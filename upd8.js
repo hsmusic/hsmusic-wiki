@@ -443,7 +443,7 @@ async function writeAlbumPage(album) {
                     <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
                     <h1>${album.name}</h1>
                     <p>
-                        ${album.artist && `By ${getArtistString(album.artists)}.<br>`}
+                        ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
                         Released ${getDateString(album)}.
                     </p>
                     <ol>
