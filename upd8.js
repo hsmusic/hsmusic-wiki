@@ -84,7 +84,8 @@ const SITE_TITLE = 'Homestuck Music Wiki';
 
 const SITE_INTRO = fixWS`
     <p>Welcome to the fan-made wiki for Homestuck music! Select any album below to begin browsing.</p>
-    <p>This site was mostly made by <a href="https://twitter.com/florriestuck/">Florrie</a> as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums are all indexed in the one place, and URLs will always stay consistent. Also included are tracks for listening on Bandcamp and other services.</p>
+    <p>This site was mostly made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums are all indexed in the one place, and URLs will always stay consistent. Also included are tracks for listening on Bandcamp and other services.</p>
+    <p>This site was mostly made by <a href="https://twitter.com/florriestuck">Florrie</a>. Listings were fetched primarily from the <a href="https://homestuck.bandcamp.com">Homestuck Bandcamp</a>. Track art is primarily from the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a>. Much of this is made based on and with use of the <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom - thanks a bunch to all who've worked on that!</p>
 `;
 
 // The folder you stick your random downloads in is called "Downloads", yeah?
