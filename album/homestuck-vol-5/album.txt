@@ -45,7 +45,7 @@ Contributors:
 - Michael Guy Bowman (meows, [Chorale for Jaspers])
 -------------------------------------------------------------------------------
 Track: An Unbreakable Union
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/an-unbreakable-union-2
 -------------------------------------------------------------------------------
 Track: Skaian Ride
@@ -125,7 +125,7 @@ Artist: Mark Hadley
 URLs: https://homestuck.bandcamp.com/track/bed-of-roses-dreams-of-derse-2
 -------------------------------------------------------------------------------
 Track: Skaian Flight
-Artist: Robert Blaker
+Artist: Kalibration
 Contributors: Andrew Huo ([Skaian Ride])
 URLs: https://homestuck.bandcamp.com/track/skaian-flight-2
 -------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ Artist: Steve Everson
 URLs: https://homestuck.bandcamp.com/track/throwdown-2
 -------------------------------------------------------------------------------
 Track: Valhalla
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/valhalla-2
 -------------------------------------------------------------------------------
 Track: Amphibious Subterrain

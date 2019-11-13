@@ -142,7 +142,7 @@ Artist: Robert J! Lake, Thomas Ferkol
 URLs: https://homestuck.bandcamp.com/track/threes-a-crowd-2
 -------------------------------------------------------------------------------
 Track: Break Shot
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/break-shot-2
 -------------------------------------------------------------------------------
 Track: Portrait
@@ -192,7 +192,7 @@ Artist: Thomas Ferkol
 URLs: https://homestuck.bandcamp.com/track/cairo-overcoat-2
 -------------------------------------------------------------------------------
 Track: Battle Against an Unfathomable Enemy
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/battle-against-an-unfathomable-enemy-2
 -------------------------------------------------------------------------------
 Track: Noirscape

@@ -14,7 +14,7 @@ URLs: https://homestuck.bandcamp.com/track/courser-2
 -------------------------------------------------------------------------------
 Track: Umbral Ultimatum
 Artist: Toby Fox
-Contributors: Robert Blaker ([An Unbreakable Union]), Alexander Rosetti ([Courser]), Seth Peelle ([Courser]), Mark Hadley ([Carefree Action]), Clark Powell ([Homestuck Anthem])
+Contributors: Kalibration ([An Unbreakable Union]), Alexander Rosetti ([Courser]), Seth Peelle ([Courser]), Mark Hadley ([Carefree Action]), Clark Powell ([Homestuck Anthem])
 URLs: https://homestuck.bandcamp.com/track/umbral-ultimatum-2
 -------------------------------------------------------------------------------
 Track: GameBro (Original 1990 Mix)

@@ -14,12 +14,12 @@ URLs: https://homestuck.bandcamp.com/track/at-the-price-of-oblivion-2
 -------------------------------------------------------------------------------
 Track: Even in Death
 Artist: Clark Powell
-Contributors: Robert Blaker ([Upward Movement (Dave Owns)])
+Contributors: Kalibration ([Upward Movement (Dave Owns)])
 URLs: https://homestuck.bandcamp.com/track/even-in-death-2
 -------------------------------------------------------------------------------
 Track: Terezi Owns
 Artist: Toby Fox
-Contributors: Robert Blaker ([Upward Movement (Dave Owns)])
+Contributors: Kalibration ([Upward Movement (Dave Owns)])
 URLs: https://homestuck.bandcamp.com/track/terezi-owns-2
 -------------------------------------------------------------------------------
 Track: Trial and Execution
@@ -50,7 +50,7 @@ Artist: Thomas Ferkol
 URLs: https://homestuck.bandcamp.com/track/havoc-to-be-wrought-2
 -------------------------------------------------------------------------------
 Track: Play The Wind
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/play-the-wind-2
 -------------------------------------------------------------------------------
 Track: Rumble at the Rink

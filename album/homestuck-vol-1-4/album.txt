@@ -77,7 +77,7 @@ Original Date: December 14, 2009
 -------------------------------------------------------------------------------
 Track: Upward Movement (Dave Owns)
 Directory: upward-movement-dave-owns
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/upward-movement-dave-owns-3
 Original Date: December 14, 2009
 -------------------------------------------------------------------------------
@@ -116,14 +116,14 @@ Original Date: December 14, 2009
 -------------------------------------------------------------------------------
 Track: Verdancy (Bassline)
 Directory: verdancy-bassline
-Artist: Robert Blaker
+Artist: Kalibration
 URLs: https://homestuck.bandcamp.com/track/verdancy-bassline-3
 Original Date: December 14, 2009
 -------------------------------------------------------------------------------
 Track: Potential Verdancy
 Directory: potential-verdancy
 Artist: Robert J! Lake
-Contributors: Robert Blaker ([Verdancy])
+Contributors: Kalibration ([Verdancy])
 URLs: https://homestuck.bandcamp.com/track/potential-verdancy-2
 Original Date: October 24, 2011
 -------------------------------------------------------------------------------
