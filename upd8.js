@@ -80,7 +80,12 @@ const {
     splitArray
 } = require('./upd8-util');
 
-const SITE_TITLE = 'Homestuck';
+const SITE_TITLE = 'Homestuck Music Wiki';
+
+const SITE_INTRO = fixWS`
+    <p>Welcome to the fan-made wiki for Homestuck music! Select any album below to begin browsing.</p>
+    <p>This site was mostly made by <a href="https://twitter.com/florriestuck/">Florrie</a> as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums are all indexed in the one place, and URLs will always stay consistent. Also included are tracks for listening on Bandcamp and other services.</p>
+`;
 
 // The folder you stick your random downloads in is called "Downloads", yeah?
 // (Unless you sort all your downloads into manual, organized locations. Good
@@ -403,6 +408,9 @@ async function writeTopIndexPage(albumData) {
             <body id="top-index">
                 <div id="content">
                     <h1>${SITE_TITLE}</h1>
+                    <div id="intro">
+                        ${SITE_INTRO}
+                    </div>
                     <div class="grid-listing">
                         ${albumData.map(album => fixWS`
                             <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">

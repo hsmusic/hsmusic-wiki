@@ -147,3 +147,7 @@ li.contributed-only-original {
     text-align: center;
     font-size: 2em;
 }
+
+#intro {
+    margin: 24px 12%;
+}
