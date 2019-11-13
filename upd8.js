@@ -221,7 +221,7 @@ async function processAlbumDataFile(file) {
     const albumName = getBasicField(albumSection, 'Album');
     const albumArtists = getListField(albumSection, 'Artists') || getListField(albumSection, 'Artist');
     const albumDate = getBasicField(albumSection, 'Date');
-    const noTrackArt = (getBasicField(albumSection, 'Track Art') === 'none');
+    const albumNoTrackArt = (getBasicField(albumSection, 'Track Art') === 'none');
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
     // I don't like these varia8le names. I'm sorry. -- I only really use the
@@ -263,7 +263,6 @@ async function processAlbumDataFile(file) {
         date: dateValue,
         artists: albumArtists,
         directory: albumDirectory,
-        noTrackArt,
         theme: {
             fg: albumColorFG,
             bg: albumColorBG,
@@ -282,6 +281,7 @@ async function processAlbumDataFile(file) {
 
         const trackName = getBasicField(section, 'Track');
         const originalDate = getBasicField(section, 'Original Date');
+        const noTrackArt = (getBasicField(section, 'Track Art') === 'none') || albumNoTrackArt;
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
         let trackContributors = getListField(section, 'Contributors') || [];
         let trackDirectory = getBasicField(section, 'Directory');
@@ -346,6 +346,7 @@ async function processAlbumDataFile(file) {
             artists: trackArtists,
             contributors: trackContributors,
             date,
+            noTrackArt,
             directory: trackDirectory,
             urls: trackURLs,
             // 8ack-reference the al8um o8ject! This is very useful for when
@@ -644,7 +645,7 @@ function getAlbumCover(album) {
 function getTrackCover(track) {
     // Some al8ums don't have any track art at all, and in those, every track
     // just inherits the al8um's own cover art.
-    if (track.album.noTrackArt) {
+    if (track.noTrackArt) {
         return getAlbumCover(track.album);
     } else {
         return `${ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.jpg`;
