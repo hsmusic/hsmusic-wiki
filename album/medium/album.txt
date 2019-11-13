@@ -1,0 +1,30 @@
+Album: Medium
+Artist: Clark Powell
+Date: April 14, 2011
+FG: #22ccff
+-------------------------------------------------------------------------------
+Track: Light
+Directory: light-medium
+URLs: https://homestuck.bandcamp.com/track/light-4
+-------------------------------------------------------------------------------
+Track: Shade
+URLs: https://homestuck.bandcamp.com/track/shade-2
+-------------------------------------------------------------------------------
+Track: Rain
+URLs: https://homestuck.bandcamp.com/track/rain-2
+-------------------------------------------------------------------------------
+Track: Frogs
+URLs: https://homestuck.bandcamp.com/track/frogs-2
+-------------------------------------------------------------------------------
+Track: Frost
+Directory: frost-medium
+URLs: https://homestuck.bandcamp.com/track/frost-4
+-------------------------------------------------------------------------------
+Track: Clockwork
+URLs: https://homestuck.bandcamp.com/track/clockwork-2
+-------------------------------------------------------------------------------
+Track: Heat
+URLs: https://homestuck.bandcamp.com/track/heat-2
+-------------------------------------------------------------------------------
+Track: Wind
+URLs: https://homestuck.bandcamp.com/track/wind-2

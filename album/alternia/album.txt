@@ -1,0 +1,58 @@
+Album: Alternia
+Artist: Toby Fox
+Date: July 18, 2010
+FG: #cc44ff
+-------------------------------------------------------------------------------
+Track: Crustacean
+URLs: https://homestuck.bandcamp.com/track/crustacean-2
+-------------------------------------------------------------------------------
+Track: Showdown
+URLs: https://homestuck.bandcamp.com/track/showdown-2
+-------------------------------------------------------------------------------
+Track: mIrAcLeS
+URLs: https://homestuck.bandcamp.com/track/miracles-2
+-------------------------------------------------------------------------------
+Track: The Lemonsnout Turnabout
+URLs: https://homestuck.bandcamp.com/track/the-lemonsnout-turnabout-2
+-------------------------------------------------------------------------------
+Track: Phaze and Blood
+URLs: https://homestuck.bandcamp.com/track/phaze-and-blood-2
+-------------------------------------------------------------------------------
+Track: psych0ruins
+URLs: https://homestuck.bandcamp.com/track/psych0ruins-2
+-------------------------------------------------------------------------------
+Track: Walls Covered in Blood
+URLs: https://homestuck.bandcamp.com/track/walls-covered-in-blood-2
+-------------------------------------------------------------------------------
+Track: dESPERADO ROCKET CHAIRS,
+URLs: https://homestuck.bandcamp.com/track/desperado-rocket-chairs-2
+-------------------------------------------------------------------------------
+Track: Death of the Lusii
+URLs: https://homestuck.bandcamp.com/track/death-of-the-lusii-2
+-------------------------------------------------------------------------------
+Track: Virgin Orb
+URLs: https://homestuck.bandcamp.com/track/virgin-orb-2
+-------------------------------------------------------------------------------
+Track: The La2t Frontier
+URLs: https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
+-------------------------------------------------------------------------------
+Track: Skaian Summoning
+URLs: https://homestuck.bandcamp.com/track/skaian-summoning-2
+-------------------------------------------------------------------------------
+Track: The Thirteenth Hour
+URLs: https://homestuck.bandcamp.com/track/the-thirteenth-hour-2
+-------------------------------------------------------------------------------
+Track: Spider's Claw
+URLs: https://homestuck.bandcamp.com/track/spiders-claw
+-------------------------------------------------------------------------------
+Track: Staring
+URLs: https://homestuck.bandcamp.com/track/staring
+-------------------------------------------------------------------------------
+Track: Keepers
+URLs: https://homestuck.bandcamp.com/track/keepers
+-------------------------------------------------------------------------------
+Track: Theme
+URLs: https://homestuck.bandcamp.com/track/theme-2
+-------------------------------------------------------------------------------
+Track: Walls Covered in Blood DX
+URLs: https://homestuck.bandcamp.com/track/walls-covered-in-blood-dx-2

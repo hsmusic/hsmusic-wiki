@@ -1,0 +1,71 @@
+Album: The Felt
+Date: December 2 2010
+FG: #33aa55
+-------------------------------------------------------------------------------
+Track: Jade Dragon
+Artist: Robert J! Lake
+URLs: https://homestuck.bandcamp.com/track/jade-dragon-2
+-------------------------------------------------------------------------------
+Track: Swing of the Clock
+Artist: Solatrus
+URLs: https://homestuck.bandcamp.com/track/swing-of-the-clock-2
+-------------------------------------------------------------------------------
+Track: Rhapsody in Green
+Artist: Clark Powell
+URLs: https://homestuck.bandcamp.com/track/rhapsody-in-green-2
+-------------------------------------------------------------------------------
+Track: Humphrey's Lullaby
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/humphreys-lullaby-2
+-------------------------------------------------------------------------------
+Track: Clockwork Reversal
+Artist: Thomas Ferkol
+URLs: https://homestuck.bandcamp.com/track/clockwork-reversal-2
+-------------------------------------------------------------------------------
+Track: Chartreuse Rewind
+Artist: Solatrus
+URLs: https://homestuck.bandcamp.com/track/chartreuse-rewind-2
+-------------------------------------------------------------------------------
+Track: The Broken Clock
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/the-broken-clock-2
+-------------------------------------------------------------------------------
+Track: Apocryphal Antithesis
+Artist: Clark Powell
+URLs: https://homestuck.bandcamp.com/track/apocryphal-antithesis-2
+-------------------------------------------------------------------------------
+Track: Trails
+Artist: Mark Hadley
+URLs: https://homestuck.bandcamp.com/track/trails-2
+-------------------------------------------------------------------------------
+Track: Baroqueback Bowtier (Scratch's Lament)
+Artist: Clark Powell
+URLs: https://homestuck.bandcamp.com/track/baroqueback-bowtier-scratchs-lament-2
+-------------------------------------------------------------------------------
+Track: Scratch
+Artist: David Ko
+URLs: https://homestuck.bandcamp.com/track/scratch-2
+-------------------------------------------------------------------------------
+Track: Omelette Sandwich
+Artist: Mark Hadley
+URLs: https://homestuck.bandcamp.com/track/omelette-sandwich-2
+-------------------------------------------------------------------------------
+Track: Temporal Piano
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/temporal-piano-2
+-------------------------------------------------------------------------------
+Track: Time Paradox
+Artist: Thomas Ferkol
+URLs: https://homestuck.bandcamp.com/track/time-paradox-2
+-------------------------------------------------------------------------------
+Track: Eldritch
+Artist: Alexander Rosetti
+URLs: https://homestuck.bandcamp.com/track/eldritch-2
+-------------------------------------------------------------------------------
+Track: English
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/english-2
+-------------------------------------------------------------------------------
+Track: Variations
+Artist: Robert J! Lake
+URLs: https://homestuck.bandcamp.com/track/variations-2

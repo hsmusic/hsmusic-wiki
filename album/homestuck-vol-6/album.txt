@@ -1,0 +1,100 @@
+Album: Homestuck Vol. 6: Heir Transparent
+Directory: homestuck-vol-6
+Date: January 5 2011
+FG: #6699ff
+-------------------------------------------------------------------------------
+Track: Frost
+Artist: Solatrus
+Directory: frost-vol6
+URLs: https://homestuck.bandcamp.com/track/frost-3
+-------------------------------------------------------------------------------
+Track: Courser
+Artist: Seth Peelle, Alexander Rosetti
+URLs: https://homestuck.bandcamp.com/track/courser-2
+-------------------------------------------------------------------------------
+Track: Umbral Ultimatum
+Artist: Toby Fox
+Contributors: Robert Blaker ([An Unbreakable Union]), Alexander Rosetti ([Courser]), Seth Peelle ([Courser]), Mark Hadley ([Carefree Action]), Clark Powell ([Homestuck Anthem])
+URLs: https://homestuck.bandcamp.com/track/umbral-ultimatum-2
+-------------------------------------------------------------------------------
+Track: GameBro (Original 1990 Mix)
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/gamebro-original-1990-mix-2
+-------------------------------------------------------------------------------
+Track: Tribal Ebonpyre
+Artist: Erik Scheele
+Contributors: Toby Fox ([Atomyk Ebonpyre])
+URLs: https://homestuck.bandcamp.com/track/tribal-ebonpyre-2
+-------------------------------------------------------------------------------
+Track: I Don't Want to Miss a Thing
+Artist: Michael Guy Bowman
+Contributors: Aerosmith (original), Dianne Warren (lyrics)
+URLs: https://homestuck.bandcamp.com/track/i-dont-want-to-miss-a-thing-2
+-------------------------------------------------------------------------------
+Track: MeGaLoVania
+Artist: Toby Fox
+Directory: MeGaLoVania
+Contributors: Tensei (guitar)
+URLs: https://homestuck.bandcamp.com/track/megalovania-2
+-------------------------------------------------------------------------------
+Track: Walk-Stab-Walk (R&E)
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/walk-stab-walk-r-e-2
+-------------------------------------------------------------------------------
+Track: Gaia Queen
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/gaia-queen-2
+-------------------------------------------------------------------------------
+Track: Elevatorstuck
+Artist: Tensei
+Contributors: Clark Powell ([Homestuck Anthem])
+URLs: https://homestuck.bandcamp.com/track/elevatorstuck-2
+-------------------------------------------------------------------------------
+Track: Wacky Antics
+Artist: David Ko, Toby Fox
+URLs: https://homestuck.bandcamp.com/track/wacky-antics-2
+-------------------------------------------------------------------------------
+Track: Horschestra
+Artist: Alexander Rosetti
+URLs: https://homestuck.bandcamp.com/track/horschestra-2
+-------------------------------------------------------------------------------
+Track: Heir Transparent
+Artist: Robert J! Lake
+Contributors: Buzinkai ([Doctor])
+URLs: https://homestuck.bandcamp.com/track/heir-transparent-2
+-------------------------------------------------------------------------------
+Track: Boy Skylark (Brief)
+Artist: Robert J! Lake
+URLs: https://homestuck.bandcamp.com/track/boy-skylark-brief-2
+-------------------------------------------------------------------------------
+Track: Squidissension
+Artist: Mark Hadley
+Contributors: Alexander Rosetti ([Squiddles!]), David Ko ([Dissension])
+URLs: https://homestuck.bandcamp.com/track/squidissension-2
+-------------------------------------------------------------------------------
+Track: Blackest Heart
+Artist: Mark Hadley
+Contributors: Toby Fox ([Black])
+URLs: https://homestuck.bandcamp.com/track/blackest-heart-2
+-------------------------------------------------------------------------------
+Track: Nic Cage Song
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/nic-cage-song-2
+-------------------------------------------------------------------------------
+Track: Phrenic Phever
+Artist: Clark Powell
+URLs: https://homestuck.bandcamp.com/track/phrenic-phever-2
+-------------------------------------------------------------------------------
+Track: 3 In The Morning (Pianokind)
+Artist: Erik Scheele
+Contributors: Clark Powell ([Three in the Morning])
+URLs: https://homestuck.bandcamp.com/track/3-in-the-morning-pianokind-2
+-------------------------------------------------------------------------------
+Track: A Tender Moment
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/a-tender-moment-2
+-------------------------------------------------------------------------------
+Track: Crystalanthology
+Artist: Solatrus
+Contributors: Alexander Rosetti ([Crystalanthemums])
+URLs: https://homestuck.bandcamp.com/track/crystalanthology-2

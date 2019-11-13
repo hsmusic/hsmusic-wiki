@@ -1,0 +1,25 @@
+Album: Symphony Impossible to Play
+Artist: Clark Powell
+Date: August 1, 2012
+FG: #dd5544
+-------------------------------------------------------------------------------
+Track: I - Overture
+Directory: overture
+URLs: https://homestuck.bandcamp.com/track/i-overture-2
+Contributors:
+- Alexander Rosetti ([Crystalanthemums])
+- Buzinkai ([Endless Climb], [Doctor], [Explore])
+- Toby Fox ([Atomyk Ebonpyre])
+-------------------------------------------------------------------------------
+Track: II - Sarabande
+Directory: sarabande-symphony
+Contributors: Erik Scheele ([Sarabande])
+URLs: https://homestuck.bandcamp.com/track/ii-sarabande-2
+-------------------------------------------------------------------------------
+Track: III - Serenade
+Directory: serenade-symphony
+URLs: https://homestuck.bandcamp.com/track/iii-serenade-2
+-------------------------------------------------------------------------------
+Track: IV - Anthem
+Directory: anthem
+URLs: https://homestuck.bandcamp.com/track/iv-anthem-2

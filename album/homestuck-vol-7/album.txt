@@ -1,0 +1,93 @@
+Album: Homestuck Vol. 7: At the Price of Oblivion
+Directory: homestuck-vol-7
+Date: May 31, 2011
+FG: #b536da
+-------------------------------------------------------------------------------
+Track: Black Rose / Green Sun
+Artist: Malcolm Brown
+URLs: https://homestuck.bandcamp.com/track/black-rose-green-sun-2
+-------------------------------------------------------------------------------
+Track: At The Price of Oblivion
+Artist: Malcolm Brown
+Contributors: Michael Guy Bowman ([Chorale for Jaspers]), Mark Hadley ([Aggrieve])
+URLs: https://homestuck.bandcamp.com/track/at-the-price-of-oblivion-2
+-------------------------------------------------------------------------------
+Track: Even in Death
+Artist: Clark Powell
+Contributors: Robert Blaker ([Upward Movement (Dave Owns)])
+URLs: https://homestuck.bandcamp.com/track/even-in-death-2
+-------------------------------------------------------------------------------
+Track: Terezi Owns
+Artist: Toby Fox
+Contributors: Robert Blaker ([Upward Movement (Dave Owns)])
+URLs: https://homestuck.bandcamp.com/track/terezi-owns-2
+-------------------------------------------------------------------------------
+Track: Trial and Execution
+Artist: Malcolm Brown
+Contributors: Toby Fox ([Lemonsnout Turnabout]), Alexander Rosetti ([Crystalanthemums])
+URLs: https://homestuck.bandcamp.com/track/trial-and-execution-2
+-------------------------------------------------------------------------------
+Track: The Carnival
+Artist: Erik Scheele
+Contributors: Mark Hadley ([Harlequin])
+URLs: https://homestuck.bandcamp.com/track/the-carnival-2
+-------------------------------------------------------------------------------
+Track: Spider8reath
+Artist: Tensei
+Contributors: Toby Fox ([Spider's Claw])
+URLs: https://homestuck.bandcamp.com/track/spider8reath-2
+-------------------------------------------------------------------------------
+Track: Lifdoff
+Artist: Malcolm Brown
+URLs: https://homestuck.bandcamp.com/track/lifdoff-2
+-------------------------------------------------------------------------------
+Track: Awakening
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/awakening-2
+-------------------------------------------------------------------------------
+Track: Havoc To Be Wrought
+Artist: Thomas Ferkol
+URLs: https://homestuck.bandcamp.com/track/havoc-to-be-wrought-2
+-------------------------------------------------------------------------------
+Track: Play The Wind
+Artist: Robert Blaker
+URLs: https://homestuck.bandcamp.com/track/play-the-wind-2
+-------------------------------------------------------------------------------
+Track: Rumble at the Rink
+Artist: Toby Fox
+URLs: https://homestuck.bandcamp.com/track/rumble-at-the-rink-2
+-------------------------------------------------------------------------------
+Track: Let's All Rock the Heist
+Artist: Robert J! Lake
+URLs: https://homestuck.bandcamp.com/track/lets-all-rock-the-heist-2
+-------------------------------------------------------------------------------
+Track: WSW-Beatdown
+Artist: Erik Scheele
+Contributors: Curt Blakeslee ([Beatdown (Strider Style)])
+URLs: https://homestuck.bandcamp.com/track/wsw-beatdown-2
+-------------------------------------------------------------------------------
+Track: Earthsea Borealis
+Artist: Toby Fox
+Contributors: Buzinkai ([Endless Climb])
+URLs: https://homestuck.bandcamp.com/track/earthsea-borealis-2
+-------------------------------------------------------------------------------
+Track: Warhammer of Zillyhoo
+Artist: Michael Guy Bowman
+URLs: https://homestuck.bandcamp.com/track/warhammer-of-zillyhoo-2
+-------------------------------------------------------------------------------
+Track: Savior of the Dreaming Dead
+Artist: Malcolm Brown
+Contributors: Buzinkai ([Doctor]), Toby Fox ([Savior of the Waking World])
+URLs: https://homestuck.bandcamp.com/track/savior-of-the-dreaming-dead-2
+-------------------------------------------------------------------------------
+Track: Maplehoof's Adventure
+Artist: Michael Guy Bowman
+URLs: https://homestuck.bandcamp.com/track/maplehoofs-adventure-2
+-------------------------------------------------------------------------------
+Track: Sburban Reversal
+Artist: Mark Hadley
+URLs: https://homestuck.bandcamp.com/track/sburban-reversal-2
+-------------------------------------------------------------------------------
+Track: White Host, Green Room
+Artist: Tensei
+URLs: https://homestuck.bandcamp.com/track/white-host-green-room-2

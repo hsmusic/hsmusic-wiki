@@ -1,0 +1,149 @@
+/* A frontend file! Wow.
+ * This file is just loaded statically 8y <link>s in the HTML files, so there's
+ * no need to re-run upd8.js when tweaking values here. Handy!
+ */
+
+/* Pages can specify their own theme colors (used for links, and may8e other
+ * things) by changing this CSS varia8le through their 8ody's style attri8ute.
+ * And yes, CSS varia8les are supported in 8asically every major 8rowser.
+ * No, I don't care a8out Internet Explorer.
+ */
+:root {
+    --fg-color: #0088ff;
+    --bg-color: #222222;
+    --theme: 0; /* 0: dark (below light), 1: light (below dark) */
+}
+
+body {
+    background-color: var(--bg-color);
+
+    --bg-shade: calc(255 * var(--theme));
+    --fg-shade: calc(255 * (1 - var(--theme)));
+
+    color: rgb(var(--fg-shade), var(--fg-shade), var(--fg-shade));
+
+    display: flex;
+    padding: 15px;
+}
+
+a {
+    color: var(--fg-color);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#sidebar, #content {
+    background-color: rgba(var(--bg-shade), var(--bg-shade), var(--bg-shade), 0.6);
+    border: 1px dotted var(--fg-color);
+    border-radius: 3px;
+}
+
+#sidebar {
+    flex: 1 1 20%;
+    max-width: 250px;
+    float: left;
+    padding: 20px 5px;
+    margin-right: 10px;
+    font-size: 0.85em;
+    height: 100%;
+}
+
+#content {
+    padding: 20px;
+}
+
+#sidebar h1 {
+    font-size: 1.25em;
+    text-align: center;
+}
+
+#sidebar h2 {
+    font-size: 1.1em;
+    text-align: center;
+    margin: 0;
+}
+
+#sidebar hr {
+    color: #555;
+    margin: 10px 5px;
+}
+
+#sidebar ol {
+    padding-left: 30px;
+    padding-right: 15px;
+}
+
+#sidebar li.current-track {
+    font-weight: 800;
+}
+
+#sidebar li {
+    overflow-wrap: break-word;
+}
+
+#content {
+    flex-grow: 1;
+}
+
+#cover-art {
+    float: right;
+    width: 40%;
+    max-width: 400px;
+    margin: 0 0 10px 10px;
+    background-color: #181818;
+    border: 2px solid var(--fg-color);
+}
+
+#cover-art img {
+    width: 100%;
+    display: block;
+}
+
+h1 {
+    font-size: 1.5em;
+}
+
+#content li {
+    margin-bottom: 4px;
+}
+
+#content li i {
+    white-space: nowrap;
+}
+
+.grid-listing {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid-listing > .grid-item {
+    flex: 1 1 0;
+    display: inline-block;
+    min-width: 120px;
+    max-width: 240px;
+    margin: 15px;
+    text-align: center;
+    background-color: #111111;
+    border: 1px dotted var(--fg-color);
+    border-radius: 2px;
+    padding: 5px;
+}
+
+.grid-listing > .grid-item > img {
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+li.contributed-only-original {
+    opacity: 0.7;
+}
+
+#top-index #content h1 {
+    text-align: center;
+    font-size: 2em;
+}

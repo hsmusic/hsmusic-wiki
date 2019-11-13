@@ -1,0 +1,31 @@
+Album: Mobius Trip and Hadron Kaleido
+Artist: Michael Guy Bowman
+Date: May 31, 2011
+FG: #eecc22
+-------------------------------------------------------------------------------
+Track: Forever
+URLs: https://bowman.bandcamp.com/track/forever
+-------------------------------------------------------------------------------
+Track: Dawn of Man
+URLs: https://bowman.bandcamp.com/track/dawn-of-man
+-------------------------------------------------------------------------------
+Track: Beta Version
+URLs: https://bowman.bandcamp.com/track/beta-version
+-------------------------------------------------------------------------------
+Track: No Release
+URLs: https://bowman.bandcamp.com/track/no-release
+-------------------------------------------------------------------------------
+Track: Fly
+URLs: https://bowman.bandcamp.com/track/fly
+-------------------------------------------------------------------------------
+Track: Lies With The Sea
+URLs: https://bowman.bandcamp.com/track/lies-with-the-sea
+-------------------------------------------------------------------------------
+Track: Chain Of Prospit
+URLs: https://bowman.bandcamp.com/track/chain-of-prospit
+-------------------------------------------------------------------------------
+Track: Pumpkin Tide
+URLs: https://bowman.bandcamp.com/track/pumpkin-tide
+-------------------------------------------------------------------------------
+Track: The Deeper You Go
+URLs: https://bowman.bandcamp.com/track/the-deeper-you-go
