@@ -509,15 +509,13 @@ async function writeTrackPage(track, albumData) {
                             `).join('\n')}
                         </ul>
                     `}
-                    <p>Listen:</p>
-                    <ul>
-                        ${track.urls.map(url => fixWS`
-                            <li><a href="${url}">${
-                                url.includes('bandcamp.com') ? 'Bandcamp' :
-                                url.includes('youtu') ? 'YouTube' :
-                                '(External)'
-                            }</a></li>
-                        `)}
+                    <p>Listen: ${joinNoOxford(track.urls.map(url => fixWS`
+                        <a href="${url}">${
+                            url.includes('bandcamp.com') ? 'Bandcamp' :
+                            url.includes('youtu') ? 'YouTube' :
+                            '(External)'
+                        }</a>
+                    `))}</p>
                     </ul>
                 </div>
             </body>
