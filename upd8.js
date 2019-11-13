@@ -221,6 +221,7 @@ async function processAlbumDataFile(file) {
     const albumName = getBasicField(albumSection, 'Album');
     const albumArtists = getListField(albumSection, 'Artists') || getListField(albumSection, 'Artist');
     const albumDate = getBasicField(albumSection, 'Date');
+    const noTrackArt = (getBasicField(albumSection, 'Track Art') === 'none');
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
     // I don't like these varia8le names. I'm sorry. -- I only really use the
@@ -262,6 +263,7 @@ async function processAlbumDataFile(file) {
         date: dateValue,
         artists: albumArtists,
         directory: albumDirectory,
+        noTrackArt,
         theme: {
             fg: albumColorFG,
             bg: albumColorBG,
@@ -644,13 +646,7 @@ function getAlbumCover(album) {
 function getTrackCover(track) {
     // Some al8ums don't have any track art at all, and in those, every track
     // just inherits the al8um's own cover art.
-    // TODO: Don't hard-c8de this!
-    if ([
-        'homestuck-vol-5',
-        'squiddles',
-        'medium',
-        'symphony-impossible-to-play'
-    ].includes(track.album.directory)) {
+    if (track.album.noTrackArt) {
         return getAlbumCover(track.album);
     } else {
         return `${ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.jpg`;

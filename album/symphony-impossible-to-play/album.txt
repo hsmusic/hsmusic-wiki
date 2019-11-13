@@ -1,6 +1,7 @@
 Album: Symphony Impossible to Play
 Artist: Clark Powell
 Date: August 1, 2012
+Track Art: none
 FG: #dd5544
 -------------------------------------------------------------------------------
 Track: I - Overture
