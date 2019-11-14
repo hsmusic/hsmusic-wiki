@@ -217,12 +217,59 @@ async function processAlbumDataFile(file) {
         return listLines.map(line => line.slice(2));
     };
 
+    const getContributionField = (section, name) => {
+        let contributors = getListField(section, name);
+
+        if (!contributors) {
+            return null;
+        }
+
+        contributors = contributors.map(contrib => {
+            // 8asically, the format is "Who (What)", or just "Who". 8e sure to
+            // keep in mind that "what" doesn't necessarily have a value!
+            const match = contrib.match(/^(.*?)( \((.*)\))?$/);
+            if (!match) {
+                return contrib;
+            }
+            const who = match[1];
+            const what = match[3] || null;
+            return {who, what};
+        });
+
+        const badContributor = contributors.find(val => typeof val === 'string');
+        if (badContributor) {
+            return {error: `An entry has an incorrectly formatted contributor, "${badContributor}".`};
+        }
+
+        if (contributors.length === 1 && contributors[0].who === 'none') {
+            return null;
+        }
+
+        return contributors;
+    };
+
     const albumSection = sections[0];
     const albumName = getBasicField(albumSection, 'Album');
     const albumArtists = getListField(albumSection, 'Artists') || getListField(albumSection, 'Artist');
     const albumDate = getBasicField(albumSection, 'Date');
-    const albumNoTrackArt = (getBasicField(albumSection, 'Track Art') === 'none');
+    const albumCoverArtists = getContributionField(albumSection, 'Cover Art');
+    const albumHasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
+    const albumTrackCoverArtists = getContributionField(albumSection, 'Track Art');
     let albumDirectory = getBasicField(albumSection, 'Directory');
+
+    if (albumCoverArtists && albumCoverArtists.error) {
+        return albumCoverArtists;
+    }
+
+    if (albumTrackCoverArtists && albumTrackCoverArtists.error) {
+        return albumTrackCoverArtists.error;
+    }
+
+    if (!albumCoverArtists) {
+        // The Squiddles al8um doesn't have any kind of cover art attri8ution
+        // seemingly anywhere, so... just leaving this commented out for now.
+        // console.warn(`The album "${albumName}" is missing the "Cover Art" field.`);
+    }
 
     // I don't like these varia8le names. I'm sorry. -- I only really use the
     // FG theme in the Homestuck wiki site (at least as of this writing), since
@@ -262,6 +309,7 @@ async function processAlbumDataFile(file) {
         name: albumName,
         date: dateValue,
         artists: albumArtists,
+        coverArtists: albumCoverArtists,
         directory: albumDirectory,
         theme: {
             fg: albumColorFG,
@@ -281,10 +329,14 @@ async function processAlbumDataFile(file) {
 
         const trackName = getBasicField(section, 'Track');
         const originalDate = getBasicField(section, 'Original Date');
-        const noTrackArt = (getBasicField(section, 'Track Art') === 'none') || albumNoTrackArt;
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
-        let trackContributors = getListField(section, 'Contributors') || [];
+        let trackCoverArtists = getContributionField(section, 'Track Art');
+        let trackContributors = getContributionField(section, 'Contributors') || [];
         let trackDirectory = getBasicField(section, 'Directory');
+
+        if (trackContributors.error) {
+            return trackContributors;
+        }
 
         if (!trackName) {
             return {error: 'A track section is missing the "Track" (name) field.'};
@@ -301,28 +353,23 @@ async function processAlbumDataFile(file) {
             }
         }
 
-        if (!trackDirectory) {
-            trackDirectory = getKebabCase(trackName);
+        if (!trackCoverArtists) {
+            if (albumHasTrackArt) {
+                if (albumTrackCoverArtists) {
+                    trackCoverArtists = albumTrackCoverArtists;
+                } else {
+                    // TODO: return an error!
+                    // console.warn(`The track "${trackName}" is missing the "Track Art" field.`);
+                }
+            }
         }
 
-        trackContributors = trackContributors.map(contrib => {
-            // 8asically, the format is "Who (What)", or just "Who". 8e sure to
-            // keep in mind that "what" doesn't necessarily have a value!
-            const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-            if (!match) {
-                return contrib;
-            }
-            const who = match[1];
-            const what = match[3] || null;
-            if (!what) {
-                console.log(trackName, '-\t', albumName, '-\t', who);
-            }
-            return {who, what};
-        });
+        if (trackCoverArtists && trackCoverArtists.length && [0] === 'none') {
+            trackCoverArtists = null;
+        }
 
-        const badContributor = trackContributors.find(val => typeof val === 'string');
-        if (badContributor) {
-            return {error: `The track "${trackName}" has an incorrectly formatted contributor, "${badContributor}".`};
+        if (!trackDirectory) {
+            trackDirectory = getKebabCase(trackName);
         }
 
         let date;
@@ -344,9 +391,9 @@ async function processAlbumDataFile(file) {
         tracks.push({
             name: trackName,
             artists: trackArtists,
+            coverArtists: trackCoverArtists,
             contributors: trackContributors,
             date,
-            noTrackArt,
             directory: trackDirectory,
             urls: trackURLs,
             // 8ack-reference the al8um o8ject! This is very useful for when
@@ -394,7 +441,9 @@ function getDateString({ date }) {
 }
 
 function getArtistNames(albumData) {
-    return Array.from(new Set(albumData.reduce((acc, album) => acc.concat(album.tracks.reduce((acc, track) => acc.concat(track.artists), [])), [])));
+    return Array.from(new Set(
+        albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), [])
+    ));
 }
 
 async function writeTopIndexPage(albumData) {
@@ -431,11 +480,12 @@ async function writeTopIndexPage(albumData) {
 
 // This function title is my gr8test work of art.
 async function writeIndexAndTrackPagesForAlbum(album, albumData) {
-    await writeAlbumPage(album);
+    await writeAlbumPage(album, albumData);
     await Promise.all(album.tracks.map(track => writeTrackPage(track, albumData)));
 }
 
-async function writeAlbumPage(album) {
+async function writeAlbumPage(album, albumData) {
+    const allTracks = getAllTracks(albumData);
     const albumDirectory = path.join(ALBUM_DIRECTORY, album.directory);
     await mkdirp(albumDirectory);
     await writeFile(path.join(albumDirectory, 'index.html'), fixWS`
@@ -456,6 +506,9 @@ async function writeAlbumPage(album) {
                     <h1>${album.name}</h1>
                     <p>
                         ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
+                        ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
+                            <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                        `))}.<br>`}
                         Released ${getDateString(album)}.
                     </p>
                     <ol>
@@ -497,6 +550,9 @@ async function writeTrackPage(track, albumData) {
                     <h1>${track.name}</h1>
                     <p>
                         By ${getArtistString(track.artists)}.<br>
+                        ${track.coverArtists && `Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
+                            <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                        `))}.<br>`}
                         Released ${getDateString(track)}.
                     </p>
                     ${track.contributors.length && fixWS`
@@ -510,13 +566,13 @@ async function writeTrackPage(track, albumData) {
                             `).join('\n')}
                         </ul>
                     `}
-                    <p>Listen: ${joinNoOxford(track.urls.map(url => fixWS`
+                    <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
                         <a href="${url}">${
                             url.includes('bandcamp.com') ? 'Bandcamp' :
                             url.includes('youtu') ? 'YouTube' :
                             '(External)'
                         }</a>
-                    `))}</p>
+                    `), 'or')}.</p>
                     </ul>
                 </div>
             </body>
@@ -529,7 +585,9 @@ async function writeArtistPages(albumData) {
 }
 
 async function writeArtistPage(artistName, albumData) {
-    const tracks = sortByDate(getAllTracks(albumData).filter(track => track.artists.includes(artistName) || track.contributors.some(({ who }) => who === artistName)));
+    const allTracks = getAllTracks(albumData);
+    const tracks = sortByDate(allTracks.filter(track => track.artists.includes(artistName) || track.contributors.some(({ who }) => who === artistName)));
+    const artThings = sortByDate(albumData.concat(allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
 
     // Shish!
     const kebab = getArtistDirectory(artistName);
@@ -551,16 +609,34 @@ async function writeArtistPage(artistName, albumData) {
                         <a id="cover-art" href="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"></a>
                     `}
                     <h1>${artistName}</h1>
-                    <ol>
-                        ${tracks.map(track => fixWS`
-                            <li class="${!track.artists.includes(artistName) && `contributed ${track.contributors.filter(({ who }) => who === artistName).every(({ what }) => what && what.startsWith('[') && what.endsWith(']')) && 'contributed-only-original'}`}">
-                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
-                                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
-                                ${!track.artists.includes(artistName) && `<span class="contributed">(${track.contributors.filter(({ who }) => who === artistName).map(contrib => getContributionString(contrib, tracks)).join(', ') || 'contributed'})</span> `}
-                                <i>from <a href="${ALBUM_DIRECTORY}/${track.album.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.album.name}</a></i>
-                            </li>
-                        `).join('\n')}
-                    </ol>
+                    ${tracks.length && fixWS`
+                        <h2>Tracks</h2>
+                        <ol>
+                            ${tracks.map(track => fixWS`
+                                <li class="${!track.artists.includes(artistName) && `contributed ${track.contributors.filter(({ who }) => who === artistName).every(({ what }) => what && what.startsWith('[') && what.endsWith(']')) && 'contributed-only-original'}`}">
+                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
+                                    ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
+                                    ${!track.artists.includes(artistName) && `<span class="contributed">(${track.contributors.filter(({ who }) => who === artistName).map(contrib => getContributionString(contrib, tracks)).join(', ') || 'contributed'})</span>`}
+                                    <i>from <a href="${ALBUM_DIRECTORY}/${track.album.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.album.name}</a></i>
+                                </li>
+                            `).join('\n')}
+                        </ol>
+                    `}
+                    ${artThings.length && fixWS`
+                        <h2>Art</h2>
+                        <ol>
+                            ${artThings.map(thing => {
+                                const contrib = thing.coverArtists.find(({ who }) => who === artistName);
+                                return fixWS`
+                                    <li>
+                                        <a href="${thing.album ? TRACK_DIRECTORY : ALBUM_DIRECTORY}/${thing.directory}/index.html"${thing.theme && ` style="${getThemeString(thing.theme)}"`}>${thing.name}</a>
+                                        ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
+                                        <i>${thing.album ? `from <a href="${ALBUM_DIRECTORY}/${thing.album.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.album.name}</a>` : `(cover art)`}</i>
+                                    </li>
+                                `
+                            }).join('\n')}
+                        </ol>
+                    `}
                 </div>
             </body>
         </html>
@@ -594,7 +670,7 @@ function getArtistDirectory(artistName) {
 }
 
 function getKebabCase(name) {
-    return name.split(' ').join('-').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').toLowerCase();
+    return name.split(' ').join('-').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
 }
 
 function generateSidebarForAlbum(album, currentTrack = null) {
@@ -645,7 +721,7 @@ function getAlbumCover(album) {
 function getTrackCover(track) {
     // Some al8ums don't have any track art at all, and in those, every track
     // just inherits the al8um's own cover art.
-    if (track.noTrackArt) {
+    if (track.coverArtists === null) {
         return getAlbumCover(track.album);
     } else {
         return `${ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.jpg`;

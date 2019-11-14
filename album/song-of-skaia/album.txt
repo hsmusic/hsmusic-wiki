@@ -1,0 +1,15 @@
+Album: Song of Skaia
+Artist: Mark Hadley
+Cover Art: minty
+Track Art: none
+Date: January 1, 2012
+FG: #02b7ff
+-------------------------------------------------------------------------------
+Track: Null
+URLs: https://parsecproductions.bandcamp.com/track/null
+-------------------------------------------------------------------------------
+Track: Skaian Birth
+URLs: https://parsecproductions.bandcamp.com/track/skaian-birth
+-------------------------------------------------------------------------------
+Track: Song of Skaia
+URLs: https://parsecproductions.bandcamp.com/track/song-of-skaia

@@ -1,6 +1,7 @@
 Album: Medium
 Artist: Clark Powell
 Date: April 14, 2011
+Cover Art: Cindry Dominguez, Andrew Hussie
 Track Art: none
 FG: #22ccff
 -------------------------------------------------------------------------------

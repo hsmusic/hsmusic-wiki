@@ -1,25 +1,31 @@
 Album: Homestuck Vol. 10
+Cover Art: Lexxy
 Date: June 12, 2016
 -------------------------------------------------------------------------------
 Track: Creata
 Artist: Seth Peelle
+Track Art: PJ Tush
 URLs: https://homestuck.bandcamp.com/track/creata-3
 -------------------------------------------------------------------------------
 Track: Train
 Artist: Buzinkai
+Track Art: Kate Holden
 URLs: https://homestuck.bandcamp.com/track/train-2
 -------------------------------------------------------------------------------
 Track: Of Gods and Witches
 Artist: Tensei
+Track Art: Archeia
 URLs: https://homestuck.bandcamp.com/track/of-gods-and-witches-2
 -------------------------------------------------------------------------------
 Track: Beatup
 Artist: Clark Powell, Astro Kid
 Contributors: Curt Blakeslee ([Beatdown])
+Track Art: Shan M.
 URLs: https://homestuck.bandcamp.com/track/beatup-2
 -------------------------------------------------------------------------------
 Track: You Killed My Father (Prepare To Die)
 Artist: Team Dogfight
+Track Art: Mika B.
 URLs: https://homestuck.bandcamp.com/track/you-killed-my-father-prepare-to-die-2
 Contributors:
 - Yishan Mai (drums, mixing)
@@ -32,15 +38,18 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: Sound Judgement
 Artist: Malcolm Brown
+Track Art: Sera B.
 Contributors: Toby Fox ([Terezi's Theme]), Mark Hadley ([Harlequin])
 URLs: https://homestuck.bandcamp.com/track/sound-judgement-2
 -------------------------------------------------------------------------------
 Track: Aggrievocation
 Artist: Mark Hadley
+Track Art: Rachel Lundin
 URLs: https://homestuck.bandcamp.com/track/aggrievocation-2
 -------------------------------------------------------------------------------
 Track: Stride
 Artist: Kalibration
+Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/stride-2
 Contributors:
 - Toby Fox ([Moonsetter], [Showdown])
@@ -48,37 +57,45 @@ Contributors:
 Track: Skaian Overdrive
 Artist: Thomas Ferkol
 Contributors: Andrew Huo ([Skaian Ride])
+Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/skaian-overdrive-2
 -------------------------------------------------------------------------------
 Track: Freefall
 Artist: Robert J! Lake
+Track Art: Nico J. Dolloso
 URLs: https://homestuck.bandcamp.com/track/freefall-2
 -------------------------------------------------------------------------------
 Track: Moonsweater
 Artist: David Ellis
+Track Art: David Litt
 URLs: https://homestuck.bandcamp.com/track/moonsweater-2
 Contributors:
-- Toby Fox (apologee, [Moonsetter])
+- Toby Fox (with apologies to, [Moonsetter])
 - Malik Refaat (alto & tenor saxophone)
 -------------------------------------------------------------------------------
 Track: Castle
 Artist: Buzinkai
+Track Art: Kiko B.
 URLs: https://homestuck.bandcamp.com/track/castle-2
 -------------------------------------------------------------------------------
 Track: Skaian Happy Flight
 Artist: Seth Peelle
+Track Art: Alyssa
 URLs: https://homestuck.bandcamp.com/track/skaian-happy-flight-2
 -------------------------------------------------------------------------------
 Track: Voidlight
 Artist: Thomas Ferkol
+Track Art: Zilleniose
 URLs: https://homestuck.bandcamp.com/track/voidlight-2
 -------------------------------------------------------------------------------
 Track: Beatdown DX
 Artist: Curt Blakeslee
+Track Art: miraculoustang
 URLs: https://homestuck.bandcamp.com/track/beatdown-dx-2
 -------------------------------------------------------------------------------
 Track: Solar Voyage
 Artist: Marcy Nabors
+Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/solar-voyage-2
 Contributors:
 - Michael Guy Bowman (arrangement)
@@ -91,6 +108,7 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: Feel (Alive)
 Artist: Luke Benjamins, Robert J! Lake
+Track Art: Fenn
 URLs: https://homestuck.bandcamp.com/track/feel-alive-2
 Contributors:
 - Luke Benjamins (composition)
@@ -98,19 +116,23 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: Breeze
 Artist: Erik Scheele
+Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/breeze-2
 -------------------------------------------------------------------------------
 Track: Starfall
 Artist: Solatrus
 Contributors: Justin Hellier (special thanks)
+Track Art: Christina Lillard
 URLs: https://homestuck.bandcamp.com/track/starfall-2
 -------------------------------------------------------------------------------
 Track: Ascend
 Artist: Tensei
+Track Art: Marimo
 URLs: https://homestuck.bandcamp.com/track/ascend-2
 -------------------------------------------------------------------------------
 Track: Lilith in Starlight
 Artist: Malcolm Brown
+Track Art: Sera B.
 URLs: https://homestuck.bandcamp.com/track/lilith-in-starlight-2
 Contributors:
 - Malcolm Brown ([Black Rose / Green Sun])
@@ -119,10 +141,12 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: Thanks for Playing
 Artist: Max Wright
+Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/thanks-for-playing-2
 -------------------------------------------------------------------------------
 Track: Renewed Return
 Artist: Marcy Nabors
+Track Art: Zilleniose
 URLs: https://homestuck.bandcamp.com/track/renewed-return-2
 Contributors:
 - Yishan Mai (flute)
@@ -134,8 +158,10 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: THIS Pumpkin
 Artist: Alexander Rosetti
+Track Art: Worthikids
 URLs: https://homestuck.bandcamp.com/track/this-pumpkin-2
 -------------------------------------------------------------------------------
 Track: Conclude
 Artist: Seth Peelle
+Track Art: Kiko B.
 URLs: https://homestuck.bandcamp.com/track/conclude-2

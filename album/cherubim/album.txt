@@ -1,0 +1,65 @@
+Album: Cherubim
+Cover Art: Kait Linney (lines), Shelby Cragg (coloring & logo)
+Date: March 14, 2013
+FG: #ff7600
+-------------------------------------------------------------------------------
+Track: Reverie
+Artist: Alexander Rosetti
+Track Art: Marina
+URLs: https://homestuck.bandcamp.com/track/reverie-2
+-------------------------------------------------------------------------------
+Track: Power Fantasy
+Artist: Clark Powell
+Track Art: Elyse Holmes
+URLs: https://homestuck.bandcamp.com/track/power-fantasy-2
+-------------------------------------------------------------------------------
+Track: Stellarum Salve
+Artist: Robert J! Lake
+Track Art: Mobble
+URLs: https://homestuck.bandcamp.com/track/stellarum-salve-2
+-------------------------------------------------------------------------------
+Track: Carne Vale
+Artist: Malcolm Brown
+Track Art: Leslie Hung
+URLs: https://homestuck.bandcamp.com/track/carne-vale-2
+-------------------------------------------------------------------------------
+Track: Green Lolly
+Artist: Tyler Dever, Robert J! Lake
+Track Art: Brianne
+URLs: https://homestuck.bandcamp.com/track/green-lolly-2
+Contributors:
+- Tyler Dever (original theme)
+- Robert J! Lake (arrangement, production)
+-------------------------------------------------------------------------------
+Track: Red Sucker
+Artist: Tyler Dever, Robert J! Lake
+Track Art: Dana Smart
+URLs: https://homestuck.bandcamp.com/track/red-sucker-2
+Contributors:
+- Tyler Dever (theme)
+- Robert J! Lake (arrangement, production)
+-------------------------------------------------------------------------------
+Track: Constant Confinement
+Artist: Erik Scheele
+Track Art: Michelle Czajkowski
+URLs: https://homestuck.bandcamp.com/track/constant-confinement-2
+-------------------------------------------------------------------------------
+Track: Constant Conquest
+Artist: Michael Guy Bowman
+Track Art: Elly
+URLs: https://homestuck.bandcamp.com/track/constant-conquest-2
+-------------------------------------------------------------------------------
+Track: The Lyrist
+Artist: Thomas Ferkol
+Track Art: Rumminov
+URLs: https://homestuck.bandcamp.com/track/the-lyrist-2
+-------------------------------------------------------------------------------
+Track: The Lordling
+Artist: Toby Fox
+Track Art: Rumminov
+URLs: https://homestuck.bandcamp.com/track/the-lordling-2
+-------------------------------------------------------------------------------
+Track: Eternity Served Cold
+Artist: Malcolm Brown
+Track Art: rennerei
+URLs: https://homestuck.bandcamp.com/track/eternity-served-cold-2

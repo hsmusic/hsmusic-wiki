@@ -1,5 +1,7 @@
 Album: Midnight Crew: Drawing Dead
 Date: Febuary 4 2010
+Cover Art: Andrew Hussie
+Track Art: Andrew Hussie
 FG: #dd0000
 -------------------------------------------------------------------------------
 Track: Three in the Morning

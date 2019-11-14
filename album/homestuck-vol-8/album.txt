@@ -1,161 +1,198 @@
 Album: Homestuck Vol. 8
 Date: October 25, 2011
+Cover Art: Andrew Hussie
 FG: #4ac925
 -------------------------------------------------------------------------------
 Track: Calamity
 Artist: Michael Guy Bowman
+Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/calamity-2
 -------------------------------------------------------------------------------
 Track: Do You Remem8er Me
 Artist: Malcolm Brown
 Contributors: Toby Fox ([Death of the Lusii]), Erik Scheele ([Ruins])
+Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/do-you-remem8er-me-2
 -------------------------------------------------------------------------------
 Track: Flare
 Artist: Clark Powell
+Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/flare-2
 -------------------------------------------------------------------------------
 Track: Galactic Cancer
 Artist: Thomas Ferkol
+Track Art: Lauren Ross
 URLs: https://homestuck.bandcamp.com/track/galactic-cancer-2
 -------------------------------------------------------------------------------
 Track: Serenade
 Artist: Clark Powell
+Track Art: clorinspats
 Directory: serenade-vol8
 URLs: https://homestuck.bandcamp.com/track/serenade-2
 -------------------------------------------------------------------------------
 Track: Frog Forager
 Artist: Erik Scheele
+Track Art: Kaymurph
 URLs: https://homestuck.bandcamp.com/track/frog-forager-2
 -------------------------------------------------------------------------------
 Track: Love You (Feferi's Theme)
 Artist: Toby Fox
+Track Art: Left
 URLs: https://homestuck.bandcamp.com/track/love-you-feferis-theme-2
 -------------------------------------------------------------------------------
 Track: Ocean Stars Falling
 Artist: Michael Guy Bowman
 Contributors: Mark Hadley ([Ocean Stars])
+Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/ocean-stars-falling-2
 -------------------------------------------------------------------------------
 Track: Escape Pod
 Artist: Michael Guy Bowman
+Track Art: Peter Turner
 URLs: https://homestuck.bandcamp.com/track/escape-pod-2
 -------------------------------------------------------------------------------
 Track: Davesprite
 Artist: Toby Fox
+Track Art: P-RO
 URLs: https://homestuck.bandcamp.com/track/davesprite-2
 -------------------------------------------------------------------------------
 Track: Airtime
 Artist: Robert J! Lake
+Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/airtime-2
 -------------------------------------------------------------------------------
 Track: Frog Hunt
 Artist: Michael Guy Bowman
+Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/frog-hunt-2
 -------------------------------------------------------------------------------
 Track: Terraform
 Artist: Solatrus
 Contributors: Thomas Ferkol (electric guitar)
+Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/terraform-2
 -------------------------------------------------------------------------------
 Track: Unite Synchronization
 Artist: Malcolm Brown
+Track Art: M Thomas Harding
 URLs: https://homestuck.bandcamp.com/track/unite-synchronization-2
 -------------------------------------------------------------------------------
 Track: Homefree
 Artist: Hilary Troiano
+Track Art: Vivian Ng
 Contributors: Clark Powell ([Homestuck Anthem]), Mark Hadley ([Homestuck])
 URLs: https://homestuck.bandcamp.com/track/homefree-2
 -------------------------------------------------------------------------------
 Track: Galaxy Hearts
 Artist: Mark Hadley
+Track Art: Rachel Weiss
 URLs: https://homestuck.bandcamp.com/track/galaxy-hearts-2
 -------------------------------------------------------------------------------
 Track: Scourge Sisters
 Artist: Erik Scheele
+Track Art: M Thomas Harding
 URLs: https://homestuck.bandcamp.com/track/scourge-sisters-2
 -------------------------------------------------------------------------------
 Track: Arcade Thunder
 Artist: Robert J! Lake
+Track Art: Maf
 URLs: https://homestuck.bandcamp.com/track/arcade-thunder-2
 -------------------------------------------------------------------------------
 Track: Pyrocumulus (Sicknasty)
 Artist: Robert J! Lake
 Contributors: Andrew Huo ([Skaian Scuffle]), Mark Hadley ([Skies of Skaia])
+Track Art: Rutares
 URLs: https://homestuck.bandcamp.com/track/pyrocumulus-sicknasty-2
 -------------------------------------------------------------------------------
 Track: Kingside Castle
 Artist: Clark Powell
+Track Art: Nic Carey
 URLs: https://homestuck.bandcamp.com/track/kingside-castle-2
 -------------------------------------------------------------------------------
 Track: Temporary
 Artist: Robert J! Lake
 Contributors: Erik Scheele ([Temporal Piano])
+Track Art: Chaz Canterbury
 URLs: https://homestuck.bandcamp.com/track/temporary-2
 -------------------------------------------------------------------------------
 Track: Gust of Heir
 Artist: Tyler Dever, Michael Guy Bowman
 Contributors: Clark Powell (additional sequencing)
+Track Art: Fibug
 URLs: https://homestuck.bandcamp.com/track/gust-of-heir-2
 -------------------------------------------------------------------------------
 Track: Afraid of the Darko
 Artist: Robert J! Lake
+Track Art: Robert J! Lake
 URLs: https://homestuck.bandcamp.com/track/afraid-of-the-darko-2
 -------------------------------------------------------------------------------
 Track: Even in Death (T'Morra's Belly Mix)
 Artist: Clark Powell, Tavia Morra
+Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/even-in-death-tmorras-belly-mix-2
 -------------------------------------------------------------------------------
 Track: Bargaining with the Beast
 Artist: Thomas Ferkol
+Track Art: Vivian Ng
 URLs: https://homestuck.bandcamp.com/track/bargaining-with-the-beast-2
 -------------------------------------------------------------------------------
 Track: Frostbite
 Artist: Toby Fox
 Contributors: Marcy Nabors (flute)
+Track Art: Nic Carey
 URLs: https://homestuck.bandcamp.com/track/frostbite-2
 -------------------------------------------------------------------------------
 Track: The Lost Child
 Artist: Toby Fox
+Track Art: Sarah Fu
 URLs: https://homestuck.bandcamp.com/track/the-lost-child-2
 -------------------------------------------------------------------------------
 Track: Questant's Lament
 Artist: Thomas Ferkol
+Track Art: Fibug
 URLs: https://homestuck.bandcamp.com/track/questants-lament-2
 -------------------------------------------------------------------------------
 Track: Hussie Hunt
 Artist: Malcolm Brown
 Contributors: Buzinkai ([Explore])
+Track Art: saffronScarf
 URLs: https://homestuck.bandcamp.com/track/hussie-hunt-2
 -------------------------------------------------------------------------------
 Track: Havoc
 Artist: Svix
+Track Art: Emi
 URLs: https://homestuck.bandcamp.com/track/havoc-2
 -------------------------------------------------------------------------------
 Track: Drift into the Sun
 Artist: Thomas Ferkol
 Contributors: Clark Powell (some production), Toby Fox (climax drum programming)
+Track Art: Zilon
 URLs: https://homestuck.bandcamp.com/track/drift-into-the-sun-2
 -------------------------------------------------------------------------------
 Track: Infinity Mechanism
 Artist: Thomas Ferkol
+Track Art: VickyBit
 URLs: https://homestuck.bandcamp.com/track/infinity-mechanism-2
 -------------------------------------------------------------------------------
 Track: Revered Return
 Artist: Nick Smalley, Michael Guy Bowman
+Track Art: Noot
 URLs: https://homestuck.bandcamp.com/track/revered-return-2
 -------------------------------------------------------------------------------
 Track: Judgment Day
 Artist: Toby Fox
 Contributors: Kelly Sadwin (violin), Erik Scheele ([Ruins])
+Track Art: Lazylaz
 URLs: https://homestuck.bandcamp.com/track/judgment-day-2
 -------------------------------------------------------------------------------
 Track: Lotus (Bloom)
 Artist: Seth Peelle
+Track Art: myluckyseven
 URLs: https://homestuck.bandcamp.com/track/lotus-bloom-2
 -------------------------------------------------------------------------------
 Track: Cascade
 Artist: Toby Fox, Tensei, Clark Powell, Malcolm Brown
+Track Art: none
 URLs: https://homestuck.bandcamp.com/track/cascade-2
 Contributors:
 - Tensei ([Cascade (Beta)])
@@ -166,10 +203,12 @@ Contributors:
 Track: I'm a Member of the Midnight Crew (Acapella)
 Artist: David Ko
 Contributors: Eddie Morton (original [I'm a Member of the Midnight Crew])
+Track Art: Vivian Ng
 URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-acapella-2
 -------------------------------------------------------------------------------
 Track: How Do I Live (D8 Night Version)
 Artist: Michael Guy Bowman
+Track Art: Victoria Grace Elliot
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-d8-night-version-2
 Contributors:
 - Thomas Ferkol (electric guitar)
@@ -178,13 +217,16 @@ Contributors:
 -------------------------------------------------------------------------------
 Track: Cascade (Beta)
 Artist: Tensei
+Track Art: Mia Schwartz
 URLs: https://homestuck.bandcamp.com/track/cascade-beta-2
 -------------------------------------------------------------------------------
 Track: Black Hole / Green Sun
 Artist: Malcolm Brown, Toby Fox
 Contributors: Tensei (electric guitar), Kelly Sadwin (violin)
+Track Art: none
 URLs: https://homestuck.bandcamp.com/track/black-hole-green-sun-2
 -------------------------------------------------------------------------------
 Track: Carefree Action
 Artist: Mark Hadley
+Track Art: 8bitkitten
 URLs: https://homestuck.bandcamp.com/track/carefree-action-2

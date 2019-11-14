@@ -1,0 +1,169 @@
+Album: coloUrs and mayhem: Universe B
+Cover Art: Shelby Cragg
+Directory: coloUrs-and-mayhem-universe-b
+Date: April 13, 2012
+FG: #a5d2e2
+-------------------------------------------------------------------------------
+Track: ~~SIDE 1~~
+Artist: Toby Fox
+Track Art: none
+Directory: side-1-universe-b
+URLs: https://homestuck.bandcamp.com/track/universe-b-side-1
+-------------------------------------------------------------------------------
+Track: Green Ghost
+Artist: Monobrow
+Track Art: Koba
+URLs: https://homestuck.bandcamp.com/track/green-ghost-2
+-------------------------------------------------------------------------------
+Track: Orchid Horror
+Artist: David DeCou
+Track Art: Sukka
+URLs: https://homestuck.bandcamp.com/track/orchid-horror-2
+-------------------------------------------------------------------------------
+Track: Red Disc
+Artist: Nathan H.
+Track Art: Aurum
+URLs: https://homestuck.bandcamp.com/track/red-disc-2
+-------------------------------------------------------------------------------
+Track: Blue Atom
+Artist: David Ellis
+Contributors: Malik Refaat (alto saxophone)
+Track Art: Petra K.
+URLs: https://homestuck.bandcamp.com/track/blue-atom-2
+-------------------------------------------------------------------------------
+Track: ~~SIDE 2~~
+Artist: Toby Fox
+Track Art: none
+Directory: side-2-universe-b
+URLs: https://homestuck.bandcamp.com/track/universe-b-side-2
+-------------------------------------------------------------------------------
+Track: Cyan Beast
+Artist: David Ellis
+Track Art: Paperartichokes
+URLs: https://homestuck.bandcamp.com/track/cyan-beast-2
+-------------------------------------------------------------------------------
+Track: Pink Cat
+Artist: Ryan Ames
+Track Art: MissNK
+URLs: https://homestuck.bandcamp.com/track/pink-cat-2
+-------------------------------------------------------------------------------
+Track: Orange Hat
+Artist: Plumegeist
+Track Art: Meggie Fox
+URLs: https://homestuck.bandcamp.com/track/orange-hat-2
+-------------------------------------------------------------------------------
+Track: Emerald Terror
+Artist: Elisa McCabe
+Track Art: Elisa McCabe
+URLs: https://homestuck.bandcamp.com/track/emerald-terror-2
+-------------------------------------------------------------------------------
+Track: ~~ADDITIONAL MAYHEM~~
+Artist: Toby Fox
+Directory: additional-mayhem-universe-b
+URLs: https://homestuck.bandcamp.com/track/universe-b-additional-mayhem
+-------------------------------------------------------------------------------
+Track: Squiddle Song
+Artist: Maya Kern
+Track Art: Maya Kern
+URLs: https://homestuck.bandcamp.com/track/squiddle-song-2
+-------------------------------------------------------------------------------
+Track: Pendulum
+Artist: Shandy
+Track Art: Rinatan
+URLs: https://homestuck.bandcamp.com/track/pendulum-2
+-------------------------------------------------------------------------------
+Track: Pale Rapture
+Artist: The Black Curtain
+Track Art: The-Everlasting-Ash
+URLs: https://homestuck.bandcamp.com/track/pale-rapture-2
+-------------------------------------------------------------------------------
+Track: Do The Windy Thing
+Artist: Brian Schaefer
+Track Art: Emily Blundell
+URLs: https://homestuck.bandcamp.com/track/do-the-windy-thing-2
+-------------------------------------------------------------------------------
+Track: Pilot Light
+Artist: Thomas Ibarra, AutoDevote, SparksD2145
+Track Art: KIIPPU
+URLs: https://homestuck.bandcamp.com/track/pilot-light-2
+-------------------------------------------------------------------------------
+Track: Ohgodcat
+Artist: Gec
+Track Art: Shelby Cragg
+URLs: https://homestuck.bandcamp.com/track/ohgodcat-2
+-------------------------------------------------------------------------------
+Track: Cupcake Girl
+Artist: Liam O'Donnell
+Track Art: Ella
+URLs: https://homestuck.bandcamp.com/track/cupcake-girl-2
+-------------------------------------------------------------------------------
+Track: Phantasmic Youngsters
+Artist: Tristan Scroggins
+Track Art: Tristan Scroggins
+URLs: https://homestuck.bandcamp.com/track/phantasmic-youngsters-2
+-------------------------------------------------------------------------------
+Track: Battle Brotocol
+Artist: Elliot Colp
+Track Art: Elliot Colp
+URLs: https://homestuck.bandcamp.com/track/battle-brotocol-2
+-------------------------------------------------------------------------------
+Track: Bec Noir
+Artist: Will Kommor
+Track Art: Rem
+URLs: https://homestuck.bandcamp.com/track/bec-noir-2
+-------------------------------------------------------------------------------
+Track: The Vast Glub
+Artist: Kris Flacke
+Track Art: M. Schmahl
+URLs: https://homestuck.bandcamp.com/track/the-vast-glub-2
+-------------------------------------------------------------------------------
+Track: WV: Become the Mayor of Cans
+Artist: Solarbear
+Track Art: Derples
+URLs: https://homestuck.bandcamp.com/track/wv-become-the-mayor-of-cans-2
+-------------------------------------------------------------------------------
+Track: March of the Batterwitch
+Artist: Marcy Nabors
+Track Art: Dawn Davis
+URLs: https://homestuck.bandcamp.com/track/march-of-the-batterwitch-2
+-------------------------------------------------------------------------------
+Track: Coolkid
+Artist: Haunter
+Track Art: Raizor
+URLs: https://homestuck.bandcamp.com/track/coolkid-2
+-------------------------------------------------------------------------------
+Track: Clockstopper
+Artist: viaSatellite, infiniteKnife
+Track Art: Kurimja
+URLs: https://homestuck.bandcamp.com/track/clockstopper-2
+-------------------------------------------------------------------------------
+Track: Dapper Dueling
+Artist: Max Wright
+Track Art: Shillo
+URLs: https://homestuck.bandcamp.com/track/dapper-dueling-2
+-------------------------------------------------------------------------------
+Track: Checkmate
+Artist: David Dycus
+Track Art: Shad
+URLs: https://homestuck.bandcamp.com/track/checkmate-2
+-------------------------------------------------------------------------------
+Track: Vodka Mutiny
+Artist: Mai Yishan
+Contributors: themfish (SFX)
+Track Art: Riri
+URLs: https://homestuck.bandcamp.com/track/vodka-mutiny-2
+-------------------------------------------------------------------------------
+Track: Dord Waltz
+Artist: Elaine Wang
+Track Art: Merrigo
+URLs: https://homestuck.bandcamp.com/track/dord-waltz-2
+-------------------------------------------------------------------------------
+Track: Rustless Fall
+Artist: Gabe Stilez
+Track Art: Kadi Fedoruk
+URLs: https://homestuck.bandcamp.com/track/rustless-fall-2
+-------------------------------------------------------------------------------
+Track: Pipeorgankind
+Artist: James Roach
+Track Art: VickyBit
+URLs: https://homestuck.bandcamp.com/track/pipeorgankind-2

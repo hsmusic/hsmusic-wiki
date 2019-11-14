@@ -1,0 +1,177 @@
+Album: coloUrs and mayhem: Universe A
+Directory: coloUrs-and-mayhem-universe-a
+Cover Art: Shelby Cragg
+Date: April 2, 2012
+FG: #9292e2
+-------------------------------------------------------------------------------
+Track: ~~SIDE 1~~
+Artist: Toby Fox
+Track Art: none
+Directory: side-1-universe-a
+URLs: https://homestuck.bandcamp.com/track/universe-a-side-1
+-------------------------------------------------------------------------------
+Track: Rust Servant
+Artist: William Ascenzo
+Track Art: Leslie Hung
+URLs: https://homestuck.bandcamp.com/track/rust-servant
+-------------------------------------------------------------------------------
+Track: Bronze Rebel
+Artist: Yan Rodriguez
+Track Art: Kitsu
+URLs: https://homestuck.bandcamp.com/track/bronze-rebel
+-------------------------------------------------------------------------------
+Track: Gold Pilot
+Artist: First Turn Fold
+Track Art: SuryaAsura
+URLs: https://homestuck.bandcamp.com/track/gold-pilot
+-------------------------------------------------------------------------------
+Track: Iron Infidel
+Artist: Samm Neiland
+Track Art: Paula Vieira
+URLs: https://homestuck.bandcamp.com/track/iron-infidel
+Contributors:
+- Katherine Bordonaro, Connor Favero, Lorilyn "Neoscottie" Seyler, Steve Johnson, Andrea McNeil, Ari, Pippin (special thanks)
+-------------------------------------------------------------------------------
+Track: Olive Scribe
+Artist: Magnum
+Track Art: Magnum
+URLs: https://homestuck.bandcamp.com/track/olive-scribe
+-------------------------------------------------------------------------------
+Track: Jade Mother
+Artist: Nathan H.
+Track Art: Zilon
+URLs: https://homestuck.bandcamp.com/track/jade-mother
+-------------------------------------------------------------------------------
+Track: Teal Hunter
+Artist: William Ascenzo
+Track Art: Myotishi
+URLs: https://homestuck.bandcamp.com/track/teal-hunter
+-------------------------------------------------------------------------------
+Track: Cobalt Corsair
+Artist: Max Wright
+Track Art: Cactuar
+URLs: https://homestuck.bandcamp.com/track/cobalt-corsair
+-------------------------------------------------------------------------------
+Track: Indigo Archer
+Artist: Rachel Macwhirter
+Track Art: Chelsea Thomas
+URLs: https://homestuck.bandcamp.com/track/indigo-archer
+-------------------------------------------------------------------------------
+Track: Purple Tyrant
+Artist: Kevin Grant
+Track Art: Asiul
+URLs: https://homestuck.bandcamp.com/track/purple-tyrant
+-------------------------------------------------------------------------------
+Track: Violet Mariner
+Artist: William Ascenzo
+Track Art: rumminov
+URLs: https://homestuck.bandcamp.com/track/violet-mariner
+-------------------------------------------------------------------------------
+Track: Fuchsia Ruler
+Artist: Sinister Psyche
+Track Art: Mel
+URLs: https://homestuck.bandcamp.com/track/fuchsia-ruler
+-------------------------------------------------------------------------------
+Track: ~~SIDE 2~~
+Artist: Toby Fox
+Track Art: none
+Directory: side-2-universe-a
+URLs: https://homestuck.bandcamp.com/track/universe-a-side-2
+-------------------------------------------------------------------------------
+Track: Rust Maid
+Artist: Plumegeist
+Track Art: Digidigi66
+URLs: https://homestuck.bandcamp.com/track/rust-maid
+-------------------------------------------------------------------------------
+Track: Bronze Page
+Artist: Ian White, Eston Schweickart
+Contributors: Ally Clark (vocals)
+Track Art: Durandana
+URLs: https://homestuck.bandcamp.com/track/bronze-page
+-------------------------------------------------------------------------------
+Track: Gold Mage
+Artist: repeatedScales
+Track Art: Prassio
+URLs: https://homestuck.bandcamp.com/track/gold-mage
+-------------------------------------------------------------------------------
+Track: Iron Knight
+Artist: DJ Sai Tae
+Track Art: Emma Glaze
+URLs: https://homestuck.bandcamp.com/track/iron-knight
+-------------------------------------------------------------------------------
+Track: Olive Rogue
+Artist: Eston Schweickart
+Contributors: Alex Amlie-Wolf (bass)
+Track Art: Mingmingfurb
+URLs: https://homestuck.bandcamp.com/track/olive-rogue
+-------------------------------------------------------------------------------
+Track: Jade Sylph
+Artist: Frank Haught
+Track Art: Michelle Czajkowski
+URLs: https://homestuck.bandcamp.com/track/jade-sylph
+-------------------------------------------------------------------------------
+Track: Teal Seer
+Artist: Kera Jones
+Track Art: Bloodredbites
+URLs: https://homestuck.bandcamp.com/track/teal-seer
+-------------------------------------------------------------------------------
+Track: Cobalt Thief
+Artist: Ray McDougall
+Track Art: Ray McDougall
+URLs: https://homestuck.bandcamp.com/track/cobalt-thief
+-------------------------------------------------------------------------------
+Track: Indigo Heir
+Artist: Paul Tuttle Starr
+Track Art: Rebecca Ryberg
+URLs: https://homestuck.bandcamp.com/track/indigo-heir
+-------------------------------------------------------------------------------
+Track: Purple Bard
+Artist: Gec
+Track Art: Brianne
+URLs: https://homestuck.bandcamp.com/track/purple-bard
+-------------------------------------------------------------------------------
+Track: Violet Prince
+Artist: DJ Sai Tae
+Track Art: Whimzu
+URLs: https://homestuck.bandcamp.com/track/violet-prince
+-------------------------------------------------------------------------------
+Track: Fuchsia Witch
+Artist: David Dycus
+Track Art: Inverts
+URLs: https://homestuck.bandcamp.com/track/fuchsia-witch
+-------------------------------------------------------------------------------
+Track: ~~ADITIONAL MAYHEM~~
+Artist: Toby Fox
+Track Art: none
+Directory: additional-mayhem-universe-a
+URLs: https://homestuck.bandcamp.com/track/universe-a-additional-mayhem
+-------------------------------------------------------------------------------
+Track: Your Universe
+Artist: Marcus Citrine
+Track Art: Jones N. Wiedle
+URLs: https://homestuck.bandcamp.com/track/your-universe
+Contributors:
+- Rachel St. Marseille (voice)
+- Steve Blum (piano)
+- Nicole Sequeira (bass)
+- Eric Hagstrom (drums)
+-------------------------------------------------------------------------------
+Track: Superego
+Artist: Yan Rodriguez
+Track Art: Kajoi
+URLs: https://homestuck.bandcamp.com/track/superego
+-------------------------------------------------------------------------------
+Track: Made of Time
+Artist: James Roach
+Track Art: Alexia Khodanian
+URLs: https://homestuck.bandcamp.com/track/made-of-time
+-------------------------------------------------------------------------------
+Track: Nine Lives One Love
+Artist: Dallas Ross Hicks
+Track Art: Lynnai Hicks
+URLs: https://homestuck.bandcamp.com/track/nine-lives-one-love
+-------------------------------------------------------------------------------
+Track: Temporal Shenanigans
+Artist: Rachel Macwhirter
+Track Art: Astrom
+URLs: https://homestuck.bandcamp.com/track/temporal-shenanigans

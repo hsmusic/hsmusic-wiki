@@ -1,6 +1,7 @@
 Album: Homestuck Vol. 5
 Date: June 13, 2010
-Track Art: none
+Cover Art: Lexxy
+Has Track Art: no
 FG: #00aaff
 -------------------------------------------------------------------------------
 Track: Homestuck Anthem
