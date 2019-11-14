@@ -22,12 +22,12 @@ URLs: https://homestuck.bandcamp.com/track/trepidation-2
 -------------------------------------------------------------------------------
 Track: Firefly
 Artist: Buzinkai
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/firefly-2
 -------------------------------------------------------------------------------
 Track: Whistling Jackhammer
 Artist: Robert J! Lake
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/whistling-jackhammer-2
 -------------------------------------------------------------------------------
 Track: Ugly Betty
@@ -177,7 +177,7 @@ URLs: https://homestuck.bandcamp.com/track/threes-a-crowd-2
 -------------------------------------------------------------------------------
 Track: Break Shot
 Artist: Kalibration
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/break-shot-2
 -------------------------------------------------------------------------------
 Track: Portrait
@@ -187,7 +187,7 @@ URLs: https://homestuck.bandcamp.com/track/portrait-2
 -------------------------------------------------------------------------------
 Track: Negative Aperture
 Artist: Svix
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/negative-aperture-2
 -------------------------------------------------------------------------------
 Track: Sweet Dreams, Timaeus
@@ -197,12 +197,12 @@ URLs: https://homestuck.bandcamp.com/track/sweet-dreams-timaeus-2
 -------------------------------------------------------------------------------
 Track: Red Miles
 Artist: Tyler Dever
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/red-miles-2
 -------------------------------------------------------------------------------
 Track: The Changing Game
 Artist: Thomas Ferkol
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/the-changing-game-2
 -------------------------------------------------------------------------------
 Track: Requited
@@ -281,5 +281,5 @@ URLs: https://homestuck.bandcamp.com/track/another-countdown-2
 -------------------------------------------------------------------------------
 Track: Frustracean
 Artist: Toby Fox
-Track Art: Andrew Hussie
+Track Art: Homestuck
 URLs: https://www.youtube.com/watch?v=om3VC6ru4yk

@@ -1,6 +1,6 @@
 Album: The Felt
 Cover Art: skepticArcher
-Track Art: Andrew Hussie
+Track Art: Homestuck
 Date: December 2 2010
 FG: #33aa55
 -------------------------------------------------------------------------------

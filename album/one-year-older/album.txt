@@ -1,0 +1,83 @@
+Album: One Year Older
+Artist: Erik Scheele
+Cover Art: Killian Ng
+Date: August 15, 2012
+FG: #00aaff
+-------------------------------------------------------------------------------
+Track: Sunrise
+Contributors: Erik Scheele ([Light])
+Track Art: Tavia Morra
+URLs: https://erikscheele.bandcamp.com/track/sunrise
+-------------------------------------------------------------------------------
+Track: October
+Track Art: saffronScarf
+URLs: https://erikscheele.bandcamp.com/track/october
+-------------------------------------------------------------------------------
+Track: Firefly Cloud
+Contributors: Buzinkai ([Doctor])
+Track Art: Nic Carey
+URLs: https://erikscheele.bandcamp.com/track/firefly-cloud
+-------------------------------------------------------------------------------
+Track: FantasyP
+Contributors: Toby Fox ([Penumbra Phantasm])
+Track Art: Kaymurph
+URLs: https://erikscheele.bandcamp.com/track/fantasyp
+-------------------------------------------------------------------------------
+Track: Underfoot
+Track Art: Tavia Morra
+URLs: https://erikscheele.bandcamp.com/track/underfoot
+-------------------------------------------------------------------------------
+Track: Flying Car
+Track Art: njeekyo
+URLs: https://erikscheele.bandcamp.com/track/flying-car
+-------------------------------------------------------------------------------
+Track: Cancerous Core
+Track Art: Dawn Davis
+URLs: https://erikscheele.bandcamp.com/track/cancerous-core
+-------------------------------------------------------------------------------
+Track: Game Over
+Track Art: Sarah Fu
+URLs: https://erikscheele.bandcamp.com/track/game-over
+-------------------------------------------------------------------------------
+Track: Unlabeled
+Track Art: Killian Ng
+URLs: https://erikscheele.bandcamp.com/track/unlabeled
+-------------------------------------------------------------------------------
+Track: Skaian Shrapnel
+Track Art: Crowbawt
+URLs: https://erikscheele.bandcamp.com/track/skiain-shrapnel
+Contributors:
+- Erik Scheele ([Ruins], [Walk-Stab-Walk (R&E)])
+- Alexander Rosetti ([Crystalanthemums])
+-------------------------------------------------------------------------------
+Track: The Scratch
+Track Art: Brian Griv
+URLs: https://erikscheele.bandcamp.com/track/the-scratch
+-------------------------------------------------------------------------------
+Track: Respit
+Track Art: Sasha Morrissey
+URLs: https://erikscheele.bandcamp.com/track/respit
+-------------------------------------------------------------------------------
+Track: Negastrife
+Contributors: Malcolm Brown ([Showtime])
+Track Art: Crowbawt
+URLs: https://erikscheele.bandcamp.com/track/negastrife
+-------------------------------------------------------------------------------
+Track: Mother
+Contributors: Robert J! Lake (additional beats), Mark Hadley ([Skies of Skaia])
+Track Art: Louise L.
+URLs: https://erikscheele.bandcamp.com/track/mother
+-------------------------------------------------------------------------------
+Track: Another Chance
+Artist: Eston Schweickart
+Contributors: Erik Scheele ([Walk-Stab-Walk (R&E)])
+Track Art: dapperpixel
+URLs: https://erikscheele.bandcamp.com/track/another-chance-bonus
+-------------------------------------------------------------------------------
+Track: Under The Hat
+Track Art: none
+URLs: https://erikscheele.bandcamp.com/track/under-the-hat-bonus
+-------------------------------------------------------------------------------
+Track: Mother (Piano)
+Track Art: none
+URLs: https://erikscheele.bandcamp.com/track/mother-piano-bonus

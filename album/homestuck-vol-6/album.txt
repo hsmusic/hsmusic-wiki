@@ -1,6 +1,6 @@
 Album: Homestuck Vol. 6: Heir Transparent
-Cover Art: Andrew Hussie
-Track Art: Andrew Hussie
+Cover Art: Homestuck
+Track Art: Homestuck
 Directory: homestuck-vol-6
 Date: January 5 2011
 FG: #6699ff

@@ -1,6 +1,6 @@
 Album: AlterniaBound
 Cover Art: SaffronScarf
-Track Art: Andrew Hussie
+Track Art: Homestuck
 Date: March 14, 2011
 FG: #00a4a4
 -------------------------------------------------------------------------------

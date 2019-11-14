@@ -266,9 +266,7 @@ async function processAlbumDataFile(file) {
     }
 
     if (!albumCoverArtists) {
-        // The Squiddles al8um doesn't have any kind of cover art attri8ution
-        // seemingly anywhere, so... just leaving this commented out for now.
-        // console.warn(`The album "${albumName}" is missing the "Cover Art" field.`);
+        return {error: `The album "${albumName}" is missing the "Cover Art" field.`};
     }
 
     // I don't like these varia8le names. I'm sorry. -- I only really use the

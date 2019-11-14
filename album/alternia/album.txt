@@ -1,7 +1,7 @@
 Album: Alternia
 Artist: Toby Fox
-Cover Art: Andrew Hussie
-Track Art: Andrew Hussie
+Cover Art: Homestuck
+Track Art: Homestuck
 Date: July 18, 2010
 FG: #cc44ff
 -------------------------------------------------------------------------------

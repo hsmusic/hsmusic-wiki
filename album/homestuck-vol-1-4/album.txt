@@ -1,8 +1,8 @@
 Album: Homestuck Vol. 1-4
 Date: October 24 2011
 Directory: homestuck-vol-1-4
-Cover Art: Andrew Hussie
-Track Art: Andrew Hussie
+Cover Art: Homestuck
+Track Art: Homestuck
 FG: #aaccff
 -------------------------------------------------------------------------------
 Track: Showtime (Piano Refrain)
