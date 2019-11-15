@@ -1,0 +1,108 @@
+Album: Hiveswap Friendsim
+Artist: James Roach
+Cover Art: P-PAMda
+Track Art: none
+Date: December 15, 2018
+FG: #33aaff
+-------------------------------------------------------------------------------
+Track: ARTCHOP (APPARENTLY)
+URLs:
+- https://homestuck.bandcamp.com/track/artchop-apparently
+- https://soundcloud.com/jamesroachmusic/i-guess-its-called-artchop-i-didnt-name-it-but-im-down
+-------------------------------------------------------------------------------
+Track: Ｍ Ｏ Ｉ Ｓ Ｔ
+Directory: moist
+URLs:
+- https://homestuck.bandcamp.com/track/-
+- https://soundcloud.com/jamesroachmusic/a-bunch-of-boxes-that-dont-translate-into-a-url
+-------------------------------------------------------------------------------
+Track: Call me Gor-Gor
+URLs:
+- https://homestuck.bandcamp.com/track/call-me-gor-gor
+- https://soundcloud.com/jamesroachmusic/call-me-gor-gor
+-------------------------------------------------------------------------------
+Track: &gt;tfw another james roach track
+Directory: tfw-another-james-roach-track
+URLs:
+- https://homestuck.bandcamp.com/track/tfw-another-james-roach-track
+- https://soundcloud.com/jamesroachmusic/tfw-another-james-roach-track
+-------------------------------------------------------------------------------
+Track: Piwates ',:^]
+URLs:
+- https://homestuck.bandcamp.com/track/piwates
+- https://soundcloud.com/jamesroachmusic/piwates
+-------------------------------------------------------------------------------
+Track: it be like that sometimes
+URLs:
+- https://homestuck.bandcamp.com/track/it-be-like-that-sometimes
+- https://soundcloud.com/jamesroachmusic/it-be-like-that-sometimes
+-------------------------------------------------------------------------------
+Track: take me to clown church
+URLs:
+- https://homestuck.bandcamp.com/track/take-me-to-clown-church
+- https://soundcloud.com/jamesroachmusic/take-me-to-clown-church
+-------------------------------------------------------------------------------
+Track: fortnite funny moments epic fails episode 413
+URLs:
+- https://homestuck.bandcamp.com/track/fortnite-funny-moments-epic-fails-episode-413
+- https://soundcloud.com/jamesroachmusic/fortnite-funny-moments-epic-fails-episode-413
+-------------------------------------------------------------------------------
+Track: Old Secret
+URLs:
+- https://homestuck.bandcamp.com/track/old-secret
+- https://soundcloud.com/jamesroachmusic/old-secret
+-------------------------------------------------------------------------------
+Track: imagine, if you will, a situation wherein i wrote the bulk of this song at 4 am and then woke up only to discover the monstrosity i had created in my fleeting hubris
+URLs:
+- https://homestuck.bandcamp.com/track/iiywaswiwtbotsa4aatwuotdtmihcimfh
+- https://soundcloud.com/jamesroachmusic/iiywaswiwtbotsa4aatwuotdtmihcimfh
+-------------------------------------------------------------------------------
+Track: SERVICE CAR
+URLs:
+- https://homestuck.bandcamp.com/track/service-car
+- https://soundcloud.com/jamesroachmusic/service-car
+-------------------------------------------------------------------------------
+Track: (an ascii image of bowsette)
+URLs:
+- https://homestuck.bandcamp.com/track/an-ascii-image-of-bowsette
+- https://soundcloud.com/jamesroachmusic/an-ascii-image-of-bowsette
+-------------------------------------------------------------------------------
+Track: idk man you name it im tired
+URLs:
+- https://homestuck.bandcamp.com/track/idk-man-you-name-it-im-tired
+- https://soundcloud.com/jamesroachmusic/wanshis-theme-idk-man-you-name-it-im-tired
+-------------------------------------------------------------------------------
+Track: GRAVEYARD SHIFT
+URLs:
+- https://homestuck.bandcamp.com/track/graveyard-shift
+- https://soundcloud.com/jamesroachmusic/graveyard-shift-play-the-route-and-then-tweet-hamesatron-about-how-good-this-title-is
+-------------------------------------------------------------------------------
+Track: CLOWNFUCKER
+Artist: James Roach, Toby Fox
+URLs:
+- https://homestuck.bandcamp.com/track/clownfucker
+- https://soundcloud.com/jamesroachmusic/clownfucker-by-james-roach-and-toby-fox
+-------------------------------------------------------------------------------
+Track: ▲trollkind cannot gain anything without first giving something in return. to obtain something of equal value must be lost. that is alchemys first law of equivalent exchange. in those days, we really believed that to be the worlds one, and only, truth.▼
+URLs:
+- https://homestuck.bandcamp.com/track/this-title-was-too-long
+- https://soundcloud.com/jamesroachmusic/this-title-is-too-long-see-description-darayas-theme
+-------------------------------------------------------------------------------
+Track: turns out its like the shoe
+URLs: https://homestuck.bandcamp.com/track/turns-out-its-like-the-shoe
+-------------------------------------------------------------------------------
+Track: yall know i just do the music right
+Artist: James Roach, Toby Fox
+URLs: https://homestuck.bandcamp.com/track/yall-know-i-just-do-the-music-right
+-------------------------------------------------------------------------------
+Track: the final clowntdown
+URLs: https://homestuck.bandcamp.com/track/the-final-clowntdown
+-------------------------------------------------------------------------------
+Track: END OF FRIENDVANGELION
+URLs: https://homestuck.bandcamp.com/track/end-of-friendvangelion
+-------------------------------------------------------------------------------
+Track: VALID END
+URLs: https://homestuck.bandcamp.com/track/valid-end
+-------------------------------------------------------------------------------
+Track: WORST END
+URLs: https://homestuck.bandcamp.com/track/worst-end

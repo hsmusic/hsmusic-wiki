@@ -1,0 +1,31 @@
+Album: THE GRUBBLES
+Artist: The Grubbels
+Cover Art: The Grubbels
+Track Art: none
+Date: September 14, 2017 00:00:04
+FG: #dd0000
+-------------------------------------------------------------------------------
+Track: Broom Temperature
+URLs:
+- https://homestuck.bandcamp.com/track/broom-temperature
+- https://youtu.be/cuqKzBxAnE8
+-------------------------------------------------------------------------------
+Track: Frondly Warning
+URLs:
+- https://homestuck.bandcamp.com/track/frondly-warning
+- https://youtu.be/OfkccsHR4fs
+-------------------------------------------------------------------------------
+Track: Ghost Mound
+URLs:
+- https://homestuck.bandcamp.com/track/ghost-mound
+- https://youtu.be/QqJhLGGHqCk
+-------------------------------------------------------------------------------
+Track: Every Single Grievance
+URLs:
+- https://homestuck.bandcamp.com/track/every-single-grievance
+- https://youtu.be/D8N_53-cjGU
+-------------------------------------------------------------------------------
+Track: Get The Horns
+URLs:
+- https://homestuck.bandcamp.com/track/get-the-horns
+- https://youtu.be/ZZbFo1W1TjQ

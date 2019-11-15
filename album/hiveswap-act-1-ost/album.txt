@@ -1,0 +1,101 @@
+Album: Hiveswap Act 1 OST
+Artist: James Roach, Toby Fox
+Cover Art: Homestuck
+Track Art: none
+Date: September 14, 2017 00:00:05
+FG: #33cc77
+-------------------------------------------------------------------------------
+Track: Definitely Safe Forever
+URLs: https://homestuck.bandcamp.com/track/definitely-safe-forever-2
+-------------------------------------------------------------------------------
+Track: Snake Escape
+URLs: https://homestuck.bandcamp.com/track/snake-escape-2
+-------------------------------------------------------------------------------
+Track: Joey Claire, Extraordinaire
+URLs: https://homestuck.bandcamp.com/track/joey-claire-extraordinaire-2
+-------------------------------------------------------------------------------
+Track: Half-Harley Manor
+URLs: https://homestuck.bandcamp.com/track/half-harley-manor-2
+-------------------------------------------------------------------------------
+Track: Relatively Visible Darkness
+URLs: https://homestuck.bandcamp.com/track/relatively-visible-darkness-2
+-------------------------------------------------------------------------------
+Track: Bedroom for an Annoying Dog
+URLs: https://homestuck.bandcamp.com/track/bedroom-for-an-annoying-dog-2
+-------------------------------------------------------------------------------
+Track: That's How I Beat Snake
+URLs: https://homestuck.bandcamp.com/track/thats-how-i-beat-snake-2
+-------------------------------------------------------------------------------
+Track: Jude Harley, Bizarrely
+URLs: https://homestuck.bandcamp.com/track/jude-harley-bizarrely-2
+-------------------------------------------------------------------------------
+Track: Table for Tooth
+URLs: https://homestuck.bandcamp.com/track/table-for-tooth-2
+-------------------------------------------------------------------------------
+Track: Final Spice
+URLs: https://homestuck.bandcamp.com/track/final-spice-2
+-------------------------------------------------------------------------------
+Track: Living Legend
+URLs: https://homestuck.bandcamp.com/track/living-legend-2
+-------------------------------------------------------------------------------
+Track: Singular Peril
+URLs: https://homestuck.bandcamp.com/track/singular-peril-2
+-------------------------------------------------------------------------------
+Track: A More Defensible Position
+URLs: https://homestuck.bandcamp.com/track/a-more-defensible-position-2
+-------------------------------------------------------------------------------
+Track: Open The Door
+URLs: https://homestuck.bandcamp.com/track/open-the-door-2
+-------------------------------------------------------------------------------
+Track: Keep Your Head Down
+URLs: https://homestuck.bandcamp.com/track/keep-your-head-down-2
+-------------------------------------------------------------------------------
+Track: Oh Whoa, What's This
+URLs: https://homestuck.bandcamp.com/track/oh-whoa-whats-this-2
+-------------------------------------------------------------------------------
+Track: Some Kind of Alien
+URLs: https://homestuck.bandcamp.com/track/some-kind-of-alien-2
+-------------------------------------------------------------------------------
+Track: Rustbloot
+URLs: https://homestuck.bandcamp.com/track/rustblood-2
+-------------------------------------------------------------------------------
+Track: Filthy Nuclear Bunker
+URLs: https://homestuck.bandcamp.com/track/filthy-nuclear-bunker-2
+-------------------------------------------------------------------------------
+Track: SPORTS! Personally, I Love Them.
+URLs: https://homestuck.bandcamp.com/track/sports-personally-i-love-them-2
+-------------------------------------------------------------------------------
+Track: Lofted Gunpile
+URLs: https://homestuck.bandcamp.com/track/lofted-gunpile-2
+-------------------------------------------------------------------------------
+Track: SERPENT GENESIS
+URLs: https://homestuck.bandcamp.com/track/serpent-genesis-2
+-------------------------------------------------------------------------------
+Track: We Shall Go Together
+URLs: https://homestuck.bandcamp.com/track/we-shall-go-together-2
+-------------------------------------------------------------------------------
+Track: Wish You Were Here
+URLs: https://homestuck.bandcamp.com/track/wish-you-were-here-2
+-------------------------------------------------------------------------------
+Track: Intermission 1
+URLs: https://homestuck.bandcamp.com/track/intermission-1-2
+-------------------------------------------------------------------------------
+Track: B-SIDE: Old Steps
+Directory: old-steps
+URLs: https://homestuck.bandcamp.com/track/b-side-old-steps-2
+-------------------------------------------------------------------------------
+Track: B-SIDE: How it Could Have Gone
+Directory: how-it-could-have-gone
+URLs: https://homestuck.bandcamp.com/track/b-side-how-it-could-have-gone-2
+-------------------------------------------------------------------------------
+Track: B-SIDE: Alternate Recipe
+Directory: alternate-recipe
+URLs: https://homestuck.bandcamp.com/track/b-side-alternate-recipe-2
+-------------------------------------------------------------------------------
+Track: B-SIDE: Heavy Snaking
+Directory: heavy-snaking
+URLs: https://homestuck.bandcamp.com/track/b-side-heavy-snaking-2
+-------------------------------------------------------------------------------
+Track: B-SIDE: SPOOKTUNE
+Directory: spooktune
+URLs: https://homestuck.bandcamp.com/track/b-side-spooktune-2
