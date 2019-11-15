@@ -1,0 +1,42 @@
+Album: Sburb
+Artist: Tyler Dever, Erik Scheele
+Cover Art: Vivian Ng
+Track Art: none
+Date: July 13, 2011
+FG: #34cdff
+-------------------------------------------------------------------------------
+Track: The Prelude
+URLs: https://youtu.be/7k8zCRNxa7k
+-------------------------------------------------------------------------------
+Track: Genesis
+URLs: https://youtu.be/qOkMYB-r6b8
+-------------------------------------------------------------------------------
+Track: Eden
+URLs: https://youtu.be/hcXixYBLk_8
+-------------------------------------------------------------------------------
+Track: Exodus
+URLs: https://youtu.be/UnbRhrKFofY
+-------------------------------------------------------------------------------
+Track: Requiem
+URLs: https://youtu.be/cVKRJOqKMDY
+-------------------------------------------------------------------------------
+Track: The Meek
+URLs: https://youtu.be/hKEylNAp1-Q
+-------------------------------------------------------------------------------
+Track: Chronicles
+URLs: https://youtu.be/TOtz3MTSeKg
+-------------------------------------------------------------------------------
+Track: Rapture
+URLs: https://youtu.be/zqbExJ93rXo
+-------------------------------------------------------------------------------
+Track: Creation
+URLs: https://youtu.be/XorynbzZQpI
+-------------------------------------------------------------------------------
+Track: Revelations I
+URLs: https://youtu.be/YoIYaFyll5Q
+-------------------------------------------------------------------------------
+Track: Revelations II
+URLs: https://youtu.be/pXcUUevV4nA
+-------------------------------------------------------------------------------
+Track: Revelations III
+URLs: https://youtu.be/d-Gewy6q_zw

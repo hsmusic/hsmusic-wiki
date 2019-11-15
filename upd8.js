@@ -668,7 +668,7 @@ function getArtistDirectory(artistName) {
 }
 
 function getKebabCase(name) {
-    return name.split(' ').join('-').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
+    return name.split(' ').join('-').replace(/&/g, 'and').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').toLowerCase();
 }
 
 function generateSidebarForAlbum(album, currentTrack = null) {

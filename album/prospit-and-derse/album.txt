@@ -1,0 +1,44 @@
+Album: Prospit & Derse
+Artist: Solatrus
+Cover Art: Lexxy, skepticArcher
+Date: August 22, 2011
+FG: #cc44cc
+-------------------------------------------------------------------------------
+Track: Hallowed Halls
+Track Art: Bea
+URLs: https://youtu.be/12H6ZBc47bU
+-------------------------------------------------------------------------------
+Track: The Golden Towers
+Track Art: Pride
+URLs: https://youtu.be/ljdrlnSi4Gw
+-------------------------------------------------------------------------------
+Track: Prospit Dreamers
+Track Art: Zilleniose
+URLs: https://youtu.be/kXAzXOk-pGo
+Contributors:
+- Solatrus ([Frost])
+- Buzinkai ([Doctor])
+- Toby Fox ([Penumbra Phantasm])
+-------------------------------------------------------------------------------
+Track: Center of Brilliance
+Track Art: Shelby Cragg
+URLs: https://youtu.be/N6H9k2p3c_o
+-------------------------------------------------------------------------------
+Track: Darkened Streets
+Track Art: A. Smith
+URLs: https://youtu.be/mVpqo-OdbSk
+-------------------------------------------------------------------------------
+Track: The Obsidian Towers
+Track Art: Kat
+URLs: https://youtu.be/NXgHHh4NlR8
+-------------------------------------------------------------------------------
+Track: Derse Dreamers
+Track Art: Mixt
+URLs: https://youtu.be/NOkeFOkE7No
+Contributors:
+- Toby Fox ([Atomyk Ebonpyre])
+- Buzinkai ([Endless Climb])
+-------------------------------------------------------------------------------
+Track: Core of Darkness
+Track Art: Shad
+URLs: https://youtu.be/ZXC1O6DC55c
