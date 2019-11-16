@@ -34,6 +34,7 @@ URLs: https://homestuck.bandcamp.com/track/the-broken-clock-2
 -------------------------------------------------------------------------------
 Track: Apocryphal Antithesis
 Artist: Clark Powell
+References: Endless Climb
 URLs: https://homestuck.bandcamp.com/track/apocryphal-antithesis-2
 -------------------------------------------------------------------------------
 Track: Trails
@@ -70,4 +71,5 @@ URLs: https://homestuck.bandcamp.com/track/english-2
 -------------------------------------------------------------------------------
 Track: Variations
 Artist: Robert J! Lake
+References: Rhapsody in Green, Jade Dragon, Swing of the Clock, Afraid of the Darko
 URLs: https://homestuck.bandcamp.com/track/variations-2

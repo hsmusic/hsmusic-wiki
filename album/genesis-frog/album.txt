@@ -1,61 +1,83 @@
 Album: Genesis Frog
 Artist: Alexander Rosetti
-Cover Art: Alexander Rosetti
-Track Art: Alexander Rosetti
+Cover Art: Marina
+Track Art: Marina
 Date: October 23, 2012
 FG: #00aa77
 -------------------------------------------------------------------------------
 Track: Prelude
+References: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/prelude
 -------------------------------------------------------------------------------
 Track: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/pondsquatter
 -------------------------------------------------------------------------------
 Track: Our Glorious Speaker
-Contributors: Erik Scheele ([Sarabande])
+References: Pondsquatter, Sarabande
 URLs: https://albatrosssoup.bandcamp.com/track/our-glorious-speaker
 -------------------------------------------------------------------------------
 Track: Prospitian Folklore
+References: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/prospitian-folklore
 -------------------------------------------------------------------------------
 Track: Consorts' Intermezzo
+References: Buy NAK Sell DOOF, Pink Shells, Entrance of the Salamanders, Thip of the Tongue
 URLs: https://albatrosssoup.bandcamp.com/track/consorts-intermezzo
 -------------------------------------------------------------------------------
 Track: Buy NAK Sell DOOF
-Contributors: Toby Fox ([Atomyk Ebonpyre])
+References: Atomyk Ebonpyre
 Directory: buy-NAK-sell-DOOF
 URLs: https://albatrosssoup.bandcamp.com/track/buy-nak-sell-doof
 -------------------------------------------------------------------------------
 Track: Pink Shells
+References: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/pink-shells
 -------------------------------------------------------------------------------
 Track: Entrance of the Salamanders
+References: Our Glorious Speaker
 URLs: https://albatrosssoup.bandcamp.com/track/entrance-of-the-salamanders
 -------------------------------------------------------------------------------
 Track: Thip of the Tongue
+References: Stoke the Forge
 URLs: https://albatrosssoup.bandcamp.com/track/thip-of-the-tongue
 -------------------------------------------------------------------------------
 Track: Frogs' Intermezzo
+References: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/frogs-intermezzo
 -------------------------------------------------------------------------------
 Track: Breeding Duties
+References: Pondsquatter, Prospitian Folklore
 URLs: https://albatrosssoup.bandcamp.com/track/breeding-duties
 -------------------------------------------------------------------------------
 Track: Stoke the Forge
+References: Prospitian Folklore
 URLs: https://albatrosssoup.bandcamp.com/track/stoke-the-forge
 -------------------------------------------------------------------------------
 Track: Great LOFAF Expedition of 2009
+References: Pondsquatter, Our Glorious Speaker
 URLs: https://albatrosssoup.bandcamp.com/track/great-lofaf-expedition-of-2009
 -------------------------------------------------------------------------------
 Track: The Temple's Withered Bloom
 URLs: https://albatrosssoup.bandcamp.com/track/the-temples-withered-bloom
 -------------------------------------------------------------------------------
 Track: Bilious
-Contributors: Toby Fox ([Black])
+References: Prospitian Folklore, Black, The Temple's Withered Bloom
 URLs: https://albatrosssoup.bandcamp.com/track/bilious
 -------------------------------------------------------------------------------
 Track: Speaker (Skaia's Reflection)
+References: Pondsquatter
 URLs: https://albatrosssoup.bandcamp.com/track/speaker-skaias-reflection
 -------------------------------------------------------------------------------
 Track: The Vast Croak
+References: Pondsquatter, Prospitian Folklore, Buy NAK Sell DOOF, Pink SHells, Entrance of the Salamanders, Thip of the Tongue, Frogs' Intermezzo
 URLs: https://albatrosssoup.bandcamp.com/track/the-vast-croak
+-------------------------------------------------------------------------------
+Track: Pondsquatter (Live Chamber Version)
+References: Prelude, Pondsquatter, Frogs' Intermezzo, Great LOFAF Expedition of 2009, Breeding Duties
+Track Art: none
+URLs: https://www.youtube.com/watch?v=l07w1i-C7hs
+-------------------------------------------------------------------------------
+Track: Frogsong
+References: Pondsquatter
+Track Art: none
+URLs: https://www.youtube.com/watch?v=xINZv3-S6xU

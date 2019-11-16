@@ -6,6 +6,7 @@ Date: July 13, 2011
 FG: #34cdff
 -------------------------------------------------------------------------------
 Track: The Prelude
+References: Homestuck Anthem
 URLs: https://youtu.be/7k8zCRNxa7k
 -------------------------------------------------------------------------------
 Track: Genesis
@@ -15,6 +16,7 @@ Track: Eden
 URLs: https://youtu.be/hcXixYBLk_8
 -------------------------------------------------------------------------------
 Track: Exodus
+References: Sburban Jungle
 URLs: https://youtu.be/UnbRhrKFofY
 -------------------------------------------------------------------------------
 Track: Requiem
@@ -24,15 +26,18 @@ Track: The Meek
 URLs: https://youtu.be/hKEylNAp1-Q
 -------------------------------------------------------------------------------
 Track: Chronicles
+References: Candles and Clockwork
 URLs: https://youtu.be/TOtz3MTSeKg
 -------------------------------------------------------------------------------
 Track: Rapture
 URLs: https://youtu.be/zqbExJ93rXo
 -------------------------------------------------------------------------------
 Track: Creation
+References: Homestuck Anthem
 URLs: https://youtu.be/XorynbzZQpI
 -------------------------------------------------------------------------------
 Track: Revelations I
+References: Homestuck Anthem
 URLs: https://youtu.be/YoIYaFyll5Q
 -------------------------------------------------------------------------------
 Track: Revelations II

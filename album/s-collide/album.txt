@@ -6,16 +6,27 @@ FG: #cc3322
 -------------------------------------------------------------------------------
 Track: Creata (Canon Edit)
 Artist: Seth Peelle
+References: Creata
 URLs: https://homestuck.bandcamp.com/track/creata-canon-edit-2
 -------------------------------------------------------------------------------
 Track: Oppa Toby Style
 Artist: Toby Fox
 URLs: https://homestuck.bandcamp.com/track/oppa-toby-style-2
+References:
+- Rex Duodecim Angelus
+- English
+- Cascade (Beta)
+- Doctor
+- Crystalanthemums
+- Crustacean
+- Black
 -------------------------------------------------------------------------------
 Track: Eternity, Served Cold (Canon Edit)
 Artist: Malcolm Brown
+References: Eternity Served Cold
 URLs: https://homestuck.bandcamp.com/track/eternity-served-cold-canon-edit-2
 -------------------------------------------------------------------------------
 Track: Heir of Grief
 Artist: Tensei
+References: Heir Conditioning
 URLs: https://homestuck.bandcamp.com/track/heir-of-grief-2

@@ -15,7 +15,7 @@ URLs: https://youtu.be/MrOqTjNrB2Q
 -----------------------------------------------
 Track: Squiddle Parade
 Artist: Ian Taylor
-Contributors: Clark Powell ([Homestuck Anthem])
+References: Homestuck Anthem
 URLs: https://youtu.be/gqd8XTRwzoI
 -----------------------------------------------
 Track: Squiddle March
@@ -28,6 +28,7 @@ URLs: https://youtu.be/3KdAsyPq4UM
 -----------------------------------------------
 Track: Sun-Speckled Squiddly Afternoon
 Artist: Alexander Rosetti
+References: Squiddles!
 URLs: https://youtu.be/faRVzG1TZus
 -----------------------------------------------
 Track: Squiddles Campfire
@@ -36,6 +37,7 @@ URLs: https://youtu.be/sBi2kKCDDCk
 -----------------------------------------------
 Track: Friendship is Paramount
 Artist: Seth Peelle
+References: Squiddles!
 URLs: https://youtu.be/X0DmGl7AJIU
 -----------------------------------------------
 Track: Lazybones
@@ -76,15 +78,17 @@ URLs: https://youtu.be/S3bsomR8W_w
 Track: Plumbthroat Gives Chase
 Artist: Alexander Rosetti
 Contributors: Toby Fox (Skipper Plumbthroat)
+References: Catchyegrabber (Skipper Plumbthroat's Song)
 URLs: https://youtu.be/4PfZu1AWTWI
 -----------------------------------------------
 Track: Squiddles the Movie Trailer - The Day the Unicorns Couldn't Play
 Artist: Toby Fox
+References: Squiddles!
 URLs: https://youtu.be/9lWRGynBNVs
 -----------------------------------------------
 Track: Carefree Princess Berryboo
 Artist: Alexander Rosetti
-Contributors: Mark Hadley ([Carefree Victory])
+References: Carefree Action
 URLs: https://youtu.be/_Z8qT1GBhds
 -----------------------------------------------
 Track: Mister Bowman Tells You About the Squiddles
@@ -97,4 +101,5 @@ URLs: https://youtu.be/gFWWC9vmSzQ
 -----------------------------------------------
 Track: Let the Squiddles Sleep (End Theme)
 Artist: Robert J! Lake
+References: Squiddles!
 URLs: https://youtu.be/mpn7lahHvEc

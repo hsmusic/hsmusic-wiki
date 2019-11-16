@@ -10,21 +10,22 @@ URLs: https://homestuck.bandcamp.com/track/homestuck-anthem-2
 -------------------------------------------------------------------------------
 Track: Skaian Skirmish
 Artist: Andrew Huo, Toby Fox
+References: Skaian Skuffle, Lotus
 URLs: https://homestuck.bandcamp.com/track/skaian-skirmish-2
 -------------------------------------------------------------------------------
 Track: Savior of the Waking World
 Artist: Toby Fox
-Contributors: Buzinkai ([Doctor])
+References: Doctor, Penumbra Phantasm
 URLs: https://homestuck.bandcamp.com/track/savior-of-the-waking-world-2
 -------------------------------------------------------------------------------
 Track: Clockwork Melody
 Artist: Clark Powell
-Contributors: Buzinkai ([Endless Climb])
+References: Endless Climb
 URLs: https://homestuck.bandcamp.com/track/clockwork-melody-2
 -------------------------------------------------------------------------------
 Track: Heirfare
 Artist: Alexander Rosetti
-Contributors: Malcolm Brown ([Showtime]), Mark Hadley ([Harlequin])
+References: Showtime (Original Mix), Showtime (Piano Refrain), Harlequin
 URLs: https://homestuck.bandcamp.com/track/heirfare-2
 -------------------------------------------------------------------------------
 Track: Jade's Lullaby
@@ -33,18 +34,19 @@ URLs: https://homestuck.bandcamp.com/track/jades-lullaby-2
 -------------------------------------------------------------------------------
 Track: Aggrievance
 Artist: Mark Hadley
+References: Aggrieve
 URLs: https://homestuck.bandcamp.com/track/aggrievance-2
 -------------------------------------------------------------------------------
 Track: Happy Cat Song!
 Artist: Michael Guy Bowman, Toby Fox
-Contributors: Michael Guy Bowman ([Chorale for Jaspers])
+References: Chorale for Jaspers
 URLs: https://homestuck.bandcamp.com/track/happy-cat-song-2
 -------------------------------------------------------------------------------
 Track: Hardchorale
 Artist: Alexander Rosetti, Toby Fox
+Contributors: Michael Guy Bowman (meows)
+References: Chorale for Jaspers, Squiddles!
 URLs: https://homestuck.bandcamp.com/track/hardchorale-2
-Contributors:
-- Michael Guy Bowman (meows, [Chorale for Jaspers])
 -------------------------------------------------------------------------------
 Track: An Unbreakable Union
 Artist: Kalibration
@@ -52,14 +54,17 @@ URLs: https://homestuck.bandcamp.com/track/an-unbreakable-union-2
 -------------------------------------------------------------------------------
 Track: Skaian Ride
 Artist: Seth Peelle, Andrew Huo
+References: Aggrieve, Showtime (Original Mix)
 URLs: https://homestuck.bandcamp.com/track/skaian-ride-2
 -------------------------------------------------------------------------------
 Track: White
 Artist: Toby Fox
+References: Black
 URLs: https://homestuck.bandcamp.com/track/white-2
 -------------------------------------------------------------------------------
 Track: Octoroon Rangoon
 Artist: Toby Fox
+References: Black, The Ballad of Jack Noir
 URLs: https://homestuck.bandcamp.com/track/octoroon-rangoon-2
 -------------------------------------------------------------------------------
 Track: Pumpkin Cravings
@@ -68,7 +73,7 @@ URLs: https://homestuck.bandcamp.com/track/pumpkin-cravings-2
 -------------------------------------------------------------------------------
 Track: Welcome to the New Extreme
 Artist: Robert J! Lake
-Contributors: Michael Guy Bowman ([Sburban Jungle])
+References: Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/welcome-to-the-new-extreme-2
 -------------------------------------------------------------------------------
 Track: Crystalanthemums
@@ -77,7 +82,7 @@ URLs: https://homestuck.bandcamp.com/track/crystalanthemums-2
 -------------------------------------------------------------------------------
 Track: Skaia (Incipisphere Mix)
 Artist: Solatrus
-Contributors: Mark Hadley ([Skies of Skaia])
+References: Skies of Skaia
 URLs: https://homestuck.bandcamp.com/track/skaia-incipisphere-mix-2
 -------------------------------------------------------------------------------
 Track: Sarabande
@@ -87,7 +92,7 @@ URLs: https://homestuck.bandcamp.com/track/sarabande-2
 -------------------------------------------------------------------------------
 Track: Clockwork Sorrow
 Artist: David Ko
-Contributors: Clark Powell ([Clockwork Melody])
+References: Clockwork Melody
 URLs: https://homestuck.bandcamp.com/track/clockwork-sorrow-2
 -------------------------------------------------------------------------------
 Track: Phantasmagoric Waltz
@@ -96,17 +101,17 @@ URLs: https://homestuck.bandcamp.com/track/phantasmagoric-waltz-2
 -------------------------------------------------------------------------------
 Track: Sunslammer
 Artist: Seth Peelle
-Contributors: Toby Fox ([Sunsetter])
+References: Sunsetter
 URLs: https://homestuck.bandcamp.com/track/sunslammer-2
 -------------------------------------------------------------------------------
 Track: Lotus Land Story
 Artist: Toby Fox
-Contributors: Seth Peelle ([Lotus])
+References: Lotus, Doctor
 URLs: https://homestuck.bandcamp.com/track/lotus-land-story-2
 -------------------------------------------------------------------------------
 Track: Chorale for War
 Artist: Steve Everson
-Contributors: Michael Guy Bowman ([Chorale for Jaspers])
+References: Chorale for Jaspers
 URLs: https://homestuck.bandcamp.com/track/chorale-for-war-2
 -------------------------------------------------------------------------------
 Track: Unsheath'd
@@ -119,29 +124,33 @@ URLs: https://homestuck.bandcamp.com/track/versus-2
 -------------------------------------------------------------------------------
 Track: Planet Healer
 Artist: Seth Peelle
-Contributors: Buzinkai ([Doctor]), Toby Fox (various material), Erik Scheele (various material)
+References: Doctor, Savior of the Waking World
+Contributors: Toby Fox (various material), Erik Scheele (various material)
 URLs: https://homestuck.bandcamp.com/track/planet-healer-2
 -------------------------------------------------------------------------------
 Track: Bed of Rose's / Dreams of Derse
 Artist: Mark Hadley
+References: Aggrieve
 URLs: https://homestuck.bandcamp.com/track/bed-of-roses-dreams-of-derse-2
 -------------------------------------------------------------------------------
 Track: Skaian Flight
 Artist: Kalibration
-Contributors: Andrew Huo ([Skaian Ride])
+References: Skaian Ride
 URLs: https://homestuck.bandcamp.com/track/skaian-flight-2
 -------------------------------------------------------------------------------
 Track: How Do I Live (Bunny Back in the Box Version)
 Artist: Michael Guy Bowman
-Contributors: Nick Smalley (guitar solo), Trisha Yearwood ([How Do I Live]), Dianne Warren (lyrics)
+Contributors: Nick Smalley (guitar solo), Trisha Yearwood (How Do I Live)
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-bunny-back-in-the-box-version-2
 -------------------------------------------------------------------------------
 Track: Dupliblaze COMAGMA
 Artist: Toby Fox
+References: Atomyk Ebonpyre, Beatdown (Strider Style)
 URLs: https://homestuck.bandcamp.com/track/dupliblaze-comagma-2
 -------------------------------------------------------------------------------
 Track: Moonshatter
 Artist: Toby Fox
+References: Harlequin
 URLs: https://homestuck.bandcamp.com/track/moonshatter-2
 -------------------------------------------------------------------------------
 Track: Sunsetter
@@ -154,6 +163,7 @@ URLs: https://homestuck.bandcamp.com/track/lotus-2
 -------------------------------------------------------------------------------
 Track: Ruins (With Strings)
 Artist: Erik Scheele, Michael Guy Bowman
+References: Ruins, Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/ruins-with-strings-2
 -------------------------------------------------------------------------------
 Track: Ectobiology
@@ -170,35 +180,38 @@ URLs: https://homestuck.bandcamp.com/track/underworld-2
 -------------------------------------------------------------------------------
 Track: Crystamanthequins
 Artist: Erik Scheele
-Contributors: Alexander Rosetti ([Crystalanthemums]), Perry Sullivan ([Mannequin])
+Contributors: Perry Sullivan (Mannequin)
+References: Crystalanthemums, Mannequin
 URLs: https://homestuck.bandcamp.com/track/crystamanthequins-2
 -------------------------------------------------------------------------------
 Track: Endless Climbing
 Artist: Perry Sullivan
-Contributors: Buzinkai ([Endless Climb])
+References: Endless Climb
 URLs: https://homestuck.bandcamp.com/track/endless-climbing-2
 -------------------------------------------------------------------------------
 Track: Land of the Salamanders
 Artist: David Ko
-Contributors: Buzinkai ([Doctor])
+References: Doctor, Sburban Jungle, Showtime (Original Mix), Dissension (Remix), Aggrieve, Vagabounce
 URLs: https://homestuck.bandcamp.com/track/land-of-the-salamanders-2
 -------------------------------------------------------------------------------
 Track: Medical Emergency
 Artist: Alexander Rosetti
-Contributors: Buzinkai ([Doctor]), Toby Fox (various material)
+References: Savior of the Waking World
 URLs: https://homestuck.bandcamp.com/track/medical-emergency-2
 -------------------------------------------------------------------------------
 Track: Clockwork Contrivance
 Artist: Clark Powell
+References: Clockwork Melody
 URLs: https://homestuck.bandcamp.com/track/clockwork-contrivance-2
 -------------------------------------------------------------------------------
 Track: Get Up
 Artist: Toby Fox
+References: Savior of the Waking World, Doctor
 URLs: https://homestuck.bandcamp.com/track/get-up-2
 -------------------------------------------------------------------------------
 Track: Vertical Motion
 Artist: Toby Fox
-Contributors: Buzinkai ([Endless Climb])
+References: Endless Climb
 URLs: https://homestuck.bandcamp.com/track/vertical-motion-2
 -------------------------------------------------------------------------------
 Track: The Beginning of Something Really Excellent
@@ -207,11 +220,13 @@ URLs: https://homestuck.bandcamp.com/track/the-beginning-of-something-really-exc
 -------------------------------------------------------------------------------
 Track: Pyrocumulus (Kickstart)
 Artist: Robert J! Lake
-Contributors: Andrew Huo ([Skaian Shuffle])
+Contributors: Andrew Huo ([Skaian Skuffle])
+References: Skaian Skuffle
 URLs: https://homestuck.bandcamp.com/track/pyrocumulus-kickstart-2
 -------------------------------------------------------------------------------
-Track: Skaian Shuffle
+Track: Skaian Skuffle
 Artist: Andrew Huo
+References: Skies of Skaia
 URLs: https://homestuck.bandcamp.com/track/skaian-skuffle-2
 -------------------------------------------------------------------------------
 Track: Throwdown
@@ -228,6 +243,7 @@ URLs: https://homestuck.bandcamp.com/track/amphibious-subterrain-2
 -------------------------------------------------------------------------------
 Track: Light
 Artist: Erik Scheele
+References: Showtime (Piano Refrain)
 Directory: light-vol5
 URLs: https://homestuck.bandcamp.com/track/light-3
 -------------------------------------------------------------------------------
@@ -249,7 +265,7 @@ URLs: https://homestuck.bandcamp.com/track/ecstasy-2
 -------------------------------------------------------------------------------
 Track: Snow Pollen
 Artist: Toby Fox
-Contributors: Seth Peelle ([Lotus])
+References: Lotus
 URLs: https://homestuck.bandcamp.com/track/snow-pollen-2
 -------------------------------------------------------------------------------
 Track: Candles and Clockwork
@@ -262,17 +278,17 @@ URLs: https://homestuck.bandcamp.com/track/can-town-2
 -------------------------------------------------------------------------------
 Track: Plague Doctor
 Artist: Steve Everson
-Contributors: Buzinkai ([Doctor])
+References: Doctor
 URLs: https://homestuck.bandcamp.com/track/plague-doctor-2
 -------------------------------------------------------------------------------
 Track: Enlightenment
 Artist: Steve Everson
-Contributors: Buzinkai ([Endless Climb]), Mark Hadley ([Aggrieve])
+References: Aggrieve, Endless Climb
 URLs: https://homestuck.bandcamp.com/track/enlightenment-2
 -------------------------------------------------------------------------------
 Track: Doctor Remix
 Artist: Gabe Nezovic
-Contributors: Buzinkai ([Doctor])
+References: Doctor
 URLs: https://homestuck.bandcamp.com/track/doctor-remix-2
 -------------------------------------------------------------------------------
 Track: Biophosphoradelecrystalluminescence
@@ -286,8 +302,29 @@ URLs: https://homestuck.bandcamp.com/track/song-of-life-2
 Track: Descend
 Artist: Toby Fox
 URLs: https://homestuck.bandcamp.com/track/descend-2
+References:
+- Upward Movement
+- Sburban Jungle
+- Beatdown
+- Skies of Skaia
+- Showtime
+- Aggrieve
+- Black
+- Harlequin
+- Explore
+- Chorale for Jaspers
+- Underworld
+- Three in the Morning
+- Pumpkin Cravings
+- Vagabounce
+- Skaian Skuffle
+- Doctor
+- Savior of the Waking World
+- Endless Climb
+- Atomyk Ebonpyre
+- Lotus
 -------------------------------------------------------------------------------
 Track: Homestuck
 Artist: Mark Hadley
-Contributors: Clark Powell ([Homestuck Anthem])
+References: Homestuck Anthem
 URLs: https://homestuck.bandcamp.com/track/homestuck-2

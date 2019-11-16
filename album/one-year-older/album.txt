@@ -5,7 +5,7 @@ Date: August 15, 2012
 FG: #00aaff
 -------------------------------------------------------------------------------
 Track: Sunrise
-Contributors: Erik Scheele ([Light])
+References: Light:light-vol5
 Track Art: Tavia Morra
 URLs: https://erikscheele.bandcamp.com/track/sunrise
 -------------------------------------------------------------------------------
@@ -14,12 +14,12 @@ Track Art: saffronScarf
 URLs: https://erikscheele.bandcamp.com/track/october
 -------------------------------------------------------------------------------
 Track: Firefly Cloud
-Contributors: Buzinkai ([Doctor])
+References: Doctor
 Track Art: Nic Carey
 URLs: https://erikscheele.bandcamp.com/track/firefly-cloud
 -------------------------------------------------------------------------------
 Track: FantasyP
-Contributors: Toby Fox ([Penumbra Phantasm])
+References: Savior of the Waking World
 Track Art: Kaymurph
 URLs: https://erikscheele.bandcamp.com/track/fantasyp
 -------------------------------------------------------------------------------
@@ -45,10 +45,8 @@ URLs: https://erikscheele.bandcamp.com/track/unlabeled
 -------------------------------------------------------------------------------
 Track: Skaian Shrapnel
 Track Art: Crowbawt
+References: Ruins (With Strings), Walk-Stab-Walk (R&E), Crystalanthemums
 URLs: https://erikscheele.bandcamp.com/track/skiain-shrapnel
-Contributors:
-- Erik Scheele ([Ruins], [Walk-Stab-Walk (R&E)])
-- Alexander Rosetti ([Crystalanthemums])
 -------------------------------------------------------------------------------
 Track: The Scratch
 Track Art: Brian Griv
@@ -59,18 +57,19 @@ Track Art: Sasha Morrissey
 URLs: https://erikscheele.bandcamp.com/track/respit
 -------------------------------------------------------------------------------
 Track: Negastrife
-Contributors: Malcolm Brown ([Showtime])
+References: Showtime (Piano Refrain), Cascade (Beta)
 Track Art: Crowbawt
 URLs: https://erikscheele.bandcamp.com/track/negastrife
 -------------------------------------------------------------------------------
 Track: Mother
-Contributors: Robert J! Lake (additional beats), Mark Hadley ([Skies of Skaia])
+Contributors: Robert J! Lake (additional beats)
+References: Mother (Piano), Skies of Skaia
 Track Art: Louise L.
 URLs: https://erikscheele.bandcamp.com/track/mother
 -------------------------------------------------------------------------------
 Track: Another Chance
 Artist: Eston Schweickart
-Contributors: Erik Scheele ([Walk-Stab-Walk (R&E)])
+References: Walk-Stab-Walk (R&E)
 Track Art: dapperpixel
 URLs: https://erikscheele.bandcamp.com/track/another-chance-bonus
 -------------------------------------------------------------------------------

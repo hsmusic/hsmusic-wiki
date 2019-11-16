@@ -9,7 +9,9 @@ Track: Null
 URLs: https://parsecproductions.bandcamp.com/track/null
 -------------------------------------------------------------------------------
 Track: Skaian Birth
+References: Skies of Skaia
 URLs: https://parsecproductions.bandcamp.com/track/skaian-birth
 -------------------------------------------------------------------------------
 Track: Song of Skaia
+References: Skies of Skaia
 URLs: https://parsecproductions.bandcamp.com/track/song-of-skaia

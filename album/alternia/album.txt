@@ -30,18 +30,21 @@ Track: dESPERADO ROCKET CHAIRS,
 URLs: https://homestuck.bandcamp.com/track/desperado-rocket-chairs-2
 -------------------------------------------------------------------------------
 Track: Death of the Lusii
+References: Crustacean
 URLs: https://homestuck.bandcamp.com/track/death-of-the-lusii-2
 -------------------------------------------------------------------------------
 Track: Virgin Orb
 URLs: https://homestuck.bandcamp.com/track/virgin-orb-2
 -------------------------------------------------------------------------------
 Track: The La2t Frontier
+References: Sunsetter
 URLs: https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
 -------------------------------------------------------------------------------
 Track: Skaian Summoning
 URLs: https://homestuck.bandcamp.com/track/skaian-summoning-2
 -------------------------------------------------------------------------------
 Track: The Thirteenth Hour
+References: Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/the-thirteenth-hour-2
 -------------------------------------------------------------------------------
 Track: Spider's Claw
@@ -57,4 +60,5 @@ Track: Theme
 URLs: https://homestuck.bandcamp.com/track/theme-2
 -------------------------------------------------------------------------------
 Track: Walls Covered in Blood DX
+References: Walls Covered in Blood
 URLs: https://homestuck.bandcamp.com/track/walls-covered-in-blood-dx-2

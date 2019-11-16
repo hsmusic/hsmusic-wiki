@@ -6,22 +6,27 @@ FG: #00a4a4
 -------------------------------------------------------------------------------
 Track: Arisen Anew
 Artist: Tensei
+References: psych0ruins
 URLs: https://homestuck.bandcamp.com/track/arisen-anew-2
 -------------------------------------------------------------------------------
 Track: Karkat's Theme
 Artist: Toby Fox
+References: Crustacean
 URLs: https://homestuck.bandcamp.com/track/karkats-theme-2
 -------------------------------------------------------------------------------
 Track: Trollcops
 Artist: Erik Scheele
+References: Under the Hat
 URLs: https://homestuck.bandcamp.com/track/trollcops-2
 -------------------------------------------------------------------------------
 Track: BL1ND JUST1C3 - 1NV3ST1G4T1ON !!
 Artist: Malcolm Brown
+References: The Lemonsnout Turnabout, Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/bl1nd-just1c3-1nv3st1g4t1on-2
 -------------------------------------------------------------------------------
 Track: Terezi's Theme
 Artist: Toby Fox
+References: The Lemonsnout Turnabout, Theme
 URLs: https://homestuck.bandcamp.com/track/terezis-theme-2
 -------------------------------------------------------------------------------
 Track: Dreamers and The Dead
@@ -30,28 +35,36 @@ URLs: https://homestuck.bandcamp.com/track/dreamers-and-the-dead-2
 -------------------------------------------------------------------------------
 Track: Vriska's Theme
 Artist: Toby Fox
+References: Spider's Claw, Theme
 URLs: https://homestuck.bandcamp.com/track/vriskas-theme-2
 -------------------------------------------------------------------------------
 Track: She's a Sp8der
 Artist: Tensei
+References: Spider's Claw, MeGaLoVania, Eridan's Theme, Crustacean
 URLs: https://homestuck.bandcamp.com/track/shes-a-sp8der-2
 -------------------------------------------------------------------------------
 Track: FIDUSPAWN, GO!
 Artist: David Ko
 Contributors: Toby Fox (arrangement), The_Eighth_Bit (soundfont)
 URLs: https://homestuck.bandcamp.com/track/fiduspawn-go-2
+References:
+- Pumpkin Cravings
+- Harlequin
+- Sunsetter
+- dESPERADO ROCKET CHAIRS,
 -------------------------------------------------------------------------------
 Track: Darling Kanaya
 Artist: Toby Fox
 URLs: https://homestuck.bandcamp.com/track/darling-kanaya-2
 -------------------------------------------------------------------------------
 Track: Requiem of Sunshine and Rainbows
-Artist: Peter Turner
+Artist: Paige Turner
 URLs: https://homestuck.bandcamp.com/track/requiem-of-sunshine-and-rainbows-2
 -------------------------------------------------------------------------------
 Track: Eridan's Theme
 Artist: Toby Fox
-Contributors: Alexander Rosetti ([Catchyegrabber (Skipper Plumbthroat's Song)]), The_Eighth_Bit (soundfont)
+Contributors: The_Eighth_Bit (soundfont)
+References: Catchyegrabber (Skipper Plumbthroat's Song)
 URLs: https://homestuck.bandcamp.com/track/eridans-theme-2
 -------------------------------------------------------------------------------
 Track: Nautical Nightmare
@@ -61,16 +74,18 @@ URLs: https://homestuck.bandcamp.com/track/nautical-nightmare-2
 -------------------------------------------------------------------------------
 Track: Nepeta's Theme
 Artist: Toby Fox
+References: Walls Covered in Blood
 URLs: https://homestuck.bandcamp.com/track/nepetas-theme-2
 -------------------------------------------------------------------------------
 Track: Horschestra STRONG Version
 Artist: Alexander Rosetti
+References: Horschestra, Walls Covered in Blood
 Directory: horschestra-STRONG-version
 URLs: https://homestuck.bandcamp.com/track/horschestra-strong-version-2
 -------------------------------------------------------------------------------
 Track: Blackest Heart (With Honks)
 Artist: Toby Fox
-Contributors: Mark Hadley ([Blackest Heart])
+References: Blackest Heart
 URLs: https://homestuck.bandcamp.com/track/blackest-heart-with-honks-2
 -------------------------------------------------------------------------------
 Track: Midnight Calliope
@@ -87,21 +102,33 @@ URLs: https://homestuck.bandcamp.com/track/trollian-standoff-2
 -------------------------------------------------------------------------------
 Track: Rex Duodecim Angelus
 Artist: Malcolm Brown
-Contributors: Toby Fox ("Alternia" album), Alexander Rosetti ([Horschestra])
 URLs: https://homestuck.bandcamp.com/track/rex-duodecim-angelus-2
+References:
+- Crustacean
+- The Lemonsnout Turnabout
+- dESPERADO ROCKET CHAIRS,
+- Virgin Orb
+- Horschestra
+- Walls Covered in Blood
+- Keepers
+- The La2t Frontiier
+- psych0ruins
+- Spider's Claw
 -------------------------------------------------------------------------------
 Track: Killed by BR8K Spider!!!!!!!!
 Artist: Toby Fox
+References: Spider's Claw
 URLs: https://homestuck.bandcamp.com/track/killed-by-br8k-spider-2
 -------------------------------------------------------------------------------
 Track: Alternia
 Artist: Seth Peelle
-Contributors: Toby Fox ([Theme])
+References: Theme
 URLs: https://homestuck.bandcamp.com/track/alternia-2
 -------------------------------------------------------------------------------
 Track: Trollcops (Radio Play)
 Artist: Erik Scheele
 Contributors: Nick Smalley (words)
+References: Trollcops
 URLs: https://homestuck.bandcamp.com/track/trollcops-radio-play-2
 -------------------------------------------------------------------------------
 Track: Catapult Capuchin
@@ -119,16 +146,20 @@ URLs: https://homestuck.bandcamp.com/track/a-fairy-battle-2
 Track: The Blind Prophet
 Artist: Toby Fox
 Contributors: hank hill & cyclops (everything)
+References: The La2t Frontiier, MeGaLoVania, Courser
 URLs: https://homestuck.bandcamp.com/track/the-blind-prophet-2
 -------------------------------------------------------------------------------
 Track: AlterniaBound
 Artist: Toby Fox
+References: Theme
 URLs: https://homestuck.bandcamp.com/track/alterniabound-2
 -------------------------------------------------------------------------------
 Track: You Won A Combat
 Artist: Toby Fox
+References: Theme
 URLs: https://homestuck.bandcamp.com/track/you-won-a-combat-2
 -------------------------------------------------------------------------------
 Track: Rest A While
 Artist: Toby Fox
+References: Theme
 URLs: https://homestuck.bandcamp.com/track/rest-a-while-2

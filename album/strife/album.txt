@@ -9,20 +9,21 @@ Track: Stormspirit
 URLs: https://tenseimusic.bandcamp.com/track/stormspirit
 -------------------------------------------------------------------------------
 Track: Heir Conditioning
-Contributors: Toby Fox ([Savior of the Waking World])
+References: Savior of the Waking World
 URLs: https://tenseimusic.bandcamp.com/track/heir-conditioning
 -------------------------------------------------------------------------------
 Track: Dance of Thorns
 URLs: https://tenseimusic.bandcamp.com/track/dance-of-thorns
 -------------------------------------------------------------------------------
 Track: Time on My Side
-Contributors: Curt Blakeslee ([Beatdown (Strider Style)]), Toby Fox ([Black])
+References: Beatdown (Strider Style), Black
 URLs: https://tenseimusic.bandcamp.com/track/time-on-my-side
 -------------------------------------------------------------------------------
 Track: Atomic Bonsai
 URLs: https://tenseimusic.bandcamp.com/track/atomic-bonsai
 -------------------------------------------------------------------------------
 Track: Knife's Edge
+References: Cascade (Beta)
 URLs: https://tenseimusic.bandcamp.com/track/knifes-edge
 -------------------------------------------------------------------------------
 Track: Make a Wish

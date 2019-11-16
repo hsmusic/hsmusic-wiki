@@ -41,11 +41,13 @@ URLs: https://youtu.be/0DILZ3Qi_Wg
 Track: Requiem for an Exile
 Artist: Tyler Dever
 Contributors: Solatrus (production)
+References: Requiem
 Track Art: Zilleniose
 URLs: https://youtu.be/aAphwUVKFm4
 -------------------------------------------------------------------------------
 Track: Raggy Looking Dance
 Artist: Alexander Rosetti
+References: Squiddles!
 Track Art: Zilleniose
 URLs: https://youtu.be/kHSVHbxBEHU
 -------------------------------------------------------------------------------
@@ -56,12 +58,13 @@ URLs: https://youtu.be/K7WRrBG6BM8
 -------------------------------------------------------------------------------
 Track: Litrichean Rioghail
 Artist: Malcolm Brown
+References: Explore
 Track Art: saffronScarf
 URLs: https://youtu.be/RtzNs4pH11Y
 -------------------------------------------------------------------------------
 Track: Ruins Rising
 Artist: Michael Guy Bowman
-Contributors: Erik Scheele ([Ruins])
+References: Ruins (With Strings)
 Track Art: Raizor
 URLs: https://youtu.be/pDYCL68d3wI
 -------------------------------------------------------------------------------
@@ -72,11 +75,13 @@ URLs: https://youtu.be/qtt0o-v2yco
 -------------------------------------------------------------------------------
 Track: Nightmare
 Artist: Malcolm Brown
+References: Carapacian Dominion
 Track Art: Left
 URLs: https://youtu.be/CVxTL43Czuc
 -------------------------------------------------------------------------------
 Track: Vagabounce Remix
 Artist: David Ko
+References: Vagabounce
 Track Art: Noot
 URLs: https://youtu.be/P_pCaNbhExo
 -------------------------------------------------------------------------------

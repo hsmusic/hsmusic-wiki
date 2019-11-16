@@ -85,7 +85,7 @@ const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_INTRO = fixWS`
     <p>Welcome to my fan-made Homestuck music wiki! Select any album below to begin browsing.</p>
     <p>This site was mostly made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums are all indexed in the one place, and URLs will always stay consistent. Also included are tracks for listening on Bandcamp and other services.</p>
-    <p>This site was mostly made by <a href="https://twitter.com/florriestuck">Florrie</a>. Listings were fetched primarily from the <a href="https://homestuck.bandcamp.com">Homestuck Bandcamp</a>. Track art is primarily from the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a>. Much of this is made based on and with use of the <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom - thanks a bunch to all who've worked on that!</p>
+    <p>This site was mostly made by Florrie (<a href="https://twitter.com/florriestuck">@florriestuck</a>, <a href="https://reddit.com/u/towerofnix">/u/towerofnix</a> - feel free to send suggestions and feedback!!). Listings were fetched primarily from the <a href="https://homestuck.bandcamp.com">Homestuck Bandcamp</a>. Track art is primarily from the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a>. Leitmotif and track-reference info is gathered from the fantastic <a href="https://recordcrash.com/nsnd.html">NSND</a>. Much of this is made based on and with use of the <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom - thanks a bunch to all who've worked on that!</p>
 `;
 
 // The folder you stick your random downloads in is called "Downloads", yeah?
@@ -327,6 +327,7 @@ async function processAlbumDataFile(file) {
 
         const trackName = getBasicField(section, 'Track');
         const originalDate = getBasicField(section, 'Original Date');
+        const references = getListField(section, 'References') || [];
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
         let trackCoverArtists = getContributionField(section, 'Track Art');
         let trackContributors = getContributionField(section, 'Contributors') || [];
@@ -352,7 +353,7 @@ async function processAlbumDataFile(file) {
         }
 
         if (!trackCoverArtists) {
-            if (albumHasTrackArt) {
+            if (getBasicField(section, 'Track Art') !== 'none' && albumHasTrackArt) {
                 if (albumTrackCoverArtists) {
                     trackCoverArtists = albumTrackCoverArtists;
                 } else {
@@ -391,6 +392,7 @@ async function processAlbumDataFile(file) {
             artists: trackArtists,
             coverArtists: trackCoverArtists,
             contributors: trackContributors,
+            references,
             date,
             directory: trackDirectory,
             urls: trackURLs,
@@ -514,7 +516,7 @@ async function writeAlbumPage(album, albumData) {
                             <li>
                                 <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
                                 ${track.artists !== album.artists && fixWS`
-                                    <i>by ${getArtistString(track.artists)}</i>
+                                    <span class="by">by ${getArtistString(track.artists)}</span>
                                 `}
                             </li>
                         `).join('\n')}
@@ -529,6 +531,8 @@ async function writeTrackPage(track, albumData) {
     const artistNames = getArtistNames(albumData);
     const allTracks = getAllTracks(albumData);
     const trackDirectory = path.join(TRACK_DIRECTORY, track.directory);
+    const tracksThatReference = getTracksThatReference(track, allTracks);
+    const tracksReferenced = getTracksReferencedBy(track, allTracks);
     await mkdirp(trackDirectory);
     await writeFile(path.join(trackDirectory, 'index.html'), fixWS`
         <!DOCTYPE html>
@@ -553,6 +557,14 @@ async function writeTrackPage(track, albumData) {
                         `))}.<br>`}
                         Released ${getDateString(track)}.
                     </p>
+                    <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
+                        <a href="${url}">${
+                            url.includes('bandcamp.com') ? 'Bandcamp' :
+                            url.includes('youtu') ? 'YouTube' :
+                            url.includes('soundcloud') ? 'SoundCloud' :
+                            '(External)'
+                        }</a>
+                    `), 'or')}.</p>
                     ${track.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
@@ -564,15 +576,28 @@ async function writeTrackPage(track, albumData) {
                             `).join('\n')}
                         </ul>
                     `}
-                    <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
-                        <a href="${url}">${
-                            url.includes('bandcamp.com') ? 'Bandcamp' :
-                            url.includes('youtu') ? 'YouTube' :
-                            url.includes('soundcloud') ? 'SoundCloud' :
-                            '(External)'
-                        }</a>
-                    `), 'or')}.</p>
-                    </ul>
+                    ${tracksReferenced.length && fixWS`
+                        <p>Tracks that <i>${track.name}</i> references:</p>
+                        <ul>
+                            ${tracksReferenced.map(track => fixWS`
+                                <li>
+                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                    <span class="by">by ${getArtistString(track.artists)}</span>
+                                </li>
+                            `).join('\n')}
+                        </ul>
+                    `}
+                    ${tracksThatReference.length && fixWS`
+                        <p>Tracks that reference <i>${track.name}</i>:</p>
+                        <ul>
+                            ${tracksThatReference.map(track => fixWS`
+                                <li>
+                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                    <span class="by">by ${getArtistString(track.artists)}</span>
+                                </li>
+                            `).join('\n')}
+                        </ul>
+                    `}
                 </div>
             </body>
         </html>
@@ -585,7 +610,12 @@ async function writeArtistPages(albumData) {
 
 async function writeArtistPage(artistName, albumData) {
     const allTracks = getAllTracks(albumData);
-    const tracks = sortByDate(allTracks.filter(track => track.artists.includes(artistName) || track.contributors.some(({ who }) => who === artistName)));
+    const tracks = sortByDate(allTracks.filter(track => (
+        track.artists.includes(artistName) ||
+        track.contributors.some(({ who }) => who === artistName) ||
+        getTracksReferencedBy(track, allTracks).some(track => track.artists.includes(artistName))
+    )
+    ));
     const artThings = sortByDate(albumData.concat(allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
 
     // Shish!
@@ -610,15 +640,29 @@ async function writeArtistPage(artistName, albumData) {
                     <h1>${artistName}</h1>
                     ${tracks.length && fixWS`
                         <h2>Tracks</h2>
+                        <p>Dim tracks are tracks that this artist contributed only a based-upon song to.</p>
                         <ol>
-                            ${tracks.map(track => fixWS`
-                                <li class="${!track.artists.includes(artistName) && `contributed ${track.contributors.filter(({ who }) => who === artistName).every(({ what }) => what && what.startsWith('[') && what.endsWith(']')) && 'contributed-only-original'}`}">
-                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
-                                    ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
-                                    ${!track.artists.includes(artistName) && `<span class="contributed">(${track.contributors.filter(({ who }) => who === artistName).map(contrib => getContributionString(contrib, tracks)).join(', ') || 'contributed'})</span>`}
-                                    <i>from <a href="${ALBUM_DIRECTORY}/${track.album.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.album.name}</a></i>
-                                </li>
-                            `).join('\n')}
+                            ${tracks.map(track => {
+                                const contrib = {
+                                    who: artistName,
+                                    what: [
+                                        ...track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what),
+                                        ...getTracksReferencedBy(track, allTracks).filter(track => track.artists.includes(artistName)).map(track => `[${track.name}]`)
+                                    ].filter(Boolean).join(', ')
+                                };
+                                if (contrib.length && track.artists.includes(artistName)) {
+                                    const nonTracks = contrib.what.split(',').map(what => what.trim()).filter(what => !(what.startsWith('[') && what.endsWith(']')));
+                                    contrib.what = nonTracks.join(', ');
+                                }
+                                return fixWS`
+                                    <li class="${!track.artists.includes(artistName) && `contributed ${track.contributors.filter(({ who }) => who === artistName).every(({ what }) => what && what.startsWith('[') && what.endsWith(']')) && 'contributed-only-original'}`}">
+                                        <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
+                                        ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
+                                        ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
+                                        <i>from <a href="${ALBUM_DIRECTORY}/${track.album.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.album.name}</a></i>
+                                    </li>
+                                `;
+                            }).join('\n')}
                         </ol>
                     `}
                     ${artThings.length && fixWS`
@@ -632,7 +676,7 @@ async function writeArtistPage(artistName, albumData) {
                                         ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
                                         <i>${thing.album ? `from <a href="${ALBUM_DIRECTORY}/${thing.album.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.album.name}</a>` : `(cover art)`}</i>
                                     </li>
-                                `
+                                `;
                             }).join('\n')}
                         </ol>
                     `}
@@ -650,6 +694,21 @@ function getContributionString({ what }, allTracks) {
                 ? `<i><a href="${TRACK_DIRECTORY}/${allTracks.find(track => track.name === name).directory}/index.html">${name}</a></i>`
                 : `<i>${name}</i>`)
         : '';
+}
+
+function getTracksThatReference(track, allTracks) {
+    return allTracks.filter(t => getTracksReferencedBy(t, allTracks).includes(track));
+}
+
+function getTracksReferencedBy(track, allTracks) {
+    return track.references.map(ref => {
+        if (ref.includes(':')) {
+            const dir = ref.split(':')[1];
+            return allTracks.find(track => track.directory === dir);
+        } else {
+            return allTracks.find(track => track.name === ref);
+        }
+    }).filter(Boolean);
 }
 
 function getArtistString(artists) {

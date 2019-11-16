@@ -5,8 +5,11 @@ FG: #c7ff43
 ------------------------------------------------------------------------------
 Track: Overture (Canon Edit)
 Artist: Clark Powell, Toby Fox
+Contributors: Toby Fox (additional work)
 Track Art: Homestuck
 URLs: https://homestuck.bandcamp.com/track/overture-canon-edit-2
-Contributors:
-- Clark Powell ([I - Overture])
-- Toby Fox (additional work)
+References:
+- I - Overture
+- Doctor
+- Sburban Jungle
+- Black Hole / Green Sun

@@ -10,6 +10,7 @@ URLs: https://homestuck.bandcamp.com/track/three-in-the-morning-3
 -------------------------------------------------------------------------------
 Track: Blue Noir
 Artist: David Ko
+References: Vagabounce
 URLs: https://homestuck.bandcamp.com/track/blue-noir-2
 -------------------------------------------------------------------------------
 Track: Dead Shuffle
@@ -66,6 +67,7 @@ URLs: https://homestuck.bandcamp.com/track/tall-dark-and-loathsome-2
 -------------------------------------------------------------------------------
 Track: Joker's Wild
 Artist: Mark Hadley
+References: Harlequin
 URLs: https://homestuck.bandcamp.com/track/jokers-wild-2
 -------------------------------------------------------------------------------
 Track: Livin' It Up
@@ -74,4 +76,5 @@ URLs: https://homestuck.bandcamp.com/track/livin-it-up-2
 -------------------------------------------------------------------------------
 Track: Hauntjelly
 Artist: Andrew Huo, Ian Taylor
+References: Hauntjam
 URLs: https://homestuck.bandcamp.com/track/hauntjelly-2

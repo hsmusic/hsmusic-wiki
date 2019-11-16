@@ -79,6 +79,7 @@ URLs:
 -------------------------------------------------------------------------------
 Track: CLOWNFUCKER
 Artist: James Roach, Toby Fox
+References: take me to clown church
 URLs:
 - https://homestuck.bandcamp.com/track/clownfucker
 - https://soundcloud.com/jamesroachmusic/clownfucker-by-james-roach-and-toby-fox
@@ -100,9 +101,14 @@ URLs: https://homestuck.bandcamp.com/track/the-final-clowntdown
 -------------------------------------------------------------------------------
 Track: END OF FRIENDVANGELION
 URLs: https://homestuck.bandcamp.com/track/end-of-friendvangelion
+References:
+- Homestuck Anthem
+- Joey Claire, Extraordinaire
+- Rustblood
 -------------------------------------------------------------------------------
 Track: VALID END
 URLs: https://homestuck.bandcamp.com/track/valid-end
 -------------------------------------------------------------------------------
 Track: WORST END
+References: English, Black, GRAVEYARD SHIFT
 URLs: https://homestuck.bandcamp.com/track/worst-end

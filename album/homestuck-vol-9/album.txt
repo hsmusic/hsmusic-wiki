@@ -5,7 +5,7 @@ FG: #f2a400
 -------------------------------------------------------------------------------
 Track: Crystalmethequins
 Artist: Clark Powell, Astro Kid
-Contributors: Erik Scheele ([Crystamanthequins]), Alexander Rosetti ([Crystalanthemums] melody)
+References: Crystamanthequins, Crystalanthemums
 Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/crystalmethequins-2
 -------------------------------------------------------------------------------
@@ -32,12 +32,14 @@ URLs: https://homestuck.bandcamp.com/track/whistling-jackhammer-2
 -------------------------------------------------------------------------------
 Track: Ugly Betty
 Artist: Robert J! Lake
+References: Aggrieve (Violin Refrain)
 Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/ugly-betty-2
 -------------------------------------------------------------------------------
 Track: Hate You
 Artist: Toby Fox
 Contributors: Azami (laughter)
+References: Love You
 Track Art: MissNK
 URLs: https://homestuck.bandcamp.com/track/hate-you-2
 -------------------------------------------------------------------------------
@@ -53,12 +55,14 @@ URLs: https://homestuck.bandcamp.com/track/skaianet-2
 -------------------------------------------------------------------------------
 Track: Another Jungle
 Artist: Michael Guy Bowman
+References: Sburban Jungle, Showtime
 Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/skaianet-2
 -------------------------------------------------------------------------------
 Track: GameGrl (Original 1993 Mix)
 Artist: Michael Guy Bowman
 Contributors: Erik Scheele (keytar), Tavia Morra (vocals)
+References: Airtime, Afraid of the Darko
 Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/gamegrl-original-1993-mix-2
 -------------------------------------------------------------------------------
@@ -74,6 +78,7 @@ URLs: https://homestuck.bandcamp.com/track/a-little-fight-mewsic-2
 -------------------------------------------------------------------------------
 Track: Austin, Atlantis
 Artist: Clark Powell
+References: Beatdown (Strider Style), Atomyk Ebonpyre, Explore, Endless Climb, Flare
 Track Art: Nic Carey
 URLs: https://homestuck.bandcamp.com/track/austin-atlantis-2
 -------------------------------------------------------------------------------
@@ -96,6 +101,7 @@ URLs: https://homestuck.bandcamp.com/track/minihoofs-adventure-2
 -------------------------------------------------------------------------------
 Track: Encore
 Artist: Malcolm Brown
+References: Showtime, Lifdoff, Unite Synchronization
 Track Art: Bea
 URLs: https://homestuck.bandcamp.com/track/encore-2
 -------------------------------------------------------------------------------
@@ -161,7 +167,7 @@ URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-post
 -------------------------------------------------------------------------------
 Track: Three in the Morning (Aftermath)
 Artist: Erik Scheele
-Contributors: Clark Powell ([Three in the Morning])
+Refrences: Three in the Morning
 Track Art: Dawn Davis
 URLs: https://homestuck.bandcamp.com/track/three-in-the-morning-aftermath-2
 -------------------------------------------------------------------------------
@@ -172,6 +178,7 @@ URLs: https://homestuck.bandcamp.com/track/lancer-2
 -------------------------------------------------------------------------------
 Track: Three's a Crowd
 Artist: Robert J! Lake, Thomas Ferkol
+References: Three in the Morning
 Track Art: ari
 URLs: https://homestuck.bandcamp.com/track/threes-a-crowd-2
 -------------------------------------------------------------------------------
@@ -207,6 +214,7 @@ URLs: https://homestuck.bandcamp.com/track/the-changing-game-2
 -------------------------------------------------------------------------------
 Track: Requited
 Artist: Clark Powell
+References: Serenade
 Track Art: Dodostad
 URLs: https://homestuck.bandcamp.com/track/requited-2
 -------------------------------------------------------------------------------
@@ -224,11 +232,13 @@ URLs: https://homestuck.bandcamp.com/track/moonsetter-2
 Track: Candles and Clockwork (Alpha Version)
 Artist: Tyler Dever
 Contributors: Alexander Rosetti (mixing)
+References: Candles and Clockwork
 Track Art: Worthikids
 URLs: https://homestuck.bandcamp.com/track/candles-and-clockwork-alpha-version-2
 -------------------------------------------------------------------------------
 Track: Coursing
 Artist: Alexander Rosetti
+References: Courser
 Track Art: Zilleniose
 URLs: https://homestuck.bandcamp.com/track/coursing-2
 -------------------------------------------------------------------------------
@@ -244,6 +254,7 @@ URLs: https://homestuck.bandcamp.com/track/battle-against-an-unfathomable-enemy-
 -------------------------------------------------------------------------------
 Track: Noirscape
 Artist: David Ellis
+References: Black, Crystalanthemums, Descend
 Track Art: kendle bentley b!
 URLs: https://homestuck.bandcamp.com/track/noirscape-2
 -------------------------------------------------------------------------------
@@ -258,14 +269,16 @@ Contributors:
 - DJ Sai Tae (guitar)
 - viaSatellite (guitar & bass)
 - Ian White (trumpet & bass)
-- Michael Guy Bowman ([Sburban Jungle])
-- Toby Fox ([Umbral Ultimatum])
-- Seth Peelle ([Courser])
-- Alexander Rosetti ([Courser])
-- Buzinkai ([Doctor])
+References:
+- Sburban Jungle
+- Savior of the Waking World
+- Courser
+- Doctor
+- Black Rose / Green Sun
 -------------------------------------------------------------------------------
 Track: A Taste for Adventure
 Artist: Seth Peele
+References: Dissension, Carefree Action, Showtime
 Track Art: minty
 URLs: https://homestuck.bandcamp.com/track/a-taste-for-adventure-2
 -------------------------------------------------------------------------------
@@ -276,10 +289,12 @@ URLs: https://homestuck.bandcamp.com/track/stargaze-2
 -------------------------------------------------------------------------------
 Track: Another Countdown
 Artist: Michael Guy Bowman
+References: Another Jungle
 Track Art: Emery Ferguson
 URLs: https://homestuck.bandcamp.com/track/another-countdown-2
 -------------------------------------------------------------------------------
 Track: Frustracean
 Artist: Toby Fox
+References: Crustacean
 Track Art: Homestuck
 URLs: https://www.youtube.com/watch?v=om3VC6ru4yk

@@ -1,258 +1,240 @@
 Album: Homestuck Vol. 1-4
 Date: October 24 2011
-Directory: homestuck-vol-1-4
 Cover Art: Homestuck
 Track Art: Homestuck
 FG: #aaccff
 -------------------------------------------------------------------------------
 Track: Showtime (Piano Refrain)
-Directory: showtime-piano-refrain
-Artist: Malcolm Brown
+Artist: Kevin Regamey, Malcolm Brown
 Contributors: Kevin Regamey (arrangement)
-URLs: https://homestuck.bandcamp.com/track/showtime-piano-refrain-3
+References: Showtime (Original Mix)
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/showtime-piano-refrain-3
 -------------------------------------------------------------------------------
 Track: Harlequin
-Directory: harlequin
 Artist: Mark Hadley
-URLs: https://homestuck.bandcamp.com/track/harlequin-3
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/harlequin-3
 -------------------------------------------------------------------------------
 Track: Showtime (Original Mix)
-Directory: showtime-original-mix
 Artist: Malcolm Brown
-URLs: https://homestuck.bandcamp.com/track/showtime-original-mix-3
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/showtime-original-mix-3
 -------------------------------------------------------------------------------
 Track: Aggrieve (Violin Refrain)
-Directory: aggrieve-violin-refrain
-Artist: Mark Hadley
+Artist: Andrew Huo, Mark Hadley
 Contributors: Andrew Huo (arrangement), Gabe Nezovic (mastering)
-URLs: https://homestuck.bandcamp.com/track/aggrieve-violin-refrain-3
+References: Aggrieve
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/aggrieve-violin-refrain-3
 -------------------------------------------------------------------------------
 Track: Sburban Countdown
-Directory: sburban-coutndown
-Artist: Michael Guy Bowman
+Artist: Mark Hadley, Michael Guy Bowman
 Contributors: Mark Hadley (arrangement)
-URLs: https://homestuck.bandcamp.com/track/sburban-countdown-3
+References: Sburban Jungle
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/sburban-countdown-3
 -------------------------------------------------------------------------------
 Track: Aggrieve
-Directory: aggrieve
 Artist: Mark Hadley
 URLs: https://homestuck.bandcamp.com/track/aggrieve-3
 Original Date: August 9, 2009
 -------------------------------------------------------------------------------
 Track: Showtime (Imp Strife Mix)
-Directory: showtime-imp-strife-mix
-Artist: Malcolm Brown
+Artist: Buzinkai, Curt Blakeslee, Malcolm Brown
 Contributors: Buzinkai (arrangement), Curt Blakeslee (fanfare)
-URLs: https://homestuck.bandcamp.com/track/showtime-imp-strife-mix-3
+References: Showtime (Original Mix)
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/showtime-imp-strife-mix-3
 -------------------------------------------------------------------------------
 Track: Nannaquin
-Directory: nannaquin
 Artist: Mark Hadley
-URLs: https://homestuck.bandcamp.com/track/nannaquin-3
+References: Harlequin
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/nannaquin-3
 -------------------------------------------------------------------------------
 Track: Skies of Skaia
-Directory: skies-of-skaia
 Artist: Mark Hadley
-URLs: https://homestuck.bandcamp.com/track/skies-of-skaia-3
 Original Date: August 9, 2009
+URLs: https://homestuck.bandcamp.com/track/skies-of-skaia-3
 -------------------------------------------------------------------------------
 Track: Harlequin (Rock Version)
-Directory: harlequin-rock-version
-Artist: Michael Guy Bowman
-Contributors: Joseph Aylsworth (guitar), Mark Hadley ([Harlequin])
-URLs: https://homestuck.bandcamp.com/track/harlequin-rock-version-3
+Artist: Michael Guy Bowman, Joseph Aylsworth
+Contributors: Joseph Aylsworth (guitar)
+References: Harlequin
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/harlequin-rock-version-3
 -------------------------------------------------------------------------------
 Track: John Sleeps - Skaian Magicant
-Directory: john-sleeps-skaian-magicant
 Artist: Toby Fox
-Contributors: Malcolm Brown ([Showtime (Piano Refrain)]), Mark Hadley ([Skies of Skaia])
-URLs: https://homestuck.bandcamp.com/track/john-sleeps-skaian-magicant-2
+References: Showtime (Piano Refrain), Skies of Skaia
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/john-sleeps-skaian-magicant-2
 -------------------------------------------------------------------------------
 Track: Upward Movement (Dave Owns)
-Directory: upward-movement-dave-owns
 Artist: Kalibration
-URLs: https://homestuck.bandcamp.com/track/upward-movement-dave-owns-3
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/upward-movement-dave-owns-3
 -------------------------------------------------------------------------------
 Track: Vagabounce
-Directory: vagabounce
 Artist: David Ko
-URLs: https://homestuck.bandcamp.com/track/vagabounce-3
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/vagabounce-3
 -------------------------------------------------------------------------------
 Track: Explore
-Directory: explore
-Artist: Buzinkai
+Artist: Buzinkai, Michael Guy Bowman
 Contributors: Michael Guy Bowman (arrangement)
-URLs: https://homestuck.bandcamp.com/track/explore-3
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/explore-3
 -------------------------------------------------------------------------------
 Track: Gardener
-Directory: gardener
 Artist: Steve Everson
-Contributors: Robert J! Lake ([The Beginning of Something Really Excellent])
-URLs: https://homestuck.bandcamp.com/track/gardener-2
+References: The Beginning of Something Really Excellent
 Original Date: October 24, 2011
+URLs: https://homestuck.bandcamp.com/track/gardener-2
 -------------------------------------------------------------------------------
 Track: Showtime Remix
-Directory: showtime-remix
-Artist: Gabe Nezovic, Malcolm Brown
-URLs: https://homestuck.bandcamp.com/track/showtime-remix-3
+Artist: Gabe Nezovic
+References: Showtime (Piano Refrain)
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/showtime-remix-3
 -------------------------------------------------------------------------------
 Track: Aggrieve Remix
-Directory: aggrieve-remix
 Artist: Gabe Nezovic
-Contributors: Mark Hadley ([Aggrieve])
-URLs: https://homestuck.bandcamp.com/track/aggrieve-remix-3
+References: Aggrieve
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/aggrieve-remix-3
 -------------------------------------------------------------------------------
 Track: Verdancy (Bassline)
-Directory: verdancy-bassline
 Artist: Kalibration
-URLs: https://homestuck.bandcamp.com/track/verdancy-bassline-3
 Original Date: December 14, 2009
+URLs: https://homestuck.bandcamp.com/track/verdancy-bassline-3
 -------------------------------------------------------------------------------
 Track: Potential Verdancy
-Directory: potential-verdancy
 Artist: Robert J! Lake
-Contributors: Kalibration ([Verdancy])
-URLs: https://homestuck.bandcamp.com/track/potential-verdancy-2
+References: Verdancy (Bassline)
 Original Date: October 24, 2011
+URLs: https://homestuck.bandcamp.com/track/potential-verdancy-2
 -------------------------------------------------------------------------------
 Track: Beatdown (Strider Style)
-Directory: beatdown-strider-style
 Artist: Curt Blakeslee
-URLs: https://homestuck.bandcamp.com/track/beatdown-strider-style-3
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/beatdown-strider-style-3
 -------------------------------------------------------------------------------
 Track: Harleboss
-Directory: harleboss
 Artist: Malcolm Brown
-Contributors: Mark Hadley ([Harlequin])
-URLs: https://homestuck.bandcamp.com/track/harleboss-3
+References: Harlequin
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/harleboss-3
 -------------------------------------------------------------------------------
 Track: Beatdown Round 2
-Directory: beatdown-round-2
 Artist: Curt Blakeslee
-URLs: https://homestuck.bandcamp.com/track/beatdown-round-2-3
+References: Beatdown (Strider Style)
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/beatdown-round-2-3
 -------------------------------------------------------------------------------
 Track: Dissension (Original)
-Directory: dissension-original
 Artist: David Ko
-URLs: https://homestuck.bandcamp.com/track/dissension-original-3
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/dissension-original-3
 -------------------------------------------------------------------------------
 Track: Dissension (Remix)
-Directory: dissension-remix
 Artist: David Ko
-URLs: https://homestuck.bandcamp.com/track/dissension-remix-3
+References: Dissension (Original)
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/dissension-remix-3
 -------------------------------------------------------------------------------
 Track: Ohgodwhat
-Directory: ohgodwhat
 Artist: Nick Smalley
-URLs: https://homestuck.bandcamp.com/track/ohgodwhat-3
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/ohgodwhat-3
 -------------------------------------------------------------------------------
 Track: Ohgodwhat Remix
-Directory: ohgodwhat-remix
 Artist: Michael Guy Bowman
-Contributors: Nick Smalley ([Ohgodwhat])
-URLs: https://homestuck.bandcamp.com/track/ohgodwhat-remix-3
+References: Ohgodwhat
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/ohgodwhat-remix-3
 -------------------------------------------------------------------------------
 Track: Rediscover Fusion
-Directory: rediscover-fusion
 Artist: BurnedKirby
-URLs: https://homestuck.bandcamp.com/track/rediscover-fusion-3
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/rediscover-fusion-3
 -------------------------------------------------------------------------------
 Track: Explore Remix
-Directory: explore-remix
 Artist: Gabe Nezovic
-Contributors: Buzinkai ([Explore]), Michael Guy Bowman ([Explore])
-URLs: https://homestuck.bandcamp.com/track/explore-remix-3
+References: Explore
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/explore-remix-3
 -------------------------------------------------------------------------------
 Track: Chorale for Jaspers
-Directory: chorale-for-jaspers
 Artist: Michael Guy Bowman
-URLs: https://homestuck.bandcamp.com/track/chorale-for-jaspers-3
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/chorale-for-jaspers-3
 -------------------------------------------------------------------------------
 Track: Pony Chorale
-Directory: pony-chorale
 Artist: Michael Guy Bowman
-URLs: https://homestuck.bandcamp.com/track/pony-chorale-3
+References: Chorale for Jaspers
 Original Date: December 15, 2009
+URLs: https://homestuck.bandcamp.com/track/pony-chorale-3
 -------------------------------------------------------------------------------
 Track: Revelawesome
 Artist: Malcolm Brown
-URLs: https://homestuck.bandcamp.com/track/revelawesome-3
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/revelawesome-3
 -------------------------------------------------------------------------------
 Track: Hardlyquin
 Artist: Mark Hadley
-URLs: https://homestuck.bandcamp.com/track/hardlyquin-3
+References: Harlequin
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/hardlyquin-3
 -------------------------------------------------------------------------------
 Track: Carefree Victory
-Artist: Mark Hadley, Andrew Huo, Toby Fox
-URLs: https://homestuck.bandcamp.com/track/carefree-victory-3
+Artist: Andrew Huo, Toby Fox
+References: Carefree Action
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/carefree-victory-3
 -------------------------------------------------------------------------------
 Track: Ballad of Awakening
 Artist: Malcolm Brown
-URLs: https://homestuck.bandcamp.com/track/ballad-of-awakening-3
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/ballad-of-awakening-3
 -------------------------------------------------------------------------------
 Track: Sburban Jungle
 Artist: Michael Guy Bowman
-URLs: https://homestuck.bandcamp.com/track/sburban-jungle-3
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/sburban-jungle-3
 -------------------------------------------------------------------------------
 Track: Three in the Morning (RJ's I Can Barely Sleep In This Casino Remix)
 Artist: Robert J! Lake
 Directory: three-in-the-morning-rj
-Contributors: Clark Powell ([Three in the Morning])
-URLs: https://homestuck.bandcamp.com/track/three-in-the-morning-rjs-i-can-barely-sleep-in-this-casino-remix-3
+References: Three in the Morning
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/three-in-the-morning-rjs-i-can-barely-sleep-in-this-casino-remix-3
 -------------------------------------------------------------------------------
 Track: Doctor
 Artist: Buzinkai
 Contributors: Clark Powell (production), Michael Vallejo (production)
-URLs: https://homestuck.bandcamp.com/track/doctor-3
+References: Doctor (Original Loop)
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/doctor-3
 -------------------------------------------------------------------------------
 Track: Endless Climb
 Artist: Buzinkai
-URLs: https://homestuck.bandcamp.com/track/endless-climb-3
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/endless-climb-3
 -------------------------------------------------------------------------------
 Track: Atomyk Ebonpyre
 Artist: Toby Fox
-URLs: https://homestuck.bandcamp.com/track/atomyk-ebonpyre-3
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/atomyk-ebonpyre-3
 -------------------------------------------------------------------------------
 Track: Black
 Artist: Toby Fox
-Contributors: Eddie Morton (vocals)
-URLs: https://homestuck.bandcamp.com/track/black-3
+References: Liquid Negrocity
 Original Date: April 13, 2010
+URLs: https://homestuck.bandcamp.com/track/black-3
 -------------------------------------------------------------------------------
 Track: Doctor (Original Loop)
 Artist: Buzinkai
-URLs: https://homestuck.bandcamp.com/track/doctor-original-loop-2
 Original Date: October 24, 2011
+URLs: https://homestuck.bandcamp.com/track/doctor-original-loop-2

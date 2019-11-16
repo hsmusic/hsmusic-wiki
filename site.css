@@ -151,3 +151,8 @@ li.contributed-only-original {
 #intro {
     margin: 24px 12%;
 }
+
+li .by {
+    white-space: nowrap;
+    font-style: oblique;
+}

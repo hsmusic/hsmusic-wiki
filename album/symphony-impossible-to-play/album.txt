@@ -8,20 +8,29 @@ FG: #dd5544
 Track: I - Overture
 Directory: overture
 URLs: https://homestuck.bandcamp.com/track/i-overture-2
-Contributors:
-- Alexander Rosetti ([Crystalanthemums])
-- Buzinkai ([Endless Climb], [Doctor], [Explore])
-- Toby Fox ([Atomyk Ebonpyre])
+References:
+- Endless Climb
+- Crystalanthemums
+- Atomyk Ebonpyre
+- Sburban Jungle
+- Doctor
+- Three in the Morning
+- Flare
+- Explore
+- Upward Movement (Dave Owns)
+- Even in Death
 -------------------------------------------------------------------------------
 Track: II - Sarabande
+References: Sarabande:sarabande-vol5
 Directory: sarabande-symphony
-Contributors: Erik Scheele ([Sarabande])
 URLs: https://homestuck.bandcamp.com/track/ii-sarabande-2
 -------------------------------------------------------------------------------
 Track: III - Serenade
+References: Serenade, Ruins (With Strings)
 Directory: serenade-symphony
 URLs: https://homestuck.bandcamp.com/track/iii-serenade-2
 -------------------------------------------------------------------------------
 Track: IV - Anthem
+References: Homestuck Anthem
 Directory: anthem
 URLs: https://homestuck.bandcamp.com/track/iv-anthem-2

@@ -10,6 +10,7 @@ URLs: https://homestuck.bandcamp.com/track/reverie-2
 -------------------------------------------------------------------------------
 Track: Power Fantasy
 Artist: Clark Powell
+References: Reverie
 Track Art: Elyse Holmes
 URLs: https://homestuck.bandcamp.com/track/power-fantasy-2
 -------------------------------------------------------------------------------
@@ -20,6 +21,7 @@ URLs: https://homestuck.bandcamp.com/track/stellarum-salve-2
 -------------------------------------------------------------------------------
 Track: Carne Vale
 Artist: Malcolm Brown
+References: Stellarum Salve, English, Eternity Served Cold
 Track Art: Leslie Hung
 URLs: https://homestuck.bandcamp.com/track/carne-vale-2
 -------------------------------------------------------------------------------
@@ -46,6 +48,7 @@ URLs: https://homestuck.bandcamp.com/track/constant-confinement-2
 -------------------------------------------------------------------------------
 Track: Constant Conquest
 Artist: Michael Guy Bowman
+References: Constant Confinement, Doctor
 Track Art: Elly
 URLs: https://homestuck.bandcamp.com/track/constant-conquest-2
 -------------------------------------------------------------------------------
@@ -56,6 +59,7 @@ URLs: https://homestuck.bandcamp.com/track/the-lyrist-2
 -------------------------------------------------------------------------------
 Track: The Lordling
 Artist: Toby Fox
+References: The Lyrist
 Track Art: Rumminov
 URLs: https://homestuck.bandcamp.com/track/the-lordling-2
 -------------------------------------------------------------------------------
@@ -63,3 +67,12 @@ Track: Eternity Served Cold
 Artist: Malcolm Brown
 Track Art: rennerei
 URLs: https://homestuck.bandcamp.com/track/eternity-served-cold-2
+References:
+- Sburban Jungle
+- English
+- Revelawesome
+- Black Rose / Green Sun
+- Endless Climb
+- Ruins (With Strings)
+- Savior of the Waking World
+- Doctor

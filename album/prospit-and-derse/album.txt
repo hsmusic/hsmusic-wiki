@@ -9,16 +9,14 @@ Track Art: Bea
 URLs: https://youtu.be/12H6ZBc47bU
 -------------------------------------------------------------------------------
 Track: The Golden Towers
+References: The Obsidian Towers
 Track Art: Pride
 URLs: https://youtu.be/ljdrlnSi4Gw
 -------------------------------------------------------------------------------
 Track: Prospit Dreamers
 Track Art: Zilleniose
+References: Savior of the Waking World, Frost:frost-vol-6, Doctor
 URLs: https://youtu.be/kXAzXOk-pGo
-Contributors:
-- Solatrus ([Frost])
-- Buzinkai ([Doctor])
-- Toby Fox ([Penumbra Phantasm])
 -------------------------------------------------------------------------------
 Track: Center of Brilliance
 Track Art: Shelby Cragg
@@ -34,10 +32,8 @@ URLs: https://youtu.be/NXgHHh4NlR8
 -------------------------------------------------------------------------------
 Track: Derse Dreamers
 Track Art: Mixt
+References: Atomyk Ebonpyre, Endless Climb
 URLs: https://youtu.be/NOkeFOkE7No
-Contributors:
-- Toby Fox ([Atomyk Ebonpyre])
-- Buzinkai ([Endless Climb])
 -------------------------------------------------------------------------------
 Track: Core of Darkness
 Track Art: Shad

@@ -9,6 +9,7 @@ Track: Forever
 URLs: https://bowman.bandcamp.com/track/forever
 -------------------------------------------------------------------------------
 Track: Dawn of Man
+References: Sburban Jungle
 URLs: https://bowman.bandcamp.com/track/dawn-of-man
 -------------------------------------------------------------------------------
 Track: Beta Version
@@ -21,6 +22,7 @@ Track: Fly
 URLs: https://bowman.bandcamp.com/track/fly
 -------------------------------------------------------------------------------
 Track: Lies With The Sea
+References: Sburban Jungle
 URLs: https://bowman.bandcamp.com/track/lies-with-the-sea
 -------------------------------------------------------------------------------
 Track: Chain Of Prospit
@@ -30,4 +32,5 @@ Track: Pumpkin Tide
 URLs: https://bowman.bandcamp.com/track/pumpkin-tide
 -------------------------------------------------------------------------------
 Track: The Deeper You Go
+References: Sburban Jungle
 URLs: https://bowman.bandcamp.com/track/the-deeper-you-go

@@ -6,6 +6,7 @@ FG: #9292e2
 -------------------------------------------------------------------------------
 Track: ~~SIDE 1~~
 Artist: Toby Fox
+References: Black
 Track Art: none
 Directory: side-1-universe-a
 URLs: https://homestuck.bandcamp.com/track/universe-a-side-1
@@ -49,6 +50,7 @@ URLs: https://homestuck.bandcamp.com/track/teal-hunter
 -------------------------------------------------------------------------------
 Track: Cobalt Corsair
 Artist: Max Wright
+References: Hallowed Halls
 Track Art: Cactuar
 URLs: https://homestuck.bandcamp.com/track/cobalt-corsair
 -------------------------------------------------------------------------------
@@ -64,16 +66,19 @@ URLs: https://homestuck.bandcamp.com/track/purple-tyrant
 -------------------------------------------------------------------------------
 Track: Violet Mariner
 Artist: William Ascenzo
+References: Showtime (Piano Refrain)
 Track Art: rumminov
 URLs: https://homestuck.bandcamp.com/track/violet-mariner
 -------------------------------------------------------------------------------
 Track: Fuchsia Ruler
 Artist: Sinister Psyche
+Refrences: Black
 Track Art: Mel
 URLs: https://homestuck.bandcamp.com/track/fuchsia-ruler
 -------------------------------------------------------------------------------
 Track: ~~SIDE 2~~
 Artist: Toby Fox
+References: ~~SIDE 1~~:side-1-universe-a
 Track Art: none
 Directory: side-2-universe-a
 URLs: https://homestuck.bandcamp.com/track/universe-a-side-2

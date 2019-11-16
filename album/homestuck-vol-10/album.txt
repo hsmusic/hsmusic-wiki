@@ -6,6 +6,22 @@ Track: Creata
 Artist: Seth Peelle
 Track Art: PJ Tush
 URLs: https://homestuck.bandcamp.com/track/creata-3
+References:
+- Showtime
+- Doctor
+- Harlequin
+- Aggrieve
+- Chorale for Jaspers
+- Endless Climb
+- Beatdown
+- Atomyk Ebonpyre
+- Upward Movement
+- Frost:frost-vol-6
+- The Beginning of Something Really Excellent
+- Dissension
+- Carefree Action
+- Revelawesome
+- Song of Skaia
 -------------------------------------------------------------------------------
 Track: Train
 Artist: Buzinkai
@@ -14,12 +30,13 @@ URLs: https://homestuck.bandcamp.com/track/train-2
 -------------------------------------------------------------------------------
 Track: Of Gods and Witches
 Artist: Tensei
+References: Doctor
 Track Art: Archeia
 URLs: https://homestuck.bandcamp.com/track/of-gods-and-witches-2
 -------------------------------------------------------------------------------
 Track: Beatup
 Artist: Clark Powell, Astro Kid
-Contributors: Curt Blakeslee ([Beatdown])
+References: Beatdown (Strider Style)
 Track Art: Shan M.
 URLs: https://homestuck.bandcamp.com/track/beatup-2
 -------------------------------------------------------------------------------
@@ -35,43 +52,50 @@ Contributors:
 - David Dycus (synths, composition)
 - Ian White (trumpet)
 - Kelly Sadwin (violin)
+References:
+- Showtime (Piano Refrain)
+- Showtime (Original Mix)
+- Aggrieve (Violin Refrain)
+- Black
+- Checkmate
+- Gaia Queen
 -------------------------------------------------------------------------------
 Track: Sound Judgement
 Artist: Malcolm Brown
 Track Art: Sera B.
-Contributors: Toby Fox ([Terezi's Theme]), Mark Hadley ([Harlequin])
+References: Terezi's Theme, Harlequin
 URLs: https://homestuck.bandcamp.com/track/sound-judgement-2
 -------------------------------------------------------------------------------
 Track: Aggrievocation
 Artist: Mark Hadley
+References: Aggrieve
 Track Art: Rachel Lundin
 URLs: https://homestuck.bandcamp.com/track/aggrievocation-2
 -------------------------------------------------------------------------------
 Track: Stride
 Artist: Kalibration
+References: Moonsetter, Showdown (Strider Style), Upward Movement (Dave Owns)
 Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/stride-2
-Contributors:
-- Toby Fox ([Moonsetter], [Showdown])
 -------------------------------------------------------------------------------
 Track: Skaian Overdrive
 Artist: Thomas Ferkol
-Contributors: Andrew Huo ([Skaian Ride])
+References: Skaian Ride, Sburban Jungle
 Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/skaian-overdrive-2
 -------------------------------------------------------------------------------
 Track: Freefall
 Artist: Robert J! Lake
+References: Cascade (Beta)
 Track Art: Nico J. Dolloso
 URLs: https://homestuck.bandcamp.com/track/freefall-2
 -------------------------------------------------------------------------------
 Track: Moonsweater
 Artist: David Ellis
+Contributors: Toby Fox (with apologies to), Malik Refaat (alto & tenor saxophone)
+References: Moonsetter
 Track Art: David Litt
 URLs: https://homestuck.bandcamp.com/track/moonsweater-2
-Contributors:
-- Toby Fox (with apologies to, [Moonsetter])
-- Malik Refaat (alto & tenor saxophone)
 -------------------------------------------------------------------------------
 Track: Castle
 Artist: Buzinkai
@@ -80,6 +104,7 @@ URLs: https://homestuck.bandcamp.com/track/castle-2
 -------------------------------------------------------------------------------
 Track: Skaian Happy Flight
 Artist: Seth Peelle
+References: Skaian Ride
 Track Art: Alyssa
 URLs: https://homestuck.bandcamp.com/track/skaian-happy-flight-2
 -------------------------------------------------------------------------------
@@ -90,11 +115,13 @@ URLs: https://homestuck.bandcamp.com/track/voidlight-2
 -------------------------------------------------------------------------------
 Track: Beatdown DX
 Artist: Curt Blakeslee
+References: Beatdown (Strider Style)
 Track Art: miraculoustang
 URLs: https://homestuck.bandcamp.com/track/beatdown-dx-2
 -------------------------------------------------------------------------------
 Track: Solar Voyage
 Artist: Marcy Nabors
+References: Ruins (With Strings), Flare, Explore
 Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/solar-voyage-2
 Contributors:
@@ -122,6 +149,7 @@ URLs: https://homestuck.bandcamp.com/track/breeze-2
 Track: Starfall
 Artist: Solatrus
 Contributors: Justin Hellier (special thanks)
+References: Ascend
 Track Art: Christina Lillard
 URLs: https://homestuck.bandcamp.com/track/starfall-2
 -------------------------------------------------------------------------------
@@ -129,15 +157,32 @@ Track: Ascend
 Artist: Tensei
 Track Art: Marimo
 URLs: https://homestuck.bandcamp.com/track/ascend-2
+References:
+- Doctor
+- Cascade (Beta)
+- Time on My Side
+- Beatdown (Strider Style)
+- Upward Movement (Dave Owns)
+- Savior of the Waking World
+- Black Rose / Green Sun
+- Arisen Anew
+- Crystalanthemums
+- Dance of Thorns
+- Heir Conditioning
+- Atomic Bonsai
+- Sunsetter
+- MeGaLoVania
+- Crustacean
+- Spider's Claw
+- Homestuck Anthem
+- Showtime (Original Mix)
+- Carefree Action
 -------------------------------------------------------------------------------
 Track: Lilith in Starlight
 Artist: Malcolm Brown
+References: Black Rose / Green Sun, Mother, Aggrieve, Darling Kanaya
 Track Art: Sera B.
 URLs: https://homestuck.bandcamp.com/track/lilith-in-starlight-2
-Contributors:
-- Malcolm Brown ([Black Rose / Green Sun])
-- Mark Hadley ([Aggrieve])
-- Toby Fox ([Darling Kanaya])
 -------------------------------------------------------------------------------
 Track: Thanks for Playing
 Artist: Max Wright
@@ -155,9 +200,22 @@ Contributors:
 - Jamie Paige Stanely (percussion)
 - Kyle G. Jamolin (lyrics & choir direction)
 - Ciaran Cain, Zeynep Dilli, Kat Jamolin, Kyle G. Jamolin, Michael Ohr, Cobin Pangilinan, Robin S, Chris Roper, Stephen "Jeebes" Wiley (choir)
+References:
+- Warhammer of Zillyhoo
+- Calamity
+- Walk-STab-Walk (R&E)
+- Doctor
+- Crystalanthemums
+- Skies of Skaia
+- Frost:frost-vol-6
+- Beatdown (Strider Style)
+- Savior of the Waking World
+- Courser
+- Sburban Jungle
 -------------------------------------------------------------------------------
 Track: THIS Pumpkin
 Artist: Alexander Rosetti
+References: Pumpkin Cravings
 Track Art: Worthikids
 URLs: https://homestuck.bandcamp.com/track/this-pumpkin-2
 -------------------------------------------------------------------------------
@@ -165,3 +223,8 @@ Track: Conclude
 Artist: Seth Peelle
 Track Art: Kiko B.
 URLs: https://homestuck.bandcamp.com/track/conclude-2
+References:
+- Sburban Jungle
+- Showtime (Piano Refrain)
+- Homestuck
+- Skies of Skaia
