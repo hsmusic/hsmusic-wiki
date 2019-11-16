@@ -650,7 +650,7 @@ async function writeArtistPage(artistName, albumData) {
                                         ...getTracksReferencedBy(track, allTracks).filter(track => track.artists.includes(artistName)).map(track => `[${track.name}]`)
                                     ].filter(Boolean).join(', ')
                                 };
-                                if (contrib.length && track.artists.includes(artistName)) {
+                                if (contrib.what && track.artists.includes(artistName)) {
                                     const nonTracks = contrib.what.split(',').map(what => what.trim()).filter(what => !(what.startsWith('[') && what.endsWith(']')));
                                     contrib.what = nonTracks.join(', ');
                                 }
