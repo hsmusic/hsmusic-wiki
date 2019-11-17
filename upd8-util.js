@@ -43,3 +43,17 @@ module.exports.joinNoOxford = function(array, plural = 'and') {
 
     return `${array.slice(0, -1).join(', ')} ${plural} ${array[array.length - 1]}`;
 };
+
+module.exports.progressPromiseAll = function (msg, array) {
+    let done = 0, total = array.length;
+    process.stdout.write(`\r${msg} [0/${total}]`);
+    return Promise.all(array.map(promise => promise.then(val => {
+        done++;
+        if (done === total) {
+            process.stdout.write(`\r\x1b[2m${msg} [${done}/${total}] \x1b[0;32mDone!\x1b[0m \n`)
+        } else {
+            process.stdout.write(`\r${msg} [${done}/${total}]`);
+        }
+        return val;
+    })));
+};

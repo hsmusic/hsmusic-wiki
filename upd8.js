@@ -77,6 +77,7 @@ const access = util.promisify(fs.access);
 
 const {
     joinNoOxford,
+    progressPromiseAll,
     splitArray
 } = require('./upd8-util');
 
@@ -138,7 +139,7 @@ async function findAlbumDataFiles() {
 
     const albums = await readdir(ALBUM_DIRECTORY);
 
-    const paths = await Promise.all(albums.map(async album => {
+    const paths = await progressPromiseAll(`Searching for album files.`, albums.map(async album => {
         // Argua8ly terri8le/am8iguous varia8le naming. Too 8ad!
         const albumDirectory = path.join(ALBUM_DIRECTORY, album);
         const files = await readdir(albumDirectory);
@@ -248,6 +249,40 @@ async function processAlbumDataFile(file) {
         return contributors;
     };
 
+    const getMultilineField = (lines, name) => {
+        // All this code is 8asically the same as the getListText - just with a
+        // different line prefix (four spaces instead of a dash and a space).
+        let startIndex = lines.findIndex(line => line.startsWith(name + ':'));
+        if (startIndex === -1) {
+            return null;
+        }
+        startIndex++;
+        let endIndex = lines.findIndex((line, index) => index >= startIndex && !line.startsWith('    '));
+        if (endIndex === -1) {
+            endIndex = lines.length;
+        }
+        // If there aren't any content lines, don't return anything!
+        if (endIndex === startIndex) {
+            return null;
+        }
+        // We also join the lines instead of returning an array.
+        const listLines = lines.slice(startIndex, endIndex);
+        return listLines.map(line => line.slice(4)).join('\n');
+    };
+
+    const getMultilineHTMLField = (lines, name) => {
+        const text = getMultilineField(lines, name);
+        if (text) {
+            const lines = text.split('\n');
+            if (!lines[0].startsWith('<i>')) {
+                return {error: `An entry is missing commentary citation: "${lines[0].slice(0, 40)}..."`};
+            }
+            return lines.map(line => line.startsWith('<ul>') ? line : `<p>${line}</p>`).join('\n');
+        } else {
+            return null;
+        }
+    };
+
     const albumSection = sections[0];
     const albumName = getBasicField(albumSection, 'Album');
     const albumArtists = getListField(albumSection, 'Artists') || getListField(albumSection, 'Artist');
@@ -255,10 +290,15 @@ async function processAlbumDataFile(file) {
     const albumCoverArtists = getContributionField(albumSection, 'Cover Art');
     const albumHasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
     const albumTrackCoverArtists = getContributionField(albumSection, 'Track Art');
+    const albumCommentary = getMultilineHTMLField(albumSection, 'Commentary');
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
     if (albumCoverArtists && albumCoverArtists.error) {
         return albumCoverArtists;
+    }
+
+    if (albumCommentary && albumCommentary.error) {
+        return albumCommentary;
     }
 
     if (albumTrackCoverArtists && albumTrackCoverArtists.error) {
@@ -308,6 +348,7 @@ async function processAlbumDataFile(file) {
         date: dateValue,
         artists: albumArtists,
         coverArtists: albumCoverArtists,
+        commentary: albumCommentary,
         directory: albumDirectory,
         theme: {
             fg: albumColorFG,
@@ -326,6 +367,7 @@ async function processAlbumDataFile(file) {
         }
 
         const trackName = getBasicField(section, 'Track');
+        const trackCommentary = getMultilineHTMLField(section, 'Commentary');
         const originalDate = getBasicField(section, 'Original Date');
         const references = getListField(section, 'References') || [];
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
@@ -335,6 +377,10 @@ async function processAlbumDataFile(file) {
 
         if (trackContributors.error) {
             return trackContributors;
+        }
+
+        if (trackCommentary && trackCommentary.error) {
+            return trackCommentary;
         }
 
         if (!trackName) {
@@ -392,6 +438,7 @@ async function processAlbumDataFile(file) {
             artists: trackArtists,
             coverArtists: trackCoverArtists,
             contributors: trackContributors,
+            commentary: trackCommentary,
             references,
             date,
             directory: trackDirectory,
@@ -521,6 +568,12 @@ async function writeAlbumPage(album, albumData) {
                             </li>
                         `).join('\n')}
                     </ol>
+                    ${album.commentary && fixWS`
+                        <p>Artist commentary:</p>
+                        <blockquote>
+                            ${album.commentary}
+                        </blockquote>
+                    `}
                 </div>
             </body>
         </html>
@@ -598,6 +651,12 @@ async function writeTrackPage(track, albumData) {
                             `).join('\n')}
                         </ul>
                     `}
+                    ${track.commentary && fixWS`
+                        <p>Artist commentary:</p>
+                        <blockquote>
+                            ${track.commentary}
+                        </blockquote>
+                    `}
                 </div>
             </body>
         </html>
@@ -614,14 +673,15 @@ async function writeArtistPage(artistName, albumData) {
         track.artists.includes(artistName) ||
         track.contributors.some(({ who }) => who === artistName) ||
         getTracksReferencedBy(track, allTracks).some(track => track.artists.includes(artistName))
-    )
-    ));
+    )));
     const artThings = sortByDate(albumData.concat(allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
+    const commentaryThings = sortByDate(albumData.concat(allTracks).filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')));
 
     // Shish!
     const kebab = getArtistDirectory(artistName);
 
     const artistDirectory = path.join(ARTIST_DIRECTORY, kebab);
+    const index = `${ARTIST_DIRECTORY}/${kebab}/index.html`;
     await mkdirp(artistDirectory);
     await writeFile(path.join(artistDirectory, 'index.html'), fixWS`
         <!DOCTYPE html>
@@ -638,8 +698,13 @@ async function writeArtistPage(artistName, albumData) {
                         <a id="cover-art" href="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"></a>
                     `}
                     <h1>${artistName}</h1>
+                    <p>Jump to: ${[
+                        tracks.length && `<a href="${index}#tracks">Tracks</a>`,
+                        artThings.length && `<a href="${index}#art">Art</a>`,
+                        commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
+                    ].filter(Boolean).join(', ')}</p>
                     ${tracks.length && fixWS`
-                        <h2>Tracks</h2>
+                        <h2 id="tracks">Tracks</h2>
                         <p>Dim tracks are tracks that this artist contributed only a based-upon song to.</p>
                         <ol>
                             ${tracks.map(track => {
@@ -666,7 +731,7 @@ async function writeArtistPage(artistName, albumData) {
                         </ol>
                     `}
                     ${artThings.length && fixWS`
-                        <h2>Art</h2>
+                        <h2 id="art">Art</h2>
                         <ol>
                             ${artThings.map(thing => {
                                 const contrib = thing.coverArtists.find(({ who }) => who === artistName);
@@ -679,6 +744,17 @@ async function writeArtistPage(artistName, albumData) {
                                 `;
                             }).join('\n')}
                         </ol>
+                    `}
+                    ${commentaryThings.length && fixWS`
+                        <h2 id="commentary">Commentary</h2>
+                        <ul>
+                            ${commentaryThings.map(thing => fixWS`
+                                <li>
+                                    <a href="${thing.album ? TRACK_DIRECTORY : ALBUM_DIRECTORY}/${thing.directory}/index.html"${thing.theme && ` style="${getThemeString(thing.theme)}"`}>${thing.name}</a>
+                                    <i>${thing.album ? `from <a href="${ALBUM_DIRECTORY}/${thing.album.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.album.name}</a>` : `(album commentary)`}</i>
+                                </li>
+                            `).join('\n')}
+                        </ul>
                     `}
                 </div>
             </body>
@@ -878,20 +954,20 @@ async function main() {
     // Technically, we could do the data file reading and output writing at the
     // same time, 8ut that kinda makes the code messy, so I'm not 8othering
     // with it.
-    const albumData = await Promise.all(albumDataFiles.map(processAlbumDataFile));
+    const albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(processAlbumDataFile));
 
     sortByDate(albumData);
 
     const errors = albumData.filter(obj => obj.error);
     if (errors.length) {
         for (const error of errors) {
-            console.log(error.error);
+            console.log(`\x1b[31;1m${error.error}\x1b[0m`);
         }
         return;
     }
 
     await writeTopIndexPage(albumData);
-    await Promise.all(albumData.map(album => writeIndexAndTrackPagesForAlbum(album, albumData)));
+    await progressPromiseAll(`Writing album & track pages.`, albumData.map(album => writeIndexAndTrackPagesForAlbum(album, albumData)));
     await writeArtistPages(albumData);
 
     // await writeGridSite(albumData);

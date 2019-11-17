@@ -43,6 +43,7 @@ a:hover {
 
 #sidebar {
     flex: 1 1 20%;
+    min-width: 200px;
     max-width: 250px;
     float: left;
     padding: 20px 5px;
@@ -155,4 +156,18 @@ li.contributed-only-original {
 li .by {
     white-space: nowrap;
     font-style: oblique;
+}
+
+p code {
+    font-size: 1em;
+    font-family: 'courier new';
+    font-weight: 800;
+}
+
+blockquote {
+    max-width: 600px;
+}
+
+p img {
+    max-width: 100%;
 }
