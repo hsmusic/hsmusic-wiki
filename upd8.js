@@ -671,8 +671,7 @@ async function writeArtistPage(artistName, albumData) {
     const allTracks = getAllTracks(albumData);
     const tracks = sortByDate(allTracks.filter(track => (
         track.artists.includes(artistName) ||
-        track.contributors.some(({ who }) => who === artistName) ||
-        getTracksReferencedBy(track, allTracks).some(track => track.artists.includes(artistName))
+        track.contributors.some(({ who }) => who === artistName)
     )));
     const artThings = sortByDate(albumData.concat(allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
     const commentaryThings = sortByDate(albumData.concat(allTracks).filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')));
@@ -705,7 +704,6 @@ async function writeArtistPage(artistName, albumData) {
                     ].filter(Boolean).join(', ')}</p>
                     ${tracks.length && fixWS`
                         <h2 id="tracks">Tracks</h2>
-                        <p>Dim tracks are tracks that this artist contributed only a based-upon song to.</p>
                         <ol>
                             ${tracks.map(track => {
                                 const contrib = {
@@ -720,7 +718,7 @@ async function writeArtistPage(artistName, albumData) {
                                     contrib.what = nonTracks.join(', ');
                                 }
                                 return fixWS`
-                                    <li class="${!track.artists.includes(artistName) && `contributed ${track.contributors.filter(({ who }) => who === artistName).every(({ what }) => what && what.startsWith('[') && what.endsWith(']')) && 'contributed-only-original'}`}">
+                                    <li class="${!track.artists.includes(artistName) && `contributed`}">
                                         <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
                                         ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
                                         ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
