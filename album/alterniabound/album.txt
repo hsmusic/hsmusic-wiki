@@ -1,5 +1,5 @@
 Album: AlterniaBound
-Cover Art: SaffronScarf
+Cover Art: saffronScarf
 Track Art: Homestuck
 Date: March 14, 2011
 FG: #00a4a4
