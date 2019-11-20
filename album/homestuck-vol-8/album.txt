@@ -347,7 +347,7 @@ URLs: https://homestuck.bandcamp.com/track/cascade-2
 -------------------------------------------------------------------------------
 Track: I'm a Member of the Midnight Crew (Acapella)
 Artist: David Ko
-Contributors: Eddie Morton (original [I'm a Member of the Midnight Crew])
+Contributors: Eddie Morton (I'm a Member of the Midnight Crew)
 Track Art: Vivian Ng
 URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-acapella-2
 -------------------------------------------------------------------------------

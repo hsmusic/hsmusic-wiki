@@ -240,7 +240,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Expedition
 Artist: Mark Hadley
-Contributors: Toby Fox ([English]), Buzinkai ([Explore])
+References: English, Explore
 Track Art: Kiddy
 URLs: https://homestuck.bandcamp.com/track/expedition-2
 Commentary:

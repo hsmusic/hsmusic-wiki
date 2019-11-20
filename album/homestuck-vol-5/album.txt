@@ -301,7 +301,6 @@ URLs: https://homestuck.bandcamp.com/track/the-beginning-of-something-really-exc
 -------------------------------------------------------------------------------
 Track: Pyrocumulus (Kickstart)
 Artist: Robert J! Lake
-Contributors: Andrew Huo ([Skaian Skuffle])
 References: Skaian Skuffle
 URLs: https://homestuck.bandcamp.com/track/pyrocumulus-kickstart-2
 -------------------------------------------------------------------------------
