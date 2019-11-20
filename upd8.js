@@ -82,6 +82,10 @@ const {
     th
 } = require('./upd8-util');
 
+// This can 8e changed if you want to output to some other directory. Just make
+// sure static files are copied into it too! (Which, ahem. Might 8e a todo.)
+const SITE_DIRECTORY = '';
+
 const SITE_TITLE = 'Homestuck Music Wiki';
 
 const SITE_INTRO = fixWS`
@@ -108,7 +112,6 @@ const ALBUM_DIRECTORY = 'album';
 const TRACK_DIRECTORY = 'track';
 const ARTIST_DIRECTORY = 'artist';
 const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
-const GRID_DIRECTORY = 'grid';
 
 // Might ena8le this later... we'll see! Eventually. May8e.
 const ENABLE_ARTIST_AVATARS = false;
@@ -116,7 +119,6 @@ const ENABLE_ARTIST_AVATARS = false;
 const ALBUM_DATA_FILE = 'album.txt';
 
 const CSS_FILE = 'site.css';
-const GRID_CSS_FILE = 'grid-site.css';
 
 // Note there isn't a 'find track data files' function. I plan on including the
 // data for all tracks within an al8um collected in the single metadata file
@@ -494,35 +496,53 @@ function getArtistNames(albumData) {
     ));
 }
 
-async function writeTopIndexPage(albumData) {
-    // This is hard-coded, i.e. we don't do a path.join(ROOT_DIRECTORY).
+// 8asic function for writing any site page. Handles all the 8asename,
+// directory, and site-template shenanigans!
+async function writePage(directoryParts, title, body) {
+    const directory = path.join(SITE_DIRECTORY, ...directoryParts);
+    await mkdirp(directory);
+    // This is sort of hard-coded, i.e. we don't do path.join(ROOT_DIRECTORY).
     // May8e that's 8ad? Yes, definitely 8ad. 8ut I'm too lazy to fix it...
-    // for now. TM.
-    await writeFile('index.html', fixWS`
+    // for now. TM. (Ahem. Still. Soon...may8e. TM. -- Should 8e easier now
+    // that we'll have a proper function for writing any page - just appending
+    // a ROOT_DIRECTORY should work. Um... okay, fine, I'll do that.)
+    if (directoryParts.length === 0) console.log(directory, SITE_DIRECTORY);
+    await writeFile(path.join(directory, 'index.html'), fixWS`
         <!DOCTYPE html>
         <html>
             <head>
-                <meta charset="utf-8">
-                <title>${SITE_TITLE}</title>
-                <link rel="stylesheet" href="site.css">
+                ${[
+                    `<meta charset="utf-8">`,
+                    `<title>${title}</title>`,
+                    directory !== SITE_DIRECTORY &&
+                    directory !== '.' &&
+                    `<base href="${path.relative(directory, SITE_DIRECTORY)}">`,
+                    `<link rel="stylesheet" href="${CSS_FILE}">`
+                ].filter(Boolean).join('\n')}
             </head>
-            <body id="top-index">
-                <div id="content">
-                    <h1>${SITE_TITLE}</h1>
-                    <div id="intro">
-                        ${SITE_INTRO}
-                    </div>
-                    <div class="grid-listing">
-                        ${albumData.map(album => fixWS`
-                            <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
-                                <img src="${getAlbumCover(album)}">
-                                <span>${album.name}</span>
-                            </a>
-                        `).join('\n')}
-                    </div>
-                </div>
-            </body>
+            ${body}
         </html>
+    `);
+}
+
+async function writeTopIndexPage(albumData) {
+    await writePage([], SITE_TITLE, fixWS`
+        <body id="top-index">
+            <div id="content">
+                <h1>${SITE_TITLE}</h1>
+                <div id="intro">
+                    ${SITE_INTRO}
+                </div>
+                <div class="grid-listing">
+                    ${albumData.map(album => fixWS`
+                        <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                            <img src="${getAlbumCover(album)}">
+                            <span>${album.name}</span>
+                        </a>
+                    `).join('\n')}
+                </div>
+            </div>
+        </body>
     `);
 }
 
@@ -534,138 +554,116 @@ async function writeIndexAndTrackPagesForAlbum(album, albumData) {
 
 async function writeAlbumPage(album, albumData) {
     const allTracks = getAllTracks(albumData);
-    const albumDirectory = path.join(ALBUM_DIRECTORY, album.directory);
-    await mkdirp(albumDirectory);
-    await writeFile(path.join(albumDirectory, 'index.html'), fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta charset="utf-8">
-                <title>${album.name}</title>
-                <base href="${path.relative(albumDirectory, '')}">
-                <link rel="stylesheet" href="${CSS_FILE}">
-            </head>
-            <body style="${getThemeString(album.theme)}">
-                <div id="sidebar">
-                    ${generateSidebarForAlbum(album)}
-                </div>
-                <div id="content">
-                    <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
-                    <h1>${album.name}</h1>
-                    <p>
-                        ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
-                        ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
-                            <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
-                        `))}.<br>`}
-                        Released ${getDateString(album)}.
-                    </p>
-                    <ol>
-                        ${album.tracks.map(track => fixWS`
-                            <li>
-                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
-                                ${track.artists !== album.artists && fixWS`
-                                    <span class="by">by ${getArtistString(track.artists)}</span>
-                                `}
-                            </li>
-                        `).join('\n')}
-                    </ol>
-                    ${album.commentary && fixWS`
-                        <p>Artist commentary:</p>
-                        <blockquote>
-                            ${album.commentary}
-                        </blockquote>
-                    `}
-                </div>
-            </body>
-        </html>
+    await writePage([ALBUM_DIRECTORY, album.directory], album.name, fixWS`
+        <body style="${getThemeString(album.theme)}">
+            <div id="sidebar">
+                ${generateSidebarForAlbum(album)}
+            </div>
+            <div id="content">
+                <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
+                <h1>${album.name}</h1>
+                <p>
+                    ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
+                    ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
+                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                    `))}.<br>`}
+                    Released ${getDateString(album)}.
+                </p>
+                <ol>
+                    ${album.tracks.map(track => fixWS`
+                        <li>
+                            <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
+                            ${track.artists !== album.artists && fixWS`
+                                <span class="by">by ${getArtistString(track.artists)}</span>
+                            `}
+                        </li>
+                    `).join('\n')}
+                </ol>
+                ${album.commentary && fixWS`
+                    <p>Artist commentary:</p>
+                    <blockquote>
+                        ${album.commentary}
+                    </blockquote>
+                `}
+            </div>
+        </body>
     `);
 }
 
 async function writeTrackPage(track, albumData) {
     const artistNames = getArtistNames(albumData);
     const allTracks = getAllTracks(albumData);
-    const trackDirectory = path.join(TRACK_DIRECTORY, track.directory);
     const tracksThatReference = getTracksThatReference(track, allTracks);
     const tracksReferenced = getTracksReferencedBy(track, allTracks);
-    await mkdirp(trackDirectory);
-    await writeFile(path.join(trackDirectory, 'index.html'), fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta charset="utf-8">
-                <title>${track.name}</title>
-                <base href="${path.relative(trackDirectory, '')}">
-                <link rel="stylesheet" href="${CSS_FILE}">
-            </head>
-            <body style="${getThemeString(track.album.theme)}">
-                <div id="sidebar">
-                    ${generateSidebarForAlbum(track.album, track)}
-                </div>
-                <div id="content">
-                    <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}"></a>
-                    <h1>${track.name}</h1>
-                    <p>
-                        By ${getArtistString(track.artists)}.<br>
-                        ${track.coverArtists && `Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
-                            <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
-                        `))}.<br>`}
-                        Released ${getDateString(track)}.
-                    </p>
-                    <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
-                        <a href="${url}">${
-                            url.includes('bandcamp.com') ? 'Bandcamp' :
-                            url.includes('youtu') ? 'YouTube' :
-                            url.includes('soundcloud') ? 'SoundCloud' :
-                            '(External)'
-                        }</a>
-                    `), 'or')}.</p>
-                    ${track.contributors.length && fixWS`
-                        <p>Contributors:</p>
-                        <ul>
-                            ${track.contributors.map(({ who, what }) => fixWS`
-                                <li>${artistNames.includes(who)
-                                    ? `<a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>`
-                                    : who
-                                } ${what && `(${getContributionString({what}, allTracks)})`}</li>
-                            `).join('\n')}
-                        </ul>
-                    `}
-                    ${tracksReferenced.length && fixWS`
-                        <p>Tracks that <i>${track.name}</i> references:</p>
-                        <ul>
-                            ${tracksReferenced.map(track => fixWS`
-                                <li>
-                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                    <span class="by">by ${getArtistString(track.artists)}</span>
-                                </li>
-                            `).join('\n')}
-                        </ul>
-                    `}
-                    ${tracksThatReference.length && fixWS`
-                        <p>Tracks that reference <i>${track.name}</i>:</p>
-                        <ul>
-                            ${tracksThatReference.map(track => fixWS`
-                                <li>
-                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                    <span class="by">by ${getArtistString(track.artists)}</span>
-                                </li>
-                            `).join('\n')}
-                        </ul>
-                    `}
-                    ${track.commentary && fixWS`
-                        <p>Artist commentary:</p>
-                        <blockquote>
-                            ${track.commentary}
-                        </blockquote>
-                    `}
-                </div>
-            </body>
-        </html>
+    await writePage([TRACK_DIRECTORY, track.directory], track.name, fixWS`
+        <body style="${getThemeString(track.album.theme)}">
+            <div id="sidebar">
+                ${generateSidebarForAlbum(track.album, track)}
+            </div>
+            <div id="content">
+                <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}"></a>
+                <h1>${track.name}</h1>
+                <p>
+                    By ${getArtistString(track.artists)}.<br>
+                    ${track.coverArtists && `Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
+                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                    `))}.<br>`}
+                    Released ${getDateString(track)}.
+                </p>
+                <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
+                    <a href="${url}">${
+                        url.includes('bandcamp.com') ? 'Bandcamp' :
+                        url.includes('youtu') ? 'YouTube' :
+                        url.includes('soundcloud') ? 'SoundCloud' :
+                        '(External)'
+                    }</a>
+                `), 'or')}.</p>
+                ${track.contributors.length && fixWS`
+                    <p>Contributors:</p>
+                    <ul>
+                        ${track.contributors.map(({ who, what }) => fixWS`
+                            <li>${artistNames.includes(who)
+                                ? `<a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>`
+                                : who
+                            } ${what && `(${getContributionString({what}, allTracks)})`}</li>
+                        `).join('\n')}
+                    </ul>
+                `}
+                ${tracksReferenced.length && fixWS`
+                    <p>Tracks that <i>${track.name}</i> references:</p>
+                    <ul>
+                        ${tracksReferenced.map(track => fixWS`
+                            <li>
+                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                <span class="by">by ${getArtistString(track.artists)}</span>
+                            </li>
+                        `).join('\n')}
+                    </ul>
+                `}
+                ${tracksThatReference.length && fixWS`
+                    <p>Tracks that reference <i>${track.name}</i>:</p>
+                    <ul>
+                        ${tracksThatReference.map(track => fixWS`
+                            <li>
+                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                <span class="by">by ${getArtistString(track.artists)}</span>
+                            </li>
+                        `).join('\n')}
+                    </ul>
+                `}
+                ${track.commentary && fixWS`
+                    <p>Artist commentary:</p>
+                    <blockquote>
+                        ${track.commentary}
+                    </blockquote>
+                `}
+            </div>
+        </body>
     `);
 }
 
 async function writeArtistPages(albumData) {
-    await Promise.all(getArtistNames(albumData).map(artistName => writeArtistPage(artistName, albumData)));
+    await progressPromiseAll('Writing artist pages.', getArtistNames(albumData).map(artistName => writeArtistPage(artistName, albumData)));
 }
 
 async function writeArtistPage(artistName, albumData) {
@@ -679,74 +677,62 @@ async function writeArtistPage(artistName, albumData) {
 
     // Shish!
     const kebab = getArtistDirectory(artistName);
-
-    const artistDirectory = path.join(ARTIST_DIRECTORY, kebab);
     const index = `${ARTIST_DIRECTORY}/${kebab}/index.html`;
-    await mkdirp(artistDirectory);
-    await writeFile(path.join(artistDirectory, 'index.html'), fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta charset="utf-8">
-                <title>${artistName}</title>
-                <base href="${path.relative(artistDirectory, '')}">
-                <link rel="stylesheet" href="${CSS_FILE}">
-            </head>
-            <body>
-                <div id="content">
-                    ${ENABLE_ARTIST_AVATARS && await access(path.join(ARTIST_AVATAR_DIRECTORY, kebab + '.jpg')).then(() => true, () => false) && fixWS`
-                        <a id="cover-art" href="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"></a>
-                    `}
-                    <h1>${artistName}</h1>
-                    <p>Jump to: ${[
-                        tracks.length && `<a href="${index}#tracks">Tracks</a>`,
-                        artThings.length && `<a href="${index}#art">Art</a>`,
-                        commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
-                    ].filter(Boolean).join(', ')}</p>
-                    ${tracks.length && fixWS`
-                        <h2 id="tracks">Tracks</h2>
-                        ${albumChunkedList(tracks, (track, i) => {
-                            const contrib = {
-                                who: artistName,
-                                what: track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what).join(', ')
-                            };
-                            return fixWS`
-                                <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
-                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                    ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
-                                    ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
-                                </li>
-                            `;
-                        })}
-                    `}
-                    ${artThings.length && fixWS`
-                        <h2 id="art">Art</h2>
-                        ${albumChunkedList(artThings, (thing, i) => {
-                            const contrib = thing.coverArtists.find(({ who }) => who === artistName);
-                            return fixWS`
-                                <li title="${th(i + 1)} art by ${artistName}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
-                                    ${thing.album ? fixWS`
-                                        <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
-                                    ` : '<i>(cover art)</i>'}
-                                    ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
-                                </li>
-                            `;
-                        })}
-                    `}
-                    ${commentaryThings.length && fixWS`
-                        <h2 id="commentary">Commentary</h2>
-                        ${albumChunkedList(commentaryThings, thing => fixWS`
-                            <li>
+    await writePage([ARTIST_DIRECTORY, kebab], artistName, fixWS`
+        <body>
+            <div id="content">
+                ${ENABLE_ARTIST_AVATARS && await access(path.join(ARTIST_AVATAR_DIRECTORY, kebab + '.jpg')).then(() => true, () => false) && fixWS`
+                    <a id="cover-art" href="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${getArtistDirectory(artistName)}.jpg"></a>
+                `}
+                <h1>${artistName}</h1>
+                <p>Jump to: ${[
+                    tracks.length && `<a href="${index}#tracks">Tracks</a>`,
+                    artThings.length && `<a href="${index}#art">Art</a>`,
+                    commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
+                ].filter(Boolean).join(', ')}</p>
+                ${tracks.length && fixWS`
+                    <h2 id="tracks">Tracks</h2>
+                    ${albumChunkedList(tracks, (track, i) => {
+                        const contrib = {
+                            who: artistName,
+                            what: track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what).join(', ')
+                        };
+                        return fixWS`
+                            <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
+                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
+                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
+                            </li>
+                        `;
+                    })}
+                `}
+                ${artThings.length && fixWS`
+                    <h2 id="art">Art</h2>
+                    ${albumChunkedList(artThings, (thing, i) => {
+                        const contrib = thing.coverArtists.find(({ who }) => who === artistName);
+                        return fixWS`
+                            <li title="${th(i + 1)} art by ${artistName}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
                                     <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
-                                ` : '(album commentary)'}
+                                ` : '<i>(cover art)</i>'}
+                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
                             </li>
-                        `, false)}
-                        </ul>
-                    `}
-                </div>
-            </body>
-        </html>
+                        `;
+                    })}
+                `}
+                ${commentaryThings.length && fixWS`
+                    <h2 id="commentary">Commentary</h2>
+                    ${albumChunkedList(commentaryThings, thing => fixWS`
+                        <li>
+                            ${thing.album ? fixWS`
+                                <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
+                            ` : '(album commentary)'}
+                        </li>
+                    `, false)}
+                    </ul>
+                `}
+            </div>
+        </body>
     `);
 }
 
@@ -878,68 +864,6 @@ function getTrackCover(track) {
     }
 }
 
-// Super fancy, more interactive 8rowsing section of the site. May8e the
-// primary one in time???????? We'll see! For real.
-async function writeGridSite(albumData) {
-    await mkdirp(GRID_DIRECTORY);
-    await writeFile(path.join(GRID_DIRECTORY, 'index.html'), fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta charset="utf-8">
-                <title>${SITE_TITLE}</title>
-                <base href="${path.relative(GRID_DIRECTORY, '')}">
-                <link rel="stylesheet" href="${GRID_CSS_FILE}">
-            </head>
-            <body>
-                <div class="grid-listing">
-                    ${albumData.map(album => fixWS`
-                        <a class="grid-item" href="${GRID_DIRECTORY}/${ALBUM_DIRECTORY}/${album.directory}/index.html">
-                            <img src="${getAlbumCover(album)}">
-                            <span>${album.name}</span>
-                        </a>
-                    `).join('\n')}
-                </div>
-            </body>
-        </html>
-    `);
-    await Promise.all(albumData.map(writeGridAlbumPage));
-}
-
-async function writeGridAlbumPage(album) {
-    const albumDirectory = path.join(GRID_DIRECTORY, ALBUM_DIRECTORY, album.directory);
-    await mkdirp(albumDirectory);
-    await writeFile(path.join(albumDirectory, 'index.html'), fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <meta charset="utf-8">
-                <title>${album.name}</title>
-                <base href="${path.relative(albumDirectory, '')}">
-                <link rel="stylesheet" href="${GRID_CSS_FILE}">
-            </head>
-            <body>
-                <!--
-                <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
-                <h1>${album.name}</h1>
-                <p>
-                    ${album.artist && `By ${getArtistString(album.artists)}.<br>`}
-                    Released ${getDateString(album)}.
-                </p>
-                -->
-                <div class="grid-listing">
-                    ${album.tracks.map(track => fixWS`
-                        <a class="grid-item" href="${TRACK_DIRECTORY}/${track.directory}/index.html">
-                            <img src="${getTrackCover(track)}">
-                            <span>${track.name}<br>by ${joinNoOxford(track.artists)}</span>
-                        </a>
-                    `).join('\n')}
-                </div>
-            </body>
-        </html>
-    `);
-}
-
 async function main() {
     // 8ut wait, you might say, how do we know which al8um these data files
     // correspond to???????? You wouldn't dare suggest we parse the actual
@@ -985,8 +909,6 @@ async function main() {
     await writeTopIndexPage(albumData);
     await progressPromiseAll(`Writing album & track pages.`, albumData.map(album => writeIndexAndTrackPagesForAlbum(album, albumData)));
     await writeArtistPages(albumData);
-
-    // await writeGridSite(albumData);
 
     // The single most important step.
     console.log('Written!');
