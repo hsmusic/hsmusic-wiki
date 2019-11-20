@@ -167,3 +167,28 @@ blockquote {
 p img {
     max-width: 100%;
 }
+
+dl dt {
+    padding-left: 2em;
+}
+
+dl dt {
+    margin-bottom: 2px;
+}
+
+dl dd {
+    margin-bottom: 1em;
+}
+
+dl {
+    counter-reset: subolcounter;
+}
+
+dl ol {
+    list-style: none;
+}
+
+dl ol li:before {
+    counter-increment: subolcounter;
+    content: counter(subolcounter) ". ";
+}

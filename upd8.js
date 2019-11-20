@@ -78,7 +78,8 @@ const access = util.promisify(fs.access);
 const {
     joinNoOxford,
     progressPromiseAll,
-    splitArray
+    splitArray,
+    th
 } = require('./upd8-util');
 
 const SITE_TITLE = 'Homestuck Music Wiki';
@@ -704,60 +705,77 @@ async function writeArtistPage(artistName, albumData) {
                     ].filter(Boolean).join(', ')}</p>
                     ${tracks.length && fixWS`
                         <h2 id="tracks">Tracks</h2>
-                        <ol>
-                            ${tracks.map(track => {
-                                const contrib = {
-                                    who: artistName,
-                                    what: [
-                                        ...track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what),
-                                        ...getTracksReferencedBy(track, allTracks).filter(track => track.artists.includes(artistName)).map(track => `[${track.name}]`)
-                                    ].filter(Boolean).join(', ')
-                                };
-                                if (contrib.what && track.artists.includes(artistName)) {
-                                    const nonTracks = contrib.what.split(',').map(what => what.trim()).filter(what => !(what.startsWith('[') && what.endsWith(']')));
-                                    contrib.what = nonTracks.join(', ');
-                                }
-                                return fixWS`
-                                    <li class="${!track.artists.includes(artistName) && `contributed`}">
-                                        <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
-                                        ${track.artists.includes(artistName) && track.artists.length > 1 && `<span="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
-                                        ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
-                                        <i>from <a href="${ALBUM_DIRECTORY}/${track.album.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.album.name}</a></i>
-                                    </li>
-                                `;
-                            }).join('\n')}
-                        </ol>
+                        ${albumChunkedList(tracks, (track, i) => {
+                            const contrib = {
+                                who: artistName,
+                                what: track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what).join(', ')
+                            };
+                            return fixWS`
+                                <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
+                                    <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                    ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
+                                    ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
+                                </li>
+                            `;
+                        })}
                     `}
                     ${artThings.length && fixWS`
                         <h2 id="art">Art</h2>
-                        <ol>
-                            ${artThings.map(thing => {
-                                const contrib = thing.coverArtists.find(({ who }) => who === artistName);
-                                return fixWS`
-                                    <li>
-                                        <a href="${thing.album ? TRACK_DIRECTORY : ALBUM_DIRECTORY}/${thing.directory}/index.html"${thing.theme && ` style="${getThemeString(thing.theme)}"`}>${thing.name}</a>
-                                        ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
-                                        <i>${thing.album ? `from <a href="${ALBUM_DIRECTORY}/${thing.album.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.album.name}</a>` : `(cover art)`}</i>
-                                    </li>
-                                `;
-                            }).join('\n')}
-                        </ol>
+                        ${albumChunkedList(artThings, (thing, i) => {
+                            const contrib = thing.coverArtists.find(({ who }) => who === artistName);
+                            return fixWS`
+                                <li title="${th(i + 1)} art by ${artistName}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
+                                    ${thing.album ? fixWS`
+                                        <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
+                                    ` : '<i>(cover art)</i>'}
+                                    ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
+                                </li>
+                            `;
+                        })}
                     `}
                     ${commentaryThings.length && fixWS`
                         <h2 id="commentary">Commentary</h2>
-                        <ul>
-                            ${commentaryThings.map(thing => fixWS`
-                                <li>
-                                    <a href="${thing.album ? TRACK_DIRECTORY : ALBUM_DIRECTORY}/${thing.directory}/index.html"${thing.theme && ` style="${getThemeString(thing.theme)}"`}>${thing.name}</a>
-                                    <i>${thing.album ? `from <a href="${ALBUM_DIRECTORY}/${thing.album.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.album.name}</a>` : `(album commentary)`}</i>
-                                </li>
-                            `).join('\n')}
+                        ${albumChunkedList(commentaryThings, thing => fixWS`
+                            <li>
+                                ${thing.album ? fixWS`
+                                    <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
+                                ` : '(album commentary)'}
+                            </li>
+                        `, false)}
                         </ul>
                     `}
                 </div>
             </body>
         </html>
     `);
+}
+
+function albumChunkedList(tracks, getLI, showDate = true) {
+    const getAlbum = thing => thing.album ? thing.album : thing;
+    return fixWS`
+        <dl>
+            ${tracks.map((thing, i) => {
+                const li = getLI(thing, i);
+                const album = getAlbum(thing);
+                if (i === 0 || album !== getAlbum(tracks[i - 1]) || (showDate && +thing.date !== +tracks[i - 1].date)) {
+                    const heading = fixWS`
+                        <dt>
+                            <a href="${ALBUM_DIRECTORY}/${getAlbum(thing).directory}/index.html" style="${getThemeString(getAlbum(thing).theme)}">${getAlbum(thing).name}</a>
+                            ${showDate && `(${getDateString(thing)})`}
+                        </dt>
+                        <dd><ul>
+                    `;
+                    if (i > 0) {
+                        return ['</ul></dd>', heading, li];
+                    } else {
+                        return [heading, li];
+                    }
+                } else {
+                    return [li];
+                }
+            }).reduce((acc, arr) => acc.concat(arr), []).join('\n')}
+        </dl>
+    `;
 }
 
 // This function is terri8le. Sorry!
