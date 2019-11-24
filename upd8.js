@@ -78,6 +78,7 @@ const access = util.promisify(fs.access);
 const {
     joinNoOxford,
     progressPromiseAll,
+    s,
     splitArray,
     th
 } = require('./upd8-util');
@@ -88,10 +89,19 @@ const SITE_DIRECTORY = '';
 
 const SITE_TITLE = 'Homestuck Music Wiki';
 
-const SITE_INTRO = fixWS`
-    <p>Welcome to my fan-made Homestuck music wiki! Select any album below to begin browsing.</p>
-    <p>This site was mostly made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums are all indexed in the one place, and URLs will always stay consistent. Also included are tracks for listening on Bandcamp and other services.</p>
-    <p>This site was mostly made by Florrie (<a href="https://twitter.com/florriestuck">@florriestuck</a>, <a href="https://reddit.com/u/towerofnix">/u/towerofnix</a> - feel free to send suggestions and feedback!!). Listings were fetched primarily from the <a href="https://homestuck.bandcamp.com">Homestuck Bandcamp</a>. Track art is primarily from the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a>. Leitmotif and track-reference info is gathered from the fantastic <a href="https://recordcrash.com/nsnd.html">NSND</a>. Much of this is made based on and with use of the <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom - thanks a bunch to all who've worked on that!</p>
+const SITE_ABOUT = `
+    <p>Welcome to my fan-made Homestuck music wiki!</p>
+    <p><a href="https://www.homestuck.com/">Homestuck</a> has always been an incredible creative collaboration, and especially beloved by the community and critical in that collaboration is the webcomic and world's humongous soundtrack, comprising well over 500 tracks by dozens of musicians and artists. This wiki aims to be an interesting and useful resource for anyone interested in that music, as well as an archive for all things related.</p>
+    <p>Pertaining to the history of this site: it was originally made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content particularly reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums (among other missing albums, like <a href="album/squiddles/index.html">Squiddles!</a>) are all indexed in the one place, and URLs will always stay consistent. And of course, also included are links for listening on Bandcamp and other services.</p>
+    <p><i>Credits</i></p>
+    <ul>
+        <li>Florrie: that's me! I programmed most of the site, and put the whole thing together. Say hi to me on twitter (<a href="https://twitter.com/florriestuck">@florriestuck</a>) or reddit (<a href="https://reddit.com/u/towerofnix/">/u/towerofnix</a>)!</li>
+        <li><a href="https://homestuck.bandcamp.com/">Homestuck's Bandcamp</a>, the official host of Homestuck's music: I got almost all the album listings and basic track info from here.</li>
+        <li>GiovanH's <a href="https://www.reddit.com/r/homestuck/comments/dn2s69/i_was_prepared_for_this_eventuality_and_also/">complete track art archive</a>: track art! A million thanks for putting this together and sharing this with me. (Prior to this, I used the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a> to gather track art.)</li>
+        <li><a href="https://recordcrash.com/nsnd.html">NSND</a>: leitmotifs! Thanks to this site in combination with credits on the bandcamp and artists' own commentary, this wiki is a rather comprehensive resource for leitmotifs and other track references.</li>
+        <li>The <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom: the inspiration for this wiki! I've wanted to make a more complete and explorable wiki ever since seeing it. The Fandom wiki has also been a very handy reference in putting this together, so much thanks to everyone who's worked on it!</li>
+        <li>All comments on the site, <a href="https://www.reddit.com/r/homestuck/comments/dwtc4w/i_made_a_wiki_for_homestuck_albums_including/">especially from /r/homestuck</a>: I appreciate all feedback a lot! People have shared a ton of ideas and suggestions with me, and I <i>cannot</i> emphasize enough how motivating it is to share a project with like-minded folx interested in making it better with you. Extra thanks to the subreddit mods for pinning the discussion post and keeping it there so long - I received a ton of feedback I've loved working with and talking about the project with other people there has been a joy. :)</li>
+    </ul>
 `;
 
 // The folder you stick your random downloads in is called "Downloads", yeah?
@@ -112,6 +122,8 @@ const ALBUM_DIRECTORY = 'album';
 const TRACK_DIRECTORY = 'track';
 const ARTIST_DIRECTORY = 'artist';
 const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
+const LISTING_DIRECTORY = 'list';
+const ABOUT_DIRECTORY = 'about';
 
 // Might ena8le this later... we'll see! Eventually. May8e.
 const ENABLE_ARTIST_AVATARS = false;
@@ -506,7 +518,6 @@ async function writePage(directoryParts, title, body) {
     // for now. TM. (Ahem. Still. Soon...may8e. TM. -- Should 8e easier now
     // that we'll have a proper function for writing any page - just appending
     // a ROOT_DIRECTORY should work. Um... okay, fine, I'll do that.)
-    if (directoryParts.length === 0) console.log(directory, SITE_DIRECTORY);
     await writeFile(path.join(directory, 'index.html'), fixWS`
         <!DOCTYPE html>
         <html>
@@ -525,25 +536,41 @@ async function writePage(directoryParts, title, body) {
     `);
 }
 
-async function writeTopIndexPage(albumData) {
-    await writePage([], SITE_TITLE, fixWS`
-        <body id="top-index">
-            <div id="content">
-                <h1>${SITE_TITLE}</h1>
-                <div id="intro">
-                    ${SITE_INTRO}
+function writeMiscellaneousPages(albumData) {
+    return progressPromiseAll('Writing miscellaneous pages.', [
+        writePage([], SITE_TITLE, fixWS`
+            <body id="top-index">
+                <div id="content">
+                    <h1>${SITE_TITLE}</h1>
+                    <div id="intro-menu">
+                        <p>Explore the site!</p>
+                        <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
+                        <a href="about/index.html">About &amp; Credits</a>
+                        <p>...or choose an album:</p>
+                    </div>
+                    <div class="grid-listing">
+                        ${albumData.map(album => fixWS`
+                            <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                                <img src="${getAlbumCover(album)}">
+                                <span>${album.name}</span>
+                            </a>
+                        `).join('\n')}
+                    </div>
                 </div>
-                <div class="grid-listing">
-                    ${albumData.map(album => fixWS`
-                        <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
-                            <img src="${getAlbumCover(album)}">
-                            <span>${album.name}</span>
-                        </a>
-                    `).join('\n')}
+            </body>
+        `),
+        writePage([ABOUT_DIRECTORY], 'About &amp; Credits', fixWS`
+            <body>
+                <div id="content">
+                    <div class="long-content">
+                        <h1>${SITE_TITLE}</h1>
+                        <p><a href="index.html">(Home)</a></p>
+                        ${SITE_ABOUT}
+                    </div>
                 </div>
-            </div>
-        </body>
-    `);
+            </body>
+        `)
+    ]);
 }
 
 // This function title is my gr8test work of art.
@@ -764,6 +791,141 @@ function albumChunkedList(tracks, getLI, showDate = true) {
     `;
 }
 
+function writeListingPages(albumData) {
+    const allArtists = getArtistNames(albumData).sort();
+    const allTracks = getAllTracks(albumData);
+
+    const getArtistNumContributions = artistName => [
+        ...allTracks.filter(track =>
+            track.artists.includes(artistName) ||
+            [...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artistName)),
+        ...albumData.filter(album =>
+            (album.coverArtists || []).some(({ who }) => who === artistName))
+    ].length;
+
+    const getArtistNumCommentary = artistName => albumData.concat(allTracks)
+        .filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')).length;
+
+    const getAlbumLI = (album, extraText = '') => fixWS`
+        <li>
+            <a href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a>
+            ${extraText}
+        </li>
+    `;
+
+    const getArtistLI = artistName => fixWS`
+        <li>
+            <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(artistName)}/index.html">${artistName}</a>
+            (${getArtistNumContributions(artistName)} <abbr title="contributions (to music & art)">c.</abbr>)
+        </li>
+    `;
+
+    const sortByName = (a, b) => {
+        const an = a.name.toLowerCase();
+        const bn = b.name.toLowerCase();
+        return an < bn ? -1 : an > bn ? 1 : 0;
+    };
+
+    const listingDescriptors = [
+        [['albums', 'by-name'], `Albums - by Name`, albumData.slice()
+            .sort(sortByName)
+            .map(album => getAlbumLI(album, `(${album.tracks.length} tracks)`))],
+        [['albums', 'by-date'], `Albums - by Date`, sortByDate(albumData.slice())
+            .map(album => getAlbumLI(album, `(${getDateString(album)})`))],
+        [['albums', 'by-tracks'], `Albums - by Tracks`, albumData.slice()
+            .sort((a, b) => b.tracks.length - a.tracks.length)
+            .map(album => getAlbumLI(album, `(${album.tracks.length} tracks)`))],
+        [['artists', 'by-name'], `Artists - by Name`, allArtists
+            .map(name => ({name}))
+            .sort(sortByName)
+            .map(({ name }) => name)
+            .map(getArtistLI)],
+        [['artists', 'by-commentary'], `Artists - by Commentary`, allArtists
+            .map(name => ({name, commentary: getArtistNumCommentary(name)}))
+            .filter(({ commentary }) => commentary > 0)
+            .sort((a, b) => b.commentary - a.commentary)
+            .map(({ name, commentary }) => fixWS`
+                <li>
+                    <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(name)}/index.html#commentary">${name}</a>
+                    (${commentary} ${commentary === 1 ? 'entry' : 'entries'})
+                </li>
+            `)],
+        [['artists', 'by-contribs'], `Artists - by Contributions`, allArtists
+            .map(name => ({name, contribs: getArtistNumContributions(name)}))
+            .sort((a, b) => b.contribs - a.contribs)
+            .map(({ name }) => name)
+            .map(getArtistLI)],
+        [['tracks', 'by-name'], `Tracks - by Name`, allTracks.slice()
+            .sort(sortByName)
+            .map(track => fixWS`
+                <li><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>
+            `)],
+        [['tracks', 'by-album'], `Tracks - by Album`, fixWS`
+                <dl>
+                    ${albumData.map(album => fixWS`
+                        <dt><a href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></dt>
+                        <dd><ol>
+                            ${album.tracks.map(track => fixWS`
+                                <li><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>
+                            `).join('\n')}
+                        </ol></dd>
+                    `).join('\n')}
+                </dl>
+            `],
+        [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
+            sortByDate(allTracks.slice()),
+            track => fixWS`
+                <li><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>
+            `)]
+    ];
+
+    return progressPromiseAll(`Writing listing pages.`, [
+        writePage([LISTING_DIRECTORY], `Listings Index`, fixWS`
+            <body>
+                ${generateSidebarForListings(listingDescriptors)}
+                <div id="content">
+                    <h1>Listings</h1>
+                    <p>Feel free to explore any of the listings linked in the sidebar!</p>
+                </div>
+            </body>
+        `),
+        ...listingDescriptors.map(entry => writeListingPage(...entry, listingDescriptors))
+    ]);
+}
+
+function writeListingPage(directoryParts, title, items, listingDescriptors) {
+    return writePage([LISTING_DIRECTORY, ...directoryParts], title, fixWS`
+        <body>
+            ${generateSidebarForListings(listingDescriptors, directoryParts)}
+            <div id="content">
+                <h1>${title}</h1>
+                ${typeof items === 'string' ? items : fixWS`
+                    <ul>
+                        ${items.join('\n')}
+                    </ul>
+                `}
+            </div>
+        </body>
+    `);
+}
+
+function generateSidebarForListings(listingDescriptors, currentDirectoryParts) {
+    return fixWS`
+        <div id="sidebar">
+            <h2><a href="index.html">(Home)</a></h2>
+            <hr>
+            <h1><a href="${LISTING_DIRECTORY}/index.html">Listings</a></h1>
+            <ul>
+                ${listingDescriptors.map(([ ldDirectoryParts, ldTitle ]) => fixWS`
+                    <li class="${currentDirectoryParts === ldDirectoryParts && 'current'}">
+                        <a href="${LISTING_DIRECTORY}/${ldDirectoryParts.join('/')}/index.html">${ldTitle}</a>
+                    </li>
+                `).join('\n')}
+            </ul>
+        </div>
+    `;
+}
+
 // This function is terri8le. Sorry!
 function getContributionString({ what }, allTracks) {
     return what
@@ -816,7 +978,7 @@ function generateSidebarForAlbum(album, currentTrack = null) {
         <h1><a href="${ALBUM_DIRECTORY}/${album.directory}/index.html">${album.name}</a></h1>
         <ol>
             ${album.tracks.map(track => fixWS`
-                <li class="${track === currentTrack ? 'current-track' : ''}"><a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a></li>
+                <li class="${track === currentTrack ? 'current' : ''}"><a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a></li>
             `).join('\n')}
         </ol>
     `
@@ -906,9 +1068,10 @@ async function main() {
         return;
     }
 
-    await writeTopIndexPage(albumData);
+    await writeMiscellaneousPages(albumData);
     await progressPromiseAll(`Writing album & track pages.`, albumData.map(album => writeIndexAndTrackPagesForAlbum(album, albumData)));
     await writeArtistPages(albumData);
+    await writeListingPages(albumData);
 
     // The single most important step.
     console.log('Written!');

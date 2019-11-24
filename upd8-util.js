@@ -69,3 +69,8 @@ module.exports.th = function (n) {
         return n + 'th';
     }
 };
+
+// My function names just keep getting 8etter.
+module.exports.s = function (n, word) {
+    return `${n} ${word}` + (n === 1 ? '' : 's');
+};

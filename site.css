@@ -77,7 +77,7 @@ a:hover {
     padding-right: 15px;
 }
 
-#sidebar li.current-track {
+#sidebar li.current {
     font-weight: 800;
 }
 
@@ -145,8 +145,21 @@ h1 {
     font-size: 2em;
 }
 
-#intro {
-    margin: 24px 12%;
+#intro-menu {
+    margin: 24px 0;
+    padding: 10px;
+    background-color: #222222;
+    text-align: center;
+    border: 1px dotted var(--fg-color);
+    border-radius: 2px;
+}
+
+#intro-menu p {
+    margin: 12px 0;
+}
+
+#intro-menu a {
+    margin: 0 6px;
 }
 
 li .by {
@@ -164,6 +177,11 @@ blockquote {
     max-width: 600px;
 }
 
+.long-content {
+    margin-left: 12%;
+    margin-right: 12%;
+}
+
 p img {
     max-width: 100%;
 }
@@ -178,17 +196,4 @@ dl dt {
 
 dl dd {
     margin-bottom: 1em;
-}
-
-dl {
-    counter-reset: subolcounter;
-}
-
-dl ol {
-    list-style: none;
-}
-
-dl ol li:before {
-    counter-increment: subolcounter;
-    content: counter(subolcounter) ". ";
 }
