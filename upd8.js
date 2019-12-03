@@ -918,7 +918,6 @@ function writeListingPages(albumData) {
                 ${generateSidebarForListings(listingDescriptors, 'all-commentary')}
                 <div id="content">
                     <h1>All Commentary</h1>
-                    <p><a href="${LISTING_DIRECTORY}/index.html">(Back to listings.)</a></p>
                     <p><strong>${getWordCount(albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).map(x => x.commentary).join(' '), ''))}</strong> words, in all.<br>Jump to a particular album:</p>
                     <ul>
                         ${sortByDate(albumData.slice())
