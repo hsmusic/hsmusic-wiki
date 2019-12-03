@@ -287,12 +287,17 @@ async function processAlbumDataFile(file) {
 
     const getMultilineHTMLField = (lines, name) => {
         const text = getMultilineField(lines, name);
+        return text && text.split('\n').map(line => line.startsWith('<ul>') ? line : `<p>${line}</p>`).join('\n');
+    };
+
+    const getCommentaryField = lines => {
+        const text = getMultilineHTMLField(lines, 'Commentary');
         if (text) {
             const lines = text.split('\n');
-            if (!lines[0].startsWith('<i>')) {
+            if (!lines[0].includes(':</i>')) {
                 return {error: `An entry is missing commentary citation: "${lines[0].slice(0, 40)}..."`};
             }
-            return lines.map(line => line.startsWith('<ul>') ? line : `<p>${line}</p>`).join('\n');
+            return text;
         } else {
             return null;
         }
@@ -305,7 +310,7 @@ async function processAlbumDataFile(file) {
     const albumCoverArtists = getContributionField(albumSection, 'Cover Art');
     const albumHasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
     const albumTrackCoverArtists = getContributionField(albumSection, 'Track Art');
-    const albumCommentary = getMultilineHTMLField(albumSection, 'Commentary');
+    const albumCommentary = getCommentaryField(albumSection);
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
     if (albumCoverArtists && albumCoverArtists.error) {
@@ -382,7 +387,8 @@ async function processAlbumDataFile(file) {
         }
 
         const trackName = getBasicField(section, 'Track');
-        const trackCommentary = getMultilineHTMLField(section, 'Commentary');
+        const trackCommentary = getCommentaryField(section);
+        const trackLyrics = getMultilineHTMLField(section, 'Lyrics');
         const originalDate = getBasicField(section, 'Original Date');
         const references = getListField(section, 'References') || [];
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
@@ -454,6 +460,7 @@ async function processAlbumDataFile(file) {
             coverArtists: trackCoverArtists,
             contributors: trackContributors,
             commentary: trackCommentary,
+            lyrics: trackLyrics,
             references,
             date,
             directory: trackDirectory,
@@ -678,6 +685,12 @@ async function writeTrackPage(track, albumData) {
                         `).join('\n')}
                     </ul>
                 `}
+                ${track.lyrics && fixWS`
+                    <p>Lyrics:</p>
+                    <blockquote>
+                        ${track.lyrics}
+                    </blockquote>
+                `}
                 ${track.commentary && fixWS`
                     <p>Artist commentary:</p>
                     <blockquote>
@@ -876,8 +889,19 @@ function writeListingPages(albumData) {
             sortByDate(allTracks.slice()),
             track => fixWS`
                 <li><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>
+            `)],
+        [['tracks', 'with-lyrics'], `Tracks - with Lyrics`, albumChunkedList(
+            sortByDate(allTracks.slice())
+            .filter(track => track.lyrics),
+            track => fixWS`
+                <li><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>
             `)]
     ];
+
+    const getWordCount = str => {
+        const wordCount = str.split(' ').length;
+        return `${Math.floor(wordCount / 100) / 10}k`;
+    };
 
     return progressPromiseAll(`Writing listing pages.`, [
         writePage([LISTING_DIRECTORY], `Listings Index`, fixWS`
@@ -886,6 +910,52 @@ function writeListingPages(albumData) {
                 <div id="content">
                     <h1>Listings</h1>
                     <p>Feel free to explore any of the listings linked in the sidebar!</p>
+                    <p>Also check out: <a href="${LISTING_DIRECTORY}/all-commentary/index.html">all commentary on one page!</a></p>
+                </div>
+            </body>
+        `),
+        writePage([LISTING_DIRECTORY, 'all-commentary'], 'All Commentary', fixWS`
+            <body>
+                ${generateSidebarForListings(listingDescriptors)}
+                <div id="content">
+                    <h1>All Commentary</h1>
+                    <p><a href="${LISTING_DIRECTORY}/index.html">(Back to listings.)</a></p>
+                    <p><strong>${getWordCount(albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).map(x => x.commentary).join(' '), ''))}</strong> words, in all.<br>Jump to a particular album:</p>
+                    <ul>
+                        ${sortByDate(albumData.slice())
+                            .filter(album => [album, ...album.tracks].some(x => x.commentary))
+                            .map(album => fixWS`
+                                <li>
+                                    <a href="${LISTING_DIRECTORY}/all-commentary/index.html#${album.directory}" style="${getThemeString(album.theme)}">${album.name}</a>
+                                    (${(() => {
+                                        const things = [album, ...album.tracks];
+                                        const cThings = things.filter(x => x.commentary);
+                                        // const numStr = album.tracks.every(t => t.commentary) ? 'full commentary' : `${cThings.length} entries`;
+                                        const numStr = `${cThings.length}/${things.length} entries`;
+                                        return `${numStr}; ${getWordCount(cThings.map(x => x.commentary).join(' '))} words`;
+                                    })()})
+                                </li>
+                            `)
+                            .join('\n')
+                        }
+                    </ul>
+                    ${sortByDate(albumData.slice())
+                        .map(album => [album, ...album.tracks])
+                        .filter(x => x.some(y => y.commentary))
+                        .map(([ album, ...tracks ]) => fixWS`
+                            <h2 id="${album.directory}"><a href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></h2>
+                            <blockquote>
+                                ${album.commentary}
+                            </blockquote>
+                            ${tracks.filter(t => t.commentary).map(track => fixWS`
+                                <h3 id="${track.directory}"><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album.theme)}">${track.name}</a></h3>
+                                <blockquote>
+                                    ${track.commentary}
+                                </blockquote>
+                            `).join('\n')}
+                        `)
+                        .join('\n')
+                    }
                 </div>
             </body>
         `),
