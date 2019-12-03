@@ -910,13 +910,12 @@ function writeListingPages(albumData) {
                 <div id="content">
                     <h1>Listings</h1>
                     <p>Feel free to explore any of the listings linked in the sidebar!</p>
-                    <p>Also check out: <a href="${LISTING_DIRECTORY}/all-commentary/index.html">all commentary on one page!</a></p>
                 </div>
             </body>
         `),
         writePage([LISTING_DIRECTORY, 'all-commentary'], 'All Commentary', fixWS`
             <body>
-                ${generateSidebarForListings(listingDescriptors)}
+                ${generateSidebarForListings(listingDescriptors, 'all-commentary')}
                 <div id="content">
                     <h1>All Commentary</h1>
                     <p><a href="${LISTING_DIRECTORY}/index.html">(Back to listings.)</a></p>
@@ -991,6 +990,9 @@ function generateSidebarForListings(listingDescriptors, currentDirectoryParts) {
                         <a href="${LISTING_DIRECTORY}/${ldDirectoryParts.join('/')}/index.html">${ldTitle}</a>
                     </li>
                 `).join('\n')}
+                <li class="${currentDirectoryParts === 'all-commentary' && 'current'}">
+                    <a href="${LISTING_DIRECTORY}/all-commentary/index.html">All Commentary</a>
+                </li>
             </ul>
         </div>
     `;
