@@ -11,6 +11,8 @@ URLs: https://homestuck.bandcamp.com/track/creata-canon-edit-2
 -------------------------------------------------------------------------------
 Track: Oppa Toby Style
 Artist: Toby Fox
+Contributors:
+- James Roach (editing, cheers)
 URLs: https://homestuck.bandcamp.com/track/oppa-toby-style-2
 References:
 - Rex Duodecim Angelus
@@ -20,6 +22,11 @@ References:
 - Crystalanthemums
 - Crustacean
 - Black
+Commentary:
+    <i>James Roach:</i>
+    i love cheers in songs (i edited the cheers into tobys song for [s] collide, and have written them into a few things) so the sword/shield gym theme really does it for me
+    I JUST VERY SELFISHLY ADDED <a href="https://youtu.be/bjAK8D5ytiU?t=82">THESE CHEERS</a> TO AN ALREADY GOOD SONG LMAO
+    toby had written a really cool song but i wanted to give andrew some hits that were less on the downbeat for the animation so while i was editing the tracks down for length and extending bits here and there i ended up adding them in because i wanted the section to feel hype
 -------------------------------------------------------------------------------
 Track: Eternity, Served Cold (Canon Edit)
 Artist: Malcolm Brown
