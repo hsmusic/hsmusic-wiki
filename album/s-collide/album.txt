@@ -35,5 +35,10 @@ URLs: https://homestuck.bandcamp.com/track/eternity-served-cold-canon-edit-2
 -------------------------------------------------------------------------------
 Track: Heir of Grief
 Artist: Tensei
+Contributors: James Roach (editing)
 References: Heir Conditioning
 URLs: https://homestuck.bandcamp.com/track/heir-of-grief-2
+Commentary:
+    <i>James Roach:</i>
+    the rest of the edits i did for collide were like... timing things. theres a part at the end where we needed one more bar of hits during heir of grief because one extra thing happens (the part where the condesce gets stabbed is the previous 4 bars copied and edited in)
+    you might notice this if you're music savvy to the point where you're like wait why is there a 12 bar phrase in an otherwise 16 bar pattern. its because that part wasnt long enough for the animation and andrew suggested asking to re-record it and i was like thatll take too long
