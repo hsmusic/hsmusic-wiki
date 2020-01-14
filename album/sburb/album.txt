@@ -4,44 +4,100 @@ Cover Art: Vivian Ng
 Track Art: none
 Date: July 13, 2011
 FG: #34cdff
+Commentary:
+    <i>Tyler Dever:</i>
+    Sburb is my proudest accomplishment. It is the bastard child of my hopes and dreams and my most recentaccomplishments and ordeals. I set out to write music to capture everything going on in my life as well as findout who I am and what I am as far as a composer. What ended up happening was the creation of twelvepowerful pieces that are close and dear to me and are a road map of my trials. The album has a biblical themewith the titles as to fit with the concept of the story of Homestuck being that of creation. Sburb ends up beingthe catalyst for the existence of our universes and every other one. I hope you appreciate them! These are mycomments about each piece as well as a few comments on how exactly I played some of the crazier parts.
+    Enjoy!
+    <hr>
+    <b>In Loving Memory of Linda Wright</b>
+    Without her words of encouragement and pushing me the whole way, I would not be half the man I am today. She was my savior during the worsttime of my life. She inspired me to finish this album, which I almost could not bringmyself to do after her passing away. I miss you more than anything, grandma.
+    <b>Thank you so much:</b>
+    The Quintanas, the Diguiseppis, the Emmons', Mr. Saliman and Mr. Spare for helping me survive the last year.
+    The Diguiseppis for giving me a roof over my head.
+    Jess, Mr. Emmons and the Farrells for putting up with me and teaching me everything I know about music.
+    Aunt Tammy for always protecting me and supporting any decision I make.
+    My friends for pushing me to not give up what I love the most.
+    Andrew Hussie for this opportunity. For Homestuck.
+    Jeremy Iamurri for beating sense into me and being a great friend.
+    Erik Scheele for being absolutely amazing at what you do and performing this album.
+    RJ Lake for pushing me to be better.
+    The music team for pushing me, and being the biggest group of bros in existence.
+    You. For listening.
 -------------------------------------------------------------------------------
 Track: The Prelude
 References: Homestuck Anthem
 URLs: https://youtu.be/7k8zCRNxa7k
+Commentary:
+    <i>Tyler Dever:</i>
+    The Prelude is a piece that I formulated a long time ago. It actually came about from me trying to figure out thechords the harps play in the quiet last section of Saturn from Gustav Holst's The Planets. When I started writingSburb I decided that it would fit perfectly with the theme that the game creates. The structure of the chords isnot unlike how the game actually functions. They work as a juxtaposition of good and evil by using relativemajor and minor chords. It starts off quietly and on higher octaves to introduce the mood. The next sectionbrings in the Homestuck Anthem as an introduction to the album itself, signaling the beginning of the entireprocess. The piece suddenly grows in intensity as the left hand C octave ostinatos enter the phrases followed bythe calm of the storm. The piece does not resolve, however it does lead straight into the next.
 -------------------------------------------------------------------------------
 Track: Genesis
 URLs: https://youtu.be/qOkMYB-r6b8
+Commentary:
+    <i>Tyler Dever:</i>
+    This song begins with a c minor chord that both resolves the last piece and immediately sets the mood for thispiece. Genesis marks the beginning of the biblical terms as well. The Book of Genesis is the first book of boththe Hebrew Bible and Christian Old Testament. It is interpreted as the Chosen People being lead to the PromisedLand. Sburb is the pathway that leads the kids into the game that is suppose to eventually grow a new universe.It starts off quietly and builds into a fast paced journey. Genesis also introduces my favorite music technique:hemiolas. The right hand plays a melody in triplets while the left hand harmonizes in eighth notes. This createsa strange rhythm and continues the juxtaposition theme created in The Prelude's chords. Continuing the conceptof two extremes but together, the song goes into legato, quiet phrases that are immediately followed bystaccato, loud phrases.
 -------------------------------------------------------------------------------
 Track: Eden
 URLs: https://youtu.be/hcXixYBLk_8
+Commentary:
+    <i>Tyler Dever:</i>
+    The Garden of Eden is where the first man Adam, and his wife Eve, lived after their creation. It is suppose to bea beautiful, blissful utopia. It also becomes the origin of sin. The piece reflects that concept. The flowing andadventurous nature of the piece is suppose to reflect the beauty and majestic qualities of the land. As far as thekids story goes, it represents the infinite potential of Skaia. This song also continues the same hemiola motif asCreation with triplets played by the right hand and eighth notes played by the left. The glissandos at thebeginning and in the middle is an E flat pentatonic run, which basically means I only played on the black keys.Since it's completely ad libbed I wrote out a small little example. Basically, the left hand just continues upnormally while the right hand goes back and forth while slowly climbing up (if looking at the sheet music, eachnote alternates on the hands).
 -------------------------------------------------------------------------------
 Track: Exodus
 References: Sburban Jungle
 URLs: https://youtu.be/UnbRhrKFofY
+Commentary:
+    <i>Tyler Dever:</i>
+    The Book of Exodus comes after the Book of Genesis. It narrates the mass journey out of Israel by Moses. InSburb, the players must go through a set of tasks to escape impending doom. This song reflects the process ofentering the medium. This is why I encorporated Sburban Jungle into the beginning and end. The first timeSburb is booted up you hear a bit of Sburban Jungle, just like at the beginning of the song you hear the bottomchords. Later, when John enters the medium (as well as Rose) you hear the song in more complete forms likethe end of the piece. When playing, the trickiest part is definitely the triplet ostinato that continues throughoutthe entire song. The best method to pulling this off is by playing the note on the beat (which will always beeither E flat or G) with the left hand and the rest of the notes on the right hand. You will notice that when thereare lower notes, there are rests in the ostinato so that you can quickly jump down the piano.
 -------------------------------------------------------------------------------
 Track: Requiem
 URLs: https://youtu.be/cVKRJOqKMDY
+Commentary:
+    <i>Tyler Dever:</i>
+    Requiem masses are masses for the dead. Requiem is the anthem for everything and everybody lost. Oneportion of Homestuck never focused on is the direct aftermath of the destruction of the Reckoning. Requiem is atheme for all the people and things lost on Earth. The song itself could be very tricky to play depending on howfamiliar you are with time signatures. The piece is in 4/4 for the majority of the first half. It enters a 5/4 sectionwith a 4/4 continuation of the "siren" effect overlapping. The hemiola only occurs the first time, the second timebringing in a 5/4 melody to accompany it. Immediately afterwards the piece shifts into mixed meter. The 7/8section is briefly interupted by an apostrophe of 5/8. The ending shifts to 6/8 as the tone shifts from minor tomajor.
 -------------------------------------------------------------------------------
 Track: The Meek
 URLs: https://youtu.be/hKEylNAp1-Q
+Commentary:
+    <i>Tyler Dever:</i>
+    "Blessed are the meek: for they shall inherit the earth." The Meek is the theme for the Exiles. They are the onesleft to fix and save the Earth 413 years after it's destruction. It starts off solemn as the concept occurs to themthat it is their duty to repopulate and rebuild. As the piece goes on it gets more intense to reflect all of theshenanigans and gun pointing that occurs as they all converge and meet. After the tension dies away the moodfrom before is recapped before resolving at the end. However, the last run ends in dissonance, because we don'tknow how the exile's story will play out.
 -------------------------------------------------------------------------------
 Track: Chronicles
 References: Candles and Clockwork
 URLs: https://youtu.be/TOtz3MTSeKg
+Commentary:
+    <i>Tyler Dever:</i>
+    A chronicle is an account of chronological events. Homestuck does not follow a chronological structure in theslightest. Chronicles is a piano version of Candles and Clockwork. Candles and Clockwork in itself is a massivehemiola as each voice exists in a different time signature. The melody is adapted in this piece to match the 3/4arpeggio. The piece keeps changing to reflect each leg of the journey the kids have to experience in order tofinish the game, not necessarily in order.
 -------------------------------------------------------------------------------
 Track: Rapture
 URLs: https://youtu.be/zqbExJ93rXo
+Commentary:
+    <i>Tyler Dever:</i>
+    Boss fight music! Kind of. The rapture starts off quietly and peacefully before the sirens break the silence. Thesirens lead into a fast paced hectic section before dying down as quickly as it appeared. A sudden destructiveforce that comes and goes in an instant. This song uses two motifs throughout the album: the siren andhemiolas. Measures 17-19 are more than a little tricky to play. I left a note in the sheet music to help with theending line.
 -------------------------------------------------------------------------------
 Track: Creation
 References: Homestuck Anthem
 URLs: https://youtu.be/XorynbzZQpI
+Commentary:
+    <i>Tyler Dever:</i>
+    The song that means more to me than any song I've ever written and possibly will again. Sburb is all aboutcreating worlds, thus the resolution of the album comes after the storm (Rapture). No matter how harsh theprocess may be, the result is beauty and endless potential. This song is completely based around the hemiolamotif and the origin of it. It is also designed like a day. The song starts off quiet and slow as the sun rises andslowly gets more complex and full fledged as it rises until mid day when it is most busy. As the sun sets into thelater half of the day the song slows down and gets quieter toward the sunset. It resolves with the HomestuckAnthem to imply the loop to the beginning. Worlds are created and the process of Skaia starts again.
 -------------------------------------------------------------------------------
 Track: Revelations I
 References: Homestuck Anthem
 URLs: https://youtu.be/YoIYaFyll5Q
+Commentary:
+    <i>Tyler Dever:</i>
+    Revelations is the afterthought of Sburb. The three songs were added months after the original nine werefinished and pieced together into the album. They are a standalone piece from the rest of the album but still fitthe concept of Sburb and Skaia. Revelations is the equivalent of The Ultimate Riddle. Solving and understandingis the purpose behind the entire concept, however it can completely be overlooked and is not necessary tocompleting the rest of the process. Thousands of people can play the game and create their own universes butnever quite solve the riddle. In this sense, it completely is a separate entity because the other nine songs canloop freely with or without its presence. Each of the movements is based around the same arpeggio patternfeatured in Chronicles. They are another journey completely.
+    The first movement starts off as a note in the distance, a growing concept. To the sound of a siren it grows andrushes into a full blown idea. The Homestuck Anthem is briefly mentioned to imply a connection but it just keepsgoing leaving it in the dust. There are better things to get to. It slowly breaks down and flows into the nextmovement.
 -------------------------------------------------------------------------------
 Track: Revelations II
 URLs: https://youtu.be/pXcUUevV4nA
+Commentary:
+    <i>Tyler Dever:</i>
+    Movement II is the process of solving it almost. It's the path to enlightenment; overcomingobstacles and finding yourself along the way is part of the challenge.
 -------------------------------------------------------------------------------
 Track: Revelations III
 URLs: https://youtu.be/d-Gewy6q_zw
+Commentary:
+    <i>Tyler Dever:</i>
+    Resolution comes in the third movement,which is the enlightenment. One simple arpeggio starts and powers the entire piece, which also brings it to anend. The discovery of the answer brings enlightenment but also ends the journey and the entire process ofSburb/Skaia. Thank you for listening.
