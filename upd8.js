@@ -178,14 +178,14 @@ async function processAlbumDataFile(file) {
         // ordinary o8jects with an error message attached. I'm not 8othering
         // with error codes here or anywhere in this function; while this would
         // normally 8e 8ad coding practice, it doesn't really matter here,
-        // 8ecause this isn't an API getting consumed by other services (e.g.
+        // 8ecause this isn't an API getting consumed 8y other services (e.g.
         // translaction functions). If we return an error, the caller will just
         // print the attached message in the output summary.
         return {error: `Could not read ${file} (${error.code}).`};
     }
 
-    // We're probably supposed to, like, search for a header somewhere in the
-    // album contents, to make sure it's trying to be the intended structure
+    // We're pro8a8ly supposed to, like, search for a header somewhere in the
+    // al8um contents, to make sure it's trying to 8e the intended structure
     // and is a valid utf-8 (or at least ASCII) file. 8ut like, whatever.
     // We'll just return more specific errors if it's missing necessary data
     // fields.
@@ -379,7 +379,7 @@ async function processAlbumDataFile(file) {
     };
 
     for (const section of sections.slice(1)) {
-        // Just skip empty sections. Sometimes I paste a bunch of dividers,
+        // Just skip empty sections. Sometimes I paste a 8unch of dividers,
         // and this lets the empty sections doing that creates (temporarily)
         // exist without raising an error.
         if (!section.filter(Boolean).length) {
@@ -481,7 +481,7 @@ async function processAlbumDataFile(file) {
 // in Homestuck, the first four Vol.'s were com8ined into one al8um really
 // early in the history of the 8andcamp, and I still want to use that as the
 // al8um listing (not the original four al8um listings), 8ut if I only did
-// that, all the tracks would be sorted as though they were released at the
+// that, all the tracks would 8e sorted as though they were released at the
 // same time as the compilation al8um - i.e, after some other al8ums (including
 // Vol.'s 5 and 6!) were released. That would mess with chronological listings
 // including tracks from multiple al8ums, like artist pages. So, to fix that,
@@ -1062,11 +1062,11 @@ function generateSidebarForAlbum(album, currentTrack = null) {
 // these functions "hard-coded", which 8asically just means my future self and
 // anyone else trying to mess with this code can't 8lame me for my terri8le
 // decisions / laziness in figuring out a 8etter solution. That said, note to
-// future self: these only work from two levels above the root directory.
+// future self: these only work from two levels a8ove the root directory.
 // "O8viously," if you look at their implementation, 8ut if you don't... yeah.
 // You won't 8e a8le to call these for use in the lower level files.
 // ACTUALLY this means I really should just use a <base> element, which yes, I
-// have done before (on my 8log). That way all HTML files have the same root
+// have done 8efore (on my 8log). That way all HTML files have the same root
 // for referenced files, and these functions work anywhere. The catch, then, is
 // that you have to have a "8ase directory" constant, and keep that accurate on
 // 8oth your development machine and the server you pu8lish this too. So, it's
