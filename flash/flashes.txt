@@ -1,0 +1,944 @@
+ACT: Act 1 - The Note Desolation Plays
+FG: #7799ff
+------------------------------------------------------------------------------
+Flash: [S] John: Play haunting piano refrain.
+Page: 77
+Date: April 21, 2009
+Tracks:
+- Showtime (Piano Refrain)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 82
+Date: April 24, 2009
+Tracks:
+- Foley (by Clark Powell)
+------------------------------------------------------------------------------
+Flash: [S] John: Enter.
+Page: 88
+Date: April 27, 2009
+Tracks:
+- Harlequin
+------------------------------------------------------------------------------
+Flash: [S] STRIFE!
+Page: 90
+Date: April 28, 2009
+Tracks:
+- Showtime (Original Mix)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 137
+Date: May 9, 2009
+Tracks:
+- Sburban Jungle
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 186
+Date: May 21, 2009
+Tracks:
+- Harlequin
+------------------------------------------------------------------------------
+Flash: [S] Rose: Play a haunting refrain on the violin.
+Page: 222
+Date: May 29, 2009
+Tracks:
+- Aggrieve (Violin Refrain)
+------------------------------------------------------------------------------
+Flash: [S] John: Take bite of apple.
+Page: 246
+Date: June 7, 2009
+Tracks:
+- Sburban Countdown
+------------------------------------------------------------------------------
+ACT: Act 2 - Raise of the Conductor's Baton
+FG: #ff5555
+------------------------------------------------------------------------------
+Flash: [S] YOU THERE. BOY.
+Page: 253
+Date: June 14, 2009
+Tracks:
+- Showtime (Piano Refrain)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 338
+Date: July 4, 2009
+Tracks:
+- 01, 02 (by Andrew Hussie)
+- 03, 04, 05, 11 (by Gabe Nezovic)
+- 06, 07, 12, 13, 14, 15, 16 (by Robert J! Lake)
+- 08, 09 (by xerxes333)
+- 10 (by Robert Blaker)
+------------------------------------------------------------------------------
+Flash: [S] Rose: Youth roll right out the front door.
+Page: 388
+Date: July 19, 2009
+Tracks:
+- Aggrieve
+------------------------------------------------------------------------------
+Flash: [S] ==>==>==>!!!!!!!!!
+Page: 393
+Date: July 22, 2009
+Tracks:
+- Showtime (Imp Strife Mix)
+------------------------------------------------------------------------------
+Flash: [S] GET UP JOHN, THIS IS NO TIME FOR SLUMBER.
+Page: 397
+Date: July 23, 2009
+Tracks:
+- Showtime (Imp Strife Mix)
+------------------------------------------------------------------------------
+Flash: [S] JOHN, SALVAGE YOUR WEAPON AND FIGHT ON!
+Page: 400
+Date: July 25, 2009
+Tracks:
+- Showtime (Imp Strife Mix)
+------------------------------------------------------------------------------
+Flash: [S] WHAT THIS IS SO OUTRAGEOUS
+Page: 418
+Date: July 30, 2009
+Tracks:
+- Nannaquin
+------------------------------------------------------------------------------
+Flash: [S] GO ON. ==>
+Page: 422
+Date: August 1, 2009
+Tracks:
+- Skies of Skaia
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 476
+Date: August 15, 2009
+Tracks:
+- Harlequin (Rock Version)
+------------------------------------------------------------------------------
+Flash: [S] John: Sleep.
+Page: 644
+Date: September 15, 2009
+Tracks:
+- John Sleeps - Skaian Magicant
+------------------------------------------------------------------------------
+Flash: [S] John: Wake up.
+Page: 651
+Date: September 17, 2009
+Tracks:
+- John Sleeps - Skaian Magicant
+------------------------------------------------------------------------------
+Flash: [S] Dave: Ascend to the highest point of the building.
+Page: 665
+Date: September 21, 2009
+Tracks:
+- Upward Movement (Dave Owns)
+------------------------------------------------------------------------------
+Flash: [S] WV: Lead your men to victory!
+Page: 721
+Date: October 2, 2009
+Tracks:
+- Vagabounce
+------------------------------------------------------------------------------
+Flash: [S] WV: Hasten to the exit post-haste!
+Page: 755
+Date: October 9, 2009
+Tracks:
+- Sburban Reversal
+------------------------------------------------------------------------------
+Flash: [S] WV: Ascend.
+Page: 757
+Date: October 11, 2009
+Tracks:
+- Explore
+------------------------------------------------------------------------------
+ACT: Act 3 - Insane Corkscrew Haymakers
+FG: #55ff77
+------------------------------------------------------------------------------
+Flash: [S] Jade: Play a silly flute refrain.
+Page: 769
+Date: October 15, 2009
+Tracks:
+- Flute performance (by Jan Van Den Hemel)
+------------------------------------------------------------------------------
+Flash: [S] Jade: Play a hauntingly relaxing bassline.
+Page: 822
+Date: October 27, 2009
+Tracks:
+- Gardener
+------------------------------------------------------------------------------
+Flash: [S] Jade: Open FreshJamz!
+Page: 830
+Date: October 31, 2009
+Tracks:
+- Showtime Remix
+- Aggrieve Remix
+- Verdancy (Bassline)
+- Potential Verdancy
+- Ohgodwhat
+- Ohgodwhat Remix
+- Rediscover Fusion
+- Crystalanthemums
+- Explore Remix
+------------------------------------------------------------------------------
+Flash: [S] MIDNIGHT CREW: ACT 1031
+Page: 833
+Date: November 2, 2009
+Tracks:
+- Dead Shuffle
+------------------------------------------------------------------------------
+Flash: [S] Dave: STRIFE.
+Page: 836
+Date: November 6, 2009
+Tracks:
+- Beatdown (Strider Style)
+------------------------------------------------------------------------------
+Flash: [S] Jade: Descend.
+Page: 843
+Date: November 8, 2009
+Tracks:
+- Harleboss
+------------------------------------------------------------------------------
+Flash: [S] Dave: Abscond.
+Page: 871
+Date: November 18, 2009
+Tracks:
+- Beatdown Round 2
+------------------------------------------------------------------------------
+Flash: [S] Rose: Ascend.
+Page: 879
+Date: November 20, 2009
+Tracks:
+- Harleboss
+------------------------------------------------------------------------------
+Flash: [S] Strife!!!
+Page: 918
+Date: November 27, 2009
+Tracks:
+- Dissension (Original)
+------------------------------------------------------------------------------
+Flash: [S] Rose: Fast forward to now.
+Page: 938
+Date: December 1, 2009
+Tracks:
+- Chorale for Jaspers
+------------------------------------------------------------------------------
+Flash: [S] Ride.
+Page: pony
+Date: December 1, 2009
+Tracks:
+- Pony Chorale
+------------------------------------------------------------------------------
+Flash: [S] John: Examine your dad's room.
+Page: 948
+Date: December 3, 2009
+Tracks:
+- Revelawesome
+------------------------------------------------------------------------------
+Flash: [S] John: Mental breakdown.
+Page: 979
+Date: December 6, 2009
+Tracks:
+- Hardlyquin
+------------------------------------------------------------------------------
+Flash: [S] Jade: Retrieve package.
+Page: 980
+Date: December 8, 2009
+Tracks:
+- An Unbreakable Union
+- Carefree Victory
+------------------------------------------------------------------------------
+Flash: [S] Jade: Dream up extra arms and play advanced bass solo.
+Page: 1026
+Date: December 18, 2009
+Tracks:
+- The Beginning of Something Really Excellent
+------------------------------------------------------------------------------
+Flash: [S] Dave: Strife!
+Page: 1070
+Date: December 24, 2009
+Tracks:
+- Versus
+------------------------------------------------------------------------------
+Flash: [S] Jade: Pester John.
+Page: 1073
+Date: December 29, 2009
+Tracks:
+- Ballad of Awakening
+------------------------------------------------------------------------------
+Flash: [S] Enter.
+Page: 1149
+Date: January 14, 2010
+Tracks:
+- Sburban Jungle
+------------------------------------------------------------------------------
+ACT: Intermission - Don't Bleed on the Suits.
+FG: #22cc22
+------------------------------------------------------------------------------
+Flash: [S][I] ==>
+Page: 1267
+Date: January 29, 2010
+Tracks:
+- Three in the Morning
+------------------------------------------------------------------------------
+ACT: Act 4 - Flight of the Paradox Clones
+FG: #b536da
+------------------------------------------------------------------------------
+Flash: [S] ACT 4 ==>
+Page: 1358
+Date: February 10, 2010
+Tracks:
+- Doctor
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 1407
+Date: February 17, 2010
+Tracks:
+- Endless Climb
+------------------------------------------------------------------------------
+Flash: [S] Dave: Accelerate.
+Page: 1641
+Date: April 2, 2010
+Tracks:
+- Atomyk Ebonpyre
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 1656
+Date: April 3, 2010
+Tracks:
+- Bed of Rose's / Dreams of Derse
+------------------------------------------------------------------------------
+Flash: [S] Jack: Ascend.
+Page: 1668
+Date: April 13, 2010
+Tracks:
+- Black
+- Descend
+------------------------------------------------------------------------------
+Flash: [S] Rose and Dave: Shut up and jam.
+Page: 1720
+Date: April 22, 2010
+Tracks:
+- Unsheath'd
+- Welcome to the New Extreme
+- Octoroon Rangoon
+- Derse Dreamers
+- Phantasmagoric Waltz
+------------------------------------------------------------------------------
+Flash: [S] WV?: Rise up.
+Page: 1801
+Date: May 5, 2010
+Tracks:
+- Skaian Skirmish
+------------------------------------------------------------------------------
+Flash: [S] John: Reunite with your loving wife and daughter.
+Page: 1931
+Date: May 26, 2010
+Tracks:
+- How Do I Live (Bunny Back in the Box Version)
+------------------------------------------------------------------------------
+Flash: [S] Descend.
+Page: 1940
+Date: May 31, 2010
+Tracks:
+- Descend
+------------------------------------------------------------------------------
+ACT: Act 5 Act 1 - <span style="color: #008282">MOB1US DOUBL3 R34CH4ROUND</span>
+FG: #0000ff
+------------------------------------------------------------------------------
+Flash: [S] Make her pay.
+Page: 2578
+Date: September 8, 2010
+Tracks:
+- Crystamanthequins
+------------------------------------------------------------------------------
+ACT: Act 5 Act 2 - <span style="color: #2ed73a">He is already here.</span>
+FG: #ff0000
+------------------------------------------------------------------------------
+Flash: [S] ACT 5 ACT 2 ==>
+Page: 2626
+Date: September 19, 2010
+Tracks:
+- Homestuck
+------------------------------------------------------------------------------
+Flash: [S] Vriska: Watch street tough maverick with nothing to lose
+Page: 2787
+Date: October 19, 2010
+Tracks:
+- How Do I Live (Bunny Back in the Box Version)
+------------------------------------------------------------------------------
+Flash: [S] Past Karkat: Wake up.
+Page: 2792
+Date: October 25, 2010
+Tracks:
+- Karkat's Theme
+- Vriska's Theme
+- Terezi's Theme
+- AlterniaBound
+- Spider's Claw
+- MeGaLoVania
+- A Tender Moment
+- Nic Cage Song
+- Secret ROM (by Toby Fox)
+- Boy Skylark (Brief)
+- Hero's Growth (by Solatrus)
+- Phrenic Phever
+- Walk-Stab-Walk (R&E)
+- Horschestra
+------------------------------------------------------------------------------
+Flash: [S] Jade: Wake up.
+Page: 2848
+Date: November 10, 2010
+Tracks:
+- Let the Squiddles Sleep (End Theme)
+------------------------------------------------------------------------------
+Flash: [S] Jade: Enter.
+Page: 2927
+Date: November 28, 2010
+Tracks:
+- Umbral Ultimatum
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 2988
+Date: December 4, 2010
+Tracks:
+- Frost:frost-vol6
+------------------------------------------------------------------------------
+Flash: [S] Jade: STRIFE!!!!!!!!!!!!
+Page: 3001
+Date: December 6, 2010
+Tracks:
+- Sunslammer
+------------------------------------------------------------------------------
+Flash: [S] John: Enter village.
+Page: 3079
+Date: December 15, 2010
+Tracks:
+- Planet Healer
+------------------------------------------------------------------------------
+Flash: [S] JOHN. RISE UP.
+Page: 3087
+Date: December 16, 2010
+Tracks:
+- Savior of the Waking World
+------------------------------------------------------------------------------
+Flash: [S] Wake.
+Page: 3297
+Date: January 15, 2011
+Tracks:
+- MeGaLoVania
+------------------------------------------------------------------------------
+Flash: [S] Kanaya: Return to the core.
+Page: 3321
+Date: January 22, 2011
+Tracks:
+- Darling Kanaya
+- Karkat's Theme
+- Eridan's Theme
+- Nautical Nightmare
+- Heir Conditioning
+------------------------------------------------------------------------------
+Flash: [S] Equius: Seek the highb100d.
+Page: 3438
+Date: February 6, 2011
+Tracks:
+- Horschestra STRONG Version
+- Nepeta's Theme
+- Blackest Heart (With Honks)
+- Midnight Calliope
+- Miracles (by ICP, Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] 3x SHOWDOWN COMBO.
+Page: 3520
+Date: February 16, 2011
+Tracks:
+- Trollian Standoff
+------------------------------------------------------------------------------
+Flash: [S] All: Behold glory of Zillyhoo.
+Page: 3679
+Date: March 23, 2011
+Tracks:
+- Warhammer of Zillyhoo
+------------------------------------------------------------------------------
+Flash: [S] Seer: Descend.
+Page: 3695
+Date: March 30, 2011
+Tracks:
+- Black Rose / Green Sun
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 3696
+Date: April 2, 2011
+Tracks:
+- At The Price of Oblivion
+------------------------------------------------------------------------------
+Flash: [S] Terezi: Read note.
+Page: 3718
+Date: April 17, 2011
+Tracks:
+- Secret ROM (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] Terezi: Play records.
+Page: 3725
+Date: April 19, 2011
+Tracks:
+- Trollcops
+- Havoc To Be Wrought
+- Rumble at the Rink
+- Unlabeled
+- XROM (by Toby Fox)
+- I'm a Member of the Midnight Crew (by Eddie Morton)
+------------------------------------------------------------------------------
+Flash: [S] Seer: Ascend.
+Page: 3744
+Date: April 30, 2011
+Tracks:
+- Terezi Owns
+------------------------------------------------------------------------------
+Flash: [S] Flip.
+Page: 3760
+Date: May 15, 2011
+Tracks:
+- BL1ND JUST1C3 : 1NV3ST1G4T1ON !!
+------------------------------------------------------------------------------
+Flash: [S] Attempt rare and highly dangerous 5x SHOWDOWN COMBO.
+Page: 4085
+Date: August 22, 2011
+Tracks:
+- The Carnival
+------------------------------------------------------------------------------
+Flash: [S] Cascade.
+Page: 4109
+Date: October 25, 2011
+Tracks:
+- Cascade (Beta)
+- Flare
+- Savior of the Dreaming Dead
+- Black Hole / Green Sun
+------------------------------------------------------------------------------
+ACT: Intermission 2 - The Man in the Cairo Overcoat.
+FG: #22cc22
+------------------------------------------------------------------------------
+Flash: [S] Begin intermission 2.
+Page: 4111
+Date: October 31, 2011
+Tracks:
+- English
+------------------------------------------------------------------------------
+ACT: Act 6 Act 1 - Through Broken Glass
+FG: #7799ff
+------------------------------------------------------------------------------
+Flash: [S] ACT 6
+Page: 4113
+Date: November 11, 2011
+Tracks:
+- Homestuck Anthem
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 4275
+Date: December 7, 2011
+Tracks:
+- Foley (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] Jane: Get mail.
+Page: 4282
+Date: December 9, 2011
+Tracks:
+- Foley (by Clark Powell)
+------------------------------------------------------------------------------
+ACT: Act 6 Intermission 1 - corpse party
+FG: #a10000
+------------------------------------------------------------------------------
+Flash: [S][A6I1] Karkat: Mental breakdown.
+Page: 4373
+Date: December 23, 2011
+Tracks:
+- Frustracean
+------------------------------------------------------------------------------
+Flash: [S] END OF ACT 6 INTERMISSION 1
+Page: 4390
+Date: December 29, 2011
+Tracks:
+- Infinity Mechanism
+------------------------------------------------------------------------------
+ACT: Act 6 Act 2 - Your shit is wrecked.
+FG: #f2a400
+------------------------------------------------------------------------------
+Flash: [S] Roxy: Sleepwalk.
+Page: 4486
+Date: January 21, 2011
+Tracks:
+- Even in Death
+------------------------------------------------------------------------------
+Flash: [S] RAP-OFF!!!!!!!!!!
+Page: 4541
+Date: February 4, 2012
+Tracks:
+- Anbroids:anbroids-v2
+------------------------------------------------------------------------------
+Flash: [S] Prince of Heart: Rise up.
+Page: 4572
+Date: February 16, 2012
+Tracks:
+- Time on My Side
+------------------------------------------------------------------------------
+Flash: [S] Frigglish: Fast forward to Jaspersprite.
+Page: 4617
+Date: February 26, 2012
+Tracks:
+- Chorale for Jaspers
+------------------------------------------------------------------------------
+Flash: [S] Jane: Enter.
+Page: 4665
+Date: March 8, 2012
+Tracks:
+- Another Jungle
+- A Taste for Adventure
+------------------------------------------------------------------------------
+ACT: Act 6 Intermission 2 - penis ouija
+FG: #e00707
+------------------------------------------------------------------------------
+Flash: [S][A6I2] ???
+Page: 4815
+Date: April 3, 2012
+Tracks:
+- weird moody horse shit (by Alexander Rosetti)
+------------------------------------------------------------------------------
+ACT: Act 6 Act 3 - Nobles
+FG: #8899cc
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 3
+Page: 4820
+Date: April 14, 2012
+Tracks:
+- Rain
+------------------------------------------------------------------------------
+Flash: [S] Jane: Proceed.
+Page: 4825
+Date: April 16, 2012
+Tracks:
+- Ruins (With Strings)
+------------------------------------------------------------------------------
+Flash: [S] Jane: Cautiously approach.
+Page: 4827
+Date: April 17, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S] DD: Ascend.
+Page: 4942
+Date: May 17, 2012
+Tracks:
+- Black
+------------------------------------------------------------------------------
+Flash: [S] DD: Ascend more casually.
+Page: 4944
+Date: May 17, 2012
+Tracks:
+- I'm a Member of the Midnight Crew (Acapella)
+------------------------------------------------------------------------------
+Flash: [S] Terry: Fast forward to Liv.
+Page: 5027
+Date: June 12, 2012
+Tracks:
+- I Don't Want to Miss a Thing
+------------------------------------------------------------------------------
+Flash: [S] Dirk: Synchronize.
+Page: 5238
+Date: July 9, 2012
+Tracks:
+- Unite Synchronization
+------------------------------------------------------------------------------
+Flash: [S] Dirk: Unite.
+Page: 5252
+Date: July 9, 2012
+Tracks:
+- Unite Synchronization
+------------------------------------------------------------------------------
+Flash: [S] Dirk: Synchronize.
+Page: 5238
+Date: July 9, 2012
+Tracks:
+- Unite Synchronization
+------------------------------------------------------------------------------
+Flash: [S] Caliborn: Enter.
+Page: 5261
+Date: July 28, 2012
+Tracks:
+- Eternity Served Cold
+------------------------------------------------------------------------------
+ACT: Act 6 Intermission 3 - Ballet of the Dancestors
+FG: #b536da
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 INTERMISSION 3
+Page: 5263
+Date: August 31, 2012
+Tracks:
+- Fuchsia Ruler
+- Darling Dolorosa (by Toby Fox)
+- GameGrl (Original 1993 Mix)
+- Iron Infidel
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I3] ==>
+Page: 5308
+Date: September 24, 2012
+Tracks:
+- Hate You
+- G4M3BL0RG (by Toby Fox)
+- Olive Rogue
+- Violet Prince
+- Purple Bard
+- Teal Seer
+- Crab Waltz (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S][A6I3] ==>
+Page: 5398
+Date: October 22, 2012
+Tracks:
+- 108 Stars of Density (by Toby Fox)
+- The Brave and the Bronze (by Yan Rodriguez)
+- Jade Sylph
+- Rust Maid
+- Indigo Heir
+- Orchid Horror
+- Davesprite
+- iRRRRRRRRECONCIA8LE
+------------------------------------------------------------------------------
+Flash: [S][A6I3] ==>
+Page: 5426
+Date: October 27, 2012
+Jiff: Yeah
+Tracks: <span class="loading">Loading</span>
+------------------------------------------------------------------------------
+Flash: [S][A6I3] MINISTRIFE!!!
+Page: 5427
+Date: November 3, 2012
+Tracks:
+- Killed by BR8K Spider!!!!!!!!
+------------------------------------------------------------------------------
+ACT: Act 6 Act 4 - Void
+FG: #cccccc
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 4
+Page: 5438
+Date: November 12, 2012
+Tracks:
+- Even in Death (T'Morra's Belly Mix)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 5440
+Date: November 14, 2012
+Tracks:
+- English
+------------------------------------------------------------------------------
+ACT: Act 6 Intermission 4 - Dead
+FG: #777777
+------------------------------------------------------------------------------
+Flash: [S][A6I4] ==>
+Page: 5471
+Date: November 18, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I4] ==>
+Page: 5472
+Date: November 19, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I4] ==>
+Page: 5473
+Date: November 19, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I4] ==>
+Page: 5474
+Date: November 19, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I4] ==>
+Page: 5485
+Date: November 21, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S!][A6I4] ==>
+Page: 5494
+Date: November 25, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [!!!][A6I4] ==>
+Page: 5495
+Date: November 25, 2012
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+ACT: Act 6 Act 5 - Of Gods and Tricksters
+FG: #ffee00
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 5
+Page: 5512
+Date: November 28, 2012
+Tracks:
+- A Taste for Adventure
+------------------------------------------------------------------------------
+Flash: [S] Ride.
+Page: 5655
+Date: December 26, 2012
+Tracks:
+- Horschestra STRONG Version
+------------------------------------------------------------------------------
+Flash: [S] Jane: Engage.
+Page: 5711
+Date: January 9, 2013
+Tracks:
+- Trickster Mode (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] Jane: Blast off.
+Page: 5712
+Date: January 10, 2013
+Tracks:
+- Trickster Mode (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 5 ACT 2
+Page: 5714
+Date: January 11, 2013
+Tracks:
+- Kazoostuck (by Toby Fox)
+- (I'm not going through the rest of the Trickster flashes, sorry.)
+------------------------------------------------------------------------------
+ACT: Act 6 Intermission 5 - <span style="color: #929292">I'M PUTTING YOU ON SPEAKER CRAB.</span>
+FG: #77ff88
+------------------------------------------------------------------------------
+Flash: [S][A6I5] BEGIN INTERFISHIN
+Page: 5981
+Date: March 10, 2013
+Tracks:
+- Elevatorstuck
+------------------------------------------------------------------------------
+Flash: [S][A6I5] END OF ACT 6 INTERMISSION 5 INTERMISSION 4
+Page: 6066
+Date: April 1, 2013
+Tracks:
+- Blackest Heart (With Honks)
+------------------------------------------------------------------------------
+Flash: [S][A6I5] ==>
+Page: 6231
+Date: April 13, 2013
+Tracks:
+- A Taste for Adventure
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Act 1 - HOMOSUCK
+FG: #2ed73a
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 6
+Page: 6243
+Date: June 12, 2013
+Tracks:
+- Homosuck Anthem (by Toby Fox)
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Intermission 1 - Stardust
+FG: #dddddd
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 6 INTERMISSION 1
+Page: 6278
+Date: June 14, 2013
+Tracks:
+- Gold Pilot
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Intermission 3 - GAME OVER
+FG: #ffffff
+------------------------------------------------------------------------------
+Flash: [S] GAME OVER.
+Page: 6901
+Date: October 25, 2014
+Tracks:
+- Carne Vale
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Intermission 4 - <span style="color: #008282">F1X TH1S</span>
+FG: #4466ff
+------------------------------------------------------------------------------
+Flash: [S][A6A6I4] ====>
+Page: 7098
+Date: November 28, 2014
+Tracks:
+- Pipeorgankind
+------------------------------------------------------------------------------
+Flash: [S][A6A6I4] ====>
+Page: 7101
+Date: December 1, 2014
+Tracks:
+- Elevatorstuck, with Meows (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S][A6A6I4] ====>
+Page: 7405
+Date: January 19, 2015
+Tracks:
+- Not a creature was stirring (by Alexander Rosetti)
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Act 5 - MASTERPIECE
+FG: #55ff00
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 6 ACT 5
+Page: 7409
+Date: April 13, 2015
+Tracks:
+- Homosuck Swan Song (by Toby Fox)
+------------------------------------------------------------------------------
+Flash: [S] MSPA Reader: Mental breakdown.
+Page: 7448
+Date: April 22, 2015
+Tracks:
+- Hello Zepp - Saw Theme (by Charlie Clouser)
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Intermission 5 - <span style="color: #1076a2">She's 8ack</span>
+FG: #00ffff
+------------------------------------------------------------------------------
+Flash: [S] ACT 6 ACT 6 INTERMISSION 5
+Page: 7449
+Date: April 26, 2015
+Tracks:
+- Moonsetter
+------------------------------------------------------------------------------
+Flash: [S][A6A6I5] ====>
+Page: 7928
+Date: July 23, 2015
+Tracks:
+- Horsecatska (by James Roach)
+------------------------------------------------------------------------------
+Flash: [S] Terezi: Remem8er.
+Page: 7959
+Date: July 27, 2015
+Tracks:
+- Do You Remem8er Me
+------------------------------------------------------------------------------
+ACT: Act 6 Act 6 Act 6 - <span style="color: #ff0000">Collide.</span>
+FG: #ee1100
+------------------------------------------------------------------------------
+Flash: [S] Collide.
+Page: 8087
+Date: April 6, 2016
+Tracks:
+- Creata (Canon Edit)
+- Oppa Toby Style
+- Eternity, Served Cold (Canon Edit)
+- Heir of Grief
+------------------------------------------------------------------------------
+ACT: Act 7 - <span style="color: #c7ff43">The Rapture</span><br><i>&amp; Post Canon</i>
+FG: #ffffff
+------------------------------------------------------------------------------
+Flash: [S] ACT 7
+Page: 8127
+Date: April 13, 2016
+Tracks:
+- Overture (Canon Edit)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 8129
+Date: October 25, 2016
+Tracks:
+- Foley (by Clark Powell)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 8130
+Date: October 25, 2016
+Tracks:
+- Ascend

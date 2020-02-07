@@ -72,9 +72,36 @@ a:hover {
     margin: 10px 5px;
 }
 
-#sidebar ol {
+#sidebar > ol, #sidebar > ul {
     padding-left: 30px;
     padding-right: 15px;
+}
+
+#sidebar > dl {
+    padding-right: 15px;
+    padding-left: 0;
+}
+
+#sidebar > dl dt {
+    padding-left: 15px;
+    margin-top: 0.5em;
+}
+
+#sidebar > dl dt.current {
+    font-weight: 800;
+}
+
+#sidebar > dl dd {
+    margin-left: 0;
+}
+
+#sidebar > dl dd ul {
+    padding-left: 30px;
+    margin-left: 0;
+}
+
+#sidebar > dl .side {
+    padding-left: 10px;
 }
 
 #sidebar li.current {
@@ -140,6 +167,11 @@ h1 {
     margin-bottom: 10px;
 }
 
+.grid-listing h2 {
+    text-align: center;
+    width: 100%;
+}
+
 #top-index #content h1 {
     text-align: center;
     font-size: 2em;
@@ -196,4 +228,46 @@ dl dt {
 
 dl dd {
     margin-bottom: 1em;
+}
+
+.new {
+    animation: new 1s infinite;
+}
+
+@keyframes new {
+    0% {
+        color: #bbdd00;
+    }
+
+    50% {
+        color: #eeff22;
+    }
+
+    100% {
+        color: #bbdd00;
+    }
+}
+
+/* fake :P */
+.loading::after {
+    content: '.';
+    animation: loading 6s infinite;
+}
+
+@keyframes loading {
+    0 {
+        content: '.';
+    }
+
+    33% {
+        content: '..';
+    }
+
+    66% {
+        content: '...';
+    }
+
+    100% {
+        content: '.';
+    }
 }
