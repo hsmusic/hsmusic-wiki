@@ -36,7 +36,7 @@ URLs: https://homestuck.bandcamp.com/track/death-of-the-lusii-2
 Track: Virgin Orb
 URLs: https://homestuck.bandcamp.com/track/virgin-orb-2
 -------------------------------------------------------------------------------
-Track: The La2t Frontier
+Track: The La2t Frontiier
 References: Sunsetter
 URLs: https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
 -------------------------------------------------------------------------------
