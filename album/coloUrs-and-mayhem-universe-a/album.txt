@@ -149,7 +149,7 @@ Track Art: Prassio
 URLs: https://homestuck.bandcamp.com/track/gold-mage
 -------------------------------------------------------------------------------
 Track: Iron Knight
-Artist: DJ Sai Tae
+Artist: DJ最テー
 Track Art: Emma Glaze
 URLs: https://homestuck.bandcamp.com/track/iron-knight
 -------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ Track Art: Brianne
 URLs: https://homestuck.bandcamp.com/track/purple-bard
 -------------------------------------------------------------------------------
 Track: Violet Prince
-Artist: DJ Sai Tae
+Artist: DJ最テー
 Track Art: Whimzu
 URLs: https://homestuck.bandcamp.com/track/violet-prince
 -------------------------------------------------------------------------------
