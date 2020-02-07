@@ -105,6 +105,14 @@ const SITE_ABOUT = `
     </ul>
 `;
 
+const SITE_FEEDBACK = `
+    <p><strong>Feature requests? Noticed any errors?</strong> Please let me know! I appreciate feedback a lot, and always want to make this site better.</p>
+    <p>The best place to talk about this site is on its <a href="https://forum.homestuck.xyz/viewtopic.php?f=7&t=151">HomestuckXYZ forum thread</a>.</p>
+    <p>If you're not one for forums or don't have an account there, you can spam me on <a href="https://twitter.com/florriestuck">Twitter</a>.</p>
+    <p>Or, if you're <em>really</em> old fashioned, I've got an email too: towerofnix at gmail dot beans.</p>
+    <p>Thank you for sharing your feedback!</p>
+`;
+
 // The folder you stick your random downloads in is called "Downloads", yeah?
 // (Unless you sort all your downloads into manual, organized locations. Good
 // for you.) It might just 8e me, 8ut I've always said "the downloads folder."
@@ -125,6 +133,7 @@ const ARTIST_DIRECTORY = 'artist';
 const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
 const LISTING_DIRECTORY = 'list';
 const ABOUT_DIRECTORY = 'about';
+const FEEDBACK_DIRECTORY = 'feedback';
 const FLASH_DIRECTORY = 'flash';
 
 // Might ena8le this later... we'll see! Eventually. May8e.
@@ -608,8 +617,9 @@ function writeMiscellaneousPages(albumData, flashData) {
                     <div id="intro-menu">
                         <p>Explore the site!</p>
                         <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
-                        <a href="about/index.html">About &amp; Credits</a>
                         <a href="${FLASH_DIRECTORY}/index.html">Flashes <span class="new">(New!)</span></a>
+                        <a href="${ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
+                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
                         <p>...or choose an album:</p>
                     </div>
                     <div class="grid-listing">
@@ -630,7 +640,8 @@ function writeMiscellaneousPages(albumData, flashData) {
                     <div id="intro-menu">
                         <a href="index.html">Home</a>
                         <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
-                        <a href="about/index.html">About &amp; Credits</a>
+                        <a href="${ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
+                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
                     </div>
                     <div class="long-content">
                         <p>Also check out:</p>
@@ -659,6 +670,17 @@ function writeMiscellaneousPages(albumData, flashData) {
                         <h1>${SITE_TITLE}</h1>
                         <p><a href="index.html">(Home)</a></p>
                         ${SITE_ABOUT}
+                    </div>
+                </div>
+            </body>
+        `),
+        writePage([FEEDBACK_DIRECTORY], 'Feedback!', fixWS`
+            <body>
+                <div id="content">
+                    <div class="long-content">
+                        <h1>Feedback!</h1>
+                        <p><a href="index.html">(Home)</a></p>
+                        ${SITE_FEEDBACK}
                     </div>
                 </div>
             </body>
