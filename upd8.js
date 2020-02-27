@@ -617,7 +617,7 @@ function writeMiscellaneousPages(albumData, flashData) {
                     <div id="intro-menu">
                         <p>Explore the site!</p>
                         <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
-                        <a href="${FLASH_DIRECTORY}/index.html">Flashes <span class="new">(New!)</span></a>
+                        <a href="${FLASH_DIRECTORY}/index.html">Flashes</a>
                         <a href="${ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
                         <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
                         <p>...or choose an album:</p>
