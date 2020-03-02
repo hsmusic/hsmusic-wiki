@@ -628,7 +628,7 @@ function writeMiscellaneousPages(albumData, flashData) {
                     </div>
                     <h2>Fandom</h2>
                     <div class="grid-listing">
-                        ${albumData.filter(album => album.isFanon).map(album => fixWS`
+                        ${albumData.filter(album => album.isFanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
                                 <img src="${getAlbumCover(album)}">
                                 <span>${album.name}</span>
@@ -638,7 +638,7 @@ function writeMiscellaneousPages(albumData, flashData) {
                     </div>
                     <h2>Official</h2>
                     <div class="grid-listing">
-                        ${albumData.filter(album => !album.isFanon).map(album => fixWS`
+                        ${albumData.filter(album => !album.isFanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
                                 <img src="${getAlbumCover(album)}">
                                 <span>${album.name}</span>
