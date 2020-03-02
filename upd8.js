@@ -325,6 +325,8 @@ async function processAlbumDataFile(file) {
     const albumCommentary = getCommentaryField(albumSection);
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
+    const isFanon = getBasicField(albumSection, 'Canon') === 'Fanon';
+
     if (albumCoverArtists && albumCoverArtists.error) {
         return albumCoverArtists;
     }
@@ -382,6 +384,7 @@ async function processAlbumDataFile(file) {
         coverArtists: albumCoverArtists,
         commentary: albumCommentary,
         directory: albumDirectory,
+        isFanon,
         theme: {
             fg: albumColorFG,
             bg: albumColorBG,
@@ -477,6 +480,7 @@ async function processAlbumDataFile(file) {
             date,
             directory: trackDirectory,
             urls: trackURLs,
+            isFanon,
             // 8ack-reference the al8um o8ject! This is very useful for when
             // we're outputting the track pages.
             album: albumData
@@ -622,8 +626,19 @@ function writeMiscellaneousPages(albumData, flashData) {
                         <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
                         <p>...or choose an album:</p>
                     </div>
+                    <h2>Fandom</h2>
                     <div class="grid-listing">
-                        ${albumData.map(album => fixWS`
+                        ${albumData.filter(album => album.isFanon).map(album => fixWS`
+                            <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                                <img src="${getAlbumCover(album)}">
+                                <span>${album.name}</span>
+                            </a>
+                        `).join('\n')}
+                        <a class="grid-item" href="#" style="--fg-color: #ffffff">...and more to be added soon</a>
+                    </div>
+                    <h2>Official</h2>
+                    <div class="grid-listing">
+                        ${albumData.filter(album => !album.isFanon).map(album => fixWS`
                             <a class="grid-item" href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
                                 <img src="${getAlbumCover(album)}">
                                 <span>${album.name}</span>
@@ -738,6 +753,8 @@ async function writeTrackPage(track, albumData, flashData) {
     const artistNames = getArtistNames(albumData);
     const allTracks = getAllTracks(albumData);
     const tracksThatReference = getTracksThatReference(track, allTracks);
+    const ttrFanon = tracksThatReference.filter(t => t.isFanon);
+    const ttrCanon = tracksThatReference.filter(t => !t.isFanon);
     const tracksReferenced = getTracksReferencedBy(track, allTracks);
     const flashesThatFeature = getFlashesThatFeature(track, allTracks, flashData);
     await writePage([TRACK_DIRECTORY, track.directory], track.name, fixWS`
@@ -787,14 +804,30 @@ async function writeTrackPage(track, albumData, flashData) {
                 `}
                 ${tracksThatReference.length && fixWS`
                     <p>Tracks that reference <i>${track.name}</i>:</p>
-                    <ul>
-                        ${tracksThatReference.map(track => fixWS`
-                            <li>
-                                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                <span class="by">by ${getArtistString(track.artists, albumData)}</span>
-                            </li>
-                        `).join('\n')}
-                    </ul>
+                    <dl>
+                        ${ttrCanon.length && fixWS`
+                            <dt>Official:</dt>
+                            <dd><ul>
+                                ${ttrCanon.map(track => fixWS`
+                                    <li>
+                                        <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                        <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                    </li>
+                                `).join('\n')}
+                            </ul></dd>
+                        `}
+                        ${ttrFanon.length && fixWS`
+                            <dt>Fandom:</dt>
+                            <dd><ul>
+                                ${ttrFanon.map(track => fixWS`
+                                    <li>
+                                        <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+                                        <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                    </li>
+                                `).join('\n')}
+                            </ul></dd>
+                        `}
+                    </dl>
                 `}
                 ${flashesThatFeature.length && fixWS`
                     <p>Flashes that feature <i>${track.name}</i>:</p>

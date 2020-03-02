@@ -177,6 +177,13 @@ h1 {
     font-size: 2em;
 }
 
+#top-index #content h2 {
+    text-align: center;
+    font-size: 3em;
+    font-variant: small-caps;
+    font-style: oblique;
+}
+
 #intro-menu {
     margin: 24px 0;
     padding: 10px;
