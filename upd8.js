@@ -76,8 +76,10 @@ const writeFile = util.promisify(fs.writeFile);
 const access = util.promisify(fs.access);
 
 const {
+    cacheOneArg,
     joinNoOxford,
     progressPromiseAll,
+    queue,
     s,
     splitArray,
     th
@@ -93,7 +95,7 @@ const SITE_ABOUT = `
     <p>Welcome to my fan-made Homestuck music wiki!</p>
     <p><a href="https://www.homestuck.com/">Homestuck</a> has always been an incredible creative collaboration, and especially beloved by the community and critical in that collaboration is the webcomic and world's humongous soundtrack, comprising well over 500 tracks by dozens of musicians and artists. This wiki aims to be an interesting and useful resource for anyone interested in that music, as well as an archive for all things related.</p>
     <p>Pertaining to the history of this site: it was originally made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content particularly reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums (among other missing albums, like <a href="album/squiddles/index.html">Squiddles!</a>) are all indexed in the one place, and URLs will always stay consistent. And of course, also included are links for listening on Bandcamp and other services.</p>
-    <p><i>Credits</i></p>
+    <p><i>Resource &amp; Author Credits</i></p>
     <ul>
         <li>Florrie: that's me! I programmed most of the site, and put the whole thing together. Say hi to me on twitter (<a href="https://twitter.com/florriestuck">@florriestuck</a>) or reddit (<a href="https://reddit.com/u/towerofnix/">/u/towerofnix</a>)!</li>
         <li><a href="https://homestuck.bandcamp.com/">Homestuck's Bandcamp</a>, the official host of Homestuck's music: I got almost all the album listings and basic track info from here.</li>
@@ -103,6 +105,12 @@ const SITE_ABOUT = `
         <li>The <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom: the inspiration for this wiki! I've wanted to make a more complete and explorable wiki ever since seeing it. The Fandom wiki has also been a very handy reference in putting this together, so much thanks to everyone who's worked on it!</li>
         <li>All comments on the site: I appreciate all feedback a lot! People have shared a ton of ideas and suggestions with me, and I <i>cannot</i> emphasize enough how motivating it is to share a project with like-minded folx interested in making it better with you.</li>
     </ul>
+    <p><i>Feature Acknowledgements</i></p>
+    <p>Thank you, GiovanH, for linking me to a resource for higher quality cover art, and bringing to my attention the fact that clicking a cover art on Bandcamp to zoom in will often reveal a higher quality image.</p>
+    <p>Thank you, cosmogonicalAuthor, for a variety of feature requests and comments! In particular: improving way the track list on author pages is sorted; expanding the introduction; expanding the introduction message to the website; and linking bonus art for Homestuck Vol. 5 - plus a few other good suggestions I haven't gotten to yet. Thanks!</p>
+    <p>Thank you, Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki.</p>
+    <p>Thank you, Kidpen, for suggesting the "Flashes that feature this track" feature.</p>
+    <p>Thanks for pointing out typos, errors in reference lists, and out of date details: cookiefonster, foreverFlummoxed.</p>
 `;
 
 const SITE_FEEDBACK = `
@@ -270,13 +278,45 @@ function getMultilineField(lines, name) {
     return listLines.map(line => line.slice(4)).join('\n');
 };
 
-function getMultilineHTMLField(lines, name) {
-    const text = getMultilineField(lines, name);
-    return text && text.split('\n').map(line => line.startsWith('<ul>') ? line : `<p>${line}</p>`).join('\n');
+function transformMultiline(text, D) {
+    // Heck yes, HTML magics.
+
+    text = text.replace(/\[\[(.+?)\]\]/g, (match, ref) => {
+        const track = getLinkedTrack(ref, D);
+        if (track) {
+            return fixWS`
+                <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
+            `;
+        } else {
+            console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
+            return ref;
+        }
+    });
+
+    const outLines = [];
+
+    let inList = false;
+    for (const line of text.split('\n')) {
+        if (line.startsWith('-')) {
+            if (!inList) {
+                outLines.push('<ul>');
+                inList = true;
+            }
+            outLines.push(`    <li>${line.slice(1).trim()}</li>`);
+        } else {
+            if (inList) {
+                outLines.push('</ul>');
+                inList = false;
+            }
+            outLines.push(`<p>${line}</p>`);
+        }
+    }
+
+    return outLines.join('\n');
 };
 
 function getCommentaryField(lines) {
-    const text = getMultilineHTMLField(lines, 'Commentary');
+    const text = getMultilineField(lines, 'Commentary');
     if (text) {
         const lines = text.split('\n');
         if (!lines[0].includes(':</i>')) {
@@ -328,15 +368,15 @@ async function processAlbumDataFile(file) {
     const isFanon = getBasicField(albumSection, 'Canon') === 'Fanon';
 
     if (albumCoverArtists && albumCoverArtists.error) {
-        return albumCoverArtists;
+        return {error: `${albumCoverArtists.error} (in ${albumName})`};
     }
 
     if (albumCommentary && albumCommentary.error) {
-        return albumCommentary;
+        return {error: `${albumCommentary.error} (in ${albumName})`};
     }
 
     if (albumTrackCoverArtists && albumTrackCoverArtists.error) {
-        return albumTrackCoverArtists.error;
+        return {error: `${albumTrackCoverArtists.error} (in ${albumName})`};
     }
 
     if (!albumCoverArtists) {
@@ -403,7 +443,7 @@ async function processAlbumDataFile(file) {
 
         const trackName = getBasicField(section, 'Track');
         const trackCommentary = getCommentaryField(section);
-        const trackLyrics = getMultilineHTMLField(section, 'Lyrics');
+        const trackLyrics = getMultilineField(section, 'Lyrics');
         const originalDate = getBasicField(section, 'Original Date');
         const references = getListField(section, 'References') || [];
         let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
@@ -412,11 +452,11 @@ async function processAlbumDataFile(file) {
         let trackDirectory = getBasicField(section, 'Directory');
 
         if (trackContributors.error) {
-            return trackContributors;
+            return {error: `${trackContributors.error} (in ${trackName}, ${albumName})`};
         }
 
         if (trackCommentary && trackCommentary.error) {
-            return trackCommentary;
+            return {error: `${trackCommentary.error} (in ${trackName}, ${albumName})`};
         }
 
         if (!trackName) {
@@ -612,7 +652,8 @@ async function writePage(directoryParts, title, body) {
     `);
 }
 
-function writeMiscellaneousPages(albumData, flashData) {
+function writeMiscellaneousPages(D) {
+    const { albumData, flashData } = D;
     return progressPromiseAll('Writing miscellaneous pages.', [
         writePage([], SITE_TITLE, fixWS`
             <body id="top-index">
@@ -623,7 +664,7 @@ function writeMiscellaneousPages(albumData, flashData) {
                         <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
                         <a href="${FLASH_DIRECTORY}/index.html">Flashes</a>
                         <a href="${ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
-                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
+                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback &amp; Suggestions</a>
                         <p>...or choose an album:</p>
                     </div>
                     <h2>Fandom</h2>
@@ -656,7 +697,7 @@ function writeMiscellaneousPages(albumData, flashData) {
                         <a href="index.html">Home</a>
                         <a href="${LISTING_DIRECTORY}/index.html">Listings</a>
                         <a href="${ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
-                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback</a>
+                        <a href="${FEEDBACK_DIRECTORY}/index.html">Feedback &amp; Suggestions</a>
                     </div>
                     <div class="long-content">
                         <p>Also check out:</p>
@@ -689,11 +730,11 @@ function writeMiscellaneousPages(albumData, flashData) {
                 </div>
             </body>
         `),
-        writePage([FEEDBACK_DIRECTORY], 'Feedback!', fixWS`
+        writePage([FEEDBACK_DIRECTORY], 'Feedback &amp; Suggestions!', fixWS`
             <body>
                 <div id="content">
                     <div class="long-content">
-                        <h1>Feedback!</h1>
+                        <h1>Feedback &amp; Suggestions!</h1>
                         <p><a href="index.html">(Home)</a></p>
                         ${SITE_FEEDBACK}
                     </div>
@@ -704,15 +745,15 @@ function writeMiscellaneousPages(albumData, flashData) {
 }
 
 // This function title is my gr8test work of art.
-function writeIndexAndTrackPagesForAlbum(album, albumData, flashData) {
+// (The 8ehavior... well, um. Don't tell anyone, 8ut it's even 8etter.)
+function writeIndexAndTrackPagesForAlbum(album, D) {
     return [
-        writeAlbumPage(album, albumData),
-        ...album.tracks.map(track => writeTrackPage(track, albumData, flashData))
+        () => writeAlbumPage(album, D),
+        ...album.tracks.map(track => () => writeTrackPage(track, D))
     ];
 }
 
-async function writeAlbumPage(album, albumData) {
-    const allTracks = getAllTracks(albumData);
+async function writeAlbumPage(album, D) {
     await writePage([ALBUM_DIRECTORY, album.directory], album.name, fixWS`
         <body style="${getThemeString(album.theme)}">
             <div id="sidebar">
@@ -722,9 +763,9 @@ async function writeAlbumPage(album, albumData) {
                 <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
                 <h1>${album.name}</h1>
                 <p>
-                    ${album.artists && `By ${getArtistString(album.artists, albumData)}.<br>`}
+                    ${album.artists && `By ${getArtistString(album.artists, D)}.<br>`}
                     ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
-                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, D)})`}
                     `))}.<br>`}
                     Released ${getDateString(album)}.
                 </p>
@@ -733,7 +774,7 @@ async function writeAlbumPage(album, albumData) {
                         <li>
                             <a href="${TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
                             ${track.artists !== album.artists && fixWS`
-                                <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                <span class="by">by ${getArtistString(track.artists, D)}</span>
                             `}
                         </li>
                     `).join('\n')}
@@ -741,7 +782,7 @@ async function writeAlbumPage(album, albumData) {
                 ${album.commentary && fixWS`
                     <p>Artist commentary:</p>
                     <blockquote>
-                        ${album.commentary}
+                        ${transformMultiline(album.commentary, D)}
                     </blockquote>
                 `}
             </div>
@@ -749,14 +790,13 @@ async function writeAlbumPage(album, albumData) {
     `);
 }
 
-async function writeTrackPage(track, albumData, flashData) {
-    const artistNames = getArtistNames(albumData);
-    const allTracks = getAllTracks(albumData);
-    const tracksThatReference = getTracksThatReference(track, allTracks);
+async function writeTrackPage(track, D) {
+    const { artistNames } = D;
+    const tracksThatReference = getTracksThatReference(track, D);
     const ttrFanon = tracksThatReference.filter(t => t.isFanon);
     const ttrCanon = tracksThatReference.filter(t => !t.isFanon);
-    const tracksReferenced = getTracksReferencedBy(track, allTracks);
-    const flashesThatFeature = getFlashesThatFeature(track, allTracks, flashData);
+    const tracksReferenced = getTracksReferencedBy(track, D);
+    const flashesThatFeature = getFlashesThatFeature(track, D);
     await writePage([TRACK_DIRECTORY, track.directory], track.name, fixWS`
         <body style="${getThemeString(track.album.theme)}">
             <div id="sidebar">
@@ -766,9 +806,9 @@ async function writeTrackPage(track, albumData, flashData) {
                 <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}"></a>
                 <h1>${track.name}</h1>
                 <p>
-                    By ${getArtistString(track.artists, albumData)}.<br>
+                    By ${getArtistString(track.artists, D)}.<br>
                     ${track.coverArtists && `Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
-                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, allTracks)})`}
+                        <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what}, D)})`}
                     `))}.<br>`}
                     Released ${getDateString(track)}.
                 </p>
@@ -777,6 +817,7 @@ async function writeTrackPage(track, albumData, flashData) {
                         url.includes('bandcamp.com') ? 'Bandcamp' :
                         url.includes('youtu') ? 'YouTube' :
                         url.includes('soundcloud') ? 'SoundCloud' :
+                        url.includes('archive.homestuck.net') ? 'archive.homestuck.net' :
                         '(External)'
                     }</a>
                 `), 'or')}.</p>
@@ -787,7 +828,7 @@ async function writeTrackPage(track, albumData, flashData) {
                             <li>${artistNames.includes(who)
                                 ? `<a href="${ARTIST_DIRECTORY}/${getArtistDirectory(who)}/index.html">${who}</a>`
                                 : who
-                            } ${what && `(${getContributionString({what}, allTracks)})`}</li>
+                            } ${what && `(${getContributionString({what}, D)})`}</li>
                         `).join('\n')}
                     </ul>
                 `}
@@ -797,7 +838,7 @@ async function writeTrackPage(track, albumData, flashData) {
                         ${tracksReferenced.map(track => fixWS`
                             <li>
                                 <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                <span class="by">by ${getArtistString(track.artists, D)}</span>
                             </li>
                         `).join('\n')}
                     </ul>
@@ -811,7 +852,7 @@ async function writeTrackPage(track, albumData, flashData) {
                                 ${ttrCanon.map(track => fixWS`
                                     <li>
                                         <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                        <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                        <span class="by">by ${getArtistString(track.artists, D)}</span>
                                     </li>
                                 `).join('\n')}
                             </ul></dd>
@@ -822,7 +863,7 @@ async function writeTrackPage(track, albumData, flashData) {
                                 ${ttrFanon.map(track => fixWS`
                                     <li>
                                         <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                        <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                        <span class="by">by ${getArtistString(track.artists, D)}</span>
                                     </li>
                                 `).join('\n')}
                             </ul></dd>
@@ -838,13 +879,13 @@ async function writeTrackPage(track, albumData, flashData) {
                 ${track.lyrics && fixWS`
                     <p>Lyrics:</p>
                     <blockquote>
-                        ${track.lyrics}
+                        ${transformMultiline(track.lyrics, D)}
                     </blockquote>
                 `}
                 ${track.commentary && fixWS`
                     <p>Artist commentary:</p>
                     <blockquote>
-                        ${track.commentary}
+                        ${transformMultiline(track.commentary, D)}
                     </blockquote>
                 `}
             </div>
@@ -852,18 +893,17 @@ async function writeTrackPage(track, albumData, flashData) {
     `);
 }
 
-async function writeArtistPages(albumData, flashData) {
-    await progressPromiseAll('Writing artist pages.', getArtistNames(albumData).map(artistName => writeArtistPage(artistName, albumData, flashData)));
+async function writeArtistPages(D) {
+    await progressPromiseAll('Writing artist pages.', queue(D.artistNames.map(artistName => () => writeArtistPage(artistName, D))));
 }
 
-async function writeArtistPage(artistName, albumData, flashData) {
-    const allTracks = getAllTracks(albumData);
-    const tracks = sortByDate(allTracks.filter(track => (
+async function writeArtistPage(artistName, D) {
+    const tracks = sortByDate(D.allTracks.filter(track => (
         track.artists.includes(artistName) ||
         track.contributors.some(({ who }) => who === artistName)
     )));
-    const artThings = sortByDate(albumData.concat(allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
-    const commentaryThings = sortByDate(albumData.concat(allTracks).filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')));
+    const artThings = sortByDate(D.albumData.concat(D.allTracks).filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName)));
+    const commentaryThings = sortByDate(D.albumData.concat(D.allTracks).filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')));
 
     // Shish!
     const kebab = getArtistDirectory(artistName);
@@ -887,12 +927,12 @@ async function writeArtistPage(artistName, albumData, flashData) {
                             who: artistName,
                             what: track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what).join(', ')
                         };
-                        const flashes = getFlashesThatFeature(track, allTracks, flashData);
+                        const flashes = getFlashesThatFeature(track, D);
                         return fixWS`
                             <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                                 <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName), albumData)})</span>`}
-                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks) || 'contributed'})</span>`}
+                                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName), D)})</span>`}
+                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, D) || 'contributed'})</span>`}
                                 ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>`}
                             </li>
                         `;
@@ -907,7 +947,7 @@ async function writeArtistPage(artistName, albumData, flashData) {
                                 ${thing.album ? fixWS`
                                     <a href="${TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.album.theme)}">${thing.name}</a>
                                 ` : '<i>(cover art)</i>'}
-                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, tracks)})</span>`}
+                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib, D)})</span>`}
                             </li>
                         `;
                     })}
@@ -915,7 +955,7 @@ async function writeArtistPage(artistName, albumData, flashData) {
                 ${commentaryThings.length && fixWS`
                     <h2 id="commentary">Commentary</h2>
                     ${albumChunkedList(commentaryThings, thing => {
-                        const flashes = getFlashesThatFeature(thing, allTracks, flashData);
+                        const flashes = getFlashesThatFeature(thing, D);
                         return fixWS`
                             <li>
                                 ${thing.album ? fixWS`
@@ -960,12 +1000,12 @@ function albumChunkedList(tracks, getLI, showDate = true) {
     `;
 }
 
-async function writeFlashPages(albumData, flashData) {
-    await progressPromiseAll('Writing Flash pages.', flashData.map(flash => flash.page && writeFlashPage(flash, albumData, flashData)).filter(Boolean));
+async function writeFlashPages(D) {
+    await progressPromiseAll('Writing Flash pages.', D.flashData.map(flash => flash.page && writeFlashPage(flash, D)).filter(Boolean));
 }
 
-async function writeFlashPage(flash, albumData, flashData) {
-    const allTracks = getAllTracks(albumData);
+async function writeFlashPage(flash, D) {
+    const {allTracks, flashData} = D;
     const kebab = getFlashDirectory(flash);
     const index = `${FLASH_DIRECTORY}/${kebab}/index.html`;
     const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'))
@@ -1005,13 +1045,13 @@ async function writeFlashPage(flash, albumData, flashData) {
                 <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                 <ul>
                     ${flash.tracks.map(ref => {
-                        const track = getLinkedTrack(ref, allTracks);
+                        const track = getLinkedTrack(ref, D);
                         const neighm = ref.match(/(.*?\S):/) || [ref, ref];
                         if (track) {
                             return fixWS`
                                 <li>
                                     <a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${neighm[1]}</a>
-                                    <span class="by">by ${getArtistString(track.artists, albumData)}</span>
+                                    <span class="by">by ${getArtistString(track.artists, D)}</span>
                                 </li>
                             `;
                         } else {
@@ -1019,7 +1059,7 @@ async function writeFlashPage(flash, albumData, flashData) {
                             if (by) {
                                 const name = ref.replace(by, '').trim();
                                 const who = by[0].replace(/\(by |\)/g, '').split(',').map(w => w.trim());
-                                return `<li>${name} <span class="by">by ${getArtistString(who, albumData)}</span></li>`;
+                                return `<li>${name} <span class="by">by ${getArtistString(who, D)}</span></li>`;
                             } else {
                                 return `<li>${ref}</li>`;
                             }
@@ -1031,9 +1071,11 @@ async function writeFlashPage(flash, albumData, flashData) {
     `);
 }
 
-function writeListingPages(albumData) {
-    const allArtists = getArtistNames(albumData).sort();
-    const allTracks = getAllTracks(albumData);
+function writeListingPages(D) {
+    const { albumData, allTracks, artistNames } = D;
+
+    const allArtists = artistNames.slice().sort();
+    const albumsAndTracks = albumData.concat(allTracks)
 
     const getArtistNumContributions = artistName => [
         ...allTracks.filter(track =>
@@ -1043,7 +1085,7 @@ function writeListingPages(albumData) {
             (album.coverArtists || []).some(({ who }) => who === artistName))
     ].length;
 
-    const getArtistNumCommentary = artistName => albumData.concat(allTracks)
+    const getArtistNumCommentary = artistName => albumsAndTracks
         .filter(thing => thing.commentary && thing.commentary.includes('<i>' + artistName + ':</i>')).length;
 
     const getAlbumLI = (album, extraText = '') => fixWS`
@@ -1169,13 +1211,15 @@ function writeListingPages(albumData) {
                         .filter(x => x.some(y => y.commentary))
                         .map(([ album, ...tracks ]) => fixWS`
                             <h2 id="${album.directory}"><a href="${ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></h2>
-                            <blockquote>
-                                ${album.commentary}
-                            </blockquote>
+                            ${album.commentary && fixWS`
+                                <blockquote>
+                                    ${transformMultiline(album.commentary, D)}
+                                e</blockquote>
+                            `}
                             ${tracks.filter(t => t.commentary).map(track => fixWS`
                                 <h3 id="${track.directory}"><a href="${TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album.theme)}">${track.name}</a></h3>
                                 <blockquote>
-                                    ${track.commentary}
+                                    ${transformMultiline(track.commentary, D)}
                                 </blockquote>
                             `).join('\n')}
                         `)
@@ -1225,7 +1269,8 @@ function generateSidebarForListings(listingDescriptors, currentDirectoryParts) {
 }
 
 // This function is terri8le. Sorry!
-function getContributionString({ what }, allTracks) {
+function getContributionString({ what }, D) {
+    const { allTracks } = D;
     return what
         ? what.replace(/\[(.*?)\]/g, (match, name) =>
             allTracks.some(track => track.name === name)
@@ -1234,32 +1279,43 @@ function getContributionString({ what }, allTracks) {
         : '';
 }
 
-function getTracksThatReference(track, allTracks) {
-    return allTracks.filter(t => getTracksReferencedBy(t, allTracks).includes(track));
+function getTracksThatReference(track, D) {
+    return D.allTracks.filter(t => getTracksReferencedBy(t, D).includes(track));
 }
 
-function getTracksReferencedBy(track, allTracks) {
-    return track.references.map(ref => getLinkedTrack(ref, allTracks)).filter(Boolean);
+function getTracksReferencedBy(track, D) {
+    return track.references.map(ref => getLinkedTrack(ref, D)).filter(Boolean);
 }
 
-function getLinkedTrack(ref, allTracks) {
+function getLinkedTrack(ref, D) {
+    const { allTracks } = D;
     const match = ref.match(/\S:(.*)/);
     if (match) {
         const dir = match[1];
         return allTracks.find(track => track.directory === dir);
     } else {
-        return allTracks.find(track => track.name === ref);
+        const track = allTracks.find(track => track.name === ref);
+        if (track) {
+            return track;
+        } else {
+            const track = allTracks.find(track => track.name.toLowerCase() === ref.toLowerCase());
+            if (track) {
+                console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
+                console.warn(`\x1b[31m- ${ref}\x1b[0m`);
+                console.warn(`\x1b[32m+ ${track.name}\x1b[0m`);
+                return track;
+            }
+        }
     }
 }
 
-function getFlashesThatFeature(track, allTracks, flashData) {
-    return flashData.filter(flash => flash.tracks && flash.tracks.map(t => getLinkedTrack(t, allTracks)).includes(track));
+function getFlashesThatFeature(track, D) {
+    return D.flashData.filter(flash => flash.tracks && flash.tracks.map(t => getLinkedTrack(t, D)).includes(track));
 }
 
-function getArtistString(artists, albumData) {
-    const artistNames = getArtistNames(albumData);
+function getArtistString(artists, D) {
     return joinNoOxford(artists.map(artist => {
-        if (artistNames.includes(artist)) {
+        if (D.artistNames.includes(artist)) {
             return fixWS`
                 <a href="${ARTIST_DIRECTORY}/${getArtistDirectory(artist)}/index.html">${artist}</a>
             `;
@@ -1415,18 +1471,59 @@ async function main() {
         return;
     }
 
-    await writeMiscellaneousPages(albumData, flashData);
-    await progressPromiseAll(`Writing album & track pages.`, albumData.map(album => writeIndexAndTrackPagesForAlbum(album, albumData, flashData)).reduce((a, b) => a.concat(b)));
-    await writeArtistPages(albumData, flashData);
-    await writeListingPages(albumData);
-    await writeFlashPages(albumData, flashData);
+    const D = {
+        albumData,
+        flashData,
+        allTracks: getAllTracks(albumData),
+        artistNames: getArtistNames(albumData)
+    };
 
-    /*
-    const allTracks = getAllTracks(albumData)
-    const track = albumData.find(album => album.name === 'Homestuck Vol. 6: Heir Transparent').tracks[0];
-    console.log(getFlashesThatFeature(track, allTracks, flashData));
-    console.log(getLinkedTrack('Frost:frost-vol6', allTracks));
-    */
+    {
+        const directories = [];
+        for (const { directory, name } of albumData) {
+            if (directories.includes(directory)) {
+                console.log(`\x1b[31;1mDuplicate album directory "${directory}" (${name})\x1b[0m`);
+                return;
+            }
+            directories.push(directory);
+        }
+    }
+
+    {
+        const directories = [];
+        const where = {};
+        for (const { directory, album } of getAllTracks(albumData)) {
+            if (directories.includes(directory)) {
+                console.log(`\x1b[31;1mDuplicate track directory "${directory}"\x1b[0m`);
+                console.log(`Shows up in:`);
+                console.log(`- ${album.name}`);
+                console.log(`- ${where[directory].name}`);
+                return;
+            }
+            directories.push(directory);
+            where[directory] = album;
+        }
+    }
+
+    {
+        for (const { references, name, album } of D.allTracks) {
+            for (const ref of references) {
+                // Skip these, for now.
+                if (ref.includes("by")) {
+                    continue;
+                }
+                if (!getLinkedTrack(ref, D)) {
+                    console.warn(`\x1b[33mTrack not found "${ref}" in ${name} (${album.name})\x1b[0m`);
+                }
+            }
+        }
+    }
+
+    await writeMiscellaneousPages(D);
+    await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album, D)).reduce((a, b) => a.concat(b))));
+    await writeArtistPages(D);
+    await writeListingPages(D);
+    await writeFlashPages(D);
 
     // The single most important step.
     console.log('Written!');
