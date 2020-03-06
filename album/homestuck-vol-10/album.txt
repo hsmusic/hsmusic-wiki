@@ -29,18 +29,18 @@ Artist: Seth Peelle
 Track Art: PJ Tush
 URLs: https://homestuck.bandcamp.com/track/creata-3
 References:
-- Showtime
+- Showtime (Original Mix)
 - Doctor
 - Harlequin
 - Aggrieve
 - Chorale for Jaspers
 - Endless Climb
-- Beatdown
+- Beatdown (Strider Style)
 - Atomyk Ebonpyre
-- Upward Movement
-- Frost:frost-vol-6
+- Upward Movement (Dave Owns)
+- Frost:frost-vol6
 - The Beginning of Something Really Excellent
-- Dissension
+- Dissension (Original)
 - Carefree Action
 - Revelawesome
 - Song of Skaia
@@ -166,7 +166,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Stride
 Artist: Kalibration
-References: Moonsetter, Showdown (Strider Style), Upward Movement (Dave Owns)
+References: Moonsetter, Showdown, Upward Movement (Dave Owns)
 Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/stride-2
 Commentary:
@@ -368,7 +368,7 @@ References:
 - Time on My Side
 - Beatdown (Strider Style)
 - Upward Movement (Dave Owns)
-- Savior of the Waking World
+- Penumbra Phantasm
 - Black Rose / Green Sun
 - Arisen Anew
 - Crystalanthemums
@@ -429,13 +429,13 @@ Contributors:
 References:
 - Warhammer of Zillyhoo
 - Calamity
-- Walk-STab-Walk (R&E)
+- Walk-Stab-Walk (R&E)
 - Doctor
 - Crystalanthemums
 - Skies of Skaia
-- Frost:frost-vol-6
+- Frost:frost-vol6
 - Beatdown (Strider Style)
-- Savior of the Waking World
+- Penumbra Phantasm
 - Courser
 - Sburban Jungle
 Commentary:

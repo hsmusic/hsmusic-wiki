@@ -41,7 +41,12 @@ URLs: https://homestuck.bandcamp.com/track/courser-2
 -------------------------------------------------------------------------------
 Track: Umbral Ultimatum
 Artist: Toby Fox
-References: Savior of the Waking World, An Unbreakable Union, Courser, Carefree Action, Homestuck Anthem
+References:
+- Penumbra Phantasm
+- An Unbreakable Union
+- Courser
+- Carefree Action
+- Homestuck Anthem
 URLs: https://homestuck.bandcamp.com/track/umbral-ultimatum-2
 -------------------------------------------------------------------------------
 Track: GameBro (Original 1990 Mix)
@@ -56,7 +61,7 @@ URLs: https://homestuck.bandcamp.com/track/tribal-ebonpyre-2
 Track: I Don't Want to Miss a Thing
 Artist: Michael Guy Bowman
 Contributors: Aerosmith (original), Dianne Warren (lyrics)
-References: Sburban Jungle, Showtime, Explore, Squiddles!
+References: Sburban Jungle, Showtime (Original Mix), Explore, Squiddles!
 URLs: https://homestuck.bandcamp.com/track/i-dont-want-to-miss-a-thing-2
 -------------------------------------------------------------------------------
 Track: MeGaLoVania
@@ -100,7 +105,7 @@ URLs: https://homestuck.bandcamp.com/track/boy-skylark-brief-2
 -------------------------------------------------------------------------------
 Track: Squidissension
 Artist: Mark Hadley
-References: Dissension, Squiddles!
+References: Dissension (Original), Squiddles!
 URLs: https://homestuck.bandcamp.com/track/squidissension-2
 Commentary:
     <i>Mark Hadley:</i>

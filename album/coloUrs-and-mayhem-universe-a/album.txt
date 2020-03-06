@@ -12,11 +12,11 @@ Directory: side-1-universe-a
 URLs: https://homestuck.bandcamp.com/track/universe-a-side-1
 -------------------------------------------------------------------------------
 Track: Rust Servant
-Artist: William Ascenzo
+Artist: Will Ascenzo
 Track Art: Leslie Hung
 URLs: https://homestuck.bandcamp.com/track/rust-servant
 Commentary:
-    <i>William Ascenzo:</i>
+    <i>Will Ascenzo:</i>
     If Violet Mariner was the elder child and Teal Hunter the middle child, then Rust Servant is the youngest child onto which I poured all my love and affection. This was one of my favorite pieces to work on and even today I’m still pretty pleased with how it turned out, from the striking staccato and col legno strings opening the song to the frantic violins, melancholic chromatic percussion, deep brass, and fast-paced drum grooves. I wanted the song to be big, epic, a little scary. If I may be so immodest, I think I succeeded.
     Rust Servant was the only one of my three contest submissions to remain allocated to the character I had in mind while writing it, Aradia’s tragic ancestor and Lord English’s dreadful Handmaid (although the name was changed from the terribly uncreative Handmaid of Death to something more apt for the naming scheme of the album).
     When I wrote this song, I had just taken an Intro to Hinduism class the previous fall and had written a short research paper on Kali, the Hindu goddess of time and death (more remembered for being related to death—those of you who have seen Indiana Jones and the Temple of Doom must be familiar with the Thuggees, a cult of Kali-worshipers infamous for conducting human sacrifices—and, apparently, ripping people’s hearts out and setting them on fire as well). And, of course, because I am A SHAMELESS HOMESTUCK NERD, I immediately thought, “Time? Death? THAT REMINDS ME OF ONE OF THE TROLLS” (no I didn’t write my paper on that, i’m not that terrible). It doesn’t come through much in the song itself, but that’s where I got the inspiration from. And the moral of this story is, take a theology class (or two, or three) on a religion you know nothing about. It’ll give you all sorts of new ideas for Homestuck fanart.
@@ -59,11 +59,11 @@ Commentary:
     Inspiration for this piece came after listening to a segment of Hans Zimmer's "Attack" from the Pearl Harbor Soundtrack. I intended for the song to have a 'majestic' tone, but initially couldn't think of a character to set this theme to, so I chose the four beta kids. However, after being reassigned characters I think the piece fits equally well if not better with the Dolorosa.
 -------------------------------------------------------------------------------
 Track: Teal Hunter
-Artist: William Ascenzo
+Artist: Will Ascenzo
 Track Art: Myotishi
 URLs: https://homestuck.bandcamp.com/track/teal-hunter
 Commentary:
-    <i>William Ascenzo:</i>
+    <i>Will Ascenzo:</i>
     Teal Hunter was sort of the middle child of my three Homestuck music contest submissions. Even now it’s still my least favorite of the three songs I submitted. Why Radiation picked it along with my other two, I’ll never know. I certainly wasn’t expecting it to be chosen. With over a thousand submissions I’m sure there was no shortage of Redglare songs for him to choose from. Maybe the $20 I slipped him when I submitted my songs had something to do with it But his ways are not our ways.
     When Volume 9 came out, a lot of people looked at Radiation’s arrangement of Stress by Buzinaki and started noting similarities between it and Teal Hunter. Radiation wrote about why the two songs sound similar in his commentary for Stress. If we’re going to talk about “what sounds like what”, then I’ll lay my cards on the table and state that Teal Hunter was begun as pretty much a direct reference to <a href="https://www.youtube.com/watch?v=Bt_0Lg4-RkE">00 Gundam</a> from the Gundam 00 soundtrack (if you can’t tell by now, I really like Gundams). When I started the piece, the first draft was more or less a low-rent version of that song, in the same way a cartoon that wants to parody Indiana Jones would get a song that sounds close to John Williams’ Raiders March without being close enough to qualify as plagiarism. So I just kept fiddling with it until the two melodies sounded different. By the time I got to the final product and had added the buildup in the beginning, the two had nothing but their rhythm and syncopation in common.
     Teal Hunter’s original title was Bête Blanche, a play on bête noire, a French phrase literally meaning “black beast” that the fan name “Bec Noir” is most likely a reference to. As evident, the song was originally allocated to PM, the one Exile powerful enough to battle Jack Noir to a stalemate.
@@ -98,7 +98,7 @@ Track Art: Asiul
 URLs: https://homestuck.bandcamp.com/track/purple-tyrant
 -------------------------------------------------------------------------------
 Track: Violet Mariner
-Artist: William Ascenzo
+Artist: Will Ascenzo
 References: Showtime (Piano Refrain)
 Track Art: rumminov
 URLs: https://homestuck.bandcamp.com/track/violet-mariner

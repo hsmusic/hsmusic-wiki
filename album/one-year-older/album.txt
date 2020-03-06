@@ -45,7 +45,7 @@ Commentary:
     And of course, there's one or two Doctor quotes in there just because.
 -------------------------------------------------------------------------------
 Track: FantasyP
-References: Savior of the Waking World
+References: Penumbra Phantasm
 Track Art: Kaymurph
 URLs: https://erikscheele.bandcamp.com/track/fantasyp
 Commentary:
@@ -160,6 +160,8 @@ Commentary:
 Track: Under The Hat
 Track Art: none
 URLs: https://erikscheele.bandcamp.com/track/under-the-hat-bonus
+References:
+- Under The Hat:under-the-hat-lofam
 Commentary:
     <i>Erik Scheele:</i>
     Also known as <a href="track/trollcops/index.html">Trollcops</a>, this is a rather old idea that I once had for a Dad strife theme. I mean, all the kids had fight music, why not him? Anyway, between a chiptune variant I started and Trollcops, it's had a bit of a journey, but when it turned out alright on piano too, I didn't see any reason not to record a few takes.

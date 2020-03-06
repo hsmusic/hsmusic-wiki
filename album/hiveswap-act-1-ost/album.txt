@@ -311,7 +311,7 @@ Directory: heavy-snaking
 URLs: https://homestuck.bandcamp.com/track/b-side-heavy-snaking-2
 References:
 - Half-Harley Manor
-- Table For Tooth
+- Table for Tooth
 - Joey Claire, Extraordinaire
 Commentary:
     <i>James Roach:</i>

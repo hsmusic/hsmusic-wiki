@@ -22,14 +22,14 @@ Track: The Decision | The Division
 Artist: Viko Riféo
 Track Art: BlueAmethyst
 References:
-- The Paradox Paradigm (by Jack McMenamin)
+- The Paradox Paradigm
 URLs: https://unofficialmspafans.bandcamp.com/track/the-decision-the-division
 -------------------------------------------------------------------------------
 Track: [MEAT EPILOGUE | 🥩]
 Artist: ndividedbyzero
 Track Art: none
 References:
-- The Paradox Paradigm (by Jack McMenamin)
+- The Paradox Paradigm
 URLs: https://unofficialmspafans.bandcamp.com/track/meat-epilogue
 -------------------------------------------------------------------------------
 Track: Party God
@@ -44,7 +44,7 @@ Artist: Ucklin
 Track Art: BlueAmethyst
 References:
 - English
-- Horsecatska
+- Horsecatska (by James Roach)
 - [S] Dirk: Unite Synchronization (WITH LYRICS) (by toucanSandwiches)
 - Whistling Jackhammer
 - Austin, Atlantis
@@ -55,7 +55,7 @@ References:
 - Battle Brotocol
 - Brobot Scrimmage (by Pascal van den Bos)
 - Eternity Served Cold
-- WORST END THEME
+- WORST END
 - Strider Showdown (by Bill Bolin)
 - Character Theme for Dirk Strider (by WindlessZephyr)
 - I Am An Island (by PhemieC)
@@ -86,12 +86,12 @@ References:
 - HOMOSUCK, DIRECTOR'S CUT, OF THE YEAR EDITION. (by ndividedbyzero)
 - Eternity Served Cold
 - Purple Bard
-- Beatdown
-- Horsechestra
-- Homosuck Swan Song
-- Savior of the Waking World
+- Beatdown (Strider Style)
+- Horschestra
+- Homosuck Swan Song (by Toby Fox)
+- Penumbra Phantasm
 - The Lyrist
-- The Paradox Paradigm (by Jack McMenamin)
+- The Paradox Paradigm
 - Swing of the Clock
 URLs: https://unofficialmspafans.bandcamp.com/track/the-rarest-and-most-interpretive-dance-meatcabre
 -------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ References:
 - Even in Death
 - Spider8reath
 - Killed by BR8K Spider!!!!!!!!
-- Savior of the Waking World
+- Penumbra Phantasm
 - Retcnojuration (by ndividedbyzero)
 - Conflict! (by Emilia K.)
 - Homestuck
@@ -131,7 +131,7 @@ Track Art: Spades
 References:
 - Black Rose / Green Sun
 - Lilith in Starlight
-- At the Price of Oblivion
+- At The Price of Oblivion
 - Aggrieve
 - Flare
 - Endless Climb
@@ -155,6 +155,10 @@ References:
 - Orange Hat
 - Upward Movement (Dave Owns)
 URLs: https://unofficialmspafans.bandcamp.com/track/kamina-burana-ascend-to-the-highest-point-of-the-building
+Commentary:
+    <i>Mikkynga:</i>
+    Also bonus art because i read the wrong part of the epilogues at first but i liked it anyway and i couldn't just let it die:
+    <img src="misc/kamina-burana-bonus.jpeg">
 -------------------------------------------------------------------------------
 Track: Giving Up the Ghost
 Artist: M3l0m4ni4c
@@ -172,7 +176,7 @@ Track: [CANDY EPILOGUE | 🍭]
 Artist: ndividedbyzero
 Track Art: none
 References:
-- The Paradox Paradigm (by Jack McMenamin)
+- The Paradox Paradigm
 URLs: https://unofficialmspafans.bandcamp.com/track/candy-epilogue
 -------------------------------------------------------------------------------
 Track: Athazagoraphobia
@@ -200,7 +204,7 @@ Track Art: Cosmic
 References:
 - Homestuck Anthem
 - Do You Remem8er Me
-- Savior of the Waking World
+- Penumbra Phantasm
 - Infinity Mechanism
 URLs: https://unofficialmspafans.bandcamp.com/track/remember-me-when-i-am-gone-away
 -------------------------------------------------------------------------------
@@ -217,7 +221,7 @@ Track Art: Jas
 References:
 - English
 - The Lemonsnout Turnabout
-- Savior of the Waking World
+- Penumbra Phantasm
 - MeGaLoVania
 - Upward Movement (Dave Owns)
 - Black Rose / Green Sun

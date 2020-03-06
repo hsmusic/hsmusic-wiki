@@ -175,7 +175,7 @@ URLs: https://homestuck.bandcamp.com/track/versus-2
 -------------------------------------------------------------------------------
 Track: Planet Healer
 Artist: Seth Peelle
-References: Doctor, Savior of the Waking World
+References: Doctor, Penumbra Phantasm
 Contributors: Toby Fox (various material), Erik Scheele (various material)
 URLs: https://homestuck.bandcamp.com/track/planet-healer-2
 -------------------------------------------------------------------------------
@@ -217,7 +217,7 @@ URLs: https://homestuck.bandcamp.com/track/lotus-2
 -------------------------------------------------------------------------------
 Track: Ruins (With Strings)
 Artist: Erik Scheele, Michael Guy Bowman
-References: Ruins, Sburban Jungle
+References: Ruins (by Erik Scheele), Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/ruins-with-strings-2
 Commentary:
     <i>Erik Scheele:</i>
@@ -252,7 +252,7 @@ Commentary:
 Track: Crystamanthequins
 Artist: Erik Scheele
 Contributors: Perry Sullivan (Mannequin)
-References: Crystalanthemums, Mannequin
+References: Crystalanthemums, Mannequin (by Perry Sullivan)
 URLs: https://homestuck.bandcamp.com/track/crystamanthequins-2
 Commentary:
     <i>Erik Scheele:</i>
@@ -287,7 +287,7 @@ URLs: https://homestuck.bandcamp.com/track/clockwork-contrivance-2
 -------------------------------------------------------------------------------
 Track: Get Up
 Artist: Toby Fox
-References: Savior of the Waking World, Doctor
+References: Penumbra Phantasm, Doctor
 URLs: https://homestuck.bandcamp.com/track/get-up-2
 -------------------------------------------------------------------------------
 Track: Vertical Motion
@@ -402,11 +402,11 @@ Track: Descend
 Artist: Toby Fox
 URLs: https://homestuck.bandcamp.com/track/descend-2
 References:
-- Upward Movement
+- Upward Movement (Dave Owns)
 - Sburban Jungle
-- Beatdown
+- Beatdown (Strider Style)
 - Skies of Skaia
-- Showtime
+- Showtime (Original Mix)
 - Aggrieve
 - Black
 - Harlequin

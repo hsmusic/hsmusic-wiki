@@ -79,7 +79,7 @@ Commentary:
 Track: Hate You
 Artist: Toby Fox
 Contributors: Azami (laughter)
-References: Love You
+References: Love You (Feferi's Theme)
 Track Art: MissNK
 URLs: https://homestuck.bandcamp.com/track/hate-you-2
 -------------------------------------------------------------------------------
@@ -112,7 +112,7 @@ URLs: https://homestuck.bandcamp.com/track/skaianet-2
 -------------------------------------------------------------------------------
 Track: Another Jungle
 Artist: Michael Guy Bowman
-References: Sburban Jungle, Showtime
+References: Sburban Jungle, Showtime (Original Mix)
 Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/skaianet-2
 Commentary:
@@ -217,7 +217,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Encore
 Artist: Malcolm Brown
-References: Showtime, Lifdoff, Unite Synchronization
+References: Showtime (Original Mix), Lifdoff, Unite Synchronization
 Track Art: Bea
 URLs: https://homestuck.bandcamp.com/track/encore-2
 Commentary:
@@ -515,14 +515,14 @@ Contributors:
 - Ian White (trumpet & bass)
 References:
 - Sburban Jungle
-- Savior of the Waking World
+- Penumbra Phantasm
 - Courser
 - Doctor
 - Black Rose / Green Sun
 -------------------------------------------------------------------------------
 Track: A Taste for Adventure
 Artist: Seth Peele
-References: Dissension, Carefree Action, Showtime
+References: Dissension (Original), Carefree Action, Showtime (Original Mix)
 Track Art: minty
 URLs: https://homestuck.bandcamp.com/track/a-taste-for-adventure-2
 -------------------------------------------------------------------------------

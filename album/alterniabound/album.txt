@@ -47,7 +47,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Trollcops
 Artist: Erik Scheele
-References: Under the Hat
+References: Under the Hat:under-the-hat
 URLs: https://homestuck.bandcamp.com/track/trollcops-2
 Commentary:
     <i>Erik Scheele:</i>

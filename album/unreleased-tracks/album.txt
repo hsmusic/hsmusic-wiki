@@ -1,0 +1,23 @@
+Album: Unreleased Tracks
+Cover Art: Homestuck
+Date: November 11, 1111
+FG: #ff7bf7
+Canon: Fanon
+-------------------------------------------------------------------------------
+Track: Penumbra Phantasm
+Artist: Toby Fox
+URLs:
+- https://www.youtube.com/watch?v=OdntMzdkFnk
+- https://www.youtube.com/watch?v=sIgtSvgERB4
+-------------------------------------------------------------------------------
+Track: Skaian Shuffle
+Artist: Clark Powell
+URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F059%20Skaian%20Shuffle.mp3&mode=default
+-------------------------------------------------------------------------------
+Track: The Paradox Paradigm
+Artist: Jack McMenamin
+URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Fan%20Music%20and%20VA%2FHomestuck%20Fansong%20Archive%20%282011%29%2FHomestuck%20Fan%20Music%20Part%2010%2FThe%20Paradox%20Paradigm.mp3&mode=default
+-------------------------------------------------------------------------------
+Track: White King
+Artist: Demographerist
+URLs: https://www.youtube.com/watch?v=x6NrArPldZo
