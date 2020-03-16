@@ -120,3 +120,38 @@ module.exports.cacheOneArg = function (fn) {
         return arg[symbol];
     };
 };
+
+const decorateTime = function (functionToBeWrapped) {
+    const fn = function(...args) {
+        const start = Date.now();
+        const ret = functionToBeWrapped(...args);
+        const end = Date.now();
+        fn.timeSpent += end - start;
+        fn.timesCalled++;
+        return ret;
+    };
+
+    fn.wrappedName = functionToBeWrapped.name;
+    fn.timeSpent = 0;
+    fn.timesCalled = 0;
+    fn.displayTime = function() {
+        const averageTime = fn.timeSpent / fn.timesCalled;
+        console.log(`\x1b[1m${fn.wrappedName}(...):\x1b[0m ${fn.timeSpent} ms / ${fn.timesCalled} calls \x1b[2m(avg: ${averageTime} ms)\x1b[0m`);
+    };
+
+    decorateTime.decoratedFunctions.push(fn);
+
+    return fn;
+};
+
+decorateTime.decoratedFunctions = [];
+decorateTime.displayTime = function() {
+    if (decorateTime.decoratedFunctions.length) {
+        console.log(`\x1b[1mdecorateTime results: ` + '-'.repeat(40) + '\x1b[0m');
+        for (const fn of decorateTime.decoratedFunctions) {
+            fn.displayTime();
+        }
+    }
+};
+
+module.exports.decorateTime = decorateTime;

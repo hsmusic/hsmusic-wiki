@@ -310,7 +310,9 @@ URLs: https://homestuck.bandcamp.com/track/atomyk-ebonpyre-3
 -------------------------------------------------------------------------------
 Track: Black
 Artist: Toby Fox
-References: Liquid Negrocity
+References:
+- I'm a Member of the Midnight Crew
+- Liquid Negrocity
 Original Date: April 13, 2010
 URLs: https://homestuck.bandcamp.com/track/black-3
 -------------------------------------------------------------------------------

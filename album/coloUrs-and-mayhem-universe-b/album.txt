@@ -152,7 +152,7 @@ Track Art: Emily Blundell
 URLs: https://homestuck.bandcamp.com/track/do-the-windy-thing-2
 -------------------------------------------------------------------------------
 Track: Pilot Light
-Artist: Thomas Ibarra, AutoDevote, SparksD2145
+Artist: Thomas Ibarra, AutoDevote
 References: Flare
 Track Art: KIIPPU
 URLs: https://homestuck.bandcamp.com/track/pilot-light-2

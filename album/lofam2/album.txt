@@ -7,18 +7,28 @@ Canon: Fanon
 Commentary:
     <i>Liza Fletcher:</i>
     This album means a lot to me, for a lot of reasons. Not just because it represents literally months of planning, organization, rounds of messaging, upsets, drama, triumph and general hard work on the part of me and some very good friends of mine. Not just because we managed to get some of the top talent in the fandom to contribute not only music but track art. Not just because that talent includes music and art team members and the uniquely universally beloved superfan Dante Basco. Not just because that talent also includes many friends I love dearly, some of whom I got to know through this project.
-    No, this album is special to me because the original Land of Fans and Music holds a very dear place in my heart. It was the first album of Homestuck-related music I ever owned. I played it over and over, and read the album commentary until I damn near had it memorized. It was LoFaM which spurred me to stop lurking on the MSPA forums and dive headlong into the collective insanity we call Homestuck fandom. And right when I did so coincided with the start of the second fanmusic thread, and a guy namedUnderwater Basketweaving posting something he called Fighting Spirit. I downloaded it, loved it, and have been hip deep in collecting fanmusic - not just that already collected for my convenience in an album - ever since.
+    No, this album is special to me because the original Land of Fans and Music holds a very dear place in my heart. It was the first album of Homestuck-related music I ever owned. I played it over and over, and read the album commentary until I damn near had it memorized. It was LoFaM which spurred me to stop lurking on the MSPA forums and dive headlong into the collective insanity we call Homestuck fandom. And right when I did so coincided with the start of the second fanmusic thread, and a guy named Underwater Basketweaving posting something he called Fighting Spirit. I downloaded it, loved it, and have been hip deep in collecting fanmusic - not just that already collected for my convenience in an album - ever since.
     Fighting Spirit is in here, and its sequel, and many others I and my compatriots ran across in our scouring of not only the fanmusic thread but tindeck, soundcloud, tumblr and basically anywhere on the big wide internet where MSPA fans celebrate their love of this remarkable work of fiction through music.
     It's my hope that, having gathered it all here for your convenience, you too are spurred to start your own search for the best, including many pieces that for one reason or another we had to leave off. The Land of Fans and Music is not just this 2-disc set or its predecessor; they're only the tip of the vast landscape of amazing talent. Come in. Explore. Get lost in it, like I did. I haven't regretted it for a second.
+    <hr>
+    <i>Special Thanks:</i>
+    <b>-CONCEPTION/ORGANIZATION-</b><br>Lambda Bledsoe<br>Liza Fletcher
+    <b>-ORGANIZATION TEAM-</b><br>Slogbait<br>Veritas Unae<br>Rachel Macwhirter<br>Paige 'hrmnzr" Stanley<br>Astro Kid<br>Sarah (clumsyroyalty)<br>Shoona<br>Charles "Crazy-8" Neudorf<br>Yishan Mai (Cat Boss)<br>Brad "Avinoch" Griffin<br>Mark "Dagoth Xil" Ciocca
+    <b>-MASTERING-</b><br>Brad "Avinoch" Griffin<br>Veritas Unae
+    <b>-COMMENTARY BOOKLET-</b><br>Brad "Avinoch" Griffin
+    <b>-WEBSITE CODING-</b><br>Veritas Unae
+    <b>-WEBSITE HOSTING-</b><br>AndrewNeo and skaia.net
+    <b>-INSPIRATION-</b><br>Andrew Hussie &amp; What Pumpkin Studios<br>The Homestuck Music Team
 -------------------------------------------------------------------------------
 Track: •~DISK 1~•
-Directory: o-disk-1-o
+Directory: disk1-lofam2
 Artist: Veritas Unae
 Track Art: none
+References: The Paradox Paradigm
 URLs: https://unofficialmspafans.bandcamp.com/track/o-disk-1-o
 -------------------------------------------------------------------------------
 Track: Chronology
-Artist: Paige Stanley
+Artist: Jamie Paige Stanley
 Track Art: Skylar
 References:
 - English
@@ -27,7 +37,7 @@ References:
 - --Emperical
 URLs: https://unofficialmspafans.bandcamp.com/track/chronology
 Commentary:
-    <i>Paige Stanley:</i>
+    <i>Jamie Paige Stanley:</i>
     Hi there!! Welcome to the second LOFAM. Kind of sounds like some really gangster hiphop group or something. Anyways this is a song I made JUST FOR THE ALBUM!!! Wowee. There's a lot going on here. There's the intro which is like Lord English taking a proverbial shit on everything by existing or something like that, then it sort of BLEHs and goes into the main part of the song. Right off the bat you've got Sburban Jungle's marimba part played backwards on a piano, and then there's some stuff from a fan song that I don't remember the title of. THEN there's stuff from Condy's song off the unofficial ancestor album, and some stuff from some other things. There's basically a lot of things!! It's a very thing filled song.
     <i>Skylar:</i>
     paige told me the song was about doc scratch, the condesce and lord english, and since the track was titled chronology i tried to show some sort of a progression within the track art while expressing some of the background of each character.
@@ -44,12 +54,12 @@ Commentary:
     Here's my track art for "Jackpot"! It's a Roxy strife theme, and since we have yet to witness such an event in Homestuck, let's make believe. ;3
 -------------------------------------------------------------------------------
 Track: Satellite Physician
-Artist: Joe Oullet
+Artist: Joe Ouellet
 Track Art: grayscaleOddysey
 References: Doctor, Penumbra Phantasm
 URLs: https://unofficialmspafans.bandcamp.com/track/satellite-physician
 Commentary:
-    <i>Joe Oullet:</i>
+    <i>Joe Ouellet:</i>
     Before making this song, I had wanted to do a remix of Doctor for a while. There are so many remixes and different versions of this song that I knew there were infinite possibilities when it came to remixing the song. When it finally came time to start, I wanted to go for the <i>spacey</i>, electronic, <i>hardcore</i> sounding style that I attempted a little bit with [[Electrocumulus]]. This song actually turned out much better than I expected. When confronted for a name for this piece, I wanted ot name it something like "Planet Healer." I decided to just swap out a few synonyms and voila, Satellite Physician was done!
     <i>grayscaleOdyssey:</i>
     This track and cover art was featured in the Homestuck/Zelda fan adventure, Legend of Homestuck, as John's theme.
@@ -69,19 +79,22 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Cuddlefish
 Artist: Thomas Ferkol
-Track Art: Slogbait
+Track Art: Seth Massey
 URLs: https://unofficialmspafans.bandcamp.com/track/cuddlefish
 Commentary:
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     No Commentary. Sorry fellow fans and booklet readers. No haiku this time either. Just an empty page, with nothing to entertain you except the track title, artist credits, and pretty arts to the right.
     SCREW THAT.
     I'm gonna fill these empty pages with a story, just for you. I haven't written anything since high school English class. You're in for a treat. It's gonna be<br>S<br>T<br>U<br>P<br>I<br>D
+    <i>Florrie Haero:</i>
+    (per [[LoFaM 4 standard:jungle-3]], ive highlighted commentary from people besides the original musicians or cover artists in bold!)
+    <i><b>Brad Griffin:</b></i>
     <i>DUSK FALLS ACROSS A SAFFROWN MEADOW. A SINGLE BLADE OF CRABGRASS UNDULATES VOLUMINOUSLY AMIDST THE RAPTUROUS BREEZE, ONLY TO HALT ITS SWAY SUDDENLY AND CRUNCHINGLY AS IT IS CRASSLY CRUSHED UNDERFOOT BY AN IMMENSE FOOT (SPECIFICALLY THE UNDERNEATH PART OF THAT FOOT). THE OWNER OF THE AFOREMENTIONED FOOT LOOKS DOWNWARD WITH AN AIR OF BAFFLED ASTONISHMENT< IN A SIMILAR FASHION TO HOW A MOOSE CAUGHT IN A UFO TRACTOR BEAM MIGHT LOOK AT A BLADE OF CRABGRASS IT HAD JUST TRODDEN ON. THIS ISN'T A SIMILE.</i>
     <i>"EUUUUUUUUNGH," GROANS THE ABDUCTEE MOOSE AS IT RISES.</i>
 -------------------------------------------------------------------------------
 Track: Rectify
 Artist: Thomas Ibarra
-Track Art: Slogbait
+Track Art: Seth Massey
 References: Black, Atomyk Ebonpyre, Showtime (Piano Refrain)
 URLs: https://unofficialmspafans.bandcamp.com/track/rectify
 Commentary:
@@ -106,7 +119,7 @@ Track Art: Dawn Davis
 References: Skaian Skirmish, Skaian Shuffle
 URLs: https://unofficialmspafans.bandcamp.com/track/skaian-starstorm
 Commentary:
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     NO COMMENTARY HERE!
     <i>continued from [[Cuddlefish]];</i>
     <i>AN EERILY IRRIDESCENT INCANDESCENCE ENVELOPS THE BEHEMOTH ELK AS IT JOURNEYS HEAVENWARD, UNWILLINGLY ABANDONING THE FLATTENED DIGITARIUM STRAND IN FAVOUR OF THE CHILL EMPTINESS OF THE FRIGID EVENING ATMOSPHERE. DEER-TICKS ATTEMPT TO EVACUATE THEIR MANGY HOST, ONLY TO FIND THEMSELVES DRAWN CONGRUENTLY SKYWARD. OAK-LIKE LIMBS THRASH FLACIDLY, FLAILING FRUITLESSLY FOR A FOOTHOLD, BUT FINDING FEWER THAN FEW. AFTER A SCANT MOMENT OF MOOSE DESPAIR, THE HULKING BEAST RESIGNS ITSELF TO INEVITABILIT, AND CEASES ITS STRUGGLE.</i>
@@ -167,7 +180,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Squiddles In Sunglasses
 Artist: Eston Schweickart
-Track Art: RachoTamer
+Track Art: RaChoTamer
 References: Friendship is Paramount, Squiddle Samba
 URLs: https://unofficialmspafans.bandcamp.com/track/squiddles-in-sunglasses
 Commentary:
@@ -180,9 +193,9 @@ Track Art: Brenden Cameron
 References: Jackpot
 URLs: https://unofficialmspafans.bandcamp.com/track/jackbot
 Commentary:
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     NO COMMENTARY HERE!
-    <i>continued from Skaian Starstorm...</i>
+    <i>continued from [[Skaian Starstorm]]...</i>
     <i>AS THE ANTLERED ALCES ACCELERATES ITS ASCENSION, ABJECT AWE ASSUAGES ANXIOUSNESS. IT IS DAZZLED BY THE GOLDEN TUNDRA STRETCHING BEYOND THE MOONLIT HORIZON, CUMULUS CLOUds STreAKING BY LIKE A NUDE ATTENTION SEEKER AT A SPORTS MATCH. AS IF COMPLETING THE METAPHOR, THERE IS ALSO A NUDE MAN FLOATING ALONGSIDE.</i>
     <i>"Well, hiya!" EXCLAIMS THE RUDELY PROTRUDING GENT, WITH UNNERVINGLY BOISTEROUS VIGOR.</i>
     <i>"MMMRNGUUUUH," RESPONDS OUR HOVED HERO, IN KIND.</i>
@@ -243,7 +256,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Psychedelic Psychodelic
 Artist: Yishan Mai
-Track Art: Crowbawt
+Track Art: Amethyst Barron
 References:
 - Atomyk Ebonpyre
 - English
@@ -262,7 +275,7 @@ Commentary:
     Draw, Spades.
 -------------------------------------------------------------------------------
 Track: Flare (With Vocals)
-Artist: horizon
+Artist: Ashley Lyons
 Track Art: PV
 References: Flare
 URLs: https://unofficialmspafans.bandcamp.com/track/flare-with-vocals
@@ -273,42 +286,42 @@ Lyrics:
     Last night I dreamt of you -<br>you were beautiful, amidst a sky of blue
     It was only the two of us,<br>hearts beating synchronously
     Do you feel for me?
-    I heard a song the other day;<br>it reminded me of the way<br>I love you<br>and how I never got to say that ot you
+    I heard a song the other day;<br>it reminded me of the way<br>I love you<br>and how I never got to say that to you
     So many things I wanted to do;<br>so many dreams<br>left for dead in the water<br>drowned and gone;<br>just smile and let them go
     I wanted so much more<br>than a game we were born to lose<br>I wanted so much more<br>so much more for you
 Commentary:
     <i>horzion:</i>
     Flare has always struck a place in my heart, for many reasons. Plazmataz has always, always impressed me, but Flare just evoked something simply rawin the depths of my mind; I knew then that I had to use that feeling as a kind of empathy towards the Beta kids. Though it was used in a specific moment in canon, I chose to write lyrics from the point of view I could most appreciate -- the pain associated with love when life hands you something you don't know how to survive.
     <i>PV:</i>
-    I have ben listening to Horizon's renditions of Homestuck music with her lyrics for a while now, and Flare has always been my favorite one she did. I hoped I could make a picture that represents the feeling of closeness beween the four kids ingetting through the game that I feel in the words she wrote.
+    I have been listening to Horizon's renditions of Homestuck music with her lyrics for a while now, and Flare has always been my favorite one she did. I hoped I could make a picture that represents the feeling of closeness beween the four kids ingetting through the game that I feel in the words she wrote.
 -------------------------------------------------------------------------------
 Track: Sports
-Artist: Paige Stanley
+Artist: Jamie Paige Stanley
 Track Art: Spectrumfizz
 URLs: https://unofficialmspafans.bandcamp.com/track/sports
 Commentary:
-    <i>Paige Stanley:</i>
+    <i>Jamie Paige Stanley:</i>
     <i>Hey, you. Yeah, you. No, this isn't Paige speaking. It's Florrie. Me. Please, for goodness sake, <a href="about/index.html">tell me</a> that I forgot to embed the commentary image for this track here. I don't have access to the booklet on which I'm writing this ATM, so I can't grab a screenshot. Plz. Thank you.</i>
     <i>Spectrumfizz:</i>
     dude come check this out hummusr is like one of my favoprite musicans so i made a thnig for this MAD TRACK
 -------------------------------------------------------------------------------
 Track: Dirgeish
 Artist: Nick Smalley, Andrew Huo
-Track Art: Slogbait
+Track Art: Seth Massey
 URLs: https://unofficialmspafans.bandcamp.com/track/dirgeish
 Commentary:
     <i>Nick Smalley:</i>
     Dirgeish was made in 2008, a year before Homestuck even started! Crazy, right? Who ever thought life existed before Homestuck, ha ha ha... I made the original in about an hour, and when I got on the Homestuck music team, I had the help of Adghar (Andrew Who!!!!) to complete it!
 -------------------------------------------------------------------------------
 Track: Electrocumulus
-Artist: Joe Oullet
-Track Art: Plaid
+Artist: Joe Ouellet
+Track Art: plaidcushion
 References: Pyrocumulus (Kickstart), Skaian Skuffle
 URLs: https://unofficialmspafans.bandcamp.com/track/electrocumulus
 Commentary:
-    <i>Joe Oullet:</i>
+    <i>Joe Ouellet:</i>
     Electrocumulus is a remix of Pyrocumulus by RJ Lake and was my first ever attempt at remixing an official Homestuck track. Looking back, I have no idea why I chose to remix this song in particular; it must have just been stuck in my head that day. As one could gather from the title, this remix is supposed to be an upbeat, elecronic remix. As I was composing, it seemed to turn into a dance track of sorts. The genre still fit my idea, so I kept going. I think it was a rather successful first Homestuck remix.
-    <i>Plaid:</i>
+    <i>plaidcushion:</i>
     The songs this was remixed from are associated with Skaia and the battlefield, but I thought that Electrocumulus was way too high energy and fun for something like that. I decided to go for the next best thing- John speeding through Skaia and plowing through clouds in his Dad's car! As it turns out, exploded clouds are also rpetty fun to cut out with a scalpel.
 -------------------------------------------------------------------------------
 Track: Three in the Morning (Kali's 2 in the AM PM Edit)
@@ -320,7 +333,7 @@ Commentary:
     <i>Kalibration:</i>
     Its a song, I made it, the computer<br>Great it's RJ music track enjoyed, that could bring<br>(⅃°ヘ°)⅃
     yeah i dont know how i feel about that track i guess its a song and i made it ans well, thats more than i can say for a lot of things
-    <i>Luke Bledsoe:</i>
+    <i><b>Lambda Bledsoe:</b></i>
     kali has such a way with words
 -------------------------------------------------------------------------------
 Track: Showtime (End Strife Remix)
@@ -416,18 +429,18 @@ Commentary:
     That one terrible LEGENDARY ENDLESS DVS SAX song I amde almost went on the album instead of this and I felt like paying tribute to it, so that's where the little sax rif came from.
     <i>Lunise:</i>
     I had the feeling that I had to met some pretty high expectations when I was called upon to draw this one, so I was pretty nervous about doing it. I spent a long time mulling over how I was going to go about drawing this track art after I completed the art for Stalemate. We don't know nearly as much about the denizens as we do about the kids or the trolls or even the carapacians, but I took what we do know about the beta kids' denizens and ran with it.
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     note: Lunise wrote seven paragraphs about the creative process behind this wonderful art piece. I can only fit the first one on the page.
 -------------------------------------------------------------------------------
 Track: Sburban Genesis
 Artist: Lark Mordancy
-Track Art: Plaid
+Track Art: plaidcushion
 References: Dawn of Man, Sburban Jungle, Exodus
 URLs: https://unofficialmspafans.bandcamp.com/track/sburban-genesis
 Commentary:
     <i>Lark Mordancy:</i>
     Though Sburban Jungle was the first song to hook me on Michael Guy Bowman's music, my heart lies with Mobious Trip and Hadron Kaleido. Dawn of Man is a favorite of mine from that album, and it also happens to be a partial remix of Sburban Jungle. In the Homestuck tradition, the natural thing to do then was mix them together, along with a cameo from Exodus, featured in SBURB. The instruments are based primarily on Dawn of Man, bringing in some of Sburban Jungle's mallet percussion and a few of my own additions. The result is Sburban Genesis, a song ultimately inspired by the mysterious origins of the game and its multi-universal legacy.
-    <i>Plaid:</i>
+    <i>plaidcushion:</i>
     This really sounded like a night time kind of song to me, which I think went nicely with the baby frog Jade finds on her island as a kid. He's a pretty cute little guy, but his role carries a lot of weight, so I think he fits the song pretty well.
 -------------------------------------------------------------------------------
 Track: Who Mourns for Jack Noir?
@@ -446,11 +459,11 @@ Artist: Thomas Ferkol
 Track Art: Dawn Davis
 URLs: https://unofficialmspafans.bandcamp.com/track/the-seer-and-the-tribesmen
 Commentary:
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     No commentary here!
     <i>continued from [[JackBot]];</i>
-    <i>THE LUMINESCENT AURA SUBSIDES, AND BOTH OF THE UNCLOTHED EARTH CREATURES ARE PLUNGED INTO INKY BLACK DARKNESS. FAINT SOUNDS AND METALLIC SCRATCHING SUGGEST NEARBY MOVEMENT. THE MOOSE IS VISIBLY SHAKEN... AT LEAST IT WOULD BE IF IT WERE VISIBLE TO ANYBODY. BUT IT ISN'T BECAUSE OF THE DARKNESS.
-    BUZZING FLUORESCENT LIGHTS FLICKER ON, REVEALING A VAST DOMED ROOM. IN THE CORNER, WHAT CAN ONLY BE DESCRIBED AS A CROSS BETWEEN A GIANT SQUID AND A CORGI FIDDLES WITH A PANEL ON SOME MYSTERIOUS MACHINERY. THE NUDIST EMOTES IN SURPRISE. THIS CATCHES THE ALIEN'S ATTENTION, AND IT ABANDONS ITS FORMER TASK, APPROACHING THE NEW ARRIFALS EXCITEDLY. WITH ITS SOFT, FURRY TENTACLES GESTICULATING WILDLY, IT GESTURES TOWARD WHAT ONE CAN ONLY ASSUME IS ITS TORSO. UPON CLOSE INSPECTION, IT IS WEARING A NAME TAG THAT READS:
+    <i>THE LUMINESCENT AURA SUBSIDES, AND BOTH OF THE UNCLOTHED EARTH CREATURES ARE PLUNGED INTO INKY BLACK DARKNESS. FAINT SOUNDS AND METALLIC SCRATCHING SUGGEST NEARBY MOVEMENT. THE MOOSE IS VISIBLY SHAKEN... AT LEAST IT WOULD BE IF IT WERE VISIBLE TO ANYBODY. BUT IT ISN'T BECAUSE OF THE DARKNESS.</i>
+    <i>BUZZING FLUORESCENT LIGHTS FLICKER ON, REVEALING A VAST DOMED ROOM. IN THE CORNER, WHAT CAN ONLY BE DESCRIBED AS A CROSS BETWEEN A GIANT SQUID AND A CORGI FIDDLES WITH A PANEL ON SOME MYSTERIOUS MACHINERY. THE NUDIST EMOTES IN SURPRISE. THIS CATCHES THE ALIEN'S ATTENTION, AND IT ABANDONS ITS FORMER TASK, APPROACHING THE NEW ARRIFALS EXCITEDLY. WITH ITS SOFT, FURRY TENTACLES GESTICULATING WILDLY, IT GESTURES TOWARD WHAT ONE CAN ONLY ASSUME IS ITS TORSO. UPON CLOSE INSPECTION, IT IS WEARING A NAME TAG THAT READS:</i>
     <center><i>Hello, My Name Is</i></center>
     <center><i><big>BNORKEL</big></i></center>
 -------------------------------------------------------------------------------
@@ -463,30 +476,30 @@ Commentary:
     When I listened to Four for the first time, I imagined the entire Incipisphere as if it were one of those cool panoramic views of the universe. The title more than likely relates to the planets the kids arrive upon in the Medium, so I decided to use that aspect to create the basis of my idea. I recreated most of the planets from scratch while using references, used *tons* of Photoshop effects to create shading and light sources, and utilized stock images to create what I believe represents the "Four" planets within the Incipisphere that the song centers around.
 -------------------------------------------------------------------------------
 Track: Prospitian Lullaby
-Artist: Paige Stanley
+Artist: Jamie Paige Stanley
 Track Art: Shoona
 References: Homestuck Anthem, Sburban Jungle
 URLs: https://unofficialmspafans.bandcamp.com/track/prospitian-lullaby
 Commentary:
-    <i>Paige Stanely:</i>
+    <i>Jamie Paige Stanley:</i>
     Hello again!! Disk one is coming to a close. I hope you've enjoyed the fan land and of music so far!! This is a lullaby based mostly off of Homestuck Anthem by Clark "Plazmataz" Powell and Sburban Jungle by Michael Guy Bowman. It's really slowa nd sweet and has my favorite chord thingy ever which is the F to F minor thing going on there. It's all in all a song that you hopefully fall asleep listening to because that's what it's supposed to do!! And you might need a nap after listening to disk one. In fact, for the full Land of Fans and Musics Experience The Second™, take a nap in between the two disks. Yes. Anyways, I hope you enjoy our musical stylings and that you don't buy this album because that's illegal.
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     [END OF DISK 1]
 -------------------------------------------------------------------------------
 Track: •~Disk 2~•
-Directory: o-disk-2-o
+Directory: disk2-lofam2
 Artist: Veritas Unae
 Track Art: melodiousDiscord
 References: White King, Sburban Jungle
 URLs: https://unofficialmspafans.bandcamp.com/track/o-disk-2-o
 Commentary:
-    <i>Luke Bledsoe:</i>
-    Hi. I'm Luke Bledsoe, or Xzaz. I started the project to put LoFaM2 together.
+    <i>Lambda Bledsoe:</i>
+    Hi. I'm Lambda Bledsoe, or Xzaz. I started the project to put LoFaM2 together.
     I started reading Homestuck because of the music. It's fantastic.
     In some cases even moreso than the official music, the music that fans have made for it.
     This is to be expected, considering..... this album.
     I don't have some whimsical, vaguely inspiring words to put here, but thanks to everyone that helped make ths labum and everyone that's listened to it!
-    -λ
+     -λ
 -------------------------------------------------------------------------------
 Track: Brofessor Layton (Every Puzzle Has A Brolution)
 Artist: Ian White
@@ -501,7 +514,7 @@ Commentary:
     <i>doctoroftime:</i>
     Te song was a Gamebro remix and I had just figured out that Bro Strider probably writes Gamebro so it was obvious that a <i>Professor Layton x Homestuck</i> crossover needde to happen. I looked at the covers of the Layton games and basically just went for it.
     And because Professor Layton has tons of weird puzzle shit that no one ever questions and Homestuck is the exact same.
-    Plus I wanted Bro in a nifty tophat and Dave in Luke's snazzy sweater.
+    Plus I wanted Bro in a nifty tophat and Dave in Lambda's snazzy sweater.
 -------------------------------------------------------------------------------
 Track: ElecTrollCopSwing
 Artist: Astro Kid
@@ -649,7 +662,7 @@ Commentary:
     I recall this was primiarily composed for two reasons. One: Combining the Doctor Who theme with Doctor needed to happen. Two: The Doctor Who Sburb fan adventure was something I had just discovered and I wanted to compose something for it. There's not much to be said about this one. It's Doctor + Doctor Who Theme. Yeah.
 -------------------------------------------------------------------------------
 Track: Wind In My Heir
-Artist: Joe Oullet
+Artist: Joe Ouellet
 Track Art: Racheme
 URLs: https://unofficialmspafans.bandcamp.com/track/wind-in-my-heir
 Commentary:
@@ -740,7 +753,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Blood Knight
 Artist: Rachel Macwhirter
-Track Art: Paula Vieira
+Track Art: Elanor Pam
 URLs: https://unofficialmspafans.bandcamp.com/track/blood-knight-2
 Commentary:
     <i>Rachel Macwhirter:</i>
@@ -759,7 +772,7 @@ Commentary:
 Track: Red Miles
 Directory: red-miles-lofam2
 Artist: David Dycus
-Track Art: Crowbawt
+Track Art: Amethyst Barron
 References: Sburban Jungle
 URLs: https://unofficialmspafans.bandcamp.com/track/red-miles
 Commentary:
@@ -809,7 +822,7 @@ Commentary:
     <i>Clark Powell:</i>
     This song was made at Christmas.
     It's not Christmas anymore.
-    <i>Luke Bledsoe:</i>
+    <i>Lambda Bledsoe:</i>
     this entire album was a joke at clark's expense
 -------------------------------------------------------------------------------
 Track: Finale Strife
@@ -831,7 +844,7 @@ Lyrics:
 Commentary:
     <i>Dante Basco:</i>
     one of my first comments for rose was "she's gangsta"... then when i met jade, i said she was gangsta too... it kinda just stuck in with the homestucks and this is a song that i dedicate to those girls... i'm glad everyone dug it.
-    <i>Luke Bledsoe:</i>
+    <i><b>Lambda Bledsoe:</b></i>
     there <i>would</i> be lyrics here if i were capable of interpreting them.
 -------------------------------------------------------------------------------
 Track: Joy And Dreams Eternal
@@ -898,12 +911,12 @@ Commentary:
     This didn't start out as a Homestuck themed song, but once I realized that it mached up with the dark and moody feel of the Midnight Crew, I decided to complete it with that goal in mind. The song itself is pretty simple, all in all. I just really dig that bassline.
 -------------------------------------------------------------------------------
 Track: A Stitch In Time
-Artist: Joe Oullet
+Artist: Joe Ouellet
 Track Art: AS
 URLs: https://unofficialmspafans.bandcamp.com/track/a-stitch-in-time
 Commentary:
-    <i>Joe Oullet:</i>
-    Whe ngiven the chance ot make an extra track for LOFAM 2, I jumped at the opportunity. It turns out I was assigned a Felt realted track, specifically to Stitch. I wanted to stay true to the feel of the album The Felt. I used strings, light percussion, and most importantly, I messed around with teh tempo. This was a little bit of a challenge for me, but I think it turned outa lright. Fun fact; The glitchy effect was not on purpose, it was an export error I thought sounded cool so I kept it.
+    <i>Joe Ouellet:</i>
+    When given the chance ot make an extra track for LOFAM 2, I jumped at the opportunity. It turns out I was assigned a Felt realted track, specifically to Stitch. I wanted to stay true to the feel of the album The Felt. I used strings, light percussion, and most importantly, I messed around with teh tempo. This was a little bit of a challenge for me, but I think it turned outa lright. Fun fact; The glitchy effect was not on purpose, it was an export error I thought sounded cool so I kept it.
 -------------------------------------------------------------------------------
 Track: Ave Dei Novi
 Artist: Will Ascenzo
@@ -919,15 +932,15 @@ Commentary:
     When I started "Ave Dei Novi" (a song made just for Land of Fans and Music 2), I fully intended that it would be the biggest, strongest, most well-composed, best Homestuck fan composition I've workedo n tto date, a sort of capstone of Homestuck fan music. The first Land of Fans and Music had two of my early songs on it, and I felt it was appropriate that I do my best and show how far I'd come in a year for the second album. "Ave Dei Novi" takes its cue, partially, from the bombastic and incredible Gundam Unicorn soundtrack by Sawano Hiroyuki, especially in the orchestra and percussion grooves, which I worked very hard on. I think I'm most proud of the bongo groove breakdown in the middle and the "Atomyk Ebonpyre" section near the end. Those two parts ended up especially fantastic.
     <i>xkoraxayomex:</i>
     Overall I feel that the artwork suits the piece in terms of relativity and presentation. I think it looks refined and somewhat detailed, but there is room for improvement. When I read the title for the piece, Ascension, I automatically thought back to Jade's god tier, as it is simply gorgeous and I just love it. It was a milestone for her becoming an even more essential character in Homestuck.
-    <i>Luke Bledsoe:</i>
+    <i><b>Lambda Bledsoe:</b></i>
     this song was originally titled "ascension", but there was to be another song on lofam2 with a similar title ("god tier ascension") (except now there isn't) so wmm changed it to"ave dei novi" which translates to "hail the new gods"
 -------------------------------------------------------------------------------
 Track: Nevermore (Can't Sleep, Crows Will Find Me)
 Artist: Thomas Ferkol
-Track Art: Crowbawt
+Track Art: Amethyst Barron
 URLs: https://unofficialmspafans.bandcamp.com/track/nevermore-cant-sleep-crows-will-find-me
 Commentary:
-    <i>Brad Griffin:</i>
+    <i><b>Brad Griffin:</b></i>
     No commentary here!
     <i>continued from [[The Seer and the Tribesmen]]:</i>
     <i>HE NAKED FELLOW INTRODUCES HISEMLF IN RETURN. OVERJOYED, BNORKEL BARKS UP A CLOUD OF PUNGENT INK. THIS STARTLES THE MOOSE, WHO PROCEEDS TO INSTINCTIVELY CHARGE THEM BOTH. A FLURRY OF ACTIVITY! ANTLERS FLASH, TENTACLES FLAIL, EXPOSED FLESH JUTS OFFENSIVELY.</i>

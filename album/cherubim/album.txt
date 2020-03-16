@@ -87,13 +87,13 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: The Lyrist
 Artist: Thomas Ferkol
-Track Art: Rumminov
+Track Art: rumminov
 URLs: https://homestuck.bandcamp.com/track/the-lyrist-2
 -------------------------------------------------------------------------------
 Track: The Lordling
 Artist: Toby Fox
 References: The Lyrist
-Track Art: Rumminov
+Track Art: rumminov
 URLs: https://homestuck.bandcamp.com/track/the-lordling-2
 -------------------------------------------------------------------------------
 Track: Eternity Served Cold

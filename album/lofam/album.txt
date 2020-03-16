@@ -47,6 +47,7 @@ Artist: Yishan Mai
 Track Art: Red Pen
 References:
 - Skies of Skaia
+- Homestuck Title Screen
 - Homestuck
 - Theme
 URLs: https://homestuckgaiden.bandcamp.com/track/beginnings-press-start-to-play
@@ -59,7 +60,7 @@ Commentary:
     Fun fact: I didn't realise for a hwile that "Homestuck" and "Alternia" were technically remixes themselves, amking this a 3x remix-of-remix combob.
 -------------------------------------------------------------------------------
 Track: Downtime
-Artist: SparksD2145
+Artist: AutoDevote
 Track Art: JNJ
 References:
 - Showtime (Piano Refrain)
@@ -145,7 +146,7 @@ References:
 URLs: https://homestuckgaiden.bandcamp.com/track/first-guardian-last-stand
 Commentary:
     <i>Chase:</i>
-    I can see htis as music for Spades Slick and Doc Scratch's confrontation. Kind of like a fistfight ina 20s-era speakeasy. Except with less fists and more candy. And chiptunes.
+    I can see this as music for Spades Slick and Doc Scratch's confrontation. Kind of like a fistfight ina 20s-era speakeasy. Except with less fists and more candy. And chiptunes.
     ...uh, never mind.
     <i>melodiousDiscord:</i>
     This one was a bit of an oops moment haha! The way it was originally posted, I had thought the song title was "Chasing Fireflies" but as it turns out, that is Chase's full username. I had already made this up though. Doc Scratch standing on John's planet for some reason. With fireflies in the background.
@@ -504,7 +505,7 @@ Commentary:
     <i>Max Wright:</i>
     This is a piece that found inspiration in pretty much everything. The main influences in this case were Bach (instrument choice), the Professor Layton Theme (throughout, mainly the introduction and melody that the violin takes), [[Explore]], and The Felt album in general. The inspiration from Professor Layton, drawing from video game themes, also affected my choice to make this loop(able).
     House of Lalonde was always intended from the start to be the theme fro some sort of home. Orginally, it was going to be for doc Scratch's study... but the oly reason that never happened was because I couldn't find the righto rgan sound (the kind you hear in [[Scratch]]). So, scrapping that idea, I continued to set about sculpting a theme for a sophisticated abode, and eventually reached hte conclusion that it would work rather well for Rose's. I may extend it some day...
-    <i>"Somewhere a zealous god threads these strings between the clouds and the earth, preparing for a symphony it fears impossible to play."<br>-- Charles Barkley
+    <i>"Somewhere a zealous god threads these strings between the clouds and the earth, preparing for a symphony it fears impossible to play."<br>-- Charles Barkley</i>
 -------------------------------------------------------------------------------
 Track: L'etat de l'ambivalence
 Artist: Tyler Dever
@@ -742,7 +743,7 @@ Commentary:
 Track: Cutscene at the End of the Hallway
 Artist: Robert J! Lake
 Track Art: Zilleniose
-References: Beginnings (Press Start to Play)
+References: Homestuck Title Screen
 URLs: https://homestuckgaiden.bandcamp.com/track/cutscene-at-the-end-of-the-hallway
 Commentary:
     <i>Robert J! Lake:</i>

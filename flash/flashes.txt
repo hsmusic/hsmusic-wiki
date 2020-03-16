@@ -11,7 +11,7 @@ Flash: [S] ==>
 Page: 82
 Date: April 24, 2009
 Tracks:
-- Foley (by Clark Powell)
+- Windchime Foley
 ------------------------------------------------------------------------------
 Flash: [S] John: Enter.
 Page: 88
@@ -57,6 +57,7 @@ Page: 253
 Date: June 14, 2009
 Tracks:
 - Showtime (Piano Refrain)
+- Harlequin
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 338
@@ -67,6 +68,8 @@ Tracks:
 - 06, 07, 12, 13, 14, 15, 16 (by Robert J! Lake)
 - 08, 09 (by xerxes333)
 - 10 (by Robert Blaker)
+- Harlequin
+- JOHN DO THE WINDY THING
 ------------------------------------------------------------------------------
 Flash: [S] Rose: Youth roll right out the front door.
 Page: 388
@@ -373,7 +376,7 @@ Tracks:
 - MeGaLoVania
 - A Tender Moment
 - Nic Cage Song
-- Secret ROM (by Toby Fox)
+- Secret ROM
 - Boy Skylark (Brief)
 - Hero's Growth (by Solatrus)
 - Phrenic Phever
@@ -480,8 +483,8 @@ Tracks:
 - Havoc To Be Wrought
 - Rumble at the Rink
 - Unlabeled
-- XROM (by Toby Fox)
-- I'm a Member of the Midnight Crew (by Eddie Morton)
+- XROM
+- I'm a Member of the Midnight Crew
 ------------------------------------------------------------------------------
 Flash: [S] Seer: Ascend.
 Page: 3744
@@ -596,7 +599,7 @@ Flash: [S][A6I2] ???
 Page: 4815
 Date: April 3, 2012
 Tracks:
-- weird moody horse shit (by Alexander Rosetti)
+- weird moody horse shit
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 3 - Nobles
 FG: #8899cc
@@ -669,8 +672,8 @@ Page: 5263
 Date: August 31, 2012
 Tracks:
 - Fuchsia Ruler
-- Darling Dolorosa (by Toby Fox)
-- GameGrl (Original 1993 Mix)
+- Darling Dolorosa
+- GameGlr
 - Iron Infidel
 - Elevatorstuck
 ------------------------------------------------------------------------------
@@ -679,19 +682,19 @@ Page: 5308
 Date: September 24, 2012
 Tracks:
 - Hate You
-- G4M3BL0RG (by Toby Fox)
+- G4M3BL0RG
 - Olive Rogue
 - Violet Prince
 - Purple Bard
 - Teal Seer
-- Crab Waltz (by Toby Fox)
+- Crab Waltz
 ------------------------------------------------------------------------------
 Flash: [S][A6I3] ==>
 Page: 5398
 Date: October 22, 2012
 Tracks:
-- 108 Stars of Density (by Toby Fox)
-- The Brave and the Bronze (by Yan Rodriguez)
+- 108 Stars of Density
+- The Brave and the Bronze
 - Jade Sylph
 - Rust Maid
 - Indigo Heir
@@ -789,14 +792,12 @@ Tracks:
 Flash: [S] Jane: Engage.
 Page: 5711
 Date: January 9, 2013
-Tracks:
-- Trickster Mode (by Toby Fox)
+Tracks: Trickster Mode (Engage)
 ------------------------------------------------------------------------------
 Flash: [S] Jane: Blast off.
 Page: 5712
 Date: January 10, 2013
-Tracks:
-- Trickster Mode (by Toby Fox)
+Tracks: Trickster Mode (Blast Off)
 ------------------------------------------------------------------------------
 Flash: [S] ACT 6 ACT 5 ACT 2
 Page: 5714
@@ -804,6 +805,41 @@ Date: January 11, 2013
 Tracks:
 - Kazoostuck (by Toby Fox)
 - (I'm not going through the rest of the Trickster flashes, sorry.)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 5726
+Date: January 13, 2013
+Tracks: Trickster Mode (Engage)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 5740
+Date: January 17, 2013
+Tracks: Trickster Mode (Engage)
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 5759
+Date: January 23, 2013
+Tracks: Trickster Mode (Engage)
+------------------------------------------------------------------------------
+Flash: [S] Tricksters: Alchemize.
+Page: 5763
+Date: January 24, 2013
+Tracks: A Very Trickster Mode Christmas
+------------------------------------------------------------------------------
+Flash: [S] ==>
+Page: 5764
+Date: January 25, 2013
+Tracks: Warhammer of Zillyhoo (With Mario Paint)
+------------------------------------------------------------------------------
+Flash: [S] WHEEEEEEEEEEE!
+Page: 5776
+Date: January 26, 2013
+Tracks: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
+------------------------------------------------------------------------------
+Flash: [S] HA HA HA! HE HE HE! HO HO HO!
+Page: 5777
+Date: January 26, 2013
+Tracks: A Very Trickster Mode Christmas (With Fancy Santas)
 ------------------------------------------------------------------------------
 ACT: Act 6 Intermission 5 - <span style="color: #929292">I'M PUTTING YOU ON SPEAKER CRAB.</span>
 FG: #77ff88
@@ -832,8 +868,7 @@ FG: #2ed73a
 Flash: [S] ACT 6 ACT 6
 Page: 6243
 Date: June 12, 2013
-Tracks:
-- Homosuck Anthem (by Toby Fox)
+Tracks: Homosuck Anthem
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Intermission 1 - Stardust
 FG: #dddddd
@@ -866,13 +901,13 @@ Flash: [S][A6A6I4] ====>
 Page: 7101
 Date: December 1, 2014
 Tracks:
-- Elevatorstuck, with Meows (by Toby Fox)
+- Elevatorstuck, with Meows
 ------------------------------------------------------------------------------
 Flash: [S][A6A6I4] ====>
 Page: 7405
 Date: January 19, 2015
 Tracks:
-- Not a creature was stirring (by Alexander Rosetti)
+- not a creature was stirring
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Act 5 - MASTERPIECE
 FG: #55ff00
@@ -881,13 +916,13 @@ Flash: [S] ACT 6 ACT 6 ACT 5
 Page: 7409
 Date: April 13, 2015
 Tracks:
-- Homosuck Swan Song (by Toby Fox)
+- Homosuck Swan Song
 ------------------------------------------------------------------------------
 Flash: [S] MSPA Reader: Mental breakdown.
 Page: 7448
 Date: April 22, 2015
 Tracks:
-- Hello Zepp - Saw Theme (by Charlie Clouser)
+- Hello Zepp
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Intermission 5 - <span style="color: #1076a2">She's 8ack</span>
 FG: #00ffff
@@ -902,7 +937,7 @@ Flash: [S][A6A6I5] ====>
 Page: 7928
 Date: July 23, 2015
 Tracks:
-- Horsecatska (by James Roach)
+- Horsecatska
 ------------------------------------------------------------------------------
 Flash: [S] Terezi: Remem8er.
 Page: 7959
@@ -935,7 +970,7 @@ Flash: [S] ==>
 Page: 8129
 Date: October 25, 2016
 Tracks:
-- Foley (by Clark Powell)
+- Windchime Foley
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 8130

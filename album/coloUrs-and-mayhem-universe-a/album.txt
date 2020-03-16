@@ -40,7 +40,7 @@ URLs: https://homestuck.bandcamp.com/track/gold-pilot
 -------------------------------------------------------------------------------
 Track: Iron Infidel
 Artist: Samm Neiland
-Track Art: Paula Vieira
+Track Art: Elanor Pam
 URLs: https://homestuck.bandcamp.com/track/iron-infidel
 Contributors:
 - Katherine Bordonaro, Connor Favero, Lorilyn "Neoscottie" Seyler, Steve Johnson, Andrea McNeil, Ari, Pippin (special thanks)

@@ -4,20 +4,151 @@ Date: November 11, 1111
 FG: #ff7bf7
 Canon: Fanon
 -------------------------------------------------------------------------------
+Track: 108 Stars of Density
+Artist: Toby Fox
+References: Hate You
+URLs: https://www.youtube.com/watch?v=Swdd0pKviG8
+-------------------------------------------------------------------------------
+Track: A Very Trickster Mode Christmas
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=MaywzJqgyh4
+-------------------------------------------------------------------------------
+Track: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
+Artist: Toby Fox
+References: A Very Trickster Mode Christmas
+URLs: https://www.youtube.com/watch?v=91yZRnk3BRA
+-------------------------------------------------------------------------------
+Track: A Very Trickster Mode Christmas (With Fancy Santas)
+Artist: Toby Fox
+References: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
+URLs: https://www.youtube.com/watch?v=DydDjMNlBsQ
+-------------------------------------------------------------------------------
+Track: An Apple Disaster!!
+Artist: Toby Fox
+URLs:
+- https://www.youtube.com/watch?v=wa2K_8Ff41M
+- https://fwugradiation.tumblr.com/post/13528293577/improvised-touhou-music-with-annoying-commentary
+-------------------------------------------------------------------------------
+Track: Crab Waltz
+Artist: Toby Fox
+References: Crustacean
+URLs: https://www.youtube.com/watch?v=jUly2ujqDvY
+-------------------------------------------------------------------------------
+Track: Darling Dolorosa
+Artist: Toby Fox
+References: Darling Kanaya
+URLs: https://www.youtube.com/watch?v=G28357JCv4c
+-------------------------------------------------------------------------------
+Track: Elevatorstuck, with Meows
+Artist: Toby Fox
+References: Elevatorstuck
+URLs: https://www.youtube.com/watch?v=RxZNeHvgNUE
+-------------------------------------------------------------------------------
+Track: G4M38L0RG
+Artist: Toby Fox
+References: GameBro (Original 1990 Mix), The La2t Frontiier, The Blind Prophet
+URLs: https://www.youtube.com/watch?v=2pWQT4jGrm4
+-------------------------------------------------------------------------------
+Track: GameGlr
+Artist: Toby Fox
+References: GameGrl (Original 1993 Mix), Teal Seer
+URLs: https://www.youtube.com/watch?v=Nc4nIdsuG7o
+-------------------------------------------------------------------------------
+Track: Hello Zepp
+Artist: Charlie Clouser
+URLs: https://www.youtube.com/watch?v=vhSHXGM7kgE
+-------------------------------------------------------------------------------
+Track: Hero's Growth
+Artist: Solatrus
+URLs: https://www.youtube.com/watch?v=DVau5m6l8FU
+-------------------------------------------------------------------------------
+Track: Homestuck Title Screen
+Artist: MK_97
+References: Skies of Skaia
+URLs: https://www.youtube.com/watch?v=N_kGx5RikYA
+-------------------------------------------------------------------------------
+Track: Homosuck Anthem
+Artist: Toby Fox
+References: Homestuck Anthem
+URLs: https://www.youtube.com/watch?v=sVXPWSvSKGM
+-------------------------------------------------------------------------------
+Track: Homosuck Swan Song
+Artist: Toby Fox
+References: Homestuck Anthem
+URLs: https://www.youtube.com/watch?v=XzEJp5QJ8vE
+-------------------------------------------------------------------------------
+Track: Horsecatska
+Artist: James Roach
+References: Horschestra
+URLs: https://www.youtube.com/watch?v=EjCbsleXpuk
+-------------------------------------------------------------------------------
+Track: I'm a Member of the Midnight Crew
+Artist: Eddie Morton
+URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
+-------------------------------------------------------------------------------
+Track: Kazoostuck
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=mjKX8H3mSJo
+-------------------------------------------------------------------------------
+Track: not a creature was stirring
+Artist: Alexander Rosetti
+URLs: https://www.youtube.com/watch?v=hdlh6FRPnCw
+-------------------------------------------------------------------------------
+Track: null
+Artist: Toby Fox
+Directory: null-toby-fox
+References: Penumbra Phantasm
+URLs: https://www.youtube.com/watch?v=sIgtSvgERB4
+-------------------------------------------------------------------------------
 Track: Penumbra Phantasm
 Artist: Toby Fox
 URLs:
+- https://www.youtube.com/watch?v=RIq4GrMv96I
 - https://www.youtube.com/watch?v=OdntMzdkFnk
-- https://www.youtube.com/watch?v=sIgtSvgERB4
+-------------------------------------------------------------------------------
+Track: Secret ROM
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=ercVSU3rjrc
 -------------------------------------------------------------------------------
 Track: Skaian Shuffle
 Artist: Clark Powell
 URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F059%20Skaian%20Shuffle.mp3&mode=default
 -------------------------------------------------------------------------------
+Track: The Brave and the Bronze
+Artist: Yan Rodriguez
+URLs: https://www.youtube.com/watch?v=pK4-g7TiWQA
+-------------------------------------------------------------------------------
 Track: The Paradox Paradigm
 Artist: Jack McMenamin
 URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Fan%20Music%20and%20VA%2FHomestuck%20Fansong%20Archive%20%282011%29%2FHomestuck%20Fan%20Music%20Part%2010%2FThe%20Paradox%20Paradigm.mp3&mode=default
 -------------------------------------------------------------------------------
+Track: Trickster Mode (Engage)
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=0Hd6q5xn8mg
+-------------------------------------------------------------------------------
+Track: Trickster Mode (Blast Off)
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=0Hd6q5xn8mg
+-------------------------------------------------------------------------------
+Track: Warhammer of Zillyhoo (With Mario Paint)
+Artist: Toby Fox
+References: Warhammer of Zillyhoo
+URLs: https://www.youtube.com/watch?v=hCO-grMys2k
+-------------------------------------------------------------------------------
+Track: weird moody horse shit
+Artist: Alexander Rosetti
+References: not a creature was stirring
+URLs: https://www.youtube.com/watch?v=hC2Vdh7WmDc
+-------------------------------------------------------------------------------
 Track: White King
 Artist: Demographerist
 URLs: https://www.youtube.com/watch?v=x6NrArPldZo
+-------------------------------------------------------------------------------
+Track: Windchime Foley
+Artist: Clark Powel
+URLs: https://www.youtube.com/watch?v=CSMMmOtRLiU
+-------------------------------------------------------------------------------
+Track: XROM
+Artist: Toby Fox
+References: Secret ROM
+URLs: https://www.youtube.com/watch?v=wY2nX_b9Gm4

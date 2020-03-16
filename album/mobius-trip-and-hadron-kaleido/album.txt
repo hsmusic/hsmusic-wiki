@@ -59,7 +59,9 @@ Lyrics:
     And if the rules they can bend<br>You know you still could be friends<br>But it doesn't rely on me<br>This is as far as I go<br>I only say what I know<br>And what I know is you need release
 -------------------------------------------------------------------------------
 Track: Fly
-URLs: https://bowman.bandcamp.com/track/fly
+URLs:
+- https://www.youtube.com/watch?v=CUDkBTYWtGk
+- https://bowman.bandcamp.com/track/fly
 Lyrics:
     Fly fly fly whatcha say<br>Whatcha gonna do<br>Change your ways change your life<br>Change your point of view<br>Been so long since your feet<br>Felt the open air<br>So far back down the line<br>Were you even there?
     It's so cold the rain blows in your eyes<br>It's so cold the days go flashing by<br>It's so cold you've lost all track of time<br>It's so cold you turn back into slime

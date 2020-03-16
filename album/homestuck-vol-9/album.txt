@@ -157,7 +157,7 @@ URLs: https://homestuck.bandcamp.com/track/assault-2
 -------------------------------------------------------------------------------
 Track: A Little Fight Mewsic
 Artist: Thomas Ferkol
-Track Art: Crowbawt
+Track Art: Amethyst Barron
 URLs: https://homestuck.bandcamp.com/track/a-little-fight-mewsic-2
 -------------------------------------------------------------------------------
 Track: Austin, Atlantis
@@ -332,6 +332,7 @@ Track: I'm a Member of the Midnight Crew (Post-Punk Version)
 Artist: Michael Guy Bowman
 Contributors: Erik Scheele (piano), Marcy Nabors (thermin & accordian)
 Track Art: Cari Garafalo
+Referenecs: I'm a Member of the Midnight Crew
 URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-post-punk-version-2
 Commentary:
     <i>Michael Guy Bowman:</i>
@@ -367,7 +368,7 @@ URLs: https://homestuck.bandcamp.com/track/break-shot-2
 -------------------------------------------------------------------------------
 Track: Portrait
 Artist: Solatrus
-Track Art: Katie Holden
+Track Art: Kate Holden
 URLs: https://homestuck.bandcamp.com/track/portrait-2
 Commentary:
     <i>Solatrus:</i>
@@ -420,7 +421,7 @@ URLs: https://homestuck.bandcamp.com/track/the-changing-game-2
 Track: Requited
 Artist: Clark Powell
 References: Serenade
-Track Art: Dodostad
+Track Art: dodostad
 URLs: https://homestuck.bandcamp.com/track/requited-2
 Commentary:
     <i>Clark Powell:</i>
