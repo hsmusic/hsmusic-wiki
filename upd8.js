@@ -117,6 +117,7 @@ const SITE_ABOUT = fixWS`
         <li>Kidpen, for suggesting the "Flashes that feature this track" feature.</li>
         <li>an emailer, for suggesting the "Random track" feature.</li>
         <li>foreverFlumoxed, for pointing out that <a href="flash/338/index.html">[S] ==&gt;</a> contains reference to <a href="track/john-do-the-windy-thing/index.html">JOHN DO THE WINDY THING</a>. This reminded me to add all the unreleased Flash tracks to the Unreleased Tracks album!</li>
+        <li>Makin, for various initial help in data collection (especially commentary) and lifting the site off the ground by pinning it to the top of the /r/homestuck subreddit for a while, and for linking me the independent release of <a href="https://jamesdever.bandcamp.com/album/sburb">Sburb</a>.</li>
         <li>Thanks for pointing out typos, errors in reference lists, and out of date details: cookiefonster, foreverFlummoxed.</li>
     </ul>
 `;
