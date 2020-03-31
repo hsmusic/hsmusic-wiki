@@ -615,7 +615,7 @@ function stringifyAlbumData() {
         }
 
         return value;
-    });
+    }, 1);
 }
 
 // 8asic function for writing any site page. Handles all the 8asename,

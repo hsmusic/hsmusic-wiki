@@ -44,6 +44,7 @@ Track: Skaian Summoning
 URLs: https://homestuck.bandcamp.com/track/skaian-summoning-2
 -------------------------------------------------------------------------------
 Track: The Thirteenth Hour
+Track Art: foreverFlummoxed
 References: Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/the-thirteenth-hour-2
 -------------------------------------------------------------------------------
