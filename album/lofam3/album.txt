@@ -419,7 +419,7 @@ Commentary:
     <i>Elanor Pam:</i>
     Aranea.
 -------------------------------------------------------------------------------
-Track: Batheast's Theme
+Track: Bathearst's Theme
 Artist: Eston Schweickart
 Track Art: Scarodactyl
 URLs: https://unofficialmspafans.bandcamp.com/track/bathearsts-theme
@@ -580,7 +580,7 @@ Commentary:
     <i><b>Brad Griffin:</b></i>
     Slick strut!
 -------------------------------------------------------------------------------
-Track: Thombs & Krypton
+Track: Tombs & Krypton
 Directory: tombs-and-krypton
 Artist: Rob Little
 Track Art: fueledbyanimation
