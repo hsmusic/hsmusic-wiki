@@ -1,0 +1,99 @@
+Album: Beyond Canon
+Date: April 13, 2020
+Cover Art: Xamag
+Track Art: none
+FG: #f2a400
+-------------------------------------------------------------------------------
+Track: exclusion zone
+Artist: horizon
+URLs: https://homestuck.bandcamp.com/track/exclusion-zone
+-------------------------------------------------------------------------------
+Track: Now I'm a Villain
+Artist: David Ellis
+URLs: https://homestuck.bandcamp.com/track/now-im-a-villain
+References: Showtime (Original Mix)
+-------------------------------------------------------------------------------
+Track: Cosmic Carousel
+Artist: polysaw
+URLs: https://homestuck.bandcamp.com/track/cosmic-carousel
+-------------------------------------------------------------------------------
+Track: Surprise, We're Back
+Artist: Sean Gorter
+URLs: https://homestuck.bandcamp.com/track/surprise-were-back
+References: End of Act
+-------------------------------------------------------------------------------
+Track: SPLIT REALITY
+Artist: Xaurix
+URLs: https://homestuck.bandcamp.com/track/split-reality
+References: Alphamatic Replacement
+-------------------------------------------------------------------------------
+Track: Assembly
+Artist: Erik Scheele
+URLs: https://homestuck.bandcamp.com/track/assembly
+-------------------------------------------------------------------------------
+Track: Not Canon in F major, Op. 69
+Artist: Alex Votl
+URLs: https://homestuck.bandcamp.com/track/not-canon-in-f-major-op-69
+-------------------------------------------------------------------------------
+Track: The Leaving
+Artist: Marcus Carline
+Contributors: Marc Encabo (bass), Tom Kendall Hughes (drums)
+URLs: https://homestuck.bandcamp.com/track/the-leaving
+Lyrics:
+    Smoke is all I breathe,<br>is all you hear, is all in me.<br>Taste the drier air.<br>There’s nothing left.
+    Letters fill the empty space.<br>There’s so much space that’s left untouched.<br>Running scares me more than God,<br>but staying can’t sustain.
+    The sparks of fire, earthbound,<br>have found your home. Be gone now.<br>It’s not your fault, you know this.<br>But the leaving is just the same.
+    I feel the wind beneath my arms.<br>It’s warmer now than I recall.<br>Have you heard the news today?<br>They closed the school.
+    You and I have been through this,<br>have been through that, have been at ease.<br>Nothing scares me more than God,<br>and Nothing cannot sustain.
+    The sparks of fire, earthbound,<br>have found your home. Be gone now.<br>It’s not your fault, you know this.<br>But the leaving is still the same.
+    You sent me fire.<br>Fire, I’ll tear my throat out.<br>Burn my blackened lips.<br>You gave me fire.<br>Fire, I’ll tear my heart out.<br>I’d rather tear my heart out.<br>But I can’t stay here.
+    The sparks of fire earthbound<br>have found your home. Be gone now.<br>It’s not your fault, you know this.<br>But you can’t help but turn around.<br>The embers haven’t faded.<br>The love you left, unmade.<br>It’s not your fault, you know this.<br>But the leaving is still the same.
+-------------------------------------------------------------------------------
+Track: Light Burns Out (Gestalt)
+Artist: Waif
+URLs: https://homestuck.bandcamp.com/track/light-burns-out-gestalt
+-------------------------------------------------------------------------------
+Track: Hometeam Adv8ntage
+Artist: Twirlin' Curtis
+URLs: https://homestuck.bandcamp.com/track/hometeam-adv8ntage
+-------------------------------------------------------------------------------
+Track: After the Sun
+Artist: Circlejourney
+URLs: https://homestuck.bandcamp.com/track/after-the-sun
+-------------------------------------------------------------------------------
+Track: Narrative Command
+Artist: Sean William Calhoun
+URLs: https://homestuck.bandcamp.com/track/narrative-command
+-------------------------------------------------------------------------------
+Track: eleventh hour
+Artist: Monobrow
+URLs: https://homestuck.bandcamp.com/track/eleventh-hour
+-------------------------------------------------------------------------------
+Track: Adios, Lost Boys
+Artist: Clark Powell
+URLs: https://homestuck.bandcamp.com/track/adios-lost-boys
+-------------------------------------------------------------------------------
+Track: Moving Onwards
+Artist: Matthias Ramalho
+URLs: https://homestuck.bandcamp.com/track/moving-onwards
+-------------------------------------------------------------------------------
+Track: Make a Pretty Picture
+Artist: Tristan Scroggins
+URLs: https://homestuck.bandcamp.com/track/make-a-pretty-picture
+-------------------------------------------------------------------------------
+Track: Four Kids (and a Game They Played Together)
+Artist: Robert J! Lake
+References: Four Kids and a Game They Play Together
+URLs: https://homestuck.bandcamp.com/track/four-kids-and-a-game-they-played-together
+Lyrics:
+    it’s been a little bit since the last time we all talked<br>so...how are all of you doing?<br>i know that i have been a bit unkind to you all<br>and i’m trying to undo it
+    we thought this ended years ago but it survived<br>i've forgotten far too often why i even recognize these faces<br>that don't have names placed with them<br>inside my hazy brain, but then<br>there's too much to begin to touch on here
+    i’m<br>pulled back<br>once again<br>and i told myself,<br>told myself,<br>told myself<br>i wouldn’t be on this adventure
+    but i’m haunted by<br>all of these memories<br>that i have of four kids<br>and the game they played together
+    i burned the bridges thoroughly but still everyone's trusting me again<br>and i should be relieved but it happened so suddenly<br>and i know in my heart i haven't earned this,<br>but everyone acts like my concern isn't a problem<br>like nothing is wrong with my very involvement
+    but i know how the song ends
+    i can’t begin to list the times that i’ve walked<br>along this road and concluded<br>that nothing that i’ve done here will make sense, in the end<br>but i find that kind of soothing
+-------------------------------------------------------------------------------
+Track: crystal hung in firmament's descent
+Artist: Emelia K.
+URLs: https://homestuck.bandcamp.com/track/crystal-hung-in-firmaments-descent

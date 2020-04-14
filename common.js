@@ -65,9 +65,10 @@ const C = {
     // sorted 8y date.
     getAllTracks: albumData => C.sortByDate(albumData.reduce((acc, album) => acc.concat(album.tracks), [])),
 
-    getArtistNames: albumData => Array.from(new Set(
-        albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), [])
-    )),
+    getArtistNames: (albumData, flashData) => Array.from(new Set([
+        ...albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), []),
+        ...flashData.filter(flash => !flash.act8r8k).reduce((acc, flash) => acc.concat(flash.contributors.map(({ who }) => who)), [])
+    ])),
 
     getKebabCase: name => name.split(' ').join('-').replace(/&/g, 'and').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').toLowerCase(),
 
@@ -75,15 +76,16 @@ const C = {
     // "directories", we just reformat the artist's name.
     getArtistDirectory: artistName => C.getKebabCase(artistName),
 
-    getArtistNumContributions: (artistName, {allTracks, albumData}) => [
+    getArtistNumContributions: (artistName, {allTracks, albumData, flashData}) => [
         ...allTracks.filter(track =>
             track.artists.includes(artistName) ||
             [...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artistName)),
+        ...flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artistName)),
         ...albumData.filter(album =>
             (album.coverArtists || []).some(({ who }) => who === artistName))
     ].length,
 
-    getArtistCommentary: (artistName, {albumsAndTracks}) => albumsAndTracks.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'))
+    getArtistCommentary: (artistName, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'))
 };
 
 if (typeof module === 'object') {

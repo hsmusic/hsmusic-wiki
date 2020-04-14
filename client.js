@@ -7,7 +7,7 @@
 
 const officialAlbumData = albumData.filter(album => !album.isFanon);
 const fandomAlbumData = albumData.filter(album => album.isFanon);
-const artistNames = C.getArtistNames(albumData);
+const artistNames = C.getArtistNames(albumData, flashData);
 const allTracks = C.getAllTracks(albumData);
 
 function pick(array) {
@@ -43,7 +43,7 @@ for (const a of document.body.querySelectorAll('[data-random]')) {
                 case 'track-in-fandom': return openTrack(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
                 case 'track-in-official': return openTrack(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
                 case 'artist': return openArtist(pick(artistNames));
-                case 'artist-more-than-one-contrib': return openArtist(pick(artistNames.filter(name => C.getArtistNumContributions(name, {albumData, allTracks}) > 1)));
+                case 'artist-more-than-one-contrib': return openArtist(pick(artistNames.filter(name => C.getArtistNumContributions(name, {albumData, allTracks, flashData}) > 1)));
             }
         } finally {
             evt.preventDefault();

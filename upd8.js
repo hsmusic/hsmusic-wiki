@@ -156,7 +156,7 @@ let artistNames;
 
 let officialAlbumData;
 let fandomAlbumData;
-let tracksAndAlbums;
+let justEverythingMan; // tracks, albums, flashes
 
 // Note there isn't a 'find track data files' function. I plan on including the
 // data for all tracks within an al8um collected in the single metadata file
@@ -309,7 +309,7 @@ function transformMultiline(text) {
     const outLines = [];
 
     let inList = false;
-    for (const line of text.split('\n')) {
+    for (const line of text.split(/\r|\n|\r\n/)) {
         if (line.startsWith('- ')) {
             if (!inList) {
                 outLines.push('<ul>');
@@ -574,16 +574,22 @@ async function processFlashDataFile(file) {
 
         const name = getBasicField(section, 'Flash');
         let page = getBasicField(section, 'Page');
+        let directory = getBasicField(section, 'Directory');
         let date = getBasicField(section, 'Date');
         const jiff = getBasicField(section, 'Jiff');
         const tracks = getListField(section, 'Tracks');
+        const contributors = getContributionField(section, 'Contributors') || [];
 
         if (!name) {
             return {error: 'Expected "Flash" (name) field!'};
         }
 
-        if (!page) {
-            return {error: 'Expected "Page" field!'};
+        if (!page && !directory) {
+            return {error: 'Expected "Page" or "Directory" field!'};
+        }
+
+        if (!directory) {
+            directory = page;
         }
 
         if (!date) {
@@ -600,17 +606,28 @@ async function processFlashDataFile(file) {
             return {error: 'Expected "Tracks" field!'};
         }
 
-        return {name, page, date, tracks, act, theme, jiff};
+        return {name, page, directory, date, contributors, tracks, act, theme, jiff};
     });
 }
 
 function getDateString({ date }) {
-    return date.toLocaleDateString();
+    const pad = val => val.toString().padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
 function stringifyAlbumData() {
     return JSON.stringify(albumData, (key, value) => {
         if (['album', 'commentary'].includes(key)) {
+            return undefined;
+        }
+
+        return value;
+    }, 1);
+}
+
+function stringifyFlashData() {
+    return JSON.stringify(flashData, (key, value) => {
+        if (['act', 'commentary'].includes(key)) {
             return undefined;
         }
 
@@ -711,7 +728,7 @@ function writeMiscellaneousPages() {
                     </div>
                     <div class="grid-listing">
                         ${flashData.map(flash => flash.act8r8k ? fixWS`
-                            <h2 style="${getThemeString(flash.theme)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => f.page && f.act === flash.act))}/index.html">${flash.act}</a></h2>
+                            <h2 style="${getThemeString(flash.theme)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === flash.act))}/index.html">${flash.act}</a></h2>
                         ` : fixWS`
                             <a class="grid-item" href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" style="${getThemeString(flash.theme)}">
                                 <img src="${getFlashCover(flash)}">
@@ -755,6 +772,7 @@ function writeMiscellaneousPages() {
         writeFile('data.js', fixWS`
             // Yo, this file is gener8ted. Don't mess around with it!
             window.albumData = ${stringifyAlbumData()};
+            window.flashData = ${stringifyFlashData()};
         `)
     ]);
 }
@@ -920,8 +938,9 @@ async function writeArtistPage(artistName) {
         track.artists.includes(artistName) ||
         track.contributors.some(({ who }) => who === artistName)
     ));
-    const artThings = tracksAndAlbums.filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName));
-    const commentaryThings = tracksAndAlbums.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'));
+    const artThings = justEverythingMan.filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName));
+    const flashes = flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artistName));
+    const commentaryThings = justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'));
 
     const unreleasedTracks = tracks.filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = tracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
@@ -958,6 +977,7 @@ async function writeArtistPage(artistName) {
                         unreleasedTracks.length && `<a href="${index}#unreleased-tracks">(Unreleased Tracks)</a>`
                     ].filter(Boolean).join(' '),
                     artThings.length && `<a href="${index}#art">Art</a>`,
+                    flashes.length && `<a href="${index}#flashes">Flashes &amp; Games</a>`,
                     commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
                 ].filter(Boolean).join(', ')}</p>
                 ${tracks.length && `<h2 id="tracks">Tracks</h2>`}
@@ -980,6 +1000,19 @@ async function writeArtistPage(artistName) {
                             </li>
                         `;
                     }, true, 'artDate')}
+                `}
+                ${flashes.length && fixWS`
+                    <h2 id="flashes">Flashes &amp; Games</h2>
+                    ${actChunkedList(flashes, flash => {
+                        const contributionString = flash.contributors.filter(({ who }) => who === artistName).map(getContributionString).join(' ');
+                        return fixWS`
+                            <li>
+                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/index.html" style="${getThemeString(flash.theme)}">${flash.name}</a>
+                                ${contributionString && `<span class="contributed">(${contributionString})</span>`}
+                                (${getDateString({date: flash.date})})
+                            </li>
+                        `
+                    })}
                 `}
                 ${commentaryThings.length && fixWS`
                     <h2 id="commentary">Commentary</h2>
@@ -1030,15 +1063,48 @@ function albumChunkedList(tracks, getLI, showDate = true, dateProperty = 'date')
     `;
 }
 
+function actChunkedList(flashes, getLI, showDate = true, dateProperty = 'date') {
+    return fixWS`
+        <dl>
+            ${flashes.slice().sort((a, b) => a[dateProperty] - b[dateProperty]).map((flash, i, sorted) => {
+                const li = getLI(flash, i);
+                const act = flash.act;
+                const previous = sorted[i - 1];
+                if (i === 0 || act !== previous.act) {
+                    const heading = fixWS`
+                        <dt>
+                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/index.html" style="${getThemeString(flash.theme)}">${flash.act}</a>
+                        </dt>
+                        <dd><ul>
+                    `;
+                    if (i > 0) {
+                        return ['</ul></dd>', heading, li];
+                    } else {
+                        return [heading, li];
+                    }
+                } else {
+                    return [li];
+                }
+            }).reduce((acc, arr) => acc.concat(arr), []).join('\n')}
+        </dl>
+    `;
+}
+
 async function writeFlashPages() {
-    await progressPromiseAll('Writing Flash pages.', queue(flashData.map(flash => () => flash.page && writeFlashPage(flash)).filter(Boolean)));
+    await progressPromiseAll('Writing Flash pages.', queue(flashData.map(flash => () => !flash.act8r8k && writeFlashPage(flash)).filter(Boolean)));
 }
 
 async function writeFlashPage(flash) {
     const kebab = getFlashDirectory(flash);
     const index = `${C.FLASH_DIRECTORY}/${kebab}/index.html`;
-    const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'))
-    const side = (flashData.indexOf(flash) < act6) ? 1 : 2
+    const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'));
+    const postCanon = flashData.findIndex(f => f.act.includes('Post Canon'));
+    const outsideCanon = postCanon + flashData.slice(postCanon).findIndex(f => !f.act.includes('Post Canon'));
+    const side = (
+        (flashData.indexOf(flash) < act6) ? 1 :
+        (flashData.indexOf(flash) <= outsideCanon) ? 2 :
+        0
+    );
     await writePage([C.FLASH_DIRECTORY, kebab], flash.name, fixWS`
         <body style="${getThemeString(flash.theme)}">
             <div id="sidebar">
@@ -1048,15 +1114,24 @@ async function writeFlashPage(flash) {
                 <dl>
                     ${flashData.filter(f => f.act8r8k).map(({ act, theme }) => fixWS`
                         ${act.startsWith('Act 1') && fixWS`
-                            <dt class="side ${side === 1 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => f.page && f.act.startsWith('Act 1')))}/index.html" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>
+                            <dt class="side ${side === 1 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/index.html" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>
                         `}
                         ${act.startsWith('Act 6 Act 1') && fixWS`
-                            <dt class="side ${side === 2 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => f.page && f.act.startsWith('Act 6')))}/index.html" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>
+                            <dt class="side ${side === 2 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/index.html" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>
                         `}
-                        ${(flashData.findIndex(f => f.act === act) < act6 ? (side === 1) : (side === 2)) && `<dt class="${act === flash.act ? 'current' : ''}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => f.page && f.act === act))}/index.html" style="${getThemeString(theme)}">${act}</a></dt>`}
+                        ${act.startsWith('Hiveswap') && fixWS`
+                            <dt class="side ${side === 0 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/index.html" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>
+                        `}
+                        ${(
+                            (flashData.findIndex(f => f.act === act) < act6) ? (side === 1) :
+                            ((flashData.findIndex(f => f.act === act) < outsideCanon) ? (side === 2) :
+                            true)
+                        ) && fixWS`
+                            <dt class="${act === flash.act ? 'current' : ''}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/index.html" style="${getThemeString(theme)}">${act}</a></dt>
+                        `}
                         ${act === flash.act && fixWS`
                             <dd><ul>
-                                ${flashData.filter(f => f.page && f.act === act).map(f => fixWS`
+                                ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
                                     <li class="${f === flash ? 'current' : ''}">
                                         <a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/index.html" style="${getThemeString(f.theme)}">${f.name}</a>
                                     </li>
@@ -1070,16 +1145,28 @@ async function writeFlashPage(flash) {
                 <h1>${flash.name}</h1>
                 <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}"></a>
                 <p>Released ${getDateString(flash)}.</p>
-                <p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>
+                ${flash.page && `<p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>`}
+                ${flash.contributors.length && fixWS`
+                    <p>Contributors:</p>
+                    <ul>
+                        ${flash.contributors.map(({ who, what }) => fixWS`
+                            <li>${artistNames.includes(who)
+                                ? `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>`
+                                : who
+                            } ${what && `(${getContributionString({what})})`}</li>
+                        `).join('\n')}
+                    </ul>
+                `}
                 <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                 <ul>
                     ${flash.tracks.map(ref => {
                         const track = getLinkedTrack(ref);
                         const neighm = ref.match(/(.*?\S):/) || [ref, ref];
                         if (track) {
+                            const neeeighm = neighm[1].replace('$$$$', ':');
                             return fixWS`
                                 <li>
-                                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${neighm[1]}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${neeeighm}</a>
                                     <span class="by">by ${getArtistString(track.artists)}</span>
                                 </li>
                             `;
@@ -1102,7 +1189,6 @@ async function writeFlashPage(flash) {
 
 function writeListingPages() {
     const allArtists = artistNames.slice().sort();
-    const albumsAndTracks = albumData.concat(allTracks)
 
     const getAlbumLI = (album, extraText = '') => fixWS`
         <li>
@@ -1114,7 +1200,7 @@ function writeListingPages() {
     const getArtistLI = artistName => fixWS`
         <li>
             <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artistName)}/index.html">${artistName}</a>
-            (${C.getArtistNumContributions(artistName, {allTracks, albumData})} <abbr title="contributions (to music & art)">c.</abbr>)
+            (${C.getArtistNumContributions(artistName, {allTracks, albumData, flashData})} <abbr title="contributions (to music, art, and flashes)">c.</abbr>)
         </li>
     `;
 
@@ -1139,7 +1225,7 @@ function writeListingPages() {
             .map(({ name }) => name)
             .map(getArtistLI)],
         [['artists', 'by-commentary'], `Artists - by Commentary`, allArtists
-            .map(name => ({name, commentary: C.getArtistCommentary(name, {albumsAndTracks}).length}))
+            .map(name => ({name, commentary: C.getArtistCommentary(name, {justEverythingMan}).length}))
             .filter(({ commentary }) => commentary > 0)
             .sort((a, b) => b.commentary - a.commentary)
             .map(({ name, commentary }) => fixWS`
@@ -1149,7 +1235,7 @@ function writeListingPages() {
                 </li>
             `)],
         [['artists', 'by-contribs'], `Artists - by Contributions`, allArtists
-            .map(name => ({name, contribs: C.getArtistNumContributions(name, {albumData, allTracks})}))
+            .map(name => ({name, contribs: C.getArtistNumContributions(name, {albumData, allTracks, flashData})}))
             .sort((a, b) => b.contribs - a.contribs)
             .map(({ name }) => name)
             .map(getArtistLI)],
@@ -1413,7 +1499,8 @@ function getThemeString({fg, bg, theme}) {
 function getFlashDirectory(flash) {
     // const kebab = getKebabCase(flash.name.replace('[S] ', ''));
     // return flash.page + (kebab ? '-' + kebab : '');
-    return '' + flash.page;
+    // return '' + flash.page;
+    return '' + flash.directory;
 }
 
 function getAlbumListTag(album) {
@@ -1484,7 +1571,7 @@ function getTrackCover(track) {
     }
 }
 function getFlashCover(flash) {
-    return `${C.FLASH_DIRECTORY}/${flash.page}.${flash.jiff === 'Yeah' ? 'gif' : 'png'}`;
+    return `${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'png'}`;
 }
 
 function getFlashLink(flash) {
@@ -1552,12 +1639,12 @@ async function main() {
     }
 
     allTracks = C.getAllTracks(albumData);
-    artistNames = C.getArtistNames(albumData);
+    artistNames = C.getArtistNames(albumData, flashData);
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
     officialAlbumData = albumData.filter(album => !album.isFanon);
     fandomAlbumData = albumData.filter(album => album.isFanon);
-    tracksAndAlbums = C.sortByDate(allTracks.concat(albumData));
+    justEverythingMan = C.sortByDate(allTracks.concat(albumData, flashData));
 
     {
         const directories = [];

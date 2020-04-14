@@ -977,3 +977,376 @@ Page: 8130
 Date: October 25, 2016
 Tracks:
 - Ascend
+------------------------------------------------------------------------------
+ACT: Hiveswap Friendsim
+FG: #d3ff8f
+------------------------------------------------------------------------------
+Flash: Of Bloodthurst and Bratwurst
+Contributors:
+- Andrew Hussie (writing: Ardata, Diemen)
+- Danny Cragg (art: characters, backgrounds, endings)
+- Shelby Cragg (art: colorist)
+- David Turnbull (programming)
+Directory: fs-vol1
+Date: April 13, 2018
+Tracks: Breeding Duties, Moonshine
+------------------------------------------------------------------------------
+Flash: Of Aesthetics, Crimson and Otherwise
+Contributors:
+- Aysha U. Farah (writing: Amisia)
+- Anonymous (writing: Cirava)
+- Danny Cragg (art: characters, backgrounds, endings)
+- Shelby Cragg (art: colorist)
+- David Turnbull (programming)
+Directory: fs-vol2
+Date: April 27, 2018
+Tracks: ARTCHOP (APPARENTLY), Ｍ Ｏ Ｉ Ｓ Ｔ:moist
+------------------------------------------------------------------------------
+Flash: Of Ladies Gray and Lusii White
+Contributors:
+- Aysha U. Farah (writing: Skylla)
+- Cee L. Kyle (writing: Bronya)
+- Adrienne Garcia (art: characters, backgrounds, endings)
+- David Turnbull (programming)
+Directory: fs-vol3
+Date: May 11, 2018
+Tracks: Dapper Dueling, Phantasmagoric Waltz
+------------------------------------------------------------------------------
+Flash: Of Wright and Wronged
+Contributors:
+- Lalo Hunt (writing: Tagora)
+- Magdalena Clark (writing: Vikare)
+- Gina Chacón (art: characters, backgrounds, endings)
+- David Turnbull (programming)
+Directory: fs-vol4
+Date: May 25, 2018
+Tracks: Call me Gor-Gor, Thip of the Tongue
+------------------------------------------------------------------------------
+Flash: Of Affection, Unwanted or Untrue
+Contributors:
+- Aysha U. Farah (writing: Polypa)
+- Cee L. Kyle (writing: Zebruh)
+- Adrienne Garcia (art: characters, backgrounds, endings)
+- David Turnbull (programming)
+Directory: fs-vol5
+Date: June 8, 2018
+Tracks: Coursing, Hollow Suit
+------------------------------------------------------------------------------
+Flash: Of Text and Envy, Green
+Contributors:
+- Magdalena Clark (writing: Elwurd)
+- Aysha U. Farah (writing: Kuprum & Folykl)
+- Danny Cragg (art: characters, backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol6
+Date: June 22, 2018
+Tracks: Superego, >tfw another james roach track:tfw-another-james-roach-track
+------------------------------------------------------------------------------
+Flash: Of Business, Flagrantly Illegal
+Contributors:
+- Cee L. Kyle (writing: Remele)
+- Aysha U. Farah (writing: Konyyl)
+- Gina Chacón (art: characters, backgrounds, endings)
+- David Turnbull (programming)
+Directory: fs-vol7
+Date: July 6, 2018
+Tracks:
+- Piwates ',$$$$^]:piwates
+- Olive Scribe
+------------------------------------------------------------------------------
+Flash: Of Stresses, Song and Otherwise
+Contributors:
+- Lalo Hunt (writing: Tyzias)
+- Aysha U. Farah (writing: Chixie)
+- Adrienne Garcia (art: characters, backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol8
+Date: July 20, 2018
+Tracks: Single Female Lawyer, it be like that sometimes
+------------------------------------------------------------------------------
+Flash: Of Gazes Cool and Tempers Hot
+Contributors:
+- Kieran Miranda (writing: Azdaja)
+- Aysha U. Farah (writing: Chahut)
+- Gina Chacón (art: characters, backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol9
+Date: August 3, 2018
+Tracks: DaJam, take me to clown church
+------------------------------------------------------------------------------
+Flash: Of Faraway Lands and Nearby Pals
+Contributors:
+- Aysha U. Farah (writing: Zebede)
+- Magdalena Clark (writing: Zebede)
+- David Turnbull (writing: Tegiri)
+- Adrienne Garcia (art: characters)
+- Phil Gibson (art: backgrounds, endings)
+- Angela Sham (art: backgrounds)
+Directory: fs-vol10
+Date: August 17, 2018
+Tracks:
+- beekeeper who? i dont know her.
+- ASSAULT
+------------------------------------------------------------------------------
+Flash: Of Pals and Promises, Made and Broken
+Contributors:
+- Aysha U. Farah (writing: Mallek)
+- Cee L. Kyle (writing: Lynera)
+- Adrienne Garcia (art: characters)
+- Phil Gibson (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol11
+Date: August 31, 2018
+Tracks: fortnite funny moments epic fails episode 413, Frostbite
+------------------------------------------------------------------------------
+Flash: Of Know-Nothings and Know-It-Alls
+Contributors:
+- Lalo Hunt (writing: Galekh)
+- David Turnbull (writing: Tirona)
+- Adrienne Garcia (art: characters)
+- Leland Goodman (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol12
+Date: September 14, 2018
+Tracks: Snow Pollen, Carefree Princess Berryboo
+------------------------------------------------------------------------------
+Flash: Of Fate, Fortune, and Fashion
+Contributors:
+- Aysha U. Farah (writing: Boldir)
+- Kieran Miranda (writing: Stelsa)
+- Adrienne Garcia (art: characters)
+- Phil Gibson (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol13
+Date: September 28, 2018
+Tracks: Old Secret, IIYWASWIWTBOTSA4AATWUOTDTMIHCIMFH
+------------------------------------------------------------------------------
+Flash: Of Cleanliness and Clownliness
+Contributors:
+- Aysha U. Farah (writing: Marsti)
+- Thomas Carr (writing: Karako)
+- Kim Quach (art: characters)
+- Angela Sham (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol14
+Date: October 10, 2018
+Tracks: SERVICE CAR, (an ascii image of bowsette)
+------------------------------------------------------------------------------
+Flash: Of Creatives, Conventional or Otherwise
+Contributors:
+- Kieran Miranda (writing: Charun)
+- Lalo Hunt (writing: Wanshi)
+- Adrienne Garcia (art: characters)
+- Phil Gibson (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol15
+Date: October 26, 2018
+Tracks: Charun's Cave, idk man you name it im tired
+------------------------------------------------------------------------------
+Flash: Of Cult- And Capt-ivation
+Contributors:
+- Thomas Carr (writing: Fozzer)
+- V (writing: Marvus)
+- Kim Quach (art: characters)
+- CJ Walker (art: backgrounds, endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol16
+Date: November 9, 2018
+Tracks: GRAVEYARD SHIFT, CLOWNFUCKER
+------------------------------------------------------------------------------
+Flash: Of Teen and Tech, Acerbic
+Contributors:
+- Cee L. Kyle (writing: Daraya)
+- David Turnbull (writing: Nihkee, programming)
+- Adrienne Garcia (art: characters)
+- Phil Gibson (art: backgrounds)
+- Kim Quach (art: endings)
+- Mint Chipleaf (programming)
+Directory: fs-vol17
+Date: November 30, 2018
+Tracks:
+- (this title was too long)
+- turns out its like the shoe
+- END OF FRIENDVANGELION
+------------------------------------------------------------------------------
+Flash: Of Endings, Many
+Contributors:
+- V (writing: Lanque)
+- Kieran Miranda (writing: Soleil Twins)
+- Kim Quach (art: characters)
+- CJ Walker (art: backgrounds, endings)
+- Adrienne Garcia (art: colorist)
+- Mint Chipleaf (programming)
+Directory: fs-vol18
+Date: December 14, 2018
+Tracks:
+- yall know i just do the music right
+- VALID END
+- the final clowntdown
+------------------------------------------------------------------------------
+Flash: Of Hosts, Excellent
+Contributors:
+- Aysha U. Farah (writing)
+- Lalo Hunt (writing)
+- Kim Quach (art: characters)
+- Phil Gibson (art: endings)
+- Mint Chipleaf (programming)
+Directory: fs-epilogue
+Date: December 14, 2018
+Tracks: WORST END
+------------------------------------------------------------------------------
+ACT: Pesterquest
+FG: #71daff
+------------------------------------------------------------------------------
+Flash: Magic Is Fucking Real
+Contributors:
+- Aysha U. Farah (writing: Prologue)
+- Andrew Hussie (writing: John, art: backgrounds)
+- Kim Quach (art: characters)
+- Xamag (art: backgrounds, endings)
+Directory: pq-vol1
+Date: September 4, 2019
+Tracks:
+- WORST END
+- sometimes i call andrew hussie 'andy' and so far he hasn't corrected me
+------------------------------------------------------------------------------
+Flash: Something Beyond The Sky
+Contributors:
+- Aysha U. Farah (writing)
+- Breya Rivera (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol2
+Date: September 4, 2019
+Tracks: please support The Trevor Project
+------------------------------------------------------------------------------
+Flash: A King's Feast of Ass
+Contributors:
+- James Roach (writing)
+- Gina Chacón (art: characters)
+- Xamag (art: backgrounds, endings)
+Directory: pq-vol3
+Date: September 18, 2019
+Tracks:
+- 2chords
+- ill probably just name this one something normal oh no wait oh jeez aw beans
+- 24/7 lo fi anime beats to question your sexuality to
+------------------------------------------------------------------------------
+Flash: The Loneliest Girl In The World
+Contributors:
+- David Turnbull (writing)
+- Breya Rivera (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol4
+Date: October 2, 2019
+Tracks: CAREFREE VICTORY (REMIX)
+------------------------------------------------------------------------------
+Flash: Skip to The Trolls
+Contributors:
+- Aysha U. Farah (writing: Karkat)
+- Magdalena Clark (writing: Kanaya)
+- Gina Chacón (art: characters)
+- Phil Gibson (art: backgrounds, endings)
+Directory: pq-vol5
+Date: October 16, 2019
+Tracks: CRUSTacean:crustacean-pq, Darling Kanaya
+------------------------------------------------------------------------------
+Flash: Clowns and Corsairs
+Contributors:
+- Aysha U. Farah (writing: Gamzee)
+- Kate Mitchell (writing: Vriska)
+- Haven Daniels-Taylor (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol6
+Date: October 30, 2019
+Tracks: mIrAcLeS, Superego
+------------------------------------------------------------------------------
+Flash: Dragons and Dairy
+Contributors:
+- Lalo Hunt (writing: Equius)
+- Sarah Zedig (writing: Terezi)
+- Xamag (art: characters)
+- Gina Chacón (art: backgrounds, endings)
+Directory: pq-vol7
+Date: November 13, 2019
+Tracks: CH3CK TH3 M3T4D4T4, Indigo Heir
+------------------------------------------------------------------------------
+Flash: Team Charge
+Contributors:
+- David Turnbull (writing: Tavros)
+- James Roach (writing: Aradia)
+- Breya Rivera (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol8
+Date: December 5, 2019
+Tracks:
+- Bronze Rebel
+- yeah, it is
+------------------------------------------------------------------------------
+Flash: Blood and Binary
+Contributors:
+- Aysha U. Farah (writing: Nepeta)
+- Anonymous 2.0 (writing: Sollux)
+- Haven Daniels-Taylor (art: Nepeta, Pounce)
+- Gina Chacón (art: Sollux)
+- Charlie Flocke (art: backgrounds, endings)
+Directory: pq-vol9
+Date: December 20, 2019
+Tracks: Requiem, KWCOM DOT WAV
+------------------------------------------------------------------------------
+Flash: Wow Pesterquest Your Mom Lets You Have Two Fish ?
+Contributors:
+- Griever (writing: Eridan)
+- Thomas Carr (writing: Feferi)
+- Kim Quach (art: characters)
+- Gina Chacón (art: backgrounds, endings)
+Directory: pq-vol10
+Date: January 15, 2020
+Tracks:
+- THIS TIME ITS ERIDAN (I FORGOT WHAT I NAMED THIS)
+- The La2t Frontiier
+- Love You (Feferi's Theme)
+------------------------------------------------------------------------------
+Flash: The Call Of Leadership
+Contributors:
+- Pip Dillistone (writing)
+- Gina Chacón (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol11
+Date: February 5, 2020
+Tracks: i guess
+------------------------------------------------------------------------------
+Flash: Thats right ADVENTURE!!!!
+Contributors:
+- Magdalena Clark (writing)
+- Breya Rivera (art: characters)
+- Gina Chacón (art: backgrounds, endings)
+Directory: pq-vol12
+Date: February 19, 2020
+Tracks: Riches to Ruins Movement II
+------------------------------------------------------------------------------
+Flash: Friendship Wozard
+Contributors:
+- Lalo Hunt (writing)
+- Haven Daniels-Taylor (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol13
+Date: March 4, 2020
+Tracks:
+- Would you believe this was for something else
+- Even in Death (T'Morra's Belly Mix)
+------------------------------------------------------------------------------
+Flash: Just Go Ahead Now
+Contributors:
+- Lalo Hunt (writing: Dirk)
+- Aysha U. Farah (writing: Afterw@rd)
+- Gina Chacón (art: characters)
+- Courtney Brendle (art: backgrounds, endings)
+Directory: pq-vol14
+Date: April 1, 2020
+Tracks:
+- Stress
+- Beatup
+- Unite Synchronization
+- this is like... what was it... > [S] MSPAR$$$$ Remember:mspar-remember
+- normal song name
+- Embittered Shore
