@@ -12,20 +12,48 @@ Track: Now I'm a Villain
 Artist: David Ellis
 URLs: https://homestuck.bandcamp.com/track/now-im-a-villain
 References: Showtime (Original Mix)
+Commentary:
+    <i>David Ellis:</i>
+    (<a href="https://twitter.com/Ducksual/status/1249782135688437761">Twitter</a>)
+    It was fun to play lots of nice low 7 string guitar chugs and to try and make it sound as villainous as possible. :)
 -------------------------------------------------------------------------------
 Track: Cosmic Carousel
 Artist: polysaw
-URLs: https://homestuck.bandcamp.com/track/cosmic-carousel
+Track Art: CrepesAhoy
+URLs:
+- https://homestuck.bandcamp.com/track/cosmic-carousel
+- https://www.youtube.com/watch?v=xxVwRERwmJg
+- https://soundcloud.com/polysaw/homestuck-beyond-canon-cosmic-carousel
 -------------------------------------------------------------------------------
 Track: Surprise, We're Back
 Artist: Sean Gorter
-URLs: https://homestuck.bandcamp.com/track/surprise-were-back
 References: End of Act
+URLs:
+- https://homestuck.bandcamp.com/track/surprise-were-back
+- https://soundcloud.com/flareproductions/surprise-were-back
+Commentary:
+    <i>Sean Gorter:</i>
+    (<a href="https://soundcloud.com/flareproductions/surprise-were-back">SoundCloud</a>)
+    Surprise, bitch. Bet you didn't see this album coming.
 -------------------------------------------------------------------------------
 Track: SPLIT REALITY
-Artist: Xaurix
-URLs: https://homestuck.bandcamp.com/track/split-reality
+Artist: Xauric
+URLs:
+- https://homestuck.bandcamp.com/track/split-reality
+- https://www.youtube.com/watch?v=XzZ7PNmcHiU
 References: Alphamatic Replacement
+Commentary:
+    <i>Xauric:</i>
+    (<a href="https://twitter.com/Xauric/status/1249774701691301894">Twitter</a>)
+    Eight years ago, I made a track for a webcomic called Homestuck for a music competition.
+    Today, I'm happy to announce the official release of my track, SPLIT REALITY, on the newest Homestuck album, Beyond Canon!!!
+    Enjoy <3
+    I'm also officially apart of the Homestuck music team, and will be working with them further for more releases~
+    <3 <3 <3
+    (<a href="https://www.youtube.com/watch?v=XzZ7PNmcHiU">YouTube</a>)
+    K I wanna be real with y'all here.
+    This track means a lot to me in more than one way. Between a bunch of depressive episodes and just outstanding amounts of imposter syndrome, I had a lot of anxiety that I wouldn't even be able to make a track that was in the ballpark of "good", let alone at all worthy of being on the first official album of Homestuck^2. And for a while there, I wasn't really making things I was at all enjoying or proud of. I was worried of making something that wasn't "homestuck" enough, or wasn't something people were really expecting. But the support of the amazing Homestuck music team helped contribute to a track I can firmly say I'm proud of, and even being included on this album means the world to me.
+    So I really, really do hope you guys enjoy this <3
 -------------------------------------------------------------------------------
 Track: Assembly
 Artist: Erik Scheele
@@ -48,22 +76,65 @@ Lyrics:
     The sparks of fire, earthbound,<br>have found your home. Be gone now.<br>It’s not your fault, you know this.<br>But the leaving is still the same.
     You sent me fire.<br>Fire, I’ll tear my throat out.<br>Burn my blackened lips.<br>You gave me fire.<br>Fire, I’ll tear my heart out.<br>I’d rather tear my heart out.<br>But I can’t stay here.
     The sparks of fire earthbound<br>have found your home. Be gone now.<br>It’s not your fault, you know this.<br>But you can’t help but turn around.<br>The embers haven’t faded.<br>The love you left, unmade.<br>It’s not your fault, you know this.<br>But the leaving is still the same.
+Commentary:
+    <i>Marcus Carline:</i>
+    (<a href="https://twitter.com/marcuscarline/status/1249814813179428864">Twitter</a>)
+    So I did a thing (was a small part in doing a thing). My track is The Leaving, but honestly give this whole thing a listen. I'm very proud to be included here. Happy Homestuck Day!
 -------------------------------------------------------------------------------
 Track: Light Burns Out (Gestalt)
 Artist: Waif
-URLs: https://homestuck.bandcamp.com/track/light-burns-out-gestalt
+Track Art: Waif
+URLs:
+- https://homestuck.bandcamp.com/track/light-burns-out-gestalt
+- https://soundcloud.com/shes-beautiful/light-goes-out-gestalt
+Commentary:
+    <i>Waif:</i>
+    (<a href="https://soundcloud.com/shes-beautiful/light-goes-out-gestalt">SoundCloud</a>)
+    It is all happening again
+    She needed the money
+    (<a href="https://twitter.com/sexwarlocks/status/1249775240261120000">Twitter</a>)
+    Time is a flat circle and I made another official song for #homestuck to be released on #homestuckday
+    It never ends
+    I do not know WHY it happens but it does
+    If you are confused<br>Understand<br>So am i
+    All jokes aside i'm really very happy with this song and i think it's cool and big and i hope you all like it too
 -------------------------------------------------------------------------------
 Track: Hometeam Adv8ntage
 Artist: Twirlin' Curtis
 URLs: https://homestuck.bandcamp.com/track/hometeam-adv8ntage
+Commentary:
+    <i>Twirlin' Curtis:</i>
+    (<a href="https://twitter.com/TwirlinCurtis/status/1249775784941760512">Twitter</a>)
+    Whoops, might have fucked around and wrote music for @homestuck
+    please enjoy
+    My tune is called Hometeam Adv8ntage, btw!
+    Hugest thanks to @barkbarkclark for being awesome amazing the best ever and having me on! <3 <3 <3
 -------------------------------------------------------------------------------
 Track: After the Sun
 Artist: Circlejourney
-URLs: https://homestuck.bandcamp.com/track/after-the-sun
+URLs:
+- https://homestuck.bandcamp.com/track/after-the-sun
+- https://www.youtube.com/watch?v=wEIWdGAOBuc
+Commentary:
+    <i>Circlejourney:</i>
+    (<a href="https://twitter.com/circlejourney/status/1249775612799201280">Twitter</a>)
+    I made this track for the Homestuck music team's new album, Beyond Canon. I'm humbled to be a part of this incredible project; you can listen to the album at <a href="https://homestuck.bandcamp.com/album/beyond-canon">http://homestuck.bandcamp.com/album/beyond-canon</a>!
+    (<a href="https://twitter.com/circlejourney/status/1249858664057327616">Twitter</a>)
+    as promised...
+    me in 2016: I should join at least one Homestuck fan project before the comic ends, this may be my last chance
+    me in 2020, somehow on the team of people who made the music that inspired me, making music for a comic that's still going: well,
 -------------------------------------------------------------------------------
 Track: Narrative Command
 Artist: Sean William Calhoun
-URLs: https://homestuck.bandcamp.com/track/narrative-command
+Track Art: Sean William Calhoun
+URLs:
+- https://homestuck.bandcamp.com/track/narrative-command
+- https://www.youtube.com/watch?v=keoJTpGQxPE
+Commentary:
+    <i>Sean William Calhoun:</i>
+    (<a href="https://www.youtube.com/watch?v=keoJTpGQxPE">YouTube</a>)
+    <blockquote>Holy crap. Impeccable. I might transcribe this for my music project.</blockquote>
+    This might make it a bit easier — I made a notated blueprint before I started producing it (notated on two piano grand staves, because that's easy for me to parse, but it's certainly not a playable two-piano score). It's not 100% accurate to how it wound up (and I'm not going to fix it, because I don't have any use for an accurate "score"), but if you take this as a slightly-flawed transcription you can probably get the rest relatively easily. <a href="misc/narrative-command-blueprint.pdf">(link!)</a>
 -------------------------------------------------------------------------------
 Track: eleventh hour
 Artist: Monobrow
@@ -75,7 +146,13 @@ URLs: https://homestuck.bandcamp.com/track/adios-lost-boys
 -------------------------------------------------------------------------------
 Track: Moving Onwards
 Artist: Matthias Ramalho
-URLs: https://homestuck.bandcamp.com/track/moving-onwards
+URLs:
+- https://homestuck.bandcamp.com/track/moving-onwards
+- https://soundcloud.com/friendly-coy/moving-onwards
+Commentary:
+    <i>Matthias Ramalho:</i>
+    (<a href="https://soundcloud.com/friendly-coy/moving-onwards">SoundCloud</a>)
+    My track from the album "Beyond Canon", by the Homestuck^2 Music Team. So he-hey I got to the big leagues! don't know how I got here but I gotta tell ya, it feels awesome.
 -------------------------------------------------------------------------------
 Track: Make a Pretty Picture
 Artist: Tristan Scroggins
@@ -93,7 +170,22 @@ Lyrics:
     i burned the bridges thoroughly but still everyone's trusting me again<br>and i should be relieved but it happened so suddenly<br>and i know in my heart i haven't earned this,<br>but everyone acts like my concern isn't a problem<br>like nothing is wrong with my very involvement
     but i know how the song ends
     i can’t begin to list the times that i’ve walked<br>along this road and concluded<br>that nothing that i’ve done here will make sense, in the end<br>but i find that kind of soothing
+Commentary:
+    <i>Robert J! Lake:</i>
+    (<a href="https://twitter.com/spellbang/status/1249755343615393792">Twitter</a>)
+    might fuck around and release some stuckhome syndrome music today...
+    by that i mean i'm definitely releasing some stuckhome syndrome music today. if all goes well i'll probably have it up in like...maybe a little over an hour?
+    no promises but you know. i am just a little creacher
+    -
+    i wasn't technically lying
 -------------------------------------------------------------------------------
 Track: crystal hung in firmament's descent
 Artist: Emelia K.
-URLs: https://homestuck.bandcamp.com/track/crystal-hung-in-firmaments-descent
+Track Art: Emelia K.
+URLs:
+- https://homestuck.bandcamp.com/track/crystal-hung-in-firmaments-descent
+- https://soundcloud.com/emelia-kaylee/crystal-hung-in-firmaments-descent
+Commentary:
+    <i>Emelia K.:</i>
+    (<a href="https://soundcloud.com/emelia-kaylee/crystal-hung-in-firmaments-descent">SoundCloud</a>)
+    a silence descends
