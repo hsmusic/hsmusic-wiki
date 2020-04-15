@@ -1511,6 +1511,35 @@ function getAlbumListTag(album) {
     }
 }
 
+function chronologyButtons(currentTrack, {mapProperty, toArtist, filterCondition, headingWord}) {
+    return currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist).map(artist => {
+        if (!artistNames.includes(artist)) return '';
+
+        const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && track[mapProperty] && track[mapProperty].map(toArtist).includes(artist));
+        const index = releasedTracks.indexOf(currentTrack);
+
+        if (index === -1) return '';
+
+        const previous = releasedTracks[index - 1];
+        const next = releasedTracks[index + 1];
+        const parts = [
+            previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" title="${previous.name}">Previous</a>`,
+            next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" title="${next.name}">Next</a>`
+        ].filter(Boolean);
+
+        const heading = `${th(index + 1)} ${headingWord} by <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html">${artist}</a>`;
+
+        return parts.length ? fixWS`
+            <p>
+                ${heading}<br>
+                (${parts.join(', ')})
+            </p>
+        ` : fixWS`
+            <p>${heading}</p>
+        `;
+    }).filter(Boolean).join('\n');
+}
+
 function generateSidebarForAlbum(album, currentTrack = null) {
     const listTag = getAlbumListTag(album);
     return fixWS`
@@ -1522,10 +1551,24 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 <li class="${track === currentTrack ? 'current' : ''}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a></li>
             `).join('\n')}
         </${listTag}>
-        <hr>
-        <p>
-            <a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">Random track</a></li>
-        </p>
+        ${(album.tracks.length > 1 || currentTrack) && `<hr>`}
+        ${album.tracks.length > 1 && fixWS`
+            <p>
+                <a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">Random track</a></li>
+            </p>
+        `}
+        ${currentTrack && fixWS`
+            ${chronologyButtons(currentTrack, {
+                mapProperty: 'artists',
+                toArtist: artist => artist,
+                headingWord: 'track'
+            })}
+            ${chronologyButtons(currentTrack, {
+                mapProperty: 'coverArtists',
+                toArtist: ({ who }) => who,
+                headingWord: 'track art'
+            })}
+        `}
     `
 }
 
