@@ -109,8 +109,8 @@ Artist: James Roach
 Track Art: melodiousDiscord
 URLs: https://unofficialmspafans.bandcamp.com/track/glow-in-the-distance-save
 -------------------------------------------------------------------------------
-Track: Lulling Lutescant [Prospit Sleep]
-Directory: lulling-lutescant
+Track: Lulling Lutescent [Prospit Sleep]
+Directory: lulling-lutescent
 Artist: Veritas Unae
 Track Art: Phosphorescence
 URLs: https://unofficialmspafans.bandcamp.com/track/lulling-lutescent-prospit-sleep

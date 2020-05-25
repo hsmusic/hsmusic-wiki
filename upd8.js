@@ -584,14 +584,6 @@ async function processArtistDataFile(file) {
     const sections = Array.from(getSections(contentLines));
 
     return sections.map(section => {
-        if (getBasicField(section, 'ACT')) {
-            act = getBasicField(section, 'ACT');
-            theme = {
-                fg: getBasicField(section, 'FG')
-            };
-            return {act8r8k: true, act, theme};
-        }
-
         const name = getBasicField(section, 'Artist');
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
         const alias = getBasicField(section, 'Alias');

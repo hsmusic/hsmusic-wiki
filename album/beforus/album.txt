@@ -375,7 +375,7 @@ Commentary:
     So rad, even the ramps are skateboards. The special-effects explosions that come with this land, thankfully, have no scent.
     Bright colors are especially dangerous and I thought they suited the track, and I ran with my tried-and-tested graphic style!
 -------------------------------------------------------------------------------
-Track: Scratchlses Scraps
+Track: Scratchless Scraps
 Artist: ndividedbyzero
 Track Art: Neiratina
 URLs: https://unofficialmspafans.bandcamp.com/track/scratchless-scraps
@@ -786,9 +786,9 @@ Track Art: Fayghost
 URLs: https://unofficialmspafans.bandcamp.com/track/funeral-march-of-the-avenging-dead
 Commentary:
     <i>SerialSymphony:</i>
-    Someone needs to take my voilins away fro me, I love them too much.<br>-'Skip'/SerilaSymphony
+    Someone needs to take my violins away fro me, I love them too much.<br>-'Skip'/SerilaSymphony
     <i>Fayghost:</i>
-    Don't worry, your violins are safe with me. I promise to wakl them twice a day.
+    Don't worry, your violins are safe with me. I promise to walk them twice a day.
 -------------------------------------------------------------------------------
 Track: Past and Present
 Artist: Oliver Hendricks
@@ -971,20 +971,20 @@ Track: Rex Duodecim Daemonia X (ReDuX)
 Artist: Veritas Unae
 Track Art: HermesNitram
 References:
-- ♈ - Fatalism
-- ♉ - Breathtak1ng
-- ♊ - The Mituna Method
-- ♋ - Civil Discussi9n
-- ♌ - MOG^3
-- ♍ - Let Me Dance, Let Me Glisten
-- ♎ - R4d1c4l!
-- ♏ - Salv8tion
-- ♐ - Creeping Blue
-- ♑ - Pious Noise
-- ♒ - Aquasex Renegade
-- ♓ - Killer Beach
 - Rex Duodecim Angelus
+- ♋ - Civil Discussi9n
+- ♐ - Creeping Blue
+- ♉ - Breathtak1ng
+- ♌ - MOG^3
+- ♑ - Pious Noise
+- ♈ - Fatalism
+- ♏ - Salv8tion
+- ♍ - Let Me Dance, Let Me Glisten
+- ♒ - Aquasex Renegade
+- ♎ - R4d1c4l!
+- ♊ - The Mituna Method
 - The Thirteenth Hour
+- ♓ - Killer Beach
 URLs: https://unofficialmspafans.bandcamp.com/track/rex-duodecim-daemonia-x-redux
 Commentary:
     <i>Veritas Unae:</i>
