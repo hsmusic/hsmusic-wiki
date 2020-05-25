@@ -3,6 +3,10 @@ Artist: Alexander Rosetti
 Cover Art: Marina
 Date: October 23, 2012
 FG: #00aa77
+URLs:
+- https://albatrosssoup.bandcamp.com/album/genesis-frog
+- https://www.youtube.com/watch?v=V_RoZCvUP9w
+- https://www.youtube.com/playlist?list=PLia7MqxG6On5M5Z2OtoNgCWzNmCiRcWZo
 Commentary:
     <i>Alexander Rosetti:</i>
     I’m uploading the commentary for Genesis Frog as text for those of you who could not buy my album but were interested in a composer’s thoughts and detailed descriptions on its concept and execution. This is Part 1 of 4. If you like the album I encourage you to purchase it if you are able, as it helps support me and it will be that much easier to bring you more music in the future!
@@ -172,7 +176,7 @@ Commentary:
     The piece opens with a major chord in the strings, as if to continue the train of thought left behind by the previous track’s end. However, the chord quickly changes into something more dissonant, and the tone shifts from light to dark. The choir answers the strings, and the piece progresses in this manner with the two sections being featured the most. A gamelan ensemble plays in the background, very out of tune with the rest of the ensemble, lending to the sense of foreboding. There is a musical device in here that represents Jack, a descending line that implies a tritone. It comes in quietly and at irregular intervals, indicative of the murderous asshole lying in wait among the confines of the temple. As the music progresses, this motive comes in more and more until it is an ostinato under the chordal strings and choir. Eventually the piece crescendos and leads into the next track, where Jack is finally the star of the show.
 -------------------------------------------------------------------------------
 Track: Bilious
-References: Prospitian Folklore, Black, The Temple's Withered Bloom
+References: Prospitian Folklore, Liquid Negrocity, The Temple's Withered Bloom
 Track Art: Rikuru
 URLs: https://albatrosssoup.bandcamp.com/track/bilious
 Commentary:

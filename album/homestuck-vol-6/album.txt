@@ -4,6 +4,10 @@ Track Art: Homestuck
 Directory: homestuck-vol-6
 Date: January 5 2011
 FG: #6699ff
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-5-6-with-the-felt
+- https://www.youtube.com/watch?v=jrNz5d97JIA
+- https://www.youtube.com/playlist?list=PL6_yub4_EV2S0deHxo7RKV0zPQ0TCx7Za
 -------------------------------------------------------------------------------
 Track: Frost
 Artist: Solatrus
@@ -113,7 +117,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Blackest Heart
 Artist: Mark Hadley
-References: Black
+References: Liquid Negrocity
 URLs: https://homestuck.bandcamp.com/track/blackest-heart-2
 Commentary:
     <i>Mark Hadley:</i>

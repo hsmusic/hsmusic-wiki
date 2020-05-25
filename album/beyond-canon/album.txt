@@ -3,10 +3,30 @@ Date: April 13, 2020
 Cover Art: Xamag
 Track Art: none
 FG: #f2a400
+Canon: Beyond
+URLs:
+- https://homestuck.bandcamp.com/album/beyond-canon
+- https://www.youtube.com/watch?v=CliIjlWjOMY
+- https://www.youtube.com/playlist?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 -------------------------------------------------------------------------------
 Track: exclusion zone
 Artist: horizon
-URLs: https://homestuck.bandcamp.com/track/exclusion-zone
+URLs:
+- https://homestuck.bandcamp.com/track/exclusion-zone
+- https://www.youtube.com/watch?v=yllaAhv5EYA
+Lyrics:
+    (vocalizations of "ee" and "ah")<br>always<br>you --<br>(vocalizations of "ee" and "ah" continue)<br>-- made a monster<br>ha ha ha<br>ha ha-ah
+    <i>"You sit up there all day long and do <b>nothing.</b> Except come down and make tea.</i>
+    you just made a monster (x4)
+    (sampled vocoder breakdown begins)
+    the skyline, the skyline, the<br>storyteller<br>the skyline, the skyline<br>the storyteller
+    you just made a monster (x4)
+Commentary:
+    <i>horizon:</i>
+    (<a href="https://www.youtube.com/watch?v=yllaAhv5EYA">YouTube</a>)
+    my contribution to Homestuck^2's first album: exclusion zone from Beyond Canon.
+    i can't express how meaningful it was to be able to write something for this, so i won't try. all i can say is thank you, thank you, thank you.
+    you have given me a home i would be happy to be stuck in.
 -------------------------------------------------------------------------------
 Track: Now I'm a Villain
 Artist: David Ellis
@@ -86,12 +106,8 @@ Artist: Waif
 Track Art: Waif
 URLs:
 - https://homestuck.bandcamp.com/track/light-burns-out-gestalt
-- https://soundcloud.com/shes-beautiful/light-goes-out-gestalt
 Commentary:
     <i>Waif:</i>
-    (<a href="https://soundcloud.com/shes-beautiful/light-goes-out-gestalt">SoundCloud</a>)
-    It is all happening again
-    She needed the money
     (<a href="https://twitter.com/sexwarlocks/status/1249775240261120000">Twitter</a>)
     Time is a flat circle and I made another official song for #homestuck to be released on #homestuckday
     It never ends
@@ -112,9 +128,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: After the Sun
 Artist: Circlejourney
+Track Art: Circlejourney
 URLs:
 - https://homestuck.bandcamp.com/track/after-the-sun
 - https://www.youtube.com/watch?v=wEIWdGAOBuc
+- https://soundcloud.com/circlejourney/after-the-sun
 Commentary:
     <i>Circlejourney:</i>
     (<a href="https://twitter.com/circlejourney/status/1249775612799201280">Twitter</a>)
@@ -123,6 +141,8 @@ Commentary:
     as promised...
     me in 2016: I should join at least one Homestuck fan project before the comic ends, this may be my last chance
     me in 2020, somehow on the team of people who made the music that inspired me, making music for a comic that's still going: well,
+    (<a href="https://www.youtube.com/watch?v=wEIWdGAOBuc">YouTube</a>)
+    It's about beginnings in endings...building the world in the comic's early pages, and rebuilding the world after the end. But also, all interpretations are valid.
 -------------------------------------------------------------------------------
 Track: Narrative Command
 Artist: Sean William Calhoun
@@ -178,6 +198,19 @@ Commentary:
     no promises but you know. i am just a little creacher
     -
     i wasn't technically lying
+    (<a href="https://twitter.com/spellbang/status/1250780820287164419">Twitter</a>)
+    might as well talk a tiny bit about this song, Four Kids (and a Game They Played Together), since people are responding to it way more strongly than i kind of expected
+    the original version of the track from yeaaaaars ago i wrote as an instrumental i intended to be the "homestuck end credits theme," which ended up not panning out for a bunch of reasons, but the song was always a fave of mine, and stuck around on my hard drive until i polished it up as the finale of the main portion of Stuckhome Syndrome P1V1. i still love this version of the song very much.
+    i had a vocal version brewing in my head for ages. literally from before stuckhome syndrome was released. i mean, the first line (it's been a little bit since the last time we all talked/so how are all of you doing?) was just a sudden thing about me getting volume 10 together
+    i never had anything besides that opening line, though, not really. for ages i thought i'd finish it up for the last stuckhome volume (i haven't even put the 2nd together...but i will! this year probably?) but a lot  ended up hitting me in the interim and i didn't have time for it
+    about five months ago i was contacted to be a part of the homestuck 2 music team and was told the lowdown: it was a clean slate, and a chance to establish the musical rockbed for homestuck 2 going forward. no quotes of hs1 songs whatsoever, but we'd be making new songs TO quote
+    i messed around with a few other demos but it was pretty quick for me to settle on deciding to do this. since four kids was never actually released as part of homestuck proper, it ended up feeling like the perfect time to pull the track together for real.
+    though the instrumental of the new version came together with steady work over the past few months the actual vocals and lyrics didn't coalesce until about two weeks ago. i had messed around with dozens of variants until then; the only stuff finalized earlier was the chorus
+    singing it was fresh hell because it's stretching my range extremely hard, but i didn't want to do pitch correction. on the final track there is some on the backing vocals for two parts, mostly to help finish the thing quickly, but the majority of it is natural
+    it was endless, endless retakes and it still sound bad to my ears but i think the roughness maybe helps the emotional quality of the song? i guess?
+    for my part, i'm just glad it's done and i'm glad it's apparently good. anyway. thanks
+    oh and lastly i guess speculate all you want about the meaning of the song but i'm not going to engage with any of that stuff because i kinda feel like what the song is feeling is clear without my input on that front
+    but. yeah. thanks again. <3
 -------------------------------------------------------------------------------
 Track: crystal hung in firmament's descent
 Artist: Emelia K.

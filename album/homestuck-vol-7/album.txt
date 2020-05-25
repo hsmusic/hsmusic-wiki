@@ -3,10 +3,14 @@ Directory: homestuck-vol-7
 Cover Art: Homestuck
 Date: May 31, 2011 00:00:05
 FG: #b536da
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-7-8-with-cherubim
+- https://www.youtube.com/watch?v=mNibQ4LxeME
+- https://www.youtube.com/playlist?list=PL42042A1D4689C9E0
 -------------------------------------------------------------------------------
 Track: Black Rose / Green Sun
 Artist: Malcolm Brown
-Track Art: Vinks (lines), Shelby (colors)
+Track Art: Vinks (lines), Shelby Cragg (colors)
 URLs: https://homestuck.bandcamp.com/track/black-rose-green-sun-2
 Commentary:
     <i>Malcolm Brown:</i>
@@ -20,7 +24,7 @@ Commentary:
 Track: At The Price of Oblivion
 Artist: Malcolm Brown
 References: Chorale for Jaspers, Rex Duodecim Angelus, Black Rose / Green Sun, Aggrieve
-Track Art: Shelby
+Track Art: Shelby Cragg
 URLs: https://homestuck.bandcamp.com/track/at-the-price-of-oblivion-2
 Commentary:
     <i>Malcolm Brown:</i>
@@ -41,13 +45,13 @@ URLs: https://homestuck.bandcamp.com/track/even-in-death-2
 Track: Terezi Owns
 Artist: Toby Fox
 References: Upward Movement (Dave Owns)
-Track Art: Guzusuru
+Track Art: Angela Sham
 URLs: https://homestuck.bandcamp.com/track/terezi-owns-2
 -------------------------------------------------------------------------------
 Track: Trial and Execution
 Artist: Malcolm Brown
 References: The Lemonsnout Turnabout, Crystalanthemums
-Track Art: Shelby
+Track Art: Shelby Cragg
 URLs: https://homestuck.bandcamp.com/track/trial-and-execution-2
 Commentary:
     <i>Malcolm Brown:</i>
@@ -134,7 +138,7 @@ URLs: https://homestuck.bandcamp.com/track/earthsea-borealis-2
 -------------------------------------------------------------------------------
 Track: Warhammer of Zillyhoo
 Artist: Michael Guy Bowman
-Track Art: Vinks (lines), Shelby (colors)
+Track Art: Vinks (lines), Shelby Cragg (colors)
 URLs: https://homestuck.bandcamp.com/track/warhammer-of-zillyhoo-2
 -------------------------------------------------------------------------------
 Track: Savior of the Dreaming Dead

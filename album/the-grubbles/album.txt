@@ -4,6 +4,9 @@ Cover Art: The Grubbels
 Track Art: none
 Date: September 14, 2017 00:00:04
 FG: #dd0000
+URLs:
+- https://homestuck.bandcamp.com/album/hiveswap-act-1-ost-with-the-grubbles
+- https://www.youtube.com/playlist?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Broom Temperature
 URLs:

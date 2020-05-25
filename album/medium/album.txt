@@ -1,9 +1,12 @@
 Album: Medium
 Artist: Clark Powell
 Date: April 14, 2011
-Cover Art: Cindy Dominguez, Homestuck
+Cover Art: Cindy Dominguez
 Track Art: none
 FG: #22ccff
+URLs:
+- https://homestuck.bandcamp.com/album/symphony-impossible-to-play-with-medium
+- https://www.youtube.com/playlist?list=PLB9D2EAC43B6195B8
 -------------------------------------------------------------------------------
 Track: Light
 Directory: light-medium

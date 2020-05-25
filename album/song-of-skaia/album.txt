@@ -4,6 +4,9 @@ Cover Art: minty
 Track Art: none
 Date: January 1, 2012
 FG: #02b7ff
+URLs:
+- https://parsecproductions.bandcamp.com/album/song-of-skaia
+- https://www.youtube.com/playlist?list=PLnVpmehyaOFbcZ8PWCeZmXZZw0W9HQ_9T
 -------------------------------------------------------------------------------
 Track: Null
 Directory: null-mark-hadley

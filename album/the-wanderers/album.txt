@@ -2,6 +2,8 @@ Album: The Wanderers
 Cover Art: Lauren Ross
 Date: July 14, 2011
 FG: #ffcc66
+URLs:
+- https://www.youtube.com/playlist?list=PLF3092FD8EA59F218
 -------------------------------------------------------------------------------
 Track: Carapacian Dominion
 Artist: Seth Peelle
@@ -112,7 +114,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Nightmare
 Artist: Malcolm Brown
-References: Black, Rex Duodecim Angelus, Carapacian Dominion
+References: Liquid Negrocity, Rex Duodecim Angelus, Carapacian Dominion
 Track Art: Left
 URLs: https://youtu.be/CVxTL43Czuc
 Commentary:

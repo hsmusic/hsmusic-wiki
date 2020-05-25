@@ -3,6 +3,10 @@ Date: October 24 2011
 Cover Art: Homestuck
 Track Art: Homestuck
 FG: #aaccff
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-1-4-with-midnight-crew-drawing-dead
+- https://www.youtube.com/watch?v=9N342A3G5jo
+- https://www.youtube.com/playlist?list=PL6_yub4_EV2R6PzZdPigyPIiCGFfh3Nzb
 -------------------------------------------------------------------------------
 Track: Showtime (Piano Refrain)
 Artist: Kevin Regamey, Malcolm Brown

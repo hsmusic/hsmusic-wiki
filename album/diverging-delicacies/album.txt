@@ -3,6 +3,9 @@ Cover Art: Ephemerald
 Date: March 1, 2020
 FG: #f2a400
 Canon: Fanon
+URLs:
+- https://unofficialmspafans.bandcamp.com/album/diverging-delicacies
+- https://www.youtube.com/playlist?list=PL1fTYKSo2grAJ--CZjFkFeFa3Uy6-xV4x
 -------------------------------------------------------------------------------
 Track: Greetings from Earth C!
 Artist: pizzagremlin
@@ -169,7 +172,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/giving-up-the-ghost
 -------------------------------------------------------------------------------
 Track: Pursuit in Polykrome
 Artist: heir-of-puns
-Track Art: swan
+Track Art: sw4nfire
 URLs: https://unofficialmspafans.bandcamp.com/track/pursuit-in-polykrome
 -------------------------------------------------------------------------------
 Track: [CANDY EPILOGUE | 🍭]

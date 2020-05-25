@@ -4,6 +4,10 @@ Cover Art: P-PAMda
 Track Art: Homestuck
 Date: December 15, 2018
 FG: #33aaff
+URLs:
+- https://homestuck.bandcamp.com/album/hiveswap-friendsim
+- https://www.youtube.com/watch?v=UkwFC9Y_i4E
+- https://www.youtube.com/playlist?list=PLo6jbRGXGrthDwNj6v6rJKBBmRNluTn3d
 -------------------------------------------------------------------------------
 Track: ARTCHOP (APPARENTLY)
 URLs:
@@ -245,7 +249,7 @@ Commentary:
     (Lanque's other theme; no commentary)
 -------------------------------------------------------------------------------
 Track: WORST END
-References: English, Black, GRAVEYARD SHIFT
+References: English, Liquid Negrocity, GRAVEYARD SHIFT
 URLs: https://homestuck.bandcamp.com/track/worst-end
 Commentary:
     <i>James Roach:</i>

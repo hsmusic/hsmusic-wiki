@@ -3,6 +3,10 @@ Cover Art: skepticArcher
 Track Art: Homestuck
 Date: December 2 2010
 FG: #33aa55
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-5-6-with-the-felt
+- https://www.youtube.com/watch?v=o76TAd1ExFE
+- https://www.youtube.com/playlist?list=PLlGklfYAdslavhtb5kUefK1V_ki5NvbVu
 -------------------------------------------------------------------------------
 Track: Jade Dragon
 Artist: Robert J! Lake

@@ -3,6 +3,9 @@ Cover Art: Homestuck
 Track Art: Homestuck
 Date: April 6, 2016
 FG: #cc3322
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-9-10-with-s-collide-and-act-7
+- https://www.youtube.com/watch?v=OcwqP0pMxGE
 -------------------------------------------------------------------------------
 Track: Creata (Canon Edit)
 Artist: Seth Peelle
@@ -15,13 +18,14 @@ Contributors:
 - James Roach (editing, cheers)
 URLs: https://homestuck.bandcamp.com/track/oppa-toby-style-2
 References:
+- Ham And Steak
 - Rex Duodecim Angelus
 - English
 - Cascade (Beta)
 - Doctor
 - Crystalanthemums
 - Crustacean
-- Black
+- Liquid Negrocity
 Commentary:
     <i>James Roach:</i>
     i love cheers in songs (i edited the cheers into tobys song for [s] collide, and have written them into a few things) so the sword/shield gym theme really does it for me

@@ -4,6 +4,9 @@ Cover Art: melodiousDiscord
 Date: July 30, 2011
 FG: #4876ff
 Canon: Fanon
+URLs:
+- https://homestuckgaiden.bandcamp.com/album/land-of-fans-and-music-unofficial-album
+- https://www.youtube.com/playlist?list=PLobrSigyi16AZehECGnfHOlArBUu-96Ea
 Commentary:
     <i>Elaine Wang:</i>
     So. I'm Elaine Wang, orngjce223, electronic orange juice; and I do stuff. A lot of stuff really, like dragging a friend along on a dizzy jaunt through philosophy and moral free will in the context of Skaianet Laboratories, while writing an outline as to how to create a Rose Strider AU, while attempting to forecast whether GIF or PNG images will be readable in fifty years, while tossing around a rhythm in my head which might or might not turn into a song, while figuring out what environment variables to set in a bash shell to make it look as much like Homsetuck as possible, while doing pixel art to fill in the gaps, while cooking pasta.
@@ -60,7 +63,7 @@ Commentary:
     Fun fact: I didn't realise for a hwile that "Homestuck" and "Alternia" were technically remixes themselves, amking this a 3x remix-of-remix combob.
 -------------------------------------------------------------------------------
 Track: Downtime
-Artist: AutoDevote
+Artist: Thomas Ibarra
 Track Art: JNJ
 References:
 - Showtime (Piano Refrain)
@@ -102,13 +105,13 @@ Commentary:
     Initially everything is piled on top, in the center. In revision for the album I pan everything back and forth. It may be noted that this song still sounds perfectly fine in mono, though.
 -------------------------------------------------------------------------------
 Track: Crystalanachrony
-Artist: Well Manicured Man
+Artist: Willow Ascenzo
 Track Art: Aelyrin
 References:
 - Crystalanthemums
 URLs: https://homestuckgaiden.bandcamp.com/track/crystalanachrony
 Commentary:
-    <i>Well Manicured Man:</i>
+    <i>Willow Ascenzo:</i>
     If I had to pin this song to just one of Homestuck's swelling cast of characters, it would have to be Aradia. When we first meet her in the Hivebent act, she's an emotionless ghost who later becomes a ghost frog, then a ghost in a robot body (or a "ghost in the shell" :rimshot:), before making her final sea change into a cheerful fairy god with time powers (which explains the ticking and subtle reversem elodies of the song, atl east). The peppy piano and melancholy backing strings and woodwinds represent these aspects of Aradia's presonality - accustomed to death, she acts as a cheery Charon for her fallen teammates. I built the piano melody (and the title) out of Alexander Rosetti's "Crystalanthemums" because to me, ever since [S] Make her pay, the tune has been irrevocably linked to the trolls, Aradia, Terezi, and Vriska in particular. It also translated to a peppy piano melody much better than Toby Fox's "[[psych0ruins]]" would have.
     This song is also an homage to Michiru Yamane's impressive body of soundtrack work for the various Castlevania games.
 -------------------------------------------------------------------------------
@@ -141,8 +144,8 @@ Track: First Guardian, Last Stand
 Artist: Chase
 Track Art: melodiousDiscord
 References:
-- Black
 - Beatdown (Strider Style)
+- Liquid Negrocity
 URLs: https://homestuckgaiden.bandcamp.com/track/first-guardian-last-stand
 Commentary:
     <i>Chase:</i>
@@ -289,12 +292,12 @@ Commentary:
     I intended this to have a bit of an iconic feel (note the orange halo formed by the clouds).
 -------------------------------------------------------------------------------
 Track: Atomik Meltdown
-Artist: Hames
+Artist: James Roach
 Track Art: Pancake-Fairy
 References: Atomyk Ebonpyre
 URLs: https://homestuckgaiden.bandcamp.com/track/atomik-meltdown
 Commentary:
-    <i>Hames:</i>
+    <i>James Roach:</i>
     I liked the idea of Ebonpyre being used as a strife theme for Dave, so I wanted to go a little further with it. I imagined Dave using al ot of time-skipping while he fights (as represented by the record scratches).
     Atomik Meltdown was probably my first real foray into fanmusic. I had written two remixes previously, but I didn't really spend much time on them. Looking back on this song now, all I can see are the mistakes and the naive part arrangement. At the time I remember really being excited about this. Thank you for the nomination.
     <i>Pancake-Fairy:</i>
@@ -303,7 +306,7 @@ Commentary:
 Track: Jackie Treats
 Artist: Artisticpolo
 Track Art: Pancake-Fairy
-References: Black, Frost:frost-vol6
+References: Frost:frost-vol6, Liquid Negrocity
 URLs: https://homestuckgaiden.bandcamp.com/track/jackie-treats
 Commentary:
     <i>Artisticpolo:</i>
@@ -429,7 +432,7 @@ Commentary:
 Track: Under the Hat
 Directory: under-the-hat-lofam
 Artist: Erik Scheele
-Track Art: TheifofTruth
+Track Art: ThiefofTruth
 URLs: https://homestuckgaiden.bandcamp.com/track/under-the-hat
 Commentary:
     <i>Erik Scheele:</i>
@@ -678,7 +681,7 @@ Commentary:
     As soon as I listened to this song, I knew I had to draw the artwork for it. To me, it clearly represented the passage from childhood to maturity that each of the kids, especially John, were forced to udnergo in their short-lived session. Focusing on our favourite Friend-Leader, I attempted to capture this with an image of him turning his back on the relative safety and comforts of childhood and the watchful eye of his guardian.
 -------------------------------------------------------------------------------
 Track: The Drawing of the Four
-Artist: Well Manicured Man
+Artist: Willow Ascenzo
 Track Art: Red Pen
 References:
 - Sburban Jungle
@@ -686,7 +689,7 @@ References:
 - Beatdown (Strider Style)
 URLs: https://homestuckgaiden.bandcamp.com/track/the-drawing-of-the-four
 Commentary:
-    <i>Well Manicured Man:</i>
+    <i>Willow Ascenzo:</i>
     The title is, of course, a blatant reference to Sven King's Dark Towerseries. The song is a build-up to each of the four kids entering the Medium (they're being "drawn" into the game just as Eddie, Susannah, and Jake were drawn into Mid-World, but that's enough for now about something that isn't Homsetuck), so we start out with a slow rendition of "Sburban Jungle" played on the piano (John's instrument) with subsequent accompaniment by a violin (Rose's instrument). Then, here come the drums (Dave's isntrument), and we kick the song into high gear when the flute and bass (both Jade's instruments) come in. There's al ong period of pseudo-improv frm the bass, flute, and violin before returning to the meat of the song - and a nod to the Squiddles theme (another reference to Rose) before the finale. Curiously, the order of the instruments exactly matches the order of the kids' introduction.
 -------------------------------------------------------------------------------
 Track: Ira quod Angelus

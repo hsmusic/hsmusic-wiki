@@ -4,8 +4,8 @@
   "description": "fan wiki for homestuck albums",
   "main": "upd8.js",
   "dependencies": {
-    "mkdirp": "^0.5.1",
-    "fix-whitespace": "^1.0.3"
+    "fix-whitespace": "^1.0.3",
+    "mkdirp": "^0.5.5"
   },
   "license": "GPL-3.0"
 }

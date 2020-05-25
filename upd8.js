@@ -98,10 +98,11 @@ const SITE_ABOUT = fixWS`
     <p>Welcome to my fan-made Homestuck music wiki!</p>
     <p><a href="https://www.homestuck.com/">Homestuck</a> has always been an incredible creative collaboration, and especially beloved by the community and critical in that collaboration is the webcomic and world's humongous soundtrack, comprising well over 500 tracks by dozens of musicians and artists. This wiki aims to be an interesting and useful resource for anyone interested in that music, as well as an archive for all things related.</p>
     <p>Pertaining to the history of this site: it was originally made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content particularly reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums (among other missing albums, like <a href="album/squiddles/index.html">Squiddles!</a>) are all indexed in the one place, and URLs will always stay consistent. And of course, also included are links for listening on Bandcamp and other services.</p>
+    <p>The code for this website is open source (GPL-3.0), and can be explored or forked <a href="https://github.com/hsmusic/hsmusic.github.io/">here</a>. I don't actively keep track of issues or PRs raised there; if you want to get in touch with feature requests or comments on the code, my contact info is <a href="feedback/index.html">here</a>!</p>
     <p><i>Resource &amp; Author Credits</i></p>
     <ul>
         <li>Florrie: that's me! I programmed most of the site, and put the whole thing together. Say hi to me on twitter (<a href="https://twitter.com/florriestuck">@florriestuck</a>) or reddit (<a href="https://reddit.com/u/towerofnix/">/u/towerofnix</a>)!</li>
-        <li><a href="https://homestuck.bandcamp.com/">Homestuck's Bandcamp</a>, the official host of Homestuck's music: I got almost all the album listings and basic track info from here.</li>
+        <li><a href="https://homestuck.bandcamp.com/">Homestuck's Bandcamp</a>, the official host of Homestuck's music: I got almost all the official album listings and basic track info from here.</li>
         <li>GiovanH's <a href="https://my.pcloud.com/publink/show?code=kZdJQ8kZNyIwh0Hn1ime6Ty7L2J87BE3E2ak">complete track art archive</a>: track art! A million thanks for putting this together and sharing this with me. (Prior to this, I used the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a> to gather track art.)</li>
         <li><a href="https://homestuck.net/music/references.html">NSND</a>: leitmotifs! Thanks to this site in combination with credits on the bandcamp and artists' own commentary, this wiki is a rather comprehensive resource for leitmotifs and other track references.</li>
         <li><a href="https://www.bgreco.net/hsflash.html">bgreco.net (HQ Audio Flashes)</a>: thumbnail captures for the individual Flash animations! There were a couple captures missing that I took myself, but most Flash thumbnails are from here.</a></li>
@@ -113,11 +114,12 @@ const SITE_ABOUT = fixWS`
     <ul>
         <li><b>Thank you,</b> GiovanH, for linking me to a resource for higher quality cover art, and bringing to my attention the fact that clicking a cover art on Bandcamp to zoom in will often reveal a higher quality image.</li>
         <li>cosmogonicalAuthor, for a variety of feature requests and comments! In particular: improving way the track list on author pages is sorted; expanding the introduction; expanding the introduction message to the website; and linking bonus art for Homestuck Vol. 5 - plus a few other good suggestions I haven't gotten to yet. Thanks!</li>
-        <!-- <li>Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki.</li> -->
+        <li>Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki.</li>
         <li>Kidpen, for suggesting the "Flashes that feature this track" feature.</li>
         <li>an emailer, for suggesting the "Random track" feature.</li>
         <li>foreverFlumoxed, for pointing out that <a href="flash/338/index.html">[S] ==&gt;</a> contains reference to <a href="track/john-do-the-windy-thing/index.html">JOHN DO THE WINDY THING</a> (this reminded me to add all the unreleased Flash tracks to the Unreleased Tracks album!), and for going to the massive effort of checking every track page and pointing out a bunch of missing cover arts and title typos!</li>
         <li>Makin, for various initial help in data collection (especially commentary) and lifting the site off the ground by pinning it to the top of the /r/homestuck subreddit for a while, and for linking me the independent release of <a href="https://jamesdever.bandcamp.com/album/sburb">Sburb</a>.</li>
+        <li>an emailer, for sending a crop of the YT thumbnail art for <a href="track/after-the-sun/index.html">After the Sun</a> (plus the SoundCloud link for that track).</li>
         <li>Thanks for pointing out typos, errors in reference lists, and out of date details: cookiefonster, foreverFlummoxed.</li>
     </ul>
 `;
@@ -126,7 +128,7 @@ const SITE_FEEDBACK = fixWS`
     <p><strong>Feature requests? Noticed any errors?</strong> Please let me know! I appreciate feedback a lot, and always want to make this site better.</p>
     <p>The best place to talk about this site is on its <a href="https://forum.homestuck.xyz/viewtopic.php?f=7&t=151">HomestuckXYZ forum thread</a>.</p>
     <p>If you're not one for forums or don't have an account there, you can spam me on <a href="https://twitter.com/florriestuck">Twitter</a>.</p>
-    <p>Or, if you're <em>really</em> old fashioned, I've got an email too: towerofnix at gmail dot beans.</p>
+    <p>Or, if you're <em>really</em> old fashioned, I've got an email too: towerofnix at gmail dot beans. (You know the domain.)</p>
     <p>Thank you for sharing your feedback!</p>
 `;
 
@@ -137,8 +139,13 @@ const SITE_JS_DISABLED = fixWS`
 
 // Might ena8le this later... we'll see! Eventually. May8e.
 const ENABLE_ARTIST_AVATARS = false;
+const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
 
-const ALBUM_DATA_FILE = 'album.txt';
+// the ways these filenames are used are super inconsistent and i am really
+// not bothering myself to fix that right now lol
+const ALBUM_DATA_FILE = 'album.txt';    // /album/*/$.txt
+const ARTIST_DATA_FILE = 'artists.txt'; // /$.txt
+const FLASH_DATA_FILE = 'flashes.txt';  // /flashes/$.txt
 
 const CSS_FILE = 'site.css';
 
@@ -153,10 +160,12 @@ let allTracks;
 let flashData;
 
 let artistNames;
+let artistData;
 
 let officialAlbumData;
 let fandomAlbumData;
-let justEverythingMan; // tracks, albums, flashes
+let justEverythingMan; // tracks, albums, flashes -- don't forget to upd8 getHrefOfAnythingMan!
+let justEverythingSortedByArtDateMan;
 
 // Note there isn't a 'find track data files' function. I plan on including the
 // data for all tracks within an al8um collected in the single metadata file
@@ -378,9 +387,14 @@ async function processAlbumDataFile(file) {
     const albumHasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
     const albumTrackCoverArtists = getContributionField(albumSection, 'Track Art');
     const albumCommentary = getCommentaryField(albumSection);
+    const albumURLs = (getListField(albumSection, 'URLs') || []).filter(Boolean);
     let albumDirectory = getBasicField(albumSection, 'Directory');
 
-    const isFanon = getBasicField(albumSection, 'Canon') === 'Fanon';
+    const canon = getBasicField(albumSection, 'Canon');
+    const isCanon = canon === 'Canon' || !canon;
+    const isBeyond = canon === 'Beyond';
+    const isOfficial = isCanon || isBeyond;
+    const isFanon = canon === 'Fanon';
 
     if (albumCoverArtists && albumCoverArtists.error) {
         return {error: `${albumCoverArtists.error} (in ${albumName})`};
@@ -441,6 +455,10 @@ async function processAlbumDataFile(file) {
         coverArtists: albumCoverArtists,
         commentary: albumCommentary,
         directory: albumDirectory,
+        urls: albumURLs,
+        isCanon,
+        isBeyond,
+        isOfficial,
         isFanon,
         theme: {
             fg: albumColorFG,
@@ -541,6 +559,9 @@ async function processAlbumDataFile(file) {
             artDate: artDateValue,
             directory: trackDirectory,
             urls: trackURLs,
+            isCanon,
+            isBeyond,
+            isOfficial,
             isFanon,
             // 8ack-reference the al8um o8ject! This is very useful for when
             // we're outputting the track pages.
@@ -549,6 +570,38 @@ async function processAlbumDataFile(file) {
     }
 
     return albumData;
+}
+
+async function processArtistDataFile(file) {
+    let contents;
+    try {
+        contents = await readFile(file, 'utf-8');
+    } catch (error) {
+        return {error: `Could not read ${file} (${error.code}).`};
+    }
+
+    const contentLines = contents.split('\n');
+    const sections = Array.from(getSections(contentLines));
+
+    return sections.map(section => {
+        if (getBasicField(section, 'ACT')) {
+            act = getBasicField(section, 'ACT');
+            theme = {
+                fg: getBasicField(section, 'FG')
+            };
+            return {act8r8k: true, act, theme};
+        }
+
+        const name = getBasicField(section, 'Artist');
+        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
+        const alias = getBasicField(section, 'Alias');
+
+        if (!name) {
+            return {error: 'Expected "Artist" (name) field!'};
+        }
+
+        return {name, urls, alias};
+    });
 }
 
 async function processFlashDataFile(file) {
@@ -637,7 +690,7 @@ function stringifyFlashData() {
 
 // 8asic function for writing any site page. Handles all the 8asename,
 // directory, and site-template shenanigans!
-async function writePage(directoryParts, title, body) {
+async function writePage(directoryParts, titleOrHead, body) {
     const directory = path.join(C.SITE_DIRECTORY, ...directoryParts);
     await mkdirp(directory);
     // This is sort of hard-coded, i.e. we don't do path.join(C.ROOT_DIRECTORY).
@@ -651,7 +704,7 @@ async function writePage(directoryParts, title, body) {
             <head>
                 ${[
                     `<meta charset="utf-8">`,
-                    `<title>${title}</title>`,
+                    (titleOrHead.split('\n').length && !titleOrHead.includes('<title>')) ? `<title>${titleOrHead}</title>` : titleOrHead,
                     directory !== C.SITE_DIRECTORY &&
                     directory !== '.' &&
                     `<base href="${path.relative(directory, C.SITE_DIRECTORY)}">`,
@@ -675,19 +728,33 @@ async function writePage(directoryParts, title, body) {
 
 function writeMiscellaneousPages() {
     return progressPromiseAll('Writing miscellaneous pages.', [
-        writePage([], SITE_TITLE, fixWS`
+        writePage([], fixWS`
+            <title>${SITE_TITLE}</title>
+            <meta name="description" content="Expansive resource for anyone interested in fan- and official music alike; an archive for all things related.">
+        `, fixWS`
             <body id="top-index">
                 <div id="content">
                     <h1>${SITE_TITLE}</h1>
                     <div id="intro-menu">
                         <p>Explore the site!</p>
                         <a href="${C.LISTING_DIRECTORY}/index.html">Listings</a>
-                        <a href="${C.FLASH_DIRECTORY}/index.html">Flashes</a>
+                        <a href="${C.FLASH_DIRECTORY}/index.html">Flashes &amp; Games</a>
                         <a href="${C.ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
                         <a href="${C.FEEDBACK_DIRECTORY}/index.html">Feedback &amp; Suggestions</a>
                         <p>...or choose an album:</p>
                     </div>
+                    <h2>Beyond Canon</h2>
+                    <h3>The future of Homestuck music, today.<br>Albums by the Homestuck^2 Music Team. 2020+.</h2>
+                    <div class="grid-listing">
+                        ${albumData.filter(album => album.isBeyond).reverse().map(album => fixWS`
+                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                                <img src="${getAlbumCover(album)}">
+                                <span>${album.name}</span>
+                            </a>
+                        `).join('\n')}
+                    </div>
                     <h2>Fandom</h2>
+                    <h3>A look into Homestuck's world of music and art created&mdash;and organized&mdash;by fans.<br>The beginning of time, through the end.</h3>
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isFanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
@@ -698,8 +765,9 @@ function writeMiscellaneousPages() {
                         <a class="grid-item" href="#" style="--fg-color: #ffffff">...and more to be added soon</a>
                     </div>
                     <h2>Official</h2>
+                    <h3>The original discography: a replica of the Homestuck Bandcamp prior to the enmergening.<br>Albums organized by What Pumpkin. 2009&ndash;2019.</h3>
                     <div class="grid-listing">
-                        ${albumData.filter(album => !album.isFanon).reverse().map(album => fixWS`
+                        ${albumData.filter(album => album.isCanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
                                 <img src="${getAlbumCover(album)}">
                                 <span>${album.name}</span>
@@ -709,10 +777,10 @@ function writeMiscellaneousPages() {
                 </div>
             </body>
         `),
-        writePage([C.FLASH_DIRECTORY], `Flashes`, fixWS`
+        writePage([C.FLASH_DIRECTORY], `Flashes & Games`, fixWS`
             <body id="top-index">
                 <div id="content">
-                    <h1>Flashes</h1>
+                    <h1>Flashes &amp; Games</h1>
                     <div id="intro-menu">
                         <a href="index.html">Home</a>
                         <a href="${C.LISTING_DIRECTORY}/index.html">Listings</a>
@@ -804,6 +872,7 @@ async function writeAlbumPage(album) {
                     Released ${getDateString(album)}.
                     ${+album.artDate !== +album.date && `<br>Art released ${getDateString({date: album.artDate})}.`}
                 </p>
+                ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>`}
                 <${listTag}>
                     ${album.tracks.map(track => fixWS`
                         <li>
@@ -828,7 +897,7 @@ async function writeAlbumPage(album) {
 async function writeTrackPage(track) {
     const tracksThatReference = getTracksThatReference(track);
     const ttrFanon = tracksThatReference.filter(t => t.isFanon);
-    const ttrCanon = tracksThatReference.filter(t => !t.isFanon);
+    const ttrOfficial = tracksThatReference.filter(t => t.isOfficial);
     const tracksReferenced = getTracksReferencedBy(track);
     const flashesThatFeature = getFlashesThatFeature(track);
     await writePage([C.TRACK_DIRECTORY, track.directory], track.name, fixWS`
@@ -847,16 +916,7 @@ async function writeTrackPage(track) {
                     Released ${getDateString(track)}.
                     ${+track.artDate !== +track.date && `<br>Art released ${getDateString({date: track.artDate})}.`}
                 </p>
-                <p>Listen on ${joinNoOxford(track.urls.map(url => fixWS`
-                    <a href="${url}">${
-                        url.includes('bandcamp.com') ? 'Bandcamp' :
-                        url.includes('youtu') ? 'YouTube' :
-                        url.includes('soundcloud') ? 'SoundCloud' :
-                        url.includes('archive.homestuck.net') ? 'archive.homestuck.net' :
-                        url.includes('tumblr.com') ? 'Tumblr' :
-                        '(External)'
-                    }</a>
-                `), 'or')}.</p>
+                <p>Listen on ${joinNoOxford(track.urls.map(fancifyURL), 'or')}.</p>
                 ${track.contributors.length && fixWS`
                     <p>Contributors:</p>
                     <ul>
@@ -882,10 +942,10 @@ async function writeTrackPage(track) {
                 ${tracksThatReference.length && fixWS`
                     <p>Tracks that reference <i>${track.name}</i>:</p>
                     <dl>
-                        ${ttrCanon.length && fixWS`
+                        ${ttrOfficial.length && fixWS`
                             <dt>Official:</dt>
                             <dd><ul>
-                                ${ttrCanon.map(track => fixWS`
+                                ${ttrOfficial.map(track => fixWS`
                                     <li>
                                         <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
                                         <span class="by">by ${getArtistString(track.artists)}</span>
@@ -907,7 +967,7 @@ async function writeTrackPage(track) {
                     </dl>
                 `}
                 ${flashesThatFeature.length && fixWS`
-                    <p>Flashes that feature <i>${track.name}</i>:</p>
+                    <p>Flashes &amp; games that feature <i>${track.name}</i>:</p>
                     <ul>
                         ${flashesThatFeature.map(flash => `<li>${getFlashLinkHTML(flash)}</li>`).join('\n')}
                     </ul>
@@ -934,6 +994,10 @@ async function writeArtistPages() {
 }
 
 async function writeArtistPage(artistName) {
+    const {
+        urls = []
+    } = artistData.find(({ name }) => name === artistName) || {};
+
     const tracks = allTracks.filter(track => (
         track.artists.includes(artistName) ||
         track.contributors.some(({ who }) => who === artistName)
@@ -971,6 +1035,7 @@ async function writeArtistPage(artistName) {
                     <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"></a>
                 `}
                 <h1>${artistName}</h1>
+                ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
                 <p>Jump to: ${[
                     [
                         tracks.length && `<a href="${index}#tracks">Tracks</a>`,
@@ -979,7 +1044,7 @@ async function writeArtistPage(artistName) {
                     artThings.length && `<a href="${index}#art">Art</a>`,
                     flashes.length && `<a href="${index}#flashes">Flashes &amp; Games</a>`,
                     commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
-                ].filter(Boolean).join(', ')}</p>
+                ].filter(Boolean).join(', ')}.</p>
                 ${tracks.length && `<h2 id="tracks">Tracks</h2>`}
                 ${releasedTracks.length && generateTrackList(releasedTracks)}
                 ${unreleasedTracks.length && fixWS`
@@ -1110,7 +1175,7 @@ async function writeFlashPage(flash) {
             <div id="sidebar">
                 <h2><a href="index.html">(Home)</a></h2>
                 <hr>
-                <h1><a href="${C.FLASH_DIRECTORY}/index.html">Flashes</a></h1>
+                <h1><a href="${C.FLASH_DIRECTORY}/index.html">Flashes &amp; Games</a></h1>
                 <dl>
                     ${flashData.filter(f => f.act8r8k).map(({ act, theme }) => fixWS`
                         ${act.startsWith('Act 1') && fixWS`
@@ -1140,6 +1205,17 @@ async function writeFlashPage(flash) {
                         `}
                     `).join('\n')}
                 </dl>
+                <hr>
+                ${chronologyButtons(flash, {
+                    headingWord: 'flash/game',
+                    sourceData: flashData,
+                    filters: [
+                        {
+                            mapProperty: 'contributors',
+                            toArtist: ({ who }) => who
+                        }
+                    ]
+                })}
             </div>
             <div id="content">
                 <h1>${flash.name}</h1>
@@ -1511,20 +1587,52 @@ function getAlbumListTag(album) {
     }
 }
 
-function chronologyButtons(currentTrack, {mapProperty, toArtist, filterCondition, headingWord}) {
-    return currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist).map(artist => {
+function fancifyURL(url, {album = false} = {}) {
+    return fixWS`<a href="${url}">${
+        url.includes('bandcamp.com') ? 'Bandcamp' :
+        url.includes('youtu') ? (album ? (
+            url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full&nbsp;Album)'
+        ) : 'YouTube') :
+        url.includes('soundcloud') ? 'SoundCloud' :
+        url.includes('tumblr.com') ? 'Tumblr' :
+        url.includes('twitter.com') ? 'Twitter' :
+        url.includes('deviantart.com') ? 'DeviantArt' :
+        new URL(url).hostname
+    }</a>`;
+}
+
+function chronologyButtons(currentTrack, {
+    mapProperty,
+    toArtist,
+    filters, // {property, toArtist}
+    headingWord,
+    sourceData = justEverythingMan
+}) {
+    return (
+        Array.from(new Set(filters.flatMap(({ mapProperty, toArtist }) => currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist))))
+    ).map(artist => {
         if (!artistNames.includes(artist)) return '';
 
-        const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && track[mapProperty] && track[mapProperty].map(toArtist).includes(artist));
-        const index = releasedTracks.indexOf(currentTrack);
+        const releasedThings = sourceData.filter(thing => {
+            const album = albumData.includes(thing) ? thing : thing.album;
+            if (album && album.directory === C.UNRELEASED_TRACKS_DIRECTORY) {
+                return false;
+            }
+
+            return filters.some(({ mapProperty, toArtist }) => (
+                thing[mapProperty] &&
+                thing[mapProperty].map(toArtist).includes(artist)
+            ));
+        });
+        const index = releasedThings.indexOf(currentTrack);
 
         if (index === -1) return '';
 
-        const previous = releasedTracks[index - 1];
-        const next = releasedTracks[index + 1];
+        const previous = releasedThings[index - 1];
+        const next = releasedThings[index + 1];
         const parts = [
-            previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" title="${previous.name}">Previous</a>`,
-            next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" title="${next.name}">Next</a>`
+            previous && `<a href="${getHrefOfAnythingMan(previous)}" title="${previous.name}">Previous</a>`,
+            next && `<a href="${getHrefOfAnythingMan(next)}" title="${next.name}">Next</a>`
         ].filter(Boolean);
 
         const heading = `${th(index + 1)} ${headingWord} by <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html">${artist}</a>`;
@@ -1544,6 +1652,11 @@ function generateSidebarForAlbum(album, currentTrack = null) {
     const listTag = getAlbumListTag(album);
     return fixWS`
         <h2><a href="index.html">(Home)</a></h2>
+        <!-- <h3>${
+            album.isFanon ? 'Fanon' :
+            album.isBeyond ? 'Beyond Canon' :
+            album.isOfficial ? 'Official' : ''
+        }</h3> -->
         <hr>
         <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html">${album.name}</a></h1>
         <${listTag}>
@@ -1557,16 +1670,39 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 <a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">Random track</a></li>
             </p>
         `}
+        ${currentTrack === null && chronologyButtons(album, {
+            headingWord: 'cover art',
+            sourceData: justEverythingSortedByArtDateMan,
+            filters: [
+                {
+                    mapProperty: 'coverArtists',
+                    toArtist: ({ who }) => who
+                }
+            ]
+        })}
         ${currentTrack && fixWS`
             ${chronologyButtons(currentTrack, {
-                mapProperty: 'artists',
-                toArtist: artist => artist,
-                headingWord: 'track'
+                headingWord: 'track',
+                filters: [
+                    {
+                        mapProperty: 'artists',
+                        toArtist: artist => artist
+                    },
+                    {
+                        mapProperty: 'contributors',
+                        toArtist: ({ who }) => who
+                    }
+                ]
             })}
             ${chronologyButtons(currentTrack, {
-                mapProperty: 'coverArtists',
-                toArtist: ({ who }) => who,
-                headingWord: 'track art'
+                headingWord: 'cover art',
+                sourceData: justEverythingSortedByArtDateMan,
+                filters: [
+                    {
+                        mapProperty: 'coverArtists',
+                        toArtist: ({ who }) => who
+                    }
+                ]
             })}
         `}
     `
@@ -1600,6 +1736,18 @@ function getTrackCover(track) {
     return `../../${C.ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.png`;
 }
 */
+
+function getHrefOfAnythingMan(anythingMan) {
+    return (
+        albumData.includes(anythingMan) ? C.ALBUM_DIRECTORY :
+        allTracks.includes(anythingMan) ? C.TRACK_DIRECTORY :
+        flashData.includes(anythingMan) ? C.FLASH_DIRECTORY :
+        'idk-bud'
+    ) + '/' + (
+        flashData.includes(anythingMan) ? getFlashDirectory(anythingMan) :
+        anythingMan.directory
+    ) + '/index.html';
+}
 
 function getAlbumCover(album) {
     return `${C.ALBUM_DIRECTORY}/${album.directory}/cover.jpg`;
@@ -1667,7 +1815,17 @@ async function main() {
         return;
     }
 
-    flashData = await processFlashDataFile(path.join(C.FLASH_DIRECTORY, 'flashes.txt'));
+    // TODO: error catching doesnt do anything on artists actually...
+    // but for now we dont do any significant error throwing
+    // (not any that wouldnt be caught elsewhere, later)
+    // so i guess its not a big deal???? :o
+    artistData = await processArtistDataFile(ARTIST_DATA_FILE);
+    if (artistData.error) {
+        console.log(`\x1b[31;1m${artistData.error}\x1b[0m`);
+        return;
+    }
+
+    flashData = await processFlashDataFile(path.join(C.FLASH_DIRECTORY, FLASH_DATA_FILE));
     if (flashData.error) {
         console.log(`\x1b[31;1m${flashData.error}\x1b[0m`);
         return;
@@ -1685,9 +1843,48 @@ async function main() {
     artistNames = C.getArtistNames(albumData, flashData);
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
+    {
+        let buffer = [];
+        const clearBuffer = function() {
+            if (buffer.length) {
+                for (const entry of buffer.slice(0, -1)) {
+                    console.log(`\x1b[2m... ${entry.name} ...\x1b[0m`);
+                }
+                const lastEntry = buffer[buffer.length - 1];
+                console.log(`\x1b[2m... \x1b[0m${lastEntry.name}\x1b[0;2m ...\x1b[0m`);
+                buffer = [];
+            }
+        };
+        let CR4SH = false;
+        for (let name of artistNames) {
+            const entry = artistData.find(entry => entry.name === name);
+            if (!entry) {
+                clearBuffer();
+                console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
+                CR4SH = true;
+            } else if (entry.alias) {
+                clearBuffer();
+                console.log(`\x1b[31mArtist "\x1b[1m${name}\x1b[0;31m" should be named "\x1b[1m${entry.alias}\x1b[0;31m"\x1b[0m`);
+                CR4SH = true;
+            } else {
+                buffer.push(entry);
+                if (buffer.length > 3) {
+                    buffer.shift();
+                }
+            }
+        }
+        if (CR4SH) {
+            return;
+        } else {
+            console.log(`All artist data is good!`);
+        }
+    }
+
     officialAlbumData = albumData.filter(album => !album.isFanon);
     fandomAlbumData = albumData.filter(album => album.isFanon);
-    justEverythingMan = C.sortByDate(allTracks.concat(albumData, flashData));
+    justEverythingMan = C.sortByDate(albumData.concat(allTracks, flashData.filter(flash => !flash.act8r8k)));
+    justEverythingSortedByArtDateMan = C.sortByArtDate(justEverythingMan.slice());
+    // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(getHrefOfAnythingMan), null, 2));
 
     {
         const directories = [];

@@ -4,6 +4,10 @@ Art Date: April 13, 2017
 Cover Art Date: June 13, 2010
 Cover Art: Lexxy
 FG: #00aaff
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-5-6-with-the-felt
+- https://www.youtube.com/watch?v=DuBmOO4muV8
+- https://www.youtube.com/playlist?list=PL6_yub4_EV2SVvGuBwOxgN4aMhISOZito
 Commentary:
     <i>Florrie Haero:</i>
     track art on these tracks has been uploaded from the <a href="https://sollay-b.tumblr.com/post/188094230423/hello-a-couple-of-years-ago-allyssinian">Homestuck Vol. 5 Anthology</a>! the official release of Vol. 5 didn't come with track art; this collaborative project organized artists to submit their own original art for the album. the art was originally shared in a huge colection on tumblr on 4/13/17 and has now been collected here for viewing convenience and discoverability!
@@ -33,7 +37,7 @@ URLs: https://homestuck.bandcamp.com/track/clockwork-melody-2
 -------------------------------------------------------------------------------
 Track: Heirfare
 Artist: Alexander Rosetti
-Track Art: sollay-b
+Track Art: Sollay
 References: Showtime (Original Mix), Showtime (Piano Refrain), Harlequin
 URLs: https://homestuck.bandcamp.com/track/heirfare-2
 Commentary:
@@ -83,8 +87,8 @@ URLs: https://homestuck.bandcamp.com/track/skaian-ride-2
 -------------------------------------------------------------------------------
 Track: White
 Artist: Toby Fox
-Track Art: rainahkretva
-References: Black
+Track Art: RainbowCookiz
+References: Liquid Negrocity
 URLs: https://homestuck.bandcamp.com/track/white-2
 -------------------------------------------------------------------------------
 Track: Octoroon Rangoon
@@ -110,7 +114,7 @@ URLs: https://homestuck.bandcamp.com/track/welcome-to-the-new-extreme-2
 -------------------------------------------------------------------------------
 Track: Crystalanthemums
 Artist: Alexander Rosetti
-Track Art: Chuchumi
+Track Art: Chumi
 URLs: https://homestuck.bandcamp.com/track/crystalanthemums-2
 Commentary:
     <i>Alexander Rosetti:</i>
@@ -118,7 +122,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Skaia (Incipisphere Mix)
 Artist: Solatrus
-Track Art: Razzberrysheep
+Track Art: razzberrysheep
 References: Skies of Skaia
 URLs: https://homestuck.bandcamp.com/track/skaia-incipisphere-mix-2
 Commentary:
@@ -144,7 +148,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Sarabande
 Artist: Erik Scheele
-Track Art: sol-lay
+Track Art: Sollay
 Directory: sarabande-vol5
 URLs: https://homestuck.bandcamp.com/track/sarabande-2
 Commentary:
@@ -180,7 +184,7 @@ URLs: https://homestuck.bandcamp.com/track/sunslammer-2
 -------------------------------------------------------------------------------
 Track: Lotus Land Story
 Artist: Toby Fox
-Track Art: knightic
+Track Art: fenkko
 References: Lotus, Doctor
 URLs: https://homestuck.bandcamp.com/track/lotus-land-story-2
 -------------------------------------------------------------------------------
@@ -296,9 +300,8 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Crystamanthequins
 Artist: Erik Scheele
-Contributors: Perry Sullivan (Mannequin)
-Track Art: Jununy
-References: Crystalanthemums, Mannequin (by Perry Sullivan)
+Track Art: Jenny
+References: Crystalanthemums, Mannequin
 URLs: https://homestuck.bandcamp.com/track/crystamanthequins-2
 Commentary:
     <i>Erik Scheele:</i>
@@ -349,12 +352,12 @@ URLs: https://homestuck.bandcamp.com/track/vertical-motion-2
 -------------------------------------------------------------------------------
 Track: The Beginning of Something Really Excellent
 Artist: Robert J! Lake
-Track Art: A-vodka-mutiny
+Track Art: a-vodka-mutini
 URLs: https://homestuck.bandcamp.com/track/the-beginning-of-something-really-excellent-2
 -------------------------------------------------------------------------------
 Track: Pyrocumulus (Kickstart)
 Artist: Robert J! Lake
-Track Art: Thespacemaid
+Track Art: thespacemaid
 References: Skaian Skuffle
 URLs: https://homestuck.bandcamp.com/track/pyrocumulus-kickstart-2
 -------------------------------------------------------------------------------
@@ -369,7 +372,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Throwdown
 Artist: Steve Everson
-Track Art: trainwreckgenerator
+Track Art: Gene
 URLs: https://homestuck.bandcamp.com/track/throwdown-2
 Commentary:
     <i>Steve Everson:</i>
@@ -477,23 +480,29 @@ References:
 - Upward Movement (Dave Owns)
 - Sburban Jungle
 - Beatdown (Strider Style)
+- Mutiny
 - Skies of Skaia
 - Showtime (Original Mix)
 - Aggrieve
-- Black
+- Jackknive
+- Liquid Negrocity
+- Guardian
 - Harlequin
 - Explore
 - Chorale for Jaspers
 - Underworld
 - Three in the Morning
+- Non Compos Mentis
 - Pumpkin Cravings
 - Vagabounce
 - Skaian Skuffle
 - Doctor
-- Savior of the Waking World
+- Penumbra Phantasm
 - Endless Climb
 - Atomyk Ebonpyre
 - Lotus
+- Problem Sleuth Theme
+- Dirgeish
 -------------------------------------------------------------------------------
 Track: Homestuck
 Artist: Mark Hadley

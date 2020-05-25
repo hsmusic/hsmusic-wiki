@@ -1,15 +1,18 @@
 Album: Land of Fans and Music 4
 Directory: lofam4
-Cover Art: Sozay
+Cover Art: Sozzay
 Date: September 9, 2017
 FG: #aed6f0
 Canon: Fanon
+URLs:
+- https://unofficialmspafans.bandcamp.com/album/land-of-fans-and-music-4
+- https://www.youtube.com/playlist?list=PLYr2YZ5D3rfQBkwagYEi_JPvVYUIVfxn6
 Commentary:
     <i>The Unofficialmspafans present:</i>
     <center>LAND OF FANS AND MUSIC 4</center>
     <b>The Team:</b><br>Lambda Bledsoe<br>Veritas Unae<br>Liza McCall<br>ndividedbyzero<br>Lathan Jury<br>Emily<br>Aris "ostrichlittledungeon" Martinian<br>Makin
     <b>Booklet:</b><br>Circlejourney
-    <b>Additional Help:</b><br>Mark Ciocca (Dagoth Xil)<br>Yishan "Catboss." Mai<br>Seijen<br>SerialSymphony<br>nights<br>power464646<br>Bambosh<br>wheals<br>Kal-la-kal-la<br>WHATISLOSTINTHEMINES<br>SplitSuns
+    <b>Additional Help:</b><br>Mark Ciocca (Dagoth Xil)<br>Yishan "Catboss." Mai<br>Seijen<br>SerialSymphony<br>nights<br>Grace Medley<br>Bambosh<br>wheals<br>Kal-la-kal-la<br>WHATISLOSTINTHEMINES<br>SplitSuns
     <b>Special Thanks:</b><br>Elaine "OJ" Wang<br>M. Alex "melodiousDiscord" Moser<br>Brad "Avinoch" Griffin<br>Robert J! Lake<br>Christina "Lune" Lillard<br>The Cool and New Music Team<br>Andrew Hussie &amp; What Pumpkin Studios<br>The Homestuck Music Team
     <hr>
     <i>Lambda Bledsoe:</i>
@@ -143,12 +146,12 @@ Commentary:
     I wonder what life was like for the carapacians, floating out in space away from everything going on on the battlefield as it got prototyped. Seems kind of lonely.
 -------------------------------------------------------------------------------
 Track: Pax Condesca
-Artist: ViKomprenas
+Artist: Viko Riféo
 Track Art: Circlejourney
 References: Crystalanthemums, Negastrife
 URLs: https://unofficialmspafans.bandcamp.com/track/pax-condesca
 Commentary:
-    <i>ViKomprenas:</i>
+    <i>Viko Riféo:</i>
     Wait why did this get on the album it sucks
     It's about the Condesce, obviously. It's vaguely about her conquering a planet? The natives fight a long fight and then they just barely win! and everyone is reflecting on their loss and then she just glasses them or whatever she does. There's Crystalanthemums mostly because it seems to be teh default badass-trolls theme. Also that is some badass art.
     <i>Circlejourney:</i>
@@ -194,12 +197,12 @@ Track Art: Chumi
 URLs: https://unofficialmspafans.bandcamp.com/track/skaian-dreamers
 Commentary:
     <i>Difarem:</i>
-    Thsi track has quite the story! It was originally meant to be fake "loading screen" music, to accompany a parodic video on the Cool and New Music Team youtube channel about Overseer v3 (a web-based sburb web game, whose development team I used to be part of) being shut down by What Pumpkin (though the C&amp;D was later found out to be fake). The project fell through, so I continued working on it and posted it on the LOFAM Discord server, where it got approved (thanks Lambda), though the deadline had tehcnically passed.
+    This track has quite the story! It was originally meant to be fake "loading screen" music, to accompany a parodic video on the Cool and New Music Team youtube channel about Overseer v3 (a web-based sburb web game, whose development team I used to be part of) being shut down by What Pumpkin (though the C&amp;D was later found out to be fake). The project fell through, so I continued working on it and posted it on the LOFAM Discord server, where it got approved (thanks Lambda), though the deadline had tehcnically passed.
     <i>Chumi:</i>
     it sounds like a song for the beginning of a cool adventure! so that's what i drew :o
 -------------------------------------------------------------------------------
 Track: Emerald Waltz
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: Beta
 References: Darling Kanaya
 URLs: https://unofficialmspafans.bandcamp.com/track/emerald-waltz
@@ -286,12 +289,12 @@ Commentary:
     Like the song, this fantastic art was originally used for Act 8 Volume 1. It's a pretty stark contrast to the carefree art for Glide immediately before it; Alternate Calliope has now taken off her hood, with a look that indicates that she means business.
 -------------------------------------------------------------------------------
 Track: Bonehead Destiny (LoFaM Cut)
-Artist: power464646
+Artist: Grace Medley
 Track Art: Elanor Pam
 References: Unite Synchronization
 URLs: https://unofficialmspafans.bandcamp.com/track/bonehead-destiny-lofam-cut
 Commentary:
-    <i>power464646:</i>
+    <i>Grace Medley:</i>
     This song was originally written for FLSA's Problem Sleuth album, however those of you who've heard the original may notice some subtle differences. This song is meant to be a theme for late-game PS, with the first half representing the over-the-top surrealism of Higgs Bonehead's sacrifice, and the second, the far more interesting rush to beat DMK. I pretty much spent the ages 10-12 listening to Daft Punk and Digitalism near-exclusively, and I think the influence shines through pretty clearly here. The second half is a slight nod to the rush of [S] Dirk: Unite and Synchronize, which I feel is stylistically similar to the pacing from the end of PS.
     <i>Elanor Pam:</i>
     The futility of a sacrifice, the chaos of a final battle, the wrath of an arbiter, the finding of love after death, the absolute ownage of a sharply written missive. All these and more contributed to making the epic ending of Problem Sleuth what it came to be known as: a confusing clusterfuck of hilarious and completely insane shenanigans.
@@ -435,7 +438,7 @@ Commentary:
     <i><b>Aris Martinian:</b></i>
     After the acapella and post-punk versions of I'm a Member of the Midnight Crew, you may be wondering how there could possibly be a unique version of this song without stooping to What Pumpkin's level and making "I'm a Member of the Midnight Ska." theh0nestman manages to take this early 20th century classic somewhere entirely new. This version of the song has a country rock feel to it, with soft verses leading into harder, crunchier choruses, and the bridges between verses taking us into previously uncharted melodic territory.
     <i>dodostad:</i>
-    I was asking around for iconic rock album covers to base the art on since it was rather classic rock take on the midnight crew. SOmeone said Nirvana's Nevermind and I laughed and laughed and went with it
+    I was asking around for iconic rock album covers to base the art on since it was rather classic rock take on the midnight crew. Someone said Nirvana's Nevermind and I laughed and laughed and went with it
 -------------------------------------------------------------------------------
 Track: Crystalendofgames
 Artist: Jamie Paige Stanley
@@ -457,7 +460,7 @@ Commentary:
 Track: ~~DISC 2~~
 Directory: disc2-lofam4
 Artist: Lambda Bledsoe, ndividedbyzero
-Track Art: Remi
+Track Art: Buck
 References: Jackpot
 URLs: https://unofficialmspafans.bandcamp.com/track/disc-2-2
 Commentary:
@@ -619,7 +622,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: All the Luck
 Artist: Xoro Laventer
-Track Art: P. Gibson
+Track Art: Phil Gibson
 References:
 - Spider's Claw
 - MeGaLoVania
@@ -628,7 +631,7 @@ References:
 - Lotus
 URLs: https://unofficialmspafans.bandcamp.com/track/all-the-luck
 Commentary:
-    <i>P. Gibson:</i>
+    <i>Phil Gibson:</i>
     Vriska is gr8 and thank goodness she saved all of space and time so we could hear this album
     <i><b>wheals:</b></i>
     Xoro was working on a little 8-song Vriska album concept for the CANMT, to be released on 8/8/2016. Though the idea never came to be, he made a couple songs for it, which then languished on the main tab of our organization sheet. Reading through the list of semi-abandoned songs there, I convinced him to put it on our Volume 8, so it ended up with some 8-related action. At some point, either the LOFAM judges listened to the album and felt it was a standout track, or Xoro submitted it on his own. The latter is possible since right around then was when Lambda put out an open call on /r/homestuck for song submissions. Either way, Xoro felt the song could bei mproved, so the song as presented here is an even more polished version of the v8lume one. Relistening, many of the changes jump out. Right away you can tell some of the instruments have changed. (Enemy Approaching, the Undertale song, is still an obvious compositional inspiration, even though the instrumentation being less electronic makes this version less similar in that sense.) Some of the mixing is better and more punchy, a skill that Xoro excels at. Terezi's theme opens the bridge, after which the song contains new composition. Returning to the original motifs of the song after the bridge, it continues to put a new spin on them. I never cease to be impressed by the musical improvements of my friends in the Homestuck fanmusic community. And I'm glad that in a managerial role, I can facilitate others' improvement. Let's all give Xoro a thumbsup for the great work here.
@@ -681,14 +684,14 @@ Commentary:
     I'm personally glad Elanor took the Hiveswap route for this song's track art, because I feel it fits the song so well even beyond Old Secret. The song invokes a calm theme for Joey, and speculation on all of the possible misadventuers she'll have that we'll soon get to see. As of this writing, Hiveswap's definitive release date of September 14th was revealed three days ago, and I hold hope it won't be delayed any longer. In the meantime, Daydream is a theme that embodies thoughts of that wait and that hope, and of course, thoughts of the game itself.
 -------------------------------------------------------------------------------
 Track: Grimbark
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: Amethyst Barron
 References: Penumbra Phantasm
 URLs: https://unofficialmspafans.bandcamp.com/track/grimbark
 Commentary:
     <i>Amethyst Barron:</i>
     A space werewolf with reality warping powers would be terrifying and I wanted to reflect that. Also I really like drawing drooly sharp teeth.
-    <i><b>power464646:</b></i>
+    <i><b>Grace Medley:</b></i>
     Okay, okay. Before you start listening to this song, just picture in your head the absolute BEST grimdark Jade theme. Then hit play. If you're not confused as to how Ascenzo managed to read your mind, you did something wrong.
 -------------------------------------------------------------------------------
 Track: Upward Meowvement (Davepetasprite^2 Owns)
@@ -908,7 +911,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/cleopatras-cocktail-party
 Commentary:
     <i>nights:</i>
     I'm really happy with this piece! The music sets a uniquely nice atmosphere on LOPAN, which I hoped to capture in this art's composition and colors. (Also the glass is just water, I promise I don't condone underage drinking, please don't call the cops)
-    <i><b>power464646:</b></i>
+    <i><b>Grace Medley:</b></i>
     During his time as a musician for Homestuck, Thoams Ferkol touched on a wide range of styles, from metal to neoclassical to krautrock, and everywhere in between. One he hadn't done, though, was disco... Until now! Conceived as one of three land themes for the alpha session (LOPAN in particular), this track sadly never saw an official release, but it's here, now, for your listening pleasure.
 -------------------------------------------------------------------------------
 Track: Quest Crypt
@@ -947,11 +950,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Sunslammer (Cement City Remix)
 Artist: Cement City
-Track Art: Culljoy
+Track Art: Cro
 References: Sunslammer
 URLs: https://unofficialmspafans.bandcamp.com/track/sunslammer-cement-city-remix
 Commentary:
-    <i>Culljoy:</i>
+    <i>Cro:</i>
     This was quite an interesting piece to work on; I was trying to do something with perspective though you know, practice will eventually take someone far! Anyway, here's Jade. The green sun is in the corner because outside of paying mind to the spacey environment, it somewhat references her whoel god tiering ordeal, which essentially meant the first guardian bonus pack.
     <i><b>ndividedbyzero:</b></i>
     i think this song speaks for itself so here are some lyrics.
@@ -1000,12 +1003,12 @@ Commentary:
     (ps, viko told me to say johndave is canon i guess)
 -------------------------------------------------------------------------------
 Track: Robert Jailbreak
-Artist: FriendlyCoy
+Artist: Matthias Ramalho
 Track Art: Jaspy
 References: Pumpkin Cravings, Assail, Jackknive
 URLs: https://unofficialmspafans.bandcamp.com/track/robert-jailbreak
 Commentary:
-    <i>FriendlyCoy:</i>
+    <i>Matthias Ramalho:</i>
     This track is a joke. It doesn't have a serious purpose. But it is, in fact, an 8-bit track I worked quite hard to make sound good. If you love 8-bit and RJ, then this is the track just for you!
     <i>Jaspy:</i>
     so i worked on this art way back in the beginning of the year just to see if i could contribute to the album and made a piece of art i'm pretty happy about, i don't really do art stuff so this was a first for me but im glad i could have worked on the album in some way still. it was pretty fun working on the art in general, coming up with the idea was pretty quick after i heard the song, but the hard part was trying to draw lil rj for the art (with a trackpad, dont use trackpds), and after a few revisions i think i got it to a pretty close style to the original. anyway glad i could help work on the album, and hope you dudes all enjoy the rest of it
@@ -1180,7 +1183,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Thyme on My Fries
 Artist: SplitSuns
-Track Art: TwinBuilder
+Track Art: Ephemerald
 References:
 - Time on My Side
 - Smackdown
@@ -1267,7 +1270,7 @@ Commentary:
     Omega Timeline is a song about the Game Over timeline, which Terezi heavily assists in healing with a plan she formed herself. Naturally, then, it works for the art to show Terezi in the middle of her final journey in this timeline, inches away from finding her true potential. It fits the adventurous and determined nature of the song pretty well! The fact that the letter Omega is associated with Libra helps too, of course.
 -------------------------------------------------------------------------------
 Track: Emerald Cinders
-Artist: power464646
+Artist: Grace Medley
 Track Art: sonotcanon
 References:
 - Rhapsody in Green
@@ -1276,7 +1279,7 @@ References:
 - English
 URLs: https://unofficialmspafans.bandcamp.com/track/emerald-cinders
 Commentary:
-    <i>power464646:</i>
+    <i>Grace Medley:</i>
     This song started out as a test to see if I could replicate that bassy blare from every major action film trailer from the past six or so years. Then, it evolved into a Rhapsody in Green cover, and the rest is history. While making this I had the image of the Midnight Crew's casino burning down as Spades struggles to escape, then I re-thought it over with Lord English's arrival into Jack's body, then Jake's battle against the leprechauns, until I eventually decided, "as long as it's Felt-themed, this song isa bout it". There are a few references to Felt-based songs in here, too. The aforementioned Rhapsody in Green, the eerie variation of English from early on in Carne Vale, the opening from Afraid of the Darko (although quite drastically rewritten for a cinematic vibe) and a hopeful piano reprise of Carne Vale as a reflection of the first defeat Jake had left the Felt with. Then it concludes with the tail-end of English, because the Felt never truly stay down.
     <i>sonotcanon:</i>
     snowman a la mal from inception. credit to power for the concept!
@@ -1304,7 +1307,7 @@ Commentary:
     GPI: Fondly regard Selan spending too much time fiddling with the background
 -------------------------------------------------------------------------------
 Track: Prospitian Monody
-Artist: ViKomprenas
+Artist: Viko Riféo
 Track Art: Jas
 References:
 - Cascade (Beta)
@@ -1312,7 +1315,7 @@ References:
 - Rex Duodecim Angelus
 URLs: https://unofficialmspafans.bandcamp.com/track/prospitian-monody
 Commentary:
-    <i>ViKomprenas:</i>
+    <i>Viko Riféo:</i>
     I honestly can't believe this got in. I mean, don't get me wrong, I'm satisfied with it, but seriously this took ages to get to a publishable state.
     Prospitian Monody started life as a techno/ambient fusion with acoustic instruments in for fun too, which is a fancy way of saying I have no idea what genres actually mean. It also had a completely different melody. People told me the piano didn't fit so I made it synth, people told me the melody was aimless but couldn't explain why so I just rewrote it and blindly hoped, and they liked it but then production sucked again so I made it orchestral, and then the whole thing became synth instruments, which I kind afound bland but also it works well and I don't know what else to do. ANYWAY ENOUGH RAMBLING ABOUT USELESS FEEDBACK LETS GET TO THE SONG ITSELF
     A monody is essentially a dirge, except that it's not a dirge? It's dirgeish anyway. (fucking hell ost) This is like a funeral hymn for the White King, but the Dersite army is slaughtering all the Prospitians that try to mourn, so in the end the funeral ends up being held by some Dersites who aren't sympathetic to Prospit, but do respect tradition and politeness and etiquette and so on, so to compensate for it being a funeral for the enemy they make it all imposing and evil. (The Black King is too busy ending the world to notice.) You could sort of view it as a counterpart to [[Broken Dreams]] on the SBURB OST, but focusing more on Derse's triumph than on Prospit's downfall.
@@ -1360,21 +1363,22 @@ References:
 URLs: https://unofficialmspafans.bandcamp.com/track/ultimate-alchemy
 Commentary:
     <i>Interrobang:</i>
-    The song that eventually came to be known as Ultimate Alchemy started at a time I found myself listening to Volume 7's Earthsea Borealis, which remains one of my favorite Homestuck songs ever. One day, a melody popped into my head, and I started writing. At some point in the composition process I decided I might as well try to submit the song to LOFAM4, and with quite a bit of much-appreciated feedback from the judges, got it into a completed state. The biggest surprise as I was finishing up work occurred when ViKomprenas pointed out that what I had thought was the original melody throughout the song was in fact Bilions, which is a great song from the Genesis Frog album that I had embarrassingly forgotten about.
-    A lot of people helped me to get this song into the state that it's in now, and I'd like to take this opportunity to thank them. Thanks to ViKomprenas and Xoro Laventer, who both had some really great ideas on mastering and percussion that ultimately didn't make it into the final song; to Wheals for giving it a final name, and ESPECIALLY to Seijen, whose mastering amde the final product much better than I could have ever thought. And of course many, many, many thanks to Circlejourney, whose art is indescribably fitting and amazing. Finally I'd like to thank the LOFAM4 team for all their help and support, y'all are a bunch of great people and it's been an honor to have this opportunity.
+    The song that eventually came to be known as Ultimate Alchemy started at a time I found myself listening to Volume 7's Earthsea Borealis, which remains one of my favorite Homestuck songs ever. One day, a melody popped into my head, and I started writing. At some point in the composition process I decided I might as well try to submit the song to LOFAM4, and with quite a bit of much-appreciated feedback from the judges, got it into a completed state. The biggest surprise as I was finishing up work occurred when Viko Riféo pointed out that what I had thought was the original melody throughout the song was in fact Bilions, which is a great song from the Genesis Frog album that I had embarrassingly forgotten about.
+    A lot of people helped me to get this song into the state that it's in now, and I'd like to take this opportunity to thank them. Thanks to Viko Riféo and Xoro Laventer, who both had some really great ideas on mastering and percussion that ultimately didn't make it into the final song; to Wheals for giving it a final name, and ESPECIALLY to Seijen, whose mastering amde the final product much better than I could have ever thought. And of course many, many, many thanks to Circlejourney, whose art is indescribably fitting and amazing. Finally I'd like to thank the LOFAM4 team for all their help and support, y'all are a bunch of great people and it's been an honor to have this opportunity.
     <i>Circlejourney:</i>
     The track is clearly about the Ultimate Alchemy, which I also find it very evocative of. I took that prompt on as faithfully as I could.
     This is one part of a larger iamge formed of the covers of this, [[Crystalendofgames]], and [[Black Hole / White Door]].
 -------------------------------------------------------------------------------
 Track: The Sock Ruse
-Artist: Facetious & Friends
-Track Art: Nick Turner
+Artist: Alex Votl
+Contributors: Facetious (Alex Votl) & Friends
+Track Art: Nick Tucker
 URLs: https://unofficialmspafans.bandcamp.com/track/the-sock-ruse
 Lyrics:
     Please <a href="feedback/index.html">send me</a> the lyrics, i love them but i cannot make out a few parts <3
     <i>From <a href="http://www.mspaintadventures.com/sweetbroandhellajeff/?cid=007.jpg">Sweet Bro and Hella Jeff, page 7</a>.</i>
 Commentary:
-    <i>Facetious:</i>
+    <i>Alex Votl:</i>
     this project was pieced together over the course of 5 years with tons of help from my friends. it started out as an inside joke from the homestuck tinychat community around 2011, but i see it more as an homage to the series and the fandom. thanks for the memories everyone. it was a blast.
     <i>Nick Tucker:</i>
     The most common way of perceiving the passing of time into a concept that humans can understand often involves the idea of moving forward through time, as if we foresee what is in our path, and appraoch it in a straight line. A more accurate way of looking at it is that we are reversing into the events of tomorrow, with no real idea of what awaits us. When we look ahead, we see our past, and that informes our actions. The Maori turn of phrase, "ka mura, ka muri" means to walk backwards into the future.
@@ -1435,7 +1439,7 @@ Commentary:
     When I hear the song, it's a no brainer that it was about Roxy in the dreambubbles, being a remix of 'Even in Death' and all. What was tricky was figuring out what exactly to show in the track art: what angle, what aspect of the dreambubbles, and so on. I didn't want to make the art too busy, so I went for a simpler piece that showcased one of the grander moments of the 'Roxy: Sleepwalk' flash—where the music swells as Roxy falls into that dream bubble. Pinks and purples were used cause they pop on the black, and they're nice mysterious colors.
 -------------------------------------------------------------------------------
 Track: Crystalline Repose
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: dodostad
 References: Crystalanthemums
 URLs: https://unofficialmspafans.bandcamp.com/track/crystalline-repose
@@ -1487,7 +1491,7 @@ Track Art: Kate Griffith
 References: Moonsetter
 URLs: https://unofficialmspafans.bandcamp.com/track/moonsetter-strider-remix
 Commentary:
-    <i><b>power464646:</b></i>
+    <i><b>Grace Medley:</b></i>
     Cement City doesn't normally do music like this, so hearing Toby Fox's Moonsetter remixed into a laid-back, yet high energy neopsychedelic piece is a blast of fresh air, especially for someone like myself, who practically grew up listening to experimental electronic music. Despite the track's simplicity, it somehow succeeds in pulling off an atmosphere all of its own, and makes one of Toby's catchiest tunes even catchier.
     <i><b>WHATISLOSTINTHEMINES:</b></i>
     Honestly, the head of an ogre doesn't sound like the most comfortable chair to me, but evidently, the Striders disagree. I guess they're too... cool...

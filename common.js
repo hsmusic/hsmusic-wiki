@@ -46,6 +46,11 @@ const C = {
         return data.sort((a, b) => a.date - b.date);
     },
 
+    // Same details as the sortByDate, 8ut for covers~
+    sortByArtDate: data => {
+        return data.sort((a, b) => (a.artDate || a.date) - (b.artDate || b.date));
+    },
+
     // This gets all the track o8jects defined in every al8um, and sorts them 8y
     // date released. Generally, albumData will pro8a8ly already 8e sorted 8efore
     // you pass it to this function, 8ut individual tracks can have their own

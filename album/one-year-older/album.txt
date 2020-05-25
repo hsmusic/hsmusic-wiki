@@ -1,8 +1,11 @@
 Album: One Year Older
 Artist: Erik Scheele
-Cover Art: Killian Ng
+Cover Art: Vivian Ng
 Date: August 15, 2012
 FG: #00aaff
+URLs:
+- https://erikscheele.bandcamp.com/album/one-year-older
+- https://www.youtube.com/playlist?list=PL43D61BA1D4DF9B24
 Commentary:
     <i>Erik Scheele:</i>
     <center><small>okay first things first</small><br>I<br>MADE THIS<br><big>FOR YOU</big></center>
@@ -88,7 +91,7 @@ Commentary:
     At any rate, the music I went for was to just go along with that, a peaceful song for his demise before he came back. It feels kind of morbid, but since the concept of death has kind of gone out the window and back again in Homestuck, it's hardly as morbid as it could be.
 -------------------------------------------------------------------------------
 Track: Unlabeled
-Track Art: Killian Ng
+Track Art: Vivian Ng
 URLs: https://erikscheele.bandcamp.com/track/unlabeled
 Commentary:
     <i>Erik Scheele:</i>
@@ -115,7 +118,7 @@ Commentary:
     The piece started out as extreme laziness on my aprt, just idle playing around with various distortion on synths and samples, until the school project came up and wanted results fast. So I threw some things together until they formed the opening, and took a very lax approach to the piano part, a sort of "here's a riff, now play around with it, there's your part" with a drum loop over top. Thankfully my laziness didn't extend to the whole thing, and it all got more polished up and developed over time. It still keeps the "improvised piano part based off one riff" idea, though.
 -------------------------------------------------------------------------------
 Track: Respit
-Track Art: Sasha Morrissey
+Track Art: K
 URLs: https://erikscheele.bandcamp.com/track/respit
 Commentary:
     <i>Erik Scheele:</i>

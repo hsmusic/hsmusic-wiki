@@ -4,13 +4,16 @@ Cover Art: Quietserval
 Date: December 15, 2013
 FG: #88a4ff
 Canon: Fanon
+URLs:
+- https://unofficialmspafans.bandcamp.com/album/land-of-fans-and-music-3
+- https://www.youtube.com/playlist?list=PL2E1aOkERtLVH6mVZNPZ8Cou4_K_6n7QS
 Commentary:
     <i>Veritas Unae:</i>
     In 2011, some musicians got together. They had an idea, to grab together some of the many pieces of fan music floating around the MSPA forums and the internet, and compile it into an album for the fandom to download. I can remember excitedly heading to my second semester classes at university listening to the tunes that these fantastic artists had provided, and the track art to go with each song. I'm so glad to have worked with most if not all of these musicians along the course of the past 3 years.
     I got my own chacne to participate in these endeavours in 2012, with the fan musicians coming together to work on Sburb OST and LoFaM 2. And now we're here, in 2013, releasing LoFaM 3 for you all. I hope you love each and every track on this album, much like I remember loving LoFaM in 2011. Many thanks have to be extended to everyone who brings these projects together, most of all Lune, who has handled everything art for the project! I couldn't have done it without her. Thanks to Brad for making the booklet, AndrewNeo for hosting all this fan music for us, Xzaz for being incredible at picking tracks and references, as well as the brave sacrifices he has made for the album, and to Solatrus, Konec0 and Mark for helping along the way.
     Thanks for listening!
     - Veritas Unae
-    <i>Lunise:</i>
+    <i>Christina Lillard:</i>
     So this sure is a thing! I did art for LOFAM2 and retconned in a nice banner for the rehosted LOFAM1, so naturally I sold my soul to the LOFAM once more to draw things and wrangle some artists for the third album! I consider this project a tribute to the creative side of the Homestuck fandom. You guys rock! I hope yoiu enjoy this album and take a look at all the cool art for it.
     - your friendly neighborhood Lune
     <hr>
@@ -90,7 +93,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Emissary of Dance
 Artist: Yishan Mai
-Track Art: poinko
+Track Art: Phil Gibson
 URLs: https://unofficialmspafans.bandcamp.com/track/emissary-of-dance
 References:
 - Emissary of Wind
@@ -139,12 +142,12 @@ Commentary:
     <small>...brenna"randomencounter"curranyan"nucleose"rodriguezmarcynabors(shadolith) sammneilandmax"imbrog"wrightgecdavidkorobert"kali"blaker paige"hrmnzr"<small>stanleysinisterpsycheian"myusernamesmud"white toby"radiatio<small>n"foxveritasunaeda<small>vid"dirtiest"dycus teamdogfightdavidellis(alunatic'sda</small>ydream)demographerist</small></small></small>
 -------------------------------------------------------------------------------
 Track: Dance of Viridian and Violet
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: rosesarecrimson
 References: Dance of Thorns, Endless Climb
 URLs: https://unofficialmspafans.bandcamp.com/track/dance-of-viridian-and-violet
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     Dance of Viridian and Violet is an oldtrack of mine--about two years old! I was surprised anyone remembered it enough to nominate it for Land of Fans and Music 3, but I suppose I should never underestimate people's willingness to dig years back through a fanartist's works. Anyway, like I said, it is very old and absolutely no mastering was used on it whatsoever (I'm scared to actually look at its waveform) since back then I didn't know what mastering was. The song ended up sounding quite beautiful, and I sitll think so today, despite my relative lack of skill.
     Of course, this track being so old, I'd long since deleted the original FL Studio project file during spring cleaning, so I didn't have access to any of the MIDI data (the same thing happened with [[Sign of the Scorpion]]). I couldn't even properly remaster the song since I no longer had a lossless source. That's why I made a brand-new arrangement of the piece for LOFAM 3 that captures the piece's ouriginal beauty and romantic feel while only adding to its richness and elegance. Both Dance of Thorns and Endless Climb are hinted at in the composition, and while there aren't any quotes from Alternia/Bound, the stately elegance of the piece is meant to recall Kanaya.
     <i>rosesarecrimson:</i>
@@ -262,7 +265,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Fracta Sub Luna
 Artist: Thomas Ferkol
-Track Art: Ella
+Track Art: dodostad
 URLs: https://unofficialmspafans.bandcamp.com/track/fracta-sub-luna
 Commentary:
     <i>dodostad:</i>
@@ -386,12 +389,12 @@ Commentary:
     There's no sleepy eyes,<br>Just a snoozing Roxy butt.<br>(I'm not complaining)
 -------------------------------------------------------------------------------
 Track: Sign of the Scorpion
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: rufiohbascoh
 References: Spider's Claw
 URLs: https://unofficialmspafans.bandcamp.com/track/sign-of-the-scorpion
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     Sign of the Scorpion is an old track of mine, about maybe 14 or 15 months old, and while I'm legitimately proud of a lot of compositional elements, the mastering and production horrified me looking back on it. Like [[Dance of Viridian and Violet]], I'd long since deleted the project file, since it was just a one-off Homestuck song that I figured I was unlikely to ever need again, so I made a nwe arrangement of the piece from scratch, taking elements I liked frmo the original and putting them in a new context. It doesn't quote any Homestuck themes (I don't believe the original did at all), except for a brief mention of Spider's Claw right at the end. The new arrangement has a bit more of a hard-rock feel and toned-down orchestral elements, making it a bit more reflective of Vriska as a character.
     <i>rufiohbascoh:</i>
     I did a track art for one of Ascenzo's songs back in LOFAM2 as well and also the art for Rust Apocalypse. So, when I saw two songs by him on the available songs for track art, I couldn't really help myself. His songs are great. I know you like it, I can tell. Hope the track art seems suitable, and that you'll enjoy that as well. I have nothing else to say on the matter. That's it.
@@ -531,12 +534,12 @@ References:
 URLs: https://unofficialmspafans.bandcamp.com/track/garden-of-eden-part-2
 -------------------------------------------------------------------------------
 Track: Electric Fireflies
-Artist: AutoDevote
+Artist: Thomas Ibarra
 Track Art: Elanor Pam
 References: Firefly Cloud, Doctor, Showtime (Original Mix)
 URLs: https://unofficialmspafans.bandcamp.com/track/electric-fireflies
 Commentary:
-    <i>AutoDevote:</i>
+    <i>Thomas Ibarra:</i>
     Many of my recompositions tend to be experiments with lemotiffs, and Electric Fireflies is no exception. While largely focused around the light flicks of piano melody within Firefly Cloud and the song itself by Erik "Jit" Scheele, I found my experiment to take a coures of its own. I tried to follow Jit's carefully integrated elements of Doctor to discover that his method employed a much more flowing and intertwined realization of instrumental melody; this was something I felt tha I did not achieve. I felt refreshing to observe what can only be described as mastery of melody, theme and atmosphere. It was a pleasure to make this piece.
     <i>Elanor Pam:</i>
     Sketched and colored in Paint Tool Sai and color adjusted in Photoshop.
@@ -725,7 +728,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Forest Fire
 Artist: Brad Griffin
-Contributors: Jeremy Iamurri (with regards to), Clark Powell (with regards to)
+Contributors: Solatrus (with regards to), Clark Powell (with regards to)
 Track Art: sayachan-art
 References: Flare
 URLs: https://unofficialmspafans.bandcamp.com/track/forest-fire
@@ -776,7 +779,7 @@ References: Rust Servant
 URLs: https://unofficialmspafans.bandcamp.com/track/maid-in-spades
 Commentary:
     <i>Max Wright:</i>
-    Taking the motif from Will Ascenzo's Rust Servant and completely changing the genre was one of the more fun piece ideas I've had.
+    Taking the motif from Willow Ascenzo's Rust Servant and completely changing the genre was one of the more fun piece ideas I've had.
     Maid in Spades is a piece written fro the Handmaid, reimagining the character in a swinging bundle of positive vibes. Now, I could try and justify the choice of genre here by referring to her past, how she is a tragic character with a pure heart, how she was nurtured into evil... but the truth is: this piece doesn't fit the Handmaid in the slightest.
     But really, it was never meant to.
     <i>dodostad:</i>
@@ -805,12 +808,12 @@ Commentary:
     Doing art for a dance remix of Frost wouldn't have proved tricky if not for a perplexing (but very cool) track title. And so, here we have Jade and some frogs integrated as part of a... metaphoric-circuitboard-type-thing by Echidna. I think if you imagine the song set to a trippy frog-gathering montage on LOFAF with this imagery, you'll get a better idea of what I was aiming for. At any rate, I'm really happy with how it turned out, and I hope I've done the track the justice it absolutely deserves.
 -------------------------------------------------------------------------------
 Track: Pirates of Alternia: Dead Troll's Chest
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: rufiohbascoh
 References: Cobalt Corsair, Violet Mariner
 URLs: https://unofficialmspafans.bandcamp.com/track/pirates-of-alternia-dead-trolls-chest
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     0:00-0:14: An unassuming troll merchant ship sails the ocean, its precious cargo of shitty romantic comedy movies tucked safely within its lower decks, unaware of the danger that approaches.
     0:14-0:24: A pirate ship suddenly appears from out of the fog, closing in fast! Its captain: the dastardly pirate Marquise Spinneret Mindfang!
     0:24-1:05: Mindfang's pirate crew boards the vessel, and a battle ensues! This part introduces the main theme of the piece, which is adapted from the first thirty esconds or so of Imbrog's Cobalt Corsair. As the fight continues, another ship closes in...
@@ -835,7 +838,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Explore [Keygen Mix]
 Artist: ndividedbyzero
-Track Art: Lunise
+Track Art: Christina Lillard
 References: Explore
 URLs: https://unofficialmspafans.bandcamp.com/track/explore-keygen-mix
 Commentary:
@@ -843,7 +846,7 @@ Commentary:
     What even is keygen music? I have no idea, but if it exists, I hope this sounds like it.
     This song is pretty important to me. Prior to completing it in March 2012, I had really only been making small loops in FL Studio that only had one or two instruments, save for two submissions I'd sent to the Homestuck fanmusic contest, which, while pretty good in terms of structure even by my standards today, didn't exactly have much to them in production value. But when I took it upon myself to rearrange Explore, that suddenly changed. I was extremely self-deprecative about it at first, but as I began to listen to it more, I realized that it didn't sound all that bad- in fact, it even sounded.. tolerable, compared to everything else I'd made. And that was essentially when I resolved to work on making my music sound even better.
     In fact, people liked it enough that it was nominated for LOFAM 3, no more than a year later. Having improved a lot by that time, I decided to touch it up a little, and this version is the result. I didn't really change all that much, besides adding and tweaking a few instruments, but I hope it sounds better nonetheless.
-    <i>Lune:</i>
+    <i>Christina Lillard:</i>
     My interest in doing Homestuck fanart has waned over the past few months, but I will always have a soft spot for the exiles no matter what. So it is only natural that I do goofy exile art for an Explore arrangement! Even though I was seriously burned out on art in general when I did this, I think it turned out okay. Goofy, happy exiles always turn out okay!
 -------------------------------------------------------------------------------
 Track: Ohgodboss
@@ -861,7 +864,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Dogfight (Dirtiest's Dubstep Remix)
 Artist: David Dycus
-Track Art: Lunise
+Track Art: Christina Lillard
 References:
 - Dogfight
 - Bec Noir
@@ -872,7 +875,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/dogfight-dirtiests-dubstep-r
 Commentary:
     <i>David Dycus:</i>
     My first attempt at a dubstep song, from my ill-conceived dubstep phase. It took a ton of time, an entire new drum pack, and ultimately, a new laptop to finish. It's not my favorite song I've ever made--it doesn't sound like a real dubstep song, in my opinion--but I learned a lot in the process of making it.
-    <i>Lune:</i>
+    <i>Christina Lillard:</i>
     I HOPE YOU LIKE GAMEGRL
 -------------------------------------------------------------------------------
 Track: Starblaze

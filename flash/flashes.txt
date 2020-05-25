@@ -700,7 +700,7 @@ Tracks:
 - Indigo Heir
 - Orchid Horror
 - Davesprite
-- iRRRRRRRRECONCIA8LE
+- iRRRRRRRRECONCILA8LE
 ------------------------------------------------------------------------------
 Flash: [S][A6I3] ==>
 Page: 5426
@@ -1204,6 +1204,7 @@ Contributors:
 - Andrew Hussie (writing: John, art: backgrounds)
 - Kim Quach (art: characters)
 - Xamag (art: backgrounds, endings)
+- Mint Chipleaf (programming)
 Directory: pq-vol1
 Date: September 4, 2019
 Tracks:
@@ -1215,6 +1216,7 @@ Contributors:
 - Aysha U. Farah (writing)
 - Breya Rivera (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
+- David Turnbull (programming)
 Directory: pq-vol2
 Date: September 4, 2019
 Tracks: please support The Trevor Project
@@ -1224,6 +1226,7 @@ Contributors:
 - James Roach (writing)
 - Gina Chacón (art: characters)
 - Xamag (art: backgrounds, endings)
+- Mint Chipleaf (programming)
 Directory: pq-vol3
 Date: September 18, 2019
 Tracks:
@@ -1233,7 +1236,7 @@ Tracks:
 ------------------------------------------------------------------------------
 Flash: The Loneliest Girl In The World
 Contributors:
-- David Turnbull (writing)
+- David Turnbull (writing, programming)
 - Breya Rivera (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
 Directory: pq-vol4
@@ -1246,6 +1249,7 @@ Contributors:
 - Magdalena Clark (writing: Kanaya)
 - Gina Chacón (art: characters)
 - Phil Gibson (art: backgrounds, endings)
+- Mint Chipleaf (programming)
 Directory: pq-vol5
 Date: October 16, 2019
 Tracks: CRUSTacean:crustacean-pq, Darling Kanaya
@@ -1256,6 +1260,7 @@ Contributors:
 - Kate Mitchell (writing: Vriska)
 - Haven Daniels-Taylor (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
+- David Turnbull (programming)
 Directory: pq-vol6
 Date: October 30, 2019
 Tracks: mIrAcLeS, Superego
@@ -1266,13 +1271,14 @@ Contributors:
 - Sarah Zedig (writing: Terezi)
 - Xamag (art: characters)
 - Gina Chacón (art: backgrounds, endings)
+- Mint Chipleaf (programming)
 Directory: pq-vol7
 Date: November 13, 2019
 Tracks: CH3CK TH3 M3T4D4T4, Indigo Heir
 ------------------------------------------------------------------------------
 Flash: Team Charge
 Contributors:
-- David Turnbull (writing: Tavros)
+- David Turnbull (writing: Tavros, programming)
 - James Roach (writing: Aradia)
 - Breya Rivera (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
@@ -1289,6 +1295,7 @@ Contributors:
 - Haven Daniels-Taylor (art: Nepeta, Pounce)
 - Gina Chacón (art: Sollux)
 - Charlie Flocke (art: backgrounds, endings)
+- Mint Chipleaf (programming)
 Directory: pq-vol9
 Date: December 20, 2019
 Tracks: Requiem, KWCOM DOT WAV
@@ -1299,6 +1306,7 @@ Contributors:
 - Thomas Carr (writing: Feferi)
 - Kim Quach (art: characters)
 - Gina Chacón (art: backgrounds, endings)
+- Zichao Zang (programming)
 Directory: pq-vol10
 Date: January 15, 2020
 Tracks:
@@ -1311,6 +1319,7 @@ Contributors:
 - Pip Dillistone (writing)
 - Gina Chacón (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
+- Adelaide Killigan (prorgamming)
 Directory: pq-vol11
 Date: February 5, 2020
 Tracks: i guess
@@ -1320,6 +1329,7 @@ Contributors:
 - Magdalena Clark (writing)
 - Breya Rivera (art: characters)
 - Gina Chacón (art: backgrounds, endings)
+- Andrew D. (programming)
 Directory: pq-vol12
 Date: February 19, 2020
 Tracks: Riches to Ruins Movement II
@@ -1329,6 +1339,7 @@ Contributors:
 - Lalo Hunt (writing)
 - Haven Daniels-Taylor (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
+- Andrew D. (programming)
 Directory: pq-vol13
 Date: March 4, 2020
 Tracks:
@@ -1341,6 +1352,7 @@ Contributors:
 - Aysha U. Farah (writing: Afterw@rd)
 - Gina Chacón (art: characters)
 - Courtney Brendle (art: backgrounds, endings)
+- Adelaide Killigan (programming)
 Directory: pq-vol14
 Date: April 1, 2020
 Tracks:

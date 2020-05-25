@@ -3,6 +3,9 @@ Cover Art: saffronScarf
 Track Art: Homestuck
 Date: March 14, 2011
 FG: #00a4a4
+URLs:
+- https://homestuck.bandcamp.com/album/alterniabound-with-alternia
+- https://www.youtube.com/playlist?list=PL6BD21F562EDA9E09
 Commentary:
     <i>Toby Fox:</i>
     Bad news for everyone.

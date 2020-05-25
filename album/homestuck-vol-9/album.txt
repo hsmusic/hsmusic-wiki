@@ -2,6 +2,10 @@ Album: Homestuck Vol. 9
 Cover Art: Lazylaz
 Date: June 12, 2012
 FG: #f2a400
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-9-10-with-s-collide-and-act-7
+- https://www.youtube.com/watch?v=n1BVIEipjwk
+- https://www.youtube.com/playlist?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Crystalmethequins
 Artist: Clark Powell, Astro Kid
@@ -51,7 +55,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Trepidation
 Artist: Svix
-Track Art: Cheddar
+Track Art: Kiko B.
 URLs: https://homestuck.bandcamp.com/track/trepidation-2
 -------------------------------------------------------------------------------
 Track: Firefly
@@ -316,11 +320,11 @@ Commentary:
     <i>Tavia Morra:</i>
     This is another one that RJ let me do whatever I wanted on. After thinking about the title of the track, I remembered the moment in Homestuck when we all finally found out the answer to the infamous question <a href="https://www.homestuck.com/story/4853">“What Pumpkin?”</a> And what a heartwarming answer it was! To me, this was one of the most gentle tear-jerking moments in the comic to date. It just made sense to draw.
 -------------------------------------------------------------------------------
-Track: iRRRRRRRRECONCIA8LE
+Track: iRRRRRRRRECONCILA8LE
+Directory: iRRRRRRRRECONCILA8LE
 Artist: Michael Guy Bowman
 Contributors: Thomas Ferkol (electric guitar)
 Track Art: 8bitkitten
-Directory: iRRRRRRRRECONCIA8LE
 URLs: https://homestuck.bandcamp.com/track/irrrrrrrreconcila8le-2
 Commentary:
     <i>Michael Guy Bowman:</i>
@@ -486,7 +490,7 @@ URLs: https://homestuck.bandcamp.com/track/battle-against-an-unfathomable-enemy-
 -------------------------------------------------------------------------------
 Track: Noirscape
 Artist: David Ellis
-References: Black, Crystalanthemums, Descend
+References: Liquid Negrocity, Crystalanthemums, Descend
 Track Art: kendle bentley b!
 URLs: https://homestuck.bandcamp.com/track/noirscape-2
 Commentary:
@@ -509,7 +513,7 @@ Track Art: skepticArcher
 URLs: https://homestuck.bandcamp.com/track/dogfight-2
 Contributors:
 - David Dycus (organizer & synths)
-- Will Ascenzo (orchestra)
+- Willow Ascenzo (orchestra)
 - Yishan Mai (drums & piano)
 - DJ最テー (guitar)
 - viaSatellite (guitar & bass)
@@ -522,7 +526,7 @@ References:
 - Black Rose / Green Sun
 -------------------------------------------------------------------------------
 Track: A Taste for Adventure
-Artist: Seth Peele
+Artist: Seth Peelle
 References: Dissension (Original), Carefree Action, Showtime (Original Mix)
 Track Art: minty
 URLs: https://homestuck.bandcamp.com/track/a-taste-for-adventure-2

@@ -1,0 +1,79 @@
+Album: Strife 2
+Artist: Tensei
+Date: March 13, 2017
+Cover Art: Marimo
+Track Art: none
+FG: #a347c5
+Canon: Fanon
+URLs:
+- https://tenseimusic.bandcamp.com/album/strife-2
+- https://www.youtube.com/playlist?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Spirit of Storms
+URLs:
+- https://tenseimusic.bandcamp.com/track/spirit-of-storms
+- https://youtu.be/SxAgn108-EI?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Sanguine Panchromatic
+URLs:
+- https://tenseimusic.bandcamp.com/track/sanguine-panchromatic
+- https://youtu.be/6Vcp1k7NCFM?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: G4M3 OR D13
+Track Art: nights
+URLs:
+- https://tenseimusic.bandcamp.com/track/g4m3-or-d13
+- https://youtu.be/yFlmr242IfA?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Rouge on the Rox
+URLs:
+- https://tenseimusic.bandcamp.com/track/rouge-on-the-rox
+- https://youtu.be/3hepsdc1xPc?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Perfect Cascade of the Heart
+References: Cascade (Beta), Time on My Side
+URLs:
+- https://tenseimusic.bandcamp.com/track/perfect-cascade-of-the-heart
+- https://youtu.be/8_iVaqCiRFE?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Hope Strikes Eternal
+Track Art: nights
+URLs:
+- https://tenseimusic.bandcamp.com/track/hope-strikes-eternal
+- https://youtu.be/OK4EIzezQ78?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Aerosoul
+URLs:
+- https://tenseimusic.bandcamp.com/track/aerosoul
+- https://youtu.be/EQfJqxsQ_P8?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Arachnofunkia
+Track Art: nights
+URLs:
+- https://tenseimusic.bandcamp.com/track/arachnofunkia
+- https://youtu.be/gHllq3hex28?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: The King in Red
+Track Art: nights
+References: Crustacean
+URLs:
+- https://tenseimusic.bandcamp.com/track/the-king-in-red
+- https://youtu.be/8kMVJ8wvLoo?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Heel Girl
+References: Umbral Ultimatum
+URLs:
+- https://tenseimusic.bandcamp.com/track/heel-girl
+- https://youtu.be/RrU12KztX0Q?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Unite Division
+References: Liquid Negrocity
+URLs:
+- https://tenseimusic.bandcamp.com/track/unite-division
+- https://youtu.be/qZWBziarZ2E?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA
+-------------------------------------------------------------------------------
+Track: Spirit of Storms (Reprise)
+References: Spirit of Storms
+URLs:
+- https://tenseimusic.bandcamp.com/track/spirit-of-storms-reprise
+- https://youtu.be/psmbW5obOrQ?list=PLo6jbRGXGrtga6SrkG6lFuibIh1nBq5AA

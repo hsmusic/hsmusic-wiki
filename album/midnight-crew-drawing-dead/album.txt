@@ -3,6 +3,10 @@ Date: Febuary 4 2010
 Cover Art: Homestuck
 Track Art: Homestuck
 FG: #dd0000
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-1-4-with-midnight-crew-drawing-dead
+- https://www.youtube.com/watch?v=JQBK41qzhR4
+- https://www.youtube.com/playlist?list=PL83FE65DF950D7072
 -------------------------------------------------------------------------------
 Track: Three in the Morning
 Artist: Clark Powell

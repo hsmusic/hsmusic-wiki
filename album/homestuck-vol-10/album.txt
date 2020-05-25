@@ -1,6 +1,9 @@
 Album: Homestuck Vol. 10
 Cover Art: Lexxy
 Date: June 12, 2016
+URLs:
+- https://www.youtube.com/watch?v=LW9-Ov8CiRY
+- https://www.youtube.com/playlist?list=PLo6jbRGXGrth0hlSpAR9bO9_-iBqPy7Dq
 Commentary:
     <i>Robert J! Lake:</i> (project manager)
     This almost didn't happen.
@@ -79,7 +82,7 @@ Commentary:
 Track: Beatup
 Artist: Clark Powell, Astro Kid
 References: Beatdown (Strider Style)
-Track Art: Shannon Murphy
+Track Art: Shan Murphy
 URLs: https://homestuck.bandcamp.com/track/beatup-2
 Commentary:
     <i>Clark Powell:</i>
@@ -106,7 +109,7 @@ Track Art: Mika B.
 URLs: https://homestuck.bandcamp.com/track/you-killed-my-father-prepare-to-die-2
 Contributors:
 - Yishan Mai (drums, mixing)
-- Will Ascenzo (orchestra, choir)
+- Willow Ascenzo (orchestra, choir)
 - DJ最テー (guitars)
 - viaSatellite (bass)
 - David Dycus (synths, composition)
@@ -116,7 +119,7 @@ References:
 - Showtime (Piano Refrain)
 - Showtime (Original Mix)
 - Aggrieve (Violin Refrain)
-- Black
+- Liquid Negrocity
 - Checkmate
 - Gaia Queen
 Commentary:
@@ -125,7 +128,7 @@ Commentary:
     <i>viaSatellite:</i> (bassist)
     Homestuck had been one of the best experiences of my life, and being able to contribute music to it on several occasions fulfilled a few of my dreams.
     It's been a massive pleasure to work with y'all.
-    <i>Will Ascenzo:</i> (orchestra, choir)
+    <i>Willow Ascenzo:</i> (orchestra, choir)
     The amount of musical fan activity that came out of Homestuck was really quite incredible, and something I've never seen in any fandom before. For all the highs and lows in the Homestuck fandom the way the fandom appreciated fanmusic was special.
     <i>David Dycus</i>: (composer, synths)
     Homestuck gave me a sense of musical purpose I have not experienced before or since.

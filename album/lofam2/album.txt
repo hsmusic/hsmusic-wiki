@@ -1,9 +1,12 @@
 Album: Land of Fans and Music 2
 Directory: lofam2
-Cover Art: Lunise
+Cover Art: Christina Lillard
 Date: December 25, 2012
 FG: #33a1c9
 Canon: Fanon
+URLs:
+- https://unofficialmspafans.bandcamp.com/album/land-of-fans-and-music-2
+- https://www.youtube.com/playlist?list=PL_Njm6JMBBED5Iz-9Cct870dIQ3ip-6dF
 Commentary:
     <i>Liza Fletcher:</i>
     This album means a lot to me, for a lot of reasons. Not just because it represents literally months of planning, organization, rounds of messaging, upsets, drama, triumph and general hard work on the part of me and some very good friends of mine. Not just because we managed to get some of the top talent in the fandom to contribute not only music but track art. Not just because that talent includes music and art team members and the uniquely universally beloved superfan Dante Basco. Not just because that talent also includes many friends I love dearly, some of whom I got to know through this project.
@@ -13,7 +16,7 @@ Commentary:
     <hr>
     <i>Special Thanks:</i>
     <b>-CONCEPTION/ORGANIZATION-</b><br>Lambda Bledsoe<br>Liza Fletcher
-    <b>-ORGANIZATION TEAM-</b><br>Slogbait<br>Veritas Unae<br>Rachel Macwhirter<br>Paige 'hrmnzr" Stanley<br>Astro Kid<br>Sarah (clumsyroyalty)<br>Shoona<br>Charles "Crazy-8" Neudorf<br>Yishan Mai (Cat Boss)<br>Brad "Avinoch" Griffin<br>Mark "Dagoth Xil" Ciocca
+    <b>-ORGANIZATION TEAM-</b><br>Slogbait<br>Veritas Unae<br>Rachel Rose Mitchell<br>Paige 'hrmnzr" Stanley<br>Astro Kid<br>clumsyroyalty (clumsyroyalty)<br>Shoona<br>Charles "Crazy-8" Neudorf<br>Yishan Mai (Cat Boss)<br>Brad "Avinoch" Griffin<br>Mark "Dagoth Xil" Ciocca
     <b>-MASTERING-</b><br>Brad "Avinoch" Griffin<br>Veritas Unae
     <b>-COMMENTARY BOOKLET-</b><br>Brad "Avinoch" Griffin
     <b>-WEBSITE CODING-</b><br>Veritas Unae
@@ -95,7 +98,7 @@ Commentary:
 Track: Rectify
 Artist: Thomas Ibarra
 Track Art: Seth Massey
-References: Black, Atomyk Ebonpyre, Showtime (Piano Refrain)
+References: Liquid Negrocity, Atomyk Ebonpyre, Showtime (Piano Refrain)
 URLs: https://unofficialmspafans.bandcamp.com/track/rectify
 Commentary:
     <i>Thomas Ibarra:</i>
@@ -127,14 +130,14 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Good Dog (Best Friend)
 Artist: Yishan Mai
-Track Art: Lunise
+Track Art: Christina Lillard
 References: Courser, Carefree Action
 URLs: https://unofficialmspafans.bandcamp.com/track/good-dog-best-friend
 Commentary:
     <i>Yishan Mai:</i>
     ~ in loving memory of becquerel ~
     He was a good dog, and the best friend anyone could ever hope to have.
-    <i>Lunise:</i>
+    <i>Christina Lillard:</i>
     I was inspired by the pesterlog on <a href="https://homestuck.com/story/4858">page <s>6758</s> 4858</a>. Even thuogh I had heard this track long before that update, when I listened to it again to get an idea for what kind of track art I'd like to draw for it, all I could think of was that pesterlog about alpha Jade.
 -------------------------------------------------------------------------------
 Track: Unforgiving Terrain
@@ -155,7 +158,7 @@ Commentary:
     After the original art file crashed like a piping hot baby on a meteor, I decided to create an Egyptian hieroglyphic-ish piece for this song because you know, DESERTS and WANDERERS and WOW JUST GOSH. But I also wanted to add in some of WV's little cahlk drawings too because it's cute! I mean, come on. Look at them, being happy and carefree and unaware. Yes, I know deep in my heart that this story will have a very happy end. No doubts about it. *insert evil laughter here*
 -------------------------------------------------------------------------------
 Track: CR1M1N4L, CR1M1N4L
-Artist: Rachel Macwhirter
+Artist: Rachel Rose Mitchell
 Track Art: Pandora
 URLs: https://unofficialmspafans.bandcamp.com/track/cr1m1n4l-cr1m1n4l
 Lyrics:
@@ -170,7 +173,7 @@ Lyrics:
     Criminal, Criminal! To the window!<br>Criminal, Criminal! It's your fault, you know.<br>Criminal, Criminal! It's your time to go.<br>I'll secure the rope and you're out with a throw.
     Criminal, Criminal! To the window!<br>Criminal, Criminal! It's your fault, you know.<br>Criminal, Criminal! It's your time to go.<br>I'll secure the rope and you're out with a throw.
 Commentary:
-    <i>Rachel Macwhirter:</i>
+    <i>Rachel Rose Mitchell:</i>
     L3T TH1S B3 4 L3SSON TO 4LL OF TH3 PROSP3CT1V3 CR1M1N4LS OUT TH3R3
     1 4M 4LW4YS W4TCH1NG
     F1GUR4T1V3LY
@@ -260,7 +263,7 @@ Track Art: Amethyst Barron
 References:
 - Atomyk Ebonpyre
 - English
-- Black
+- Liquid Negrocity
 - The Ballad of Jack Noir
 - Walk-Stab-Walk (R&E)
 - Let's All Rock the Heist
@@ -301,7 +304,9 @@ Track Art: Spectrumfizz
 URLs: https://unofficialmspafans.bandcamp.com/track/sports
 Commentary:
     <i>Jamie Paige Stanley:</i>
-    <i>Hey, you. Yeah, you. No, this isn't Paige speaking. It's Florrie. Me. Please, for goodness sake, <a href="about/index.html">tell me</a> that I forgot to embed the commentary image for this track here. I don't have access to the booklet on which I'm writing this ATM, so I can't grab a screenshot. Plz. Thank you.</i>
+    <s><i>Hey, you. Yeah, you. No, this isn't Paige speaking. It's Florrie. Me. Please, for goodness sake, <a href="about/index.html">tell me</a> that I forgot to embed the commentary image for this track here. I don't have access to the booklet on which I'm writing this ATM, so I can't grab a screenshot. Plz. Thank you.</i></s>
+    <i>got it lol</i>
+    <img src="misc/commentary-here.png">
     <i>Spectrumfizz:</i>
     dude come check this out hummusr is like one of my favoprite musicans so i made a thnig for this MAD TRACK
 -------------------------------------------------------------------------------
@@ -375,7 +380,7 @@ References:
 - MeGaLoVania
 - Spider's Claw
 - Walk-Stab-Walk (R&E)
-- Black
+- Liquid Negrocity
 URLs: https://unofficialmspafans.bandcamp.com/track/fighting-spirit
 Commentary:
     <i>Kevin Grant:</i>
@@ -388,7 +393,7 @@ Artist: Thomas Ibarra
 Track Art: Spectrumfizz
 References:
 - Harlequin
-- Black
+- Liquid Negrocity
 - Sburban Jungle
 - Carefree Action
 URLs: https://unofficialmspafans.bandcamp.com/track/irradiated
@@ -413,7 +418,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Rise of the Denizens
 Artist: Domble
-Track Art: Lunise
+Track Art: Christina Lillard
 References:
 - Courser
 - Earthsea Borealis
@@ -427,7 +432,7 @@ Commentary:
     <i>Domble:</i>
     The original version of the track sounded nothing like this. What I want is for people who heard the first one to think, "wow, this guy really got less bad in a year." It references all the songs it originally did, whether in the same basic way (Courser, Ruins) or differently (Dawn of Man, the rose rap).
     That one terrible LEGENDARY ENDLESS DVS SAX song I amde almost went on the album instead of this and I felt like paying tribute to it, so that's where the little sax rif came from.
-    <i>Lunise:</i>
+    <i>Christina Lillard:</i>
     I had the feeling that I had to met some pretty high expectations when I was called upon to draw this one, so I was pretty nervous about doing it. I spent a long time mulling over how I was going to go about drawing this track art after I completed the art for Stalemate. We don't know nearly as much about the denizens as we do about the kids or the trolls or even the carapacians, but I took what we do know about the beta kids' denizens and ran with it.
     <i><b>Brad Griffin:</b></i>
     note: Lunise wrote seven paragraphs about the creative process behind this wonderful art piece. I can only fit the first one on the page.
@@ -446,7 +451,7 @@ Commentary:
 Track: Who Mourns for Jack Noir?
 Artist: Nitrosparxx
 Track Art: Corrina
-References: Black, The Beginning of Something Really Excellent
+References: Liquid Negrocity, The Beginning of Something Really Excellent
 URLs: https://unofficialmspafans.bandcamp.com/track/who-mourns-for-jack-noir
 Commentary:
     <i>Nitrosparxx:</i>
@@ -625,7 +630,7 @@ Commentary:
     Back when I had a far more depressing view on being trapped in the veil I wanted to make a short tune for it using a chrod progression I played on piano all the time and really wanted to use. Reminds me a bit of how some of the chords go in Shadow of the Colossus, but a lot less epic.
 -------------------------------------------------------------------------------
 Track: Til The Last Breath
-Artist: Branden Cameron
+Artist: Brenden Cameron
 Track Art: Racheme
 References:
 - Showtime (Original Mix)
@@ -666,7 +671,7 @@ Artist: Joe Ouellet
 Track Art: Racheme
 URLs: https://unofficialmspafans.bandcamp.com/track/wind-in-my-heir
 Commentary:
-    <i>Joe OUllet:</i>
+    <i>Joe Oullet:</i>
     WIMH is one of my fisrt original Homestuck fan-pieces. Originally entered in the contest to select tracks for Colours and Mayhem, it was a song geared towards John and his powers as an Heir of Breath. I chose a very laid back feel to this piece, progressing fom a soft choir at the beginning, picking up an arpeggiated synth and kick on the way to a more intense section of the song. I wanted the song to flow just like the wind: starting softly, the breeze picks up gradually, when suddenly a gust of wind comes, only to leave just as fast as it came.
 -------------------------------------------------------------------------------
 Track: Fighting Spirit ~Second Form~
@@ -702,7 +707,7 @@ Commentary:
     This is my favourite song on the album, and I ended up doing two track arts for it. This one is better, I think! I decided to use Doc Scratch because the song was about the Green Sun, and out of all the characters associated with it, I felt Doc Scratch best suited the song.
 -------------------------------------------------------------------------------
 Track: Doghead
-Artist: Will Ascenzo, D. Crystal
+Artist: Willow Ascenzo, D. Crystal
 Track Art: albel-is-mine
 References:
 - Chorale for Jaspers
@@ -710,7 +715,7 @@ References:
 - Carefree Action
 URLs: https://unofficialmspafans.bandcamp.com/track/doghead
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     I got the idea for "Doghead" shortly after "Cascade" and Jade's incredible ascension. I set out to create something epic, fast-paced, and exciting, but once I'd finished the first part, I found it was missing something. So I approached MSPA forumite and fellow Homestuck fan musician D. Crystal to see if he could add some guitar and drum tracks. He was happy to oblige, and the endresult turned out much better than the work I could do by myself. I learned two lessons that one day: one, that two heads are better than one and collaboration is incredibly fun, and two, that electric guitars make everything better.
 -------------------------------------------------------------------------------
 Track: Jane's Theme
@@ -752,11 +757,11 @@ Commentary:
     And what you see here is the finished product.
 -------------------------------------------------------------------------------
 Track: Blood Knight
-Artist: Rachel Macwhirter
+Artist: Rachel Rose Mitchell
 Track Art: Elanor Pam
 URLs: https://unofficialmspafans.bandcamp.com/track/blood-knight-2
 Commentary:
-    <i>Rachel Macwhirter:</i>
+    <i>Rachel Rose Mitchell:</i>
     When I amde Blood Knight, I was still pretty exhausted from putting Mechani% - now known as [[Indigo Archer]] - together. I'd never made anything as complex as Indigo Archer bfeore and on top of that I had massive anxieties about getting into the competition. I was stressed out! So Blood Knight nearly never happened.
     About a week before the music contest ended, I was talking to my best friend and he said he thought I could make a kickass song for Karkat. I didn't really believe him at first. Karkat is one of my favourite characters and I didn't feel confident about capturing him at all. But my friend persisted and threw a few ideas at me. Eventually I found myself in Cubase making music again with my best friend to tahnk for it.
     Immediately, I knew it needed electric guitars. That was problematic for me as I'd never, ever gotten synthesized guitars to sound halfway decent before. Heck, I'm still not entirely sure how I managed it, but I'm super happy with how it turned out. The feel of it matches what I was going for; not quite metal, not quite a ballad, kind of melancholy but also kind of in your face. Sort of. You might be able to tell that I had an easier time making it than describing it, heh. Pretty darn proud of this piece.
@@ -781,12 +786,12 @@ Commentary:
     A year and a half later, Red Miles definitely sounds like a first attempt. My only objective was to try to make the most over-the-top, attention-grabbing chiptune-metal song I could muster, so I threw in every trope I knew: the pipe organ, the wall of 8-bit synths, the Inferno electric guitar patch, and the Sburban Jungle motif (which I would use many, many more times). It may have been a bit much, but it was a necessary first step.
 -------------------------------------------------------------------------------
 Track: Elegy for a Thief (Dreamscape Remix)
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 References: Spider's Claw
 Track Art: Cap
 URLs: https://unofficialmspafans.bandcamp.com/track/elegy-for-a-thief-dreamscape-remix
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     I wrote <i>Elegy for a Thief</i> back in August 2011, inspired by the evocative image of ghost-Vriska standing in the snow outside John's house. After re-arranging it into a solo piano piece, I sat on it for a while. Eventually I began to work on another remix, but forgot about it. Then the song was nominated for Land of Fans and Music 2, and I rushed to polish up the song now that I had better tools and more skill. But I'd lost the original file, and the only remaining part of the scrapped remix was the right-hand piano notes (luckily, those were the most important part of the song)! The new remix is exotic and a bit hypnotic, syumbolizing John and Vriska's journey through the sureal and fantastic memory-realms of the afterlife.
     <i>Cap:</i>
     Originally, I planned to do a sentimental image of Vriska standing in the snow, but it turned out pretty lame. Then I figured hey, since I'm making somethin for a fantastic song for an amazing troll, why not make the piecea lmost as gr8t as her? So the snow idea melted and turned into this bizarre, dreambubble-ish creation!
@@ -807,7 +812,7 @@ Lyrics:
 -------------------------------------------------------------------------------
 Track: Embittered Shore
 Artist: Max Wright
-Track Art: Sarah
+Track Art: clumsyroyalty
 URLs: https://unofficialmspafans.bandcamp.com/track/embittered-shore
 Commentary:
     <i>Max Wright:</i>
@@ -826,18 +831,18 @@ Commentary:
     this entire album was a joke at clark's expense
 -------------------------------------------------------------------------------
 Track: Finale Strife
-Artist: Will Ascenzo
-Track Art: Ducky Seils
+Artist: Willow Ascenzo
+Track Art: Ducky Senpai
 URLs: https://unofficialmspafans.bandcamp.com/track/finale-strife
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     I began "Finale Strife" as a long, slow-burning build-up song for the final battle with Lord English, in a similar vein to "Finale Toccata" from Castlevania: Symphony of the Night. That, however, didn't pan out, and it ended up turning into a fast-paced,  high-energy strife theme more in the vein of "The Curse of Sorrow" from Castlevania: Order of Ecclesia (the only Castlevania game I've actually come close to beating), especially the organ, electric guitar, and snappy drum kit. The main melody has some resemblance to the Black King's theme from [[Rex Duodecim Angelus]] by Malcolm Brown, but not enough to qualify as a remix or arrangement.
-    <i>Ducky Seils:</i>
-    I initially ahd no idea what I was going to do for this song. I skimmed through the tracks and noticed this one by Will Ascenzo (who did some of my favorites on coloUrs and mayhem: Universe A like [[Teal Hunter]] and [[Violet Mariner]]), and I was instantly sold probably because of my love for pipe organs. Anyway, for a lack of better inspiration, I used the description Will left on soundcloud - "Final battle with Lord English." Tie that to Aranea's mentioning that Jake was destined to beat Lord English, and I had my inspiration. The lineart took much longer than it should have since my tablet had been freaking out and I haven't gotten the new one yet, but the coloring went quite smoothly.
+    <i>Ducky Senpai:</i>
+    I initially ahd no idea what I was going to do for this song. I skimmed through the tracks and noticed this one by Willow Ascenzo (who did some of my favorites on coloUrs and mayhem: Universe A like [[Teal Hunter]] and [[Violet Mariner]]), and I was instantly sold probably because of my love for pipe organs. Anyway, for a lack of better inspiration, I used the description Will left on soundcloud - "Final battle with Lord English." Tie that to Aranea's mentioning that Jake was destined to beat Lord English, and I had my inspiration. The lineart took much longer than it should have since my tablet had been freaking out and I haven't gotten the new one yet, but the coloring went quite smoothly.
 -------------------------------------------------------------------------------
 Track: Gangsta
 Artist: Dante Basco
-Track Art: Sarah
+Track Art: clumsyroyalty
 URLs: https://unofficialmspafans.bandcamp.com/track/gangsta
 Lyrics:
     ???
@@ -919,7 +924,7 @@ Commentary:
     When given the chance ot make an extra track for LOFAM 2, I jumped at the opportunity. It turns out I was assigned a Felt realted track, specifically to Stitch. I wanted to stay true to the feel of the album The Felt. I used strings, light percussion, and most importantly, I messed around with teh tempo. This was a little bit of a challenge for me, but I think it turned outa lright. Fun fact; The glitchy effect was not on purpose, it was an export error I thought sounded cool so I kept it.
 -------------------------------------------------------------------------------
 Track: Ave Dei Novi
-Artist: Will Ascenzo
+Artist: Willow Ascenzo
 Track Art: xkoraxayomex
 References:
 - Doctor
@@ -928,7 +933,7 @@ References:
 - Atomyk Ebonpyre
 URLs: https://unofficialmspafans.bandcamp.com/track/ave-dei-novi
 Commentary:
-    <i>Will Ascenzo:</i>
+    <i>Willow Ascenzo:</i>
     When I started "Ave Dei Novi" (a song made just for Land of Fans and Music 2), I fully intended that it would be the biggest, strongest, most well-composed, best Homestuck fan composition I've workedo n tto date, a sort of capstone of Homestuck fan music. The first Land of Fans and Music had two of my early songs on it, and I felt it was appropriate that I do my best and show how far I'd come in a year for the second album. "Ave Dei Novi" takes its cue, partially, from the bombastic and incredible Gundam Unicorn soundtrack by Sawano Hiroyuki, especially in the orchestra and percussion grooves, which I worked very hard on. I think I'm most proud of the bongo groove breakdown in the middle and the "Atomyk Ebonpyre" section near the end. Those two parts ended up especially fantastic.
     <i>xkoraxayomex:</i>
     Overall I feel that the artwork suits the piece in terms of relativity and presentation. I think it looks refined and somewhat detailed, but there is room for improvement. When I read the title for the piece, Ascension, I automatically thought back to Jade's god tier, as it is simply gorgeous and I just love it. It was a milestone for her becoming an even more essential character in Homestuck.
@@ -975,22 +980,22 @@ Commentary:
     Oh and the title makes me think of The Dance of Eternity by Dream Theater which is a really cool song.
 -------------------------------------------------------------------------------
 Track: Alphamatic Replacement
-Artist: Xander Wright
+Artist: Xauric
 Track Art: dodostad
 URLs: https://unofficialmspafans.bandcamp.com/track/alphamatic-replacement
 Commentary:
-    <i>Xander Wright:</i>
+    <i>Xauric:</i>
     So... this piece was originally designed to just be... exactly that. Just another piece. It wasn't meant for Homestuck, it wasn't meant or Tumblr ora nyone to see it. But a fantastic friend of mine told me about the Homestuck Music competition, so I figured why not. I sent this in after tweaking it a bit, and just for fun, threw it upon Tumblr. I then left for vacation, but still had internet access. I came back to see my song exploded on Tumblr, and was promptly getting upwards of 1,000-3,000 views a week. Needless to say, I was ecstatic. The song itself was kind of... my own personal blend? I love songs that combine organic and inorganic elements, and with Homestuck being the big thing on the block lately, I decided to try it out. As evidence by this album, it didn't make it, but it certainly was a big hit. However, what's funnier is that the version I put on Tumblr was the unmastered version, so when I put the mastered version up, it didn't get nearly as many hits as the unmastered version.
     A lot of people have asked me whether or not I'm going to make a second Homestuck track. And as much as I love the motivation from fans to do so, I don't think I could handle trying to one-up a piece like this and failing. So, here's to you, Homestuck.
     <i>dodostad:</i>
     For me the sogn was about alpha kids, no question about it. It took me a long time to come up with a composition that I liked and that seemed to fit the song. LOOK OUT FOR THE MILES JANE
 -------------------------------------------------------------------------------
 Track: Planetarium
-Artist: Rachel Macwhirter
+Artist: Rachel Rose Mitchell
 Track Art: Spectrumfizz
 URLs: https://unofficialmspafans.bandcamp.com/track/planetarium
 Commentary:
-    <i>Rachel Macwhirter:</i>
+    <i>Rachel Rose Mitchell:</i>
     Planetarium was the first piece of Homestuck fan music I ever made. I'd oly just caught up with the archives when I was set a composition assignment or university. Having never used Logic to compose before, I had fun playing with a bunch of the different inbuilt instruments. When I found the koto, I knew exactly what I wanted to do. I tried to make it sound somewhat ethereal and otherworldly to represent the Incipisphere in all its beautiful weirdness. To try to do that, I threw a whole lot of reverb and delay at pretty much every track. I really did not know what I was doing, but it was fun.
     The vocal lines were an afterthought. Actually, no, they were less than an afterthought. They werent actually something I thought I should include at all, but the assignment had a requirement of at least four recorded audio tracks. I threw those lines together at home on Cubase (I don't actually have a Mac, let alone Logic!) the morning the piece was drew it, slapped them onto the piece with Logic that day and got the assignment in just in time. But in the end, I think they enhanced the feel of the piece, so I'm kind of glad I had to chuck them in there!
     <i>Spectrumfizz:</i>

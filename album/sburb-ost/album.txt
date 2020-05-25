@@ -1,0 +1,370 @@
+Album: Sburb OST
+Directory: sburb-ost
+Cover Art: melodiousDiscord
+Date: November 24, 2012
+FG: #ffb400
+Canon: Fanon
+URLs:
+- https://unofficialmspafans.bandcamp.com/album/sburb-ost
+- https://www.youtube.com/playlist?list=PL2E1aOkERtLXq9YuH-q42kkqvsYGl7fvD
+-------------------------------------------------------------------------------
+Track: ~~~~DISK 1~~~~
+Directory: disk1-sburb-ost
+Artist: Veritas Unae
+Track Art: none
+URLs: https://unofficialmspafans.bandcamp.com/track/disk-1
+-------------------------------------------------------------------------------
+Track: Waiting For Adventure [Loading Screen]
+Directory: waiting-for-adventure
+Artist: Michael Guy Bowman
+Track Art: Tavia Morra
+URLs: https://unofficialmspafans.bandcamp.com/track/waiting-for-adventure-loading-screen
+-------------------------------------------------------------------------------
+Track: SBURBan Prelude [Main Menu]
+Directory: sburban-prelude
+Artist: sidewalkbanana
+Track Art: RunDoubleRun, Emily
+References: Sburban Jungle
+URLs: https://unofficialmspafans.bandcamp.com/track/sburban-prelude-main-menu
+-------------------------------------------------------------------------------
+Track: Meta Choices [Options]
+Directory: meta-choices
+Artist: sidewalkbanana
+Track Art; RunDoubleRun, Emily
+URLs: https://unofficialmspafans.bandcamp.com/track/meta-choices-options
+-------------------------------------------------------------------------------
+Track: Ignorance Is Bliss [Tutorial]
+Directory: ignorance-is-bliss
+Artist: Marcy Nabors
+Track Art: Esabelle Ryngin
+References: Homestuck Anthem
+URLs: https://unofficialmspafans.bandcamp.com/track/ignorance-is-bliss-tutorial
+-------------------------------------------------------------------------------
+Track: Metamorphic Choices [Kernel Prototyping]
+Directory: metamorphic-choices
+Artist: Veritas Unae, Marcy Nabors
+Track Art: Dawn Davis
+URLs: https://unofficialmspafans.bandcamp.com/track/metamorphic-choices-kernel-prototyping
+-------------------------------------------------------------------------------
+Track: Dawn of the End [Countdown]
+Directory: dawn-of-the-end
+Artist: Max Wright
+Track Art: invalidgriffin
+References: Sburban Jungle, Umbral Ultimatum
+URLs: https://unofficialmspafans.bandcamp.com/track/dawn-of-the-end-countdown
+-------------------------------------------------------------------------------
+Track: A Spirited Conversation [Sprite Interaction]
+Directory: a-spirited-conversation
+Artist: Veritas Unae, Charles Neudorf
+Track Art: Adoxographist
+References: Metamorphic Choices [Kernel Prototyping]
+URLs: https://unofficialmspafans.bandcamp.com/track/a-spirited-conversation-sprite-interaction
+-------------------------------------------------------------------------------
+Track: Layers Upon Layers [Build]
+Directory: layers-upon-layers
+Artist: Marcy Nabors, Jamie Paige Stanley
+Track Art: Alistair Diszrali
+References: Waiting For Adventure [Loading Screen]
+URLs: https://unofficialmspafans.bandcamp.com/track/layers-upon-layers-build
+-------------------------------------------------------------------------------
+Track: Mysterious Messengers [Exiles]
+Directory: mysterious-messengers
+Artist: Traikan
+Track Art: Vero
+URLs: https://unofficialmspafans.bandcamp.com/track/mysterious-messengers-exiles
+-------------------------------------------------------------------------------
+Track: Overly Ostentatious Ogre [Miniboss]
+Directory: overly-ostentatious-ogre
+Artist: Red Pen
+Track Art: Tawa, Kate Holden
+URLs: https://unofficialmspafans.bandcamp.com/track/overly-ostentatious-ogre-miniboss
+-------------------------------------------------------------------------------
+Track: The Porkhollow is Overflowing! [Echeladder]
+Directory: the-porkhollow-is-overflowing
+Artist: Veritas Unae
+Track Art: Toe
+URLs: https://unofficialmspafans.bandcamp.com/track/the-porkhollow-is-overflowing-echeladder
+-------------------------------------------------------------------------------
+Track: Consort Air [Consorts]
+Directory: consort-air
+Artist: Brad Griffin
+Track Art: 8bitkitten
+URLs: https://unofficialmspafans.bandcamp.com/track/consort-air-consorts
+-------------------------------------------------------------------------------
+Track: Fraymotif Samba [Consort Shop]
+Directory: fraymotif-samba
+Artist: James Roach
+Track Art: Esabelle Ryngin
+URLs: https://unofficialmspafans.bandcamp.com/track/fraymotif-samba-consort-shop
+-------------------------------------------------------------------------------
+Track: Waking the Beast [Denizen Encounter]
+Directory: waking-the-beast
+Artist: Eston Schweickart, Yan Rodriguez
+Track Art: Zilleniose
+URLs: https://unofficialmspafans.bandcamp.com/track/waking-the-beast-denizen-encounter
+-------------------------------------------------------------------------------
+Track: Glow in the Distance [Save]
+Directory: glow-in-the-distance
+Artist: James Roach
+Track Art: melodiousDiscord
+URLs: https://unofficialmspafans.bandcamp.com/track/glow-in-the-distance-save
+-------------------------------------------------------------------------------
+Track: Lulling Lutescant [Prospit Sleep]
+Directory: lulling-lutescant
+Artist: Veritas Unae
+Track Art: Phosphorescence
+URLs: https://unofficialmspafans.bandcamp.com/track/lulling-lutescent-prospit-sleep
+-------------------------------------------------------------------------------
+Track: On Golden Dreams [Prospit]
+Directory: on-golden-dreams
+Artist: Veritas Unae
+Track Art: invalidgriffin
+References: Lulling Lutescant [Prospit Sleep]
+URLs: https://unofficialmspafans.bandcamp.com/track/on-golden-dreams-prospit
+-------------------------------------------------------------------------------
+Track: Amongst Smiling Faces [Prospitian Dignitaries]
+Directory: amongst-smiling-faces
+Artist: Tarranon
+Track Art: Kate Holden
+URLs: https://unofficialmspafans.bandcamp.com/track/amongst-smiling-faces-prospitian-dignitaries
+-------------------------------------------------------------------------------
+Track: Grudge in A Minor [Jack Noir]
+Directory: grudge-in-a-minor
+Artist: Yishan Mai
+Track Art: melodiousDiscord
+References: Liquid Negrocity
+URLs: https://unofficialmspafans.bandcamp.com/track/grudge-in-a-minor-jack-noir
+-------------------------------------------------------------------------------
+Track: Lavender Lullably [Derse Sleep]
+Directory: lavender-lullaby
+Artist: Veritas Unae
+Track Art: Phosphorescence
+References: Planet in Shadow [Derse]
+URLs: https://unofficialmspafans.bandcamp.com/track/lavender-lullaby-derse-sleep
+-------------------------------------------------------------------------------
+Track: Planet in Shadow [Derse]
+Directory: planet-in-shadow
+Artist: Yishan Mai
+Track Art: Kat
+URLs: https://unofficialmspafans.bandcamp.com/track/planet-in-shadow-derse
+-------------------------------------------------------------------------------
+Track: Drolls and Dignitaries [Dersite Agents]
+Directory: drolls-and-dignitaries
+Artist: Yishan Mai
+Track Art: Selan Pike
+URLs: https://unofficialmspafans.bandcamp.com/track/drolls-and-dignitaries-dersite-agents
+-------------------------------------------------------------------------------
+Track: The Ultimate Riddle [Ultimate Riddle]
+Directory: the-ultimate-riddle
+Artist: Marcy Nabors
+Track Art: melodiousDiscord
+URLs: https://unofficialmspafans.bandcamp.com/track/the-ultimate-riddle-ultimate-riddle
+-------------------------------------------------------------------------------
+Track: Eldritch Murmurs [Horrorterrors]
+Directory: eldritch-murmurs
+Artist: Fuzz
+Track Art: Vero
+URLs: https://unofficialmspafans.bandcamp.com/track/eldritch-murmurs-horrorterrors
+-------------------------------------------------------------------------------
+Track: Outer Reaches [Veil]
+Directory: outer-reaches
+Artist: Charles Neudorf
+Track Art: Esabelle Ryngin
+URLs: https://unofficialmspafans.bandcamp.com/track/outer-reaches-veil
+-------------------------------------------------------------------------------
+Track: Inner Depths [Labs]
+Directory: inner-depths
+Artist: Brad Griffin
+Track Art: Tarranon
+References: Outer Reaches [Veil]
+URLs: https://unofficialmspafans.bandcamp.com/track/inner-depths-labs
+-------------------------------------------------------------------------------
+Track: Autogenesis [Ectobiology]
+Directory: autogenesis
+Artist: Red Pen
+Track Art: Phosphorescence
+URLs: https://unofficialmspafans.bandcamp.com/track/autogenesis-ectobiology
+-------------------------------------------------------------------------------
+Track: Broken Dreams [Prospit's Fall]
+Directory: broken-dreams
+Artist: Veritas Unae, Charles Neudorf
+Track Art: Brad Griffin
+References: On Golden Dreams [Prospit]
+URLs: https://unofficialmspafans.bandcamp.com/track/broken-dreams-prospits-fall
+-------------------------------------------------------------------------------
+Track: Paradoxical Meteor Shower [Reckoning]
+Directory: paradoxical-meteor-shower
+Artist: Trent West
+Track Art: Kat
+URLs: https://unofficialmspafans.bandcamp.com/track/paradoxical-meteor-shower-reckoning
+-------------------------------------------------------------------------------
+Track: Emerald Icarus [Green Sun]
+Directory: emerald-icarus
+Artist: Marcy Nabors
+Track Art: Mixt
+URLs: https://unofficialmspafans.bandcamp.com/track/emerald-icarus-green-sun
+-------------------------------------------------------------------------------
+Track: ~~~~DISK 2~~~~
+Directory: disk2-sburb-ost
+Artist: Veritas Unae
+Track Art: melodiousDiscord
+References: Emerald Icarus [Green Sun], CumuloSeerus [Oracle Clouds]
+URLs: https://unofficialmspafans.bandcamp.com/track/disk-2
+-------------------------------------------------------------------------------
+Track: CumuloSeerus [Oracle Clouds]
+Directory: cumuloseerus
+Artist: Brad Griffin
+Track Art: Tavia Morra
+References: SBURBan Prelude [Main Menu]
+URLs: https://unofficialmspafans.bandcamp.com/track/cumuloseerus-oracle-clouds
+-------------------------------------------------------------------------------
+Track: Checkerboard Checkmate [Battlefield]
+Directory: checkerboard-checkmate
+Artist: Tarranon
+Track Art: Tavia Morra
+URLs: https://unofficialmspafans.bandcamp.com/track/checkerboard-checkmate-battlefield
+-------------------------------------------------------------------------------
+Track: Skaiaward [Skaia]
+Directory: skaiaward
+Artist: Marcy Nabors, Solatrus
+Track Art: Toe
+URLs: https://unofficialmspafans.bandcamp.com/track/skaiaward-skaia
+-------------------------------------------------------------------------------
+Track: Resurrection [God Tier]
+Directory: resurrection
+Artist: Brad Griffin
+Track Art: Kate Holden
+References: Sburban Jungle
+URLs: https://unofficialmspafans.bandcamp.com/track/resurrection-god-tier
+-------------------------------------------------------------------------------
+Track: Land of _____ and Frogs [Frog Gathering]
+Directory: land-of-_____-and-frogs
+Artist: Veritas Unae
+Track Art: Brad Griffin
+URLs: https://unofficialmspafans.bandcamp.com/track/land-of-and-frogs-frog-gathering
+-------------------------------------------------------------------------------
+Track: Rana's Abode [Frog Temple]
+Directory: ranas-abode
+Artist: Yan Rodriguez
+Track Art: Toe
+URLs: https://unofficialmspafans.bandcamp.com/track/ranas-abode-frog-temple
+-------------------------------------------------------------------------------
+Track: The Will to Fight Further [Denizen Strife]
+Directory: the-will-to-fight-further
+Artist: Kevin Grant, Yishan Mai
+Track Art: Dawn Davis
+References:
+- The Will to Fight (Original Mix) [Denizen Strife]
+- Showtime (Piano Refrain)
+- Waking the Beast [Denizen Encounter]
+URLs: https://unofficialmspafans.bandcamp.com/track/the-will-to-fight-further-denizen-strife
+-------------------------------------------------------------------------------
+Track: Barren Session [Game Over]
+Directory: barren-session
+Artist: Brad Griffin
+Track Art: Nurse Tiger
+URLs: https://unofficialmspafans.bandcamp.com/track/barren-session-game-over
+-------------------------------------------------------------------------------
+Track: Dilemma [The Choice]
+Directory: dilemma
+Artist: Fuzz
+Track Art: Dawn Davis
+URLs: https://unofficialmspafans.bandcamp.com/track/dilemma-the-choice
+-------------------------------------------------------------------------------
+Track: Vulcanic Volcano [Forge]
+Directory: vulcanic-volcano
+Artist: Traikan
+Track Art: Selan Pike
+URLs: https://unofficialmspafans.bandcamp.com/track/vulcanic-volcano-forge
+-------------------------------------------------------------------------------
+Track: Check the Chequered Castle [Battlefield Castle]
+Directory: check-the-chequered-castle
+Artist: Veritas Unae
+Track Art: Mixt
+URLs: https://unofficialmspafans.bandcamp.com/track/check-the-chequered-castle-battlefield-castle
+-------------------------------------------------------------------------------
+Track: Endgame Execution [Black King Battle]
+Directory: endgame-execution
+Artist: Yishan Mai
+Track Art: shymuffin
+References: Rex Duodecim Angelus
+URLs: https://unofficialmspafans.bandcamp.com/track/endgame-execution-black-king-battle
+-------------------------------------------------------------------------------
+Track: Where ribbIt All Began [Genesis Frog]
+Directory: where-ribbit-all-began
+Artist: Tarranon
+Track Art: Tawa
+URLs: https://unofficialmspafans.bandcamp.com/track/where-ribbit-all-began-genesis-frog
+-------------------------------------------------------------------------------
+Track: Higher Hopes [Game Complete]
+Directory: higher-hopes
+Artist: Tarranon
+Track Art: Mixt
+URLs: https://unofficialmspafans.bandcamp.com/track/higher-hopes-game-complete
+-------------------------------------------------------------------------------
+Track: Gods of the New World [Universe Creation]
+Directory: gods-of-the-new-world
+Artist: Max Wright
+Track Art: invalidgriffin
+URLs: https://unofficialmspafans.bandcamp.com/track/gods-of-the-new-world-universe-creation
+-------------------------------------------------------------------------------
+Track: ~~~~BONUS~~~~
+Directory: bonus-sburb-ost
+Artist: Veritas Unae
+Track Art: Veritas Unae
+References: Gods of the New World [Universe Creation]
+URLs: https://unofficialmspafans.bandcamp.com/track/bonus
+-------------------------------------------------------------------------------
+Track: The Untold Story [Skaia Exposition]
+Directory: the-untold-story
+Artist: Brad Griffin
+Track Art: Brad Griffin
+References:
+- CumuloSeerus [Oracle Clouds]
+- Check the Chequered Castle [Battlefield Castle]
+- On Golden Dreams [Prospit]
+- Checkerboard Checkmate [Battlefield]
+- Overly Ostentatious Ogre [Miniboss]
+- Resurrection [God Tier]
+- Gods of the New World [Universe Creation]
+URLs: https://unofficialmspafans.bandcamp.com/track/the-untold-story-skaia-exposition
+-------------------------------------------------------------------------------
+Track: Melody && Form && Composition [Alchemiter]
+Directory: melody-form-composition
+Artist: Charles Neudorf, Marcy Nabors
+Track Art: Selan Pike
+URLs: https://unofficialmspafans.bandcamp.com/track/melody-form-composition-alchemiter
+-------------------------------------------------------------------------------
+Track: Take Flight [Battleship]
+Directory: take-flight
+Artist: Veritas Unae
+Track Art: Pseudonym
+References:
+- Checkerboard Checkmate [Battlefield]
+- Check the Chequered Castle [Battlefield Castle]
+URLs: https://unofficialmspafans.bandcamp.com/track/take-flight-battleship
+-------------------------------------------------------------------------------
+Track: Born to Die [Doomed Timeline]
+Directory: born-to-die
+Artist: ThiefofTruth, Brad Griffin
+Track Art: Manyan
+URLs: https://unofficialmspafans.bandcamp.com/track/born-to-die-doomed-timeline
+-------------------------------------------------------------------------------
+Track: The Will to Fight (Original Mix) [Denizen Strife]
+Directory: the-will-to-fight-original-mix
+Artist: Kevin Grant
+Track Art: Dawn Davis
+References: Showtime (Original Mix)
+URLs: https://unofficialmspafans.bandcamp.com/track/the-will-to-fight-original-mix-denizen-strife
+-------------------------------------------------------------------------------
+Track: Prime [Pause]
+Directory: prime
+Artist: Trent West
+Track Art: Nurse Tiger
+URLs: https://unofficialmspafans.bandcamp.com/track/prime-pause
+-------------------------------------------------------------------------------
+Track: Godfight [PvP]
+Directory: godfight
+Artist: Yishan Mai
+Track Art: Shoona
+URLs: https://unofficialmspafans.bandcamp.com/track/godfight-pvp

@@ -3,6 +3,9 @@ Cover Art: Shelby Cragg
 Directory: coloUrs-and-mayhem-universe-b
 Date: April 13, 2012
 FG: #a5d2e2
+URLs:
+- https://homestuck.bandcamp.com/album/colours-and-mayhem-universe-a-b
+- https://www.youtube.com/playlist?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: ~~SIDE 1~~
 Artist: Toby Fox
@@ -57,7 +60,7 @@ URLs: https://homestuck.bandcamp.com/track/universe-b-side-2
 -------------------------------------------------------------------------------
 Track: Cyan Beast
 Artist: David Ellis
-Track Art: Paperartichokes
+Track Art: PaperArtichokes
 URLs: https://homestuck.bandcamp.com/track/cyan-beast-2
 Commentary:
     <i>David Ellis:</i>
@@ -152,7 +155,7 @@ Track Art: Emily Blundell
 URLs: https://homestuck.bandcamp.com/track/do-the-windy-thing-2
 -------------------------------------------------------------------------------
 Track: Pilot Light
-Artist: Thomas Ibarra, AutoDevote
+Artist: Thomas Ibarra
 References: Flare
 Track Art: KIIPPU
 URLs: https://homestuck.bandcamp.com/track/pilot-light-2
@@ -164,7 +167,7 @@ URLs: https://homestuck.bandcamp.com/track/ohgodcat-2
 -------------------------------------------------------------------------------
 Track: Cupcake Girl
 Artist: Liam O'Donnell
-Track Art: Ella
+Track Art: dodostad
 URLs: https://homestuck.bandcamp.com/track/cupcake-girl-2
 -------------------------------------------------------------------------------
 Track: Phantasmic Youngsters
@@ -266,7 +269,7 @@ References:
 - Showtime (Original Mix)
 - Warhammer of Zillyhoo
 - Explore
-- Black
+- Liquid Negrocity
 - Doctor
 - Lifdoff
 - Harlequin

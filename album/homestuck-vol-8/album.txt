@@ -2,6 +2,10 @@ Album: Homestuck Vol. 8
 Date: October 25, 2011
 Cover Art: Homestuck
 FG: #4ac925
+URLs:
+- https://homestuck.bandcamp.com/album/homestuck-vol-7-8-with-cherubim
+- https://www.youtube.com/watch?v=-cIpWboujY4
+- https://www.youtube.com/playlist?list=PL497A0AACAD8DBE57
 -------------------------------------------------------------------------------
 Track: Calamity
 Artist: Michael Guy Bowman
@@ -89,7 +93,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Escape Pod
 Artist: Michael Guy Bowman
-Track Art: Peter Turner
+Track Art: Paige Turner
 URLs: https://homestuck.bandcamp.com/track/escape-pod-2
 Commentary:
     <i>Michael Guy Bowman:</i>
@@ -353,7 +357,7 @@ URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-acap
 -------------------------------------------------------------------------------
 Track: How Do I Live (D8 Night Version)
 Artist: Michael Guy Bowman
-Track Art: Victoria Grace Elliot
+Track Art: Victoria Grace Elliott
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-d8-night-version-2
 Contributors:
 - Thomas Ferkol (electric guitar)

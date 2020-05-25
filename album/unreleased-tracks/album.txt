@@ -77,6 +77,17 @@ Artist: Toby Fox
 References: GameGrl (Original 1993 Mix), Teal Seer
 URLs: https://www.youtube.com/watch?v=Nc4nIdsuG7o
 -------------------------------------------------------------------------------
+Track: Ham And Steak
+Artist: Malcolm Brown
+References:
+- Rex English
+- Unite Synchronization
+- Homestuck Anthem
+- Showtime (Original Mix)
+URLs:
+- https://www.youtube.com/watch?v=OqT3gaihbPE
+- https://soundcloud.com/dragonxvi/ham-and-steak-unused-homestuck-music
+-------------------------------------------------------------------------------
 Track: Hello Zepp
 Artist: Charlie Clouser
 URLs: https://www.youtube.com/watch?v=vhSHXGM7kgE
@@ -109,9 +120,17 @@ Track: I'm a Member of the Midnight Crew
 Artist: Eddie Morton
 URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
 -------------------------------------------------------------------------------
+Track: Jadesprite
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=rdXvlsXlKOk
+-------------------------------------------------------------------------------
 Track: Kazoostuck
 Artist: Toby Fox
 URLs: https://www.youtube.com/watch?v=mjKX8H3mSJo
+-------------------------------------------------------------------------------
+Track: Mannequin
+Artist: Perry Sullivan
+URLs: https://www.youtube.com/watch?v=gAyPFa3nEK4
 -------------------------------------------------------------------------------
 Track: not a creature was stirring
 Artist: Alexander Rosetti
@@ -137,6 +156,11 @@ URLs:
 - https://clarkpowell.bandcamp.com/track/requiem
 - https://www.youtube.com/watch?v=3kWFQy0kWC4
 ------------------------------------------------------------------------------
+Track: Rex English
+Artist: Toby Fox
+References: Rex Duodecim Angelus, English
+URLs: https://www.youtube.com/watch?v=xTQo2rPvEzM
+-------------------------------------------------------------------------------
 Track: Riches to Ruins Movement II
 Artist: Toby Fox
 References: Riches to Ruins Movements I & II
@@ -187,7 +211,7 @@ Artist: Demographerist
 URLs: https://www.youtube.com/watch?v=x6NrArPldZo
 -------------------------------------------------------------------------------
 Track: Windchime Foley
-Artist: Clark Powel
+Artist: Clark Powell
 URLs: https://www.youtube.com/watch?v=CSMMmOtRLiU
 -------------------------------------------------------------------------------
 Track: XROM
@@ -222,6 +246,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: 2chords
 Artist: James Roach
+References: Upward Movement (Dave Owns)
 URLs: https://www.youtube.com/watch?v=Q3JQPZ2T03k
 -------------------------------------------------------------------------------
 Track: ill probably just name this one something normal oh no wait oh jeez aw beans

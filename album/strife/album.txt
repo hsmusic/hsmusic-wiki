@@ -4,6 +4,10 @@ Cover Art: Tauhid Bondia
 Track Art: Homestuck
 Date: February 16, 2011
 FG: #e83240
+URLs:
+- https://tenseimusic.bandcamp.com/album/homestuck-strife
+- https://www.youtube.com/watch?v=Oz2a5VxQZME
+- https://www.youtube.com/playlist?list=PLA6uDhvF1uwwbNxxpsrs31uu8p2DX0Jve
 -------------------------------------------------------------------------------
 Track: Stormspirit
 URLs: https://tenseimusic.bandcamp.com/track/stormspirit
@@ -16,7 +20,7 @@ Track: Dance of Thorns
 URLs: https://tenseimusic.bandcamp.com/track/dance-of-thorns
 -------------------------------------------------------------------------------
 Track: Time on My Side
-References: Beatdown (Strider Style), Black
+References: Beatdown (Strider Style), Liquid Negrocity
 URLs: https://tenseimusic.bandcamp.com/track/time-on-my-side
 Commentary:
     <i>Tensei:</i>
