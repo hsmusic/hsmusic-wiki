@@ -101,7 +101,7 @@ const SITE_ABOUT = fixWS`
     <p>The code for this website is open source (GPL-3.0), and can be explored or forked <a href="https://github.com/hsmusic/hsmusic.github.io/">here</a>. I don't actively keep track of issues or PRs raised there; if you want to get in touch with feature requests or comments on the code, my contact info is <a href="feedback/index.html">here</a>!</p>
     <p><i>Resource &amp; Author Credits</i></p>
     <ul>
-        <li>Florrie: that's me! I programmed most of the site, and put the whole thing together. Say hi to me on twitter (<a href="https://twitter.com/florriestuck">@florriestuck</a>) or reddit (<a href="https://reddit.com/u/towerofnix/">/u/towerofnix</a>)!</li>
+        <li>Florrie: that's me! I programmed most of the site, and put the whole thing together. <a href="feedback/index.html">Say hi</a>!</li>
         <li><a href="https://homestuck.bandcamp.com/">Homestuck's Bandcamp</a>, the official host of Homestuck's music: I got almost all the official album listings and basic track info from here.</li>
         <li>GiovanH's <a href="https://my.pcloud.com/publink/show?code=kZdJQ8kZNyIwh0Hn1ime6Ty7L2J87BE3E2ak">complete track art archive</a>: track art! A million thanks for putting this together and sharing this with me. (Prior to this, I used the <a href="https://web.archive.org/web/20190720035022/https://homestuck.bandcamp.com/music">Web Archive</a> to gather track art.)</li>
         <li><a href="https://homestuck.net/music/references.html">NSND</a>: leitmotifs! Thanks to this site in combination with credits on the bandcamp and artists' own commentary, this wiki is a rather comprehensive resource for leitmotifs and other track references.</li>
@@ -127,8 +127,8 @@ const SITE_ABOUT = fixWS`
 const SITE_FEEDBACK = fixWS`
     <p><strong>Feature requests? Noticed any errors?</strong> Please let me know! I appreciate feedback a lot, and always want to make this site better.</p>
     <p>The best place to talk about this site is on its <a href="https://forum.homestuck.xyz/viewtopic.php?f=7&t=151">HomestuckXYZ forum thread</a>.</p>
-    <p>If you're not one for forums or don't have an account there, you can spam me on <a href="https://twitter.com/florriestuck">Twitter</a>.</p>
-    <p>Or, if you're <em>really</em> old fashioned, I've got an email too: towerofnix at gmail dot beans. (You know the domain.)</p>
+    <p>Or, if forums aren't really the thing for you, I've got an email too: towerofnix at gmail dot beans. (You know the domain.)</p>
+    <p>I used to have a Twitter account, but Twitter is bad and poofing from it was probably my greatest decision.</p>
     <p>Thank you for sharing your feedback!</p>
 `;
 
