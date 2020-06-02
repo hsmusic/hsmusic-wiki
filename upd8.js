@@ -108,6 +108,7 @@ const SITE_ABOUT = fixWS`
         <li><a href="https://www.bgreco.net/hsflash.html">bgreco.net (HQ Audio Flashes)</a>: thumbnail captures for the individual Flash animations! There were a couple captures missing that I took myself, but most Flash thumbnails are from here.</a></li>
         <li>The <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom: the inspiration for this wiki! I've wanted to make a more complete and explorable wiki ever since seeing it. The Fandom wiki has also been a very handy reference in putting this together, so much thanks to everyone who's worked on it!</li>
         <li>All organizers and contributors of the <a href="https://sollay-b.tumblr.com/post/188094230423/hello-a-couple-of-years-ago-allyssinian">Homestuck Vol. 5 Anthology</a> - community-made track art for <a href="album/homestuck-vol-5/index.html">Homestuck Vol. 5</a>! All of this art is <i>excellent</i>. Each track credits its respective cover artist.</li>
+        <li>Likewise for the <a href="https://hsfanmusic.skaia.net/post/619761136023257089/unofficialmspafans-we-are-proud-to-announce-the">Beyond Canon Track Art Anthology</a>!</li>
         <li>All comments on the site: I appreciate all feedback a lot! People have shared a ton of ideas and suggestions with me, and I <i>cannot</i> emphasize enough how motivating it is to share a project with like-minded folx interested in making it better with you.</li>
     </ul>
     <p><i>Feature Acknowledgements</i></p>
@@ -318,7 +319,8 @@ function transformMultiline(text) {
     const outLines = [];
 
     let inList = false;
-    for (const line of text.split(/\r|\n|\r\n/)) {
+    for (let line of text.split(/\r|\n|\r\n/)) {
+        line = line.replace(/<img src="(.*?)">/g, '<a href="$1">$&</a>');
         if (line.startsWith('- ')) {
             if (!inList) {
                 outLines.push('<ul>');

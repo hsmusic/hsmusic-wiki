@@ -15,7 +15,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/greetings-from-earth-c
 -------------------------------------------------------------------------------
 Track: Hauntological Nightmares
 Artist: M3l0m4ni4c
-Track Art: tipsy
+Track Art: Tipsy
 References:
 - Heir Transparent
 - Spirit of Storms
@@ -247,7 +247,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/thats-kind-of-xenophobic
 -------------------------------------------------------------------------------
 Track: The Floor Is Faygo
 Artist: M3l0m4ni4c
-Track Art: tipsy
+Track Art: Tipsy
 URLs: https://unofficialmspafans.bandcamp.com/track/the-floor-is-faygo
 -------------------------------------------------------------------------------
 Track: Universal Remission
