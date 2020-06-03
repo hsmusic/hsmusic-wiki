@@ -1701,14 +1701,19 @@ function chronologyButtons(currentTrack, {
 }
 
 function generateHeaderForAlbum(album, currentTrack = null) {
+    const index = currentTrack && album.tracks.indexOf(currentTrack)
+    const previous = currentTrack && album.tracks[index - 1]
+    const next = currentTrack && album.tracks[index + 1]
     return fixWS`
         <h2>
             <a href="index.html">Home</a>
             / <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html">${album.name}</a>
             ${currentTrack && `/ <a href="${C.TRACK_DIRECTORY}/${currentTrack.directory}/index.html">${currentTrack.name}</a>`}
-            <span>
-                ${album.tracks.length > 1 && `(<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">Random track</a>)`}
-            </span>
+            <span>${album.tracks.length > 1 && `(${[
+                previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" title="${previous.name}">Previous</a>`,
+                next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" title="${next.name}">Next</a>`,
+                `<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">${currentTrack ? 'Random' : 'Random Track'}</a>`
+            ].filter(Boolean).join(', ')})`}</span>
         </h2>
         <div>
             ${currentTrack === null && chronologyButtons(album, {
