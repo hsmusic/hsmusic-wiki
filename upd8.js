@@ -1,7 +1,7 @@
 // HEY N8RDS!
 //
 // This is one of the 8ACKEND FILES. It's not used anywhere on the actual site
-// you are might 8e using right now.
+// you are pro8a8ly using right now.
 //
 // Specifically, this one does all the actual work of the music wiki. The
 // process looks something like this:
@@ -698,6 +698,7 @@ async function writePage(directoryParts, titleOrHead, body) {
             <head>
                 ${[
                     `<meta charset="utf-8">`,
+                    `<meta name="viewport" content="width=device-width, initial-scale=1">`,
                     (titleOrHead.split('\n').length && !titleOrHead.includes('<title>')) ? `<title>${titleOrHead}</title>` : titleOrHead,
                     directory !== C.SITE_DIRECTORY &&
                     directory !== '.' &&
