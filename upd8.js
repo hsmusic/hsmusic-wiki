@@ -1383,7 +1383,8 @@ function writeListingPages() {
                     </div>
                     <div id="content">
                         <h1>Listings</h1>
-                        <p>Feel free to explore any of the listings linked in the sidebar!</p>
+                        <p>Feel free to explore any of the listings linked below and in the sidebar!</p>
+                        ${generateLinkIndexForListings(listingDescriptors)}
                     </div>
                 </div>
             </body>
@@ -1525,6 +1526,12 @@ function generateHeaderForListings(listingDescriptors, currentDirectoryParts) {
 function generateSidebarForListings(listingDescriptors, currentDirectoryParts) {
     return fixWS`
         <h1><a href="${C.LISTING_DIRECTORY}/index.html">Listings</a></h1>
+        ${generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)}
+    `;
+}
+
+function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts) {
+    return fixWS`
         <ul>
             ${listingDescriptors.map(([ ldDirectoryParts, ldTitle ]) => fixWS`
                 <li class="${currentDirectoryParts === ldDirectoryParts && 'current'}">
