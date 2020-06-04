@@ -1,5 +1,5 @@
 Album: Sburb
-Artist: Tyler Dever, Erik Scheele
+Artist: James Dever, Erik Scheele
 Cover Art: Vivian Ng
 Track Art: none
 Date: July 13, 2011
@@ -8,7 +8,7 @@ URLs:
 - https://jamesdever.bandcamp.com/album/sburb
 - https://www.youtube.com/playlist?list=PL988516F160FCCF3A
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     Sburb is my proudest accomplishment. It is the bastard child of my hopes and dreams and my most recent accomplishments and ordeals. I set out to write music to capture everything going on in my life as well as find out who I am and what I am as far as a composer. What ended up happening was the creation of twelve powerful pieces that are close and dear to me and are a road map of my trials. The album has a biblical theme with the titles as to fit with the concept of the story of Homestuck being that of creation. Sburb ends up being the catalyst for the existence of our universes and every other one. I hope you appreciate them! These are my comments about each piece as well as a few comments on how exactly I played some of the crazier parts.
     Enjoy!
@@ -37,7 +37,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/prelude
 - https://youtu.be/7k8zCRNxa7k
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     The Prelude is a piece that I formulated a long time ago. It actually came about from me trying to figure out the chords the harps play in the quiet last section of Saturn from Gustav Holst's The Planets. When I started writing Sburb I decided that it would fit perfectly with the theme that the game creates. The structure of the chords is not unlike how the game actually functions. They work as a juxtaposition of good and evil by using relative major and minor chords. It starts off quietly and on higher octaves to introduce the mood. The next section brings in the Homestuck Anthem as an introduction to the album itself, signaling the beginning of the entire process. The piece suddenly grows in intensity as the left hand C octave ostinatos enter the phrases followed by the calm of the storm. The piece does not resolve, however it does lead straight into the next.
     <i>(commentary redux)</i>
@@ -50,7 +50,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/genesis
 - https://youtu.be/qOkMYB-r6b8
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     This song begins with a C minor chord that both resolves the last piece and immediately sets the mood for this piece. Genesis marks the beginning of the biblical terms as well. The Book of Genesis is the first book of both the Hebrew Bible and Christian Old Testament. It is interpreted as the Chosen People being lead to the Promised Land. Sburb is the pathway that leads the kids into the game that is suppose to eventually grow a new universe. It starts off quietly and builds into a fast paced journey. Genesis also introduces my favorite music technique: hemiolas. The right hand plays a melody in triplets while the left hand harmonizes in eighth notes. This creates a strange rhythm and continues the juxtaposition theme created in The Prelude's chords. Continuing the concept of two extremes but together, the song goes into legato, quiet phrases that are immediately followed by staccato, loud phrases.
     <i>(commentary redux)</i>
@@ -61,7 +61,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/eden
 - https://youtu.be/hcXixYBLk_8
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     The Garden of Eden is where the first man Adam, and his wife Eve, lived after their creation. It is suppose to be a beautiful, blissful utopia. It also becomes the origin of sin. The piece reflects that concept. The flowing and adventurous nature of the piece is suppose to reflect the beauty and majestic qualities of the land. As far as the kids story goes, it represents the infinite potential of Skaia. This song also continues the same hemiola motif as Creation with triplets played by the right hand and eighth notes played by the left. The glissandos at the beginning and in the middle is an E flat pentatonic run, which basically means I only played on the black keys. Since it's completely ad libbed I wrote out a small little example. Basically, the left hand just continues up normally while the right hand goes back and forth while slowly climbing up (if looking at the sheet music, each note alternates on the hands).
     <i>(commentary redux)</i>
@@ -74,7 +74,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/exodus
 - https://youtu.be/UnbRhrKFofY
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     The Book of Exodus comes after the Book of Genesis. It narrates the mass journey out of Israel by Moses. In Sburb, the players must go through a set of tasks to escape impending doom. This song reflects the process of entering the medium. This is why I encorporated Sburban Jungle into the beginning and end. The first time Sburb is booted up you hear a bit of Sburban Jungle, just like at the beginning of the song you hear the bottom chords. Later, when John enters the medium (as well as Rose) you hear the song in more complete forms like the end of the piece. When playing, the trickiest part is definitely the triplet ostinato that continues throughout the entire song. The best method to pulling this off is by playing the note on the beat (which will always be either E flat or G) with the left hand and the rest of the notes on the right hand. You will notice that when there are lower notes, there are rests in the ostinato so that you can quickly jump down the piano.
     <i>(commentary redux)</i>
@@ -86,7 +86,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/requiem
 - https://youtu.be/cVKRJOqKMDY
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     Requiem masses are masses for the dead. Requiem is the anthem for everything and everybody lost. One portion of Homestuck never focused on is the direct aftermath of the destruction of the Reckoning. Requiem is a theme for all the people and things lost on Earth. The song itself could be very tricky to play depending on how familiar you are with time signatures. The piece is in 4/4 for the majority of the first half. It enters a 5/4 section with a 4/4 continuation of the "siren" effect overlapping. The hemiola only occurs the first time, the second time bringing in a 5/4 melody to accompany it. Immediately afterwards the piece shifts into mixed meter. The 7/8 section is briefly interupted by an apostrophe of 5/8. The ending shifts to 6/8 as the tone shifts from minor to major.
     <i>(commentary redux)</i>
@@ -98,7 +98,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/the-meek
 - https://youtu.be/hKEylNAp1-Q
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     "Blessed are the meek: for they shall inherit the earth." The Meek is the theme for the Exiles. They are the ones left to fix and save the Earth 413 years after its destruction. It starts off solemn as the concept occurs to them that it is their duty to repopulate and rebuild. As the piece goes on it gets more intense to reflect all of the shenanigans and gun pointing that occurs as they all converge and meet. After the tension dies away the mood from before is recapped before resolving at the end. However, the last run ends in dissonance, because we don't know how the exile's story will play out.
     <i>(commentary redux)</i>
@@ -113,7 +113,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/chronicles
 - https://youtu.be/TOtz3MTSeKg
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     A chronicle is an account of chronological events. Homestuck does not follow a chronological structure in the slightest. Chronicles is a piano version of Candles and Clockwork. Candles and Clockwork in itself is a massive hemiola as each voice exists in a different time signature. The melody is adapted in this piece to match the 3/4 arpeggio. The piece keeps changing to reflect each leg of the journey the kids have to experience in order to finish the game, not necessarily in order.
     <i>(commentary redux)</i>
@@ -125,7 +125,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/rapture
 - https://youtu.be/zqbExJ93rXo
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     Boss fight music! Kind of. The rapture starts off quietly and peacefully before the sirens break the silence. The sirens lead into a fast paced hectic section before dying down as quickly as it appeared. A sudden destructive force that comes and goes in an instant. This song uses two motifs throughout the album: the siren and hemiolas. Measures 17-19 are more than a little tricky to play. I left a note in the sheet music to help with the ending line.
     <i>(commentary redux)</i>
@@ -137,7 +137,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/creation
 - https://youtu.be/XorynbzZQpI
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)
     The song that means more to me than any song I've ever written and possibly will again. Sburb is all about creating worlds, thus the resolution of the album comes after the storm (Rapture). No matter how harsh the process may be, the result is beauty and endless potential. This song is completely based around the hemiola motif and the origin of it. It is also designed like a day. The song starts off quiet and slow as the sun rises and slowly gets more complex and full fledged as it rises until mid day when it is most busy. As the sun sets into the later half of the day the song slows down and gets quieter toward the sunset. It resolves with the Homestuck Anthem to imply the loop to the beginning. Worlds are created and the process of Skaia starts again.
     <i>(commentary redux)</i>
@@ -152,7 +152,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/revelations-i
 - https://youtu.be/YoIYaFyll5Q
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     <i>(original commentary)</i>
     Revelations is the afterthought of Sburb. The three songs were added months after the original nine were finished and pieced together into the album. They are a standalone piece from the rest of the album but still fit the concept of Sburb and Skaia. Revelations is the equivalent of The Ultimate Riddle. Solving and understanding is the purpose behind the entire concept, however it can completely be overlooked and is not necessary to completing the rest of the process. Thousands of people can play the game and create their own universes but never quite solve the riddle. In this sense, it completely is a separate entity because the other nine songs can loop freely with or without its presence. Each of the movements is based around the same arpeggio pattern featured in Chronicles. They are another journey completely.
     The first movement starts off as a note in the distance, a growing concept. To the sound of a siren it grows and rushes into a full blown idea. The Homestuck Anthem is briefly mentioned to imply a connection but it just keeps going leaving it in the dust. There are better things to get to. It slowly breaks down and flows into the next movement.
@@ -165,7 +165,7 @@ URLs:
 - https://jamesdever.bandcamp.com/track/revelations-ii
 - https://youtu.be/pXcUUevV4nA
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     Movement II is the process of solving it almost. It's the path to enlightenment; overcoming obstacles and finding yourself along the way is part of the challenge.
 -------------------------------------------------------------------------------
 Track: Revelations III
@@ -173,5 +173,5 @@ URLs:
 - https://jamesdever.bandcamp.com/track/revelations-iii
 - https://youtu.be/d-Gewy6q_zw
 Commentary:
-    <i>Tyler Dever:</i>
+    <i>James Dever:</i>
     Resolution comes in the third movement, which is the enlightenment. One simple arpeggio starts and powers the entire piece, which also brings it to an end. The discovery of the answer brings enlightenment but also ends the journey and the entire process of Sburb/Skaia. Thank you for listening.

@@ -23,11 +23,20 @@ Artist: Toby Fox
 References: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
 URLs: https://www.youtube.com/watch?v=DydDjMNlBsQ
 -------------------------------------------------------------------------------
+Track: Amen, Brother
+Artist: The Winstons
+URLs: https://www.youtube.com/watch?v=GxZuq57_bYM
+-------------------------------------------------------------------------------
 Track: An Apple Disaster!!
 Artist: Toby Fox
 URLs:
 - https://www.youtube.com/watch?v=wa2K_8Ff41M
 - https://fwugradiation.tumblr.com/post/13528293577/improvised-touhou-music-with-annoying-commentary
+-------------------------------------------------------------------------------
+Track: Battle! (Colress)
+Artist: Pokémon
+URLs:
+- https://www.youtube.com/watch?v=NvQBpb6eqp8
 -------------------------------------------------------------------------------
 Track: beekeeper who? i dont know her.
 Artist: James Roach
@@ -51,6 +60,10 @@ Artist: Toby Fox
 References: Crustacean
 URLs: https://www.youtube.com/watch?v=jUly2ujqDvY
 -------------------------------------------------------------------------------
+Track: Creeping in My Soul
+Artist: Cryoshell
+URLs: https://www.youtube.com/watch?v=qI6qyW3QCLc
+-------------------------------------------------------------------------------
 Track: DaJam
 Artist: Alexander Rosetti
 URLs:
@@ -61,6 +74,11 @@ Track: Darling Dolorosa
 Artist: Toby Fox
 References: Darling Kanaya
 URLs: https://www.youtube.com/watch?v=G28357JCv4c
+-------------------------------------------------------------------------------
+Track: Double Midnight
+Artist: Toby Fox
+References: Liquid Negrocity, I'm a Member of the Midnight Crew
+URLs: https://www.youtube.com/watch?v=un7k0l8p12U
 -------------------------------------------------------------------------------
 Track: Elevatorstuck, with Meows
 Artist: Toby Fox
@@ -119,6 +137,14 @@ URLs: https://www.youtube.com/watch?v=EjCbsleXpuk
 Track: I'm a Member of the Midnight Crew
 Artist: Eddie Morton
 URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
+-------------------------------------------------------------------------------
+Track: Icirrus City
+Artist: Pokémon
+URLs: https://www.youtube.com/watch?v=nDNqwdjCGBQ
+-------------------------------------------------------------------------------
+Track: In the Hall of the Mountain King
+Artist: Edvard Grieg
+URLs: https://www.youtube.com/watch?v=kLp_Hh6DKWc
 -------------------------------------------------------------------------------
 Track: Jadesprite
 Artist: Toby Fox
@@ -184,6 +210,10 @@ Track: The Brave and the Bronze
 Artist: Yan Rodriguez
 URLs: https://www.youtube.com/watch?v=pK4-g7TiWQA
 -------------------------------------------------------------------------------
+Track: The Court of Miracles
+Artist: Disney
+URLs: https://www.youtube.com/watch?v=xq7z_xMGPM8
+-------------------------------------------------------------------------------
 Track: The Paradox Paradigm
 Artist: Jack McMenamin
 URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Fan%20Music%20and%20VA%2FHomestuck%20Fansong%20Archive%20%282011%29%2FHomestuck%20Fan%20Music%20Part%2010%2FThe%20Paradox%20Paradigm.mp3&mode=default
@@ -209,6 +239,10 @@ URLs: https://www.youtube.com/watch?v=hC2Vdh7WmDc
 Track: White King
 Artist: Demographerist
 URLs: https://www.youtube.com/watch?v=x6NrArPldZo
+-------------------------------------------------------------------------------
+Track: Wind-up Storm
+Artist: Llyona Fang
+URLs: https://reversalrain.bandcamp.com/track/wind-up-storm
 -------------------------------------------------------------------------------
 Track: Windchime Foley
 Artist: Clark Powell

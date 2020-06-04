@@ -390,14 +390,14 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Sign of the Scorpion
 Artist: Willow Ascenzo
-Track Art: rufiohbascoh
+Track Art: Ducky Senpai
 References: Spider's Claw
 URLs: https://unofficialmspafans.bandcamp.com/track/sign-of-the-scorpion
 Commentary:
     <i>Willow Ascenzo:</i>
     Sign of the Scorpion is an old track of mine, about maybe 14 or 15 months old, and while I'm legitimately proud of a lot of compositional elements, the mastering and production horrified me looking back on it. Like [[Dance of Viridian and Violet]], I'd long since deleted the project file, since it was just a one-off Homestuck song that I figured I was unlikely to ever need again, so I made a nwe arrangement of the piece from scratch, taking elements I liked frmo the original and putting them in a new context. It doesn't quote any Homestuck themes (I don't believe the original did at all), except for a brief mention of Spider's Claw right at the end. The new arrangement has a bit more of a hard-rock feel and toned-down orchestral elements, making it a bit more reflective of Vriska as a character.
-    <i>rufiohbascoh:</i>
-    I did a track art for one of Ascenzo's songs back in LOFAM2 as well and also the art for Rust Apocalypse. So, when I saw two songs by him on the available songs for track art, I couldn't really help myself. His songs are great. I know you like it, I can tell. Hope the track art seems suitable, and that you'll enjoy that as well. I have nothing else to say on the matter. That's it.
+    <i>Ducky Senpai:</i>
+    I did a track art for one of Ascenzo's songs back in LOFAM2 as well and also the art for [[Rust Apocalypse]]. So, when I saw two songs by them on the available songs for track art, I couldn't really help myself. Their songs are great. I know you like it, I can tell. Hope the track art seems suitable, and that you'll enjoy that as well. I have nothing else to say on the matter. That's it.
 -------------------------------------------------------------------------------
 Track: Aqueous Armagourdden
 Artist: Brad Griffin
@@ -504,7 +504,7 @@ References:
 URLs: https://unofficialmspafans.bandcamp.com/track/garden-of-eden-part-1
 Commentary:
     <i>Veritas Unae:</i>
-    Wow. This piece was a huge undertaking that started back when I first played Eden sometime... last year I think? I really connected with Tyler's piece, so much so that I made sure to let him know (and continue to let him know) how easy and intuitive it felt to play. I experimented with it, transitioning into psych0ruins, and then into Doctor. Being heavily inspired by Konec0's dance medleys, I thought to extend the piece, and extend it I did. Up until the Walk Stab Walk / Earthsea Borealis section was all ad lib'd on my piano, as I picked pieces I thought I could move between, and beyond there I wrote original scores straight into Sibelius which I could barely dream of playing. This piece developed into what you hear today, including the seret ending! I hope it moves you, as all of Homestuck's music has moved me. Enjoy listening to this 31 song medley! Some day I'll learn to play it.
+    Wow. This piece was a huge undertaking that started back when I first played Eden sometime... last year I think? I really connected with James's piece, so much so that I made sure to let him know (and continue to let him know) how easy and intuitive it felt to play. I experimented with it, transitioning into psych0ruins, and then into Doctor. Being heavily inspired by Konec0's dance medleys, I thought to extend the piece, and extend it I did. Up until the Walk Stab Walk / Earthsea Borealis section was all ad lib'd on my piano, as I picked pieces I thought I could move between, and beyond there I wrote original scores straight into Sibelius which I could barely dream of playing. This piece developed into what you hear today, including the seret ending! I hope it moves you, as all of Homestuck's music has moved me. Enjoy listening to this 31 song medley! Some day I'll learn to play it.
     A 'quick' fact, I had planned to continue the Killed By 8r8k Spider section through over the top of the Unite Synchronization ostinato, but when I played back the section after the high G, stacatto F into the ostinato, I felt a powerful urge to just get straight back into the final version of Eden, which was written on whim straight into that 4/4 pattern and more fluidly in B minor. It feels like a new life has been breathed into Eden because of it, and I'm so happy to be the man to have done it!
     <i>azuzatori:</i>
     scoot did piano<br>i drew piano
@@ -809,7 +809,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Pirates of Alternia: Dead Troll's Chest
 Artist: Willow Ascenzo
-Track Art: rufiohbascoh
+Track Art: Ducky Senpai
 References: Cobalt Corsair, Violet Mariner
 URLs: https://unofficialmspafans.bandcamp.com/track/pirates-of-alternia-dead-trolls-chest
 Commentary:
@@ -823,7 +823,7 @@ Commentary:
     2:58-3:53: Thrust, parry, dodge, that kind of stuff. What remains of Mindfang's crew knows it's best to stay out of their way. Meanwhile, a round of decisive cannon fire takes its toll on Dualscar's ship.
     3:53-4:00: Dualscar and Mindfang's blades both end up precariously close to each other's throats.
     4:00-4:13: One jump cut later, Dualscar is left adrift in a lifeboat as Mindfang's ship, a little worse for the wear, vanishes into the void.
-    <i>rufiohbascoh:</i>
+    <i>Ducky Senpai:</i>
     Oh look, it appears I've done yet another track art for Ascenzo. I'm kind of like Will's artist stalker.
 -------------------------------------------------------------------------------
 Track: Sunsoaked Heavenscape
@@ -887,5 +887,5 @@ Commentary:
     <i>plaidcushion:</i>
     Starblaze is a really cool track, and I'm really pleased I got to make the art for it! I tried to stick with the same format as the art for the song it came from, but a bit more lively- It made me think of the Alpha kids hanging out together at night, lit only by the glow of their lanterns from the tower in LoCaH.
     <i><b>Brad Griffin:</b></i>
-    Welp, so ends the third volume of Land of Fans and Music. This album would not be possible without your suggestions and onstant support.
+    Welp, so ends the third volume of Land of Fans and Music. This album would not be possible without your suggestions and constant support.
     Thanks for listening!

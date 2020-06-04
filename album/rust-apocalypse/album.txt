@@ -1,0 +1,43 @@
+Album: Rust Apocalypse
+Artist: Willow Ascenzo
+Date: January 5, 2013
+Cover Art: Ducky Senpai
+Track Art: none
+FG: #7848e4
+Canon: Fanon
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/album/rust-apocalypse
+Commentary:
+    <i>Willow Ascenzo:</i>
+    Five exciting new arrangements of my three compositions featured on the album coloUrs and mayhem: Universe A by Homestuck, including the monstrous and colossal song "Rust Apocalypse"! The original compositions are included as bonus tracks.
+    This EP is not officially related to Andrew Hussie's MSPaint Adventures and the music contained herein is sold as the property of its composer, and not as official Homestuck music.
+-------------------------------------------------------------------------------
+Track: Broken Rainbow
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/broken-rainbow
+-------------------------------------------------------------------------------
+Track: Rust Witch
+References: Rust Servant
+Directory: rust-witch-ascenzo
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/rust-witch
+-------------------------------------------------------------------------------
+Track: Teal Justice
+References: Teal Hunter
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/teal-justice
+-------------------------------------------------------------------------------
+Track: Violet Armada
+References: Violet Mariner
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/violet-armada
+-------------------------------------------------------------------------------
+Track: Rust Apocalypse
+References: Rust Servant
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/rust-apocalypse
+-------------------------------------------------------------------------------
+Track: White Angel
+References: Teal Hunter
+URLs:
+- https://wellmanicuredmusic.bandcamp.com/track/white-angel

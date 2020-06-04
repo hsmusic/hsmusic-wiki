@@ -89,6 +89,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Dreamers and The Dead
 Artist: Thomas Ferkol
+References: Cuddlefish
 URLs: https://homestuck.bandcamp.com/track/dreamers-and-the-dead-2
 Commentary:
     <i>Thomas Ferkol:</i>

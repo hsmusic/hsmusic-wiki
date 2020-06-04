@@ -22,7 +22,6 @@ body {
 
     color: rgb(var(--fg-shade), var(--fg-shade), var(--fg-shade));
 
-    display: flex;
     padding: 15px;
 }
 
@@ -35,7 +34,50 @@ a:hover {
     text-decoration: underline;
 }
 
-#sidebar, #content {
+.columns {
+    display: flex;
+}
+
+#header {
+    margin-bottom: 10px;
+    padding: 5px;
+    font-size: 0.85em;
+    display: flex;
+}
+
+#header > h2 {
+    font-size: 1em;
+    margin: 0 20px 0 0;
+    font-weight: normal;
+}
+
+#header > h2 > a:last-of-type {
+    font-weight: 800;
+}
+
+#header > h2 > span {
+    white-space: nowrap;
+}
+
+#header > div {
+    flex-grow: 1;
+}
+
+#header > div > * {
+    margin-right: 1px;
+}
+
+#header > div > *:not(:last-child):after {
+    content: "•";
+    margin-left: 1px;
+}
+
+#header .chronology {
+    display: inline;
+    white-space: nowrap;
+}
+
+#sidebar, #content, #header {
     background-color: rgba(var(--bg-shade), var(--bg-shade), var(--bg-shade), 0.6);
     border: 1px dotted var(--fg-color);
     border-radius: 3px;
@@ -46,7 +88,7 @@ a:hover {
     min-width: 200px;
     max-width: 250px;
     float: left;
-    padding: 20px 5px;
+    padding: 5px;
     margin-right: 10px;
     font-size: 0.85em;
     height: 100%;
@@ -140,12 +182,16 @@ a:hover {
     max-width: 400px;
     margin: 0 0 10px 10px;
     background-color: #181818;
-    border: 2px solid var(--fg-color);
 }
 
 #cover-art img {
     width: 100%;
     display: block;
+}
+
+img {
+    border: 2px solid var(--fg-color);
+    box-sizing: border-box;
 }
 
 h1 {

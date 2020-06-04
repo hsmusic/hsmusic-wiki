@@ -25,7 +25,7 @@ Commentary:
     This is not so much an end as a new beginning.
     Homestuck music, to me, has been an ever present part of my life for six years now. I can still keenly recall switching on my iPod Touch to the original Land of Fans and Music as I travelled into university for my first year of higher education, the excitement I felt in getting one of my own songs on the second installment and the deep pride I had in bringing the third album to fruition. The Land of Fans and Music has always been a celebration of the best of Homestuck fan music, a collection of musicians that continues to grow from strength to strength, doing things I could never dream of accomplishing.
     But Homestuck is a work filled with passion, with creativity and ingenuity, and it is that spark that has set so many of its fans ablaze. Through transformative retellings like Cool and New Homestuck and Act 8, the songs of which have equally earned their places in the annals of fanmusic history, and innovative projects bringing light to untold stories like Beforus, Ancestral and Xenoplanetarium yet to come, Homestuck fanmusicians are always hungry for content on which to develop their musical crafts. It only takes a quick listen to some of my early Homestuck content (my tindeck is still mostly online, including those Nepetaquest tracks...) just to see how far I've been able to hone my own crafts through this medium.
-    However, it is time. As all things inevitably must, the Land of Fans and Music project is reaching its final limits. While it would not at all surprise me to see another small scale LoFaM 5 spring forth from the incredible pool of talent that I have the privilege to interact with on a daily basis, ti is here that I personally choose to bow out towards my future horizons. While I will always be a part of this fan music community, I think I'm finally tapped out on my own Homestuck energy. (Thankfully, you can be freed of my disgusting motif potpourris. How many of those do I have now? Like... 4?)
+    However, it is time. As all things inevitably must, the Land of Fans and Music project is reaching its final limits. While it would not at all surprise me to see another small scale LoFaM 5 spring forth from the incredible pool of talent that I have the privilege to interact with on a daily basis, it is here that I personally choose to bow out towards my future horizons. While I will always be a part of this fan music community, I think I'm finally tapped out on my own Homestuck energy. (Thankfully, you can be freed of my disgusting motif potpourris. How many of those do I have now? Like... 4?)
     This album would not exist without so many incredible people. Thanks must be givven to Lambda for spearheading the project, and getting the ball rolling in the initial stages. She is incredible at pulling everything these projects need together and I know this album would not be half of what it is without her. Thanks also to Cait for what she has done towards getting this album out. Hopefully this means no more long nights for me uploading hundreds of tracks. Thanks to Blackhole and circlejourney for what they've done for the booklet you're reading right now. It looks fantastic and is filled to the brim with amazing information. And to both circlejourney and nights, thanks must be extended for the high calibre of art this booklet is home to. To Makin, Aris, Emily, Liza and even Mark and Lathan, thanks for being a part of this process in helping us sort through the hundreds of tracks we received.
     It's been six long years for me, but I finally close my own chapter on Homestuck fan music*. I wish everyone the best of luck in their future pursuits.
     Yours in fanmusic, from now and forever more,
@@ -120,7 +120,10 @@ Commentary:
 Track: Midnight
 Artist: TirantBacon
 Track Art: Calicorn
-References: Midnight Suffer, Liquid Negrocity
+References:
+- Midnight Suffer
+- Liquid Negrocity
+- Amen, Brother
 URLs: https://unofficialmspafans.bandcamp.com/track/midnight
 Commentary:
     <i>TirantBacon:</i>
@@ -304,6 +307,7 @@ Artist: SplitSuns
 Track Art: Neiratina
 References:
 - Chorale for Jaspers
+- Amen, Brother
 - Aggrieve
 - Battle Against an Unfathomable Enemy
 - At The Price of Oblivion
@@ -466,7 +470,7 @@ URLs: https://unofficialmspafans.bandcamp.com/track/disc-2-2
 Commentary:
     <i>Lambda Bledsoe:</i>
     For a lot of people LoFaM2 is the best (released) LoFaM, which is... sort of weird, as someone that did it. Personally, I sort of think of 2 and 3 as parts of one whole because they were so close in proudction and a number of songs were moved from the former to the latter.
-    Also for a lot of people, the most represenative songs of LoFaM2 would be things like [[Alphamatic Replacement]], [[CR1M1N4L, CR1M1N4L]], [[Fighting Spirit]], [[Dance-Stab-Dance]], stuff like that. As the, uh, co-head of Loaf 2 though, I sorta always felt that Jackpot was the "most LoFaM2" song? Not sure exactly what it was. Perhaps that it had like thre remixes (two of which never made it to a LoFaM), perhaps that it was my personal #1 "why wasn't this on coloUrs and mayhem" song. But, anyway, yeah, we did Jackpot. It's a neat song.
+    Also for a lot of people, the most represenative songs of LoFaM2 would be things like [[Alphamatic Replacement]], [[CR1M1N4L, CR1M1N4L]], [[Fighting Spirit]], [[Dance-Stab-Dance]], stuff like that. As the, uh, co-head of Loaf 2 though, I sorta always felt that Jackpot was the "most LoFaM2" song? Not sure exactly what it was. Perhaps that it had like three remixes (two of which never made it to a LoFaM), perhaps that it was my personal #1 "why wasn't this on coloUrs and mayhem" song. But, anyway, yeah, we did Jackpot. It's a neat song.
     <i><b>ndividedbyzero:</b></i>
     In my opinion, this track art perfectly fits the "calm before the storm" vibe of a middle before an end, like Disc 2 is before the endgame-themed Disc 3. I'll also note it looks incredibly fitting for the cover of a vinyl record, and with those bright colors and jazzy writing I'd check that hypothetical cover out the moment I saw it.
 -------------------------------------------------------------------------------
@@ -652,7 +656,7 @@ Track Art: sonotcanon
 URLs: https://unofficialmspafans.bandcamp.com/track/prospit-towers
 Commentary:
     <i>SerialSymphony:</i>
-    Prospit Towers took cues from the Genesis Frog album, as well as inspiration from tracks like [[Moonsetter]. I wanted something subdued but moving to capture the feel of the moon. Also, I'm on LOFAM, hi mom!
+    Prospit Towers took cues from the Genesis Frog album, as well as inspiration from tracks like [[Moonsetter]]. I wanted something subdued but moving to capture the feel of the moon. Also, I'm on LOFAM, hi mom!
     <i><b>WHATISLOSTINTHEMINES:</b></i>
     In this piece by sonotcanon, Jade looks down on the city of Prospit from one of the... Prospit Towers. I'd say that sitting like that on a window pane is unsafe, but then I remembered that dreamselves can, you know, fly, so whatever.
 -------------------------------------------------------------------------------
@@ -756,6 +760,22 @@ Commentary:
 Track: One and a Half Midnight
 Artist: Xoro Laventer
 Track Art: Selan Pike
+References:
+- Liquid Negrocity
+- Amen, Brother
+- Upward Movement (Dave Owns)
+- Double Midnight
+- I'm a Member of the Midnight Crew
+- Showtime (Original Mix)
+- Beatdown (Strider Style)
+- Freefall
+- Terezi's Theme
+- Unite Synchronization
+- Moonsetter
+- Sunsetter
+- Moshi Moshi?
+- English
+- ~~ADDITIONAL MAYHEM~~
 URLs: https://unofficialmspafans.bandcamp.com/track/one-and-a-half-midnight
 Commentary:
     <i>Selan Pike:</i>
@@ -764,6 +784,7 @@ Commentary:
 Track: Fractal Flowers Nui
 Artist: Kal-la-kal-la
 Track Art: Selan Pike
+References: Fractal Flowers, Creeping in My Soul
 URLs: https://unofficialmspafans.bandcamp.com/track/fractal-flowers-nui
 Commentary:
     <i>Kal-la-kal-la:</i>
@@ -899,7 +920,7 @@ References: Endless Climb, Atomyk Ebonpyre
 URLs: https://unofficialmspafans.bandcamp.com/track/atomyk-clockwyrk
 Commentary:
     <i>Marcy Nabors:</i>
-    This song represents a lot of firsts for me. My first piece of Homestuck fan music, my first time composing for an ensemble of orchestral instruments, and the uh... second song I ever wrote in a digital audio workstation. I read Homestuck in a feverish marathon in the Fall of 2010 while taking a class about playing in a rock band and recording music (my high school was very cool). Around that time, I'd also been sequencing MIDI files in Anvil Studio (a program which was also the genesis of Bowman's MIDI experience), and had only recently discovered that Logic also had MIDI sequencing capabilities. After falling madly in love with the Homestuck soundtrack, I had an epiphany to the tune of "holy shit, I know how to make stuff like that!" and Atomyk Clockwyrk was thus the result. I've come a long way sinc ethen, but it's a testament to the quality of Logic Pro's stock library that I managed to make it sound this good with minimal knowledge of production. A little volume automation, slap a limiter on top (not even Logic's wonderful Adaptive Limiter? Come ON, 16-year old Marcy...), and blam, what you're hearing today is a time capsule of what I put together in December of 2010.
+    This song represents a lot of firsts for me. My first piece of Homestuck fan music, my first time composing for an ensemble of orchestral instruments, and the uh... second song I ever wrote in a digital audio workstation. I read Homestuck in a feverish marathon in the Fall of 2010 while taking a class about playing in a rock band and recording music (my high school was very cool). Around that time, I'd also been sequencing MIDI files in Anvil Studio (a program which was also the genesis of Bowman's MIDI experience), and had only recently discovered that Logic also had MIDI sequencing capabilities. After falling madly in love with the Homestuck soundtrack, I had an epiphany to the tune of "holy shit, I know how to make stuff like that!" and Atomyk Clockwyrk was thus the result. I've come a long way since then, but it's a testament to the quality of Logic Pro's stock library that I managed to make it sound this good with minimal knowledge of production. A little volume automation, slap a limiter on top (not even Logic's wonderful Adaptive Limiter? Come ON, 16-year old Marcy...), and blam, what you're hearing today is a time capsule of what I put together in December of 2010.
     <i><b>WHATISLOSTINTHEMINES:</b></i>
     Dave is waiting in his land. For what? We're not quite sure. Perhaps he is simply waiting for one of the countless time loops he has employed as hsi session's time player. In any case, it can't be comfortable wearing that suit in that heat. I guess that's the price of being a c&nbsp;o&nbsp;o&nbsp;l&nbsp;k&nbsp;i&nbsp;d though.
     Fun fact actually, this piece had a couple other variants before this version, which had Dave wearing different colored suits. One was white, and the other was red. However, after dazed-squid was suggested to try a green one instead, it managed to catch the eye quite very well indeed. As such, the green version stuck.
@@ -1327,6 +1348,7 @@ Artist: M3l0m4ni4c
 Track Art: Andiavang
 References:
 - Double Midnight
+- Amen, Brother
 - Penumbra Phantasm
 - A Baby Legend - The Baby is 2 (by Toby Fox)
 - Dirgeish

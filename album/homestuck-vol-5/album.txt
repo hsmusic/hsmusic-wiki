@@ -275,7 +275,7 @@ Commentary:
     Really it’s the “(With Strings)” part that is my doing. When Jit was first inducted to the team, he did not have access at the time to a proper recording environment or midi controller that he could apply a high-quality piano sound to, so he had recorded his piano demo for “Ruins” on what I’m guessing is an on-board laptop microphone. I thought the composition was really great but knew that it would sound too unpolished to make the cut onto a Homestuck album, so I resolved to write a string accompaniment around his composition.
     By applying an incredibly enormous amount of reverb to the piano part, I hid the low fidelity of the original recording and made it sound as though it was hauntingly played to the listener from the other end of a cave. Given my lack of any truly convincing string samples, I chose instead to use deliberately mechanical strings, gently de-tuning them to sound a bit reminiscent of early string synthesizers, somewhat inspired by “Crystal Japan”, a creepy instrumental by David Bowie.
     Some of the other elements of the ambiance (the wind, the really high notes that echo for a long time) I drew from the soundtrack to World of Goo, specifically the track “Jelly” which I noticed bore a strong resemblance tonally to Jit’s composition. To seal the melancholy, I doubled the piano melody on guitar using a very cool, muted sound with a lot of echoes and pitch bends. I signed the tune by adding a cadence from “Sburban Jungle” at the very end.
-    Really, the track should probably be listed simply as “Ruins” if not for the fact that there is not official piano rendition of the piece. I think it would be really cool to hear such a version of the tune if Jit ever found himself recording material in a studio again (as he did for Tyler’s piano suite Sburb).
+    Really, the track should probably be listed simply as “Ruins” if not for the fact that there is not official piano rendition of the piece. I think it would be really cool to hear such a version of the tune if Jit ever found himself recording material in a studio again (as he did for James’s piano suite Sburb).
 -------------------------------------------------------------------------------
 Track: Ectobiology
 Artist: David Ko
@@ -432,7 +432,7 @@ References: Lotus
 URLs: https://homestuck.bandcamp.com/track/snow-pollen-2
 -------------------------------------------------------------------------------
 Track: Candles and Clockwork
-Artist: Tyler Dever
+Artist: James Dever
 Track Art: Quibbs
 URLs: https://homestuck.bandcamp.com/track/candles-and-clockwork-2
 -------------------------------------------------------------------------------

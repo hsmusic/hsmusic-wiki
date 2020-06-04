@@ -110,6 +110,8 @@ URLs: https://homestuck.bandcamp.com/track/john-sleeps-skaian-magicant-2
 Track: Upward Movement (Dave Owns)
 Artist: Kalibration
 Original Date: December 14, 2009
+References:
+- Amen, Brother
 URLs: https://homestuck.bandcamp.com/track/upward-movement-dave-owns-3
 -------------------------------------------------------------------------------
 Track: Vagabounce

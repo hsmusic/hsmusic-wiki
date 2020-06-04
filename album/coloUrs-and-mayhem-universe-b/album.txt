@@ -183,6 +183,8 @@ URLs: https://homestuck.bandcamp.com/track/battle-brotocol-2
 Track: Bec Noir
 Artist: Will Kommor
 Track Art: Rem
+References:
+- Amen, Brother
 URLs: https://homestuck.bandcamp.com/track/bec-noir-2
 -------------------------------------------------------------------------------
 Track: The Vast Glub

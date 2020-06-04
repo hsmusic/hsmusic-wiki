@@ -1424,13 +1424,13 @@ function writeListingPages() {
                             .map(([ album, ...tracks ]) => fixWS`
                                 <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></h2>
                                 ${album.commentary && fixWS`
-                                    <blockquote>
+                                    <blockquote style="${getThemeString(album.theme)}">
                                         ${transformMultiline(album.commentary)}
                                     </blockquote>
                                 `}
                                 ${tracks.filter(t => t.commentary).map(track => fixWS`
                                     <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album.theme)}">${track.name}</a></h3>
-                                    <blockquote>
+                                    <blockquote style="${getThemeString(album.theme)}">
                                         ${transformMultiline(track.commentary)}
                                     </blockquote>
                                 `).join('\n')}
@@ -1651,6 +1651,7 @@ function fancifyURL(url, {album = false} = {}) {
         url.includes('tumblr.com') ? 'Tumblr' :
         url.includes('twitter.com') ? 'Twitter' :
         url.includes('deviantart.com') ? 'DeviantArt' :
+        url.includes('wikipedia.org') ? 'Wikipedia' :
         new URL(url).hostname
     }</a>`;
 }
@@ -1921,20 +1922,24 @@ async function main() {
                 buffer = [];
             }
         };
+        const showWhere = name => {
+            const where = justEverythingMan.filter(thing => [...thing.coverArtists || [], ...thing.contributors || []].some(({ who }) => who === name) || [...thing.artists || []].includes(name));
+            for (const thing of where) {
+                console.log(`\x1b[31m- ` + (thing.album ? `(\x1b[1m${thing.album.name}\x1b[0;31m)` : '') + ` \x1b[1m${thing.name}\x1b[0m`);
+            }
+        };
         let CR4SH = false;
         for (let name of artistNames) {
             const entry = artistData.find(entry => entry.name === name);
             if (!entry) {
                 clearBuffer();
                 console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
+                showWhere(name);
                 CR4SH = true;
             } else if (entry.alias) {
                 clearBuffer();
                 console.log(`\x1b[31mArtist "\x1b[1m${name}\x1b[0;31m" should be named "\x1b[1m${entry.alias}\x1b[0;31m"\x1b[0m`);
-                const where = justEverythingMan.filter(thing => [...thing.coverArtists || [], ...thing.contributors || []].some(({ who }) => who === name));
-                for (const thing of where) {
-                    console.log(`\x1b[31m- ` + (thing.album ? `(\x1b[1m${thing.album.name}\x1b[0;31m)` : '') + ` \x1b[1m${thing.name}\x1b[0m`);
-                }
+                showWhere(name);
                 CR4SH = true;
             } else {
                 buffer.push(entry);
