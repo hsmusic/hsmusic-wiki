@@ -455,7 +455,7 @@ Track: E%ile
 Directory: exile
 Artist: ndividedbyzero
 Track Art: Xagave
-References: Ruins (With Strings)
+References: Ruins
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/e-ile
 - https://youtu.be/r_wqTbLDEAE?list=PL1fTYKSo2grBk7cJ3aIoYT2tc8eikCUKV
@@ -708,6 +708,7 @@ Commentary:
     The track made me feel like she was doing her time travel thing and wreckin crud, so here she is in some important part of history screwing everything up, getting ready to cull you if necessary 8]
 -------------------------------------------------------------------------------
 Track: Mutiny
+Directory: mutiny-ancestral
 Artist: Zan Beaver
 Track Art: Elanor Pam
 URLs:

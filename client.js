@@ -7,7 +7,7 @@
 
 const officialAlbumData = albumData.filter(album => !album.isFanon);
 const fandomAlbumData = albumData.filter(album => album.isFanon);
-const artistNames = C.getArtistNames(albumData, flashData);
+const artistNames = artistData.filter(artist => !artist.alias).map(artist => artist.name);
 const allTracks = C.getAllTracks(albumData);
 
 function pick(array) {

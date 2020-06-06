@@ -225,6 +225,8 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Beta
 -------------------------------------------------------------------------------
+Artist: Bill Bolin
+-------------------------------------------------------------------------------
 Artist: Blackhole
 URLs:
 - https://not-terezi-pyrope.tumblr.com/
@@ -532,6 +534,9 @@ URLs:
 Artist: Devin H-S
 -------------------------------------------------------------------------------
 Artist: devonianecho
+-------------------------------------------------------------------------------
+Artist: Diane Warren
+URLs: https://en.wikipedia.org/wiki/Diane_Warren
 -------------------------------------------------------------------------------
 Artist: Difarem
 URLs:
@@ -1692,8 +1697,6 @@ Artist: Richard Gung
 Artist: Rikuru
 -------------------------------------------------------------------------------
 Artist: rilez
--------------------------------------------------------------------------------
-Artist: Rilez
 URLs:
 - https://soundcloud.com/rilezfp
 -------------------------------------------------------------------------------
@@ -2136,6 +2139,9 @@ Artist: Tri-gender Panini
 URLs:
 - https://soundcloud.com/musical_panini
 - https://musicalpaninigrill.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Trisha Yearwood
+URLs: https://en.wikipedia.org/wiki/Trisha_Yearwood
 -------------------------------------------------------------------------------
 Artist: Tristan Scroggins
 URLs:

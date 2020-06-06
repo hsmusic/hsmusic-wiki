@@ -95,6 +95,10 @@ Artist: Toby Fox
 References: GameGrl (Original 1993 Mix), Teal Seer
 URLs: https://www.youtube.com/watch?v=Nc4nIdsuG7o
 -------------------------------------------------------------------------------
+Track: Guardian
+Artist: Bill Bolin
+Has URLs: no
+-------------------------------------------------------------------------------
 Track: Ham And Steak
 Artist: Malcolm Brown
 References:
@@ -134,6 +138,11 @@ Artist: James Roach
 References: Horschestra
 URLs: https://www.youtube.com/watch?v=EjCbsleXpuk
 -------------------------------------------------------------------------------
+Track: How Do I Live
+Artist: Diane Warren
+Contributors: Trisha Yearwood (performance in Con Air)
+URLs: https://www.youtube.com/watch?v=Sjx-T7_CGQA
+-------------------------------------------------------------------------------
 Track: I'm a Member of the Midnight Crew
 Artist: Eddie Morton
 URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
@@ -158,6 +167,14 @@ Track: Mannequin
 Artist: Perry Sullivan
 URLs: https://www.youtube.com/watch?v=gAyPFa3nEK4
 -------------------------------------------------------------------------------
+Track: Mutiny
+Artist: Bill Bolin
+Has URLs: no
+-------------------------------------------------------------------------------
+Track: Non Compos Mentis
+Artist: Bill Bolin
+Has URLs: no
+-------------------------------------------------------------------------------
 Track: not a creature was stirring
 Artist: Alexander Rosetti
 URLs: https://www.youtube.com/watch?v=hdlh6FRPnCw
@@ -173,6 +190,10 @@ Artist: Toby Fox
 URLs:
 - https://www.youtube.com/watch?v=RIq4GrMv96I
 - https://www.youtube.com/watch?v=OdntMzdkFnk
+-------------------------------------------------------------------------------
+Track: Problem Sleuth Theme
+Artist: Mark Hadley
+URLs: https://www.youtube.com/watch?v=DAj-vYcKNYY
 -------------------------------------------------------------------------------
 Track: Requiem
 Artist: Clark Powell
@@ -192,6 +213,10 @@ Artist: Toby Fox
 References: Riches to Ruins Movements I & II
 URLs: https://www.youtube.com/watch?v=mNu1KAi0Prk
 -------------------------------------------------------------------------------
+Track: Ruins
+Artist: Erik Scheele
+URLs: https://youtu.be/gbiS4WkCOVo?t=4987
+-------------------------------------------------------------------------------
 Track: Secret ROM
 Artist: Toby Fox
 URLs: https://www.youtube.com/watch?v=ercVSU3rjrc
@@ -205,6 +230,11 @@ URLs:
 Track: Skaian Shuffle
 Artist: Clark Powell
 URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F059%20Skaian%20Shuffle.mp3&mode=default
+-------------------------------------------------------------------------------
+Track: Strider Showdown
+Artist: Bill Bolin
+References: Beatdown (Strider Style)
+Has URLs: no
 -------------------------------------------------------------------------------
 Track: The Brave and the Bronze
 Artist: Yan Rodriguez

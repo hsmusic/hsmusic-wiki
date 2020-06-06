@@ -543,9 +543,11 @@ async function processAlbumDataFile(file) {
 
         const artDateValue = new Date(artDate);
 
-        const trackURLs = (getListField(section, 'URLs') || []).filter(Boolean);
+        const hasURLs = getBasicField(section, 'Has URLs') !== 'no';
 
-        if (!trackURLs.length) {
+        const trackURLs = hasURLs && (getListField(section, 'URLs') || []).filter(Boolean);
+
+        if (hasURLs && !trackURLs.length) {
             return {error: `The track "${trackName}" should have at least one URL specified.`};
         }
 
@@ -680,6 +682,10 @@ function stringifyFlashData() {
 
         return value;
     }, 1);
+}
+
+function stringifyArtistData() {
+    return JSON.stringify(artistData, null, 1);
 }
 
 // 8asic function for writing any site page. Handles all the 8asename,
@@ -836,6 +842,7 @@ function writeMiscellaneousPages() {
             // Yo, this file is gener8ted. Don't mess around with it!
             window.albumData = ${stringifyAlbumData()};
             window.flashData = ${stringifyFlashData()};
+            window.artistData = ${stringifyArtistData()};
         `)
     ]);
 }
@@ -864,21 +871,21 @@ async function writeAlbumPage(album) {
                     <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}" alt="cover art"></a>
                     <h1>${album.name}</h1>
                     <p>
-                        ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
+                        ${album.artists && `By ${getArtistString(album.artists)}.<br>` || `<!-- (here: Full-album musician credits) -->`}
                         ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
                             <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what})})`}
-                        `))}.<br>`}
+                        `))}.<br>` || `<!-- (here: Cover art credits) -->`}
                         Released ${getDateString(album)}.
-                        ${+album.artDate !== +album.date && `<br>Art released ${getDateString({date: album.artDate})}.`}
+                        ${+album.artDate !== +album.date && `<br>Art released ${getDateString({date: album.artDate})}.` || `<!-- (here: Cover art release date) -->`}
                     </p>
-                    ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>`}
+                    ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>` || `<!-- (here: Listen on...) -->`}
                     <${listTag}>
                         ${album.tracks.map(track => fixWS`
                             <li>
                                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
                                 ${track.artists !== album.artists && fixWS`
                                     <span class="by">by ${getArtistString(track.artists)}</span>
-                                `}
+                                ` || `<!-- (here: Track-specific musician credits) -->`}
                             </li>
                         `).join('\n')}
                     </${listTag}>
@@ -887,7 +894,7 @@ async function writeAlbumPage(album) {
                         <blockquote>
                             ${transformMultiline(album.commentary)}
                         </blockquote>
-                    `}
+                    ` || `<!-- (here: Full-album commentary) -->`}
                 </div>
             </div>
         </body>
@@ -913,25 +920,32 @@ async function writeTrackPage(track) {
                     <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}" alt="cover art"></a>
                     <h1>${track.name}</h1>
                     <p>
-                        By ${getArtistString(track.artists)}.<br>
-                        ${track.coverArtists && `Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
+                        By ${getArtistString(track.artists)}.
+                        ${track.coverArtists && `<br>Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
                             <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what})})`}
-                        `))}.<br>`}
-                        Released ${getDateString(track)}.
-                        ${+track.artDate !== +track.date && `<br>Art released ${getDateString({date: track.artDate})}.`}
+                        `))}.` || `<!-- (here: Cover art credits) -->`}
+                        ${track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && `<br>Released ${getDateString(track)}.` || `<!-- (here: Track release date) -->`}
+                        ${+track.artDate !== +track.date && `<br>Art released ${getDateString({date: track.artDate})}.` || `<!-- (here: Cover art release date, if it differs) -->`}
                     </p>
-                    <p>Listen on ${joinNoOxford(track.urls.map(fancifyURL), 'or')}.</p>
+                    ${track.urls.length ? fixWS`
+                        <p>Listen on ${joinNoOxford(track.urls.map(fancifyURL), 'or')}.</p>
+                    ` : fixWS`
+                        <p>This track has no URLs at which it can be listened.</p>
+                    `}
                     ${track.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
                             ${track.contributors.map(({ who, what }) => fixWS`
-                                <li>${artistNames.includes(who)
-                                    ? `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>`
-                                    : who
-                                } ${what && `(${getContributionString({what})})`}</li>
+                                <li>
+                                    ${artistNames.includes(who)
+                                        ? `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>`
+                                        : who
+                                    }
+                                    ${what && `(${getContributionString({what})})` || `<!-- (here: Contribution details) -->`}
+                                </li>
                             `).join('\n')}
                         </ul>
-                    `}
+                    ` || `<!-- (here: Track contributor credits) -->`}
                     ${tracksReferenced.length && fixWS`
                         <p>Tracks that <i>${track.name}</i> references:</p>
                         <ul>
@@ -942,7 +956,7 @@ async function writeTrackPage(track) {
                                 </li>
                             `).join('\n')}
                         </ul>
-                    `}
+                    ` || `<!-- (here: List of tracks referenced) -->`}
                     ${tracksThatReference.length && fixWS`
                         <p>Tracks that reference <i>${track.name}</i>:</p>
                         <dl>
@@ -956,7 +970,7 @@ async function writeTrackPage(track) {
                                         </li>
                                     `).join('\n')}
                                 </ul></dd>
-                            `}
+                            ` || `<!-- (here: Official tracks) -->`}
                             ${ttrFanon.length && fixWS`
                                 <dt>Fandom:</dt>
                                 <dd><ul>
@@ -967,27 +981,27 @@ async function writeTrackPage(track) {
                                         </li>
                                     `).join('\n')}
                                 </ul></dd>
-                            `}
+                            ` || `<!-- (here: Fandom tracks) -->`}
                         </dl>
-                    `}
+                    ` || `<!-- (here: Tracks that reference this track) -->`}
                     ${flashesThatFeature.length && fixWS`
                         <p>Flashes &amp; games that feature <i>${track.name}</i>:</p>
                         <ul>
                             ${flashesThatFeature.map(flash => `<li>${getFlashLinkHTML(flash)}</li>`).join('\n')}
                         </ul>
-                    `}
+                    ` || `<!-- (here: Flashes that feature this track) -->`}
                     ${track.lyrics && fixWS`
                         <p>Lyrics:</p>
                         <blockquote>
                             ${transformMultiline(track.lyrics)}
                         </blockquote>
-                    `}
+                    ` || `<!-- (here: Track lyrics) -->`}
                     ${track.commentary && fixWS`
                         <p>Artist commentary:</p>
                         <blockquote>
                             ${transformMultiline(track.commentary)}
                         </blockquote>
-                    `}
+                    ` || `<!-- (here: Track commentary) -->`}
                 </div>
             </div>
         </body>
@@ -1023,9 +1037,9 @@ async function writeArtistPage(artistName) {
         return fixWS`
             <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a>
-                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>`}
-                ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>`}
-                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>`}
+                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>` || `<!-- (here: Co-artist credits) -->`}
+                ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>` || `<!-- (here: Contribution details) -->`}
+                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
             </li>
         `;
     });
@@ -1184,7 +1198,7 @@ async function writeFlashPage(flash) {
                     / <a href="${C.FLASH_DIRECTORY}/${kebab}/index.html">${flash.name}</a>
                 </h2>
                 <div>
-                    ${chronologyButtons(flash, {
+                    ${chronologyLinks(flash, {
                         headingWord: 'flash/game',
                         sourceData: flashData,
                         filters: [
@@ -1193,47 +1207,46 @@ async function writeFlashPage(flash) {
                                 toArtist: ({ who }) => who
                             }
                         ]
-                    })}
+                    }) || `<!-- (here: Contributor chronology links) -->`}
                 </div>
             </div>
             <div class="columns">
                 <div id="sidebar">
                     <h1><a href="${C.FLASH_DIRECTORY}/index.html">Flashes &amp; Games</a></h1>
                     <dl>
-                        ${flashData.filter(f => f.act8r8k).map(({ act, theme }) => fixWS`
-                            ${act.startsWith('Act 1') && fixWS`
-                                <dt class="side ${side === 1 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/index.html" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>
-                            `}
-                            ${act.startsWith('Act 6 Act 1') && fixWS`
-                                <dt class="side ${side === 2 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/index.html" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>
-                            `}
-                            ${act.startsWith('Hiveswap') && fixWS`
-                                <dt class="side ${side === 0 && 'current'}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/index.html" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>
-                            `}
-                            ${(
-                                (flashData.findIndex(f => f.act === act) < act6) ? (side === 1) :
-                                ((flashData.findIndex(f => f.act === act) < outsideCanon) ? (side === 2) :
-                                true)
-                            ) && fixWS`
-                                <dt class="${act === flash.act ? 'current' : ''}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/index.html" style="${getThemeString(theme)}">${act}</a></dt>
-                            `}
-                            ${act === flash.act && fixWS`
+                        ${flashData.filter(f => f.act8r8k).filter(({ act }) =>
+                            act.startsWith('Act 1') ||
+                            act.startsWith('Act 6 Act 1') ||
+                            act.startsWith('Hiveswap') ||
+                            (
+                                flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
+                                flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
+                                true
+                            )
+                        ).flatMap(({ act, theme }) => [
+                            act.startsWith('Act 1') && `<dt${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/index.html" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
+                            || act.startsWith('Act 6 Act 1') && `<dt${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/index.html" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
+                            || act.startsWith('Hiveswap') && `<dt${classes('side', side === 0 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/index.html" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
+                            (
+                                flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
+                                flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
+                                true
+                            ) && `<dt${classes(act === flash.act && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/index.html" style="${getThemeString(theme)}">${act}</a></dt>`,
+                            act === flash.act && fixWS`
                                 <dd><ul>
                                     ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
-                                        <li class="${f === flash ? 'current' : ''}">
-                                            <a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/index.html" style="${getThemeString(f.theme)}">${f.name}</a>
-                                        </li>
+                                        <li${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/index.html" style="${getThemeString(f.theme)}">${f.name}</a></li>
                                     `).join('\n')}
                                 </ul></dd>
-                            `}
-                        `).join('\n')}
+                            `
+                        ]).filter(Boolean).join('\n')}
                     </dl>
                 </div>
                 <div id="content">
                     <h1>${flash.name}</h1>
                     <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}" alt="cover art"></a>
                     <p>Released ${getDateString(flash)}.</p>
-                    ${flash.page && `<p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>`}
+                    ${flash.page && `<p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>` || `<!-- (here: Play-online links) -->`}
                     ${flash.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
@@ -1241,10 +1254,10 @@ async function writeFlashPage(flash) {
                                 <li>${artistNames.includes(who)
                                     ? `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>`
                                     : who
-                                } ${what && `(${getContributionString({what})})`}</li>
+                                }${what && ` (${getContributionString({what})})`}</li>
                             `).join('\n')}
                         </ul>
-                    `}
+                    ` || `<!-- (here: Flash contributor details) -->`}
                     <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                     <ul>
                         ${flash.tracks.map(ref => {
@@ -1429,13 +1442,13 @@ function writeListingPages() {
                                     <blockquote style="${getThemeString(album.theme)}">
                                         ${transformMultiline(album.commentary)}
                                     </blockquote>
-                                `}
+                                ` || `<!-- (here: Full-album commentary) -->`}
                                 ${tracks.filter(t => t.commentary).map(track => fixWS`
                                     <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album.theme)}">${track.name}</a></h3>
                                     <blockquote style="${getThemeString(album.theme)}">
                                         ${transformMultiline(track.commentary)}
                                     </blockquote>
-                                `).join('\n')}
+                                `).join('\n') || `<!-- (here: Per-track commentary) -->`}
                             `)
                             .join('\n')
                         }
@@ -1516,10 +1529,10 @@ function generateHeaderForListings(listingDescriptors, currentDirectoryParts) {
                 ? currentDirectoryParts.join('/')
                 : currentDirectoryParts
             }/index.html">` + (
-                (currentDirectoryParts === 'all-commentary') ? `All Commentary` :
-                (currentDirectoryParts === 'random') ? `Random Pages` :
+                currentDirectoryParts === 'all-commentary' ? `All Commentary` :
+                currentDirectoryParts === 'random' ? `Random Pages` :
                 listingDescriptors.find(([ ldDirectoryParts ]) => ldDirectoryParts === currentDirectoryParts)[1]
-            ) + `</a>`}
+            ) + `</a>` || `<!-- (here: Link to current listing) -->`}
         </h2>
     `;
 }
@@ -1535,14 +1548,14 @@ function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)
     return fixWS`
         <ul>
             ${listingDescriptors.map(([ ldDirectoryParts, ldTitle ]) => fixWS`
-                <li class="${currentDirectoryParts === ldDirectoryParts && 'current'}">
+                <li${classes(currentDirectoryParts === ldDirectoryParts && 'current')}>
                     <a href="${C.LISTING_DIRECTORY}/${ldDirectoryParts.join('/')}/index.html">${ldTitle}</a>
                 </li>
             `).join('\n')}
-            <li class="${currentDirectoryParts === 'all-commentary' && 'current'}">
+            <li${classes(currentDirectoryParts === 'all-commentary' && 'current')}>
                 <a href="${C.LISTING_DIRECTORY}/all-commentary/index.html">All Commentary</a>
             </li>
-            <li class="${currentDirectoryParts === 'random' && 'current'}">
+            <li${classes(currentDirectoryParts === 'random' && 'current')}>
                 <a href="${C.LISTING_DIRECTORY}/random/index.html">Random Pages</a>
             </li>
         </ul>
@@ -1664,7 +1677,7 @@ function fancifyURL(url, {album = false} = {}) {
     }</a>`;
 }
 
-function chronologyButtons(currentTrack, {
+function chronologyLinks(currentTrack, {
     mapProperty,
     toArtist,
     filters, // {property, toArtist}
@@ -1703,7 +1716,7 @@ function chronologyButtons(currentTrack, {
         return fixWS`
             <div class="chronology">
                 <span class="heading">${heading}</span>
-                ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>`}
+                ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>` || `<!-- (here: Next/previous links) -->`}
             </div>
         `;
     }).filter(Boolean).join('\n');
@@ -1717,15 +1730,31 @@ function generateHeaderForAlbum(album, currentTrack = null) {
         <h2>
             <a href="index.html">Home</a>
             / <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html">${album.name}</a>
-            ${currentTrack && `/ <a href="${C.TRACK_DIRECTORY}/${currentTrack.directory}/index.html">${currentTrack.name}</a>`}
-            <span>${album.tracks.length > 1 && `(${[
-                previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" title="${previous.name}">Previous</a>`,
-                next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" title="${next.name}">Next</a>`,
-                `<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">${currentTrack ? 'Random' : 'Random Track'}</a>`
-            ].filter(Boolean).join(', ')})`}</span>
+            ${currentTrack && `/ <a href="${C.TRACK_DIRECTORY}/${currentTrack.directory}/index.html">${currentTrack.name}</a>` || `<!-- (here: Link to current track) --> `}
+            ${album.tracks.length > 1 && fixWS`
+                <span>(${[
+                    previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" title="${previous.name}">Previous</a>`,
+                    next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" title="${next.name}">Next</a>`,
+                    `<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">${currentTrack ? 'Random' : 'Random Track'}</a>`
+                ].filter(Boolean).join(', ')})</span>
+            ` || `<!-- (here: Album navigation links) -->`}
         </h2>
         <div>
-            ${currentTrack === null && chronologyButtons(album, {
+            ${currentTrack && chronologyLinks(currentTrack, {
+                headingWord: 'track',
+                sourceData: allTracks,
+                filters: [
+                    {
+                        mapProperty: 'artists',
+                        toArtist: artist => artist
+                    },
+                    {
+                        mapProperty: 'contributors',
+                        toArtist: ({ who }) => who
+                    }
+                ]
+            }) || `<!-- (here: Musician & contributors chronology links) -->`}
+            ${chronologyLinks(currentTrack || album, {
                 headingWord: 'cover art',
                 sourceData: justEverythingSortedByArtDateMan,
                 filters: [
@@ -1734,33 +1763,7 @@ function generateHeaderForAlbum(album, currentTrack = null) {
                         toArtist: ({ who }) => who
                     }
                 ]
-            })}
-            ${currentTrack && fixWS`
-                ${chronologyButtons(currentTrack, {
-                    headingWord: 'track',
-                    sourceData: allTracks,
-                    filters: [
-                        {
-                            mapProperty: 'artists',
-                            toArtist: artist => artist
-                        },
-                        {
-                            mapProperty: 'contributors',
-                            toArtist: ({ who }) => who
-                        }
-                    ]
-                })}
-                ${chronologyButtons(currentTrack, {
-                    headingWord: 'cover art',
-                    sourceData: justEverythingSortedByArtDateMan,
-                    filters: [
-                        {
-                            mapProperty: 'coverArtists',
-                            toArtist: ({ who }) => who
-                        }
-                    ]
-                })}
-            `}
+            }) || `<!-- (here: Cover art chronology links) -->`}
         </div>
     `;
 }
@@ -1770,9 +1773,7 @@ function generateSidebarForAlbum(album, currentTrack = null) {
     return fixWS`
         <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html">${album.name}</a></h1>
         <${listTag}>
-            ${album.tracks.map(track => fixWS`
-                <li class="${track === currentTrack ? 'current' : ''}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a></li>
-            `).join('\n')}
+            ${album.tracks.map(track => `<li${classes(track === currentTrack && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a></li>`).join('\n')}
         </${listTag}>
     `
 }
@@ -1858,6 +1859,11 @@ function rebaseURLs(directory, html) {
     });
 }
 
+function classes(...args) {
+    const values = args.filter(Boolean);
+    return values.length ? ` class="${values.join(' ')}"` : '';
+}
+
 async function main() {
     // 8ut wait, you might say, how do we know which al8um these data files
     // correspond to???????? You wouldn't dare suggest we parse the actual
@@ -1925,7 +1931,12 @@ async function main() {
     }
 
     allTracks = C.getAllTracks(albumData);
-    artistNames = C.getArtistNames(albumData, flashData);
+    artistNames = Array.from(new Set([
+        ...albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), []),
+        ...flashData.filter(flash => !flash.act8r8k).reduce((acc, flash) => acc.concat(flash.contributors.map(({ who }) => who)), []),
+        ...artistData.filter(artist => !artist.alias).map(artist => artist.name)
+    ]));
+
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
     officialAlbumData = albumData.filter(album => !album.isFanon);

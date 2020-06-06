@@ -236,6 +236,7 @@ Track: How Do I Live (Bunny Back in the Box Version)
 Artist: Michael Guy Bowman
 Track Art: copiko-art
 Contributors: Nick Smalley (guitar solo), Trisha Yearwood (How Do I Live)
+References: How Do I Live
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-bunny-back-in-the-box-version-2
 -------------------------------------------------------------------------------
 Track: Dupliblaze COMAGMA
@@ -263,7 +264,7 @@ URLs: https://homestuck.bandcamp.com/track/lotus-2
 Track: Ruins (With Strings)
 Artist: Erik Scheele, Michael Guy Bowman
 Track Art: ghostpressure
-References: Ruins (by Erik Scheele), Sburban Jungle
+References: Ruins, Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/ruins-with-strings-2
 Commentary:
     <i>Erik Scheele:</i>

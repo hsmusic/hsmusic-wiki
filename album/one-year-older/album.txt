@@ -100,7 +100,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Skaian Shrapnel
 Track Art: Amethyst Barron
-References: Ruins (With Strings), Walk-Stab-Walk (R&E), Crystalanthemums
+References: Ruins, Walk-Stab-Walk (R&E), Crystalanthemums
 URLs: https://erikscheele.bandcamp.com/track/skiain-shrapnel
 Commentary:
     <i>Erik Scheele:</i>

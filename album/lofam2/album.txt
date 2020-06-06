@@ -146,7 +146,7 @@ Track Art: Cap
 References:
 - Endless Expanse
 - Carapacian Dominion
-- Ruins (With Strings)
+- Ruins
 - Growing Up
 - Gilded Sands
 - Nightmare
@@ -423,7 +423,7 @@ References:
 - Courser
 - Earthsea Borealis
 - Upward Movement (Dave Owns)
-- Ruins (With Strings)
+- Ruins
 - Dawn of Man
 - the rose rap (by Toby Fox)
 - Cascade
@@ -541,7 +541,7 @@ References:
 - Gaia Queen
 - Endless Climb
 - Olive Rogue
-- Ruins (With Strings)
+- Ruins
 - Lotus
 - BL1ND JUST1C3 : 1NV3ST1G4T1ON !!
 - Chorale for Jaspers

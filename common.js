@@ -70,11 +70,6 @@ const C = {
     // sorted 8y date.
     getAllTracks: albumData => C.sortByDate(albumData.reduce((acc, album) => acc.concat(album.tracks), [])),
 
-    getArtistNames: (albumData, flashData) => Array.from(new Set([
-        ...albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), []),
-        ...flashData.filter(flash => !flash.act8r8k).reduce((acc, flash) => acc.concat(flash.contributors.map(({ who }) => who)), [])
-    ])),
-
     getKebabCase: name => name.split(' ').join('-').replace(/&/g, 'and').replace(/[^a-zA-Z0-9\-]/g, '').replace(/-{2,}/g, '-').replace(/^-+|-+$/g, '').toLowerCase(),
 
     // Terri8le hack: since artists aren't really o8jects and don't have proper

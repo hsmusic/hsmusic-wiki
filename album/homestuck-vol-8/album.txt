@@ -21,7 +21,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Do You Remem8er Me
 Artist: Malcolm Brown
-References: Lifdoff, Showtime (Original Mix), Death of the Lusii, Ruins (With Strings)
+References: Lifdoff, Showtime (Original Mix), Death of the Lusii, Ruins
 Track Art: Richard Gung
 URLs: https://homestuck.bandcamp.com/track/do-you-remem8er-me-2
 Commentary:
@@ -332,7 +332,7 @@ Commentary:
 Track: Judgment Day
 Artist: Toby Fox
 Contributors: Kelly Sadwin (violin)
-References: Ruins (With Strings)
+References: Ruins
 Track Art: Lazylaz
 URLs: https://homestuck.bandcamp.com/track/judgment-day-2
 -------------------------------------------------------------------------------

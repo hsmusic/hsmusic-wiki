@@ -499,7 +499,7 @@ References:
 - Dawn of Man
 - Cascade (Beta)
 - Liquid Negrocity
-- Ruins (With Strings)
+- Ruins
 - Black Rose / Green Sun
 URLs: https://unofficialmspafans.bandcamp.com/track/garden-of-eden-part-1
 Commentary:
@@ -587,7 +587,7 @@ Track: Tombs & Krypton
 Directory: tombs-and-krypton
 Artist: Rob Little
 Track Art: fueledbyanimation
-References: Ruins (With Strings)
+References: Ruins
 URLs: https://unofficialmspafans.bandcamp.com/track/tombs-krypton
 Commentary:
     <i>Rob Little:</i>

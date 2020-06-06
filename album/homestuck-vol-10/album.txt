@@ -284,7 +284,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Solar Voyage
 Artist: Marcy Nabors
-References: Ruins (With Strings), Flare, Explore
+References: Ruins, Flare, Explore
 Track Art: Seth Massey
 URLs: https://homestuck.bandcamp.com/track/solar-voyage-2
 Contributors:

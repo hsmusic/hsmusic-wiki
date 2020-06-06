@@ -95,7 +95,7 @@ Commentary:
 Track: Awakening
 Artist: Erik Scheele
 Track Art: Devin H-S
-References: Ruins (With Strings)
+References: Ruins
 URLs: https://homestuck.bandcamp.com/track/awakening-2
 -------------------------------------------------------------------------------
 Track: Havoc To Be Wrought

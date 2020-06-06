@@ -412,7 +412,7 @@ Track: The Explored Ruins
 Artist: RowBird, one-imperfect-rose
 Track Art: Neiratina
 URLs: https://unofficialmspafans.bandcamp.com/track/the-explored-ruins
-References: Explore, Ruins (With Strings)
+References: Explore, Ruins
 Commentary:
     <i>RowBird:</i>
     This song was composed with the intent of having a "Homestuck" feel to it, while being my own creation at the same time. The floating left-hand chord pattern that is heard throughout the song is inspired by [[Flare]], and [[Three in the Morning]]. The piano portion was composed before I even knew of the fan album, so it was mostly in the additional elements (the strings, woodwinds, percussion, etc.) that the character was shaped.
