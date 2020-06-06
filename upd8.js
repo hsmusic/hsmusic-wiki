@@ -692,7 +692,7 @@ async function writePage(directoryParts, titleOrHead, body) {
     // for now. TM. (Ahem. Still. Soon...may8e. TM. -- Should 8e easier now
     // that we'll have a proper function for writing any page - just appending
     // a C.ROOT_DIRECTORY should work. Um... okay, fine, I'll do that.)
-    await writeFile(path.join(directory, 'index.html'), fixWS`
+    await writeFile(path.join(directory, 'index.html'), rebaseURLs(directory, fixWS`
         <!DOCTYPE html>
         <html>
             <head>
@@ -700,9 +700,9 @@ async function writePage(directoryParts, titleOrHead, body) {
                     `<meta charset="utf-8">`,
                     `<meta name="viewport" content="width=device-width, initial-scale=1">`,
                     (titleOrHead.split('\n').length && !titleOrHead.includes('<title>')) ? `<title>${titleOrHead}</title>` : titleOrHead,
-                    directory !== C.SITE_DIRECTORY &&
-                    directory !== '.' &&
-                    `<base href="${path.relative(directory, C.SITE_DIRECTORY)}">`,
+                    // directory !== C.SITE_DIRECTORY &&
+                    // directory !== '.' &&
+                    // `<base href="${path.relative(directory, C.SITE_DIRECTORY)}">`,
                     `<link rel="stylesheet" href="${CSS_FILE}">`,
                     // Apply JavaScript directly to the HTML <head>.
                     // (This is unfortun8, 8ut necessary, 8ecause the entire
@@ -718,7 +718,7 @@ async function writePage(directoryParts, titleOrHead, body) {
             </head>
             ${body}
         </html>
-    `);
+    `));
 }
 
 function writeMiscellaneousPages() {
@@ -743,7 +743,7 @@ function writeMiscellaneousPages() {
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isBeyond).reverse().map(album => fixWS`
                             <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
-                                <img src="${getAlbumCover(album)}">
+                                <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
                         `).join('\n')}
@@ -753,7 +753,7 @@ function writeMiscellaneousPages() {
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isFanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
-                                <img src="${getAlbumCover(album)}">
+                                <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
                         `).join('\n')}
@@ -764,7 +764,7 @@ function writeMiscellaneousPages() {
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isCanon).reverse().map(album => fixWS`
                             <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
-                                <img src="${getAlbumCover(album)}">
+                                <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
                         `).join('\n')}
@@ -794,7 +794,7 @@ function writeMiscellaneousPages() {
                             <h2 style="${getThemeString(flash.theme)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === flash.act))}/index.html">${flash.act}</a></h2>
                         ` : fixWS`
                             <a class="grid-item" href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" style="${getThemeString(flash.theme)}">
-                                <img src="${getFlashCover(flash)}">
+                                <img src="${getFlashCover(flash)}" alt="cover art">
                                 <span>${flash.name}</span>
                             </a>
                         `).join('\n')}
@@ -861,7 +861,7 @@ async function writeAlbumPage(album) {
                     ${generateSidebarForAlbum(album)}
                 </div>
                 <div id="content">
-                    <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}"></a>
+                    <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}" alt="cover art"></a>
                     <h1>${album.name}</h1>
                     <p>
                         ${album.artists && `By ${getArtistString(album.artists)}.<br>`}
@@ -910,7 +910,7 @@ async function writeTrackPage(track) {
                     ${generateSidebarForAlbum(track.album, track)}
                 </div>
                 <div id="content">
-                    <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}"></a>
+                    <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}" alt="cover art"></a>
                     <h1>${track.name}</h1>
                     <p>
                         By ${getArtistString(track.artists)}.<br>
@@ -1037,7 +1037,7 @@ async function writeArtistPage(artistName) {
         <body>
             <div id="content">
                 ${ENABLE_ARTIST_AVATARS && await access(path.join(C.ARTIST_AVATAR_DIRECTORY, kebab + '.jpg')).then(() => true, () => false) && fixWS`
-                    <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"></a>
+                    <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg" alt="Artist avatar"></a>
                 `}
                 <h1>${artistName}</h1>
                 ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
@@ -1231,7 +1231,7 @@ async function writeFlashPage(flash) {
                 </div>
                 <div id="content">
                     <h1>${flash.name}</h1>
-                    <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}"></a>
+                    <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}" alt="cover art"></a>
                     <p>Released ${getDateString(flash)}.</p>
                     ${flash.page && `<p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>`}
                     ${flash.contributors.length && fixWS`
@@ -1840,6 +1840,22 @@ function getFlashLink(flash) {
 
 function getFlashLinkHTML(flash) {
     return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" title="Page ${flash.page}" style="${getThemeString(flash.theme)}">${flash.name}</a>`;
+}
+
+function rebaseURLs(directory, html) {
+    if (directory === '') {
+        return html;
+    }
+    return html.replace(/(href|src)="(.*?)"/g, (match, attr, url) => {
+        try {
+            new URL(url);
+            // no error: it's a full url
+        } catch (error) {
+            // caught an error: it's a component!
+            url = path.relative(directory, url);
+        }
+        return `${attr}="${url}"`;
+    });
 }
 
 async function main() {
