@@ -142,11 +142,9 @@ const SITE_JS_DISABLED = fixWS`
 const ENABLE_ARTIST_AVATARS = false;
 const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
 
-// the ways these filenames are used are super inconsistent and i am really
-// not bothering myself to fix that right now lol
 const ALBUM_DATA_FILE = 'album.txt';    // /album/*/$.txt
 const ARTIST_DATA_FILE = 'artists.txt'; // /$.txt
-const FLASH_DATA_FILE = 'flashes.txt';  // /flashes/$.txt
+const FLASH_DATA_FILE = 'flashes.txt';  // /$.txt
 
 const CSS_FILE = 'site.css';
 
@@ -628,6 +626,7 @@ async function processFlashDataFile(file) {
         const jiff = getBasicField(section, 'Jiff');
         const tracks = getListField(section, 'Tracks');
         const contributors = getContributionField(section, 'Contributors') || [];
+        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
 
         if (!name) {
             return {error: 'Expected "Flash" (name) field!'};
@@ -655,7 +654,7 @@ async function processFlashDataFile(file) {
             return {error: 'Expected "Tracks" field!'};
         }
 
-        return {name, page, directory, date, contributors, tracks, act, theme, jiff};
+        return {name, page, directory, date, contributors, tracks, urls, act, theme, jiff};
     });
 }
 
@@ -1180,7 +1179,6 @@ async function writeFlashPages() {
 
 async function writeFlashPage(flash) {
     const kebab = getFlashDirectory(flash);
-    const index = `${C.FLASH_DIRECTORY}/${kebab}/index.html`;
     const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'));
     const postCanon = flashData.findIndex(f => f.act.includes('Post Canon'));
     const outsideCanon = postCanon + flashData.slice(postCanon).findIndex(f => !f.act.includes('Post Canon'));
@@ -1189,6 +1187,16 @@ async function writeFlashPage(flash) {
         (flashData.indexOf(flash) <= outsideCanon) ? 2 :
         0
     );
+
+    const flashes = flashData.filter(flash => !flash.act8r8k);
+    const index = flashes.indexOf(flash);
+    const previous = flashes[index - 1];
+    const next = flashes[index + 1];
+    const parts = [
+        previous && `<a href="${getHrefOfAnythingMan(previous)}" title="${previous.name}">Previous</a>`,
+        next && `<a href="${getHrefOfAnythingMan(next)}" title="${next.name}">Next</a>`
+    ].filter(Boolean);
+
     await writePage([C.FLASH_DIRECTORY, kebab], flash.name, fixWS`
         <body style="${getThemeString(flash.theme)}">
             <div id="header">
@@ -1196,6 +1204,9 @@ async function writeFlashPage(flash) {
                     <a href="index.html">Home</a>
                     / <a href="${C.FLASH_DIRECTORY}/index.html">Flashes &amp; Games</a>
                     / <a href="${C.FLASH_DIRECTORY}/${kebab}/index.html">${flash.name}</a>
+                    ${parts.length && fixWS`
+                        <span>(${parts.join(', ')})</span>
+                    ` || `<!-- (here: Flash navigation links) -->`}
                 </h2>
                 <div>
                     ${chronologyLinks(flash, {
@@ -1246,7 +1257,16 @@ async function writeFlashPage(flash) {
                     <h1>${flash.name}</h1>
                     <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}" alt="cover art"></a>
                     <p>Released ${getDateString(flash)}.</p>
-                    ${flash.page && `<p>Play on <a href="${getFlashLink(flash)}">Homestuck</a> (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`}).</p>` || `<!-- (here: Play-online links) -->`}
+                    ${(flash.page || flash.urls.length) && `<p>Play on ${joinNoOxford(
+                        [
+                            flash.page && getFlashLink(flash),
+                            ...flash.urls
+                        ].map(url => `<span class="nowrap"><a href="${url}">${fancifyURL(url)}</a>` + (
+                            url.includes('homestuck.com') ? ` (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`})` :
+                            url.includes('bgreco.net') ? ` (HQ audio)` :
+                            url.includes('youtu') ? ` (on any device)` :
+                            ''
+                        ) + `</span>`), 'or')}.</p>` || `<!-- (here: Play-online links) -->`}
                     ${flash.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
@@ -1916,7 +1936,7 @@ async function main() {
         return;
     }
 
-    flashData = await processFlashDataFile(path.join(C.FLASH_DIRECTORY, FLASH_DATA_FILE));
+    flashData = await processFlashDataFile(FLASH_DATA_FILE);
     if (flashData.error) {
         console.log(`\x1b[31;1m${flashData.error}\x1b[0m`);
         return;

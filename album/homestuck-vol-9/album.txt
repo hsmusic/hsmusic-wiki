@@ -22,7 +22,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Anbroids V2.0
 Artist: Malcolm Brown
-References: Davesprite
+References: Anbroids, Davesprite
 Track Art: Jonathan Griffiths
 Directory: anbroids-v2
 URLs: https://homestuck.bandcamp.com/track/anbroids-v20-2
