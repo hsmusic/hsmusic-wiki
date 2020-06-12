@@ -125,8 +125,7 @@ const SITE_ABOUT = fixWS`
     </ul>
 `;
 
-const SITE_CHANGELOG = fixWS`
-`;
+const SITE_CHANGELOG = fs.readFileSync('changelog.html').toString().trim(); // fight me bro
 
 const SITE_FEEDBACK = fixWS`
     <p><strong>Feature requests? Noticed any errors?</strong> Please let me know! I appreciate feedback a lot, and always want to make this site better.</p>
@@ -1884,6 +1883,10 @@ function rebaseURLs(directory, html) {
         return html;
     }
     return html.replace(/(href|src)="(.*?)"/g, (match, attr, url) => {
+        if (url.startsWith('#')) {
+            return `${attr}="${url}"`;
+        }
+
         try {
             new URL(url);
             // no error: it's a full url
