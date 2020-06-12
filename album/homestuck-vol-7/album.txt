@@ -168,6 +168,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: White Host, Green Room
 Artist: Tensei
-References: Terezi Owns, Cascade (Beta), Black Rose / Green Sun
+References:
+- Terezi Owns
+- Cascade (Beta)
+- The King in Red
+- Black Rose / Green Sun
 Track Art: Al Neun
 URLs: https://homestuck.bandcamp.com/track/white-host-green-room-2

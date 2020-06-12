@@ -330,7 +330,7 @@ Commentary:
     Yeah like wearing sunglasses and its attack is to tell you to not do drugs.
 -------------------------------------------------------------------------------
 Track: B-SIDE: SPOOKTUNE
-References: Relatively Visible Darkness
+References: Spooktune:spooktune-undertale, Relatively Visible Darkness
 Directory: spooktune
 URLs: https://homestuck.bandcamp.com/track/b-side-spooktune-2
 Commentary:

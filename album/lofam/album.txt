@@ -132,6 +132,7 @@ Commentary:
 Track: Thought and Flow
 Artist: Steve Everson
 Track Art: catastrophicGenesis
+References: Hydrocity Zone (Act 2)
 URLs: https://homestuckgaiden.bandcamp.com/track/thought-and-flow
 Commentary:
     <i>Steve Everson:</i>
@@ -407,6 +408,7 @@ Track Art: Red Pen
 Contributors:
 - Beast72 (original midi)
 - Goatmon (additional vocals)
+References: Supercalifragilisticexpialidocious
 URLs: https://homestuckgaiden.bandcamp.com/track/sadomasopedorobonecrobestiality
 Lyrics:
     It's...
@@ -542,7 +544,7 @@ Contributors:
 - Alexander Rosetti (secondary naks)
 Track Art: Tawa
 References:
-- Nyanyanyanyanyanyanya! (by daniwellP)
+- Nyanyanyanyanyanyanya!
 - Tribal Ebonpyre
 - Sburban Jungle
 URLs: https://homestuckgaiden.bandcamp.com/track/nakkadile
@@ -649,6 +651,7 @@ Commentary:
 Track: SWEET BRO AND HELLA JEFF SHOW
 Artist: Erik Scheele
 Track Art: Elaine Wang
+References: Deck the Halls
 URLs: https://homestuckgaiden.bandcamp.com/track/sweet-bro-and-hella-jeff-show
 Lyrics:
     IT'S THE SWEET BRO AND HELLA JEFF SHOW
@@ -669,6 +672,7 @@ References:
 - Hearts Flush
 - Crystalanthemums
 - Homestuck Anthem
+- How Do I Live
 - Ruins
 - Liquid Negrocity
 URLs: https://homestuckgaiden.bandcamp.com/track/growing-up

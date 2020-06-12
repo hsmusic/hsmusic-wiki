@@ -21,7 +21,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Arisen Anew
 Artist: Tensei
-References: psych0ruins
+References: psych0ruins, My Little Pony Theme
 URLs: https://homestuck.bandcamp.com/track/arisen-anew-2
 Commentary:
     <i>Tensei:</i>
@@ -63,7 +63,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: BL1ND JUST1C3 : 1NV3ST1G4T1ON !!
 Artist: Malcolm Brown
-References: The Lemonsnout Turnabout, Sburban Jungle
+References: The Lemonsnout Turnabout, Objection! 2001, Sburban Jungle
 URLs: https://homestuck.bandcamp.com/track/bl1nd-just1c3-1nv3st1g4t1on-2
 Commentary:
     <i>Malcolm Brown:</i>
@@ -231,7 +231,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Blackest Heart (With Honks)
 Artist: Toby Fox
-References: Blackest Heart
+References: Blackest Heart, La Cucaracha, First Call, Toreador Song
 URLs: https://homestuck.bandcamp.com/track/blackest-heart-with-honks-2
 Commentary:
     <i>Toby Fox:</i>
@@ -254,6 +254,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Chaotic Strength
 Artist: Thomas Ferkol
+References: Chaotic Frenzy, The Number of the Beast, The Riddle Wants To Be
 URLs: https://homestuck.bandcamp.com/track/chaotic-strength-2
 Commentary:
     <i>Thomas Ferkol:</i>
@@ -388,7 +389,12 @@ Commentary:
 Track: The Blind Prophet
 Artist: Toby Fox
 Contributors: hank hill & cyclops (everything)
-References: The La2t Frontiier, MeGaLoVania, Courser
+References
+- The La2t Frontiier
+- Yahoos and Triangles
+- MeGaLoVania
+- Course
+- Guile's Theme
 URLs: https://homestuck.bandcamp.com/track/the-blind-prophet-2
 Commentary:
     <i>cyclops???:</i>

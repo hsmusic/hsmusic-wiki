@@ -125,6 +125,9 @@ const SITE_ABOUT = fixWS`
     </ul>
 `;
 
+const SITE_CHANGELOG = fixWS`
+`;
+
 const SITE_FEEDBACK = fixWS`
     <p><strong>Feature requests? Noticed any errors?</strong> Please let me know! I appreciate feedback a lot, and always want to make this site better.</p>
     <p>The best place to talk about this site is on its <a href="https://forum.homestuck.xyz/viewtopic.php?f=7&t=151">HomestuckXYZ forum thread</a>.</p>
@@ -741,6 +744,7 @@ function writeMiscellaneousPages() {
                         <a href="${C.FLASH_DIRECTORY}/index.html">Flashes &amp; Games</a>
                         <a href="${C.ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
                         <a href="${C.FEEDBACK_DIRECTORY}/index.html">Feedback &amp; Suggestions</a>
+                        <a href="${C.CHANGELOG_DIRECTORY}/index.html">Changelog</a>
                         <p>...or choose an album:</p>
                     </div>
                     <h2>Beyond Canon</h2>
@@ -786,6 +790,7 @@ function writeMiscellaneousPages() {
                         <a href="${C.LISTING_DIRECTORY}/index.html">Listings</a>
                         <a href="${C.ABOUT_DIRECTORY}/index.html">About &amp; Credits</a>
                         <a href="${C.FEEDBACK_DIRECTORY}/index.html">Feedback &amp; Suggestions</a>
+                        <a href="${C.CHANGELOG_DIRECTORY}/index.html">Changelog</a>
                     </div>
                     <div class="long-content">
                         <p>Also check out:</p>
@@ -814,6 +819,17 @@ function writeMiscellaneousPages() {
                         <h1>${SITE_TITLE}</h1>
                         <p><a href="index.html">(Home)</a></p>
                         ${SITE_ABOUT}
+                    </div>
+                </div>
+            </body>
+        `),
+        writePage([C.CHANGELOG_DIRECTORY], `Changelog`, fixWS`
+            <body>
+                <div id="content">
+                    <div class="long-content">
+                        <h1>Changelog</h1>
+                        <p><a href="index.html">(Home)</a></p>
+                        ${SITE_CHANGELOG}
                     </div>
                 </div>
             </body>

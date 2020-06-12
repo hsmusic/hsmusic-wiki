@@ -29,8 +29,8 @@ Commentary:
 Track: ˚ Disk 1 ˚
 Directory: disk1-lofam3
 Artist: Veritas Unae
+References: Violet and Gold
 URLs: https://unofficialmspafans.bandcamp.com/track/disk-1-2
-Refrences: Violet and Gold
 -------------------------------------------------------------------------------
 Track: The Delicate Art of Temporal Manipulation
 Artist: Eston Schweickart
@@ -186,7 +186,7 @@ Commentary:
 Track: 720413
 Artist: Lark Mordancy
 Track Art: sayachan-art
-References: Sburban Jungle, 69423 (by Michael Guy Bowman)
+References: Sburban Jungle, 69423
 URLs: https://unofficialmspafans.bandcamp.com/track/720413
 Commentary:
     <i>Lark Mordancy:</i>
@@ -446,6 +446,7 @@ Artist: Yishan Mai
 Track Art: plaidcushion
 References:
 - Unite Synchronization
+- Space Jam
 - GameBro (Original 1990 Mix)
 - GameGrl (Original 1993 Mix)
 URLs: https://unofficialmspafans.bandcamp.com/track/theme-of-the-slam-jam
@@ -696,7 +697,11 @@ Commentary:
 Track: Sketches in Black
 Artist: Kevin Grant
 Track Art: queenoftheantz
-References: Liquid Negrocity, Horschestra
+References:
+- It Don't Mean a Thing (If It Ain't Got That Swing)
+- Paint It, Black
+- Liquid Negrocity
+- Horschestra
 URLs: https://unofficialmspafans.bandcamp.com/track/sketches-in-black
 Commentary:
     <i>Kevin Grant:</i>

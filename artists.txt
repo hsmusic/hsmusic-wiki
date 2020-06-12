@@ -10,6 +10,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: A. Smith
 -------------------------------------------------------------------------------
+Artist: Ace Attorney
+URLs: https://en.wikipedia.org/wiki/Ace_Attorney
+-------------------------------------------------------------------------------
 Artist: Acyl
 URLs:
 - https://asktheseacowvboys.tumblr.com/
@@ -27,6 +30,9 @@ URLs:
 - https://paperseverywhere.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Aelyrin
+-------------------------------------------------------------------------------
+Artist: Aerosmith
+URLs: https://en.wikipedia.org/wiki/Aerosmith
 -------------------------------------------------------------------------------
 Artist: aeolianChemist
 URLs:
@@ -53,6 +59,9 @@ URLs:
 Artist: Alex Votl
 URLs:
 - https://soundcloud.com/votl
+-------------------------------------------------------------------------------
+Artist: Alexander Borodin
+URLs: https://en.wikipedia.org/wiki/Alexander_Borodin
 -------------------------------------------------------------------------------
 Artist: Alexander Rosetti
 URLs:
@@ -156,6 +165,9 @@ Artist: ARTistotel
 URLs:
 - https://artistotel.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Arvo Pärt
+URLs: https://en.wikipedia.org/wiki/Arvo_P%C3%A4rt
+-------------------------------------------------------------------------------
 Artist: Aryll
 URLs:
 - https://aryll.tumblr.com/
@@ -191,6 +203,9 @@ Artist: Aurum
 URLs:
 - https://geolu.tumblr.com/
 - https://www.quietcosmos.com/
+-------------------------------------------------------------------------------
+Artist: Avatar: The Last Airbender
+URLs: https://en.wikipedia.org/wiki/Avatar:_The_Last_Airbender
 -------------------------------------------------------------------------------
 Artist: awakesleeping
 URLs:
@@ -240,6 +255,9 @@ Artist: BlueAmethyst
 URLs:
 - https://blueamethystdraw.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Blue's Clues
+URLs: https://en.wikipedia.org/wiki/Blue%27s_Clues
+-------------------------------------------------------------------------------
 Artist: bootsie
 URLs:
 - https://bootsie-art.tumblr.com/
@@ -270,6 +288,9 @@ Artist: Brian Schaefer
 Artist: Brianne
 URLs:
 - https://ghostbri.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Bruno Mars
+URLs: https://en.wikipedia.org/wiki/Bruno_Mars
 -------------------------------------------------------------------------------
 Artist: Buck
 URLs:
@@ -303,7 +324,11 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Carla Bravo
 -------------------------------------------------------------------------------
+Artist: Castlevania
+-------------------------------------------------------------------------------
 Artist: catastrophicGenesis
+-------------------------------------------------------------------------------
+Artist: Cave Story
 -------------------------------------------------------------------------------
 Artist: Cee L. Kyle
 URLs:
@@ -327,8 +352,6 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Charles Neudorf
 -------------------------------------------------------------------------------
-Artist: Charlie Clouser
--------------------------------------------------------------------------------
 Artist: Charlie Flocke
 URLs:
 - https://twitter.com/calochart
@@ -349,6 +372,9 @@ Artist: cherry bomb bunny
 Artist: Christina Lillard
 URLs:
 - https://lunedraws.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Chrono Trigger
+URLs: https://en.wikipedia.org/wiki/Chrono_Trigger
 -------------------------------------------------------------------------------
 Artist: Chumi
 URLs:
@@ -379,6 +405,8 @@ Artist: clumsyroyalty
 -------------------------------------------------------------------------------
 Artist: cobaltmoth
 -------------------------------------------------------------------------------
+Artist: Coldplay
+-------------------------------------------------------------------------------
 Artist: Colin Stanfill
 -------------------------------------------------------------------------------
 Artist: cookiefonster
@@ -406,6 +434,9 @@ URLs:
 Artist: cratmang
 URLs:
 - https://twitter.com/CRatmanG
+-------------------------------------------------------------------------------
+Artist: Crazy Frog
+URLs: https://en.wikipedia.org/wiki/Crazy_Frog
 -------------------------------------------------------------------------------
 Artist: creepyknees
 URLs:
@@ -457,6 +488,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: D. Crystal
 -------------------------------------------------------------------------------
+Artist: Daft Punk
+URLs: https://en.wikipedia.org/wiki/Daft_Punk
+-------------------------------------------------------------------------------
 Artist: Dallas Ross Hicks
 URLs:
 - https://drhicks76.tumblr.com/
@@ -466,6 +500,8 @@ Artist: Dalmationer
 Artist: Dana Smart
 -------------------------------------------------------------------------------
 Artist: Daniel McDonald
+-------------------------------------------------------------------------------
+Artist: daniwellP
 -------------------------------------------------------------------------------
 Artist: Danna Vital
 -------------------------------------------------------------------------------
@@ -544,9 +580,14 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Digidigi66
 -------------------------------------------------------------------------------
+Artist: Dinah Washington
+URLs: https://en.wikipedia.org/wiki/Dinah_Washington
+-------------------------------------------------------------------------------
 Artist: Disney
 -------------------------------------------------------------------------------
 Artist: DJ最テー
+-------------------------------------------------------------------------------
+Artist: Doctor Who
 -------------------------------------------------------------------------------
 Artist: doctoroftime
 -------------------------------------------------------------------------------
@@ -579,6 +620,9 @@ URLs:
 - https://duckysenpai.bandcamp.com/
 - https://kamokachan.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Duke Ellington
+URLs: https://en.wikipedia.org/wiki/Duke_Ellington
+-------------------------------------------------------------------------------
 Artist: Durandana
 -------------------------------------------------------------------------------
 Artist: Dzu
@@ -607,6 +651,9 @@ Artist: Elanor Pam
 Artist: electric lantern
 URLs:
 - https://soundcloud.com/soregold
+-------------------------------------------------------------------------------
+Artist: Electric Six
+URLs: https://en.wikipedia.org/wiki/Electric_Six
 -------------------------------------------------------------------------------
 Artist: Elisa McCabe
 -------------------------------------------------------------------------------
@@ -687,6 +734,12 @@ Artist: Fibug
 URLs:
 - https://fishiebug-art.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Final Fantasy
+URLs: https://en.wikipedia.org/wiki/Final_Fantasy
+-------------------------------------------------------------------------------
+Artist: Fire Emblem
+URLs: https://en.wikipedia.org/wiki/Fire_Emblem
+-------------------------------------------------------------------------------
 Artist: First Turn Fold
 URLs:
 - https://soundcloud.com/first-turn-fold
@@ -747,6 +800,12 @@ Artist: Gene
 URLs:
 - https://trainwreckgenerator.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Georges Bizet
+URLs: https://en.wikipedia.org/wiki/Georges_Bizet
+-------------------------------------------------------------------------------
+Artist: Ghostbusters
+URLs: https://en.wikipedia.org/wiki/Ghostbusters
+-------------------------------------------------------------------------------
 Artist: Ghostcrebs
 URLs:
 - https://ghostcrebs.tumblr.com/
@@ -778,6 +837,9 @@ URLs:
 - https://soundcloud.com/user-743933328
 - https://twitter.com/power464646
 -------------------------------------------------------------------------------
+Artist: Gran Turismo
+URLs: https://en.wikipedia.org/wiki/Gran_Turismo_(series)
+-------------------------------------------------------------------------------
 Artist: grayscaleOddysey
 -------------------------------------------------------------------------------
 Artist: Griever
@@ -792,6 +854,9 @@ Artist: Guy
 Artist: Hadron Kalido
 URLs:
 - https://hadronus.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Hamilton: An American Musical
+URLs: https://en.wikipedia.org/wiki/Hamilton_(musical)
 -------------------------------------------------------------------------------
 Artist: Hames
 Alias: James Roach
@@ -863,6 +928,12 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: irl-porrim-maryam
 -------------------------------------------------------------------------------
+Artist: Iron Maiden
+URLs: https://en.wikipedia.org/wiki/Iron_Maiden
+-------------------------------------------------------------------------------
+Artist: Irving Mills
+URLs: https://en.wikipedia.org/wiki/Irving_Mills
+-------------------------------------------------------------------------------
 Artist: Isoraķatheð Zorethan F.
 -------------------------------------------------------------------------------
 Artist: Jack McMenamin
@@ -902,6 +973,12 @@ Artist: Joe Ouellet
 URLs:
 - https://soundcloud.com/doublejoeseven-1
 -------------------------------------------------------------------------------
+Artist: Johann Sebastian Bach
+URLs: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+-------------------------------------------------------------------------------
+Artist: JoJo's Bizarre Adventure
+URLs: https://en.wikipedia.org/wiki/JoJo%27s_Bizarre_Adventure
+-------------------------------------------------------------------------------
 Artist: Jonathan Griffiths
 URLs:
 - http://www.beyondthecanopy.com/
@@ -917,6 +994,9 @@ Artist: Joseph Aylsworth
 Artist: JulietCee
 URLs:
 - https://julietcee.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Justice
+URLs: https://en.wikipedia.org/wiki/Justice_(band)
 -------------------------------------------------------------------------------
 Artist: K
 URLs:
@@ -957,6 +1037,9 @@ URLs:
 - https://katemitchell.bandcamp.com/
 - https://twitter.com/gamblignant8
 - https://www.ssstudio.org/kate
+-------------------------------------------------------------------------------
+Artist: Katy Perry
+URLs: https://en.wikipedia.org/wiki/Katy_Perry
 -------------------------------------------------------------------------------
 Artist: kayak
 -------------------------------------------------------------------------------
@@ -1009,6 +1092,9 @@ URLs:
 Artist: kindergraph
 URLs:
 - https://kindergraph.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: King of the Hill
+URLs: https://en.wikipedia.org/wiki/King_of_the_Hill
 -------------------------------------------------------------------------------
 Artist: Kirvia
 URLs:
@@ -1088,6 +1174,9 @@ Artist: Left
 -------------------------------------------------------------------------------
 Artist: Leland Goodman
 -------------------------------------------------------------------------------
+Artist: Lemon Demon
+URLs: https://en.wikipedia.org/wiki/Lemon_Demon
+-------------------------------------------------------------------------------
 Artist: Leondra
 -------------------------------------------------------------------------------
 Artist: Leslie Hung
@@ -1116,6 +1205,9 @@ Artist: Llyona Fang
 URLs:
 - https://llyonafang.tumblr.com/
 - https://www.youtube.com/user/misticwater123
+-------------------------------------------------------------------------------
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/Introduction_to_entropy
 -------------------------------------------------------------------------------
 Artist: Lou Chastain
 URLs:
@@ -1152,9 +1244,15 @@ Artist: M. Schmahl
 URLs:
 - https://brilleg.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: M.O.O.N.
+URLs: https://musicofthemoon.com/
+-------------------------------------------------------------------------------
 Artist: M3l0m4ni4c
 URLs:
 - https://soundcloud.com/m3l0m4ni4c
+-------------------------------------------------------------------------------
+Artist: Madder Mortem
+URLs: https://en.wikipedia.org/wiki/Madder_Mortem
 -------------------------------------------------------------------------------
 Artist: Maddie Haines
 -------------------------------------------------------------------------------
@@ -1209,6 +1307,12 @@ Artist: Marina
 Artist: Mark Hadley
 URLs:
 - https://parsecproductions.bandcamp.com/
+-------------------------------------------------------------------------------
+Artist: Mark Ronson
+URLs: https://en.wikipedia.org/wiki/Mark_Ronson
+-------------------------------------------------------------------------------
+Artist: Mary Poppins
+URLs: https://en.wikipedia.org/wiki/Mary_Poppins_(film)
 -------------------------------------------------------------------------------
 Artist: Matrosha
 URLs:
@@ -1269,12 +1373,18 @@ Artist: Meruz
 URLs:
 - https://meruz.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Metallica
+URLs: https://en.wikipedia.org/wiki/Metallica
+-------------------------------------------------------------------------------
 Artist: Mia Schwartz
 -------------------------------------------------------------------------------
 Artist: Michael Guy Bowman
 URLs:
 - https://bowman.bandcamp.com/
 - https://www.youtube.com/channel/UCL5ykJ3-tVwrZFNtMSlTaVQ
+-------------------------------------------------------------------------------
+Artist: Michael Markowski
+URLs: https://www.michaelmarkowski.com/
 -------------------------------------------------------------------------------
 Artist: Michelle Czajkowski
 -------------------------------------------------------------------------------
@@ -1352,6 +1462,10 @@ Artist: motorizedBootlegger
 -------------------------------------------------------------------------------
 Artist: multiversalInk
 -------------------------------------------------------------------------------
+Artist: My Little Pony
+-------------------------------------------------------------------------------
+Artist: Mykola Leontovych
+-------------------------------------------------------------------------------
 Artist: myluckyseven
 URLs:
 - http://www.jetbougan.com/
@@ -1360,9 +1474,15 @@ Artist: Myotishi
 URLs:
 - https://rosieberry.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: N.W.A.
+URLs: https://en.wikipedia.org/wiki/N.W.A
+-------------------------------------------------------------------------------
 Artist: nappotuna
 URLs:
 - https://nappotuna.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Naruto
+URLs: https://en.wikipedia.org/wiki/Naruto
 -------------------------------------------------------------------------------
 Artist: Nate Tronerud
 URLs:
@@ -1580,6 +1700,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Private I.
 -------------------------------------------------------------------------------
+Artist: Professor Layton and the Curious Village
+URLs: https://en.wikipedia.org/wiki/Professor_Layton_and_the_Curious_Village
+-------------------------------------------------------------------------------
 Artist: Pseudonym
 -------------------------------------------------------------------------------
 Artist: psithurist
@@ -1644,6 +1767,9 @@ Artist: Raizor
 Artist: Ralen Gainsborough
 -------------------------------------------------------------------------------
 Artist: Rangzhe
+-------------------------------------------------------------------------------
+Artist: Ratboy Genius
+URLs: https://www.youtube.com/channel/UC98dbK3WqEkgiFj91WAwYJQ
 -------------------------------------------------------------------------------
 Artist: rawlithmora
 -------------------------------------------------------------------------------
@@ -1719,6 +1845,9 @@ Artist: Robyo
 -------------------------------------------------------------------------------
 Artist: rockytoad
 -------------------------------------------------------------------------------
+Artist: RollerCoaster Tycoon
+URLs: https://en.wikipedia.org/wiki/RollerCoaster_Tycoon
+-------------------------------------------------------------------------------
 Artist: rose-ebottles
 URLs:
 - https://rose-ebottles.tumblr.com/
@@ -1780,6 +1909,9 @@ URLs:
 - https://www.youtube.com/c/letstalkaboutstuff
 - https://twitter.com/hmsnofun
 -------------------------------------------------------------------------------
+Artist: Saw
+URLs: https://en.wikipedia.org/wiki/Saw_(franchise)
+-------------------------------------------------------------------------------
 Artist: sayachan-art
 -------------------------------------------------------------------------------
 Artist: Scarlet Schaefer
@@ -1787,6 +1919,8 @@ Artist: Scarlet Schaefer
 Artist: Scarodactyl
 URLs:
 - https://scarodactyl.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Scott Stutzman
 -------------------------------------------------------------------------------
 Artist: Seagrot
 -------------------------------------------------------------------------------
@@ -1798,6 +1932,8 @@ Artist: Sean William Calhoun
 URLs:
 - https://dothemusicything.tumblr.com/
 - https://www.youtube.com/channel/UCfF9BIFwhPdqdJRpG7Fs61g
+-------------------------------------------------------------------------------
+Artist: Secret of Mana
 -------------------------------------------------------------------------------
 Artist: seiii-tan
 -------------------------------------------------------------------------------
@@ -1823,6 +1959,9 @@ URLs:
 Artist: SerialSymphony
 URLs:
 - https://soundcloud.com/serialsymphony
+-------------------------------------------------------------------------------
+Artist: Set It Off
+URLs: https://en.wikipedia.org/wiki/Set_It_Off_(band)
 -------------------------------------------------------------------------------
 Artist: Seth Massey
 URLs:
@@ -1927,6 +2066,9 @@ Artist: Snilm
 URLs:
 - https://snilm.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Snoop Dogg
+URLs: https://en.wikipedia.org/wiki/Snoop_Dogg
+-------------------------------------------------------------------------------
 Artist: Solarbear
 -------------------------------------------------------------------------------
 Artist: Solatrus
@@ -1940,6 +2082,8 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Somnivus
 -------------------------------------------------------------------------------
+Artist: Sonic the Hedgehog
+-------------------------------------------------------------------------------
 Artist: sonotcanon
 URLs:
 - https://sonotcanon-draws.tumblr.com/
@@ -1949,15 +2093,23 @@ URLs:
 - https://sozzay.tumblr.com/
 - https://www.deviantart.com/sozzay
 -------------------------------------------------------------------------------
+Artist: Space Jam
+URLs: https://en.wikipedia.org/wiki/Space_Jam
+-------------------------------------------------------------------------------
 Artist: Spades
 URLs:
 - https://spectralspades.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Spectrumfizz
 -------------------------------------------------------------------------------
+Artist: SpellingPhailer
+-------------------------------------------------------------------------------
 Artist: Spicy Nyx
 URLs:
 - https://cupofnyx.carrd.co/
+-------------------------------------------------------------------------------
+Artist: Splatoon
+URLs: https://en.wikipedia.org/wiki/Splatoon
 -------------------------------------------------------------------------------
 Artist: SplitSuns
 URLs:
@@ -1975,6 +2127,9 @@ Artist: straightfacedgriff
 URLs:
 - https://hierogriff.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Street Fighter
+URLs: https://en.wikipedia.org/wiki/Street_Fighter
+-------------------------------------------------------------------------------
 Artist: Strideer
 -------------------------------------------------------------------------------
 Artist: strife-kind
@@ -1986,6 +2141,9 @@ URLs:
 - https://gingerybiscuit.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Sukka
+-------------------------------------------------------------------------------
+Artist: Super Mario
+URLs: https://en.wikipedia.org/wiki/Super_Mario
 -------------------------------------------------------------------------------
 Artist: SuryaAsura
 URLs:
@@ -2049,6 +2207,9 @@ Artist: The Black Curtain
 -------------------------------------------------------------------------------
 Artist: The D
 -------------------------------------------------------------------------------
+Artist: The Flintstones
+URLs: https://en.wikipedia.org/wiki/The_Flintstones
+-------------------------------------------------------------------------------
 Artist: The Great Anansi
 URLs:
 - https://soundcloud.com/the-great-anansi
@@ -2056,12 +2217,18 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: The Grubbels
 -------------------------------------------------------------------------------
+Artist: The Legend of Zelda
+URLs: https://en.wikipedia.org/wiki/The_Legend_of_Zelda
+-------------------------------------------------------------------------------
 Artist: The Lovable Tramp
 -------------------------------------------------------------------------------
 Artist: The One Music Maniac
 URLs:
 - https://theonemusicmaniac.tumblr.com/
 - https://www.youtube.com/user/theonemusicmaniac
+-------------------------------------------------------------------------------
+Artist: The Rolling Stones
+URLs: https://en.wikipedia.org/wiki/The_Rolling_Stones
 -------------------------------------------------------------------------------
 Artist: The Winstons
 URLs:
@@ -2130,6 +2297,9 @@ Artist: Toris Crow
 URLs:
 - https://toriscrow.bandcamp.com/
 - https://ukulelecrow.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Touhou Project
+URLs: https://en.wikipedia.org/wiki/Touhou_Project
 -------------------------------------------------------------------------------
 Artist: Traikan
 -------------------------------------------------------------------------------
@@ -2221,6 +2391,8 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: VT Stark
 -------------------------------------------------------------------------------
+Artist: VVVVVV
+-------------------------------------------------------------------------------
 Artist: Waif
 URLs:
 - https://shesbeautiful.bandcamp.com/
@@ -2253,6 +2425,8 @@ URLs:
 - https://wellmanicuredmusic.bandcamp.com/
 -------------------------------------------------------------------------------
 Artist: Winter
+-------------------------------------------------------------------------------
+Artist: Wolfgang Amadeus Mozart
 -------------------------------------------------------------------------------
 Artist: Worthikids
 URLs:
@@ -2305,6 +2479,9 @@ URLs:
 - https://soundcloud.com/catbossstudio
 -------------------------------------------------------------------------------
 Artist: Yorick Cobb
+-------------------------------------------------------------------------------
+Artist: Ys
+URLs: https://en.wikipedia.org/wiki/Ys_(series)
 -------------------------------------------------------------------------------
 Artist: ysh
 URLs:

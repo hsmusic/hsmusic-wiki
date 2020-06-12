@@ -126,7 +126,7 @@ Track: ♏Spider's Eclipse♏
 Artist: Blackhole
 Contributors: Magnoliajades (vocals)
 Track Art: Josefin B.
-References: Spider8ite!!!!!!!!, Cobalt Corsair
+References: Spider8ite!!!!!!!!, Cobalt Corsair, Winterfall
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/spiders-eclipse
 - https://youtu.be/LtLE_T53p_A?list=PL1fTYKSo2grBk7cJ3aIoYT2tc8eikCUKV
@@ -911,6 +911,9 @@ Commentary:
 Track: Tomorrow There'll Be More Of Us
 Artist: Navochao
 Track Art: Liz Fish
+References:
+- Tomorrow There'll Be More Of Us:tomorrow-therell-be-more-of-us-hamilton
+- Burn
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/tomorrow-therell-be-more-of-us
 - https://youtu.be/sCRu0qZOiMA?list=PL1fTYKSo2grBk7cJ3aIoYT2tc8eikCUKV
@@ -1024,6 +1027,7 @@ Commentary:
 Track: Swan Song
 Artist: Navochao
 Track Art: Gelasticat
+References: The Cave You Fear, Swan Song:swan-song-set-it-off
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/swan-song
 - https://youtu.be/MGOoXJMvZNU?list=PL1fTYKSo2grBk7cJ3aIoYT2tc8eikCUKV

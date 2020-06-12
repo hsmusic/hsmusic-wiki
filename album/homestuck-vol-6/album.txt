@@ -12,6 +12,7 @@ URLs:
 Track: Frost
 Artist: Solatrus
 Directory: frost-vol6
+References: Flow
 URLs: https://homestuck.bandcamp.com/track/frost-3
 Commentary:
     <i>Solatrus:</i>
@@ -64,8 +65,13 @@ URLs: https://homestuck.bandcamp.com/track/tribal-ebonpyre-2
 -------------------------------------------------------------------------------
 Track: I Don't Want to Miss a Thing
 Artist: Michael Guy Bowman
-Contributors: Aerosmith (original), Dianne Warren (lyrics)
-References: Sburban Jungle, Showtime (Original Mix), Explore, Squiddles!
+References:
+- I Don't Want to Miss a Thing:i-dont-want-to-miss-a-thing-aerosmith
+- Sburban Jungle
+- Showtime (Original Mix)
+- Squiddles!
+- Explore
+- How Do I Live
 URLs: https://homestuck.bandcamp.com/track/i-dont-want-to-miss-a-thing-2
 -------------------------------------------------------------------------------
 Track: MeGaLoVania
@@ -125,6 +131,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Nic Cage Song
 Artist: Toby Fox
+References:
+- Drop It Like It's Hot
+- Ah! vous dirai-je, maman
+- Nic Cage Romance
 URLs: https://homestuck.bandcamp.com/track/nic-cage-song-2
 -------------------------------------------------------------------------------
 Track: Phrenic Phever

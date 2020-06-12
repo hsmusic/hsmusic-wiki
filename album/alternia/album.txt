@@ -41,7 +41,7 @@ Track: Virgin Orb
 URLs: https://homestuck.bandcamp.com/track/virgin-orb-2
 -------------------------------------------------------------------------------
 Track: The La2t Frontiier
-References: Sunsetter
+References: Sunsetter, Guile's Theme
 URLs: https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
 -------------------------------------------------------------------------------
 Track: Skaian Summoning

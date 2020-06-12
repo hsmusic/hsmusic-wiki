@@ -348,6 +348,7 @@ References:
 - Showtime (Original Mix)
 - Showtime (Piano Refrain)
 - Sburban Jungle
+- I Don't Want to Miss a Thing
 URLs: https://unofficialmspafans.bandcamp.com/track/showtime-end-strife-remix
 Commentary:
     <i>Plumegeist:</i>
@@ -425,7 +426,7 @@ References:
 - Upward Movement (Dave Owns)
 - Ruins
 - Dawn of Man
-- the rose rap (by Toby Fox)
+- the rose rap
 - Cascade
 URLs: https://unofficialmspafans.bandcamp.com/track/rise-of-the-denizens
 Commentary:
@@ -511,7 +512,7 @@ Artist: Ian White
 Track Art: doctoroftime
 References:
 - GameBro (Original 1990 Mix)
-- Layton's Theme (by Tomohito Nishiura)
+- Layton's Theme
 URLs: https://unofficialmspafans.bandcamp.com/track/brofessor-layton-every-puzzle-has-a-brolution
 Commentary:
     <i>Ian White:</i>
@@ -524,7 +525,7 @@ Commentary:
 Track: ElecTrollCopSwing
 Artist: Astro Kid
 Track Art: Rachel Weiss
-References: Trollcops
+References: Revolution 909, Trollcops, Fuck tha Police
 URLs: https://unofficialmspafans.bandcamp.com/track/electrollcopswing
 Commentary:
     <i>Rachel Weiss:</i>
@@ -660,7 +661,7 @@ Commentary:
 Track: I'm The Doctor
 Artist: Veritas Unae
 Track Art: Strideer
-References: Doctor
+References: Doctor, Doctor Who Theme
 URLs: https://unofficialmspafans.bandcamp.com/track/im-the-doctor
 Commentary:
     <i>Veritas Unae:</i>
@@ -693,6 +694,7 @@ References:
 - Crystalanthemums
 - Ocean Stars
 - Homestuck Anthem
+- How Do I Live
 URLs: https://unofficialmspafans.bandcamp.com/track/fighting-spirit-second-form
 Commentary:
     <i>Kevin Grant:</i>
@@ -821,7 +823,9 @@ Commentary:
 Track: Ye Flarey Gentlemen
 Artist: Clark Powell
 Track Art: Dawn Davis
-References: Flare
+References:
+- Flare
+- God Rest You Merry, Gentlemen
 URLs: https://unofficialmspafans.bandcamp.com/track/ye-flarey-gentlemen
 Commentary:
     <i>Clark Powell:</i>
@@ -972,7 +976,7 @@ References:
 - Dance of Thorns
 - Sburban Jungle
 - An Unbreakable Union
-- Mutiny (by Bill Bolin)
+- Mutiny
 URLs: https://unofficialmspafans.bandcamp.com/track/the-dance-of-oblivion
 Commentary:
     <i>Domble:</i>

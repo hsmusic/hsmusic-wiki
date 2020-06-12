@@ -27,10 +27,12 @@ Directory: frost-medium
 URLs: https://homestuck.bandcamp.com/track/frost-4
 -------------------------------------------------------------------------------
 Track: Clockwork
+References: Westminister Quarters, Carol of the Bells
 URLs: https://homestuck.bandcamp.com/track/clockwork-2
 -------------------------------------------------------------------------------
 Track: Heat
 URLs: https://homestuck.bandcamp.com/track/heat-2
 -------------------------------------------------------------------------------
 Track: Wind
+References: Polovtsian Dances
 URLs: https://homestuck.bandcamp.com/track/wind-2

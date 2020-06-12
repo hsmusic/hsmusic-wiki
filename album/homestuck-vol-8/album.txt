@@ -175,7 +175,11 @@ Commentary:
 Track: Homefree
 Artist: Hilary Troiano
 Track Art: Vivian Ng
-References: Homestuck Anthem, Homestuck, Sburban Jungle, Upward Movement (Dave Owns)
+References:
+- Shooting Star
+- Homestuck Anthem
+- Sburban Jungle
+- Upward Movement (Dave Owns)
 URLs: https://homestuck.bandcamp.com/track/homefree-2
 Commentary:
     <i>Hilary Troiano:</i>
@@ -318,7 +322,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Revered Return
 Artist: Nick Smalley, Michael Guy Bowman
-References: Sburban Jungle
+References: Dirgeish, Sburban Jungle
 Track Art: Noot
 URLs: https://homestuck.bandcamp.com/track/revered-return-2
 Commentary:
@@ -358,11 +362,11 @@ URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-acap
 Track: How Do I Live (D8 Night Version)
 Artist: Michael Guy Bowman
 Track Art: Victoria Grace Elliott
+References: How Do I Live
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-d8-night-version-2
 Contributors:
 - Thomas Ferkol (electric guitar)
 - David Ko (backup vocals)
-- Trisha Yearwood (original [How Do I Live])
 Commentary:
     <i>Michael Guy Bowman:</i>
     So, like it or not, my signature song seems to be the country ballad made famous by a movie about how Nicolas Cage and John Cusack screw up absolutely everything and destroy the Las Vegas strip. Hence, for Volume 8, I decided to do a more serious version of “How Do I Live” that doesn’t mortify me entirely.

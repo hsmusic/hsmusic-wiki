@@ -235,14 +235,14 @@ URLs: https://homestuck.bandcamp.com/track/skaian-flight-2
 Track: How Do I Live (Bunny Back in the Box Version)
 Artist: Michael Guy Bowman
 Track Art: copiko-art
-Contributors: Nick Smalley (guitar solo), Trisha Yearwood (How Do I Live)
+Contributors: Nick Smalley (guitar solo)
 References: How Do I Live
 URLs: https://homestuck.bandcamp.com/track/how-do-i-live-bunny-back-in-the-box-version-2
 -------------------------------------------------------------------------------
 Track: Dupliblaze COMAGMA
 Artist: Toby Fox
 Track Art: Shoutloaf
-References: Atomyk Ebonpyre, Beatdown (Strider Style)
+References: Atomyk Ebonpyre, Drop It Like It's Hot, Beatdown (Strider Style)
 URLs: https://homestuck.bandcamp.com/track/dupliblaze-comagma-2
 -------------------------------------------------------------------------------
 Track: Moonshatter

@@ -59,6 +59,7 @@ Commentary:
 Track: Green Lolly
 Artist: James Dever, Robert J! Lake
 Track Art: Brianne
+References: The Uranian
 URLs: https://homestuck.bandcamp.com/track/green-lolly-2
 Contributors:
 - James Dever (original theme)
@@ -67,6 +68,7 @@ Contributors:
 Track: Red Sucker
 Artist: James Dever, Robert J! Lake
 Track Art: Dana Smart
+References: The Undying
 URLs: https://homestuck.bandcamp.com/track/red-sucker-2
 Contributors:
 - James Dever (theme)

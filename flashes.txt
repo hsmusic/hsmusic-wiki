@@ -469,7 +469,7 @@ URLs:
 Flash: [S] John: Enter village.
 Page: 3079
 Date: December 15, 2010
-Tracks: Planet Healer
+Tracks: Planet Healer, Fear of the Heavens
 URLs:
 - https://www.bgreco.net/hsflash/004979.html
 ------------------------------------------------------------------------------
@@ -628,7 +628,7 @@ Tracks: Foley (by Toby Fox)
 Flash: [S] Jane: Get mail.
 Page: 4282
 Date: December 9, 2011
-Tracks: Foley (by Clark Powell)
+Tracks: Windchime Foley
 ------------------------------------------------------------------------------
 ACT: Act 6 Intermission 1 - corpse party
 FG: #a10000
@@ -741,7 +741,7 @@ URLs:
 Flash: [S] Terry: Fast forward to Liv.
 Page: 5027
 Date: June 12, 2012
-Tracks: I Don't Want to Miss a Thing
+Tracks: I Don't Want to Miss a Thing:i-dont-want-to-miss-a-thing
 ------------------------------------------------------------------------------
 Flash: [S] Dirk: Synchronize.
 Page: 5238

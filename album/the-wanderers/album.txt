@@ -23,6 +23,7 @@ URLs: https://youtu.be/TktueKyYBKs
 Track: Gilded Sands
 Artist: Nick Smalley, Solatrus
 Track Art: Kat
+References: Stone Tower Temple
 URLs: https://youtu.be/i5gsRSo3sMo
 Commentary:
     <i>Solatrus:</i>
@@ -43,6 +44,7 @@ URLs: https://youtu.be/CadBaY2j6pE
 Track: Mayor Maynot
 Artist: Toby Fox
 Track Art: Shad
+References: Mailtime
 URLs: https://youtu.be/d9KVN4WfHHc
 -------------------------------------------------------------------------------
 Track: We Walk

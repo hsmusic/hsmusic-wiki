@@ -10,6 +10,7 @@ URLs:
 -------------------------------------------------------------------------------
 Track: Jade Dragon
 Artist: Robert J! Lake
+References: Viva la Vida
 URLs: https://homestuck.bandcamp.com/track/jade-dragon-2
 -------------------------------------------------------------------------------
 Track: Swing of the Clock
@@ -53,6 +54,7 @@ URLs: https://homestuck.bandcamp.com/track/humphreys-lullaby-2
 -------------------------------------------------------------------------------
 Track: Clockwork Reversal
 Artist: Thomas Ferkol
+References: Clockwork Apocalypse
 URLs: https://homestuck.bandcamp.com/track/clockwork-reversal-2
 Commentary:
     <i>Thomas Ferkol:</i>
@@ -101,6 +103,7 @@ URLs: https://homestuck.bandcamp.com/track/baroqueback-bowtier-scratchs-lament-2
 -------------------------------------------------------------------------------
 Track: Scratch
 Artist: David Ko
+References: Toccata and Fugue in D minor, Ultimate Koopa
 URLs: https://homestuck.bandcamp.com/track/scratch-2
 -------------------------------------------------------------------------------
 Track: Omelette Sandwich
@@ -116,6 +119,7 @@ URLs: https://homestuck.bandcamp.com/track/temporal-piano-2
 -------------------------------------------------------------------------------
 Track: Time Paradox
 Artist: Thomas Ferkol
+References: Westminister Quarters
 URLs: https://homestuck.bandcamp.com/track/time-paradox-2
 Commentary:
     <i>Thomas Ferkol:</i>

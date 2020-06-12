@@ -13,14 +13,15 @@ Track: Stormspirit
 URLs: https://tenseimusic.bandcamp.com/track/stormspirit
 -------------------------------------------------------------------------------
 Track: Heir Conditioning
-References: Doctor, Penumbra Phantasm
+References: Tomboyish Girl in Love, Doctor, Penumbra Phantasm
 URLs: https://tenseimusic.bandcamp.com/track/heir-conditioning
 -------------------------------------------------------------------------------
 Track: Dance of Thorns
+References: Moon Over the Castle, Bloody Tears, Beginning, Recruitment Theme
 URLs: https://tenseimusic.bandcamp.com/track/dance-of-thorns
 -------------------------------------------------------------------------------
 Track: Time on My Side
-References: Beatdown (Strider Style), Liquid Negrocity
+References: Beatdown (Strider Style), Liquid Negrocity, Master of Puppets
 URLs: https://tenseimusic.bandcamp.com/track/time-on-my-side
 Commentary:
     <i>Tensei:</i>
@@ -40,10 +41,11 @@ Commentary:
     That aside, obviously stuff from The Prodigy’s Fat of the Land album bears some resemblance as well, especially with the cheesy bassline. I know that a few Prodigy songs have been used in the otherwise kinda shitty Charlie’s Angels movies whenever shit was about to go down, and that’s really the kind of vibe I was going for as well.
 -------------------------------------------------------------------------------
 Track: Atomic Bonsai
+References: The Raising Fighting Spirit, Reverse Situation, The Decisive Battle
 URLs: https://tenseimusic.bandcamp.com/track/atomic-bonsai
 -------------------------------------------------------------------------------
 Track: Knife's Edge
-References: Cascade (Beta)
+References: To Make the End of Battle, Cascade (Beta)
 URLs: https://tenseimusic.bandcamp.com/track/knifes-edge
 -------------------------------------------------------------------------------
 Track: Make a Wish

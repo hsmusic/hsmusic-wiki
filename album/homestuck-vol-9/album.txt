@@ -130,7 +130,7 @@ Commentary:
 Track: GameGrl (Original 1993 Mix)
 Artist: Michael Guy Bowman
 Contributors: Erik Scheele (keytar), Tavia Morra (vocals)
-References: Airtime, Afraid of the Darko
+References: Bro Hop, Airtime, Afraid of the Darko
 Track Art: Tavia Morra
 URLs: https://homestuck.bandcamp.com/track/gamegrl-original-1993-mix-2
 Commentary:
@@ -166,7 +166,13 @@ URLs: https://homestuck.bandcamp.com/track/a-little-fight-mewsic-2
 -------------------------------------------------------------------------------
 Track: Austin, Atlantis
 Artist: Clark Powell
-References: Beatdown (Strider Style), Atomyk Ebonpyre, Explore, Endless Climb, Flare
+References:
+- Beatdown (Strider Style)
+- Atomyk Ebonpyre
+- Magnificat
+- Explore
+- Endless Climb
+- Flare
 Track Art: Nic Carey
 URLs: https://homestuck.bandcamp.com/track/austin-atlantis-2
 Commentary:
@@ -273,14 +279,22 @@ Commentary:
 Track: Jane Dargason
 Artist: Clark Powell, Robert J! Lake
 Track Art: Dawn Davis
+References: Life in Technicolor
 URLs: https://homestuck.bandcamp.com/track/jane-dargason-2
 Commentary:
     <i>Clark Powell:</i>
+    (<a href="https://plazmataz.tumblr.com/post/25536699941/jane-dargason-it-may-be-a-little-late-by-now-but">Tumblr</a>)
     It may be a little late by now, but I wanted to give one more of my songs from Volume 9 a post of its own.
     First let me say that RJ Lake is a joy to work with. We sent Jane Dargason back and forth between us, remixing each other’s remixes until the track was in its final state. For reference:
     The original sketch put together by RJ sounded like <a href="misc/jane-dargason-sketch.mp3">this</a>.
     By the end of the process, things had evolved <a href="https://homestuck.bandcamp.com/track/jane-dargason-2">quite a bit</a>.
     I also want to take a moment to say that my good friend Dawn did a spectacular job on the track art! She has a wondrous way with colors, and her drawings of the Homestuck kids have a childlike optimism about them. Nothing could have been a more perfect match for a track like this one!
+    (<a href="https://plazmataz.tumblr.com/post/23084666959/and-for-your-listening-pleasure-a-snippet-of">Tumblr</a>)
+    And for your listening pleasure, <a href="misc/jane-dargason-another-sketch.mp3">a snippet</a> of something called Jane Dargason. It is an unfinished track, part of my work lately putting together some music for Homestuck Volume 9. <a href="album/homestuck-vol-9/princess-of-helium.jpg">The beautiful artwork</a>, for which the music is arguably just a vehicle, is brought to you by the astounding talent of Tavia Morra.
+    You remember [[Jade Dragon]], right? The rich wall of sound therein owes itself to the fact that it samples Viva la Vida, from its namesake Coldplay album. Jane Dargason is a spiritual successor, using samplework from Life in Technicolor off the same album. All of this is combined here to surprisingly lovely effect with sounds from an unreleased track by RJ (who, as we have discussed, is the coolest).
+    In short, we have an anthemic Jane tune in the workings!
+    <i>Florrie Haero:</i>
+    the track art attached to the audio file on the original tumblr post eventually became the art for [[Princess of Helium]]!
 -------------------------------------------------------------------------------
 Track: Before the Beginning and After the End
 Artist: Robert J! Lake
@@ -304,6 +318,7 @@ URLs: https://homestuck.bandcamp.com/track/cumulating-dreams-2
 Track: Busting Makes Me Feel Good
 Artist: Michael Guy Bowman
 Track Art: Victoria Grace Elliott
+References: Ghostbusters
 URLs: https://homestuck.bandcamp.com/track/busting-makes-me-feel-good-2
 Commentary:
     <i>Michael Guy Bowman:</i>

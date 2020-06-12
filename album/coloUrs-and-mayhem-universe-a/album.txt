@@ -113,7 +113,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Fuchsia Ruler
 Artist: Sinister Psyche
-Refrences: Black
+Refrences: Liquid Negrocity, twoward2 the heaven2
 Track Art: Mel
 URLs: https://homestuck.bandcamp.com/track/fuchsia-ruler
 Commentary:
@@ -201,6 +201,7 @@ Track: ~~ADITIONAL MAYHEM~~
 Artist: Toby Fox
 Track Art: none
 Directory: additional-mayhem-universe-a
+References: Double Midnight
 URLs: https://homestuck.bandcamp.com/track/universe-a-additional-mayhem
 -------------------------------------------------------------------------------
 Track: Your Universe

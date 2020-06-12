@@ -32,6 +32,7 @@ Artist: Seth Peelle
 Track Art: PJ Tush
 URLs: https://homestuck.bandcamp.com/track/creata-3
 References:
+- Skaia Voyages
 - Showtime (Original Mix)
 - Doctor
 - Harlequin
@@ -244,7 +245,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Skaian Happy Flight
 Artist: Seth Peelle
-References: Skaian Ride, Skies of Skaia
+References: Skaian Ride, Skaia Voyages
 Track Art: Alyssa Lee Dalangin
 URLs: https://homestuck.bandcamp.com/track/skaian-happy-flight-2
 Commentary:
@@ -333,6 +334,7 @@ Commentary:
 Track: Breeze
 Artist: Erik Scheele
 Track Art: Richard Gung
+References: Sea of Derse
 URLs: https://homestuck.bandcamp.com/track/breeze-2
 Commentary:
     <i>Erik Scheele:</i>
@@ -369,6 +371,7 @@ References:
 - Doctor
 - Cascade (Beta)
 - Time on My Side
+- Hydrogen
 - Beatdown (Strider Style)
 - Upward Movement (Dave Owns)
 - Penumbra Phantasm
@@ -379,8 +382,10 @@ References:
 - Heir Conditioning
 - Atomic Bonsai
 - Sunsetter
+- Neos City (Night)
 - MeGaLoVania
 - Crustacean
+- Meet the Flintstones
 - Spider's Claw
 - Homestuck Anthem
 - Showtime (Original Mix)
@@ -388,7 +393,7 @@ References:
 Commentary:
     <i>Tensei:</i>
     First of all, I'm not an EDM producer.
-    So I made this track called The King in Red. Here's the song:<br>PSYCH, that's the wrong song!
+    So I made this track called [[The King in Red]]. Here's the song:<br>PSYCH, that's the wrong song!
     Sweet Fruity Loops - I use that.<br>Supa hot beats - I drop that.<br>John and Aradia - I ship that.
 -------------------------------------------------------------------------------
 Track: Lilith in Starlight
@@ -434,6 +439,7 @@ References:
 - Calamity
 - Walk-Stab-Walk (R&E)
 - Doctor
+- Dirgeish
 - Crystalanthemums
 - Skies of Skaia
 - Frost:frost-vol6

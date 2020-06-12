@@ -151,7 +151,7 @@ Commentary:
 Track: Pax Condesca
 Artist: Viko Riféo
 Track Art: Circlejourney
-References: Crystalanthemums, Negastrife
+References: Calamari Inkantation, Crystalanthemums, Negastrife
 URLs: https://unofficialmspafans.bandcamp.com/track/pax-condesca
 Commentary:
     <i>Viko Riféo:</i>
@@ -322,6 +322,7 @@ Artist: Shandy
 Track Art: Shandy
 References:
 - Black Rose / Green Sun
+- Greensleeves
 - Endless Climb
 URLs: https://unofficialmspafans.bandcamp.com/track/my-lady-greensleeves
 Commentary:
@@ -594,7 +595,11 @@ Track: Three in the Morning (Ngame's Bowmix) [Explicit]
 Directory: three-in-the-morning-ngames-bowmix
 Artist: Ngame
 Track Art: Ngame
-References: Three in the Morning
+References:
+- Three in the Morning
+- RollerCoaster Tycoon Theme
+- Fruity Pebbles Jingle
+- Bowman Remix
 URLs: https://unofficialmspafans.bandcamp.com/track/three-in-the-morning-ngames-bowmix-explicit
 Commentary:
     <i>Ngame:</i>
@@ -1151,6 +1156,7 @@ References:
 - Crystalanthemums
 - Showdown
 - Death by Glamour
+- RollerCoaster Tycoon Theme
 - Sunsetter
 - Showtime (Piano Refrain)
 - Endless Climb
@@ -1177,7 +1183,7 @@ Track: Pseudumbra Phauxtasm
 Artist: Marcy Nabors, Jamie Paige Stanley
 Contributors: Matt Martin (guitar)
 Track Art: Circlejourney
-References: Penumbra Phantasm, Sunsetter
+References: Penumbra Phantasm, Breath of the Wild Theme, Sunsetter
 URLs: https://unofficialmspafans.bandcamp.com/track/pseudumbra-phauxtasm
 Commentary:
     <i>Marcy Nabors:</i>
@@ -1206,12 +1212,16 @@ Track: Thyme on My Fries
 Artist: SplitSuns
 Track Art: Ephemerald
 References:
+- Axel F
 - Time on My Side
+- E.T.
 - Smackdown
 - Moonsetter
-- MeGaLoVania
+- Waters of Nazareth
 - I'm a Member of the Midnight Crew
+- Vela-Nova
 - Unite Synchronization
+- MeGaLoVania
 URLs: https://unofficialmspafans.bandcamp.com/track/thyme-on-my-fries
 Commentary:
     <i>SplitSuns:</i>
@@ -1227,10 +1237,10 @@ Track Art: Hadron Kalido
 References:
 - Formation
 - Skaia Voyages
-- Celestial Fantasia
 - Cascade (Beta)
 - Sburban Jungle
 - Another Jungle
+- Celestial Fantasia
 - Homestuck Anthem
 URLs: https://unofficialmspafans.bandcamp.com/track/raise-of-the-conductors-baton
 Commentary:
@@ -1264,7 +1274,7 @@ Commentary:
 Track: Solar Momentum
 Artist: Nicholas Nakano
 Track Art: Mags
-References: Sunsetter
+References: Pushing Onwards, Sunsetter
 URLs: https://unofficialmspafans.bandcamp.com/track/solar-momentum
 Commentary:
     <i>Nicholas Nakano:</i>
@@ -1350,7 +1360,7 @@ References:
 - Double Midnight
 - Amen, Brother
 - Penumbra Phantasm
-- A Baby Legend - The Baby is 2 (by Toby Fox)
+- A Baby Legend - The Baby is 2
 - Dirgeish
 URLs: https://unofficialmspafans.bandcamp.com/track/shatter
 Commentary:
@@ -1463,7 +1473,7 @@ Commentary:
 Track: Crystalline Repose
 Artist: Willow Ascenzo
 Track Art: dodostad
-References: Crystalanthemums
+References: Corridors of Time, Crystalanthemums
 URLs: https://unofficialmspafans.bandcamp.com/track/crystalline-repose
 Commentary:
     <i>dodostad:</i>
@@ -1510,7 +1520,7 @@ Commentary:
 Track: Moonsetter (Strider Remix)
 Artist: Cement City
 Track Art: Kate Griffith
-References: Moonsetter
+References: Moonsetter, Mad About the Boy
 URLs: https://unofficialmspafans.bandcamp.com/track/moonsetter-strider-remix
 Commentary:
     <i><b>Grace Medley:</b></i>
@@ -1546,15 +1556,24 @@ Track Art: sweetjegus
 References:
 - Your Best Friend
 - Softly
-- Safe Return (by The Track Team)
+- Fall of Fall ~ Autumnal Waterfall
+- Safe Return
 - The Beginning of Something Really Excellent
 - An Apple Disaster!!
+- Ryuunosuke Akutagawa's "Kappa" ~ Candid Friend
+- Bad Apple!!
+- Native Faith
+- The Primal Scene of Japan the Girl Saw
 - Menu (Full)
+- Sleeping Terror
 - Homestuck Anthem
 - Upward Movement (Dave Owns)
+- Calamari Inkantation
 - Feel (Alive)
 - Hopes and Dreams
 - Theme
+- September Pumpkin
+- Theme of Eastern Story
 - Magical Hopalong Cassidy Station
 URLs: https://unofficialmspafans.bandcamp.com/track/fruitjam
 Commentary:
@@ -1568,27 +1587,27 @@ Commentary:
     she says lofam team but this song is mark's and my fault
     <hr>
     <b>References:</B>
-    - Your Best Friend - 0:00-0:33, 2:45-2:48
+    - [[Your Best Friend]] - 0:00-0:33, 2:45-2:48
     - [[Softly]] - 0:20-0:26
-    - Fall of Fall ~ Autumn Waterfall - 0:26-0:31
-    - Safe Return - 0:39-0:43, 0:53-0:56
+    - [[Fall of Fall ~ Autumnal Waterfall]] - 0:26-0:31
+    - [[Safe Return]] - 0:39-0:43, 0:53-0:56
     - [[The Beginning of Something Really Excellent]] - 0:49-1:03
     - [[An Apple Disaster!!]] - 1:03-1:29
-    - Ryuunosuke Akutagawa's "Kappa" ~ Candid Friend - 1:09-1:14
-    - Bad Apple!! - 1:29-1:42
-    - Native Faith - 1:52-1:55
-    - The Primal Scene of Japan the Girl Saw - 2:12-2:14
-    - Menu (Full) - 2:16-2:35
-    - Sleeping Terror - 2:22-2:35
+    - [[Ryuunosuke Akutagawa's "Kappa" ~ Candid Friend]] - 1:09-1:14
+    - [[Bad Apple!!]] - 1:29-1:42
+    - [[Native Faith]] - 1:52-1:55
+    - [[The Primal Scene of Japan the Girl Saw]] - 2:12-2:14
+    - [[Menu (Full)]] - 2:16-2:35
+    - [[Sleeping Terror]] - 2:22-2:35
     - [[Homestuck Anthem]] - 2:29-2:35
     - [[Upward Movement (Dave Owns)]] - 2:35-2:38
-    - Calamari Inkantation - 2:39-2:48
+    - [[Calamari Inkantation]] - 2:39-2:48
     - [[Feel (Alive)]] - 2:49-2:51
-    - Hopes and Dreams - 2:52-2:55, 2:59-3:02
+    - [[Hopes and Dreams]] - 2:52-2:55, 2:59-3:02
     - [[Theme]] - 2:55-2:58
-    - September Pumpkin - 3:02-3:05
-    - Theme of Eastern Story - 3:05-3:27
-    - Magical Hopalong Cassidy Station - 3:18-3:29
+    - [[September Pumpkin]] - 3:02-3:05
+    - [[Theme of Eastern Story]] - 3:05-3:27
+    - [[Magical Hopalong Cassidy Station]] - 3:18-3:29
 -------------------------------------------------------------------------------
 Track: Lightfall
 Artist: nights
@@ -1633,18 +1652,22 @@ Track: Revisit / Rewind
 Artist: Aris Martinian
 Track Art: nights
 References:
-- Ascend
 - Doctor
 - Cascade (Beta)
 - Sburban Jungle
 - Tick
 - Lord Spanish
+- Fruity Pebbles Jingle
+- Potato Knishes
+- The Ultimate Showdown of Ultimate Destiny
 - Rex Mille Geromius
 - Penumbra Phantasm
 - Even in Death
+- Space Jam
 - Chorale for Jaspers
 - At The Price of Oblivion
 - Contra
+- Ascend
 - MeGaLoVania
 - Moshi Moshi?
 - Unintentional Touhou
@@ -1652,12 +1675,14 @@ References:
 - Upward Movement (Dave Owns)
 - Formation
 - Jungle #3
-- Muse of Nanchos
+- Muse of Nanchoso
+- Meet the Flintstones
 - Intro
+- RollerCoaster Tycoon Theme
 URLs: https://unofficialmspafans.bandcamp.com/track/revisit-rewind
 Commentary:
     <i>Aris Martiniain:</i>
-    God, this was so much work. Oh yeah, and I lost the first half of the project file towards the end so I couldn't go back and edit it. Ugh. But all in all, I'm pretty happy with how it turned out. The original plan was to go through the CANMT discography and pick the most iconic songs over time. If you're unfamiliar with its discography, I highly recommend you at least <a href="https://coolandnewwebcomic.bandcamp.com/">go give it a glance</a>. I roughly settled on useing Cascante, Tick/Tock, Fruity Pebbles Redux, Gunshow, Rex Mille Geromius, Doctor and Penumbra Phantasm (cool and new vol V), Contra (from Cool and New Homestuck), Moshi Moshi, Final Confrontation, Unintentional Touhou, In the Beginning/Contact, Formation, Jungle #3, Muse of Nanchos, Flintstones, Gunshow 2, and of course, teh RCT theme and Bowman's credit score. Shoutouts to difarem for making the "it's between my buttocks" vocalid for me. Revisit/Rewind, which is based heavily on Ascend, was released as the Cool and New Homestuck song for [S] Credits.
+    God, this was so much work. Oh yeah, and I lost the first half of the project file towards the end so I couldn't go back and edit it. Ugh. But all in all, I'm pretty happy with how it turned out. The original plan was to go through the CANMT discography and pick the most iconic songs over time. If you're unfamiliar with its discography, I highly recommend you at least <a href="https://coolandnewwebcomic.bandcamp.com/">go give it a glance</a>. I roughly settled on useing Cascante, Tick/Tock, Fruity Pebbles Redux, Gunshow, Rex Mille Geromius, Doctor and Penumbra Phantasm (cool and new vol V), Contra (from Cool and New Homestuck), Moshi Moshi, Final Confrontation, Unintentional Touhou, In the Beginning/Contact, Formation, Jungle #3, Muse of Nanchos, Flintstones, Gunshow 2, and of course, the RCT theme and Bowman's credit score. Shoutouts to difarem for making the "it's between my buttocks" vocalid for me. Revisit/Rewind, which is based heavily on Ascend, was released as the Cool and New Homestuck song for [S] Credits.
     <i><b>wheals:</b></i>
     This art was made in like five hours on Christmas 2016 when i yelled at nights to make some John/Aradia art for Revisit/Rewind (it being based off Ascend, with its iconic John/Aradia art). That's basically the plot of The Christmas Carol and by writing this seven months later I'm now the Ghost of Christmas Future. I'll let Past Nights (the Ghost of Christmas Past) fill you in on the rest:
     <i>nights:</i>

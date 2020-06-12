@@ -9,6 +9,10 @@ Artist: Toby Fox
 References: Hate You
 URLs: https://www.youtube.com/watch?v=Swdd0pKviG8
 -------------------------------------------------------------------------------
+Track: 69423
+Artist: Michael Guy Bowman
+URLs: https://www.youtube.com/watch?v=-zdjvvqFuME
+-------------------------------------------------------------------------------
 Track: A Very Trickster Mode Christmas
 Artist: Toby Fox
 URLs: https://www.youtube.com/watch?v=MaywzJqgyh4
@@ -23,10 +27,6 @@ Artist: Toby Fox
 References: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
 URLs: https://www.youtube.com/watch?v=DydDjMNlBsQ
 -------------------------------------------------------------------------------
-Track: Amen, Brother
-Artist: The Winstons
-URLs: https://www.youtube.com/watch?v=GxZuq57_bYM
--------------------------------------------------------------------------------
 Track: An Apple Disaster!!
 Artist: Toby Fox
 URLs:
@@ -36,11 +36,6 @@ URLs:
 Track: Anbroids
 Artist: Malcolm Brown
 URLs: https://www.youtube.com/watch?v=elZ-C1JmNBc
--------------------------------------------------------------------------------
-Track: Battle! (Colress)
-Artist: Pokémon
-URLs:
-- https://www.youtube.com/watch?v=NvQBpb6eqp8
 -------------------------------------------------------------------------------
 Track: beekeeper who? i dont know her.
 Artist: James Roach
@@ -55,18 +50,31 @@ Commentary:
     thanks guys.
     anyway zebede's bullet points and even his name are references to me but thats kinda where it ends. st. james son of zebedee is also known as santiago, which is my birthname. the tongva were "maybe" the indigenous people of long beach, where i live, which is "too far to visit" which is a joke about The Greater Los Angeles Area. I live 20 minutes away. cowards.
 -------------------------------------------------------------------------------
+Track: Bowman Remix
+Artist: Michael Guy Bowman
+URLs: https://www.youtube.com/watch?v=VukaD23AIfE
+-------------------------------------------------------------------------------
+Track: Chaotic Frenzy
+Artist: Thomas Ferkol
+URLs: https://youtu.be/gbiS4WkCOVo?t=19078
+-------------------------------------------------------------------------------
 Track: Charun's Cave
 Artist: Toby Fox
 URLs: https://www.youtube.com/watch?v=wc5iruoYLXM
+-------------------------------------------------------------------------------
+Track: Clockwork Apocalypse
+Artist: Thomas Ferkol
+References: Endless Climb
+URLs: https://www.youtube.com/watch?v=e1d8iai1Wlk
+-------------------------------------------------------------------------------
+Track: CORE
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=tDuEWw648jo
 -------------------------------------------------------------------------------
 Track: Crab Waltz
 Artist: Toby Fox
 References: Crustacean
 URLs: https://www.youtube.com/watch?v=jUly2ujqDvY
--------------------------------------------------------------------------------
-Track: Creeping in My Soul
-Artist: Cryoshell
-URLs: https://www.youtube.com/watch?v=qI6qyW3QCLc
 -------------------------------------------------------------------------------
 Track: DaJam
 Artist: Alexander Rosetti
@@ -79,6 +87,10 @@ Artist: Toby Fox
 References: Darling Kanaya
 URLs: https://www.youtube.com/watch?v=G28357JCv4c
 -------------------------------------------------------------------------------
+Track: Death by Glamour
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=2TgO-tN5wAM
+-------------------------------------------------------------------------------
 Track: Double Midnight
 Artist: Toby Fox
 References: Liquid Negrocity, I'm a Member of the Midnight Crew
@@ -88,6 +100,10 @@ Track: Elevatorstuck, with Meows
 Artist: Toby Fox
 References: Elevatorstuck
 URLs: https://www.youtube.com/watch?v=RxZNeHvgNUE
+-------------------------------------------------------------------------------
+Track: Flow
+Artist: Solatrus
+URLs: https://youtu.be/gbiS4WkCOVo?t=9580
 -------------------------------------------------------------------------------
 Track: G4M38L0RG
 Artist: Toby Fox
@@ -114,10 +130,6 @@ URLs:
 - https://www.youtube.com/watch?v=OqT3gaihbPE
 - https://soundcloud.com/dragonxvi/ham-and-steak-unused-homestuck-music
 -------------------------------------------------------------------------------
-Track: Hello Zepp
-Artist: Charlie Clouser
-URLs: https://www.youtube.com/watch?v=vhSHXGM7kgE
--------------------------------------------------------------------------------
 Track: Hero's Growth
 Artist: Solatrus
 URLs: https://www.youtube.com/watch?v=DVau5m6l8FU
@@ -137,27 +149,14 @@ Artist: Toby Fox
 References: Homestuck Anthem
 URLs: https://www.youtube.com/watch?v=XzEJp5QJ8vE
 -------------------------------------------------------------------------------
+Track: Hopes and Dreams
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=tz82xbLvK_k
+-------------------------------------------------------------------------------
 Track: Horsecatska
 Artist: James Roach
 References: Horschestra
 URLs: https://www.youtube.com/watch?v=EjCbsleXpuk
--------------------------------------------------------------------------------
-Track: How Do I Live
-Artist: Diane Warren
-Contributors: Trisha Yearwood (performance in Con Air)
-URLs: https://www.youtube.com/watch?v=Sjx-T7_CGQA
--------------------------------------------------------------------------------
-Track: I'm a Member of the Midnight Crew
-Artist: Eddie Morton
-URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
--------------------------------------------------------------------------------
-Track: Icirrus City
-Artist: Pokémon
-URLs: https://www.youtube.com/watch?v=nDNqwdjCGBQ
--------------------------------------------------------------------------------
-Track: In the Hall of the Mountain King
-Artist: Edvard Grieg
-URLs: https://www.youtube.com/watch?v=kLp_Hh6DKWc
 -------------------------------------------------------------------------------
 Track: Jadesprite
 Artist: Toby Fox
@@ -167,13 +166,25 @@ Track: Kazoostuck
 Artist: Toby Fox
 URLs: https://www.youtube.com/watch?v=mjKX8H3mSJo
 -------------------------------------------------------------------------------
+Track: Magical Hopalong Cassidy Station
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=wa2K_8Ff41M
+-------------------------------------------------------------------------------
 Track: Mannequin
 Artist: Perry Sullivan
 URLs: https://www.youtube.com/watch?v=gAyPFa3nEK4
 -------------------------------------------------------------------------------
+Track: Menu (Full)
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=brP9Q08kEfk
+-------------------------------------------------------------------------------
 Track: Mutiny
 Artist: Bill Bolin
 Has URLs: no
+-------------------------------------------------------------------------------
+Track: Nic Cage Romance
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=fvDpDxXXZog
 -------------------------------------------------------------------------------
 Track: Non Compos Mentis
 Artist: Bill Bolin
@@ -221,15 +232,29 @@ Track: Ruins
 Artist: Erik Scheele
 URLs: https://youtu.be/gbiS4WkCOVo?t=4987
 -------------------------------------------------------------------------------
+Track: Sea of Derse
+Artist: Erik Scheele
+URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F092%20Sea%20of%20Derse.mp3&mode=default
+-------------------------------------------------------------------------------
 Track: Secret ROM
 Artist: Toby Fox
+References: The Little Sprite, Terra's Theme, Wind Scene, Chrono Trigger
 URLs: https://www.youtube.com/watch?v=ercVSU3rjrc
+-------------------------------------------------------------------------------
+Track: Shooting Star
+Artist: Hilary Troiano
+URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F133%20Shooting%20Star.mp3&mode=default
 -------------------------------------------------------------------------------
 Track: Single Female Lawyer
 Artist: Alexander Rosetti
 URLs:
 - https://www.youtube.com/watch?v=4Q2dS1Z2p9g
 - https://soundcloud.com/albatrosssoup/seer-of-same-color-scalemate-combos
+-------------------------------------------------------------------------------
+Track: Skaia Voyages
+Artist: Clark Powell
+References: Sburban Jungle, Showtime (Piano Refrain), Skies of Skaia
+URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Sound%20Test%2F~Disc%203~%20Unreleased%20Homestuck%20Music%20Team%20Music%2F379%20Skaia%20Voyages.mp3&mode=default
 -------------------------------------------------------------------------------
 Track: Skaian Shuffle
 Artist: Clark Powell
@@ -240,17 +265,31 @@ Artist: Bill Bolin
 References: Beatdown (Strider Style)
 Has URLs: no
 -------------------------------------------------------------------------------
+Track: Spider Dance
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=YZ3XjVVNagU
+-------------------------------------------------------------------------------
+Track: Spooktune
+Directory: spooktune-undertale
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=K1qjt_1geiI
+-------------------------------------------------------------------------------
 Track: The Brave and the Bronze
 Artist: Yan Rodriguez
 URLs: https://www.youtube.com/watch?v=pK4-g7TiWQA
 -------------------------------------------------------------------------------
-Track: The Court of Miracles
-Artist: Disney
-URLs: https://www.youtube.com/watch?v=xq7z_xMGPM8
--------------------------------------------------------------------------------
 Track: The Paradox Paradigm
 Artist: Jack McMenamin
 URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path=Homestuck%20Fan%20Music%20and%20VA%2FHomestuck%20Fansong%20Archive%20%282011%29%2FHomestuck%20Fan%20Music%20Part%2010%2FThe%20Paradox%20Paradigm.mp3&mode=default
+-------------------------------------------------------------------------------
+Track: The Undying
+Artist: James Dever
+URLs: https://youtu.be/gbiS4WkCOVo?t=26954
+-------------------------------------------------------------------------------
+Track: The Uranian
+Artist: James Dever
+References: The Undying
+URLs: https://youtu.be/gbiS4WkCOVo?t=27042
 -------------------------------------------------------------------------------
 Track: Trickster Mode (Engage)
 Artist: Toby Fox
@@ -282,10 +321,18 @@ Track: Windchime Foley
 Artist: Clark Powell
 URLs: https://www.youtube.com/watch?v=CSMMmOtRLiU
 -------------------------------------------------------------------------------
+Track: Winterfall
+Artist: Blackhole
+URLs: https://soundcloud.com/blackholesc/winterfall
+-------------------------------------------------------------------------------
 Track: XROM
 Artist: Toby Fox
 References: Secret ROM
 URLs: https://www.youtube.com/watch?v=wY2nX_b9Gm4
+-------------------------------------------------------------------------------
+Track: Your Best Friend
+Artist: Toby Fox
+URLs: https://www.youtube.com/watch?v=83jGCWCcBzc
 -------------------------------------------------------------------------------
 Track: sometimes i call andrew hussie 'andy' and so far he hasn't corrected me
 Artist: James Roach
@@ -430,3 +477,403 @@ References:
 Commentary:
     <i>James Roach:</i>
     its over
+-------------------------------------------------------------------------------
+Track: A Bell is Tolling
+Artist: Secret of Mana
+URLs: https://www.youtube.com/watch?v=4DCriOkhxqA
+-------------------------------------------------------------------------------
+Track: Ah! vous dirai-je, maman
+Artist: Wolfgang Amadeus Mozart
+URLs:
+- https://en.wikipedia.org/wiki/Ah!_vous_dirai-je,_maman
+-------------------------------------------------------------------------------
+Track: Amen, Brother
+Artist: The Winstons
+URLs: https://www.youtube.com/watch?v=GxZuq57_bYM
+-------------------------------------------------------------------------------
+Track: Axel F
+Artist: Crazy Frog
+URLs: https://www.youtube.com/watch?v=k85mRPqvMbE
+-------------------------------------------------------------------------------
+Track: Bad Apple!!
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=3kXx6f7qaa8
+-------------------------------------------------------------------------------
+Track: Battle! (Colress)
+Artist: Pokémon
+URLs:
+- https://www.youtube.com/watch?v=NvQBpb6eqp8
+-------------------------------------------------------------------------------
+Track: Beginning
+Artist: Castlevania
+URLs: https://www.youtube.com/watch?v=ptgaCJSF7j8
+-------------------------------------------------------------------------------
+Track: Bloody Tears
+Artist: Castlevania
+URLs: https://www.youtube.com/watch?v=AxQGB7a-6xQ
+-------------------------------------------------------------------------------
+Track: Breath of the Wild Theme
+Artist: The Legend of Zelda
+URLs: https://www.youtube.com/watch?v=cPWBG6_jn4Y
+-------------------------------------------------------------------------------
+Track: Burn
+Artist: Hamilton: An American Musical
+URLs: https://www.youtube.com/watch?v=pRZzCg8hRA4
+-------------------------------------------------------------------------------
+Track: Calamari Inkantation
+Artist: Splatoon
+URLs: https://www.youtube.com/watch?v=k4k1NdUEUP4
+-------------------------------------------------------------------------------
+Track: Carol of the Bells
+Artist: Mykola Leontovych
+URLs: https://www.youtube.com/watch?v=ejU1lK-3C4U
+-------------------------------------------------------------------------------
+Track: Chrono Trigger
+Artist: Chrono Trigger
+URLs: https://www.youtube.com/watch?v=g-s-VQBoUdc
+-------------------------------------------------------------------------------
+Track: Corridors of Time
+Artist: Chrono Trigger
+URLs: https://www.youtube.com/watch?v=bNzYIEY-CcM
+-------------------------------------------------------------------------------
+Track: Courage
+Artist: JoJo's Bizarre Adventure
+URLs: https://www.youtube.com/watch?v=Rpc8K-zQoYM
+-------------------------------------------------------------------------------
+Track: Creeping in My Soul
+Artist: Cryoshell
+URLs: https://www.youtube.com/watch?v=qI6qyW3QCLc
+-------------------------------------------------------------------------------
+Track: Danger! High Voltage
+Artist: Electric Six
+URLs: https://www.youtube.com/watch?v=d2KgoVyloPo
+-------------------------------------------------------------------------------
+Track: Deck the Halls
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/Deck_the_Halls
+-------------------------------------------------------------------------------
+Track: Drop It Like It's Hot
+Artist: Snoop Dogg
+URLs: https://www.youtube.com/watch?v=GtUVQei3nX4
+-------------------------------------------------------------------------------
+Track: Doctor Who Theme
+Artist: Doctor Who
+URLs: https://www.youtube.com/watch?v=75V4ClJZME4
+-------------------------------------------------------------------------------
+Track: E.T.
+Artist: Katy Perry
+URLs: https://www.youtube.com/watch?v=2lrxaY-hcvA
+-------------------------------------------------------------------------------
+Track: Eternal Recurrence
+Artist: Secret of Mana
+URLs: https://www.youtube.com/watch?v=w4Kv3ZlvQLw
+-------------------------------------------------------------------------------
+Track: Fall of Fall ~ Autumnal Waterfall
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=-F3_Cj-fMWw
+-------------------------------------------------------------------------------
+Track: Fear of the Heavens
+Artist: Secret of Mana
+URLs: https://www.youtube.com/watch?v=NFN0GLAMJ3k
+-------------------------------------------------------------------------------
+Track: First Call
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/First_call
+-------------------------------------------------------------------------------
+Track: Frog's Theme
+Artist: Chrono Trigger
+URLs: https://www.youtube.com/watch?v=9YsAyO9oW00
+-------------------------------------------------------------------------------
+Track: Fruity Pebbles Jingle
+Artist: Scott Stutzman
+URLs: https://www.youtube.com/watch?v=apVOS4CJIls
+-------------------------------------------------------------------------------
+Track: Fuck tha Police
+Artist: N.W.A.
+URLs: https://www.youtube.com/watch?v=ADdpLv3RDhA
+-------------------------------------------------------------------------------
+Track: Greensleeves
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/Greensleeves
+-------------------------------------------------------------------------------
+Track: Ghostbusters
+Artist: Ghostbusters
+URLs: https://www.youtube.com/watch?v=m9We2XsVZfc
+-------------------------------------------------------------------------------
+Track: God Rest You Merry, Gentlemen
+Artist: Lost in History
+URLs:
+- https://en.wikipedia.org/wiki/God_Rest_You_Merry,_Gentlemen
+-------------------------------------------------------------------------------
+Track: Guile's Theme
+Artist: Street Fighter
+URLs: https://www.youtube.com/watch?v=Iof5pRAIZmw
+-------------------------------------------------------------------------------
+Track: Hello Zepp
+Artist: Saw
+URLs: https://www.youtube.com/watch?v=vhSHXGM7kgE
+-------------------------------------------------------------------------------
+Track: How Do I Live
+Artist: Diane Warren
+Contributors: Trisha Yearwood (performance in Con Air)
+URLs: https://www.youtube.com/watch?v=Sjx-T7_CGQA
+-------------------------------------------------------------------------------
+Track: Hydrocity Zone (Act 2)
+Artist: Sonic the Hedgehog
+URLs: https://www.youtube.com/watch?v=PNYL4w-qxcE
+-------------------------------------------------------------------------------
+Track: Hydrogen
+Artist: M.O.O.N.
+URLs: https://www.youtube.com/watch?v=SNE2oCZH_4k
+-------------------------------------------------------------------------------
+Track: I Don't Want to Miss a Thing
+Directory: i-dont-want-to-miss-a-thing-aerosmith
+Artist: Diane Warren
+Contributors: Aerosmith (performance in Armageddon)
+URLs: https://www.youtube.com/watch?v=JkK8g6FMEXE
+-------------------------------------------------------------------------------
+Track: I'm a Member of the Midnight Crew
+Artist: Eddie Morton
+URLs: https://www.youtube.com/watch?v=ARLPT5rKjWo
+-------------------------------------------------------------------------------
+Track: Icirrus City
+Artist: Pokémon
+URLs: https://www.youtube.com/watch?v=nDNqwdjCGBQ
+-------------------------------------------------------------------------------
+Track: In the Hall of the Mountain King
+Artist: Edvard Grieg
+URLs: https://www.youtube.com/watch?v=kLp_Hh6DKWc
+-------------------------------------------------------------------------------
+Track: It Don't Mean a Thing (If It Ain't Got That Swing)
+Artist: Duke Ellington, Irving Mills
+URLs: https://www.youtube.com/watch?v=qDQpZT3GhDg
+-------------------------------------------------------------------------------
+Track: JoJo ~Sono Chi no Sadame~
+Artist: JoJo's Bizarre Adventure
+URLs: https://www.youtube.com/watch?v=sugUX1PtUc4
+-------------------------------------------------------------------------------
+Track: La Cucaracha
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/La_Cucaracha
+-------------------------------------------------------------------------------
+Track: Layton's Theme
+Artist: Professor Layton and the Curious Village
+URLs: https://www.youtube.com/watch?v=dFBKHSitIjo
+-------------------------------------------------------------------------------
+Track: Life in Technicolor
+Artist: Coldplay
+URLs: https://www.youtube.com/watch?v=sPD59NTahc0
+-------------------------------------------------------------------------------
+Track: Mad About the Boy
+Artist: Dinah Washington
+URLs: https://www.youtube.com/watch?v=RtIwWjmcvvo
+-------------------------------------------------------------------------------
+Track: Magnificat
+Artist: Arvo Pärt
+URLs: https://www.youtube.com/watch?v=7WrP_9Jpfkc
+-------------------------------------------------------------------------------
+Track: Mailtime
+Artist: Blue's Clues
+URLs: https://www.youtube.com/watch?v=-KRtN6-DgrY
+-------------------------------------------------------------------------------
+Track: Master of Puppets
+Artist: Metallica
+URLs: https://www.youtube.com/watch?v=S7blkui3nQc
+-------------------------------------------------------------------------------
+Track: Meet the Flintstones
+Artist: The Flintstones
+URLs: https://www.youtube.com/watch?v=2s13X66BFd8
+-------------------------------------------------------------------------------
+Track: Moon Over the Castle
+Artist: Gran Turismo
+URLs: https://www.youtube.com/watch?v=7DYL2blxWSA
+-------------------------------------------------------------------------------
+Track: Moonsong
+Artist: Cave Story
+URLs: https://www.youtube.com/watch?v=q09KoR7g018
+-------------------------------------------------------------------------------
+Track: My Little Pony Theme
+Artist: My Little Pony
+URLs: https://www.youtube.com/watch?v=QP_rIAkb_v8
+-------------------------------------------------------------------------------
+Track: Native Faith
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=P7dLp2Eb7cg
+-------------------------------------------------------------------------------
+Track: Neos City (Night)
+Artist: Pokémon
+URLs: https://www.youtube.com/watch?v=nXipo_gVMCs
+-------------------------------------------------------------------------------
+Track: Nyanyanyanyanyanyanya!
+Artist: daniwellP
+URLs: https://www.youtube.com/watch?v=Til6kcoY0Yk
+-------------------------------------------------------------------------------
+Track: Objection! 2001
+Artist: Ace Attorney
+URLs: https://www.youtube.com/watch?v=_I34nshlOPk
+-------------------------------------------------------------------------------
+Track: Paint It, Black
+Artist: The Rolling Stones
+URLs: https://www.youtube.com/watch?v=O4irXQhgMqg
+-------------------------------------------------------------------------------
+Track: Polovtsian Dances
+Artist: Alexander Borodin
+URLs: https://www.youtube.com/watch?v=QWU1uj9WmOM
+-------------------------------------------------------------------------------
+Track: Potato Knishes
+Artist: Ratboy Genius
+URLs: https://www.youtube.com/watch?v=IFfLCuHSZ-U
+-------------------------------------------------------------------------------
+Track: Pushing Onwards
+Artist: VVVVVV
+URLs: https://www.youtube.com/watch?v=25m3Gk7mRQM
+-------------------------------------------------------------------------------
+Track: Recruitment Theme
+Artist: Fire Emblem
+URLs: https://www.youtube.com/watch?v=9xlMErV9Fts
+-------------------------------------------------------------------------------
+Track: Reverse Situation
+Artist: Naruto
+URLs: https://www.youtube.com/watch?v=Sv93yQE8bRo
+-------------------------------------------------------------------------------
+Track: Revolution 909
+Artist: Daft Punk
+URLs: https://www.youtube.com/watch?v=Wtd6DvLoCsU
+-------------------------------------------------------------------------------
+Track: RollerCoaster Tycoon Theme
+Artist: RollerCoaster Tycoon
+URLs: https://www.youtube.com/watch?v=KT45kiI5FYw
+-------------------------------------------------------------------------------
+Track: Ryuunosuke Akutagawa's "Kappa" ~ Candid Friend
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=cp-yuFXYNg4
+-------------------------------------------------------------------------------
+Track: Safe Return
+Artist: Avatar: The Last Airbender
+URLs: https://www.youtube.com/watch?v=lOgFt70GB4c
+-------------------------------------------------------------------------------
+Track: Science Blaster
+Artist: SpellingPhailer
+URLs: https://www.youtube.com/watch?v=quxzJ5xyuC4
+-------------------------------------------------------------------------------
+Track: September Pumpkin
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=M3A-ieD418M
+-------------------------------------------------------------------------------
+Track: Sleeping Terror
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=llO4PINy2e8
+-------------------------------------------------------------------------------
+Track: Space Jam
+Artist: Space Jam
+URLs: https://www.youtube.com/watch?v=J9FImc2LOr8
+-------------------------------------------------------------------------------
+Track: Stone Tower Temple
+Artist: The Legend of Zelda
+URLs: https://www.youtube.com/watch?v=wz_NK5HgR6Q
+-------------------------------------------------------------------------------
+Track: Supercalifragilisticexpialidocious
+Artist: Mary Poppins
+URLs: https://www.youtube.com/watch?v=uZNRzc3hWvE
+-------------------------------------------------------------------------------
+Track: Swan Song
+Directory: swan-song-set-it-off
+Artist: Set It Off
+URLs: https://www.youtube.com/watch?v=bzSoICQLf-Q
+-------------------------------------------------------------------------------
+Track: Terra's Theme
+Artist: Final Fantasy
+URLs: https://www.youtube.com/watch?v=a6t_uyg_pF8
+-------------------------------------------------------------------------------
+Track: The Cave You Fear
+Artist: Michael Markowski
+URLs: https://www.youtube.com/watch?v=o4pOswwQAxQ
+-------------------------------------------------------------------------------
+Track: The Court of Miracles
+Artist: Disney
+URLs: https://www.youtube.com/watch?v=xq7z_xMGPM8
+------------------------------------------------------------------------------
+Track: The Decisive Battle
+Artist: Final Fantasy
+URLs: https://www.youtube.com/watch?v=lxKb48wvt60
+-------------------------------------------------------------------------------
+Track: The Little Sprite
+Artist: Secret of Mana
+URLs: https://www.youtube.com/watch?v=WCVqfgc2730
+-------------------------------------------------------------------------------
+Track: The Number of the Beast
+Artist: Iron Maiden
+URLs: https://www.youtube.com/watch?v=7-iRf9AWoyE
+-------------------------------------------------------------------------------
+Track: The Primal Scene of Japan the Girl Saw
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=okDBNnAjItU
+-------------------------------------------------------------------------------
+Track: The Raising Fighting Spirit
+Artist: Naruto
+URLs: https://www.youtube.com/watch?v=mjjkHg5FOhk
+-------------------------------------------------------------------------------
+Track: The Riddle Wants To Be
+Artist: Madder Mortem
+URLs: https://www.youtube.com/watch?v=y-1XiWfdDeY
+-------------------------------------------------------------------------------
+Track: The Ultiamte Showdown of Ultimate Destiny
+Artist: Lemon Demon
+URLs: https://www.youtube.com/watch?v=z4UYpDB7J-s
+-------------------------------------------------------------------------------
+Track: Theme of Eastern Story
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=qGwASZn0ZKA
+-------------------------------------------------------------------------------
+Track: To Make the End of Battle
+Artist: Ys
+URLs: https://www.youtube.com/watch?v=Y9Mam93QIQo
+-------------------------------------------------------------------------------
+Track: Toccata and Fugue in D minor
+Artist: Johann Sebastian Bach
+URLs: https://www.youtube.com/watch?v=ho9rZjlsyYY
+-------------------------------------------------------------------------------
+Track: Tomboyish Girl in Love
+Artist: Touhou Project
+URLs: https://www.youtube.com/watch?v=JIZ12EQ2SFg
+-------------------------------------------------------------------------------
+Track: Tomorrow There'll Be More Of Us
+Directory: tomorrow-therell-be-more-of-us-hamilton
+Artist: Hamilton: An American Musical
+URLs: https://www.youtube.com/watch?v=Lsbx9MBFAYM
+-------------------------------------------------------------------------------
+Track: Toreador Song
+Artist: Georges Bizet
+URLs: https://www.youtube.com/watch?v=2fDkxQBjgFU
+-------------------------------------------------------------------------------
+Track: Uptown Funk
+Artist: Mark Ronson, Bruno Mars
+URLs: https://www.youtube.com/watch?v=7Ya2U8XN_Zw
+-------------------------------------------------------------------------------
+Track: Ultimate Koopa
+Artist: Super Mario
+URLs: https://www.youtube.com/watch?v=J6YwX03nFQM
+-------------------------------------------------------------------------------
+Track: Vela-Nova
+Artist: Sonic the Hedgehog
+URLs: https://www.youtube.com/watch?v=-7WQn-SXYZ4
+-------------------------------------------------------------------------------
+Track: Viva la Vida
+Artist: Coldplay
+URLs: https://www.youtube.com/watch?v=zOQ4ld6NsXE
+-------------------------------------------------------------------------------
+Track: Westminister Quarters
+Artist: Lost in History
+URLs: https://en.wikipedia.org/wiki/Westminster_Quarters
+-------------------------------------------------------------------------------
+Track: Waters of Nazareth
+Artist: Justice
+URLs: https://www.youtube.com/watch?v=1SEgoi7kjw8
+-------------------------------------------------------------------------------
+Track: Wind Scene
+Artist: Chrono Trigger
+URLs: https://www.youtube.com/watch?v=hELte7HgL2Y
+-------------------------------------------------------------------------------
+Track: Yahoos and Triangles
+Artist: King of the Hill
+URLs: https://www.youtube.com/watch?v=BbnzBO6odgw

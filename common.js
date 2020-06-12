@@ -31,6 +31,7 @@ const C = {
     LISTING_DIRECTORY: 'list',
     ABOUT_DIRECTORY: 'about',
     FEEDBACK_DIRECTORY: 'feedback',
+    CHANGELOG_DIRECTORY: 'changelog',
     FLASH_DIRECTORY: 'flash',
     JS_DISABLED_DIRECTORY: 'js-disabled',
 
