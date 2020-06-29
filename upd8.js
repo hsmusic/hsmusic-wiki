@@ -1407,6 +1407,13 @@ function writeListingPages() {
                     (${s(getTracksThatReference(track).length, 'time')} referenced)
                 </li>
             `)],
+        [['tracks', 'in-flashes', 'by-album'], `Tracks - in Flashes &amp; Games (by Album)`, albumChunkedList(
+            C.sortByDate(allTracks.slice()).filter(track => getFlashesThatFeature(track).length > 0),
+            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>`)],
+        [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by First Feature)`,
+            Array.from(new Set(flashData.filter(flash => !flash.act8r8k).flatMap(flash => getTracksFeaturedByFlash(flash))))
+            .filter(Boolean)
+            .map(track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.album.theme)}">${track.name}</a></li>`)],
         [['tracks', 'with-lyrics'], `Tracks - with Lyrics`, albumChunkedList(
             C.sortByDate(allTracks.slice())
             .filter(track => track.lyrics),
@@ -1698,10 +1705,10 @@ function getAlbumListTag(album) {
 }
 
 function fancifyURL(url, {album = false} = {}) {
-    return fixWS`<a href="${url}">${
+    return fixWS`<a href="${url}" class="nowrap">${
         url.includes('bandcamp.com') ? 'Bandcamp' :
         url.includes('youtu') ? (album ? (
-            url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full&nbsp;Album)'
+            url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full Album)'
         ) : 'YouTube') :
         url.includes('soundcloud') ? 'SoundCloud' :
         url.includes('tumblr.com') ? 'Tumblr' :

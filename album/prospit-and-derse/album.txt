@@ -3,6 +3,7 @@ Artist: Solatrus
 Cover Art: Lexxy, skepticArcher
 Date: August 22, 2011
 FG: #cc44cc
+URLs: https://www.youtube.com/playlist?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <b>Propsit & Derse 1 Year Anniversary Commentary</b>
@@ -18,7 +19,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Hallowed Halls
 Track Art: Bea
-URLs: https://youtu.be/12H6ZBc47bU
+URLs: https://youtu.be/ImNmotu8-pU?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -40,7 +41,7 @@ Commentary:
 Track: The Golden Towers
 References: The Obsidian Towers
 Track Art: Pride
-URLs: https://youtu.be/ljdrlnSi4Gw
+URLs: https://youtu.be/wVFRxJpa2og?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     Oh boy. ...What to say on this one...
@@ -55,7 +56,7 @@ Commentary:
 Track: Prospit Dreamers
 Track Art: Zilleniose
 References: Penumbra Phantasm, Frost:frost-vol6, Doctor
-URLs: https://youtu.be/kXAzXOk-pGo
+URLs: https://youtu.be/S70lGd8zpRM?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -81,7 +82,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Center of Brilliance
 Track Art: Shelby Cragg
-URLs: https://youtu.be/N6H9k2p3c_o
+URLs: https://youtu.be/514f8SzU62M?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     Expecting a different song, were you? B)
@@ -94,7 +95,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Darkened Streets
 Track Art: A. Smith
-URLs: https://youtu.be/mVpqo-OdbSk
+URLs: https://youtu.be/kb_v4KCml-s?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     This was definitely the song that started everything off. It’s dark, dreary, but still majestic like the very moon it describes. The music takes on you a flight. You’re one of the Derse Dreamers, the wind rushing across your face as you approach the moon’s surface. Carapaces scurrying about, too afraid to be caught after curfew, wary of Jack Noir and his gang.
@@ -108,7 +109,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: The Obsidian Towers
 Track Art: Kat
-URLs: https://youtu.be/NXgHHh4NlR8
+URLs: https://youtu.be/IdaYlKyxfx4?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     I started to shift styles for this one a bit. I wanted something that was more majestic sounding, but still as dark as Darkened Streets. Ultimately, I decided to feature the choir section more in the intro. It actually was probably the first synth I put in this song. Everything basically followed.
@@ -121,7 +122,7 @@ Commentary:
 Track: Derse Dreamers
 Track Art: Mixt
 References: Atomyk Ebonpyre, Endless Climb
-URLs: https://youtu.be/NOkeFOkE7No
+URLs: https://youtu.be/HpmCCuSHmng?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -144,7 +145,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Core of Darkness
 Track Art: Shad
-URLs: https://youtu.be/ZXC1O6DC55c
+URLs: https://youtu.be/VEJ3hfCnW_w?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
