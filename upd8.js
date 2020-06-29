@@ -701,7 +701,7 @@ async function writePage(directoryParts, titleOrHead, body) {
     // a C.ROOT_DIRECTORY should work. Um... okay, fine, I'll do that.)
     await writeFile(path.join(directory, 'index.html'), rebaseURLs(directory, fixWS`
         <!DOCTYPE html>
-        <html>
+        <html data-rebase="${path.relative(directory, C.SITE_DIRECTORY)}">
             <head>
                 ${[
                     `<meta charset="utf-8">`,

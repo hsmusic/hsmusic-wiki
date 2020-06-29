@@ -10,6 +10,15 @@ const fandomAlbumData = albumData.filter(album => album.isFanon);
 const artistNames = artistData.filter(artist => !artist.alias).map(artist => artist.name);
 const allTracks = C.getAllTracks(albumData);
 
+function rebase(href) {
+    const relative = document.documentElement.dataset.rebase;
+    if (relative) {
+        return relative + "/" + href;
+    } else {
+        return href;
+    }
+}
+
 function pick(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
@@ -20,15 +29,15 @@ function getAlbum(el) {
 }
 
 function openAlbum(album) {
-    location.href = `${C.ALBUM_DIRECTORY}/${album.directory}/index.html`;
+    location.href = rebase(`${C.ALBUM_DIRECTORY}/${album.directory}/index.html`);
 }
 
 function openTrack(track) {
-    location.href = `${C.TRACK_DIRECTORY}/${track.directory}/index.html`;
+    location.href = rebase(`${C.TRACK_DIRECTORY}/${track.directory}/index.html`);
 }
 
 function openArtist(artist) {
-    location.href = `${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html`;
+    location.href = rebase(`${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html`);
 }
 
 for (const a of document.body.querySelectorAll('[data-random]')) {
