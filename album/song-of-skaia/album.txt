@@ -9,13 +9,22 @@ URLs:
 - https://www.youtube.com/playlist?list=PLnVpmehyaOFbcZ8PWCeZmXZZw0W9HQ_9T
 -------------------------------------------------------------------------------
 Track: Null
+Duration: 2:32
 Directory: null-mark-hadley
-URLs: https://parsecproductions.bandcamp.com/track/null
+URLs:
+- https://parsecproductions.bandcamp.com/track/null
+- https://youtu.be/86Gfj88184k?list=PLnVpmehyaOFbcZ8PWCeZmXZZw0W9HQ_9T
 -------------------------------------------------------------------------------
 Track: Skaian Birth
+Duration: 2:28
 References: Skies of Skaia
-URLs: https://parsecproductions.bandcamp.com/track/skaian-birth
+URLs:
+- https://parsecproductions.bandcamp.com/track/skaian-birth
+- https://youtu.be/pEtclU-Tdck?list=PLnVpmehyaOFbcZ8PWCeZmXZZw0W9HQ_9T
 -------------------------------------------------------------------------------
 Track: Song of Skaia
+Duration: 6:27
 References: Skies of Skaia
-URLs: https://parsecproductions.bandcamp.com/track/song-of-skaia
+URLs:
+- https://parsecproductions.bandcamp.com/track/song-of-skaia
+- https://youtu.be/731LkYOajeA?list=PLnVpmehyaOFbcZ8PWCeZmXZZw0W9HQ_9T

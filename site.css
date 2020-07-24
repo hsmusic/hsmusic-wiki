@@ -319,6 +319,15 @@ dl dd {
     margin-bottom: 1em;
 }
 
+dl ul, dl ol {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.album-group-list dt {
+    font-style: oblique;
+}
+
 .new {
     animation: new 1s infinite;
 }

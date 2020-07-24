@@ -9,27 +9,32 @@ URLs:
 - https://www.youtube.com/playlist?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Broom Temperature
+Duration: 1:58
 URLs:
 - https://homestuck.bandcamp.com/track/broom-temperature
-- https://youtu.be/cuqKzBxAnE8
+- https://youtu.be/HmPs0DNemyg?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Frondly Warning
+Duration: 2:19
 URLs:
 - https://homestuck.bandcamp.com/track/frondly-warning
-- https://youtu.be/OfkccsHR4fs
+- https://youtu.be/5Bp4v_w5Y0o?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Ghost Mound
+Duration: 2:02
 URLs:
 - https://homestuck.bandcamp.com/track/ghost-mound
-- https://youtu.be/QqJhLGGHqCk
+- https://youtu.be/QqJhLGGHqCk?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Every Single Grievance
+Duration: 1:11
 URLs:
 - https://homestuck.bandcamp.com/track/every-single-grievance
-- https://youtu.be/D8N_53-cjGU
+- https://youtu.be/D8N_53-cjGU?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj
 -------------------------------------------------------------------------------
 Track: Get The Horns
+Duration: 2:15
 References: Filthy Nuclear Bunker
 URLs:
 - https://homestuck.bandcamp.com/track/get-the-horns
-- https://youtu.be/ZZbFo1W1TjQ
+- https://youtu.be/ZZbFo1W1TjQ?list=PLo6jbRGXGrtjQOs-3_TbJ6SvFBUEhztgj

@@ -32,10 +32,11 @@ Commentary:
     Looking back on it now, I love how obvious my early inspirations are but I do love the work I was able to create during one of the most tumultuous times in my life. Thanks for listening.
 -------------------------------------------------------------------------------
 Track: The Prelude
+Duration: 1:43
 References: Homestuck Anthem
 URLs:
 - https://jamesdever.bandcamp.com/track/prelude
-- https://youtu.be/7k8zCRNxa7k
+- https://youtu.be/7k8zCRNxa7k?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -46,9 +47,10 @@ Commentary:
     The album in its entirety is performed by Erik Scheele.
 -------------------------------------------------------------------------------
 Track: Genesis
+Duration: 2:26
 URLs:
 - https://jamesdever.bandcamp.com/track/genesis
-- https://youtu.be/qOkMYB-r6b8
+- https://youtu.be/qOkMYB-r6b8?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -57,9 +59,10 @@ Commentary:
     The previous track sets up the resolution that the opening measures provide here. This movement introduces the two against three polyrhythm idea that continues throughout the album as well as a few choice hemiolas. Coming from a percussion background, I find a lot of melodic potential in rhythmic content and this whole suite was a place for me to test that out.
 -------------------------------------------------------------------------------
 Track: Eden
+Duration: 2:06
 URLs:
 - https://jamesdever.bandcamp.com/track/eden
-- https://youtu.be/hcXixYBLk_8
+- https://youtu.be/hcXixYBLk_8?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -69,10 +72,11 @@ Commentary:
     Still in love with those flourishes after all these years.
 -------------------------------------------------------------------------------
 Track: Exodus
+Duration: 2:08
 References: Sburban Jungle
 URLs:
 - https://jamesdever.bandcamp.com/track/exodus
-- https://youtu.be/UnbRhrKFofY
+- https://youtu.be/UnbRhrKFofY?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -82,9 +86,10 @@ Commentary:
     When I was writing this movement I really wanted to explore how much I could utilize the different registers of the piano while keeping a constant ostinato running through the middle register.
 -------------------------------------------------------------------------------
 Track: Requiem
+Duration: 2:56
 URLs:
 - https://jamesdever.bandcamp.com/track/requiem
-- https://youtu.be/cVKRJOqKMDY
+- https://youtu.be/cVKRJOqKMDY?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -94,9 +99,10 @@ Commentary:
     I tried to hide the resolution at the end by having a quiet final note low in the bass after the bell like ringing of the final major arrival to add finality while also trying to let the unresolved final chord linger. Erik's performance really nailed it.
 -------------------------------------------------------------------------------
 Track: The Meek
+Duration: 2:16
 URLs:
 - https://jamesdever.bandcamp.com/track/the-meek
-- https://youtu.be/hKEylNAp1-Q
+- https://youtu.be/hKEylNAp1-Q?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -108,10 +114,11 @@ Commentary:
     I also really love not resolving these movements, if you haven't noticed.
 -------------------------------------------------------------------------------
 Track: Chronicles
+Duration: 1:42
 References: Candles and Clockwork
 URLs:
 - https://jamesdever.bandcamp.com/track/chronicles
-- https://youtu.be/TOtz3MTSeKg
+- https://youtu.be/TOtz3MTSeKg?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -121,9 +128,10 @@ Commentary:
     The second part of the song introduces the final major motive of the suite, a sextuplet accompaniment outlining the tonic and dominant. A staple of the western art canon, it was a good foundation for me to work on some melodies that weren't purely rhythmic noodling.
 -------------------------------------------------------------------------------
 Track: Rapture
+Duration: 1:52
 URLs:
 - https://jamesdever.bandcamp.com/track/rapture
-- https://youtu.be/zqbExJ93rXo
+- https://youtu.be/zqbExJ93rXo?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -132,10 +140,11 @@ Commentary:
     Rapture was the boss tune of the suite. The big bad of the album, it brings back the bass and sustain pedal heavy ostinato while trying to juxtapose a simple and quiet melody that bookends it.
 -------------------------------------------------------------------------------
 Track: Creation
+Duration: 4:02
 References: Homestuck Anthem
 URLs:
 - https://jamesdever.bandcamp.com/track/creation
-- https://youtu.be/XorynbzZQpI
+- https://youtu.be/XorynbzZQpI?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)
@@ -147,10 +156,11 @@ Commentary:
     I wrote this the weeks following the passing of my grandmother. It will always be for her and for everything she did for me.
 -------------------------------------------------------------------------------
 Track: Revelations I
+Duration: 1:07
 References: Homestuck Anthem
 URLs:
 - https://jamesdever.bandcamp.com/track/revelations-i
-- https://youtu.be/YoIYaFyll5Q
+- https://youtu.be/YoIYaFyll5Q?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     <i>(original commentary)</i>
@@ -161,17 +171,19 @@ Commentary:
     <i>(commentary from movements II and III is from original booklet)</i>
 -------------------------------------------------------------------------------
 Track: Revelations II
+Duration: 2:41
 URLs:
 - https://jamesdever.bandcamp.com/track/revelations-ii
-- https://youtu.be/pXcUUevV4nA
+- https://youtu.be/pXcUUevV4nA?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     Movement II is the process of solving it almost. It's the path to enlightenment; overcoming obstacles and finding yourself along the way is part of the challenge.
 -------------------------------------------------------------------------------
 Track: Revelations III
+Duration: 3:04
 URLs:
 - https://jamesdever.bandcamp.com/track/revelations-iii
-- https://youtu.be/d-Gewy6q_zw
+- https://youtu.be/d-Gewy6q_zw?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
     Resolution comes in the third movement, which is the enlightenment. One simple arpeggio starts and powers the entire piece, which also brings it to an end. The discovery of the answer brings enlightenment but also ends the journey and the entire process of Sburb/Skaia. Thank you for listening.

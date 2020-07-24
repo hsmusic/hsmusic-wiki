@@ -6,7 +6,7 @@ FG: #4876ff
 Canon: Fanon
 URLs:
 - https://homestuckgaiden.bandcamp.com/album/land-of-fans-and-music-unofficial-album
-- https://www.youtube.com/playlist?list=PLobrSigyi16AZehECGnfHOlArBUu-96Ea
+- https://www.youtube.com/playlist?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Elaine Wang:</i>
     So. I'm Elaine Wang, orngjce223, electronic orange juice; and I do stuff. A lot of stuff really, like dragging a friend along on a dizzy jaunt through philosophy and moral free will in the context of Skaianet Laboratories, while writing an outline as to how to create a Rose Strider AU, while attempting to forecast whether GIF or PNG images will be readable in fifty years, while tossing around a rhythm in my head which might or might not turn into a song, while figuring out what environment variables to set in a bash shell to make it look as much like Homsetuck as possible, while doing pixel art to fill in the gaps, while cooking pasta.
@@ -36,7 +36,7 @@ Commentary:
     <i>Special Thanks:</i>
     To Elaine Wang (electronic orange juce/orngjce223), for initiating the project, and for writing the foreword to this booklet.
     To Jeremy "Solatrus" Iamurri, for his magnificent work in mastering the album.
-    To Yishan Mai (konec0) and melodiousDiscord, for pushing the project forward, and crafting the commentary booklet.
+    To Catboss (konec0) and melodiousDiscord, for pushing the project forward, and crafting the commentary booklet.
     To Robert J! Lake, for giving us a spot on Homestuck Gaiden.
     To the music team, for gifting us with a veritable smorgasboard of sound.
     To Andrew Hussie, for authoring the nexus of sheer creative energy we call Homsetuck.
@@ -46,16 +46,19 @@ Commentary:
     <i>We hope you enjoyed the first-ever Homestuck Fanmusic Album!</i>
 -------------------------------------------------------------------------------
 Track: Beginnings (Press Start to Play)
-Artist: Yishan Mai
+Artist: Catboss
 Track Art: Red Pen
+Duration: 6:18
 References:
 - Skies of Skaia
 - Homestuck Title Screen
 - Homestuck
 - Theme
-URLs: https://homestuckgaiden.bandcamp.com/track/beginnings-press-start-to-play
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/beginnings-press-start-to-play
+- https://youtu.be/WLa8iqsW_x8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
-    <i>Yishan Mai:</i>
+    <i>Catboss:</i>
     So I might as well start off with a brief self-introduction. Hello everynyan! I'm konec0. Sometimes I do fanmusic. Sometimes that fanmusic ends up being non-Nepetaquest related (rare!) and finds its way on to the Fanmusic thread.
     This is not one of those songs.
     Near the start of this fanmusic album project orngjce223 asked for someone to remix MK_97's "Homestuck Title Theme", while incorporating more motifs from Homestuck's music. I decided sure why not? And then this song was born. So Beginnings is a remix of a remix, really. The original was a remix of "Skies of Skaia" - I added the motifs from "Homestuck" and "Alternia" because I felt they were representative of the kids' and the trolls' journeys respectively. I mean come on, the title is RIGHT THERE. So yeah.
@@ -65,10 +68,13 @@ Commentary:
 Track: Downtime
 Artist: Thomas Ibarra
 Track Art: JNJ
+Duration: 2:15
 References:
 - Showtime (Piano Refrain)
 - Showdown
-URLs: https://homestuckgaiden.bandcamp.com/track/downtime
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/downtime
+- https://youtu.be/IKnJNJHty2U?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>SparksD2145:</i>
     My younger sister is responsible for my admiration of MSPA: she desrves the first line of this commentary, because she is awesome. Problem Sleuth has always held a place in my heart; wit hthe rise of Homestuck, MSPA continues to be a beacon of awesome. I have never before been faced with such a preposterous amount of talent in any fandom, and the MSPA Community continues to grow and evolve in such a way that smashes through any "threshold" of artistic creativity. I am inspired, and wish to inspire.
@@ -79,9 +85,12 @@ Commentary:
 Track: Doctor (Deep Breeze Mix)
 Artist: Solatrus
 Track Art: august
+Duration: 4:36
 References:
 - Doctor
-URLs: https://homestuckgaiden.bandcamp.com/track/doctor-deep-breeze-mix
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/doctor-deep-breeze-mix
+- https://youtu.be/L25OBcThKc8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Solatrus:</i>
     I started reading Homestuck in mid January of 2010, but never aelly found myself absolutely hooked. So, I really took my time getting through it, especially Acts 1 and 2.
@@ -92,9 +101,12 @@ Commentary:
 Track: Meltwater
 Artist: Elaine Wang
 Track Art: Dalmationer
+Duration: 5:04
 References:
 - Frost
-URLs: https://homestuckgaiden.bandcamp.com/track/meltwater
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/meltwater
+- https://youtu.be/zJ7zBZ9ARGI?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Elaine Wang:</i>
     Okay, so. What happens when Jade's planet melts?
@@ -107,9 +119,12 @@ Commentary:
 Track: Crystalanachrony
 Artist: Willow Ascenzo
 Track Art: Aelyrin
+Duration: 3:05
 References:
 - Crystalanthemums
-URLs: https://homestuckgaiden.bandcamp.com/track/crystalanachrony
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/crystalanachrony
+- https://youtu.be/UAONvQ4VQaA?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Willow Ascenzo:</i>
     If I had to pin this song to just one of Homestuck's swelling cast of characters, it would have to be Aradia. When we first meet her in the Hivebent act, she's an emotionless ghost who later becomes a ghost frog, then a ghost in a robot body (or a "ghost in the shell" :rimshot:), before making her final sea change into a cheerful fairy god with time powers (which explains the ticking and subtle reversem elodies of the song, atl east). The peppy piano and melancholy backing strings and woodwinds represent these aspects of Aradia's presonality - accustomed to death, she acts as a cheery Charon for her fallen teammates. I built the piano melody (and the title) out of Alexander Rosetti's "Crystalanthemums" because to me, ever since [S] Make her pay, the tune has been irrevocably linked to the trolls, Aradia, Terezi, and Vriska in particular. It also translated to a peppy piano melody much better than Toby Fox's "[[psych0ruins]]" would have.
@@ -119,7 +134,10 @@ Track: The Land of Wind and Shade
 Artist: Kristian Anderson
 Contributors: Eston Schweickart (mixing)
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/the-land-of-wind-and-shade
+Duration: 3:17
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/the-land-of-wind-and-shad
+- https://youtu.be/nFAMTC_I-Ns?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0e
 Commentary:
     <i>Kristian Anderson:</i>
     The cool blue landscape of LOWAS, with its winding rivers of oil and bio-luminescent sky, has always been one of my favourite pieces of imagery from the Homestuck Universe. Its dreamy topography sucks me in, and before I can protest I've been seated and presented with a wine list. "Nothing but the finest fermented crude for you", they say. Well okay. It's not particularly tasty, but it's nice to look at and has a nice finish.
@@ -132,8 +150,11 @@ Commentary:
 Track: Thought and Flow
 Artist: Steve Everson
 Track Art: catastrophicGenesis
+Duration: 1:46
 References: Hydrocity Zone (Act 2)
-URLs: https://homestuckgaiden.bandcamp.com/track/thought-and-flow
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/thought-and-flow
+- https://youtu.be/Bj-3pyAbc3U?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Steve Everson:</i>
     This track is part of a remix project that I began after a major computer failure that cost me most of my audio files and music project. The overall objective was to remix the themes from the levels of Sonic 3 &amp; Knuckles into music for each troll, a projec that is still slowly ongoing.
@@ -144,10 +165,13 @@ Commentary:
 Track: First Guardian, Last Stand
 Artist: Chase
 Track Art: melodiousDiscord
+Duration: 3:33
 References:
 - Beatdown (Strider Style)
 - Liquid Negrocity
-URLs: https://homestuckgaiden.bandcamp.com/track/first-guardian-last-stand
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/first-guardian-last-stand
+- https://youtu.be/kVbmMiXPbC8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Chase:</i>
     I can see this as music for Spades Slick and Doc Scratch's confrontation. Kind of like a fistfight ina 20s-era speakeasy. Except with less fists and more candy. And chiptunes.
@@ -158,7 +182,10 @@ Commentary:
 Track: Land of Wrath and Angels
 Artist: Ian White
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/land-of-wrath-and-angels
+Duration: 2:23
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/land-of-wrath-and-angels
+- https://youtu.be/qiPWW6m3QUQ?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Ian White:</i>
     Land of Wrath and Angels was a melody that I had been ignoring for about a year now. I brought it up when we were trying to hash out some Troll leitmotifs and instruments for the Hivebent Radioplay (remember when that was a thign?) It was for Eridan(!) I guess I liked the idea of him pining over a giant pipe organ cause he thought that's what evil guys are supposed to do whenever they get scorned, by girls usually. I myself felt the sick sting of scorn when Dacen suggested an accordion or French horn might suit Eridan better. WELL FUCK YOU DACEN. LoWaA was the last in a series of 12 short songs I made for the Troll Planets. It was actually revealed a solid 4 or 5 months after the other 11, so I really wanted to make it satand out as the big finale of my (kind of pointless) musical excursion. I'm also lazy though so I just rehashed an old melody I had lying aorund. Then I threw in some rocking guitar and pounding drums and angry synths and called it a day. At some point I realized that the initial melody kind of gets lost in the balance, so I repeated it at the end all clear and pretyt-like with harps and clarinets, which actually turned out to be my favourite part of the song, so yay.
@@ -169,7 +196,10 @@ Commentary:
 Track: Ruins of Rajavihara
 Artist: Red Pen
 Track Art: Mal McGannon
-URLs: https://homestuckgaiden.bandcamp.com/track/ruins-of-rajavihara
+Duration: 2:58
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/ruins-of-rajavihara
+- https://youtu.be/xyKvZV-UlRE?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Red Pen:</i>
     Ruins are majestic. Ruins are mysterious. And to me, ruins are really really awesome.
@@ -182,7 +212,10 @@ Commentary:
 Track: Vigilante ~ Cornered
 Artist: Brenna Curran
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/vigilante-cornered
+Duration: 3:21
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/vigilante-cornered
+- https://youtu.be/5Yb4SeK7-Mw?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Brenna Curran:</i>
     1:34 4M, TH3 12TH OF 6TH P3R1G33, ST4NDOFF.
@@ -198,7 +231,10 @@ Commentary:
 Track: A Fashionable Escape
 Artist: Yan Rodriguez
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/a-fashionable-escape
+Duration: 3:43
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/a-fashionable-escape
+- https://youtu.be/WEdZedw0Fno?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Yan Rodriguez:</i>
     Ah this is one of those songs I'm particularly proud of for making. It was for this AU thing I was doing, in which kanaya Maryam was a super secret spy having to break into the Big Boss Sollux's base with Karkat as an informer. That didn't pan out though, but I still managed to make this beauty. It's heavily, heavily inspired by Yoko Kanno, my favorite composer. The idea is that the first half is when she's sneaking about giong through, knowing that this is important, THIS IS SERIOUS, and she can't risk it here. She stumbles upon a computer, with a typewriter as a keyboard for whatever reason, and then the alarm goes off she gets caught and the big bad chase action scene starts. I had worked on it for about a month, and I kept losing progress because of crashes, but Silence convinced me to finish it, and boy am I glad he did.
@@ -208,9 +244,12 @@ Commentary:
 Track: Clockbreaker
 Artist: Mal McGannon
 Track Art: Brad Griffin
+Duration: 2:40
 References:
 - The Broken Clock
-URLs: https://homestuckgaiden.bandcamp.com/track/clockbreaker
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/clockbreaker
+- https://youtu.be/ZKhzNLEXlAI?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Mal McGannon:</i>
     I've always liked the Midnight Crew album, Drawing Dead; it's got this delicious synergy between jazz and techno with a dark overtone that is super sexy. (I'm a big fan.) Another thing I'm a big fan of is Jit and his music, because Jit's mad talented. So when I was in the shower one morning (where I do my best thinking) and I had the idea for a Midnight Crew cover of Jit's song from The Felt, "The Broken Clock", I filed it away under "future stuff to do", because it's rare I have what I consider a good idea with regards to composition.
@@ -221,7 +260,10 @@ Commentary:
 Track: Quartz Lullaby
 Artist: Evan Copeland
 Track Art: kayak
-URLs: https://homestuckgaiden.bandcamp.com/track/quartz-lullaby
+Duration: 0:41
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/quartz-lullaby
+- https://youtu.be/MjbvKSLqAiw?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Evan Copeland:</i>
     This is a piece I wrote one night when I was having trouble sleeping, fittingly enough. In retrospect, I think I took influence from Dire Dire Docks and [[Crystalanthemums]] with this song. I enjoy listening to it, and hopefully others will too.
@@ -232,10 +274,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Dance of the Wayward Vagabond
 Artist: Alexander Rosetti
-Contributors:
-- Meghan Kininger (bassoon)
+Contributors: Meghan Kininger (bassoon)
 Track Art: catastrophicGenesis
-URLs: https://homestuckgaiden.bandcamp.com/track/dance-of-the-wayward-vagabond
+Duration: 2:32
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/dance-of-the-wayward-vagabond
+- https://youtu.be/y41tmpZvU5Y?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Alexander Rosetti:</i>
     I wrote this for a composition assignment almost two years ago. It was still very early on in Homestuck and the Wayward Vagabond was currently the only exile we'd been introduced to. This was also before I really started contributing "official" Homestuck music, so when I wrote this I thought of it s being more inspired by Homestuck and left it in the fan music thread. The performance features myself on piano and Meghan Kininger on bassoon.
@@ -245,7 +289,10 @@ Commentary:
 Track: Joker Strife
 Artist: Gec
 Track Art: Brad Griffin
-URLs: https://homestuckgaiden.bandcamp.com/track/joker-strife
+Duration: 3:09
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/joker-strife
+- https://youtu.be/EpifLARQWZk?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Gec:</i>
     This song was originally called Ghost Aqua. I created this song for a hypothetical strife theme for Gamzee. Though the song didn't start off that way.
@@ -257,8 +304,11 @@ Commentary:
 Track: Sunshaker
 Artist: D. Crystal
 Track Art: D. Crystal
+Duration: 2:29
 References: Sunsetter
-URLs: https://homestuckgaiden.bandcamp.com/track/sunshaker
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sunshaker
+- https://youtu.be/_YhSVxovTO8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>D. Crystal:</i>
     i made this song thing
@@ -270,8 +320,11 @@ Commentary:
 Track: Sburban Rush
 Artist: Ralen Gainsborough
 Track Art: melodiousDiscord
+Duration: 1:37
 References: Sburban Jungle
-URLs: https://homestuckgaiden.bandcamp.com/track/sburban-rush
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sburban-rush
+- https://youtu.be/LiewiuFbFJo?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Ralen Gainsborough:</i>
     A while back, the MSPA forums had the "Forapocalypse", and everyone had their avatars enter the medium one way or another to 'survive' the forums going down.
@@ -283,7 +336,10 @@ Commentary:
 Track: Prince of Seas
 Artist: Max Wright
 Track Art: crepuscularDissembler
-URLs: https://homestuckgaiden.bandcamp.com/track/prince-of-seas
+Duration: 1:53
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/prince-of-seas
+- https://youtu.be/X4uMbtMmoxI?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Max Wright:</i>
     This piece was an interesting one for me, and not only because it was my first try at composing something orchestral. My original plan was to make it a sad, slow song with the theme I'd come up with; at least that's what it sounded like it should do in my head. But when I showed the theme to people, the replies were all that it sounded piratey. So that was the new direction I decided to take, and eventually I ended upw tih Prince of Seas. Little bit of trivia; originally I'd named it Jack (after Jack Sparrow), but of course that wouldn't have fit into Homestuck at all... so I just modified eridan's title.
@@ -295,8 +351,11 @@ Commentary:
 Track: Atomik Meltdown
 Artist: James Roach
 Track Art: Pancake-Fairy
+Duration: 3:28
 References: Atomyk Ebonpyre
-URLs: https://homestuckgaiden.bandcamp.com/track/atomik-meltdown
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/atomik-meltdown
+- https://youtu.be/W4EdCoD_dIQ?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>James Roach:</i>
     I liked the idea of Ebonpyre being used as a strife theme for Dave, so I wanted to go a little further with it. I imagined Dave using al ot of time-skipping while he fights (as represented by the record scratches).
@@ -307,8 +366,11 @@ Commentary:
 Track: Jackie Treats
 Artist: Artisticpolo
 Track Art: Pancake-Fairy
+Duration: 3:14
 References: Frost:frost-vol6, Liquid Negrocity
-URLs: https://homestuckgaiden.bandcamp.com/track/jackie-treats
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/jackie-treats
+- https://youtu.be/8aMnTdLJ57A?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Artisticpolo:</i>
     This is a commentary! Just saying this in case you accidentally clicked on this pdf and got lost.
@@ -321,7 +383,10 @@ Commentary:
 Track: Skaian Air
 Artist: Trent West
 Track Art: Elaine Wang
-URLs: https://homestuckgaiden.bandcamp.com/track/skaian-air
+Duration: 2:45
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/skaian-air
+- https://youtu.be/jost0oi6dLY?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Trent West:</i>
     Here's a little song I made after the update with John and WV in the flying car. I don't really have much to say about it, I was fucking around on my keyboardo ne day and played those chords you hear and thought "yeah sure that ounds good" (I have no fucking clue about chord progression or any other technical shit). I added the stuff at the beginning next because it sounded weird just jumping right into the chords. The drums are acombination of a preset that comes with Fruity Loops with a filter over it and a sampled dru loop I had lying around with some echo and reverb. The drums near the end are more samples I threw into a slicer and distorted.
@@ -333,8 +398,11 @@ Commentary:
 Track: Sburban Elevator
 Artist: Alexander Rosetti
 Track Art: Miff
+Duration: 0:30
 References: Sburban Jungle
-URLs: https://homestuckgaiden.bandcamp.com/track/sburban-elevator
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sburban-elevator
+- https://youtu.be/SqJiI9ouAhU?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Alexander Rosetti:</i>
     All I remember was someone requestin Sburban Jungle in the style of elevator music so out pops this thing.
@@ -342,7 +410,10 @@ Commentary:
 Track: Moody Mister Gemini
 Artist: Thomas Ferkol
 Track Art: umibouzu
-URLs: https://homestuckgaiden.bandcamp.com/track/moody-mister-gemini
+Duration: 1:53
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/moody-mister-gemini
+- https://youtu.be/vySAcabFPvk?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Thomas Ferkol:</i>
     Sollux seemed a moody fellow when he was first introduced, so I tried to capture the image he gave. This piece is much different from what I generally made at the time, more complex and faster paced tahn say Grudgebearer or Blind Legislacerator. There is a lot of contrasting dynamics thrown in, supposed to be reminiscent of his split personality. The piano line where both hands are playing sixteenth notes near the endi sm y favorite part. There isn't much else to say. It's moody and for mister Gemini.
@@ -352,7 +423,10 @@ Commentary:
 Track: Starkind
 Artist: Toby Fox
 Track Art: Brad Griffin
-URLs: https://homestuckgaiden.bandcamp.com/track/starkind
+Duration: 3:47
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/starkind
+- https://youtu.be/kAQAkPr6Jr8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Toby Fox:</i>
     I saw the updates for Rose blowing stuff up and finding that giant Captchalogue card with the <u>Green Sun</u> on it, and then someone said "is that a strife specibus card? What would that be? Starkind?" or something to that effect. And that inpsired me ot make a pretty awesome boss song that was too much like other things I've made to put on an album.
@@ -362,15 +436,19 @@ Commentary:
 Track: Maibasojen
 Artist: Isoraķatheð Zorethan F.
 Track Art: Isoraķatheð Zorethan F.
-URLs: https://homestuckgaiden.bandcamp.com/track/maibasojen
+Duration: 3:13
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/maibasojen
+- https://youtu.be/-P9FdBPpY04?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Isoraķatheð Zorethan F.:</i>
     Well, what have we... Felt (SI: HS\MUS:B0) got me thinking about time signatures, and also lumping multiple together. This is the fruition of this endeavor. Granted, it's not any good, but this may be the one piece where you have a 30/30 time signature (4/4 overlay 5/5 overlay 6/8). It's a little bit tired; stumbling; drunk... much like the first time when I first found this comic, I would assume. That was about two years ago.
     (On an unrelated note, this applies to table tennis very well.)
 -------------------------------------------------------------------------------
 Track: MeGaDanceVaNia
-Artist: Yishan Mai
+Artist: Catboss
 Track Art: JNJ
+Duration: 6:04
 References:
 - MeGaLoVania
 - Sburban Jungle
@@ -392,9 +470,11 @@ References:
 - Aggrieve
 - Showtime (Original Mix)
 - Showdown
-URLs: https://homestuckgaiden.bandcamp.com/track/megadancevania
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/megadancevania
+- https://youtu.be/UIcXeunzAaM?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Comentary:
-    <i>Yishan Mai:</i>
+    <i>Catboss:</i>
     One fine day I got the idea for a MeGaLoVania dance remix, but I sat on it because frankly? I don't actually enjoy dance music. Or techno. Or whatever genre this classifies as.
     Several days later, I was trying to conjure up music for Nepetaquest. But I was drawing a blank because "MeGaLoVania dance remix come on guy you want it" was stuck in my head. So eventaully I was like "OKAY I'LL DO IT SHUTUP"
     And then once I got started, it just grew. And grew. And grew. Like cancer. MUSICAL CANCER. efore I knew it I'd stuffed most of the kids' and trolls' motifs in there. There are 20 melodies I used (albeit some only for veeeery short segments). It started off with 16; I expanded it slightly in the process of revising it for the album. See if you can spot them all!
@@ -405,11 +485,14 @@ Comentary:
 Track: SadoMasoPedoRoboNecroBestiality
 Artist: tynic
 Track Art: Red Pen
+Duration: 1:48
 Contributors:
 - Beast72 (original midi)
 - Goatmon (additional vocals)
 References: Supercalifragilisticexpialidocious
-URLs: https://homestuckgaiden.bandcamp.com/track/sadomasopedorobonecrobestiality
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sadomasopedorobonecrobestiality
+- https://youtu.be/Vx-DcwcETag?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Lyrics:
     It's...
     (Chorus)
@@ -432,10 +515,13 @@ Commentary:
     I'd always hoped that I'd eventually come out with some Homestuck thing that would be well remembered by the fans. Here I was wasting my time whipping together silly mario paints, when I should have been recording catchy songs about amoral abusive relationships. Live and learn.
 -------------------------------------------------------------------------------
 Track: Under the Hat
-Directory: under-the-hat-lofam
 Artist: Erik Scheele
 Track Art: ThiefofTruth
-URLs: https://homestuckgaiden.bandcamp.com/track/under-the-hat
+Duration: 1:57
+Directory: under-the-hat-lofam
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/under-the-hat
+- https://youtu.be/wNZlrF3JkIE?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Erik Scheele:</i>
     So this started off as some music for Dad. And then I was like "this isn't strife-y enough!" cause it was supposed to be strife-y and then this happened. Since it's supposed to be battle music and all, the more laid-back chill version wouldn't really work.
@@ -445,6 +531,7 @@ Commentary:
 Track: Sburban Piano Doctor
 Artist: Brad Griffin
 Track Art: Brad Griffin
+Duration: 1:52
 References:
 - Sburban Jungle
 - Doctor
@@ -452,7 +539,9 @@ References:
 - Aggrieve
 - Penumbra Phantasm
 - Beatdown (Strider Style)
-URLs: https://homestuckgaiden.bandcamp.com/track/sburban-piano-doctor
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sburban-piano-doctor
+- https://youtu.be/AUkt5bpcJdQ?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Brad Griffin:</i>
     Sburban Jungle and Doctor are pretty much the tastiest songs ever, so I wanted to see what would happen if I mashed em into a gooey paste. As I was putting the ingredients back, some chunks of Showtime and Aggrieve fell into the pot. I tried to tone down the flavor by adding a little more Doctor, but then a bit of Black and Beatdown got pulled in with it. At this point it all boiled over onto my laptop and uploaded itself to the internet. Total culinary disaster!
@@ -461,8 +550,11 @@ Commentary:
 Track: The Hymn of Making Babies
 Artist: EnnuiKing
 Track Art: tT Twigwise
+Duration: 1:12
 References: Descend, Explore
-URLs: https://homestuckgaiden.bandcamp.com/track/the-hymn-of-making-babies
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/the-hymn-of-making-babies
+- https://youtu.be/UJG_HuK0gAE?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>EnnuiKing:</i>
     A few months ago I was on a classical guitar kick. I decided to make adaptations of Homestuck tunes for classical guitar, and they both translated surprisingly well for the most part. This particular rendition of Explore is based off the version from Descend, which is in C Minor as opposed to the A Minor of the original. Explore forever has an association with ectobiology because the scene where it plays in Descend is of Egbert sending babies onto meteors.
@@ -473,7 +565,10 @@ Commentary:
 Track: Emissary of Wind
 Artist: Eston Schweickart
 Track Art: kayak
-URLs: https://homestuckgaiden.bandcamp.com/track/emissary-of-wind
+Duration: 3:00
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/emissary-of-wind
+- https://youtu.be/oXlCAWBo668?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Eston Schweickart:</i>
     Emissary of Wind is the musical narrative of John flying around with his jet pack. As badasses are wont to do. I composed this song entirely in Gar(b)ageBand over the course of am onth in an internet-scarce interlude in my summer, not long after Volume 5 was released. Songs on that album, particularly [[Sunslammer]], were my main inspiration.
@@ -484,7 +579,10 @@ Commentary:
 Track: Land of Quartz and Melody
 Artist: Thomas Ferkol
 Track Art: catastrophicGenesis
-URLs: https://homestuckgaiden.bandcamp.com/track/land-of-quartz-and-melody
+Duration: 4:04
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/land-of-quartz-and-melody
+- https://youtu.be/frJDF4Z2iI8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Thomas Ferkol:</i>
     This piece was inspired by the land with the same name, mainly because I thought the scenery was interesting and would fit my style of composition. Generally in music, crystalline landscapes are given reverb laden atmospheres with bells and other instruments with a resonant sound. In this piece, I used the instrumentation of handbells, a piano, some synth string and choir background, and drum kit, the two prminent instrmuments being the piano and bells. The bells worked toset the atmosphere while piano handled melody. Then everything got doused in reverb. So much reverb. Maybe the reverb has reverb. But voila. This is one of my favorites from before I was on the music team.
@@ -494,8 +592,11 @@ Commentary:
 Track: Midnight Spider
 Artist: Yan Rodriguez
 Track Art: umibouzu
+Duration: 3:17
 References: Spider's Claw
-URLs: https://homestuckgaiden.bandcamp.com/track/midnight-spider
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/midnight-spider
+- https://youtu.be/DqaBuZMPees?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Yan Rodriguez:</i>
     Even though I'd been making .mid files for about 2 years before making this song, this was my first legitimate song in FL Studoi, my current workstation. Honestly while I do like the composition of this piece, the production is horrible and I wonder how people can listen to it even now, when I can do much better. It's also my first Homestuck song/remix, so whoo, and also the most popular. It, like [[A Fashionable Escape]], was for an AU thing, in which sax player and assassin Vriska Serket drifted to this new big city, running into trouble, kickin ass, and jammin on that sax.
@@ -505,7 +606,10 @@ Commentary:
 Track: House of Lalonde
 Artist: Max Wright
 Track Art: Red Pen
-URLs: https://homestuckgaiden.bandcamp.com/track/house-of-lalonde
+Duration: 1:20
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/house-of-lalonde
+- https://youtu.be/olGAOvLH2AY?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Max Wright:</i>
     This is a piece that found inspiration in pretty much everything. The main influences in this case were Bach (instrument choice), the Professor Layton Theme (throughout, mainly the introduction and melody that the violin takes), [[Explore]], and The Felt album in general. The inspiration from Professor Layton, drawing from video game themes, also affected my choice to make this loop(able).
@@ -515,8 +619,10 @@ Commentary:
 Track: L'etat de l'ambivalence
 Artist: James Dever
 Track Art: umibouzu
+Duration: 3:04
 References: psych0ruins
-URLs: https://homestuckgaiden.bandcamp.com/track/letat-de-lambivalence
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/letat-de-lambivalence
 Commentary:
     <i>James Dever:</i>
     L'état de l'ambivalence is the bastardized child of two different songs. I wrote the beginning of a song at the beginning of Hivebent called Lusus' Lament. It was supposed to be like a [[Chorale for Jaspers]] but for the trolls' custodians. This was before I even knew Alternia was in the works. After hearing psych0ruins I loved those beginning arpeggios and crying effect. So when Rad mentioned the idea of having troll planet themes, I jumped at the chance of making one for Aradia. I used the beginning to Lusus' Lament and then combined it with those beginning arpeggios and the first phrases of psych0ruins.
@@ -528,8 +634,11 @@ Commentary:
 Track: Growin' Up Strider
 Artist: Ian White
 Track Art: umibouzu
+Duration: 1:30
 References: Beatdown (Strider Style)
-URLs: https://homestuckgaiden.bandcamp.com/track/growin-up-strider
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/growin-up-strider
+- https://youtu.be/xnPkExwPsiE?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Ian White:</i>
     Growin' Up Strider fills a pretty obvious niche I guess, a cutesy song to montage Bro raising/training/abusing Dave, parallel to John and dad and [[Homestuck Anthem]]. The whole time I was making it I had DJ School from Rhythm Heaven stuck in my head, which is another cutesy song about another pair of cool dudes who are also learning to scratch records. So I guess I stole that. They probably weren't brothers though on account of how one was blue and the other was a robot I think. Lemmings had an influence too, which is to say that's where I stole those high-pitched bleeps from. I didn't even think to use Beatdown for the melody until I had prety much built the rest of the song around it. I had an old midi (by Tenebrais I think) and started goofing around trying to play it out in a major key and it fit pretty well sooooo that's that story.
@@ -543,11 +652,14 @@ Contributors:
 - Kat Macielinski (primary naks)
 - Alexander Rosetti (secondary naks)
 Track Art: Tawa
+Duration: 2:48
 References:
 - Nyanyanyanyanyanyanya!
 - Tribal Ebonpyre
 - Sburban Jungle
-URLs: https://homestuckgaiden.bandcamp.com/track/nakkadile
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/nakkadile
+- https://youtu.be/MQhf1bWXnlU?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Marcy Nabors:</i>
     This all began when Solatrus and I noted that Kat was quite talented at nakking. This was write around the time that the viral Nyan Cat video dropped, so I decided to sample Kat's naks and make some sort of remix. Afer showing an early draft to Alex Rosetti, he offered to supply some more miscellaneous naks. At some point I realized that the Tribal Ebonpyre drums fit really well in this song, and itall just snowballed from there. NAK NAK BV
@@ -557,15 +669,21 @@ Commentary:
 Track: Vigilante
 Artist: Brenna Curran
 Track Art: motorizedBootlegger
-URLs: https://homestuckgaiden.bandcamp.com/track/vigilante
+Duration: 2:00
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/vigilante
+- https://youtu.be/LqmPOZvgY9c?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Brenna Curran:</i>
-    After Terezi's intro section, I felt that she needed a strife theme. It had to be something that could capture bot hteh quirkyness ofa k id playing make believe and hardboiled grittiness of a police chase/standoff. It's one part Phoenix Wright, another part film noir and big band jazz and some funky cop chase thrown in for good measure. The 8-bit version was the first one I made. If the 8-bit version is the sacharine topping of the cake, then Cornered is its seedy underbelly, burnt to a crisp at the bottom of the pan.
+    After Terezi's intro section, I felt that she needed a strife theme. It had to be something that could capture bot hteh quirkyness of a kid playing make believe and hardboiled grittiness of a police chase/standoff. It's one part Phoenix Wright, another part film noir and big band jazz and some funky cop chase thrown in for good measure. The 8-bit version was the first one I made. If the 8-bit version is the sacharine topping of the cake, then Cornered is its seedy underbelly, burnt to a crisp at the bottom of the pan.
 -------------------------------------------------------------------------------
 Track: Jack and Black Queen
 Artist: Miss Prince
 Track Art: catastrophicGenesis
-URLs: https://homestuckgaiden.bandcamp.com/track/jack-and-black-queen
+Duration: 5:29
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/jack-and-black-queen
+- https://youtu.be/Sto3hlSPJ0Y?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Lyrics:
     I watch you through my window<br>As you sit there on your throne,<br>That arrogant expression on your face.<br>And I think, if I could have you<br>For one second, here, alone,<br>I'd find a way to put you in your place.
     'Cause you've been messin' around with my mind<br>But now it's my turn, yeah, now it's my time<br>I'm tired of waiting for my chance<br>I'm taking what is mine!
@@ -582,7 +700,7 @@ Lyrics:
 Commentary:
     <i>catastrophicGenesis:</i>
     It is remarkably difficult to make someone look truly hateful or disdainful when you have so little in the way of facial features to work with. Still, it's an incredibly vicious song, and it was fun to draw to, even if it did get me some funny looks from my housemates.
-    <i>Yishan Mai:</i>
+    <i>Catboss:</i>
     Miss Prince didn't have anything to say for this song, so everyone just sit back
     relax
     and enjoy this marvellous hate <s>snog</s> song.
@@ -590,7 +708,10 @@ Commentary:
 Track: A War of One Bullet
 Artist: Traikan
 Track Art: Quirk
-URLs: https://homestuckgaiden.bandcamp.com/track/a-war-of-one-bullet
+Duration: 3:06
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/a-war-of-one-bullet
+- https://youtu.be/IiQCV9XDw9o?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Traikan:</i>
     A long time ago, while reading a thread abuot Homestuck on a forum far far away, I stumbled upon some fanmusic by EidolonOrpheus. It was amazing and, more relevant to this commentary, it reminded me that not only did I once have an interest in composition, I still had some music software installed.
@@ -604,9 +725,12 @@ Commentary:
 Track: Corpse Casanova
 Artist: EnnuiKing
 Track Art: kayak
-References: Ectobiology
 Contributors: Angelo Badalamenti (inspiration through work on Twin Peaks)
-URLs: https://homestuckgaiden.bandcamp.com/track/corpse-casanova
+Duration: 2:21
+References: Ectobiology
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/corpse-casanova
+- https://youtu.be/SRfuIqOk4ng?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>EnnuiKing:</i>
     I wanted to pay tribute to the "2X CORPSESMOOCH COMBO" in the form of a song, and I decided on a whim that Ectobiology would be the perfect song to remix in order to do so. The saxaphone sounded like Microsoft GS Wavetable SW Synth, so I experimented with slathering reverb on it. I came across a preset that made it sound like the saxophone in "Audrey's Theme" from Angelo Badalamenti's Twin Peaks score, and decided that this was the new direction I wanted for the song. Towards the end, it features tremolo picking, which I feel is my signature guitar technique since it's the only one I can pull off that sounds remotely impressive.
@@ -617,8 +741,11 @@ Commentary:
 Track: Salamander Fiesta
 Artist: The Lovable Tramp
 Track Art: Yee-Tvae Corinst
+Duration: 3:14
 References: Doctor
-URLs: https://homestuckgaiden.bandcamp.com/track/salamander-fiesta
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/salamander-fiesta
+- https://youtu.be/Thl5GVkYm3w?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>The Lovable Tramp:</i>
     This is what happens hwen someone is obsessed with Homestuck and afro-cuban grooves at the same time.
@@ -628,8 +755,11 @@ Commentary:
 Track: MegaloVaniaC
 Artist: Xenocidebot
 Track Art: melodiousDiscord
+Duration: 1:42
 References: MeGaLoVania
-URLs: https://homestuckgaiden.bandcamp.com/track/megalovaniac
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/megalovaniac
+- https://youtu.be/a9URB9XKhH4?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Xenocidebot:</i>
     When I heard the original MeGaLoVania, it was the synth-sounding bit in the Alterniabound flash, and not the full album version. So I genuinely thought I was doing a rock cover of a synth-rock song and didn't mess with the instrumentation or anything else too drastically. Kinda wish I had in retrospect for differentiation's sake.
@@ -640,7 +770,10 @@ Commentary:
 Track: Shame and Doubt
 Artist: Trent West
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/shame-and-doubt
+Duration: 2:44
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/shame-and-doubt
+- https://youtu.be/ar5r6MQJJMc?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Trent West:</i>
     ok so first there's like this bass and then it's like WHOAAAAAAAA some fucking synth thrown in there and then these drums come in and that weird plane noise and then some more drums in the background and then everything drops out and it's like oh wait what happened and then there's another synth that comes in and then the drums come back in and go all clacky clack clack boom boom and then there's some like record scratchers and stuff repeated really fast and high pitched and then stuff drops out again and then some new drums come in for a bit so then you have some of the otehr stuff that dropped out come back in for only like 10 seconds but then they drop out an then that one synth comes back but it has a filter on it to make it sound all freaky deeky and then the song ends.
@@ -651,8 +784,11 @@ Commentary:
 Track: SWEET BRO AND HELLA JEFF SHOW
 Artist: Erik Scheele
 Track Art: Elaine Wang
+Duration: 1:07
 References: Deck the Halls
-URLs: https://homestuckgaiden.bandcamp.com/track/sweet-bro-and-hella-jeff-show
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/sweet-bro-and-hella-jeff-show
+- https://youtu.be/pEvOb04ySb4?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Lyrics:
     IT'S THE SWEET BRO AND HELLA JEFF SHOW
     WOOOOOOooooooOOOOOOOOOooooooOOOOOOoooooH
@@ -667,6 +803,7 @@ Commentary:
 Track: Growing Up
 Artist: Eston Schweickart
 Track Art: Cheers
+Duration: 5:11
 References:
 - Lotus
 - Hearts Flush
@@ -675,7 +812,9 @@ References:
 - How Do I Live
 - Ruins
 - Liquid Negrocity
-URLs: https://homestuckgaiden.bandcamp.com/track/growing-up
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/growing-up
+- https://youtu.be/L-XX9zvxugU?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Eston Schweickart:</i>
     In order: Lotus, Hearts Flush, Crystalanthemums, Homestuck Anthem, HDILWY, Ruins, Liquid Negrocity, and back to Lotus. The original name for this piece was Homsetuck Medley 1, since I planned on writing more like ti before I realized what a ridiculous idea that was. (I actually got pretty far on number 2 before giving up.)
@@ -687,11 +826,14 @@ Commentary:
 Track: The Drawing of the Four
 Artist: Willow Ascenzo
 Track Art: Red Pen
+Duration: 5:00
 References:
 - Sburban Jungle
 - Squiddles!
 - Beatdown (Strider Style)
-URLs: https://homestuckgaiden.bandcamp.com/track/the-drawing-of-the-four
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/the-drawing-of-the-four
+- https://youtu.be/_Ory1eb632I?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Willow Ascenzo:</i>
     The title is, of course, a blatant reference to Sven King's Dark Towerseries. The song is a build-up to each of the four kids entering the Medium (they're being "drawn" into the game just as Eddie, Susannah, and Jake were drawn into Mid-World, but that's enough for now about something that isn't Homsetuck), so we start out with a slow rendition of "Sburban Jungle" played on the piano (John's instrument) with subsequent accompaniment by a violin (Rose's instrument). Then, here come the drums (Dave's isntrument), and we kick the song into high gear when the flute and bass (both Jade's instruments) come in. There's al ong period of pseudo-improv frm the bass, flute, and violin before returning to the meat of the song - and a nod to the Squiddles theme (another reference to Rose) before the finale. Curiously, the order of the instruments exactly matches the order of the kids' introduction.
@@ -699,7 +841,10 @@ Commentary:
 Track: Ira quod Angelus
 Artist: Kalibration
 Track Art: catastrophicGenesis
-URLs: https://homestuckgaiden.bandcamp.com/track/ira-quod-angelus
+Duration: 5:11
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/ira-quod-angelus
+- https://youtu.be/jt_unlzLBpE?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Kalibration:</i>
     Hi kids this is the song I made for EridanLand but Radiation didn't like it so he slapped me down and told me to get out of the music team. Just kidding, that didn't happen. Maybe. Anyways, this song was really fun to make. I tried a lot of crazy sound-manipulation things I'd never really tried before for the breakdown and outro, and I really feel like I succeeded with them! The main theme that happens on the rhodes is really fun to play, and might become a prominent theme later...? Either way, I hope you like this song asm uch as I do! Much love from Kali, thank you for listening!
@@ -709,7 +854,10 @@ Commentary:
 Track: Final Stand
 Artist: Gec
 Track Art: umibouzu
-URLs: https://homestuckgaiden.bandcamp.com/track/final-stand
+Duration: 4:32
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/final-stand
+- https://youtu.be/vSj-kLixKH8?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Gec:</i>
     I took the time to make this song sound like it was meant for a robust flash sequence. Really intense drum &amp; bass plus a few orchestral and electronic touches tie it all together.
@@ -722,23 +870,29 @@ Commentary:
 Track: Farewell
 Artist: Fuzz
 Track Art: melodiousDiscord
-URLs: https://homestuckgaiden.bandcamp.com/track/farewell
+Duration: 4:04
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/farewell
+- https://youtu.be/SHzmF_sSCi0?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Fuzz:</i>
     My approach to music is very dramatic. When I create music I tend to visualise very specific scenes which take place when it plays. Farewell was originally intended to accompany the scene where John discovered Mom and Dad were dead. At this point in the story it could have gone any way, so I started playing around and doing improvisations based around the Showtime theme, being a theme cetral to John. After messing around some more for a while I realised that a mroe bittersweet touch worked better though, and that instead of being used for lamenting, in my minds eye the piece seemed to fit something more akin to a goodbye, such as a scene displaying the kids and trolls parting ways.
     <i>melodiousDiscord:</i>
-    This piece is based on what I hope will happen (still). After joining forces to defeat Jack, the kids' ultimate reward is unlocked and the trolls either go back to their won world, or accompany the kids. John is the last to leave and you can see the shadows ofTerezi and Karkat. John gives a final wave before stepping through the door, Karkat gives a last farewell gesture in response. A bittersweet ending indeed.
+    This piece is based on what I hope will happen (still). After joining forces to defeat Jack, the kids' ultimate reward is unlocked and the trolls either go back to their won world, or accompany the kids. John is the last to leave and you can see the shadows of Terezi and Karkat. John gives a final wave before stepping through the door, Karkat gives a last farewell gesture in response. A bittersweet ending indeed.
 -------------------------------------------------------------------------------
 Track: ~ Heir - Seer - Knight - Witch ~
 Artist: Joe Griffith
 Track Art: kayak
+Duration: 7:59
 References:
 - Doctor
 - Endless Climb
 - Atomyk Ebonpyre
 - Frost
 - Squiddles!
-URLs: https://homestuckgaiden.bandcamp.com/track/heir-seer-knight-witch
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/heir-seer-knight-witch
+- https://youtu.be/YT2a2jI8_Yo?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Joe Griffith:</i>
     Generally speaking, it's fairly uncommon to find a Remix or Arrangement authored by me; I much prefer to write from scratch, using my own material. However, one story winter night as I slept curled up in my cave, the spirit of a great troll came to me...
@@ -750,8 +904,11 @@ Commentary:
 Track: Cutscene at the End of the Hallway
 Artist: Robert J! Lake
 Track Art: Zilleniose
+Duration: 2:50
 References: Homestuck Title Screen
-URLs: https://homestuckgaiden.bandcamp.com/track/cutscene-at-the-end-of-the-hallway
+URLs:
+- https://homestuckgaiden.bandcamp.com/track/cutscene-at-the-end-of-the-hallway
+- https://youtu.be/ZSWphWAVpfs?list=PLVrrmdafwD4-cD2-ZeRtfnzvRpl2IsrQ0
 Commentary:
     <i>Robert J! Lake:</i>
     so i put together this thing in twenty seconds, except it actually took several months because i never worked on it but who cares about that

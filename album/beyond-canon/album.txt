@@ -30,9 +30,10 @@ Commentary:
 Track: exclusion zone
 Artist: horizon
 Track Art: Zowerlemon
+Duration: 2:22
 URLs:
 - https://homestuck.bandcamp.com/track/exclusion-zone
-- https://www.youtube.com/watch?v=yllaAhv5EYA
+- https://youtu.be/yllaAhv5EYA?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Lyrics:
     (vocalizations of "ee" and "ah")<br>always<br>you --<br>(vocalizations of "ee" and "ah" continue)<br>-- made a monster<br>ha ha ha<br>ha ha-ah
     <i>"You sit up there all day long and do <b>nothing.</b> Except come down and make tea.</i>
@@ -56,7 +57,10 @@ Commentary:
 Track: Now I'm a Villain
 Artist: David Ellis
 Track Art: Jas
-URLs: https://homestuck.bandcamp.com/track/now-im-a-villain
+Duration: 4:40
+URLs:
+- https://homestuck.bandcamp.com/track/now-im-a-villain
+- https://youtu.be/-CbjEPNFCqQ?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 References: Showtime (Original Mix)
 Commentary:
     <i>David Ellis:</i>
@@ -68,9 +72,10 @@ Commentary:
 Track: Cosmic Carousel
 Artist: polysaw
 Track Art: Rachel Z
+Duration: 3:29
 URLs:
 - https://homestuck.bandcamp.com/track/cosmic-carousel
-- https://www.youtube.com/watch?v=xxVwRERwmJg
+- https://youtu.be/xxVwRERwmJg?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/polysaw/homestuck-beyond-canon-cosmic-carousel
 Commentary:
     <i>CrepesAhoy:</i>
@@ -85,14 +90,18 @@ Commentary:
 Track: Surprise, We're Back
 Artist: Sean Gorter
 Track Art: D'paq
+Duration: 5:21
 References: End of Act
 URLs:
 - https://homestuck.bandcamp.com/track/surprise-were-back
+- https://youtu.be/jeuBiSxYHEI?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/flareproductions/surprise-were-back
 Commentary:
     <i>Sean Gorter:</i>
     (<a href="https://soundcloud.com/flareproductions/surprise-were-back">SoundCloud</a>)
     Surprise, bitch. Bet you didn't see this album coming.
+    (<a href="https://youtu.be/jeuBiSxYHEI">YouTube</a>)
+    It's a great privilege of mine to contribute music to Homestuck^2. We're glad we can finally show you what we've been doing.
     <i>D'paq:</i>
     I was indeed surprised by HS^2's sudden appearence, at first I thought it was a really well-characterized fan continuation like with Act Omega, with its own website like VE, they even shared the same artist, I can recognize Xamag's art from a mile away, love it. But turns out that they indeed Were Back, and I'm really looking forward to what they have in store.Dirk, the ==> command, and the Theseus seemed like the perfect trinity to represent a(n) (un)likely continuation to an already colossal story. The sky full of faint memories of the baffling/fascinating (Meat) Epilogues, Dirk as the constellation marking him as one of this universe's gods, the one who put that story into motion. There's another simpler track art I made that I also enjoy, but in my mind the piano and the stars go together much better, the one with Dirk and the huge ==> command feels like it'd accompany some electronic song instead. Have a nice day!
     <img src="misc/surprise-were-back-wip1.jpg">
@@ -102,8 +111,10 @@ Commentary:
 Track: SPLIT REALITY
 Artist: Xauric
 Track Art: Gastlu
+Duration: 5:06
 URLs:
 - https://homestuck.bandcamp.com/track/split-reality
+- https://youtu.be/XzZ7PNmcHiU?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://www.youtube.com/watch?v=XzZ7PNmcHiU
 References: Alphamatic Replacement
 Commentary:
@@ -125,7 +136,10 @@ Commentary:
 Track: Assembly
 Artist: Erik Scheele
 Track Art: ysh
-URLs: https://homestuck.bandcamp.com/track/assembly
+Duration: 4:37
+URLs:
+- https://homestuck.bandcamp.com/track/assembly
+- https://youtu.be/jCqE4ePSsMQ?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>ysh:</i>
     When I got the track (and stopped squeeing) I contacted the composer to ask what he envisioned while making it, and he told me that the track was about Dirk's team's journey through space towards the new planet as well as about them preparing for the game (hence the name). So I did my best to convey all of that. The track uses many synth sounds, or at least *some* synth sounds, and to me that was enough to justify going for the 80's neon aesthetic. I used mainly triadic palette where each colour corresponded to one of the characters: orange for Dirk, violet for Rose, teal/turquoise for Terezi. The theme of "three" is also reinforced by the triangle shape, which I referenced in composition as well as by slapping a big fat triangle in the middle of the picture. It works as a visual portal and also represents the letter Delta (as in Deltritus, the name of the new planet). The idea of actual assembling of the game is referenced through the Venn diagram glyph inside the portal and by those sick grid mountains in the background that I totally didn't trace from some random stock image. There's some more symbolism stuffed in the picture but this commentary is already too long and I'd like to leave some things open to interpretation. Doing track art has been a long dream of mine, and I'm extremely glad and thankful I've been given this chance to participate in this project!
@@ -136,7 +150,10 @@ Commentary:
 Track: Not Canon in F major, Op. 69
 Artist: Alex Votl
 Track Art: Spicy Nyx
-URLs: https://homestuck.bandcamp.com/track/not-canon-in-f-major-op-69
+Duration: 3:40
+URLs:
+- https://homestuck.bandcamp.com/track/not-canon-in-f-major-op-69
+- https://youtu.be/scBYW884ymU?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Spicy Nyx:</i>
     When I listen to the song it makes me think of how much Homestuck has strayed into non-canon and I wanted to draw what's pretty much become the 3 most influential characters of homestuck, looking out at whats to come next has they go further and further out of the canon story.
@@ -147,7 +164,10 @@ Track: The Leaving
 Artist: Marcus Carline
 Track Art: RainbowLustDash
 Contributors: Marc Encabo (bass), Tom Kendall Hughes (drums)
-URLs: https://homestuck.bandcamp.com/track/the-leaving
+Duration: 3:33
+URLs:
+- https://homestuck.bandcamp.com/track/the-leaving
+- https://youtu.be/rb3ZqqiLGYE?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Lyrics:
     Smoke is all I breathe,<br>is all you hear, is all in me.<br>Taste the drier air.<br>There's nothing left.
     Letters fill the empty space.<br>There's so much space that's left untouched.<br>Running scares me more than God,<br>but staying can't sustain.
@@ -170,8 +190,10 @@ Commentary:
 Track: Light Burns Out (Gestalt)
 Artist: Waif
 Track Art: Mikkynga
+Duration: 7:16
 URLs:
 - https://homestuck.bandcamp.com/track/light-burns-out-gestalt
+- https://youtu.be/uTXx7knWeys?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Waif:</i>
     (<a href="https://twitter.com/sexwarlocks/status/1249775240261120000">Twitter</a>)
@@ -192,7 +214,10 @@ Commentary:
 Track: Hometeam Adv8ntage
 Artist: Twirlin' Curtis
 Track Art: Tipsy
-URLs: https://homestuck.bandcamp.com/track/hometeam-adv8ntage
+Duration: 3:58
+URLs:
+- https://homestuck.bandcamp.com/track/hometeam-adv8ntage
+- https://youtu.be/ZrkxZz-QeVk?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Twirlin' Curtis:</i>
     (<a href="https://twitter.com/TwirlinCurtis/status/1249775784941760512">Twitter</a>)
@@ -208,9 +233,10 @@ Commentary:
 Track: After the Sun
 Artist: Circlejourney
 Track Art: zzzealousy
+Duration: 4:13
 URLs:
 - https://homestuck.bandcamp.com/track/after-the-sun
-- https://www.youtube.com/watch?v=wEIWdGAOBuc
+- https://youtu.be/wEIWdGAOBuc?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/circlejourney/after-the-sun
 Commentary:
     <i>Circlejourney:</i>
@@ -235,14 +261,19 @@ Commentary:
 Track: Narrative Command
 Artist: Sean William Calhoun
 Track Art: Ana
+Duration: 4:13
 URLs:
 - https://homestuck.bandcamp.com/track/narrative-command
-- https://www.youtube.com/watch?v=keoJTpGQxPE
+- https://youtu.be/keoJTpGQxPE?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Sean William Calhoun:</i>
     (<a href="https://www.youtube.com/watch?v=keoJTpGQxPE">YouTube</a>)
     <blockquote>Holy crap. Impeccable. I might transcribe this for my music project.</blockquote>
     This might make it a bit easier — I made a notated blueprint before I started producing it (notated on two piano grand staves, because that's easy for me to parse, but it's certainly not a playable two-piano score). It's not 100% accurate to how it wound up (and I'm not going to fix it, because I don't have any use for an accurate "score"), but if you take this as a slightly-flawed transcription you can probably get the rest relatively easily. <a href="misc/narrative-command-blueprint.pdf">(link!)</a>
+    <blockquote>I don’t want to do this beautiful track a disservice by comparing it to music that’s already been made, because it’s one of the most original and creative songs ive ever heard, but it also does kind of sound like all the songs on [[album:Cherubim]] had a brawl and kicked the shit out of each other</blockquote>
+    It intentionally sounds tangentially like a bit of OG Homestuck music (without quoting anything). Calliope's music is a little like some of One Year Older (like [[Firefly Cloud]]) and [[Voidlight]] (from HS Vol. 10). At the beginning of Homestuck^2, Dirk said "Finally, this story is back on the rails. Maybe we can get back to what things were like in the good old days," so his music sounds more stereotypically Homestuck, with the quasi-chiptune style that's in a lot of classic Homestuck music.
+    <blockquote><blockquote><blockquote>have fun trying to transcribe dirk's 13/8 section lmao</blockquote><i>but consider: 13/4</i></blockquote>but consider: 13/1</blockquote>
+    My notational thoughts aren't really consequential, since this is electronic, and the score was only for my own ease of composing, not for performance, but I've always thought of it as Calliope's section in 4/4 and Dirk's in 13/16, so when they start to combine, it's 4 (Calliope eighth notes) against 13 (Dirk sixteenth notes)
     (<i>original track art</i>)
     <img src="misc/narrative-command.jpg">
     <i>Ana:</i>
@@ -254,7 +285,10 @@ Commentary:
 Track: eleventh hour
 Artist: Monobrow
 Track Art: Skyplayer
-URLs: https://homestuck.bandcamp.com/track/eleventh-hour
+Duration: 2:46
+URLs:
+- https://homestuck.bandcamp.com/track/eleventh-hour
+- https://youtu.be/ZiJxlnS5kPw?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Skyplayer:</i>
     This piece started with a concept that is actually explored in other pieces in this album's set: Dirk's departure and what he left behind. Even the same symbolism can be found in other pieces: Theseus streaking across his face, shatters of memories lost to space. Mine started to mutate though, to take on a form beyond my control. My skill to render the memories failed me: WIPs show the corpse of John, the beheading of Dirk, other fragments of the Epilogues. The main decisions of the piece happened spontaneously: fragments of a clock reforming to Dirk's silhouette, Theseus moving from the corner and taking its place as Dirk's glasses. The colors went through many iterations, a volatile photoshop file of hue shifts and stacked filters. The final nail in the coffin for any hope of a semblance of normalcy in this came with my most baffling decision of all: splashing my previous two track arts for UMSPAF over this one. My original monochrome draft for Diverging Delicacies' "Dirk's Dreamers" became the only shattered memory, a destruction of art I birthed but am not fond of. Moons of Theseus' "Unchained" merged with the fibers of space, a celebrated giant looming over all my other pieces. Much like the man this art is focused on, the very piece itself has become a distractingly shiny mirror reflecting the artist's self-indulgent nonsense. I'm being told there's a song attached to this?
@@ -266,7 +300,10 @@ Commentary:
 Track: Adios, Lost Boys
 Artist: Clark Powell
 Track Art: qsleeper
-URLs: https://homestuck.bandcamp.com/track/adios-lost-boys
+Duration: 3:30
+URLs:
+- https://homestuck.bandcamp.com/track/adios-lost-boys
+- https://youtu.be/QWubKiNrCz0?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>qsleepr:</i>
     I was pretty happy when I found out that I'd be drawing a piece for this song, since I've always had a soft spot for Tavros—he's an underappreciated boy! In the end, I didn't really do many different concept sketches for this one. I knew that I wanted a scene of Tavros, in his Peter Pan outfit, staring out as the friends and army they'd worked so hard to gather get eaten by the black hole. The ghosts are just as much the ‘Lost Boys' here as Tav is himself. I was going for a ‘wistful, but resigned' sort of feeling for this, since all Tav can really do now is watch. He knows he's unable to stop everyone from being destroyed—or, as we know now, getting pulled into the new HS^2 universe. So basically, he's just chillin'.
@@ -276,8 +313,10 @@ Commentary:
 Track: Moving Onwards
 Artist: Matthias Ramalho
 Track Art: cratmang
+Duration: 3:15
 URLs:
 - https://homestuck.bandcamp.com/track/moving-onwards
+- https://youtu.be/V2rvPt0jjdE?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/friendly-coy/moving-onwards
 Commentary:
     <i>Matthias Ramalho:</i>
@@ -293,7 +332,10 @@ Commentary:
 Track: Make a Pretty Picture
 Artist: Tristan Scroggins
 Track Art: Aeritus
-URLs: https://homestuck.bandcamp.com/track/make-a-pretty-picture
+Duration: 2:29
+URLs:
+- https://homestuck.bandcamp.com/track/make-a-pretty-picture
+- https://youtu.be/a2bQF3q74Lc?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Commentary:
     <i>Aeritus:</i>
     When I first heard the song it just really felt like a Jane song to me. I really wanted to play with the title itself so most of the concept has been Jane (and family) on the making of the Pretty Picture, because when you're in such an high position it's important to look good and pretty, no matter what... right? I Also had a few other sketches of Rose and Jade since the track art of the main motif used for this song had them, but after the updates and the general feeling regarding Jade and Rose has been switched on the bad side, it just didnt felt right for me and the tone of the song itself.
@@ -306,8 +348,11 @@ Commentary:
 Track: Four Kids (and a Game They Played Together)
 Artist: Robert J! Lake
 Track Art: Star-nomad
+Duration: 4:13
 References: Four Kids and a Game They Play Together
-URLs: https://homestuck.bandcamp.com/track/four-kids-and-a-game-they-played-together
+URLs:
+- https://homestuck.bandcamp.com/track/four-kids-and-a-game-they-played-together
+- https://youtu.be/njJhDlhFGa8?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 Lyrics:
     it's been a little bit since the last time we all talked<br>so...how are all of you doing?<br>i know that i have been a bit unkind to you all<br>and i'm trying to undo it
     we thought this ended years ago but it survived<br>i've forgotten far too often why i even recognize these faces<br>that don't have names placed with them<br>inside my hazy brain, but then<br>there's too much to begin to touch on here
@@ -346,8 +391,10 @@ Commentary:
 Track: crystal hung in firmament's descent
 Artist: Emelia K.
 Track Art: awkward
+Duration: 3:11
 URLs:
 - https://homestuck.bandcamp.com/track/crystal-hung-in-firmaments-descent
+- https://youtu.be/LsfBIMV1e-Q?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/emelia-kaylee/crystal-hung-in-firmaments-descent
 Commentary:
     <i>Emelia K.:</i>

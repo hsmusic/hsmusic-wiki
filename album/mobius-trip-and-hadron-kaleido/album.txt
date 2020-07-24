@@ -7,7 +7,7 @@ FG: #eecc22
 URLs:
 - https://bowman.bandcamp.com/album/mobius-trip-and-hadron-kaleido
 - https://www.youtube.com/watch?v=YBZx4eTVu4Ufun
-- https://www.youtube.com/playlist?list=PLAA4CC77749E4B58E
+- https://www.youtube.com/playlist?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Commentary:
     <i>Michael Guy Bowman:</i>
     <i>Is there a linear story to this album, or is it some other form of story telling?</i>
@@ -31,11 +31,17 @@ Commentary:
     That's all I can remember at the moment. Bowman might remember more.
 -------------------------------------------------------------------------------
 Track: Forever
-URLs: https://bowman.bandcamp.com/track/forever
+Duration: 2:58
+URLs:
+- https://bowman.bandcamp.com/track/forever
+- https://youtu.be/O9Q5JvfBMYc?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 -------------------------------------------------------------------------------
 Track: Dawn of Man
+Duration: 5:44
 References: Sburban Jungle
-URLs: https://bowman.bandcamp.com/track/dawn-of-man
+URLs:
+- https://bowman.bandcamp.com/track/dawn-of-man
+- https://youtu.be/Fyib6VCDA2s?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     I was about fifteen<br>I was walking the beach<br>I was racing a wave<br>It knocked me off my feet<br>I fell into the tide<br>It spat me back on the sand<br>I laughed without a clue<br>How lucky I was to land
     It's been a long long time<br>Since my life was spared<br>It's been a long long time<br>But I'm still not scared
@@ -47,10 +53,16 @@ Lyrics:
     If anyone's out there to see what I have done<br>Can somebody tell me what I am to become<br>Our tiny lives, they fly right by<br>Who were they, and next to them<br>Who the hell am I?
 -------------------------------------------------------------------------------
 Track: Beta Version
-URLs: https://bowman.bandcamp.com/track/beta-version
+Duration: 4:35
+URLs:
+- https://bowman.bandcamp.com/track/beta-version
+- https://youtu.be/m6Km35fIHiw?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 -------------------------------------------------------------------------------
 Track: No Release
-URLs: https://bowman.bandcamp.com/track/no-release
+Duration: 4:28
+URLs:
+- https://bowman.bandcamp.com/track/no-release
+- https://youtu.be/ZO_ile-Mdsw?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     She's changed, she's new now<br>She's moved on somehow<br>The pain is gone now<br>But she still needs room to breathe
     You've changed you're silent<br>For all those years spent<br>Explaining what it was that you really meant
@@ -63,9 +75,10 @@ Lyrics:
     And if the rules they can bend<br>You know you still could be friends<br>But it doesn't rely on me<br>This is as far as I go<br>I only say what I know<br>And what I know is you need release
 -------------------------------------------------------------------------------
 Track: Fly
+Duration: 5:01
 URLs:
-- https://www.youtube.com/watch?v=CUDkBTYWtGk
 - https://bowman.bandcamp.com/track/fly
+- https://youtu.be/CUDkBTYWtGk?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     Fly fly fly whatcha say<br>Whatcha gonna do<br>Change your ways change your life<br>Change your point of view<br>Been so long since your feet<br>Felt the open air<br>So far back down the line<br>Were you even there?
     It's so cold the rain blows in your eyes<br>It's so cold the days go flashing by<br>It's so cold you've lost all track of time<br>It's so cold you turn back into slime
@@ -75,8 +88,11 @@ Lyrics:
     And you're on your way of work<br>But you just can't work it out<br>And you can't recall the details<br>Or what it was about<br>So you hustle through your morning<br>And you waste your afternoon<br>And at night you still are wondering<br>If you'll dream again so soon<br>And you lay awake and wonder<br>And you never get your sleep<br>Cause you're still waiting for the answers<br>But you never hear a peep<br>And you die alone and angry<br>And you're wrapped up in a shroud<br>And the world's far below you<br>And your feet are in the clouds
 -------------------------------------------------------------------------------
 Track: Lies With The Sea
+Duration: 4:46
 References: Sburban Jungle
-URLs: https://bowman.bandcamp.com/track/lies-with-the-sea
+URLs:
+- https://bowman.bandcamp.com/track/lies-with-the-sea
+- https://youtu.be/LH_tBygClwg?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     Lonely submarine in murky shades of blue and green<br>A silent knock on Davy Jones' door<br>Octopi and hydronauts explore unsalvaged shipwrecks caught<br>In coral reeves that span the ocean floor
     The geothermal chemistry<br>Of vents below the deep blue sea<br>Burning on and on<br>The winking of an angler's light<br>You make this underwater flight<br>Down where there is no sun
@@ -94,7 +110,10 @@ Commentary:
      “Down, down far below, somewhere safe/ Lost in the wave once again.”
 -------------------------------------------------------------------------------
 Track: Chain Of Prospit
-URLs: https://bowman.bandcamp.com/track/chain-of-prospit
+Duration: 4:37
+URLs:
+- https://bowman.bandcamp.com/track/chain-of-prospit
+- https://youtu.be/c9XA_P5g_4w?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     Hold up before your hopes and dreams are sold up<br>You haven't failed yet don't hold up<br>Don't cut the tape before it's rolled up<br>You've always got a chance
     Rock it and if the picture isn't clear just shop it<br>You're swinging by the chain of prospit<br>The future's always there so pop it<br>Back into its place
@@ -105,7 +124,10 @@ Lyrics:
     Reversal, all matter and its great dispersal<br>The secrets of the universal<br>This isn't just a dry rehearsal<br>We're living for today
 -------------------------------------------------------------------------------
 Track: Pumpkin Tide
-URLs: https://bowman.bandcamp.com/track/pumpkin-tide
+Duration: 3:31
+URLs:
+- https://bowman.bandcamp.com/track/pumpkin-tide
+- https://youtu.be/lyxw3e3RvzE?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw
 Lyrics:
     Destroy your desk, it's useless now<br>Build yourself a fort to hide<br>Close your eyes and crawl inside<br>You're sailing on the pumpkin tide
     The ship you're on is yours alone<br>The wind will push your sweet sweet ride<br>But this foreign wave just appearified<br>You're sailing on the pumpkin tide
@@ -115,5 +137,8 @@ Lyrics:
     The door into your heart is locked<br>Its key is buried in your mind<br>Too heavy to carry but too huge to leave behind<br>Without it you will surely die<br>But even that's just another lie<br>Sailing on the pumpkin tide
 -------------------------------------------------------------------------------
 Track: The Deeper You Go
+Duration: 3:36
 References: Sburban Jungle
-URLs: https://bowman.bandcamp.com/track/the-deeper-you-go
+URLs:
+- https://bowman.bandcamp.com/track/the-deeper-you-go
+- https://youtu.be/IMpM4xKg9vU?list=OLAK5uy_kT4A-zOvA1ht-UCuwStN-uoVIdxS7S7Qw

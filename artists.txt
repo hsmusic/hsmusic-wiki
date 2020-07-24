@@ -17,6 +17,8 @@ Artist: Acyl
 URLs:
 - https://asktheseacowvboys.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Adam Beveridge
+-------------------------------------------------------------------------------
 Artist: Adamantist
 URLs:
 - https://admantist.tumblr.com/
@@ -326,7 +328,15 @@ Artist: Carla Bravo
 -------------------------------------------------------------------------------
 Artist: Castlevania
 -------------------------------------------------------------------------------
+Artist: Casual Sunday
+URLs: http://casualsunday.bandcamp.com/
+-------------------------------------------------------------------------------
 Artist: catastrophicGenesis
+-------------------------------------------------------------------------------
+Artist: Catboss
+URLs:
+- https://catboss.bandcamp.com/
+- https://soundcloud.com/catbossstudio
 -------------------------------------------------------------------------------
 Artist: Cave Story
 -------------------------------------------------------------------------------
@@ -384,9 +394,11 @@ Artist: Cindy Dominguez
 -------------------------------------------------------------------------------
 Artist: Circlejourney
 URLs:
-- https://circlejourneyart.tumblr.com/
+- https://circlejourney.bandcamp.com/
 - https://soundcloud.com/circlejourney
+- https://circlejourneyart.tumblr.com/
 - https://twitter.com/circlejourney
+- https://circlejourney.net/
 -------------------------------------------------------------------------------
 Artist: cityinthesea
 -------------------------------------------------------------------------------
@@ -399,7 +411,13 @@ URLs:
 - https://clarkpowell.bandcamp.com/
 - https://soundcloud.com/plazmataz
 -------------------------------------------------------------------------------
+Artist: climeade
+URLs:
+- https://climeade.tumblr.com/
+-------------------------------------------------------------------------------
 Artist: clorinspats
+-------------------------------------------------------------------------------
+Artist: Clouds Haberberg
 -------------------------------------------------------------------------------
 Artist: clumsyroyalty
 -------------------------------------------------------------------------------
@@ -415,6 +433,9 @@ URLs:
 - https://cookiefonster666.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: copiko-art
+-------------------------------------------------------------------------------
+Artist: Corbin Pangilinan
+URLs: https://endlessconsideration.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Corona Sanctus
 -------------------------------------------------------------------------------
@@ -627,6 +648,10 @@ Artist: Durandana
 -------------------------------------------------------------------------------
 Artist: Dzu
 -------------------------------------------------------------------------------
+Artist: Earthbound
+URLs:
+- https://en.wikipedia.org/wiki/EarthBound
+-------------------------------------------------------------------------------
 Artist: Eddie Morton
 URLs:
 - https://en.wikipedia.org/wiki/Eddie_Morton
@@ -698,6 +723,7 @@ URLs:
 Artist: Erik Scheele
 URLs:
 - https://erikscheele.bandcamp.com/
+- http://www.erikscheele.com/
 -------------------------------------------------------------------------------
 Artist: Erin B.
 URLs:
@@ -944,6 +970,8 @@ URLs:
 - https://soundcloud.com/jamesdevermusic
 - https://twitter.com/jamzdenver
 -------------------------------------------------------------------------------
+Artist: James Ellis
+-------------------------------------------------------------------------------
 Artist: James Roach
 URLs:
 - https://hames.bandcamp.com/
@@ -968,6 +996,10 @@ URLs:
 Artist: JNJ
 -------------------------------------------------------------------------------
 Artist: Joe Griffith
+-------------------------------------------------------------------------------
+Artist: Joe Morley
+-------------------------------------------------------------------------------
+Artist: Joe Teague
 -------------------------------------------------------------------------------
 Artist: Joe Ouellet
 URLs:
@@ -1483,6 +1515,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Naruto
 URLs: https://en.wikipedia.org/wiki/Naruto
+-------------------------------------------------------------------------------
+Artist: Nat Wesley
+URLs: https://natbird.bandcamp.com/
 -------------------------------------------------------------------------------
 Artist: Nate Tronerud
 URLs:
@@ -2053,6 +2088,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: slitherbot
 -------------------------------------------------------------------------------
+Artist: slogbait
+Alias: Seth Massey
+-------------------------------------------------------------------------------
 Artist: SmashCooper
 URLs:
 - https://smash-cooper.tumblr.com/
@@ -2118,6 +2156,8 @@ URLs:
 Artist: Star-nomad
 URLs:
 - https://www.instagram.com/star_n0mad/
+-------------------------------------------------------------------------------
+Artist: stellamorphine
 -------------------------------------------------------------------------------
 Artist: Steve Everson
 -------------------------------------------------------------------------------
@@ -2276,6 +2316,8 @@ Artist: Thomas Ibarra
 URLs:
 - https://soundcloud.com/sparksd2145
 -------------------------------------------------------------------------------
+Artist: Timothy Reed
+-------------------------------------------------------------------------------
 Artist: Tipsy
 URLs:
 - https://sometipsygnostalgic.tumblr.com/
@@ -2297,6 +2339,9 @@ Artist: Toris Crow
 URLs:
 - https://toriscrow.bandcamp.com/
 - https://ukulelecrow.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Toto
+URLs: https://en.wikipedia.org/wiki/Toto_(band)
 -------------------------------------------------------------------------------
 Artist: Touhou Project
 URLs: https://en.wikipedia.org/wiki/Touhou_Project
@@ -2474,9 +2519,7 @@ URLs:
 - https://yellowstockings.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Yishan Mai
-URLs:
-- https://catboss.bandcamp.com/
-- https://soundcloud.com/catbossstudio
+Alias: Catboss
 -------------------------------------------------------------------------------
 Artist: Yorick Cobb
 -------------------------------------------------------------------------------

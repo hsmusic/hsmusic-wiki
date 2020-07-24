@@ -5,11 +5,11 @@ Date: March 14, 2011
 FG: #00a4a4
 URLs:
 - https://homestuck.bandcamp.com/album/alterniabound-with-alternia
-- https://www.youtube.com/playlist?list=PL6BD21F562EDA9E09
+- https://www.youtube.com/playlist?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     Bad news for everyone.
-    This album is not here to explode your pants off. This album is not one that is going to give you a hemmorage from headbanging too much. If you want hard-rocking, excellently mastered, brainkilling tracks, look no further than Tensei's <a href="album/strife/index.html">STRIFE!</a> album. It should wet your whistle for heavy metal, and possibly any other multitude of wind instruments you present to its sweaty, testosterone-laden spray.
+    This album is not here to explode your pants off. This album is not one that is going to give you a hemmorage from headbanging too much. If you want hard-rocking, excellently mastered, brainkilling tracks, look no further than Tensei's [[album:Strife!]] album. It should wet your whistle for heavy metal, and possibly any other multitude of wind instruments you present to its sweaty, testosterone-laden spray.
     Instead.
     This album is for a special group of people. The people that open the AlterniaBound flashes in one tab and then leave them on repeat, just so they can listen to Horschestra 4000 times. These are the people that complained incessantly when Eridan's theme wasn't on an album, even though it hadn't even existed in the comic yet. Some of these people have named their children after MSPA characters.
     You terrible, wonderful people. This album is your fault.
@@ -21,8 +21,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Arisen Anew
 Artist: Tensei
+Duration: 2:55
 References: psych0ruins, My Little Pony Theme
-URLs: https://homestuck.bandcamp.com/track/arisen-anew-2
+URLs:
+- https://homestuck.bandcamp.com/track/arisen-anew-2
+- https://youtu.be/C0BYVRNGoEo?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Tensei:</i>
     (Aradia's Homecoming)
@@ -37,12 +40,15 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Karkat's Theme
 Artist: Toby Fox
+Duration: 1:58
 References: Crustacean
-URLs: https://homestuck.bandcamp.com/track/karkats-theme-2
+URLs:
+- https://homestuck.bandcamp.com/track/karkats-theme-2
+- https://youtu.be/8M5FxI_p5wg?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Karkat Walkabout)
-    <a href="album/alternia/index.html">Alternia</a> began when I created <a href="track/crustacean/index.html">Crustacean</a>.
+    [[album:Alternia]] began when I created [[Crustacean]].
     AlterniaBound began when Andrew asked me for a looping version of that track - Crustacean - to use in a flash. Initially this song was simply so, but after I learned more about the scope and depth of the AlterniaBound project... I decided that more of a change was in order for the track. (It was at that point that I also decided it would be cool to have some hidden tracks... leading to the early premiere of many tracks that would eventually be on Volume 6.)
     A little while ago, I finished the "final version" of this track. It's not incredibly melodic or wrenchingly dire like my usual fare, but it still remains one of my own personal favorites:
     <ul><li>It's pompous, alien, and goofy - in short, pretty accurate of Karkat and Alternia as a whole</li><li>It subtly implies that tuba is Karkat's instrument of choice, which we all know is entirely true</li><li>WHO THE FUCK LET THE ELEPHANTS IN HERE ARRRGH FUCKING GAMZEE</li></ul>
@@ -50,21 +56,27 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Trollcops
 Artist: Erik Scheele
+Duration: 2:45
 References: Under the Hat:under-the-hat
-URLs: https://homestuck.bandcamp.com/track/trollcops-2
+URLs:
+- https://homestuck.bandcamp.com/track/trollcops-2
+- https://youtu.be/agUl2xmrBuA?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Erik Scheele:</i>
     (Alternate Universe Intermission)
-    So this pretty much happened when Radiation went "yo jit make something" and I was like "okay", and then later I was like "bluuuuuuh don't know what to write", and then Radiation went "do trollcops", and I went "no that's dumb, stupid dumb, what is trollcops even", and Radiation went "DO IT JIT YOU BUTT", and I was like "NO RADIATION I HATE EVERYTHING". And then, Mellotron samples happened, and here we are. Also, it should be pointed out that in <a href="track/trollcops-radio-play/index.html">the version with vocals</a>, there's a name drop of the fan music piece that htis is based off of. Yes, it takes this long to re-use things, sometimes.
+    So this pretty much happened when Radiation went "yo jit make something" and I was like "okay", and then later I was like "bluuuuuuh don't know what to write", and then Radiation went "do trollcops", and I went "no that's dumb, stupid dumb, what is trollcops even", and Radiation went "DO IT JIT YOU BUTT", and I was like "NO RADIATION I HATE EVERYTHING". And then, Mellotron samples happened, and here we are. Also, it should be pointed out that in the version with vocals, [[Trollcops (Radio Play)]], there's a name drop of the fan music piece that htis is based off of. Yes, it takes this long to re-use things, sometimes.
     Besides that, I dunno, just enjoy it.
     <i>Toby Fox:</i>
-    Don't tell anyone, but this is actually a remix of one of Jit's old fansongs called <a href="track/under-the-hat/index.html">Under the Hat</a>, which was a battle theme for Dad. So if your heart still pines for him... his soul and pipe are contained deep within this track.
+    Don't tell anyone, but this is actually a remix of one of Jit's old fansongs called [[Under the Hat]], which was a battle theme for Dad. So if your heart still pines for him... his soul and pipe are contained deep within this track.
     So damn catchy and sleuthy.
 -------------------------------------------------------------------------------
 Track: BL1ND JUST1C3 : 1NV3ST1G4T1ON !!
 Artist: Malcolm Brown
+Duration: 2:48
 References: The Lemonsnout Turnabout, Objection! 2001, Sburban Jungle
-URLs: https://homestuck.bandcamp.com/track/bl1nd-just1c3-1nv3st1g4t1on-2
+URLs:
+- https://homestuck.bandcamp.com/track/bl1nd-just1c3-1nv3st1g4t1on-2
+- https://youtu.be/yg41u9AejSs?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Malcolm Brown:</i>
     (Terezi Investigates)
@@ -73,13 +85,16 @@ Commentary:
     I've also tried to sync in bits of the story as it happens, so you'll hear a bit of Gamzee honking in the distanec, andthe whole thing builds up to that special climax.
     HOP3 YOU L1K3 1T, 1T W4S 4 PL34SUR3 TO M4K3!
     <i>Toby Fox:</i>
-    People kept asking me for a Phoenix Wright remix of Lemonsnout Turnabout, so Malcolm creating this was essentially a miracle, especially considering he hadn't been around <a href="track/squiddidle/index.html">since Squiddles</a>.
+    People kept asking me for a Phoenix Wright remix of Lemonsnout Turnabout, so Malcolm creating this was essentially a miracle, especially considering he hadn't been around since [[Squiddidle!]].
     Thank you Malcolm. That kiss at the end? That's me kissing you.
 -------------------------------------------------------------------------------
 Track: Terezi's Theme
 Artist: Toby Fox
+Duration: 2:16
 References: The Lemonsnout Turnabout, Theme
-URLs: https://homestuck.bandcamp.com/track/terezis-theme-2
+URLs:
+- https://homestuck.bandcamp.com/track/terezis-theme-2
+- https://youtu.be/IIw4NDK7j4w?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Terezi Walkabout)
@@ -89,20 +104,26 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Dreamers and The Dead
 Artist: Thomas Ferkol
+Duration: 4:04
 References: Cuddlefish
-URLs: https://homestuck.bandcamp.com/track/dreamers-and-the-dead-2
+URLs:
+- https://homestuck.bandcamp.com/track/dreamers-and-the-dead-2
+- https://youtu.be/9PlP0RUzacQ?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Thomas Ferkol:</i>
     (World of the Afterlife)
-    A piece for the characters in the afterlife, mainly Feferi, and the general ambience of the dream bubbles. Originally, I tried a mix of various brass instruments, percussion, string orchestra, koto, and an electric bass. It didn't feel right. So I pushed that piece aside altogether and restarted with an instrumentation more reminiscent of that used in "Cuddlefish," the troll theme I made for Feferi right before I joined the music team. The intro piano was meant to feel spacey, reminiscent of <a href="track/eldritch/index.html">Eldritch</a> and <a href="track/english/index.html">English</a>, sort of bringing the listener into the afterlife. When the flute enters, I feel that this was as Feferi communicated with the Elder Gods of setting up her dream bubble. The orchestral crescendo brings us to the area deep in space where the bubbles float. From then on, we travel past several bubbles, just absorbing the scenery. The rest of the piece contains glimpses of other events within the bubbles, such as Feferi and Jade's dream chats and the shocking developments concerning the troll session's guardian code. And, of course, a major key ending for all the happy folks floating around in the afterlife.
+    A piece for the characters in the afterlife, mainly Feferi, and the general ambience of the dream bubbles. Originally, I tried a mix of various brass instruments, percussion, string orchestra, koto, and an electric bass. It didn't feel right. So I pushed that piece aside altogether and restarted with an instrumentation more reminiscent of that used in "Cuddlefish," the troll theme I made for Feferi right before I joined the music team. The intro piano was meant to feel spacey, reminiscent of [[Eldritch]] and [[English]], sort of bringing the listener into the afterlife. When the flute enters, I feel that this was as Feferi communicated with the Elder Gods of setting up her dream bubble. The orchestral crescendo brings us to the area deep in space where the bubbles float. From then on, we travel past several bubbles, just absorbing the scenery. The rest of the piece contains glimpses of other events within the bubbles, such as Feferi and Jade's dream chats and the shocking developments concerning the troll session's guardian code. And, of course, a major key ending for all the happy folks floating around in the afterlife.
     <i>Toby Fox:</i>
     Thomas is continually on point with his orchestral stuff. He actually made a bunch of awesome troll-related tracks that are on his tindeck: <a href="http://tindeck.com/users/EidolonOrpheus">(dead link)</a>
     Go check out the track "Cuddlefish" - he actually uses a minor version of the melody from that at 2:50. Dude is a talent.
 -------------------------------------------------------------------------------
 Track: Vriska's Theme
 Artist: Toby Fox
+Duration: 1:43
 References: Spider's Claw, Theme
-URLs: https://homestuck.bandcamp.com/track/vriskas-theme-2
+URLs:
+- https://homestuck.bandcamp.com/track/vriskas-theme-2
+- https://youtu.be/LkJHtDiNowk?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Vriska Walkabout)
@@ -114,8 +135,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: She's a Sp8der
 Artist: Tensei
+Duration: 3:05
 References: Spider's Claw, MeGaLoVania, Eridan's Theme, Crustacean
-URLs: https://homestuck.bandcamp.com/track/shes-a-sp8der-2
+URLs:
+- https://homestuck.bandcamp.com/track/shes-a-sp8der-2
+- https://youtu.be/lqMGkbnWOQU?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Tensei:</i>
     (Adventure on the High Seas)
@@ -126,13 +150,20 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: FIDUSPAWN, GO!
 Artist: David Ko
+Duration: 1:43
 Contributors: Toby Fox (arrangement), The_Eighth_Bit (soundfont)
-URLs: https://homestuck.bandcamp.com/track/fiduspawn-go-2
+URLs:
+- https://homestuck.bandcamp.com/track/fiduspawn-go-2
+- https://youtu.be/fCBr-v4JswY?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 References:
-- dESPERADO ROCKET CHAIRS,
+- Showtime (Imp Strife Mix)
 - Pumpkin Cravings
 - Harlequin
-- Sunsetter
+- Sunslammer
+- dESPERADO ROCKET CHAIRS,
+- MeGaLoVania
+- Vagabounce
+- Beatdown (Strider Style)
 Commentary:
     <i>David Ko:</i>
     (Tavros' Battle Theme)
@@ -145,18 +176,24 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Darling Kanaya
 Artist: Toby Fox
-URLs: https://homestuck.bandcamp.com/track/darling-kanaya-2
+Duration: 2:07
+URLs:
+- https://homestuck.bandcamp.com/track/darling-kanaya-2
+- https://youtu.be/54YThzEi4bk?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 References: Virgin Orb
 Commentary:
     <i>Toby Fox:</i>
     (Kanaya Walkabout)
     I didn't call it "Kanaya's Theme" because I didn't think that it was stylish enough for her. I originally wrote it as the theme just for walking around her house, but I think it turned out to fit her really well as a character despite my own doubts.
-    Like Terezi's theme, "Darling Kanaya" isn't a remix of her Alternia track (<a href="track/virgin-orb/index.html">Virgin Orb</a>), but it contains some similar stuff. There are heavily vibrato'd strings... wavering, luscious 7th chords... melodic piano... lots of arpeggios... and a general uplifting feeling of satisfying, calm emotion. She is one of the very few characters in Hivebent that I would categorize as "sane" by human standards, and thus actually one of my favorite trolls. And despite the semi-low quality of the instrumentation, this is one of my favorite tracks by myself.
+    Like Terezi's theme, "Darling Kanaya" isn't a remix of her Alternia track ([[Virgin Orb]]), but it contains some similar stuff. There are heavily vibrato'd strings... wavering, luscious 7th chords... melodic piano... lots of arpeggios... and a general uplifting feeling of satisfying, calm emotion. She is one of the very few characters in Hivebent that I would categorize as "sane" by human standards, and thus actually one of my favorite trolls. And despite the semi-low quality of the instrumentation, this is one of my favorite tracks by myself.
     It's all kind of ghostly and heartfelt, like a sad look out the window with a romance novel in your lap, and then a knowing, welcoming smile. I think that makes sense considering she's an undead vampire now! Or not.
 -------------------------------------------------------------------------------
 Track: Requiem of Sunshine and Rainbows
 Artist: Paige Turner
-URLs: https://homestuck.bandcamp.com/track/requiem-of-sunshine-and-rainbows-2
+Duration: 2:44
+URLs:
+- https://homestuck.bandcamp.com/track/requiem-of-sunshine-and-rainbows-2
+- https://youtu.be/erj2UQjMlhs?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Paige Turner:</i>
     (Rainbow Drinker Kanaya)
@@ -170,8 +207,11 @@ Commentary:
 Track: Eridan's Theme
 Artist: Toby Fox
 Contributors: The_Eighth_Bit (soundfont)
+Duration: 2:41
 References: Catchyegrabber (Skipper Plumbthroat's Song)
-URLs: https://homestuck.bandcamp.com/track/eridans-theme-2
+URLs:
+- https://homestuck.bandcamp.com/track/eridans-theme-2
+- https://youtu.be/mFLsoipuscM?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>David Ko:</i>
     (Eridan Walkabout)
@@ -192,18 +232,24 @@ Commentary:
 Track: Nautical Nightmare
 Artist: Toby Fox
 Contributors: The_Eighth_Bit (soundfont)
-URLs: https://homestuck.bandcamp.com/track/nautical-nightmare-2
+Duration: 1:50
+URLs:
+- https://homestuck.bandcamp.com/track/nautical-nightmare-2
+- https://youtu.be/K5aZ0PdrT3U?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Eridan Boss Battle)
     Originally Nautical Nightmare was an orchestral piece for Rose's Denizen.* I wasn't completely satisfied with the end result so it was ultimately scrapped, but the melody and chords kept dancing in my head. MANY months later I discovered the Ultimate Megadrive soundfont by The_Eighth_Bit and I decided to remake it as a boss theme for Eridan. Basically everything about the song changed - the only thing that remains is the main melody and chords.
     It's not a really overwhelming track because Eridan is a bit of a joke, but I'm pretty happy with it. The bassline and solo section are some of the sassiest I've ever written, the melody is still really catchy, and the action is persistent. Just listen to that thing a couple times and I'll be damned if it doesn't get stuck in your head.
-    *I have since done something better called <a href="track/earthsea-borealis/index.html">Earthsea Borealis</a>. Maybe you will hear it someday.
+    *I have since done something better called [[Earthsea Borealis]]. Maybe you will hear it someday.
 -------------------------------------------------------------------------------
 Track: Nepeta's Theme
 Artist: Toby Fox
+Duration: 1:32
 References: Walls Covered in Blood
-URLs: https://homestuck.bandcamp.com/track/nepetas-theme-2
+URLs:
+- https://homestuck.bandcamp.com/track/nepetas-theme-2
+- https://youtu.be/Q7ZUxyLyIao?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Nepeta Walkabout)
@@ -214,9 +260,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Horschestra STRONG Version
 Artist: Alexander Rosetti
+Duration: 3:23
 References: Horschestra, Walls Covered in Blood
 Directory: horschestra-STRONG-version
-URLs: https://homestuck.bandcamp.com/track/horschestra-strong-version-2
+URLs:
+- https://homestuck.bandcamp.com/track/horschestra-strong-version-2
+- https://youtu.be/HHlaLTjv4So?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Alexander Rosetti:</i>
     (Equius Walkabout)
@@ -231,8 +280,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Blackest Heart (With Honks)
 Artist: Toby Fox
+Duration: 2:30
 References: Blackest Heart, La Cucaracha, First Call, Toreador Song
-URLs: https://homestuck.bandcamp.com/track/blackest-heart-with-honks-2
+URLs:
+- https://homestuck.bandcamp.com/track/blackest-heart-with-honks-2
+- https://youtu.be/-lJrvGkxPMI?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Prelude to a Killer Clown)
@@ -243,7 +295,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Midnight Calliope
 Artist: Mark Hadley
-URLs: https://homestuck.bandcamp.com/track/midnight-calliope-2
+Duration: 1:50
+URLs:
+- https://homestuck.bandcamp.com/track/midnight-calliope-2
+- https://youtu.be/owRKKJN5PkE?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Mark Hadley:</i>
     (Gamzee the Killer)
@@ -254,8 +309,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Chaotic Strength
 Artist: Thomas Ferkol
+Duration: 2:34
 References: Chaotic Frenzy, The Number of the Beast, The Riddle Wants To Be
-URLs: https://homestuck.bandcamp.com/track/chaotic-strength-2
+URLs:
+- https://homestuck.bandcamp.com/track/chaotic-strength-2
+- https://youtu.be/GUMeMEbJB0M?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Thomas Ferkol:</i>
     HOW TO WRITE MUSIC<br>STEP 1: WRITE STRONG GUITAR<br>STEP 2: WRITE STRONG DRUMS<br>STEP 3: YELL INTO THE MICROPHONE<br>STEP 4: FLEX<br>STEP 5: Get a towel because GOD DAMN so much sweat.
@@ -267,7 +325,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Trollian Standoff
 Artist: Tensei
-URLs: https://homestuck.bandcamp.com/track/trollian-standoff-2
+Duration: 1:14
+URLs:
+- https://homestuck.bandcamp.com/track/trollian-standoff-2
+- https://youtu.be/wbYnGg_QKt4?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Tensei:</i>
     (Triple Showdown Combo)
@@ -279,7 +340,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Rex Duodecim Angelus
 Artist: Malcolm Brown
-URLs: https://homestuck.bandcamp.com/track/rex-duodecim-angelus-2
+Duration: 6:39
+URLs:
+- https://homestuck.bandcamp.com/track/rex-duodecim-angelus-2
+- https://youtu.be/hn6Yl371mIc?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 References:
 - Crustacean
 - The Lemonsnout Turnabout
@@ -298,15 +362,15 @@ Commentary:
     This was designed as music for the EPIC yet only hinted at battle between the Black King and the Trolls at the end of their game. Rather than making it a fast-paced action-centric doom-fest, it ended upmore like some kind of apocalyptic dance number: The Trolls, despite going against fairly tough odds, all banded together under Karkat's leadership into a well oiled, tactical nuclear force that managed to overcome the Black King and beat the game.
     It is, along with the unique 'Black King's theme, more or less a combination of various Troll themes arranged in order of attack. It's probably easier to just explain what's going on where:
     0:00 - We start with the black king's introduction, Aradiabots from doomed timelines teleporting in and assembling, the reckoning beginning, the Vast Glub being suppressed.
-    1:34 - At this point, the fearless leader steps into action as the first to attack (<a href="track/crustacean/index.html">Crustacean</a>). I like to think this move shreds any sense of doubt they had in Karkat as leader at this point. Karkat's theme's quite fun to work with, so I enjoyed this bit.
-    2:03 - Terezi made sense as a logical follow to Karkat (<a href="track/the-lemonsnout-turnabout.html">The Lemonsnout Turnabout</a>). It starts off quite simple yet more organised than Karkat's section, representing Terezi's initial appearance as a fairly harmless, blind Troll girl, before building up to her surprise attack. I'd already mucked about with Terezi's theme in my other track, but this one I think is a bit more faithful to the original.
+    1:34 - At this point, the fearless leader steps into action as the first to attack ([[Crustacean]]). I like to think this move shreds any sense of doubt they had in Karkat as leader at this point. Karkat's theme's quite fun to work with, so I enjoyed this bit.
+    2:03 - Terezi made sense as a logical follow to Karkat ([[The Lemonsnout Turnabout]]). It starts off quite simple yet more organised than Karkat's section, representing Terezi's initial appearance as a fairly harmless, blind Troll girl, before building up to her surprise attack. I'd already mucked about with Terezi's theme in my other track, but this one I think is a bit more faithful to the original.
     2:34 - The King responds.
-    2:56 - Tavros in his Jet Car (<a href="track/desperado-rocket-chairs/index.html">Desperado Rocket Chairs</a>). There's a hint of tragedy to Tavros' character that I think comes through here - His melody kinda builds up but just as he's about to act it kinda fades back down. Ah well... The world's smallest violin is playing the intro trumpet section to Tavros' original theme here.
-    3:15 - Kanaya, being quite graceful and yet incredibly deadly (<a href="track/virgin-orb/index.html">Virgin Orb</a>). She pretty much stops the music and focuses all attention on her - Something she'll do again in the future. I really like the opening of Kanaya's theme, so this is one of my fave bits. The chainsaw is also quite a fun touch.
-    3:34 - Equius decides to step in and show people how it's done with the might and efficiency only a highb100d could bring, and indeed he probably would, but Nepeta keeps being silly and sneaking in some attacks (<a href="track/horschestra/index.html">Horschestra</a> &amp; <a href="track/walls-covered-in-blood/index.html">Walls Covered in Blood</a>). It was a bit of a faff combining these two, but I liked the idea of Equius' almost military like anthem being interrupted by Nepeta's calypso funkiness.
-    3:53 - Feferi and Eridan move in (<a href="track/keepers/index.html">Keepers</a>). These two have worked together before, and provide a potent force against the King.
+    2:56 - Tavros in his Jet Car ([[dESPERADO ROCKET CHAIRS,]]). There's a hint of tragedy to Tavros' character that I think comes through here - His melody kinda builds up but just as he's about to act it kinda fades back down. Ah well... The world's smallest violin is playing the intro trumpet section to Tavros' original theme here.
+    3:15 - Kanaya, being quite graceful and yet incredibly deadly ([[Virgin Orb]]). She pretty much stops the music and focuses all attention on her - Something she'll do again in the future. I really like the opening of Kanaya's theme, so this is one of my fave bits. The chainsaw is also quite a fun touch.
+    3:34 - Equius decides to step in and show people how it's done with the might and efficiency only a highb100d could bring, and indeed he probably would, but Nepeta keeps being silly and sneaking in some attacks ([[Horschestra]] &amp; [[Walls Covered in Blood]]). It was a bit of a faff combining these two, but I liked the idea of Equius' almost military like anthem being interrupted by Nepeta's calypso funkiness.
+    3:53 - Feferi and Eridan move in ([[Keepers]]). These two have worked together before, and provide a potent force against the King.
     4:13 - The King responds once again.
-    4:36 - Sollux and Aradia decide to now get involved having kept the King's psychic powers in check (<a href="track/the-la2t-frontiier/index.html">The La2t Frontiier</a> &amp; <a href="track/psych0ruins/index.html">psych0ruins</a>). I took more or less the openings of both themes and tried gluing them together. There's also an additional bit influenced by Aradia's in the 2nd half.
+    4:36 - Sollux and Aradia decide to now get involved having kept the King's psychic powers in check ([[The La2t Frontiier]] &amp; [[psych0ruins]]). I took more or less the openings of both themes and tried gluing them together. There's also an additional bit influenced by Aradia's in the 2nd half.
     4:56 - Based on Karkat's description on what Gamzee's contribution to the fight was. I figured having Gamzee 'parody' the King's theme worked better here. The music doesn't even really imply what his attack was, only that it built up, was unleashed, and surprised the hell out of everyone...
     5:14 - The King's nearly defeated and getting desperate.
     5:39 - Vriska steps up, and finishes it. With one impossi8ly lucky roll.
@@ -316,8 +380,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Killed by BR8K Spider!!!!!!!!
 Artist: Toby Fox
+Duration: 4:20
 References: Spider's Claw
-URLs: https://homestuck.bandcamp.com/track/killed-by-br8k-spider-2
+URLs:
+- https://homestuck.bandcamp.com/track/killed-by-br8k-spider-2
+- https://youtu.be/KpnY41JNVbo?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (God-Vriska's Finest Hour)
@@ -325,8 +392,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Alternia
 Artist: Seth Peelle
+Duration: 3:57
 References: Theme
-URLs: https://homestuck.bandcamp.com/track/alternia-2
+URLs:
+- https://homestuck.bandcamp.com/track/alternia-2
+- https://youtu.be/ouwick_Ii2c?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Seth Peelle:</i>
     (Hivebent)
@@ -340,8 +410,11 @@ Commentary:
 Track: Trollcops (Radio Play)
 Artist: Erik Scheele
 Contributors: Nick Smalley (words)
+Duration: 2:59
 References: Trollcops
-URLs: https://homestuck.bandcamp.com/track/trollcops-radio-play-2
+URLs:
+- https://homestuck.bandcamp.com/track/trollcops-radio-play-2
+- https://youtu.be/fGQY8jLZa5w?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Lyrics:
     Alternia: One of the roughest beats in the universe. It's a tough job to keep it safe, and an even tougher job to find people who'll keep it that way. She's a gal with a knack for justice and has the force under her thumb. He's a guy who just joined the APD and finding his bearings is about as easy as feeding a Gyclops his cough syrup. And together, they are Trollcops.
     It isn't going to be easy teaching the rookie the ropes of the force, but she's the only one who can do it without getting him killed. So far the biggest problem they've hit is striking the right chord with each other. It seems like whenever they're partners, there isn't a moment when they're not both at each other's throats. It's gonna take a miracle to find a middle road with this pair, and keep their antics under the hat.
@@ -355,7 +428,10 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Catapult Capuchin
 Artist: Toby Fox
-URLs: https://homestuck.bandcamp.com/track/catapult-capuchin-2
+Duration: 1:58
+URLs:
+- https://homestuck.bandcamp.com/track/catapult-capuchin-2
+- https://youtu.be/zOLsLiqSAEo?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (I KILL ANIMALS!!!)
@@ -366,36 +442,45 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Science Seahorse
 Artist: Toby Fox
-URLs: https://homestuck.bandcamp.com/track/science-seahorse-2
+Duration: 3:06
+URLs:
+- https://homestuck.bandcamp.com/track/science-seahorse-2
+- https://youtu.be/9FsGWsS91r8?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (PISCES PRINCESS)
     Another make-believe Mega Man X Track using daveeeey's X2 samples.
     Ironically, despite the awesome, Eri-licious name, this is kind of a combination Feferi and Eridan track. It starts out with some mystical, deep-sea vibraphones, rolling cymbals like waves washing through the piece... then plays some more beach-like music, which has just a hint of brassy regality to it. The solo is a bit emotional, kinda back and forth between hapyy and tempestuous, but that's how it is between moirails.
     Eridan is DEFINITELY the boss of this level.
-    Shame that Fef doesn't get a really Feffy track to herself on this album. Poor Fef. BUT if you ARE looking for that and don't mind skipping over somewhere else, go back to the Squiddles Album and check out <a href="track/carefree-princess-berryboo/index.html">Carefree Princess Berryboo</a> by Alexander Rosetti. I think it fits her perfectly, especially as far as AlterniaBound walkabout themes go... enjoy it, it's cute!
+    Shame that Fef doesn't get a really Feffy track to herself on this album. Poor Fef. BUT if you ARE looking for that and don't mind skipping over somewhere else, go back to the Squiddles Album and check out [[Carefree Princess Berryboo]] by Alexander Rosetti. I think it fits her perfectly, especially as far as AlterniaBound walkabout themes go... enjoy it, it's cute!
     I sadly don't remember who suggested the name "Science Seahorse"... someone cool. You're cool, person! Smile.
 -------------------------------------------------------------------------------
 Track: A Fairy Battle
 Artist: Toby Fox
-URLs: https://homestuck.bandcamp.com/track/a-fairy-battle-2
+Duration: 1:37
+URLs:
+- https://homestuck.bandcamp.com/track/a-fairy-battle-2
+- https://youtu.be/LHr417f4Y8U?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     (Kanaya Battle Theme?)
     This piece is made in PXTONE, so it might sound a bit like one of Buzinkai's tracks.
-    I wanted to make a battle theme for Kanaya. I think it does fit her in a really weird way... although it doesn't really line up with the motifs presented in, say, Darling Kanaya and Virgin Orb. I can totally imagine her revving up that chainsaw and taking down some imps to this, though. Especially with the delicate synthesized bell so prominent, it does sound kinda delicate... So really, it's your choice what this song is supposed to be. Enjoy your freedom.
+    I wanted to make a battle theme for Kanaya. I think it does fit her in a really weird way... although it doesn't really line up with the motifs presented in, say, [[Darling Kanaya]] and [[Virgin Orb]]. I can totally imagine her revving up that chainsaw and taking down some imps to this, though. Especially with the delicate synthesized bell so prominent, it does sound kinda delicate... So really, it's your choice what this song is supposed to be. Enjoy your freedom.
     Oh, and also enjoy that really loud bass. Pump that shit in your cars.
 -------------------------------------------------------------------------------
 Track: The Blind Prophet
 Artist: Toby Fox
+Duration: 3:00
 Contributors: hank hill & cyclops (everything)
-References
+References:
 - The La2t Frontiier
 - Yahoos and Triangles
 - MeGaLoVania
-- Course
+- Courser
 - Guile's Theme
-URLs: https://homestuck.bandcamp.com/track/the-blind-prophet-2
+URLs:
+- https://homestuck.bandcamp.com/track/the-blind-prophet-2
+- https://youtu.be/nClhUae7DMs?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>cyclops???:</i>
     my thoughts:
@@ -407,8 +492,11 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: AlterniaBound
 Artist: Toby Fox
+Duration: 0:20
 References: Theme
-URLs: https://homestuck.bandcamp.com/track/alterniabound-2
+URLs:
+- https://homestuck.bandcamp.com/track/alterniabound-2
+- https://youtu.be/FD5tJvMtzDo?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     These aren't "true" pieces... just jingles based off of "Theme". But I hope that for all their insignificance, they really instill the idea of a game inside of you.
@@ -416,16 +504,22 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: You Won A Combat
 Artist: Toby Fox
+Duration: 0:08
 References: Theme
-URLs: https://homestuck.bandcamp.com/track/you-won-a-combat-2
+URLs:
+- https://homestuck.bandcamp.com/track/you-won-a-combat-2
+- https://youtu.be/heNdjTRVf5U?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     When you win a battle on Alternia, this song plays. No one knows who's singing.
 -------------------------------------------------------------------------------
 Track: Rest A While
 Artist: Toby Fox
+Duration: 0:09
 References: Theme
-URLs: https://homestuck.bandcamp.com/track/rest-a-while-2
+URLs:
+- https://homestuck.bandcamp.com/track/rest-a-while-2
+- https://youtu.be/Iq7clpsMTmA?list=PLnVpmehyaOFZWO9QOZmD6A3TIK0wZ6xE2
 Commentary:
     <i>Toby Fox:</i>
     And with that.... good night.

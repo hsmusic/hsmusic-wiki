@@ -11,11 +11,15 @@ Track: ~~SIDE 1~~
 Artist: Toby Fox
 References: English
 Track Art: none
+Duration: 0:08
 Directory: side-1-universe-b
-URLs: https://homestuck.bandcamp.com/track/universe-b-side-1
+URLs:
+- https://homestuck.bandcamp.com/track/universe-b-side-1
+- https://youtu.be/ScD8J0igQwU?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Green Ghost
 Artist: Monobrow
+Duration: 5:58
 References:
 - Doctor
 - Moonsong
@@ -23,7 +27,10 @@ References:
 - A Bell is Tolling
 - Terra's Theme
 Track Art: Koba
-URLs: https://homestuck.bandcamp.com/track/green-ghost-2
+URLs:
+- https://homestuck.bandcamp.com/track/green-ghost-2
+- https://youtu.be/nx2CqNp16IA?list=PLD729D6C2BFB4844C
+- https://soundcloud.com/robobrow/green_ghost
 Commentary:
     <i>Monobrow:</i>
     So my song, Cosmic Surgeon?  People told me to enter a contest that came up right around the time I finished it.  It was for the Homestuck Fan Album, which actually turned out to be 2 albums lol.  So yup, I entered, and I was one of the winners, in fact it’s actually the first track (track 1 is an opener)... I’m kinda astonished by that today, but I guess it fits!
@@ -32,15 +39,29 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Orchid Horror
 Artist: David DeCou
-References: Chorale for Jaspers
 Track Art: Sukka
-URLs: https://homestuck.bandcamp.com/track/orchid-horror-2
+Duration: 4:07
+References: Chorale for Jaspers
+URLs:
+- https://homestuck.bandcamp.com/track/orchid-horror-2
+- https://youtu.be/ZOVhMJgdIX0?list=PLD729D6C2BFB4844C
+Commentary:
+    <i>David DeCou:</i>
+    (<a href="https://www.youtube.com/watch?v=Rf5X2PbLNfQ&lc=UgwWhsMYgXXX5g_F4Yl4AaABAg">YouTube</a>)
+    <blockquote>Probably one of my favorite songs on the album.<br>I'm curious, what songs are remixed in this?</blockquote>
+    Thanks! The first five notes are from Chorale for Jaspers, and I used that twice in the song. I also used the chord progression that's often used in Sburban Jungle in the middle section with the drums, organ, piano and strings. (actually, a lot of homestuck songs) but the rest of it is original I'm pretty sure.
+    (<a href="https://www.youtube.com/watch?v=Rf5X2PbLNfQ&lc=UgzZnx3ouFO3y5zD49B4AaABAg">YouTube</a>)
+    <blockquote>I thought I heard Black Hole/Green Sun, and also, if you squint your ears just right, it sounds a bit like The Dangerous Symphony (not a Homestuck song)</blockquote>
+    Black Rose/Green Sun is a great song. I did use the same sort of chord progression that's in there. It shows up in a lot of Homestuck songs though I think.
 -------------------------------------------------------------------------------
 Track: Red Disc
 Artist: Nathan H.
-References: Atomyk Ebonpyre
 Track Art: Aurum
-URLs: https://homestuck.bandcamp.com/track/red-disc-2
+Duration: 2:52
+References: Atomyk Ebonpyre
+URLs:
+- https://homestuck.bandcamp.com/track/red-disc-2
+- https://youtu.be/Y4lJcMpYGZk?list=PLD729D6C2BFB4844C
 Commentary:
     <i>Nathan H.:</i>
     This was the first entry I made for the contest, and likely the one that took me the longest to complete; probably because I was running into walls during transitions while trying to keep whole song congruent. Nonetheless, I think it turned out great. I had a battle between Hephaestus and Dave in mind as I wrote the piece, and took inspiration for it from the first few boss fights in the game Dark Souls.
@@ -48,9 +69,12 @@ Commentary:
 Track: Blue Atom
 Artist: David Ellis
 Contributors: Malik Refaat (alto saxophone)
-References: The Beginning of Something Really Excellent
 Track Art: Petra K.
-URLs: https://homestuck.bandcamp.com/track/blue-atom-2
+Duration: 4:46
+References: The Beginning of Something Really Excellent
+URLs:
+- https://homestuck.bandcamp.com/track/blue-atom-2
+- https://youtu.be/QrB8PrwBIY0?list=PLD729D6C2BFB4844C
 Commentary:
     <i>David Ellis:</i>
     When I started writing the pieces for the contest I knew I wanted one of them to be based around a theme that already existed. Running through a few ideas I landed on doing a kind of jazzy shuffle piece around the main theme from ‘The Beginning of Something Really Excellent’. As soon as I hit the first chord with the Rhodes piano it became smooth. The writing process was really quick and the piece was almost completely sketched out on the keyboard in one go. As the piece was intended for Jade - given the use of the earlier theme - I added in a little bass solo.
@@ -59,14 +83,20 @@ Commentary:
 Track: ~~SIDE 2~~
 Artist: Toby Fox
 Track Art: none
+Duration: 0:13
 References: ~~SIDE 1~~:side-1-universe-b
 Directory: side-2-universe-b
-URLs: https://homestuck.bandcamp.com/track/universe-b-side-2
+URLs:
+- https://homestuck.bandcamp.com/track/universe-b-side-2
+- https://youtu.be/fhaFzwEZ-VI?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Cyan Beast
 Artist: David Ellis
 Track Art: PaperArtichokes
-URLs: https://homestuck.bandcamp.com/track/cyan-beast-2
+Duration: 3:44
+URLs:
+- https://homestuck.bandcamp.com/track/cyan-beast-2
+- https://youtu.be/qhP_QTvAeQg?list=PLD729D6C2BFB4844C
 Commentary:
     <i>David Ellis:</i>
     This piece started as an offshoot of a song that was very loosely based on John and Jade’s three year voyage between the two windows. I felt that the theme that became the chorus to this piece needed to be at a higher tempo than the rest of that song so I took it out and based this tune around it instead. It was originally titled ‘Heir of the Dog’ as I was still thinking it could be either a Jade or a John piece at the time and wasn’t certain who I’d end up submitting it for (also because terrible puns).
@@ -75,9 +105,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Pink Cat
 Artist: Ryan Ames
-References: Chorale for Jaspers, Aggrieve, Carefree Action
 Track Art: MissNK
-URLs: https://homestuck.bandcamp.com/track/pink-cat-2
+Duration: 3:52
+References: Chorale for Jaspers, Aggrieve, Carefree Action
+URLs:
+- https://homestuck.bandcamp.com/track/pink-cat-2
+- https://youtu.be/mF7WdQcSkHI?list=PLD729D6C2BFB4844C
 Commentary:
     <i>Ryan Ames:</i>
     I don’t want to clog up the audio post so I figured I’d make a separate post for my reasoning behind the different parts of the song!
@@ -96,12 +129,18 @@ Commentary:
 Track: Orange Hat
 Artist: Plumegeist
 Track Art: Meggie Fox
-URLs: https://homestuck.bandcamp.com/track/orange-hat-2
+Duration: 2:36
+URLs:
+- https://homestuck.bandcamp.com/track/orange-hat-2
+- https://youtu.be/sMkNFjy8xcU?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Emerald Terror
 Artist: Elisa McCabe
 Track Art: Elisa McCabe
-URLs: https://homestuck.bandcamp.com/track/emerald-terror-2
+Duration: 2:31
+URLs:
+- https://homestuck.bandcamp.com/track/emerald-terror-2
+- https://youtu.be/CWDbNoGgGyQ?list=PLD729D6C2BFB4844C
 Commentary:
     <i>Elisa McCabe:</i>
     First of all I have this unreasonably intense love of Jake that I can’t really entirely explain. Uh. So I definitely wanted to do a song for him. The main idea I started out with was that I’d do a song with two parts, the first part representing Grandpa Harley, then I’d have it morph into the second part, which would be for post-scratch Jake. I first thought of having a literal record scratch but man that sounded dumb :] I referred to the first part, to myself, as Grandpa Harley, and the second part as Hellmurder Island.
@@ -112,13 +151,20 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ~~ADDITIONAL MAYHEM~~
 Artist: Toby Fox
+Duration: 0:18
+References: Jadesprite
 Directory: additional-mayhem-universe-b
-URLs: https://homestuck.bandcamp.com/track/universe-b-additional-mayhem
+URLs:
+- https://homestuck.bandcamp.com/track/universe-b-additional-mayhem
+- https://youtu.be/GetfDAZKshg?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Squiddle Song
 Artist: Maya Kern
 Track Art: Maya Kern
-URLs: https://homestuck.bandcamp.com/track/squiddle-song-2
+Duration: 2:27
+URLs:
+- https://homestuck.bandcamp.com/track/squiddle-song-2
+- https://youtu.be/eWNMf4-ZMOQ?list=PLD729D6C2BFB4844C
 Lyrics:
     C G6 Am F
     wake up in the morning<br>there's a brand new day ahead<br>the sun is bright and the clouds smile down<br>and all your friends are dead
@@ -144,85 +190,133 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Pendulum
 Artist: Shandy
-References: Sburban Jungle
 Track Art: Rinatan
-URLs: https://homestuck.bandcamp.com/track/pendulum-2
+Duration: 3:16
+References: Sburban Jungle
+URLs:
+- https://homestuck.bandcamp.com/track/pendulum-2
+- https://youtu.be/Mv0zF9BRfOI?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Pale Rapture
 Artist: The Black Curtain
 Track Art: The-Everlasting-Ash
-URLs: https://homestuck.bandcamp.com/track/pale-rapture-2
+Duration: 4:06
+URLs:
+- https://homestuck.bandcamp.com/track/pale-rapture-2
+- https://youtu.be/iWnZhSjbPrs?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Do The Windy Thing
 Artist: Brian Schaefer
-References: Doctor, Showtime (Original Mix)
 Track Art: Emily Blundell
-URLs: https://homestuck.bandcamp.com/track/do-the-windy-thing-2
+Duration: 2:45
+References: Doctor, Showtime (Original Mix)
+URLs:
+- https://homestuck.bandcamp.com/track/do-the-windy-thing-2
+- https://youtu.be/T-CliOV5-sg?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Pilot Light
 Artist: Thomas Ibarra
-References: Flare
 Track Art: KIIPPU
-URLs: https://homestuck.bandcamp.com/track/pilot-light-2
+Duration: 2:51
+References: Flare
+URLs:
+- https://homestuck.bandcamp.com/track/pilot-light-2
+- https://youtu.be/05nEUculjxM?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Ohgodcat
 Artist: Gec
 Track Art: Shelby Cragg
-URLs: https://homestuck.bandcamp.com/track/ohgodcat-2
+Duration: 2:22
+URLs:
+- https://homestuck.bandcamp.com/track/ohgodcat-2
+- https://youtu.be/s-4SihyV1yU?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Cupcake Girl
 Artist: Liam O'Donnell
 Track Art: dodostad
-URLs: https://homestuck.bandcamp.com/track/cupcake-girl-2
+Duration: 1:21
+URLs:
+- https://homestuck.bandcamp.com/track/cupcake-girl-2
+- https://youtu.be/zvtTVc1s70A?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Phantasmic Youngsters
 Artist: Tristan Scroggins
 Track Art: Tristan Scroggins
-URLs: https://homestuck.bandcamp.com/track/phantasmic-youngsters-2
+Duration: 3:21
+URLs:
+- https://homestuck.bandcamp.com/track/phantasmic-youngsters-2
+- https://youtu.be/q4VTyykeKFw?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Battle Brotocol
 Artist: Elliot Colp
 Track Art: Elliot Colp
-URLs: https://homestuck.bandcamp.com/track/battle-brotocol-2
+Duration: 2:16
+URLs:
+- https://homestuck.bandcamp.com/track/battle-brotocol-2
+- https://youtu.be/XeHvUfWSYS4?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Bec Noir
 Artist: Will Kommor
 Track Art: Rem
+Duration: 3:17
 References:
 - Amen, Brother
-URLs: https://homestuck.bandcamp.com/track/bec-noir-2
+URLs:
+- https://homestuck.bandcamp.com/track/bec-noir-2
+- https://youtu.be/5V-RpYzKfx8?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: The Vast Glub
 Artist: Kris Flacke
 Track Art: M. Schmahl
-URLs: https://homestuck.bandcamp.com/track/the-vast-glub-2
+Duration: 4:23
+URLs:
+- https://homestuck.bandcamp.com/track/the-vast-glub-2
+- https://youtu.be/wq3tRD7hBH0?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: WV: Become the Mayor of Cans
 Artist: Solarbear
 Track Art: Derples
-URLs: https://homestuck.bandcamp.com/track/wv-become-the-mayor-of-cans-2
+Duration: 4:00
+URLs:
+- https://homestuck.bandcamp.com/track/wv-become-the-mayor-of-cans-2
+- https://youtu.be/uQ-OLuD6WAM?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: March of the Batterwitch
 Artist: Marcy Nabors
-References: Chorale for Jaspers
 Track Art: Dawn Davis
-URLs: https://homestuck.bandcamp.com/track/march-of-the-batterwitch-2
+Duration: 3:35
+References: Chorale for Jaspers
+URLs:
+- https://homestuck.bandcamp.com/track/march-of-the-batterwitch-2
+- https://youtu.be/1YyY6v87qsA?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Coolkid
 Artist: Haunter
 Track Art: Raizor
-URLs: https://homestuck.bandcamp.com/track/coolkid-2
+Duration: 4:03
+URLs:
+- https://homestuck.bandcamp.com/track/coolkid-2
+- https://youtu.be/2el6ZUkK6YE?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Clockstopper
 Artist: viaSatellite, infiniteKnife
-References: Beatdown (Strider Style), Atomyk Ebonpyre, Upward Movement (Dave Owns)
 Track Art: Kurimja
-URLs: https://homestuck.bandcamp.com/track/clockstopper-2
+Duration: 5:42
+References:
+- Beatdown (Strider Style)
+- Atomyk Ebonpyre
+- Upward Movement (Dave Owns)
+URLs:
+- https://homestuck.bandcamp.com/track/clockstopper-2
+- https://youtu.be/CO5IN60Nt9E?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Dapper Dueling
 Artist: Max Wright
 Track Art: Shillo
-URLs: https://homestuck.bandcamp.com/track/dapper-dueling-2
+Duration: 2:45
+URLs:
+- https://homestuck.bandcamp.com/track/dapper-dueling-2
+- https://youtu.be/-bnKY83hEAc?list=PLD729D6C2BFB4844C
 Commentary:
     <i>Max Wright:</i>
     Dapper Dueling was inspired originally by a Steampunk band named The Cog is Dead - after listening to the song I just linked, I tried to take down the general feel and basic instrumentation, and then work on my own from there. Instruments used in the piece are:
@@ -230,22 +324,33 @@ Commentary:
     I also gave the original Showtime strife mix a few listens for the purpose of structuring my piece - after all, it’s meant to be a Strife theme. However, pretty much all sources of inspiration were only used in the parts before the banjo solo; the rest was just me having fun with music.
     Let me also point out that it made me extremely happy to see in canon that Jake bounces from side to side before he is about to fight; it was the exact image of him I was hoping for.
     Also, while composing, I imagined Dapper Dueling to fit a fight scene similar to <a href="https://www.youtube.com/watch?v=BGCMfprPJoA">this</a>, from Sherlock Holmes (2009).
+    (<a href="https://youtu.be/clnLNQkB5O4">YouTube</a>)
+    This was my interpretation of a Jake Strife theme. After the intensity of [[Cobalt Corsair]] I wanted to make something fun to listen to, and ended up with this. Imagine Jake English bouncing nimbly from side to side, facing off to wrestle his eager opponent.
 -------------------------------------------------------------------------------
 Track: Checkmate
 Artist: David Dycus
 Track Art: Shad
-URLs: https://homestuck.bandcamp.com/track/checkmate-2
+Duration: 2:42
+URLs:
+- https://homestuck.bandcamp.com/track/checkmate-2
+- https://youtu.be/Z6IMxFibTTQ?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Vodka Mutiny
-Artist: Yishan Mai
+Artist: Catboss
 Contributors: themfish (SFX)
 Track Art: Riri
-URLs: https://homestuck.bandcamp.com/track/vodka-mutiny-2
+Duration: 3:01
+URLs:
+- https://homestuck.bandcamp.com/track/vodka-mutiny-2
+- https://youtu.be/H1Ry5qhIaOs?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Dord Waltz
 Artist: Elaine Wang
 Track Art: Merrigo
-URLs: https://homestuck.bandcamp.com/track/dord-waltz-2
+Duration: 2:09
+URLs:
+- https://homestuck.bandcamp.com/track/dord-waltz-2
+- https://youtu.be/e-fb2fUGNIE?list=PLD729D6C2BFB4844C
 Commentary:
     <i>Elaine Wang:</i>
     Fun facts:
@@ -264,14 +369,20 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Rustless Fall
 Artist: Gabe Stilez
-References: Endless Climb
 Track Art: Kadi Fedoruk
-URLs: https://homestuck.bandcamp.com/track/rustless-fall-2
+Duration: 3:32
+References: Endless Climb
+URLs:
+- https://homestuck.bandcamp.com/track/rustless-fall-2
+- https://youtu.be/YDzxho9uztI?list=PLD729D6C2BFB4844C
 -------------------------------------------------------------------------------
 Track: Pipeorgankind
 Artist: James Roach
 Track Art: VickyBit
-URLs: https://homestuck.bandcamp.com/track/pipeorgankind-2
+Duration: 5:04
+URLs:
+- https://homestuck.bandcamp.com/track/pipeorgankind-2
+- https://youtu.be/hTpm_sDz62M?list=PLD729D6C2BFB4844C
 References:
 - Showtime (Original Mix)
 - Warhammer of Zillyhoo

@@ -19,6 +19,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Hallowed Halls
 Track Art: Bea
+Duration: 3:35
 URLs: https://youtu.be/ImNmotu8-pU?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
@@ -39,8 +40,9 @@ Commentary:
     I have to say I’m pleased overall with this song, but, like any artist, it’s difficult to look back at my works. They never seem completed. Especially the Prospit half for me.
 -------------------------------------------------------------------------------
 Track: The Golden Towers
-References: The Obsidian Towers
 Track Art: Pride
+Duration: 3:22
+References: The Obsidian Towers
 URLs: https://youtu.be/wVFRxJpa2og?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
@@ -55,6 +57,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Prospit Dreamers
 Track Art: Zilleniose
+Duration: 3:19
 References: Penumbra Phantasm, Frost:frost-vol6, Doctor
 URLs: https://youtu.be/S70lGd8zpRM?list=PL9E0E46E420487203
 Commentary:
@@ -82,6 +85,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Center of Brilliance
 Track Art: Shelby Cragg
+Duration: 3:37
 URLs: https://youtu.be/514f8SzU62M?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
@@ -95,6 +99,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Darkened Streets
 Track Art: A. Smith
+Duration: 4:02
 URLs: https://youtu.be/kb_v4KCml-s?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
@@ -109,6 +114,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: The Obsidian Towers
 Track Art: Kat
+Duration: 3:19
 URLs: https://youtu.be/IdaYlKyxfx4?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
@@ -121,6 +127,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Derse Dreamers
 Track Art: Mixt
+Duration: 3:35
 References: Atomyk Ebonpyre, Endless Climb
 URLs: https://youtu.be/HpmCCuSHmng?list=PL9E0E46E420487203
 Commentary:
@@ -145,6 +152,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Core of Darkness
 Track Art: Shad
+Duration: 3:14
 URLs: https://youtu.be/VEJ3hfCnW_w?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>

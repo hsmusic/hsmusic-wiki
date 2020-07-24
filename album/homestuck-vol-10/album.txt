@@ -3,7 +3,7 @@ Cover Art: Lexxy
 Date: June 12, 2016
 URLs:
 - https://www.youtube.com/watch?v=LW9-Ov8CiRY
-- https://www.youtube.com/playlist?list=PLo6jbRGXGrth0hlSpAR9bO9_-iBqPy7Dq
+- https://www.youtube.com/playlist?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Robert J! Lake:</i> (project manager)
     This almost didn't happen.
@@ -30,7 +30,10 @@ Commentary:
 Track: Creata
 Artist: Seth Peelle
 Track Art: PJ Tush
-URLs: https://homestuck.bandcamp.com/track/creata-3
+Duration: 8:12
+URLs:
+- https://homestuck.bandcamp.com/track/creata-3
+- https://youtu.be/lXmiKt-rBjo?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 References:
 - Skaia Voyages
 - Showtime (Original Mix)
@@ -50,19 +53,22 @@ References:
 - Song of Skaia
 Commentary:
     <i>Seth Peelle:</i>
-    When I first auditioned for the Homestuck music team back in 2009, one of my two audition pieces was <a href="track/pumpkin-cravings/index.html">Pumpkin Cravings</a>, which ended upon the "Homestuck Vol. 5" album of the following year (and was subsequently orchestrated by the illustrious Alexander Rosetti into <a href="track/this-pumpkin/index.html">THIS Pumpkin</a> on THIS Album). The other piece was a short electronic-sounding demo entitled "Skaia Voyages" that I based on the <a href="track/sburban-jungle/index.html">Sburban Jungle</a> and <a href="track/skies-of-skaia/index.html">Skies of Skaia</a> themes, inspired by the purposefully vague notion of the Kids' "ascension" recently introduced in the comic at that time. The demo never ended up going anywhere in that form, but its musical ideas stuck in my head, growing and evolving in my mindscape over the years into something much grander than what I had originally envisioned. It grew additional references to <a href="track/revelawesome/index.html">Revelawesome</a> and the Kids' themes, grew a full orchestra, grew a massive choir and epic sci-fi noises of indeterminate nature...
+    When I first auditioned for the Homestuck music team back in 2009, one of my two audition pieces was [[Pumpkin Cravings]], which ended upon the "Homestuck Vol. 5" album of the following year (and was subsequently orchestrated by the illustrious Alexander Rosetti into [[THIS Pumpkin]] on THIS Album). The other piece was a short electronic-sounding demo entitled "Skaia Voyages" that I based on the [[Sburban Jungle]] and [[Skies of Skaia]] themes, inspired by the purposefully vague notion of the Kids' "ascension" recently introduced in the comic at that time. The demo never ended up going anywhere in that form, but its musical ideas stuck in my head, growing and evolving in my mindscape over the years into something much grander than what I had originally envisioned. It grew additional references to [[Revelawesome]] and the Kids' themes, grew a full orchestra, grew a massive choir and epic sci-fi noises of indeterminate nature...
     And then - eventually - it became REAL.
     It ASCENDED.
     (yes it was totally that easy.<br>no you can't stop me from pretending this.)
     <i>PJ Tush:</i>
     WOW 7 years of Homestuck. I only hopped on this hectic bandwagon in 2011, but it was definitely worth it. I NEVER would have expected to be able to contribute to and take part in Homestuck itself. This is like a dream come true. THAT BEING SAID: CREATA!
-    Creata was heard <a href="track/creata-canon-edit/index.html">in short</a> during the first part of Collide, so being able to listen to the full version of the song and then DRAW for it was pretty cathartic (i might have cried). When drawing for Creata, I wanted to capture the "essence of creation" and highlight the greater purpose of the Beta kids in the creation of their universe. The piece is long and explosive, much like one would expect the creation of an entire universe to be. I wanted to depict a climactic moment, something grandiose and defining that fits in with the end of Homestuck properly. What better event than the Genesis Frog finally blooming with the original quartet?
+    Creata was heard in short ([[Creata (Canon Edit)]]) during the first part of Collide, so being able to listen to the full version of the song and then DRAW for it was pretty cathartic (i might have cried). When drawing for Creata, I wanted to capture the "essence of creation" and highlight the greater purpose of the Beta kids in the creation of their universe. The piece is long and explosive, much like one would expect the creation of an entire universe to be. I wanted to depict a climactic moment, something grandiose and defining that fits in with the end of Homestuck properly. What better event than the Genesis Frog finally blooming with the original quartet?
     (i definitely did cry)
 -------------------------------------------------------------------------------
 Track: Train
 Artist: Buzinkai
 Track Art: Kate Holden
-URLs: https://homestuck.bandcamp.com/track/train-2
+Duration: 1:33
+URLs:
+- https://homestuck.bandcamp.com/track/train-2
+- https://youtu.be/vhzgtJcLouU?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Kate Holden:</i>
     So I may have originally thought this track was about a literal train and been like "I can't really drawn trains..." only to be told it was more like a training montage for John and agreeing that maybe I can actually draw John. I'd been watching a lot of Ruroni Kenshin with the girlfriend on Netflix and because this art was done by me as a last minute switcheroo I didn't have much time, so I did what I do best; I was a piece of weeaboo trash and made this ridiculous fake shounen manga panel in manga studio.
@@ -71,9 +77,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Of Gods and Witches
 Artist: Tensei
-References: Doctor
 Track Art: Archeia
-URLs: https://homestuck.bandcamp.com/track/of-gods-and-witches-2
+Duration: 4:13
+References: Doctor
+URLs:
+- https://homestuck.bandcamp.com/track/of-gods-and-witches-2
+- https://youtu.be/a7qyOw3LuLE?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Tensei:</i>
     For the longest time I considered this a song for Jade, specifically her dog tier transformation. Then I realized, far too late, that Aranea doesn't have a lot of music given her relative importance in the comic!
@@ -82,9 +91,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Beatup
 Artist: Clark Powell, Astro Kid
-References: Beatdown (Strider Style)
 Track Art: Shan Murphy
-URLs: https://homestuck.bandcamp.com/track/beatup-2
+Duration: 5:11
+References: Beatdown (Strider Style)
+URLs:
+- https://homestuck.bandcamp.com/track/beatup-2
+- https://youtu.be/vHClZp44AQg?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Clark Powell:</i>
     This was the best remix I ever worked on. There was another ermix of this song that didn't make it onto the album, but you can use your imagination for that.
@@ -107,9 +119,12 @@ Commentary:
 Track: You Killed My Father (Prepare To Die)
 Artist: Team Dogfight
 Track Art: Mika B.
-URLs: https://homestuck.bandcamp.com/track/you-killed-my-father-prepare-to-die-2
+Duration: 4:22
+URLs:
+- https://homestuck.bandcamp.com/track/you-killed-my-father-prepare-to-die-2
+- https://youtu.be/jJ7XGZ04Fgc?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Contributors:
-- Yishan Mai (drums, mixing)
+- Catboss (drums, mixing)
 - Willow Ascenzo (orchestra, choir)
 - DJ最テー (guitars)
 - viaSatellite (bass)
@@ -134,7 +149,7 @@ Commentary:
     <i>David Dycus</i>: (composer, synths)
     Homestuck gave me a sense of musical purpose I have not experienced before or since.
     ...Actually, that sounds stupid. Don't print any of that.
-    <i>Yishan Mai:</i> (drums, mixing)
+    <i>Catboss:</i> (drums, mixing)
     Literally everyone I know is a Homestuck.
     I am trapped in an unending hell.
     Please kill me.
@@ -145,12 +160,15 @@ Commentary:
 Track: Sound Judgement
 Artist: Malcolm Brown
 Track Art: Sera B.
+Duration: 3:26
 References: Terezi's Theme, Harlequin
-URLs: https://homestuck.bandcamp.com/track/sound-judgement-2
+URLs:
+- https://homestuck.bandcamp.com/track/sound-judgement-2
+- https://youtu.be/SgFCP-3EkNw?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Malcolm Brown:</i>
     Couldn't end without giving Terezi another chance to shine. "Sound Judgement" basically tells the story of Terezi's "CLOWN HUNT1NG" escapade where she goes hunting after Gamzee, battles him &amp; gets spectacularly "ATOMIC DOUBLE JUGGALO BACKBREAKER"'d for her trouble. Goal here was mainly to create a "Terezi doing something badass" track: A little inspiration from things like "Battle without Honor or Humanity" from Kill Bill, sprinkled with little bits inspired by Terezi's theme, then a bit of weir dguitar solo for Harlequin to represent Gamzee, and a whole load of staccato strings and rhythm guitar everywhere else.
-    Originally called "JUDG3M3NT D4Y" but we already have a track called <a href="track/judgment-day/index.html">Judgment Day</a>.
+    Originally called "JUDG3M3NT D4Y" but we already have a track called [[Judgment Day]].
     We've literally used all the names.
     "Sound Judgement" works better though, although it should probably be "Smell Judgement"?
     That sounds ridiculous though.
@@ -159,20 +177,26 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Aggrievocation
 Artist: Mark Hadley
-References: Aggrieve
 Track Art: Rachel Lundin
-URLs: https://homestuck.bandcamp.com/track/aggrievocation-2
+Duration: 3:41
+References: Aggrieve
+URLs:
+- https://homestuck.bandcamp.com/track/aggrievocation-2
+- https://youtu.be/JB3kKp7jRag?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Mark Hadley:</i>
-    While <a href="track/harlequin/index.html">Harlequin</a> was the first piece of mine to appear in Homestuck, the first piece I actually wrote for it was <a href="track/aggrieve/index.html">Aggrieve</a>, and so I felt it was only fitting to make another mix of it for the final album. Plus it gave me an excuse to try writing it in a metal style! I'm not sure it could still be considered Rose's "official theme" anymore (not after the mountain of excellent music the team's written for her over the years), but I still like to think of it that way.
+    While [[Harlequin]] was the first piece of mine to appear in Homestuck, the first piece I actually wrote for it was [[Aggrieve]], and so I felt it was only fitting to make another mix of it for the final album. Plus it gave me an excuse to try writing it in a metal style! I'm not sure it could still be considered Rose's "official theme" anymore (not after the mountain of excellent music the team's written for her over the years), but I still like to think of it that way.
     <i>Rachel Lundin:</i>
     Just, put, like, "It was cool to work on this," I don't know!
 -------------------------------------------------------------------------------
 Track: Stride
 Artist: Kalibration
-References: Moonsetter, Showdown, Upward Movement (Dave Owns)
 Track Art: Seth Massey
-URLs: https://homestuck.bandcamp.com/track/stride-2
+Duration: 3:26
+References: Moonsetter, Showdown, Upward Movement (Dave Owns)
+URLs:
+- https://homestuck.bandcamp.com/track/stride-2
+- https://youtu.be/h3n1ToY-UvA?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Kalibration:</i>
     Well, it's really my last song for Homestuck, huh...
@@ -183,9 +207,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Skaian Overdrive
 Artist: Thomas Ferkol
-References: Skaian Ride, Sburban Jungle
 Track Art: Seth Massey
-URLs: https://homestuck.bandcamp.com/track/skaian-overdrive-2
+Duration: 2:27
+References: Skaian Ride, Sburban Jungle
+URLs:
+- https://homestuck.bandcamp.com/track/skaian-overdrive-2
+- https://youtu.be/_uhUEvkcTfY?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Thomas Ferkol:</i>
     Pretty sure this one first came about back in 2012.
@@ -200,9 +227,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Freefall
 Artist: Robert J! Lake
-References: Cascade (Beta)
 Track Art: Nico J. Dolloso
-URLs: https://homestuck.bandcamp.com/track/freefall-2
+Duration: 4:13
+References: Cascade (Beta)
+URLs:
+- https://homestuck.bandcamp.com/track/freefall-2
+- https://youtu.be/4pZP1Fkt9Mc?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Robert J! Lake:</i>
     Cascade2 has a strange following online.
@@ -218,21 +248,27 @@ Commentary:
 Track: Moonsweater
 Artist: David Ellis
 Contributors: Toby Fox (with apologies to), Malik Refaat (alto & tenor saxophone)
-References: Moonsetter
 Track Art: David Litt
-URLs: https://homestuck.bandcamp.com/track/moonsweater-2
+Duration: 7:57
+References: Moonsetter
+URLs:
+- https://homestuck.bandcamp.com/track/moonsweater-2
+- https://youtu.be/mB3xE2h_Bo4?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>David Ellis:</i>
     The idea for this started around the time Volume 9 came out.
     Someone asked Toby what his favourite piece was and he said 'Moonsetter'.
-    As he liked what I did with <a href="track/the-beginning-of-something-really-excellent/index.html">TBOSRE</a> for <a href="track/blue-atom/index.html">Blue Atom</a> I set out to rework Moonsetter into smooth jazz, ended up with shuffle-funk.
+    As he liked what I did with [[The Beginning of Something Really Excellent]] for [[Blue Atom]] I set out to rework Moonsetter into smooth jazz, ended up with shuffle-funk.
     Close enough.
     Thomas Ferkol came up with the name.
 -------------------------------------------------------------------------------
 Track: Castle
 Artist: Buzinkai
 Track Art: Kiko B.
-URLs: https://homestuck.bandcamp.com/track/castle-2
+Duration: 1:13
+URLs:
+- https://homestuck.bandcamp.com/track/castle-2
+- https://youtu.be/DMWGKi9FqhA?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Kiko B.:</i>
     This gentle but haunting refrain from Buzinkai reminded me of those calm-but-ominous moments in my favorite adventure games, particularly a fantastic little game called Cave Story. Given the title of the track, a castle-exploration scene seemed to be a given.
@@ -245,9 +281,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Skaian Happy Flight
 Artist: Seth Peelle
-References: Skaian Ride, Skaia Voyages
 Track Art: Alyssa Lee Dalangin
-URLs: https://homestuck.bandcamp.com/track/skaian-happy-flight-2
+Duration: 2:06
+References: Skaian Ride, Skaia Voyages
+URLs:
+- https://homestuck.bandcamp.com/track/skaian-happy-flight-2
+- https://youtu.be/rozLPCPXopw?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Seth Peelle:</i>
     The 1984 fantasy film "The NeverEnding Story" was one of my favorite childhood movies.
@@ -265,7 +304,10 @@ Commentary:
 Track: Voidlight
 Artist: Thomas Ferkol
 Track Art: Zilleniose
-URLs: https://homestuck.bandcamp.com/track/voidlight-2
+Duration: 3:14
+URLs:
+- https://homestuck.bandcamp.com/track/voidlight-2
+- https://youtu.be/FOG0NbZnKzU?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Thomas Ferkol:</i>
     Based on Calliope's ahven in the Furthest Rings, this track has gone on a journey.
@@ -273,9 +315,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Beatdown DX
 Artist: Curt Blakeslee
-References: Beatdown (Strider Style)
 Track Art: miraculoustang
-URLs: https://homestuck.bandcamp.com/track/beatdown-dx-2
+Duration: 4:13
+References: Beatdown (Strider Style)
+URLs:
+- https://homestuck.bandcamp.com/track/beatdown-dx-2
+- https://youtu.be/EJPtdTzq6uY?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Curt Blakeslee:</i>
     A simplified chiptune rendering of Beatdown. Dave's original strife track was purposefully overproduced, loud, and busy, so Beatdown DX is actually less 'deluxe' than the original.
@@ -285,9 +330,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Solar Voyage
 Artist: Marcy Nabors
-References: Ruins, Flare, Explore
 Track Art: Seth Massey
-URLs: https://homestuck.bandcamp.com/track/solar-voyage-2
+Duration: 5:06
+References: Ruins, Flare, Explore
+URLs:
+- https://homestuck.bandcamp.com/track/solar-voyage-2
+- https://youtu.be/r78qOIX8ITI?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Contributors:
 - Michael Guy Bowman (arrangement)
 - Marcy Nabors (arrangement, vocals)
@@ -299,7 +347,7 @@ Contributors:
 Commentary:
     <i>Marcy Nabors:</i>
     Way back in good ol' 2012 I was in a little one-off band with Erik Scheele, Clark Powell, Astro Kid, and the ever-charismatic Michael Guy Bowman.
-    At one point we played a small backyard show of <a href="album/mobius-trip-and-hadron-kaleido/index.html">Mobius Trip and Hadron Kaleido</a> tunes, along with many other Homestuck songs you all know and love, to a lovely audience of dedicated fans.
+    At one point we played a small backyard show of [[album:Mobius Trip and Hadron Kaleido]] tunes, along with many other Homestuck songs you all know and love, to a lovely audience of dedicated fans.
     In an effort to pack our show with even more Homestuck material, we put together this cool medley as a live bit, based on songs some of the band members had worked on.
     Four years later, and with the addition of some radicool guitar by Tensei and rockin' drums by Jamie Paige Stanley, we're pleased to present it to you in this glorious and shiny new form!
     Also Paul.
@@ -312,7 +360,10 @@ Commentary:
 Track: Feel (Alive)
 Artist: Luke Benjamins, Robert J! Lake
 Track Art: PJ Tush, Fenn, Mika B.
-URLs: https://homestuck.bandcamp.com/track/feel-alive-2
+Duration: 3:14
+URLs:
+- https://homestuck.bandcamp.com/track/feel-alive-2
+- https://youtu.be/Yngy9XIzRLY?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Contributors:
 - Luke Benjamins (composition)
 - Robert J! Lake (production, arrangement)
@@ -322,6 +373,10 @@ Commentary:
     In the end, I'm gald to finally share itw ith the world in some form, and I hope the world enjoys it.
     <i>Robert J! Lake:</i>
     This is really Luke's song. I started the project file but he made it his own. The crow noises are mine.
+    (<a href="https://www.youtube.com/watch?v=Yngy9XIzRLY&lc=UgheYBDHMQfgt3gCoAEC">YouTube</a>)
+    <blockquote>RJ, if you arranged this piece, then there must be an original you used as a base. Is there some sort of file or sheet for that track?</blockquote>
+    luke might have a famitracker file. the way it worked is basically that he wrote the vast majority of the melodic content in famitracker and sent that my way, and i incorporated it as i saw fit. some of it's completely my own - that bassline, and the break section, for instance, as well as the second solo - but most of it comes directly from just a few wavs he shot my way.
+    so ask him, is my best advice!
     <i>PJ Tush:</i>
     Being so high energy, I wanted to make the piece as colorful as possible, but not unattractively saturated. Initially I planned on reflecting the characters in dream bubbles of their respective colors, but decided to depict them in full mugshot instead.
     Each character is lightly engulfed in a colroful overlay in front of the chaotic, perpetually expanding infinity of gay space.
@@ -334,8 +389,11 @@ Commentary:
 Track: Breeze
 Artist: Erik Scheele
 Track Art: Richard Gung
+Duration: 5:16
 References: Sea of Derse
-URLs: https://homestuck.bandcamp.com/track/breeze-2
+URLs:
+- https://homestuck.bandcamp.com/track/breeze-2
+- https://youtu.be/h9E2e6JgIp0?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Erik Scheele:</i>
     Originally my thought for this piece was Spades Slick and Ms. Paint on a gondola, something semi-romantic and jazzy and very ship-worthy. Hence the accordion. But then, like any other time I started feeling vaguely like making something into a piece for shipping people, I actually made the piece and got a way better idea for what it would be for, aka post-game everyone-hanging-out reflection-relaxation. And hey, the accordion still worked.
@@ -346,9 +404,12 @@ Commentary:
 Track: Starfall
 Artist: Solatrus
 Contributors: Justin Hellier (special thanks)
-References: Ascend
 Track Art: Christina Lillard
-URLs: https://homestuck.bandcamp.com/track/starfall-2
+Duration: 4:13
+References: Ascend
+URLs:
+- https://homestuck.bandcamp.com/track/starfall-2
+- https://youtu.be/1H26iJNOtx4?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Solatrus:</i>
     I got inspired by listening to a friend's liquid drum and bass tracks back in 2014 (shoutout to you, Justin!), and decided I really wanted to do something along those lines.
@@ -366,7 +427,10 @@ Commentary:
 Track: Ascend
 Artist: Tensei
 Track Art: Marimo
-URLs: https://homestuck.bandcamp.com/track/ascend-2
+Duration: 6:12
+URLs:
+- https://homestuck.bandcamp.com/track/ascend-2
+- https://youtu.be/e9gGXYbtSt8?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 References:
 - Doctor
 - Cascade (Beta)
@@ -398,9 +462,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Lilith in Starlight
 Artist: Malcolm Brown
-References: Black Rose / Green Sun, Mother, Aggrieve, Darling Kanaya
 Track Art: Sera B.
-URLs: https://homestuck.bandcamp.com/track/lilith-in-starlight-2
+Duration: 3:51
+References: Black Rose / Green Sun, Mother, Aggrieve, Darling Kanaya
+URLs:
+- https://homestuck.bandcamp.com/track/lilith-in-starlight-2
+- https://youtu.be/9ZRH3pMAsEw?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Malcolm Brown:</i>
     This track's actually effectively a second go at a previous track I made called "Mother" which blended Black Rose/Green Sun &amp; Aggrieve in a sort've more mystical tone.
@@ -414,10 +481,13 @@ Commentary:
 Track: Thanks for Playing
 Artist: Max Wright
 Track Art: Seth Massey
-URLs: https://homestuck.bandcamp.com/track/thanks-for-playing-2
+Duration: 3:31
+URLs:
+- https://homestuck.bandcamp.com/track/thanks-for-playing-2
+- https://youtu.be/XsCBaAv59cc?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Max Wright:</i>
-    <i>Thanks for Playing</i> was originally conceived as a theme for Calliope, back before the <a href="album/cherubim/index.html">Cherubim</a> album had been released. At that time it had a runtime of only one minute, so when Volume 10 was being organised I ran with what I had and extended it into the piece featured. I felt that the initial theme has an air of purity, something that lent itself well to the birth of a new world - hence its allocation.
+    <i>Thanks for Playing</i> was originally conceived as a theme for Calliope, back before the [[album:Cherubim]] album had been released. At that time it had a runtime of only one minute, so when Volume 10 was being organised I ran with what I had and extended it into the piece featured. I felt that the initial theme has an air of purity, something that lent itself well to the birth of a new world - hence its allocation.
     At least, that's how I'm justifying it. In reality this can be considered a Calliope piece at heart.
     <i>Seth Massey:</i>
     This is a realy fantastic song that I'd been rooting for from the start, and when given the chance to do art for it I was intent on making sure it got the beautiful art it deserved.
@@ -426,9 +496,12 @@ Commentary:
 Track: Renewed Return
 Artist: Marcy Nabors
 Track Art: Zilleniose
-URLs: https://homestuck.bandcamp.com/track/renewed-return-2
+Duration: 9:10
+URLs:
+- https://homestuck.bandcamp.com/track/renewed-return-2
+- https://youtu.be/qqZO_D5CO28?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Contributors:
-- Yishan Mai (flute)
+- Catboss (flute)
 - Marcy Nabors (bass clarinet)
 - Kelly Sadwin (violin & viola)
 - Jamie Paige Stanely (percussion)
@@ -450,7 +523,7 @@ References:
 Commentary:
     <i>Marcy Nabors:</i>
     Four years! And what a wild four years it has been.
-    I started this one back in 2012 alongside <a href="track/solar-voyage/index.html">Solar Voyage</a>, with lofty ambitions of live choir, strings, and woodwinds, a number of movements in different time signatures and tempos, and enough heart and soul to rival Homestuck itself. All this time later, I've emerged from my musical cocoon with a striking success of a piece, its deilcate wings glistening in the moonlight as it rears its feathery antennae, taking in the world with newfound---
+    I started this one back in 2012 alongside [[Solar Voyage]], with lofty ambitions of live choir, strings, and woodwinds, a number of movements in different time signatures and tempos, and enough heart and soul to rival Homestuck itself. All this time later, I've emerged from my musical cocoon with a striking success of a piece, its deilcate wings glistening in the moonlight as it rears its feathery antennae, taking in the world with newfound---
     *ahem*.
     Right.
     I extend my endless thanks to the folks who were kind enough to lend their voices, instruments, and time to what has turned out to be the longest song in the entire Homestuck discography.
@@ -463,9 +536,12 @@ Lyrics:
 -------------------------------------------------------------------------------
 Track: THIS Pumpkin
 Artist: Alexander Rosetti
-References: Pumpkin Cravings
 Track Art: Worthikids
-URLs: https://homestuck.bandcamp.com/track/this-pumpkin-2
+Duration: 4:02
+References: Pumpkin Cravings
+URLs:
+- https://homestuck.bandcamp.com/track/this-pumpkin-2
+- https://youtu.be/ekWbliUNqfM?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 Commentary:
     <i>Alexander Rosetti:</i>
     THIS Pumpkin is an arrangement of Seth "Beatfox" Peelle's Pumpkin Cravings from Homestuck Volume 5.
@@ -482,7 +558,10 @@ Commentary:
 Track: Conclude
 Artist: Seth Peelle
 Track Art: Kiko B.
-URLs: https://homestuck.bandcamp.com/track/conclude-2
+Duration: 7:47
+URLs:
+- https://homestuck.bandcamp.com/track/conclude-2
+- https://youtu.be/5Dq01x-oxWM?list=PLnVpmehyaOFZV53x19jl4NTpDEQtOaoR5
 References:
 - Sburban Jungle
 - Showtime (Piano Refrain)
@@ -507,7 +586,7 @@ Commentary:
     My single favorite page in HS is page 82 - the soothing but foreboding sound of wind chimes ringing in the howling breeze might even be my favorite use of sound in the whole comic, period.
     I intentionally set the scene to look a lot like his yard in Act 1, with the "THANKS FOR PLAYING" text hanging in the sky as the one distinguishing feature that sets this piece post-Act 7. Here, John isn't gazing forlornly at his neighborhood in the anticipation of a long day, but relaxing somewhere warm and familiar after that long day has finally come to a close.
     By the way, I haven't forgotten that his ACTUAL yard isn't exactly intact by the end of Act 1, but I figured it was worth it to take a little artistic license to deliver what this track needed.
-    It's not TOO much of a stretch to assume that John or any one ofh is God Tier pals could have rebuilt his home in the new universe, right?
+    It's not TOO much of a stretch to assume that John or any one of his God Tier pals could have rebuilt his home in the new universe, right?
     Right.
     It's my headcanon and I won't be shamed!
     On a final and more personal note, Homestuck, and its music,<br>hold a very special place in my heart.

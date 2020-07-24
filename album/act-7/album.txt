@@ -1,6 +1,7 @@
 Album: Act 7
 Artist: Clark Powell, Toby Fox
 Cover Art: Homestuck
+Track Art: Homestuck
 Date: April 13, 2016
 FG: #c7ff43
 URLs:
@@ -8,7 +9,7 @@ URLs:
 - https://www.youtube.com/watch?v=FPsMeamXcE8
 ------------------------------------------------------------------------------
 Track: Overture (Canon Edit)
-Track Art: Homestuck
+Duration: 9:00
 URLs:
 - https://homestuck.bandcamp.com/track/overture-canon-edit-2
 - https://www.youtube.com/watch?v=FPsMeamXcE8

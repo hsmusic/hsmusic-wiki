@@ -10,60 +10,114 @@ URLs:
 - https://www.youtube.com/playlist?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Crustacean
-URLs: https://homestuck.bandcamp.com/track/crustacean-2
+Duration: 1:31
+URLs:
+- https://homestuck.bandcamp.com/track/crustacean-2
+- https://youtu.be/U5CGEwHZoss?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Showdown
-URLs: https://homestuck.bandcamp.com/track/showdown-2
+Duration: 1:43
+URLs:
+- https://homestuck.bandcamp.com/track/showdown-2
+- https://youtu.be/5mdkmTXDG2I?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: mIrAcLeS
-URLs: https://homestuck.bandcamp.com/track/miracles-2
+Duration: 2:31
+URLs:
+- https://homestuck.bandcamp.com/track/miracles-2
+- https://youtu.be/ztovKMiiolU?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: The Lemonsnout Turnabout
-URLs: https://homestuck.bandcamp.com/track/the-lemonsnout-turnabout-2
+Duration: 2:23
+URLs:
+- https://homestuck.bandcamp.com/track/the-lemonsnout-turnabout-2
+- https://youtu.be/pvgyx0w8B1E?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Phaze and Blood
-URLs: https://homestuck.bandcamp.com/track/phaze-and-blood-2
+Duration: 1:38
+URLs:
+- https://homestuck.bandcamp.com/track/phaze-and-blood-2
+- https://youtu.be/fNsqqoGNLpE?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: psych0ruins
-URLs: https://homestuck.bandcamp.com/track/psych0ruins-2
+Duration: 2:15
+URLs:
+- https://homestuck.bandcamp.com/track/psych0ruins-2
+- https://youtu.be/ueccsD074a8?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Walls Covered in Blood
-URLs: https://homestuck.bandcamp.com/track/walls-covered-in-blood-2
+Duration: 2:00
+URLs:
+- https://homestuck.bandcamp.com/track/walls-covered-in-blood-2
+- https://youtu.be/REM1E8wC3Gs?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: dESPERADO ROCKET CHAIRS,
-URLs: https://homestuck.bandcamp.com/track/desperado-rocket-chairs-2
+Duration: 1:37
+URLs:
+- https://homestuck.bandcamp.com/track/desperado-rocket-chairs-2
+- https://youtu.be/KPYJ9TuXZmQ?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Death of the Lusii
+Duration: 2:00
 References: Crustacean
-URLs: https://homestuck.bandcamp.com/track/death-of-the-lusii-2
+URLs:
+- https://homestuck.bandcamp.com/track/death-of-the-lusii-2
+- https://youtu.be/mrflmgFRrYo?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Virgin Orb
-URLs: https://homestuck.bandcamp.com/track/virgin-orb-2
+Duration: 2:23
+URLs:
+- https://homestuck.bandcamp.com/track/virgin-orb-2
+- https://youtu.be/mrflmgFRrYo?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: The La2t Frontiier
 References: Sunsetter, Guile's Theme
-URLs: https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
+Duration: 1:50
+URLs:
+- https://homestuck.bandcamp.com/track/the-la2t-frontiier-2
+- https://youtu.be/aPd9mP7ZrlY?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Skaian Summoning
-URLs: https://homestuck.bandcamp.com/track/skaian-summoning-2
+Duration: 2:22
+URLs:
+- https://homestuck.bandcamp.com/track/skaian-summoning-2
+- https://youtu.be/gWBlVTuyp0s?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: The Thirteenth Hour
 Track Art: foreverFlummoxed
+Duration: 2:10
 References: Sburban Jungle
-URLs: https://homestuck.bandcamp.com/track/the-thirteenth-hour-2
+URLs:
+- https://homestuck.bandcamp.com/track/the-thirteenth-hour-2
+- https://youtu.be/SixKHx18sqk?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Spider's Claw
-URLs: https://homestuck.bandcamp.com/track/spiders-claw
+Duration: 0:37
+URLs:
+- https://homestuck.bandcamp.com/track/spiders-claw
+- https://youtu.be/ZA9M-ZpdlC8?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Staring
-URLs: https://homestuck.bandcamp.com/track/staring
+Duration: 1:21
+URLs:
+- https://homestuck.bandcamp.com/track/staring
+- https://youtu.be/4TUOfRlT1ks?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Keepers
-URLs: https://homestuck.bandcamp.com/track/keepers
+Duration: 1:55
+URLs:
+- https://homestuck.bandcamp.com/track/keepers
+- https://youtu.be/Sy3Au5UsykI?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Theme
-URLs: https://homestuck.bandcamp.com/track/theme-2
+Duration: 1:28
+URLs:
+- https://homestuck.bandcamp.com/track/theme-2
+- https://youtu.be/S2Pr-_j0qcc?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ
 -------------------------------------------------------------------------------
 Track: Walls Covered in Blood DX
+Duration: 2:01
 References: Walls Covered in Blood
-URLs: https://homestuck.bandcamp.com/track/walls-covered-in-blood-dx-2
+URLs:
+- https://homestuck.bandcamp.com/track/walls-covered-in-blood-dx-2
+- https://youtu.be/WPqca-NWV2k?list=PLYhdhHfN2xDpqsbieSVEmK_OYNgAYgZEZ

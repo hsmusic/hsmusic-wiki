@@ -8,65 +8,93 @@ URLs:
 -----------------------------------------------
 Track: Squiddles!
 Artist: Alexander Rosetti
-URLs: https://youtu.be/fXo6q-jENfE
+Duration: 2:54
+URLs:
+- https://youtu.be/fXo6q-jENfE?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Rainbow Valley
 Artist: David Ko
 Contributors: Alexander Rosetti (remix)
-URLs: https://youtu.be/MrOqTjNrB2Q
+Duration: 1:10
+URLs:
+- https://youtu.be/MrOqTjNrB2Q?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddle Parade
 Artist: Ian Taylor
 References: Homestuck Anthem
-URLs: https://youtu.be/gqd8XTRwzoI
+Duration: 0:50
+URLs:
+- https://youtu.be/gqd8XTRwzoI?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddle March
 Artist: Erik Scheele
-URLs: https://youtu.be/6l7shCvDXUU
+Duration: 1:09
+URLs:
+- https://youtu.be/6l7shCvDXUU?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Tangled Waltz
 Artist: Michael Guy Bowman
-URLs: https://youtu.be/3KdAsyPq4UM
+Duration: 4:15
+URLs:
+- https://youtu.be/3KdAsyPq4UM?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Sun-Speckled Squiddly Afternoon
 Artist: Alexander Rosetti
+Duration: 1:41
 References: Squiddles!
-URLs: https://youtu.be/faRVzG1TZus
+URLs:
+- https://youtu.be/faRVzG1TZus?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddles Campfire
 Artist: Erik Scheele
-URLs: https://youtu.be/sBi2kKCDDCk
+Duration: 5:16
+URLs:
+- https://youtu.be/sBi2kKCDDCk?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Friendship is Paramount
 Artist: Seth Peelle
+Duration: 3:43
 References: Squiddles!
-URLs: https://youtu.be/X0DmGl7AJIU
+URLs:
+- https://youtu.be/X0DmGl7AJIU?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Lazybones
 Artist: Steve Everson
-URLs: https://youtu.be/15iiMuYvA_Q
+Duration: 1:15
+URLs:
+- https://youtu.be/15iiMuYvA_Q?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Tentacles
 Artist: Robert J! Lake
-URLs: https://youtu.be/LMfO0Z_E878
+Duration: 1:57
+URLs:
+- https://youtu.be/LMfO0Z_E878?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddles Happytime Fun Go!
 Artist: Robert J! Lake
-URLs: https://youtu.be/uXBAl4pd7gA
+Duration: 1:43
+URLs:
+- https://youtu.be/uXBAl4pd7gA?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: The Sound of Pure Squid Giggles
 Artist: Nick Smalley
 Contributors: Alexander Rosetti (remix)
-URLs: https://youtu.be/9tOJOpn1UD0
+Duration: 1:22
+URLs:
+- https://youtu.be/9tOJOpn1UD0?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddle Samba
 Artist: Michael Guy Bowman
-URLs: https://youtu.be/U1H0Q6FjGyc
+Duration: 3:05
+URLs:
+- https://youtu.be/U1H0Q6FjGyc?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddles in Paradise
 Artist: Solatrus
 Contributors: Alexander Rosetti (Squiddle voices)
-URLs: https://youtu.be/2YG_6ke8X0o
+Duration: 4:11
+URLs:
+- https://youtu.be/2YG_6ke8X0o?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -94,45 +122,63 @@ Commentary:
 -----------------------------------------------
 Track: Squiddidle!
 Artist: Malcolm Brown
-URLs: https://youtu.be/gyqSztKs_6o
+Duration: 2:00
+URLs:
+- https://youtu.be/gyqSztKs_6o?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Catchyegrabber (Skipper Plumbthroat's Song)
 Artist: Alexander Rosetti
 Contributors: Toby Fox (Skipper Plumbthroat)
-URLs: https://youtu.be/S3bsomR8W_w
+Duration: 4:33
+URLs:
+- https://youtu.be/S3bsomR8W_w?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Plumbthroat Gives Chase
 Artist: Alexander Rosetti
 Contributors: Toby Fox (Skipper Plumbthroat)
+Duration: 2:51
 References: Catchyegrabber (Skipper Plumbthroat's Song)
-URLs: https://youtu.be/4PfZu1AWTWI
+URLs:
+- https://youtu.be/4PfZu1AWTWI?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Squiddles the Movie Trailer - The Day the Unicorns Couldn't Play
 Artist: Toby Fox
+Duration: 1:51
 References: Squiddles!
-URLs: https://youtu.be/9lWRGynBNVs
+URLs:
+- https://youtu.be/9lWRGynBNVs?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Carefree Princess Berryboo
 Artist: Alexander Rosetti
+Duration: 2:16
 References: Carefree Action
-URLs: https://youtu.be/_Z8qT1GBhds
+URLs:
+- https://youtu.be/_Z8qT1GBhds?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Mister Bowman Tells You About the Squiddles
 Artist: Michael Guy Bowman
-URLs: https://youtu.be/09eVHqwHWYM
+Duration: 4:27
+URLs:
+- https://youtu.be/09eVHqwHWYM?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Ocean Stars
 Artist: Mark Hadley
-URLs: https://youtu.be/gFWWC9vmSzQ
+Duration: 2:09
+URLs:
+- https://youtu.be/gFWWC9vmSzQ?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 Commentary:
     <i>Mark Hadley:</i>
     Everyone writing songs for the Squiddles album opted for happy-go-lucky and crazy-sounding things, but in an effort to make a variety, I aimed instead for something more calm and serene, picturing a calm ocean at night lit only by the full moon and stars. Admittedly, it's just 12 bars that repeat over and over, each time adding in an additional instrument track. Still, it's one of the most relaxing things I've ever written.
 -----------------------------------------------
 Track: Let the Squiddles Sleep (End Theme)
 Artist: Robert J! Lake
+Duration: 5:06
 References: Squiddles!
-URLs: https://youtu.be/mpn7lahHvEc
+URLs:
+- https://youtu.be/mpn7lahHvEc?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H
 -----------------------------------------------
 Track: Friendship Aneurysm
 Artist: Alexander Rosetti
-URLs: https://youtu.be/w6RNFIXfiyY
+Duration: 0:19
+URLs:
+- https://youtu.be/w6RNFIXfiyY?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H

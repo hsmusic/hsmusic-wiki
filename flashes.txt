@@ -429,7 +429,7 @@ Tracks:
 - Nic Cage Song
 - Secret ROM
 - Boy Skylark (Brief)
-- Hero's Growth (by Solatrus)
+- Hero's Growth
 - Phrenic Phever
 - Walk-Stab-Walk (R&E)
 - Horschestra
@@ -546,7 +546,7 @@ URLs:
 Flash: [S] Terezi: Read note.
 Page: 3718
 Date: April 17, 2011
-Tracks: Secret ROM (by Toby Fox)
+Tracks: Secret ROM
 URLs:
 - https://www.bgreco.net/hsflash/005618.html
 ------------------------------------------------------------------------------
@@ -787,7 +787,7 @@ Page: 5308
 Date: September 24, 2012
 Tracks:
 - Hate You
-- G4M3BL0RG
+- G4M38L0RG
 - Olive Rogue
 - Violet Prince
 - Purple Bard
@@ -916,8 +916,7 @@ Flash: [S] ACT 6 ACT 5 ACT 2
 Page: 5714
 Date: January 11, 2013
 Tracks:
-- Kazoostuck (by Toby Fox)
-- (I'm not going through the rest of the Trickster flashes, sorry.)
+- Kazoostuck
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 5726
@@ -944,10 +943,10 @@ Page: 5764
 Date: January 25, 2013
 Tracks: Warhammer of Zillyhoo (With Mario Paint)
 ------------------------------------------------------------------------------
-Flash: [S] WHddddddEEEEE!
+Flash: [S] WHEEEEEEEEEEE!
 Page: 5776
 Date: January 26, 2013
-Tracks: A Very Trickster Mode Christmas (WHddddddEEEEE!)
+Tracks: A Very Trickster Mode Christmas (WHEEEEEEEEEEE!)
 ------------------------------------------------------------------------------
 Flash: [S] HA HA HA! HE HE HE! HO HO HO!
 Page: 5777
@@ -1037,7 +1036,8 @@ URLs:
 Flash: [S][A6A6I4] ====>
 Page: 7101
 Date: December 1, 2014
-Tracks: Elevatorstuck, with Meows
+Tracks:
+- Elevatorstuck, with Meows
 ------------------------------------------------------------------------------
 Flash: [S][A6A6I4] ====>
 Page: 7405

@@ -9,9 +9,12 @@ URLs:
 -------------------------------------------------------------------------------
 Track: Crystalmethequins
 Artist: Clark Powell, Astro Kid
-References: Crystamanthequins, Crystalanthemums
 Track Art: Richard Gung
-URLs: https://homestuck.bandcamp.com/track/crystalmethequins-2
+Duration: 5:13
+References: Crystamanthequins, Crystalanthemums
+URLs:
+- https://homestuck.bandcamp.com/track/crystalmethequins-2
+- https://youtu.be/r8rWfPPrKJ0?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Clark Powell:</i>
     Let me tell you of this song’s origins, for I saw it unfold with mine own eyes.
@@ -22,10 +25,13 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Anbroids V2.0
 Artist: Malcolm Brown
-References: Anbroids, Davesprite
 Track Art: Jonathan Griffiths
+Duration: 2:19
+References: Anbroids, Davesprite
 Directory: anbroids-v2
-URLs: https://homestuck.bandcamp.com/track/anbroids-v20-2
+URLs:
+- https://homestuck.bandcamp.com/track/anbroids-v20-2
+- https://youtu.be/AVPmUpN_W3o?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Malcolm Brown:</i>
     <code style="color: #e00707">DAVE: we are in the shit now<br>DAVE: we are motherfuckin entrenched in this bitch</code>
@@ -56,12 +62,18 @@ Commentary:
 Track: Trepidation
 Artist: Svix
 Track Art: Kiko B.
-URLs: https://homestuck.bandcamp.com/track/trepidation-2
+Duration: 3:52
+URLs:
+- https://homestuck.bandcamp.com/track/trepidation-2
+- https://youtu.be/WxLtO42_AJQ?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Firefly
 Artist: Buzinkai
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/firefly-2
+Duration: 1:08
+URLs:
+- https://homestuck.bandcamp.com/track/firefly-2
+- https://youtu.be/KC9v0nOnDK8?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Buzinkai:</i>
     Firefly is a special song. I was walking through a small lot to my apartment in the summertime, and fireflies were all around me. And I just thought of the -perfect- theme for it, and I rushed in to my apartment as fast as I could to get it down. It's the only song that's come to me like that.
@@ -69,28 +81,40 @@ Commentary:
 Track: Whistling Jackhammer
 Artist: Robert J! Lake
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/whistling-jackhammer-2
+Duration: 3:59
+URLs:
+- https://homestuck.bandcamp.com/track/whistling-jackhammer-2
+- https://youtu.be/a9ExRM4xlw8?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Ugly Betty
 Artist: Robert J! Lake
-References: Aggrieve (Violin Refrain)
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/ugly-betty-2
+Duration: 3:22
+References: Aggrieve (Violin Refrain)
+URLs:
+- https://homestuck.bandcamp.com/track/ugly-betty-2
+- https://youtu.be/EdCZ1kKzb8A?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Tavia Morra:</i>
-    RJ gave me the reins on this one. At first I was drawing it in the same style as a <a href="track/before-the-beginning-and-after-the-end/index.html">later track</a> I did art for, but then it quickly turned in to a painting. This palette in particular was fun and challenging to work with. I’m happy with the end result, since it looks like the Batterwitch is cackling as the world burns down around her.
+    RJ gave me the reins on this one. At first I was drawing it in the same style as a later track ([[Before the Beginning and After the End]]) I did art for, but then it quickly turned in to a painting. This palette in particular was fun and challenging to work with. I’m happy with the end result, since it looks like the Batterwitch is cackling as the world burns down around her.
 -------------------------------------------------------------------------------
 Track: Hate You
 Artist: Toby Fox
 Contributors: Azami (laughter)
-References: Love You (Feferi's Theme)
 Track Art: MissNK
-URLs: https://homestuck.bandcamp.com/track/hate-you-2
+Duration: 2:53
+References: Love You (Feferi's Theme)
+URLs:
+- https://homestuck.bandcamp.com/track/hate-you-2
+- https://youtu.be/2gU_54ibyKM?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Pumpkin Party in Sea Hitler's Water Apocalypse
 Artist: Malcolm Brown
 Track Art: Marina
-URLs: https://homestuck.bandcamp.com/track/pumpkin-party-in-sea-hitlers-water-apocalypse-2
+Duration: 3:54
+URLs:
+- https://homestuck.bandcamp.com/track/pumpkin-party-in-sea-hitlers-water-apocalypse-2
+- https://youtu.be/LgG8lAVh-EA?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Malcolm Brown:</i>
     Aaah Pumpkin Party in Sea Hitler’s Water Apocalypse. Or Pumpkin Party in Colony 413 or whatever I was calling it before I decided to go nuts.  The original working title was just “Pumpkin Party”, so at the very least we started somewhere sensible.
@@ -112,13 +136,19 @@ Commentary:
 Track: Skaianet
 Artist: Mark Hadley
 Track Art: Linnet
-URLs: https://homestuck.bandcamp.com/track/skaianet-2
+Duration: 2:33
+URLs:
+- https://homestuck.bandcamp.com/track/skaianet-2
+- https://youtu.be/QLdoDAn290A?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Another Jungle
 Artist: Michael Guy Bowman
-References: Sburban Jungle, Showtime (Original Mix)
 Track Art: Richard Gung
-URLs: https://homestuck.bandcamp.com/track/skaianet-2
+Duration: 4:39
+References: Sburban Jungle, Showtime (Original Mix)
+URLs:
+- https://homestuck.bandcamp.com/track/another-jungle-2
+- https://youtu.be/upRmDHMcREg?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     Before this track was used in Homestuck along with Beatfox’s “A Taste for Adventure”, it was actually made for a nearly 3-year-old defunct fan project. Housetrapped was a story about an alternate Sburb session and “Another Jungle” was a the-same-but-different theme for the loading screen of that universe’s Sburb client. Sound familiar?
@@ -130,9 +160,12 @@ Commentary:
 Track: GameGrl (Original 1993 Mix)
 Artist: Michael Guy Bowman
 Contributors: Erik Scheele (keytar), Tavia Morra (vocals)
-References: Bro Hop, Airtime, Afraid of the Darko
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/gamegrl-original-1993-mix-2
+Duration: 3:29
+References: Bro Hop, Airtime, Afraid of the Darko
+URLs:
+- https://homestuck.bandcamp.com/track/gamegrl-original-1993-mix-2
+- https://youtu.be/4kdVpq3bnuY?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     Originally we’d planned on doing a Homestuck album that was devoted entirely to the Sburb Alpha kids and their session, all of us doing tracks that would parallel earlier tracks in a same-but-different fashion. While this album became Homestuck Vol. 9, a lot of analogous tracks remained from the original concept, including this track as an alternative to “GameBro (Original 1990 Mix)” from Homestuck Vol. 6: Heir Transparent.
@@ -153,19 +186,42 @@ Commentary:
     <img src="misc/overall-quest.jpg">
     Eventually we got the overalls and proceeded to take the most fantastic pictures ever. I’ll be posting up some other photos from that day later on so keep your eyes peeled!
     All in all, this track is probably the most involved I’d been on a Homestuck album and am so glad it was this one. I had a blast!
+Lyrics:
+    Aw yeah! What's up gamers?<br>I'm GameGrl, and I'm here to show you that girls can game too!<br>Don't go easy on me, guys - unless you want to get beat by a GIRL.<br>Are you ready? Let's DO THIS.
+    Yo I'm the GameGrl, and I've got the scores<br>'Cause I woop butt and game hardcore<br>I might look cute but I play to win<br>So get your head in the game, 'cause we're about to begin
+    I got sweet moves and secret skills<br>To pull off the codes, the combos, and kills<br>Tapping my fingers like a maniac<br>This girl's gone bad on a game attack!
+    GAME ATTACK! GAME ATTACK!<br>When I'm on the scoreboard, you sure can tell!<br>GAME ATTACK! GAME ATTACK!<br>Cause I spell my scores "G-R-L!"<br>GAME ATTACK! GAME ATTACK!<br>You gamer guys better take it like a man!<br>GAME ATTACK! GAME ATTACK!<br>If you can't keep up then talk to the hand!
+    I'm the GameGrl!<br>(She's a GameGrl) The best in the world!<br>(She's a GameGrl) Girls rule!<br>(She's a GameGrl) And boys drool!<br>(She's a GameGrl) I'm kickin' rad!<br>(She's a GameGrl) You're super bad!<br>(She's a GameGrl) Better than the rest<br>When you're gaming with the GameGrl you're gaming with the best!
+    When I say "game", you say "girl!"<br>GAME! GRL! GAME! GRL!<br>When I say "best", you say "the world!"<br>BEST IN! THE WORLD! BEST IN! THE WORLD!<br>When I say girls, you say rule!<br>GIRLS! RULE! GIRLS! RULE!<br>When I say boys, you say drool!<br>BOYS! DROOL! BOYS! DROOL!
+    Let's have a dance party RIGHT NOW. Everybody do the wave! Yeah, that's pretty good. Check it out! I'm dancing! I'm dancing! Check this move out! Oh man, oh yeah!
+    Aw yeah. I'm having SO MUCH FUN. This is like a slumber party where there's nothing to do but play games ALL NIGHT LONG. Oh yeah, and NO BOYS ALLOWED. Not that I CARE - I can beat any boy at any game, any time, anywhere!
+    Puzzle games, fighting games, action, rpg,<br>Shoot 'em ups, beat 'em ups, virtual reality,<br>Dating sims, flight sims, CD-rom or console,<br>Handheld, arcade, tabletopping oldschool,<br>Turn-based, card-based, tactical, strategy,<br>Text-based adventure, point-and-click mystery,<br>FPS, racers, platforms, rhythm games,<br>She's the bomb at anything you can name!
+    GAME ATTACK! GAME ATTACK!<br>Gamer guys better run and hide!<br>GAME ATTACK! GAME ATTACK!<br>'Cause I'm the baddest, so step aside!<br>GAME ATTACK! GAME ATTACK!<br>I got the stats, and that's my proof!<br>GAME ATTACK! GAME ATTACK!<br>So come on and RAISE THE ROOF!
+    I'm the GameGrl!<br>(She's a GameGrl) The best in the world!<br>(She's a GameGrl) Girls rule!<br>(She's a GameGrl) And boys drool!<br>(She's a GameGrl) I'm kickin' rad!<br>(She's a GameGrl) You're super bad!<br>(She's a GameGrl) 'Cause I've got the moves<br>So step into my GAMER GROOVE.
+    Don't be a wimp!<br>(She's a GameGrl) Unless you're a shrimp!<br>(She's a GameGrl) I'm the new cool!<br>(She's a GameGrl) You're old school!<br>(She's a GameGrl) Gaming like a pro!<br>(She's a GameGrl) Come on, let's go!<br>(She's a GameGrl) Better than the rest<br>When you're gaming with the GameGrl you're gaming with the best!
+    Awesome! That was totally rad to the max! I could just keep doing this all day... NOT! I've got games to play, and if you think I'm gonna slow down just to talk to a bunch of amateurs, then you need to seriously blow the dust out of your cartridges.
+    But hey, girls, whenever you need to show those creepy boys who's boss, just remember that GameGrl's got your back. Look for me on specially-marked boxes of Betty Crocker brand snacks and have an adult call the toll-free number to subscribe to the girls-only GameGrl Magazine. Alright, check you later girlfriends!
 -------------------------------------------------------------------------------
 Track: ASSAULT
 Artist: Toby Fox
 Track Art: Maf
-URLs: https://homestuck.bandcamp.com/track/assault-2
+Duration: 2:21
+URLs:
+- https://homestuck.bandcamp.com/track/assault-2
+- https://youtu.be/4u_Gk9bH5_4?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: A Little Fight Mewsic
 Artist: Thomas Ferkol
 Track Art: Amethyst Barron
-URLs: https://homestuck.bandcamp.com/track/a-little-fight-mewsic-2
+Duration: 2:19
+URLs:
+- https://homestuck.bandcamp.com/track/a-little-fight-mewsic-2
+- https://youtu.be/O-EtZR02vGA?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Austin, Atlantis
 Artist: Clark Powell
+Track Art: Nic Carey
+Duration: 3:43
 References:
 - Beatdown (Strider Style)
 - Atomyk Ebonpyre
@@ -173,11 +229,12 @@ References:
 - Explore
 - Endless Climb
 - Flare
-Track Art: Nic Carey
-URLs: https://homestuck.bandcamp.com/track/austin-atlantis-2
+URLs:
+- https://homestuck.bandcamp.com/track/austin-atlantis-2
+- https://youtu.be/wPfUy4j9V7c?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Clark Powell:</i>
-    Nothing inspires me more than spaces, regardless of whether they are real or virtual. Examples include cities, mountains, buildings, individual rooms, even entire planets (see <a href="album/medium/index.html">Medium</a>).
+    Nothing inspires me more than spaces, regardless of whether they are real or virtual. Examples include cities, mountains, buildings, individual rooms, even entire planets (see [[album:Medium]]).
     Austin is currently my real world home, and to imagine it flooded and empty is a fascinating thing. Should Dirk ever decide to explore beyond Houston, what forgotten worlds would he find in the other lost Texan fortresses?
     The whole song was written to musically explore this sunken Austin, and to deliver a strong atmosphere and sense of place. The parts I used to piece together this portrait are the constituent Homestuck tunes, each of which I chose because of thematic applicability; they include Beatdown, Explore, Flare, and even Atomyk Ebonpyre.
     To capture the same essence visually in the track art, I knew I could trust Tynic. She is an incredible background artist with an uncanny sense for colors and composition! I am so proud of her work here; the song just wouldn’t be the same without the accompanying artwork.
@@ -186,22 +243,28 @@ Commentary:
 Track: Despot
 Artist: Erik Scheele
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/despot-2
+Duration: 3:36
+URLs:
+- https://homestuck.bandcamp.com/track/despot-2
+- https://youtu.be/O7CI8okTWSg?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
-<i>Erik Scheele:</i>
-Started as a sequel to Upward Movement, before Hussie skipped over that entire sequence, which made me try to build it into a general Dirk theme. Sort of like a rise to power, from princehood to kinghood, or sommat. Maybe even a character theme, though I can’t really make those calls.
-<i>Tavia Morra:</i>
-This picture started with an innocent suggestion from RJ who imagined Dirk riding a <a href="https://en.wikipedia.org/wiki/Super_Hang-On">super hang on motorcycle</a> to this song. I took the idea over to Jit who then helped me develop the picture to what it became, suggesting the <a href="https://www.youtube.com/watch?v=LUUbp-4kKMA">FF7 motorcycle chase</a> as inspiration and to turn the motorcycle in to Sawtooth.
+    <i>Erik Scheele:</i>
+    Started as a sequel to Upward Movement, before Hussie skipped over that entire sequence, which made me try to build it into a general Dirk theme. Sort of like a rise to power, from princehood to kinghood, or sommat. Maybe even a character theme, though I can’t really make those calls.
+    <i>Tavia Morra:</i>
+    This picture started with an innocent suggestion from RJ who imagined Dirk riding a <a href="https://en.wikipedia.org/wiki/Super_Hang-On">super hang on motorcycle</a> to this song. I took the idea over to Jit who then helped me develop the picture to what it became, suggesting the <a href="https://www.youtube.com/watch?v=LUUbp-4kKMA">FF7 motorcycle chase</a> as inspiration and to turn the motorcycle in to Sawtooth.
 -------------------------------------------------------------------------------
 Track: Stress
 Artist: Toby Fox, Buzinkai
 Contributors: Toby Fox (arrangement)
 Track Art: P-RO
-URLs: https://homestuck.bandcamp.com/track/stress-2
+Duration: 2:02
+URLs:
+- https://homestuck.bandcamp.com/track/stress-2
+- https://youtu.be/RZGdkT96JDs?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Toby Fox:</i>
     art by P-RO at <a href="nomorepros.tumblr.com">nomorepros.tumblr.com</a>. P-RO always does a maximally amazing job so why I asked her to draw the art is a non-question.
-    Stress is actually a pretty faithful arrangement of an original track by George Buzinkai. Buzinkai has been responsible for several HS-important melodies like Doctor, Endless Climb, and Explore and [her] work, for me, has always established a certain “essence” of what Homestuck is. My goal for this piece was actually to create a classic strife theme for Dirk with the core feeling of earlier pieces like Showtime or Doctor, so basing the piece off of something with that “essence” was important.*
+    Stress is actually a pretty faithful arrangement of an original track by Buzinkai. Buzinkai has been responsible for several HS-important melodies like Doctor, Endless Climb, and Explore and [her] work, for me, has always established a certain “essence” of what Homestuck is. My goal for this piece was actually to create a classic strife theme for Dirk with the core feeling of earlier pieces like Showtime or Doctor, so basing the piece off of something with that “essence” was important.*
     I can’t say why Buzinkai wrote this piece the way she did, so I’ll instead highlight the differences between the original and my arrangement.
     <ul><li><p>Updated the instrumentation. Buzinkai’s usage of PXTONE is indeed charming and nostalgic-sounding, but I wanted to push things bit further. One major difference is the arrangement of the strings - Buzinkai’s PXTONE strings have an sharp attack to them, while mine come on a bit softer but are thicker. My strings then sound more “lush” but less “urgent.”</p></li> <li><p>I added a section between the original A section and B section with lower intensity. This was because the song got a bit too repetitive and static simply repeating like Buzinkai’s. Oddly, the repeats didn’t bother me in his track. I think this is partially because MY loop point, unlike Buzinkai’s, lowers the intensity a LOT more by removing a bunch of instruments where his simply flows into a repeat. I need to think about that more.</p></li> <li><p>Added an introduction and a true ending to make it more of a proper start-to-finish song.</p></li></ul>
     About the similarity to Teal Hunter and a fun syncopation lesson:
@@ -214,7 +277,10 @@ Track: Minihoof's Adventure
 Artist: Michael Guy Bowman
 Contributors: Tavio Morra (vocals)
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/minihoofs-adventure-2
+Duration: 2:47
+URLs:
+- https://homestuck.bandcamp.com/track/minihoofs-adventure-2
+- https://youtu.be/KMyh7F9cyrE?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     I get the feeling that down the line there will be an explanation for why exactly there’s a tiny Maplehoof on Dirk Strider’s desk and it will be one of the biggest plot revelations in all of Homestuck. For me it was a cue that there needed to be a Sburb Alpha universe paralell for the song “Maplehoof’s Adventure”, which in itself was a spiritual sequel to “Pony Chorale”. It’s sort of a reality check to realize that I have written not one, not two, but three songs for cartoon ponies now - I guess that’s part of this disease we call the Internet.
@@ -227,9 +293,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Encore
 Artist: Malcolm Brown
-References: Showtime (Original Mix), Lifdoff, Unite Synchronization
 Track Art: Bea
-URLs: https://homestuck.bandcamp.com/track/encore-2
+Duration: 3:09
+References: Showtime (Original Mix), Lifdoff, Unite Synchronization
+URLs:
+- https://homestuck.bandcamp.com/track/encore-2
+- https://youtu.be/d8R1N5h3Mzc?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Malcolm Brown:</i>
     Let’s talk about Encore! Or “Showtime 2: Encore”.
@@ -250,9 +319,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Expedition
 Artist: Mark Hadley
-References: English, Explore
 Track Art: Kiddy
-URLs: https://homestuck.bandcamp.com/track/expedition-2
+Duration: 2:29
+References: English, Explore
+URLs:
+- https://homestuck.bandcamp.com/track/expedition-2
+- https://youtu.be/UjUpiHOtjWs?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Mark Hadley:</i>
     As I've mentioned before, I really like finding ways to combine themes. In this case, I combined 'Explore' and 'English' in a style inspired by the sailing theme from 'Legend of Zelda: The Wind Waker'. (It's easy to miss the theme from 'English', since it's a lot more upbeat and in a major key.) I don't use brass a lot when I write, but I think it came out well here.
@@ -260,7 +332,10 @@ Commentary:
 Track: Elephant Gun
 Artist: Michael Guy Bowman
 Track Art: 8bitkitten
-URLs: https://homestuck.bandcamp.com/track/elephant-gun-2
+Duration: 2:39
+URLs:
+- https://homestuck.bandcamp.com/track/elephant-gun-2
+- https://youtu.be/60Qjl1iyZ4U?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     This is pure Jake strife music - I started this project with the definite goal in mind to make something that sounded purely like video game music for a battle. Jake English is sort of the archetypal Roosevelt-type swashbuckler with all the bravado of a turn-of-the-century primitivist. For him, the palette of sounds is instantaneous: heavy percussion rumbling at a breakneck pace. I threw in chimes, timpani, xylophone, glockenspiel, cymbal crashes, and an uncompromising drum machine to get the atmosphere I wanted.
@@ -271,7 +346,10 @@ Commentary:
 Track: Miasmajesty
 Artist: Solatrus, Nick Smalley
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/miasmajesty-2
+Duration: 3:20
+URLs:
+- https://homestuck.bandcamp.com/track/miasmajesty-2
+- https://youtu.be/cfzEta7PCkk?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Tavia Morra:</i>
     You ever have one of those days where the pen and photoshop just seem to be behaving? I was having one of those days and as a result this picture of Dirk happened. He’s holding a Derse flag with the pointy end coming at the viewer. This man means business.
@@ -279,8 +357,11 @@ Commentary:
 Track: Jane Dargason
 Artist: Clark Powell, Robert J! Lake
 Track Art: Dawn Davis
+Duration: 3:43
 References: Life in Technicolor
-URLs: https://homestuck.bandcamp.com/track/jane-dargason-2
+URLs:
+- https://homestuck.bandcamp.com/track/jane-dargason-2
+- https://youtu.be/jSczYjYAaUY?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Clark Powell:</i>
     (<a href="https://plazmataz.tumblr.com/post/25536699941/jane-dargason-it-may-be-a-little-late-by-now-but">Tumblr</a>)
@@ -299,7 +380,10 @@ Commentary:
 Track: Before the Beginning and After the End
 Artist: Robert J! Lake
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/before-the-beginning-and-after-the-end-2
+Duration: 4:27
+URLs:
+- https://homestuck.bandcamp.com/track/before-the-beginning-and-after-the-end-2
+- https://youtu.be/Nab_SoEy8rk?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Tavia Morra:</i>
     This was one of the last track art pieces I did that I had a lot of fun with. I didn’t really know what I was doing when I went in, but as soon as I had laid out what Alpha Kid went where, the colors instantly stood out in my mind. I really like the way this one came out.
@@ -307,19 +391,28 @@ Commentary:
 Track: Bridge of Stars
 Artist: Thomas Ferkol
 Track Art: 8bitkitten
-URLs: https://homestuck.bandcamp.com/track/bridge-of-stars-2
+Duration: 3:35
+URLs:
+- https://homestuck.bandcamp.com/track/bridge-of-stars-2
+- https://youtu.be/yQSb3LMPk0Q?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Cumulating Dreams
 Artist: Solatrus
 Contributors: Clark Powell (cello)
 Track Art: Kat
-URLs: https://homestuck.bandcamp.com/track/cumulating-dreams-2
+Duration: 3:11
+URLs:
+- https://homestuck.bandcamp.com/track/cumulating-dreams-2
+- https://youtu.be/80ZicKue9yM?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Busting Makes Me Feel Good
 Artist: Michael Guy Bowman
 Track Art: Victoria Grace Elliott
+Duration: 3:25
 References: Ghostbusters
-URLs: https://homestuck.bandcamp.com/track/busting-makes-me-feel-good-2
+URLs:
+- https://homestuck.bandcamp.com/track/busting-makes-me-feel-good-2
+- https://youtu.be/ObxMP2v6ke8?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     This track was an attempt to try something in the same vain as the soundtrack to Jet Set Radio Future which was recommended to me by friends Erik Scheele and Richard Gung. Composer Hideki Naganuma has created some of the most intricate and engaging pieces of dance music I’ve ever heard - his signature approach is his construction of entire songs around only a handful of samples (check out “Funky Dealer” for a good example).
@@ -330,7 +423,10 @@ Commentary:
 Track: Everything is Something to Somebody
 Artist: Robert J! Lake
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/everything-is-something-to-somebody-2
+Duration: 3:06
+URLs:
+- https://homestuck.bandcamp.com/track/everything-is-something-to-somebody-2
+- https://youtu.be/reSPRXEtVmg?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Tavia Morra:</i>
     This is another one that RJ let me do whatever I wanted on. After thinking about the title of the track, I remembered the moment in Homestuck when we all finally found out the answer to the infamous question <a href="https://www.homestuck.com/story/4853">“What Pumpkin?”</a> And what a heartwarming answer it was! To me, this was one of the most gentle tear-jerking moments in the comic to date. It just made sense to draw.
@@ -340,7 +436,10 @@ Directory: iRRRRRRRRECONCILA8LE
 Artist: Michael Guy Bowman
 Contributors: Thomas Ferkol (electric guitar)
 Track Art: 8bitkitten
-URLs: https://homestuck.bandcamp.com/track/irrrrrrrreconcila8le-2
+Duration: 1:41
+URLs:
+- https://homestuck.bandcamp.com/track/irrrrrrrreconcila8le-2
+- https://youtu.be/IyVUutdaP8E?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     Before there was 20+ hours of music in the Homestuck catalog, the music team’s task was to create new themes at a moment’s notice for new elements of the story. When Tavrisprite appeared in the comic, I challenged myself to make a suitable theme at the same pace I might once have cobbled something together back in 2009. I posted the resulting demo track on my Soundcloud the same day as the character made its debut.
@@ -351,8 +450,11 @@ Track: I'm a Member of the Midnight Crew (Post-Punk Version)
 Artist: Michael Guy Bowman
 Contributors: Erik Scheele (piano), Marcy Nabors (thermin & accordian)
 Track Art: Cari Garafalo
+Duration: 3:50
 Referenecs: I'm a Member of the Midnight Crew
-URLs: https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-post-punk-version-2
+URLs:
+- https://homestuck.bandcamp.com/track/im-a-member-of-the-midnight-crew-post-punk-version-2
+- https://youtu.be/nU9YXh_0L4Y?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     One of the things I’d always felt was curious about our re-appropriation of the hundred-year-old vaudeville track by Eddie Morton was the complete contrast between its cheerful mood and the sinister nature of the characters it represents. The Midnight Crew, while fashion-savvy, are cold-blooded murderers, and I’d been curious as to what a darker version of their signature song might sound like.
@@ -362,9 +464,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Three in the Morning (Aftermath)
 Artist: Erik Scheele
-References: Three in the Morning
 Track Art: Dawn Davis
-URLs: https://homestuck.bandcamp.com/track/three-in-the-morning-aftermath-2
+Duration: 3:28
+References: Three in the Morning
+URLs:
+- https://homestuck.bandcamp.com/track/three-in-the-morning-aftermath-2
+- https://youtu.be/nkRwwNcIkEw?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Erik Scheele:</i>
     I don’t remember how long ago it was that Plaz asked me to do an improvisation around their Three In The Morning, but I did it, and here it is!
@@ -372,23 +477,35 @@ Commentary:
 Track: Lancer
 Artist: Clark Powell
 Track Art: clorinspats
-URLs: https://homestuck.bandcamp.com/track/lancer-2
+Duration: 3:51
+URLs:
+- https://homestuck.bandcamp.com/track/lancer-2
+- https://youtu.be/C1L6GAcqAVE?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Three's a Crowd
 Artist: Robert J! Lake, Thomas Ferkol
-References: Three in the Morning
 Track Art: ari
-URLs: https://homestuck.bandcamp.com/track/threes-a-crowd-2
+Duration: 3:27
+References: Three in the Morning
+URLs:
+- https://homestuck.bandcamp.com/track/threes-a-crowd-2
+- https://youtu.be/hBnCIpVQTls?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Break Shot
 Artist: Kalibration
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/break-shot-2
+Duration: 3:05
+URLs:
+- https://homestuck.bandcamp.com/track/break-shot-2
+- https://youtu.be/E07s837gHWE?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Portrait
 Artist: Solatrus
 Track Art: Kate Holden
-URLs: https://homestuck.bandcamp.com/track/portrait-2
+Duration: 4:13
+URLs:
+- https://homestuck.bandcamp.com/track/portrait-2
+- https://youtu.be/qkF5HxMd1LA?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Solatrus:</i>
     Honestly, on all three, it was a lot of going with my gut because I hadn’t quite gained the understanding of writing percussion that I now have. Though, having a good instinct for interesting rhythms definitely is why I seem to be so notorious for percussion/drum beats.
@@ -402,17 +519,26 @@ Commentary:
 Track: Negative Aperture
 Artist: Svix
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/negative-aperture-2
+Duration: 2:36
+URLs:
+- https://homestuck.bandcamp.com/track/negative-aperture-2
+- https://youtu.be/x15fE5XGk1g?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Sweet Dreams, Timaeus
 Artist: Thomas Ferkol
 Track Art: Vivian Ng
-URLs: https://homestuck.bandcamp.com/track/sweet-dreams-timaeus-2
+Duration: 3:19
+URLs:
+- https://homestuck.bandcamp.com/track/sweet-dreams-timaeus-2
+- https://youtu.be/GhVCvz1sRdw?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Red Miles
 Artist: James Dever
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/red-miles-2
+Duration: 3:10
+URLs:
+- https://homestuck.bandcamp.com/track/red-miles-2
+- https://youtu.be/_7ulwTrNnTE?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>James Dever:</i>
     <b>History</b>
@@ -435,13 +561,19 @@ Commentary:
 Track: The Changing Game
 Artist: Thomas Ferkol
 Track Art: Homestuck
-URLs: https://homestuck.bandcamp.com/track/the-changing-game-2
+Duration: 4:12
+URLs:
+- https://homestuck.bandcamp.com/track/the-changing-game-2
+- https://youtu.be/a7UeOYYKrxg?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Requited
 Artist: Clark Powell
-References: Serenade
 Track Art: dodostad
-URLs: https://homestuck.bandcamp.com/track/requited-2
+Duration: 4:32
+References: Serenade
+URLs:
+- https://homestuck.bandcamp.com/track/requited-2
+- https://youtu.be/k3QzERACr-Q?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Clark Powell:</i>
     Back on Volume 8 I wrote a song called Serenade; the track art for it explains well what the song is about. In a great many ways it was an important song for me. For one, it was the first song I’ve ever written, by which I mean a short, lyrical work written in a structure including verses and choruses. On top of that the music and the melodies came unusually naturally to me, and it all felt organic and expressive of my situation in life at the time of writing. Serenade is by far the closest emotional connection I have to Homestuck.
@@ -452,23 +584,32 @@ Commentary:
 Track: Princess of Helium
 Artist: Clark Powell
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/princess-of-helium-2
+Duration: 2:12
+URLs:
+- https://homestuck.bandcamp.com/track/princess-of-helium-2
+- https://youtu.be/mAgr3UH7ywo?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
-    <i>Clark Powell:</i>
+    <i>Tavia Morra:</i>
     This was the first track art I had done for Volume 9, but at the time I drew it I didn’t know it was going to be on the upcoming album. Plazmataz played a track they’d been working on outloud for me and asked if I wanted to do art. I jumped on the opportunity and got a lot of painting practice in with this one. I’m super proud of this one, since it was the first picture in a while that had a strong palette.
 -------------------------------------------------------------------------------
 Track: Moonsetter
 Artist: Toby Fox
 Contributors: Samm Neiland (viola), Clark Powell (cello)
 Track Art: saffronScarf
-URLs: https://homestuck.bandcamp.com/track/moonsetter-2
+Duration: 2:21
+URLs:
+- https://homestuck.bandcamp.com/track/moonsetter-2
+- https://youtu.be/75kJb_aAvKY?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Candles and Clockwork (Alpha Version)
 Artist: James Dever
 Contributors: Alexander Rosetti (mixing)
-References: Candles and Clockwork
 Track Art: Worthikids
-URLs: https://homestuck.bandcamp.com/track/candles-and-clockwork-alpha-version-2
+Duration: 2:28
+References: Candles and Clockwork
+URLs:
+- https://homestuck.bandcamp.com/track/candles-and-clockwork-alpha-version-2
+- https://youtu.be/0aPJVZMW4xI?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>James Dever:</i>
     <b>History</b>
@@ -486,9 +627,12 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Coursing
 Artist: Alexander Rosetti
-References: Courser
 Track Art: Zilleniose
-URLs: https://homestuck.bandcamp.com/track/coursing-2
+Duration: 4:17
+References: Courser
+URLs:
+- https://homestuck.bandcamp.com/track/coursing-2
+- https://youtu.be/yzfiSLL9vOo?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Alexander Rosetti:</i>
     I wrote it to be the “alpha” version of Courser, another piece by myself and Beatfox. Where Courser is a theme for Bec, Coursing can be thought of as a theme for GCat, though in my mind it encompasses the idea of any First Guardian. It is not a “remix” or even an arrangement of Courser, but it is based off Courser’s material and of course heavily references it and quotes it. I hope you enjoy! The track art is by the amazing Zilleniose. Thanks Zoey!
@@ -496,18 +640,27 @@ Commentary:
 Track: Cairo Overcoat
 Artist: Thomas Ferkol
 Track Art: Lauren Ross
-URLs: https://homestuck.bandcamp.com/track/cairo-overcoat-2
+Duration: 3:43
+URLs:
+- https://homestuck.bandcamp.com/track/cairo-overcoat-2
+- https://youtu.be/PLYF-Zlfd2c?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Battle Against an Unfathomable Enemy
 Artist: Kalibration
 Track Art: skepticArcher
-URLs: https://homestuck.bandcamp.com/track/battle-against-an-unfathomable-enemy-2
+Duration: 3:40
+URLs:
+- https://homestuck.bandcamp.com/track/battle-against-an-unfathomable-enemy-2
+- https://youtu.be/xtCo--GAAnA?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Noirscape
 Artist: David Ellis
-References: Liquid Negrocity, Crystalanthemums, Descend
 Track Art: kendle bentley b!
-URLs: https://homestuck.bandcamp.com/track/noirscape-2
+Duration: 5:08
+References: Liquid Negrocity, Crystalanthemums, Descend
+URLs:
+- https://homestuck.bandcamp.com/track/noirscape-2
+- https://youtu.be/dG5BjK4194A?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>David Ellis:</i>
     This tune got some pretty cool art from kendle bentley b! at electroluxx.tumblr.com. I don’t really know anything other than ‘wow, that’s really cool’.
@@ -525,11 +678,14 @@ Commentary:
 Track: Dogfight
 Artist: Team Dogfight
 Track Art: skepticArcher
-URLs: https://homestuck.bandcamp.com/track/dogfight-2
+Duration: 3:40
+URLs:
+- https://homestuck.bandcamp.com/track/dogfight-2
+- https://youtu.be/t7jg87kn5ps?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Contributors:
 - David Dycus (organizer & synths)
 - Willow Ascenzo (orchestra)
-- Yishan Mai (drums & piano)
+- Catboss (drums & piano)
 - DJ最テー (guitar)
 - viaSatellite (guitar & bass)
 - Ian White (trumpet & bass)
@@ -542,23 +698,32 @@ References:
 -------------------------------------------------------------------------------
 Track: A Taste for Adventure
 Artist: Seth Peelle
-References: Dissension (Original), Carefree Action, Showtime (Original Mix)
 Track Art: minty
-URLs: https://homestuck.bandcamp.com/track/a-taste-for-adventure-2
+Duration: 8:24
+References: Dissension (Original), Carefree Action, Showtime (Original Mix)
+URLs:
+- https://homestuck.bandcamp.com/track/a-taste-for-adventure-2
+- https://youtu.be/S4kIfIUSV6o?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 -------------------------------------------------------------------------------
 Track: Stargaze
 Artist: Nick Smalley
 Track Art: Tavia Morra
-URLs: https://homestuck.bandcamp.com/track/stargaze-2
+Duration: 1:24
+URLs:
+- https://homestuck.bandcamp.com/track/stargaze-2
+- https://youtu.be/ZTkdO7c4MEE?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Tavia Morra:</i>
     Nick Smalley approached me about this one with a very specific image for this one. He wanted a night time version of Lexxy’s wonderful <a href="misc/together.jpg">Beta Kids image</a>. I had a lot of fun sprinkling details in to this image. I think the part that makes me smile most is little Minihoof curled up on Dirk’s chest.
 -------------------------------------------------------------------------------
 Track: Another Countdown
 Artist: Michael Guy Bowman
-References: Another Jungle
 Track Art: Emery Ferguson
-URLs: https://homestuck.bandcamp.com/track/another-countdown-2
+Duration: 1:20
+References: Another Jungle
+URLs:
+- https://homestuck.bandcamp.com/track/another-countdown-2
+- https://youtu.be/e71naCnOdwo?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
 Commentary:
     <i>Michael Guy Bowman:</i>
     I’ve mentioned a few times that Homestuck Vol. 9, in its early planning stages, was conceived as an album that would be dedicated to the new session of Homestuck, and most of the tracks would mimic older songs re-imagined in the new universe presented in Act 6. “Another Countdown” was thus the sister song of “Sburban Countdown” - both are brief arrangements of their parent songs (“Another Jungle” and “Sburban Jungle” respectively) meant to crescendo towards a major climax.
@@ -567,6 +732,9 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Frustracean
 Artist: Toby Fox
-References: Crustacean
 Track Art: Homestuck
-URLs: https://www.youtube.com/watch?v=om3VC6ru4yk
+Duration: 2:47
+References: Crustacean
+URLs:
+- https://www.youtube.com/watch?v=om3VC6ru4yk
+- https://youtu.be/om3VC6ru4yk?list=PLy5UGIMKOXpOfcXVfECYjb09aHc2uSEUv
