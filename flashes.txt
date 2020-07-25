@@ -1,6 +1,11 @@
 ACT: Act 1 - The Note Desolation Plays
 FG: #7799ff
 ------------------------------------------------------------------------------
+Flash: John: Examine games on CD rack.
+Page: 31
+Date: April 16, 2009
+Tracks: Problem Sleuth Theme
+------------------------------------------------------------------------------
 Flash: [S] John: Play haunting piano refrain.
 Page: 77
 Date: April 21, 2009
@@ -426,6 +431,7 @@ Tracks:
 - Spider's Claw
 - MeGaLoVania
 - A Tender Moment
+- Nic Cage Romance
 - Nic Cage Song
 - Secret ROM
 - Boy Skylark (Brief)
@@ -577,6 +583,11 @@ Date: May 15, 2011
 Tracks: BL1ND JUST1C3 : 1NV3ST1G4T1ON !!
 URLs:
 - https://youtu.be/8RC_02KeBrE
+------------------------------------------------------------------------------
+Flash: [S][o] ==>
+Page: 3952
+Date: August 15, 2011
+Tracks: Fear of the Heavens
 ------------------------------------------------------------------------------
 Flash: [S] Attempt rare and highly dangerous 5x SHOWDOWN COMBO.
 Page: 4085
@@ -1024,6 +1035,11 @@ URLs:
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Intermission 4 - <span style="color: #008282">F1X TH1S</span>
 FG: #4466ff
+------------------------------------------------------------------------------
+Flash: [S][A6A6I4] ====>
+Page: 7086
+Date: November 24, 2014
+Tracks: Fear of the Heavens
 ------------------------------------------------------------------------------
 Flash: [S][A6A6I4] ====>
 Page: 7098

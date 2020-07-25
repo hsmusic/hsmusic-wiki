@@ -696,6 +696,7 @@ References:
 - Lotus
 - Problem Sleuth Theme
 - Dirgeish
+- Fear of the Heavens
 -------------------------------------------------------------------------------
 Track: Homestuck
 Artist: Mark Hadley

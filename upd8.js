@@ -97,7 +97,7 @@ const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_ABOUT = fixWS`
     <p>Welcome to my fan-made Homestuck music wiki!</p>
     <p><a href="https://www.homestuck.com/">Homestuck</a> has always been an incredible creative collaboration, and especially beloved by the community and critical in that collaboration is the webcomic and world's humongous soundtrack, comprising well over 500 tracks by dozens of musicians and artists. This wiki aims to be an interesting and useful resource for anyone interested in that music, as well as an archive for all things related.</p>
-    <p>Pertaining to the history of this site: it was originally made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content particularly reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums (among other missing albums, like <a href="album/squiddles/index.html">Squiddles!</a>) are all indexed in the one place, and URLs will always stay consistent. And of course, also included are links for listening on Bandcamp and other services.</p>
+    <p>Pertaining to the history of this site: it was originally made as a remake of Homestuck's official <a href="https://homestuck.bandcamp.com/">Bandcamp</a>, which saw its content particularly reduced on <a href="https://twitter.com/hamesatron/status/1187842783618297856">10/25/19</a>. This site aims to be a more reliable resource and reference: track art (conspicuously missing from the Bandcamp) is archived here, solo albums (among other missing albums, like [[album:Squiddles!]]) are all indexed in the one place, and URLs will always stay consistent. And of course, also included are links for listening on Bandcamp and other services.</p>
     <p>The code for this website is open source (GPL-3.0), and can be explored or forked <a href="https://github.com/hsmusic/hsmusic.github.io/">here</a>. I don't actively keep track of issues or PRs raised there; if you want to get in touch with feature requests or comments on the code, my contact info is <a href="feedback/index.html">here</a>!</p>
     <p><i>Resource &amp; Author Credits</i></p>
     <ul>
@@ -107,7 +107,7 @@ const SITE_ABOUT = fixWS`
         <li><a href="https://homestuck.net/music/references.html">NSND</a>: leitmotifs! Thanks to this site in combination with credits on the bandcamp and artists' own commentary, this wiki is a rather comprehensive resource for leitmotifs and other track references.</li>
         <li><a href="https://www.bgreco.net/hsflash.html">bgreco.net (HQ Audio Flashes)</a>: thumbnail captures for the individual Flash animations! There were a couple captures missing that I took myself, but most Flash thumbnails are from here.</a></li>
         <li>The <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom: the inspiration for this wiki! I've wanted to make a more complete and explorable wiki ever since seeing it. The Fandom wiki has also been a very handy reference in putting this together, so much thanks to everyone who's worked on it!</li>
-        <li>All organizers and contributors of the <a href="https://sollay-b.tumblr.com/post/188094230423/hello-a-couple-of-years-ago-allyssinian">Homestuck Vol. 5 Anthology</a> - community-made track art for <a href="album/homestuck-vol-5/index.html">Homestuck Vol. 5</a>! All of this art is <i>excellent</i>. Each track credits its respective cover artist.</li>
+        <li>All organizers and contributors of the <a href="https://sollay-b.tumblr.com/post/188094230423/hello-a-couple-of-years-ago-allyssinian">Homestuck Vol. 5 Anthology</a> - community-made track art for [[album:Homestuck Vol. 5]]! All of this art is <i>excellent</i>. Each track credits its respective cover artist.</li>
         <li>Likewise for the <a href="https://hsfanmusic.skaia.net/post/619761136023257089/unofficialmspafans-we-are-proud-to-announce-the">Beyond Canon Track Art Anthology</a>!</li>
         <li>All comments on the site: I appreciate all feedback a lot! People have shared a ton of ideas and suggestions with me, and I <i>cannot</i> emphasize enough how motivating it is to share a project with like-minded folx interested in making it better with you.</li>
     </ul>
@@ -118,10 +118,10 @@ const SITE_ABOUT = fixWS`
         <li>Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki.</li>
         <li>Kidpen, for suggesting the "Flashes that feature this track" feature.</li>
         <li>an emailer, for suggesting the "Random track" feature.</li>
-        <li>foreverFlumoxed, for pointing out that <a href="flash/338/index.html">[S] ==&gt;</a> contains reference to <a href="track/john-do-the-windy-thing/index.html">JOHN DO THE WINDY THING</a> (this reminded me to add all the unreleased Flash tracks to the Unreleased Tracks album!), and for going to the massive effort of checking every track page and pointing out a bunch of missing cover arts and title typos!</li>
+        <li>foreverFlumoxed, for pointing out that [[flash:338]] contains reference to [[JOHN DO THE WINDY THING]] (this reminded me to add all the unreleased Flash tracks to the Unreleased Tracks album!), for recommending the restructure to [[album:Unreleased Tracks]], and for going to the massive effort of checking every track page and pointing out a bunch of missing cover arts and title typos!</li>
         <li>Makin, for various initial help in data collection (especially commentary) and lifting the site off the ground by pinning it to the top of the /r/homestuck subreddit for a while, and for linking me the independent release of <a href="https://jamesdever.bandcamp.com/album/sburb">Sburb</a>.</li>
-        <li>an emailer, for sending a crop of the YT thumbnail art for <a href="track/after-the-sun/index.html">After the Sun</a> (plus the SoundCloud link for that track).</li>
-        <li>Thanks for pointing out typos, errors in reference lists, and out of date details: cookiefonster, foreverFlummoxed.</li>
+        <li>an emailer, for sending a crop of the YT thumbnail art for [[After the Sun]] (plus the SoundCloud link for that track), for reporting the "Random" buttons being broken, and for linking a bunch of resources and various official uploads of tracks and albums.</li>
+        <li>Thanks for pointing out typos, errors in reference lists, and out of date details: cookiefonster, foreverFlummoxed, and an emailer.</li>
     </ul>
 `;
 
@@ -915,7 +915,7 @@ function writeMiscellaneousPages() {
                     <div class="long-content">
                         <h1>${SITE_TITLE}</h1>
                         <p><a href="index.html">(Home)</a></p>
-                        ${SITE_ABOUT}
+                        ${transformMultiline(SITE_ABOUT, true)}
                     </div>
                 </div>
             </body>
@@ -1478,7 +1478,7 @@ function writeListingPages() {
         [['albums', 'by-name'], `Albums - by Name`, albumData.slice()
             .sort(sortByName)
             .map(album => getAlbumLI(album, `(${album.tracks.length} tracks)`))],
-        [['albums', 'by-date'], `Albums - by Date`, C.sortByDate(albumData.slice())
+        [['albums', 'by-date'], `Albums - by Date`, C.sortByDate(albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
             .map(album => getAlbumLI(album, `(${getDateString(album)})`))],
         [['albums', 'by-duration'], `Albums - by Duration`, albumData.slice()
             .map(album => ({album, duration: getTotalDuration(album.tracks)}))
@@ -1537,7 +1537,7 @@ function writeListingPages() {
                 </dl>
             `],
         [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
-            C.sortByDate(allTracks.slice()),
+            C.sortByDate(allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
             track => fixWS`
                 <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>
             `)],

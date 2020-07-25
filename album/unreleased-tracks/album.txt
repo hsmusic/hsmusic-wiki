@@ -135,10 +135,20 @@ Artist: Toby Fox
 Duration: 0:38
 URLs: https://www.youtube.com/watch?v=mjKX8H3mSJo
 -------------------------------------------------------------------------------
+Track: Nic Cage Romance
+Artist: Toby Fox
+Duration: 1:19
+URLs: https://www.youtube.com/watch?v=fvDpDxXXZog
+-------------------------------------------------------------------------------
 Track: not a creature was stirring
 Artist: Alexander Rosetti
 Duration: 0:59
 URLs: https://www.youtube.com/watch?v=hdlh6FRPnCw
+-------------------------------------------------------------------------------
+Track: Problem Sleuth Theme
+Artist: Mark Hadley
+Duration: 1:06
+URLs: https://www.youtube.com/watch?v=DAj-vYcKNYY
 -------------------------------------------------------------------------------
 Track: Requiem
 Artist: Clark Powell
@@ -158,7 +168,12 @@ URLs: https://www.youtube.com/watch?v=mNu1KAi0Prk
 Track: Secret ROM
 Artist: Toby Fox
 Duration: 3:22
-References: The Little Sprite, Terra's Theme, Wind Scene, Chrono Trigger
+References:
+- The Little Sprite
+- Onett Theme
+- Terra's Theme
+- Wind Scene
+- Chrono Trigger
 URLs: https://www.youtube.com/watch?v=ercVSU3rjrc
 -------------------------------------------------------------------------------
 Track: Single Female Lawyer
@@ -286,11 +301,6 @@ Track: Mutiny
 Artist: Bill Bolin
 Has URLs: no
 -------------------------------------------------------------------------------
-Track: Nic Cage Romance
-Artist: Toby Fox
-Duration: 1:19
-URLs: https://www.youtube.com/watch?v=fvDpDxXXZog
--------------------------------------------------------------------------------
 Track: Non Compos Mentis
 Artist: Bill Bolin
 Has URLs: no
@@ -307,11 +317,6 @@ Artist: Toby Fox
 URLs:
 - https://www.youtube.com/watch?v=RIq4GrMv96I
 - https://www.youtube.com/watch?v=OdntMzdkFnk
--------------------------------------------------------------------------------
-Track: Problem Sleuth Theme
-Artist: Mark Hadley
-Duration: 1:06
-URLs: https://www.youtube.com/watch?v=DAj-vYcKNYY
 ------------------------------------------------------------------------------
 Track: Rex English
 Artist: Toby Fox
@@ -883,6 +888,11 @@ Track: Objection! 2001
 Artist: Ace Attorney
 Duration: 1:13
 URLs: https://www.youtube.com/watch?v=_I34nshlOPk
+-------------------------------------------------------------------------------
+Track: Onett Theme
+Artist: Earthbound
+Duration: 2:24
+URLs: https://www.youtube.com/watch?v=7y5RRgjfNek
 -------------------------------------------------------------------------------
 Track: Paint It, Black
 Artist: The Rolling Stones
