@@ -77,14 +77,20 @@ const C = {
     // "directories", we just reformat the artist's name.
     getArtistDirectory: artistName => C.getKebabCase(artistName),
 
-    getArtistNumContributions: (artistName, {allTracks, albumData, flashData}) => [
-        ...allTracks.filter(track =>
-            track.artists.includes(artistName) ||
-            [...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artistName)),
+    getThingsArtistContributedTo: (artistName, {allTracks, albumData, flashData}) => [
+        ...allTracks.filter(track => [
+            ...track.artists,
+            ...track.contributors,
+            ...track.coverArtists || []
+        ].some(({ who }) => who === artistName)),
         ...flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artistName)),
         ...albumData.filter(album =>
             (album.coverArtists || []).some(({ who }) => who === artistName))
-    ].length,
+    ],
+
+    getArtistNumContributions: (artistName, {allTracks, albumData, flashData}) => (
+        C.getThingsArtistContributedTo(artistName, {allTracks, albumData, flashData}).length
+    ),
 
     getArtistCommentary: (artistName, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'))
 };

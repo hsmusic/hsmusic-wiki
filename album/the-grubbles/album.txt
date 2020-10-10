@@ -1,7 +1,7 @@
 Album: THE GRUBBLES
 Artist: The Grubbels
 Cover Art: The Grubbels
-Track Art: none
+Has Track Art: no
 Date: September 14, 2017 00:00:04
 FG: #dd0000
 URLs:

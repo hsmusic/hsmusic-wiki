@@ -264,6 +264,7 @@ Artist: Kal-la-kal-la
 Track Art: Cosmic
 Duration: 4:28
 References:
+- Remember
 - Homestuck Anthem
 - Do You Remem8er Me
 - Penumbra Phantasm

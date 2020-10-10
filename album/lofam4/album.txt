@@ -34,6 +34,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ~~DISC 1~~
 Artist: Lambda Bledsoe, ndividedbyzero
+Track Art: none
 References: Homestuck Title Screen
 Duration: 0:32
 Directory: disc1-lofam4

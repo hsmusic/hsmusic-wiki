@@ -444,6 +444,7 @@ Commentary:
 Track: Fighting Spirit
 Artist: Kevin Grant
 Track Art: AS
+Duration: 4:04
 References:
 - Doctor
 - Showtime (Original Mix)
@@ -1033,6 +1034,7 @@ Track: Joy And Dreams Eternal
 Artist: Malcolm Brown
 Track Art: Fitzwibble
 References: Ballad of Awakening
+Duration: 2:45
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/joy-and-dreams-eternal
 - https://youtu.be/KlKvnXvJ5a8?list=PLnVpmehyaOFZuWBGTwXgaTHoEU0I81xei
@@ -1043,7 +1045,7 @@ Commentary:
 Track: Guns Blazing
 Artist: Catboss
 Track Art: angryoct
-Duration: 2:45
+Duration: 3:21
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/guns-blazing
 - https://youtu.be/nzXoB2hXYCw?list=PLnVpmehyaOFZuWBGTwXgaTHoEU0I81xei

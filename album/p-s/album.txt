@@ -3,8 +3,9 @@ Directory: p-s
 Cover Art: Seth Massey, climeade
 Date: June 13, 2018
 FG: #bbc0a8
-Has Track Art: No
+Has Track Art: no
 Canon: Fanon
+URLs: https://casualsunday.bandcamp.com/album/p-s
 Commentary:
     <i>Casual Sunday:</i>
     a love letter to homestuck

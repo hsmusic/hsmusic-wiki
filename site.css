@@ -81,6 +81,26 @@ a:hover {
     white-space: nowrap;
 }
 
+.icons {
+    font-style: normal;
+    white-space: nowrap;
+}
+
+.icon {
+    display: inline-block;
+    width: 24px;
+    height: 1em;
+    position: relative;
+}
+
+.icon > svg {
+    width: 24px;
+    height: 24px;
+    top: -0.25em;
+    position: absolute;
+    fill: var(--fg-color);
+}
+
 @media (max-width: 780px) {
     #sidebar {
         display: none;

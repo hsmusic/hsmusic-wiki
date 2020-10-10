@@ -2,8 +2,9 @@ Album: Shortcuts
 Cover Art: Robert J! Lake
 Date: November 2, 2013
 FG: #aca7b8
-Has Track Art: No
+Has Track Art: no
 Canon: Fanon
+URLs: https://casualsunday.bandcamp.com/album/shortcuts
 Commentary:
     <i>Casual Sundays:</i>
     an album about love and loss and numbers and places<br>(best listened to on headphones or loud, loud, gorgeous speakers)

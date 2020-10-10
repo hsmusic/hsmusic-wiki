@@ -233,7 +233,7 @@ Commentary:
 Track: Galaxy Hearts
 Artist: Mark Hadley
 Track Art: Rachel Weiss
-Duuration: 2:54
+Duration: 2:54
 URLs:
 - https://homestuck.bandcamp.com/track/galaxy-hearts-2
 - https://youtu.be/YQX0TWA_x6Q?list=PLnVpmehyaOFa9Ssz0RANELG8eSoUeOQiC
@@ -362,7 +362,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Hussie Hunt
 Artist: Malcolm Brown
-Track Art: saffronScarf
+Track Art: Hanni Brosh
 Duration: 2:46
 References: Explore
 URLs:

@@ -37,6 +37,21 @@
 
 // TRACK ART CREDITS. This is a must.
 
+// 2020-08-23
+// ATTENTION ALL 8*TCHES AND OTHER GENDER TRUCKERS: AS IT TURNS OUT, THIS CODE
+// ****SUCKS****. I DON'T THINK ANYTHING WILL EVER REDEEM IT, 8UT THAT DOESN'T
+// MEAN WE CAN'T TAKE SOME ACTION TO MAKE WRITING IT A LITTLE LESS TERRI8LE.
+// We're gonna start defining STRUCTURES to make things suck less!!!!!!!!
+// No classes 8ecause those are a huge pain and like, pro8a8ly 8ad performance
+// or whatever -- just some standard structures that should 8e followed
+// wherever reasona8le. Only one I need today is the contri8 one 8ut let's put
+// any new general-purpose structures here too, ok?
+//
+// Contri8ution: {who, what, date, thing}. D8 and thing are the new fields.
+//
+// Use these wisely, which is to say all the time and instead of whatever
+// terri8le new pseudo structure you're trying to invent!!!!!!!!
+
 'use strict';
 
 const fs = require('fs');
@@ -107,15 +122,16 @@ const SITE_ABOUT = fixWS`
         <li><a href="https://homestuck.net/music/references.html">NSND</a>: leitmotifs! Thanks to this site in combination with credits on the bandcamp and artists' own commentary, this wiki is a rather comprehensive resource for leitmotifs and other track references.</li>
         <li><a href="https://www.bgreco.net/hsflash.html">bgreco.net (HQ Audio Flashes)</a>: thumbnail captures for the individual Flash animations! There were a couple captures missing that I took myself, but most Flash thumbnails are from here.</a></li>
         <li>The <a href="https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki">Homestuck and MSPA Music Wiki</a> on Fandom: the inspiration for this wiki! I've wanted to make a more complete and explorable wiki ever since seeing it. The Fandom wiki has also been a very handy reference in putting this together, so much thanks to everyone who's worked on it!</li>
+        <li><a href="https://carrd.co/">carrd.co</a>: I stole your icons.svg file. It is mine now. :tobyfox_dog_sunglasses:</li>
         <li>All organizers and contributors of the <a href="https://sollay-b.tumblr.com/post/188094230423/hello-a-couple-of-years-ago-allyssinian">Homestuck Vol. 5 Anthology</a> - community-made track art for [[album:Homestuck Vol. 5]]! All of this art is <i>excellent</i>. Each track credits its respective cover artist.</li>
-        <li>Likewise for the <a href="https://hsfanmusic.skaia.net/post/619761136023257089/unofficialmspafans-we-are-proud-to-announce-the">Beyond Canon Track Art Anthology</a>!</li>
+        <li>Likewise for the <a href="https://hsfanmusic.skaia.net/post/619761136023257089/unofficialmspafans-we-are-proud-to-announce-the">Beyond Canon Track Art Anthology</a> as well as <a href="https://alterniaart.tumblr.com/">Alternia/Bound</a>!</li>
         <li>All comments on the site: I appreciate all feedback a lot! People have shared a ton of ideas and suggestions with me, and I <i>cannot</i> emphasize enough how motivating it is to share a project with like-minded folx interested in making it better with you.</li>
     </ul>
     <p><i>Feature Acknowledgements</i></p>
     <ul>
         <li><b>Thank you,</b> GiovanH, for linking me to a resource for higher quality cover art, and bringing to my attention the fact that clicking a cover art on Bandcamp to zoom in will often reveal a higher quality image.</li>
         <li>cosmogonicalAuthor, for a variety of feature requests and comments! In particular: improving way the track list on author pages is sorted; expanding the introduction; expanding the introduction message to the website; and linking bonus art for Homestuck Vol. 5 - plus a few other good suggestions I haven't gotten to yet. Thanks!</li>
-        <li>Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki.</li>
+        <li>Monckat, for suggesting the album Strife 2 before I'd begun adding fandom-created albums and unofficial releases to this wiki, and for working with an emailer to reupload the original cover art for [[track:the-thirteenth-hour]].</li>
         <li>Kidpen, for suggesting the "Flashes that feature this track" feature.</li>
         <li>an emailer, for suggesting the "Random track" feature.</li>
         <li>foreverFlumoxed, for pointing out that [[flash:338]] contains reference to [[JOHN DO THE WINDY THING]] (this reminded me to add all the unreleased Flash tracks to the Unreleased Tracks album!), for recommending the restructure to [[album:Unreleased Tracks]], and for going to the massive effort of checking every track page and pointing out a bunch of missing cover arts and title typos!</li>
@@ -250,6 +266,12 @@ function getContributionField(section, name) {
         return null;
     }
 
+    if (contributors.length === 1 && contributors[0].startsWith('<i>')) {
+        const arr = [];
+        arr.textContent = contributors[0];
+        return arr;
+    }
+
     contributors = contributors.map(contrib => {
         // 8asically, the format is "Who (What)", or just "Who". 8e sure to
         // keep in mind that "what" doesn't necessarily have a value!
@@ -295,26 +317,51 @@ function getMultilineField(lines, name) {
     return listLines.map(line => line.slice(4)).join('\n');
 };
 
-function transformMultiline(text, treatAsDocument=false) {
-    // Heck yes, HTML magics.
-
-    text = text.replace(/\[\[(album:|flash:)?(.+?)\]\]/g, (match, category, ref) => {
+function transformInline(text) {
+    return text.replace(/\[\[(album:|artist:|flash:|track:)?(.+?)\]\]/g, (match, category, ref, offset) => {
         if (category === 'album:') {
             const album = getLinkedAlbum(ref);
             if (album) {
                 return fixWS`
-                    <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a>
+                    <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">${album.name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked album ${match} does not exist!\x1b[0m`);
                 return ref;
             }
+        } else if (category === 'artist:') {
+            const artist = getLinkedArtist(ref);
+            if (artist) {
+                return `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist.name)}/index.html">${artist.name}</a>`;
+            } else {
+                console.warn(`\x1b[33mThe linked artist ${artist} does not exist!\x1b[0m`);
+                return ref;
+            }
         } else if (category === 'flash:') {
             const flash = getLinkedFlash(ref);
             if (flash) {
-                return getFlashLinkHTML(flash);
+                let name = flash.name;
+                const nextCharacter = text[offset + 1];
+                const lastCharacter = name[name.length - 1];
+                if (
+                    ![' ', '\n'].includes(nextCharacter) &&
+                    lastCharacter === '.'
+                ) {
+                    name = name.slice(0, -1);
+                }
+                return getFlashLinkHTML(flash, name);
             } else {
                 console.warn(`\x1b[33mThe linked flash ${match} does not exist!\x1b[0m`);
+                return ref;
+            }
+        } else if (category === 'track:') {
+            const track = getLinkedTrack(ref);
+            if (track) {
+                return fixWS`
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
+                `;
+            } else {
+                console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
                 return ref;
             }
         } else {
@@ -327,7 +374,7 @@ function transformMultiline(text, treatAsDocument=false) {
                     name = track.name;
                 }
                 return fixWS`
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
@@ -335,6 +382,12 @@ function transformMultiline(text, treatAsDocument=false) {
             }
         }
     });
+}
+
+function transformMultiline(text, treatAsDocument=false) {
+    // Heck yes, HTML magics.
+
+    text = transformInline(text);
 
     if (treatAsDocument) {
         return text;
@@ -404,100 +457,83 @@ async function processAlbumDataFile(file) {
     const sections = Array.from(getSections(contentLines));
 
     const albumSection = sections[0];
-    const albumName = getBasicField(albumSection, 'Album');
-    const albumArtists = getListField(albumSection, 'Artists') || getListField(albumSection, 'Artist');
-    const albumDate = getBasicField(albumSection, 'Date');
-    const albumArtDate = getBasicField(albumSection, 'Art Date') || albumDate;
-    const albumCoverArtDate = getBasicField(albumSection, 'Cover Art Date') || albumArtDate;
-    const albumCoverArtists = getContributionField(albumSection, 'Cover Art');
-    const albumHasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
-    const albumTrackCoverArtists = getContributionField(albumSection, 'Track Art');
-    const albumCommentary = getCommentaryField(albumSection);
-    const albumURLs = (getListField(albumSection, 'URLs') || []).filter(Boolean);
-    let albumDirectory = getBasicField(albumSection, 'Directory');
+    const album = {};
+
+    album.name = getBasicField(albumSection, 'Album');
+    album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
+    album.date = getBasicField(albumSection, 'Date');
+    album.artDate = getBasicField(albumSection, 'Art Date') || album.date;
+    album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.artDate;
+    album.coverArtists = getContributionField(albumSection, 'Cover Art');
+    album.hasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
+    album.trackCoverArtists = getContributionField(albumSection, 'Track Art');
+    album.commentary = getCommentaryField(albumSection);
+    album.urls = (getListField(albumSection, 'URLs') || []).filter(Boolean);
+    album.directory = getBasicField(albumSection, 'Directory');
 
     const canon = getBasicField(albumSection, 'Canon');
-    const isCanon = canon === 'Canon' || !canon;
-    const isBeyond = canon === 'Beyond';
-    const isOfficial = isCanon || isBeyond;
-    const isFanon = canon === 'Fanon';
+    album.isCanon = canon === 'Canon' || !canon;
+    album.isBeyond = canon === 'Beyond';
+    album.isOfficial = album.isCanon || album.isBeyond;
+    album.isFanon = canon === 'Fanon';
 
-    if (albumCoverArtists && albumCoverArtists.error) {
-        return {error: `${albumCoverArtists.error} (in ${albumName})`};
+    if (album.artists && album.artists.error) {
+        return {error: `${album.artists.error} (in ${album.name})`};
     }
 
-    if (albumCommentary && albumCommentary.error) {
-        return {error: `${albumCommentary.error} (in ${albumName})`};
+    if (album.coverArtists && album.coverArtists.error) {
+        return {error: `${album.coverArtists.error} (in ${album.name})`};
     }
 
-    if (albumTrackCoverArtists && albumTrackCoverArtists.error) {
-        return {error: `${albumTrackCoverArtists.error} (in ${albumName})`};
+    if (album.commentary && album.commentary.error) {
+        return {error: `${album.commentary.error} (in ${album.name})`};
     }
 
-    if (!albumCoverArtists) {
-        return {error: `The album "${albumName}" is missing the "Cover Art" field.`};
+    if (album.trackCoverArtists && album.trackCoverArtists.error) {
+        return {error: `${album.trackCoverArtists.error} (in ${album.name})`};
     }
 
-    // I don't like these varia8le names. I'm sorry. -- I only really use the
-    // FG theme in the Homestuck wiki site (at least as of this writing), since
-    // without any styles consistent across the site, it kinda ends up losing
-    // any coherence of a single we8site and is a 8it distracting to navig8.
-    // 8ut these are implemented if you ever want to mess with them in the
-    // future or whatever.
-    const albumColorFG = getBasicField(albumSection, 'FG') || '#0088ff';
-    const albumColorBG = getBasicField(albumSection, 'BG') || '#222222';
-    const albumThemeBluhBluh = getBasicField(albumSection, 'Theme') || 0;
-    const albumTheme = {
-        fg: albumColorFG,
-        bg: albumColorBG,
-        theme: albumThemeBluhBluh
-    };
+    if (!album.coverArtists) {
+        return {error: `The album "${album.name}" is missing the "Cover Art" field.`};
+    }
 
-    if (!albumName) {
+    album.color = getBasicField(albumSection, 'FG') || '#0088ff';
+
+    if (!album.name) {
         return {error: 'Expected "Album" (name) field!'};
     }
 
-    if (!albumDate) {
+    if (!album.date) {
         return {error: 'Expected "Date" field!'};
     }
 
-    if (isNaN(Date.parse(albumDate))) {
-        return {error: `Invalid Date field: "${albumDate}"`};
+    if (isNaN(Date.parse(album.date))) {
+        return {error: `Invalid Date field: "${album.date}"`};
     }
 
-    const dateValue = new Date(albumDate);
-    const coverArtDateValue = new Date(albumCoverArtDate);
+    album.date = new Date(album.date);
+    album.artDate = new Date(album.artDate);
+    album.coverArtDate = new Date(album.coverArtDate);
 
-    if (!albumDirectory) {
-        albumDirectory = C.getKebabCase(albumName);
+    if (isNaN(Date.parse(album.artDate))) {
+        return {error: `Invalid Art Date field: "${album.date}"`};
     }
 
-    // We need to declare this varia8le 8efore the al8um varia8le, 8ecause
-    // that varia8le references this one. 8ut we won't actually fill in the
-    // contents of the tracks varia8le until after creating the al8um one,
-    // 8ecause each track o8ject will (8ack-)reference the al8um o8ject.
-    const tracks = [];
+    if (isNaN(Date.parse(album.coverArtDate))) {
+        return {error: `Invalid Cover Art Date field: "${album.date}"`};
+    }
 
-    const albumData = {
-        name: albumName,
-        date: dateValue,
-        artDate: coverArtDateValue,
-        artists: albumArtists,
-        coverArtists: albumCoverArtists,
-        commentary: albumCommentary,
-        directory: albumDirectory,
-        urls: albumURLs,
-        isCanon,
-        isBeyond,
-        isOfficial,
-        isFanon,
-        theme: albumTheme,
-        tracks,
-        usesGroups: false
-    };
+    if (!album.directory) {
+        album.directory = C.getKebabCase(album.name);
+    }
+
+    album.tracks = [];
+
+    // will be overwritten if a group section is found!
+    album.usesGroups = false;
 
     let group = '';
-    let groupTheme = albumTheme;
+    let groupColor = album.color;
 
     for (const section of sections.slice(1)) {
         // Just skip empty sections. Sometimes I paste a 8unch of dividers,
@@ -510,103 +546,101 @@ async function processAlbumDataFile(file) {
         const groupName = getBasicField(section, 'Group');
         if (groupName) {
             group = groupName;
-            albumData.usesGroups = true;
-
-            const groupColorFG = getBasicField(section, 'FG');
-            const groupColorBG = getBasicField(section, 'BG');
-            const iDontRememberWhatThisVariableDoesTheme = getBasicField(section, 'Theme');
-            groupTheme = Object.assign({}, albumTheme, Object.fromEntries([
-                ['fg', groupColorFG],
-                ['bg', groupColorBG],
-                ['theme', iDontRememberWhatThisVariableDoesTheme]
-            ].filter(([k, v]) => v)));
-
+            groupColor = getBasicField(section, 'FG');
+            album.usesGroups = true;
             continue;
         }
 
-        const trackName = getBasicField(section, 'Track');
-        const trackCommentary = getCommentaryField(section);
-        const trackLyrics = getMultilineField(section, 'Lyrics');
-        const originalDate = getBasicField(section, 'Original Date');
-        const artDate = getBasicField(section, 'Art Date') || originalDate || albumArtDate;
-        const references = getListField(section, 'References') || [];
-        let trackArtists = getListField(section, 'Artists') || getListField(section, 'Artist');
-        let trackCoverArtists = getContributionField(section, 'Track Art');
-        let trackContributors = getContributionField(section, 'Contributors') || [];
-        let trackDirectory = getBasicField(section, 'Directory');
+        const track = {};
 
-        if (!trackName) {
-            return {error: 'A track section is missing the "Track" (name) field.'};
+        track.name = getBasicField(section, 'Track');
+        track.commentary = getCommentaryField(section);
+        track.lyrics = getMultilineField(section, 'Lyrics');
+        track.originalDate = getBasicField(section, 'Original Date');
+        track.artDate = getBasicField(section, 'Art Date') || track.originalDate || album.artDate;
+        track.references = getListField(section, 'References') || [];
+        track.artists = getContributionField(section, 'Artists') || getContributionField(section, 'Artist');
+        track.coverArtists = getContributionField(section, 'Track Art');
+        track.contributors = getContributionField(section, 'Contributors') || [];
+        track.directory = getBasicField(section, 'Directory');
+
+        if (!track.name) {
+            return {error: 'A track section is missing the "Track" (name) field (in ${album.name)}.'};
         }
 
-        let trackDuration = getBasicField(section, 'Duration');
+        let durationString = getBasicField(section, 'Duration') || '0:00';
+        track.duration = getDurationInSeconds(durationString);
 
-        if (!trackDuration) {
-            // return {error: `The track "${trackName}" is missing the "Duration" field.`};
-            trackDuration = '0:00';
+        if (track.contributors.error) {
+            return {error: `${track.contributors.error} (in ${track.name}, ${album.name})`};
         }
 
-        trackDuration = getDurationInSeconds(trackDuration);
-
-        if (trackContributors.error) {
-            return {error: `${trackContributors.error} (in ${trackName}, ${albumName})`};
+        if (track.commentary && track.commentary.error) {
+            return {error: `${track.commentary.error} (in ${track.name}, ${album.name})`};
         }
 
-        if (trackCommentary && trackCommentary.error) {
-            return {error: `${trackCommentary.error} (in ${trackName}, ${albumName})`};
-        }
-
-        if (!trackArtists) {
+        if (!track.artists) {
             // If an al8um has an artist specified (usually 8ecause it's a solo
             // al8um), let tracks inherit that artist. We won't display the
             // "8y <artist>" string on the al8um listing.
-            if (albumArtists) {
-                trackArtists = albumArtists;
+            if (album.artists) {
+                track.artists = album.artists;
             } else {
-                return {error: `The track "${trackName}" is missing the "Artist" field.`};
+                return {error: `The track "${track.name}" is missing the "Artist" field (in ${album.name}).`};
             }
         }
 
-        if (!trackCoverArtists) {
-            if (getBasicField(section, 'Track Art') !== 'none' && albumHasTrackArt) {
-                if (albumTrackCoverArtists) {
-                    trackCoverArtists = albumTrackCoverArtists;
+        if (!track.coverArtists) {
+            if (getBasicField(section, 'Track Art') !== 'none' && album.hasTrackArt) {
+                if (album.trackCoverArtists) {
+                    track.coverArtists = album.trackCoverArtists;
                 } else {
-                    // TODO: return an error!
-                    // console.warn(`The track "${trackName}" is missing the "Track Art" field.`);
+                    return {error: `The track "${track.name}" is missing the "Track Art" field (in ${album.name}).`};
                 }
             }
         }
 
-        if (trackCoverArtists && trackCoverArtists.length && [0] === 'none') {
-            trackCoverArtists = null;
+        if (track.coverArtists && track.coverArtists.length && track.coverArtists[0] === 'none') {
+            track.coverArtists = null;
         }
 
-        if (!trackDirectory) {
-            trackDirectory = C.getKebabCase(trackName);
+        if (!track.directory) {
+            track.directory = C.getKebabCase(track.name);
         }
 
-        let date;
-        if (originalDate) {
-            if (isNaN(Date.parse(originalDate))) {
-                return {error: `The track "${trackName}"'s has an invalid "Original Date" field: "${originalDate}"`};
+        if (track.originalDate) {
+            if (isNaN(Date.parse(track.originalDate))) {
+                return {error: `The track "${track.name}"'s has an invalid "Original Date" field: "${track.originalDate}"`};
             }
-            date = new Date(originalDate);
+            track.date = new Date(track.originalDate);
         } else {
-            date = dateValue;
+            track.date = album.date;
         }
 
-        const artDateValue = new Date(artDate);
+        track.artDate = new Date(track.artDate);
 
         const hasURLs = getBasicField(section, 'Has URLs') !== 'no';
 
-        const trackURLs = hasURLs && (getListField(section, 'URLs') || []).filter(Boolean);
+        track.urls = hasURLs && (getListField(section, 'URLs') || []).filter(Boolean);
 
-        if (hasURLs && !trackURLs.length) {
-            return {error: `The track "${trackName}" should have at least one URL specified.`};
+        if (hasURLs && !track.urls.length) {
+            return {error: `The track "${track.name}" should have at least one URL specified.`};
         }
 
-        tracks.push({
+        // 8ack-reference the al8um o8ject! This is very useful for when
+        // we're outputting the track pages.
+        track.album = album;
+
+        track.group = group;
+
+        if (group) {
+            track.color = groupColor;
+        } else {
+            track.color = album.color;
+        }
+
+        /*
+        album.tracks.push({
             name: trackName,
             artists: trackArtists,
             coverArtists: trackCoverArtists,
@@ -619,19 +653,20 @@ async function processAlbumDataFile(file) {
             artDate: artDateValue,
             directory: trackDirectory,
             urls: trackURLs,
-            isCanon,
-            isBeyond,
-            isOfficial,
-            isFanon,
+            isCanon: album.isCanon,
+            isBeyond: album.isBeyond,
+            isOfficial: album.isOfficial,
+            isFanon: album.isFanon,
             group,
             theme: group ? groupTheme : albumTheme,
-            // 8ack-reference the al8um o8ject! This is very useful for when
-            // we're outputting the track pages.
-            album: albumData
+            album
         });
+        */
+
+        album.tracks.push(track);
     }
 
-    return albumData;
+    return album;
 }
 
 async function processArtistDataFile(file) {
@@ -669,14 +704,12 @@ async function processFlashDataFile(file) {
     const contentLines = contents.split('\n');
     const sections = Array.from(getSections(contentLines));
 
-    let act, theme;
+    let act, color;
     return sections.map(section => {
         if (getBasicField(section, 'ACT')) {
             act = getBasicField(section, 'ACT');
-            theme = {
-                fg: getBasicField(section, 'FG')
-            };
-            return {act8r8k: true, act, theme};
+            color = getBasicField(section, 'FG');
+            return {act8r8k: true, act, color};
         }
 
         const name = getBasicField(section, 'Flash');
@@ -684,7 +717,7 @@ async function processFlashDataFile(file) {
         let directory = getBasicField(section, 'Directory');
         let date = getBasicField(section, 'Date');
         const jiff = getBasicField(section, 'Jiff');
-        const tracks = getListField(section, 'Tracks');
+        const tracks = getListField(section, 'Tracks') || [];
         const contributors = getContributionField(section, 'Contributors') || [];
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
 
@@ -710,11 +743,7 @@ async function processFlashDataFile(file) {
 
         date = new Date(date);
 
-        if (!tracks) {
-            return {error: 'Expected "Tracks" field!'};
-        }
-
-        return {name, page, directory, date, contributors, tracks, urls, act, theme, jiff};
+        return {name, page, directory, date, contributors, tracks, urls, act, color, jiff};
     });
 }
 
@@ -848,7 +877,7 @@ function writeMiscellaneousPages() {
                     <h3>The future of Homestuck music, today.<br>Albums by the Homestuck^2 Music Team. 2020+.</h2>
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isBeyond).reverse().map(album => fixWS`
-                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">
                                 <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
@@ -858,7 +887,7 @@ function writeMiscellaneousPages() {
                     <h3>A look into Homestuck's world of music and art created&mdash;and organized&mdash;by fans.<br>The beginning of time, through the end.</h3>
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isFanon).reverse().map(album => fixWS`
-                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">
                                 <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
@@ -869,7 +898,7 @@ function writeMiscellaneousPages() {
                     <h3>The original discography: a replica of the Homestuck Bandcamp prior to the enmergening.<br>Albums organized by What Pumpkin. 2009&ndash;2019.</h3>
                     <div class="grid-listing">
                         ${albumData.filter(album => album.isCanon).reverse().map(album => fixWS`
-                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">
+                            <a class="grid-item" href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">
                                 <img src="${getAlbumCover(album)}" alt="cover art">
                                 <span>${album.name}</span>
                             </a>
@@ -898,9 +927,9 @@ function writeMiscellaneousPages() {
                     </div>
                     <div class="grid-listing">
                         ${flashData.map(flash => flash.act8r8k ? fixWS`
-                            <h2 style="${getThemeString(flash.theme)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === flash.act))}/index.html">${flash.act}</a></h2>
+                            <h2 style="${getThemeString(flash)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === flash.act))}/index.html">${flash.act}</a></h2>
                         ` : fixWS`
-                            <a class="grid-item" href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" style="${getThemeString(flash.theme)}">
+                            <a class="grid-item" href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" style="${getThemeString(flash)}">
                                 <img src="${getFlashCover(flash)}" alt="cover art">
                                 <span>${flash.name}</span>
                             </a>
@@ -970,7 +999,7 @@ function writeIndexAndTrackPagesForAlbum(album) {
 
 async function writeAlbumPage(album) {
     const trackToListItem = track => fixWS`
-        <li style="${getThemeString(track.theme)}">
+        <li style="${getThemeString(track)}">
             (${getDurationString(track.duration)})
             <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.name}</a>
             ${track.artists !== album.artists && fixWS`
@@ -980,7 +1009,7 @@ async function writeAlbumPage(album) {
     `;
     const listTag = getAlbumListTag(album);
     await writePage([C.ALBUM_DIRECTORY, album.directory], album.name, fixWS`
-        <body style="${getThemeString(album.theme)}; --album-directory: ${album.directory}">
+        <body style="${getThemeString(album)}; --album-directory: ${album.directory}">
             <div id="header">
                 ${generateHeaderForAlbum(album)}
             </div>
@@ -992,10 +1021,8 @@ async function writeAlbumPage(album) {
                     <a id="cover-art" href="${getAlbumCover(album)}"><img src="${getAlbumCover(album)}" alt="cover art"></a>
                     <h1>${album.name}</h1>
                     <p>
-                        ${album.artists && `By ${getArtistString(album.artists)}.<br>` || `<!-- (here: Full-album musician credits) -->`}
-                        ${album.coverArtists && `Cover art by ${joinNoOxford(album.coverArtists.map(({ who, what }) => fixWS`
-                            <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what})})`}
-                        `))}.<br>` || `<!-- (here: Cover art credits) -->`}
+                        ${album.artists && `By ${getArtistString(album.artists, true)}.<br>` || `<!-- (here: Full-album musician credits) -->`}
+                        ${album.coverArtists &&  `Cover art by ${getArtistString(album.coverArtists, true)}.<br>` || `<!-- (here: Cover art credits) -->`}
                         Released ${getDateString(album)}.
                         ${+album.artDate !== +album.date && `<br>Art released ${getDateString({date: album.artDate})}.` || `<!-- (here: Cover art release date) -->`}
                         <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.</p>
@@ -1033,12 +1060,12 @@ async function writeAlbumPage(album) {
 
 async function writeTrackPage(track) {
     const tracksThatReference = getTracksThatReference(track);
-    const ttrFanon = tracksThatReference.filter(t => t.isFanon);
-    const ttrOfficial = tracksThatReference.filter(t => t.isOfficial);
+    const ttrFanon = tracksThatReference.filter(t => t.album.isFanon);
+    const ttrOfficial = tracksThatReference.filter(t => t.album.isOfficial);
     const tracksReferenced = getTracksReferencedBy(track);
     const flashesThatFeature = getFlashesThatFeature(track);
     await writePage([C.TRACK_DIRECTORY, track.directory], track.name, fixWS`
-        <body style="${getThemeString(track.theme)}; --album-directory: ${track.album.directory}; --track-directory: ${track.directory}">
+        <body style="${getThemeString(track)}; --album-directory: ${track.album.directory}; --track-directory: ${track.directory}">
             <div id="header">
                 ${generateHeaderForAlbum(track.album, track)}
             </div>
@@ -1050,10 +1077,8 @@ async function writeTrackPage(track) {
                     <a href="${getTrackCover(track)}" id="cover-art"><img src="${getTrackCover(track)}" alt="cover art"></a>
                     <h1>${track.name}</h1>
                     <p>
-                        By ${getArtistString(track.artists)}.
-                        ${track.coverArtists && `<br>Cover art by ${joinNoOxford(track.coverArtists.map(({ who, what }) => fixWS`
-                            <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>${what && ` (${getContributionString({what})})`}
-                        `))}.` || `<!-- (here: Cover art credits) -->`}
+                        By ${getArtistString(track.artists, true)}.
+                        ${track.coverArtists &&  `<br>Cover art by ${getArtistString(track.coverArtists, true)}.` || `<!-- (here: Cover art credits) -->`}
                         ${track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && `<br>Released ${getDateString(track)}.` || `<!-- (here: Track release date) -->`}
                         ${+track.artDate !== +track.date && `<br>Art released ${getDateString({date: track.artDate})}.` || `<!-- (here: Cover art release date, if it differs) -->`}
                         ${track.duration && `<br>Duration: ${getDurationString(track.duration)}.` || `<!-- (here: Track duration) -->`}
@@ -1063,18 +1088,13 @@ async function writeTrackPage(track) {
                     ` : fixWS`
                         <p>This track has no URLs at which it can be listened.</p>
                     `}
+                    ${track.contributors.textContent && fixWS`
+                        <p>Contributors:<br>${transformInline(track.contributors.textContent)}</p>
+                    `}
                     ${track.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
-                            ${track.contributors.map(({ who, what }) => fixWS`
-                                <li>
-                                    ${artistNames.includes(who)
-                                        ? `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>`
-                                        : who
-                                    }
-                                    ${what && `(${getContributionString({what})})` || `<!-- (here: Contribution details) -->`}
-                                </li>
-                            `).join('\n')}
+                            ${track.contributors.map(contrib => `<li>${getArtistString([contrib], true)}</li>`).join('\n')}
                         </ul>
                     ` || `<!-- (here: Track contributor credits) -->`}
                     ${tracksReferenced.length && fixWS`
@@ -1082,7 +1102,7 @@ async function writeTrackPage(track) {
                         <ul>
                             ${tracksReferenced.map(track => fixWS`
                                 <li>
-                                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                                     <span class="by">by ${getArtistString(track.artists)}</span>
                                 </li>
                             `).join('\n')}
@@ -1096,7 +1116,7 @@ async function writeTrackPage(track) {
                                 <dd><ul>
                                     ${ttrOfficial.map(track => fixWS`
                                         <li>
-                                            <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                                            <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                                             <span class="by">by ${getArtistString(track.artists)}</span>
                                         </li>
                                     `).join('\n')}
@@ -1107,7 +1127,7 @@ async function writeTrackPage(track) {
                                 <dd><ul>
                                     ${ttrFanon.map(track => fixWS`
                                         <li>
-                                            <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                                            <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                                             <span class="by">by ${getArtistString(track.artists)}</span>
                                         </li>
                                     `).join('\n')}
@@ -1145,8 +1165,7 @@ async function writeArtistPages() {
 
 function getTracksByArtist(artistName) {
     return allTracks.filter(track => (
-        track.artists.includes(artistName) ||
-        track.contributors.some(({ who }) => who === artistName)
+        [...track.artists, ...track.contributors].some(({ who }) => who === artistName)
     ));
 }
 
@@ -1172,7 +1191,7 @@ async function writeArtistPage(artistName) {
         return fixWS`
             <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                 ${track.duration && `(${getDurationString(track.duration)})` || `<!-- (here: Duration) -->`}
-                <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                 ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>` || `<!-- (here: Co-artist credits) -->`}
                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>` || `<!-- (here: Contribution details) -->`}
                 ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
@@ -1204,7 +1223,7 @@ async function writeArtistPage(artistName) {
                     <h2 id="tracks">Tracks</h2>
                 `}
                 ${releasedTracks.length && fixWS`
-                    <p>${artistName} has released ~${getDurationString(getTotalDuration(releasedTracks))} ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'} of music collected on this wiki.</p>
+                    <p>${artistName} has contributed ~${getDurationString(getTotalDuration(releasedTracks))} ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'} of music collected on this wiki.</p>
                     ${generateTrackList(releasedTracks)}
                 `}
                 ${unreleasedTracks.length && fixWS`
@@ -1218,9 +1237,9 @@ async function writeArtistPage(artistName) {
                         return fixWS`
                             <li title="${th(i + 1)} art by ${artistName}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.theme)}">${thing.name}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '<i>(cover art)</i>'}
-                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.map(({ who }) => who).filter(a => a !== artistName))})</span>`}
+                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== artistName))})</span>`}
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
                             </li>
                         `;
@@ -1232,7 +1251,7 @@ async function writeArtistPage(artistName) {
                         const contributionString = flash.contributors.filter(({ who }) => who === artistName).map(getContributionString).join(' ');
                         return fixWS`
                             <li>
-                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/index.html" style="${getThemeString(flash.theme)}">${flash.name}</a>
+                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/index.html" style="${getThemeString(flash)}">${flash.name}</a>
                                 ${contributionString && `<span class="contributed">(${contributionString})</span>`}
                                 (${getDateString({date: flash.date})})
                             </li>
@@ -1246,7 +1265,7 @@ async function writeArtistPage(artistName) {
                         return fixWS`
                             <li>
                                 ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing.theme)}">${thing.name}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/index.html" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '(album commentary)'}
                                 ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>`}
                             </li>
@@ -1270,7 +1289,7 @@ function albumChunkedList(tracks, getLI, showDate = true, dateProperty = 'date')
                 if (i === 0 || album !== getAlbum(previous) || (showDate && +thing[dateProperty] !== +previous[dateProperty])) {
                     const heading = fixWS`
                         <dt>
-                            <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/index.html" style="${getThemeString(getAlbum(thing).theme)}">${getAlbum(thing).name}</a>
+                            <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/index.html" style="${getThemeString(getAlbum(thing))}">${getAlbum(thing).name}</a>
                             ${showDate && `(${getDateString({date: thing[dateProperty]})})`}
                         </dt>
                         <dd><ul>
@@ -1298,7 +1317,7 @@ function actChunkedList(flashes, getLI, showDate = true, dateProperty = 'date') 
                 if (i === 0 || act !== previous.act) {
                     const heading = fixWS`
                         <dt>
-                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/index.html" style="${getThemeString(flash.theme)}">${flash.act}</a>
+                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/index.html" style="${getThemeString(flash)}">${flash.act}</a>
                         </dt>
                         <dd><ul>
                     `;
@@ -1340,7 +1359,7 @@ async function writeFlashPage(flash) {
     ].filter(Boolean);
 
     await writePage([C.FLASH_DIRECTORY, kebab], flash.name, fixWS`
-        <body style="${getThemeString(flash.theme)}; --flash-directory: ${flash.directory}">
+        <body style="${getThemeString(flash)}; --flash-directory: ${flash.directory}">
             <div id="header">
                 <h2>
                     <a href="index.html">Home</a>
@@ -1376,7 +1395,7 @@ async function writeFlashPage(flash) {
                                 flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
                                 true
                             )
-                        ).flatMap(({ act, theme }) => [
+                        ).flatMap(({ act, color }) => [
                             act.startsWith('Act 1') && `<dt${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/index.html" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
                             || act.startsWith('Act 6 Act 1') && `<dt${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/index.html" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
                             || act.startsWith('Hiveswap') && `<dt${classes('side', side === 0 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/index.html" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
@@ -1384,11 +1403,11 @@ async function writeFlashPage(flash) {
                                 flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
                                 flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
                                 true
-                            ) && `<dt${classes(act === flash.act && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/index.html" style="${getThemeString(theme)}">${act}</a></dt>`,
+                            ) && `<dt${classes(act === flash.act && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/index.html" style="${getThemeString({color})}">${act}</a></dt>`,
                             act === flash.act && fixWS`
                                 <dd><ul>
                                     ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
-                                        <li${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/index.html" style="${getThemeString(f.theme)}">${f.name}</a></li>
+                                        <li${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/index.html" style="${getThemeString(f)}">${f.name}</a></li>
                                     `).join('\n')}
                                 </ul></dd>
                             `
@@ -1409,6 +1428,36 @@ async function writeFlashPage(flash) {
                             url.includes('youtu') ? ` (on any device)` :
                             ''
                         ) + `</span>`), 'or')}.</p>` || `<!-- (here: Play-online links) -->`}
+                    ${flash.contributors.textContent && fixWS`
+                        <p>Contributors:<br>${transformInline(flash.contributors.textContent)}</p>
+                    `}
+                    ${flash.tracks.length && fixWS`
+                        <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
+                        <ul>
+                            ${flash.tracks.map(ref => {
+                                const track = getLinkedTrack(ref);
+                                const neighm = ref.match(/(.*?\S):/) || [ref, ref];
+                                if (track) {
+                                    const neeeighm = neighm[1].replace('$$$$', ':');
+                                    return fixWS`
+                                        <li>
+                                            <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${neeeighm}</a>
+                                            <span class="by">by ${getArtistString(track.artists)}</span>
+                                        </li>
+                                    `;
+                                } else {
+                                    const by = ref.match(/\(by .*\)/);
+                                    if (by) {
+                                        const name = ref.replace(by, '').trim();
+                                        const contribs = by[0].replace(/\(by |\)/g, '').split(',').map(w => ({who: w.trim()}));
+                                        return `<li>${name} <span class="by">by ${getArtistString(contribs)}</span></li>`;
+                                    } else {
+                                        return `<li>${ref}</li>`;
+                                    }
+                                }
+                            }).join('\n')}
+                        </ul>
+                    ` || `<!-- (here: Flash track listing) -->`}
                     ${flash.contributors.length && fixWS`
                         <p>Contributors:</p>
                         <ul>
@@ -1420,31 +1469,6 @@ async function writeFlashPage(flash) {
                             `).join('\n')}
                         </ul>
                     ` || `<!-- (here: Flash contributor details) -->`}
-                    <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
-                    <ul>
-                        ${flash.tracks.map(ref => {
-                            const track = getLinkedTrack(ref);
-                            const neighm = ref.match(/(.*?\S):/) || [ref, ref];
-                            if (track) {
-                                const neeeighm = neighm[1].replace('$$$$', ':');
-                                return fixWS`
-                                    <li>
-                                        <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${neeeighm}</a>
-                                        <span class="by">by ${getArtistString(track.artists)}</span>
-                                    </li>
-                                `;
-                            } else {
-                                const by = ref.match(/\(by .*\)/);
-                                if (by) {
-                                    const name = ref.replace(by, '').trim();
-                                    const who = by[0].replace(/\(by |\)/g, '').split(',').map(w => w.trim());
-                                    return `<li>${name} <span class="by">by ${getArtistString(who)}</span></li>`;
-                                } else {
-                                    return `<li>${ref}</li>`;
-                                }
-                            }
-                        }).join('\n')}
-                    </ul>
                 </div>
             </div>
         </body>
@@ -1456,7 +1480,7 @@ function writeListingPages() {
 
     const getAlbumLI = (album, extraText = '') => fixWS`
         <li>
-            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a>
+            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">${album.name}</a>
             ${extraText}
         </li>
     `;
@@ -1519,18 +1543,32 @@ function writeListingPages() {
                     (~${getDurationString(duration)})
                 </li>
             `)],
+        [['artists', 'by-latest'], `Artists - by Latest Contribution`, C.sortByDate(allArtists
+            .map(name => ({name, things: C.getThingsArtistContributedTo(name, {albumData, allTracks, flashData})}))
+            .map(({ name, things }) => ({name, things: things.filter(thing => !thing.album || thing.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)}))
+            .filter(({ things }) => things.length)
+            .map(({ name, things }) => ({name, date: C.sortByDate(things).reverse()[0].date}))
+            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
+        )
+            .reverse()
+            .map(({ name, date }) => fixWS`
+                <li>
+                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/index.html">${name}</a>
+                    (${getDateString({date})})
+                </li>
+            `)],
         [['tracks', 'by-name'], `Tracks - by Name`, allTracks.slice()
             .sort(sortByName)
             .map(track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>
+                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>
             `)],
         [['tracks', 'by-album'], `Tracks - by Album`, fixWS`
                 <dl>
                     ${albumData.map(album => fixWS`
-                        <dt><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></dt>
+                        <dt><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">${album.name}</a></dt>
                         <dd><ol>
                             ${album.tracks.map(track => fixWS`
-                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>
+                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>
                             `).join('\n')}
                         </ol></dd>
                     `).join('\n')}
@@ -1539,14 +1577,14 @@ function writeListingPages() {
         [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
             C.sortByDate(allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
             track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>
+                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>
             `)],
         [['tracks', 'by-duration'], `Tracks - by Duration`, C.sortByDate(allTracks.slice())
             .filter(track => track.duration > 0)
             .sort((a, b) => b.duration - a.duration)
             .map(track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                     (${getDurationString(track.duration)})
                 </li>
             `)],
@@ -1558,7 +1596,7 @@ function writeListingPages() {
             )),
             track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                     (${getDurationString(track.duration)})
                 </li>
             `,
@@ -1569,22 +1607,22 @@ function writeListingPages() {
             .sort((a, b) => getTracksThatReference(b).length - getTracksThatReference(a).length)
             .map(track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a>
                     (${s(getTracksThatReference(track).length, 'time')} referenced)
                 </li>
             `)],
         [['tracks', 'in-flashes', 'by-album'], `Tracks - in Flashes &amp; Games (by Album)`, albumChunkedList(
             C.sortByDate(allTracks.slice()).filter(track => getFlashesThatFeature(track).length > 0),
-            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>`)],
+            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>`)],
         [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by First Feature)`,
             Array.from(new Set(flashData.filter(flash => !flash.act8r8k).flatMap(flash => getTracksFeaturedByFlash(flash))))
             .filter(Boolean)
-            .map(track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>`)],
+            .map(track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>`)],
         [['tracks', 'with-lyrics'], `Tracks - with Lyrics`, albumChunkedList(
             C.sortByDate(allTracks.slice())
             .filter(track => track.lyrics),
             track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track.theme)}">${track.name}</a></li>
+                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(track)}">${track.name}</a></li>
             `)]
     ];
 
@@ -1628,7 +1666,7 @@ function writeListingPages() {
                                 .filter(album => [album, ...album.tracks].some(x => x.commentary))
                                 .map(album => fixWS`
                                     <li>
-                                        <a href="${C.LISTING_DIRECTORY}/all-commentary/index.html#${album.directory}" style="${getThemeString(album.theme)}">${album.name}</a>
+                                        <a href="${C.LISTING_DIRECTORY}/all-commentary/index.html#${album.directory}" style="${getThemeString(album)}">${album.name}</a>
                                         (${(() => {
                                             const things = [album, ...album.tracks];
                                             const cThings = things.filter(x => x.commentary);
@@ -1645,15 +1683,15 @@ function writeListingPages() {
                             .map(album => [album, ...album.tracks])
                             .filter(x => x.some(y => y.commentary))
                             .map(([ album, ...tracks ]) => fixWS`
-                                <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album.theme)}">${album.name}</a></h2>
+                                <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/index.html" style="${getThemeString(album)}">${album.name}</a></h2>
                                 ${album.commentary && fixWS`
-                                    <blockquote style="${getThemeString(album.theme)}">
+                                    <blockquote style="${getThemeString(album)}">
                                         ${transformMultiline(album.commentary)}
                                     </blockquote>
                                 ` || `<!-- (here: Full-album commentary) -->`}
                                 ${tracks.filter(t => t.commentary).map(track => fixWS`
-                                    <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album.theme)}">${track.name}</a></h3>
-                                    <blockquote style="${getThemeString(album.theme)}">
+                                    <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html" style="${getThemeString(album)}">${track.name}</a></h3>
+                                    <blockquote style="${getThemeString(album)}">
                                         ${transformMultiline(track.commentary)}
                                     </blockquote>
                                 `).join('\n') || `<!-- (here: Per-track commentary) -->`}
@@ -1692,7 +1730,7 @@ function writeListingPages() {
                             ].map(category => fixWS`
                                 <dt>${category.name}: (<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="album-in-${category.code}">Random Album</a>, <a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-${category.code}">Random Track</a>)</dt>
                                 <dd><ul>${category.albumData.map(album => fixWS`
-                                    <li><a style="${getThemeString(album.theme)}; --album-directory: ${album.directory}" href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">${album.name}</a></li>
+                                    <li><a style="${getThemeString(album)}; --album-directory: ${album.directory}" href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album">${album.name}</a></li>
                                 `).join('\n')}</ul></dd>
                             `).join('\n')}
                         </dl>
@@ -1801,23 +1839,35 @@ function getTracksReferencedBy(track) {
 getTracksReferencedBy.cache = Symbol();
 
 function getLinkedTrack(ref) {
+    if (ref.includes('track:')) {
+        ref = ref.replace('track:', '');
+        return allTracks.find(track => track.directory === ref);
+    }
+
     const match = ref.match(/\S:(.*)/);
     if (match) {
         const dir = match[1];
         return allTracks.find(track => track.directory === dir);
-    } else {
-        const track = allTracks.find(track => track.name === ref);
-        if (track) {
-            return track;
-        } else {
-            const track = allTracks.find(track => track.name.toLowerCase() === ref.toLowerCase());
-            if (track) {
-                console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
-                console.warn(`\x1b[31m- ${ref}\x1b[0m`);
-                console.warn(`\x1b[32m+ ${track.name}\x1b[0m`);
-                return track;
-            }
-        }
+    }
+
+    let track;
+
+    track = allTracks.find(track => track.directory === ref);
+    if (track) {
+        return track;
+    }
+
+    track = allTracks.find(track => track.name === ref);
+    if (track) {
+        return track;
+    }
+
+    track = allTracks.find(track => track.name.toLowerCase() === ref.toLowerCase());
+    if (track) {
+        console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
+        console.warn(`\x1b[31m- ${ref}\x1b[0m`);
+        console.warn(`\x1b[32m+ ${track.name}\x1b[0m`);
+        return track;
     }
 }
 
@@ -1836,6 +1886,18 @@ function getLinkedAlbum(ref) {
         }
     }
     return album;
+}
+
+function getLinkedArtist(ref) {
+    let artist = artistData.find(artist => C.getArtistDirectory(artist.name) === ref);
+    if (artist) {
+        return artist;
+    }
+
+    artist = artistData.find(artist => artist.name === ref);
+    if (artist) {
+        return artist;
+    }
 }
 
 function getLinkedFlash(ref) {
@@ -1857,24 +1919,33 @@ function getTracksFeaturedByFlash(flash) {
 
 getTracksFeaturedByFlash.cache = Symbol();
 
-function getArtistString(artists) {
-    return joinNoOxford(artists.map(artist => {
-        if (artistNames.includes(artist)) {
-            return fixWS`
-                <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html">${artist}</a>
-            `;
-        } else {
-            return artist;
-        }
+function getArtistString(artists, showIcons = false) {
+    return joinNoOxford(artists.map(({ who, what }) => {
+        const { urls = [] } = artistData.find(({ name }) => name === who) || {};
+        return (
+            `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/index.html">${who}</a>` +
+            (what ? ` (${getContributionString({what})})` : '') +
+            (showIcons && urls.length ? ` <span class="icons">(${urls.map(iconifyURL).join(', ')})</span>` : '')
+        );
     }));
 }
 
+/*
 function getThemeString({fg, bg, theme}) {
     return [
         [fg, `--fg-color: ${fg}`],
         [bg, `--bg-color: ${bg}`],
         [theme, `--theme: ${theme + ''}`]
     ].filter(pair => pair[0] !== undefined).map(pair => pair[1]).join('; ');
+}
+*/
+
+function getThemeString({color}) {
+    if (color) {
+        return `--fg-color: ${color}`;
+    } else {
+        return ``;
+    }
 }
 
 function getFlashDirectory(flash) {
@@ -1895,6 +1966,9 @@ function getAlbumListTag(album) {
 function fancifyURL(url, {album = false} = {}) {
     return fixWS`<a href="${url}" class="nowrap">${
         url.includes('bandcamp.com') ? 'Bandcamp' :
+        (
+            url.includes('music.solatrus.com')
+        ) ? `Bandcamp (${new URL(url).hostname})` :
         url.includes('youtu') ? (album ? (
             url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full Album)'
         ) : 'YouTube') :
@@ -1903,8 +1977,25 @@ function fancifyURL(url, {album = false} = {}) {
         url.includes('twitter.com') ? 'Twitter' :
         url.includes('deviantart.com') ? 'DeviantArt' :
         url.includes('wikipedia.org') ? 'Wikipedia' :
+        url.includes('poetryfoundation.org') ? 'Poetry Foundation' :
         new URL(url).hostname
     }</a>`;
+}
+
+function iconifyURL(url) {
+    const [ id, msg ] = (
+        url.includes('bandcamp.com') ? ['bandcamp', 'Bandcamp'] :
+        (
+            url.includes('music.solatrus.com')
+        ) ? ['bandcamp', `Bandcamp (${new URL(url).hostname})`] :
+        url.includes('youtu') ? ['youtube', 'YouTube'] :
+        url.includes('soundcloud') ? ['soundcloud', 'SoundCloud'] :
+        url.includes('tumblr.com') ? ['tumblr', 'Tumblr'] :
+        url.includes('twitter.com') ? ['twitter', 'Twitter'] :
+        url.includes('deviantart.com') ? ['deviantart', 'DeviantArt'] :
+        ['globe', `External (${new URL(url).hostname})`]
+    );
+    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="icons.svg#icon-${id}"></use></svg></a>`;
 }
 
 function chronologyLinks(currentTrack, {
@@ -2008,7 +2099,7 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 ${album.tracks.flatMap((track, i, arr) => [
                     (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                     (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                        <dt style="${getThemeString(track.theme)}"${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>
+                        <dt style="${getThemeString(track)}"${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>
                         <dd><${listTag}>
                     `,
                     (currentTrack && track.group === currentTrack.group) && trackToListItem(track),
@@ -2084,8 +2175,11 @@ function getFlashLink(flash) {
     return `https://homestuck.com/story/${flash.page}`;
 }
 
-function getFlashLinkHTML(flash) {
-    return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" title="Page ${flash.page}" style="${getThemeString(flash.theme)}">${flash.name}</a>`;
+function getFlashLinkHTML(flash, name = null) {
+    if (!name) {
+        name = flash.name;
+    }
+    return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/index.html" title="Page ${flash.page}" style="${getThemeString(flash)}">${name}</a>`;
 }
 
 function rebaseURLs(directory, html) {
@@ -2181,9 +2275,16 @@ async function main() {
 
     allTracks = C.getAllTracks(albumData);
     artistNames = Array.from(new Set([
-        ...albumData.reduce((acc, album) => acc.concat((album.coverArtists || []).map(({ who }) => who), album.tracks.reduce((acc, track) => acc.concat(track.artists, (track.coverArtists || []).map(({ who }) => who)), [])), []),
-        ...flashData.filter(flash => !flash.act8r8k).reduce((acc, flash) => acc.concat(flash.contributors.map(({ who }) => who)), []),
-        ...artistData.filter(artist => !artist.alias).map(artist => artist.name)
+        ...artistData.filter(artist => !artist.alias).map(artist => artist.name),
+        ...albumData.reduce((acc, album) => acc.concat([
+            ...album.artists || [],
+            ...album.coverArtists || [],
+            ...album.tracks.reduce((acc, track) => acc.concat([
+                ...track.artists,
+                ...track.coverArtists || [],
+                ...track.contributors || []
+            ]), [])
+        ]), []).map(contribution => contribution.who)
     ]));
 
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
@@ -2206,24 +2307,31 @@ async function main() {
                 buffer = [];
             }
         };
-        const showWhere = name => {
-            const where = justEverythingMan.filter(thing => [...thing.coverArtists || [], ...thing.contributors || []].some(({ who }) => who === name) || [...thing.artists || []].includes(name));
+        const showWhere = (name, color) => {
+            const where = justEverythingMan.filter(thing => [
+                ...thing.coverArtists || [],
+                ...thing.contributors || [],
+                ...thing.artists || []
+            ].some(({ who }) => who === name));
             for (const thing of where) {
-                console.log(`\x1b[31m- ` + (thing.album ? `(\x1b[1m${thing.album.name}\x1b[0;31m)` : '') + ` \x1b[1m${thing.name}\x1b[0m`);
+                console.log(`\x1b[${color}m- ` + (thing.album ? `(\x1b[1m${thing.album.name}\x1b[0;${color}m)` : '') + ` \x1b[1m${thing.name}\x1b[0m`);
             }
         };
         let CR4SH = false;
         for (let name of artistNames) {
-            const entry = artistData.find(entry => entry.name === name);
+            const entry = artistData.find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
             if (!entry) {
                 clearBuffer();
                 console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
-                showWhere(name);
+                showWhere(name, 31);
                 CR4SH = true;
             } else if (entry.alias) {
-                clearBuffer();
-                console.log(`\x1b[31mArtist "\x1b[1m${name}\x1b[0;31m" should be named "\x1b[1m${entry.alias}\x1b[0;31m"\x1b[0m`);
-                showWhere(name);
+                console.log(`\x1b[33mArtist "\x1b[1m${name}\x1b[0;33m" should be named "\x1b[1m${entry.alias}\x1b[0;33m"\x1b[0m`);
+                showWhere(name, 33);
+                CR4SH = true;
+            } else if (entry.name !== name) {
+                console.log(`\x1b[33mArtist "\x1b[1m${name}\x1b[0;33m" should be named "\x1b[1m${entry.name}\x1b[0;33m"\x1b[0m`);
+                showWhere(name, 33);
                 CR4SH = true;
             } else {
                 buffer.push(entry);

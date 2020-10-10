@@ -2,7 +2,7 @@ Album: Strife 2
 Artist: Tensei
 Date: March 13, 2017
 Cover Art: Marimo
-Track Art: none
+Has Track Art: no
 FG: #a347c5
 Canon: Fanon
 URLs:

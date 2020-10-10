@@ -1,7 +1,7 @@
 Album: Sburb
 Artist: James Dever, Erik Scheele
 Cover Art: Vivian Ng
-Track Art: none
+Has Track Art: no
 Date: July 13, 2011
 FG: #34cdff
 URLs:
@@ -147,7 +147,7 @@ URLs:
 - https://youtu.be/XorynbzZQpI?list=PL988516F160FCCF3A
 Commentary:
     <i>James Dever:</i>
-    <i>(original commentary)
+    <i>(original commentary)</i>
     The song that means more to me than any song I've ever written and possibly will again. Sburb is all about creating worlds, thus the resolution of the album comes after the storm (Rapture). No matter how harsh the process may be, the result is beauty and endless potential. This song is completely based around the hemiola motif and the origin of it. It is also designed like a day. The song starts off quiet and slow as the sun rises and slowly gets more complex and full fledged as it rises until mid day when it is most busy. As the sun sets into the later half of the day the song slows down and gets quieter toward the sunset. It resolves with the Homestuck Anthem to imply the loop to the beginning. Worlds are created and the process of Skaia starts again.
     <i>(commentary redux)</i>
     This movement is framed as a sunset. Starting off quiet, building to a peak before shying away to where it started.

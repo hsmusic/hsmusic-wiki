@@ -275,7 +275,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Minihoof's Adventure
 Artist: Michael Guy Bowman
-Contributors: Tavio Morra (vocals)
+Contributors: Tavia Morra (vocals)
 Track Art: Tavia Morra
 Duration: 2:47
 URLs:
@@ -399,7 +399,7 @@ URLs:
 Track: Cumulating Dreams
 Artist: Solatrus
 Contributors: Clark Powell (cello)
-Track Art: Kat
+Track Art: Nyanface
 Duration: 3:11
 URLs:
 - https://homestuck.bandcamp.com/track/cumulating-dreams-2
@@ -595,7 +595,7 @@ Commentary:
 Track: Moonsetter
 Artist: Toby Fox
 Contributors: Samm Neiland (viola), Clark Powell (cello)
-Track Art: saffronScarf
+Track Art: Hanni Brosh
 Duration: 2:21
 URLs:
 - https://homestuck.bandcamp.com/track/moonsetter-2

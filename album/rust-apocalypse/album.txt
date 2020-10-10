@@ -2,7 +2,7 @@ Album: Rust Apocalypse
 Artist: Willow Ascenzo
 Date: January 5, 2013
 Cover Art: Ducky Senpai
-Track Art: none
+Has Track Art: no
 FG: #7848e4
 Canon: Fanon
 URLs:

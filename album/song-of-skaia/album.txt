@@ -1,7 +1,7 @@
 Album: Song of Skaia
 Artist: Mark Hadley
 Cover Art: minty
-Track Art: none
+Has Track Art: no
 Date: January 1, 2012
 FG: #02b7ff
 URLs:

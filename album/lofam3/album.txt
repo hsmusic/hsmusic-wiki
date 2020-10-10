@@ -28,6 +28,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ˚ Disk 1 ˚
 Artist: Veritas Unae
+Track Art: none
 Duration: 0:24
 References: Violet and Gold
 Directory: disk1-lofam3

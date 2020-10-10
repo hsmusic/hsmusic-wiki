@@ -1,7 +1,7 @@
 Album: Symphony Impossible to Play
 Artist: Clark Powell
 Cover Art: Tavia Morra
-Track Art: none
+Has Track Art: no
 Date: August 1, 2012
 FG: #dd5544
 URLs:

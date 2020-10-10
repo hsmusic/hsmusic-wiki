@@ -1,7 +1,7 @@
 Album: Squiddles!
 Date: August 26, 2010
 Cover Art: Homestuck
-Track Art: none
+Has Track Art: no
 FG: #bb44ff
 URLs:
 - https://www.youtube.com/playlist?list=PLy5UGIMKOXpONMExgI7lVYFwQa54QFp_H

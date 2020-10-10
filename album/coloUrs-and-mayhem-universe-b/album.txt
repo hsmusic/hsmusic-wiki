@@ -151,6 +151,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ~~ADDITIONAL MAYHEM~~
 Artist: Toby Fox
+Track Art: none
 Duration: 0:18
 References: Jadesprite
 Directory: additional-mayhem-universe-b
@@ -329,7 +330,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Checkmate
 Artist: David Dycus
-Track Art: Shad
+Track Art: Shad Andrews
 Duration: 2:42
 URLs:
 - https://homestuck.bandcamp.com/track/checkmate-2

@@ -70,7 +70,13 @@ URLs:
 - https://homestuck.bandcamp.com/track/iron-infidel
 - https://youtu.be/pIplxQdLgA4?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
 Contributors:
-- Katherine Bordonaro, Connor Favero, Lorilyn "Neoscottie" Seyler, Steve Johnson, Andrea McNeil, Ari, Pippin (special thanks)
+- Katherine Bordonaro
+- Connor Favero
+- Lorilyn "Neoscottie" Seyler
+- Steve Johnson
+- Andrea McNeil
+- ari
+- Pippin
 -------------------------------------------------------------------------------
 Track: Olive Scribe
 Artist: Magnum
@@ -284,7 +290,7 @@ URLs:
 - https://homestuck.bandcamp.com/track/fuchsia-witch
 - https://youtu.be/FApClQH9MrE?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
 -------------------------------------------------------------------------------
-Track: ~~ADITIONAL MAYHEM~~
+Track: ~~ADDITIONAL MAYHEM~~
 Artist: Toby Fox
 Track Art: none
 Duration: 0:17
@@ -296,7 +302,7 @@ URLs:
 -------------------------------------------------------------------------------
 Track: Your Universe
 Artist: Marcus Citrine
-Track Art: Jones N. Wiedle
+Track Art: J.N. Wiedle
 Duration: 4:50
 URLs:
 - https://homestuck.bandcamp.com/track/your-universe

@@ -81,6 +81,8 @@ Tracks:
 - 08, 09 (by xerxes333)
 - 10 (by Robert Blaker)
 - Harlequin
+- cp_close.mp3
+- Ghostbusters
 - JOHN DO THE WINDY THING
 URLs:
 - https://www.bgreco.net/hsflash/002238.html
@@ -135,12 +137,12 @@ URLs:
 Flash: [S] John: Sleep.
 Page: 644
 Date: September 15, 2009
-Tracks: John Sleeps - Skaian Magicant
+Tracks: John Sleeps / Skaian Magicant
 ------------------------------------------------------------------------------
 Flash: [S] John: Wake up.
 Page: 651
 Date: September 17, 2009
-Tracks: John Sleeps - Skaian Magicant
+Tracks: John Sleeps / Skaian Magicant
 ------------------------------------------------------------------------------
 Flash: [S] Dave: Ascend to the highest point of the building.
 Page: 665
@@ -374,6 +376,9 @@ Tracks: Skaian Skirmish
 URLs:
 - https://youtu.be/ehSFreQEq2A
 - https://www.bgreco.net/hsflash/003701.html
+Contributors:
+- Michael Firman (art)
+- Nic Carey (art)
 ------------------------------------------------------------------------------
 Flash: [S] John: Reunite with your loving wife and daughter.
 Page: 1931
@@ -389,9 +394,26 @@ Tracks: Descend
 URLs:
 - https://youtu.be/paQXkYModNs
 - https://www.bgreco.net/hsflash/003840.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Jessica Allison (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Nic Carey (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 ACT: Act 5 Act 1 - <span style="color: #008282">MOB1US DOUBL3 R34CH4ROUND</span>
 FG: #0000ff
+------------------------------------------------------------------------------
+Flash: [S???] ======>
+Page: 2070
+Date: June 22, 2010
+Tracks: Showdown
+URLs: https://www.homestuck.com/story/2070
 ------------------------------------------------------------------------------
 Flash: [S] Make her pay.
 Page: 2578
@@ -400,6 +422,23 @@ Tracks: Crystamanthequins
 URLs:
 - https://youtu.be/raMHZCdgnnU
 - https://www.bgreco.net/hsflash/004478.html
+Contributors:
+- Brett Muller (art)
+- clorinspats (art)
+- Eyes5 (art)
+- FauxMonstur (art)
+- Jessica Allison (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- myluckyseven (art)
+- Nic Carey (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Tavia Morra (art)
+- skepticArcher (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 ACT: Act 5 Act 2 - <span style="color: #2ed73a">He is already here.</span>
 FG: #ff0000
@@ -441,6 +480,15 @@ Tracks:
 - Horschestra
 URLs:
 - https://www.bgreco.net/hsflash/004692.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Jessica Allison (art)
+- M. Thomas Harding (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] Jade: Wake up.
 Page: 2848
@@ -448,6 +496,17 @@ Date: November 10, 2010
 Tracks: Let the Squiddles Sleep (End Theme)
 URLs:
 - https://youtu.be/NUHzVVCnEVk
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Jessica Allison (art)
+- M. Thomas Harding (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- skepticArcher (art)
+- Tavia Morra (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] Jade: Enter.
 Page: 2927
@@ -456,6 +515,16 @@ Tracks: Umbral Ultimatum
 URLs:
 - https://youtu.be/BeeVidHB8-I
 - https://www.bgreco.net/hsflash/004827.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Nic Carey (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 2988
@@ -478,6 +547,15 @@ Date: December 15, 2010
 Tracks: Planet Healer, Fear of the Heavens
 URLs:
 - https://www.bgreco.net/hsflash/004979.html
+Contributors:
+- Eyes5 (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Nic Carey (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] JOHN. RISE UP.
 Page: 3087
@@ -486,6 +564,8 @@ Tracks: Savior of the Waking World
 URLs:
 - https://youtu.be/jYCa-ByMNsA
 - https://www.bgreco.net/hsflash/004987.html
+Contributors:
+- Lexxy (art)
 ------------------------------------------------------------------------------
 Flash: [S] Wake.
 Page: 3297
@@ -506,6 +586,17 @@ Tracks:
 - Heir Conditioning
 URLs:
 - https://www.bgreco.net/hsflash/005221.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Jessica Allison (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] Equius: Seek the highb100d.
 Page: 3438
@@ -518,6 +609,17 @@ Tracks:
 - Miracles (by ICP, Toby Fox)
 URLs:
 - https://www.bgreco.net/hsflash/005338.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Jessica Allison (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] 3x SHOWDOWN COMBO.
 Page: 3520
@@ -526,6 +628,12 @@ Tracks: Trollian Standoff
 URLs:
 - https://youtu.be/VEA60fK1bk8
 - https://www.bgreco.net/hsflash/005420.html
+Contributors:
+- Eyes5 (art)
+- Lexxy (art)
+- Nic Carey (art)
+- skepticArcher (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] All: Behold glory of Zillyhoo.
 Page: 3679
@@ -541,6 +649,14 @@ Date: March 30, 2011
 Tracks: Black Rose / Green Sun
 URLs:
 - https://www.bgreco.net/hsflash/005595.html
+Contributors:
+- Eyes5 (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- Paige Turner (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 3696
@@ -548,6 +664,8 @@ Date: April 2, 2011
 Tracks: At The Price of Oblivion
 URLs:
 - https://www.bgreco.net/hsflash/005596.html
+Contributors:
+- Lexxy (art)
 ------------------------------------------------------------------------------
 Flash: [S] Terezi: Read note.
 Page: 3718
@@ -576,6 +694,16 @@ Tracks: Terezi Owns
 URLs:
 - https://youtu.be/n-hCXQPW_do
 - https://www.bgreco.net/hsflash/005644.html
+Contributors:
+- clorinspats (art)
+- Eyes5 (art)
+- M. Thomas Harding (art)
+- myluckyseven (art)
+- Nic Carey (art)
+- Paige Turner (art)
+- skepticArcher (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
 ------------------------------------------------------------------------------
 Flash: [S] Flip.
 Page: 3760
@@ -596,6 +724,9 @@ Tracks: The Carnival
 URLs:
 - https://youtu.be/V-ePGeiKr_k
 - https://www.bgreco.net/hsflash/005985.html
+Contributors:
+- Vivian Ng (art)
+- Lazylaz (art)
 ------------------------------------------------------------------------------
 Flash: [S] Cascade.
 Page: 4109
@@ -608,6 +739,23 @@ Tracks:
 URLs:
 - https://youtu.be/FDt-SLyEcjI
 - https://www.bgreco.net/hsflash/006009.html
+Contributors:
+- Brett Muller (art)
+- Eyes5 (art)
+- Lazylaz (art)
+- Leppu (art)
+- Lexxy (art)
+- M. Thomas Harding (art)
+- myluckyseven (art)
+- Nic Carey (art)
+- Paige Turner (art)
+- Richard Gung (art)
+- Shad Andrews (art)
+- skepticArcher (art)
+- Lauren Ross (art)
+- Tavia Morra (art)
+- Vivian Ng (art)
+- Xamag (art)
 ------------------------------------------------------------------------------
 ACT: Intermission 2 - The Man in the Cairo Overcoat.
 FG: #22cc22
@@ -792,6 +940,17 @@ Tracks:
 - Elevatorstuck
 URLs:
 - https://www.bgreco.net/hsflash/007163.html
+Contributors:
+- Amanda H. (art)
+- Chaz Canterbury (art)
+- Lexxy (art)
+- Paige Turner (art)
+- Scarodactyl (art)
+- Hanni Brosh (art)
+- Lauren Ross (art)
+- Vivian Ng (art)
+- Xamag (art)
+- Tanney Liu (art)
 ------------------------------------------------------------------------------
 Flash: [S][A6I3] ==>
 Page: 5308
@@ -806,6 +965,7 @@ Tracks:
 - Crab Waltz
 URLs:
 - https://www.bgreco.net/hsflash/007208.html
+Contributors: <i>See [[flash:5263]].</i>
 ------------------------------------------------------------------------------
 Flash: [S][A6I3] ==>
 Page: 5398
@@ -821,6 +981,7 @@ Tracks:
 - iRRRRRRRRECONCILA8LE
 URLs:
 - https://www.bgreco.net/hsflash/007298.html
+Contributors: <i>See [[flash:5263]].</i>
 ------------------------------------------------------------------------------
 Flash: [S][A6I3] ==>
 Page: 5426
@@ -834,6 +995,10 @@ Date: November 3, 2012
 Tracks: Killed by BR8K Spider!!!!!!!!
 URLs:
 - https://www.bgreco.net/hsflash/007327.html
+Contributors:
+- Feastings (art: character sprites)
+- Scarodactyl (art: background sprites)
+- Shelby Cragg (art: last panel)
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 4 - Void
 FG: #cccccc
@@ -1032,6 +1197,13 @@ Tracks: Carne Vale
 URLs:
 - https://youtu.be/5IDKxUEiuyc
 - https://www.bgreco.net/hsflash/GAMEOVER.html
+Contributors:
+- Hanni Brosh (art)
+- Matt Cummings (art)
+- Jonathan Griffiths (art)
+- Rennie Kingsley (art)
+- Zack Morrison (art)
+- J.N. Wiedle (art)
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Intermission 4 - <span style="color: #008282">F1X TH1S</span>
 FG: #4466ff
@@ -1086,6 +1258,18 @@ Tracks: Moonsetter
 URLs:
 - https://youtu.be/BzxRi-HWDLc
 - https://www.bgreco.net/hsflash/009349.html
+Contributors:
+- Xamag (art)
+- Adrienne Garcia (art)
+- Ikimaru (art)
+- Rennie Kingsley (art)
+- J.N. Wiedle (art)
+------------------------------------------------------------------------------
+Flash: [S][A6A6I5] ====>
+Page: 7635
+Date: June 3, 2015
+Contributors:
+- Rah-Bop (art)
 ------------------------------------------------------------------------------
 Flash: [S][A6A6I5] ====>
 Page: 7928
@@ -1093,6 +1277,8 @@ Date: July 23, 2015
 Tracks: Horsecatska
 URLs:
 - https://youtu.be/9G-2714Ht9Q
+Contributors:
+- ipgd (art)
 ------------------------------------------------------------------------------
 Flash: [S] Terezi: Remem8er.
 Page: 7959
@@ -1100,6 +1286,12 @@ Date: July 27, 2015
 Tracks: Do You Remem8er Me
 URLs:
 - https://youtu.be/3pLgxneqLgk
+Contributors:
+- Adrienne Garcia (art)
+- Ikimaru (art)
+- Angela Sham (art)
+- Shelby Cragg (art)
+- Rah-Bop (art)
 ------------------------------------------------------------------------------
 ACT: Act 6 Act 6 Act 6 - <span style="color: #ff0000">Collide.</span>
 FG: #ee1100
@@ -1114,6 +1306,26 @@ Tracks:
 - Heir of Grief
 URLs:
 - https://youtu.be/Y5wYN6rB_Rg
+Contributors:
+- Adrienne Garcia (art)
+- Airin (art)
+- Angela Sham (art)
+- Callan Bencich (art)
+- Chaz Canterbury (art)
+- Danny Cragg (art)
+- HONE (art)
+- Jonathan Griffiths (art)
+- Jos Venti (art)
+- Matt Cummings (art)
+- Phil Gibson (art)
+- Rah-Bop (art)
+- Ri (art)
+- Shelby Cragg (art)
+- Tauhid Bondia (art)
+- Temmie Chang (art)
+- Toastyglow (art)
+- Vivian Ng (art)
+- Xamag (art)
 ------------------------------------------------------------------------------
 ACT: Act 7 - <span style="color: #c7ff43">The Rapture</span><br><i>&amp; Post Canon</i>
 FG: #dddddd
@@ -1124,6 +1336,11 @@ Date: April 13, 2016
 Tracks: Overture (Canon Edit)
 URLs:
 - https://youtu.be/FevMNMwvdPw
+Contributors:
+- Adrienne Garcia
+- Angela Sham
+- Gina Chacón
+- Rah-Bop
 ------------------------------------------------------------------------------
 Flash: [S] ==>
 Page: 8129
@@ -1457,7 +1674,7 @@ Contributors:
 - Mint Chipleaf (programming)
 Directory: pq-vol9
 Date: December 20, 2019
-Tracks: Requiem, KWCOM DOT WAV
+Tracks: Requiem:requiem-labyrinths-heart, KWCOM DOT WAV
 ------------------------------------------------------------------------------
 Flash: Wow Pesterquest Your Mom Lets You Have Two Fish ?
 Contributors:

@@ -2,7 +2,7 @@ Album: Perfectly Generic Album
 Artist: Cristata
 Date: November 10, 2019
 Cover Art: Cristata
-Track Art: none
+Has Track Art: no
 FG: #1cb611
 Canon: Fanon
 URLs:

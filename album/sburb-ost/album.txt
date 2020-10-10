@@ -39,7 +39,7 @@ URLs:
 Track: Meta Choices [Options]
 Directory: meta-choices
 Artist: sidewalkbanana
-Track Art; RunDoubleRun, Emily
+Track Art: RunDoubleRun, Emily
 Duration: 4:56
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/meta-choices-options
@@ -195,7 +195,7 @@ URLs:
 - https://unofficialmspafans.bandcamp.com/track/grudge-in-a-minor-jack-noir
 - https://youtu.be/QSRDbMqEKNU?list=PL2E1aOkERtLXq9YuH-q42kkqvsYGl7fvD
 -------------------------------------------------------------------------------
-Track: Lavender Lullably [Derse Sleep]
+Track: Lavender Lullaby [Derse Sleep]
 Directory: lavender-lullaby
 Artist: Veritas Unae
 Track Art: Phosphorescence
@@ -208,7 +208,7 @@ URLs:
 Track: Planet in Shadow [Derse]
 Directory: planet-in-shadow
 Artist: Catboss
-Track Art: Kat
+Track Art: Nyanface
 Duration: 4:51
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/planet-in-shadow-derse
@@ -282,7 +282,7 @@ URLs:
 Track: Paradoxical Meteor Shower [Reckoning]
 Directory: paradoxical-meteor-shower
 Artist: Trent West
-Track Art: Kat
+Track Art: Nyanface
 Duration: 3:34
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/paradoxical-meteor-shower-reckoning

@@ -3,7 +3,9 @@ Artist: Solatrus
 Cover Art: Lexxy, skepticArcher
 Date: August 22, 2011
 FG: #cc44cc
-URLs: https://www.youtube.com/playlist?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/album/prospit-derse
+- https://www.youtube.com/playlist?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <b>Propsit & Derse 1 Year Anniversary Commentary</b>
@@ -20,7 +22,9 @@ Commentary:
 Track: Hallowed Halls
 Track Art: Bea
 Duration: 3:35
-URLs: https://youtu.be/ImNmotu8-pU?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/hallowed-halls
+- https://youtu.be/ImNmotu8-pU?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -38,12 +42,16 @@ Commentary:
     "contributing to homestuck, a webcomic thats given me so many opportunities, friends and good memories is a great honor, especially to be involved in an album as conceptually compelling and well executed as the prospit and derse album. i thank solatrus for the opportunity to be a part of his creation and everyone who helped me give back to something that has influenced my life immensely."
     Thanks for helping me out, Bea. And keep up the good work.
     I have to say I’m pleased overall with this song, but, like any artist, it’s difficult to look back at my works. They never seem completed. Especially the Prospit half for me.
+    (<i>original track art</i>)
+    <img src="misc/hallowed-halls-old.jpg">
 -------------------------------------------------------------------------------
 Track: The Golden Towers
 Track Art: Pride
 Duration: 3:22
 References: The Obsidian Towers
-URLs: https://youtu.be/wVFRxJpa2og?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/the-golden-towers
+- https://youtu.be/wVFRxJpa2og?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     Oh boy. ...What to say on this one...
@@ -59,7 +67,9 @@ Track: Prospit Dreamers
 Track Art: Zilleniose
 Duration: 3:19
 References: Penumbra Phantasm, Frost:frost-vol6, Doctor
-URLs: https://youtu.be/S70lGd8zpRM?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/prospit-dreamers
+- https://youtu.be/S70lGd8zpRM?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -86,7 +96,9 @@ Commentary:
 Track: Center of Brilliance
 Track Art: Shelby Cragg
 Duration: 3:37
-URLs: https://youtu.be/514f8SzU62M?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/center-of-brilliance
+- https://youtu.be/514f8SzU62M?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     Expecting a different song, were you? B)
@@ -100,7 +112,9 @@ Commentary:
 Track: Darkened Streets
 Track Art: A. Smith
 Duration: 4:02
-URLs: https://youtu.be/kb_v4KCml-s?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/darkened-streets
+- https://youtu.be/kb_v4KCml-s?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     This was definitely the song that started everything off. It’s dark, dreary, but still majestic like the very moon it describes. The music takes on you a flight. You’re one of the Derse Dreamers, the wind rushing across your face as you approach the moon’s surface. Carapaces scurrying about, too afraid to be caught after curfew, wary of Jack Noir and his gang.
@@ -113,9 +127,11 @@ Commentary:
     In a side note, I’d love to link you to the artist who did the song cover art for Darkened Streets, but I’ve lost contact with them! If anyone knows where I can get in contact again, please let me know!
 -------------------------------------------------------------------------------
 Track: The Obsidian Towers
-Track Art: Kat
+Track Art: Kato
 Duration: 3:19
-URLs: https://youtu.be/IdaYlKyxfx4?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/the-obsidian-towers
+- https://youtu.be/IdaYlKyxfx4?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     I started to shift styles for this one a bit. I wanted something that was more majestic sounding, but still as dark as Darkened Streets. Ultimately, I decided to feature the choir section more in the intro. It actually was probably the first synth I put in this song. Everything basically followed.
@@ -129,7 +145,9 @@ Track: Derse Dreamers
 Track Art: Mixt
 Duration: 3:35
 References: Atomyk Ebonpyre, Endless Climb
-URLs: https://youtu.be/HpmCCuSHmng?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/derse-dreamers
+- https://youtu.be/HpmCCuSHmng?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>
@@ -151,9 +169,11 @@ Commentary:
     More importantly, however, I’m thrilled this song is enjoyed by so many people, and I’ve been blown away how people have have been using this song in their own derivative works. It’s just really heartwarming as an artist to see my work out there having a life of its own.
 -------------------------------------------------------------------------------
 Track: Core of Darkness
-Track Art: Shad
+Track Art: Shad Andrews
 Duration: 3:14
-URLs: https://youtu.be/VEJ3hfCnW_w?list=PL9E0E46E420487203
+URLs:
+- https://music.solatrus.com/track/core-of-darkness
+- https://youtu.be/VEJ3hfCnW_w?list=PL9E0E46E420487203
 Commentary:
     <i>Solatrus:</i>
     <i>(original commentary)</i>

@@ -1,7 +1,7 @@
 Album: Hiveswap Act 1 OST
 Artist: James Roach, Toby Fox
 Cover Art: Homestuck
-Track Art: none
+Has Track Art: no
 Date: September 14, 2017 00:00:05
 FG: #33cc77
 URLs:

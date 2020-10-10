@@ -369,7 +369,7 @@ Contributors:
 - Robert J! Lake (production, arrangement)
 Commentary:
     <i>Luke Benjamins:</i>
-    I actually wrote the melody for this track almost five years ago, for a project that never got off the ground. As far as I can remember, I didn't have any particular inspiration when I wrote it, musical or otherwise. It's the catchiest tun eI've ever made, yet I couldn't tell you how it came to me exactly. This version is a completely unique take on this melod ycompared to the original context, giving it a very different Feel. I wasn't able to do any of the audio production for this track, but I did guide RJ as to how I Feel it should be put together. We ended up pushing the deadline too much with this one, and there are still a couple things I wish had been changed, but like with any creative work, you need to draw the line somewhere, lest you polish it endlessly.
+    I actually wrote the melody for this track almost five years ago, for a project that never got off the ground. As far as I can remember, I didn't have any particular inspiration when I wrote it, musical or otherwise. It's the catchiest tune I've ever made, yet I couldn't tell you how it came to me exactly. This version is a completely unique take on this melod ycompared to the original context, giving it a very different Feel. I wasn't able to do any of the audio production for this track, but I did guide RJ as to how I Feel it should be put together. We ended up pushing the deadline too much with this one, and there are still a couple things I wish had been changed, but like with any creative work, you need to draw the line somewhere, lest you polish it endlessly.
     In the end, I'm gald to finally share itw ith the world in some form, and I hope the world enjoys it.
     <i>Robert J! Lake:</i>
     This is really Luke's song. I started the project file but he made it his own. The crow noises are mine.
@@ -504,9 +504,17 @@ Contributors:
 - Catboss (flute)
 - Marcy Nabors (bass clarinet)
 - Kelly Sadwin (violin & viola)
-- Jamie Paige Stanely (percussion)
+- Jamie Paige Stanley (percussion)
 - Kyle G. Jamolin (lyrics & choir direction)
-- Ciaran Cain, Zeynep Dilli, Kat Jamolin, Kyle G. Jamolin, Michael Ohr, Cobin Pangilinan, Robin S, Chris Roper, Stephen "Jeebes" Wiley (choir)
+- Ciaran Cain (choir)
+- Zeynep Dilli (choir)
+- Kat Jamolin (choir)
+- Kyle G. Jamolin (choir)
+- Michael Ohr (choir)
+- Cobin Pangilinan (choir)
+- Robin S (choir)
+- Chris Roper (choir)
+- Stephen "Jeebes" Wiley (choir)
 References:
 - Warhammer of Zillyhoo
 - Calamity

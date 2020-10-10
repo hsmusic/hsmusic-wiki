@@ -25,7 +25,7 @@ URLs: https://youtu.be/TktueKyYBKs?list=PLF3092FD8EA59F218
 -------------------------------------------------------------------------------
 Track: Gilded Sands
 Artist: Nick Smalley, Solatrus
-Track Art: Kat
+Track Art: Nyanface
 Duration: 4:00
 References: Stone Tower Temple
 URLs: https://youtu.be/i5gsRSo3sMo?list=PLF3092FD8EA59F218
@@ -42,13 +42,13 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Years in the Future
 Artist: Robert J! Lake
-Track Art: Shad
+Track Art: Shad Andrews
 Duration: 4:35
 URLs: https://youtu.be/CadBaY2j6pE?list=PLF3092FD8EA59F218
 -------------------------------------------------------------------------------
 Track: Mayor Maynot
 Artist: Toby Fox
-Track Art: Shad
+Track Art: Shad Andrews
 Duration: 3:20
 References: Mailtime
 URLs: https://youtu.be/d9KVN4WfHHc?list=PLF3092FD8EA59F218
@@ -90,7 +90,7 @@ URLs: https://youtu.be/K7WRrBG6BM8?list=PLF3092FD8EA59F218
 -------------------------------------------------------------------------------
 Track: Litrichean Rioghail
 Artist: Malcolm Brown
-Track Art: saffronScarf
+Track Art: Hanni Brosh
 Duration: 5:00
 References: Explore
 URLs: https://youtu.be/RtzNs4pH11Y?list=PLF3092FD8EA59F218

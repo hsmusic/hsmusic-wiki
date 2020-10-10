@@ -1,5 +1,6 @@
 Album: Unreleased Tracks
 Cover Art: Homestuck
+Has Track Art: no
 Date: November 11, 1111
 FG: #ff7bf7
 Canon: Fanon
@@ -150,15 +151,6 @@ Artist: Mark Hadley
 Duration: 1:06
 URLs: https://www.youtube.com/watch?v=DAj-vYcKNYY
 -------------------------------------------------------------------------------
-Track: Requiem
-Artist: Clark Powell
-Duration: 4:38
-References: Serenade
-Directory: requiem-labyrinths-heart
-URLs:
-- https://clarkpowell.bandcamp.com/track/requiem
-- https://www.youtube.com/watch?v=3kWFQy0kWC4
--------------------------------------------------------------------------------
 Track: Riches to Ruins Movement II
 Artist: Toby Fox
 Duration: 1:10
@@ -267,6 +259,7 @@ URLs: https://youtu.be/gbiS4WkCOVo?t=9580
 -------------------------------------------------------------------------------
 Track: Guardian
 Artist: Bill Bolin
+Duration: 2:05
 Has URLs: no
 -------------------------------------------------------------------------------
 Track: Ham And Steak
@@ -299,10 +292,12 @@ URLs: https://www.youtube.com/watch?v=gAyPFa3nEK4
 -------------------------------------------------------------------------------
 Track: Mutiny
 Artist: Bill Bolin
+Duration: 2:59
 Has URLs: no
 -------------------------------------------------------------------------------
 Track: Non Compos Mentis
 Artist: Bill Bolin
+Duration: 1:53
 Has URLs: no
 -------------------------------------------------------------------------------
 Track: null
@@ -352,6 +347,7 @@ URLs: https://archive.homestuck.net/wl/?id=bBs1qkrvHtZIpfhl7XCLoBX7o41d3nEE&path
 -------------------------------------------------------------------------------
 Track: Strider Showdown
 Artist: Bill Bolin
+Duration: 0:57
 References: Beatdown (Strider Style)
 Has URLs: no
 -------------------------------------------------------------------------------
@@ -645,6 +641,26 @@ Artist: JoJo's Bizarre Adventure
 Duration: 2:38
 URLs: https://www.youtube.com/watch?v=Rpc8K-zQoYM
 -------------------------------------------------------------------------------
+Track: cp_close.mp3
+Artist: Captain Planet
+Duration: 1:01
+URLs:
+- https://hsmusic.github.io/misc/cp_close.mp3
+- https://www.youtube.com/watch?v=v1QYQpHdzpw
+Commentary:
+    <i>Florrie Haero:</i>
+    cp_close.mp3 is a track referenced in the flash file for [[flash:338]]. an emailer sent a whole bunch of neat information about the context around this flash, so instead of rewording all that, here's their quote with all the details!
+    ---
+    Your track listing for Dave's Phat Beat Machine, aka <a href="http://www.mspaintadventures.com/test_index.php?s=6&p=002238">this page</a>, is kind of incorrect as listed in the music wiki at [[flash:338]]. Maybe you already know this stuff, but I'm breaking it down Just In Case.
+    So here's the thing: the secret buttons with extra music you find after selecting the four corner buttons on the machine are actually broken due to link rot. Somewhat unusually, the flash does indeed pull music directly from external sites which have stopped working over the years. By looking into the flash itself you can see the intended music for each button. From left to right:
+    - <a href="http://www.mspaintadventures.com/storyfiles/hs2/00253/mspa_harlequin.mp3">http://www.mspaintadventures.com/storyfiles/hs2/00253/mspa_harlequin.mp3</a><br> This one still works, as it links back to MSPA. Reused from the Act 2 walkaround, actually.
+    - <a href="http://www.turner.com/planet/mp3/cp_close.mp3">http://www.turner.com/planet/mp3/cp_close.mp3</a> The Captain Planet theme song, or closing credits apparently or whatever. Idk, never watched it. Visiting this link now redirects you to a redesigned Warner page instead.
+    - <a href="http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3">http://fozzy42.com/SoundClips/Themes/Movies/Ghostbusters.mp3</a> Ghostbusters theme song from some random-ass page that no longer exists.
+    - <a href="http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3">http://pasko.webs.com/foreign/Aerosmith_-_I_Dont_Wanna_Miss_A_Thing.mp3</a> Same deal as above, but for I Don't Wanna Miss A Thing (as an Armageddon reference).... wait, that's weird. Why does that link play JOHN DO THE WINDY THING? Someone actually purchased the site domain once it expired to make it play a different song ;).
+    My point is that if you want to be accurate then you should probably be listing the music that Hussie originally put into the flash, since it's What He Intended, and omitting the replacement song, since for all we know it could be replaced any day with a medley of farts or whatever by the new site owner. As an extra I'm attaching the original tracks so you can check them out. If you want to verify you can open the flash in a decompiler program like JPEXS and check out where it links to.
+    ---
+    i did end up keeping [[JOHN DO THE WINDY THING]] in the featured tracks list since it's what's current and has presumably been around for a while, and is a curious case of a fan track sneaking into official media (however arbitrarily so). if it gets replaced by farts and the reference list needs an update, so be it! :P
+-------------------------------------------------------------------------------
 Track: Creeping in My Soul
 Artist: Cryoshell
 Duration: 3:59
@@ -748,6 +764,10 @@ Contributors: Trisha Yearwood (performance in Con Air)
 Duration: 3:55
 URLs: https://www.youtube.com/watch?v=Sjx-T7_CGQA
 -------------------------------------------------------------------------------
+Track: Howl
+Artist: Allen Ginsberg
+URLs: https://www.poetryfoundation.org/poems/49303/howl
+-------------------------------------------------------------------------------
 Track: Hydrocity Zone (Act 2)
 Artist: Sonic the Hedgehog
 Duration: 1:55
@@ -780,6 +800,12 @@ Artist: Duke Ellington, Irving Mills
 Duration: 2:45
 URLs: https://www.youtube.com/watch?v=qDQpZT3GhDg
 -------------------------------------------------------------------------------
+Track: Jet Black
+Artist: Jawbreaker
+Duration: 5:14
+Directory: jet-black-jawbreaker
+URLs: https://www.youtube.com/watch?v=Dn3_YzLi_2A
+-------------------------------------------------------------------------------
 Track: JoJo ~Sono Chi no Sadame~
 Artist: JoJo's Bizarre Adventure
 Duration: 4:24
@@ -788,6 +814,11 @@ URLs: https://www.youtube.com/watch?v=sugUX1PtUc4
 Track: La Cucaracha
 Artist: Lost in History
 URLs: https://en.wikipedia.org/wiki/La_Cucaracha
+-------------------------------------------------------------------------------
+Track: Lori and Erich Baker
+Artist: StoryCorps
+Duration: 2:28
+URLs: https://beta.prx.org/stories/130979
 -------------------------------------------------------------------------------
 Track: Layton's Theme
 Artist: Professor Layton and the Curious Village
@@ -830,7 +861,7 @@ URLs: https://www.youtube.com/watch?v=-KRtN6-DgrY
 -------------------------------------------------------------------------------
 Track: Master of Puppets
 Artist: Metallica
-Duration: 8;35
+Duration: 8:35
 URLs: https://www.youtube.com/watch?v=S7blkui3nQc
 -------------------------------------------------------------------------------
 Track: Meet the Flintstones
@@ -909,6 +940,12 @@ Artist: Ratboy Genius
 Duration: 1:20
 URLs: https://www.youtube.com/watch?v=IFfLCuHSZ-U
 -------------------------------------------------------------------------------
+Track: Prana Ferox
+Artist: The Mountain Goats
+Duration: 3:59
+Directory: prana-ferox-the-mountain-goats
+URLs: https://www.youtube.com/watch?v=j2NwP64RoG8
+-------------------------------------------------------------------------------
 Track: Pushing Onwards
 Artist: VVVVVV
 Duration: 3:39
@@ -918,6 +955,10 @@ Track: Recruitment Theme
 Artist: Fire Emblem
 Duration: 1:44
 URLs: https://www.youtube.com/watch?v=9xlMErV9Fts
+-------------------------------------------------------------------------------
+Track: Remember
+Artist: Christina Rosetti
+URLs: https://www.poetryfoundation.org/poems/45000/remember-56d224509b7ae
 -------------------------------------------------------------------------------
 Track: Reverse Situation
 Artist: Naruto
@@ -974,6 +1015,10 @@ Artist: The Legend of Zelda
 Duration: 2:00
 URLs: https://www.youtube.com/watch?v=wz_NK5HgR6Q
 -------------------------------------------------------------------------------
+Track: Summer
+Artist: Noah Noble
+Has URLs: no
+-------------------------------------------------------------------------------
 Track: Supercalifragilisticexpialidocious
 Artist: Mary Poppins
 Duration: 3:00
@@ -994,6 +1039,10 @@ Track: The Cave You Fear
 Artist: Michael Markowski
 Duration: 4:00
 URLs: https://www.youtube.com/watch?v=o4pOswwQAxQ
+-------------------------------------------------------------------------------
+Track: The City of Dreadful Night
+Artist: Bysshe Vanolis
+URLs: https://www.poetryfoundation.org/poems/45407/the-city-of-dreadful-night
 -------------------------------------------------------------------------------
 Track: The Court of Miracles
 Artist: Disney
@@ -1065,6 +1114,10 @@ Track: Toreador Song
 Artist: Georges Bizet
 Duration: 6:12
 URLs: https://www.youtube.com/watch?v=2fDkxQBjgFU
+-------------------------------------------------------------------------------
+Track: Up-Hill
+Artist: Christina Rosetti
+URLs: https://www.poetryfoundation.org/poems/45002/up-hill
 -------------------------------------------------------------------------------
 Track: Uptown Funk
 Artist: Mark Ronson, Bruno Mars

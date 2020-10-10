@@ -132,7 +132,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ♏Spider's Eclipse♏
 Artist: Blackhole
-Contributors: Magnoliajades (vocals)
+Contributors: magnoliajades (vocals)
 Track Art: Josefin B.
 Duration: 10:00
 References: Spider8ite!!!!!!!!, Cobalt Corsair, Winterfall
@@ -163,7 +163,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: ♑His Demented Mural♑
 Artist: Zan Beaver
-Track Art: Amanda
+Track Art: Amanda Bell
 Duration: 3:51
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/his-demented-mural
@@ -172,7 +172,7 @@ Commentary:
     <i>Zan Beaver:</i>
     The Grand Highblood,<br>He is the enforcer,<br>He is the ruler,<br>He is the one they fear.<br>But why do they fear?<br>His unmatched tyranny?<br>His capricious pardons?<br>They do not know,<br>And they fear to know,<br>Because anyone who knows,<br>Becomes a part of His Demented Mural.
     So yeah, The Grand Highblood. Pretty scary guy, right? Anyways, that short sort-of poem is the best way I can portray my thought process while making this. It starts off with an eerie organ and piano representing the dread anyone would feel from having to confront him. It speeds up to represent his violent nature, and the many repetitions embody his cruel insanity. The few sections of the piece that show glimmers of hope are soon shot down and brought back to vicious hopelessness.
-    <i>Amanda:</i>
+    <i>Amanda Bell:</i>
     The title of the track I did work for was called "His Demented Mural". Besides the painting he keeps behind his throne, I also imagined his face paint to be a part of that. Changing everyday to match each addition to the wall behind him.
 -------------------------------------------------------------------------------
 Track: ♒Tumescent♒
@@ -691,7 +691,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: The Mechanism
 Artist: not-the-kind-you-save
-Track Art: Amanda
+Track Art: Amanda Bell
 Duration: 3:23
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/the-mechanism
@@ -711,7 +711,7 @@ Commentary:
     <i>not-the-kind-you-save:</i>
     I was tasked with writing a song about Darkleer's thoughts and feelings as he exiles himself post not-killing the Disciple, which is great because my specialty is making things sad.
     The lyrics show Darkleer agonizing over his decision and narrating his emotions, but I wanted to make sure that the tone of the music itself was never really comical--his pain is Serious Business. Unlike many Homestuck songs, this one isn't particularly electronic-sounding, and I think it feels almost like a woe-is-me song from a musical. Hope you enjoy!
-    <i>Amanda:</i>
+    <i>Amanda Bell:</i>
     For this piece I wanted to amplify the melancholy and regret that Darkleer feels after he lets the Disciple go after the Sufferer's execution. The comic only touches base with this moment briefly, so I was happy to work alongside such a great piece that extends on that particular time.
 -------------------------------------------------------------------------------
 Track: Summon the Cavalreapers
@@ -1018,7 +1018,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Sandswept Schismatic
 Artist: Acyl
-Track Art: Amanda
+Track Art: Amanda Bell
 Duration: 3:54
 URLs:
 - https://unofficialmspafans.bandcamp.com/track/sandswept-schismatic
@@ -1026,7 +1026,7 @@ URLs:
 Commentary:
     <i>Acyl:</i>
     So I was working on music for an askblog, and it came out particularly Summoner-y! I'm pretty sure the guitar that comes in around 2:05 was something from a Legend of Zelda song I heard once but it seemed to fit a young Mr. Nitram.
-    <i>Amanda:</i>
+    <i>Amanda Bell:</i>
     As the song being inspired by Nitram + Zelda, this color palette and imagery came to fruition. Heavily inspired by Skyward Sword.
 -------------------------------------------------------------------------------
 Track: lazutrix
