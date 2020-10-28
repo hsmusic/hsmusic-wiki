@@ -115,7 +115,6 @@ Duration: 5:06
 URLs:
 - https://homestuck.bandcamp.com/track/split-reality
 - https://youtu.be/XzZ7PNmcHiU?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
-- https://www.youtube.com/watch?v=XzZ7PNmcHiU
 References: Alphamatic Replacement
 Commentary:
     <i>Xauric:</i>
@@ -311,7 +310,7 @@ Commentary:
     <img src="misc/adios-lost-boys-wip2.jpg">
 -------------------------------------------------------------------------------
 Track: Moving Onwards
-Artist: Matthias Ramalho
+Artist: Mathias Ramalho
 Track Art: cratmang
 Duration: 3:15
 URLs:
@@ -319,7 +318,7 @@ URLs:
 - https://youtu.be/V2rvPt0jjdE?list=PLnVpmehyaOFbH-1hH663k70qBQp5jc_CU
 - https://soundcloud.com/friendly-coy/moving-onwards
 Commentary:
-    <i>Matthias Ramalho:</i>
+    <i>Mathias Ramalho:</i>
     (<a href="https://soundcloud.com/friendly-coy/moving-onwards">SoundCloud</a>)
     My track from the album "Beyond Canon", by the Homestuck^2 Music Team. So he-hey I got to the big leagues! don't know how I got here but I gotta tell ya, it feels awesome.
     <i>cratmang:</i>

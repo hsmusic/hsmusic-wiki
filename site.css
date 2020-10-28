@@ -51,7 +51,13 @@ a:hover {
     font-weight: normal;
 }
 
-#header > h2 > a:last-of-type {
+#header > h2 a.current,
+#header > h2.highlight-last-link > a:last-of-type {
+    font-weight: 800;
+}
+
+#header > h2.dot-between-spans > span:not(:last-child)::after {
+    content: " \00b7 ";
     font-weight: 800;
 }
 
@@ -63,13 +69,9 @@ a:hover {
     flex-grow: 1;
 }
 
-#header > div > * {
-    margin-right: 1px;
-}
-
-#header > div > *:not(:last-child):after {
-    content: "•";
-    margin-left: 1px;
+#header > div > *:not(:last-child)::after {
+    content: " \00b7 ";
+    font-weight: 800;
 }
 
 #header .chronology {
@@ -102,8 +104,22 @@ a:hover {
 }
 
 @media (max-width: 780px) {
-    #sidebar {
+    #sidebar:not(.no-hide) {
         display: none;
+    }
+
+    .columns.vertical-when-thin {
+        flex-direction: column;
+    }
+
+    .columns.vertical-when-thin > *:not(:last-child) {
+        margin-bottom: 10px;
+    }
+
+    #sidebar.no-hide {
+        max-width: unset !important;
+        flex-basis: unset !important;
+        margin-right: 0;
     }
 }
 
@@ -117,6 +133,7 @@ a:hover {
     flex: 1 1 20%;
     min-width: 200px;
     max-width: 250px;
+    flex-basis: 250px;
     float: left;
     padding: 5px;
     margin-right: 10px;
@@ -124,8 +141,16 @@ a:hover {
     height: 100%;
 }
 
+#sidebar.wide {
+    max-width: 350px;
+    flex-basis: 300px;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+
 #content {
     padding: 20px;
+    flex-grow: 1;
 }
 
 #sidebar h1 {
@@ -202,10 +227,6 @@ a:hover {
     overflow-wrap: break-word;
 }
 
-#content {
-    flex-grow: 1;
-}
-
 #cover-art {
     float: right;
     width: 40%;
@@ -215,13 +236,38 @@ a:hover {
 }
 
 #cover-art img {
-    width: 100%;
     display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 img {
     border: 2px solid var(--fg-color);
     box-sizing: border-box;
+    position: relative;
+    padding: 5px;
+    text-align: left;
+    background-color: var(--dim-color);
+    color: white;
+    /* these unfortunately dont take effect while loading, so...
+    text-align: center;
+    line-height: 2em;
+    text-shadow: 0 0 5px black;
+    font-style: oblique;
+    */
+}
+
+.js-hide {
+    display: none;
+}
+
+a.box:focus {
+    outline: 3px double var(--fg-color);
+}
+
+a.box:focus:not(:focus-visible) {
+    outline: none;
 }
 
 h1 {
@@ -243,11 +289,8 @@ h1 {
     align-items: center;
 }
 
-.grid-listing > .grid-item {
-    flex: 1 1 26%;
+.grid-item {
     display: inline-block;
-    min-width: 160px;
-    max-width: 240px;
     margin: 15px;
     text-align: center;
     background-color: #111111;
@@ -256,34 +299,83 @@ h1 {
     padding: 5px;
 }
 
-.grid-listing > .grid-item > img {
+.grid-item img {
+    display: block;
     width: 100%;
-    margin-bottom: 10px;
+    height: 100%;
 }
 
-.grid-listing h2 {
-    text-align: center;
+.grid-item span {
+    margin-top: 0.45em;
+    display: block;
+}
+
+.grid-listing > .grid-item {
+    flex: 1 1 26%;
+}
+
+.grid-actions {
+    display: flex;
+    flex-direction: column;
+    margin: 15px;
+}
+
+.grid-actions > .grid-item {
+    flex-basis: unset !important;
+    margin: 5px;
+}
+
+.grid-item {
+    flex-basis: 240px;
+    min-width: 200px;
+    max-width: 240px;
+}
+
+.grid-item:not(.large-grid-item) {
+    flex-basis: 180px;
+    min-width: 120px;
+    max-width: 180px;
+    font-size: 0.9em;
+}
+
+.square {
+    position: relative;
     width: 100%;
 }
 
-#top-index #content h1 {
+.square::after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+}
+
+.square-content {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+#content.top-index h1,
+#content.flash-index h1 {
     text-align: center;
     font-size: 2em;
 }
 
-#top-index #content h2 {
+#content.flash-index h2 {
     text-align: center;
     font-size: 3em;
     font-variant: small-caps;
     font-style: oblique;
     margin-bottom: 0;
+    text-align: center;
+    width: 100%;
 }
 
-#top-index #content h3 {
+#content.top-index h2 {
     text-align: center;
-    font-size: 1.1em;
-    font-style: oblique;
+    font-size: 2em;
     font-weight: normal;
+    margin-bottom: 0;
 }
 
 #intro-menu {

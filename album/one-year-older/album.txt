@@ -14,9 +14,9 @@ Commentary:
     Now, before I start rambling at length about the music in here, I've got to toss out a few "thank you"s to people.
     First, to all the artists that helped out with the track art. The stuff that they've all given me is just incredible, and if you ever ask me what my favorite part of this album is I would defiitely say "the art". I may be biased. There's full versions of all the album art with the album itself, and I'd highly encourage you to give it a look-over and see what else these talented people have put out.
     Second, to the other people in the music team, who've helped me go from "some guy who uses famitracker and an awful microphone" to "somewhat of an okay digital musician". I'm thankful for every bit of critiquing I've gotten, too, even if I can be really stubborn about it. And all the bros I know in there, if I could meet everyone in person there would be endless fistbumps. You guys rock.
-    Third, to all the firends and people I've met over the years, through Homestuck and otherwise, that've been great to hang out with and chill with and just talk about stupid random things with.
+    Third, to all the friends and people I've met over the years, through Homestuck and otherwise, that've been great to hang out with and chill with and just talk about stupid random things with.
     Fourth, to my family for always being around, and for....well, being family. Keeping me alive and healthy and stuff and keeping me from completely failing in this "life" thing.
-    And lastly to Andrew Hussie for creating Homestuck, making the really crazy decision to bring me onto the taem in the first place, and for giving me the opportunity to both make an album and just make music for him in the first place. I don't know how little I would've composed if I didn't have Homestuck pushing along, both giving me a reason to write and things to write about.
+    And lastly to Andrew Hussie for creating Homestuck, making the really crazy decision to bring me onto the team in the first place, and for giving me the opportunity to both make an album and just make music for him in the first place. I don't know how little I would've composed if I didn't have Homestuck pushing along, both giving me a reason to write and things to write about.
     Alright! Now that all that before-album talk is done with, it's time to get into the album proper. I hope you, out there, enjoy this album, and I'll see you on the flipside.
     <i>Signed, Erik "Jit" Scheele</i>
 -------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ URLs:
 Commentary:
     <i>Eric Scheele:</i>
     So, where else to start this off but the beginning? And by beginning, I mean "the morning of 4/13/09, John's birthday and the beginning of it all". So I wanted to take time with this piece, and create a sort of smooth, shifting landscape, illustrating the sun rising over John's neighborhood before he wakes up. This was mainly achieved by intersparsing little melodic hits on instruments with each other, building up and fading out in turn. The opening from a rather old tune of mine, "Light" from Volume 5, also makes an appearance in here to further the overall effect.
-    I imagine, if this piece were performed live, it would do best with all the instrumentalists scattered to some degree. And I usually ahte that gimmick, but it could work well in this context.
+    I imagine, if this piece were performed live, it would do best with all the instrumentalists scattered to some degree. And I usually hate that gimmick, but it could work well in this context.
 -------------------------------------------------------------------------------
 Track: October
 Track Art: Hanni Brosh
@@ -41,7 +41,7 @@ URLs:
 Commentary:
     <i>Eric Scheele:</i>
     Now to completely break away from the previous track, we move into a peppy, small ensemble piece. This one just started out because I wanted a tight ensemble to play something together, something sort of bouncy and light. Before that, I'd been making a lot of pieces that felt unnecessarily large, sticking in instruments for just one little section and not using them the rest of the time, so something lighter with more emphasis on individual parts seemed like a great idea. I had no idea what to call it, though, and it didn't really seem to have much context in terms of the album either, until I was looking through the 2010 calendar that the art team made, and came across the October artwork. Immediately it was like, that was it, the piece both fit the "kids and fun" aesthetic that lasted a while in the beginning, and the artwork fit too, so it achieved purpose and title both at the same time.
-    Instrumentally it fit too, it had piano and bass and bitcrushed drums that sounded somewhat like beatboxing, which were three out of the four instruments the original kids used. There's definitely a discrepancy with using synth vs. violin, though. Before anyone asks, I definitely spent time trying to fandangle string patches into it, but it just didn't work. So you can imagine Rose playing an electric violin, that's what I do. (I don't know if electric violins can functionl ike that string players please don't strangle me thank you)
+    Instrumentally it fit too, it had piano and bass and bitcrushed drums that sounded somewhat like beatboxing, which were three out of the four instruments the original kids used. There's definitely a discrepancy with using synth vs. violin, though. Before anyone asks, I definitely spent time trying to fandangle string patches into it, but it just didn't work. So you can imagine Rose playing an electric violin, that's what I do. (I don't know if electric violins can function like that string players please don't strangle me thank you)
 -------------------------------------------------------------------------------
 Track: Firefly Cloud
 Track Art: Nic Carey
@@ -52,7 +52,7 @@ URLs:
 - https://youtu.be/Y3u8E918EwM?list=PLnVpmehyaOFa4xghnUpmCxz8AtEk-ewlI
 Commentary:
     <i>Eric Scheele:</i>
-    So after a quick burst of events and some luck, John finds himself in LOWAS, the Land of Wind and Shade. Everything's dark, except for the stars above, but as we found out, the were really fireflies trapped in the clouds. This was one of the concepts I latched onto rather hard with this piece, the mass of sparkling and blinking above John as he traipsed about. I've been lucky enough to live in a more rural area for most of my life, and being able to watch the stars was always great, so I could only ever imagine what LOWAS's clouds looked like.
+    So after a quick burst of events and some luck, John finds himself in LOWAS, the Land of Wind and Shade. Everything's dark, except for the stars above, but as we found out, they were really fireflies trapped in the clouds. This was one of the concepts I latched onto rather hard with this piece, the mass of sparkling and blinking above John as he traipsed about. I've been lucky enough to live in a more rural area for most of my life, and being able to watch the stars was always great, so I could only ever imagine what LOWAS's clouds looked like.
     Anyway. I kept the sparkling mainly to the piano, higher register work with some delay making a nice twinkling effect. I'd also just gotten some wonderful "piano in an attic for 80 years" samples, which came with a large variety of inner-piano works, like tapping or heavy strokes of the strings, and I sprinkled those rather liberally in places to try and get the effect of thunder. (After all, what sort of lightning storms could a firefly cloud have, anyway?)
     And of course, there's one or two Doctor quotes in there just because.
 -------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ Commentary:
     <i>Erik Scheele:</i>
     This is definitely one of the older tracks on the record, a cover of Penumbra Phantasm by Toby Fox aka Radiation. At the time of writing this, that track still hasn't been released, but that didn't stop me from making a cover of it. And then re-making that cover, since the first one was kind of crap.
     Not really a whole lot of deep thought or anything with this, I just thought the melody sounded cool and it could work for a sort of high-energy swooping-around sort of thing. And then later, I associated it with John's jetpack flight after he gets warned off from dying to his planet's Denizen, so that's what it became.
-    On a completely random note this piece always makes me want to go out running, and I have done so to this piece a few times. If I could do flips and parkour adn stuff I'd totally be doing that too cause it works really well. Maybe gunfights too. Alright let's move on to the next piece.
+    On a completely random note this piece always makes me want to go out running, and I have done so to this piece a few times. If I could do flips and parkour and stuff I'd totally be doing that too cause it works really well. Maybe gunfights too. Alright let's move on to the next piece.
 -------------------------------------------------------------------------------
 Track: Underfoot
 Track Art: Tavia Morra
@@ -78,7 +78,7 @@ URLs:
 Commentary:
     <i>Erik Scheele:</i>
     The first of two completely-solo-piano pieces on here, this piece was a small idea that I had one night, that I sat on and worked into a rough piece right then and there even though I was supposed to be recording parts of the [[album:Sburb]] album at the time. And a little later, I was fortunate enough to get a good recording of it before heading home for the summer.
-    The piece itself ise meant to go along with John discovering Jade's dead dreamself, after waking up on Skaia for the first time. I know a lot of people associate [[Sarabande]], from Volume 5, with that event, or at least with John reading Jade's letter, but I couldn't help but want to at least touch on it while going through his timeline. Originally I'd stuck this before John even entered the Medium, but that didn't really have any moment tacked on with it, and it made much more sense here.
+    The piece itself is meant to go along with John discovering Jade's dead dreamself, after waking up on Skaia for the first time. I know a lot of people associate [[Sarabande]], from Volume 5, with that event, or at least with John reading Jade's letter, but I couldn't help but want to at least touch on it while going through his timeline. Originally I'd stuck this before John even entered the Medium, but that didn't really have any moment tacked on with it, and it made much more sense here.
 -------------------------------------------------------------------------------
 Track: Flying Car
 Track Art: njeekyo
@@ -101,7 +101,7 @@ URLs:
 Commentary:
     <i>Erik Scheele:</i>
     The descent into Skaia and the exploration of its interior, I feel, went by too quick. It might just be because the Tomb Raider series was a favorite while growing up, but I've always loved old, unexplored ruins, arcane or mystical elements hinted at with wall carvings or murals, that sort of thing. And Skaia, being the center of a sort of central planet to everything in Sburb, could be chock-full of old buildings and mystical secrets to explore.
-    So, to try and accompany the general air of mystery and exploration that would have gone with a long journey into the center of Skaia, I took an old idea in Locrian mode. If you're a music person, Locrian is when you take a major scale, but start it on the last note. It's a rather off-kilter scale, and it can't ever really resolve to the toni chord like most other scales can, which made it rather suited to a piece about the sort of strange secrets and landscapes that could be hidden in the center of Skaia.
+    So, to try and accompany the general air of mystery and exploration that would have gone with a long journey into the center of Skaia, I took an old idea in Locrian mode. If you're a music person, Locrian is when you take a major scale, but start it on the last note. It's a rather off-kilter scale, and it can't ever really resolve to the tonic chord like most other scales can, which made it rather suited to a piece about the sort of strange secrets and landscapes that could be hidden in the center of Skaia.
 -------------------------------------------------------------------------------
 Track: Game Over
 Track Art: Sarah Fu
@@ -146,7 +146,7 @@ URLs:
 - https://youtu.be/5UrMv4IQclk?list=PLnVpmehyaOFa4xghnUpmCxz8AtEk-ewlI
 Commentary:
     <i>Erik Scheele:</i>
-    Aka "the big reset button for the universe". It was hinted at for ages in the comic, and finally happened at some point after this piece was made. It als oserved as the inspiration for a project that my third-year piano studio did.
+    Aka "the big reset button for the universe". It was hinted at for ages in the comic, and finally happened at some point after this piece was made. It also served as the inspiration for a project that my third-year piano studio did.
     In the comic, this event was basically a way to reset the universe, everything inside it, and recreate it in a different way, one that would make the game winnable. So, in my head, a mass de-compilation of everything, like a massive maelstrom building as bits of data are pulled apart. A black hole, in other words, but arcing out in waves of energy ilke lightning. Mother Nature ain't got crap on this beast.
     The piece started out as extreme laziness on my aprt, just idle playing around with various distortion on synths and samples, until the school project came up and wanted results fast. So I threw some things together until they formed the opening, and took a very lax approach to the piano part, a sort of "here's a riff, now play around with it, there's your part" with a drum loop over top. Thankfully my laziness didn't extend to the whole thing, and it all got more polished up and developed over time. It still keeps the "improvised piano part based off one riff" idea, though.
 -------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ URLs:
 - https://youtu.be/jw2hUg_32PQ?list=PLnVpmehyaOFa4xghnUpmCxz8AtEk-ewlI
 Commentary:
     <i>Erik Scheele:</i>
-    Way back, before I was even on the team and before I thought I even belonged on the team, I recorded a simple piano refrain. First thing I'd ever recorded, too, and I want to say it was done a few months after Homestuck had started. In my ehad, it fit in as a possible refrain for one of the characters, and the idea always stuck in my head that it could also work as a piece for the very ending for Homestuck, a sort of "all is well" refrain. After two years, I was finally able to make something like what I was thinking and put it in the right context.
+    Way back, before I was even on the team and before I thought I even belonged on the team, I recorded a simple piano refrain. First thing I'd ever recorded, too, and I want to say it was done a few months after Homestuck had started. In my head, it fit in as a possible refrain for one of the characters, and the idea always stuck in my head that it could also work as a piece for the very ending for Homestuck, a sort of "all is well" refrain. After two years, I was finally able to make something like what I was thinking and put it in the right context.
     Like the [[Homestuck Anthem]], I went with using the four kids' instruments: piano, strings, drums/percussion, and bass, and stuck mainly with those. I also got some help by Mr. Lake of Awesome Beats Inc. who was way better at beats than I am, and he made it way better too. Big props to him.
     With the new universe and many new characters being explored, this piece might not work for "the end of Homestuck" anymore, but if anything, I see it as a sort of moving forward. John's journey on that one day, when he turned 13, matured both him and his friends. Like many others, he took the hero's journey, and grew as a result of it, and so this piece could very well fit him leaving his universe and going on to the next, bringing his experiences and knowledge with him, just as well as it could fit him moving past Sburb to whatever adventures lie ahead.
 -------------------------------------------------------------------------------
@@ -199,9 +199,14 @@ URLs:
 - https://youtu.be/gfw3ALlYnmY?list=PLnVpmehyaOFa4xghnUpmCxz8AtEk-ewlI
 Commentary:
     <i>Erik Scheele:</i>
-    BONUS TRACK TIME! But since I didn't make this one, I'm not going to talk over it, I'm going to turn htis over to Eston for his commentary. So here's Eston:
+    BONUS TRACK TIME! But since I didn't make this one, I'm not going to talk over it, I'm going to turn this over to Eston for his commentary. So here's Eston:
     <i>Eston Schweickart:</i>
-    <ul><li>Like most of this album, it was made over a year before release</li><li>Sound sources include the "stab" sound from Walk-Stab-Walk and a burnt-out lightbulb</li><li>Jit is an amazingly talented musician and a spectacular pianist, but he will never admit it nor accept it</li><li>I spent longer writing and producing this piece than any other finished song I've worked on (~5 months)</li><li>I took cues from Jit's style of orchestral instruments accompanying synths reminiscent of chiptunes, and though it is largely a re-imagining of Walk-Stab-Walk, I included subtle tips of the hat to his other early works</li><li>Yes good that sounded sufficiently pretentious</li></ul>
+    - Like most of this album, it was made over a year before release
+    - Sound sources include the "stab" sound from Walk-Stab-Walk and a burnt-out lightbulb
+    - Jit is an amazingly talented musician and a spectacular pianist, but he will never admit it nor accept it
+    - I spent longer writing and producing this piece than any other finished song I've worked on (~5 months)
+    - I took cues from Jit's style of orchestral instruments accompanying synths reminiscent of chiptunes, and though it is largely a re-imagining of Walk-Stab-Walk, I included subtle tips of the hat to his other early works
+    - Yes good that sounded sufficiently pretentious
     <i>Erik Scheele:</i>
     Eston is the coolest of bros and makes sick music. But in a good way, not like sick with the flu or whatever. If you want to check out more of his stuff, and you should, you can visit his blog at <a href="https://siasinsilence.tumblr.com/">siasinsilence.tumblr.com</a>.
 -------------------------------------------------------------------------------

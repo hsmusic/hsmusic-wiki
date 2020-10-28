@@ -62,6 +62,10 @@ URLs:
 - https://albel-is-mine.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Alex Amlie-Wolf
+URLs:
+- https://alexamliewolf.bandcamp.com
+- https://soundcloud.com/alexamlie/
+- https://www.youtube.com/user/nemecic9199
 -------------------------------------------------------------------------------
 Artist: Alex Votl
 URLs:
@@ -79,6 +83,7 @@ Artist: Alexandria Kemp
 Artist: Alexia Khodanian
 URLs:
 - https://alexiadraws.tumblr.com/
+- https://twitter.com/alexiakhodanian/
 -------------------------------------------------------------------------------
 Artist: Alina James
 URLs:
@@ -211,13 +216,12 @@ Artist: Ashley Jones
 Artist: Asiul
 URLs:
 - https://purenonsens.tumblr.com/
+- https://twitter.com/purenonsens/
 -------------------------------------------------------------------------------
 Artist: Astro Kid
 URLs:
 - https://soundcloud.com/astro_kid
 - https://astrokid.bandcamp.com/
--------------------------------------------------------------------------------
-Artist: Astrom
 -------------------------------------------------------------------------------
 Artist: atissi
 URLs:
@@ -225,7 +229,7 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: august
 -------------------------------------------------------------------------------
-Artist: Temporal Shenanigans
+Artist: Astrom
 URLs:
 - https://alliebirdseed.tumblr.com/
 -------------------------------------------------------------------------------
@@ -283,8 +287,7 @@ URLs:
 - https://soundcloud.com/blackholesc
 -------------------------------------------------------------------------------
 Artist: Bloodredbites
-URLs:
-- https://www.deviantart.com/bloodredbites
+Alias: Sangcoon
 -------------------------------------------------------------------------------
 Artist: BlueAmethyst
 URLs:
@@ -426,8 +429,7 @@ URLs:
 Artist: Cheers
 -------------------------------------------------------------------------------
 Artist: Chelsea Thomas
-URLs:
-- https://toguchin.tumblr.com/
+Alias: Toguchidraws
 -------------------------------------------------------------------------------
 Artist: cherry bomb bunny
 -------------------------------------------------------------------------------
@@ -585,6 +587,7 @@ URLs: https://en.wikipedia.org/wiki/Daft_Punk
 -------------------------------------------------------------------------------
 Artist: Dallas Ross Hicks
 URLs:
+- https://soundcloud.com/drhicks76/
 - https://drhicks76.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Dalmationer
@@ -633,6 +636,8 @@ Dead URLs:
 Artist: David DeCou
 -------------------------------------------------------------------------------
 Artist: David Dycus
+URLs:
+- https://dirtiestmusic.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: David Ellis
 URLs:
@@ -653,6 +658,11 @@ Artist: Daysi
 Artist: dazed-squid
 URLs:
 - https://dazed-squid.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: Decon Theed
+URLs:
+- https://103records.bandcamp.com/
+- https://soundcloud.com/103_records/
 -------------------------------------------------------------------------------
 Artist: demfury
 URLs:
@@ -680,6 +690,8 @@ URLs:
 - https://soundcloud.com/difarem
 -------------------------------------------------------------------------------
 Artist: Digidigi66
+URLs:
+- https://www.deviantart.com/digidigi66
 -------------------------------------------------------------------------------
 Artist: Dinah Washington
 URLs: https://en.wikipedia.org/wiki/Dinah_Washington
@@ -687,6 +699,8 @@ URLs: https://en.wikipedia.org/wiki/Dinah_Washington
 Artist: Disney
 -------------------------------------------------------------------------------
 Artist: DJ最テー
+URLs:
+- https://soundcloud.com/djsaitae/
 -------------------------------------------------------------------------------
 Artist: Doctor Who
 -------------------------------------------------------------------------------
@@ -752,6 +766,9 @@ URLs:
 - https://music.orngjce223.net/
 -------------------------------------------------------------------------------
 Artist: Elanor Pam
+URLs:
+- https://twitter.com/elanorpam
+- http://www.fanelorn.net/
 -------------------------------------------------------------------------------
 Artist: electric lantern
 URLs:
@@ -759,6 +776,10 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Electric Six
 URLs: https://en.wikipedia.org/wiki/Electric_Six
+-------------------------------------------------------------------------------
+Artist: Eligecos
+URLs:
+- https://twitter.com/Eligecos/
 -------------------------------------------------------------------------------
 Artist: Elisa McCabe
 -------------------------------------------------------------------------------
@@ -811,14 +832,18 @@ Artist: Erin B.
 URLs:
 - https://crowwingedangel.tumblr.com/
 -------------------------------------------------------------------------------
+Artist: Erupan
+URLs:
+- https://erupan.tumblr.com/
+-------------------------------------------------------------------------------
 Artist: Esabelle Ryngin
 URLs:
 - https://esabelleryngin.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Eston Schweickart
 URLs:
-- https://siasinsilence.tumblr.com/
 - https://soundcloud.com/eschweic
+- https://siasinsilence.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Evan Copeland
 -------------------------------------------------------------------------------
@@ -865,6 +890,8 @@ URLs: https://en.wikipedia.org/wiki/Fire_Emblem
 Artist: First Turn Fold
 URLs:
 - https://soundcloud.com/first-turn-fold
++ https://www.youtube.com/channel/UCq2m3lZnbmjb0tW4wUPmRZg
+- https://firstturnfold.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Fitzwibble
 URLs:
@@ -899,7 +926,7 @@ URLs:
 - https://freckledoctopus.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: FriendlyCoy
-Alias: Matthias Ramalho
+Alias: Mathias Ramalho
 -------------------------------------------------------------------------------
 Artist: fuchsi
 -------------------------------------------------------------------------------
@@ -921,6 +948,7 @@ URLs:
 Artist: gaylalondes
 -------------------------------------------------------------------------------
 Artist: Gec
+Alias: Eligecos
 -------------------------------------------------------------------------------
 Artist: Gelasticat
 -------------------------------------------------------------------------------
@@ -980,6 +1008,10 @@ Artist: Griever
 URLs:
 - https://mspfa.com/?s=13714&p=1
 - https://twitter.com/Griever1337/
+-------------------------------------------------------------------------------
+Artist: Grim Harlequin
+URLs:
+- https://grimharlequin.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Gunsandwwands
 -------------------------------------------------------------------------------
@@ -1047,6 +1079,8 @@ URLs:
 Artist: Ian Taylor
 -------------------------------------------------------------------------------
 Artist: Ian White
+URLs:
+- https://soundcloud.com/myusernamesmud/
 -------------------------------------------------------------------------------
 Artist: Ikimaru
 URLs:
@@ -1170,6 +1204,7 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: J.N. Wiedle
 URLs:
+- https://twitter.com/jnwiedle
 - https://blog.jnwiedle.com/
 -------------------------------------------------------------------------------
 Artist: Jones N. Wiedle
@@ -1198,9 +1233,13 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Kait Linney
 -------------------------------------------------------------------------------
-Artist: Kajoi
+Artist: Kajoinen
 URLs:
 - https://kajoi.tumblr.com/
+- https://twitter.com/kajoinen/
+-------------------------------------------------------------------------------
+Artist: Kajoi
+Alias: Kajoinen
 -------------------------------------------------------------------------------
 Artist: Kal-la-kal-la
 URLs:
@@ -1265,8 +1304,15 @@ Artist: Kera Jones
 Artist: Kevin Grant
 URLs:
 - https://soundcloud.com/kevingrant
+- https://www.youtube.com/user/kaviar101/
 -------------------------------------------------------------------------------
 Artist: Kevin Regamey
+-------------------------------------------------------------------------------
+Artist: Kezinox
+URLs:
+- https://kezinox.bandcamp.com/
+- https://soundcloud.com/kezinox/
+- https://www.youtube.com/user/Kezinox
 -------------------------------------------------------------------------------
 Artist: Khoroshonov
 -------------------------------------------------------------------------------
@@ -1314,7 +1360,9 @@ Artist: Kisbys
 -------------------------------------------------------------------------------
 Artist: Kitsu
 URLs:
+- https://9mileshigh-old.tumblr.com/
 - https://akitsu-47.tumblr.com/
+- https://ackart.carbonmade.com/
 -------------------------------------------------------------------------------
 Artist: knightic
 Alias: fenkko
@@ -1397,6 +1445,8 @@ Artist: Leondra
 Artist: Leppu
 -------------------------------------------------------------------------------
 Artist: Leslie Hung
+URLs:
+- https://twitter.com/lesliehung
 -------------------------------------------------------------------------------
 Artist: Lexxy
 URLs:
@@ -1460,6 +1510,7 @@ URLs:
 Artist: Lynnai Hicks
 URLs:
 - https://drhicks76.tumblr.com/tagged/Lynnai-Art
+- https://www.deviantart.com/drhicks76
 -------------------------------------------------------------------------------
 Artist: Lyza K.
 URLs:
@@ -1519,6 +1570,7 @@ Artist: Marc Encabo
 -------------------------------------------------------------------------------
 Artist: Marcus Carline
 URLs:
+- https://twitter.com/marcuscarline/
 - https://marcuscarline.com/
 -------------------------------------------------------------------------------
 Artist: Marcus Citrine
@@ -1562,10 +1614,13 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Matt Martin
 -------------------------------------------------------------------------------
-Artist: Matthias Ramalho
+Artist: Mathias Ramalho
 URLs:
 - https://friendlycoy.bandcamp.com/
 - https://soundcloud.com/friendly-coy
+-------------------------------------------------------------------------------
+Artist: Matthias Ramalho
+Alias: Mathias Ramalho
 -------------------------------------------------------------------------------
 Artist: Max Wright
 URLs:
@@ -1637,6 +1692,10 @@ Artist: Michael Ohr
 Artist: Michael Vallejo
 -------------------------------------------------------------------------------
 Artist: Michelle Czajkowski
+URLs:
+- https://tinypaint.tumblr.com/
+- https://twitter.com/avasdemon
+- https://www.avasdemon.com/
 -------------------------------------------------------------------------------
 Artist: microwavedsoap
 URLs:
@@ -1656,8 +1715,7 @@ URLs:
 - https://www.behance.net/mikkynga
 -------------------------------------------------------------------------------
 Artist: Mingmingfurb
-URLs:
-- https://grimharlequin.tumblr.com/
+Alias: Grim Harlequin
 -------------------------------------------------------------------------------
 Artist: Mint Chipleaf
 URLs:
@@ -1725,6 +1783,8 @@ URLs:
 Artist: Myotishi
 URLs:
 - https://rosieberry.tumblr.com/
+- https://twitter.com/rosiemonomi/
+- https://www.deviantart.com/myotishi
 -------------------------------------------------------------------------------
 Artist: N.W.A.
 URLs: https://en.wikipedia.org/wiki/N.W.A
@@ -1891,6 +1951,8 @@ URLs:
 Artist: Paul Henderson
 -------------------------------------------------------------------------------
 Artist: Paul Tuttle Starr
+URLs:
+- https://paultuttlestarr.bandcamp.com/
 -------------------------------------------------------------------------------
 Artist: paveffer
 URLs:
@@ -1942,6 +2004,11 @@ URLs:
 - https://plaidart.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Plumegeist
+URLs:
+- https://plumegeist.bandcamp.com/
+- https://soundcloud.com/plumegeist
+- https://www.youtube.com/user/Plumegeist
+- https://twitter.com/geistbox/
 -------------------------------------------------------------------------------
 Artist: poinko
 Alias: Phil Gibson
@@ -1966,6 +2033,9 @@ Artist: power464646
 Alias: Grace Medley
 -------------------------------------------------------------------------------
 Artist: Prassio
+URLs:
+- https://twitter.com/prassiooo
+- http://prassio.net/
 -------------------------------------------------------------------------------
 Artist: Pride
 URLs:
@@ -2081,8 +2151,7 @@ URLs:
 - https://reasonpeason.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Rebecca Ryberg
-URLs:
-- https://erupan.tumblr.com/
+Alias: Erupan
 -------------------------------------------------------------------------------
 Artist: Red Pen
 URLs:
@@ -2109,6 +2178,7 @@ URLs:
 - https://www.weavecomic.com/
 -------------------------------------------------------------------------------
 Artist: repeatedScales
+Alias: Decon Theed
 -------------------------------------------------------------------------------
 Artist: rest✩taurus
 -------------------------------------------------------------------------------
@@ -2206,6 +2276,11 @@ URLs:
 - https://celisea.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Samm Neiland
+-------------------------------------------------------------------------------
+Artist: Sangcoon
+URLs:
+- https://sangcoon.tumblr.com/
+- https://www.deviantart.com/bloodredbites
 -------------------------------------------------------------------------------
 Artist: Sara Stebbins
 -------------------------------------------------------------------------------
@@ -2307,7 +2382,8 @@ URLs:
 Artist: Shannon
 URLs:
 - https://superflatpsyche.tumblr.com/
-- https://www.deviantart.com/stj-44
+- https://www.deviantart.com/superflatpsychosis
+- https://twitter.com/SuperflatPsyche
 -------------------------------------------------------------------------------
 Artist: Shan Murphy
 URLs:
@@ -2363,6 +2439,7 @@ URLs:
 - https://fire-cycle.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Sinister Psyche
+Alias: Kezinox
 -------------------------------------------------------------------------------
 Artist: skepticArcher
 Dead URLs:
@@ -2499,6 +2576,7 @@ URLs: https://en.wikipedia.org/wiki/Super_Mario
 -------------------------------------------------------------------------------
 Artist: SuryaAsura
 URLs:
+- https://twitter.com/suryaasura/
 - https://demonsfromthesun.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Svix
@@ -2665,6 +2743,10 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Toe
 -------------------------------------------------------------------------------
+Artist: Toguchidraws
+URLs:
+- https://toguchin.tumblr.com/
+-------------------------------------------------------------------------------
 Artist: Tom Kendall Hughes
 -------------------------------------------------------------------------------
 Artist: Toon Lettuce
@@ -2803,8 +2885,9 @@ URLs:
 -------------------------------------------------------------------------------
 Artist: Willow Ascenzo
 URLs:
-- https://soundcloud.com/wellmanicuredman
 - https://wellmanicuredmusic.bandcamp.com/
+- https://soundcloud.com/wellmanicuredman
+- https://twitter.com/wmm_ebooks/
 -------------------------------------------------------------------------------
 Artist: Winter
 -------------------------------------------------------------------------------
@@ -2815,6 +2898,10 @@ URLs:
 - https://worthikids.bandcamp.com/
 - https://www.youtube.com/user/Worthikids
 - https://worthikids.tumblr.com/
+-------------------------------------------------------------------------------
+Artist: WP
+URLs:
+- https://debonairbear.tumblr.com/
 -------------------------------------------------------------------------------
 Artist: Xagave
 URLs:
@@ -2850,6 +2937,8 @@ Artist: Yan Rodriguez
 URLs:
 - https://nucleose.bandcamp.com/
 - https://soundcloud.com/nucleose
+- https://www.youtube.com/channel/UCD7a6h_5Jwj_EkwwK2g5H9A/
+- https://twitter.com/nucleose/
 -------------------------------------------------------------------------------
 Artist: yazshu
 -------------------------------------------------------------------------------
@@ -2886,6 +2975,7 @@ URLs:
 Artist: Zilon
 URLs:
 - https://notzilon.tumblr.com/
+- https://twitter.com/notzilon/
 -------------------------------------------------------------------------------
 Artist: Zichao Zang
 -------------------------------------------------------------------------------

@@ -2,9 +2,45 @@
 // 8uilder.
 
 const C = {
-    // This can 8e changed if you want to output to some other directory. Just make
-    // sure static files are copied into it too! (Which, ahem. Might 8e a todo.)
-    SITE_DIRECTORY: '',
+    // This can 8e changed if you want to output to some other directory. It's
+    // the one you'll upload online with rsync or whatever when you're pushing
+    // an upd8, and also the one you'd compress if you wanted to make a 8ackup
+    // of the whole dang site. Just keep in mind that the gener8ted result will
+    // contain a couple symlinked directories, so if you're uploading, you're
+    // pro8a8ly gonna want to resolve those yourself.
+    SITE_DIRECTORY: 'site',
+
+    // Code that's used just for the 8uild! CSS and client JavaScript, etc.
+    // (This gets symlinked into SITE_DIRECTORY.)
+    STATIC_DIRECTORY: 'static',
+
+    // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
+    // site code should 8e put here. Which, uh, only really means this one
+    // file. 8ut rather than hard code it, anything in this directory can 8e
+    // shared across 8oth ends of the code8ase.
+    // (This gets symlinked into SITE_DIRECTORY.)
+    COMMON_DIRECTORY: 'common',
+
+    // Static media will 8e referenced in the site here!
+    // The contents are categorized 8y the constants 8elow.
+    // (This gets symlinked into SITE_DIRECTORY.)
+    MEDIA_DIRECTORY: 'media',
+
+    // Contains a folder for each al8um, within which is the al8um cover art
+    // as well as any track art. Structure itself looks somethin' like this:
+    // * album-art/<album.directory>/cover.jpg
+    // * album-art/<album.directory>/<track1.directory>.jpg
+    // * album-art/<album.directory>/<track2.directory>.jpg
+    MEDIA_ALBUM_ART_DIRECOTRY: 'album-art',
+
+    // Just one folder, with a single image for each flash, matching its output
+    // directory like al8um and track art. (Just keep in mind the directory of
+    // a flash is just its page num8er most of the time.)
+    MEDIA_FLASH_ART_DIRECTORY: 'flash-art',
+
+    // Miscellaneous stuff! This is pretty much only referenced in commentary
+    // fields.
+    MEDIA_MISC_DIRECOTRY: 'misc',
 
     // The folder you stick your random downloads in is called "Downloads",
     // yeah? (Unless you sort all your downloads into manual, organized

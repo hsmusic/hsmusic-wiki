@@ -77,10 +77,16 @@ Contributors:
 - Andrea McNeil
 - ari
 - Pippin
+Lyrics:
+    Han bear ey all vor smarte<br>Oo en day trei striat ande glemt<br>Lee kell vell are vey til lit
+    Vor shlekt ah chilt meh bloo far guh<br>Vee har ing en sha liet ell aey deed<br>Lee kell vell are vey til lit
+    (<i>English:</i>)
+    He carries all our pain<br>And one day his strife is forgotten<br>However, we are forgiven
+    Our kin are separated by colour of blood.<br>We are without without love or virture.<br>However, we are forgiven.
 -------------------------------------------------------------------------------
 Track: Olive Scribe
 Artist: Magnum
-Track Art: Magnum
+Track Art: WP
 Duration: 2:27
 URLs:
 - https://homestuck.bandcamp.com/track/olive-scribe
@@ -134,7 +140,7 @@ Commentary:
 -------------------------------------------------------------------------------
 Track: Indigo Archer
 Artist: Rachel Rose Mitchell
-Track Art: Chelsea Thomas
+Track Art: Toguchidraws
 Duration: 4:42
 URLs:
 - https://homestuck.bandcamp.com/track/indigo-archer
@@ -146,7 +152,7 @@ Track Art: Asiul
 Duration: 3:50
 URLs:
 - https://homestuck.bandcamp.com/track/purple-tyrant
-- https://youtu.be/tcFOqqCWao8?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
+- https://youtu.be/DfbLS-W0V9A?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
 -------------------------------------------------------------------------------
 Track: Violet Mariner
 Artist: Willow Ascenzo
@@ -163,16 +169,19 @@ Commentary:
     Violet Mariner was the first song I started working on for the Homestuck music contest that eventually became the coloUrs and mayhem dual album. It’s a song about Dualscar—but it wasn’t always a song about Dualscar. No, it started out as a song about John. This explains the harp/piano section, which plays with the opening melody to Showtime, vaguely darting near it without ever actually producing the exact notes from Malcolm Brown’s original song. I intended it to be more of a hint of John’s original strife theme than a direct reference. In hindsight, keeping the references to existing Homestuck leitmotifs subtle was a smart idea. If I’d been more overt in my references and just made it a straight-up Doctor remix or an explicit arrangement of Showtime, it would have been really hard to reallocate it to a different character. And I’m happy that Violet Mariner is a Dualscar song. Dualscar needs more songs. And also it gave Radiation an excuse to almost name it “Violet Seaman”. And besides, it means I still technically haven’t used the original title, Heirstrike, yet.
 -------------------------------------------------------------------------------
 Track: Fuchsia Ruler
-Artist: Sinister Psyche
+Artist: Kezinox
 Track Art: Mel
 Duration: 4:07
 Refrences: Liquid Negrocity, twoward2 the heaven2
 URLs:
 - https://homestuck.bandcamp.com/track/fuchsia-ruler
 - https://youtu.be/AgOGQVszHbY?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
+- https://soundcloud.com/kezinox/witching-hour
 Commentary:
-    <i>Sinister Psyche:</i>
+    <i>Kezinox:</i>
     Obviously with a name like Witc)(ing )(our, this song is for the condesce/batterwitch/etc. I always figured a sexy psychotic space empress bent on universal domination needed an over-the-top evil, but also dance-able track. I’d actually been planning to do a song like this for her for quite a while since she’s one of—if not my favorite—characters. Every 30 seconds or so represents a time in the Condesce’s life as we know it up to now and, while the song is almost wholly original, I did pull a few minor, but very recognizable things from songs like liquid negrocity and Twoard2 the Heaven2 to help really nail the connection.
+    (<a href="https://soundcloud.com/kezinox/witching-hour">SoundCloud</a>)
+    This is my song entry for the Homestuck Music Contest--essentially a dark electro house song for the Condesce. On a technical level this song more or less represents the culmination of all the practice and knowledge I've gained from working with music up until now.
 -------------------------------------------------------------------------------
 Track: ~~SIDE 2~~
 Artist: Toby Fox
@@ -208,14 +217,26 @@ Duration: 0:57
 URLs:
 - https://homestuck.bandcamp.com/track/bronze-page
 - https://youtu.be/2ZmG8q5z1XE?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
+Lyrics:
+    There is a land that I know, it is real and not just make believe<br>One where friends will defend one another to the end, and you never have to leave
+    A boy with the love in his heart, 'boldened by the courage in his soul<br>He will fight for the rights of the fairies and the sprites, a hero among trolls
+    You sitting there watching troll TV, get on up and come with me!<br>Adventure lies and soon you will be, watching Fiduspawn!
 -------------------------------------------------------------------------------
 Track: Gold Mage
-Artist: repeatedScales
+Artist: Decon Theed
 Track Art: Prassio
 Duration: 3:30
 URLs:
 - https://homestuck.bandcamp.com/track/gold-mage
 - https://youtu.be/IY9mF06ZVFI?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
+- https://soundcloud.com/103_records/repeatedscales-gold-mage-2011
+Commentary:
+    <i>Decon Theed:</i>
+    Yes, I'm still amused by the fact that the comments on the most popular YouTube upload of this song essentially consist of nothing but "THIS REMINDS ME OF X GAME".
+    And not one of them has ever guessed Baten Kaitos, which provided the primary sources of inspiration for this track (the two Chaotic Dance songs: <a href="https://www.youtube.com/watch?v=_B64f48ewdo">link</a> - <a href="https://www.youtube.com/watch?v=6ftFQ_ToXvA">link</a>). Absolute madness.
+    So. Gold Mage. Originally known as "Playtime is Over" and written for Dirk Strider before being repurposed to Sollux. Probably my most successful song, before I wrote that remix of Amalgum from Undertale. The very first piece of music I ever made money on.
+    I shan't lie; I'm not as fond of this song as I used to be. Not because of the Homestuck connection or anything; simply because it's just too repettitive. Enough so that it lead to why the eventual remix of it turned out the way it did (too busy and cluttered in places - [[track:gold-mage-playtime-is-over-mix]]) It was so with purpose; I did intend for lyrics to go over this- I even wrote a few- but never recorded anything. But honestly, I can't quite bring myself to hate it. The chords are quite nice, what melodies there are + the basslines are pretty slick, and it was my first major musical success. Though the royalties have since slowed way, way down- it's like £10 every four months, if that- it was a major deal when it first dropped as a part of coloUrs & mayhem: Universe A. Even Toby Fox and (assuming I'm not misremembering entirely) Andrew Hussie had nice things to say about it- directly comarping it to EarthBound-type stuff and being astounded it was written, from the ground up, in a PS1 game.
+    I may not be much into Homestuck these days, and I definitely think the song is showing it's age... but, hell, it's special to me all the same. One of the most integral pieces of my early music career by a wide margin.
 -------------------------------------------------------------------------------
 Track: Iron Knight
 Artist: DJ最テー
@@ -228,7 +249,7 @@ URLs:
 Track: Olive Rogue
 Artist: Eston Schweickart
 Contributors: Alex Amlie-Wolf (bass)
-Track Art: Mingmingfurb
+Track Art: Grim Harlequin
 Duration: 4:57
 URLs:
 - https://homestuck.bandcamp.com/track/olive-rogue
@@ -244,7 +265,7 @@ URLs:
 -------------------------------------------------------------------------------
 Track: Teal Seer
 Artist: Kera Jones
-Track Art: Bloodredbites
+Track Art: Sangcoon
 Duration: 2:32
 URLs:
 - https://homestuck.bandcamp.com/track/teal-seer
@@ -260,14 +281,14 @@ URLs:
 -------------------------------------------------------------------------------
 Track: Indigo Heir
 Artist: Paul Tuttle Starr
-Track Art: Rebecca Ryberg
+Track Art: Erupan
 Duration: 5:00
 URLs:
 - https://homestuck.bandcamp.com/track/indigo-heir
 - https://youtu.be/tdzG9kkxGt8?list=PLnVpmehyaOFYiRW0x2OrqmeDZZp4rQHEV
 -------------------------------------------------------------------------------
 Track: Purple Bard
-Artist: Gec
+Artist: Eligecos
 Track Art: Brianne
 Duration: 3:08
 URLs:
@@ -325,7 +346,7 @@ Lyrics:
 -------------------------------------------------------------------------------
 Track: Superego
 Artist: Yan Rodriguez
-Track Art: Kajoi
+Track Art: Kajoinen
 Duration: 2:58
 URLs:
 - https://homestuck.bandcamp.com/track/superego
