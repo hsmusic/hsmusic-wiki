@@ -2465,35 +2465,6 @@ function generateSidebarForAlbum(album, currentTrack = null) {
     `
 }
 
-// These two functions are sort of hard-coded ways to quickly gra8 the path to
-// cover arts, for em8edding witin the HTML. They're actually 8ig hacks,
-// 8ecause they assume the track and al8um directories are adjacent to each
-// other. I get to make that assumption on the responsi8ility that I la8el
-// these functions "hard-coded", which 8asically just means my future self and
-// anyone else trying to mess with this code can't 8lame me for my terri8le
-// decisions / laziness in figuring out a 8etter solution. That said, note to
-// future self: these only work from two levels a8ove the root directory.
-// "O8viously," if you look at their implementation, 8ut if you don't... yeah.
-// You won't 8e a8le to call these for use in the lower level files.
-// ACTUALLY this means I really should just use a <base> element, which yes, I
-// have done 8efore (on my 8log). That way all HTML files have the same root
-// for referenced files, and these functions work anywhere. The catch, then, is
-// that you have to have a "8ase directory" constant, and keep that accurate on
-// 8oth your development machine and the server you pu8lish this too. So, it's
-// a trade-off. 8ut it does mean much cleaner, more general-use functions.
-// Which is kind of the goal here, I suppose. --- Actually, hold on, I took a
-// look at the document8tion and apparently relative URLs are totally okay!
-// Com8ine that with path.relative and I think that should work as a way to
-// skip a 8ase directory constant. Neat!
-/*
-function getAlbumCover(album) {
-    return `../../${C.ALBUM_DIRECTORY}/${album.directory}/cover.png`;
-}
-function getTrackCover(track) {
-    return `../../${C.ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.png`;
-}
-*/
-
 function getHrefOfAnythingMan(anythingMan) {
     return (
         albumData.includes(anythingMan) ? C.ALBUM_DIRECTORY :
@@ -2507,7 +2478,8 @@ function getHrefOfAnythingMan(anythingMan) {
 }
 
 function getAlbumCover(album) {
-    return `${C.ALBUM_DIRECTORY}/${album.directory}/cover.jpg`;
+    const file = 'cover.jpg';
+    return `${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/${file}`;
 }
 function getTrackCover(track) {
     // Some al8ums don't have any track art at all, and in those, every track
@@ -2515,11 +2487,13 @@ function getTrackCover(track) {
     if (track.coverArtists === null) {
         return getAlbumCover(track.album);
     } else {
-        return `${C.ALBUM_DIRECTORY}/${track.album.directory}/${track.directory}.jpg`;
+        const file = `${track.directory}.jpg`;
+        return `${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${track.album.directory}/${file}`;
     }
 }
 function getFlashCover(flash) {
-    return `${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'png'}`;
+    const file = `${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'png'}`;
+    return `${C.MEDIA_DIRECTORY}/${C.MEDIA_FLASH_ART_DIRECTORY}/${file}`;
 }
 
 function getFlashLink(flash) {
