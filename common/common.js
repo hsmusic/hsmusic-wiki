@@ -10,9 +10,17 @@ const C = {
     // pro8a8ly gonna want to resolve those yourself.
     SITE_DIRECTORY: 'site',
 
-    // Code that's used just for the 8uild! CSS and client JavaScript, etc.
+    // Code that's used only in the static site! CSS, cilent JS, etc.
     // (This gets symlinked into SITE_DIRECTORY.)
     STATIC_DIRECTORY: 'static',
+
+    // Data files for the site, including flash, artist, and al8um data.
+    // There are also some HTML files here, which are read and em8edded as
+    // content in a few gener8ted pages (e.g. the changelog).
+    DATA_DIRECTORY: 'data',
+
+    // Su8directory under data for al8um files.
+    DATA_ALBUM_DIRECTORY: 'album',
 
     // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
     // site code should 8e put here. Which, uh, only really means this one
@@ -31,7 +39,7 @@ const C = {
     // * album-art/<album.directory>/cover.jpg
     // * album-art/<album.directory>/<track1.directory>.jpg
     // * album-art/<album.directory>/<track2.directory>.jpg
-    MEDIA_ALBUM_ART_DIRECOTRY: 'album-art',
+    MEDIA_ALBUM_ART_DIRECTORY: 'album-art',
 
     // Just one folder, with a single image for each flash, matching its output
     // directory like al8um and track art. (Just keep in mind the directory of
