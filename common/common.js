@@ -10,10 +10,6 @@ const C = {
     // pro8a8ly gonna want to resolve those yourself.
     SITE_DIRECTORY: 'site',
 
-    // Code that's used only in the static site! CSS, cilent JS, etc.
-    // (This gets symlinked into SITE_DIRECTORY.)
-    STATIC_DIRECTORY: 'static',
-
     // Data files for the site, including flash, artist, and al8um data.
     // There are also some HTML files here, which are read and em8edded as
     // content in a few gener8ted pages (e.g. the changelog).
@@ -28,6 +24,10 @@ const C = {
     // shared across 8oth ends of the code8ase.
     // (This gets symlinked into SITE_DIRECTORY.)
     COMMON_DIRECTORY: 'common',
+
+    // Code that's used only in the static site! CSS, cilent JS, etc.
+    // (This gets symlinked into SITE_DIRECTORY.)
+    STATIC_DIRECTORY: 'static',
 
     // Static media will 8e referenced in the site here!
     // The contents are categorized 8y the constants 8elow.

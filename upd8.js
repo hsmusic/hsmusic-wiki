@@ -89,6 +89,8 @@ const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const access = util.promisify(fs.access);
+const symlink = util.promisify(fs.symlink);
+const unlink = util.promisify(fs.unlink);
 
 const {
     cacheOneArg,
@@ -101,7 +103,7 @@ const {
     th
 } = require('./upd8-util');
 
-const C = require('./common');
+const C = require('./common/common');
 
 // This can 8e changed if you want to output to some other directory. Just make
 // sure static files are copied into it too! (Which, ahem. Might 8e a todo.)
@@ -143,7 +145,7 @@ const SITE_ABOUT = fixWS`
     </ul>
 `;
 
-const SITE_CHANGELOG = fs.readFileSync('changelog.html').toString().trim(); // fight me bro
+const SITE_CHANGELOG = fs.readFileSync(`${C.DATA_DIRECTORY}/changelog.html`).toString().trim(); // fight me bro
 
 const SITE_FEEDBACK = fixWS`
     <p><strong>Feature requests?<br>Noticed any errors?<br>Itching to see that one missing album on the wiki?</strong></p>
@@ -163,9 +165,8 @@ const SITE_JS_DISABLED = fixWS`
 const ENABLE_ARTIST_AVATARS = false;
 const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
 
-const ALBUM_DATA_FILE = 'album.txt';    // /album/*/$.txt
-const ARTIST_DATA_FILE = 'artists.txt'; // /$.txt
-const FLASH_DATA_FILE = 'flashes.txt';  // /$.txt
+const ARTIST_DATA_FILE = 'artists.txt';
+const FLASH_DATA_FILE = 'flashes.txt';
 
 const CSS_FILE = 'site.css';
 
@@ -195,33 +196,8 @@ let justEverythingSortedByArtDateMan;
 // missing track files (or track files which are not linked to al8ums). All a
 // 8unch of stuff that's a pain to deal with for no apparent 8enefit.
 async function findAlbumDataFiles() {
-    // Promises suck. This could pro8a8ly 8e written with async/await and an
-    // ordinary for loop, 8ut I'm using promises 8ecause they let all the
-    // folders get read simultaneously.
-    // ...Actually screw it, let's use async/await AND promises.
-    /*
-    return readdir(C.ALBUM_DIRECTORY)
-        .then(albums => Promise.all(albums
-            .map(album => readdir(path.join(C.ALBUM_DIRECTORY, album))
-                .then(files => files.includes(ALBUM_DATA_FILE) ? path.join(C.ALBUM_DIRECTORY, album, ALBUM_DATA_FILE) : null))))
-        .then(paths => paths.filter(Boolean));
-    */
-
-    const albums = await readdir(C.ALBUM_DIRECTORY);
-
-    const paths = await progressPromiseAll(`Searching for album files.`, albums.map(async album => {
-        // Argua8ly terri8le/am8iguous varia8le naming. Too 8ad!
-        const albumDirectory = path.join(C.ALBUM_DIRECTORY, album);
-        const files = await readdir(albumDirectory);
-        if (files.includes(ALBUM_DATA_FILE)) {
-            return path.join(albumDirectory, ALBUM_DATA_FILE);
-        }
-        // The old code returns null if the data file isn't present, 8ut that's
-        // not actually necessary. We just need some falsey value, and the
-        // implied undefined when you don't explicitly return anything works.
-    }));
-
-    return paths.filter(Boolean);
+    return (await readdir(path.join(C.DATA_DIRECTORY, C.DATA_ALBUM_DIRECTORY)))
+        .map(albumFile => path.join(C.DATA_DIRECTORY, C.DATA_ALBUM_DIRECTORY, albumFile));
 }
 
 function* getSections(lines) {
@@ -842,7 +818,7 @@ async function OLD_writePage(directoryParts, titleOrHead, body) {
                     // directory !== C.SITE_DIRECTORY &&
                     // directory !== '.' &&
                     // `<base href="${path.relative(directory, C.SITE_DIRECTORY)}">`,
-                    `<link rel="stylesheet" href="${CSS_FILE}">`,
+                    `<link rel="stylesheet" href="${C.STATIC_DIRECTORY}/${CSS_FILE}">`,
                     // Apply JavaScript directly to the HTML <head>.
                     // (This is unfortun8, 8ut necessary, 8ecause the entire
                     // <body> tag is passed to this function; if we wanted to
@@ -850,9 +826,9 @@ async function OLD_writePage(directoryParts, titleOrHead, body) {
                     // string, well........ we don't want to go there.
                     // To deal with this, we use the "defer" property, which
                     // means the code only runs once the body has 8een loaded.)
-                    `<script src="common.js"></script>`,
+                    `<script src="${C.COMMON_DIRECTORY}/common.js"></script>`,
                     `<script src="data.js"></script>`,
-                    `<script defer src="client.js"></script>`
+                    `<script defer src="${C.STATIC_DIRECTORY}/client.js"></script>`
                 ].filter(Boolean).join('\n')}
             </head>
             ${body}
@@ -1010,16 +986,16 @@ async function writePage(directoryParts, {
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
-                <link rel="stylesheet" href="site.css">
+                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css">
             </head>
             <body ${attributes({style: body.style})}>
                 ${layoutHTML}
-                <script src="lazy-show.js"></script>
-                <script src="lazy-loading.js"></script>
-                <script src="lazy-fallback.js"></script>
-                <script src="common.js"></script>
+                <script src="${C.STATIC_DIRECTORY}/lazy-show.js"></script>
+                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
+                <script src="${C.STATIC_DIRECTORY}/lazy-fallback.js"></script>
+                <script src="${C.COMMON_DIRECTORY}/common.js"></script>
                 <script src="data.js"></script>
-                <script src="client.js"></script>
+                <script src="${C.STATIC_DIRECTORY}/client.js"></script>
             </body>
         </html>
     `));
@@ -1087,6 +1063,26 @@ function getNewReleases(numReleases) {
         ...majorReleases.map(album => ({large: true, item: album})),
         ...otherReleases.map(album => ({large: false, item: album}))
     ];
+}
+
+function writeSymlinks() {
+    return progressPromiseAll('Building site symlinks.', [
+        link(C.COMMON_DIRECTORY),
+        link(C.STATIC_DIRECTORY),
+        link(C.MEDIA_DIRECTORY)
+    ]);
+
+    async function link(directory) {
+        const file = path.join(C.SITE_DIRECTORY, directory);
+        try {
+            await unlink(file);
+        } catch (error) {
+            if (error.code !== 'ENOENT') {
+                throw error;
+            }
+        }
+        await symlink(path.join('..', directory), file);
+    }
 }
 
 function writeMiscellaneousPages() {
@@ -1285,7 +1281,7 @@ function writeMiscellaneousPages() {
             nav: {simple: true}
         }),
 
-        writeFile('data.js', fixWS`
+        writeFile(path.join(C.SITE_DIRECTORY, 'data.js'), fixWS`
             // Yo, this file is gener8ted. Don't mess around with it!
             window.albumData = ${stringifyAlbumData()};
             window.flashData = ${stringifyFlashData()};
@@ -1323,6 +1319,7 @@ async function writeAlbumPage(album) {
             content: fixWS`
                 ${img({
                     src: getAlbumCover(album),
+                    alt: 'album cover',
                     id: 'cover-art',
                     link: true,
                     square: true
@@ -1412,6 +1409,7 @@ async function writeTrackPage(track) {
             content: fixWS`
                 ${img({
                     src: getTrackCover(track),
+                    alt: 'track cover',
                     id: 'cover-art',
                     link: true,
                     square: true
@@ -2354,7 +2352,7 @@ function iconifyURL(url) {
         url.includes('deviantart.com') ? ['deviantart', 'DeviantArt'] :
         ['globe', `External (${new URL(url).hostname})`]
     );
-    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="icons.svg#icon-${id}"></use></svg></a>`;
+    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${C.STATIC_DIRECTORY}/icons.svg#icon-${id}"></use></svg></a>`;
 }
 
 function chronologyLinks(currentTrack, {
@@ -2549,7 +2547,7 @@ function rebaseURLs(directory, html) {
             // no error: it's a full url
         } catch (error) {
             // caught an error: it's a component!
-            url = path.relative(directory, url);
+            url = path.relative(directory, path.join(C.SITE_DIRECTORY, url));
         }
         return `${attr}="${url}"`;
     });
@@ -2607,13 +2605,13 @@ async function main() {
     // but for now we dont do any significant error throwing
     // (not any that wouldnt be caught elsewhere, later)
     // so i guess its not a big deal???? :o
-    artistData = await processArtistDataFile(ARTIST_DATA_FILE);
+    artistData = await processArtistDataFile(path.join(C.DATA_DIRECTORY, ARTIST_DATA_FILE));
     if (artistData.error) {
         console.log(`\x1b[31;1m${artistData.error}\x1b[0m`);
         return;
     }
 
-    flashData = await processFlashDataFile(FLASH_DATA_FILE);
+    flashData = await processFlashDataFile(path.join(C.DATA_DIRECTORY, FLASH_DATA_FILE));
     if (flashData.error) {
         console.log(`\x1b[31;1m${flashData.error}\x1b[0m`);
         return;
@@ -2756,11 +2754,11 @@ async function main() {
         }
     }
 
+    await writeSymlinks();
     await writeMiscellaneousPages();
-
-    // await writeListingPages();
-    // await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
-    // await writeArtistPages();
+    await writeListingPages();
+    await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
+    await writeArtistPages();
     await writeFlashPages();
 
     decorateTime.displayTime();
