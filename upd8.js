@@ -1114,7 +1114,7 @@ function writeMiscellaneousPages() {
                             lazy: true
                         })}
                         <div class="grid-actions">
-                            <a class="box grid-item" href="albums/fandom/index.html" style="--fg-color: #ffffff">Explore all!</a>
+                            <a class="box grid-item" href="albums/fandom/index.html" style="--fg-color: #ffffff">Explore Fandom!</a>
                             <a class="box grid-item" href="${C.FEEDBACK_DIRECTORY}/index.html" style="--fg-color: #ffffff">Request an album!</a>
                         </div>
                     </div>
@@ -1129,7 +1129,7 @@ function writeMiscellaneousPages() {
                             lazy: true
                         })}
                         <div class="grid-actions">
-                            <a class="box grid-item" href="albums/official/index.html" style="--fg-color: #ffffff">Explore all!</a>
+                            <a class="box grid-item" href="albums/official/index.html" style="--fg-color: #ffffff">Explore Official!</a>
                         </div>
                     </div>
                 `
