@@ -1334,12 +1334,11 @@ async function writeAlbumPage(album) {
                 </p>
                 ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>` || `<!-- (here: Listen on...) -->`}
                 ${album.usesGroups ? fixWS`
-                    <p>This album listing is divided into groups:</p>
                     <dl class="album-group-list">
                         ${album.tracks.flatMap((track, i, arr) => [
                             (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                             (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                                <dt>${track.group}:</dt>
+                                ${track.group && `<dt>${track.group}:</dt>`}
                                 <dd><${listTag}>
                             `,
                             trackToListItem(track),
@@ -2450,7 +2449,7 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 ${album.tracks.flatMap((track, i, arr) => [
                     (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                     (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                        <dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>
+                        ${track.group && `<dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>`}
                         <dd><${listTag}>
                     `,
                     (currentTrack && track.group === currentTrack.group) && trackToListItem(track),
