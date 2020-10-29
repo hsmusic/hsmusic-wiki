@@ -2450,9 +2450,9 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                     (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                     (i === 0 || track.group !== arr[i - 1].group) && fixWS`
                         ${track.group && `<dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>`}
-                        <dd><${listTag}>
+                        <dd style="${getThemeString(track)}"><${listTag}>
                     `,
-                    (currentTrack && track.group === currentTrack.group) && trackToListItem(track),
+                    (!currentTrack || track.group === currentTrack.group) && trackToListItem(track),
                     i === arr.length && `</${listTag}></dd>`
                 ].filter(Boolean)).join('\n')}
             </dl>
