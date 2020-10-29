@@ -525,7 +525,7 @@ async function processAlbumDataFile(file) {
         const groupName = getBasicField(section, 'Group');
         if (groupName) {
             group = groupName;
-            groupColor = getBasicField(section, 'FG');
+            groupColor = getBasicField(section, 'FG') || album.color;
             album.usesGroups = true;
             continue;
         }
