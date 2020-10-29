@@ -933,8 +933,8 @@ async function writePage(directoryParts, {
 
     const sidebarHTML = sidebar.content && fixWS`
         <div id="sidebar" ${classes(
-            sidebar.wide && 'wide',
-            !sidebar.collapse && 'no-hide',
+            wide && 'wide',
+            !collapse && 'no-hide',
             ...sidebar.classes || []
         )}>
             ${sidebar.content}
