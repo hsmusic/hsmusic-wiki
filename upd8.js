@@ -1339,7 +1339,7 @@ async function writeAlbumPage(album) {
                             (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                             (i === 0 || track.group !== arr[i - 1].group) && fixWS`
                                 ${track.group && `<dt>${track.group}:</dt>`}
-                                <dd><${listTag}>
+                                <dd><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
                             `,
                             trackToListItem(track),
                             i === arr.length && `</${listTag}></dd>`
@@ -2449,8 +2449,12 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 ${album.tracks.flatMap((track, i, arr) => [
                     (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                     (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                        ${track.group && `<dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a></dt>`}
-                        <dd style="${getThemeString(track)}"><${listTag}>
+                        ${track.group && fixWS`
+                            <dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}>
+                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a>
+                            </dt>
+                        `}
+                        <dd style="${getThemeString(track)}"><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
                     `,
                     (!currentTrack || track.group === currentTrack.group) && trackToListItem(track),
                     i === arr.length && `</${listTag}></dd>`
