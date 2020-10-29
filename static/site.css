@@ -198,7 +198,7 @@ a:hover {
 }
 
 #sidebar > dl dt {
-    padding-left: 15px;
+    padding-left: 10px;
     margin-top: 0.5em;
 }
 
@@ -438,6 +438,11 @@ dl ul, dl ol {
 
 .album-group-list dt {
     font-style: oblique;
+    padding-left: 0;
+}
+
+.album-group-list dd {
+    margin-left: 0;
 }
 
 .new {
