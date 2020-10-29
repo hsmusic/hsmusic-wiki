@@ -2452,6 +2452,7 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                         ${track.group && fixWS`
                             <dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}>
                                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/index.html">${track.group}</a>
+                                ${listTag === 'ol' ? `(${i + 1}&ndash;${arr.length - arr.slice().reverse().findIndex(t => t.group === track.group)})` : `<!-- (here: track number range) -->`}
                             </dt>
                         `}
                         <dd style="${getThemeString(track)}"><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
