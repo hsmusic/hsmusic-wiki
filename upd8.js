@@ -2403,11 +2403,18 @@ function generateAlbumNavLinks(album, currentTrack = null) {
     const index = currentTrack && album.tracks.indexOf(currentTrack)
     const previous = currentTrack && album.tracks[index - 1]
     const next = currentTrack && album.tracks[index + 1]
-    return `(${[
+
+    const [ previousLine, nextLine, randomLine ] = [
         previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/index.html" id="previous-button" title="${previous.name}">Previous</a>`,
         next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/index.html" id="next-button" title="${next.name}">Next</a>`,
         `<a href="${C.JS_DISABLED_DIRECTORY}/index.html" data-random="track-in-album" id="random-button">${currentTrack ? 'Random' : 'Random Track'}</a>`
-    ].filter(Boolean).join(', ')})`;
+    ];
+
+    if (previousLine || nextLine) {
+        return `(${[previousLine, nextLine].filter(Boolean).join(', ')}<span class="js-hide">, ${randomLine}</span>)`;
+    } else {
+        return `<span class="js-hide">(${randomLine})</span>`;
+    }
 }
 
 function generateAlbumChronologyLinks(album, currentTrack = null) {
