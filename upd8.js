@@ -1419,7 +1419,7 @@ async function writeTrackPage(track) {
             links: [
                 ['./', 'Home'],
                 [`${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name],
-                [`${C.TRACK_DIRECTORY}/${track.direcotry}/`, track.name],
+                [`${C.TRACK_DIRECTORY}/${track.directory}/`, track.name],
                 [null, generateAlbumNavLinks(album, track)]
             ],
             content: fixWS`
