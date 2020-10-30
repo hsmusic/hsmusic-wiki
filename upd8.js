@@ -363,6 +363,57 @@ function transformInline(text) {
     });
 }
 
+function parseAttributes(string) {
+    const attributes = Object.create(null);
+    const skipWhitespace = i => {
+        const ws = /\s/;
+        if (ws.test(string[i])) {
+            const match = string.slice(i).match(/[^\s]/);
+            if (match) {
+                return i + match.index;
+            } else {
+                return string.length;
+            }
+        } else {
+            return i;
+        }
+    };
+
+    for (let i = 0; i < string.length;) {
+        i = skipWhitespace(i);
+        const aStart = i;
+        const aEnd = i + string.slice(i).match(/[\s=]|$/).index;
+        const attribute = string.slice(aStart, aEnd);
+        i = skipWhitespace(aEnd);
+        if (string[i] === '=') {
+            i = skipWhitespace(i + 1);
+            let end, endOffset;
+            if (string[i] === '"' || string[i] === "'") {
+                end = string[i];
+                endOffset = 1;
+                i++;
+            } else {
+                end = '\\s';
+                endOffset = 0;
+            }
+            const vStart = i;
+            const vEnd = i + string.slice(i).match(new RegExp(`${end}|$`)).index;
+            const value = string.slice(vStart, vEnd);
+            i = vEnd + endOffset;
+            attributes[attribute] = value;
+        } else {
+            attributes[attribute] = attribute;
+        }
+    }
+    return Object.fromEntries(Object.entries(attributes).map(([ key, val ]) => [
+        key,
+        val === 'true' ? true :
+        val === 'false' ? false :
+        val === key ? true :
+        val
+    ]));
+}
+
 function transformMultiline(text, treatAsDocument=false) {
     // Heck yes, HTML magics.
 
@@ -376,7 +427,11 @@ function transformMultiline(text, treatAsDocument=false) {
 
     let inList = false;
     for (let line of text.split(/\r|\n|\r\n/)) {
-        line = line.replace(/<img src="(.*?)">/g, '<a href="$1">$&</a>');
+        line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
+            lazy: true,
+            link: true,
+            ...parseAttributes(attributes)
+        }));
         if (line.startsWith('- ')) {
             if (!inList) {
                 outLines.push('<ul>');
@@ -828,6 +883,9 @@ async function OLD_writePage(directoryParts, titleOrHead, body) {
                     // means the code only runs once the body has 8een loaded.)
                     `<script src="${C.COMMON_DIRECTORY}/common.js"></script>`,
                     `<script src="data.js"></script>`,
+                    `<script defer src="${C.STATIC_DIRECTORY}/lazy-show.js"></script>`,
+                    `<script defer src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>`,
+                    `<script defer src="${C.STATIC_DIRECTORY}/lazy-fallback.js"></script>`,
                     `<script defer src="${C.STATIC_DIRECTORY}/client.js"></script>`
                 ].filter(Boolean).join('\n')}
             </head>
@@ -851,6 +909,8 @@ function img({
     src = '',
     alt = '',
     id = '',
+    width = '',
+    height = '',
     link = false,
     lazy = false,
     square = false
@@ -860,7 +920,9 @@ function img({
 
     const imgAttributes = attributes({
         id: link ? '' : id,
-        alt
+        alt,
+        width,
+        height
     });
 
     const nonlazyHTML = wrap(`<img src="${src}" ${imgAttributes}>`);
