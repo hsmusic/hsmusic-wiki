@@ -1133,7 +1133,8 @@ function writeMiscellaneousPages() {
                             entries: (albumData
                                 .filter(album => album.isFanon)
                                 .reverse()
-                                .slice(0, 7)
+                                .slice(0, 6)
+                                .concat([albumData.find(album => album.directory === C.UNRELEASED_TRACKS_DIRECTORY)])
                                 .map(album => ({item: album}))),
                             lazy: true
                         })}
