@@ -2359,6 +2359,7 @@ function fancifyURL(url, {album = false} = {}) {
         url.includes('deviantart.com') ? 'DeviantArt' :
         url.includes('wikipedia.org') ? 'Wikipedia' :
         url.includes('poetryfoundation.org') ? 'Poetry Foundation' :
+        url.includes('instagram.com') ? 'Instagram' :
         new URL(url).hostname
     }</a>`;
 }
@@ -2374,6 +2375,7 @@ function iconifyURL(url) {
         url.includes('tumblr.com') ? ['tumblr', 'Tumblr'] :
         url.includes('twitter.com') ? ['twitter', 'Twitter'] :
         url.includes('deviantart.com') ? ['deviantart', 'DeviantArt'] :
+        url.includes('instagram.com') ? ['instagram', 'Instagram'] :
         ['globe', `External (${new URL(url).hostname})`]
     );
     return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${C.STATIC_DIRECTORY}/icons.svg#icon-${id}"></use></svg></a>`;
