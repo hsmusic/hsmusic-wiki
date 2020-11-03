@@ -2578,7 +2578,7 @@ function getTrackCover(track) {
     }
 }
 function getFlashCover(flash) {
-    const file = `${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'png'}`;
+    const file = `${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'jpg'}`;
     return `${C.MEDIA_DIRECTORY}/${C.MEDIA_FLASH_ART_DIRECTORY}/${file}`;
 }
 
