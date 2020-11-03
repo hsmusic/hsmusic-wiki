@@ -1072,6 +1072,41 @@ function getFlashGridHTML(props) {
     });
 }
 
+function getTableHTML({
+    entries,
+    srcFn,
+    hrefFn,
+    altFn,
+    infoFn = () => [],
+    columnsFn = () => [],
+    lazy = true
+}) {
+    return entries.map(({ item }, i) => fixWS`
+        <a ${classes('table-row', 'box')} href="${hrefFn(item)}" style="${getThemeString(item)}">
+            ${img({
+                src: srcFn(item),
+                alt: altFn(item),
+                lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
+            })}
+            <div class="table-row-summary">
+                <span class="table-row-name">${item.name}</span><br>
+                ${infoFn(item).map(val => `<span class="table-row-info">${val}</span>`).join('\n')}
+            </div>
+            ${columnsFn(item).map(val => `<span class="table-row-column">${val}</span>`).join('\n')}
+        </a>
+    `).join('\n');
+}
+
+function getAlbumTableHTML(props) {
+    return getTableHTML({
+        srcFn: getAlbumCover,
+        hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
+        altFn: () => 'album cover',
+        infoFn: album => [getDateString(album), s(album.tracks.length, 'track'), getDurationString(getTotalDuration(album.tracks))],
+        ...props
+    });
+}
+
 function getNewReleases(numReleases) {
     const latestFirst = albumData.slice().reverse();
 
@@ -1193,6 +1228,9 @@ function writeMiscellaneousPages() {
                 classes: ['top-index'],
                 content: fixWS`
                     <h1>Albums - Fandom</h1>
+                    <p class="quick-links">View as: <a href="#grid">Grid</a>, <a href="#list">List</a></p>
+                    <p class="quick-links"><a href="list/">More listings!</a></p>
+                    <h2 id="grid">Grid</h2>
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
                             entries: (albumData
@@ -1200,6 +1238,16 @@ function writeMiscellaneousPages() {
                                 .reverse()
                                 .map(album => ({item: album}))),
                             lazy: 4
+                        })}
+                    </div>
+                    <h2 id="list">List</h2>
+                    <div class="table-listing">
+                        ${getAlbumTableHTML({
+                            entries: (albumData
+                                .filter(album => album.isFanon)
+                                .reverse()
+                                .map(album => ({item: album}))),
+                            lazy: true
                         })}
                     </div>
                 `
