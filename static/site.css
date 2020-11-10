@@ -343,53 +343,6 @@ h1 {
     font-size: 0.9em;
 }
 
-.table-listing {
-    display: flex;
-    flex-direction: column;
-}
-
-.table-row {
-    display: flex;
-    align-items: center;
-    margin: 5px;
-}
-
-.table-row img {
-    display: block;
-    height: 60px;
-    width: 60px;
-    padding: 2px;
-}
-
-.table-row-summary {
-    flex-grow: 1;
-    margin-left: 10px;
-}
-
-.table-row-info {
-    color: white;
-    white-space: nowrap;
-}
-
-.table-row-column {
-    width: 100px;
-    text-align: center;
-}
-
-.table-row:hover {
-    text-decoration: none;
-}
-
-.table-row:hover .table-row-name,
-.table-row:hover .table-row-column {
-    text-decoration: underline;
-}
-
-.table-row-summary > .table-row-info:not(:last-child)::after {
-    content: " \00b7 ";
-    font-weight: 800;
-}
-
 .square {
     position: relative;
     width: 100%;
