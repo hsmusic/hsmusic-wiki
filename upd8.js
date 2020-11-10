@@ -2428,6 +2428,9 @@ function fancifyURL(url, {album = false} = {}) {
         (
             url.includes('music.solatrus.com')
         ) ? `Bandcamp (${new URL(url).hostname})` :
+        (
+            url.includes('types.pl')
+        ) ? `Mastodon (${new URL(url).hostname})` :
         url.includes('youtu') ? (album ? (
             url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full Album)'
         ) : 'YouTube') :
@@ -2448,6 +2451,9 @@ function iconifyURL(url) {
         (
             url.includes('music.solatrus.com')
         ) ? ['bandcamp', `Bandcamp (${new URL(url).hostname})`] :
+        (
+            url.includes('types.pl')
+        ) ? ['mastodon', `Mastodon (${new URL(url).hostname})`] :
         url.includes('youtu') ? ['youtube', 'YouTube'] :
         url.includes('soundcloud') ? ['soundcloud', 'SoundCloud'] :
         url.includes('tumblr.com') ? ['tumblr', 'Tumblr'] :
