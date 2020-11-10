@@ -129,6 +129,7 @@ const ARTIST_AVATAR_DIRECTORY = 'artist-avatar';
 
 const ARTIST_DATA_FILE = 'artists.txt';
 const FLASH_DATA_FILE = 'flashes.txt';
+const NEWS_DATA_FILE = 'news.txt';
 
 const CSS_FILE = 'site.css';
 
@@ -141,6 +142,7 @@ const CSS_FILE = 'site.css';
 let albumData;
 let allTracks;
 let flashData;
+let newsData;
 
 let artistNames;
 let artistData;
@@ -743,6 +745,59 @@ async function processFlashDataFile(file) {
     });
 }
 
+async function processNewsDataFile(file) {
+    let contents;
+    try {
+        contents = await readFile(file, 'utf-8');
+    } catch (error) {
+        return {error: `Could not read ${file} (${error.code}).`};
+    }
+
+    const contentLines = contents.split('\n');
+    const sections = Array.from(getSections(contentLines));
+
+    return sections.map(section => {
+        const name = getBasicField(section, 'Name');
+        if (!name) {
+            return {error: 'Expected "Name" field!'};
+        }
+
+        const id = getBasicField(section, 'ID');
+        if (!id) {
+            return {error: 'Expected "ID" field!'};
+        }
+
+        let body = getMultilineField(section, 'Body');
+        if (!body) {
+            return {error: 'Expected "Body" field!'};
+        }
+
+        let date = getBasicField(section, 'Date');
+        if (!date) {
+            return {error: 'Expected "Date" field!'};
+        }
+
+        if (isNaN(Date.parse(date))) {
+            return {error: `Invalid date field: "${date}"`};
+        }
+
+        date = new Date(date);
+
+        let bodyShort = body.split('\n')[0];
+
+        body = transformMultiline(body);
+        bodyShort = transformMultiline(bodyShort);
+
+        return {
+            name,
+            body,
+            bodyShort,
+            date,
+            id
+        };
+    });
+}
+
 function getDateString({ date }) {
     /*
     const pad = val => val.toString().padStart(2, '0');
@@ -1170,7 +1225,12 @@ function writeMiscellaneousPages() {
                     </ul>
                     <hr>
                     <h1>News</h1>
-                    <p>Todo.</p>
+                    ${newsData.slice(0, 3).map(entry => fixWS`
+                        <article>
+                            <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/#${entry.id}">${entry.name}</a></h2>
+                            ${entry.body}
+                        </article>
+                    `).join('\n')}
                 `
             },
             nav: {
@@ -1303,6 +1363,22 @@ function writeMiscellaneousPages() {
                 content: fixWS`
                     <h1>JavaScript Disabled (or out of date)</h1>
                     ${SITE_JS_DISABLED}
+                `
+            },
+            nav: {simple: true}
+        }),
+
+        writePage([C.NEWS_DIRECTORY], {
+            title: 'News',
+            main: {
+                content: fixWS`
+                    <h1>News</h1>
+                    ${newsData.map(entry => fixWS`
+                        <article id="${entry.id}">
+                            <h2><a href="#${entry.id}">${getDateString(entry)} - ${entry.name}</a></h2>
+                            ${entry.body}
+                        </article>
+                    `).join('\n')}
                 `
             },
             nav: {simple: true}
@@ -2634,6 +2710,20 @@ async function main() {
     const flashErrors = flashData.filter(obj => obj.error);
     if (flashErrors.length) {
         for (const error of flashErrors) {
+            console.log(`\x1b[31;1m${error.error}\x1b[0m`);
+        }
+        return;
+    }
+
+    newsData = await processNewsDataFile(path.join(C.DATA_DIRECTORY, NEWS_DATA_FILE));
+    if (newsData.error) {
+        console.log(`\x1b[31;1m${newsData.error}\x1b[0m`);
+        return;
+    }
+
+    const newsErrors = newsData.filter(obj => obj.error);
+    if (newsErrors.length) {
+        for (const error of newsErrors) {
             console.log(`\x1b[31;1m${error.error}\x1b[0m`);
         }
         return;

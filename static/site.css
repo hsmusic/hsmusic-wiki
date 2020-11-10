@@ -153,28 +153,31 @@ a:hover {
     flex-grow: 1;
 }
 
+#sidebar > h1,
+#sidebar > h2,
+#sidebar > h3,
+#sidebar > p {
+    text-align: center;
+}
+
 #sidebar h1 {
     font-size: 1.25em;
-    text-align: center;
 }
 
 #sidebar h2 {
     font-size: 1.1em;
-    text-align: center;
     margin: 0;
 }
 
 #sidebar h3 {
     font-size: 1.1em;
-    text-align: center;
     font-style: oblique;
     font-variant: small-caps;
     margin-top: 0.3em;
     margin-bottom: 0em;
 }
 
-#sidebar p {
-    text-align: center;
+#sidebar > p {
     margin: 0.5em 0;
 }
 
@@ -225,6 +228,24 @@ a:hover {
 
 #sidebar li {
     overflow-wrap: break-word;
+}
+
+#sidebar article {
+    text-align: left;
+    margin: 5px 5px 15px 5px;
+}
+
+#sidebar article:last-child {
+    margin-bottom: 5px;
+}
+
+#sidebar article h2 {
+    border-bottom: 1px dotted white;
+}
+
+#sidebar article h2 time {
+    float: right;
+    font-weight: normal;
 }
 
 #cover-art {

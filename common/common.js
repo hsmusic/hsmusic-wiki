@@ -77,6 +77,7 @@ const C = {
     FEEDBACK_DIRECTORY: 'feedback',
     CHANGELOG_DIRECTORY: 'changelog',
     FLASH_DIRECTORY: 'flash',
+    NEWS_DIRECTORY: 'news',
     JS_DISABLED_DIRECTORY: 'js-disabled',
 
     UNRELEASED_TRACKS_DIRECTORY: 'unreleased-tracks',
