@@ -1826,12 +1826,10 @@ async function writeFlashPage(flash) {
                     <ul>
                         ${flash.tracks.map(ref => {
                             const track = getLinkedTrack(ref);
-                            const neighm = ref.match(/(.*?\S):/) || [ref, ref];
                             if (track) {
-                                const neeeighm = neighm[1].replace('$$$$', ':');
                                 return fixWS`
                                     <li>
-                                        <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${neeeighm}</a>
+                                        <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
                                         <span class="by">by ${getArtistString(track.artists)}</span>
                                     </li>
                                 `;
