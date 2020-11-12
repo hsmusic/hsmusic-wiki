@@ -1022,7 +1022,7 @@ async function writePage(directoryParts, {
 
     if (nav.simple) {
         nav.links = [
-            ['./', 'Home'],
+            ['./', 'HSMusic'],
             [href, title]
         ]
     }
@@ -1236,7 +1236,7 @@ function writeMiscellaneousPages() {
             nav: {
                 content: fixWS`
                     <h2 class="dot-between-spans">
-                        <span><a class="current" href="./">Home</a></span>
+                        <span><a class="current" href="./">HSMusic</a></span>
                         <span><a href="${C.LISTING_DIRECTORY}/">Listings</a></span>
                         <span><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></span>
                         <span><a href="${C.ABOUT_DIRECTORY}/">About &amp; Credits</a></span>
@@ -1466,7 +1466,7 @@ async function writeAlbumPage(album) {
         },
         nav: {
             links: [
-                ['./', 'Home'],
+                ['./', 'HSMusic'],
                 [`${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name],
                 [null, generateAlbumNavLinks(album)]
             ],
@@ -1496,7 +1496,7 @@ async function writeTrackPage(track) {
         },
         nav: {
             links: [
-                ['./', 'Home'],
+                ['./', 'HSMusic'],
                 [`${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name],
                 [`${C.TRACK_DIRECTORY}/${track.directory}/`, track.name],
                 [null, generateAlbumNavLinks(album, track)]
@@ -1894,7 +1894,7 @@ async function writeFlashPage(flash) {
         },
         nav: {
             links: [
-                ['./', 'Home'],
+                ['./', 'HSMusic'],
                 [`${C.FLASH_DIRECTORY}/`, `Flashes &amp; Games`],
                 [`${C.FLASH_DIRECTORY}/${kebab}/`, flash.name],
                 parts.length && [null, parts.join(', ')]
