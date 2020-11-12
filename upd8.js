@@ -1932,7 +1932,7 @@ function writeListingPages() {
     const getArtistLI = artistName => fixWS`
         <li>
             <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artistName)}/">${artistName}</a>
-            (${C.getArtistNumContributions(artistName, {allTracks, albumData, flashData})} <abbr title="contributions (to music, art, and flashes)">c.</abbr>)
+            (${'' + C.getArtistNumContributions(artistName, {allTracks, albumData, flashData})} <abbr title="contributions (to music, art, and flashes)">c.</abbr>)
         </li>
     `;
 
