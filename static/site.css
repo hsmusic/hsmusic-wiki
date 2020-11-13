@@ -331,9 +331,21 @@ h1 {
     height: 100%;
 }
 
-.grid-item span {
+.grid-item:hover {
+    text-decoration: none;
+}
+
+.grid-actions .grid-item:hover {
+    text-decoration: underline;
+}
+
+.grid-item span:first-of-type {
     margin-top: 0.45em;
     display: block;
+}
+
+.grid-item:hover span:first-of-type {
+    text-decoration: underline;
 }
 
 .grid-listing > .grid-item {

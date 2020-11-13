@@ -1085,6 +1085,7 @@ function getGridHTML({
     srcFn,
     hrefFn,
     altFn,
+    details = false,
     lazy = true
 }) {
     return entries.map(({ large, item }, i) => fixWS`
@@ -1096,6 +1097,9 @@ function getGridHTML({
                 square: true
             })}
             <span>${item.name}</span>
+            ${details && fixWS`
+                <span>(${s(item.tracks.length, 'track')}, ${getDurationString(getTotalDuration(item.tracks))})</span>
+            `}
         </a>
     `).join('\n');
 }
@@ -1256,6 +1260,7 @@ function writeMiscellaneousPages() {
                     <p class="quick-links"><a href="list/">More listings!</a></p>
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
+                            details: true,
                             entries: (albumData
                                 .filter(album => album.isFanon)
                                 .reverse()
@@ -1277,6 +1282,7 @@ function writeMiscellaneousPages() {
                     <p class="quick-links"><a href="list/">More listings!</a></p>
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
+                            details: true,
                             entries: (albumData
                                 .filter(album => album.isOfficial)
                                 .reverse()
