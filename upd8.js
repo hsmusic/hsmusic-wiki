@@ -1199,7 +1199,7 @@ function writeMiscellaneousPages() {
                         })}
                         <div class="grid-actions">
                             <a class="box grid-item" href="albums/fandom/" style="--fg-color: #ffffff">Explore Fandom!</a>
-                            <a class="box grid-item" href="${C.FEEDBACK_DIRECTORY}/" style="--fg-color: #ffffff">Request an album!</a>
+                            <a class="box grid-item" href="${C.FEEDBACK_DIRECTORY}/" style="--fg-color: #ffffff">Share an album!</a>
                         </div>
                     </div>
                     <h2>Official</h2>
