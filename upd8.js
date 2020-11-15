@@ -284,7 +284,7 @@ function transformInline(text) {
             const flash = getLinkedFlash(ref);
             if (flash) {
                 let name = flash.name;
-                const nextCharacter = text[offset + 1];
+                const nextCharacter = text[offset + match.length];
                 const lastCharacter = name[name.length - 1];
                 if (
                     ![' ', '\n', '<'].includes(nextCharacter) &&
