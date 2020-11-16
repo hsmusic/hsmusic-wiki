@@ -1026,7 +1026,7 @@ async function writePage(directoryParts, {
     const layoutHTML = [
         navHTML,
         sidebar.content ? fixWS`
-            <div ${classes('columns', !collapse && 'vertical-when-thin')}>
+            <div ${classes('layout-columns', !collapse && 'vertical-when-thin')}>
                 ${sidebarHTML}
                 ${mainHTML}
             </div>
@@ -1617,7 +1617,7 @@ async function writeArtistPage(artistName) {
                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
                 ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>` || `<!-- (here: Co-artist credits) -->`}
                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>` || `<!-- (here: Contribution details) -->`}
-                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
+                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
             </li>
         `;
     });
@@ -1690,7 +1690,7 @@ async function writeArtistPage(artistName) {
                                 ${thing.album ? fixWS`
                                     <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '(album commentary)'}
-                                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(getFlashLinkHTML))})</span></br>`}
+                                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
                             </li>
                         `
                     }, false)}
@@ -1905,6 +1905,8 @@ async function writeFlashPage(flash) {
 
 function writeListingPages() {
     const allArtists = artistNames.slice().sort();
+    const reversedTracks = allTracks.slice().reverse();
+    const reversedThings = justEverythingMan.slice().reverse();
 
     const getAlbumLI = (album, extraText = '') => fixWS`
         <li>
@@ -1954,11 +1956,61 @@ function writeListingPages() {
                     (${commentary} ${commentary === 1 ? 'entry' : 'entries'})
                 </li>
             `)],
-        [['artists', 'by-contribs'], `Artists - by Contributions`, allArtists
-            .map(name => ({name, contribs: C.getArtistNumContributions(name, {albumData, allTracks, flashData})}))
-            .sort((a, b) => b.contribs - a.contribs)
-            .map(({ name }) => name)
-            .map(getArtistLI)],
+        [['artists', 'by-contribs'], `Artists - by Contributions`, fixWS`
+            <div class="content-columns">
+                <div class="column">
+                    <h2>Track Contributors</h2>
+                    <ul>
+                        ${allArtists
+                            .map(name => ({
+                                name,
+                                contribs: allTracks.filter(({ album, artists, contributors }) =>
+                                    album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                                    [
+                                        ...artists,
+                                        ...contributors
+                                    ].some(({ who }) => who === name)).length
+                            }))
+                            .sort((a, b) => b.contribs - a.contribs)
+                            .filter(({ contribs }) => contribs)
+                            .map(({ name, contribs }) => fixWS`
+                                <li>
+                                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}">${name}</a>
+                                    (${contribs} <abbr title="contributions (to track music)">c.</abbr>)
+                                </li>
+                            `)
+                            .join('\n')
+                        }
+                    </ul>
+                </div>
+                <div class="column">
+                    <h2>Art &amp; Flash Contributors</h2>
+                    <ul>
+                        ${allArtists
+                            .map(name => ({
+                                name,
+                                contribs: justEverythingMan.filter(({ album, contributors, coverArtists }) => (
+                                    album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                                    [
+                                        ...!album && contributors || [],
+                                        ...coverArtists || []
+                                    ].some(({ who }) => who === name)
+                                )).length
+                            }))
+                            .sort((a, b) => b.contribs - a.contribs)
+                            .filter(({ contribs }) => contribs)
+                            .map(({ name, contribs }) => fixWS`
+                                <li>
+                                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}">${name}</a>
+                                    (${contribs} <abbr title="contributions (to art and flashes)">c.</abbr>)
+                                </li>
+                            `)
+                            .join('\n')
+                        }
+                    </ul>
+                </div>
+            </div>
+        `],
         [['artists', 'by-duration'], `Artists - by Duration`, allArtists
             .map(name => ({name, duration: getTotalDuration(
                 getTracksByArtist(name).filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
@@ -1971,23 +2023,57 @@ function writeListingPages() {
                     (~${getDurationString(duration)})
                 </li>
             `)],
-        [['artists', 'by-latest'], `Artists - by Latest Contribution`, C.sortByDate(allArtists
-            .map(name => ({name, things: C.getThingsArtistContributedTo(name, {albumData, allTracks, flashData})}))
-            .map(({ name, things }) => ({name, things: things.filter(thing => !thing.album || thing.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)}))
-            .filter(({ things }) => things.length)
-            .map(({ name, things }) => ({name, date: new Date(things.reduce((date, thing) => Math.max(date,
-                (thing.coverArtists?.some(({ who }) => who === name)
-                    ? thing.coverArtDate
-                    : thing.date)), 0))}))
-            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-        )
-            .reverse()
-            .map(({ name, date }) => fixWS`
-                <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/">${name}</a>
-                    (${getDateString({date})})
-                </li>
-            `)],
+        [['artists', 'by-latest'], `Artists - by Latest Contribution`, fixWS`
+            <div class="content-columns">
+                <div class="column">
+                    <h2>Track Contributors</h2>
+                    <ul>
+                        ${C.sortByDate(allArtists
+                            .map(name => ({
+                                name,
+                                date: reversedTracks.find(({ album, artists, contributors }) => (
+                                    album.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                                    [...artists, ...contributors].some(({ who }) => who === name)
+                                ))?.date
+                            }))
+                            .filter(({ date }) => date)
+                            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
+                        ).reverse().map(({ name, date }) => fixWS`
+                            <li>
+                                <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/">${name}</a>
+                                (${getDateString({date})})
+                            </li>
+                        `).join('\n')}
+                    </ul>
+                </div>
+                <div class="column">
+                    <h2>Art &amp; Flash Contributors</h2>
+                    <ul>
+                        ${C.sortByDate(allArtists
+                            .map(name => {
+                                const thing = reversedThings.find(({ album, coverArtists, contributors }) => (
+                                    album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                                    [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === name)
+                                ));
+                                return thing && {
+                                    name,
+                                    date: (thing.coverArtists?.some(({ who }) => who === name)
+                                        ? thing.coverArtDate
+                                        : thing.date)
+                                };
+                            })
+                            .filter(Boolean)
+                            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
+                        ).reverse().map(({ name, date }) => fixWS`
+                            <li>
+                                <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/">${name}</a>
+                                (${getDateString({date})})
+                            </li>
+                        `).join('\n')}
+                    </ul>
+                </div>
+            </div>
+        `],
         [['tracks', 'by-name'], `Tracks - by Name`, allTracks.slice()
             .sort(sortByName)
             .map(track => fixWS`
@@ -2068,7 +2154,7 @@ function writeListingPages() {
                 <div id="header">
                     ${generateHeaderForListings(listingDescriptors)}
                 </div>
-                <div class="columns">
+                <div class="layout-columns">
                     <div id="sidebar">
                         ${generateSidebarForListings(listingDescriptors)}
                     </div>
@@ -2085,7 +2171,7 @@ function writeListingPages() {
                 <div id="header">
                     ${generateHeaderForListings(listingDescriptors, 'all-commentary')}
                 </div>
-                <div class="columns">
+                <div class="layout-columns">
                     <div id="sidebar">
                         ${generateSidebarForListings(listingDescriptors, 'all-commentary')}
                     </div>
@@ -2138,7 +2224,7 @@ function writeListingPages() {
                 <div id="header">
                     ${generateHeaderForListings(listingDescriptors, 'random')}
                 </div>
-                <div class="columns">
+                <div class="layout-columns">
                     <div id="sidebar">
                         ${generateSidebarForListings(listingDescriptors, 'random')}
                     </div>
@@ -2174,26 +2260,32 @@ function writeListingPages() {
 }
 
 function writeListingPage(directoryParts, title, items, listingDescriptors) {
-    return OLD_writePage([C.LISTING_DIRECTORY, ...directoryParts], title, fixWS`
-        <body>
-            <div id="header">
-                ${generateHeaderForListings(listingDescriptors, directoryParts)}
-            </div>
-            <div class="columns">
-                <div id="sidebar">
-                    ${generateSidebarForListings(listingDescriptors, directoryParts)}
-                </div>
-                <div id="content">
-                    <h1>${title}</h1>
-                    ${typeof items === 'string' ? items : fixWS`
-                        <ul>
-                            ${items.join('\n')}
-                        </ul>
-                    `}
-                </div>
-            </div>
-        </body>
-    `);
+    return writePage([C.LISTING_DIRECTORY, ...directoryParts], {
+        title,
+
+        main: {
+            content: fixWS`
+                <h1>${title}</h1>
+                ${typeof items === 'string' ? items : fixWS`
+                    <ul>
+                        ${items.join('\n')}
+                    </ul>
+                `}
+            `
+        },
+
+        sidebar: {
+            content: generateSidebarForListings(listingDescriptors, directoryParts)
+        },
+
+        nav: {
+            links: [
+                ['./', 'HSMusic'],
+                [`${C.LISTING_DIRECTORY}/`, 'Listings'],
+                [`${C.LISTING_DIRECTORY}/${directoryParts.join('/')}/`, title]
+            ]
+        }
+    });
 }
 
 function generateHeaderForListings(listingDescriptors, currentDirectoryParts) {

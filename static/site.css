@@ -34,7 +34,7 @@ a:hover {
     text-decoration: underline;
 }
 
-.columns {
+.layout-columns {
     display: flex;
 }
 
@@ -103,16 +103,29 @@ a:hover {
     fill: var(--fg-color);
 }
 
+.content-columns {
+    columns: 2;
+}
+
+.content-columns .column {
+    break-inside: avoid;
+}
+
+.content-columns .column h2 {
+    margin-top: 0;
+    font-size: 1em;
+}
+
 @media (max-width: 780px) {
     #sidebar:not(.no-hide) {
         display: none;
     }
 
-    .columns.vertical-when-thin {
+    .layout-columns.vertical-when-thin {
         flex-direction: column;
     }
 
-    .columns.vertical-when-thin > *:not(:last-child) {
+    .layout-columns.vertical-when-thin > *:not(:last-child) {
         margin-bottom: 10px;
     }
 
@@ -120,6 +133,12 @@ a:hover {
         max-width: unset !important;
         flex-basis: unset !important;
         margin-right: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .content-columns {
+        columns: 1;
     }
 }
 
@@ -131,7 +150,7 @@ a:hover {
 
 #sidebar {
     flex: 1 1 20%;
-    min-width: 200px;
+    min-width: 150px;
     max-width: 250px;
     flex-basis: 250px;
     float: left;
