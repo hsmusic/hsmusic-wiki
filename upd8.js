@@ -460,8 +460,8 @@ async function processAlbumDataFile(file) {
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.date = getBasicField(albumSection, 'Date');
-    album.artDate = getBasicField(albumSection, 'Art Date') || album.date;
-    album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.artDate;
+    album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
+    album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
     album.coverArtists = getContributionField(albumSection, 'Cover Art');
     album.hasTrackArt = (getBasicField(albumSection, 'Has Track Art') !== 'no');
     album.trackCoverArtists = getContributionField(albumSection, 'Track Art');
@@ -510,15 +510,15 @@ async function processAlbumDataFile(file) {
     }
 
     album.date = new Date(album.date);
-    album.artDate = new Date(album.artDate);
+    album.trackArtDate = new Date(album.trackArtDate);
     album.coverArtDate = new Date(album.coverArtDate);
 
-    if (isNaN(Date.parse(album.artDate))) {
-        return {error: `Invalid Art Date field: "${album.date}"`};
+    if (isNaN(Date.parse(album.trackArtDate))) {
+        return {error: `Invalid Track Art Date field: "${album.trackArtDate}"`};
     }
 
     if (isNaN(Date.parse(album.coverArtDate))) {
-        return {error: `Invalid Cover Art Date field: "${album.date}"`};
+        return {error: `Invalid Cover Art Date field: "${album.coverArtDate}"`};
     }
 
     if (!album.directory) {
@@ -555,7 +555,7 @@ async function processAlbumDataFile(file) {
         track.commentary = getCommentaryField(section);
         track.lyrics = getMultilineField(section, 'Lyrics');
         track.originalDate = getBasicField(section, 'Original Date');
-        track.artDate = getBasicField(section, 'Art Date') || track.originalDate || album.artDate;
+        track.coverArtDate = getBasicField(section, 'Cover Art Date') || track.originalDate || album.trackArtDate;
         track.references = getListField(section, 'References') || [];
         track.artists = getContributionField(section, 'Artists') || getContributionField(section, 'Artist');
         track.coverArtists = getContributionField(section, 'Track Art');
@@ -615,7 +615,7 @@ async function processAlbumDataFile(file) {
             track.date = album.date;
         }
 
-        track.artDate = new Date(track.artDate);
+        track.coverArtDate = new Date(track.coverArtDate);
 
         const hasURLs = getBasicField(section, 'Has URLs') !== 'no';
 
@@ -636,30 +636,6 @@ async function processAlbumDataFile(file) {
         } else {
             track.color = album.color;
         }
-
-        /*
-        album.tracks.push({
-            name: trackName,
-            artists: trackArtists,
-            coverArtists: trackCoverArtists,
-            contributors: trackContributors,
-            duration: trackDuration,
-            commentary: trackCommentary,
-            lyrics: trackLyrics,
-            references,
-            date,
-            artDate: artDateValue,
-            directory: trackDirectory,
-            urls: trackURLs,
-            isCanon: album.isCanon,
-            isBeyond: album.isBeyond,
-            isOfficial: album.isOfficial,
-            isFanon: album.isFanon,
-            group,
-            theme: group ? groupTheme : albumTheme,
-            album
-        });
-        */
 
         album.tracks.push(track);
     }
@@ -807,6 +783,7 @@ function getDateString({ date }) {
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
+    date = new Date(date);
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
 }
 
@@ -1438,7 +1415,7 @@ async function writeAlbumPage(album) {
                     ${album.artists && `By ${getArtistString(album.artists, true)}.<br>` || `<!-- (here: Full-album musician credits) -->`}
                     ${album.coverArtists &&  `Cover art by ${getArtistString(album.coverArtists, true)}.<br>` || `<!-- (here: Cover art credits) -->`}
                     Released ${getDateString(album)}.
-                    ${+album.artDate !== +album.date && `<br>Art released ${getDateString({date: album.artDate})}.` || `<!-- (here: Cover art release date) -->`}
+                    ${+album.coverArtDate !== +album.date && `<br>Art released ${getDateString({date: album.coverArtDate})}.` || `<!-- (here: Cover art release date) -->`}
                     <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.</p>
                 </p>
                 ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>` || `<!-- (here: Listen on...) -->`}
@@ -1527,7 +1504,7 @@ async function writeTrackPage(track) {
                     By ${getArtistString(track.artists, true)}.
                     ${track.coverArtists &&  `<br>Cover art by ${getArtistString(track.coverArtists, true)}.` || `<!-- (here: Cover art credits) -->`}
                     ${album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && `<br>Released ${getDateString(track)}.` || `<!-- (here: Track release date) -->`}
-                    ${+track.artDate !== +track.date && `<br>Art released ${getDateString({date: track.artDate})}.` || `<!-- (here: Cover art release date, if it differs) -->`}
+                    ${+track.coverArtDate !== +track.date && `<br>Art released ${getDateString({date: track.coverArtDate})}.` || `<!-- (here: Cover art release date, if it differs) -->`}
                     ${track.duration && `<br>Duration: ${getDurationString(track.duration)}.` || `<!-- (here: Track duration) -->`}
                 </p>
                 ${track.urls.length ? fixWS`
@@ -1689,7 +1666,7 @@ async function writeArtistPage(artistName) {
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
                             </li>
                         `;
-                    }, true, 'artDate')}
+                    }, true, 'coverArtDate')}
                 `}
                 ${flashes.length && fixWS`
                     <h2 id="flashes">Flashes &amp; Games</h2>
@@ -1724,19 +1701,22 @@ async function writeArtistPage(artistName) {
     `);
 }
 
-function albumChunkedList(tracks, getLI, showDate = true, dateProperty = 'date') {
+function albumChunkedList(tracks, getLI, showDate = true, datePropertyOrFn = 'date') {
     const getAlbum = thing => thing.album ? thing.album : thing;
+    const dateFn = (typeof datePropertyOrFn === 'function'
+        ? datePropertyOrFn
+        : track => track[datePropertyOrFn]);
     return fixWS`
         <dl>
-            ${tracks.slice().sort((a, b) => dateProperty ? a[dateProperty] - b[dateProperty] : 0).map((thing, i, sorted) => {
+            ${tracks.slice().sort((a, b) => dateFn(a) - dateFn(b)).map((thing, i, sorted) => {
                 const li = getLI(thing, i);
                 const album = getAlbum(thing);
                 const previous = sorted[i - 1];
-                if (i === 0 || album !== getAlbum(previous) || (showDate && +thing[dateProperty] !== +previous[dateProperty])) {
+                if (i === 0 || album !== getAlbum(previous) || (showDate && +dateFn(thing) !== +dateFn(previous))) {
                     const heading = fixWS`
                         <dt>
                             <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/" style="${getThemeString(getAlbum(thing))}">${getAlbum(thing).name}</a>
-                            ${showDate && `(${getDateString({date: thing[dateProperty]})})`}
+                            ${showDate && `(${getDateString({date: dateFn(thing)})})`}
                         </dt>
                         <dd><ul>
                     `;
@@ -1995,7 +1975,10 @@ function writeListingPages() {
             .map(name => ({name, things: C.getThingsArtistContributedTo(name, {albumData, allTracks, flashData})}))
             .map(({ name, things }) => ({name, things: things.filter(thing => !thing.album || thing.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)}))
             .filter(({ things }) => things.length)
-            .map(({ name, things }) => ({name, date: C.sortByDate(things).reverse()[0].date}))
+            .map(({ name, things }) => ({name, date: new Date(things.reduce((date, thing) => Math.max(date,
+                (thing.coverArtists?.some(({ who }) => who === name)
+                    ? thing.coverArtDate
+                    : thing.date)), 0))}))
             .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
         )
             .reverse()
