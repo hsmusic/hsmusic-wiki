@@ -72,6 +72,7 @@ const C = {
     TRACK_DIRECTORY: 'track',
     ARTIST_DIRECTORY: 'artist',
     ARTIST_AVATAR_DIRECTORY: 'artist-avatar',
+    TAG_DIRECTORY: 'tag',
     LISTING_DIRECTORY: 'list',
     ABOUT_DIRECTORY: 'about',
     FEEDBACK_DIRECTORY: 'feedback',
@@ -94,7 +95,7 @@ const C = {
 
     // Same details as the sortByDate, 8ut for covers~
     sortByArtDate: data => {
-        return data.sort((a, b) => (a.artDate || a.date) - (b.artDate || b.date));
+        return data.sort((a, b) => (a.coverArtDate || a.date) - (b.coverArtDate || b.date));
     },
 
     // This gets all the track o8jects defined in every al8um, and sorts them 8y

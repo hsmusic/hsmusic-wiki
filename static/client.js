@@ -38,19 +38,19 @@ function getFlash(el) {
 }
 
 function openAlbum(album) {
-    location.href = rebase(`${C.ALBUM_DIRECTORY}/${album.directory}/index.html`);
+    return rebase(`${C.ALBUM_DIRECTORY}/${album.directory}/`);
 }
 
 function openTrack(track) {
-    location.href = rebase(`${C.TRACK_DIRECTORY}/${track.directory}/index.html`);
+    return rebase(`${C.TRACK_DIRECTORY}/${track.directory}/`);
 }
 
 function openArtist(artist) {
-    location.href = rebase(`${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/index.html`);
+    return rebase(`${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/`);
 }
 
 function openFlash(flash) {
-    location.href = rebase(`${C.FLASH_DIRECTORY}/${flash.directory}/index.html`);
+    return rebase(`${C.FLASH_DIRECTORY}/${flash.directory}/`);
 }
 
 /* i implemented these functions but we dont actually use them anywhere lol
@@ -80,20 +80,20 @@ function openNextTrack() {
     const { list, index } = getTrackListAndIndex();
     if (!list) return;
     if (index === list.length) return;
-    openTrack(list[index + 1]);
+    return openTrack(list[index + 1]);
 }
 
 function openPreviousTrack() {
     const { list, index } = getTrackListAndIndex();
     if (!list) return;
     if (index === 0) return;
-    openTrack(list[index - 1]);
+    return openTrack(list[index - 1]);
 }
 
 function openRandomTrack() {
     const { list } = getTrackListAndIndex();
     if (!list) return;
-    openTrack(pick(list));
+    return openTrack(pick(list));
 }
 
 function getFlashListAndIndex() {
@@ -107,31 +107,30 @@ function getFlashListAndIndex() {
 function openNextFlash() {
     const { list, index } = getFlashListAndIndex();
     if (index === list.length) return;
-    openFlash(list[index + 1]);
+    return openFlash(list[index + 1]);
 }
 
 function openPreviousFlash() {
     const { list, index } = getFlashListAndIndex();
     if (index === 0) return;
-    openFlash(list[index - 1]);
+    return openFlash(list[index - 1]);
 }
 
 for (const a of document.body.querySelectorAll('[data-random]')) {
     a.addEventListener('click', evt => {
-        try {
-            switch (a.dataset.random) {
-                case 'album': return openAlbum(pick(albumData));
-                case 'album-in-fandom': return openAlbum(pick(fandomAlbumData));
-                case 'album-in-official': openAlbum(pick(officialAlbumData));
-                case 'track': return openTrack(pick(allTracks));
-                case 'track-in-album': return openTrack(pick(getAlbum(a).tracks));
-                case 'track-in-fandom': return openTrack(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
-                case 'track-in-official': return openTrack(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
-                case 'artist': return openArtist(pick(artistNames));
-                case 'artist-more-than-one-contrib': return openArtist(pick(artistNames.filter(name => C.getArtistNumContributions(name, {albumData, allTracks, flashData}) > 1)));
-            }
-        } finally {
-            evt.preventDefault();
+        setTimeout(() => {
+            a.href = rebase(C.JS_DISABLED_DIRECTORY);
+        });
+        switch (a.dataset.random) {
+            case 'album': return a.href = openAlbum(pick(albumData));
+            case 'album-in-fandom': return a.href = openAlbum(pick(fandomAlbumData));
+            case 'album-in-official': return a.href = openAlbum(pick(officialAlbumData));
+            case 'track': return a.href = openTrack(pick(allTracks));
+            case 'track-in-album': return a.href = openTrack(pick(getAlbum(a).tracks));
+            case 'track-in-fandom': return a.href = openTrack(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
+            case 'track-in-official': return a.href = openTrack(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
+            case 'artist': return a.href = openArtist(pick(artistNames));
+            case 'artist-more-than-one-contrib': return a.href = openArtist(pick(artistNames.filter(name => C.getArtistNumContributions(name, {albumData, allTracks, flashData}) > 1)));
         }
     });
 }
@@ -164,3 +163,13 @@ document.addEventListener('keypress', event => {
         }
     }
 });
+
+for (const reveal of document.querySelectorAll('.reveal')) {
+    reveal.addEventListener('click', event => {
+        if (!reveal.classList.contains('revealed')) {
+            reveal.classList.add('revealed');
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    });
+}

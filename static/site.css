@@ -170,6 +170,7 @@ a:hover {
 #content {
     padding: 20px;
     flex-grow: 1;
+    flex-shrink: 3;
 }
 
 #sidebar > h1,
@@ -267,22 +268,25 @@ a:hover {
     font-weight: normal;
 }
 
-#cover-art {
+#cover-art-container {
     float: right;
     width: 40%;
     max-width: 400px;
     margin: 0 0 10px 10px;
-    background-color: #181818;
+    font-size: 0.8em;
 }
 
 #cover-art img {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: cover;
 }
 
-img {
+#cover-art-container p {
+    margin-top: 5px;
+}
+
+.image-container {
     border: 2px solid var(--fg-color);
     box-sizing: border-box;
     position: relative;
@@ -291,7 +295,18 @@ img {
     background-color: var(--dim-color);
     color: white;
     display: inline-block;
-    object-fit: contain;
+    width: 100%;
+    height: 100%;
+}
+
+.image-inner-area {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+img {
+    object-fit: cover;
     /* these unfortunately dont take effect while loading, so...
     text-align: center;
     line-height: 2em;
@@ -314,6 +329,8 @@ a.box:focus:not(:focus-visible) {
 
 a.box img {
     display: block;
+    width: 100%;
+    height: auto;
 }
 
 h1 {
@@ -348,6 +365,13 @@ h1 {
 .grid-item img {
     width: 100%;
     height: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+.grid-item span {
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .grid-item:hover {
@@ -358,12 +382,12 @@ h1 {
     text-decoration: underline;
 }
 
-.grid-item span:first-of-type {
+.grid-item > span:first-of-type {
     margin-top: 0.45em;
     display: block;
 }
 
-.grid-item:hover span:first-of-type {
+.grid-item:hover > span:first-of-type {
     text-decoration: underline;
 }
 
@@ -423,6 +447,38 @@ h1 {
     padding-right: 100%;
 }
 
+.reveal {
+    position: relative;
+}
+
+.reveal img {
+    filter: blur(20px);
+    opacity: 0.4;
+}
+
+.reveal-text {
+    color: white;
+    position: absolute;
+    top: 15px;
+    left: 10px;
+    right: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.reveal-interaction {
+    opacity: 0.8;
+}
+
+.reveal.revealed img {
+    filter: none;
+    opacity: 1;
+}
+
+.reveal.revealed .reveal-text {
+    display: none;
+}
+
 #content.top-index h1,
 #content.flash-index h1 {
     text-align: center;
@@ -480,6 +536,7 @@ p code {
 
 blockquote {
     max-width: 600px;
+    margin-right: 0;
 }
 
 .long-content {
