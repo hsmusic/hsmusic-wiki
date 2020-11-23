@@ -449,6 +449,8 @@ h1 {
 
 .reveal {
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .reveal img {

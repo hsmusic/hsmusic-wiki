@@ -1866,7 +1866,10 @@ async function writeFlashPage(flash) {
         main: {
             content: fixWS`
                 <h1>${flash.name}</h1>
-                <a id="cover-art" href="${getFlashCover(flash)}"><img src="${getFlashCover(flash)}" alt="cover art"></a>
+                ${generateCoverLink({
+                    src: getFlashCover(flash),
+                    alt: 'cover art'
+                })}
                 <p>Released ${getDateString(flash)}.</p>
                 ${(flash.page || flash.urls.length) && `<p>Play on ${joinNoOxford(
                     [
