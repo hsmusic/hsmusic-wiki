@@ -110,6 +110,8 @@ const SITE_SHORT_TITLE = 'HSMusic';
 const SITE_VERSION = 'autumnal polish haul';
 const SITE_RELEASE = '10 October 2020';
 
+const SITE_DONATE_LINK = 'https://liberapay.com/nebula';
+
 function readDataFile(file) {
     // fight me bro
     return fs.readFileSync(path.join(C.DATA_DIRECTORY, file)).toString().trim();
@@ -659,12 +661,13 @@ async function processArtistDataFile(file) {
         const name = getBasicField(section, 'Artist');
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
         const alias = getBasicField(section, 'Alias');
+        const note = getMultilineField(section, 'Note');
 
         if (!name) {
             return {error: 'Expected "Artist" (name) field!'};
         }
 
-        return {name, urls, alias};
+        return {name, urls, alias, note};
     });
 }
 
@@ -684,7 +687,8 @@ async function processFlashDataFile(file) {
         if (getBasicField(section, 'ACT')) {
             act = getBasicField(section, 'ACT');
             color = getBasicField(section, 'FG');
-            return {act8r8k: true, act, color};
+            const anchor = getBasicField(section, 'Anchor');
+            return {act8r8k: true, act, color, anchor};
         }
 
         const name = getBasicField(section, 'Flash');
@@ -1238,8 +1242,8 @@ function writeMiscellaneousPages() {
                 content: fixWS`
                     <h1>Get involved!</h1>
                     <ul>
-                        <li><a href="${C.FEEDBACK_DIRECTORY}/">Request features or send feedback!</a></li>
-                        <li><a href="donate/">Donate????</a></li>
+                        <li><a href="${C.FEEDBACK_DIRECTORY}/">Send feedback</a></li>
+                        ${SITE_DONATE_LINK && `<li><a href="${SITE_DONATE_LINK}">Donate</a></li>`}
                     </ul>
                     <hr>
                     <h1>News</h1>
@@ -1319,11 +1323,23 @@ function writeMiscellaneousPages() {
                         <p>Also check out:</p>
                         <ul>
                             <li>Bambosh's <a href="https://www.youtube.com/watch?v=AEIOQN3YmNc">[S]Homestuck - All flashes</a>: an excellently polished compilation of all Flash animations in Homestuck.</li>
+                            <li>Bambosh's <a href="https://bambosh.github.io/unofficial-homestuck-collection/">Unofficial Homestuck Collection</a>: an even more refined compilation of <i>everything</i> Homestuck, with a music database based on this wiki very neatly integrated.</li>
                             <li>bgreco.net's <a href="https://www.bgreco.net/hsflash.html">Homestuck HQ Audio Flashes</a>: an index of all HS Flash animations with Bandcamp-quality audio built in. (Also the source for many thumbnails below!)</li>
+                        </ul>
+                        <p class="quick-links">Jump to:</p>
+                        <ul class="quick-links">
+                            ${[
+                                ['a1', 'Side 1 (Acts 1-5)', '#4ac925'],
+                                ['a6a1', 'Side 2 (Acts 6-7)', '#1076a2'],
+                                ['friendsim', 'Hiveswap Friendsim', '#d3ff8f'],
+                                ['pesterquest', 'Pesterquest', '#71daff']
+                            ].map(([ anchor, label, color ]) => fixWS`
+                                <li><a href="#${anchor}" style="${getThemeString({color})}">${label}</a></li>
+                            `).join('\n')}
                         </ul>
                     </div>
                     ${flashData.filter(flash => flash.act8r8k).map((act, i) => fixWS`
-                        <h2 style="${getThemeString(act)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act.act))}/">${act.act}</a></h2>
+                        <h2 id="${act.anchor}" style="${getThemeString(act)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act.act))}/">${act.act}</a></h2>
                         <div class="grid-listing">
                             ${getFlashGridHTML({
                                 entries: (flashData
@@ -1335,6 +1351,13 @@ function writeMiscellaneousPages() {
                     `).join('\n')}
                 `
             },
+
+            /*
+            sidebar: {
+                content: generateSidebarForFlashes(null)
+            },
+            */
+
             nav: {simple: true}
         }),
 
@@ -1657,7 +1680,8 @@ function getTracksByArtist(artistName) {
 
 async function writeArtistPage(artistName) {
     const {
-        urls = []
+        urls = [],
+        note = ''
     } = artistData.find(({ name }) => name === artistName) || {};
 
     const tracks = getTracksByArtist(artistName);
@@ -1697,6 +1721,11 @@ async function writeArtistPage(artistName) {
                     <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg" alt="Artist avatar"></a>
                 `}
                 <h1>${artistName}</h1>
+                ${note && fixWS`
+                    <p>Note:</p>
+                    <blockquote>${note}</blockquote>
+                    <hr>
+                `}
                 ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
                 <p>Jump to: ${[
                     [
@@ -1840,14 +1869,6 @@ async function writeFlashPages() {
 
 async function writeFlashPage(flash) {
     const kebab = getFlashDirectory(flash);
-    const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'));
-    const postCanon = flashData.findIndex(f => f.act.includes('Post Canon'));
-    const outsideCanon = postCanon + flashData.slice(postCanon).findIndex(f => !f.act.includes('Post Canon'));
-    const side = (
-        (flashData.indexOf(flash) < act6) ? 1 :
-        (flashData.indexOf(flash) <= outsideCanon) ? 2 :
-        0
-    );
 
     const flashes = flashData.filter(flash => !flash.act8r8k);
     const index = flashes.indexOf(flash);
@@ -1923,37 +1944,7 @@ async function writeFlashPage(flash) {
             `
         },
         sidebar: {
-            content: fixWS`
-                <h1><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></h1>
-                <dl>
-                    ${flashData.filter(f => f.act8r8k).filter(({ act }) =>
-                        act.startsWith('Act 1') ||
-                        act.startsWith('Act 6 Act 1') ||
-                        act.startsWith('Hiveswap') ||
-                        (
-                            flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
-                            flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
-                            true
-                        )
-                    ).flatMap(({ act, color }) => [
-                        act.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
-                        || act.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
-                        || act.startsWith('Hiveswap') && `<dt ${classes('side', side === 0 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
-                        (
-                            flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
-                            flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
-                            true
-                        ) && `<dt ${classes(act === flash.act && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/" style="${getThemeString({color})}">${act}</a></dt>`,
-                        act === flash.act && fixWS`
-                            <dd><ul>
-                                ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
-                                    <li ${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/" style="${getThemeString(f)}">${f.name}</a></li>
-                                `).join('\n')}
-                            </ul></dd>
-                        `
-                    ]).filter(Boolean).join('\n')}
-                </dl>
-            `
+            content: generateSidebarForFlashes(flash)
         },
         nav: {
             links: [
@@ -1978,6 +1969,52 @@ async function writeFlashPage(flash) {
             `
         }
     });
+}
+
+function generateSidebarForFlashes(flash) {
+    const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'));
+    const postCanon = flashData.findIndex(f => f.act.includes('Post Canon'));
+    const outsideCanon = postCanon + flashData.slice(postCanon).findIndex(f => !f.act.includes('Post Canon'));
+    const index = flashData.indexOf(flash);
+    const side = (
+        (index < 0) ? 0 :
+        (index < act6) ? 1 :
+        (index <= outsideCanon) ? 2 :
+        3
+    );
+    const currentAct = flash && flash.act;
+
+    return fixWS`
+        <h1><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></h1>
+        <dl>
+            ${flashData.filter(f => f.act8r8k).filter(({ act }) =>
+                act.startsWith('Act 1') ||
+                act.startsWith('Act 6 Act 1') ||
+                act.startsWith('Hiveswap') ||
+                (
+                    flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
+                    flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
+                    true
+                )
+            ).flatMap(({ act, color }) => [
+                act.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
+                || act.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
+                || act.startsWith('Hiveswap') && `<dt ${classes('side', side === 3 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
+                (
+                    flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
+                    flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
+                    true
+                ) && `<dt ${classes(act === currentAct && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/" style="${getThemeString({color})}">${act}</a></dt>`,
+                act === currentAct && fixWS`
+                    <dd><ul>
+                        ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
+                            <li ${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/" style="${getThemeString(f)}">${f.name}</a></li>
+                        `).join('\n')}
+                    </ul></dd>
+                `
+            ]).filter(Boolean).join('\n')}
+        </dl>
+    `;
 }
 
 function writeListingPages() {

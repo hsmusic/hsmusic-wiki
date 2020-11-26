@@ -504,8 +504,13 @@ h1 {
     margin-bottom: 0;
 }
 
-#content.top-index p.quick-links {
+.quick-links {
     text-align: center;
+}
+
+ul.quick-links {
+    list-style: none;
+    padding-left: 0;
 }
 
 #intro-menu {
