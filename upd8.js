@@ -1669,7 +1669,7 @@ async function writeTrackPage(track) {
 }
 
 async function writeArtistPages() {
-    await progressPromiseAll('Writing artist pages.', queue(artistNames.map(artistName => () => writeArtistPage(artistName))));
+    await progressPromiseAll('Writing artist pages.', queue(artistData.map(artist => () => writeArtistPage(artist))));
 }
 
 function getTracksByArtist(artistName) {
@@ -1678,31 +1678,36 @@ function getTracksByArtist(artistName) {
     ));
 }
 
-async function writeArtistPage(artistName) {
+async function writeArtistPage(artist) {
+    if (artist.alias) {
+        return writeArtistAliasPage(artist);
+    }
+
     const {
+        name,
         urls = [],
         note = ''
-    } = artistData.find(({ name }) => name === artistName) || {};
+    } = artist;
 
-    const tracks = getTracksByArtist(artistName);
-    const artThings = justEverythingMan.filter(thing => (thing.coverArtists || []).some(({ who }) => who === artistName));
-    const flashes = flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artistName));
-    const commentaryThings = justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'));
+    const tracks = getTracksByArtist(name);
+    const artThings = justEverythingMan.filter(thing => (thing.coverArtists || []).some(({ who }) => who === name));
+    const flashes = flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === name));
+    const commentaryThings = justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + name + ':</i>'));
 
     const unreleasedTracks = tracks.filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = tracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
 
     const generateTrackList = tracks => albumChunkedList(tracks, (track, i) => {
         const contrib = {
-            who: artistName,
-            what: track.contributors.filter(({ who }) => who === artistName).map(({ what }) => what).join(', ')
+            who: name,
+            what: track.contributors.filter(({ who }) => who === name).map(({ what }) => what).join(', ')
         };
         const flashes = getFlashesThatFeature(track);
         return fixWS`
-            <li title="${th(i + 1)} track by ${artistName}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
+            <li title="${th(i + 1)} track by ${name}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                 ${track.duration && `(${getDurationString(track.duration)})` || `<!-- (here: Duration) -->`}
                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
-                ${track.artists.includes(artistName) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== artistName))})</span>` || `<!-- (here: Co-artist credits) -->`}
+                ${track.artists.includes(name) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(a => a !== name))})</span>` || `<!-- (here: Co-artist credits) -->`}
                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>` || `<!-- (here: Contribution details) -->`}
                 ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
             </li>
@@ -1710,17 +1715,17 @@ async function writeArtistPage(artistName) {
     });
 
     // Shish!
-    const kebab = C.getArtistDirectory(artistName);
+    const kebab = C.getArtistDirectory(name);
     const index = `${C.ARTIST_DIRECTORY}/${kebab}/`;
     await writePage([C.ARTIST_DIRECTORY, kebab], {
-        title: artistName,
+        title: name,
 
         main: {
             content: fixWS`
                 ${ENABLE_ARTIST_AVATARS && await access(path.join(C.ARTIST_AVATAR_DIRECTORY, kebab + '.jpg')).then(() => true, () => false) && fixWS`
-                    <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(artistName)}.jpg" alt="Artist avatar"></a>
+                    <a id="cover-art" href="${C.ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(name)}.jpg"><img src="${ARTIST_AVATAR_DIRECTORY}/${C.getArtistDirectory(name)}.jpg" alt="Artist avatar"></a>
                 `}
-                <h1>${artistName}</h1>
+                <h1>${name}</h1>
                 ${note && fixWS`
                     <p>Note:</p>
                     <blockquote>${note}</blockquote>
@@ -1740,7 +1745,7 @@ async function writeArtistPage(artistName) {
                     <h2 id="tracks">Tracks</h2>
                 `}
                 ${releasedTracks.length && fixWS`
-                    <p>${artistName} has contributed ~${getDurationString(getTotalDuration(releasedTracks))} ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'} of music collected on this wiki.</p>
+                    <p>${name} has contributed ~${getDurationString(getTotalDuration(releasedTracks))} ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'} of music collected on this wiki.</p>
                     ${generateTrackList(releasedTracks)}
                 `}
                 ${unreleasedTracks.length && fixWS`
@@ -1750,13 +1755,13 @@ async function writeArtistPage(artistName) {
                 ${artThings.length && fixWS`
                     <h2 id="art">Art</h2>
                     ${albumChunkedList(artThings, (thing, i) => {
-                        const contrib = thing.coverArtists.find(({ who }) => who === artistName);
+                        const contrib = thing.coverArtists.find(({ who }) => who === name);
                         return fixWS`
-                            <li title="${th(i + 1)} art by ${artistName}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
+                            <li title="${th(i + 1)} art by ${name}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
                                     <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '<i>(cover art)</i>'}
-                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== artistName))})</span>`}
+                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== name))})</span>`}
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
                             </li>
                         `;
@@ -1765,7 +1770,7 @@ async function writeArtistPage(artistName) {
                 ${flashes.length && fixWS`
                     <h2 id="flashes">Flashes &amp; Games</h2>
                     ${actChunkedList(flashes, flash => {
-                        const contributionString = flash.contributors.filter(({ who }) => who === artistName).map(getContributionString).join(' ');
+                        const contributionString = flash.contributors.filter(({ who }) => who === name).map(getContributionString).join(' ');
                         return fixWS`
                             <li>
                                 <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getThemeString(flash)}">${flash.name}</a>
@@ -1798,10 +1803,40 @@ async function writeArtistPage(artistName) {
                 ['./', SITE_SHORT_TITLE],
                 [`${C.LISTING_DIRECTORY}/`, 'Listings'],
                 [null, 'Artist:'],
-                [`${C.ARTIST_DIRECTORY}/${kebab}/`, artistName]
+                [`${C.ARTIST_DIRECTORY}/${kebab}/`, name]
             ]
         }
     });
+}
+
+async function writeArtistAliasPage(artist) {
+    const { name, alias } = artist;
+    const kebab1 = C.getArtistDirectory(name);
+    const kebab2 = C.getArtistDirectory(alias);
+
+    const directory = path.join(C.SITE_DIRECTORY, C.ARTIST_DIRECTORY, kebab1);
+    const file = path.join(directory, 'index.html');
+    const target = `/${C.ARTIST_DIRECTORY}/${kebab2}/`;
+
+    await mkdirp(directory);
+    await writeFile(file, fixWS`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Moved to ${alias}</title>
+                <meta charset="utf-8">
+                <meta http-equiv="refresh" content="0;url=${target}">
+                <link rel="canonical" href="${target}">
+                <link rel="stylesheet" href="static/site-basic.css">
+            </head>
+            <body>
+                <main>
+                    <h1>Moved to ${alias}</h1>
+                    <p>This page has been moved to <a href="${target}">${target}</a>.</p>
+                </main>
+            </body>
+        </html>
+    `);
 }
 
 function albumChunkedList(tracks, getLI, showDate = true, datePropertyOrFn = 'date') {
