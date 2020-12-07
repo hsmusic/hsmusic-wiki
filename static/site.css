@@ -103,6 +103,11 @@ a:hover {
     fill: var(--fg-color);
 }
 
+.rerelease {
+    opacity: 0.7;
+    font-style: oblique;
+}
+
 .content-columns {
     columns: 2;
 }
@@ -489,7 +494,7 @@ h1 {
 
 #content.flash-index h2 {
     text-align: center;
-    font-size: 3em;
+    font-size: 2.5em;
     font-variant: small-caps;
     font-style: oblique;
     margin-bottom: 0;
@@ -501,7 +506,7 @@ h1 {
     text-align: center;
     font-size: 2em;
     font-weight: normal;
-    margin-bottom: 0;
+    margin-bottom: 0.25em;
 }
 
 .quick-links {
@@ -511,6 +516,15 @@ h1 {
 ul.quick-links {
     list-style: none;
     padding-left: 0;
+}
+
+ul.quick-links li {
+    display: inline-block;
+}
+
+ul.quick-links li:not(:last-child)::after {
+    content: " \00b7 ";
+    font-weight: 800;
 }
 
 #intro-menu {
@@ -580,6 +594,32 @@ dl ul, dl ol {
 
 .album-group-list dd {
     margin-left: 0;
+}
+
+hr.split::before {
+    content: "(split)";
+    color: #808080;
+}
+
+hr.split {
+    position: relative;
+    overflow: hidden;
+    border: none;
+}
+
+hr.split::after {
+    display: inline-block;
+    content: "";
+    border: 1px inset #808080;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    margin-top: -2px;
+    margin-left: 10px;
+}
+
+li > ul {
+    margin-top: 5px;
 }
 
 .new {
