@@ -509,20 +509,20 @@ h1 {
     margin-bottom: 0.25em;
 }
 
-.quick-links {
+.quick-info {
     text-align: center;
 }
 
-ul.quick-links {
+ul.quick-info {
     list-style: none;
     padding-left: 0;
 }
 
-ul.quick-links li {
+ul.quick-info li {
     display: inline-block;
 }
 
-ul.quick-links li:not(:last-child)::after {
+ul.quick-info li:not(:last-child)::after {
     content: " \00b7 ";
     font-weight: 800;
 }

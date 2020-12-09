@@ -262,7 +262,7 @@ function getMultilineField(lines, name) {
 };
 
 function transformInline(text) {
-    return text.replace(/\[\[(album:|artist:|flash:|track:)?(.+?)\]\]/g, (match, category, ref, offset) => {
+    return text.replace(/\[\[(album:|artist:|flash:|track:|tag:)?(.+?)\]\]/g, (match, category, ref, offset) => {
         if (category === 'album:') {
             const album = getLinkedAlbum(ref);
             if (album) {
@@ -306,6 +306,16 @@ function transformInline(text) {
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
+                return ref;
+            }
+        } else if (category === 'tag:') {
+            const tag = tagData.find(tag => tag.directory === ref);
+            if (tag) {
+                return fixWS`
+                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a>
+                `;
+            } else {
+                console.warn(`\x1b[33mThe linked tag ${match} does not exist!\x1b[0m`);
                 return ref;
             }
         } else {
@@ -1277,7 +1287,7 @@ function writeMiscellaneousPages() {
                 classes: ['top-index'],
                 content: fixWS`
                     <h1>Albums - Fandom</h1>
-                    <p class="quick-links"><a href="list/">More listings!</a></p>
+                    <p class="quick-info"><a href="list/">More listings!</a></p>
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
                             details: true,
@@ -1299,7 +1309,7 @@ function writeMiscellaneousPages() {
                 classes: ['top-index'],
                 content: fixWS`
                     <h1>Albums - Official</h1>
-                    <p class="quick-links"><a href="list/">More listings!</a></p>
+                    <p class="quick-info"><a href="list/">More listings!</a></p>
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
                             details: true,
@@ -1322,8 +1332,8 @@ function writeMiscellaneousPages() {
                 content: fixWS`
                     <h1>Flashes &amp; Games</h1>
                     <div class="long-content">
-                        <p class="quick-links">Jump to:</p>
-                        <ul class="quick-links">
+                        <p class="quick-info">Jump to:</p>
+                        <ul class="quick-info">
                             ${[
                                 ['a1', 'Side 1 (Acts 1-5)', '#4ac925'],
                                 ['a6a1', 'Side 2 (Acts 6-7)', '#1076a2'],
@@ -2008,7 +2018,7 @@ async function writeFlashPage(flash) {
                 ['./', SITE_SHORT_TITLE],
                 [`${C.FLASH_DIRECTORY}/`, `Flashes &amp; Games`],
                 [`${C.FLASH_DIRECTORY}/${kebab}/`, flash.name],
-                parts.length && [null, parts.join(', ')]
+                parts.length && [null, `(${parts.join(', ')})`]
             ].filter(Boolean),
             content: fixWS`
                 <div>
@@ -2532,6 +2542,7 @@ function writeTagPage(tag) {
             classes: ['top-index'],
             content: fixWS`
                 <h1>${tag.name}</h1>
+                <p class="quick-info">(Appears in ${s(things.length, 'cover art')})</p>
                 <div class="grid-listing">
                     ${getGridHTML({
                         entries: things.map(item => ({item})),
@@ -2779,9 +2790,11 @@ function chronologyLinks(currentTrack, {
     headingWord,
     sourceData = justEverythingMan
 }) {
-    return (
-        Array.from(new Set(filters.flatMap(({ mapProperty, toArtist }) => currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist))))
-    ).map(artist => {
+    const artists = Array.from(new Set(filters.flatMap(({ mapProperty, toArtist }) => currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist))));
+    if (artists.length > 8) {
+        return `<div class="chronology">(See artist pages for chronology info!)</div>`;
+    }
+    return artists.map(artist => {
         if (!artistNames.includes(artist)) return '';
 
         const releasedThings = sourceData.filter(thing => {
@@ -3059,19 +3072,6 @@ async function main() {
             ])
         ].map(contribution => contribution.who)
     ]));
-    newsData = await processNewsDataFile(path.join(C.DATA_DIRECTORY, NEWS_DATA_FILE));
-    if (newsData.error) {
-        console.log(`\x1b[31;1m${newsData.error}\x1b[0m`);
-        return;
-    }
-
-    const newsErrors = newsData.filter(obj => obj.error);
-    if (newsErrors.length) {
-        for (const error of newsErrors) {
-            console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-        }
-        return;
-    }
 
     tagData = await processTagDataFile(path.join(C.DATA_DIRECTORY, TAG_DATA_FILE));
     if (tagData.error) {
@@ -3087,6 +3087,20 @@ async function main() {
             }
             return;
         }
+    }
+
+    newsData = await processNewsDataFile(path.join(C.DATA_DIRECTORY, NEWS_DATA_FILE));
+    if (newsData.error) {
+        console.log(`\x1b[31;1m${newsData.error}\x1b[0m`);
+        return;
+    }
+
+    const newsErrors = newsData.filter(obj => obj.error);
+    if (newsErrors.length) {
+        for (const error of newsErrors) {
+            console.log(`\x1b[31;1m${error.error}\x1b[0m`);
+        }
+        return;
     }
 
     {
@@ -3268,7 +3282,7 @@ async function main() {
     await writeMiscellaneousPages();
     await writeListingPages();
     await writeTagPages();
-    await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
+    // await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
     await writeArtistPages();
     await writeFlashPages();
 

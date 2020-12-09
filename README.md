@@ -1,6 +1,6 @@
 # HSMusic
 
-HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagining of [earlier][fandom] [projects][nsnd] archiving and celebrating the expansive history of Homestuck official and fan music. Roughly periodic releases of the website are released at [hsmusic.wiki][hsmusic]; all development occurs in this public Git repository, which can be accessed at [notabug.org][notabug] and [ed1.club][ed1club].
+HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagining of [earlier][fandom] [projects][nsnd] archiving and celebrating the expansive history of Homestuck official and fan music. Roughly periodic releases of the website are released at [hsmusic.wiki][hsmusic]; all development occurs in this public Git repository, which can be accessed at [notabug.org][notabug].
 
 ## Project Structure
 
@@ -24,9 +24,23 @@ The majority of the code volume is generated HTML content and supporting utility
 
 In the past, data, HTML, and media files were all interspersed with each other. Yea, even the generated HTML files were included as part of the repository; their diffs, part of every commit. Those were dark times indeed.
 
+## Forking
+
+hsmusic is a relatively generic music wiki software, so you're more than encouraged to create a fork for your own archival or cataloguing purposes! You're encouraged to [drop us a link][feedback] if you do - we'd love to hear from you.
+
+Still, at present moment, a fair bit of the wiki design is baked into the update code itself - any configuration (such as getting rid of the "flashes & games") section will have you digging into the code yourself. In the future, we'd love to make the wiki software more customizable from a forking perspective, but we haven't gotten to it yet. Let us know if this is something you're interested in - we'd love to chat about what additions or changes would be useful in making a more versatile generic music wiki software!
+
+## Pull Requests
+
+As mentioned, part of the focus of the hsmusic.wiki release was to create a more modular and develop-able repository. So, on the curious chance anyone would like to contribute code to the repo, such is certainly capable now!
+
+Still, for larger additions, I'd encourage you to throw an email or contact ([links here][feedback]) before writing all the implementation code: besides code tips which might make your life a bit easier (questions are welcome), I'd also love to discuss feature designs and values while they're still being brainstormed! That way, I don't need to tell you there are fundamental ideas or code details I'd want rebuilt - the last thing I want is anyone putting hours into code which could have been avoided being poured down the drain!
+
+As ever, feedback is always welcome, and may be shared via the usual links. Thank you for checking the repository out!
+
   [fandom]: https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki
   [nsnd]: https://homestuck.net/music/references.html
   [hsmusic]: https://hsmusic.wiki
   [notabug]: https://notabug.org/hsmusic/hsmusic
-  [ed1club]: https://git.ed1.club/florrie/hsmusic
   [fixws]: https://www.npmjs.com/package/fix-whitespace
+  [feedback]: https://hsmusic.wiki/feedback/
