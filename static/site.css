@@ -335,7 +335,7 @@ a.box:focus:not(:focus-visible) {
 a.box img {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
 }
 
 h1 {

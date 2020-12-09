@@ -1112,7 +1112,7 @@ function getGridHTML({
     entries,
     srcFn,
     hrefFn,
-    altFn,
+    altFn = () => '',
     details = false,
     lazy = true
 }) {
@@ -1137,7 +1137,6 @@ function getAlbumGridHTML(props) {
     return getGridHTML({
         srcFn: getAlbumCover,
         hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
-        altFn: () => 'album cover',
         ...props
     });
 }
@@ -1146,7 +1145,6 @@ function getAlbumGridHTML(props) {
     return getGridHTML({
         srcFn: getAlbumCover,
         hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
-        altFn: () => 'album cover',
         ...props
     });
 }
@@ -2551,10 +2549,7 @@ function writeTagPage(tag) {
                             : getAlbumCover(thing)),
                         hrefFn: thing => (thing.album
                             ? `${C.TRACK_DIRECTORY}/${thing.directory}/`
-                            : `${C.ALBUM_DIRECTORY}/${thing.directory}`),
-                        altFn: thing => (thing.album
-                            ? 'track cover'
-                            : 'album cover')
+                            : `${C.ALBUM_DIRECTORY}/${thing.directory}`)
                     })}
                 </div>
             `
