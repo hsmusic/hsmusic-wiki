@@ -1094,12 +1094,10 @@ async function writePage(directoryParts, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css">
+                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
                 ${layoutHTML}
-                <script src="${C.STATIC_DIRECTORY}/lazy-show.js"></script>
-                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
-                <script src="${C.STATIC_DIRECTORY}/lazy-fallback.js"></script>
                 <script src="${C.COMMON_DIRECTORY}/common.js"></script>
                 <script src="data.js"></script>
                 <script src="${C.STATIC_DIRECTORY}/client.js"></script>
