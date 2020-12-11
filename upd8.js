@@ -105,10 +105,11 @@ const {
 
 const C = require('./common/common');
 
+const SITE_CANONICAL_BASE = 'https://hsmusic.wiki/';
 const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_SHORT_TITLE = 'HSMusic';
-const SITE_VERSION = 'autumnal polish haul';
-const SITE_RELEASE = '10 October 2020';
+const SITE_VERSION = 'launch of hsmusic.wiki';
+const SITE_RELEASE = '12 December 2020';
 
 const SITE_DONATE_LINK = 'https://liberapay.com/nebula';
 
@@ -1010,6 +1011,12 @@ async function writePage(directoryParts, {
     const file = path.join(directory, 'index.html');
     const href = path.join(...directoryParts, 'index.html');
 
+    let targetPath = directoryParts.join('/');
+    if (directoryParts.length) {
+        targetPath += '/';
+    }
+    const canonical = SITE_CANONICAL_BASE + targetPath;
+
     const mainHTML = main.content && fixWS`
         <main id="content" ${classes(...main.classes || [])}>
             ${main.content}
@@ -1093,6 +1100,7 @@ async function writePage(directoryParts, {
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
+                <link rel="canonical" href="${canonical}">
                 <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css">
                 <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
             </head>
