@@ -1761,7 +1761,9 @@ async function writeArtistPage(artist) {
                 <h1>${name}</h1>
                 ${note && fixWS`
                     <p>Note:</p>
-                    <blockquote>${note}</blockquote>
+                    <blockquote>
+                        ${transformMultiline(note)}
+                    </blockquote>
                     <hr>
                 `}
                 ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
@@ -3275,7 +3277,7 @@ async function main() {
     await writeMiscellaneousPages();
     await writeListingPages();
     await writeTagPages();
-    // await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
+    await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
     await writeArtistPages();
     await writeFlashPages();
 
