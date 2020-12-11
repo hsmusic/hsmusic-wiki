@@ -1525,7 +1525,7 @@ async function writeAlbumPage(album) {
                         ${album.tracks.flatMap((track, i, arr) => [
                             (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                             (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                                ${track.group && `<dt>${track.group}:</dt>`}
+                                ${track.group && `<dt>${track.group} (~${getDurationString(getTotalDuration(album.tracks.filter(({ group }) => group === track.group)))}):</dt>`}
                                 <dd><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
                             `,
                             trackToListItem(track),
@@ -2344,6 +2344,9 @@ function writeListingPages() {
         return `${Math.floor(wordCount / 100) / 10}k`;
     };
 
+    const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+
     return progressPromiseAll(`Writing listing pages.`, [
         writePage([C.LISTING_DIRECTORY], {
             title: `Listings Index`,
@@ -2351,6 +2354,8 @@ function writeListingPages() {
             main: {
                 content: fixWS`
                     <h1>Listings</h1>
+                    <p>${SITE_TITLE}: <b>${releasedTracks.length}</b> tracks across <b>${releasedAlbums.length}</b> albums, totaling <b>~${getDurationString(getTotalDuration(releasedTracks))}</b> ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'}.</p>
+                    <hr>
                     <p>Feel free to explore any of the listings linked below and in the sidebar!</p>
                     ${generateLinkIndexForListings(listingDescriptors)}
                 `
