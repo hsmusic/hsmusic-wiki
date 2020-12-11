@@ -1279,6 +1279,7 @@ function writeMiscellaneousPages() {
                         <span><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></span>
                         <span><a href="${C.ABOUT_DIRECTORY}/">About &amp; Credits</a></span>
                         <span><a href="${C.FEEDBACK_DIRECTORY}/">Feedback &amp; Suggestions</a></span>
+                        <span><a href="${SITE_DONATE_LINK}">Donate</a></span>
                         <span><a href="${C.CHANGELOG_DIRECTORY}/">Changelog</a> (${SITE_RELEASE}: ${SITE_VERSION})</span>
                     </h2>
                 `
