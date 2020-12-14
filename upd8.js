@@ -108,6 +108,8 @@ const C = require('./common/common');
 const SITE_CANONICAL_BASE = 'https://hsmusic.wiki/';
 const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_SHORT_TITLE = 'HSMusic';
+const SITE_DESCRIPTION = `Expansive resource for anyone interested in fan-made and official Homestuck music alike; an archive for all things related.`;
+
 const SITE_VERSION = 'launch of hsmusic.wiki';
 const SITE_RELEASE = '12 December 2020';
 
@@ -700,7 +702,9 @@ async function processFlashDataFile(file) {
             act = getBasicField(section, 'ACT');
             color = getBasicField(section, 'FG');
             const anchor = getBasicField(section, 'Anchor');
-            return {act8r8k: true, act, color, anchor};
+            const jump = getBasicField(section, 'Jump');
+            const jumpColor = getBasicField(section, 'Jump Color') || color;
+            return {act8r8k: true, act, color, anchor, jump, jumpColor};
         }
 
         const name = getBasicField(section, 'Flash');
@@ -1206,7 +1210,7 @@ function writeMiscellaneousPages() {
         writePage([], {
             title: SITE_TITLE,
             meta: {
-                description: "Expansive resource for anyone interested in fan-made and official Homestuck music alike; an archive for all things related."
+                description: SITE_DESCRIPTION
             },
             main: {
                 classes: ['top-index'],
@@ -1339,14 +1343,8 @@ function writeMiscellaneousPages() {
                     <div class="long-content">
                         <p class="quick-info">Jump to:</p>
                         <ul class="quick-info">
-                            ${[
-                                ['a1', 'Side 1 (Acts 1-5)', '#4ac925'],
-                                ['a6a1', 'Side 2 (Acts 6-7)', '#1076a2'],
-                                ['hiveswap', 'Hiveswap', '#33cc77'],
-                                ['friendsim', 'Hiveswap Friendsim', '#d3ff8f'],
-                                ['pesterquest', 'Pesterquest', '#71daff']
-                            ].map(([ anchor, label, color ]) => fixWS`
-                                <li><a href="#${anchor}" style="${getThemeString({color})}">${label}</a></li>
+                            ${flashData.filter(act => act.act8r8k && act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
+                                <li><a href="#${anchor}" style="${getThemeString({color: jumpColor})}">${jump}</a></li>
                             `).join('\n')}
                         </ul>
                     </div>
@@ -1975,12 +1973,7 @@ async function writeFlashPage(flash) {
                     [
                         flash.page && getFlashLink(flash),
                         ...flash.urls
-                    ].map(url => `<span class="nowrap"><a href="${url}">${fancifyURL(url)}</a>` + (
-                        url.includes('homestuck.com') ? ` (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`})` :
-                        url.includes('bgreco.net') ? ` (HQ audio)` :
-                        url.includes('youtu') ? ` (on any device)` :
-                        ''
-                    ) + `</span>`), 'or')}.</p>` || `<!-- (here: Play-online links) -->`}
+                    ].map(url => fancifyFlashURL(url, flash)), 'or')}.</p>` || `<!-- (here: Play-online links) -->`}
                 ${flash.contributors.textContent && fixWS`
                     <p>Contributors:<br>${transformInline(flash.contributors.textContent)}</p>
                 `}
@@ -2770,6 +2763,15 @@ function fancifyURL(url, {album = false} = {}) {
         url.includes('instagram.com') ? 'Instagram' :
         new URL(url).hostname
     }</a>`;
+}
+
+function fancifyFlashURL(url, flash) {
+    return `<span class="nowrap">${fancifyURL(url)}` + (
+        url.includes('homestuck.com') ? ` (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`})` :
+        url.includes('bgreco.net') ? ` (HQ audio)` :
+        url.includes('youtu') ? ` (on any device)` :
+        ''
+    ) + `</span>`;
 }
 
 function iconifyURL(url) {
