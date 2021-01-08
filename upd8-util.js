@@ -62,7 +62,11 @@ module.exports.progressPromiseAll = function (msg, array) {
     })));
 };
 
-module.exports.queue = function (array, max = 10) {
+module.exports.queue = function (array, max = 50) {
+    if (max === 0) {
+        return array.map(fn => fn());
+    }
+
     const begin = [];
     let current = 0;
     const ret = array.map(fn => new Promise((resolve, reject) => {
@@ -155,3 +159,140 @@ decorateTime.displayTime = function() {
 };
 
 module.exports.decorateTime = decorateTime;
+
+// Stolen as #@CK from mtui!
+const parseOptions = async function(options, optionDescriptorMap) {
+    // This function is sorely lacking in comments, but the basic usage is
+    // as such:
+    //
+    // options is the array of options you want to process;
+    // optionDescriptorMap is a mapping of option names to objects that describe
+    // the expected value for their corresponding options.
+    // Returned is a mapping of any specified option names to their values, or
+    // a process.exit(1) and error message if there were any issues.
+    //
+    // Here are examples of optionDescriptorMap to cover all the things you can
+    // do with it:
+    //
+    // optionDescriptorMap: {
+    //   'telnet-server': {type: 'flag'},
+    //   't': {alias: 'telnet-server'}
+    // }
+    //
+    // options: ['t'] -> result: {'telnet-server': true}
+    //
+    // optionDescriptorMap: {
+    //   'directory': {
+    //     type: 'value',
+    //     validate(name) {
+    //       // const whitelistedDirectories = ['apple', 'banana']
+    //       if (whitelistedDirectories.includes(name)) {
+    //         return true
+    //       } else {
+    //         return 'a whitelisted directory'
+    //       }
+    //     }
+    //   },
+    //   'files': {type: 'series'}
+    // }
+    //
+    // ['--directory', 'apple'] -> {'directory': 'apple'}
+    // ['--directory', 'artichoke'] -> (error)
+    // ['--files', 'a', 'b', 'c', ';'] -> {'files': ['a', 'b', 'c']}
+    //
+    // TODO: Be able to validate the values in a series option.
+
+    const handleDashless = optionDescriptorMap[parseOptions.handleDashless];
+    const handleUnknown = optionDescriptorMap[parseOptions.handleUnknown];
+    const result = Object.create(null);
+    for (let i = 0; i < options.length; i++) {
+        const option = options[i];
+        if (option.startsWith('--')) {
+            // --x can be a flag or expect a value or series of values
+            let name = option.slice(2).split('=')[0]; // '--x'.split('=') = ['--x']
+            let descriptor = optionDescriptorMap[name];
+            if (!descriptor) {
+                if (handleUnknown) {
+                    handleUnknown(option);
+                } else {
+                    console.error(`Unknown option name: ${name}`);
+                    process.exit(1);
+                }
+                continue;
+            }
+            if (descriptor.alias) {
+                name = descriptor.alias;
+                descriptor = optionDescriptorMap[name];
+            }
+            if (descriptor.type === 'flag') {
+                result[name] = true;
+            } else if (descriptor.type === 'value') {
+                let value = option.slice(2).split('=')[1];
+                if (!value) {
+                    value = options[++i];
+                    if (!value || value.startsWith('-')) {
+                        value = null;
+                    }
+                }
+                if (!value) {
+                    console.error(`Expected a value for --${name}`);
+                    process.exit(1);
+                }
+                result[name] = value;
+            } else if (descriptor.type === 'series') {
+                if (!options.slice(i).includes(';')) {
+                    console.error(`Expected a series of values concluding with ; (\\;) for --${name}`);
+                    process.exit(1);
+                }
+                const endIndex = i + options.slice(i).indexOf(';');
+                result[name] = options.slice(i + 1, endIndex);
+                i = endIndex;
+            }
+            if (descriptor.validate) {
+                const validation = await descriptor.validate(result[name]);
+                if (validation !== true) {
+                    console.error(`Expected ${validation} for --${name}`);
+                    process.exit(1);
+                }
+            }
+        } else if (option.startsWith('-')) {
+            // mtui doesn't use any -x=y or -x y format optionuments
+            // -x will always just be a flag
+            let name = option.slice(1);
+            let descriptor = optionDescriptorMap[name];
+            if (!descriptor) {
+                if (handleUnknown) {
+                    handleUnknown(option);
+                } else {
+                    console.error(`Unknown option name: ${name}`);
+                    process.exit(1);
+                }
+                continue;
+            }
+            if (descriptor.alias) {
+                name = descriptor.alias;
+                descriptor = optionDescriptorMap[name];
+            }
+            if (descriptor.type === 'flag') {
+                result[name] = true;
+            } else {
+                console.error(`Use --${name} (value) to specify ${name}`);
+                process.exit(1);
+            }
+        } else if (handleDashless) {
+            handleDashless(option);
+        }
+    }
+    return result;
+}
+
+parseOptions.handleDashless = Symbol();
+parseOptions.handleUnknown = Symbol();
+
+module.exports.parseOptions = parseOptions;
+
+// Cheap FP for a cheap dyke!
+// I have no idea if this is what curry actually means.
+module.exports.curry = f => x => (...args) => f(x, ...args);
+
+module.exports.mapInPlace = (array, fn) => array.splice(0, array.length, ...array.map(fn));

@@ -5,10 +5,10 @@
 
 'use strict';
 
-const officialAlbumData = albumData.filter(album => !album.isFanon);
-const fandomAlbumData = albumData.filter(album => album.isFanon);
-const artistNames = artistData.filter(artist => !artist.alias).map(artist => artist.name);
-const allTracks = C.getAllTracks(albumData);
+let albumData, artistData, flashData;
+let officialAlbumData, fandomAlbumData, artistNames;
+
+let ready = false;
 
 function rebase(href) {
     const relative = document.documentElement.dataset.rebase;
@@ -27,6 +27,10 @@ function cssProp(el, key) {
     return getComputedStyle(el).getPropertyValue(key).trim();
 }
 
+function getRefDirectory(ref) {
+    return ref.split(':')[1];
+}
+
 function getAlbum(el) {
     const directory = cssProp(el, '--album-directory');
     return albumData.find(album => album.directory === directory);
@@ -37,16 +41,16 @@ function getFlash(el) {
     return flashData.find(flash => flash.directory === directory);
 }
 
-function openAlbum(album) {
-    return rebase(`${C.ALBUM_DIRECTORY}/${album.directory}/`);
+function openAlbum(directory) {
+    return rebase(`${C.ALBUM_DIRECTORY}/${directory}/`);
 }
 
-function openTrack(track) {
-    return rebase(`${C.TRACK_DIRECTORY}/${track.directory}/`);
+function openTrack(directory) {
+    return rebase(`${C.TRACK_DIRECTORY}/${directory}/`);
 }
 
-function openArtist(artist) {
-    return rebase(`${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/`);
+function openArtist(directory) {
+    return rebase(`${C.ARTIST_DIRECTORY}/${directory}/`);
 }
 
 function openFlash(flash) {
@@ -76,20 +80,6 @@ function getTrackListAndIndex() {
     return {list: album.tracks, index: trackIndex};
 }
 
-function openNextTrack() {
-    const { list, index } = getTrackListAndIndex();
-    if (!list) return;
-    if (index === list.length) return;
-    return openTrack(list[index + 1]);
-}
-
-function openPreviousTrack() {
-    const { list, index } = getTrackListAndIndex();
-    if (!list) return;
-    if (index === 0) return;
-    return openTrack(list[index - 1]);
-}
-
 function openRandomTrack() {
     const { list } = getTrackListAndIndex();
     if (!list) return;
@@ -104,33 +94,26 @@ function getFlashListAndIndex() {
     return {list, index: flashIndex};
 }
 
-function openNextFlash() {
-    const { list, index } = getFlashListAndIndex();
-    if (index === list.length) return;
-    return openFlash(list[index + 1]);
-}
-
-function openPreviousFlash() {
-    const { list, index } = getFlashListAndIndex();
-    if (index === 0) return;
-    return openFlash(list[index - 1]);
-}
-
 for (const a of document.body.querySelectorAll('[data-random]')) {
     a.addEventListener('click', evt => {
+        if (!ready) {
+            evt.preventDefault();
+            return;
+        }
+
         setTimeout(() => {
             a.href = rebase(C.JS_DISABLED_DIRECTORY);
         });
         switch (a.dataset.random) {
-            case 'album': return a.href = openAlbum(pick(albumData));
-            case 'album-in-fandom': return a.href = openAlbum(pick(fandomAlbumData));
-            case 'album-in-official': return a.href = openAlbum(pick(officialAlbumData));
-            case 'track': return a.href = openTrack(pick(allTracks));
-            case 'track-in-album': return a.href = openTrack(pick(getAlbum(a).tracks));
-            case 'track-in-fandom': return a.href = openTrack(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
-            case 'track-in-official': return a.href = openTrack(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), [])));
-            case 'artist': return a.href = openArtist(pick(artistNames));
-            case 'artist-more-than-one-contrib': return a.href = openArtist(pick(artistNames.filter(name => C.getArtistNumContributions(name, {albumData, allTracks, flashData}) > 1)));
+            case 'album': return a.href = openAlbum(pick(albumData).directory);
+            case 'album-in-fandom': return a.href = openAlbum(pick(fandomAlbumData).directory);
+            case 'album-in-official': return a.href = openAlbum(pick(officialAlbumData).directory);
+            case 'track': return a.href = openTrack(getRefDirectory(pick(albumData.map(a => a.tracks).reduce((a, b) => a.concat(b), []))));
+            case 'track-in-album': return a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
+            case 'track-in-fandom': return a.href = openTrack(getRefDirectory(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), []))));
+            case 'track-in-official': return a.href = openTrack(getRefDirectory(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), []))));
+            case 'artist': return a.href = openArtist(pick(artistData).directory);
+            case 'artist-more-than-one-contrib': return a.href = openArtist(pick(artistData.filter(artist => C.getArtistNumContributions(artist) > 1)).directory);
         }
     });
 }
@@ -159,7 +142,7 @@ document.addEventListener('keypress', event => {
         } else if (event.charCode === 'P'.charCodeAt(0)) {
             if (previous) previous.click();
         } else if (event.charCode === 'R'.charCodeAt(0)) {
-            if (random) random.click();
+            if (random && ready) random.click();
         }
     }
 });
@@ -173,3 +156,23 @@ for (const reveal of document.querySelectorAll('.reveal')) {
         }
     });
 }
+
+const elements1 = document.getElementsByClassName('js-hide-once-data');
+const elements2 = document.getElementsByClassName('js-show-once-data');
+
+for (const element of elements1) element.style.display = 'block';
+
+fetch(rebase('data.json')).then(data => data.json()).then(data => {
+    albumData = data.albumData;
+    artistData = data.artistData;
+    flashData = data.flashData;
+
+    officialAlbumData = albumData.filter(album => !album.isFanon);
+    fandomAlbumData = albumData.filter(album => album.isFanon);
+    artistNames = artistData.filter(artist => !artist.alias).map(artist => artist.name);
+
+    for (const element of elements1) element.style.display = 'none';
+    for (const element of elements2) element.style.display = 'block';
+
+    ready = true;
+});

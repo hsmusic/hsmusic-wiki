@@ -15,14 +15,37 @@
 }
 
 body {
-    background-color: var(--bg-color);
-
     --bg-shade: calc(255 * var(--theme));
     --fg-shade: calc(255 * (1 - var(--theme)));
+    background: black;
+    margin: 10px;
+    overflow-y: scroll;
+}
 
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+
+    background-image: url("https://www.homestuck.com/images/desktops/johnhouse_1920x1080.jpg");
+    background-position: center;
+    background-size: cover;
+    opacity: 0.5;
+}
+
+#page-container {
+    background-color: var(--bg-color);
     color: rgb(var(--fg-shade), var(--fg-shade), var(--fg-shade));
 
+    max-width: 1200px;
+    margin: 10px auto 50px;
     padding: 15px;
+
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 a {
@@ -34,14 +57,36 @@ a:hover {
     text-decoration: underline;
 }
 
+#skippers {
+    position: absolute;
+    left: -100px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+}
+
+#skippers:focus-within {
+    position: static;
+    width: unset;
+    height: unset;
+}
+
+#skippers > .skipper:not(:last-child)::after {
+    content: " \00b7 ";
+    font-weight: 800;
+}
+
 .layout-columns {
     display: flex;
 }
 
-#header {
+#header, #skippers {
     margin-bottom: 10px;
     padding: 5px;
     font-size: 0.85em;
+}
+
+#header {
     display: flex;
 }
 
@@ -122,7 +167,7 @@ a:hover {
 }
 
 @media (max-width: 780px) {
-    #sidebar:not(.no-hide) {
+    .sidebar:not(.no-hide) {
         display: none;
     }
 
@@ -134,7 +179,7 @@ a:hover {
         margin-bottom: 10px;
     }
 
-    #sidebar.no-hide {
+    .sidebar.no-hide {
         max-width: unset !important;
         flex-basis: unset !important;
         margin-right: 0;
@@ -147,25 +192,43 @@ a:hover {
     }
 }
 
-#sidebar, #content, #header {
+.sidebar, #content, #header, #skippers {
     background-color: rgba(var(--bg-shade), var(--bg-shade), var(--bg-shade), 0.6);
     border: 1px dotted var(--fg-color);
     border-radius: 3px;
 }
 
-#sidebar {
+.sidebar-column {
     flex: 1 1 20%;
     min-width: 150px;
     max-width: 250px;
     flex-basis: 250px;
-    float: left;
-    padding: 5px;
-    margin-right: 10px;
-    font-size: 0.85em;
     height: 100%;
 }
 
-#sidebar.wide {
+.sidebar-multiple {
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-multiple .sidebar:not(:first-child) {
+    margin-top: 10px;
+}
+
+.sidebar {
+    padding: 5px;
+    font-size: 0.85em;
+}
+
+#sidebar-left {
+    margin-right: 10px;
+}
+
+#sidebar-right {
+    margin-left: 10px;
+}
+
+.sidebar.wide {
     max-width: 350px;
     flex-basis: 300px;
     flex-shrink: 0;
@@ -178,23 +241,23 @@ a:hover {
     flex-shrink: 3;
 }
 
-#sidebar > h1,
-#sidebar > h2,
-#sidebar > h3,
-#sidebar > p {
+.sidebar > h1,
+.sidebar > h2,
+.sidebar > h3,
+.sidebar > p {
     text-align: center;
 }
 
-#sidebar h1 {
+.sidebar h1 {
     font-size: 1.25em;
 }
 
-#sidebar h2 {
+.sidebar h2 {
     font-size: 1.1em;
     margin: 0;
 }
 
-#sidebar h3 {
+.sidebar h3 {
     font-size: 1.1em;
     font-style: oblique;
     font-variant: small-caps;
@@ -202,73 +265,70 @@ a:hover {
     margin-bottom: 0em;
 }
 
-#sidebar > p {
+.sidebar > p {
     margin: 0.5em 0;
+    padding: 0 5px;
 }
 
-#sidebar p:last-child {
-    margin-bottom: 0;
-}
-
-#sidebar hr {
+.sidebar hr {
     color: #555;
     margin: 10px 5px;
 }
 
-#sidebar > ol, #sidebar > ul {
+.sidebar > ol, .sidebar > ul {
     padding-left: 30px;
     padding-right: 15px;
 }
 
-#sidebar > dl {
+.sidebar > dl {
     padding-right: 15px;
     padding-left: 0;
 }
 
-#sidebar > dl dt {
+.sidebar > dl dt {
     padding-left: 10px;
     margin-top: 0.5em;
 }
 
-#sidebar > dl dt.current {
+.sidebar > dl dt.current {
     font-weight: 800;
 }
 
-#sidebar > dl dd {
+.sidebar > dl dd {
     margin-left: 0;
 }
 
-#sidebar > dl dd ul {
+.sidebar > dl dd ul {
     padding-left: 30px;
     margin-left: 0;
 }
 
-#sidebar > dl .side {
+.sidebar > dl .side {
     padding-left: 10px;
 }
 
-#sidebar li.current {
+.sidebar li.current {
     font-weight: 800;
 }
 
-#sidebar li {
+.sidebar li {
     overflow-wrap: break-word;
 }
 
-#sidebar article {
+.sidebar article {
     text-align: left;
     margin: 5px 5px 15px 5px;
 }
 
-#sidebar article:last-child {
+.sidebar article:last-child {
     margin-bottom: 5px;
 }
 
-#sidebar article h2 {
+.sidebar article h2 {
     border-bottom: 1px dotted white;
 }
 
-#sidebar article h2 time {
+.sidebar article h2 time {
     float: right;
     font-weight: normal;
 }
@@ -320,7 +380,9 @@ img {
     */
 }
 
-.js-hide {
+.js-hide,
+.js-show-once-data,
+.js-hide-once-data {
     display: none;
 }
 
@@ -594,6 +656,10 @@ dl ul, dl ol {
 
 .album-group-list dd {
     margin-left: 0;
+}
+
+.group-chronology-link {
+    font-style: oblique;
 }
 
 hr.split::before {

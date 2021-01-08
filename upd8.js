@@ -51,6 +51,14 @@
 //
 // Use these wisely, which is to say all the time and instead of whatever
 // terri8le new pseudo structure you're trying to invent!!!!!!!!
+//
+// Upd8 2021-01-03: Soooooooo we didn't actually really end up using these,
+// lol? Well there's still only one anyway. Kinda ended up doing a 8ig refactor
+// of all the o8ject structures today. It's not *especially* relevant 8ut feels
+// worth mentioning? I'd get rid of this comment 8lock 8ut I like it too much!
+// Even though I haven't actually reread it, lol. 8ut yeah, hopefully in the
+// spirit of this "make things more consistent" attitude I 8rought up 8ack in
+// August, stuff's lookin' 8etter than ever now. W00t!
 
 'use strict';
 
@@ -94,8 +102,11 @@ const unlink = util.promisify(fs.unlink);
 
 const {
     cacheOneArg,
+    curry,
     decorateTime,
     joinNoOxford,
+    mapInPlace,
+    parseOptions,
     progressPromiseAll,
     queue,
     s,
@@ -109,9 +120,6 @@ const SITE_CANONICAL_BASE = 'https://hsmusic.wiki/';
 const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_SHORT_TITLE = 'HSMusic';
 const SITE_DESCRIPTION = `Expansive resource for anyone interested in fan-made and official Homestuck music alike; an archive for all things related.`;
-
-const SITE_VERSION = 'launch of hsmusic.wiki';
-const SITE_RELEASE = '12 December 2020';
 
 const SITE_DONATE_LINK = 'https://liberapay.com/nebula';
 
@@ -133,6 +141,7 @@ const ARTIST_DATA_FILE = 'artists.txt';
 const FLASH_DATA_FILE = 'flashes.txt';
 const NEWS_DATA_FILE = 'news.txt';
 const TAG_DATA_FILE = 'tags.txt';
+const GROUP_DATA_FILE = 'groups.txt';
 
 const CSS_FILE = 'site.css';
 
@@ -143,10 +152,11 @@ const CSS_FILE = 'site.css';
 // Upd8: Okay yeah these aren't actually any different. Still cleaner than
 // passing around a data object containing all this, though.
 let albumData;
-let allTracks;
+let trackData;
 let flashData;
 let newsData;
 let tagData;
+let groupData;
 
 let artistNames;
 let artistData;
@@ -155,6 +165,9 @@ let officialAlbumData;
 let fandomAlbumData;
 let justEverythingMan; // tracks, albums, flashes -- don't forget to upd8 getHrefOfAnythingMan!
 let justEverythingSortedByArtDateMan;
+let contributionData;
+
+let queueSize;
 
 // Note there isn't a 'find track data files' function. I plan on including the
 // data for all tracks within an al8um collected in the single metadata file
@@ -312,7 +325,7 @@ function transformInline(text) {
                 return ref;
             }
         } else if (category === 'tag:') {
-            const tag = tagData.find(tag => tag.directory === ref);
+            const tag = getLinkedTag(ref);
             if (tag) {
                 return fixWS`
                     <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a>
@@ -481,7 +494,8 @@ async function processAlbumDataFile(file) {
     album.trackCoverArtists = getContributionField(albumSection, 'Track Art');
     album.artTags = getListField(albumSection, 'Art Tags') || [];
     album.commentary = getCommentaryField(albumSection);
-    album.urls = (getListField(albumSection, 'URLs') || []).filter(Boolean);
+    album.urls = getListField(albumSection, 'URLs') || [];
+    album.groups = getListField(albumSection, 'Groups') || [];
     album.directory = getBasicField(albumSection, 'Directory');
 
     const canon = getBasicField(albumSection, 'Canon');
@@ -489,6 +503,8 @@ async function processAlbumDataFile(file) {
     album.isBeyond = canon === 'Beyond';
     album.isOfficial = album.isCanon || album.isBeyond;
     album.isFanon = canon === 'Fanon';
+
+    album.isMajorRelease = getBasicField(albumSection, 'Major Release') === 'yes';
 
     if (album.artists && album.artists.error) {
         return {error: `${album.artists.error} (in ${album.name})`};
@@ -580,7 +596,7 @@ async function processAlbumDataFile(file) {
         track.aka = getBasicField(section, 'AKA');
 
         if (!track.name) {
-            return {error: 'A track section is missing the "Track" (name) field (in ${album.name)}.'};
+            return {error: `A track section is missing the "Track" (name) field (in ${album.name}, previous: ${album.tracks[album.tracks.length - 1]?.name}).`};
         }
 
         let durationString = getBasicField(section, 'Duration') || '0:00';
@@ -676,12 +692,21 @@ async function processArtistDataFile(file) {
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
         const alias = getBasicField(section, 'Alias');
         const note = getMultilineField(section, 'Note');
+        let directory = getBasicField(section, 'Directory');
 
         if (!name) {
             return {error: 'Expected "Artist" (name) field!'};
         }
 
-        return {name, urls, alias, note};
+        if (!directory) {
+            directory = C.getArtistDirectory(name);
+        }
+
+        if (alias) {
+            return {name, directory, alias};
+        } else {
+            return {name, directory, urls, note};
+        }
     });
 }
 
@@ -837,6 +862,51 @@ async function processTagDataFile(file) {
     });
 }
 
+async function processGroupDataFile(file) {
+    let contents;
+    try {
+        contents = await readFile(file, 'utf-8');
+    } catch (error) {
+        return {error: `Could not read ${file} (${error.code}).`};
+    }
+
+    const contentLines = contents.split('\n');
+    const sections = Array.from(getSections(contentLines));
+
+    return sections.map(section => {
+        const name = getBasicField(section, 'Group');
+        if (!name) {
+            return {error: 'Expected "Group" field!'};
+        }
+
+        let directory = getBasicField(section, 'Directory');
+        if (!directory) {
+            directory = C.getKebabCase(name);
+        }
+
+        let description = getMultilineField(section, 'Description');
+        if (!description) {
+            return {error: 'Expected "Description" field!'};
+        }
+
+        let descriptionShort = description.split('<hr class="split">')[0];
+
+        description = transformMultiline(description);
+        descriptionShort = transformMultiline(descriptionShort);
+
+        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
+
+        return {
+            name,
+            directory,
+            description,
+            descriptionShort,
+            urls,
+            color: '#00ffff'
+        };
+    });
+}
+
 function getDateString({ date }) {
     /*
     const pad = val => val.toString().padStart(2, '0');
@@ -885,28 +955,81 @@ function getTotalDuration(tracks) {
 
 const stringifyIndent = 0;
 
+const toRefs = (label, array) => array.filter(Boolean).map(x => `${label}:${x.directory}`);
+
+function stringifyRefs(key, value) {
+    switch (key) {
+        case 'albums': return toRefs('album', value);
+        case 'tracks':
+        case 'references':
+        case 'referencedBy':
+            if (!Array.isArray(value)) console.log(Object.keys(value));
+            return toRefs('track', value);
+        case 'artists':
+        case 'contributors':
+        case 'coverArtists':
+        case 'trackCoverArtists':
+            return value && value.map(({ who, what }) => ({who: `artist:${who.directory}`, what}));
+        case 'flashes': return toRefs('flash', value);
+        case 'groups': return toRefs('group', value);
+        case 'artTags': return toRefs('tag', value);
+        case 'aka': return value && `track:${value.directory}`;
+        default:
+            return value;
+    }
+}
+
 function stringifyAlbumData() {
     return JSON.stringify(albumData, (key, value) => {
-        if (['album', 'commentary'].includes(key)) {
-            return undefined;
+        switch (key) {
+            case 'commentary':
+                return '';
+            default:
+                return stringifyRefs(key, value);
         }
+    }, stringifyIndent);
+}
 
-        return value;
+function stringifyTrackData() {
+    return JSON.stringify(trackData, (key, value) => {
+        switch (key) {
+            case 'album':
+            case 'commentary':
+            case 'otherReleases':
+                return undefined;
+            default:
+                return stringifyRefs(key, value);
+        }
     }, stringifyIndent);
 }
 
 function stringifyFlashData() {
     return JSON.stringify(flashData, (key, value) => {
-        if (['act', 'commentary'].includes(key)) {
-            return undefined;
+        switch (key) {
+            case 'act':
+            case 'commentary':
+                return undefined;
+            default:
+                return stringifyRefs(key, value);
         }
-
-        return value;
     }, stringifyIndent);
 }
 
 function stringifyArtistData() {
-    return JSON.stringify(artistData, null, stringifyIndent);
+    return JSON.stringify(artistData, (key, value) => {
+        switch (key) {
+            case 'tracks': // skip stringifyRefs handling 'tracks' key as an array
+                return value;
+            case 'asAny':
+                return;
+            case 'asArtist':
+            case 'asContributor':
+            case 'asCoverArtist':
+                return toRefs('track', value);
+            default:
+                return stringifyRefs(key, value);
+        }
+    }, stringifyIndent);
 }
 
 function escapeAttributeValue(value) {
@@ -996,11 +1119,16 @@ async function writePage(directoryParts, {
 
     main = {
         classes: [],
+        collapseSidebars: true,
         content: ''
     },
 
     sidebar = {
-        collapse: true,
+        classes: [],
+        content: ''
+    },
+
+    sidebarRight = {
         classes: [],
         content: ''
     },
@@ -1021,26 +1149,51 @@ async function writePage(directoryParts, {
     }
     const canonical = SITE_CANONICAL_BASE + targetPath;
 
+    const {
+        collapseSidebars = true
+    } = main;
+
     const mainHTML = main.content && fixWS`
         <main id="content" ${classes(...main.classes || [])}>
             ${main.content}
         </main>
     `;
 
-    const {
-        collapse = true,
+    const generateSidebarHTML = (id, {
+        content,
+        multiple,
+        classes: sidebarClasses = [],
         wide = false
-    } = sidebar;
-
-    const sidebarHTML = sidebar.content && fixWS`
-        <div id="sidebar" ${classes(
+    }) => (content ? fixWS`
+        <div id="${id}" ${classes(
+            'sidebar-column',
+            'sidebar',
             wide && 'wide',
-            !collapse && 'no-hide',
-            ...sidebar.classes || []
+            !collapseSidebars && 'no-hide',
+            ...sidebarClasses
         )}>
-            ${sidebar.content}
+            ${content}
         </div>
-    `;
+    ` : multiple ? fixWS`
+        <div id="${id}" ${classes(
+            'sidebar-column',
+            'sidebar-multiple',
+            wide && 'wide',
+            !collapseSidebars && 'no-hide'
+        )}>
+            ${multiple.map(content => fixWS`
+                <div ${classes(
+                    'sidebar',
+                    ...sidebarClasses
+                )}>
+                    ${content}
+                </div>
+            `).join('\n')}
+        </div>
+    ` : '');
+
+    const sidebarLeftHTML = generateSidebarHTML('sidebar-left', sidebar);
+    const sidebarRightHTML = generateSidebarHTML('sidebar-right', sidebarRight);
 
     if (nav.simple) {
         nav.links = [
@@ -1087,10 +1240,11 @@ async function writePage(directoryParts, {
 
     const layoutHTML = [
         navHTML,
-        sidebar.content ? fixWS`
-            <div ${classes('layout-columns', !collapse && 'vertical-when-thin')}>
-                ${sidebarHTML}
+        (sidebarLeftHTML || sidebarRightHTML) ? fixWS`
+            <div ${classes('layout-columns', !collapseSidebars && 'vertical-when-thin')}>
+                ${sidebarLeftHTML}
                 ${mainHTML}
+                ${sidebarRightHTML}
             </div>
         ` : mainHTML
     ].filter(Boolean).join('\n');
@@ -1109,9 +1263,16 @@ async function writePage(directoryParts, {
                 <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
-                ${layoutHTML}
+                <div id="page-container">
+                    ${mainHTML && fixWS`
+                        <div id="skippers">
+                            <span class="skipper"><a href="#content">Skip to content</a></span>
+                            ${sidebar.content && `<span class="skipper"><a href="#sidebar-left">Skip to sidebar</a></span>`}
+                        </div>
+                    `}
+                    ${layoutHTML}
+                </div>
                 <script src="${C.COMMON_DIRECTORY}/common.js"></script>
-                <script src="data.js"></script>
                 <script src="${C.STATIC_DIRECTORY}/client.js"></script>
             </body>
         </html>
@@ -1133,7 +1294,7 @@ function getGridHTML({
                 alt: altFn(item),
                 lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                 square: true,
-                reveal: getRevealString(getTagsUsedIn(item))
+                reveal: getRevealString(item.artTags)
             })}
             <span>${item.name}</span>
             ${details && fixWS`
@@ -1170,10 +1331,8 @@ function getFlashGridHTML(props) {
 
 function getNewReleases(numReleases) {
     const latestFirst = albumData.slice().reverse();
-
-    // TODO: Major fan albums
-    const majorReleases = [];
-    majorReleases.push(latestFirst.find(album => album.isOfficial));
+    const majorReleases = latestFirst.filter(album => album.isOfficial || album.isMajorRelease);
+    majorReleases.splice(1);
 
     const otherReleases = latestFirst
         .filter(album => !majorReleases.includes(album))
@@ -1214,6 +1373,7 @@ function writeMiscellaneousPages() {
             },
             main: {
                 classes: ['top-index'],
+                collapseSidebars: false,
                 content: fixWS`
                     <h1>${SITE_TITLE}</h1>
                     <h2>New Releases</h2>
@@ -1256,7 +1416,6 @@ function writeMiscellaneousPages() {
                 `
             },
             sidebar: {
-                collapse: false,
                 wide: true,
                 content: fixWS`
                     <h1>Get involved!</h1>
@@ -1284,7 +1443,6 @@ function writeMiscellaneousPages() {
                         <span><a href="${C.ABOUT_DIRECTORY}/">About &amp; Credits</a></span>
                         <span><a href="${C.FEEDBACK_DIRECTORY}/">Feedback &amp; Suggestions</a></span>
                         <span><a href="${SITE_DONATE_LINK}">Donate</a></span>
-                        <span><a href="${C.CHANGELOG_DIRECTORY}/">Changelog</a> (${SITE_RELEASE}: ${SITE_VERSION})</span>
                     </h2>
                 `
             }
@@ -1308,6 +1466,9 @@ function writeMiscellaneousPages() {
                         })}
                     </div>
                 `
+            },
+            sidebar: {
+                content: generateSidebarForGroup(true, null)
             },
             nav: {simple: true}
         }),
@@ -1439,11 +1600,12 @@ function writeMiscellaneousPages() {
             nav: {simple: true}
         }),
 
-        writeFile(path.join(C.SITE_DIRECTORY, 'data.js'), fixWS`
-            // Yo, this file is gener8ted. Don't mess around with it!
-            window.albumData = ${stringifyAlbumData()};
-            window.flashData = ${stringifyFlashData()};
-            window.artistData = ${stringifyArtistData()};
+        writeFile(path.join(C.SITE_DIRECTORY, 'data.json'), fixWS`
+            {
+                "albumData": ${stringifyAlbumData()},
+                "flashData": ${stringifyFlashData()},
+                "artistData": ${stringifyArtistData()}
+            }
         `)
     ]);
 }
@@ -1479,11 +1641,17 @@ function generateCoverLink({
 
 // This function title is my gr8test work of art.
 // (The 8ehavior... well, um. Don't tell anyone, 8ut it's even 8etter.)
+/* // RIP, 2k20-2k20.
 function writeIndexAndTrackPagesForAlbum(album) {
     return [
         () => writeAlbumPage(album),
         ...album.tracks.map(track => () => writeTrackPage(track))
     ];
+}
+*/
+
+function writeAlbumPages() {
+    return progressPromiseAll(`Writing album pages.`, queue(albumData.map(curry(writeAlbumPage)), queueSize));
 }
 
 async function writeAlbumPage(album) {
@@ -1507,7 +1675,7 @@ async function writeAlbumPage(album) {
                 ${generateCoverLink({
                     src: getAlbumCover(album),
                     alt: 'album cover',
-                    tags: getTagsUsedIn(album)
+                    tags: album.artTags
                 })}
                 <h1>${album.name}</h1>
                 <p>
@@ -1543,9 +1711,8 @@ async function writeAlbumPage(album) {
                 ` || `<!-- (here: Full-album commentary) -->`}
             `
         },
-        sidebar: {
-            content: generateSidebarForAlbum(album)
-        },
+        sidebar: generateSidebarForAlbum(album),
+        sidebarRight: generateSidebarRightForAlbum(album),
         nav: {
             links: [
                 ['./', SITE_SHORT_TITLE],
@@ -1561,17 +1728,21 @@ async function writeAlbumPage(album) {
     });
 }
 
+function writeTrackPages() {
+    return progressPromiseAll(`Writing track pages.`, queue(trackData.map(curry(writeTrackPage)), queueSize));
+}
+
 async function writeTrackPage(track) {
     const { album } = track;
-    const tracksThatReference = getTracksThatReference(track);
+    const tracksThatReference = track.referencedBy;
     const ttrFanon = tracksThatReference.filter(t => t.album.isFanon);
     const ttrOfficial = tracksThatReference.filter(t => t.album.isOfficial);
-    const tracksReferenced = getTracksReferencedBy(track);
-    const otherReleases = getOtherReleasesOf(track);
+    const tracksReferenced = track.references;
+    const otherReleases = track.otherReleases;
     const listTag = getAlbumListTag(track.album);
 
     const flashesThatFeature = C.sortByDate([track, ...otherReleases]
-        .flatMap(track => getFlashesThatFeature(track).map(flash => ({flash, as: track}))));
+        .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
 
     const generateTrackList = tracks => fixWS`
         <ul>
@@ -1601,9 +1772,8 @@ async function writeTrackPage(track) {
             style: `${getThemeString(track)}; --album-directory: ${album.directory}; --track-directory: ${track.directory}`
         },
 
-        sidebar: {
-            content: generateSidebarForAlbum(album, track)
-        },
+        sidebar: generateSidebarForAlbum(album, track),
+        sidebarRight: generateSidebarRightForAlbum(album, track),
 
         nav: {
             links: [
@@ -1625,7 +1795,7 @@ async function writeTrackPage(track) {
                 ${generateCoverLink({
                     src: getTrackCover(track),
                     alt: 'track cover',
-                    tags: getTagsUsedIn(track)
+                    tags: track.artTags
                 })}
                 <h1>${track.name}</h1>
                 <p>
@@ -1708,13 +1878,7 @@ async function writeTrackPage(track) {
 }
 
 async function writeArtistPages() {
-    await progressPromiseAll('Writing artist pages.', queue(artistData.map(artist => () => writeArtistPage(artist))));
-}
-
-function getTracksByArtist(artistName) {
-    return allTracks.filter(track => (
-        [...track.artists, ...track.contributors].some(({ who }) => who === artistName)
-    ));
+    await progressPromiseAll('Writing artist pages.', queue(artistData.map(curry(writeArtistPage)), queueSize));
 }
 
 async function writeArtistPage(artist) {
@@ -1728,25 +1892,26 @@ async function writeArtistPage(artist) {
         note = ''
     } = artist;
 
-    const tracks = getTracksByArtist(name);
-    const artThings = justEverythingMan.filter(thing => (thing.coverArtists || []).some(({ who }) => who === name));
-    const flashes = flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === name));
+    const artThings = justEverythingMan.filter(thing => (thing.coverArtists || []).some(({ who }) => who === artist));
+    const flashes = flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artist));
     const commentaryThings = justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + name + ':</i>'));
 
-    const unreleasedTracks = tracks.filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = tracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const unreleasedTracks = [...artist.tracks.asArtist, ...artist.tracks.asContributor]
+        .filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = [...artist.tracks.asArtist, ...artist.tracks.asContributor]
+        .filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
 
     const generateTrackList = tracks => albumChunkedList(tracks, (track, i) => {
         const contrib = {
-            who: name,
-            what: track.contributors.filter(({ who }) => who === name).map(({ what }) => what).join(', ')
+            who: artist,
+            what: track.contributors.filter(({ who }) => who === artist).map(({ what }) => what).join(', ')
         };
-        const flashes = getFlashesThatFeature(track);
+        const { flashes } = track;
         return fixWS`
             <li ${classes(track.aka && 'rerelease')} title="${th(i + 1)} track by ${name}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                 ${track.duration && `(${getDurationString(track.duration)})` || `<!-- (here: Duration) -->`}
                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
-                ${track.artists.some(({ who }) => who === name) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(({ who }) => who !== name))})</span>` || `<!-- (here: Co-artist credits) -->`}
+                ${track.artists.some(({ who }) => who === artist) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(({ who }) => who !== artist))})</span>` || `<!-- (here: Co-artist credits) -->`}
                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>` || `<!-- (here: Contribution details) -->`}
                 ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>` || `<!-- (here: Flashes featuring this track) -->`}
                 ${track.aka && `<span class="rerelease-label">(re-release)</span>`}
@@ -1774,16 +1939,17 @@ async function writeArtistPage(artist) {
                     <hr>
                 `}
                 ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
+                ${artThings.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${kebab}/gallery/">art gallery</a>!</p>`}
                 <p>Jump to: ${[
                     [
-                        tracks.length && `<a href="${index}#tracks">Tracks</a>`,
+                        [...releasedTracks, ...unreleasedTracks].length && `<a href="${index}#tracks">Tracks</a>`,
                         unreleasedTracks.length && `<a href="${index}#unreleased-tracks">(Unreleased Tracks)</a>`
                     ].filter(Boolean).join(' '),
                     artThings.length && `<a href="${index}#art">Art</a>`,
                     flashes.length && `<a href="${index}#flashes">Flashes &amp; Games</a>`,
                     commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
                 ].filter(Boolean).join(', ')}.</p>
-                ${tracks.length && fixWS`
+                ${[...releasedTracks, ...unreleasedTracks].length && fixWS`
                     <h2 id="tracks">Tracks</h2>
                 `}
                 ${releasedTracks.length && fixWS`
@@ -1796,14 +1962,15 @@ async function writeArtistPage(artist) {
                 `}
                 ${artThings.length && fixWS`
                     <h2 id="art">Art</h2>
+                    <p>View <a href="${C.ARTIST_DIRECTORY}/${kebab}/gallery/">art gallery</a>! Or browse the list:</p>
                     ${albumChunkedList(artThings, (thing, i) => {
-                        const contrib = thing.coverArtists.find(({ who }) => who === name);
+                        const contrib = thing.coverArtists.find(({ who }) => who === artist);
                         return fixWS`
                             <li title="${th(i + 1)} art by ${name}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
                                     <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '<i>(cover art)</i>'}
-                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== name))})</span>`}
+                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== artist))})</span>`}
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
                             </li>
                         `;
@@ -1812,7 +1979,7 @@ async function writeArtistPage(artist) {
                 ${flashes.length && fixWS`
                     <h2 id="flashes">Flashes &amp; Games</h2>
                     ${actChunkedList(flashes, flash => {
-                        const contributionString = flash.contributors.filter(({ who }) => who === name).map(getContributionString).join(' ');
+                        const contributionString = flash.contributors.filter(({ who }) => who === artist).map(getContributionString).join(' ');
                         return fixWS`
                             <li>
                                 <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getThemeString(flash)}">${flash.name}</a>
@@ -1825,13 +1992,13 @@ async function writeArtistPage(artist) {
                 ${commentaryThings.length && fixWS`
                     <h2 id="commentary">Commentary</h2>
                     ${albumChunkedList(commentaryThings, thing => {
-                        const flashes = getFlashesThatFeature(thing);
+                        const { flashes } = thing;
                         return fixWS`
                             <li>
                                 ${thing.album ? fixWS`
                                     <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
                                 ` : '(album commentary)'}
-                                ${flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
+                                ${flashes?.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
                             </li>
                         `
                     }, false)}
@@ -1845,27 +2012,67 @@ async function writeArtistPage(artist) {
                 ['./', SITE_SHORT_TITLE],
                 [`${C.LISTING_DIRECTORY}/`, 'Listings'],
                 [null, 'Artist:'],
-                [`${C.ARTIST_DIRECTORY}/${kebab}/`, name]
+                [`${C.ARTIST_DIRECTORY}/${kebab}/`, name],
+                [null, `(${[
+                    `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/" class="current">Info</a>`,
+                    `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">Gallery</a>`
+                ].join(', ')})`]
             ]
         }
     });
+
+    if (artThings.length) {
+        await writePage([C.ARTIST_DIRECTORY, kebab, 'gallery'], {
+            title: name + ' - Gallery',
+
+            main: {
+                classes: ['top-index'],
+                content: fixWS`
+                    <h1>${name} - Gallery</h1>
+                    <p class="quick-info">(Contributed to ${s(artThings.length, 'cover art')})</p>
+                    <div class="grid-listing">
+                        ${getGridHTML({
+                            entries: artThings.map(item => ({item})),
+                            srcFn: thing => (thing.album
+                                ? getTrackCover(thing)
+                                : getAlbumCover(thing)),
+                            hrefFn: thing => (thing.album
+                                ? `${C.TRACK_DIRECTORY}/${thing.directory}/`
+                                : `${C.ALBUM_DIRECTORY}/${thing.directory}`)
+                        })}
+                    </div>
+                `
+            },
+
+            nav: {
+                links: [
+                    ['./', SITE_SHORT_TITLE],
+                    [`${C.LISTING_DIRECTORY}/`, 'Listings'],
+                    [null, 'Artist:'],
+                    [`${C.ARTIST_DIRECTORY}/${kebab}/`, name],
+                    [null, `(${[
+                        `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">Info</a>`,
+                        `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/" class="current">Gallery</a>`
+                    ].join(', ')})`]
+                ]
+            }
+        });
+    }
 }
 
 async function writeArtistAliasPage(artist) {
-    const { name, alias } = artist;
-    const kebab1 = C.getArtistDirectory(name);
-    const kebab2 = C.getArtistDirectory(alias);
+    const { alias } = artist;
 
-    const directory = path.join(C.SITE_DIRECTORY, C.ARTIST_DIRECTORY, kebab1);
+    const directory = path.join(C.SITE_DIRECTORY, C.ARTIST_DIRECTORY, artist.directory);
     const file = path.join(directory, 'index.html');
-    const target = `/${C.ARTIST_DIRECTORY}/${kebab2}/`;
+    const target = `/${C.ARTIST_DIRECTORY}/${alias.directory}/`;
 
     await mkdirp(directory);
     await writeFile(file, fixWS`
         <!DOCTYPE html>
         <html>
             <head>
-                <title>Moved to ${alias}</title>
+                <title>Moved to ${alias.name}</title>
                 <meta charset="utf-8">
                 <meta http-equiv="refresh" content="0;url=${target}">
                 <link rel="canonical" href="${target}">
@@ -1873,7 +2080,7 @@ async function writeArtistAliasPage(artist) {
             </head>
             <body>
                 <main>
-                    <h1>Moved to ${alias}</h1>
+                    <h1>Moved to ${alias.name}</h1>
                     <p>This page has been moved to <a href="${target}">${target}</a>.</p>
                 </main>
             </body>
@@ -1941,7 +2148,9 @@ function actChunkedList(flashes, getLI, showDate = true, dateProperty = 'date') 
 }
 
 async function writeFlashPages() {
-    await progressPromiseAll('Writing Flash pages.', queue(flashData.map(flash => () => !flash.act8r8k && writeFlashPage(flash)).filter(Boolean)));
+    await progressPromiseAll('Writing Flash pages.', queue(flashData
+        .filter(flash => !flash.act8r8k)
+        .map(curry(writeFlashPage)), queueSize));
 }
 
 async function writeFlashPage(flash) {
@@ -1980,26 +2189,12 @@ async function writeFlashPage(flash) {
                 ${flash.tracks.length && fixWS`
                     <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                     <ul>
-                        ${flash.tracks.map(ref => {
-                            const track = getLinkedTrack(ref);
-                            if (track) {
-                                return fixWS`
-                                    <li>
-                                        <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
-                                        <span class="by">by ${getArtistString(track.artists)}</span>
-                                    </li>
-                                `;
-                            } else {
-                                const by = ref.match(/\(by .*\)/);
-                                if (by) {
-                                    const name = ref.replace(by, '').trim();
-                                    const contribs = by[0].replace(/\(by |\)/g, '').split(',').map(w => ({who: w.trim()}));
-                                    return `<li>${name} <span class="by">by ${getArtistString(contribs)}</span></li>`;
-                                } else {
-                                    return `<li>${ref}</li>`;
-                                }
-                            }
-                        }).join('\n')}
+                        ${flash.tracks.map(track => fixWS`
+                            <li>
+                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                                <span class="by">by ${getArtistString(track.artists)}</span>
+                            </li>
+                        `).join('\n')}
                     </ul>
                 ` || `<!-- (here: Flash track listing) -->`}
                 ${flash.contributors.length && fixWS`
@@ -2085,21 +2280,13 @@ function generateSidebarForFlashes(flash) {
 }
 
 function writeListingPages() {
-    const allArtists = artistNames.slice().sort();
-    const reversedTracks = allTracks.slice().reverse();
+    const reversedTracks = trackData.slice().reverse();
     const reversedThings = justEverythingMan.slice().reverse();
 
     const getAlbumLI = (album, extraText = '') => fixWS`
         <li>
             <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a>
             ${extraText}
-        </li>
-    `;
-
-    const getArtistLI = artistName => fixWS`
-        <li>
-            <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artistName)}/">${artistName}</a>
-            (${'' + C.getArtistNumContributions(artistName, {allTracks, albumData, flashData})} <abbr title="contributions (to music, art, and flashes)">c.</abbr>)
         </li>
     `;
 
@@ -2122,18 +2309,23 @@ function writeListingPages() {
         [['albums', 'by-tracks'], `Albums - by Tracks`, albumData.slice()
             .sort((a, b) => b.tracks.length - a.tracks.length)
             .map(album => getAlbumLI(album, `(${s(album.tracks.length, 'track')})`))],
-        [['artists', 'by-name'], `Artists - by Name`, allArtists
-            .map(name => ({name}))
+        [['artists', 'by-name'], `Artists - by Name`, artistData
+            .filter(artist => !artist.alias)
             .sort(sortByName)
-            .map(({ name }) => name)
-            .map(getArtistLI)],
-        [['artists', 'by-commentary'], `Artists - by Commentary`, allArtists
-            .map(name => ({name, commentary: C.getArtistCommentary(name, {justEverythingMan}).length}))
+            .map(artist => fixWS`
+                <li>
+                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>
+                    (${'' + C.getArtistNumContributions(artist)} <abbr title="contributions (to music, art, and flashes)">c.</abbr>)
+                </li>
+            `)],
+        [['artists', 'by-commentary'], `Artists - by Commentary`, artistData
+            .filter(artist => !artist.alias)
+            .map(artist => ({artist, commentary: C.getArtistCommentary(artist, {justEverythingMan}).length}))
             .filter(({ commentary }) => commentary > 0)
             .sort((a, b) => b.commentary - a.commentary)
-            .map(({ name, commentary }) => fixWS`
+            .map(({ artist, commentary }) => fixWS`
                 <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/#commentary">${name}</a>
+                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/#commentary">${artist.name}</a>
                     (${commentary} ${commentary === 1 ? 'entry' : 'entries'})
                 </li>
             `)],
@@ -2142,15 +2334,16 @@ function writeListingPages() {
                 <div class="column">
                     <h2>Track Contributors</h2>
                     <ul>
-                        ${allArtists
-                            .map(name => ({
-                                name,
-                                contribs: allTracks.filter(({ album, artists, contributors }) =>
+                        ${artistData
+                            .filter(artist => !artist.alias)
+                            .map(artist => ({
+                                name: artist.name,
+                                contribs: trackData.filter(({ album, artists, contributors }) =>
                                     album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
                                     [
                                         ...artists,
                                         ...contributors
-                                    ].some(({ who }) => who === name)).length
+                                    ].some(({ who }) => who === artist)).length
                             }))
                             .sort((a, b) => b.contribs - a.contribs)
                             .filter(({ contribs }) => contribs)
@@ -2167,22 +2360,23 @@ function writeListingPages() {
                 <div class="column">
                     <h2>Art &amp; Flash Contributors</h2>
                     <ul>
-                        ${allArtists
-                            .map(name => ({
-                                name,
+                        ${artistData
+                            .filter(artist => !artist.alias)
+                            .map(artist => ({
+                                artist,
                                 contribs: justEverythingMan.filter(({ album, contributors, coverArtists }) => (
                                     album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
                                     [
                                         ...!album && contributors || [],
                                         ...coverArtists || []
-                                    ].some(({ who }) => who === name)
+                                    ].some(({ who }) => who === artist)
                                 )).length
                             }))
                             .sort((a, b) => b.contribs - a.contribs)
                             .filter(({ contribs }) => contribs)
-                            .map(({ name, contribs }) => fixWS`
+                            .map(({ artist, contribs }) => fixWS`
                                 <li>
-                                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}">${name}</a>
+                                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}">${artist.name}</a>
                                     (${contribs} <abbr title="contributions (to art and flashes)">c.</abbr>)
                                 </li>
                             `)
@@ -2192,15 +2386,16 @@ function writeListingPages() {
                 </div>
             </div>
         `],
-        [['artists', 'by-duration'], `Artists - by Duration`, allArtists
-            .map(name => ({name, duration: getTotalDuration(
-                getTracksByArtist(name).filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
+        [['artists', 'by-duration'], `Artists - by Duration`, artistData
+            .filter(artist => !artist.alias)
+            .map(artist => ({artist, duration: getTotalDuration(
+                [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
             }))
             .filter(({ duration }) => duration > 0)
             .sort((a, b) => b.duration - a.duration)
-            .map(({ name, duration }) => fixWS`
+            .map(({ artist, duration }) => fixWS`
                 <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/#tracks">${name}</a>
+                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/#tracks">${artist.name}</a>
                     (~${getDurationString(duration)})
                 </li>
             `)],
@@ -2209,19 +2404,20 @@ function writeListingPages() {
                 <div class="column">
                     <h2>Track Contributors</h2>
                     <ul>
-                        ${C.sortByDate(allArtists
-                            .map(name => ({
-                                name,
+                        ${C.sortByDate(artistData
+                            .filter(artist => !artist.alias)
+                            .map(artist => ({
+                                artist,
                                 date: reversedTracks.find(({ album, artists, contributors }) => (
                                     album.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
-                                    [...artists, ...contributors].some(({ who }) => who === name)
+                                    [...artists, ...contributors].some(({ who }) => who === artist)
                                 ))?.date
                             }))
                             .filter(({ date }) => date)
                             .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-                        ).reverse().map(({ name, date }) => fixWS`
+                        ).reverse().map(({ artist, date }) => fixWS`
                             <li>
-                                <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/">${name}</a>
+                                <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>
                                 (${getDateString({date})})
                             </li>
                         `).join('\n')}
@@ -2230,24 +2426,25 @@ function writeListingPages() {
                 <div class="column">
                     <h2>Art &amp; Flash Contributors</h2>
                     <ul>
-                        ${C.sortByDate(allArtists
-                            .map(name => {
+                        ${C.sortByDate(artistData
+                            .filter(artist => !artist.alias)
+                            .map(artist => {
                                 const thing = reversedThings.find(({ album, coverArtists, contributors }) => (
                                     album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
-                                    [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === name)
+                                    [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === artist)
                                 ));
                                 return thing && {
-                                    name,
-                                    date: (thing.coverArtists?.some(({ who }) => who === name)
+                                    artist,
+                                    date: (thing.coverArtists?.some(({ who }) => who === artist)
                                         ? thing.coverArtDate
                                         : thing.date)
                                 };
                             })
                             .filter(Boolean)
                             .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-                        ).reverse().map(({ name, date }) => fixWS`
+                        ).reverse().map(({ artist, date }) => fixWS`
                             <li>
-                                <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}/">${name}</a>
+                                <a href="${C.ARTIST_DIRECTORY}/${artist.directory}">${artist.name}</a>
                                 (${getDateString({date})})
                             </li>
                         `).join('\n')}
@@ -2255,7 +2452,7 @@ function writeListingPages() {
                 </div>
             </div>
         `],
-        [['tracks', 'by-name'], `Tracks - by Name`, allTracks.slice()
+        [['tracks', 'by-name'], `Tracks - by Name`, trackData.slice()
             .sort(sortByName)
             .map(track => fixWS`
                 <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
@@ -2273,11 +2470,11 @@ function writeListingPages() {
                 </dl>
             `],
         [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
-            C.sortByDate(allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
+            C.sortByDate(trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
             track => fixWS`
                 <li ${classes(track.aka && 'rerelease')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a> ${track.aka && `<span class="rerelease-label">(re-release)</span>`}</li>
             `)],
-        [['tracks', 'by-duration'], `Tracks - by Duration`, C.sortByDate(allTracks.slice())
+        [['tracks', 'by-duration'], `Tracks - by Duration`, C.sortByDate(trackData.slice())
             .filter(track => track.duration > 0)
             .sort((a, b) => b.duration - a.duration)
             .map(track => fixWS`
@@ -2300,24 +2497,37 @@ function writeListingPages() {
             `,
             false,
             null)],
-        [['tracks', 'by-times-referenced'], `Tracks - by Times Referenced`, C.sortByDate(allTracks.slice())
-            .filter(track => getTracksThatReference(track).length > 0)
-            .sort((a, b) => getTracksThatReference(b).length - getTracksThatReference(a).length)
+        [['tracks', 'by-times-referenced'], `Tracks - by Times Referenced`, C.sortByDate(trackData.slice())
+            .filter(track => track.referencedBy.length > 0)
+            .sort((a, b) => b.referencedBy.length - a.referencedBy.length)
             .map(track => fixWS`
                 <li>
                     <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
-                    (${s(getTracksThatReference(track).length, 'time')} referenced)
+                    (${s(track.referencedBy.length, 'time')} referenced)
                 </li>
             `)],
         [['tracks', 'in-flashes', 'by-album'], `Tracks - in Flashes &amp; Games (by Album)`, albumChunkedList(
-            C.sortByDate(allTracks.slice()).filter(track => getFlashesThatFeature(track).length > 0),
+            C.sortByDate(trackData.slice()).filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && track.flashes.length > 0),
             track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>`)],
-        [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by First Feature)`,
-            Array.from(new Set(flashData.filter(flash => !flash.act8r8k).flatMap(flash => getTracksFeaturedByFlash(flash))))
-            .filter(Boolean)
-            .map(track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>`)],
+        [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by Flash)`, fixWS`
+            <dl>
+                ${C.sortByDate(flashData.filter(flash => !flash.act8r8k))
+                    .map(flash => fixWS`
+                        <dt>
+                            <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getThemeString(flash)}">${flash.name}</a>
+                            (${getDateString(flash)})
+                        </dt>
+                        <dd><ul>
+                            ${flash.tracks.map(track => fixWS`
+                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
+                            `).join('\n')}
+                        </ul></dd>
+                    `)
+                    .join('\n')}
+            </dl>
+        `],
         [['tracks', 'with-lyrics'], `Tracks - with Lyrics`, albumChunkedList(
-            C.sortByDate(allTracks.slice())
+            C.sortByDate(trackData.slice())
             .filter(track => track.lyrics),
             track => fixWS`
                 <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
@@ -2327,7 +2537,7 @@ function writeListingPages() {
             .map(tag => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a></li>`)],
         [['tags', 'by-uses'], 'Tags - by Uses', tagData.slice().sort(sortByName)
             .filter(tag => !tag.isCW)
-            .map(tag => ({tag, timesUsed: getThingsThatUseTag(tag).length}))
+            .map(tag => ({tag, timesUsed: tag.things.length}))
             .sort((a, b) => b.timesUsed - a.timesUsed)
             .map(({ tag, timesUsed }) => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a> (${s(timesUsed, 'time')})</li>`)]
     ];
@@ -2337,7 +2547,7 @@ function writeListingPages() {
         return `${Math.floor(wordCount / 100) / 10}k`;
     };
 
-    const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
     const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
 
     return progressPromiseAll(`Writing listing pages.`, [
@@ -2402,8 +2612,8 @@ function writeListingPages() {
                                 </blockquote>
                             ` || `<!-- (here: Full-album commentary) -->`}
                             ${tracks.filter(t => t.commentary).map(track => fixWS`
-                                <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(album)}">${track.name}</a></h3>
-                                <blockquote style="${getThemeString(album)}">
+                                <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></h3>
+                                <blockquote style="${getThemeString(track)}">
                                     ${transformMultiline(track.commentary)}
                                 </blockquote>
                             `).join('\n') || `<!-- (here: Per-track commentary) -->`}
@@ -2433,6 +2643,8 @@ function writeListingPages() {
                 content: fixWS`
                     <h1>Random Pages</h1>
                     <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
+                    <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
+                    <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>
                     <dl>
                         <dt>Miscellaneous:</dt>
                         <dd><ul>
@@ -2528,13 +2740,13 @@ function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)
 }
 
 function writeTagPages() {
-    return progressPromiseAll(`Writing tag pages.`, tagData
+    return progressPromiseAll(`Writing tag pages.`, queue(tagData
         .filter(tag => !tag.isCW)
-        .map(writeTagPage));
+        .map(curry(writeTagPage)), queueSize));
 }
 
 function writeTagPage(tag) {
-    const things = getThingsThatUseTag(tag);
+    const { things } = tag;
 
     return writePage([C.TAG_DIRECTORY, tag.directory], {
         title: tag.name,
@@ -2577,71 +2789,53 @@ function writeTagPage(tag) {
 function getContributionString({ what }) {
     return what
         ? what.replace(/\[(.*?)\]/g, (match, name) =>
-            allTracks.some(track => track.name === name)
-                ? `<i><a href="${C.TRACK_DIRECTORY}/${allTracks.find(track => track.name === name).directory}/">${name}</a></i>`
+            trackData.some(track => track.name === name)
+                ? `<i><a href="${C.TRACK_DIRECTORY}/${trackData.find(track => track.name === name).directory}/">${name}</a></i>`
                 : `<i>${name}</i>`)
         : '';
 }
 
-const getTracksThatReference = cacheOneArg(track =>
-    allTracks.filter(t => getTracksReferencedBy(t).includes(track)));
-
-const getTracksReferencedBy = cacheOneArg(track =>
-    track.references.map(ref => getLinkedTrack(ref)).filter(Boolean));
-
-const getThingsThatUseTag = cacheOneArg(tag =>
-    C.sortByArtDate([...albumData, ...allTracks]).filter(thing => thing.artTags.includes(tag.name)));
-
-const getTagsUsedIn = cacheOneArg(thing =>
-    (thing.artTags || []).map(tagName => {
-        if (tagName.startsWith('cw: ')) {
-            tagName = tagName.slice(4);
-        }
-        tagName = tagName.toLowerCase()
-        return tagData.find(tag => tag.name.toLowerCase() === tagName);
-    }).filter(Boolean));
-
-const getOtherReleasesOf = cacheOneArg(track => [
-    track.aka && getLinkedTrack(track.aka),
-    ...allTracks.filter(({ aka }) => aka && getLinkedTrack(aka) === track)
-].filter(Boolean));
-
 function getLinkedTrack(ref) {
+    if (!ref) return null;
+
     if (ref.includes('track:')) {
         ref = ref.replace('track:', '');
-        return allTracks.find(track => track.directory === ref);
+        return trackData.find(track => track.directory === ref);
     }
 
     const match = ref.match(/\S:(.*)/);
     if (match) {
         const dir = match[1];
-        return allTracks.find(track => track.directory === dir);
+        return trackData.find(track => track.directory === dir);
     }
 
     let track;
 
-    track = allTracks.find(track => track.directory === ref);
+    track = trackData.find(track => track.directory === ref);
     if (track) {
         return track;
     }
 
-    track = allTracks.find(track => track.name === ref);
+    track = trackData.find(track => track.name === ref);
     if (track) {
         return track;
     }
 
-    track = allTracks.find(track => track.name.toLowerCase() === ref.toLowerCase());
+    track = trackData.find(track => track.name.toLowerCase() === ref.toLowerCase());
     if (track) {
         console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
         console.warn(`\x1b[31m- ${ref}\x1b[0m`);
         console.warn(`\x1b[32m+ ${track.name}\x1b[0m`);
         return track;
     }
+
+    return null;
 }
 
 function getLinkedAlbum(ref) {
+    if (!ref) return null;
     ref = ref.replace('album:', '');
-    let album
+    let album;
     album = albumData.find(album => album.directory === ref);
     if (!album) album = albumData.find(album => album.name === ref);
     if (!album) {
@@ -2656,7 +2850,28 @@ function getLinkedAlbum(ref) {
     return album;
 }
 
+function getLinkedGroup(ref) {
+    if (!ref) return null;
+    ref = ref.replace('group:', '');
+    let group;
+    group = groupData.find(group => group.directory === ref);
+    if (!group) group = groupData.find(group => group.name === ref);
+    if (!group) {
+        group = groupData.find(group => group.name.toLowerCase() === ref.toLowerCase());
+        if (group) {
+            console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
+            console.warn(`\x1b[31m- ${ref}\x1b[0m`);
+            console.warn(`\x1b[32m+ ${group.name}\x1b[0m`);
+            return group;
+        }
+    }
+    return group;
+}
+
 function getLinkedArtist(ref) {
+    if (!ref) return null;
+    ref = ref.replace('artist:', '');
+
     let artist = artistData.find(artist => C.getArtistDirectory(artist.name) === ref);
     if (artist) {
         return artist;
@@ -2666,24 +2881,44 @@ function getLinkedArtist(ref) {
     if (artist) {
         return artist;
     }
+
+    return null;
 }
 
 function getLinkedFlash(ref) {
+    if (!ref) return null;
     ref = ref.replace('flash:', '');
     return flashData.find(flash => flash.directory === ref);
 }
 
-const getFlashesThatFeature = cacheOneArg(track =>
-    flashData.filter(flash => (getTracksFeaturedByFlash(flash) || []).includes(track)));
+function getLinkedTag(ref) {
+    if (!ref) return null;
 
-const getTracksFeaturedByFlash = cacheOneArg(flash =>
-    flash.tracks && flash.tracks.map(t => getLinkedTrack(t)));
+    ref = ref.replace('tag:', '');
+
+    let tag = tagData.find(tag => tag.directory === ref);
+    if (tag) {
+        return tag;
+    }
+
+    if (ref.startsWith('cw: ')) {
+        ref = ref.slice(4);
+    }
+
+    tag = tagData.find(tag => tag.name === ref);
+    if (tag) {
+        return tag;
+    }
+
+    return null;
+}
 
 function getArtistString(artists, showIcons = false) {
     return joinNoOxford(artists.map(({ who, what }) => {
-        const { urls = [] } = artistData.find(({ name }) => name === who) || {};
+        if (!who) console.log(artists);
+        const { urls, directory, name } = who;
         return (
-            `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(who)}/">${who}</a>` +
+            `<a href="${C.ARTIST_DIRECTORY}/${directory}/">${name}</a>` +
             (what ? ` (${getContributionString({what})})` : '') +
             (showIcons && urls.length ? ` <span class="icons">(${urls.map(iconifyURL).join(', ')})</span>` : '')
         );
@@ -2806,8 +3041,6 @@ function chronologyLinks(currentTrack, {
         return `<div class="chronology">(See artist pages for chronology info!)</div>`;
     }
     return artists.map(artist => {
-        if (!artistNames.includes(artist)) return '';
-
         const releasedThings = sourceData.filter(thing => {
             const album = albumData.includes(thing) ? thing : thing.album;
             if (album && album.directory === C.UNRELEASED_TRACKS_DIRECTORY) {
@@ -2830,7 +3063,7 @@ function chronologyLinks(currentTrack, {
             next && `<a href="${getHrefOfAnythingMan(next)}" title="${next.name}">Next</a>`
         ].filter(Boolean);
 
-        const heading = `${th(index + 1)} ${headingWord} by <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist)}/">${artist}</a>`;
+        const heading = `${th(index + 1)} ${headingWord} by <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>`;
 
         return fixWS`
             <div class="chronology">
@@ -2857,9 +3090,9 @@ function generateAlbumNavLinks(album, currentTrack = null) {
     ];
 
     if (previousLine || nextLine) {
-        return `(${[previousLine, nextLine].filter(Boolean).join(', ')}<span class="js-hide">, ${randomLine}</span>)`;
+        return `(${[previousLine, nextLine].filter(Boolean).join(', ')}<span class="js-hide-until-data">, ${randomLine}</span>)`;
     } else {
-        return `<span class="js-hide">(${randomLine})</span>`;
+        return `<span class="js-hide-until-data">(${randomLine})</span>`;
     }
 }
 
@@ -2867,7 +3100,7 @@ function generateAlbumChronologyLinks(album, currentTrack = null) {
     return [
         currentTrack && chronologyLinks(currentTrack, {
             headingWord: 'track',
-            sourceData: allTracks,
+            sourceData: trackData,
             filters: [
                 {
                     mapProperty: 'artists',
@@ -2895,7 +3128,7 @@ function generateAlbumChronologyLinks(album, currentTrack = null) {
 function generateSidebarForAlbum(album, currentTrack = null) {
     const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.name}</a></li>`;
     const listTag = getAlbumListTag(album);
-    return fixWS`
+    return {content: fixWS`
         <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/">${album.name}</a></h1>
         ${album.usesGroups ? fixWS`
             <dl>
@@ -2919,13 +3152,133 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                 ${album.tracks.map(trackToListItem).join('\n')}
             </${listTag}>
         `}
+    `};
+}
+
+function generateSidebarRightForAlbum(album, currentTrack = null) {
+    const { groups } = album;
+    if (groups.length) {
+        return {
+            multiple: groups.map(group => {
+                const index = group.albums.indexOf(album);
+                const next = group.albums[index + 1];
+                const previous = group.albums[index - 1];
+                return {group, next, previous};
+            }).map(({group, next, previous}) => fixWS`
+                <h1><a href="${C.GROUP_DIRECTORY}/${group.directory}/">${group.name}</a></h1>
+                ${!currentTrack && group.descriptionShort}
+                <p>Visit on ${joinNoOxford(group.urls.map(fancifyURL), 'or')}.</p>
+                ${!currentTrack && fixWS`
+                    ${next && `<p class="group-chronology-link">Next: <a href="${C.ALBUM_DIRECTORY}/${next.directory}/" style="${getThemeString(next)}">${next.name}</a></p>`}
+                    ${previous && `<p class="group-chronology-link">Previous: <a href="${C.ALBUM_DIRECTORY}/${previous.directory}/" style="${getThemeString(previous)}">${previous.name}</a></p>`}
+                `}
+            `)
+        };
+    };
+}
+
+function generateSidebarForGroup(isGallery = false, currentGroup = null) {
+    return `
+        <h1>Groups</h1>
+        <ul>
+            ${groupData.map(group => fixWS`
+                <li ${classes(group === currentGroup && 'current')}>
+                    <a href="${C.GROUP_DIRECTORY}/${group.directory}/${isGallery && 'gallery/'}">${group.name}</a>
+                </li>
+            `).join('\n')}
+        </ul>
     `
+}
+
+function writeGroupPages() {
+    return progressPromiseAll(`Writing group pages.`, queue(groupData.map(curry(writeGroupPage)), queueSize));
+}
+
+async function writeGroupPage(group) {
+    const releasedAlbums = group.albums.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
+    const totalDuration = getTotalDuration(releasedTracks);
+
+    await writePage([C.GROUP_DIRECTORY, group.directory], {
+        title: group.name,
+        body: {
+            style: getThemeString(group)
+        },
+        main: {
+            content: fixWS`
+                <h1>${group.name}</h1>
+                <blockquote>
+                    ${transformMultiline(group.description)}
+                </blockquote>
+                <p>Albums:</p>
+                <ul>
+                    ${group.albums.map(album => fixWS`
+                        <li>
+                            (${album.date.getFullYear()})
+                            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a>
+                        </li>
+                    `).join('\n')}
+                </ul>
+            `
+        },
+        sidebar: {
+            content: generateSidebarForGroup(false, group)
+        },
+        nav: {
+            links: [
+                ['./', SITE_SHORT_TITLE],
+                [`${C.LISTING_DIRECTORY}/`, 'Listings'],
+                [null, 'Group:'],
+                [`${C.GROUP_DIRECTORY}/${group.directory}/`, group.name],
+                [null, `(${[
+                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/" class="current">Info</a>`,
+                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/">Gallery</a>`
+                ].join(', ')})`]
+            ]
+        }
+    });
+
+    await writePage([C.GROUP_DIRECTORY, group.directory, 'gallery'], {
+        title: `${group.name} - Gallery`,
+        body: {
+            style: getThemeString(group)
+        },
+        main: {
+            classes: ['top-index'],
+            content: fixWS`
+                <h1>${group.name} - Gallery</h1>
+                <p class="quick-info"><b>${releasedTracks.length}</b> track${releasedTracks.length === 1 ? '' : 's'} across <b>${releasedAlbums.length}</b> album${releasedAlbums.length === 1 ? '' : 's'}, totaling <b>~${getDurationString(totalDuration)}</b> ${totalDuration > 3600 ? 'hours' : 'minutes'}.</p>
+                <div class="grid-listing">
+                    ${getGridHTML({
+                        entries: C.sortByDate(group.albums.map(item => ({item}))).reverse(),
+                        srcFn: getAlbumCover,
+                        hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`
+                    })}
+                </div>
+            `
+        },
+        sidebar: {
+            content: generateSidebarForGroup(true, group)
+        },
+        nav: {
+            links: [
+                ['./', SITE_SHORT_TITLE],
+                [`${C.LISTING_DIRECTORY}/`, 'Listings'],
+                [null, 'Group:'],
+                [`${C.GROUP_DIRECTORY}/${group.directory}/`, group.name],
+                [null, `(${[
+                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/">Info</a>`,
+                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/" class="current">Gallery</a>`
+                ].join(', ')})`]
+            ]
+        }
+    });
 }
 
 function getHrefOfAnythingMan(anythingMan) {
     return (
         albumData.includes(anythingMan) ? C.ALBUM_DIRECTORY :
-        allTracks.includes(anythingMan) ? C.TRACK_DIRECTORY :
+        trackData.includes(anythingMan) ? C.TRACK_DIRECTORY :
         flashData.includes(anythingMan) ? C.FLASH_DIRECTORY :
         'idk-bud'
     ) + '/' + (
@@ -3050,7 +3403,7 @@ async function main() {
         }
     }
 
-    allTracks = C.getAllTracks(albumData);
+    trackData = C.getAllTracks(albumData);
 
     flashData = await processFlashDataFile(path.join(C.DATA_DIRECTORY, FLASH_DATA_FILE));
     if (flashData.error) {
@@ -3100,6 +3453,22 @@ async function main() {
         }
     }
 
+    groupData = await processGroupDataFile(path.join(C.DATA_DIRECTORY, GROUP_DATA_FILE));
+    if (groupData.error) {
+        console.log(`\x1b[31;1m${groupData.error}\x1b[0m`);
+        return;
+    }
+
+    {
+        const errors = groupData.filter(obj => obj.error);
+        if (errors.length) {
+            for (const error of errors) {
+                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
+            }
+            return;
+        }
+    }
+
     newsData = await processNewsDataFile(path.join(C.DATA_DIRECTORY, NEWS_DATA_FILE));
     if (newsData.error) {
         console.log(`\x1b[31;1m${newsData.error}\x1b[0m`);
@@ -3115,7 +3484,7 @@ async function main() {
     }
 
     {
-        const tagNames = new Set([...allTracks, ...albumData].flatMap(thing => thing.artTags));
+        const tagNames = new Set([...trackData, ...albumData].flatMap(thing => thing.artTags));
 
         for (let { name, isCW } of tagData) {
             if (isCW) {
@@ -3136,7 +3505,7 @@ async function main() {
 
     officialAlbumData = albumData.filter(album => !album.isFanon);
     fandomAlbumData = albumData.filter(album => album.isFanon);
-    justEverythingMan = C.sortByDate(albumData.concat(allTracks, flashData.filter(flash => !flash.act8r8k)));
+    justEverythingMan = C.sortByDate(albumData.concat(trackData, flashData.filter(flash => !flash.act8r8k)));
     justEverythingSortedByArtDateMan = C.sortByArtDate(justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(getHrefOfAnythingMan), null, 2));
 
@@ -3206,7 +3575,7 @@ async function main() {
     {
         const directories = [];
         const where = {};
-        for (const { directory, album } of allTracks) {
+        for (const { directory, album } of trackData) {
             if (directories.includes(directory)) {
                 console.log(`\x1b[31;1mDuplicate track directory "${directory}"\x1b[0m`);
                 console.log(`Shows up in:`);
@@ -3234,7 +3603,7 @@ async function main() {
     }
 
     {
-        for (const { references, name, album } of allTracks) {
+        for (const { references, name, album } of trackData) {
             for (const ref of references) {
                 // Skip these, for now.
                 if (ref.includes("by")) {
@@ -3247,12 +3616,81 @@ async function main() {
         }
     }
 
+    contributionData = Array.from(new Set([
+        ...trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
+        ...albumData.flatMap(album => [...album.coverArtists || [], ...album.artists || []]),
+        ...flashData.flatMap(flash => [...flash.contributors || []])
+    ]));
+
+    // Now that we have all the data, resolve references all 8efore actually
+    // gener8ting any of the pages, 8ecause page gener8tion is going to involve
+    // accessing these references a lot, and there's no reason to resolve them
+    // more than once. (We 8uild a few additional links that can't 8e cre8ted
+    // at initial data processing time here too.)
+
+    const filterNull = (parent, key) => {
+        for (const obj of parent) {
+            const array = obj[key];
+            for (let i = 0; i < array.length; i++) {
+                if (!Boolean(array[i])) {
+                    const prev = array[i - 1] && array[i - 1].name;
+                    const next = array[i + 1] && array[i + 1].name;
+                    console.log(`\x1b[33mUnexpected null in ${obj.name} (${key}) - prev: ${prev}, next: ${next}\x1b[0m`);
+                }
+            }
+            array.splice(0, array.length, ...array.filter(Boolean));
+        }
+    };
+
+    const actlessFlashData = flashData.filter(flash => !flash.act8r8k);
+
+    trackData.forEach(track => mapInPlace(track.references, getLinkedTrack));
+    trackData.forEach(track => track.aka = getLinkedTrack(track.aka));
+    trackData.forEach(track => mapInPlace(track.artTags, getLinkedTag));
+    albumData.forEach(album => mapInPlace(album.groups, getLinkedGroup));
+    albumData.forEach(album => mapInPlace(album.artTags, getLinkedTag));
+    artistData.forEach(artist => artist.alias = getLinkedArtist(artist.alias));
+    actlessFlashData.forEach(flash => mapInPlace(flash.tracks, getLinkedTrack));
+    contributionData.forEach(contrib => contrib.who = getLinkedArtist(contrib.who));
+
+    filterNull(trackData, 'references');
+    filterNull(albumData, 'groups');
+    filterNull(actlessFlashData, 'tracks');
+
+    trackData.forEach(track1 => track1.referencedBy = trackData.filter(track2 => track2.references.includes(track1)));
+    trackData.forEach(track => track.flashes = actlessFlashData.filter(flash => flash.tracks.includes(track)));
+    groupData.forEach(group => group.albums = albumData.filter(album => album.groups.includes(group)));
+    tagData.forEach(tag => tag.things = C.sortByArtDate([...albumData, ...trackData]).filter(thing => thing.artTags.includes(tag)));
+
+    trackData.forEach(track => track.otherReleases = [
+        track.aka,
+        ...trackData.filter(({ aka }) => aka === track)
+    ].filter(Boolean));
+
+    artistData.forEach(artist => {
+        const filterProp = prop => trackData.filter(track => track[prop]?.some(({ who }) => who === artist));
+        artist.tracks = {
+            asArtist: filterProp('artists'),
+            asContributor: filterProp('contributors'),
+            asCoverArtist: filterProp('coverArtists'),
+            asAny: trackData.filter(track => (
+                [...track.artists, ...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artist)
+            ))
+        };
+        artist.albums = albumData.filter(album => (
+            [...album.coverArtists].some(({ who }) => who === artist)
+        ));
+        artist.flashes = flashData.filter(flash => (
+            [...flash.contributors || []].some(({ who }) => who === artist)
+        ));
+    });
+
     /*
     console.log(artistData
         .filter(a => !a.alias)
         .map(a => ({
             artist: a.name,
-            things: C.getThingsArtistContributedTo(a.name, {allTracks, albumData, flashData}),
+            things: C.getThingsArtistContributedTo(a.name, {trackData, albumData, flashData}),
             urls: a.urls.filter(url =>
                 url.includes('youtu') ||
                 url.includes('soundcloud') ||
@@ -3264,7 +3702,7 @@ async function main() {
         .filter(a => a.urls.length === 0)
         .map(a => ({
             ...a,
-            things: (C.getThingsArtistContributedTo(a.artist, {allTracks, albumData, flashData}))}))
+            things: (C.getThingsArtistContributedTo(a.artist, {trackData, albumData, flashData}))}))
         .sort((a, b) => b.things.length - a.things.length)
         .map(a => [
             `* ${a.artist} (${a.things.length} c.)`// .padEnd(40, '.') +
@@ -3289,13 +3727,57 @@ async function main() {
     process.exit();
     */
 
+    const miscOptions = await parseOptions(process.argv.slice(2), {
+        'queue-size': {
+            type: 'value',
+            validate(size) {
+                if (parseInt(size) !== parseFloat(size)) return 'an integer';
+                if (parseInt(size) < 0) return 'a counting number or zero';
+                return true;
+            }
+        },
+        queue: {alias: 'queue-size'},
+
+        [parseOptions.handleUnknown]: () => {}
+    });
+
+    // Makes writing a little nicer on CPU theoretically, 8ut also costs in
+    // performance right now 'cuz it'll w8 for file writes to 8e completed
+    // 8efore moving on to more data processing. So, defaults to zero, which
+    // disa8les the queue feature altogether.
+    queueSize = +(miscOptions['queue-size'] ?? 0);
+
+    // NOT for ena8ling or disa8ling specific features of the site!
+    // This is only in charge of what general groups of files to 8uild.
+    // They're here to make development quicker when you're only working
+    // on some particular area(s) of the site rather than making changes
+    // across all of them.
+    const buildFlags = await parseOptions(process.argv.slice(2), {
+        all: {type: 'flag'}, // Defaults to true if none 8elow specified.
+
+        album: {type: 'flag'},
+        artist: {type: 'flag'},
+        flash: {type: 'flag'},
+        group: {type: 'flag'},
+        list: {type: 'flag'},
+        misc: {type: 'flag'},
+        tag: {type: 'flag'},
+        track: {type: 'flag'},
+
+        [parseOptions.handleUnknown]: () => {}
+    });
+
+    const buildAll = !Object.keys(buildFlags).length || buildFlags.all;
+
     await writeSymlinks();
-    await writeMiscellaneousPages();
-    await writeListingPages();
-    await writeTagPages();
-    await progressPromiseAll(`Writing album & track pages.`, queue(albumData.map(album => writeIndexAndTrackPagesForAlbum(album)).reduce((a, b) => a.concat(b))));
-    await writeArtistPages();
-    await writeFlashPages();
+    if (buildAll || buildFlags.misc) await writeMiscellaneousPages();
+    if (buildAll || buildFlags.list) await writeListingPages();
+    if (buildAll || buildFlags.tag) await writeTagPages();
+    if (buildAll || buildFlags.group) await writeGroupPages();
+    if (buildAll || buildFlags.album) await writeAlbumPages();
+    if (buildAll || buildFlags.track) await writeTrackPages();
+    if (buildAll || buildFlags.artist) await writeArtistPages();
+    if (buildAll || buildFlags.flash) await writeFlashPages();
 
     decorateTime.displayTime();
 

@@ -79,6 +79,7 @@ const C = {
     CHANGELOG_DIRECTORY: 'changelog',
     FLASH_DIRECTORY: 'flash',
     NEWS_DIRECTORY: 'news',
+    GROUP_DIRECTORY: 'group',
     JS_DISABLED_DIRECTORY: 'js-disabled',
 
     UNRELEASED_TRACKS_DIRECTORY: 'unreleased-tracks',
@@ -123,22 +124,9 @@ const C = {
     // "directories", we just reformat the artist's name.
     getArtistDirectory: artistName => C.getKebabCase(artistName),
 
-    getThingsArtistContributedTo: (artistName, {allTracks, albumData, flashData}) => [
-        ...allTracks.filter(track => [
-            ...track.artists,
-            ...track.contributors,
-            ...track.coverArtists || []
-        ].some(({ who }) => who === artistName)),
-        ...flashData.filter(flash => (flash.contributors || []).some(({ who }) => who === artistName)),
-        ...albumData.filter(album =>
-            (album.coverArtists || []).some(({ who }) => who === artistName))
-    ],
+    getArtistNumContributions: artist => (artist.tracks.length + artist.albums.length + artist.flashes.length),
 
-    getArtistNumContributions: (artistName, {allTracks, albumData, flashData}) => (
-        C.getThingsArtistContributedTo(artistName, {allTracks, albumData, flashData}).length
-    ),
-
-    getArtistCommentary: (artistName, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artistName + ':</i>'))
+    getArtistCommentary: (artist, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'))
 };
 
 if (typeof module === 'object') {
