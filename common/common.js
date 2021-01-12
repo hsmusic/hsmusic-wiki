@@ -77,12 +77,16 @@ const C = {
     ABOUT_DIRECTORY: 'about',
     FEEDBACK_DIRECTORY: 'feedback',
     CHANGELOG_DIRECTORY: 'changelog',
+    DISCORD_DIRECTORY: 'discord',
+    DONATE_DIRECTORY: 'donate',
     FLASH_DIRECTORY: 'flash',
     NEWS_DIRECTORY: 'news',
     GROUP_DIRECTORY: 'group',
     JS_DISABLED_DIRECTORY: 'js-disabled',
 
     UNRELEASED_TRACKS_DIRECTORY: 'unreleased-tracks',
+    OFFICIAL_GROUP_DIRECTORY: 'official',
+    FANDOM_GROUP_DIRECTORY: 'fandom',
 
     // This function was originally made to sort just al8um data, 8ut its exact
     // code works fine for sorting tracks too, so I made the varia8les and names
@@ -124,7 +128,11 @@ const C = {
     // "directories", we just reformat the artist's name.
     getArtistDirectory: artistName => C.getKebabCase(artistName),
 
-    getArtistNumContributions: artist => (artist.tracks.length + artist.albums.length + artist.flashes.length),
+    getArtistNumContributions: artist => (
+        artist.tracks.asAny.length +
+        artist.albums.asCoverArtist.length +
+        artist.flashes.asContributor.length
+    ),
 
     getArtistCommentary: (artist, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'))
 };

@@ -31,7 +31,7 @@ body::before {
     height: 100%;
     z-index: -1;
 
-    background-image: url("https://www.homestuck.com/images/desktops/johnhouse_1920x1080.jpg");
+    background-image: url("bg.jpg");
     background-position: center;
     background-size: cover;
     opacity: 0.5;
@@ -41,7 +41,7 @@ body::before {
     background-color: var(--bg-color);
     color: rgb(var(--fg-shade), var(--fg-shade), var(--fg-shade));
 
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 10px auto 50px;
     padding: 15px;
 
@@ -120,8 +120,12 @@ a:hover {
 }
 
 #header .chronology {
-    display: inline;
-    white-space: nowrap;
+    display: inline-block;
+}
+
+#header .chronology .heading,
+#header .chronology .buttons {
+    display: inline-block;
 }
 
 .nowrap {
@@ -164,32 +168,6 @@ a:hover {
 .content-columns .column h2 {
     margin-top: 0;
     font-size: 1em;
-}
-
-@media (max-width: 780px) {
-    .sidebar:not(.no-hide) {
-        display: none;
-    }
-
-    .layout-columns.vertical-when-thin {
-        flex-direction: column;
-    }
-
-    .layout-columns.vertical-when-thin > *:not(:last-child) {
-        margin-bottom: 10px;
-    }
-
-    .sidebar.no-hide {
-        max-width: unset !important;
-        flex-basis: unset !important;
-        margin-right: 0;
-    }
-}
-
-@media (max-width: 600px) {
-    .content-columns {
-        columns: 1;
-    }
 }
 
 .sidebar, #content, #header, #skippers {
@@ -727,5 +705,36 @@ li > ul {
 
     100% {
         content: '.';
+    }
+}
+
+@media (max-width: 900px) {
+    .sidebar-column:not(.no-hide) {
+        display: none;
+    }
+
+    .layout-columns.vertical-when-thin {
+        flex-direction: column;
+    }
+
+    .layout-columns.vertical-when-thin > *:not(:last-child) {
+        margin-bottom: 10px;
+    }
+
+    .sidebar-column.no-hide {
+        max-width: unset !important;
+        flex-basis: unset !important;
+        margin-right: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    .sidebar .news-entry:not(.first-news-entry) {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .content-columns {
+        columns: 1;
     }
 }

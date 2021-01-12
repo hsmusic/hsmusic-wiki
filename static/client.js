@@ -167,8 +167,8 @@ fetch(rebase('data.json')).then(data => data.json()).then(data => {
     artistData = data.artistData;
     flashData = data.flashData;
 
-    officialAlbumData = albumData.filter(album => !album.isFanon);
-    fandomAlbumData = albumData.filter(album => album.isFanon);
+    officialAlbumData = albumData.filter(album => album.groups.includes('group:official'));
+    fandomAlbumData = albumData.filter(album => !album.groups.includes('group:official'));
     artistNames = artistData.filter(artist => !artist.alias).map(artist => artist.name);
 
     for (const element of elements1) element.style.display = 'none';
