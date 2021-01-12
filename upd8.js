@@ -116,6 +116,8 @@ const {
 
 const C = require('./common/common');
 
+const CACHEBUST = 1;
+
 const SITE_CANONICAL_BASE = 'https://hsmusic.wiki/';
 const SITE_TITLE = 'Homestuck Music Wiki';
 const SITE_SHORT_TITLE = 'HSMusic';
@@ -1283,8 +1285,8 @@ async function writePage(directoryParts, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 <link rel="canonical" href="${canonical}">
-                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css">
-                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js"></script>
+                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
+                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js?${CACHEBUST}"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
                 <div id="page-container">
@@ -1296,8 +1298,8 @@ async function writePage(directoryParts, {
                     `}
                     ${layoutHTML}
                 </div>
-                <script src="${C.COMMON_DIRECTORY}/common.js"></script>
-                <script src="${C.STATIC_DIRECTORY}/client.js"></script>
+                <script src="${C.COMMON_DIRECTORY}/common.js?${CACHEBUST}"></script>
+                <script src="${C.STATIC_DIRECTORY}/client.js?${CACHEBUST}"></script>
             </body>
         </html>
     `));
