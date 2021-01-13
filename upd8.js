@@ -1293,7 +1293,8 @@ async function writePage(directoryParts, {
                     ${mainHTML && fixWS`
                         <div id="skippers">
                             <span class="skipper"><a href="#content">Skip to content</a></span>
-                            ${sidebar.content && `<span class="skipper"><a href="#sidebar-left">Skip to sidebar</a></span>`}
+                            ${sidebarLeftHTML && `<span class="skipper"><a href="#sidebar-left">Skip to sidebar ${sidebarRightHTML && '(left)'}</a></span>`}
+                            ${sidebarRightHTML && `<span class="skipper"><a href="#sidebar-right">Skip to sidebar ${sidebar.content && '(right)'}</a></span>`}
                         </div>
                     `}
                     ${layoutHTML}
