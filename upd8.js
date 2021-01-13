@@ -3347,7 +3347,7 @@ async function writeGroupPage(group) {
             content: fixWS`
                 <h1>${group.name} - Gallery</h1>
                 <p class="quick-info"><b>${releasedTracks.length}</b> track${releasedTracks.length === 1 ? '' : 's'} across <b>${releasedAlbums.length}</b> album${releasedAlbums.length === 1 ? '' : 's'}, totaling <b>~${getDurationString(totalDuration)}</b> ${totalDuration > 3600 ? 'hours' : 'minutes'}.</p>
-                ${group.directory === C.FANDOM_GROUP_DIRECTORY && `<p class="quick-info">(<a href="${C.LISTING_DIRECTORY}/groups/by-category/">Choose a group to filter by!</a>)</p>`}
+                <p class="quick-info">(<a href="${C.LISTING_DIRECTORY}/groups/by-category/">Choose another group to filter by!</a>)</p>
                 <div class="grid-listing">
                     ${getGridHTML({
                         entries: C.sortByDate(group.albums.map(item => ({item}))).reverse(),
