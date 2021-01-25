@@ -31,7 +31,7 @@ body::before {
     height: 100%;
     z-index: -1;
 
-    background-image: url("bg.jpg");
+    background-image: url("../media/bg.jpg");
     background-position: center;
     background-size: cover;
     opacity: 0.5;
@@ -80,10 +80,17 @@ a:hover {
     display: flex;
 }
 
-#header, #skippers {
-    margin-bottom: 10px;
+#header, #skippers, #footer {
     padding: 5px;
     font-size: 0.85em;
+}
+
+#header, #skippers {
+    margin-bottom: 10px;
+}
+
+#footer {
+    margin-top: 10px;
 }
 
 #header {
@@ -128,6 +135,19 @@ a:hover {
     display: inline-block;
 }
 
+footer {
+    text-align: center;
+    font-style: oblique;
+}
+
+footer > :first-child {
+    margin-top: 0;
+}
+
+footer > :last-child {
+    margin-bottom: 0;
+}
+
 .nowrap {
     white-space: nowrap;
 }
@@ -170,7 +190,7 @@ a:hover {
     font-size: 1em;
 }
 
-.sidebar, #content, #header, #skippers {
+.sidebar, #content, #header, #skippers, #footer {
     background-color: rgba(var(--bg-shade), var(--bg-shade), var(--bg-shade), 0.6);
     border: 1px dotted var(--fg-color);
     border-radius: 3px;

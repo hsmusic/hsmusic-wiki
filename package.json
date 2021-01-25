@@ -1,11 +1,14 @@
 {
-  "name": "hs-music-wiki",
-  "version": "0.0.1",
-  "description": "fan wiki for homestuck albums",
-  "main": "upd8.js",
-  "dependencies": {
-    "fix-whitespace": "^1.0.3",
-    "mkdirp": "^0.5.5"
-  },
-  "license": "GPL-3.0"
+    "name": "hsmusic-wiki",
+    "version": "0.1.0",
+    "description": "static wiki software cataloguing collaborative creation",
+    "main": "upd8.js",
+    "bin": {
+        "hsmusic": "./upd8.js"
+    },
+    "dependencies": {
+        "fix-whitespace": "^1.0.3",
+        "mkdirp": "^0.5.5"
+    },
+    "license": "GPL-3.0"
 }

@@ -8,15 +8,17 @@ const C = {
     // of the whole dang site. Just keep in mind that the gener8ted result will
     // contain a couple symlinked directories, so if you're uploading, you're
     // pro8a8ly gonna want to resolve those yourself.
-    SITE_DIRECTORY: 'site',
+    // DEFAULT_OUTPUT_DIRECTORY: 'site',
 
     // Data files for the site, including flash, artist, and al8um data.
     // There are also some HTML files here, which are read and em8edded as
     // content in a few gener8ted pages (e.g. the changelog).
-    DATA_DIRECTORY: 'data',
+    // DEFAULT_DATA_DIRECTORY: 'data',
 
-    // Su8directory under data for al8um files.
-    DATA_ALBUM_DIRECTORY: 'album',
+    // Static media will 8e referenced in the site here!
+    // The contents are categorized; see MEDIA_DIRECTORY and 8elow.
+    // (This gets symlinked into SITE_DIRECTORY.)
+    // DEFAULT_MEDIA_DIRECTORY: 'media',
 
     // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
     // site code should 8e put here. Which, uh, only really means this one
@@ -29,9 +31,11 @@ const C = {
     // (This gets symlinked into SITE_DIRECTORY.)
     STATIC_DIRECTORY: 'static',
 
-    // Static media will 8e referenced in the site here!
-    // The contents are categorized 8y the constants 8elow.
-    // (This gets symlinked into SITE_DIRECTORY.)
+    // Su8directory under DATA_DIRECTORY for al8um files.
+    DATA_ALBUM_DIRECTORY: 'album',
+
+    // Media files! This is symlinked from the provided media directory, which
+    // may be DEfAULT_MEDIA_DIRECTORY.
     MEDIA_DIRECTORY: 'media',
 
     // Contains a folder for each al8um, within which is the al8um cover art
@@ -45,6 +49,12 @@ const C = {
     // directory like al8um and track art. (Just keep in mind the directory of
     // a flash is just its page num8er most of the time.)
     MEDIA_FLASH_ART_DIRECTORY: 'flash-art',
+
+    // Again, a single folder, with one image for each artist, matching their
+    // output directory (which is usually their name in ke8a8-case). Although,
+    // unlike other art directories, you don't to specify an image for *every*
+    // artist - and present files will 8e automatically added!
+    MEDIA_ARTIST_AVATAR_DIRECTORY: 'artist-avatar',
 
     // Miscellaneous stuff! This is pretty much only referenced in commentary
     // fields.
@@ -74,9 +84,7 @@ const C = {
     ARTIST_AVATAR_DIRECTORY: 'artist-avatar',
     TAG_DIRECTORY: 'tag',
     LISTING_DIRECTORY: 'list',
-    ABOUT_DIRECTORY: 'about',
     FEEDBACK_DIRECTORY: 'feedback',
-    CHANGELOG_DIRECTORY: 'changelog',
     DISCORD_DIRECTORY: 'discord',
     DONATE_DIRECTORY: 'donate',
     FLASH_DIRECTORY: 'flash',
@@ -131,7 +139,7 @@ const C = {
     getArtistNumContributions: artist => (
         artist.tracks.asAny.length +
         artist.albums.asCoverArtist.length +
-        artist.flashes.asContributor.length
+        (artist.flashes ? artist.flashes.asContributor.length : 0)
     ),
 
     getArtistCommentary: (artist, {justEverythingMan}) => justEverythingMan.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'))

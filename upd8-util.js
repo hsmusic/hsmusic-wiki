@@ -28,6 +28,8 @@ module.exports.splitArray = function*(array, fn) {
 
 // This function's name is a joke. Jokes! Hahahahahahahaha. Funny.
 module.exports.joinNoOxford = function(array, plural = 'and') {
+    array = array.filter(Boolean);
+
     if (array.length === 0) {
         // ????????
         return '';
@@ -45,6 +47,10 @@ module.exports.joinNoOxford = function(array, plural = 'and') {
 };
 
 module.exports.progressPromiseAll = function (msg, array) {
+    if (!array.length) {
+        return Promise.resolve([]);
+    }
+
     let done = 0, total = array.length;
     process.stdout.write(`\r${msg} [0/${total}]`);
     const start = Date.now();
@@ -296,3 +302,5 @@ module.exports.parseOptions = parseOptions;
 module.exports.curry = f => x => (...args) => f(x, ...args);
 
 module.exports.mapInPlace = (array, fn) => array.splice(0, array.length, ...array.map(fn));
+
+module.exports.filterEmptyLines = string => string.split('\n').filter(line => line.trim()).join('\n');
