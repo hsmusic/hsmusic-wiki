@@ -619,7 +619,7 @@ async function processAlbumDataFile(file) {
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
-    album.wallpaperOpacity = getBasicField(albumSection, 'Wallpaper Opacity') || 0.5;
+    album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
@@ -667,14 +667,9 @@ async function processAlbumDataFile(file) {
         return {error: `Invalid Date field: "${album.date}"`};
     }
 
-    if (album.wallpaperOpacity && isNaN(parseFloat(album.wallpaperOpacity))) {
-        return {error: `Invalid Wallpaper Opacity field: "${album.wallpaperOpacity}"}`};
-    }
-
     album.date = new Date(album.date);
     album.trackArtDate = new Date(album.trackArtDate);
     album.coverArtDate = new Date(album.coverArtDate);
-    album.wallpaperOpacity = parseFloat(album.wallpaperOpacity);
 
     if (isNaN(Date.parse(album.trackArtDate))) {
         return {error: `Invalid Track Art Date field: "${album.trackArtDate}"`};
@@ -1616,12 +1611,12 @@ async function writePage(directoryParts, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
+                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
                 ${stylesheet && fixWS`
                     <style>
                         ${stylesheet}
                     </style>
                 `}
-                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
                 <script src="${C.STATIC_DIRECTORY}/lazy-loading.js?${CACHEBUST}"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
@@ -1975,6 +1970,7 @@ async function writeAlbumPage(album) {
     const listTag = getAlbumListTag(album);
     await writePage([C.ALBUM_DIRECTORY, album.directory], {
         title: album.name,
+        stylesheet: getAlbumStylesheet(album),
         body: {
             style: `${getThemeString(album)}; --album-directory: ${album.directory}`
         },
@@ -2037,6 +2033,18 @@ async function writeAlbumPage(album) {
     });
 }
 
+function getAlbumStylesheet(album) {
+    if (album.wallpaperStyle) {
+        return fixWS`
+            body::before {
+                ${album.wallpaperStyle}
+            }
+        `;
+    } else {
+        return '';
+    }
+}
+
 function writeTrackPages() {
     return progressPromiseAll(`Writing track pages.`, queue(trackData.map(curry(writeTrackPage)), queueSize));
 }
@@ -2079,6 +2087,7 @@ async function writeTrackPage(track) {
 
     await writePage([C.TRACK_DIRECTORY, track.directory], {
         title: track.name,
+        stylesheet: getAlbumStylesheet(track.album),
 
         body: {
             style: `${getThemeString(track)}; --album-directory: ${album.directory}; --track-directory: ${track.directory}`
@@ -3356,7 +3365,6 @@ function getThemeString(thing) {
     );
 
     let bgUrl = '';
-    let bgOpacity = 0;
     if (album?.wallpaperArtists) {
         // The 8ack-directory (..) here is necessary 8ecause CSS doesn't want
         // to consider the fact that this is, like, not talking a8out a URL
@@ -3365,12 +3373,11 @@ function getThemeString(thing) {
         // file! 8ut I guess that's not what CSS spec says, or whatever.
         // Pretty cringe t8h.
         bgUrl = `../${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg`;
-        bgOpacity = album.wallpaperOpacity;
     }
 
     return [
         color && `--fg-color: ${color}; --dim-color: ${dim}`,
-        bgUrl && `--bg: url("${bgUrl}"); --bg-opacity: ${bgOpacity}`
+        bgUrl && `--bg: url("${bgUrl}")`
     ].filter(Boolean).join('; ');
 }
 

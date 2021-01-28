@@ -13,7 +13,6 @@
     --bg-color: #222222;
     --theme: 0; /* 0: dark (below light), 1: light (below dark) */
     --bg: url("../media/bg.jpg");
-    --bg-opacity: 0.5;
 }
 
 body {
@@ -36,7 +35,7 @@ body::before {
     background-image: var(--bg);
     background-position: center;
     background-size: cover;
-    opacity: var(--bg-opacity);
+    opacity: 0.5;
 }
 
 #page-container {
