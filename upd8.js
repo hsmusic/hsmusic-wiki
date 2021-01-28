@@ -619,6 +619,7 @@ async function processAlbumDataFile(file) {
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
+    album.wallpaperOpacity = getBasicField(albumSection, 'Wallpaper Opacity') || 0.5;
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
@@ -666,9 +667,14 @@ async function processAlbumDataFile(file) {
         return {error: `Invalid Date field: "${album.date}"`};
     }
 
+    if (album.wallpaperOpacity && isNaN(parseFloat(album.wallpaperOpacity))) {
+        return {error: `Invalid Wallpaper Opacity field: "${album.wallpaperOpacity}"}`};
+    }
+
     album.date = new Date(album.date);
     album.trackArtDate = new Date(album.trackArtDate);
     album.coverArtDate = new Date(album.coverArtDate);
+    album.wallpaperOpacity = parseFloat(album.wallpaperOpacity);
 
     if (isNaN(Date.parse(album.trackArtDate))) {
         return {error: `Invalid Track Art Date field: "${album.trackArtDate}"`};
@@ -3334,7 +3340,7 @@ function rgb2hsl(r,g,b) {
 }
 
 function getThemeString(thing) {
-    const {color, wallpaperArtists = null} = thing;
+    const {color} = thing;
 
     const [ r, g, b ] = color.slice(1)
         .match(/[0-9a-fA-F]{2,2}/g)
@@ -3350,6 +3356,7 @@ function getThemeString(thing) {
     );
 
     let bgUrl = '';
+    let bgOpacity = 0;
     if (album?.wallpaperArtists) {
         // The 8ack-directory (..) here is necessary 8ecause CSS doesn't want
         // to consider the fact that this is, like, not talking a8out a URL
@@ -3358,11 +3365,12 @@ function getThemeString(thing) {
         // file! 8ut I guess that's not what CSS spec says, or whatever.
         // Pretty cringe t8h.
         bgUrl = `../${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg`;
+        bgOpacity = album.wallpaperOpacity;
     }
 
     return [
         color && `--fg-color: ${color}; --dim-color: ${dim}`,
-        bgUrl && `--bg: url("${bgUrl}")`
+        bgUrl && `--bg: url("${bgUrl}"); --bg-opacity: ${bgOpacity}`
     ].filter(Boolean).join('; ');
 }
 
