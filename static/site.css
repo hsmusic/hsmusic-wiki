@@ -12,6 +12,7 @@
     --fg-color: #0088ff;
     --bg-color: #222222;
     --theme: 0; /* 0: dark (below light), 1: light (below dark) */
+    --bg: url("../media/bg.jpg");
 }
 
 body {
@@ -31,7 +32,7 @@ body::before {
     height: 100%;
     z-index: -1;
 
-    background-image: url("../media/bg.jpg");
+    background-image: var(--bg);
     background-position: center;
     background-size: cover;
     opacity: 0.5;

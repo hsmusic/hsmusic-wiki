@@ -618,6 +618,7 @@ async function processAlbumDataFile(file) {
 
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
+    album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
@@ -1982,6 +1983,7 @@ async function writeAlbumPage(album) {
                 <p>
                     ${album.artists && `By ${getArtistString(album.artists, true)}.<br>`}
                     ${album.coverArtists &&  `Cover art by ${getArtistString(album.coverArtists, true)}.<br>`}
+                    ${album.wallpaperArtists && `Wallpaper art by ${getArtistString(album.wallpaperArtists, true)}.<br>`}
                     Released ${getDateString(album)}.
                     ${+album.coverArtDate !== +album.date && `<br>Art released ${getDateString({date: album.coverArtDate})}.`}
                     <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.</p>
@@ -3331,7 +3333,9 @@ function rgb2hsl(r,g,b) {
     return [60*(h<0?h+6:h), f ? n/f : 0, (a+a-n)/2];
 }
 
-function getThemeString({color}) {
+function getThemeString(thing) {
+    const {color, wallpaperArtists = null} = thing;
+
     const [ r, g, b ] = color.slice(1)
         .match(/[0-9a-fA-F]{2,2}/g)
         .slice(0, 3)
@@ -3339,11 +3343,27 @@ function getThemeString({color}) {
     const [ h, s, l ] = rgb2hsl(r, g, b);
     const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
 
-    if (color) {
-        return `--fg-color: ${color}; --dim-color: ${dim}`;
-    } else {
-        return ``;
+    const album = (
+        trackData.includes(thing) ? thing.album :
+        albumData.includes(thing) ? thing :
+        null
+    );
+
+    let bgUrl = '';
+    if (album?.wallpaperArtists) {
+        // The 8ack-directory (..) here is necessary 8ecause CSS doesn't want
+        // to consider the fact that this is, like, not talking a8out a URL
+        // relative to the CSS source file. Really, what SHOULD 8e happening
+        // here is, we use path.relative to get the URL relative to the HTML
+        // file! 8ut I guess that's not what CSS spec says, or whatever.
+        // Pretty cringe t8h.
+        bgUrl = `../${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg`;
     }
+
+    return [
+        color && `--fg-color: ${color}; --dim-color: ${dim}`,
+        bgUrl && `--bg: url("${bgUrl}")`
+    ].filter(Boolean).join('; ');
 }
 
 function getFlashDirectory(flash) {
@@ -4126,7 +4146,7 @@ async function main() {
 
     contributionData = Array.from(new Set([
         ...trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
-        ...albumData.flatMap(album => [...album.coverArtists || [], ...album.artists || []]),
+        ...albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || []]),
         ...(flashData?.flatMap(flash => [...flash.contributors || []]) || [])
     ]));
 
