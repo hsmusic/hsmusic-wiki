@@ -1441,6 +1441,7 @@ function img({
 async function writePage(directoryParts, {
     title = '',
     meta = {},
+    theme = '',
     stylesheet = '',
 
     // missing properties are auto-filled, see below!
@@ -1453,12 +1454,7 @@ async function writePage(directoryParts, {
 }) {
     body.style ??= '';
 
-    if (!body.style.includes('color')) {
-        if (body.style) {
-            body.style += '; ';
-        }
-        body.style += getThemeString(wikiInfo);
-    }
+    theme = theme ?? getThemeString(wikiInfo);
 
     main.classes ??= [];
     main.content ??= '';
@@ -1611,6 +1607,11 @@ async function writePage(directoryParts, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
+                <style>
+                    body {
+                        ${theme}
+                    }
+                </style>
                 <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
                 ${stylesheet && fixWS`
                     <style>
@@ -1971,9 +1972,7 @@ async function writeAlbumPage(album) {
     await writePage([C.ALBUM_DIRECTORY, album.directory], {
         title: album.name,
         stylesheet: getAlbumStylesheet(album),
-        body: {
-            style: `${getThemeString(album)}; --album-directory: ${album.directory}`
-        },
+        theme: `${getThemeString(album)}; --album-directory: ${album.directory}`,
         main: {
             content: fixWS`
                 ${generateCoverLink({
@@ -2088,10 +2087,7 @@ async function writeTrackPage(track) {
     await writePage([C.TRACK_DIRECTORY, track.directory], {
         title: track.name,
         stylesheet: getAlbumStylesheet(track.album),
-
-        body: {
-            style: `${getThemeString(track)}; --album-directory: ${album.directory}; --track-directory: ${track.directory}`
-        },
+        theme: `${getThemeString(track)}; --album-directory: ${album.directory}; --track-directory: ${track.directory}`,
 
         sidebarLeft: generateSidebarForAlbum(album, track),
         sidebarRight: generateSidebarRightForAlbum(album, track),
@@ -2500,9 +2496,7 @@ async function writeFlashPage(flash) {
 
     await writePage([C.FLASH_DIRECTORY, kebab], {
         title: flash.name,
-        body: {
-            style: `${getThemeString(flash)}; --flash-directory: ${flash.directory}`
-        },
+        theme: `${getThemeString(flash)}; --flash-directory: ${flash.directory}`,
         main: {
             content: fixWS`
                 <h1>${flash.name}</h1>
@@ -3155,10 +3149,7 @@ function writeTagPage(tag) {
 
     return writePage([C.TAG_DIRECTORY, tag.directory], {
         title: tag.name,
-
-        body: {
-            style: getThemeString(tag)
-        },
+        theme: getThemeString(tag),
 
         main: {
             classes: ['top-index'],
@@ -3658,9 +3649,7 @@ async function writeGroupPage(group) {
 
     await writePage([C.GROUP_DIRECTORY, group.directory], {
         title: group.name,
-        body: {
-            style: getThemeString(group)
-        },
+        theme: getThemeString(group),
         main: {
             content: fixWS`
                 <h1>${group.name}</h1>
@@ -3697,9 +3686,7 @@ async function writeGroupPage(group) {
 
     await writePage([C.GROUP_DIRECTORY, group.directory, 'gallery'], {
         title: `${group.name} - Gallery`,
-        body: {
-            style: getThemeString(group)
-        },
+        theme: getThemeString(group),
         main: {
             classes: ['top-index'],
             content: fixWS`
