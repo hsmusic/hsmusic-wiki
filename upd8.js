@@ -934,9 +934,6 @@ async function processNewsDataFile(file) {
 
         let bodyShort = body.split('<hr class="split">')[0];
 
-        body = transformMultiline(body);
-        bodyShort = transformMultiline(bodyShort);
-
         return {
             name,
             body,
@@ -1032,9 +1029,6 @@ async function processGroupDataFile(file) {
         }
 
         let descriptionShort = description.split('<hr class="split">')[0];
-
-        description = transformMultiline(description);
-        descriptionShort = transformMultiline(descriptionShort);
 
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
 
@@ -1784,7 +1778,7 @@ async function writeHomepage() {
                 ${newsData.slice(0, 3).map((entry, i) => fixWS`
                     <article ${classes('news-entry', i === 0 && 'first-news-entry')}>
                         <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/#${entry.id}">${entry.name}</a></h2>
-                        ${entry.bodyShort}
+                        ${transformMultiline(entry.bodyShort)}
                         ${entry.bodyShort !== entry.body && `<a href="${C.NEWS_DIRECTORY}/#${entry.id}">(View rest of entry!)</a>`}
                     </article>
                 `).join('\n')}
@@ -1875,7 +1869,7 @@ function writeMiscellaneousPages() {
                         ${newsData.map(entry => fixWS`
                             <article id="${entry.id}">
                                 <h2><a href="#${entry.id}">${getDateString(entry)} - ${entry.name}</a></h2>
-                                ${entry.body}
+                                ${transformMultiline(entry.body)}
                             </article>
                         `).join('\n')}
                     </div>
@@ -3586,7 +3580,7 @@ function generateSidebarRightForAlbum(album, currentTrack = null) {
                 return {group, next, previous};
             }).map(({group, next, previous}) => fixWS`
                 <h1><a href="${C.GROUP_DIRECTORY}/${group.directory}/">${group.name}</a></h1>
-                ${!currentTrack && group.descriptionShort}
+                ${!currentTrack && transformMultiline(group.descriptionShort)}
                 ${group.urls.length && `<p>Visit on ${joinNoOxford(group.urls.map(fancifyURL), 'or')}.</p>`}
                 ${!currentTrack && fixWS`
                     ${next && `<p class="group-chronology-link">Next: <a href="${C.ALBUM_DIRECTORY}/${next.directory}/" style="${getThemeString(next)}">${next.name}</a></p>`}
