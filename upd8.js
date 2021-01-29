@@ -571,7 +571,40 @@ function transformMultiline(text, treatAsDocument=false) {
     }
 
     return outLines.join('\n');
-};
+}
+
+function transformLyrics(text) {
+    // Different from transformMultiline 'cuz it joins multiple lines together
+    // with line 8reaks (<br>); transformMultiline treats each line as its own
+    // complete paragraph (or list, etc).
+
+    // If it looks like old data, then like, oh god.
+    // Use the normal transformMultiline tool.
+    if (text.includes('<br')) {
+        return transformMultiline(text);
+    }
+
+    text = transformInline(text.trim());
+
+    let buildLine = '';
+    const addLine = () => outLines.push(`<p>${buildLine}</p>`);
+    const outLines = [];
+    for (const line of text.split('\n')) {
+        if (line.length) {
+            if (buildLine.length) {
+                buildLine += '<br>';
+            }
+            buildLine += line;
+        } else if (buildLine.length) {
+            addLine();
+            buildLine = '';
+        }
+    }
+    if (buildLine.length) {
+        addLine();
+    }
+    return outLines.join('\n');
+}
 
 function getCommentaryField(lines) {
     const text = getMultilineField(lines, 'Commentary');
@@ -2174,7 +2207,7 @@ async function writeTrackPage(track) {
                 ${track.lyrics && fixWS`
                     <p>Lyrics:</p>
                     <blockquote>
-                        ${transformMultiline(track.lyrics)}
+                        ${transformLyrics(track.lyrics)}
                     </blockquote>
                 `}
                 ${commentary && fixWS`
