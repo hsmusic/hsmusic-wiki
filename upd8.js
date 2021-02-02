@@ -686,7 +686,10 @@ async function processAlbumDataFile(file) {
         return {error: `The album "${album.name}" is missing the "Cover Art" field.`};
     }
 
-    album.color = getBasicField(albumSection, 'FG') || '#0088ff';
+    album.color = (
+        getBasicField(albumSection, 'Color') ||
+        getBasicField(albumSection, 'FG')
+    );
 
     if (!album.name) {
         return {error: 'Expected "Album" (name) field!'};
@@ -735,7 +738,11 @@ async function processAlbumDataFile(file) {
         const groupName = getBasicField(section, 'Group');
         if (groupName) {
             group = groupName;
-            groupColor = getBasicField(section, 'FG') || album.color;
+            groupColor = (
+                getBasicField(section, 'Color') ||
+                getBasicField(section, 'FG') ||
+                album.color
+            );
             album.usesGroups = true;
             continue;
         }
@@ -885,7 +892,10 @@ async function processFlashDataFile(file) {
     return sections.map(section => {
         if (getBasicField(section, 'ACT')) {
             act = getBasicField(section, 'ACT');
-            color = getBasicField(section, 'FG');
+            color = (
+                getBasicField(section, 'Color') ||
+                getBasicField(section, 'FG')
+            );
             const anchor = getBasicField(section, 'Anchor');
             const jump = getBasicField(section, 'Jump');
             const jumpColor = getBasicField(section, 'Jump Color') || color;
@@ -3361,6 +3371,10 @@ function rgb2hsl(r,g,b) {
 }
 
 function getColorVariables(color) {
+    if (!color) {
+        color = wikiInfo.color;
+    }
+
     const [ r, g, b ] = color.slice(1)
         .match(/[0-9a-fA-F]{2,2}/g)
         .slice(0, 3)
