@@ -7,7 +7,7 @@
         "hsmusic": "./upd8.js"
     },
     "dependencies": {
-        "fix-whitespace": "^1.0.3",
+        "fix-whitespace": "^1.0.4",
         "mkdirp": "^0.5.5"
     },
     "license": "GPL-3.0"

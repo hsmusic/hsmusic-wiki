@@ -3,21 +3,11 @@
  * no need to re-run upd8.js when tweaking values here. Handy!
  */
 
-/* Pages can specify their own theme colors (used for links, and may8e other
- * things) by changing this CSS varia8le through their 8ody's style attri8ute.
- * And yes, CSS varia8les are supported in 8asically every major 8rowser.
- * No, I don't care a8out Internet Explorer.
- */
 :root {
-    --fg-color: #0088ff;
-    --bg-color: #222222;
-    --theme: 0; /* 0: dark (below light), 1: light (below dark) */
-    --bg: url("../media/bg.jpg");
+    --primary-color: #0088ff;
 }
 
 body {
-    --bg-shade: calc(255 * var(--theme));
-    --fg-shade: calc(255 * (1 - var(--theme)));
     background: black;
     margin: 10px;
     overflow-y: scroll;
@@ -32,15 +22,15 @@ body::before {
     height: 100%;
     z-index: -1;
 
-    background-image: var(--bg);
+    background-image: url("../media/bg.jpg");
     background-position: center;
     background-size: cover;
     opacity: 0.5;
 }
 
 #page-container {
-    background-color: var(--bg-color);
-    color: rgb(var(--fg-shade), var(--fg-shade), var(--fg-shade));
+    background-color: #222222;
+    color: #ffffff;
 
     max-width: 1100px;
     margin: 10px auto 50px;
@@ -50,7 +40,7 @@ body::before {
 }
 
 a {
-    color: var(--fg-color);
+    color: var(--primary-color);
     text-decoration: none;
 }
 
@@ -170,7 +160,7 @@ footer > :last-child {
     height: 24px;
     top: -0.25em;
     position: absolute;
-    fill: var(--fg-color);
+    fill: var(--primary-color);
 }
 
 .rerelease {
@@ -192,8 +182,8 @@ footer > :last-child {
 }
 
 .sidebar, #content, #header, #skippers, #footer {
-    background-color: rgba(var(--bg-shade), var(--bg-shade), var(--bg-shade), 0.6);
-    border: 1px dotted var(--fg-color);
+    background-color: rgba(0, 0, 0, 0.6);
+    border: 1px dotted var(--primary-color);
     border-radius: 3px;
 }
 
@@ -351,7 +341,7 @@ footer > :last-child {
 }
 
 .image-container {
-    border: 2px solid var(--fg-color);
+    border: 2px solid var(--primary-color);
     box-sizing: border-box;
     position: relative;
     padding: 5px;
@@ -386,7 +376,7 @@ img {
 }
 
 a.box:focus {
-    outline: 3px double var(--fg-color);
+    outline: 3px double var(--primary-color);
 }
 
 a.box:focus:not(:focus-visible) {
@@ -423,7 +413,7 @@ h1 {
     margin: 15px;
     text-align: center;
     background-color: #111111;
-    border: 1px dotted var(--fg-color);
+    border: 1px dotted var(--primary-color);
     border-radius: 2px;
     padding: 5px;
 }
@@ -593,7 +583,7 @@ ul.quick-info li:not(:last-child)::after {
     padding: 10px;
     background-color: #222222;
     text-align: center;
-    border: 1px dotted var(--fg-color);
+    border: 1px dotted var(--primary-color);
     border-radius: 2px;
 }
 

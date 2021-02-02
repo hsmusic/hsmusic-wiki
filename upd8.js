@@ -293,7 +293,7 @@ function transformInline(text) {
             const album = getLinkedAlbum(ref);
             if (album) {
                 return fixWS`
-                    <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a>
+                    <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked album ${match} does not exist!\x1b[0m`);
@@ -328,7 +328,7 @@ function transformInline(text) {
             const track = getLinkedTrack(ref);
             if (track) {
                 return fixWS`
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
@@ -338,7 +338,7 @@ function transformInline(text) {
             const tag = getLinkedTag(ref);
             if (tag) {
                 return fixWS`
-                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a>
+                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked tag ${match} does not exist!\x1b[0m`);
@@ -348,7 +348,7 @@ function transformInline(text) {
             const group = getLinkedGroup(ref);
             if (group) {
                 return fixWS`
-                    <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a>
+                    <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked group ${group} does not exist!\x1b[0m`);
@@ -364,7 +364,7 @@ function transformInline(text) {
                     name = track.name;
                 }
                 return fixWS`
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${name}</a>
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
@@ -1634,14 +1634,10 @@ async function writePage(directoryParts, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
-                <style>
-                    body {
-                        ${theme}
-                    }
-                </style>
                 <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
-                ${stylesheet && fixWS`
+                ${(theme || stylesheet) && fixWS`
                     <style>
+                        ${theme}
                         ${stylesheet}
                     </style>
                 `}
@@ -1675,7 +1671,7 @@ function getGridHTML({
     lazy = true
 }) {
     return entries.map(({ large, item }, i) => fixWS`
-        <a ${classes('grid-item', 'box', large && 'large-grid-item')} href="${hrefFn(item)}" style="${getThemeString(item)}">
+        <a ${classes('grid-item', 'box', large && 'large-grid-item')} href="${hrefFn(item)}" style="${getLinkThemeString(item)}">
             ${img({
                 src: srcFn(item),
                 alt: altFn(item),
@@ -1865,12 +1861,12 @@ function writeMiscellaneousPages() {
                         <p class="quick-info">Jump to:</p>
                         <ul class="quick-info">
                             ${flashData.filter(act => act.act8r8k && act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
-                                <li><a href="#${anchor}" style="${getThemeString({color: jumpColor})}">${jump}</a></li>
+                                <li><a href="#${anchor}" style="${getLinkThemeString({color: jumpColor})}">${jump}</a></li>
                             `).join('\n')}
                         </ul>
                     </div>
                     ${flashData.filter(flash => flash.act8r8k).map((act, i) => fixWS`
-                        <h2 id="${act.anchor}" style="${getThemeString(act)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act.act))}/">${act.act}</a></h2>
+                        <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act.act))}/">${act.act}</a></h2>
                         <div class="grid-listing">
                             ${getFlashGridHTML({
                                 entries: (flashData
@@ -1963,7 +1959,7 @@ function generateCoverLink({
             })}
             ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && `<p class="tags">Tags:
                 ${tags.filter(tag => !tag.isCW).map(tag => fixWS`
-                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a>
+                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a>
                 `).join(',\n')}
             </p>`}
         </div>
@@ -1987,7 +1983,7 @@ function writeAlbumPages() {
 
 async function writeAlbumPage(album) {
     const trackToListItem = track => fixWS`
-        <li style="${getThemeString(track)}">
+        <li style="${getLinkThemeString(track)}">
             (${getDurationString(track.duration)})
             <a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.name}</a>
             ${track.artists !== album.artists && fixWS`
@@ -1999,7 +1995,9 @@ async function writeAlbumPage(album) {
     await writePage([C.ALBUM_DIRECTORY, album.directory], {
         title: album.name,
         stylesheet: getAlbumStylesheet(album),
-        theme: `${getThemeString(album)}; --album-directory: ${album.directory}`,
+        theme: getThemeString(album, [
+            `--album-directory: ${album.directory}`
+        ]),
         main: {
             content: fixWS`
                 ${generateCoverLink({
@@ -2014,7 +2012,7 @@ async function writeAlbumPage(album) {
                     ${album.wallpaperArtists && `Wallpaper art by ${getArtistString(album.wallpaperArtists, true)}.<br>`}
                     Released ${getDateString(album)}.
                     ${+album.coverArtDate !== +album.date && `<br>Art released ${getDateString({date: album.coverArtDate})}.`}
-                    <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.</p>
+                    <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.
                 </p>
                 ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>`}
                 ${album.usesGroups ? fixWS`
@@ -2060,9 +2058,10 @@ async function writeAlbumPage(album) {
 }
 
 function getAlbumStylesheet(album) {
-    if (album.wallpaperStyle) {
+    if (album.wallpaperArtists) {
         return fixWS`
             body::before {
+                background-image: url("${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg");
                 ${album.wallpaperStyle}
             }
         `;
@@ -2094,7 +2093,7 @@ async function writeTrackPage(track) {
         <ul>
             ${tracks.map(track => fixWS`
                 <li ${classes(track.aka && 'rerelease')}>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                     <span class="by">by ${getArtistString(track.artists)}</span>
                     ${track.aka && `<span class="rerelease-label">(re-release)</span>`}
                 </li>
@@ -2107,14 +2106,17 @@ async function writeTrackPage(track) {
         ...otherReleases.map(track =>
             (track.commentary?.split('\n')
                 .filter(line => line.replace(/<\/b>/g, '').includes(':</i>'))
-                .flatMap(line => [line, `<i>See <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>!</i>`])
+                .flatMap(line => [line, `<i>See <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>!</i>`])
                 .join('\n')))
     ].filter(Boolean).join('\n');
 
     await writePage([C.TRACK_DIRECTORY, track.directory], {
         title: track.name,
         stylesheet: getAlbumStylesheet(track.album),
-        theme: `${getThemeString(track)}; --album-directory: ${album.directory}; --track-directory: ${track.directory}`,
+        theme: getThemeString(track, [
+            `--album-directory: ${album.directory}`,
+            `--track-directory: ${track.directory}`
+        ]),
 
         sidebarLeft: generateSidebarForAlbum(album, track),
         sidebarRight: generateSidebarRightForAlbum(album, track),
@@ -2159,8 +2161,8 @@ async function writeTrackPage(track) {
                     <ul>
                         ${otherReleases.map(track => fixWS`
                             <li>
-                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
-                                (on <a href="${C.ALBUM_DIRECTORY}/${track.album.directory}/" style="${getThemeString(track.album)}">${track.album.name}</a>)
+                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
+                                (on <a href="${C.ALBUM_DIRECTORY}/${track.album.directory}/" style="${getLinkThemeString(track.album)}">${track.album.name}</a>)
                             </li>
                         `).join('\n')}
                     </ul>
@@ -2198,7 +2200,7 @@ async function writeTrackPage(track) {
                             <li ${classes(as !== track && 'rerelease')}>
                                 ${getFlashLinkHTML(flash)}
                                 ${as !== track && fixWS`
-                                    (as <a href="${C.TRACK_DIRECTORY}/${as.directory}/" style="${getThemeString(as)}">${as.name}</a>)
+                                    (as <a href="${C.TRACK_DIRECTORY}/${as.directory}/" style="${getLinkThemeString(as)}">${as.name}</a>)
                                 `}
                             </li>
                         `).join('\n')}
@@ -2258,7 +2260,7 @@ async function writeArtistPage(artist) {
         return fixWS`
             <li ${classes(track.aka && 'rerelease')} title="${th(i + 1)} track by ${name}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
                 ${track.duration && `(${getDurationString(track.duration)})`}
-                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                 ${track.artists.some(({ who }) => who === artist) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(({ who }) => who !== artist))})</span>`}
                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>`}
                 ${wikiInfo.features.flashesAndGames && flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
@@ -2320,7 +2322,7 @@ async function writeArtistPage(artist) {
                         return fixWS`
                             <li title="${th(i + 1)} art by ${name}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getLinkThemeString(thing)}">${thing.name}</a>
                                 ` : '<i>(cover art)</i>'}
                                 ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== artist))})</span>`}
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
@@ -2334,7 +2336,7 @@ async function writeArtistPage(artist) {
                         const contributionString = flash.contributors.filter(({ who }) => who === artist).map(getContributionString).join(' ');
                         return fixWS`
                             <li>
-                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getThemeString(flash)}">${flash.name}</a>
+                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getLinkThemeString(flash)}">${flash.name}</a>
                                 ${contributionString && `<span class="contributed">(${contributionString})</span>`}
                                 (${getDateString({date: flash.date})})
                             </li>
@@ -2348,7 +2350,7 @@ async function writeArtistPage(artist) {
                         return fixWS`
                             <li>
                                 ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getThemeString(thing)}">${thing.name}</a>
+                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getLinkThemeString(thing)}">${thing.name}</a>
                                 ` : '(album commentary)'}
                                 ${wikiInfo.features.flashesAndGames && flashes?.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
                             </li>
@@ -2458,7 +2460,7 @@ function albumChunkedList(tracks, getLI, showDate = true, datePropertyOrFn = 'da
                 if (i === 0 || album !== getAlbum(previous) || (showDate && +dateFn(thing) !== +dateFn(previous))) {
                     const heading = fixWS`
                         <dt>
-                            <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/" style="${getThemeString(getAlbum(thing))}">${getAlbum(thing).name}</a>
+                            <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/" style="${getLinkThemeString(getAlbum(thing))}">${getAlbum(thing).name}</a>
                             ${showDate && `(${getDateString({date: dateFn(thing)})})`}
                         </dt>
                         <dd><ul>
@@ -2486,7 +2488,7 @@ function actChunkedList(flashes, getLI, showDate = true, dateProperty = 'date') 
                 if (i === 0 || act !== previous.act) {
                     const heading = fixWS`
                         <dt>
-                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/" style="${getThemeString(flash)}">${flash.act}</a>
+                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/" style="${getLinkThemeString(flash)}">${flash.act}</a>
                         </dt>
                         <dd><ul>
                     `;
@@ -2523,7 +2525,9 @@ async function writeFlashPage(flash) {
 
     await writePage([C.FLASH_DIRECTORY, kebab], {
         title: flash.name,
-        theme: `${getThemeString(flash)}; --flash-directory: ${flash.directory}`,
+        theme: getThemeString(flash, [
+            `--flash-directory: ${flash.directory}`
+        ]),
         main: {
             content: fixWS`
                 <h1>${flash.name}</h1>
@@ -2545,7 +2549,7 @@ async function writeFlashPage(flash) {
                     <ul>
                         ${flash.tracks.map(track => fixWS`
                             <li>
-                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                                 <span class="by">by ${getArtistString(track.artists)}</span>
                             </li>
                         `).join('\n')}
@@ -2613,18 +2617,18 @@ function generateSidebarForFlashes(flash) {
                     true
                 )
             ).flatMap(({ act, color }) => [
-                act.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/" style="--fg-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
-                || act.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/" style="--fg-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
-                || act.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/" style="--fg-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
+                act.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/" style="--primary-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
+                || act.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/" style="--primary-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
+                || act.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/" style="--primary-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
                 (
                     flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
                     flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
                     true
-                ) && `<dt ${classes(act === currentAct && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/" style="${getThemeString({color})}">${act}</a></dt>`,
+                ) && `<dt ${classes(act === currentAct && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/" style="${getLinkThemeString({color})}">${act}</a></dt>`,
                 act === currentAct && fixWS`
                     <dd><ul>
                         ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
-                            <li ${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/" style="${getThemeString(f)}">${f.name}</a></li>
+                            <li ${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/" style="${getLinkThemeString(f)}">${f.name}</a></li>
                         `).join('\n')}
                     </ul></dd>
                 `
@@ -2643,7 +2647,7 @@ function writeListingPages() {
 
     const getAlbumLI = (album, extraText = '') => fixWS`
         <li>
-            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a>
+            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
             ${extraText}
         </li>
     `;
@@ -2813,16 +2817,16 @@ function writeListingPages() {
             .filter(x => x.isGroup)
             .sort(sortByName)
             .map(group => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a></li>
+                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a></li>
             `)],
         wikiInfo.features.groupUI &&
         [['groups', 'by-category'], `Groups - by Category`, fixWS`
             <dl>
                 ${groupData.filter(x => x.isCategory).map(category => fixWS`
-                    <dt><a href="${C.GROUP_DIRECTORY}/${category.groups[0].directory}/" style="${getThemeString(category)}">${category.name}</a></li>
+                    <dt><a href="${C.GROUP_DIRECTORY}/${category.groups[0].directory}/" style="${getLinkThemeString(category)}">${category.name}</a></li>
                     <dd><ul>
                         ${category.groups.map(group => fixWS`
-                            <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/" style="${getThemeString(group)}">${group.name}</a></li>
+                            <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/" style="${getLinkThemeString(group)}">${group.name}</a></li>
                         `).join('\n')}
                     </ul></dd>
                 `).join('\n')}
@@ -2834,7 +2838,7 @@ function writeListingPages() {
             .map(group => ({group, albums: group.albums.length}))
             .sort((a, b) => b.albums - a.albums)
             .map(({ group, albums }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a> (${s(albums, 'album')})</li>
+                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${s(albums, 'album')})</li>
             `)],
         wikiInfo.features.groupUI &&
         [['groups', 'by-tracks'], `Groups - by Tracks`, groupData
@@ -2842,7 +2846,7 @@ function writeListingPages() {
             .map(group => ({group, tracks: group.albums.reduce((acc, album) => acc + album.tracks.length, 0)}))
             .sort((a, b) => b.tracks - a.tracks)
             .map(({ group, tracks }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a> (${s(tracks, 'track')})</li>
+                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${s(tracks, 'track')})</li>
             `)],
         wikiInfo.features.groupUI &&
         [['groups', 'by-duration'], `Groups - by Duration`, groupData
@@ -2850,7 +2854,7 @@ function writeListingPages() {
             .map(group => ({group, duration: getTotalDuration(group.albums.flatMap(album => album.tracks))}))
             .sort((a, b) => b.duration - a.duration)
             .map(({ group, duration }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a> (${getDurationString(duration)})</li>
+                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${getDurationString(duration)})</li>
             `)],
         wikiInfo.features.groupUI &&
         [['groups', 'by-latest'], `Groups - by Latest Album`, C.sortByDate(groupData
@@ -2866,22 +2870,22 @@ function writeListingPages() {
             .reverse()
         ).reverse().map(({ group, date }) => fixWS`
             <li>
-                <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getThemeString(group)}">${group.name}</a>
+                <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a>
                 (${getDateString({date})})
             </li>
         `)],
         [['tracks', 'by-name'], `Tracks - by Name`, trackData.slice()
             .sort(sortByName)
             .map(track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
+                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
             `)],
         [['tracks', 'by-album'], `Tracks - by Album`, fixWS`
                 <dl>
                     ${albumData.map(album => fixWS`
-                        <dt><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a></dt>
+                        <dt><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a></dt>
                         <dd><ol>
                             ${album.tracks.map(track => fixWS`
-                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
+                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
                             `).join('\n')}
                         </ol></dd>
                     `).join('\n')}
@@ -2890,14 +2894,14 @@ function writeListingPages() {
         [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
             C.sortByDate(trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
             track => fixWS`
-                <li ${classes(track.aka && 'rerelease')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a> ${track.aka && `<span class="rerelease-label">(re-release)</span>`}</li>
+                <li ${classes(track.aka && 'rerelease')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a> ${track.aka && `<span class="rerelease-label">(re-release)</span>`}</li>
             `)],
         [['tracks', 'by-duration'], `Tracks - by Duration`, C.sortByDate(trackData.slice())
             .filter(track => track.duration > 0)
             .sort((a, b) => b.duration - a.duration)
             .map(track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                     (${getDurationString(track.duration)})
                 </li>
             `)],
@@ -2909,7 +2913,7 @@ function writeListingPages() {
             )),
             track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                     (${getDurationString(track.duration)})
                 </li>
             `,
@@ -2920,26 +2924,26 @@ function writeListingPages() {
             .sort((a, b) => b.referencedBy.length - a.referencedBy.length)
             .map(track => fixWS`
                 <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a>
+                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
                     (${s(track.referencedBy.length, 'time')} referenced)
                 </li>
             `)],
         wikiInfo.features.flashesAndGames &&
         [['tracks', 'in-flashes', 'by-album'], `Tracks - in Flashes &amp; Games (by Album)`, albumChunkedList(
             C.sortByDate(trackData.slice()).filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && track.flashes.length > 0),
-            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>`)],
+            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>`)],
         wikiInfo.features.flashesAndGames &&
         [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by Flash)`, fixWS`
             <dl>
                 ${C.sortByDate(flashData.filter(flash => !flash.act8r8k))
                     .map(flash => fixWS`
                         <dt>
-                            <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getThemeString(flash)}">${flash.name}</a>
+                            <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getLinkThemeString(flash)}">${flash.name}</a>
                             (${getDateString(flash)})
                         </dt>
                         <dd><ul>
                             ${flash.tracks.map(track => fixWS`
-                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
+                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
                             `).join('\n')}
                         </ul></dd>
                     `)
@@ -2950,18 +2954,18 @@ function writeListingPages() {
             C.sortByDate(trackData.slice())
             .filter(track => track.lyrics),
             track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></li>
+                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
             `)],
         wikiInfo.features.artTagUI &&
         [['tags', 'by-name'], 'Tags - by Name', tagData.slice().sort(sortByName)
             .filter(tag => !tag.isCW)
-            .map(tag => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a></li>`)],
+            .map(tag => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a></li>`)],
         wikiInfo.features.artTagUI &&
         [['tags', 'by-uses'], 'Tags - by Uses', tagData.slice().sort(sortByName)
             .filter(tag => !tag.isCW)
             .map(tag => ({tag, timesUsed: tag.things.length}))
             .sort((a, b) => b.timesUsed - a.timesUsed)
-            .map(({ tag, timesUsed }) => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getThemeString(tag)}">${tag.name}</a> (${s(timesUsed, 'time')})</li>`)]
+            .map(({ tag, timesUsed }) => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a> (${s(timesUsed, 'time')})</li>`)]
     ].filter(Boolean);
 
     const getWordCount = str => {
@@ -3010,7 +3014,7 @@ function writeListingPages() {
                             .filter(album => [album, ...album.tracks].some(x => x.commentary))
                             .map(album => fixWS`
                                 <li>
-                                    <a href="${C.LISTING_DIRECTORY}/all-commentary/#${album.directory}" style="${getThemeString(album)}">${album.name}</a>
+                                    <a href="${C.LISTING_DIRECTORY}/all-commentary/#${album.directory}" style="${getLinkThemeString(album)}">${album.name}</a>
                                     (${(() => {
                                         const things = [album, ...album.tracks];
                                         const cThings = things.filter(x => x.commentary);
@@ -3027,15 +3031,15 @@ function writeListingPages() {
                         .map(album => [album, ...album.tracks])
                         .filter(x => x.some(y => y.commentary))
                         .map(([ album, ...tracks ]) => fixWS`
-                            <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a></h2>
+                            <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a></h2>
                             ${album.commentary && fixWS`
-                                <blockquote style="${getThemeString(album)}">
+                                <blockquote style="${getLinkThemeString(album)}">
                                     ${transformMultiline(album.commentary)}
                                 </blockquote>
                             `}
                             ${tracks.filter(t => t.commentary).map(track => fixWS`
-                                <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getThemeString(track)}">${track.name}</a></h3>
-                                <blockquote style="${getThemeString(track)}">
+                                <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></h3>
+                                <blockquote style="${getLinkThemeString(track)}">
                                     ${transformMultiline(track.commentary)}
                                 </blockquote>
                             `).join('\n')}
@@ -3083,7 +3087,7 @@ function writeListingPages() {
                         ].map(category => fixWS`
                             <dt>${category.name}: (<a href="${C.JS_DISABLED_DIRECTORY}/" data-random="album-in-${category.code}">Random Album</a>, <a href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-${category.code}">Random Track</a>)</dt>
                             <dd><ul>${category.albumData.map(album => fixWS`
-                                <li><a style="${getThemeString(album)}; --album-directory: ${album.directory}" href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-album">${album.name}</a></li>
+                                <li><a style="${getLinkThemeString(album)}; --album-directory: ${album.directory}" href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-album">${album.name}</a></li>
                             `).join('\n')}</ul></dd>
                         `).join('\n')}
                     </dl>
@@ -3348,16 +3352,6 @@ function getArtistString(artists, showIcons = false) {
     }));
 }
 
-/*
-function getThemeString({fg, bg, theme}) {
-    return [
-        [fg, `--fg-color: ${fg}`],
-        [bg, `--bg-color: ${bg}`],
-        [theme, `--theme: ${theme + ''}`]
-    ].filter(pair => pair[0] !== undefined).map(pair => pair[1]).join('; ');
-}
-*/
-
 // Graciously stolen from https://stackoverflow.com/a/54071699! ::::)
 // in: r,g,b in [0,1], out: h in [0,360) and s,l in [0,1]
 function rgb2hsl(r,g,b) {
@@ -3366,9 +3360,7 @@ function rgb2hsl(r,g,b) {
     return [60*(h<0?h+6:h), f ? n/f : 0, (a+a-n)/2];
 }
 
-function getThemeString(thing) {
-    const {color} = thing;
-
+function getColorVariables(color) {
     const [ r, g, b ] = color.slice(1)
         .match(/[0-9a-fA-F]{2,2}/g)
         .slice(0, 3)
@@ -3376,27 +3368,29 @@ function getThemeString(thing) {
     const [ h, s, l ] = rgb2hsl(r, g, b);
     const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
 
-    const album = (
-        trackData.includes(thing) ? thing.album :
-        albumData.includes(thing) ? thing :
-        null
-    );
-
-    let bgUrl = '';
-    if (album?.wallpaperArtists) {
-        // The 8ack-directory (..) here is necessary 8ecause CSS doesn't want
-        // to consider the fact that this is, like, not talking a8out a URL
-        // relative to the CSS source file. Really, what SHOULD 8e happening
-        // here is, we use path.relative to get the URL relative to the HTML
-        // file! 8ut I guess that's not what CSS spec says, or whatever.
-        // Pretty cringe t8h.
-        bgUrl = `../${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg`;
-    }
-
     return [
-        color && `--fg-color: ${color}; --dim-color: ${dim}`,
-        bgUrl && `--bg: url("${bgUrl}")`
-    ].filter(Boolean).join('; ');
+        `--primary-color: ${color}`,
+        `--dim-color: ${dim}`
+    ];
+}
+
+function getLinkThemeString(thing) {
+    return getColorVariables(thing.color).join('; ');
+}
+
+function getThemeString(thing, additionalVariables = []) {
+    const variables = [
+        ...getColorVariables(thing.color),
+        ...additionalVariables
+    ].filter(Boolean);
+
+    return fixWS`
+        ${variables.length && fixWS`
+            :root {
+                ${variables.map(line => line + ';').join('\n')}
+            }
+        `}
+    `;
 }
 
 function getFlashDirectory(flash) {
@@ -3578,12 +3572,12 @@ function generateSidebarForAlbum(album, currentTrack = null) {
                     (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
                     (i === 0 || track.group !== arr[i - 1].group) && fixWS`
                         ${track.group && fixWS`
-                            <dt style="${getThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}>
+                            <dt style="${getLinkThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}>
                                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.group}</a>
                                 ${listTag === 'ol' ? `(${i + 1}&ndash;${arr.length - arr.slice().reverse().findIndex(t => t.group === track.group)})` : `<!-- (here: track number range) -->`}
                             </dt>
                         `}
-                        <dd style="${getThemeString(track)}"><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
+                        <dd style="${getLinkThemeString(track)}"><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
                     `,
                     (!currentTrack || track.group === currentTrack.group) && trackToListItem(track),
                     i === arr.length && `</${listTag}></dd>`
@@ -3616,8 +3610,8 @@ function generateSidebarRightForAlbum(album, currentTrack = null) {
                 ${!currentTrack && transformMultiline(group.descriptionShort)}
                 ${group.urls.length && `<p>Visit on ${joinNoOxford(group.urls.map(fancifyURL), 'or')}.</p>`}
                 ${!currentTrack && fixWS`
-                    ${next && `<p class="group-chronology-link">Next: <a href="${C.ALBUM_DIRECTORY}/${next.directory}/" style="${getThemeString(next)}">${next.name}</a></p>`}
-                    ${previous && `<p class="group-chronology-link">Previous: <a href="${C.ALBUM_DIRECTORY}/${previous.directory}/" style="${getThemeString(previous)}">${previous.name}</a></p>`}
+                    ${next && `<p class="group-chronology-link">Next: <a href="${C.ALBUM_DIRECTORY}/${next.directory}/" style="${getLinkThemeString(next)}">${next.name}</a></p>`}
+                    ${previous && `<p class="group-chronology-link">Previous: <a href="${C.ALBUM_DIRECTORY}/${previous.directory}/" style="${getLinkThemeString(previous)}">${previous.name}</a></p>`}
                 `}
             `)
         };
@@ -3636,11 +3630,11 @@ function generateSidebarForGroup(isGallery = false, currentGroup = null) {
                 ${groupData.filter(x => x.isCategory).map(category => [
                     fixWS`
                         <dt ${classes(currentGroup && category === currentGroup.category && 'current')}>
-                            <a href="${C.GROUP_DIRECTORY}/${groupData.find(x => x.isGroup && x.category === category).directory}/${isGallery ? 'gallery/' : ''}" style="${getThemeString(category)}">${category.name}</a>
+                            <a href="${C.GROUP_DIRECTORY}/${groupData.find(x => x.isGroup && x.category === category).directory}/${isGallery ? 'gallery/' : ''}" style="${getLinkThemeString(category)}">${category.name}</a>
                         </dt>
                         <dd><ul>
                             ${category.groups.map(group => fixWS`
-                                <li ${classes(group === currentGroup && 'current')} style="${getThemeString(group)}">
+                                <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group)}">
                                     <a href="${C.GROUP_DIRECTORY}/${group.directory}/${isGallery && 'gallery/'}">${group.name}</a>
                                 </li>
                             `).join('\n')}
@@ -3690,7 +3684,7 @@ async function writeGroupPage(group) {
                     ${group.albums.map(album => fixWS`
                         <li>
                             (${album.date.getFullYear()})
-                            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getThemeString(album)}">${album.name}</a>
+                            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
                         </li>
                     `).join('\n')}
                 </ul>
@@ -3784,7 +3778,7 @@ function getFlashLinkHTML(flash, name = null) {
     if (!name) {
         name = flash.name;
     }
-    return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/" title="Page ${flash.page}" style="${getThemeString(flash)}">${name}</a>`;
+    return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/" title="Page ${flash.page}" style="${getLinkThemeString(flash)}">${name}</a>`;
 }
 
 function rebaseURLs(directory, html) {
@@ -3804,6 +3798,14 @@ function rebaseURLs(directory, html) {
             url = path.relative(directory, path.join(outputPath, url));
         }
         return `${attr}="${url}"`;
+    }).replace(/url\("(.*?)"\)/g, (match, url) => {
+        // same as above but for CSS url("...")-style values!
+        try {
+            new URL(url);
+        } catch (error) {
+            url = path.relative(directory, path.join(outputPath, url));
+        }
+        return `url("${url}")`;
     });
 }
 
