@@ -1724,7 +1724,7 @@ function getFlashGridHTML(props) {
 
 function getNewReleases(numReleases) {
     const latestFirst = albumData.slice().reverse();
-    const majorReleases = latestFirst.filter(album => album.groups.some(g => g.directory === C.OFFICIAL_GROUP_DIRECTORY) || album.isMajorRelease);
+    const majorReleases = latestFirst.filter(album => album.isMajorRelease);
     majorReleases.splice(1);
 
     const otherReleases = latestFirst
