@@ -472,6 +472,7 @@ function transformMultiline(text, treatAsDocument=false) {
     let inBlockquote = false;
 
     for (let line of text.split(/\r|\n|\r\n/)) {
+        const imageLine = line.startsWith('<img');
         line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
             lazy: true,
             link: true,
@@ -545,7 +546,7 @@ function transformMultiline(text, treatAsDocument=false) {
             // certain inline element tags should still be postioned within a
             // paragraph; other elements (e.g. headings) should be added as-is
             const elementMatch = line.match(/^<(.*?)[ >]/);
-            if (elementMatch && !['a', 'abbr', 'b', 'bdo', 'br', 'cite', 'code', 'data', 'datalist', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'output', 'picture', 'q', 'ruby', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'svg', 'time', 'var', 'wbr'].includes(elementMatch[1])) {
+            if (elementMatch && !imageLine && !['a', 'abbr', 'b', 'bdo', 'br', 'cite', 'code', 'data', 'datalist', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'output', 'picture', 'q', 'ruby', 'samp', 'small', 'span', 'strong', 'sub', 'sup', 'svg', 'time', 'var', 'wbr'].includes(elementMatch[1])) {
                 lineTag = '';
             }
         }
