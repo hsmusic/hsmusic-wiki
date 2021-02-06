@@ -313,11 +313,13 @@ footer > :last-child {
     margin-bottom: 5px;
 }
 
-.sidebar article h2 {
+.sidebar article h2,
+.news-index h2 {
     border-bottom: 1px dotted white;
 }
 
-.sidebar article h2 time {
+.sidebar article h2 time,
+.news-index time {
     float: right;
     font-weight: normal;
 }

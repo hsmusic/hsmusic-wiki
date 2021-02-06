@@ -954,9 +954,9 @@ async function processNewsDataFile(file) {
             return {error: 'Expected "Name" field!'};
         }
 
-        const id = getBasicField(section, 'ID');
-        if (!id) {
-            return {error: 'Expected "ID" field!'};
+        const directory = getBasicField(section, 'Directory') || getBasicField(section, 'ID');
+        if (!directory) {
+            return {error: 'Expected "Directory" field!'};
         }
 
         let body = getMultilineField(section, 'Body');
@@ -979,10 +979,10 @@ async function processNewsDataFile(file) {
 
         return {
             name,
+            directory,
             body,
             bodyShort,
-            date,
-            id
+            date
         };
     });
 }
@@ -1822,9 +1822,9 @@ async function writeHomepage() {
                 <h1>News</h1>
                 ${newsData.slice(0, 3).map((entry, i) => fixWS`
                     <article ${classes('news-entry', i === 0 && 'first-news-entry')}>
-                        <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/#${entry.id}">${entry.name}</a></h2>
+                        <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/${entry.directory}/">${entry.name}</a></h2>
                         ${transformMultiline(entry.bodyShort)}
-                        ${entry.bodyShort !== entry.body && `<a href="${C.NEWS_DIRECTORY}/#${entry.id}">(View rest of entry!)</a>`}
+                        ${entry.bodyShort !== entry.body && `<a href="${C.NEWS_DIRECTORY}/${entry.directory}/">(View rest of entry!)</a>`}
                     </article>
                 `).join('\n')}
             ` : `<p><i>News requested in content description but this feature isn't enabled</i></p>`)
@@ -1848,6 +1848,77 @@ async function writeHomepage() {
                     `).join('\n')}
                 </h2>
             `
+        }
+    });
+}
+
+function writeNewsPages() {
+    if (!wikiInfo.features.news) {
+        return;
+    }
+
+    return progressPromiseAll('Writing news pages.', queue([
+        writeNewsIndex,
+        ...newsData.map(curry(writeNewsPage))
+    ], queueSize));
+}
+
+async function writeNewsIndex() {
+    await writePage([C.NEWS_DIRECTORY], {
+        title: 'News',
+        main: {
+            content: fixWS`
+                <div class="long-content news-index">
+                    <h1>News</h1>
+                    ${newsData.map(entry => fixWS`
+                        <article id="${entry.directory}">
+                            <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/${entry.directory}/">${entry.name}</a></h2>
+                            ${transformMultiline(entry.bodyShort)}
+                            ${entry.bodyShort !== entry.body && `<p><a href="${C.NEWS_DIRECTORY}/${entry.directory}/">(View rest of entry!)</a></p>`}
+                        </article>
+                    `).join('\n')}
+                </div>
+            `
+        },
+        nav: {
+            links: [
+                ['./', wikiInfo.shortName],
+                [`${C.NEWS_DIRECTORY}/`, 'News']
+            ]
+        }
+    });
+}
+
+async function writeNewsPage(entry) {
+    // The newsData list is sorted reverse chronologically (newest ones first),
+    // so the way we find next/previous entries is flipped from normal.
+    const index = newsData.indexOf(entry)
+    const previous = newsData[index + 1];
+    const next = newsData[index - 1];
+    const nextPreviousLinks = [
+        previous && `<a href="${C.NEWS_DIRECTORY}/${previous.directory}/" id="previous-button" title="${previous.name}">Previous</a>`,
+        next && `<a href="${C.NEWS_DIRECTORY}/${next.directory}/" id="next-button" title="${next.name}">Next</a>`
+    ].filter(Boolean).join(', ');
+
+    await writePage([C.NEWS_DIRECTORY, entry.directory], {
+        title: `News - ${entry.name}`,
+        main: {
+            content: fixWS`
+                <div class="long-content">
+                    <h1>${entry.name}</h1>
+                    <p>(Published ${getDateString(entry)}.)</p>
+                    ${transformMultiline(entry.body)}
+                </div>
+            `
+        },
+        nav: {
+            links: [
+                ['./', wikiInfo.shortName],
+                [`${C.NEWS_DIRECTORY}/`, 'News'],
+                [null, getDateString(entry) + ':'],
+                [`${C.NEWS_DIRECTORY}/${entry.directory}/`, entry.name],
+                nextPreviousLinks && [null, `(${nextPreviousLinks})`]
+            ]
         }
     });
 }
@@ -1901,25 +1972,6 @@ function writeMiscellaneousPages() {
             },
             */
 
-            nav: {simple: true}
-        }),
-
-        wikiInfo.features.news &&
-        writePage([C.NEWS_DIRECTORY], {
-            title: 'News',
-            main: {
-                content: fixWS`
-                    <div class="long-content">
-                    <h1>News</h1>
-                        ${newsData.map(entry => fixWS`
-                            <article id="${entry.id}">
-                                <h2><a href="#${entry.id}">${getDateString(entry)} - ${entry.name}</a></h2>
-                                ${transformMultiline(entry.body)}
-                            </article>
-                        `).join('\n')}
-                    </div>
-                `
-            },
             nav: {simple: true}
         }),
 
@@ -4062,6 +4114,9 @@ async function main() {
             }
             return;
         }
+
+        C.sortByDate(newsData);
+        newsData.reverse();
     }
 
     {
@@ -4301,6 +4356,7 @@ async function main() {
         group: {type: 'flag'},
         list: {type: 'flag'},
         misc: {type: 'flag'},
+        news: {type: 'flag'},
         static: {type: 'flag'},
         tag: {type: 'flag'},
         track: {type: 'flag'},
@@ -4313,6 +4369,7 @@ async function main() {
     await writeSymlinks();
     if (buildAll || buildFlags.misc) await writeMiscellaneousPages();
     if (buildAll || buildFlags.static) await writeStaticPages();
+    if (buildAll || buildFlags.news) await writeNewsPages();
     if (buildAll || buildFlags.list) await writeListingPages();
     if (buildAll || buildFlags.tag) await writeTagPages();
     if (buildAll || buildFlags.group) await writeGroupPages();
