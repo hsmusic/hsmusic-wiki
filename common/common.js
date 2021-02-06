@@ -1,41 +1,23 @@
-// Okay, THIS stupid file is loaded 8y 8OTH the client and the static site
-// 8uilder.
+// This file's shared 8y 8oth the client and the static file 8uilder (i.e,
+// upd8.js). It's got common constants and a few utility functions!
 
 const C = {
-    // This can 8e changed if you want to output to some other directory. It's
-    // the one you'll upload online with rsync or whatever when you're pushing
-    // an upd8, and also the one you'd compress if you wanted to make a 8ackup
-    // of the whole dang site. Just keep in mind that the gener8ted result will
-    // contain a couple symlinked directories, so if you're uploading, you're
-    // pro8a8ly gonna want to resolve those yourself.
-    // DEFAULT_OUTPUT_DIRECTORY: 'site',
-
-    // Data files for the site, including flash, artist, and al8um data.
-    // There are also some HTML files here, which are read and em8edded as
-    // content in a few gener8ted pages (e.g. the changelog).
-    // DEFAULT_DATA_DIRECTORY: 'data',
-
-    // Static media will 8e referenced in the site here!
-    // The contents are categorized; see MEDIA_DIRECTORY and 8elow.
-    // (This gets symlinked into SITE_DIRECTORY.)
-    // DEFAULT_MEDIA_DIRECTORY: 'media',
-
     // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
     // site code should 8e put here. Which, uh, only really means this one
     // file. 8ut rather than hard code it, anything in this directory can 8e
     // shared across 8oth ends of the code8ase.
-    // (This gets symlinked into SITE_DIRECTORY.)
+    // (This gets symlinked into the --data directory.)
     COMMON_DIRECTORY: 'common',
 
     // Code that's used only in the static site! CSS, cilent JS, etc.
-    // (This gets symlinked into SITE_DIRECTORY.)
+    // (This gets symlinked into the --data directory.)
     STATIC_DIRECTORY: 'static',
 
     // Su8directory under DATA_DIRECTORY for al8um files.
     DATA_ALBUM_DIRECTORY: 'album',
 
-    // Media files! This is symlinked from the provided media directory, which
-    // may be DEfAULT_MEDIA_DIRECTORY.
+    // Media files! This is symlinked into the --data directory from the
+    // also user-provided --media directory.
     MEDIA_DIRECTORY: 'media',
 
     // Contains a folder for each al8um, within which is the al8um cover art

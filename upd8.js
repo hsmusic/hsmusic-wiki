@@ -3889,14 +3889,26 @@ function classes(...args) {
 
 async function main() {
     const miscOptions = await parseOptions(process.argv.slice(2), {
+        // Data files for the site, including flash, artist, and al8um data,
+        // and like a jillion other things too. Pretty much everything which
+        // makes an individual wiki what it is goes here!
         'data': {
             type: 'value'
         },
 
+        // Static media will 8e referenced in the site here! The contents are
+        // categorized; check out MEDIA_DIRECTORY and rel8ted constants in
+        // common/common.js. (This gets symlinked into the --data directory.)
         'media': {
             type: 'value'
         },
 
+        // This is the output directory. It's the one you'll upload online with
+        // rsync or whatever when you're pushing an upd8, and also the one
+        // you'd archive if you wanted to make a 8ackup of the whole dang
+        // site. Just keep in mind that the gener8ted result will contain a
+        // couple symlinked directories, so if you're uploading, you're pro8a8ly
+        // gonna want to resolve those yourself.
         'out': {
             type: 'value'
         },
