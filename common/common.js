@@ -69,6 +69,7 @@ const C = {
     FLASH_DIRECTORY: 'flash',
     NEWS_DIRECTORY: 'news',
     GROUP_DIRECTORY: 'group',
+    COMMENTARY_DIRECTORY: 'commentary',
     JS_DISABLED_DIRECTORY: 'js-disabled',
 
     UNRELEASED_TRACKS_DIRECTORY: 'unreleased-tracks',

@@ -2060,6 +2060,9 @@ async function writeAlbumPage(album) {
             `}
         </li>
     `;
+
+    const commentaryEntries = [album, ...album.tracks].filter(x => x.commentary).length;
+
     const listTag = getAlbumListTag(album);
     await writePage([C.ALBUM_DIRECTORY, album.directory], {
         title: album.name,
@@ -2083,6 +2086,7 @@ async function writeAlbumPage(album) {
                     ${+album.coverArtDate !== +album.date && `<br>Art released ${getDateString({date: album.coverArtDate})}.`}
                     <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.
                 </p>
+                ${commentaryEntries && `<p>View <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/">commentary page</a>!</p>`}
                 ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>`}
                 ${album.usesGroups ? fixWS`
                     <dl class="album-group-list">
@@ -3037,11 +3041,6 @@ function writeListingPages() {
             .map(({ tag, timesUsed }) => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a> (${s(timesUsed, 'time')})</li>`)]
     ].filter(Boolean);
 
-    const getWordCount = str => {
-        const wordCount = str.split(' ').length;
-        return `${Math.floor(wordCount / 100) / 10}k`;
-    };
-
     const releasedTracks = trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
     const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
 
@@ -3071,65 +3070,9 @@ function writeListingPages() {
             }
         }),
 
-        writePage([C.LISTING_DIRECTORY, 'all-commentary'], {
-            title: 'All Commentary',
-
-            main: {
-                content: fixWS`
-                    <h1>All Commentary</h1>
-                    <p><strong>${getWordCount(albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).map(x => x.commentary).join(' '), ''))}</strong> words, in all.<br>Jump to a particular album:</p>
-                    <ul>
-                        ${C.sortByDate(albumData.slice())
-                            .filter(album => [album, ...album.tracks].some(x => x.commentary))
-                            .map(album => fixWS`
-                                <li>
-                                    <a href="${C.LISTING_DIRECTORY}/all-commentary/#${album.directory}" style="${getLinkThemeString(album)}">${album.name}</a>
-                                    (${(() => {
-                                        const things = [album, ...album.tracks];
-                                        const cThings = things.filter(x => x.commentary);
-                                        // const numStr = album.tracks.every(t => t.commentary) ? 'full commentary' : `${cThings.length} entries`;
-                                        const numStr = `${cThings.length}/${things.length} entries`;
-                                        return `${numStr}; ${getWordCount(cThings.map(x => x.commentary).join(' '))} words`;
-                                    })()})
-                                </li>
-                            `)
-                            .join('\n')
-                        }
-                    </ul>
-                    ${C.sortByDate(albumData.slice())
-                        .map(album => [album, ...album.tracks])
-                        .filter(x => x.some(y => y.commentary))
-                        .map(([ album, ...tracks ]) => fixWS`
-                            <h2 id="${album.directory}"><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a></h2>
-                            ${album.commentary && fixWS`
-                                <blockquote style="${getLinkThemeString(album)}">
-                                    ${transformMultiline(album.commentary)}
-                                </blockquote>
-                            `}
-                            ${tracks.filter(t => t.commentary).map(track => fixWS`
-                                <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></h3>
-                                <blockquote style="${getLinkThemeString(track)}">
-                                    ${transformMultiline(track.commentary)}
-                                </blockquote>
-                            `).join('\n')}
-                        `)
-                        .join('\n')
-                    }
-                `
-            },
-
-            sidebarLeft: {
-                content: generateSidebarForListings(listingDescriptors, 'all-commentary')
-            },
-
-            nav: {
-                links: [
-                    ['./', wikiInfo.shortName],
-                    [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                    [`${C.LISTING_DIRECTORY}/all-commentary`, 'All Commentary']
-                ]
-            }
-        }),
+        mkdirp(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary'))
+            .then(() => writeFile(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary', 'index.html'),
+                generateRedirectPage('Album Commentary', `/${C.COMMENTARY_DIRECTORY}/`))),
 
         writePage([C.LISTING_DIRECTORY, 'random'], {
             title: 'Random Pages',
@@ -3232,6 +3175,100 @@ function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)
             </li>
         </ul>
     `;
+}
+
+function filterAlbumsByCommentary() {
+    return albumData.filter(album => [album, ...album.tracks].some(x => x.commentary));
+}
+
+function getWordCount(str) {
+    const wordCount = str.split(' ').length;
+    return `${Math.floor(wordCount / 100) / 10}k`;
+}
+
+function writeCommentaryPages() {
+    return progressPromiseAll('Writing commentary pages.', queue([
+        writeCommentaryIndex,
+        ...filterAlbumsByCommentary().map(curry(writeAlbumCommentaryPage))
+    ], queueSize));
+}
+
+async function writeCommentaryIndex() {
+    await writePage([C.COMMENTARY_DIRECTORY], {
+        title: 'Commentary',
+
+        main: {
+            content: fixWS`
+                <div class="long-content">
+                    <h1>Commentary</h1>
+                    <p><strong>${getWordCount(albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).map(x => x.commentary).join(' ')))}</strong> words across <strong>${albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).length, 0)}</strong> entries, in all.</p>
+                    <p>Choose an album:</p>
+                    <ul>
+                        ${filterAlbumsByCommentary()
+                            .map(album => fixWS`
+                                <li>
+                                    <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}" style="${getLinkThemeString(album)}">${album.name}</a>
+                                    (${(() => {
+                                        const things = [album, ...album.tracks];
+                                        const cThings = things.filter(x => x.commentary);
+                                        // const numStr = album.tracks.every(t => t.commentary) ? 'full commentary' : `${cThings.length} entries`;
+                                        const numStr = `${cThings.length}/${things.length} entries`;
+                                        return `${numStr}; ${getWordCount(cThings.map(x => x.commentary).join(' '))} words`;
+                                    })()})
+                                </li>
+                            `)
+                            .join('\n')
+                        }
+                    </ul>
+                </div>
+            `
+        },
+
+        nav: {
+            links: [
+                ['./', wikiInfo.shortName],
+                [`${C.COMMENTARY_DIRECTORY}/`, 'Commentary']
+            ]
+        }
+    });
+}
+
+async function writeAlbumCommentaryPage(album) {
+    await writePage([C.COMMENTARY_DIRECTORY, C.ALBUM_DIRECTORY, album.directory], {
+        title: `${album.name} - Commentary`,
+        stylesheet: getAlbumStylesheet(album),
+        theme: getThemeString(album),
+
+        main: {
+            content: fixWS`
+                <div class="long-content">
+                    <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/">${album.name}</a> - Commentary</h2>
+                    <p><strong>${getWordCount([album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary).join(' '))}</strong> words across <strong>${[album, ...album.tracks].filter(x => x.commentary).length}</strong> entries.</p>
+                    ${album.commentary && fixWS`
+                        <h3>Album commentary</h3>
+                        <blockquote>
+                            ${transformMultiline(album.commentary)}
+                        </blockquote>
+                    `}
+                    ${album.tracks.filter(t => t.commentary).map(track => fixWS`
+                        <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></h3>
+                        <blockquote style="${getLinkThemeString(track)}">
+                            ${transformMultiline(track.commentary)}
+                        </blockquote>
+                    `).join('\n')}
+                </div>
+            `
+        },
+
+        nav: {
+            links: [
+                ['./', wikiInfo.shortName],
+                [`${C.COMMENTARY_DIRECTORY}/`, 'Commentary'],
+                [null, 'Album:'],
+                [`${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name]
+            ]
+        }
+    });
 }
 
 function writeTagPages() {
@@ -4365,6 +4402,7 @@ async function main() {
 
         album: {type: 'flag'},
         artist: {type: 'flag'},
+        commentary: {type: 'flag'},
         flash: {type: 'flag'},
         group: {type: 'flag'},
         list: {type: 'flag'},
@@ -4385,6 +4423,7 @@ async function main() {
     if (buildAll || buildFlags.news) await writeNewsPages();
     if (buildAll || buildFlags.list) await writeListingPages();
     if (buildAll || buildFlags.tag) await writeTagPages();
+    if (buildAll || buildFlags.commentary) await writeCommentaryPages();
     if (buildAll || buildFlags.group) await writeGroupPages();
     if (buildAll || buildFlags.album) await writeAlbumPages();
     if (buildAll || buildFlags.track) await writeTrackPages();
