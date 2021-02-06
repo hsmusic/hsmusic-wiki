@@ -2311,7 +2311,8 @@ async function writeArtistPage(artist) {
         note = ''
     } = artist;
 
-    const artThings = C.sortByDate([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist]);
+    const artThingsAll = C.sortByDate(Array.from(new Set([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist])));
+    const artThingsGallery = C.sortByDate([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist]);
     const commentaryThings = C.sortByDate([...artist.tracks.asCommentator, ...artist.albums.asCommentator]);
 
     let flashes;
@@ -2366,13 +2367,13 @@ async function writeArtistPage(artist) {
                     <hr>
                 `}
                 ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
-                ${artThings.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>!</p>`}
+                ${artThingsGallery.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>!</p>`}
                 <p>Jump to: ${[
                     [
                         [...releasedTracks, ...unreleasedTracks].length && `<a href="${index}#tracks">Tracks</a>`,
                         unreleasedTracks.length && `(<a href="${index}#unreleased-tracks">Unreleased Tracks</a>)`
                     ].filter(Boolean).join(' '),
-                    artThings.length && `<a href="${index}#art">Art</a>`,
+                    artThingsAll.length && `<a href="${index}#art">Art</a>`,
                     wikiInfo.features.flashesAndGames && flashes.length && `<a href="${index}#flashes">Flashes &amp; Games</a>`,
                     commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
                 ].filter(Boolean).join(', ')}.</p>
@@ -2387,20 +2388,27 @@ async function writeArtistPage(artist) {
                     <h3 id="unreleased-tracks">Unreleased Tracks</h3>
                     ${generateTrackList(unreleasedTracks)}
                 `}
-                ${artThings.length && fixWS`
+                ${artThingsAll.length && fixWS`
                     <h2 id="art">Art</h2>
-                    <p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>! Or browse the list:</p>
-                    ${albumChunkedList(artThings, (thing, i) => {
-                        const contrib = thing.coverArtists.find(({ who }) => who === artist);
-                        return fixWS`
+                    ${artThingsGallery.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>! Or browse the list:</p>`}
+                    ${albumChunkedList(artThingsAll, (thing, i) => {
+                        const cover = {
+                            artists: thing.coverArtists,
+                            contrib: thing.coverArtists.find(({ who }) => who === artist)
+                        };
+                        const bg = {
+                            artists: thing.wallpaperArtists,
+                            contrib: thing.wallpaperArtists?.find(({ who }) => who === artist)
+                        };
+                        return [cover, bg].filter(x => x.contrib).map(({ artists, contrib }) => fixWS`
                             <li title="${th(i + 1)} art by ${name}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
                                 ${thing.album ? fixWS`
                                     <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getLinkThemeString(thing)}">${thing.name}</a>
-                                ` : '<i>(cover art)</i>'}
-                                ${thing.coverArtists.length > 1 && `<span class="contributed">(with ${getArtistString(thing.coverArtists.filter(({ who }) => who !== artist))})</span>`}
+                                ` : (contrib === bg.contrib) ? '<i>(wallpaper art)</i>' : '<i>(cover art)</i>'}
+                                ${artists.length > 1 && `<span class="contributed">(with ${getArtistString(artists.filter(({ who }) => who !== artist))})</span>`}
                                 ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
                             </li>
-                        `;
+                        `).join('\n');
                     }, true, 'coverArtDate')}
                 `}
                 ${wikiInfo.features.flashesAndGames && flashes.length && fixWS`
@@ -2440,7 +2448,7 @@ async function writeArtistPage(artist) {
                 wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
                 [null, 'Artist:'],
                 [`${C.ARTIST_DIRECTORY}/${artist.directory}/`, name],
-                artThings.length && [null, `(${[
+                artThingsGallery.length && [null, `(${[
                     `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/" class="current">Info</a>`,
                     `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">Gallery</a>`
                 ].join(', ')})`]
@@ -2448,7 +2456,7 @@ async function writeArtistPage(artist) {
         }
     });
 
-    if (artThings.length) {
+    if (artThingsGallery.length) {
         await writePage([C.ARTIST_DIRECTORY, artist.directory, 'gallery'], {
             title: name + ' - Gallery',
 
@@ -2456,10 +2464,10 @@ async function writeArtistPage(artist) {
                 classes: ['top-index'],
                 content: fixWS`
                     <h1>${name} - Gallery</h1>
-                    <p class="quick-info">(Contributed to ${s(artThings.length, 'cover art')})</p>
+                    <p class="quick-info">(Contributed to ${s(artThingsGallery.length, 'cover art')})</p>
                     <div class="grid-listing">
                         ${getGridHTML({
-                            entries: artThings.map(item => ({item})),
+                            entries: artThingsGallery.map(item => ({item})),
                             srcFn: thing => (thing.album
                                 ? getTrackCover(thing)
                                 : getAlbumCover(thing)),
@@ -2791,6 +2799,7 @@ function writeListingPages() {
                                 contribs: (
                                     artist.tracks.asCoverArtist.length +
                                     artist.albums.asCoverArtist.length +
+                                    artist.albums.asWallpaperArtist.length +
                                     (wikiInfo.features.flashesAndGames ? artist.flashes.asContributor.length : 0)
                                 )
                             }))
@@ -4090,6 +4099,7 @@ async function main() {
             ...albumData.flatMap(album => [
                 ...album.artists || [],
                 ...album.coverArtists || [],
+                ...album.wallpaperArtists || [],
                 ...album.tracks.flatMap(track => [
                     ...track.artists,
                     ...track.coverArtists || [],
@@ -4371,7 +4381,8 @@ async function main() {
         artist.albums = {
             asArtist: filterProp(albumData, 'artists'),
             asCommentator: filterCommentary(albumData),
-            asCoverArtist: filterProp(albumData, 'coverArtists')
+            asCoverArtist: filterProp(albumData, 'coverArtists'),
+            asWallpaperArtist: filterProp(albumData, 'wallpaperArtists')
         };
         if (wikiInfo.features.flashesAndGames) {
             artist.flashes = {
