@@ -2312,7 +2312,7 @@ async function writeArtistPage(artist) {
     } = artist;
 
     const artThingsAll = C.sortByDate(Array.from(new Set([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist])));
-    const artThingsGallery = C.sortByDate([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist]);
+    const artThingsGallery = C.sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
     const commentaryThings = C.sortByDate([...artist.tracks.asCommentator, ...artist.albums.asCommentator]);
 
     let flashes;
