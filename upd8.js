@@ -1221,6 +1221,8 @@ async function processHomepageInfoFile(file) {
             return {error: 'Expected "Row" (name) field!'};
         }
 
+        const color = getBasicField(section, 'Color');
+
         const type = getBasicField(section, 'Type');
         if (!type) {
             return {error: 'Expected "Type" field!'};
@@ -1229,6 +1231,8 @@ async function processHomepageInfoFile(file) {
         if (!validRowTypes.includes(type)) {
             return {error: `Expected "Type" field to be one of: ${validRowTypes.join(', ')}`};
         }
+
+        const row = {name, color, type};
 
         switch (type) {
             case 'albums': {
@@ -1257,7 +1261,7 @@ async function processHomepageInfoFile(file) {
                     return {error: 'Expected every action to be a <a>-type link!'};
                 }
 
-                return {name, type, group, groupCount, albums, actions};
+                return {...row, group, groupCount, albums, actions};
             }
         }
     });
@@ -1770,31 +1774,33 @@ async function writeHomepage() {
             content: fixWS`
                 <h1>${wikiInfo.name}</h1>
                 ${homepageInfo.rows.map((row, i) => fixWS`
-                    <h2>${row.name}</h2>
-                    ${row.type === 'albums' && fixWS`
-                        <div class="grid-listing">
-                            ${getAlbumGridHTML({
-                                entries: (
-                                    row.group === 'new-releases' ? getNewReleases(row.groupCount) :
-                                    ((getLinkedGroup(row.group)?.albums || [])
-                                        .slice()
-                                        .reverse()
-                                        .slice(0, row.groupCount)
-                                        .map(album => ({item: album})))
-                                ).concat(row.albums
-                                    .map(getLinkedAlbum)
-                                    .map(album => ({item: album}))
-                                ),
-                                lazy: i > 0
-                            })}
-                            ${row.actions.length && fixWS`
-                                <div class="grid-actions">
-                                    ${row.actions.map(action => action
-                                        .replace('<a', '<a class="box grid-item"')).join('\n')}
-                                </div>
-                            `}
-                        </div>
-                    `}
+                    <section class="row" style="${getLinkThemeString(row)}">
+                        <h2>${row.name}</h2>
+                        ${row.type === 'albums' && fixWS`
+                            <div class="grid-listing">
+                                ${getAlbumGridHTML({
+                                    entries: (
+                                        row.group === 'new-releases' ? getNewReleases(row.groupCount) :
+                                        ((getLinkedGroup(row.group)?.albums || [])
+                                            .slice()
+                                            .reverse()
+                                            .slice(0, row.groupCount)
+                                            .map(album => ({item: album})))
+                                    ).concat(row.albums
+                                        .map(getLinkedAlbum)
+                                        .map(album => ({item: album}))
+                                    ),
+                                    lazy: i > 0
+                                })}
+                                ${row.actions.length && fixWS`
+                                    <div class="grid-actions">
+                                        ${row.actions.map(action => action
+                                            .replace('<a', '<a class="box grid-item"')).join('\n')}
+                                    </div>
+                                `}
+                            </div>
+                        `}
+                    </section>
                 `).join('\n')}
             `
         },
