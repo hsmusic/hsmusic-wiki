@@ -3187,9 +3187,6 @@ function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)
                     <a href="${C.LISTING_DIRECTORY}/${ldDirectoryParts.join('/')}/">${ldTitle}</a>
                 </li>
             `).join('\n')}
-            <li ${classes(currentDirectoryParts === 'all-commentary' && 'current')}>
-                <a href="${C.LISTING_DIRECTORY}/all-commentary/">All Commentary</a>
-            </li>
             <li ${classes(currentDirectoryParts === 'random' && 'current')}>
                 <a href="${C.LISTING_DIRECTORY}/random/">Random Pages</a>
             </li>
