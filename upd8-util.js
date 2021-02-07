@@ -304,3 +304,5 @@ module.exports.curry = f => x => (...args) => f(x, ...args);
 module.exports.mapInPlace = (array, fn) => array.splice(0, array.length, ...array.map(fn));
 
 module.exports.filterEmptyLines = string => string.split('\n').filter(line => line.trim()).join('\n');
+
+module.exports.unique = arr => Array.from(new Set(arr));

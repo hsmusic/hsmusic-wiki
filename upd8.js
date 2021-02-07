@@ -114,7 +114,8 @@ const {
     queue,
     s,
     splitArray,
-    th
+    th,
+    unique
 } = require('./upd8-util');
 
 const C = require('./common/common');
@@ -2311,18 +2312,18 @@ async function writeArtistPage(artist) {
         note = ''
     } = artist;
 
-    const artThingsAll = C.sortByDate(Array.from(new Set([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist])));
+    const artThingsAll = C.sortByDate(unique([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist]));
     const artThingsGallery = C.sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
-    const commentaryThings = C.sortByDate([...artist.tracks.asCommentator, ...artist.albums.asCommentator]);
+    const commentaryThings = C.sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
 
     let flashes;
     if (wikiInfo.features.flashesAndGames) {
         flashes = artist.flashes.asContributor;
     }
 
-    const unreleasedTracks = [...artist.tracks.asArtist, ...artist.tracks.asContributor]
+    const unreleasedTracks = unique([...artist.tracks.asArtist, ...artist.tracks.asContributor])
         .filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = [...artist.tracks.asArtist, ...artist.tracks.asContributor]
+    const releasedTracks = unique([...artist.tracks.asArtist, ...artist.tracks.asContributor])
         .filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
 
     const generateTrackList = tracks => albumChunkedList(tracks, (track, i) => {
