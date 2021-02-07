@@ -3197,6 +3197,10 @@ function getWordCount(str) {
 }
 
 function writeCommentaryPages() {
+    if (!filterAlbumsByCommentary().length) {
+        return;
+    }
+
     return progressPromiseAll('Writing commentary pages.', queue([
         writeCommentaryIndex,
         ...filterAlbumsByCommentary().map(curry(writeAlbumCommentaryPage))
