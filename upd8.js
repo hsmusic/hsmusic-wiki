@@ -289,7 +289,7 @@ function getMultilineField(lines, name) {
 };
 
 function transformInline(text) {
-    return text.replace(/\[\[(album:|artist:|flash:|track:|tag:|group:)?(.+?)\]\]/g, (match, category, ref, offset) => {
+    return text.replace(/\[\[(album:|album-commentary:|artist:|flash:|track:|tag:|group:)?(.+?)\]\]/g, (match, category, ref, offset) => {
         if (category === 'album:') {
             const album = getLinkedAlbum(ref);
             if (album) {
@@ -298,6 +298,16 @@ function transformInline(text) {
                 `;
             } else {
                 console.warn(`\x1b[33mThe linked album ${match} does not exist!\x1b[0m`);
+                return ref;
+            }
+        } else if (category === 'album-commentary:') {
+            const album = getLinkedAlbum(ref);
+            if (filterAlbumsByCommentary().includes(album)) {
+                return fixWS`
+                    <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name} (commentary)</a>
+                `;
+            } else {
+                console.warn(`\x1b[33mThe linked album ${match} does not exist or has no commentary!\x1b[0m`);
                 return ref;
             }
         } else if (category === 'artist:') {
