@@ -1507,7 +1507,7 @@ async function writePage(directoryParts, {
 }) {
     body.style ??= '';
 
-    theme = theme ?? getThemeString(wikiInfo);
+    theme = theme || getThemeString(wikiInfo);
 
     main.classes ??= [];
     main.content ??= '';
