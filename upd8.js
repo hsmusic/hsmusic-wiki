@@ -4262,8 +4262,6 @@ async function main() {
         }
         if (CR4SH) {
             return;
-        } else {
-            console.log(`All artist data is good!`);
         }
     }
 
