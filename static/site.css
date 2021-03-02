@@ -94,8 +94,7 @@ a:hover {
     font-weight: normal;
 }
 
-#header > h2 a.current,
-#header > h2.highlight-last-link > a:last-of-type {
+#header > h2 a.current {
     font-weight: 800;
 }
 
@@ -462,6 +461,8 @@ h1 {
 .grid-actions > .grid-item {
     flex-basis: unset !important;
     margin: 5px;
+    --primary-color: inherit !important;
+    --dim-color: inherit !important;
 }
 
 .grid-item {

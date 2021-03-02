@@ -8,6 +8,7 @@
     },
     "dependencies": {
         "fix-whitespace": "^1.0.4",
+        "he": "^1.2.0",
         "mkdirp": "^0.5.5"
     },
     "license": "GPL-3.0"

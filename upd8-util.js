@@ -306,3 +306,66 @@ module.exports.mapInPlace = (array, fn) => array.splice(0, array.length, ...arra
 module.exports.filterEmptyLines = string => string.split('\n').filter(line => line.trim()).join('\n');
 
 module.exports.unique = arr => Array.from(new Set(arr));
+
+const logColor = color => (literals, ...values) => {
+    const w = s => process.stdout.write(s);
+    w(`\x1b[${color}m`);
+    for (let i = 0; i < literals.length; i++) {
+        w(literals[i]);
+        if (values[i] !== undefined) {
+            w(`\x1b[1m`);
+            w(String(values[i]));
+            w(`\x1b[0;${color}m`);
+        }
+    }
+    w(`\x1b[0m\n`);
+};
+
+module.exports.logWarn = logColor(33);
+module.exports.logError = logColor(31);
+
+module.exports.sortByName = (a, b) => {
+    let an = a.name.toLowerCase();
+    let bn = b.name.toLowerCase();
+    if (an.startsWith('the ')) an = an.slice(4);
+    if (bn.startsWith('the ')) bn = bn.slice(4);
+    return an < bn ? -1 : an > bn ? 1 : 0;
+};
+
+module.exports.chunkByConditions = function(array, conditions) {
+    if (array.length === 0) {
+        return [];
+    } else if (conditions.length === 0) {
+        return [array];
+    }
+
+    const out = [];
+    let cur = [array[0]];
+    for (let i = 1; i < array.length; i++) {
+        const item = array[i];
+        const prev = array[i - 1];
+        let chunk = false;
+        for (const condition of conditions) {
+            if (condition(item, prev)) {
+                chunk = true;
+                break;
+            }
+        }
+        if (chunk) {
+            out.push(cur);
+            cur = [item];
+        } else {
+            cur.push(item);
+        }
+    }
+    out.push(cur);
+    return out;
+};
+
+module.exports.chunkByProperties = function(array, properties) {
+    return module.exports.chunkByConditions(array, properties.map(p => (a, b) => a[p] !== b[p] || a[p] != b[p]))
+        .map(chunk => ({
+            ...Object.fromEntries(properties.map(p => [p, chunk[0][p]])),
+            chunk
+        }));
+};

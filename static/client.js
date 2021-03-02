@@ -10,10 +10,10 @@ let officialAlbumData, fandomAlbumData, artistNames;
 
 let ready = false;
 
-function rebase(href) {
-    const relative = document.documentElement.dataset.rebase;
+function rebase(href, rebaseKey = 'rebaseLocalized') {
+    const relative = document.documentElement.dataset[rebaseKey];
     if (relative) {
-        return relative + "/" + href;
+        return relative + href;
     } else {
         return href;
     }
@@ -162,7 +162,7 @@ const elements2 = document.getElementsByClassName('js-show-once-data');
 
 for (const element of elements1) element.style.display = 'block';
 
-fetch(rebase('data.json')).then(data => data.json()).then(data => {
+fetch(rebase('data.json', 'rebaseShared')).then(data => data.json()).then(data => {
     albumData = data.albumData;
     artistData = data.artistData;
     flashData = data.flashData;

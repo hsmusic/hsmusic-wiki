@@ -79,6 +79,9 @@ const fixWS = require('fix-whitespace');
 // exactly what we do here.
 const mkdirp = util.promisify(require('mkdirp'));
 
+// It stands for "HTML Entities", apparently. Cursed.
+const he = require('he');
+
 // This is the dum8est name for a function possi8le. Like, SURE, fine, may8e
 // the UNIX people had some valid reason to go with the weird truncated
 // lowercased convention they did. 8ut Node didn't have to ALSO use that
@@ -104,15 +107,20 @@ const unlink = util.promisify(fs.unlink);
 
 const {
     cacheOneArg,
+    chunkByConditions,
+    chunkByProperties,
     curry,
     decorateTime,
     filterEmptyLines,
     joinNoOxford,
     mapInPlace,
+    logWarn,
+    logError,
     parseOptions,
     progressPromiseAll,
     queue,
     s,
+    sortByName,
     splitArray,
     th,
     unique
@@ -120,7 +128,7 @@ const {
 
 const C = require('./common/common');
 
-const CACHEBUST = 2;
+const CACHEBUST = 3;
 
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
@@ -130,6 +138,7 @@ const NEWS_DATA_FILE = 'news.txt';
 const TAG_DATA_FILE = 'tags.txt';
 const GROUP_DATA_FILE = 'groups.txt';
 const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
+const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
 const CSS_FILE = 'site.css';
 
@@ -141,6 +150,7 @@ const CSS_FILE = 'site.css';
 // passing around a data object containing all this, though.
 let dataPath;
 let mediaPath;
+let langPath;
 let outputPath;
 
 let wikiInfo;
@@ -148,21 +158,432 @@ let homepageInfo;
 let albumData;
 let trackData;
 let flashData;
+let flashActData;
 let newsData;
 let tagData;
 let groupData;
+let groupCategoryData;
 let staticPageData;
 
 let artistNames;
 let artistData;
+let artistAliasData;
 
 let officialAlbumData;
 let fandomAlbumData;
-let justEverythingMan; // tracks, albums, flashes -- don't forget to upd8 getHrefOfAnythingMan!
+let justEverythingMan; // tracks, albums, flashes -- don't forget to upd8 toAnythingMan!
 let justEverythingSortedByArtDateMan;
 let contributionData;
 
 let queueSize;
+
+let languages;
+
+const urlSpec = {
+    localized: {
+        home: '',
+        site: '<>',
+
+        album: 'album/<>/',
+        albumCommentary: 'commentary/album/<>/',
+
+        artist: 'artist/<>/',
+        artistGallery: 'artist/<>/gallery/',
+
+        commentaryIndex: 'commentary/',
+
+        flashIndex: 'flash/',
+        flash: 'flash/<>/',
+
+        groupInfo: 'group/<>/',
+        groupGallery: 'group/<>/gallery/',
+
+        listingIndex: 'list/',
+        listing: 'list/<>/',
+
+        newsIndex: 'news/',
+        newsEntry: 'news/<>/',
+
+        staticPage: '<>/',
+        tag: 'tag/<>/',
+        track: 'track/<>/'
+    },
+
+    shared: {
+        root: '<>',
+
+        commonFile: 'common/<>',
+        staticFile: 'static/<>',
+
+        media: 'media/<>',
+        albumCover: 'media/album-art/<>/cover.jpg',
+        albumWallpaper: 'media/album-art/<>/bg.jpg',
+        trackCover: 'media/album-art/<>/<>.jpg',
+        artistAvatar: 'media/artist-avatar/<>.jpg',
+        flashArt: 'media/flash-art/<>.jpg'
+    }
+};
+
+const linkHelper = (hrefFn, {color = true} = {}) =>
+    (thing, {
+        strings, to,
+        text = '',
+        class: className = '',
+        hash = ''
+    }) => `<a href="${hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : '')}" ${attributes({
+        style: color ? getLinkThemeString(thing) : '',
+        class: className
+    })}>${text || thing.name}</a>`;
+
+const linkDirectory = (key, conf) => linkHelper(({directory}, {to}) => to[key](directory), conf);
+const linkPathname = (key, conf) => linkHelper((pathname, {to}) => to[key](pathname), conf);
+const linkIndex = (key, conf) => linkHelper((_, {to}) => to[key](''), conf);
+
+const link = {
+    album: linkDirectory('album'),
+    albumCommentary: linkDirectory('albumCommentary'),
+    artist: linkDirectory('artist', {color: false}),
+    artistGallery: linkDirectory('artistGallery', {color: false}),
+    commentaryIndex: linkIndex('commentaryIndex', {color: false}),
+    flashIndex: linkIndex('flashIndex', {color: false}),
+    flash: linkDirectory('flash'),
+    groupInfo: linkDirectory('groupInfo'),
+    groupGallery: linkDirectory('groupGallery'),
+    home: linkIndex('home', {color: false}),
+    listingIndex: linkIndex('listingIndex'),
+    listing: linkDirectory('listing'),
+    newsIndex: linkIndex('newsIndex', {color: false}),
+    newsEntry: linkDirectory('newsEntry', {color: false}),
+    staticPage: linkDirectory('staticPage', {color: false}),
+    tag: linkDirectory('tag'),
+    track: linkDirectory('track'),
+
+    media: linkPathname('media', {color: false}),
+    root: linkPathname('root', {color: false}),
+    site: linkPathname('site', {color: false})
+};
+
+function generateURLs(fromPath) {
+    const helper = toPath => {
+        let argIndex = 0;
+        const relative = (path.relative(fromPath, toPath.replaceAll('<>', () => `<${argIndex++}>`))
+            + (toPath.endsWith('/') ? '/' : ''));
+        return (...args) => relative.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+    };
+
+    return Object.fromEntries(Object.entries({...urlSpec.localized, ...urlSpec.shared}).map(
+        ([key, path]) => [key, helper(path)]
+    ));
+}
+
+const urls = Object.fromEntries(Object.entries(urlSpec.localized).map(
+    ([key, path]) => [key, generateURLs(path)]
+));
+
+const searchHelper = (keys, dataFn, findFn) => ref => {
+    if (!ref) return null;
+    ref = ref.replace(new RegExp(`^(${keys.join('|')}):`), '');
+    const found = findFn(ref, dataFn());
+    if (!found) {
+        logWarn`Didn't match anything for ${ref}! (${keys.join(', ')})`;
+    }
+    return found;
+};
+
+const matchDirectory = (ref, data) => data.find(({ directory }) => directory === ref);
+
+const matchDirectoryOrName = (ref, data) => {
+    let thing;
+
+    thing = matchDirectory(ref, data);
+    if (thing) return thing;
+
+    thing = data.find(({ name }) => name === ref);
+    if (thing) return thing;
+
+    thing = data.find(({ name }) => name.toLowerCase() === ref.toLowerCase());
+    if (thing) {
+        logWarn`Bad capitalization: ${'\x1b[31m' + ref} -> ${'\x1b[32m' + thing.name}`;
+        return thing;
+    }
+
+    return null;
+};
+
+const search = {
+    album: searchHelper(['album', 'album-commentary'], () => albumData, matchDirectoryOrName),
+    artist: searchHelper(['artist', 'artist-gallery'], () => artistData, matchDirectoryOrName),
+    flash: searchHelper(['flash'], () => flashData, matchDirectory),
+    group: searchHelper(['group', 'group-gallery'], () => groupData, matchDirectoryOrName),
+    listing: searchHelper(['listing'], () => listingSpec, matchDirectory),
+    newsEntry: searchHelper(['news-entry'], () => newsData, matchDirectory),
+    staticPage: searchHelper(['static'], () => staticPageData, matchDirectory),
+    tag: searchHelper(['tag'], () => tagData, (ref, data) =>
+        matchDirectoryOrName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data)),
+    track: searchHelper(['track'], () => trackData, matchDirectoryOrName)
+};
+
+// Localiz8tion time! Or l10n as the neeeeeeeerds call it. Which is a terri8le
+// name and not one I intend on using, thank you very much. (Don't even get me
+// started on """"a11y"""".)
+//
+// All the default strings are in strings-default.json, if you're curious what
+// those actually look like. Pretty much it's "I like {ANIMAL}" for example.
+// For each language, the o8ject gets turned into a single function of form
+// f(key, {args}). It searches for a key in the o8ject and uses the string it
+// finds (or the one in strings-default.json) as a templ8 evaluated with the
+// arguments passed. (This function gets treated as an o8ject too; it gets
+// the language code attached.)
+//
+// The function's also responsi8le for getting rid of dangerous characters
+// (quotes and angle tags), though only within the templ8te (not the args),
+// and it converts the keys of the arguments o8ject from camelCase to
+// CONSTANT_CASE too.
+function genStrings(stringsJSON, defaultJSON = null) {
+    // genStrings will only 8e called once for each language, and it happens
+    // right at the start of the program (or at least 8efore 8uilding pages).
+    // So, now's a good time to valid8te the strings and let any warnings be
+    // known.
+
+    // May8e contrary to the argument name, the arguments should 8e o8jects,
+    // not actual JSON-formatted strings!
+    if (typeof stringsJSON !== 'object' || stringsJSON.constructor !== Object) {
+        return {error: `Expected an object (parsed JSON) for stringsJSON.`};
+    }
+    if (typeof defaultJSON !== 'object') { // typeof null === object. I h8 JS.
+        return {error: `Expected an object (parsed JSON) or null for defaultJSON.`};
+    }
+
+    // All languages require a language code.
+    const code = stringsJSON['meta.languageCode'];
+    if (!code) {
+        return {error: `Missing language code.`};
+    }
+    if (typeof code !== 'string') {
+        return {error: `Expected language code to be a string.`};
+    }
+
+    // Every value on the provided o8ject should be a string.
+    // (This is lazy, but we only 8other checking this on stringsJSON, on the
+    // assumption that defaultJSON was passed through this function too, and so
+    // has already been valid8ted.)
+    {
+        let err = false;
+        for (const [ key, value ] of Object.entries(stringsJSON)) {
+            if (typeof value !== 'string') {
+                logError`(${code}) The value for ${key} should be a string.`;
+                err = true;
+            }
+        }
+        if (err) {
+            return {error: `Expected all values to be a string.`};
+        }
+    }
+
+    // Checking is generally done against the default JSON, so we'll skip out
+    // if that isn't provided (which should only 8e the case when it itself is
+    // 8eing processed as the first loaded language).
+    if (defaultJSON) {
+        // Warn for keys that are missing or unexpected.
+        const expectedKeys = Object.keys(defaultJSON);
+        const presentKeys = Object.keys(stringsJSON);
+        for (const key of presentKeys) {
+            if (!expectedKeys.includes(key)) {
+                logWarn`(${code}) Unexpected translation key: ${key} - this won't be used!`;
+            }
+        }
+        for (const key of expectedKeys) {
+            if (!presentKeys.includes(key)) {
+                logWarn`(${code}) Missing translation key: ${key} - this won't be localized!`;
+            }
+        }
+    }
+
+    // Valid8tion is complete, 8ut We can still do a little caching to make
+    // repeated actions faster.
+
+    // We're gonna 8e mut8ting the strings dictionary o8ject from here on out.
+    // We make a copy so we don't mess with the one which was given to us.
+    stringsJSON = Object.assign({}, stringsJSON);
+
+    // Preemptively pass everything through HTML encoding. This will prevent
+    // strings from embedding HTML tags or accidentally including characters
+    // that throw HTML parsers off.
+    for (const key of Object.keys(stringsJSON)) {
+        stringsJSON[key] = escapeAttributeValue(stringsJSON[key]);
+    }
+
+    // It's time to cre8te the actual langauge function!
+
+    // In the function, we don't actually distinguish 8etween the primary and
+    // default (fall8ack) strings - any relevant warnings have already 8een
+    // presented a8ove, at the time the language JSON is processed. Now we'll
+    // only 8e using them for indexing strings to use as templ8tes, and we can
+    // com8ine them for that.
+    const stringIndex = Object.assign({}, defaultJSON, stringsJSON);
+
+    // We do still need the list of valid keys though. That's 8ased upon the
+    // default strings. (Or stringsJSON, 8ut only if the defaults aren't
+    // provided - which indic8tes that the single o8ject provided *is* the
+    // default.)
+    const validKeys = Object.keys(defaultJSON || stringsJSON);
+
+    const invalidKeysFound = [];
+
+    const strings = (key, args = {}) => {
+        // Ok, with the warning out of the way, it's time to get to work.
+        // First make sure we're even accessing a valid key. (If not, return
+        // an error string as su8stitute.)
+        if (!validKeys.includes(key)) {
+            // We only want to warn a8out a given key once. More than that is
+            // just redundant!
+            if (!invalidKeysFound.includes(key)) {
+                invalidKeysFound.push(key);
+                logError`(${code}) Accessing invalid key ${key}. Fix a typo or provide this in strings-default.json!`;
+            }
+            return `MISSING: ${key}`;
+        }
+
+        const template = stringIndex[key];
+
+        // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
+        // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
+        // like, who cares, dude?) Also, this is an array, 8ecause it's handy
+        // for the iterating we're a8out to do.
+        const processedArgs = Object.entries(args)
+            .map(([ k, v ]) => [k.replace(/[A-Z]/g, '_$&').toUpperCase(), v]);
+
+        // Replacement time! Woot. Reduce comes in handy here!
+        const output = processedArgs.reduce(
+            (x, [ k, v ]) => x.replaceAll(`{${k}}`, v),
+            template);
+
+        // Post-processing: if any expected arguments *weren't* replaced, that
+        // is almost definitely an error.
+        if (output.match(/\{[A-Z_]+\}/)) {
+            logError`(${code}) Args in ${key} were missing - output: ${output}`;
+        }
+
+        return output;
+    };
+
+    // And lastly, we add some utility stuff to the strings function.
+
+    // Store the language code, for convenience of access.
+    strings.code = code;
+
+    // Store the strings dictionary itself, also for convenience.
+    strings.json = stringsJSON;
+
+    const bindUtilities = (obj, bind) => Object.fromEntries(Object.entries(obj).map(
+        ([ key, fn ]) => [key, (value, opts = {}) => fn(value, {...bind, ...opts})]
+    ));
+
+    // There are a 8unch of handy count functions which expect a strings value;
+    // for a more terse syntax, we'll stick 'em on the strings function itself,
+    // with automatic 8inding for the strings argument.
+    strings.count = bindUtilities(count, {strings});
+
+    // The link functions also expect the strings o8ject(*). May as well hand
+    // 'em over here too! Keep in mind they still expect {to} though, and that
+    // isn't something we have access to from this scope (so calls such as
+    // strings.link.album(...) still need to provide it themselves).
+    //
+    // (*) At time of writing, it isn't actually used for anything, 8ut future-
+    // proofing, ok????????
+    strings.link = bindUtilities(link, {strings});
+
+    // List functions, too!
+    strings.list = bindUtilities(list, {strings});
+
+    return strings;
+};
+
+const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit = false}) => strings(
+    (unit
+        ? `count.${stringKey}.withUnit` + (value === 1
+            ? '.singular'
+            : '.plural')
+        : `count.${stringKey}`),
+    {[argName]: value});
+
+const count = {
+    date: (date, {strings}) => {
+        // TODO: Localize.
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ]
+        date = new Date(date);
+        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
+    },
+
+    dateRange: ([startDate, endDate], {strings}) => {
+        // TODO: Localize.
+        return (startDate === endDate
+            ? count.date(startDate, {strings})
+            : `${count.date(startDate, {strings})} to ${count.date(endDate, {strings})}`);
+    },
+
+    duration: (secTotal, {strings, approximate = false, unit = false}) => {
+        if (secTotal === 0) {
+            return strings('count.duration.missing');
+        }
+
+        const hour = Math.floor(secTotal / 3600);
+        const min = Math.floor((secTotal - hour * 3600) / 60);
+        const sec = Math.floor(secTotal - hour * 3600 - min * 60);
+
+        const pad = val => val.toString().padStart(2, '0');
+
+        const stringSubkey = unit ? '.withUnit' : '';
+
+        const duration = (hour > 0
+            ? strings('count.duration.hours' + stringSubkey, {
+                hours: hour,
+                minutes: pad(min),
+                seconds: pad(sec)
+            })
+            : strings('count.duration.minutes' + stringSubkey, {
+                minutes: min,
+                seconds: pad(sec)
+            }));
+
+        return (approximate
+            ? strings('count.duration.approximate', {duration})
+            : duration);
+    },
+
+    index: (value, {strings}) => {
+        // TODO: Localize.
+        return th(value);
+    },
+
+    words: (value, {strings, unit = false}) => {
+        const words = (value > 1000
+            ? strings('count.words.thousand', {words: Math.floor(value / 100) / 10})
+            : strings('count.words', {words: value}));
+
+        return (unit
+            ? countHelper('words')(words, {strings, unit: true})
+            : words);
+    },
+
+    albums: countHelper('albums'),
+    commentaryEntries: countHelper('commentaryEntries', 'entries'),
+    contributions: countHelper('contributions'),
+    coverArts: countHelper('coverArts'),
+    timesReferenced: countHelper('timesReferenced'),
+    timesUsed: countHelper('timesUsed'),
+    tracks: countHelper('tracks')
+};
+
+const list = {
+    // TODO: Localize.
+    comma: (arr, {strings}) => arr.join(', '),
+    or: (arr, {strings}) => joinNoOxford(arr, 'or'),
+    and: (arr, {strings}) => joinNoOxford(arr, 'and')
+};
 
 // Note there isn't a 'find track data files' function. I plan on including the
 // data for all tracks within an al8um collected in the single metadata file
@@ -171,9 +592,9 @@ let queueSize;
 // only the track listing, not track data itself), and dealing with errors of
 // missing track files (or track files which are not linked to al8ums). All a
 // 8unch of stuff that's a pain to deal with for no apparent 8enefit.
-async function findAlbumDataFiles(albumDirectory) {
-    return (await readdir(path.join(albumDirectory)))
-        .map(albumFile => path.join(albumDirectory, albumFile));
+async function findFiles(dataPath) {
+    return (await readdir(dataPath))
+        .map(file => path.join(dataPath, file));
 }
 
 function* getSections(lines) {
@@ -288,104 +709,154 @@ function getMultilineField(lines, name) {
     return listLines.map(line => line.slice(4)).join('\n');
 };
 
-function transformInline(text) {
-    return text.replace(/\[\[(album:|album-commentary:|artist:|flash:|track:|tag:|group:)?(.+?)\]\]/g, (match, category, ref, offset) => {
-        if (category === 'album:') {
-            const album = getLinkedAlbum(ref);
-            if (album) {
-                return fixWS`
-                    <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
-                `;
+const replacerSpec = {
+    'album': {
+        search: 'album',
+        link: 'album'
+    },
+    'album-commentary': {
+        search: 'album',
+        link: 'albumCommentary'
+    },
+    'artist': {
+        search: 'artist',
+        link: 'artist'
+    },
+    'artist-gallery': {
+        search: 'artist',
+        link: 'artistGallery'
+    },
+    'commentary-index': {
+        search: null,
+        link: 'commentaryIndex'
+    },
+    'flash': {
+        search: 'flash',
+        link: 'flash',
+        transformName(name, search, offset, text) {
+            const nextCharacter = text[offset + search.length];
+            const lastCharacter = name[name.length - 1];
+            if (
+                ![' ', '\n', '<'].includes(nextCharacter) &&
+                lastCharacter === '.'
+            ) {
+                return name.slice(0, -1);
             } else {
-                console.warn(`\x1b[33mThe linked album ${match} does not exist!\x1b[0m`);
-                return ref;
+                return name;
             }
-        } else if (category === 'album-commentary:') {
-            const album = getLinkedAlbum(ref);
-            if (filterAlbumsByCommentary().includes(album)) {
-                return fixWS`
-                    <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name} (commentary)</a>
-                `;
-            } else {
-                console.warn(`\x1b[33mThe linked album ${match} does not exist or has no commentary!\x1b[0m`);
-                return ref;
-            }
-        } else if (category === 'artist:') {
-            const artist = getLinkedArtist(ref);
-            if (artist) {
-                return `<a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(artist.name)}/">${artist.name}</a>`;
-            } else {
-                console.warn(`\x1b[33mThe linked artist ${artist} does not exist!\x1b[0m`);
-                return ref;
-            }
-        } else if (category === 'flash:') {
-            const flash = getLinkedFlash(ref);
-            if (flash) {
-                let name = flash.name;
-                const nextCharacter = text[offset + match.length];
-                const lastCharacter = name[name.length - 1];
-                if (
-                    ![' ', '\n', '<'].includes(nextCharacter) &&
-                    lastCharacter === '.'
-                ) {
-                    name = name.slice(0, -1);
-                }
-                return getFlashLinkHTML(flash, name);
-            } else {
-                console.warn(`\x1b[33mThe linked flash ${match} does not exist!\x1b[0m`);
-                return ref;
-            }
-        } else if (category === 'track:') {
-            const track = getLinkedTrack(ref);
-            if (track) {
-                return fixWS`
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                `;
-            } else {
-                console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
-                return ref;
-            }
-        } else if (category === 'tag:') {
-            const tag = getLinkedTag(ref);
-            if (tag) {
-                return fixWS`
-                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a>
-                `;
-            } else {
-                console.warn(`\x1b[33mThe linked tag ${match} does not exist!\x1b[0m`);
-                return ref;
-            }
-        } else if (category === 'group:') {
-            const group = getLinkedGroup(ref);
-            if (group) {
-                return fixWS`
-                    <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a>
-                `;
-            } else {
-                console.warn(`\x1b[33mThe linked group ${group} does not exist!\x1b[0m`);
-                return ref;
-            }
-        } else {
-            const track = getLinkedTrack(ref);
-            if (track) {
-                let name = ref.match(/(.*):/);
-                if (name) {
-                    name = name[1];
-                } else {
-                    name = track.name;
-                }
-                return fixWS`
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${name}</a>
-                `;
-            } else {
-                console.warn(`\x1b[33mThe linked track ${match} does not exist!\x1b[0m`);
-                return ref;
-            }
+        }
+    },
+    'group': {
+        search: 'group',
+        link: 'groupInfo'
+    },
+    'group-gallery': {
+        search: 'group',
+        link: 'groupGallery'
+    },
+    'listing-index': {
+        search: null,
+        link: 'listingIndex'
+    },
+    'listing': {
+        search: 'listing',
+        link: 'listing'
+    },
+    'media': {
+        search: null,
+        link: 'media'
+    },
+    'news-index': {
+        search: null,
+        link: 'newsIndex'
+    },
+    'news-entry': {
+        search: 'newsEntry',
+        link: 'newsEntry'
+    },
+    'root': {
+        search: null,
+        link: 'root'
+    },
+    'site': {
+        search: null,
+        link: 'site'
+    },
+    'static': {
+        search: 'staticPage',
+        link: 'staticPage'
+    },
+    'tag': {
+        search: 'tag',
+        link: 'tag'
+    },
+    'track': {
+        search: 'track',
+        link: 'track'
+    }
+};
+
+{
+    let error = false;
+    for (const [key, {link: linkKey, search: searchKey}] of Object.entries(replacerSpec)) {
+        if (!link[linkKey]) {
+            logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
+            error = true;
+        }
+        if (searchKey && !search[searchKey]) {
+            logError`The replacer spec ${key} has invalid search key ${searchKey}! Specify it in search specs or fix typo.`;
+            error = true;
+        }
+    }
+    if (error) process.exit();
+
+    const categoryPart = Object.keys(replacerSpec).join('|');
+    transformInline.regexp = new RegExp(String.raw`\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
+}
+
+function transformInline(text, {strings, to}) {
+    return text.replace(transformInline.regexp, (match, _1, category, ref, hash, _2, enteredName, offset) => {
+        if (!category) {
+            category = 'track';
+        }
+
+        const {
+            search: searchKey,
+            link: linkKey,
+            transformName = null
+        } = replacerSpec[category];
+
+        const thing = (searchKey
+            ? search[searchKey](ref)
+            : {
+                directory: ref.replace(category + ':', ''),
+                name: null
+            });
+
+        if (!thing) {
+            logWarn`The link ${match} does not match anything!`;
+            return match;
+        }
+
+        const label = (enteredName
+            || transformName && transformName(thing.name, match, offset, text)
+            || thing.name);
+
+        if (!label) {
+            logWarn`The link ${match} requires a label be entered!`;
+            return match;
+        }
+
+        try {
+            return strings.link[linkKey](thing, {text: label, hash, to});
+        } catch (error) {
+            logError`The link ${match} failed to be processed: ${error}`;
+            return match;
         }
     });
 }
 
-function parseAttributes(string) {
+function parseAttributes(string, {to}) {
     const attributes = Object.create(null);
     const skipWhitespace = i => {
         const ws = /\s/;
@@ -422,7 +893,11 @@ function parseAttributes(string) {
             const vEnd = i + string.slice(i).match(new RegExp(`${end}|$`)).index;
             const value = string.slice(vStart, vEnd);
             i = vEnd + endOffset;
-            attributes[attribute] = value;
+            if (attribute === 'src' && value.startsWith('media/')) {
+                attributes[attribute] = to.media(value.slice('media/'.length));
+            } else {
+                attributes[attribute] = value;
+            }
         } else {
             attributes[attribute] = attribute;
         }
@@ -436,14 +911,10 @@ function parseAttributes(string) {
     ]));
 }
 
-function transformMultiline(text, treatAsDocument=false) {
+function transformMultiline(text, {strings, to}) {
     // Heck yes, HTML magics.
 
-    text = transformInline(text.trim());
-
-    if (treatAsDocument) {
-        return text;
-    }
+    text = transformInline(text.trim(), {strings, to});
 
     const outLines = [];
 
@@ -487,7 +958,7 @@ function transformMultiline(text, treatAsDocument=false) {
         line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
             lazy: true,
             link: true,
-            ...parseAttributes(attributes)
+            ...parseAttributes(attributes, {to})
         }));
 
         let indentThisLine = 0;
@@ -585,7 +1056,7 @@ function transformMultiline(text, treatAsDocument=false) {
     return outLines.join('\n');
 }
 
-function transformLyrics(text) {
+function transformLyrics(text, {strings, to}) {
     // Different from transformMultiline 'cuz it joins multiple lines together
     // with line 8reaks (<br>); transformMultiline treats each line as its own
     // complete paragraph (or list, etc).
@@ -593,10 +1064,10 @@ function transformLyrics(text) {
     // If it looks like old data, then like, oh god.
     // Use the normal transformMultiline tool.
     if (text.includes('<br')) {
-        return transformMultiline(text);
+        return transformMultiline(text, {strings, to});
     }
 
-    text = transformInline(text.trim());
+    text = transformInline(text.trim(), {strings, to});
 
     let buildLine = '';
     const addLine = () => outLines.push(`<p>${buildLine}</p>`);
@@ -734,10 +1205,10 @@ async function processAlbumDataFile(file) {
     album.tracks = [];
 
     // will be overwritten if a group section is found!
-    album.usesGroups = false;
+    album.trackGroups = null;
 
-    let group = '';
-    let groupColor = album.color;
+    let group = null;
+    let trackIndex = 0;
 
     for (const section of sections.slice(1)) {
         // Just skip empty sections. Sometimes I paste a 8unch of dividers,
@@ -749,15 +1220,25 @@ async function processAlbumDataFile(file) {
 
         const groupName = getBasicField(section, 'Group');
         if (groupName) {
-            group = groupName;
-            groupColor = (
-                getBasicField(section, 'Color') ||
-                getBasicField(section, 'FG') ||
-                album.color
-            );
-            album.usesGroups = true;
+            group = {
+                name: groupName,
+                color: (
+                    getBasicField(section, 'Color') ||
+                    getBasicField(section, 'FG') ||
+                    album.color
+                ),
+                startIndex: trackIndex,
+                tracks: []
+            };
+            if (album.trackGroups) {
+                album.trackGroups.push(group);
+            } else {
+                album.trackGroups = [group];
+            }
             continue;
         }
+
+        trackIndex++;
 
         const track = {};
 
@@ -841,10 +1322,9 @@ async function processAlbumDataFile(file) {
         // we're outputting the track pages.
         track.album = album;
 
-        track.group = group;
-
         if (group) {
-            track.color = groupColor;
+            track.color = group.color;
+            group.tracks.push(track);
         } else {
             track.color = album.color;
         }
@@ -911,7 +1391,7 @@ async function processFlashDataFile(file) {
             const anchor = getBasicField(section, 'Anchor');
             const jump = getBasicField(section, 'Jump');
             const jumpColor = getBasicField(section, 'Jump Color') || color;
-            return {act8r8k: true, act, color, anchor, jump, jumpColor};
+            return {act8r8k: true, name: act, color, anchor, jump, jumpColor};
         }
 
         const name = getBasicField(section, 'Flash');
@@ -1136,7 +1616,6 @@ async function processStaticPageDataFile(file) {
         let stylesheet = getMultilineField(section, 'Style') || '';
 
         let listed = getBooleanField(section, 'Listed') ?? true;
-        let treatAsHTML = getBooleanField(section, 'Treat as HTML') ?? false;
 
         return {
             name,
@@ -1144,8 +1623,7 @@ async function processStaticPageDataFile(file) {
             directory,
             content,
             stylesheet,
-            listed,
-            treatAsHTML
+            listed
         };
     });
 }
@@ -1176,6 +1654,11 @@ async function processWikiInfoFile(file) {
     // gener8ted.
     const canonicalBase = getBasicField(contentLines, 'Canonical Base');
 
+    // This is optional! Without it, the site will default to 8uilding in
+    // English. (This is only really relevant if you've provided string files
+    // for non-English languages.)
+    const defaultLanguage = getBasicField(contentLines, 'Default Language');
+
     // Also optional! In charge of <meta rel="description">.
     const description = getBasicField(contentLines, 'Description');
 
@@ -1197,6 +1680,7 @@ async function processWikiInfoFile(file) {
         shortName,
         color,
         canonicalBase,
+        defaultLanguage,
         description,
         footer,
         features: {
@@ -1269,9 +1753,6 @@ async function processHomepageInfoFile(file) {
                 }
 
                 const actions = getListField(section, 'Actions') || [];
-                if (actions.some(x => !x.startsWith('<a'))) {
-                    return {error: 'Expected every action to be a <a>-type link!'};
-                }
 
                 return {...row, group, groupCount, albums, actions};
             }
@@ -1279,37 +1760,6 @@ async function processHomepageInfoFile(file) {
     });
 
     return {sidebar, rows};
-}
-
-function getDateString({ date }) {
-    /*
-    const pad = val => val.toString().padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-    */
-    const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ]
-    date = new Date(date);
-    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
-}
-
-function getDurationString(secTotal) {
-    if (secTotal === 0) {
-        return '_:__'
-    }
-
-    let hour = Math.floor(secTotal / 3600)
-    let min = Math.floor((secTotal - hour * 3600) / 60)
-    let sec = Math.floor(secTotal - hour * 3600 - min * 60)
-
-    const pad = val => val.toString().padStart(2, '0')
-
-    if (hour > 0) {
-        return `${hour}:${pad(min)}:${pad(sec)}`
-    } else {
-        return `${min}:${pad(sec)}`
-    }
 }
 
 function getDurationInSeconds(string) {
@@ -1415,7 +1865,7 @@ function stringifyArtistData() {
 }
 
 function escapeAttributeValue(value) {
-    return value.toString().replace(/"/g, '&quot;');
+    return he.encode(value, {useNamedReferences: true});
 }
 
 function attributes(attribs) {
@@ -1491,20 +1941,48 @@ function img({
     }
 }
 
-async function writePage(directoryParts, {
-    title = '',
-    meta = {},
-    theme = '',
-    stylesheet = '',
+async function writePage(strings, baseDirectory, urlKey, directory, pageFn) {
+    // Generally this function shouldn't 8e called directly - instead use the
+    // shadowed version provided 8y wrapLanguages, which automatically provides
+    // the appropriate baseDirectory and strings arguments. (The utility
+    // functions attached to this function are generally useful, though!)
 
-    // missing properties are auto-filled, see below!
-    body = {},
-    main = {},
-    sidebarLeft = {},
-    sidebarRight = {},
-    nav = {},
-    footer = {}
-}) {
+    const paths = writePage.paths(baseDirectory, urlKey, directory);
+
+    // This is kinda complic8ted. May8e most of it can 8e moved into the code
+    // which gener8tes the urls o8ject in the first place? Or all that can 8e
+    // moved here? Or hey, may8e all THAT code is 8asically no longer needed.
+    // Worth thinking a8out.
+    const sharedKeys = Object.keys(urlSpec.shared);
+    const to = Object.fromEntries(Object.entries(urls[urlKey]).map(
+        ([key, fn]) => [
+            key,
+            (sharedKeys.includes(key) && baseDirectory
+                ? (...args) => paths.prefixToShared + fn(...args)
+                : (...args) => paths.prefixToLocalized + fn(...args))
+        ]
+    ));
+
+    const content = writePage.html(pageFn, {paths, strings, to});
+    await writePage.write(content, {paths});
+}
+
+writePage.html = (pageFn, {paths, strings, to}) => {
+    let {
+        title = '',
+        meta = {},
+        theme = '',
+        stylesheet = '',
+
+        // missing properties are auto-filled, see below!
+        body = {},
+        main = {},
+        sidebarLeft = {},
+        sidebarRight = {},
+        nav = {},
+        footer = {}
+    } = pageFn({to});
+
     body.style ??= '';
 
     theme = theme || getThemeString(wikiInfo);
@@ -1526,21 +2004,11 @@ async function writePage(directoryParts, {
     nav.links ??= [];
 
     footer.classes ??= [];
-    footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer) : '');
+    footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer, {strings, to}) : '');
 
-    const directory = path.join(outputPath, ...directoryParts);
-    const file = path.join(directory, 'index.html');
-    const href = path.join(...directoryParts, 'index.html');
-
-    let targetPath = directoryParts.join('/');
-    if (directoryParts.length) {
-        targetPath += '/';
-    }
-
-    let canonical = '';
-    if (wikiInfo.canonicalBase) {
-        canonical = wikiInfo.canonicalBase + targetPath;
-    }
+    const canonical = (wikiInfo.canonicalBase
+        ? wikiInfo.canonicalBase + paths.pathname
+        : '');
 
     const collapseSidebars = (sidebarLeft.collapse !== false) && (sidebarRight.collapse !== false);
 
@@ -1595,9 +2063,15 @@ async function writePage(directoryParts, {
 
     if (nav.simple) {
         nav.links = [
-            ['./', wikiInfo.shortName],
-            [href, title]
-        ]
+            {
+                href: to.home(),
+                title: wikiInfo.shortName
+            },
+            {
+                href: '',
+                title
+            }
+        ];
     }
 
     const links = (nav.links || []).filter(Boolean);
@@ -1607,24 +2081,18 @@ async function writePage(directoryParts, {
         const link = links[i];
         const prev = links[i - 1];
         const next = links[i + 1];
-        const [ href, title ] = link;
-        let part = '';
-        if (href) {
-            if (prev && prev[0]) {
-                part = '/ ';
-            }
-            part += `<a href="${href}">${title}</a>`;
-        } else {
-            if (next && prev) {
-                part = '/ ';
-            }
-            part += `<span>${title}</span>`;
+        const { html, href, title, divider = true } = link;
+        let part = prev && divider ? '/ ' : '';
+        if (typeof href === 'string') {
+            part += `<a href="${href}" ${classes(i === links.length - 1 && 'current')}>${title}</a>`;
+        } else if (html) {
+            part += `<span>${html}</span>`;
         }
         navLinkParts.push(part);
     }
 
     const navContentHTML = [
-        nav.links.length && fixWS`
+        links.length && fixWS`
             <h2 class="highlight-last-link">
                 ${navLinkParts.join('\n')}
             </h2>
@@ -1650,50 +2118,83 @@ async function writePage(directoryParts, {
         footerHTML
     ].filter(Boolean).join('\n');
 
-    await mkdirp(directory);
-    await writeFile(file, filterEmptyLines(rebaseURLs(directory, fixWS`
+    return filterEmptyLines(fixWS`
         <!DOCTYPE html>
-        <html data-rebase="${path.relative(directory, outputPath)}">
+        <html data-rebase-localized="${to.site('')}" data-rebase-shared="${to.root('')}">
             <head>
                 <title>${title}</title>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
-                <link rel="stylesheet" href="${C.STATIC_DIRECTORY}/site.css?${CACHEBUST}">
+                <link rel="stylesheet" href="${to.staticFile(`site.css?${CACHEBUST}`)}">
                 ${(theme || stylesheet) && fixWS`
                     <style>
                         ${theme}
                         ${stylesheet}
                     </style>
                 `}
-                <script src="${C.STATIC_DIRECTORY}/lazy-loading.js?${CACHEBUST}"></script>
+                <script src="${to.staticFile(`lazy-loading.js?${CACHEBUST}`)}"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
                 <div id="page-container">
                     ${mainHTML && fixWS`
                         <div id="skippers">
-                            <span class="skipper"><a href="#content">Skip to content</a></span>
-                            ${sidebarLeftHTML && `<span class="skipper"><a href="#sidebar-left">Skip to sidebar ${sidebarRightHTML && '(left)'}</a></span>`}
-                            ${sidebarRightHTML && `<span class="skipper"><a href="#sidebar-right">Skip to sidebar ${sidebarLeftHTML && '(right)'}</a></span>`}
-                            ${footerHTML && `<span class="skipper"><a href="#footer">Skip to footer</a></span>`}
+                            ${[
+                                ['#content', strings('misc.skippers.skipToContent')],
+                                sidebarLeftHTML && ['#sidebar-left', (sidebarRightHTML
+                                    ? strings('misc.skippers.skipToSidebar.left')
+                                    : strings('misc.skippers.skipToSidebar'))],
+                                sidebarRightHTML && ['#sidebar-right', (sidebarLeftHTML
+                                    ? strings('misc.skippers.skipToSidebar.right')
+                                    : strings('misc.skippers.skipToSidebar'))],
+                                footerHTML && ['#footer', strings('misc.skippers.skipToFooter')]
+                            ].filter(Boolean).map(([ href, title ]) => fixWS`
+                                <span class="skipper"><a href="${href}">${title}</a></span>
+                            `).join('\n')}
                         </div>
                     `}
                     ${layoutHTML}
                 </div>
-                <script src="${C.COMMON_DIRECTORY}/common.js?${CACHEBUST}"></script>
-                <script src="${C.STATIC_DIRECTORY}/client.js?${CACHEBUST}"></script>
+                <script src="${to.commonFile(`common.js?${CACHEBUST}`)}"></script>
+                <script src="${to.staticFile(`client.js?${CACHEBUST}`)}"></script>
             </body>
         </html>
-    `)));
-}
+    `);
+};
+
+writePage.write = async (content, {paths}) => {
+    await mkdirp(paths.outputDirectory);
+    await writeFile(paths.outputFile, content);
+};
+
+writePage.paths = (baseDirectory, urlKey, directory) => {
+    const prefix = baseDirectory ? baseDirectory + '/' : '';
+
+    const pathname = prefix + urlSpec.localized[urlKey].replace('<>', directory);
+
+    // Needed for the rare directory which itself contains a slash, e.g. for
+    // listings, with directories like 'albums/by-name'.
+    const prefixToLocalized = '../'.repeat(directory.split('/').length - 1);
+    const prefixToShared = (baseDirectory ? '../' : '') + prefixToLocalized;
+
+    const outputDirectory = path.join(outputPath, pathname);
+    const outputFile = path.join(outputDirectory, 'index.html');
+
+    return {
+        pathname,
+        prefixToLocalized, prefixToShared,
+        outputDirectory, outputFile
+    };
+};
 
 function getGridHTML({
+    strings,
     entries,
     srcFn,
     hrefFn,
     altFn = () => '',
-    details = false,
+    detailsFn = null,
     lazy = true
 }) {
     return entries.map(({ large, item }, i) => fixWS`
@@ -1703,37 +2204,33 @@ function getGridHTML({
                 alt: altFn(item),
                 lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                 square: true,
-                reveal: getRevealString(item.artTags)
+                reveal: getRevealString(item.artTags, {strings})
             })}
             <span>${item.name}</span>
-            ${details && fixWS`
-                <span>(${s(item.tracks.length, 'track')}, ${getDurationString(getTotalDuration(item.tracks))})</span>
-            `}
+            ${detailsFn && `<span>${detailsFn(item)}</span>`}
         </a>
     `).join('\n');
 }
 
-function getAlbumGridHTML(props) {
+function getAlbumGridHTML({strings, to, details = false, ...props}) {
     return getGridHTML({
-        srcFn: getAlbumCover,
-        hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
+        strings,
+        srcFn: album => getAlbumCover(album, {to}),
+        hrefFn: album => to.album(album.directory),
+        detailsFn: details && (album => strings('misc.albumGridDetails', {
+            tracks: strings.count.tracks(album.tracks.length, {unit: true}),
+            time: strings.count.duration(getTotalDuration(album.tracks))
+        })),
         ...props
     });
 }
 
-function getAlbumGridHTML(props) {
+function getFlashGridHTML({strings, to, ...props}) {
     return getGridHTML({
-        srcFn: getAlbumCover,
-        hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
-        ...props
-    });
-}
-
-function getFlashGridHTML(props) {
-    return getGridHTML({
-        srcFn: getFlashCover,
-        hrefFn: flash => `${C.FLASH_DIRECTORY}/${flash.directory}/`,
-        altFn: () => 'flash art',
+        strings,
+        srcFn: flash => to.flashArt(flash.directory),
+        hrefFn: flash => to.flash(flash.directory),
+        altFn: () => strings('misc.alt.flashArt'),
         ...props
     });
 }
@@ -1773,8 +2270,37 @@ function writeSymlinks() {
     }
 }
 
-async function writeHomepage() {
-    await writePage([], {
+function writeSharedFilesAndPages({strings}) {
+    return progressPromiseAll(`Writing files & pages shared across languages.`, [
+        // THESE REDIRECT PAGES ARE TECH DEBT! Oops.
+
+        groupData?.some(group => group.directory === 'fandom') &&
+        mkdirp(path.join(outputPath, 'albums', 'fandom'))
+            .then(() => writeFile(path.join(outputPath, 'albums', 'fandom', 'index.html'),
+                generateRedirectPage('Fandom - Gallery', `/${C.GROUP_DIRECTORY}/fandom/gallery/`, {strings}))),
+
+        groupData?.some(group => group.directory === 'official') &&
+        mkdirp(path.join(outputPath, 'albums', 'official'))
+            .then(() => writeFile(path.join(outputPath, 'albums', 'official', 'index.html'),
+                generateRedirectPage('Official - Gallery', `/${C.GROUP_DIRECTORY}/official/gallery/`, {strings}))),
+
+        wikiInfo.features.listings &&
+        mkdirp(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary'))
+            .then(() => writeFile(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary', 'index.html'),
+                generateRedirectPage('Album Commentary', `/${C.COMMENTARY_DIRECTORY}/`, {strings}))),
+
+        writeFile(path.join(outputPath, 'data.json'), fixWS`
+            {
+                "albumData": ${stringifyAlbumData()},
+                ${wikiInfo.features.flashesAndGames && `"flashData": ${stringifyFlashData()},`}
+                "artistData": ${stringifyArtistData()}
+            }
+        `)
+    ]);
+}
+
+function writeHomepage() {
+    return ({strings, writePage}) => writePage('home', '', ({to}) => ({
         title: wikiInfo.name,
 
         meta: {
@@ -1791,22 +2317,23 @@ async function writeHomepage() {
                         ${row.type === 'albums' && fixWS`
                             <div class="grid-listing">
                                 ${getAlbumGridHTML({
+                                    strings, to,
                                     entries: (
                                         row.group === 'new-releases' ? getNewReleases(row.groupCount) :
-                                        ((getLinkedGroup(row.group)?.albums || [])
+                                        ((search.group(row.group)?.albums || [])
                                             .slice()
                                             .reverse()
                                             .slice(0, row.groupCount)
                                             .map(album => ({item: album})))
                                     ).concat(row.albums
-                                        .map(getLinkedAlbum)
+                                        .map(search.album)
                                         .map(album => ({item: album}))
                                     ),
                                     lazy: i > 0
                                 })}
                                 ${row.actions.length && fixWS`
                                     <div class="grid-actions">
-                                        ${row.actions.map(action => action
+                                        ${row.actions.map(action => transformInline(action, {strings, to})
                                             .replace('<a', '<a class="box grid-item"')).join('\n')}
                                     </div>
                                 `}
@@ -1830,13 +2357,16 @@ async function writeHomepage() {
             //
             // And no, I will not make [[news]] into part of transformMultiline
             // (even though that would 8e hilarious).
-            content: transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__')).replace('<p>__GENERATE_NEWS__</p>', wikiInfo.features.news ? fixWS`
-                <h1>News</h1>
+            content: transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__'), {strings, to}).replace('<p>__GENERATE_NEWS__</p>', wikiInfo.features.news ? fixWS`
+                <h1>${strings('homepage.news.title')}</h1>
                 ${newsData.slice(0, 3).map((entry, i) => fixWS`
                     <article ${classes('news-entry', i === 0 && 'first-news-entry')}>
-                        <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/${entry.directory}/">${entry.name}</a></h2>
-                        ${transformMultiline(entry.bodyShort)}
-                        ${entry.bodyShort !== entry.body && `<a href="${C.NEWS_DIRECTORY}/${entry.directory}/">(View rest of entry!)</a>`}
+                        <h2><time>${strings.count.date(entry.date)}</time> ${strings.link.newsEntry(entry, {to})}</h2>
+                        ${transformMultiline(entry.bodyShort, {strings, to})}
+                        ${entry.bodyShort !== entry.body && strings.link.newsEntry(entry, {
+                            to,
+                            text: strings('homepage.news.entry.viewRest')
+                        })}
                     </article>
                 `).join('\n')}
             ` : `<p><i>News requested in content description but this feature isn't enabled</i></p>`)
@@ -1845,23 +2375,23 @@ async function writeHomepage() {
         nav: {
             content: fixWS`
                 <h2 class="dot-between-spans">
-                    <span><a class="current" href="./">${wikiInfo.shortName}</a></span>
-                    ${wikiInfo.features.listings && fixWS`
-                        <span><a href="${C.LISTING_DIRECTORY}/">Listings</a></span>
-                    `}
-                    ${wikiInfo.features.news && fixWS`
-                        <span><a href="${C.NEWS_DIRECTORY}/">News</a></span>
-                    `}
-                    ${wikiInfo.features.flashesAndGames && fixWS`
-                        <span><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></span>
-                    `}
-                    ${staticPageData.filter(page => page.listed).map(page => fixWS`
-                        <span><a href="${page.directory}/">${page.shortName}</a></span>
-                    `).join('\n')}
+                    ${[
+                        strings.link.home('', {text: wikiInfo.shortName, class: 'current', to}),
+                        strings.link.listingIndex('', {text: strings('listingIndex.title'), to}),
+                        strings.link.newsIndex('', {text: strings('newsIndex.title'), to}),
+                        strings.link.flashIndex('', {text: strings('flashIndex.title'), to}),
+                        ...staticPageData.filter(page => page.listed).map(page => strings.link.staticPage(page, {to}))
+                    ].map(link => `<span>${link}</span>`).join('\n')}
                 </h2>
             `
         }
-    });
+    }));
+}
+
+function writeMiscellaneousPages() {
+    return [
+        writeHomepage()
+    ];
 }
 
 function writeNewsPages() {
@@ -1869,160 +2399,129 @@ function writeNewsPages() {
         return;
     }
 
-    return progressPromiseAll('Writing news pages.', queue([
-        writeNewsIndex,
-        ...newsData.map(curry(writeNewsPage))
-    ], queueSize));
+    return [
+        writeNewsIndex(),
+        ...newsData.map(writeNewsEntryPage)
+    ];
 }
 
-async function writeNewsIndex() {
-    await writePage([C.NEWS_DIRECTORY], {
-        title: 'News',
+function writeNewsIndex() {
+    return ({strings, writePage}) => writePage('newsIndex', '', ({to}) => ({
+        title: strings('newsIndex.title'),
+
         main: {
             content: fixWS`
                 <div class="long-content news-index">
-                    <h1>News</h1>
+                    <h1>${strings('newsIndex.title')}</h1>
                     ${newsData.map(entry => fixWS`
                         <article id="${entry.directory}">
-                            <h2><time>${getDateString(entry)}</time> <a href="${C.NEWS_DIRECTORY}/${entry.directory}/">${entry.name}</a></h2>
-                            ${transformMultiline(entry.bodyShort)}
-                            ${entry.bodyShort !== entry.body && `<p><a href="${C.NEWS_DIRECTORY}/${entry.directory}/">(View rest of entry!)</a></p>`}
+                            <h2><time>${strings.count.date(entry.date)}</time> ${strings.link.newsEntry(entry, {to})}</h2>
+                            ${transformMultiline(entry.bodyShort, {strings, to})}
+                            ${entry.bodyShort !== entry.body && `<p>${strings.link.newsEntry(entry, {
+                                to,
+                                text: strings('newsIndex.entry.viewRest')
+                            })}</p>`}
                         </article>
                     `).join('\n')}
                 </div>
             `
         },
+
         nav: {
             links: [
-                ['./', wikiInfo.shortName],
-                [`${C.NEWS_DIRECTORY}/`, 'News']
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    href: '',
+                    title: strings('newsIndex.title')
+                }
             ]
         }
-    });
+    }));
 }
 
-async function writeNewsPage(entry) {
-    // The newsData list is sorted reverse chronologically (newest ones first),
-    // so the way we find next/previous entries is flipped from normal.
-    const index = newsData.indexOf(entry)
-    const previous = newsData[index + 1];
-    const next = newsData[index - 1];
-    const nextPreviousLinks = [
-        previous && `<a href="${C.NEWS_DIRECTORY}/${previous.directory}/" id="previous-button" title="${previous.name}">Previous</a>`,
-        next && `<a href="${C.NEWS_DIRECTORY}/${next.directory}/" id="next-button" title="${next.name}">Next</a>`
-    ].filter(Boolean).join(', ');
+function writeNewsEntryPage(entry) {
+    return ({strings, writePage}) => writePage('newsEntry', entry.directory, ({to}) => ({
+        title: strings('newsEntryPage.title', {entry: entry.name}),
 
-    await writePage([C.NEWS_DIRECTORY, entry.directory], {
-        title: `News - ${entry.name}`,
         main: {
             content: fixWS`
                 <div class="long-content">
-                    <h1>${entry.name}</h1>
-                    <p>(Published ${getDateString(entry)}.)</p>
-                    ${transformMultiline(entry.body)}
+                    <h1>${strings('newsEntryPage.title', {entry: entry.name})}</h1>
+                    <p>${strings('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
+                    ${transformMultiline(entry.body, {strings, to})}
                 </div>
             `
         },
-        nav: {
-            links: [
-                ['./', wikiInfo.shortName],
-                [`${C.NEWS_DIRECTORY}/`, 'News'],
-                [null, getDateString(entry) + ':'],
-                [`${C.NEWS_DIRECTORY}/${entry.directory}/`, entry.name],
-                nextPreviousLinks && [null, `(${nextPreviousLinks})`]
-            ]
-        }
-    });
+
+        nav: generateNewsEntryNav(entry, {strings, to})
+    }));
 }
 
-function writeMiscellaneousPages() {
-    return progressPromiseAll('Writing miscellaneous pages.', [
-        writeHomepage(),
+function generateNewsEntryNav(entry, {strings, to}) {
+    // The newsData list is sorted reverse chronologically (newest ones first),
+    // so the way we find next/previous entries is flipped from normal.
+    const previousNextLinks = generatePreviousNextLinks('newsEntry', entry, newsData.slice().reverse(), {strings, to});
 
-        groupData?.some(group => group.directory === 'fandom') &&
-        mkdirp(path.join(outputPath, 'albums', 'fandom'))
-            .then(() => writeFile(path.join(outputPath, 'albums', 'fandom', 'index.html'),
-                generateRedirectPage('Fandom - Gallery', `/${C.GROUP_DIRECTORY}/fandom/gallery/`))),
-
-        groupData?.some(group => group.directory === 'official') &&
-        mkdirp(path.join(outputPath, 'albums', 'official'))
-            .then(() => writeFile(path.join(outputPath, 'albums', 'official', 'index.html'),
-                generateRedirectPage('Official - Gallery', `/${C.GROUP_DIRECTORY}/official/gallery/`))),
-
-        wikiInfo.features.flashesAndGames &&
-        writePage([C.FLASH_DIRECTORY], {
-            title: `Flashes & Games`,
-            main: {
-                classes: ['flash-index'],
-                content: fixWS`
-                    <h1>Flashes &amp; Games</h1>
-                    <div class="long-content">
-                        <p class="quick-info">Jump to:</p>
-                        <ul class="quick-info">
-                            ${flashData.filter(act => act.act8r8k && act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
-                                <li><a href="#${anchor}" style="${getLinkThemeString({color: jumpColor})}">${jump}</a></li>
-                            `).join('\n')}
-                        </ul>
-                    </div>
-                    ${flashData.filter(flash => flash.act8r8k).map((act, i) => fixWS`
-                        <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act.act))}/">${act.act}</a></h2>
-                        <div class="grid-listing">
-                            ${getFlashGridHTML({
-                                entries: (flashData
-                                    .filter(flash => !flash.act8r8k && flash.act === act.act)
-                                    .map(flash => ({item: flash}))),
-                                lazy: i === 0 ? 4 : true
-                            })}
-                        </div>
-                    `).join('\n')}
-                `
-            },
-
-            /*
-            sidebarLeft: {
-                content: generateSidebarForFlashes(null)
-            },
-            */
-
-            nav: {simple: true}
-        }),
-
-        writeFile(path.join(outputPath, 'data.json'), fixWS`
+    return {
+        links: [
             {
-                "albumData": ${stringifyAlbumData()},
-                ${wikiInfo.features.flashesAndGames && `"flashData": ${stringifyFlashData()},`}
-                "artistData": ${stringifyArtistData()}
+                href: to.home(),
+                title: wikiInfo.shortName
+            },
+            {
+                href: to.newsIndex(),
+                title: strings('newsEntryPage.nav.news')
+            },
+            {
+                html: strings('newsEntryPage.nav.entry', {
+                    date: strings.count.date(entry.date),
+                    entry: strings.link.newsEntry(entry, {class: 'current', to})
+                })
+            },
+            previousNextLinks &&
+            {
+                divider: false,
+                html: `(${previousNextLinks})`
             }
-        `)
-    ].filter(Boolean));
+        ]
+    };
 }
 
 function writeStaticPages() {
-    return progressPromiseAll(`Writing static pages.`, queue(staticPageData.map(curry(writeStaticPage)), queueSize));
+    return staticPageData.map(writeStaticPage);
 }
 
-async function writeStaticPage(staticPage) {
-    await writePage([staticPage.directory], {
+function writeStaticPage(staticPage) {
+    return ({strings, writePage}) => writePage('staticPage', staticPage.directory, ({to}) => ({
         title: staticPage.name,
         stylesheet: staticPage.stylesheet,
+
         main: {
             content: fixWS`
                 <div class="long-content">
                     <h1>${staticPage.name}</h1>
-                    ${transformMultiline(staticPage.content, staticPage.treatAsHTML)}
+                    ${transformMultiline(staticPage.content, {strings, to})}
                 </div>
             `
         },
+
         nav: {simple: true}
-    });
+    }));
 }
 
-function getRevealString(tags = []) {
-    return tags.some(tag => tag.isCW) && (
-        'cw: ' + tags.filter(tag => tag.isCW).map(tag => `<span class="reveal-tag">${tag.name}</span>`).join(', ')) + '<br><span class="reveal-interaction">click to show</span>'
+function getRevealString(tags, {strings}) {
+    return tags && tags.some(tag => tag.isCW) && (
+        strings('misc.contentWarnings', {
+            warnings: tags.filter(tag => tag.isCW).map(tag => `<span class="reveal-tag">${tag.name}</span>`).join(', ')
+        }) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
+    );
 }
 
 function generateCoverLink({
+    strings, to,
     src,
     alt,
     tags = []
@@ -2035,13 +2534,17 @@ function generateCoverLink({
                 id: 'cover-art',
                 link: true,
                 square: true,
-                reveal: getRevealString(tags)
+                reveal: getRevealString(tags, {strings})
             })}
-            ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && `<p class="tags">Tags:
-                ${tags.filter(tag => !tag.isCW).map(tag => fixWS`
-                    <a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a>
-                `).join(',\n')}
-            </p>`}
+            ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
+                <p class="tags">
+                    ${strings('releaseInfo.artTags')}
+                    ${(tags
+                        .filter(tag => !tag.isCW)
+                        .map(tag => strings.link.tag(tag, {to}))
+                        .join(',\n'))}
+                </p>
+            `}
         </div>
     `;
 }
@@ -2058,94 +2561,156 @@ function writeIndexAndTrackPagesForAlbum(album) {
 */
 
 function writeAlbumPages() {
-    return progressPromiseAll(`Writing album pages.`, queue(albumData.map(curry(writeAlbumPage)), queueSize));
+    return albumData.map(writeAlbumPage);
 }
 
-async function writeAlbumPage(album) {
-    const trackToListItem = track => fixWS`
-        <li style="${getLinkThemeString(track)}">
-            (${getDurationString(track.duration)})
-            <a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.name}</a>
-            ${track.artists !== album.artists && fixWS`
-                <span class="by">by ${getArtistString(track.artists)}</span>
-            `}
-        </li>
-    `;
+function writeAlbumPage(album) {
+    const trackToListItem = (track, {strings, to}) => {
+        const itemOpts = {
+            duration: strings.count.duration(track.duration),
+            track: strings.link.track(track, {to})
+        };
+        return `<li style="${getLinkThemeString(track)}">${
+            (track.artists === album.artists
+                ? strings('trackList.item.withDuration', itemOpts)
+                : strings('trackList.item.withDuration.withArtists', {
+                    ...itemOpts,
+                    by: `<span class="by">${
+                        strings('trackList.item.withArtists.by', {
+                            artists: getArtistString(track.artists, {strings, to})
+                        })
+                    }</span>`
+                }))
+        }</li>`;
+    };
 
     const commentaryEntries = [album, ...album.tracks].filter(x => x.commentary).length;
 
     const listTag = getAlbumListTag(album);
-    await writePage([C.ALBUM_DIRECTORY, album.directory], {
-        title: album.name,
-        stylesheet: getAlbumStylesheet(album),
+
+    return ({strings, writePage}) => writePage('album', album.directory, ({to}) => ({
+        title: strings('albumPage.title', {album: album.name}),
+        stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(album, [
             `--album-directory: ${album.directory}`
         ]),
+
         main: {
             content: fixWS`
                 ${generateCoverLink({
-                    src: getAlbumCover(album),
-                    alt: 'album cover',
+                    strings, to,
+                    src: to.albumCover(album.directory),
+                    alt: strings('misc.alt.albumCover'),
                     tags: album.artTags
                 })}
-                <h1>${album.name}</h1>
+                <h1>${strings('albumPage.title', {album: album.name})}</h1>
                 <p>
-                    ${album.artists && `By ${getArtistString(album.artists, true)}.<br>`}
-                    ${album.coverArtists &&  `Cover art by ${getArtistString(album.coverArtists, true)}.<br>`}
-                    ${album.wallpaperArtists && `Wallpaper art by ${getArtistString(album.wallpaperArtists, true)}.<br>`}
-                    Released ${getDateString(album)}.
-                    ${+album.coverArtDate !== +album.date && `<br>Art released ${getDateString({date: album.coverArtDate})}.`}
-                    <br>Duration: ~${getDurationString(getTotalDuration(album.tracks))}.
+                    ${[
+                        album.artists && strings('releaseInfo.by', {
+                            artists: getArtistString(album.artists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        album.coverArtists && strings('releaseInfo.coverArtBy', {
+                            artists: getArtistString(album.coverArtists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
+                            artists: getArtistString(album.wallpaperArtists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        strings('releaseInfo.released', {
+                            date: strings.count.date(album.date)
+                        }),
+                        +album.coverArtDate !== +album.date && strings('releaseInfo.artReleased', {
+                            date: strings.count.date(album.coverArtDate)
+                        }),
+                        strings('releaseInfo.duration', {
+                            duration: strings.count.duration(getTotalDuration(album.tracks), {approximate: album.tracks.length > 1})
+                        })
+                    ].filter(Boolean).join('<br>\n')}
                 </p>
-                ${commentaryEntries && `<p>View <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/">commentary page</a>!</p>`}
-                ${album.urls.length && `<p>Listen on ${joinNoOxford(album.urls.map(url => fancifyURL(url, {album: true})), 'or')}.</p>`}
-                ${album.usesGroups ? fixWS`
+                ${commentaryEntries && `<p>${
+                    strings('releaseInfo.viewCommentary', {
+                        link: `<a href="${to.albumCommentary(album.directory)}">${
+                            strings('releaseInfo.viewCommentary.link')
+                        }</a>`
+                    })
+                }</p>`}
+                ${album.urls.length && `<p>${
+                    strings('releaseInfo.listenOn', {
+                        links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true, strings})))
+                    })
+                }</p>`}
+                ${album.trackGroups ? fixWS`
                     <dl class="album-group-list">
-                        ${album.tracks.flatMap((track, i, arr) => [
-                            (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
-                            (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                                ${track.group && `<dt>${track.group} (~${getDurationString(getTotalDuration(album.tracks.filter(({ group }) => group === track.group)))}):</dt>`}
-                                <dd><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
-                            `,
-                            trackToListItem(track),
-                            i === arr.length && `</${listTag}></dd>`
-                        ].filter(Boolean)).join('\n')}
+                        ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
+                            <dt>${
+                                strings('trackList.group', {
+                                    duration: strings.count.duration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
+                                    group: name
+                                })
+                            }</dt>
+                            <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                                ${tracks.map(t => trackToListItem(t, {strings, to})).join('\n')}
+                            </${listTag}></dd>
+                        `).join('\n')}
                     </dl>
                 ` : fixWS`
                     <${listTag}>
-                        ${album.tracks.map(trackToListItem).join('\n')}
+                        ${album.tracks.map(t => trackToListItem(t, {strings, to})).join('\n')}
                     </${listTag}>
                 `}
                 ${album.commentary && fixWS`
-                    <p>Artist commentary:</p>
+                    <p>${strings('releaseInfo.artistCommentary')}</p>
                     <blockquote>
-                        ${transformMultiline(album.commentary)}
+                        ${transformMultiline(album.commentary, {strings, to})}
                     </blockquote>
                 `}
             `
         },
-        sidebarLeft: generateSidebarForAlbum(album),
-        sidebarRight: generateSidebarRightForAlbum(album),
+
+        sidebarLeft: generateSidebarForAlbum(album, null, {strings, to}),
+        sidebarRight: generateSidebarRightForAlbum(album, null, {strings, to}),
+
         nav: {
             links: [
-                ['./', wikiInfo.shortName],
-                [`${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name],
-                [null, generateAlbumNavLinks(album)]
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    html: strings('albumPage.nav.album', {
+                        album: strings.link.album(album, {class: 'current', to})
+                    })
+                },
+                {
+                    divider: false,
+                    html: generateAlbumNavLinks(album, null, {strings, to})
+                }
             ],
             content: fixWS`
                 <div>
-                    ${generateAlbumChronologyLinks(album)}
+                    ${generateAlbumChronologyLinks(album, null, {strings, to})}
                 </div>
             `
         }
-    });
+    }));
 }
 
-function getAlbumStylesheet(album) {
+function getAlbumStylesheet(album, {to}) {
     if (album.wallpaperArtists) {
         return fixWS`
             body::before {
-                background-image: url("${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/bg.jpg");
+                background-image: url("${to.albumWallpaper(album.directory)}");
                 ${album.wallpaperStyle}
             }
         `;
@@ -2155,10 +2720,10 @@ function getAlbumStylesheet(album) {
 }
 
 function writeTrackPages() {
-    return progressPromiseAll(`Writing track pages.`, queue(trackData.map(curry(writeTrackPage)), queueSize));
+    return trackData.map(writeTrackPage);
 }
 
-async function writeTrackPage(track) {
+function writeTrackPage(track) {
     const { album } = track;
     const tracksThatReference = track.referencedBy;
     const ttrFanon = tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY));
@@ -2173,356 +2738,576 @@ async function writeTrackPage(track) {
             .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
     }
 
-    const generateTrackList = tracks => fixWS`
+    const generateTrackList = (tracks, {strings, to}) => fixWS`
         <ul>
-            ${tracks.map(track => fixWS`
-                <li ${classes(track.aka && 'rerelease')}>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                    <span class="by">by ${getArtistString(track.artists)}</span>
-                    ${track.aka && `<span class="rerelease-label">(re-release)</span>`}
-                </li>
-            `).join('\n')}
+            ${tracks.map(track =>
+                // vim doesnt like this code much lol
+                (({
+                    line = strings('trackList.item.withArtists', {
+                        track: strings.link.track(track, {to}),
+                        by: `<span class="by">${strings('trackList.item.withArtists.by', {
+                            artists: getArtistString(track.artists, {strings, to})
+                        })}</span>`
+                    })
+                }) => (
+                    (track.aka
+                        ? `<li class="rerelease">${strings('trackList.item.rerelease', {track: line})}</li>`
+                        : `<li>${line}</li>`)
+                ))({})
+            ).join('\n')}
         </ul>
     `;
 
-    const commentary = [
-        track.commentary,
-        ...otherReleases.map(track =>
-            (track.commentary?.split('\n')
-                .filter(line => line.replace(/<\/b>/g, '').includes(':</i>'))
-                .flatMap(line => [line, `<i>See <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>!</i>`])
-                .join('\n')))
-    ].filter(Boolean).join('\n');
+    const hasCommentary = track.commentary || otherReleases.some(t => t.commentary);
+    const generateCommentary = ({strings, to}) => transformMultiline(
+        [
+            track.commentary,
+            ...otherReleases.map(track =>
+                (track.commentary?.split('\n')
+                    .filter(line => line.replace(/<\/b>/g, '').includes(':</i>'))
+                    .map(line => fixWS`
+                        ${line}
+                        ${strings('releaseInfo.artistCommentary.seeOriginalRelease', {
+                            original: strings.link.track(track, {to})
+                        })}
+                    `)
+                    .join('\n')))
+        ].filter(Boolean).join('\n'),
+        {strings, to});
 
-    await writePage([C.TRACK_DIRECTORY, track.directory], {
-        title: track.name,
-        stylesheet: getAlbumStylesheet(track.album),
+    return ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
+        title: strings('trackPage.title', {track: track.name}),
+        stylesheet: getAlbumStylesheet(track.album, {to}),
         theme: getThemeString(track, [
             `--album-directory: ${album.directory}`,
             `--track-directory: ${track.directory}`
         ]),
 
-        sidebarLeft: generateSidebarForAlbum(album, track),
-        sidebarRight: generateSidebarRightForAlbum(album, track),
-
-        nav: {
-            links: [
-                ['./', wikiInfo.shortName],
-                [`${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name],
-                listTag === 'ol' && [null, album.tracks.indexOf(track) + 1 + '.'],
-                [`${C.TRACK_DIRECTORY}/${track.directory}/`, track.name],
-                [null, generateAlbumNavLinks(album, track)]
-            ].filter(Boolean),
-            content: fixWS`
-                <div>
-                    ${generateAlbumChronologyLinks(album, track)}
-                </div>
-            `
-        },
-
         main: {
             content: fixWS`
                 ${generateCoverLink({
-                    src: getTrackCover(track),
-                    alt: 'track cover',
+                    strings, to,
+                    src: getTrackCover(track, {to}),
+                    alt: strings('misc.alt.trackCover'),
                     tags: track.artTags
                 })}
-                <h1>${track.name}</h1>
+                <h1>${strings('trackPage.title', {track: track.name})}</h1>
                 <p>
-                    By ${getArtistString(track.artists, true)}.
-                    ${track.coverArtists &&  `<br>Cover art by ${getArtistString(track.coverArtists, true)}.`}
-                    ${album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && `<br>Released ${getDateString(track)}.`}
-                    ${+track.coverArtDate !== +track.date && `<br>Art released ${getDateString({date: track.coverArtDate})}.`}
-                    ${track.duration && `<br>Duration: ${getDurationString(track.duration)}.`}
+                    ${[
+                        strings('releaseInfo.by', {
+                            artists: getArtistString(track.artists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        track.coverArtists && strings('releaseInfo.coverArtBy', {
+                            artists: getArtistString(track.coverArtists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && strings('releaseInfo.released', {
+                            date: strings.count.date(track.date)
+                        }),
+                        +track.coverArtDate !== +track.date && strings('releaseInfo.artReleased', {
+                            date: strings.count.date(track.coverArtDate)
+                        }),
+                        track.duration && strings('releaseInfo.duration', {
+                            duration: strings.count.duration(track.duration)
+                        })
+                    ].filter(Boolean).join('<br>\n')}
                 </p>
-                ${track.urls.length ? fixWS`
-                    <p>Listen on ${joinNoOxford(track.urls.map(fancifyURL), 'or')}.</p>
-                ` : fixWS`
-                    <p>This track has no URLs at which it can be listened.</p>
-                `}
+                <p>${
+                    (track.urls.length
+                        ? strings('releaseInfo.listenOn', {
+                            links: strings.list.or(track.urls.map(url => fancifyURL(url, {strings})))
+                        })
+                        : strings('releaseInfo.listenOn.noLinks'))
+                }</p>
                 ${otherReleases.length && fixWS`
-                    <p>Also released as:</p>
+                    <p>${strings('releaseInfo.alsoReleasedAs')}</p>
                     <ul>
                         ${otherReleases.map(track => fixWS`
-                            <li>
-                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                                (on <a href="${C.ALBUM_DIRECTORY}/${track.album.directory}/" style="${getLinkThemeString(track.album)}">${track.album.name}</a>)
-                            </li>
+                            <li>${strings('releaseInfo.alsoReleasedAs.item', {
+                                track: strings.link.track(track, {to}),
+                                album: strings.link.album(track.album, {to})
+                            })}</li>
                         `).join('\n')}
                     </ul>
                 `}
                 ${track.contributors.textContent && fixWS`
-                    <p>Contributors:<br>${transformInline(track.contributors.textContent)}</p>
+                    <p>
+                        ${strings('releaseInfo.contributors')}
+                        <br>
+                        ${transformInline(track.contributors.textContent, {strings, to})}
+                    </p>
                 `}
                 ${track.contributors.length && fixWS`
-                    <p>Contributors:</p>
+                    <p>${strings('releaseInfo.contributors')}</p>
                     <ul>
-                        ${track.contributors.map(contrib => `<li>${getArtistString([contrib], true)}</li>`).join('\n')}
+                        ${(track.contributors
+                            .map(contrib => `<li>${getArtistString([contrib], {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })}</li>`)
+                            .join('\n'))}
                     </ul>
                 `}
                 ${tracksReferenced.length && fixWS`
-                    <p>Tracks that <i>${track.name}</i> references:</p>
-                    ${generateTrackList(tracksReferenced)}
+                    <p>${strings('releaseInfo.tracksReferenced', {track: `<i>${track.name}</i>`})}</p>
+                    ${generateTrackList(tracksReferenced, {strings, to})}
                 `}
                 ${tracksThatReference.length && fixWS`
-                    <p>Tracks that reference <i>${track.name}</i>:</p>
+                    <p>${strings('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
                     <dl>
                         ${ttrOfficial.length && fixWS`
                             <dt>Official:</dt>
-                            <dd>${generateTrackList(ttrOfficial)}</dd>
+                            <dd>${generateTrackList(ttrOfficial, {strings, to})}</dd>
                         `}
                         ${ttrFanon.length && fixWS`
                             <dt>Fandom:</dt>
-                            <dd>${generateTrackList(ttrFanon)}</dd>
+                            <dd>${generateTrackList(ttrFanon, {strings, to})}</dd>
                         `}
                     </dl>
                 `}
                 ${wikiInfo.features.flashesAndGames && flashesThatFeature.length && fixWS`
-                    <p>Flashes &amp; games that feature <i>${track.name}</i>:</p>
+                    <p>${strings('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
                     <ul>
                         ${flashesThatFeature.map(({ flash, as }) => fixWS`
-                            <li ${classes(as !== track && 'rerelease')}>
-                                ${getFlashLinkHTML(flash)}
-                                ${as !== track && fixWS`
-                                    (as <a href="${C.TRACK_DIRECTORY}/${as.directory}/" style="${getLinkThemeString(as)}">${as.name}</a>)
-                                `}
-                            </li>
+                            <li ${classes(as !== track && 'rerelease')}>${
+                                (as === track
+                                    ? strings('releaseInfo.flashesThatFeature.item', {
+                                        flash: strings.link.flash(flash, {to})
+                                    })
+                                    : strings('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
+                                        flash: strings.link.flash(flash, {to}),
+                                        track: strings.link.track(as, {to})
+                                    }))
+                            }</li>
                         `).join('\n')}
                     </ul>
                 `}
                 ${track.lyrics && fixWS`
-                    <p>Lyrics:</p>
+                    <p>${strings('releaseInfo.lyrics')}</p>
                     <blockquote>
-                        ${transformLyrics(track.lyrics)}
+                        ${transformLyrics(track.lyrics, {strings, to})}
                     </blockquote>
                 `}
-                ${commentary && fixWS`
-                    <p>Artist commentary:</p>
+                ${hasCommentary && fixWS`
+                    <p>${strings('releaseInfo.artistCommentary')}</p>
                     <blockquote>
-                        ${transformMultiline(commentary)}
+                        ${transformMultiline(generateCommentary({strings, to}), {strings, to})}
                     </blockquote>
                 `}
             `
+        },
+
+        sidebarLeft: generateSidebarForAlbum(album, track, {strings, to}),
+        sidebarRight: generateSidebarRightForAlbum(album, track, {strings, to}),
+
+        nav: {
+            links: [
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    href: to.album(album.directory),
+                    title: album.name
+                },
+                listTag === 'ol' ? {
+                    html: strings('trackPage.nav.track.withNumber', {
+                        number: album.tracks.indexOf(track) + 1,
+                        track: strings.link.track(track, {class: 'current', to})
+                    })
+                } : {
+                    html: strings('trackPage.nav.track', {
+                        track: strings.link.track(track, {class: 'current', to})
+                    })
+                },
+                {
+                    divider: false,
+                    html: generateAlbumNavLinks(album, track, {strings, to})
+                }
+            ].filter(Boolean),
+            content: fixWS`
+                <div>
+                    ${generateAlbumChronologyLinks(album, track, {strings, to})}
+                </div>
+            `
         }
-    });
+    }));
 }
 
-async function writeArtistPages() {
-    await progressPromiseAll('Writing artist pages.', queue(artistData.map(curry(writeArtistPage)), queueSize));
+function writeArtistPages() {
+    return [
+        ...artistData.map(writeArtistPage),
+        ...artistAliasData.map(writeArtistAliasPage)
+    ];
 }
 
-async function writeArtistPage(artist) {
-    if (artist.alias) {
-        return writeArtistAliasPage(artist);
-    }
-
+function writeArtistPage(artist) {
     const {
         name,
         urls = [],
         note = ''
     } = artist;
 
-    const artThingsAll = C.sortByDate(unique([...artist.tracks.asCoverArtist, ...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist]));
+    const artThingsAll = C.sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.tracks.asCoverArtist]));
     const artThingsGallery = C.sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
     const commentaryThings = C.sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
 
-    let flashes;
+    const hasGallery = artThingsGallery.length > 0;
+
+    const getArtistsAndContrib = (thing, key) => ({
+        artists: thing[key]?.filter(({ who }) => who !== artist),
+        contrib: thing[key]?.find(({ who }) => who === artist),
+        key
+    });
+
+    const artListChunks = chunkByProperties(artThingsAll.flatMap(thing =>
+        (['coverArtists', 'wallpaperArtists']
+            .map(key => getArtistsAndContrib(thing, key))
+            .filter(({ contrib }) => contrib)
+            .map(props => ({
+                album: thing.album || thing,
+                track: thing.album ? thing : null,
+                ...props
+            })))
+    ), ['album']);
+
+    const commentaryListChunks = chunkByProperties(commentaryThings.map(thing => ({
+        album: thing.album || thing,
+        track: thing.album ? thing : null
+    })), ['album']);
+
+    const allTracks = C.sortByDate(unique([...artist.tracks.asArtist, ...artist.tracks.asContributor]));
+    const unreleasedTracks = allTracks.filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+
+    const chunkTracks = tracks => (
+        chunkByProperties(tracks.map(track => ({
+            track,
+            album: track.album,
+            duration: track.duration,
+            artists: (track.artists.some(({ who }) => who === artist)
+                ? track.artists.filter(({ who }) => who !== artist)
+                : track.contributors.filter(({ who }) => who !== artist)),
+            contrib: {
+                who: artist,
+                what: [
+                    track.artists.find(({ who }) => who === artist)?.what,
+                    track.contributors.find(({ who }) => who === artist)?.what
+                ].filter(Boolean).join(', ')
+            }
+        })), ['album'])
+        .map(({album, chunk}) => ({
+            album, chunk,
+            duration: getTotalDuration(chunk),
+        })));
+
+    const unreleasedTrackListChunks = chunkTracks(unreleasedTracks);
+    const releasedTrackListChunks = chunkTracks(releasedTracks);
+
+    const totalReleasedDuration = getTotalDuration(releasedTracks);
+
+    let flashes, flashListChunks;
     if (wikiInfo.features.flashesAndGames) {
-        flashes = artist.flashes.asContributor;
+        flashes = C.sortByDate(artist.flashes.asContributor.slice());
+        flashListChunks = (
+            chunkByProperties(flashes.map(flash => ({
+                act: flash.act,
+                flash,
+                date: flash.date,
+                // Manual artists/contrib properties here, 8ecause we don't
+                // want to show the full list of other contri8utors inline.
+                // (It can often 8e very, very large!)
+                artists: [],
+                contrib: flash.contributors.find(({ who }) => who === artist)
+            })), ['act'])
+            .map(({ act, chunk }) => ({
+                act, chunk,
+                dateFirst: chunk[0].date,
+                dateLast: chunk[chunk.length - 1].date
+            })));
     }
 
-    const unreleasedTracks = unique([...artist.tracks.asArtist, ...artist.tracks.asContributor])
-        .filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = unique([...artist.tracks.asArtist, ...artist.tracks.asContributor])
-        .filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
-
-    const generateTrackList = tracks => albumChunkedList(tracks, (track, i) => {
-        const contrib = {
-            who: artist,
-            what: track.contributors.filter(({ who }) => who === artist).map(({ what }) => what).join(', ')
-        };
-        const { flashes } = track;
-        return fixWS`
-            <li ${classes(track.aka && 'rerelease')} title="${th(i + 1)} track by ${name}; ${th(track.album.tracks.indexOf(track) + 1)} in ${track.album.name}">
-                ${track.duration && `(${getDurationString(track.duration)})`}
-                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                ${track.artists.some(({ who }) => who === artist) && track.artists.length > 1 && `<span class="contributed">(with ${getArtistString(track.artists.filter(({ who }) => who !== artist))})</span>`}
-                ${contrib.what && `<span class="contributed">(${getContributionString(contrib) || 'contributed'})</span>`}
-                ${wikiInfo.features.flashesAndGames && flashes.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
-                ${track.aka && `<span class="rerelease-label">(re-release)</span>`}
-            </li>
-        `;
-    });
-
-    // Shish!
-    const index = `${C.ARTIST_DIRECTORY}/${artist.directory}/`;
-    const avatarPath = path.join(C.MEDIA_ARTIST_AVATAR_DIRECTORY, artist.directory + '.jpg');
-    await writePage([C.ARTIST_DIRECTORY, artist.directory], {
-        title: name,
-
-        main: {
-            content: fixWS`
-                ${(wikiInfo.features.artistAvatars &&
-                    await access(path.join(mediaPath, avatarPath)).then(() => true, () => false) &&
-                    generateCoverLink({
-                        src: path.join(C.MEDIA_DIRECTORY, avatarPath),
-                        alt: 'artist avatar'
+    const generateEntryAccents = ({ aka, entry, artists, contrib, strings, to }) =>
+        (aka
+            ? strings('artistPage.creditList.entry.rerelease', {entry})
+            : (artists.length
+                ? (contrib.what
+                    ? strings('artistPage.creditList.entry.withArtists.withContribution', {
+                        entry,
+                        artists: getArtistString(artists, {strings, to}),
+                        contribution: contrib
                     })
-                )}
-                <h1>${name}</h1>
-                ${note && fixWS`
-                    <p>Note:</p>
-                    <blockquote>
-                        ${transformMultiline(note)}
-                    </blockquote>
-                    <hr>
-                `}
-                ${urls.length && `<p>Visit on ${joinNoOxford(urls.map(fancifyURL), 'or')}.</p>`}
-                ${artThingsGallery.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>!</p>`}
-                <p>Jump to: ${[
-                    [
-                        [...releasedTracks, ...unreleasedTracks].length && `<a href="${index}#tracks">Tracks</a>`,
-                        unreleasedTracks.length && `(<a href="${index}#unreleased-tracks">Unreleased Tracks</a>)`
-                    ].filter(Boolean).join(' '),
-                    artThingsAll.length && `<a href="${index}#art">Art</a>`,
-                    wikiInfo.features.flashesAndGames && flashes.length && `<a href="${index}#flashes">Flashes &amp; Games</a>`,
-                    commentaryThings.length && `<a href="${index}#commentary">Commentary</a>`
-                ].filter(Boolean).join(', ')}.</p>
-                ${[...releasedTracks, ...unreleasedTracks].length && fixWS`
-                    <h2 id="tracks">Tracks</h2>
-                `}
-                ${releasedTracks.length && fixWS`
-                    <p>${name} has contributed ~${getDurationString(getTotalDuration(releasedTracks))} ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'} of music collected on this wiki.</p>
-                    ${generateTrackList(releasedTracks)}
-                `}
-                ${unreleasedTracks.length && fixWS`
-                    <h3 id="unreleased-tracks">Unreleased Tracks</h3>
-                    ${generateTrackList(unreleasedTracks)}
-                `}
-                ${artThingsAll.length && fixWS`
-                    <h2 id="art">Art</h2>
-                    ${artThingsGallery.length && `<p>View <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">art gallery</a>! Or browse the list:</p>`}
-                    ${albumChunkedList(artThingsAll, (thing, i) => {
-                        const cover = {
-                            artists: thing.coverArtists,
-                            contrib: thing.coverArtists.find(({ who }) => who === artist)
-                        };
-                        const bg = {
-                            artists: thing.wallpaperArtists,
-                            contrib: thing.wallpaperArtists?.find(({ who }) => who === artist)
-                        };
-                        return [cover, bg].filter(x => x.contrib).map(({ artists, contrib }) => fixWS`
-                            <li title="${th(i + 1)} art by ${name}${thing.album && `; ${th(thing.album.tracks.indexOf(thing) + 1)} track in ${thing.album.name}`}">
-                                ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getLinkThemeString(thing)}">${thing.name}</a>
-                                ` : (contrib === bg.contrib) ? '<i>(wallpaper art)</i>' : '<i>(cover art)</i>'}
-                                ${artists.length > 1 && `<span class="contributed">(with ${getArtistString(artists.filter(({ who }) => who !== artist))})</span>`}
-                                ${contrib.what && `<span class="contributed">(${getContributionString(contrib)})</span>`}
-                            </li>
-                        `).join('\n');
-                    }, true, 'coverArtDate')}
-                `}
-                ${wikiInfo.features.flashesAndGames && flashes.length && fixWS`
-                    <h2 id="flashes">Flashes &amp; Games</h2>
-                    ${actChunkedList(flashes, flash => {
-                        const contributionString = flash.contributors.filter(({ who }) => who === artist).map(getContributionString).join(' ');
-                        return fixWS`
-                            <li>
-                                <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getLinkThemeString(flash)}">${flash.name}</a>
-                                ${contributionString && `<span class="contributed">(${contributionString})</span>`}
-                                (${getDateString({date: flash.date})})
-                            </li>
-                        `
-                    })}
-                `}
-                ${commentaryThings.length && fixWS`
-                    <h2 id="commentary">Commentary</h2>
-                    ${albumChunkedList(commentaryThings, thing => {
-                        const { flashes } = thing;
-                        return fixWS`
-                            <li>
-                                ${thing.album ? fixWS`
-                                    <a href="${C.TRACK_DIRECTORY}/${thing.directory}/" style="${getLinkThemeString(thing)}">${thing.name}</a>
-                                ` : '(album commentary)'}
-                                ${wikiInfo.features.flashesAndGames && flashes?.length && `<br><span class="flashes">(Featured in ${joinNoOxford(flashes.map(flash => getFlashLinkHTML(flash)))})</span></br>`}
-                            </li>
-                        `
-                    }, false)}
-                    </ul>
-                `}
-            `
-        },
+                    : strings('artistPage.creditList.entry.withArtists', {
+                        entry,
+                        artists: getArtistString(artists, {strings, to})
+                    }))
+                : (contrib.what
+                    ? strings('artistPage.creditList.entry.withContribution', {
+                        entry,
+                        contribution: contrib
+                    })
+                    : entry)));
 
-        nav: {
-            links: [
-                ['./', wikiInfo.shortName],
-                wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                [null, 'Artist:'],
-                [`${C.ARTIST_DIRECTORY}/${artist.directory}/`, name],
-                artThingsGallery.length && [null, `(${[
-                    `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/" class="current">Info</a>`,
-                    `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/">Gallery</a>`
-                ].join(', ')})`]
-            ]
-        }
-    });
+    const generateTrackList = (chunks, {strings, to}) => fixWS`
+        <dl>
+            ${chunks.map(({album, chunk, duration}) => fixWS`
+                <dt>${strings('artistPage.creditList.album.withDate.withDuration', {
+                    album: strings.link.album(album, {to}),
+                    date: strings.count.date(album.date),
+                    duration: strings.count.duration(duration, {approximate: true})
+                })}</dt>
+                <dd><ul>
+                    ${(chunk
+                        .map(({track, ...props}) => ({
+                            aka: track.aka,
+                            entry: strings('artistPage.creditList.entry.track.withDuration', {
+                                track: strings.link.track(track, {to}),
+                                duration: strings.count.duration(track.duration, {to})
+                            }),
+                            ...props
+                        }))
+                        .map(({aka, ...opts}) => `<li ${classes(aka && 'rerelease')}>${generateEntryAccents({strings, to, aka, ...opts})}</li>`)
+                        .join('\n'))}
+                </ul></dd>
+            `).join('\n')}
+        </dl>
+    `;
 
-    if (artThingsGallery.length) {
-        await writePage([C.ARTIST_DIRECTORY, artist.directory, 'gallery'], {
-            title: name + ' - Gallery',
+    const avatarPath = path.join(C.MEDIA_ARTIST_AVATAR_DIRECTORY, artist.directory + '.jpg');
+    let avatarFileExists = null;
+
+    return async ({strings, writePage}) => {
+        // The outer step, used for gathering data, is always sync. This is
+        // normally fine 8ecause pretty much all the data we will ever need
+        // across 8uilds is available for synchronous access - 8ut this here
+        // is an exception, and we have to evaluate it asynchronously. Still,
+        // we don't want to perform that access() oper8tion any more than
+        // necessary, so we cache the value in a varia8le shared across calls
+        // to this 8uild function.
+        avatarFileExists = avatarFileExists ?? (wikiInfo.features.artistAvatars &&
+            await access(path.join(mediaPath, avatarPath)).then(() => true, () => false));
+
+        await writePage('artist', artist.directory, ({to}) => ({
+            title: strings('artistPage.title', {artist: name}),
 
             main: {
-                classes: ['top-index'],
                 content: fixWS`
-                    <h1>${name} - Gallery</h1>
-                    <p class="quick-info">(Contributed to ${s(artThingsGallery.length, 'cover art')})</p>
-                    <div class="grid-listing">
-                        ${getGridHTML({
-                            entries: artThingsGallery.map(item => ({item})),
-                            srcFn: thing => (thing.album
-                                ? getTrackCover(thing)
-                                : getAlbumCover(thing)),
-                            hrefFn: thing => (thing.album
-                                ? `${C.TRACK_DIRECTORY}/${thing.directory}/`
-                                : `${C.ALBUM_DIRECTORY}/${thing.directory}`)
-                        })}
-                    </div>
+                    ${avatarFileExists && generateCoverLink({
+                        strings, to,
+                        src: `/${C.MEDIA_DIRECTORY}/${avatarPath}`,
+                        alt: strings('misc.alt.artistAvatar')
+                    })}
+                    <h1>${strings('artistPage.title', {artist: name})}</h1>
+                    ${note && fixWS`
+                        <p>${strings('releaseInfo.note')}</p>
+                        <blockquote>
+                            ${transformMultiline(note, {strings, to})}
+                        </blockquote>
+                        <hr>
+                    `}
+                    ${urls.length && `<p>${strings('releaseInfo.visitOn', {
+                        links: strings.list.or(urls.map(url => fancifyURL(url, {strings})))
+                    })}</p>`}
+                    ${hasGallery && `<p>${strings('artistPage.viewArtGallery', {
+                        link: strings.link.artistGallery(artist, {
+                            to,
+                            text: strings('artistPage.viewArtGallery.link')
+                        })
+                    })}</p>`}
+                    <p>${strings('misc.jumpTo.withLinks', {
+                        links: strings.list.comma([
+                            [
+                                [...releasedTracks, ...unreleasedTracks].length && `<a href="#tracks">${strings('artistPage.trackList.title')}</a>`,
+                                unreleasedTracks.length && `(<a href="#unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</a>)`
+                            ].filter(Boolean).join(' '),
+                            artThingsAll.length && `<a href="#art">${strings('artistPage.artList.title')}</a>`,
+                            wikiInfo.features.flashesAndGames && flashes.length && `<a href="#flashes">${strings('artistPage.flashList.title')}</a>`,
+                            commentaryThings.length && `<a href="#commentary">${strings('artistPage.commentaryList.title')}</a>`
+                        ].filter(Boolean))
+                    })}</p>
+                    ${(releasedTracks.length || unreleasedTracks.length) && fixWS`
+                        <h2 id="tracks">${strings('artistPage.trackList.title')}</h2>
+                    `}
+                    ${releasedTracks.length && fixWS`
+                        <p>${strings('artistPage.contributedDurationLine', {
+                            artist: artist.name,
+                            duration: strings.count.duration(totalReleasedDuration, {approximate: true, unit: true})
+                        })}</p>
+                        ${generateTrackList(releasedTrackListChunks, {strings, to})}
+                    `}
+                    ${unreleasedTracks.length && fixWS`
+                        <h3 id="unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</h3>
+                        ${generateTrackList(unreleasedTrackListChunks, {strings, to})}
+                    `}
+                    ${artThingsAll.length && fixWS`
+                        <h2 id="art">${strings('artistPage.artList.title')}</h2>
+                        ${hasGallery && `<p>${strings('artistPage.viewArtGallery.orBrowseList', {
+                            link: strings.link.artistGallery(artist, {
+                                to,
+                                text: strings('artistPage.viewArtGallery.link')
+                            })
+                        })}</p>`}
+                        <dl>
+                            ${artListChunks.map(({album, chunk}) => fixWS`
+                                <dt>${strings('artistPage.creditList.album.withDate', {
+                                    album: strings.link.album(album, {to}),
+                                    date: strings.count.date(album.date)
+                                })}</dt>
+                                <dd><ul>
+                                    ${(chunk
+                                        .map(({album, track, key, ...props}) => ({
+                                            entry: (track
+                                                ? strings('artistPage.creditList.entry.track', {
+                                                    track: strings.link.track(track, {to})
+                                                })
+                                                : `<i>${strings('artistPage.creditList.entry.album.' + {
+                                                    wallpaperArtists: 'wallpaperArt',
+                                                    coverArtists: 'coverArt'
+                                                }[key])}</i>`),
+                                            ...props
+                                        }))
+                                        .map(opts => generateEntryAccents({strings, to, ...opts}))
+                                        .map(row => `<li>${row}</li>`)
+                                        .join('\n'))}
+                                </ul></dd>
+                            `).join('\n')}
+                        </dl>
+                    `}
+                    ${wikiInfo.features.flashesAndGames && flashes.length && fixWS`
+                        <h2 id="flashes">${strings('artistPage.flashList.title')}</h2>
+                        <dl>
+                            ${flashListChunks.map(({act, chunk, dateFirst, dateLast}) => fixWS`
+                                <dt>${strings('artistPage.creditList.flashAct.withDateRange', {
+                                    act: strings.link.flash(chunk[0].flash, {to, text: act.name}),
+                                    dateRange: strings.count.dateRange([dateFirst, dateLast])
+                                })}</dt>
+                                <dd><ul>
+                                    ${(chunk
+                                        .map(({flash, ...props}) => ({
+                                            entry: strings('artistPage.creditList.entry.flash', {
+                                                flash: strings.link.flash(flash, {to})
+                                            }),
+                                            ...props
+                                        }))
+                                        .map(opts => generateEntryAccents({strings, to, ...opts}))
+                                        .map(row => `<li>${row}</li>`)
+                                        .join('\n'))}
+                                </ul></dd>
+                            `).join('\n')}
+                        </dl>
+                    `}
+                    ${commentaryThings.length && fixWS`
+                        <h2 id="commentary">${strings('artistPage.commentaryList.title')}</h2>
+                        <dl>
+                            ${commentaryListChunks.map(({album, chunk}) => fixWS`
+                                <dt>${strings('artistPage.creditList.album', {
+                                    album: strings.link.album(album, {to})
+                                })}</dt>
+                                <dd><ul>
+                                    ${(chunk
+                                        .map(({album, track, ...props}) => track
+                                            ? strings('artistPage.creditList.entry.track', {
+                                                track: strings.link.track(track, {to})
+                                            })
+                                            : `<i>${strings('artistPage.creditList.entry.album.commentary')}</i>`)
+                                        .map(row => `<li>${row}</li>`)
+                                        .join('\n'))}
+                                </ul></dd>
+                            `).join('\n')}
+                        </dl>
+                    `}
                 `
             },
 
-            nav: {
-                links: [
-                    ['./', wikiInfo.shortName],
-                    wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                    [null, 'Artist:'],
-                    [`${C.ARTIST_DIRECTORY}/${artist.directory}/`, name],
-                    [null, `(${[
-                        `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">Info</a>`,
-                        `<a href="${C.ARTIST_DIRECTORY}/${artist.directory}/gallery/" class="current">Gallery</a>`
-                    ].join(', ')})`]
-                ]
-            }
-        });
+            nav: generateNavForArtist(artist, {strings, to, isGallery: false, hasGallery})
+        }));
+
+        if (hasGallery) {
+            await writePage('artistGallery', artist.directory, ({to}) => ({
+                title: strings('artistGalleryPage.title', {artist: name}),
+
+                main: {
+                    classes: ['top-index'],
+                    content: fixWS`
+                        <h1>${strings('artistGalleryPage.title', {artist: name})}</h1>
+                        <p class="quick-info">${strings('artistGalleryPage.infoLine', {
+                            coverArts: strings.count.coverArts(artThingsGallery.length, {unit: true})
+                        })}</p>
+                        <div class="grid-listing">
+                            ${getGridHTML({
+                                strings, to,
+                                entries: artThingsGallery.map(item => ({item})),
+                                srcFn: thing => (thing.album
+                                    ? getTrackCover(thing, {to})
+                                    : getAlbumCover(thing, {to})),
+                                hrefFn: thing => (thing.album
+                                    ? to.track(thing.directory)
+                                    : to.album(thing.directory))
+                            })}
+                        </div>
+                    `
+                },
+
+                nav: generateNavForArtist(artist, {strings, to, isGallery: true, hasGallery})
+            }));
+        }
     }
 }
 
-async function writeArtistAliasPage(artist) {
-    const { alias } = artist;
+function generateNavForArtist(artist, {strings, to, isGallery, hasGallery}) {
+    const infoGalleryLinks = (hasGallery &&
+        generateInfoGalleryLinks('artist', 'artistGallery', artist, isGallery, {strings, to}))
 
-    const directory = path.join(outputPath, C.ARTIST_DIRECTORY, artist.directory);
-    const file = path.join(directory, 'index.html');
-    const target = `/${C.ARTIST_DIRECTORY}/${alias.directory}/`;
-
-    await mkdirp(directory);
-    await writeFile(file, generateRedirectPage(alias.name, target));
+    return {
+        links: [
+            {
+                href: to.home(),
+                title: wikiInfo.shortName
+            },
+            wikiInfo.features.listings &&
+            {
+                href: to.listingIndex(),
+                title: strings('listingIndex.title')
+            },
+            {
+                html: strings('artistPage.nav.artist', {
+                    artist: strings.link.artist(artist, {class: 'current', to})
+                })
+            },
+            hasGallery &&
+            {
+                divider: false,
+                html: `(${infoGalleryLinks})`
+            }
+        ]
+    };
 }
 
-function generateRedirectPage(title, target) {
+function writeArtistAliasPage(artist) {
+    const { alias } = artist;
+
+    return async ({baseDirectory, strings, writePage}) => {
+        const { code } = strings;
+        const paths = writePage.paths(baseDirectory, 'artist', alias.directory);
+        const content = generateRedirectPage(alias.name, paths.pathname, {strings});
+        await writePage.write(content, {paths});
+    };
+}
+
+function generateRedirectPage(title, target, {strings}) {
     return fixWS`
         <!DOCTYPE html>
         <html>
             <head>
-                <title>Moved to ${title}</title>
+                <title>${strings('redirectPage.title', {title})}</title>
                 <meta charset="utf-8">
                 <meta http-equiv="refresh" content="0;url=${target}">
                 <link rel="canonical" href="${target}">
@@ -2530,666 +3315,1049 @@ function generateRedirectPage(title, target) {
             </head>
             <body>
                 <main>
-                    <h1>Moved to ${title}</h1>
-                    <p>This page has been moved to <a href="${target}">${target}</a>.</p>
+                    <h1>${strings('redirectPage.title', {title})}</h1>
+                    <p>${strings('redirectPage.infoLine', {
+                        target: `<a href="${target}">${target}</a>`
+                    })}</p>
                 </main>
             </body>
         </html>
     `;
 }
 
-function albumChunkedList(tracks, getLI, showDate = true, datePropertyOrFn = 'date') {
-    const getAlbum = thing => thing.album ? thing.album : thing;
-    const dateFn = (typeof datePropertyOrFn === 'function'
-        ? datePropertyOrFn
-        : track => track[datePropertyOrFn]);
-    return fixWS`
-        <dl>
-            ${tracks.slice().sort((a, b) => dateFn(a) - dateFn(b)).map((thing, i, sorted) => {
-                const li = getLI(thing, i);
-                const album = getAlbum(thing);
-                const previous = sorted[i - 1];
-                if (i === 0 || album !== getAlbum(previous) || (showDate && +dateFn(thing) !== +dateFn(previous))) {
-                    const heading = fixWS`
-                        <dt>
-                            <a href="${C.ALBUM_DIRECTORY}/${getAlbum(thing).directory}/" style="${getLinkThemeString(getAlbum(thing))}">${getAlbum(thing).name}</a>
-                            ${showDate && `(${getDateString({date: dateFn(thing)})})`}
-                        </dt>
-                        <dd><ul>
-                    `;
-                    if (i > 0) {
-                        return ['</ul></dd>', heading, li];
-                    } else {
-                        return [heading, li];
-                    }
-                } else {
-                    return [li];
-                }
-            }).reduce((acc, arr) => acc.concat(arr), []).join('\n')}
-        </dl>
-    `;
+function writeFlashPages() {
+    if (!wikiInfo.features.flashesAndGames) {
+        return;
+    }
+
+    return [
+        writeFlashIndex(),
+        ...flashData.map(writeFlashPage)
+    ];
 }
 
-function actChunkedList(flashes, getLI, showDate = true, dateProperty = 'date') {
-    return fixWS`
-        <dl>
-            ${flashes.slice().sort((a, b) => a[dateProperty] - b[dateProperty]).map((flash, i, sorted) => {
-                const li = getLI(flash, i);
-                const act = flash.act;
-                const previous = sorted[i - 1];
-                if (i === 0 || act !== previous.act) {
-                    const heading = fixWS`
-                        <dt>
-                            <a href="${C.FLASH_DIRECTORY}/${sorted.find(flash => !flash.act8r8k && flash.act === act).directory}/" style="${getLinkThemeString(flash)}">${flash.act}</a>
-                        </dt>
-                        <dd><ul>
-                    `;
-                    if (i > 0) {
-                        return ['</ul></dd>', heading, li];
-                    } else {
-                        return [heading, li];
-                    }
-                } else {
-                    return [li];
-                }
-            }).reduce((acc, arr) => acc.concat(arr), []).join('\n')}
-        </dl>
-    `;
+function writeFlashIndex() {
+    return ({strings, writePage}) => writePage('flashIndex', '', ({to}) => ({
+        title: strings('flashIndex.title'),
+
+        main: {
+            classes: ['flash-index'],
+            content: fixWS`
+                <h1>${strings('flashIndex.title')}</h1>
+                <div class="long-content">
+                    <p class="quick-info">${strings('misc.jumpTo')}</p>
+                    <ul class="quick-info">
+                        ${flashActData.filter(act => act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
+                            <li><a href="#${anchor}" style="${getLinkThemeString({color: jumpColor})}">${jump}</a></li>
+                        `).join('\n')}
+                    </ul>
+                </div>
+                ${flashActData.map((act, i) => fixWS`
+                    <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${to.flash(act.flashes[0].directory)}">${act.name}</a></h2>
+                    <div class="grid-listing">
+                        ${getFlashGridHTML({
+                            strings, to,
+                            entries: act.flashes.map(flash => ({item: flash})),
+                            lazy: i === 0 ? 4 : true
+                        })}
+                    </div>
+                `).join('\n')}
+            `
+        },
+
+        nav: {simple: true}
+    }));
 }
 
-async function writeFlashPages() {
-    await progressPromiseAll('Writing Flash pages.', queue(flashData
-        .filter(flash => !flash.act8r8k)
-        .map(curry(writeFlashPage)), queueSize));
-}
-
-async function writeFlashPage(flash) {
-    const kebab = getFlashDirectory(flash);
-
-    const flashes = flashData.filter(flash => !flash.act8r8k);
-    const index = flashes.indexOf(flash);
-    const previous = flashes[index - 1];
-    const next = flashes[index + 1];
-    const parts = [
-        previous && `<a href="${getHrefOfAnythingMan(previous)}" id="previous-button" title="${previous.name}">Previous</a>`,
-        next && `<a href="${getHrefOfAnythingMan(next)}" id="next-button" title="${next.name}">Next</a>`
-    ].filter(Boolean);
-
-    await writePage([C.FLASH_DIRECTORY, kebab], {
-        title: flash.name,
+function writeFlashPage(flash) {
+    return ({strings, writePage}) => writePage('flash', flash.directory, ({to}) => ({
+        title: strings('flashPage.title', {flash: flash.name}),
         theme: getThemeString(flash, [
             `--flash-directory: ${flash.directory}`
         ]),
+
         main: {
             content: fixWS`
-                <h1>${flash.name}</h1>
+                <h1>${strings('flashPage.title', {flash: flash.name})}</h1>
                 ${generateCoverLink({
-                    src: getFlashCover(flash),
-                    alt: 'cover art'
+                    strings, to,
+                    src: to.flashArt(flash.directory),
+                    alt: strings('misc.alt.flashArt')
                 })}
-                <p>Released ${getDateString(flash)}.</p>
-                ${(flash.page || flash.urls.length) && `<p>Play on ${joinNoOxford(
-                    [
+                <p>${strings('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
+                ${(flash.page || flash.urls.length) && `<p>${strings('releaseInfo.playOn', {
+                    links: strings.list.or([
                         flash.page && getFlashLink(flash),
                         ...flash.urls
-                    ].map(url => fancifyFlashURL(url, flash)), 'or')}.</p>`}
-                ${flash.contributors.textContent && fixWS`
-                    <p>Contributors:<br>${transformInline(flash.contributors.textContent)}</p>
-                `}
+                    ].map(url => fancifyFlashURL(url, flash, {strings})))
+                })}</p>`}
                 ${flash.tracks.length && fixWS`
                     <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                     <ul>
                         ${flash.tracks.map(track => fixWS`
                             <li>
                                 <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                                <span class="by">by ${getArtistString(track.artists)}</span>
+                                <span class="by">by ${getArtistString(track.artists, {strings, to})}</span>
                             </li>
                         `).join('\n')}
                     </ul>
                 `}
+                ${flash.contributors.textContent && fixWS`
+                    <p>
+                        ${strings('releaseInfo.contributors')}
+                        <br>
+                        ${transformInline(flash.contributors.textContent, {strings, to})}
+                    </p>
+                `}
                 ${flash.contributors.length && fixWS`
-                    <p>Contributors:</p>
+                    <p>${strings('releaseInfo.contributors')}</p>
                     <ul>
-                        ${flash.contributors.map(contrib => fixWS`<li>${getArtistString([contrib], true)}</li>`).join('\n')}
+                        ${flash.contributors
+                            .map(contrib => `<li>${getArtistString([contrib], {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })}</li>`)
+                            .join('\n')}
                     </ul>
                 `}
             `
         },
-        sidebarLeft: {
-            content: generateSidebarForFlashes(flash)
-        },
-        nav: {
-            links: [
-                ['./', wikiInfo.shortName],
-                [`${C.FLASH_DIRECTORY}/`, `Flashes &amp; Games`],
-                [`${C.FLASH_DIRECTORY}/${kebab}/`, flash.name],
-                parts.length && [null, `(${parts.join(', ')})`]
-            ].filter(Boolean),
-            content: fixWS`
-                <div>
-                    ${chronologyLinks(flash, {
-                        headingWord: 'flash/game',
-                        sourceData: flashData,
-                        filters: [
-                            {
-                                mapProperty: 'contributors',
-                                toArtist: ({ who }) => who
-                            }
-                        ]
-                    })}
-                </div>
-            `
-        }
-    });
+
+        sidebarLeft: generateSidebarForFlash(flash, {strings, to}),
+        nav: generateNavForFlash(flash, {strings, to})
+    }));
 }
 
-function generateSidebarForFlashes(flash) {
-    const act6 = flashData.findIndex(f => f.act.startsWith('Act 6'));
-    const postCanon = flashData.findIndex(f => f.act.includes('Post Canon'));
-    const outsideCanon = postCanon + flashData.slice(postCanon).findIndex(f => !f.act.includes('Post Canon'));
-    const index = flashData.indexOf(flash);
+function generateNavForFlash(flash, {strings, to}) {
+    const previousNextLinks = generatePreviousNextLinks('flash', flash, flashData, {strings, to});
+
+    return {
+        links: [
+            {
+                href: to.home(),
+                title: wikiInfo.shortName
+            },
+            {
+                href: to.flashIndex(),
+                title: strings('flashIndex.title')
+            },
+            {
+                html: strings('flashPage.nav.flash', {
+                    flash: strings.link.flash(flash, {class: 'current', to})
+                })
+            },
+            previousNextLinks &&
+            {
+                divider: false,
+                html: `(${previousNextLinks})`
+            }
+        ],
+
+        content: fixWS`
+            <div>
+                ${chronologyLinks(flash, {
+                    strings, to,
+                    headingWord: strings('misc.chronology.flash'),
+                    contribKey: 'contributors',
+                    getThings: artist => artist.flashes.asContributor
+                })}
+            </div>
+        `
+    };
+}
+
+function generateSidebarForFlash(flash, {strings, to}) {
+    // all hard-coded, sorry :(
+    // this doesnt have a super portable implementation/design...yet!!
+
+    const act6 = flashActData.findIndex(act => act.name.startsWith('Act 6'));
+    const postCanon = flashActData.findIndex(act => act.name.includes('Post Canon'));
+    const outsideCanon = postCanon + flashActData.slice(postCanon).findIndex(act => !act.name.includes('Post Canon'));
+    const actIndex = flashActData.indexOf(flash.act);
     const side = (
-        (index < 0) ? 0 :
-        (index < act6) ? 1 :
-        (index <= outsideCanon) ? 2 :
+        (actIndex < 0) ? 0 :
+        (actIndex < act6) ? 1 :
+        (actIndex <= outsideCanon) ? 2 :
         3
     );
     const currentAct = flash && flash.act;
 
-    return fixWS`
-        <h1><a href="${C.FLASH_DIRECTORY}/">Flashes &amp; Games</a></h1>
-        <dl>
-            ${flashData.filter(f => f.act8r8k).filter(({ act }) =>
-                act.startsWith('Act 1') ||
-                act.startsWith('Act 6 Act 1') ||
-                act.startsWith('Hiveswap') ||
-                (
-                    flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
-                    flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
-                    true
-                )
-            ).flatMap(({ act, color }) => [
-                act.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 1')))}/" style="--primary-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
-                || act.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Act 6')))}/" style="--primary-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
-                || act.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act.startsWith('Hiveswap')))}/" style="--primary-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
-                (
-                    flashData.findIndex(f => f.act === act) < act6 ? side === 1 :
-                    flashData.findIndex(f => f.act === act) < outsideCanon ? side === 2 :
-                    true
-                ) && `<dt ${classes(act === currentAct && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flashData.find(f => !f.act8r8k && f.act === act))}/" style="${getLinkThemeString({color})}">${act}</a></dt>`,
-                act === currentAct && fixWS`
-                    <dd><ul>
-                        ${flashData.filter(f => !f.act8r8k && f.act === act).map(f => fixWS`
-                            <li ${classes(f === flash && 'current')}><a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(f)}/" style="${getLinkThemeString(f)}">${f.name}</a></li>
-                        `).join('\n')}
-                    </ul></dd>
-                `
-            ]).filter(Boolean).join('\n')}
-        </dl>
-    `;
+    return {
+        content: fixWS`
+            <h1>${strings.link.flashIndex('', {to, text: strings('flashIndex.title')})}</h1>
+            <dl>
+                ${flashActData.filter(act =>
+                    act.name.startsWith('Act 1') ||
+                    act.name.startsWith('Act 6 Act 1') ||
+                    act.name.startsWith('Hiveswap') ||
+                    // Sorry not sorry -Yiffy
+                    (({index = flashActData.indexOf(act)} = {}) => (
+                        index < act6 ? side === 1 :
+                        index < outsideCanon ? side === 2 :
+                        true
+                    ))()
+                ).flatMap(act => [
+                    act.name.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
+                    || act.name.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
+                    || act.name.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
+                    (({index = flashActData.indexOf(act)} = {}) => (
+                        index < act6 ? side === 1 :
+                        index < outsideCanon ? side === 2 :
+                        true
+                    ))()
+                    && `<dt ${classes(act === currentAct && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="${getLinkThemeString(act)}">${act.name}</a></dt>`,
+                    act === currentAct && fixWS`
+                        <dd><ul>
+                            ${act.flashes.map(f => fixWS`
+                                <li ${classes(f === flash && 'current')}>${strings.link.flash(f, {to})}</li>
+                            `).join('\n')}
+                        </ul></dd>
+                    `
+                ]).filter(Boolean).join('\n')}
+            </dl>
+        `
+    };
 }
+
+const listingSpec = [
+    {
+        directory: 'albums/by-name',
+        title: ({strings}) => strings('listingPage.listAlbums.byName.title'),
+
+        data() {
+            return albumData.slice()
+                .sort(sortByName);
+        },
+
+        row(album, {strings, to}) {
+            return strings('listingPage.listAlbums.byName.item', {
+                album: strings.link.album(album, {to}),
+                tracks: strings.count.tracks(album.tracks.length, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'albums/by-tracks',
+        title: ({strings}) => strings('listingPage.listAlbums.byTracks.title'),
+
+        data() {
+            return albumData.slice()
+                .sort((a, b) => b.tracks.length - a.tracks.length);
+        },
+
+        row(album, {strings, to}) {
+            return strings('listingPage.listAlbums.byTracks.item', {
+                album: strings.link.album(album, {to}),
+                tracks: strings.count.tracks(album.tracks.length, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'albums/by-duration',
+        title: ({strings}) => strings('listingPage.listAlbums.byDuration.title'),
+
+        data() {
+            return albumData.slice()
+                .map(album => ({album, duration: getTotalDuration(album.tracks)}))
+                .sort((a, b) => b.duration - a.duration);
+        },
+
+        row({album, duration}, {strings, to}) {
+            return strings('listingPage.listAlbums.byDuration.item', {
+                album: strings.link.album(album, {to}),
+                duration: strings.count.duration(duration)
+            });
+        }
+    },
+
+    {
+        directory: 'albums/by-date',
+        title: ({strings}) => strings('listingPage.listAlbums.byDate.title'),
+
+        data() {
+            return C.sortByDate(albumData
+                .filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY));
+        },
+
+        row(album, {strings, to}) {
+            return strings('listingPage.listAlbums.byDate.item', {
+                album: strings.link.album(album, {to}),
+                date: strings.count.date(album.date)
+            });
+        }
+    },
+
+    {
+        directory: 'artists/by-name',
+        title: ({strings}) => strings('listingPage.listArtists.byName.title'),
+
+        data() {
+            return artistData.slice()
+                .sort(sortByName)
+                .map(artist => ({artist, contributions: C.getArtistNumContributions(artist)}));
+        },
+
+        row({artist, contributions}, {strings, to}) {
+            return strings('listingPage.listArtists.byName.item', {
+                artist: strings.link.artist(artist, {to}),
+                contributions: strings.count.contributions(contributions, {to, unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'artists/by-contribs',
+        title: ({strings}) => strings('listingPage.listArtists.byContribs.title'),
+
+        data() {
+            return {
+                toTracks: (artistData
+                    .map(artist => ({
+                        artist,
+                        contributions: (
+                            artist.tracks.asContributor.length +
+                            artist.tracks.asArtist.length
+                        )
+                    }))
+                    .sort((a, b) => b.contributions - a.contributions)
+                    .filter(({ contributions }) => contributions)),
+
+                toArtAndFlashes: (artistData
+                    .map(artist => ({
+                        artist,
+                        contributions: (
+                            artist.tracks.asCoverArtist.length +
+                            artist.albums.asCoverArtist.length +
+                            artist.albums.asWallpaperArtist.length +
+                            (wikiInfo.features.flashesAndGames
+                                ? artist.flashes.asContributor.length
+                                : 0)
+                        )
+                    }))
+                    .sort((a, b) => b.contributions - a.contributions)
+                    .filter(({ contributions }) => contributions))
+            };
+        },
+
+        html({toTracks, toArtAndFlashes}, {strings, to}) {
+            return fixWS`
+                <div class="content-columns">
+                    <div class="column">
+                        <h2>${strings('listingPage.misc.trackContributors')}</h2>
+                        <ul>
+                            ${(toTracks
+                                .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
+                                    artist: strings.link.artist(artist, {to}),
+                                    contributions: strings.count.contributions(contributions, {unit: true})
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                         </ul>
+                    </div>
+                    <div class="column">
+                        <h2>${strings('listingPage.misc' +
+                            (wikiInfo.features.flashesAndGames
+                                ? '.artAndFlashContributors'
+                                : '.artContributors'))}</h2>
+                        <ul>
+                            ${(toArtAndFlashes
+                                .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
+                                    artist: strings.link.artist(artist, {to}),
+                                    contributions: strings.count.contributions(contributions, {unit: true})
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    {
+        directory: 'artists/by-commentary',
+        title: ({strings}) => strings('listingPage.listArtists.byCommentary.title'),
+
+        data() {
+            return artistData
+                .map(artist => ({artist, entries: artist.tracks.asCommentator.length + artist.albums.asCommentator.length}))
+                .filter(({ entries }) => entries)
+                .sort((a, b) => b.entries - a.entries);
+        },
+
+        row({artist, entries}, {strings, to}) {
+            return strings('listingPage.listArtists.byCommentary.item', {
+                artist: strings.link.artist(artist, {to}),
+                entries: strings.count.commentaryEntries(entries, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'artists/by-duration',
+        title: ({strings}) => strings('listingPage.listArtists.byDuration.title'),
+
+        data() {
+            return artistData
+                .map(artist => ({artist, duration: getTotalDuration(
+                    [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
+                }))
+                .filter(({ duration }) => duration > 0)
+                .sort((a, b) => b.duration - a.duration);
+        },
+
+        row({artist, duration}, {strings, to}) {
+            return strings('listingPage.listArtists.byDuration.item', {
+                artist: strings.link.artist(artist, {to}),
+                duration: strings.count.duration(duration)
+            });
+        }
+    },
+
+    {
+        directory: 'artists/by-latest',
+        title: ({strings}) => strings('listingPage.listArtists.byLatest.title'),
+
+        data() {
+            const reversedTracks = trackData.slice().reverse();
+            const reversedArtThings = justEverythingSortedByArtDateMan.slice().reverse();
+
+            return {
+                toTracks: C.sortByDate(artistData
+                    .filter(artist => !artist.alias)
+                    .map(artist => ({
+                        artist,
+                        date: reversedTracks.find(({ album, artists, contributors }) => (
+                            album.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                            [...artists, ...contributors].some(({ who }) => who === artist)
+                        ))?.date
+                    }))
+                    .filter(({ date }) => date)
+                    .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)).reverse(),
+
+                toArtAndFlashes: C.sortByDate(artistData
+                    .filter(artist => !artist.alias)
+                    .map(artist => {
+                        const thing = reversedArtThings.find(({ album, coverArtists, contributors }) => (
+                            album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                            [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === artist)
+                        ));
+                        return thing && {
+                            artist,
+                            date: (thing.coverArtists?.some(({ who }) => who === artist)
+                                ? thing.coverArtDate
+                                : thing.date)
+                        };
+                    })
+                    .filter(Boolean)
+                    .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
+                ).reverse()
+            };
+        },
+
+        html({toTracks, toArtAndFlashes}, {strings, to}) {
+            return fixWS`
+                <div class="content-columns">
+                    <div class="column">
+                        <h2>${strings('listingPage.misc.trackContributors')}</h2>
+                        <ul>
+                            ${(toTracks
+                                .map(({ artist, date }) => strings('listingPage.listArtists.byLatest.item', {
+                                    artist: strings.link.artist(artist, {to}),
+                                    date: strings.count.date(date)
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul>
+                    </div>
+                    <div class="column">
+                        <h2>${strings('listingPage.misc' +
+                            (wikiInfo.features.flashesAndGames
+                                ? '.artAndFlashContributors'
+                                : '.artContributors'))}</h2>
+                        <ul>
+                            ${(toArtAndFlashes
+                                .map(({ artist, date }) => strings('listingPage.listArtists.byLatest.item', {
+                                    artist: strings.link.artist(artist, {to}),
+                                    date: strings.count.date(date)
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    {
+        directory: 'groups/by-name',
+        title: ({strings}) => strings('listingPage.listGroups.byName.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        data() {
+            return groupData.slice().sort(sortByName);
+        },
+
+        row(group, {strings, to}) {
+            return strings('listingPage.listGroups.byCategory.group', {
+                group: strings.link.groupInfo(group, {to}),
+                gallery: strings.link.groupGallery(group, {
+                    to,
+                    text: strings('listingPage.listGroups.byCategory.group.gallery')
+                })
+            });
+        }
+    },
+
+    {
+        directory: 'groups/by-category',
+        title: ({strings}) => strings('listingPage.listGroups.byCategory.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        html({strings, to}) {
+            return fixWS`
+                <dl>
+                    ${groupCategoryData.map(category => fixWS`
+                        <dt>${strings('listingPage.listGroups.byCategory.category', {
+                            category: strings.link.groupInfo(category.groups[0], {to, text: category.name})
+                        })}</dt>
+                        <dd><ul>
+                            ${(category.groups
+                                .map(group => strings('listingPage.listGroups.byCategory.group', {
+                                    group: strings.link.groupInfo(group, {to}),
+                                    gallery: strings.link.groupGallery(group, {
+                                        to,
+                                        text: strings('listingPage.listGroups.byCategory.group.gallery')
+                                    })
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul></dd>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'groups/by-albums',
+        title: ({strings}) => strings('listingPage.listGroups.byAlbums.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        data() {
+            return groupData
+                .map(group => ({group, albums: group.albums.length}))
+                .sort((a, b) => b.albums - a.albums);
+        },
+
+        row({group, albums}, {strings, to}) {
+            return strings('listingPage.listGroups.byAlbums.item', {
+                group: strings.link.groupInfo(group, {to}),
+                albums: strings.count.albums(albums, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'groups/by-tracks',
+        title: ({strings}) => strings('listingPage.listGroups.byTracks.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        data() {
+            return groupData
+                .map(group => ({group, tracks: group.albums.reduce((acc, album) => acc + album.tracks.length, 0)}))
+                .sort((a, b) => b.tracks - a.tracks);
+        },
+
+        row({group, tracks}, {strings, to}) {
+            return strings('listingPage.listGroups.byTracks.item', {
+                group: strings.link.groupInfo(group, {to}),
+                tracks: strings.count.tracks(tracks, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'groups/by-duration',
+        title: ({strings}) => strings('listingPage.listGroups.byDuration.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        data() {
+            return groupData
+                .map(group => ({group, duration: getTotalDuration(group.albums.flatMap(album => album.tracks))}))
+                .sort((a, b) => b.duration - a.duration);
+        },
+
+        row({group, duration}, {strings, to}) {
+            return strings('listingPage.listGroups.byDuration.item', {
+                group: strings.link.groupInfo(group, {to}),
+                duration: strings.count.duration(duration)
+            });
+        }
+    },
+
+    {
+        directory: 'groups/by-latest-album',
+        title: ({strings}) => strings('listingPage.listGroups.byLatest.title'),
+        condition: () => wikiInfo.features.groupUI,
+
+        data() {
+            return C.sortByDate(groupData
+                .map(group => ({group, date: group.albums[group.albums.length - 1].date}))
+                // So this is kinda tough to explain, 8ut 8asically, when we reverse the list after sorting it 8y d8te
+                // (so that the latest d8tes come first), it also flips the order of groups which share the same d8te.
+                // This happens mostly when a single al8um is the l8test in two groups. So, say one such al8um is in
+                // the groups "Fandom" and "UMSPAF". Per category order, Fandom is meant to show up 8efore UMSPAF, 8ut
+                // when we do the reverse l8ter, that flips them, and UMSPAF ends up displaying 8efore Fandom. So we do
+                // an extra reverse here, which will fix that and only affect groups that share the same d8te (8ecause
+                // groups that don't will 8e moved 8y the sortByDate call surrounding this).
+                .reverse()).reverse()
+        },
+
+        row({group, date}, {strings, to}) {
+            return strings('listingPage.listGroups.byLatest.item', {
+                group: strings.link.groupInfo(group, {to}),
+                date: strings.count.date(date)
+            });
+        }
+    },
+
+    {
+        directory: 'tracks/by-name',
+        title: ({strings}) => strings('listingPage.listTracks.byName.title'),
+
+        data() {
+            return trackData.slice().sort(sortByName);
+        },
+
+        row(track, {strings, to}) {
+            return strings('listingPage.listTracks.byName.item', {
+                track: strings.link.track(track, {to})
+            });
+        }
+    },
+
+    {
+        directory: 'tracks/by-album',
+        title: ({strings}) => strings('listingPage.listTracks.byAlbum.title'),
+
+        html({strings, to}) {
+            return fixWS`
+                <dl>
+                    ${albumData.map(album => fixWS`
+                        <dt>${strings('listingPage.listTracks.byAlbum.album', {
+                            album: strings.link.album(album, {to})
+                        })}</dt>
+                        <dd><ol>
+                            ${(album.tracks
+                                .map(track => strings('listingPage.listTracks.byAlbum.track', {
+                                    track: strings.link.track(track, {to})
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ol></dd>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tracks/by-date',
+        title: ({strings}) => strings('listingPage.listTracks.byDate.title'),
+
+        data() {
+            return chunkByProperties(
+                C.sortByDate(trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
+                ['album', 'date']
+            );
+        },
+
+        html(chunks, {strings, to}) {
+            return fixWS`
+                <dl>
+                    ${chunks.map(({album, date, chunk: tracks}) => fixWS`
+                        <dt>${strings('listingPage.listTracks.byDate.album', {
+                            album: strings.link.album(album, {to}),
+                            date: strings.count.date(date)
+                        })}</dt>
+                        <dd><ul>
+                            ${(tracks
+                                .map(track => track.aka
+                                    ? `<li class="rerelease">${strings('listingPage.listTracks.byDate.track.rerelease', {
+                                        track: strings.link.track(track, {to})
+                                    })}</li>`
+                                    : `<li>${strings('listingPage.listTracks.byDate.track', {
+                                        track: strings.link.track(track, {to})
+                                    })}</li>`)
+                                .join('\n'))}
+                        </ul></dd>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tracks/by-duration',
+        title: ({strings}) => strings('listingPage.listTracks.byDuration.title'),
+
+        data() {
+            return trackData
+                .map(track => ({track, duration: track.duration}))
+                .filter(({ duration }) => duration > 0)
+                .sort((a, b) => b.duration - a.duration);
+        },
+
+        row({track, duration}, {strings, to}) {
+            return strings('listingPage.listTracks.byDuration.item', {
+                track: strings.link.track(track, {to}),
+                duration: strings.count.duration(duration)
+            });
+        }
+    },
+
+    {
+        directory: 'tracks/by-duration-in-album',
+        title: ({strings}) => strings('listingPage.listTracks.byDurationInAlbum.title'),
+
+        data() {
+            return albumData.map(album => ({
+                album,
+                tracks: album.tracks.slice().sort((a, b) => b.duration - a.duration)
+            }));
+        },
+
+        html(albums, {strings, to}) {
+            return fixWS`
+                <dl>
+                    ${albums.map(({album, tracks}) => fixWS`
+                        <dt>${strings('listingPage.listTracks.byDurationInAlbum.album', {
+                            album: strings.link.album(album, {to})
+                        })}</dt>
+                        <dd><ul>
+                            ${(tracks
+                                .map(track => strings('listingPage.listTracks.byDurationInAlbum.track', {
+                                    track: strings.link.track(track, {to}),
+                                    duration: strings.count.duration(track.duration)
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </dd></ul>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tracks/by-times-referenced',
+        title: ({strings}) => strings('listingPage.listTracks.byTimesReferenced.title'),
+
+        data() {
+            return trackData
+                .map(track => ({track, timesReferenced: track.referencedBy.length}))
+                .filter(({ timesReferenced }) => timesReferenced > 0)
+                .sort((a, b) => b.timesReferenced - a.timesReferenced);
+        },
+
+        row({track, timesReferenced}, {strings, to}) {
+            return strings('listingPage.listTracks.byTimesReferenced.item', {
+                track: strings.link.track(track, {to}),
+                timesReferenced: strings.count.timesReferenced(timesReferenced, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'tracks/in-flashes/by-album',
+        title: ({strings}) => strings('listingPage.listTracks.inFlashes.byAlbum.title'),
+        condition: () => wikiInfo.features.flashesAndGames,
+
+        data() {
+            return chunkByProperties(trackData.filter(t => t.flashes.length > 0), ['album'])
+                .filter(({ album }) => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+        },
+
+        html(chunks, {strings, to}) {
+            return fixWS`
+                <dl>
+                    ${chunks.map(({album, chunk: tracks}) => fixWS`
+                        <dt>${strings('listingPage.listTracks.inFlashes.byAlbum.album', {
+                            album: strings.link.album(album, {to}),
+                            date: strings.count.date(album.date)
+                        })}</dt>
+                        <dd><ul>
+                            ${(tracks
+                                .map(track => strings('listingPage.listTracks.inFlashes.byAlbum.track', {
+                                    track: strings.link.track(track, {to}),
+                                    flashes: strings.list.and(track.flashes.map(flash => strings.link.flash(flash, {to})))
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </dd></ul>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tracks/in-flashes/by-flash',
+        title: ({strings}) => strings('listingPage.listTracks.inFlashes.byFlash.title'),
+        condition: () => wikiInfo.features.flashesAndGames,
+
+        html({strings, to}) {
+            return fixWS`
+                <dl>
+                    ${C.sortByDate(flashData.slice()).map(flash => fixWS`
+                        <dt>${strings('listingPage.listTracks.inFlashes.byFlash.flash', {
+                            flash: strings.link.flash(flash, {to}),
+                            date: strings.count.date(flash.date)
+                        })}</dt>
+                        <dd><ul>
+                            ${(flash.tracks
+                                .map(track => strings('listingPage.listTracks.inFlashes.byFlash.track', {
+                                    track: strings.link.track(track, {to}),
+                                    album: strings.link.album(track.album, {to})
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul></dd>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tracks/with-lyrics',
+        title: ({strings}) => strings('listingPage.listTracks.withLyrics.title'),
+
+        data() {
+            return chunkByProperties(trackData.filter(t => t.lyrics), ['album']);
+        },
+
+        html(chunks, {strings, to}) {
+            return fixWS`
+                <dl>
+                    ${chunks.map(({album, chunk: tracks}) => fixWS`
+                        <dt>${strings('listingPage.listTracks.withLyrics.album', {
+                            album: strings.link.album(album, {to}),
+                            date: strings.count.date(album.date)
+                        })}</dt>
+                        <dd><ul>
+                            ${(tracks
+                                .map(track => strings('listingPage.listTracks.withLyrics.track', {
+                                    track: strings.link.track(track, {to}),
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </dd></ul>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
+        directory: 'tags/by-name',
+        title: ({strings}) => strings('listingPage.listTags.byName.title'),
+        condition: () => wikiInfo.features.artTagUI,
+
+        data() {
+            return tagData
+                .filter(tag => !tag.isCW)
+                .sort(sortByName)
+                .map(tag => ({tag, timesUsed: tag.things.length}));
+        },
+
+        row({tag, timesUsed}, {strings, to}) {
+            return strings('listingPage.listTags.byName.item', {
+                tag: strings.link.tag(tag, {to}),
+                timesUsed: strings.count.timesUsed(timesUsed, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'tags/by-useds',
+        title: ({strings}) => strings('listingPage.listTags.byUses.title'),
+        condition: () => wikiInfo.features.artTagUI,
+
+        data() {
+            return tagData
+                .filter(tag => !tag.isCW)
+                .map(tag => ({tag, timesUsed: tag.things.length}))
+                .sort((a, b) => b.timesUsed - a.timesUsed);
+        },
+
+        row({tag, timesUsed}, {strings, to}) {
+            return strings('listingPage.listTags.byUses.item', {
+                tag: strings.link.tag(tag, {to}),
+                timesUsed: strings.count.timesUsed(timesUsed, {unit: true})
+            });
+        }
+    },
+
+    {
+        directory: 'random',
+        title: ({strings}) => `Random Pages`,
+        html: ({strings, to}) => fixWS`
+            <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
+            <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
+            <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>
+            <dl>
+                <dt>Miscellaneous:</dt>
+                <dd><ul>
+                    <li>
+                        <a href="#" data-random="artist">Random Artist</a>
+                        (<a href="#" data-random="artist-more-than-one-contrib">&gt;1 contribution</a>)
+                    </li>
+                    <li><a href="#" data-random="album">Random Album (whole site)</a></li>
+                    <li><a href="#" data-random="track">Random Track (whole site)</a></li>
+                </ul></dd>
+                ${[
+                    {name: 'Official', albumData: officialAlbumData, code: 'official'},
+                    {name: 'Fandom', albumData: fandomAlbumData, code: 'fandom'}
+                ].map(category => fixWS`
+                    <dt>${category.name}: (<a href="#" data-random="album-in-${category.code}">Random Album</a>, <a href="#" data-random="track-in-${category.code}">Random Track</a>)</dt>
+                    <dd><ul>${category.albumData.map(album => fixWS`
+                        <li><a style="${getLinkThemeString(album)}; --album-directory: ${album.directory}" href="#" data-random="track-in-album">${album.name}</a></li>
+                    `).join('\n')}</ul></dd>
+                `).join('\n')}
+            </dl>
+        `
+    }
+];
 
 function writeListingPages() {
     if (!wikiInfo.features.listings) {
         return;
     }
 
-    const reversedTracks = trackData.slice().reverse();
-    const reversedArtThings = justEverythingSortedByArtDateMan.slice().reverse();
-
-    const getAlbumLI = (album, extraText = '') => fixWS`
-        <li>
-            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
-            ${extraText}
-        </li>
-    `;
-
-    const sortByName = (a, b) => {
-        let an = a.name.toLowerCase();
-        let bn = b.name.toLowerCase();
-        if (an.startsWith('the ')) an = an.slice(4);
-        if (bn.startsWith('the ')) bn = bn.slice(4);
-        return an < bn ? -1 : an > bn ? 1 : 0;
-    };
-
-    const listingDescriptors = [
-        [['albums', 'by-name'], `Albums - by Name`, albumData.slice()
-            .sort(sortByName)
-            .map(album => getAlbumLI(album, `(${album.tracks.length} tracks)`))],
-        [['albums', 'by-tracks'], `Albums - by Tracks`, albumData.slice()
-            .sort((a, b) => b.tracks.length - a.tracks.length)
-            .map(album => getAlbumLI(album, `(${s(album.tracks.length, 'track')})`))],
-        [['albums', 'by-duration'], `Albums - by Duration`, albumData.slice()
-            .map(album => ({album, duration: getTotalDuration(album.tracks)}))
-            .sort((a, b) => b.duration - a.duration)
-            .map(({ album, duration }) => getAlbumLI(album, `(${getDurationString(duration)})`))],
-        [['albums', 'by-date'], `Albums - by Date`, C.sortByDate(albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
-            .map(album => getAlbumLI(album, `(${getDateString(album)})`))],
-        [['artists', 'by-name'], `Artists - by Name`, artistData
-            .filter(artist => !artist.alias)
-            .sort(sortByName)
-            .map(artist => fixWS`
-                <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>
-                    (${'' + C.getArtistNumContributions(artist)} <abbr title="contributions (to ${joinNoOxford(['music', 'art', wikiInfo.features.flashesAndGames && 'flashes'])})">c.</abbr>)
-                </li>
-            `)],
-        [['artists', 'by-contribs'], `Artists - by Contributions`, fixWS`
-            <div class="content-columns">
-                <div class="column">
-                    <h2>Track Contributors</h2>
-                    <ul>
-                        ${artistData
-                            .filter(artist => !artist.alias)
-                            .map(artist => ({
-                                name: artist.name,
-                                contribs: (
-                                    artist.tracks.asContributor.length +
-                                    artist.tracks.asArtist.length
-                                )
-                            }))
-                            .sort((a, b) => b.contribs - a.contribs)
-                            .filter(({ contribs }) => contribs)
-                            .map(({ name, contribs }) => fixWS`
-                                <li>
-                                    <a href="${C.ARTIST_DIRECTORY}/${C.getArtistDirectory(name)}">${name}</a>
-                                    (${contribs} <abbr title="contributions (to track music)">c.</abbr>)
-                                </li>
-                            `)
-                            .join('\n')
-                        }
-                    </ul>
-                </div>
-                <div class="column">
-                    <h2>Art${wikiInfo.features.flashesAndGames ? ` &amp; Flash` : ''} Contributors</h2>
-                    <ul>
-                        ${artistData
-                            .filter(artist => !artist.alias)
-                            .map(artist => ({
-                                artist,
-                                contribs: (
-                                    artist.tracks.asCoverArtist.length +
-                                    artist.albums.asCoverArtist.length +
-                                    artist.albums.asWallpaperArtist.length +
-                                    (wikiInfo.features.flashesAndGames ? artist.flashes.asContributor.length : 0)
-                                )
-                            }))
-                            .sort((a, b) => b.contribs - a.contribs)
-                            .filter(({ contribs }) => contribs)
-                            .map(({ artist, contribs }) => fixWS`
-                                <li>
-                                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}">${artist.name}</a>
-                                    (${contribs} <abbr title="contributions (to art${wikiInfo.features.flashesAndGames ? ' and flashes' : ''})">c.</abbr>)
-                                </li>
-                            `)
-                            .join('\n')
-                        }
-                    </ul>
-                </div>
-            </div>
-        `],
-        [['artists', 'by-commentary'], `Artists - by Commentary Entries`, artistData
-            .filter(artist => !artist.alias)
-            .map(artist => ({artist, commentary: artist.tracks.asCommentator.length + artist.albums.asCommentator.length}))
-            .filter(({ commentary }) => commentary > 0)
-            .sort((a, b) => b.commentary - a.commentary)
-            .map(({ artist, commentary }) => fixWS`
-                <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/#commentary">${artist.name}</a>
-                    (${commentary} ${commentary === 1 ? 'entry' : 'entries'})
-                </li>
-            `)],
-        [['artists', 'by-duration'], `Artists - by Duration`, artistData
-            .filter(artist => !artist.alias)
-            .map(artist => ({artist, duration: getTotalDuration(
-                [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
-            }))
-            .filter(({ duration }) => duration > 0)
-            .sort((a, b) => b.duration - a.duration)
-            .map(({ artist, duration }) => fixWS`
-                <li>
-                    <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/#tracks">${artist.name}</a>
-                    (~${getDurationString(duration)})
-                </li>
-            `)],
-        [['artists', 'by-latest'], `Artists - by Latest Contribution`, fixWS`
-            <div class="content-columns">
-                <div class="column">
-                    <h2>Track Contributors</h2>
-                    <ul>
-                        ${C.sortByDate(artistData
-                            .filter(artist => !artist.alias)
-                            .map(artist => ({
-                                artist,
-                                date: reversedTracks.find(({ album, artists, contributors }) => (
-                                    album.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
-                                    [...artists, ...contributors].some(({ who }) => who === artist)
-                                ))?.date
-                            }))
-                            .filter(({ date }) => date)
-                            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-                        ).reverse().map(({ artist, date }) => fixWS`
-                            <li>
-                                <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>
-                                (${getDateString({date})})
-                            </li>
-                        `).join('\n')}
-                    </ul>
-                </div>
-                <div class="column">
-                    <h2>Art${wikiInfo.features.flashesAndGames ? ` &amp; Flash` : ''} Contributors</h2>
-                    <ul>
-                        ${C.sortByDate(artistData
-                            .filter(artist => !artist.alias)
-                            .map(artist => {
-                                const thing = reversedArtThings.find(({ album, coverArtists, contributors }) => (
-                                    album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
-                                    [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === artist)
-                                ));
-                                return thing && {
-                                    artist,
-                                    date: (thing.coverArtists?.some(({ who }) => who === artist)
-                                        ? thing.coverArtDate
-                                        : thing.date)
-                                };
-                            })
-                            .filter(Boolean)
-                            .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-                        ).reverse().map(({ artist, date }) => fixWS`
-                            <li>
-                                <a href="${C.ARTIST_DIRECTORY}/${artist.directory}">${artist.name}</a>
-                                (${getDateString({date})})
-                            </li>
-                        `).join('\n')}
-                    </ul>
-                </div>
-            </div>
-        `],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-name'], `Groups - by Name`, groupData
-            .filter(x => x.isGroup)
-            .sort(sortByName)
-            .map(group => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a></li>
-            `)],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-category'], `Groups - by Category`, fixWS`
-            <dl>
-                ${groupData.filter(x => x.isCategory).map(category => fixWS`
-                    <dt><a href="${C.GROUP_DIRECTORY}/${category.groups[0].directory}/" style="${getLinkThemeString(category)}">${category.name}</a></li>
-                    <dd><ul>
-                        ${category.groups.map(group => fixWS`
-                            <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/" style="${getLinkThemeString(group)}">${group.name}</a></li>
-                        `).join('\n')}
-                    </ul></dd>
-                `).join('\n')}
-            </dl>
-        `],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-albums'], `Groups - by Albums`, groupData
-            .filter(x => x.isGroup)
-            .map(group => ({group, albums: group.albums.length}))
-            .sort((a, b) => b.albums - a.albums)
-            .map(({ group, albums }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${s(albums, 'album')})</li>
-            `)],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-tracks'], `Groups - by Tracks`, groupData
-            .filter(x => x.isGroup)
-            .map(group => ({group, tracks: group.albums.reduce((acc, album) => acc + album.tracks.length, 0)}))
-            .sort((a, b) => b.tracks - a.tracks)
-            .map(({ group, tracks }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${s(tracks, 'track')})</li>
-            `)],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-duration'], `Groups - by Duration`, groupData
-            .filter(x => x.isGroup)
-            .map(group => ({group, duration: getTotalDuration(group.albums.flatMap(album => album.tracks))}))
-            .sort((a, b) => b.duration - a.duration)
-            .map(({ group, duration }) => fixWS`
-                <li><a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a> (${getDurationString(duration)})</li>
-            `)],
-        wikiInfo.features.groupUI &&
-        [['groups', 'by-latest'], `Groups - by Latest Album`, C.sortByDate(groupData
-            .filter(x => x.isGroup)
-            .map(group => ({group, date: group.albums[group.albums.length - 1].date}))
-            // So this is kinda tough to explain, 8ut 8asically, when we reverse the list after sorting it 8y d8te
-            // (so that the latest d8tes come first), it also flips the order of groups which share the same d8te.
-            // This happens mostly when a single al8um is the l8test in two groups. So, say one such al8um is in
-            // the groups "Fandom" and "UMSPAF". Per category order, Fandom is meant to show up 8efore UMSPAF, 8ut
-            // when we do the reverse l8ter, that flips them, and UMSPAF ends up displaying 8efore Fandom. So we do
-            // an extra reverse here, which will fix that and only affect groups that share the same d8te (8ecause
-            // groups that don't will 8e moved 8y the sortByDate call surrounding this).
-            .reverse()
-        ).reverse().map(({ group, date }) => fixWS`
-            <li>
-                <a href="${C.GROUP_DIRECTORY}/${group.directory}/" style="${getLinkThemeString(group)}">${group.name}</a>
-                (${getDateString({date})})
-            </li>
-        `)],
-        [['tracks', 'by-name'], `Tracks - by Name`, trackData.slice()
-            .sort(sortByName)
-            .map(track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
-            `)],
-        [['tracks', 'by-album'], `Tracks - by Album`, fixWS`
-                <dl>
-                    ${albumData.map(album => fixWS`
-                        <dt><a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a></dt>
-                        <dd><ol>
-                            ${album.tracks.map(track => fixWS`
-                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
-                            `).join('\n')}
-                        </ol></dd>
-                    `).join('\n')}
-                </dl>
-            `],
-        [['tracks', 'by-date'], `Tracks - by Date`, albumChunkedList(
-            C.sortByDate(trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
-            track => fixWS`
-                <li ${classes(track.aka && 'rerelease')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a> ${track.aka && `<span class="rerelease-label">(re-release)</span>`}</li>
-            `)],
-        [['tracks', 'by-duration'], `Tracks - by Duration`, C.sortByDate(trackData.slice())
-            .filter(track => track.duration > 0)
-            .sort((a, b) => b.duration - a.duration)
-            .map(track => fixWS`
-                <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                    (${getDurationString(track.duration)})
-                </li>
-            `)],
-        [['tracks', 'by-duration-in-album'], `Tracks - by Duration (in Album)`, albumChunkedList(albumData.flatMap(album => album.tracks)
-            .filter(track => track.duration > 0)
-            .sort((a, b) => (
-                b.album !== a.album ? 0 :
-                b.duration - a.duration
-            )),
-            track => fixWS`
-                <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                    (${getDurationString(track.duration)})
-                </li>
-            `,
-            false,
-            null)],
-        [['tracks', 'by-times-referenced'], `Tracks - by Times Referenced`, C.sortByDate(trackData.slice())
-            .filter(track => track.referencedBy.length > 0)
-            .sort((a, b) => b.referencedBy.length - a.referencedBy.length)
-            .map(track => fixWS`
-                <li>
-                    <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                    (${s(track.referencedBy.length, 'time')} referenced)
-                </li>
-            `)],
-        wikiInfo.features.flashesAndGames &&
-        [['tracks', 'in-flashes', 'by-album'], `Tracks - in Flashes &amp; Games (by Album)`, albumChunkedList(
-            C.sortByDate(trackData.slice()).filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && track.flashes.length > 0),
-            track => `<li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>`)],
-        wikiInfo.features.flashesAndGames &&
-        [['tracks', 'in-flashes', 'by-flash'], `Tracks - in Flashes &amp; Games (by Flash)`, fixWS`
-            <dl>
-                ${C.sortByDate(flashData.filter(flash => !flash.act8r8k))
-                    .map(flash => fixWS`
-                        <dt>
-                            <a href="${C.FLASH_DIRECTORY}/${flash.directory}/" style="${getLinkThemeString(flash)}">${flash.name}</a>
-                            (${getDateString(flash)})
-                        </dt>
-                        <dd><ul>
-                            ${flash.tracks.map(track => fixWS`
-                                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
-                            `).join('\n')}
-                        </ul></dd>
-                    `)
-                    .join('\n')}
-            </dl>
-        `],
-        [['tracks', 'with-lyrics'], `Tracks - with Lyrics`, albumChunkedList(
-            C.sortByDate(trackData.slice())
-            .filter(track => track.lyrics),
-            track => fixWS`
-                <li><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></li>
-            `)],
-        wikiInfo.features.artTagUI &&
-        [['tags', 'by-name'], 'Tags - by Name', tagData.slice().sort(sortByName)
-            .filter(tag => !tag.isCW)
-            .map(tag => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a></li>`)],
-        wikiInfo.features.artTagUI &&
-        [['tags', 'by-uses'], 'Tags - by Uses', tagData.slice().sort(sortByName)
-            .filter(tag => !tag.isCW)
-            .map(tag => ({tag, timesUsed: tag.things.length}))
-            .sort((a, b) => b.timesUsed - a.timesUsed)
-            .map(({ tag, timesUsed }) => `<li><a href="${C.TAG_DIRECTORY}/${tag.directory}/" style="${getLinkThemeString(tag)}">${tag.name}</a> (${s(timesUsed, 'time')})</li>`)]
-    ].filter(Boolean);
-
-    const releasedTracks = trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
-
-    return progressPromiseAll(`Writing listing pages.`, [
-        writePage([C.LISTING_DIRECTORY], {
-            title: `Listings Index`,
-
-            main: {
-                content: fixWS`
-                    <h1>Listings</h1>
-                    <p>${wikiInfo.name}: <b>${releasedTracks.length}</b> tracks across <b>${releasedAlbums.length}</b> albums, totaling <b>~${getDurationString(getTotalDuration(releasedTracks))}</b> ${getTotalDuration(releasedTracks) > 3600 ? 'hours' : 'minutes'}.</p>
-                    <hr>
-                    <p>Feel free to explore any of the listings linked below and in the sidebar!</p>
-                    ${generateLinkIndexForListings(listingDescriptors)}
-                `
-            },
-
-            sidebarLeft: {
-                content: generateSidebarForListings(listingDescriptors)
-            },
-
-            nav: {
-                links: [
-                    ['./', wikiInfo.shortName],
-                    [`${C.LISTINGS_DIRECTORY}/`, 'Listings']
-                ]
-            }
-        }),
-
-        mkdirp(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary'))
-            .then(() => writeFile(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary', 'index.html'),
-                generateRedirectPage('Album Commentary', `/${C.COMMENTARY_DIRECTORY}/`))),
-
-        writePage([C.LISTING_DIRECTORY, 'random'], {
-            title: 'Random Pages',
-
-            main: {
-                content: fixWS`
-                    <h1>Random Pages</h1>
-                    <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
-                    <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
-                    <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>
-                    <dl>
-                        <dt>Miscellaneous:</dt>
-                        <dd><ul>
-                            <li>
-                                <a href="${C.JS_DISABLED_DIRECTORY}/" data-random="artist">Random Artist</a>
-                                (<a href="${C.JS_DISABLED_DIRECTORY}/" data-random="artist-more-than-one-contrib">&gt;1 contribution</a>)
-                            </li>
-                            <li><a href="${C.JS_DISABLED_DIRECTORY}/" data-random="album">Random Album (whole site)</a></li>
-                            <li><a href="${C.JS_DISABLED_DIRECTORY}/" data-random="track">Random Track (whole site)</a></li>
-                        </ul></dd>
-                        ${[
-                            {name: 'Official', albumData: officialAlbumData, code: 'official'},
-                            {name: 'Fandom', albumData: fandomAlbumData, code: 'fandom'}
-                        ].map(category => fixWS`
-                            <dt>${category.name}: (<a href="${C.JS_DISABLED_DIRECTORY}/" data-random="album-in-${category.code}">Random Album</a>, <a href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-${category.code}">Random Track</a>)</dt>
-                            <dd><ul>${category.albumData.map(album => fixWS`
-                                <li><a style="${getLinkThemeString(album)}; --album-directory: ${album.directory}" href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-album">${album.name}</a></li>
-                            `).join('\n')}</ul></dd>
-                        `).join('\n')}
-                    </dl>
-                `
-            },
-
-            sidebarLeft: {
-                content: generateSidebarForListings(listingDescriptors, 'all-commentary')
-            },
-
-            nav: {
-                links: [
-                    ['./', wikiInfo.shortName],
-                    [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                    [`${C.LISTING_DIRECTORY}/random`, 'Random Pages']
-                ]
-            }
-        }),
-
-        ...listingDescriptors.map(entry => writeListingPage(...entry, listingDescriptors))
-    ]);
+    return [
+        writeListingIndex(),
+        ...listingSpec.map(writeListingPage).filter(Boolean)
+    ];
 }
 
-function writeListingPage(directoryParts, title, items, listingDescriptors) {
-    return writePage([C.LISTING_DIRECTORY, ...directoryParts], {
-        title,
+function writeListingIndex() {
+    const releasedTracks = trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const duration = getTotalDuration(releasedTracks);
+
+    return ({strings, writePage}) => writePage('listingIndex', '', ({to}) => ({
+        title: strings('listingIndex.title'),
 
         main: {
             content: fixWS`
-                <h1>${title}</h1>
-                ${typeof items === 'string' ? items : fixWS`
+                <h1>${strings('listingIndex.title')}</h1>
+                <p>${strings('listingIndex.infoLine', {
+                    wiki: wikiInfo.name,
+                    tracks: `<b>${strings.count.tracks(releasedTracks.length, {unit: true})}</b>`,
+                    albums: `<b>${strings.count.albums(releasedAlbums.length, {unit: true})}</b>`,
+                    duration: `<b>${strings.count.duration(duration, {approximate: true, unit: true})}</b>`
+                })}</p>
+                <hr>
+                <p>${strings('listingIndex.exploreList')}</p>
+                ${generateLinkIndexForListings(null, {strings, to})}
+            `
+        },
+
+        sidebarLeft: {
+            content: generateSidebarForListings(null, {strings, to})
+        },
+
+        nav: {
+            links: [
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    href: to.listingIndex(),
+                    title: strings('listingIndex.title')
+                }
+            ]
+        }
+    }))
+}
+
+function writeListingPage(listing) {
+    if (listing.condition && !listing.condition()) {
+        return null;
+    }
+
+    const data = (listing.data
+        ? listing.data()
+        : null);
+
+    return ({strings, writePage}) => writePage('listing', listing.directory, ({to}) => ({
+        title: listing.title({strings}),
+
+        main: {
+            content: fixWS`
+                <h1>${listing.title({strings})}</h1>
+                ${listing.html && (listing.data
+                    ? listing.html(data, {strings, to})
+                    : listing.html({strings, to}))}
+                ${listing.row && fixWS`
                     <ul>
-                        ${items.join('\n')}
+                        ${(data
+                            .map(item => listing.row(item, {strings, to}))
+                            .map(row => `<li>${row}</li>`)
+                            .join('\n'))}
                     </ul>
                 `}
             `
         },
 
         sidebarLeft: {
-            content: generateSidebarForListings(listingDescriptors, directoryParts)
+            content: generateSidebarForListings(listing, {strings, to})
         },
 
         nav: {
             links: [
-                ['./', wikiInfo.shortName],
-                [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                [`${C.LISTING_DIRECTORY}/${directoryParts.join('/')}/`, title]
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    href: to.listingIndex(),
+                    title: strings('listingIndex.title')
+                },
+                {
+                    href: to.listing(listing.directory),
+                    title: listing.title({strings})
+                }
             ]
         }
-    });
+    }));
 }
 
-function generateSidebarForListings(listingDescriptors, currentDirectoryParts) {
+function generateSidebarForListings(currentListing, {strings, to}) {
     return fixWS`
-        <h1><a href="${C.LISTING_DIRECTORY}/">Listings</a></h1>
-        ${generateLinkIndexForListings(listingDescriptors, currentDirectoryParts)}
+        <h1>${strings.link.listingIndex('', {text: strings('listingIndex.title'), to})}</h1>
+        ${generateLinkIndexForListings(currentListing, {strings, to})}
     `;
 }
 
-function generateLinkIndexForListings(listingDescriptors, currentDirectoryParts) {
+function generateLinkIndexForListings(currentListing, {strings, to}) {
     return fixWS`
         <ul>
-            ${listingDescriptors.map(([ ldDirectoryParts, ldTitle ]) => fixWS`
-                <li ${classes(currentDirectoryParts === ldDirectoryParts && 'current')}>
-                    <a href="${C.LISTING_DIRECTORY}/${ldDirectoryParts.join('/')}/">${ldTitle}</a>
-                </li>
-            `).join('\n')}
-            <li ${classes(currentDirectoryParts === 'random' && 'current')}>
-                <a href="${C.LISTING_DIRECTORY}/random/">Random Pages</a>
-            </li>
+            ${(listingSpec
+                .filter(({ condition }) => !condition || condition())
+                .map(listing => fixWS`
+                    <li ${classes(listing === currentListing && 'current')}>
+                        <a href="${to.listing(listing.directory)}">${listing.title({strings})}</a>
+                    </li>
+                `)
+                .join('\n'))}
         </ul>
     `;
 }
@@ -3198,83 +4366,93 @@ function filterAlbumsByCommentary() {
     return albumData.filter(album => [album, ...album.tracks].some(x => x.commentary));
 }
 
-function getWordCount(str) {
-    const wordCount = str.split(' ').length;
-    return `${Math.floor(wordCount / 100) / 10}k`;
-}
-
 function writeCommentaryPages() {
     if (!filterAlbumsByCommentary().length) {
         return;
     }
 
-    return progressPromiseAll('Writing commentary pages.', queue([
-        writeCommentaryIndex,
-        ...filterAlbumsByCommentary().map(curry(writeAlbumCommentaryPage))
-    ], queueSize));
+    return [
+        writeCommentaryIndex(),
+        ...filterAlbumsByCommentary().map(writeAlbumCommentaryPage)
+    ];
 }
 
-async function writeCommentaryIndex() {
-    await writePage([C.COMMENTARY_DIRECTORY], {
-        title: 'Commentary',
+function writeCommentaryIndex() {
+    const data = filterAlbumsByCommentary()
+        .map(album => ({
+            album,
+            entries: [album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary)
+        }))
+        .map(({ album, entries }) => ({
+            album, entries,
+            words: entries.join(' ').split(' ').length
+        }));
+
+    const totalEntries = data.reduce((acc, {entries}) => acc + entries.length, 0);
+    const totalWords = data.reduce((acc, {words}) => acc + words, 0);
+
+    return ({strings, writePage}) => writePage('commentaryIndex', '', ({to}) => ({
+        title: strings('commentaryIndex.title'),
 
         main: {
             content: fixWS`
                 <div class="long-content">
-                    <h1>Commentary</h1>
-                    <p><strong>${getWordCount(albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).map(x => x.commentary).join(' ')))}</strong> words across <strong>${albumData.reduce((acc, a) => acc + [a, ...a.tracks].filter(x => x.commentary).length, 0)}</strong> entries, in all.</p>
-                    <p>Choose an album:</p>
+                    <h1>${strings('commentaryIndex.title')}</h1>
+                    <p>${strings('commentaryIndex.infoLine', {
+                        words: `<b>${strings.count.words(totalWords, {unit: true})}</b>`,
+                        entries: `<b>${strings.count.commentaryEntries(totalEntries, {unit: true})}</b>`
+                    })}</p>
+                    <p>${strings('commentaryIndex.albumList.title')}</p>
                     <ul>
-                        ${filterAlbumsByCommentary()
-                            .map(album => fixWS`
-                                <li>
-                                    <a href="${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}" style="${getLinkThemeString(album)}">${album.name}</a>
-                                    (${(() => {
-                                        const things = [album, ...album.tracks];
-                                        const cThings = things.filter(x => x.commentary);
-                                        // const numStr = album.tracks.every(t => t.commentary) ? 'full commentary' : `${cThings.length} entries`;
-                                        const numStr = `${cThings.length}/${things.length} entries`;
-                                        return `${numStr}; ${getWordCount(cThings.map(x => x.commentary).join(' '))} words`;
-                                    })()})
-                                </li>
+                        ${data
+                            .map(({ album, entries, words }) => fixWS`
+                                <li>${strings('commentaryIndex.albumList.item', {
+                                    album: strings.link.albumCommentary(album, {to}),
+                                    words: strings.count.words(words, {unit: true}),
+                                    entries: strings.count.commentaryEntries(entries.length, {unit: true})
+                                })}</li>
                             `)
-                            .join('\n')
-                        }
+                            .join('\n')}
                     </ul>
                 </div>
             `
         },
 
-        nav: {
-            links: [
-                ['./', wikiInfo.shortName],
-                [`${C.COMMENTARY_DIRECTORY}/`, 'Commentary']
-            ]
-        }
-    });
+        nav: {simple: true}
+    }));
 }
 
-async function writeAlbumCommentaryPage(album) {
-    await writePage([C.COMMENTARY_DIRECTORY, C.ALBUM_DIRECTORY, album.directory], {
-        title: `${album.name} - Commentary`,
-        stylesheet: getAlbumStylesheet(album),
+function writeAlbumCommentaryPage(album) {
+    const entries = [album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary);
+    const words = entries.join(' ').split(' ').length;
+
+    return ({strings, writePage}) => writePage('albumCommentary', album.directory, ({to}) => ({
+        title: strings('albumCommentaryPage.title', {album: album.name}),
+        stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(album),
 
         main: {
             content: fixWS`
                 <div class="long-content">
-                    <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/">${album.name}</a> - Commentary</h2>
-                    <p><strong>${getWordCount([album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary).join(' '))}</strong> words across <strong>${[album, ...album.tracks].filter(x => x.commentary).length}</strong> entries.</p>
+                    <h1>${strings('albumCommentaryPage.title', {
+                        album: strings.link.album(album, {to})
+                    })}</h1>
+                    <p>${strings('albumCommentaryPage.infoLine', {
+                        words: `<b>${strings.count.words(words, {unit: true})}</b>`,
+                        entries: `<b>${strings.count.commentaryEntries(entries.length, {unit: true})}</b>`
+                    })}</p>
                     ${album.commentary && fixWS`
-                        <h3>Album commentary</h3>
+                        <h3>${strings('albumCommentaryPage.entry.title.albumCommentary')}</h3>
                         <blockquote>
-                            ${transformMultiline(album.commentary)}
+                            ${transformMultiline(album.commentary, {strings, to})}
                         </blockquote>
                     `}
                     ${album.tracks.filter(t => t.commentary).map(track => fixWS`
-                        <h3 id="${track.directory}"><a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a></h3>
+                        <h3 id="${track.directory}">${strings('albumCommentaryPage.entry.title.trackCommentary', {
+                            track: strings.link.track(track, {to})
+                        })}</h3>
                         <blockquote style="${getLinkThemeString(track)}">
-                            ${transformMultiline(track.commentary)}
+                            ${transformMultiline(track.commentary, {strings, to})}
                         </blockquote>
                     `).join('\n')}
                 </div>
@@ -3283,13 +4461,22 @@ async function writeAlbumCommentaryPage(album) {
 
         nav: {
             links: [
-                ['./', wikiInfo.shortName],
-                [`${C.COMMENTARY_DIRECTORY}/`, 'Commentary'],
-                [null, 'Album:'],
-                [`${C.COMMENTARY_DIRECTORY}/${C.ALBUM_DIRECTORY}/${album.directory}/`, album.name]
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                {
+                    href: to.commentaryIndex(),
+                    title: strings('commentaryIndex.title')
+                },
+                {
+                    html: strings('albumCommentaryPage.nav.album', {
+                        album: strings.link.albumCommentary(album, {class: 'current', to})
+                    })
+                }
             ]
         }
-    });
+    }));
 }
 
 function writeTagPages() {
@@ -3297,32 +4484,33 @@ function writeTagPages() {
         return;
     }
 
-    return progressPromiseAll(`Writing tag pages.`, queue(tagData
-        .filter(tag => !tag.isCW)
-        .map(curry(writeTagPage)), queueSize));
+    return tagData.filter(tag => !tag.isCW).map(writeTagPage);
 }
 
 function writeTagPage(tag) {
     const { things } = tag;
 
-    return writePage([C.TAG_DIRECTORY, tag.directory], {
-        title: tag.name,
+    return ({strings, writePage}) => writePage('tag', tag.directory, ({to}) => ({
+        title: strings('tagPage.title', {tag: tag.name}),
         theme: getThemeString(tag),
 
         main: {
             classes: ['top-index'],
             content: fixWS`
-                <h1>${tag.name}</h1>
-                <p class="quick-info">(Appears in ${s(things.length, 'cover art')})</p>
+                <h1>${strings('tagPage.title', {tag: tag.name})}</h1>
+                <p class="quick-info">${strings('tagPage.infoLine', {
+                    coverArts: strings.count.coverArts(things.length, {unit: true})
+                })}</p>
                 <div class="grid-listing">
                     ${getGridHTML({
+                        strings, to,
                         entries: things.map(item => ({item})),
                         srcFn: thing => (thing.album
-                            ? getTrackCover(thing)
-                            : getAlbumCover(thing)),
+                            ? getTrackCover(thing, {to})
+                            : getAlbumCover(thing, {to})),
                         hrefFn: thing => (thing.album
-                            ? `${C.TRACK_DIRECTORY}/${thing.directory}/`
-                            : `${C.ALBUM_DIRECTORY}/${thing.directory}`)
+                            ? to.track(thing.directory)
+                            : to.album(thing.album))
                     })}
                 </div>
             `
@@ -3330,152 +4518,33 @@ function writeTagPage(tag) {
 
         nav: {
             links: [
-                ['./', wikiInfo.shortName],
-                wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                [null, 'Tag:'],
-                [`${C.TAG_DIRECTORY}/${tag.directory}/`, tag.name]
+                {
+                    href: to.home(),
+                    title: wikiInfo.shortName
+                },
+                wikiInfo.features.listings &&
+                {
+                    href: to.listingIndex(),
+                    title: strings('listingIndex.title')
+                },
+                {
+                    html: strings('tagPage.nav.tag', {
+                        tag: strings.link.tag(tag, {class: 'current', to})
+                    })
+                }
             ]
         }
-    });
+    }));
 }
 
-// This function is terri8le. Sorry!
-function getContributionString({ what }) {
-    return what
-        ? what.replace(/\[(.*?)\]/g, (match, name) =>
-            trackData.some(track => track.name === name)
-                ? `<i><a href="${C.TRACK_DIRECTORY}/${trackData.find(track => track.name === name).directory}/">${name}</a></i>`
-                : `<i>${name}</i>`)
-        : '';
-}
-
-function getLinkedTrack(ref) {
-    if (!ref) return null;
-
-    if (ref.includes('track:')) {
-        ref = ref.replace('track:', '');
-        return trackData.find(track => track.directory === ref);
-    }
-
-    const match = ref.match(/\S:(.*)/);
-    if (match) {
-        const dir = match[1];
-        return trackData.find(track => track.directory === dir);
-    }
-
-    let track;
-
-    track = trackData.find(track => track.directory === ref);
-    if (track) {
-        return track;
-    }
-
-    track = trackData.find(track => track.name === ref);
-    if (track) {
-        return track;
-    }
-
-    track = trackData.find(track => track.name.toLowerCase() === ref.toLowerCase());
-    if (track) {
-        console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
-        console.warn(`\x1b[31m- ${ref}\x1b[0m`);
-        console.warn(`\x1b[32m+ ${track.name}\x1b[0m`);
-        return track;
-    }
-
-    return null;
-}
-
-function getLinkedAlbum(ref) {
-    if (!ref) return null;
-    ref = ref.replace('album:', '');
-    let album;
-    album = albumData.find(album => album.directory === ref);
-    if (!album) album = albumData.find(album => album.name === ref);
-    if (!album) {
-        album = albumData.find(album => album.name.toLowerCase() === ref.toLowerCase());
-        if (album) {
-            console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
-            console.warn(`\x1b[31m- ${ref}\x1b[0m`);
-            console.warn(`\x1b[32m+ ${album.name}\x1b[0m`);
-            return album;
-        }
-    }
-    return album;
-}
-
-function getLinkedGroup(ref) {
-    if (!ref) return null;
-    ref = ref.replace('group:', '');
-    let group;
-    group = groupData.find(group => group.directory === ref);
-    if (!group) group = groupData.find(group => group.name === ref);
-    if (!group) {
-        group = groupData.find(group => group.name.toLowerCase() === ref.toLowerCase());
-        if (group) {
-            console.warn(`\x1b[33mBad capitalization:\x1b[0m`);
-            console.warn(`\x1b[31m- ${ref}\x1b[0m`);
-            console.warn(`\x1b[32m+ ${group.name}\x1b[0m`);
-            return group;
-        }
-    }
-    return group;
-}
-
-function getLinkedArtist(ref) {
-    if (!ref) return null;
-    ref = ref.replace('artist:', '');
-
-    let artist = artistData.find(artist => C.getArtistDirectory(artist.name) === ref);
-    if (artist) {
-        return artist;
-    }
-
-    artist = artistData.find(artist => artist.name === ref);
-    if (artist) {
-        return artist;
-    }
-
-    return null;
-}
-
-function getLinkedFlash(ref) {
-    if (!ref) return null;
-    ref = ref.replace('flash:', '');
-    return flashData?.find(flash => flash.directory === ref);
-}
-
-function getLinkedTag(ref) {
-    if (!ref) return null;
-
-    ref = ref.replace('tag:', '');
-
-    let tag = tagData.find(tag => tag.directory === ref);
-    if (tag) {
-        return tag;
-    }
-
-    if (ref.startsWith('cw: ')) {
-        ref = ref.slice(4);
-    }
-
-    tag = tagData.find(tag => tag.name === ref);
-    if (tag) {
-        return tag;
-    }
-
-    return null;
-}
-
-function getArtistString(artists, showIcons = false) {
-    return joinNoOxford(artists.map(({ who, what }) => {
-        if (!who) console.log(artists);
+function getArtistString(artists, {strings, to, showIcons = false, showContrib = false}) {
+    return strings.list.and(artists.map(({ who, what }) => {
         const { urls, directory, name } = who;
-        return (
-            `<a href="${C.ARTIST_DIRECTORY}/${directory}/">${name}</a>` +
-            (what ? ` (${getContributionString({what})})` : '') +
-            (showIcons && urls.length ? ` <span class="icons">(${urls.map(iconifyURL).join(', ')})</span>` : '')
-        );
+        return [
+            strings.link.artist(who, {to}),
+            showContrib && what && `(${what})`,
+            showIcons && urls.length && `<span class="icons">(${urls.map(iconifyURL).join(', ')})</span>`
+        ].join(' ');
     }));
 }
 
@@ -3543,37 +4612,43 @@ function getAlbumListTag(album) {
     }
 }
 
-function fancifyURL(url, {album = false} = {}) {
+function fancifyURL(url, {strings, album = false} = {}) {
+    const domain = new URL(url).hostname;
     return fixWS`<a href="${url}" class="nowrap">${
-        url.includes('bandcamp.com') ? 'Bandcamp' :
-        (
-            url.includes('music.solatrus.com')
-        ) ? `Bandcamp (${new URL(url).hostname})` :
-        (
-            url.includes('types.pl')
-        ) ? `Mastodon (${new URL(url).hostname})` :
-        url.includes('youtu') ? (album ? (
-            url.includes('list=') ? 'YouTube (Playlist)' : 'YouTube (Full Album)'
-        ) : 'YouTube') :
-        url.includes('soundcloud') ? 'SoundCloud' :
-        url.includes('tumblr.com') ? 'Tumblr' :
-        url.includes('twitter.com') ? 'Twitter' :
-        url.includes('deviantart.com') ? 'DeviantArt' :
-        url.includes('wikipedia.org') ? 'Wikipedia' :
-        url.includes('poetryfoundation.org') ? 'Poetry Foundation' :
-        url.includes('instagram.com') ? 'Instagram' :
-        url.includes('patreon.com') ? 'Patreon' :
-        new URL(url).hostname
+        domain.includes('bandcamp.com') ? strings('misc.external.bandcamp') :
+        [
+            'music.solatrux.com'
+        ].includes(domain) ? strings('misc.external.bandcamp.domain', {domain}) :
+        [
+            'types.pl'
+        ].includes(domain) ? strings('misc.external.mastodon.domain', {domain}) :
+        domain.includes('youtu') ? (album
+            ? (url.includes('list=')
+                ? strings('misc.external.youtube.playlist')
+                : strings('misc.external.youtube.fullAlbum'))
+            : strings('misc.external.youtube')) :
+        domain.includes('soundcloud') ? strings('misc.external.soundcloud') :
+        domain.includes('tumblr.com') ? strings('misc.external.tumblr') :
+        domain.includes('twitter.com') ? strings('misc.external.twitter') :
+        domain.includes('deviantart.com') ? strings('misc.external.deviantart') :
+        domain.includes('wikipedia.org') ? strings('misc.external.wikipedia') :
+        domain.includes('poetryfoundation.org') ? strings('misc.external.poetryFoundation') :
+        domain.includes('instagram.com') ? strings('misc.external.instagram') :
+        domain.includes('patreon.com') ? strings('misc.external.patreon') :
+        domain
     }</a>`;
 }
 
-function fancifyFlashURL(url, flash) {
-    return `<span class="nowrap">${fancifyURL(url)}` + (
-        url.includes('homestuck.com') ? ` (${isNaN(Number(flash.page)) ? 'secret page' : `page ${flash.page}`})` :
-        url.includes('bgreco.net') ? ` (HQ audio)` :
-        url.includes('youtu') ? ` (on any device)` :
-        ''
-    ) + `</span>`;
+function fancifyFlashURL(url, flash, {strings}) {
+    const link = fancifyURL(url, {strings});
+    return `<span class="nowrap">${
+        url.includes('homestuck.com') ? (isNaN(Number(flash.page))
+            ? strings('misc.external.flash.homestuck.secret', {link})
+            : strings('misc.external.flash.homestuck.page', {link, page: flash.page})) :
+        url.includes('bgreco.net') ? strings('misc.external.flash.bgreco', {link}) :
+        url.includes('youtu') ? strings('misc.external.flash.youtube', {link}) :
+        link
+    }</span>`;
 }
 
 function iconifyURL(url) {
@@ -3593,136 +4668,132 @@ function iconifyURL(url) {
         url.includes('instagram.com') ? ['instagram', 'Instagram'] :
         ['globe', `External (${new URL(url).hostname})`]
     );
-    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${C.STATIC_DIRECTORY}/icons.svg#icon-${id}"></use></svg></a>`;
+    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="/${C.STATIC_DIRECTORY}/icons.svg#icon-${id}"></use></svg></a>`;
 }
 
-function chronologyLinks(currentTrack, {
-    mapProperty,
-    toArtist,
-    filters, // {property, toArtist}
+function chronologyLinks(currentThing, {
+    strings, to,
     headingWord,
-    sourceData = justEverythingMan
+    contribKey,
+    getThings
 }) {
-    const artists = Array.from(new Set(filters.flatMap(({ mapProperty, toArtist }) => currentTrack[mapProperty] && currentTrack[mapProperty].map(toArtist))));
-    if (artists.length > 8) {
-        return `<div class="chronology">(See artist pages for chronology info!)</div>`;
+    const contributions = currentThing[contribKey];
+    if (!contributions) {
+        return '';
     }
-    return artists.map(artist => {
-        const releasedThings = sourceData.filter(thing => {
-            const album = albumData.includes(thing) ? thing : thing.album;
-            if (album && album.directory === C.UNRELEASED_TRACKS_DIRECTORY) {
-                return false;
-            }
 
-            return filters.some(({ mapProperty, toArtist }) => (
-                thing[mapProperty] &&
-                thing[mapProperty].map(toArtist).includes(artist)
-            ));
+    if (contributions.length > 8) {
+        return `<div class="chronology">${strings('misc.chronology.seeArtistPages')}</div>`;
+    }
+
+    return contributions.map(({ who: artist }) => {
+        const things = C.sortByDate(unique(getThings(artist)));
+        const releasedThings = things.filter(thing => {
+            const album = albumData.includes(thing) ? thing : thing.album;
+            return !(album && album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
         });
-        const index = releasedThings.indexOf(currentTrack);
+        const index = releasedThings.indexOf(currentThing);
 
         if (index === -1) return '';
 
+        // TODO: This can pro8a8ly 8e made to use generatePreviousNextLinks?
+        // We'd need to make generatePreviousNextLinks use toAnythingMan tho.
         const previous = releasedThings[index - 1];
         const next = releasedThings[index + 1];
         const parts = [
-            previous && `<a href="${getHrefOfAnythingMan(previous)}" title="${previous.name}">Previous</a>`,
-            next && `<a href="${getHrefOfAnythingMan(next)}" title="${next.name}">Next</a>`
+            previous && `<a href="${toAnythingMan(previous, to)}" title="${previous.name}">Previous</a>`,
+            next && `<a href="${toAnythingMan(next, to)}" title="${next.name}">Next</a>`
         ].filter(Boolean);
-
-        const heading = `${th(index + 1)} ${headingWord} by <a href="${C.ARTIST_DIRECTORY}/${artist.directory}/">${artist.name}</a>`;
 
         return fixWS`
             <div class="chronology">
-                <span class="heading">${heading}</span>
+                <span class="heading">${strings('misc.chronology.heading', {
+                    index: strings.count.index(index + 1),
+                    word: headingWord,
+                    artist: strings.link.artist(artist, {to})
+                })}</span>
                 ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>`}
             </div>
         `;
     }).filter(Boolean).join('\n');
 }
 
-function generateAlbumNavLinks(album, currentTrack = null) {
+function generateAlbumNavLinks(album, currentTrack, {strings, to}) {
     if (album.tracks.length <= 1) {
         return '';
     }
 
-    const index = currentTrack && album.tracks.indexOf(currentTrack)
-    const previous = currentTrack && album.tracks[index - 1]
-    const next = currentTrack && album.tracks[index + 1]
+    const previousNextLinks = currentTrack && generatePreviousNextLinks('track', currentTrack, album.tracks, {strings, to})
+    const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
+        (currentTrack
+            ? strings('trackPage.nav.random')
+            : strings('albumPage.nav.randomTrack'))
+    }</a>`;
 
-    const [ previousLine, nextLine, randomLine ] = [
-        previous && `<a href="${C.TRACK_DIRECTORY}/${previous.directory}/" id="previous-button" title="${previous.name}">Previous</a>`,
-        next && `<a href="${C.TRACK_DIRECTORY}/${next.directory}/" id="next-button" title="${next.name}">Next</a>`,
-        `<a href="${C.JS_DISABLED_DIRECTORY}/" data-random="track-in-album" id="random-button">${currentTrack ? 'Random' : 'Random Track'}</a>`
-    ];
-
-    if (previousLine || nextLine) {
-        return `(${[previousLine, nextLine].filter(Boolean).join(', ')}<span class="js-hide-until-data">, ${randomLine}</span>)`;
-    } else {
-        return `<span class="js-hide-until-data">(${randomLine})</span>`;
-    }
+    return (previousNextLinks
+        ? `(${previousNextLinks}<span class="js-hide-until-data">, ${randomLink}</span>)`
+        : `<span class="js-hide-until-data">(${randomLink})</span>`);
 }
 
-function generateAlbumChronologyLinks(album, currentTrack = null) {
+function generateAlbumChronologyLinks(album, currentTrack, {strings, to}) {
     return [
         currentTrack && chronologyLinks(currentTrack, {
-            headingWord: 'track',
-            sourceData: trackData,
-            filters: [
-                {
-                    mapProperty: 'artists',
-                    toArtist: ({ who }) => who
-                },
-                {
-                    mapProperty: 'contributors',
-                    toArtist: ({ who }) => who
-                }
-            ]
+            strings, to,
+            headingWord: strings('misc.chronology.track'),
+            contribKey: 'artists',
+            getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor]
         }),
         chronologyLinks(currentTrack || album, {
-            headingWord: 'cover art',
-            sourceData: justEverythingSortedByArtDateMan,
-            filters: [
-                {
-                    mapProperty: 'coverArtists',
-                    toArtist: ({ who }) => who
-                }
-            ]
+            strings, to,
+            headingWord: strings('misc.chronology.coverArt'),
+            contribKey: 'coverArtists',
+            getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]
         })
     ].filter(Boolean).join('\n');
 }
 
-function generateSidebarForAlbum(album, currentTrack = null) {
-    const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}><a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.name}</a></li>`;
+function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
     const listTag = getAlbumListTag(album);
-    return {content: fixWS`
-        <h1><a href="${C.ALBUM_DIRECTORY}/${album.directory}/">${album.name}</a></h1>
-        ${album.usesGroups ? fixWS`
-            <dl>
-                ${album.tracks.flatMap((track, i, arr) => [
-                    (i > 0 && track.group !== arr[i - 1].group) && `</${listTag}></dd>`,
-                    (i === 0 || track.group !== arr[i - 1].group) && fixWS`
-                        ${track.group && fixWS`
-                            <dt style="${getLinkThemeString(track)}" ${classes(currentTrack && track.group === currentTrack.group && 'current')}>
-                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/">${track.group}</a>
-                                ${listTag === 'ol' ? `(${i + 1}&ndash;${arr.length - arr.slice().reverse().findIndex(t => t.group === track.group)})` : `<!-- (here: track number range) -->`}
-                            </dt>
+
+    const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
+        strings('albumSidebar.trackList.item', {
+            track: `<a href="${to.track(track.directory)}">${track.name}</a>`
+        })
+    }</li>`;
+
+    return {
+        content: fixWS`
+            <h1><a href="${to.album(album.directory)}">${album.name}</a></h1>
+            ${album.trackGroups ? fixWS`
+                <dl>
+                    ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
+                        <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
+                            (listTag === 'ol'
+                                ? strings('albumSidebar.trackList.group.withRange', {
+                                    group: `<a href="${to.track(tracks[0].directory)}">${name}</a>`,
+                                    range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
+                                })
+                                : strings('albumSidebar.trackList.group', {
+                                    group: `<a href="${to.track(tracks[0].directory)}">${name}</a>`
+                                }))
+                        }</dt>
+                        ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
+                            <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                                ${tracks.map(trackToListItem).join('\n')}
+                            </${listTag}></dd>
                         `}
-                        <dd style="${getLinkThemeString(track)}"><${listTag === 'ol' ? `ol start="${i + 1}"` : listTag}>
-                    `,
-                    (!currentTrack || track.group === currentTrack.group) && trackToListItem(track),
-                    i === arr.length && `</${listTag}></dd>`
-                ].filter(Boolean)).join('\n')}
-            </dl>
-        ` : fixWS`
-            <${listTag}>
-                ${album.tracks.map(trackToListItem).join('\n')}
-            </${listTag}>
-        `}
-    `};
+                    `).join('\n')}
+                </dl>
+            ` : fixWS`
+                <${listTag}>
+                    ${album.tracks.map(trackToListItem).join('\n')}
+                </${listTag}>
+            `}
+        `
+    };
 }
 
-function generateSidebarRightForAlbum(album, currentTrack = null) {
+function generateSidebarRightForAlbum(album, currentTrack, {strings, to}) {
     if (!wikiInfo.features.groupUI) {
         return null;
     }
@@ -3737,37 +4808,59 @@ function generateSidebarRightForAlbum(album, currentTrack = null) {
                 const previous = group.albums[index - 1];
                 return {group, next, previous};
             }).map(({group, next, previous}) => fixWS`
-                <h1><a href="${C.GROUP_DIRECTORY}/${group.directory}/">${group.name}</a></h1>
-                ${!currentTrack && transformMultiline(group.descriptionShort)}
-                ${group.urls.length && `<p>Visit on ${joinNoOxford(group.urls.map(fancifyURL), 'or')}.</p>`}
+                <h1>${
+                    strings('albumSidebar.groupBox.title', {
+                        group: `<a href="${to.groupInfo(group.directory)}">${group.name}</a>`
+                    })
+                }</h1>
+                ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to})}
+                ${group.urls.length && `<p>${
+                    strings('releaseInfo.visitOn', {
+                        links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
+                    })
+                }</p>`}
                 ${!currentTrack && fixWS`
-                    ${next && `<p class="group-chronology-link">Next: <a href="${C.ALBUM_DIRECTORY}/${next.directory}/" style="${getLinkThemeString(next)}">${next.name}</a></p>`}
-                    ${previous && `<p class="group-chronology-link">Previous: <a href="${C.ALBUM_DIRECTORY}/${previous.directory}/" style="${getLinkThemeString(previous)}">${previous.name}</a></p>`}
+                    ${next && `<p class="group-chronology-link">${
+                        strings('albumSidebar.groupBox.next', {
+                            album: `<a href="${to.album(next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
+                        })
+                    }</p>`}
+                    ${previous && `<p class="group-chronology-link">${
+                        strings('albumSidebar.groupBox.previous', {
+                            album: `<a href="${to.album(previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
+                        })
+                    }</p>`}
                 `}
             `)
         };
     };
 }
 
-function generateSidebarForGroup(isGallery = false, currentGroup = null) {
+function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
     if (!wikiInfo.features.groupUI) {
         return null;
     }
 
+    const toGroup = isGallery ? to.groupGallery : to.groupInfo;
+
     return {
         content: fixWS`
-            <h1>Groups</h1>
+            <h1>${strings('groupSidebar.title')}</h1>
             <dl>
-                ${groupData.filter(x => x.isCategory).map(category => [
+                ${groupCategoryData.map(category => [
                     fixWS`
-                        <dt ${classes(currentGroup && category === currentGroup.category && 'current')}>
-                            <a href="${C.GROUP_DIRECTORY}/${groupData.find(x => x.isGroup && x.category === category).directory}/${isGallery ? 'gallery/' : ''}" style="${getLinkThemeString(category)}">${category.name}</a>
-                        </dt>
+                        <dt ${classes(category === currentGroup.category && 'current')}>${
+                            strings('groupSidebar.groupList.category', {
+                                category: `<a href="${toGroup(category.groups[0].directory)}" style="${getLinkThemeString(category)}">${category.name}</a>`
+                            })
+                        }</dt>
                         <dd><ul>
                             ${category.groups.map(group => fixWS`
-                                <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group)}">
-                                    <a href="${C.GROUP_DIRECTORY}/${group.directory}/${isGallery && 'gallery/'}">${group.name}</a>
-                                </li>
+                                <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group)}">${
+                                    strings('groupSidebar.groupList.item', {
+                                        group: `<a href="${toGroup(group.directory)}">${group.name}</a>`
+                                    })
+                                }</li>
                             `).join('\n')}
                         </ul></dd>
                     `
@@ -3777,173 +4870,223 @@ function generateSidebarForGroup(isGallery = false, currentGroup = null) {
     };
 }
 
-function writeGroupPages() {
-    return progressPromiseAll(`Writing group pages.`, queue(groupData.filter(x => x.isGroup).map(curry(writeGroupPage)), queueSize));
+function generateInfoGalleryLinks(urlKeyInfo, urlKeyGallery, currentThing, isGallery, {strings, to}) {
+    return [
+        strings.link[urlKeyInfo](currentThing, {
+            to,
+            class: isGallery ? '' : 'current',
+            text: strings('misc.nav.info')
+        }),
+        strings.link[urlKeyGallery](currentThing, {
+            to,
+            class: isGallery ? 'current' : '',
+            text: strings('misc.nav.gallery')
+        })
+    ].join(', ');
 }
 
-async function writeGroupPage(group) {
+function generatePreviousNextLinks(urlKey, currentThing, thingData, {strings, to}) {
+    const toThing = to[urlKey];
+
+    const index = thingData.indexOf(currentThing);
+    const previous = thingData[index - 1];
+    const next = thingData[index + 1];
+
+    return [
+        previous && `<a href="${toThing(previous.directory)}" id="previous-button" title="${previous.name}">${strings('misc.nav.previous')}</a>`,
+        next && `<a href="${toThing(next.directory)}" id="next-button" title="${next.name}">${strings('misc.nav.next')}</a>`
+    ].filter(Boolean).join(', ');
+}
+
+function generateNavForGroup(currentGroup, {strings, to, isGallery}) {
+    if (!wikiInfo.features.groupUI) {
+        return {simple: true};
+    }
+
+    const urlKey = isGallery ? 'groupGallery' : 'groupInfo';
+    const infoGalleryLinks = generateInfoGalleryLinks('groupInfo', 'groupGallery', currentGroup, isGallery, {strings, to});
+    const previousNextLinks = generatePreviousNextLinks(urlKey, currentGroup, groupData, {strings, to})
+
+    return {
+        links: [
+            {
+                href: to.home(),
+                title: wikiInfo.shortName
+            },
+            wikiInfo.features.listings &&
+            {
+                href: to.listingIndex(),
+                title: strings('listingIndex.title')
+            },
+            {
+                html: strings('groupPage.nav.group', {
+                    group: strings.link[urlKey](currentGroup, {class: 'current', to})
+                })
+            },
+            {
+                divider: false,
+                html: (previousNextLinks
+                    ? `(${infoGalleryLinks}; ${previousNextLinks})`
+                    : `(${previousNextLinks})`)
+            }
+        ]
+    };
+}
+
+function writeGroupPages() {
+    return groupData.map(writeGroupPage);
+}
+
+function writeGroupPage(group) {
     const releasedAlbums = group.albums.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
     const totalDuration = getTotalDuration(releasedTracks);
 
-    const groups = groupData.filter(x => x.isGroup);
-    const index = groups.indexOf(group);
-    const previous = groups[index - 1];
-    const next = groups[index + 1];
+    return async ({strings, writePage}) => {
+        await writePage('groupInfo', group.directory, ({to}) => ({
+            title: strings('groupInfoPage.title', {group: group.name}),
+            theme: getThemeString(group),
 
-    const generateNextPrevious = isGallery => [
-        previous && `<a href="${C.GROUP_DIRECTORY}/${previous.directory}/${isGallery ? 'gallery/' : ''}" id="previous-button" title="${previous.name}">Previous</a>`,
-        next && `<a href="${C.GROUP_DIRECTORY}/${next.directory}/${isGallery ? 'gallery/' : ''}" id="next-button" title="${next.name}">Next</a>`
-    ].filter(Boolean).join(', ');
+            main: {
+                content: fixWS`
+                    <h1>${strings('groupInfoPage.title', {group: group.name})}</h1>
+                    ${group.urls.length && `<p>${
+                        strings('releaseInfo.visitOn', {
+                            links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
+                        })
+                    }</p>`}
+                    <blockquote>
+                        ${transformMultiline(group.description, {strings, to})}
+                    </blockquote>
+                    <h2>${strings('groupInfoPage.albumList.title')}</h2>
+                    <p>${
+                        strings('groupInfoPage.viewAlbumGallery', {
+                            link: `<a href="${to.groupGallery(group.directory)}">${
+                                strings('groupInfoPage.viewAlbumGallery.link')
+                            }</a>`
+                        })
+                    }</p>
+                    <ul>
+                        ${group.albums.map(album => fixWS`
+                            <li>${
+                                strings('groupInfoPage.albumList.item', {
+                                    year: album.date.getFullYear(),
+                                    album: `<a href="${to.album(album.directory)}" style="${getLinkThemeString(album)}">${album.name}</a>`
+                                })
+                            }</li>
+                        `).join('\n')}
+                    </ul>
+                `
+            },
 
-    const npInfo = generateNextPrevious(false);
-    const npGallery = generateNextPrevious(true);
+            sidebarLeft: generateSidebarForGroup(group, {strings, to, isGallery: false}),
+            nav: generateNavForGroup(group, {strings, to, isGallery: false})
+        }));
 
-    await writePage([C.GROUP_DIRECTORY, group.directory], {
-        title: group.name,
-        theme: getThemeString(group),
-        main: {
-            content: fixWS`
-                <h1>${group.name}</h1>
-                ${group.urls.length && `<p>Visit on ${joinNoOxford(group.urls.map(fancifyURL), 'or')}.</p>`}
-                <blockquote>
-                    ${transformMultiline(group.description)}
-                </blockquote>
-                <h2>Albums</h2>
-                <p>View <a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/">album gallery</a>! Or browse the list:</p>
-                <ul>
-                    ${group.albums.map(album => fixWS`
-                        <li>
-                            (${album.date.getFullYear()})
-                            <a href="${C.ALBUM_DIRECTORY}/${album.directory}/" style="${getLinkThemeString(album)}">${album.name}</a>
-                        </li>
-                    `).join('\n')}
-                </ul>
-            `
-        },
-        sidebarLeft: generateSidebarForGroup(false, group),
-        nav: (wikiInfo.features.groupUI ? {
-            links: [
-                ['./', wikiInfo.shortName],
-                wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                [null, 'Group:'],
-                [`${C.GROUP_DIRECTORY}/${group.directory}/`, group.name],
-                [null, `(${[
-                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/" class="current">Info</a>`,
-                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/">Gallery</a>`
-                ].join(', ') + (npInfo.length ? '; ' + npInfo : '')})`]
-            ]
-        } : {simple: true})
-    });
+        await writePage('groupGallery', group.directory, ({to}) => ({
+            title: strings('groupGalleryPage.title', {group: group.name}),
+            theme: getThemeString(group),
 
-    await writePage([C.GROUP_DIRECTORY, group.directory, 'gallery'], {
-        title: `${group.name} - Gallery`,
-        theme: getThemeString(group),
-        main: {
-            classes: ['top-index'],
-            content: fixWS`
-                <h1>${group.name} - Gallery</h1>
-                <p class="quick-info"><b>${releasedTracks.length}</b> track${releasedTracks.length === 1 ? '' : 's'} across <b>${releasedAlbums.length}</b> album${releasedAlbums.length === 1 ? '' : 's'}, totaling <b>~${getDurationString(totalDuration)}</b> ${totalDuration > 3600 ? 'hours' : 'minutes'}.</p>
-                ${wikiInfo.features.groupUI && wikiInfo.features.listings && `<p class="quick-info">(<a href="${C.LISTING_DIRECTORY}/groups/by-category/">Choose another group to filter by!</a>)</p>`}
-                <div class="grid-listing">
-                    ${getGridHTML({
-                        entries: C.sortByDate(group.albums.map(item => ({item}))).reverse(),
-                        srcFn: getAlbumCover,
-                        hrefFn: album => `${C.ALBUM_DIRECTORY}/${album.directory}/`,
-                        details: true
-                    })}
-                </div>
-            `
-        },
-        sidebarLeft: generateSidebarForGroup(true, group),
-        nav: (wikiInfo.features.groupUI ? {
-            links: [
-                ['./', wikiInfo.shortName],
-                wikiInfo.features.listings && [`${C.LISTING_DIRECTORY}/`, 'Listings'],
-                [null, 'Group:'],
-                [`${C.GROUP_DIRECTORY}/${group.directory}/`, group.name],
-                [null, `(${[
-                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/">Info</a>`,
-                    `<a href="${C.GROUP_DIRECTORY}/${group.directory}/gallery/" class="current">Gallery</a>`
-                ].join(', ') + (npGallery.length ? '; ' + npGallery : '')})`]
-            ]
-        } : {simple: true})
-    });
+            main: {
+                classes: ['top-index'],
+                content: fixWS`
+                    <h1>${strings('groupGalleryPage.title', {group: group.name})}</h1>
+                    <p class="quick-info">${
+                        strings('groupGalleryPage.infoLine', {
+                            tracks: `<b>${strings.count.tracks(releasedTracks.length, {unit: true})}</b>`,
+                            albums: `<b>${strings.count.albums(releasedAlbums.length, {unit: true})}</b>`,
+                            time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
+                        })
+                    }</p>
+                    ${wikiInfo.features.groupUI && wikiInfo.features.listings && `<p class="quick-info">(<a href="${to.listing('groups/by-category')}">Choose another group to filter by!</a>)</p>`}
+                    <div class="grid-listing">
+                        ${getAlbumGridHTML({
+                            strings, to,
+                            entries: C.sortByDate(group.albums.map(item => ({item}))).reverse(),
+                            details: true
+                        })}
+                    </div>
+                `
+            },
+
+            sidebarLeft: generateSidebarForGroup(group, {strings, to, isGallery: true}),
+            nav: generateNavForGroup(group, {strings, to, isGallery: true})
+        }));
+    };
 }
 
-function getHrefOfAnythingMan(anythingMan) {
+function toAnythingMan(anythingMan, to) {
     return (
-        albumData.includes(anythingMan) ? C.ALBUM_DIRECTORY :
-        trackData.includes(anythingMan) ? C.TRACK_DIRECTORY :
-        flashData?.includes(anythingMan) ? C.FLASH_DIRECTORY :
+        albumData.includes(anythingMan) ? to.album(anythingMan.directory) :
+        trackData.includes(anythingMan) ? to.track(anythingMan.directory) :
+        flashData?.includes(anythingMan) ? to.flash(anythingMan.directory) :
         'idk-bud'
-    ) + '/' + (
-        anythingMan.directory
-    ) + '/';
+    )
 }
 
-function getAlbumCover(album) {
-    const file = 'cover.jpg';
-    return `${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${album.directory}/${file}`;
+function getAlbumCover(album, {to}) {
+    return to.albumCover(album.directory);
 }
-function getTrackCover(track) {
+
+function getTrackCover(track, {to}) {
     // Some al8ums don't have any track art at all, and in those, every track
     // just inherits the al8um's own cover art.
     if (track.coverArtists === null) {
-        return getAlbumCover(track.album);
+        return getAlbumCover(track.album, {to});
     } else {
-        const file = `${track.directory}.jpg`;
-        return `${C.MEDIA_DIRECTORY}/${C.MEDIA_ALBUM_ART_DIRECTORY}/${track.album.directory}/${file}`;
+        return to.trackCover(track.album.directory, track.directory);
     }
-}
-function getFlashCover(flash) {
-    const file = `${getFlashDirectory(flash)}.${flash.jiff === 'Yeah' ? 'gif' : 'jpg'}`;
-    return `${C.MEDIA_DIRECTORY}/${C.MEDIA_FLASH_ART_DIRECTORY}/${file}`;
 }
 
 function getFlashLink(flash) {
     return `https://homestuck.com/story/${flash.page}`;
 }
 
-function getFlashLinkHTML(flash, name = null) {
-    if (!name) {
-        name = flash.name;
-    }
-    return `<a href="${C.FLASH_DIRECTORY}/${getFlashDirectory(flash)}/" title="Page ${flash.page}" style="${getLinkThemeString(flash)}">${name}</a>`;
-}
-
-function rebaseURLs(directory, html) {
-    if (directory === '') {
-        return html;
-    }
-    return html.replace(/(href|src|data-original)="(.*?)"/g, (match, attr, url) => {
-        if (url.startsWith('#')) {
-            return `${attr}="${url}"`;
-        }
-
-        try {
-            new URL(url);
-            // no error: it's a full url
-        } catch (error) {
-            // caught an error: it's a component!
-            url = path.relative(directory, path.join(outputPath, url));
-        }
-        return `${attr}="${url}"`;
-    }).replace(/url\("(.*?)"\)/g, (match, url) => {
-        // same as above but for CSS url("...")-style values!
-        try {
-            new URL(url);
-        } catch (error) {
-            url = path.relative(directory, path.join(outputPath, url));
-        }
-        return `url("${url}")`;
-    });
-}
-
 function classes(...args) {
     const values = args.filter(Boolean);
-    // return values.length ? ` class="${values.join(' ')}"` : '';
     return `class="${values.join(' ')}"`;
+}
+
+async function processLanguageFile(file, defaultStrings = null) {
+    let contents;
+    try {
+        contents = await readFile(file, 'utf-8');
+    } catch (error) {
+        return {error: `Could not read ${file} (${error.code}).`};
+    }
+
+    let json;
+    try {
+        json = JSON.parse(contents);
+    } catch (error) {
+        return {error: `Could not parse JSON from ${file} (${error}).`};
+    }
+
+    return genStrings(json);
+}
+
+// Wrapper function for running a function once for all languages. It provides:
+// * the language strings
+// * a shadowing writePages function for outputing to the appropriate subdir
+// * a shadowing urls object for linking to the appropriate relative paths
+async function wrapLanguages(fn) {
+    for (const key of Object.keys(languages)) {
+        if (key === 'default') continue;
+
+        const strings = languages[key];
+        const baseDirectory = (strings === languages.default ? '' : strings.code);
+
+        const shadow_writePage = (urlKey, directory, pageFn) => writePage(strings, baseDirectory, urlKey, directory, pageFn);
+
+        // 8ring the utility functions over too!
+        Object.assign(shadow_writePage, writePage);
+
+        await fn({
+            baseDirectory,
+            strings,
+            writePage: shadow_writePage
+        });
+    }
 }
 
 async function main() {
@@ -3959,6 +5102,20 @@ async function main() {
         // categorized; check out MEDIA_DIRECTORY and rel8ted constants in
         // common/common.js. (This gets symlinked into the --data directory.)
         'media': {
+            type: 'value'
+        },
+
+        // String files! For the most part, this is used for translating the
+        // site to different languages, though you can also customize strings
+        // for your own 8uild of the site if you'd like. Files here should all
+        // match the format in strings-default.json in this repository. (If a
+        // language file is missing any strings, the site code will fall 8ack
+        // to what's specified in strings-default.json.)
+        //
+        // Unlike the other options here, this one's optional - the site will
+        // 8uild with the default (English) strings if this path is left
+        // unspecified.
+        'lang': {
             type: 'value'
         },
 
@@ -3987,6 +5144,7 @@ async function main() {
 
     dataPath = miscOptions.data || process.env.HSMUSIC_DATA;
     mediaPath = miscOptions.media || process.env.HSMUSIC_MEDIA;
+    langPath = miscOptions.lang || process.env.HSMUSIC_LANG; // Can 8e left unset!
     outputPath = miscOptions.out || process.env.HSMUSIC_OUT;
 
     {
@@ -4005,10 +5163,58 @@ async function main() {
         }
     }
 
+    const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+    if (defaultStrings.error) {
+        logError`Error loading default strings: ${defaultStrings.error}`;
+        return;
+    }
+
+    if (langPath) {
+        const languageDataFiles = await findFiles(langPath);
+        const results = await progressPromiseAll(`Reading & processing language files.`, languageDataFiles
+            .map(file => processLanguageFile(file, defaultStrings.json)));
+
+        let error = false;
+        for (const strings of results) {
+            if (strings.error) {
+                logError`Error loading provided strings: ${strings.error}`;
+                error = true;
+            }
+        }
+        if (error) return;
+
+        languages = Object.fromEntries(results.map(strings => [strings.code, strings]));
+    } else {
+        languages = {};
+    }
+
+    if (!languages[defaultStrings.code]) {
+        languages[defaultStrings.code] = defaultStrings;
+    }
+
     wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
     if (wikiInfo.error) {
         console.log(`\x1b[31;1m${wikiInfo.error}\x1b[0m`);
         return;
+    }
+
+    // Update languages o8ject with the wiki-specified default language!
+    // This will make page files for that language 8e gener8ted at the root
+    // directory, instead of the language-specific su8directory.
+    if (wikiInfo.defaultLanguage) {
+        if (Object.keys(languages).includes(wikiInfo.defaultLanguage)) {
+            languages.default = languages[wikiInfo.defaultLanguage];
+        } else {
+            logError`Wiki info file specified default language is ${wikiInfo.defaultLanguage}, but no such language file exists!`;
+            if (langPath) {
+                logError`Check if an appropriate file exists in ${langPath}?`;
+            } else {
+                logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+            }
+            return;
+        }
+    } else {
+        languages.default = defaultStrings;
     }
 
     homepageInfo = await processHomepageInfoFile(path.join(dataPath, HOMEPAGE_INFO_FILE));
@@ -4052,7 +5258,7 @@ async function main() {
     // avoiding that in our code 8ecause, again, we want to avoid assuming the
     // format of the returned paths here - they're only meant to 8e used for
     // reading as-is.
-    const albumDataFiles = await findAlbumDataFiles(path.join(dataPath, C.DATA_ALBUM_DIRECTORY));
+    const albumDataFiles = await findFiles(path.join(dataPath, C.DATA_ALBUM_DIRECTORY));
 
     // Technically, we could do the data file reading and output writing at the
     // same time, 8ut that kinda makes the code messy, so I'm not 8othering
@@ -4087,6 +5293,9 @@ async function main() {
         }
     }
 
+    artistAliasData = artistData.filter(x => x.alias);
+    artistData = artistData.filter(x => !x.alias);
+
     trackData = C.getAllTracks(albumData);
 
     if (wikiInfo.features.flashesAndGames) {
@@ -4104,6 +5313,9 @@ async function main() {
             return;
         }
     }
+
+    flashActData = flashData.filter(x => x.act8r8k);
+    flashData = flashData.filter(x => !x.act8r8k);
 
     artistNames = Array.from(new Set([
         ...artistData.filter(artist => !artist.alias).map(artist => artist.name),
@@ -4155,6 +5367,9 @@ async function main() {
             return;
         }
     }
+
+    groupCategoryData = groupData.filter(x => x.isCategory);
+    groupData = groupData.filter(x => x.isGroup);
 
     staticPageData = await processStaticPageDataFile(path.join(dataPath, STATIC_PAGE_DATA_FILE));
     if (staticPageData.error) {
@@ -4211,9 +5426,9 @@ async function main() {
 
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
-    justEverythingMan = C.sortByDate(albumData.concat(trackData, flashData?.filter(flash => !flash.act8r8k) || []));
+    justEverythingMan = C.sortByDate([...albumData, ...trackData, ...(flashData || [])]);
     justEverythingSortedByArtDateMan = C.sortByArtDate(justEverythingMan.slice());
-    // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(getHrefOfAnythingMan), null, 2));
+    // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
     {
         let buffer = [];
@@ -4239,7 +5454,7 @@ async function main() {
         };
         let CR4SH = false;
         for (let name of artistNames) {
-            const entry = artistData.find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
+            const entry = [...artistData, ...artistAliasData].find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
             if (!entry) {
                 clearBuffer();
                 console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
@@ -4309,12 +5524,8 @@ async function main() {
     {
         for (const { references, name, album } of trackData) {
             for (const ref of references) {
-                // Skip these, for now.
-                if (ref.includes("by")) {
-                    continue;
-                }
-                if (!getLinkedTrack(ref)) {
-                    console.warn(`\x1b[33mTrack not found "${ref}" in ${name} (${album.name})\x1b[0m`);
+                if (!search.track(ref)) {
+                    logWarn`Track not found "${ref}" in ${name} (${album.name})`;
                 }
             }
         }
@@ -4332,34 +5543,49 @@ async function main() {
     // more than once. (We 8uild a few additional links that can't 8e cre8ted
     // at initial data processing time here too.)
 
-    const filterNull = (parent, key) => {
+    const filterNullArray = (parent, key) => {
         for (const obj of parent) {
             const array = obj[key];
             for (let i = 0; i < array.length; i++) {
-                if (!Boolean(array[i])) {
+                if (!array[i]) {
                     const prev = array[i - 1] && array[i - 1].name;
                     const next = array[i + 1] && array[i + 1].name;
-                    console.log(`\x1b[33mUnexpected null in ${obj.name} (${key}) - prev: ${prev}, next: ${next}\x1b[0m`);
+                    logWarn`Unexpected null in ${obj.name} (${obj.what}) (array key ${key} - prev: ${prev}, next: ${next})`;
                 }
             }
             array.splice(0, array.length, ...array.filter(Boolean));
         }
     };
 
-    trackData.forEach(track => mapInPlace(track.references, getLinkedTrack));
-    trackData.forEach(track => track.aka = getLinkedTrack(track.aka));
-    trackData.forEach(track => mapInPlace(track.artTags, getLinkedTag));
-    albumData.forEach(album => mapInPlace(album.groups, getLinkedGroup));
-    albumData.forEach(album => mapInPlace(album.artTags, getLinkedTag));
-    artistData.forEach(artist => artist.alias = getLinkedArtist(artist.alias));
-    contributionData.forEach(contrib => contrib.who = getLinkedArtist(contrib.who));
+    const filterNullValue = (parent, key) => {
+        parent.splice(0, parent.length, ...parent.filter(obj => {
+            if (!obj[key]) {
+                logWarn`Unexpected null in ${obj.name} (value key ${key})`;
+            }
+        }));
+    };
 
-    filterNull(trackData, 'references');
-    filterNull(albumData, 'groups');
+    trackData.forEach(track => mapInPlace(track.references, search.track));
+    trackData.forEach(track => track.aka = search.track(track.aka));
+    trackData.forEach(track => mapInPlace(track.artTags, search.tag));
+    albumData.forEach(album => mapInPlace(album.groups, search.group));
+    albumData.forEach(album => mapInPlace(album.artTags, search.tag));
+    artistAliasData.forEach(artist => artist.alias = search.artist(artist.alias));
+    contributionData.forEach(contrib => contrib.who = search.artist(contrib.who));
+
+    filterNullArray(trackData, 'references');
+    filterNullArray(trackData, 'artTags');
+    filterNullArray(albumData, 'groups');
+    filterNullArray(albumData, 'artTags');
+    filterNullValue(artistAliasData, 'alias');
+    filterNullValue(contributionData, 'who');
 
     trackData.forEach(track1 => track1.referencedBy = trackData.filter(track2 => track2.references.includes(track1)));
     groupData.forEach(group => group.albums = albumData.filter(album => album.groups.includes(group)));
     tagData.forEach(tag => tag.things = C.sortByArtDate([...albumData, ...trackData]).filter(thing => thing.artTags.includes(tag)));
+
+    groupData.forEach(group => group.category = groupCategoryData.find(x => x.name === group.category));
+    groupCategoryData.forEach(category => category.groups = groupData.filter(x => x.category === category));
 
     trackData.forEach(track => track.otherReleases = [
         track.aka,
@@ -4367,13 +5593,13 @@ async function main() {
     ].filter(Boolean));
 
     if (wikiInfo.features.flashesAndGames) {
-        const actlessFlashData = flashData.filter(flash => !flash.act8r8k);
+        flashData.forEach(flash => mapInPlace(flash.tracks, search.track));
+        flashData.forEach(flash => flash.act = flashActData.find(act => act.name === flash.act));
+        flashActData.forEach(act => act.flashes = flashData.filter(flash => flash.act === act));
 
-        actlessFlashData.forEach(flash => mapInPlace(flash.tracks, getLinkedTrack));
+        filterNullArray(flashData, 'tracks');
 
-        filterNull(actlessFlashData, 'tracks');
-
-        trackData.forEach(track => track.flashes = actlessFlashData.filter(flash => flash.tracks.includes(track)));
+        trackData.forEach(track => track.flashes = flashData.filter(flash => flash.tracks.includes(track)));
     }
 
     artistData.forEach(artist => {
@@ -4400,9 +5626,6 @@ async function main() {
             };
         }
     });
-
-    groupData.filter(x => x.isGroup).forEach(group => group.category = groupData.find(x => x.isCategory && x.name === group.category));
-    groupData.filter(x => x.isCategory).forEach(category => category.groups = groupData.filter(x => x.isGroup && x.category === category));
 
     officialAlbumData = albumData.filter(album => album.groups.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY));
     fandomAlbumData = albumData.filter(album => album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY));
@@ -4439,17 +5662,65 @@ async function main() {
     const buildAll = !Object.keys(buildFlags).length || buildFlags.all;
 
     await writeSymlinks();
-    if (buildAll || buildFlags.misc) await writeMiscellaneousPages();
-    if (buildAll || buildFlags.static) await writeStaticPages();
-    if (buildAll || buildFlags.news) await writeNewsPages();
-    if (buildAll || buildFlags.list) await writeListingPages();
-    if (buildAll || buildFlags.tag) await writeTagPages();
-    if (buildAll || buildFlags.commentary) await writeCommentaryPages();
-    if (buildAll || buildFlags.group) await writeGroupPages();
-    if (buildAll || buildFlags.album) await writeAlbumPages();
-    if (buildAll || buildFlags.track) await writeTrackPages();
-    if (buildAll || buildFlags.artist) await writeArtistPages();
-    if (buildAll || buildFlags.flash) if (wikiInfo.features.flashesAndGames) await writeFlashPages();
+    await writeSharedFilesAndPages({strings: defaultStrings});
+
+    const buildDictionary = {
+        misc: writeMiscellaneousPages,
+        news: writeNewsPages,
+        list: writeListingPages,
+        tag: writeTagPages,
+        commentary: writeCommentaryPages,
+        static: writeStaticPages,
+        group: writeGroupPages,
+        album: writeAlbumPages,
+        track: writeTrackPages,
+        artist: writeArtistPages,
+        flash: writeFlashPages
+    };
+
+    const buildSteps = (buildAll
+        ? Object.values(buildDictionary)
+        : (Object.entries(buildDictionary)
+            .filter(([ flag ]) => buildFlags[flag])
+            .map(([ flag, fn ]) => fn)));
+
+    // The writeThingPages functions don't actually immediately do any file
+    // writing themselves; an initial call will only gather the relevant data
+    // which is *then* used for writing. So the return value is a function
+    // (or an array of functions) which expects {writePage, strings}, and
+    // *that's* what we call after -- multiple times, once for each language.
+    let pageWriteFns;
+    {
+        let error = false;
+
+        pageWriteFns = buildSteps.flatMap(fn => {
+            const fns = fn();
+
+            // Do a quick valid8tion! If one of the writeThingPages functions go
+            // wrong, this will stall out early and tell us which did.
+            if (!Array.isArray(fns)) {
+                logError`${fn.name} didn't return an array!`;
+                error = true;
+            } else if (fns.some(fn => typeof fn !== 'function')) {
+                logError`${fn.name} didn't return all functions!`;
+                error = true;
+            }
+
+            return fns;
+        });
+
+        if (error) {
+            return;
+        }
+    }
+
+    await wrapLanguages(async ({strings, ...opts}) => {
+        console.log(`\x1b[34;1m${strings.code} (-> /${opts.baseDirectory}) ${'-'.repeat(50)}\x1b[0m`);
+        await progressPromiseAll(`Writing ${strings.code}`, queue(
+            pageWriteFns.map(fn => () => fn({strings, ...opts})),
+            queueSize
+        ));
+    });
 
     decorateTime.displayTime();
 
