@@ -4555,7 +4555,7 @@ function getArtistString(artists, {strings, to, showIcons = false, showContrib =
             strings.link.artist(who, {to}),
             showContrib && what && `(${what})`,
             showIcons && urls.length && `<span class="icons">(${urls.map(iconifyURL).join(', ')})</span>`
-        ].join(' ');
+        ].filter(Boolean).join(' ');
     }));
 }
 
