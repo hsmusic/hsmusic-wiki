@@ -2377,11 +2377,14 @@ function writeHomepage() {
                 <h2 class="dot-between-spans">
                     ${[
                         strings.link.home('', {text: wikiInfo.shortName, class: 'current', to}),
+                        wikiInfo.features.listings &&
                         strings.link.listingIndex('', {text: strings('listingIndex.title'), to}),
+                        wikiInfo.features.news &&
                         strings.link.newsIndex('', {text: strings('newsIndex.title'), to}),
+                        wikiInfo.features.flashesAndGames &&
                         strings.link.flashIndex('', {text: strings('flashIndex.title'), to}),
                         ...staticPageData.filter(page => page.listed).map(page => strings.link.staticPage(page, {to}))
-                    ].map(link => `<span>${link}</span>`).join('\n')}
+                    ].filter(Boolean).map(link => `<span>${link}</span>`).join('\n')}
                 </h2>
             `
         }
