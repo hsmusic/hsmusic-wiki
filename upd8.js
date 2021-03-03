@@ -5073,7 +5073,7 @@ async function processLanguageFile(file, defaultStrings = null) {
         return {error: `Could not parse JSON from ${file} (${error}).`};
     }
 
-    return genStrings(json);
+    return genStrings(json, defaultStrings);
 }
 
 // Wrapper function for running a function once for all languages. It provides:
