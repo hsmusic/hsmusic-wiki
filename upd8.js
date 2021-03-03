@@ -2296,7 +2296,7 @@ function writeSharedFilesAndPages({strings}) {
                 "artistData": ${stringifyArtistData()}
             }
         `)
-    ]);
+    ].filter(Boolean));
 }
 
 function writeHomepage() {
@@ -5314,8 +5314,8 @@ async function main() {
         }
     }
 
-    flashActData = flashData.filter(x => x.act8r8k);
-    flashData = flashData.filter(x => !x.act8r8k);
+    flashActData = flashData?.filter(x => x.act8r8k);
+    flashData = flashData?.filter(x => !x.act8r8k);
 
     artistNames = Array.from(new Set([
         ...artistData.filter(artist => !artist.alias).map(artist => artist.name),
@@ -5694,7 +5694,7 @@ async function main() {
         let error = false;
 
         pageWriteFns = buildSteps.flatMap(fn => {
-            const fns = fn();
+            const fns = fn() || [];
 
             // Do a quick valid8tion! If one of the writeThingPages functions go
             // wrong, this will stall out early and tell us which did.
