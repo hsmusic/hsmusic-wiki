@@ -247,6 +247,8 @@
     "tagPage.infoLine": "Appears in {COVER_ARTS}.",
     "tagPage.nav.tag": "Tag: {TAG}",
     "trackPage.title": "{TRACK}",
+    "trackPage.referenceList.fandom": "Fandom:",
+    "trackPage.referenceList.official": "Official:",
     "trackPage.nav.track": "{TRACK}",
     "trackPage.nav.track.withNumber": "{NUMBER}. {TRACK}",
     "trackPage.nav.random": "Random"

@@ -2728,9 +2728,14 @@ function writeTrackPages() {
 
 function writeTrackPage(track) {
     const { album } = track;
+
     const tracksThatReference = track.referencedBy;
-    const ttrFanon = tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY));
-    const ttrOfficial = tracksThatReference.filter(t => t.album.groups.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY));
+    const useDividedReferences = groupData.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY);
+    const ttrFanon = (useDividedReferences &&
+        tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY)));
+    const ttrOfficial = (useDividedReferences &&
+        tracksThatReference.filter(t => t.album.groups.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY)));
+
     const tracksReferenced = track.references;
     const otherReleases = track.otherReleases;
     const listTag = getAlbumListTag(track.album);
@@ -2865,16 +2870,19 @@ function writeTrackPage(track) {
                 `}
                 ${tracksThatReference.length && fixWS`
                     <p>${strings('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
-                    <dl>
-                        ${ttrOfficial.length && fixWS`
-                            <dt>Official:</dt>
-                            <dd>${generateTrackList(ttrOfficial, {strings, to})}</dd>
-                        `}
-                        ${ttrFanon.length && fixWS`
-                            <dt>Fandom:</dt>
-                            <dd>${generateTrackList(ttrFanon, {strings, to})}</dd>
-                        `}
-                    </dl>
+                    ${useDividedReferences && fixWS`
+                        <dl>
+                            ${ttrOfficial.length && fixWS`
+                                <dt>${strings('trackPage.referenceList.official')}</dt>
+                                <dd>${generateTrackList(ttrOfficial, {strings, to})}</dd>
+                            `}
+                            ${ttrFanon.length && fixWS`
+                                <dt>${strings('trackPage.referenceList.fandom')}</dt>
+                                <dd>${generateTrackList(ttrFanon, {strings, to})}</dd>
+                            `}
+                        </dl>
+                    `}
+                    ${!useDividedReferences && generateTrackList(tracksThatReference, {strings, to})}
                 `}
                 ${wikiInfo.features.flashesAndGames && flashesThatFeature.length && fixWS`
                     <p>${strings('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
