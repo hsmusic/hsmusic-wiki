@@ -115,6 +115,7 @@ const {
     joinNoOxford,
     mapInPlace,
     logWarn,
+    logInfo,
     logError,
     parseOptions,
     progressPromiseAll,
@@ -125,6 +126,8 @@ const {
     th,
     unique
 } = require('./upd8-util');
+
+const genThumbs = require('./gen-thumbs');
 
 const C = require('./common/common');
 
@@ -261,6 +264,14 @@ const link = {
     media: linkPathname('media', {color: false}),
     root: linkPathname('root', {color: false}),
     site: linkPathname('site', {color: false})
+};
+
+const thumbnailHelper = name => file =>
+    file.replace(/\.(jpg|png)$/, name + '.jpg');
+
+const thumb = {
+    medium: thumbnailHelper('.medium'),
+    small: thumbnailHelper('.small')
 };
 
 function generateURLs(fromPath) {
@@ -958,6 +969,7 @@ function transformMultiline(text, {strings, to}) {
         line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
             lazy: true,
             link: true,
+            thumb: 'medium',
             ...parseAttributes(attributes, {to})
         }));
 
@@ -1878,6 +1890,7 @@ function attributes(attribs) {
 function img({
     src = '',
     alt = '',
+    thumb: thumbKey = '',
     reveal = '',
     id = '',
     width = '',
@@ -1889,6 +1902,9 @@ function img({
     const willSquare = square;
     const willLink = typeof link === 'string' || link;
 
+    const originalSrc = src;
+    const thumbSrc = thumbKey ? thumb[thumbKey](src) : src;
+
     const imgAttributes = attributes({
         id: link ? '' : id,
         alt,
@@ -1896,8 +1912,8 @@ function img({
         height
     });
 
-    const nonlazyHTML = wrap(`<img src="${src}" ${imgAttributes}>`);
-    const lazyHTML = lazy && wrap(`<img class="lazy" data-original="${src}" ${imgAttributes}>`, true);
+    const nonlazyHTML = wrap(`<img src="${thumbSrc}" ${imgAttributes}>`);
+    const lazyHTML = lazy && wrap(`<img class="lazy" data-original="${thumbSrc}" ${imgAttributes}>`, true);
 
     if (lazy) {
         return fixWS`
@@ -1933,7 +1949,7 @@ function img({
         if (willLink) {
             html = `<a ${classes('box', hide && 'js-hide')} ${attributes({
                 id,
-                href: typeof link === 'string' ? link : src
+                href: typeof link === 'string' ? link : originalSrc
             })}>${html}</a>`;
         }
 
@@ -2202,6 +2218,7 @@ function getGridHTML({
             ${img({
                 src: srcFn(item),
                 alt: altFn(item),
+                thumb: 'small',
                 lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                 square: true,
                 reveal: getRevealString(item.artTags, {strings})
@@ -2534,6 +2551,7 @@ function generateCoverLink({
             ${img({
                 src,
                 alt,
+                thumb: 'medium',
                 id: 'cover-art',
                 link: true,
                 square: true,
@@ -5172,6 +5190,13 @@ async function main() {
         if (errored) {
             return;
         }
+    }
+
+    logInfo`Begin thumbnail generation... -----+`;
+    const result = await genThumbs(mediaPath, {queueSize, quiet: true});
+    logInfo`Done thumbnail generation! --------+`;
+    if (!result) {
+        return;
     }
 
     const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));

@@ -46,13 +46,17 @@ module.exports.joinNoOxford = function(array, plural = 'and') {
     return `${array.slice(0, -1).join(', ')} ${plural} ${array[array.length - 1]}`;
 };
 
-module.exports.progressPromiseAll = function (msg, array) {
+module.exports.progressPromiseAll = function (msgOrMsgFn, array) {
     if (!array.length) {
         return Promise.resolve([]);
     }
 
+    const msgFn = (typeof msgOrMsgFn === 'function'
+        ? msgOrMsgFn
+        : () => msgOrMsgFn);
+
     let done = 0, total = array.length;
-    process.stdout.write(`\r${msg} [0/${total}]`);
+    process.stdout.write(`\r${msgFn()} [0/${total}]`);
     const start = Date.now();
     return Promise.all(array.map(promise => promise.then(val => {
         done++;
@@ -60,9 +64,9 @@ module.exports.progressPromiseAll = function (msg, array) {
         const pc = (Math.round(done / total * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
         if (done === total) {
             const time = Date.now() - start;
-            process.stdout.write(`\r\x1b[2m${msg} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`)
+            process.stdout.write(`\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`)
         } else {
-            process.stdout.write(`\r${msg} [${pc}] `);
+            process.stdout.write(`\r${msgFn()} [${pc}] `);
         }
         return val;
     })));
@@ -94,6 +98,8 @@ module.exports.queue = function (array, max = 50) {
 
     return ret;
 };
+
+module.exports.delay = ms => new Promise(res => setTimeout(res, ms));
 
 module.exports.th = function (n) {
     if (n % 10 === 1 && n !== 11) {
@@ -321,6 +327,7 @@ const logColor = color => (literals, ...values) => {
     w(`\x1b[0m\n`);
 };
 
+module.exports.logInfo = logColor(2);
 module.exports.logWarn = logColor(33);
 module.exports.logError = logColor(31);
 
@@ -368,4 +375,30 @@ module.exports.chunkByProperties = function(array, properties) {
             ...Object.fromEntries(properties.map(p => [p, chunk[0][p]])),
             chunk
         }));
+};
+
+// Very cool function origin8ting in... http-music pro8a8ly!
+// Sorry if we happen to 8e violating past-us's copyright, lmao.
+module.exports.promisifyProcess = function(proc, showLogging = true) {
+    // Takes a process (from the child_process module) and returns a promise
+    // that resolves when the process exits (or rejects, if the exit code is
+    // non-zero).
+    //
+    // Ayy look, no alpha8etical second letter! Couldn't tell this was written
+    // like three years ago 8efore I was me. 8888)
+
+    return new Promise((resolve, reject) => {
+        if (showLogging) {
+            proc.stdout.pipe(process.stdout);
+            proc.stderr.pipe(process.stderr);
+        }
+
+        proc.on('exit', code => {
+            if (code === 0) {
+                resolve();
+            } else {
+                reject(code);
+            }
+        })
+    })
 };
