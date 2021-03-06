@@ -3487,7 +3487,7 @@ function generateNavForFlash(flash, {strings, to}) {
             <div>
                 ${chronologyLinks(flash, {
                     strings, to,
-                    headingWord: strings('misc.chronology.flash'),
+                    headingString: 'misc.chronology.heading.flash',
                     contribKey: 'contributors',
                     getThings: artist => artist.flashes.asContributor
                 })}
@@ -4702,7 +4702,7 @@ function iconifyURL(url) {
 
 function chronologyLinks(currentThing, {
     strings, to,
-    headingWord,
+    headingString,
     contribKey,
     getThings
 }) {
@@ -4734,13 +4734,14 @@ function chronologyLinks(currentThing, {
             next && `<a href="${toAnythingMan(next, to)}" title="${next.name}">Next</a>`
         ].filter(Boolean);
 
+        const stringOpts = {
+            index: strings.count.index(index + 1, {strings}),
+            artist: strings.link.artist(artist, {to})
+        };
+
         return fixWS`
             <div class="chronology">
-                <span class="heading">${strings('misc.chronology.heading', {
-                    index: strings.count.index(index + 1),
-                    word: headingWord,
-                    artist: strings.link.artist(artist, {to})
-                })}</span>
+                <span class="heading">${strings(headingString, stringOpts)}</span>
                 ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>`}
             </div>
         `;
@@ -4768,13 +4769,13 @@ function generateAlbumChronologyLinks(album, currentTrack, {strings, to}) {
     return [
         currentTrack && chronologyLinks(currentTrack, {
             strings, to,
-            headingWord: strings('misc.chronology.track'),
+            headingString: 'misc.chronology.heading.track',
             contribKey: 'artists',
             getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor]
         }),
         chronologyLinks(currentTrack || album, {
             strings, to,
-            headingWord: strings('misc.chronology.coverArt'),
+            headingString: 'misc.chronology.heading.coverArt',
             contribKey: 'coverArtists',
             getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]
         })
