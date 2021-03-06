@@ -5341,7 +5341,7 @@ async function main() {
             return;
         }
 
-        const errors = artistData.filter(obj => obj.error);
+        const errors = flashData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
