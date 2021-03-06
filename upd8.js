@@ -486,6 +486,17 @@ function genStrings(stringsJSON, defaultJSON = null) {
     // Store the strings dictionary itself, also for convenience.
     strings.json = stringsJSON;
 
+    // Store Intl o8jects that can 8e reused for value formatting.
+    strings.intl = {
+        date: new Intl.DateTimeFormat(code, {full: true}),
+        number: new Intl.NumberFormat(code),
+        list: {
+            conjunction: new Intl.ListFormat(code, {type: 'conjunction'}),
+            disjunction: new Intl.ListFormat(code, {type: 'disjunction'}),
+            unit: new Intl.ListFormat(code, {type: 'unit'})
+        }
+    };
+
     const bindUtilities = (obj, bind) => Object.fromEntries(Object.entries(obj).map(
         ([ key, fn ]) => [key, (value, opts = {}) => fn(value, {...bind, ...opts})]
     ));
@@ -516,24 +527,15 @@ const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit =
             ? '.singular'
             : '.plural')
         : `count.${stringKey}`),
-    {[argName]: value});
+    {[argName]: strings.intl.number.format(value)});
 
 const count = {
     date: (date, {strings}) => {
-        // TODO: Localize.
-        const months = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ]
-        date = new Date(date);
-        return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
+        return strings.intl.date.format(date);
     },
 
     dateRange: ([startDate, endDate], {strings}) => {
-        // TODO: Localize.
-        return (startDate === endDate
-            ? count.date(startDate, {strings})
-            : `${count.date(startDate, {strings})} to ${count.date(endDate, {strings})}`);
+        return strings.intl.date.formatRange(startDate, endDate);
     },
 
     duration: (secTotal, {strings, approximate = false, unit = false}) => {
@@ -566,9 +568,11 @@ const count = {
     },
 
     index: (value, {strings}) => {
-        // TODO: Localize.
-        return th(value);
+        // TODO: Localize...?
+        return '#' + value;
     },
+
+    number: value => strings.intl.number.format(value),
 
     words: (value, {strings, unit = false}) => {
         const words = (value > 1000
@@ -589,11 +593,12 @@ const count = {
     tracks: countHelper('tracks')
 };
 
+const listHelper = type => (list, {strings}) => strings.intl.list[type].format(list);
+
 const list = {
-    // TODO: Localize.
-    comma: (arr, {strings}) => arr.join(', '),
-    or: (arr, {strings}) => joinNoOxford(arr, 'or'),
-    and: (arr, {strings}) => joinNoOxford(arr, 'and')
+    unit: listHelper('unit'),
+    or: listHelper('disjunction'),
+    and: listHelper('conjunction')
 };
 
 // Note there isn't a 'find track data files' function. I plan on including the
@@ -3152,7 +3157,7 @@ function writeArtistPage(artist) {
                         })
                     })}</p>`}
                     <p>${strings('misc.jumpTo.withLinks', {
-                        links: strings.list.comma([
+                        links: strings.list.unit([
                             [
                                 [...releasedTracks, ...unreleasedTracks].length && `<a href="#tracks">${strings('artistPage.trackList.title')}</a>`,
                                 unreleasedTracks.length && `(<a href="#unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</a>)`
