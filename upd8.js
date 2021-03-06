@@ -5164,6 +5164,13 @@ async function main() {
             type: 'value'
         },
 
+        // Thum8nail gener8tion is *usually* something you want, 8ut it can 8e
+        // kinda a pain to run every time, since it does necessit8te reading
+        // every media file at run time. Pass this to skip it.
+        'skip-thumbs': {
+            type: 'flag'
+        },
+
         'queue-size': {
             type: 'value',
             validate(size) {
@@ -5198,11 +5205,17 @@ async function main() {
         }
     }
 
-    logInfo`Begin thumbnail generation... -----+`;
-    const result = await genThumbs(mediaPath, {queueSize, quiet: true});
-    logInfo`Done thumbnail generation! --------+`;
-    if (!result) {
-        return;
+    const skipThumbs = miscOptions['skip-thumbs'] ?? false;
+
+    if (skipThumbs) {
+        logInfo`Skipping thumbnail generation.`;
+    } else {
+        logInfo`Begin thumbnail generation... -----+`;
+        const result = await genThumbs(mediaPath, {queueSize, quiet: true});
+        logInfo`Done thumbnail generation! --------+`;
+        if (!result) {
+            return;
+        }
     }
 
     const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
@@ -5233,6 +5246,8 @@ async function main() {
     if (!languages[defaultStrings.code]) {
         languages[defaultStrings.code] = defaultStrings;
     }
+
+    logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
 
     wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
     if (wikiInfo.error) {
@@ -5702,6 +5717,8 @@ async function main() {
     });
 
     const buildAll = !Object.keys(buildFlags).length || buildFlags.all;
+
+    logInfo`Building site pages: ${buildAll ? 'all' : Object.keys(buildFlags).join(', ')}`;
 
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings});
