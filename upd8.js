@@ -3072,7 +3072,7 @@ function writeArtistPage(artist) {
                     ? strings('artistPage.creditList.entry.withArtists.withContribution', {
                         entry,
                         artists: getArtistString(artists, {strings, to}),
-                        contribution: contrib
+                        contribution: contrib.what
                     })
                     : strings('artistPage.creditList.entry.withArtists', {
                         entry,
@@ -3081,7 +3081,7 @@ function writeArtistPage(artist) {
                 : (contrib.what
                     ? strings('artistPage.creditList.entry.withContribution', {
                         entry,
-                        contribution: contrib
+                        contribution: contrib.what
                     })
                     : entry)));
 
