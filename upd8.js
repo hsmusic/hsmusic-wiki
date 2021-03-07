@@ -568,8 +568,7 @@ const count = {
     },
 
     index: (value, {strings}) => {
-        // TODO: Localize...?
-        return '#' + value;
+        return strings('count.index', {index: value});
     },
 
     number: value => strings.intl.number.format(value),

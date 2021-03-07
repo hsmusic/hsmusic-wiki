@@ -27,6 +27,7 @@
     "count.duration.minutes.withUnit": "{MINUTES}:{SECONDS} minutes",
     "count.duration.approximate": "~{DURATION}",
     "count.duration.missing": "_:__",
+    "count.index": "#{INDEX}",
     "count.words": "{WORDS}",
     "count.words.thousand": "{WORDS}k",
     "count.words.withUnit.singular": "{WORDS} word",
