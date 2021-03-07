@@ -745,6 +745,11 @@ const replacerSpec = {
         search: null,
         link: 'commentaryIndex'
     },
+    'date': {
+        search: null,
+        value: ref => new Date(ref),
+        html: (date, {strings}) => `<time datetime="${date.toString()}">${strings.count.date(date)}</time>`
+    },
     'flash': {
         search: 'flash',
         link: 'flash',
@@ -813,8 +818,8 @@ const replacerSpec = {
 
 {
     let error = false;
-    for (const [key, {link: linkKey, search: searchKey}] of Object.entries(replacerSpec)) {
-        if (!link[linkKey]) {
+    for (const [key, {link: linkKey, search: searchKey, value, html}] of Object.entries(replacerSpec)) {
+        if (!html && !link[linkKey]) {
             logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
             error = true;
         }
@@ -838,32 +843,39 @@ function transformInline(text, {strings, to}) {
         const {
             search: searchKey,
             link: linkKey,
-            transformName = null
+            value: valueFn,
+            html: htmlFn,
+            transformName
         } = replacerSpec[category];
 
-        const thing = (searchKey
-            ? search[searchKey](ref)
-            : {
+        const value = (
+            valueFn ? valueFn(ref) :
+            searchKey ? search[searchKey](ref) :
+            {
                 directory: ref.replace(category + ':', ''),
                 name: null
             });
 
-        if (!thing) {
+        if (!value) {
             logWarn`The link ${match} does not match anything!`;
             return match;
         }
 
         const label = (enteredName
-            || transformName && transformName(thing.name, match, offset, text)
-            || thing.name);
+            || transformName && transformName(value.name, match, offset, text)
+            || value.name);
 
-        if (!label) {
+        if (!valueFn && !label) {
             logWarn`The link ${match} requires a label be entered!`;
             return match;
         }
 
+        const fn = (htmlFn
+            ? htmlFn
+            : strings.link[linkKey]);
+
         try {
-            return strings.link[linkKey](thing, {text: label, hash, to});
+            return fn(value, {text: label, hash, strings, to});
         } catch (error) {
             logError`The link ${match} failed to be processed: ${error}`;
             return match;
