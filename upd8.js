@@ -287,7 +287,7 @@ function generateURLs(fromPath) {
     ));
 }
 
-const urls = Object.fromEntries(Object.entries(urlSpec.localized).map(
+const urls = Object.fromEntries(Object.entries({...urlSpec.localized, ...urlSpec.shared}).map(
     ([key, path]) => [key, generateURLs(path)]
 ));
 
@@ -2267,7 +2267,6 @@ function getFlashGridHTML({strings, to, ...props}) {
         strings,
         srcFn: flash => to.flashArt(flash.directory),
         hrefFn: flash => to.flash(flash.directory),
-        altFn: () => strings('misc.alt.flashArt'),
         ...props
     });
 }
@@ -2308,23 +2307,22 @@ function writeSymlinks() {
 }
 
 function writeSharedFilesAndPages({strings}) {
-    return progressPromiseAll(`Writing files & pages shared across languages.`, [
-        // THESE REDIRECT PAGES ARE TECH DEBT! Oops.
+    const redirect = async (title, from, urlKey, directory) => {
+        const target = path.relative(from, urls.root[urlKey](directory));
+        const content = generateRedirectPage(title, target, {strings});
+        await mkdirp(path.join(outputPath, from));
+        await writeFile(path.join(outputPath, from, 'index.html'), content);
+    };
 
+    return progressPromiseAll(`Writing files & pages shared across languages.`, [
         groupData?.some(group => group.directory === 'fandom') &&
-        mkdirp(path.join(outputPath, 'albums', 'fandom'))
-            .then(() => writeFile(path.join(outputPath, 'albums', 'fandom', 'index.html'),
-                generateRedirectPage('Fandom - Gallery', `/${C.GROUP_DIRECTORY}/fandom/gallery/`, {strings}))),
+        redirect('Fandom - Gallery', 'albums/fandom', 'groupGallery', 'fandom'),
 
         groupData?.some(group => group.directory === 'official') &&
-        mkdirp(path.join(outputPath, 'albums', 'official'))
-            .then(() => writeFile(path.join(outputPath, 'albums', 'official', 'index.html'),
-                generateRedirectPage('Official - Gallery', `/${C.GROUP_DIRECTORY}/official/gallery/`, {strings}))),
+        redirect('Official - Gallery', 'albums/official', 'groupGallery', 'official'),
 
         wikiInfo.features.listings &&
-        mkdirp(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary'))
-            .then(() => writeFile(path.join(outputPath, C.LISTING_DIRECTORY, 'all-commentary', 'index.html'),
-                generateRedirectPage('Album Commentary', `/${C.COMMENTARY_DIRECTORY}/`, {strings}))),
+        redirect('Album Commentary', 'list/all-commentary', 'commentaryIndex', ''),
 
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
@@ -3151,7 +3149,7 @@ function writeArtistPage(artist) {
                 content: fixWS`
                     ${avatarFileExists && generateCoverLink({
                         strings, to,
-                        src: `/${C.MEDIA_DIRECTORY}/${avatarPath}`,
+                        src: to.artistAvatar(artist.directory),
                         alt: strings('misc.alt.artistAvatar')
                     })}
                     <h1>${strings('artistPage.title', {artist: name})}</h1>

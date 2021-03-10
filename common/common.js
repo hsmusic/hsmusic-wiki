@@ -60,17 +60,12 @@ const C = {
     //
     // Upd8 03/11/2020: Oh my god this was a pain to re-align (copying from
     // udp8.js over to shared.js).
-    ALBUM_DIRECTORY: 'album',
-    TRACK_DIRECTORY: 'track',
-    ARTIST_DIRECTORY: 'artist',
-    ARTIST_AVATAR_DIRECTORY: 'artist-avatar',
-    TAG_DIRECTORY: 'tag',
-    LISTING_DIRECTORY: 'list',
-    FLASH_DIRECTORY: 'flash',
-    NEWS_DIRECTORY: 'news',
-    GROUP_DIRECTORY: 'group',
-    COMMENTARY_DIRECTORY: 'commentary',
-    JS_DISABLED_DIRECTORY: 'js-disabled',
+    //
+    // Upd8 03/10/2021 (wow, almost exactly a year later): This code comment
+    // from literally the first day of wiki development is finally no longer
+    // necessary! It was commenting constnats like "ALBUM_DIRECTORY" 8efore.
+    // 8ut we don't have those constants anymore, 'cuz urlSpec in upd8.js
+    // covers all that!
 
     UNRELEASED_TRACKS_DIRECTORY: 'unreleased-tracks',
     OFFICIAL_GROUP_DIRECTORY: 'official',
