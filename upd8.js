@@ -576,13 +576,15 @@ const count = {
     number: value => strings.intl.number.format(value),
 
     words: (value, {strings, unit = false}) => {
-        const words = (value > 1000
-            ? strings('count.words.thousand', {words: Math.floor(value / 100) / 10})
-            : strings('count.words', {words: value}));
+        const num = strings.intl.number.format(value > 1000
+            ? Math.floor(value / 100) / 10
+            : value);
 
-        return (unit
-            ? countHelper('words')(words, {strings, unit: true})
-            : words);
+        const words = (value > 1000
+            ? strings('count.words.thousand', {words: num})
+            : strings('count.words', {words: num}));
+
+        return strings('count.words.withUnit.' + strings.intl.plural.cardinal.select(value), {words});
     },
 
     albums: countHelper('albums'),
