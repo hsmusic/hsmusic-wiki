@@ -3443,12 +3443,17 @@ function writeFlashPage(flash) {
                 ${flash.tracks.length && fixWS`
                     <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                     <ul>
-                        ${flash.tracks.map(track => fixWS`
-                            <li>
-                                <a href="${C.TRACK_DIRECTORY}/${track.directory}/" style="${getLinkThemeString(track)}">${track.name}</a>
-                                <span class="by">by ${getArtistString(track.artists, {strings, to})}</span>
-                            </li>
-                        `).join('\n')}
+                        ${(flash.tracks
+                            .map(track => strings('trackList.item.withArtists', {
+                                track: strings.link.track(track, {strings, to}),
+                                by: `<span class="by">${
+                                    strings('trackList.item.withArtists.by', {
+                                        artists: getArtistString(track.artists, {strings, to})
+                                    })
+                                }</span>`
+                            }))
+                            .map(row => `<li>${row}</li>`)
+                            .join('\n'))}
                     </ul>
                 `}
                 ${flash.contributors.textContent && fixWS`
@@ -4592,7 +4597,9 @@ function getArtistString(artists, {strings, to, showIcons = false, showContrib =
         return [
             strings.link.artist(who, {to}),
             showContrib && what && `(${what})`,
-            showIcons && urls.length && `<span class="icons">(${urls.map(iconifyURL).join(', ')})</span>`
+            showIcons && urls.length && `<span class="icons">(${
+                strings.list.unit(urls.map(url => iconifyURL(url, {strings, to})))
+            })</span>`
         ].filter(Boolean).join(' ');
     }));
 }
@@ -4700,24 +4707,25 @@ function fancifyFlashURL(url, flash, {strings}) {
     }</span>`;
 }
 
-function iconifyURL(url) {
+function iconifyURL(url, {strings, to}) {
+    const domain = new URL(url).hostname;
     const [ id, msg ] = (
-        url.includes('bandcamp.com') ? ['bandcamp', 'Bandcamp'] :
+        domain.includes('bandcamp.com') ? ['bandcamp', strings('misc.external.bandcamp')] :
         (
-            url.includes('music.solatrus.com')
-        ) ? ['bandcamp', `Bandcamp (${new URL(url).hostname})`] :
+            domain.includes('music.solatrus.com')
+        ) ? ['bandcamp', strings('misc.external.bandcamp.domain', {domain})] :
         (
-            url.includes('types.pl')
-        ) ? ['mastodon', `Mastodon (${new URL(url).hostname})`] :
-        url.includes('youtu') ? ['youtube', 'YouTube'] :
-        url.includes('soundcloud') ? ['soundcloud', 'SoundCloud'] :
-        url.includes('tumblr.com') ? ['tumblr', 'Tumblr'] :
-        url.includes('twitter.com') ? ['twitter', 'Twitter'] :
-        url.includes('deviantart.com') ? ['deviantart', 'DeviantArt'] :
-        url.includes('instagram.com') ? ['instagram', 'Instagram'] :
-        ['globe', `External (${new URL(url).hostname})`]
+            domain.includes('types.pl')
+        ) ? ['mastodon', strings('misc.external.mastodon.domain', {domain})] :
+        domain.includes('youtu') ? ['youtube', strings('misc.external.youtube')] :
+        domain.includes('soundcloud') ? ['soundcloud', strings('misc.external.soundcloud')] :
+        domain.includes('tumblr.com') ? ['tumblr', strings('misc.external.tumblr')] :
+        domain.includes('twitter.com') ? ['twitter', strings('misc.external.twitter')] :
+        domain.includes('deviantart.com') ? ['deviantart', strings('misc.external.deviantart')] :
+        domain.includes('instagram.com') ? ['instagram', strings('misc.external.bandcamp')] :
+        ['globe', strings('misc.external.domain', {domain})]
     );
-    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="/${C.STATIC_DIRECTORY}/icons.svg#icon-${id}"></use></svg></a>`;
+    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to.staticFile(`icons.svg#icon-${id}`)}"></use></svg></a>`;
 }
 
 function chronologyLinks(currentThing, {

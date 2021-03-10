@@ -109,6 +109,7 @@
     "misc.chronology.heading.coverArt": "{INDEX} cover art by {ARTIST}",
     "misc.chronology.heading.flash": "{INDEX} flash/game by {ARTIST}",
     "misc.chronology.heading.track": "{INDEX} track by {ARTIST}",
+    "misc.external.domain": "External ({DOMAIN})",
     "misc.external.bandcamp": "Bandcamp",
     "misc.external.bandcamp.domain": "Bandcamp ({DOMAIN})",
     "misc.external.deviantart": "DeviantArt",
