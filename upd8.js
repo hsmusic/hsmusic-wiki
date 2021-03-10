@@ -835,7 +835,7 @@ const replacerSpec = {
     if (error) process.exit();
 
     const categoryPart = Object.keys(replacerSpec).join('|');
-    transformInline.regexp = new RegExp(String.raw`\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
+    transformInline.regexp = new RegExp(String.raw`(?<!\\)\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
 }
 
 function transformInline(text, {strings, to}) {
@@ -884,7 +884,7 @@ function transformInline(text, {strings, to}) {
             logError`The link ${match} failed to be processed: ${error}`;
             return match;
         }
-    });
+    }).replaceAll(String.raw`\[[`, '[[');
 }
 
 function parseAttributes(string, {to}) {
