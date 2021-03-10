@@ -494,6 +494,10 @@ function genStrings(stringsJSON, defaultJSON = null) {
             conjunction: new Intl.ListFormat(code, {type: 'conjunction'}),
             disjunction: new Intl.ListFormat(code, {type: 'disjunction'}),
             unit: new Intl.ListFormat(code, {type: 'unit'})
+        },
+        plural: {
+            cardinal: new Intl.PluralRules(code, {type: 'cardinal'}),
+            ordinal: new Intl.PluralRules(code, {type: 'ordinal'})
         }
     };
 
@@ -523,9 +527,7 @@ function genStrings(stringsJSON, defaultJSON = null) {
 
 const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit = false}) => strings(
     (unit
-        ? `count.${stringKey}.withUnit` + (value === 1
-            ? '.singular'
-            : '.plural')
+        ? `count.${stringKey}.withUnit.` + strings.intl.plural.cardinal.select(value)
         : `count.${stringKey}`),
     {[argName]: strings.intl.number.format(value)});
 
@@ -568,7 +570,7 @@ const count = {
     },
 
     index: (value, {strings}) => {
-        return strings('count.index', {index: value});
+        return strings('count.index.' + strings.intl.plural.ordinal.select(value), {index: value});
     },
 
     number: value => strings.intl.number.format(value),
