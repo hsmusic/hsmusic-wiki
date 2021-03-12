@@ -2946,7 +2946,7 @@ function writeTrackPage(track) {
                 ${hasCommentary && fixWS`
                     <p>${strings('releaseInfo.artistCommentary')}</p>
                     <blockquote>
-                        ${transformMultiline(generateCommentary({strings, to}), {strings, to})}
+                        ${generateCommentary({strings, to})}
                     </blockquote>
                 `}
             `
