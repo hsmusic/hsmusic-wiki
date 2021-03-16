@@ -131,7 +131,7 @@ const genThumbs = require('./gen-thumbs');
 
 const C = require('./common/common');
 
-const CACHEBUST = 3;
+const CACHEBUST = 4;
 
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';

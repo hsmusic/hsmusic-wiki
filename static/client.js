@@ -41,21 +41,12 @@ function getFlash(el) {
     return flashData.find(flash => flash.directory === directory);
 }
 
-function openAlbum(directory) {
-    return rebase(`${C.ALBUM_DIRECTORY}/${directory}/`);
-}
-
-function openTrack(directory) {
-    return rebase(`${C.TRACK_DIRECTORY}/${directory}/`);
-}
-
-function openArtist(directory) {
-    return rebase(`${C.ARTIST_DIRECTORY}/${directory}/`);
-}
-
-function openFlash(flash) {
-    return rebase(`${C.FLASH_DIRECTORY}/${flash.directory}/`);
-}
+// TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
+// separ8te the tooling around that into common-shared code too.
+const openAlbum = d => rebase(`album/${d}`);
+const openTrack = d => rebase(`track/${d}`);
+const openArtist = d => rebase(`artist/${d}`);
+const openFlash = d => rebase(`flash/${d}`);
 
 /* i implemented these functions but we dont actually use them anywhere lol
 function isFlashPage() {
@@ -102,7 +93,7 @@ for (const a of document.body.querySelectorAll('[data-random]')) {
         }
 
         setTimeout(() => {
-            a.href = rebase(C.JS_DISABLED_DIRECTORY);
+            a.href = rebase('js-disabled');
         });
         switch (a.dataset.random) {
             case 'album': return a.href = openAlbum(pick(albumData).directory);
