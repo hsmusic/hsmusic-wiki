@@ -3061,6 +3061,20 @@ function writeArtistPage(artist) {
 
     const totalReleasedDuration = getTotalDuration(releasedTracks);
 
+    const countGroups = things => {
+        const usedGroups = things.flatMap(thing => thing.groups || thing.album?.groups || []);
+        return groupData
+            .map(group => ({
+                group,
+                contributions: usedGroups.filter(g => g === group).length
+            }))
+            .filter(({ contributions }) => contributions > 0)
+            .sort((a, b) => b.contributions - a.contributions);
+    };
+
+    const musicGroups = countGroups(releasedTracks);
+    const artGroups = countGroups(artThingsAll);
+
     let flashes, flashListChunks;
     if (wikiInfo.features.flashesAndGames) {
         flashes = C.sortByDate(artist.flashes.asContributor.slice());
@@ -3188,6 +3202,13 @@ function writeArtistPage(artist) {
                             artist: artist.name,
                             duration: strings.count.duration(totalReleasedDuration, {approximate: true, unit: true})
                         })}</p>
+                        <p>${strings('artistPage.musicGroupsLine', {
+                            groups: strings.list.unit(musicGroups
+                                .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
+                                    group: strings.link.groupInfo(group, {to}),
+                                    contributions: strings.count.contributions(contributions)
+                                })))
+                        })}</p>
                         ${generateTrackList(releasedTrackListChunks, {strings, to})}
                     `}
                     ${unreleasedTracks.length && fixWS`
@@ -3202,6 +3223,13 @@ function writeArtistPage(artist) {
                                 text: strings('artistPage.viewArtGallery.link')
                             })
                         })}</p>`}
+                        <p>${strings('artistPage.artGroupsLine', {
+                            groups: strings.list.unit(artGroups
+                                .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
+                                    group: strings.link.groupInfo(group, {to}),
+                                    contributions: strings.count.contributions(contributions)
+                                })))
+                        })}</p>
                         <dl>
                             ${artListChunks.map(({album, chunk}) => fixWS`
                                 <dt>${strings('artistPage.creditList.album.withDate', {
