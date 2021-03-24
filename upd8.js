@@ -131,7 +131,7 @@ const genThumbs = require('./gen-thumbs');
 
 const C = require('./common/common');
 
-const CACHEBUST = 4;
+const CACHEBUST = 5;
 
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
@@ -221,6 +221,7 @@ const urlSpec = {
         media: 'media/<>',
         albumCover: 'media/album-art/<>/cover.jpg',
         albumWallpaper: 'media/album-art/<>/bg.jpg',
+        albumBanner: 'media/album-art/<>/banner.jpg',
         trackCover: 'media/album-art/<>/<>.jpg',
         artistAvatar: 'media/artist-avatar/<>.jpg',
         flashArt: 'media/flash-art/<>.jpg'
@@ -1167,6 +1168,7 @@ async function processAlbumDataFile(file) {
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
+    album.bannerArtists = getContributionField(albumSection, 'Banner Art');
     album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
@@ -2012,6 +2014,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
 
         // missing properties are auto-filled, see below!
         body = {},
+        banner = {},
         main = {},
         sidebarLeft = {},
         sidebarRight = {},
@@ -2022,6 +2025,10 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     body.style ??= '';
 
     theme = theme || getThemeString(wikiInfo);
+
+    banner.classes ??= [];
+    banner.src ??= '';
+    banner.position ??= '';
 
     main.classes ??= [];
     main.content ??= '';
@@ -2142,8 +2149,17 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         </nav>
     `;
 
+    const bannerHTML = banner.position && banner.src && fixWS`
+        <img ${attributes({
+            id: 'banner',
+            src: banner.src,
+            alt: banner.alt
+        })} ${classes(...banner.classes || [])}>
+    `;
+
     const layoutHTML = [
         navHTML,
+        banner.position === 'top' && bannerHTML,
         (sidebarLeftHTML || sidebarRightHTML) ? fixWS`
             <div ${classes('layout-columns', !collapseSidebars && 'vertical-when-thin')}>
                 ${sidebarLeftHTML}
@@ -2151,6 +2167,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                 ${sidebarRightHTML}
             </div>
         ` : mainHTML,
+        banner.position === 'bottom' && bannerHTML,
         footerHTML
     ].filter(Boolean).join('\n');
 
@@ -2634,6 +2651,12 @@ function writeAlbumPage(album) {
             `--album-directory: ${album.directory}`
         ]),
 
+        banner: {
+            src: to.albumBanner(album.directory),
+            alt: strings('misc.alt.albumBanner'),
+            position: 'top'
+        },
+
         main: {
             content: fixWS`
                 ${generateCoverLink({
@@ -2661,6 +2684,13 @@ function writeAlbumPage(album) {
                         }),
                         album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
                             artists: getArtistString(album.wallpaperArtists, {
+                                strings, to,
+                                showContrib: true,
+                                showIcons: true
+                            })
+                        }),
+                        album.bannerArtists && strings('releaseInfo.bannerArtBy', {
+                            artists: getArtistString(album.bannerArtists, {
                                 strings, to,
                                 showContrib: true,
                                 showIcons: true
@@ -2826,6 +2856,13 @@ function writeTrackPage(track) {
             `--album-directory: ${album.directory}`,
             `--track-directory: ${track.directory}`
         ]),
+
+        banner: {
+            classes: ['dim'],
+            src: to.albumBanner(track.album.directory),
+            alt: strings('misc.alt.albumBanner'),
+            position: 'bottom'
+        },
 
         main: {
             content: fixWS`
@@ -3003,7 +3040,7 @@ function writeArtistPage(artist) {
         note = ''
     } = artist;
 
-    const artThingsAll = C.sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.tracks.asCoverArtist]));
+    const artThingsAll = C.sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.albums.asBannerArtist, ...artist.tracks.asCoverArtist]));
     const artThingsGallery = C.sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
     const commentaryThings = C.sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
 
@@ -3016,7 +3053,7 @@ function writeArtistPage(artist) {
     });
 
     const artListChunks = chunkByProperties(artThingsAll.flatMap(thing =>
-        (['coverArtists', 'wallpaperArtists']
+        (['coverArtists', 'wallpaperArtists', 'bannerArtists']
             .map(key => getArtistsAndContrib(thing, key))
             .filter(({ contrib }) => contrib)
             .map(props => ({
@@ -3245,6 +3282,7 @@ function writeArtistPage(artist) {
                                                 })
                                                 : `<i>${strings('artistPage.creditList.entry.album.' + {
                                                     wallpaperArtists: 'wallpaperArt',
+                                                    bannerArtists: 'bannerArt',
                                                     coverArtists: 'coverArt'
                                                 }[key])}</i>`),
                                             ...props
@@ -3712,6 +3750,7 @@ const listingSpec = [
                             artist.tracks.asCoverArtist.length +
                             artist.albums.asCoverArtist.length +
                             artist.albums.asWallpaperArtist.length +
+                            artist.albums.asBannerArtist.length +
                             (wikiInfo.features.flashesAndGames
                                 ? artist.flashes.asContributor.length
                                 : 0)
@@ -5639,7 +5678,7 @@ async function main() {
 
     contributionData = Array.from(new Set([
         ...trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
-        ...albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || []]),
+        ...albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
         ...(flashData?.flatMap(flash => [...flash.contributors || []]) || [])
     ]));
 
@@ -5724,7 +5763,8 @@ async function main() {
             asArtist: filterProp(albumData, 'artists'),
             asCommentator: filterCommentary(albumData),
             asCoverArtist: filterProp(albumData, 'coverArtists'),
-            asWallpaperArtist: filterProp(albumData, 'wallpaperArtists')
+            asWallpaperArtist: filterProp(albumData, 'wallpaperArtists'),
+            asBannerArtist: filterProp(albumData, 'bannerArtists')
         };
         if (wikiInfo.features.flashesAndGames) {
             artist.flashes = {
