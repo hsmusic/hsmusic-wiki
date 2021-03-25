@@ -422,7 +422,7 @@ function genStrings(stringsJSON, defaultJSON = null) {
     // strings from embedding HTML tags or accidentally including characters
     // that throw HTML parsers off.
     for (const key of Object.keys(stringsJSON)) {
-        stringsJSON[key] = escapeAttributeValue(stringsJSON[key]);
+        stringsJSON[key] = he.encode(stringsJSON[key], {useNamedReferences: true});
     }
 
     // It's time to cre8te the actual langauge function!
@@ -1899,7 +1899,9 @@ function stringifyArtistData() {
 }
 
 function escapeAttributeValue(value) {
-    return he.encode(value, {useNamedReferences: true});
+    return value
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
 }
 
 function attributes(attribs) {
