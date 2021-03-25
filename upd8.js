@@ -2861,7 +2861,7 @@ function writeTrackPage(track) {
             `--track-directory: ${track.directory}`
         ]),
 
-        banner: {
+        banner: album.bannerArtists && {
             classes: ['dim'],
             src: to.albumBanner(track.album.directory),
             alt: strings('misc.alt.albumBanner'),
