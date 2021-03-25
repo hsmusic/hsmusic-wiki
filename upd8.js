@@ -2808,7 +2808,7 @@ function writeTrackPage(track) {
 
     const tracksReferenced = track.references;
     const otherReleases = track.otherReleases;
-    const listTag = getAlbumListTag(track.album);
+    const listTag = getAlbumListTag(album);
 
     let flashesThatFeature;
     if (wikiInfo.features.flashesAndGames) {
@@ -2855,7 +2855,7 @@ function writeTrackPage(track) {
 
     return ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
         title: strings('trackPage.title', {track: track.name}),
-        stylesheet: getAlbumStylesheet(track.album, {to}),
+        stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(track, [
             `--album-directory: ${album.directory}`,
             `--track-directory: ${track.directory}`
@@ -2863,7 +2863,7 @@ function writeTrackPage(track) {
 
         banner: album.bannerArtists && {
             classes: ['dim'],
-            src: to.albumBanner(track.album.directory),
+            src: to.albumBanner(album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'bottom'
         },
