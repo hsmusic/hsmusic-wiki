@@ -612,9 +612,10 @@ const list = {
 // only the track listing, not track data itself), and dealing with errors of
 // missing track files (or track files which are not linked to al8ums). All a
 // 8unch of stuff that's a pain to deal with for no apparent 8enefit.
-async function findFiles(dataPath) {
+async function findFiles(dataPath, filter = f => true) {
     return (await readdir(dataPath))
-        .map(file => path.join(dataPath, file));
+        .map(file => path.join(dataPath, file))
+        .filter(file => filter(file));
 }
 
 function* getSections(lines) {
@@ -5316,7 +5317,7 @@ async function main() {
     }
 
     if (langPath) {
-        const languageDataFiles = await findFiles(langPath);
+        const languageDataFiles = await findFiles(langPath, f => path.extname(f) === '.json');
         const results = await progressPromiseAll(`Reading & processing language files.`, languageDataFiles
             .map(file => processLanguageFile(file, defaultStrings.json)));
 
