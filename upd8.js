@@ -1169,8 +1169,9 @@ async function processAlbumDataFile(file) {
     album.name = getBasicField(albumSection, 'Album');
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
-    album.bannerArtists = getContributionField(albumSection, 'Banner Art');
     album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
+    album.bannerArtists = getContributionField(albumSection, 'Banner Art');
+    album.bannerStyle = getMultilineField(albumSection, 'Banner Style');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
@@ -2154,11 +2155,12 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     `;
 
     const bannerHTML = banner.position && banner.src && fixWS`
-        <img ${attributes({
-            id: 'banner',
-            src: banner.src,
-            alt: banner.alt
-        })} ${classes(...banner.classes || [])}>
+        <div id="banner" ${classes(...banner.classes || [])}>
+            <img ${attributes({
+                src: banner.src,
+                alt: banner.alt
+            })}>
+        </div>
     `;
 
     const layoutHTML = [
@@ -2780,16 +2782,19 @@ function writeAlbumPage(album) {
 }
 
 function getAlbumStylesheet(album, {to}) {
-    if (album.wallpaperArtists) {
-        return fixWS`
+    return [
+        album.wallpaperArtists && fixWS`
             body::before {
                 background-image: url("${to.albumWallpaper(album.directory)}");
                 ${album.wallpaperStyle}
             }
-        `;
-    } else {
-        return '';
-    }
+        `,
+        album.bannerStyle && fixWS`
+            #banner img {
+                ${album.bannerStyle}
+            }
+        `
+    ].filter(Boolean).join('\n');
 }
 
 function writeTrackPages() {

@@ -47,11 +47,16 @@ body::before {
 #banner {
     margin: 10px 0;
     width: 100%;
-    display: block;
+    background: black;
 }
 
-#banner.dim {
-    filter: brightness(0.8);
+#banner.dim img {
+    opacity: 0.8;
+}
+
+#banner img {
+    display: block;
+    width: 100%;
 }
 
 a {
