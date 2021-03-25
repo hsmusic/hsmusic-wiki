@@ -2026,6 +2026,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
 
     theme = theme || getThemeString(wikiInfo);
 
+    banner ||= {};
     banner.classes ??= [];
     banner.src ??= '';
     banner.position ??= '';
@@ -2651,7 +2652,7 @@ function writeAlbumPage(album) {
             `--album-directory: ${album.directory}`
         ]),
 
-        banner: {
+        banner: album.bannerArtists && {
             src: to.albumBanner(album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'top'
