@@ -3068,9 +3068,10 @@ function writeArtistPage(artist) {
             .map(props => ({
                 album: thing.album || thing,
                 track: thing.album ? thing : null,
+                date: +(thing.coverArtDate || thing.date),
                 ...props
             })))
-    ), ['album']);
+    ), ['date', 'album']);
 
     const commentaryListChunks = chunkByProperties(commentaryThings.map(thing => ({
         album: thing.album || thing,
@@ -3084,6 +3085,7 @@ function writeArtistPage(artist) {
     const chunkTracks = tracks => (
         chunkByProperties(tracks.map(track => ({
             track,
+            date: +track.date,
             album: track.album,
             duration: track.duration,
             artists: (track.artists.some(({ who }) => who === artist)
@@ -3096,9 +3098,9 @@ function writeArtistPage(artist) {
                     track.contributors.find(({ who }) => who === artist)?.what
                 ].filter(Boolean).join(', ')
             }
-        })), ['album'])
-        .map(({album, chunk}) => ({
-            album, chunk,
+        })), ['date', 'album'])
+        .map(({date, album, chunk}) => ({
+            date, album, chunk,
             duration: getTotalDuration(chunk),
         })));
 
@@ -3165,10 +3167,10 @@ function writeArtistPage(artist) {
 
     const generateTrackList = (chunks, {strings, to}) => fixWS`
         <dl>
-            ${chunks.map(({album, chunk, duration}) => fixWS`
+            ${chunks.map(({date, album, chunk, duration}) => fixWS`
                 <dt>${strings('artistPage.creditList.album.withDate.withDuration', {
                     album: strings.link.album(album, {to}),
-                    date: strings.count.date(album.date),
+                    date: strings.count.date(date),
                     duration: strings.count.duration(duration, {approximate: true})
                 })}</dt>
                 <dd><ul>
@@ -3277,10 +3279,10 @@ function writeArtistPage(artist) {
                                 })))
                         })}</p>
                         <dl>
-                            ${artListChunks.map(({album, chunk}) => fixWS`
+                            ${artListChunks.map(({date, album, chunk}) => fixWS`
                                 <dt>${strings('artistPage.creditList.album.withDate', {
                                     album: strings.link.album(album, {to}),
-                                    date: strings.count.date(album.date)
+                                    date: strings.count.date(date)
                                 })}</dt>
                                 <dd><ul>
                                     ${(chunk
