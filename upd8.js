@@ -2310,7 +2310,7 @@ function getNewReleases(numReleases) {
 }
 
 function writeSymlinks() {
-    return progressPromiseAll('Building site symlinks.', [
+    return progressPromiseAll('Writing site symlinks.', [
         link(path.join(__dirname, C.COMMON_DIRECTORY), C.COMMON_DIRECTORY),
         link(path.join(__dirname, C.STATIC_DIRECTORY), C.STATIC_DIRECTORY),
         link(mediaPath, C.MEDIA_DIRECTORY)
@@ -5201,11 +5201,18 @@ async function processLanguageFile(file, defaultStrings = null) {
 // * the language strings
 // * a shadowing writePages function for outputing to the appropriate subdir
 // * a shadowing urls object for linking to the appropriate relative paths
-async function wrapLanguages(fn) {
-    for (const key of Object.keys(languages)) {
-        if (key === 'default') continue;
+async function wrapLanguages(fn, writeOneLanguage = null) {
+    const k = writeOneLanguage
+    const languagesToRun = (k
+        ? {[k]: languages[k]}
+        : languages)
 
-        const strings = languages[key];
+    const entries = Object.entries(languagesToRun)
+        .filter(([ key ]) => key !== 'default');
+
+    for (let i = 0; i < entries.length; i++) {
+        const [ key, strings ] = entries[i];
+
         const baseDirectory = (strings === languages.default ? '' : strings.code);
 
         const shadow_writePage = (urlKey, directory, pageFn) => writePage(strings, baseDirectory, urlKey, directory, pageFn);
@@ -5217,7 +5224,7 @@ async function wrapLanguages(fn) {
             baseDirectory,
             strings,
             writePage: shadow_writePage
-        });
+        }, i, entries);
     }
 }
 
@@ -5226,14 +5233,14 @@ async function main() {
         // Data files for the site, including flash, artist, and al8um data,
         // and like a jillion other things too. Pretty much everything which
         // makes an individual wiki what it is goes here!
-        'data': {
+        'data-path': {
             type: 'value'
         },
 
         // Static media will 8e referenced in the site here! The contents are
         // categorized; check out MEDIA_DIRECTORY and rel8ted constants in
         // common/common.js. (This gets symlinked into the --data directory.)
-        'media': {
+        'media-path': {
             type: 'value'
         },
 
@@ -5247,7 +5254,7 @@ async function main() {
         // Unlike the other options here, this one's optional - the site will
         // 8uild with the default (English) strings if this path is left
         // unspecified.
-        'lang': {
+        'lang-path': {
             type: 'value'
         },
 
@@ -5257,7 +5264,7 @@ async function main() {
         // site. Just keep in mind that the gener8ted result will contain a
         // couple symlinked directories, so if you're uploading, you're pro8a8ly
         // gonna want to resolve those yourself.
-        'out': {
+        'out-path': {
             type: 'value'
         },
 
@@ -5266,6 +5273,12 @@ async function main() {
         // every media file at run time. Pass this to skip it.
         'skip-thumbs': {
             type: 'flag'
+        },
+
+        // Only want 8uild one language during testing? This can chop down
+        // 8uild times a pretty 8ig chunk! Just pass a single language code.
+        'lang': {
+            type: 'value'
         },
 
         'queue-size': {
@@ -5281,10 +5294,12 @@ async function main() {
         [parseOptions.handleUnknown]: () => {}
     });
 
-    dataPath = miscOptions.data || process.env.HSMUSIC_DATA;
-    mediaPath = miscOptions.media || process.env.HSMUSIC_MEDIA;
-    langPath = miscOptions.lang || process.env.HSMUSIC_LANG; // Can 8e left unset!
-    outputPath = miscOptions.out || process.env.HSMUSIC_OUT;
+    dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
+    mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+    langPath = miscOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
+    outputPath = miscOptions['out-path'] || process.env.HSMUSIC_OUT;
+
+    const writeOneLanguage = miscOptions['lang'];
 
     {
         let errored = false;
@@ -5345,6 +5360,15 @@ async function main() {
     }
 
     logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
+
+    if (writeOneLanguage && !(writeOneLanguage in languages)) {
+        logError`Specified to write only ${writeOneLanguage}, but there is no strings file with this language code!`;
+        return;
+    } else if (writeOneLanguage) {
+        logInfo`Writing only language ${writeOneLanguage} this run.`;
+    } else {
+        logInfo`Writing all languages.`;
+    }
 
     wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
     if (wikiInfo.error) {
@@ -5796,7 +5820,7 @@ async function main() {
     // They're here to make development quicker when you're only working
     // on some particular area(s) of the site rather than making changes
     // across all of them.
-    const buildFlags = await parseOptions(process.argv.slice(2), {
+    const writeFlags = await parseOptions(process.argv.slice(2), {
         all: {type: 'flag'}, // Defaults to true if none 8elow specified.
 
         album: {type: 'flag'},
@@ -5814,9 +5838,9 @@ async function main() {
         [parseOptions.handleUnknown]: () => {}
     });
 
-    const buildAll = !Object.keys(buildFlags).length || buildFlags.all;
+    const writeAll = !Object.keys(writeFlags).length || writeFlags.all;
 
-    logInfo`Building site pages: ${buildAll ? 'all' : Object.keys(buildFlags).join(', ')}`;
+    logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
 
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings});
@@ -5835,10 +5859,10 @@ async function main() {
         flash: writeFlashPages
     };
 
-    const buildSteps = (buildAll
+    const buildSteps = (writeAll
         ? Object.values(buildDictionary)
         : (Object.entries(buildDictionary)
-            .filter(([ flag ]) => buildFlags[flag])
+            .filter(([ flag ]) => writeFlags[flag])
             .map(([ flag, fn ]) => fn)));
 
     // The writeThingPages functions don't actually immediately do any file
@@ -5871,18 +5895,21 @@ async function main() {
         }
     }
 
-    await wrapLanguages(async ({strings, ...opts}) => {
-        console.log(`\x1b[34;1m${strings.code} (-> /${opts.baseDirectory}) ${'-'.repeat(50)}\x1b[0m`);
+    await wrapLanguages(async ({strings, ...opts}, i, entries) => {
+        console.log(`\x1b[34;1m${
+            (`[${i + 1}/${entries.length}] ${strings.code} (-> /${opts.baseDirectory}) `
+                .padEnd(60, '-'))
+        }\x1b[0m`);
         await progressPromiseAll(`Writing ${strings.code}`, queue(
             pageWriteFns.map(fn => () => fn({strings, ...opts})),
             queueSize
         ));
-    });
+    }, writeOneLanguage);
 
     decorateTime.displayTime();
 
     // The single most important step.
-    console.log('Written!');
+    logInfo`Written!`;
 }
 
 main().catch(error => console.error(error));
