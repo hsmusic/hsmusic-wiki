@@ -133,6 +133,8 @@ const C = require('./common/common');
 
 const CACHEBUST = 5;
 
+const DATA_DIRECTORY = 'data';
+
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
 const ARTIST_DATA_FILE = 'artists.txt';
@@ -183,6 +185,10 @@ let queueSize;
 let languages;
 
 const urlSpec = {
+    data: {
+        track: 'track/<>'
+    },
+
     localized: {
         home: '',
         site: '<>',
@@ -1983,6 +1989,104 @@ function img({
     }
 }
 
+function serializeLink(thing) {
+    return Object.fromEntries([
+        ['name', thing.name],
+        ['directory', thing.directory],
+        ['color', thing.color]
+    ].filter(([ key, value ]) => value));
+}
+
+function serializeContribs(contribs) {
+    return contribs.map(({ who, what }) => ({
+        who: serializeLink(who),
+        what
+    }));
+}
+
+function validateWritePath(path, spec) {
+    if (!Array.isArray(path)) {
+        return {error: `Expected array, got ${path}`};
+    }
+
+    const definedKeys = Object.keys(spec);
+    const specifiedKey = path[0];
+
+    if (!definedKeys.includes(specifiedKey)) {
+        return {error: `Specified key ${specifiedKey} isn't defined`};
+    }
+
+    const expectedArgs = spec[specifiedKey].match(/<>/g).length;
+    const specifiedArgs = path.length - 1;
+
+    if (specifiedArgs !== expectedArgs) {
+        return {error: `Expected ${expectedArgs} arguments, got ${specifiedArgs}`};
+    }
+
+    return {success: true};
+}
+
+function validateWriteObject(obj) {
+    if (typeof obj !== 'object') {
+        return {error: `Expected object, got ${typeof obj}`};
+    }
+
+    if (typeof obj.type !== 'string') {
+        return {error: `Expected type to be string, got ${obj.type}`};
+    }
+
+    switch (obj.type) {
+        case 'legacy': {
+            if (typeof obj.write !== 'function') {
+                return {error: `Expected write to be string, got ${obj.write}`};
+            }
+
+            break;
+        }
+
+        case 'page': {
+            const path = validateWritePath(obj.path, urlSpec.localized);
+            if (path.error) {
+                return {error: `Path validation failed: ${path.error}`};
+            }
+
+            if (typeof obj.page !== 'function') {
+                return {error: `Expected page to be function, got ${obj.content}`};
+            }
+
+            break;
+        }
+
+        case 'data': {
+            const path = validateWritePath(obj.path, urlSpec.data);
+            if (path.error) {
+                return {error: `Path validation failed: ${path.error}`};
+            }
+
+            if (typeof obj.data !== 'function') {
+                return {error: `Expected data to be function, got ${obj.data}`};
+            }
+
+            break;
+        }
+
+        default: {
+            return {error: `Unknown type: ${obj.type}`};
+        }
+    }
+
+    return {success: true};
+}
+
+async function writeData(urlKey, directory, data) {
+    const paths = writePage.paths(DATA_DIRECTORY, urlKey, directory, {
+        spec: urlSpec.data,
+        file: 'data.json'
+    });
+
+    await writePage.write(JSON.stringify(data), {paths});
+}
+
 async function writePage(strings, baseDirectory, urlKey, directory, pageFn) {
     // Generally this function shouldn't 8e called directly - instead use the
     // shadowed version provided 8y wrapLanguages, which automatically provides
@@ -2227,10 +2331,17 @@ writePage.write = async (content, {paths}) => {
     await writeFile(paths.outputFile, content);
 };
 
-writePage.paths = (baseDirectory, urlKey, directory) => {
+writePage.paths = (baseDirectory, urlKey, directory, {
+    file = 'index.html',
+    spec = urlSpec.localized
+} = {}) => {
     const prefix = baseDirectory ? baseDirectory + '/' : '';
 
-    const pathname = prefix + urlSpec.localized[urlKey].replace('<>', directory);
+    if (!(urlKey in spec)) {
+        throw new Error(`Unknown URL key: ${urlKey}`);
+    }
+
+    const pathname = prefix + spec[urlKey].replace('<>', directory);
 
     // Needed for the rare directory which itself contains a slash, e.g. for
     // listings, with directories like 'albums/by-name'.
@@ -2238,7 +2349,7 @@ writePage.paths = (baseDirectory, urlKey, directory) => {
     const prefixToShared = (baseDirectory ? '../' : '') + prefixToLocalized;
 
     const outputDirectory = path.join(outputPath, pathname);
-    const outputFile = path.join(outputDirectory, 'index.html');
+    const outputFile = path.join(outputDirectory, file);
 
     return {
         pathname,
@@ -2858,7 +2969,28 @@ function writeTrackPage(track) {
         ].filter(Boolean).join('\n'),
         {strings, to});
 
-    return ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
+    const data = {
+        type: 'data',
+        path: ['track', track.directory],
+        data: () => ({
+            name: track.name,
+            directory: track.directory,
+            date: track.date,
+            duration: track.duration,
+            color: track.color,
+            links: {
+                artists: serializeContribs(track.artists),
+                contributors: serializeContribs(track.contributors),
+                album: serializeLink(track.album),
+                groups: track.album.groups.map(serializeLink),
+                references: track.references.map(serializeLink),
+                referencedBy: track.referencedBy.map(serializeLink)
+            }
+        })
+    };
+
+    // const page = ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
+    const page = {type: 'page', path: ['track', track.directory], page: ({strings, to}) => ({
         title: strings('trackPage.title', {track: track.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(track, [
@@ -3032,7 +3164,9 @@ function writeTrackPage(track) {
                 </div>
             `
         }
-    }));
+    })};
+
+    return [data, page];
 }
 
 function writeArtistPages() {
@@ -5867,16 +6001,22 @@ async function main() {
             .filter(([ flag ]) => writeFlags[flag])
             .map(([ flag, fn ]) => fn)));
 
+    // *NB: While what's 8elow is 8asically still true in principle, the
+    //      format is QUITE DIFFERENT than what's descri8ed here! There
+    //      will 8e actual document8tion on like, what the return format
+    //      looks like soon, once we implement a 8unch of other pages and
+    //      are certain what they actually, uh, will look like, in the end.*
+    //
     // The writeThingPages functions don't actually immediately do any file
     // writing themselves; an initial call will only gather the relevant data
     // which is *then* used for writing. So the return value is a function
     // (or an array of functions) which expects {writePage, strings}, and
     // *that's* what we call after -- multiple times, once for each language.
-    let pageWriteFns;
+    let writes;
     {
         let error = false;
 
-        pageWriteFns = buildSteps.flatMap(fn => {
+        writes = buildSteps.flatMap(fn => {
             const fns = fn() || [];
 
             // Do a quick valid8tion! If one of the writeThingPages functions go
@@ -5884,8 +6024,26 @@ async function main() {
             if (!Array.isArray(fns)) {
                 logError`${fn.name} didn't return an array!`;
                 error = true;
+            } else if (fns.every(entry => Array.isArray(entry))) {
+                if (!(
+                    fns.every(entry => entry.every(obj => typeof obj === 'object')) &&
+                    fns.every(entry => entry.every(obj => {
+                        const result = validateWriteObject(obj);
+                        if (result.error) {
+                            logError`Validating write object failed: ${result.error}`;
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }))
+                )) {
+                    logError`${fn.name} uses updated format, but entries are invalid!`;
+                    error = true;
+                }
+
+                return fns.flatMap(writes => writes);
             } else if (fns.some(fn => typeof fn !== 'function')) {
-                logError`${fn.name} didn't return all functions!`;
+                logError`${fn.name} didn't return all functions or all arrays!`;
                 error = true;
             }
 
@@ -5895,7 +6053,43 @@ async function main() {
         if (error) {
             return;
         }
+
+        // The modern(TM) return format for each writeThingPages function is an
+        // array of arrays, each of which's items are 8ig Complicated Objects
+        // that 8asically look like {type, path, content}. 8ut surprise, these
+        // aren't actually implemented in most places yet! So, we transform
+        // stuff in the old format here. 'Scept keep in mind, the OLD FORMAT
+        // doesn't really give us most of the info we want for Cool And Modern
+        // Reasons, so they're going into a fancy {type: 'legacy'} sort of
+        // o8ject, with a plain {write} property for, uh, the writing stuff,
+        // same as usual.
+        //
+        // I promise this document8tion will get 8etter when we make progress
+        // actually moving old pages over. Also it'll 8e hecks of less work
+        // than previous restructures, don't worry.
+        writes = writes.map(entry =>
+            typeof entry === 'object' ? entry :
+            typeof entry === 'function' ? {type: 'legacy', write: entry} :
+            {type: 'wut', entry});
+
+        const wut = writes.filter(({ type }) => type === 'wut');
+        if (wut.length) {
+            // Oh g*d oh h*ck.
+            logError`Uhhhhh writes contains something 8esides o8jects and functions?`;
+            logError`Definitely a 8ug!`;
+            console.log(wut);
+            return;
+        }
     }
+
+    const localizedWrites = writes.filter(({ type }) => type === 'page' || type === 'legacy');
+    const dataWrites = writes.filter(({ type }) => type === 'data');
+
+    await progressPromiseAll(`Writing data files shared across languages.`, queue(
+        // TODO: This only supports one <>-style argument.
+        dataWrites.map(({path, data}) => () => writeData(path[0], path[1], data())),
+        queueSize
+    ));
 
     await wrapLanguages(async ({strings, ...opts}, i, entries) => {
         console.log(`\x1b[34;1m${
@@ -5903,7 +6097,19 @@ async function main() {
                 .padEnd(60, '-'))
         }\x1b[0m`);
         await progressPromiseAll(`Writing ${strings.code}`, queue(
-            pageWriteFns.map(fn => () => fn({strings, ...opts})),
+            localizedWrites.map(({type, ...props}) => () => {
+                switch (type) {
+                    case 'legacy': {
+                        const { write } = props;
+                        return write({strings, ...opts});
+                    }
+                    case 'page': {
+                        const { path, page } = props;
+                        // TODO: This only supports one <>-style argument.
+                        return opts.writePage(path[0], path[1], ({to}) => page({strings, to}));
+                    }
+                }
+            }),
             queueSize
         ));
     }, writeOneLanguage);
