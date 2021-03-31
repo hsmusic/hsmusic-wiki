@@ -234,18 +234,29 @@ const urlSpec = {
     }
 };
 
-const linkHelper = (hrefFn, {color = true} = {}) =>
+const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {
         strings, to,
         text = '',
         class: className = '',
         hash = ''
-    }) => `<a href="${hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : '')}" ${attributes({
-        style: color ? getLinkThemeString(thing) : '',
-        class: className
-    })}>${text || thing.name}</a>`;
+    }) => (
+        `<a href="${hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : '')}" ${attributes({
+            ...attr ? attr(thing) : {},
+            style: color ? getLinkThemeString(thing) : '',
+            class: className
+        })}>${text || thing.name}</a>`
+    );
 
-const linkDirectory = (key, conf) => linkHelper(({directory}, {to}) => to[key](directory), conf);
+const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
+    linkHelper((thing, {to}) => to[key](thing.directory), {
+        attr: thing => ({
+            ...attr ? attr(thing) : {},
+            ...expose ? {[expose]: thing.directory} : {}
+        }),
+        ...conf
+    });
+
 const linkPathname = (key, conf) => linkHelper((pathname, {to}) => to[key](pathname), conf);
 const linkIndex = (key, conf) => linkHelper((_, {to}) => to[key](''), conf);
 
@@ -266,7 +277,7 @@ const link = {
     newsEntry: linkDirectory('newsEntry', {color: false}),
     staticPage: linkDirectory('staticPage', {color: false}),
     tag: linkDirectory('tag'),
-    track: linkDirectory('track'),
+    track: linkDirectory('track', {expose: 'data-track'}),
 
     media: linkPathname('media', {color: false}),
     root: linkPathname('root', {color: false}),
