@@ -124,7 +124,8 @@ const {
     sortByName,
     splitArray,
     th,
-    unique
+    unique,
+    withEntries
 } = require('./upd8-util');
 
 const genThumbs = require('./gen-thumbs');
@@ -132,8 +133,6 @@ const genThumbs = require('./gen-thumbs');
 const C = require('./common/common');
 
 const CACHEBUST = 5;
-
-const DATA_DIRECTORY = 'data';
 
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
@@ -186,12 +185,17 @@ let languages;
 
 const urlSpec = {
     data: {
+        root: '',
+        path: '<>',
+
         track: 'track/<>'
     },
 
     localized: {
+        root: '',
+        path: '<>',
+
         home: '',
-        site: '<>',
 
         album: 'album/<>/',
         albumCommentary: 'commentary/album/<>/',
@@ -219,12 +223,14 @@ const urlSpec = {
     },
 
     shared: {
-        root: '<>',
+        root: '',
+        path: '<>',
 
         commonFile: 'common/<>',
         staticFile: 'static/<>',
 
-        media: 'media/<>',
+        media: 'media/',
+        mediaPath: 'media/<>',
         albumCover: 'media/album-art/<>/cover.jpg',
         albumWallpaper: 'media/album-art/<>/bg.jpg',
         albumBanner: 'media/album-art/<>/banner.jpg',
@@ -233,6 +239,13 @@ const urlSpec = {
         flashArt: 'media/flash-art/<>.jpg'
     }
 };
+
+// This gets automatically switched in place when working from a baseDirectory,
+// so it should never be referenced manually.
+urlSpec.localizedWithBaseDirectory = withEntries(
+    urlSpec.localized,
+    entries => entries.map(([key, path]) => [key, '<>/' + path])
+);
 
 const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {
@@ -249,7 +262,7 @@ const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     );
 
 const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
-    linkHelper((thing, {to}) => to[key](thing.directory), {
+    linkHelper((thing, {to}) => to('localized.' + key, thing.directory), {
         attr: thing => ({
             ...attr ? attr(thing) : {},
             ...expose ? {[expose]: thing.directory} : {}
@@ -257,8 +270,8 @@ const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
         ...conf
     });
 
-const linkPathname = (key, conf) => linkHelper((pathname, {to}) => to[key](pathname), conf);
-const linkIndex = (key, conf) => linkHelper((_, {to}) => to[key](''), conf);
+const linkPathname = (key, conf) => linkHelper((pathname, {to}) => to(key, pathname), conf);
+const linkIndex = (key, conf) => linkHelper((_, {to}) => to('localized.' + key), conf);
 
 const link = {
     album: linkDirectory('album'),
@@ -279,9 +292,10 @@ const link = {
     tag: linkDirectory('tag'),
     track: linkDirectory('track', {expose: 'data-track'}),
 
-    media: linkPathname('media', {color: false}),
-    root: linkPathname('root', {color: false}),
-    site: linkPathname('site', {color: false})
+    media: linkPathname('shared.mediaPath', {color: false}),
+    root: linkPathname('shared.path', {color: false}),
+    data: linkPathname('data.path', {color: false}),
+    site: linkPathname('localized.path', {color: false})
 };
 
 const thumbnailHelper = name => file =>
@@ -293,21 +307,69 @@ const thumb = {
 };
 
 function generateURLs(fromPath) {
-    const helper = toPath => {
-        let argIndex = 0;
-        const relative = (path.relative(fromPath, toPath.replaceAll('<>', () => `<${argIndex++}>`))
-            + (toPath.endsWith('/') ? '/' : ''));
-        return (...args) => relative.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+    const getValueForFullKey = (obj, fullKey) => {
+        const [ groupKey, subKey ] = fullKey.split('.');
+        if (!groupKey || !subKey) {
+            throw new Error(`Expected group key and subkey (got ${fullKey})`);
+        }
+
+        if (!obj.hasOwnProperty(groupKey)) {
+            throw new Error(`Expected valid group key (got ${groupKey})`);
+        }
+
+        const group = obj[groupKey];
+
+        if (!group.hasOwnProperty(subKey)) {
+            throw new Error(`Expected valid subkey (got ${subKey} for group ${groupKey})`);
+        }
+
+        return group[subKey];
     };
 
-    return Object.fromEntries(Object.entries({...urlSpec.localized, ...urlSpec.shared}).map(
-        ([key, path]) => [key, helper(path)]
-    ));
+    const generateTo = fromPath => {
+        const pathHelper = (toPath) => {
+            let argIndex = 0;
+            return (path.relative(fromPath, toPath.replaceAll('<>', () => `<${argIndex++}>`))
+                + (toPath.endsWith('/') ? '/' : ''));
+        };
+
+        const groupHelper = urlGroup => withEntries(urlGroup, entries => entries
+            .map(([key, path]) => [key, pathHelper(path)]));
+
+        const relative = withEntries(urlSpec, entries => entries
+            .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
+
+        const to = (key, ...args) => {
+            const string = getValueForFullKey(relative, key)
+                .replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+
+            // Kinda hacky lol, 8ut it works.
+            const missing = string.match(/<([0-9]+)>/g);
+            if (missing) {
+                throw new Error(`Expected ${missing[missing.length - 1]} arguments, got ${args.length}`);
+            }
+
+            return string;
+        };
+
+        return {to, relative};
+    };
+
+    const generateFrom = () => {
+        const map = withEntries(urlSpec, entries => entries
+            .map(([key, group]) => [key, withEntries(group, entries => entries
+                .map(([key, path]) => [key, generateTo(path)])
+            )]));
+
+        const from = key => getValueForFullKey(map, key);
+
+        return {from, map};
+    };
+
+    return generateFrom();
 }
 
-const urls = Object.fromEntries(Object.entries({...urlSpec.localized, ...urlSpec.shared}).map(
-    ([key, path]) => [key, generateURLs(path)]
-));
+const urls = generateURLs();
 
 const searchHelper = (keys, dataFn, findFn) => ref => {
     if (!ref) return null;
@@ -944,7 +1006,7 @@ function parseAttributes(string, {to}) {
             const value = string.slice(vStart, vEnd);
             i = vEnd + endOffset;
             if (attribute === 'src' && value.startsWith('media/')) {
-                attributes[attribute] = to.media(value.slice('media/'.length));
+                attributes[attribute] = to('shared.mediaPath', value.slice('media/'.length));
             } else {
                 attributes[attribute] = value;
             }
@@ -2089,36 +2151,34 @@ function validateWriteObject(obj) {
     return {success: true};
 }
 
-async function writeData(urlKey, directory, data) {
-    const paths = writePage.paths(DATA_DIRECTORY, urlKey, directory, {
-        spec: urlSpec.data,
-        file: 'data.json'
-    });
-
+async function writeData(subKey, directory, data) {
+    const paths = writePage.paths('', 'data.' + subKey, directory, {file: 'data.json'});
     await writePage.write(JSON.stringify(data), {paths});
 }
 
-async function writePage(strings, baseDirectory, urlKey, directory, pageFn) {
+async function writePage(strings, baseDirectory, pageSubKey, directory, pageFn) {
     // Generally this function shouldn't 8e called directly - instead use the
     // shadowed version provided 8y wrapLanguages, which automatically provides
     // the appropriate baseDirectory and strings arguments. (The utility
     // functions attached to this function are generally useful, though!)
 
-    const paths = writePage.paths(baseDirectory, urlKey, directory);
+    const paths = writePage.paths(baseDirectory, 'localized.' + pageSubKey, directory);
 
-    // This is kinda complic8ted. May8e most of it can 8e moved into the code
-    // which gener8tes the urls o8ject in the first place? Or all that can 8e
-    // moved here? Or hey, may8e all THAT code is 8asically no longer needed.
-    // Worth thinking a8out.
-    const sharedKeys = Object.keys(urlSpec.shared);
-    const to = Object.fromEntries(Object.entries(urls[urlKey]).map(
-        ([key, fn]) => [
-            key,
-            (sharedKeys.includes(key) && baseDirectory
-                ? (...args) => paths.prefixToShared + fn(...args)
-                : (...args) => paths.prefixToLocalized + fn(...args))
-        ]
-    ));
+    const to = (targetFullKey, ...args) => {
+        const [ groupKey, subKey ] = targetFullKey.split('.')[0];
+        let path = paths.subdirectoryPrefix
+        // When linking to *outside* the localized area of the site, we need to
+        // make sure the result is correctly relative to the 8ase directory.
+        if (groupKey !== 'localized' && baseDirectory) {
+            path += urls.from('localizedWithBaseDirectory.' + pageSubKey).to(targetFullKey, ...args);
+        } else {
+            // If we're linking inside the localized area (or there just is no
+            // 8ase directory), the 8ase directory doesn't matter.
+            path += urls.from('localized.' + pageSubKey).to(targetFullKey, ...args);
+        }
+        // console.log(pageSubKey, '->', targetFullKey, '=', path);
+        return path;
+    };
 
     const content = writePage.html(pageFn, {paths, strings, to});
     await writePage.write(content, {paths});
@@ -2227,7 +2287,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     if (nav.simple) {
         nav.links = [
             {
-                href: to.home(),
+                href: to('localized.home'),
                 title: wikiInfo.shortName
             },
             {
@@ -2294,21 +2354,25 @@ writePage.html = (pageFn, {paths, strings, to}) => {
 
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
-        <html data-rebase-localized="${to.site('')}" data-rebase-shared="${to.root('')}">
+        <html ${attributes({
+            'data-rebase-localized': to('localized.root'),
+            'data-rebase-shared': to('shared.root'),
+            'data-rebase-data': to('data.root')
+        })}>
             <head>
                 <title>${title}</title>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
-                <link rel="stylesheet" href="${to.staticFile(`site.css?${CACHEBUST}`)}">
+                <link rel="stylesheet" href="${to('shared.staticFile', `site.css?${CACHEBUST}`)}">
                 ${(theme || stylesheet) && fixWS`
                     <style>
                         ${theme}
                         ${stylesheet}
                     </style>
                 `}
-                <script src="${to.staticFile(`lazy-loading.js?${CACHEBUST}`)}"></script>
+                <script src="${to('shared.staticFile', `lazy-loading.js?${CACHEBUST}`)}"></script>
             </head>
             <body ${attributes({style: body.style || ''})}>
                 <div id="page-container">
@@ -2330,8 +2394,8 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                     `}
                     ${layoutHTML}
                 </div>
-                <script src="${to.commonFile(`common.js?${CACHEBUST}`)}"></script>
-                <script src="${to.staticFile(`client.js?${CACHEBUST}`)}"></script>
+                <script src="${to('shared.commonFile', `common.js?${CACHEBUST}`)}"></script>
+                <script src="${to('shared.staticFile', `client.js?${CACHEBUST}`)}"></script>
             </body>
         </html>
     `);
@@ -2342,29 +2406,26 @@ writePage.write = async (content, {paths}) => {
     await writeFile(paths.outputFile, content);
 };
 
-writePage.paths = (baseDirectory, urlKey, directory, {
-    file = 'index.html',
-    spec = urlSpec.localized
+// TODO: This only supports one <>-style argument.
+writePage.paths = (baseDirectory, fullKey, directory, {
+    file = 'index.html'
 } = {}) => {
-    const prefix = baseDirectory ? baseDirectory + '/' : '';
+    const [ groupKey, subKey ] = fullKey.split('.');
 
-    if (!(urlKey in spec)) {
-        throw new Error(`Unknown URL key: ${urlKey}`);
-    }
-
-    const pathname = prefix + spec[urlKey].replace('<>', directory);
+    const pathname = (groupKey === 'localized' && baseDirectory
+        ? urls.from('shared.root').to('localizedWithBaseDirectory.' + subKey, baseDirectory, directory)
+        : urls.from('shared.root').to(fullKey, directory));
 
     // Needed for the rare directory which itself contains a slash, e.g. for
     // listings, with directories like 'albums/by-name'.
-    const prefixToLocalized = '../'.repeat(directory.split('/').length - 1);
-    const prefixToShared = (baseDirectory ? '../' : '') + prefixToLocalized;
+    const subdirectoryPrefix = '../'.repeat(directory.split('/').length - 1);
 
     const outputDirectory = path.join(outputPath, pathname);
     const outputFile = path.join(outputDirectory, file);
 
     return {
         pathname,
-        prefixToLocalized, prefixToShared,
+        subdirectoryPrefix,
         outputDirectory, outputFile
     };
 };
@@ -2398,7 +2459,7 @@ function getAlbumGridHTML({strings, to, details = false, ...props}) {
     return getGridHTML({
         strings,
         srcFn: album => getAlbumCover(album, {to}),
-        hrefFn: album => to.album(album.directory),
+        hrefFn: album => to('localized.album', album.directory),
         detailsFn: details && (album => strings('misc.albumGridDetails', {
             tracks: strings.count.tracks(album.tracks.length, {unit: true}),
             time: strings.count.duration(getTotalDuration(album.tracks))
@@ -2410,8 +2471,8 @@ function getAlbumGridHTML({strings, to, details = false, ...props}) {
 function getFlashGridHTML({strings, to, ...props}) {
     return getGridHTML({
         strings,
-        srcFn: flash => to.flashArt(flash.directory),
-        hrefFn: flash => to.flash(flash.directory),
+        srcFn: flash => to('shared.flashArt', flash.directory),
+        hrefFn: flash => to('localized.flash', flash.directory),
         ...props
     });
 }
@@ -2453,7 +2514,7 @@ function writeSymlinks() {
 
 function writeSharedFilesAndPages({strings}) {
     const redirect = async (title, from, urlKey, directory) => {
-        const target = path.relative(from, urls.root[urlKey](directory));
+        const target = path.relative(from, urls.from('shared.root').to(urlKey, directory));
         const content = generateRedirectPage(title, target, {strings});
         await mkdirp(path.join(outputPath, from));
         await writeFile(path.join(outputPath, from, 'index.html'), content);
@@ -2461,13 +2522,13 @@ function writeSharedFilesAndPages({strings}) {
 
     return progressPromiseAll(`Writing files & pages shared across languages.`, [
         groupData?.some(group => group.directory === 'fandom') &&
-        redirect('Fandom - Gallery', 'albums/fandom', 'groupGallery', 'fandom'),
+        redirect('Fandom - Gallery', 'albums/fandom', 'localized.groupGallery', 'fandom'),
 
         groupData?.some(group => group.directory === 'official') &&
-        redirect('Official - Gallery', 'albums/official', 'groupGallery', 'official'),
+        redirect('Official - Gallery', 'albums/official', 'localized.groupGallery', 'official'),
 
         wikiInfo.features.listings &&
-        redirect('Album Commentary', 'list/all-commentary', 'commentaryIndex', ''),
+        redirect('Album Commentary', 'list/all-commentary', 'localized.commentaryIndex', ''),
 
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
@@ -2610,18 +2671,7 @@ function writeNewsIndex() {
             `
         },
 
-        nav: {
-            links: [
-                {
-                    href: to.home(),
-                    title: wikiInfo.shortName
-                },
-                {
-                    href: '',
-                    title: strings('newsIndex.title')
-                }
-            ]
-        }
+        nav: {simple: true}
     }));
 }
 
@@ -2646,16 +2696,16 @@ function writeNewsEntryPage(entry) {
 function generateNewsEntryNav(entry, {strings, to}) {
     // The newsData list is sorted reverse chronologically (newest ones first),
     // so the way we find next/previous entries is flipped from normal.
-    const previousNextLinks = generatePreviousNextLinks('newsEntry', entry, newsData.slice().reverse(), {strings, to});
+    const previousNextLinks = generatePreviousNextLinks('localized.newsEntry', entry, newsData.slice().reverse(), {strings, to});
 
     return {
         links: [
             {
-                href: to.home(),
+                href: to('localized.home'),
                 title: wikiInfo.shortName
             },
             {
-                href: to.newsIndex(),
+                href: to('localized.newsIndex'),
                 title: strings('newsEntryPage.nav.news')
             },
             {
@@ -2780,7 +2830,7 @@ function writeAlbumPage(album) {
         ]),
 
         banner: album.bannerArtists && {
-            src: to.albumBanner(album.directory),
+            src: to('shared.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'top'
         },
@@ -2789,7 +2839,7 @@ function writeAlbumPage(album) {
             content: fixWS`
                 ${generateCoverLink({
                     strings, to,
-                    src: to.albumCover(album.directory),
+                    src: to('shared.albumCover', album.directory),
                     alt: strings('misc.alt.albumCover'),
                     tags: album.artTags
                 })}
@@ -2837,7 +2887,7 @@ function writeAlbumPage(album) {
                 </p>
                 ${commentaryEntries && `<p>${
                     strings('releaseInfo.viewCommentary', {
-                        link: `<a href="${to.albumCommentary(album.directory)}">${
+                        link: `<a href="${to('localized.albumCommentary', album.directory)}">${
                             strings('releaseInfo.viewCommentary.link')
                         }</a>`
                     })
@@ -2881,7 +2931,7 @@ function writeAlbumPage(album) {
         nav: {
             links: [
                 {
-                    href: to.home(),
+                    href: to('localized.home'),
                     title: wikiInfo.shortName
                 },
                 {
@@ -2907,7 +2957,7 @@ function getAlbumStylesheet(album, {to}) {
     return [
         album.wallpaperArtists && fixWS`
             body::before {
-                background-image: url("${to.albumWallpaper(album.directory)}");
+                background-image: url("${to('shared.albumWallpaper', album.directory)}");
                 ${album.wallpaperStyle}
             }
         `,
@@ -3011,7 +3061,7 @@ function writeTrackPage(track) {
 
         banner: album.bannerArtists && {
             classes: ['dim'],
-            src: to.albumBanner(album.directory),
+            src: to('shared.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'bottom'
         },
@@ -3147,11 +3197,11 @@ function writeTrackPage(track) {
         nav: {
             links: [
                 {
-                    href: to.home(),
+                    href: to('localized.home'),
                     title: wikiInfo.shortName
                 },
                 {
-                    href: to.album(album.directory),
+                    href: to('localized.album', album.directory),
                     title: album.name
                 },
                 listTag === 'ol' ? {
@@ -3356,7 +3406,7 @@ function writeArtistPage(artist) {
                 content: fixWS`
                     ${avatarFileExists && generateCoverLink({
                         strings, to,
-                        src: to.artistAvatar(artist.directory),
+                        src: to('localized.artistAvatar', artist.directory),
                         alt: strings('misc.alt.artistAvatar')
                     })}
                     <h1>${strings('artistPage.title', {artist: name})}</h1>
@@ -3518,8 +3568,8 @@ function writeArtistPage(artist) {
                                     ? getTrackCover(thing, {to})
                                     : getAlbumCover(thing, {to})),
                                 hrefFn: thing => (thing.album
-                                    ? to.track(thing.directory)
-                                    : to.album(thing.directory))
+                                    ? to('localized.track', thing.directory)
+                                    : to('localized.album', thing.directory))
                             })}
                         </div>
                     `
@@ -3538,12 +3588,12 @@ function generateNavForArtist(artist, {strings, to, isGallery, hasGallery}) {
     return {
         links: [
             {
-                href: to.home(),
+                href: to('localized.home'),
                 title: wikiInfo.shortName
             },
             wikiInfo.features.listings &&
             {
-                href: to.listingIndex(),
+                href: to('localized.listingIndex'),
                 title: strings('listingIndex.title')
             },
             {
@@ -3622,7 +3672,7 @@ function writeFlashIndex() {
                     </ul>
                 </div>
                 ${flashActData.map((act, i) => fixWS`
-                    <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${to.flash(act.flashes[0].directory)}">${act.name}</a></h2>
+                    <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${to('localized.flash', act.flashes[0].directory)}">${act.name}</a></h2>
                     <div class="grid-listing">
                         ${getFlashGridHTML({
                             strings, to,
@@ -3650,7 +3700,7 @@ function writeFlashPage(flash) {
                 <h1>${strings('flashPage.title', {flash: flash.name})}</h1>
                 ${generateCoverLink({
                     strings, to,
-                    src: to.flashArt(flash.directory),
+                    src: to('shared.flashArt', flash.directory),
                     alt: strings('misc.alt.flashArt')
                 })}
                 <p>${strings('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
@@ -3704,16 +3754,16 @@ function writeFlashPage(flash) {
 }
 
 function generateNavForFlash(flash, {strings, to}) {
-    const previousNextLinks = generatePreviousNextLinks('flash', flash, flashData, {strings, to});
+    const previousNextLinks = generatePreviousNextLinks('localized.flash', flash, flashData, {strings, to});
 
     return {
         links: [
             {
-                href: to.home(),
+                href: to('localized.home'),
                 title: wikiInfo.shortName
             },
             {
-                href: to.flashIndex(),
+                href: to('localized.flashIndex'),
                 title: strings('flashIndex.title')
             },
             {
@@ -3772,15 +3822,15 @@ function generateSidebarForFlash(flash, {strings, to}) {
                         true
                     ))()
                 ).flatMap(act => [
-                    act.name.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
-                    || act.name.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
-                    || act.name.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="--primary-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
+                    act.name.startsWith('Act 1') && `<dt ${classes('side', side === 1 && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="--primary-color: #4ac925">Side 1 (Acts 1-5)</a></dt>`
+                    || act.name.startsWith('Act 6 Act 1') && `<dt ${classes('side', side === 2 && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="--primary-color: #1076a2">Side 2 (Acts 6-7)</a></dt>`
+                    || act.name.startsWith('Hiveswap Act 1') && `<dt ${classes('side', side === 3 && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="--primary-color: #008282">Outside Canon (Misc. Games)</a></dt>`,
                     (({index = flashActData.indexOf(act)} = {}) => (
                         index < act6 ? side === 1 :
                         index < outsideCanon ? side === 2 :
                         true
                     ))()
-                    && `<dt ${classes(act === currentAct && 'current')}><a href="${to.flash(act.flashes[0].directory)}" style="${getLinkThemeString(act)}">${act.name}</a></dt>`,
+                    && `<dt ${classes(act === currentAct && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="${getLinkThemeString(act)}">${act.name}</a></dt>`,
                     act === currentAct && fixWS`
                         <dd><ul>
                             ${act.flashes.map(f => fixWS`
@@ -4548,18 +4598,7 @@ function writeListingIndex() {
             content: generateSidebarForListings(null, {strings, to})
         },
 
-        nav: {
-            links: [
-                {
-                    href: to.home(),
-                    title: wikiInfo.shortName
-                },
-                {
-                    href: to.listingIndex(),
-                    title: strings('listingIndex.title')
-                }
-            ]
-        }
+        nav: {simple: true}
     }))
 }
 
@@ -4599,15 +4638,15 @@ function writeListingPage(listing) {
         nav: {
             links: [
                 {
-                    href: to.home(),
+                    href: to('localized.home'),
                     title: wikiInfo.shortName
                 },
                 {
-                    href: to.listingIndex(),
+                    href: to('localized.listingIndex'),
                     title: strings('listingIndex.title')
                 },
                 {
-                    href: to.listing(listing.directory),
+                    href: '',
                     title: listing.title({strings})
                 }
             ]
@@ -4629,7 +4668,7 @@ function generateLinkIndexForListings(currentListing, {strings, to}) {
                 .filter(({ condition }) => !condition || condition())
                 .map(listing => fixWS`
                     <li ${classes(listing === currentListing && 'current')}>
-                        <a href="${to.listing(listing.directory)}">${listing.title({strings})}</a>
+                        <a href="${to('localized.listing', listing.directory)}">${listing.title({strings})}</a>
                     </li>
                 `)
                 .join('\n'))}
@@ -4737,11 +4776,11 @@ function writeAlbumCommentaryPage(album) {
         nav: {
             links: [
                 {
-                    href: to.home(),
+                    href: to('localized.home'),
                     title: wikiInfo.shortName
                 },
                 {
-                    href: to.commentaryIndex(),
+                    href: to('localized.commentaryIndex'),
                     title: strings('commentaryIndex.title')
                 },
                 {
@@ -4784,8 +4823,8 @@ function writeTagPage(tag) {
                             ? getTrackCover(thing, {to})
                             : getAlbumCover(thing, {to})),
                         hrefFn: thing => (thing.album
-                            ? to.track(thing.directory)
-                            : to.album(thing.album))
+                            ? to('localized.track', thing.directory)
+                            : to('localized.album', thing.album))
                     })}
                 </div>
             `
@@ -4794,12 +4833,12 @@ function writeTagPage(tag) {
         nav: {
             links: [
                 {
-                    href: to.home(),
+                    href: to('localized.home'),
                     title: wikiInfo.shortName
                 },
                 wikiInfo.features.listings &&
                 {
-                    href: to.listingIndex(),
+                    href: to('localized.listingIndex'),
                     title: strings('listingIndex.title')
                 },
                 {
@@ -4946,7 +4985,7 @@ function iconifyURL(url, {strings, to}) {
         domain.includes('instagram.com') ? ['instagram', strings('misc.external.bandcamp')] :
         ['globe', strings('misc.external.domain', {domain})]
     );
-    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to.staticFile(`icons.svg#icon-${id}`)}"></use></svg></a>`;
+    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to('shared.staticFile', `icons.svg#icon-${id}`)}"></use></svg></a>`;
 }
 
 function chronologyLinks(currentThing, {
@@ -5002,7 +5041,7 @@ function generateAlbumNavLinks(album, currentTrack, {strings, to}) {
         return '';
     }
 
-    const previousNextLinks = currentTrack && generatePreviousNextLinks('track', currentTrack, album.tracks, {strings, to})
+    const previousNextLinks = currentTrack && generatePreviousNextLinks('localized.track', currentTrack, album.tracks, {strings, to})
     const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
         (currentTrack
             ? strings('trackPage.nav.random')
@@ -5036,24 +5075,24 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
 
     const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
         strings('albumSidebar.trackList.item', {
-            track: `<a href="${to.track(track.directory)}">${track.name}</a>`
+            track: `<a href="${to('localized.track', track.directory)}">${track.name}</a>`
         })
     }</li>`;
 
     return {
         content: fixWS`
-            <h1><a href="${to.album(album.directory)}">${album.name}</a></h1>
+            <h1><a href="${to('localized.album', album.directory)}">${album.name}</a></h1>
             ${album.trackGroups ? fixWS`
                 <dl>
                     ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
                         <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
                             (listTag === 'ol'
                                 ? strings('albumSidebar.trackList.group.withRange', {
-                                    group: `<a href="${to.track(tracks[0].directory)}">${name}</a>`,
+                                    group: `<a href="${to('localized.track', tracks[0].directory)}">${name}</a>`,
                                     range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
                                 })
                                 : strings('albumSidebar.trackList.group', {
-                                    group: `<a href="${to.track(tracks[0].directory)}">${name}</a>`
+                                    group: `<a href="${to('localized.track', tracks[0].directory)}">${name}</a>`
                                 }))
                         }</dt>
                         ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
@@ -5089,7 +5128,7 @@ function generateSidebarRightForAlbum(album, currentTrack, {strings, to}) {
             }).map(({group, next, previous}) => fixWS`
                 <h1>${
                     strings('albumSidebar.groupBox.title', {
-                        group: `<a href="${to.groupInfo(group.directory)}">${group.name}</a>`
+                        group: `<a href="${to('localized.groupInfo', group.directory)}">${group.name}</a>`
                     })
                 }</h1>
                 ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to})}
@@ -5101,12 +5140,12 @@ function generateSidebarRightForAlbum(album, currentTrack, {strings, to}) {
                 ${!currentTrack && fixWS`
                     ${next && `<p class="group-chronology-link">${
                         strings('albumSidebar.groupBox.next', {
-                            album: `<a href="${to.album(next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
+                            album: `<a href="${to('localized.album', next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
                         })
                     }</p>`}
                     ${previous && `<p class="group-chronology-link">${
                         strings('albumSidebar.groupBox.previous', {
-                            album: `<a href="${to.album(previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
+                            album: `<a href="${to('localized.album', previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
                         })
                     }</p>`}
                 `}
@@ -5120,7 +5159,7 @@ function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
         return null;
     }
 
-    const toGroup = isGallery ? to.groupGallery : to.groupInfo;
+    const urlKey = isGallery ? 'localized.groupGallery' : 'localized.groupInfo';
 
     return {
         content: fixWS`
@@ -5130,14 +5169,14 @@ function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
                     fixWS`
                         <dt ${classes(category === currentGroup.category && 'current')}>${
                             strings('groupSidebar.groupList.category', {
-                                category: `<a href="${toGroup(category.groups[0].directory)}" style="${getLinkThemeString(category)}">${category.name}</a>`
+                                category: `<a href="${to(urlKey, category.groups[0].directory)}" style="${getLinkThemeString(category)}">${category.name}</a>`
                             })
                         }</dt>
                         <dd><ul>
                             ${category.groups.map(group => fixWS`
                                 <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group)}">${
                                     strings('groupSidebar.groupList.item', {
-                                        group: `<a href="${toGroup(group.directory)}">${group.name}</a>`
+                                        group: `<a href="${to(urlKey, group.directory)}">${group.name}</a>`
                                     })
                                 }</li>
                             `).join('\n')}
@@ -5165,15 +5204,13 @@ function generateInfoGalleryLinks(urlKeyInfo, urlKeyGallery, currentThing, isGal
 }
 
 function generatePreviousNextLinks(urlKey, currentThing, thingData, {strings, to}) {
-    const toThing = to[urlKey];
-
     const index = thingData.indexOf(currentThing);
     const previous = thingData[index - 1];
     const next = thingData[index + 1];
 
     return [
-        previous && `<a href="${toThing(previous.directory)}" id="previous-button" title="${previous.name}">${strings('misc.nav.previous')}</a>`,
-        next && `<a href="${toThing(next.directory)}" id="next-button" title="${next.name}">${strings('misc.nav.next')}</a>`
+        previous && `<a href="${to(urlKey, previous.directory)}" id="previous-button" title="${previous.name}">${strings('misc.nav.previous')}</a>`,
+        next && `<a href="${to(urlKey, next.directory)}" id="next-button" title="${next.name}">${strings('misc.nav.next')}</a>`
     ].filter(Boolean).join(', ');
 }
 
@@ -5182,24 +5219,26 @@ function generateNavForGroup(currentGroup, {strings, to, isGallery}) {
         return {simple: true};
     }
 
-    const urlKey = isGallery ? 'groupGallery' : 'groupInfo';
+    const urlKey = isGallery ? 'localized.groupGallery' : 'localized.groupInfo';
+    const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
+
     const infoGalleryLinks = generateInfoGalleryLinks('groupInfo', 'groupGallery', currentGroup, isGallery, {strings, to});
     const previousNextLinks = generatePreviousNextLinks(urlKey, currentGroup, groupData, {strings, to})
 
     return {
         links: [
             {
-                href: to.home(),
+                href: to('localized.home'),
                 title: wikiInfo.shortName
             },
             wikiInfo.features.listings &&
             {
-                href: to.listingIndex(),
+                href: to('localized.listingIndex'),
                 title: strings('listingIndex.title')
             },
             {
                 html: strings('groupPage.nav.group', {
-                    group: strings.link[urlKey](currentGroup, {class: 'current', to})
+                    group: strings.link[linkKey](currentGroup, {class: 'current', to})
                 })
             },
             {
@@ -5240,7 +5279,7 @@ function writeGroupPage(group) {
                     <h2>${strings('groupInfoPage.albumList.title')}</h2>
                     <p>${
                         strings('groupInfoPage.viewAlbumGallery', {
-                            link: `<a href="${to.groupGallery(group.directory)}">${
+                            link: `<a href="${to('localized.groupGallery', group.directory)}">${
                                 strings('groupInfoPage.viewAlbumGallery.link')
                             }</a>`
                         })
@@ -5250,7 +5289,7 @@ function writeGroupPage(group) {
                             <li>${
                                 strings('groupInfoPage.albumList.item', {
                                     year: album.date.getFullYear(),
-                                    album: `<a href="${to.album(album.directory)}" style="${getLinkThemeString(album)}">${album.name}</a>`
+                                    album: `<a href="${to('localized.album', album.directory)}" style="${getLinkThemeString(album)}">${album.name}</a>`
                                 })
                             }</li>
                         `).join('\n')}
@@ -5277,7 +5316,7 @@ function writeGroupPage(group) {
                             time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
                         })
                     }</p>
-                    ${wikiInfo.features.groupUI && wikiInfo.features.listings && `<p class="quick-info">(<a href="${to.listing('groups/by-category')}">Choose another group to filter by!</a>)</p>`}
+                    ${wikiInfo.features.groupUI && wikiInfo.features.listings && `<p class="quick-info">(<a href="${to('localized.listing', 'groups/by-category')}">Choose another group to filter by!</a>)</p>`}
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
                             strings, to,
@@ -5296,15 +5335,15 @@ function writeGroupPage(group) {
 
 function toAnythingMan(anythingMan, to) {
     return (
-        albumData.includes(anythingMan) ? to.album(anythingMan.directory) :
-        trackData.includes(anythingMan) ? to.track(anythingMan.directory) :
-        flashData?.includes(anythingMan) ? to.flash(anythingMan.directory) :
+        albumData.includes(anythingMan) ? to('localized.album', anythingMan.directory) :
+        trackData.includes(anythingMan) ? to('localized.track', anythingMan.directory) :
+        flashData?.includes(anythingMan) ? to('localized.flash', anythingMan.directory) :
         'idk-bud'
     )
 }
 
 function getAlbumCover(album, {to}) {
-    return to.albumCover(album.directory);
+    return to('shared.albumCover', album.directory);
 }
 
 function getTrackCover(track, {to}) {
@@ -5313,7 +5352,7 @@ function getTrackCover(track, {to}) {
     if (track.coverArtists === null) {
         return getAlbumCover(track.album, {to});
     } else {
-        return to.trackCover(track.album.directory, track.directory);
+        return to('shared.trackCover', track.album.directory, track.directory);
     }
 }
 
