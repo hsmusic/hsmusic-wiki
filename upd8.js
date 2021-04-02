@@ -185,67 +185,80 @@ let languages;
 
 const urlSpec = {
     data: {
-        root: '',
-        path: '<>',
+        prefix: 'data/',
 
-        track: 'track/<>'
+        paths: {
+            root: '',
+            path: '<>',
+
+            track: 'track/<>'
+        }
     },
 
     localized: {
-        root: '',
-        path: '<>',
+        // TODO: Implement this.
+        // prefix: '_languageCode',
 
-        home: '',
+        paths: {
+            root: '',
+            path: '<>',
 
-        album: 'album/<>/',
-        albumCommentary: 'commentary/album/<>/',
+            home: '',
 
-        artist: 'artist/<>/',
-        artistGallery: 'artist/<>/gallery/',
+            album: 'album/<>/',
+            albumCommentary: 'commentary/album/<>/',
 
-        commentaryIndex: 'commentary/',
+            artist: 'artist/<>/',
+            artistGallery: 'artist/<>/gallery/',
 
-        flashIndex: 'flash/',
-        flash: 'flash/<>/',
+            commentaryIndex: 'commentary/',
 
-        groupInfo: 'group/<>/',
-        groupGallery: 'group/<>/gallery/',
+            flashIndex: 'flash/',
+            flash: 'flash/<>/',
 
-        listingIndex: 'list/',
-        listing: 'list/<>/',
+            groupInfo: 'group/<>/',
+            groupGallery: 'group/<>/gallery/',
 
-        newsIndex: 'news/',
-        newsEntry: 'news/<>/',
+            listingIndex: 'list/',
+            listing: 'list/<>/',
 
-        staticPage: '<>/',
-        tag: 'tag/<>/',
-        track: 'track/<>/'
+            newsIndex: 'news/',
+            newsEntry: 'news/<>/',
+
+            staticPage: '<>/',
+            tag: 'tag/<>/',
+            track: 'track/<>/'
+        }
     },
 
     shared: {
-        root: '',
-        path: '<>',
+        paths: {
+            root: '',
+            path: '<>',
 
-        commonFile: 'common/<>',
-        staticFile: 'static/<>',
+            commonFile: 'common/<>',
+            staticFile: 'static/<>',
 
-        media: 'media/',
-        mediaPath: 'media/<>',
-        albumCover: 'media/album-art/<>/cover.jpg',
-        albumWallpaper: 'media/album-art/<>/bg.jpg',
-        albumBanner: 'media/album-art/<>/banner.jpg',
-        trackCover: 'media/album-art/<>/<>.jpg',
-        artistAvatar: 'media/artist-avatar/<>.jpg',
-        flashArt: 'media/flash-art/<>.jpg'
+            media: 'media/',
+            mediaPath: 'media/<>',
+            albumCover: 'media/album-art/<>/cover.jpg',
+            albumWallpaper: 'media/album-art/<>/bg.jpg',
+            albumBanner: 'media/album-art/<>/banner.jpg',
+            trackCover: 'media/album-art/<>/<>.jpg',
+            artistAvatar: 'media/artist-avatar/<>.jpg',
+            flashArt: 'media/flash-art/<>.jpg'
+        }
     }
 };
 
 // This gets automatically switched in place when working from a baseDirectory,
 // so it should never be referenced manually.
-urlSpec.localizedWithBaseDirectory = withEntries(
-    urlSpec.localized,
-    entries => entries.map(([key, path]) => [key, '<>/' + path])
-);
+urlSpec.localizedWithBaseDirectory = {
+    paths: withEntries(
+        urlSpec.localized.paths,
+        entries => entries.map(([key, path]) => [key, '<>/' + path])
+    )
+};
 
 const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {
@@ -307,7 +320,7 @@ const thumb = {
 };
 
 function generateURLs(fromPath) {
-    const getValueForFullKey = (obj, fullKey) => {
+    const getValueForFullKey = (obj, fullKey, prop = null) => {
         const [ groupKey, subKey ] = fullKey.split('.');
         if (!groupKey || !subKey) {
             throw new Error(`Expected group key and subkey (got ${fullKey})`);
@@ -323,33 +336,53 @@ function generateURLs(fromPath) {
             throw new Error(`Expected valid subkey (got ${subKey} for group ${groupKey})`);
         }
 
-        return group[subKey];
+        return {
+            value: group[subKey],
+            group
+        };
     };
 
-    const generateTo = fromPath => {
+    const generateTo = (fromPath, fromGroup) => {
         const pathHelper = (toPath) => {
             let argIndex = 0;
             return (path.relative(fromPath, toPath.replaceAll('<>', () => `<${argIndex++}>`))
                 + (toPath.endsWith('/') ? '/' : ''));
         };
 
-        const groupHelper = urlGroup => withEntries(urlGroup, entries => entries
+        const groupHelper = urlGroup => withEntries(urlGroup.paths, entries => entries
             .map(([key, path]) => [key, pathHelper(path)]));
 
         const relative = withEntries(urlSpec, entries => entries
             .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
 
+        const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
+
         const to = (key, ...args) => {
-            const string = getValueForFullKey(relative, key)
-                .replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+            const { value: template, group: toGroup } = getValueForFullKey(relative, key)
+            let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+
+            if (toGroup._prefix !== fromGroup._prefix) {
+                // TODO: Handle differing domains in prefixes.
+                const before = result;
+                result = (
+                    rebasePrefix +
+                    (toGroup._prefix || '') +
+                    result
+                );
+                console.log('prefixed:', {
+                    rebasePrefix,
+                    _prefix: toGroup._prefix,
+                    before, result
+                });
+            }
 
             // Kinda hacky lol, 8ut it works.
-            const missing = string.match(/<([0-9]+)>/g);
+            const missing = result.match(/<([0-9]+)>/g);
             if (missing) {
                 throw new Error(`Expected ${missing[missing.length - 1]} arguments, got ${args.length}`);
             }
 
-            return string;
+            return result;
         };
 
         return {to, relative};
@@ -357,11 +390,11 @@ function generateURLs(fromPath) {
 
     const generateFrom = () => {
         const map = withEntries(urlSpec, entries => entries
-            .map(([key, group]) => [key, withEntries(group, entries => entries
-                .map(([key, path]) => [key, generateTo(path)])
+            .map(([key, group]) => [key, withEntries(group.paths, entries => entries
+                .map(([key, path]) => [key, generateTo(path, group)])
             )]));
 
-        const from = key => getValueForFullKey(map, key);
+        const from = key => getValueForFullKey(map, key).value;
 
         return {from, map};
     };
@@ -2077,19 +2110,21 @@ function serializeContribs(contribs) {
     }));
 }
 
-function validateWritePath(path, spec) {
+function validateWritePath(path, urlGroup) {
     if (!Array.isArray(path)) {
         return {error: `Expected array, got ${path}`};
     }
 
-    const definedKeys = Object.keys(spec);
+    const { paths } = urlGroup;
+
+    const definedKeys = Object.keys(paths);
     const specifiedKey = path[0];
 
     if (!definedKeys.includes(specifiedKey)) {
         return {error: `Specified key ${specifiedKey} isn't defined`};
     }
 
-    const expectedArgs = spec[specifiedKey].match(/<>/g).length;
+    const expectedArgs = paths[specifiedKey].match(/<>/g).length;
     const specifiedArgs = path.length - 1;
 
     if (specifiedArgs !== expectedArgs) {
