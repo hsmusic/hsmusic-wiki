@@ -2,6 +2,8 @@
 // the random track feature right now - the idea is we only use it for stuff
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
+//
+// Upd8: As of 04/02/2021, it's now used for info cards too! Nice.
 
 'use strict';
 
@@ -10,8 +12,10 @@ let officialAlbumData, fandomAlbumData, artistNames;
 
 let ready = false;
 
+// Miscellaneous helpers ----------------------------------
+
 function rebase(href, rebaseKey = 'rebaseLocalized') {
-    const relative = document.documentElement.dataset[rebaseKey];
+    const relative = document.documentElement.dataset[rebaseKey] + '/';
     if (relative) {
         return relative + href;
     } else {
@@ -43,24 +47,11 @@ function getFlash(el) {
 
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
+const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 const openAlbum = d => rebase(`album/${d}`);
 const openTrack = d => rebase(`track/${d}`);
 const openArtist = d => rebase(`artist/${d}`);
 const openFlash = d => rebase(`flash/${d}`);
-
-/* i implemented these functions but we dont actually use them anywhere lol
-function isFlashPage() {
-    return !!cssProp(document.body, '--flash-directory');
-}
-
-function isTrackOrAlbumPage() {
-    return !!cssProp(document.body, '--album-directory');
-}
-
-function isTrackPage() {
-    return !!cssProp(document.body, '--track-directory');
-}
-*/
 
 function getTrackListAndIndex() {
     const album = getAlbum(document.body);
@@ -84,6 +75,14 @@ function getFlashListAndIndex() {
     const flashIndex = list.indexOf(flash);
     return {list, index: flashIndex};
 }
+
+// TODO: This should also use urlSpec.
+function fetchData(type, directory) {
+    return fetch(rebase(`data/${type}/${directory}/data.json`, 'rebaseData'))
+        .then(res => res.json());
+}
+
+// JS-based links -----------------------------------------
 
 for (const a of document.body.querySelectorAll('[data-random]')) {
     a.addEventListener('click', evt => {
@@ -167,3 +166,128 @@ fetch(rebase('data.json', 'rebaseShared')).then(data => data.json()).then(data =
 
     ready = true;
 });
+
+// Data & info card ---------------------------------------
+
+const NORMAL_HOVER_INFO_DELAY = 750;
+const FAST_HOVER_INFO_DELAY = 250;
+const END_FAST_HOVER_DELAY = 500;
+const HIDE_HOVER_DELAY = 250;
+
+let fastHover = false;
+let endFastHoverTimeout = null;
+
+function link(a, type, {name, directory, color}) {
+    if (color) {
+        a.style.setProperty('--primary-color', color);
+    }
+
+    a.innerText = name
+    a.href = getLinkHref(type, directory);
+}
+
+const infoCard = (() => {
+    const container = document.getElementById('info-card-container');
+
+    let cancelShow = false;
+    let hideTimeout = null;
+
+    container.addEventListener('mouseenter', cancelHide);
+    container.addEventListener('mouseleave', readyHide);
+
+    function show(type, target) {
+        cancelShow = false;
+
+        fetchData(type, target.dataset[type]).then(data => {
+            // Manual DOM 'cuz we're laaaazy.
+
+            if (cancelShow) {
+                return;
+            }
+
+            const rect = target.getBoundingClientRect();
+
+            container.style.setProperty('--primary-color', data.color);
+
+            container.classList.add('shown');
+            container.style.top = window.scrollY + rect.bottom + 'px';
+            container.style.left = window.scrollX + rect.left + 'px';
+
+            const nameLink = container.querySelector('.info-card-name a');
+            link(nameLink, 'track', data);
+
+            const albumLink = container.querySelector('.info-card-album a');
+            link(albumLink, 'album', data.links.album);
+        });
+    }
+
+    function hide() {
+        container.classList.remove('shown');
+        cancelShow = true;
+    }
+
+    function readyHide() {
+        if (!hideTimeout) {
+            hideTimeout = setTimeout(hide, HIDE_HOVER_DELAY);
+        }
+    }
+
+    function cancelHide() {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout);
+            hideTimeout = null;
+        }
+    }
+
+    return {
+        show,
+        hide,
+        readyHide,
+        cancelHide
+    };
+})();
+
+function makeInfoCardLinkHandlers(type) {
+    let hoverTimeout = null;
+
+    return {
+        mouseenter(evt) {
+            hoverTimeout = setTimeout(() => {
+                fastHover = true;
+                infoCard.show(type, evt.target);
+            }, fastHover ? FAST_HOVER_INFO_DELAY : NORMAL_HOVER_INFO_DELAY);
+
+            clearTimeout(endFastHoverTimeout);
+            endFastHoverTimeout = null;
+
+            infoCard.cancelHide();
+        },
+
+        mouseleave(evt) {
+            clearTimeout(hoverTimeout);
+
+            if (fastHover && !endFastHoverTimeout) {
+                endFastHoverTimeout = setTimeout(() => {
+                    endFastHoverTimeout = null;
+                    fastHover = false;
+                }, END_FAST_HOVER_DELAY);
+            }
+
+            infoCard.readyHide();
+        }
+    };
+}
+
+const infoCardLinkHandlers = {
+    track: makeInfoCardLinkHandlers('track')
+};
+
+function addInfoCardLinkHandlers(type) {
+    for (const a of document.querySelectorAll(`a[data-${type}]`)) {
+        for (const [ eventName, handler ] of Object.entries(infoCardLinkHandlers[type])) {
+            a.addEventListener(eventName, handler);
+        }
+    }
+}
+
+addInfoCardLinkHandlers('track');

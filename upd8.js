@@ -2387,6 +2387,15 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         footerHTML
     ].filter(Boolean).join('\n');
 
+    const infoCardHTML = fixWS`
+        <div id="info-card-container">
+            <div class="info-card">
+                <h1 class="info-card-name"><a></a></h1>
+                <p class="info-card-album">${strings('releaseInfo.from', {album: '<a></a>'})}</p>
+            </div>
+        </div>
+    `;
+
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${attributes({
@@ -2429,6 +2438,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                     `}
                     ${layoutHTML}
                 </div>
+                ${infoCardHTML}
                 <script src="${to('shared.commonFile', `common.js?${CACHEBUST}`)}"></script>
                 <script src="${to('shared.staticFile', `client.js?${CACHEBUST}`)}"></script>
             </body>

@@ -335,7 +335,7 @@ footer > :last-child {
 
 .sidebar article h2,
 .news-index h2 {
-    border-bottom: 1px dotted white;
+    border-bottom: 1px dotted;
 }
 
 .sidebar article h2 time,
@@ -701,46 +701,40 @@ li > ul {
     margin-top: 5px;
 }
 
-.new {
-    animation: new 1s infinite;
+#info-card-container {
+    position: absolute;
+    display: none;
+
+    margin-right: 10px;
 }
 
-@keyframes new {
-    0% {
-        color: #bbdd00;
-    }
-
-    50% {
-        color: #eeff22;
-    }
-
-    100% {
-        color: #bbdd00;
-    }
+#info-card-container.shown {
+    display: block;
 }
 
-/* fake :P */
-.loading::after {
-    content: '.';
-    animation: loading 6s infinite;
+.info-card {
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px dotted var(--primary-color);
+    border-radius: 3px;
+    box-shadow: 0 5px 5px black;
+
+    padding: 5px;
+    font-size: 0.9em;
 }
 
-@keyframes loading {
-    0 {
-        content: '.';
-    }
+.info-card-name {
+    font-size: 1em;
+    border-bottom: 1px dotted;
+    margin: 0;
+}
 
-    33% {
-        content: '..';
-    }
+.info-card p {
+    margin-top: 0.25em;
+    margin-bottom: 0.25em;
+}
 
-    66% {
-        content: '...';
-    }
-
-    100% {
-        content: '.';
-    }
+.info-card p:last-child {
+    margin-bottom: 0;
 }
 
 @media (max-width: 900px) {

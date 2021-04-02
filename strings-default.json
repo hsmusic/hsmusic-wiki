@@ -71,6 +71,7 @@
     "count.duration.approximate": "~{DURATION}",
     "count.duration.missing": "_:__",
     "releaseInfo.by": "By {ARTISTS}.",
+    "releaseInfo.from": "From {ALBUM}.",
     "releaseInfo.coverArtBy": "Cover art by {ARTISTS}.",
     "releaseInfo.wallpaperArtBy": "Wallpaper art by {ARTISTS}.",
     "releaseInfo.bannerArtBy": "Banner art by {ARTISTS}.",
