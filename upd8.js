@@ -237,16 +237,23 @@ const urlSpec = {
             path: '<>',
 
             commonFile: 'common/<>',
-            staticFile: 'static/<>',
+            staticFile: 'static/<>'
+        }
+    },
 
-            media: 'media/',
-            mediaPath: 'media/<>',
-            albumCover: 'media/album-art/<>/cover.jpg',
-            albumWallpaper: 'media/album-art/<>/bg.jpg',
-            albumBanner: 'media/album-art/<>/banner.jpg',
-            trackCover: 'media/album-art/<>/<>.jpg',
-            artistAvatar: 'media/artist-avatar/<>.jpg',
-            flashArt: 'media/flash-art/<>.jpg'
+    media: {
+        prefix: 'media/',
+
+        paths: {
+            root: '',
+            path: '<>',
+
+            albumCover: 'album-art/<>/cover.jpg',
+            albumWallpaper: 'album-art/<>/bg.jpg',
+            albumBanner: 'album-art/<>/banner.jpg',
+            trackCover: 'album-art/<>/<>.jpg',
+            artistAvatar: 'artist-avatar/<>.jpg',
+            flashArt: 'flash-art/<>.jpg'
         }
     }
 };
@@ -305,7 +312,7 @@ const link = {
     tag: linkDirectory('tag'),
     track: linkDirectory('track', {expose: 'data-track'}),
 
-    media: linkPathname('shared.mediaPath', {color: false}),
+    media: linkPathname('media.path', {color: false}),
     root: linkPathname('shared.path', {color: false}),
     data: linkPathname('data.path', {color: false}),
     site: linkPathname('localized.path', {color: false})
@@ -343,38 +350,37 @@ function generateURLs(fromPath) {
     };
 
     const generateTo = (fromPath, fromGroup) => {
-        const pathHelper = (toPath) => {
+        const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
+
+        const pathHelper = (toPath, toGroup) => {
+            let target = toPath;
+
             let argIndex = 0;
-            return (path.relative(fromPath, toPath.replaceAll('<>', () => `<${argIndex++}>`))
+            target = target.replaceAll('<>', () => `<${argIndex++}>`);
+
+            if (toGroup.prefix !== fromGroup.prefix) {
+                // TODO: Handle differing domains in prefixes.
+                target = rebasePrefix + (toGroup.prefix || '') + target;
+            }
+
+            return (path.relative(fromPath, target)
                 + (toPath.endsWith('/') ? '/' : ''));
         };
 
-        const groupHelper = urlGroup => withEntries(urlGroup.paths, entries => entries
-            .map(([key, path]) => [key, pathHelper(path)]));
+        const groupSymbol = Symbol();
+
+        const groupHelper = urlGroup => ({
+            [groupSymbol]: urlGroup,
+            ...withEntries(urlGroup.paths, entries => entries
+                .map(([key, path]) => [key, pathHelper(path, urlGroup)]))
+        });
 
         const relative = withEntries(urlSpec, entries => entries
             .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
 
-        const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
-
         const to = (key, ...args) => {
-            const { value: template, group: toGroup } = getValueForFullKey(relative, key)
+            const { value: template, group: {[groupSymbol]: toGroup} } = getValueForFullKey(relative, key)
             let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
-
-            if (toGroup._prefix !== fromGroup._prefix) {
-                // TODO: Handle differing domains in prefixes.
-                const before = result;
-                result = (
-                    rebasePrefix +
-                    (toGroup._prefix || '') +
-                    result
-                );
-                console.log('prefixed:', {
-                    rebasePrefix,
-                    _prefix: toGroup._prefix,
-                    before, result
-                });
-            }
 
             // Kinda hacky lol, 8ut it works.
             const missing = result.match(/<([0-9]+)>/g);
@@ -1039,7 +1045,7 @@ function parseAttributes(string, {to}) {
             const value = string.slice(vStart, vEnd);
             i = vEnd + endOffset;
             if (attribute === 'src' && value.startsWith('media/')) {
-                attributes[attribute] = to('shared.mediaPath', value.slice('media/'.length));
+                attributes[attribute] = to('media.path', value.slice('media/'.length));
             } else {
                 attributes[attribute] = value;
             }
@@ -2401,6 +2407,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         <html ${attributes({
             'data-rebase-localized': to('localized.root'),
             'data-rebase-shared': to('shared.root'),
+            'data-rebase-media': to('media.root'),
             'data-rebase-data': to('data.root')
         })}>
             <head>
@@ -2516,7 +2523,7 @@ function getAlbumGridHTML({strings, to, details = false, ...props}) {
 function getFlashGridHTML({strings, to, ...props}) {
     return getGridHTML({
         strings,
-        srcFn: flash => to('shared.flashArt', flash.directory),
+        srcFn: flash => to('media.flashArt', flash.directory),
         hrefFn: flash => to('localized.flash', flash.directory),
         ...props
     });
@@ -2875,7 +2882,7 @@ function writeAlbumPage(album) {
         ]),
 
         banner: album.bannerArtists && {
-            src: to('shared.albumBanner', album.directory),
+            src: to('media.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'top'
         },
@@ -2884,7 +2891,7 @@ function writeAlbumPage(album) {
             content: fixWS`
                 ${generateCoverLink({
                     strings, to,
-                    src: to('shared.albumCover', album.directory),
+                    src: to('media.albumCover', album.directory),
                     alt: strings('misc.alt.albumCover'),
                     tags: album.artTags
                 })}
@@ -3002,7 +3009,7 @@ function getAlbumStylesheet(album, {to}) {
     return [
         album.wallpaperArtists && fixWS`
             body::before {
-                background-image: url("${to('shared.albumWallpaper', album.directory)}");
+                background-image: url("${to('media.albumWallpaper', album.directory)}");
                 ${album.wallpaperStyle}
             }
         `,
@@ -3106,7 +3113,7 @@ function writeTrackPage(track) {
 
         banner: album.bannerArtists && {
             classes: ['dim'],
-            src: to('shared.albumBanner', album.directory),
+            src: to('media.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'bottom'
         },
@@ -3745,7 +3752,7 @@ function writeFlashPage(flash) {
                 <h1>${strings('flashPage.title', {flash: flash.name})}</h1>
                 ${generateCoverLink({
                     strings, to,
-                    src: to('shared.flashArt', flash.directory),
+                    src: to('media.flashArt', flash.directory),
                     alt: strings('misc.alt.flashArt')
                 })}
                 <p>${strings('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
@@ -5388,7 +5395,7 @@ function toAnythingMan(anythingMan, to) {
 }
 
 function getAlbumCover(album, {to}) {
-    return to('shared.albumCover', album.directory);
+    return to('media.albumCover', album.directory);
 }
 
 function getTrackCover(track, {to}) {
@@ -5397,7 +5404,7 @@ function getTrackCover(track, {to}) {
     if (track.coverArtists === null) {
         return getAlbumCover(track.album, {to});
     } else {
-        return to('shared.trackCover', track.album.directory, track.directory);
+        return to('media.trackCover', track.album.directory, track.directory);
     }
 }
 
