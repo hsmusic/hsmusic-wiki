@@ -209,9 +209,16 @@ const infoCard = (() => {
 
             container.style.setProperty('--primary-color', data.color);
 
-            container.classList.add('shown');
             container.style.top = window.scrollY + rect.bottom + 'px';
             container.style.left = window.scrollX + rect.left + 'px';
+
+            // Use a short timeout to let a currently hidden (or not yet shown)
+            // info card teleport to the position set a8ove. (If it's currently
+            // shown, it'll transition to that position.)
+            setTimeout(() => {
+                container.classList.remove('hide');
+                container.classList.add('show');
+            }, 50);
 
             const nameLink = container.querySelector('.info-card-name a');
             link(nameLink, 'track', data);
@@ -222,7 +229,8 @@ const infoCard = (() => {
     }
 
     function hide() {
-        container.classList.remove('shown');
+        container.classList.remove('show');
+        container.classList.add('hide');
         cancelShow = true;
     }
 

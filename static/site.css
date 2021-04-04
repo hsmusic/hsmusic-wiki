@@ -703,13 +703,52 @@ li > ul {
 
 #info-card-container {
     position: absolute;
-    display: none;
 
     margin-right: 10px;
+    padding-left: 3ch;
+    border-top: 1px solid white;
+
+    pointer-events: none; /* Padding area shouldn't 8e interactive. */
+    display: none;
 }
 
-#info-card-container.shown {
+#info-card-container.show,
+#info-card-container.hide {
     display: block;
+}
+
+#info-card-container.show {
+    animation: 0.2s linear forwards info-card-show;
+    transition: top 0.1s, left 0.1s;
+}
+
+#info-card-container.hide {
+    animation: 0.2s linear forwards info-card-hide;
+}
+
+@keyframes info-card-show {
+    0% {
+        opacity: 0;
+        margin-top: -5px;
+    }
+
+    100% {
+        opacity: 1;
+        margin-top: 0;
+    }
+}
+
+@keyframes info-card-hide {
+    0% {
+        opacity: 1;
+        margin-top: 0;
+    }
+
+    100% {
+        opacity: 0;
+        margin-top: 5px;
+        display: none;
+    }
 }
 
 .info-card {
@@ -720,6 +759,18 @@ li > ul {
 
     padding: 5px;
     font-size: 0.9em;
+
+    pointer-events: none;
+}
+
+#info-card-container.show .info-card {
+    animation: 0.01s linear 0.2s forwards info-card-become-interactive;
+}
+
+@keyframes info-card-become-interactive {
+    to {
+        pointer-events: auto;
+    }
 }
 
 .info-card-name {
