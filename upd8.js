@@ -4562,7 +4562,7 @@ const listingSpec = [
     },
 
     {
-        directory: 'tags/by-useds',
+        directory: 'tags/by-uses',
         title: ({strings}) => strings('listingPage.listTags.byUses.title'),
         condition: () => wikiInfo.features.artTagUI,
 
