@@ -2037,6 +2037,7 @@ function img({
     thumb: thumbKey = '',
     reveal = '',
     id = '',
+    class: className = '',
     width = '',
     height = '',
     link = false,
@@ -2051,6 +2052,7 @@ function img({
 
     const imgAttributes = attributes({
         id: link ? '' : id,
+        class: className,
         alt,
         width,
         height
@@ -2396,6 +2398,13 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     const infoCardHTML = fixWS`
         <div id="info-card-container">
             <div class="info-card">
+                <div class="info-card-art-container">
+                    ${img({
+                        class: 'info-card-art',
+                        src: '',
+                        square: true
+                    })}
+                </div>
                 <h1 class="info-card-name"><a></a></h1>
                 <p class="info-card-album">${strings('releaseInfo.from', {album: '<a></a>'})}</p>
             </div>
@@ -3091,6 +3100,11 @@ function writeTrackPage(track) {
             date: track.date,
             duration: track.duration,
             color: track.color,
+            cover: {
+                path: getTrackCover(track, {
+                    to: urls.from('media.root').to
+                })
+            },
             links: {
                 artists: serializeContribs(track.artists),
                 contributors: serializeContribs(track.contributors),

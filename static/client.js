@@ -78,7 +78,7 @@ function getFlashListAndIndex() {
 
 // TODO: This should also use urlSpec.
 function fetchData(type, directory) {
-    return fetch(rebase(`data/${type}/${directory}/data.json`, 'rebaseData'))
+    return fetch(rebase(`${type}/${directory}/data.json`, 'rebaseData'))
         .then(res => res.json());
 }
 
@@ -225,6 +225,9 @@ const infoCard = (() => {
 
             const albumLink = container.querySelector('.info-card-album a');
             link(albumLink, 'album', data.links.album);
+
+            const img = container.querySelector('.info-card-art');
+            img.src = rebase(data.cover.path, 'rebaseMedia');
         });
     }
 

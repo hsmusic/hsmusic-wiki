@@ -752,7 +752,9 @@ li > ul {
 }
 
 .info-card {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: black;
+    color: white;
+
     border: 1px dotted var(--primary-color);
     border-radius: 3px;
     box-shadow: 0 5px 5px black;
@@ -771,6 +773,24 @@ li > ul {
     to {
         pointer-events: auto;
     }
+}
+
+.info-card-art-container {
+    float: right;
+
+    width: 40%;
+    margin: 5px;
+    font-size: 0.8em;
+}
+
+.info-card-art-container .image-container {
+    padding: 2px;
+}
+
+.info-card-art {
+    display: block;
+    width: 100%;
+    height: 100%;
 }
 
 .info-card-name {
