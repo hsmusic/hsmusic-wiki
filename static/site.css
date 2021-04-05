@@ -704,9 +704,8 @@ li > ul {
 #info-card-container {
     position: absolute;
 
-    margin-right: 10px;
-    padding-left: 3ch;
-    border-top: 1px solid white;
+    left: 0;
+    right: 10px;
 
     pointer-events: none; /* Padding area shouldn't 8e interactive. */
     display: none;
@@ -714,7 +713,11 @@ li > ul {
 
 #info-card-container.show,
 #info-card-container.hide {
-    display: block;
+    display: flex;
+}
+
+#info-card-container > * {
+    flex-basis: 400px;
 }
 
 #info-card-container.show {
@@ -751,6 +754,11 @@ li > ul {
     }
 }
 
+.info-card-decor {
+    padding-left: 3ch;
+    border-top: 1px solid white;
+}
+
 .info-card {
     background-color: black;
     color: white;
@@ -763,6 +771,12 @@ li > ul {
     font-size: 0.9em;
 
     pointer-events: none;
+}
+
+.info-card::after {
+    content: "";
+    display: block;
+    clear: both;
 }
 
 #info-card-container.show .info-card {
