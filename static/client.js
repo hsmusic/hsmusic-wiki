@@ -177,11 +177,16 @@ const HIDE_HOVER_DELAY = 250;
 let fastHover = false;
 let endFastHoverTimeout = null;
 
-function link(a, type, {name, directory, color}) {
+function colorLink(a, color) {
     if (color) {
-        a.style.setProperty('--primary-color', color);
+        const { primary, dim } = C.getColors(color);
+        a.style.setProperty('--primary-color', primary);
+        a.style.setProperty('--dim-color', dim);
     }
+}
 
+function link(a, type, {name, directory, color}) {
+    colorLink(a, color);
     a.innerText = name
     a.href = getLinkHref(type, directory);
 }
@@ -227,7 +232,11 @@ const infoCard = (() => {
             link(albumLink, 'album', data.links.album);
 
             const img = container.querySelector('.info-card-art');
-            img.src = rebase(data.cover.path, 'rebaseMedia');
+            img.src = rebase(data.cover.paths.small, 'rebaseMedia');
+
+            const imgLink = container.querySelector('.info-card-art-container a');
+            colorLink(imgLink, data.color);
+            imgLink.href = rebase(data.cover.paths.original, 'rebaseMedia');
         });
     }
 

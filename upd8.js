@@ -2103,6 +2103,14 @@ function img({
     }
 }
 
+function serializeImagePaths(original) {
+    return {
+        original,
+        medium: thumb.medium(original),
+        small: thumb.small(original)
+    };
+}
+
 function serializeLink(thing) {
     return Object.fromEntries([
         ['name', thing.name],
@@ -2403,6 +2411,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                         ${img({
                             class: 'info-card-art',
                             src: '',
+                            link: true,
                             square: true
                         })}
                     </div>
@@ -3096,26 +3105,30 @@ function writeTrackPage(track) {
     const data = {
         type: 'data',
         path: ['track', track.directory],
-        data: () => ({
-            name: track.name,
-            directory: track.directory,
-            date: track.date,
-            duration: track.duration,
-            color: track.color,
-            cover: {
-                path: getTrackCover(track, {
-                    to: urls.from('media.root').to
-                })
-            },
-            links: {
-                artists: serializeContribs(track.artists),
-                contributors: serializeContribs(track.contributors),
-                album: serializeLink(track.album),
-                groups: track.album.groups.map(serializeLink),
-                references: track.references.map(serializeLink),
-                referencedBy: track.referencedBy.map(serializeLink)
-            }
-        })
+        data: () => {
+            const coverPath = getTrackCover(track, {
+                to: urls.from('media.root').to
+            });
+
+            return {
+                name: track.name,
+                directory: track.directory,
+                date: track.date,
+                duration: track.duration,
+                color: track.color,
+                cover: {
+                    paths: serializeImagePaths(coverPath)
+                },
+                links: {
+                    artists: serializeContribs(track.artists),
+                    contributors: serializeContribs(track.contributors),
+                    album: serializeLink(track.album),
+                    groups: track.album.groups.map(serializeLink),
+                    references: track.references.map(serializeLink),
+                    referencedBy: track.referencedBy.map(serializeLink)
+                }
+            };
+        }
     };
 
     // const page = ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
@@ -4932,39 +4945,17 @@ function getArtistString(artists, {strings, to, showIcons = false, showContrib =
     }));
 }
 
-// Graciously stolen from https://stackoverflow.com/a/54071699! ::::)
-// in: r,g,b in [0,1], out: h in [0,360) and s,l in [0,1]
-function rgb2hsl(r,g,b) {
-    let a=Math.max(r,g,b), n=a-Math.min(r,g,b), f=(1-Math.abs(a+a-n-1));
-    let h= n && ((a==r) ? (g-b)/n : ((a==g) ? 2+(b-r)/n : 4+(r-g)/n));
-    return [60*(h<0?h+6:h), f ? n/f : 0, (a+a-n)/2];
-}
-
-function getColorVariables(color) {
-    if (!color) {
-        color = wikiInfo.color;
-    }
-
-    const [ r, g, b ] = color.slice(1)
-        .match(/[0-9a-fA-F]{2,2}/g)
-        .slice(0, 3)
-        .map(val => parseInt(val, 16) / 255);
-    const [ h, s, l ] = rgb2hsl(r, g, b);
-    const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
-
-    return [
-        `--primary-color: ${color}`,
-        `--dim-color: ${dim}`
-    ];
-}
-
 function getLinkThemeString(thing) {
-    return getColorVariables(thing.color).join('; ');
+    const { primary, dim } = C.getColors(thing.color || wikiInfo.color);
+    return `--primary-color: ${primary}; --dim-color: ${dim}`;
 }
 
 function getThemeString(thing, additionalVariables = []) {
+    const { primary, dim } = C.getColors(thing.color || wikiInfo.color);
+
     const variables = [
-        ...getColorVariables(thing.color),
+        `--primary-color: ${primary}`,
+        `--dim-color: ${dim}`,
         ...additionalVariables
     ].filter(Boolean);
 
