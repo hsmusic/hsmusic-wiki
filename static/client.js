@@ -12,6 +12,38 @@ let officialAlbumData, fandomAlbumData, artistNames;
 
 let ready = false;
 
+// Localiz8tion nonsense ----------------------------------
+
+const language = document.documentElement.getAttribute('lang');
+
+let list;
+if (
+    typeof Intl === 'object' &&
+    typeof Intl.ListFormat === 'function'
+) {
+    const getFormat = type => {
+        const formatter = new Intl.ListFormat(language, {type});
+        return formatter.format.bind(formatter);
+    };
+
+    list = {
+        conjunction: getFormat('conjunction'),
+        disjunction: getFormat('disjunction'),
+        unit: getFormat('unit')
+    };
+} else {
+    // Not a gr8 mock we've got going here, 8ut it's *mostly* language-free.
+    // We use the same mock for every list 'cuz we don't have any of the
+    // necessary CLDR info to appropri8tely distinguish 8etween them.
+    const arbitraryMock = array => array.join(', ');
+
+    list = {
+        conjunction: arbitraryMock,
+        disjunction: arbitraryMock,
+        unit: arbitraryMock
+    };
+}
+
 // Miscellaneous helpers ----------------------------------
 
 function rebase(href, rebaseKey = 'rebaseLocalized') {
@@ -251,9 +283,8 @@ const infoCard = (() => {
             imgLink.href = rebase(data.cover.paths.original, 'rebaseMedia');
 
             if (containerShow === containerReveal) {
-                // TODO: List localiz8tion?
                 const cw = containerShow.querySelector('.info-card-art-warnings');
-                cw.innerText = data.cover.warnings.join(', ');
+                cw.innerText = list.unit(data.cover.warnings);
 
                 const reveal = containerShow.querySelector('.reveal');
                 reveal.classList.remove('revealed');

@@ -2451,6 +2451,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${attributes({
+            lang: strings.code,
             'data-rebase-localized': to('localized.root'),
             'data-rebase-shared': to('shared.root'),
             'data-rebase-media': to('media.root'),
@@ -2850,7 +2851,7 @@ function getRevealStringFromWarnings(warnings, {strings}) {
 
 function getRevealStringFromTags(tags, {strings}) {
     return tags && tags.some(tag => tag.isCW) && (
-        getRevealStringFromWarnings(tags.filter(tag => tag.isCW).map(tag => tag.name).join(', '), {strings}));
+        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isCW).map(tag => tag.name).join(', '), {strings})));
 }
 
 function generateCoverLink({
