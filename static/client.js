@@ -231,12 +231,33 @@ const infoCard = (() => {
             const albumLink = container.querySelector('.info-card-album a');
             link(albumLink, 'album', data.links.album);
 
-            const img = container.querySelector('.info-card-art');
+            const [ containerNoReveal, containerReveal ] = [
+                container.querySelector('.info-card-art-container.no-reveal'),
+                container.querySelector('.info-card-art-container.reveal')
+            ];
+
+            const [ containerShow, containerHide ] = (data.cover.warnings.length
+                ? [containerReveal, containerNoReveal]
+                : [containerNoReveal, containerReveal]);
+
+            containerHide.style.display = 'none';
+            containerShow.style.display = 'block';
+
+            const img = containerShow.querySelector('.info-card-art');
             img.src = rebase(data.cover.paths.small, 'rebaseMedia');
 
-            const imgLink = container.querySelector('.info-card-art-container a');
+            const imgLink = containerShow.querySelector('a');
             colorLink(imgLink, data.color);
             imgLink.href = rebase(data.cover.paths.original, 'rebaseMedia');
+
+            if (containerShow === containerReveal) {
+                // TODO: List localiz8tion?
+                const cw = containerShow.querySelector('.info-card-art-warnings');
+                cw.innerText = data.cover.warnings.join(', ');
+
+                const reveal = containerShow.querySelector('.reveal');
+                reveal.classList.remove('revealed');
+            }
         });
     }
 

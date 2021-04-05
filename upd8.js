@@ -2126,6 +2126,23 @@ function serializeContribs(contribs) {
     }));
 }
 
+function serializeCover(thing, pathFunction) {
+    const coverPath = pathFunction(thing, {
+        to: urls.from('media.root').to
+    });
+
+    const { artTags } = thing;
+
+    const cwTags = artTags.filter(tag => tag.isCW);
+    const linkTags = artTags.filter(tag => !tag.isCW);
+
+    return {
+        paths: serializeImagePaths(coverPath),
+        tags: linkTags.map(serializeLink),
+        warnings: cwTags.map(tag => tag.name)
+    };
+}
+
 function validateWritePath(path, urlGroup) {
     if (!Array.isArray(path)) {
         return {error: `Expected array, got ${path}`};
@@ -2407,12 +2424,21 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         <div id="info-card-container">
             <div class="info-card-decor">
                 <div class="info-card">
-                    <div class="info-card-art-container">
+                    <div class="info-card-art-container no-reveal">
                         ${img({
                             class: 'info-card-art',
                             src: '',
                             link: true,
                             square: true
+                        })}
+                    </div>
+                    <div class="info-card-art-container reveal">
+                        ${img({
+                            class: 'info-card-art',
+                            src: '',
+                            link: true,
+                            square: true,
+                            reveal: getRevealStringFromWarnings('<span class="info-card-art-warnings"></span>', {strings})
                         })}
                     </div>
                     <h1 class="info-card-name"><a></a></h1>
@@ -2519,7 +2545,7 @@ function getGridHTML({
                 thumb: 'small',
                 lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                 square: true,
-                reveal: getRevealString(item.artTags, {strings})
+                reveal: getRevealStringFromTags(item.artTags, {strings})
             })}
             <span>${item.name}</span>
             ${detailsFn && `<span>${detailsFn(item)}</span>`}
@@ -2817,12 +2843,14 @@ function writeStaticPage(staticPage) {
     }));
 }
 
-function getRevealString(tags, {strings}) {
+
+function getRevealStringFromWarnings(warnings, {strings}) {
+    return strings('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
+}
+
+function getRevealStringFromTags(tags, {strings}) {
     return tags && tags.some(tag => tag.isCW) && (
-        strings('misc.contentWarnings', {
-            warnings: tags.filter(tag => tag.isCW).map(tag => `<span class="reveal-tag">${tag.name}</span>`).join(', ')
-        }) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
-    );
+        getRevealStringFromWarnings(tags.filter(tag => tag.isCW).map(tag => tag.name).join(', '), {strings}));
 }
 
 function generateCoverLink({
@@ -2840,7 +2868,7 @@ function generateCoverLink({
                 id: 'cover-art',
                 link: true,
                 square: true,
-                reveal: getRevealString(tags, {strings})
+                reveal: getRevealStringFromTags(tags, {strings})
             })}
             ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
                 <p class="tags">
@@ -3105,30 +3133,22 @@ function writeTrackPage(track) {
     const data = {
         type: 'data',
         path: ['track', track.directory],
-        data: () => {
-            const coverPath = getTrackCover(track, {
-                to: urls.from('media.root').to
-            });
-
-            return {
-                name: track.name,
-                directory: track.directory,
-                date: track.date,
-                duration: track.duration,
-                color: track.color,
-                cover: {
-                    paths: serializeImagePaths(coverPath)
-                },
-                links: {
-                    artists: serializeContribs(track.artists),
-                    contributors: serializeContribs(track.contributors),
-                    album: serializeLink(track.album),
-                    groups: track.album.groups.map(serializeLink),
-                    references: track.references.map(serializeLink),
-                    referencedBy: track.referencedBy.map(serializeLink)
-                }
-            };
-        }
+        data: () => ({
+            name: track.name,
+            directory: track.directory,
+            date: track.date,
+            duration: track.duration,
+            color: track.color,
+            cover: serializeCover(track, getTrackCover),
+            links: {
+                artists: serializeContribs(track.artists),
+                contributors: serializeContribs(track.contributors),
+                album: serializeLink(track.album),
+                groups: track.album.groups.map(serializeLink),
+                references: track.references.map(serializeLink),
+                referencedBy: track.referencedBy.map(serializeLink)
+            }
+        })
     };
 
     // const page = ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({

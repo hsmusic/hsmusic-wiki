@@ -795,6 +795,9 @@ li > ul {
     width: 40%;
     margin: 5px;
     font-size: 0.8em;
+
+    /* Dynamically shown. */
+    display: none;
 }
 
 .info-card-art-container .image-container {
