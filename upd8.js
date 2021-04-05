@@ -2852,7 +2852,7 @@ function getRevealStringFromWarnings(warnings, {strings}) {
 
 function getRevealStringFromTags(tags, {strings}) {
     return tags && tags.some(tag => tag.isCW) && (
-        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isCW).map(tag => tag.name).join(', ')), {strings}));
+        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isCW).map(tag => tag.name)), {strings}));
 }
 
 function generateCoverLink({
