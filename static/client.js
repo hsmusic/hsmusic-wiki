@@ -223,6 +223,17 @@ function link(a, type, {name, directory, color}) {
     a.href = getLinkHref(type, directory);
 }
 
+function joinElements(type, elements) {
+    // We can't use the Intl APIs with elements, 8ecuase it only oper8tes on
+    // strings. So instead, we'll pass the element's outer HTML's (which means
+    // the entire HTML of that element).
+    //
+    // That does mean this function returns a string, so always 8e sure to
+    // set innerHTML when using it (not appendChild).
+
+    return list[type](elements.map(el => el.outerHTML));
+}
+
 const infoCard = (() => {
     const container = document.getElementById('info-card-container');
 
@@ -257,11 +268,23 @@ const infoCard = (() => {
                 container.classList.add('show');
             }, 50);
 
+            // 8asic details.
+
             const nameLink = container.querySelector('.info-card-name a');
             link(nameLink, 'track', data);
 
             const albumLink = container.querySelector('.info-card-album a');
             link(albumLink, 'album', data.links.album);
+
+            const artistSpan = container.querySelector('.info-card-artists span');
+            artistSpan.innerHTML = joinElements('conjunction', data.links.artists.map(({ who: artist }) => {
+                const a = document.createElement('a');
+                a.href = getLinkHref('artist', artist.directory);
+                a.innerText = artist.name;
+                return a;
+            }));
+
+            // Cover art.
 
             const [ containerNoReveal, containerReveal ] = [
                 container.querySelector('.info-card-art-container.no-reveal'),

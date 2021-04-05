@@ -2443,6 +2443,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                     </div>
                     <h1 class="info-card-name"><a></a></h1>
                     <p class="info-card-album">${strings('releaseInfo.from', {album: '<a></a>'})}</p>
+                    <p class="info-card-artists">${strings('releaseInfo.by', {artists: '<span></span>'})}</p>
                 </div>
             </div>
         </div>
