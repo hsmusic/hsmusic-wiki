@@ -290,7 +290,7 @@ const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
         ...conf
     });
 
-const linkPathname = (key, conf) => linkHelper((pathname, {to}) => to(key, pathname), conf);
+const linkPathname = (key, conf) => linkHelper(({directory: pathname}, {to}) => to(key, pathname), conf);
 const linkIndex = (key, conf) => linkHelper((_, {to}) => to('localized.' + key), conf);
 
 const link = {
