@@ -764,7 +764,7 @@ li > ul {
     100% {
         opacity: 0;
         margin-top: 5px;
-        display: none;
+        display: none !important;
     }
 }
 
