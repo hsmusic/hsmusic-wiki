@@ -239,6 +239,7 @@ const infoCard = (() => {
 
     let cancelShow = false;
     let hideTimeout = null;
+    let showing = false;
 
     container.addEventListener('mouseenter', cancelHide);
     container.addEventListener('mouseleave', readyHide);
@@ -252,6 +253,8 @@ const infoCard = (() => {
             if (cancelShow) {
                 return;
             }
+
+            showing = true;
 
             const rect = target.getBoundingClientRect();
 
@@ -333,10 +336,11 @@ const infoCard = (() => {
         container.classList.remove('show');
         container.classList.add('hide');
         cancelShow = true;
+        showing = false;
     }
 
     function readyHide() {
-        if (!hideTimeout) {
+        if (!hideTimeout && showing) {
             hideTimeout = setTimeout(hide, HIDE_HOVER_DELAY);
         }
     }
