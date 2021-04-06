@@ -2444,6 +2444,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                     <h1 class="info-card-name"><a></a></h1>
                     <p class="info-card-album">${strings('releaseInfo.from', {album: '<a></a>'})}</p>
                     <p class="info-card-artists">${strings('releaseInfo.by', {artists: '<span></span>'})}</p>
+                    <p class="info-card-cover-artists">${strings('releaseInfo.coverArtBy', {artists: '<span></span>'})}</p>
                 </div>
             </div>
         </div>
@@ -3145,6 +3146,7 @@ function writeTrackPage(track) {
             links: {
                 artists: serializeContribs(track.artists),
                 contributors: serializeContribs(track.contributors),
+                coverArtists: serializeContribs(track.coverArtists || []),
                 album: serializeLink(track.album),
                 groups: track.album.groups.map(serializeLink),
                 references: track.references.map(serializeLink),

@@ -284,6 +284,20 @@ const infoCard = (() => {
                 return a;
             }));
 
+            const coverArtistParagraph = container.querySelector('.info-card-cover-artists');
+            const coverArtistSpan = coverArtistParagraph.querySelector('span');
+            if (data.links.coverArtists.length) {
+                coverArtistParagraph.style.display = 'block';
+                coverArtistSpan.innerHTML = joinElements('conjunction', data.links.coverArtists.map(({ who: artist }) => {
+                    const a = document.createElement('a');
+                    a.href = getLinkHref('artist', artist.directory);
+                    a.innerText = artist.name;
+                    return a;
+                }));
+            } else {
+                coverArtistParagraph.style.display = 'none';
+            }
+
             // Cover art.
 
             const [ containerNoReveal, containerReveal ] = [
