@@ -2402,7 +2402,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
             <img ${attributes({
                 src: banner.src,
                 alt: banner.alt
-            })}>
+            })} width="1100" height="200">
         </div>
     `;
 
