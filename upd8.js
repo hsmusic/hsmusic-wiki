@@ -5156,7 +5156,7 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
 
     const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
         strings('albumSidebar.trackList.item', {
-            track: `<a href="${to('localized.track', track.directory)}">${track.name}</a>`
+            track: strings.link.track(track, {to})
         })
     }</li>`;
 
@@ -5169,11 +5169,11 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
                         <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
                             (listTag === 'ol'
                                 ? strings('albumSidebar.trackList.group.withRange', {
-                                    group: `<a href="${to('localized.track', tracks[0].directory)}">${name}</a>`,
+                                    group: strings.link.track(tracks[0], {to, text: name}),
                                     range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
                                 })
                                 : strings('albumSidebar.trackList.group', {
-                                    group: `<a href="${to('localized.track', tracks[0].directory)}">${name}</a>`
+                                    group: strings.link.track(tracks[0], {to, text: name})
                                 }))
                         }</dt>
                         ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
