@@ -77,6 +77,7 @@
     "releaseInfo.bannerArtBy": "Banner art by {ARTISTS}.",
     "releaseInfo.released": "Released {DATE}.",
     "releaseInfo.artReleased": "Art released {DATE}.",
+    "releaseInfo.addedToWiki": "Added to wiki {DATE}.",
     "releaseInfo.duration": "Duration: {DURATION}.",
     "releaseInfo.viewCommentary": "View {LINK}!",
     "releaseInfo.viewCommentary.link": "commentary page",

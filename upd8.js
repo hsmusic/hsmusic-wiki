@@ -1293,6 +1293,7 @@ async function processAlbumDataFile(file) {
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
+    album.dateAdded = getBasicField(albumSection, 'Date Added');
     album.coverArtists = getContributionField(albumSection, 'Cover Art');
     album.hasTrackArt = getBooleanField(albumSection, 'Has Track Art') ?? true;
     album.trackCoverArtists = getContributionField(albumSection, 'Track Art');
@@ -1329,28 +1330,37 @@ async function processAlbumDataFile(file) {
     );
 
     if (!album.name) {
-        return {error: 'Expected "Album" (name) field!'};
+        return {error: `Expected "Album" (name) field!`};
     }
 
     if (!album.date) {
-        return {error: 'Expected "Date" field!'};
+        return {error: `Expected "Date" field! (in ${album.name})`};
+    }
+
+    if (!album.dateAdded) {
+        return {error: `Expected "Date Added" field! (in ${album.name})`};
     }
 
     if (isNaN(Date.parse(album.date))) {
-        return {error: `Invalid Date field: "${album.date}"`};
+        return {error: `Invalid Date field: "${album.date}" (in ${album.name})`};
+    }
+
+    if (isNaN(Date.parse(album.trackArtDate))) {
+        return {error: `Invalid Track Art Date field: "${album.trackArtDate}" (in ${album.name})`};
+    }
+
+    if (isNaN(Date.parse(album.coverArtDate))) {
+        return {error: `Invalid Cover Art Date field: "${album.coverArtDate}" (in ${album.name})`};
+    }
+
+    if (isNaN(Date.parse(album.dateAdded))) {
+        return {error: `Invalid Date Added field: "${album.dateAdded}" (in ${album.name})`};
     }
 
     album.date = new Date(album.date);
     album.trackArtDate = new Date(album.trackArtDate);
     album.coverArtDate = new Date(album.coverArtDate);
-
-    if (isNaN(Date.parse(album.trackArtDate))) {
-        return {error: `Invalid Track Art Date field: "${album.trackArtDate}"`};
-    }
-
-    if (isNaN(Date.parse(album.coverArtDate))) {
-        return {error: `Invalid Cover Art Date field: "${album.coverArtDate}"`};
-    }
+    album.dateAdded = new Date(album.dateAdded);
 
     if (!album.directory) {
         album.directory = C.getKebabCase(album.name);
@@ -1894,7 +1904,7 @@ async function processHomepageInfoFile(file) {
                 }
 
                 let groupCount = getBasicField(section, 'Count');
-                if ((group || newReleases) && !groupCount) {
+                if (group && !groupCount) {
                     return {error: 'Expected "Count" field!'};
                 }
 
@@ -2593,6 +2603,101 @@ function getNewReleases(numReleases) {
     ];
 }
 
+function getNewAdditions(numAlbums) {
+    // Sort al8ums, in descending order of priority, 8y...
+    //
+    // * D8te of addition to the wiki (descending).
+    // * Major releases first.
+    // * D8te of release (descending).
+    //
+    // Major releases go first to 8etter ensure they show up in the list (and
+    // are usually at the start of the final output for a given d8 of release
+    // too).
+    const sortedAlbums = albumData.slice().sort((a, b) => {
+        if (a.dateAdded > b.dateAdded) return -1;
+        if (a.dateAdded < b.dateAdded) return 1;
+        if (a.isMajorRelease && !b.isMajorRelease) return -1;
+        if (!a.isMajorRelease && b.isMajorRelease) return 1;
+        if (a.date > b.date) return -1;
+        if (a.date < b.date) return 1;
+    });
+
+    // When multiple al8ums are added to the wiki at a time, we want to show
+    // all of them 8efore pulling al8ums from the next (earlier) date. We also
+    // want to show a diverse selection of al8ums - with limited space, we'd
+    // rather not show only the latest al8ums, if those happen to all 8e
+    // closely rel8ted!
+    //
+    // Specifically, we're concerned with avoiding too much overlap amongst
+    // the primary (first/top-most) group. We do this 8y collecting every
+    // primary group present amongst the al8ums for a given d8 into one
+    // (ordered) array, initially sorted (inherently) 8y latest al8um from
+    // the group. Then we cycle over the array, adding one al8um from each
+    // group until all the al8ums from that release d8 have 8een added (or
+    // we've met the total target num8er of al8ums). Once we've added all the
+    // al8ums for a given group, it's struck from the array (so the groups
+    // with the most additions on one d8 will have their oldest releases
+    // collected more towards the end of the list).
+
+    const albums = [];
+
+    let i = 0;
+    outerLoop: while (i < sortedAlbums.length) {
+        // 8uild up a list of groups and their al8ums 8y order of decending
+        // release, iter8ting until we're on a different d8. (We use a map for
+        // indexing so we don't have to iter8te through the entire array each
+        // time we access one of its entries. This is 8asically unnecessary
+        // since this will never 8e an expensive enough task for that to
+        // matter.... 8ut it's nicer code. BBBB) )
+        const currentDate = sortedAlbums[i].dateAdded;
+        const groupMap = new Map();
+        const groupArray = [];
+        for (let album; (album = sortedAlbums[i]) && +album.dateAdded === +currentDate; i++) {
+            const primaryGroup = album.groups[0];
+            if (groupMap.has(primaryGroup)) {
+                groupMap.get(primaryGroup).push(album);
+            } else {
+                const entry = [album]
+                groupMap.set(primaryGroup, entry);
+                groupArray.push(entry);
+            }
+        }
+
+        // Then cycle over that sorted array, adding one al8um from each to
+        // the main array until we've run out or have met the target num8er
+        // of al8ums.
+        while (groupArray.length) {
+            let j = 0;
+            while (j < groupArray.length) {
+                const entry = groupArray[j];
+                const album = entry.shift();
+                albums.push(album);
+
+
+                // This is the only time we ever add anything to the main al8um
+                // list, so it's also the only place we need to check if we've
+                // met the target length.
+                if (albums.length === numAlbums) {
+                    // If we've met it, 8r8k out of the outer loop - we're done
+                    // here!
+                    break outerLoop;
+                }
+
+                if (entry.length) {
+                    j++;
+                } else {
+                    groupArray.splice(j, 1);
+                }
+            }
+        }
+    }
+
+    // Finally, do some quick mapping shenanigans to 8etter display the result
+    // in a grid. (This should pro8a8ly 8e a separ8te, shared function, 8ut
+    // whatevs.)
+    return albums.map(album => ({large: album.isMajorRelease, item: album}));
+}
+
 function writeSymlinks() {
     return progressPromiseAll('Writing site symlinks.', [
         link(path.join(__dirname, C.COMMON_DIRECTORY), C.COMMON_DIRECTORY),
@@ -2662,6 +2767,7 @@ function writeHomepage() {
                                     strings, to,
                                     entries: (
                                         row.group === 'new-releases' ? getNewReleases(row.groupCount) :
+                                        row.group === 'new-additions' ? getNewAdditions(row.groupCount) :
                                         ((search.group(row.group)?.albums || [])
                                             .slice()
                                             .reverse()
@@ -3019,6 +3125,13 @@ function writeAlbumPage(album) {
                         ${album.tracks.map(t => trackToListItem(t, {strings, to})).join('\n')}
                     </${listTag}>
                 `}
+                <p>
+                    ${[
+                        strings('releaseInfo.addedToWiki', {
+                            date: strings.count.date(album.dateAdded)
+                        })
+                    ].filter(Boolean).join('<br>\n')}
+                </p>
                 ${album.commentary && fixWS`
                     <p>${strings('releaseInfo.artistCommentary')}</p>
                     <blockquote>
