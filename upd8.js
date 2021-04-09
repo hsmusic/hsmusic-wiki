@@ -3164,12 +3164,15 @@ function writeTrackPage(track) {
             `--track-directory: ${track.directory}`
         ]),
 
+        // disabled for now! shifting banner position per height of page is disorienting
+        /*
         banner: album.bannerArtists && {
             classes: ['dim'],
             src: to('media.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'bottom'
         },
+        */
 
         main: {
             content: fixWS`
