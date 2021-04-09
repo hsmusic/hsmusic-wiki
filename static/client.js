@@ -403,4 +403,11 @@ function addInfoCardLinkHandlers(type) {
     }
 }
 
-addInfoCardLinkHandlers('track');
+// Info cards are disa8led for now since they aren't quite ready for release,
+// 8ut you can try 'em out 8y setting this localStorage flag!
+//
+//     localStorage.tryInfoCards = true;
+//
+if (localStorage.tryInfoCards) {
+    addInfoCardLinkHandlers('track');
+}
