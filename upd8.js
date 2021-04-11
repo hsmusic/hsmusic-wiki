@@ -4105,7 +4105,7 @@ const listingSpec = [
         title: ({strings}) => strings('listingPage.listAlbums.byDuration.title'),
 
         data() {
-            return albumData.slice()
+            return albumData
                 .map(album => ({album, duration: getTotalDuration(album.tracks)}))
                 .sort((a, b) => b.duration - a.duration);
         },
@@ -4554,6 +4554,7 @@ const listingSpec = [
 
         data() {
             return trackData
+                .filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)
                 .map(track => ({track, duration: track.duration}))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
