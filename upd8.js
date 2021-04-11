@@ -4136,6 +4136,38 @@ const listingSpec = [
     },
 
     {
+        directory: 'albusm/by-date-added',
+        title: ({strings}) => strings('listingPage.listAlbums.byDateAdded.title'),
+
+        data() {
+            return chunkByProperties(albumData.slice().sort((a, b) => {
+                if (a.dateAdded < b.dateAdded) return -1;
+                if (a.dateAdded > b.dateAdded) return 1;
+            }), ['dateAdded']);
+        },
+
+        html(chunks, {strings, to}) {
+            return fixWS`
+                <dl>
+                    ${chunks.map(({dateAdded, chunk: albums}) => fixWS`
+                        <dt>${strings('listingPage.listAlbums.byDateAdded.date', {
+                            date: strings.count.date(dateAdded)
+                        })}</dt>
+                        <dd><ul>
+                            ${(albums
+                                .map(album => strings('listingPage.listAlbums.byDateAdded.album', {
+                                    album: strings.link.album(album, {to})
+                                }))
+                                .map(row => `<li>${row}</li>`)
+                                .join('\n'))}
+                        </ul></dd>
+                    `).join('\n')}
+                </dl>
+            `;
+        }
+    },
+
+    {
         directory: 'artists/by-name',
         title: ({strings}) => strings('listingPage.listArtists.byName.title'),
 

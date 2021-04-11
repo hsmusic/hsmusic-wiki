@@ -370,7 +370,18 @@ module.exports.chunkByConditions = function(array, conditions) {
 };
 
 module.exports.chunkByProperties = function(array, properties) {
-    return module.exports.chunkByConditions(array, properties.map(p => (a, b) => a[p] !== b[p] || a[p] != b[p]))
+    return module.exports.chunkByConditions(array, properties.map(p => (a, b) => {
+        if (a[p] instanceof Date && b[p] instanceof Date)
+            return +a[p] !== +b[p];
+
+        if (a[p] !== b[p]) return true;
+
+        // Not sure if this line is still necessary with the specific check for
+        // d8tes a8ove, 8ut, uh, keeping it anyway, just in case....?
+        if (a[p] != b[p]) return true;
+
+        return false;
+    }))
         .map(chunk => ({
             ...Object.fromEntries(properties.map(p => [p, chunk[0][p]])),
             chunk
