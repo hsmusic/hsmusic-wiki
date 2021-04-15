@@ -992,13 +992,7 @@ const replacerSpec = {
         stop_literal;
 
     const parseOneTextNode = function(input, i, stopAt) {
-        const nodes = parseNodes(input, i, stopAt, true);
-
-        return (
-            nodes.length === 0 ? null :
-            nodes.length === 1 ? nodes[0] :
-            makeNode(i, 'text', nodes.map(node => node.string).join(' '))
-        );
+        return parseNodes(input, i, stopAt, true)[0];
     };
 
     const parseNodes = function(input, i, stopAt, textOnly) {
