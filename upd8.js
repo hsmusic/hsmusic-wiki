@@ -117,6 +117,7 @@ const {
     logWarn,
     logInfo,
     logError,
+    makeExtendedRegExp,
     parseOptions,
     progressPromiseAll,
     queue,
@@ -930,6 +931,11 @@ const replacerSpec = {
         search: 'staticPage',
         link: 'staticPage'
     },
+    'string': {
+        search: null,
+        value: ref => ref,
+        html: (ref, {strings, args}) => strings(ref, args)
+    },
     'tag': {
         search: 'tag',
         link: 'tag'
@@ -955,7 +961,273 @@ const replacerSpec = {
     if (error) process.exit();
 
     const categoryPart = Object.keys(replacerSpec).join('|');
-    transformInline.regexp = new RegExp(String.raw`(?<!\\)\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
+    // transformInline.regexp = new RegExp(String.raw`(?<!\\)\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
+    transformInline.regexp = makeExtendedRegExp(String.raw`
+      (?<!\\)\[\[             // Opening [[ (only match unescaped).
+      ((${categoryPart}):)?   // Key of which replacer to use (track, album, etc). Defaults to track.
+      (.+?)                   // Argument for search function (or value function, if none provided).
+      ((?<! )#.+?)?           // Hash part for links, except when past a space (e.g. "Track #1").
+      (\|(.+?))?              // Label part, to replace default text or provide when there is none.
+      \]\]                    // Closing ]].
+    `, 'g');
+
+    transformInline.parse = function(input) {
+        const makeNode = (i, type, props) => ({i, type, ...props});
+        const makeError = (i, message) => makeNode(i, 'error', {message});
+        const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
+
+        const parseOneTextNode = function(i, opts) {
+            const { nodes, i: newI, ...rest } = parseNodes(i, {
+                ...opts,
+                textOnly: true
+            });
+
+            return {
+                node: (
+                    nodes.length === 0 ? null :
+                    nodes.length === 1 ? nodes[0] :
+                    makeNode(i, 'text', {
+                        string: nodes.map(node => node.string).join(' ')
+                    })),
+                i,
+                ...rest
+            };
+        };
+
+        const parseNodes = function(i, {
+            closerFn = null,
+            textOnly = false
+        } = {}) {
+            let nodes = [];
+            let escapeNext = false;
+            let string = '';
+            let iString = 0;
+
+            const matchLiteral = str => {
+                const fn = i =>
+                    (input.slice(i, i + str.length) === str
+                        ? {iMatch: i, iParse: i + str.length, match: str, fn}
+                        : null);
+                fn.literal = str;
+                return fn;
+            };
+
+            const matchAny = (...fns) => i => {
+                if (!fns.length) return null;
+                const result = fns[0](i);
+                if (result) return result;
+                return matchAny(...fns.slice(1))(i);
+            };
+
+            // Syntax literals.
+            const tagBeginning = matchLiteral('[[');
+            const tagEnding = matchLiteral(']]');
+            const tagReplacerValue = matchLiteral(':');
+            const tagArgument = matchLiteral('*');
+            const tagArgumentValue = matchLiteral('=');
+            const tagLabel = matchLiteral('|');
+
+            const pushNode = (...args) => nodes.push(makeNode(...args));
+            const pushTextNode = () => {
+                if (string.length) {
+                    pushNode(iString, 'text', {string});
+                    string = '';
+                }
+            };
+
+            while (i < input.length) {
+                let match;
+
+                if (escapeNext) {
+                    string += input[i];
+                    i++;
+                    continue;
+                }
+
+                if (input[i] === '\\') {
+                    escapeNext = true;
+                    i++;
+                    continue;
+                }
+
+                const closerResult = closerFn && closerFn(i);
+                if (closerResult) {
+                    pushTextNode();
+                    return {nodes, i, closerResult};
+                }
+
+                if (match = tagBeginning(i)) {
+                    if (textOnly)
+                        throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
+
+                    pushTextNode();
+
+                    i = match.iParse;
+
+                    const iTag = match.iMatch;
+
+                    let P, // parse
+                        N, // node
+                        M; // match
+                    const loadResults = result => {
+                        P = result;
+                        N = P.node || P.nodes;
+                        M = P.closerResult;
+                    };
+
+                    // Replacer key (or value)
+
+                    loadResults(parseOneTextNode(i, {
+                        closerFn: matchAny(tagReplacerValue, tagArgument, tagLabel, tagEnding)
+                    }));
+
+                    if (!M) throw endOfInput(i, `reading replacer key`);
+
+                    if (!N) {
+                        switch (M.fn) {
+                            case tagReplacerValue:
+                            case tagArgument:
+                            case tagLabel:
+                                throw makeError(i, `Expected text (replacer key).`);
+                            case tagEnding:
+                                throw makeError(i, `Expected text (replacer key/value).`);
+                        }
+                    }
+
+                    const replacerFirst = N;
+                    i = M.iParse;
+
+                    // Replacer value (if explicit)
+
+                    let replacerSecond;
+
+                    if (M.fn === tagReplacerValue) {
+                        loadResults(parseNodes(i, {
+                            closerFn: matchAny(tagArgument, tagLabel, tagEnding)
+                        }));
+
+                        if (!M) throw endOfInput(i, `reading replacer value`);
+                        if (!N) throw makeError(i, `Expected content (replacer value).`);
+
+                        replacerSecond = N;
+                        i = M.iParse
+                    }
+
+                    // Assign first & second to replacer key/value
+
+                    // Value is an array of nodes, 8ut key is just one (or null).
+                    // So if we use replacerFirst as the value, we need to stick
+                    // it in an array (on its own).
+                    const [ replacerKey, replacerValue ] =
+                        (replacerSecond
+                            ? [replacerFirst, replacerSecond]
+                            : [null, [replacerFirst]]);
+
+                    // Arguments
+
+                    const args = [];
+
+                    while (M.fn === tagArgument) {
+                        loadResults(parseOneTextNode(i, {
+                            closerFn: matchAny(tagArgumentValue, tagArgument, tagLabel, tagEnding)
+                        }));
+
+                        if (!M) throw endOfInput(i, `reading argument key`);
+
+                        if (M.fn !== tagArgumentValue)
+                            throw makeError(i, `Expected ${tagArgumentValue.literal} (tag argument).`);
+
+                        if (!N)
+                            throw makeError(i, `Expected text (argument key).`);
+
+                        const key = N;
+                        i = M.iParse;
+
+                        loadResults(parseNodes(i, {
+                            closerFn: matchAny(tagArgument, tagLabel, tagEnding)
+                        }));
+
+                        if (!M) throw endOfInput(i, `reading argument value`);
+                        if (!N) throw makeError(i, `Expected content (argument value).`);
+
+                        const value = N;
+                        i = M.iParse;
+
+                        args.push({key, value});
+                    }
+
+                    let label;
+
+                    if (M.fn === tagLabel) {
+                        loadResults(parseOneTextNode(i, {
+                            closerFn: matchAny(tagEnding)
+                        }));
+
+                        if (!M) throw endOfInput(i, `reading label`);
+                        if (!N) throw makeError(i, `Expected text (label).`);
+
+                        label = N;
+                        i = M.iParse;
+                    }
+
+                    nodes.push(makeNode(iTag, 'tag', {replacerKey, replacerValue, args, label}));
+
+                    continue;
+                }
+
+                string += input[i];
+                i++;
+            }
+
+            pushTextNode();
+            return {nodes, i};
+        };
+
+        try {
+            return parseNodes(0).nodes;
+        } catch (errorNode) {
+            if (errorNode.type !== 'error') {
+                throw errorNode;
+            }
+
+            const { i, message } = errorNode;
+
+            // TODO: Visual line/surrounding characters presentation!
+            throw new SyntaxError(`Parse error (at pos ${i}): ${message}`);
+        }
+    };
+}
+
+{
+    const show = input => process.stdout.write(`-- ${input}\n` + util.inspect(
+        transformInline.parse(input),
+        {
+            depth: null,
+            colors: true
+        }
+    ) + '\n\n');
+
+    show(`[[album:are-you-lost|Cristata's new album]]`);
+    show(`[[string:content.donate.patreonLine*link=[[external:https://www.patreon.com/qznebula|Patreon]]]]`);
+}
+
+{
+    function test(input) {
+        let n = 0;
+        const start = Date.now();
+        const end = start + 1000;
+        while (Date.now() < end) {
+            transformInline.parse(input);
+            n++;
+        }
+        console.log(`Ran ${n} times.`);
+    }
+
+    test(fixWS`
+        [[string:content.donate.patreonLine*link=[[external:https://www.patreon.com/qznebula|Patreon]]]]
+        Hello, world! Wow [[album:the-beans-zone]] is some cool stuff.
+    `);
+    process.exit();
 }
 
 function transformInline(text, {strings, to}) {

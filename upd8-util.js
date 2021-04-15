@@ -416,3 +416,14 @@ module.exports.promisifyProcess = function(proc, showLogging = true) {
 
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 module.exports.withEntries = (obj, fn) => Object.fromEntries(fn(Object.entries(obj)));
+
+// Stolen from here: https://stackoverflow.com/a/53925033
+// We changed the # to // though.
+module.exports.makeExtendedRegExp = (inputPatternStr, flags) => {
+    // Remove everything between the first unescaped `//` and the end of a line
+    // and then remove all unescaped whitespace
+    const cleanedPatternStr = inputPatternStr
+        .replace(/(^|[^\\])\/\/.*/g, '$1')
+        .replace(/(^|[^\\])\s+/g, '$1');
+    return new RegExp(cleanedPatternStr, flags);
+};
