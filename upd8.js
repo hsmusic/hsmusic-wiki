@@ -995,7 +995,7 @@ const replacerSpec = {
         };
 
         const parseNodes = function(i, {
-            closerFn = null,
+            stopAt = null,
             textOnly = false
         } = {}) {
             let nodes = [];
@@ -1003,29 +1003,13 @@ const replacerSpec = {
             let string = '';
             let iString = 0;
 
-            const matchLiteral = str => {
-                const fn = i =>
-                    (input.slice(i, i + str.length) === str
-                        ? {iMatch: i, iParse: i + str.length, match: str, fn}
-                        : null);
-                fn.literal = str;
-                return fn;
-            };
-
-            const matchAny = (...fns) => i => {
-                if (!fns.length) return null;
-                const result = fns[0](i);
-                if (result) return result;
-                return matchAny(...fns.slice(1))(i);
-            };
-
             // Syntax literals.
-            const tagBeginning = matchLiteral('[[');
-            const tagEnding = matchLiteral(']]');
-            const tagReplacerValue = matchLiteral(':');
-            const tagArgument = matchLiteral('*');
-            const tagArgumentValue = matchLiteral('=');
-            const tagLabel = matchLiteral('|');
+            const tagBeginning = '[[';
+            const tagEnding = ']]';
+            const tagReplacerValue = ':';
+            const tagArgument = '*';
+            const tagArgumentValue = '=';
+            const tagLabel = '|';
 
             const pushNode = (...args) => nodes.push(makeNode(...args));
             const pushTextNode = () => {
@@ -1036,8 +1020,6 @@ const replacerSpec = {
             };
 
             while (i < input.length) {
-                let match;
-
                 if (escapeNext) {
                     string += input[i];
                     i++;
@@ -1050,41 +1032,45 @@ const replacerSpec = {
                     continue;
                 }
 
-                const closerResult = closerFn && closerFn(i);
-                if (closerResult) {
-                    pushTextNode();
-                    return {nodes, i, closerResult};
+                if (stopAt) {
+                    for (const literal of stopAt) {
+                        if (input.slice(i, i + literal.length) === literal) {
+                            pushTextNode();
+                            return {
+                                nodes, i,
+                                stoppedAt: {iMatch: i, iParse: i + literal.length, literal}
+                            };
+                        }
+                    }
                 }
 
-                if (match = tagBeginning(i)) {
+                if (input.slice(i, i + tagBeginning.length) === tagBeginning) {
                     if (textOnly)
                         throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
 
                     pushTextNode();
-
-                    i = match.iParse;
-
-                    const iTag = match.iMatch;
+                    const iTag = i;
+                    i += tagBeginning.length;
 
                     let P, // parse
                         N, // node
-                        M; // match
+                        M; // match (stopped at)
                     const loadResults = result => {
                         P = result;
                         N = P.node || P.nodes;
-                        M = P.closerResult;
+                        M = P.stoppedAt;
                     };
 
                     // Replacer key (or value)
 
                     loadResults(parseOneTextNode(i, {
-                        closerFn: matchAny(tagReplacerValue, tagArgument, tagLabel, tagEnding)
+                        stopAt: [tagReplacerValue, tagArgument, tagLabel, tagEnding]
                     }));
 
                     if (!M) throw endOfInput(i, `reading replacer key`);
 
                     if (!N) {
-                        switch (M.fn) {
+                        switch (M.literal) {
                             case tagReplacerValue:
                             case tagArgument:
                             case tagLabel:
@@ -1101,9 +1087,9 @@ const replacerSpec = {
 
                     let replacerSecond;
 
-                    if (M.fn === tagReplacerValue) {
+                    if (M.literal === tagReplacerValue) {
                         loadResults(parseNodes(i, {
-                            closerFn: matchAny(tagArgument, tagLabel, tagEnding)
+                            stopAt: [tagArgument, tagLabel, tagEnding]
                         }));
 
                         if (!M) throw endOfInput(i, `reading replacer value`);
@@ -1127,14 +1113,14 @@ const replacerSpec = {
 
                     const args = [];
 
-                    while (M.fn === tagArgument) {
+                    while (M.literal === tagArgument) {
                         loadResults(parseOneTextNode(i, {
-                            closerFn: matchAny(tagArgumentValue, tagArgument, tagLabel, tagEnding)
+                            stopAt: [tagArgumentValue, tagArgument, tagLabel, tagEnding]
                         }));
 
                         if (!M) throw endOfInput(i, `reading argument key`);
 
-                        if (M.fn !== tagArgumentValue)
+                        if (M.literal !== tagArgumentValue)
                             throw makeError(i, `Expected ${tagArgumentValue.literal} (tag argument).`);
 
                         if (!N)
@@ -1144,7 +1130,7 @@ const replacerSpec = {
                         i = M.iParse;
 
                         loadResults(parseNodes(i, {
-                            closerFn: matchAny(tagArgument, tagLabel, tagEnding)
+                            stopAt: [tagArgument, tagLabel, tagEnding]
                         }));
 
                         if (!M) throw endOfInput(i, `reading argument value`);
@@ -1158,9 +1144,9 @@ const replacerSpec = {
 
                     let label;
 
-                    if (M.fn === tagLabel) {
+                    if (M.literal === tagLabel) {
                         loadResults(parseOneTextNode(i, {
-                            closerFn: matchAny(tagEnding)
+                            stopAt: [tagEnding]
                         }));
 
                         if (!M) throw endOfInput(i, `reading label`);
