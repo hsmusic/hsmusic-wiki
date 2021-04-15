@@ -1173,7 +1173,7 @@ const replacerSpec = {
 }
 
 {
-    function test(input) {
+    const test = input => {
         let n = 0;
         const s = 5;
         const start = Date.now();
