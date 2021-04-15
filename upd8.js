@@ -971,202 +971,205 @@ const replacerSpec = {
       \]\]                    // Closing ]].
     `, 'g');
 
-    transformInline.parse = function(input) {
-        const makeNode = (i, type, props) => ({i, type, ...props});
-        const makeError = (i, message) => makeNode(i, 'error', {message});
-        const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
+    // Syntax literals.
+    const tagBeginning = '[[';
+    const tagEnding = ']]';
+    const tagReplacerValue = ':';
+    const tagArgument = '*';
+    const tagArgumentValue = '=';
+    const tagLabel = '|';
 
-        let stopped,
-            stop_iMatch,
-            stop_iParse,
-            stop_literal;
+    const makeNode = (i, type, props) => ({i, type, ...props});
+    const makeError = (i, message) => makeNode(i, 'error', {message});
+    const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
 
-        const parseOneTextNode = function(i, opts) {
-            const nodes = parseNodes(i, {
-                ...opts,
-                textOnly: true
-            });
+    // These are 8asically stored on the glo8al scope, which might seem odd
+    // for a recursive function, 8ut the values are only ever used immediately
+    // after they're set.
+    let stopped,
+        stop_iMatch,
+        stop_iParse,
+        stop_literal;
 
-            return (
-                nodes.length === 0 ? null :
-                nodes.length === 1 ? nodes[0] :
-                makeNode(i, 'text', {
-                    string: nodes.map(node => node.string).join(' ')
-                })
-            );
+    const parseOneTextNode = function(input, i, opts) {
+        const nodes = parseNodes(input, i, {
+            ...opts,
+            textOnly: true
+        });
+
+        return (
+            nodes.length === 0 ? null :
+            nodes.length === 1 ? nodes[0] :
+            makeNode(i, 'text', {
+                string: nodes.map(node => node.string).join(' ')
+            })
+        );
+    };
+
+    const parseNodes = function(input, i, {
+        stopAt = null,
+        textOnly = false
+    } = {}) {
+        let nodes = [];
+        let escapeNext = false;
+        let string = '';
+        let iString = 0;
+
+        const pushNode = (...args) => nodes.push(makeNode(...args));
+        const pushTextNode = () => {
+            if (string.length) {
+                pushNode(iString, 'text', {string});
+                string = '';
+            }
         };
 
-        const parseNodes = function(i, {
-            stopAt = null,
-            textOnly = false
-        } = {}) {
-            let nodes = [];
-            let escapeNext = false;
-            let string = '';
-            let iString = 0;
-
-            // Syntax literals.
-            const tagBeginning = '[[';
-            const tagEnding = ']]';
-            const tagReplacerValue = ':';
-            const tagArgument = '*';
-            const tagArgumentValue = '=';
-            const tagLabel = '|';
-
-            const pushNode = (...args) => nodes.push(makeNode(...args));
-            const pushTextNode = () => {
-                if (string.length) {
-                    pushNode(iString, 'text', {string});
-                    string = '';
-                }
-            };
-
-            while (i < input.length) {
-                if (escapeNext) {
-                    string += input[i];
-                    i++;
-                    continue;
-                }
-
-                if (input[i] === '\\') {
-                    escapeNext = true;
-                    i++;
-                    continue;
-                }
-
-                if (stopAt) {
-                    for (const literal of stopAt) {
-                        if (input.slice(i, i + literal.length) === literal) {
-                            pushTextNode();
-                            stopped = true;
-                            stop_iMatch = i;
-                            stop_iParse = i + literal.length;
-                            stop_literal = literal;
-                            return nodes;
-                        }
-                    }
-                }
-
-                if (input.slice(i, i + tagBeginning.length) === tagBeginning) {
-                    if (textOnly)
-                        throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
-
-                    pushTextNode();
-                    const iTag = i;
-                    i += tagBeginning.length;
-
-                    let N;
-
-                    // Replacer key (or value)
-
-                    N = parseOneTextNode(i, {
-                        stopAt: [tagReplacerValue, tagArgument, tagLabel, tagEnding]
-                    });
-
-                    if (!stopped) throw endOfInput(i, `reading replacer key`);
-
-                    if (!N) {
-                        switch (stop_literal) {
-                            case tagReplacerValue:
-                            case tagArgument:
-                            case tagLabel:
-                                throw makeError(i, `Expected text (replacer key).`);
-                            case tagEnding:
-                                throw makeError(i, `Expected text (replacer key/value).`);
-                        }
-                    }
-
-                    const replacerFirst = N;
-                    i = stop_iParse;
-
-                    // Replacer value (if explicit)
-
-                    let replacerSecond;
-
-                    if (stop_literal === tagReplacerValue) {
-                        N = parseNodes(i, {
-                            stopAt: [tagArgument, tagLabel, tagEnding]
-                        });
-
-                        if (!stopped) throw endOfInput(i, `reading replacer value`);
-                        if (!N.length) throw makeError(i, `Expected content (replacer value).`);
-
-                        replacerSecond = N;
-                        i = stop_iParse
-                    }
-
-                    // Assign first & second to replacer key/value
-
-                    // Value is an array of nodes, 8ut key is just one (or null).
-                    // So if we use replacerFirst as the value, we need to stick
-                    // it in an array (on its own).
-                    const [ replacerKey, replacerValue ] =
-                        (replacerSecond
-                            ? [replacerFirst, replacerSecond]
-                            : [null, [replacerFirst]]);
-
-                    // Arguments
-
-                    const args = [];
-
-                    while (stop_literal === tagArgument) {
-                        N = parseOneTextNode(i, {
-                            stopAt: [tagArgumentValue, tagArgument, tagLabel, tagEnding]
-                        });
-
-                        if (!stopped) throw endOfInput(i, `reading argument key`);
-
-                        if (stop_literal !== tagArgumentValue)
-                            throw makeError(i, `Expected ${tagArgumentValue.literal} (tag argument).`);
-
-                        if (!N)
-                            throw makeError(i, `Expected text (argument key).`);
-
-                        const key = N;
-                        i = stop_iParse;
-
-                        N = parseNodes(i, {
-                            stopAt: [tagArgument, tagLabel, tagEnding]
-                        });
-
-                        if (!stopped) throw endOfInput(i, `reading argument value`);
-                        if (!N.length) throw makeError(i, `Expected content (argument value).`);
-
-                        const value = N;
-                        i = stop_iParse;
-
-                        args.push({key, value});
-                    }
-
-                    let label;
-
-                    if (stop_literal === tagLabel) {
-                        N = parseOneTextNode(i, {
-                            stopAt: [tagEnding]
-                        });
-
-                        if (!stopped) throw endOfInput(i, `reading label`);
-                        if (!N) throw makeError(i, `Expected text (label).`);
-
-                        label = N;
-                        i = stop_iParse;
-                    }
-
-                    nodes.push(makeNode(iTag, 'tag', {replacerKey, replacerValue, args, label}));
-
-                    continue;
-                }
-
+        while (i < input.length) {
+            if (escapeNext) {
                 string += input[i];
                 i++;
+                continue;
             }
 
-            pushTextNode();
-            return nodes;
-        };
+            if (input[i] === '\\') {
+                escapeNext = true;
+                i++;
+                continue;
+            }
 
+            if (stopAt) {
+                for (const literal of stopAt) {
+                    if (input.slice(i, i + literal.length) === literal) {
+                        pushTextNode();
+                        stopped = true;
+                        stop_iMatch = i;
+                        stop_iParse = i + literal.length;
+                        stop_literal = literal;
+                        return nodes;
+                    }
+                }
+            }
+
+            if (input.slice(i, i + tagBeginning.length) === tagBeginning) {
+                if (textOnly)
+                    throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
+
+                pushTextNode();
+                const iTag = i;
+                i += tagBeginning.length;
+
+                let N;
+
+                // Replacer key (or value)
+
+                N = parseOneTextNode(input, i, {
+                    stopAt: [tagReplacerValue, tagArgument, tagLabel, tagEnding]
+                });
+
+                if (!stopped) throw endOfInput(i, `reading replacer key`);
+
+                if (!N) {
+                    switch (stop_literal) {
+                        case tagReplacerValue:
+                        case tagArgument:
+                        case tagLabel:
+                            throw makeError(i, `Expected text (replacer key).`);
+                        case tagEnding:
+                            throw makeError(i, `Expected text (replacer key/value).`);
+                    }
+                }
+
+                const replacerFirst = N;
+                i = stop_iParse;
+
+                // Replacer value (if explicit)
+
+                let replacerSecond;
+
+                if (stop_literal === tagReplacerValue) {
+                    N = parseNodes(input, i, {
+                        stopAt: [tagArgument, tagLabel, tagEnding]
+                    });
+
+                    if (!stopped) throw endOfInput(i, `reading replacer value`);
+                    if (!N.length) throw makeError(i, `Expected content (replacer value).`);
+
+                    replacerSecond = N;
+                    i = stop_iParse
+                }
+
+                // Assign first & second to replacer key/value
+
+                // Value is an array of nodes, 8ut key is just one (or null).
+                // So if we use replacerFirst as the value, we need to stick
+                // it in an array (on its own).
+                const [ replacerKey, replacerValue ] =
+                    (replacerSecond
+                        ? [replacerFirst, replacerSecond]
+                        : [null, [replacerFirst]]);
+
+                // Arguments
+
+                const args = [];
+
+                while (stop_literal === tagArgument) {
+                    N = parseOneTextNode(input, i, {
+                        stopAt: [tagArgumentValue, tagArgument, tagLabel, tagEnding]
+                    });
+
+                    if (!stopped) throw endOfInput(i, `reading argument key`);
+
+                    if (stop_literal !== tagArgumentValue)
+                        throw makeError(i, `Expected ${tagArgumentValue.literal} (tag argument).`);
+
+                    if (!N)
+                        throw makeError(i, `Expected text (argument key).`);
+
+                    const key = N;
+                    i = stop_iParse;
+
+                    N = parseNodes(input, i, {
+                        stopAt: [tagArgument, tagLabel, tagEnding]
+                    });
+
+                    if (!stopped) throw endOfInput(i, `reading argument value`);
+                    if (!N.length) throw makeError(i, `Expected content (argument value).`);
+
+                    const value = N;
+                    i = stop_iParse;
+
+                    args.push({key, value});
+                }
+
+                let label;
+
+                if (stop_literal === tagLabel) {
+                    N = parseOneTextNode(input, i, {
+                        stopAt: [tagEnding]
+                    });
+
+                    if (!stopped) throw endOfInput(i, `reading label`);
+                    if (!N) throw makeError(i, `Expected text (label).`);
+
+                    label = N;
+                    i = stop_iParse;
+                }
+
+                nodes.push(makeNode(iTag, 'tag', {replacerKey, replacerValue, args, label}));
+
+                continue;
+            }
+
+            string += input[i];
+            i++;
+        }
+
+        pushTextNode();
+        return nodes;
+    };
+
+    transformInline.parse = function(input) {
         try {
-            return parseNodes(0);
+            return parseNodes(input, 0);
         } catch (errorNode) {
             if (errorNode.type !== 'error') {
                 throw errorNode;
