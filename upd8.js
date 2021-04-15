@@ -979,7 +979,7 @@ const replacerSpec = {
     const tagArgumentValue = '=';
     const tagLabel = '|';
 
-    const makeNode = (i, type, props) => ({i, type, ...props});
+    const makeNode = (i, type, data) => ({i, type, data});
     const makeError = (i, message) => makeNode(i, 'error', {message});
     const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
 
