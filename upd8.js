@@ -991,11 +991,8 @@ const replacerSpec = {
         stop_iParse,
         stop_literal;
 
-    const parseOneTextNode = function(input, i, opts) {
-        const nodes = parseNodes(input, i, {
-            ...opts,
-            textOnly: true
-        });
+    const parseOneTextNode = function(input, i, stopAt) {
+        const nodes = parseNodes(input, i, stopAt, true);
 
         return (
             nodes.length === 0 ? null :
@@ -1006,10 +1003,7 @@ const replacerSpec = {
         );
     };
 
-    const parseNodes = function(input, i, {
-        stopAt = null,
-        textOnly = false
-    } = {}) {
+    const parseNodes = function(input, i, stopAt, textOnly) {
         let nodes = [];
         let escapeNext = false;
         let string = '';
@@ -1060,9 +1054,7 @@ const replacerSpec = {
 
                 // Replacer key (or value)
 
-                N = parseOneTextNode(input, i, {
-                    stopAt: [tagReplacerValue, tagArgument, tagLabel, tagEnding]
-                });
+                N = parseOneTextNode(input, i, [tagReplacerValue, tagArgument, tagLabel, tagEnding]);
 
                 if (!stopped) throw endOfInput(i, `reading replacer key`);
 
@@ -1085,9 +1077,7 @@ const replacerSpec = {
                 let replacerSecond;
 
                 if (stop_literal === tagReplacerValue) {
-                    N = parseNodes(input, i, {
-                        stopAt: [tagArgument, tagLabel, tagEnding]
-                    });
+                    N = parseNodes(input, i, [tagArgument, tagLabel, tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading replacer value`);
                     if (!N.length) throw makeError(i, `Expected content (replacer value).`);
@@ -1111,9 +1101,7 @@ const replacerSpec = {
                 const args = [];
 
                 while (stop_literal === tagArgument) {
-                    N = parseOneTextNode(input, i, {
-                        stopAt: [tagArgumentValue, tagArgument, tagLabel, tagEnding]
-                    });
+                    N = parseOneTextNode(input, i, [tagArgumentValue, tagArgument, tagLabel, tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading argument key`);
 
@@ -1126,9 +1114,7 @@ const replacerSpec = {
                     const key = N;
                     i = stop_iParse;
 
-                    N = parseNodes(input, i, {
-                        stopAt: [tagArgument, tagLabel, tagEnding]
-                    });
+                    N = parseNodes(input, i, [tagArgument, tagLabel, tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading argument value`);
                     if (!N.length) throw makeError(i, `Expected content (argument value).`);
@@ -1142,9 +1128,7 @@ const replacerSpec = {
                 let label;
 
                 if (stop_literal === tagLabel) {
-                    N = parseOneTextNode(input, i, {
-                        stopAt: [tagEnding]
-                    });
+                    N = parseOneTextNode(input, i, [tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading label`);
                     if (!N) throw makeError(i, `Expected text (label).`);
