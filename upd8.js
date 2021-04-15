@@ -1015,10 +1015,9 @@ const replacerSpec = {
         let string = '';
         let iString = 0;
 
-        const pushNode = (...args) => nodes.push(makeNode(...args));
         const pushTextNode = () => {
             if (string.length) {
-                pushNode(iString, 'text', {string});
+                nodes.push(makeNode(iString, 'text', {string}));
                 string = '';
             }
         };
