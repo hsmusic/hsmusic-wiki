@@ -1097,13 +1097,19 @@ const replacerSpec = {
 
                 // Assign first & second to replacer key/value
 
+                let replacerKey,
+                    replacerValue;
+
                 // Value is an array of nodes, 8ut key is just one (or null).
                 // So if we use replacerFirst as the value, we need to stick
                 // it in an array (on its own).
-                const [ replacerKey, replacerValue ] =
-                    (replacerSecond
-                        ? [replacerFirst, replacerSecond]
-                        : [null, [replacerFirst]]);
+                if (replacerSecond) {
+                    replacerKey = replacerFirst;
+                    replacerValue = replacerSecond;
+                } else {
+                    replacerKey = null;
+                    replacerValue = [replacerFirst];
+                }
 
                 // Arguments
 
