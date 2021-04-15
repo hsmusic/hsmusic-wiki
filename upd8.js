@@ -1175,13 +1175,14 @@ const replacerSpec = {
 {
     function test(input) {
         let n = 0;
+        const s = 5;
         const start = Date.now();
-        const end = start + 1000;
+        const end = start + s * 1000;
         while (Date.now() < end) {
             transformInline.parse(input);
             n++;
         }
-        console.log(`Ran ${n} times.`);
+        console.log(`Ran ${Math.round(n / s)} times/sec.`);
     }
 
     test(fixWS`
