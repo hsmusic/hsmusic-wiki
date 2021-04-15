@@ -1000,6 +1000,8 @@ const replacerSpec = {
         let string = '';
         let iString = 0;
 
+        stopped = false;
+
         const pushTextNode = () => {
             if (string.length) {
                 nodes.push({i: iString, type: 'text', data: string});
@@ -1149,7 +1151,7 @@ const replacerSpec = {
                 throw errorNode;
             }
 
-            const { i, message } = errorNode;
+            const { i, data: { message } } = errorNode;
 
             // TODO: Visual line/surrounding characters presentation!
             throw new SyntaxError(`Parse error (at pos ${i}): ${message}`);
