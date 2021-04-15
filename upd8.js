@@ -961,17 +961,6 @@ const replacerSpec = {
     }
     if (error) process.exit();
 
-    const categoryPart = Object.keys(replacerSpec).join('|');
-    // transformInline.regexp = new RegExp(String.raw`(?<!\\)\[\[((${categoryPart}):)?(.+?)((?<! )#.+?)?(\|(.+?))?\]\]`, 'g');
-    transformInline.regexp = makeExtendedRegExp(String.raw`
-      (?<!\\)\[\[             // Opening [[ (only match unescaped).
-      ((${categoryPart}):)?   // Key of which replacer to use (track, album, etc). Defaults to track.
-      (.+?)                   // Argument for search function (or value function, if none provided).
-      ((?<! )#.+?)?           // Hash part for links, except when past a space (e.g. "Track #1").
-      (\|(.+?))?              // Label part, to replace default text or provide when there is none.
-      \]\]                    // Closing ]].
-    `, 'g');
-
     // Syntax literals.
     const tagBeginning = '[[';
     const tagEnding = ']]';
