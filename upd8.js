@@ -997,9 +997,7 @@ const replacerSpec = {
         return (
             nodes.length === 0 ? null :
             nodes.length === 1 ? nodes[0] :
-            makeNode(i, 'text', {
-                string: nodes.map(node => node.string).join(' ')
-            })
+            makeNode(i, 'text', nodes.map(node => node.string).join(' '))
         );
     };
 
@@ -1011,7 +1009,7 @@ const replacerSpec = {
 
         const pushTextNode = () => {
             if (string.length) {
-                nodes.push(makeNode(iString, 'text', {string}));
+                nodes.push(makeNode(iString, 'text', string));
                 string = '';
             }
         };
