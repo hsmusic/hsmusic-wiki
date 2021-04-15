@@ -427,3 +427,11 @@ module.exports.makeExtendedRegExp = (inputPatternStr, flags) => {
         .replace(/(^|[^\\])\s+/g, '$1');
     return new RegExp(cleanedPatternStr, flags);
 };
+
+
+// Stolen from here: https://stackoverflow.com/a/3561711
+//
+// There's a proposal for a native JS function like this, 8ut it's not even
+// past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
+module.exports.escapeRegex = string =>
+    string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');

@@ -111,6 +111,7 @@ const {
     chunkByProperties,
     curry,
     decorateTime,
+    escapeRegex,
     filterEmptyLines,
     joinNoOxford,
     mapInPlace,
@@ -979,6 +980,15 @@ const replacerSpec = {
     const tagArgumentValue = '=';
     const tagLabel = '|';
 
+    const R_tagBeginning = escapeRegex(tagBeginning);
+    const R_tagEnding = escapeRegex(tagEnding);
+    const R_tagReplacerValue = escapeRegex(tagReplacerValue);
+    const R_tagArgument = escapeRegex(tagArgument);
+    const R_tagArgumentValue = escapeRegex(tagArgumentValue);
+    const R_tagLabel = escapeRegex(tagLabel);
+
+    const regexpCache = {};
+
     const makeError = (i, message) => ({i, type: 'error', data: {message}});
     const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
 
@@ -1009,45 +1019,62 @@ const replacerSpec = {
             }
         };
 
+        const literalsToMatch = stopAt ? stopAt.concat([R_tagBeginning]) : [R_tagBeginning];
+
+        // The 8ackslash stuff here is to only match an even (or zero) num8er
+        // of sequential 'slashes. Even amounts always cancel out! Odd amounts
+        // don't, which would mean the following literal is 8eing escaped and
+        // should 8e counted only as part of the current string/text.
+        //
+        // Inspired 8y this: https://stackoverflow.com/a/41470813
+        const regexpSource = `(?<!\\\\)(?:\\\\{2})*(${literalsToMatch.join('|')})`;
+
+        // There are 8asically only a few regular expressions we'll ever use,
+        // 8ut it's a pain to hard-code them all, so we dynamically gener8te
+        // and cache them for reuse instead.
+        let regexp;
+        if (regexpCache.hasOwnProperty(regexpSource)) {
+            regexp = regexpCache[regexpSource];
+        } else {
+            regexp = new RegExp(regexpSource);
+            regexpCache[regexpSource] = regexp;
+        }
+
         while (i < input.length) {
-            if (escapeNext) {
-                string += input[i];
-                i++;
-                continue;
+            const match = input.slice(i).match(regexp);
+
+            if (!match) {
+                break;
             }
 
-            if (input[i] === '\\') {
-                escapeNext = true;
-                i++;
-                continue;
+            const closestMatch = match[0];
+            const closestMatchIndex = i + match.index;
+
+            iString = i;
+            string = input.slice(i, closestMatchIndex);
+            pushTextNode();
+
+            i = closestMatchIndex + closestMatch.length;
+
+            if (closestMatch !== tagBeginning) {
+                stopped = true;
+                stop_iMatch = closestMatchIndex;
+                stop_iParse = i;
+                stop_literal = closestMatch;
+                return nodes;
             }
 
-            if (stopAt) {
-                for (const literal of stopAt) {
-                    if (input.slice(i, i + literal.length) === literal) {
-                        pushTextNode();
-                        stopped = true;
-                        stop_iMatch = i;
-                        stop_iParse = i + literal.length;
-                        stop_literal = literal;
-                        return nodes;
-                    }
-                }
-            }
-
-            if (input.slice(i, i + tagBeginning.length) === tagBeginning) {
+            if (closestMatch === tagBeginning) {
                 if (textOnly)
                     throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
 
-                pushTextNode();
-                const iTag = i;
-                i += tagBeginning.length;
+                const iTag = closestMatchIndex;
 
                 let N;
 
                 // Replacer key (or value)
 
-                N = parseOneTextNode(input, i, [tagReplacerValue, tagArgument, tagLabel, tagEnding]);
+                N = parseOneTextNode(input, i, [R_tagReplacerValue, R_tagArgument, R_tagLabel, R_tagEnding]);
 
                 if (!stopped) throw endOfInput(i, `reading replacer key`);
 
@@ -1070,7 +1097,7 @@ const replacerSpec = {
                 let replacerSecond;
 
                 if (stop_literal === tagReplacerValue) {
-                    N = parseNodes(input, i, [tagArgument, tagLabel, tagEnding]);
+                    N = parseNodes(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading replacer value`);
                     if (!N.length) throw makeError(i, `Expected content (replacer value).`);
@@ -1094,7 +1121,7 @@ const replacerSpec = {
                 const args = [];
 
                 while (stop_literal === tagArgument) {
-                    N = parseOneTextNode(input, i, [tagArgumentValue, tagArgument, tagLabel, tagEnding]);
+                    N = parseOneTextNode(input, i, [R_tagArgumentValue, R_tagArgument, R_tagLabel, R_tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading argument key`);
 
@@ -1107,7 +1134,7 @@ const replacerSpec = {
                     const key = N;
                     i = stop_iParse;
 
-                    N = parseNodes(input, i, [tagArgument, tagLabel, tagEnding]);
+                    N = parseNodes(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading argument value`);
                     if (!N.length) throw makeError(i, `Expected content (argument value).`);
@@ -1121,7 +1148,7 @@ const replacerSpec = {
                 let label;
 
                 if (stop_literal === tagLabel) {
-                    N = parseOneTextNode(input, i, [tagEnding]);
+                    N = parseOneTextNode(input, i, [R_tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading label`);
                     if (!N) throw makeError(i, `Expected text (label).`);
@@ -1134,9 +1161,6 @@ const replacerSpec = {
 
                 continue;
             }
-
-            string += input[i];
-            i++;
         }
 
         pushTextNode();
