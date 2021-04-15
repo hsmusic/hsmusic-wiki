@@ -979,8 +979,7 @@ const replacerSpec = {
     const tagArgumentValue = '=';
     const tagLabel = '|';
 
-    const makeNode = (i, type, data) => ({i, type, data});
-    const makeError = (i, message) => makeNode(i, 'error', {message});
+    const makeError = (i, message) => ({i, type: 'error', data: {message}});
     const endOfInput = (i, comment) => makeError(i, `Unexpected end of input (${comment}).`);
 
     // These are 8asically stored on the glo8al scope, which might seem odd
@@ -1003,7 +1002,7 @@ const replacerSpec = {
 
         const pushTextNode = () => {
             if (string.length) {
-                nodes.push(makeNode(iString, 'text', string));
+                nodes.push({i: iString, type: 'text', data: string});
                 string = '';
             }
         };
@@ -1129,7 +1128,7 @@ const replacerSpec = {
                     i = stop_iParse;
                 }
 
-                nodes.push(makeNode(iTag, 'tag', {replacerKey, replacerValue, args, label}));
+                nodes.push({i: iTag, type: 'tag', data: {replacerKey, replacerValue, args, label}});
 
                 continue;
             }
