@@ -1005,7 +1005,7 @@ const replacerSpec = {
 
         const pushTextNode = () => {
             if (string.length) {
-                nodes.push({i: iString, type: 'text', data: string});
+                nodes.push({i: iString, iEnd: i, type: 'text', data: string});
                 string = '';
             }
         };
@@ -1174,7 +1174,7 @@ const replacerSpec = {
                     i = stop_iParse;
                 }
 
-                nodes.push({i: iTag, type: 'tag', data: {replacerKey, replacerValue, hash, args, label}});
+                nodes.push({i: iTag, iEnd: i, type: 'tag', data: {replacerKey, replacerValue, hash, args, label}});
 
                 continue;
             }
