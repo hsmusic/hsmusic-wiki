@@ -1210,8 +1210,29 @@ const replacerSpec = {
 
             const { i, data: { message } } = errorNode;
 
-            // TODO: Visual line/surrounding characters presentation!
-            throw new SyntaxError(`Parse error (at pos ${i}): ${message}`);
+            let lineStart = input.slice(0, i).lastIndexOf('\n');
+            if (lineStart >= 0) {
+                lineStart += 1;
+            } else {
+                lineStart = 0;
+            }
+
+            let lineEnd = input.slice(i).indexOf('\n');
+            if (lineEnd >= 0) {
+                lineEnd += i;
+            } else {
+                lineEnd = input.length;
+            }
+
+            const line = input.slice(lineStart, lineEnd);
+
+            const cursor = i - lineStart;
+
+            throw new SyntaxError(fixWS`
+                Parse error (at pos ${i}): ${message}
+                ${line}
+                ${'-'.repeat(cursor) + '^'}
+            `);
         }
     };
 }
