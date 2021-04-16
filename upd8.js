@@ -970,13 +970,30 @@ const replacerSpec = {
     const tagArgumentValue = '=';
     const tagLabel = '|';
 
-    const R_tagBeginning = escapeRegex(tagBeginning);
-    const R_tagEnding = escapeRegex(tagEnding);
-    const R_tagReplacerValue = escapeRegex(tagReplacerValue);
-    const R_tagHash = escapeRegex(tagHash);
-    const R_tagArgument = escapeRegex(tagArgument);
-    const R_tagArgumentValue = escapeRegex(tagArgumentValue);
-    const R_tagLabel = escapeRegex(tagLabel);
+    const noPrecedingWhitespace = '(?<!\\s)';
+
+    const R_tagBeginning =
+        escapeRegex(tagBeginning);
+
+    const R_tagEnding =
+        escapeRegex(tagEnding);
+
+    const R_tagReplacerValue =
+        noPrecedingWhitespace +
+        escapeRegex(tagReplacerValue);
+
+    const R_tagHash =
+        noPrecedingWhitespace +
+        escapeRegex(tagHash);
+
+    const R_tagArgument =
+        escapeRegex(tagArgument);
+
+    const R_tagArgumentValue =
+        escapeRegex(tagArgumentValue);
+
+    const R_tagLabel =
+        escapeRegex(tagLabel);
 
     const regexpCache = {};
 
