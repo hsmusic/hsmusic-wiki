@@ -1033,6 +1033,9 @@ const replacerSpec = {
             const match = input.slice(i).match(regexp);
 
             if (!match) {
+                iString = i;
+                string = input.slice(i, input.length);
+                pushTextNode();
                 break;
             }
 
@@ -1158,7 +1161,6 @@ const replacerSpec = {
             }
         }
 
-        pushTextNode();
         return nodes;
     };
 
