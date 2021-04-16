@@ -879,8 +879,8 @@ const replacerSpec = {
     'flash': {
         search: 'flash',
         link: 'flash',
-        transformName(name, search, offset, text) {
-            const nextCharacter = text[offset + search.length];
+        transformName(name, node, input) {
+            const nextCharacter = input[node.iEnd];
             const lastCharacter = name[name.length - 1];
             if (
                 ![' ', '\n', '<'].includes(nextCharacter) &&
@@ -1237,6 +1237,7 @@ const replacerSpec = {
     };
 }
 
+/*
 {
     const show = input => process.stdout.write(`-- ${input}\n` + util.inspect(
         transformInline.parse(input),
@@ -1269,11 +1270,22 @@ const replacerSpec = {
     `);
     process.exit();
 }
+*/
 
-function transformInline(text, {strings, to}) {
-    return text.replace(transformInline.regexp, (match, _1, category, ref, hash, _2, enteredName, offset) => {
-        if (!category) {
-            category = 'track';
+{
+    const evaluateTag = function(node, opts) {
+        const { input, strings, to } = opts;
+
+        const source = input.slice(node.i, node.iEnd);
+
+        const replacerKey = node.data.replacerKey?.data || 'track';
+        const replacerValue = transformNodes(node.data.replacerValue, opts);
+        const hash = node.data.hash && transformNodes(node.data.hash, opts);
+        const enteredLabel = node.data.label && transformNode(node.data.label, opts);
+
+        if (!replacerSpec[replacerKey]) {
+            logWarn`The link ${source} has an invalid replacer key!`;
+            return source;
         }
 
         const {
@@ -1282,28 +1294,28 @@ function transformInline(text, {strings, to}) {
             value: valueFn,
             html: htmlFn,
             transformName
-        } = replacerSpec[category];
+        } = replacerSpec[replacerKey];
 
         const value = (
-            valueFn ? valueFn(ref) :
-            searchKey ? search[searchKey](ref) :
+            valueFn ? valueFn(replacerValue) :
+            searchKey ? search[searchKey](replacerValue) :
             {
-                directory: ref.replace(category + ':', ''),
+                directory: replacerValue,
                 name: null
             });
 
         if (!value) {
-            logWarn`The link ${match} does not match anything!`;
-            return match;
+            logWarn`The link ${search} does not match anything!`;
+            return search;
         }
 
-        const label = (enteredName
-            || transformName && transformName(value.name, match, offset, text)
+        const label = (enteredLabel
+            || transformName && transformName(value.name, node, input)
             || value.name);
 
         if (!valueFn && !label) {
-            logWarn`The link ${match} requires a label be entered!`;
-            return match;
+            logWarn`The link ${search} requires a label be entered!`;
+            return search;
         }
 
         const fn = (htmlFn
@@ -1313,10 +1325,48 @@ function transformInline(text, {strings, to}) {
         try {
             return fn(value, {text: label, hash, strings, to});
         } catch (error) {
-            logError`The link ${match} failed to be processed: ${error}`;
-            return match;
+            logError`The link ${source} failed to be processed: ${error}`;
+            return source;
         }
-    }).replaceAll(String.raw`\[[`, '[[');
+    };
+
+    const transformNode = function(node, opts) {
+        if (!node) {
+            throw new Error('Expected a node!');
+        }
+
+        if (Array.isArray(node)) {
+            throw new Error('Got an array - use transformNodes here!');
+        }
+
+        switch (node.type) {
+            case 'text':
+                return node.data;
+            case 'tag':
+                return evaluateTag(node, opts);
+            default:
+                throw new Error(`Unknown node type ${node.type}`);
+        }
+    };
+
+    const transformNodes = function(nodes, opts) {
+        if (!nodes || !Array.isArray(nodes)) {
+            throw new Error(`Expected an array of nodes! Got: ${nodes}`);
+        }
+
+        return nodes.map(node => transformNode(node, opts)).join('');
+    };
+
+    Object.assign(transformInline, {
+        evaluateTag,
+        transformNode,
+        transformNodes
+    });
+}
+
+function transformInline(input, {strings, to}) {
+    const nodes = transformInline.parse(input);
+    return transformInline.transformNodes(nodes, {strings, to, input});
 }
 
 function parseAttributes(string, {to}) {
