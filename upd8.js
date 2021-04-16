@@ -965,6 +965,7 @@ const replacerSpec = {
     const tagBeginning = '[[';
     const tagEnding = ']]';
     const tagReplacerValue = ':';
+    const tagHash = '#';
     const tagArgument = '*';
     const tagArgumentValue = '=';
     const tagLabel = '|';
@@ -972,6 +973,7 @@ const replacerSpec = {
     const R_tagBeginning = escapeRegex(tagBeginning);
     const R_tagEnding = escapeRegex(tagEnding);
     const R_tagReplacerValue = escapeRegex(tagReplacerValue);
+    const R_tagHash = escapeRegex(tagHash);
     const R_tagArgument = escapeRegex(tagArgument);
     const R_tagArgumentValue = escapeRegex(tagArgumentValue);
     const R_tagLabel = escapeRegex(tagLabel);
@@ -1066,7 +1068,7 @@ const replacerSpec = {
 
                 // Replacer key (or value)
 
-                N = parseOneTextNode(input, i, [R_tagReplacerValue, R_tagArgument, R_tagLabel, R_tagEnding]);
+                N = parseOneTextNode(input, i, [R_tagReplacerValue, R_tagHash, R_tagArgument, R_tagLabel, R_tagEnding]);
 
                 if (!stopped) throw endOfInput(i, `reading replacer key`);
 
@@ -1074,8 +1076,9 @@ const replacerSpec = {
                     switch (stop_literal) {
                         case tagReplacerValue:
                         case tagArgument:
-                        case tagLabel:
                             throw makeError(i, `Expected text (replacer key).`);
+                        case tagLabel:
+                        case tagHash:
                         case tagEnding:
                             throw makeError(i, `Expected text (replacer key/value).`);
                     }
@@ -1089,7 +1092,7 @@ const replacerSpec = {
                 let replacerSecond;
 
                 if (stop_literal === tagReplacerValue) {
-                    N = parseNodes(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
+                    N = parseNodes(input, i, [R_tagHash, R_tagArgument, R_tagLabel, R_tagEnding]);
 
                     if (!stopped) throw endOfInput(i, `reading replacer value`);
                     if (!N.length) throw makeError(i, `Expected content (replacer value).`);
@@ -1112,6 +1115,22 @@ const replacerSpec = {
                 } else {
                     replacerKey = null;
                     replacerValue = [replacerFirst];
+                }
+
+                // Hash
+
+                let hash;
+
+                if (stop_literal === tagHash) {
+                    N = parseNodes(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
+
+                    if (!stopped) throw endOfInput(i, `reading hash`);
+
+                    if (!N)
+                        throw makeError(i, `Expected content (hash).`);
+
+                    hash = N;
+                    i = stop_iParse;
                 }
 
                 // Arguments
@@ -1155,7 +1174,7 @@ const replacerSpec = {
                     i = stop_iParse;
                 }
 
-                nodes.push({i: iTag, type: 'tag', data: {replacerKey, replacerValue, args, label}});
+                nodes.push({i: iTag, type: 'tag', data: {replacerKey, replacerValue, hash, args, label}});
 
                 continue;
             }
