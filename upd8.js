@@ -1020,8 +1020,15 @@ const replacerSpec = {
 
         stopped = false;
 
-        const pushTextNode = () => {
+        const pushTextNode = (isLast) => {
             string = input.slice(iString, i);
+
+            // If this is the last text node 8efore stopping (at a stopAt match
+            // or the end of the input), trim off whitespace at the end.
+            if (isLast) {
+                string = string.trimEnd();
+            }
+
             if (string.length) {
                 nodes.push({i: iString, iEnd: i, type: 'text', data: string});
                 string = '';
@@ -1049,29 +1056,46 @@ const replacerSpec = {
             regexpCache[regexpSource] = regexp;
         }
 
+        // Skip whitespace at the start of parsing. This is run every time
+        // parseNodes is called (and thus parseOneTextNode too), so spaces
+        // at the start of syntax elements will always 8e skipped. We don't
+        // skip whitespace that shows up inside content (i.e. once we start
+        // parsing below), though!
+        const whitespaceOffset = input.slice(i).search(/[^\s]/);
+
+        // If the string is all whitespace, that's just zero content, so
+        // return the empty nodes array.
+        if (whitespaceOffset === -1) {
+            return nodes;
+        }
+
+        i += whitespaceOffset;
+
         while (i < input.length) {
             const match = input.slice(i).match(regexp);
 
             if (!match) {
                 iString = i;
                 i = input.length;
-                pushTextNode();
+                pushTextNode(true);
                 break;
             }
 
             const closestMatch = match[0];
             const closestMatchIndex = i + match.index;
 
-            iString = i;
-            i = closestMatchIndex;
-            pushTextNode();
-
             if (textOnly && closestMatch === tagBeginning)
                 throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
 
+            const stopHere = (closestMatch !== tagBeginning);
+
+            iString = i;
+            i = closestMatchIndex;
+            pushTextNode(stopHere);
+
             i += closestMatch.length;
 
-            if (closestMatch !== tagBeginning) {
+            if (stopHere) {
                 stopped = true;
                 stop_iMatch = closestMatchIndex;
                 stop_iParse = i;
