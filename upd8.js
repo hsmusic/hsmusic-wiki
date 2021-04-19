@@ -1021,6 +1021,7 @@ const replacerSpec = {
         stopped = false;
 
         const pushTextNode = () => {
+            string = input.slice(iString, i);
             if (string.length) {
                 nodes.push({i: iString, iEnd: i, type: 'text', data: string});
                 string = '';
@@ -1053,7 +1054,7 @@ const replacerSpec = {
 
             if (!match) {
                 iString = i;
-                string = input.slice(i, input.length);
+                i = input.length;
                 pushTextNode();
                 break;
             }
@@ -1062,17 +1063,17 @@ const replacerSpec = {
             const closestMatchIndex = i + match.index;
 
             iString = i;
-            string = input.slice(i, closestMatchIndex);
+            i = closestMatchIndex;
             pushTextNode();
 
-            i = closestMatchIndex + closestMatch.length;
+            i += closestMatch.length;
 
             if (closestMatch !== tagBeginning) {
                 stopped = true;
                 stop_iMatch = closestMatchIndex;
                 stop_iParse = i;
                 stop_literal = closestMatch;
-                return nodes;
+                break;
             }
 
             if (closestMatch === tagBeginning) {
