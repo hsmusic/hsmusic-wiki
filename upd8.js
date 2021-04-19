@@ -1304,9 +1304,6 @@ const replacerSpec = {
         const source = input.slice(node.i, node.iEnd);
 
         const replacerKey = node.data.replacerKey?.data || 'track';
-        const replacerValue = transformNodes(node.data.replacerValue, opts);
-        const hash = node.data.hash && transformNodes(node.data.hash, opts);
-        const enteredLabel = node.data.label && transformNode(node.data.label, opts);
 
         if (!replacerSpec[replacerKey]) {
             logWarn`The link ${source} has an invalid replacer key!`;
@@ -1321,6 +1318,8 @@ const replacerSpec = {
             transformName
         } = replacerSpec[replacerKey];
 
+        const replacerValue = transformNodes(node.data.replacerValue, opts);
+
         const value = (
             valueFn ? valueFn(replacerValue) :
             searchKey ? search[searchKey](replacerValue) :
@@ -1334,6 +1333,8 @@ const replacerSpec = {
             return search;
         }
 
+        const enteredLabel = node.data.label && transformNode(node.data.label, opts);
+
         const label = (enteredLabel
             || transformName && transformName(value.name, node, input)
             || value.name);
@@ -1343,12 +1344,20 @@ const replacerSpec = {
             return search;
         }
 
+        const hash = node.data.hash && transformNodes(node.data.hash, opts);
+
+        const args = node.data.args && Object.fromEntries(node.data.args.map(
+            ({ key, value }) => [
+                transformNode(key, opts),
+                transformNodes(value, opts)
+            ]));
+
         const fn = (htmlFn
             ? htmlFn
             : strings.link[linkKey]);
 
         try {
-            return fn(value, {text: label, hash, strings, to});
+            return fn(value, {text: label, hash, args, strings, to});
         } catch (error) {
             logError`The link ${source} failed to be processed: ${error}`;
             return source;
