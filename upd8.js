@@ -1066,6 +1066,9 @@ const replacerSpec = {
             i = closestMatchIndex;
             pushTextNode();
 
+            if (textOnly && closestMatch === tagBeginning)
+                throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
+
             i += closestMatch.length;
 
             if (closestMatch !== tagBeginning) {
@@ -1077,9 +1080,6 @@ const replacerSpec = {
             }
 
             if (closestMatch === tagBeginning) {
-                if (textOnly)
-                    throw makeError(i, `Unexpected [[tag]] - expected only text here.`);
-
                 const iTag = closestMatchIndex;
 
                 let N;
