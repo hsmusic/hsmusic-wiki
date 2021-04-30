@@ -6185,8 +6185,8 @@ async function main() {
 
     trackData.forEach(track => track.otherReleases = [
         track.aka,
-        ...trackData.filter(({ aka }) => aka === track)
-    ].filter(Boolean));
+        ...trackData.filter(({ aka }) => aka === track || (track.aka && aka === track.aka)),
+    ].filter(x => x && x !== track));
 
     if (wikiInfo.features.flashesAndGames) {
         flashData.forEach(flash => mapInPlace(flash.tracks, search.track));
