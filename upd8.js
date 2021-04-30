@@ -3142,7 +3142,6 @@ function writeAlbumPage(album) {
         },
 
         sidebarLeft: generateSidebarForAlbum(album, null, {strings, to}),
-        sidebarRight: generateSidebarRightForAlbum(album, null, {strings, to}),
 
         nav: {
             links: [
@@ -3413,7 +3412,6 @@ function writeTrackPage(track) {
         },
 
         sidebarLeft: generateSidebarForAlbum(album, track, {strings, to}),
-        sidebarRight: generateSidebarRightForAlbum(album, track, {strings, to}),
 
         nav: {
             links: [
@@ -5311,79 +5309,90 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
         })
     }</li>`;
 
-    return {
-        content: fixWS`
-            <h1><a href="${to('localized.album', album.directory)}">${album.name}</a></h1>
-            ${album.trackGroups ? fixWS`
-                <dl>
-                    ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
-                        <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
-                            (listTag === 'ol'
-                                ? strings('albumSidebar.trackList.group.withRange', {
-                                    group: strings.link.track(tracks[0], {to, text: name}),
-                                    range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
-                                })
-                                : strings('albumSidebar.trackList.group', {
-                                    group: strings.link.track(tracks[0], {to, text: name})
-                                }))
-                        }</dt>
-                        ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
-                            <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
-                                ${tracks.map(trackToListItem).join('\n')}
-                            </${listTag}></dd>
-                        `}
-                    `).join('\n')}
-                </dl>
-            ` : fixWS`
-                <${listTag}>
-                    ${album.tracks.map(trackToListItem).join('\n')}
-                </${listTag}>
-            `}
-        `
-    };
-}
-
-function generateSidebarRightForAlbum(album, currentTrack, {strings, to}) {
-    if (!wikiInfo.features.groupUI) {
-        return null;
-    }
+    const trackListPart = fixWS`
+        <h1><a href="${to('localized.album', album.directory)}">${album.name}</a></h1>
+        ${album.trackGroups ? fixWS`
+            <dl>
+                ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
+                    <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
+                        (listTag === 'ol'
+                            ? strings('albumSidebar.trackList.group.withRange', {
+                                group: strings.link.track(tracks[0], {to, text: name}),
+                                range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
+                            })
+                            : strings('albumSidebar.trackList.group', {
+                                group: strings.link.track(tracks[0], {to, text: name})
+                            }))
+                    }</dt>
+                    ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
+                        <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                            ${tracks.map(trackToListItem).join('\n')}
+                        </${listTag}></dd>
+                    `}
+                `).join('\n')}
+            </dl>
+        ` : fixWS`
+            <${listTag}>
+                ${album.tracks.map(trackToListItem).join('\n')}
+            </${listTag}>
+        `}
+    `;
 
     const { groups } = album;
-    if (groups.length) {
+
+    const groupParts = groups.map(group => {
+        const index = group.albums.indexOf(album);
+        const next = group.albums[index + 1];
+        const previous = group.albums[index - 1];
+        return {group, next, previous};
+    }).map(({group, next, previous}) => fixWS`
+        <h1>${
+            strings('albumSidebar.groupBox.title', {
+                group: `<a href="${to('localized.groupInfo', group.directory)}">${group.name}</a>`
+            })
+        }</h1>
+        ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to})}
+        ${group.urls.length && `<p>${
+            strings('releaseInfo.visitOn', {
+                links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
+            })
+        }</p>`}
+        ${!currentTrack && fixWS`
+            ${next && `<p class="group-chronology-link">${
+                strings('albumSidebar.groupBox.next', {
+                    album: `<a href="${to('localized.album', next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
+                })
+            }</p>`}
+            ${previous && `<p class="group-chronology-link">${
+                strings('albumSidebar.groupBox.previous', {
+                    album: `<a href="${to('localized.album', previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
+                })
+            }</p>`}
+        `}
+    `);
+
+    if (groupParts.length) {
+        if (currentTrack) {
+            const combinedGroupPart = groupParts.join('\n<hr>\n');
+            return {
+                multiple: [
+                    trackListPart,
+                    combinedGroupPart
+                ]
+            };
+        } else {
+            return {
+                multiple: [
+                    ...groupParts,
+                    trackListPart
+                ]
+            };
+        }
+    } else {
         return {
-            collapse: false,
-            multiple: groups.map(group => {
-                const index = group.albums.indexOf(album);
-                const next = group.albums[index + 1];
-                const previous = group.albums[index - 1];
-                return {group, next, previous};
-            }).map(({group, next, previous}) => fixWS`
-                <h1>${
-                    strings('albumSidebar.groupBox.title', {
-                        group: `<a href="${to('localized.groupInfo', group.directory)}">${group.name}</a>`
-                    })
-                }</h1>
-                ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to})}
-                ${group.urls.length && `<p>${
-                    strings('releaseInfo.visitOn', {
-                        links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
-                    })
-                }</p>`}
-                ${!currentTrack && fixWS`
-                    ${next && `<p class="group-chronology-link">${
-                        strings('albumSidebar.groupBox.next', {
-                            album: `<a href="${to('localized.album', next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
-                        })
-                    }</p>`}
-                    ${previous && `<p class="group-chronology-link">${
-                        strings('albumSidebar.groupBox.previous', {
-                            album: `<a href="${to('localized.album', previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
-                        })
-                    }</p>`}
-                `}
-            `)
+            content: trackListPart
         };
-    };
+    }
 }
 
 function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
