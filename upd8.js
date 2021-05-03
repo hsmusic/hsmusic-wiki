@@ -192,6 +192,7 @@ const urlSpec = {
             path: '<>',
 
             album: 'album/<>',
+            artist: 'artist/<>',
             track: 'track/<>'
         }
     },
@@ -1515,6 +1516,7 @@ async function processArtistDataFile(file) {
         const name = getBasicField(section, 'Artist');
         const urls = (getListField(section, 'URLs') || []).filter(Boolean);
         const alias = getBasicField(section, 'Alias');
+        const hasAvatar = getBooleanField(section, 'Has Avatar') ?? false;
         const note = getMultilineField(section, 'Note');
         let directory = getBasicField(section, 'Directory');
 
@@ -1529,7 +1531,7 @@ async function processArtistDataFile(file) {
         if (alias) {
             return {name, directory, alias};
         } else {
-            return {name, directory, urls, note};
+            return {name, directory, urls, note, hasAvatar};
         }
     });
 }
@@ -2123,18 +2125,20 @@ function serializeImagePaths(original) {
 }
 
 function serializeLink(thing) {
-    return Object.fromEntries([
-        ['name', thing.name],
-        ['directory', thing.directory],
-        ['color', thing.color]
-    ].filter(([ key, value ]) => value));
+    const ret = {};
+    ret.name = thing.name;
+    ret.directory = thing.directory;
+    if (thing.color) ret.color = thing.color;
+    return ret;
 }
 
 function serializeContribs(contribs) {
-    return contribs.map(({ who, what }) => ({
-        artist: serializeLink(who),
-        contribution: what
-    }));
+    return contribs.map(({ who, what }) => {
+        const ret = {};
+        ret.artist = serializeLink(who);
+        if (what) ret.contribution = what;
+        return ret;
+    });
 }
 
 function serializeCover(thing, pathFunction) {
@@ -2161,21 +2165,19 @@ function serializeGroupsForAlbum(album) {
         const previous = group.albums[index - 1] || null;
         return {group, index, next, previous};
     }).map(({group, index, next, previous}) => ({
-        name: group.name,
+        link: serializeLink(group),
         descriptionShort: group.descriptionShort,
         albumIndex: index,
         nextAlbum: next && serializeLink(next),
         previousAlbum: previous && serializeLink(previous),
-        urls: group.urls,
-        link: serializeLink(group)
+        urls: group.urls
     }));
 }
 
 function serializeGroupsForTrack(track) {
     return track.album.groups.map(group => ({
-        name: group.name,
+        link: serializeLink(group),
         urls: group.urls,
-        link: serializeLink(group)
     }));
 }
 
@@ -3084,9 +3086,8 @@ function writeAlbumPage(album) {
                 tracks: trackGroup.tracks.map(track => track.directory)
             })),
             tracks: album.tracks.map(track => ({
-                name: track.name,
-                duration: track.duration,
-                link: serializeLink(track)
+                link: serializeLink(track),
+                duration: track.duration
             }))
         })
     };
@@ -3539,6 +3540,7 @@ function writeArtistPage(artist) {
     const getArtistsAndContrib = (thing, key) => ({
         artists: thing[key]?.filter(({ who }) => who !== artist),
         contrib: thing[key]?.find(({ who }) => who === artist),
+        thing,
         key
     });
 
@@ -3671,26 +3673,63 @@ function writeArtistPage(artist) {
         </dl>
     `;
 
-    const avatarPath = path.join(C.MEDIA_ARTIST_AVATAR_DIRECTORY, artist.directory + '.jpg');
-    let avatarFileExists = null;
+    const serializeArtistsAndContrib = key => thing => {
+        const { artists, contrib } = getArtistsAndContrib(thing, key);
+        const ret = {};
+        ret.link = serializeLink(thing);
+        if (contrib.what) ret.contribution = contrib.what;
+        if (artists.length) ret.otherArtists = serializeContribs(artists);
+        return ret;
+    };
 
-    return async ({strings, writePage}) => {
-        // The outer step, used for gathering data, is always sync. This is
-        // normally fine 8ecause pretty much all the data we will ever need
-        // across 8uilds is available for synchronous access - 8ut this here
-        // is an exception, and we have to evaluate it asynchronously. Still,
-        // we don't want to perform that access() oper8tion any more than
-        // necessary, so we cache the value in a varia8le shared across calls
-        // to this 8uild function.
-        avatarFileExists = avatarFileExists ?? (wikiInfo.features.artistAvatars &&
-            await access(path.join(mediaPath, avatarPath)).then(() => true, () => false));
+    const serializeTrackListChunks = chunks =>
+        chunks.map(({date, album, chunk, duration}) => ({
+            album: serializeLink(album),
+            date,
+            duration,
+            tracks: chunk.map(({ track }) => ({
+                link: serializeLink(track),
+                duration: track.duration
+            }))
+        }));
 
-        await writePage('artist', artist.directory, ({to}) => ({
+    const data = {
+        type: 'data',
+        path: ['artist', artist.directory],
+        data: () => ({
+            albums: {
+                asCoverArtist: artist.albums.asCoverArtist.map(serializeArtistsAndContrib('coverArtists')),
+                asWallpaperArtist: artist.albums.asWallpaperArtist.map(serializeArtistsAndContrib('wallpaperArtists')),
+                asBannerArtist: artist.albums.asBannerArtist.map(serializeArtistsAndContrib('bannerArtists'))
+            },
+            flashes: wikiInfo.features.flashesAndGames ? {
+                asContributor: artist.flashes.asContributor
+                    .map(flash => getArtistsAndContrib(flash, 'contributors'))
+                    .map(({ contrib, thing: flash }) => ({
+                        link: serializeLink(flash),
+                        contribution: contrib.what
+                    }))
+            } : null,
+            tracks: {
+                asArtist: artist.tracks.asArtist.map(serializeArtistsAndContrib('artists')),
+                asContributor: artist.tracks.asContributor.map(serializeArtistsAndContrib('contributors')),
+                chunked: {
+                    released: serializeTrackListChunks(releasedTrackListChunks),
+                    unreleased: serializeTrackListChunks(unreleasedTrackListChunks)
+                }
+            }
+        })
+    };
+
+    const infoPage = {
+        type: 'page',
+        path: ['artist', artist.directory],
+        page: ({strings, to}) => ({
             title: strings('artistPage.title', {artist: name}),
 
             main: {
                 content: fixWS`
-                    ${avatarFileExists && generateCoverLink({
+                    ${artist.hasAvatar && generateCoverLink({
                         strings, to,
                         src: to('localized.artistAvatar', artist.directory),
                         alt: strings('misc.alt.artistAvatar')
@@ -3833,38 +3872,42 @@ function writeArtistPage(artist) {
             },
 
             nav: generateNavForArtist(artist, {strings, to, isGallery: false, hasGallery})
-        }));
+        })
+    };
 
-        if (hasGallery) {
-            await writePage('artistGallery', artist.directory, ({to}) => ({
-                title: strings('artistGalleryPage.title', {artist: name}),
+    const galleryPage = hasGallery && {
+        type: 'page',
+        path: ['artistGallery', artist.directory],
+        page: ({strings, to}) => ({
+            title: strings('artistGalleryPage.title', {artist: name}),
 
-                main: {
-                    classes: ['top-index'],
-                    content: fixWS`
-                        <h1>${strings('artistGalleryPage.title', {artist: name})}</h1>
-                        <p class="quick-info">${strings('artistGalleryPage.infoLine', {
-                            coverArts: strings.count.coverArts(artThingsGallery.length, {unit: true})
-                        })}</p>
-                        <div class="grid-listing">
-                            ${getGridHTML({
-                                strings, to,
-                                entries: artThingsGallery.map(item => ({item})),
-                                srcFn: thing => (thing.album
-                                    ? getTrackCover(thing, {to})
-                                    : getAlbumCover(thing, {to})),
-                                hrefFn: thing => (thing.album
-                                    ? to('localized.track', thing.directory)
-                                    : to('localized.album', thing.directory))
-                            })}
-                        </div>
-                    `
-                },
+            main: {
+                classes: ['top-index'],
+                content: fixWS`
+                    <h1>${strings('artistGalleryPage.title', {artist: name})}</h1>
+                    <p class="quick-info">${strings('artistGalleryPage.infoLine', {
+                        coverArts: strings.count.coverArts(artThingsGallery.length, {unit: true})
+                    })}</p>
+                    <div class="grid-listing">
+                        ${getGridHTML({
+                            strings, to,
+                            entries: artThingsGallery.map(item => ({item})),
+                            srcFn: thing => (thing.album
+                                ? getTrackCover(thing, {to})
+                                : getAlbumCover(thing, {to})),
+                            hrefFn: thing => (thing.album
+                                ? to('localized.track', thing.directory)
+                                : to('localized.album', thing.directory))
+                        })}
+                    </div>
+                `
+            },
 
-                nav: generateNavForArtist(artist, {strings, to, isGallery: true, hasGallery})
-            }));
-        }
-    }
+            nav: generateNavForArtist(artist, {strings, to, isGallery: true, hasGallery})
+        })
+    };
+
+    return [data, infoPage, galleryPage].filter(Boolean);
 }
 
 function generateNavForArtist(artist, {strings, to, isGallery, hasGallery}) {
