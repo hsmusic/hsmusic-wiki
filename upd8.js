@@ -191,6 +191,7 @@ const urlSpec = {
             root: '',
             path: '<>',
 
+            album: 'album/<>',
             track: 'track/<>'
         }
     },
@@ -2131,8 +2132,8 @@ function serializeLink(thing) {
 
 function serializeContribs(contribs) {
     return contribs.map(({ who, what }) => ({
-        who: serializeLink(who),
-        what
+        artist: serializeLink(who),
+        contribution: what
     }));
 }
 
@@ -2151,6 +2152,31 @@ function serializeCover(thing, pathFunction) {
         tags: linkTags.map(serializeLink),
         warnings: cwTags.map(tag => tag.name)
     };
+}
+
+function serializeGroupsForAlbum(album) {
+    return album.groups.map(group => {
+        const index = group.albums.indexOf(album);
+        const next = group.albums[index + 1] || null;
+        const previous = group.albums[index - 1] || null;
+        return {group, index, next, previous};
+    }).map(({group, index, next, previous}) => ({
+        name: group.name,
+        descriptionShort: group.descriptionShort,
+        albumIndex: index,
+        nextAlbum: next && serializeLink(next),
+        previousAlbum: previous && serializeLink(previous),
+        urls: group.urls,
+        link: serializeLink(group)
+    }));
+}
+
+function serializeGroupsForTrack(track) {
+    return track.album.groups.map(group => ({
+        name: group.name,
+        urls: group.urls,
+        link: serializeLink(group)
+    }));
 }
 
 function validateWritePath(path, urlGroup) {
@@ -3028,10 +3054,44 @@ function writeAlbumPage(album) {
     };
 
     const commentaryEntries = [album, ...album.tracks].filter(x => x.commentary).length;
+    const albumDuration = getTotalDuration(album.tracks);
 
     const listTag = getAlbumListTag(album);
 
-    return ({strings, writePage}) => writePage('album', album.directory, ({to}) => ({
+    const data = {
+        type: 'data',
+        path: ['album', album.directory],
+        data: () => ({
+            name: album.name,
+            directory: album.directory,
+            dates: {
+                released: album.date,
+                trackArtAdded: album.trackArtDate,
+                coverArtAdded: album.coverArtDate,
+                addedToWiki: album.dateAdded
+            },
+            duration: albumDuration,
+            color: album.color,
+            cover: serializeCover(album, getAlbumCover),
+            artists: serializeContribs(album.artists || []),
+            coverArtists: serializeContribs(album.coverArtists || []),
+            wallpaperArtists: serializeContribs(album.wallpaperArtists || []),
+            bannerArtists: serializeContribs(album.bannerArtists || []),
+            groups: serializeGroupsForAlbum(album),
+            trackGroups: album.trackGroups?.map(trackGroup => ({
+                name: trackGroup.name,
+                color: trackGroup.color,
+                tracks: trackGroup.tracks.map(track => track.directory)
+            })),
+            tracks: album.tracks.map(track => ({
+                name: track.name,
+                duration: track.duration,
+                link: serializeLink(track)
+            }))
+        })
+    };
+
+    const page = {type: 'page', path: ['album', album.directory], page: ({strings, to}) => ({
         title: strings('albumPage.title', {album: album.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(album, [
@@ -3090,7 +3150,7 @@ function writeAlbumPage(album) {
                             date: strings.count.date(album.coverArtDate)
                         }),
                         strings('releaseInfo.duration', {
-                            duration: strings.count.duration(getTotalDuration(album.tracks), {approximate: album.tracks.length > 1})
+                            duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
                         })
                     ].filter(Boolean).join('<br>\n')}
                 </p>
@@ -3165,7 +3225,9 @@ function writeAlbumPage(album) {
                 </div>
             `
         }
-    }));
+    })};
+
+    return [page, data];
 }
 
 function getAlbumStylesheet(album, {to}) {
@@ -3251,23 +3313,28 @@ function writeTrackPage(track) {
         data: () => ({
             name: track.name,
             directory: track.directory,
-            date: track.date,
+            dates: {
+                released: track.date,
+                originallyReleased: track.originalDate,
+                coverArtAdded: track.coverArtDate
+            },
             duration: track.duration,
             color: track.color,
             cover: serializeCover(track, getTrackCover),
-            links: {
-                artists: serializeContribs(track.artists),
-                contributors: serializeContribs(track.contributors),
-                coverArtists: serializeContribs(track.coverArtists || []),
-                album: serializeLink(track.album),
-                groups: track.album.groups.map(serializeLink),
-                references: track.references.map(serializeLink),
-                referencedBy: track.referencedBy.map(serializeLink)
-            }
+            artists: serializeContribs(track.artists),
+            contributors: serializeContribs(track.contributors),
+            coverArtists: serializeContribs(track.coverArtists || []),
+            album: serializeLink(track.album),
+            groups: serializeGroupsForTrack(track),
+            references: track.references.map(serializeLink),
+            referencedBy: track.referencedBy.map(serializeLink),
+            alsoReleasedAs: otherReleases.map(track => ({
+                track: serializeLink(track),
+                album: serializeLink(track.album)
+            }))
         })
     };
 
-    // const page = ({strings, writePage}) => writePage('track', track.directory, ({to}) => ({
     const page = {type: 'page', path: ['track', track.directory], page: ({strings, to}) => ({
         title: strings('trackPage.title', {track: track.name}),
         stylesheet: getAlbumStylesheet(album, {to}),

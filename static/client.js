@@ -277,10 +277,10 @@ const infoCard = (() => {
             link(nameLink, 'track', data);
 
             const albumLink = container.querySelector('.info-card-album a');
-            link(albumLink, 'album', data.links.album);
+            link(albumLink, 'album', data.album);
 
             const artistSpan = container.querySelector('.info-card-artists span');
-            artistSpan.innerHTML = joinElements('conjunction', data.links.artists.map(({ who: artist }) => {
+            artistSpan.innerHTML = joinElements('conjunction', data.artists.map(({ artist }) => {
                 const a = document.createElement('a');
                 a.href = getLinkHref('artist', artist.directory);
                 a.innerText = artist.name;
@@ -289,9 +289,9 @@ const infoCard = (() => {
 
             const coverArtistParagraph = container.querySelector('.info-card-cover-artists');
             const coverArtistSpan = coverArtistParagraph.querySelector('span');
-            if (data.links.coverArtists.length) {
+            if (data.coverArtists.length) {
                 coverArtistParagraph.style.display = 'block';
-                coverArtistSpan.innerHTML = joinElements('conjunction', data.links.coverArtists.map(({ who: artist }) => {
+                coverArtistSpan.innerHTML = joinElements('conjunction', data.coverArtists.map(({ artist }) => {
                     const a = document.createElement('a');
                     a.href = getLinkHref('artist', artist.directory);
                     a.innerText = artist.name;
