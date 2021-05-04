@@ -5186,7 +5186,7 @@ function writeTagPage(tag) {
                             : getAlbumCover(thing, {to})),
                         hrefFn: thing => (thing.album
                             ? to('localized.track', thing.directory)
-                            : to('localized.album', thing.album))
+                            : to('localized.album', thing.directory))
                     })}
                 </div>
             `
