@@ -107,6 +107,7 @@ const unlink = util.promisify(fs.unlink);
 
 const {
     cacheOneArg,
+    call,
     chunkByConditions,
     chunkByProperties,
     curry,
@@ -182,6 +183,99 @@ let contributionData;
 let queueSize;
 
 let languages;
+
+const html = {
+    // Non-comprehensive. ::::P
+    selfClosingTags: ['br', 'img'],
+
+    // Pass to tag() as an attri8utes key to make tag() return a 8lank string
+    // if the provided content is empty. Useful for when you'll only 8e showing
+    // an element according to the presence of content that would 8elong there.
+    onlyIfContent: Symbol(),
+
+    tag(tagName, ...args) {
+        const selfClosing = html.selfClosingTags.includes(tagName);
+
+        let openTag;
+        let content;
+        let attrs;
+
+        if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
+            attrs = args[0];
+            content = args[1];
+        } else {
+            content = args[0];
+        }
+
+        if (selfClosing && content) {
+            throw new Error(`Tag <${tagName}> is self-closing but got content!`);
+        }
+
+        if (attrs?.[html.onlyIfContent] && !content) {
+            return '';
+        }
+
+        if (attrs) {
+            const attrString = html.attributes(args[0]);
+            if (attrString) {
+                openTag = `${tagName} ${attrString}`;
+            }
+        }
+
+        if (!openTag) {
+            openTag = tagName;
+        }
+
+        if (Array.isArray(content)) {
+            content = content.filter(Boolean).join('\n');
+        }
+
+        if (content) {
+            if (content.includes('\n')) {
+                return fixWS`
+                    <${openTag}>
+                        ${content}
+                    </${tagName}>
+                `;
+            } else {
+                return `<${openTag}>${content}</${tagName}>`;
+            }
+        } else {
+            if (selfClosing) {
+                return `<${openTag}>`;
+            } else {
+                return `<${openTag}></${tagName}>`;
+            }
+        }
+    },
+
+    escapeAttributeValue(value) {
+        return value
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&apos;');
+    },
+
+    attributes(attribs) {
+        return Object.entries(attribs)
+            .map(([ key, val ]) => {
+                if (!val)
+                    return [key, val];
+                else if (typeof val === 'string' || typeof val === 'boolean')
+                    return [key, val];
+                else if (typeof val === 'number')
+                    return [key, val.toString()];
+                else if (Array.isArray(val))
+                    return [key, val.join(' ')];
+                else
+                    throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
+            })
+            .filter(([ key, val ]) => val)
+            .map(([ key, val ]) => (typeof val === 'boolean'
+                ? `${key}`
+                : `${key}="${html.escapeAttributeValue(val)}"`))
+            .join(' ');
+    }
+};
 
 const urlSpec = {
     data: {
@@ -276,11 +370,12 @@ const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
         class: className = '',
         hash = ''
     }) => (
-        `<a href="${hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : '')}" ${attributes({
+        html.tag('a', {
             ...attr ? attr(thing) : {},
+            href: hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : ''),
             style: color ? getLinkThemeString(thing) : '',
             class: className
-        })}>${text || thing.name}</a>`
+        }, text || thing.name)
     );
 
 const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
@@ -2031,19 +2126,6 @@ function stringifyArtistData() {
     }, stringifyIndent);
 }
 
-function escapeAttributeValue(value) {
-    return value
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&apos;');
-}
-
-function attributes(attribs) {
-    return Object.entries(attribs)
-        .filter(([ key, val ]) => val !== '')
-        .map(([ key, val ]) => `${key}="${escapeAttributeValue(val)}"`)
-        .join(' ');
-}
-
 function img({
     src = '',
     alt = '',
@@ -2063,7 +2145,7 @@ function img({
     const originalSrc = src;
     const thumbSrc = thumbKey ? thumb[thumbKey](src) : src;
 
-    const imgAttributes = attributes({
+    const imgAttributes = html.attributes({
         id: link ? '' : id,
         class: className,
         alt,
@@ -2083,36 +2165,35 @@ function img({
         return nonlazyHTML;
     }
 
-    function wrap(html, hide = false) {
-        html = fixWS`
-            <div class="image-inner-area">${html}</div>
-        `;
+    function wrap(input, hide = false) {
+        let wrapped = input;
 
-        html = fixWS`
-            <div class="image-container">${html}</div>
-        `;
+        wrapped = `<div class="image-inner-area">${wrapped}</div>`;
+        wrapped = `<div class="image-container">${wrapped}</div>`;
 
         if (reveal) {
-            html = fixWS`
+            wrapped = fixWS`
                 <div class="reveal">
-                    ${html}
+                    ${wrapped}
                     <span class="reveal-text">${reveal}</span>
                 </div>
             `;
         }
 
         if (willSquare) {
-            html = fixWS`<div ${classes('square', hide && !willLink && 'js-hide')}><div class="square-content">${html}</div></div>`;
+            wrapped = html.tag('div', {class: 'square-content'}, wrapped);
+            wrapped = html.tag('div', {class: ['square', hide && !willLink && 'js-hide']}, wrapped);
         }
 
         if (willLink) {
-            html = `<a ${classes('box', hide && 'js-hide')} ${attributes({
+            wrapped = html.tag('a', {
                 id,
+                class: ['box', hide && 'js-hide'],
                 href: typeof link === 'string' ? link : originalSrc
-            })}>${html}</a>`;
+            }, wrapped);
         }
 
-        return html;
+        return wrapped;
     }
 }
 
@@ -2420,29 +2501,27 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         navLinkParts.push(part);
     }
 
-    const navContentHTML = [
-        links.length && fixWS`
-            <h2 class="highlight-last-link">
-                ${navLinkParts.join('\n')}
-            </h2>
-        `,
+    const navHTML = html.tag('nav', {
+        [html.onlyIfContent]: true,
+        id: 'header',
+        class: nav.classes
+    }, [
+        links.length && html.tag('h2', {class: 'highlight-last-link'}, navLinkParts),
         nav.content
-    ].filter(Boolean).join('\n');
+    ]);
 
-    const navHTML = navContentHTML && fixWS`
-        <nav id="header" ${classes(...nav.classes || [])}>
-            ${navContentHTML}
-        </nav>
-    `;
-
-    const bannerHTML = banner.position && banner.src && fixWS`
-        <div id="banner" ${classes(...banner.classes || [])}>
-            <img ${attributes({
-                src: banner.src,
-                alt: banner.alt
-            })} width="1100" height="200">
-        </div>
-    `;
+    const bannerHTML = banner.position && banner.src && html.tag('div',
+        {
+            id: 'banner',
+            class: banner.classes
+        },
+        html.tag('img', {
+            src: banner.src,
+            alt: banner.alt,
+            width: 1100,
+            height: 200
+        })
+    );
 
     const layoutHTML = [
         navHTML,
@@ -2490,7 +2569,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
 
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
-        <html ${attributes({
+        <html ${html.attributes({
             lang: strings.code,
             'data-rebase-localized': to('localized.root'),
             'data-rebase-shared': to('shared.root'),
@@ -2501,7 +2580,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                 <title>${title}</title>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
-                ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${escapeAttributeValue(value)}">`).join('\n')}
+                ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${html.escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
                 <link rel="stylesheet" href="${to('shared.staticFile', `site.css?${CACHEBUST}`)}">
                 ${(theme || stylesheet) && fixWS`
@@ -2512,7 +2591,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                 `}
                 <script src="${to('shared.staticFile', `lazy-loading.js?${CACHEBUST}`)}"></script>
             </head>
-            <body ${attributes({style: body.style || ''})}>
+            <body ${html.attributes({style: body.style || ''})}>
                 <div id="page-container">
                     ${mainHTML && fixWS`
                         <div id="skippers">
@@ -3271,25 +3350,19 @@ function writeTrackPage(track) {
             .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
     }
 
-    const generateTrackList = (tracks, {strings, to}) => fixWS`
-        <ul>
-            ${tracks.map(track =>
-                // vim doesnt like this code much lol
-                (({
-                    line = strings('trackList.item.withArtists', {
-                        track: strings.link.track(track, {to}),
-                        by: `<span class="by">${strings('trackList.item.withArtists.by', {
-                            artists: getArtistString(track.artists, {strings, to})
-                        })}</span>`
-                    })
-                }) => (
-                    (track.aka
-                        ? `<li class="rerelease">${strings('trackList.item.rerelease', {track: line})}</li>`
-                        : `<li>${line}</li>`)
-                ))({})
-            ).join('\n')}
-        </ul>
-    `;
+    const generateTrackList = (tracks, {strings, to}) => html.tag('ul',
+        tracks.map(track => {
+            const line = strings('trackList.item.withArtists', {
+                track: strings.link.track(track, {to}),
+                by: `<span class="by">${strings('trackList.item.withArtists.by', {
+                    artists: getArtistString(track.artists, {strings, to})
+                })}</span>`
+            });
+            return (track.aka
+                ? `<li class="rerelease">${strings('trackList.item.rerelease', {track: line})}</li>`
+                : `<li>${line}</li>`);
+        })
+    );
 
     const hasCommentary = track.commentary || otherReleases.some(t => t.commentary);
     const generateCommentary = ({strings, to}) => transformMultiline(

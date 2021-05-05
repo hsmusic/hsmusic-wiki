@@ -416,3 +416,8 @@ module.exports.promisifyProcess = function(proc, showLogging = true) {
 
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 module.exports.withEntries = (obj, fn) => Object.fromEntries(fn(Object.entries(obj)));
+
+// Nothin' more to it than what it says. Runs a function in-place. Provides an
+// altern8tive syntax to the usual IIFEs (e.g. (() => {})()) when you want to
+// open a scope and run some statements while inside an existing expression.
+module.exports.call = fn => fn();
