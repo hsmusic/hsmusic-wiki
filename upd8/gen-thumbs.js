@@ -92,7 +92,7 @@ const {
     progressPromiseAll,
     promisifyProcess,
     queue,
-} = require('./upd8-util');
+} = require('./util');
 
 function traverse(startDirPath, {
     filterFile = () => true,

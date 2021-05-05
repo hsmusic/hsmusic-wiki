@@ -127,11 +127,11 @@ const {
     th,
     unique,
     withEntries
-} = require('./upd8-util');
+} = require('./util');
 
 const genThumbs = require('./gen-thumbs');
 
-const C = require('./common/common');
+const C = require('../common/common');
 
 const CACHEBUST = 5;
 

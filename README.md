@@ -6,7 +6,7 @@ HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagini
 
 **Disclaimer:** most of the code here *sucks*. It's been shambled together over the course of over a year, and while we're fairly confident it's all at minimum functional, we can't guarantee the same about its understandability! Still, for the official release of [hsmusic.wiki][hsmusic], we've done our best to put together a codebase which is *somewhat* navigable. The description below summarizes it:
 
-* `upd8.js`: "Build" code for the site. Everything specific to generating the structure and HTML content of the website is conatined in this file. As expected, it's pretty massive.
+* `upd8`: "Build" code for the site. Everything specific to generating the structure and HTML content of the website is conatined in this folder. As expected, it's pretty massive, and is currently undergoing some much-belated restructuring.
 * `static`: Static code and supporting files. Everything here is wholly client-side and referenced by the generated HTML files.
 * `common`: Code which is depended upon by both client- and server-side code. For the most part, this is constants such as directory paths, though there are a few handy algorithms here too.
 * In the not quite so far past, we used to have `data` and `media` folders too. Today, for portability and convenience in project structure, those are saved in separate repositories, and you can pass hsmusic paths to them through the `--data` and `--media` options, or the `HSMUSIC_DATA` and `HSMUSIC_MEDIA` environment variables.
@@ -14,7 +14,7 @@ HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagini
   * Media directory: Images and other static files referenced by generated and static content across the site. Many of the files here are cover art, and their names match the automatically generated "kebab case" identifiers for tracks and albums (or a manually overridden one).
 * Same for the output root: previously it was in a `site` folder; today, use `--out` or `HSMUSIC_OUT`!
 
-The code process for upd8.js was politely introduced by 2019!us back when we were beginning the site, and it's essentially the same structure followed today. In summary:
+The upd8 code process was politely introduced by 2019!us back when we were beginning the site, and it's essentially the same structure followed today. In summary:
 
 1. Locate and read data files, processing them into relatively usable JS object-style formats. (The formats themselves are hard-coded and somewhat arbitrary, and are often extended when more or different data is useful.)
 2. Validate the data and show any errors that might've been caught during processing. (These aren't exhaustive test cases; they're designed to catch a majority of common errors and typos.)

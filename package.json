@@ -4,7 +4,7 @@
     "description": "static wiki software cataloguing collaborative creation",
     "main": "upd8.js",
     "bin": {
-        "hsmusic": "./upd8.js"
+        "hsmusic": "./upd8/main.js"
     },
     "dependencies": {
         "fix-whitespace": "^1.0.4",
