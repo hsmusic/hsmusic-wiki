@@ -1,0 +1,92 @@
+// Some really simple functions for formatting HTML content.
+
+// Non-comprehensive. ::::P
+export const selfClosingTags = ['br', 'img'];
+
+// Pass to tag() as an attri8utes key to make tag() return a 8lank string
+// if the provided content is empty. Useful for when you'll only 8e showing
+// an element according to the presence of content that would 8elong there.
+export const onlyIfContent = Symbol();
+
+export function tag(tagName, ...args) {
+    const selfClosing = selfClosingTags.includes(tagName);
+
+    let openTag;
+    let content;
+    let attrs;
+
+    if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
+        attrs = args[0];
+        content = args[1];
+    } else {
+        content = args[0];
+    }
+
+    if (selfClosing && content) {
+        throw new Error(`Tag <${tagName}> is self-closing but got content!`);
+    }
+
+    if (attrs?.[onlyIfContent] && !content) {
+        return '';
+    }
+
+    if (attrs) {
+        const attrString = attributes(args[0]);
+        if (attrString) {
+            openTag = `${tagName} ${attrString}`;
+        }
+    }
+
+    if (!openTag) {
+        openTag = tagName;
+    }
+
+    if (Array.isArray(content)) {
+        content = content.filter(Boolean).join('\n');
+    }
+
+    if (content) {
+        if (content.includes('\n')) {
+            return (
+                `<${openTag}>\n` +
+                content.split('\n').map(line => '    ' + line + '\n').join('') +
+                `</${tagName}>`
+            );
+        } else {
+            return `<${openTag}>${content}</${tagName}>`;
+        }
+    } else {
+        if (selfClosing) {
+            return `<${openTag}>`;
+        } else {
+            return `<${openTag}></${tagName}>`;
+        }
+    }
+}
+
+export function escapeAttributeValue(value) {
+    return value
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+}
+
+export function attributes(attribs) {
+    return Object.entries(attribs)
+        .map(([ key, val ]) => {
+            if (!val)
+                return [key, val];
+            else if (typeof val === 'string' || typeof val === 'boolean')
+                return [key, val];
+            else if (typeof val === 'number')
+                return [key, val.toString()];
+            else if (Array.isArray(val))
+                return [key, val.join(' ')];
+            else
+                throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
+        })
+        .filter(([ key, val ]) => val)
+        .map(([ key, val ]) => (typeof val === 'boolean'
+            ? `${key}`
+            : `${key}="${escapeAttributeValue(val)}"`))
+        .join(' ');
+}

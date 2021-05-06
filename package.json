@@ -2,14 +2,14 @@
     "name": "hsmusic-wiki",
     "version": "0.1.0",
     "description": "static wiki software cataloguing collaborative creation",
+    "type": "module",
     "main": "upd8.js",
     "bin": {
-        "hsmusic": "./upd8/main.js"
+        "hsmusic": "./src/upd8.js"
     },
     "dependencies": {
         "fix-whitespace": "^1.0.4",
-        "he": "^1.2.0",
-        "mkdirp": "^0.5.5"
+        "he": "^1.2.0"
     },
     "license": "GPL-3.0"
 }

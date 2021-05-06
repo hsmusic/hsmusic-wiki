@@ -77,41 +77,55 @@
 const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
-const { spawn } = require('child_process');
-const crypto = require('crypto');
-const fsp = require('fs/promises'); // Whatcha know! Nice.
-const fs = require('fs'); // Still gotta include 8oth tho, for createReadStream.
-const path = require('path');
+import { spawn } from 'child_process';
+import { createHash } from 'crypto';
+import * as path from 'path';
 
-const {
-    delay,
+import {
+    readdir,
+    readFile,
+    writeFile
+} from 'fs/promises'; // Whatcha know! Nice.
+
+import {
+    createReadStream
+} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
+
+import {
     logError,
     logInfo,
     logWarn,
     parseOptions,
-    progressPromiseAll,
+    progressPromiseAll
+} from './util/cli.js';
+
+import {
     promisifyProcess,
+} from './util/node-utils.js';
+
+import {
+    delay,
     queue,
-} = require('./util');
+} from './util/sugar.js';
 
 function traverse(startDirPath, {
     filterFile = () => true,
     filterDir = () => true
 } = {}) {
     const recursive = (names, subDirPath) => Promise
-        .all(names.map(name => fsp.readdir(path.join(startDirPath, subDirPath, name)).then(
+        .all(names.map(name => readdir(path.join(startDirPath, subDirPath, name)).then(
             names => filterDir(name) ? recursive(names, path.join(subDirPath, name)) : [],
             err => filterFile(name) ? [path.join(subDirPath, name)] : [])))
         .then(pathArrays => pathArrays.flatMap(x => x));
 
-    return fsp.readdir(startDirPath)
+    return readdir(startDirPath)
         .then(names => recursive(names, ''));
 }
 
 function readFileMD5(filePath) {
     return new Promise((resolve, reject) => {
-        const md5 = crypto.createHash('md5');
-        const stream = fs.createReadStream(filePath);
+        const md5 = createHash('md5');
+        const stream = createReadStream(filePath);
         stream.on('data', data => md5.update(data));
         stream.on('end', data => resolve(md5.digest('hex')));
         stream.on('error', err => reject(err));
@@ -147,7 +161,7 @@ function generateImageThumbnails(filePath) {
     });
 }
 
-async function genThumbs(mediaPath, {
+export default async function genThumbs(mediaPath, {
     queueSize = 0,
     quiet = false
 } = {}) {
@@ -179,7 +193,7 @@ async function genThumbs(mediaPath, {
 
     let cache, firstRun = false, failedReadingCache = false;
     try {
-        cache = JSON.parse(await fsp.readFile(path.join(mediaPath, CACHE_FILE)));
+        cache = JSON.parse(await readFile(path.join(mediaPath, CACHE_FILE)));
         quietInfo`Cache file successfully read.`;
     } catch (error) {
         cache = {};
@@ -195,7 +209,7 @@ async function genThumbs(mediaPath, {
     }
 
     try {
-        await fsp.writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(cache));
+        await writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(cache));
         quietInfo`Writing to cache file appears to be working.`;
     } catch (error) {
         logWarn`Test of cache file writing failed: ${error}`;
@@ -280,7 +294,7 @@ async function genThumbs(mediaPath, {
     }
 
     try {
-        await fsp.writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(updatedCache));
+        await writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(updatedCache));
         quietInfo`Updated cache file successfully written!`;
     } catch (error) {
         logWarn`Failed to write updated cache file: ${error}`;
@@ -289,35 +303,4 @@ async function genThumbs(mediaPath, {
     }
 
     return true;
-};
-
-module.exports = genThumbs;
-
-if (require.main === module) {
-    (async () => {
-        const miscOptions = await parseOptions(process.argv.slice(2), {
-            'media': {
-                type: 'value'
-            },
-
-            'queue-size': {
-                type: 'value',
-                validate(size) {
-                    if (parseInt(size) !== parseFloat(size)) return 'an integer';
-                    if (parseInt(size) < 0) return 'a counting number or zero';
-                    return true;
-                }
-            },
-            queue: {alias: 'queue-size'}
-        });
-
-        const mediaPath = miscOptions.media || process.env.HSMUSIC_MEDIA;
-        if (!mediaPath) {
-            logError`Expected --media option or HSMUSIC_MEDIA to be set`;
-        }
-
-        const queueSize = +(miscOptions['queue-size'] ?? 0);
-
-        await genThumbs(mediaPath, {queueSize});
-    })().catch(err => console.error(err));
 }

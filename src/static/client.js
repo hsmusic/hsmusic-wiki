@@ -5,7 +5,9 @@
 //
 // Upd8: As of 04/02/2021, it's now used for info cards too! Nice.
 
-'use strict';
+import {
+    getColors
+} from '../util/colors.js';
 
 let albumData, artistData, flashData;
 let officialAlbumData, fandomAlbumData, artistNames;
@@ -47,7 +49,7 @@ if (
 // Miscellaneous helpers ----------------------------------
 
 function rebase(href, rebaseKey = 'rebaseLocalized') {
-    const relative = document.documentElement.dataset[rebaseKey] + '/';
+    const relative = (document.documentElement.dataset[rebaseKey] || '.') + '/';
     if (relative) {
         return relative + href;
     } else {
@@ -211,7 +213,7 @@ let endFastHoverTimeout = null;
 
 function colorLink(a, color) {
     if (color) {
-        const { primary, dim } = C.getColors(color);
+        const { primary, dim } = getColors(color);
         a.style.setProperty('--primary-color', primary);
         a.style.setProperty('--dim-color', dim);
     }

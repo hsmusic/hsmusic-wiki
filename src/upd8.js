@@ -62,76 +62,99 @@
 // spirit of this "make things more consistent" attitude I 8rought up 8ack in
 // August, stuff's lookin' 8etter than ever now. W00t!
 
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
-const util = require('util');
+import * as path from 'path';
+import { promisify } from 'util';
+import { fileURLToPath } from 'url';
 
 // I made this dependency myself! A long, long time ago. It is pro8a8ly my
 // most useful li8rary ever. I'm not sure 8esides me actually uses it, though.
-const fixWS = require('fix-whitespace');
+import fixWS from 'fix-whitespace';
 // Wait nevermind, I forgot a8out why-do-kids-love-the-taste-of-cinnamon-toast-
 // crunch. THAT is my 8est li8rary.
 
-// The require function just returns whatever the module exports, so there's
-// no reason you can't wrap it in some decorator right out of the 8ox. Which is
-// exactly what we do here.
-const mkdirp = util.promisify(require('mkdirp'));
-
 // It stands for "HTML Entities", apparently. Cursed.
-const he = require('he');
+import he from 'he';
 
-// This is the dum8est name for a function possi8le. Like, SURE, fine, may8e
-// the UNIX people had some valid reason to go with the weird truncated
-// lowercased convention they did. 8ut Node didn't have to ALSO use that
-// convention! Would it have 8een so hard to just name the function something
-// like fs.readDirectory???????? No, it wouldn't have 8een.
-const readdir = util.promisify(fs.readdir);
-// 8ut okay, like, look at me. DOING THE SAME THING. See, *I* could have named
-// my promisified function differently, and yet I did not. I literally cannot
-// explain why. We are all used to following in the 8ad decisions of our
-// ancestors, and never never never never never never never consider that hey,
-// may8e we don't need to make the exact same decisions they did. Even when
-// we're perfectly aware th8t's exactly what we're doing! Programmers,
-// including me, are all pretty stupid.
+import {
+    // This is the dum8est name for a function possi8le. Like, SURE, fine, may8e
+    // the UNIX people had some valid reason to go with the weird truncated
+    // lowercased convention they did. 8ut Node didn't have to ALSO use that
+    // convention! Would it have 8een so hard to just name the function
+    // something like fs.readDirectory???????? No, it wouldn't have 8een.
+    readdir,
+    // ~~ 8ut okay, like, look at me. DOING THE SAME THING. See, *I* could have
+    // named my promisified function differently, and yet I did not. I literally
+    // cannot explain why. We are all used to following in the 8ad decisions of
+    // our ancestors, and never never never never never never never consider
+    // that hey, may8e we don't need to make the exact same decisions they did.
+    // Even when we're perfectly aware th8t's exactly what we're doing! ~~
+    //
+    // 2021 ADDENDUM: Ok, a year and a half later the a8ove is still true,
+    //                except for the part a8out promisifying, since fs/promises
+    //                already does that for us. 8ut I could STILL import it
+    //                using my own name (`readdir as readDirectory`), and yet
+    //                here I am, defin8tely not doing that.
+    //                SOME THINGS NEVER CHANGE.
+    //
+    // Programmers, including me, are all pretty stupid.
 
-// 8ut I mean, come on. Look. Node decided to use readFile, instead of like,
-// what, cat? Why couldn't they rename readdir too???????? As Johannes Kepler
-// once so elegantly put it: "Shrug."
-const readFile = util.promisify(fs.readFile);
-const writeFile = util.promisify(fs.writeFile);
-const access = util.promisify(fs.access);
-const symlink = util.promisify(fs.symlink);
-const unlink = util.promisify(fs.unlink);
+    // 8ut I mean, come on. Look. Node decided to use readFile, instead of like,
+    // what, cat? Why couldn't they rename readdir too???????? As Johannes
+    // Kepler once so elegantly put it: "Shrug."
+    readFile,
+    writeFile,
+    access,
+    mkdir,
+    symlink,
+    unlink
+} from 'fs/promises';
 
-const {
-    cacheOneArg,
-    call,
-    chunkByConditions,
-    chunkByProperties,
-    curry,
+import genThumbs from './gen-thumbs.js';
+import * as html from './util/html.js';
+import link from './util/link.js';
+
+import {
     decorateTime,
-    filterEmptyLines,
-    joinNoOxford,
-    mapInPlace,
     logWarn,
     logInfo,
     logError,
     parseOptions,
-    progressPromiseAll,
+    progressPromiseAll
+} from './util/cli.js';
+
+import {
+    getLinkThemeString,
+    getThemeString
+} from './util/colors.js';
+
+import {
+    chunkByConditions,
+    chunkByProperties,
+    getAllTracks,
+    getArtistCommentary,
+    getArtistNumContributions,
+    getKebabCase,
+    sortByArtDate,
+    sortByDate,
+    sortByName
+} from './util/wiki-data.js';
+
+import {
+    call,
+    filterEmptyLines,
+    mapInPlace,
     queue,
-    s,
-    sortByName,
     splitArray,
-    th,
     unique,
     withEntries
-} = require('./util');
+} from './util/sugar.js';
 
-const genThumbs = require('./gen-thumbs');
+import {
+    generateURLs,
+    thumb
+} from './util/urls.js';
 
-const C = require('../common/common');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 5;
 
@@ -145,7 +168,26 @@ const GROUP_DATA_FILE = 'groups.txt';
 const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
-const CSS_FILE = 'site.css';
+const UNRELEASED_TRACKS_DIRECTORY = 'unreleased-tracks';
+const OFFICIAL_GROUP_DIRECTORY = 'official';
+const FANDOM_GROUP_DIRECTORY = 'fandom';
+
+// Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
+// site code should 8e put here. Which, uh, ~~only really means this one
+// file~~ is now a variety of useful utilities!
+//
+// Rather than hard code it, anything in this directory can 8e shared across
+// 8oth ends of the code8ase.
+// (This gets symlinked into the --data directory.)
+const UTILITY_DIRECTORY = 'util';
+
+// Code that's used only in the static site! CSS, cilent JS, etc.
+// (This gets symlinked into the --data directory.)
+const STATIC_DIRECTORY = 'static';
+
+// Su8directory under provided --data directory for al8um files, which are
+// read from and processed to compose the majority of album and track data.
+const DATA_ALBUM_DIRECTORY = 'album';
 
 // Shared varia8les! These are more efficient to access than a shared varia8le
 // (or at least I h8pe so), and are easier to pass across functions than a
@@ -183,99 +225,6 @@ let contributionData;
 let queueSize;
 
 let languages;
-
-const html = {
-    // Non-comprehensive. ::::P
-    selfClosingTags: ['br', 'img'],
-
-    // Pass to tag() as an attri8utes key to make tag() return a 8lank string
-    // if the provided content is empty. Useful for when you'll only 8e showing
-    // an element according to the presence of content that would 8elong there.
-    onlyIfContent: Symbol(),
-
-    tag(tagName, ...args) {
-        const selfClosing = html.selfClosingTags.includes(tagName);
-
-        let openTag;
-        let content;
-        let attrs;
-
-        if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
-            attrs = args[0];
-            content = args[1];
-        } else {
-            content = args[0];
-        }
-
-        if (selfClosing && content) {
-            throw new Error(`Tag <${tagName}> is self-closing but got content!`);
-        }
-
-        if (attrs?.[html.onlyIfContent] && !content) {
-            return '';
-        }
-
-        if (attrs) {
-            const attrString = html.attributes(args[0]);
-            if (attrString) {
-                openTag = `${tagName} ${attrString}`;
-            }
-        }
-
-        if (!openTag) {
-            openTag = tagName;
-        }
-
-        if (Array.isArray(content)) {
-            content = content.filter(Boolean).join('\n');
-        }
-
-        if (content) {
-            if (content.includes('\n')) {
-                return fixWS`
-                    <${openTag}>
-                        ${content}
-                    </${tagName}>
-                `;
-            } else {
-                return `<${openTag}>${content}</${tagName}>`;
-            }
-        } else {
-            if (selfClosing) {
-                return `<${openTag}>`;
-            } else {
-                return `<${openTag}></${tagName}>`;
-            }
-        }
-    },
-
-    escapeAttributeValue(value) {
-        return value
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&apos;');
-    },
-
-    attributes(attribs) {
-        return Object.entries(attribs)
-            .map(([ key, val ]) => {
-                if (!val)
-                    return [key, val];
-                else if (typeof val === 'string' || typeof val === 'boolean')
-                    return [key, val];
-                else if (typeof val === 'number')
-                    return [key, val.toString()];
-                else if (Array.isArray(val))
-                    return [key, val.join(' ')];
-                else
-                    throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
-            })
-            .filter(([ key, val ]) => val)
-            .map(([ key, val ]) => (typeof val === 'boolean'
-                ? `${key}`
-                : `${key}="${html.escapeAttributeValue(val)}"`))
-            .join(' ');
-    }
-};
 
 const urlSpec = {
     data: {
@@ -332,7 +281,10 @@ const urlSpec = {
             root: '',
             path: '<>',
 
-            commonFile: 'common/<>',
+            utilityRoot: 'util',
+            staticRoot: 'static',
+
+            utilityFile: 'util/<>',
             staticFile: 'static/<>'
         }
     },
@@ -363,149 +315,7 @@ urlSpec.localizedWithBaseDirectory = {
     )
 };
 
-const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
-    (thing, {
-        strings, to,
-        text = '',
-        class: className = '',
-        hash = ''
-    }) => (
-        html.tag('a', {
-            ...attr ? attr(thing) : {},
-            href: hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : ''),
-            style: color ? getLinkThemeString(thing) : '',
-            class: className
-        }, text || thing.name)
-    );
-
-const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
-    linkHelper((thing, {to}) => to('localized.' + key, thing.directory), {
-        attr: thing => ({
-            ...attr ? attr(thing) : {},
-            ...expose ? {[expose]: thing.directory} : {}
-        }),
-        ...conf
-    });
-
-const linkPathname = (key, conf) => linkHelper(({directory: pathname}, {to}) => to(key, pathname), conf);
-const linkIndex = (key, conf) => linkHelper((_, {to}) => to('localized.' + key), conf);
-
-const link = {
-    album: linkDirectory('album'),
-    albumCommentary: linkDirectory('albumCommentary'),
-    artist: linkDirectory('artist', {color: false}),
-    artistGallery: linkDirectory('artistGallery', {color: false}),
-    commentaryIndex: linkIndex('commentaryIndex', {color: false}),
-    flashIndex: linkIndex('flashIndex', {color: false}),
-    flash: linkDirectory('flash'),
-    groupInfo: linkDirectory('groupInfo'),
-    groupGallery: linkDirectory('groupGallery'),
-    home: linkIndex('home', {color: false}),
-    listingIndex: linkIndex('listingIndex'),
-    listing: linkDirectory('listing'),
-    newsIndex: linkIndex('newsIndex', {color: false}),
-    newsEntry: linkDirectory('newsEntry', {color: false}),
-    staticPage: linkDirectory('staticPage', {color: false}),
-    tag: linkDirectory('tag'),
-    track: linkDirectory('track', {expose: 'data-track'}),
-
-    media: linkPathname('media.path', {color: false}),
-    root: linkPathname('shared.path', {color: false}),
-    data: linkPathname('data.path', {color: false}),
-    site: linkPathname('localized.path', {color: false})
-};
-
-const thumbnailHelper = name => file =>
-    file.replace(/\.(jpg|png)$/, name + '.jpg');
-
-const thumb = {
-    medium: thumbnailHelper('.medium'),
-    small: thumbnailHelper('.small')
-};
-
-function generateURLs(fromPath) {
-    const getValueForFullKey = (obj, fullKey, prop = null) => {
-        const [ groupKey, subKey ] = fullKey.split('.');
-        if (!groupKey || !subKey) {
-            throw new Error(`Expected group key and subkey (got ${fullKey})`);
-        }
-
-        if (!obj.hasOwnProperty(groupKey)) {
-            throw new Error(`Expected valid group key (got ${groupKey})`);
-        }
-
-        const group = obj[groupKey];
-
-        if (!group.hasOwnProperty(subKey)) {
-            throw new Error(`Expected valid subkey (got ${subKey} for group ${groupKey})`);
-        }
-
-        return {
-            value: group[subKey],
-            group
-        };
-    };
-
-    const generateTo = (fromPath, fromGroup) => {
-        const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
-
-        const pathHelper = (toPath, toGroup) => {
-            let target = toPath;
-
-            let argIndex = 0;
-            target = target.replaceAll('<>', () => `<${argIndex++}>`);
-
-            if (toGroup.prefix !== fromGroup.prefix) {
-                // TODO: Handle differing domains in prefixes.
-                target = rebasePrefix + (toGroup.prefix || '') + target;
-            }
-
-            return (path.relative(fromPath, target)
-                + (toPath.endsWith('/') ? '/' : ''));
-        };
-
-        const groupSymbol = Symbol();
-
-        const groupHelper = urlGroup => ({
-            [groupSymbol]: urlGroup,
-            ...withEntries(urlGroup.paths, entries => entries
-                .map(([key, path]) => [key, pathHelper(path, urlGroup)]))
-        });
-
-        const relative = withEntries(urlSpec, entries => entries
-            .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
-
-        const to = (key, ...args) => {
-            const { value: template, group: {[groupSymbol]: toGroup} } = getValueForFullKey(relative, key)
-            let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
-
-            // Kinda hacky lol, 8ut it works.
-            const missing = result.match(/<([0-9]+)>/g);
-            if (missing) {
-                throw new Error(`Expected ${missing[missing.length - 1]} arguments, got ${args.length}`);
-            }
-
-            return result;
-        };
-
-        return {to, relative};
-    };
-
-    const generateFrom = () => {
-        const map = withEntries(urlSpec, entries => entries
-            .map(([key, group]) => [key, withEntries(group.paths, entries => entries
-                .map(([key, path]) => [key, generateTo(path, group)])
-            )]));
-
-        const from = key => getValueForFullKey(map, key).value;
-
-        return {from, map};
-    };
-
-    return generateFrom();
-}
-
-const urls = generateURLs();
+const urls = generateURLs(urlSpec);
 
 const searchHelper = (keys, dataFn, findFn) => ref => {
     if (!ref) return null;
@@ -1460,7 +1270,7 @@ async function processAlbumDataFile(file) {
     album.dateAdded = new Date(album.dateAdded);
 
     if (!album.directory) {
-        album.directory = C.getKebabCase(album.name);
+        album.directory = getKebabCase(album.name);
     }
 
     album.tracks = [];
@@ -1557,7 +1367,7 @@ async function processAlbumDataFile(file) {
         }
 
         if (!track.directory) {
-            track.directory = C.getKebabCase(track.name);
+            track.directory = getKebabCase(track.name);
         }
 
         if (track.originalDate) {
@@ -1620,7 +1430,7 @@ async function processArtistDataFile(file) {
         }
 
         if (!directory) {
-            directory = C.getArtistDirectory(name);
+            directory = getKebabCase(name);
         }
 
         if (alias) {
@@ -1776,7 +1586,7 @@ async function processTagDataFile(file) {
             }
         }
 
-        const directory = C.getKebabCase(name);
+        const directory = getKebabCase(name);
 
         return {
             name,
@@ -1817,7 +1627,7 @@ async function processGroupDataFile(file) {
 
         let directory = getBasicField(section, 'Directory');
         if (!directory) {
-            directory = C.getKebabCase(name);
+            directory = getKebabCase(name);
         }
 
         let description = getMultilineField(section, 'Description');
@@ -2390,7 +2200,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
 
     body.style ??= '';
 
-    theme = theme || getThemeString(wikiInfo);
+    theme = theme || getThemeString(wikiInfo.color);
 
     banner ||= {};
     banner.classes ??= [];
@@ -2612,15 +2422,14 @@ writePage.html = (pageFn, {paths, strings, to}) => {
                     ${layoutHTML}
                 </div>
                 ${infoCardHTML}
-                <script src="${to('shared.commonFile', `common.js?${CACHEBUST}`)}"></script>
-                <script src="${to('shared.staticFile', `client.js?${CACHEBUST}`)}"></script>
+                <script type="module" src="${to('shared.staticFile', `client.js?${CACHEBUST}`)}"></script>
             </body>
         </html>
     `);
 };
 
 writePage.write = async (content, {paths}) => {
-    await mkdirp(paths.outputDirectory);
+    await mkdir(paths.outputDirectory, {recursive: true});
     await writeFile(paths.outputFile, content);
 };
 
@@ -2658,7 +2467,7 @@ function getGridHTML({
     lazy = true
 }) {
     return entries.map(({ large, item }, i) => fixWS`
-        <a ${classes('grid-item', 'box', large && 'large-grid-item')} href="${hrefFn(item)}" style="${getLinkThemeString(item)}">
+        <a ${classes('grid-item', 'box', large && 'large-grid-item')} href="${hrefFn(item)}" style="${getLinkThemeString(item.color)}">
             ${img({
                 src: srcFn(item),
                 alt: altFn(item),
@@ -2807,13 +2616,14 @@ function getNewAdditions(numAlbums) {
 
 function writeSymlinks() {
     return progressPromiseAll('Writing site symlinks.', [
-        link(path.join(__dirname, C.COMMON_DIRECTORY), C.COMMON_DIRECTORY),
-        link(path.join(__dirname, C.STATIC_DIRECTORY), C.STATIC_DIRECTORY),
-        link(mediaPath, C.MEDIA_DIRECTORY)
+        link(path.join(__dirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
+        link(path.join(__dirname, STATIC_DIRECTORY), 'shared.staticRoot'),
+        link(mediaPath, 'media.root')
     ]);
 
-    async function link(directory, target) {
-        const file = path.join(outputPath, target);
+    async function link(directory, urlKey) {
+        const pathname = urls.from('shared.root').to(urlKey);
+        const file = path.join(outputPath, pathname);
         try {
             await unlink(file);
         } catch (error) {
@@ -2829,7 +2639,7 @@ function writeSharedFilesAndPages({strings}) {
     const redirect = async (title, from, urlKey, directory) => {
         const target = path.relative(from, urls.from('shared.root').to(urlKey, directory));
         const content = generateRedirectPage(title, target, {strings});
-        await mkdirp(path.join(outputPath, from));
+        await mkdir(path.join(outputPath, from), {recursive: true});
         await writeFile(path.join(outputPath, from, 'index.html'), content);
     };
 
@@ -2866,7 +2676,7 @@ function writeHomepage() {
             content: fixWS`
                 <h1>${wikiInfo.name}</h1>
                 ${homepageInfo.rows.map((row, i) => fixWS`
-                    <section class="row" style="${getLinkThemeString(row)}">
+                    <section class="row" style="${getLinkThemeString(row.color)}">
                         <h2>${row.name}</h2>
                         ${row.type === 'albums' && fixWS`
                             <div class="grid-listing">
@@ -3120,7 +2930,7 @@ function writeAlbumPage(album) {
             duration: strings.count.duration(track.duration),
             track: strings.link.track(track, {to})
         };
-        return `<li style="${getLinkThemeString(track)}">${
+        return `<li style="${getLinkThemeString(track.color)}">${
             (track.artists === album.artists
                 ? strings('trackList.item.withDuration', itemOpts)
                 : strings('trackList.item.withDuration.withArtists', {
@@ -3174,7 +2984,7 @@ function writeAlbumPage(album) {
     const page = {type: 'page', path: ['album', album.directory], page: ({strings, to}) => ({
         title: strings('albumPage.title', {album: album.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
-        theme: getThemeString(album, [
+        theme: getThemeString(album.color, [
             `--album-directory: ${album.directory}`
         ]),
 
@@ -3334,11 +3144,11 @@ function writeTrackPage(track) {
     const { album } = track;
 
     const tracksThatReference = track.referencedBy;
-    const useDividedReferences = groupData.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY);
+    const useDividedReferences = groupData.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY);
     const ttrFanon = (useDividedReferences &&
-        tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY)));
+        tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY)));
     const ttrOfficial = (useDividedReferences &&
-        tracksThatReference.filter(t => t.album.groups.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY)));
+        tracksThatReference.filter(t => t.album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY)));
 
     const tracksReferenced = track.references;
     const otherReleases = track.otherReleases;
@@ -3346,7 +3156,7 @@ function writeTrackPage(track) {
 
     let flashesThatFeature;
     if (wikiInfo.features.flashesAndGames) {
-        flashesThatFeature = C.sortByDate([track, ...otherReleases]
+        flashesThatFeature = sortByDate([track, ...otherReleases]
             .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
     }
 
@@ -3412,7 +3222,7 @@ function writeTrackPage(track) {
     const page = {type: 'page', path: ['track', track.directory], page: ({strings, to}) => ({
         title: strings('trackPage.title', {track: track.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
-        theme: getThemeString(track, [
+        theme: getThemeString(track.color, [
             `--album-directory: ${album.directory}`,
             `--track-directory: ${track.directory}`
         ]),
@@ -3452,7 +3262,7 @@ function writeTrackPage(track) {
                                 showIcons: true
                             })
                         }),
-                        album.directory !== C.UNRELEASED_TRACKS_DIRECTORY && strings('releaseInfo.released', {
+                        album.directory !== UNRELEASED_TRACKS_DIRECTORY && strings('releaseInfo.released', {
                             date: strings.count.date(track.date)
                         }),
                         +track.coverArtDate !== +track.date && strings('releaseInfo.artReleased', {
@@ -3604,9 +3414,9 @@ function writeArtistPage(artist) {
         note = ''
     } = artist;
 
-    const artThingsAll = C.sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.albums.asBannerArtist, ...artist.tracks.asCoverArtist]));
-    const artThingsGallery = C.sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
-    const commentaryThings = C.sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
+    const artThingsAll = sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.albums.asBannerArtist, ...artist.tracks.asCoverArtist]));
+    const artThingsGallery = sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
+    const commentaryThings = sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
 
     const hasGallery = artThingsGallery.length > 0;
 
@@ -3634,9 +3444,9 @@ function writeArtistPage(artist) {
         track: thing.album ? thing : null
     })), ['album']);
 
-    const allTracks = C.sortByDate(unique([...artist.tracks.asArtist, ...artist.tracks.asContributor]));
-    const unreleasedTracks = allTracks.filter(track => track.album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = allTracks.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const allTracks = sortByDate(unique([...artist.tracks.asArtist, ...artist.tracks.asContributor]));
+    const unreleasedTracks = allTracks.filter(track => track.album.directory === UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = allTracks.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
 
     const chunkTracks = tracks => (
         chunkByProperties(tracks.map(track => ({
@@ -3681,7 +3491,7 @@ function writeArtistPage(artist) {
 
     let flashes, flashListChunks;
     if (wikiInfo.features.flashesAndGames) {
-        flashes = C.sortByDate(artist.flashes.asContributor.slice());
+        flashes = sortByDate(artist.flashes.asContributor.slice());
         flashListChunks = (
             chunkByProperties(flashes.map(flash => ({
                 act: flash.act,
@@ -4069,12 +3879,12 @@ function writeFlashIndex() {
                     <p class="quick-info">${strings('misc.jumpTo')}</p>
                     <ul class="quick-info">
                         ${flashActData.filter(act => act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
-                            <li><a href="#${anchor}" style="${getLinkThemeString({color: jumpColor})}">${jump}</a></li>
+                            <li><a href="#${anchor}" style="${getLinkThemeString(jumpColor)}">${jump}</a></li>
                         `).join('\n')}
                     </ul>
                 </div>
                 ${flashActData.map((act, i) => fixWS`
-                    <h2 id="${act.anchor}" style="${getLinkThemeString(act)}"><a href="${to('localized.flash', act.flashes[0].directory)}">${act.name}</a></h2>
+                    <h2 id="${act.anchor}" style="${getLinkThemeString(act.color)}"><a href="${to('localized.flash', act.flashes[0].directory)}">${act.name}</a></h2>
                     <div class="grid-listing">
                         ${getFlashGridHTML({
                             strings, to,
@@ -4093,7 +3903,7 @@ function writeFlashIndex() {
 function writeFlashPage(flash) {
     return ({strings, writePage}) => writePage('flash', flash.directory, ({to}) => ({
         title: strings('flashPage.title', {flash: flash.name}),
-        theme: getThemeString(flash, [
+        theme: getThemeString(flash.color, [
             `--flash-directory: ${flash.directory}`
         ]),
 
@@ -4232,7 +4042,7 @@ function generateSidebarForFlash(flash, {strings, to}) {
                         index < outsideCanon ? side === 2 :
                         true
                     ))()
-                    && `<dt ${classes(act === currentAct && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="${getLinkThemeString(act)}">${act.name}</a></dt>`,
+                    && `<dt ${classes(act === currentAct && 'current')}><a href="${to('localized.flash', act.flashes[0].directory)}" style="${getLinkThemeString(act.color)}">${act.name}</a></dt>`,
                     act === currentAct && fixWS`
                         <dd><ul>
                             ${act.flashes.map(f => fixWS`
@@ -4304,8 +4114,8 @@ const listingSpec = [
         title: ({strings}) => strings('listingPage.listAlbums.byDate.title'),
 
         data() {
-            return C.sortByDate(albumData
-                .filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY));
+            return sortByDate(albumData
+                .filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY));
         },
 
         row(album, {strings, to}) {
@@ -4355,7 +4165,7 @@ const listingSpec = [
         data() {
             return artistData.slice()
                 .sort(sortByName)
-                .map(artist => ({artist, contributions: C.getArtistNumContributions(artist)}));
+                .map(artist => ({artist, contributions: getArtistNumContributions(artist)}));
         },
 
         row({artist, contributions}, {strings, to}) {
@@ -4462,7 +4272,7 @@ const listingSpec = [
         data() {
             return artistData
                 .map(artist => ({artist, duration: getTotalDuration(
-                    [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY))
+                    [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY))
                 }))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
@@ -4485,23 +4295,23 @@ const listingSpec = [
             const reversedArtThings = justEverythingSortedByArtDateMan.slice().reverse();
 
             return {
-                toTracks: C.sortByDate(artistData
+                toTracks: sortByDate(artistData
                     .filter(artist => !artist.alias)
                     .map(artist => ({
                         artist,
                         date: reversedTracks.find(({ album, artists, contributors }) => (
-                            album.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                            album.directory !== UNRELEASED_TRACKS_DIRECTORY &&
                             [...artists, ...contributors].some(({ who }) => who === artist)
                         ))?.date
                     }))
                     .filter(({ date }) => date)
                     .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)).reverse(),
 
-                toArtAndFlashes: C.sortByDate(artistData
+                toArtAndFlashes: sortByDate(artistData
                     .filter(artist => !artist.alias)
                     .map(artist => {
                         const thing = reversedArtThings.find(({ album, coverArtists, contributors }) => (
-                            album?.directory !== C.UNRELEASED_TRACKS_DIRECTORY &&
+                            album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
                             [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === artist)
                         ));
                         return thing && {
@@ -4665,7 +4475,7 @@ const listingSpec = [
         condition: () => wikiInfo.features.groupUI,
 
         data() {
-            return C.sortByDate(groupData
+            return sortByDate(groupData
                 .map(group => ({group, date: group.albums[group.albums.length - 1].date}))
                 // So this is kinda tough to explain, 8ut 8asically, when we reverse the list after sorting it 8y d8te
                 // (so that the latest d8tes come first), it also flips the order of groups which share the same d8te.
@@ -4731,7 +4541,7 @@ const listingSpec = [
 
         data() {
             return chunkByProperties(
-                C.sortByDate(trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)),
+                sortByDate(trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)),
                 ['album', 'date']
             );
         },
@@ -4767,7 +4577,7 @@ const listingSpec = [
 
         data() {
             return trackData
-                .filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY)
+                .filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)
                 .map(track => ({track, duration: track.duration}))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
@@ -4840,7 +4650,7 @@ const listingSpec = [
 
         data() {
             return chunkByProperties(trackData.filter(t => t.flashes.length > 0), ['album'])
-                .filter(({ album }) => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+                .filter(({ album }) => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
         },
 
         html(chunks, {strings, to}) {
@@ -4874,7 +4684,7 @@ const listingSpec = [
         html({strings, to}) {
             return fixWS`
                 <dl>
-                    ${C.sortByDate(flashData.slice()).map(flash => fixWS`
+                    ${sortByDate(flashData.slice()).map(flash => fixWS`
                         <dt>${strings('listingPage.listTracks.inFlashes.byFlash.flash', {
                             flash: strings.link.flash(flash, {to}),
                             date: strings.count.date(flash.date)
@@ -4987,7 +4797,7 @@ const listingSpec = [
                 ].map(category => fixWS`
                     <dt>${category.name}: (<a href="#" data-random="album-in-${category.code}">Random Album</a>, <a href="#" data-random="track-in-${category.code}">Random Track</a>)</dt>
                     <dd><ul>${category.albumData.map(album => fixWS`
-                        <li><a style="${getLinkThemeString(album)}; --album-directory: ${album.directory}" href="#" data-random="track-in-album">${album.name}</a></li>
+                        <li><a style="${getLinkThemeString(album.color)}; --album-directory: ${album.directory}" href="#" data-random="track-in-album">${album.name}</a></li>
                     `).join('\n')}</ul></dd>
                 `).join('\n')}
             </dl>
@@ -5007,8 +4817,8 @@ function writeListingPages() {
 }
 
 function writeListingIndex() {
-    const releasedTracks = trackData.filter(track => track.album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
-    const releasedAlbums = albumData.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedTracks = trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
+    const releasedAlbums = albumData.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
     const duration = getTotalDuration(releasedTracks);
 
     return ({strings, writePage}) => writePage('listingIndex', '', ({to}) => ({
@@ -5178,7 +4988,7 @@ function writeAlbumCommentaryPage(album) {
     return ({strings, writePage}) => writePage('albumCommentary', album.directory, ({to}) => ({
         title: strings('albumCommentaryPage.title', {album: album.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
-        theme: getThemeString(album),
+        theme: getThemeString(album.color),
 
         main: {
             content: fixWS`
@@ -5200,7 +5010,7 @@ function writeAlbumCommentaryPage(album) {
                         <h3 id="${track.directory}">${strings('albumCommentaryPage.entry.title.trackCommentary', {
                             track: strings.link.track(track, {to})
                         })}</h3>
-                        <blockquote style="${getLinkThemeString(track)}">
+                        <blockquote style="${getLinkThemeString(track.color)}">
                             ${transformMultiline(track.commentary, {strings, to})}
                         </blockquote>
                     `).join('\n')}
@@ -5241,7 +5051,7 @@ function writeTagPage(tag) {
 
     return ({strings, writePage}) => writePage('tag', tag.directory, ({to}) => ({
         title: strings('tagPage.title', {tag: tag.name}),
-        theme: getThemeString(tag),
+        theme: getThemeString(tag.color),
 
         main: {
             classes: ['top-index'],
@@ -5299,29 +5109,6 @@ function getArtistString(artists, {strings, to, showIcons = false, showContrib =
     }));
 }
 
-function getLinkThemeString(thing) {
-    const { primary, dim } = C.getColors(thing.color || wikiInfo.color);
-    return `--primary-color: ${primary}; --dim-color: ${dim}`;
-}
-
-function getThemeString(thing, additionalVariables = []) {
-    const { primary, dim } = C.getColors(thing.color || wikiInfo.color);
-
-    const variables = [
-        `--primary-color: ${primary}`,
-        `--dim-color: ${dim}`,
-        ...additionalVariables
-    ].filter(Boolean);
-
-    return fixWS`
-        ${variables.length && fixWS`
-            :root {
-                ${variables.map(line => line + ';').join('\n')}
-            }
-        `}
-    `;
-}
-
 function getFlashDirectory(flash) {
     // const kebab = getKebabCase(flash.name.replace('[S] ', ''));
     // return flash.page + (kebab ? '-' + kebab : '');
@@ -5330,11 +5117,11 @@ function getFlashDirectory(flash) {
 }
 
 function getTagDirectory({name}) {
-    return C.getKebabCase(name);
+    return getKebabCase(name);
 }
 
 function getAlbumListTag(album) {
-    if (album.directory === C.UNRELEASED_TRACKS_DIRECTORY) {
+    if (album.directory === UNRELEASED_TRACKS_DIRECTORY) {
         return 'ul';
     } else {
         return 'ol';
@@ -5417,10 +5204,10 @@ function chronologyLinks(currentThing, {
     }
 
     return contributions.map(({ who: artist }) => {
-        const things = C.sortByDate(unique(getThings(artist)));
+        const things = sortByDate(unique(getThings(artist)));
         const releasedThings = things.filter(thing => {
             const album = albumData.includes(thing) ? thing : thing.album;
-            return !(album && album.directory === C.UNRELEASED_TRACKS_DIRECTORY);
+            return !(album && album.directory === UNRELEASED_TRACKS_DIRECTORY);
         });
         const index = releasedThings.indexOf(currentThing);
 
@@ -5543,12 +5330,12 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
         ${!currentTrack && fixWS`
             ${next && `<p class="group-chronology-link">${
                 strings('albumSidebar.groupBox.next', {
-                    album: `<a href="${to('localized.album', next.directory)}" style="${getLinkThemeString(next)}">${next.name}</a>`
+                    album: `<a href="${to('localized.album', next.directory)}" style="${getLinkThemeString(next.color)}">${next.name}</a>`
                 })
             }</p>`}
             ${previous && `<p class="group-chronology-link">${
                 strings('albumSidebar.groupBox.previous', {
-                    album: `<a href="${to('localized.album', previous.directory)}" style="${getLinkThemeString(previous)}">${previous.name}</a>`
+                    album: `<a href="${to('localized.album', previous.directory)}" style="${getLinkThemeString(previous.color)}">${previous.name}</a>`
                 })
             }</p>`}
         `}
@@ -5593,12 +5380,12 @@ function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
                     fixWS`
                         <dt ${classes(category === currentGroup.category && 'current')}>${
                             strings('groupSidebar.groupList.category', {
-                                category: `<a href="${to(urlKey, category.groups[0].directory)}" style="${getLinkThemeString(category)}">${category.name}</a>`
+                                category: `<a href="${to(urlKey, category.groups[0].directory)}" style="${getLinkThemeString(category.color)}">${category.name}</a>`
                             })
                         }</dt>
                         <dd><ul>
                             ${category.groups.map(group => fixWS`
-                                <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group)}">${
+                                <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group.color)}">${
                                     strings('groupSidebar.groupList.item', {
                                         group: `<a href="${to(urlKey, group.directory)}">${group.name}</a>`
                                     })
@@ -5680,14 +5467,14 @@ function writeGroupPages() {
 }
 
 function writeGroupPage(group) {
-    const releasedAlbums = group.albums.filter(album => album.directory !== C.UNRELEASED_TRACKS_DIRECTORY);
+    const releasedAlbums = group.albums.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
     const totalDuration = getTotalDuration(releasedTracks);
 
     return async ({strings, writePage}) => {
         await writePage('groupInfo', group.directory, ({to}) => ({
             title: strings('groupInfoPage.title', {group: group.name}),
-            theme: getThemeString(group),
+            theme: getThemeString(group.color),
 
             main: {
                 content: fixWS`
@@ -5713,7 +5500,7 @@ function writeGroupPage(group) {
                             <li>${
                                 strings('groupInfoPage.albumList.item', {
                                     year: album.date.getFullYear(),
-                                    album: `<a href="${to('localized.album', album.directory)}" style="${getLinkThemeString(album)}">${album.name}</a>`
+                                    album: `<a href="${to('localized.album', album.directory)}" style="${getLinkThemeString(album.color)}">${album.name}</a>`
                                 })
                             }</li>
                         `).join('\n')}
@@ -5727,7 +5514,7 @@ function writeGroupPage(group) {
 
         await writePage('groupGallery', group.directory, ({to}) => ({
             title: strings('groupGalleryPage.title', {group: group.name}),
-            theme: getThemeString(group),
+            theme: getThemeString(group.color),
 
             main: {
                 classes: ['top-index'],
@@ -5744,7 +5531,7 @@ function writeGroupPage(group) {
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
                             strings, to,
-                            entries: C.sortByDate(group.albums.map(item => ({item}))).reverse(),
+                            entries: sortByDate(group.albums.map(item => ({item}))).reverse(),
                             details: true
                         })}
                     </div>
@@ -5848,8 +5635,8 @@ async function main() {
         },
 
         // Static media will 8e referenced in the site here! The contents are
-        // categorized; check out MEDIA_DIRECTORY and rel8ted constants in
-        // common/common.js. (This gets symlinked into the --data directory.)
+        // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
+        // near the top of this file (upd8.js).
         'media-path': {
             type: 'value'
         },
@@ -5882,6 +5669,12 @@ async function main() {
         // kinda a pain to run every time, since it does necessit8te reading
         // every media file at run time. Pass this to skip it.
         'skip-thumbs': {
+            type: 'flag'
+        },
+
+        // Or, if you *only* want to gener8te newly upd8ted thum8nails, you can
+        // pass this flag! It exits 8efore 8uilding the rest of the site.
+        'thumbs-only': {
             type: 'flag'
         },
 
@@ -5928,6 +5721,12 @@ async function main() {
     }
 
     const skipThumbs = miscOptions['skip-thumbs'] ?? false;
+    const thumbsOnly = miscOptions['thumbs-only'] ?? false;
+
+    if (skipThumbs && thumbsOnly) {
+        logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
+        return;
+    }
 
     if (skipThumbs) {
         logInfo`Skipping thumbnail generation.`;
@@ -5935,9 +5734,8 @@ async function main() {
         logInfo`Begin thumbnail generation... -----+`;
         const result = await genThumbs(mediaPath, {queueSize, quiet: true});
         logInfo`Done thumbnail generation! --------+`;
-        if (!result) {
-            return;
-        }
+        if (!result) return;
+        if (thumbsOnly) return;
     }
 
     const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
@@ -6046,7 +5844,7 @@ async function main() {
     // avoiding that in our code 8ecause, again, we want to avoid assuming the
     // format of the returned paths here - they're only meant to 8e used for
     // reading as-is.
-    const albumDataFiles = await findFiles(path.join(dataPath, C.DATA_ALBUM_DIRECTORY));
+    const albumDataFiles = await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY));
 
     // Technically, we could do the data file reading and output writing at the
     // same time, 8ut that kinda makes the code messy, so I'm not 8othering
@@ -6063,7 +5861,7 @@ async function main() {
         }
     }
 
-    C.sortByDate(albumData);
+    sortByDate(albumData);
 
     artistData = await processArtistDataFile(path.join(dataPath, ARTIST_DATA_FILE));
     if (artistData.error) {
@@ -6084,7 +5882,7 @@ async function main() {
     artistAliasData = artistData.filter(x => x.alias);
     artistData = artistData.filter(x => !x.alias);
 
-    trackData = C.getAllTracks(albumData);
+    trackData = getAllTracks(albumData);
 
     if (wikiInfo.features.flashesAndGames) {
         flashData = await processFlashDataFile(path.join(dataPath, FLASH_DATA_FILE));
@@ -6190,7 +5988,7 @@ async function main() {
             return;
         }
 
-        C.sortByDate(newsData);
+        sortByDate(newsData);
         newsData.reverse();
     }
 
@@ -6214,8 +6012,8 @@ async function main() {
 
     artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
-    justEverythingMan = C.sortByDate([...albumData, ...trackData, ...(flashData || [])]);
-    justEverythingSortedByArtDateMan = C.sortByArtDate(justEverythingMan.slice());
+    justEverythingMan = sortByDate([...albumData, ...trackData, ...(flashData || [])]);
+    justEverythingSortedByArtDateMan = sortByArtDate(justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
     {
@@ -6370,7 +6168,7 @@ async function main() {
 
     trackData.forEach(track1 => track1.referencedBy = trackData.filter(track2 => track2.references.includes(track1)));
     groupData.forEach(group => group.albums = albumData.filter(album => album.groups.includes(group)));
-    tagData.forEach(tag => tag.things = C.sortByArtDate([...albumData, ...trackData]).filter(thing => thing.artTags.includes(tag)));
+    tagData.forEach(tag => tag.things = sortByArtDate([...albumData, ...trackData]).filter(thing => thing.artTags.includes(tag)));
 
     groupData.forEach(group => group.category = groupCategoryData.find(x => x.name === group.category));
     groupCategoryData.forEach(category => category.groups = groupData.filter(x => x.category === category));
@@ -6416,8 +6214,8 @@ async function main() {
         }
     });
 
-    officialAlbumData = albumData.filter(album => album.groups.some(group => group.directory === C.OFFICIAL_GROUP_DIRECTORY));
-    fandomAlbumData = albumData.filter(album => album.groups.every(group => group.directory !== C.OFFICIAL_GROUP_DIRECTORY));
+    officialAlbumData = albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
+    fandomAlbumData = albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
     // performance right now 'cuz it'll w8 for file writes to 8e completed
