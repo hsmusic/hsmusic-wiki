@@ -654,6 +654,16 @@ function getBasicField(lines, name) {
     return line && line.slice(name.length + 1).trim();
 }
 
+function getDimensionsField(lines, name) {
+    const string = getBasicField(lines, name);
+    if (!string) return string;
+    const parts = string.split(/[x,* ]+/g);
+    if (parts.length !== 2) throw new Error(`Invalid dimensions: ${string} (expected width & height)`);
+    const nums = parts.map(part => Number(part.trim()));
+    if (nums.includes(NaN)) throw new Error(`Invalid dimensions: ${string} (couldn't parse as numbers)`);
+    return nums;
+}
+
 function getBooleanField(lines, name) {
     // The ?? oper8tor (which is just, hilariously named, lol) can 8e used to
     // specify a default!
@@ -1197,6 +1207,7 @@ async function processAlbumDataFile(file) {
     album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
     album.bannerArtists = getContributionField(albumSection, 'Banner Art');
     album.bannerStyle = getMultilineField(albumSection, 'Banner Style');
+    album.bannerDimensions = getDimensionsField(albumSection, 'Banner Dimensions');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
     album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
@@ -2206,6 +2217,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     banner.classes ??= [];
     banner.src ??= '';
     banner.position ??= '';
+    banner.dimensions ??= [0, 0];
 
     main.classes ??= [];
     main.content ??= '';
@@ -2328,8 +2340,8 @@ writePage.html = (pageFn, {paths, strings, to}) => {
         html.tag('img', {
             src: banner.src,
             alt: banner.alt,
-            width: 1100,
-            height: 200
+            width: banner.dimensions[0] || 1100,
+            height: banner.dimensions[1] || 200
         })
     );
 
@@ -2989,6 +3001,7 @@ function writeAlbumPage(album) {
         ]),
 
         banner: album.bannerArtists && {
+            dimensions: album.bannerDimensions,
             src: to('media.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'top'
@@ -3231,6 +3244,7 @@ function writeTrackPage(track) {
         /*
         banner: album.bannerArtists && {
             classes: ['dim'],
+            dimensions: album.bannerDimensions,
             src: to('media.albumBanner', album.directory),
             alt: strings('misc.alt.albumBanner'),
             position: 'bottom'
