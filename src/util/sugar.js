@@ -68,3 +68,11 @@ export function queue(array, max = 50) {
 export function delay(ms) {
     return new Promise(res => setTimeout(res, ms));
 }
+
+// Stolen from here: https://stackoverflow.com/a/3561711
+//
+// There's a proposal for a native JS function like this, 8ut it's not even
+// past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
+export function escapeRegex(string) {
+    return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
