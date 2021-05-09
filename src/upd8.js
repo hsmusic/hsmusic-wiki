@@ -1616,6 +1616,7 @@ async function processAlbumDataFile(file) {
     album.groups = getListField(albumSection, 'Groups') || [];
     album.directory = getBasicField(albumSection, 'Directory');
     album.isMajorRelease = getBooleanField(albumSection, 'Major Release') ?? false;
+    album.isListedOnHomepage = getBooleanField(albumSection, 'Listed on Homepage') ?? true;
 
     if (album.artists && album.artists.error) {
         return {error: `${album.artists.error} (in ${album.name})`};
@@ -2912,7 +2913,7 @@ function getFlashGridHTML({strings, to, ...props}) {
 }
 
 function getNewReleases(numReleases) {
-    const latestFirst = albumData.slice().reverse();
+    const latestFirst = albumData.filter(album => album.isListedOnHomepage).reverse();
     const majorReleases = latestFirst.filter(album => album.isMajorRelease);
     majorReleases.splice(1);
 
@@ -2936,7 +2937,7 @@ function getNewAdditions(numAlbums) {
     // Major releases go first to 8etter ensure they show up in the list (and
     // are usually at the start of the final output for a given d8 of release
     // too).
-    const sortedAlbums = albumData.slice().sort((a, b) => {
+    const sortedAlbums = albumData.filter(album => album.isListedOnHomepage).sort((a, b) => {
         if (a.dateAdded > b.dateAdded) return -1;
         if (a.dateAdded < b.dateAdded) return 1;
         if (a.isMajorRelease && !b.isMajorRelease) return -1;
