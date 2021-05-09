@@ -201,27 +201,10 @@ let mediaPath;
 let langPath;
 let outputPath;
 
-let wikiInfo;
-let homepageInfo;
-let albumData;
-let trackData;
-let flashData;
-let flashActData;
-let newsData;
-let tagData;
-let groupData;
-let groupCategoryData;
-let staticPageData;
-
-let artistNames;
-let artistData;
-let artistAliasData;
-
-let officialAlbumData;
-let fandomAlbumData;
-let justEverythingMan; // tracks, albums, flashes -- don't forget to upd8 toAnythingMan!
-let justEverythingSortedByArtDateMan;
-let contributionData;
+// Glo8al data o8ject shared 8etween 8uild functions and all that. This keeps
+// everything encapsul8ted in one place, so it's easy to pass and share across
+// modules!
+let wikiData = {};
 
 let queueSize;
 
@@ -318,10 +301,13 @@ urlSpec.localizedWithBaseDirectory = {
 
 const urls = generateURLs(urlSpec);
 
-const searchHelper = (keys, dataFn, findFn) => ref => {
+const searchHelper = (keys, dataProp, findFn) => (ref, {wikiData}) => {
     if (!ref) return null;
     ref = ref.replace(new RegExp(`^(${keys.join('|')}):`), '');
-    const found = findFn(ref, dataFn());
+    if (!wikiData[dataProp]) {
+        console.log('find', dataProp, Object.keys(wikiData));
+    }
+    const found = findFn(ref, wikiData[dataProp]);
     if (!found) {
         logWarn`Didn't match anything for ${ref}! (${keys.join(', ')})`;
     }
@@ -349,16 +335,16 @@ const matchDirectoryOrName = (ref, data) => {
 };
 
 const search = {
-    album: searchHelper(['album', 'album-commentary'], () => albumData, matchDirectoryOrName),
-    artist: searchHelper(['artist', 'artist-gallery'], () => artistData, matchDirectoryOrName),
-    flash: searchHelper(['flash'], () => flashData, matchDirectory),
-    group: searchHelper(['group', 'group-gallery'], () => groupData, matchDirectoryOrName),
-    listing: searchHelper(['listing'], () => listingSpec, matchDirectory),
-    newsEntry: searchHelper(['news-entry'], () => newsData, matchDirectory),
-    staticPage: searchHelper(['static'], () => staticPageData, matchDirectory),
-    tag: searchHelper(['tag'], () => tagData, (ref, data) =>
+    album: searchHelper(['album', 'album-commentary'], 'albumData', matchDirectoryOrName),
+    artist: searchHelper(['artist', 'artist-gallery'], 'artistData', matchDirectoryOrName),
+    flash: searchHelper(['flash'], 'flashData', matchDirectory),
+    group: searchHelper(['group', 'group-gallery'], 'groupData', matchDirectoryOrName),
+    listing: searchHelper(['listing'], 'listingSpec', matchDirectory),
+    newsEntry: searchHelper(['news-entry'], 'newsData', matchDirectory),
+    staticPage: searchHelper(['static'], 'staticPageData', matchDirectory),
+    tag: searchHelper(['tag'], 'tagData', (ref, data) =>
         matchDirectoryOrName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data)),
-    track: searchHelper(['track'], () => trackData, matchDirectoryOrName)
+    track: searchHelper(['track'], 'trackData', matchDirectoryOrName)
 };
 
 // Localiz8tion time! Or l10n as the neeeeeeeerds call it. Which is a terri8le
@@ -1215,7 +1201,7 @@ const replacerSpec = {
 
 {
     const evaluateTag = function(node, opts) {
-        const { input, strings, to } = opts;
+        const { input, strings, to, wikiData } = opts;
 
         const source = input.slice(node.i, node.iEnd);
 
@@ -1238,15 +1224,15 @@ const replacerSpec = {
 
         const value = (
             valueFn ? valueFn(replacerValue) :
-            searchKey ? search[searchKey](replacerValue) :
+            searchKey ? search[searchKey](replacerValue, {wikiData}) :
             {
                 directory: replacerValue,
                 name: null
             });
 
         if (!value) {
-            logWarn`The link ${search} does not match anything!`;
-            return search;
+            logWarn`The link ${source} does not match anything!`;
+            return source;
         }
 
         const enteredLabel = node.data.label && transformNode(node.data.label, opts);
@@ -1256,8 +1242,8 @@ const replacerSpec = {
             || value.name);
 
         if (!valueFn && !label) {
-            logWarn`The link ${search} requires a label be entered!`;
-            return search;
+            logWarn`The link ${source} requires a label be entered!`;
+            return source;
         }
 
         const hash = node.data.hash && transformNodes(node.data.hash, opts);
@@ -1314,9 +1300,13 @@ const replacerSpec = {
     });
 }
 
-function transformInline(input, {strings, to}) {
+function transformInline(input, {strings, to, wikiData}) {
+    if (!strings) throw new Error('Expected strings');
+    if (!to) throw new Error('Expected to');
+    if (!wikiData) throw new Error('Expected wikiData');
+
     const nodes = transformInline.parse(input);
-    return transformInline.transformNodes(nodes, {strings, to, input});
+    return transformInline.transformNodes(nodes, {input, strings, to, wikiData});
 }
 
 function parseAttributes(string, {to}) {
@@ -1374,10 +1364,14 @@ function parseAttributes(string, {to}) {
     ]));
 }
 
-function transformMultiline(text, {strings, to}) {
+function transformMultiline(text, {strings, to, wikiData}) {
     // Heck yes, HTML magics.
 
-    text = transformInline(text.trim(), {strings, to});
+    if (!strings) throw new Error('Expected strings');
+    if (!to) throw new Error('Expected to');
+    if (!wikiData) throw new Error('Expected wikiData');
+
+    text = transformInline(text.trim(), {strings, to, wikiData});
 
     const outLines = [];
 
@@ -1520,7 +1514,7 @@ function transformMultiline(text, {strings, to}) {
     return outLines.join('\n');
 }
 
-function transformLyrics(text, {strings, to}) {
+function transformLyrics(text, {strings, to, wikiData}) {
     // Different from transformMultiline 'cuz it joins multiple lines together
     // with line 8reaks (<br>); transformMultiline treats each line as its own
     // complete paragraph (or list, etc).
@@ -1528,10 +1522,10 @@ function transformLyrics(text, {strings, to}) {
     // If it looks like old data, then like, oh god.
     // Use the normal transformMultiline tool.
     if (text.includes('<br')) {
-        return transformMultiline(text, {strings, to});
+        return transformMultiline(text, {strings, to, wikiData});
     }
 
-    text = transformInline(text.trim(), {strings, to});
+    text = transformInline(text.trim(), {strings, to, wikiData});
 
     let buildLine = '';
     const addLine = () => outLines.push(`<p>${buildLine}</p>`);
@@ -2292,8 +2286,8 @@ function stringifyRefs(key, value) {
     }
 }
 
-function stringifyAlbumData() {
-    return JSON.stringify(albumData, (key, value) => {
+function stringifyAlbumData({wikiData}) {
+    return JSON.stringify(wikiData.albumData, (key, value) => {
         switch (key) {
             case 'commentary':
                 return '';
@@ -2303,8 +2297,8 @@ function stringifyAlbumData() {
     }, stringifyIndent);
 }
 
-function stringifyTrackData() {
-    return JSON.stringify(trackData, (key, value) => {
+function stringifyTrackData({wikiData}) {
+    return JSON.stringify(wikiData.trackData, (key, value) => {
         switch (key) {
             case 'album':
             case 'commentary':
@@ -2316,8 +2310,8 @@ function stringifyTrackData() {
     }, stringifyIndent);
 }
 
-function stringifyFlashData() {
-    return JSON.stringify(flashData, (key, value) => {
+function stringifyFlashData({wikiData}) {
+    return JSON.stringify(wikiData.flashData, (key, value) => {
         switch (key) {
             case 'act':
             case 'commentary':
@@ -2328,8 +2322,8 @@ function stringifyFlashData() {
     }, stringifyIndent);
 }
 
-function stringifyArtistData() {
-    return JSON.stringify(artistData, (key, value) => {
+function stringifyArtistData({wikiData}) {
+    return JSON.stringify(wikiData.artistData, (key, value) => {
         switch (key) {
             case 'asAny':
                 return;
@@ -2560,7 +2554,7 @@ async function writeData(subKey, directory, data) {
     await writePage.write(JSON.stringify(data), {paths});
 }
 
-async function writePage(strings, baseDirectory, pageSubKey, directory, pageFn) {
+async function writePage(pageSubKey, directory, pageFn, {baseDirectory, strings, wikiData}) {
     // Generally this function shouldn't 8e called directly - instead use the
     // shadowed version provided 8y wrapLanguages, which automatically provides
     // the appropriate baseDirectory and strings arguments. (The utility
@@ -2584,11 +2578,13 @@ async function writePage(strings, baseDirectory, pageSubKey, directory, pageFn) 
         return path;
     };
 
-    const content = writePage.html(pageFn, {paths, strings, to});
+    const content = writePage.html(pageFn, {paths, strings, to, wikiData});
     await writePage.write(content, {paths});
 }
 
-writePage.html = (pageFn, {paths, strings, to}) => {
+writePage.html = (pageFn, {paths, strings, to, wikiData}) => {
+    const { wikiInfo } = wikiData;
+
     let {
         title = '',
         meta = {},
@@ -2632,7 +2628,7 @@ writePage.html = (pageFn, {paths, strings, to}) => {
     nav.links ??= [];
 
     footer.classes ??= [];
-    footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer, {strings, to}) : '');
+    footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer, {strings, to, wikiData}) : '');
 
     const canonical = (wikiInfo.canonicalBase
         ? wikiInfo.canonicalBase + paths.pathname
@@ -2912,7 +2908,9 @@ function getFlashGridHTML({strings, to, ...props}) {
     });
 }
 
-function getNewReleases(numReleases) {
+function getNewReleases(numReleases, {wikiData}) {
+    const { albumData } = wikiData;
+
     const latestFirst = albumData.filter(album => album.isListedOnHomepage).reverse();
     const majorReleases = latestFirst.filter(album => album.isMajorRelease);
     majorReleases.splice(1);
@@ -2927,7 +2925,9 @@ function getNewReleases(numReleases) {
     ];
 }
 
-function getNewAdditions(numAlbums) {
+function getNewAdditions(numAlbums, {wikiData}) {
+    const { albumData } = wikiData;
+
     // Sort al8ums, in descending order of priority, 8y...
     //
     // * D8te of addition to the wiki (descending).
@@ -3043,7 +3043,9 @@ function writeSymlinks() {
     }
 }
 
-function writeSharedFilesAndPages({strings}) {
+function writeSharedFilesAndPages({strings, wikiData}) {
+    const { groupData, wikiInfo } = wikiData;
+
     const redirect = async (title, from, urlKey, directory) => {
         const target = path.relative(from, urls.from('shared.root').to(urlKey, directory));
         const content = generateRedirectPage(title, target, {strings});
@@ -3063,15 +3065,17 @@ function writeSharedFilesAndPages({strings}) {
 
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
-                "albumData": ${stringifyAlbumData()},
-                ${wikiInfo.features.flashesAndGames && `"flashData": ${stringifyFlashData()},`}
-                "artistData": ${stringifyArtistData()}
+                "albumData": ${stringifyAlbumData({wikiData})},
+                ${wikiInfo.features.flashesAndGames && `"flashData": ${stringifyFlashData({wikiData})},`}
+                "artistData": ${stringifyArtistData({wikiData})}
             }
         `)
     ].filter(Boolean));
 }
 
-function writeHomepage() {
+function writeHomepage({wikiData}) {
+    const { newsData, staticPageData, homepageInfo, wikiInfo } = wikiData;
+
     return ({strings, writePage}) => writePage('home', '', ({to}) => ({
         title: wikiInfo.name,
 
@@ -3091,22 +3095,22 @@ function writeHomepage() {
                                 ${getAlbumGridHTML({
                                     strings, to,
                                     entries: (
-                                        row.group === 'new-releases' ? getNewReleases(row.groupCount) :
-                                        row.group === 'new-additions' ? getNewAdditions(row.groupCount) :
-                                        ((search.group(row.group)?.albums || [])
+                                        row.group === 'new-releases' ? getNewReleases(row.groupCount, {wikiData}) :
+                                        row.group === 'new-additions' ? getNewAdditions(row.groupCount, {wikiData}) :
+                                        ((search.group(row.group, {wikiData})?.albums || [])
                                             .slice()
                                             .reverse()
                                             .slice(0, row.groupCount)
                                             .map(album => ({item: album})))
                                     ).concat(row.albums
-                                        .map(search.album)
+                                        .map(album => search.album(album, {wikiData}))
                                         .map(album => ({item: album}))
                                     ),
                                     lazy: i > 0
                                 })}
                                 ${row.actions.length && fixWS`
                                     <div class="grid-actions">
-                                        ${row.actions.map(action => transformInline(action, {strings, to})
+                                        ${row.actions.map(action => transformInline(action, {strings, to, wikiData})
                                             .replace('<a', '<a class="box grid-item"')).join('\n')}
                                     </div>
                                 `}
@@ -3130,19 +3134,20 @@ function writeHomepage() {
             //
             // And no, I will not make [[news]] into part of transformMultiline
             // (even though that would 8e hilarious).
-            content: transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__'), {strings, to}).replace('<p>__GENERATE_NEWS__</p>', wikiInfo.features.news ? fixWS`
-                <h1>${strings('homepage.news.title')}</h1>
-                ${newsData.slice(0, 3).map((entry, i) => fixWS`
-                    <article ${classes('news-entry', i === 0 && 'first-news-entry')}>
-                        <h2><time>${strings.count.date(entry.date)}</time> ${strings.link.newsEntry(entry, {to})}</h2>
-                        ${transformMultiline(entry.bodyShort, {strings, to})}
-                        ${entry.bodyShort !== entry.body && strings.link.newsEntry(entry, {
-                            to,
-                            text: strings('homepage.news.entry.viewRest')
-                        })}
-                    </article>
-                `).join('\n')}
-            ` : `<p><i>News requested in content description but this feature isn't enabled</i></p>`)
+            content: (transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__'), {strings, to, wikiData})
+                .replace('<p>__GENERATE_NEWS__</p>', wikiInfo.features.news ? fixWS`
+                    <h1>${strings('homepage.news.title')}</h1>
+                    ${newsData.slice(0, 3).map((entry, i) => fixWS`
+                        <article ${classes('news-entry', i === 0 && 'first-news-entry')}>
+                            <h2><time>${strings.count.date(entry.date)}</time> ${strings.link.newsEntry(entry, {to})}</h2>
+                            ${transformMultiline(entry.bodyShort, {strings, to, wikiData})}
+                            ${entry.bodyShort !== entry.body && strings.link.newsEntry(entry, {
+                                to,
+                                text: strings('homepage.news.entry.viewRest')
+                            })}
+                        </article>
+                    `).join('\n')}
+                ` : `<p><i>News requested in content description but this feature isn't enabled</i></p>`))
         },
 
         nav: {
@@ -3164,24 +3169,28 @@ function writeHomepage() {
     }));
 }
 
-function writeMiscellaneousPages() {
+function writeMiscellaneousPages({wikiData}) {
     return [
-        writeHomepage()
+        writeHomepage({wikiData})
     ];
 }
 
-function writeNewsPages() {
+function writeNewsPages({wikiData}) {
+    const { newsData, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.news) {
         return;
     }
 
     return [
-        writeNewsIndex(),
-        ...newsData.map(writeNewsEntryPage)
+        writeNewsIndex({wikiData}),
+        ...newsData.map(entry => writeNewsEntryPage(entry, {wikiData}))
     ];
 }
 
-function writeNewsIndex() {
+function writeNewsIndex({wikiData}) {
+    const { newsData } = wikiData;
+
     return ({strings, writePage}) => writePage('newsIndex', '', ({to}) => ({
         title: strings('newsIndex.title'),
 
@@ -3192,7 +3201,7 @@ function writeNewsIndex() {
                     ${newsData.map(entry => fixWS`
                         <article id="${entry.directory}">
                             <h2><time>${strings.count.date(entry.date)}</time> ${strings.link.newsEntry(entry, {to})}</h2>
-                            ${transformMultiline(entry.bodyShort, {strings, to})}
+                            ${transformMultiline(entry.bodyShort, {strings, to, wikiData})}
                             ${entry.bodyShort !== entry.body && `<p>${strings.link.newsEntry(entry, {
                                 to,
                                 text: strings('newsIndex.entry.viewRest')
@@ -3207,7 +3216,7 @@ function writeNewsIndex() {
     }));
 }
 
-function writeNewsEntryPage(entry) {
+function writeNewsEntryPage(entry, {wikiData}) {
     return ({strings, writePage}) => writePage('newsEntry', entry.directory, ({to}) => ({
         title: strings('newsEntryPage.title', {entry: entry.name}),
 
@@ -3216,16 +3225,18 @@ function writeNewsEntryPage(entry) {
                 <div class="long-content">
                     <h1>${strings('newsEntryPage.title', {entry: entry.name})}</h1>
                     <p>${strings('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
-                    ${transformMultiline(entry.body, {strings, to})}
+                    ${transformMultiline(entry.body, {strings, to, wikiData})}
                 </div>
             `
         },
 
-        nav: generateNewsEntryNav(entry, {strings, to})
+        nav: generateNewsEntryNav(entry, {strings, to, wikiData})
     }));
 }
 
-function generateNewsEntryNav(entry, {strings, to}) {
+function generateNewsEntryNav(entry, {strings, to, wikiData}) {
+    const { wikiInfo, newsData } = wikiData;
+
     // The newsData list is sorted reverse chronologically (newest ones first),
     // so the way we find next/previous entries is flipped from normal.
     const previousNextLinks = generatePreviousNextLinks('localized.newsEntry', entry, newsData.slice().reverse(), {strings, to});
@@ -3255,11 +3266,11 @@ function generateNewsEntryNav(entry, {strings, to}) {
     };
 }
 
-function writeStaticPages() {
-    return staticPageData.map(writeStaticPage);
+function writeStaticPages({wikiData}) {
+    return wikiData.staticPageData.map(staticPage => writeStaticPage(staticPage, {wikiData}));
 }
 
-function writeStaticPage(staticPage) {
+function writeStaticPage(staticPage, {wikiData}) {
     return ({strings, writePage}) => writePage('staticPage', staticPage.directory, ({to}) => ({
         title: staticPage.name,
         stylesheet: staticPage.stylesheet,
@@ -3268,7 +3279,7 @@ function writeStaticPage(staticPage) {
             content: fixWS`
                 <div class="long-content">
                     <h1>${staticPage.name}</h1>
-                    ${transformMultiline(staticPage.content, {strings, to})}
+                    ${transformMultiline(staticPage.content, {strings, to, wikiData})}
                 </div>
             `
         },
@@ -3288,11 +3299,13 @@ function getRevealStringFromTags(tags, {strings}) {
 }
 
 function generateCoverLink({
-    strings, to,
+    strings, to, wikiData,
     src,
     alt,
     tags = []
 }) {
+    const { wikiInfo } = wikiData;
+
     return fixWS`
         <div id="cover-art-container">
             ${img({
@@ -3328,11 +3341,13 @@ function writeIndexAndTrackPagesForAlbum(album) {
 }
 */
 
-function writeAlbumPages() {
-    return albumData.map(writeAlbumPage);
+function writeAlbumPages({wikiData}) {
+    return wikiData.albumData.map(album => writeAlbumPage(album, {wikiData}));
 }
 
-function writeAlbumPage(album) {
+function writeAlbumPage(album, {wikiData}) {
+    const { wikiInfo } = wikiData;
+
     const trackToListItem = (track, {strings, to}) => {
         const itemOpts = {
             duration: strings.count.duration(track.duration),
@@ -3406,7 +3421,7 @@ function writeAlbumPage(album) {
         main: {
             content: fixWS`
                 ${generateCoverLink({
-                    strings, to,
+                    strings, to, wikiData,
                     src: to('media.albumCover', album.directory),
                     alt: strings('misc.alt.albumCover'),
                     tags: album.artTags
@@ -3494,13 +3509,13 @@ function writeAlbumPage(album) {
                 ${album.commentary && fixWS`
                     <p>${strings('releaseInfo.artistCommentary')}</p>
                     <blockquote>
-                        ${transformMultiline(album.commentary, {strings, to})}
+                        ${transformMultiline(album.commentary, {strings, to, wikiData})}
                     </blockquote>
                 `}
             `
         },
 
-        sidebarLeft: generateSidebarForAlbum(album, null, {strings, to}),
+        sidebarLeft: generateSidebarForAlbum(album, null, {strings, to, wikiData}),
 
         nav: {
             links: [
@@ -3545,11 +3560,12 @@ function getAlbumStylesheet(album, {to}) {
     ].filter(Boolean).join('\n');
 }
 
-function writeTrackPages() {
-    return trackData.map(writeTrackPage);
+function writeTrackPages({wikiData}) {
+    return wikiData.trackData.map(track => writeTrackPage(track, {wikiData}));
 }
 
-function writeTrackPage(track) {
+function writeTrackPage(track, {wikiData}) {
+    const { groupData, wikiInfo } = wikiData;
     const { album } = track;
 
     const tracksThatReference = track.referencedBy;
@@ -3598,7 +3614,7 @@ function writeTrackPage(track) {
                     `)
                     .join('\n')))
         ].filter(Boolean).join('\n'),
-        {strings, to});
+        {strings, to, wikiData});
 
     const data = {
         type: 'data',
@@ -3650,7 +3666,7 @@ function writeTrackPage(track) {
         main: {
             content: fixWS`
                 ${generateCoverLink({
-                    strings, to,
+                    strings, to, wikiData,
                     src: getTrackCover(track, {to}),
                     alt: strings('misc.alt.trackCover'),
                     tags: track.artTags
@@ -3705,7 +3721,7 @@ function writeTrackPage(track) {
                     <p>
                         ${strings('releaseInfo.contributors')}
                         <br>
-                        ${transformInline(track.contributors.textContent, {strings, to})}
+                        ${transformInline(track.contributors.textContent, {strings, to, wikiData})}
                     </p>
                 `}
                 ${track.contributors.length && fixWS`
@@ -3760,7 +3776,7 @@ function writeTrackPage(track) {
                 ${track.lyrics && fixWS`
                     <p>${strings('releaseInfo.lyrics')}</p>
                     <blockquote>
-                        ${transformLyrics(track.lyrics, {strings, to})}
+                        ${transformLyrics(track.lyrics, {strings, to, wikiData})}
                     </blockquote>
                 `}
                 ${hasCommentary && fixWS`
@@ -3772,7 +3788,7 @@ function writeTrackPage(track) {
             `
         },
 
-        sidebarLeft: generateSidebarForAlbum(album, track, {strings, to}),
+        sidebarLeft: generateSidebarForAlbum(album, track, {strings, to, wikiData}),
 
         nav: {
             links: [
@@ -3810,14 +3826,16 @@ function writeTrackPage(track) {
     return [data, page];
 }
 
-function writeArtistPages() {
+function writeArtistPages({wikiData}) {
     return [
-        ...artistData.map(writeArtistPage),
-        ...artistAliasData.map(writeArtistAliasPage)
+        ...wikiData.artistData.map(artist => writeArtistPage(artist, {wikiData})),
+        ...wikiData.artistAliasData.map(artist => writeArtistAliasPage(artist, {wikiData}))
     ];
 }
 
-function writeArtistPage(artist) {
+function writeArtistPage(artist, {wikiData}) {
+    const { groupData, wikiInfo } = wikiData;
+
     const {
         name,
         urls = [],
@@ -4023,7 +4041,7 @@ function writeArtistPage(artist) {
             main: {
                 content: fixWS`
                     ${artist.hasAvatar && generateCoverLink({
-                        strings, to,
+                        strings, to, wikiData,
                         src: to('localized.artistAvatar', artist.directory),
                         alt: strings('misc.alt.artistAvatar')
                     })}
@@ -4031,7 +4049,7 @@ function writeArtistPage(artist) {
                     ${note && fixWS`
                         <p>${strings('releaseInfo.note')}</p>
                         <blockquote>
-                            ${transformMultiline(note, {strings, to})}
+                            ${transformMultiline(note, {strings, to, wikiData})}
                         </blockquote>
                         <hr>
                     `}
@@ -4164,7 +4182,7 @@ function writeArtistPage(artist) {
                 `
             },
 
-            nav: generateNavForArtist(artist, {strings, to, isGallery: false, hasGallery})
+            nav: generateNavForArtist(artist, {isGallery: false, hasGallery, strings, to, wikiData})
         })
     };
 
@@ -4196,14 +4214,16 @@ function writeArtistPage(artist) {
                 `
             },
 
-            nav: generateNavForArtist(artist, {strings, to, isGallery: true, hasGallery})
+            nav: generateNavForArtist(artist, {isGallery: true, hasGallery, strings, to, wikiData})
         })
     };
 
     return [data, infoPage, galleryPage].filter(Boolean);
 }
 
-function generateNavForArtist(artist, {strings, to, isGallery, hasGallery}) {
+function generateNavForArtist(artist, {isGallery, hasGallery, strings, to, wikiData}) {
+    const { wikiInfo } = wikiData;
+
     const infoGalleryLinks = (hasGallery &&
         generateInfoGalleryLinks('artist', 'artistGallery', artist, isGallery, {strings, to}))
 
@@ -4232,7 +4252,9 @@ function generateNavForArtist(artist, {strings, to, isGallery, hasGallery}) {
     };
 }
 
-function writeArtistAliasPage(artist) {
+function writeArtistAliasPage(artist, {wikiData}) {
+    // This function doesn't actually use wikiData, 8ut, um, consistency?
+
     const { alias } = artist;
 
     return async ({baseDirectory, strings, writePage}) => {
@@ -4266,18 +4288,22 @@ function generateRedirectPage(title, target, {strings}) {
     `;
 }
 
-function writeFlashPages() {
+function writeFlashPages({wikiData}) {
+    const { flashData, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.flashesAndGames) {
         return;
     }
 
     return [
-        writeFlashIndex(),
-        ...flashData.map(writeFlashPage)
+        writeFlashIndex({wikiData}),
+        ...flashData.map(flash => writeFlashPage(flash, {wikiData}))
     ];
 }
 
-function writeFlashIndex() {
+function writeFlashIndex({wikiData}) {
+    const { flashActData } = wikiData;
+
     return ({strings, writePage}) => writePage('flashIndex', '', ({to}) => ({
         title: strings('flashIndex.title'),
 
@@ -4310,7 +4336,7 @@ function writeFlashIndex() {
     }));
 }
 
-function writeFlashPage(flash) {
+function writeFlashPage(flash, {wikiData}) {
     return ({strings, writePage}) => writePage('flash', flash.directory, ({to}) => ({
         title: strings('flashPage.title', {flash: flash.name}),
         theme: getThemeString(flash.color, [
@@ -4321,7 +4347,7 @@ function writeFlashPage(flash) {
             content: fixWS`
                 <h1>${strings('flashPage.title', {flash: flash.name})}</h1>
                 ${generateCoverLink({
-                    strings, to,
+                    strings, to, wikiData,
                     src: to('media.flashArt', flash.directory),
                     alt: strings('misc.alt.flashArt')
                 })}
@@ -4352,7 +4378,7 @@ function writeFlashPage(flash) {
                     <p>
                         ${strings('releaseInfo.contributors')}
                         <br>
-                        ${transformInline(flash.contributors.textContent, {strings, to})}
+                        ${transformInline(flash.contributors.textContent, {strings, to, wikiData})}
                     </p>
                 `}
                 ${flash.contributors.length && fixWS`
@@ -4370,12 +4396,14 @@ function writeFlashPage(flash) {
             `
         },
 
-        sidebarLeft: generateSidebarForFlash(flash, {strings, to}),
-        nav: generateNavForFlash(flash, {strings, to})
+        sidebarLeft: generateSidebarForFlash(flash, {strings, to, wikiData}),
+        nav: generateNavForFlash(flash, {strings, to, wikiData})
     }));
 }
 
-function generateNavForFlash(flash, {strings, to}) {
+function generateNavForFlash(flash, {strings, to, wikiData}) {
+    const { flashData, wikiInfo } = wikiData;
+
     const previousNextLinks = generatePreviousNextLinks('localized.flash', flash, flashData, {strings, to});
 
     return {
@@ -4403,7 +4431,7 @@ function generateNavForFlash(flash, {strings, to}) {
         content: fixWS`
             <div>
                 ${chronologyLinks(flash, {
-                    strings, to,
+                    strings, to, wikiData,
                     headingString: 'misc.chronology.heading.flash',
                     contribKey: 'contributors',
                     getThings: artist => artist.flashes.asContributor
@@ -4413,9 +4441,11 @@ function generateNavForFlash(flash, {strings, to}) {
     };
 }
 
-function generateSidebarForFlash(flash, {strings, to}) {
+function generateSidebarForFlash(flash, {strings, to, wikiData}) {
     // all hard-coded, sorry :(
     // this doesnt have a super portable implementation/design...yet!!
+
+    const { flashActData } = wikiData;
 
     const act6 = flashActData.findIndex(act => act.name.startsWith('Act 6'));
     const postCanon = flashActData.findIndex(act => act.name.includes('Post Canon'));
@@ -4471,8 +4501,8 @@ const listingSpec = [
         directory: 'albums/by-name',
         title: ({strings}) => strings('listingPage.listAlbums.byName.title'),
 
-        data() {
-            return albumData.slice()
+        data({wikiData}) {
+            return wikiData.albumData.slice()
                 .sort(sortByName);
         },
 
@@ -4488,8 +4518,8 @@ const listingSpec = [
         directory: 'albums/by-tracks',
         title: ({strings}) => strings('listingPage.listAlbums.byTracks.title'),
 
-        data() {
-            return albumData.slice()
+        data({wikiData}) {
+            return wikiData.albumData.slice()
                 .sort((a, b) => b.tracks.length - a.tracks.length);
         },
 
@@ -4505,8 +4535,8 @@ const listingSpec = [
         directory: 'albums/by-duration',
         title: ({strings}) => strings('listingPage.listAlbums.byDuration.title'),
 
-        data() {
-            return albumData
+        data({wikiData}) {
+            return wikiData.albumData
                 .map(album => ({album, duration: getTotalDuration(album.tracks)}))
                 .sort((a, b) => b.duration - a.duration);
         },
@@ -4523,8 +4553,8 @@ const listingSpec = [
         directory: 'albums/by-date',
         title: ({strings}) => strings('listingPage.listAlbums.byDate.title'),
 
-        data() {
-            return sortByDate(albumData
+        data({wikiData}) {
+            return sortByDate(wikiData.albumData
                 .filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY));
         },
 
@@ -4540,8 +4570,8 @@ const listingSpec = [
         directory: 'albusm/by-date-added',
         title: ({strings}) => strings('listingPage.listAlbums.byDateAdded.title'),
 
-        data() {
-            return chunkByProperties(albumData.slice().sort((a, b) => {
+        data({wikiData}) {
+            return chunkByProperties(wikiData.albumData.slice().sort((a, b) => {
                 if (a.dateAdded < b.dateAdded) return -1;
                 if (a.dateAdded > b.dateAdded) return 1;
             }), ['dateAdded']);
@@ -4572,8 +4602,8 @@ const listingSpec = [
         directory: 'artists/by-name',
         title: ({strings}) => strings('listingPage.listArtists.byName.title'),
 
-        data() {
-            return artistData.slice()
+        data({wikiData}) {
+            return wikiData.artistData.slice()
                 .sort(sortByName)
                 .map(artist => ({artist, contributions: getArtistNumContributions(artist)}));
         },
@@ -4590,9 +4620,9 @@ const listingSpec = [
         directory: 'artists/by-contribs',
         title: ({strings}) => strings('listingPage.listArtists.byContribs.title'),
 
-        data() {
+        data({wikiData}) {
             return {
-                toTracks: (artistData
+                toTracks: (wikiData.artistData
                     .map(artist => ({
                         artist,
                         contributions: (
@@ -4603,7 +4633,7 @@ const listingSpec = [
                     .sort((a, b) => b.contributions - a.contributions)
                     .filter(({ contributions }) => contributions)),
 
-                toArtAndFlashes: (artistData
+                toArtAndFlashes: (wikiData.artistData
                     .map(artist => ({
                         artist,
                         contributions: (
@@ -4611,17 +4641,22 @@ const listingSpec = [
                             artist.albums.asCoverArtist.length +
                             artist.albums.asWallpaperArtist.length +
                             artist.albums.asBannerArtist.length +
-                            (wikiInfo.features.flashesAndGames
+                            (wikiData.wikiInfo.features.flashesAndGames
                                 ? artist.flashes.asContributor.length
                                 : 0)
                         )
                     }))
                     .sort((a, b) => b.contributions - a.contributions)
-                    .filter(({ contributions }) => contributions))
+                    .filter(({ contributions }) => contributions)),
+
+                // This is a kinda naughty hack, 8ut like, it's the only place
+                // we'd 8e passing wikiData to html() otherwise, so like....
+                // (Ok we do do this again once later.)
+                showAsFlashes: wikiData.wikiInfo.features.flashesAndGames
             };
         },
 
-        html({toTracks, toArtAndFlashes}, {strings, to}) {
+        html({toTracks, toArtAndFlashes, showAsFlashes}, {strings, to}) {
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
@@ -4638,7 +4673,7 @@ const listingSpec = [
                     </div>
                     <div class="column">
                         <h2>${strings('listingPage.misc' +
-                            (wikiInfo.features.flashesAndGames
+                            (showAsFlashes
                                 ? '.artAndFlashContributors'
                                 : '.artContributors'))}</h2>
                         <ul>
@@ -4660,8 +4695,8 @@ const listingSpec = [
         directory: 'artists/by-commentary',
         title: ({strings}) => strings('listingPage.listArtists.byCommentary.title'),
 
-        data() {
-            return artistData
+        data({wikiData}) {
+            return wikiData.artistData
                 .map(artist => ({artist, entries: artist.tracks.asCommentator.length + artist.albums.asCommentator.length}))
                 .filter(({ entries }) => entries)
                 .sort((a, b) => b.entries - a.entries);
@@ -4679,8 +4714,8 @@ const listingSpec = [
         directory: 'artists/by-duration',
         title: ({strings}) => strings('listingPage.listArtists.byDuration.title'),
 
-        data() {
-            return artistData
+        data({wikiData}) {
+            return wikiData.artistData
                 .map(artist => ({artist, duration: getTotalDuration(
                     [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY))
                 }))
@@ -4700,12 +4735,12 @@ const listingSpec = [
         directory: 'artists/by-latest',
         title: ({strings}) => strings('listingPage.listArtists.byLatest.title'),
 
-        data() {
-            const reversedTracks = trackData.slice().reverse();
-            const reversedArtThings = justEverythingSortedByArtDateMan.slice().reverse();
+        data({wikiData}) {
+            const reversedTracks = wikiData.trackData.slice().reverse();
+            const reversedArtThings = wikiData.justEverythingSortedByArtDateMan.slice().reverse();
 
             return {
-                toTracks: sortByDate(artistData
+                toTracks: sortByDate(wikiData.artistData
                     .filter(artist => !artist.alias)
                     .map(artist => ({
                         artist,
@@ -4717,7 +4752,7 @@ const listingSpec = [
                     .filter(({ date }) => date)
                     .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)).reverse(),
 
-                toArtAndFlashes: sortByDate(artistData
+                toArtAndFlashes: sortByDate(wikiData.artistData
                     .filter(artist => !artist.alias)
                     .map(artist => {
                         const thing = reversedArtThings.find(({ album, coverArtists, contributors }) => (
@@ -4733,11 +4768,16 @@ const listingSpec = [
                     })
                     .filter(Boolean)
                     .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)
-                ).reverse()
+                ).reverse(),
+
+                // (Ok we did it again.)
+                // This is a kinda naughty hack, 8ut like, it's the only place
+                // we'd 8e passing wikiData to html() otherwise, so like....
+                showAsFlashes: wikiData.wikiInfo.features.flashesAndGames
             };
         },
 
-        html({toTracks, toArtAndFlashes}, {strings, to}) {
+        html({toTracks, toArtAndFlashes, showAsFlashes}, {strings, to}) {
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
@@ -4754,7 +4794,7 @@ const listingSpec = [
                     </div>
                     <div class="column">
                         <h2>${strings('listingPage.misc' +
-                            (wikiInfo.features.flashesAndGames
+                            (showAsFlashes
                                 ? '.artAndFlashContributors'
                                 : '.artContributors'))}</h2>
                         <ul>
@@ -4775,11 +4815,8 @@ const listingSpec = [
     {
         directory: 'groups/by-name',
         title: ({strings}) => strings('listingPage.listGroups.byName.title'),
-        condition: () => wikiInfo.features.groupUI,
-
-        data() {
-            return groupData.slice().sort(sortByName);
-        },
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
 
         row(group, {strings, to}) {
             return strings('listingPage.listGroups.byCategory.group', {
@@ -4795,9 +4832,10 @@ const listingSpec = [
     {
         directory: 'groups/by-category',
         title: ({strings}) => strings('listingPage.listGroups.byCategory.title'),
-        condition: () => wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        data: ({wikiData}) => wikiData.groupCategoryData,
 
-        html({strings, to}) {
+        html(groupCategoryData, {strings, to}) {
             return fixWS`
                 <dl>
                     ${groupCategoryData.map(category => fixWS`
@@ -4825,10 +4863,10 @@ const listingSpec = [
     {
         directory: 'groups/by-albums',
         title: ({strings}) => strings('listingPage.listGroups.byAlbums.title'),
-        condition: () => wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
-        data() {
-            return groupData
+        data({wikiData}) {
+            return wikiData.groupData
                 .map(group => ({group, albums: group.albums.length}))
                 .sort((a, b) => b.albums - a.albums);
         },
@@ -4844,10 +4882,10 @@ const listingSpec = [
     {
         directory: 'groups/by-tracks',
         title: ({strings}) => strings('listingPage.listGroups.byTracks.title'),
-        condition: () => wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
-        data() {
-            return groupData
+        data({wikiData}) {
+            return wikiData.groupData
                 .map(group => ({group, tracks: group.albums.reduce((acc, album) => acc + album.tracks.length, 0)}))
                 .sort((a, b) => b.tracks - a.tracks);
         },
@@ -4863,10 +4901,10 @@ const listingSpec = [
     {
         directory: 'groups/by-duration',
         title: ({strings}) => strings('listingPage.listGroups.byDuration.title'),
-        condition: () => wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
-        data() {
-            return groupData
+        data({wikiData}) {
+            return wikiData.groupData
                 .map(group => ({group, duration: getTotalDuration(group.albums.flatMap(album => album.tracks))}))
                 .sort((a, b) => b.duration - a.duration);
         },
@@ -4882,18 +4920,23 @@ const listingSpec = [
     {
         directory: 'groups/by-latest-album',
         title: ({strings}) => strings('listingPage.listGroups.byLatest.title'),
-        condition: () => wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
-        data() {
-            return sortByDate(groupData
+        data({wikiData}) {
+            return sortByDate(wikiData.groupData
                 .map(group => ({group, date: group.albums[group.albums.length - 1].date}))
-                // So this is kinda tough to explain, 8ut 8asically, when we reverse the list after sorting it 8y d8te
-                // (so that the latest d8tes come first), it also flips the order of groups which share the same d8te.
-                // This happens mostly when a single al8um is the l8test in two groups. So, say one such al8um is in
-                // the groups "Fandom" and "UMSPAF". Per category order, Fandom is meant to show up 8efore UMSPAF, 8ut
-                // when we do the reverse l8ter, that flips them, and UMSPAF ends up displaying 8efore Fandom. So we do
-                // an extra reverse here, which will fix that and only affect groups that share the same d8te (8ecause
-                // groups that don't will 8e moved 8y the sortByDate call surrounding this).
+                // So this is kinda tough to explain, 8ut 8asically, when we
+                // reverse the list after sorting it 8y d8te (so that the latest
+                // d8tes come first), it also flips the order of groups which
+                // share the same d8te.  This happens mostly when a single al8um
+                // is the l8test in two groups. So, say one such al8um is in the
+                // groups "Fandom" and "UMSPAF". Per category order, Fandom is
+                // meant to show up 8efore UMSPAF, 8ut when we do the reverse
+                // l8ter, that flips them, and UMSPAF ends up displaying 8efore
+                // Fandom. So we do an extra reverse here, which will fix that
+                // and only affect groups that share the same d8te (8ecause
+                // groups that don't will 8e moved 8y the sortByDate call
+                // surrounding this).
                 .reverse()).reverse()
         },
 
@@ -4909,8 +4952,8 @@ const listingSpec = [
         directory: 'tracks/by-name',
         title: ({strings}) => strings('listingPage.listTracks.byName.title'),
 
-        data() {
-            return trackData.slice().sort(sortByName);
+        data({wikiData}) {
+            return wikiData.trackData.slice().sort(sortByName);
         },
 
         row(track, {strings, to}) {
@@ -4923,8 +4966,9 @@ const listingSpec = [
     {
         directory: 'tracks/by-album',
         title: ({strings}) => strings('listingPage.listTracks.byAlbum.title'),
+        data: ({wikiData}) => wikiData.albumData,
 
-        html({strings, to}) {
+        html(albumData, {strings, to}) {
             return fixWS`
                 <dl>
                     ${albumData.map(album => fixWS`
@@ -4949,9 +4993,9 @@ const listingSpec = [
         directory: 'tracks/by-date',
         title: ({strings}) => strings('listingPage.listTracks.byDate.title'),
 
-        data() {
+        data({wikiData}) {
             return chunkByProperties(
-                sortByDate(trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)),
+                sortByDate(wikiData.trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)),
                 ['album', 'date']
             );
         },
@@ -4985,8 +5029,8 @@ const listingSpec = [
         directory: 'tracks/by-duration',
         title: ({strings}) => strings('listingPage.listTracks.byDuration.title'),
 
-        data() {
-            return trackData
+        data({wikiData}) {
+            return wikiData.trackData
                 .filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)
                 .map(track => ({track, duration: track.duration}))
                 .filter(({ duration }) => duration > 0)
@@ -5005,8 +5049,8 @@ const listingSpec = [
         directory: 'tracks/by-duration-in-album',
         title: ({strings}) => strings('listingPage.listTracks.byDurationInAlbum.title'),
 
-        data() {
-            return albumData.map(album => ({
+        data({wikiData}) {
+            return wikiData.albumData.map(album => ({
                 album,
                 tracks: album.tracks.slice().sort((a, b) => b.duration - a.duration)
             }));
@@ -5038,8 +5082,8 @@ const listingSpec = [
         directory: 'tracks/by-times-referenced',
         title: ({strings}) => strings('listingPage.listTracks.byTimesReferenced.title'),
 
-        data() {
-            return trackData
+        data({wikiData}) {
+            return wikiData.trackData
                 .map(track => ({track, timesReferenced: track.referencedBy.length}))
                 .filter(({ timesReferenced }) => timesReferenced > 0)
                 .sort((a, b) => b.timesReferenced - a.timesReferenced);
@@ -5056,10 +5100,11 @@ const listingSpec = [
     {
         directory: 'tracks/in-flashes/by-album',
         title: ({strings}) => strings('listingPage.listTracks.inFlashes.byAlbum.title'),
-        condition: () => wikiInfo.features.flashesAndGames,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
 
-        data() {
-            return chunkByProperties(trackData.filter(t => t.flashes.length > 0), ['album'])
+        data({wikiData}) {
+            return chunkByProperties(wikiData.trackData
+                .filter(t => t.flashes.length > 0), ['album'])
                 .filter(({ album }) => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
         },
 
@@ -5089,9 +5134,10 @@ const listingSpec = [
     {
         directory: 'tracks/in-flashes/by-flash',
         title: ({strings}) => strings('listingPage.listTracks.inFlashes.byFlash.title'),
-        condition: () => wikiInfo.features.flashesAndGames,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
+        data: ({wikiData}) => wikiData.flashData,
 
-        html({strings, to}) {
+        html(flashData, {strings, to}) {
             return fixWS`
                 <dl>
                     ${sortByDate(flashData.slice()).map(flash => fixWS`
@@ -5118,8 +5164,8 @@ const listingSpec = [
         directory: 'tracks/with-lyrics',
         title: ({strings}) => strings('listingPage.listTracks.withLyrics.title'),
 
-        data() {
-            return chunkByProperties(trackData.filter(t => t.lyrics), ['album']);
+        data({wikiData}) {
+            return chunkByProperties(wikiData.trackData.filter(t => t.lyrics), ['album']);
         },
 
         html(chunks, {strings, to}) {
@@ -5147,10 +5193,10 @@ const listingSpec = [
     {
         directory: 'tags/by-name',
         title: ({strings}) => strings('listingPage.listTags.byName.title'),
-        condition: () => wikiInfo.features.artTagUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
 
-        data() {
-            return tagData
+        data({wikiData}) {
+            return wikiData.tagData
                 .filter(tag => !tag.isCW)
                 .sort(sortByName)
                 .map(tag => ({tag, timesUsed: tag.things.length}));
@@ -5167,10 +5213,10 @@ const listingSpec = [
     {
         directory: 'tags/by-uses',
         title: ({strings}) => strings('listingPage.listTags.byUses.title'),
-        condition: () => wikiInfo.features.artTagUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
 
-        data() {
-            return tagData
+        data({wikiData}) {
+            return wikiData.tagData
                 .filter(tag => !tag.isCW)
                 .map(tag => ({tag, timesUsed: tag.things.length}))
                 .sort((a, b) => b.timesUsed - a.timesUsed);
@@ -5187,7 +5233,13 @@ const listingSpec = [
     {
         directory: 'random',
         title: ({strings}) => `Random Pages`,
-        html: ({strings, to}) => fixWS`
+
+        data: ({wikiData}) => ({
+            officialAlbumData: wikiData.officialAlbumData,
+            fandomAlbumData: wikiData.fandomAlbumData
+        }),
+
+        html: ({officialAlbumData, fandomAlbumData}, {strings, to}) => fixWS`
             <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
             <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
             <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>
@@ -5215,18 +5267,22 @@ const listingSpec = [
     }
 ];
 
-function writeListingPages() {
+function writeListingPages({wikiData}) {
+    const { listingSpec, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.listings) {
         return;
     }
 
     return [
-        writeListingIndex(),
-        ...listingSpec.map(writeListingPage).filter(Boolean)
+        writeListingIndex({wikiData}),
+        ...listingSpec.map(listing => writeListingPage(listing, {wikiData})).filter(Boolean)
     ];
 }
 
-function writeListingIndex() {
+function writeListingIndex({wikiData}) {
+    const { albumData, trackData, wikiInfo } = wikiData;
+
     const releasedTracks = trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
     const releasedAlbums = albumData.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
     const duration = getTotalDuration(releasedTracks);
@@ -5245,25 +5301,27 @@ function writeListingIndex() {
                 })}</p>
                 <hr>
                 <p>${strings('listingIndex.exploreList')}</p>
-                ${generateLinkIndexForListings(null, {strings, to})}
+                ${generateLinkIndexForListings(null, {strings, to, wikiData})}
             `
         },
 
         sidebarLeft: {
-            content: generateSidebarForListings(null, {strings, to})
+            content: generateSidebarForListings(null, {strings, to, wikiData})
         },
 
         nav: {simple: true}
     }))
 }
 
-function writeListingPage(listing) {
-    if (listing.condition && !listing.condition()) {
+function writeListingPage(listing, {wikiData}) {
+    if (listing.condition && !listing.condition({wikiData})) {
         return null;
     }
 
+    const { wikiInfo } = wikiData;
+
     const data = (listing.data
-        ? listing.data()
+        ? listing.data({wikiData})
         : null);
 
     return ({strings, writePage}) => writePage('listing', listing.directory, ({to}) => ({
@@ -5287,7 +5345,7 @@ function writeListingPage(listing) {
         },
 
         sidebarLeft: {
-            content: generateSidebarForListings(listing, {strings, to})
+            content: generateSidebarForListings(listing, {strings, to, wikiData})
         },
 
         nav: {
@@ -5309,18 +5367,20 @@ function writeListingPage(listing) {
     }));
 }
 
-function generateSidebarForListings(currentListing, {strings, to}) {
+function generateSidebarForListings(currentListing, {strings, to, wikiData}) {
     return fixWS`
         <h1>${strings.link.listingIndex('', {text: strings('listingIndex.title'), to})}</h1>
-        ${generateLinkIndexForListings(currentListing, {strings, to})}
+        ${generateLinkIndexForListings(currentListing, {strings, to, wikiData})}
     `;
 }
 
-function generateLinkIndexForListings(currentListing, {strings, to}) {
+function generateLinkIndexForListings(currentListing, {strings, to, wikiData}) {
+    const { listingSpec } = wikiData;
+
     return fixWS`
         <ul>
             ${(listingSpec
-                .filter(({ condition }) => !condition || condition())
+                .filter(({ condition }) => !condition || condition({wikiData}))
                 .map(listing => fixWS`
                     <li ${classes(listing === currentListing && 'current')}>
                         <a href="${to('localized.listing', listing.directory)}">${listing.title({strings})}</a>
@@ -5331,23 +5391,25 @@ function generateLinkIndexForListings(currentListing, {strings, to}) {
     `;
 }
 
-function filterAlbumsByCommentary() {
-    return albumData.filter(album => [album, ...album.tracks].some(x => x.commentary));
+function filterAlbumsByCommentary(albums) {
+    return albums.filter(album => [album, ...album.tracks].some(x => x.commentary));
 }
 
-function writeCommentaryPages() {
-    if (!filterAlbumsByCommentary().length) {
+function writeCommentaryPages({wikiData}) {
+    const albums = filterAlbumsByCommentary(wikiData.albumData);
+
+    if (!albums.length) {
         return;
     }
 
     return [
-        writeCommentaryIndex(),
-        ...filterAlbumsByCommentary().map(writeAlbumCommentaryPage)
+        writeCommentaryIndex({wikiData}),
+        ...albums.map(album => writeAlbumCommentaryPage(album, {wikiData}))
     ];
 }
 
-function writeCommentaryIndex() {
-    const data = filterAlbumsByCommentary()
+function writeCommentaryIndex({wikiData}) {
+    const data = filterAlbumsByCommentary(wikiData.albumData)
         .map(album => ({
             album,
             entries: [album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary)
@@ -5391,7 +5453,9 @@ function writeCommentaryIndex() {
     }));
 }
 
-function writeAlbumCommentaryPage(album) {
+function writeAlbumCommentaryPage(album, {wikiData}) {
+    const { wikiInfo } = wikiData;
+
     const entries = [album, ...album.tracks].filter(x => x.commentary).map(x => x.commentary);
     const words = entries.join(' ').split(' ').length;
 
@@ -5413,7 +5477,7 @@ function writeAlbumCommentaryPage(album) {
                     ${album.commentary && fixWS`
                         <h3>${strings('albumCommentaryPage.entry.title.albumCommentary')}</h3>
                         <blockquote>
-                            ${transformMultiline(album.commentary, {strings, to})}
+                            ${transformMultiline(album.commentary, {strings, to, wikiData})}
                         </blockquote>
                     `}
                     ${album.tracks.filter(t => t.commentary).map(track => fixWS`
@@ -5421,7 +5485,7 @@ function writeAlbumCommentaryPage(album) {
                             track: strings.link.track(track, {to})
                         })}</h3>
                         <blockquote style="${getLinkThemeString(track.color)}">
-                            ${transformMultiline(track.commentary, {strings, to})}
+                            ${transformMultiline(track.commentary, {strings, to, wikiData})}
                         </blockquote>
                     `).join('\n')}
                 </div>
@@ -5448,15 +5512,20 @@ function writeAlbumCommentaryPage(album) {
     }));
 }
 
-function writeTagPages() {
+function writeTagPages({wikiData}) {
+    const { tagData, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.artTagUI) {
         return;
     }
 
-    return tagData.filter(tag => !tag.isCW).map(writeTagPage);
+    return tagData
+        .filter(tag => !tag.isCW)
+        .map(tag => writeTagPage(tag, {wikiData}));
 }
 
-function writeTagPage(tag) {
+function writeTagPage(tag, {wikiData}) {
+    const { wikiInfo } = wikiData;
     const { things } = tag;
 
     return ({strings, writePage}) => writePage('tag', tag.directory, ({to}) => ({
@@ -5599,11 +5668,13 @@ function iconifyURL(url, {strings, to}) {
 }
 
 function chronologyLinks(currentThing, {
-    strings, to,
+    strings, to, wikiData,
     headingString,
     contribKey,
     getThings
 }) {
+    const { albumData } = wikiData;
+
     const contributions = currentThing[contribKey];
     if (!contributions) {
         return '';
@@ -5628,8 +5699,8 @@ function chronologyLinks(currentThing, {
         const previous = releasedThings[index - 1];
         const next = releasedThings[index + 1];
         const parts = [
-            previous && `<a href="${toAnythingMan(previous, to)}" title="${previous.name}">Previous</a>`,
-            next && `<a href="${toAnythingMan(next, to)}" title="${next.name}">Next</a>`
+            previous && `<a href="${toAnythingMan(previous, {to, wikiData})}" title="${previous.name}">Previous</a>`,
+            next && `<a href="${toAnythingMan(next, {to, wikiData})}" title="${next.name}">Next</a>`
         ].filter(Boolean);
 
         const stringOpts = {
@@ -5666,13 +5737,13 @@ function generateAlbumNavLinks(album, currentTrack, {strings, to}) {
 function generateAlbumChronologyLinks(album, currentTrack, {strings, to}) {
     return [
         currentTrack && chronologyLinks(currentTrack, {
-            strings, to,
+            strings, to, wikiData,
             headingString: 'misc.chronology.heading.track',
             contribKey: 'artists',
             getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor]
         }),
         chronologyLinks(currentTrack || album, {
-            strings, to,
+            strings, to, wikiData,
             headingString: 'misc.chronology.heading.coverArt',
             contribKey: 'coverArtists',
             getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]
@@ -5680,7 +5751,7 @@ function generateAlbumChronologyLinks(album, currentTrack, {strings, to}) {
     ].filter(Boolean).join('\n');
 }
 
-function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
+function generateSidebarForAlbum(album, currentTrack, {strings, to, wikiData}) {
     const listTag = getAlbumListTag(album);
 
     const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
@@ -5731,7 +5802,7 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
                 group: `<a href="${to('localized.groupInfo', group.directory)}">${group.name}</a>`
             })
         }</h1>
-        ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to})}
+        ${!currentTrack && transformMultiline(group.descriptionShort, {strings, to, wikiData})}
         ${group.urls.length && `<p>${
             strings('releaseInfo.visitOn', {
                 links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
@@ -5775,7 +5846,9 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to}) {
     }
 }
 
-function generateSidebarForGroup(currentGroup, {strings, to, isGallery}) {
+function generateSidebarForGroup(currentGroup, {isGallery, strings, to, wikiData}) {
+    const { groupCategoryData, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.groupUI) {
         return null;
     }
@@ -5835,7 +5908,9 @@ function generatePreviousNextLinks(urlKey, currentThing, thingData, {strings, to
     ].filter(Boolean).join(', ');
 }
 
-function generateNavForGroup(currentGroup, {strings, to, isGallery}) {
+function generateNavForGroup(currentGroup, {isGallery, strings, to, wikiData}) {
+    const { groupData, wikiInfo } = wikiData;
+
     if (!wikiInfo.features.groupUI) {
         return {simple: true};
     }
@@ -5872,11 +5947,13 @@ function generateNavForGroup(currentGroup, {strings, to, isGallery}) {
     };
 }
 
-function writeGroupPages() {
-    return groupData.map(writeGroupPage);
+function writeGroupPages({wikiData}) {
+    return wikiData.groupData.map(group => writeGroupPage(group, {wikiData}));
 }
 
-function writeGroupPage(group) {
+function writeGroupPage(group, {wikiData}) {
+    const { wikiInfo } = wikiData;
+
     const releasedAlbums = group.albums.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
     const totalDuration = getTotalDuration(releasedTracks);
@@ -5895,7 +5972,7 @@ function writeGroupPage(group) {
                         })
                     }</p>`}
                     <blockquote>
-                        ${transformMultiline(group.description, {strings, to})}
+                        ${transformMultiline(group.description, {strings, to, wikiData})}
                     </blockquote>
                     <h2>${strings('groupInfoPage.albumList.title')}</h2>
                     <p>${
@@ -5918,8 +5995,8 @@ function writeGroupPage(group) {
                 `
             },
 
-            sidebarLeft: generateSidebarForGroup(group, {strings, to, isGallery: false}),
-            nav: generateNavForGroup(group, {strings, to, isGallery: false})
+            sidebarLeft: generateSidebarForGroup(group, {isGallery: false, strings, to, wikiData}),
+            nav: generateNavForGroup(group, {isGallery: false, strings, to, wikiData})
         }));
 
         await writePage('groupGallery', group.directory, ({to}) => ({
@@ -5948,17 +6025,17 @@ function writeGroupPage(group) {
                 `
             },
 
-            sidebarLeft: generateSidebarForGroup(group, {strings, to, isGallery: true}),
-            nav: generateNavForGroup(group, {strings, to, isGallery: true})
+            sidebarLeft: generateSidebarForGroup(group, {isGallery: true, strings, to, wikiData}),
+            nav: generateNavForGroup(group, {isGallery: true, strings, to, wikiData})
         }));
     };
 }
 
-function toAnythingMan(anythingMan, to) {
+function toAnythingMan(anythingMan, {to, wikiData}) {
     return (
-        albumData.includes(anythingMan) ? to('localized.album', anythingMan.directory) :
-        trackData.includes(anythingMan) ? to('localized.track', anythingMan.directory) :
-        flashData?.includes(anythingMan) ? to('localized.flash', anythingMan.directory) :
+        wikiData.albumData.includes(anythingMan) ? to('localized.album', anythingMan.directory) :
+        wikiData.trackData.includes(anythingMan) ? to('localized.track', anythingMan.directory) :
+        wikiData.flashData?.includes(anythingMan) ? to('localized.flash', anythingMan.directory) :
         'idk-bud'
     )
 }
@@ -6008,7 +6085,7 @@ async function processLanguageFile(file, defaultStrings = null) {
 // * the language strings
 // * a shadowing writePages function for outputing to the appropriate subdir
 // * a shadowing urls object for linking to the appropriate relative paths
-async function wrapLanguages(fn, writeOneLanguage = null) {
+async function wrapLanguages(fn, {writeOneLanguage = null, wikiData}) {
     const k = writeOneLanguage
     const languagesToRun = (k
         ? {[k]: languages[k]}
@@ -6022,7 +6099,7 @@ async function wrapLanguages(fn, writeOneLanguage = null) {
 
         const baseDirectory = (strings === languages.default ? '' : strings.code);
 
-        const shadow_writePage = (urlKey, directory, pageFn) => writePage(strings, baseDirectory, urlKey, directory, pageFn);
+        const shadow_writePage = (urlKey, directory, pageFn) => writePage(urlKey, directory, pageFn, {baseDirectory, strings, wikiData});
 
         // 8ring the utility functions over too!
         Object.assign(shadow_writePage, writePage);
@@ -6030,12 +6107,17 @@ async function wrapLanguages(fn, writeOneLanguage = null) {
         await fn({
             baseDirectory,
             strings,
+            wikiData,
             writePage: shadow_writePage
         }, i, entries);
     }
 }
 
 async function main() {
+    const WD = wikiData;
+
+    WD.listingSpec = listingSpec;
+
     const miscOptions = await parseOptions(process.argv.slice(2), {
         // Data files for the site, including flash, artist, and al8um data,
         // and like a jillion other things too. Pretty much everything which
@@ -6188,20 +6270,20 @@ async function main() {
         logInfo`Writing all languages.`;
     }
 
-    wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
-    if (wikiInfo.error) {
-        console.log(`\x1b[31;1m${wikiInfo.error}\x1b[0m`);
+    WD.wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
+    if (WD.wikiInfo.error) {
+        console.log(`\x1b[31;1m${WD.wikiInfo.error}\x1b[0m`);
         return;
     }
 
     // Update languages o8ject with the wiki-specified default language!
     // This will make page files for that language 8e gener8ted at the root
     // directory, instead of the language-specific su8directory.
-    if (wikiInfo.defaultLanguage) {
-        if (Object.keys(languages).includes(wikiInfo.defaultLanguage)) {
-            languages.default = languages[wikiInfo.defaultLanguage];
+    if (WD.wikiInfo.defaultLanguage) {
+        if (Object.keys(languages).includes(WD.wikiInfo.defaultLanguage)) {
+            languages.default = languages[WD.wikiInfo.defaultLanguage];
         } else {
-            logError`Wiki info file specified default language is ${wikiInfo.defaultLanguage}, but no such language file exists!`;
+            logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
             if (langPath) {
                 logError`Check if an appropriate file exists in ${langPath}?`;
             } else {
@@ -6213,15 +6295,15 @@ async function main() {
         languages.default = defaultStrings;
     }
 
-    homepageInfo = await processHomepageInfoFile(path.join(dataPath, HOMEPAGE_INFO_FILE));
+    WD.homepageInfo = await processHomepageInfoFile(path.join(dataPath, HOMEPAGE_INFO_FILE));
 
-    if (homepageInfo.error) {
-        console.log(`\x1b[31;1m${homepageInfo.error}\x1b[0m`);
+    if (WD.homepageInfo.error) {
+        console.log(`\x1b[31;1m${WD.homepageInfo.error}\x1b[0m`);
         return;
     }
 
     {
-        const errors = homepageInfo.rows.filter(obj => obj.error);
+        const errors = WD.homepageInfo.rows.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6259,10 +6341,10 @@ async function main() {
     // Technically, we could do the data file reading and output writing at the
     // same time, 8ut that kinda makes the code messy, so I'm not 8othering
     // with it.
-    albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(processAlbumDataFile));
+    WD.albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(processAlbumDataFile));
 
     {
-        const errors = albumData.filter(obj => obj.error);
+        const errors = WD.albumData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6271,16 +6353,16 @@ async function main() {
         }
     }
 
-    sortByDate(albumData);
+    sortByDate(WD.albumData);
 
-    artistData = await processArtistDataFile(path.join(dataPath, ARTIST_DATA_FILE));
-    if (artistData.error) {
-        console.log(`\x1b[31;1m${artistData.error}\x1b[0m`);
+    WD.artistData = await processArtistDataFile(path.join(dataPath, ARTIST_DATA_FILE));
+    if (WD.artistData.error) {
+        console.log(`\x1b[31;1m${WD.artistData.error}\x1b[0m`);
         return;
     }
 
     {
-        const errors = artistData.filter(obj => obj.error);
+        const errors = WD.artistData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6289,19 +6371,19 @@ async function main() {
         }
     }
 
-    artistAliasData = artistData.filter(x => x.alias);
-    artistData = artistData.filter(x => !x.alias);
+    WD.artistAliasData = WD.artistData.filter(x => x.alias);
+    WD.artistData = WD.artistData.filter(x => !x.alias);
 
-    trackData = getAllTracks(albumData);
+    WD.trackData = getAllTracks(WD.albumData);
 
-    if (wikiInfo.features.flashesAndGames) {
-        flashData = await processFlashDataFile(path.join(dataPath, FLASH_DATA_FILE));
-        if (flashData.error) {
-            console.log(`\x1b[31;1m${flashData.error}\x1b[0m`);
+    if (WD.wikiInfo.features.flashesAndGames) {
+        WD.flashData = await processFlashDataFile(path.join(dataPath, FLASH_DATA_FILE));
+        if (WD.flashData.error) {
+            console.log(`\x1b[31;1m${WD.flashData.error}\x1b[0m`);
             return;
         }
 
-        const errors = flashData.filter(obj => obj.error);
+        const errors = WD.flashData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6310,36 +6392,17 @@ async function main() {
         }
     }
 
-    flashActData = flashData?.filter(x => x.act8r8k);
-    flashData = flashData?.filter(x => !x.act8r8k);
+    WD.flashActData = WD.flashData?.filter(x => x.act8r8k);
+    WD.flashData = WD.flashData?.filter(x => !x.act8r8k);
 
-    artistNames = Array.from(new Set([
-        ...artistData.filter(artist => !artist.alias).map(artist => artist.name),
-        ...[
-            ...albumData.flatMap(album => [
-                ...album.artists || [],
-                ...album.coverArtists || [],
-                ...album.wallpaperArtists || [],
-                ...album.tracks.flatMap(track => [
-                    ...track.artists,
-                    ...track.coverArtists || [],
-                    ...track.contributors || []
-                ])
-            ]),
-            ...(flashData?.flatMap(flash => [
-                ...flash.contributors || []
-            ]) || [])
-        ].map(contribution => contribution.who)
-    ]));
-
-    tagData = await processTagDataFile(path.join(dataPath, TAG_DATA_FILE));
-    if (tagData.error) {
-        console.log(`\x1b[31;1m${tagData.error}\x1b[0m`);
+    WD.tagData = await processTagDataFile(path.join(dataPath, TAG_DATA_FILE));
+    if (WD.tagData.error) {
+        console.log(`\x1b[31;1m${WD.tagData.error}\x1b[0m`);
         return;
     }
 
     {
-        const errors = tagData.filter(obj => obj.error);
+        const errors = WD.tagData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6348,14 +6411,14 @@ async function main() {
         }
     }
 
-    groupData = await processGroupDataFile(path.join(dataPath, GROUP_DATA_FILE));
-    if (groupData.error) {
-        console.log(`\x1b[31;1m${groupData.error}\x1b[0m`);
+    WD.groupData = await processGroupDataFile(path.join(dataPath, GROUP_DATA_FILE));
+    if (WD.groupData.error) {
+        console.log(`\x1b[31;1m${WD.groupData.error}\x1b[0m`);
         return;
     }
 
     {
-        const errors = groupData.filter(obj => obj.error);
+        const errors = WD.groupData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6364,17 +6427,17 @@ async function main() {
         }
     }
 
-    groupCategoryData = groupData.filter(x => x.isCategory);
-    groupData = groupData.filter(x => x.isGroup);
+    WD.groupCategoryData = WD.groupData.filter(x => x.isCategory);
+    WD.groupData = WD.groupData.filter(x => x.isGroup);
 
-    staticPageData = await processStaticPageDataFile(path.join(dataPath, STATIC_PAGE_DATA_FILE));
-    if (staticPageData.error) {
-        console.log(`\x1b[31;1m${staticPageData.error}\x1b[0m`);
+    WD.staticPageData = await processStaticPageDataFile(path.join(dataPath, STATIC_PAGE_DATA_FILE));
+    if (WD.staticPageData.error) {
+        console.log(`\x1b[31;1m${WD.staticPageData.error}\x1b[0m`);
         return;
     }
 
     {
-        const errors = staticPageData.filter(obj => obj.error);
+        const errors = WD.staticPageData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6383,14 +6446,14 @@ async function main() {
         }
     }
 
-    if (wikiInfo.features.news) {
-        newsData = await processNewsDataFile(path.join(dataPath, NEWS_DATA_FILE));
-        if (newsData.error) {
-            console.log(`\x1b[31;1m${newsData.error}\x1b[0m`);
+    if (WD.wikiInfo.features.news) {
+        WD.newsData = await processNewsDataFile(path.join(dataPath, NEWS_DATA_FILE));
+        if (WD.newsData.error) {
+            console.log(`\x1b[31;1m${WD.newsData.error}\x1b[0m`);
             return;
         }
 
-        const errors = newsData.filter(obj => obj.error);
+        const errors = WD.newsData.filter(obj => obj.error);
         if (errors.length) {
             for (const error of errors) {
                 console.log(`\x1b[31;1m${error.error}\x1b[0m`);
@@ -6398,14 +6461,14 @@ async function main() {
             return;
         }
 
-        sortByDate(newsData);
-        newsData.reverse();
+        sortByDate(WD.newsData);
+        WD.newsData.reverse();
     }
 
     {
-        const tagNames = new Set([...trackData, ...albumData].flatMap(thing => thing.artTags));
+        const tagNames = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTags));
 
-        for (let { name, isCW } of tagData) {
+        for (let { name, isCW } of WD.tagData) {
             if (isCW) {
                 name = 'cw: ' + name;
             }
@@ -6420,11 +6483,30 @@ async function main() {
         }
     }
 
-    artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
-
-    justEverythingMan = sortByDate([...albumData, ...trackData, ...(flashData || [])]);
-    justEverythingSortedByArtDateMan = sortByArtDate(justEverythingMan.slice());
+    WD.justEverythingMan = sortByDate([...WD.albumData, ...WD.trackData, ...(WD.flashData || [])]);
+    WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
+
+    const artistNames = Array.from(new Set([
+        ...WD.artistData.filter(artist => !artist.alias).map(artist => artist.name),
+        ...[
+            ...WD.albumData.flatMap(album => [
+                ...album.artists || [],
+                ...album.coverArtists || [],
+                ...album.wallpaperArtists || [],
+                ...album.tracks.flatMap(track => [
+                    ...track.artists,
+                    ...track.coverArtists || [],
+                    ...track.contributors || []
+                ])
+            ]),
+            ...(WD.flashData?.flatMap(flash => [
+                ...flash.contributors || []
+            ]) || [])
+        ].map(contribution => contribution.who)
+    ]));
+
+    artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
 
     {
         let buffer = [];
@@ -6439,7 +6521,7 @@ async function main() {
             }
         };
         const showWhere = (name, color) => {
-            const where = justEverythingMan.filter(thing => [
+            const where = WD.justEverythingMan.filter(thing => [
                 ...thing.coverArtists || [],
                 ...thing.contributors || [],
                 ...thing.artists || []
@@ -6450,7 +6532,7 @@ async function main() {
         };
         let CR4SH = false;
         for (let name of artistNames) {
-            const entry = [...artistData, ...artistAliasData].find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
+            const entry = [...WD.artistData, ...WD.artistAliasData].find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
             if (!entry) {
                 clearBuffer();
                 console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
@@ -6478,7 +6560,7 @@ async function main() {
 
     {
         const directories = [];
-        for (const { directory, name } of albumData) {
+        for (const { directory, name } of WD.albumData) {
             if (directories.includes(directory)) {
                 console.log(`\x1b[31;1mDuplicate album directory "${directory}" (${name})\x1b[0m`);
                 return;
@@ -6490,7 +6572,7 @@ async function main() {
     {
         const directories = [];
         const where = {};
-        for (const { directory, album } of trackData) {
+        for (const { directory, album } of WD.trackData) {
             if (directories.includes(directory)) {
                 console.log(`\x1b[31;1mDuplicate track directory "${directory}"\x1b[0m`);
                 console.log(`Shows up in:`);
@@ -6518,19 +6600,19 @@ async function main() {
     }
 
     {
-        for (const { references, name, album } of trackData) {
+        for (const { references, name, album } of WD.trackData) {
             for (const ref of references) {
-                if (!search.track(ref)) {
+                if (!search.track(ref, {wikiData})) {
                     logWarn`Track not found "${ref}" in ${name} (${album.name})`;
                 }
             }
         }
     }
 
-    contributionData = Array.from(new Set([
-        ...trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
-        ...albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
-        ...(flashData?.flatMap(flash => [...flash.contributors || []]) || [])
+    WD.contributionData = Array.from(new Set([
+        ...WD.trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
+        ...WD.albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
+        ...(WD.flashData?.flatMap(flash => [...flash.contributors || []]) || [])
     ]));
 
     // Now that we have all the data, resolve references all 8efore actually
@@ -6561,71 +6643,71 @@ async function main() {
         }));
     };
 
-    trackData.forEach(track => mapInPlace(track.references, search.track));
-    trackData.forEach(track => track.aka = search.track(track.aka));
-    trackData.forEach(track => mapInPlace(track.artTags, search.tag));
-    albumData.forEach(album => mapInPlace(album.groups, search.group));
-    albumData.forEach(album => mapInPlace(album.artTags, search.tag));
-    artistAliasData.forEach(artist => artist.alias = search.artist(artist.alias));
-    contributionData.forEach(contrib => contrib.who = search.artist(contrib.who));
+    WD.trackData.forEach(track => mapInPlace(track.references, r => search.track(r, {wikiData})));
+    WD.trackData.forEach(track => track.aka = search.track(track.aka, {wikiData}));
+    WD.trackData.forEach(track => mapInPlace(track.artTags, t => search.tag(t, {wikiData})));
+    WD.albumData.forEach(album => mapInPlace(album.groups, g => search.group(g, {wikiData})));
+    WD.albumData.forEach(album => mapInPlace(album.artTags, t => search.tag(t, {wikiData})));
+    WD.artistAliasData.forEach(artist => artist.alias = search.artist(artist.alias, {wikiData}));
+    WD.contributionData.forEach(contrib => contrib.who = search.artist(contrib.who, {wikiData}));
 
-    filterNullArray(trackData, 'references');
-    filterNullArray(trackData, 'artTags');
-    filterNullArray(albumData, 'groups');
-    filterNullArray(albumData, 'artTags');
-    filterNullValue(artistAliasData, 'alias');
-    filterNullValue(contributionData, 'who');
+    filterNullArray(WD.trackData, 'references');
+    filterNullArray(WD.trackData, 'artTags');
+    filterNullArray(WD.albumData, 'groups');
+    filterNullArray(WD.albumData, 'artTags');
+    filterNullValue(WD.artistAliasData, 'alias');
+    filterNullValue(WD.contributionData, 'who');
 
-    trackData.forEach(track1 => track1.referencedBy = trackData.filter(track2 => track2.references.includes(track1)));
-    groupData.forEach(group => group.albums = albumData.filter(album => album.groups.includes(group)));
-    tagData.forEach(tag => tag.things = sortByArtDate([...albumData, ...trackData]).filter(thing => thing.artTags.includes(tag)));
+    WD.trackData.forEach(track1 => track1.referencedBy = WD.trackData.filter(track2 => track2.references.includes(track1)));
+    WD.groupData.forEach(group => group.albums = WD.albumData.filter(album => album.groups.includes(group)));
+    WD.tagData.forEach(tag => tag.things = sortByArtDate([...WD.albumData, ...WD.trackData]).filter(thing => thing.artTags.includes(tag)));
 
-    groupData.forEach(group => group.category = groupCategoryData.find(x => x.name === group.category));
-    groupCategoryData.forEach(category => category.groups = groupData.filter(x => x.category === category));
+    WD.groupData.forEach(group => group.category = WD.groupCategoryData.find(x => x.name === group.category));
+    WD.groupCategoryData.forEach(category => category.groups = WD.groupData.filter(x => x.category === category));
 
-    trackData.forEach(track => track.otherReleases = [
+    WD.trackData.forEach(track => track.otherReleases = [
         track.aka,
-        ...trackData.filter(({ aka }) => aka === track || (track.aka && aka === track.aka)),
+        ...WD.trackData.filter(({ aka }) => aka === track || (track.aka && aka === track.aka)),
     ].filter(x => x && x !== track));
 
-    if (wikiInfo.features.flashesAndGames) {
-        flashData.forEach(flash => mapInPlace(flash.tracks, search.track));
-        flashData.forEach(flash => flash.act = flashActData.find(act => act.name === flash.act));
-        flashActData.forEach(act => act.flashes = flashData.filter(flash => flash.act === act));
+    if (WD.wikiInfo.features.flashesAndGames) {
+        WD.flashData.forEach(flash => mapInPlace(flash.tracks, t => search.track(t, {wikiData})));
+        WD.flashData.forEach(flash => flash.act = WD.flashActData.find(act => act.name === flash.act));
+        WD.flashActData.forEach(act => act.flashes = WD.flashData.filter(flash => flash.act === act));
 
-        filterNullArray(flashData, 'tracks');
+        filterNullArray(WD.flashData, 'tracks');
 
-        trackData.forEach(track => track.flashes = flashData.filter(flash => flash.tracks.includes(track)));
+        WD.trackData.forEach(track => track.flashes = WD.flashData.filter(flash => flash.tracks.includes(track)));
     }
 
-    artistData.forEach(artist => {
+    WD.artistData.forEach(artist => {
         const filterProp = (array, prop) => array.filter(thing => thing[prop]?.some(({ who }) => who === artist));
         const filterCommentary = array => array.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'));
         artist.tracks = {
-            asArtist: filterProp(trackData, 'artists'),
-            asCommentator: filterCommentary(trackData),
-            asContributor: filterProp(trackData, 'contributors'),
-            asCoverArtist: filterProp(trackData, 'coverArtists'),
-            asAny: trackData.filter(track => (
+            asArtist: filterProp(WD.trackData, 'artists'),
+            asCommentator: filterCommentary(WD.trackData),
+            asContributor: filterProp(WD.trackData, 'contributors'),
+            asCoverArtist: filterProp(WD.trackData, 'coverArtists'),
+            asAny: WD.trackData.filter(track => (
                 [...track.artists, ...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artist)
             ))
         };
         artist.albums = {
-            asArtist: filterProp(albumData, 'artists'),
-            asCommentator: filterCommentary(albumData),
-            asCoverArtist: filterProp(albumData, 'coverArtists'),
-            asWallpaperArtist: filterProp(albumData, 'wallpaperArtists'),
-            asBannerArtist: filterProp(albumData, 'bannerArtists')
+            asArtist: filterProp(WD.albumData, 'artists'),
+            asCommentator: filterCommentary(WD.albumData),
+            asCoverArtist: filterProp(WD.albumData, 'coverArtists'),
+            asWallpaperArtist: filterProp(WD.albumData, 'wallpaperArtists'),
+            asBannerArtist: filterProp(WD.albumData, 'bannerArtists')
         };
-        if (wikiInfo.features.flashesAndGames) {
+        if (WD.wikiInfo.features.flashesAndGames) {
             artist.flashes = {
-                asContributor: filterProp(flashData, 'contributors')
+                asContributor: filterProp(WD.flashData, 'contributors')
             };
         }
     });
 
-    officialAlbumData = albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
-    fandomAlbumData = albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
+    WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
+    WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
     // performance right now 'cuz it'll w8 for file writes to 8e completed
@@ -6661,7 +6743,7 @@ async function main() {
     logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
 
     await writeSymlinks();
-    await writeSharedFilesAndPages({strings: defaultStrings});
+    await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
 
     const buildDictionary = {
         misc: writeMiscellaneousPages,
@@ -6699,7 +6781,7 @@ async function main() {
         let error = false;
 
         writes = buildSteps.flatMap(fn => {
-            const fns = fn() || [];
+            const fns = fn({wikiData}) || [];
 
             // Do a quick valid8tion! If one of the writeThingPages functions go
             // wrong, this will stall out early and tell us which did.
@@ -6794,7 +6876,7 @@ async function main() {
             }),
             queueSize
         ));
-    }, writeOneLanguage);
+    }, {writeOneLanguage, wikiData});
 
     decorateTime.displayTime();
 
