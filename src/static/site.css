@@ -339,6 +339,35 @@ footer > :last-child {
     overflow-wrap: break-word;
 }
 
+.sidebar > details.current summary {
+    font-weight: 800;
+}
+
+.sidebar > details summary {
+    margin-top: 0.5em;
+    padding-left: 5px;
+    user-select: none;
+}
+
+.sidebar > details summary:hover {
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.sidebar > details ul,
+.sidebar > details ol {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.sidebar > details:last-child {
+    margin-bottom: 10px;
+}
+
+.sidebar > details[open] {
+    margin-bottom: 1em;
+}
+
 .sidebar article {
     text-align: left;
     margin: 5px 5px 15px 5px;

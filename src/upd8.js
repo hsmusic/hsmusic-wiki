@@ -5762,31 +5762,33 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to, wikiData}) {
 
     const trackListPart = fixWS`
         <h1><a href="${to('localized.album', album.directory)}">${album.name}</a></h1>
-        ${album.trackGroups ? fixWS`
-            <dl>
-                ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
-                    <dt ${classes(tracks.includes(currentTrack) && 'current')}>${
+        ${(album.trackGroups
+            ? album.trackGroups.map(({ name, color, startIndex, tracks }) =>
+                html.tag('details', {
+                    open: !currentTrack || tracks.includes(currentTrack),
+                    class: tracks.includes(currentTrack) && 'current'
+                }, [
+                    html.tag('summary',
                         (listTag === 'ol'
                             ? strings('albumSidebar.trackList.group.withRange', {
-                                group: strings.link.track(tracks[0], {to, text: name}),
+                                group: name,
                                 range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
                             })
                             : strings('albumSidebar.trackList.group', {
-                                group: strings.link.track(tracks[0], {to, text: name})
+                                group: name
                             }))
-                    }</dt>
-                    ${(!currentTrack || tracks.includes(currentTrack)) && fixWS`
-                        <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                    ),
+                    fixWS`
+                        <${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
                             ${tracks.map(trackToListItem).join('\n')}
-                        </${listTag}></dd>
-                    `}
-                `).join('\n')}
-            </dl>
-        ` : fixWS`
-            <${listTag}>
-                ${album.tracks.map(trackToListItem).join('\n')}
-            </${listTag}>
-        `}
+                        </${listTag}>
+                    `
+                ])).join('\n')
+            : fixWS`
+                <${listTag}>
+                    ${album.tracks.map(trackToListItem).join('\n')}
+                </${listTag}>
+            `)}
     `;
 
     const { groups } = album;
