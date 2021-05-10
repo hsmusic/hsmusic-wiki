@@ -5765,7 +5765,10 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to, wikiData}) {
         ${(album.trackGroups
             ? album.trackGroups.map(({ name, color, startIndex, tracks }) =>
                 html.tag('details', {
-                    open: !currentTrack || tracks.includes(currentTrack),
+                    // Leave side8ar track groups collapsed on al8um homepage,
+                    // since there's already a view of all the groups expanded
+                    // in the main content area.
+                    open: currentTrack && tracks.includes(currentTrack),
                     class: tracks.includes(currentTrack) && 'current'
                 }, [
                     html.tag('summary',
