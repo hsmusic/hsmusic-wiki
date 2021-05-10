@@ -349,9 +349,14 @@ footer > :last-child {
     user-select: none;
 }
 
+.sidebar > details summary .group-name {
+    color: var(--primary-color);
+}
+
 .sidebar > details summary:hover {
     cursor: pointer;
     text-decoration: underline;
+    text-decoration-color: var(--primary-color);
 }
 
 .sidebar > details ul,

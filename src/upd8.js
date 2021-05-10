@@ -5772,13 +5772,14 @@ function generateSidebarForAlbum(album, currentTrack, {strings, to, wikiData}) {
                     class: tracks.includes(currentTrack) && 'current'
                 }, [
                     html.tag('summary',
+                        {style: getLinkThemeString(color)},
                         (listTag === 'ol'
                             ? strings('albumSidebar.trackList.group.withRange', {
-                                group: name,
+                                group: `<span class="group-name">${name}</span>`,
                                 range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
                             })
                             : strings('albumSidebar.trackList.group', {
-                                group: name
+                                group: `<span class="group-name">${name}</span>`
                             }))
                     ),
                     fixWS`
