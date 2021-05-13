@@ -15,8 +15,9 @@ export function getColors(primary) {
         .map(val => parseInt(val, 16) / 255);
     const [ h, s, l ] = rgb2hsl(r, g, b);
     const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
+    const bg = `hsla(${Math.round(h)}deg, ${Math.round(s * 15)}%, 12%, 0.80)`;
 
-    return {primary, dim};
+    return {primary, dim, bg};
 }
 
 export function getLinkThemeString(color) {
@@ -29,11 +30,12 @@ export function getLinkThemeString(color) {
 export function getThemeString(color, additionalVariables = []) {
     if (!color) return '';
 
-    const { primary, dim } = getColors(color);
+    const { primary, dim, bg } = getColors(color);
 
     const variables = [
         `--primary-color: ${primary}`,
         `--dim-color: ${dim}`,
+        `--bg-color: ${bg}`,
         ...additionalVariables
     ].filter(Boolean);
 

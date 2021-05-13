@@ -29,8 +29,7 @@ body::before {
 }
 
 #page-container {
-    background-color: rgba(35, 35, 35, 0.80);
-    backdrop-filter: blur(4px);
+    background-color: var(--bg-color, rgba(35, 35, 35, 0.80));
     color: #ffffff;
 
     max-width: 1100px;
