@@ -109,6 +109,7 @@ import {
     unlink
 } from 'fs/promises';
 
+import find from './util/find.js';
 import genThumbs from './gen-thumbs.js';
 import * as html from './util/html.js';
 import link from './util/link.js';
@@ -300,52 +301,6 @@ urlSpec.localizedWithBaseDirectory = {
 };
 
 const urls = generateURLs(urlSpec);
-
-const searchHelper = (keys, dataProp, findFn) => (ref, {wikiData}) => {
-    if (!ref) return null;
-    ref = ref.replace(new RegExp(`^(${keys.join('|')}):`), '');
-    if (!wikiData[dataProp]) {
-        console.log('find', dataProp, Object.keys(wikiData));
-    }
-    const found = findFn(ref, wikiData[dataProp]);
-    if (!found) {
-        logWarn`Didn't match anything for ${ref}! (${keys.join(', ')})`;
-    }
-    return found;
-};
-
-const matchDirectory = (ref, data) => data.find(({ directory }) => directory === ref);
-
-const matchDirectoryOrName = (ref, data) => {
-    let thing;
-
-    thing = matchDirectory(ref, data);
-    if (thing) return thing;
-
-    thing = data.find(({ name }) => name === ref);
-    if (thing) return thing;
-
-    thing = data.find(({ name }) => name.toLowerCase() === ref.toLowerCase());
-    if (thing) {
-        logWarn`Bad capitalization: ${'\x1b[31m' + ref} -> ${'\x1b[32m' + thing.name}`;
-        return thing;
-    }
-
-    return null;
-};
-
-const search = {
-    album: searchHelper(['album', 'album-commentary'], 'albumData', matchDirectoryOrName),
-    artist: searchHelper(['artist', 'artist-gallery'], 'artistData', matchDirectoryOrName),
-    flash: searchHelper(['flash'], 'flashData', matchDirectory),
-    group: searchHelper(['group', 'group-gallery'], 'groupData', matchDirectoryOrName),
-    listing: searchHelper(['listing'], 'listingSpec', matchDirectory),
-    newsEntry: searchHelper(['news-entry'], 'newsData', matchDirectory),
-    staticPage: searchHelper(['static'], 'staticPageData', matchDirectory),
-    tag: searchHelper(['tag'], 'tagData', (ref, data) =>
-        matchDirectoryOrName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data)),
-    track: searchHelper(['track'], 'trackData', matchDirectoryOrName)
-};
 
 // Localiz8tion time! Or l10n as the neeeeeeeerds call it. Which is a terri8le
 // name and not one I intend on using, thank you very much. (Don't even get me
@@ -754,32 +709,32 @@ function getMultilineField(lines, name) {
 
 const replacerSpec = {
     'album': {
-        search: 'album',
+        find: 'album',
         link: 'album'
     },
     'album-commentary': {
-        search: 'album',
+        find: 'album',
         link: 'albumCommentary'
     },
     'artist': {
-        search: 'artist',
+        find: 'artist',
         link: 'artist'
     },
     'artist-gallery': {
-        search: 'artist',
+        find: 'artist',
         link: 'artistGallery'
     },
     'commentary-index': {
-        search: null,
+        find: null,
         link: 'commentaryIndex'
     },
     'date': {
-        search: null,
+        find: null,
         value: ref => new Date(ref),
         html: (date, {strings}) => `<time datetime="${date.toString()}">${strings.count.date(date)}</time>`
     },
     'flash': {
-        search: 'flash',
+        find: 'flash',
         link: 'flash',
         transformName(name, node, input) {
             const nextCharacter = input[node.iEnd];
@@ -795,69 +750,69 @@ const replacerSpec = {
         }
     },
     'group': {
-        search: 'group',
+        find: 'group',
         link: 'groupInfo'
     },
     'group-gallery': {
-        search: 'group',
+        find: 'group',
         link: 'groupGallery'
     },
     'listing-index': {
-        search: null,
+        find: null,
         link: 'listingIndex'
     },
     'listing': {
-        search: 'listing',
+        find: 'listing',
         link: 'listing'
     },
     'media': {
-        search: null,
+        find: null,
         link: 'media'
     },
     'news-index': {
-        search: null,
+        find: null,
         link: 'newsIndex'
     },
     'news-entry': {
-        search: 'newsEntry',
+        find: 'newsEntry',
         link: 'newsEntry'
     },
     'root': {
-        search: null,
+        find: null,
         link: 'root'
     },
     'site': {
-        search: null,
+        find: null,
         link: 'site'
     },
     'static': {
-        search: 'staticPage',
+        find: 'staticPage',
         link: 'staticPage'
     },
     'string': {
-        search: null,
+        find: null,
         value: ref => ref,
         html: (ref, {strings, args}) => strings(ref, args)
     },
     'tag': {
-        search: 'tag',
+        find: 'tag',
         link: 'tag'
     },
     'track': {
-        search: 'track',
+        find: 'track',
         link: 'track'
     }
 };
 
 {
     let error = false;
-    for (const [key, {link: linkKey, search: searchKey, value, html}] of Object.entries(replacerSpec)) {
+    for (const [key, {link: linkKey, find: findKey, value, html}] of Object.entries(replacerSpec)) {
         if (!html && !link[linkKey]) {
             logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
             error = true;
         }
-        if (searchKey && !search[searchKey]) {
-            logError`The replacer spec ${key} has invalid search key ${searchKey}! Specify it in search specs or fix typo.`;
+        if (findKey && !find[findKey]) {
+            logError`The replacer spec ${key} has invalid find key ${findKey}! Specify it in find specs or fix typo.`;
             error = true;
         }
     }
@@ -1213,7 +1168,7 @@ const replacerSpec = {
         }
 
         const {
-            search: searchKey,
+            find: findKey,
             link: linkKey,
             value: valueFn,
             html: htmlFn,
@@ -1224,7 +1179,7 @@ const replacerSpec = {
 
         const value = (
             valueFn ? valueFn(replacerValue) :
-            searchKey ? search[searchKey](replacerValue, {wikiData}) :
+            findKey ? find[findKey](replacerValue, {wikiData}) :
             {
                 directory: replacerValue,
                 name: null
@@ -3097,13 +3052,13 @@ function writeHomepage({wikiData}) {
                                     entries: (
                                         row.group === 'new-releases' ? getNewReleases(row.groupCount, {wikiData}) :
                                         row.group === 'new-additions' ? getNewAdditions(row.groupCount, {wikiData}) :
-                                        ((search.group(row.group, {wikiData})?.albums || [])
+                                        ((find.group(row.group, {wikiData})?.albums || [])
                                             .slice()
                                             .reverse()
                                             .slice(0, row.groupCount)
                                             .map(album => ({item: album})))
                                     ).concat(row.albums
-                                        .map(album => search.album(album, {wikiData}))
+                                        .map(album => find.album(album, {wikiData}))
                                         .map(album => ({item: album}))
                                     ),
                                     lazy: i > 0
@@ -6608,7 +6563,7 @@ async function main() {
     {
         for (const { references, name, album } of WD.trackData) {
             for (const ref of references) {
-                if (!search.track(ref, {wikiData})) {
+                if (!find.track(ref, {wikiData})) {
                     logWarn`Track not found "${ref}" in ${name} (${album.name})`;
                 }
             }
@@ -6649,13 +6604,13 @@ async function main() {
         }));
     };
 
-    WD.trackData.forEach(track => mapInPlace(track.references, r => search.track(r, {wikiData})));
-    WD.trackData.forEach(track => track.aka = search.track(track.aka, {wikiData}));
-    WD.trackData.forEach(track => mapInPlace(track.artTags, t => search.tag(t, {wikiData})));
-    WD.albumData.forEach(album => mapInPlace(album.groups, g => search.group(g, {wikiData})));
-    WD.albumData.forEach(album => mapInPlace(album.artTags, t => search.tag(t, {wikiData})));
-    WD.artistAliasData.forEach(artist => artist.alias = search.artist(artist.alias, {wikiData}));
-    WD.contributionData.forEach(contrib => contrib.who = search.artist(contrib.who, {wikiData}));
+    WD.trackData.forEach(track => mapInPlace(track.references, r => find.track(r, {wikiData})));
+    WD.trackData.forEach(track => track.aka = find.track(track.aka, {wikiData}));
+    WD.trackData.forEach(track => mapInPlace(track.artTags, t => find.tag(t, {wikiData})));
+    WD.albumData.forEach(album => mapInPlace(album.groups, g => find.group(g, {wikiData})));
+    WD.albumData.forEach(album => mapInPlace(album.artTags, t => find.tag(t, {wikiData})));
+    WD.artistAliasData.forEach(artist => artist.alias = find.artist(artist.alias, {wikiData}));
+    WD.contributionData.forEach(contrib => contrib.who = find.artist(contrib.who, {wikiData}));
 
     filterNullArray(WD.trackData, 'references');
     filterNullArray(WD.trackData, 'artTags');
@@ -6677,7 +6632,7 @@ async function main() {
     ].filter(x => x && x !== track));
 
     if (WD.wikiInfo.features.flashesAndGames) {
-        WD.flashData.forEach(flash => mapInPlace(flash.tracks, t => search.track(t, {wikiData})));
+        WD.flashData.forEach(flash => mapInPlace(flash.tracks, t => find.track(t, {wikiData})));
         WD.flashData.forEach(flash => flash.act = WD.flashActData.find(act => act.name === flash.act));
         WD.flashActData.forEach(act => act.flashes = WD.flashData.filter(flash => flash.act === act));
 
