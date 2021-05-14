@@ -205,3 +205,82 @@ export function genStrings(stringsJSON, {
 
     return strings;
 }
+
+const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit = false}) => strings(
+    (unit
+        ? `count.${stringKey}.withUnit.` + strings.intl.plural.cardinal.select(value)
+        : `count.${stringKey}`),
+    {[argName]: strings.intl.number.format(value)});
+
+export const count = {
+    date: (date, {strings}) => {
+        return strings.intl.date.format(date);
+    },
+
+    dateRange: ([startDate, endDate], {strings}) => {
+        return strings.intl.date.formatRange(startDate, endDate);
+    },
+
+    duration: (secTotal, {strings, approximate = false, unit = false}) => {
+        if (secTotal === 0) {
+            return strings('count.duration.missing');
+        }
+
+        const hour = Math.floor(secTotal / 3600);
+        const min = Math.floor((secTotal - hour * 3600) / 60);
+        const sec = Math.floor(secTotal - hour * 3600 - min * 60);
+
+        const pad = val => val.toString().padStart(2, '0');
+
+        const stringSubkey = unit ? '.withUnit' : '';
+
+        const duration = (hour > 0
+            ? strings('count.duration.hours' + stringSubkey, {
+                hours: hour,
+                minutes: pad(min),
+                seconds: pad(sec)
+            })
+            : strings('count.duration.minutes' + stringSubkey, {
+                minutes: min,
+                seconds: pad(sec)
+            }));
+
+        return (approximate
+            ? strings('count.duration.approximate', {duration})
+            : duration);
+    },
+
+    index: (value, {strings}) => {
+        return strings('count.index.' + strings.intl.plural.ordinal.select(value), {index: value});
+    },
+
+    number: value => strings.intl.number.format(value),
+
+    words: (value, {strings, unit = false}) => {
+        const num = strings.intl.number.format(value > 1000
+            ? Math.floor(value / 100) / 10
+            : value);
+
+        const words = (value > 1000
+            ? strings('count.words.thousand', {words: num})
+            : strings('count.words', {words: num}));
+
+        return strings('count.words.withUnit.' + strings.intl.plural.cardinal.select(value), {words});
+    },
+
+    albums: countHelper('albums'),
+    commentaryEntries: countHelper('commentaryEntries', 'entries'),
+    contributions: countHelper('contributions'),
+    coverArts: countHelper('coverArts'),
+    timesReferenced: countHelper('timesReferenced'),
+    timesUsed: countHelper('timesUsed'),
+    tracks: countHelper('tracks')
+};
+
+const listHelper = type => (list, {strings}) => strings.intl.list[type].format(list);
+
+export const list = {
+    unit: listHelper('unit'),
+    or: listHelper('disjunction'),
+    and: listHelper('conjunction')
+};
