@@ -1,4 +1,5 @@
 import { logWarn } from './cli.js';
+import { bindOpts } from './sugar.js';
 
 // Localiz8tion time! Or l10n as the neeeeeeeerds call it. Which is a terri8le
 // name and not one I intend on using, thank you very much. (Don't even get me
@@ -194,13 +195,13 @@ export function genStrings(stringsJSON, {
         }
     };
 
-    const bindOpts = (obj, bind) => Object.fromEntries(Object.entries(obj).map(
-        ([ key, fn ]) => [key, (value, opts = {}) => fn(value, {...bind, ...opts})]
-    ));
-
     // And the provided utility dictionaries themselves, of course!
     for (const [key, utilDict] of Object.entries(bindUtilities)) {
-        strings[key] = bindOpts(utilDict, {strings});
+        const boundUtilDict = {};
+        for (const [key, fn] of Object.entries(utilDict)) {
+            boundUtilDict[key] = bindOpts(fn, {strings});
+        }
+        strings[key] = boundUtilDict;
     }
 
     return strings;

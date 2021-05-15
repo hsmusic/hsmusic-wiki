@@ -14,15 +14,21 @@ import { getLinkThemeString } from './colors.js'
 
 const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {
-        strings, to,
+        to,
         text = '',
+        attributes = null,
         class: className = '',
+        color: color2 = true,
         hash = ''
     }) => (
         html.tag('a', {
             ...attr ? attr(thing) : {},
+            ...attributes ? attributes : {},
             href: hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : ''),
-            style: color ? getLinkThemeString(thing.color) : '',
+            style: (
+                typeof color2 === 'string' ? getLinkThemeString(color2) :
+                color2 && color ? getLinkThemeString(thing.color) :
+                ''),
             class: className
         }, text || thing.name)
     );

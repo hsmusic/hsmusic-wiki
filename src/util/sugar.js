@@ -76,3 +76,14 @@ export function delay(ms) {
 export function escapeRegex(string) {
     return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
+
+export function bindOpts(fn, bind) {
+    const bindIndex = bind[bindOpts.bindIndex] ?? 1;
+
+    return (...args) => {
+        const opts = args[bindIndex] ?? {};
+        return fn(...args.slice(0, bindIndex), {...bind, ...opts});
+    };
+}
+
+bindOpts.bindIndex = Symbol();

@@ -73,18 +73,20 @@ export function escapeAttributeValue(value) {
 export function attributes(attribs) {
     return Object.entries(attribs)
         .map(([ key, val ]) => {
-            if (!val)
-                return [key, val];
-            else if (typeof val === 'string' || typeof val === 'boolean')
-                return [key, val];
+            if (typeof val === 'undefined' || val === null)
+                return [key, val, false];
+            else if (typeof val === 'string')
+                return [key, val, true];
+            else if (typeof val === 'boolean')
+                return [key, val, val];
             else if (typeof val === 'number')
-                return [key, val.toString()];
+                return [key, val.toString(), true];
             else if (Array.isArray(val))
-                return [key, val.join(' ')];
+                return [key, val.filter(Boolean).join(' '), val.length > 0];
             else
                 throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
         })
-        .filter(([ key, val ]) => val)
+        .filter(([ key, val, keep ]) => keep)
         .map(([ key, val ]) => (typeof val === 'boolean'
             ? `${key}`
             : `${key}="${escapeAttributeValue(val)}"`))
