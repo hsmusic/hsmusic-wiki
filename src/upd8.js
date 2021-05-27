@@ -5474,6 +5474,11 @@ function writeGroupPage(group, {wikiData}) {
     const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
     const totalDuration = getTotalDuration(releasedTracks);
 
+    const albumLines = group.albums.map(album => ({
+        album,
+        otherGroup: album.groups.find(g => g !== group)
+    }));
+
     const infoPage = {
         type: 'page',
         path: ['groupInfo', group.directory],
@@ -5505,14 +5510,22 @@ function writeGroupPage(group, {wikiData}) {
                         })
                     }</p>
                     <ul>
-                        ${group.albums.map(album => fixWS`
-                            <li>${
-                                strings('groupInfoPage.albumList.item', {
-                                    year: album.date.getFullYear(),
-                                    album: link.album(album)
+                        ${albumLines.map(({ album, otherGroup }) => {
+                            const item = strings('groupInfoPage.albumList.item', {
+                                year: album.date.getFullYear(),
+                                album: link.album(album)
+                            });
+                            return html.tag('li', (otherGroup
+                                ? strings('groupInfoPage.albumList.item.withAccent', {
+                                    item,
+                                    accent: html.tag('span',
+                                        {class: 'other-group-accent'},
+                                        strings('groupInfoPage.albumList.item.otherGroupAccent', {
+                                            group: link.groupInfo(otherGroup, {color: false})
+                                        }))
                                 })
-                            }</li>
-                        `).join('\n')}
+                                : item));
+                        }).join('\n')}
                     </ul>
                 `
             },

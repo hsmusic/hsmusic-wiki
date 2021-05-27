@@ -197,9 +197,11 @@ footer > :last-child {
     fill: var(--primary-color);
 }
 
-.rerelease {
+.rerelease,
+.other-group-accent {
     opacity: 0.7;
     font-style: oblique;
+    white-space: nowrap;
 }
 
 .content-columns {

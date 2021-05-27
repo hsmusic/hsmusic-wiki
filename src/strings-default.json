@@ -213,6 +213,8 @@
     "groupInfoPage.viewAlbumGallery.link": "album gallery",
     "groupInfoPage.albumList.title": "Albums",
     "groupInfoPage.albumList.item": "({YEAR}) {ALBUM}",
+    "groupInfoPage.albumList.item.withAccent": "{ITEM} {ACCENT}",
+    "groupInfoPage.albumList.item.otherGroupAccent": "(from {GROUP})",
     "groupGalleryPage.title": "{GROUP} - Gallery",
     "groupGalleryPage.infoLine": "{TRACKS} across {ALBUMS}, totaling {TIME}.",
     "groupGalleryPage.anotherGroupLine": "({LINK})",
