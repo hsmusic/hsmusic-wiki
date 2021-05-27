@@ -5234,6 +5234,13 @@ function generateSidebarForAlbum(album, {
 }) {
     const listTag = getAlbumListTag(album);
 
+    const trackGroups = album.trackGroups || [{
+        name: strings('albumSidebar.trackList.fallbackGroupName'),
+        color: album.color,
+        startIndex: 0,
+        tracks: album.tracks
+    }];
+
     const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
         strings('albumSidebar.trackList.item', {
             track: link.track(track)
@@ -5242,37 +5249,31 @@ function generateSidebarForAlbum(album, {
 
     const trackListPart = fixWS`
         <h1>${link.album(album)}</h1>
-        ${(album.trackGroups
-            ? album.trackGroups.map(({ name, color, startIndex, tracks }) =>
-                html.tag('details', {
-                    // Leave side8ar track groups collapsed on al8um homepage,
-                    // since there's already a view of all the groups expanded
-                    // in the main content area.
-                    open: currentTrack && tracks.includes(currentTrack),
-                    class: tracks.includes(currentTrack) && 'current'
-                }, [
-                    html.tag('summary',
-                        {style: getLinkThemeString(color)},
-                        (listTag === 'ol'
-                            ? strings('albumSidebar.trackList.group.withRange', {
-                                group: `<span class="group-name">${name}</span>`,
-                                range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
-                            })
-                            : strings('albumSidebar.trackList.group', {
-                                group: `<span class="group-name">${name}</span>`
-                            }))
-                    ),
-                    fixWS`
-                        <${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
-                            ${tracks.map(trackToListItem).join('\n')}
-                        </${listTag}>
-                    `
-                ])).join('\n')
-            : fixWS`
-                <${listTag}>
-                    ${album.tracks.map(trackToListItem).join('\n')}
-                </${listTag}>
-            `)}
+        ${trackGroups.map(({ name, color, startIndex, tracks }) =>
+            html.tag('details', {
+                // Leave side8ar track groups collapsed on al8um homepage,
+                // since there's already a view of all the groups expanded
+                // in the main content area.
+                open: currentTrack && tracks.includes(currentTrack),
+                class: tracks.includes(currentTrack) && 'current'
+            }, [
+                html.tag('summary',
+                    {style: getLinkThemeString(color)},
+                    (listTag === 'ol'
+                        ? strings('albumSidebar.trackList.group.withRange', {
+                            group: `<span class="group-name">${name}</span>`,
+                            range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
+                        })
+                        : strings('albumSidebar.trackList.group', {
+                            group: `<span class="group-name">${name}</span>`
+                        }))
+                ),
+                fixWS`
+                    <${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                        ${tracks.map(trackToListItem).join('\n')}
+                    </${listTag}>
+                `
+            ])).join('\n')}
     `;
 
     const { groups } = album;
