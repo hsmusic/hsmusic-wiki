@@ -1,4 +1,4 @@
-import { logWarn } from './cli.js';
+import { logError, logWarn } from './cli.js';
 import { bindOpts } from './sugar.js';
 
 // Localiz8tion time! Or l10n as the neeeeeeeerds call it. Which is a terri8le
