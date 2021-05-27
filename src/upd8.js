@@ -5158,14 +5158,14 @@ function chronologyLinks(currentThing, {
         const next = releasedThings[index + 1];
         const parts = [
             previous && linkAnythingMan(previous, {
-                link,
-                text: strings('misc.nav.previous'),
-                wikiData
+                link, wikiData,
+                color: false,
+                text: strings('misc.nav.previous')
             }),
             next && linkAnythingMan(next, {
-                link,
-                text: strings('misc.nav.next'),
-                wikiData
+                link, wikiData,
+                color: false,
+                text: strings('misc.nav.next')
             })
         ].filter(Boolean);
 
