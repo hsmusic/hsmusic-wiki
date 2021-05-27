@@ -261,9 +261,11 @@ footer > :last-child {
 }
 
 #content {
+    box-sizing: border-box;
     padding: 20px;
     flex-grow: 1;
     flex-shrink: 3;
+    overflow-wrap: break-word;
 }
 
 .sidebar > h1,
@@ -903,5 +905,25 @@ li > ul {
 @media (max-width: 600px) {
     .content-columns {
         columns: 1;
+    }
+
+    #content {
+        width: 100%;
+    }
+
+    #cover-art-container {
+        float: none;
+        margin: 0 10px 10px 10px;
+        margin: 0;
+        width: 100%;
+        max-width: unset;
+    }
+
+    #header {
+        display: block;
+    }
+
+    #header > div {
+        margin-top: 0.5em;
     }
 }
