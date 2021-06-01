@@ -195,7 +195,7 @@ export function progressPromiseAll(msgOrMsgFn, array) {
     let done = 0, total = array.length;
     process.stdout.write(`\r${msgFn()} [0/${total}]`);
     const start = Date.now();
-    return Promise.all(array.map(promise => promise.then(val => {
+    return Promise.all(array.map(promise => Promise.resolve(promise).then(val => {
         done++;
         // const pc = `${done}/${total}`;
         const pc = (Math.round(done / total * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
