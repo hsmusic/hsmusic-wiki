@@ -2007,13 +2007,18 @@ writePage.html = (pageFn, {
         nav.content
     ]);
 
-    const bannerHTML = banner.position && banner.src && html.tag('div',
+    const bannerSrc = (
+        banner.src ? banner.src :
+        banner.path ? to(...banner.path) :
+        null);
+
+    const bannerHTML = banner.position && bannerSrc && html.tag('div',
         {
             id: 'banner',
             class: banner.classes
         },
         html.tag('img', {
-            src: banner.src,
+            src: bannerSrc,
             alt: banner.alt,
             width: banner.dimensions[0] || 1100,
             height: banner.dimensions[1] || 200
@@ -2630,12 +2635,21 @@ function getRevealStringFromTags(tags, {strings}) {
 }
 
 function generateCoverLink({
-    link, strings, wikiData,
+    link, strings, to, wikiData,
     src,
+    path,
     alt,
     tags = []
 }) {
     const { wikiInfo } = wikiData;
+
+    if (!src && path) {
+        src = to(...path);
+    }
+
+    if (!src) {
+        throw new Error(`Expected src or path`);
+    }
 
     return fixWS`
         <div id="cover-art-container">
@@ -2744,7 +2758,6 @@ function writeAlbumPage(album, {wikiData}) {
             getArtistString,
             link,
             strings,
-            to,
             transformMultiline
         }) => ({
             title: strings('albumPage.title', {album: album.name}),
@@ -2755,7 +2768,7 @@ function writeAlbumPage(album, {wikiData}) {
 
             banner: album.bannerArtists && {
                 dimensions: album.bannerDimensions,
-                src: to('media.albumBanner', album.directory),
+                path: ['media.albumBanner', album.directory],
                 alt: strings('misc.alt.albumBanner'),
                 position: 'top'
             },
@@ -2763,7 +2776,7 @@ function writeAlbumPage(album, {wikiData}) {
             main: {
                 content: fixWS`
                     ${generateCoverLink({
-                        src: to('media.albumCover', album.directory),
+                        path: ['media.albumCover', album.directory],
                         alt: strings('misc.alt.albumCover'),
                         tags: album.artTags
                     })}
@@ -2807,9 +2820,9 @@ function writeAlbumPage(album, {wikiData}) {
                     </p>
                     ${commentaryEntries && `<p>${
                         strings('releaseInfo.viewCommentary', {
-                            link: `<a href="${to('localized.albumCommentary', album.directory)}">${
-                                strings('releaseInfo.viewCommentary.link')
-                            }</a>`
+                            link: link.albumCommentary(album, {
+                                text: strings('releaseInfo.viewCommentary.link')
+                            })
                         })
                     }</p>`}
                     ${album.urls.length && `<p>${
@@ -3016,7 +3029,7 @@ function writeTrackPage(track, {wikiData}) {
                 banner: album.bannerArtists && {
                     classes: ['dim'],
                     dimensions: album.bannerDimensions,
-                    src: to('media.albumBanner', album.directory),
+                    path: ['media.albumBanner', album.directory],
                     alt: strings('misc.alt.albumBanner'),
                     position: 'bottom'
                 },
@@ -3421,7 +3434,7 @@ function writeArtistPage(artist, {wikiData}) {
                 main: {
                     content: fixWS`
                         ${artist.hasAvatar && generateCoverLink({
-                            src: to('localized.artistAvatar', artist.directory),
+                            path: ['localized.artistAvatar', artist.directory],
                             alt: strings('misc.alt.artistAvatar')
                         })}
                         <h1>${strings('artistPage.title', {artist: name})}</h1>
@@ -6462,6 +6475,7 @@ async function main() {
                     [bindOpts.bindIndex]: 0,
                     link: bound.link,
                     strings,
+                    to,
                     wikiData
                 });
 
