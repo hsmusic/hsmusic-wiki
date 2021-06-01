@@ -4640,42 +4640,6 @@ function generateChronologyLinks(currentThing, {
     }).filter(Boolean).join('\n');
 }
 
-function generateSidebarForGroup(currentGroup, isGallery, {link, strings, wikiData}) {
-    const { groupCategoryData, wikiInfo } = wikiData;
-
-    if (!wikiInfo.features.groupUI) {
-        return null;
-    }
-
-    const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
-
-    return {
-        content: fixWS`
-            <h1>${strings('groupSidebar.title')}</h1>
-            ${groupCategoryData.map(category =>
-                html.tag('details', {
-                    open: category === currentGroup.category,
-                    class: category === currentGroup.category && 'current'
-                }, [
-                    html.tag('summary',
-                        {style: getLinkThemeString(category.color)},
-                        strings('groupSidebar.groupList.category', {
-                            category: `<span class="group-name">${category.name}</span>`
-                        })),
-                    html.tag('ul',
-                        category.groups.map(group => fixWS`
-                            <li ${classes(group === currentGroup && 'current')} style="${getLinkThemeString(group.color)}">${
-                                strings('groupSidebar.groupList.item', {
-                                    group: link[linkKey](group)
-                                })
-                            }</li>
-                        `))
-                ])).join('\n')}
-            </dl>
-        `
-    };
-}
-
 function generateInfoGalleryLinks(currentThing, isGallery, {
     link, strings,
     linkKeyGallery,
@@ -4723,170 +4687,6 @@ function generatePreviousNextLinks(current, {
             color: false
         })
     ].filter(Boolean).join(', ');
-}
-
-function generateNavForGroup(currentGroup, isGallery, {link, strings, wikiData}) {
-    const { groupData, wikiInfo } = wikiData;
-
-    if (!wikiInfo.features.groupUI) {
-        return {simple: true};
-    }
-
-    const urlKey = isGallery ? 'localized.groupGallery' : 'localized.groupInfo';
-    const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
-
-    const infoGalleryLinks = generateInfoGalleryLinks(currentGroup, isGallery, {
-        link, strings,
-        linkKeyGallery: 'groupGallery',
-        linkKeyInfo: 'groupInfo'
-    });
-
-    const previousNextLinks = generatePreviousNextLinks(currentGroup, {
-        link, strings,
-        data: groupData,
-        linkKey
-    });
-
-    return {
-        links: [
-            {toHome: true},
-            wikiInfo.features.listings &&
-            {
-                path: ['localized.listingIndex'],
-                title: strings('listingIndex.title')
-            },
-            {
-                html: strings('groupPage.nav.group', {
-                    group: link[linkKey](currentGroup, {class: 'current'})
-                })
-            },
-            {
-                divider: false,
-                html: (previousNextLinks
-                    ? `(${infoGalleryLinks}; ${previousNextLinks})`
-                    : `(${previousNextLinks})`)
-            }
-        ]
-    };
-}
-
-function writeGroupPages({wikiData}) {
-    return wikiData.groupData.map(group => writeGroupPage(group, {wikiData}));
-}
-
-function writeGroupPage(group, {wikiData}) {
-    const { wikiInfo } = wikiData;
-
-    const releasedAlbums = group.albums.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
-    const totalDuration = getTotalDuration(releasedTracks);
-
-    const albumLines = group.albums.map(album => ({
-        album,
-        otherGroup: album.groups.find(g => g !== group)
-    }));
-
-    const infoPage = {
-        type: 'page',
-        path: ['groupInfo', group.directory],
-        page: ({
-            link,
-            strings,
-            transformMultiline
-        }) => ({
-            title: strings('groupInfoPage.title', {group: group.name}),
-            theme: getThemeString(group.color),
-
-            main: {
-                content: fixWS`
-                    <h1>${strings('groupInfoPage.title', {group: group.name})}</h1>
-                    ${group.urls.length && `<p>${
-                        strings('releaseInfo.visitOn', {
-                            links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
-                        })
-                    }</p>`}
-                    <blockquote>
-                        ${transformMultiline(group.description)}
-                    </blockquote>
-                    <h2>${strings('groupInfoPage.albumList.title')}</h2>
-                    <p>${
-                        strings('groupInfoPage.viewAlbumGallery', {
-                            link: link.groupGallery(group, {
-                                text: strings('groupInfoPage.viewAlbumGallery.link')
-                            })
-                        })
-                    }</p>
-                    <ul>
-                        ${albumLines.map(({ album, otherGroup }) => {
-                            const item = strings('groupInfoPage.albumList.item', {
-                                year: album.date.getFullYear(),
-                                album: link.album(album)
-                            });
-                            return html.tag('li', (otherGroup
-                                ? strings('groupInfoPage.albumList.item.withAccent', {
-                                    item,
-                                    accent: html.tag('span',
-                                        {class: 'other-group-accent'},
-                                        strings('groupInfoPage.albumList.item.otherGroupAccent', {
-                                            group: link.groupInfo(otherGroup, {color: false})
-                                        }))
-                                })
-                                : item));
-                        }).join('\n')}
-                    </ul>
-                `
-            },
-
-            sidebarLeft: generateSidebarForGroup(group, false, {link, strings, wikiData}),
-            nav: generateNavForGroup(group, false, {link, strings, wikiData})
-        })
-    };
-
-    const galleryPage = {
-        type: 'page',
-        path: ['groupGallery', group.directory],
-        page: ({
-            getAlbumGridHTML,
-            link,
-            strings
-        }) => ({
-            title: strings('groupGalleryPage.title', {group: group.name}),
-            theme: getThemeString(group.color),
-
-            main: {
-                classes: ['top-index'],
-                content: fixWS`
-                    <h1>${strings('groupGalleryPage.title', {group: group.name})}</h1>
-                    <p class="quick-info">${
-                        strings('groupGalleryPage.infoLine', {
-                            tracks: `<b>${strings.count.tracks(releasedTracks.length, {unit: true})}</b>`,
-                            albums: `<b>${strings.count.albums(releasedAlbums.length, {unit: true})}</b>`,
-                            time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
-                        })
-                    }</p>
-                    ${wikiInfo.features.groupUI && wikiInfo.features.listings && html.tag('p',
-                        {class: 'quick-info'},
-                        strings('groupGalleryPage.anotherGroupLine', {
-                            link: link.listing(listingSpec.find(l => l.directory === 'groups/by-category'), {
-                                text: strings('groupGalleryPage.anotherGroupLine.link')
-                            })
-                        })
-                    )}
-                    <div class="grid-listing">
-                        ${getAlbumGridHTML({
-                            entries: sortByDate(group.albums.map(item => ({item}))).reverse(),
-                            details: true
-                        })}
-                    </div>
-                `
-            },
-
-            sidebarLeft: generateSidebarForGroup(group, true, {link, strings, wikiData}),
-            nav: generateNavForGroup(group, true, {link, strings, wikiData})
-        })
-    };
-
-    return [infoPage, galleryPage];
 }
 
 // RIP toAnythingMan (previously getHrefOfAnythingMan), 2020-05-25<>2021-05-14.
@@ -5607,7 +5407,7 @@ async function main() {
     const buildDictionary = pageSpecs;
 
     const buildSteps = (writeAll
-        ? Object.values(buildDictionary)
+        ? Object.entries(buildDictionary)
         : (Object.entries(buildDictionary)
             .filter(([ flag ]) => writeFlags[flag])));
 
@@ -5798,6 +5598,12 @@ async function main() {
                     strings,
                     to,
                     wikiData
+                });
+
+                bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
+                    [bindOpts.bindIndex]: 2,
+                    link: bound.link,
+                    strings
                 });
 
                 bound.generatePreviousNextLinks = bindOpts(generatePreviousNextLinks, {

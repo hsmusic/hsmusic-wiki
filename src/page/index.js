@@ -26,4 +26,5 @@
 // pertain only to site page generation.
 
 export * as album from './album.js';
+export * as group from './group.js';
 export * as track from './track.js';

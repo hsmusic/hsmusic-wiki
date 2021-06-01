@@ -1,19 +1,8 @@
 // Album page specification.
-//
-// Also exports utility functions:
-//   - generateAlbumSidebar
-//   - generateAlbumNavLinks
-//   - generateAlbumChronologyLinks
 
 // Imports
 
 import fixWS from 'fix-whitespace';
-
-import {
-    getAlbumCover,
-    getAlbumListTag,
-    getTotalDuration
-} from '../util/wiki-data.js';
 
 import {
     getLinkThemeString,
@@ -21,6 +10,12 @@ import {
 } from '../util/colors.js';
 
 import * as html from '../util/html.js';
+
+import {
+    getAlbumCover,
+    getAlbumListTag,
+    getTotalDuration
+} from '../util/wiki-data.js';
 
 // Page exports
 
@@ -96,8 +91,8 @@ export function write(album, {wikiData}) {
         type: 'page',
         path: ['album', album.directory],
         page: ({
-            chronologyLinks,
             fancifyURL,
+            generateChronologyLinks,
             generateCoverLink,
             getAlbumStylesheet,
             getArtistString,
@@ -232,7 +227,7 @@ export function write(album, {wikiData}) {
                         html: generateAlbumNavLinks(album, null, {strings})
                     }
                 ],
-                content: html.tag('div', generateAlbumChronologyLinks(album, null, {chronologyLinks}))
+                content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
             }
         })
     };
@@ -240,7 +235,7 @@ export function write(album, {wikiData}) {
     return [page, data];
 }
 
-// Utility exports
+// Utility functions
 
 export function generateAlbumSidebar(album, currentTrack, {
     fancifyURL,
