@@ -5,6 +5,8 @@
 //   - generateAlbumNavLinks
 //   - generateAlbumChronologyLinks
 
+// Imports
+
 import fixWS from 'fix-whitespace';
 
 import {
@@ -19,6 +21,8 @@ import {
 } from '../util/colors.js';
 
 import * as html from '../util/html.js';
+
+// Page exports
 
 export function targets({wikiData}) {
     return wikiData.albumData;
@@ -225,7 +229,7 @@ export function write(album, {wikiData}) {
                     album.tracks.length > 1 &&
                     {
                         divider: false,
-                        html: generateAlbumNavLinks(album, null, {link, strings})
+                        html: generateAlbumNavLinks(album, null, {strings})
                     }
                 ],
                 content: html.tag('div', generateAlbumChronologyLinks(album, null, {chronologyLinks}))
@@ -235,6 +239,8 @@ export function write(album, {wikiData}) {
 
     return [page, data];
 }
+
+// Utility exports
 
 export function generateAlbumSidebar(album, currentTrack, {
     fancifyURL,
@@ -344,13 +350,15 @@ export function generateAlbumSidebar(album, currentTrack, {
     }
 }
 
-export function generateAlbumNavLinks(album, currentTrack, {link, strings}) {
+export function generateAlbumNavLinks(album, currentTrack, {
+    generatePreviousNextLinks,
+    strings
+}) {
     if (album.tracks.length <= 1) {
         return '';
     }
 
     const previousNextLinks = currentTrack && generatePreviousNextLinks(currentTrack, {
-        link, strings,
         data: album.tracks,
         linkKey: 'track'
     });
@@ -365,14 +373,14 @@ export function generateAlbumNavLinks(album, currentTrack, {link, strings}) {
         : `<span class="js-hide-until-data">(${randomLink})</span>`);
 }
 
-export function generateAlbumChronologyLinks(album, currentTrack, {chronologyLinks}) {
+export function generateAlbumChronologyLinks(album, currentTrack, {generateChronologyLinks}) {
     return [
-        currentTrack && chronologyLinks(currentTrack, {
+        currentTrack && generateChronologyLinks(currentTrack, {
             contribKey: 'artists',
             getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor],
             headingString: 'misc.chronology.heading.track'
         }),
-        chronologyLinks(currentTrack || album, {
+        generateChronologyLinks(currentTrack || album, {
             contribKey: 'coverArtists',
             getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist],
             headingString: 'misc.chronology.heading.coverArt'

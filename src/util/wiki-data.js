@@ -1,5 +1,9 @@
 // Utility functions for interacting with wiki data.
 
+import {
+    UNRELEASED_TRACKS_DIRECTORY
+} from '../util/magic-constants.js';
+
 // Generic value operations
 
 export function getKebabCase(name) {
@@ -95,7 +99,7 @@ export function getAlbumCover(album, {to}) {
 
 export function getAlbumListTag(album) {
     // TODO: This is hard-coded! No. 8ad.
-    return (album.directory === 'unreleased-tracks' ? 'ul' : 'ol');
+    return (album.directory === UNRELEASED_TRACKS_DIRECTORY ? 'ul' : 'ol');
 }
 
 // This gets all the track o8jects defined in every al8um, and sorts them 8y
