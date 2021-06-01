@@ -89,6 +89,15 @@ export function sortByArtDate(data) {
 
 // Specific data utilities
 
+export function getAlbumCover(album, {to}) {
+    return to('media.albumCover', album.directory);
+}
+
+export function getAlbumListTag(album) {
+    // TODO: This is hard-coded! No. 8ad.
+    return (album.directory === 'unreleased-tracks' ? 'ul' : 'ol');
+}
+
 // This gets all the track o8jects defined in every al8um, and sorts them 8y
 // date released. Generally, albumData will pro8a8ly already 8e sorted 8efore
 // you pass it to this function, 8ut individual tracks can have their own
@@ -123,4 +132,26 @@ export function getArtistCommentary(artist, {justEverythingMan}) {
         (thing?.commentary
             .replace(/<\/?b>/g, '')
             .includes('<i>' + artist.name + ':</i>')));
+}
+
+export function getFlashCover(flash, {to}) {
+    return to('media.flashArt', flash.directory);
+}
+
+export function getFlashLink(flash) {
+    return `https://homestuck.com/story/${flash.page}`;
+}
+
+export function getTotalDuration(tracks) {
+    return tracks.reduce((duration, track) => duration + track.duration, 0);
+}
+
+export function getTrackCover(track, {to}) {
+    // Some al8ums don't have any track art at all, and in those, every track
+    // just inherits the al8um's own cover art.
+    if (track.coverArtists === null) {
+        return getAlbumCover(track.album, {to});
+    } else {
+        return to('media.trackCover', track.album.directory, track.directory);
+    }
 }

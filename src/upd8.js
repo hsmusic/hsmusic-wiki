@@ -109,8 +109,10 @@ import {
     unlink
 } from 'fs/promises';
 
-import find from './util/find.js';
 import genThumbs from './gen-thumbs.js';
+import * as pageSpecs from './page/index.js';
+
+import find from './util/find.js';
 import * as html from './util/html.js';
 import unbound_link from './util/link.js';
 
@@ -142,14 +144,28 @@ import {
 import {
     chunkByConditions,
     chunkByProperties,
+    getAlbumCover,
+    getAlbumListTag,
     getAllTracks,
     getArtistCommentary,
     getArtistNumContributions,
+    getFlashCover,
     getKebabCase,
+    getTotalDuration,
+    getTrackCover,
     sortByArtDate,
     sortByDate,
     sortByName
 } from './util/wiki-data.js';
+
+import {
+    serializeContribs,
+    serializeCover,
+    serializeGroupsForAlbum,
+    serializeGroupsForTrack,
+    serializeImagePaths,
+    serializeLink
+} from './util/serialize.js';
 
 import {
     bindOpts,
@@ -1488,10 +1504,6 @@ function getDurationInSeconds(string) {
     }
 }
 
-function getTotalDuration(tracks) {
-    return tracks.reduce((duration, track) => duration + track.duration, 0);
-}
-
 const stringifyIndent = 0;
 
 const toRefs = (label, objectOrArray) => {
@@ -1648,71 +1660,6 @@ function img({
 
         return wrapped;
     }
-}
-
-function serializeImagePaths(original) {
-    return {
-        original,
-        medium: thumb.medium(original),
-        small: thumb.small(original)
-    };
-}
-
-function serializeLink(thing) {
-    const ret = {};
-    ret.name = thing.name;
-    ret.directory = thing.directory;
-    if (thing.color) ret.color = thing.color;
-    return ret;
-}
-
-function serializeContribs(contribs) {
-    return contribs.map(({ who, what }) => {
-        const ret = {};
-        ret.artist = serializeLink(who);
-        if (what) ret.contribution = what;
-        return ret;
-    });
-}
-
-function serializeCover(thing, pathFunction) {
-    const coverPath = pathFunction(thing, {
-        to: urls.from('media.root').to
-    });
-
-    const { artTags } = thing;
-
-    const cwTags = artTags.filter(tag => tag.isCW);
-    const linkTags = artTags.filter(tag => !tag.isCW);
-
-    return {
-        paths: serializeImagePaths(coverPath),
-        tags: linkTags.map(serializeLink),
-        warnings: cwTags.map(tag => tag.name)
-    };
-}
-
-function serializeGroupsForAlbum(album) {
-    return album.groups.map(group => {
-        const index = group.albums.indexOf(album);
-        const next = group.albums[index + 1] || null;
-        const previous = group.albums[index - 1] || null;
-        return {group, index, next, previous};
-    }).map(({group, index, next, previous}) => ({
-        link: serializeLink(group),
-        descriptionShort: group.descriptionShort,
-        albumIndex: index,
-        nextAlbum: next && serializeLink(next),
-        previousAlbum: previous && serializeLink(previous),
-        urls: group.urls
-    }));
-}
-
-function serializeGroupsForTrack(track) {
-    return track.album.groups.map(group => ({
-        link: serializeLink(group),
-        urls: group.urls,
-    }));
 }
 
 function validateWritePath(path, urlGroup) {
@@ -2685,218 +2632,6 @@ function writeIndexAndTrackPagesForAlbum(album) {
     ];
 }
 */
-
-function writeAlbumPages({wikiData}) {
-    return wikiData.albumData.map(album => writeAlbumPage(album, {wikiData}));
-}
-
-function writeAlbumPage(album, {wikiData}) {
-    const { wikiInfo } = wikiData;
-
-    const trackToListItem = (track, {getArtistString, link, strings}) => {
-        const itemOpts = {
-            duration: strings.count.duration(track.duration),
-            track: link.track(track)
-        };
-        return `<li style="${getLinkThemeString(track.color)}">${
-            (track.artists === album.artists
-                ? strings('trackList.item.withDuration', itemOpts)
-                : strings('trackList.item.withDuration.withArtists', {
-                    ...itemOpts,
-                    by: `<span class="by">${
-                        strings('trackList.item.withArtists.by', {
-                            artists: getArtistString(track.artists)
-                        })
-                    }</span>`
-                }))
-        }</li>`;
-    };
-
-    const commentaryEntries = [album, ...album.tracks].filter(x => x.commentary).length;
-    const albumDuration = getTotalDuration(album.tracks);
-
-    const listTag = getAlbumListTag(album);
-
-    const data = {
-        type: 'data',
-        path: ['album', album.directory],
-        data: () => ({
-            name: album.name,
-            directory: album.directory,
-            dates: {
-                released: album.date,
-                trackArtAdded: album.trackArtDate,
-                coverArtAdded: album.coverArtDate,
-                addedToWiki: album.dateAdded
-            },
-            duration: albumDuration,
-            color: album.color,
-            cover: serializeCover(album, getAlbumCover),
-            artists: serializeContribs(album.artists || []),
-            coverArtists: serializeContribs(album.coverArtists || []),
-            wallpaperArtists: serializeContribs(album.wallpaperArtists || []),
-            bannerArtists: serializeContribs(album.bannerArtists || []),
-            groups: serializeGroupsForAlbum(album),
-            trackGroups: album.trackGroups?.map(trackGroup => ({
-                name: trackGroup.name,
-                color: trackGroup.color,
-                tracks: trackGroup.tracks.map(track => track.directory)
-            })),
-            tracks: album.tracks.map(track => ({
-                link: serializeLink(track),
-                duration: track.duration
-            }))
-        })
-    };
-
-    const page = {
-        type: 'page',
-        path: ['album', album.directory],
-        page: ({
-            generateCoverLink,
-            getAlbumStylesheet,
-            getArtistString,
-            link,
-            strings,
-            transformMultiline
-        }) => ({
-            title: strings('albumPage.title', {album: album.name}),
-            stylesheet: getAlbumStylesheet(album),
-            theme: getThemeString(album.color, [
-                `--album-directory: ${album.directory}`
-            ]),
-
-            banner: album.bannerArtists && {
-                dimensions: album.bannerDimensions,
-                path: ['media.albumBanner', album.directory],
-                alt: strings('misc.alt.albumBanner'),
-                position: 'top'
-            },
-
-            main: {
-                content: fixWS`
-                    ${generateCoverLink({
-                        path: ['media.albumCover', album.directory],
-                        alt: strings('misc.alt.albumCover'),
-                        tags: album.artTags
-                    })}
-                    <h1>${strings('albumPage.title', {album: album.name})}</h1>
-                    <p>
-                        ${[
-                            album.artists && strings('releaseInfo.by', {
-                                artists: getArtistString(album.artists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.coverArtists && strings('releaseInfo.coverArtBy', {
-                                artists: getArtistString(album.coverArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
-                                artists: getArtistString(album.wallpaperArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.bannerArtists && strings('releaseInfo.bannerArtBy', {
-                                artists: getArtistString(album.bannerArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            strings('releaseInfo.released', {
-                                date: strings.count.date(album.date)
-                            }),
-                            +album.coverArtDate !== +album.date && strings('releaseInfo.artReleased', {
-                                date: strings.count.date(album.coverArtDate)
-                            }),
-                            strings('releaseInfo.duration', {
-                                duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
-                            })
-                        ].filter(Boolean).join('<br>\n')}
-                    </p>
-                    ${commentaryEntries && `<p>${
-                        strings('releaseInfo.viewCommentary', {
-                            link: link.albumCommentary(album, {
-                                text: strings('releaseInfo.viewCommentary.link')
-                            })
-                        })
-                    }</p>`}
-                    ${album.urls.length && `<p>${
-                        strings('releaseInfo.listenOn', {
-                            links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true, strings})))
-                        })
-                    }</p>`}
-                    ${album.trackGroups ? fixWS`
-                        <dl class="album-group-list">
-                            ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
-                                <dt>${
-                                    strings('trackList.group', {
-                                        duration: strings.count.duration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
-                                        group: name
-                                    })
-                                }</dt>
-                                <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
-                                    ${tracks.map(t => trackToListItem(t, {getArtistString, link, strings})).join('\n')}
-                                </${listTag}></dd>
-                            `).join('\n')}
-                        </dl>
-                    ` : fixWS`
-                        <${listTag}>
-                            ${album.tracks.map(t => trackToListItem(t, {getArtistString, link, strings})).join('\n')}
-                        </${listTag}>
-                    `}
-                    <p>
-                        ${[
-                            strings('releaseInfo.addedToWiki', {
-                                date: strings.count.date(album.dateAdded)
-                            })
-                        ].filter(Boolean).join('<br>\n')}
-                    </p>
-                    ${album.commentary && fixWS`
-                        <p>${strings('releaseInfo.artistCommentary')}</p>
-                        <blockquote>
-                            ${transformMultiline(album.commentary)}
-                        </blockquote>
-                    `}
-                `
-            },
-
-            sidebarLeft: generateSidebarForAlbum(album, {
-                link,
-                strings,
-                transformMultiline,
-                wikiData
-            }),
-
-            nav: {
-                links: [
-                    {toHome: true},
-                    {
-                        html: strings('albumPage.nav.album', {
-                            album: link.album(album, {class: 'current'})
-                        })
-                    },
-                    album.tracks.length > 1 &&
-                    {
-                        divider: false,
-                        html: generateAlbumNavLinks(album, null, {link, strings})
-                    }
-                ],
-                content: fixWS`
-                    <div>
-                        ${generateAlbumChronologyLinks(album, null, {link, strings})}
-                    </div>
-                `
-            }
-        })
-    };
-
-    return [page, data];
-}
 
 function getAlbumStylesheet(album, {to}) {
     return [
@@ -5068,14 +4803,6 @@ function getTagDirectory({name}) {
     return getKebabCase(name);
 }
 
-function getAlbumListTag(album) {
-    if (album.directory === UNRELEASED_TRACKS_DIRECTORY) {
-        return 'ul';
-    } else {
-        return 'ol';
-    }
-}
-
 function fancifyURL(url, {strings, album = false} = {}) {
     const domain = new URL(url).hostname;
     return fixWS`<a href="${url}" class="nowrap">${
@@ -5194,156 +4921,6 @@ function chronologyLinks(currentThing, {
             </div>
         `;
     }).filter(Boolean).join('\n');
-}
-
-function generateAlbumNavLinks(album, currentTrack, {link, strings}) {
-    if (album.tracks.length <= 1) {
-        return '';
-    }
-
-    const previousNextLinks = currentTrack && generatePreviousNextLinks(currentTrack, {
-        link, strings,
-        data: album.tracks,
-        linkKey: 'track'
-    });
-    const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
-        (currentTrack
-            ? strings('trackPage.nav.random')
-            : strings('albumPage.nav.randomTrack'))
-    }</a>`;
-
-    return (previousNextLinks
-        ? `(${previousNextLinks}<span class="js-hide-until-data">, ${randomLink}</span>)`
-        : `<span class="js-hide-until-data">(${randomLink})</span>`);
-}
-
-function generateAlbumChronologyLinks(album, currentTrack, {link, strings}) {
-    return [
-        currentTrack && chronologyLinks(currentTrack, {
-            contribKey: 'artists',
-            getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor],
-            headingString: 'misc.chronology.heading.track',
-            strings,
-            link,
-            wikiData
-        }),
-        chronologyLinks(currentTrack || album, {
-            contribKey: 'coverArtists',
-            getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist],
-            headingString: 'misc.chronology.heading.coverArt',
-            link,
-            strings,
-            wikiData
-        })
-    ].filter(Boolean).join('\n');
-}
-
-function generateSidebarForAlbum(album, {
-    currentTrack = null,
-    link,
-    strings,
-    transformMultiline,
-    wikiData
-}) {
-    const listTag = getAlbumListTag(album);
-
-    const trackGroups = album.trackGroups || [{
-        name: strings('albumSidebar.trackList.fallbackGroupName'),
-        color: album.color,
-        startIndex: 0,
-        tracks: album.tracks
-    }];
-
-    const trackToListItem = track => `<li ${classes(track === currentTrack && 'current')}>${
-        strings('albumSidebar.trackList.item', {
-            track: link.track(track)
-        })
-    }</li>`;
-
-    const trackListPart = fixWS`
-        <h1>${link.album(album)}</h1>
-        ${trackGroups.map(({ name, color, startIndex, tracks }) =>
-            html.tag('details', {
-                // Leave side8ar track groups collapsed on al8um homepage,
-                // since there's already a view of all the groups expanded
-                // in the main content area.
-                open: currentTrack && tracks.includes(currentTrack),
-                class: tracks.includes(currentTrack) && 'current'
-            }, [
-                html.tag('summary',
-                    {style: getLinkThemeString(color)},
-                    (listTag === 'ol'
-                        ? strings('albumSidebar.trackList.group.withRange', {
-                            group: `<span class="group-name">${name}</span>`,
-                            range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
-                        })
-                        : strings('albumSidebar.trackList.group', {
-                            group: `<span class="group-name">${name}</span>`
-                        }))
-                ),
-                fixWS`
-                    <${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
-                        ${tracks.map(trackToListItem).join('\n')}
-                    </${listTag}>
-                `
-            ])).join('\n')}
-    `;
-
-    const { groups } = album;
-
-    const groupParts = groups.map(group => {
-        const index = group.albums.indexOf(album);
-        const next = group.albums[index + 1];
-        const previous = group.albums[index - 1];
-        return {group, next, previous};
-    }).map(({group, next, previous}) => fixWS`
-        <h1>${
-            strings('albumSidebar.groupBox.title', {
-                group: link.groupInfo(group)
-            })
-        }</h1>
-        ${!currentTrack && transformMultiline(group.descriptionShort)}
-        ${group.urls.length && `<p>${
-            strings('releaseInfo.visitOn', {
-                links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
-            })
-        }</p>`}
-        ${!currentTrack && fixWS`
-            ${next && `<p class="group-chronology-link">${
-                strings('albumSidebar.groupBox.next', {
-                    album: link.album(next)
-                })
-            }</p>`}
-            ${previous && `<p class="group-chronology-link">${
-                strings('albumSidebar.groupBox.previous', {
-                    album: link.album(previous)
-                })
-            }</p>`}
-        `}
-    `);
-
-    if (groupParts.length) {
-        if (currentTrack) {
-            const combinedGroupPart = groupParts.join('\n<hr>\n');
-            return {
-                multiple: [
-                    trackListPart,
-                    combinedGroupPart
-                ]
-            };
-        } else {
-            return {
-                multiple: [
-                    ...groupParts,
-                    trackListPart
-                ]
-            };
-        }
-    } else {
-        return {
-            content: trackListPart
-        };
-    }
 }
 
 function generateSidebarForGroup(currentGroup, isGallery, {link, strings, wikiData}) {
@@ -5604,28 +5181,6 @@ function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
         wikiData.flashData?.includes(anythingMan) ? link.flash(anythingMan, opts) :
         'idk bud'
     )
-}
-
-function getAlbumCover(album, {to}) {
-    return to('media.albumCover', album.directory);
-}
-
-function getTrackCover(track, {to}) {
-    // Some al8ums don't have any track art at all, and in those, every track
-    // just inherits the al8um's own cover art.
-    if (track.coverArtists === null) {
-        return getAlbumCover(track.album, {to});
-    } else {
-        return to('media.trackCover', track.album.directory, track.directory);
-    }
-}
-
-function getFlashCover(flash, {to}) {
-    return to('media.flashArt', flash.directory);
-}
-
-function getFlashLink(flash) {
-    return `https://homestuck.com/story/${flash.page}`;
 }
 
 function classes(...args) {
@@ -6316,6 +5871,7 @@ async function main() {
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
 
+    /*
     const buildDictionary = {
         misc: writeMiscellaneousPages,
         news: writeNewsPages,
@@ -6329,12 +5885,14 @@ async function main() {
         artist: writeArtistPages,
         flash: writeFlashPages
     };
+    */
+
+    const buildDictionary = pageSpecs;
 
     const buildSteps = (writeAll
         ? Object.values(buildDictionary)
         : (Object.entries(buildDictionary)
-            .filter(([ flag ]) => writeFlags[flag])
-            .map(([ flag, fn ]) => fn)));
+            .filter(([ flag ]) => writeFlags[flag])));
 
     // *NB: While what's 8elow is 8asically still true in principle, the
     //      format is QUITE DIFFERENT than what's descri8ed here! There
@@ -6351,18 +5909,27 @@ async function main() {
     {
         let error = false;
 
-        writes = buildSteps.flatMap(fn => {
-            const fns = fn({wikiData}) || [];
+        const targets = buildSteps.flatMap(([ flag, pageSpec ]) => {
+            const targets = pageSpec.targets({wikiData});
+            return targets.map(target => ({flag, pageSpec, target}));
+        });
 
-            // Do a quick valid8tion! If one of the writeThingPages functions go
-            // wrong, this will stall out early and tell us which did.
-            if (!Array.isArray(fns)) {
-                logError`${fn.name} didn't return an array!`;
-                error = true;
-            } else if (fns.every(entry => Array.isArray(entry))) {
+        const writeArrays = await progressPromiseAll(`Processing build data to be shared across langauges.`, queue(
+            targets.map(({ flag, pageSpec, target }) => () => {
+                const writes = pageSpec.write(target, {wikiData}) || [];
+
+                // Do a quick valid8tion! If one of the writeThingPages functions go
+                // wrong, this will stall out early and tell us which did.
+
+                if (!Array.isArray(writes)) {
+                    logError`${flag + '.write'} didn't return an array!`;
+                    error = true;
+                    return [];
+                }
+
                 if (!(
-                    fns.every(entry => entry.every(obj => typeof obj === 'object')) &&
-                    fns.every(entry => entry.every(obj => {
+                    writes.every(obj => typeof obj === 'object') &&
+                    writes.every(obj => {
                         const result = validateWriteObject(obj);
                         if (result.error) {
                             logError`Validating write object failed: ${result.error}`;
@@ -6370,24 +5937,23 @@ async function main() {
                         } else {
                             return true;
                         }
-                    }))
+                    })
                 )) {
-                    logError`${fn.name} uses updated format, but entries are invalid!`;
+                    logError`${flag + '.write'} uses updated format, but entries are invalid!`;
                     error = true;
+                    return [];
                 }
 
-                return fns.flatMap(writes => writes);
-            } else if (fns.some(fn => typeof fn !== 'function')) {
-                logError`${fn.name} didn't return all functions or all arrays!`;
-                error = true;
-            }
-
-            return fns;
-        });
+                return writes;
+            }),
+            queueSize
+        ));
 
         if (error) {
             return;
         }
+
+        writes = writeArrays.flatMap(writes => writes);
     }
 
     const pageWrites = writes.filter(({ type }) => type === 'page');
@@ -6395,8 +5961,36 @@ async function main() {
     const redirectWrites = writes.filter(({ type }) => type === 'redirect');
 
     await progressPromiseAll(`Writing data files shared across languages.`, queue(
-        // TODO: This only supports one <>-style argument.
-        dataWrites.map(({path, data}) => () => writeData(path[0], path[1], data())),
+        dataWrites.map(({path, data}) => () => {
+            const bound = {};
+
+            bound.serializeLink = bindOpts(serializeLink, {});
+
+            bound.serializeContribs = bindOpts(serializeContribs, {});
+
+            bound.serializeImagePaths = bindOpts(serializeImagePaths, {
+                thumb
+            });
+
+            bound.serializeCover = bindOpts(serializeCover, {
+                [bindOpts.bindIndex]: 2,
+                serializeImagePaths: bound.serializeImagePaths,
+                urls
+            });
+
+            bound.serializeGroupsForAlbum = bindOpts(serializeGroupsForAlbum, {
+                serializeLink
+            });
+
+            bound.serializeGroupsForTrack = bindOpts(serializeGroupsForTrack, {
+                serializeLink
+            });
+
+            // TODO: This only supports one <>-style argument.
+            return writeData(path[0], path[1], data({
+                ...bound
+            }));
+        }),
         queueSize
     ));
 
@@ -6453,6 +6047,10 @@ async function main() {
                     to
                 });
 
+                bound.fancifyURL = bindOpts(fancifyURL, {
+                    strings
+                });
+
                 bound.getArtistString = bindOpts(getArtistString, {
                     iconifyURL: bound.iconifyURL,
                     link: bound.link,
@@ -6469,6 +6067,12 @@ async function main() {
 
                 bound.getFlashCover = bindOpts(getFlashCover, {
                     to
+                });
+
+                bound.chronologyLinks = bindOpts(chronologyLinks, {
+                    link: bound.link,
+                    strings,
+                    wikiData
                 });
 
                 bound.generateCoverLink = bindOpts(generateCoverLink, {
