@@ -2429,120 +2429,6 @@ function writeMiscellaneousPages({wikiData}) {
     ];
 }
 
-function writeNewsPages({wikiData}) {
-    const { newsData, wikiInfo } = wikiData;
-
-    if (!wikiInfo.features.news) {
-        return;
-    }
-
-    return [
-        writeNewsIndex({wikiData}),
-        ...newsData.map(entry => writeNewsEntryPage(entry, {wikiData}))
-    ];
-}
-
-function writeNewsIndex({wikiData}) {
-    const { newsData } = wikiData;
-
-    const page = {
-        type: 'page',
-        path: ['newsIndex'],
-        page: ({
-            link,
-            strings,
-            transformMultiline
-        }) => ({
-            title: strings('newsIndex.title'),
-
-            main: {
-                content: fixWS`
-                    <div class="long-content news-index">
-                        <h1>${strings('newsIndex.title')}</h1>
-                        ${newsData.map(entry => fixWS`
-                            <article id="${entry.directory}">
-                                <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
-                                ${transformMultiline(entry.bodyShort)}
-                                ${entry.bodyShort !== entry.body && `<p>${link.newsEntry(entry, {
-                                    text: strings('newsIndex.entry.viewRest')
-                                })}</p>`}
-                            </article>
-                        `).join('\n')}
-                    </div>
-                `
-            },
-
-            nav: {simple: true}
-        })
-    };
-
-    return [page];
-}
-
-function writeNewsEntryPage(entry, {wikiData}) {
-    const page = {
-        type: 'page',
-        path: ['newsEntry', entry.directory],
-        page: ({
-            link,
-            strings,
-            transformMultiline,
-        }) => ({
-            title: strings('newsEntryPage.title', {entry: entry.name}),
-
-            main: {
-                content: fixWS`
-                    <div class="long-content">
-                        <h1>${strings('newsEntryPage.title', {entry: entry.name})}</h1>
-                        <p>${strings('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
-                        ${transformMultiline(entry.body)}
-                    </div>
-                `
-            },
-
-            nav: generateNewsEntryNav(entry, {link, strings, wikiData})
-        })
-    };
-
-    return [page];
-}
-
-function generateNewsEntryNav(entry, {link, strings, wikiData}) {
-    const { wikiInfo, newsData } = wikiData;
-
-    // The newsData list is sorted reverse chronologically (newest ones first),
-    // so the way we find next/previous entries is flipped from normal.
-    const previousNextLinks = generatePreviousNextLinks(entry, {
-        link, strings,
-        data: newsData.slice().reverse(),
-        linkKey: 'newsEntry'
-    });
-
-    return {
-        links: [
-            {
-                path: ['localized.home'],
-                title: wikiInfo.shortName
-            },
-            {
-                path: ['localized.newsIndex'],
-                title: strings('newsEntryPage.nav.news')
-            },
-            {
-                html: strings('newsEntryPage.nav.entry', {
-                    date: strings.count.date(entry.date),
-                    entry: link.newsEntry(entry, {class: 'current'})
-                })
-            },
-            previousNextLinks &&
-            {
-                divider: false,
-                html: `(${previousNextLinks})`
-            }
-        ]
-    };
-}
-
 function writeStaticPages({wikiData}) {
     return wikiData.staticPageData.map(staticPage => writeStaticPage(staticPage, {wikiData}));
 }
@@ -4913,71 +4799,101 @@ async function main() {
         : (Object.entries(buildDictionary)
             .filter(([ flag ]) => writeFlags[flag])));
 
-    // *NB: While what's 8elow is 8asically still true in principle, the
-    //      format is QUITE DIFFERENT than what's descri8ed here! There
-    //      will 8e actual document8tion on like, what the return format
-    //      looks like soon, once we implement a 8unch of other pages and
-    //      are certain what they actually, uh, will look like, in the end.*
-    //
-    // The writeThingPages functions don't actually immediately do any file
-    // writing themselves; an initial call will only gather the relevant data
-    // which is *then* used for writing. So the return value is a function
-    // (or an array of functions) which expects {strings}, and *that's* what
-    // we call after -- multiple times, once for each language.
     let writes;
     {
         let error = false;
 
-        const targets = buildSteps.flatMap(([ flag, pageSpec ]) => {
+        const buildStepsWithTargets = buildSteps.map(([ flag, pageSpec ]) => {
+            // Condition not met: skip this build step altogether.
+            if (pageSpec.condition && !pageSpec.condition({wikiData})) {
+                return null;
+            }
+
+            // May still call writeTargetless if present.
+            if (!pageSpec.targets) {
+                return {flag, pageSpec, targets: []};
+            }
+
+            if (!pageSpec.write) {
+                logError`${flag + '.targets'} is specified, but ${flag + '.write'} is missing!`;
+                error = true;
+                return null;
+            }
+
             const targets = pageSpec.targets({wikiData});
-            return targets.map(target => ({flag, pageSpec, target}));
-        });
-
-        const writeArrays = await progressPromiseAll(`Processing build data to be shared across langauges.`, queue(
-            targets.map(({ flag, pageSpec, target }) => () => {
-                const writes = pageSpec.write(target, {wikiData}) || [];
-
-                // Do a quick valid8tion! If one of the writeThingPages functions go
-                // wrong, this will stall out early and tell us which did.
-
-                if (!Array.isArray(writes)) {
-                    logError`${flag + '.write'} didn't return an array!`;
-                    error = true;
-                    return [];
-                }
-
-                if (!(
-                    writes.every(obj => typeof obj === 'object') &&
-                    writes.every(obj => {
-                        const result = validateWriteObject(obj);
-                        if (result.error) {
-                            logError`Validating write object failed: ${result.error}`;
-                            return false;
-                        } else {
-                            return true;
-                        }
-                    })
-                )) {
-                    logError`${flag + '.write'} uses updated format, but entries are invalid!`;
-                    error = true;
-                    return [];
-                }
-
-                return writes;
-            }),
-            queueSize
-        ));
+            return {flag, pageSpec, targets};
+        }).filter(Boolean);
 
         if (error) {
             return;
         }
 
-        writes = writeArrays.flatMap(writes => writes);
+        const validateWrites = (writes, fnName) => {
+            // Do a quick valid8tion! If one of the writeThingPages functions go
+            // wrong, this will stall out early and tell us which did.
+
+            if (!Array.isArray(writes)) {
+                logError`${fnName} didn't return an array!`;
+                error = true;
+                return false;
+            }
+
+            if (!(
+                writes.every(obj => typeof obj === 'object') &&
+                writes.every(obj => {
+                    const result = validateWriteObject(obj);
+                    if (result.error) {
+                        logError`Validating write object failed: ${result.error}`;
+                        return false;
+                    } else {
+                        return true;
+                    }
+                })
+            )) {
+                logError`${fnName} returned invalid entries!`;
+                error = true;
+                return false;
+            }
+
+            return true;
+        };
+
+        writes = buildStepsWithTargets.flatMap(({ flag, pageSpec, targets }) => {
+            const writes = targets.flatMap(target =>
+                pageSpec.write(target, {wikiData}).slice() || []);
+
+            if (!validateWrites(writes, flag + '.write')) {
+                return [];
+            }
+
+            if (pageSpec.writeTargetless) {
+                const writes2 = pageSpec.writeTargetless({wikiData});
+
+                if (!validateWrites(writes2, flag + '.writeTargetless')) {
+                    return [];
+                }
+
+                writes.push(...writes2);
+            }
+
+            return writes;
+        });
+
+        if (error) {
+            return;
+        }
     }
 
     const pageWrites = writes.filter(({ type }) => type === 'page');
     const dataWrites = writes.filter(({ type }) => type === 'data');
     const redirectWrites = writes.filter(({ type }) => type === 'redirect');
+
+    if (writes.length) {
+        logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${dataWrites.length} data, ${redirectWrites.length} redirect)`;
+    } else {
+        logWarn`No writes returned at all, so exiting early. This is probably a bug!`;
+        return;
+    }
 
     await progressPromiseAll(`Writing data files shared across languages.`, queue(
         dataWrites.map(({path, data}) => () => {
