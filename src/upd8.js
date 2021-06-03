@@ -5358,6 +5358,8 @@ async function main() {
     // disa8les the queue feature altogether.
     queueSize = +(miscOptions['queue-size'] ?? 0);
 
+    const buildDictionary = pageSpecs;
+
     // NOT for ena8ling or disa8ling specific features of the site!
     // This is only in charge of what general groups of files to 8uild.
     // They're here to make development quicker when you're only working
@@ -5366,17 +5368,9 @@ async function main() {
     const writeFlags = await parseOptions(process.argv.slice(2), {
         all: {type: 'flag'}, // Defaults to true if none 8elow specified.
 
-        album: {type: 'flag'},
-        artist: {type: 'flag'},
-        commentary: {type: 'flag'},
-        flash: {type: 'flag'},
-        group: {type: 'flag'},
-        list: {type: 'flag'},
-        misc: {type: 'flag'},
-        news: {type: 'flag'},
-        static: {type: 'flag'},
-        tag: {type: 'flag'},
-        track: {type: 'flag'},
+        // Kinda a hack t8h!
+        ...Object.fromEntries(Object.keys(buildDictionary)
+            .map(key => [key, {type: 'flag'}])),
 
         [parseOptions.handleUnknown]: () => {}
     });
@@ -5387,24 +5381,6 @@ async function main() {
 
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
-
-    /*
-    const buildDictionary = {
-        misc: writeMiscellaneousPages,
-        news: writeNewsPages,
-        list: writeListingPages,
-        tag: writeTagPages,
-        commentary: writeCommentaryPages,
-        static: writeStaticPages,
-        group: writeGroupPages,
-        album: writeAlbumPages,
-        track: writeTrackPages,
-        artist: writeArtistPages,
-        flash: writeFlashPages
-    };
-    */
-
-    const buildDictionary = pageSpecs;
 
     const buildSteps = (writeAll
         ? Object.entries(buildDictionary)
