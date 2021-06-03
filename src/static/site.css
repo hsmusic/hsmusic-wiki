@@ -40,8 +40,9 @@ body::before {
 }
 
 #page-container > * {
-    margin-left: 15px;
-    margin-right: 15px;
+    --margin: 15px; /* necessary for size calculations due to CSS suckery */
+    margin-left: var(--margin);
+    margin-right: var(--margin);
 }
 
 #banner {
@@ -909,6 +910,10 @@ li > ul {
 
     #content {
         width: 100%;
+    }
+
+    #page-container > #content {
+        width: calc(100% - calc(var(--margin) * 2));
     }
 
     #cover-art-container {
