@@ -1978,13 +1978,13 @@ writePage.html = (pageFn, {
     const layoutHTML = [
         navHTML,
         banner.position === 'top' && bannerHTML,
-        (sidebarLeftHTML || sidebarRightHTML) ? fixWS`
-            <div ${classes('layout-columns', !collapseSidebars && 'vertical-when-thin')}>
-                ${sidebarLeftHTML}
-                ${mainHTML}
-                ${sidebarRightHTML}
-            </div>
-        ` : mainHTML,
+        html.tag('div',
+            {class: ['layout-columns', !collapseSidebars && 'vertical-when-thin']},
+            [
+                sidebarLeftHTML,
+                mainHTML,
+                sidebarRightHTML
+            ]),
         banner.position === 'bottom' && bannerHTML,
         footerHTML
     ].filter(Boolean).join('\n');
