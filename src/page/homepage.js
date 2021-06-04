@@ -4,10 +4,6 @@
 
 import fixWS from 'fix-whitespace';
 
-import {
-    getLinkThemeString
-} from '../util/colors.js';
-
 import find from '../util/find.js';
 
 import * as html from '../util/html.js';
@@ -27,6 +23,7 @@ export function writeTargetless({wikiData}) {
         path: ['home'],
         page: ({
             getAlbumGridHTML,
+            getLinkThemeString,
             link,
             strings,
             to,

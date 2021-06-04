@@ -46,44 +46,45 @@ export function write(listing, {wikiData}) {
     const page = {
         type: 'page',
         path: ['listing', listing.directory],
-        page: ({
-            link,
-            strings
-        }) => ({
-            title: listing.title({strings}),
+        page: opts => {
+            const { link, strings } = opts;
 
-            main: {
-                content: fixWS`
-                    <h1>${listing.title({strings})}</h1>
-                    ${listing.html && (listing.data
-                        ? listing.html(data, {link, strings})
-                        : listing.html({link, strings}))}
-                    ${listing.row && fixWS`
-                        <ul>
-                            ${(data
-                                .map(item => listing.row(item, {link, strings}))
-                                .map(row => `<li>${row}</li>`)
-                                .join('\n'))}
-                        </ul>
-                    `}
-                `
-            },
+            return {
+                title: listing.title({strings}),
 
-            sidebarLeft: {
-                content: generateSidebarForListings(listing, {link, strings, wikiData})
-            },
+                main: {
+                    content: fixWS`
+                        <h1>${listing.title({strings})}</h1>
+                        ${listing.html && (listing.data
+                            ? listing.html(data, opts)
+                            : listing.html(opts))}
+                        ${listing.row && fixWS`
+                            <ul>
+                                ${(data
+                                    .map(item => listing.row(item, opts))
+                                    .map(row => `<li>${row}</li>`)
+                                    .join('\n'))}
+                            </ul>
+                        `}
+                    `
+                },
 
-            nav: {
-                links: [
-                    {toHome: true},
-                    {
-                        path: ['localized.listingIndex'],
-                        title: strings('listingIndex.title')
-                    },
-                    {toCurrentPage: true}
-                ]
-            }
-        })
+                sidebarLeft: {
+                    content: generateSidebarForListings(listing, {link, strings, wikiData})
+                },
+
+                nav: {
+                    links: [
+                        {toHome: true},
+                        {
+                            path: ['localized.listingIndex'],
+                            title: strings('listingIndex.title')
+                        },
+                        {toCurrentPage: true}
+                    ]
+                }
+            };
+        }
     };
 
     return [page];

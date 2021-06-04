@@ -8,11 +8,6 @@ import {
     UNRELEASED_TRACKS_DIRECTORY
 } from '../util/magic-constants.js';
 
-import {
-    getLinkThemeString,
-    getThemeString
-} from '../util/colors.js';
-
 import * as html from '../util/html.js';
 
 import {
@@ -44,6 +39,8 @@ export function write(group, {wikiData}) {
         page: ({
             generateInfoGalleryLinks,
             generatePreviousNextLinks,
+            getLinkThemeString,
+            getThemeString,
             fancifyURL,
             link,
             strings,
@@ -92,7 +89,13 @@ export function write(group, {wikiData}) {
                 `
             },
 
-            sidebarLeft: generateGroupSidebar(group, false, {link, strings, wikiData}),
+            sidebarLeft: generateGroupSidebar(group, false, {
+                getLinkThemeString,
+                link,
+                strings,
+                wikiData
+            }),
+
             nav: generateGroupNav(group, false, {
                 generateInfoGalleryLinks,
                 generatePreviousNextLinks,
@@ -110,6 +113,8 @@ export function write(group, {wikiData}) {
             generateInfoGalleryLinks,
             generatePreviousNextLinks,
             getAlbumGridHTML,
+            getLinkThemeString,
+            getThemeString,
             link,
             strings
         }) => ({
@@ -144,7 +149,13 @@ export function write(group, {wikiData}) {
                 `
             },
 
-            sidebarLeft: generateGroupSidebar(group, true, {link, strings, wikiData}),
+            sidebarLeft: generateGroupSidebar(group, true, {
+                getLinkThemeString,
+                link,
+                strings,
+                wikiData
+            }),
+
             nav: generateGroupNav(group, true, {
                 generateInfoGalleryLinks,
                 generatePreviousNextLinks,
@@ -160,7 +171,12 @@ export function write(group, {wikiData}) {
 
 // Utility functions
 
-function generateGroupSidebar(currentGroup, isGallery, {link, strings, wikiData}) {
+function generateGroupSidebar(currentGroup, isGallery, {
+    getLinkThemeString,
+    link,
+    strings,
+    wikiData
+}) {
     const { groupCategoryData, wikiInfo } = wikiData;
 
     if (!wikiInfo.features.groupUI) {

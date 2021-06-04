@@ -5,11 +5,6 @@
 import fixWS from 'fix-whitespace';
 
 import {
-    getLinkThemeString,
-    getThemeString
-} from '../util/colors.js';
-
-import {
     filterAlbumsByCommentary
 } from '../util/wiki-data.js';
 
@@ -34,6 +29,8 @@ export function write(album, {wikiData}) {
         path: ['albumCommentary', album.directory],
         page: ({
             getAlbumStylesheet,
+            getLinkThemeString,
+            getThemeString,
             link,
             strings,
             to,

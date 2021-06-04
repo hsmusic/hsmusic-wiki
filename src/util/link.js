@@ -10,7 +10,14 @@
 // gener8ting just a8out any link on the site.
 
 import * as html from './html.js'
-import { getLinkThemeString } from './colors.js'
+import { getColors } from './colors.js'
+
+export function getLinkThemeString(color) {
+    if (!color) return '';
+
+    const { primary, dim } = getColors(color);
+    return `--primary-color: ${primary}; --dim-color: ${dim}`;
+}
 
 const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {

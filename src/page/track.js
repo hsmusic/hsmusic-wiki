@@ -10,10 +10,6 @@ import {
     generateAlbumSidebar
 } from './album.js';
 
-import {
-    getThemeString
-} from '../util/colors.js';
-
 import * as html from '../util/html.js';
 
 import {
@@ -134,6 +130,8 @@ export function write(track, {wikiData}) {
             generatePreviousNextLinks,
             getAlbumStylesheet,
             getArtistString,
+            getLinkThemeString,
+            getThemeString,
             getTrackCover,
             link,
             strings,
@@ -284,6 +282,7 @@ export function write(track, {wikiData}) {
 
                 sidebarLeft: generateAlbumSidebar(album, track, {
                     fancifyURL,
+                    getLinkThemeString,
                     link,
                     strings,
                     transformMultiline,

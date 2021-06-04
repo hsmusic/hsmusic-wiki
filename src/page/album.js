@@ -4,12 +4,11 @@
 
 import fixWS from 'fix-whitespace';
 
-import {
-    getLinkThemeString,
-    getThemeString
-} from '../util/colors.js';
-
 import * as html from '../util/html.js';
+
+import {
+    bindOpts
+} from '../util/sugar.js';
 
 import {
     getAlbumCover,
@@ -26,7 +25,12 @@ export function targets({wikiData}) {
 export function write(album, {wikiData}) {
     const { wikiInfo } = wikiData;
 
-    const trackToListItem = (track, {getArtistString, link, strings}) => {
+    const unbound_trackToListItem = (track, {
+        getArtistString,
+        getLinkThemeString,
+        link,
+        strings
+    }) => {
         const itemOpts = {
             duration: strings.count.duration(track.duration),
             track: link.track(track)
@@ -96,140 +100,152 @@ export function write(album, {wikiData}) {
             generateCoverLink,
             getAlbumStylesheet,
             getArtistString,
+            getLinkThemeString,
+            getThemeString,
             link,
             strings,
             transformMultiline
-        }) => ({
-            title: strings('albumPage.title', {album: album.name}),
-            stylesheet: getAlbumStylesheet(album),
-            theme: getThemeString(album.color, [
-                `--album-directory: ${album.directory}`
-            ]),
-
-            banner: album.bannerArtists && {
-                dimensions: album.bannerDimensions,
-                path: ['media.albumBanner', album.directory],
-                alt: strings('misc.alt.albumBanner'),
-                position: 'top'
-            },
-
-            main: {
-                content: fixWS`
-                    ${generateCoverLink({
-                        path: ['media.albumCover', album.directory],
-                        alt: strings('misc.alt.albumCover'),
-                        tags: album.artTags
-                    })}
-                    <h1>${strings('albumPage.title', {album: album.name})}</h1>
-                    <p>
-                        ${[
-                            album.artists && strings('releaseInfo.by', {
-                                artists: getArtistString(album.artists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.coverArtists && strings('releaseInfo.coverArtBy', {
-                                artists: getArtistString(album.coverArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
-                                artists: getArtistString(album.wallpaperArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            album.bannerArtists && strings('releaseInfo.bannerArtBy', {
-                                artists: getArtistString(album.bannerArtists, {
-                                    showContrib: true,
-                                    showIcons: true
-                                })
-                            }),
-                            strings('releaseInfo.released', {
-                                date: strings.count.date(album.date)
-                            }),
-                            +album.coverArtDate !== +album.date && strings('releaseInfo.artReleased', {
-                                date: strings.count.date(album.coverArtDate)
-                            }),
-                            strings('releaseInfo.duration', {
-                                duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
-                            })
-                        ].filter(Boolean).join('<br>\n')}
-                    </p>
-                    ${commentaryEntries && `<p>${
-                        strings('releaseInfo.viewCommentary', {
-                            link: link.albumCommentary(album, {
-                                text: strings('releaseInfo.viewCommentary.link')
-                            })
-                        })
-                    }</p>`}
-                    ${album.urls.length && `<p>${
-                        strings('releaseInfo.listenOn', {
-                            links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true})))
-                        })
-                    }</p>`}
-                    ${album.trackGroups ? fixWS`
-                        <dl class="album-group-list">
-                            ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
-                                <dt>${
-                                    strings('trackList.group', {
-                                        duration: strings.count.duration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
-                                        group: name
-                                    })
-                                }</dt>
-                                <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
-                                    ${tracks.map(t => trackToListItem(t, {getArtistString, link, strings})).join('\n')}
-                                </${listTag}></dd>
-                            `).join('\n')}
-                        </dl>
-                    ` : fixWS`
-                        <${listTag}>
-                            ${album.tracks.map(t => trackToListItem(t, {getArtistString, link, strings})).join('\n')}
-                        </${listTag}>
-                    `}
-                    <p>
-                        ${[
-                            strings('releaseInfo.addedToWiki', {
-                                date: strings.count.date(album.dateAdded)
-                            })
-                        ].filter(Boolean).join('<br>\n')}
-                    </p>
-                    ${album.commentary && fixWS`
-                        <p>${strings('releaseInfo.artistCommentary')}</p>
-                        <blockquote>
-                            ${transformMultiline(album.commentary)}
-                        </blockquote>
-                    `}
-                `
-            },
-
-            sidebarLeft: generateAlbumSidebar(album, null, {
-                fancifyURL,
+        }) => {
+            const trackToListItem = bindOpts(unbound_trackToListItem, {
+                getArtistString,
+                getLinkThemeString,
                 link,
-                strings,
-                transformMultiline,
-                wikiData
-            }),
+                strings
+            });
 
-            nav: {
-                links: [
-                    {toHome: true},
-                    {
-                        html: strings('albumPage.nav.album', {
-                            album: link.album(album, {class: 'current'})
-                        })
-                    },
-                    album.tracks.length > 1 &&
-                    {
-                        divider: false,
-                        html: generateAlbumNavLinks(album, null, {strings})
-                    }
-                ],
-                content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
-            }
-        })
+            return {
+                title: strings('albumPage.title', {album: album.name}),
+                stylesheet: getAlbumStylesheet(album),
+                theme: getThemeString(album.color, [
+                    `--album-directory: ${album.directory}`
+                ]),
+
+                banner: album.bannerArtists && {
+                    dimensions: album.bannerDimensions,
+                    path: ['media.albumBanner', album.directory],
+                    alt: strings('misc.alt.albumBanner'),
+                    position: 'top'
+                },
+
+                main: {
+                    content: fixWS`
+                        ${generateCoverLink({
+                            path: ['media.albumCover', album.directory],
+                            alt: strings('misc.alt.albumCover'),
+                            tags: album.artTags
+                        })}
+                        <h1>${strings('albumPage.title', {album: album.name})}</h1>
+                        <p>
+                            ${[
+                                album.artists && strings('releaseInfo.by', {
+                                    artists: getArtistString(album.artists, {
+                                        showContrib: true,
+                                        showIcons: true
+                                    })
+                                }),
+                                album.coverArtists && strings('releaseInfo.coverArtBy', {
+                                    artists: getArtistString(album.coverArtists, {
+                                        showContrib: true,
+                                        showIcons: true
+                                    })
+                                }),
+                                album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
+                                    artists: getArtistString(album.wallpaperArtists, {
+                                        showContrib: true,
+                                        showIcons: true
+                                    })
+                                }),
+                                album.bannerArtists && strings('releaseInfo.bannerArtBy', {
+                                    artists: getArtistString(album.bannerArtists, {
+                                        showContrib: true,
+                                        showIcons: true
+                                    })
+                                }),
+                                strings('releaseInfo.released', {
+                                    date: strings.count.date(album.date)
+                                }),
+                                +album.coverArtDate !== +album.date && strings('releaseInfo.artReleased', {
+                                    date: strings.count.date(album.coverArtDate)
+                                }),
+                                strings('releaseInfo.duration', {
+                                    duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
+                                })
+                            ].filter(Boolean).join('<br>\n')}
+                        </p>
+                        ${commentaryEntries && `<p>${
+                            strings('releaseInfo.viewCommentary', {
+                                link: link.albumCommentary(album, {
+                                    text: strings('releaseInfo.viewCommentary.link')
+                                })
+                            })
+                        }</p>`}
+                        ${album.urls.length && `<p>${
+                            strings('releaseInfo.listenOn', {
+                                links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true})))
+                            })
+                        }</p>`}
+                        ${album.trackGroups ? fixWS`
+                            <dl class="album-group-list">
+                                ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
+                                    <dt>${
+                                        strings('trackList.group', {
+                                            duration: strings.count.duration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
+                                            group: name
+                                        })
+                                    }</dt>
+                                    <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
+                                        ${tracks.map(trackToListItem).join('\n')}
+                                    </${listTag}></dd>
+                                `).join('\n')}
+                            </dl>
+                        ` : fixWS`
+                            <${listTag}>
+                                ${album.tracks.map(trackToListItem).join('\n')}
+                            </${listTag}>
+                        `}
+                        <p>
+                            ${[
+                                strings('releaseInfo.addedToWiki', {
+                                    date: strings.count.date(album.dateAdded)
+                                })
+                            ].filter(Boolean).join('<br>\n')}
+                        </p>
+                        ${album.commentary && fixWS`
+                            <p>${strings('releaseInfo.artistCommentary')}</p>
+                            <blockquote>
+                                ${transformMultiline(album.commentary)}
+                            </blockquote>
+                        `}
+                    `
+                },
+
+                sidebarLeft: generateAlbumSidebar(album, null, {
+                    fancifyURL,
+                    getLinkThemeString,
+                    link,
+                    strings,
+                    transformMultiline,
+                    wikiData
+                }),
+
+                nav: {
+                    links: [
+                        {toHome: true},
+                        {
+                            html: strings('albumPage.nav.album', {
+                                album: link.album(album, {class: 'current'})
+                            })
+                        },
+                        album.tracks.length > 1 &&
+                        {
+                            divider: false,
+                            html: generateAlbumNavLinks(album, null, {strings})
+                        }
+                    ],
+                    content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
+                }
+            };
+        }
     };
 
     return [page, data];
@@ -239,6 +255,7 @@ export function write(album, {wikiData}) {
 
 export function generateAlbumSidebar(album, currentTrack, {
     fancifyURL,
+    getLinkThemeString,
     link,
     strings,
     transformMultiline,

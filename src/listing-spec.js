@@ -1,10 +1,6 @@
 import fixWS from 'fix-whitespace';
 
 import {
-    getLinkThemeString
-} from './util/colors.js';
-
-import {
     UNRELEASED_TRACKS_DIRECTORY
 } from './util/magic-constants.js';
 
@@ -757,7 +753,10 @@ const listingSpec = [
             fandomAlbumData: wikiData.fandomAlbumData
         }),
 
-        html: ({officialAlbumData, fandomAlbumData}, {strings}) => fixWS`
+        html: ({officialAlbumData, fandomAlbumData}, {
+            getLinkThemeString,
+            strings
+        }) => fixWS`
             <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
             <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
             <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>

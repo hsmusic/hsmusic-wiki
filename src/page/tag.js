@@ -4,10 +4,6 @@
 
 import fixWS from 'fix-whitespace';
 
-import {
-    getThemeString
-} from '../util/colors.js';
-
 // Page exports
 
 export function condition({wikiData}) {
@@ -28,6 +24,7 @@ export function write(tag, {wikiData}) {
         page: ({
             getAlbumCover,
             getGridHTML,
+            getThemeString,
             getTrackCover,
             link,
             strings,

@@ -19,31 +19,3 @@ export function getColors(primary) {
 
     return {primary, dim, bg};
 }
-
-export function getLinkThemeString(color) {
-    if (!color) return '';
-
-    const { primary, dim } = getColors(color);
-    return `--primary-color: ${primary}; --dim-color: ${dim}`;
-}
-
-export function getThemeString(color, additionalVariables = []) {
-    if (!color) return '';
-
-    const { primary, dim, bg } = getColors(color);
-
-    const variables = [
-        `--primary-color: ${primary}`,
-        `--dim-color: ${dim}`,
-        `--bg-color: ${bg}`,
-        ...additionalVariables
-    ].filter(Boolean);
-
-    if (!variables.length) return '';
-
-    return (
-        `:root {\n` +
-        variables.map(line => `    ` + line + ';\n').join('') +
-        `}`
-    );
-}

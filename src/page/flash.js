@@ -4,11 +4,6 @@
 
 import fixWS from 'fix-whitespace';
 
-import {
-    getLinkThemeString,
-    getThemeString
-} from '../util/colors.js';
-
 import * as html from '../util/html.js';
 
 import {
@@ -36,6 +31,7 @@ export function write(flash, {wikiData}) {
             generatePreviousNextLinks,
             getArtistString,
             getFlashCover,
+            getThemeString,
             link,
             strings,
             transformInline
@@ -118,6 +114,7 @@ export function writeTargetless({wikiData}) {
         path: ['flashIndex'],
         page: ({
             getFlashGridHTML,
+            getLinkThemeString,
             link,
             strings
         }) => ({

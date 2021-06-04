@@ -116,7 +116,25 @@ import * as pageSpecs from './page/index.js';
 
 import find from './util/find.js';
 import * as html from './util/html.js';
-import unbound_link from './util/link.js';
+import unbound_link, {getLinkThemeString} from './util/link.js';
+
+import {
+    fancifyFlashURL,
+    fancifyURL,
+    generateChronologyLinks,
+    generateCoverLink,
+    generateInfoGalleryLinks,
+    generatePreviousNextLinks,
+    getAlbumGridHTML,
+    getAlbumStylesheet,
+    getArtistString,
+    getFlashGridHTML,
+    getGridHTML,
+    getRevealStringFromTags,
+    getRevealStringFromWarnings,
+    getThemeString,
+    iconifyURL
+} from './misc-templates.js';
 
 import {
     decorateTime,
@@ -126,11 +144,6 @@ import {
     parseOptions,
     progressPromiseAll
 } from './util/cli.js';
-
-import {
-    getLinkThemeString,
-    getThemeString
-} from './util/colors.js';
 
 import {
     validateReplacerSpec,
@@ -1761,51 +1774,43 @@ writePage.html = (pageFn, {
 
     const collapseSidebars = (sidebarLeft.collapse !== false) && (sidebarRight.collapse !== false);
 
-    const mainHTML = main.content && fixWS`
-        <main id="content" ${classes(...main.classes || [])}>
-            ${main.content}
-        </main>
-    `;
+    const mainHTML = main.content && html.tag('main', {
+        id: 'content',
+        class: main.classes
+    }, main.content);
 
-    const footerHTML = footer.content && fixWS`
-        <footer id="footer" ${classes(...footer.classes || [])}>
-            ${footer.content}
-        </footer>
-    `;
+    const footerHTML = footer.content && html.tag('footer', {
+        id: 'footer',
+        class: footer.classes
+    }, footer.content);
 
     const generateSidebarHTML = (id, {
         content,
         multiple,
-        classes: sidebarClasses = [],
+        classes,
         collapse = true,
         wide = false
-    }) => (content ? fixWS`
-        <div id="${id}" ${classes(
-            'sidebar-column',
-            'sidebar',
-            wide && 'wide',
-            !collapse && 'no-hide',
-            ...sidebarClasses
-        )}>
-            ${content}
-        </div>
-    ` : multiple ? fixWS`
-        <div id="${id}" ${classes(
-            'sidebar-column',
-            'sidebar-multiple',
-            wide && 'wide',
-            !collapse && 'no-hide'
-        )}>
-            ${multiple.map(content => fixWS`
-                <div ${classes(
-                    'sidebar',
-                    ...sidebarClasses
-                )}>
-                    ${content}
-                </div>
-            `).join('\n')}
-        </div>
-    ` : '');
+    }) => (content
+        ? html.tag('div',
+            {id, class: [
+                'sidebar-column',
+                'sidebar',
+                wide && 'wide',
+                !collapse && 'no-hide',
+                ...classes
+            ]},
+            content)
+        : multiple ? html.tag('div',
+            {id, class: [
+                'sidebar-column',
+                'sidebar-multiple',
+                wide && 'wide',
+                !collapse && 'no-hide'
+            ]},
+            multiple.map(content => html.tag('div',
+                {class: ['sidebar', ...classes]},
+                content)))
+        : '');
 
     const sidebarLeftHTML = generateSidebarHTML('sidebar-left', sidebarLeft);
     const sidebarRightHTML = generateSidebarHTML('sidebar-right', sidebarRight);
@@ -2012,58 +2017,6 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
     };
 };
 
-function getGridHTML({
-    strings,
-    entries,
-    srcFn,
-    hrefFn,
-    altFn = () => '',
-    detailsFn = null,
-    lazy = true
-}) {
-    return entries.map(({ large, item }, i) => fixWS`
-        <a ${classes('grid-item', 'box', large && 'large-grid-item')} href="${hrefFn(item)}" style="${getLinkThemeString(item.color)}">
-            ${img({
-                src: srcFn(item),
-                alt: altFn(item),
-                thumb: 'small',
-                lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
-                square: true,
-                reveal: getRevealStringFromTags(item.artTags, {strings})
-            })}
-            <span>${item.name}</span>
-            ${detailsFn && `<span>${detailsFn(item)}</span>`}
-        </a>
-    `).join('\n');
-}
-
-function getAlbumGridHTML({
-    getAlbumCover, getGridHTML, strings, to,
-    details = false,
-    ...props
-}) {
-    return getGridHTML({
-        srcFn: getAlbumCover,
-        hrefFn: album => to('localized.album', album.directory),
-        detailsFn: details && (album => strings('misc.albumGridDetails', {
-            tracks: strings.count.tracks(album.tracks.length, {unit: true}),
-            time: strings.count.duration(getTotalDuration(album.tracks))
-        })),
-        ...props
-    });
-}
-
-function getFlashGridHTML({
-    getFlashCover, getGridHTML, to,
-    ...props
-}) {
-    return getGridHTML({
-        srcFn: getFlashCover,
-        hrefFn: flash => to('localized.flash', flash.directory),
-        ...props
-    });
-}
-
 function writeSymlinks() {
     return progressPromiseAll('Writing site symlinks.', [
         link(path.join(__dirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
@@ -2115,72 +2068,6 @@ function writeSharedFilesAndPages({strings, wikiData}) {
     ].filter(Boolean));
 }
 
-function getRevealStringFromWarnings(warnings, {strings}) {
-    return strings('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
-}
-
-function getRevealStringFromTags(tags, {strings}) {
-    return tags && tags.some(tag => tag.isCW) && (
-        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isCW).map(tag => tag.name)), {strings}));
-}
-
-function generateCoverLink({
-    link, strings, to, wikiData,
-    src,
-    path,
-    alt,
-    tags = []
-}) {
-    const { wikiInfo } = wikiData;
-
-    if (!src && path) {
-        src = to(...path);
-    }
-
-    if (!src) {
-        throw new Error(`Expected src or path`);
-    }
-
-    return fixWS`
-        <div id="cover-art-container">
-            ${img({
-                src,
-                alt,
-                thumb: 'medium',
-                id: 'cover-art',
-                link: true,
-                square: true,
-                reveal: getRevealStringFromTags(tags, {strings})
-            })}
-            ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
-                <p class="tags">
-                    ${strings('releaseInfo.artTags')}
-                    ${(tags
-                        .filter(tag => !tag.isCW)
-                        .map(link.tag)
-                        .join(',\n'))}
-                </p>
-            `}
-        </div>
-    `;
-}
-
-function getAlbumStylesheet(album, {to}) {
-    return [
-        album.wallpaperArtists && fixWS`
-            body::before {
-                background-image: url("${to('media.albumWallpaper', album.directory)}");
-                ${album.wallpaperStyle}
-            }
-        `,
-        album.bannerStyle && fixWS`
-            #banner img {
-                ${album.bannerStyle}
-            }
-        `
-    ].filter(Boolean).join('\n');
-}
-
 function generateRedirectPage(title, target, {strings}) {
     return fixWS`
         <!DOCTYPE html>
@@ -2204,203 +2091,6 @@ function generateRedirectPage(title, target, {strings}) {
     `;
 }
 
-function getArtistString(artists, {
-    iconifyURL, link, strings,
-    showIcons = false,
-    showContrib = false
-}) {
-    return strings.list.and(artists.map(({ who, what }) => {
-        const { urls, directory, name } = who;
-        return [
-            link.artist(who),
-            showContrib && what && `(${what})`,
-            showIcons && urls.length && `<span class="icons">(${
-                strings.list.unit(urls.map(url => iconifyURL(url, {strings})))
-            })</span>`
-        ].filter(Boolean).join(' ');
-    }));
-}
-
-function getFlashDirectory(flash) {
-    // const kebab = getKebabCase(flash.name.replace('[S] ', ''));
-    // return flash.page + (kebab ? '-' + kebab : '');
-    // return '' + flash.page;
-    return '' + flash.directory;
-}
-
-function getTagDirectory({name}) {
-    return getKebabCase(name);
-}
-
-function fancifyURL(url, {strings, album = false} = {}) {
-    const domain = new URL(url).hostname;
-    return fixWS`<a href="${url}" class="nowrap">${
-        domain.includes('bandcamp.com') ? strings('misc.external.bandcamp') :
-        [
-            'music.solatrux.com'
-        ].includes(domain) ? strings('misc.external.bandcamp.domain', {domain}) :
-        [
-            'types.pl'
-        ].includes(domain) ? strings('misc.external.mastodon.domain', {domain}) :
-        domain.includes('youtu') ? (album
-            ? (url.includes('list=')
-                ? strings('misc.external.youtube.playlist')
-                : strings('misc.external.youtube.fullAlbum'))
-            : strings('misc.external.youtube')) :
-        domain.includes('soundcloud') ? strings('misc.external.soundcloud') :
-        domain.includes('tumblr.com') ? strings('misc.external.tumblr') :
-        domain.includes('twitter.com') ? strings('misc.external.twitter') :
-        domain.includes('deviantart.com') ? strings('misc.external.deviantart') :
-        domain.includes('wikipedia.org') ? strings('misc.external.wikipedia') :
-        domain.includes('poetryfoundation.org') ? strings('misc.external.poetryFoundation') :
-        domain.includes('instagram.com') ? strings('misc.external.instagram') :
-        domain.includes('patreon.com') ? strings('misc.external.patreon') :
-        domain
-    }</a>`;
-}
-
-function fancifyFlashURL(url, flash, {strings}) {
-    const link = fancifyURL(url, {strings});
-    return `<span class="nowrap">${
-        url.includes('homestuck.com') ? (isNaN(Number(flash.page))
-            ? strings('misc.external.flash.homestuck.secret', {link})
-            : strings('misc.external.flash.homestuck.page', {link, page: flash.page})) :
-        url.includes('bgreco.net') ? strings('misc.external.flash.bgreco', {link}) :
-        url.includes('youtu') ? strings('misc.external.flash.youtube', {link}) :
-        link
-    }</span>`;
-}
-
-function iconifyURL(url, {strings, to}) {
-    const domain = new URL(url).hostname;
-    const [ id, msg ] = (
-        domain.includes('bandcamp.com') ? ['bandcamp', strings('misc.external.bandcamp')] :
-        (
-            domain.includes('music.solatrus.com')
-        ) ? ['bandcamp', strings('misc.external.bandcamp.domain', {domain})] :
-        (
-            domain.includes('types.pl')
-        ) ? ['mastodon', strings('misc.external.mastodon.domain', {domain})] :
-        domain.includes('youtu') ? ['youtube', strings('misc.external.youtube')] :
-        domain.includes('soundcloud') ? ['soundcloud', strings('misc.external.soundcloud')] :
-        domain.includes('tumblr.com') ? ['tumblr', strings('misc.external.tumblr')] :
-        domain.includes('twitter.com') ? ['twitter', strings('misc.external.twitter')] :
-        domain.includes('deviantart.com') ? ['deviantart', strings('misc.external.deviantart')] :
-        domain.includes('instagram.com') ? ['instagram', strings('misc.external.bandcamp')] :
-        ['globe', strings('misc.external.domain', {domain})]
-    );
-    return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to('shared.staticFile', `icons.svg#icon-${id}`)}"></use></svg></a>`;
-}
-
-function generateChronologyLinks(currentThing, {
-    contribKey,
-    getThings,
-    headingString,
-    link,
-    strings,
-    wikiData
-}) {
-    const { albumData } = wikiData;
-
-    const contributions = currentThing[contribKey];
-    if (!contributions) {
-        return '';
-    }
-
-    if (contributions.length > 8) {
-        return `<div class="chronology">${strings('misc.chronology.seeArtistPages')}</div>`;
-    }
-
-    return contributions.map(({ who: artist }) => {
-        const things = sortByDate(unique(getThings(artist)));
-        const releasedThings = things.filter(thing => {
-            const album = albumData.includes(thing) ? thing : thing.album;
-            return !(album && album.directory === UNRELEASED_TRACKS_DIRECTORY);
-        });
-        const index = releasedThings.indexOf(currentThing);
-
-        if (index === -1) return '';
-
-        // TODO: This can pro8a8ly 8e made to use generatePreviousNextLinks?
-        // We'd need to make generatePreviousNextLinks use toAnythingMan tho.
-        const previous = releasedThings[index - 1];
-        const next = releasedThings[index + 1];
-        const parts = [
-            previous && linkAnythingMan(previous, {
-                link, wikiData,
-                color: false,
-                text: strings('misc.nav.previous')
-            }),
-            next && linkAnythingMan(next, {
-                link, wikiData,
-                color: false,
-                text: strings('misc.nav.next')
-            })
-        ].filter(Boolean);
-
-        const stringOpts = {
-            index: strings.count.index(index + 1, {strings}),
-            artist: link.artist(artist)
-        };
-
-        return fixWS`
-            <div class="chronology">
-                <span class="heading">${strings(headingString, stringOpts)}</span>
-                ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>`}
-            </div>
-        `;
-    }).filter(Boolean).join('\n');
-}
-
-function generateInfoGalleryLinks(currentThing, isGallery, {
-    link, strings,
-    linkKeyGallery,
-    linkKeyInfo
-}) {
-    return [
-        link[linkKeyInfo](currentThing, {
-            class: isGallery ? '' : 'current',
-            text: strings('misc.nav.info')
-        }),
-        link[linkKeyGallery](currentThing, {
-            class: isGallery ? 'current' : '',
-            text: strings('misc.nav.gallery')
-        })
-    ].join(', ');
-}
-
-function generatePreviousNextLinks(current, {
-    data,
-    link,
-    linkKey,
-    strings
-}) {
-    const linkFn = link[linkKey];
-
-    const index = data.indexOf(current);
-    const previous = data[index - 1];
-    const next = data[index + 1];
-
-    return [
-        previous && linkFn(previous, {
-            attributes: {
-                id: 'previous-button',
-                title: previous.name
-            },
-            text: strings('misc.nav.previous'),
-            color: false
-        }),
-        next && linkFn(next, {
-            attributes: {
-                id: 'next-button',
-                title: next.name
-            },
-            text: strings('misc.nav.next'),
-            color: false
-        })
-    ].filter(Boolean).join(', ');
-}
-
 // RIP toAnythingMan (previously getHrefOfAnythingMan), 2020-05-25<>2021-05-14.
 // ........Yet the function 8reathes life anew as linkAnythingMan! ::::)
 function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
@@ -2410,11 +2100,6 @@ function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
         wikiData.flashData?.includes(anythingMan) ? link.flash(anythingMan, opts) :
         'idk bud'
     )
-}
-
-function classes(...args) {
-    const values = args.filter(Boolean);
-    return `class="${values.join(' ')}"`;
 }
 
 async function processLanguageFile(file, defaultStrings = null) {
@@ -3255,6 +2940,11 @@ async function main() {
                 bound.link = withEntries(unbound_link, entries => entries
                     .map(([ key, fn ]) => [key, bindOpts(fn, {to})]));
 
+                bound.linkAnythingMan = bindOpts(linkAnythingMan, {
+                    link: bound.link,
+                    wikiData
+                });
+
                 bound.parseAttributes = bindOpts(parseAttributes, {
                     to
                 });
@@ -3291,6 +2981,10 @@ async function main() {
                     strings
                 });
 
+                bound.getLinkThemeString = getLinkThemeString;
+
+                bound.getThemeString = getThemeString;
+
                 bound.getArtistString = bindOpts(getArtistString, {
                     iconifyURL: bound.iconifyURL,
                     link: bound.link,
@@ -3311,12 +3005,14 @@ async function main() {
 
                 bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
                     link: bound.link,
+                    linkAnythingMan: bound.linkAnythingMan,
                     strings,
                     wikiData
                 });
 
                 bound.generateCoverLink = bindOpts(generateCoverLink, {
                     [bindOpts.bindIndex]: 0,
+                    img,
                     link: bound.link,
                     strings,
                     to,
@@ -3336,6 +3032,8 @@ async function main() {
 
                 bound.getGridHTML = bindOpts(getGridHTML, {
                     [bindOpts.bindIndex]: 0,
+                    getLinkThemeString,
+                    img,
                     strings
                 });
 
@@ -3352,6 +3050,14 @@ async function main() {
                     getFlashCover: bound.getFlashCover,
                     getGridHTML: bound.getGridHTML,
                     to
+                });
+
+                bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
+                    strings
+                });
+
+                bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
+                    strings
                 });
 
                 bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
