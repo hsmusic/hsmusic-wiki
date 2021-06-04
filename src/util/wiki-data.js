@@ -93,6 +93,10 @@ export function sortByArtDate(data) {
 
 // Specific data utilities
 
+export function filterAlbumsByCommentary(albums) {
+    return albums.filter(album => [album, ...album.tracks].some(x => x.commentary));
+}
+
 export function getAlbumCover(album, {to}) {
     return to('media.albumCover', album.directory);
 }

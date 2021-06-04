@@ -40,6 +40,7 @@
 // pertain only to site page generation.
 
 export * as album from './album.js';
+export * as albumCommentary from './album-commentary.js';
 export * as artist from './artist.js';
 export * as artistAlias from './artist-alias.js';
 export * as flash from './flash.js';
