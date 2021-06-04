@@ -2429,38 +2429,6 @@ function writeMiscellaneousPages({wikiData}) {
     ];
 }
 
-function writeStaticPages({wikiData}) {
-    return wikiData.staticPageData.map(staticPage => writeStaticPage(staticPage, {wikiData}));
-}
-
-function writeStaticPage(staticPage, {wikiData}) {
-    const page = {
-        type: 'page',
-        path: ['staticPage', staticPage.directory],
-        page: ({
-            strings,
-            transformMultiline
-        }) => ({
-            title: staticPage.name,
-            stylesheet: staticPage.stylesheet,
-
-            main: {
-                content: fixWS`
-                    <div class="long-content">
-                        <h1>${staticPage.name}</h1>
-                        ${transformMultiline(staticPage.content)}
-                    </div>
-                `
-            },
-
-            nav: {simple: true}
-        })
-    };
-
-    return [page];
-}
-
-
 function getRevealStringFromWarnings(warnings, {strings}) {
     return strings('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
 }
