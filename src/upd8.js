@@ -2165,17 +2165,6 @@ function generateCoverLink({
     `;
 }
 
-// This function title is my gr8test work of art.
-// (The 8ehavior... well, um. Don't tell anyone, 8ut it's even 8etter.)
-/* // RIP, 2k20-2k20.
-function writeIndexAndTrackPagesForAlbum(album) {
-    return [
-        () => writeAlbumPage(album),
-        ...album.tracks.map(track => () => writeTrackPage(track))
-    ];
-}
-*/
-
 function getAlbumStylesheet(album, {to}) {
     return [
         album.wallpaperArtists && fixWS`
