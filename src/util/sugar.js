@@ -87,3 +87,115 @@ export function bindOpts(fn, bind) {
 }
 
 bindOpts.bindIndex = Symbol();
+
+// Utility function for providing useful interfaces to the JS AggregateError
+// class.
+//
+// Generally, this works by returning a set of interfaces which operate on
+// functions: wrap() takes a function and returns a new function which passes
+// its arguments through and appends any resulting error to the internal error
+// list; call() simplifies this process by wrapping the provided function and
+// then calling it immediately. Once the process for which errors should be
+// aggregated is complete, close() constructs and throws an AggregateError
+// object containing all caught errors (or doesn't throw anything if there were
+// no errors).
+export function openAggregate({
+    // Constructor to use, defaulting to the builtin AggregateError class.
+    // Anything passed here should probably extend from that! May be used for
+    // letting callers programatically distinguish between multiple aggregate
+    // errors.
+    errorClass = AggregateError,
+
+    // Optional human-readable message to describe the aggregate error, if
+    // constructed.
+    message = '',
+
+    // Value to return when a provided function throws an error. (This is
+    // primarily useful when wrapping a function and then providing it to
+    // another utility, e.g. array.map().)
+    returnOnFail = null
+} = {}) {
+    const errors = [];
+
+    const aggregate = {};
+
+    aggregate.wrap = fn => (...args) => {
+        try {
+            return fn(...args);
+        } catch (error) {
+            errors.push(error);
+            return returnOnFail;
+        }
+    };
+
+    aggregate.call = (fn, ...args) => {
+        return aggregate.wrap(fn)(...args);
+    };
+
+    aggregate.map = (...args) => {
+        const parent = aggregate;
+        const { result, aggregate: child } = mapAggregate(...args);
+        parent.call(child.close);
+        return result;
+    };
+
+    aggregate.close = () => {
+        if (errors.length) {
+            throw Reflect.construct(errorClass, [errors, message]);
+        }
+    };
+
+    return aggregate;
+}
+
+// Performs an ordinary array map with the given function, collating into a
+// results array (with errored inputs filtered out) and an error aggregate.
+//
+// Note the aggregate property is the result of openAggregate(), still unclosed;
+// use aggregate.close() to throw the error. (This aggregate may be passed to a
+// parent aggregate: `parent.call(aggregate.close)`!)
+export function mapAggregate(array, fn, aggregateOpts) {
+    const failureSymbol = Symbol();
+
+    const aggregate = openAggregate({
+        ...aggregateOpts,
+        returnOnFail: failureSymbol
+    });
+
+    const result = array.map(aggregate.wrap(fn))
+        .filter(value => value !== failureSymbol);
+
+    return {result, aggregate};
+}
+
+// Totally sugar function for opening an aggregate, running the provided
+// function with it, then closing the function and returning the result (if
+// there's no throw).
+export function withAggregate(aggregateOpts, fn) {
+    if (typeof aggregateOpts === 'function') {
+        fn = aggregateOpts;
+        aggregateOpts = {};
+    }
+
+    const aggregate = openAggregate(aggregateOpts);
+    const result = fn(aggregate);
+    aggregate.close();
+    return result;
+}
+
+export function showAggregate(topError) {
+    const recursive = error => {
+        const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'}`;
+        if (error instanceof AggregateError) {
+            return header + '\n' + (error.errors
+                .map(recursive)
+                .flatMap(str => str.split('\n'))
+                .map(line => ` | ` + line)
+                .join('\n'));
+        } else {
+            return header;
+        }
+    };
+
+    console.log(recursive(topError));
+}
