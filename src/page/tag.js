@@ -18,6 +18,12 @@ export function write(tag, {wikiData}) {
     const { wikiInfo } = wikiData;
     const { things } = tag;
 
+    // Display things featuring this art tag in reverse chronological order,
+    // sticking the most recent additions near the top!
+    const thingsReversed = things.slice().reverse();
+
+    const entries = thingsReversed.map(item => ({item}));
+
     const page = {
         type: 'page',
         path: ['tag', tag.directory],
@@ -42,7 +48,7 @@ export function write(tag, {wikiData}) {
                     })}</p>
                     <div class="grid-listing">
                         ${getGridHTML({
-                            entries: things.map(item => ({item})),
+                            entries,
                             srcFn: thing => (thing.album
                                 ? getTrackCover(thing)
                                 : getAlbumCover(thing)),
