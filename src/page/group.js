@@ -201,7 +201,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
                     html.tag('ul',
                         category.groups.map(group => html.tag('li',
                             {
-                                class: currentGroup && 'current',
+                                class: group === currentGroup && 'current',
                                 style: getLinkThemeString(group.color)
                             },
                             strings('groupSidebar.groupList.item', {
