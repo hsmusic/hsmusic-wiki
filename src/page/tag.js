@@ -99,10 +99,12 @@ function generateTagNav(tag, {
                     tag: link.tag(tag, {class: 'current'})
                 })
             },
+            /*
             previousNextLinks && {
                 divider: false,
                 html: `(${previousNextLinks})`
             }
+            */
         ]
     };
 }
