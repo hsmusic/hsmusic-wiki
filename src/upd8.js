@@ -2449,6 +2449,8 @@ async function main() {
         }
     }
 
+    WD.tagData.sort(sortByName);
+
     WD.groupData = await processGroupDataFile(path.join(dataPath, GROUP_DATA_FILE));
     if (WD.groupData.error) {
         console.log(`\x1b[31;1m${WD.groupData.error}\x1b[0m`);

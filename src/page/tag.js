@@ -28,6 +28,7 @@ export function write(tag, {wikiData}) {
         type: 'page',
         path: ['tag', tag.directory],
         page: ({
+            generatePreviousNextLinks,
             getAlbumCover,
             getGridHTML,
             getThemeString,
@@ -60,20 +61,48 @@ export function write(tag, {wikiData}) {
                 `
             },
 
-            nav: {
-                links: [
-                    {toHome: true},
-                    wikiInfo.features.listings &&
-                    {
-                        path: ['localized.listingIndex'],
-                        title: strings('listingIndex.title')
-                    },
-                    {toCurrentPage: true}
-                ]
-            }
+            nav: generateTagNav(tag, {
+                generatePreviousNextLinks,
+                link,
+                strings,
+                wikiData
+            })
         })
     };
 
     return [page];
 }
 
+// Utility functions
+
+function generateTagNav(tag, {
+    generatePreviousNextLinks,
+    link,
+    strings,
+    wikiData
+}) {
+    const previousNextLinks = generatePreviousNextLinks(tag, {
+        data: wikiData.tagData.filter(tag => !tag.isCW),
+        linkKey: 'tag'
+    });
+
+    return {
+        links: [
+            {toHome: true},
+            wikiData.wikiInfo.features.listings &&
+            {
+                path: ['localized.listingIndex'],
+                title: strings('listingIndex.title')
+            },
+            {
+                html: strings('tagPage.nav.tag', {
+                    tag: link.tag(tag, {class: 'current'})
+                })
+            },
+            previousNextLinks && {
+                divider: false,
+                html: `(${previousNextLinks})`
+            }
+        ]
+    };
+}
