@@ -13,5 +13,7 @@ export function validateReference(type = '') {
             if (typePart !== type)
                 throw new TypeError(`Expected ref to begin with "${type}:", got "${typePart}:" (ref: ${ref})`);
         }
+
+        return true;
     };
 }
