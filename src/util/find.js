@@ -1,3 +1,7 @@
+import {
+    logWarn
+} from './cli.js';
+
 function findHelper(keys, dataProp, findFn) {
     return (ref, {wikiData}) => {
         if (!ref) return null;

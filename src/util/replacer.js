@@ -1,5 +1,5 @@
 import find from './find.js';
-import {logError} from './cli.js';
+import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
 
 export function validateReplacerSpec(replacerSpec, link) {
