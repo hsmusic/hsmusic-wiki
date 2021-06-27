@@ -104,15 +104,18 @@ export function openAggregate({
     // Anything passed here should probably extend from that! May be used for
     // letting callers programatically distinguish between multiple aggregate
     // errors.
-    errorClass = AggregateError,
+    //
+    // This should be provided using the aggregateThrows utility function.
+    [openAggregate.errorClassSymbol]: errorClass = AggregateError,
 
     // Optional human-readable message to describe the aggregate error, if
     // constructed.
     message = '',
 
-    // Value to return when a provided function throws an error. (This is
-    // primarily useful when wrapping a function and then providing it to
-    // another utility, e.g. array.map().)
+    // Value to return when a provided function throws an error. If this is a
+    // function, it will be called with the arguments given to the function.
+    // (This is primarily useful when wrapping a function and then providing it
+    // to another utility, e.g. array.map().)
     returnOnFail = null
 } = {}) {
     const errors = [];
@@ -124,12 +127,18 @@ export function openAggregate({
             return fn(...args);
         } catch (error) {
             errors.push(error);
-            return returnOnFail;
+            return (typeof returnOnFail === 'function'
+                ? returnOnFail(...args)
+                : returnOnFail);
         }
     };
 
     aggregate.call = (fn, ...args) => {
         return aggregate.wrap(fn)(...args);
+    };
+
+    aggregate.nest = (...args) => {
+        return aggregate.call(() => withAggregate(...args));
     };
 
     aggregate.map = (...args) => {
@@ -138,6 +147,15 @@ export function openAggregate({
         parent.call(child.close);
         return result;
     };
+
+    aggregate.filter = (...args) => {
+        const parent = aggregate;
+        const { result, aggregate: child } = filterAggregate(...args);
+        parent.call(child.close);
+        return result;
+    };
+
+    aggregate.throws = aggregateThrows;
 
     aggregate.close = () => {
         if (errors.length) {
@@ -148,8 +166,18 @@ export function openAggregate({
     return aggregate;
 }
 
+openAggregate.errorClassSymbol = Symbol('error class');
+
+// Utility function for providing {errorClass} parameter to aggregate functions.
+export function aggregateThrows(errorClass) {
+    return {[openAggregate.errorClassSymbol]: errorClass};
+}
+
 // Performs an ordinary array map with the given function, collating into a
 // results array (with errored inputs filtered out) and an error aggregate.
+//
+// Optionally, override returnOnFail to disable filtering and map errored inputs
+// to a particular output.
 //
 // Note the aggregate property is the result of openAggregate(), still unclosed;
 // use aggregate.close() to throw the error. (This aggregate may be passed to a
@@ -158,12 +186,55 @@ export function mapAggregate(array, fn, aggregateOpts) {
     const failureSymbol = Symbol();
 
     const aggregate = openAggregate({
-        ...aggregateOpts,
-        returnOnFail: failureSymbol
+        returnOnFail: failureSymbol,
+        ...aggregateOpts
     });
 
     const result = array.map(aggregate.wrap(fn))
         .filter(value => value !== failureSymbol);
+
+    return {result, aggregate};
+}
+
+// Performs an ordinary array filter with the given function, collating into a
+// results array (with errored inputs filtered out) and an error aggregate.
+//
+// Optionally, override returnOnFail to disable filtering errors and map errored
+// inputs to a particular output.
+//
+// As with mapAggregate, the returned aggregate property is not yet closed.
+export function filterAggregate(array, fn, aggregateOpts) {
+    const failureSymbol = Symbol();
+
+    const aggregate = openAggregate({
+        returnOnFail: failureSymbol,
+        ...aggregateOpts
+    });
+
+    const result = array.map(aggregate.wrap((x, ...rest) => ({
+        input: x,
+        output: fn(x, ...rest)
+    })))
+        .filter(value => {
+            // Filter out results which match the failureSymbol, i.e. errored
+            // inputs.
+            if (value === failureSymbol) return false;
+
+            // Always keep results which match the overridden returnOnFail
+            // value, if provided.
+            if (value === aggregateOpts.returnOnFail) return true;
+
+            // Otherwise, filter according to the returned value of the wrapped
+            // function.
+            return value.output;
+        })
+        .map(value => {
+            // Then turn the results back into their corresponding input, or, if
+            // provided, the overridden returnOnFail value.
+            return (value === aggregateOpts.returnOnFail
+                ? value
+                : value.input);
+        });
 
     return {result, aggregate};
 }

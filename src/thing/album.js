@@ -1,6 +1,7 @@
 import Thing from './thing.js';
 
 import {
+    validateDirectory,
     validateReference
 } from './structures.js';
 
@@ -10,22 +11,33 @@ import {
 } from '../util/sugar.js';
 
 export default class Album extends Thing {
+    #directory = null;
     #tracks = [];
 
     static updateError = {
+        directory: Thing.extendPropertyError('directory'),
         tracks: Thing.extendPropertyError('tracks')
     };
 
     update(source) {
-        withAggregate(({ wrap, call, map }) => {
-            if (source.tracks) {
-                this.#tracks = map(source.tracks, t => validateReference('track')(t) && t, {
-                    errorClass: this.constructor.updateError.tracks
+        const err = this.constructor.updateError;
+
+        withAggregate(({ nest, filter, throws }) => {
+
+            if (source.directory) {
+                nest(throws(err.directory), ({ call }) => {
+                    if (call(validateDirectory, source.directory)) {
+                        this.#directory = source.directory;
+                    }
                 });
             }
+
+            if (source.tracks)
+                this.#tracks = filter(source.tracks, validateReference('track'), throws(err.tracks));
         });
     }
 
+    get directory() { return this.#directory; }
     get tracks() { return this.#tracks; }
 }
 
@@ -35,6 +47,7 @@ console.log('tracks (before):', album.tracks);
 
 try {
     album.update({
+        directory: 'oh yes',
         tracks: [
             'lol',
             123,
