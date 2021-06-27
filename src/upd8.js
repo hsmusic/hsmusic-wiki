@@ -110,7 +110,7 @@ import {
 } from 'fs/promises';
 
 import genThumbs from './gen-thumbs.js';
-import listingSpec from './listing-spec.js';
+import { listingSpec, listingTargetSpec } from './listing-spec.js';
 import urlSpec from './url-spec.js';
 import * as pageSpecs from './page/index.js';
 
@@ -2155,6 +2155,7 @@ async function main() {
     const WD = wikiData;
 
     WD.listingSpec = listingSpec;
+    WD.listingTargetSpec = listingTargetSpec;
 
     const miscOptions = await parseOptions(process.argv.slice(2), {
         // Data files for the site, including flash, artist, and al8um data,

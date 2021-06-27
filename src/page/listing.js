@@ -47,14 +47,15 @@ export function write(listing, {wikiData}) {
         type: 'page',
         path: ['listing', listing.directory],
         page: opts => {
-            const { link, strings } = opts;
+            const { getLinkThemeString, link, strings } = opts;
+            const titleKey = `listingPage.${listing.stringsKey}.title`;
 
             return {
-                title: listing.title({strings}),
+                title: strings(titleKey),
 
                 main: {
                     content: fixWS`
-                        <h1>${listing.title({strings})}</h1>
+                        <h1>${strings(titleKey)}</h1>
                         ${listing.html && (listing.data
                             ? listing.html(data, opts)
                             : listing.html(opts))}
@@ -70,7 +71,12 @@ export function write(listing, {wikiData}) {
                 },
 
                 sidebarLeft: {
-                    content: generateSidebarForListings(listing, {link, strings, wikiData})
+                    content: generateSidebarForListings(listing, {
+                        getLinkThemeString,
+                        link,
+                        strings,
+                        wikiData
+                    })
                 },
 
                 nav: {
@@ -101,6 +107,7 @@ export function writeTargetless({wikiData}) {
         type: 'page',
         path: ['listingIndex'],
         page: ({
+            getLinkThemeString,
             strings,
             link
         }) => ({
@@ -117,12 +124,17 @@ export function writeTargetless({wikiData}) {
                     })}</p>
                     <hr>
                     <p>${strings('listingIndex.exploreList')}</p>
-                    ${generateLinkIndexForListings(null, {link, strings, wikiData})}
+                    ${generateLinkIndexForListings(null, false, {link, strings, wikiData})}
                 `
             },
 
             sidebarLeft: {
-                content: generateSidebarForListings(null, {link, strings, wikiData})
+                content: generateSidebarForListings(null, {
+                    getLinkThemeString,
+                    link,
+                    strings,
+                    wikiData
+                })
             },
 
             nav: {simple: true}
@@ -134,25 +146,62 @@ export function writeTargetless({wikiData}) {
 
 // Utility functions
 
-function generateSidebarForListings(currentListing, {link, strings, wikiData}) {
+function generateSidebarForListings(currentListing, {
+    getLinkThemeString,
+    link,
+    strings,
+    wikiData
+}) {
     return fixWS`
         <h1>${link.listingIndex('', {text: strings('listingIndex.title')})}</h1>
-        ${generateLinkIndexForListings(currentListing, {link, strings, wikiData})}
+        ${generateLinkIndexForListings(currentListing, true, {
+            getLinkThemeString,
+            link,
+            strings,
+            wikiData
+        })}
     `;
 }
 
-function generateLinkIndexForListings(currentListing, {link, strings, wikiData}) {
-    const { listingSpec } = wikiData;
+function generateLinkIndexForListings(currentListing, forSidebar, {
+    getLinkThemeString,
+    link,
+    strings,
+    wikiData
+}) {
+    const { listingTargetSpec, wikiInfo } = wikiData;
 
-    return fixWS`
-        <ul>
-            ${(listingSpec
-                .filter(({ condition }) => !condition || condition({wikiData}))
-                .map(listing => html.tag('li',
-                    {class: [listing === currentListing && 'current']},
-                    link.listing(listing, {text: listing.title({strings})})
-                ))
-                .join('\n'))}
-        </ul>
-    `;
+    const filteredByCondition = listingTargetSpec
+        .map(({ listings, ...rest }) => ({
+            ...rest,
+            listings: listings.filter(({ condition: c }) => !c || c({wikiData}))
+        }))
+        .filter(({ listings }) => listings.length > 0);
+
+    const genUL = listings => html.tag('ul',
+        listings.map(listing => html.tag('li',
+            {class: [listing === currentListing && 'current']},
+            link.listing(listing, {text: strings(`listingPage.${listing.stringsKey}.title.short`)})
+        )));
+
+    if (forSidebar) {
+        return filteredByCondition.map(({ title, listings }) =>
+            html.tag('details', {
+                open: !forSidebar || listings.includes(currentListing),
+                class: listings.includes(currentListing) && 'current'
+            }, [
+                html.tag('summary',
+                    {style: getLinkThemeString(wikiInfo.color)},
+                    html.tag('span',
+                        {class: 'group-name'},
+                        title({strings}))),
+                genUL(listings)
+            ])).join('\n');
+    } else {
+        return html.tag('dl',
+            filteredByCondition.flatMap(({ title, listings }) => [
+                html.tag('dt', title({strings})),
+                html.tag('dd', genUL(listings))
+            ]));
+    }
 }

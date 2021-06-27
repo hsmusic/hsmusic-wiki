@@ -15,7 +15,7 @@ import {
 const listingSpec = [
     {
         directory: 'albums/by-name',
-        title: ({strings}) => strings('listingPage.listAlbums.byName.title'),
+        stringsKey: 'listAlbums.byName',
 
         data({wikiData}) {
             return wikiData.albumData.slice()
@@ -32,7 +32,7 @@ const listingSpec = [
 
     {
         directory: 'albums/by-tracks',
-        title: ({strings}) => strings('listingPage.listAlbums.byTracks.title'),
+        stringsKey: 'listAlbums.byTracks',
 
         data({wikiData}) {
             return wikiData.albumData.slice()
@@ -49,7 +49,7 @@ const listingSpec = [
 
     {
         directory: 'albums/by-duration',
-        title: ({strings}) => strings('listingPage.listAlbums.byDuration.title'),
+        stringsKey: 'listAlbums.byDuration',
 
         data({wikiData}) {
             return wikiData.albumData
@@ -67,7 +67,7 @@ const listingSpec = [
 
     {
         directory: 'albums/by-date',
-        title: ({strings}) => strings('listingPage.listAlbums.byDate.title'),
+        stringsKey: 'listAlbums.byDate',
 
         data({wikiData}) {
             return sortByDate(wikiData.albumData
@@ -84,7 +84,7 @@ const listingSpec = [
 
     {
         directory: 'albusm/by-date-added',
-        title: ({strings}) => strings('listingPage.listAlbums.byDateAdded.title'),
+        stringsKey: 'listAlbums.byDateAdded',
 
         data({wikiData}) {
             return chunkByProperties(wikiData.albumData.slice().sort((a, b) => {
@@ -116,7 +116,7 @@ const listingSpec = [
 
     {
         directory: 'artists/by-name',
-        title: ({strings}) => strings('listingPage.listArtists.byName.title'),
+        stringsKey: 'listArtists.byName',
 
         data({wikiData}) {
             return wikiData.artistData.slice()
@@ -134,7 +134,7 @@ const listingSpec = [
 
     {
         directory: 'artists/by-contribs',
-        title: ({strings}) => strings('listingPage.listArtists.byContribs.title'),
+        stringsKey: 'listArtists.byContribs',
 
         data({wikiData}) {
             return {
@@ -209,7 +209,7 @@ const listingSpec = [
 
     {
         directory: 'artists/by-commentary',
-        title: ({strings}) => strings('listingPage.listArtists.byCommentary.title'),
+        stringsKey: 'listArtists.byCommentary',
 
         data({wikiData}) {
             return wikiData.artistData
@@ -228,7 +228,7 @@ const listingSpec = [
 
     {
         directory: 'artists/by-duration',
-        title: ({strings}) => strings('listingPage.listArtists.byDuration.title'),
+        stringsKey: 'listArtists.byDuration',
 
         data({wikiData}) {
             return wikiData.artistData
@@ -249,7 +249,7 @@ const listingSpec = [
 
     {
         directory: 'artists/by-latest',
-        title: ({strings}) => strings('listingPage.listArtists.byLatest.title'),
+        stringsKey: 'listArtists.byLatest',
 
         data({wikiData}) {
             const reversedTracks = wikiData.trackData.slice().reverse();
@@ -330,7 +330,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-name',
-        title: ({strings}) => strings('listingPage.listGroups.byName.title'),
+        stringsKey: 'listGroups.byName',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
         data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
 
@@ -346,7 +346,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-category',
-        title: ({strings}) => strings('listingPage.listGroups.byCategory.title'),
+        stringsKey: 'listGroups.byCategory',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
         data: ({wikiData}) => wikiData.groupCategoryData,
 
@@ -376,7 +376,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-albums',
-        title: ({strings}) => strings('listingPage.listGroups.byAlbums.title'),
+        stringsKey: 'listGroups.byAlbums',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
         data({wikiData}) {
@@ -395,7 +395,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-tracks',
-        title: ({strings}) => strings('listingPage.listGroups.byTracks.title'),
+        stringsKey: 'listGroups.byTracks',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
         data({wikiData}) {
@@ -414,7 +414,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-duration',
-        title: ({strings}) => strings('listingPage.listGroups.byDuration.title'),
+        stringsKey: 'listGroups.byDuration',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
         data({wikiData}) {
@@ -433,7 +433,7 @@ const listingSpec = [
 
     {
         directory: 'groups/by-latest-album',
-        title: ({strings}) => strings('listingPage.listGroups.byLatest.title'),
+        stringsKey: 'listGroups.byLatest',
         condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
 
         data({wikiData}) {
@@ -464,7 +464,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-name',
-        title: ({strings}) => strings('listingPage.listTracks.byName.title'),
+        stringsKey: 'listTracks.byName',
 
         data({wikiData}) {
             return wikiData.trackData.slice().sort(sortByName);
@@ -479,7 +479,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-album',
-        title: ({strings}) => strings('listingPage.listTracks.byAlbum.title'),
+        stringsKey: 'listTracks.byAlbum',
         data: ({wikiData}) => wikiData.albumData,
 
         html(albumData, {link, strings}) {
@@ -505,7 +505,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-date',
-        title: ({strings}) => strings('listingPage.listTracks.byDate.title'),
+        stringsKey: 'listTracks.byDate',
 
         data({wikiData}) {
             return chunkByProperties(
@@ -541,7 +541,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-duration',
-        title: ({strings}) => strings('listingPage.listTracks.byDuration.title'),
+        stringsKey: 'listTracks.byDuration',
 
         data({wikiData}) {
             return wikiData.trackData
@@ -561,7 +561,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-duration-in-album',
-        title: ({strings}) => strings('listingPage.listTracks.byDurationInAlbum.title'),
+        stringsKey: 'listTracks.byDurationInAlbum',
 
         data({wikiData}) {
             return wikiData.albumData.map(album => ({
@@ -594,7 +594,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/by-times-referenced',
-        title: ({strings}) => strings('listingPage.listTracks.byTimesReferenced.title'),
+        stringsKey: 'listTracks.byTimesReferenced',
 
         data({wikiData}) {
             return wikiData.trackData
@@ -613,7 +613,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/in-flashes/by-album',
-        title: ({strings}) => strings('listingPage.listTracks.inFlashes.byAlbum.title'),
+        stringsKey: 'listTracks.inFlashes.byAlbum',
         condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
 
         data({wikiData}) {
@@ -647,7 +647,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/in-flashes/by-flash',
-        title: ({strings}) => strings('listingPage.listTracks.inFlashes.byFlash.title'),
+        stringsKey: 'listTracks.inFlashes.byFlash',
         condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
         data: ({wikiData}) => wikiData.flashData,
 
@@ -676,7 +676,7 @@ const listingSpec = [
 
     {
         directory: 'tracks/with-lyrics',
-        title: ({strings}) => strings('listingPage.listTracks.withLyrics.title'),
+        stringsKey: 'listTracks.withLyrics',
 
         data({wikiData}) {
             return chunkByProperties(wikiData.trackData.filter(t => t.lyrics), ['album']);
@@ -706,7 +706,7 @@ const listingSpec = [
 
     {
         directory: 'tags/by-name',
-        title: ({strings}) => strings('listingPage.listTags.byName.title'),
+        stringsKey: 'listTags.byName',
         condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
 
         data({wikiData}) {
@@ -726,7 +726,7 @@ const listingSpec = [
 
     {
         directory: 'tags/by-uses',
-        title: ({strings}) => strings('listingPage.listTags.byUses.title'),
+        stringsKey: 'listTags.byUses',
         condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
 
         data({wikiData}) {
@@ -746,7 +746,7 @@ const listingSpec = [
 
     {
         directory: 'random',
-        title: ({strings}) => `Random Pages`,
+        stringsKey: 'other.randomPages',
 
         data: ({wikiData}) => ({
             officialAlbumData: wikiData.officialAlbumData,
@@ -784,4 +784,36 @@ const listingSpec = [
     }
 ];
 
-export default listingSpec;
+const filterListings = directoryPrefix => listingSpec
+    .filter(l => l.directory.startsWith(directoryPrefix));
+
+const listingTargetSpec = [
+    {
+        title: ({strings}) => strings('listingPage.target.album'),
+        listings: filterListings('album')
+    },
+    {
+        title: ({strings}) => strings('listingPage.target.artist'),
+        listings: filterListings('artist')
+    },
+    {
+        title: ({strings}) => strings('listingPage.target.group'),
+        listings: filterListings('group')
+    },
+    {
+        title: ({strings}) => strings('listingPage.target.track'),
+        listings: filterListings('track')
+    },
+    {
+        title: ({strings}) => strings('listingPage.target.tag'),
+        listings: filterListings('tag')
+    },
+    {
+        title: ({strings}) => strings('listingPage.target.other'),
+        listings: [
+            listingSpec.find(l => l.directory === 'random')
+        ]
+    }
+];
+
+export {listingSpec, listingTargetSpec};
