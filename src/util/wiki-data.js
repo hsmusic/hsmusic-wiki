@@ -79,11 +79,11 @@ export function sortByName(a, b) {
 // This function was originally made to sort just al8um data, 8ut its exact
 // code works fine for sorting tracks too, so I made the varia8les and names
 // more general.
-export function sortByDate(data) {
+export function sortByDate(data, dateKey = 'date') {
     // Just to 8e clear: sort is a mutating function! I only return the array
     // 8ecause then you don't have to define it as a separate varia8le 8efore
     // passing it into this function.
-    return data.sort((a, b) => a.date - b.date);
+    return data.sort((a, b) => a[dateKey] - b[dateKey]);
 }
 
 // Same details as the sortByDate, 8ut for covers~

@@ -394,6 +394,7 @@ export function generateAlbumChronologyLinks(album, currentTrack, {generateChron
         }),
         generateChronologyLinks(currentTrack || album, {
             contribKey: 'coverArtists',
+            dateKey: 'coverArtDate',
             getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist],
             headingString: 'misc.chronology.heading.coverArt'
         })

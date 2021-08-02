@@ -51,7 +51,7 @@ export function write(artist, {wikiData}) {
         key
     });
 
-    const artListChunks = chunkByProperties(artThingsAll.flatMap(thing =>
+    const artListChunks = chunkByProperties(sortByDate(artThingsAll.flatMap(thing =>
         (['coverArtists', 'wallpaperArtists', 'bannerArtists']
             .map(key => getArtistsAndContrib(thing, key))
             .filter(({ contrib }) => contrib)
@@ -61,7 +61,7 @@ export function write(artist, {wikiData}) {
                 date: +(thing.coverArtDate || thing.date),
                 ...props
             })))
-    ), ['date', 'album']);
+    )), ['date', 'album']);
 
     const commentaryListChunks = chunkByProperties(commentaryThings.map(thing => ({
         album: thing.album || thing,

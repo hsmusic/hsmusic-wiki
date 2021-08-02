@@ -45,6 +45,7 @@ export function getArtistString(artists, {
 // Chronology links
 
 export function generateChronologyLinks(currentThing, {
+    dateKey = 'date',
     contribKey,
     getThings,
     headingString,
@@ -65,7 +66,7 @@ export function generateChronologyLinks(currentThing, {
     }
 
     return contributions.map(({ who: artist }) => {
-        const things = sortByDate(unique(getThings(artist)));
+        const things = sortByDate(unique(getThings(artist)), dateKey);
         const releasedThings = things.filter(thing => {
             const album = albumData.includes(thing) ? thing : thing.album;
             return !(album && album.directory === UNRELEASED_TRACKS_DIRECTORY);
