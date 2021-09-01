@@ -143,7 +143,9 @@ export function getArtistCommentary(artist, {justEverythingMan}) {
 }
 
 export function getFlashCover(flash, {to}) {
-    return to('media.flashArt', flash.directory);
+    return (flash.jiff
+        ? to('media.flashArtGif', flash.directory)
+        : to('media.flashArt', flash.directory));
 }
 
 export function getFlashLink(flash) {

@@ -75,7 +75,8 @@ const urlSpec = {
             albumBanner: 'album-art/<>/banner.jpg',
             trackCover: 'album-art/<>/<>.jpg',
             artistAvatar: 'artist-avatar/<>.jpg',
-            flashArt: 'flash-art/<>.jpg'
+            flashArt: 'flash-art/<>.jpg',
+            flashArtGif: 'flash-art/<>.gif' // Hack! Sorry not sorry. ::::)
         }
     }
 };
