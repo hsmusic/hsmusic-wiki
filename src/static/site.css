@@ -201,6 +201,9 @@ footer > :last-child {
 .other-group-accent {
     opacity: 0.7;
     font-style: oblique;
+}
+
+.other-group-accent {
     white-space: nowrap;
 }
 
