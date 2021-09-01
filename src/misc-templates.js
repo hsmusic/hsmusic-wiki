@@ -199,8 +199,17 @@ export function getAlbumStylesheet(album, {to}) {
 // Fancy lookin' links
 
 export function fancifyURL(url, {strings, album = false} = {}) {
-    const domain = new URL(url).hostname;
+    let local = Symbol();
+    let domain;
+    try {
+        domain = new URL(url).hostname;
+    } catch (error) {
+        // No support for relative local URLs yet, sorry! (I.e, local URLs must
+        // be absolute relative to the domain name in order to work.)
+        domain = local;
+    }
     return fixWS`<a href="${url}" class="nowrap">${
+        domain === local ? strings('misc.external.local') :
         domain.includes('bandcamp.com') ? strings('misc.external.bandcamp') :
         [
             'music.solatrux.com'
