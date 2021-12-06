@@ -886,9 +886,19 @@ async function processAlbumDataFile(file) {
                     getBasicField(section, 'FG') ||
                     album.color
                 ),
+                originalDate: getBasicField(section, 'Original Date'),
                 startIndex: trackIndex,
                 tracks: []
             };
+            if (group.originalDate) {
+                if (isNaN(Date.parse(group.originalDate))) {
+                    return {error: `The track group "${group.name}" has an invalid "Original Date" field: "${group.originalDate}"`};
+                }
+                group.originalDate = new Date(group.originalDate);
+                group.date = group.originalDate;
+            } else {
+                group.date = album.date;
+            }
             if (album.trackGroups) {
                 album.trackGroups.push(group);
             } else {
@@ -962,7 +972,11 @@ async function processAlbumDataFile(file) {
             if (isNaN(Date.parse(track.originalDate))) {
                 return {error: `The track "${track.name}"'s has an invalid "Original Date" field: "${track.originalDate}"`};
             }
+            track.originalDate = new Date(track.originalDate);
             track.date = new Date(track.originalDate);
+        } else if (group && group.originalDate) {
+            track.originalDate = group.originalDate;
+            track.date = group.originalDate;
         } else {
             track.date = album.date;
         }
@@ -2848,7 +2862,7 @@ async function main() {
 
         writes = buildStepsWithTargets.flatMap(({ flag, pageSpec, targets }) => {
             const writes = targets.flatMap(target =>
-                pageSpec.write(target, {wikiData}).slice() || []);
+                pageSpec.write(target, {wikiData})?.slice() || []);
 
             if (!validateWrites(writes, flag + '.write')) {
                 return [];
