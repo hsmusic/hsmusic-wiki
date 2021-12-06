@@ -9,10 +9,10 @@ HSMusic, short for the *Homestuck Music Wiki*, is a revitalization and reimagini
 * `src/upd8.js`: "Build" code for the site. Everything specific to generating the structure and HTML content of the website is conatined in this file. As expected, it's pretty massive, and is currently undergoing some much-belated restructuring.
 * `src/static`: Static code and supporting files. Everything here is wholly client-side and referenced by the generated HTML files.
 * `src/common`: Code which is depended upon by both client- and server-side code. For the most part, this is constants such as directory paths, though there are a few handy algorithms here too.
-* In the not quite so far past, we used to have `data` and `media` folders too. Today, for portability and convenience in project structure, those are saved in separate repositories, and you can pass hsmusic paths to them through the `--data` and `--media` options, or the `HSMUSIC_DATA` and `HSMUSIC_MEDIA` environment variables.
+* In the not quite so far past, we used to have `data` and `media` folders too. Today, for portability and convenience in project structure, those are saved in separate repositories, and you can pass hsmusic paths to them through the `--data-path` and `--media-path` options, or the `HSMUSIC_DATA` and `HSMUSIC_MEDIA` environment variables.
   * Data directory: The majority of data files belonging to the wiki are here. If you were to, say, create a fork of hsmusic for some other music archival project, you'd want to change the files here. Data files are all a custom text format designed to be easy to edit, process, and maintain; they should be self-descriptive.
   * Media directory: Images and other static files referenced by generated and static content across the site. Many of the files here are cover art, and their names match the automatically generated "kebab case" identifiers for tracks and albums (or a manually overridden one).
-* Same for the output root: previously it was in a `site` folder; today, use `--out` or `HSMUSIC_OUT`!
+* Same for the output root: previously it was in a `site` folder; today, use `--out-path` or `HSMUSIC_OUT`!
 
 The upd8 code process was politely introduced by 2019!us back when we were beginning the site, and it's essentially the same structure followed today. In summary:
 

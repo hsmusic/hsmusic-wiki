@@ -225,14 +225,14 @@ const DEFAULT_STRINGS_FILE = 'strings-default.json';
 //
 // Rather than hard code it, anything in this directory can 8e shared across
 // 8oth ends of the code8ase.
-// (This gets symlinked into the --data directory.)
+// (This gets symlinked into the --data-path directory.)
 const UTILITY_DIRECTORY = 'util';
 
 // Code that's used only in the static site! CSS, cilent JS, etc.
-// (This gets symlinked into the --data directory.)
+// (This gets symlinked into the --data-path directory.)
 const STATIC_DIRECTORY = 'static';
 
-// Su8directory under provided --data directory for al8um files, which are
+// Su8directory under provided --data-path directory for al8um files, which are
 // read from and processed to compose the majority of album and track data.
 const DATA_ALBUM_DIRECTORY = 'album';
 
@@ -2257,9 +2257,9 @@ async function main() {
                 errored = true;
             }
         };
-        error(!dataPath,   `Expected --data option or HSMUSIC_DATA to be set`);
-        error(!mediaPath,  `Expected --media option or HSMUSIC_MEDIA to be set`);
-        error(!outputPath, `Expected --out option or HSMUSIC_OUT to be set`);
+        error(!dataPath,   `Expected --data-path option or HSMUSIC_DATA to be set`);
+        error(!mediaPath,  `Expected --media-path option or HSMUSIC_MEDIA to be set`);
+        error(!outputPath, `Expected --out-path option or HSMUSIC_OUT to be set`);
         if (errored) {
             return;
         }
