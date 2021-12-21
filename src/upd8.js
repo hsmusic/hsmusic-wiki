@@ -768,7 +768,7 @@ async function processAlbumDataFile(file) {
     // We'll just return more specific errors if it's missing necessary data
     // fields.
 
-    const contentLines = contents.split('\n');
+    const contentLines = contents.split(/\r\n|\r|\n/);
 
     // In this line of code I defeat the purpose of using a generator in the
     // first place. Sorry!!!!!!!!
