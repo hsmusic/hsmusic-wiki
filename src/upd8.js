@@ -271,9 +271,13 @@ async function findFiles(dataPath, filter = f => true) {
         .filter(file => filter(file));
 }
 
+function splitLines(text) {
+    return text.split(/\r|\n|\r\n/);
+}
+
 function* getSections(lines) {
     // ::::)
-    const isSeparatorLine = line => /^-{8,}$/.test(line);
+    const isSeparatorLine = line => /^-{8,}/.test(line);
     yield* splitArray(lines, isSeparatorLine);
 }
 
@@ -594,7 +598,7 @@ function transformMultiline(text, {
     // interested in doing lol. sorry!!!
     let inBlockquote = false;
 
-    for (let line of text.split(/\r|\n|\r\n/)) {
+    for (let line of splitLines(text)) {
         const imageLine = line.startsWith('<img');
         line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
             lazy: true,
@@ -1016,7 +1020,7 @@ async function processArtistDataFile(file) {
         return {error: `Could not read ${file} (${error.code}).`};
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     return sections.filter(s => s.filter(Boolean).length).map(section => {
@@ -1051,7 +1055,7 @@ async function processFlashDataFile(file) {
         return {error: `Could not read ${file} (${error.code}).`};
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     let act, color;
@@ -1111,7 +1115,7 @@ async function processNewsDataFile(file) {
         return {error: `Could not read ${file} (${error.code}).`};
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     return sections.map(section => {
@@ -1165,7 +1169,7 @@ async function processTagDataFile(file) {
         }
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     return sections.map(section => {
@@ -1211,7 +1215,7 @@ async function processGroupDataFile(file) {
         }
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     let category, color;
@@ -1266,7 +1270,7 @@ async function processStaticPageDataFile(file) {
         }
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     return sections.map(section => {
@@ -1313,7 +1317,7 @@ async function processWikiInfoFile(file) {
     // Unlike other data files, the site info data file isn't 8roken up into
     // more than one entry. So we operate on the plain old contentLines array,
     // rather than dividing into sections like we usually do!
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
 
     const name = getBasicField(contentLines, 'Name');
     if (!name) {
@@ -1376,7 +1380,7 @@ async function processHomepageInfoFile(file) {
         return {error: `Could not read ${file} (${error.code}).`};
     }
 
-    const contentLines = contents.split('\n');
+    const contentLines = splitLines(contents);
     const sections = Array.from(getSections(contentLines));
 
     const [ firstSection, ...rowSections ] = sections;
