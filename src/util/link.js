@@ -19,6 +19,8 @@ export function getLinkThemeString(color) {
     return `--primary-color: ${primary}; --dim-color: ${dim}`;
 }
 
+const appendIndexHTMLRegex = /^(?!https?:\/\/).+\/$/;
+
 const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
     (thing, {
         to,
@@ -27,18 +29,30 @@ const linkHelper = (hrefFn, {color = true, attr = null} = {}) =>
         class: className = '',
         color: color2 = true,
         hash = ''
-    }) => (
-        html.tag('a', {
+    }) => {
+        let href = hrefFn(thing, {to});
+
+        if (link.globalOptions.appendIndexHTML) {
+            if (appendIndexHTMLRegex.test(href)) {
+                href += 'index.html';
+            }
+        }
+
+        if (hash) {
+            href += (hash.startsWith('#') ? '' : '#') + hash;
+        }
+
+        return html.tag('a', {
             ...attr ? attr(thing) : {},
             ...attributes ? attributes : {},
-            href: hrefFn(thing, {to}) + (hash ? (hash.startsWith('#') ? '' : '#') + hash : ''),
+            href,
             style: (
                 typeof color2 === 'string' ? getLinkThemeString(color2) :
                 color2 && color ? getLinkThemeString(thing.color) :
                 ''),
             class: className
         }, text || thing.name)
-    );
+    };
 
 const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
     linkHelper((thing, {to}) => to('localized.' + key, thing.directory), {
@@ -53,6 +67,15 @@ const linkPathname = (key, conf) => linkHelper(({directory: pathname}, {to}) => 
 const linkIndex = (key, conf) => linkHelper((_, {to}) => to('localized.' + key), conf);
 
 const link = {
+    globalOptions: {
+        // This should usually only 8e used during development! It'll take any
+        // href that ends with `/` and append `index.html` to the returned
+        // value (for to.thing() functions). This is handy when developing
+        // without a local server (i.e. using file:// protocol URLs in your
+        // 8rowser), 8ut isn't guaranteed to 8e 100% 8ug-free.
+        appendIndexHTML: false
+    },
+
     album: linkDirectory('album'),
     albumCommentary: linkDirectory('albumCommentary'),
     artist: linkDirectory('artist', {color: false}),

@@ -2233,10 +2233,18 @@ async function main() {
             type: 'flag'
         },
 
-        // Only want 8uild one language during testing? This can chop down
+        // Only want to 8uild one language during testing? This can chop down
         // 8uild times a pretty 8ig chunk! Just pass a single language code.
         'lang': {
             type: 'value'
+        },
+
+        // Working without a dev server and just using file:// URLs in your we8
+        // 8rowser? This will automatically append index.html to links across
+        // the site. Not recommended for production, since it isn't guaranteed
+        // 100% error-free (and index.html-style links are less pretty anyway).
+        'append-index-html': {
+            type: 'flag'
         },
 
         'queue-size': {
@@ -2273,6 +2281,12 @@ async function main() {
         if (errored) {
             return;
         }
+    }
+
+    const appendIndexHTML = miscOptions['append-index-html'] ?? false;
+    if (appendIndexHTML) {
+        logWarn`Appending index.html to link hrefs. (Note: not recommended for production release!)`;
+        unbound_link.globalOptions.appendIndexHTML = true;
     }
 
     const skipThumbs = miscOptions['skip-thumbs'] ?? false;
