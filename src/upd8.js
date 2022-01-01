@@ -782,6 +782,11 @@ async function processAlbumDataFile(file) {
     const album = {};
 
     album.name = getBasicField(albumSection, 'Album');
+
+    if (!album.name) {
+        return {error: `The file "${path.relative(dataPath, file)}" is missing the "Album" field - maybe this is a misplaced file instead of album data?`};
+    }
+
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
     album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
