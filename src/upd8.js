@@ -3059,7 +3059,6 @@ async function main() {
 
                 bound.getGridHTML = bindOpts(getGridHTML, {
                     [bindOpts.bindIndex]: 0,
-                    getLinkThemeString,
                     img,
                     strings
                 });
@@ -3068,15 +3067,15 @@ async function main() {
                     [bindOpts.bindIndex]: 0,
                     getAlbumCover: bound.getAlbumCover,
                     getGridHTML: bound.getGridHTML,
-                    strings,
-                    to
+                    link: bound.link,
+                    strings
                 });
 
                 bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
                     [bindOpts.bindIndex]: 0,
                     getFlashCover: bound.getFlashCover,
                     getGridHTML: bound.getGridHTML,
-                    to
+                    link: bound.link
                 });
 
                 bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {

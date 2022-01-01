@@ -452,9 +452,9 @@ export function write(artist, {wikiData}) {
                             srcFn: thing => (thing.album
                                 ? getTrackCover(thing)
                                 : getAlbumCover(thing)),
-                            hrefFn: thing => (thing.album
-                                ? to('localized.track', thing.directory)
-                                : to('localized.album', thing.directory))
+                            linkFn: (thing, opts) => (thing.album
+                                ? link.track(thing, opts)
+                                : link.album(thing, opts))
                         })}
                     </div>
                 `

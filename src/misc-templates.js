@@ -270,45 +270,42 @@ export function iconifyURL(url, {strings, to}) {
 // Grids
 
 export function getGridHTML({
-    getLinkThemeString,
     img,
     strings,
 
     entries,
     srcFn,
-    hrefFn,
+    linkFn,
     altFn = () => '',
     detailsFn = null,
     lazy = true
 }) {
-    return entries.map(({ large, item }, i) => html.tag('a',
+    return entries.map(({ large, item }, i) => linkFn(item,
         {
             class: ['grid-item', 'box', large && 'large-grid-item'],
-            href: hrefFn(item),
-            style: getLinkThemeString(item.color)
-        },
-        fixWS`
-            ${img({
-                src: srcFn(item),
-                alt: altFn(item),
-                thumb: 'small',
-                lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
-                square: true,
-                reveal: getRevealStringFromTags(item.artTags, {strings})
-            })}
-            <span>${item.name}</span>
-            ${detailsFn && `<span>${detailsFn(item)}</span>`}
-        `)).join('\n');
+            text: fixWS`
+                ${img({
+                    src: srcFn(item),
+                    alt: altFn(item),
+                    thumb: 'small',
+                    lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
+                    square: true,
+                    reveal: getRevealStringFromTags(item.artTags, {strings})
+                })}
+                <span>${item.name}</span>
+                ${detailsFn && `<span>${detailsFn(item)}</span>`}
+            `
+        })).join('\n');
 }
 
 export function getAlbumGridHTML({
-    getAlbumCover, getGridHTML, strings, to,
+    getAlbumCover, getGridHTML, link, strings,
     details = false,
     ...props
 }) {
     return getGridHTML({
         srcFn: getAlbumCover,
-        hrefFn: album => to('localized.album', album.directory),
+        linkFn: link.album,
         detailsFn: details && (album => strings('misc.albumGridDetails', {
             tracks: strings.count.tracks(album.tracks.length, {unit: true}),
             time: strings.count.duration(getTotalDuration(album.tracks))
@@ -318,15 +315,16 @@ export function getAlbumGridHTML({
 }
 
 export function getFlashGridHTML({
-    getFlashCover, getGridHTML, to,
+    getFlashCover, getGridHTML, link,
     ...props
 }) {
     return getGridHTML({
         srcFn: getFlashCover,
-        hrefFn: flash => to('localized.flash', flash.directory),
+        linkFn: link.flash,
         ...props
     });
 }
+
 // Nav-bar links
 
 export function generateInfoGalleryLinks(currentThing, isGallery, {
