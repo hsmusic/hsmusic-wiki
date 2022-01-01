@@ -2052,7 +2052,13 @@ function writeSymlinks() {
                 throw error;
             }
         }
-        await symlink(path.resolve(directory), file);
+        try {
+            await symlink(path.resolve(directory), file);
+        } catch (error) {
+            if (error.code === 'EPERM') {
+                await symlink(path.resolve(directory), file, 'junction');
+            }
+        }
     }
 }
 
