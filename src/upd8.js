@@ -1792,7 +1792,7 @@ writePage.html = (pageFn, {
     footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer) : '');
 
     const canonical = (wikiInfo.canonicalBase
-        ? wikiInfo.canonicalBase + paths.pathname
+        ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathanme)
         : '');
 
     const collapseSidebars = (sidebarLeft.collapse !== false) && (sidebarRight.collapse !== false);

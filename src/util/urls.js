@@ -34,25 +34,32 @@ export function generateURLs(urlSpec) {
         };
     };
 
+    // This should be called on values which are going to be passed to
+    // path.relative, because relative will resolve a leading slash as the root
+    // directory of the working device, which we aren't looking for here.
+    const trimLeadingSlash = P => P.startsWith('/') ? P.slice(1) : P;
+
     const generateTo = (fromPath, fromGroup) => {
+        const A = trimLeadingSlash(fromPath);
+
         const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
 
         const pathHelper = (toPath, toGroup) => {
-            let target = (toPath === '/' ? '' : toPath);
+            let B = trimLeadingSlash(toPath);
 
             let argIndex = 0;
-            target = target.replaceAll('<>', () => `<${argIndex++}>`);
+            B = B.replaceAll('<>', () => `<${argIndex++}>`);
 
             if (toGroup.prefix !== fromGroup.prefix) {
                 // TODO: Handle differing domains in prefixes.
-                target = rebasePrefix + (toGroup.prefix || '') + target;
+                B = rebasePrefix + (toGroup.prefix || '') + B;
             }
 
             const suffix = (toPath.endsWith('/') ? '/' : '');
 
             return {
-                posix: path.posix.relative(fromPath, target) + suffix,
-                device: path.relative(fromPath, target) + suffix
+                posix: path.posix.relative(A, B) + suffix,
+                device: path.relative(A, B) + suffix
             };
         };
 
