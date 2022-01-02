@@ -112,7 +112,8 @@ export function writeTargetless({wikiData}) {
                             link.newsIndex('', {text: strings('newsIndex.title'), to}),
                             wikiInfo.features.flashesAndGames &&
                             link.flashIndex('', {text: strings('flashIndex.title'), to}),
-                            ...staticPageData.filter(page => page.listed).map(link.staticPage)
+                            ...staticPageData.filter(page => page.listed).map(page =>
+                                link.staticPage(page, {text: page.shortName}))
                         ].filter(Boolean).map(link => `<span>${link}</span>`).join('\n')}
                     </h2>
                 `
