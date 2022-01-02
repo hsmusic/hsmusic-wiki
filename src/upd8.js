@@ -272,7 +272,7 @@ async function findFiles(dataPath, filter = f => true) {
 }
 
 function splitLines(text) {
-    return text.split(/\r|\n|\r\n/);
+    return text.split(/\r\n|\r|\n/);
 }
 
 function* getSections(lines) {
