@@ -69,16 +69,20 @@ export function generateURLs(urlSpec) {
 
         const toHelper = (delimiterMode) => (key, ...args) => {
             const {
-                value: {[delimiterMode]: template},
-                group: {[groupSymbol]: toGroup}
+                value: {[delimiterMode]: template}
             } = getValueForFullKey(relative, key);
 
-            let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
+            let missing = 0;
+            let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => {
+                if (n < args.length) {
+                    return args[n];
+                } else {
+                    missing++;
+                }
+            });
 
-            // Kinda hacky lol, 8ut it works.
-            const missing = result.match(/<([0-9]+)>/g);
             if (missing) {
-                throw new Error(`Expected ${missing[missing.length - 1]} arguments, got ${args.length}`);
+                throw new Error(`Expected ${missing + args.length} arguments, got ${args.length} (key ${key}, args [${args}])`);
             }
 
             return result;
