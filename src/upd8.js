@@ -2023,8 +2023,8 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
     const [ groupKey, subKey ] = fullKey.split('.');
 
     const pathname = (groupKey === 'localized' && baseDirectory
-        ? urls.from('shared.root').to('localizedWithBaseDirectory.' + subKey, baseDirectory, directory)
-        : urls.from('shared.root').to(fullKey, directory));
+        ? urls.from('shared.root').toDevice('localizedWithBaseDirectory.' + subKey, baseDirectory, directory)
+        : urls.from('shared.root').toDevice(fullKey, directory));
 
     // Needed for the rare directory which itself contains a slash, e.g. for
     // listings, with directories like 'albums/by-name'.
@@ -2048,7 +2048,7 @@ function writeSymlinks() {
     ]);
 
     async function link(directory, urlKey) {
-        const pathname = urls.from('shared.root').to(urlKey);
+        const pathname = urls.from('shared.root').toDevice(urlKey);
         const file = path.join(outputPath, pathname);
         try {
             await unlink(file);

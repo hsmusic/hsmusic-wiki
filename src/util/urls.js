@@ -48,8 +48,12 @@ export function generateURLs(urlSpec) {
                 target = rebasePrefix + (toGroup.prefix || '') + target;
             }
 
-            return (path.relative(fromPath, target)
-                + (toPath.endsWith('/') ? '/' : ''));
+            const suffix = (toPath.endsWith('/') ? '/' : '');
+
+            return {
+                posix: path.posix.relative(fromPath, target) + suffix,
+                device: path.relative(fromPath, target) + suffix
+            };
         };
 
         const groupSymbol = Symbol();
@@ -63,8 +67,12 @@ export function generateURLs(urlSpec) {
         const relative = withEntries(urlSpec, entries => entries
             .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
 
-        const to = (key, ...args) => {
-            const { value: template, group: {[groupSymbol]: toGroup} } = getValueForFullKey(relative, key)
+        const toHelper = (delimiterMode) => (key, ...args) => {
+            const {
+                value: {[delimiterMode]: template},
+                group: {[groupSymbol]: toGroup}
+            } = getValueForFullKey(relative, key);
+
             let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => args[n]);
 
             // Kinda hacky lol, 8ut it works.
@@ -76,7 +84,10 @@ export function generateURLs(urlSpec) {
             return result;
         };
 
-        return {to, relative};
+        return {
+            to: toHelper('posix'),
+            toDevice: toHelper('device')
+        };
     };
 
     const generateFrom = () => {
