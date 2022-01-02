@@ -38,7 +38,7 @@ export function generateURLs(urlSpec) {
         const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
 
         const pathHelper = (toPath, toGroup) => {
-            let target = toPath;
+            let target = (toPath === '/' ? '' : toPath);
 
             let argIndex = 0;
             target = target.replaceAll('<>', () => `<${argIndex++}>`);
