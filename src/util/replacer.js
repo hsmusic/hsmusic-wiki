@@ -324,7 +324,10 @@ function evaluateTag(node, opts) {
 
     const source = input.slice(node.i, node.iEnd);
 
-    const replacerKey = node.data.replacerKey?.data || 'track';
+    const replacerKeyImplied = !node.data.replacerKey;
+    const replacerKey = (replacerKeyImplied
+        ? 'track'
+        : node.data.replacerKey.data);
 
     if (!replacerSpec[replacerKey]) {
         logWarn`The link ${source} has an invalid replacer key!`;
@@ -343,7 +346,9 @@ function evaluateTag(node, opts) {
 
     const value = (
         valueFn ? valueFn(replacerValue) :
-        findKey ? find[findKey](replacerValue, {wikiData}) :
+        findKey ? find[findKey]((replacerKeyImplied
+            ? replacerValue
+            : replacerKey + `:` + replacerValue), {wikiData}) :
         {
             directory: replacerValue,
             name: null

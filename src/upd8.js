@@ -186,7 +186,6 @@ import {
     bindOpts,
     call,
     filterEmptyLines,
-    mapInPlace,
     queue,
     splitArray,
     unique,
@@ -2683,16 +2682,6 @@ async function main() {
         }
     }
 
-    {
-        for (const { references, name, album } of WD.trackData) {
-            for (const ref of references) {
-                if (!find.track(ref, {wikiData})) {
-                    logWarn`Track not found "${ref}" in ${name} (${album.name})`;
-                }
-            }
-        }
-    }
-
     WD.contributionData = Array.from(new Set([
         ...WD.trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
         ...WD.albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
@@ -2705,68 +2694,136 @@ async function main() {
     // more than once. (We 8uild a few additional links that can't 8e cre8ted
     // at initial data processing time here too.)
 
-    const filterNullArray = (parent, key) => {
-        for (const obj of parent) {
-            const array = obj[key];
-            for (let i = 0; i < array.length; i++) {
-                if (!array[i]) {
-                    const prev = array[i - 1] && array[i - 1].name;
-                    const next = array[i + 1] && array[i + 1].name;
-                    logWarn`Unexpected null in ${obj.name} (${obj.what}) (array key ${key} - prev: ${prev}, next: ${next})`;
+    const allContribSources = [];
+
+    // Collect all contrib data sources into one array, which will be processed
+    // later.
+    const collectContributors = function(thing, ...contribDataKeys) {
+        allContribSources.push(...contribDataKeys.map(key => ({
+            thing,
+            key,
+            data: thing[key]
+        })).filter(({ data }) => data?.length));
+    };
+
+    // Process in three parts:
+    // 1) collate all contrib data into one set (no duplicates)
+    // 2) convert every "who" contrib string into an actual artist object
+    // 3) filter each source (not the set!) by null who values
+    const postprocessContributors = function() {
+        const allContribData = new Set(allContribSources.flatMap(source => source.data));
+        const originalContribStrings = new Map();
+
+        for (const contrib of allContribData) {
+            originalContribStrings.set(contrib, contrib.who);
+            contrib.who = find.artist(contrib.who, {wikiData});
+        }
+
+        for (const { thing, key, data } of allContribSources) {
+            data.splice(0, data.length, ...data.filter(contrib => {
+                if (!contrib.who) {
+                    const orig = originalContribStrings.get(contrib);
+                    logWarn`Post-process: Contributor ${orig} didn't match any artist data - in ${thing.name} (key: ${key})`;
                 }
-            }
-            array.splice(0, array.length, ...array.filter(Boolean));
+            }));
         }
     };
 
-    const filterNullValue = (parent, key) => {
-        parent.splice(0, parent.length, ...parent.filter(obj => {
-            if (!obj[key]) {
-                logWarn`Unexpected null in ${obj.name} (value key ${key})`;
-                return false;
+    // Note: this mutates the original object, but NOT the actual array it's
+    // operating on. This means if the array at the original thing[key] value
+    // was also used elsewhere, it will have the original values (not the mapped
+    // and filtered ones).
+    const mapAndFilter = function(thing, key, {
+        map,
+        filter = x => x,
+        context // only used for debugging
+    }) {
+        const replacement = [];
+        for (const value of thing[key]) {
+            const newValue = map(value);
+            if (filter(newValue)) {
+                replacement.push(newValue);
+            } else {
+                let contextPart = `${thing.name}`;
+                if (context) {
+                    contextPart += ` (${context(thing)})`;
+                }
+                logWarn`Post-process: Value ${value} (${key}) didn't match any data - ${contextPart}`;
             }
-            return true;
-        }));
+        }
+        thing[key] = replacement;
     };
 
-    WD.trackData.forEach(track => mapInPlace(track.references, r => find.track(r, {wikiData})));
-    WD.trackData.forEach(track => track.aka = find.track(track.aka, {wikiData}));
-    WD.trackData.forEach(track => mapInPlace(track.artTags, t => find.tag(t, {wikiData})));
-    WD.albumData.forEach(album => mapInPlace(album.groups, g => find.group(g, {wikiData})));
-    WD.albumData.forEach(album => mapInPlace(album.artTags, t => find.tag(t, {wikiData})));
-    WD.artistAliasData.forEach(artist => artist.alias = find.artist(artist.alias, {wikiData}));
-    WD.contributionData.forEach(contrib => contrib.who = find.artist(contrib.who, {wikiData}));
+    const bound = {
+        findGroup: x => find.group(x, {wikiData}),
+        findTrack: x => find.track(x, {wikiData}),
+        findTag: x => find.tag(x, {wikiData})
+    };
 
-    filterNullArray(WD.trackData, 'references');
-    filterNullArray(WD.trackData, 'artTags');
-    filterNullArray(WD.albumData, 'groups');
-    filterNullArray(WD.albumData, 'artTags');
-    filterNullValue(WD.artistAliasData, 'alias');
-    filterNullValue(WD.contributionData, 'who');
-
-    WD.trackData.forEach(track1 => track1.referencedBy = WD.trackData.filter(track2 => track2.references.includes(track1)));
-    WD.groupData.forEach(group => group.albums = WD.albumData.filter(album => album.groups.includes(group)));
-    WD.tagData.forEach(tag => tag.things = sortByArtDate([...WD.albumData, ...WD.trackData]).filter(thing => thing.artTags.includes(tag)));
-
-    WD.groupData.forEach(group => group.category = WD.groupCategoryData.find(x => x.name === group.category));
-    WD.groupCategoryData.forEach(category => category.groups = WD.groupData.filter(x => x.category === category));
-
-    WD.trackData.forEach(track => track.otherReleases = [
-        track.aka,
-        ...WD.trackData.filter(({ aka }) => aka === track || (track.aka && aka === track.aka)),
-    ].filter(x => x && x !== track));
-
-    if (WD.wikiInfo.features.flashesAndGames) {
-        WD.flashData.forEach(flash => mapInPlace(flash.tracks, t => find.track(t, {wikiData})));
-        WD.flashData.forEach(flash => flash.act = WD.flashActData.find(act => act.name === flash.act));
-        WD.flashActData.forEach(act => act.flashes = WD.flashData.filter(flash => flash.act === act));
-
-        filterNullArray(WD.flashData, 'tracks');
-
-        WD.trackData.forEach(track => track.flashes = WD.flashData.filter(flash => flash.tracks.includes(track)));
+    for (const track of WD.trackData) {
+        const context = () => track.album.name;
+        track.aka = find.track(track.aka, {wikiData});
+        mapAndFilter(track, 'references', {map: bound.findTrack, context});
+        mapAndFilter(track, 'artTags', {map: bound.findTag, context});
+        collectContributors(track, 'artists', 'contributors', 'coverArtists');
     }
 
-    WD.artistData.forEach(artist => {
+    for (const track1 of WD.trackData) {
+        track1.referencedBy = WD.trackData.filter(track2 => track2.references.includes(track1));
+        track1.otherReleases = [
+            track1.aka,
+            ...WD.trackData.filter(track2 =>
+                track2.aka === track1 ||
+                (track1.aka && track2.aka === track1.aka))
+        ].filter(x => x && x !== track1);
+    }
+
+    for (const album of WD.albumData) {
+        mapAndFilter(album, 'groups', {map: bound.findGroup});
+        mapAndFilter(album, 'artTags', {map: bound.findTag});
+        collectContributors(album, 'artists', 'coverArtists', 'wallpaperArtists', 'bannerArtists');
+    }
+
+    mapAndFilter(WD, 'artistAliasData', {
+        map: artist => {
+            artist.alias = find.artist(artist.alias, {wikiData});
+            return artist;
+        },
+        filter: artist => artist.alias
+    });
+
+    for (const group of WD.groupData) {
+        group.albums = WD.albumData.filter(album => album.groups.includes(group));
+        group.category = WD.groupCategoryData.find(x => x.name === group.category);
+    }
+
+    for (const category of WD.groupCategoryData) {
+        category.groups = WD.groupData.filter(x => x.category === category);
+    }
+
+    const albumAndTrackDataSortedByArtDateMan = sortByArtDate([...WD.albumData, ...WD.trackData]);
+
+    for (const tag of WD.tagData) {
+        tag.things = albumAndTrackDataSortedByArtDateMan.filter(thing => thing.artTags.includes(tag));
+    }
+
+    if (WD.wikiInfo.features.flashesAndGames) {
+        for (const flash of WD.flashData) {
+            flash.act = WD.flashActData.find(act => act.name === flash.act);
+            mapAndFilter(flash, 'tracks', {map: bound.findTrack});
+            collectContributors(flash, 'contributors');
+        }
+
+        for (const act of WD.flashActData) {
+            act.flashes = WD.flashData.filter(flash => flash.act === act);
+        }
+
+        for (const track of WD.trackData) {
+            track.flashes = WD.flashData.filter(flash => flash.tracks.includes(track));
+        }
+    }
+
+    for (const artist of WD.artistData) {
         const filterProp = (array, prop) => array.filter(thing => thing[prop]?.some(({ who }) => who === artist));
         const filterCommentary = array => array.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'));
         artist.tracks = {
@@ -2790,7 +2847,9 @@ async function main() {
                 asContributor: filterProp(WD.flashData, 'contributors')
             };
         }
-    });
+    }
+
+    postprocessContributors();
 
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
