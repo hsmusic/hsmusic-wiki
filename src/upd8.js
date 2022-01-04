@@ -2724,7 +2724,9 @@ async function main() {
                 if (!contrib.who) {
                     const orig = originalContribStrings.get(contrib);
                     logWarn`Post-process: Contributor ${orig} didn't match any artist data - in ${thing.name} (key: ${key})`;
+                    return false;
                 }
+                return true;
             }));
         }
     };
@@ -2823,6 +2825,10 @@ async function main() {
         }
     }
 
+    // Process contributors before artist data, because a bunch of artist data
+    // will depend on accessing the values postprocessContributors() updates.
+    postprocessContributors();
+
     for (const artist of WD.artistData) {
         const filterProp = (array, prop) => array.filter(thing => thing[prop]?.some(({ who }) => who === artist));
         const filterCommentary = array => array.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'));
@@ -2848,8 +2854,6 @@ async function main() {
             };
         }
     }
-
-    postprocessContributors();
 
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
