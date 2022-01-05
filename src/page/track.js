@@ -155,7 +155,7 @@ export function write(track, {wikiData}) {
                 banner: album.bannerArtists && {
                     classes: ['dim'],
                     dimensions: album.bannerDimensions,
-                    path: ['media.albumBanner', album.directory],
+                    path: ['media.albumBanner', album.directory, album.bannerFileExtension],
                     alt: strings('misc.alt.albumBanner'),
                     position: 'bottom'
                 },

@@ -789,8 +789,10 @@ async function processAlbumDataFile(file) {
     album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
     album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
     album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
+    album.wallpaperFileExtension = getBasicField(albumSection, 'Wallpaper File Extension') || 'jpg';
     album.bannerArtists = getContributionField(albumSection, 'Banner Art');
     album.bannerStyle = getMultilineField(albumSection, 'Banner Style');
+    album.bannerFileExtension = getBasicField(albumSection, 'Banner File Extension') || 'jpg';
     album.bannerDimensions = getDimensionsField(albumSection, 'Banner Dimensions');
     album.date = getBasicField(albumSection, 'Date');
     album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;

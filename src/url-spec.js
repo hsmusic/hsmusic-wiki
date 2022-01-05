@@ -71,8 +71,8 @@ const urlSpec = {
             path: '<>',
 
             albumCover: 'album-art/<>/cover.jpg',
-            albumWallpaper: 'album-art/<>/bg.jpg',
-            albumBanner: 'album-art/<>/banner.jpg',
+            albumWallpaper: 'album-art/<>/bg.<>',
+            albumBanner: 'album-art/<>/banner.<>',
             trackCover: 'album-art/<>/<>.jpg',
             artistAvatar: 'artist-avatar/<>.jpg',
             flashArt: 'flash-art/<>.jpg',
