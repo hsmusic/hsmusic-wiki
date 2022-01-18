@@ -17,6 +17,9 @@
 //      going to 8e in. May8e JSON, 8ut more likely some weird custom format
 //      which will 8e a lot easier to edit.
 //
+//      Like three years later oh god: SURPISE! We went with the latter, but
+//      they're YAML now. Probably. Assuming that hasn't changed, yet.
+//
 //   3. Generate the page files! They're just static index.html files, and are
 //      what gh-pages (or wherever this is hosted) will show to clients.
 //      Hopefully pretty minimalistic HTML, 8ut like, shrug. They'll reference
@@ -27,40 +30,6 @@
 //
 // Oh yeah, like. Just run this through some relatively recent version of
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
-
-// HEY FUTURE ME!!!!!!!! Don't forget to implement artist pages! Those are,
-// like, the coolest idea you've had yet, so DO NOT FORGET. (Remem8er, link
-// from track listings, etc!) --- Thanks, past me. To futurerer me: an al8um
-// listing page (a list of all the al8ums)! Make sure to sort these 8y date -
-// we'll need a new field for al8ums.
-
-// ^^^^^^^^ DID THAT! 8ut also, artist images. Pro8a8ly stolen from the fandom
-// wiki (I found half those images anywayz).
-
-// TRACK ART CREDITS. This is a must.
-
-// 2020-08-23
-// ATTENTION ALL 8*TCHES AND OTHER GENDER TRUCKERS: AS IT TURNS OUT, THIS CODE
-// ****SUCKS****. I DON'T THINK ANYTHING WILL EVER REDEEM IT, 8UT THAT DOESN'T
-// MEAN WE CAN'T TAKE SOME ACTION TO MAKE WRITING IT A LITTLE LESS TERRI8LE.
-// We're gonna start defining STRUCTURES to make things suck less!!!!!!!!
-// No classes 8ecause those are a huge pain and like, pro8a8ly 8ad performance
-// or whatever -- just some standard structures that should 8e followed
-// wherever reasona8le. Only one I need today is the contri8 one 8ut let's put
-// any new general-purpose structures here too, ok?
-//
-// Contri8ution: {who, what, date, thing}. D8 and thing are the new fields.
-//
-// Use these wisely, which is to say all the time and instead of whatever
-// terri8le new pseudo structure you're trying to invent!!!!!!!!
-//
-// Upd8 2021-01-03: Soooooooo we didn't actually really end up using these,
-// lol? Well there's still only one anyway. Kinda ended up doing a 8ig refactor
-// of all the o8ject structures today. It's not *especially* relevant 8ut feels
-// worth mentioning? I'd get rid of this comment 8lock 8ut I like it too much!
-// Even though I haven't actually reread it, lol. 8ut yeah, hopefully in the
-// spirit of this "make things more consistent" attitude I 8rought up 8ack in
-// August, stuff's lookin' 8etter than ever now. W00t!
 
 import * as path from 'path';
 import { promisify } from 'util';
@@ -74,6 +43,8 @@ import fixWS from 'fix-whitespace';
 
 // It stands for "HTML Entities", apparently. Cursed.
 import he from 'he';
+
+import yaml from 'js-yaml';
 
 import {
     // This is the dum8est name for a function possi8le. Like, SURE, fine, may8e
@@ -118,6 +89,8 @@ import find from './util/find.js';
 import * as html from './util/html.js';
 import unbound_link, {getLinkThemeString} from './util/link.js';
 
+import Album from './thing/album.js';
+
 import {
     fancifyFlashURL,
     fancifyURL,
@@ -129,6 +102,7 @@ import {
     getAlbumStylesheet,
     getArtistString,
     getFlashGridHTML,
+    getFooterLocalizationLinks,
     getGridHTML,
     getRevealStringFromTags,
     getRevealStringFromWarnings,
@@ -137,6 +111,7 @@ import {
 } from './misc-templates.js';
 
 import {
+    color,
     decorateTime,
     logWarn,
     logInfo,
@@ -185,10 +160,15 @@ import {
 import {
     bindOpts,
     call,
+    filterAggregateAsync,
     filterEmptyLines,
+    mapAggregateAsync,
+    openAggregate,
     queue,
+    showAggregate,
     splitArray,
     unique,
+    withAggregate,
     withEntries
 } from './util/sugar.js';
 
@@ -208,6 +188,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 7;
 
+// MAKE THESE END IN YAML
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
 const ARTIST_DATA_FILE = 'artists.txt';
@@ -274,6 +255,11 @@ function splitLines(text) {
     return text.split(/\r\n|\r|\n/);
 }
 
+// REFERENCE CODE!
+// REFERENCE CODE!
+// REFERENCE CODE!
+// REFERENCE CODE!
+
 function* getSections(lines) {
     // ::::)
     const isSeparatorLine = line => /^-{8,}/.test(line);
@@ -285,9 +271,11 @@ function getBasicField(lines, name) {
     return line && line.slice(name.length + 1).trim();
 }
 
-function getDimensionsField(lines, name) {
-    const string = getBasicField(lines, name);
-    if (!string) return string;
+function parseDimensions(string) {
+    if (!string) {
+        return null;
+    }
+
     const parts = string.split(/[x,* ]+/g);
     if (parts.length !== 2) throw new Error(`Invalid dimensions: ${string} (expected width & height)`);
     const nums = parts.map(part => Number(part.trim()));
@@ -338,9 +326,7 @@ function getListField(lines, name) {
     return listLines.map(line => line.slice(2));
 };
 
-function getContributionField(section, name) {
-    let contributors = getListField(section, name);
-
+function parseContributors(contributors) {
     if (!contributors) {
         return null;
     }
@@ -737,10 +723,61 @@ function transformLyrics(text, {
     return outLines.join('\n');
 }
 
-function getCommentaryField(lines) {
-    const text = getMultilineField(lines, 'Commentary');
+// Use parseErrorFactory to declare different "types" of errors. By storing the
+// factory itself in an accessible location, the type of error may be detected
+// by comparing against its own factory property.
+function parseErrorFactory(annotation) {
+    return function factory(data = null) {
+        return {
+            error: true,
+            annotation,
+            data,
+            factory
+        };
+    };
+}
+
+function parseField(object, key, steps) {
+    let value = object[key];
+
+    for (const step of steps) {
+        try {
+            value = step(value);
+        } catch (error) {
+            throw parseField.stepError({
+                stepName: step.name,
+                stepError: error
+            });
+        }
+    }
+
+    return value;
+}
+
+parseField.stepError = parseErrorFactory('step failed');
+
+function assertFieldPresent(value) {
+    if (value === undefined || value === null) {
+        throw assertFieldPresent.missingField();
+    } else {
+        return value;
+    }
+}
+
+assertFieldPresent.missingField = parseErrorFactory('missing field');
+
+function assertValidDate(dateString, {optional = false} = {}) {
+    if (dateString && isNaN(Date.parse(dateString))) {
+        throw assertValidDate.invalidDate();
+    }
+    return value;
+}
+
+assertValidDate.invalidDate = parseErrorFactory('invalid date');
+
+function parseCommentary(text) {
     if (text) {
-        const lines = text.split('\n');
+        const lines = String(text).split('\n');
         if (!lines[0].replace(/<\/b>/g, '').includes(':</i>')) {
             return {error: `An entry is missing commentary citation: "${lines[0].slice(0, 40)}..."`};
         }
@@ -748,7 +785,140 @@ function getCommentaryField(lines) {
     } else {
         return null;
     }
+}
+
+// General function for inputting a single document (usually loaded from YAML)
+// and outputting an instance of a provided Thing subclass.
+//
+// makeParseDocument is a factory function: the returned function will take a
+// document and apply the configuration passed to makeParseDocument in order to
+// construct a Thing subclass.
+function makeParseDocument(thingClass, {
+    // Optional early step for transforming field values before providing them
+    // to the Thing's update() method. This is useful when the input format
+    // (i.e. values in the document) differ from the format the actual Thing
+    // expects.
+    //
+    // Each key and value are a field name (not an update() property) and a
+    // function which takes the value for that field and returns the value which
+    // will be passed on to update().
+    fieldTransformations = {},
+
+    // Mapping of Thing.update() source properties to field names.
+    //
+    // Note this is property -> field, not field -> property. This is a
+    // shorthand convenience because properties are generally typical
+    // camel-cased JS properties, while fields may contain whitespace and be
+    // more easily represented as quoted strings.
+    propertyFieldMapping
+}) {
+    const knownFields = Object.values(propertyFieldMapping);
+
+    // Invert the property-field mapping, since it'll come in handy for
+    // assigning update() source values later.
+    const fieldPropertyMapping = Object.fromEntries(
+        (Object.entries(propertyFieldMapping)
+            .map(([ property, field ]) => [field, property])));
+
+    return function(document, {file = null}) {
+        const unknownFields = Object.keys(document)
+            .filter(field => !knownFields.includes(field));
+
+        if (unknownFields.length) {
+            throw new makeParseDocument.UnknownFieldsError(unknownFields);
+        }
+
+        const fieldValues = {};
+
+        for (const [ field, value ] of Object.entries(document)) {
+            if (Object.hasOwn(fieldTransformations, field)) {
+                fieldValues[field] = fieldTransformations[field](value);
+            } else {
+                fieldValues[field] = value;
+            }
+        }
+
+        const sourceProperties = {};
+
+        for (const [ field, value ] of Object.entries(fieldValues)) {
+            const property = fieldPropertyMapping[field];
+            sourceProperties[property] = value;
+        }
+
+        const thing = Reflect.construct(thingClass, []);
+
+        const C = color;
+        const filePart = file ? `(file: ${C.bright(C.blue(path.relative(dataPath, file)))})` : '';
+        withAggregate({message: `Errors applying ${C.green(thingClass.name)} properties ${filePart}`}, ({ call }) => {
+            for (const [ property, value ] of Object.entries(sourceProperties)) {
+                call(() => {
+                    thing[property] = value;
+                });
+            }
+        });
+
+        return thing;
+    };
+}
+
+makeParseDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
+    constructor(fields) {
+        super(`Unknown fields present: ${fields.join(', ')}`);
+        this.fields = fields;
+    }
 };
+
+processAlbumDataFile.parseDocument = makeParseDocument(Album, {
+    fieldTransformations: {
+        'Artists': parseContributors,
+        'Cover Artists': parseContributors,
+        'Default Track Cover Artists': parseContributors,
+        'Wallpaper Artists': parseContributors,
+        'Banner Artists': parseContributors,
+
+        'Date': value => new Date(value),
+        'Date Added': value => new Date(value),
+        'Cover Art Date': value => new Date(value),
+        'Default Track Cover Art Date': value => new Date(value),
+
+        'Banner Dimensions': parseDimensions,
+    },
+
+    propertyFieldMapping: {
+        name: 'Album',
+
+        color: 'Color',
+        directory: 'Directory',
+        urls: 'URLs',
+
+        artistContribsByRef: 'Artists',
+        coverArtistContribsByRef: 'Cover Artists',
+        trackCoverArtistContribsByRef: 'Default Track Cover Artists',
+
+        wallpaperArtistContribsByRef: 'Wallpaper Artists',
+        wallpaperStyle: 'Wallpaper Style',
+        wallpaperFileExtension: 'Wallpaper File Extension',
+
+        bannerArtistContribsByRef: 'Banner Artists',
+        bannerStyle: 'Banner Style',
+        bannerFileExtension: 'Banner File Extension',
+        bannerDimensions: 'Banner Dimensions',
+
+        date: 'Date',
+        trackArtDate: 'Default Track Cover Art Date',
+        coverArtDate: 'Cover Art Date',
+        dateAddedToWiki: 'Date Added',
+
+        hasTrackArt: 'Has Track Art',
+        isMajorRelease: 'Major Release',
+        isListedOnHomepage: 'Listed on Homepage',
+
+        aka: 'Also Released As',
+        groupsByRef: 'Groups',
+        artTagsByRef: 'Art Tags',
+        commentary: 'Commentary',
+    }
+});
 
 async function processAlbumDataFile(file) {
     let contents;
@@ -771,43 +941,54 @@ async function processAlbumDataFile(file) {
     // We'll just return more specific errors if it's missing necessary data
     // fields.
 
-    const contentLines = contents.split(/\r\n|\r|\n/);
+    const documents = yaml.loadAll(contents);
 
-    // In this line of code I defeat the purpose of using a generator in the
-    // first place. Sorry!!!!!!!!
-    const sections = Array.from(getSections(contentLines));
+    const albumDoc = documents[0];
 
-    const albumSection = sections[0];
-    const album = {};
+    return processAlbumDataFile.parseDocument(albumDoc, {file});
 
-    album.name = getBasicField(albumSection, 'Album');
+    // --------------------------------------------------------------
+
+    // const album = {};
+
+    album.name = parseField(albumDoc, 'Album', [
+        assertFieldPresent
+    ]);
 
     if (!album.name) {
         return {error: `The file "${path.relative(dataPath, file)}" is missing the "Album" field - maybe this is a misplaced file instead of album data?`};
     }
 
-    album.artists = getContributionField(albumSection, 'Artists') || getContributionField(albumSection, 'Artist');
-    album.wallpaperArtists = getContributionField(albumSection, 'Wallpaper Art');
-    album.wallpaperStyle = getMultilineField(albumSection, 'Wallpaper Style');
-    album.wallpaperFileExtension = getBasicField(albumSection, 'Wallpaper File Extension') || 'jpg';
-    album.bannerArtists = getContributionField(albumSection, 'Banner Art');
-    album.bannerStyle = getMultilineField(albumSection, 'Banner Style');
-    album.bannerFileExtension = getBasicField(albumSection, 'Banner File Extension') || 'jpg';
-    album.bannerDimensions = getDimensionsField(albumSection, 'Banner Dimensions');
-    album.date = getBasicField(albumSection, 'Date');
-    album.trackArtDate = getBasicField(albumSection, 'Track Art Date') || album.date;
-    album.coverArtDate = getBasicField(albumSection, 'Cover Art Date') || album.date;
-    album.dateAdded = getBasicField(albumSection, 'Date Added');
-    album.coverArtists = getContributionField(albumSection, 'Cover Art');
-    album.hasTrackArt = getBooleanField(albumSection, 'Has Track Art') ?? true;
-    album.trackCoverArtists = getContributionField(albumSection, 'Track Art');
-    album.artTags = getListField(albumSection, 'Art Tags') || [];
-    album.commentary = getCommentaryField(albumSection);
-    album.urls = getListField(albumSection, 'URLs') || [];
-    album.groups = getListField(albumSection, 'Groups') || [];
-    album.directory = getBasicField(albumSection, 'Directory');
-    album.isMajorRelease = getBooleanField(albumSection, 'Major Release') ?? false;
-    album.isListedOnHomepage = getBooleanField(albumSection, 'Listed on Homepage') ?? true;
+    // album.directory = albumDoc['Directory'];
+    // album.urls = albumDoc['URLs'] || [];
+
+    // album.artists = parseContributors(albumDoc['Artists']);
+
+    // album.date = albumDoc['Date'];
+    // album.trackArtDate = albumDoc['Track Art Date'] || album.date;
+    // album.coverArtDate = albumDoc['Cover Art Date'] || album.date;
+    // album.dateAdded = albumDoc['Date Added'];
+
+    // album.coverArtists = parseContributors(albumDoc['Cover Artists']);
+    // album.trackCoverArtists = parseContributors(albumDoc['Default Track Cover Artists']);
+    // album.hasTrackArt = albumDoc['Has Track Art'] ?? true;
+
+    // album.wallpaperArtists = parseContributors(albumDoc['Wallpaper Artists']);
+    // album.wallpaperStyle = albumDoc['Wallpaper Style'];
+    // album.wallpaperFileExtension = albumDoc['Wallpaper File Extension'] || 'jpg';
+
+    // album.bannerArtists = albumDoc['Banner Artists'];
+    // album.bannerStyle = albumDoc['Banner Style'];
+    // album.bannerFileExtension = albumDoc['Banner File Extension'] || 'jpg';
+    // album.bannerDimensions = parseDimensions(albumDoc['Banner Dimensions']);
+
+    // album.groups = albumDoc['Groups'] || [];
+    // album.artTags = albumDoc['Art Tags'] || [];
+
+    // album.commentary = parseCommentary(albumDoc['Commentary']);
+
+    // album.isMajorRelease = albumDoc['Major Release'] ?? false;
+    // album.isListedOnHomepage = albumDoc['Listed on Homepage'] ?? true;
 
     if (album.artists && album.artists.error) {
         return {error: `${album.artists.error} (in ${album.name})`};
@@ -829,10 +1010,7 @@ async function processAlbumDataFile(file) {
         return {error: `The album "${album.name}" is missing the "Cover Art" field.`};
     }
 
-    album.color = (
-        getBasicField(albumSection, 'Color') ||
-        getBasicField(albumSection, 'FG')
-    );
+    // album.color = albumDoc['Color'];
 
     if (!album.name) {
         return {error: `Expected "Album" (name) field!`};
@@ -879,24 +1057,20 @@ async function processAlbumDataFile(file) {
     let group = null;
     let trackIndex = 0;
 
-    for (const section of sections.slice(1)) {
+    for (const doc of documents.slice(1)) {
         // Just skip empty sections. Sometimes I paste a 8unch of dividers,
         // and this lets the empty sections doing that creates (temporarily)
         // exist without raising an error.
-        if (!section.filter(Boolean).length) {
+        if (!doc) {
             continue;
         }
 
-        const groupName = getBasicField(section, 'Group');
+        const groupName = doc['Group'];
         if (groupName) {
             group = {
                 name: groupName,
-                color: (
-                    getBasicField(section, 'Color') ||
-                    getBasicField(section, 'FG') ||
-                    album.color
-                ),
-                originalDate: getBasicField(section, 'Original Date'),
+                color: doc['Color'] || album.color,
+                originalDate: doc['Original Date'],
                 startIndex: trackIndex,
                 tracks: []
             };
@@ -921,27 +1095,46 @@ async function processAlbumDataFile(file) {
 
         const track = {};
 
-        track.name = getBasicField(section, 'Track');
-        track.commentary = getCommentaryField(section);
-        track.lyrics = getMultilineField(section, 'Lyrics');
-        track.originalDate = getBasicField(section, 'Original Date');
-        track.coverArtDate = getBasicField(section, 'Cover Art Date') || track.originalDate || album.trackArtDate;
-        track.references = getListField(section, 'References') || [];
-        track.artists = getContributionField(section, 'Artists') || getContributionField(section, 'Artist');
-        track.coverArtists = getContributionField(section, 'Track Art');
-        track.artTags = getListField(section, 'Art Tags') || [];
-        track.contributors = getContributionField(section, 'Contributors') || [];
-        track.directory = getBasicField(section, 'Directory');
-        track.aka = getBasicField(section, 'AKA');
+        track.name = String(doc['Track']);
 
-        if (!track.name) {
-            return {error: `A track section is missing the "Track" (name) field (in ${album.name}, previous: ${album.tracks[album.tracks.length - 1]?.name}).`};
+        track.commentary = parseCommentary(doc['Commentary']);
+        track.lyrics = String(doc['Lyrics']);
+
+        track.originalDate = doc['Date First Released'];
+        track.coverArtDate = doc['Cover Art Date'] || track.originalDate || album.trackArtDate;
+
+        isNaN(Date.parse(track.originalDate))
+
+        if (track.originalDate) {
+            if (isNaN(Date.parse(track.originalDate))) {
+                return {error: `The track "${track.name}"'s has an invalid "Date First Released" field: "${track.originalDate}"`};
+            }
+            track.originalDate = new Date(track.originalDate);
+            track.date = new Date(track.originalDate);
+        } else if (group && group.originalDate) {
+            track.originalDate = group.originalDate;
+            track.date = group.originalDate;
+        } else {
+            track.date = album.date;
         }
 
-        let durationString = getBasicField(section, 'Duration') || '0:00';
-        track.duration = getDurationInSeconds(durationString);
+        track.coverArtDate = new Date(track.coverArtDate);
 
-        if (track.contributors.error) {
+        track.references = doc['References'] || [];
+        track.artists = parseContributors(doc['Artists']);
+        track.coverArtists = parseContributors(doc['Cover Artists']);
+        track.artTags = doc['Art Tags'] || [];
+        track.contributors = parseContributors(doc['Contributors']);
+        track.directory = doc['Directory'];
+        track.aka = doc['AKA'];
+
+        if (!track.name) {
+            return {error: `A track document is missing the "Track" (name) field (in ${album.name}, previous: ${album.tracks[album.tracks.length - 1]?.name}).`};
+        }
+
+        track.duration = getDurationInSeconds(doc['Duration'] || '0:00');
+
+        if (track.contributors?.error) {
             return {error: `${track.contributors.error} (in ${track.name}, ${album.name})`};
         }
 
@@ -960,42 +1153,28 @@ async function processAlbumDataFile(file) {
             }
         }
 
-        if (!track.coverArtists) {
-            if (getBasicField(section, 'Track Art') !== 'none' && album.hasTrackArt) {
-                if (album.trackCoverArtists) {
-                    track.coverArtists = album.trackCoverArtists;
-                } else {
-                    return {error: `The track "${track.name}" is missing the "Track Art" field (in ${album.name}).`};
-                }
-            }
-        }
-
-        if (track.coverArtists && track.coverArtists.length && track.coverArtists[0] === 'none') {
+        if (doc['Has Cover Art'] === false) {
             track.coverArtists = null;
+        } else if (album.hasTrackArt && !track.coverArtists) {
+            if (album.trackCoverArtists) {
+                track.coverArtists = album.trackCoverArtists;
+            } else {
+                return {error: `The track "${track.name}" is missing the "Cover Artists" field (in ${album.name}).`};
+            }
         }
 
         if (!track.directory) {
-            track.directory = getKebabCase(track.name);
-        }
-
-        if (track.originalDate) {
-            if (isNaN(Date.parse(track.originalDate))) {
-                return {error: `The track "${track.name}"'s has an invalid "Original Date" field: "${track.originalDate}"`};
+            try {
+                track.directory = getKebabCase(track.name);
+            } catch (error) {
+                console.log('error:', track.name);
+                process.exit();
             }
-            track.originalDate = new Date(track.originalDate);
-            track.date = new Date(track.originalDate);
-        } else if (group && group.originalDate) {
-            track.originalDate = group.originalDate;
-            track.date = group.originalDate;
-        } else {
-            track.date = album.date;
         }
 
-        track.coverArtDate = new Date(track.coverArtDate);
+        const hasURLs = doc['Has URLs'] ?? true;
 
-        const hasURLs = getBooleanField(section, 'Has URLs') ?? true;
-
-        track.urls = hasURLs && (getListField(section, 'URLs') || []).filter(Boolean);
+        track.urls = hasURLs && doc['URLs'] || [];
 
         if (hasURLs && !track.urls.length) {
             return {error: `The track "${track.name}" should have at least one URL specified.`};
@@ -1726,15 +1905,35 @@ writePage.to = ({
 }) => (targetFullKey, ...args) => {
     const [ groupKey, subKey ] = targetFullKey.split('.');
     let path = paths.subdirectoryPrefix;
+
+    let from;
+    let to;
+
     // When linking to *outside* the localized area of the site, we need to
     // make sure the result is correctly relative to the 8ase directory.
-    if (groupKey !== 'localized' && baseDirectory) {
-        path += urls.from('localizedWithBaseDirectory.' + pageSubKey).to(targetFullKey, ...args);
+    if (groupKey !== 'localized' && groupKey !== 'localizedDefaultLanguage' && baseDirectory) {
+        from = 'localizedWithBaseDirectory.' + pageSubKey;
+        to = targetFullKey;
+    } else if (groupKey === 'localizedDefaultLanguage' && baseDirectory) {
+        // Special case for specifically linking *from* a page with base
+        // directory *to* a page without! Used for the language switcher and
+        // hopefully nothing else oh god.
+        from = 'localizedWithBaseDirectory.' + pageSubKey;
+        to = 'localized.' + subKey;
+    } else if (groupKey === 'localizedDefaultLanguage') {
+        // Linking to the default, except surprise, we're already IN the default
+        // (no baseDirectory set).
+        from = 'localized.' + pageSubKey;
+        to = 'localized.' + subKey;
     } else {
         // If we're linking inside the localized area (or there just is no
         // 8ase directory), the 8ase directory doesn't matter.
-        path += urls.from('localized.' + pageSubKey).to(targetFullKey, ...args);
+        from = 'localized.' + pageSubKey;
+        to = targetFullKey;
     }
+
+    path += urls.from(from).to(to, ...args);
+
     return path;
 };
 
@@ -1792,8 +1991,12 @@ writePage.html = (pageFn, {
     footer.classes ??= [];
     footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer) : '');
 
+    footer.content += '\n' + getFooterLocalizationLinks(paths.pathname, {
+        languages, paths, strings, to
+    });
+
     const canonical = (wikiInfo.canonicalBase
-        ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathanme)
+        ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
         : '');
 
     const collapseSidebars = (sidebarLeft.collapse !== false) && (sidebarRight.collapse !== false);
@@ -2035,6 +2238,7 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
     const outputFile = path.join(outputDirectory, file);
 
     return {
+        toPath: [fullKey, directory],
         pathname,
         subdirectoryPrefix,
         outputDirectory, outputFile
@@ -2419,12 +2623,32 @@ async function main() {
     // avoiding that in our code 8ecause, again, we want to avoid assuming the
     // format of the returned paths here - they're only meant to 8e used for
     // reading as-is.
-    const albumDataFiles = await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY));
+    const albumDataFiles = await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY), f => path.extname(f) === '.yaml');
 
-    // Technically, we could do the data file reading and output writing at the
-    // same time, 8ut that kinda makes the code messy, so I'm not 8othering
-    // with it.
-    WD.albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(processAlbumDataFile));
+    class LoadDataFileError extends AggregateError {}
+
+    // WD.albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(aggregate.wrapAsync(processAlbumDataFile)));
+
+    const processDataAggregate = openAggregate({message: `Errors processing data files`});
+
+    await processDataAggregate.callAsync(async () => {
+        const { aggregate, result } = await mapAggregateAsync(albumDataFiles, processAlbumDataFile, {
+            message: `Errors processing album files`,
+            promiseAll: array => progressPromiseAll(`Reading & processing album files.`, array)
+        });
+
+        WD.albumData = result;
+
+        aggregate.close();
+    });
+
+    try {
+        processDataAggregate.close();
+    } catch (error) {
+        showAggregate(error);
+    }
+
+    process.exit();
 
     {
         const errors = WD.albumData.filter(obj => obj.error);

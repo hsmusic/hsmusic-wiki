@@ -1,5 +1,6 @@
 {
     "meta.languageCode": "en",
+    "meta.languageName": "English",
     "count.tracks": "{TRACKS}",
     "count.tracks.withUnit.zero": "",
     "count.tracks.withUnit.one": "{TRACKS} track",
@@ -148,6 +149,7 @@
     "misc.contentWarnings": "cw: {WARNINGS}",
     "misc.contentWarnings.reveal": "click to show",
     "misc.albumGridDetails": "({TRACKS}, {TIME})",
+    "misc.uiLanguage": "UI Language: {LANGUAGES}",
     "homepage.title": "{TITLE}",
     "homepage.news.title": "News",
     "homepage.news.entry.viewRest": "(View rest of entry!)",

@@ -6,46 +6,10 @@
 // together as an AggregateError. See util/sugar.js for utility functions to
 // make writing code around this easier!
 
-export default class Thing {
-    constructor(source, {
-        wikiData
-    } = {}) {
-        if (source) {
-            this.update(source);
-        }
+import CacheableObject from './cacheable-object.js';
 
-        if (wikiData && this.checkComplete()) {
-            this.postprocess({wikiData});
-        }
-    }
-
-    static PropertyError = class extends AggregateError {
-        #key = this.constructor.key;
-        get key() { return this.#key; }
-
-        constructor(errors) {
-            super(errors, '');
-            this.message = `${errors.length} error(s) in property "${this.#key}"`;
-        }
-    };
-
-    static extendPropertyError(key) {
-        const cls = class extends this.PropertyError {
-            static #key = key;
-            static get key() { return this.#key; }
-        };
-
-        Object.defineProperty(cls, 'name', {value: `PropertyError:${key}`});
-        return cls;
-    }
-
-    // Called when instantiating a thing, and when its data is updated for any
-    // reason. (Which currently includes no reasons, but hey, future-proofing!)
-    //
-    // Don't expect source to be a complete object, even on the first call - the
-    // method checkComplete() will prevent incomplete resources from being mixed
-    // with the rest.
-    update(source) {}
+export default class Thing extends CacheableObject {
+    static propertyDescriptors = Symbol('Thing property descriptors');
 
     // Called when collecting the full list of available things of that type
     // for wiki data; this method determine whether or not to include it.

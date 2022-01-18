@@ -3,18 +3,47 @@
 // A 8unch of these depend on process.stdout 8eing availa8le, so they won't
 // work within the 8rowser.
 
+const { process } = globalThis;
+
+export const ENABLE_COLOR = process && (
+    (process.env.CLICOLOR_FORCE && process.env.CLICOLOR_FORCE === '1')
+    ?? (process.env.CLICOLOR && process.env.CLICOLOR === '1' && process.stdout.hasColors && process.stdout.hasColors())
+    ?? (process.stdout.hasColors ? process.stdout.hasColors() : true));
+
+const C = n => (ENABLE_COLOR
+    ? text => `\x1b[${n}m${text}\x1b[0m`
+    : text => text);
+
+export const color = {
+    bright: C('1'),
+    dim: C('2'),
+    black: C('30'),
+    red: C('31'),
+    green: C('32'),
+    yellow: C('33'),
+    blue: C('34'),
+    magenta: C('35'),
+    cyan: C('36'),
+    white: C('37')
+};
+
 const logColor = color => (literals, ...values) => {
     const w = s => process.stdout.write(s);
-    w(`\x1b[${color}m`);
+    const wc = text => {
+        if (ENABLE_COLOR) w(text);
+    };
+
+    wc(`\x1b[${color}m`);
     for (let i = 0; i < literals.length; i++) {
         w(literals[i]);
         if (values[i] !== undefined) {
-            w(`\x1b[1m`);
+            wc(`\x1b[1m`);
             w(String(values[i]));
-            w(`\x1b[0;${color}m`);
+            wc(`\x1b[0;${color}m`);
         }
     }
-    w(`\x1b[0m\n`);
+    wc(`\x1b[0m`);
+    w('\n');
 };
 
 export const logInfo = logColor(2);

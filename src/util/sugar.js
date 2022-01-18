@@ -6,6 +6,8 @@
 // It will likely only do exactly what I want it to, and only in the cases I
 // decided were relevant enough to 8other handling.
 
+import { color } from './cli.js';
+
 // Apparently JavaScript doesn't come with a function to split an array into
 // chunks! Weird. Anyway, this is an awesome place to use a generator, even
 // though we don't really make use of the 8enefits of generators any time we
@@ -133,8 +135,23 @@ export function openAggregate({
         }
     };
 
+    aggregate.wrapAsync = fn => (...args) => {
+        return fn(...args).then(
+            value => value,
+            error => {
+                errors.push(error);
+                return (typeof returnOnFail === 'function'
+                    ? returnOnFail(...args)
+                    : returnOnFail);
+            });
+    };
+
     aggregate.call = (fn, ...args) => {
         return aggregate.wrap(fn)(...args);
+    };
+
+    aggregate.callAsync = (fn, ...args) => {
+        return aggregate.wrapAsync(fn)(...args);
     };
 
     aggregate.nest = (...args) => {
@@ -183,6 +200,19 @@ export function aggregateThrows(errorClass) {
 // use aggregate.close() to throw the error. (This aggregate may be passed to a
 // parent aggregate: `parent.call(aggregate.close)`!)
 export function mapAggregate(array, fn, aggregateOpts) {
+    return _mapAggregate('sync', null, array, fn, aggregateOpts);
+}
+
+export function mapAggregateAsync(array, fn, {
+    promiseAll = Promise.all,
+    ...aggregateOpts
+} = {}) {
+    return _mapAggregate('async', promiseAll, array, fn, aggregateOpts);
+}
+
+// Helper function for mapAggregate which holds code common between sync and
+// async versions.
+export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
     const failureSymbol = Symbol();
 
     const aggregate = openAggregate({
@@ -190,10 +220,16 @@ export function mapAggregate(array, fn, aggregateOpts) {
         ...aggregateOpts
     });
 
-    const result = array.map(aggregate.wrap(fn))
-        .filter(value => value !== failureSymbol);
-
-    return {result, aggregate};
+    if (mode === 'sync') {
+        const result = array.map(aggregate.wrap(fn))
+            .filter(value => value !== failureSymbol);
+        return {result, aggregate};
+    } else {
+        return promiseAll(array.map(aggregate.wrapAsync(fn))).then(values => {
+            const result = values.filter(value => value !== failureSymbol);
+            return {result, aggregate};
+        });
+    }
 }
 
 // Performs an ordinary array filter with the given function, collating into a
@@ -204,6 +240,19 @@ export function mapAggregate(array, fn, aggregateOpts) {
 //
 // As with mapAggregate, the returned aggregate property is not yet closed.
 export function filterAggregate(array, fn, aggregateOpts) {
+    return _filterAggregate('sync', null, array, fn, aggregateOpts);
+}
+
+export async function filterAggregateAsync(array, fn, {
+    promiseAll = Promise.all,
+    ...aggregateOpts
+} = {}) {
+    return _filterAggregate('async', promiseAll, array, fn, aggregateOpts);
+}
+
+// Helper function for filterAggregate which holds code common between sync and
+// async versions.
+function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
     const failureSymbol = Symbol();
 
     const aggregate = openAggregate({
@@ -211,32 +260,57 @@ export function filterAggregate(array, fn, aggregateOpts) {
         ...aggregateOpts
     });
 
-    const result = array.map(aggregate.wrap((x, ...rest) => ({
-        input: x,
-        output: fn(x, ...rest)
-    })))
-        .filter(value => {
-            // Filter out results which match the failureSymbol, i.e. errored
-            // inputs.
-            if (value === failureSymbol) return false;
+    function filterFunction(value) {
+        // Filter out results which match the failureSymbol, i.e. errored
+        // inputs.
+        if (value === failureSymbol) return false;
 
-            // Always keep results which match the overridden returnOnFail
-            // value, if provided.
-            if (value === aggregateOpts.returnOnFail) return true;
+        // Always keep results which match the overridden returnOnFail
+        // value, if provided.
+        if (value === aggregateOpts.returnOnFail) return true;
 
-            // Otherwise, filter according to the returned value of the wrapped
-            // function.
-            return value.output;
-        })
-        .map(value => {
-            // Then turn the results back into their corresponding input, or, if
-            // provided, the overridden returnOnFail value.
-            return (value === aggregateOpts.returnOnFail
-                ? value
-                : value.input);
+        // Otherwise, filter according to the returned value of the wrapped
+        // function.
+        return value.output;
+    }
+
+    function mapFunction(value) {
+        // Then turn the results back into their corresponding input, or, if
+        // provided, the overridden returnOnFail value.
+        return (value === aggregateOpts.returnOnFail
+            ? value
+            : value.input);
+    }
+
+    function wrapperFunction(x, ...rest) {
+        return {
+            input: x,
+            output: fn(x, ...rest)
+        };
+    }
+
+    if (mode === 'sync') {
+        const result = array
+            .map(aggregate.wrap((input, index, array) => {
+                const output = fn(input, index, array);
+                return {input, output};
+            }))
+            .filter(filterFunction)
+            .map(mapFunction);
+
+        return {result, aggregate};
+    } else {
+        return promiseAll(array.map(aggregate.wrapAsync(async (input, index, array) => {
+            const output = await fn(input, index, array);
+            return {input, output};
+        }))).then(values => {
+            const result = values
+                .filter(filterFunction)
+                .map(mapFunction);
+
+            return {result, aggregate};
         });
-
-    return {result, aggregate};
+    }
 }
 
 // Totally sugar function for opening an aggregate, running the provided
@@ -256,7 +330,17 @@ export function withAggregate(aggregateOpts, fn) {
 
 export function showAggregate(topError) {
     const recursive = error => {
-        const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'}`;
+        const stackLines = error.stack?.split('\n');
+        const stackLine = stackLines?.find(line =>
+            line.trim().startsWith('at')
+            && !line.includes('sugar')
+            && !line.includes('node:internal'));
+        const tracePart = (stackLine
+            ? '- ' + stackLine.trim()
+            : '(no stack trace)');
+
+        const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'} ${color.dim(tracePart)}`;
+
         if (error instanceof AggregateError) {
             return header + '\n' + (error.errors
                 .map(recursive)
@@ -268,5 +352,5 @@ export function showAggregate(topError) {
         }
     };
 
-    console.log(recursive(topError));
+    console.error(recursive(topError));
 }
