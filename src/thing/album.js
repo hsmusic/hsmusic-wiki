@@ -16,56 +16,7 @@ import {
     validateReferenceList,
 } from './validators.js';
 
-import {
-    aggregateThrows,
-    showAggregate,
-    withAggregate
-} from '../util/sugar.js';
-
 export default class Album extends Thing {
-    /*
-    #name = 'Unnamed Album';
-
-    #color = null;
-    #directory = null;
-    #urls = [];
-
-    #artists = [];
-    #coverArtists = [];
-    #trackCoverArtists = [];
-
-    #wallpaperArtists = [];
-    #wallpaperStyle = '';
-    #wallpaperFileExtension = 'jpg';
-
-    #bannerArtists = [];
-    #bannerStyle = '';
-    #bannerFileExtension = 'jpg';
-    #bannerDimensions = [0, 0];
-
-    #date = null;
-    #trackArtDate = null;
-    #coverArtDate = null;
-    #dateAddedToWiki = null;
-
-    #hasTrackArt = true;
-    #isMajorRelease = false;
-    #isListedOnHomepage = true;
-
-    #aka = '';
-    #groups = [];
-    #artTags = [];
-    #commentary = '';
-
-    #tracks = [];
-
-    static propertyError = {
-        name: Thing.extendPropertyError('name'),
-        directory: Thing.extendPropertyError('directory'),
-        tracks: Thing.extendPropertyError('tracks')
-    };
-    */
-
     static propertyDescriptors = {
         // Update & expose
 
@@ -241,65 +192,4 @@ export default class Album extends Thing {
             flags: {update: true}
         }
     };
-
-    /*
-    update(source) {
-        const err = this.constructor.propertyError;
-
-        withAggregate(aggregateThrows(Thing.UpdateError), ({ nest, filter, throws }) => {
-            if (source.name) {
-                nest(throws(err.name), ({ call }) => {
-                    if (call(validateName, source.name)) {
-                        this.#name = source.name;
-                    }
-                });
-            }
-
-            if (source.color) {
-                nest(throws(err.color), ({ call }) => {
-                    if (call(validateColor, source.color)) {
-                        this.#color = source.color;
-                    }
-                });
-            }
-
-            if (source.directory) {
-                nest(throws(err.directory), ({ call }) => {
-                    if (call(validateDirectory, source.directory)) {
-                        this.#directory = source.directory;
-                    }
-                });
-            }
-
-            if (source.tracks)
-                this.#tracks = filter(source.tracks, validateReference('track'), throws(err.tracks));
-        });
-    }
-
-    get name() { return this.#name; }
-    get directory() { return this.#directory; }
-    get tracks() { return this.#tracks; }
-    */
 }
-
-/*
-const album = new Album();
-
-console.log('tracks (before):', album.tracks);
-
-try {
-    album.update({
-        directory: 'oh yes',
-        tracks: [
-            'lol',
-            123,
-            'track:oh-yeah',
-            'group:what-am-i-doing-here'
-        ]
-    });
-} catch (error) {
-    showAggregate(error);
-}
-
-console.log('tracks (after):', album.tracks);
-*/
