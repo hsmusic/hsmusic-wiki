@@ -1,5 +1,13 @@
 import { withAggregate } from '../util/sugar.js';
 
+import { color, ENABLE_COLOR } from '../util/cli.js';
+
+import { inspect as nodeInspect } from 'util';
+
+function inspect(value) {
+    return nodeInspect(value, {colors: ENABLE_COLOR});
+}
+
 // Basic types (primitives)
 
 function a(noun) {
@@ -97,12 +105,25 @@ export function isArray(value) {
     return true;
 }
 
+function validateArrayItemsHelper(itemValidator) {
+    return (item, index) => {
+        try {
+            itemValidator(item);
+        } catch (error) {
+            error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${error.message}`;
+            throw error;
+        }
+    };
+}
+
 export function validateArrayItems(itemValidator) {
+    const fn = validateArrayItemsHelper(itemValidator);
+
     return array => {
         isArray(array);
 
         withAggregate({message: 'Errors validating array items'}, ({ wrap }) => {
-            array.forEach(wrap(itemValidator));
+            array.forEach(wrap(fn));
         });
 
         return true;
