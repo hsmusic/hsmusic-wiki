@@ -7,7 +7,7 @@ function findHelper(keys, dataProp, findFns = {}) {
     const byDirectory = findFns.byDirectory || matchDirectory;
     const byName = findFns.byName || matchName;
 
-    const keyRefRegex = new RegExp(`^((${keys.join('|')}):)?(.*)$`);
+    const keyRefRegex = new RegExp(`^((${keys.join('|')}):(?:\S))?(.*)$`);
 
     return (fullRef, {wikiData}) => {
         if (!fullRef) return null;

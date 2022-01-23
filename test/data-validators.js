@@ -16,6 +16,7 @@ import {
     // Wiki data
     isDimensions,
     isDirectory,
+    isDuration,
     validateReference,
     validateReferenceList,
 } from '../src/thing/validators.js';
@@ -138,12 +139,22 @@ test('isDimensions', t => {
 });
 
 test('isDirectory', t => {
-    t.plan(5);
+    t.plan(6);
     t.ok(isDirectory('savior-of-the-waking-world'));
     t.ok(isDirectory('MeGaLoVania'));
+    t.ok(isDirectory('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_'));
     t.throws(() => isDirectory(123), TypeError);
     t.throws(() => isDirectory(''), TypeError);
     t.throws(() => isDirectory('troll saint nicholas and the quest for the holy pail'), TypeError);
+});
+
+test('isDuration', t => {
+    t.plan(5);
+    t.ok(isDuration(60));
+    t.ok(isDuration(0.02));
+    t.ok(isDuration(0));
+    t.throws(() => isDuration(-1), TypeError);
+    t.throws(() => isDuration('10:25'), TypeError);
 });
 
 test.skip('isName', t => {

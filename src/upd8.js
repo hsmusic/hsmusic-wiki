@@ -89,7 +89,9 @@ import find from './util/find.js';
 import * as html from './util/html.js';
 import unbound_link, {getLinkThemeString} from './util/link.js';
 
-import Album from './thing/album.js';
+import Album, { TrackGroup } from './thing/album.js';
+import Thing from './thing/thing.js';
+import Track from './thing/track.js';
 
 import {
     fancifyFlashURL,
@@ -868,7 +870,7 @@ makeParseDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
     }
 };
 
-processAlbumDataFile.parseDocument = makeParseDocument(Album, {
+const parseAlbumDocument = makeParseDocument(Album, {
     fieldTransformations: {
         'Artists': parseContributors,
         'Cover Artists': parseContributors,
@@ -945,7 +947,62 @@ async function processAlbumDataFile(file) {
 
     const albumDoc = documents[0];
 
-    return processAlbumDataFile.parseDocument(albumDoc, {file});
+    const album = parseAlbumDocument(albumDoc, {file});
+
+    // Slightly separate meanings: tracks is the array of Track objects (and
+    // only Track objects); trackGroups is the array of TrackGroup objects,
+    // organizing (by string reference) the Track objects within the Album.
+    // tracks is returned for collating with the rest of wiki data; trackGroups
+    // is directly set on the album object.
+    const tracks = [];
+    const trackGroups = [];
+
+    // We can't mutate an array once it's set as a property value, so prepare
+    // the tracks that will show up in a track list all the way before actually
+    // applying it.
+    let currentTracksByRef = null;
+    let currentTrackGroupDoc = null;
+
+    function closeCurrentTrackGroup() {
+        if (currentTracksByRef) {
+            let trackGroup;
+
+            if (currentTrackGroupDoc) {
+                trackGroup = parseTrackGroupDocument(currentTrackGroupDoc, {file});
+            } else {
+                trackGroup = new TrackGroup();
+                trackGroup.isDefaultTrackGroup = true;
+            }
+
+            trackGroup.tracksByRef = currentTracksByRef;
+            trackGroups.push(trackGroup);
+        }
+    }
+
+    for (const doc of documents.slice(1)) {
+        if (doc['Group']) {
+            closeCurrentTrackGroup();
+            currentTracksByRef = [];
+            currentTrackGroupDoc = doc;
+            continue;
+        }
+
+        const track = parseTrackDocument(doc, {file});
+        tracks.push(track);
+
+        const ref = Thing.getReference(track);
+        if (currentTracksByRef) {
+            currentTracksByRef.push(ref);
+        } else {
+            currentTracksByRef = [ref];
+        }
+    }
+
+    closeCurrentTrackGroup();
+
+    album.trackGroups = trackGroups;
+
+    return {album, tracks};
 
     // --------------------------------------------------------------
 
@@ -1196,6 +1253,52 @@ async function processAlbumDataFile(file) {
 
     return album;
 }
+
+const parseTrackGroupDocument = makeParseDocument(TrackGroup, {
+    fieldTransformations: {
+        'Date Originally Released': value => new Date(value),
+    },
+
+    propertyFieldMapping: {
+        name: 'Group',
+        color: 'Color',
+        dateOriginallyReleased: 'Date Originally Released',
+    }
+});
+
+const parseTrackDocument = makeParseDocument(Track, {
+    fieldTransformations: {
+        'Duration': getDurationInSeconds,
+
+        'Date First Released': value => new Date(value),
+
+        'Artists': parseContributors,
+        'Contributors': parseContributors,
+        'Cover Artists': parseContributors,
+    },
+
+    propertyFieldMapping: {
+        name: 'Track',
+
+        directory: 'Directory',
+        duration: 'Duration',
+        urls: 'URLs',
+
+        dateFirstReleased: 'Date First Released',
+        hasCoverArt: 'Has Cover Art',
+        hasURLs: 'Has URLs',
+
+        referencedTracksByRef: 'Referenced Tracks',
+        artistContribsByRef: 'Artists',
+        contributorContribsByRef: 'Contributors',
+        coverArtistContribsByRef: 'Cover Artists',
+        artTagsByRef: 'Art Tags',
+        originalReleaseTrackByRef: 'Originally Released As',
+
+        commentary: 'Commentary',
+        lyrics: 'Lyrics'
+    }
+});
 
 async function processArtistDataFile(file) {
     let contents;
@@ -1626,6 +1729,14 @@ async function processHomepageInfoFile(file) {
 }
 
 function getDurationInSeconds(string) {
+    if (typeof string === 'number') {
+        return string;
+    }
+
+    if (typeof string !== 'string') {
+        throw new TypeError(`Expected a string or number, got ${string}`);
+    }
+
     const parts = string.split(':').map(n => parseInt(n))
     if (parts.length === 3) {
         return parts[0] * 3600 + parts[1] * 60 + parts[2]
@@ -2645,7 +2756,7 @@ async function main() {
     try {
         processDataAggregate.close();
     } catch (error) {
-        showAggregate(error);
+        showAggregate(error, {pathToFile: f => path.relative(__dirname, f)});
     }
 
     process.exit();

@@ -1,4 +1,6 @@
+import CacheableObject from './cacheable-object.js';
 import Thing from './thing.js';
+import find from '../util/find.js';
 
 import {
     isBoolean,
@@ -12,21 +14,70 @@ import {
     isURL,
     isString,
     validateArrayItems,
+    validateInstanceOf,
     validateReference,
     validateReferenceList,
 } from './validators.js';
 
-export default class Album extends Thing {
+export class TrackGroup extends CacheableObject {
     static propertyDescriptors = {
         // Update & expose
 
         name: {
             flags: {update: true, expose: true},
+            update: {default: 'Unnamed Track Group', validate: isName}
+        },
 
-            update: {
-                default: 'Unnamed Album',
-                validate: isName
+        color: {
+            flags: {update: true, expose: true},
+            update: {validate: isColor}
+        },
+
+        dateOriginallyReleased: {
+            flags: {update: true, expose: true},
+            update: {validate: isDate}
+        },
+
+        tracksByRef: {
+            flags: {update: true, expose: true},
+            update: {validate: validateReferenceList('track')}
+        },
+
+        isDefaultTrackGroup: {
+            flags: {update: true, expose: true},
+            update: {validate: isBoolean}
+        },
+
+        // Update only
+
+        trackData: {
+            flags: {update: true},
+            update: {validate: validateArrayItems(item => isInstance(item, Track))}
+        },
+
+        // Expose only
+
+        tracks: {
+            flags: {expose: true},
+
+            expose: {
+                dependencies: ['tracksByRef', 'trackData'],
+                compute: ({ tracksByRef, trackData }) => (
+                    tracksByRef.map(ref => find.track(ref, {wikiData: {trackData}})))
             }
+        }
+    };
+}
+
+export default class Album extends Thing {
+    static [Thing.referenceType] = 'album';
+
+    static propertyDescriptors = {
+        // Update & expose
+
+        name: {
+            flags: {update: true, expose: true},
+            update: {default: 'Unnamed Album', validate: isName}
         },
 
         color: {
@@ -36,7 +87,8 @@ export default class Album extends Thing {
 
         directory: {
             flags: {update: true, expose: true},
-            update: {validate: isDirectory}
+            update: {validate: isDirectory},
+            expose: Thing.directoryExpose
         },
 
         urls: {
@@ -109,11 +161,11 @@ export default class Album extends Thing {
             }
         },
 
-        tracksByRef: {
+        trackGroups: {
             flags: {update: true, expose: true},
 
             update: {
-                validate: validateReferenceList('track')
+                validate: validateArrayItems(validateInstanceOf(TrackGroup))
             }
         },
 
@@ -176,6 +228,7 @@ export default class Album extends Thing {
 
         // Expose only
 
+        /*
         tracks: {
             flags: {expose: true},
 
@@ -185,11 +238,14 @@ export default class Album extends Thing {
                     trackReferences.map(ref => find.track(ref, {wikiData})))
             }
         },
+        */
 
         // Update only
 
+        /*
         wikiData: {
             flags: {update: true}
         }
+        */
     };
 }

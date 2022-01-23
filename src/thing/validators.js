@@ -47,6 +47,24 @@ export function isNegative(number) {
     return true;
 }
 
+export function isPositiveOrZero(number) {
+    isNumber(number);
+
+    if (number < 0)
+        throw new TypeError(`Expected positive number or zero`);
+
+    return true;
+}
+
+export function isNegativeOrZero(number) {
+    isNumber(number);
+
+    if (number > 0)
+        throw new TypeError(`Expected negative number or zero`);
+
+    return true;
+}
+
 export function isInteger(number) {
     isNumber(number);
 
@@ -130,6 +148,10 @@ export function validateArrayItems(itemValidator) {
     };
 }
 
+export function validateInstanceOf(constructor) {
+    return object => isInstance(object, constructor);
+}
+
 // Wiki data (primitives & non-primitives)
 
 export function isColor(color) {
@@ -187,8 +209,15 @@ export function isDimensions(dimensions) {
 export function isDirectory(directory) {
     isStringNonEmpty(directory);
 
-    if (directory.match(/[^a-zA-Z0-9\-]/))
-        throw new TypeError(`Expected only letters, numbers, and dash, got "${directory}"`);
+    if (directory.match(/[^a-zA-Z0-9_\-]/))
+        throw new TypeError(`Expected only letters, numbers, dash, and underscore, got "${directory}"`);
+
+    return true;
+}
+
+export function isDuration(duration) {
+    isNumber(duration);
+    isPositiveOrZero(duration);
 
     return true;
 }
@@ -209,13 +238,17 @@ export function validateReference(type = 'track') {
     return ref => {
         isStringNonEmpty(ref);
 
-        const hasTwoParts = ref.includes(':');
-        const [ typePart, directoryPart ] = ref.split(':');
+        const match = ref.trim().match(/^(?:(?<typePart>\S+):(?=\S))?(?<directoryPart>.+)(?<!:)$/);
 
-        if (hasTwoParts && typePart !== type)
-            throw new TypeError(`Expected ref to begin with "${type}:", got "${typePart}:" (ref: ${ref})`);
+        if (!match)
+            throw new TypeError(`Malformed reference`);
 
-        if (hasTwoParts)
+        const { groups: { typePart, directoryPart } } = match;
+
+        if (typePart && typePart !== type)
+            throw new TypeError(`Expected ref to begin with "${type}:", got "${typePart}:"`);
+
+        if (typePart)
             isDirectory(directoryPart);
 
         isName(ref);

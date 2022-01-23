@@ -328,7 +328,7 @@ export function withAggregate(aggregateOpts, fn) {
     return result;
 }
 
-export function showAggregate(topError) {
+export function showAggregate(topError, {pathToFile = null} = {}) {
     const recursive = error => {
         const stackLines = error.stack?.split('\n');
         const stackLine = stackLines?.find(line =>
@@ -336,7 +336,7 @@ export function showAggregate(topError) {
             && !line.includes('sugar')
             && !line.includes('node:internal'));
         const tracePart = (stackLine
-            ? '- ' + stackLine.trim()
+            ? '- ' + stackLine.trim().replace(/file:\/\/(.*\.js)/, (match, pathname) => pathToFile(pathname))
             : '(no stack trace)');
 
         const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'} ${color.dim(tracePart)}`;
