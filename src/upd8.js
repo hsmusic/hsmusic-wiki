@@ -257,22 +257,6 @@ function splitLines(text) {
     return text.split(/\r\n|\r|\n/);
 }
 
-// REFERENCE CODE!
-// REFERENCE CODE!
-// REFERENCE CODE!
-// REFERENCE CODE!
-
-function* getSections(lines) {
-    // ::::)
-    const isSeparatorLine = line => /^-{8,}/.test(line);
-    yield* splitArray(lines, isSeparatorLine);
-}
-
-function getBasicField(lines, name) {
-    const line = lines.find(line => line.startsWith(name + ':'));
-    return line && line.slice(name.length + 1).trim();
-}
-
 function parseDimensions(string) {
     if (!string) {
         return null;
@@ -284,49 +268,6 @@ function parseDimensions(string) {
     if (nums.includes(NaN)) throw new Error(`Invalid dimensions: ${string} (couldn't parse as numbers)`);
     return nums;
 }
-
-function getBooleanField(lines, name) {
-    // The ?? oper8tor (which is just, hilariously named, lol) can 8e used to
-    // specify a default!
-    const value = getBasicField(lines, name);
-    switch (value) {
-        case 'yes':
-        case 'true':
-            return true;
-        case 'no':
-        case 'false':
-            return false;
-        default:
-            return null;
-    }
-}
-
-function getListField(lines, name) {
-    let startIndex = lines.findIndex(line => line.startsWith(name + ':'));
-    // If callers want to default to an empty array, they should stick
-    // "|| []" after the call.
-    if (startIndex === -1) {
-        return null;
-    }
-    // We increment startIndex 8ecause we don't want to include the
-    // "heading" line (e.g. "URLs:") in the actual data.
-    startIndex++;
-    let endIndex = lines.findIndex((line, index) => index >= startIndex && !line.startsWith('- '));
-    if (endIndex === -1) {
-        endIndex = lines.length;
-    }
-    if (endIndex === startIndex) {
-        // If there is no list that comes after the heading line, treat the
-        // heading line itself as the comma-separ8ted array value, using
-        // the 8asic field function to do that. (It's l8 and my 8rain is
-        // sleepy. Please excuse any unhelpful comments I may write, or may
-        // have already written, in this st8. Thanks!)
-        const value = getBasicField(lines, name);
-        return value && value.split(',').map(val => val.trim());
-    }
-    const listLines = lines.slice(startIndex, endIndex);
-    return listLines.map(line => line.slice(2));
-};
 
 function parseContributors(contributors) {
     if (!contributors) {
@@ -361,27 +302,6 @@ function parseContributors(contributors) {
     }
 
     return contributors;
-};
-
-function getMultilineField(lines, name) {
-    // All this code is 8asically the same as the getListText - just with a
-    // different line prefix (four spaces instead of a dash and a space).
-    let startIndex = lines.findIndex(line => line.startsWith(name + ':'));
-    if (startIndex === -1) {
-        return null;
-    }
-    startIndex++;
-    let endIndex = lines.findIndex((line, index) => index >= startIndex && line.length && !line.startsWith('    '));
-    if (endIndex === -1) {
-        endIndex = lines.length;
-    }
-    // If there aren't any content lines, don't return anything!
-    if (endIndex === startIndex) {
-        return null;
-    }
-    // We also join the lines instead of returning an array.
-    const listLines = lines.slice(startIndex, endIndex);
-    return listLines.map(line => line.slice(4)).join('\n');
 };
 
 const replacerSpec = {
@@ -983,257 +903,6 @@ function parseAlbumEntryDocuments(documents) {
     closeCurrentTrackGroup();
 
     return {tracks, trackGroups};
-}
-
-async function processAlbumDataFile(file) {
-    // --------------------------------------------------------------
-
-    // const album = {};
-
-    album.name = parseField(albumDoc, 'Album', [
-        assertFieldPresent
-    ]);
-
-    if (!album.name) {
-        return {error: `The file "${path.relative(dataPath, file)}" is missing the "Album" field - maybe this is a misplaced file instead of album data?`};
-    }
-
-    // album.directory = albumDoc['Directory'];
-    // album.urls = albumDoc['URLs'] || [];
-
-    // album.artists = parseContributors(albumDoc['Artists']);
-
-    // album.date = albumDoc['Date'];
-    // album.trackArtDate = albumDoc['Track Art Date'] || album.date;
-    // album.coverArtDate = albumDoc['Cover Art Date'] || album.date;
-    // album.dateAdded = albumDoc['Date Added'];
-
-    // album.coverArtists = parseContributors(albumDoc['Cover Artists']);
-    // album.trackCoverArtists = parseContributors(albumDoc['Default Track Cover Artists']);
-    // album.hasTrackArt = albumDoc['Has Track Art'] ?? true;
-
-    // album.wallpaperArtists = parseContributors(albumDoc['Wallpaper Artists']);
-    // album.wallpaperStyle = albumDoc['Wallpaper Style'];
-    // album.wallpaperFileExtension = albumDoc['Wallpaper File Extension'] || 'jpg';
-
-    // album.bannerArtists = albumDoc['Banner Artists'];
-    // album.bannerStyle = albumDoc['Banner Style'];
-    // album.bannerFileExtension = albumDoc['Banner File Extension'] || 'jpg';
-    // album.bannerDimensions = parseDimensions(albumDoc['Banner Dimensions']);
-
-    // album.groups = albumDoc['Groups'] || [];
-    // album.artTags = albumDoc['Art Tags'] || [];
-
-    // album.commentary = parseCommentary(albumDoc['Commentary']);
-
-    // album.isMajorRelease = albumDoc['Major Release'] ?? false;
-    // album.isListedOnHomepage = albumDoc['Listed on Homepage'] ?? true;
-
-    if (album.artists && album.artists.error) {
-        return {error: `${album.artists.error} (in ${album.name})`};
-    }
-
-    if (album.coverArtists && album.coverArtists.error) {
-        return {error: `${album.coverArtists.error} (in ${album.name})`};
-    }
-
-    if (album.commentary && album.commentary.error) {
-        return {error: `${album.commentary.error} (in ${album.name})`};
-    }
-
-    if (album.trackCoverArtists && album.trackCoverArtists.error) {
-        return {error: `${album.trackCoverArtists.error} (in ${album.name})`};
-    }
-
-    if (!album.coverArtists) {
-        return {error: `The album "${album.name}" is missing the "Cover Art" field.`};
-    }
-
-    // album.color = albumDoc['Color'];
-
-    if (!album.name) {
-        return {error: `Expected "Album" (name) field!`};
-    }
-
-    if (!album.date) {
-        return {error: `Expected "Date" field! (in ${album.name})`};
-    }
-
-    if (!album.dateAdded) {
-        return {error: `Expected "Date Added" field! (in ${album.name})`};
-    }
-
-    if (isNaN(Date.parse(album.date))) {
-        return {error: `Invalid Date field: "${album.date}" (in ${album.name})`};
-    }
-
-    if (isNaN(Date.parse(album.trackArtDate))) {
-        return {error: `Invalid Track Art Date field: "${album.trackArtDate}" (in ${album.name})`};
-    }
-
-    if (isNaN(Date.parse(album.coverArtDate))) {
-        return {error: `Invalid Cover Art Date field: "${album.coverArtDate}" (in ${album.name})`};
-    }
-
-    if (isNaN(Date.parse(album.dateAdded))) {
-        return {error: `Invalid Date Added field: "${album.dateAdded}" (in ${album.name})`};
-    }
-
-    album.date = new Date(album.date);
-    album.trackArtDate = new Date(album.trackArtDate);
-    album.coverArtDate = new Date(album.coverArtDate);
-    album.dateAdded = new Date(album.dateAdded);
-
-    if (!album.directory) {
-        album.directory = getKebabCase(album.name);
-    }
-
-    album.tracks = [];
-
-    // will be overwritten if a group section is found!
-    album.trackGroups = null;
-
-    let group = null;
-    let trackIndex = 0;
-
-    for (const doc of documents.slice(1)) {
-        // Just skip empty sections. Sometimes I paste a 8unch of dividers,
-        // and this lets the empty sections doing that creates (temporarily)
-        // exist without raising an error.
-        if (!doc) {
-            continue;
-        }
-
-        const groupName = doc['Group'];
-        if (groupName) {
-            group = {
-                name: groupName,
-                color: doc['Color'] || album.color,
-                originalDate: doc['Original Date'],
-                startIndex: trackIndex,
-                tracks: []
-            };
-            if (group.originalDate) {
-                if (isNaN(Date.parse(group.originalDate))) {
-                    return {error: `The track group "${group.name}" has an invalid "Original Date" field: "${group.originalDate}"`};
-                }
-                group.originalDate = new Date(group.originalDate);
-                group.date = group.originalDate;
-            } else {
-                group.date = album.date;
-            }
-            if (album.trackGroups) {
-                album.trackGroups.push(group);
-            } else {
-                album.trackGroups = [group];
-            }
-            continue;
-        }
-
-        trackIndex++;
-
-        const track = {};
-
-        track.name = String(doc['Track']);
-
-        track.commentary = parseCommentary(doc['Commentary']);
-        track.lyrics = String(doc['Lyrics']);
-
-        track.originalDate = doc['Date First Released'];
-        track.coverArtDate = doc['Cover Art Date'] || track.originalDate || album.trackArtDate;
-
-        isNaN(Date.parse(track.originalDate))
-
-        if (track.originalDate) {
-            if (isNaN(Date.parse(track.originalDate))) {
-                return {error: `The track "${track.name}"'s has an invalid "Date First Released" field: "${track.originalDate}"`};
-            }
-            track.originalDate = new Date(track.originalDate);
-            track.date = new Date(track.originalDate);
-        } else if (group && group.originalDate) {
-            track.originalDate = group.originalDate;
-            track.date = group.originalDate;
-        } else {
-            track.date = album.date;
-        }
-
-        track.coverArtDate = new Date(track.coverArtDate);
-
-        track.references = doc['References'] || [];
-        track.artists = parseContributors(doc['Artists']);
-        track.coverArtists = parseContributors(doc['Cover Artists']);
-        track.artTags = doc['Art Tags'] || [];
-        track.contributors = parseContributors(doc['Contributors']);
-        track.directory = doc['Directory'];
-        track.aka = doc['AKA'];
-
-        if (!track.name) {
-            return {error: `A track document is missing the "Track" (name) field (in ${album.name}, previous: ${album.tracks[album.tracks.length - 1]?.name}).`};
-        }
-
-        track.duration = getDurationInSeconds(doc['Duration'] || '0:00');
-
-        if (track.contributors?.error) {
-            return {error: `${track.contributors.error} (in ${track.name}, ${album.name})`};
-        }
-
-        if (track.commentary && track.commentary.error) {
-            return {error: `${track.commentary.error} (in ${track.name}, ${album.name})`};
-        }
-
-        if (!track.artists) {
-            // If an al8um has an artist specified (usually 8ecause it's a solo
-            // al8um), let tracks inherit that artist. We won't display the
-            // "8y <artist>" string on the al8um listing.
-            if (album.artists) {
-                track.artists = album.artists;
-            } else {
-                return {error: `The track "${track.name}" is missing the "Artist" field (in ${album.name}).`};
-            }
-        }
-
-        if (doc['Has Cover Art'] === false) {
-            track.coverArtists = null;
-        } else if (album.hasTrackArt && !track.coverArtists) {
-            if (album.trackCoverArtists) {
-                track.coverArtists = album.trackCoverArtists;
-            } else {
-                return {error: `The track "${track.name}" is missing the "Cover Artists" field (in ${album.name}).`};
-            }
-        }
-
-        if (!track.directory) {
-            try {
-                track.directory = getKebabCase(track.name);
-            } catch (error) {
-                console.log('error:', track.name);
-                process.exit();
-            }
-        }
-
-        const hasURLs = doc['Has URLs'] ?? true;
-
-        track.urls = hasURLs && doc['URLs'] || [];
-
-        if (hasURLs && !track.urls.length) {
-            return {error: `The track "${track.name}" should have at least one URL specified.`};
-        }
-
-        // 8ack-reference the al8um o8ject! This is very useful for when
-        // we're outputting the track pages.
-        track.album = album;
-
-        if (group) {
-            track.color = group.color;
-            group.tracks.push(track);
-        } else {
-            track.color = album.color;
-        }
-
-        album.tracks.push(track);
-    }
-
-    return album;
 }
 
 const parseTrackGroupDocument = makeParseDocument(TrackGroup, {
@@ -2654,6 +2323,7 @@ async function main() {
         logInfo`Writing all languages.`;
     }
 
+    /*
     WD.wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
     if (WD.wikiInfo.error) {
         console.log(`\x1b[31;1m${WD.wikiInfo.error}\x1b[0m`);
@@ -2695,6 +2365,7 @@ async function main() {
             return;
         }
     }
+    */
 
     // 8ut wait, you might say, how do we know which al8um these data files
     // correspond to???????? You wouldn't dare suggest we parse the actual
@@ -2821,8 +2492,7 @@ async function main() {
             });
     }
 
-    console.log('albumData:', WD.albumData);
-    console.log('trackData:', WD.trackData);
+    console.log(WD);
 
     try {
         processDataAggregate.close();
