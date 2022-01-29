@@ -356,7 +356,7 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 }
 
 export function showAggregate(topError, {pathToFile = null} = {}) {
-    const recursive = error => {
+    const recursive = (error, {level}) => {
         const stackLines = error.stack?.split('\n');
         const stackLine = stackLines?.find(line =>
             line.trim().startsWith('at')
@@ -367,17 +367,25 @@ export function showAggregate(topError, {pathToFile = null} = {}) {
             : '(no stack trace)');
 
         const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'} ${color.dim(tracePart)}`;
+        const bar = (level % 2 === 0
+            ? '\u2502'
+            : color.dim('\u254e'));
+        const head = (level % 2 === 0
+            ? '\u257f'
+            : color.dim('\u257f'));
 
         if (error instanceof AggregateError) {
             return header + '\n' + (error.errors
-                .map(recursive)
+                .map(error => recursive(error, {level: level + 1}))
                 .flatMap(str => str.split('\n'))
-                .map(line => ` | ` + line)
+                .map((line, i, lines) => (i === 0
+                    ? ` ${head} ${line}`
+                    : ` ${bar} ${line}`))
                 .join('\n'));
         } else {
             return header;
         }
     };
 
-    console.error(recursive(topError));
+    console.error(recursive(topError, {level: 0}));
 }
