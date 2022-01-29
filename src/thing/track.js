@@ -55,6 +55,11 @@ export default class Track extends Thing {
             update: {validate: isDate}
         },
 
+        coverArtDate: {
+            flags: {update: true, expose: true},
+            update: {validate: isDate}
+        },
+
         hasCoverArt: {
             flags: {update: true, expose: true},
             update: {default: true, validate: isBoolean}

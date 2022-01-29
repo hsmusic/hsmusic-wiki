@@ -158,9 +158,20 @@ export function openAggregate({
         return aggregate.call(() => withAggregate(...args));
     };
 
+    aggregate.nestAsync = (...args) => {
+        return aggregate.callAsync(() => withAggregateAsync(...args));
+    };
+
     aggregate.map = (...args) => {
         const parent = aggregate;
         const { result, aggregate: child } = mapAggregate(...args);
+        parent.call(child.close);
+        return result;
+    };
+
+    aggregate.mapAsync = async (...args) => {
+        const parent = aggregate;
+        const { result, aggregate: child } = await mapAggregateAsync(...args);
         parent.call(child.close);
         return result;
     };
@@ -317,15 +328,31 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 // function with it, then closing the function and returning the result (if
 // there's no throw).
 export function withAggregate(aggregateOpts, fn) {
+    return _withAggregate('sync', aggregateOpts, fn);
+}
+
+export function withAggregateAsync(aggregateOpts, fn) {
+    return _withAggregate('async', aggregateOpts, fn);
+}
+
+export function _withAggregate(mode, aggregateOpts, fn) {
     if (typeof aggregateOpts === 'function') {
         fn = aggregateOpts;
         aggregateOpts = {};
     }
 
     const aggregate = openAggregate(aggregateOpts);
-    const result = fn(aggregate);
-    aggregate.close();
-    return result;
+
+    if (mode === 'sync') {
+        const result = fn(aggregate);
+        aggregate.close();
+        return result;
+    } else {
+        return fn(aggregate).then(result => {
+            aggregate.close();
+            return result;
+        });
+    }
 }
 
 export function showAggregate(topError, {pathToFile = null} = {}) {

@@ -812,7 +812,13 @@ function makeParseDocument(thingClass, {
     // shorthand convenience because properties are generally typical
     // camel-cased JS properties, while fields may contain whitespace and be
     // more easily represented as quoted strings.
-    propertyFieldMapping
+    propertyFieldMapping,
+
+    // Completely ignored fields. These won't throw an unknown field error if
+    // they're present in a document, but they won't be used for Thing property
+    // generation, either. Useful for stuff that's present in data files but not
+    // yet implemented as part of a Thing's data model!
+    ignoredFields = []
 }) {
     const knownFields = Object.values(propertyFieldMapping);
 
@@ -822,8 +828,12 @@ function makeParseDocument(thingClass, {
         (Object.entries(propertyFieldMapping)
             .map(([ property, field ]) => [field, property])));
 
-    return function(document, {file = null}) {
-        const unknownFields = Object.keys(document)
+    return function(document) {
+        const documentEntries = Object.entries(document)
+            .filter(([ field ]) => !ignoredFields.includes(field));
+
+        const unknownFields = documentEntries
+            .map(([ field ]) => field)
             .filter(field => !knownFields.includes(field));
 
         if (unknownFields.length) {
@@ -832,7 +842,7 @@ function makeParseDocument(thingClass, {
 
         const fieldValues = {};
 
-        for (const [ field, value ] of Object.entries(document)) {
+        for (const [ field, value ] of documentEntries) {
             if (Object.hasOwn(fieldTransformations, field)) {
                 fieldValues[field] = fieldTransformations[field](value);
             } else {
@@ -849,9 +859,7 @@ function makeParseDocument(thingClass, {
 
         const thing = Reflect.construct(thingClass, []);
 
-        const C = color;
-        const filePart = file ? `(file: ${C.bright(C.blue(path.relative(dataPath, file)))})` : '';
-        withAggregate({message: `Errors applying ${C.green(thingClass.name)} properties ${filePart}`}, ({ call }) => {
+        withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({ call }) => {
             for (const [ property, value ] of Object.entries(sourceProperties)) {
                 call(() => {
                     thing[property] = value;
@@ -922,33 +930,7 @@ const parseAlbumDocument = makeParseDocument(Album, {
     }
 });
 
-async function processAlbumDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        // This function can return "error o8jects," which are really just
-        // ordinary o8jects with an error message attached. I'm not 8othering
-        // with error codes here or anywhere in this function; while this would
-        // normally 8e 8ad coding practice, it doesn't really matter here,
-        // 8ecause this isn't an API getting consumed 8y other services (e.g.
-        // translaction functions). If we return an error, the caller will just
-        // print the attached message in the output summary.
-        return {error: `Could not read ${file} (${error.code}).`};
-    }
-
-    // We're pro8a8ly supposed to, like, search for a header somewhere in the
-    // al8um contents, to make sure it's trying to 8e the intended structure
-    // and is a valid utf-8 (or at least ASCII) file. 8ut like, whatever.
-    // We'll just return more specific errors if it's missing necessary data
-    // fields.
-
-    const documents = yaml.loadAll(contents);
-
-    const albumDoc = documents[0];
-
-    const album = parseAlbumDocument(albumDoc, {file});
-
+function parseAlbumEntryDocuments(documents) {
     // Slightly separate meanings: tracks is the array of Track objects (and
     // only Track objects); trackGroups is the array of TrackGroup objects,
     // organizing (by string reference) the Track objects within the Album.
@@ -968,7 +950,7 @@ async function processAlbumDataFile(file) {
             let trackGroup;
 
             if (currentTrackGroupDoc) {
-                trackGroup = parseTrackGroupDocument(currentTrackGroupDoc, {file});
+                trackGroup = parseTrackGroupDocument(currentTrackGroupDoc);
             } else {
                 trackGroup = new TrackGroup();
                 trackGroup.isDefaultTrackGroup = true;
@@ -979,7 +961,7 @@ async function processAlbumDataFile(file) {
         }
     }
 
-    for (const doc of documents.slice(1)) {
+    for (const doc of documents) {
         if (doc['Group']) {
             closeCurrentTrackGroup();
             currentTracksByRef = [];
@@ -987,7 +969,7 @@ async function processAlbumDataFile(file) {
             continue;
         }
 
-        const track = parseTrackDocument(doc, {file});
+        const track = parseTrackDocument(doc);
         tracks.push(track);
 
         const ref = Thing.getReference(track);
@@ -1000,10 +982,10 @@ async function processAlbumDataFile(file) {
 
     closeCurrentTrackGroup();
 
-    album.trackGroups = trackGroups;
+    return {tracks, trackGroups};
+}
 
-    return {album, tracks};
-
+async function processAlbumDataFile(file) {
     // --------------------------------------------------------------
 
     // const album = {};
@@ -1271,6 +1253,7 @@ const parseTrackDocument = makeParseDocument(Track, {
         'Duration': getDurationInSeconds,
 
         'Date First Released': value => new Date(value),
+        'Cover Art Date': value => new Date(value),
 
         'Artists': parseContributors,
         'Contributors': parseContributors,
@@ -1284,6 +1267,7 @@ const parseTrackDocument = makeParseDocument(Track, {
         duration: 'Duration',
         urls: 'URLs',
 
+        coverArtDate: 'Cover Art Date',
         dateFirstReleased: 'Date First Released',
         hasCoverArt: 'Has Cover Art',
         hasURLs: 'Has URLs',
@@ -1297,7 +1281,9 @@ const parseTrackDocument = makeParseDocument(Track, {
 
         commentary: 'Commentary',
         lyrics: 'Lyrics'
-    }
+    },
+
+    ignoredFields: ['Sampled Tracks']
 });
 
 async function processArtistDataFile(file) {
@@ -2736,22 +2722,107 @@ async function main() {
     // reading as-is.
     const albumDataFiles = await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY), f => path.extname(f) === '.yaml');
 
-    class LoadDataFileError extends AggregateError {}
+    const documentModes = {
+        onePerFile: Symbol('Document mode: One per file'),
+        headerAndEntries: Symbol('Document mode: Header and entries'),
+        allInOne: Symbol('Document mode: All in one')
+    };
 
-    // WD.albumData = await progressPromiseAll(`Reading & processing album files.`, albumDataFiles.map(aggregate.wrapAsync(processAlbumDataFile)));
+    const dataSteps = [
+        {
+            title: `Process album files`,
+            files: albumDataFiles,
+
+            documentMode: documentModes.headerAndEntries,
+            processHeaderDocument: parseAlbumDocument,
+            processEntryDocuments: parseAlbumEntryDocuments,
+
+            save(results) {
+                const albumData = [];
+                const trackData = [];
+
+                for (const {
+                    header: album,
+                    entries: { tracks, trackGroups }
+                } of results) {
+                    album.trackGroups = trackGroups;
+                    albumData.push(album);
+                    trackData.push(...tracks);
+                }
+
+                Object.assign(WD, {albumData, trackData});
+            }
+        }
+    ];
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
 
-    await processDataAggregate.callAsync(async () => {
-        const { aggregate, result } = await mapAggregateAsync(albumDataFiles, processAlbumDataFile, {
-            message: `Errors processing album files`,
-            promiseAll: array => progressPromiseAll(`Reading & processing album files.`, array)
-        });
+    const documentModeFunctions = {
+        [documentModes.onePerFile]: (documents, dataStep) => (
+            dataStep.processDocument(documents[0])
+        ),
 
-        WD.albumData = result;
+        [documentModes.headerAndEntries]: (documents, dataStep) => ({
+            header: dataStep.processHeaderDocument(documents[0]),
+            entries: dataStep.processEntryDocuments(documents.slice(1))
+        }),
 
-        aggregate.close();
-    });
+        [documentModes.allInOne]: (documents, dataStep) => (
+            documents.map(dataStep.processDocument)
+        )
+    };
+
+    function decorateErrorWithFile(file, fn) {
+        try {
+            return fn();
+        } catch (error) {
+            error.message += (
+                (error.message.includes('\n') ? '\n' : ' ') +
+                `(file: ${color.bright(color.blue(path.relative(dataPath, file)))})`
+            );
+            throw error;
+        }
+    }
+
+    for (const dataStep of dataSteps) {
+        await processDataAggregate.nestAsync(
+            {message: `Errors during data step: ${dataStep.title}`},
+            async ({map, mapAsync}) => {
+                const processDocuments = documentModeFunctions[dataStep.documentMode];
+
+                if (!processDocuments) {
+                    throw new Error(`Invalid documentMode: ${dataStep.documentMode}`);
+                }
+
+                const readResults = await mapAsync(
+                    dataStep.files,
+                    file => (readFile(file, 'utf-8')
+                        .then(contents => ({file, contents}))),
+                    {
+                        message: `Errors reading data files`,
+                        promiseAll: array => progressPromiseAll(`Data step: ${dataStep.title} (reading data files)`, array)
+                    });
+
+                const yamlResults = map(
+                    readResults,
+                    ({ file, contents }) => decorateErrorWithFile(file,
+                        () => ({file, documents: yaml.loadAll(contents)})
+                    ),
+                    {message: `Errors parsing data files as valid YAML`});
+
+                const processResults = map(
+                    yamlResults,
+                    ({ file, documents }) => decorateErrorWithFile(file,
+                        () => processDocuments(documents, dataStep)
+                    ),
+                    {message: `Errors processing data files as valid wiki documents`,});
+
+                dataStep.save(processResults);
+            });
+    }
+
+    console.log('albumData:', WD.albumData);
+    console.log('trackData:', WD.trackData);
 
     try {
         processDataAggregate.close();
