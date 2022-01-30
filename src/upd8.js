@@ -90,6 +90,7 @@ import * as html from './util/html.js';
 import unbound_link, {getLinkThemeString} from './util/link.js';
 
 import Album, { TrackGroup } from './thing/album.js';
+import Artist from './thing/artist.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -161,9 +162,9 @@ import {
 
 import {
     bindOpts,
-    call,
     filterAggregateAsync,
     filterEmptyLines,
+    mapAggregate,
     mapAggregateAsync,
     openAggregate,
     queue,
@@ -193,7 +194,7 @@ const CACHEBUST = 7;
 // MAKE THESE END IN YAML
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
-const ARTIST_DATA_FILE = 'artists.txt';
+const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.txt';
 const NEWS_DATA_FILE = 'news.txt';
 const TAG_DATA_FILE = 'tags.txt';
@@ -781,9 +782,9 @@ function makeParseDocument(thingClass, {
 
         withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({ call }) => {
             for (const [ property, value ] of Object.entries(sourceProperties)) {
-                call(() => {
+                (() => {
                     thing[property] = value;
-                });
+                })();
             }
         });
 
@@ -953,6 +954,21 @@ const parseTrackDocument = makeParseDocument(Track, {
     },
 
     ignoredFields: ['Sampled Tracks']
+});
+
+const processArtistDocument = makeParseDocument(Artist, {
+    propertyFieldMapping: {
+        name: 'Artist',
+
+        directory: 'Directory',
+        urls: 'URLs',
+
+        aliasRefs: 'Aliases',
+
+        contextNotes: 'Context Notes'
+    },
+
+    ignoredFields: ['Dead URLs']
 });
 
 async function processArtistDataFile(file) {
@@ -1845,10 +1861,10 @@ writePage.html = (pageFn, {
                     cur.toCurrentPage ? '' :
                     cur.toHome ? to('localized.home') :
                     cur.path ? to(...cur.path) :
-                    cur.href ? call(() => {
+                    cur.href ? (() => {
                         logWarn`Using legacy href format nav link in ${paths.pathname}`;
                         return cur.href;
-                    }) :
+                    })() :
                     null)
             };
             if (attributes.href === null) {
@@ -2421,7 +2437,19 @@ async function main() {
                     trackData.push(...tracks);
                 }
 
-                Object.assign(WD, {albumData, trackData});
+                Object.assign(wikiData, {albumData, trackData});
+            }
+        },
+
+        {
+            title: `Process artist file`,
+            files: [path.join(dataPath, ARTIST_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument: processArtistDocument,
+
+            save(results) {
+                wikiData.artistData = results;
             }
         }
     ];
@@ -2438,9 +2466,10 @@ async function main() {
             entries: dataStep.processEntryDocuments(documents.slice(1))
         }),
 
-        [documentModes.allInOne]: (documents, dataStep) => (
-            documents.map(dataStep.processDocument)
-        )
+        // All in one is kinda tricky because we don't want errors to invalidate
+        // the entire file - only each document. We just special case it,
+        // handling it completely separately later.
+        [documentModes.allInOne]: documentModes.allInOne
     };
 
     function decorateErrorWithFile(file, fn) {
@@ -2458,11 +2487,36 @@ async function main() {
     for (const dataStep of dataSteps) {
         await processDataAggregate.nestAsync(
             {message: `Errors during data step: ${dataStep.title}`},
-            async ({map, mapAsync}) => {
+            async ({call, map, mapAsync}) => {
                 const processDocuments = documentModeFunctions[dataStep.documentMode];
 
                 if (!processDocuments) {
                     throw new Error(`Invalid documentMode: ${dataStep.documentMode}`);
+                }
+
+                if (processDocuments === documentModes.allInOne) {
+                    if (dataStep.files.length !== 1) {
+                        throw new Error(`Expected 1 file for all-in-one documentMode, not ${files.length}`);
+                    }
+
+                    const file = dataStep.files[0];
+                    const readResult = await readFile(file);
+                    const yamlResult = yaml.loadAll(readResult);
+
+                    const {
+                        result: processResults,
+                        aggregate: processAggregate
+                    } = mapAggregate(
+                        yamlResult,
+                        dataStep.processDocument,
+                        {message: `Errors processing documents`}
+                    );
+
+                    call(processAggregate.close);
+
+                    dataStep.save(processResults);
+
+                    return;
                 }
 
                 const readResults = await mapAsync(
@@ -2477,27 +2531,32 @@ async function main() {
                 const yamlResults = map(
                     readResults,
                     ({ file, contents }) => decorateErrorWithFile(file,
-                        () => ({file, documents: yaml.loadAll(contents)})
-                    ),
+                        () => ({file, documents: yaml.loadAll(contents)})),
                     {message: `Errors parsing data files as valid YAML`});
 
                 const processResults = map(
                     yamlResults,
                     ({ file, documents }) => decorateErrorWithFile(file,
-                        () => processDocuments(documents, dataStep)
-                    ),
-                    {message: `Errors processing data files as valid wiki documents`,});
+                        () => processDocuments(documents, dataStep)),
+                    {message: `Errors processing data files as valid wiki documents`});
 
                 dataStep.save(processResults);
             });
     }
 
-    console.log(WD);
+    logInfo`Loaded data and processed objects:`;
+    logInfo` - ${wikiData.albumData.length} albums`;
+    logInfo` - ${wikiData.trackData.length} tracks`;
+    logInfo` - ${wikiData.artistData.length} artists`;
 
     try {
         processDataAggregate.close();
     } catch (error) {
         showAggregate(error, {pathToFile: f => path.relative(__dirname, f)});
+        logWarn`The above errors were detected while processing data files.`;
+        logWarn`If the remaining valid data is complete enough, the wiki will`;
+        logWarn`still build - but all errored data will be skipped.`;
+        logWarn`(Resolve errors for more complete output!)`;
     }
 
     process.exit();
