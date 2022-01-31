@@ -10,6 +10,7 @@ import {
     isDate,
     isDimensions,
     isDirectory,
+    isFileExtension,
     isName,
     isURL,
     isString,
@@ -176,7 +177,7 @@ export default class Album extends Thing {
 
         wallpaperFileExtension: {
             flags: {update: true, expose: true},
-            update: {validate: isString}
+            update: {validate: isFileExtension}
         },
 
         bannerStyle: {
@@ -186,7 +187,7 @@ export default class Album extends Thing {
 
         bannerFileExtension: {
             flags: {update: true, expose: true},
-            update: {validate: isString}
+            update: {validate: isFileExtension}
         },
 
         bannerDimensions: {

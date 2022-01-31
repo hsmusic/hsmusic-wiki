@@ -214,11 +214,13 @@ export default class CacheableObject {
     #getExposeComputeFunction(property) {
         const { flags, expose } = this.#getPropertyDescriptor(property);
 
-        const compute = (!flags.update && expose?.compute);
-        const transform = (flags.update && expose?.transform);
+        const compute = expose?.compute;
+        const transform = expose?.transform;
 
         if (flags.update && !transform) {
             return null;
+        } else if (flags.update && compute) {
+            throw new Error(`Updating property ${property} has compute function, should be formatted as transform`);
         } else if (!flags.update && !compute) {
             throw new Error(`Exposed property ${property} does not update and is missing compute function`);
         }

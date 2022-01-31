@@ -350,7 +350,7 @@ export function _withAggregate(mode, aggregateOpts, fn) {
     }
 }
 
-export function showAggregate(topError, {pathToFile = null} = {}) {
+export function showAggregate(topError, {pathToFile = p => p} = {}) {
     const recursive = (error, {level}) => {
         const stackLines = error.stack?.split('\n');
         const stackLine = stackLines?.find(line =>

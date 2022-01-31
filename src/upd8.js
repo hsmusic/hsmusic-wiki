@@ -80,6 +80,8 @@ import {
     unlink
 } from 'fs/promises';
 
+import { inspect as nodeInspect } from 'util';
+
 import genThumbs from './gen-thumbs.js';
 import { listingSpec, listingTargetSpec } from './listing-spec.js';
 import urlSpec from './url-spec.js';
@@ -91,6 +93,7 @@ import unbound_link, {getLinkThemeString} from './util/link.js';
 
 import Album, { TrackGroup } from './thing/album.js';
 import Artist from './thing/artist.js';
+import Flash, { FlashAct } from './thing/flash.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -120,7 +123,8 @@ import {
     logInfo,
     logError,
     parseOptions,
-    progressPromiseAll
+    progressPromiseAll,
+    ENABLE_COLOR
 } from './util/cli.js';
 
 import {
@@ -195,7 +199,7 @@ const CACHEBUST = 7;
 const WIKI_INFO_FILE = 'wiki-info.txt';
 const HOMEPAGE_INFO_FILE = 'homepage.txt';
 const ARTIST_DATA_FILE = 'artists.yaml';
-const FLASH_DATA_FILE = 'flashes.txt';
+const FLASH_DATA_FILE = 'flashes.yaml';
 const NEWS_DATA_FILE = 'news.txt';
 const TAG_DATA_FILE = 'tags.txt';
 const GROUP_DATA_FILE = 'groups.txt';
@@ -218,6 +222,10 @@ const STATIC_DIRECTORY = 'static';
 // Su8directory under provided --data-path directory for al8um files, which are
 // read from and processed to compose the majority of album and track data.
 const DATA_ALBUM_DIRECTORY = 'album';
+
+function inspect(value) {
+    return nodeInspect(value, {colors: ENABLE_COLOR});
+}
 
 // Shared varia8les! These are more efficient to access than a shared varia8le
 // (or at least I h8pe so), and are easier to pass across functions than a
@@ -713,10 +721,10 @@ function parseCommentary(text) {
 // General function for inputting a single document (usually loaded from YAML)
 // and outputting an instance of a provided Thing subclass.
 //
-// makeParseDocument is a factory function: the returned function will take a
-// document and apply the configuration passed to makeParseDocument in order to
-// construct a Thing subclass.
-function makeParseDocument(thingClass, {
+// makeProcessDocument is a factory function: the returned function will take a
+// document and apply the configuration passed to makeProcessDocument in order
+// to construct a Thing subclass.
+function makeProcessDocument(thingClass, {
     // Optional early step for transforming field values before providing them
     // to the Thing's update() method. This is useful when the input format
     // (i.e. values in the document) differ from the format the actual Thing
@@ -749,7 +757,24 @@ function makeParseDocument(thingClass, {
         (Object.entries(propertyFieldMapping)
             .map(([ property, field ]) => [field, property])));
 
-    return function(document) {
+    const decorateErrorWithName = fn => {
+        const nameField = propertyFieldMapping['name'];
+        if (!nameField) return fn;
+
+        return document => {
+            try {
+                return fn(document);
+            } catch (error) {
+                const name = document[nameField];
+                error.message = (name
+                    ? `(name: ${inspect(name)}) ${error.message}`
+                    : `(${color.dim(`no name found`)}) ${error.message}`);
+                throw error;
+            }
+        };
+    };
+
+    return decorateErrorWithName(document => {
         const documentEntries = Object.entries(document)
             .filter(([ field ]) => !ignoredFields.includes(field));
 
@@ -758,7 +783,7 @@ function makeParseDocument(thingClass, {
             .filter(field => !knownFields.includes(field));
 
         if (unknownFields.length) {
-            throw new makeParseDocument.UnknownFieldsError(unknownFields);
+            throw new makeProcessDocument.UnknownFieldsError(unknownFields);
         }
 
         const fieldValues = {};
@@ -789,17 +814,17 @@ function makeParseDocument(thingClass, {
         });
 
         return thing;
-    };
+    });
 }
 
-makeParseDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
+makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
     constructor(fields) {
         super(`Unknown fields present: ${fields.join(', ')}`);
         this.fields = fields;
     }
 };
 
-const parseAlbumDocument = makeParseDocument(Album, {
+const processAlbumDocument = makeProcessDocument(Album, {
     fieldTransformations: {
         'Artists': parseContributors,
         'Cover Artists': parseContributors,
@@ -851,7 +876,7 @@ const parseAlbumDocument = makeParseDocument(Album, {
     }
 });
 
-function parseAlbumEntryDocuments(documents) {
+function processAlbumEntryDocuments(documents) {
     // Slightly separate meanings: tracks is the array of Track objects (and
     // only Track objects); trackGroups is the array of TrackGroup objects,
     // organizing (by string reference) the Track objects within the Album.
@@ -906,7 +931,7 @@ function parseAlbumEntryDocuments(documents) {
     return {tracks, trackGroups};
 }
 
-const parseTrackGroupDocument = makeParseDocument(TrackGroup, {
+const parseTrackGroupDocument = makeProcessDocument(TrackGroup, {
     fieldTransformations: {
         'Date Originally Released': value => new Date(value),
     },
@@ -918,7 +943,7 @@ const parseTrackGroupDocument = makeParseDocument(TrackGroup, {
     }
 });
 
-const parseTrackDocument = makeParseDocument(Track, {
+const parseTrackDocument = makeProcessDocument(Track, {
     fieldTransformations: {
         'Duration': getDurationInSeconds,
 
@@ -956,7 +981,7 @@ const parseTrackDocument = makeParseDocument(Track, {
     ignoredFields: ['Sampled Tracks']
 });
 
-const processArtistDocument = makeParseDocument(Artist, {
+const processArtistDocument = makeProcessDocument(Artist, {
     propertyFieldMapping: {
         name: 'Artist',
 
@@ -971,40 +996,36 @@ const processArtistDocument = makeParseDocument(Artist, {
     ignoredFields: ['Dead URLs']
 });
 
-async function processArtistDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
+const processFlashDocument = makeProcessDocument(Flash, {
+    fieldTransformations: {
+        'Date': value => new Date(value),
+
+        'Contributors': parseContributors,
+    },
+
+    propertyFieldMapping: {
+        name: 'Flash',
+
+        directory: 'Directory',
+        page: 'Page',
+        date: 'Date',
+        coverArtFileExtension: 'Cover Art File Extension',
+
+        featuredTracksByRef: 'Featured Tracks',
+        contributorContribsByRef: 'Contributors',
+        urls: 'URLs'
+    },
+});
+
+const processFlashActDocument = makeProcessDocument(FlashAct, {
+    propertyFieldMapping: {
+        name: 'Act',
+        color: 'Color',
+        anchor: 'Anchor',
+        jump: 'Jump',
+        jumpColor: 'Jump Color'
     }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    return sections.filter(s => s.filter(Boolean).length).map(section => {
-        const name = getBasicField(section, 'Artist');
-        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
-        const alias = getBasicField(section, 'Alias');
-        const hasAvatar = getBooleanField(section, 'Has Avatar') ?? false;
-        const note = getMultilineField(section, 'Note');
-        let directory = getBasicField(section, 'Directory');
-
-        if (!name) {
-            return {error: 'Expected "Artist" (name) field!'};
-        }
-
-        if (!directory) {
-            directory = getKebabCase(name);
-        }
-
-        if (alias) {
-            return {name, directory, alias};
-        } else {
-            return {name, directory, urls, note, hasAvatar};
-        }
-    });
-}
+});
 
 async function processFlashDataFile(file) {
     let contents;
@@ -2421,8 +2442,8 @@ async function main() {
             files: albumDataFiles,
 
             documentMode: documentModes.headerAndEntries,
-            processHeaderDocument: parseAlbumDocument,
-            processEntryDocuments: parseAlbumEntryDocuments,
+            processHeaderDocument: processAlbumDocument,
+            processEntryDocuments: processAlbumEntryDocuments,
 
             save(results) {
                 const albumData = [];
@@ -2436,6 +2457,9 @@ async function main() {
                     albumData.push(album);
                     trackData.push(...tracks);
                 }
+
+                sortByDate(albumData);
+                sortByDate(trackData);
 
                 Object.assign(wikiData, {albumData, trackData});
             }
@@ -2451,7 +2475,49 @@ async function main() {
             save(results) {
                 wikiData.artistData = results;
             }
-        }
+        },
+
+        // TODO: WD.wikiInfo.features.flashesAndGames &&
+        {
+            title: `Process flash file`,
+            files: [path.join(dataPath, FLASH_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument(document) {
+                return ('Act' in document
+                    ? processFlashActDocument(document)
+                    : processFlashDocument(document));
+            },
+
+            save(results) {
+                let flashAct;
+                let flashesByRef = [];
+
+                if (results[0] && !(results[0] instanceof FlashAct)) {
+                    throw new Error(`Expected an act at top of flash data file`);
+                }
+
+                for (const thing of results) {
+                    if (thing instanceof FlashAct) {
+                        if (flashAct) {
+                            Object.assign(flashAct, {flashesByRef});
+                        }
+
+                        flashAct = thing;
+                        flashesByRef = [];
+                    } else {
+                        flashesByRef.push(Thing.getReference(thing));
+                    }
+                }
+
+                if (flashAct) {
+                    Object.assign(flashAct, {flashesByRef});
+                }
+
+                wikiData.flashData = results.filter(x => x instanceof Flash);
+                wikiData.flashActData = results.filter(x => x instanceof FlashAct);
+            }
+        },
     ];
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
@@ -2487,7 +2553,7 @@ async function main() {
     for (const dataStep of dataSteps) {
         await processDataAggregate.nestAsync(
             {message: `Errors during data step: ${dataStep.title}`},
-            async ({call, map, mapAsync}) => {
+            async ({call, callAsync, map, mapAsync}) => {
                 const processDocuments = documentModeFunctions[dataStep.documentMode];
 
                 if (!processDocuments) {
@@ -2500,15 +2566,32 @@ async function main() {
                     }
 
                     const file = dataStep.files[0];
-                    const readResult = await readFile(file);
-                    const yamlResult = yaml.loadAll(readResult);
+
+                    const readResult = await callAsync(readFile, file);
+
+                    if (!readResult) {
+                        return;
+                    }
+
+                    const yamlResult = call(yaml.loadAll, readResult);
+
+                    if (!yamlResult) {
+                        return;
+                    }
 
                     const {
                         result: processResults,
                         aggregate: processAggregate
                     } = mapAggregate(
                         yamlResult,
-                        dataStep.processDocument,
+                        (document, i) => {
+                            try {
+                                return dataStep.processDocument(document);
+                            } catch (error) {
+                                error.message = `(${color.yellow(`#${i + 1}`)}) ${error.message}`;
+                                throw error;
+                            }
+                        },
                         {message: `Errors processing documents`}
                     );
 
@@ -2544,71 +2627,33 @@ async function main() {
             });
     }
 
-    logInfo`Loaded data and processed objects:`;
-    logInfo` - ${wikiData.albumData.length} albums`;
-    logInfo` - ${wikiData.trackData.length} tracks`;
-    logInfo` - ${wikiData.artistData.length} artists`;
+    {
+        logInfo`Loaded data and processed objects:`;
+        logInfo` - ${wikiData.albumData.length} albums`;
+        logInfo` - ${wikiData.trackData.length} tracks`;
+        logInfo` - ${wikiData.artistData.length} artists`;
+        if (wikiData.flashData)
+            logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
 
-    try {
-        processDataAggregate.close();
-    } catch (error) {
-        showAggregate(error, {pathToFile: f => path.relative(__dirname, f)});
-        logWarn`The above errors were detected while processing data files.`;
-        logWarn`If the remaining valid data is complete enough, the wiki will`;
-        logWarn`still build - but all errored data will be skipped.`;
-        logWarn`(Resolve errors for more complete output!)`;
+        let errorless = true;
+        try {
+            processDataAggregate.close();
+        } catch (error) {
+            showAggregate(error, {pathToFile: f => path.relative(__dirname, f)});
+            logWarn`The above errors were detected while processing data files.`;
+            logWarn`If the remaining valid data is complete enough, the wiki will`;
+            logWarn`still build - but all errored data will be skipped.`;
+            logWarn`(Resolve errors for more complete output!)`;
+            errorless = false;
+        }
+
+        if (errorless) {
+            logInfo`All data processed without any errors - nice!`;
+            logInfo`(This means all source files will be fully accounted for during page generation.)`;
+        }
     }
 
     process.exit();
-
-    {
-        const errors = WD.albumData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
-
-    sortByDate(WD.albumData);
-
-    WD.artistData = await processArtistDataFile(path.join(dataPath, ARTIST_DATA_FILE));
-    if (WD.artistData.error) {
-        console.log(`\x1b[31;1m${WD.artistData.error}\x1b[0m`);
-        return;
-    }
-
-    {
-        const errors = WD.artistData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
-
-    WD.artistAliasData = WD.artistData.filter(x => x.alias);
-    WD.artistData = WD.artistData.filter(x => !x.alias);
-
-    WD.trackData = getAllTracks(WD.albumData);
-
-    if (WD.wikiInfo.features.flashesAndGames) {
-        WD.flashData = await processFlashDataFile(path.join(dataPath, FLASH_DATA_FILE));
-        if (WD.flashData.error) {
-            console.log(`\x1b[31;1m${WD.flashData.error}\x1b[0m`);
-            return;
-        }
-
-        const errors = WD.flashData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
 
     WD.flashActData = WD.flashData?.filter(x => x.act8r8k);
     WD.flashData = WD.flashData?.filter(x => !x.act8r8k);

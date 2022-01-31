@@ -222,6 +222,18 @@ export function isDuration(duration) {
     return true;
 }
 
+export function isFileExtension(string) {
+    isStringNonEmpty(string);
+
+    if (string[0] === '.')
+        throw new TypeError(`Expected no dot (.) at the start of file extension`);
+
+    if (string.match(/[^a-zA-Z0-9_]/))
+        throw new TypeError(`Expected only alphanumeric and underscore`);
+
+    return true;
+}
+
 export function isName(name) {
     return isString(name);
 }
@@ -259,4 +271,37 @@ export function validateReference(type = 'track') {
 
 export function validateReferenceList(type = '') {
     return validateArrayItems(validateReference(type));
+}
+
+// Compositional utilities
+
+export function oneOf(...checks) {
+    return value => {
+        const errorMeta = [];
+
+        for (let i = 0, check; check = checks[i]; i++) {
+            try {
+                const result = check(value);
+
+                if (result !== true) {
+                    throw new Error(`Check returned false`);
+                }
+
+                return true;
+            } catch (error) {
+                errorMeta.push([check, i, error]);
+            }
+        }
+
+        // Don't process error messages until every check has failed.
+        const errors = [];
+        for (const [ check, i, error ] of errorMeta) {
+            error.message = (check.name
+                ? `(#${i} "${check.name}") ${error.message}`
+                : `(#${i}) ${error.message}`);
+            error.check = check;
+            errors.push(error);
+        }
+        throw new AggregateError(errors, `Expected one of ${checks.length} possible checks, but none were true`);
+    };
 }

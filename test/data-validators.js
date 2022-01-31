@@ -17,8 +17,12 @@ import {
     isDimensions,
     isDirectory,
     isDuration,
+    isFileExtension,
     validateReference,
     validateReferenceList,
+
+    // Compositional utilities
+    oneOf,
 } from '../src/thing/validators.js';
 
 function test(msg, fn) {
@@ -157,6 +161,16 @@ test('isDuration', t => {
     t.throws(() => isDuration('10:25'), TypeError);
 });
 
+test('isFileExtension', t => {
+    t.plan(6);
+    t.ok(isFileExtension('png'));
+    t.ok(isFileExtension('jpg'));
+    t.ok(isFileExtension('sub_loc'));
+    t.throws(() => isFileExtension(''), TypeError);
+    t.throws(() => isFileExtension('.jpg'), TypeError);
+    t.throws(() => isFileExtension('just an image bro!!!!'), TypeError);
+});
+
 test.skip('isName', t => {
     // TODO
 });
@@ -215,4 +229,38 @@ test('validateReferenceList', t => {
     t.is(caughtError.errors.length, 2);
     t.true(caughtError.errors[0] instanceof TypeError);
     t.true(caughtError.errors[1] instanceof TypeError);
+});
+
+test('oneOf', t => {
+    t.plan(11);
+
+    const isStringOrNumber = oneOf(isString, isNumber);
+
+    t.ok(isStringOrNumber('hello world'));
+    t.ok(isStringOrNumber(42));
+    t.throws(() => isStringOrNumber(false));
+
+    const mockError = new Error();
+    const neverSucceeds = () => {
+        throw mockError;
+    };
+
+    const isStringOrGetRekt = oneOf(isString, neverSucceeds);
+
+    t.ok(isStringOrGetRekt('phew!'));
+
+    let caughtError = null;
+    try {
+        isStringOrGetRekt(0xdeadbeef);
+    } catch (err) {
+        caughtError = err;
+    }
+
+    t.isNot(caughtError, null);
+    t.true(caughtError instanceof AggregateError);
+    t.is(caughtError.errors.length, 2);
+    t.true(caughtError.errors[0] instanceof TypeError);
+    t.is(caughtError.errors[0].check, isString);
+    t.is(caughtError.errors[1], mockError);
+    t.is(caughtError.errors[1].check, neverSucceeds);
 });
