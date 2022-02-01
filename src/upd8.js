@@ -94,6 +94,7 @@ import unbound_link, {getLinkThemeString} from './util/link.js';
 import Album, { TrackGroup } from './thing/album.js';
 import Artist from './thing/artist.js';
 import Flash, { FlashAct } from './thing/flash.js';
+import Group, { GroupCategory } from './thing/group.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -202,7 +203,7 @@ const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.yaml';
 const NEWS_DATA_FILE = 'news.txt';
 const TAG_DATA_FILE = 'tags.txt';
-const GROUP_DATA_FILE = 'groups.txt';
+const GROUP_DATA_FILE = 'groups.yaml';
 const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
@@ -1182,6 +1183,22 @@ async function processTagDataFile(file) {
         };
     });
 }
+
+const processGroupDocument = makeProcessDocument(Group, {
+    propertyFieldMapping: {
+        name: 'Group',
+        directory: 'Directory',
+        description: 'Description',
+        urls: 'URLs',
+    }
+});
+
+const processGroupCategoryDocument = makeProcessDocument(GroupCategory, {
+    propertyFieldMapping: {
+        name: 'Category',
+        color: 'Color',
+    }
+});
 
 async function processGroupDataFile(file) {
     let contents;
@@ -2565,6 +2582,47 @@ async function main() {
                 wikiData.flashActData = results.filter(x => x instanceof FlashAct);
             }
         },
+
+        {
+            title: `Process group file`,
+            files: [path.join(dataPath, GROUP_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument(document) {
+                return ('Category' in document
+                    ? processGroupCategoryDocument(document)
+                    : processGroupDocument(document));
+            },
+
+            save(results) {
+                let groupCategory;
+                let groupsByRef = [];
+
+                if (results[0] && !(results[0] instanceof GroupCategory)) {
+                    throw new Error(`Expected a category at top of group data file`);
+                }
+
+                for (const thing of results) {
+                    if (thing instanceof GroupCategory) {
+                        if (groupCategory) {
+                            Object.assign(groupCategory, {groupsByRef});
+                        }
+
+                        groupCategory = thing;
+                        groupsByRef = [];
+                    } else {
+                        groupsByRef.push(Thing.getReference(thing));
+                    }
+                }
+
+                if (groupCategory) {
+                    Object.assign(groupCategory, {groupsByRef});
+                }
+
+                wikiData.groupData = results.filter(x => x instanceof Group);
+                wikiData.groupCategoryData = results.filter(x => x instanceof GroupCategory);
+            }
+        },
     ];
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
@@ -2708,6 +2766,7 @@ async function main() {
             logInfo` - ${wikiData.artistData.length} artists`;
             if (wikiData.flashData)
                 logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
+            logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
         } catch (error) {
             console.error(`Error showing data summary:`, error);
         }
