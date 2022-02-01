@@ -98,6 +98,7 @@ import Group, { GroupCategory } from './thing/group.js';
 import HomepageLayout, {
     HomepageLayoutAlbumsRow,
 } from './thing/homepage-layout.js';
+import NewsEntry from './thing/news-entry.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -201,10 +202,10 @@ const CACHEBUST = 7;
 
 // MAKE THESE END IN YAML
 const WIKI_INFO_FILE = 'wiki-info.txt';
-const HOMEPAGE_LAYOUT_FILE = 'homepage.yaml';
+const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.yaml';
-const NEWS_DATA_FILE = 'news.txt';
+const NEWS_DATA_FILE = 'news.yaml';
 const TAG_DATA_FILE = 'tags.txt';
 const GROUP_DATA_FILE = 'groups.yaml';
 const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
@@ -1093,55 +1094,18 @@ async function processFlashDataFile(file) {
     });
 }
 
-async function processNewsDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
+const processNewsEntryDocument = makeProcessDocument(NewsEntry, {
+    fieldTransformations: {
+        'Date': value => new Date(value)
+    },
+
+    propertyFieldMapping: {
+        name: 'Name',
+        directory: 'Directory',
+        date: 'Date',
+        content: 'Content',
     }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    return sections.map(section => {
-        const name = getBasicField(section, 'Name');
-        if (!name) {
-            return {error: 'Expected "Name" field!'};
-        }
-
-        const directory = getBasicField(section, 'Directory') || getBasicField(section, 'ID');
-        if (!directory) {
-            return {error: 'Expected "Directory" field!'};
-        }
-
-        let body = getMultilineField(section, 'Body');
-        if (!body) {
-            return {error: 'Expected "Body" field!'};
-        }
-
-        let date = getBasicField(section, 'Date');
-        if (!date) {
-            return {error: 'Expected "Date" field!'};
-        }
-
-        if (isNaN(Date.parse(date))) {
-            return {error: `Invalid date field: "${date}"`};
-        }
-
-        date = new Date(date);
-
-        let bodyShort = body.split('<hr class="split">')[0];
-
-        return {
-            name,
-            directory,
-            body,
-            bodyShort,
-            date
-        };
-    });
-}
+});
 
 async function processTagDataFile(file) {
     let contents;
@@ -2592,7 +2556,7 @@ async function main() {
 
         {
             title: `Process homepage layout file`,
-            files: [path.join(dataPath, HOMEPAGE_LAYOUT_FILE)],
+            files: [path.join(dataPath, HOMEPAGE_LAYOUT_DATA_FILE)],
 
             documentMode: documentModes.headerAndEntries,
             processHeaderDocument: processHomepageLayoutDocument,
@@ -2606,6 +2570,22 @@ async function main() {
                 const { header: homepageLayout, entries: rows } = results[0];
                 Object.assign(homepageLayout, {rows});
                 Object.assign(wikiData, {homepageLayout});
+            }
+        },
+
+        // TODO: WD.wikiInfo.features.news &&
+        {
+            title: `Process news data file`,
+            files: [path.join(dataPath, NEWS_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument: processNewsEntryDocument,
+
+            save(results) {
+                sortByDate(results);
+                results.reverse();
+
+                wikiData.newsData = results;
             }
         },
     ];
@@ -2752,6 +2732,8 @@ async function main() {
             if (wikiData.flashData)
                 logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
             logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
+            if (wikiData.newsData)
+                logInfo` - ${wikiData.newsData.length} news entries`;
             if (wikiData.homepageLayout)
                 logInfo` - ${1} homepage layout (${wikiData.homepageLayout.rows.length} rows)`;
         } catch (error) {
@@ -2832,25 +2814,6 @@ async function main() {
             }
             return;
         }
-    }
-
-    if (WD.wikiInfo.features.news) {
-        WD.newsData = await processNewsDataFile(path.join(dataPath, NEWS_DATA_FILE));
-        if (WD.newsData.error) {
-            console.log(`\x1b[31;1m${WD.newsData.error}\x1b[0m`);
-            return;
-        }
-
-        const errors = WD.newsData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-
-        sortByDate(WD.newsData);
-        WD.newsData.reverse();
     }
 
     {
