@@ -93,6 +93,7 @@ import unbound_link, {getLinkThemeString} from './util/link.js';
 
 import Album, { TrackGroup } from './thing/album.js';
 import Artist from './thing/artist.js';
+import ArtTag from './thing/art-tag.js';
 import Flash, { FlashAct } from './thing/flash.js';
 import Group, { GroupCategory } from './thing/group.js';
 import HomepageLayout, {
@@ -206,7 +207,7 @@ const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.yaml';
 const NEWS_DATA_FILE = 'news.yaml';
-const TAG_DATA_FILE = 'tags.txt';
+const ART_TAG_DATA_FILE = 'tags.yaml';
 const GROUP_DATA_FILE = 'groups.yaml';
 const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
@@ -1107,51 +1108,14 @@ const processNewsEntryDocument = makeProcessDocument(NewsEntry, {
     }
 });
 
-async function processTagDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return [];
-        } else {
-            return {error: `Could not read ${file} (${error.code}).`};
-        }
+const processArtTagDocument = makeProcessDocument(ArtTag, {
+    propertyFieldMapping: {
+        name: 'Tag',
+        directory: 'Directory',
+        color: 'Color',
+        isContentWarning: 'Is CW'
     }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    return sections.map(section => {
-        let isCW = false;
-
-        let name = getBasicField(section, 'Tag');
-        if (!name) {
-            name = getBasicField(section, 'CW');
-            isCW = true;
-            if (!name) {
-                return {error: 'Expected "Tag" or "CW" field!'};
-            }
-        }
-
-        let color;
-        if (!isCW) {
-            color = getBasicField(section, 'Color');
-            if (!color) {
-                return {error: 'Expected "Color" field!'};
-            }
-        }
-
-        const directory = getKebabCase(name);
-
-        return {
-            name,
-            directory,
-            isCW,
-            color
-        };
-    });
-}
+});
 
 const processGroupDocument = makeProcessDocument(Group, {
     propertyFieldMapping: {
@@ -2588,6 +2552,20 @@ async function main() {
                 wikiData.newsData = results;
             }
         },
+
+        {
+            title: `Process art tags file`,
+            files: [path.join(dataPath, ART_TAG_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument: processArtTagDocument,
+
+            save(results) {
+                results.sort(sortByName);
+
+                wikiData.tagData = results;
+            }
+        },
     ];
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
@@ -2732,6 +2710,7 @@ async function main() {
             if (wikiData.flashData)
                 logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
             logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
+            logInfo` - ${wikiData.tagData.length} art tags`;
             if (wikiData.newsData)
                 logInfo` - ${wikiData.newsData.length} news entries`;
             if (wikiData.homepageLayout)
@@ -2759,46 +2738,6 @@ async function main() {
     }
 
     process.exit();
-
-    WD.flashActData = WD.flashData?.filter(x => x.act8r8k);
-    WD.flashData = WD.flashData?.filter(x => !x.act8r8k);
-
-    WD.tagData = await processTagDataFile(path.join(dataPath, TAG_DATA_FILE));
-    if (WD.tagData.error) {
-        console.log(`\x1b[31;1m${WD.tagData.error}\x1b[0m`);
-        return;
-    }
-
-    {
-        const errors = WD.tagData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
-
-    WD.tagData.sort(sortByName);
-
-    WD.groupData = await processGroupDataFile(path.join(dataPath, GROUP_DATA_FILE));
-    if (WD.groupData.error) {
-        console.log(`\x1b[31;1m${WD.groupData.error}\x1b[0m`);
-        return;
-    }
-
-    {
-        const errors = WD.groupData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
-
-    WD.groupCategoryData = WD.groupData.filter(x => x.isCategory);
-    WD.groupData = WD.groupData.filter(x => x.isGroup);
 
     WD.staticPageData = await processStaticPageDataFile(path.join(dataPath, STATIC_PAGE_DATA_FILE));
     if (WD.staticPageData.error) {
