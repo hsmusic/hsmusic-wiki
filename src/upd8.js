@@ -896,7 +896,7 @@ function processAlbumEntryDocuments(documents) {
             let trackGroup;
 
             if (currentTrackGroupDoc) {
-                trackGroup = parseTrackGroupDocument(currentTrackGroupDoc);
+                trackGroup = processTrackGroupDocument(currentTrackGroupDoc);
             } else {
                 trackGroup = new TrackGroup();
                 trackGroup.isDefaultTrackGroup = true;
@@ -915,7 +915,7 @@ function processAlbumEntryDocuments(documents) {
             continue;
         }
 
-        const track = parseTrackDocument(doc);
+        const track = processTrackDocument(doc);
         tracks.push(track);
 
         const ref = Thing.getReference(track);
@@ -931,7 +931,7 @@ function processAlbumEntryDocuments(documents) {
     return {tracks, trackGroups};
 }
 
-const parseTrackGroupDocument = makeProcessDocument(TrackGroup, {
+const processTrackGroupDocument = makeProcessDocument(TrackGroup, {
     fieldTransformations: {
         'Date Originally Released': value => new Date(value),
     },
@@ -943,7 +943,7 @@ const parseTrackGroupDocument = makeProcessDocument(TrackGroup, {
     }
 });
 
-const parseTrackDocument = makeProcessDocument(Track, {
+const processTrackDocument = makeProcessDocument(Track, {
     fieldTransformations: {
         'Duration': getDurationInSeconds,
 
@@ -2443,19 +2443,66 @@ async function main() {
 
             documentMode: documentModes.headerAndEntries,
             processHeaderDocument: processAlbumDocument,
-            processEntryDocuments: processAlbumEntryDocuments,
+            processEntryDocument(document) {
+                return ('Group' in document
+                    ? processTrackGroupDocument(document)
+                    : processTrackDocument(document));
+            },
+
+            // processEntryDocuments: processAlbumEntryDocuments,
 
             save(results) {
                 const albumData = [];
                 const trackData = [];
 
-                for (const {
-                    header: album,
-                    entries: { tracks, trackGroups }
-                } of results) {
+                for (const { header: album, entries } of results) {
+                    // We can't mutate an array once it's set as a property
+                    // value, so prepare the tracks and track groups that will
+                    // show up in a track list all the way before actually
+                    // applying them.
+                    const trackGroups = [];
+                    let currentTracksByRef = null;
+                    let currentTrackGroup = null;
+
+                    function closeCurrentTrackGroup() {
+                        if (currentTracksByRef) {
+                            let trackGroup;
+
+                            if (currentTrackGroup) {
+                                trackGroup = currentTrackGroup;
+                            } else {
+                                trackGroup = new TrackGroup();
+                                trackGroup.name = `Default Track Group`;
+                                trackGroup.isDefaultTrackGroup = true;
+                            }
+
+                            trackGroup.tracksByRef = currentTracksByRef;
+                            trackGroups.push(trackGroup);
+                        }
+                    }
+
+                    for (const entry of entries) {
+                        if (entry instanceof TrackGroup) {
+                            closeCurrentTrackGroup();
+                            currentTracksByRef = [];
+                            currentTrackGroup = entry;
+                            continue;
+                        }
+
+                        trackData.push(entry);
+
+                        const ref = Thing.getReference(entry);
+                        if (currentTracksByRef) {
+                            currentTracksByRef.push(ref);
+                        } else {
+                            currentTracksByRef = [ref];
+                        }
+                    }
+
+                    closeCurrentTrackGroup();
+
                     album.trackGroups = trackGroups;
                     albumData.push(album);
-                    trackData.push(...tracks);
                 }
 
                 sortByDate(albumData);
@@ -2522,45 +2569,42 @@ async function main() {
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
 
-    const documentModeFunctions = {
-        [documentModes.onePerFile]: (documents, dataStep) => (
-            dataStep.processDocument(documents[0])
-        ),
+    function decorateErrorWithFile(fn) {
+        return (x, index, array) => {
+            try {
+                return fn(x, index, array);
+            } catch (error) {
+                error.message += (
+                    (error.message.includes('\n') ? '\n' : ' ') +
+                    `(file: ${color.bright(color.blue(path.relative(dataPath, x.file)))})`
+                );
+                throw error;
+            }
+        };
+    }
 
-        [documentModes.headerAndEntries]: (documents, dataStep) => ({
-            header: dataStep.processHeaderDocument(documents[0]),
-            entries: dataStep.processEntryDocuments(documents.slice(1))
-        }),
-
-        // All in one is kinda tricky because we don't want errors to invalidate
-        // the entire file - only each document. We just special case it,
-        // handling it completely separately later.
-        [documentModes.allInOne]: documentModes.allInOne
-    };
-
-    function decorateErrorWithFile(file, fn) {
-        try {
-            return fn();
-        } catch (error) {
-            error.message += (
-                (error.message.includes('\n') ? '\n' : ' ') +
-                `(file: ${color.bright(color.blue(path.relative(dataPath, file)))})`
-            );
-            throw error;
+    function decorateErrorWithIndex(fn) {
+        return (x, index, array) => {
+            try {
+                return fn(x, index, array);
+            } catch (error) {
+                error.message = `(${color.yellow(`#${index + 1}`)}) ${error.message}`;
+                throw error;
+            }
         }
     }
 
     for (const dataStep of dataSteps) {
         await processDataAggregate.nestAsync(
             {message: `Errors during data step: ${dataStep.title}`},
-            async ({call, callAsync, map, mapAsync}) => {
-                const processDocuments = documentModeFunctions[dataStep.documentMode];
+            async ({call, callAsync, map, mapAsync, nest}) => {
+                const { documentMode } = dataStep;
 
-                if (!processDocuments) {
-                    throw new Error(`Invalid documentMode: ${dataStep.documentMode}`);
+                if (!(Object.values(documentModes).includes(documentMode))) {
+                    throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
                 }
 
-                if (processDocuments === documentModes.allInOne) {
+                if (documentMode === documentModes.allInOne) {
                     if (dataStep.files.length !== 1) {
                         throw new Error(`Expected 1 file for all-in-one documentMode, not ${files.length}`);
                     }
@@ -2584,14 +2628,7 @@ async function main() {
                         aggregate: processAggregate
                     } = mapAggregate(
                         yamlResult,
-                        (document, i) => {
-                            try {
-                                return dataStep.processDocument(document);
-                            } catch (error) {
-                                error.message = `(${color.yellow(`#${i + 1}`)}) ${error.message}`;
-                                throw error;
-                            }
-                        },
+                        decorateErrorWithIndex(dataStep.processDocument),
                         {message: `Errors processing documents`}
                     );
 
@@ -2613,27 +2650,67 @@ async function main() {
 
                 const yamlResults = map(
                     readResults,
-                    ({ file, contents }) => decorateErrorWithFile(file,
-                        () => ({file, documents: yaml.loadAll(contents)})),
+                    decorateErrorWithFile(
+                        ({ file, contents }) => ({file, documents: yaml.loadAll(contents)})),
                     {message: `Errors parsing data files as valid YAML`});
 
-                const processResults = map(
-                    yamlResults,
-                    ({ file, documents }) => decorateErrorWithFile(file,
-                        () => processDocuments(documents, dataStep)),
-                    {message: `Errors processing data files as valid wiki documents`});
+                let processResults;
+
+                if (documentMode === documentModes.headerAndEntries) {
+                    nest({message: `Errors processing data files as valid documents`}, ({ call, map }) => {
+                        processResults = [];
+
+                        yamlResults.forEach(({ file, documents }) => {
+                            const [ headerDocument, ...entryDocuments ] = documents;
+
+                            const header = call(
+                                decorateErrorWithFile(
+                                    ({ document }) => dataStep.processHeaderDocument(document)),
+                                {file, document: headerDocument});
+
+                            // Don't continue processing files whose header
+                            // document is invalid - the entire file is excempt
+                            // from data in this case.
+                            if (!header) {
+                                return;
+                            }
+
+                            const entries = map(
+                                entryDocuments.map(document => ({file, document})),
+                                decorateErrorWithFile(
+                                    decorateErrorWithIndex(
+                                        ({ document }) => dataStep.processEntryDocument(document))),
+                                {message: `Errors processing entry documents`});
+
+                            // Entries may be incomplete (i.e. any errored
+                            // documents won't have a processed output
+                            // represented here) - this is intentional! By
+                            // principle, partial output is preferred over
+                            // erroring an entire file.
+                            processResults.push({header, entries});
+                        });
+                    });
+                }
+
+                if (documentMode === documentModes.onePerFile) {
+                    throw new Error('TODO: onePerFile not yet implemented');
+                }
 
                 dataStep.save(processResults);
             });
     }
 
     {
-        logInfo`Loaded data and processed objects:`;
-        logInfo` - ${wikiData.albumData.length} albums`;
-        logInfo` - ${wikiData.trackData.length} tracks`;
-        logInfo` - ${wikiData.artistData.length} artists`;
-        if (wikiData.flashData)
-            logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
+        try {
+            logInfo`Loaded data and processed objects:`;
+            logInfo` - ${wikiData.albumData.length} albums`;
+            logInfo` - ${wikiData.trackData.length} tracks`;
+            logInfo` - ${wikiData.artistData.length} artists`;
+            if (wikiData.flashData)
+                logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
+        } catch (error) {
+            console.error(`Error showing data summary:`, error);
+        }
 
         let errorless = true;
         try {
