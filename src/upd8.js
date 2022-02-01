@@ -808,9 +808,7 @@ function makeProcessDocument(thingClass, {
 
         withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({ call }) => {
             for (const [ property, value ] of Object.entries(sourceProperties)) {
-                (() => {
-                    thing[property] = value;
-                })();
+                call(() => (thing[property] = value));
             }
         });
 
