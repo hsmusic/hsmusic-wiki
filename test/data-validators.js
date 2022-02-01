@@ -4,6 +4,7 @@ import { showAggregate } from '../src/util/sugar.js';
 import {
     // Basic types
     isBoolean,
+    isCountingNumber,
     isNumber,
     isString,
     isStringNonEmpty,
@@ -58,6 +59,16 @@ test('isNumber', t => {
     t.ok(isNumber(-10));
     t.throws(() => isNumber('413'), TypeError);
     t.throws(() => isNumber(true), TypeError);
+});
+
+test('isCountingNumber', t => {
+    t.plan(6);
+    t.ok(isCountingNumber(3));
+    t.ok(isCountingNumber(1));
+    t.throws(() => isCountingNumber(1.75), TypeError);
+    t.throws(() => isCountingNumber(0), TypeError);
+    t.throws(() => isCountingNumber(-1), TypeError);
+    t.throws(() => isCountingNumber('612'), TypeError);
 });
 
 test('isString', t => {

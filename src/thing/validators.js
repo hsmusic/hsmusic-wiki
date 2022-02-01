@@ -74,6 +74,13 @@ export function isInteger(number) {
     return true;
 }
 
+export function isCountingNumber(number) {
+    isInteger(number);
+    isPositive(number);
+
+    return true;
+}
+
 export function isString(value) {
     return isType(value, 'string');
 }

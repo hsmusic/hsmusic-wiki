@@ -95,6 +95,9 @@ import Album, { TrackGroup } from './thing/album.js';
 import Artist from './thing/artist.js';
 import Flash, { FlashAct } from './thing/flash.js';
 import Group, { GroupCategory } from './thing/group.js';
+import HomepageLayout, {
+    HomepageLayoutAlbumsRow,
+} from './thing/homepage-layout.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -198,7 +201,7 @@ const CACHEBUST = 7;
 
 // MAKE THESE END IN YAML
 const WIKI_INFO_FILE = 'wiki-info.txt';
-const HOMEPAGE_INFO_FILE = 'homepage.txt';
+const HOMEPAGE_LAYOUT_FILE = 'homepage.yaml';
 const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.yaml';
 const NEWS_DATA_FILE = 'news.txt';
@@ -750,6 +753,10 @@ function makeProcessDocument(thingClass, {
     // yet implemented as part of a Thing's data model!
     ignoredFields = []
 }) {
+    if (!propertyFieldMapping) {
+        throw new Error(`Expected propertyFieldMapping to be provided`);
+    }
+
     const knownFields = Object.values(propertyFieldMapping);
 
     // Invert the property-field mapping, since it'll come in handy for
@@ -1367,72 +1374,50 @@ async function processWikiInfoFile(file) {
     };
 }
 
-async function processHomepageInfoFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
+const processHomepageLayoutDocument = makeProcessDocument(HomepageLayout, {
+    propertyFieldMapping: {
+        sidebarContent: 'Sidebar Content'
+    },
+
+    ignoredFields: ['Homepage']
+});
+
+const homepageLayoutRowBaseSpec = {
+};
+
+const makeProcessHomepageLayoutRowDocument = (rowClass, spec) => makeProcessDocument(rowClass, {
+    ...spec,
+
+    propertyFieldMapping: {
+        name: 'Row',
+        color: 'Color',
+        type: 'Type',
+        ...spec.propertyFieldMapping,
+    }
+});
+
+const homepageLayoutRowTypeProcessMapping = {
+    albums: makeProcessHomepageLayoutRowDocument(HomepageLayoutAlbumsRow, {
+        propertyFieldMapping: {
+            sourceGroupByRef: 'Group',
+            countAlbumsFromGroup: 'Count',
+            sourceAlbumsByRef: 'Albums',
+            actionLinks: 'Actions'
+        }
+    })
+};
+
+function processHomepageLayoutRowDocument(document) {
+    const type = document['Type'];
+
+    const match = Object.entries(homepageLayoutRowTypeProcessMapping)
+        .find(([ key ]) => key === type);
+
+    if (!match) {
+        throw new TypeError(`No processDocument function for row type ${type}!`);
     }
 
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    const [ firstSection, ...rowSections ] = sections;
-
-    const sidebar = getMultilineField(firstSection, 'Sidebar');
-
-    const validRowTypes = ['albums'];
-
-    const rows = rowSections.map(section => {
-        const name = getBasicField(section, 'Row');
-        if (!name) {
-            return {error: 'Expected "Row" (name) field!'};
-        }
-
-        const color = getBasicField(section, 'Color');
-
-        const type = getBasicField(section, 'Type');
-        if (!type) {
-            return {error: 'Expected "Type" field!'};
-        }
-
-        if (!validRowTypes.includes(type)) {
-            return {error: `Expected "Type" field to be one of: ${validRowTypes.join(', ')}`};
-        }
-
-        const row = {name, color, type};
-
-        switch (type) {
-            case 'albums': {
-                const group = getBasicField(section, 'Group') || null;
-                const albums = getListField(section, 'Albums') || [];
-
-                if (!group && !albums) {
-                    return {error: 'Expected "Group" and/or "Albums" field!'};
-                }
-
-                let groupCount = getBasicField(section, 'Count');
-                if (group && !groupCount) {
-                    return {error: 'Expected "Count" field!'};
-                }
-
-                if (groupCount) {
-                    if (isNaN(parseInt(groupCount))) {
-                        return {error: `Invalid Count field: "${groupCount}"`};
-                    }
-
-                    groupCount = parseInt(groupCount);
-                }
-
-                const actions = getListField(section, 'Actions') || [];
-
-                return {...row, group, groupCount, albums, actions};
-            }
-        }
-    });
-
-    return {sidebar, rows};
+    return match[1](document);
 }
 
 function getDurationInSeconds(string) {
@@ -2400,23 +2385,6 @@ async function main() {
     } else {
         languages.default = defaultStrings;
     }
-
-    WD.homepageInfo = await processHomepageInfoFile(path.join(dataPath, HOMEPAGE_INFO_FILE));
-
-    if (WD.homepageInfo.error) {
-        console.log(`\x1b[31;1m${WD.homepageInfo.error}\x1b[0m`);
-        return;
-    }
-
-    {
-        const errors = WD.homepageInfo.rows.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
     */
 
     // 8ut wait, you might say, how do we know which al8um these data files
@@ -2528,7 +2496,7 @@ async function main() {
         },
 
         {
-            title: `Process artist file`,
+            title: `Process artists file`,
             files: [path.join(dataPath, ARTIST_DATA_FILE)],
 
             documentMode: documentModes.allInOne,
@@ -2541,7 +2509,7 @@ async function main() {
 
         // TODO: WD.wikiInfo.features.flashesAndGames &&
         {
-            title: `Process flash file`,
+            title: `Process flashes file`,
             files: [path.join(dataPath, FLASH_DATA_FILE)],
 
             documentMode: documentModes.allInOne,
@@ -2582,7 +2550,7 @@ async function main() {
         },
 
         {
-            title: `Process group file`,
+            title: `Process groups file`,
             files: [path.join(dataPath, GROUP_DATA_FILE)],
 
             documentMode: documentModes.allInOne,
@@ -2619,6 +2587,25 @@ async function main() {
 
                 wikiData.groupData = results.filter(x => x instanceof Group);
                 wikiData.groupCategoryData = results.filter(x => x instanceof GroupCategory);
+            }
+        },
+
+        {
+            title: `Process homepage layout file`,
+            files: [path.join(dataPath, HOMEPAGE_LAYOUT_FILE)],
+
+            documentMode: documentModes.headerAndEntries,
+            processHeaderDocument: processHomepageLayoutDocument,
+            processEntryDocument: processHomepageLayoutRowDocument,
+
+            save(results) {
+                if (!results[0]) {
+                    return;
+                }
+
+                const { header: homepageLayout, entries: rows } = results[0];
+                Object.assign(homepageLayout, {rows});
+                Object.assign(wikiData, {homepageLayout});
             }
         },
     ];
@@ -2765,6 +2752,8 @@ async function main() {
             if (wikiData.flashData)
                 logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
             logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
+            if (wikiData.homepageLayout)
+                logInfo` - ${1} homepage layout (${wikiData.homepageLayout.rows.length} rows)`;
         } catch (error) {
             console.error(`Error showing data summary:`, error);
         }
