@@ -2822,7 +2822,7 @@ async function main() {
         };
         let CR4SH = false;
         for (let name of artistNames) {
-            const entry = [...WD.artistData, ...WD.artistAliasData].find(entry => entry.name === name || entry.name.toLowerCase() === name.toLowerCase());
+            const entry = find.artist(name, {wikiData});
             if (!entry) {
                 clearBuffer();
                 console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
@@ -2830,10 +2830,6 @@ async function main() {
                 CR4SH = true;
             } else if (entry.alias) {
                 console.log(`\x1b[33mArtist "\x1b[1m${name}\x1b[0;33m" should be named "\x1b[1m${entry.alias}\x1b[0;33m"\x1b[0m`);
-                showWhere(name, 33);
-                CR4SH = true;
-            } else if (entry.name !== name) {
-                console.log(`\x1b[33mArtist "\x1b[1m${name}\x1b[0;33m" should be named "\x1b[1m${entry.name}\x1b[0;33m"\x1b[0m`);
                 showWhere(name, 33);
                 CR4SH = true;
             } else {
