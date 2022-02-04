@@ -15,7 +15,7 @@ export default class StaticPage extends Thing {
 
         name: {
             flags: {update: true, expose: true},
-            update: {validate: isName}
+            update: {validate: isName, default: 'Unnamed Static Page'}
         },
 
         nameShort: {

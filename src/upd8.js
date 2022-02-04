@@ -103,6 +103,7 @@ import NewsEntry from './thing/news-entry.js';
 import StaticPage from './thing/static-page.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
+import WikiInfo from './thing/wiki-info.js';
 
 import {
     fancifyFlashURL,
@@ -202,8 +203,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 7;
 
-// MAKE THESE END IN YAML
-const WIKI_INFO_FILE = 'wiki-info.txt';
+const WIKI_INFO_FILE = 'wiki-info.yaml';
 const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 const ARTIST_DATA_FILE = 'artists.yaml';
 const FLASH_DATA_FILE = 'flashes.yaml';
@@ -1250,71 +1250,23 @@ async function processStaticPageDataFile(file) {
     });
 }
 
-async function processWikiInfoFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
+const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
+    propertyFieldMapping: {
+        name: 'Name',
+        shortName: 'Short Name',
+        color: 'Color',
+        description: 'Description',
+        footerContent: 'Footer Content',
+        defaultLanguage: 'Default Language',
+        canonicalBase: 'Canonical Base',
+        enableArtistAvatars: 'Enable Artist Avatars',
+        enableFlashesAndGames: 'Enable Flashes & Games',
+        enableListings: 'Enable Listings',
+        enableNews: 'Enable News',
+        enableArtTagUI: 'Enable Art Tag UI',
+        enableGroupUI: 'Enable Group UI',
     }
-
-    // Unlike other data files, the site info data file isn't 8roken up into
-    // more than one entry. So we operate on the plain old contentLines array,
-    // rather than dividing into sections like we usually do!
-    const contentLines = splitLines(contents);
-
-    const name = getBasicField(contentLines, 'Name');
-    if (!name) {
-        return {error: 'Expected "Name" field!'};
-    }
-
-    const shortName = getBasicField(contentLines, 'Short Name') || name;
-
-    const color = getBasicField(contentLines, 'Color') || '#0088ff';
-
-    // This is optional! Without it, <meta rel="canonical"> tags won't 8e
-    // gener8ted.
-    const canonicalBase = getBasicField(contentLines, 'Canonical Base');
-
-    // This is optional! Without it, the site will default to 8uilding in
-    // English. (This is only really relevant if you've provided string files
-    // for non-English languages.)
-    const defaultLanguage = getBasicField(contentLines, 'Default Language');
-
-    // Also optional! In charge of <meta rel="description">.
-    const description = getBasicField(contentLines, 'Description');
-
-    const footer = getMultilineField(contentLines, 'Footer') || '';
-
-    // We've had a comment lying around for ages, just reading:
-    // "Might ena8le this later... we'll see! Eventually. May8e."
-    // We still haven't! 8ut hey, the option's here.
-    const enableArtistAvatars = getBooleanField(contentLines, 'Enable Artist Avatars') ?? false;
-
-    const enableFlashesAndGames = getBooleanField(contentLines, 'Enable Flashes & Games') ?? false;
-    const enableListings = getBooleanField(contentLines, 'Enable Listings') ?? false;
-    const enableNews = getBooleanField(contentLines, 'Enable News') ?? false;
-    const enableArtTagUI = getBooleanField(contentLines, 'Enable Art Tag UI') ?? false;
-    const enableGroupUI = getBooleanField(contentLines, 'Enable Group UI') ?? false;
-
-    return {
-        name,
-        shortName,
-        color,
-        canonicalBase,
-        defaultLanguage,
-        description,
-        footer,
-        features: {
-            artistAvatars: enableArtistAvatars,
-            flashesAndGames: enableFlashesAndGames,
-            listings: enableListings,
-            news: enableNews,
-            artTagUI: enableArtTagUI,
-            groupUI: enableGroupUI
-        }
-    };
-}
+});
 
 const processHomepageLayoutDocument = makeProcessDocument(HomepageLayout, {
     propertyFieldMapping: {
@@ -2303,12 +2255,6 @@ async function main() {
     }
 
     /*
-    WD.wikiInfo = await processWikiInfoFile(path.join(dataPath, WIKI_INFO_FILE));
-    if (WD.wikiInfo.error) {
-        console.log(`\x1b[31;1m${WD.wikiInfo.error}\x1b[0m`);
-        return;
-    }
-
     // Update languages o8ject with the wiki-specified default language!
     // This will make page files for that language 8e gener8ted at the root
     // directory, instead of the language-specific su8directory.
@@ -2362,6 +2308,22 @@ async function main() {
     };
 
     const dataSteps = [
+        {
+            title: `Process wiki info file`,
+            files: [path.join(dataPath, WIKI_INFO_FILE)],
+
+            documentMode: documentModes.onePerFile,
+            processDocument: processWikiInfoDocument,
+
+            save(results) {
+                if (!results[0]) {
+                    return;
+                }
+
+                wikiData.wikiInfo = results[0];
+            }
+        },
+
         {
             title: `Process album files`,
             files: albumDataFiles,
@@ -2720,7 +2682,29 @@ async function main() {
                 }
 
                 if (documentMode === documentModes.onePerFile) {
-                    throw new Error('TODO: onePerFile not yet implemented');
+                    nest({message: `Errors processing data files as valid documents`}, ({ call, map }) => {
+                        processResults = [];
+
+                        yamlResults.forEach(({ file, documents }) => {
+                            if (documents.length > 1) {
+                                call(decorateErrorWithFile(() => {
+                                    throw new Error(`Only expected one document to be present per file`);
+                                }));
+                                return;
+                            }
+
+                            const result = call(
+                                decorateErrorWithFile(
+                                    ({ document }) => dataStep.processDocument(document)),
+                                {file, document: documents[0]});
+
+                            if (!result) {
+                                return;
+                            }
+
+                            processResults.push(result);
+                        });
+                    });
                 }
 
                 dataStep.save(processResults);
@@ -2742,6 +2726,8 @@ async function main() {
             logInfo` - ${wikiData.staticPageData.length} static pages`;
             if (wikiData.homepageLayout)
                 logInfo` - ${1} homepage layout (${wikiData.homepageLayout.rows.length} rows)`;
+            if (wikiData.wikiInfo)
+                logInfo` - ${1} wiki config file`;
         } catch (error) {
             console.error(`Error showing data summary:`, error);
         }

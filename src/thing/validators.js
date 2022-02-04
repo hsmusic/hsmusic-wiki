@@ -241,6 +241,15 @@ export function isFileExtension(string) {
     return true;
 }
 
+export function isLanguageCode(string) {
+    // TODO: This is a stub function because really we don't need a detailed
+    // is-language-code parser right now.
+
+    isString(string);
+
+    return true;
+}
+
 export function isName(name) {
     return isString(name);
 }
