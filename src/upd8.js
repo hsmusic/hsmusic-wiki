@@ -100,6 +100,7 @@ import HomepageLayout, {
     HomepageLayoutAlbumsRow,
 } from './thing/homepage-layout.js';
 import NewsEntry from './thing/news-entry.js';
+import StaticPage from './thing/static-page.js';
 import Thing from './thing/thing.js';
 import Track from './thing/track.js';
 
@@ -209,7 +210,7 @@ const FLASH_DATA_FILE = 'flashes.yaml';
 const NEWS_DATA_FILE = 'news.yaml';
 const ART_TAG_DATA_FILE = 'tags.yaml';
 const GROUP_DATA_FILE = 'groups.yaml';
-const STATIC_PAGE_DATA_FILE = 'static-pages.txt';
+const STATIC_PAGE_DATA_FILE = 'static-pages.yaml';
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
 // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
@@ -1187,6 +1188,19 @@ async function processGroupDataFile(file) {
         };
     });
 }
+
+const processStaticPageDocument = makeProcessDocument(StaticPage, {
+    propertyFieldMapping: {
+        name: 'Name',
+        nameShort: 'Short Name',
+        directory: 'Directory',
+
+        content: 'Content',
+        stylesheet: 'Style',
+
+        showInNavigationBar: 'Show in Navigation Bar'
+    }
+});
 
 async function processStaticPageDataFile(file) {
     let contents;
@@ -2566,6 +2580,18 @@ async function main() {
                 wikiData.tagData = results;
             }
         },
+
+        {
+            title: `Process static pages file`,
+            files: [path.join(dataPath, STATIC_PAGE_DATA_FILE)],
+
+            documentMode: documentModes.allInOne,
+            processDocument: processStaticPageDocument,
+
+            save(results) {
+                wikiData.staticPageData = results;
+            }
+        },
     ];
 
     const processDataAggregate = openAggregate({message: `Errors processing data files`});
@@ -2713,6 +2739,7 @@ async function main() {
             logInfo` - ${wikiData.tagData.length} art tags`;
             if (wikiData.newsData)
                 logInfo` - ${wikiData.newsData.length} news entries`;
+            logInfo` - ${wikiData.staticPageData.length} static pages`;
             if (wikiData.homepageLayout)
                 logInfo` - ${1} homepage layout (${wikiData.homepageLayout.rows.length} rows)`;
         } catch (error) {
@@ -2738,22 +2765,6 @@ async function main() {
     }
 
     process.exit();
-
-    WD.staticPageData = await processStaticPageDataFile(path.join(dataPath, STATIC_PAGE_DATA_FILE));
-    if (WD.staticPageData.error) {
-        console.log(`\x1b[31;1m${WD.staticPageData.error}\x1b[0m`);
-        return;
-    }
-
-    {
-        const errors = WD.staticPageData.filter(obj => obj.error);
-        if (errors.length) {
-            for (const error of errors) {
-                console.log(`\x1b[31;1m${error.error}\x1b[0m`);
-            }
-            return;
-        }
-    }
 
     {
         const tagNames = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTags));
