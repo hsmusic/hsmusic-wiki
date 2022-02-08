@@ -16,6 +16,11 @@ import {
     validateReferenceList,
 } from './validators.js';
 
+import Album from './album.js';
+import ArtTag from './art-tag.js';
+
+import find from '../util/find.js';
+
 export default class Track extends Thing {
     static [Thing.referenceType] = 'track';
 
@@ -112,6 +117,55 @@ export default class Track extends Thing {
 
         // Update only
 
+        albumData: {
+            flags: {update: true},
+            update: {validate: validateArrayItems(x => x instanceof Album)}
+        },
+
+        artTagData: {
+            flags: {update: true},
+            update: {validate: validateArrayItems(x => x instanceof ArtTag)}
+        },
+
         // Expose only
+
+        album: {
+            flags: {expose: true},
+
+            expose: {
+                dependencies: ['albumData'],
+                compute: ({ [this.instance]: track, albumData }) => (
+                    albumData?.find(album => album.tracks.includes(track)) ?? null)
+            }
+        },
+
+        date: {
+            flags: {expose: true},
+
+            expose: {
+                dependencies: ['albumData', 'dateFirstReleased'],
+                compute: ({ albumData, dateFirstReleased, [this.instance]: track }) => (
+                    dateFirstReleased ??
+                    albumData?.find(album => album.tracks.includes(track))?.date ??
+                    null
+                )
+            }
+        },
+
+        artTags: {
+            flags: {expose: true},
+
+            expose: {
+                dependencies: ['artTagsByRef', 'artTagData'],
+
+                compute: ({ artTagsByRef, artTagData }) => (
+                    (artTagsByRef && artTagData
+                        ? (artTagsByRef
+                            .map(ref => find.tag(ref, {wikiData: {tagData: artTagData}}))
+                            .filter(Boolean))
+                        : [])
+                )
+            }
+        }
     };
 }

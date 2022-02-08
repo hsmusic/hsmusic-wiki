@@ -96,7 +96,7 @@ export function isStringNonEmpty(value) {
 
 // Complex types (non-primitives)
 
-function isInstance(value, constructor) {
+export function isInstance(value, constructor) {
     isObject(value);
 
     if (!(value instanceof constructor))
@@ -133,7 +133,11 @@ export function isArray(value) {
 function validateArrayItemsHelper(itemValidator) {
     return (item, index) => {
         try {
-            itemValidator(item);
+            const value = itemValidator(item);
+
+            if (value !== true) {
+                throw new Error(`Expected validator to return true`);
+            }
         } catch (error) {
             error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${error.message}`;
             throw error;

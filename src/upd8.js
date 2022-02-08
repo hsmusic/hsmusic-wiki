@@ -94,6 +94,7 @@ import unbound_link, {getLinkThemeString} from './util/link.js';
 import Album, { TrackGroup } from './thing/album.js';
 import Artist from './thing/artist.js';
 import ArtTag from './thing/art-tag.js';
+import CacheableObject from './thing/cacheable-object.js';
 import Flash, { FlashAct } from './thing/flash.js';
 import Group, { GroupCategory } from './thing/group.js';
 import HomepageLayout, {
@@ -2164,6 +2165,13 @@ async function main() {
         },
         queue: {alias: 'queue-size'},
 
+        // This option is super slow and has the potential for bugs! It puts
+        // CacheableObject in a mode where every instance is a Proxy which will
+        // keep track of invalid property accesses.
+        'show-invalid-property-accesses': {
+            type: 'flag'
+        },
+
         [parseOptions.handleUnknown]: () => {}
     });
 
@@ -2214,6 +2222,12 @@ async function main() {
         if (thumbsOnly) return;
     }
 
+    const showInvalidPropertyAccesses = miscOptions['show-invalid-property-accesses'] ?? false;
+
+    if (showInvalidPropertyAccesses) {
+        CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
+    }
+
     const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
     if (defaultStrings.error) {
         logError`Error loading default strings: ${defaultStrings.error}`;
@@ -2253,27 +2267,6 @@ async function main() {
     } else {
         logInfo`Writing all languages.`;
     }
-
-    /*
-    // Update languages o8ject with the wiki-specified default language!
-    // This will make page files for that language 8e gener8ted at the root
-    // directory, instead of the language-specific su8directory.
-    if (WD.wikiInfo.defaultLanguage) {
-        if (Object.keys(languages).includes(WD.wikiInfo.defaultLanguage)) {
-            languages.default = languages[WD.wikiInfo.defaultLanguage];
-        } else {
-            logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
-            if (langPath) {
-                logError`Check if an appropriate file exists in ${langPath}?`;
-            } else {
-                logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
-            }
-            return;
-        }
-    } else {
-        languages.default = defaultStrings;
-    }
-    */
 
     // 8ut wait, you might say, how do we know which al8um these data files
     // correspond to???????? You wouldn't dare suggest we parse the actual
@@ -2391,9 +2384,6 @@ async function main() {
                     album.trackGroups = trackGroups;
                     albumData.push(album);
                 }
-
-                sortByDate(albumData);
-                sortByDate(trackData);
 
                 Object.assign(wikiData, {albumData, trackData});
             }
@@ -2539,7 +2529,7 @@ async function main() {
             save(results) {
                 results.sort(sortByName);
 
-                wikiData.tagData = results;
+                wikiData.artTagData = results;
             }
         },
 
@@ -2720,7 +2710,7 @@ async function main() {
             if (wikiData.flashData)
                 logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
             logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
-            logInfo` - ${wikiData.tagData.length} art tags`;
+            logInfo` - ${wikiData.artTagData.length} art tags`;
             if (wikiData.newsData)
                 logInfo` - ${wikiData.newsData.length} news entries`;
             logInfo` - ${wikiData.staticPageData.length} static pages`;
@@ -2750,21 +2740,72 @@ async function main() {
         }
     }
 
-    process.exit();
+    if (!WD.wikiInfo) {
+        logError`Can't proceed without wiki info file (${WIKI_INFO_FILE}) successfully loading`;
+        return;
+    }
+
+
+    // Data linking! Basically, provide (portions of) wikiData to the Things
+    // which require it - they'll expose dynamically computed properties as a
+    // result (many of which are required for page HTML generation).
+
+    for (const album of WD.albumData) {
+        album.trackData = WD.trackData;
+
+        for (const trackGroup of album.trackGroups) {
+            trackGroup.trackData = WD.trackData;
+        }
+    }
+
+    for (const track of WD.trackData) {
+        track.albumData = WD.albumData;
+        track.artTagData = WD.artTagData;
+    }
+
+    // Extra organization stuff needed for listings and the like.
+
+    Object.assign(wikiData, {
+        albumData: sortByDate(WD.albumData.slice()),
+        trackData: sortByDate(WD.trackData.slice())
+    });
+
+    console.log(WD.trackData[0].name, WD.trackData[0].album.name);
+    console.log(WD.albumData[0].name, WD.albumData[0].tracks[0].name);
+
+    return;
+
+    // Update languages o8ject with the wiki-specified default language!
+    // This will make page files for that language 8e gener8ted at the root
+    // directory, instead of the language-specific su8directory.
+    if (WD.wikiInfo.defaultLanguage) {
+        if (Object.keys(languages).includes(WD.wikiInfo.defaultLanguage)) {
+            languages.default = languages[WD.wikiInfo.defaultLanguage];
+        } else {
+            logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
+            if (langPath) {
+                logError`Check if an appropriate file exists in ${langPath}?`;
+            } else {
+                logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+            }
+            return;
+        }
+    } else {
+        languages.default = defaultStrings;
+    }
 
     {
-        const tagNames = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTags));
+        const tagRefs = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTagsByRef ?? []));
 
-        for (let { name, isCW } of WD.tagData) {
-            if (isCW) {
-                name = 'cw: ' + name;
+        for (const ref of tagRefs) {
+            if (find.tag(ref, {wikiData})) {
+                tagRefs.delete(ref);
             }
-            tagNames.delete(name);
         }
 
-        if (tagNames.size) {
-            for (const name of Array.from(tagNames).sort()) {
-                console.log(`\x1b[33;1m- Missing tag: "${name}"\x1b[0m`);
+        if (tagRefs.size) {
+            for (const ref of Array.from(tagRefs).sort()) {
+                console.log(`\x1b[33;1m- Missing tag: "${ref}"\x1b[0m`);
             }
             return;
         }
@@ -2774,7 +2815,9 @@ async function main() {
     WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
-    const artistNames = Array.from(new Set([
+    return;
+
+    const artistRefs = Array.from(new Set([
         ...WD.artistData.filter(artist => !artist.alias).map(artist => artist.name),
         ...[
             ...WD.albumData.flatMap(album => [
@@ -3417,4 +3460,12 @@ async function main() {
     logInfo`Written!`;
 }
 
-main().catch(error => console.error(error));
+main().catch(error => {
+    if (error instanceof AggregateError) {
+        showAggregate(error);
+    } else {
+        console.error(error);
+    }
+}).then(() => {
+    CacheableObject.showInvalidAccesses();
+});

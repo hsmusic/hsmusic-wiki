@@ -83,6 +83,8 @@ function inspect(value) {
 }
 
 export default class CacheableObject {
+    static instance = Symbol('CacheableObject `this` instance');
+
     #propertyUpdateValues = Object.create(null);
     #propertyUpdateCacheInvalidators = Object.create(null);
 
@@ -100,6 +102,19 @@ export default class CacheableObject {
     constructor() {
         this.#defineProperties();
         this.#initializeUpdatingPropertyValues();
+
+        if (CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
+            return new Proxy(this, {
+                get: (obj, key) => {
+                    if (!Object.hasOwn(obj, key)) {
+                        if (key !== 'constructor') {
+                            CacheableObject._invalidAccesses.add(`(${obj.constructor.name}).${key}`);
+                        }
+                    }
+                    return obj[key];
+                }
+            });
+        }
     }
 
     #initializeUpdatingPropertyValues() {
@@ -227,7 +242,8 @@ export default class CacheableObject {
 
         const dependencyKeys = expose.dependencies || [];
         const dependencyGetters = dependencyKeys.map(key => () => [key, this.#propertyUpdateValues[key]]);
-        const getAllDependencies = () => Object.fromEntries(dependencyGetters.map(f => f()));
+        const getAllDependencies = () => Object.fromEntries(dependencyGetters.map(f => f())
+            .concat([[this.constructor.instance, this]]));
 
         if (flags.update) {
             return () => transform(this.#propertyUpdateValues[property], getAllDependencies());
@@ -267,5 +283,23 @@ export default class CacheableObject {
                 return true;
             }
         };
+    }
+
+    static DEBUG_SLOW_TRACK_INVALID_PROPERTIES = false;
+    static _invalidAccesses = new Set();
+
+    static showInvalidAccesses() {
+        if (!this.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
+            return;
+        }
+
+        if (!this._invalidAccesses.size) {
+            return;
+        }
+
+        console.log(`${this._invalidAccesses.size} unique invalid accesses:`);
+        for (const line of this._invalidAccesses) {
+            console.log(` - ${line}`);
+        }
     }
 }

@@ -1,6 +1,5 @@
 import CacheableObject from './cacheable-object.js';
 import Thing from './thing.js';
-import find from '../util/find.js';
 
 import {
     isBoolean,
@@ -10,6 +9,7 @@ import {
     isDate,
     isDimensions,
     isDirectory,
+    isInstance,
     isFileExtension,
     isName,
     isURL,
@@ -19,6 +19,10 @@ import {
     validateReference,
     validateReferenceList,
 } from './validators.js';
+
+import Track from './track.js';
+
+import find from '../util/find.js';
 
 export class TrackGroup extends CacheableObject {
     static propertyDescriptors = {
@@ -64,7 +68,12 @@ export class TrackGroup extends CacheableObject {
             expose: {
                 dependencies: ['tracksByRef', 'trackData'],
                 compute: ({ tracksByRef, trackData }) => (
-                    tracksByRef.map(ref => find.track(ref, {wikiData: {trackData}})))
+                    (tracksByRef && trackData
+                        ? (tracksByRef
+                            .map(ref => find.track(ref, {wikiData: {trackData}}))
+                            .filter(Boolean))
+                        : [])
+                )
             }
         }
     };
@@ -227,26 +236,29 @@ export default class Album extends Thing {
             update: {validate: isCommentary}
         },
 
+        // Update only
+
+        trackData: {
+            flags: {update: true},
+            update: {validate: validateArrayItems(x => x instanceof Track)}
+        },
+
         // Expose only
 
-        /*
         tracks: {
             flags: {expose: true},
 
             expose: {
-                dependencies: ['trackReferences', 'wikiData'],
-                compute: ({trackReferences, wikiData}) => (
-                    trackReferences.map(ref => find.track(ref, {wikiData})))
+                dependencies: ['trackGroups', 'trackData'],
+                compute: ({ trackGroups, trackData }) => (
+                    (trackGroups && trackData
+                        ? (trackGroups
+                            .flatMap(group => group.tracksByRef ?? [])
+                            .map(ref => find.track(ref, {wikiData: {trackData}}))
+                            .filter(Boolean))
+                        : [])
+                )
             }
         },
-        */
-
-        // Update only
-
-        /*
-        wikiData: {
-            flags: {update: true}
-        }
-        */
     };
 }
