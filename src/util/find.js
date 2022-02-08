@@ -7,7 +7,7 @@ function findHelper(keys, dataProp, findFns = {}) {
     const byDirectory = findFns.byDirectory || matchDirectory;
     const byName = findFns.byName || matchName;
 
-    const keyRefRegex = new RegExp(`^((${keys.join('|')}):(?:\S))?(.*)$`);
+    const keyRefRegex = new RegExp(String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`);
 
     return (fullRef, {wikiData}) => {
         if (!fullRef) return null;
@@ -21,7 +21,7 @@ function findHelper(keys, dataProp, findFns = {}) {
         }
 
         const key = match[1];
-        const ref = match[3];
+        const ref = match[2];
 
         const data = wikiData[dataProp];
 
@@ -78,7 +78,7 @@ const find = {
     listing: findHelper(['listing'], 'listingSpec'),
     newsEntry: findHelper(['news-entry'], 'newsData'),
     staticPage: findHelper(['static'], 'staticPageData'),
-    tag: findHelper(['tag'], 'tagData', {byName: matchTagName}),
+    tag: findHelper(['tag'], 'artTagData', {byName: matchTagName}),
     track: findHelper(['track'], 'trackData')
 };
 
