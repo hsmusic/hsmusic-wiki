@@ -879,7 +879,6 @@ const processAlbumDocument = makeProcessDocument(Album, {
         isMajorRelease: 'Major Release',
         isListedOnHomepage: 'Listed on Homepage',
 
-        aka: 'Also Released As',
         groupsByRef: 'Groups',
         artTagsByRef: 'Art Tags',
         commentary: 'Commentary',
