@@ -17,6 +17,7 @@ import {
 } from './validators.js';
 
 import Album from './album.js';
+import Artist from './artist.js';
 import ArtTag from './art-tag.js';
 
 import find from '../util/find.js';
@@ -100,6 +101,7 @@ export default class Track extends Thing {
             update: {validate: validateReferenceList('tag')}
         },
 
+        // Previously known as: (track).aka
         originalReleaseTrackByRef: {
             flags: {update: true, expose: true},
             update: {validate: validateReference('track')}
@@ -117,15 +119,9 @@ export default class Track extends Thing {
 
         // Update only
 
-        albumData: {
-            flags: {update: true},
-            update: {validate: validateArrayItems(x => x instanceof Album)}
-        },
-
-        artTagData: {
-            flags: {update: true},
-            update: {validate: validateArrayItems(x => x instanceof ArtTag)}
-        },
+        albumData: Thing.genWikiDataProperty(Album),
+        artistData: Thing.genWikiDataProperty(Artist),
+        artTagData: Thing.genWikiDataProperty(ArtTag),
 
         // Expose only
 
@@ -150,6 +146,12 @@ export default class Track extends Thing {
                     null
                 )
             }
+        },
+
+        // Previously known as: (track).artists
+        artistContribs: {
+            flags: {expose: true},
+            expose: Thing.genContribsExpose('artistContribsByRef')
         },
 
         artTags: {

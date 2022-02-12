@@ -3,7 +3,12 @@
 
 import CacheableObject from './cacheable-object.js';
 
+import {
+    validateArrayItems,
+} from './validators.js';
+
 import { getKebabCase } from '../util/wiki-data.js';
+import find from '../util/find.js';
 
 export default class Thing extends CacheableObject {
     static referenceType = Symbol('Thing.referenceType');
@@ -19,6 +24,31 @@ export default class Thing extends CacheableObject {
                 return directory;
         }
     };
+
+    static genContribsExpose(contribsByRefProperty) {
+        return {
+            dependencies: ['artistData', contribsByRefProperty],
+            compute: ({ artistData, [contribsByRefProperty]: contribsByRef }) => (
+                (contribsByRef && artistData
+                    ? (contribsByRef
+                        .map(({ who: ref, what }) => ({
+                            who: find.artist(ref, {wikiData: {artistData}}),
+                            what
+                        }))
+                        .filter(({ who }) => who))
+                    : [])
+            )
+        };
+    }
+
+    static genWikiDataProperty(thingClass) {
+        return {
+            flags: {update: true},
+            update: {
+                validate: validateArrayItems(x => x instanceof thingClass)
+            }
+        };
+    }
 
     static getReference(thing) {
         if (!thing.constructor[Thing.referenceType])

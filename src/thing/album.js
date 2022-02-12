@@ -20,6 +20,8 @@ import {
     validateReferenceList,
 } from './validators.js';
 
+import Artist from './artist.js';
+import ArtTag from './art-tag.js';
 import Track from './track.js';
 
 import find from '../util/find.js';
@@ -75,7 +77,7 @@ export class TrackGroup extends CacheableObject {
                         : [])
                 )
             }
-        }
+        },
     };
 }
 
@@ -238,12 +240,16 @@ export default class Album extends Thing {
 
         // Update only
 
-        trackData: {
-            flags: {update: true},
-            update: {validate: validateArrayItems(x => x instanceof Track)}
-        },
+        artistData: Thing.genWikiDataProperty(Artist),
+        trackData: Thing.genWikiDataProperty(Track),
 
         // Expose only
+
+        // Previously known as: (album).artists
+        artistContribs: {
+            flags: {expose: true},
+            expose: Thing.genContribsExpose('artistContribsByRef')
+        },
 
         tracks: {
             flags: {expose: true},

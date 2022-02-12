@@ -2750,6 +2750,7 @@ async function main() {
     // result (many of which are required for page HTML generation).
 
     for (const album of WD.albumData) {
+        album.artistData = WD.artistData;
         album.trackData = WD.trackData;
 
         for (const trackGroup of album.trackGroups) {
@@ -2759,6 +2760,7 @@ async function main() {
 
     for (const track of WD.trackData) {
         track.albumData = WD.albumData;
+        track.artistData = WD.artistData;
         track.artTagData = WD.artTagData;
     }
 
@@ -2771,6 +2773,11 @@ async function main() {
 
     console.log(WD.trackData[0].name, WD.trackData[0].album.name);
     console.log(WD.albumData[0].name, WD.albumData[0].tracks[0].name);
+    console.log(WD.trackData[0].artistContribs[0].who.name);
+    console.log(
+        (WD.albumData
+            .find(album => album.name === 'Alternia')
+            .artistContribs[0].who.name));
 
     return;
 
