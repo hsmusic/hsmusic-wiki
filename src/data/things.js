@@ -197,6 +197,19 @@ Thing.common = {
         };
     },
 
+    // Corresponding function for a single reference.
+    singleReference: thingClass => {
+        const { [Thing.referenceType]: referenceType } = thingClass;
+        if (!referenceType) {
+            throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
+        }
+
+        return {
+            flags: {update: true, expose: true},
+            update: {validate: validateReference(referenceType)}
+        };
+    },
+
     // Corresponding dynamic property to contribsByRef, which takes the values
     // in the provided property and searches the object's artistData for
     // matching actual Artist objects. The computed structure has the same form
@@ -270,21 +283,8 @@ Album.propertyDescriptors = {
     wallpaperArtistContribsByRef: Thing.common.contribsByRef(),
     bannerArtistContribsByRef: Thing.common.contribsByRef(),
 
-    groupsByRef: {
-        flags: {update: true, expose: true},
-
-        update: {
-            validate: validateReferenceList('group')
-        }
-    },
-
-    artTagsByRef: {
-        flags: {update: true, expose: true},
-
-        update: {
-            validate: validateReferenceList('tag')
-        }
-    },
+    groupsByRef: Thing.common.referenceList(Group),
+    artTagsByRef: Thing.common.referenceList(ArtTag),
 
     trackGroups: {
         flags: {update: true, expose: true},
@@ -357,10 +357,7 @@ TrackGroup.propertyDescriptors = {
 
     dateOriginallyReleased: Thing.common.simpleDate(),
 
-    tracksByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('track')}
-    },
+    tracksByRef: Thing.common.referenceList(Track),
 
     isDefaultTrackGroup: Thing.common.flag(false),
 
@@ -406,25 +403,15 @@ Track.propertyDescriptors = {
     hasCoverArt: Thing.common.flag(true),
     hasURLs: Thing.common.flag(true),
 
-    referencedTracksByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('track')}
-    },
+    referencedTracksByRef: Thing.common.referenceList(Track),
+    artTagsByRef: Thing.common.referenceList(ArtTag),
 
     artistContribsByRef: Thing.common.contribsByRef(),
     contributorContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
 
-    artTagsByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('tag')}
-    },
-
     // Previously known as: (track).aka
-    originalReleaseTrackByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReference('track')}
-    },
+    originalReleaseTrackByRef: Thing.common.singleReference(Track),
 
     commentary: {
         flags: {update: true, expose: true},
@@ -492,13 +479,9 @@ Artist.propertyDescriptors = {
     name: Thing.common.name('Unnamed Artist'),
     directory: Thing.common.directory(),
     urls: Thing.common.urls(),
-
-    aliasRefs: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('artist')}
-    },
-
     contextNotes: Thing.common.simpleString(),
+
+    aliasRefs: Thing.common.referenceList(Artist),
 };
 
 // -> Group
@@ -531,10 +514,7 @@ GroupCategory.propertyDescriptors = {
     name: Thing.common.name('Unnamed Group Category'),
     color: Thing.common.color(),
 
-    groupsByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('group')}
-    },
+    groupsByRef: Thing.common.referenceList(Group),
 };
 
 // -> ArtTag
@@ -649,15 +629,8 @@ HomepageLayoutAlbumsRow.propertyDescriptors = {
         }
     },
 
-    sourceGroupByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReference('group')}
-    },
-
-    sourceAlbumsByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('album')}
-    },
+    sourceGroupByRef: Thing.common.singleReference(Group),
+    sourceAlbumsByRef: Thing.common.referenceList(Album),
 
     countAlbumsFromGroup: {
         flags: {update: true, expose: true},
@@ -713,12 +686,10 @@ Flash.propertyDescriptors = {
         update: {validate: isFileExtension}
     },
 
-    featuredTracksByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('track')}
-    },
+    featuredTracksByRef: Thing.common.referenceList(Track),
 
     contributorContribsByRef: Thing.common.contribsByRef(),
+
     urls: Thing.common.urls(),
 };
 
@@ -731,10 +702,7 @@ FlashAct.propertyDescriptors = {
     jump: Thing.common.simpleString(),
     jumpColor: Thing.common.color(),
 
-    flashesByRef: {
-        flags: {update: true, expose: true},
-        update: {validate: validateReferenceList('flash')}
-    },
+    flashesByRef: Thing.common.referenceList(Flash),
 };
 
 // WikiInfo
