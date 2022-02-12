@@ -356,7 +356,8 @@ export function showAggregate(topError, {pathToFile = p => p} = {}) {
         const stackLine = stackLines?.find(line =>
             line.trim().startsWith('at')
             && !line.includes('sugar')
-            && !line.includes('node:internal'));
+            && !line.includes('node:internal')
+            && !line.includes('<anonymous>'));
         const tracePart = (stackLine
             ? '- ' + stackLine.trim().replace(/file:\/\/(.*\.js)/, (match, pathname) => pathToFile(pathname))
             : '(no stack trace)');

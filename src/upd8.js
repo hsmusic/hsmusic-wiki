@@ -91,20 +91,26 @@ import find from './util/find.js';
 import * as html from './util/html.js';
 import unbound_link, {getLinkThemeString} from './util/link.js';
 
-import Album, { TrackGroup } from './thing/album.js';
-import Artist from './thing/artist.js';
-import ArtTag from './thing/art-tag.js';
-import CacheableObject from './thing/cacheable-object.js';
-import Flash, { FlashAct } from './thing/flash.js';
-import Group, { GroupCategory } from './thing/group.js';
-import HomepageLayout, {
+import CacheableObject from './data/cacheable-object.js';
+
+import {
+    Album,
+    Artist,
+    ArtTag,
+    Flash,
+    FlashAct,
+    Group,
+    GroupCategory,
+    HomepageLayout,
     HomepageLayoutAlbumsRow,
-} from './thing/homepage-layout.js';
-import NewsEntry from './thing/news-entry.js';
-import StaticPage from './thing/static-page.js';
-import Thing from './thing/thing.js';
-import Track from './thing/track.js';
-import WikiInfo from './thing/wiki-info.js';
+    HomepageLayoutRow,
+    NewsEntry,
+    StaticPage,
+    Thing,
+    Track,
+    TrackGroup,
+    WikiInfo,
+} from './data/things.js';
 
 import {
     fancifyFlashURL,
@@ -2612,7 +2618,7 @@ async function main() {
 
                     call(processAggregate.close);
 
-                    dataStep.save(processResults);
+                    call(dataStep.save, processResults);
 
                     return;
                 }
@@ -2696,7 +2702,7 @@ async function main() {
                     });
                 }
 
-                dataStep.save(processResults);
+                call(dataStep.save, processResults);
             });
     }
 

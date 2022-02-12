@@ -1,6 +1,6 @@
 import test from 'tape';
 
-import CacheableObject from '../src/thing/cacheable-object.js';
+import CacheableObject from '../src/data/cacheable-object.js';
 
 // Utility
 

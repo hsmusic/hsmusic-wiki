@@ -134,6 +134,10 @@ export default class CacheableObject {
     }
 
     #defineProperties() {
+        if (!this.constructor.propertyDescriptors) {
+            throw new Error(`Expected constructor ${this.constructor.name} to define propertyDescriptors`);
+        }
+
         for (const [ property, descriptor ] of Object.entries(this.constructor.propertyDescriptors)) {
             const { flags } = descriptor;
 
