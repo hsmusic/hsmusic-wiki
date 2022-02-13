@@ -252,6 +252,9 @@ Thing.common = {
     })
 };
 
+// Get a reference to a thing (e.g. track:showtime-piano-refrain), using its
+// constructor's [Thing.referenceType] as the prefix. This will throw an error
+// if the thing's directory isn't yet provided/computable.
 Thing.getReference = function(thing) {
     if (!thing.constructor[Thing.referenceType])
         throw TypeError(`Passed Thing is ${thing.constructor.name}, which provides no [Thing.referenceType]`);
@@ -398,7 +401,6 @@ Track.propertyDescriptors = {
 
     urls: Thing.common.urls(),
     dateFirstReleased: Thing.common.simpleDate(),
-    coverArtDate: Thing.common.simpleDate(),
 
     hasCoverArt: Thing.common.flag(true),
     hasURLs: Thing.common.flag(true),
@@ -451,8 +453,31 @@ Track.propertyDescriptors = {
         }
     },
 
+    coverArtDate: {
+        flags: {update: true, expose: true},
+
+        update: {validate: isDate},
+
+        expose: {
+            dependencies: ['albumData', 'dateFirstReleased'],
+            transform: (coverArtDate, { albumData, dateFirstReleased, [Track.instance]: track }) => (
+                coverArtDate ??
+                dateFirstReleased ??
+                albumData?.find(album => album.tracks.includes(track))?.trackArtDate ??
+                albumData?.find(album => album.tracks.includes(track))?.date ??
+                null
+            )
+        }
+    },
+
     // Previously known as: (track).artists
     artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
+
+    // Previously known as: (track).contributors
+    contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
+
+    // Previously known as: (track).coverArtists
+    coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
 
     artTags: {
         flags: {expose: true},

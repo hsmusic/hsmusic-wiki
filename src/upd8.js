@@ -2780,10 +2780,12 @@ async function main() {
     console.log(WD.trackData[0].name, WD.trackData[0].album.name);
     console.log(WD.albumData[0].name, WD.albumData[0].tracks[0].name);
     console.log(WD.trackData[0].artistContribs[0].who.name);
-    console.log(
-        (WD.albumData
-            .find(album => album.name === 'Alternia')
-            .artistContribs[0].who.name));
+    const demoAlbum1 = WD.albumData.find(album => album.name === 'Alternia');
+    const demoAlbum2 = WD.albumData.find(album => album.name === 'Homestuck Vol. 5');
+    console.log(demoAlbum1.artistContribs[0]?.who.name);
+    console.log(demoAlbum2.tracks[0].name,
+        demoAlbum2.tracks[0].date,
+        demoAlbum2.tracks[0].coverArtDate);
 
     return;
 
