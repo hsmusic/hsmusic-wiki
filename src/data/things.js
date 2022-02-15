@@ -242,6 +242,41 @@ Thing.common = {
         }
     }),
 
+    // Dynamically inherit a contribution list from some other object, if it
+    // hasn't been overridden on this object. This is handy for solo albums
+    // where all tracks have the same artist, for example.
+    //
+    // Note: The arguments of this function aren't currently final! The final
+    // format will look more like (contribsByRef, parentContribsByRef), e.g.
+    // ('artistContribsByRef', '@album/artistContribsByRef').
+    dynamicInheritContribs: (
+        contribsByRefProperty,
+        parentContribsByRefProperty,
+        wikiDataProperty,
+        findFn
+    ) => ({
+        flags: {expose: true},
+        expose: {
+            dependencies: [contribsByRefProperty, wikiDataProperty, 'artistData'],
+            compute({
+                [Thing.instance]: thing,
+                [contribsByRefProperty]: contribsByRef,
+                [wikiDataProperty]: wikiData,
+                artistData
+            }) {
+                if (!artistData) return [];
+                const refs = (contribsByRef ?? findFn(thing, wikiData)?.[parentContribsByRefProperty]);
+                if (!refs) return [];
+                return (refs
+                    .map(({ who: ref, what }) => ({
+                        who: find.artist(ref, {wikiData: {artistData}}),
+                        what
+                    }))
+                    .filter(({ who }) => who));
+            }
+        }
+    }),
+
     // General purpose wiki data constructor, for properties like artistData,
     // trackData, etc.
     wikiData: (thingClass) => ({
@@ -388,6 +423,13 @@ TrackGroup.propertyDescriptors = {
 
 // -> Track
 
+// This is a quick utility function for now, since the same code is reused in
+// several places. Ideally it wouldn't be - we'd just reuse the `album` property
+// - but support for that hasn't been coded yet :P
+Track.findAlbum = (track, albumData) => {
+    return albumData?.find(album => album.tracks.includes(track));
+};
+
 Track.propertyDescriptors = {
     // Update & expose
 
@@ -447,7 +489,7 @@ Track.propertyDescriptors = {
             dependencies: ['albumData', 'dateFirstReleased'],
             compute: ({ albumData, dateFirstReleased, [Track.instance]: track }) => (
                 dateFirstReleased ??
-                albumData?.find(album => album.tracks.includes(track))?.date ??
+                Track.findAlbum(track)?.date ??
                 null
             )
         }
@@ -463,21 +505,21 @@ Track.propertyDescriptors = {
             transform: (coverArtDate, { albumData, dateFirstReleased, [Track.instance]: track }) => (
                 coverArtDate ??
                 dateFirstReleased ??
-                albumData?.find(album => album.tracks.includes(track))?.trackArtDate ??
-                albumData?.find(album => album.tracks.includes(track))?.date ??
+                Track.findAlbum(track, albumData)?.trackArtDate ??
+                Track.findAlbum(track, albumData)?.date ??
                 null
             )
         }
     },
 
     // Previously known as: (track).artists
-    artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
+    artistContribs: Thing.common.dynamicInheritContribs('artistContribsByRef', 'artistContribsByRef', 'albumData', Track.findAlbum),
 
     // Previously known as: (track).contributors
     contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
     // Previously known as: (track).coverArtists
-    coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
+    coverArtistContribs: Thing.common.dynamicInheritContribs('coverArtistContribsByRef', 'trackCoverArtistContribsByRef', 'albumData', Track.findAlbum),
 
     artTags: {
         flags: {expose: true},
