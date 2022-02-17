@@ -2942,12 +2942,6 @@ async function main() {
         }
     }
 
-    WD.contributionData = Array.from(new Set([
-        ...WD.trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
-        ...WD.albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
-        ...(WD.flashData?.flatMap(flash => [...flash.contributors || []]) || [])
-    ]));
-
     // Now that we have all the data, resolve references all 8efore actually
     // gener8ting any of the pages, 8ecause page gener8tion is going to involve
     // accessing these references a lot, and there's no reason to resolve them
