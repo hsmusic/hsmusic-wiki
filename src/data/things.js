@@ -546,7 +546,7 @@ Track.propertyDescriptors = {
             compute: ({ artTagsByRef, artTagData }) => (
                 (artTagsByRef && artTagData
                     ? (artTagsByRef
-                        .map(ref => find.tag(ref, {wikiData: {tagData: artTagData}}))
+                        .map(ref => find.tag(ref, {wikiData: {artTagData}}))
                         .filter(Boolean))
                     : [])
             )
@@ -570,6 +570,40 @@ Artist.propertyDescriptors = {
             validate: validateArrayItems(isName)
         }
     },
+
+    isAlias: Thing.common.flag(),
+    aliasedArtistRef: Thing.common.singleReference(Artist),
+
+    // Update only
+
+    artistData: Thing.common.wikiData(Artist),
+
+    // Expose only
+
+    aliasedArtist: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['artistData', 'aliasedArtistRef'],
+            compute: ({ artistData, aliasedArtistRef }) => (
+                (aliasedArtistRef && artistData
+                    ? find.artist(aliasedArtistRef, {wikiData: {artistData}}, {quiet: true})
+                    : null)
+            )
+        }
+    },
+
+    // albumsAsCoverArtist
+    // albumsAsWallpaperArtist
+    // albumsAsBannerArtist
+    // albumsAsCommentator
+
+    // tracksAsArtist
+    // tracksAsContributor
+    // tracksAsCoverArtist
+    // tracksAsCommentator
+
+    // flashesAsContributor
 };
 
 // -> Group

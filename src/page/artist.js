@@ -38,9 +38,22 @@ export function write(artist, {wikiData}) {
         note = ''
     } = artist;
 
-    const artThingsAll = sortByDate(unique([...artist.albums.asCoverArtist, ...artist.albums.asWallpaperArtist, ...artist.albums.asBannerArtist, ...artist.tracks.asCoverArtist]));
-    const artThingsGallery = sortByDate([...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist]);
-    const commentaryThings = sortByDate([...artist.albums.asCommentator, ...artist.tracks.asCommentator]);
+    const artThingsAll = sortByDate(unique([
+        ...artist.albumsAsCoverArtist ?? [],
+        ...artist.albumsAsWallpaperArtist ?? [],
+        ...artist.albumsAsBannerArtist ?? [],
+        ...artist.tracksAsCoverArtist ?? []
+    ]));
+
+    const artThingsGallery = sortByDate([
+        ...artist.albumsAsCoverArtist ?? [],
+        ...artist.tracksAsCoverArtist ?? []
+    ]);
+
+    const commentaryThings = sortByDate([
+        ...artist.albumsAsCommentator ?? [],
+        ...artist.tracksAsCommentator ?? []
+    ]);
 
     const hasGallery = artThingsGallery.length > 0;
 
@@ -68,7 +81,11 @@ export function write(artist, {wikiData}) {
         track: thing.album ? thing : null
     })), ['album']);
 
-    const allTracks = sortByDate(unique([...artist.tracks.asArtist, ...artist.tracks.asContributor]));
+    const allTracks = sortByDate(unique([
+        ...artist.tracksAsArtist ?? [],
+        ...artist.tracksAsContributor ?? []
+    ]));
+
     const unreleasedTracks = allTracks.filter(track => track.album.directory === UNRELEASED_TRACKS_DIRECTORY);
     const releasedTracks = allTracks.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
 
@@ -115,7 +132,7 @@ export function write(artist, {wikiData}) {
 
     let flashes, flashListChunks;
     if (wikiInfo.enableFlashesAndGames) {
-        flashes = sortByDate(artist.flashes.asContributor.slice());
+        flashes = sortByDate(artist.flashesAsContributor?.slice() ?? []);
         flashListChunks = (
             chunkByProperties(flashes.map(flash => ({
                 act: flash.act,
@@ -228,21 +245,21 @@ export function write(artist, {wikiData}) {
 
             return {
                 albums: {
-                    asCoverArtist: artist.albums.asCoverArtist.map(serializeArtistsAndContrib('coverArtists')),
-                    asWallpaperArtist: artist.albums.asWallpaperArtist.map(serializeArtistsAndContrib('wallpaperArtists')),
-                    asBannerArtist: artist.albums.asBannerArtist.map(serializeArtistsAndContrib('bannerArtists'))
+                    asCoverArtist: artist.albumsAsCoverArtist?.map(serializeArtistsAndContrib('coverArtists')),
+                    asWallpaperArtist: artist.albumsAsWallpaperArtist?.map(serializeArtistsAndContrib('wallpaperArtists')),
+                    asBannerArtist: artist.albumsAsBannerArtist?.map(serializeArtistsAndContrib('bannerArtists'))
                 },
                 flashes: wikiInfo.enableFlashesAndGames ? {
-                    asContributor: artist.flashes.asContributor
-                        .map(flash => getArtistsAndContrib(flash, 'contributors'))
+                    asContributor: (artist.flashesAsContributor
+                        ?.map(flash => getArtistsAndContrib(flash, 'contributors'))
                         .map(({ contrib, thing: flash }) => ({
                             link: serializeLink(flash),
                             contribution: contrib.what
-                        }))
+                        })))
                 } : null,
                 tracks: {
-                    asArtist: artist.tracks.asArtist.map(serializeArtistsAndContrib('artists')),
-                    asContributor: artist.tracks.asContributor.map(serializeArtistsAndContrib('contributors')),
+                    asArtist: artist.tracksAsArtist.map(serializeArtistsAndContrib('artists')),
+                    asContributor: artist.tracksAsContributor.map(serializeArtistsAndContrib('contributors')),
                     chunked: {
                         released: serializeTrackListChunks(releasedTrackListChunks),
                         unreleased: serializeTrackListChunks(unreleasedTrackListChunks)

@@ -2794,6 +2794,10 @@ async function main() {
         track.artTagData = WD.artTagData;
     }
 
+    for (const artist of WD.artistData) {
+        artist.artistData = WD.artistData;
+    }
+
     // Extra organization stuff needed for listings and the like.
 
     Object.assign(wikiData, {
@@ -2841,19 +2845,21 @@ async function main() {
     WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
+    WD.artistAliasData = wikiData.artistData.flatMap(artist => {
+        const origRef = Thing.getReference(artist);
+        return (artist.aliasNames?.map(name => {
+            const alias = new Artist();
+            alias.name = name;
+            alias.isAlias = true;
+            alias.aliasedArtistRef = origRef;
+            alias.artistData = WD.artistData;
+            return alias;
+        }) ?? []);
+    });
+
     // TODO: this should probably be some kinda generalized function lol
     {
         const aggregate = openAggregate({message: `Errors validating artist references in data`});
-
-        const aliasToOrigMap = new Map();
-        const aliasArtistData = wikiData.artistData.flatMap(artist => {
-            return (artist.aliasNames?.map(ref => {
-                const alias = new Artist();
-                alias.name = ref;
-                aliasToOrigMap.set(alias, artist);
-                return alias;
-            }) ?? []);
-        });
 
         const sources = [
             [WD.albumData, [
@@ -2888,9 +2894,9 @@ async function main() {
                         thingAgg.nest({message: `Errors for property ${color.green(prop)}`}, propAgg => {
                             for (const { who: ref } of contribs) {
                                 propAgg.call(() => {
-                                    const entryAlias = find.artist(ref, {wikiData: {artistData: aliasArtistData}, quiet: true});
+                                    const entryAlias = find.artist(ref, {wikiData: {artistData: wikiData.artistAliasData}, quiet: true});
                                     if (entryAlias) {
-                                        const orig = aliasToOrigMap.get(entryAlias);
+                                        const orig = find.artist(entryAlias.aliasedArtistRef, {wikiData: {artistData: wikiData.artistData}, quiet: true});
                                         throw new Error(`Reference ${color.red(ref)} is to an alias, reference ${color.green(orig.name)} instead`);
                                     }
                                     const entry = find.artist(ref, {wikiData: {artistData: wikiData.artistData}, quiet: true});
@@ -2995,7 +3001,7 @@ async function main() {
 
     const albumAndTrackDataSortedByArtDateMan = sortByArtDate([...WD.albumData, ...WD.trackData]);
 
-    for (const tag of WD.tagData) {
+    for (const tag of WD.artTagData) {
         tag.things = albumAndTrackDataSortedByArtDateMan.filter(thing => thing.artTags.includes(tag));
     }
 
@@ -3071,8 +3077,6 @@ async function main() {
 
     logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
 
-    return;
-
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
 
@@ -3103,6 +3107,12 @@ async function main() {
             }
 
             const targets = pageSpec.targets({wikiData});
+            if (!Array.isArray(targets)) {
+                logError`${flag + '.targets'} was called, but it didn't return an array! (${typeof targets})`;
+                error = true;
+                return null;
+            }
+
             return {flag, pageSpec, targets};
         }).filter(Boolean);
 
@@ -3139,6 +3149,8 @@ async function main() {
 
             return true;
         };
+
+        return;
 
         writes = buildStepsWithTargets.flatMap(({ flag, pageSpec, targets }) => {
             const writes = targets.flatMap(target =>

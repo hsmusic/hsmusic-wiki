@@ -710,7 +710,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
         data({wikiData}) {
-            return wikiData.tagData
+            return wikiData.artTagData
                 .filter(tag => !tag.isCW)
                 .sort(sortByName)
                 .map(tag => ({tag, timesUsed: tag.things.length}));
@@ -730,7 +730,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
         data({wikiData}) {
-            return wikiData.tagData
+            return wikiData.artTagData
                 .filter(tag => !tag.isCW)
                 .map(tag => ({tag, timesUsed: tag.things.length}))
                 .sort((a, b) => b.timesUsed - a.timesUsed);
