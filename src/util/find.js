@@ -9,7 +9,7 @@ function findHelper(keys, dataProp, findFns = {}) {
 
     const keyRefRegex = new RegExp(String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`);
 
-    return (fullRef, {wikiData}) => {
+    return (fullRef, {wikiData, quiet = false}) => {
         if (!fullRef) return null;
         if (typeof fullRef !== 'string') {
             throw new Error(`Got a reference that is ${typeof fullRef}, not string: ${fullRef}`);
@@ -26,10 +26,10 @@ function findHelper(keys, dataProp, findFns = {}) {
         const data = wikiData[dataProp];
 
         const found = (key
-            ? byDirectory(ref, data)
-            : byName(ref, data));
+            ? byDirectory(ref, data, quiet)
+            : byName(ref, data, quiet));
 
-        if (!found) {
+        if (!found && !quiet) {
             logWarn`Didn't match anything for ${fullRef}!`;
         }
 
@@ -37,19 +37,22 @@ function findHelper(keys, dataProp, findFns = {}) {
     };
 }
 
-function matchDirectory(ref, data) {
+function matchDirectory(ref, data, quiet) {
     return data.find(({ directory }) => directory === ref);
 }
 
-function matchName(ref, data) {
+function matchName(ref, data, quiet) {
     const matches = data.filter(({ name }) => name.toLowerCase() === ref.toLowerCase());
 
     if (matches.length > 1) {
-        logError`Multiple matches for reference "${ref}". Please resolve:`;
-        for (const match of matches) {
-            logError`- ${match.name} (${match.directory})`;
+        // TODO: This should definitely be a thrown error.
+        if (!quiet) {
+            logError`Multiple matches for reference "${ref}". Please resolve:`;
+            for (const match of matches) {
+                logError`- ${match.name} (${match.directory})`;
+            }
+            logError`Returning null for this reference.`;
         }
-        logError`Returning null for this reference.`;
         return null;
     }
 
@@ -59,15 +62,15 @@ function matchName(ref, data) {
 
     const thing = matches[0];
 
-    if (ref !== thing.name) {
+    if (ref !== thing.name && !quiet) {
         logWarn`Bad capitalization: ${'\x1b[31m' + ref} -> ${'\x1b[32m' + thing.name}`;
     }
 
     return thing;
 }
 
-function matchTagName(ref, data) {
-    return matchName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data);
+function matchTagName(ref, data, quiet) {
+    return matchName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data, quiet);
 }
 
 const find = {

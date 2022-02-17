@@ -350,19 +350,28 @@ export function _withAggregate(mode, aggregateOpts, fn) {
     }
 }
 
-export function showAggregate(topError, {pathToFile = p => p} = {}) {
+export function showAggregate(topError, {
+    pathToFile = p => p,
+    showTraces = true
+} = {}) {
     const recursive = (error, {level}) => {
-        const stackLines = error.stack?.split('\n');
-        const stackLine = stackLines?.find(line =>
-            line.trim().startsWith('at')
-            && !line.includes('sugar')
-            && !line.includes('node:internal')
-            && !line.includes('<anonymous>'));
-        const tracePart = (stackLine
-            ? '- ' + stackLine.trim().replace(/file:\/\/(.*\.js)/, (match, pathname) => pathToFile(pathname))
-            : '(no stack trace)');
-
-        const header = `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'} ${color.dim(tracePart)}`;
+        let header = (showTraces
+            ? `[${error.constructor.name || 'unnamed'}] ${error.message || '(no message)'}`
+            : (error instanceof AggregateError
+                ? `[${error.message || '(no message)'}]`
+                : error.message || '(no message)'));
+        if (showTraces) {
+            const stackLines = error.stack?.split('\n');
+            const stackLine = stackLines?.find(line =>
+                line.trim().startsWith('at')
+                && !line.includes('sugar')
+                && !line.includes('node:internal')
+                && !line.includes('<anonymous>'));
+            const tracePart = (stackLine
+                ? '- ' + stackLine.trim().replace(/file:\/\/(.*\.js)/, (match, pathname) => pathToFile(pathname))
+                : '(no stack trace)');
+            header += ` ${color.dim(tracePart)}`;
+        }
         const bar = (level % 2 === 0
             ? '\u2502'
             : color.dim('\u254e'));

@@ -548,7 +548,12 @@ Artist.propertyDescriptors = {
     urls: Thing.common.urls(),
     contextNotes: Thing.common.simpleString(),
 
-    aliasRefs: Thing.common.referenceList(Artist),
+    aliasNames: {
+        flags: {update: true, expose: true},
+        update: {
+            validate: validateArrayItems(isName)
+        }
+    },
 };
 
 // -> Group

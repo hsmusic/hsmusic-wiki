@@ -1003,7 +1003,7 @@ const processArtistDocument = makeProcessDocument(Artist, {
         directory: 'Directory',
         urls: 'URLs',
 
-        aliasRefs: 'Aliases',
+        aliasNames: 'Aliases',
 
         contextNotes: 'Context Notes'
     },
@@ -2160,6 +2160,14 @@ async function main() {
             type: 'flag'
         },
 
+        // Want sweet, sweet trace8ack info in aggreg8te error messages? This
+        // will print all the juicy details (or at least the first relevant
+        // line) right to your output, 8ut also pro8a8ly give you a headache
+        // 8ecause wow that is a lot of visual noise.
+        'show-traces': {
+            type: 'flag'
+        },
+
         'queue-size': {
             type: 'value',
             validate(size) {
@@ -2211,6 +2219,15 @@ async function main() {
 
     const skipThumbs = miscOptions['skip-thumbs'] ?? false;
     const thumbsOnly = miscOptions['thumbs-only'] ?? false;
+    const showAggregateTraces = miscOptions['show-traces'] ?? false;
+
+    const niceShowAggregate = (error, ...opts) => {
+        showAggregate(error, {
+            showTraces: showAggregateTraces,
+            pathToFile: f => path.relative(__dirname, f),
+            ...opts
+        });
+    };
 
     if (skipThumbs && thumbsOnly) {
         logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
@@ -2731,7 +2748,7 @@ async function main() {
         try {
             processDataAggregate.close();
         } catch (error) {
-            showAggregate(error, {pathToFile: f => path.relative(__dirname, f)});
+            niceShowAggregate(error);
             logWarn`The above errors were detected while processing data files.`;
             logWarn`If the remaining valid data is complete enough, the wiki will`;
             logWarn`still build - but all errored data will be skipped.`;
@@ -2777,20 +2794,6 @@ async function main() {
         trackData: sortByDate(WD.trackData.slice())
     });
 
-    console.log(WD.trackData[0].name, WD.trackData[0].album.name);
-    console.log(WD.albumData[0].name, WD.albumData[0].tracks[0].name);
-    console.log(WD.trackData[0].artistContribs[0].who.name);
-    const demoAlbum1 = WD.albumData.find(album => album.name === 'Alternia');
-    const demoAlbum2 = WD.albumData.find(album => album.name === 'Homestuck Vol. 5');
-    const demoAlbum3 = WD.albumData.find(album => album.name === 'Homestuck Vol. 1');
-    console.log(demoAlbum1.artistContribs[0]?.who.name);
-    console.log(demoAlbum2.tracks[0].name,
-        demoAlbum2.tracks[0].date,
-        demoAlbum2.tracks[0].coverArtDate);
-    console.log(demoAlbum3.tracks[0].coverArtistContribs[0]?.who.name);
-
-    return;
-
     // Update languages o8ject with the wiki-specified default language!
     // This will make page files for that language 8e gener8ted at the root
     // directory, instead of the language-specific su8directory.
@@ -2831,74 +2834,86 @@ async function main() {
     WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
-    return;
-
-    const artistRefs = Array.from(new Set([
-        ...WD.artistData.filter(artist => !artist.alias).map(artist => artist.name),
-        ...[
-            ...WD.albumData.flatMap(album => [
-                ...album.artists || [],
-                ...album.coverArtists || [],
-                ...album.wallpaperArtists || [],
-                ...album.tracks.flatMap(track => [
-                    ...track.artists,
-                    ...track.coverArtists || [],
-                    ...track.contributors || []
-                ])
-            ]),
-            ...(WD.flashData?.flatMap(flash => [
-                ...flash.contributors || []
-            ]) || [])
-        ].map(contribution => contribution.who)
-    ]));
-
-    artistNames.sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 : a.toLowerCase() > b.toLowerCase() ? 1 : 0);
-
+    // TODO: this should probably be some kinda generalized function lol
     {
-        let buffer = [];
-        const clearBuffer = function() {
-            if (buffer.length) {
-                for (const entry of buffer.slice(0, -1)) {
-                    console.log(`\x1b[2m... ${entry.name} ...\x1b[0m`);
-                }
-                const lastEntry = buffer[buffer.length - 1];
-                console.log(`\x1b[2m... \x1b[0m${lastEntry.name}\x1b[0;2m ...\x1b[0m`);
-                buffer = [];
+        const aggregate = openAggregate({message: `Errors validating artist references in data`});
+
+        const aliasToOrigMap = new Map();
+        const aliasArtistData = wikiData.artistData.flatMap(artist => {
+            return (artist.aliasNames?.map(ref => {
+                const alias = new Artist();
+                alias.name = ref;
+                aliasToOrigMap.set(alias, artist);
+                return alias;
+            }) ?? []);
+        });
+
+        const sources = [
+            [WD.albumData, [
+                'artistContribsByRef',
+                'coverArtistContribsByRef',
+                'trackCoverArtistContribsByRef',
+                'wallpaperArtistContribsByRef',
+                'bannerArtistContribsByRef'
+            ]],
+            [WD.trackData, [
+                'artistContribsByRef',
+                'contributorContribsByRef',
+                'coverArtistContribsByRef'
+            ]],
+            [WD.flashData, [
+                'contributorContribsByRef'
+            ]]
+        ]
+
+        for (const [ things, properties ] of sources) {
+            if (!things) {
+                continue;
             }
-        };
-        const showWhere = (name, color) => {
-            const where = WD.justEverythingMan.filter(thing => [
-                ...thing.coverArtists || [],
-                ...thing.contributors || [],
-                ...thing.artists || []
-            ].some(({ who }) => who === name));
-            for (const thing of where) {
-                console.log(`\x1b[${color}m- ` + (thing.album ? `(\x1b[1m${thing.album.name}\x1b[0;${color}m)` : '') + ` \x1b[1m${thing.name}\x1b[0m`);
-            }
-        };
-        let CR4SH = false;
-        for (let name of artistNames) {
-            const entry = find.artist(name, {wikiData});
-            if (!entry) {
-                clearBuffer();
-                console.log(`\x1b[31mMissing entry for artist "\x1b[1m${name}\x1b[0;31m"\x1b[0m`);
-                showWhere(name, 31);
-                CR4SH = true;
-            } else if (entry.alias) {
-                console.log(`\x1b[33mArtist "\x1b[1m${name}\x1b[0;33m" should be named "\x1b[1m${entry.alias}\x1b[0;33m"\x1b[0m`);
-                showWhere(name, 33);
-                CR4SH = true;
-            } else {
-                buffer.push(entry);
-                if (buffer.length > 3) {
-                    buffer.shift();
-                }
+
+            for (const thing of things) {
+                aggregate.nest({message: `Errors for ${thing.constructor.name} ${color.green(thing.name)} (${color.green(Thing.getReference(thing))})`}, thingAgg => {
+                    for (const prop of properties) {
+                        const contribs = thing[prop];
+                        if (!contribs) {
+                            continue;
+                        }
+                        thingAgg.nest({message: `Errors for property ${color.green(prop)}`}, propAgg => {
+                            for (const { who: ref } of contribs) {
+                                propAgg.call(() => {
+                                    const entryAlias = find.artist(ref, {wikiData: {artistData: aliasArtistData}, quiet: true});
+                                    if (entryAlias) {
+                                        const orig = aliasToOrigMap.get(entryAlias);
+                                        throw new Error(`Reference ${color.red(ref)} is to an alias, reference ${color.green(orig.name)} instead`);
+                                    }
+                                    const entry = find.artist(ref, {wikiData: {artistData: wikiData.artistData}, quiet: true});
+                                    if (!entry) {
+                                        throw new Error(`No entry found for reference ${color.red(ref)}`);
+                                    }
+                                    if (
+                                        ref.toLowerCase() === entry.name.toLowerCase() &&
+                                        ref !== entry.name
+                                    ) {
+                                        throw new Error(`Miscapitalized name ${color.red(ref)}, reference ${color.green(entry.name)} instead`);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         }
-        if (CR4SH) {
+
+        try {
+            aggregate.close();
+        } catch (error) {
+            niceShowAggregate(error);
+            // TODO: more graceful auto-resolve, filter out invalid references
             return;
         }
     }
+
+    return;
 
     {
         const directories = [];
@@ -2930,7 +2945,7 @@ async function main() {
     {
         const artists = [];
         const artistsLC = [];
-        for (const name of artistNames) {
+        for (const name of artistRefs) {
             if (!artists.includes(name) && artistsLC.includes(name.toLowerCase())) {
                 const other = artists.find(oth => oth.toLowerCase() === name.toLowerCase());
                 console.log(`\x1b[31;1mMiscapitalized artist name: ${name}, ${other}\x1b[0m`);
