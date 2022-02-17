@@ -363,6 +363,7 @@ Album.propertyDescriptors = {
     // Update only
 
     artistData: Thing.common.wikiData(Artist),
+    groupData: Thing.common.wikiData(Group),
     trackData: Thing.common.wikiData(Track),
 
     // Expose only
@@ -380,6 +381,21 @@ Album.propertyDescriptors = {
                     ? (trackGroups
                         .flatMap(group => group.tracksByRef ?? [])
                         .map(ref => find.track(ref, {wikiData: {trackData}}))
+                        .filter(Boolean))
+                    : [])
+            )
+        }
+    },
+
+    groups: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['groupsByRef', 'groupData'],
+            compute: ({ groupsByRef, groupData }) => (
+                (groupsByRef && groupData
+                    ? (groupsByRef
+                        .map(ref => find.group(ref, {wikiData: {groupData}}))
                         .filter(Boolean))
                     : [])
             )

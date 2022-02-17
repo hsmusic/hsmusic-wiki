@@ -2774,6 +2774,7 @@ async function main() {
 
     for (const album of WD.albumData) {
         album.artistData = WD.artistData;
+        album.groupData = WD.groupData;
         album.trackData = WD.trackData;
 
         for (const trackGroup of album.trackGroups) {
@@ -2913,8 +2914,6 @@ async function main() {
         }
     }
 
-    return;
-
     {
         const directories = [];
         for (const { directory, name } of WD.albumData) {
@@ -2942,74 +2941,7 @@ async function main() {
         }
     }
 
-    // Now that we have all the data, resolve references all 8efore actually
-    // gener8ting any of the pages, 8ecause page gener8tion is going to involve
-    // accessing these references a lot, and there's no reason to resolve them
-    // more than once. (We 8uild a few additional links that can't 8e cre8ted
-    // at initial data processing time here too.)
-
-    const allContribSources = [];
-
-    // Collect all contrib data sources into one array, which will be processed
-    // later.
-    const collectContributors = function(thing, ...contribDataKeys) {
-        allContribSources.push(...contribDataKeys.map(key => ({
-            thing,
-            key,
-            data: thing[key]
-        })).filter(({ data }) => data?.length));
-    };
-
-    // Process in three parts:
-    // 1) collate all contrib data into one set (no duplicates)
-    // 2) convert every "who" contrib string into an actual artist object
-    // 3) filter each source (not the set!) by null who values
-    const postprocessContributors = function() {
-        const allContribData = new Set(allContribSources.flatMap(source => source.data));
-        const originalContribStrings = new Map();
-
-        for (const contrib of allContribData) {
-            originalContribStrings.set(contrib, contrib.who);
-            contrib.who = find.artist(contrib.who, {wikiData});
-        }
-
-        for (const { thing, key, data } of allContribSources) {
-            data.splice(0, data.length, ...data.filter(contrib => {
-                if (!contrib.who) {
-                    const orig = originalContribStrings.get(contrib);
-                    logWarn`Post-process: Contributor ${orig} didn't match any artist data - in ${thing.name} (key: ${key})`;
-                    return false;
-                }
-                return true;
-            }));
-        }
-    };
-
-    // Note: this mutates the original object, but NOT the actual array it's
-    // operating on. This means if the array at the original thing[key] value
-    // was also used elsewhere, it will have the original values (not the mapped
-    // and filtered ones).
-    const mapAndFilter = function(thing, key, {
-        map,
-        filter = x => x,
-        context // only used for debugging
-    }) {
-        const replacement = [];
-        for (const value of thing[key]) {
-            const newValue = map(value);
-            if (filter(newValue)) {
-                replacement.push(newValue);
-            } else {
-                let contextPart = `${thing.name}`;
-                if (context) {
-                    contextPart += ` (${context(thing)})`;
-                }
-                logWarn`Post-process: Value ${value} (${key}) didn't match any data - ${contextPart}`;
-            }
-        }
-        thing[key] = replacement;
-    };
-
+    /*
     const bound = {
         findGroup: x => find.group(x, {wikiData}),
         findTrack: x => find.track(x, {wikiData}),
@@ -3021,7 +2953,6 @@ async function main() {
         track.aka = find.track(track.aka, {wikiData});
         mapAndFilter(track, 'references', {map: bound.findTrack, context});
         mapAndFilter(track, 'artTags', {map: bound.findTag, context});
-        collectContributors(track, 'artists', 'contributors', 'coverArtists');
     }
 
     for (const track1 of WD.trackData) {
@@ -3037,7 +2968,6 @@ async function main() {
     for (const album of WD.albumData) {
         mapAndFilter(album, 'groups', {map: bound.findGroup});
         mapAndFilter(album, 'artTags', {map: bound.findTag});
-        collectContributors(album, 'artists', 'coverArtists', 'wallpaperArtists', 'bannerArtists');
     }
 
     mapAndFilter(WD, 'artistAliasData', {
@@ -3067,7 +2997,6 @@ async function main() {
         for (const flash of WD.flashData) {
             flash.act = WD.flashActData.find(act => act.name === flash.act);
             mapAndFilter(flash, 'tracks', {map: bound.findTrack});
-            collectContributors(flash, 'contributors');
         }
 
         for (const act of WD.flashActData) {
@@ -3078,10 +3007,6 @@ async function main() {
             track.flashes = WD.flashData.filter(flash => flash.tracks.includes(track));
         }
     }
-
-    // Process contributors before artist data, because a bunch of artist data
-    // will depend on accessing the values postprocessContributors() updates.
-    postprocessContributors();
 
     for (const artist of WD.artistData) {
         const filterProp = (array, prop) => array.filter(thing => thing[prop]?.some(({ who }) => who === artist));
@@ -3108,9 +3033,13 @@ async function main() {
             };
         }
     }
+    */
 
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
+
+    console.log(WD.officialAlbumData.length, WD.fandomAlbumData.length);
+    return;
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
     // performance right now 'cuz it'll w8 for file writes to 8e completed
