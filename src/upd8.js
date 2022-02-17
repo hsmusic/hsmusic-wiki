@@ -2942,20 +2942,6 @@ async function main() {
         }
     }
 
-    {
-        const artists = [];
-        const artistsLC = [];
-        for (const name of artistRefs) {
-            if (!artists.includes(name) && artistsLC.includes(name.toLowerCase())) {
-                const other = artists.find(oth => oth.toLowerCase() === name.toLowerCase());
-                console.log(`\x1b[31;1mMiscapitalized artist name: ${name}, ${other}\x1b[0m`);
-                return;
-            }
-            artists.push(name);
-            artistsLC.push(name.toLowerCase());
-        }
-    }
-
     WD.contributionData = Array.from(new Set([
         ...WD.trackData.flatMap(track => [...track.artists || [], ...track.contributors || [], ...track.coverArtists || []]),
         ...WD.albumData.flatMap(album => [...album.artists || [], ...album.coverArtists || [], ...album.wallpaperArtists || [], ...album.bannerArtists || []]),
