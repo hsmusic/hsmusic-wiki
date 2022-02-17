@@ -1339,6 +1339,7 @@ function getDurationInSeconds(string) {
     }
 }
 
+/*
 const stringifyIndent = 0;
 
 const toRefs = (label, objectOrArray) => {
@@ -1425,6 +1426,7 @@ function stringifyArtistData({wikiData}) {
         }
     }, stringifyIndent);
 }
+*/
 
 function img({
     src,
@@ -1591,10 +1593,12 @@ function validateWriteObject(obj) {
     return {success: true};
 }
 
+/*
 async function writeData(subKey, directory, data) {
     const paths = writePage.paths('', 'data.' + subKey, directory, {file: 'data.json'});
     await writePage.write(JSON.stringify(data), {paths});
 }
+*/
 
 // This used to 8e a function! It's long 8een divided into multiple helper
 // functions, and nowadays we just directly access those, rather than ever
@@ -1995,6 +1999,7 @@ function writeSharedFilesAndPages({strings, wikiData}) {
         wikiInfo.enableListings &&
         redirect('Album Commentary', 'list/all-commentary', 'localized.commentaryIndex', ''),
 
+        /*
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
                 "albumData": ${stringifyAlbumData({wikiData})},
@@ -2002,6 +2007,7 @@ function writeSharedFilesAndPages({strings, wikiData}) {
                 "artistData": ${stringifyArtistData({wikiData})}
             }
         `)
+        */
     ].filter(Boolean));
 }
 
@@ -3038,8 +3044,6 @@ async function main() {
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
-    return;
-
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
     // performance right now 'cuz it'll w8 for file writes to 8e completed
     // 8efore moving on to more data processing. So, defaults to zero, which
@@ -3066,6 +3070,8 @@ async function main() {
     const writeAll = !Object.keys(writeFlags).length || writeFlags.all;
 
     logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
+
+    return;
 
     await writeSymlinks();
     await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
@@ -3165,12 +3171,13 @@ async function main() {
     const redirectWrites = writes.filter(({ type }) => type === 'redirect');
 
     if (writes.length) {
-        logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${dataWrites.length} data, ${redirectWrites.length} redirect)`;
+        logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${dataWrites.length} data [currently skipped], ${redirectWrites.length} redirect)`;
     } else {
         logWarn`No writes returned at all, so exiting early. This is probably a bug!`;
         return;
     }
 
+    /*
     await progressPromiseAll(`Writing data files shared across languages.`, queue(
         dataWrites.map(({path, data}) => () => {
             const bound = {};
@@ -3204,6 +3211,7 @@ async function main() {
         }),
         queueSize
     ));
+    */
 
     const perLanguageFn = async ({strings, ...opts}, i, entries) => {
         console.log(`\x1b[34;1m${
