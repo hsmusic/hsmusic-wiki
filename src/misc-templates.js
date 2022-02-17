@@ -145,7 +145,7 @@ export function generateCoverLink({
                 square: true,
                 reveal: getRevealStringFromTags(tags, {strings})
             })}
-            ${wikiInfo.features.artTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
+            ${wikiInfo.enableArtTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
                 <p class="tags">
                     ${strings('releaseInfo.artTags')}
                     ${(tags

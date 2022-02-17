@@ -49,7 +49,7 @@ export function write(track, {wikiData}) {
     const listTag = getAlbumListTag(album);
 
     let flashesThatFeature;
-    if (wikiInfo.features.flashesAndGames) {
+    if (wikiInfo.enableFlashesAndGames) {
         flashesThatFeature = sortByDate([track, ...otherReleases]
             .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
     }
@@ -250,7 +250,7 @@ export function write(track, {wikiData}) {
                             `}
                             ${!useDividedReferences && generateTrackList(tracksThatReference)}
                         `}
-                        ${wikiInfo.features.flashesAndGames && flashesThatFeature.length && fixWS`
+                        ${wikiInfo.enableFlashesAndGames && flashesThatFeature.length && fixWS`
                             <p>${strings('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
                             <ul>
                                 ${flashesThatFeature.map(({ flash, as }) => html.tag('li',

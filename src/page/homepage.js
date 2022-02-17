@@ -87,7 +87,7 @@ export function writeTargetless({wikiData}) {
                 // And no, I will not make [[news]] into part of transformMultiline
                 // (even though that would 8e hilarious).
                 content: (transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__'))
-                    .replace('<p>__GENERATE_NEWS__</p>', wikiInfo.features.news ? fixWS`
+                    .replace('<p>__GENERATE_NEWS__</p>', wikiInfo.enableNews ? fixWS`
                         <h1>${strings('homepage.news.title')}</h1>
                         ${newsData.slice(0, 3).map((entry, i) => html.tag('article',
                             {class: ['news-entry', i === 0 && 'first-news-entry']},
@@ -106,11 +106,11 @@ export function writeTargetless({wikiData}) {
                     <h2 class="dot-between-spans">
                         ${[
                             link.home('', {text: wikiInfo.shortName, class: 'current', to}),
-                            wikiInfo.features.listings &&
+                            wikiInfo.enableListings &&
                             link.listingIndex('', {text: strings('listingIndex.title'), to}),
-                            wikiInfo.features.news &&
+                            wikiInfo.enableNews &&
                             link.newsIndex('', {text: strings('newsIndex.title'), to}),
-                            wikiInfo.features.flashesAndGames &&
+                            wikiInfo.enableFlashesAndGames &&
                             link.flashIndex('', {text: strings('flashIndex.title'), to}),
                             ...staticPageData.filter(page => page.listed).map(page =>
                                 link.staticPage(page, {text: page.shortName}))

@@ -114,7 +114,7 @@ export function write(artist, {wikiData}) {
     const artGroups = countGroups(artThingsAll);
 
     let flashes, flashListChunks;
-    if (wikiInfo.features.flashesAndGames) {
+    if (wikiInfo.enableFlashesAndGames) {
         flashes = sortByDate(artist.flashes.asContributor.slice());
         flashListChunks = (
             chunkByProperties(flashes.map(flash => ({
@@ -232,7 +232,7 @@ export function write(artist, {wikiData}) {
                     asWallpaperArtist: artist.albums.asWallpaperArtist.map(serializeArtistsAndContrib('wallpaperArtists')),
                     asBannerArtist: artist.albums.asBannerArtist.map(serializeArtistsAndContrib('bannerArtists'))
                 },
-                flashes: wikiInfo.features.flashesAndGames ? {
+                flashes: wikiInfo.enableFlashesAndGames ? {
                     asContributor: artist.flashes.asContributor
                         .map(flash => getArtistsAndContrib(flash, 'contributors'))
                         .map(({ contrib, thing: flash }) => ({
@@ -303,7 +303,7 @@ export function write(artist, {wikiData}) {
                                     unreleasedTracks.length && `(<a href="#unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</a>)`
                                 ].filter(Boolean).join(' '),
                                 artThingsAll.length && `<a href="#art">${strings('artistPage.artList.title')}</a>`,
-                                wikiInfo.features.flashesAndGames && flashes.length && `<a href="#flashes">${strings('artistPage.flashList.title')}</a>`,
+                                wikiInfo.enableFlashesAndGames && flashes.length && `<a href="#flashes">${strings('artistPage.flashList.title')}</a>`,
                                 commentaryThings.length && `<a href="#commentary">${strings('artistPage.commentaryList.title')}</a>`
                             ].filter(Boolean))
                         })}</p>
@@ -369,7 +369,7 @@ export function write(artist, {wikiData}) {
                                 `).join('\n')}
                             </dl>
                         `}
-                        ${wikiInfo.features.flashesAndGames && flashes.length && fixWS`
+                        ${wikiInfo.enableFlashesAndGames && flashes.length && fixWS`
                             <h2 id="flashes">${strings('artistPage.flashList.title')}</h2>
                             <dl>
                                 ${flashListChunks.map(({act, chunk, dateFirst, dateLast}) => fixWS`
@@ -492,7 +492,7 @@ function generateNavForArtist(artist, isGallery, hasGallery, {
     return {
         links: [
             {toHome: true},
-            wikiInfo.features.listings &&
+            wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
                 title: strings('listingIndex.title')

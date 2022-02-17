@@ -793,7 +793,7 @@ FlashAct.propertyDescriptors = {
     flashesByRef: Thing.common.referenceList(Flash),
 };
 
-// WikiInfo
+// -> WikiInfo
 
 WikiInfo.propertyDescriptors = {
     // Update & expose

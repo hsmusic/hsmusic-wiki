@@ -7,7 +7,7 @@ import fixWS from 'fix-whitespace';
 // Page exports
 
 export function condition({wikiData}) {
-    return wikiData.wikiInfo.features.news;
+    return wikiData.wikiInfo.enableNews;
 }
 
 export function targets({wikiData}) {

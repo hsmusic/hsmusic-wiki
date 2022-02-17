@@ -13,7 +13,7 @@ import {
 // Page exports
 
 export function condition({wikiData}) {
-    return wikiData.wikiInfo.features.flashesAndGames;
+    return wikiData.wikiInfo.enableFlashesAndGames;
 }
 
 export function targets({wikiData}) {

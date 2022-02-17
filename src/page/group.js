@@ -132,7 +132,7 @@ export function write(group, {wikiData}) {
                             time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
                         })
                     }</p>
-                    ${wikiInfo.features.groupUI && wikiInfo.features.listings && html.tag('p',
+                    ${wikiInfo.enableGroupUI && wikiInfo.enableListings && html.tag('p',
                         {class: 'quick-info'},
                         strings('groupGalleryPage.anotherGroupLine', {
                             link: link.listing(listingSpec.find(l => l.directory === 'groups/by-category'), {
@@ -179,7 +179,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
 }) {
     const { groupCategoryData, wikiInfo } = wikiData;
 
-    if (!wikiInfo.features.groupUI) {
+    if (!wikiInfo.enableGroupUI) {
         return null;
     }
 
@@ -222,7 +222,7 @@ function generateGroupNav(currentGroup, isGallery, {
 }) {
     const { groupData, wikiInfo } = wikiData;
 
-    if (!wikiInfo.features.groupUI) {
+    if (!wikiInfo.enableGroupUI) {
         return {simple: true};
     }
 
@@ -242,7 +242,7 @@ function generateGroupNav(currentGroup, isGallery, {
     return {
         links: [
             {toHome: true},
-            wikiInfo.features.listings &&
+            wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
                 title: strings('listingIndex.title')

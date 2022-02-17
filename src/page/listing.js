@@ -25,7 +25,7 @@ import {
 // Page exports
 
 export function condition({wikiData}) {
-    return wikiData.wikiInfo.features.listings;
+    return wikiData.wikiInfo.enableListings;
 }
 
 export function targets({wikiData}) {

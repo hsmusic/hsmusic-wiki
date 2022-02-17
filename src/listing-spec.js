@@ -157,7 +157,7 @@ const listingSpec = [
                             artist.albums.asCoverArtist.length +
                             artist.albums.asWallpaperArtist.length +
                             artist.albums.asBannerArtist.length +
-                            (wikiData.wikiInfo.features.flashesAndGames
+                            (wikiData.wikiInfo.enableFlashesAndGames
                                 ? artist.flashes.asContributor.length
                                 : 0)
                         )
@@ -168,7 +168,7 @@ const listingSpec = [
                 // This is a kinda naughty hack, 8ut like, it's the only place
                 // we'd 8e passing wikiData to html() otherwise, so like....
                 // (Ok we do do this again once later.)
-                showAsFlashes: wikiData.wikiInfo.features.flashesAndGames
+                showAsFlashes: wikiData.wikiInfo.enableFlashesAndGames
             };
         },
 
@@ -289,7 +289,7 @@ const listingSpec = [
                 // (Ok we did it again.)
                 // This is a kinda naughty hack, 8ut like, it's the only place
                 // we'd 8e passing wikiData to html() otherwise, so like....
-                showAsFlashes: wikiData.wikiInfo.features.flashesAndGames
+                showAsFlashes: wikiData.wikiInfo.enableFlashesAndGames
             };
         },
 
@@ -331,7 +331,7 @@ const listingSpec = [
     {
         directory: 'groups/by-name',
         stringsKey: 'listGroups.byName',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
         data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
 
         row(group, {link, strings}) {
@@ -347,7 +347,7 @@ const listingSpec = [
     {
         directory: 'groups/by-category',
         stringsKey: 'listGroups.byCategory',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
         data: ({wikiData}) => wikiData.groupCategoryData,
 
         html(groupCategoryData, {link, strings}) {
@@ -377,7 +377,7 @@ const listingSpec = [
     {
         directory: 'groups/by-albums',
         stringsKey: 'listGroups.byAlbums',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
         data({wikiData}) {
             return wikiData.groupData
@@ -396,7 +396,7 @@ const listingSpec = [
     {
         directory: 'groups/by-tracks',
         stringsKey: 'listGroups.byTracks',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
         data({wikiData}) {
             return wikiData.groupData
@@ -415,7 +415,7 @@ const listingSpec = [
     {
         directory: 'groups/by-duration',
         stringsKey: 'listGroups.byDuration',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
         data({wikiData}) {
             return wikiData.groupData
@@ -434,7 +434,7 @@ const listingSpec = [
     {
         directory: 'groups/by-latest-album',
         stringsKey: 'listGroups.byLatest',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.groupUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
         data({wikiData}) {
             return sortByDate(wikiData.groupData
@@ -614,7 +614,7 @@ const listingSpec = [
     {
         directory: 'tracks/in-flashes/by-album',
         stringsKey: 'listTracks.inFlashes.byAlbum',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableFlashesAndGames,
 
         data({wikiData}) {
             return chunkByProperties(wikiData.trackData
@@ -648,7 +648,7 @@ const listingSpec = [
     {
         directory: 'tracks/in-flashes/by-flash',
         stringsKey: 'listTracks.inFlashes.byFlash',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.flashesAndGames,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableFlashesAndGames,
         data: ({wikiData}) => wikiData.flashData,
 
         html(flashData, {link, strings}) {
@@ -707,7 +707,7 @@ const listingSpec = [
     {
         directory: 'tags/by-name',
         stringsKey: 'listTags.byName',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
         data({wikiData}) {
             return wikiData.tagData
@@ -727,7 +727,7 @@ const listingSpec = [
     {
         directory: 'tags/by-uses',
         stringsKey: 'listTags.byUses',
-        condition: ({wikiData}) => wikiData.wikiInfo.features.artTagUI,
+        condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
         data({wikiData}) {
             return wikiData.tagData

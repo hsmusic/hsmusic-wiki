@@ -7,7 +7,7 @@ import fixWS from 'fix-whitespace';
 // Page exports
 
 export function condition({wikiData}) {
-    return wikiData.wikiInfo.features.artTagUI;
+    return wikiData.wikiInfo.enableArtTagUI;
 }
 
 export function targets({wikiData}) {
@@ -89,7 +89,7 @@ function generateTagNav(tag, {
     return {
         links: [
             {toHome: true},
-            wikiData.wikiInfo.features.listings &&
+            wikiData.wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
                 title: strings('listingIndex.title')

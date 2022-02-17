@@ -1992,13 +1992,13 @@ function writeSharedFilesAndPages({strings, wikiData}) {
         groupData?.some(group => group.directory === 'official') &&
         redirect('Official - Gallery', 'albums/official', 'localized.groupGallery', 'official'),
 
-        wikiInfo.features.listings &&
+        wikiInfo.enableListings &&
         redirect('Album Commentary', 'list/all-commentary', 'localized.commentaryIndex', ''),
 
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
                 "albumData": ${stringifyAlbumData({wikiData})},
-                ${wikiInfo.features.flashesAndGames && `"flashData": ${stringifyFlashData({wikiData})},`}
+                ${wikiInfo.enableFlashesAndGames && `"flashData": ${stringifyFlashData({wikiData})},`}
                 "artistData": ${stringifyArtistData({wikiData})}
             }
         `)
@@ -2423,7 +2423,7 @@ async function main() {
             }
         },
 
-        // TODO: WD.wikiInfo.features.flashesAndGames &&
+        // TODO: WD.wikiInfo.enableFlashesAndGames &&
         {
             title: `Process flashes file`,
             files: [path.join(dataPath, FLASH_DATA_FILE)],
@@ -2525,7 +2525,7 @@ async function main() {
             }
         },
 
-        // TODO: WD.wikiInfo.features.news &&
+        // TODO: WD.wikiInfo.enableNews &&
         {
             title: `Process news data file`,
             files: [path.join(dataPath, NEWS_DATA_FILE)],
@@ -2993,7 +2993,7 @@ async function main() {
         tag.things = albumAndTrackDataSortedByArtDateMan.filter(thing => thing.artTags.includes(tag));
     }
 
-    if (WD.wikiInfo.features.flashesAndGames) {
+    if (WD.wikiInfo.enableFlashesAndGames) {
         for (const flash of WD.flashData) {
             flash.act = WD.flashActData.find(act => act.name === flash.act);
             mapAndFilter(flash, 'tracks', {map: bound.findTrack});
@@ -3027,7 +3027,7 @@ async function main() {
             asWallpaperArtist: filterProp(WD.albumData, 'wallpaperArtists'),
             asBannerArtist: filterProp(WD.albumData, 'bannerArtists')
         };
-        if (WD.wikiInfo.features.flashesAndGames) {
+        if (WD.wikiInfo.enableFlashesAndGames) {
             artist.flashes = {
                 asContributor: filterProp(WD.flashData, 'contributors')
             };
@@ -3038,7 +3038,6 @@ async function main() {
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
-    console.log(WD.officialAlbumData.length, WD.fandomAlbumData.length);
     return;
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
