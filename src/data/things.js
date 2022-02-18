@@ -210,6 +210,46 @@ Thing.common = {
         };
     },
 
+    // Corresponding dynamic property to referenceList, which takes the values
+    // in the provided property and searches the specified wiki data for
+    // matching actual Thing-subclass objects.
+    dynamicThingsFromReferenceList: (
+        referenceListProperty,
+        wikiDataProperty,
+        findFn
+    ) => ({
+        flags: {expose: true},
+
+        expose: {
+            dependencies: [referenceListProperty, wikiDataProperty],
+            compute: ({ [referenceListProperty]: refs, [wikiDataProperty]: wikiData }) => (
+                (refs && wikiData
+                    ? (refs
+                        .map(ref => findFn(ref, {wikiData: {[wikiDataProperty]: wikiData}}))
+                        .filter(Boolean))
+                    : [])
+            )
+        }
+    }),
+
+    // Corresponding function for a single reference.
+    dynamicThingFromSingleReference: (
+        singleReferenceProperty,
+        wikiDataProperty,
+        findFn
+    ) => ({
+        flags: {expose: true},
+
+        expose: {
+            dependencies: [singleReferenceProperty, wikiDataProperty],
+            compute: ({ [singleReferenceProperyt]: ref, [wikiDataProperty]: wikiData }) => (
+                (ref && wikiData
+                    ? findFn(ref, {wikiData: {[wikiDataProperty]: wikiData}})
+                    : [])
+            )
+        }
+    }),
+
     // Corresponding dynamic property to contribsByRef, which takes the values
     // in the provided property and searches the object's artistData for
     // matching actual Artist objects. The computed structure has the same form
@@ -274,6 +314,36 @@ Thing.common = {
                     }))
                     .filter(({ who }) => who));
             }
+        }
+    }),
+
+    // Neat little shortcut for "reversing" the reference lists stored on other
+    // things - for example, tracks specify a "referenced tracks" property, and
+    // you would use this to compute a corresponding "referenced *by* tracks"
+    // property. Naturally, the passed ref list property is of the things in the
+    // wiki data provided, not the requesting Thing itself.
+    reverseReferenceList: (wikiDataProperty, referencerRefListProperty) => ({
+        flags: {expose: true},
+
+        expose: {
+            dependencies: [wikiDataProperty],
+
+            compute: ({ [wikiDataProperty]: wikiData, [Thing.instance]: thing }) => (
+                wikiData?.filter(t => t[referencerRefListProperty]?.includes(thing)))
+        }
+    }),
+
+    // Corresponding function for single references. Note that the return value
+    // is still a list - this is for matching all the objects whose single
+    // reference (in the given property) matches this Thing.
+    reverseSingleReference: (wikiDataProperty, referencerRefListProperty) => ({
+        flags: {expose: true},
+
+        expose: {
+            dependencies: [wikiDataProperty],
+
+            compute: ({ [wikiDataProperty]: wikiData, [Thing.instance]: thing }) => (
+                wikiData?.filter(t => t[referencerRefListProperty] === thing))
         }
     }),
 
@@ -387,20 +457,9 @@ Album.propertyDescriptors = {
         }
     },
 
-    groups: {
-        flags: {expose: true},
+    groups: Thing.common.dynamicThingsFromReferenceList('groupsByRef', 'groupData', find.group),
 
-        expose: {
-            dependencies: ['groupsByRef', 'groupData'],
-            compute: ({ groupsByRef, groupData }) => (
-                (groupsByRef && groupData
-                    ? (groupsByRef
-                        .map(ref => find.group(ref, {wikiData: {groupData}}))
-                        .filter(Boolean))
-                    : [])
-            )
-        }
-    },
+    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
 };
 
 TrackGroup.propertyDescriptors = {
@@ -485,6 +544,7 @@ Track.propertyDescriptors = {
     albumData: Thing.common.wikiData(Album),
     artistData: Thing.common.wikiData(Artist),
     artTagData: Thing.common.wikiData(ArtTag),
+    trackData: Thing.common.wikiData(Track),
 
     // Expose only
 
@@ -537,21 +597,16 @@ Track.propertyDescriptors = {
     // Previously known as: (track).coverArtists
     coverArtistContribs: Thing.common.dynamicInheritContribs('coverArtistContribsByRef', 'trackCoverArtistContribsByRef', 'albumData', Track.findAlbum),
 
-    artTags: {
-        flags: {expose: true},
+    // Previously known as: (track).references
+    referencedTracks: Thing.common.dynamicThingsFromReferenceList('referencedTracksByRef', 'trackData', find.track),
 
-        expose: {
-            dependencies: ['artTagsByRef', 'artTagData'],
+    // Previously known as: (track).referencedBy
+    referencedByTracks: Thing.common.reverseReferenceList('trackData', 'referencedTracks'),
 
-            compute: ({ artTagsByRef, artTagData }) => (
-                (artTagsByRef && artTagData
-                    ? (artTagsByRef
-                        .map(ref => find.tag(ref, {wikiData: {artTagData}}))
-                        .filter(Boolean))
-                    : [])
-            )
-        }
-    }
+    // Previously known as: (track).flashes
+    featuredInFlashes: Thing.common.reverseReferenceList('flashData', 'featuredTracks'),
+
+    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
 };
 
 // -> Artist
@@ -598,6 +653,7 @@ Artist.propertyDescriptors = {
     // albumsAsBannerArtist
     // albumsAsCommentator
 
+    // tracksAsAny
     // tracksAsArtist
     // tracksAsContributor
     // tracksAsCoverArtist
@@ -618,6 +674,10 @@ Group.propertyDescriptors = {
 
     urls: Thing.common.urls(),
 
+    // Update only
+
+    albumData: Thing.common.wikiData(Album),
+
     // Expose only
 
     descriptionShort: {
@@ -627,7 +687,17 @@ Group.propertyDescriptors = {
             dependencies: ['description'],
             compute: ({ description }) => description.split('<hr class="split">')[0]
         }
-    }
+    },
+
+    albums: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['albumData'],
+            compute: ({ albumData, [Group.instance]: group }) => (
+                albumData?.filter(album => album.groups.includes(group)) ?? [])
+        }
+    },
 };
 
 GroupCategory.propertyDescriptors = {
@@ -648,6 +718,24 @@ ArtTag.propertyDescriptors = {
     directory: Thing.common.directory(),
     color: Thing.common.color(),
     isContentWarning: Thing.common.flag(false),
+
+    // Update only
+
+    albumData: Thing.common.wikiData(Album),
+    trackData: Thing.common.wikiData(Track),
+
+    // Expose only
+
+    // Previously known as: (tag).things
+    taggedInThings: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['albumData', 'trackData'],
+            compute: ({ albumData, trackData, [ArtTag.instance]: artTag }) => (
+                [...albumData, ...trackData].filter(thing => thing.artTags?.includes(artTag)))
+        }
+    }
 };
 
 // -> NewsEntry

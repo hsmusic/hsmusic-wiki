@@ -415,7 +415,7 @@ const replacerSpec = {
         html: (ref, {strings, args}) => strings(ref, args)
     },
     'tag': {
-        find: 'tag',
+        find: 'artTag',
         link: 'tag'
     },
     'track': {
@@ -2792,10 +2792,20 @@ async function main() {
         track.albumData = WD.albumData;
         track.artistData = WD.artistData;
         track.artTagData = WD.artTagData;
+        track.trackData = WD.trackData;
     }
 
     for (const artist of WD.artistData) {
         artist.artistData = WD.artistData;
+    }
+
+    for (const group of WD.groupData) {
+        group.albumData = WD.albumData;
+    }
+
+    for (const artTag of WD.artTagData) {
+        artTag.albumData = WD.albumData;
+        artTag.trackData = WD.trackData;
     }
 
     // Extra organization stuff needed for listings and the like.
@@ -2804,6 +2814,9 @@ async function main() {
         albumData: sortByDate(WD.albumData.slice()),
         trackData: sortByDate(WD.trackData.slice())
     });
+
+    // console.log(WD.trackData.find(t => t.name === 'Aggrievance').artTags[0].taggedInThings.map(thing => thing.name));
+    // return;
 
     // Update languages o8ject with the wiki-specified default language!
     // This will make page files for that language 8e gener8ted at the root
@@ -2828,7 +2841,7 @@ async function main() {
         const tagRefs = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTagsByRef ?? []));
 
         for (const ref of tagRefs) {
-            if (find.tag(ref, {wikiData})) {
+            if (find.artTag(ref, {wikiData})) {
                 tagRefs.delete(ref);
             }
         }

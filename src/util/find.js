@@ -25,6 +25,10 @@ function findHelper(keys, dataProp, findFns = {}) {
 
         const data = wikiData[dataProp];
 
+        if (!data) {
+            throw new Error(`Expected data to be present`);
+        }
+
         const found = (key
             ? byDirectory(ref, data, quiet)
             : byName(ref, data, quiet));
@@ -76,12 +80,12 @@ function matchTagName(ref, data, quiet) {
 const find = {
     album: findHelper(['album', 'album-commentary'], 'albumData'),
     artist: findHelper(['artist', 'artist-gallery'], 'artistData'),
+    artTag: findHelper(['tag'], 'artTagData', {byName: matchTagName}),
     flash: findHelper(['flash'], 'flashData'),
     group: findHelper(['group', 'group-gallery'], 'groupData'),
     listing: findHelper(['listing'], 'listingSpec'),
     newsEntry: findHelper(['news-entry'], 'newsData'),
     staticPage: findHelper(['static'], 'staticPageData'),
-    tag: findHelper(['tag'], 'artTagData', {byName: matchTagName}),
     track: findHelper(['track'], 'trackData')
 };
 

@@ -129,9 +129,9 @@ export function getAllTracks(albumData) {
 
 export function getArtistNumContributions(artist) {
     return (
-        artist.tracks.asAny.length +
-        artist.albums.asCoverArtist.length +
-        (artist.flashes ? artist.flashes.asContributor.length : 0)
+        (artist.tracksAsAny?.length ?? 0) +
+        (artist.albumsAsCoverArtist?.length ?? 0) +
+        (artist.flashesAsContributor?.length ?? 0)
     );
 }
 

@@ -142,8 +142,8 @@ const listingSpec = [
                     .map(artist => ({
                         artist,
                         contributions: (
-                            artist.tracks.asContributor.length +
-                            artist.tracks.asArtist.length
+                            (artist.tracksAsContributor?.length ?? 0) +
+                            (artist.tracksAsArtist?.length ?? 0)
                         )
                     }))
                     .sort((a, b) => b.contributions - a.contributions)
@@ -153,12 +153,12 @@ const listingSpec = [
                     .map(artist => ({
                         artist,
                         contributions: (
-                            artist.tracks.asCoverArtist.length +
-                            artist.albums.asCoverArtist.length +
-                            artist.albums.asWallpaperArtist.length +
-                            artist.albums.asBannerArtist.length +
+                            (artist.tracksAsCoverArtist?.length ?? 0) +
+                            (artist.albumsAsCoverArtist?.length ?? 0) +
+                            (artist.albumsAsWallpaperArtist?.length ?? 0) +
+                            (artist.albumsAsBannerArtist?.length ?? 0) +
                             (wikiData.wikiInfo.enableFlashesAndGames
-                                ? artist.flashes.asContributor.length
+                                ? (artist.flashesAsContributor?.length ?? 0)
                                 : 0)
                         )
                     }))
@@ -213,7 +213,10 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.artistData
-                .map(artist => ({artist, entries: artist.tracks.asCommentator.length + artist.albums.asCommentator.length}))
+                .map(artist => ({artist, entries: (
+                    (artist.tracksAsCommentator?.length ?? 0) +
+                    (artist.albumsAsCommentator?.length ?? 0)
+                )}))
                 .filter(({ entries }) => entries)
                 .sort((a, b) => b.entries - a.entries);
         },
@@ -232,8 +235,12 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.artistData
-                .map(artist => ({artist, duration: getTotalDuration(
-                    [...artist.tracks.asArtist, ...artist.tracks.asContributor].filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY))
+                .map(artist => ({
+                    artist,
+                    duration: getTotalDuration([
+                        ...artist.tracksAsArtist ?? [],
+                        ...artist.tracksAsContributor ?? []
+                    ].filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY))
                 }))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
@@ -260,9 +267,12 @@ const listingSpec = [
                     .filter(artist => !artist.alias)
                     .map(artist => ({
                         artist,
-                        date: reversedTracks.find(({ album, artists, contributors }) => (
-                            album.directory !== UNRELEASED_TRACKS_DIRECTORY &&
-                            [...artists, ...contributors].some(({ who }) => who === artist)
+                        date: reversedTracks.find(track => (
+                            track.album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
+                            [
+                                ...track.artistContribs ?? [],
+                                ...track.contributorContribs ?? []
+                            ].some(({ who }) => who === artist)
                         ))?.date
                     }))
                     .filter(({ date }) => date)
@@ -271,13 +281,16 @@ const listingSpec = [
                 toArtAndFlashes: sortByDate(wikiData.artistData
                     .filter(artist => !artist.alias)
                     .map(artist => {
-                        const thing = reversedArtThings.find(({ album, coverArtists, contributors }) => (
-                            album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
-                            [...coverArtists || [], ...!album && contributors || []].some(({ who }) => who === artist)
+                        const thing = reversedArtThings.find(thing => (
+                            thing.album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
+                            [
+                                ...thing.coverArtistContribs ?? [],
+                                ...!thing.album && thing.contributorContribs || []
+                            ].some(({ who }) => who === artist)
                         ));
                         return thing && {
                             artist,
-                            date: (thing.coverArtists?.some(({ who }) => who === artist)
+                            date: (thing.coverArtistContribs?.some(({ who }) => who === artist)
                                 ? thing.coverArtDate
                                 : thing.date)
                         };
@@ -438,7 +451,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return sortByDate(wikiData.groupData
-                .map(group => ({group, date: group.albums[group.albums.length - 1].date}))
+                .map(group => ({group, date: group.albums[group.albums.length - 1]?.date}))
                 // So this is kinda tough to explain, 8ut 8asically, when we
                 // reverse the list after sorting it 8y d8te (so that the latest
                 // d8tes come first), it also flips the order of groups which
@@ -598,7 +611,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.trackData
-                .map(track => ({track, timesReferenced: track.referencedBy.length}))
+                .map(track => ({track, timesReferenced: track.referencedByTracks.length}))
                 .filter(({ timesReferenced }) => timesReferenced > 0)
                 .sort((a, b) => b.timesReferenced - a.timesReferenced);
         },
@@ -618,7 +631,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return chunkByProperties(wikiData.trackData
-                .filter(t => t.flashes.length > 0), ['album'])
+                .filter(t => t.featuredInFlashes?.length > 0), ['album'])
                 .filter(({ album }) => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
         },
 
@@ -634,7 +647,7 @@ const listingSpec = [
                             ${(tracks
                                 .map(track => strings('listingPage.listTracks.inFlashes.byAlbum.track', {
                                     track: link.track(track),
-                                    flashes: strings.list.and(track.flashes.map(link.flash))
+                                    flashes: strings.list.and(track.featuredInFlashes.map(link.flash))
                                 }))
                                 .map(row => `<li>${row}</li>`)
                                 .join('\n'))}
@@ -713,7 +726,7 @@ const listingSpec = [
             return wikiData.artTagData
                 .filter(tag => !tag.isCW)
                 .sort(sortByName)
-                .map(tag => ({tag, timesUsed: tag.things.length}));
+                .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}));
         },
 
         row({tag, timesUsed}, {link, strings}) {
@@ -732,7 +745,7 @@ const listingSpec = [
         data({wikiData}) {
             return wikiData.artTagData
                 .filter(tag => !tag.isCW)
-                .map(tag => ({tag, timesUsed: tag.things.length}))
+                .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}))
                 .sort((a, b) => b.timesUsed - a.timesUsed);
         },
 

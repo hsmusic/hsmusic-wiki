@@ -16,7 +16,7 @@ export function targets({wikiData}) {
 
 export function write(tag, {wikiData}) {
     const { wikiInfo } = wikiData;
-    const { things } = tag;
+    const { taggedInThings: things } = tag;
 
     // Display things featuring this art tag in reverse chronological order,
     // sticking the most recent additions near the top!
