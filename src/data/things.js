@@ -20,6 +20,7 @@ import {
     isNumber,
     isURL,
     isString,
+    isWholeNumber,
     oneOf,
     validateArrayItems,
     validateInstanceOf,
@@ -270,7 +271,7 @@ Thing.common = {
         expose: {
             dependencies: ['artistData', contribsByRefProperty],
             compute: ({ artistData, [contribsByRefProperty]: contribsByRef }) => (
-                (contribsByRef && artistData
+                ((contribsByRef && artistData)
                     ? (contribsByRef
                         .map(({ who: ref, what }) => ({
                             who: find.artist(ref, {wikiData: {artistData}}),
@@ -329,7 +330,10 @@ Thing.common = {
             dependencies: [wikiDataProperty],
 
             compute: ({ [wikiDataProperty]: wikiData, [Thing.instance]: thing }) => (
-                wikiData?.filter(t => t[referencerRefListProperty]?.includes(thing)))
+                (wikiData
+                    ? wikiData.filter(t => t[referencerRefListProperty]?.includes(thing))
+                    : [])
+            )
         }
     }),
 
@@ -466,7 +470,25 @@ TrackGroup.propertyDescriptors = {
     // Update & expose
 
     name: Thing.common.name('Unnamed Track Group'),
-    color: Thing.common.color(),
+
+    color: {
+        flags: {update: true, expose: true},
+
+        update: {validate: isColor},
+
+        expose: {
+            dependencies: ['album'],
+
+            transform(color, { album }) {
+                return color ?? album?.color ?? null;
+            }
+        }
+    },
+
+    startIndex: {
+        flags: {update: true, expose: true},
+        update: {validate: isWholeNumber}
+    },
 
     dateOriginallyReleased: Thing.common.simpleDate(),
 
@@ -475,6 +497,11 @@ TrackGroup.propertyDescriptors = {
     isDefaultTrackGroup: Thing.common.flag(false),
 
     // Update only
+
+    album: {
+        flags: {update: true},
+        update: {validate: validateInstanceOf(Album)}
+    },
 
     trackData: Thing.common.wikiData(Track),
 
@@ -544,6 +571,7 @@ Track.propertyDescriptors = {
     albumData: Thing.common.wikiData(Album),
     artistData: Thing.common.wikiData(Artist),
     artTagData: Thing.common.wikiData(ArtTag),
+    flashData: Thing.common.wikiData(Flash),
     trackData: Thing.common.wikiData(Track),
 
     // Expose only
@@ -565,8 +593,22 @@ Track.propertyDescriptors = {
             dependencies: ['albumData', 'dateFirstReleased'],
             compute: ({ albumData, dateFirstReleased, [Track.instance]: track }) => (
                 dateFirstReleased ??
-                Track.findAlbum(track)?.date ??
+                Track.findAlbum(track, albumData)?.date ??
                 null
+            )
+        }
+    },
+
+    color: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['albumData', 'trackData'],
+
+            compute: ({ albumData, trackData, [Track.instance]: track }) => (
+                (Track.findAlbum(track, albumData)?.trackGroups
+                    .find(tg => tg.tracks.includes(track))?.color)
+                ?? null
             )
         }
     },
@@ -584,6 +626,30 @@ Track.propertyDescriptors = {
                 Track.findAlbum(track, albumData)?.trackArtDate ??
                 Track.findAlbum(track, albumData)?.date ??
                 null
+            )
+        }
+    },
+
+    otherReleases: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['originalReleaseTrackByRef', 'trackData'],
+
+            compute: ({ originalReleaseTrackByRef: ref1, trackData, [Track.instance]: t1 }) => (
+                (ref1 && trackData
+                    ? [
+                        find.track(ref1, {wikiData: {trackData}}),
+                        ...trackData.filter(t2 => {
+                            const { originalReleaseTrackByRef: ref2 } = t2;
+                            return (
+                                t2 !== t1 &&
+                                ref2 &&
+                                (
+                                    find.track(ref2, {wikiData: {trackData}}) ===
+                                    find.track(ref1, {wikiData: {trackData}})))
+                        })]
+                    : [])
             )
         }
     },

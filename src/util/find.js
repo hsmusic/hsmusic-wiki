@@ -4,6 +4,12 @@ import {
 } from './cli.js';
 
 function findHelper(keys, dataProp, findFns = {}) {
+    // Note: This cache explicitly *doesn't* support mutable data arrays. If the
+    // data array is modified, make sure it's actually a new array object, not
+    // the original, or the cache here will break and act as though the data
+    // hasn't changed!
+    const cache = new WeakMap();
+
     const byDirectory = findFns.byDirectory || matchDirectory;
     const byName = findFns.byName || matchName;
 
@@ -15,6 +21,23 @@ function findHelper(keys, dataProp, findFns = {}) {
             throw new Error(`Got a reference that is ${typeof fullRef}, not string: ${fullRef}`);
         }
 
+        const data = wikiData[dataProp];
+
+        if (!data) {
+            throw new Error(`Expected data to be present`);
+        }
+
+        let cacheForThisData = cache.get(data);
+        const cachedValue = cacheForThisData?.[fullRef];
+        if (cachedValue) {
+            globalThis.NUM_CACHE = (globalThis.NUM_CACHE || 0) + 1;
+            return cachedValue;
+        }
+        if (!cacheForThisData) {
+            cacheForThisData = Object.create(null);
+            cache.set(data, cacheForThisData);
+        }
+
         const match = fullRef.match(keyRefRegex);
         if (!match) {
             throw new Error(`Malformed link reference: "${fullRef}"`);
@@ -23,12 +46,6 @@ function findHelper(keys, dataProp, findFns = {}) {
         const key = match[1];
         const ref = match[2];
 
-        const data = wikiData[dataProp];
-
-        if (!data) {
-            throw new Error(`Expected data to be present`);
-        }
-
         const found = (key
             ? byDirectory(ref, data, quiet)
             : byName(ref, data, quiet));
@@ -36,6 +53,8 @@ function findHelper(keys, dataProp, findFns = {}) {
         if (!found && !quiet) {
             logWarn`Didn't match anything for ${fullRef}!`;
         }
+
+        cacheForThisData[fullRef] = found;
 
         return found;
     };

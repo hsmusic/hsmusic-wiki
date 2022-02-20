@@ -164,9 +164,11 @@ export function write(album, {wikiData}) {
                                 strings('releaseInfo.released', {
                                     date: strings.count.date(album.date)
                                 }),
-                                +album.coverArtDate !== +album.date && strings('releaseInfo.artReleased', {
-                                    date: strings.count.date(album.coverArtDate)
-                                }),
+                                (album.coverArtDate &&
+                                    +album.coverArtDate !== +album.date &&
+                                    strings('releaseInfo.artReleased', {
+                                        date: strings.count.date(album.coverArtDate)
+                                    })),
                                 strings('releaseInfo.duration', {
                                     duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
                                 })
@@ -179,7 +181,7 @@ export function write(album, {wikiData}) {
                                 })
                             })
                         }</p>`}
-                        ${album.urls.length && `<p>${
+                        ${album.urls?.length && `<p>${
                             strings('releaseInfo.listenOn', {
                                 links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true})))
                             })
@@ -263,12 +265,16 @@ export function generateAlbumSidebar(album, currentTrack, {
 }) {
     const listTag = getAlbumListTag(album);
 
+    /*
     const trackGroups = album.trackGroups || [{
         name: strings('albumSidebar.trackList.fallbackGroupName'),
         color: album.color,
         startIndex: 0,
         tracks: album.tracks
     }];
+    */
+
+    const { trackGroups } = album;
 
     const trackToListItem = track => html.tag('li',
         {class: track === currentTrack && 'current'},
@@ -276,9 +282,14 @@ export function generateAlbumSidebar(album, currentTrack, {
             track: link.track(track)
         }));
 
+    const nameOrDefault = (isDefaultTrackGroup, name) =>
+        (isDefaultTrackGroup
+            ? strings('albumSidebar.trackList.fallbackGroupName')
+            : name);
+
     const trackListPart = fixWS`
         <h1>${link.album(album)}</h1>
-        ${trackGroups.map(({ name, color, startIndex, tracks }) =>
+        ${trackGroups.map(({ name, color, startIndex, tracks, isDefaultTrackGroup }) =>
             html.tag('details', {
                 // Leave side8ar track groups collapsed on al8um homepage,
                 // since there's already a view of all the groups expanded
@@ -290,11 +301,11 @@ export function generateAlbumSidebar(album, currentTrack, {
                     {style: getLinkThemeString(color)},
                     (listTag === 'ol'
                         ? strings('albumSidebar.trackList.group.withRange', {
-                            group: `<span class="group-name">${name}</span>`,
+                            group: `<span class="group-name">${nameOrDefault(isDefaultTrackGroup, name)}</span>`,
                             range: `${startIndex + 1}&ndash;${startIndex + tracks.length}`
                         })
                         : strings('albumSidebar.trackList.group', {
-                            group: `<span class="group-name">${name}</span>`
+                            group: `<span class="group-name">${nameOrDefault(isDefaultTrackGroup, name)}</span>`
                         }))
                 ),
                 fixWS`
@@ -319,7 +330,7 @@ export function generateAlbumSidebar(album, currentTrack, {
             })
         }</h1>
         ${!currentTrack && transformMultiline(group.descriptionShort)}
-        ${group.urls.length && `<p>${
+        ${group.urls?.length && `<p>${
             strings('releaseInfo.visitOn', {
                 links: strings.list.or(group.urls.map(url => fancifyURL(url)))
             })

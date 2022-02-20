@@ -35,7 +35,7 @@ export function getArtistString(artists, {
         return [
             link.artist(who),
             showContrib && what && `(${what})`,
-            showIcons && urls.length && `<span class="icons">(${
+            showIcons && urls?.length && `<span class="icons">(${
                 strings.list.unit(urls.map(url => iconifyURL(url, {strings})))
             })</span>`
         ].filter(Boolean).join(' ');

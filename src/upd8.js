@@ -906,6 +906,8 @@ function processAlbumEntryDocuments(documents) {
     let currentTracksByRef = null;
     let currentTrackGroupDoc = null;
 
+    let trackIndex = 0;
+
     function closeCurrentTrackGroup() {
         if (currentTracksByRef) {
             let trackGroup;
@@ -917,6 +919,7 @@ function processAlbumEntryDocuments(documents) {
                 trackGroup.isDefaultTrackGroup = true;
             }
 
+            trackGroup.startIndex = trackIndex;
             trackGroup.tracksByRef = currentTracksByRef;
             trackGroups.push(trackGroup);
         }
@@ -929,6 +932,8 @@ function processAlbumEntryDocuments(documents) {
             currentTrackGroupDoc = doc;
             continue;
         }
+
+        trackIndex++;
 
         const track = processTrackDocument(doc);
         tracks.push(track);
@@ -2384,6 +2389,7 @@ async function main() {
                                 trackGroup.isDefaultTrackGroup = true;
                             }
 
+                            trackGroup.album = album;
                             trackGroup.tracksByRef = currentTracksByRef;
                             trackGroups.push(trackGroup);
                         }
@@ -2773,7 +2779,6 @@ async function main() {
         return;
     }
 
-
     // Data linking! Basically, provide (portions of) wikiData to the Things
     // which require it - they'll expose dynamically computed properties as a
     // result (many of which are required for page HTML generation).
@@ -2792,6 +2797,7 @@ async function main() {
         track.albumData = WD.albumData;
         track.artistData = WD.artistData;
         track.artTagData = WD.artTagData;
+        track.flashData = WD.flashData;
         track.trackData = WD.trackData;
     }
 
@@ -2815,7 +2821,8 @@ async function main() {
         trackData: sortByDate(WD.trackData.slice())
     });
 
-    // console.log(WD.trackData.find(t => t.name === 'Aggrievance').artTags[0].taggedInThings.map(thing => thing.name));
+    // const track = WD.trackData.find(t => t.name === 'Under the Sun');
+    // console.log(track.album.trackGroups.find(tg => tg.tracks.includes(track)).color, track.color);
     // return;
 
     // Update languages o8ject with the wiki-specified default language!
@@ -3163,7 +3170,7 @@ async function main() {
             return true;
         };
 
-        return;
+        // return;
 
         writes = buildStepsWithTargets.flatMap(({ flag, pageSpec, targets }) => {
             const writes = targets.flatMap(target =>

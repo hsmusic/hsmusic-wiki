@@ -81,6 +81,13 @@ export function isCountingNumber(number) {
     return true;
 }
 
+export function isWholeNumber(number) {
+    isInteger(number);
+    isPositiveOrZero(number);
+
+    return true;
+}
+
 export function isString(value) {
     return isType(value, 'string');
 }

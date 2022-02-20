@@ -35,23 +35,20 @@ export function targets({wikiData}) {
 
 export function write(track, {wikiData}) {
     const { groupData, wikiInfo } = wikiData;
-    const { album } = track;
+    const { album, referencedByTracks, referencedTracks, otherReleases } = track;
 
-    const tracksThatReference = track.referencedBy;
     const useDividedReferences = groupData.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY);
-    const ttrFanon = (useDividedReferences &&
-        tracksThatReference.filter(t => t.album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY)));
-    const ttrOfficial = (useDividedReferences &&
-        tracksThatReference.filter(t => t.album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY)));
+    const rbtFanon = (useDividedReferences &&
+        referencedByTracks.filter(t => t.album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY)));
+    const rbtOfficial = (useDividedReferences &&
+        referencedByTracks.filter(t => t.album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY)));
 
-    const tracksReferenced = track.references;
-    const otherReleases = track.otherReleases;
     const listTag = getAlbumListTag(album);
 
     let flashesThatFeature;
     if (wikiInfo.enableFlashesAndGames) {
         flashesThatFeature = sortByDate([track, ...otherReleases]
-            .flatMap(track => track.flashes.map(flash => ({flash, as: track}))));
+            .flatMap(track => track.featuredInFlashes.map(flash => ({flash, as: track}))));
     }
 
     const unbound_generateTrackList = (tracks, {getArtistString, link, strings}) => html.tag('ul',
@@ -59,7 +56,7 @@ export function write(track, {wikiData}) {
             const line = strings('trackList.item.withArtists', {
                 track: link.track(track),
                 by: `<span class="by">${strings('trackList.item.withArtists.by', {
-                    artists: getArtistString(track.artists)
+                    artists: getArtistString(track.artistContribs)
                 })}</span>`
             });
             return (track.aka
@@ -172,13 +169,13 @@ export function write(track, {wikiData}) {
                         <p>
                             ${[
                                 strings('releaseInfo.by', {
-                                    artists: getArtistString(track.artists, {
+                                    artists: getArtistString(track.artistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
                                 track.coverArtists && strings('releaseInfo.coverArtBy', {
-                                    artists: getArtistString(track.coverArtists, {
+                                    artists: getArtistString(track.coverArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
@@ -186,16 +183,18 @@ export function write(track, {wikiData}) {
                                 album.directory !== UNRELEASED_TRACKS_DIRECTORY && strings('releaseInfo.released', {
                                     date: strings.count.date(track.date)
                                 }),
-                                +track.coverArtDate !== +track.date && strings('releaseInfo.artReleased', {
-                                    date: strings.count.date(track.coverArtDate)
-                                }),
+                                (track.coverArtDate &&
+                                    +track.coverArtDate !== +track.date &&
+                                    strings('releaseInfo.artReleased', {
+                                        date: strings.count.date(track.coverArtDate)
+                                    })),
                                 track.duration && strings('releaseInfo.duration', {
                                     duration: strings.count.duration(track.duration)
                                 })
                             ].filter(Boolean).join('<br>\n')}
                         </p>
                         <p>${
-                            (track.urls.length
+                            (track.urls?.length
                                 ? strings('releaseInfo.listenOn', {
                                     links: strings.list.or(track.urls.map(url => fancifyURL(url, {strings})))
                                 })
@@ -212,17 +211,10 @@ export function write(track, {wikiData}) {
                                 `).join('\n')}
                             </ul>
                         `}
-                        ${track.contributors.textContent && fixWS`
-                            <p>
-                                ${strings('releaseInfo.contributors')}
-                                <br>
-                                ${transformInline(track.contributors.textContent)}
-                            </p>
-                        `}
-                        ${track.contributors.length && fixWS`
+                        ${track.contributorContribs.length && fixWS`
                             <p>${strings('releaseInfo.contributors')}</p>
                             <ul>
-                                ${(track.contributors
+                                ${(track.contributorContribs
                                     .map(contrib => `<li>${getArtistString([contrib], {
                                         showContrib: true,
                                         showIcons: true
@@ -230,25 +222,25 @@ export function write(track, {wikiData}) {
                                     .join('\n'))}
                             </ul>
                         `}
-                        ${tracksReferenced.length && fixWS`
+                        ${referencedTracks.length && fixWS`
                             <p>${strings('releaseInfo.tracksReferenced', {track: `<i>${track.name}</i>`})}</p>
-                            ${generateTrackList(tracksReferenced)}
+                            ${generateTrackList(referencedTracks)}
                         `}
-                        ${tracksThatReference.length && fixWS`
+                        ${referencedByTracks.length && fixWS`
                             <p>${strings('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
                             ${useDividedReferences && fixWS`
                                 <dl>
-                                    ${ttrOfficial.length && fixWS`
+                                    ${rbtOfficial.length && fixWS`
                                         <dt>${strings('trackPage.referenceList.official')}</dt>
-                                        <dd>${generateTrackList(ttrOfficial)}</dd>
+                                        <dd>${generateTrackList(rbtOfficial)}</dd>
                                     `}
-                                    ${ttrFanon.length && fixWS`
+                                    ${rbtFanon.length && fixWS`
                                         <dt>${strings('trackPage.referenceList.fandom')}</dt>
-                                        <dd>${generateTrackList(ttrFanon)}</dd>
+                                        <dd>${generateTrackList(rbtFanon)}</dd>
                                     `}
                                 </dl>
                             `}
-                            ${!useDividedReferences && generateTrackList(tracksThatReference)}
+                            ${!useDividedReferences && generateTrackList(referencedByTracks)}
                         `}
                         ${wikiInfo.enableFlashesAndGames && flashesThatFeature.length && fixWS`
                             <p>${strings('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
