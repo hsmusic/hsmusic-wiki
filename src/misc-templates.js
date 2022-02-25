@@ -396,9 +396,9 @@ export function getFooterLocalizationLinks(pathname, {
             { json: { 'meta.languageName': b } }
         ) => a < b ? -1 : a > b ? 1 : 0)
         .map(strings => html.tag('span', html.tag('a', {
-            href: (strings.code === languages.default.code
+            href: (strings.baseDirectory === languages.default.baseDirectory
                 ? to('localizedDefaultLanguage' + keySuffix, ...toArgs)
-                : to('localizedWithBaseDirectory' + keySuffix, strings.code, ...toArgs))
+                : to('localizedWithBaseDirectory' + keySuffix, strings.baseDirectory, ...toArgs))
         }, strings.json['meta.languageName'])));
 
     return html.tag('div',

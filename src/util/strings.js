@@ -68,6 +68,23 @@ export function genStrings(stringsJSON, {
         return {error: `Expected language code to be a string.`};
     }
 
+    // Lanuages can also provide a 8ase-directory code, which will otherwise
+    // default to the language code. This controls the name of the directory the
+    // localized HTML will 8e outputted to, which could 8e useful for, like,
+    // testing a 8uild of the site with one language JSON set somewhere besides
+    // the default directory.
+    //
+    // Note that internally, baseDirectory, not code, is the property used to
+    // identify a language - two language files may share a language code (like
+    // "en" or "es), but base directories should always be unique.
+    let baseDirectory = stringsJSON['meta.baseDirectory'];
+    if (!baseDirectory) {
+        baseDirectory = code;
+    }
+    if (typeof baseDirectory !== 'string') {
+        return {Error: `Expected base directory to be a string.`};
+    }
+
     // Every value on the provided o8ject should be a string.
     // (This is lazy, but we only 8other checking this on stringsJSON, on the
     // assumption that defaultJSON was passed through this function too, and so
@@ -76,7 +93,7 @@ export function genStrings(stringsJSON, {
         let err = false;
         for (const [ key, value ] of Object.entries(stringsJSON)) {
             if (typeof value !== 'string') {
-                logError`(${code}) The value for ${key} should be a string.`;
+                logError`(${baseDirectory}) The value for ${key} should be a string.`;
                 err = true;
             }
         }
@@ -94,12 +111,12 @@ export function genStrings(stringsJSON, {
         const presentKeys = Object.keys(stringsJSON);
         for (const key of presentKeys) {
             if (!expectedKeys.includes(key)) {
-                logWarn`(${code}) Unexpected translation key: ${key} - this won't be used!`;
+                logWarn`(${baseDirectory}) Unexpected translation key: ${key} - this won't be used!`;
             }
         }
         for (const key of expectedKeys) {
             if (!presentKeys.includes(key)) {
-                logWarn`(${code}) Missing translation key: ${key} - this won't be localized!`;
+                logWarn`(${baseDirectory}) Missing translation key: ${key} - this won't be localized!`;
             }
         }
     }
@@ -144,7 +161,7 @@ export function genStrings(stringsJSON, {
             // just redundant!
             if (!invalidKeysFound.includes(key)) {
                 invalidKeysFound.push(key);
-                logError`(${code}) Accessing invalid key ${key}. Fix a typo or provide this in strings-default.json!`;
+                logError`(${baseDirectory}) Accessing invalid key ${key}. Fix a typo or provide this in strings-default.json!`;
             }
             return `MISSING: ${key}`;
         }
@@ -166,7 +183,7 @@ export function genStrings(stringsJSON, {
         // Post-processing: if any expected arguments *weren't* replaced, that
         // is almost definitely an error.
         if (output.match(/\{[A-Z_]+\}/)) {
-            logError`(${code}) Args in ${key} were missing - output: ${output}`;
+            logError`(${baseDirectory}) Args in ${key} were missing - output: ${output}`;
         }
 
         return output;
@@ -179,6 +196,9 @@ export function genStrings(stringsJSON, {
 
     // Store the strings dictionary itself, also for convenience.
     strings.json = stringsJSON;
+
+    // Same with the base directory.
+    strings.baseDirectory = baseDirectory;
 
     // Store Intl o8jects that can 8e reused for value formatting.
     strings.intl = {

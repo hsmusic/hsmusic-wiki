@@ -2040,7 +2040,7 @@ async function wrapLanguages(fn, {writeOneLanguage = null}) {
     for (let i = 0; i < entries.length; i++) {
         const [ key, strings ] = entries[i];
 
-        const baseDirectory = (strings === languages.default ? '' : strings.code);
+        const baseDirectory = (strings === languages.default ? '' : strings.baseDirectory);
 
         await fn({
             baseDirectory,
@@ -2233,7 +2233,7 @@ async function main() {
         }
         if (error) return;
 
-        languages = Object.fromEntries(results.map(strings => [strings.code, strings]));
+        languages = Object.fromEntries(results.map(strings => [strings.baseDirectory, strings]));
     } else {
         languages = {};
     }
