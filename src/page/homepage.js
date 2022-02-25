@@ -16,7 +16,7 @@ import {
 // Page exports
 
 export function writeTargetless({wikiData}) {
-    const { newsData, staticPageData, homepageInfo, wikiInfo } = wikiData;
+    const { newsData, staticPageData, homepageLayout, wikiInfo } = wikiData;
 
     const page = {
         type: 'page',
@@ -40,27 +40,24 @@ export function writeTargetless({wikiData}) {
                 classes: ['top-index'],
                 content: fixWS`
                     <h1>${wikiInfo.name}</h1>
-                    ${homepageInfo.rows.map((row, i) => fixWS`
+                    ${homepageLayout.rows?.map((row, i) => fixWS`
                         <section class="row" style="${getLinkThemeString(row.color)}">
                             <h2>${row.name}</h2>
                             ${row.type === 'albums' && fixWS`
                                 <div class="grid-listing">
                                     ${getAlbumGridHTML({
                                         entries: (
-                                            row.group === 'new-releases' ? getNewReleases(row.groupCount, {wikiData}) :
-                                            row.group === 'new-additions' ? getNewAdditions(row.groupCount, {wikiData}) :
-                                            ((find.group(row.group, {wikiData})?.albums || [])
+                                            row.sourceGroupByRef === 'new-releases' ? getNewReleases(row.countAlbumsFromGroup, {wikiData}) :
+                                            row.sourceGroupByRef === 'new-additions' ? getNewAdditions(row.countAlbumsFromGroup, {wikiData}) :
+                                            ((row.sourceGroup?.albums ?? [])
                                                 .slice()
                                                 .reverse()
-                                                .slice(0, row.groupCount)
+                                                .slice(0, row.countAlbumsFromGroup)
                                                 .map(album => ({item: album})))
-                                        ).concat(row.albums
-                                            .map(album => find.album(album, {wikiData}))
-                                            .map(album => ({item: album}))
-                                        ),
+                                        ).concat(row.sourceAlbums.map(album => ({item: album}))),
                                         lazy: i > 0
                                     })}
-                                    ${row.actions.length && fixWS`
+                                    ${row.actions?.length && fixWS`
                                         <div class="grid-actions">
                                             ${row.actions.map(action => transformInline(action)
                                                 .replace('<a', '<a class="box grid-item"')).join('\n')}
@@ -73,7 +70,7 @@ export function writeTargetless({wikiData}) {
                 `
             },
 
-            sidebarLeft: homepageInfo.sidebar && {
+            sidebarLeft: homepageLayout.sidebarContent && {
                 wide: true,
                 collapse: false,
                 // This is a pretty filthy hack! 8ut otherwise, the [[news]] part
@@ -86,15 +83,15 @@ export function writeTargetless({wikiData}) {
                 //
                 // And no, I will not make [[news]] into part of transformMultiline
                 // (even though that would 8e hilarious).
-                content: (transformMultiline(homepageInfo.sidebar.replace('[[news]]', '__GENERATE_NEWS__'))
+                content: (transformMultiline(homepageLayout.sidebarContent.replace('[[news]]', '__GENERATE_NEWS__'))
                     .replace('<p>__GENERATE_NEWS__</p>', wikiInfo.enableNews ? fixWS`
                         <h1>${strings('homepage.news.title')}</h1>
                         ${newsData.slice(0, 3).map((entry, i) => html.tag('article',
                             {class: ['news-entry', i === 0 && 'first-news-entry']},
                             fixWS`
                                 <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
-                                ${transformMultiline(entry.bodyShort)}
-                                ${entry.bodyShort !== entry.body && link.newsEntry(entry, {
+                                ${transformMultiline(entry.contentShort)}
+                                ${entry.contentShort !== entry.content && link.newsEntry(entry, {
                                     text: strings('homepage.news.entry.viewRest')
                                 })}
                             `)).join('\n')}
@@ -105,15 +102,16 @@ export function writeTargetless({wikiData}) {
                 content: fixWS`
                     <h2 class="dot-between-spans">
                         ${[
-                            link.home('', {text: wikiInfo.shortName, class: 'current', to}),
+                            link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
                             wikiInfo.enableListings &&
                             link.listingIndex('', {text: strings('listingIndex.title'), to}),
                             wikiInfo.enableNews &&
                             link.newsIndex('', {text: strings('newsIndex.title'), to}),
                             wikiInfo.enableFlashesAndGames &&
                             link.flashIndex('', {text: strings('flashIndex.title'), to}),
-                            ...staticPageData.filter(page => page.listed).map(page =>
-                                link.staticPage(page, {text: page.shortName}))
+                            ...(staticPageData
+                                .filter(page => page.showInNavigationBar)
+                                .map(page => link.staticPage(page, {text: page.nameShort})))
                         ].filter(Boolean).map(link => `<span>${link}</span>`).join('\n')}
                     </h2>
                 `

@@ -52,7 +52,7 @@ export function write(group, {wikiData}) {
             main: {
                 content: fixWS`
                     <h1>${strings('groupInfoPage.title', {group: group.name})}</h1>
-                    ${group.urls.length && `<p>${
+                    ${group.urls?.length && `<p>${
                         strings('releaseInfo.visitOn', {
                             links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
                         })

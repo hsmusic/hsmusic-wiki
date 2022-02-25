@@ -32,11 +32,7 @@ export function targets({wikiData}) {
 export function write(artist, {wikiData}) {
     const { groupData, wikiInfo } = wikiData;
 
-    const {
-        name,
-        urls = [],
-        note = ''
-    } = artist;
+    const { name, urls, note } = artist;
 
     const artThingsAll = sortByDate(unique([
         ...artist.albumsAsCoverArtist ?? [],
@@ -305,7 +301,7 @@ export function write(artist, {wikiData}) {
                             </blockquote>
                             <hr>
                         `}
-                        ${urls.length && `<p>${strings('releaseInfo.visitOn', {
+                        ${urls?.length && `<p>${strings('releaseInfo.visitOn', {
                             links: strings.list.or(urls.map(url => fancifyURL(url, {strings})))
                         })}</p>`}
                         ${hasGallery && `<p>${strings('artistPage.viewArtGallery', {

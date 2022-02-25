@@ -31,7 +31,7 @@ export function write(entry, {wikiData}) {
                     <div class="long-content">
                         <h1>${strings('newsEntryPage.title', {entry: entry.name})}</h1>
                         <p>${strings('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
-                        ${transformMultiline(entry.body)}
+                        ${transformMultiline(entry.content)}
                     </div>
                 `
             },
@@ -68,8 +68,8 @@ export function writeTargetless({wikiData}) {
                         ${newsData.map(entry => fixWS`
                             <article id="${entry.directory}">
                                 <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
-                                ${transformMultiline(entry.bodyShort)}
-                                ${entry.bodyShort !== entry.body && `<p>${link.newsEntry(entry, {
+                                ${transformMultiline(entry.contentShort)}
+                                ${entry.contentShort !== entry.content && `<p>${link.newsEntry(entry, {
                                     text: strings('newsIndex.entry.viewRest')
                                 })}</p>`}
                             </article>

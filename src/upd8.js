@@ -1213,58 +1213,10 @@ const processStaticPageDocument = makeProcessDocument(StaticPage, {
     }
 });
 
-async function processStaticPageDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return [];
-        } else {
-            return {error: `Could not read ${file} (${error.code}).`};
-        }
-    }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    return sections.map(section => {
-        const name = getBasicField(section, 'Name');
-        if (!name) {
-            return {error: 'Expected "Name" field!'};
-        }
-
-        const shortName = getBasicField(section, 'Short Name') || name;
-
-        let directory = getBasicField(section, 'Directory');
-        if (!directory) {
-            return {error: 'Expected "Directory" field!'};
-        }
-
-        let content = getMultilineField(section, 'Content');
-        if (!content) {
-            return {error: 'Expected "Content" field!'};
-        }
-
-        let stylesheet = getMultilineField(section, 'Style') || '';
-
-        let listed = getBooleanField(section, 'Listed') ?? true;
-
-        return {
-            name,
-            shortName,
-            directory,
-            content,
-            stylesheet,
-            listed
-        };
-    });
-}
-
 const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
     propertyFieldMapping: {
         name: 'Name',
-        shortName: 'Short Name',
+        nameShort: 'Short Name',
         color: 'Color',
         description: 'Description',
         footerContent: 'Footer Content',
@@ -1772,7 +1724,7 @@ writePage.html = (pageFn, {
         let { title: linkTitle } = cur;
 
         if (cur.toHome) {
-            linkTitle ??= wikiInfo.shortName;
+            linkTitle ??= wikiInfo.nameShort;
         } else if (cur.toCurrentPage) {
             linkTitle ??= title;
         }
@@ -2783,46 +2735,91 @@ async function main() {
     // which require it - they'll expose dynamically computed properties as a
     // result (many of which are required for page HTML generation).
 
-    for (const album of WD.albumData) {
-        album.artistData = WD.artistData;
-        album.groupData = WD.groupData;
-        album.trackData = WD.trackData;
+    function linkDataArrays() {
+        for (const album of WD.albumData) {
+            album.artistData = WD.artistData;
+            album.groupData = WD.groupData;
+            album.trackData = WD.trackData;
 
-        for (const trackGroup of album.trackGroups) {
-            trackGroup.trackData = WD.trackData;
+            for (const trackGroup of album.trackGroups) {
+                trackGroup.trackData = WD.trackData;
+            }
         }
-    }
 
-    for (const track of WD.trackData) {
-        track.albumData = WD.albumData;
-        track.artistData = WD.artistData;
-        track.artTagData = WD.artTagData;
-        track.flashData = WD.flashData;
-        track.trackData = WD.trackData;
-    }
+        for (const track of WD.trackData) {
+            track.albumData = WD.albumData;
+            track.artistData = WD.artistData;
+            track.artTagData = WD.artTagData;
+            track.flashData = WD.flashData;
+            track.trackData = WD.trackData;
+        }
 
-    for (const artist of WD.artistData) {
-        artist.artistData = WD.artistData;
-    }
+        for (const artist of WD.artistData) {
+            artist.artistData = WD.artistData;
+        }
 
-    for (const group of WD.groupData) {
-        group.albumData = WD.albumData;
-    }
+        for (const group of WD.groupData) {
+            group.albumData = WD.albumData;
+            group.groupCategoryData = WD.groupCategoryData;
+        }
 
-    for (const artTag of WD.artTagData) {
-        artTag.albumData = WD.albumData;
-        artTag.trackData = WD.trackData;
+        for (const category of WD.groupCategoryData) {
+            category.groupData = WD.groupData;
+        }
+
+        for (const flash of WD.flashData) {
+            flash.artistData = WD.artistData;
+            flash.trackData = WD.trackData;
+            flash.flashActData = WD.flashActData;
+        }
+
+        for (const act of WD.flashActData) {
+            act.flashData = WD.flashData;
+        }
+
+        for (const artTag of WD.artTagData) {
+            artTag.albumData = WD.albumData;
+            artTag.trackData = WD.trackData;
+        }
+
+        for (const row of WD.homepageLayout.rows) {
+            row.albumData = WD.albumData;
+            row.groupData = WD.groupData;
+        }
     }
 
     // Extra organization stuff needed for listings and the like.
 
-    Object.assign(wikiData, {
-        albumData: sortByDate(WD.albumData.slice()),
-        trackData: sortByDate(WD.trackData.slice())
-    });
+    function sortDataArrays() {
+        Object.assign(wikiData, {
+            albumData: sortByDate(WD.albumData.slice()),
+            trackData: sortByDate(WD.trackData.slice())
+        });
+    }
+
+    // Now post-process data in three steps...
+
+    // 1. Link data arrays so that all essential references between objects are
+    // are complete, so properties (like dates!) are inherited where that's
+    // appropriate.
+    linkDataArrays();
+
+    // 2. Sort data arrays so that they're all in order! This may use properties
+    // which are only available after the initial linking.
+    sortDataArrays();
+
+    // 3. Re-link data arrays, so that every object has the new, sorted
+    // versions. Note that the sorting step deliberately creates new arrays
+    // (mutating slices instead of the original arrays) - this is so that the
+    // object caching system understands that it's working with a new ordering.
+    // We still need to actually provide those updated arrays over again!
+    linkDataArrays();
 
     // const track = WD.trackData.find(t => t.name === 'Under the Sun');
     // console.log(track.album.trackGroups.find(tg => tg.tracks.includes(track)).color, track.color);
+    // console.log(WD.homepageLayout.rows[0].countAlbumsFromGroup);
+    // console.log(WD.albumData.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
+    // console.log(WD.groupData.find(g => g.name === 'Fandom').albums.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
     // return;
 
     // Update languages o8ject with the wiki-specified default language!

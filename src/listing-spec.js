@@ -673,7 +673,7 @@ const listingSpec = [
                             date: strings.count.date(flash.date)
                         })}</dt>
                         <dd><ul>
-                            ${(flash.tracks
+                            ${(flash.featuredTracks
                                 .map(track => strings('listingPage.listTracks.inFlashes.byFlash.track', {
                                     track: link.track(track),
                                     album: link.album(track.album)

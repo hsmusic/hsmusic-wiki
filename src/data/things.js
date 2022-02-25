@@ -243,7 +243,7 @@ Thing.common = {
 
         expose: {
             dependencies: [singleReferenceProperty, wikiDataProperty],
-            compute: ({ [singleReferenceProperyt]: ref, [wikiDataProperty]: wikiData }) => (
+            compute: ({ [singleReferenceProperty]: ref, [wikiDataProperty]: wikiData }) => (
                 (ref && wikiData
                     ? findFn(ref, {wikiData: {[wikiDataProperty]: wikiData}})
                     : [])
@@ -603,9 +603,9 @@ Track.propertyDescriptors = {
         flags: {expose: true},
 
         expose: {
-            dependencies: ['albumData', 'trackData'],
+            dependencies: ['albumData'],
 
-            compute: ({ albumData, trackData, [Track.instance]: track }) => (
+            compute: ({ albumData, [Track.instance]: track }) => (
                 (Track.findAlbum(track, albumData)?.trackGroups
                     .find(tg => tg.tracks.includes(track))?.color)
                 ?? null
@@ -743,6 +743,7 @@ Group.propertyDescriptors = {
     // Update only
 
     albumData: Thing.common.wikiData(Album),
+    groupCategoryData: Thing.common.wikiData(GroupCategory),
 
     // Expose only
 
@@ -764,6 +765,27 @@ Group.propertyDescriptors = {
                 albumData?.filter(album => album.groups.includes(group)) ?? [])
         }
     },
+
+    color: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['groupCategoryData'],
+
+            compute: ({ groupCategoryData, [Group.instance]: group }) => (
+                groupCategoryData.find(category => category.groups.includes(group))?.color ?? null)
+        }
+    },
+
+    category: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['groupCategoryData'],
+            compute: ({ groupCategoryData, [Group.instance]: group }) => (
+                groupCategoryData?.filter(category => category.groups.includes(group)) ?? [])
+        }
+    },
 };
 
 GroupCategory.propertyDescriptors = {
@@ -773,6 +795,14 @@ GroupCategory.propertyDescriptors = {
     color: Thing.common.color(),
 
     groupsByRef: Thing.common.referenceList(Group),
+
+    // Update only
+
+    groupData: Thing.common.wikiData(Group),
+
+    // Expose only
+
+    groups: Thing.common.dynamicThingsFromReferenceList('groupsByRef', 'groupData', find.group),
 };
 
 // -> ArtTag
@@ -823,9 +853,7 @@ NewsEntry.propertyDescriptors = {
         expose: {
             dependencies: ['content'],
 
-            compute({ content }) {
-                return body.split('<hr class="split">')[0];
-            }
+            compute: ({ content }) => content.split('<hr class="split">')[0]
         }
     },
 };
@@ -885,6 +913,14 @@ HomepageLayoutRow.propertyDescriptors = {
     },
 
     color: Thing.common.color(),
+
+    // Update only
+
+    // These aren't necessarily used by every HomepageLayoutRow subclass, but
+    // for convenience of providing this data, every row accepts all wiki data
+    // arrays depended upon by any subclass's behavior.
+    albumData: Thing.common.wikiData(Album),
+    groupData: Thing.common.wikiData(Group),
 };
 
 HomepageLayoutAlbumsRow.propertyDescriptors = {
@@ -917,6 +953,11 @@ HomepageLayoutAlbumsRow.propertyDescriptors = {
         flags: {update: true, expose: true},
         update: {validate: validateArrayItems(isString)}
     },
+
+    // Expose only
+
+    sourceGroup: Thing.common.dynamicThingFromSingleReference('sourceGroupByRef', 'groupData', find.group),
+    sourceAlbums: Thing.common.dynamicThingsFromReferenceList('sourceAlbumsByRef', 'albumData', find.album),
 };
 
 // -> Flash
@@ -951,7 +992,7 @@ Flash.propertyDescriptors = {
         update: {validate: oneOf(isString, isNumber)},
 
         expose: {
-            transform: value => value.toString()
+            transform: value => (value === null ? null : value.toString())
         }
     },
 
@@ -967,6 +1008,40 @@ Flash.propertyDescriptors = {
     contributorContribsByRef: Thing.common.contribsByRef(),
 
     urls: Thing.common.urls(),
+
+    // Update only
+
+    artistData: Thing.common.wikiData(Artist),
+    trackData: Thing.common.wikiData(Track),
+    flashActData: Thing.common.wikiData(FlashAct),
+
+    // Expose only
+
+    contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
+
+    featuredTracks: Thing.common.dynamicThingsFromReferenceList('featuredTracksByRef', 'trackData', find.track),
+
+    act: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['flashActData'],
+
+            compute: ({ flashActData, [Flash.instance]: flash }) => (
+                flashActData.find(act => act.flashes.includes(flash)) ?? null)
+        }
+    },
+
+    color: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['flashActData'],
+
+            compute: ({ flashActData, [Flash.instance]: flash }) => (
+                flashActData.find(act => act.flashes.includes(flash))?.color ?? null)
+        }
+    },
 };
 
 FlashAct.propertyDescriptors = {
@@ -979,6 +1054,14 @@ FlashAct.propertyDescriptors = {
     jumpColor: Thing.common.color(),
 
     flashesByRef: Thing.common.referenceList(Flash),
+
+    // Update only
+
+    flashData: Thing.common.wikiData(Flash),
+
+    // Expose only
+
+    flashes: Thing.common.dynamicThingsFromReferenceList('flashesByRef', 'flashData', find.flash),
 };
 
 // -> WikiInfo
@@ -989,7 +1072,7 @@ WikiInfo.propertyDescriptors = {
     name: Thing.common.name('Unnamed Wiki'),
 
     // Displayed in nav bar.
-    shortName: {
+    nameShort: {
         flags: {update: true, expose: true},
         update: {validate: isName},
 

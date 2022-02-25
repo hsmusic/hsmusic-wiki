@@ -49,13 +49,13 @@ export function write(flash, {wikiData}) {
                         alt: strings('misc.alt.flashArt')
                     })}
                     <p>${strings('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
-                    ${(flash.page || flash.urls.length) && `<p>${strings('releaseInfo.playOn', {
+                    ${(flash.page || flash.urls?.length) && `<p>${strings('releaseInfo.playOn', {
                         links: strings.list.or([
                             flash.page && getFlashLink(flash),
-                            ...flash.urls
+                            ...flash.urls ?? []
                         ].map(url => fancifyFlashURL(url, flash)))
                     })}</p>`}
-                    ${flash.tracks.length && fixWS`
+                    ${flash.tracks?.length && fixWS`
                         <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                         <ul>
                             ${(flash.tracks
@@ -71,17 +71,10 @@ export function write(flash, {wikiData}) {
                                 .join('\n'))}
                         </ul>
                     `}
-                    ${flash.contributors.textContent && fixWS`
-                        <p>
-                            ${strings('releaseInfo.contributors')}
-                            <br>
-                            ${transformInline(flash.contributors.textContent)}
-                        </p>
-                    `}
-                    ${flash.contributors.length && fixWS`
+                    ${flash.contributorContribs.length && fixWS`
                         <p>${strings('releaseInfo.contributors')}</p>
                         <ul>
-                            ${flash.contributors
+                            ${flash.contributorContribs
                                 .map(contrib => `<li>${getArtistString([contrib], {
                                     showContrib: true,
                                     showIcons: true
