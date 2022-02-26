@@ -159,7 +159,7 @@ export function getTotalDuration(tracks) {
 export function getTrackCover(track, {to}) {
     // Some al8ums don't have any track art at all, and in those, every track
     // just inherits the al8um's own cover art.
-    if (track.coverArtists === null) {
+    if (!track.hasCoverArt) {
         return getAlbumCover(track.album, {to});
     } else {
         return to('media.trackCover', track.album.directory, track.directory);

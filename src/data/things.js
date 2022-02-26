@@ -546,7 +546,6 @@ Track.propertyDescriptors = {
     urls: Thing.common.urls(),
     dateFirstReleased: Thing.common.simpleDate(),
 
-    hasCoverArt: Thing.common.flag(true),
     hasURLs: Thing.common.flag(true),
 
     referencedTracksByRef: Thing.common.referenceList(Track),
@@ -555,6 +554,18 @@ Track.propertyDescriptors = {
     artistContribsByRef: Thing.common.contribsByRef(),
     contributorContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
+
+    hasCoverArt: {
+        flags: {update: true, expose: true},
+
+        update: {validate: isBoolean},
+
+        expose: {
+            dependencies: ['albumData'],
+            transform: (hasCoverArt, { albumData, [Track.instance]: track }) => (
+                hasCoverArt ?? Track.findAlbum(track, albumData)?.hasTrackArt ?? true)
+        }
+    },
 
     // Previously known as: (track).aka
     originalReleaseTrackByRef: Thing.common.singleReference(Track),
