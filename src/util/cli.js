@@ -179,35 +179,52 @@ export async function parseOptions(options, optionDescriptorMap) {
 export const handleDashless = Symbol();
 export const handleUnknown = Symbol();
 
-export function decorateTime(functionToBeWrapped) {
+export function decorateTime(arg1, arg2) {
+    const [ id, functionToBeWrapped ] =
+        ((typeof arg1 === 'string' || typeof arg1 === 'symbol')
+            ? [arg1, arg2]
+            : [Symbol(arg1.name), arg1]);
+
+    const meta = decorateTime.idMetaMap[id] ?? {
+        wrappedName: functionToBeWrapped.name,
+        timeSpent: 0,
+        timesCalled: 0,
+        displayTime() {
+            const averageTime = meta.timeSpent / meta.timesCalled;
+            console.log(`\x1b[1m${typeof id === 'symbol' ? id.description : id}(...):\x1b[0m ${meta.timeSpent} ms / ${meta.timesCalled} calls \x1b[2m(avg: ${averageTime} ms)\x1b[0m`);
+        }
+    };
+
+    decorateTime.idMetaMap[id] = meta;
+
     const fn = function(...args) {
         const start = Date.now();
         const ret = functionToBeWrapped(...args);
         const end = Date.now();
-        fn.timeSpent += end - start;
-        fn.timesCalled++;
+        meta.timeSpent += end - start;
+        meta.timesCalled++;
         return ret;
     };
 
-    fn.wrappedName = functionToBeWrapped.name;
-    fn.timeSpent = 0;
-    fn.timesCalled = 0;
-    fn.displayTime = function() {
-        const averageTime = fn.timeSpent / fn.timesCalled;
-        console.log(`\x1b[1m${fn.wrappedName}(...):\x1b[0m ${fn.timeSpent} ms / ${fn.timesCalled} calls \x1b[2m(avg: ${averageTime} ms)\x1b[0m`);
-    };
-
-    decorateTime.decoratedFunctions.push(fn);
+    fn.displayTime = meta.displayTime;
 
     return fn;
 }
 
-decorateTime.decoratedFunctions = [];
+decorateTime.idMetaMap = Object.create(null);
+
 decorateTime.displayTime = function() {
-    if (decorateTime.decoratedFunctions.length) {
+    const map = decorateTime.idMetaMap;
+
+    const keys = [
+        ...Object.getOwnPropertySymbols(map),
+        ...Object.getOwnPropertyNames(map)
+    ];
+
+    if (keys.length) {
         console.log(`\x1b[1mdecorateTime results: ` + '-'.repeat(40) + '\x1b[0m');
-        for (const fn of decorateTime.decoratedFunctions) {
-            fn.displayTime();
+        for (const key of keys) {
+            map[key].displayTime();
         }
     }
 };

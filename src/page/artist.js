@@ -61,7 +61,7 @@ export function write(artist, {wikiData}) {
     });
 
     const artListChunks = chunkByProperties(sortByDate(artThingsAll.flatMap(thing =>
-        (['coverArtists', 'wallpaperArtists', 'bannerArtists']
+        (['coverArtistContribs', 'wallpaperArtistContribs', 'bannerArtistContribs']
             .map(key => getArtistsAndContrib(thing, key))
             .filter(({ contrib }) => contrib)
             .map(props => ({
@@ -91,14 +91,14 @@ export function write(artist, {wikiData}) {
             date: +track.date,
             album: track.album,
             duration: track.duration,
-            artists: (track.artists.some(({ who }) => who === artist)
-                ? track.artists.filter(({ who }) => who !== artist)
-                : track.contributors.filter(({ who }) => who !== artist)),
+            artists: (track.artistContribs.some(({ who }) => who === artist)
+                ? track.artistContribs.filter(({ who }) => who !== artist)
+                : track.contributorContribs.filter(({ who }) => who !== artist)),
             contrib: {
                 who: artist,
                 what: [
-                    track.artists.find(({ who }) => who === artist)?.what,
-                    track.contributors.find(({ who }) => who === artist)?.what
+                    track.artistContribs.find(({ who }) => who === artist)?.what,
+                    track.contributorContribs.find(({ who }) => who === artist)?.what
                 ].filter(Boolean).join(', ')
             }
         })), ['date', 'album'])
@@ -138,7 +138,7 @@ export function write(artist, {wikiData}) {
                 // want to show the full list of other contri8utors inline.
                 // (It can often 8e very, very large!)
                 artists: [],
-                contrib: flash.contributors.find(({ who }) => who === artist)
+                contrib: flash.contributorContribs.find(({ who }) => who === artist)
             })), ['act'])
             .map(({ act, chunk }) => ({
                 act, chunk,
@@ -241,21 +241,21 @@ export function write(artist, {wikiData}) {
 
             return {
                 albums: {
-                    asCoverArtist: artist.albumsAsCoverArtist?.map(serializeArtistsAndContrib('coverArtists')),
-                    asWallpaperArtist: artist.albumsAsWallpaperArtist?.map(serializeArtistsAndContrib('wallpaperArtists')),
-                    asBannerArtist: artist.albumsAsBannerArtist?.map(serializeArtistsAndContrib('bannerArtists'))
+                    asCoverArtist: artist.albumsAsCoverArtist?.map(serializeArtistsAndContrib('coverArtistContribs')),
+                    asWallpaperArtist: artist.albumsAsWallpaperArtist?.map(serializeArtistsAndContrib('wallpaperArtistContribs')),
+                    asBannerArtist: artist.albumsAsBannerArtist?.map(serializeArtistsAndContrib('bannerArtistContribs'))
                 },
                 flashes: wikiInfo.enableFlashesAndGames ? {
                     asContributor: (artist.flashesAsContributor
-                        ?.map(flash => getArtistsAndContrib(flash, 'contributors'))
+                        ?.map(flash => getArtistsAndContrib(flash, 'contributorContribs'))
                         .map(({ contrib, thing: flash }) => ({
                             link: serializeLink(flash),
                             contribution: contrib.what
                         })))
                 } : null,
                 tracks: {
-                    asArtist: artist.tracksAsArtist.map(serializeArtistsAndContrib('artists')),
-                    asContributor: artist.tracksAsContributor.map(serializeArtistsAndContrib('contributors')),
+                    asArtist: artist.tracksAsArtist.map(serializeArtistsAndContrib('artistContribs')),
+                    asContributor: artist.tracksAsContributor.map(serializeArtistsAndContrib('contributorContribs')),
                     chunked: {
                         released: serializeTrackListChunks(releasedTrackListChunks),
                         unreleased: serializeTrackListChunks(unreleasedTrackListChunks)

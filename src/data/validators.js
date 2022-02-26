@@ -1,6 +1,6 @@
 import { withAggregate } from '../util/sugar.js';
 
-import { color, ENABLE_COLOR } from '../util/cli.js';
+import { color, ENABLE_COLOR, decorateTime } from '../util/cli.js';
 
 import { inspect as nodeInspect } from 'util';
 
@@ -155,7 +155,7 @@ function validateArrayItemsHelper(itemValidator) {
 export function validateArrayItems(itemValidator) {
     const fn = validateArrayItemsHelper(itemValidator);
 
-    return array => {
+    return decorateTime('validateArrayItems -> work', array => {
         isArray(array);
 
         withAggregate({message: 'Errors validating array items'}, ({ wrap }) => {
@@ -163,7 +163,7 @@ export function validateArrayItems(itemValidator) {
         });
 
         return true;
-    };
+    });
 }
 
 export function validateInstanceOf(constructor) {

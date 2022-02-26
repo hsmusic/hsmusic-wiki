@@ -358,7 +358,27 @@ Thing.common = {
         update: {
             validate: validateArrayItems(validateInstanceOf(thingClass))
         }
-    })
+    }),
+
+    // This one's kinda tricky: it parses artist "references" from the
+    // commentary content, and finds the matching artist for each reference.
+    // This is mostly useful for credits and listings on artist pages.
+    commentatorArtists: () => ({
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['artistData', 'commentary'],
+
+            compute: ({ artistData, commentary }) => (
+                (artistData && commentary
+                    ? Array.from(new Set((Array
+                        .from(commentary
+                            .replace(/<\/?b>/g, '')
+                            .matchAll(/<i>(?<who>.*?):<\/i>/g))
+                        .map(({ groups: {who} }) => find.artist(who, {wikiData: {artistData}, quiet: true})))))
+                    : []))
+        }
+    }),
 };
 
 // Get a reference to a thing (e.g. track:showtime-piano-refrain), using its
@@ -444,6 +464,8 @@ Album.propertyDescriptors = {
 
     // Previously known as: (album).artists
     artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
+
+    commentatorArtists: Thing.common.commentatorArtists(),
 
     tracks: {
         flags: {expose: true},
@@ -587,6 +609,8 @@ Track.propertyDescriptors = {
 
     // Expose only
 
+    commentatorArtists: Thing.common.commentatorArtists(),
+
     album: {
         flags: {expose: true},
 
@@ -688,6 +712,18 @@ Track.propertyDescriptors = {
 
 // -> Artist
 
+Artist.filterByContrib = (thingDataProperty, contribsProperty) => ({
+    flags: {expose: true},
+
+    expose: {
+        dependencies: [thingDataProperty],
+
+        compute: ({ [thingDataProperty]: thingData, [Artist.instance]: artist }) => (
+            thingData?.filter(({ [contribsProperty]: contribs }) => (
+                contribs?.some(contrib => contrib.who === artist))))
+    }
+});
+
 Artist.propertyDescriptors = {
     // Update & expose
 
@@ -708,7 +744,10 @@ Artist.propertyDescriptors = {
 
     // Update only
 
+    albumData: Thing.common.wikiData(Album),
     artistData: Thing.common.wikiData(Artist),
+    flashData: Thing.common.wikiData(Flash),
+    trackData: Thing.common.wikiData(Track),
 
     // Expose only
 
@@ -725,18 +764,53 @@ Artist.propertyDescriptors = {
         }
     },
 
-    // albumsAsCoverArtist
-    // albumsAsWallpaperArtist
-    // albumsAsBannerArtist
-    // albumsAsCommentator
+    tracksAsArtist: Artist.filterByContrib('trackData', 'artistContribs'),
+    tracksAsContributor: Artist.filterByContrib('trackData', 'contributorContribs'),
+    tracksAsCoverArtist: Artist.filterByContrib('trackData', 'coverArtistContribs'),
 
-    // tracksAsAny
-    // tracksAsArtist
-    // tracksAsContributor
-    // tracksAsCoverArtist
-    // tracksAsCommentator
+    tracksAsAny: {
+        flags: {expose: true},
 
-    // flashesAsContributor
+        expose: {
+            dependencies: ['trackData'],
+
+            compute: ({ trackData, [Artist.instance]: artist }) => (
+                trackData?.filter(track => (
+                    [
+                        ...track.artistContribs,
+                        ...track.contributorContribs,
+                        ...track.coverArtistContribs
+                    ].some(({ who }) => who === artist))))
+        }
+    },
+
+    tracksAsCommentator: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['trackData'],
+
+            compute: ({ trackData, [Artist.instance]: artist }) => (
+                trackData.filter(({ commentatorArtists }) => commentatorArtists?.includes(artist)))
+        }
+    },
+
+    albumsAsCoverArtist: Artist.filterByContrib('albumData', 'coverArtistContribs'),
+    albumsAsWallpaperArtist: Artist.filterByContrib('albumData', 'wallpaperArtistContribs'),
+    albumsAsBannerArtist: Artist.filterByContrib('albumData', 'bannerArtistContribs'),
+
+    albumsAsCommentator: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['albumData'],
+
+            compute: ({ albumData, [Artist.instance]: artist }) => (
+                albumData.filter(({ commentatorArtists }) => commentatorArtists?.includes(artist)))
+        }
+    },
+
+    flashesAsContributor: Artist.filterByContrib('flashData', 'contributorContribs'),
 };
 
 // -> Group

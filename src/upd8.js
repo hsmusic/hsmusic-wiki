@@ -2736,56 +2736,26 @@ async function main() {
     // result (many of which are required for page HTML generation).
 
     function linkDataArrays() {
-        for (const album of WD.albumData) {
-            album.artistData = WD.artistData;
-            album.groupData = WD.groupData;
-            album.trackData = WD.trackData;
-
-            for (const trackGroup of album.trackGroups) {
-                trackGroup.trackData = WD.trackData;
+        function assignWikiData(things, ...keys) {
+            for (let i = 0; i < things.length; i++) {
+                for (let j = 0; j < keys.length; j++) {
+                    const key = keys[j];
+                    things[i][key] = wikiData[key];
+                }
             }
         }
 
-        for (const track of WD.trackData) {
-            track.albumData = WD.albumData;
-            track.artistData = WD.artistData;
-            track.artTagData = WD.artTagData;
-            track.flashData = WD.flashData;
-            track.trackData = WD.trackData;
-        }
+        assignWikiData(WD.albumData, 'artistData', 'groupData', 'trackData');
+        WD.albumData.forEach(album => assignWikiData(album.trackGroups, 'trackData'));
 
-        for (const artist of WD.artistData) {
-            artist.artistData = WD.artistData;
-        }
-
-        for (const group of WD.groupData) {
-            group.albumData = WD.albumData;
-            group.groupCategoryData = WD.groupCategoryData;
-        }
-
-        for (const category of WD.groupCategoryData) {
-            category.groupData = WD.groupData;
-        }
-
-        for (const flash of WD.flashData) {
-            flash.artistData = WD.artistData;
-            flash.trackData = WD.trackData;
-            flash.flashActData = WD.flashActData;
-        }
-
-        for (const act of WD.flashActData) {
-            act.flashData = WD.flashData;
-        }
-
-        for (const artTag of WD.artTagData) {
-            artTag.albumData = WD.albumData;
-            artTag.trackData = WD.trackData;
-        }
-
-        for (const row of WD.homepageLayout.rows) {
-            row.albumData = WD.albumData;
-            row.groupData = WD.groupData;
-        }
+        assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
+        assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
+        assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
+        assignWikiData(WD.groupCategoryData, 'groupData');
+        assignWikiData(WD.flashData, 'artistData', 'flashActData', 'trackData');
+        assignWikiData(WD.flashActData, 'flashData');
+        assignWikiData(WD.artTagData, 'albumData', 'trackData');
+        assignWikiData(WD.homepageLayout.rows, 'albumData', 'groupData');
     }
 
     // Extra organization stuff needed for listings and the like.
@@ -2820,6 +2790,7 @@ async function main() {
     // console.log(WD.homepageLayout.rows[0].countAlbumsFromGroup);
     // console.log(WD.albumData.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
     // console.log(WD.groupData.find(g => g.name === 'Fandom').albums.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
+    // console.log(WD.trackData.find(t => t.name === 'Another Chance').commentatorArtists.map(artist => `${artist.name} - commentated ${artist.tracksAsCommentator.length} tracks, ${artist.albumsAsCommentator.length} albums`).join('\n'));
     // return;
 
     // Update languages o8ject with the wiki-specified default language!
@@ -3430,8 +3401,6 @@ async function main() {
         wikiData
     });
 
-    decorateTime.displayTime();
-
     // The single most important step.
     logInfo`Written!`;
 }
@@ -3443,5 +3412,6 @@ main().catch(error => {
         console.error(error);
     }
 }).then(() => {
+    decorateTime.displayTime();
     CacheableObject.showInvalidAccesses();
 });
