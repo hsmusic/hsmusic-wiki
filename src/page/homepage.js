@@ -57,9 +57,9 @@ export function writeTargetless({wikiData}) {
                                         ).concat(row.sourceAlbums.map(album => ({item: album}))),
                                         lazy: i > 0
                                     })}
-                                    ${row.actions?.length && fixWS`
+                                    ${row.actionLinks?.length && fixWS`
                                         <div class="grid-actions">
-                                            ${row.actions.map(action => transformInline(action)
+                                            ${row.actionLinks.map(action => transformInline(action)
                                                 .replace('<a', '<a class="box grid-item"')).join('\n')}
                                         </div>
                                     `}
