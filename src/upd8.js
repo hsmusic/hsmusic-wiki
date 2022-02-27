@@ -424,7 +424,7 @@ const replacerSpec = {
     }
 };
 
-if (!validateReplacerSpec(replacerSpec, unbound_link)) {
+if (!validateReplacerSpec(replacerSpec, {find, link: unbound_link})) {
     process.exit();
 }
 
@@ -2049,6 +2049,35 @@ async function wrapLanguages(fn, {writeOneLanguage = null}) {
     }
 }
 
+// Handy utility function for binding the find.thing() functions to a complete
+// wikiData object, optionally taking default options to provide to the find
+// function. Note that this caches the arrays read from wikiData right when it's
+// called, so if their values change, you'll have to continue with a fresh call
+// to indFind.
+function bindFind(wikiData, opts1) {
+    return Object.fromEntries(Object.entries({
+        album: 'albumData',
+        artist: 'artistData',
+        artTag: 'artTagData',
+        flash: 'flashData',
+        group: 'groupData',
+        listing: 'listingSpec',
+        newsEntry: 'newsData',
+        staticPage: 'staticPageData',
+        track: 'trackData',
+    }).map(([ key, value ]) => {
+        const findFn = find[key];
+        const thingData = wikiData[value];
+        return [key, (opts1
+            ? (ref, opts2) => (opts2
+                ? findFn(ref, thingData, {...opts1, ...opts2})
+                : findFn(ref, thingData, opts1))
+            : (ref, opts2) => (opts2
+                ? findFn(ref, thingData, opts2)
+                : findFn(ref, thingData)))];
+    }));
+}
+
 async function main() {
     Error.stackTraceLimit = Infinity;
 
@@ -2106,6 +2135,13 @@ async function main() {
         // Or, if you *only* want to gener8te newly upd8ted thum8nails, you can
         // pass this flag! It exits 8efore 8uilding the rest of the site.
         'thumbs-only': {
+            type: 'flag'
+        },
+
+        // Just working on data entries and not interested in actually
+        // generating site HTML yet? This flag will cut execution off right
+        // 8efore any site 8uilding actually happens.
+        'no-build': {
             type: 'flag'
         },
 
@@ -2182,6 +2218,7 @@ async function main() {
 
     const skipThumbs = miscOptions['skip-thumbs'] ?? false;
     const thumbsOnly = miscOptions['thumbs-only'] ?? false;
+    const noBuild = miscOptions['no-build'] ?? false;
     const showAggregateTraces = miscOptions['show-traces'] ?? false;
 
     const niceShowAggregate = (error, ...opts) => {
@@ -2244,7 +2281,9 @@ async function main() {
 
     logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
 
-    if (writeOneLanguage && !(writeOneLanguage in languages)) {
+    if (noBuild) {
+        logInfo`Not generating any site or page files this run (--no-build passed).`;
+    } else if (writeOneLanguage && !(writeOneLanguage in languages)) {
         logError`Specified to write only ${writeOneLanguage}, but there is no strings file with this language code!`;
         return;
     } else if (writeOneLanguage) {
@@ -2765,25 +2804,137 @@ async function main() {
             albumData: sortByDate(WD.albumData.slice()),
             trackData: sortByDate(WD.trackData.slice())
         });
+
+        // Re-link data arrays, so that every object has the new, sorted
+        // versions. Note that the sorting step deliberately creates new arrays
+        // (mutating slices instead of the original arrays) - this is so that
+        // the object caching system understands that it's working with a new
+        // ordering.  We still need to actually provide those updated arrays
+        // over again!
+        linkDataArrays();
     }
 
-    // Now post-process data in three steps...
+    // Warn about references across data which don't match anything.
+    // This involves using the find() functions on all references, setting it to
+    // 'error' mode, and collecting everything in a structured logged (which
+    // gets logged if there are any errors). At the same time, we remove errored
+    // references from the thing's data array.
 
-    // 1. Link data arrays so that all essential references between objects are
-    // are complete, so properties (like dates!) are inherited where that's
+    const referenceSpec = [
+        ['albumData', {
+            artistContribsByRef: '_contrib',
+            coverArtistContribsByRef: '_contrib',
+            trackCoverArtistContribsByRef: '_contrib',
+            wallpaperArtistContribsByRef: '_contrib',
+            bannerArtistContribsByRef: '_contrib',
+            groupsByRef: 'group',
+            artTagsByRef: 'artTag',
+        }],
+
+        ['trackData', {
+            artistContribsByRef: '_contrib',
+            contributorContribsByRef: '_contrib',
+            coverArtistContribsByRef: '_contrib',
+            referencedTracksByRef: 'track',
+            artTagsByRef: 'artTag',
+            originalReleaseTrackByRef: 'track',
+        }],
+
+        ['groupCategoryData', {
+            groupsByRef: 'group',
+        }],
+
+        ['homepageLayout.rows', {
+            sourceGroupsByRef: 'group',
+            sourceAlbumsByRef: 'album',
+        }],
+
+        ['flashData', {
+            contributorContribsByRef: '_contrib',
+            featuredTracksByRef: 'track',
+        }],
+
+        ['flashActData', {
+            flashesByRef: 'flash',
+        }],
+    ];
+
+    function getNestedProp(obj, key) {
+        const recursive = (o, k) => (k.length === 1
+            ? o[k[0]]
+            : recursive(o[k[0]], k.slice(1)));
+        const keys = key.split(/(?<=(?<!\\)(?:\\\\)*)\./);
+        return recursive(obj, keys);
+    }
+
+    function filterAndShowReferenceErrors() {
+        const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
+        const boundFind = bindFind(wikiData, {mode: 'error'});
+        for (const [ thingDataProp, propSpec ] of referenceSpec) {
+            const thingData = getNestedProp(wikiData, thingDataProp);
+            aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({ nest }) => {
+                for (const thing of thingData) {
+                    nest({message: `Reference errors in ${inspect(thing)}`}, ({ filter }) => {
+                        for (const [ property, findFnKey ] of Object.entries(propSpec)) {
+                            if (!thing[property]) continue;
+                            if (findFnKey === '_contrib') {
+                                thing[property] = filter(thing[property],
+                                    decorateErrorWithIndex(({ who }) => boundFind.artist(who)),
+                                    {message: `Reference errors in contributions ${color.green(property)}`});
+                                continue;
+                            }
+                            const findFn = boundFind[findFnKey];
+                            const value = thing[property];
+                            if (Array.isArray(value)) {
+                                thing[property] = filter(value, decorateErrorWithIndex(findFn),
+                                    {message: `Reference errors in property ${color.green(property)}`});
+                            } else {
+                                nest({message: `Reference error in property ${color.green(property)}`}, ({ call }) => {
+                                    try {
+                                        call(findFn, value);
+                                    } catch (error) {
+                                        thing[property] = null;
+                                        throw error;
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        let errorless = true;
+        try {
+            aggregate.close();
+        } catch (error) {
+            niceShowAggregate(error);
+            logWarn`The above errors were detected while validating references in data files.`;
+            logWarn`If the remaining valid data is complete enough, the wiki will still build -`;
+            logWarn`but all errored references will be skipped.`;
+            logWarn`(Resolve errors for more complete output!)`;
+            errorless = false;
+        }
+
+        if (errorless) {
+            logInfo`All references validated without any errors - nice!`;
+            logInfo`(This means all references between things, such as leitmotif references`
+            logInfo` and artist credits, will be fully accounted for during page generation.)`;
+        }
+    }
+
+    // Link data arrays so that all essential references between objects are
+    // complete, so properties (like dates!) are inherited where that's
     // appropriate.
     linkDataArrays();
 
-    // 2. Sort data arrays so that they're all in order! This may use properties
+    // Filter out any reference errors throughout the data, warning about them
+    // too.
+    filterAndShowReferenceErrors();
+
+    // Sort data arrays so that they're all in order! This may use properties
     // which are only available after the initial linking.
     sortDataArrays();
-
-    // 3. Re-link data arrays, so that every object has the new, sorted
-    // versions. Note that the sorting step deliberately creates new arrays
-    // (mutating slices instead of the original arrays) - this is so that the
-    // object caching system understands that it's working with a new ordering.
-    // We still need to actually provide those updated arrays over again!
-    linkDataArrays();
 
     // const track = WD.trackData.find(t => t.name === 'Under the Sun');
     // console.log(track.album.trackGroups.find(tg => tg.tracks.includes(track)).color, track.color);
@@ -2816,7 +2967,7 @@ async function main() {
         const tagRefs = new Set([...WD.trackData, ...WD.albumData].flatMap(thing => thing.artTagsByRef ?? []));
 
         for (const ref of tagRefs) {
-            if (find.artTag(ref, {wikiData})) {
+            if (find.artTag(ref, WD.artTagData)) {
                 tagRefs.delete(ref);
             }
         }
@@ -2845,75 +2996,6 @@ async function main() {
         }) ?? []);
     });
 
-    // TODO: this should probably be some kinda generalized function lol
-    {
-        const aggregate = openAggregate({message: `Errors validating artist references in data`});
-
-        const sources = [
-            [WD.albumData, [
-                'artistContribsByRef',
-                'coverArtistContribsByRef',
-                'trackCoverArtistContribsByRef',
-                'wallpaperArtistContribsByRef',
-                'bannerArtistContribsByRef'
-            ]],
-            [WD.trackData, [
-                'artistContribsByRef',
-                'contributorContribsByRef',
-                'coverArtistContribsByRef'
-            ]],
-            [WD.flashData, [
-                'contributorContribsByRef'
-            ]]
-        ]
-
-        for (const [ things, properties ] of sources) {
-            if (!things) {
-                continue;
-            }
-
-            for (const thing of things) {
-                aggregate.nest({message: `Errors for ${thing.constructor.name} ${color.green(thing.name)} (${color.green(Thing.getReference(thing))})`}, thingAgg => {
-                    for (const prop of properties) {
-                        const contribs = thing[prop];
-                        if (!contribs) {
-                            continue;
-                        }
-                        thingAgg.nest({message: `Errors for property ${color.green(prop)}`}, propAgg => {
-                            for (const { who: ref } of contribs) {
-                                propAgg.call(() => {
-                                    const entryAlias = find.artist(ref, {wikiData: {artistData: wikiData.artistAliasData}, quiet: true});
-                                    if (entryAlias) {
-                                        const orig = find.artist(entryAlias.aliasedArtistRef, {wikiData: {artistData: wikiData.artistData}, quiet: true});
-                                        throw new Error(`Reference ${color.red(ref)} is to an alias, reference ${color.green(orig.name)} instead`);
-                                    }
-                                    const entry = find.artist(ref, {wikiData: {artistData: wikiData.artistData}, quiet: true});
-                                    if (!entry) {
-                                        throw new Error(`No entry found for reference ${color.red(ref)}`);
-                                    }
-                                    if (
-                                        ref.toLowerCase() === entry.name.toLowerCase() &&
-                                        ref !== entry.name
-                                    ) {
-                                        throw new Error(`Miscapitalized name ${color.red(ref)}, reference ${color.green(entry.name)} instead`);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        }
-
-        try {
-            aggregate.close();
-        } catch (error) {
-            niceShowAggregate(error);
-            // TODO: more graceful auto-resolve, filter out invalid references
-            return;
-        }
-    }
-
     {
         const directories = [];
         for (const { directory, name } of WD.albumData) {
@@ -2941,102 +3023,10 @@ async function main() {
         }
     }
 
-    /*
-    const bound = {
-        findGroup: x => find.group(x, {wikiData}),
-        findTrack: x => find.track(x, {wikiData}),
-        findTag: x => find.tag(x, {wikiData})
-    };
-
-    for (const track of WD.trackData) {
-        const context = () => track.album.name;
-        track.aka = find.track(track.aka, {wikiData});
-        mapAndFilter(track, 'references', {map: bound.findTrack, context});
-        mapAndFilter(track, 'artTags', {map: bound.findTag, context});
-    }
-
-    for (const track1 of WD.trackData) {
-        track1.referencedBy = WD.trackData.filter(track2 => track2.references.includes(track1));
-        track1.otherReleases = [
-            track1.aka,
-            ...WD.trackData.filter(track2 =>
-                track2.aka === track1 ||
-                (track1.aka && track2.aka === track1.aka))
-        ].filter(x => x && x !== track1);
-    }
-
-    for (const album of WD.albumData) {
-        mapAndFilter(album, 'groups', {map: bound.findGroup});
-        mapAndFilter(album, 'artTags', {map: bound.findTag});
-    }
-
-    mapAndFilter(WD, 'artistAliasData', {
-        map: artist => {
-            artist.alias = find.artist(artist.alias, {wikiData});
-            return artist;
-        },
-        filter: artist => artist.alias
-    });
-
-    for (const group of WD.groupData) {
-        group.albums = WD.albumData.filter(album => album.groups.includes(group));
-        group.category = WD.groupCategoryData.find(x => x.name === group.category);
-    }
-
-    for (const category of WD.groupCategoryData) {
-        category.groups = WD.groupData.filter(x => x.category === category);
-    }
-
-    const albumAndTrackDataSortedByArtDateMan = sortByArtDate([...WD.albumData, ...WD.trackData]);
-
-    for (const tag of WD.artTagData) {
-        tag.things = albumAndTrackDataSortedByArtDateMan.filter(thing => thing.artTags.includes(tag));
-    }
-
-    if (WD.wikiInfo.enableFlashesAndGames) {
-        for (const flash of WD.flashData) {
-            flash.act = WD.flashActData.find(act => act.name === flash.act);
-            mapAndFilter(flash, 'tracks', {map: bound.findTrack});
-        }
-
-        for (const act of WD.flashActData) {
-            act.flashes = WD.flashData.filter(flash => flash.act === act);
-        }
-
-        for (const track of WD.trackData) {
-            track.flashes = WD.flashData.filter(flash => flash.tracks.includes(track));
-        }
-    }
-
-    for (const artist of WD.artistData) {
-        const filterProp = (array, prop) => array.filter(thing => thing[prop]?.some(({ who }) => who === artist));
-        const filterCommentary = array => array.filter(thing => thing.commentary && thing.commentary.replace(/<\/?b>/g, '').includes('<i>' + artist.name + ':</i>'));
-        artist.tracks = {
-            asArtist: filterProp(WD.trackData, 'artists'),
-            asCommentator: filterCommentary(WD.trackData),
-            asContributor: filterProp(WD.trackData, 'contributors'),
-            asCoverArtist: filterProp(WD.trackData, 'coverArtists'),
-            asAny: WD.trackData.filter(track => (
-                [...track.artists, ...track.contributors, ...track.coverArtists || []].some(({ who }) => who === artist)
-            ))
-        };
-        artist.albums = {
-            asArtist: filterProp(WD.albumData, 'artists'),
-            asCommentator: filterCommentary(WD.albumData),
-            asCoverArtist: filterProp(WD.albumData, 'coverArtists'),
-            asWallpaperArtist: filterProp(WD.albumData, 'wallpaperArtists'),
-            asBannerArtist: filterProp(WD.albumData, 'bannerArtists')
-        };
-        if (WD.wikiInfo.enableFlashesAndGames) {
-            artist.flashes = {
-                asContributor: filterProp(WD.flashData, 'contributors')
-            };
-        }
-    }
-    */
-
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
+
+    if (noBuild) return;
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
     // performance right now 'cuz it'll w8 for file writes to 8e completed
@@ -3248,7 +3238,10 @@ async function main() {
                     to
                 });
 
+                bound.find = bindFind(wikiData, {mode: 'warn'});
+
                 bound.transformInline = bindOpts(transformInline, {
+                    find: bound.find,
                     link: bound.link,
                     replacerSpec,
                     strings,

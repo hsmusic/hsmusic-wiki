@@ -155,7 +155,7 @@ function validateArrayItemsHelper(itemValidator) {
 export function validateArrayItems(itemValidator) {
     const fn = validateArrayItemsHelper(itemValidator);
 
-    return decorateTime('validateArrayItems -> work', array => {
+    return array => {
         isArray(array);
 
         withAggregate({message: 'Errors validating array items'}, ({ wrap }) => {
@@ -163,7 +163,7 @@ export function validateArrayItems(itemValidator) {
         });
 
         return true;
-    });
+    };
 }
 
 export function validateInstanceOf(constructor) {

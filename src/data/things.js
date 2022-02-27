@@ -34,6 +34,9 @@ import {
 
 import find from '../util/find.js';
 
+import { inspect } from 'util';
+import { color } from '../util/cli.js';
+
 // Stub classes (and their exports) at the top of the file - these are
 // referenced later when we actually define static class fields. We deliberately
 // define the classes and set their static fields in two separate steps so that
@@ -216,17 +219,17 @@ Thing.common = {
     // matching actual Thing-subclass objects.
     dynamicThingsFromReferenceList: (
         referenceListProperty,
-        wikiDataProperty,
+        thingDataProperty,
         findFn
     ) => ({
         flags: {expose: true},
 
         expose: {
-            dependencies: [referenceListProperty, wikiDataProperty],
-            compute: ({ [referenceListProperty]: refs, [wikiDataProperty]: wikiData }) => (
-                (refs && wikiData
+            dependencies: [referenceListProperty, thingDataProperty],
+            compute: ({ [referenceListProperty]: refs, [thingDataProperty]: thingData }) => (
+                (refs && thingData
                     ? (refs
-                        .map(ref => findFn(ref, {wikiData: {[wikiDataProperty]: wikiData}}))
+                        .map(ref => findFn(ref, thingData, {mode: 'quiet'}))
                         .filter(Boolean))
                     : [])
             )
@@ -236,17 +239,15 @@ Thing.common = {
     // Corresponding function for a single reference.
     dynamicThingFromSingleReference: (
         singleReferenceProperty,
-        wikiDataProperty,
+        thingDataProperty,
         findFn
     ) => ({
         flags: {expose: true},
 
         expose: {
-            dependencies: [singleReferenceProperty, wikiDataProperty],
-            compute: ({ [singleReferenceProperty]: ref, [wikiDataProperty]: wikiData }) => (
-                (ref && wikiData
-                    ? findFn(ref, {wikiData: {[wikiDataProperty]: wikiData}})
-                    : [])
+            dependencies: [singleReferenceProperty, thingDataProperty],
+            compute: ({ [singleReferenceProperty]: ref, [thingDataProperty]: thingData }) => (
+                (ref && thingData ? findFn(ref, thingData, {mode: 'quiet'}) : [])
             )
         }
     }),
@@ -274,7 +275,7 @@ Thing.common = {
                 ((contribsByRef && artistData)
                     ? (contribsByRef
                         .map(({ who: ref, what }) => ({
-                            who: find.artist(ref, {wikiData: {artistData}}),
+                            who: find.artist(ref, artistData),
                             what
                         }))
                         .filter(({ who }) => who))
@@ -293,24 +294,24 @@ Thing.common = {
     dynamicInheritContribs: (
         contribsByRefProperty,
         parentContribsByRefProperty,
-        wikiDataProperty,
+        thingDataProperty,
         findFn
     ) => ({
         flags: {expose: true},
         expose: {
-            dependencies: [contribsByRefProperty, wikiDataProperty, 'artistData'],
+            dependencies: [contribsByRefProperty, thingDataProperty, 'artistData'],
             compute({
                 [Thing.instance]: thing,
                 [contribsByRefProperty]: contribsByRef,
-                [wikiDataProperty]: wikiData,
+                [thingDataProperty]: thingData,
                 artistData
             }) {
                 if (!artistData) return [];
-                const refs = (contribsByRef ?? findFn(thing, wikiData)?.[parentContribsByRefProperty]);
+                const refs = (contribsByRef ?? findFn(thing, thingData, {mode: 'quiet'})?.[parentContribsByRefProperty]);
                 if (!refs) return [];
                 return (refs
                     .map(({ who: ref, what }) => ({
-                        who: find.artist(ref, {wikiData: {artistData}}),
+                        who: find.artist(ref, artistData),
                         what
                     }))
                     .filter(({ who }) => who));
@@ -375,7 +376,7 @@ Thing.common = {
                         .from(commentary
                             .replace(/<\/?b>/g, '')
                             .matchAll(/<i>(?<who>.*?):<\/i>/g))
-                        .map(({ groups: {who} }) => find.artist(who, {wikiData: {artistData}, quiet: true})))))
+                        .map(({ groups: {who} }) => find.artist(who, artistData, {mode: 'quiet'})))))
                     : []))
         }
     }),
@@ -392,6 +393,18 @@ Thing.getReference = function(thing) {
         throw TypeError(`Passed ${thing.constructor.name} is missing its directory`);
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
+};
+
+// Default custom inspect function, which may be overridden by Thing subclasses.
+// This will be used when displaying aggregate errors and other in command-line
+// logging - it's the place to provide information useful in identifying the
+// Thing being presented.
+Thing.prototype[inspect.custom] = function() {
+    const cname = this.constructor.name;
+
+    return (this.name
+        ? `${cname} ${color.green(`"${this.name}"`)}`
+        : `${cname}`);
 };
 
 // -> Album
@@ -476,7 +489,7 @@ Album.propertyDescriptors = {
                 (trackGroups && trackData
                     ? (trackGroups
                         .flatMap(group => group.tracksByRef ?? [])
-                        .map(ref => find.track(ref, {wikiData: {trackData}}))
+                        .map(ref => find.track(ref, trackData))
                         .filter(Boolean))
                     : [])
             )
@@ -537,7 +550,7 @@ TrackGroup.propertyDescriptors = {
             compute: ({ tracksByRef, trackData }) => (
                 (tracksByRef && trackData
                     ? (tracksByRef
-                        .map(ref => find.track(ref, {wikiData: {trackData}}))
+                        .map(ref => find.track(ref, trackData))
                         .filter(Boolean))
                     : [])
             )
@@ -570,12 +583,12 @@ Track.propertyDescriptors = {
 
     hasURLs: Thing.common.flag(true),
 
-    referencedTracksByRef: Thing.common.referenceList(Track),
-    artTagsByRef: Thing.common.referenceList(ArtTag),
-
     artistContribsByRef: Thing.common.contribsByRef(),
     contributorContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
+
+    referencedTracksByRef: Thing.common.referenceList(Track),
+    artTagsByRef: Thing.common.referenceList(ArtTag),
 
     hasCoverArt: {
         flags: {update: true, expose: true},
@@ -676,7 +689,7 @@ Track.propertyDescriptors = {
                     return [];
                 }
 
-                const tOrig = find.track(ref1, {wikiData: {trackData}});
+                const tOrig = find.track(ref1, trackData);
                 if (!tOrig) {
                     return [];
                 }
@@ -688,7 +701,7 @@ Track.propertyDescriptors = {
                         return (
                             t2 !== t1 &&
                             ref2 &&
-                            find.track(ref2, {wikiData: {trackData}}) === tOrig
+                            find.track(ref2, trackData) === tOrig
                         );
                     })
                 ];
@@ -716,6 +729,13 @@ Track.propertyDescriptors = {
 
     artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
 };
+
+Track.prototype[inspect.custom] = function() {
+    const base = Thing.prototype[inspect.custom].apply(this);
+    return (this.album?.name
+        ? base + ` (from ${color.green(this.album.name)})`
+        : base);
+}
 
 // -> Artist
 
@@ -765,7 +785,7 @@ Artist.propertyDescriptors = {
             dependencies: ['artistData', 'aliasedArtistRef'],
             compute: ({ artistData, aliasedArtistRef }) => (
                 (aliasedArtistRef && artistData
-                    ? find.artist(aliasedArtistRef, {wikiData: {artistData}}, {quiet: true})
+                    ? find.artist(aliasedArtistRef, artistData, {mode: 'quiet'})
                     : null)
             )
         }
@@ -1095,9 +1115,9 @@ Flash.propertyDescriptors = {
         update: {validate: isFileExtension}
     },
 
-    featuredTracksByRef: Thing.common.referenceList(Track),
-
     contributorContribsByRef: Thing.common.contribsByRef(),
+
+    featuredTracksByRef: Thing.common.referenceList(Track),
 
     urls: Thing.common.urls(),
 

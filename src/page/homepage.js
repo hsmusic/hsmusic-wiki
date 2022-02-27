@@ -4,8 +4,6 @@
 
 import fixWS from 'fix-whitespace';
 
-import find from '../util/find.js';
-
 import * as html from '../util/html.js';
 
 import {

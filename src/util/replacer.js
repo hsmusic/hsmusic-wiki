@@ -1,8 +1,7 @@
-import find from './find.js';
 import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
 
-export function validateReplacerSpec(replacerSpec, link) {
+export function validateReplacerSpec(replacerSpec, {find, link}) {
     let success = true;
 
     for (const [key, {link: linkKey, find: findKey, value, html}] of Object.entries(replacerSpec)) {
@@ -320,7 +319,7 @@ export function parseInput(input) {
 }
 
 function evaluateTag(node, opts) {
-    const { input, link, replacerSpec, strings, to, wikiData } = opts;
+    const { find, input, link, replacerSpec, strings, to, wikiData } = opts;
 
     const source = input.slice(node.i, node.iEnd);
 
@@ -348,7 +347,7 @@ function evaluateTag(node, opts) {
         valueFn ? valueFn(replacerValue) :
         findKey ? find[findKey]((replacerKeyImplied
             ? replacerValue
-            : replacerKey + `:` + replacerValue), {wikiData}) :
+            : replacerKey + `:` + replacerValue)) :
         {
             directory: replacerValue,
             name: null
@@ -417,13 +416,14 @@ function transformNodes(nodes, opts) {
     return nodes.map(node => transformNode(node, opts)).join('');
 }
 
-export function transformInline(input, {replacerSpec, link, strings, to, wikiData}) {
+export function transformInline(input, {replacerSpec, find, link, strings, to, wikiData}) {
     if (!replacerSpec) throw new Error('Expected replacerSpec');
+    if (!find) throw new Error('Expected find');
     if (!link) throw new Error('Expected link');
     if (!strings) throw new Error('Expected strings');
     if (!to) throw new Error('Expected to');
     if (!wikiData) throw new Error('Expected wikiData');
 
     const nodes = parseInput(input);
-    return transformNodes(nodes, {input, link, replacerSpec, strings, to, wikiData});
+    return transformNodes(nodes, {input, find, link, replacerSpec, strings, to, wikiData});
 }
