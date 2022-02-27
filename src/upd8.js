@@ -2879,7 +2879,14 @@ async function main() {
                             if (!thing[property]) continue;
                             if (findFnKey === '_contrib') {
                                 thing[property] = filter(thing[property],
-                                    decorateErrorWithIndex(({ who }) => boundFind.artist(who)),
+                                    decorateErrorWithIndex(({ who }) => {
+                                        const alias = find.artist(who, wikiData.artistAliasData, {mode: 'quiet'});
+                                        if (alias) {
+                                            const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
+                                            throw new Error(`Reference ${color.red(who)} is to an alias, should be ${color.green(original.name)}`);
+                                        }
+                                        return boundFind.artist(who);
+                                    }),
                                     {message: `Reference errors in contributions ${color.green(property)}`});
                                 continue;
                             }
@@ -2927,6 +2934,18 @@ async function main() {
     // complete, so properties (like dates!) are inherited where that's
     // appropriate.
     linkDataArrays();
+
+    WD.artistAliasData = wikiData.artistData.flatMap(artist => {
+        const origRef = Thing.getReference(artist);
+        return (artist.aliasNames?.map(name => {
+            const alias = new Artist();
+            alias.name = name;
+            alias.isAlias = true;
+            alias.aliasedArtistRef = origRef;
+            alias.artistData = WD.artistData;
+            return alias;
+        }) ?? []);
+    });
 
     // Filter out any reference errors throughout the data, warning about them
     // too.
@@ -2983,18 +3002,6 @@ async function main() {
     WD.justEverythingMan = sortByDate([...WD.albumData, ...WD.trackData, ...(WD.flashData || [])]);
     WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
-
-    WD.artistAliasData = wikiData.artistData.flatMap(artist => {
-        const origRef = Thing.getReference(artist);
-        return (artist.aliasNames?.map(name => {
-            const alias = new Artist();
-            alias.name = name;
-            alias.isAlias = true;
-            alias.aliasedArtistRef = origRef;
-            alias.artistData = WD.artistData;
-            return alias;
-        }) ?? []);
-    });
 
     {
         const directories = [];
