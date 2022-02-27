@@ -1,5 +1,7 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
+import { fileURLToPath } from 'url';
+
 // Very cool function origin8ting in... http-music pro8a8ly!
 // Sorry if we happen to 8e violating past-us's copyright, lmao.
 export function promisifyProcess(proc, showLogging = true) {
@@ -24,4 +26,12 @@ export function promisifyProcess(proc, showLogging = true) {
             }
         })
     })
+}
+
+// Handy-dandy utility function for detecting whether the passed URL is the
+// running JavaScript file. This takes `import.meta.url` from ES6 modules, which
+// is great 'cuz (module === require.main) doesn't work without CommonJS
+// modules.
+export function isMain(importMetaURL) {
+    return (process.argv[1] === fileURLToPath(importMetaURL));
 }

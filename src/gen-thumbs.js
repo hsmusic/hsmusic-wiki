@@ -100,6 +100,7 @@ import {
 } from './util/cli.js';
 
 import {
+    isMain,
     promisifyProcess,
 } from './util/node-utils.js';
 
@@ -303,4 +304,30 @@ export default async function genThumbs(mediaPath, {
     }
 
     return true;
+}
+
+if (isMain(import.meta.url)) {
+    (async function() {
+        const miscOptions = await parseOptions(process.argv.slice(2), {
+            'media-path': {
+                type: 'value'
+            },
+            'queue-size': {
+                type: 'value',
+                validate(size) {
+                    if (parseInt(size) !== parseFloat(size)) return 'an integer';
+                    if (parseInt(size) < 0) return 'a counting number or zero';
+                    return true;
+                }
+            },
+            queue: {alias: 'queue-size'},
+        });
+
+        const mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+        const queueSize = +(miscOptions['queue-size'] ?? 0);
+
+        await genThumbs(mediaPath, {queueSize});
+    })().catch(err => {
+        console.error(err);
+    });
 }
