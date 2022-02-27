@@ -671,21 +671,28 @@ Track.propertyDescriptors = {
         expose: {
             dependencies: ['originalReleaseTrackByRef', 'trackData'],
 
-            compute: ({ originalReleaseTrackByRef: ref1, trackData, [Track.instance]: t1 }) => (
-                (ref1 && trackData
-                    ? [
-                        find.track(ref1, {wikiData: {trackData}}),
-                        ...trackData.filter(t2 => {
-                            const { originalReleaseTrackByRef: ref2 } = t2;
-                            return (
-                                t2 !== t1 &&
-                                ref2 &&
-                                (
-                                    find.track(ref2, {wikiData: {trackData}}) ===
-                                    find.track(ref1, {wikiData: {trackData}})))
-                        })]
-                    : [])
-            )
+            compute: ({ originalReleaseTrackByRef: ref1, trackData, [Track.instance]: t1 }) => {
+                if (!(ref1 && trackData)) {
+                    return [];
+                }
+
+                const tOrig = find.track(ref1, {wikiData: {trackData}});
+                if (!tOrig) {
+                    return [];
+                }
+
+                return [
+                    tOrig,
+                    ...trackData.filter(t2 => {
+                        const { originalReleaseTrackByRef: ref2 } = t2;
+                        return (
+                            t2 !== t1 &&
+                            ref2 &&
+                            find.track(ref2, {wikiData: {trackData}}) === tOrig
+                        );
+                    })
+                ];
+            }
         }
     },
 
