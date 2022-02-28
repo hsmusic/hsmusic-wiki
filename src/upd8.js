@@ -2917,16 +2917,16 @@ async function main() {
                                         }
                                         return boundFind.artist(who);
                                     }),
-                                    {message: `Reference errors in contributions ${color.green(property)}`});
+                                    {message: `Reference errors in contributions ${color.green(property)} (${color.green('find.artist')})`});
                                 continue;
                             }
                             const findFn = boundFind[findFnKey];
                             const value = thing[property];
                             if (Array.isArray(value)) {
                                 thing[property] = filter(value, decorateErrorWithIndex(findFn),
-                                    {message: `Reference errors in property ${color.green(property)}`});
+                                    {message: `Reference errors in property ${color.green(property)} (${color.green('find.' + findFnKey)})`});
                             } else {
-                                nest({message: `Reference error in property ${color.green(property)}`}, ({ call }) => {
+                                nest({message: `Reference error in property ${color.green(property)} (${color.green('find.' + findFnKey)})`}, ({ call }) => {
                                     try {
                                         call(findFn, value);
                                     } catch (error) {
