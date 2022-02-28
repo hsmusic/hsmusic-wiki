@@ -891,66 +891,6 @@ const processAlbumDocument = makeProcessDocument(Album, {
     }
 });
 
-function processAlbumEntryDocuments(documents) {
-    // Slightly separate meanings: tracks is the array of Track objects (and
-    // only Track objects); trackGroups is the array of TrackGroup objects,
-    // organizing (by string reference) the Track objects within the Album.
-    // tracks is returned for collating with the rest of wiki data; trackGroups
-    // is directly set on the album object.
-    const tracks = [];
-    const trackGroups = [];
-
-    // We can't mutate an array once it's set as a property value, so prepare
-    // the tracks that will show up in a track list all the way before actually
-    // applying it.
-    let currentTracksByRef = null;
-    let currentTrackGroupDoc = null;
-
-    let trackIndex = 0;
-
-    function closeCurrentTrackGroup() {
-        if (currentTracksByRef) {
-            let trackGroup;
-
-            if (currentTrackGroupDoc) {
-                trackGroup = processTrackGroupDocument(currentTrackGroupDoc);
-            } else {
-                trackGroup = new TrackGroup();
-                trackGroup.isDefaultTrackGroup = true;
-            }
-
-            trackGroup.startIndex = trackIndex;
-            trackGroup.tracksByRef = currentTracksByRef;
-            trackGroups.push(trackGroup);
-        }
-    }
-
-    for (const doc of documents) {
-        if (doc['Group']) {
-            closeCurrentTrackGroup();
-            currentTracksByRef = [];
-            currentTrackGroupDoc = doc;
-            continue;
-        }
-
-        trackIndex++;
-
-        const track = processTrackDocument(doc);
-        tracks.push(track);
-
-        const ref = Thing.getReference(track);
-        if (currentTracksByRef) {
-            currentTracksByRef.push(ref);
-        } else {
-            currentTracksByRef = [ref];
-        }
-    }
-
-    closeCurrentTrackGroup();
-
-    return {tracks, trackGroups};
-}
-
 const processTrackGroupDocument = makeProcessDocument(TrackGroup, {
     fieldTransformations: {
         'Date Originally Released': value => new Date(value),
@@ -2353,8 +2293,6 @@ async function main() {
                     : processTrackDocument(document));
             },
 
-            // processEntryDocuments: processAlbumEntryDocuments,
-
             save(results) {
                 const albumData = [];
                 const trackData = [];
@@ -2367,6 +2305,8 @@ async function main() {
                     const trackGroups = [];
                     let currentTracksByRef = null;
                     let currentTrackGroup = null;
+
+                    const albumRef = Thing.getReference(album);
 
                     function closeCurrentTrackGroup() {
                         if (currentTracksByRef) {
@@ -2396,11 +2336,13 @@ async function main() {
 
                         trackData.push(entry);
 
-                        const ref = Thing.getReference(entry);
+                        entry.dataSourceAlbumByRef = albumRef;
+
+                        const trackRef = Thing.getReference(entry);
                         if (currentTracksByRef) {
-                            currentTracksByRef.push(ref);
+                            currentTracksByRef.push(trackRef);
                         } else {
-                            currentTracksByRef = [ref];
+                            currentTracksByRef = [trackRef];
                         }
                     }
 
@@ -2826,6 +2768,82 @@ async function main() {
         linkDataArrays();
     }
 
+    // Warn about directories which are reused across more than one of the same
+    // type of Thing. Directories are the unique identifier for most data
+    // objects across the wiki, so we have to make sure they aren't duplicated!
+    // This also altogether filters out instances of things with duplicate
+    // directories (so if two tracks share the directory "megalovania", they'll
+    // both be skipped for the build, for example).
+
+    const deduplicateSpec = [
+        'albumData',
+        'artTagData',
+        'flashData',
+        'groupData',
+        'newsData',
+        'trackData',
+    ];
+
+    let duplicateDirectoriesErrored = false;
+
+    function filterAndShowDuplicateDirectories() {
+        const aggregate = openAggregate({message: `Duplicate directories found`});
+        for (const thingDataProp of deduplicateSpec) {
+            const thingData = wikiData[thingDataProp];
+            aggregate.nest({message: `Duplicate directories found in ${color.green('wikiData.' + thingDataProp)}`}, ({ call }) => {
+                const directoryPlaces = Object.create(null);
+                const duplicateDirectories = [];
+                for (const thing of thingData) {
+                    const { directory } = thing;
+                    if (directory in directoryPlaces) {
+                        directoryPlaces[directory].push(thing);
+                        duplicateDirectories.push(directory);
+                    } else {
+                        directoryPlaces[directory] = [thing];
+                    }
+                }
+                if (!duplicateDirectories.length) return;
+                duplicateDirectories.sort((a, b) => {
+                    const aL = a.toLowerCase();
+                    const bL = b.toLowerCase();
+                    return aL < bL ? -1 : aL > bL ? 1 : 0;
+                });
+                for (const directory of duplicateDirectories) {
+                    const places = directoryPlaces[directory];
+                    call(() => {
+                        throw new Error(`Duplicate directory ${color.green(directory)}:\n` +
+                            places.map(thing => ` - ` + inspect(thing)).join('\n'));
+                    });
+                }
+                const allDuplicatedThings = Object.values(directoryPlaces).filter(arr => arr.length > 1).flat();
+                const filteredThings = thingData.filter(thing => !allDuplicatedThings.includes(thing));
+                wikiData[thingDataProp] = filteredThings;
+            });
+        }
+
+        let errorless = true;
+
+        try {
+            aggregate.close();
+        } catch (aggregate) {
+            niceShowAggregate(aggregate);
+            logWarn`The above duplicate directories were detected while reviewing data files.`;
+            logWarn`Each thing listed above will been totally excempt from this build of the site!`;
+            logWarn`Specify unique 'Directory' fields in data entries to resolve these.`;
+            logWarn`${`Note:`} This will probably result in reference errors below.`;
+            logWarn`${`. . .`} You should fix duplicate directories first!`;
+            logWarn`(Resolve errors for more complete output!)`;
+            duplicateDirectoriesErrored = true;
+            errorless = false;
+        }
+
+        if (errorless) {
+            logInfo`No duplicate directories found - nice!`;
+        }
+
+        linkDataArrays();
+    }
+
     // Warn about references across data which don't match anything.
     // This involves using the find() functions on all references, setting it to
     // 'error' mode, and collecting everything in a structured logged (which
@@ -2931,6 +2949,10 @@ async function main() {
             logWarn`The above errors were detected while validating references in data files.`;
             logWarn`If the remaining valid data is complete enough, the wiki will still build -`;
             logWarn`but all errored references will be skipped.`;
+            if (duplicateDirectoriesErrored) {
+                logWarn`${`Note:`} Duplicate directories were found as well. Review those first,`;
+                logWarn`${`. . .`} as they may have caused some of the errors detected above.`;
+            }
             logWarn`(Resolve errors for more complete output!)`;
             errorless = false;
         }
@@ -2946,6 +2968,10 @@ async function main() {
     // complete, so properties (like dates!) are inherited where that's
     // appropriate.
     linkDataArrays();
+
+    // Filter out any things with duplicate directories throughout the data,
+    // warning about them too.
+    filterAndShowDuplicateDirectories();
 
     // Filter out any reference errors throughout the data, warning about them
     // too.
@@ -3002,33 +3028,6 @@ async function main() {
     WD.justEverythingMan = sortByDate([...WD.albumData, ...WD.trackData, ...(WD.flashData || [])]);
     WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
     // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
-
-    {
-        const directories = [];
-        for (const { directory, name } of WD.albumData) {
-            if (directories.includes(directory)) {
-                console.log(`\x1b[31;1mDuplicate album directory "${directory}" (${name})\x1b[0m`);
-                return;
-            }
-            directories.push(directory);
-        }
-    }
-
-    {
-        const directories = [];
-        const where = {};
-        for (const { directory, album } of WD.trackData) {
-            if (directories.includes(directory)) {
-                console.log(`\x1b[31;1mDuplicate track directory "${directory}"\x1b[0m`);
-                console.log(`Shows up in:`);
-                console.log(`- ${album.name}`);
-                console.log(`- ${where[directory].name}`);
-                return;
-            }
-            directories.push(directory);
-            where[directory] = album;
-        }
-    }
 
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));

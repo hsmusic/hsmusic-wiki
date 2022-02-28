@@ -404,7 +404,9 @@ Thing.prototype[inspect.custom] = function() {
 
     return (this.name
         ? `${cname} ${color.green(`"${this.name}"`)}`
-        : `${cname}`);
+        : `${cname}`) + (this.directory
+            ? ` (${color.blue(Thing.getReference(this))})`
+            : '');
 };
 
 // -> Album
@@ -489,7 +491,7 @@ Album.propertyDescriptors = {
                 (trackGroups && trackData
                     ? (trackGroups
                         .flatMap(group => group.tracksByRef ?? [])
-                        .map(ref => find.track(ref, trackData))
+                        .map(ref => find.track(ref, trackData, {mode: 'quiet'}))
                         .filter(Boolean))
                     : [])
             )
@@ -605,6 +607,8 @@ Track.propertyDescriptors = {
     // Previously known as: (track).aka
     originalReleaseTrackByRef: Thing.common.singleReference(Track),
 
+    dataSourceAlbumByRef: Thing.common.singleReference(Album),
+
     commentary: {
         flags: {update: true, expose: true},
         update: {validate: isCommentary}
@@ -633,6 +637,15 @@ Track.propertyDescriptors = {
                 albumData?.find(album => album.tracks.includes(track)) ?? null)
         }
     },
+
+    // Note - this is an internal property used only to help identify a track.
+    // It should not be assumed in general that the album and dataSourceAlbum match
+    // (i.e. a track may dynamically be moved from one album to another, at
+    // which point dataSourceAlbum refers to where it was originally from, and is
+    // not generally relevant information). It's also not guaranteed that
+    // dataSourceAlbum is available (depending on the Track creator to optionally
+    // provide dataSourceAlbumByRef).
+    dataSourceAlbum: Thing.common.dynamicThingFromSingleReference('dataSourceAlbumByRef', 'albumData', find.album),
 
     date: {
         flags: {expose: true},
@@ -732,8 +745,14 @@ Track.propertyDescriptors = {
 
 Track.prototype[inspect.custom] = function() {
     const base = Thing.prototype[inspect.custom].apply(this);
-    return (this.album?.name
-        ? base + ` (from ${color.green(this.album.name)})`
+
+    const { album, dataSourceAlbum } = this;
+    const albumName = (album ? album.name : dataSourceAlbum?.name);
+    const albumIndex = albumName && (album ? album.tracks.indexOf(this) : dataSourceAlbum.tracks.indexOf(this));
+    const trackNum = (albumIndex === -1 ? '#?' : `#${albumIndex + 1}`);
+
+    return (albumName
+        ? base + ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
         : base);
 }
 
