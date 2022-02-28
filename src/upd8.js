@@ -2423,6 +2423,18 @@ async function main() {
 
             save(results) {
                 wikiData.artistData = results;
+
+                wikiData.artistAliasData = results.flatMap(artist => {
+                    const origRef = Thing.getReference(artist);
+                    return (artist.aliasNames?.map(name => {
+                        const alias = new Artist();
+                        alias.name = name;
+                        alias.isAlias = true;
+                        alias.aliasedArtistRef = origRef;
+                        alias.artistData = WD.artistData;
+                        return alias;
+                    }) ?? []);
+                });
             }
         },
 
@@ -2934,18 +2946,6 @@ async function main() {
     // complete, so properties (like dates!) are inherited where that's
     // appropriate.
     linkDataArrays();
-
-    WD.artistAliasData = wikiData.artistData.flatMap(artist => {
-        const origRef = Thing.getReference(artist);
-        return (artist.aliasNames?.map(name => {
-            const alias = new Artist();
-            alias.name = name;
-            alias.isAlias = true;
-            alias.aliasedArtistRef = origRef;
-            alias.artistData = WD.artistData;
-            return alias;
-        }) ?? []);
-    });
 
     // Filter out any reference errors throughout the data, warning about them
     // too.
