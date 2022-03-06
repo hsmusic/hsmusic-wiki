@@ -186,7 +186,7 @@ export function write(album, {wikiData}) {
                                 links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true})))
                             })
                         }</p>`}
-                        ${album.trackGroups ? fixWS`
+                        ${album.trackGroups && (album.trackGroups.length > 1 || !album.trackGroups[0].isDefaultTrackGroup) ? fixWS`
                             <dl class="album-group-list">
                                 ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
                                     <dt>${
