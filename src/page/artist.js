@@ -32,7 +32,7 @@ export function targets({wikiData}) {
 export function write(artist, {wikiData}) {
     const { groupData, wikiInfo } = wikiData;
 
-    const { name, urls, note } = artist;
+    const { name, urls, contextNotes } = artist;
 
     const artThingsAll = sortByDate(unique([
         ...artist.albumsAsCoverArtist ?? [],
@@ -295,10 +295,10 @@ export function write(artist, {wikiData}) {
                             alt: strings('misc.alt.artistAvatar')
                         })}
                         <h1>${strings('artistPage.title', {artist: name})}</h1>
-                        ${note && fixWS`
+                        ${contextNotes && fixWS`
                             <p>${strings('releaseInfo.note')}</p>
                             <blockquote>
-                                ${transformMultiline(note)}
+                                ${transformMultiline(contextNotes)}
                             </blockquote>
                             <hr>
                         `}
