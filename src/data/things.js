@@ -526,11 +526,6 @@ TrackGroup.propertyDescriptors = {
         }
     },
 
-    startIndex: {
-        flags: {update: true, expose: true},
-        update: {validate: isWholeNumber}
-    },
-
     dateOriginallyReleased: Thing.common.simpleDate(),
 
     tracksByRef: Thing.common.referenceList(Track),
@@ -560,6 +555,17 @@ TrackGroup.propertyDescriptors = {
                         .filter(Boolean))
                     : [])
             )
+        }
+    },
+
+    startIndex: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['album'],
+            compute: ({ album, [TrackGroup.instance]: trackGroup }) => (album.trackGroups
+                .slice(0, album.trackGroups.indexOf(trackGroup))
+                .reduce((acc, tg) => acc + tg.tracks.length, 0))
         }
     },
 };
