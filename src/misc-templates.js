@@ -111,8 +111,8 @@ export function getRevealStringFromWarnings(warnings, {strings}) {
 }
 
 export function getRevealStringFromTags(tags, {strings}) {
-    return tags && tags.some(tag => tag.isCW) && (
-        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isCW).map(tag => tag.name)), {strings}));
+    return tags && tags.some(tag => tag.isContentWarning) && (
+        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isContentWarning).map(tag => tag.name)), {strings}));
 }
 
 // Cover art links
@@ -145,11 +145,11 @@ export function generateCoverLink({
                 square: true,
                 reveal: getRevealStringFromTags(tags, {strings})
             })}
-            ${wikiInfo.enableArtTagUI && tags.filter(tag => !tag.isCW).length && fixWS`
+            ${wikiInfo.enableArtTagUI && tags.filter(tag => !tag.isContentWarning).length && fixWS`
                 <p class="tags">
                     ${strings('releaseInfo.artTags')}
                     ${(tags
-                        .filter(tag => !tag.isCW)
+                        .filter(tag => !tag.isContentWarning)
                         .map(link.tag)
                         .join(',\n'))}
                 </p>

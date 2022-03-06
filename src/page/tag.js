@@ -11,7 +11,7 @@ export function condition({wikiData}) {
 }
 
 export function targets({wikiData}) {
-    return wikiData.artTagData.filter(tag => !tag.isCW);
+    return wikiData.artTagData.filter(tag => !tag.isContentWarning);
 }
 
 export function write(tag, {wikiData}) {
@@ -82,7 +82,7 @@ function generateTagNav(tag, {
     wikiData
 }) {
     const previousNextLinks = generatePreviousNextLinks(tag, {
-        data: wikiData.artTagData.filter(tag => !tag.isCW),
+        data: wikiData.artTagData.filter(tag => !tag.isContentWarning),
         linkKey: 'tag'
     });
 

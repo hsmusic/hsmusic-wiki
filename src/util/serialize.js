@@ -33,8 +33,8 @@ export function serializeCover(thing, pathFunction, {
 
     const { artTags } = thing;
 
-    const cwTags = artTags.filter(tag => tag.isCW);
-    const linkTags = artTags.filter(tag => !tag.isCW);
+    const cwTags = artTags.filter(tag => tag.isContentWarning);
+    const linkTags = artTags.filter(tag => !tag.isContentWarning);
 
     return {
         paths: serializeImagePaths(coverPath),

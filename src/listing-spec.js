@@ -724,7 +724,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.artTagData
-                .filter(tag => !tag.isCW)
+                .filter(tag => !tag.isContentWarning)
                 .sort(sortByName)
                 .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}));
         },
@@ -744,7 +744,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.artTagData
-                .filter(tag => !tag.isCW)
+                .filter(tag => !tag.isContentWarning)
                 .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}))
                 .sort((a, b) => b.timesUsed - a.timesUsed);
         },
