@@ -120,7 +120,7 @@ export function write(album, {wikiData}) {
                     `--album-directory: ${album.directory}`
                 ]),
 
-                banner: album.bannerArtists && {
+                banner: album.bannerArtistContribs && {
                     dimensions: album.bannerDimensions,
                     path: ['media.albumBanner', album.directory, album.bannerFileExtension],
                     alt: strings('misc.alt.albumBanner'),

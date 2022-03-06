@@ -136,6 +136,13 @@ Thing.common = {
         update: {validate: validateArrayItems(isURL)}
     }),
 
+    // A file extension! Or the default, if provided when calling this.
+    fileExtension: (defaultFileExtension = null) => ({
+        flags: {update: true, expose: true},
+        update: {validate: isFileExtension},
+        expose: {transform: value => value ?? defaultFileExtension}
+    }),
+
     // Straightforward flag descriptor for a variety of property purposes.
     // Provide a default value, true or false!
     flag: (defaultValue = false) => {
@@ -442,19 +449,10 @@ Album.propertyDescriptors = {
     },
 
     wallpaperStyle: Thing.common.simpleString(),
-
-    wallpaperFileExtension: {
-        flags: {update: true, expose: true},
-        update: {validate: isFileExtension}
-    },
+    wallpaperFileExtension: Thing.common.fileExtension('jpg'),
 
     bannerStyle: Thing.common.simpleString(),
-
-    bannerFileExtension: {
-        flags: {update: true, expose: true},
-        update: {validate: isFileExtension}
-    },
-
+    bannerFileExtension: Thing.common.fileExtension('jpg'),
     bannerDimensions: {
         flags: {update: true, expose: true},
         update: {validate: isDimensions}
@@ -1132,10 +1130,7 @@ Flash.propertyDescriptors = {
 
     date: Thing.common.simpleDate(),
 
-    coverArtFileExtension: {
-        flags: {update: true, expose: true},
-        update: {validate: isFileExtension}
-    },
+    coverArtFileExtension: Thing.common.fileExtension('jpg'),
 
     contributorContribsByRef: Thing.common.contribsByRef(),
 
