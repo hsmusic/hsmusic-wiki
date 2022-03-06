@@ -477,8 +477,11 @@ Album.propertyDescriptors = {
 
     // Expose only
 
-    // Previously known as: (album).artists
     artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
+    coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
+    trackCoverArtistContribs: Thing.common.dynamicContribs('trackCoverArtistContribsByRef'),
+    wallpaperArtistContribs: Thing.common.dynamicContribs('wallpaperArtistContribsByRef'),
+    bannerArtistContribs: Thing.common.dynamicContribs('bannerArtistContribsByRef'),
 
     commentatorArtists: Thing.common.commentatorArtists(),
 

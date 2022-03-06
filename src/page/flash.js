@@ -55,15 +55,15 @@ export function write(flash, {wikiData}) {
                             ...flash.urls ?? []
                         ].map(url => fancifyFlashURL(url, flash)))
                     })}</p>`}
-                    ${flash.tracks?.length && fixWS`
+                    ${flash.featuredTracks && fixWS`
                         <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                         <ul>
-                            ${(flash.tracks
+                            ${(flash.featuredTracks
                                 .map(track => strings('trackList.item.withArtists', {
                                     track: link.track(track),
                                     by: `<span class="by">${
                                         strings('trackList.item.withArtists.by', {
-                                            artists: getArtistString(track.artists)
+                                            artists: getArtistString(track.artistContribs)
                                         })
                                     }</span>`
                                 }))
@@ -186,8 +186,8 @@ function generateNavForFlash(flash, {
             <div>
                 ${generateChronologyLinks(flash, {
                     headingString: 'misc.chronology.heading.flash',
-                    contribKey: 'contributors',
-                    getThings: artist => artist.flashes.asContributor
+                    contribKey: 'contributorContribs',
+                    getThings: artist => artist.flashesAsContributor
                 })}
             </div>
         `

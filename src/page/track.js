@@ -103,9 +103,9 @@ export function write(track, {wikiData}) {
             duration: track.duration,
             color: track.color,
             cover: serializeCover(track, getTrackCover),
-            artists: serializeContribs(track.artists),
-            contributors: serializeContribs(track.contributors),
-            coverArtists: serializeContribs(track.coverArtists || []),
+            artistsContribs: serializeContribs(track.artistContribs),
+            contributorContribs: serializeContribs(track.contributorContribs),
+            coverArtistContribs: serializeContribs(track.coverArtistContribs || []),
             album: serializeLink(track.album),
             groups: serializeGroupsForTrack(track),
             references: track.references.map(serializeLink),
@@ -174,7 +174,7 @@ export function write(track, {wikiData}) {
                                         showIcons: true
                                     })
                                 }),
-                                track.coverArtists && strings('releaseInfo.coverArtBy', {
+                                track.coverArtistContribs && strings('releaseInfo.coverArtBy', {
                                     artists: getArtistString(track.coverArtistContribs, {
                                         showContrib: true,
                                         showIcons: true

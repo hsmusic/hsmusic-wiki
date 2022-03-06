@@ -74,10 +74,10 @@ export function write(album, {wikiData}) {
             duration: albumDuration,
             color: album.color,
             cover: serializeCover(album, getAlbumCover),
-            artists: serializeContribs(album.artists || []),
-            coverArtists: serializeContribs(album.coverArtists || []),
-            wallpaperArtists: serializeContribs(album.wallpaperArtists || []),
-            bannerArtists: serializeContribs(album.bannerArtists || []),
+            artistContribs: serializeContribs(album.artistContribs || []),
+            coverArtistContribs: serializeContribs(album.coverArtistContribs || []),
+            wallpaperArtistContribs: serializeContribs(album.wallpaperArtistContribs || []),
+            bannerArtistContribs: serializeContribs(album.bannerArtistContribs || []),
             groups: serializeGroupsForAlbum(album),
             trackGroups: album.trackGroups?.map(trackGroup => ({
                 name: trackGroup.name,
@@ -137,26 +137,26 @@ export function write(album, {wikiData}) {
                         <h1>${strings('albumPage.title', {album: album.name})}</h1>
                         <p>
                             ${[
-                                album.artists && strings('releaseInfo.by', {
-                                    artists: getArtistString(album.artists, {
+                                album.artistContribs.length && strings('releaseInfo.by', {
+                                    artists: getArtistString(album.artistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
-                                album.coverArtists && strings('releaseInfo.coverArtBy', {
-                                    artists: getArtistString(album.coverArtists, {
+                                album.coverArtistContribs.length && strings('releaseInfo.coverArtBy', {
+                                    artists: getArtistString(album.coverArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
-                                album.wallpaperArtists && strings('releaseInfo.wallpaperArtBy', {
-                                    artists: getArtistString(album.wallpaperArtists, {
+                                album.wallpaperArtistContribs.length && strings('releaseInfo.wallpaperArtBy', {
+                                    artists: getArtistString(album.wallpaperArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
-                                album.bannerArtists && strings('releaseInfo.bannerArtBy', {
-                                    artists: getArtistString(album.bannerArtists, {
+                                album.bannerArtistContribs.length && strings('releaseInfo.bannerArtBy', {
+                                    artists: getArtistString(album.bannerArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
@@ -399,14 +399,14 @@ export function generateAlbumNavLinks(album, currentTrack, {
 export function generateAlbumChronologyLinks(album, currentTrack, {generateChronologyLinks}) {
     return [
         currentTrack && generateChronologyLinks(currentTrack, {
-            contribKey: 'artists',
-            getThings: artist => [...artist.tracks.asArtist, ...artist.tracks.asContributor],
+            contribKey: 'artistContribs',
+            getThings: artist => [...artist.tracksAsArtist, ...artist.tracksAsContributor],
             headingString: 'misc.chronology.heading.track'
         }),
         generateChronologyLinks(currentTrack || album, {
-            contribKey: 'coverArtists',
+            contribKey: 'coverArtistContribs',
             dateKey: 'coverArtDate',
-            getThings: artist => [...artist.albums.asCoverArtist, ...artist.tracks.asCoverArtist],
+            getThings: artist => [...artist.albumsAsCoverArtist, ...artist.tracksAsCoverArtist],
             headingString: 'misc.chronology.heading.coverArt'
         })
     ].filter(Boolean).join('\n');
