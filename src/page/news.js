@@ -105,10 +105,7 @@ function generateNewsEntryNav(entry, {
 
     return {
         links: [
-            {
-                path: ['localized.home'],
-                title: wikiInfo.shortName
-            },
+            {toHome: true},
             {
                 path: ['localized.newsIndex'],
                 title: strings('newsEntryPage.nav.news')

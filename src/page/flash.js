@@ -162,10 +162,7 @@ function generateNavForFlash(flash, {
 
     return {
         links: [
-            {
-                path: ['localized.home'],
-                title: wikiInfo.shortName
-            },
+            {toHome: true},
             {
                 path: ['localized.flashIndex'],
                 title: strings('flashIndex.title')
