@@ -98,7 +98,7 @@ export function filterAlbumsByCommentary(albums) {
 }
 
 export function getAlbumCover(album, {to}) {
-    return to('media.albumCover', album.directory);
+    return to('media.albumCover', album.directory, album.coverArtFileExtension);
 }
 
 export function getAlbumListTag(album) {
@@ -143,9 +143,7 @@ export function getArtistCommentary(artist, {justEverythingMan}) {
 }
 
 export function getFlashCover(flash, {to}) {
-    return (flash.jiff
-        ? to('media.flashArtGif', flash.directory)
-        : to('media.flashArt', flash.directory));
+    return to('media.flashArt', flash.directory, flash.coverArtFileExtension);
 }
 
 export function getFlashLink(flash) {
@@ -162,8 +160,12 @@ export function getTrackCover(track, {to}) {
     if (!track.hasCoverArt) {
         return getAlbumCover(track.album, {to});
     } else {
-        return to('media.trackCover', track.album.directory, track.directory);
+        return to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension);
     }
+}
+
+export function getArtistAvatar(artist, {to}) {
+    return to('media.artistAvatar', artist.directory, artist.avatarFileExtension);
 }
 
 // Big-ass homepage row functions

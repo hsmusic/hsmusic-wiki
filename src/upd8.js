@@ -159,6 +159,7 @@ import {
     getAlbumCover,
     getAlbumListTag,
     getAllTracks,
+    getArtistAvatar,
     getArtistCommentary,
     getArtistNumContributions,
     getFlashCover,
@@ -867,6 +868,9 @@ const processAlbumDocument = makeProcessDocument(Album, {
         coverArtistContribsByRef: 'Cover Artists',
         trackCoverArtistContribsByRef: 'Default Track Cover Artists',
 
+        coverArtFileExtension: 'Cover Art File Extension',
+        trackCoverArtFileExtension: 'Track Art File Extension',
+
         wallpaperArtistContribsByRef: 'Wallpaper Artists',
         wallpaperStyle: 'Wallpaper Style',
         wallpaperFileExtension: 'Wallpaper File Extension',
@@ -923,6 +927,7 @@ const processTrackDocument = makeProcessDocument(Track, {
         urls: 'URLs',
 
         coverArtDate: 'Cover Art Date',
+        coverArtFileExtension: 'Cover Art File Extension',
         dateFirstReleased: 'Date First Released',
         hasCoverArt: 'Has Cover Art',
         hasURLs: 'Has URLs',
@@ -947,6 +952,8 @@ const processArtistDocument = makeProcessDocument(Artist, {
 
         directory: 'Directory',
         urls: 'URLs',
+        hasAvatar: 'Has Avatar',
+        avatarFileExtension: 'Avatar File Extension',
 
         aliasNames: 'Aliases',
 
@@ -3298,6 +3305,10 @@ async function main() {
                 });
 
                 bound.getFlashCover = bindOpts(getFlashCover, {
+                    to
+                });
+
+                bound.getArtistAvatar = bindOpts(getArtistAvatar, {
                     to
                 });
 

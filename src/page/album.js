@@ -74,10 +74,10 @@ export function write(album, {wikiData}) {
             duration: albumDuration,
             color: album.color,
             cover: serializeCover(album, getAlbumCover),
-            artistContribs: serializeContribs(album.artistContribs || []),
-            coverArtistContribs: serializeContribs(album.coverArtistContribs || []),
-            wallpaperArtistContribs: serializeContribs(album.wallpaperArtistContribs || []),
-            bannerArtistContribs: serializeContribs(album.bannerArtistContribs || []),
+            artistContribs: serializeContribs(album.artistContribs),
+            coverArtistContribs: serializeContribs(album.coverArtistContribs),
+            wallpaperArtistContribs: serializeContribs(album.wallpaperArtistContribs),
+            bannerArtistContribs: serializeContribs(album.bannerArtistContribs),
             groups: serializeGroupsForAlbum(album),
             trackGroups: album.trackGroups?.map(trackGroup => ({
                 name: trackGroup.name,
@@ -98,6 +98,7 @@ export function write(album, {wikiData}) {
             fancifyURL,
             generateChronologyLinks,
             generateCoverLink,
+            getAlbumCover,
             getAlbumStylesheet,
             getArtistString,
             getLinkThemeString,
@@ -120,7 +121,7 @@ export function write(album, {wikiData}) {
                     `--album-directory: ${album.directory}`
                 ]),
 
-                banner: album.bannerArtistContribs && {
+                banner: album.bannerArtistContribs.length && {
                     dimensions: album.bannerDimensions,
                     path: ['media.albumBanner', album.directory, album.bannerFileExtension],
                     alt: strings('misc.alt.albumBanner'),
@@ -130,7 +131,7 @@ export function write(album, {wikiData}) {
                 main: {
                     content: fixWS`
                         ${generateCoverLink({
-                            path: ['media.albumCover', album.directory],
+                            src: getAlbumCover(album),
                             alt: strings('misc.alt.albumCover'),
                             tags: album.artTags
                         })}

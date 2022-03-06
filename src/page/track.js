@@ -149,7 +149,7 @@ export function write(track, {wikiData}) {
 
                 // disabled for now! shifting banner position per height of page is disorienting
                 /*
-                banner: album.bannerArtistContribs && {
+                banner: album.bannerArtistContribs.length && {
                     classes: ['dim'],
                     dimensions: album.bannerDimensions,
                     path: ['media.albumBanner', album.directory, album.bannerFileExtension],

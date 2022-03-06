@@ -448,6 +448,9 @@ Album.propertyDescriptors = {
         }
     },
 
+    coverArtFileExtension: Thing.common.fileExtension('jpg'),
+    trackCoverArtFileExtension: Thing.common.fileExtension('jpg'),
+
     wallpaperStyle: Thing.common.simpleString(),
     wallpaperFileExtension: Thing.common.fileExtension('jpg'),
 
@@ -602,6 +605,20 @@ Track.propertyDescriptors = {
             dependencies: ['albumData'],
             transform: (hasCoverArt, { albumData, [Track.instance]: track }) => (
                 hasCoverArt ?? Track.findAlbum(track, albumData)?.hasTrackArt ?? true)
+        }
+    },
+
+    coverArtFileExtension: {
+        flags: {update: true, expose: true},
+
+        update: {validate: isFileExtension},
+
+        expose: {
+            dependencies: ['albumData'],
+            transform: (coverArtFileExtension, { albumData, [Track.instance]: track }) => (
+                coverArtFileExtension ??
+                Track.findAlbum(track, albumData)?.trackCoverArtFileExtension ??
+                true)
         }
     },
 
@@ -778,6 +795,9 @@ Artist.propertyDescriptors = {
     directory: Thing.common.directory(),
     urls: Thing.common.urls(),
     contextNotes: Thing.common.simpleString(),
+
+    hasAvatar: Thing.common.flag(false),
+    avatarFileExtension: Thing.common.fileExtension('jpg'),
 
     aliasNames: {
         flags: {update: true, expose: true},

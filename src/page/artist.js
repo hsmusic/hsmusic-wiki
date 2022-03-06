@@ -272,6 +272,7 @@ export function write(artist, {wikiData}) {
             fancifyURL,
             generateCoverLink,
             generateInfoGalleryLinks,
+            getArtistAvatar,
             getArtistString,
             link,
             strings,
@@ -290,7 +291,7 @@ export function write(artist, {wikiData}) {
                 main: {
                     content: fixWS`
                         ${artist.hasAvatar && generateCoverLink({
-                            path: ['localized.artistAvatar', artist.directory],
+                            src: getArtistAvatar(artist),
                             alt: strings('misc.alt.artistAvatar')
                         })}
                         <h1>${strings('artistPage.title', {artist: name})}</h1>
@@ -369,9 +370,9 @@ export function write(artist, {wikiData}) {
                                                         track: link.track(track)
                                                     })
                                                     : `<i>${strings('artistPage.creditList.entry.album.' + {
-                                                        wallpaperArtists: 'wallpaperArt',
-                                                        bannerArtists: 'bannerArt',
-                                                        coverArtists: 'coverArt'
+                                                        wallpaperArtistContribs: 'wallpaperArt',
+                                                        bannerArtistContribs: 'bannerArt',
+                                                        coverArtistContribs: 'coverArt'
                                                     }[key])}</i>`),
                                                 ...props
                                             }))

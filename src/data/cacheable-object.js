@@ -169,7 +169,7 @@ export default class CacheableObject {
             const oldValue = this.#propertyUpdateValues[property];
 
             if (newValue === undefined) {
-                throw new ValueError(`Properties cannot be set to undefined`);
+                throw new TypeError(`Properties cannot be set to undefined`);
             }
 
             if (newValue === oldValue) {

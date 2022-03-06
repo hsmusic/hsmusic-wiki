@@ -182,7 +182,7 @@ export function getThemeString(color, additionalVariables = []) {
 }
 export function getAlbumStylesheet(album, {to}) {
     return [
-        album.wallpaperArtistContribs && fixWS`
+        album.wallpaperArtistContribs.length && fixWS`
             body::before {
                 background-image: url("${to('media.albumWallpaper', album.directory, album.wallpaperFileExtension)}");
                 ${album.wallpaperStyle}
