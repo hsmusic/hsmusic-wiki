@@ -50,6 +50,7 @@ export function writeTargetless({wikiData}) {
                                             ((row.sourceGroup?.albums ?? [])
                                                 .slice()
                                                 .reverse()
+                                                .filter(album => album.isListedOnHomepage)
                                                 .slice(0, row.countAlbumsFromGroup)
                                                 .map(album => ({item: album})))
                                         ).concat(row.sourceAlbums.map(album => ({item: album}))),
