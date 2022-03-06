@@ -1250,7 +1250,6 @@ WikiInfo.propertyDescriptors = {
 
     // Feature toggles
 
-    enableArtistAvatars: Thing.common.flag(false),
     enableFlashesAndGames: Thing.common.flag(false),
     enableListings: Thing.common.flag(false),
     enableNews: Thing.common.flag(false),

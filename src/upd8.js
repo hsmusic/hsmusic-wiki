@@ -1169,7 +1169,6 @@ const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
         footerContent: 'Footer Content',
         defaultLanguage: 'Default Language',
         canonicalBase: 'Canonical Base',
-        enableArtistAvatars: 'Enable Artist Avatars',
         enableFlashesAndGames: 'Enable Flashes & Games',
         enableListings: 'Enable Listings',
         enableNews: 'Enable News',
