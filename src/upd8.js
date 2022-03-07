@@ -2744,7 +2744,7 @@ async function main() {
             }
         }
 
-        assignWikiData(WD.albumData, 'artistData', 'groupData', 'trackData');
+        assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
         WD.albumData.forEach(album => assignWikiData(album.trackGroups, 'trackData'));
 
         assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');

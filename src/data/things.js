@@ -473,6 +473,7 @@ Album.propertyDescriptors = {
     // Update only
 
     artistData: Thing.common.wikiData(Artist),
+    artTagData: Thing.common.wikiData(ArtTag),
     groupData: Thing.common.wikiData(Group),
     trackData: Thing.common.wikiData(Track),
 
