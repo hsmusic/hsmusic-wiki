@@ -1599,7 +1599,7 @@ writePage.html = (pageFn, {
     nav.links ??= [];
 
     footer.classes ??= [];
-    footer.content ??= (wikiInfo.footer ? transformMultiline(wikiInfo.footer) : '');
+    footer.content ??= (wikiInfo.footerContent ? transformMultiline(wikiInfo.footerContent) : '');
 
     footer.content += '\n' + getFooterLocalizationLinks(paths.pathname, {
         languages, paths, strings, to
