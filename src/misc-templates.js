@@ -23,6 +23,15 @@ import {
     sortByDate
 } from './util/wiki-data.js';
 
+const BANDCAMP_DOMAINS = [
+    'bc.s3m.us',
+    'music.solatrux.com',
+];
+
+const MASTODON_DOMAINS = [
+    'types.pl',
+];
+
 // Artist strings
 
 export function getArtistString(artists, {
@@ -211,12 +220,8 @@ export function fancifyURL(url, {strings, album = false} = {}) {
     return fixWS`<a href="${url}" class="nowrap">${
         domain === local ? strings('misc.external.local') :
         domain.includes('bandcamp.com') ? strings('misc.external.bandcamp') :
-        [
-            'music.solatrux.com'
-        ].includes(domain) ? strings('misc.external.bandcamp.domain', {domain}) :
-        [
-            'types.pl'
-        ].includes(domain) ? strings('misc.external.mastodon.domain', {domain}) :
+        BANDCAMP_DOMAINS.includes(domain) ? strings('misc.external.bandcamp.domain', {domain}) :
+        MASTODON_DOMAINS.includes(domain) ? strings('misc.external.mastodon.domain', {domain}) :
         domain.includes('youtu') ? (album
             ? (url.includes('list=')
                 ? strings('misc.external.youtube.playlist')
@@ -250,12 +255,8 @@ export function iconifyURL(url, {strings, to}) {
     const domain = new URL(url).hostname;
     const [ id, msg ] = (
         domain.includes('bandcamp.com') ? ['bandcamp', strings('misc.external.bandcamp')] :
-        (
-            domain.includes('music.solatrus.com')
-        ) ? ['bandcamp', strings('misc.external.bandcamp.domain', {domain})] :
-        (
-            domain.includes('types.pl')
-        ) ? ['mastodon', strings('misc.external.mastodon.domain', {domain})] :
+        BANDCAMP_DOMAINS.includes(domain) ? ['bandcamp', strings('misc.external.bandcamp.domain', {domain})] :
+        MASTODON_DOMAINS.includes(domain) ? ['mastodon', strings('misc.external.mastodon.domain', {domain})] :
         domain.includes('youtu') ? ['youtube', strings('misc.external.youtube')] :
         domain.includes('soundcloud') ? ['soundcloud', strings('misc.external.soundcloud')] :
         domain.includes('tumblr.com') ? ['tumblr', strings('misc.external.tumblr')] :
