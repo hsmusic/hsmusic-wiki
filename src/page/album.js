@@ -210,13 +210,15 @@ export function write(album, {wikiData}) {
                                 ${album.tracks.map(trackToListItem).join('\n')}
                             </${listTag}>
                         `}
-                        <p>
-                            ${[
-                                strings('releaseInfo.addedToWiki', {
-                                    date: strings.count.date(album.dateAdded)
-                                })
-                            ].filter(Boolean).join('<br>\n')}
-                        </p>
+                        ${album.dateAddedToWiki && fixWS`
+                            <p>
+                                ${[
+                                    strings('releaseInfo.addedToWiki', {
+                                        date: strings.count.date(album.dateAddedToWiki)
+                                    })
+                                ].filter(Boolean).join('<br>\n')}
+                            </p>
+                        `}
                         ${album.commentary && fixWS`
                             <p>${strings('releaseInfo.artistCommentary')}</p>
                             <blockquote>
