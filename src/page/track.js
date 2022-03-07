@@ -174,7 +174,7 @@ export function write(track, {wikiData}) {
                                         showIcons: true
                                     })
                                 }),
-                                track.coverArtistContribs && strings('releaseInfo.coverArtBy', {
+                                track.coverArtistContribs.length && strings('releaseInfo.coverArtBy', {
                                     artists: getArtistString(track.coverArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
