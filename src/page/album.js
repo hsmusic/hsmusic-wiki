@@ -7,13 +7,14 @@ import fixWS from 'fix-whitespace';
 import * as html from '../util/html.js';
 
 import {
-    bindOpts
+    bindOpts,
+    compareArrays,
 } from '../util/sugar.js';
 
 import {
     getAlbumCover,
     getAlbumListTag,
-    getTotalDuration
+    getTotalDuration,
 } from '../util/wiki-data.js';
 
 // Page exports
@@ -36,13 +37,16 @@ export function write(album, {wikiData}) {
             track: link.track(track)
         };
         return `<li style="${getLinkThemeString(track.color)}">${
-            (track.artists === album.artists
+            (compareArrays(
+                track.artistContribs.map(c => c.who),
+                album.artistContribs.map(c => c.who),
+                {checkOrder: false})
                 ? strings('trackList.item.withDuration', itemOpts)
                 : strings('trackList.item.withDuration.withArtists', {
                     ...itemOpts,
                     by: `<span class="by">${
                         strings('trackList.item.withArtists.by', {
-                            artists: getArtistString(track.artists)
+                            artists: getArtistString(track.artistContribs)
                         })
                     }</span>`
                 }))

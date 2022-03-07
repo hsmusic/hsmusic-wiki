@@ -32,6 +32,11 @@ export const filterEmptyLines = string => string.split('\n').filter(line => line
 
 export const unique = arr => Array.from(new Set(arr));
 
+export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) => (
+    arr1.length === arr2.length && (checkOrder
+        ? (arr1.every((x, i) => arr2[i] === x))
+        : (arr1.every(x => arr2.includes(x)))));
+
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 export const withEntries = (obj, fn) => Object.fromEntries(fn(Object.entries(obj)));
 
