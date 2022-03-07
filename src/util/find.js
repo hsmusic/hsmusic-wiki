@@ -4,6 +4,8 @@ import {
     logWarn
 } from './cli.js';
 
+import { inspect } from 'util';
+
 function warnOrThrow(mode, message) {
     switch (mode) {
         case 'error':
@@ -88,7 +90,7 @@ function matchName(ref, data, mode) {
     if (matches.length > 1) {
         return warnOrThrow(mode,
             `Multiple matches for reference "${ref}". Please resolve:\n` +
-            matches.map(match => `- ${match.name} (${match.directory})\n`).join('') +
+            matches.map(match => `- ${inspect(match)}\n`).join('') +
             `Returning null for this reference.`);
     }
 
