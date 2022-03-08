@@ -484,6 +484,26 @@ function parseAttributes(string, {to}) {
     ]));
 }
 
+function joinLineBreaks(sourceLines) {
+    const outLines = [];
+
+    let lineSoFar = '';
+    for (let i = 0; i < sourceLines.length; i++) {
+        const line = sourceLines[i];
+        lineSoFar += line;
+        if (!line.endsWith('<br>')) {
+            outLines.push(lineSoFar);
+            lineSoFar = '';
+        }
+    }
+
+    if (lineSoFar) {
+        outLines.push(lineSoFar);
+    }
+
+    return outLines;
+}
+
 function transformMultiline(text, {
     parseAttributes,
     transformInline
@@ -529,7 +549,9 @@ function transformMultiline(text, {
     // interested in doing lol. sorry!!!
     let inBlockquote = false;
 
-    for (let line of splitLines(text)) {
+    let lines = splitLines(text);
+    lines = joinLineBreaks(lines);
+    for (let line of lines) {
         const imageLine = line.startsWith('<img');
         line = line.replace(/<img (.*?)>/g, (match, attributes) => img({
             lazy: true,
