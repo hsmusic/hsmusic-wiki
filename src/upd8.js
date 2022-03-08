@@ -599,6 +599,15 @@ function transformMultiline(text, {
                 inBlockquote = false;
                 outLines.push('</blockquote>');
             }
+
+            // let some escaped symbols display as the normal symbol, since the
+            // point of escaping them is just to avoid having them be treated as
+            // syntax markers!
+            if (lineContent.match(/( *)\\-/)) {
+                lineContent = lineContent.replace('\\-', '-');
+            } else if (lineContent.match(/( *)\\>/)) {
+                lineContent = lineContent.replace('\\>', '>');
+            }
         }
 
         if (lineTag === 'p') {
