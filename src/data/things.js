@@ -716,33 +716,32 @@ Track.propertyDescriptors = {
         }
     },
 
+    originalReleaseTrack: Thing.common.dynamicThingFromSingleReference('originalReleaseTrackByRef', 'trackData', find.track),
+
     otherReleases: {
         flags: {expose: true},
 
         expose: {
             dependencies: ['originalReleaseTrackByRef', 'trackData'],
 
-            compute: ({ originalReleaseTrackByRef: ref1, trackData, [Track.instance]: t1 }) => {
-                if (!(ref1 && trackData)) {
+            compute: ({ originalReleaseTrackByRef: t1origRef, trackData, [Track.instance]: t1 }) => {
+                if (!trackData) {
                     return [];
                 }
 
-                const tOrig = find.track(ref1, trackData);
-                if (!tOrig) {
-                    return [];
-                }
+                const t1orig = find.track(t1origRef, trackData);
 
                 return [
-                    tOrig,
+                    t1orig,
                     ...trackData.filter(t2 => {
-                        const { originalReleaseTrackByRef: ref2 } = t2;
+                        const { originalReleaseTrack: t2orig } = t2;
                         return (
                             t2 !== t1 &&
-                            ref2 &&
-                            find.track(ref2, trackData) === tOrig
+                            t2orig &&
+                            (t2orig === t1orig || t2orig === t1)
                         );
                     })
-                ];
+                ].filter(Boolean);
             }
         }
     },
