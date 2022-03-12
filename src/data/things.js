@@ -609,9 +609,12 @@ Track.propertyDescriptors = {
         update: {validate: isBoolean},
 
         expose: {
-            dependencies: ['albumData'],
-            transform: (hasCoverArt, { albumData, [Track.instance]: track }) => (
-                hasCoverArt ?? Track.findAlbum(track, albumData)?.hasTrackArt ?? true)
+            dependencies: ['albumData', 'coverArtistContribsByRef'],
+            transform: (hasCoverArt, { albumData, coverArtistContribsByRef, [Track.instance]: track }) => (
+                hasCoverArt ??
+                (coverArtistContribsByRef?.length > 0 || null) ??
+                Track.findAlbum(track, albumData)?.hasTrackArt ??
+                true)
         }
     },
 
