@@ -14,7 +14,7 @@ export function write(aliasArtist, {wikiData}) {
         type: 'redirect',
         fromPath: ['artist', aliasArtist.directory],
         toPath: ['artist', aliasedArtist.directory],
-        title: () => aliasArtist.name
+        title: () => aliasedArtist.name
     };
 
     return [redirect];
