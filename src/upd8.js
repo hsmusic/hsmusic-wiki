@@ -380,6 +380,10 @@ const replacerSpec = {
         find: 'group',
         link: 'groupGallery'
     },
+    'home': {
+        find: null,
+        link: 'home'
+    },
     'listing-index': {
         find: null,
         link: 'listingIndex'
