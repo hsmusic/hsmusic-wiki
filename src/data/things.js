@@ -28,6 +28,8 @@ import {
     validateReferenceList,
 } from './validators.js';
 
+import * as S from './serialize.js';
+
 import {
     getKebabCase,
 } from '../util/wiki-data.js';
@@ -508,6 +510,43 @@ Album.propertyDescriptors = {
     artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
 };
 
+Album[S.serializeDescriptors] = {
+    name: S.id,
+    color: S.id,
+    directory: S.id,
+    urls: S.id,
+
+    date: S.id,
+    coverArtDate: S.id,
+    trackArtDate: S.id,
+    dateAddedToWiki: S.id,
+
+    artistContribs: S.toContribRefs,
+    coverArtistContribs: S.toContribRefs,
+    trackCoverArtistContribs: S.toContribRefs,
+    wallpaperArtistContribs: S.toContribRefs,
+    bannerArtistContribs: S.toContribRefs,
+
+    coverArtFileExtension: S.id,
+    trackCoverArtFileExtension: S.id,
+    wallpaperStyle: S.id,
+    wallpaperFileExtension: S.id,
+    bannerStyle: S.id,
+    bannerFileExtension: S.id,
+    bannerDimensions: S.id,
+
+    hasTrackArt: S.id,
+    isMajorRelease: S.id,
+    isListedOnHomepage: S.id,
+
+    commentary: S.id,
+
+    tracks: S.toRefs,
+    groups: S.toRefs,
+    artTags: S.toRefs,
+    commentatorArtists: S.toRefs,
+};
+
 TrackGroup.propertyDescriptors = {
     // Update & expose
 
@@ -781,7 +820,7 @@ Track.prototype[inspect.custom] = function() {
     return (albumName
         ? base + ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
         : base);
-}
+};
 
 // -> Artist
 
@@ -871,6 +910,7 @@ Artist.propertyDescriptors = {
         }
     },
 
+    albumsAsAlbumArtist: Artist.filterByContrib('albumData', 'artistContribs'),
     albumsAsCoverArtist: Artist.filterByContrib('albumData', 'coverArtistContribs'),
     albumsAsWallpaperArtist: Artist.filterByContrib('albumData', 'wallpaperArtistContribs'),
     albumsAsBannerArtist: Artist.filterByContrib('albumData', 'bannerArtistContribs'),
@@ -887,6 +927,31 @@ Artist.propertyDescriptors = {
     },
 
     flashesAsContributor: Artist.filterByContrib('flashData', 'contributorContribs'),
+};
+
+Artist[S.serializeDescriptors] = {
+    name: S.id,
+    directory: S.id,
+    urls: S.id,
+    contextNotes: S.id,
+
+    hasAvatar: S.id,
+    avatarFileExtension: S.id,
+
+    aliasNames: S.id,
+
+    tracksAsArtist: S.toRefs,
+    tracksAsContributor: S.toRefs,
+    tracksAsCoverArtist: S.toRefs,
+    tracksAsCommentator: S.toRefs,
+
+    albumsAsAlbumArtist: S.toRefs,
+    albumsAsCoverArtist: S.toRefs,
+    albumsAsWallpaperArtist: S.toRefs,
+    albumsAsBannerArtist: S.toRefs,
+    albumsAsCommentator: S.toRefs,
+
+    flashesAsContributor: S.toRefs,
 };
 
 // -> Group
@@ -1200,6 +1265,17 @@ Flash.propertyDescriptors = {
                 flashActData.find(act => act.flashes.includes(flash))?.color ?? null)
         }
     },
+};
+
+Flash[S.serializeDescriptors] = {
+    name: S.id,
+    page: S.id,
+    directory: S.id,
+    date: S.id,
+    contributors: S.toContribRefs,
+    tracks: S.toRefs,
+    urls: S.id,
+    color: S.id,
 };
 
 FlashAct.propertyDescriptors = {

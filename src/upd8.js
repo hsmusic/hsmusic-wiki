@@ -112,6 +112,8 @@ import {
     WikiInfo,
 } from './data/things.js';
 
+import { serializeThings } from './data/serialize.js';
+
 import {
     fancifyFlashURL,
     fancifyURL,
@@ -1273,94 +1275,9 @@ function getDurationInSeconds(string) {
     }
 }
 
-/*
-const stringifyIndent = 0;
-
-const toRefs = (label, objectOrArray) => {
-    if (Array.isArray(objectOrArray)) {
-        return objectOrArray.filter(Boolean).map(x => `${label}:${x.directory}`);
-    } else if (objectOrArray.directory) {
-        throw new Error('toRefs should not be passed a single object with directory');
-    } else if (typeof objectOrArray === 'object') {
-        return Object.fromEntries(Object.entries(objectOrArray)
-            .map(([ key, value ]) => [key, toRefs(key, value)]));
-    } else {
-        throw new Error('toRefs should be passed an array or object of arrays');
-    }
-};
-
-function stringifyRefs(key, value) {
-    switch (key) {
-        case 'tracks':
-        case 'references':
-        case 'referencedBy':
-            return toRefs('track', value);
-        case 'artists':
-        case 'contributors':
-        case 'coverArtists':
-        case 'trackCoverArtists':
-            return value && value.map(({ who, what }) => ({who: `artist:${who.directory}`, what}));
-        case 'albums': return toRefs('album', value);
-        case 'flashes': return toRefs('flash', value);
-        case 'groups': return toRefs('group', value);
-        case 'artTags': return toRefs('tag', value);
-        case 'aka': return value && `track:${value.directory}`;
-        default:
-            return value;
-    }
+function stringifyThings(thingData) {
+    return JSON.stringify(serializeThings(thingData));
 }
-
-function stringifyAlbumData({wikiData}) {
-    return JSON.stringify(wikiData.albumData, (key, value) => {
-        switch (key) {
-            case 'commentary':
-                return '';
-            default:
-                return stringifyRefs(key, value);
-        }
-    }, stringifyIndent);
-}
-
-function stringifyTrackData({wikiData}) {
-    return JSON.stringify(wikiData.trackData, (key, value) => {
-        switch (key) {
-            case 'album':
-            case 'commentary':
-            case 'otherReleases':
-                return undefined;
-            default:
-                return stringifyRefs(key, value);
-        }
-    }, stringifyIndent);
-}
-
-function stringifyFlashData({wikiData}) {
-    return JSON.stringify(wikiData.flashData, (key, value) => {
-        switch (key) {
-            case 'act':
-            case 'commentary':
-                return undefined;
-            default:
-                return stringifyRefs(key, value);
-        }
-    }, stringifyIndent);
-}
-
-function stringifyArtistData({wikiData}) {
-    return JSON.stringify(wikiData.artistData, (key, value) => {
-        switch (key) {
-            case 'asAny':
-                return;
-            case 'asArtist':
-            case 'asContributor':
-            case 'asCoverArtist':
-                return toRefs('track', value);
-            default:
-                return stringifyRefs(key, value);
-        }
-    }, stringifyIndent);
-}
-*/
 
 function img({
     src,
@@ -1933,15 +1850,13 @@ function writeSharedFilesAndPages({strings, wikiData}) {
         wikiInfo.enableListings &&
         redirect('Album Commentary', 'list/all-commentary', 'localized.commentaryIndex', ''),
 
-        /*
         writeFile(path.join(outputPath, 'data.json'), fixWS`
             {
-                "albumData": ${stringifyAlbumData({wikiData})},
-                ${wikiInfo.enableFlashesAndGames && `"flashData": ${stringifyFlashData({wikiData})},`}
-                "artistData": ${stringifyArtistData({wikiData})}
+                "albumData": ${stringifyThings(wikiData.albumData)},
+                ${wikiInfo.enableFlashesAndGames && `"flashData": ${stringifyThings(wikiData.flashData)},`}
+                "artistData": ${stringifyThings(wikiData.artistData)}
             }
         `)
-        */
     ].filter(Boolean));
 }
 

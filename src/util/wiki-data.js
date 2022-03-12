@@ -2,7 +2,7 @@
 
 import {
     UNRELEASED_TRACKS_DIRECTORY
-} from '../util/magic-constants.js';
+} from './magic-constants.js';
 
 // Generic value operations
 

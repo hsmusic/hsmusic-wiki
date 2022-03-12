@@ -9,6 +9,10 @@ import {
     getColors
 } from '../util/colors.js';
 
+import {
+    getArtistNumContributions
+} from '../util/wiki-data.js';
+
 let albumData, artistData, flashData;
 let officialAlbumData, fandomAlbumData, artistNames;
 
@@ -137,7 +141,7 @@ for (const a of document.body.querySelectorAll('[data-random]')) {
             case 'track-in-fandom': return a.href = openTrack(getRefDirectory(pick(fandomAlbumData.reduce((acc, album) => acc.concat(album.tracks), []))));
             case 'track-in-official': return a.href = openTrack(getRefDirectory(pick(officialAlbumData.reduce((acc, album) => acc.concat(album.tracks), []))));
             case 'artist': return a.href = openArtist(pick(artistData).directory);
-            case 'artist-more-than-one-contrib': return a.href = openArtist(pick(artistData.filter(artist => C.getArtistNumContributions(artist) > 1)).directory);
+            case 'artist-more-than-one-contrib': return a.href = openArtist(pick(artistData.filter(artist => getArtistNumContributions(artist) > 1)).directory);
         }
     });
 }
