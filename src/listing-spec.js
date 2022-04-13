@@ -83,7 +83,7 @@ const listingSpec = [
     },
 
     {
-        directory: 'albusm/by-date-added',
+        directory: 'albums/by-date-added',
         stringsKey: 'listAlbums.byDateAdded',
 
         data({wikiData}) {
