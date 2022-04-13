@@ -183,8 +183,8 @@ export function getNewAdditions(numAlbums, {wikiData}) {
     // are usually at the start of the final output for a given d8 of release
     // too).
     const sortedAlbums = albumData.filter(album => album.isListedOnHomepage).sort((a, b) => {
-        if (a.dateAdded > b.dateAdded) return -1;
-        if (a.dateAdded < b.dateAdded) return 1;
+        if (a.dateAddedToWiki > b.dateAddedToWiki) return -1;
+        if (a.dateAddedToWiki < b.dateAddedToWiki) return 1;
         if (a.isMajorRelease && !b.isMajorRelease) return -1;
         if (!a.isMajorRelease && b.isMajorRelease) return 1;
         if (a.date > b.date) return -1;
@@ -218,10 +218,10 @@ export function getNewAdditions(numAlbums, {wikiData}) {
         // time we access one of its entries. This is 8asically unnecessary
         // since this will never 8e an expensive enough task for that to
         // matter.... 8ut it's nicer code. BBBB) )
-        const currentDate = sortedAlbums[i].dateAdded;
+        const currentDate = sortedAlbums[i].dateAddedToWiki;
         const groupMap = new Map();
         const groupArray = [];
-        for (let album; (album = sortedAlbums[i]) && +album.dateAdded === +currentDate; i++) {
+        for (let album; (album = sortedAlbums[i]) && +album.dateAddedToWiki === +currentDate; i++) {
             const primaryGroup = album.groups[0];
             if (groupMap.has(primaryGroup)) {
                 groupMap.get(primaryGroup).push(album);

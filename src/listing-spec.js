@@ -88,9 +88,9 @@ const listingSpec = [
 
         data({wikiData}) {
             return chunkByProperties(wikiData.albumData.slice().sort((a, b) => {
-                if (a.dateAdded < b.dateAdded) return -1;
-                if (a.dateAdded > b.dateAdded) return 1;
-            }), ['dateAdded']);
+                if (a.dateAddedToWiki < b.dateAddedToWiki) return -1;
+                if (a.dateAddedToWiki > b.dateAddedToWiki) return 1;
+            }), ['dateAddedToWiki']);
         },
 
         html(chunks, {link, strings}) {
