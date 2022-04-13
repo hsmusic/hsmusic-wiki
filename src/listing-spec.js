@@ -96,9 +96,9 @@ const listingSpec = [
         html(chunks, {link, strings}) {
             return fixWS`
                 <dl>
-                    ${chunks.map(({dateAdded, chunk: albums}) => fixWS`
+                    ${chunks.map(({dateAddedToWiki, chunk: albums}) => fixWS`
                         <dt>${strings('listingPage.listAlbums.byDateAdded.date', {
-                            date: strings.count.date(dateAdded)
+                            date: strings.count.date(dateAddedToWiki)
                         })}</dt>
                         <dd><ul>
                             ${(albums
