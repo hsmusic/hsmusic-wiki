@@ -73,7 +73,7 @@ export function write(album, {wikiData}) {
                 released: album.date,
                 trackArtAdded: album.trackArtDate,
                 coverArtAdded: album.coverArtDate,
-                addedToWiki: album.dateAdded
+                addedToWiki: album.dateAddedToWiki
             },
             duration: albumDuration,
             color: album.color,
