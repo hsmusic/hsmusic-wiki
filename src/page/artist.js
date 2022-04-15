@@ -96,10 +96,10 @@ export function write(artist, {wikiData}) {
                 : track.contributorContribs.filter(({ who }) => who !== artist)),
             contrib: {
                 who: artist,
-                what: [
+                whatArray: [
                     track.artistContribs.find(({ who }) => who === artist)?.what,
                     track.contributorContribs.find(({ who }) => who === artist)?.what
-                ].filter(Boolean).join(', ')
+                ].filter(Boolean)
             }
         })), ['date', 'album'])
         .map(({date, album, chunk}) => ({
@@ -154,20 +154,20 @@ export function write(artist, {wikiData}) {
         (aka
             ? strings('artistPage.creditList.entry.rerelease', {entry})
             : (artists.length
-                ? (contrib.what
+                ? ((contrib.what || contrib.whatArray?.length)
                     ? strings('artistPage.creditList.entry.withArtists.withContribution', {
                         entry,
                         artists: getArtistString(artists),
-                        contribution: contrib.what
+                        contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
                     })
                     : strings('artistPage.creditList.entry.withArtists', {
                         entry,
                         artists: getArtistString(artists)
                     }))
-                : (contrib.what
+                : ((contrib.what || contrib.whatArray?.length)
                     ? strings('artistPage.creditList.entry.withContribution', {
                         entry,
-                        contribution: contrib.what
+                        contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
                     })
                     : entry)));
 
