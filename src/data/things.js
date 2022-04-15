@@ -430,9 +430,19 @@ Album.propertyDescriptors = {
     urls: Thing.common.urls(),
 
     date: Thing.common.simpleDate(),
-    coverArtDate: Thing.common.simpleDate(),
     trackArtDate: Thing.common.simpleDate(),
     dateAddedToWiki: Thing.common.simpleDate(),
+
+    coverArtDate: {
+        flags: {update: true, expose: true},
+
+        update: {validate: isDate},
+
+        expose: {
+            dependencies: ['date'],
+            transform: (coverArtDate, { date }) => coverArtDate ?? date ?? null
+        }
+    },
 
     artistContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
