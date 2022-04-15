@@ -32,6 +32,7 @@ import * as S from './serialize.js';
 
 import {
     getKebabCase,
+    sortByArtDate,
 } from '../util/wiki-data.js';
 
 import find from '../util/find.js';
@@ -1055,7 +1056,8 @@ ArtTag.propertyDescriptors = {
         expose: {
             dependencies: ['albumData', 'trackData'],
             compute: ({ albumData, trackData, [ArtTag.instance]: artTag }) => (
-                [...albumData, ...trackData].filter(thing => thing.artTags?.includes(artTag)))
+                sortByArtDate([...albumData, ...trackData]
+                    .filter(thing => thing.artTags?.includes(artTag))))
         }
     }
 };
