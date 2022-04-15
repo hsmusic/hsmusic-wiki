@@ -2943,6 +2943,8 @@ async function main() {
     // console.log(WD.albumData.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
     // console.log(WD.groupData.find(g => g.name === 'Fandom').albums.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
     // console.log(WD.trackData.find(t => t.name === 'Another Chance').commentatorArtists.map(artist => `${artist.name} - commentated ${artist.tracksAsCommentator.length} tracks, ${artist.albumsAsCommentator.length} albums`).join('\n'));
+    // console.log(WD.groupCategoryData.map(c => `${c.name} (${c.groups.map(g => g.name).join(', ')})`).join('\n'));
+    // console.log(WD.groupData.map(g => `${g.name} (${g.category?.name})`).join('\n'));
     // return;
 
     // Update languages o8ject with the wiki-specified default language!

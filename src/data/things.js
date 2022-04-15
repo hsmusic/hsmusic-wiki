@@ -1020,7 +1020,7 @@ Group.propertyDescriptors = {
         expose: {
             dependencies: ['groupCategoryData'],
             compute: ({ groupCategoryData, [Group.instance]: group }) => (
-                groupCategoryData?.filter(category => category.groups.includes(group)) ?? [])
+                groupCategoryData.find(category => category.groups.includes(group)) ?? null)
         }
     },
 };
