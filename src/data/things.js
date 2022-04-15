@@ -630,6 +630,15 @@ Track.findAlbum = (track, albumData) => {
     return albumData?.find(album => album.tracks.includes(track));
 };
 
+// Another reused utility function. This one's logic is a bit more complicated.
+Track.hasCoverArt = (track, albumData, coverArtistContribsByRef, hasCoverArt) => {
+    return (
+        hasCoverArt ??
+        (coverArtistContribsByRef?.length > 0 || null) ??
+        Track.findAlbum(track, albumData)?.hasTrackArt ??
+        true);
+};
+
 Track.propertyDescriptors = {
     // Update & expose
 
@@ -661,10 +670,7 @@ Track.propertyDescriptors = {
         expose: {
             dependencies: ['albumData', 'coverArtistContribsByRef'],
             transform: (hasCoverArt, { albumData, coverArtistContribsByRef, [Track.instance]: track }) => (
-                hasCoverArt ??
-                (coverArtistContribsByRef?.length > 0 || null) ??
-                Track.findAlbum(track, albumData)?.hasTrackArt ??
-                true)
+                Track.hasCoverArt(track, albumData, coverArtistContribsByRef, hasCoverArt))
         }
     },
 
@@ -674,11 +680,13 @@ Track.propertyDescriptors = {
         update: {validate: isFileExtension},
 
         expose: {
-            dependencies: ['albumData'],
-            transform: (coverArtFileExtension, { albumData, [Track.instance]: track }) => (
+            dependencies: ['albumData', 'coverArtistContribsByRef'],
+            transform: (coverArtFileExtension, { albumData, coverArtistContribsByRef, hasCoverArt, [Track.instance]: track }) => (
                 coverArtFileExtension ??
-                Track.findAlbum(track, albumData)?.trackCoverArtFileExtension ??
-                true)
+                (Track.hasCoverArt(track, albumData, coverArtistContribsByRef, hasCoverArt)
+                    ? Track.findAlbum(track, albumData)?.trackCoverArtFileExtension
+                    : Track.findAlbum(track, albumData)?.coverArtFileExtension) ??
+                'jpg')
         }
     },
 
