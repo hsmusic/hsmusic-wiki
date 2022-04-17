@@ -44,40 +44,13 @@ import fixWS from 'fix-whitespace';
 // It stands for "HTML Entities", apparently. Cursed.
 import he from 'he';
 
-import yaml from 'js-yaml';
-
 import {
-    // This is the dum8est name for a function possi8le. Like, SURE, fine, may8e
-    // the UNIX people had some valid reason to go with the weird truncated
-    // lowercased convention they did. 8ut Node didn't have to ALSO use that
-    // convention! Would it have 8een so hard to just name the function
-    // something like fs.readDirectory???????? No, it wouldn't have 8een.
-    readdir,
-    // ~~ 8ut okay, like, look at me. DOING THE SAME THING. See, *I* could have
-    // named my promisified function differently, and yet I did not. I literally
-    // cannot explain why. We are all used to following in the 8ad decisions of
-    // our ancestors, and never never never never never never never consider
-    // that hey, may8e we don't need to make the exact same decisions they did.
-    // Even when we're perfectly aware th8t's exactly what we're doing! ~~
-    //
-    // 2021 ADDENDUM: Ok, a year and a half later the a8ove is still true,
-    //                except for the part a8out promisifying, since fs/promises
-    //                already does that for us. 8ut I could STILL import it
-    //                using my own name (`readdir as readDirectory`), and yet
-    //                here I am, defin8tely not doing that.
-    //                SOME THINGS NEVER CHANGE.
-    //
-    // Programmers, including me, are all pretty stupid.
-
-    // 8ut I mean, come on. Look. Node decided to use readFile, instead of like,
-    // what, cat? Why couldn't they rename readdir too???????? As Johannes
-    // Kepler once so elegantly put it: "Shrug."
-    readFile,
-    writeFile,
     access,
     mkdir,
+    readFile,
     symlink,
-    unlink
+    writeFile,
+    unlink,
 } from 'fs/promises';
 
 import { inspect as nodeInspect } from 'util';
@@ -87,32 +60,23 @@ import { listingSpec, listingTargetSpec } from './listing-spec.js';
 import urlSpec from './url-spec.js';
 import * as pageSpecs from './page/index.js';
 
-import find from './util/find.js';
+import find, { bindFind } from './util/find.js';
 import * as html from './util/html.js';
 import unbound_link, {getLinkThemeString} from './util/link.js';
+import { findFiles } from './util/io.js';
 
 import CacheableObject from './data/cacheable-object.js';
 
-import {
-    Album,
-    Artist,
-    ArtTag,
-    Flash,
-    FlashAct,
-    Group,
-    GroupCategory,
-    HomepageLayout,
-    HomepageLayoutAlbumsRow,
-    HomepageLayoutRow,
-    NewsEntry,
-    StaticPage,
-    Thing,
-    Track,
-    TrackGroup,
-    WikiInfo,
-} from './data/things.js';
-
 import { serializeThings } from './data/serialize.js';
+
+import {
+    filterDuplicateDirectories,
+    filterReferenceErrors,
+    linkWikiDataArrays,
+    loadAndProcessDataDocuments,
+    sortWikiDataArrays,
+    WIKI_INFO_FILE,
+} from './data/yaml.js';
 
 import {
     fancifyFlashURL,
@@ -184,6 +148,7 @@ import {
 
 import {
     bindOpts,
+    decorateErrorWithIndex,
     filterAggregateAsync,
     filterEmptyLines,
     mapAggregate,
@@ -211,16 +176,8 @@ import {
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 7;
+const CACHEBUST = 8;
 
-const WIKI_INFO_FILE = 'wiki-info.yaml';
-const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
-const ARTIST_DATA_FILE = 'artists.yaml';
-const FLASH_DATA_FILE = 'flashes.yaml';
-const NEWS_DATA_FILE = 'news.yaml';
-const ART_TAG_DATA_FILE = 'tags.yaml';
-const GROUP_DATA_FILE = 'groups.yaml';
-const STATIC_PAGE_DATA_FILE = 'static-pages.yaml';
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
 // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
@@ -235,10 +192,6 @@ const UTILITY_DIRECTORY = 'util';
 // Code that's used only in the static site! CSS, cilent JS, etc.
 // (This gets symlinked into the --data-path directory.)
 const STATIC_DIRECTORY = 'static';
-
-// Su8directory under provided --data-path directory for al8um files, which are
-// read from and processed to compose the majority of album and track data.
-const DATA_ALBUM_DIRECTORY = 'album';
 
 function inspect(value) {
     return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -266,69 +219,9 @@ let languages;
 
 const urls = generateURLs(urlSpec);
 
-// Note there isn't a 'find track data files' function. I plan on including the
-// data for all tracks within an al8um collected in the single metadata file
-// for that al8um. Otherwise there'll just 8e way too many files, and I'd also
-// have to worry a8out linking track files to al8um files (which would contain
-// only the track listing, not track data itself), and dealing with errors of
-// missing track files (or track files which are not linked to al8ums). All a
-// 8unch of stuff that's a pain to deal with for no apparent 8enefit.
-async function findFiles(dataPath, filter = f => true) {
-    return (await readdir(dataPath))
-        .map(file => path.join(dataPath, file))
-        .filter(file => filter(file));
-}
-
 function splitLines(text) {
     return text.split(/\r\n|\r|\n/);
 }
-
-function parseDimensions(string) {
-    if (!string) {
-        return null;
-    }
-
-    const parts = string.split(/[x,* ]+/g);
-    if (parts.length !== 2) throw new Error(`Invalid dimensions: ${string} (expected width & height)`);
-    const nums = parts.map(part => Number(part.trim()));
-    if (nums.includes(NaN)) throw new Error(`Invalid dimensions: ${string} (couldn't parse as numbers)`);
-    return nums;
-}
-
-function parseContributors(contributors) {
-    if (!contributors) {
-        return null;
-    }
-
-    if (contributors.length === 1 && contributors[0].startsWith('<i>')) {
-        const arr = [];
-        arr.textContent = contributors[0];
-        return arr;
-    }
-
-    contributors = contributors.map(contrib => {
-        // 8asically, the format is "Who (What)", or just "Who". 8e sure to
-        // keep in mind that "what" doesn't necessarily have a value!
-        const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-        if (!match) {
-            return contrib;
-        }
-        const who = match[1];
-        const what = match[3] || null;
-        return {who, what};
-    });
-
-    const badContributor = contributors.find(val => typeof val === 'string');
-    if (badContributor) {
-        return {error: `An entry has an incorrectly formatted contributor, "${badContributor}".`};
-    }
-
-    if (contributors.length === 1 && contributors[0].who === 'none') {
-        return null;
-    }
-
-    return contributors;
-};
 
 const replacerSpec = {
     'album': {
@@ -704,579 +597,6 @@ function transformLyrics(text, {
         addLine();
     }
     return outLines.join('\n');
-}
-
-// Use parseErrorFactory to declare different "types" of errors. By storing the
-// factory itself in an accessible location, the type of error may be detected
-// by comparing against its own factory property.
-function parseErrorFactory(annotation) {
-    return function factory(data = null) {
-        return {
-            error: true,
-            annotation,
-            data,
-            factory
-        };
-    };
-}
-
-function parseField(object, key, steps) {
-    let value = object[key];
-
-    for (const step of steps) {
-        try {
-            value = step(value);
-        } catch (error) {
-            throw parseField.stepError({
-                stepName: step.name,
-                stepError: error
-            });
-        }
-    }
-
-    return value;
-}
-
-parseField.stepError = parseErrorFactory('step failed');
-
-function assertFieldPresent(value) {
-    if (value === undefined || value === null) {
-        throw assertFieldPresent.missingField();
-    } else {
-        return value;
-    }
-}
-
-assertFieldPresent.missingField = parseErrorFactory('missing field');
-
-function assertValidDate(dateString, {optional = false} = {}) {
-    if (dateString && isNaN(Date.parse(dateString))) {
-        throw assertValidDate.invalidDate();
-    }
-    return value;
-}
-
-assertValidDate.invalidDate = parseErrorFactory('invalid date');
-
-function parseCommentary(text) {
-    if (text) {
-        const lines = String(text).split('\n');
-        if (!lines[0].replace(/<\/b>/g, '').includes(':</i>')) {
-            return {error: `An entry is missing commentary citation: "${lines[0].slice(0, 40)}..."`};
-        }
-        return text;
-    } else {
-        return null;
-    }
-}
-
-// General function for inputting a single document (usually loaded from YAML)
-// and outputting an instance of a provided Thing subclass.
-//
-// makeProcessDocument is a factory function: the returned function will take a
-// document and apply the configuration passed to makeProcessDocument in order
-// to construct a Thing subclass.
-function makeProcessDocument(thingClass, {
-    // Optional early step for transforming field values before providing them
-    // to the Thing's update() method. This is useful when the input format
-    // (i.e. values in the document) differ from the format the actual Thing
-    // expects.
-    //
-    // Each key and value are a field name (not an update() property) and a
-    // function which takes the value for that field and returns the value which
-    // will be passed on to update().
-    fieldTransformations = {},
-
-    // Mapping of Thing.update() source properties to field names.
-    //
-    // Note this is property -> field, not field -> property. This is a
-    // shorthand convenience because properties are generally typical
-    // camel-cased JS properties, while fields may contain whitespace and be
-    // more easily represented as quoted strings.
-    propertyFieldMapping,
-
-    // Completely ignored fields. These won't throw an unknown field error if
-    // they're present in a document, but they won't be used for Thing property
-    // generation, either. Useful for stuff that's present in data files but not
-    // yet implemented as part of a Thing's data model!
-    ignoredFields = []
-}) {
-    if (!propertyFieldMapping) {
-        throw new Error(`Expected propertyFieldMapping to be provided`);
-    }
-
-    const knownFields = Object.values(propertyFieldMapping);
-
-    // Invert the property-field mapping, since it'll come in handy for
-    // assigning update() source values later.
-    const fieldPropertyMapping = Object.fromEntries(
-        (Object.entries(propertyFieldMapping)
-            .map(([ property, field ]) => [field, property])));
-
-    const decorateErrorWithName = fn => {
-        const nameField = propertyFieldMapping['name'];
-        if (!nameField) return fn;
-
-        return document => {
-            try {
-                return fn(document);
-            } catch (error) {
-                const name = document[nameField];
-                error.message = (name
-                    ? `(name: ${inspect(name)}) ${error.message}`
-                    : `(${color.dim(`no name found`)}) ${error.message}`);
-                throw error;
-            }
-        };
-    };
-
-    return decorateErrorWithName(document => {
-        const documentEntries = Object.entries(document)
-            .filter(([ field ]) => !ignoredFields.includes(field));
-
-        const unknownFields = documentEntries
-            .map(([ field ]) => field)
-            .filter(field => !knownFields.includes(field));
-
-        if (unknownFields.length) {
-            throw new makeProcessDocument.UnknownFieldsError(unknownFields);
-        }
-
-        const fieldValues = {};
-
-        for (const [ field, value ] of documentEntries) {
-            if (Object.hasOwn(fieldTransformations, field)) {
-                fieldValues[field] = fieldTransformations[field](value);
-            } else {
-                fieldValues[field] = value;
-            }
-        }
-
-        const sourceProperties = {};
-
-        for (const [ field, value ] of Object.entries(fieldValues)) {
-            const property = fieldPropertyMapping[field];
-            sourceProperties[property] = value;
-        }
-
-        const thing = Reflect.construct(thingClass, []);
-
-        withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({ call }) => {
-            for (const [ property, value ] of Object.entries(sourceProperties)) {
-                call(() => (thing[property] = value));
-            }
-        });
-
-        return thing;
-    });
-}
-
-makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
-    constructor(fields) {
-        super(`Unknown fields present: ${fields.join(', ')}`);
-        this.fields = fields;
-    }
-};
-
-const processAlbumDocument = makeProcessDocument(Album, {
-    fieldTransformations: {
-        'Artists': parseContributors,
-        'Cover Artists': parseContributors,
-        'Default Track Cover Artists': parseContributors,
-        'Wallpaper Artists': parseContributors,
-        'Banner Artists': parseContributors,
-
-        'Date': value => new Date(value),
-        'Date Added': value => new Date(value),
-        'Cover Art Date': value => new Date(value),
-        'Default Track Cover Art Date': value => new Date(value),
-
-        'Banner Dimensions': parseDimensions,
-    },
-
-    propertyFieldMapping: {
-        name: 'Album',
-
-        color: 'Color',
-        directory: 'Directory',
-        urls: 'URLs',
-
-        artistContribsByRef: 'Artists',
-        coverArtistContribsByRef: 'Cover Artists',
-        trackCoverArtistContribsByRef: 'Default Track Cover Artists',
-
-        coverArtFileExtension: 'Cover Art File Extension',
-        trackCoverArtFileExtension: 'Track Art File Extension',
-
-        wallpaperArtistContribsByRef: 'Wallpaper Artists',
-        wallpaperStyle: 'Wallpaper Style',
-        wallpaperFileExtension: 'Wallpaper File Extension',
-
-        bannerArtistContribsByRef: 'Banner Artists',
-        bannerStyle: 'Banner Style',
-        bannerFileExtension: 'Banner File Extension',
-        bannerDimensions: 'Banner Dimensions',
-
-        date: 'Date',
-        trackArtDate: 'Default Track Cover Art Date',
-        coverArtDate: 'Cover Art Date',
-        dateAddedToWiki: 'Date Added',
-
-        hasTrackArt: 'Has Track Art',
-        isMajorRelease: 'Major Release',
-        isListedOnHomepage: 'Listed on Homepage',
-
-        groupsByRef: 'Groups',
-        artTagsByRef: 'Art Tags',
-        commentary: 'Commentary',
-    }
-});
-
-const processTrackGroupDocument = makeProcessDocument(TrackGroup, {
-    fieldTransformations: {
-        'Date Originally Released': value => new Date(value),
-    },
-
-    propertyFieldMapping: {
-        name: 'Group',
-        color: 'Color',
-        dateOriginallyReleased: 'Date Originally Released',
-    }
-});
-
-const processTrackDocument = makeProcessDocument(Track, {
-    fieldTransformations: {
-        'Duration': getDurationInSeconds,
-
-        'Date First Released': value => new Date(value),
-        'Cover Art Date': value => new Date(value),
-
-        'Artists': parseContributors,
-        'Contributors': parseContributors,
-        'Cover Artists': parseContributors,
-    },
-
-    propertyFieldMapping: {
-        name: 'Track',
-
-        directory: 'Directory',
-        duration: 'Duration',
-        urls: 'URLs',
-
-        coverArtDate: 'Cover Art Date',
-        coverArtFileExtension: 'Cover Art File Extension',
-        dateFirstReleased: 'Date First Released',
-        hasCoverArt: 'Has Cover Art',
-        hasURLs: 'Has URLs',
-
-        referencedTracksByRef: 'Referenced Tracks',
-        artistContribsByRef: 'Artists',
-        contributorContribsByRef: 'Contributors',
-        coverArtistContribsByRef: 'Cover Artists',
-        artTagsByRef: 'Art Tags',
-        originalReleaseTrackByRef: 'Originally Released As',
-
-        commentary: 'Commentary',
-        lyrics: 'Lyrics'
-    },
-
-    ignoredFields: ['Sampled Tracks']
-});
-
-const processArtistDocument = makeProcessDocument(Artist, {
-    propertyFieldMapping: {
-        name: 'Artist',
-
-        directory: 'Directory',
-        urls: 'URLs',
-        hasAvatar: 'Has Avatar',
-        avatarFileExtension: 'Avatar File Extension',
-
-        aliasNames: 'Aliases',
-
-        contextNotes: 'Context Notes'
-    },
-
-    ignoredFields: ['Dead URLs']
-});
-
-const processFlashDocument = makeProcessDocument(Flash, {
-    fieldTransformations: {
-        'Date': value => new Date(value),
-
-        'Contributors': parseContributors,
-    },
-
-    propertyFieldMapping: {
-        name: 'Flash',
-
-        directory: 'Directory',
-        page: 'Page',
-        date: 'Date',
-        coverArtFileExtension: 'Cover Art File Extension',
-
-        featuredTracksByRef: 'Featured Tracks',
-        contributorContribsByRef: 'Contributors',
-        urls: 'URLs'
-    },
-});
-
-const processFlashActDocument = makeProcessDocument(FlashAct, {
-    propertyFieldMapping: {
-        name: 'Act',
-        color: 'Color',
-        anchor: 'Anchor',
-        jump: 'Jump',
-        jumpColor: 'Jump Color'
-    }
-});
-
-async function processFlashDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
-    }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    let act, color;
-    return sections.map(section => {
-        if (getBasicField(section, 'ACT')) {
-            act = getBasicField(section, 'ACT');
-            color = (
-                getBasicField(section, 'Color') ||
-                getBasicField(section, 'FG')
-            );
-            const anchor = getBasicField(section, 'Anchor');
-            const jump = getBasicField(section, 'Jump');
-            const jumpColor = getBasicField(section, 'Jump Color') || color;
-            return {act8r8k: true, name: act, color, anchor, jump, jumpColor};
-        }
-
-        const name = getBasicField(section, 'Flash');
-        let page = getBasicField(section, 'Page');
-        let directory = getBasicField(section, 'Directory');
-        let date = getBasicField(section, 'Date');
-        const jiff = getBasicField(section, 'Jiff');
-        const tracks = getListField(section, 'Tracks') || [];
-        const contributors = getContributionField(section, 'Contributors') || [];
-        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
-
-        if (!name) {
-            return {error: 'Expected "Flash" (name) field!'};
-        }
-
-        if (!page && !directory) {
-            return {error: 'Expected "Page" or "Directory" field!'};
-        }
-
-        if (!directory) {
-            directory = page;
-        }
-
-        if (!date) {
-            return {error: 'Expected "Date" field!'};
-        }
-
-        if (isNaN(Date.parse(date))) {
-            return {error: `Invalid Date field: "${date}"`};
-        }
-
-        date = new Date(date);
-
-        return {name, page, directory, date, contributors, tracks, urls, act, color, jiff};
-    });
-}
-
-const processNewsEntryDocument = makeProcessDocument(NewsEntry, {
-    fieldTransformations: {
-        'Date': value => new Date(value)
-    },
-
-    propertyFieldMapping: {
-        name: 'Name',
-        directory: 'Directory',
-        date: 'Date',
-        content: 'Content',
-    }
-});
-
-const processArtTagDocument = makeProcessDocument(ArtTag, {
-    propertyFieldMapping: {
-        name: 'Tag',
-        directory: 'Directory',
-        color: 'Color',
-        isContentWarning: 'Is CW'
-    }
-});
-
-const processGroupDocument = makeProcessDocument(Group, {
-    propertyFieldMapping: {
-        name: 'Group',
-        directory: 'Directory',
-        description: 'Description',
-        urls: 'URLs',
-    }
-});
-
-const processGroupCategoryDocument = makeProcessDocument(GroupCategory, {
-    propertyFieldMapping: {
-        name: 'Category',
-        color: 'Color',
-    }
-});
-
-async function processGroupDataFile(file) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            return [];
-        } else {
-            return {error: `Could not read ${file} (${error.code}).`};
-        }
-    }
-
-    const contentLines = splitLines(contents);
-    const sections = Array.from(getSections(contentLines));
-
-    let category, color;
-    return sections.map(section => {
-        if (getBasicField(section, 'Category')) {
-            category = getBasicField(section, 'Category');
-            color = getBasicField(section, 'Color');
-            return {isCategory: true, name: category, color};
-        }
-
-        const name = getBasicField(section, 'Group');
-        if (!name) {
-            return {error: 'Expected "Group" field!'};
-        }
-
-        let directory = getBasicField(section, 'Directory');
-        if (!directory) {
-            directory = getKebabCase(name);
-        }
-
-        let description = getMultilineField(section, 'Description');
-        if (!description) {
-            return {error: 'Expected "Description" field!'};
-        }
-
-        let descriptionShort = description.split('<hr class="split">')[0];
-
-        const urls = (getListField(section, 'URLs') || []).filter(Boolean);
-
-        return {
-            isGroup: true,
-            name,
-            directory,
-            description,
-            descriptionShort,
-            urls,
-            category,
-            color
-        };
-    });
-}
-
-const processStaticPageDocument = makeProcessDocument(StaticPage, {
-    propertyFieldMapping: {
-        name: 'Name',
-        nameShort: 'Short Name',
-        directory: 'Directory',
-
-        content: 'Content',
-        stylesheet: 'Style',
-
-        showInNavigationBar: 'Show in Navigation Bar'
-    }
-});
-
-const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
-    propertyFieldMapping: {
-        name: 'Name',
-        nameShort: 'Short Name',
-        color: 'Color',
-        description: 'Description',
-        footerContent: 'Footer Content',
-        defaultLanguage: 'Default Language',
-        canonicalBase: 'Canonical Base',
-        enableFlashesAndGames: 'Enable Flashes & Games',
-        enableListings: 'Enable Listings',
-        enableNews: 'Enable News',
-        enableArtTagUI: 'Enable Art Tag UI',
-        enableGroupUI: 'Enable Group UI',
-    }
-});
-
-const processHomepageLayoutDocument = makeProcessDocument(HomepageLayout, {
-    propertyFieldMapping: {
-        sidebarContent: 'Sidebar Content'
-    },
-
-    ignoredFields: ['Homepage']
-});
-
-const homepageLayoutRowBaseSpec = {
-};
-
-const makeProcessHomepageLayoutRowDocument = (rowClass, spec) => makeProcessDocument(rowClass, {
-    ...spec,
-
-    propertyFieldMapping: {
-        name: 'Row',
-        color: 'Color',
-        type: 'Type',
-        ...spec.propertyFieldMapping,
-    }
-});
-
-const homepageLayoutRowTypeProcessMapping = {
-    albums: makeProcessHomepageLayoutRowDocument(HomepageLayoutAlbumsRow, {
-        propertyFieldMapping: {
-            sourceGroupByRef: 'Group',
-            countAlbumsFromGroup: 'Count',
-            sourceAlbumsByRef: 'Albums',
-            actionLinks: 'Actions'
-        }
-    })
-};
-
-function processHomepageLayoutRowDocument(document) {
-    const type = document['Type'];
-
-    const match = Object.entries(homepageLayoutRowTypeProcessMapping)
-        .find(([ key ]) => key === type);
-
-    if (!match) {
-        throw new TypeError(`No processDocument function for row type ${type}!`);
-    }
-
-    return match[1](document);
-}
-
-function getDurationInSeconds(string) {
-    if (typeof string === 'number') {
-        return string;
-    }
-
-    if (typeof string !== 'string') {
-        throw new TypeError(`Expected a string or number, got ${string}`);
-    }
-
-    const parts = string.split(':').map(n => parseInt(n))
-    if (parts.length === 3) {
-        return parts[0] * 3600 + parts[1] * 60 + parts[2]
-    } else if (parts.length === 2) {
-        return parts[0] * 60 + parts[1]
-    } else {
-        return 0
-    }
 }
 
 function stringifyThings(thingData) {
@@ -1945,35 +1265,6 @@ async function wrapLanguages(fn, {writeOneLanguage = null}) {
     }
 }
 
-// Handy utility function for binding the find.thing() functions to a complete
-// wikiData object, optionally taking default options to provide to the find
-// function. Note that this caches the arrays read from wikiData right when it's
-// called, so if their values change, you'll have to continue with a fresh call
-// to indFind.
-function bindFind(wikiData, opts1) {
-    return Object.fromEntries(Object.entries({
-        album: 'albumData',
-        artist: 'artistData',
-        artTag: 'artTagData',
-        flash: 'flashData',
-        group: 'groupData',
-        listing: 'listingSpec',
-        newsEntry: 'newsData',
-        staticPage: 'staticPageData',
-        track: 'trackData',
-    }).map(([ key, value ]) => {
-        const findFn = find[key];
-        const thingData = wikiData[value];
-        return [key, (opts1
-            ? (ref, opts2) => (opts2
-                ? findFn(ref, thingData, {...opts1, ...opts2})
-                : findFn(ref, thingData, opts1))
-            : (ref, opts2) => (opts2
-                ? findFn(ref, thingData, opts2)
-                : findFn(ref, thingData)))];
-    }));
-}
-
 async function main() {
     Error.stackTraceLimit = Infinity;
 
@@ -2153,7 +1444,9 @@ async function main() {
     }
 
     if (langPath) {
-        const languageDataFiles = await findFiles(langPath, f => path.extname(f) === '.json');
+        const languageDataFiles = await findFiles(langPath, {
+            filter: f => path.extname(f) === '.json'
+        });
         const results = await progressPromiseAll(`Reading & processing language files.`, languageDataFiles
             .map(file => processLanguageFile(file, defaultStrings)));
 
@@ -2188,471 +1481,37 @@ async function main() {
         logInfo`Writing all languages.`;
     }
 
-    // 8ut wait, you might say, how do we know which al8um these data files
-    // correspond to???????? You wouldn't dare suggest we parse the actual
-    // paths returned 8y this function, which ought to 8e of effectively
-    // unknown format except for their purpose as reada8le data files!?
-    // To that, I would say, yeah, you're right. Thanks a 8unch, my projection
-    // of "you". We're going to read these files later, and contained within
-    // will 8e the actual directory names that the data correspond to. Yes,
-    // that's redundant in some ways - we COULD just return the directory name
-    // in addition to the data path, and duplicating that name within the file
-    // itself suggests we 8e careful to avoid mismatching it - 8ut doing it
-    // this way lets the data files themselves 8e more porta8le (meaning we
-    // could store them all in one folder, if we wanted, and this program would
-    // still output to the correct al8um directories), and also does make the
-    // function's signature simpler (an array of strings, rather than some kind
-    // of structure containing 8oth data file paths and output directories).
-    // This is o8jectively a good thing, 8ecause it means the function can stay
-    // truer to its name, and have a narrower purpose: it doesn't need to
-    // concern itself with where we *output* files, or whatever other reasons
-    // we might (hypothetically) have for knowing the containing directory.
-    // And, in the strange case where we DO really need to know that info, we
-    // callers CAN use path.dirname to find out that data. 8ut we'll 8e
-    // avoiding that in our code 8ecause, again, we want to avoid assuming the
-    // format of the returned paths here - they're only meant to 8e used for
-    // reading as-is.
-    const albumDataFiles = await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY), f => path.extname(f) === '.yaml');
-
-    const documentModes = {
-        onePerFile: Symbol('Document mode: One per file'),
-        headerAndEntries: Symbol('Document mode: Header and entries'),
-        allInOne: Symbol('Document mode: All in one')
-    };
-
-    const dataSteps = [
-        {
-            title: `Process wiki info file`,
-            files: [path.join(dataPath, WIKI_INFO_FILE)],
-
-            documentMode: documentModes.onePerFile,
-            processDocument: processWikiInfoDocument,
-
-            save(results) {
-                if (!results[0]) {
-                    return;
-                }
-
-                wikiData.wikiInfo = results[0];
-            }
-        },
-
-        {
-            title: `Process album files`,
-            files: albumDataFiles,
-
-            documentMode: documentModes.headerAndEntries,
-            processHeaderDocument: processAlbumDocument,
-            processEntryDocument(document) {
-                return ('Group' in document
-                    ? processTrackGroupDocument(document)
-                    : processTrackDocument(document));
-            },
-
-            save(results) {
-                const albumData = [];
-                const trackData = [];
-
-                for (const { header: album, entries } of results) {
-                    // We can't mutate an array once it's set as a property
-                    // value, so prepare the tracks and track groups that will
-                    // show up in a track list all the way before actually
-                    // applying them.
-                    const trackGroups = [];
-                    let currentTracksByRef = null;
-                    let currentTrackGroup = null;
-
-                    const albumRef = Thing.getReference(album);
-
-                    function closeCurrentTrackGroup() {
-                        if (currentTracksByRef) {
-                            let trackGroup;
-
-                            if (currentTrackGroup) {
-                                trackGroup = currentTrackGroup;
-                            } else {
-                                trackGroup = new TrackGroup();
-                                trackGroup.name = `Default Track Group`;
-                                trackGroup.isDefaultTrackGroup = true;
-                            }
-
-                            trackGroup.album = album;
-                            trackGroup.tracksByRef = currentTracksByRef;
-                            trackGroups.push(trackGroup);
-                        }
-                    }
-
-                    for (const entry of entries) {
-                        if (entry instanceof TrackGroup) {
-                            closeCurrentTrackGroup();
-                            currentTracksByRef = [];
-                            currentTrackGroup = entry;
-                            continue;
-                        }
-
-                        trackData.push(entry);
-
-                        entry.dataSourceAlbumByRef = albumRef;
-
-                        const trackRef = Thing.getReference(entry);
-                        if (currentTracksByRef) {
-                            currentTracksByRef.push(trackRef);
-                        } else {
-                            currentTracksByRef = [trackRef];
-                        }
-                    }
-
-                    closeCurrentTrackGroup();
-
-                    album.trackGroups = trackGroups;
-                    albumData.push(album);
-                }
-
-                Object.assign(wikiData, {albumData, trackData});
-            }
-        },
-
-        {
-            title: `Process artists file`,
-            files: [path.join(dataPath, ARTIST_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument: processArtistDocument,
-
-            save(results) {
-                wikiData.artistData = results;
-
-                wikiData.artistAliasData = results.flatMap(artist => {
-                    const origRef = Thing.getReference(artist);
-                    return (artist.aliasNames?.map(name => {
-                        const alias = new Artist();
-                        alias.name = name;
-                        alias.isAlias = true;
-                        alias.aliasedArtistRef = origRef;
-                        alias.artistData = WD.artistData;
-                        return alias;
-                    }) ?? []);
-                });
-            }
-        },
-
-        // TODO: WD.wikiInfo.enableFlashesAndGames &&
-        {
-            title: `Process flashes file`,
-            files: [path.join(dataPath, FLASH_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument(document) {
-                return ('Act' in document
-                    ? processFlashActDocument(document)
-                    : processFlashDocument(document));
-            },
-
-            save(results) {
-                let flashAct;
-                let flashesByRef = [];
-
-                if (results[0] && !(results[0] instanceof FlashAct)) {
-                    throw new Error(`Expected an act at top of flash data file`);
-                }
-
-                for (const thing of results) {
-                    if (thing instanceof FlashAct) {
-                        if (flashAct) {
-                            Object.assign(flashAct, {flashesByRef});
-                        }
-
-                        flashAct = thing;
-                        flashesByRef = [];
-                    } else {
-                        flashesByRef.push(Thing.getReference(thing));
-                    }
-                }
-
-                if (flashAct) {
-                    Object.assign(flashAct, {flashesByRef});
-                }
-
-                wikiData.flashData = results.filter(x => x instanceof Flash);
-                wikiData.flashActData = results.filter(x => x instanceof FlashAct);
-            }
-        },
-
-        {
-            title: `Process groups file`,
-            files: [path.join(dataPath, GROUP_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument(document) {
-                return ('Category' in document
-                    ? processGroupCategoryDocument(document)
-                    : processGroupDocument(document));
-            },
-
-            save(results) {
-                let groupCategory;
-                let groupsByRef = [];
-
-                if (results[0] && !(results[0] instanceof GroupCategory)) {
-                    throw new Error(`Expected a category at top of group data file`);
-                }
-
-                for (const thing of results) {
-                    if (thing instanceof GroupCategory) {
-                        if (groupCategory) {
-                            Object.assign(groupCategory, {groupsByRef});
-                        }
-
-                        groupCategory = thing;
-                        groupsByRef = [];
-                    } else {
-                        groupsByRef.push(Thing.getReference(thing));
-                    }
-                }
-
-                if (groupCategory) {
-                    Object.assign(groupCategory, {groupsByRef});
-                }
-
-                wikiData.groupData = results.filter(x => x instanceof Group);
-                wikiData.groupCategoryData = results.filter(x => x instanceof GroupCategory);
-            }
-        },
-
-        {
-            title: `Process homepage layout file`,
-            files: [path.join(dataPath, HOMEPAGE_LAYOUT_DATA_FILE)],
-
-            documentMode: documentModes.headerAndEntries,
-            processHeaderDocument: processHomepageLayoutDocument,
-            processEntryDocument: processHomepageLayoutRowDocument,
-
-            save(results) {
-                if (!results[0]) {
-                    return;
-                }
-
-                const { header: homepageLayout, entries: rows } = results[0];
-                Object.assign(homepageLayout, {rows});
-                Object.assign(wikiData, {homepageLayout});
-            }
-        },
-
-        // TODO: WD.wikiInfo.enableNews &&
-        {
-            title: `Process news data file`,
-            files: [path.join(dataPath, NEWS_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument: processNewsEntryDocument,
-
-            save(results) {
-                sortByDate(results);
-                results.reverse();
-
-                wikiData.newsData = results;
-            }
-        },
-
-        {
-            title: `Process art tags file`,
-            files: [path.join(dataPath, ART_TAG_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument: processArtTagDocument,
-
-            save(results) {
-                results.sort(sortByName);
-
-                wikiData.artTagData = results;
-            }
-        },
-
-        {
-            title: `Process static pages file`,
-            files: [path.join(dataPath, STATIC_PAGE_DATA_FILE)],
-
-            documentMode: documentModes.allInOne,
-            processDocument: processStaticPageDocument,
-
-            save(results) {
-                wikiData.staticPageData = results;
-            }
-        },
-    ];
-
-    const processDataAggregate = openAggregate({message: `Errors processing data files`});
-
-    function decorateErrorWithFile(fn) {
-        return (x, index, array) => {
-            try {
-                return fn(x, index, array);
-            } catch (error) {
-                error.message += (
-                    (error.message.includes('\n') ? '\n' : ' ') +
-                    `(file: ${color.bright(color.blue(path.relative(dataPath, x.file)))})`
-                );
-                throw error;
-            }
-        };
-    }
-
-    function decorateErrorWithIndex(fn) {
-        return (x, index, array) => {
-            try {
-                return fn(x, index, array);
-            } catch (error) {
-                error.message = `(${color.yellow(`#${index + 1}`)}) ${error.message}`;
-                throw error;
-            }
-        }
-    }
-
-    for (const dataStep of dataSteps) {
-        await processDataAggregate.nestAsync(
-            {message: `Errors during data step: ${dataStep.title}`},
-            async ({call, callAsync, map, mapAsync, nest}) => {
-                const { documentMode } = dataStep;
-
-                if (!(Object.values(documentModes).includes(documentMode))) {
-                    throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
-                }
-
-                if (documentMode === documentModes.allInOne) {
-                    if (dataStep.files.length !== 1) {
-                        throw new Error(`Expected 1 file for all-in-one documentMode, not ${files.length}`);
-                    }
-
-                    const file = dataStep.files[0];
-
-                    const readResult = await callAsync(readFile, file);
-
-                    if (!readResult) {
-                        return;
-                    }
-
-                    const yamlResult = call(yaml.loadAll, readResult);
-
-                    if (!yamlResult) {
-                        return;
-                    }
-
-                    const {
-                        result: processResults,
-                        aggregate: processAggregate
-                    } = mapAggregate(
-                        yamlResult,
-                        decorateErrorWithIndex(dataStep.processDocument),
-                        {message: `Errors processing documents`}
-                    );
-
-                    call(processAggregate.close);
-
-                    call(dataStep.save, processResults);
-
-                    return;
-                }
-
-                const readResults = await mapAsync(
-                    dataStep.files,
-                    file => (readFile(file, 'utf-8')
-                        .then(contents => ({file, contents}))),
-                    {
-                        message: `Errors reading data files`,
-                        promiseAll: array => progressPromiseAll(`Data step: ${dataStep.title} (reading data files)`, array)
-                    });
-
-                const yamlResults = map(
-                    readResults,
-                    decorateErrorWithFile(
-                        ({ file, contents }) => ({file, documents: yaml.loadAll(contents)})),
-                    {message: `Errors parsing data files as valid YAML`});
-
-                let processResults;
-
-                if (documentMode === documentModes.headerAndEntries) {
-                    nest({message: `Errors processing data files as valid documents`}, ({ call, map }) => {
-                        processResults = [];
-
-                        yamlResults.forEach(({ file, documents }) => {
-                            const [ headerDocument, ...entryDocuments ] = documents;
-
-                            const header = call(
-                                decorateErrorWithFile(
-                                    ({ document }) => dataStep.processHeaderDocument(document)),
-                                {file, document: headerDocument});
-
-                            // Don't continue processing files whose header
-                            // document is invalid - the entire file is excempt
-                            // from data in this case.
-                            if (!header) {
-                                return;
-                            }
-
-                            const entries = map(
-                                entryDocuments.map(document => ({file, document})),
-                                decorateErrorWithFile(
-                                    decorateErrorWithIndex(
-                                        ({ document }) => dataStep.processEntryDocument(document))),
-                                {message: `Errors processing entry documents`});
-
-                            // Entries may be incomplete (i.e. any errored
-                            // documents won't have a processed output
-                            // represented here) - this is intentional! By
-                            // principle, partial output is preferred over
-                            // erroring an entire file.
-                            processResults.push({header, entries});
-                        });
-                    });
-                }
-
-                if (documentMode === documentModes.onePerFile) {
-                    nest({message: `Errors processing data files as valid documents`}, ({ call, map }) => {
-                        processResults = [];
-
-                        yamlResults.forEach(({ file, documents }) => {
-                            if (documents.length > 1) {
-                                call(decorateErrorWithFile(() => {
-                                    throw new Error(`Only expected one document to be present per file`);
-                                }));
-                                return;
-                            }
-
-                            const result = call(
-                                decorateErrorWithFile(
-                                    ({ document }) => dataStep.processDocument(document)),
-                                {file, document: documents[0]});
-
-                            if (!result) {
-                                return;
-                            }
-
-                            processResults.push(result);
-                        });
-                    });
-                }
-
-                call(dataStep.save, processResults);
-            });
-    }
+    const {
+        aggregate: processDataAggregate,
+        result: wikiDataResult
+    } = await loadAndProcessDataDocuments({dataPath});
+
+    Object.assign(wikiData, wikiDataResult);
 
     {
+        const logThings = (thingDataProp, label) => logInfo` - ${wikiData[thingDataProp]?.length ?? color.red('(Missing!)')} ${color.normal(color.dim(label))}`;
         try {
             logInfo`Loaded data and processed objects:`;
-            logInfo` - ${wikiData.albumData.length} albums`;
-            logInfo` - ${wikiData.trackData.length} tracks`;
-            logInfo` - ${wikiData.artistData.length} artists`;
-            if (wikiData.flashData)
-                logInfo` - ${wikiData.flashData.length} flashes (${wikiData.flashActData.length} acts)`;
-            logInfo` - ${wikiData.groupData.length} groups (${wikiData.groupCategoryData.length} categories)`;
-            logInfo` - ${wikiData.artTagData.length} art tags`;
-            if (wikiData.newsData)
-                logInfo` - ${wikiData.newsData.length} news entries`;
-            logInfo` - ${wikiData.staticPageData.length} static pages`;
-            if (wikiData.homepageLayout)
+            logThings('albumData', 'albums');
+            logThings('trackData', 'tracks');
+            logThings('artistData', 'artists');
+            if (wikiData.flashData) {
+                logThings('flashData', 'flashes');
+                logThings('flashActData', 'flash acts');
+            }
+            logThings('groupData', 'groups');
+            logThings('groupCategoryData', 'group categories');
+            logThings('artTagData', 'art tags');
+            if (wikiData.newsData) {
+                logThings('newsData', 'news entries');
+            }
+            logThings('staticPageData', 'static pages');
+            if (wikiData.homepageLayout) {
                 logInfo` - ${1} homepage layout (${wikiData.homepageLayout.rows.length} rows)`;
-            if (wikiData.wikiInfo)
+            }
+            if (wikiData.wikiInfo) {
                 logInfo` - ${1} wiki config file`;
+            }
         } catch (error) {
             console.error(`Error showing data summary:`, error);
         }
@@ -2680,105 +1539,11 @@ async function main() {
         return;
     }
 
-    // Data linking! Basically, provide (portions of) wikiData to the Things
-    // which require it - they'll expose dynamically computed properties as a
-    // result (many of which are required for page HTML generation).
-
-    function linkDataArrays() {
-        function assignWikiData(things, ...keys) {
-            for (let i = 0; i < things.length; i++) {
-                for (let j = 0; j < keys.length; j++) {
-                    const key = keys[j];
-                    things[i][key] = wikiData[key];
-                }
-            }
-        }
-
-        assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
-        WD.albumData.forEach(album => assignWikiData(album.trackGroups, 'trackData'));
-
-        assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
-        assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
-        assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
-        assignWikiData(WD.groupCategoryData, 'groupData');
-        assignWikiData(WD.flashData, 'artistData', 'flashActData', 'trackData');
-        assignWikiData(WD.flashActData, 'flashData');
-        assignWikiData(WD.artTagData, 'albumData', 'trackData');
-        assignWikiData(WD.homepageLayout.rows, 'albumData', 'groupData');
-    }
-
-    // Extra organization stuff needed for listings and the like.
-
-    function sortDataArrays() {
-        Object.assign(wikiData, {
-            albumData: sortByDate(WD.albumData.slice()),
-            trackData: sortByDate(WD.trackData.slice())
-        });
-
-        // Re-link data arrays, so that every object has the new, sorted
-        // versions. Note that the sorting step deliberately creates new arrays
-        // (mutating slices instead of the original arrays) - this is so that
-        // the object caching system understands that it's working with a new
-        // ordering.  We still need to actually provide those updated arrays
-        // over again!
-        linkDataArrays();
-    }
-
-    // Warn about directories which are reused across more than one of the same
-    // type of Thing. Directories are the unique identifier for most data
-    // objects across the wiki, so we have to make sure they aren't duplicated!
-    // This also altogether filters out instances of things with duplicate
-    // directories (so if two tracks share the directory "megalovania", they'll
-    // both be skipped for the build, for example).
-
-    const deduplicateSpec = [
-        'albumData',
-        'artTagData',
-        'flashData',
-        'groupData',
-        'newsData',
-        'trackData',
-    ];
-
     let duplicateDirectoriesErrored = false;
 
     function filterAndShowDuplicateDirectories() {
-        const aggregate = openAggregate({message: `Duplicate directories found`});
-        for (const thingDataProp of deduplicateSpec) {
-            const thingData = wikiData[thingDataProp];
-            aggregate.nest({message: `Duplicate directories found in ${color.green('wikiData.' + thingDataProp)}`}, ({ call }) => {
-                const directoryPlaces = Object.create(null);
-                const duplicateDirectories = [];
-                for (const thing of thingData) {
-                    const { directory } = thing;
-                    if (directory in directoryPlaces) {
-                        directoryPlaces[directory].push(thing);
-                        duplicateDirectories.push(directory);
-                    } else {
-                        directoryPlaces[directory] = [thing];
-                    }
-                }
-                if (!duplicateDirectories.length) return;
-                duplicateDirectories.sort((a, b) => {
-                    const aL = a.toLowerCase();
-                    const bL = b.toLowerCase();
-                    return aL < bL ? -1 : aL > bL ? 1 : 0;
-                });
-                for (const directory of duplicateDirectories) {
-                    const places = directoryPlaces[directory];
-                    call(() => {
-                        throw new Error(`Duplicate directory ${color.green(directory)}:\n` +
-                            places.map(thing => ` - ` + inspect(thing)).join('\n'));
-                    });
-                }
-                const allDuplicatedThings = Object.values(directoryPlaces).filter(arr => arr.length > 1).flat();
-                const filteredThings = thingData.filter(thing => !allDuplicatedThings.includes(thing));
-                wikiData[thingDataProp] = filteredThings;
-            });
-        }
-
+        const aggregate = filterDuplicateDirectories(wikiData);
         let errorless = true;
-
         try {
             aggregate.close();
         } catch (aggregate) {
@@ -2792,111 +1557,13 @@ async function main() {
             duplicateDirectoriesErrored = true;
             errorless = false;
         }
-
         if (errorless) {
             logInfo`No duplicate directories found - nice!`;
         }
-
-        linkDataArrays();
-    }
-
-    // Warn about references across data which don't match anything.
-    // This involves using the find() functions on all references, setting it to
-    // 'error' mode, and collecting everything in a structured logged (which
-    // gets logged if there are any errors). At the same time, we remove errored
-    // references from the thing's data array.
-
-    const referenceSpec = [
-        ['albumData', {
-            artistContribsByRef: '_contrib',
-            coverArtistContribsByRef: '_contrib',
-            trackCoverArtistContribsByRef: '_contrib',
-            wallpaperArtistContribsByRef: '_contrib',
-            bannerArtistContribsByRef: '_contrib',
-            groupsByRef: 'group',
-            artTagsByRef: 'artTag',
-        }],
-
-        ['trackData', {
-            artistContribsByRef: '_contrib',
-            contributorContribsByRef: '_contrib',
-            coverArtistContribsByRef: '_contrib',
-            referencedTracksByRef: 'track',
-            artTagsByRef: 'artTag',
-            originalReleaseTrackByRef: 'track',
-        }],
-
-        ['groupCategoryData', {
-            groupsByRef: 'group',
-        }],
-
-        ['homepageLayout.rows', {
-            sourceGroupsByRef: 'group',
-            sourceAlbumsByRef: 'album',
-        }],
-
-        ['flashData', {
-            contributorContribsByRef: '_contrib',
-            featuredTracksByRef: 'track',
-        }],
-
-        ['flashActData', {
-            flashesByRef: 'flash',
-        }],
-    ];
-
-    function getNestedProp(obj, key) {
-        const recursive = (o, k) => (k.length === 1
-            ? o[k[0]]
-            : recursive(o[k[0]], k.slice(1)));
-        const keys = key.split(/(?<=(?<!\\)(?:\\\\)*)\./);
-        return recursive(obj, keys);
     }
 
     function filterAndShowReferenceErrors() {
-        const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
-        const boundFind = bindFind(wikiData, {mode: 'error'});
-        for (const [ thingDataProp, propSpec ] of referenceSpec) {
-            const thingData = getNestedProp(wikiData, thingDataProp);
-            aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({ nest }) => {
-                for (const thing of thingData) {
-                    nest({message: `Reference errors in ${inspect(thing)}`}, ({ filter }) => {
-                        for (const [ property, findFnKey ] of Object.entries(propSpec)) {
-                            if (!thing[property]) continue;
-                            if (findFnKey === '_contrib') {
-                                thing[property] = filter(thing[property],
-                                    decorateErrorWithIndex(({ who }) => {
-                                        const alias = find.artist(who, wikiData.artistAliasData, {mode: 'quiet'});
-                                        if (alias) {
-                                            const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
-                                            throw new Error(`Reference ${color.red(who)} is to an alias, should be ${color.green(original.name)}`);
-                                        }
-                                        return boundFind.artist(who);
-                                    }),
-                                    {message: `Reference errors in contributions ${color.green(property)} (${color.green('find.artist')})`});
-                                continue;
-                            }
-                            const findFn = boundFind[findFnKey];
-                            const value = thing[property];
-                            if (Array.isArray(value)) {
-                                thing[property] = filter(value, decorateErrorWithIndex(findFn),
-                                    {message: `Reference errors in property ${color.green(property)} (${color.green('find.' + findFnKey)})`});
-                            } else {
-                                nest({message: `Reference error in property ${color.green(property)} (${color.green('find.' + findFnKey)})`}, ({ call }) => {
-                                    try {
-                                        call(findFn, value);
-                                    } catch (error) {
-                                        thing[property] = null;
-                                        throw error;
-                                    }
-                                });
-                            }
-                        }
-                    });
-                }
-            });
-        }
-
+        const aggregate = filterReferenceErrors(wikiData);
         let errorless = true;
         try {
             aggregate.close();
@@ -2912,7 +1579,6 @@ async function main() {
             logWarn`(Resolve errors for more complete output!)`;
             errorless = false;
         }
-
         if (errorless) {
             logInfo`All references validated without any errors - nice!`;
             logInfo`(This means all references between things, such as leitmotif references`
@@ -2923,7 +1589,7 @@ async function main() {
     // Link data arrays so that all essential references between objects are
     // complete, so properties (like dates!) are inherited where that's
     // appropriate.
-    linkDataArrays();
+    linkWikiDataArrays(wikiData);
 
     // Filter out any things with duplicate directories throughout the data,
     // warning about them too.
@@ -2935,7 +1601,7 @@ async function main() {
 
     // Sort data arrays so that they're all in order! This may use properties
     // which are only available after the initial linking.
-    sortDataArrays();
+    sortWikiDataArrays(wikiData);
 
     // const track = WD.trackData.find(t => t.name === 'Under the Sun');
     // console.log(track.album.trackGroups.find(tg => tg.tracks.includes(track)).color, track.color);

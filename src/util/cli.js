@@ -17,6 +17,7 @@ const C = n => (ENABLE_COLOR
 export const color = {
     bright: C('1'),
     dim: C('2'),
+    normal: C('22'),
     black: C('30'),
     red: C('31'),
     green: C('32'),

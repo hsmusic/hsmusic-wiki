@@ -124,3 +124,32 @@ const find = {
 };
 
 export default find;
+
+// Handy utility function for binding the find.thing() functions to a complete
+// wikiData object, optionally taking default options to provide to the find
+// function. Note that this caches the arrays read from wikiData right when it's
+// called, so if their values change, you'll have to continue with a fresh call
+// to bindFind.
+export function bindFind(wikiData, opts1) {
+    return Object.fromEntries(Object.entries({
+        album: 'albumData',
+        artist: 'artistData',
+        artTag: 'artTagData',
+        flash: 'flashData',
+        group: 'groupData',
+        listing: 'listingSpec',
+        newsEntry: 'newsData',
+        staticPage: 'staticPageData',
+        track: 'trackData',
+    }).map(([ key, value ]) => {
+        const findFn = find[key];
+        const thingData = wikiData[value];
+        return [key, (opts1
+            ? (ref, opts2) => (opts2
+                ? findFn(ref, thingData, {...opts1, ...opts2})
+                : findFn(ref, thingData, opts1))
+            : (ref, opts2) => (opts2
+                ? findFn(ref, thingData, opts2)
+                : findFn(ref, thingData)))];
+    }));
+}

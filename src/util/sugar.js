@@ -215,7 +215,7 @@ export function mapAggregate(array, fn, aggregateOpts) {
 }
 
 export function mapAggregateAsync(array, fn, {
-    promiseAll = Promise.all,
+    promiseAll = Promise.all.bind(Promise),
     ...aggregateOpts
 } = {}) {
     return _mapAggregate('async', promiseAll, array, fn, aggregateOpts);
@@ -255,7 +255,7 @@ export function filterAggregate(array, fn, aggregateOpts) {
 }
 
 export async function filterAggregateAsync(array, fn, {
-    promiseAll = Promise.all,
+    promiseAll = Promise.all.bind(Promise),
     ...aggregateOpts
 } = {}) {
     return _filterAggregate('async', promiseAll, array, fn, aggregateOpts);
@@ -370,7 +370,7 @@ export function showAggregate(topError, {
             const stackLine = stackLines?.find(line =>
                 line.trim().startsWith('at')
                 && !line.includes('sugar')
-                && !line.includes('node:internal')
+                && !line.includes('node:')
                 && !line.includes('<anonymous>'));
             const tracePart = (stackLine
                 ? '- ' + stackLine.trim().replace(/file:\/\/(.*\.js)/, (match, pathname) => pathToFile(pathname))
@@ -398,4 +398,15 @@ export function showAggregate(topError, {
     };
 
     console.error(recursive(topError, {level: 0}));
+}
+
+export function decorateErrorWithIndex(fn) {
+    return (x, index, array) => {
+        try {
+            return fn(x, index, array);
+        } catch (error) {
+            error.message = `(${color.yellow(`#${index + 1}`)}) ${error.message}`;
+            throw error;
+        }
+    }
 }
