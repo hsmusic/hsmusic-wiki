@@ -1,6 +1,8 @@
+import * as os from 'os';
 import * as path from 'path';
 import * as repl from 'repl';
 import { fileURLToPath } from 'url';
+import { promisify } from 'util';
 
 import {
     filterDuplicateDirectories,
@@ -24,10 +26,15 @@ async function main() {
         'show-traces': {
             type: 'flag'
         },
+
+        'no-history': {
+            type: 'flag'
+        },
     });
 
     const dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
     const showAggregateTraces = miscOptions['show-traces'] ?? false;
+    const disableHistory = miscOptions['no-history'] ?? false;
 
     if (!dataPath) {
         logError`Expected --data-path option or HSMUSIC_DATA to be set`;
@@ -89,6 +96,21 @@ async function main() {
         wikiData,
         {wikiData, WD: wikiData}
     );
+
+    if (disableHistory) {
+        console.log(`\rInput history disabled (--no-history provided)`);
+        replServer.displayPrompt(true);
+    } else {
+        const historyFile = path.join(os.homedir(), '.hsmusic_repl_history');
+        replServer.setupHistory(historyFile, err => {
+            if (err) {
+                console.error(`\rFailed to begin locally logging input history to ${historyFile} (provide --no-history to disable)`);
+            } else {
+                console.log(`\rLogging input history to ${historyFile} (provide --no-history to disable)`);
+            }
+            replServer.displayPrompt(true);
+        });
+    }
 }
 
 main().catch(error => {

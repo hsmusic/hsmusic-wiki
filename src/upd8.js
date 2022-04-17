@@ -1603,16 +1603,6 @@ async function main() {
     // which are only available after the initial linking.
     sortWikiDataArrays(wikiData);
 
-    // const track = WD.trackData.find(t => t.name === 'Under the Sun');
-    // console.log(track.album.trackGroups.find(tg => tg.tracks.includes(track)).color, track.color);
-    // console.log(WD.homepageLayout.rows[0].countAlbumsFromGroup);
-    // console.log(WD.albumData.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
-    // console.log(WD.groupData.find(g => g.name === 'Fandom').albums.map(a => `${a.name} (${a.date.toDateString()})`).join('\n'));
-    // console.log(WD.trackData.find(t => t.name === 'Another Chance').commentatorArtists.map(artist => `${artist.name} - commentated ${artist.tracksAsCommentator.length} tracks, ${artist.albumsAsCommentator.length} albums`).join('\n'));
-    // console.log(WD.groupCategoryData.map(c => `${c.name} (${c.groups.map(g => g.name).join(', ')})`).join('\n'));
-    // console.log(WD.groupData.map(g => `${g.name} (${g.category?.name})`).join('\n'));
-    // return;
-
     // Update languages o8ject with the wiki-specified default language!
     // This will make page files for that language 8e gener8ted at the root
     // directory, instead of the language-specific su8directory.
