@@ -82,10 +82,16 @@ export function escapeRegex(string) {
 export function bindOpts(fn, bind) {
     const bindIndex = bind[bindOpts.bindIndex] ?? 1;
 
-    return (...args) => {
+    const bound = function(...args) {
         const opts = args[bindIndex] ?? {};
         return fn(...args.slice(0, bindIndex), {...bind, ...opts});
     };
+
+    Object.defineProperty(bound, 'name', {
+        value: (fn.name ? `(options-bound) ${fn.name}` : `(options-bound)`)
+    });
+
+    return bound;
 }
 
 bindOpts.bindIndex = Symbol();
