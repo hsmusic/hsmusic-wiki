@@ -820,6 +820,7 @@ writePage.to = ({
 };
 
 writePage.html = (pageFn, {
+    localizedPaths,
     paths,
     strings,
     to,
@@ -880,6 +881,13 @@ writePage.html = (pageFn, {
     const canonical = (wikiInfo.canonicalBase
         ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
         : '');
+
+    const localizedCanonical = (wikiInfo.canonicalBase
+        ? Object.entries(localizedPaths).map(([ code, { pathname } ]) => ({
+            lang: code,
+            href: wikiInfo.canonicalBase + (pathname === '/' ? '' : pathname)
+        }))
+        : []);
 
     const collapseSidebars = (sidebarLeft.collapse !== false) && (sidebarRight.collapse !== false);
 
@@ -1061,6 +1069,7 @@ writePage.html = (pageFn, {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${html.escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
+                ${localizedCanonical.map(({ lang, href }) => `<link rel="alternate" hreflang="${lang}" href="${href}">`).join('\n')}
                 <link rel="stylesheet" href="${to('shared.staticFile', `site.css?${CACHEBUST}`)}">
                 ${(theme || stylesheet) && fixWS`
                     <style>
@@ -1256,12 +1265,7 @@ async function wrapLanguages(fn, {writeOneLanguage = null}) {
     for (let i = 0; i < entries.length; i++) {
         const [ key, strings ] = entries[i];
 
-        const baseDirectory = (strings === languages.default ? '' : strings.baseDirectory);
-
-        await fn({
-            baseDirectory,
-            strings
-        }, i, entries);
+        await fn(strings, i, entries);
     }
 }
 
@@ -1823,23 +1827,46 @@ async function main() {
     ));
     */
 
-    const perLanguageFn = async ({strings, ...opts}, i, entries) => {
+    const getBaseDirectory = strings =>
+        (strings === languages.default
+            ? ''
+            : strings.baseDirectory);
+
+    const perLanguageFn = async (strings, i, entries) => {
+        const baseDirectory = getBaseDirectory(strings);
+
         console.log(`\x1b[34;1m${
-            (`[${i + 1}/${entries.length}] ${strings.code} (-> /${opts.baseDirectory}) `
+            (`[${i + 1}/${entries.length}] ${strings.code} (-> /${baseDirectory}) `
                 .padEnd(60, '-'))
         }\x1b[0m`);
 
         await progressPromiseAll(`Writing ${strings.code}`, queue([
             ...pageWrites.map(({type, ...props}) => () => {
                 const { path, page } = props;
-                const { baseDirectory } = opts;
 
                 // TODO: This only supports one <>-style argument.
                 const pageSubKey = path[0];
                 const directory = path[1];
 
-                const paths = writePage.paths(baseDirectory, 'localized.' + pageSubKey, directory);
-                const to = writePage.to({baseDirectory, pageSubKey, paths});
+                const localizedPaths = Object.fromEntries(Object.entries(languages)
+                    .filter(([ key ]) => key !== 'default')
+                    .map(([ key, strings ]) => [strings.code, writePage.paths(
+                        getBaseDirectory(strings),
+                        'localized.' + pageSubKey,
+                        directory
+                    )]));
+
+                const paths = writePage.paths(
+                    baseDirectory,
+                    'localized.' + pageSubKey,
+                    directory
+                );
+
+                const to = writePage.to({
+                    baseDirectory,
+                    pageSubKey,
+                    paths
+                });
 
                 // TODO: Is there some nicer way to define these,
                 // may8e without totally re-8inding everything for
@@ -1986,6 +2013,7 @@ async function main() {
                 });
 
                 const content = writePage.html(pageFn, {
+                    localizedPaths,
                     paths,
                     strings,
                     to,
@@ -1996,8 +2024,6 @@ async function main() {
                 return writePage.write(content, {paths});
             }),
             ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
-                const { baseDirectory } = opts;
-
                 const title = titleFn({
                     strings
                 });
