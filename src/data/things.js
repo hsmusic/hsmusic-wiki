@@ -476,6 +476,7 @@ Album.propertyDescriptors = {
 
     hasCoverArt: Thing.common.flag(true),
     hasTrackArt: Thing.common.flag(true),
+    hasTrackNumbers: Thing.common.flag(true),
     isMajorRelease: Thing.common.flag(false),
     isListedOnHomepage: Thing.common.flag(true),
 

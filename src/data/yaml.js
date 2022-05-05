@@ -221,6 +221,7 @@ export const processAlbumDocument = makeProcessDocument(Album, {
 
         hasCoverArt: 'Has Cover Art',
         hasTrackArt: 'Has Track Art',
+        hasTrackNumbers: 'Has Track Numbers',
         isMajorRelease: 'Major Release',
         isListedOnHomepage: 'Listed on Homepage',
 

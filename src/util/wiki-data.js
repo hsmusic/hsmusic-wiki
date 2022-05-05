@@ -107,8 +107,7 @@ export function getAlbumCover(album, {to}) {
 }
 
 export function getAlbumListTag(album) {
-    // TODO: This is hard-coded! No. 8ad.
-    return (album.directory === UNRELEASED_TRACKS_DIRECTORY ? 'ul' : 'ol');
+    return (album.hasTrackNumbers ? 'ol' : 'ul');
 }
 
 // This gets all the track o8jects defined in every al8um, and sorts them 8y
