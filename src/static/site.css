@@ -707,8 +707,12 @@ ul.quick-info li:not(:last-child)::after {
 }
 
 li .by {
-    white-space: nowrap;
+    display: inline-block;
     font-style: oblique;
+}
+
+li .by a {
+    display: inline-block;
 }
 
 p code {
