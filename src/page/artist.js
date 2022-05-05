@@ -9,10 +9,6 @@ import fixWS from 'fix-whitespace';
 import * as html from '../util/html.js';
 
 import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from '../util/magic-constants.js';
-
-import {
     bindOpts,
     unique
 } from '../util/sugar.js';
@@ -82,9 +78,6 @@ export function write(artist, {wikiData}) {
         ...artist.tracksAsContributor ?? []
     ]));
 
-    const unreleasedTracks = allTracks.filter(track => track.album.directory === UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = allTracks.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
-
     const chunkTracks = tracks => (
         chunkByProperties(tracks.map(track => ({
             track,
@@ -107,10 +100,8 @@ export function write(artist, {wikiData}) {
             duration: getTotalDuration(chunk),
         })));
 
-    const unreleasedTrackListChunks = chunkTracks(unreleasedTracks);
-    const releasedTrackListChunks = chunkTracks(releasedTracks);
-
-    const totalReleasedDuration = getTotalDuration(releasedTracks);
+    const trackListChunks = chunkTracks(allTracks);
+    const totalDuration = getTotalDuration(allTracks);
 
     const countGroups = things => {
         const usedGroups = things.flatMap(thing => thing.groups || thing.album?.groups || []);
@@ -123,7 +114,7 @@ export function write(artist, {wikiData}) {
             .sort((a, b) => b.contributions - a.contributions);
     };
 
-    const musicGroups = countGroups(releasedTracks);
+    const musicGroups = countGroups(allTracks);
     const artGroups = countGroups(artThingsAll);
 
     let flashes, flashListChunks;
@@ -176,11 +167,20 @@ export function write(artist, {wikiData}) {
     }) => fixWS`
         <dl>
             ${chunks.map(({date, album, chunk, duration}) => fixWS`
-                <dt>${strings('artistPage.creditList.album.withDate.withDuration', {
-                    album: link.album(album),
-                    date: strings.count.date(date),
-                    duration: strings.count.duration(duration, {approximate: true})
-                })}</dt>
+                <dt>${
+                    (date && duration) ? strings('artistPage.creditList.album.withDate.withDuration', {
+                        album: link.album(album),
+                        date: strings.count.date(date),
+                        duration: strings.count.duration(duration, {approximate: true})
+                    }) : date ? strings('artistPage.creditList.album.withDate', {
+                        album: link.album(album),
+                        date: strings.count.date(date)
+                    }) : duration ? strings('artistPage.creditList.album.withDuration', {
+                        album: link.album(album),
+                        duration: strings.count.duration(duration, {approximate: true})
+                    }) : strings('artistPage.creditList.album', {
+                        album: link.album(album)
+                    })}</dt>
                 <dd><ul>
                     ${(chunk
                         .map(({track, ...props}) => ({
@@ -256,10 +256,7 @@ export function write(artist, {wikiData}) {
                 tracks: {
                     asArtist: artist.tracksAsArtist.map(serializeArtistsAndContrib('artistContribs')),
                     asContributor: artist.tracksAsContributor.map(serializeArtistsAndContrib('contributorContribs')),
-                    chunked: {
-                        released: serializeTrackListChunks(releasedTrackListChunks),
-                        unreleased: serializeTrackListChunks(unreleasedTrackListChunks)
-                    }
+                    chunked: serializeTrackListChunks(trackListChunks)
                 }
             };
         }
@@ -312,22 +309,17 @@ export function write(artist, {wikiData}) {
                         })}</p>`}
                         <p>${strings('misc.jumpTo.withLinks', {
                             links: strings.list.unit([
-                                [
-                                    [...releasedTracks, ...unreleasedTracks].length && `<a href="#tracks">${strings('artistPage.trackList.title')}</a>`,
-                                    unreleasedTracks.length && `(<a href="#unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</a>)`
-                                ].filter(Boolean).join(' '),
+                                allTracks.length && `<a href="#tracks">${strings('artistPage.trackList.title')}</a>`,
                                 artThingsAll.length && `<a href="#art">${strings('artistPage.artList.title')}</a>`,
                                 wikiInfo.enableFlashesAndGames && flashes.length && `<a href="#flashes">${strings('artistPage.flashList.title')}</a>`,
                                 commentaryThings.length && `<a href="#commentary">${strings('artistPage.commentaryList.title')}</a>`
                             ].filter(Boolean))
                         })}</p>
-                        ${(releasedTracks.length || unreleasedTracks.length) && fixWS`
+                        ${allTracks.length && fixWS`
                             <h2 id="tracks">${strings('artistPage.trackList.title')}</h2>
-                        `}
-                        ${releasedTracks.length && fixWS`
                             <p>${strings('artistPage.contributedDurationLine', {
                                 artist: artist.name,
-                                duration: strings.count.duration(totalReleasedDuration, {approximate: true, unit: true})
+                                duration: strings.count.duration(totalDuration, {approximate: true, unit: true})
                             })}</p>
                             <p>${strings('artistPage.musicGroupsLine', {
                                 groups: strings.list.unit(musicGroups
@@ -336,11 +328,7 @@ export function write(artist, {wikiData}) {
                                         contributions: strings.count.contributions(contributions)
                                     })))
                             })}</p>
-                            ${generateTrackList(releasedTrackListChunks)}
-                        `}
-                        ${unreleasedTracks.length && fixWS`
-                            <h3 id="unreleased-tracks">${strings('artistPage.unreleasedTrackList.title')}</h3>
-                            ${generateTrackList(unreleasedTrackListChunks)}
+                            ${generateTrackList(trackListChunks)}
                         `}
                         ${artThingsAll.length && fixWS`
                             <h2 id="art">${strings('artistPage.artList.title')}</h2>

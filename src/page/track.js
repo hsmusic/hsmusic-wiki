@@ -13,8 +13,7 @@ import {
 import * as html from '../util/html.js';
 
 import {
-    OFFICIAL_GROUP_DIRECTORY,
-    UNRELEASED_TRACKS_DIRECTORY
+    OFFICIAL_GROUP_DIRECTORY
 } from '../util/magic-constants.js';
 
 import {
@@ -181,7 +180,7 @@ export function write(track, {wikiData}) {
                                         showIcons: true
                                     })
                                 }),
-                                album.directory !== UNRELEASED_TRACKS_DIRECTORY && strings('releaseInfo.released', {
+                                track.date && strings('releaseInfo.released', {
                                     date: strings.count.date(track.date)
                                 }),
                                 (track.coverArtDate &&

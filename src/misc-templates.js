@@ -11,10 +11,6 @@ import {
 } from './util/colors.js';
 
 import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from './util/magic-constants.js';
-
-import {
     unique
 } from './util/sugar.js';
 
@@ -75,19 +71,15 @@ export function generateChronologyLinks(currentThing, {
     }
 
     return contributions.map(({ who: artist }) => {
-        const things = sortByDate(unique(getThings(artist)), dateKey);
-        const releasedThings = things.filter(thing => {
-            const album = albumData.includes(thing) ? thing : thing.album;
-            return !(album && album.directory === UNRELEASED_TRACKS_DIRECTORY);
-        });
-        const index = releasedThings.indexOf(currentThing);
+        const things = sortByDate(unique(getThings(artist)).filter(t => t[dateKey]), dateKey);
+        const index = things.indexOf(currentThing);
 
         if (index === -1) return '';
 
         // TODO: This can pro8a8ly 8e made to use generatePreviousNextLinks?
         // We'd need to make generatePreviousNextLinks use toAnythingMan tho.
-        const previous = releasedThings[index - 1];
-        const next = releasedThings[index + 1];
+        const previous = things[index - 1];
+        const next = things[index + 1];
         const parts = [
             previous && linkAnythingMan(previous, {
                 color: false,
@@ -98,6 +90,10 @@ export function generateChronologyLinks(currentThing, {
                 text: strings('misc.nav.next')
             })
         ].filter(Boolean);
+
+        if (!parts.length) {
+            return '';
+        }
 
         const stringOpts = {
             index: strings.count.index(index + 1, {strings}),

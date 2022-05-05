@@ -168,7 +168,7 @@ export function write(album, {wikiData}) {
                                         showIcons: true
                                     })
                                 }),
-                                strings('releaseInfo.released', {
+                                album.date && strings('releaseInfo.released', {
                                     date: strings.count.date(album.date)
                                 }),
                                 (album.coverArtDate &&
@@ -328,9 +328,10 @@ export function generateAlbumSidebar(album, currentTrack, {
     const { groups } = album;
 
     const groupParts = groups.map(group => {
-        const index = group.albums.indexOf(album);
-        const next = group.albums[index + 1];
-        const previous = group.albums[index - 1];
+        const albums = group.albums.filter(album => album.date);
+        const index = albums.indexOf(album);
+        const next = index >= 0 && albums[index + 1];
+        const previous = index > 0 && albums[index - 1];
         return {group, next, previous};
     }).map(({group, next, previous}) => fixWS`
         <h1>${

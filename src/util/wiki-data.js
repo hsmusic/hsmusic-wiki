@@ -83,7 +83,24 @@ export function sortByDate(data, dateKey = 'date') {
     // Just to 8e clear: sort is a mutating function! I only return the array
     // 8ecause then you don't have to define it as a separate varia8le 8efore
     // passing it into this function.
-    return data.sort((a, b) => a[dateKey] - b[dateKey]);
+    return data.sort(({ [dateKey]: a }, { [dateKey]: b }) => {
+        // It's possible for objects with and without dates to be mixed
+        // together in the same array. If that's the case, we put all items
+        // without dates at the end.
+        if (a && b) {
+            return a - b;
+        } else if (a) {
+            return -1;
+        } else if (b) {
+            return 1;
+        } else {
+            // If neither of the items being compared have a date, don't move
+            // them relative to each other. This is basically the same as
+            // filtering out all non-date items and then pushing them at the
+            // end after sorting the rest.
+            return 0;
+        }
+    });
 }
 
 // Same details as the sortByDate, 8ut for covers~

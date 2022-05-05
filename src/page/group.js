@@ -4,10 +4,6 @@
 
 import fixWS from 'fix-whitespace';
 
-import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from '../util/magic-constants.js';
-
 import * as html from '../util/html.js';
 
 import {
@@ -24,9 +20,9 @@ export function targets({wikiData}) {
 export function write(group, {wikiData}) {
     const { listingSpec, wikiInfo } = wikiData;
 
-    const releasedAlbums = group.albums.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
-    const releasedTracks = releasedAlbums.flatMap(album => album.tracks);
-    const totalDuration = getTotalDuration(releasedTracks);
+    const { albums } = group;
+    const tracks = albums.flatMap(album => album.tracks);
+    const totalDuration = getTotalDuration(tracks);
 
     const albumLines = group.albums.map(album => ({
         album,
@@ -70,10 +66,14 @@ export function write(group, {wikiData}) {
                     }</p>
                     <ul>
                         ${albumLines.map(({ album, otherGroup }) => {
-                            const item = strings('groupInfoPage.albumList.item', {
-                                year: album.date.getFullYear(),
-                                album: link.album(album)
-                            });
+                            const item = (album.date
+                                ? strings('groupInfoPage.albumList.item', {
+                                    year: album.date.getFullYear(),
+                                    album: link.album(album)
+                                })
+                                : strings('groupInfoPage.albumList.item.withoutYear', {
+                                    album: link.album(album)
+                                }));
                             return html.tag('li', (otherGroup
                                 ? strings('groupInfoPage.albumList.item.withAccent', {
                                     item,
@@ -127,8 +127,8 @@ export function write(group, {wikiData}) {
                     <h1>${strings('groupGalleryPage.title', {group: group.name})}</h1>
                     <p class="quick-info">${
                         strings('groupGalleryPage.infoLine', {
-                            tracks: `<b>${strings.count.tracks(releasedTracks.length, {unit: true})}</b>`,
-                            albums: `<b>${strings.count.albums(releasedAlbums.length, {unit: true})}</b>`,
+                            tracks: `<b>${strings.count.tracks(tracks.length, {unit: true})}</b>`,
+                            albums: `<b>${strings.count.albums(albums.length, {unit: true})}</b>`,
                             time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
                         })
                     }</p>
