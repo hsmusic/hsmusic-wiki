@@ -606,6 +606,7 @@ function stringifyThings(thingData) {
 function img({
     src,
     alt,
+    noSrcText = '',
     thumb: thumbKey,
     reveal,
     id,
@@ -620,7 +621,7 @@ function img({
     const willLink = typeof link === 'string' || link;
 
     const originalSrc = src;
-    const thumbSrc = thumbKey ? thumb[thumbKey](src) : src;
+    const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
 
     const imgAttributes = html.attributes({
         id: link ? '' : id,
@@ -630,10 +631,13 @@ function img({
         height
     });
 
-    const nonlazyHTML = wrap(`<img src="${thumbSrc}" ${imgAttributes}>`);
-    const lazyHTML = lazy && wrap(`<img class="lazy" data-original="${thumbSrc}" ${imgAttributes}>`, true);
+    const noSrcHTML = !src && wrap(`<div class="image-text-area">${noSrcText}</div>`);
+    const nonlazyHTML = src && wrap(`<img src="${thumbSrc}" ${imgAttributes}>`);
+    const lazyHTML = src && lazy && wrap(`<img class="lazy" data-original="${thumbSrc}" ${imgAttributes}>`, true);
 
-    if (lazy) {
+    if (!src) {
+        return noSrcHTML;
+    } else if (lazy) {
         return fixWS`
             <noscript>${nonlazyHTML}</noscript>
             ${lazyHTML}

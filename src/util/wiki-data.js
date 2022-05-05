@@ -98,7 +98,12 @@ export function filterAlbumsByCommentary(albums) {
 }
 
 export function getAlbumCover(album, {to}) {
-    return to('media.albumCover', album.directory, album.coverArtFileExtension);
+    // Some albums don't have art! This function returns null in that case.
+    if (album.hasCoverArt) {
+        return to('media.albumCover', album.directory, album.coverArtFileExtension);
+    } else {
+        return null;
+    }
 }
 
 export function getAlbumListTag(album) {
@@ -155,8 +160,10 @@ export function getTotalDuration(tracks) {
 }
 
 export function getTrackCover(track, {to}) {
-    // Some al8ums don't have any track art at all, and in those, every track
-    // just inherits the al8um's own cover art.
+    // Some albums don't have any track art at all, and in those, every track
+    // just inherits the album's own cover art. Note that since cover art isn't
+    // guaranteed on albums either, it's possible that this function returns
+    // null!
     if (!track.hasCoverArt) {
         return getAlbumCover(track.album, {to});
     } else {

@@ -219,6 +219,7 @@ export const processAlbumDocument = makeProcessDocument(Album, {
         coverArtDate: 'Cover Art Date',
         dateAddedToWiki: 'Date Added',
 
+        hasCoverArt: 'Has Cover Art',
         hasTrackArt: 'Has Track Art',
         isMajorRelease: 'Major Release',
         isListedOnHomepage: 'Listed on Homepage',

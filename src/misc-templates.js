@@ -277,6 +277,7 @@ export function getGridHTML({
     entries,
     srcFn,
     linkFn,
+    noSrcTextFn = () => '',
     altFn = () => '',
     detailsFn = null,
     lazy = true
@@ -291,7 +292,8 @@ export function getGridHTML({
                     thumb: 'small',
                     lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                     square: true,
-                    reveal: getRevealStringFromTags(item.artTags, {strings})
+                    reveal: getRevealStringFromTags(item.artTags, {strings}),
+                    noSrcText: noSrcTextFn(item)
                 })}
                 <span>${item.name}</span>
                 ${detailsFn && `<span>${detailsFn(item)}</span>`}
@@ -307,10 +309,13 @@ export function getAlbumGridHTML({
     return getGridHTML({
         srcFn: getAlbumCover,
         linkFn: link.album,
-        detailsFn: details && (album => strings('misc.albumGridDetails', {
+        detailsFn: details && (album => strings('misc.albumGrid.details', {
             tracks: strings.count.tracks(album.tracks.length, {unit: true}),
             time: strings.count.duration(getTotalDuration(album.tracks))
         })),
+        noSrcTextFn: album => strings('misc.albumGrid.noCoverArt', {
+            album: album.name
+        }),
         ...props
     });
 }

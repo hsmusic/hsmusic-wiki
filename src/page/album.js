@@ -118,6 +118,8 @@ export function write(album, {wikiData}) {
                 strings
             });
 
+            const cover = getAlbumCover(album);
+
             return {
                 title: strings('albumPage.title', {album: album.name}),
                 stylesheet: getAlbumStylesheet(album),
@@ -134,8 +136,8 @@ export function write(album, {wikiData}) {
 
                 main: {
                     content: fixWS`
-                        ${generateCoverLink({
-                            src: getAlbumCover(album),
+                        ${cover && generateCoverLink({
+                            src: cover,
                             alt: strings('misc.alt.albumCover'),
                             tags: album.artTags
                         })}

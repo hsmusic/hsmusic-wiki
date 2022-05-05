@@ -138,6 +138,7 @@ export function write(track, {wikiData}) {
             to
         }) => {
             const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, strings});
+            const cover = getTrackCover(track);
 
             return {
                 title: strings('trackPage.title', {track: track.name}),
@@ -160,8 +161,8 @@ export function write(track, {wikiData}) {
 
                 main: {
                     content: fixWS`
-                        ${generateCoverLink({
-                            src: getTrackCover(track),
+                        ${cover && generateCoverLink({
+                            src: cover,
                             alt: strings('misc.alt.trackCover'),
                             tags: track.artTags
                         })}
