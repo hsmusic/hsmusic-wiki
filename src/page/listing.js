@@ -15,10 +15,6 @@ import fixWS from 'fix-whitespace';
 import * as html from '../util/html.js';
 
 import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from '../util/magic-constants.js';
-
-import {
     getTotalDuration
 } from '../util/wiki-data.js';
 
@@ -99,9 +95,7 @@ export function write(listing, {wikiData}) {
 export function writeTargetless({wikiData}) {
     const { albumData, trackData, wikiInfo } = wikiData;
 
-    const releasedTracks = trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY);
-    const releasedAlbums = albumData.filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
-    const duration = getTotalDuration(releasedTracks);
+    const totalDuration = getTotalDuration(trackData);
 
     const page = {
         type: 'page',
@@ -118,9 +112,9 @@ export function writeTargetless({wikiData}) {
                     <h1>${strings('listingIndex.title')}</h1>
                     <p>${strings('listingIndex.infoLine', {
                         wiki: wikiInfo.name,
-                        tracks: `<b>${strings.count.tracks(releasedTracks.length, {unit: true})}</b>`,
-                        albums: `<b>${strings.count.albums(releasedAlbums.length, {unit: true})}</b>`,
-                        duration: `<b>${strings.count.duration(duration, {approximate: true, unit: true})}</b>`
+                        tracks: `<b>${strings.count.tracks(trackData.length, {unit: true})}</b>`,
+                        albums: `<b>${strings.count.albums(albumData.length, {unit: true})}</b>`,
+                        duration: `<b>${strings.count.duration(totalDuration, {approximate: true, unit: true})}</b>`
                     })}</p>
                     <hr>
                     <p>${strings('listingIndex.exploreList')}</p>

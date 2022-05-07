@@ -6,6 +6,5 @@
 // All such uses should eventually be replaced with better code in due time
 // (TM).
 
-export const UNRELEASED_TRACKS_DIRECTORY = 'unreleased-tracks';
 export const OFFICIAL_GROUP_DIRECTORY = 'official';
 export const FANDOM_GROUP_DIRECTORY = 'fandom';

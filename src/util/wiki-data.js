@@ -1,9 +1,5 @@
 // Utility functions for interacting with wiki data.
 
-import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from './magic-constants.js';
-
 // Generic value operations
 
 export function getKebabCase(name) {

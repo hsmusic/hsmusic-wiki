@@ -1,10 +1,6 @@
 import fixWS from 'fix-whitespace';
 
 import {
-    UNRELEASED_TRACKS_DIRECTORY
-} from './util/magic-constants.js';
-
-import {
     chunkByProperties,
     getArtistNumContributions,
     getTotalDuration,
@@ -70,8 +66,7 @@ const listingSpec = [
         stringsKey: 'listAlbums.byDate',
 
         data({wikiData}) {
-            return sortByDate(wikiData.albumData
-                .filter(album => album.directory !== UNRELEASED_TRACKS_DIRECTORY));
+            return sortByDate(wikiData.albumData.filter(album => album.date));
         },
 
         row(album, {link, strings}) {
@@ -240,7 +235,7 @@ const listingSpec = [
                     duration: getTotalDuration([
                         ...artist.tracksAsArtist ?? [],
                         ...artist.tracksAsContributor ?? []
-                    ].filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY))
+                    ])
                 }))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
@@ -259,35 +254,27 @@ const listingSpec = [
         stringsKey: 'listArtists.byLatest',
 
         data({wikiData}) {
-            const reversedTracks = wikiData.trackData.slice().reverse();
-            const reversedArtThings = wikiData.justEverythingSortedByArtDateMan.slice().reverse();
+            const reversedTracks = wikiData.trackData.filter(t => t.date).reverse();
+            const reversedArtThings = wikiData.justEverythingSortedByArtDateMan.filter(t => t.date).reverse();
 
             return {
                 toTracks: sortByDate(wikiData.artistData
-                    .filter(artist => !artist.alias)
                     .map(artist => ({
                         artist,
-                        date: reversedTracks.find(track => (
-                            track.album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
-                            [
-                                ...track.artistContribs ?? [],
-                                ...track.contributorContribs ?? []
-                            ].some(({ who }) => who === artist)
-                        ))?.date
+                        date: reversedTracks.find(track => ([
+                            ...track.artistContribs ?? [],
+                            ...track.contributorContribs ?? []
+                        ].some(({ who }) => who === artist)))?.date
                     }))
                     .filter(({ date }) => date)
                     .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)).reverse(),
 
                 toArtAndFlashes: sortByDate(wikiData.artistData
-                    .filter(artist => !artist.alias)
                     .map(artist => {
-                        const thing = reversedArtThings.find(thing => (
-                            thing.album?.directory !== UNRELEASED_TRACKS_DIRECTORY &&
-                            [
-                                ...thing.coverArtistContribs ?? [],
-                                ...!thing.album && thing.contributorContribs || []
-                            ].some(({ who }) => who === artist)
-                        ));
+                        const thing = reversedArtThings.find(thing => ([
+                            ...thing.coverArtistContribs ?? [],
+                            ...!thing.album && thing.contributorContribs || []
+                        ].some(({ who }) => who === artist)));
                         return thing && {
                             artist,
                             date: (thing.coverArtistContribs?.some(({ who }) => who === artist)
@@ -451,7 +438,14 @@ const listingSpec = [
 
         data({wikiData}) {
             return sortByDate(wikiData.groupData
-                .map(group => ({group, date: group.albums[group.albums.length - 1]?.date}))
+                .map(group => {
+                    const albums = group.albums.filter(a => a.date);
+                    return albums.length && {
+                        group,
+                        date: albums[albums.length - 1].date
+                    };
+                })
+                .filter(Boolean)
                 // So this is kinda tough to explain, 8ut 8asically, when we
                 // reverse the list after sorting it 8y d8te (so that the latest
                 // d8tes come first), it also flips the order of groups which
@@ -522,7 +516,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return chunkByProperties(
-                sortByDate(wikiData.trackData.filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)),
+                sortByDate(wikiData.trackData.filter(t => t.date)),
                 ['album', 'date']
             );
         },
@@ -558,7 +552,6 @@ const listingSpec = [
 
         data({wikiData}) {
             return wikiData.trackData
-                .filter(track => track.album.directory !== UNRELEASED_TRACKS_DIRECTORY)
                 .map(track => ({track, duration: track.duration}))
                 .filter(({ duration }) => duration > 0)
                 .sort((a, b) => b.duration - a.duration);
@@ -631,8 +624,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return chunkByProperties(wikiData.trackData
-                .filter(t => t.featuredInFlashes?.length > 0), ['album'])
-                .filter(({ album }) => album.directory !== UNRELEASED_TRACKS_DIRECTORY);
+                .filter(t => t.featuredInFlashes?.length > 0), ['album']);
         },
 
         html(chunks, {link, strings}) {

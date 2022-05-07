@@ -170,8 +170,7 @@ import {
 // Pensive emoji!
 import {
     FANDOM_GROUP_DIRECTORY,
-    OFFICIAL_GROUP_DIRECTORY,
-    UNRELEASED_TRACKS_DIRECTORY
+    OFFICIAL_GROUP_DIRECTORY
 } from './util/magic-constants.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
