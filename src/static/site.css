@@ -273,7 +273,7 @@ footer > :last-child {
     padding: 20px;
     flex-grow: 1;
     flex-shrink: 3;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
 }
 
 .sidebar > h1,
