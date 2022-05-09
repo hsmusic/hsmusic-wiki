@@ -17,5 +17,9 @@ export function getColors(primary) {
     const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
     const bg = `hsla(${Math.round(h)}deg, ${Math.round(s * 15)}%, 12%, 0.80)`;
 
-    return {primary, dim, bg};
+    return {
+        primary, dim, bg,
+        rgb: [r, g, b],
+        hsl: [h, s, l],
+    };
 }
