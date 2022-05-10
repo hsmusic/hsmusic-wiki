@@ -30,7 +30,7 @@ export function write(entry, {wikiData}) {
                 content: fixWS`
                     <div class="long-content">
                         <h1>${language.$('newsEntryPage.title', {entry: entry.name})}</h1>
-                        <p>${language.$('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
+                        <p>${language.$('newsEntryPage.published', {date: language.formatDate(entry.date)})}</p>
                         ${transformMultiline(entry.content)}
                     </div>
                 `
@@ -67,7 +67,7 @@ export function writeTargetless({wikiData}) {
                         <h1>${language.$('newsIndex.title')}</h1>
                         ${newsData.map(entry => fixWS`
                             <article id="${entry.directory}">
-                                <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
+                                <h2><time>${language.formatDate(entry.date)}</time> ${link.newsEntry(entry)}</h2>
                                 ${transformMultiline(entry.contentShort)}
                                 ${entry.contentShort !== entry.content && `<p>${link.newsEntry(entry, {
                                     text: language.$('newsIndex.entry.viewRest')
@@ -112,7 +112,7 @@ function generateNewsEntryNav(entry, {
             },
             {
                 html: language.$('newsEntryPage.nav.entry', {
-                    date: strings.count.date(entry.date),
+                    date: language.formatDate(entry.date),
                     entry: link.newsEntry(entry, {class: 'current'})
                 })
             },

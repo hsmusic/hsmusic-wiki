@@ -88,7 +88,7 @@ export function writeTargetless({wikiData}) {
                         ${newsData.slice(0, 3).map((entry, i) => html.tag('article',
                             {class: ['news-entry', i === 0 && 'first-news-entry']},
                             fixWS`
-                                <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
+                                <h2><time>${language.formatDate(entry.date)}</time> ${link.newsEntry(entry)}</h2>
                                 ${transformMultiline(entry.contentShort)}
                                 ${entry.contentShort !== entry.content && link.newsEntry(entry, {
                                     text: language.$('homepage.news.entry.viewRest')

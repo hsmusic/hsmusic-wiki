@@ -48,7 +48,7 @@ export function write(flash, {wikiData}) {
                         src: getFlashCover(flash),
                         alt: language.$('misc.alt.flashArt')
                     })}
-                    <p>${language.$('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
+                    <p>${language.$('releaseInfo.released', {date: language.formatDate(flash.date)})}</p>
                     ${(flash.page || flash.urls?.length) && `<p>${language.$('releaseInfo.playOn', {
                         links: strings.list.or([
                             flash.page && getFlashLink(flash),

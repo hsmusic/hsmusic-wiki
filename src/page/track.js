@@ -181,15 +181,15 @@ export function write(track, {wikiData}) {
                                     })
                                 }),
                                 track.date && language.$('releaseInfo.released', {
-                                    date: strings.count.date(track.date)
+                                    date: language.formatDate(track.date)
                                 }),
                                 (track.coverArtDate &&
                                     +track.coverArtDate !== +track.date &&
                                     language.$('releaseInfo.artReleased', {
-                                        date: strings.count.date(track.coverArtDate)
+                                        date: language.formatDate(track.coverArtDate)
                                     })),
                                 track.duration && language.$('releaseInfo.duration', {
-                                    duration: strings.count.duration(track.duration)
+                                    duration: language.formatDuration(track.duration)
                                 })
                             ].filter(Boolean).join('<br>\n')}
                         </p>

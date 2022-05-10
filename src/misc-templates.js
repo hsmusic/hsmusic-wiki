@@ -96,7 +96,7 @@ export function generateChronologyLinks(currentThing, {
         }
 
         const stringOpts = {
-            index: strings.count.index(index + 1, {strings}),
+            index: language.formatIndex(index + 1, {strings}),
             artist: link.artist(artist)
         };
 
@@ -307,7 +307,7 @@ export function getAlbumGridHTML({
         linkFn: link.album,
         detailsFn: details && (album => language.$('misc.albumGrid.details', {
             tracks: language.countTracks(album.tracks.length, {unit: true}),
-            time: strings.count.duration(getTotalDuration(album.tracks))
+            time: language.formatDuration(getTotalDuration(album.tracks))
         })),
         noSrcTextFn: album => language.$('misc.albumGrid.noCoverArt', {
             album: album.name

@@ -47,7 +47,7 @@ export function write(album, {wikiData}) {
                             album: link.album(album)
                         })}</h1>
                         <p>${language.$('albumCommentaryPage.infoLine', {
-                            words: `<b>${strings.count.words(words, {unit: true})}</b>`,
+                            words: `<b>${language.formatWordCount(words, {unit: true})}</b>`,
                             entries: `<b>${language.countCommentaryEntries(entries.length, {unit: true})}</b>`
                         })}</p>
                         ${album.commentary && fixWS`
@@ -116,7 +116,7 @@ export function writeTargetless({wikiData}) {
                     <div class="long-content">
                         <h1>${language.$('commentaryIndex.title')}</h1>
                         <p>${language.$('commentaryIndex.infoLine', {
-                            words: `<b>${strings.count.words(totalWords, {unit: true})}</b>`,
+                            words: `<b>${language.formatWordCount(totalWords, {unit: true})}</b>`,
                             entries: `<b>${language.countCommentaryEntries(totalEntries, {unit: true})}</b>`
                         })}</p>
                         <p>${language.$('commentaryIndex.albumList.title')}</p>
@@ -125,7 +125,7 @@ export function writeTargetless({wikiData}) {
                                 .map(({ album, entries, words }) => fixWS`
                                     <li>${language.$('commentaryIndex.albumList.item', {
                                         album: link.albumCommentary(album),
-                                        words: strings.count.words(words, {unit: true}),
+                                        words: language.formatWordCount(words, {unit: true}),
                                         entries: language.countCommentaryEntries(entries.length, {unit: true})
                                     })}</li>
                                 `)

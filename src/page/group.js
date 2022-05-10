@@ -129,7 +129,7 @@ export function write(group, {wikiData}) {
                         language.$('groupGalleryPage.infoLine', {
                             tracks: `<b>${language.countTracks(tracks.length, {unit: true})}</b>`,
                             albums: `<b>${language.countAlbums(albums.length, {unit: true})}</b>`,
-                            time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
+                            time: `<b>${language.formatDuration(totalDuration, {unit: true})}</b>`
                         })
                     }</p>
                     ${wikiInfo.enableGroupUI && wikiInfo.enableListings && html.tag('p',

@@ -246,7 +246,7 @@ const replacerSpec = {
     'date': {
         find: null,
         value: ref => new Date(ref),
-        html: (date, {strings}) => `<time datetime="${date.toString()}">${strings.count.date(date)}</time>`
+        html: (date, {strings}) => `<time datetime="${date.toString()}">${language.formatDate(date)}</time>`
     },
     'flash': {
         find: 'flash',

@@ -170,14 +170,14 @@ export function write(artist, {wikiData}) {
                 <dt>${
                     (date && duration) ? language.$('artistPage.creditList.album.withDate.withDuration', {
                         album: link.album(album),
-                        date: strings.count.date(date),
-                        duration: strings.count.duration(duration, {approximate: true})
+                        date: language.formatDate(date),
+                        duration: language.formatDuration(duration, {approximate: true})
                     }) : date ? language.$('artistPage.creditList.album.withDate', {
                         album: link.album(album),
-                        date: strings.count.date(date)
+                        date: language.formatDate(date)
                     }) : duration ? language.$('artistPage.creditList.album.withDuration', {
                         album: link.album(album),
-                        duration: strings.count.duration(duration, {approximate: true})
+                        duration: language.formatDuration(duration, {approximate: true})
                     }) : language.$('artistPage.creditList.album', {
                         album: link.album(album)
                     })}</dt>
@@ -187,7 +187,7 @@ export function write(artist, {wikiData}) {
                             aka: track.aka,
                             entry: language.$('artistPage.creditList.entry.track.withDuration', {
                                 track: link.track(track),
-                                duration: strings.count.duration(track.duration)
+                                duration: language.formatDuration(track.duration)
                             }),
                             ...props
                         }))
@@ -319,7 +319,7 @@ export function write(artist, {wikiData}) {
                             <h2 id="tracks">${language.$('artistPage.trackList.title')}</h2>
                             <p>${language.$('artistPage.contributedDurationLine', {
                                 artist: artist.name,
-                                duration: strings.count.duration(totalDuration, {approximate: true, unit: true})
+                                duration: language.formatDuration(totalDuration, {approximate: true, unit: true})
                             })}</p>
                             <p>${language.$('artistPage.musicGroupsLine', {
                                 groups: strings.list.unit(musicGroups
@@ -348,7 +348,7 @@ export function write(artist, {wikiData}) {
                                 ${artListChunks.map(({date, album, chunk}) => fixWS`
                                     <dt>${language.$('artistPage.creditList.album.withDate', {
                                         album: link.album(album),
-                                        date: strings.count.date(date)
+                                        date: language.formatDate(date)
                                     })}</dt>
                                     <dd><ul>
                                         ${(chunk
@@ -377,7 +377,7 @@ export function write(artist, {wikiData}) {
                                 ${flashListChunks.map(({act, chunk, dateFirst, dateLast}) => fixWS`
                                     <dt>${language.$('artistPage.creditList.flashAct.withDateRange', {
                                         act: link.flash(chunk[0].flash, {text: act.name}),
-                                        dateRange: strings.count.dateRange([dateFirst, dateLast])
+                                        dateRange: language.formatDateRange(dateFirst, dateLast)
                                     })}</dt>
                                     <dd><ul>
                                         ${(chunk

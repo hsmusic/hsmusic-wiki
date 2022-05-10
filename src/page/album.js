@@ -33,7 +33,7 @@ export function write(album, {wikiData}) {
         strings
     }) => {
         const itemOpts = {
-            duration: strings.count.duration(track.duration),
+            duration: language.formatDuration(track.duration),
             track: link.track(track)
         };
         return `<li style="${getLinkThemeString(track.color)}">${
@@ -169,15 +169,15 @@ export function write(album, {wikiData}) {
                                     })
                                 }),
                                 album.date && language.$('releaseInfo.released', {
-                                    date: strings.count.date(album.date)
+                                    date: language.formatDate(album.date)
                                 }),
                                 (album.coverArtDate &&
                                     +album.coverArtDate !== +album.date &&
                                     language.$('releaseInfo.artReleased', {
-                                        date: strings.count.date(album.coverArtDate)
+                                        date: language.formatDate(album.coverArtDate)
                                     })),
                                 language.$('releaseInfo.duration', {
-                                    duration: strings.count.duration(albumDuration, {approximate: album.tracks.length > 1})
+                                    duration: language.formatDuration(albumDuration, {approximate: album.tracks.length > 1})
                                 })
                             ].filter(Boolean).join('<br>\n')}
                         </p>
@@ -198,7 +198,7 @@ export function write(album, {wikiData}) {
                                 ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
                                     <dt>${
                                         language.$('trackList.group', {
-                                            duration: strings.count.duration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
+                                            duration: language.formatDuration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
                                             group: name
                                         })
                                     }</dt>
@@ -216,7 +216,7 @@ export function write(album, {wikiData}) {
                             <p>
                                 ${[
                                     language.$('releaseInfo.addedToWiki', {
-                                        date: strings.count.date(album.dateAddedToWiki)
+                                        date: language.formatDate(album.dateAddedToWiki)
                                     })
                                 ].filter(Boolean).join('<br>\n')}
                             </p>
