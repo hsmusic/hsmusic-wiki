@@ -34,7 +34,7 @@ export function write(tag, {wikiData}) {
             getThemeString,
             getTrackCover,
             link,
-            strings,
+            language,
             to
         }) => ({
             title: language.$('tagPage.title', {tag: tag.name}),
@@ -64,7 +64,7 @@ export function write(tag, {wikiData}) {
             nav: generateTagNav(tag, {
                 generatePreviousNextLinks,
                 link,
-                strings,
+                language,
                 wikiData
             })
         })
@@ -78,7 +78,7 @@ export function write(tag, {wikiData}) {
 function generateTagNav(tag, {
     generatePreviousNextLinks,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const previousNextLinks = generatePreviousNextLinks(tag, {

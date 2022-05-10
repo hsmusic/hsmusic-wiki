@@ -18,7 +18,7 @@ const listingSpec = [
                 .sort(sortByName);
         },
 
-        row(album, {link, strings}) {
+        row(album, {link, language}) {
             return language.$('listingPage.listAlbums.byName.item', {
                 album: link.album(album),
                 tracks: language.countTracks(album.tracks.length, {unit: true})
@@ -35,7 +35,7 @@ const listingSpec = [
                 .sort((a, b) => b.tracks.length - a.tracks.length);
         },
 
-        row(album, {link, strings}) {
+        row(album, {link, language}) {
             return language.$('listingPage.listAlbums.byTracks.item', {
                 album: link.album(album),
                 tracks: language.countTracks(album.tracks.length, {unit: true})
@@ -53,7 +53,7 @@ const listingSpec = [
                 .sort((a, b) => b.duration - a.duration);
         },
 
-        row({album, duration}, {link, strings}) {
+        row({album, duration}, {link, language}) {
             return language.$('listingPage.listAlbums.byDuration.item', {
                 album: link.album(album),
                 duration: language.formatDuration(duration)
@@ -69,7 +69,7 @@ const listingSpec = [
             return sortByDate(wikiData.albumData.filter(album => album.date));
         },
 
-        row(album, {link, strings}) {
+        row(album, {link, language}) {
             return language.$('listingPage.listAlbums.byDate.item', {
                 album: link.album(album),
                 date: language.formatDate(album.date)
@@ -88,7 +88,7 @@ const listingSpec = [
             }), ['dateAddedToWiki']);
         },
 
-        html(chunks, {link, strings}) {
+        html(chunks, {link, language}) {
             return fixWS`
                 <dl>
                     ${chunks.map(({dateAddedToWiki, chunk: albums}) => fixWS`
@@ -119,7 +119,7 @@ const listingSpec = [
                 .map(artist => ({artist, contributions: getArtistNumContributions(artist)}));
         },
 
-        row({artist, contributions}, {link, strings}) {
+        row({artist, contributions}, {link, language}) {
             return language.$('listingPage.listArtists.byName.item', {
                 artist: link.artist(artist),
                 contributions: language.countContributions(contributions, {unit: true})
@@ -167,7 +167,7 @@ const listingSpec = [
             };
         },
 
-        html({toTracks, toArtAndFlashes, showAsFlashes}, {link, strings}) {
+        html({toTracks, toArtAndFlashes, showAsFlashes}, {link, language}) {
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
@@ -216,7 +216,7 @@ const listingSpec = [
                 .sort((a, b) => b.entries - a.entries);
         },
 
-        row({artist, entries}, {link, strings}) {
+        row({artist, entries}, {link, language}) {
             return language.$('listingPage.listArtists.byCommentary.item', {
                 artist: link.artist(artist),
                 entries: language.countCommentaryEntries(entries, {unit: true})
@@ -241,7 +241,7 @@ const listingSpec = [
                 .sort((a, b) => b.duration - a.duration);
         },
 
-        row({artist, duration}, {link, strings}) {
+        row({artist, duration}, {link, language}) {
             return language.$('listingPage.listArtists.byDuration.item', {
                 artist: link.artist(artist),
                 duration: language.formatDuration(duration)
@@ -293,7 +293,7 @@ const listingSpec = [
             };
         },
 
-        html({toTracks, toArtAndFlashes, showAsFlashes}, {link, strings}) {
+        html({toTracks, toArtAndFlashes, showAsFlashes}, {link, language}) {
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
@@ -334,7 +334,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
         data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
 
-        row(group, {link, strings}) {
+        row(group, {link, language}) {
             return language.$('listingPage.listGroups.byCategory.group', {
                 group: link.groupInfo(group),
                 gallery: link.groupGallery(group, {
@@ -350,7 +350,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
         data: ({wikiData}) => wikiData.groupCategoryData,
 
-        html(groupCategoryData, {link, strings}) {
+        html(groupCategoryData, {link, language}) {
             return fixWS`
                 <dl>
                     ${groupCategoryData.map(category => fixWS`
@@ -385,7 +385,7 @@ const listingSpec = [
                 .sort((a, b) => b.albums - a.albums);
         },
 
-        row({group, albums}, {link, strings}) {
+        row({group, albums}, {link, language}) {
             return language.$('listingPage.listGroups.byAlbums.item', {
                 group: link.groupInfo(group),
                 albums: language.countAlbums(albums, {unit: true})
@@ -404,7 +404,7 @@ const listingSpec = [
                 .sort((a, b) => b.tracks - a.tracks);
         },
 
-        row({group, tracks}, {link, strings}) {
+        row({group, tracks}, {link, language}) {
             return language.$('listingPage.listGroups.byTracks.item', {
                 group: link.groupInfo(group),
                 tracks: language.countTracks(tracks, {unit: true})
@@ -423,7 +423,7 @@ const listingSpec = [
                 .sort((a, b) => b.duration - a.duration);
         },
 
-        row({group, duration}, {link, strings}) {
+        row({group, duration}, {link, language}) {
             return language.$('listingPage.listGroups.byDuration.item', {
                 group: link.groupInfo(group),
                 duration: language.formatDuration(duration)
@@ -461,7 +461,7 @@ const listingSpec = [
                 .reverse()).reverse()
         },
 
-        row({group, date}, {link, strings}) {
+        row({group, date}, {link, language}) {
             return language.$('listingPage.listGroups.byLatest.item', {
                 group: link.groupInfo(group),
                 date: language.formatDate(date)
@@ -477,7 +477,7 @@ const listingSpec = [
             return wikiData.trackData.slice().sort(sortByName);
         },
 
-        row(track, {link, strings}) {
+        row(track, {link, language}) {
             return language.$('listingPage.listTracks.byName.item', {
                 track: link.track(track)
             });
@@ -489,7 +489,7 @@ const listingSpec = [
         stringsKey: 'listTracks.byAlbum',
         data: ({wikiData}) => wikiData.albumData,
 
-        html(albumData, {link, strings}) {
+        html(albumData, {link, language}) {
             return fixWS`
                 <dl>
                     ${albumData.map(album => fixWS`
@@ -521,7 +521,7 @@ const listingSpec = [
             );
         },
 
-        html(chunks, {link, strings}) {
+        html(chunks, {link, language}) {
             return fixWS`
                 <dl>
                     ${chunks.map(({album, date, chunk: tracks}) => fixWS`
@@ -557,7 +557,7 @@ const listingSpec = [
                 .sort((a, b) => b.duration - a.duration);
         },
 
-        row({track, duration}, {link, strings}) {
+        row({track, duration}, {link, language}) {
             return language.$('listingPage.listTracks.byDuration.item', {
                 track: link.track(track),
                 duration: language.formatDuration(duration)
@@ -576,7 +576,7 @@ const listingSpec = [
             }));
         },
 
-        html(albums, {link, strings}) {
+        html(albums, {link, language}) {
             return fixWS`
                 <dl>
                     ${albums.map(({album, tracks}) => fixWS`
@@ -609,7 +609,7 @@ const listingSpec = [
                 .sort((a, b) => b.timesReferenced - a.timesReferenced);
         },
 
-        row({track, timesReferenced}, {link, strings}) {
+        row({track, timesReferenced}, {link, language}) {
             return language.$('listingPage.listTracks.byTimesReferenced.item', {
                 track: link.track(track),
                 timesReferenced: language.countTimesReferenced(timesReferenced, {unit: true})
@@ -627,7 +627,7 @@ const listingSpec = [
                 .filter(t => t.featuredInFlashes?.length > 0), ['album']);
         },
 
-        html(chunks, {link, strings}) {
+        html(chunks, {link, language}) {
             return fixWS`
                 <dl>
                     ${chunks.map(({album, chunk: tracks}) => fixWS`
@@ -656,7 +656,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableFlashesAndGames,
         data: ({wikiData}) => wikiData.flashData,
 
-        html(flashData, {link, strings}) {
+        html(flashData, {link, language}) {
             return fixWS`
                 <dl>
                     ${sortByDate(flashData.slice()).map(flash => fixWS`
@@ -687,7 +687,7 @@ const listingSpec = [
             return chunkByProperties(wikiData.trackData.filter(t => t.lyrics), ['album']);
         },
 
-        html(chunks, {link, strings}) {
+        html(chunks, {link, language}) {
             return fixWS`
                 <dl>
                     ${chunks.map(({album, chunk: tracks}) => fixWS`
@@ -721,7 +721,7 @@ const listingSpec = [
                 .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}));
         },
 
-        row({tag, timesUsed}, {link, strings}) {
+        row({tag, timesUsed}, {link, language}) {
             return language.$('listingPage.listTags.byName.item', {
                 tag: link.tag(tag),
                 timesUsed: language.countTimesUsed(timesUsed, {unit: true})
@@ -741,7 +741,7 @@ const listingSpec = [
                 .sort((a, b) => b.timesUsed - a.timesUsed);
         },
 
-        row({tag, timesUsed}, {link, strings}) {
+        row({tag, timesUsed}, {link, language}) {
             return language.$('listingPage.listTags.byUses.item', {
                 tag: link.tag(tag),
                 timesUsed: language.countTimesUsed(timesUsed, {unit: true})
@@ -760,7 +760,7 @@ const listingSpec = [
 
         html: ({officialAlbumData, fandomAlbumData}, {
             getLinkThemeString,
-            strings
+            language
         }) => fixWS`
             <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
             <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
@@ -794,27 +794,27 @@ const filterListings = directoryPrefix => listingSpec
 
 const listingTargetSpec = [
     {
-        title: ({strings}) => language.$('listingPage.target.album'),
+        title: ({language}) => language.$('listingPage.target.album'),
         listings: filterListings('album')
     },
     {
-        title: ({strings}) => language.$('listingPage.target.artist'),
+        title: ({language}) => language.$('listingPage.target.artist'),
         listings: filterListings('artist')
     },
     {
-        title: ({strings}) => language.$('listingPage.target.group'),
+        title: ({language}) => language.$('listingPage.target.group'),
         listings: filterListings('group')
     },
     {
-        title: ({strings}) => language.$('listingPage.target.track'),
+        title: ({language}) => language.$('listingPage.target.track'),
         listings: filterListings('track')
     },
     {
-        title: ({strings}) => language.$('listingPage.target.tag'),
+        title: ({language}) => language.$('listingPage.target.tag'),
         listings: filterListings('tag')
     },
     {
-        title: ({strings}) => language.$('listingPage.target.other'),
+        title: ({language}) => language.$('listingPage.target.other'),
         listings: [
             listingSpec.find(l => l.directory === 'random')
         ]

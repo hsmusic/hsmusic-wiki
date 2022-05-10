@@ -30,7 +30,7 @@ export function write(album, {wikiData}) {
         getArtistString,
         getLinkThemeString,
         link,
-        strings
+        language
     }) => {
         const itemOpts = {
             duration: language.formatDuration(track.duration),
@@ -108,14 +108,14 @@ export function write(album, {wikiData}) {
             getLinkThemeString,
             getThemeString,
             link,
-            strings,
+            language,
             transformMultiline
         }) => {
             const trackToListItem = bindOpts(unbound_trackToListItem, {
                 getArtistString,
                 getLinkThemeString,
                 link,
-                strings
+                language
             });
 
             const cover = getAlbumCover(album);
@@ -234,7 +234,7 @@ export function write(album, {wikiData}) {
                     fancifyURL,
                     getLinkThemeString,
                     link,
-                    strings,
+                    language,
                     transformMultiline,
                     wikiData
                 }),
@@ -250,7 +250,7 @@ export function write(album, {wikiData}) {
                         album.tracks.length > 1 &&
                         {
                             divider: false,
-                            html: generateAlbumNavLinks(album, null, {strings})
+                            html: generateAlbumNavLinks(album, null, {language})
                         }
                     ],
                     content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
@@ -268,7 +268,7 @@ export function generateAlbumSidebar(album, currentTrack, {
     fancifyURL,
     getLinkThemeString,
     link,
-    strings,
+    language,
     transformMultiline,
     wikiData
 }) {
@@ -385,7 +385,7 @@ export function generateAlbumSidebar(album, currentTrack, {
 
 export function generateAlbumNavLinks(album, currentTrack, {
     generatePreviousNextLinks,
-    strings
+    language
 }) {
     if (album.tracks.length <= 1) {
         return '';

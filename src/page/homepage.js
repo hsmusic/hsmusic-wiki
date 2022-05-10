@@ -23,7 +23,7 @@ export function writeTargetless({wikiData}) {
             getAlbumGridHTML,
             getLinkThemeString,
             link,
-            strings,
+            language,
             to,
             transformInline,
             transformMultiline

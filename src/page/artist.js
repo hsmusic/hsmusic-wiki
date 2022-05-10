@@ -139,7 +139,7 @@ export function write(artist, {wikiData}) {
     }
 
     const generateEntryAccents = ({
-        getArtistString, strings,
+        getArtistString, language,
         aka, entry, artists, contrib
     }) =>
         (aka
@@ -163,7 +163,7 @@ export function write(artist, {wikiData}) {
                     : entry)));
 
     const unbound_generateTrackList = (chunks, {
-        getArtistString, link, strings
+        getArtistString, link, language
     }) => fixWS`
         <dl>
             ${chunks.map(({date, album, chunk, duration}) => fixWS`
@@ -193,7 +193,7 @@ export function write(artist, {wikiData}) {
                         }))
                         .map(({aka, ...opts}) => html.tag('li',
                             {class: aka && 'rerelease'},
-                            generateEntryAccents({getArtistString, strings, aka, ...opts})))
+                            generateEntryAccents({getArtistString, language, aka, ...opts})))
                         .join('\n'))}
                 </ul></dd>
             `).join('\n')}
@@ -272,14 +272,14 @@ export function write(artist, {wikiData}) {
             getArtistAvatar,
             getArtistString,
             link,
-            strings,
+            language,
             to,
             transformMultiline
         }) => {
             const generateTrackList = bindOpts(unbound_generateTrackList, {
                 getArtistString,
                 link,
-                strings
+                language
             });
 
             return {
@@ -300,7 +300,7 @@ export function write(artist, {wikiData}) {
                             <hr>
                         `}
                         ${urls?.length && `<p>${language.$('releaseInfo.visitOn', {
-                            links: language.formatDisjunctionList(urls.map(url => fancifyURL(url, {strings})))
+                            links: language.formatDisjunctionList(urls.map(url => fancifyURL(url, {language})))
                         })}</p>`}
                         ${hasGallery && `<p>${language.$('artistPage.viewArtGallery', {
                             link: link.artistGallery(artist, {
@@ -364,7 +364,7 @@ export function write(artist, {wikiData}) {
                                                     }[key])}</i>`),
                                                 ...props
                                             }))
-                                            .map(opts => generateEntryAccents({getArtistString, strings, ...opts}))
+                                            .map(opts => generateEntryAccents({getArtistString, language, ...opts}))
                                             .map(row => `<li>${row}</li>`)
                                             .join('\n'))}
                                     </ul></dd>
@@ -387,7 +387,7 @@ export function write(artist, {wikiData}) {
                                                 }),
                                                 ...props
                                             }))
-                                            .map(opts => generateEntryAccents({getArtistString, strings, ...opts}))
+                                            .map(opts => generateEntryAccents({getArtistString, language, ...opts}))
                                             .map(row => `<li>${row}</li>`)
                                             .join('\n'))}
                                     </ul></dd>
@@ -420,7 +420,7 @@ export function write(artist, {wikiData}) {
                 nav: generateNavForArtist(artist, false, hasGallery, {
                     generateInfoGalleryLinks,
                     link,
-                    strings,
+                    language,
                     wikiData
                 })
             };
@@ -436,7 +436,7 @@ export function write(artist, {wikiData}) {
             getGridHTML,
             getTrackCover,
             link,
-            strings,
+            language,
             to
         }) => ({
             title: language.$('artistGalleryPage.title', {artist: name}),
@@ -465,7 +465,7 @@ export function write(artist, {wikiData}) {
             nav: generateNavForArtist(artist, true, hasGallery, {
                 generateInfoGalleryLinks,
                 link,
-                strings,
+                language,
                 wikiData
             })
         })
@@ -479,14 +479,14 @@ export function write(artist, {wikiData}) {
 function generateNavForArtist(artist, isGallery, hasGallery, {
     generateInfoGalleryLinks,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const { wikiInfo } = wikiData;
 
     const infoGalleryLinks = (hasGallery &&
         generateInfoGalleryLinks(artist, isGallery, {
-            link, strings,
+            link, language,
             linkKeyGallery: 'artistGallery',
             linkKeyInfo: 'artist'
         }))

@@ -39,7 +39,7 @@ export function write(group, {wikiData}) {
             getThemeString,
             fancifyURL,
             link,
-            strings,
+            language,
             transformMultiline
         }) => ({
             title: language.$('groupInfoPage.title', {group: group.name}),
@@ -50,7 +50,7 @@ export function write(group, {wikiData}) {
                     <h1>${language.$('groupInfoPage.title', {group: group.name})}</h1>
                     ${group.urls?.length && `<p>${
                         language.$('releaseInfo.visitOn', {
-                            links: language.formatDisjunctionList(group.urls.map(url => fancifyURL(url, {strings})))
+                            links: language.formatDisjunctionList(group.urls.map(url => fancifyURL(url, {language})))
                         })
                     }</p>`}
                     <blockquote>
@@ -92,7 +92,7 @@ export function write(group, {wikiData}) {
             sidebarLeft: generateGroupSidebar(group, false, {
                 getLinkThemeString,
                 link,
-                strings,
+                language,
                 wikiData
             }),
 
@@ -100,7 +100,7 @@ export function write(group, {wikiData}) {
                 generateInfoGalleryLinks,
                 generatePreviousNextLinks,
                 link,
-                strings,
+                language,
                 wikiData
             })
         })
@@ -116,7 +116,7 @@ export function write(group, {wikiData}) {
             getLinkThemeString,
             getThemeString,
             link,
-            strings
+            language
         }) => ({
             title: language.$('groupGalleryPage.title', {group: group.name}),
             theme: getThemeString(group.color),
@@ -152,7 +152,7 @@ export function write(group, {wikiData}) {
             sidebarLeft: generateGroupSidebar(group, true, {
                 getLinkThemeString,
                 link,
-                strings,
+                language,
                 wikiData
             }),
 
@@ -160,7 +160,7 @@ export function write(group, {wikiData}) {
                 generateInfoGalleryLinks,
                 generatePreviousNextLinks,
                 link,
-                strings,
+                language,
                 wikiData
             })
         })
@@ -174,7 +174,7 @@ export function write(group, {wikiData}) {
 function generateGroupSidebar(currentGroup, isGallery, {
     getLinkThemeString,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const { groupCategoryData, wikiInfo } = wikiData;
@@ -217,7 +217,7 @@ function generateGroupNav(currentGroup, isGallery, {
     generateInfoGalleryLinks,
     generatePreviousNextLinks,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const { groupData, wikiInfo } = wikiData;

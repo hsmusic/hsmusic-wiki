@@ -17,7 +17,7 @@ export function write(staticPage, {wikiData}) {
         type: 'page',
         path: ['staticPage', staticPage.directory],
         page: ({
-            strings,
+            language,
             transformMultiline
         }) => ({
             title: staticPage.name,

@@ -1,5 +1,5 @@
 // Miscellaneous utility functions which are useful across page specifications.
-// These are made available right on a page spec's ({wikiData, strings, ...})
+// These are made available right on a page spec's ({wikiData, language, ...})
 // args object!
 
 import fixWS from 'fix-whitespace';
@@ -31,7 +31,7 @@ const MASTODON_DOMAINS = [
 // Artist strings
 
 export function getArtistString(artists, {
-    iconifyURL, link, strings,
+    iconifyURL, link, language,
     showIcons = false,
     showContrib = false
 }) {
@@ -41,7 +41,7 @@ export function getArtistString(artists, {
             link.artist(who),
             showContrib && what && `(${what})`,
             showIcons && urls?.length && `<span class="icons">(${
-                language.formatUnitList(urls.map(url => iconifyURL(url, {strings})))
+                language.formatUnitList(urls.map(url => iconifyURL(url, {language})))
             })</span>`
         ].filter(Boolean).join(' ');
     }));
@@ -56,7 +56,7 @@ export function generateChronologyLinks(currentThing, {
     headingString,
     link,
     linkAnythingMan,
-    strings,
+    language,
     wikiData
 }) {
     const { albumData } = wikiData;
@@ -96,7 +96,7 @@ export function generateChronologyLinks(currentThing, {
         }
 
         const stringOpts = {
-            index: language.formatIndex(index + 1, {strings}),
+            index: language.formatIndex(index + 1, {language}),
             artist: link.artist(artist)
         };
 
@@ -111,19 +111,19 @@ export function generateChronologyLinks(currentThing, {
 
 // Content warning tags
 
-export function getRevealStringFromWarnings(warnings, {strings}) {
+export function getRevealStringFromWarnings(warnings, {language}) {
     return language.$('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${language.$('misc.contentWarnings.reveal')}</span>`
 }
 
-export function getRevealStringFromTags(tags, {strings}) {
+export function getRevealStringFromTags(tags, {language}) {
     return tags && tags.some(tag => tag.isContentWarning) && (
-        getRevealStringFromWarnings(language.formatUnitList(tags.filter(tag => tag.isContentWarning).map(tag => tag.name)), {strings}));
+        getRevealStringFromWarnings(language.formatUnitList(tags.filter(tag => tag.isContentWarning).map(tag => tag.name)), {language}));
 }
 
 // Cover art links
 
 export function generateCoverLink({
-    img, link, strings, to, wikiData,
+    img, link, language, to, wikiData,
     src,
     path,
     alt,
@@ -148,7 +148,7 @@ export function generateCoverLink({
                 id: 'cover-art',
                 link: true,
                 square: true,
-                reveal: getRevealStringFromTags(tags, {strings})
+                reveal: getRevealStringFromTags(tags, {language})
             })}
             ${wikiInfo.enableArtTagUI && tags.filter(tag => !tag.isContentWarning).length && fixWS`
                 <p class="tags">
@@ -203,7 +203,7 @@ export function getAlbumStylesheet(album, {to}) {
 
 // Fancy lookin' links
 
-export function fancifyURL(url, {strings, album = false} = {}) {
+export function fancifyURL(url, {language, album = false} = {}) {
     let local = Symbol();
     let domain;
     try {
@@ -235,8 +235,8 @@ export function fancifyURL(url, {strings, album = false} = {}) {
     }</a>`;
 }
 
-export function fancifyFlashURL(url, flash, {strings}) {
-    const link = fancifyURL(url, {strings});
+export function fancifyFlashURL(url, flash, {language}) {
+    const link = fancifyURL(url, {language});
     return `<span class="nowrap">${
         url.includes('homestuck.com') ? (isNaN(Number(flash.page))
             ? language.$('misc.external.flash.homestuck.secret', {link})
@@ -247,7 +247,7 @@ export function fancifyFlashURL(url, flash, {strings}) {
     }</span>`;
 }
 
-export function iconifyURL(url, {strings, to}) {
+export function iconifyURL(url, {language, to}) {
     const domain = new URL(url).hostname;
     const [ id, msg ] = (
         domain.includes('bandcamp.com') ? ['bandcamp', language.$('misc.external.bandcamp')] :
@@ -268,7 +268,7 @@ export function iconifyURL(url, {strings, to}) {
 
 export function getGridHTML({
     img,
-    strings,
+    language,
 
     entries,
     srcFn,
@@ -288,7 +288,7 @@ export function getGridHTML({
                     thumb: 'small',
                     lazy: (typeof lazy === 'number' ? i >= lazy : lazy),
                     square: true,
-                    reveal: getRevealStringFromTags(item.artTags, {strings}),
+                    reveal: getRevealStringFromTags(item.artTags, {language}),
                     noSrcText: noSrcTextFn(item)
                 })}
                 <span>${item.name}</span>
@@ -298,7 +298,7 @@ export function getGridHTML({
 }
 
 export function getAlbumGridHTML({
-    getAlbumCover, getGridHTML, link, strings,
+    getAlbumCover, getGridHTML, link, language,
     details = false,
     ...props
 }) {
@@ -330,7 +330,7 @@ export function getFlashGridHTML({
 // Nav-bar links
 
 export function generateInfoGalleryLinks(currentThing, isGallery, {
-    link, strings,
+    link, language,
     linkKeyGallery,
     linkKeyInfo
 }) {
@@ -350,7 +350,7 @@ export function generatePreviousNextLinks(current, {
     data,
     link,
     linkKey,
-    strings
+    language
 }) {
     const linkFn = link[linkKey];
 
@@ -383,7 +383,7 @@ export function generatePreviousNextLinks(current, {
 export function getFooterLocalizationLinks(pathname, {
     languages,
     paths,
-    strings,
+    language,
     to
 }) {
     const { toPath } = paths;

@@ -33,7 +33,7 @@ export function write(flash, {wikiData}) {
             getFlashCover,
             getThemeString,
             link,
-            strings,
+            language,
             transformInline
         }) => ({
             title: language.$('flashPage.title', {flash: flash.name}),
@@ -85,12 +85,12 @@ export function write(flash, {wikiData}) {
                 `
             },
 
-            sidebarLeft: generateSidebarForFlash(flash, {link, strings, wikiData}),
+            sidebarLeft: generateSidebarForFlash(flash, {link, language, wikiData}),
             nav: generateNavForFlash(flash, {
                 generateChronologyLinks,
                 generatePreviousNextLinks,
                 link,
-                strings,
+                language,
                 wikiData
             })
         })
@@ -109,7 +109,7 @@ export function writeTargetless({wikiData}) {
             getFlashGridHTML,
             getLinkThemeString,
             link,
-            strings
+            language
         }) => ({
             title: language.$('flashIndex.title'),
 
@@ -150,7 +150,7 @@ function generateNavForFlash(flash, {
     generateChronologyLinks,
     generatePreviousNextLinks,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const { flashData, wikiInfo } = wikiData;
@@ -191,7 +191,7 @@ function generateNavForFlash(flash, {
     };
 }
 
-function generateSidebarForFlash(flash, {link, strings, wikiData}) {
+function generateSidebarForFlash(flash, {link, language, wikiData}) {
     // all hard-coded, sorry :(
     // this doesnt have a super portable implementation/design...yet!!
 

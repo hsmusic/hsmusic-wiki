@@ -43,7 +43,7 @@ export function write(listing, {wikiData}) {
         type: 'page',
         path: ['listing', listing.directory],
         page: opts => {
-            const { getLinkThemeString, link, strings } = opts;
+            const { getLinkThemeString, link, language } = opts;
             const titleKey = `listingPage.${listing.stringsKey}.title`;
 
             return {
@@ -70,7 +70,7 @@ export function write(listing, {wikiData}) {
                     content: generateSidebarForListings(listing, {
                         getLinkThemeString,
                         link,
-                        strings,
+                        language,
                         wikiData
                     })
                 },
@@ -102,7 +102,7 @@ export function writeTargetless({wikiData}) {
         path: ['listingIndex'],
         page: ({
             getLinkThemeString,
-            strings,
+            language,
             link
         }) => ({
             title: language.$('listingIndex.title'),
@@ -118,7 +118,7 @@ export function writeTargetless({wikiData}) {
                     })}</p>
                     <hr>
                     <p>${language.$('listingIndex.exploreList')}</p>
-                    ${generateLinkIndexForListings(null, false, {link, strings, wikiData})}
+                    ${generateLinkIndexForListings(null, false, {link, language, wikiData})}
                 `
             },
 
@@ -126,7 +126,7 @@ export function writeTargetless({wikiData}) {
                 content: generateSidebarForListings(null, {
                     getLinkThemeString,
                     link,
-                    strings,
+                    language,
                     wikiData
                 })
             },
@@ -143,7 +143,7 @@ export function writeTargetless({wikiData}) {
 function generateSidebarForListings(currentListing, {
     getLinkThemeString,
     link,
-    strings,
+    language,
     wikiData
 }) {
     return fixWS`
@@ -151,7 +151,7 @@ function generateSidebarForListings(currentListing, {
         ${generateLinkIndexForListings(currentListing, true, {
             getLinkThemeString,
             link,
-            strings,
+            language,
             wikiData
         })}
     `;
@@ -160,7 +160,7 @@ function generateSidebarForListings(currentListing, {
 function generateLinkIndexForListings(currentListing, forSidebar, {
     getLinkThemeString,
     link,
-    strings,
+    language,
     wikiData
 }) {
     const { listingTargetSpec, wikiInfo } = wikiData;
@@ -188,13 +188,13 @@ function generateLinkIndexForListings(currentListing, forSidebar, {
                     {style: getLinkThemeString(wikiInfo.color)},
                     html.tag('span',
                         {class: 'group-name'},
-                        title({strings}))),
+                        title({language}))),
                 genUL(listings)
             ])).join('\n');
     } else {
         return html.tag('dl',
             filteredByCondition.flatMap(({ title, listings }) => [
-                html.tag('dt', title({strings})),
+                html.tag('dt', title({language})),
                 html.tag('dd', genUL(listings))
             ]));
     }

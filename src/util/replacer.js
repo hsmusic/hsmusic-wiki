@@ -319,7 +319,7 @@ export function parseInput(input) {
 }
 
 function evaluateTag(node, opts) {
-    const { find, input, link, replacerSpec, strings, to, wikiData } = opts;
+    const { find, input, language, link, replacerSpec, to, wikiData } = opts;
 
     const source = input.slice(node.i, node.iEnd);
 
@@ -382,7 +382,7 @@ function evaluateTag(node, opts) {
         : link[linkKey]);
 
     try {
-        return fn(value, {text: label, hash, args, strings, to});
+        return fn(value, {text: label, hash, args, language, to});
     } catch (error) {
         logError`The link ${source} failed to be processed: ${error}`;
         return source;
@@ -416,14 +416,14 @@ function transformNodes(nodes, opts) {
     return nodes.map(node => transformNode(node, opts)).join('');
 }
 
-export function transformInline(input, {replacerSpec, find, link, strings, to, wikiData}) {
+export function transformInline(input, {replacerSpec, find, link, language, to, wikiData}) {
     if (!replacerSpec) throw new Error('Expected replacerSpec');
     if (!find) throw new Error('Expected find');
     if (!link) throw new Error('Expected link');
-    if (!strings) throw new Error('Expected strings');
+    if (!language) throw new Error('Expected language');
     if (!to) throw new Error('Expected to');
     if (!wikiData) throw new Error('Expected wikiData');
 
     const nodes = parseInput(input);
-    return transformNodes(nodes, {input, find, link, replacerSpec, strings, to, wikiData});
+    return transformNodes(nodes, {input, find, link, replacerSpec, language, to, wikiData});
 }

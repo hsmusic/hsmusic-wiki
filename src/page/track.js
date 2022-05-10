@@ -50,7 +50,7 @@ export function write(track, {wikiData}) {
             .flatMap(track => track.featuredInFlashes.map(flash => ({flash, as: track}))));
     }
 
-    const unbound_generateTrackList = (tracks, {getArtistString, link, strings}) => html.tag('ul',
+    const unbound_generateTrackList = (tracks, {getArtistString, link, language}) => html.tag('ul',
         tracks.map(track => {
             const line = language.$('trackList.item.withArtists', {
                 track: link.track(track),
@@ -67,7 +67,7 @@ export function write(track, {wikiData}) {
     const hasCommentary = track.commentary || otherReleases.some(t => t.commentary);
     const generateCommentary = ({
         link,
-        strings,
+        language,
         transformMultiline
     }) => transformMultiline([
         track.commentary,
@@ -130,13 +130,13 @@ export function write(track, {wikiData}) {
             getThemeString,
             getTrackCover,
             link,
-            strings,
+            language,
             transformInline,
             transformLyrics,
             transformMultiline,
             to
         }) => {
-            const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, strings});
+            const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, language});
             const cover = getTrackCover(track);
 
             return {
@@ -196,7 +196,7 @@ export function write(track, {wikiData}) {
                         <p>${
                             (track.urls?.length
                                 ? language.$('releaseInfo.listenOn', {
-                                    links: language.formatDisjunctionList(track.urls.map(url => fancifyURL(url, {strings})))
+                                    links: language.formatDisjunctionList(track.urls.map(url => fancifyURL(url, {language})))
                                 })
                                 : language.$('releaseInfo.listenOn.noLinks'))
                         }</p>
@@ -266,7 +266,7 @@ export function write(track, {wikiData}) {
                         ${hasCommentary && fixWS`
                             <p>${language.$('releaseInfo.artistCommentary')}</p>
                             <blockquote>
-                                ${generateCommentary({link, strings, transformMultiline})}
+                                ${generateCommentary({link, language, transformMultiline})}
                             </blockquote>
                         `}
                     `
@@ -276,7 +276,7 @@ export function write(track, {wikiData}) {
                     fancifyURL,
                     getLinkThemeString,
                     link,
-                    strings,
+                    language,
                     transformMultiline,
                     wikiData
                 }),
@@ -303,7 +303,7 @@ export function write(track, {wikiData}) {
                             divider: false,
                             html: generateAlbumNavLinks(album, track, {
                                 generatePreviousNextLinks,
-                                strings
+                                language
                             })
                         }
                     ].filter(Boolean),

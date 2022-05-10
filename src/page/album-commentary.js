@@ -32,7 +32,7 @@ export function write(album, {wikiData}) {
             getLinkThemeString,
             getThemeString,
             link,
-            strings,
+            language,
             to,
             transformMultiline
         }) => ({
@@ -107,7 +107,7 @@ export function writeTargetless({wikiData}) {
         path: ['commentaryIndex'],
         page: ({
             link,
-            strings
+            language
         }) => ({
             title: language.$('commentaryIndex.title'),
 
