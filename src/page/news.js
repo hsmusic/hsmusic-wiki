@@ -24,13 +24,13 @@ export function write(entry, {wikiData}) {
             strings,
             transformMultiline,
         }) => ({
-            title: strings('newsEntryPage.title', {entry: entry.name}),
+            title: language.$('newsEntryPage.title', {entry: entry.name}),
 
             main: {
                 content: fixWS`
                     <div class="long-content">
-                        <h1>${strings('newsEntryPage.title', {entry: entry.name})}</h1>
-                        <p>${strings('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
+                        <h1>${language.$('newsEntryPage.title', {entry: entry.name})}</h1>
+                        <p>${language.$('newsEntryPage.published', {date: strings.count.date(entry.date)})}</p>
                         ${transformMultiline(entry.content)}
                     </div>
                 `
@@ -59,18 +59,18 @@ export function writeTargetless({wikiData}) {
             strings,
             transformMultiline
         }) => ({
-            title: strings('newsIndex.title'),
+            title: language.$('newsIndex.title'),
 
             main: {
                 content: fixWS`
                     <div class="long-content news-index">
-                        <h1>${strings('newsIndex.title')}</h1>
+                        <h1>${language.$('newsIndex.title')}</h1>
                         ${newsData.map(entry => fixWS`
                             <article id="${entry.directory}">
                                 <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
                                 ${transformMultiline(entry.contentShort)}
                                 ${entry.contentShort !== entry.content && `<p>${link.newsEntry(entry, {
-                                    text: strings('newsIndex.entry.viewRest')
+                                    text: language.$('newsIndex.entry.viewRest')
                                 })}</p>`}
                             </article>
                         `).join('\n')}
@@ -108,10 +108,10 @@ function generateNewsEntryNav(entry, {
             {toHome: true},
             {
                 path: ['localized.newsIndex'],
-                title: strings('newsEntryPage.nav.news')
+                title: language.$('newsEntryPage.nav.news')
             },
             {
-                html: strings('newsEntryPage.nav.entry', {
+                html: language.$('newsEntryPage.nav.entry', {
                     date: strings.count.date(entry.date),
                     entry: link.newsEntry(entry, {class: 'current'})
                 })

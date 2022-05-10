@@ -22,8 +22,8 @@ import { bindOpts } from './sugar.js';
 // look like a dictionary each value of which is itself a util dictionary,
 // each value of which is a function in the format (value, opts) => (...).
 // Each of those util dictionaries will 8e attached to the final returned
-// strings() function, containing functions which automatically have that
-// same strings() function provided as part of its opts argument (alongside
+// language.$() function, containing functions which automatically have that
+// same language.$() function provided as part of its opts argument (alongside
 // any additional arguments passed).
 //
 // Basically, it's so that instead of doing:
@@ -193,7 +193,7 @@ export function genStrings(stringsJSON, {
     return strings;
 }
 
-const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit = false}) => strings(
+const countHelper = (stringKey, argName = stringKey) => (value, {strings, unit = false}) => language.$(
     (unit
         ? `count.${stringKey}.withUnit.` + strings.intl.plural.cardinal.select(value)
         : `count.${stringKey}`),
@@ -222,10 +222,10 @@ export const count = {
             : value);
 
         const words = (value > 1000
-            ? strings('count.words.thousand', {words: num})
-            : strings('count.words', {words: num}));
+            ? language.$('count.words.thousand', {words: num})
+            : language.$('count.words', {words: num}));
 
-        return strings('count.words.withUnit.' + strings.intl.plural.cardinal.select(value), {words});
+        return language.$('count.words.withUnit.' + strings.intl.plural.cardinal.select(value), {words});
     },
 
     albums: countHelper('albums'),

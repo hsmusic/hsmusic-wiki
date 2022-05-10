@@ -47,11 +47,11 @@ export function write(listing, {wikiData}) {
             const titleKey = `listingPage.${listing.stringsKey}.title`;
 
             return {
-                title: strings(titleKey),
+                title: language.$(titleKey),
 
                 main: {
                     content: fixWS`
-                        <h1>${strings(titleKey)}</h1>
+                        <h1>${language.$(titleKey)}</h1>
                         ${listing.html && (listing.data
                             ? listing.html(data, opts)
                             : listing.html(opts))}
@@ -80,7 +80,7 @@ export function write(listing, {wikiData}) {
                         {toHome: true},
                         {
                             path: ['localized.listingIndex'],
-                            title: strings('listingIndex.title')
+                            title: language.$('listingIndex.title')
                         },
                         {toCurrentPage: true}
                     ]
@@ -105,19 +105,19 @@ export function writeTargetless({wikiData}) {
             strings,
             link
         }) => ({
-            title: strings('listingIndex.title'),
+            title: language.$('listingIndex.title'),
 
             main: {
                 content: fixWS`
-                    <h1>${strings('listingIndex.title')}</h1>
-                    <p>${strings('listingIndex.infoLine', {
+                    <h1>${language.$('listingIndex.title')}</h1>
+                    <p>${language.$('listingIndex.infoLine', {
                         wiki: wikiInfo.name,
                         tracks: `<b>${language.countTracks(trackData.length, {unit: true})}</b>`,
                         albums: `<b>${language.countAlbums(albumData.length, {unit: true})}</b>`,
                         duration: `<b>${strings.count.duration(totalDuration, {approximate: true, unit: true})}</b>`
                     })}</p>
                     <hr>
-                    <p>${strings('listingIndex.exploreList')}</p>
+                    <p>${language.$('listingIndex.exploreList')}</p>
                     ${generateLinkIndexForListings(null, false, {link, strings, wikiData})}
                 `
             },
@@ -147,7 +147,7 @@ function generateSidebarForListings(currentListing, {
     wikiData
 }) {
     return fixWS`
-        <h1>${link.listingIndex('', {text: strings('listingIndex.title')})}</h1>
+        <h1>${link.listingIndex('', {text: language.$('listingIndex.title')})}</h1>
         ${generateLinkIndexForListings(currentListing, true, {
             getLinkThemeString,
             link,
@@ -175,7 +175,7 @@ function generateLinkIndexForListings(currentListing, forSidebar, {
     const genUL = listings => html.tag('ul',
         listings.map(listing => html.tag('li',
             {class: [listing === currentListing && 'current']},
-            link.listing(listing, {text: strings(`listingPage.${listing.stringsKey}.title.short`)})
+            link.listing(listing, {text: language.$(`listingPage.${listing.stringsKey}.title.short`)})
         )));
 
     if (forSidebar) {

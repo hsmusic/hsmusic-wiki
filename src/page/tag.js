@@ -37,14 +37,14 @@ export function write(tag, {wikiData}) {
             strings,
             to
         }) => ({
-            title: strings('tagPage.title', {tag: tag.name}),
+            title: language.$('tagPage.title', {tag: tag.name}),
             theme: getThemeString(tag.color),
 
             main: {
                 classes: ['top-index'],
                 content: fixWS`
-                    <h1>${strings('tagPage.title', {tag: tag.name})}</h1>
-                    <p class="quick-info">${strings('tagPage.infoLine', {
+                    <h1>${language.$('tagPage.title', {tag: tag.name})}</h1>
+                    <p class="quick-info">${language.$('tagPage.infoLine', {
                         coverArts: language.countCoverArts(things.length, {unit: true})
                     })}</p>
                     <div class="grid-listing">
@@ -92,10 +92,10 @@ function generateTagNav(tag, {
             wikiData.wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
-                title: strings('listingIndex.title')
+                title: language.$('listingIndex.title')
             },
             {
-                html: strings('tagPage.nav.tag', {
+                html: language.$('tagPage.nav.tag', {
                     tag: link.tag(tag, {class: 'current'})
                 })
             },

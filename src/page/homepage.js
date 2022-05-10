@@ -84,14 +84,14 @@ export function writeTargetless({wikiData}) {
                 // (even though that would 8e hilarious).
                 content: (transformMultiline(homepageLayout.sidebarContent.replace('[[news]]', '__GENERATE_NEWS__'))
                     .replace('<p>__GENERATE_NEWS__</p>', wikiInfo.enableNews ? fixWS`
-                        <h1>${strings('homepage.news.title')}</h1>
+                        <h1>${language.$('homepage.news.title')}</h1>
                         ${newsData.slice(0, 3).map((entry, i) => html.tag('article',
                             {class: ['news-entry', i === 0 && 'first-news-entry']},
                             fixWS`
                                 <h2><time>${strings.count.date(entry.date)}</time> ${link.newsEntry(entry)}</h2>
                                 ${transformMultiline(entry.contentShort)}
                                 ${entry.contentShort !== entry.content && link.newsEntry(entry, {
-                                    text: strings('homepage.news.entry.viewRest')
+                                    text: language.$('homepage.news.entry.viewRest')
                                 })}
                             `)).join('\n')}
                     ` : `<p><i>News requested in content description but this feature isn't enabled</i></p>`))
@@ -103,11 +103,11 @@ export function writeTargetless({wikiData}) {
                         ${[
                             link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
                             wikiInfo.enableListings &&
-                            link.listingIndex('', {text: strings('listingIndex.title'), to}),
+                            link.listingIndex('', {text: language.$('listingIndex.title'), to}),
                             wikiInfo.enableNews &&
-                            link.newsIndex('', {text: strings('newsIndex.title'), to}),
+                            link.newsIndex('', {text: language.$('newsIndex.title'), to}),
                             wikiInfo.enableFlashesAndGames &&
-                            link.flashIndex('', {text: strings('flashIndex.title'), to}),
+                            link.flashIndex('', {text: language.$('flashIndex.title'), to}),
                             ...(staticPageData
                                 .filter(page => page.showInNavigationBar)
                                 .map(page => link.staticPage(page, {text: page.nameShort})))

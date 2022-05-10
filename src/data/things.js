@@ -1494,7 +1494,7 @@ Object.assign(Language.prototype, {
 
     formatDuration(secTotal, {approximate = false, unit = false}) {
         if (secTotal === 0) {
-            return strings('count.duration.missing');
+            return language.$('count.duration.missing');
         }
 
         const hour = Math.floor(secTotal / 3600);
@@ -1537,8 +1537,8 @@ Object.assign(Language.prototype, {
             : value);
 
         const words = (value > 1000
-            ? strings('count.words.thousand', {words: num})
-            : strings('count.words', {words: num}));
+            ? language.$('count.words.thousand', {words: num})
+            : language.$('count.words', {words: num}));
 
         return this.$('count.words.withUnit.' + this.getUnitForm(value), {words});
     },

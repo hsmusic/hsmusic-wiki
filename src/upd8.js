@@ -311,7 +311,7 @@ const replacerSpec = {
     'string': {
         find: null,
         value: ref => ref,
-        html: (ref, {strings, args}) => strings(ref, args)
+        html: (ref, {strings, args}) => language.$(ref, args)
     },
     'tag': {
         find: 'artTag',
@@ -1049,9 +1049,9 @@ writePage.html = (pageFn, {
                         })}
                     </div>
                     <h1 class="info-card-name"><a></a></h1>
-                    <p class="info-card-album">${strings('releaseInfo.from', {album: '<a></a>'})}</p>
-                    <p class="info-card-artists">${strings('releaseInfo.by', {artists: '<span></span>'})}</p>
-                    <p class="info-card-cover-artists">${strings('releaseInfo.coverArtBy', {artists: '<span></span>'})}</p>
+                    <p class="info-card-album">${language.$('releaseInfo.from', {album: '<a></a>'})}</p>
+                    <p class="info-card-artists">${language.$('releaseInfo.by', {artists: '<span></span>'})}</p>
+                    <p class="info-card-cover-artists">${language.$('releaseInfo.coverArtBy', {artists: '<span></span>'})}</p>
                 </div>
             </div>
         </div>
@@ -1087,14 +1087,14 @@ writePage.html = (pageFn, {
                     ${mainHTML && fixWS`
                         <div id="skippers">
                             ${[
-                                ['#content', strings('misc.skippers.skipToContent')],
+                                ['#content', language.$('misc.skippers.skipToContent')],
                                 sidebarLeftHTML && ['#sidebar-left', (sidebarRightHTML
-                                    ? strings('misc.skippers.skipToSidebar.left')
-                                    : strings('misc.skippers.skipToSidebar'))],
+                                    ? language.$('misc.skippers.skipToSidebar.left')
+                                    : language.$('misc.skippers.skipToSidebar'))],
                                 sidebarRightHTML && ['#sidebar-right', (sidebarLeftHTML
-                                    ? strings('misc.skippers.skipToSidebar.right')
-                                    : strings('misc.skippers.skipToSidebar'))],
-                                footerHTML && ['#footer', strings('misc.skippers.skipToFooter')]
+                                    ? language.$('misc.skippers.skipToSidebar.right')
+                                    : language.$('misc.skippers.skipToSidebar'))],
+                                footerHTML && ['#footer', language.$('misc.skippers.skipToFooter')]
                             ].filter(Boolean).map(([ href, title ]) => fixWS`
                                 <span class="skipper"><a href="${href}">${title}</a></span>
                             `).join('\n')}
@@ -1201,7 +1201,7 @@ function generateRedirectPage(title, target, {strings}) {
         <!DOCTYPE html>
         <html>
             <head>
-                <title>${strings('redirectPage.title', {title})}</title>
+                <title>${language.$('redirectPage.title', {title})}</title>
                 <meta charset="utf-8">
                 <meta http-equiv="refresh" content="0;url=${target}">
                 <link rel="canonical" href="${target}">
@@ -1209,8 +1209,8 @@ function generateRedirectPage(title, target, {strings}) {
             </head>
             <body>
                 <main>
-                    <h1>${strings('redirectPage.title', {title})}</h1>
-                    <p>${strings('redirectPage.infoLine', {
+                    <h1>${language.$('redirectPage.title', {title})}</h1>
+                    <p>${language.$('redirectPage.infoLine', {
                         target: `<a href="${target}">${target}</a>`
                     })}</p>
                 </main>

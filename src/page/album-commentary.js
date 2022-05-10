@@ -36,28 +36,28 @@ export function write(album, {wikiData}) {
             to,
             transformMultiline
         }) => ({
-            title: strings('albumCommentaryPage.title', {album: album.name}),
+            title: language.$('albumCommentaryPage.title', {album: album.name}),
             stylesheet: getAlbumStylesheet(album),
             theme: getThemeString(album.color),
 
             main: {
                 content: fixWS`
                     <div class="long-content">
-                        <h1>${strings('albumCommentaryPage.title', {
+                        <h1>${language.$('albumCommentaryPage.title', {
                             album: link.album(album)
                         })}</h1>
-                        <p>${strings('albumCommentaryPage.infoLine', {
+                        <p>${language.$('albumCommentaryPage.infoLine', {
                             words: `<b>${strings.count.words(words, {unit: true})}</b>`,
                             entries: `<b>${language.countCommentaryEntries(entries.length, {unit: true})}</b>`
                         })}</p>
                         ${album.commentary && fixWS`
-                            <h3>${strings('albumCommentaryPage.entry.title.albumCommentary')}</h3>
+                            <h3>${language.$('albumCommentaryPage.entry.title.albumCommentary')}</h3>
                             <blockquote>
                                 ${transformMultiline(album.commentary)}
                             </blockquote>
                         `}
                         ${album.tracks.filter(t => t.commentary).map(track => fixWS`
-                            <h3 id="${track.directory}">${strings('albumCommentaryPage.entry.title.trackCommentary', {
+                            <h3 id="${track.directory}">${language.$('albumCommentaryPage.entry.title.trackCommentary', {
                                 track: link.track(track)
                             })}</h3>
                             <blockquote style="${getLinkThemeString(track.color)}">
@@ -73,10 +73,10 @@ export function write(album, {wikiData}) {
                     {toHome: true},
                     {
                         path: ['localized.commentaryIndex'],
-                        title: strings('commentaryIndex.title')
+                        title: language.$('commentaryIndex.title')
                     },
                     {
-                        html: strings('albumCommentaryPage.nav.album', {
+                        html: language.$('albumCommentaryPage.nav.album', {
                             album: link.albumCommentary(album, {class: 'current'})
                         })
                     }
@@ -109,21 +109,21 @@ export function writeTargetless({wikiData}) {
             link,
             strings
         }) => ({
-            title: strings('commentaryIndex.title'),
+            title: language.$('commentaryIndex.title'),
 
             main: {
                 content: fixWS`
                     <div class="long-content">
-                        <h1>${strings('commentaryIndex.title')}</h1>
-                        <p>${strings('commentaryIndex.infoLine', {
+                        <h1>${language.$('commentaryIndex.title')}</h1>
+                        <p>${language.$('commentaryIndex.infoLine', {
                             words: `<b>${strings.count.words(totalWords, {unit: true})}</b>`,
                             entries: `<b>${language.countCommentaryEntries(totalEntries, {unit: true})}</b>`
                         })}</p>
-                        <p>${strings('commentaryIndex.albumList.title')}</p>
+                        <p>${language.$('commentaryIndex.albumList.title')}</p>
                         <ul>
                             ${data
                                 .map(({ album, entries, words }) => fixWS`
-                                    <li>${strings('commentaryIndex.albumList.item', {
+                                    <li>${language.$('commentaryIndex.albumList.item', {
                                         album: link.albumCommentary(album),
                                         words: strings.count.words(words, {unit: true}),
                                         entries: language.countCommentaryEntries(entries.length, {unit: true})

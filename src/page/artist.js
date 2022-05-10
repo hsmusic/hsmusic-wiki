@@ -143,20 +143,20 @@ export function write(artist, {wikiData}) {
         aka, entry, artists, contrib
     }) =>
         (aka
-            ? strings('artistPage.creditList.entry.rerelease', {entry})
+            ? language.$('artistPage.creditList.entry.rerelease', {entry})
             : (artists.length
                 ? ((contrib.what || contrib.whatArray?.length)
-                    ? strings('artistPage.creditList.entry.withArtists.withContribution', {
+                    ? language.$('artistPage.creditList.entry.withArtists.withContribution', {
                         entry,
                         artists: getArtistString(artists),
                         contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
                     })
-                    : strings('artistPage.creditList.entry.withArtists', {
+                    : language.$('artistPage.creditList.entry.withArtists', {
                         entry,
                         artists: getArtistString(artists)
                     }))
                 : ((contrib.what || contrib.whatArray?.length)
-                    ? strings('artistPage.creditList.entry.withContribution', {
+                    ? language.$('artistPage.creditList.entry.withContribution', {
                         entry,
                         contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
                     })
@@ -168,24 +168,24 @@ export function write(artist, {wikiData}) {
         <dl>
             ${chunks.map(({date, album, chunk, duration}) => fixWS`
                 <dt>${
-                    (date && duration) ? strings('artistPage.creditList.album.withDate.withDuration', {
+                    (date && duration) ? language.$('artistPage.creditList.album.withDate.withDuration', {
                         album: link.album(album),
                         date: strings.count.date(date),
                         duration: strings.count.duration(duration, {approximate: true})
-                    }) : date ? strings('artistPage.creditList.album.withDate', {
+                    }) : date ? language.$('artistPage.creditList.album.withDate', {
                         album: link.album(album),
                         date: strings.count.date(date)
-                    }) : duration ? strings('artistPage.creditList.album.withDuration', {
+                    }) : duration ? language.$('artistPage.creditList.album.withDuration', {
                         album: link.album(album),
                         duration: strings.count.duration(duration, {approximate: true})
-                    }) : strings('artistPage.creditList.album', {
+                    }) : language.$('artistPage.creditList.album', {
                         album: link.album(album)
                     })}</dt>
                 <dd><ul>
                     ${(chunk
                         .map(({track, ...props}) => ({
                             aka: track.aka,
-                            entry: strings('artistPage.creditList.entry.track.withDuration', {
+                            entry: language.$('artistPage.creditList.entry.track.withDuration', {
                                 track: link.track(track),
                                 duration: strings.count.duration(track.duration)
                             }),
@@ -283,47 +283,47 @@ export function write(artist, {wikiData}) {
             });
 
             return {
-                title: strings('artistPage.title', {artist: name}),
+                title: language.$('artistPage.title', {artist: name}),
 
                 main: {
                     content: fixWS`
                         ${artist.hasAvatar && generateCoverLink({
                             src: getArtistAvatar(artist),
-                            alt: strings('misc.alt.artistAvatar')
+                            alt: language.$('misc.alt.artistAvatar')
                         })}
-                        <h1>${strings('artistPage.title', {artist: name})}</h1>
+                        <h1>${language.$('artistPage.title', {artist: name})}</h1>
                         ${contextNotes && fixWS`
-                            <p>${strings('releaseInfo.note')}</p>
+                            <p>${language.$('releaseInfo.note')}</p>
                             <blockquote>
                                 ${transformMultiline(contextNotes)}
                             </blockquote>
                             <hr>
                         `}
-                        ${urls?.length && `<p>${strings('releaseInfo.visitOn', {
+                        ${urls?.length && `<p>${language.$('releaseInfo.visitOn', {
                             links: strings.list.or(urls.map(url => fancifyURL(url, {strings})))
                         })}</p>`}
-                        ${hasGallery && `<p>${strings('artistPage.viewArtGallery', {
+                        ${hasGallery && `<p>${language.$('artistPage.viewArtGallery', {
                             link: link.artistGallery(artist, {
-                                text: strings('artistPage.viewArtGallery.link')
+                                text: language.$('artistPage.viewArtGallery.link')
                             })
                         })}</p>`}
-                        <p>${strings('misc.jumpTo.withLinks', {
+                        <p>${language.$('misc.jumpTo.withLinks', {
                             links: strings.list.unit([
-                                allTracks.length && `<a href="#tracks">${strings('artistPage.trackList.title')}</a>`,
-                                artThingsAll.length && `<a href="#art">${strings('artistPage.artList.title')}</a>`,
-                                wikiInfo.enableFlashesAndGames && flashes.length && `<a href="#flashes">${strings('artistPage.flashList.title')}</a>`,
-                                commentaryThings.length && `<a href="#commentary">${strings('artistPage.commentaryList.title')}</a>`
+                                allTracks.length && `<a href="#tracks">${language.$('artistPage.trackList.title')}</a>`,
+                                artThingsAll.length && `<a href="#art">${language.$('artistPage.artList.title')}</a>`,
+                                wikiInfo.enableFlashesAndGames && flashes.length && `<a href="#flashes">${language.$('artistPage.flashList.title')}</a>`,
+                                commentaryThings.length && `<a href="#commentary">${language.$('artistPage.commentaryList.title')}</a>`
                             ].filter(Boolean))
                         })}</p>
                         ${allTracks.length && fixWS`
-                            <h2 id="tracks">${strings('artistPage.trackList.title')}</h2>
-                            <p>${strings('artistPage.contributedDurationLine', {
+                            <h2 id="tracks">${language.$('artistPage.trackList.title')}</h2>
+                            <p>${language.$('artistPage.contributedDurationLine', {
                                 artist: artist.name,
                                 duration: strings.count.duration(totalDuration, {approximate: true, unit: true})
                             })}</p>
-                            <p>${strings('artistPage.musicGroupsLine', {
+                            <p>${language.$('artistPage.musicGroupsLine', {
                                 groups: strings.list.unit(musicGroups
-                                    .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
+                                    .map(({ group, contributions }) => language.$('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
                                         contributions: language.countContributions(contributions)
                                     })))
@@ -331,22 +331,22 @@ export function write(artist, {wikiData}) {
                             ${generateTrackList(trackListChunks)}
                         `}
                         ${artThingsAll.length && fixWS`
-                            <h2 id="art">${strings('artistPage.artList.title')}</h2>
-                            ${hasGallery && `<p>${strings('artistPage.viewArtGallery.orBrowseList', {
+                            <h2 id="art">${language.$('artistPage.artList.title')}</h2>
+                            ${hasGallery && `<p>${language.$('artistPage.viewArtGallery.orBrowseList', {
                                 link: link.artistGallery(artist, {
-                                    text: strings('artistPage.viewArtGallery.link')
+                                    text: language.$('artistPage.viewArtGallery.link')
                                 })
                             })}</p>`}
-                            <p>${strings('artistPage.artGroupsLine', {
+                            <p>${language.$('artistPage.artGroupsLine', {
                                 groups: strings.list.unit(artGroups
-                                    .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
+                                    .map(({ group, contributions }) => language.$('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
                                         contributions: language.countContributions(contributions)
                                     })))
                             })}</p>
                             <dl>
                                 ${artListChunks.map(({date, album, chunk}) => fixWS`
-                                    <dt>${strings('artistPage.creditList.album.withDate', {
+                                    <dt>${language.$('artistPage.creditList.album.withDate', {
                                         album: link.album(album),
                                         date: strings.count.date(date)
                                     })}</dt>
@@ -354,10 +354,10 @@ export function write(artist, {wikiData}) {
                                         ${(chunk
                                             .map(({album, track, key, ...props}) => ({
                                                 entry: (track
-                                                    ? strings('artistPage.creditList.entry.track', {
+                                                    ? language.$('artistPage.creditList.entry.track', {
                                                         track: link.track(track)
                                                     })
-                                                    : `<i>${strings('artistPage.creditList.entry.album.' + {
+                                                    : `<i>${language.$('artistPage.creditList.entry.album.' + {
                                                         wallpaperArtistContribs: 'wallpaperArt',
                                                         bannerArtistContribs: 'bannerArt',
                                                         coverArtistContribs: 'coverArt'
@@ -372,17 +372,17 @@ export function write(artist, {wikiData}) {
                             </dl>
                         `}
                         ${wikiInfo.enableFlashesAndGames && flashes.length && fixWS`
-                            <h2 id="flashes">${strings('artistPage.flashList.title')}</h2>
+                            <h2 id="flashes">${language.$('artistPage.flashList.title')}</h2>
                             <dl>
                                 ${flashListChunks.map(({act, chunk, dateFirst, dateLast}) => fixWS`
-                                    <dt>${strings('artistPage.creditList.flashAct.withDateRange', {
+                                    <dt>${language.$('artistPage.creditList.flashAct.withDateRange', {
                                         act: link.flash(chunk[0].flash, {text: act.name}),
                                         dateRange: strings.count.dateRange([dateFirst, dateLast])
                                     })}</dt>
                                     <dd><ul>
                                         ${(chunk
                                             .map(({flash, ...props}) => ({
-                                                entry: strings('artistPage.creditList.entry.flash', {
+                                                entry: language.$('artistPage.creditList.entry.flash', {
                                                     flash: link.flash(flash)
                                                 }),
                                                 ...props
@@ -395,19 +395,19 @@ export function write(artist, {wikiData}) {
                             </dl>
                         `}
                         ${commentaryThings.length && fixWS`
-                            <h2 id="commentary">${strings('artistPage.commentaryList.title')}</h2>
+                            <h2 id="commentary">${language.$('artistPage.commentaryList.title')}</h2>
                             <dl>
                                 ${commentaryListChunks.map(({album, chunk}) => fixWS`
-                                    <dt>${strings('artistPage.creditList.album', {
+                                    <dt>${language.$('artistPage.creditList.album', {
                                         album: link.album(album)
                                     })}</dt>
                                     <dd><ul>
                                         ${(chunk
                                             .map(({album, track, ...props}) => track
-                                                ? strings('artistPage.creditList.entry.track', {
+                                                ? language.$('artistPage.creditList.entry.track', {
                                                     track: link.track(track)
                                                 })
-                                                : `<i>${strings('artistPage.creditList.entry.album.commentary')}</i>`)
+                                                : `<i>${language.$('artistPage.creditList.entry.album.commentary')}</i>`)
                                             .map(row => `<li>${row}</li>`)
                                             .join('\n'))}
                                     </ul></dd>
@@ -439,13 +439,13 @@ export function write(artist, {wikiData}) {
             strings,
             to
         }) => ({
-            title: strings('artistGalleryPage.title', {artist: name}),
+            title: language.$('artistGalleryPage.title', {artist: name}),
 
             main: {
                 classes: ['top-index'],
                 content: fixWS`
-                    <h1>${strings('artistGalleryPage.title', {artist: name})}</h1>
-                    <p class="quick-info">${strings('artistGalleryPage.infoLine', {
+                    <h1>${language.$('artistGalleryPage.title', {artist: name})}</h1>
+                    <p class="quick-info">${language.$('artistGalleryPage.infoLine', {
                         coverArts: language.countCoverArts(artThingsGallery.length, {unit: true})
                     })}</p>
                     <div class="grid-listing">
@@ -497,10 +497,10 @@ function generateNavForArtist(artist, isGallery, hasGallery, {
             wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
-                title: strings('listingIndex.title')
+                title: language.$('listingIndex.title')
             },
             {
-                html: strings('artistPage.nav.artist', {
+                html: language.$('artistPage.nav.artist', {
                     artist: link.artist(artist, {class: 'current'})
                 })
             },

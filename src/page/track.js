@@ -52,14 +52,14 @@ export function write(track, {wikiData}) {
 
     const unbound_generateTrackList = (tracks, {getArtistString, link, strings}) => html.tag('ul',
         tracks.map(track => {
-            const line = strings('trackList.item.withArtists', {
+            const line = language.$('trackList.item.withArtists', {
                 track: link.track(track),
-                by: `<span class="by">${strings('trackList.item.withArtists.by', {
+                by: `<span class="by">${language.$('trackList.item.withArtists.by', {
                     artists: getArtistString(track.artistContribs)
                 })}</span>`
             });
             return (track.aka
-                ? `<li class="rerelease">${strings('trackList.item.rerelease', {track: line})}</li>`
+                ? `<li class="rerelease">${language.$('trackList.item.rerelease', {track: line})}</li>`
                 : `<li>${line}</li>`);
         })
     );
@@ -76,7 +76,7 @@ export function write(track, {wikiData}) {
                 .filter(line => line.replace(/<\/b>/g, '').includes(':</i>'))
                 .map(line => fixWS`
                     ${line}
-                    ${strings('releaseInfo.artistCommentary.seeOriginalRelease', {
+                    ${language.$('releaseInfo.artistCommentary.seeOriginalRelease', {
                         original: link.track(track)
                     })}
                 `)
@@ -140,7 +140,7 @@ export function write(track, {wikiData}) {
             const cover = getTrackCover(track);
 
             return {
-                title: strings('trackPage.title', {track: track.name}),
+                title: language.$('trackPage.title', {track: track.name}),
                 stylesheet: getAlbumStylesheet(album, {to}),
                 theme: getThemeString(track.color, [
                     `--album-directory: ${album.directory}`,
@@ -153,7 +153,7 @@ export function write(track, {wikiData}) {
                     classes: ['dim'],
                     dimensions: album.bannerDimensions,
                     path: ['media.albumBanner', album.directory, album.bannerFileExtension],
-                    alt: strings('misc.alt.albumBanner'),
+                    alt: language.$('misc.alt.albumBanner'),
                     position: 'bottom'
                 },
                 */
@@ -162,49 +162,49 @@ export function write(track, {wikiData}) {
                     content: fixWS`
                         ${cover && generateCoverLink({
                             src: cover,
-                            alt: strings('misc.alt.trackCover'),
+                            alt: language.$('misc.alt.trackCover'),
                             tags: track.artTags
                         })}
-                        <h1>${strings('trackPage.title', {track: track.name})}</h1>
+                        <h1>${language.$('trackPage.title', {track: track.name})}</h1>
                         <p>
                             ${[
-                                strings('releaseInfo.by', {
+                                language.$('releaseInfo.by', {
                                     artists: getArtistString(track.artistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
-                                track.coverArtistContribs.length && strings('releaseInfo.coverArtBy', {
+                                track.coverArtistContribs.length && language.$('releaseInfo.coverArtBy', {
                                     artists: getArtistString(track.coverArtistContribs, {
                                         showContrib: true,
                                         showIcons: true
                                     })
                                 }),
-                                track.date && strings('releaseInfo.released', {
+                                track.date && language.$('releaseInfo.released', {
                                     date: strings.count.date(track.date)
                                 }),
                                 (track.coverArtDate &&
                                     +track.coverArtDate !== +track.date &&
-                                    strings('releaseInfo.artReleased', {
+                                    language.$('releaseInfo.artReleased', {
                                         date: strings.count.date(track.coverArtDate)
                                     })),
-                                track.duration && strings('releaseInfo.duration', {
+                                track.duration && language.$('releaseInfo.duration', {
                                     duration: strings.count.duration(track.duration)
                                 })
                             ].filter(Boolean).join('<br>\n')}
                         </p>
                         <p>${
                             (track.urls?.length
-                                ? strings('releaseInfo.listenOn', {
+                                ? language.$('releaseInfo.listenOn', {
                                     links: strings.list.or(track.urls.map(url => fancifyURL(url, {strings})))
                                 })
-                                : strings('releaseInfo.listenOn.noLinks'))
+                                : language.$('releaseInfo.listenOn.noLinks'))
                         }</p>
                         ${otherReleases.length && fixWS`
-                            <p>${strings('releaseInfo.alsoReleasedAs')}</p>
+                            <p>${language.$('releaseInfo.alsoReleasedAs')}</p>
                             <ul>
                                 ${otherReleases.map(track => fixWS`
-                                    <li>${strings('releaseInfo.alsoReleasedAs.item', {
+                                    <li>${language.$('releaseInfo.alsoReleasedAs.item', {
                                         track: link.track(track),
                                         album: link.album(track.album)
                                     })}</li>
@@ -212,7 +212,7 @@ export function write(track, {wikiData}) {
                             </ul>
                         `}
                         ${track.contributorContribs.length && fixWS`
-                            <p>${strings('releaseInfo.contributors')}</p>
+                            <p>${language.$('releaseInfo.contributors')}</p>
                             <ul>
                                 ${(track.contributorContribs
                                     .map(contrib => `<li>${getArtistString([contrib], {
@@ -223,19 +223,19 @@ export function write(track, {wikiData}) {
                             </ul>
                         `}
                         ${referencedTracks.length && fixWS`
-                            <p>${strings('releaseInfo.tracksReferenced', {track: `<i>${track.name}</i>`})}</p>
+                            <p>${language.$('releaseInfo.tracksReferenced', {track: `<i>${track.name}</i>`})}</p>
                             ${generateTrackList(referencedTracks)}
                         `}
                         ${referencedByTracks.length && fixWS`
-                            <p>${strings('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
+                            <p>${language.$('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
                             ${useDividedReferences && fixWS`
                                 <dl>
                                     ${rbtOfficial.length && fixWS`
-                                        <dt>${strings('trackPage.referenceList.official')}</dt>
+                                        <dt>${language.$('trackPage.referenceList.official')}</dt>
                                         <dd>${generateTrackList(rbtOfficial)}</dd>
                                     `}
                                     ${rbtFanon.length && fixWS`
-                                        <dt>${strings('trackPage.referenceList.fandom')}</dt>
+                                        <dt>${language.$('trackPage.referenceList.fandom')}</dt>
                                         <dd>${generateTrackList(rbtFanon)}</dd>
                                     `}
                                 </dl>
@@ -243,28 +243,28 @@ export function write(track, {wikiData}) {
                             ${!useDividedReferences && generateTrackList(referencedByTracks)}
                         `}
                         ${wikiInfo.enableFlashesAndGames && flashesThatFeature.length && fixWS`
-                            <p>${strings('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
+                            <p>${language.$('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>
                             <ul>
                                 ${flashesThatFeature.map(({ flash, as }) => html.tag('li',
                                     {class: as !== track && 'rerelease'},
                                     (as === track
-                                        ? strings('releaseInfo.flashesThatFeature.item', {
+                                        ? language.$('releaseInfo.flashesThatFeature.item', {
                                             flash: link.flash(flash)
                                         })
-                                        : strings('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
+                                        : language.$('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
                                             flash: link.flash(flash),
                                             track: link.track(as)
                                         })))).join('\n')}
                             </ul>
                         `}
                         ${track.lyrics && fixWS`
-                            <p>${strings('releaseInfo.lyrics')}</p>
+                            <p>${language.$('releaseInfo.lyrics')}</p>
                             <blockquote>
                                 ${transformLyrics(track.lyrics)}
                             </blockquote>
                         `}
                         ${hasCommentary && fixWS`
-                            <p>${strings('releaseInfo.artistCommentary')}</p>
+                            <p>${language.$('releaseInfo.artistCommentary')}</p>
                             <blockquote>
                                 ${generateCommentary({link, strings, transformMultiline})}
                             </blockquote>
@@ -289,12 +289,12 @@ export function write(track, {wikiData}) {
                             title: album.name
                         },
                         listTag === 'ol' ? {
-                            html: strings('trackPage.nav.track.withNumber', {
+                            html: language.$('trackPage.nav.track.withNumber', {
                                 number: album.tracks.indexOf(track) + 1,
                                 track: link.track(track, {class: 'current', to})
                             })
                         } : {
-                            html: strings('trackPage.nav.track', {
+                            html: language.$('trackPage.nav.track', {
                                 track: link.track(track, {class: 'current', to})
                             })
                         },

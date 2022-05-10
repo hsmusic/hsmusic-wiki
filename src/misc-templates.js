@@ -67,7 +67,7 @@ export function generateChronologyLinks(currentThing, {
     }
 
     if (contributions.length > 8) {
-        return `<div class="chronology">${strings('misc.chronology.seeArtistPages')}</div>`;
+        return `<div class="chronology">${language.$('misc.chronology.seeArtistPages')}</div>`;
     }
 
     return contributions.map(({ who: artist }) => {
@@ -83,11 +83,11 @@ export function generateChronologyLinks(currentThing, {
         const parts = [
             previous && linkAnythingMan(previous, {
                 color: false,
-                text: strings('misc.nav.previous')
+                text: language.$('misc.nav.previous')
             }),
             next && linkAnythingMan(next, {
                 color: false,
-                text: strings('misc.nav.next')
+                text: language.$('misc.nav.next')
             })
         ].filter(Boolean);
 
@@ -102,7 +102,7 @@ export function generateChronologyLinks(currentThing, {
 
         return fixWS`
             <div class="chronology">
-                <span class="heading">${strings(headingString, stringOpts)}</span>
+                <span class="heading">${language.$(headingString, stringOpts)}</span>
                 ${parts.length && `<span class="buttons">(${parts.join(', ')})</span>`}
             </div>
         `;
@@ -112,7 +112,7 @@ export function generateChronologyLinks(currentThing, {
 // Content warning tags
 
 export function getRevealStringFromWarnings(warnings, {strings}) {
-    return strings('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${strings('misc.contentWarnings.reveal')}</span>`
+    return language.$('misc.contentWarnings', {warnings}) + `<br><span class="reveal-interaction">${language.$('misc.contentWarnings.reveal')}</span>`
 }
 
 export function getRevealStringFromTags(tags, {strings}) {
@@ -152,7 +152,7 @@ export function generateCoverLink({
             })}
             ${wikiInfo.enableArtTagUI && tags.filter(tag => !tag.isContentWarning).length && fixWS`
                 <p class="tags">
-                    ${strings('releaseInfo.artTags')}
+                    ${language.$('releaseInfo.artTags')}
                     ${(tags
                         .filter(tag => !tag.isContentWarning)
                         .map(link.tag)
@@ -214,23 +214,23 @@ export function fancifyURL(url, {strings, album = false} = {}) {
         domain = local;
     }
     return fixWS`<a href="${url}" class="nowrap">${
-        domain === local ? strings('misc.external.local') :
-        domain.includes('bandcamp.com') ? strings('misc.external.bandcamp') :
-        BANDCAMP_DOMAINS.includes(domain) ? strings('misc.external.bandcamp.domain', {domain}) :
-        MASTODON_DOMAINS.includes(domain) ? strings('misc.external.mastodon.domain', {domain}) :
+        domain === local ? language.$('misc.external.local') :
+        domain.includes('bandcamp.com') ? language.$('misc.external.bandcamp') :
+        BANDCAMP_DOMAINS.includes(domain) ? language.$('misc.external.bandcamp.domain', {domain}) :
+        MASTODON_DOMAINS.includes(domain) ? language.$('misc.external.mastodon.domain', {domain}) :
         domain.includes('youtu') ? (album
             ? (url.includes('list=')
-                ? strings('misc.external.youtube.playlist')
-                : strings('misc.external.youtube.fullAlbum'))
-            : strings('misc.external.youtube')) :
-        domain.includes('soundcloud') ? strings('misc.external.soundcloud') :
-        domain.includes('tumblr.com') ? strings('misc.external.tumblr') :
-        domain.includes('twitter.com') ? strings('misc.external.twitter') :
-        domain.includes('deviantart.com') ? strings('misc.external.deviantart') :
-        domain.includes('wikipedia.org') ? strings('misc.external.wikipedia') :
-        domain.includes('poetryfoundation.org') ? strings('misc.external.poetryFoundation') :
-        domain.includes('instagram.com') ? strings('misc.external.instagram') :
-        domain.includes('patreon.com') ? strings('misc.external.patreon') :
+                ? language.$('misc.external.youtube.playlist')
+                : language.$('misc.external.youtube.fullAlbum'))
+            : language.$('misc.external.youtube')) :
+        domain.includes('soundcloud') ? language.$('misc.external.soundcloud') :
+        domain.includes('tumblr.com') ? language.$('misc.external.tumblr') :
+        domain.includes('twitter.com') ? language.$('misc.external.twitter') :
+        domain.includes('deviantart.com') ? language.$('misc.external.deviantart') :
+        domain.includes('wikipedia.org') ? language.$('misc.external.wikipedia') :
+        domain.includes('poetryfoundation.org') ? language.$('misc.external.poetryFoundation') :
+        domain.includes('instagram.com') ? language.$('misc.external.instagram') :
+        domain.includes('patreon.com') ? language.$('misc.external.patreon') :
         domain
     }</a>`;
 }
@@ -239,10 +239,10 @@ export function fancifyFlashURL(url, flash, {strings}) {
     const link = fancifyURL(url, {strings});
     return `<span class="nowrap">${
         url.includes('homestuck.com') ? (isNaN(Number(flash.page))
-            ? strings('misc.external.flash.homestuck.secret', {link})
-            : strings('misc.external.flash.homestuck.page', {link, page: flash.page})) :
-        url.includes('bgreco.net') ? strings('misc.external.flash.bgreco', {link}) :
-        url.includes('youtu') ? strings('misc.external.flash.youtube', {link}) :
+            ? language.$('misc.external.flash.homestuck.secret', {link})
+            : language.$('misc.external.flash.homestuck.page', {link, page: flash.page})) :
+        url.includes('bgreco.net') ? language.$('misc.external.flash.bgreco', {link}) :
+        url.includes('youtu') ? language.$('misc.external.flash.youtube', {link}) :
         link
     }</span>`;
 }
@@ -250,16 +250,16 @@ export function fancifyFlashURL(url, flash, {strings}) {
 export function iconifyURL(url, {strings, to}) {
     const domain = new URL(url).hostname;
     const [ id, msg ] = (
-        domain.includes('bandcamp.com') ? ['bandcamp', strings('misc.external.bandcamp')] :
-        BANDCAMP_DOMAINS.includes(domain) ? ['bandcamp', strings('misc.external.bandcamp.domain', {domain})] :
-        MASTODON_DOMAINS.includes(domain) ? ['mastodon', strings('misc.external.mastodon.domain', {domain})] :
-        domain.includes('youtu') ? ['youtube', strings('misc.external.youtube')] :
-        domain.includes('soundcloud') ? ['soundcloud', strings('misc.external.soundcloud')] :
-        domain.includes('tumblr.com') ? ['tumblr', strings('misc.external.tumblr')] :
-        domain.includes('twitter.com') ? ['twitter', strings('misc.external.twitter')] :
-        domain.includes('deviantart.com') ? ['deviantart', strings('misc.external.deviantart')] :
-        domain.includes('instagram.com') ? ['instagram', strings('misc.external.bandcamp')] :
-        ['globe', strings('misc.external.domain', {domain})]
+        domain.includes('bandcamp.com') ? ['bandcamp', language.$('misc.external.bandcamp')] :
+        BANDCAMP_DOMAINS.includes(domain) ? ['bandcamp', language.$('misc.external.bandcamp.domain', {domain})] :
+        MASTODON_DOMAINS.includes(domain) ? ['mastodon', language.$('misc.external.mastodon.domain', {domain})] :
+        domain.includes('youtu') ? ['youtube', language.$('misc.external.youtube')] :
+        domain.includes('soundcloud') ? ['soundcloud', language.$('misc.external.soundcloud')] :
+        domain.includes('tumblr.com') ? ['tumblr', language.$('misc.external.tumblr')] :
+        domain.includes('twitter.com') ? ['twitter', language.$('misc.external.twitter')] :
+        domain.includes('deviantart.com') ? ['deviantart', language.$('misc.external.deviantart')] :
+        domain.includes('instagram.com') ? ['instagram', language.$('misc.external.bandcamp')] :
+        ['globe', language.$('misc.external.domain', {domain})]
     );
     return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to('shared.staticFile', `icons.svg#icon-${id}`)}"></use></svg></a>`;
 }
@@ -305,11 +305,11 @@ export function getAlbumGridHTML({
     return getGridHTML({
         srcFn: getAlbumCover,
         linkFn: link.album,
-        detailsFn: details && (album => strings('misc.albumGrid.details', {
+        detailsFn: details && (album => language.$('misc.albumGrid.details', {
             tracks: language.countTracks(album.tracks.length, {unit: true}),
             time: strings.count.duration(getTotalDuration(album.tracks))
         })),
-        noSrcTextFn: album => strings('misc.albumGrid.noCoverArt', {
+        noSrcTextFn: album => language.$('misc.albumGrid.noCoverArt', {
             album: album.name
         }),
         ...props
@@ -337,11 +337,11 @@ export function generateInfoGalleryLinks(currentThing, isGallery, {
     return [
         link[linkKeyInfo](currentThing, {
             class: isGallery ? '' : 'current',
-            text: strings('misc.nav.info')
+            text: language.$('misc.nav.info')
         }),
         link[linkKeyGallery](currentThing, {
             class: isGallery ? 'current' : '',
-            text: strings('misc.nav.gallery')
+            text: language.$('misc.nav.gallery')
         })
     ].join(', ');
 }
@@ -364,7 +364,7 @@ export function generatePreviousNextLinks(current, {
                 id: 'previous-button',
                 title: previous.name
             },
-            text: strings('misc.nav.previous'),
+            text: language.$('misc.nav.previous'),
             color: false
         }),
         next && linkFn(next, {
@@ -372,7 +372,7 @@ export function generatePreviousNextLinks(current, {
                 id: 'next-button',
                 title: next.name
             },
-            text: strings('misc.nav.next'),
+            text: language.$('misc.nav.next'),
             color: false
         })
     ].filter(Boolean).join(', ');
@@ -405,5 +405,5 @@ export function getFooterLocalizationLinks(pathname, {
 
     return html.tag('div',
         {class: 'footer-localization-links'},
-        strings('misc.uiLanguage', {languages: links.join('\n')}));
+        language.$('misc.uiLanguage', {languages: links.join('\n')}));
 }

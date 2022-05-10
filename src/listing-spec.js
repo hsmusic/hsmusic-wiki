@@ -19,7 +19,7 @@ const listingSpec = [
         },
 
         row(album, {link, strings}) {
-            return strings('listingPage.listAlbums.byName.item', {
+            return language.$('listingPage.listAlbums.byName.item', {
                 album: link.album(album),
                 tracks: language.countTracks(album.tracks.length, {unit: true})
             });
@@ -36,7 +36,7 @@ const listingSpec = [
         },
 
         row(album, {link, strings}) {
-            return strings('listingPage.listAlbums.byTracks.item', {
+            return language.$('listingPage.listAlbums.byTracks.item', {
                 album: link.album(album),
                 tracks: language.countTracks(album.tracks.length, {unit: true})
             });
@@ -54,7 +54,7 @@ const listingSpec = [
         },
 
         row({album, duration}, {link, strings}) {
-            return strings('listingPage.listAlbums.byDuration.item', {
+            return language.$('listingPage.listAlbums.byDuration.item', {
                 album: link.album(album),
                 duration: strings.count.duration(duration)
             });
@@ -70,7 +70,7 @@ const listingSpec = [
         },
 
         row(album, {link, strings}) {
-            return strings('listingPage.listAlbums.byDate.item', {
+            return language.$('listingPage.listAlbums.byDate.item', {
                 album: link.album(album),
                 date: strings.count.date(album.date)
             });
@@ -92,12 +92,12 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${chunks.map(({dateAddedToWiki, chunk: albums}) => fixWS`
-                        <dt>${strings('listingPage.listAlbums.byDateAdded.date', {
+                        <dt>${language.$('listingPage.listAlbums.byDateAdded.date', {
                             date: strings.count.date(dateAddedToWiki)
                         })}</dt>
                         <dd><ul>
                             ${(albums
-                                .map(album => strings('listingPage.listAlbums.byDateAdded.album', {
+                                .map(album => language.$('listingPage.listAlbums.byDateAdded.album', {
                                     album: link.album(album)
                                 }))
                                 .map(row => `<li>${row}</li>`)
@@ -120,7 +120,7 @@ const listingSpec = [
         },
 
         row({artist, contributions}, {link, strings}) {
-            return strings('listingPage.listArtists.byName.item', {
+            return language.$('listingPage.listArtists.byName.item', {
                 artist: link.artist(artist),
                 contributions: language.countContributions(contributions, {unit: true})
             });
@@ -171,10 +171,10 @@ const listingSpec = [
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
-                        <h2>${strings('listingPage.misc.trackContributors')}</h2>
+                        <h2>${language.$('listingPage.misc.trackContributors')}</h2>
                         <ul>
                             ${(toTracks
-                                .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
+                                .map(({ artist, contributions }) => language.$('listingPage.listArtists.byContribs.item', {
                                     artist: link.artist(artist),
                                     contributions: language.countContributions(contributions, {unit: true})
                                 }))
@@ -183,13 +183,13 @@ const listingSpec = [
                          </ul>
                     </div>
                     <div class="column">
-                        <h2>${strings('listingPage.misc' +
+                        <h2>${language.$('listingPage.misc' +
                             (showAsFlashes
                                 ? '.artAndFlashContributors'
                                 : '.artContributors'))}</h2>
                         <ul>
                             ${(toArtAndFlashes
-                                .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
+                                .map(({ artist, contributions }) => language.$('listingPage.listArtists.byContribs.item', {
                                     artist: link.artist(artist),
                                     contributions: language.countContributions(contributions, {unit: true})
                                 }))
@@ -217,7 +217,7 @@ const listingSpec = [
         },
 
         row({artist, entries}, {link, strings}) {
-            return strings('listingPage.listArtists.byCommentary.item', {
+            return language.$('listingPage.listArtists.byCommentary.item', {
                 artist: link.artist(artist),
                 entries: language.countCommentaryEntries(entries, {unit: true})
             });
@@ -242,7 +242,7 @@ const listingSpec = [
         },
 
         row({artist, duration}, {link, strings}) {
-            return strings('listingPage.listArtists.byDuration.item', {
+            return language.$('listingPage.listArtists.byDuration.item', {
                 artist: link.artist(artist),
                 duration: strings.count.duration(duration)
             });
@@ -297,10 +297,10 @@ const listingSpec = [
             return fixWS`
                 <div class="content-columns">
                     <div class="column">
-                        <h2>${strings('listingPage.misc.trackContributors')}</h2>
+                        <h2>${language.$('listingPage.misc.trackContributors')}</h2>
                         <ul>
                             ${(toTracks
-                                .map(({ artist, date }) => strings('listingPage.listArtists.byLatest.item', {
+                                .map(({ artist, date }) => language.$('listingPage.listArtists.byLatest.item', {
                                     artist: link.artist(artist),
                                     date: strings.count.date(date)
                                 }))
@@ -309,13 +309,13 @@ const listingSpec = [
                         </ul>
                     </div>
                     <div class="column">
-                        <h2>${strings('listingPage.misc' +
+                        <h2>${language.$('listingPage.misc' +
                             (showAsFlashes
                                 ? '.artAndFlashContributors'
                                 : '.artContributors'))}</h2>
                         <ul>
                             ${(toArtAndFlashes
-                                .map(({ artist, date }) => strings('listingPage.listArtists.byLatest.item', {
+                                .map(({ artist, date }) => language.$('listingPage.listArtists.byLatest.item', {
                                     artist: link.artist(artist),
                                     date: strings.count.date(date)
                                 }))
@@ -335,10 +335,10 @@ const listingSpec = [
         data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
 
         row(group, {link, strings}) {
-            return strings('listingPage.listGroups.byCategory.group', {
+            return language.$('listingPage.listGroups.byCategory.group', {
                 group: link.groupInfo(group),
                 gallery: link.groupGallery(group, {
-                    text: strings('listingPage.listGroups.byCategory.group.gallery')
+                    text: language.$('listingPage.listGroups.byCategory.group.gallery')
                 })
             });
         }
@@ -354,15 +354,15 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${groupCategoryData.map(category => fixWS`
-                        <dt>${strings('listingPage.listGroups.byCategory.category', {
+                        <dt>${language.$('listingPage.listGroups.byCategory.category', {
                             category: link.groupInfo(category.groups[0], {text: category.name})
                         })}</dt>
                         <dd><ul>
                             ${(category.groups
-                                .map(group => strings('listingPage.listGroups.byCategory.group', {
+                                .map(group => language.$('listingPage.listGroups.byCategory.group', {
                                     group: link.groupInfo(group),
                                     gallery: link.groupGallery(group, {
-                                        text: strings('listingPage.listGroups.byCategory.group.gallery')
+                                        text: language.$('listingPage.listGroups.byCategory.group.gallery')
                                     })
                                 }))
                                 .map(row => `<li>${row}</li>`)
@@ -386,7 +386,7 @@ const listingSpec = [
         },
 
         row({group, albums}, {link, strings}) {
-            return strings('listingPage.listGroups.byAlbums.item', {
+            return language.$('listingPage.listGroups.byAlbums.item', {
                 group: link.groupInfo(group),
                 albums: language.countAlbums(albums, {unit: true})
             });
@@ -405,7 +405,7 @@ const listingSpec = [
         },
 
         row({group, tracks}, {link, strings}) {
-            return strings('listingPage.listGroups.byTracks.item', {
+            return language.$('listingPage.listGroups.byTracks.item', {
                 group: link.groupInfo(group),
                 tracks: language.countTracks(tracks, {unit: true})
             });
@@ -424,7 +424,7 @@ const listingSpec = [
         },
 
         row({group, duration}, {link, strings}) {
-            return strings('listingPage.listGroups.byDuration.item', {
+            return language.$('listingPage.listGroups.byDuration.item', {
                 group: link.groupInfo(group),
                 duration: strings.count.duration(duration)
             });
@@ -462,7 +462,7 @@ const listingSpec = [
         },
 
         row({group, date}, {link, strings}) {
-            return strings('listingPage.listGroups.byLatest.item', {
+            return language.$('listingPage.listGroups.byLatest.item', {
                 group: link.groupInfo(group),
                 date: strings.count.date(date)
             });
@@ -478,7 +478,7 @@ const listingSpec = [
         },
 
         row(track, {link, strings}) {
-            return strings('listingPage.listTracks.byName.item', {
+            return language.$('listingPage.listTracks.byName.item', {
                 track: link.track(track)
             });
         }
@@ -493,12 +493,12 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${albumData.map(album => fixWS`
-                        <dt>${strings('listingPage.listTracks.byAlbum.album', {
+                        <dt>${language.$('listingPage.listTracks.byAlbum.album', {
                             album: link.album(album)
                         })}</dt>
                         <dd><ol>
                             ${(album.tracks
-                                .map(track => strings('listingPage.listTracks.byAlbum.track', {
+                                .map(track => language.$('listingPage.listTracks.byAlbum.track', {
                                     track: link.track(track)
                                 }))
                                 .map(row => `<li>${row}</li>`)
@@ -525,17 +525,17 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${chunks.map(({album, date, chunk: tracks}) => fixWS`
-                        <dt>${strings('listingPage.listTracks.byDate.album', {
+                        <dt>${language.$('listingPage.listTracks.byDate.album', {
                             album: link.album(album),
                             date: strings.count.date(date)
                         })}</dt>
                         <dd><ul>
                             ${(tracks
                                 .map(track => track.aka
-                                    ? `<li class="rerelease">${strings('listingPage.listTracks.byDate.track.rerelease', {
+                                    ? `<li class="rerelease">${language.$('listingPage.listTracks.byDate.track.rerelease', {
                                         track: link.track(track)
                                     })}</li>`
-                                    : `<li>${strings('listingPage.listTracks.byDate.track', {
+                                    : `<li>${language.$('listingPage.listTracks.byDate.track', {
                                         track: link.track(track)
                                     })}</li>`)
                                 .join('\n'))}
@@ -558,7 +558,7 @@ const listingSpec = [
         },
 
         row({track, duration}, {link, strings}) {
-            return strings('listingPage.listTracks.byDuration.item', {
+            return language.$('listingPage.listTracks.byDuration.item', {
                 track: link.track(track),
                 duration: strings.count.duration(duration)
             });
@@ -580,12 +580,12 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${albums.map(({album, tracks}) => fixWS`
-                        <dt>${strings('listingPage.listTracks.byDurationInAlbum.album', {
+                        <dt>${language.$('listingPage.listTracks.byDurationInAlbum.album', {
                             album: link.album(album)
                         })}</dt>
                         <dd><ul>
                             ${(tracks
-                                .map(track => strings('listingPage.listTracks.byDurationInAlbum.track', {
+                                .map(track => language.$('listingPage.listTracks.byDurationInAlbum.track', {
                                     track: link.track(track),
                                     duration: strings.count.duration(track.duration)
                                 }))
@@ -610,7 +610,7 @@ const listingSpec = [
         },
 
         row({track, timesReferenced}, {link, strings}) {
-            return strings('listingPage.listTracks.byTimesReferenced.item', {
+            return language.$('listingPage.listTracks.byTimesReferenced.item', {
                 track: link.track(track),
                 timesReferenced: language.countTimesReferenced(timesReferenced, {unit: true})
             });
@@ -631,13 +631,13 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${chunks.map(({album, chunk: tracks}) => fixWS`
-                        <dt>${strings('listingPage.listTracks.inFlashes.byAlbum.album', {
+                        <dt>${language.$('listingPage.listTracks.inFlashes.byAlbum.album', {
                             album: link.album(album),
                             date: strings.count.date(album.date)
                         })}</dt>
                         <dd><ul>
                             ${(tracks
-                                .map(track => strings('listingPage.listTracks.inFlashes.byAlbum.track', {
+                                .map(track => language.$('listingPage.listTracks.inFlashes.byAlbum.track', {
                                     track: link.track(track),
                                     flashes: strings.list.and(track.featuredInFlashes.map(link.flash))
                                 }))
@@ -660,13 +660,13 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${sortByDate(flashData.slice()).map(flash => fixWS`
-                        <dt>${strings('listingPage.listTracks.inFlashes.byFlash.flash', {
+                        <dt>${language.$('listingPage.listTracks.inFlashes.byFlash.flash', {
                             flash: link.flash(flash),
                             date: strings.count.date(flash.date)
                         })}</dt>
                         <dd><ul>
                             ${(flash.featuredTracks
-                                .map(track => strings('listingPage.listTracks.inFlashes.byFlash.track', {
+                                .map(track => language.$('listingPage.listTracks.inFlashes.byFlash.track', {
                                     track: link.track(track),
                                     album: link.album(track.album)
                                 }))
@@ -691,13 +691,13 @@ const listingSpec = [
             return fixWS`
                 <dl>
                     ${chunks.map(({album, chunk: tracks}) => fixWS`
-                        <dt>${strings('listingPage.listTracks.withLyrics.album', {
+                        <dt>${language.$('listingPage.listTracks.withLyrics.album', {
                             album: link.album(album),
                             date: strings.count.date(album.date)
                         })}</dt>
                         <dd><ul>
                             ${(tracks
-                                .map(track => strings('listingPage.listTracks.withLyrics.track', {
+                                .map(track => language.$('listingPage.listTracks.withLyrics.track', {
                                     track: link.track(track),
                                 }))
                                 .map(row => `<li>${row}</li>`)
@@ -722,7 +722,7 @@ const listingSpec = [
         },
 
         row({tag, timesUsed}, {link, strings}) {
-            return strings('listingPage.listTags.byName.item', {
+            return language.$('listingPage.listTags.byName.item', {
                 tag: link.tag(tag),
                 timesUsed: language.countTimesUsed(timesUsed, {unit: true})
             });
@@ -742,7 +742,7 @@ const listingSpec = [
         },
 
         row({tag, timesUsed}, {link, strings}) {
-            return strings('listingPage.listTags.byUses.item', {
+            return language.$('listingPage.listTags.byUses.item', {
                 tag: link.tag(tag),
                 timesUsed: language.countTimesUsed(timesUsed, {unit: true})
             });
@@ -794,27 +794,27 @@ const filterListings = directoryPrefix => listingSpec
 
 const listingTargetSpec = [
     {
-        title: ({strings}) => strings('listingPage.target.album'),
+        title: ({strings}) => language.$('listingPage.target.album'),
         listings: filterListings('album')
     },
     {
-        title: ({strings}) => strings('listingPage.target.artist'),
+        title: ({strings}) => language.$('listingPage.target.artist'),
         listings: filterListings('artist')
     },
     {
-        title: ({strings}) => strings('listingPage.target.group'),
+        title: ({strings}) => language.$('listingPage.target.group'),
         listings: filterListings('group')
     },
     {
-        title: ({strings}) => strings('listingPage.target.track'),
+        title: ({strings}) => language.$('listingPage.target.track'),
         listings: filterListings('track')
     },
     {
-        title: ({strings}) => strings('listingPage.target.tag'),
+        title: ({strings}) => language.$('listingPage.target.tag'),
         listings: filterListings('tag')
     },
     {
-        title: ({strings}) => strings('listingPage.target.other'),
+        title: ({strings}) => language.$('listingPage.target.other'),
         listings: [
             listingSpec.find(l => l.directory === 'random')
         ]

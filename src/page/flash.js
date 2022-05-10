@@ -36,20 +36,20 @@ export function write(flash, {wikiData}) {
             strings,
             transformInline
         }) => ({
-            title: strings('flashPage.title', {flash: flash.name}),
+            title: language.$('flashPage.title', {flash: flash.name}),
             theme: getThemeString(flash.color, [
                 `--flash-directory: ${flash.directory}`
             ]),
 
             main: {
                 content: fixWS`
-                    <h1>${strings('flashPage.title', {flash: flash.name})}</h1>
+                    <h1>${language.$('flashPage.title', {flash: flash.name})}</h1>
                     ${generateCoverLink({
                         src: getFlashCover(flash),
-                        alt: strings('misc.alt.flashArt')
+                        alt: language.$('misc.alt.flashArt')
                     })}
-                    <p>${strings('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
-                    ${(flash.page || flash.urls?.length) && `<p>${strings('releaseInfo.playOn', {
+                    <p>${language.$('releaseInfo.released', {date: strings.count.date(flash.date)})}</p>
+                    ${(flash.page || flash.urls?.length) && `<p>${language.$('releaseInfo.playOn', {
                         links: strings.list.or([
                             flash.page && getFlashLink(flash),
                             ...flash.urls ?? []
@@ -59,10 +59,10 @@ export function write(flash, {wikiData}) {
                         <p>Tracks featured in <i>${flash.name.replace(/\.$/, '')}</i>:</p>
                         <ul>
                             ${(flash.featuredTracks
-                                .map(track => strings('trackList.item.withArtists', {
+                                .map(track => language.$('trackList.item.withArtists', {
                                     track: link.track(track),
                                     by: `<span class="by">${
-                                        strings('trackList.item.withArtists.by', {
+                                        language.$('trackList.item.withArtists.by', {
                                             artists: getArtistString(track.artistContribs)
                                         })
                                     }</span>`
@@ -72,7 +72,7 @@ export function write(flash, {wikiData}) {
                         </ul>
                     `}
                     ${flash.contributorContribs.length && fixWS`
-                        <p>${strings('releaseInfo.contributors')}</p>
+                        <p>${language.$('releaseInfo.contributors')}</p>
                         <ul>
                             ${flash.contributorContribs
                                 .map(contrib => `<li>${getArtistString([contrib], {
@@ -111,14 +111,14 @@ export function writeTargetless({wikiData}) {
             link,
             strings
         }) => ({
-            title: strings('flashIndex.title'),
+            title: language.$('flashIndex.title'),
 
             main: {
                 classes: ['flash-index'],
                 content: fixWS`
-                    <h1>${strings('flashIndex.title')}</h1>
+                    <h1>${language.$('flashIndex.title')}</h1>
                     <div class="long-content">
-                        <p class="quick-info">${strings('misc.jumpTo')}</p>
+                        <p class="quick-info">${language.$('misc.jumpTo')}</p>
                         <ul class="quick-info">
                             ${flashActData.filter(act => act.jump).map(({ anchor, jump, jumpColor }) => fixWS`
                                 <li><a href="#${anchor}" style="${getLinkThemeString(jumpColor)}">${jump}</a></li>
@@ -165,10 +165,10 @@ function generateNavForFlash(flash, {
             {toHome: true},
             {
                 path: ['localized.flashIndex'],
-                title: strings('flashIndex.title')
+                title: language.$('flashIndex.title')
             },
             {
-                html: strings('flashPage.nav.flash', {
+                html: language.$('flashPage.nav.flash', {
                     flash: link.flash(flash, {class: 'current'})
                 })
             },
@@ -211,7 +211,7 @@ function generateSidebarForFlash(flash, {link, strings, wikiData}) {
 
     return {
         content: fixWS`
-            <h1>${link.flashIndex('', {text: strings('flashIndex.title')})}</h1>
+            <h1>${link.flashIndex('', {text: language.$('flashIndex.title')})}</h1>
             <dl>
                 ${flashActData.filter(act =>
                     act.name.startsWith('Act 1') ||

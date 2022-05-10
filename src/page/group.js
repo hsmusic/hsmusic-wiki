@@ -42,44 +42,44 @@ export function write(group, {wikiData}) {
             strings,
             transformMultiline
         }) => ({
-            title: strings('groupInfoPage.title', {group: group.name}),
+            title: language.$('groupInfoPage.title', {group: group.name}),
             theme: getThemeString(group.color),
 
             main: {
                 content: fixWS`
-                    <h1>${strings('groupInfoPage.title', {group: group.name})}</h1>
+                    <h1>${language.$('groupInfoPage.title', {group: group.name})}</h1>
                     ${group.urls?.length && `<p>${
-                        strings('releaseInfo.visitOn', {
+                        language.$('releaseInfo.visitOn', {
                             links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
                         })
                     }</p>`}
                     <blockquote>
                         ${transformMultiline(group.description)}
                     </blockquote>
-                    <h2>${strings('groupInfoPage.albumList.title')}</h2>
+                    <h2>${language.$('groupInfoPage.albumList.title')}</h2>
                     <p>${
-                        strings('groupInfoPage.viewAlbumGallery', {
+                        language.$('groupInfoPage.viewAlbumGallery', {
                             link: link.groupGallery(group, {
-                                text: strings('groupInfoPage.viewAlbumGallery.link')
+                                text: language.$('groupInfoPage.viewAlbumGallery.link')
                             })
                         })
                     }</p>
                     <ul>
                         ${albumLines.map(({ album, otherGroup }) => {
                             const item = (album.date
-                                ? strings('groupInfoPage.albumList.item', {
+                                ? language.$('groupInfoPage.albumList.item', {
                                     year: album.date.getFullYear(),
                                     album: link.album(album)
                                 })
-                                : strings('groupInfoPage.albumList.item.withoutYear', {
+                                : language.$('groupInfoPage.albumList.item.withoutYear', {
                                     album: link.album(album)
                                 }));
                             return html.tag('li', (otherGroup
-                                ? strings('groupInfoPage.albumList.item.withAccent', {
+                                ? language.$('groupInfoPage.albumList.item.withAccent', {
                                     item,
                                     accent: html.tag('span',
                                         {class: 'other-group-accent'},
-                                        strings('groupInfoPage.albumList.item.otherGroupAccent', {
+                                        language.$('groupInfoPage.albumList.item.otherGroupAccent', {
                                             group: link.groupInfo(otherGroup, {color: false})
                                         }))
                                 })
@@ -118,15 +118,15 @@ export function write(group, {wikiData}) {
             link,
             strings
         }) => ({
-            title: strings('groupGalleryPage.title', {group: group.name}),
+            title: language.$('groupGalleryPage.title', {group: group.name}),
             theme: getThemeString(group.color),
 
             main: {
                 classes: ['top-index'],
                 content: fixWS`
-                    <h1>${strings('groupGalleryPage.title', {group: group.name})}</h1>
+                    <h1>${language.$('groupGalleryPage.title', {group: group.name})}</h1>
                     <p class="quick-info">${
-                        strings('groupGalleryPage.infoLine', {
+                        language.$('groupGalleryPage.infoLine', {
                             tracks: `<b>${language.countTracks(tracks.length, {unit: true})}</b>`,
                             albums: `<b>${language.countAlbums(albums.length, {unit: true})}</b>`,
                             time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
@@ -134,9 +134,9 @@ export function write(group, {wikiData}) {
                     }</p>
                     ${wikiInfo.enableGroupUI && wikiInfo.enableListings && html.tag('p',
                         {class: 'quick-info'},
-                        strings('groupGalleryPage.anotherGroupLine', {
+                        language.$('groupGalleryPage.anotherGroupLine', {
                             link: link.listing(listingSpec.find(l => l.directory === 'groups/by-category'), {
-                                text: strings('groupGalleryPage.anotherGroupLine.link')
+                                text: language.$('groupGalleryPage.anotherGroupLine.link')
                             })
                         })
                     )}
@@ -187,7 +187,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
 
     return {
         content: fixWS`
-            <h1>${strings('groupSidebar.title')}</h1>
+            <h1>${language.$('groupSidebar.title')}</h1>
             ${groupCategoryData.map(category =>
                 html.tag('details', {
                     open: category === currentGroup.category,
@@ -195,7 +195,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
                 }, [
                     html.tag('summary',
                         {style: getLinkThemeString(category.color)},
-                        strings('groupSidebar.groupList.category', {
+                        language.$('groupSidebar.groupList.category', {
                             category: `<span class="group-name">${category.name}</span>`
                         })),
                     html.tag('ul',
@@ -204,7 +204,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
                                 class: group === currentGroup && 'current',
                                 style: getLinkThemeString(group.color)
                             },
-                            strings('groupSidebar.groupList.item', {
+                            language.$('groupSidebar.groupList.item', {
                                 group: link[linkKey](group)
                             }))))
                 ])).join('\n')}
@@ -245,10 +245,10 @@ function generateGroupNav(currentGroup, isGallery, {
             wikiInfo.enableListings &&
             {
                 path: ['localized.listingIndex'],
-                title: strings('listingIndex.title')
+                title: language.$('listingIndex.title')
             },
             {
-                html: strings('groupPage.nav.group', {
+                html: language.$('groupPage.nav.group', {
                     group: link[linkKey](currentGroup, {class: 'current'})
                 })
             },
