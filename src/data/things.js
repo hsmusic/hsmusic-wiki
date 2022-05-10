@@ -181,6 +181,13 @@ Thing.common = {
         update: {validate: isString}
     }),
 
+    // External function. These should only be used as dependencies for other
+    // properties, so they're left unexposed.
+    externalFunction: () => ({
+        flags: {update: true},
+        update: {validate: t => typeof t === 'function'}
+    }),
+
     // Super simple "contributions by reference" list, used for a variety of
     // properties (Artists, Cover Artists, etc). This is the property which is
     // externally provided, in the form:
@@ -1414,6 +1421,10 @@ Language.propertyDescriptors = {
         update: {validate: t => typeof t === 'object'}
     },
 
+    // Update only
+
+    escapeHTML: Thing.common.externalFunction(),
+
     // Expose only
 
     intl_date: intlHelper(Intl.DateTimeFormat, {full: true}),
@@ -1432,6 +1443,18 @@ Language.propertyDescriptors = {
             compute: ({ strings }) => strings ? Object.keys(strings) : []
         }
     },
+
+    strings_htmlEscaped: {
+        flags: {expose: true},
+        expose: {
+            dependencies: ['strings', 'escapeHTML'],
+            compute({ strings, escapeHTML }) {
+                if (!strings || !escapeHTML) return null;
+                return Object.fromEntries(Object.entries(strings)
+                    .map(([ k, v ]) => [k, escapeHTML(v)]));
+            }
+        }
+    },
 };
 
 const countHelper = (stringKey, argName = stringKey) => function(value, {unit = false} = {}) {
@@ -1444,11 +1467,42 @@ const countHelper = (stringKey, argName = stringKey) => function(value, {unit = 
 
 Object.assign(Language.prototype, {
     $(key, args = {}) {
+        return this.formatString(key, args);
+    },
+
+    assertIntlAvailable(property) {
+        if (!this[property]) {
+            throw new Error(`Intl API ${property} unavailable`);
+        }
+    },
+
+    getUnitForm(value) {
+        this.assertIntlAvailable('intl_pluralCardinal');
+        return this.intl_pluralCardinal.select(value);
+    },
+
+    formatString(key, args = {}) {
+        if (this.strings && !this.strings_htmlEscaped) {
+            throw new Error(`HTML-escaped strings unavailable - please ensure escapeHTML function is provided`);
+        }
+
+        return this.formatStringHelper(this.strings_htmlEscaped, key, args);
+    },
+
+    formatStringNoHTMLEscape(key, args = {}) {
+        return this.formatStringHelper(this.strings, key, args);
+    },
+
+    formatStringHelper(strings, key, args = {}) {
+        if (!strings) {
+            throw new Error(`Strings unavailable`);
+        }
+
         if (!this.validKeys.includes(key)) {
             throw new Error(`Invalid key ${key} accessed`);
         }
 
-        const template = this.strings[key];
+        const template = strings[key];
 
         // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
         // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
@@ -1471,17 +1525,6 @@ Object.assign(Language.prototype, {
         return output;
     },
 
-    assertIntlAvailable(property) {
-        if (!this[property]) {
-            throw new Error(`Intl API ${property} unavailable`);
-        }
-    },
-
-    getUnitForm(value) {
-        this.assertIntlAvailable('intl_pluralCardinal');
-        return this.intl_pluralCardinal.select(value);
-    },
-
     formatDate(date) {
         this.assertIntlAvailable('intl_date');
         return this.intl_date.format(date);
@@ -1494,7 +1537,7 @@ Object.assign(Language.prototype, {
 
     formatDuration(secTotal, {approximate = false, unit = false}) {
         if (secTotal === 0) {
-            return language.$('count.duration.missing');
+            return this.formatString('count.duration.missing');
         }
 
         const hour = Math.floor(secTotal / 3600);
@@ -1506,24 +1549,24 @@ Object.assign(Language.prototype, {
         const stringSubkey = unit ? '.withUnit' : '';
 
         const duration = (hour > 0
-            ? this.$('count.duration.hours' + stringSubkey, {
+            ? this.formatString('count.duration.hours' + stringSubkey, {
                 hours: hour,
                 minutes: pad(min),
                 seconds: pad(sec)
             })
-            : this.$('count.duration.minutes' + stringSubkey, {
+            : this.formatString('count.duration.minutes' + stringSubkey, {
                 minutes: min,
                 seconds: pad(sec)
             }));
 
         return (approximate
-            ? this.$('count.duration.approximate', {duration})
+            ? this.formatString('count.duration.approximate', {duration})
             : duration);
     },
 
     formatIndex(value) {
         this.assertIntlAvailable('intl_pluralOrdinal');
-        return this.$('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
+        return this.formatString('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
     },
 
     formatNumber(value) {
@@ -1537,10 +1580,10 @@ Object.assign(Language.prototype, {
             : value);
 
         const words = (value > 1000
-            ? language.$('count.words.thousand', {words: num})
-            : language.$('count.words', {words: num}));
+            ? this.formatString('count.words.thousand', {words: num})
+            : this.formatString('count.words', {words: num}));
 
-        return this.$('count.words.withUnit.' + this.getUnitForm(value), {words});
+        return this.formatString('count.words.withUnit.' + this.getUnitForm(value), {words});
     },
 
     // Conjunction list: A, B, and C
