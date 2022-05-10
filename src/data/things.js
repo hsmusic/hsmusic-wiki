@@ -1543,6 +1543,24 @@ Object.assign(Language.prototype, {
         return this.$('count.words.withUnit.' + this.getUnitForm(value), {words});
     },
 
+    // Conjunction list: A, B, and C
+    formatConjunctionList(array) {
+        this.assertIntlAvailable('intl_listConjunction');
+        return this.intl_listConjunction.format(array);
+    },
+
+    // Disjunction lists: A, B, or C
+    formatDisjunctionList(array) {
+        this.assertIntlAvailable('intl_listDisjunction');
+        return this.intl_listDisjunction.format(array);
+    },
+
+    // Unit lists: A, B, C
+    formatUnitList(array) {
+        this.assertIntlAvailable('intl_listUnit');
+        return this.intl_listUnit.format(array);
+    },
+
     // TODO: These are hard-coded. Is there a better way?
     countAlbums: countHelper('albums'),
     countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
