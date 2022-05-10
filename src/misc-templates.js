@@ -35,13 +35,13 @@ export function getArtistString(artists, {
     showIcons = false,
     showContrib = false
 }) {
-    return strings.list.and(artists.map(({ who, what }) => {
+    return language.formatConjunctionList(artists.map(({ who, what }) => {
         const { urls, directory, name } = who;
         return [
             link.artist(who),
             showContrib && what && `(${what})`,
             showIcons && urls?.length && `<span class="icons">(${
-                strings.list.unit(urls.map(url => iconifyURL(url, {strings})))
+                language.formatUnitList(urls.map(url => iconifyURL(url, {strings})))
             })</span>`
         ].filter(Boolean).join(' ');
     }));
@@ -117,7 +117,7 @@ export function getRevealStringFromWarnings(warnings, {strings}) {
 
 export function getRevealStringFromTags(tags, {strings}) {
     return tags && tags.some(tag => tag.isContentWarning) && (
-        getRevealStringFromWarnings(strings.list.unit(tags.filter(tag => tag.isContentWarning).map(tag => tag.name)), {strings}));
+        getRevealStringFromWarnings(language.formatUnitList(tags.filter(tag => tag.isContentWarning).map(tag => tag.name)), {strings}));
 }
 
 // Cover art links

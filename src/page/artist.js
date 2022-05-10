@@ -149,7 +149,7 @@ export function write(artist, {wikiData}) {
                     ? language.$('artistPage.creditList.entry.withArtists.withContribution', {
                         entry,
                         artists: getArtistString(artists),
-                        contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
+                        contribution: (contrib.whatArray ? language.formatUnitList(contrib.whatArray) : contrib.what)
                     })
                     : language.$('artistPage.creditList.entry.withArtists', {
                         entry,
@@ -158,7 +158,7 @@ export function write(artist, {wikiData}) {
                 : ((contrib.what || contrib.whatArray?.length)
                     ? language.$('artistPage.creditList.entry.withContribution', {
                         entry,
-                        contribution: (contrib.whatArray ? strings.list.unit(contrib.whatArray) : contrib.what)
+                        contribution: (contrib.whatArray ? language.formatUnitList(contrib.whatArray) : contrib.what)
                     })
                     : entry)));
 
@@ -300,7 +300,7 @@ export function write(artist, {wikiData}) {
                             <hr>
                         `}
                         ${urls?.length && `<p>${language.$('releaseInfo.visitOn', {
-                            links: strings.list.or(urls.map(url => fancifyURL(url, {strings})))
+                            links: language.formatDisjunctionList(urls.map(url => fancifyURL(url, {strings})))
                         })}</p>`}
                         ${hasGallery && `<p>${language.$('artistPage.viewArtGallery', {
                             link: link.artistGallery(artist, {
@@ -308,7 +308,7 @@ export function write(artist, {wikiData}) {
                             })
                         })}</p>`}
                         <p>${language.$('misc.jumpTo.withLinks', {
-                            links: strings.list.unit([
+                            links: language.formatUnitList([
                                 allTracks.length && `<a href="#tracks">${language.$('artistPage.trackList.title')}</a>`,
                                 artThingsAll.length && `<a href="#art">${language.$('artistPage.artList.title')}</a>`,
                                 wikiInfo.enableFlashesAndGames && flashes.length && `<a href="#flashes">${language.$('artistPage.flashList.title')}</a>`,
@@ -322,7 +322,7 @@ export function write(artist, {wikiData}) {
                                 duration: language.formatDuration(totalDuration, {approximate: true, unit: true})
                             })}</p>
                             <p>${language.$('artistPage.musicGroupsLine', {
-                                groups: strings.list.unit(musicGroups
+                                groups: language.formatUnitList(musicGroups
                                     .map(({ group, contributions }) => language.$('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
                                         contributions: language.countContributions(contributions)
@@ -338,7 +338,7 @@ export function write(artist, {wikiData}) {
                                 })
                             })}</p>`}
                             <p>${language.$('artistPage.artGroupsLine', {
-                                groups: strings.list.unit(artGroups
+                                groups: language.formatUnitList(artGroups
                                     .map(({ group, contributions }) => language.$('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
                                         contributions: language.countContributions(contributions)

@@ -50,7 +50,7 @@ export function write(flash, {wikiData}) {
                     })}
                     <p>${language.$('releaseInfo.released', {date: language.formatDate(flash.date)})}</p>
                     ${(flash.page || flash.urls?.length) && `<p>${language.$('releaseInfo.playOn', {
-                        links: strings.list.or([
+                        links: language.formatDisjunctionList([
                             flash.page && getFlashLink(flash),
                             ...flash.urls ?? []
                         ].map(url => fancifyFlashURL(url, flash)))

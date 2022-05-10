@@ -639,7 +639,7 @@ const listingSpec = [
                             ${(tracks
                                 .map(track => language.$('listingPage.listTracks.inFlashes.byAlbum.track', {
                                     track: link.track(track),
-                                    flashes: strings.list.and(track.featuredInFlashes.map(link.flash))
+                                    flashes: language.formatConjunctionList(track.featuredInFlashes.map(link.flash))
                                 }))
                                 .map(row => `<li>${row}</li>`)
                                 .join('\n'))}

@@ -190,7 +190,7 @@ export function write(album, {wikiData}) {
                         }</p>`}
                         ${album.urls?.length && `<p>${
                             language.$('releaseInfo.listenOn', {
-                                links: strings.list.or(album.urls.map(url => fancifyURL(url, {album: true})))
+                                links: language.formatDisjunctionList(album.urls.map(url => fancifyURL(url, {album: true})))
                             })
                         }</p>`}
                         ${album.trackGroups && (album.trackGroups.length > 1 || !album.trackGroups[0].isDefaultTrackGroup) ? fixWS`
@@ -342,7 +342,7 @@ export function generateAlbumSidebar(album, currentTrack, {
         ${!currentTrack && transformMultiline(group.descriptionShort)}
         ${group.urls?.length && `<p>${
             language.$('releaseInfo.visitOn', {
-                links: strings.list.or(group.urls.map(url => fancifyURL(url)))
+                links: language.formatDisjunctionList(group.urls.map(url => fancifyURL(url)))
             })
         }</p>`}
         ${!currentTrack && fixWS`

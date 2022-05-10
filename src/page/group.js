@@ -50,7 +50,7 @@ export function write(group, {wikiData}) {
                     <h1>${language.$('groupInfoPage.title', {group: group.name})}</h1>
                     ${group.urls?.length && `<p>${
                         language.$('releaseInfo.visitOn', {
-                            links: strings.list.or(group.urls.map(url => fancifyURL(url, {strings})))
+                            links: language.formatDisjunctionList(group.urls.map(url => fancifyURL(url, {strings})))
                         })
                     }</p>`}
                     <blockquote>

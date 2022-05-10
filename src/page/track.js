@@ -196,7 +196,7 @@ export function write(track, {wikiData}) {
                         <p>${
                             (track.urls?.length
                                 ? language.$('releaseInfo.listenOn', {
-                                    links: strings.list.or(track.urls.map(url => fancifyURL(url, {strings})))
+                                    links: language.formatDisjunctionList(track.urls.map(url => fancifyURL(url, {strings})))
                                 })
                                 : language.$('releaseInfo.listenOn.noLinks'))
                         }</p>
