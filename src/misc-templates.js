@@ -306,7 +306,7 @@ export function getAlbumGridHTML({
         srcFn: getAlbumCover,
         linkFn: link.album,
         detailsFn: details && (album => strings('misc.albumGrid.details', {
-            tracks: strings.count.tracks(album.tracks.length, {unit: true}),
+            tracks: language.countTracks(album.tracks.length, {unit: true}),
             time: strings.count.duration(getTotalDuration(album.tracks))
         })),
         noSrcTextFn: album => strings('misc.albumGrid.noCoverArt', {

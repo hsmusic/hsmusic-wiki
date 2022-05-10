@@ -127,8 +127,8 @@ export function write(group, {wikiData}) {
                     <h1>${strings('groupGalleryPage.title', {group: group.name})}</h1>
                     <p class="quick-info">${
                         strings('groupGalleryPage.infoLine', {
-                            tracks: `<b>${strings.count.tracks(tracks.length, {unit: true})}</b>`,
-                            albums: `<b>${strings.count.albums(albums.length, {unit: true})}</b>`,
+                            tracks: `<b>${language.countTracks(tracks.length, {unit: true})}</b>`,
+                            albums: `<b>${language.countAlbums(albums.length, {unit: true})}</b>`,
                             time: `<b>${strings.count.duration(totalDuration, {unit: true})}</b>`
                         })
                     }</p>

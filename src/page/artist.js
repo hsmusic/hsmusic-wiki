@@ -325,7 +325,7 @@ export function write(artist, {wikiData}) {
                                 groups: strings.list.unit(musicGroups
                                     .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
-                                        contributions: strings.count.contributions(contributions)
+                                        contributions: language.countContributions(contributions)
                                     })))
                             })}</p>
                             ${generateTrackList(trackListChunks)}
@@ -341,7 +341,7 @@ export function write(artist, {wikiData}) {
                                 groups: strings.list.unit(artGroups
                                     .map(({ group, contributions }) => strings('artistPage.groupsLine.item', {
                                         group: link.groupInfo(group),
-                                        contributions: strings.count.contributions(contributions)
+                                        contributions: language.countContributions(contributions)
                                     })))
                             })}</p>
                             <dl>
@@ -446,7 +446,7 @@ export function write(artist, {wikiData}) {
                 content: fixWS`
                     <h1>${strings('artistGalleryPage.title', {artist: name})}</h1>
                     <p class="quick-info">${strings('artistGalleryPage.infoLine', {
-                        coverArts: strings.count.coverArts(artThingsGallery.length, {unit: true})
+                        coverArts: language.countCoverArts(artThingsGallery.length, {unit: true})
                     })}</p>
                     <div class="grid-listing">
                         ${getGridHTML({

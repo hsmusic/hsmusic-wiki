@@ -21,7 +21,7 @@ const listingSpec = [
         row(album, {link, strings}) {
             return strings('listingPage.listAlbums.byName.item', {
                 album: link.album(album),
-                tracks: strings.count.tracks(album.tracks.length, {unit: true})
+                tracks: language.countTracks(album.tracks.length, {unit: true})
             });
         }
     },
@@ -38,7 +38,7 @@ const listingSpec = [
         row(album, {link, strings}) {
             return strings('listingPage.listAlbums.byTracks.item', {
                 album: link.album(album),
-                tracks: strings.count.tracks(album.tracks.length, {unit: true})
+                tracks: language.countTracks(album.tracks.length, {unit: true})
             });
         }
     },
@@ -122,7 +122,7 @@ const listingSpec = [
         row({artist, contributions}, {link, strings}) {
             return strings('listingPage.listArtists.byName.item', {
                 artist: link.artist(artist),
-                contributions: strings.count.contributions(contributions, {unit: true})
+                contributions: language.countContributions(contributions, {unit: true})
             });
         }
     },
@@ -176,7 +176,7 @@ const listingSpec = [
                             ${(toTracks
                                 .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
                                     artist: link.artist(artist),
-                                    contributions: strings.count.contributions(contributions, {unit: true})
+                                    contributions: language.countContributions(contributions, {unit: true})
                                 }))
                                 .map(row => `<li>${row}</li>`)
                                 .join('\n'))}
@@ -191,7 +191,7 @@ const listingSpec = [
                             ${(toArtAndFlashes
                                 .map(({ artist, contributions }) => strings('listingPage.listArtists.byContribs.item', {
                                     artist: link.artist(artist),
-                                    contributions: strings.count.contributions(contributions, {unit: true})
+                                    contributions: language.countContributions(contributions, {unit: true})
                                 }))
                                 .map(row => `<li>${row}</li>`)
                                 .join('\n'))}
@@ -219,7 +219,7 @@ const listingSpec = [
         row({artist, entries}, {link, strings}) {
             return strings('listingPage.listArtists.byCommentary.item', {
                 artist: link.artist(artist),
-                entries: strings.count.commentaryEntries(entries, {unit: true})
+                entries: language.countCommentaryEntries(entries, {unit: true})
             });
         }
     },
@@ -388,7 +388,7 @@ const listingSpec = [
         row({group, albums}, {link, strings}) {
             return strings('listingPage.listGroups.byAlbums.item', {
                 group: link.groupInfo(group),
-                albums: strings.count.albums(albums, {unit: true})
+                albums: language.countAlbums(albums, {unit: true})
             });
         }
     },
@@ -407,7 +407,7 @@ const listingSpec = [
         row({group, tracks}, {link, strings}) {
             return strings('listingPage.listGroups.byTracks.item', {
                 group: link.groupInfo(group),
-                tracks: strings.count.tracks(tracks, {unit: true})
+                tracks: language.countTracks(tracks, {unit: true})
             });
         }
     },
@@ -612,7 +612,7 @@ const listingSpec = [
         row({track, timesReferenced}, {link, strings}) {
             return strings('listingPage.listTracks.byTimesReferenced.item', {
                 track: link.track(track),
-                timesReferenced: strings.count.timesReferenced(timesReferenced, {unit: true})
+                timesReferenced: language.countTimesReferenced(timesReferenced, {unit: true})
             });
         }
     },
@@ -724,7 +724,7 @@ const listingSpec = [
         row({tag, timesUsed}, {link, strings}) {
             return strings('listingPage.listTags.byName.item', {
                 tag: link.tag(tag),
-                timesUsed: strings.count.timesUsed(timesUsed, {unit: true})
+                timesUsed: language.countTimesUsed(timesUsed, {unit: true})
             });
         }
     },
@@ -744,7 +744,7 @@ const listingSpec = [
         row({tag, timesUsed}, {link, strings}) {
             return strings('listingPage.listTags.byUses.item', {
                 tag: link.tag(tag),
-                timesUsed: strings.count.timesUsed(timesUsed, {unit: true})
+                timesUsed: language.countTimesUsed(timesUsed, {unit: true})
             });
         }
     },

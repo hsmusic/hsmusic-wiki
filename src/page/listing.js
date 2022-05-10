@@ -112,8 +112,8 @@ export function writeTargetless({wikiData}) {
                     <h1>${strings('listingIndex.title')}</h1>
                     <p>${strings('listingIndex.infoLine', {
                         wiki: wikiInfo.name,
-                        tracks: `<b>${strings.count.tracks(trackData.length, {unit: true})}</b>`,
-                        albums: `<b>${strings.count.albums(albumData.length, {unit: true})}</b>`,
+                        tracks: `<b>${language.countTracks(trackData.length, {unit: true})}</b>`,
+                        albums: `<b>${language.countAlbums(albumData.length, {unit: true})}</b>`,
                         duration: `<b>${strings.count.duration(totalDuration, {approximate: true, unit: true})}</b>`
                     })}</p>
                     <hr>

@@ -45,7 +45,7 @@ export function write(tag, {wikiData}) {
                 content: fixWS`
                     <h1>${strings('tagPage.title', {tag: tag.name})}</h1>
                     <p class="quick-info">${strings('tagPage.infoLine', {
-                        coverArts: strings.count.coverArts(things.length, {unit: true})
+                        coverArts: language.countCoverArts(things.length, {unit: true})
                     })}</p>
                     <div class="grid-listing">
                         ${getGridHTML({

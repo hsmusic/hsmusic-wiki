@@ -32,7 +32,7 @@ import { bindOpts } from './sugar.js';
 //
 // ...you can just do:
 //
-//     strings.count.tracks(album.tracks.length)
+//     language.countTracks(album.tracks.length)
 //
 // Definitely note bindUtilities expects an OBJECT, not an array, otherwise
 // it won't 8e a8le to know what keys to attach the utilities 8y!
