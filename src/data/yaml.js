@@ -11,6 +11,7 @@ import {
     Album,
     Artist,
     ArtTag,
+    BuildDirective,
     Flash,
     FlashAct,
     Group,
@@ -55,6 +56,7 @@ function inspect(value) {
 // --> YAML data repository structure constants
 
 export const WIKI_INFO_FILE = 'wiki-info.yaml';
+export const BUILD_DIRECTIVE_DATA_FILE = 'build-directives.yaml';
 export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
 export const ARTIST_DATA_FILE = 'artists.yaml';
 export const FLASH_DATA_FILE = 'flashes.yaml';
@@ -395,6 +397,14 @@ export const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
         enableNews: 'Enable News',
         enableArtTagUI: 'Enable Art Tag UI',
         enableGroupUI: 'Enable Group UI',
+    }
+});
+
+export const processBuildDirectiveDocument = makeProcessDocument(BuildDirective, {
+    propertyFieldMapping: {
+        directive: 'Directive',
+        baseDirectory: 'Base Directory',
+        language: 'Language',
     }
 });
 

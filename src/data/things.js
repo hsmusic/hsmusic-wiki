@@ -87,6 +87,12 @@ export class FlashAct extends CacheableObject {}
 // -> WikiInfo
 export class WikiInfo extends CacheableObject {}
 
+// -> Language
+export class Language extends CacheableObject {}
+
+// -> BuildDirective
+export class BuildDirective extends CacheableObject {}
+
 // Before initializing property descriptors, set additional independent
 // constants on the classes (which are referenced later).
 
@@ -1362,4 +1368,197 @@ WikiInfo.propertyDescriptors = {
     enableNews: Thing.common.flag(false),
     enableArtTagUI: Thing.common.flag(false),
     enableGroupUI: Thing.common.flag(false),
+};
+
+// -> Language
+
+const intlHelper = (constructor, opts) => ({
+    flags: {expose: true},
+    expose: {
+        dependencies: ['code', 'intlCode'],
+        compute: ({ code, intlCode }) => {
+            const constructCode = intlCode ?? code;
+            if (!constructCode) return null;
+            return Reflect.construct(constructor, [constructCode, opts]);
+        }
+    }
+});
+
+Language.propertyDescriptors = {
+    // Update & expose
+
+    // General language code. This is used to identify the language distinctly
+    // from other languages (similar to how "Directory" operates in many data
+    // objects).
+    code: {
+        flags: {update: true, expose: true},
+        update: {validate: isLanguageCode}
+    },
+
+    // Language code specific to JavaScript's Internationalization (Intl) API.
+    // Usually this will be the same as the language's general code, but it
+    // may be overridden to provide Intl constructors an alternative value.
+    intlCode: {
+        flags: {update: true, expose: true},
+        update: {validate: isLanguageCode},
+        expose: {
+            dependencies: ['code'],
+            transform: (intlCode, { code }) => intlCode ?? code
+        }
+    },
+
+    // Mapping of translation keys to values (strings). Generally, don't
+    // access this object directly - use methods instead.
+    strings: {
+        flags: {update: true, expose: true},
+        update: {validate: t => typeof t === 'object'}
+    },
+
+    // Expose only
+
+    intl_date: intlHelper(Intl.DateTimeFormat, {full: true}),
+    intl_number: intlHelper(Intl.NumberFormat),
+    intl_listConjunction: intlHelper(Intl.ListFormat, {type: 'conjunction'}),
+    intl_listDisjunction: intlHelper(Intl.ListFormat, {type: 'disjunction'}),
+    intl_listUnit: intlHelper(Intl.ListFormat, {type: 'unit'}),
+    intl_pluralCardinal: intlHelper(Intl.PluralRules, {type: 'cardinal'}),
+    intl_pluralOrdinal: intlHelper(Intl.PluralRules, {type: 'ordinal'}),
+
+    validKeys: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['strings'],
+            compute: ({ strings }) => strings ? Object.keys(strings) : []
+        }
+    },
+};
+
+const countHelper = (stringKey, argName = stringKey) => function(value, {unit = false} = {}) {
+    return this.$(
+        (unit
+            ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
+            : `count.${stringKey}`),
+        {[argName]: this.formatNumber(value)});
+};
+
+Object.assign(Language.prototype, {
+    $(key, args = {}) {
+        if (!this.validKeys.includes(key)) {
+            throw new Error(`Invalid key ${key} accessed`);
+        }
+
+        const template = this.strings[key];
+
+        // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
+        // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
+        // like, who cares, dude?) Also, this is an array, 8ecause it's handy
+        // for the iterating we're a8out to do.
+        const processedArgs = Object.entries(args)
+            .map(([ k, v ]) => [k.replace(/[A-Z]/g, '_$&').toUpperCase(), v]);
+
+        // Replacement time! Woot. Reduce comes in handy here!
+        const output = processedArgs.reduce(
+            (x, [ k, v ]) => x.replaceAll(`{${k}}`, v),
+            template);
+
+        // Post-processing: if any expected arguments *weren't* replaced, that
+        // is almost definitely an error.
+        if (output.match(/\{[A-Z_]+\}/)) {
+            throw new Error(`Args in ${key} were missing - output: ${output}`);
+        }
+
+        return output;
+    },
+
+    assertIntlAvailable(property) {
+        if (!this[property]) {
+            throw new Error(`Intl API ${property} unavailable`);
+        }
+    },
+
+    getUnitForm(value) {
+        this.assertIntlAvailable('intl_pluralCardinal');
+        return this.intl_pluralCardinal.select(value);
+    },
+
+    formatDate(date) {
+        this.assertIntlAvailable('intl_date');
+        return this.intl_date.format(date);
+    },
+
+    formatDateRange(startDate, endDate) {
+        this.assertIntlAvailable('intl_date');
+        return this.intl_date.formatRange(startDate, endDate);
+    },
+
+    formatDuration(secTotal, {approximate = false, unit = false}) {
+        if (secTotal === 0) {
+            return strings('count.duration.missing');
+        }
+
+        const hour = Math.floor(secTotal / 3600);
+        const min = Math.floor((secTotal - hour * 3600) / 60);
+        const sec = Math.floor(secTotal - hour * 3600 - min * 60);
+
+        const pad = val => val.toString().padStart(2, '0');
+
+        const stringSubkey = unit ? '.withUnit' : '';
+
+        const duration = (hour > 0
+            ? this.$('count.duration.hours' + stringSubkey, {
+                hours: hour,
+                minutes: pad(min),
+                seconds: pad(sec)
+            })
+            : this.$('count.duration.minutes' + stringSubkey, {
+                minutes: min,
+                seconds: pad(sec)
+            }));
+
+        return (approximate
+            ? this.$('count.duration.approximate', {duration})
+            : duration);
+    },
+
+    formatIndex(value) {
+        this.assertIntlAvailable('intl_pluralOrdinal');
+        return this.$('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
+    },
+
+    formatNumber(value) {
+        this.assertIntlAvailable('intl_number');
+        return this.intl_number.format(value);
+    },
+
+    formatWordCount(value) {
+        const num = this.formatNumber(value > 1000
+            ? Math.floor(value / 100) / 10
+            : value);
+
+        const words = (value > 1000
+            ? strings('count.words.thousand', {words: num})
+            : strings('count.words', {words: num}));
+
+        return this.$('count.words.withUnit.' + this.getUnitForm(value), {words});
+    },
+
+    // TODO: These are hard-coded. Is there a better way?
+    countAlbums: countHelper('albums'),
+    countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
+    countContributions: countHelper('contributions'),
+    countCoverArts: countHelper('coverArts'),
+    countTimesReferenced: countHelper('timesReferenced'),
+    countTimesUsed: countHelper('timesUsed'),
+    countTracks: countHelper('tracks'),
+});
+
+// -> BuildDirective
+
+BuildDirective.propertyDescriptors = {
+    // Update & expose
+
+    directive: Thing.common.directory(),
+    baseDirectory: Thing.common.directory(),
+    language: Thing.common.simpleString(),
 };

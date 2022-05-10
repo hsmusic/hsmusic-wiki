@@ -43,7 +43,7 @@ import { bindOpts } from './sugar.js';
 export function genStrings(stringsJSON, {
     he,
     defaultJSON = null,
-    bindUtilities = []
+    bindUtilities = {}
 }) {
     // genStrings will only 8e called once for each language, and it happens
     // right at the start of the program (or at least 8efore 8uilding pages).
@@ -153,40 +153,6 @@ export function genStrings(stringsJSON, {
     const invalidKeysFound = [];
 
     const strings = (key, args = {}) => {
-        // Ok, with the warning out of the way, it's time to get to work.
-        // First make sure we're even accessing a valid key. (If not, return
-        // an error string as su8stitute.)
-        if (!validKeys.includes(key)) {
-            // We only want to warn a8out a given key once. More than that is
-            // just redundant!
-            if (!invalidKeysFound.includes(key)) {
-                invalidKeysFound.push(key);
-                logError`(${baseDirectory}) Accessing invalid key ${key}. Fix a typo or provide this in strings-default.json!`;
-            }
-            return `MISSING: ${key}`;
-        }
-
-        const template = stringIndex[key];
-
-        // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
-        // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
-        // like, who cares, dude?) Also, this is an array, 8ecause it's handy
-        // for the iterating we're a8out to do.
-        const processedArgs = Object.entries(args)
-            .map(([ k, v ]) => [k.replace(/[A-Z]/g, '_$&').toUpperCase(), v]);
-
-        // Replacement time! Woot. Reduce comes in handy here!
-        const output = processedArgs.reduce(
-            (x, [ k, v ]) => x.replaceAll(`{${k}}`, v),
-            template);
-
-        // Post-processing: if any expected arguments *weren't* replaced, that
-        // is almost definitely an error.
-        if (output.match(/\{[A-Z_]+\}/)) {
-            logError`(${baseDirectory}) Args in ${key} were missing - output: ${output}`;
-        }
-
-        return output;
     };
 
     // And lastly, we add some utility stuff to the strings function.
@@ -243,36 +209,9 @@ export const count = {
     },
 
     duration: (secTotal, {strings, approximate = false, unit = false}) => {
-        if (secTotal === 0) {
-            return strings('count.duration.missing');
-        }
-
-        const hour = Math.floor(secTotal / 3600);
-        const min = Math.floor((secTotal - hour * 3600) / 60);
-        const sec = Math.floor(secTotal - hour * 3600 - min * 60);
-
-        const pad = val => val.toString().padStart(2, '0');
-
-        const stringSubkey = unit ? '.withUnit' : '';
-
-        const duration = (hour > 0
-            ? strings('count.duration.hours' + stringSubkey, {
-                hours: hour,
-                minutes: pad(min),
-                seconds: pad(sec)
-            })
-            : strings('count.duration.minutes' + stringSubkey, {
-                minutes: min,
-                seconds: pad(sec)
-            }));
-
-        return (approximate
-            ? strings('count.duration.approximate', {duration})
-            : duration);
     },
 
     index: (value, {strings}) => {
-        return strings('count.index.' + strings.intl.plural.ordinal.select(value), {index: value});
     },
 
     number: value => strings.intl.number.format(value),
