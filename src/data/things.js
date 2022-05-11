@@ -1418,6 +1418,23 @@ Language.propertyDescriptors = {
     // access this object directly - use methods instead.
     strings: {
         flags: {update: true, expose: true},
+        update: {validate: t => typeof t === 'object'},
+        expose: {
+            dependencies: ['inheritedStrings'],
+            transform(strings, { inheritedStrings }) {
+                if (strings || inheritedStrings) {
+                    return {...strings ?? {}, ...inheritedStrings ?? {}};
+                } else {
+                    return null;
+                }
+            }
+        }
+    },
+
+    // May be provided to specify "default" strings, generally (but not
+    // necessarily) inherited from another Language object.
+    inheritedStrings: {
+        flags: {update: true, expose: true},
         update: {validate: t => typeof t === 'object'}
     },
 
@@ -1439,18 +1456,22 @@ Language.propertyDescriptors = {
         flags: {expose: true},
 
         expose: {
-            dependencies: ['strings'],
-            compute: ({ strings }) => strings ? Object.keys(strings) : []
+            dependencies: ['strings', 'inheritedStrings'],
+            compute: ({ strings, inheritedStrings }) => Array.from(new Set([
+                ...Object.keys(strings ?? {}),
+                ...Object.keys(inheritedStrings ?? {})
+            ]))
         }
     },
 
     strings_htmlEscaped: {
         flags: {expose: true},
         expose: {
-            dependencies: ['strings', 'escapeHTML'],
-            compute({ strings, escapeHTML }) {
-                if (!strings || !escapeHTML) return null;
-                return Object.fromEntries(Object.entries(strings)
+            dependencies: ['strings', 'inheritedStrings', 'escapeHTML'],
+            compute({ strings, inheritedStrings, escapeHTML }) {
+                if (!(strings || inheritedStrings) || !escapeHTML) return null;
+                const allStrings = {...strings ?? {}, ...inheritedStrings ?? {}};
+                return Object.fromEntries(Object.entries(allStrings)
                     .map(([ k, v ]) => [k, escapeHTML(v)]));
             }
         }
