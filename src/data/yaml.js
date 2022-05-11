@@ -11,7 +11,6 @@ import {
     Album,
     Artist,
     ArtTag,
-    BuildDirective,
     Flash,
     FlashAct,
     Group,
@@ -397,14 +396,6 @@ export const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
         enableNews: 'Enable News',
         enableArtTagUI: 'Enable Art Tag UI',
         enableGroupUI: 'Enable Group UI',
-    }
-});
-
-export const processBuildDirectiveDocument = makeProcessDocument(BuildDirective, {
-    propertyFieldMapping: {
-        directive: 'Directive',
-        baseDirectory: 'Base Directory',
-        language: 'Language',
     }
 });
 

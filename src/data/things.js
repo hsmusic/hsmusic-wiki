@@ -90,9 +90,6 @@ export class WikiInfo extends CacheableObject {}
 // -> Language
 export class Language extends CacheableObject {}
 
-// -> BuildDirective
-export class BuildDirective extends CacheableObject {}
-
 // Before initializing property descriptors, set additional independent
 // constants on the classes (which are referenced later).
 
@@ -1638,13 +1635,3 @@ Object.assign(Language.prototype, {
     countTimesUsed: countHelper('timesUsed'),
     countTracks: countHelper('tracks'),
 });
-
-// -> BuildDirective
-
-BuildDirective.propertyDescriptors = {
-    // Update & expose
-
-    directive: Thing.common.directory(),
-    baseDirectory: Thing.common.directory(),
-    language: Thing.common.simpleString(),
-};
