@@ -1238,6 +1238,9 @@ async function processLanguageFile(file) {
     }
     delete json['meta.languageCode'];
 
+    const intlCode = json['meta.languageIntlCode'] ?? null;
+    delete json['meta.languageIntlCode'];
+
     const name = json['meta.languageName'];
     if (!name) {
         throw new Error(`Missing language name (${code})`);
@@ -1251,6 +1254,7 @@ async function processLanguageFile(file) {
 
     const language = new Language();
     language.code = code;
+    language.intlCode = intlCode;
     language.name = name;
     language.escapeHTML = string => he.encode(string, {useNamedReferences: true});
     language.strings = json;
