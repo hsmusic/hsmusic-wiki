@@ -33,7 +33,7 @@ export function write(album, {wikiData}) {
         language
     }) => {
         const itemOpts = {
-            duration: language.formatDuration(track.duration),
+            duration: language.formatDuration(track.duration ?? 0),
             track: link.track(track)
         };
         return `<li style="${getLinkThemeString(track.color)}">${

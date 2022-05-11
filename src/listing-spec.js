@@ -572,7 +572,7 @@ const listingSpec = [
         data({wikiData}) {
             return wikiData.albumData.map(album => ({
                 album,
-                tracks: album.tracks.slice().sort((a, b) => b.duration - a.duration)
+                tracks: album.tracks.slice().sort((a, b) => (b.duration ?? 0) - (a.duration ?? 0))
             }));
         },
 
@@ -587,7 +587,7 @@ const listingSpec = [
                             ${(tracks
                                 .map(track => language.$('listingPage.listTracks.byDurationInAlbum.track', {
                                     track: link.track(track),
-                                    duration: language.formatDuration(track.duration)
+                                    duration: language.formatDuration(track.duration ?? 0)
                                 }))
                                 .map(row => `<li>${row}</li>`)
                                 .join('\n'))}

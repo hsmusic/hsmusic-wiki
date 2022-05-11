@@ -1402,6 +1402,10 @@ Language.propertyDescriptors = {
         update: {validate: isLanguageCode}
     },
 
+    // Human-readable name. This should be the language's own native name, not
+    // localized to any other language.
+    name: Thing.common.simpleString(),
+
     // Language code specific to JavaScript's Internationalization (Intl) API.
     // Usually this will be the same as the language's general code, but it
     // may be overridden to provide Intl constructors an alternative value.
@@ -1556,7 +1560,7 @@ Object.assign(Language.prototype, {
         return this.intl_date.formatRange(startDate, endDate);
     },
 
-    formatDuration(secTotal, {approximate = false, unit = false}) {
+    formatDuration(secTotal, {approximate = false, unit = false} = {}) {
         if (secTotal === 0) {
             return this.formatString('count.duration.missing');
         }

@@ -70,6 +70,10 @@ import CacheableObject from './data/cacheable-object.js';
 import { serializeThings } from './data/serialize.js';
 
 import {
+    Language,
+} from './data/things.js';
+
+import {
     filterDuplicateDirectories,
     filterReferenceErrors,
     linkWikiDataArrays,
@@ -112,12 +116,6 @@ import {
     validateReplacerSpec,
     transformInline
 } from './util/replacer.js';
-
-import {
-    genStrings,
-    count,
-    list
-} from './util/strings.js';
 
 import {
     chunkByConditions,
@@ -214,8 +212,6 @@ let wikiData = {};
 
 let queueSize;
 
-let languages;
-
 const urls = generateURLs(urlSpec);
 
 function splitLines(text) {
@@ -246,7 +242,7 @@ const replacerSpec = {
     'date': {
         find: null,
         value: ref => new Date(ref),
-        html: (date, {strings}) => `<time datetime="${date.toString()}">${language.formatDate(date)}</time>`
+        html: (date, {language}) => `<time datetime="${date.toString()}">${language.formatDate(date)}</time>`
     },
     'flash': {
         find: 'flash',
@@ -311,7 +307,7 @@ const replacerSpec = {
     'string': {
         find: null,
         value: ref => ref,
-        html: (ref, {strings, args}) => language.$(ref, args)
+        html: (ref, {language, args}) => language.$(ref, args)
     },
     'tag': {
         find: 'artTag',
@@ -823,9 +819,11 @@ writePage.to = ({
 };
 
 writePage.html = (pageFn, {
+    defaultLanguage,
+    language,
+    languages,
     localizedPaths,
     paths,
-    strings,
     to,
     transformMultiline,
     wikiData
@@ -878,7 +876,7 @@ writePage.html = (pageFn, {
     footer.content ??= (wikiInfo.footerContent ? transformMultiline(wikiInfo.footerContent) : '');
 
     footer.content += '\n' + getFooterLocalizationLinks(paths.pathname, {
-        languages, paths, strings, to
+        defaultLanguage, languages, paths, language, to
     });
 
     const canonical = (wikiInfo.canonicalBase
@@ -1045,7 +1043,7 @@ writePage.html = (pageFn, {
                             src: '',
                             link: true,
                             square: true,
-                            reveal: getRevealStringFromWarnings('<span class="info-card-art-warnings"></span>', {strings})
+                            reveal: getRevealStringFromWarnings('<span class="info-card-art-warnings"></span>', {language})
                         })}
                     </div>
                     <h1 class="info-card-name"><a></a></h1>
@@ -1060,7 +1058,7 @@ writePage.html = (pageFn, {
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${html.attributes({
-            lang: strings.code,
+            lang: language.code,
             'data-rebase-localized': to('localized.root'),
             'data-rebase-shared': to('shared.root'),
             'data-rebase-media': to('media.root'),
@@ -1166,12 +1164,12 @@ function writeSymlinks() {
     }
 }
 
-function writeSharedFilesAndPages({strings, wikiData}) {
+function writeSharedFilesAndPages({language, wikiData}) {
     const { groupData, wikiInfo } = wikiData;
 
     const redirect = async (title, from, urlKey, directory) => {
         const target = path.relative(from, urls.from('shared.root').to(urlKey, directory));
-        const content = generateRedirectPage(title, target, {strings});
+        const content = generateRedirectPage(title, target, {language});
         await mkdir(path.join(outputPath, from), {recursive: true});
         await writeFile(path.join(outputPath, from, 'index.html'), content);
     };
@@ -1196,7 +1194,7 @@ function writeSharedFilesAndPages({strings, wikiData}) {
     ].filter(Boolean));
 }
 
-function generateRedirectPage(title, target, {strings}) {
+function generateRedirectPage(title, target, {language}) {
     return fixWS`
         <!DOCTYPE html>
         <html>
@@ -1230,33 +1228,37 @@ function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
     )
 }
 
-async function processLanguageFile(file, defaultStrings = null) {
-    let contents;
-    try {
-        contents = await readFile(file, 'utf-8');
-    } catch (error) {
-        return {error: `Could not read ${file} (${error.code}).`};
+async function processLanguageFile(file) {
+    const contents = await readFile(file, 'utf-8');
+    const json = JSON.parse(contents);
+
+    const code = json['meta.languageCode'];
+    if (!code) {
+        throw new Error(`Missing language code (file: ${file})`);
+    }
+    delete json['meta.languageCode'];
+
+    const name = json['meta.languageName'];
+    if (!name) {
+        throw new Error(`Missing language name (${code})`);
+    }
+    delete json['meta.languageName'];
+
+    if (json['meta.baseDirectory']) {
+        logWarn`(${code}) Language JSON still has unused meta.baseDirectory`;
+        delete json['meta.baseDirectory'];
     }
 
-    let json;
-    try {
-        json = JSON.parse(contents);
-    } catch (error) {
-        return {error: `Could not parse JSON from ${file} (${error}).`};
-    }
-
-    return genStrings(json, {
-        he,
-        defaultJSON: defaultStrings?.json,
-        bindUtilities: {
-            count,
-            list
-        }
-    });
+    const language = new Language();
+    language.code = code;
+    language.name = name;
+    language.escapeHTML = string => he.encode(string, {useNamedReferences: true});
+    language.strings = json;
+    return language;
 }
 
 // Wrapper function for running a function once for all languages.
-async function wrapLanguages(fn, {writeOneLanguage = null}) {
+async function wrapLanguages(fn, {languages, writeOneLanguage = null}) {
     const k = writeOneLanguage;
     const languagesToRun = (k
         ? {[k]: languages[k]}
@@ -1266,9 +1268,9 @@ async function wrapLanguages(fn, {writeOneLanguage = null}) {
         .filter(([ key ]) => key !== 'default');
 
     for (let i = 0; i < entries.length; i++) {
-        const [ key, strings ] = entries[i];
+        const [ key, language ] = entries[i];
 
-        await fn(strings, i, entries);
+        await fn(language, i, entries);
     }
 }
 
@@ -1444,50 +1446,6 @@ async function main() {
         CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
     }
 
-    const defaultStrings = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
-    if (defaultStrings.error) {
-        logError`Error loading default strings: ${defaultStrings.error}`;
-        return;
-    }
-
-    if (langPath) {
-        const languageDataFiles = await findFiles(langPath, {
-            filter: f => path.extname(f) === '.json'
-        });
-        const results = await progressPromiseAll(`Reading & processing language files.`, languageDataFiles
-            .map(file => processLanguageFile(file, defaultStrings)));
-
-        let error = false;
-        for (const strings of results) {
-            if (strings.error) {
-                logError`Error loading provided strings: ${strings.error}`;
-                error = true;
-            }
-        }
-        if (error) return;
-
-        languages = Object.fromEntries(results.map(strings => [strings.baseDirectory, strings]));
-    } else {
-        languages = {};
-    }
-
-    if (!languages[defaultStrings.code]) {
-        languages[defaultStrings.code] = defaultStrings;
-    }
-
-    logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
-
-    if (noBuild) {
-        logInfo`Not generating any site or page files this run (--no-build passed).`;
-    } else if (writeOneLanguage && !(writeOneLanguage in languages)) {
-        logError`Specified to write only ${writeOneLanguage}, but there is no strings file with this language code!`;
-        return;
-    } else if (writeOneLanguage) {
-        logInfo`Writing only language ${writeOneLanguage} this run.`;
-    } else {
-        logInfo`Writing all languages.`;
-    }
-
     const {
         aggregate: processDataAggregate,
         result: wikiDataResult
@@ -1610,23 +1568,61 @@ async function main() {
     // which are only available after the initial linking.
     sortWikiDataArrays(wikiData);
 
-    // Update languages o8ject with the wiki-specified default language!
-    // This will make page files for that language 8e gener8ted at the root
-    // directory, instead of the language-specific su8directory.
-    if (WD.wikiInfo.defaultLanguage) {
-        if (Object.keys(languages).includes(WD.wikiInfo.defaultLanguage)) {
-            languages.default = languages[WD.wikiInfo.defaultLanguage];
-        } else {
-            logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
-            if (langPath) {
-                logError`Check if an appropriate file exists in ${langPath}?`;
-            } else {
-                logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
-            }
-            return;
-        }
+    const internalDefaultLanguage = await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+
+    let languages;
+    if (langPath) {
+        const languageDataFiles = await findFiles(langPath, {
+            filter: f => path.extname(f) === '.json'
+        });
+
+        const results = await progressPromiseAll(`Reading & processing language files.`, languageDataFiles
+            .map(file => processLanguageFile(file)));
+
+        languages = Object.fromEntries(results.map(language => [language.code, language]));
     } else {
-        languages.default = defaultStrings;
+        languages = {};
+    }
+
+    const customDefaultLanguage = languages[WD.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
+    let finalDefaultLanguage;
+
+    if (customDefaultLanguage) {
+        logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
+        customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
+        finalDefaultLanguage = customDefaultLanguage;
+    } else if (WD.wikiInfo.defaultLanguage) {
+        logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
+        if (langPath) {
+            logError`Check if an appropriate file exists in ${langPath}?`;
+        } else {
+            logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+        }
+        return;
+    } else {
+        languages[defaultLanguage.code] = internalDefaultLanguage;
+        finalDefaultLanguage = internalDefaultLanguage;
+    }
+
+    for (const language of Object.values(languages)) {
+        if (language === finalDefaultLanguage) {
+            continue;
+        }
+
+        language.inheritedStrings = finalDefaultLanguage.strings;
+    }
+
+    logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
+
+    if (noBuild) {
+        logInfo`Not generating any site or page files this run (--no-build passed).`;
+    } else if (writeOneLanguage && !(writeOneLanguage in languages)) {
+        logError`Specified to write only ${writeOneLanguage}, but there is no strings file with this language code!`;
+        return;
+    } else if (writeOneLanguage) {
+        logInfo`Writing only language ${writeOneLanguage} this run.`;
+    } else {
+        logInfo`Writing all languages.`;
     }
 
     {
@@ -1683,7 +1679,7 @@ async function main() {
     logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
 
     await writeSymlinks();
-    await writeSharedFilesAndPages({strings: defaultStrings, wikiData});
+    await writeSharedFilesAndPages({language: finalDefaultLanguage, wikiData});
 
     const buildSteps = (writeAll
         ? Object.entries(buildDictionary)
@@ -1830,20 +1826,15 @@ async function main() {
     ));
     */
 
-    const getBaseDirectory = strings =>
-        (strings === languages.default
-            ? ''
-            : strings.baseDirectory);
-
-    const perLanguageFn = async (strings, i, entries) => {
-        const baseDirectory = getBaseDirectory(strings);
+    const perLanguageFn = async (language, i, entries) => {
+        const baseDirectory = (language === finalDefaultLanguage ? '' : language.code);
 
         console.log(`\x1b[34;1m${
-            (`[${i + 1}/${entries.length}] ${strings.code} (-> /${baseDirectory}) `
+            (`[${i + 1}/${entries.length}] ${language.code} (-> /${baseDirectory}) `
                 .padEnd(60, '-'))
         }\x1b[0m`);
 
-        await progressPromiseAll(`Writing ${strings.code}`, queue([
+        await progressPromiseAll(`Writing ${language.code}`, queue([
             ...pageWrites.map(({type, ...props}) => () => {
                 const { path, page } = props;
 
@@ -1853,8 +1844,8 @@ async function main() {
 
                 const localizedPaths = Object.fromEntries(Object.entries(languages)
                     .filter(([ key ]) => key !== 'default')
-                    .map(([ key, strings ]) => [strings.code, writePage.paths(
-                        getBaseDirectory(strings),
+                    .map(([ key, language ]) => [language.code, writePage.paths(
+                        (language === finalDefaultLanguage ? '' : language.code),
                         'localized.' + pageSubKey,
                         directory
                     )]));
@@ -1894,7 +1885,7 @@ async function main() {
                     find: bound.find,
                     link: bound.link,
                     replacerSpec,
-                    strings,
+                    language,
                     to,
                     wikiData
                 });
@@ -1910,17 +1901,17 @@ async function main() {
                 });
 
                 bound.iconifyURL = bindOpts(iconifyURL, {
-                    strings,
+                    language,
                     to
                 });
 
                 bound.fancifyURL = bindOpts(fancifyURL, {
-                    strings
+                    language
                 });
 
                 bound.fancifyFlashURL = bindOpts(fancifyFlashURL, {
                     [bindOpts.bindIndex]: 2,
-                    strings
+                    language
                 });
 
                 bound.getLinkThemeString = getLinkThemeString;
@@ -1930,7 +1921,7 @@ async function main() {
                 bound.getArtistString = bindOpts(getArtistString, {
                     iconifyURL: bound.iconifyURL,
                     link: bound.link,
-                    strings
+                    language
                 });
 
                 bound.getAlbumCover = bindOpts(getAlbumCover, {
@@ -1952,7 +1943,7 @@ async function main() {
                 bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
                     link: bound.link,
                     linkAnythingMan: bound.linkAnythingMan,
-                    strings,
+                    language,
                     wikiData
                 });
 
@@ -1960,7 +1951,7 @@ async function main() {
                     [bindOpts.bindIndex]: 0,
                     img,
                     link: bound.link,
-                    strings,
+                    language,
                     to,
                     wikiData
                 });
@@ -1968,18 +1959,18 @@ async function main() {
                 bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
                     [bindOpts.bindIndex]: 2,
                     link: bound.link,
-                    strings
+                    language
                 });
 
                 bound.generatePreviousNextLinks = bindOpts(generatePreviousNextLinks, {
                     link: bound.link,
-                    strings
+                    language
                 });
 
                 bound.getGridHTML = bindOpts(getGridHTML, {
                     [bindOpts.bindIndex]: 0,
                     img,
-                    strings
+                    language
                 });
 
                 bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {
@@ -1987,7 +1978,7 @@ async function main() {
                     getAlbumCover: bound.getAlbumCover,
                     getGridHTML: bound.getGridHTML,
                     link: bound.link,
-                    strings
+                    language
                 });
 
                 bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
@@ -1998,11 +1989,11 @@ async function main() {
                 });
 
                 bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
-                    strings
+                    language
                 });
 
                 bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
-                    strings
+                    language
                 });
 
                 bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
@@ -2011,14 +2002,16 @@ async function main() {
 
                 const pageFn = () => page({
                     ...bound,
-                    strings,
+                    language,
                     to
                 });
 
                 const content = writePage.html(pageFn, {
+                    defaultLanguage: finalDefaultLanguage,
+                    language,
+                    languages,
                     localizedPaths,
                     paths,
-                    strings,
                     to,
                     transformMultiline: bound.transformMultiline,
                     wikiData
@@ -2028,7 +2021,7 @@ async function main() {
             }),
             ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
                 const title = titleFn({
-                    strings
+                    language
                 });
 
                 // TODO: This only supports one <>-style argument.
@@ -2036,15 +2029,15 @@ async function main() {
                 const to = writePage.to({baseDirectory, pageSubKey: fromPath[0], paths: fromPaths});
 
                 const target = to('localized.' + toPath[0], ...toPath.slice(1));
-                const content = generateRedirectPage(title, target, {strings});
+                const content = generateRedirectPage(title, target, {language});
                 return writePage.write(content, {paths: fromPaths});
             })
         ], queueSize));
     };
 
     await wrapLanguages(perLanguageFn, {
+        languages,
         writeOneLanguage,
-        wikiData
     });
 
     // The single most important step.

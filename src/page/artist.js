@@ -187,7 +187,7 @@ export function write(artist, {wikiData}) {
                             aka: track.aka,
                             entry: language.$('artistPage.creditList.entry.track.withDuration', {
                                 track: link.track(track),
-                                duration: language.formatDuration(track.duration)
+                                duration: language.formatDuration(track.duration ?? 0)
                             }),
                             ...props
                         }))

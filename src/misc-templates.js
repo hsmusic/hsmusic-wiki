@@ -381,6 +381,7 @@ export function generatePreviousNextLinks(current, {
 // Footer stuff
 
 export function getFooterLocalizationLinks(pathname, {
+    defaultLanguage,
     languages,
     paths,
     language,
@@ -392,16 +393,13 @@ export function getFooterLocalizationLinks(pathname, {
 
     const links = Object.entries(languages)
         .filter(([ code ]) => code !== 'default')
-        .map(([ code, strings ]) => strings)
-        .sort((
-            { json: { 'meta.languageName': a } },
-            { json: { 'meta.languageName': b } }
-        ) => a < b ? -1 : a > b ? 1 : 0)
-        .map(strings => html.tag('span', html.tag('a', {
-            href: (strings.baseDirectory === languages.default.baseDirectory
+        .map(([ code, language ]) => language)
+        .sort(({ name: a }, { name: b }) => a < b ? -1 : a > b ? 1 : 0)
+        .map(language => html.tag('span', html.tag('a', {
+            href: (language === defaultLanguage
                 ? to('localizedDefaultLanguage' + keySuffix, ...toArgs)
-                : to('localizedWithBaseDirectory' + keySuffix, strings.baseDirectory, ...toArgs))
-        }, strings.json['meta.languageName'])));
+                : to('localizedWithBaseDirectory' + keySuffix, language.code, ...toArgs))
+        }, language.name)));
 
     return html.tag('div',
         {class: 'footer-localization-links'},
