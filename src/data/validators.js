@@ -235,6 +235,14 @@ export const isContribution = validateProperties({
 
 export const isContributionList = validateArrayItems(isContribution);
 
+export const isAdditionalFile = validateProperties({
+    title: isString,
+    description: value => (value === undefined || value === null || isString(value)),
+    files: validateArrayItems(isString)
+});
+
+export const isAdditionalFileList = validateArrayItems(isAdditionalFile);
+
 export function isDimensions(dimensions) {
     isArray(dimensions);
 

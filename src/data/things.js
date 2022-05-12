@@ -4,6 +4,7 @@
 import CacheableObject from './cacheable-object.js';
 
 import {
+    isAdditionalFileList,
     isBoolean,
     isColor,
     isCommentary,
@@ -205,6 +206,26 @@ Thing.common = {
     commentary: () => ({
         flags: {update: true, expose: true},
         update: {validate: isCommentary}
+    }),
+
+    // This is a somewhat more involved data structure - it's for additional
+    // or "bonus" files associated with albums or tracks (or anything else).
+    // It's got this form:
+    //
+    //     [
+    //         {title: 'Booklet', files: ['Booklet.pdf']},
+    //         {
+    //             title: 'Wallpaper',
+    //             description: 'Cool Wallpaper!',
+    //             files: ['1440x900.png', '1920x1080.png']
+    //         },
+    //         {title: 'Alternate Covers', description: null, files: [...]},
+    //         ...
+    //     ]
+    //
+    additionalFiles: () => ({
+        flags: {update: true, expose: true},
+        update: {validate: isAdditionalFileList}
     }),
 
     // A reference list! Keep in mind this is for general references to wiki
@@ -497,6 +518,7 @@ Album.propertyDescriptors = {
     isListedOnHomepage: Thing.common.flag(true),
 
     commentary: Thing.common.commentary(),
+    additionalFiles: Thing.common.additionalFiles(),
 
     // Update only
 
@@ -566,6 +588,7 @@ Album[S.serializeDescriptors] = {
     isListedOnHomepage: S.id,
 
     commentary: S.id,
+    additionalFiles: S.id,
 
     tracks: S.toRefs,
     groups: S.toRefs,
@@ -712,6 +735,7 @@ Track.propertyDescriptors = {
 
     commentary: Thing.common.commentary(),
     lyrics: Thing.common.simpleString(),
+    additionalFiles: Thing.common.additionalFiles(),
 
     // Update only
 

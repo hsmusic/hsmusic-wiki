@@ -190,6 +190,8 @@ export const processAlbumDocument = makeProcessDocument(Album, {
         'Default Track Cover Art Date': value => new Date(value),
 
         'Banner Dimensions': parseDimensions,
+
+        'Additional Files': parseAdditionalFiles,
     },
 
     propertyFieldMapping: {
@@ -229,6 +231,8 @@ export const processAlbumDocument = makeProcessDocument(Album, {
         groupsByRef: 'Groups',
         artTagsByRef: 'Art Tags',
         commentary: 'Commentary',
+
+        additionalFiles: 'Additional Files',
     }
 });
 
@@ -254,6 +258,8 @@ export const processTrackDocument = makeProcessDocument(Track, {
         'Artists': parseContributors,
         'Contributors': parseContributors,
         'Cover Artists': parseContributors,
+
+        'Additional Files': parseAdditionalFiles,
     },
 
     propertyFieldMapping: {
@@ -277,7 +283,9 @@ export const processTrackDocument = makeProcessDocument(Track, {
         originalReleaseTrackByRef: 'Originally Released As',
 
         commentary: 'Commentary',
-        lyrics: 'Lyrics'
+        lyrics: 'Lyrics',
+
+        additionalFiles: 'Additional Files',
     },
 
     ignoredFields: ['Sampled Tracks']
@@ -463,6 +471,20 @@ export function getDurationInSeconds(string) {
     } else {
         return 0
     }
+}
+
+export function parseAdditionalFiles(array) {
+    if (!array) return null;
+    if (!Array.isArray(array)) {
+        // Error will be caught when validating against whatever this value is
+        return array;
+    }
+
+    return array.map(item => ({
+        title: item['Title'],
+        description: item['Description'] ?? null,
+        files: item['Files']
+    }));
 }
 
 export function parseCommentary(text) {
