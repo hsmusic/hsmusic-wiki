@@ -129,9 +129,7 @@ export function isObject(value) {
 }
 
 export function isArray(value) {
-    isObject(value);
-
-    if (!Array.isArray(value))
+    if (typeof value !== 'object' || value === null || !Array.isArray(value))
         throw new TypeError(`Expected an array, got ${value}`);
 
     return true;
