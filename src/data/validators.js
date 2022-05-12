@@ -192,19 +192,46 @@ export function isCommentary(commentary) {
 
 const isArtistRef = validateReference('artist');
 
-export function isContribution(contrib) {
-    // TODO: Use better object validation for this (supporting aggregates etc)
+export function validateProperties(spec) {
+    const specEntries = Object.entries(spec);
+    const specKeys = Object.keys(spec);
 
-    isObject(contrib);
+    return object => {
+        isObject(object);
 
-    isArtistRef(contrib.who);
+        if (Array.isArray(object))
+            throw new TypeError(`Expected an object, got array`);
 
-    if (contrib.what !== null) {
-        isStringNonEmpty(contrib.what);
-    }
+        withAggregate({message: `Errors validating object properties`}, ({ call }) => {
+            for (const [ specKey, specValidator ] of specEntries) {
+                call(() => {
+                    const value = object[specKey];
+                    try {
+                        specValidator(value);
+                    } catch (error) {
+                        error.message = `(key: ${color.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
+                        throw error;
+                    }
+                });
+            }
 
-    return true;
+            const unknownKeys = Object.keys(object).filter(key => !specKeys.includes(key));
+            if (unknownKeys.length > 0) {
+                call(() => {
+                    throw new Error(`Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`);
+                });
+            }
+        });
+
+        return true;
+    };
 }
+
+
+export const isContribution = validateProperties({
+    who: isArtistRef,
+    what: value => value === undefined || value === null || isStringNonEmpty(value),
+});
 
 export const isContributionList = validateArrayItems(isContribution);
 
