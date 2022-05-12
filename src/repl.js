@@ -83,7 +83,7 @@ async function main() {
         filterReferenceErrors(wikiData).close();
         console.log('No reference errors found. (complete data)');
     } catch (error) {
-        niceShowAggegate(error);
+        niceShowAggregate(error);
         console.log('Duplicate directories found. (partial data)');
     }
 
