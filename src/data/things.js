@@ -201,6 +201,12 @@ Thing.common = {
         update: {validate: isContributionList}
     }),
 
+    // Artist commentary! Generally present on tracks and albums.
+    commentary: () => ({
+        flags: {update: true, expose: true},
+        update: {validate: isCommentary}
+    }),
+
     // A reference list! Keep in mind this is for general references to wiki
     // objects of (usually) other Thing subclasses, not specifically leitmotif
     // references in tracks (although that property uses referenceList too!).
@@ -490,10 +496,7 @@ Album.propertyDescriptors = {
     isMajorRelease: Thing.common.flag(false),
     isListedOnHomepage: Thing.common.flag(true),
 
-    commentary: {
-        flags: {update: true, expose: true},
-        update: {validate: isCommentary}
-    },
+    commentary: Thing.common.commentary(),
 
     // Update only
 
@@ -707,11 +710,7 @@ Track.propertyDescriptors = {
 
     dataSourceAlbumByRef: Thing.common.singleReference(Album),
 
-    commentary: {
-        flags: {update: true, expose: true},
-        update: {validate: isCommentary}
-    },
-
+    commentary: Thing.common.commentary(),
     lyrics: Thing.common.simpleString(),
 
     // Update only
