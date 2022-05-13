@@ -1447,7 +1447,7 @@ Language.propertyDescriptors = {
             dependencies: ['inheritedStrings'],
             transform(strings, { inheritedStrings }) {
                 if (strings || inheritedStrings) {
-                    return {...strings ?? {}, ...inheritedStrings ?? {}};
+                    return {...inheritedStrings ?? {}, ...strings ?? {}};
                 } else {
                     return null;
                 }
@@ -1482,8 +1482,8 @@ Language.propertyDescriptors = {
         expose: {
             dependencies: ['strings', 'inheritedStrings'],
             compute: ({ strings, inheritedStrings }) => Array.from(new Set([
-                ...Object.keys(strings ?? {}),
-                ...Object.keys(inheritedStrings ?? {})
+                ...Object.keys(inheritedStrings ?? {}),
+                ...Object.keys(strings ?? {})
             ]))
         }
     },
@@ -1494,7 +1494,7 @@ Language.propertyDescriptors = {
             dependencies: ['strings', 'inheritedStrings', 'escapeHTML'],
             compute({ strings, inheritedStrings, escapeHTML }) {
                 if (!(strings || inheritedStrings) || !escapeHTML) return null;
-                const allStrings = {...strings ?? {}, ...inheritedStrings ?? {}};
+                const allStrings = {...inheritedStrings ?? {}, ...strings ?? {}};
                 return Object.fromEntries(Object.entries(allStrings)
                     .map(([ k, v ]) => [k, escapeHTML(v)]));
             }
