@@ -39,7 +39,7 @@ export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
     });
 }
 
-export function generateAdditionalFilesList(additionalFiles, {language, linkFile}) {
+export function generateAdditionalFilesList(additionalFiles, {language, getFileSize, linkFile}) {
     if (!additionalFiles?.length) return '';
 
     const fileCount = additionalFiles.flatMap(g => g.files).length;
@@ -52,10 +52,17 @@ export function generateAdditionalFilesList(additionalFiles, {language, linkFile
                     ? language.$('releaseInfo.additionalFiles.entry.withDescription', {title, description})
                     : language.$('releaseInfo.additionalFiles.entry', {title}))}</dt>
                 <dd><ul>
-                    ${files.map(file => `<li>${language.$('releaseInfo.additionalFiles.file', {
-                        file: linkFile(file),
-                        size: '<i>pre-computed size</i>'
-                    })}</li>`).join('\n')}
+                    ${files.map(file => {
+                        const size = getFileSize(file);
+                        return (size
+                            ? `<li>${language.$('releaseInfo.additionalFiles.file.withSize', {
+                                file: linkFile(file),
+                                size: language.formatFileSize(getFileSize(file))
+                            })}</li>`
+                            : `<li>${language.$('releaseInfo.additionalFiles.file', {
+                                file: linkFile(file)
+                            })}</li>`);
+                    }).join('\n')}
                 </ul></dd>
             `).join('\n')}
         </dl>

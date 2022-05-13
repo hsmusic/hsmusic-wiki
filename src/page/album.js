@@ -109,10 +109,12 @@ export function write(album, {wikiData}) {
             getAlbumStylesheet,
             getArtistString,
             getLinkThemeString,
+            getSizeOfAdditionalFile,
             getThemeString,
             link,
             language,
-            transformMultiline
+            transformMultiline,
+            urls,
         }) => {
             const trackToListItem = bindOpts(unbound_trackToListItem, {
                 getArtistString,
@@ -219,7 +221,11 @@ export function write(album, {wikiData}) {
                             </${listTag}>
                         `}
                         ${hasAdditionalFiles && generateAdditionalFilesList(album.additionalFiles, {
-                            linkFile: file => link.albumAdditionalFile({album, file})
+                            // TODO: Kinda near the metal here...
+                            getFileSize: file => getSizeOfAdditionalFile(urls
+                                .from('media.root')
+                                .to('media.albumAdditionalFile', album.directory, file)),
+                            linkFile: file => link.albumAdditionalFile({album, file}),
                         })}
                         ${album.dateAddedToWiki && fixWS`
                             <p>

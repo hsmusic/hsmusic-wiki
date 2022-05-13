@@ -173,6 +173,8 @@ import {
     OFFICIAL_GROUP_DIRECTORY
 } from './util/magic-constants.js';
 
+import FileSizePreloader from './file-size-preloader.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 8;
@@ -1655,6 +1657,45 @@ async function main() {
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
+    const fileSizePreloader = new FileSizePreloader();
+
+    // File sizes of additional files need to be precalculated before we can
+    // actually reference 'em in site building, so get those loading right
+    // away. We actually need to keep track of two things here - the on-device
+    // file paths we're actually reading, and the corresponding on-site media
+    // paths that will be exposed in site build code. We'll build a mapping
+    // function between them so that when site code requests a site path,
+    // it'll get the size of the file at the corresponding device path.
+    const additionalFilePaths = [
+        ...WD.albumData.flatMap(album => (
+            [
+                ...album.additionalFiles ?? [],
+                ...album.tracks.flatMap(track => track.additionalFiles ?? [])
+            ]
+            .flatMap(fileGroup => fileGroup.files)
+            .map(file => ({
+                device: (path.join(mediaPath, urls
+                    .from('media.root')
+                    .toDevice('media.albumAdditionalFile', album.directory, file))),
+                media: (urls
+                    .from('media.root')
+                    .to('media.albumAdditionalFile', album.directory, file))
+            })))),
+    ];
+
+    const getSizeOfAdditionalFile = mediaPath => {
+        const { device = null } = additionalFilePaths.find(({ media }) => media === mediaPath) || {};
+        if (!device) return null;
+        return fileSizePreloader.getSizeOfPath(device);
+    };
+
+    logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
+
+    fileSizePreloader.loadPaths(...additionalFilePaths.map(path => path.device));
+    await fileSizePreloader.waitUntilDoneLoading();
+
+    logInfo`Done preloading filesizes!`;
+
     if (noBuild) return;
 
     // Makes writing a little nicer on CPU theoretically, 8ut also costs in
@@ -2016,8 +2057,12 @@ async function main() {
 
                 const pageFn = () => page({
                     ...bound,
+
                     language,
-                    to
+                    to,
+                    urls,
+
+                    getSizeOfAdditionalFile,
                 });
 
                 const content = writePage.html(pageFn, {

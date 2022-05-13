@@ -1649,6 +1649,28 @@ Object.assign(Language.prototype, {
         return this.intl_listUnit.format(array);
     },
 
+    // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
+    formatFileSize(bytes) {
+        if (!bytes) return '';
+
+        bytes = parseInt(bytes);
+        if (isNaN(bytes)) return '';
+
+        const round = exp => Math.round(bytes / 10 ** (exp - 1)) / 10;
+
+        if (bytes >= 10 ** 12) {
+            return this.formatString('count.fileSize.terabytes', {terabytes: round(12)});
+        } else if (bytes >= 10 ** 9) {
+            return this.formatString('count.fileSize.gigabytes', {gigabytes: round(9)});
+        } else if (bytes >= 10 ** 6) {
+            return this.formatString('count.fileSize.megabytes', {megabytes: round(6)});
+        } else if (bytes >= 10 ** 3) {
+            return this.formatString('count.fileSize.kilobytes', {kilobytes: round(3)});
+        } else {
+            return this.formatString('count.fileSize.bytes', {bytes});
+        }
+    },
+
     // TODO: These are hard-coded. Is there a better way?
     countAlbums: countHelper('albums'),
     countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
