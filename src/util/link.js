@@ -94,6 +94,19 @@ const link = {
     tag: linkDirectory('tag'),
     track: linkDirectory('track', {expose: 'data-track'}),
 
+    // TODO: This is a bit hacky. Files are just strings (not objects), so we
+    // have to manually provide the album alongside the file. They also don't
+    // follow the usual {name: whatever} type shape, so we have to provide that
+    // ourselves.
+    _albumAdditionalFileHelper: linkHelper(
+        ((fakeFileObject, { to }) =>
+            to('media.albumAdditionalFile', fakeFileObject.album.directory, fakeFileObject.name)),
+        {color: false}),
+    albumAdditionalFile: ({ file, album }, { to }) => link._albumAdditionalFileHelper({
+        name: file,
+        album
+    }, {to}),
+
     media: linkPathname('media.path', {color: false}),
     root: linkPathname('shared.path', {color: false}),
     data: linkPathname('data.path', {color: false}),

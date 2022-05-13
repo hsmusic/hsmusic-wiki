@@ -53,7 +53,8 @@ export function write(album, {wikiData}) {
         }</li>`;
     };
 
-    const commentaryEntries = [album, ...album.tracks].filter(x => x.commentary).length;
+    const hasCommentaryEntries = ([album, ...album.tracks].filter(x => x.commentary).length > 0);
+    const hasAdditionalFiles = (album.additionalFiles?.length > 0);
     const albumDuration = getTotalDuration(album.tracks);
 
     const listTag = getAlbumListTag(album);
@@ -100,6 +101,8 @@ export function write(album, {wikiData}) {
         path: ['album', album.directory],
         page: ({
             fancifyURL,
+            generateAdditionalFilesShortcut,
+            generateAdditionalFilesList,
             generateChronologyLinks,
             generateCoverLink,
             getAlbumCover,
@@ -181,12 +184,15 @@ export function write(album, {wikiData}) {
                                 })
                             ].filter(Boolean).join('<br>\n')}
                         </p>
-                        ${commentaryEntries && `<p>${
-                            language.$('releaseInfo.viewCommentary', {
-                                link: link.albumCommentary(album, {
-                                    text: language.$('releaseInfo.viewCommentary.link')
+                        ${(hasAdditionalFiles || hasCommentaryEntries) && fixWS`<p>
+                            ${[
+                                hasAdditionalFiles && generateAdditionalFilesShortcut(album.additionalFiles, {language}),
+                                hasCommentaryEntries && language.$('releaseInfo.viewCommentary', {
+                                    link: link.albumCommentary(album, {
+                                        text: language.$('releaseInfo.viewCommentary.link')
+                                    })
                                 })
-                            })
+                            ].filter(Boolean).join('<br>\n')
                         }</p>`}
                         ${album.urls?.length && `<p>${
                             language.$('releaseInfo.listenOn', {
@@ -212,6 +218,9 @@ export function write(album, {wikiData}) {
                                 ${album.tracks.map(trackToListItem).join('\n')}
                             </${listTag}>
                         `}
+                        ${hasAdditionalFiles && generateAdditionalFilesList(album.additionalFiles, {
+                            linkFile: file => link.albumAdditionalFile({album, file})
+                        })}
                         ${album.dateAddedToWiki && fixWS`
                             <p>
                                 ${[

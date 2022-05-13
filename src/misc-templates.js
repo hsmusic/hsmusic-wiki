@@ -28,6 +28,40 @@ const MASTODON_DOMAINS = [
     'types.pl',
 ];
 
+// "Additional Files" listing
+
+export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
+    if (!additionalFiles?.length) return '';
+
+    return language.$('releaseInfo.additionalFiles.shortcut', {
+        anchorLink: `<a href="#additional-files">${language.$('releaseInfo.additionalFiles.shortcut.anchorLink')}</a>`,
+        titles: language.formatUnitList(additionalFiles.map(g => g.title))
+    });
+}
+
+export function generateAdditionalFilesList(additionalFiles, {language, linkFile}) {
+    if (!additionalFiles?.length) return '';
+
+    const fileCount = additionalFiles.flatMap(g => g.files).length;
+
+    return fixWS`
+        <p id="additional-files">${language.$('releaseInfo.additionalFiles.heading', {fileCount})}</p>
+        <dl>
+            ${additionalFiles.map(({ title, description, files }) => fixWS`
+                <dt>${(description
+                    ? language.$('releaseInfo.additionalFiles.entry.withDescription', {title, description})
+                    : language.$('releaseInfo.additionalFiles.entry', {title}))}</dt>
+                <dd><ul>
+                    ${files.map(file => `<li>${language.$('releaseInfo.additionalFiles.file', {
+                        file: linkFile(file),
+                        size: '<i>pre-computed size</i>'
+                    })}</li>`).join('\n')}
+                </ul></dd>
+            `).join('\n')}
+        </dl>
+    `;
+}
+
 // Artist strings
 
 export function getArtistString(artists, {

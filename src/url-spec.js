@@ -76,6 +76,7 @@ const urlSpec = {
             trackCover: 'album-art/<>/<>.<>',
             artistAvatar: 'artist-avatar/<>.<>',
             flashArt: 'flash-art/<>.<>',
+            albumAdditionalFile: 'album-additional/<>/<>',
         }
     }
 };

@@ -85,6 +85,8 @@ import {
 import {
     fancifyFlashURL,
     fancifyURL,
+    generateAdditionalFilesShortcut,
+    generateAdditionalFilesList,
     generateChronologyLinks,
     generateCoverLink,
     generateInfoGalleryLinks,
@@ -1942,6 +1944,14 @@ async function main() {
 
                 bound.getArtistAvatar = bindOpts(getArtistAvatar, {
                     to
+                });
+
+                bound.generateAdditionalFilesShortcut = bindOpts(generateAdditionalFilesShortcut, {
+                    language
+                });
+
+                bound.generateAdditionalFilesList = bindOpts(generateAdditionalFilesList, {
+                    language
                 });
 
                 bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
