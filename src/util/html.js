@@ -1,7 +1,22 @@
 // Some really simple functions for formatting HTML content.
 
-// Non-comprehensive. ::::P
-export const selfClosingTags = ['br', 'img'];
+// COMPREHENSIVE!
+// https://html.spec.whatwg.org/multipage/syntax.html#void-elements
+export const selfClosingTags = [
+    'area',
+    'base',
+    'br',
+    'col',
+    'embed',
+    'hr',
+    'img',
+    'input',
+    'link',
+    'meta',
+    'source',
+    'track',
+    'wbr',
+];
 
 // Pass to tag() as an attri8utes key to make tag() return a 8lank string
 // if the provided content is empty. Useful for when you'll only 8e showing

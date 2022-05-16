@@ -156,6 +156,7 @@
     "misc.skippers.skipToSidebar.left": "Skip to sidebar (left)",
     "misc.skippers.skipToSidebar.right": "Skip to sidebar (right)",
     "misc.skippers.skipToFooter": "Skip to footer",
+    "misc.socialEmbed.heading": "{WIKI_NAME} | {HEADING}",
     "misc.jumpTo": "Jump to:",
     "misc.jumpTo.withLinks": "Jump to: {LINKS}.",
     "misc.contentWarnings": "cw: {WARNINGS}",
@@ -358,5 +359,10 @@
     "trackPage.referenceList.official": "Official:",
     "trackPage.nav.track": "{TRACK}",
     "trackPage.nav.track.withNumber": "{NUMBER}. {TRACK}",
-    "trackPage.nav.random": "Random"
+    "trackPage.nav.random": "Random",
+    "trackPage.socialEmbed.heading": "{ALBUM}",
+    "trackPage.socialEmbed.title": "{TRACK}",
+    "trackPage.socialEmbed.body.withArtists.withCoverArtists": "By {ARTISTS}; art by {COVER_ARTISTS}.",
+    "trackPage.socialEmbed.body.withArtists": "By {ARTISTS}.",
+    "trackPage.socialEmbed.body.withCoverArtists": "Art by {COVER_ARTISTS}."
 }

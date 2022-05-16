@@ -194,6 +194,9 @@ const UTILITY_DIRECTORY = 'util';
 // (This gets symlinked into the --data-path directory.)
 const STATIC_DIRECTORY = 'static';
 
+// This exists adjacent to index.html for any page with oEmbed metadata.
+const OEMBED_JSON_FILE = 'oembed.json';
+
 function inspect(value) {
     return nodeInspect(value, {colors: ENABLE_COLOR});
 }
@@ -822,12 +825,13 @@ writePage.to = ({
     return path;
 };
 
-writePage.html = (pageFn, {
+writePage.html = (pageInfo, {
     defaultLanguage,
     language,
     languages,
     localizedPaths,
     paths,
+    oEmbedJSONHref,
     to,
     transformMultiline,
     wikiData
@@ -847,8 +851,9 @@ writePage.html = (pageFn, {
         sidebarLeft = {},
         sidebarRight = {},
         nav = {},
-        footer = {}
-    } = pageFn({to});
+        footer = {},
+        socialEmbed = {},
+    } = pageInfo;
 
     body.style ??= '';
 
@@ -1059,6 +1064,14 @@ writePage.html = (pageFn, {
         </div>
     `;
 
+    const socialEmbedHTML = [
+        socialEmbed.title && html.tag('meta', {property: 'og:title', content: socialEmbed.title}),
+        socialEmbed.description && html.tag('meta', {property: 'og:description', content: socialEmbed.description}),
+        socialEmbed.image && html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
+        socialEmbed.color && html.tag('meta', {name: 'theme-color', content: socialEmbed.color}),
+        oEmbedJSONHref && html.tag('link', {type: 'application/json+oembed', href: oEmbedJSONHref}),
+    ].filter(Boolean).join('\n');
+
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${html.attributes({
@@ -1075,6 +1088,7 @@ writePage.html = (pageFn, {
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${html.escapeAttributeValue(value)}">`).join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
                 ${localizedCanonical.map(({ lang, href }) => `<link rel="alternate" hreflang="${lang}" href="${href}">`).join('\n')}
+                ${socialEmbedHTML}
                 <link rel="stylesheet" href="${to('shared.staticFile', `site.css?${CACHEBUST}`)}">
                 ${(theme || stylesheet) && fixWS`
                     <style>
@@ -1111,9 +1125,40 @@ writePage.html = (pageFn, {
     `);
 };
 
-writePage.write = async (content, {paths}) => {
+writePage.oEmbedJSON = (pageInfo, {
+    language,
+    wikiData,
+}) => {
+    const { socialEmbed } = pageInfo;
+    const { wikiInfo } = wikiData;
+    const { canonicalBase, nameShort } = wikiInfo;
+
+    const entries = [
+        socialEmbed.heading && ['author_name',
+            language.$('misc.socialEmbed.heading', {
+                wikiName: nameShort,
+                heading: socialEmbed.heading
+            })],
+        socialEmbed.headingLink && canonicalBase && ['author_url',
+            canonicalBase.replace(/\/$/, '') + '/' +
+            socialEmbed.headingLink.replace(/^\//, '')],
+    ].filter(Boolean);
+
+    if (!entries.length) return '';
+
+    return JSON.stringify(Object.fromEntries(entries));
+};
+
+writePage.write = async ({
+    html,
+    oEmbedJSON = '',
+    paths,
+}) => {
     await mkdir(paths.outputDirectory, {recursive: true});
-    await writeFile(paths.outputFile, content);
+    await Promise.all([
+        writeFile(paths.outputFile, html),
+        oEmbedJSON && writeFile(paths.oEmbedJSONFile, oEmbedJSON)
+    ].filter(Boolean));
 };
 
 // TODO: This only supports one <>-style argument.
@@ -1132,12 +1177,14 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
 
     const outputDirectory = path.join(outputPath, pathname);
     const outputFile = path.join(outputDirectory, file);
+    const oEmbedJSONFile = path.join(outputDirectory, OEMBED_JSON_FILE);
 
     return {
         toPath: [fullKey, directory],
         pathname,
         subdirectoryPrefix,
-        outputDirectory, outputFile
+        outputDirectory, outputFile,
+        oEmbedJSONFile,
     };
 };
 
@@ -1909,6 +1956,14 @@ async function main() {
                     paths
                 });
 
+                const absoluteTo = (targetFullKey, ...args) => {
+                    const [ groupKey, subKey ] = targetFullKey.split('.');
+                    const from = urls.from('shared.root');
+                    return '/' + (groupKey === 'localized' && baseDirectory
+                        ? from.to('localizedWithBaseDirectory.' + subKey, baseDirectory, ...args)
+                        : from.to(targetFullKey, ...args));
+                };
+
                 // TODO: Is there some nicer way to define these,
                 // may8e without totally re-8inding everything for
                 // each page?
@@ -2055,28 +2110,44 @@ async function main() {
                     to
                 });
 
-                const pageFn = () => page({
+                const pageInfo = page({
                     ...bound,
 
                     language,
+
+                    absoluteTo,
+                    relativeTo: to,
                     to,
                     urls,
 
                     getSizeOfAdditionalFile,
                 });
 
-                const content = writePage.html(pageFn, {
+                const oEmbedJSON = writePage.oEmbedJSON(pageInfo, {
+                    language,
+                    wikiData,
+                });
+
+                const oEmbedJSONHref = (oEmbedJSON && wikiData.wikiInfo.canonicalBase) && (
+                    wikiData.wikiInfo.canonicalBase + urls.from('shared.root').to('shared.path', paths.pathname + OEMBED_JSON_FILE));
+
+                const html = writePage.html(pageInfo, {
                     defaultLanguage: finalDefaultLanguage,
                     language,
                     languages,
                     localizedPaths,
+                    oEmbedJSONHref,
                     paths,
                     to,
                     transformMultiline: bound.transformMultiline,
                     wikiData
                 });
 
-                return writePage.write(content, {paths});
+                return writePage.write({
+                    html,
+                    oEmbedJSON,
+                    paths,
+                });
             }),
             ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
                 const title = titleFn({

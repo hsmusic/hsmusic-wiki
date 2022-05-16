@@ -116,10 +116,36 @@ export function write(track, {wikiData}) {
         })
     };
 
+    const getSocialEmbedDescription = ({
+        getArtistString: _getArtistString,
+        language,
+    }) => {
+        const hasArtists = (track.artistContribs?.length > 0);
+        const hasCoverArtists = (track.coverArtistContribs?.length > 0);
+        const getArtistString = contribs => _getArtistString(contribs, {
+            // We don't want to put actual HTML tags in social embeds (sadly
+            // they don't get parsed and displayed, generally speaking), so
+            // override the link argument so that artist "links" just show
+            // their names.
+            link: {artist: artist => artist.name}
+        });
+        if (!hasArtists && !hasCoverArtists) return '';
+        return language.formatString(
+            'trackPage.socialEmbed.body' + [
+                hasArtists && '.withArtists',
+                hasCoverArtists && '.withCoverArtists',
+            ].filter(Boolean).join(''),
+            Object.fromEntries([
+                hasArtists && ['artists', getArtistString(track.artistContribs)],
+                hasCoverArtists && ['coverArtists', getArtistString(track.coverArtistContribs)],
+            ].filter(Boolean)))
+    };
+
     const page = {
         type: 'page',
         path: ['track', track.directory],
         page: ({
+            absoluteTo,
             fancifyURL,
             generateChronologyLinks,
             generateCoverLink,
@@ -134,7 +160,8 @@ export function write(track, {wikiData}) {
             transformInline,
             transformLyrics,
             transformMultiline,
-            to
+            to,
+            urls,
         }) => {
             const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, language});
             const cover = getTrackCover(track);
@@ -146,6 +173,15 @@ export function write(track, {wikiData}) {
                     `--album-directory: ${album.directory}`,
                     `--track-directory: ${track.directory}`
                 ]),
+
+                socialEmbed: {
+                    heading: language.$('trackPage.socialEmbed.heading', {album: track.album.name}),
+                    headingLink: absoluteTo('localized.album', album.directory),
+                    title: language.$('trackPage.socialEmbed.title', {track: track.name}),
+                    description: getSocialEmbedDescription({getArtistString, language}),
+                    image: '/' + getTrackCover(track, {to: urls.from('shared.root').to}),
+                    color: track.color,
+                },
 
                 // disabled for now! shifting banner position per height of page is disorienting
                 /*
