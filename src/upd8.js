@@ -1133,6 +1133,8 @@ writePage.oEmbedJSON = (pageInfo, {
     const { wikiInfo } = wikiData;
     const { canonicalBase, nameShort } = wikiInfo;
 
+    if (!socialEmbed) return '';
+
     const entries = [
         socialEmbed.heading && ['author_name',
             language.$('misc.socialEmbed.heading', {

@@ -220,13 +220,6 @@ export function write(album, {wikiData}) {
                                 ${album.tracks.map(trackToListItem).join('\n')}
                             </${listTag}>
                         `}
-                        ${hasAdditionalFiles && generateAdditionalFilesList(album.additionalFiles, {
-                            // TODO: Kinda near the metal here...
-                            getFileSize: file => getSizeOfAdditionalFile(urls
-                                .from('media.root')
-                                .to('media.albumAdditionalFile', album.directory, file)),
-                            linkFile: file => link.albumAdditionalFile({album, file}),
-                        })}
                         ${album.dateAddedToWiki && fixWS`
                             <p>
                                 ${[
@@ -236,6 +229,13 @@ export function write(album, {wikiData}) {
                                 ].filter(Boolean).join('<br>\n')}
                             </p>
                         `}
+                        ${hasAdditionalFiles && generateAdditionalFilesList(album.additionalFiles, {
+                            // TODO: Kinda near the metal here...
+                            getFileSize: file => getSizeOfAdditionalFile(urls
+                                .from('media.root')
+                                .to('media.albumAdditionalFile', album.directory, file)),
+                            linkFile: file => link.albumAdditionalFile({album, file}),
+                        })}
                         ${album.commentary && fixWS`
                             <p>${language.$('releaseInfo.artistCommentary')}</p>
                             <blockquote>

@@ -722,6 +722,7 @@ p code {
 }
 
 blockquote {
+    margin-left: 40px;
     max-width: 600px;
     margin-right: 0;
 }
@@ -737,7 +738,8 @@ p img {
 }
 
 dl dt {
-    padding-left: 2em;
+    padding-left: 40px;
+    max-width: 600px;
 }
 
 dl dt {
