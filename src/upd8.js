@@ -45,9 +45,10 @@ import fixWS from 'fix-whitespace';
 import he from 'he';
 
 import {
-    access,
+    copyFile,
     mkdir,
     readFile,
+    stat,
     symlink,
     writeFile,
     unlink,
@@ -196,6 +197,9 @@ const STATIC_DIRECTORY = 'static';
 
 // This exists adjacent to index.html for any page with oEmbed metadata.
 const OEMBED_JSON_FILE = 'oembed.json';
+
+// Automatically copied (if present) from media directory to site root.
+const FAVICON_FILE = 'favicon.ico';
 
 function inspect(value) {
     return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -1190,6 +1194,26 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
     };
 };
 
+async function writeFavicon() {
+    try {
+        await stat(path.join(mediaPath, FAVICON_FILE));
+    } catch (error) {
+        return;
+    }
+
+    try {
+        await copyFile(
+            path.join(mediaPath, FAVICON_FILE),
+            path.join(outputPath, FAVICON_FILE)
+        );
+    } catch (error) {
+        logWarn`Failed to copy favicon! ${error.message}`;
+        return;
+    }
+
+    logInfo`Copied favicon to site root.`;
+}
+
 function writeSymlinks() {
     return progressPromiseAll('Writing site symlinks.', [
         link(path.join(__dirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
@@ -1774,6 +1798,7 @@ async function main() {
 
     logInfo`Writing site pages: ${writeAll ? 'all' : Object.keys(writeFlags).join(', ')}`;
 
+    await writeFavicon();
     await writeSymlinks();
     await writeSharedFilesAndPages({language: finalDefaultLanguage, wikiData});
 
