@@ -294,7 +294,7 @@ Thing.common = {
         expose: {
             dependencies: [singleReferenceProperty, thingDataProperty],
             compute: ({ [singleReferenceProperty]: ref, [thingDataProperty]: thingData }) => (
-                (ref && thingData ? findFn(ref, thingData, {mode: 'quiet'}) : [])
+                (ref && thingData ? findFn(ref, thingData, {mode: 'quiet'}) : null)
             )
         }
     }),
@@ -854,8 +854,27 @@ Track.propertyDescriptors = {
     // Previously known as: (track).references
     referencedTracks: Thing.common.dynamicThingsFromReferenceList('referencedTracksByRef', 'trackData', find.track),
 
-    // Previously known as: (track).referencedBy
-    referencedByTracks: Thing.common.reverseReferenceList('trackData', 'referencedTracks'),
+    // Specifically exclude re-releases from this list - while it's useful to
+    // get from a re-release to the tracks it references, re-releases aren't
+    // generally relevant from the perspective of the tracks being referenced.
+    // Filtering them from data here hides them from the corresponding field
+    // on the site (obviously), and has the bonus of not counting them when
+    // counting the number of times a track has been referenced, for use in
+    // the "Tracks - by Times Referenced" listing page (or other data
+    // processing).
+    referencedByTracks: {
+        flags: {expose: true},
+
+        expose: {
+            dependencies: ['trackData'],
+
+            compute: ({ trackData, [Track.instance]: track }) => (trackData
+                ? (trackData
+                    .filter(t => !t.originalReleaseTrack)
+                    .filter(t => t.referencedTracks?.includes(track)))
+                : [])
+        }
+    },
 
     // Previously known as: (track).flashes
     featuredInFlashes: Thing.common.reverseReferenceList('flashData', 'featuredTracks'),

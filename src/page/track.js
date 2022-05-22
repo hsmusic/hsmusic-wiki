@@ -40,17 +40,13 @@ export function write(track, {wikiData}) {
             .flatMap(track => track.featuredInFlashes.map(flash => ({flash, as: track}))));
     }
 
-    const unbound_getTrackItem = (track, {getArtistString, link, language}) => {
-        const line = language.$('trackList.item.withArtists', {
+    const unbound_getTrackItem = (track, {getArtistString, link, language}) => (
+        html.tag('li', language.$('trackList.item.withArtists', {
             track: link.track(track),
             by: `<span class="by">${language.$('trackList.item.withArtists.by', {
                 artists: getArtistString(track.artistContribs)
             })}</span>`
-        });
-        return (track.aka
-            ? `<li class="rerelease">${language.$('trackList.item.rerelease', {track: line})}</li>`
-            : `<li>${line}</li>`);
-    };
+        })));
 
     const unbound_generateTrackList = (tracks, {getArtistString, link, language}) => html.tag('ul',
         tracks.map(track => unbound_getTrackItem(track, {getArtistString, link, language}))
@@ -156,7 +152,6 @@ export function write(track, {wikiData}) {
             to,
             urls,
         }) => {
-            const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, language});
             const getTrackItem = bindOpts(unbound_getTrackItem, {getArtistString, link, language});
             const cover = getTrackCover(track);
 
@@ -254,7 +249,7 @@ export function write(track, {wikiData}) {
                         `}
                         ${referencedTracks.length && fixWS`
                             <p>${language.$('releaseInfo.tracksReferenced', {track: `<i>${track.name}</i>`})}</p>
-                            ${generateTrackList(referencedTracks)}
+                            ${html.tag('ul', referencedTracks.map(getTrackItem))}
                         `}
                         ${referencedByTracks.length && fixWS`
                             <p>${language.$('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
