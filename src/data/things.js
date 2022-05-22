@@ -1388,13 +1388,22 @@ WikiInfo.propertyDescriptors = {
         update: {validate: isURL}
     },
 
-    // Feature toggles
+    divideTrackListsByGroupsByRef: Thing.common.referenceList(Group),
 
+    // Feature toggles
     enableFlashesAndGames: Thing.common.flag(false),
     enableListings: Thing.common.flag(false),
     enableNews: Thing.common.flag(false),
     enableArtTagUI: Thing.common.flag(false),
     enableGroupUI: Thing.common.flag(false),
+
+    // Update only
+
+    groupData: Thing.common.wikiData(Group),
+
+    // Expose only
+
+    divideTrackListsByGroups: Thing.common.dynamicThingsFromReferenceList('divideTrackListsByGroupsByRef', 'groupData', find.group),
 };
 
 // -> Language

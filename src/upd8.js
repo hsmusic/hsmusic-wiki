@@ -92,6 +92,7 @@ import {
     generateCoverLink,
     generateInfoGalleryLinks,
     generatePreviousNextLinks,
+    generateTrackListDividedByGroups,
     getAlbumGridHTML,
     getAlbumStylesheet,
     getArtistString,
@@ -2109,6 +2110,11 @@ async function main() {
                 bound.generatePreviousNextLinks = bindOpts(generatePreviousNextLinks, {
                     link: bound.link,
                     language
+                });
+
+                bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
+                    language,
+                    wikiData,
                 });
 
                 bound.getGridHTML = bindOpts(getGridHTML, {

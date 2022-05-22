@@ -402,6 +402,7 @@ export const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
         footerContent: 'Footer Content',
         defaultLanguage: 'Default Language',
         canonicalBase: 'Canonical Base',
+        divideTrackListsByGroupsByRef: 'Divide Track Lists By Groups',
         enableFlashesAndGames: 'Enable Flashes & Games',
         enableListings: 'Enable Listings',
         enableNews: 'Enable News',
@@ -1089,6 +1090,8 @@ export function linkWikiDataArrays(wikiData) {
     }
 
     const WD = wikiData;
+
+    assignWikiData([WD.wikiInfo], 'groupData');
 
     assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
     WD.albumData.forEach(album => assignWikiData(album.trackGroups, 'trackData'));

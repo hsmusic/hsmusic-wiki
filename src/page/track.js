@@ -13,10 +13,6 @@ import {
 import * as html from '../util/html.js';
 
 import {
-    OFFICIAL_GROUP_DIRECTORY
-} from '../util/magic-constants.js';
-
-import {
     bindOpts
 } from '../util/sugar.js';
 
@@ -36,12 +32,6 @@ export function write(track, {wikiData}) {
     const { groupData, wikiInfo } = wikiData;
     const { album, referencedByTracks, referencedTracks, otherReleases } = track;
 
-    const useDividedReferences = groupData.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY);
-    const rbtFanon = (useDividedReferences &&
-        referencedByTracks.filter(t => t.album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY)));
-    const rbtOfficial = (useDividedReferences &&
-        referencedByTracks.filter(t => t.album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY)));
-
     const listTag = getAlbumListTag(album);
 
     let flashesThatFeature;
@@ -50,18 +40,20 @@ export function write(track, {wikiData}) {
             .flatMap(track => track.featuredInFlashes.map(flash => ({flash, as: track}))));
     }
 
+    const unbound_getTrackItem = (track, {getArtistString, link, language}) => {
+        const line = language.$('trackList.item.withArtists', {
+            track: link.track(track),
+            by: `<span class="by">${language.$('trackList.item.withArtists.by', {
+                artists: getArtistString(track.artistContribs)
+            })}</span>`
+        });
+        return (track.aka
+            ? `<li class="rerelease">${language.$('trackList.item.rerelease', {track: line})}</li>`
+            : `<li>${line}</li>`);
+    };
+
     const unbound_generateTrackList = (tracks, {getArtistString, link, language}) => html.tag('ul',
-        tracks.map(track => {
-            const line = language.$('trackList.item.withArtists', {
-                track: link.track(track),
-                by: `<span class="by">${language.$('trackList.item.withArtists.by', {
-                    artists: getArtistString(track.artistContribs)
-                })}</span>`
-            });
-            return (track.aka
-                ? `<li class="rerelease">${language.$('trackList.item.rerelease', {track: line})}</li>`
-                : `<li>${line}</li>`);
-        })
+        tracks.map(track => unbound_getTrackItem(track, {getArtistString, link, language}))
     );
 
     const hasCommentary = track.commentary || otherReleases.some(t => t.commentary);
@@ -150,6 +142,7 @@ export function write(track, {wikiData}) {
             generateChronologyLinks,
             generateCoverLink,
             generatePreviousNextLinks,
+            generateTrackListDividedByGroups,
             getAlbumStylesheet,
             getArtistString,
             getLinkThemeString,
@@ -164,6 +157,7 @@ export function write(track, {wikiData}) {
             urls,
         }) => {
             const generateTrackList = bindOpts(unbound_generateTrackList, {getArtistString, link, language});
+            const getTrackItem = bindOpts(unbound_getTrackItem, {getArtistString, link, language});
             const cover = getTrackCover(track);
 
             return {
@@ -264,19 +258,10 @@ export function write(track, {wikiData}) {
                         `}
                         ${referencedByTracks.length && fixWS`
                             <p>${language.$('releaseInfo.tracksThatReference', {track: `<i>${track.name}</i>`})}</p>
-                            ${useDividedReferences && fixWS`
-                                <dl>
-                                    ${rbtOfficial.length && fixWS`
-                                        <dt>${language.$('trackPage.referenceList.official')}</dt>
-                                        <dd>${generateTrackList(rbtOfficial)}</dd>
-                                    `}
-                                    ${rbtFanon.length && fixWS`
-                                        <dt>${language.$('trackPage.referenceList.fandom')}</dt>
-                                        <dd>${generateTrackList(rbtFanon)}</dd>
-                                    `}
-                                </dl>
-                            `}
-                            ${!useDividedReferences && generateTrackList(referencedByTracks)}
+                            ${generateTrackListDividedByGroups(referencedByTracks, {
+                                getTrackItem,
+                                wikiData,
+                            })}
                         `}
                         ${wikiInfo.enableFlashesAndGames && flashesThatFeature.length && fixWS`
                             <p>${language.$('releaseInfo.flashesThatFeature', {track: `<i>${track.name}</i>`})}</p>

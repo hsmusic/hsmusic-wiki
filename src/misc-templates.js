@@ -242,6 +242,52 @@ export function getAlbumStylesheet(album, {to}) {
     ].filter(Boolean).join('\n');
 }
 
+// Divided track lists
+
+export function generateTrackListDividedByGroups(tracks, {
+    getTrackItem,
+    language,
+    wikiData,
+}) {
+    const { divideTrackListsByGroups: groups } = wikiData.wikiInfo;
+
+    if (!groups?.length) {
+        return html.tag('ul', tracks.map(t => getTrackItem(t)));
+    }
+
+    const lists = Object.fromEntries(groups.map(group => [group.directory, {group, tracks: []}]));
+    const other = [];
+
+    for (const track of tracks) {
+        const { album } = track;
+        const group = groups.find(g => g.albums.includes(album));
+        if (group) {
+            lists[group.directory].tracks.push(track);
+        } else {
+            other.push(track);
+        }
+    }
+
+    const ddul = tracks => fixWS`
+        <dd><ul>
+            ${tracks.map(t => getTrackItem(t)).join('\n')}
+        </ul></dd>
+    `;
+
+    return html.tag('dl', Object.values(lists)
+        .filter(({ tracks }) => tracks.length)
+        .flatMap(({ group, tracks }) => [
+            html.tag('dt', language.formatString('trackList.group', {group: group.name})),
+            ddul(tracks)
+        ])
+        .concat(other.length ? [
+            `<dt>${language.formatString('trackList.group', {
+                group: language.formatString('trackList.group.other')
+            })}</dt>`,
+            ddul(other)
+        ] : []));
+}
+
 // Fancy lookin' links
 
 export function fancifyURL(url, {language, album = false} = {}) {

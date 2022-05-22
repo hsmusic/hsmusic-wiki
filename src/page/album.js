@@ -205,7 +205,7 @@ export function write(album, {wikiData}) {
                             <dl class="album-group-list">
                                 ${album.trackGroups.map(({ name, color, startIndex, tracks }) => fixWS`
                                     <dt>${
-                                        language.$('trackList.group', {
+                                        language.$('trackList.section.withDuration', {
                                             duration: language.formatDuration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
                                             group: name
                                         })
