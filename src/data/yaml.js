@@ -29,12 +29,15 @@ import {
 import {
     color,
     ENABLE_COLOR,
+    logInfo,
+    logWarn,
 } from '../util/cli.js';
 
 import {
     decorateErrorWithIndex,
     mapAggregate,
     openAggregate,
+    showAggregate,
     withAggregate,
 } from '../util/sugar.js';
 
@@ -1273,4 +1276,56 @@ export function filterReferenceErrors(wikiData) {
     }
 
     return aggregate;
+}
+
+// Utility function for loading all wiki data from the provided YAML data
+// directory (e.g. the root of the hsmusic-data repository). This doesn't
+// provide much in the way of customization; it's meant to be used more as
+// a boilerplate for more specialized output, or as a quick start in utilities
+// where reporting info about data loading isn't as relevant as during the
+// main wiki build process.
+export async function quickLoadAllFromYAML(dataPath, {
+    showAggregate: customShowAggregate = showAggregate,
+} = {}) {
+    const showAggregate = customShowAggregate;
+
+    let wikiData;
+
+    {
+        const { aggregate, result } = await loadAndProcessDataDocuments({
+            dataPath,
+        });
+
+        wikiData = result;
+
+        try {
+            aggregate.close();
+            logInfo`Loaded data without errors. (complete data)`;
+        } catch (error) {
+            showAggregate(error);
+            logWarn`Loaded data with errors. (partial data)`;
+        }
+    }
+
+    linkWikiDataArrays(wikiData);
+
+    try {
+        filterDuplicateDirectories(wikiData).close();
+        logInfo`No duplicate directories found. (complete data)`;
+    } catch (error) {
+        showAggregate(error);
+        logWarn`Duplicate directories found. (partial data)`;
+    }
+
+    try {
+        filterReferenceErrors(wikiData).close();
+        logInfo`No reference errors found. (complete data)`;
+    } catch (error) {
+        showAggregate(error);
+        logWarn`Duplicate directories found. (partial data)`;
+    }
+
+    sortWikiDataArrays(wikiData);
+
+    return wikiData;
 }

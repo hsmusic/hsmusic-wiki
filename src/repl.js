@@ -4,14 +4,7 @@ import * as repl from 'repl';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
 
-import {
-    filterDuplicateDirectories,
-    filterReferenceErrors,
-    linkWikiDataArrays,
-    loadAndProcessDataDocuments,
-    sortWikiDataArrays,
-} from './data/yaml.js';
-
+import { quickLoadAllFromYAML } from './data/yaml.js';
 import { logError, parseOptions } from './util/cli.js';
 import { showAggregate } from './util/sugar.js';
 
@@ -41,54 +34,9 @@ async function main() {
         return;
     }
 
-    const niceShowAggregate = (error, ...opts) => {
-        showAggregate(error, {
-            showTraces: showAggregateTraces,
-            pathToFile: f => path.relative(__dirname, f),
-            ...opts
-        });
-    };
-
     console.log('HSMusic data REPL');
 
-    let wikiData;
-
-    {
-        const { aggregate, result } = await loadAndProcessDataDocuments({
-            dataPath,
-        });
-
-        wikiData = result;
-
-        try {
-            aggregate.close();
-            console.log('Loaded data without errors. (complete data)');
-        } catch (error) {
-            niceShowAggregate(error);
-            console.log('Loaded data with errors. (partial data)');
-        }
-    }
-
-    linkWikiDataArrays(wikiData);
-
-    try {
-        filterDuplicateDirectories(wikiData).close();
-        console.log('No duplicate directories found. (complete data)');
-    } catch (error) {
-        niceShowAggregate(error);
-        console.log('Duplicate directories found. (partial data)');
-    }
-
-    try {
-        filterReferenceErrors(wikiData).close();
-        console.log('No reference errors found. (complete data)');
-    } catch (error) {
-        niceShowAggregate(error);
-        console.log('Duplicate directories found. (partial data)');
-    }
-
-    sortWikiDataArrays(wikiData);
-
+    const wikiData = await quickLoadAllFromYAML(dataPath);
     const replServer = repl.start();
 
     Object.assign(
