@@ -207,7 +207,7 @@ export function write(album, {wikiData}) {
                                     <dt>${
                                         language.$('trackList.section.withDuration', {
                                             duration: language.formatDuration(getTotalDuration(tracks), {approximate: tracks.length > 1}),
-                                            group: name
+                                            section: name
                                         })
                                     }</dt>
                                     <dd><${listTag === 'ol' ? `ol start="${startIndex + 1}"` : listTag}>
