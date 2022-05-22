@@ -2186,8 +2186,8 @@ async function main() {
                 const to = writePage.to({baseDirectory, pageSubKey: fromPath[0], paths: fromPaths});
 
                 const target = to('localized.' + toPath[0], ...toPath.slice(1));
-                const content = generateRedirectPage(title, target, {language});
-                return writePage.write(content, {paths: fromPaths});
+                const html = generateRedirectPage(title, target, {language});
+                return writePage.write({html, paths: fromPaths});
             })
         ], queueSize));
     };
