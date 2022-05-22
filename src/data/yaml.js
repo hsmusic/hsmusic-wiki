@@ -1189,6 +1189,10 @@ export function filterDuplicateDirectories(wikiData) {
 // data array.
 export function filterReferenceErrors(wikiData) {
     const referenceSpec = [
+        ['wikiInfo', {
+            divideTrackListsByGroupsByRef: 'group',
+        }],
+
         ['albumData', {
             artistContribsByRef: '_contrib',
             coverArtistContribsByRef: '_contrib',
@@ -1240,7 +1244,8 @@ export function filterReferenceErrors(wikiData) {
     for (const [ thingDataProp, propSpec ] of referenceSpec) {
         const thingData = getNestedProp(wikiData, thingDataProp);
         aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({ nest }) => {
-            for (const thing of thingData) {
+            const things = Array.isArray(thingData) ? thingData : [thingData];
+            for (const thing of things) {
                 nest({message: `Reference errors in ${inspect(thing)}`}, ({ filter }) => {
                     for (const [ property, findFnKey ] of Object.entries(propSpec)) {
                         if (!thing[property]) continue;
