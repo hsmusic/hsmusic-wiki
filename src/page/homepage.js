@@ -29,6 +29,7 @@ export function writeTargetless({wikiData}) {
             transformMultiline
         }) => ({
             title: wikiInfo.name,
+            showWikiNameInTitle: false,
 
             meta: {
                 description: wikiInfo.description

@@ -151,6 +151,8 @@
     "misc.nav.next": "Next",
     "misc.nav.info": "Info",
     "misc.nav.gallery": "Gallery",
+    "misc.pageTitle": "{TITLE}",
+    "misc.pageTitle.withWikiName": "{TITLE} | {WIKI_NAME}",
     "misc.skippers.skipToContent": "Skip to content",
     "misc.skippers.skipToSidebar": "Skip to sidebar",
     "misc.skippers.skipToSidebar.left": "Skip to sidebar (left)",

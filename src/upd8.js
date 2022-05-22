@@ -848,6 +848,8 @@ writePage.html = (pageInfo, {
         theme = '',
         stylesheet = '',
 
+        showWikiNameInTitle = true,
+
         // missing properties are auto-filled, see below!
         body = {},
         banner = {},
@@ -1086,7 +1088,12 @@ writePage.html = (pageInfo, {
             'data-rebase-data': to('data.root')
         })}>
             <head>
-                <title>${title}</title>
+                <title>${(showWikiNameInTitle
+                    ? language.formatString('misc.pageTitle.withWikiName', {
+                        title,
+                        wikiName: wikiInfo.nameShort
+                    })
+                    : language.formatString('misc.pageTitle', {title}))}</title>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 ${Object.entries(meta).filter(([ key, value ]) => value).map(([ key, value ]) => `<meta ${key}="${html.escapeAttributeValue(value)}">`).join('\n')}
