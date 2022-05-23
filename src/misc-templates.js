@@ -479,7 +479,7 @@ export function getFooterLocalizationLinks(pathname, {
     const toArgs = toPath.slice(1);
 
     const links = Object.entries(languages)
-        .filter(([ code ]) => code !== 'default')
+        .filter(([ code, language ]) => code !== 'default' && !language.hidden)
         .map(([ code, language ]) => language)
         .sort(({ name: a }, { name: b }) => a < b ? -1 : a > b ? 1 : 0)
         .map(language => html.tag('span', html.tag('a', {

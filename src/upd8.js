@@ -1332,6 +1332,9 @@ async function processLanguageFile(file) {
     }
     delete json['meta.languageName'];
 
+    const hidden = json['meta.hidden'] ?? false;
+    delete json['meta.hidden'];
+
     if (json['meta.baseDirectory']) {
         logWarn`(${code}) Language JSON still has unused meta.baseDirectory`;
         delete json['meta.baseDirectory'];
@@ -1341,6 +1344,7 @@ async function processLanguageFile(file) {
     language.code = code;
     language.intlCode = intlCode;
     language.name = name;
+    language.hidden = hidden;
     language.escapeHTML = string => he.encode(string, {useNamedReferences: true});
     language.strings = json;
     return language;
@@ -1972,7 +1976,7 @@ async function main() {
                 const directory = path[1];
 
                 const localizedPaths = Object.fromEntries(Object.entries(languages)
-                    .filter(([ key ]) => key !== 'default')
+                    .filter(([ key, language ]) => key !== 'default' && !language.hidden)
                     .map(([ key, language ]) => [language.code, writePage.paths(
                         (language === finalDefaultLanguage ? '' : language.code),
                         'localized.' + pageSubKey,

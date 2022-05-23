@@ -1466,6 +1466,16 @@ Language.propertyDescriptors = {
         }
     },
 
+    // Flag which represents whether or not to hide a language from general
+    // access. If a language is hidden, its portion of the website will still
+    // be built (with all strings localized to the language), but it won't be
+    // included in controls for switching languages or the <link rel=alternate>
+    // tags used for search engine optimization. This flag is intended for use
+    // with languages that are currently in development and not ready for
+    // formal release, or which are just kept hidden as "experimental zones"
+    // for wiki development or content testing.
+    hidden: Thing.common.flag(false),
+
     // Mapping of translation keys to values (strings). Generally, don't
     // access this object directly - use methods instead.
     strings: {
