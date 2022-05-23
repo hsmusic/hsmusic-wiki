@@ -1689,7 +1689,7 @@ async function main() {
         }
         return;
     } else {
-        languages[defaultLanguage.code] = internalDefaultLanguage;
+        languages[internalDefaultLanguage.code] = internalDefaultLanguage;
         finalDefaultLanguage = internalDefaultLanguage;
     }
 
