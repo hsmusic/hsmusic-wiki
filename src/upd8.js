@@ -1082,7 +1082,10 @@ writePage.html = (pageInfo, {
     return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${html.attributes({
-            lang: language.code,
+            lang: language.intlCode,
+            'data-language-code': language.code,
+            'data-url-key': paths.toPath[0],
+            ...Object.fromEntries(paths.toPath.slice(1).map((v, i) => [['data-url-value' + i], v])),
             'data-rebase-localized': to('localized.root'),
             'data-rebase-shared': to('shared.root'),
             'data-rebase-media': to('media.root'),
