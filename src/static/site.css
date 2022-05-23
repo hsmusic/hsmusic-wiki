@@ -984,3 +984,22 @@ html[data-language-code=preview-en][data-url-key="localized.home"] #content h1::
     display: block;
     content: "(Preview Build)";
 }
+
+html[data-language-code=preview-en] #header h2 > :first-child::before {
+    content: "(Preview Build! ✨) ";
+    animation: preview-notice 4s infinite;
+}
+
+@keyframes preview-notice {
+    0% {
+        color: #cc5500;
+    }
+
+    50% {
+        color: #ffaa00;
+    }
+
+    100% {
+        color: #cc5500;
+    }
+}
