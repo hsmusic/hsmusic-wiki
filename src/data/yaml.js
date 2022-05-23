@@ -1170,16 +1170,20 @@ export function filterDuplicateDirectories(wikiData) {
         });
     }
 
+    // TODO: This code closes the aggregate but it generally gets closed again
+    // by the caller. This works but it might be weird to assume closing an
+    // aggregate twice is okay, maybe there's a better solution? Expose a new
+    // function on aggregates for checking if it *would* error?
+    // (i.e: errors.length > 0)
     try {
         aggregate.close();
-        return aggregate;
     } catch (error) {
         // Duplicate entries were found and filtered out, resulting in altered
         // wikiData arrays. These must be re-linked so objects receive the new
         // data.
         linkWikiDataArrays(wikiData);
-        return error;
     }
+    return aggregate;
 }
 
 // Warn about references across data which don't match anything.  This involves
