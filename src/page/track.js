@@ -19,7 +19,7 @@ import {
 import {
     getTrackCover,
     getAlbumListTag,
-    sortByDate
+    sortChronologically,
 } from '../util/wiki-data.js';
 
 // Page exports
@@ -36,8 +36,15 @@ export function write(track, {wikiData}) {
 
     let flashesThatFeature;
     if (wikiInfo.enableFlashesAndGames) {
-        flashesThatFeature = sortByDate([track, ...otherReleases]
-            .flatMap(track => track.featuredInFlashes.map(flash => ({flash, as: track}))));
+        flashesThatFeature = sortChronologically([track, ...otherReleases]
+            .flatMap(track => track.featuredInFlashes
+                .map(flash => ({
+                    flash,
+                    as: track,
+                    directory: flash.directory,
+                    name: flash.name,
+                    date: flash.date
+                }))));
     }
 
     const unbound_getTrackItem = (track, {getArtistString, link, language}) => (

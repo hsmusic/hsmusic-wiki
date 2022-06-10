@@ -16,7 +16,10 @@ import {
 import {
     chunkByProperties,
     getTotalDuration,
-    sortByDate
+    sortAlbumsTracksChronologically,
+    sortByDate,
+    sortByDirectory,
+    sortChronologically,
 } from '../util/wiki-data.js';
 
 // Page exports
@@ -30,19 +33,19 @@ export function write(artist, {wikiData}) {
 
     const { name, urls, contextNotes } = artist;
 
-    const artThingsAll = sortByDate(unique([
+    const artThingsAll = sortAlbumsTracksChronologically(unique([
         ...artist.albumsAsCoverArtist ?? [],
         ...artist.albumsAsWallpaperArtist ?? [],
         ...artist.albumsAsBannerArtist ?? [],
         ...artist.tracksAsCoverArtist ?? []
-    ]));
+    ]), {getDate: o => o.coverArtDate});
 
-    const artThingsGallery = sortByDate([
+    const artThingsGallery = sortAlbumsTracksChronologically([
         ...artist.albumsAsCoverArtist ?? [],
         ...artist.tracksAsCoverArtist ?? []
-    ]);
+    ], {getDate: o => o.coverArtDate});
 
-    const commentaryThings = sortByDate([
+    const commentaryThings = sortAlbumsTracksChronologically([
         ...artist.albumsAsCommentator ?? [],
         ...artist.tracksAsCommentator ?? []
     ]);
@@ -56,24 +59,24 @@ export function write(artist, {wikiData}) {
         key
     });
 
-    const artListChunks = chunkByProperties(sortByDate(artThingsAll.flatMap(thing =>
+    const artListChunks = chunkByProperties(artThingsAll.flatMap(thing =>
         (['coverArtistContribs', 'wallpaperArtistContribs', 'bannerArtistContribs']
             .map(key => getArtistsAndContrib(thing, key))
             .filter(({ contrib }) => contrib)
             .map(props => ({
                 album: thing.album || thing,
                 track: thing.album ? thing : null,
-                date: +(thing.coverArtDate || thing.date),
+                date: thing.date,
                 ...props
             })))
-    )), ['date', 'album']);
+    ), ['date', 'album']);
 
     const commentaryListChunks = chunkByProperties(commentaryThings.map(thing => ({
         album: thing.album || thing,
         track: thing.album ? thing : null
     })), ['album']);
 
-    const allTracks = sortByDate(unique([
+    const allTracks = sortAlbumsTracksChronologically(unique([
         ...artist.tracksAsArtist ?? [],
         ...artist.tracksAsContributor ?? []
     ]));
@@ -119,7 +122,7 @@ export function write(artist, {wikiData}) {
 
     let flashes, flashListChunks;
     if (wikiInfo.enableFlashesAndGames) {
-        flashes = sortByDate(artist.flashesAsContributor?.slice() ?? []);
+        flashes = sortChronologically(artist.flashesAsContributor?.slice() ?? []);
         flashListChunks = (
             chunkByProperties(flashes.map(flash => ({
                 act: flash.act,

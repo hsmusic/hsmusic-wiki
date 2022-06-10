@@ -8,7 +8,7 @@ import * as html from '../util/html.js';
 
 import {
     getTotalDuration,
-    sortByDate
+    sortChronologically,
 } from '../util/wiki-data.js';
 
 // Page exports
@@ -142,7 +142,12 @@ export function write(group, {wikiData}) {
                     )}
                     <div class="grid-listing">
                         ${getAlbumGridHTML({
-                            entries: sortByDate(group.albums.map(item => ({item}))).reverse(),
+                            entries: sortChronologically(group.albums.map(album => ({
+                                item: album,
+                                directory: album.directory,
+                                name: album.name,
+                                date: album.date,
+                            }))).reverse(),
                             details: true
                         })}
                     </div>

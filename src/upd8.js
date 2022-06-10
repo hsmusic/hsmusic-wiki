@@ -128,15 +128,11 @@ import {
     getAlbumListTag,
     getAllTracks,
     getArtistAvatar,
-    getArtistCommentary,
     getArtistNumContributions,
     getFlashCover,
     getKebabCase,
     getTotalDuration,
     getTrackCover,
-    sortByArtDate,
-    sortByDate,
-    sortByName
 } from './util/wiki-data.js';
 
 import {
@@ -1737,10 +1733,6 @@ async function main() {
             return;
         }
     }
-
-    WD.justEverythingMan = sortByDate([...WD.albumData, ...WD.trackData, ...(WD.flashData || [])]);
-    WD.justEverythingSortedByArtDateMan = sortByArtDate(WD.justEverythingMan.slice());
-    // console.log(JSON.stringify(justEverythingSortedByArtDateMan.map(toAnythingMan), null, 2));
 
     WD.officialAlbumData = WD.albumData.filter(album => album.groups.some(group => group.directory === OFFICIAL_GROUP_DIRECTORY));
     WD.fandomAlbumData = WD.albumData.filter(album => album.groups.every(group => group.directory !== OFFICIAL_GROUP_DIRECTORY));

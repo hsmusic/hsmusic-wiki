@@ -7,6 +7,11 @@ import fixWS from 'fix-whitespace';
 import * as html from './util/html.js';
 
 import {
+    Track,
+    Album,
+} from './data/things.js';
+
+import {
     getColors
 } from './util/colors.js';
 
@@ -16,7 +21,8 @@ import {
 
 import {
     getTotalDuration,
-    sortByDate
+    sortAlbumsTracksChronologically,
+    sortChronologically,
 } from './util/wiki-data.js';
 
 const BANDCAMP_DOMAINS = [
@@ -112,7 +118,15 @@ export function generateChronologyLinks(currentThing, {
     }
 
     return contributions.map(({ who: artist }) => {
-        const things = sortByDate(unique(getThings(artist)).filter(t => t[dateKey]), dateKey);
+        const thingsUnsorted = unique(getThings(artist)).filter(t => t[dateKey]);
+
+        // Kinda a hack, but we automatically detect which is (probably) the
+        // right function to use here.
+        const args = [thingsUnsorted, {getDate: t => t[dateKey]}];
+        const things = (thingsUnsorted.every(t => t instanceof Album || t instanceof Track)
+            ? sortAlbumsTracksChronologically(...args)
+            : sortChronologically(...args));
+
         const index = things.indexOf(currentThing);
 
         if (index === -1) return '';

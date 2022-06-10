@@ -42,8 +42,9 @@ import {
 } from '../util/sugar.js';
 
 import {
-    sortByDate,
-    sortByName,
+    sortAlbumsTracksChronologically,
+    sortAlphabetically,
+    sortChronologically,
 } from '../util/wiki-data.js';
 
 import find, { bindFind } from '../util/find.js';
@@ -861,7 +862,7 @@ export const dataSteps = [
         processDocument: processNewsEntryDocument,
 
         save(newsData) {
-            sortByDate(newsData);
+            sortChronologically(newsData);
             newsData.reverse();
 
             return {newsData};
@@ -876,7 +877,7 @@ export const dataSteps = [
         processDocument: processArtTagDocument,
 
         save(artTagData) {
-            artTagData.sort(sortByName);
+            sortAlphabetically(artTagData);
 
             return {artTagData};
         }
@@ -1108,8 +1109,8 @@ export function linkWikiDataArrays(wikiData) {
 
 export function sortWikiDataArrays(wikiData) {
     Object.assign(wikiData, {
-        albumData: sortByDate(wikiData.albumData.slice()),
-        trackData: sortByDate(wikiData.trackData.slice())
+        albumData: sortChronologically(wikiData.albumData.slice()),
+        trackData: sortAlbumsTracksChronologically(wikiData.trackData.slice()),
     });
 
     // Re-link data arrays, so that every object has the new, sorted versions.

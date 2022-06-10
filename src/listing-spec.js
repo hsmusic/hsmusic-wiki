@@ -4,8 +4,8 @@ import {
     chunkByProperties,
     getArtistNumContributions,
     getTotalDuration,
-    sortByDate,
-    sortByName
+    sortAlphabetically,
+    sortChronologically,
 } from './util/wiki-data.js';
 
 const listingSpec = [
@@ -14,8 +14,7 @@ const listingSpec = [
         stringsKey: 'listAlbums.byName',
 
         data({wikiData}) {
-            return wikiData.albumData.slice()
-                .sort(sortByName);
+            return sortAlphabetically(wikiData.albumData.slice());
         },
 
         row(album, {link, language}) {
@@ -66,7 +65,7 @@ const listingSpec = [
         stringsKey: 'listAlbums.byDate',
 
         data({wikiData}) {
-            return sortByDate(wikiData.albumData.filter(album => album.date));
+            return sortChronologically(wikiData.albumData.filter(album => album.date));
         },
 
         row(album, {link, language}) {
@@ -114,8 +113,7 @@ const listingSpec = [
         stringsKey: 'listArtists.byName',
 
         data({wikiData}) {
-            return wikiData.artistData.slice()
-                .sort(sortByName)
+            return sortAlphabetically(wikiData.artistData.slice())
                 .map(artist => ({artist, contributions: getArtistNumContributions(artist)}));
         },
 
@@ -254,22 +252,23 @@ const listingSpec = [
         stringsKey: 'listArtists.byLatest',
 
         data({wikiData}) {
-            const reversedTracks = wikiData.trackData.filter(t => t.date).reverse();
-            const reversedArtThings = wikiData.justEverythingSortedByArtDateMan.filter(t => t.date).reverse();
+            const reversedTracks = sortChronologically(wikiData.trackData.filter(t => t.date)).reverse();
+            const reversedArtThings = sortChronologically([...wikiData.trackData, ...wikiData.albumData].filter(t => t.coverArtDate)).reverse();
 
             return {
-                toTracks: sortByDate(wikiData.artistData
+                toTracks: sortChronologically(wikiData.artistData
                     .map(artist => ({
                         artist,
+                        directory: artist.directory,
+                        name: artist.name,
                         date: reversedTracks.find(track => ([
                             ...track.artistContribs ?? [],
                             ...track.contributorContribs ?? []
                         ].some(({ who }) => who === artist)))?.date
                     }))
-                    .filter(({ date }) => date)
-                    .sort((a, b) => a.name < b.name ? 1 : a.name > b.name ? -1 : 0)).reverse(),
+                    .filter(({ date }) => date)).reverse(),
 
-                toArtAndFlashes: sortByDate(wikiData.artistData
+                toArtAndFlashes: sortChronologically(wikiData.artistData
                     .map(artist => {
                         const thing = reversedArtThings.find(thing => ([
                             ...thing.coverArtistContribs ?? [],
@@ -277,6 +276,8 @@ const listingSpec = [
                         ].some(({ who }) => who === artist)));
                         return thing && {
                             artist,
+                            directory: artist.directory,
+                            name: artist.name,
                             date: (thing.coverArtistContribs?.some(({ who }) => who === artist)
                                 ? thing.coverArtDate
                                 : thing.date)
@@ -332,7 +333,7 @@ const listingSpec = [
         directory: 'groups/by-name',
         stringsKey: 'listGroups.byName',
         condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
-        data: ({wikiData}) => wikiData.groupData.slice().sort(sortByName),
+        data: ({wikiData}) => sortAlphabetically(wikiData.groupData.slice()),
 
         row(group, {link, language}) {
             return language.$('listingPage.listGroups.byCategory.group', {
@@ -437,11 +438,13 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
         data({wikiData}) {
-            return sortByDate(wikiData.groupData
+            return sortChronologically(wikiData.groupData
                 .map(group => {
                     const albums = group.albums.filter(a => a.date);
                     return albums.length && {
                         group,
+                        directory: group.directory,
+                        name: group.name,
                         date: albums[albums.length - 1].date
                     };
                 })
@@ -456,8 +459,8 @@ const listingSpec = [
                 // l8ter, that flips them, and UMSPAF ends up displaying 8efore
                 // Fandom. So we do an extra reverse here, which will fix that
                 // and only affect groups that share the same d8te (8ecause
-                // groups that don't will 8e moved 8y the sortByDate call
-                // surrounding this).
+                // groups that don't will 8e moved 8y the sortChronologically
+                // call surrounding this).
                 .reverse()).reverse()
         },
 
@@ -474,7 +477,7 @@ const listingSpec = [
         stringsKey: 'listTracks.byName',
 
         data({wikiData}) {
-            return wikiData.trackData.slice().sort(sortByName);
+            return sortAlphabetically(wikiData.trackData.slice());
         },
 
         row(track, {link, language}) {
@@ -516,7 +519,7 @@ const listingSpec = [
 
         data({wikiData}) {
             return chunkByProperties(
-                sortByDate(wikiData.trackData.filter(t => t.date)),
+                sortChronologically(wikiData.trackData.filter(t => t.date)),
                 ['album', 'date']
             );
         },
@@ -659,7 +662,7 @@ const listingSpec = [
         html(flashData, {link, language}) {
             return fixWS`
                 <dl>
-                    ${sortByDate(flashData.slice()).map(flash => fixWS`
+                    ${sortChronologically(flashData.slice()).map(flash => fixWS`
                         <dt>${language.$('listingPage.listTracks.inFlashes.byFlash.flash', {
                             flash: link.flash(flash),
                             date: language.formatDate(flash.date)
@@ -715,9 +718,7 @@ const listingSpec = [
         condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
         data({wikiData}) {
-            return wikiData.artTagData
-                .filter(tag => !tag.isContentWarning)
-                .sort(sortByName)
+            return sortAlphabetically(wikiData.artTagData.filter(tag => !tag.isContentWarning))
                 .map(tag => ({tag, timesUsed: tag.taggedInThings?.length}));
         },
 
