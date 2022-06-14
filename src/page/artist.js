@@ -143,9 +143,9 @@ export function write(artist, {wikiData}) {
 
     const generateEntryAccents = ({
         getArtistString, language,
-        aka, entry, artists, contrib
+        original, entry, artists, contrib
     }) =>
-        (aka
+        (original
             ? language.$('artistPage.creditList.entry.rerelease', {entry})
             : (artists.length
                 ? ((contrib.what || contrib.whatArray?.length)
@@ -187,16 +187,16 @@ export function write(artist, {wikiData}) {
                 <dd><ul>
                     ${(chunk
                         .map(({track, ...props}) => ({
-                            aka: track.aka,
+                            original: track.originalReleaseTrack,
                             entry: language.$('artistPage.creditList.entry.track.withDuration', {
                                 track: link.track(track),
                                 duration: language.formatDuration(track.duration ?? 0)
                             }),
                             ...props
                         }))
-                        .map(({aka, ...opts}) => html.tag('li',
-                            {class: aka && 'rerelease'},
-                            generateEntryAccents({getArtistString, language, aka, ...opts})))
+                        .map(({original, ...opts}) => html.tag('li',
+                            {class: original && 'rerelease'},
+                            generateEntryAccents({getArtistString, language, original, ...opts})))
                         .join('\n'))}
                 </ul></dd>
             `).join('\n')}
