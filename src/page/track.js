@@ -7,6 +7,7 @@ import fixWS from 'fix-whitespace';
 import {
     generateAlbumChronologyLinks,
     generateAlbumNavLinks,
+    generateAlbumSecondaryNav,
     generateAlbumSidebar
 } from './album.js';
 
@@ -335,7 +336,13 @@ export function write(track, {wikiData}) {
                             ${generateAlbumChronologyLinks(album, track, {generateChronologyLinks})}
                         </div>
                     `
-                }
+                },
+
+                secondaryNav: generateAlbumSecondaryNav(album, track, {
+                    language,
+                    link,
+                    getLinkThemeString,
+                }),
             };
         }
     };

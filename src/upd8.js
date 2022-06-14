@@ -854,6 +854,7 @@ writePage.html = (pageInfo, {
         sidebarLeft = {},
         sidebarRight = {},
         nav = {},
+        secondaryNav = {},
         footer = {},
         socialEmbed = {},
     } = pageInfo;
@@ -883,6 +884,10 @@ writePage.html = (pageInfo, {
     nav.classes ??= [];
     nav.content ??= '';
     nav.links ??= [];
+
+    secondaryNav ??= {};
+    secondaryNav.content ??= '';
+    secondaryNav.content ??= '';
 
     footer.classes ??= [];
     footer.content ??= (wikiInfo.footerContent ? transformMultiline(wikiInfo.footerContent) : '');
@@ -1005,6 +1010,14 @@ writePage.html = (pageInfo, {
         nav.content
     ]);
 
+    const secondaryNavHTML = html.tag('nav', {
+        [html.onlyIfContent]: true,
+        id: 'secondary-nav',
+        class: secondaryNav.classes
+    }, [
+        secondaryNav.content
+    ]);
+
     const bannerSrc = (
         banner.src ? banner.src :
         banner.path ? to(...banner.path) :
@@ -1026,6 +1039,7 @@ writePage.html = (pageInfo, {
     const layoutHTML = [
         navHTML,
         banner.position === 'top' && bannerHTML,
+        secondaryNavHTML,
         html.tag('div',
             {class: ['layout-columns', !collapseSidebars && 'vertical-when-thin']},
             [

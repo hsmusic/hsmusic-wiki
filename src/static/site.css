@@ -106,12 +106,12 @@ a:hover {
     display: flex;
 }
 
-#header, #skippers, #footer {
+#header, #secondary-nav, #skippers, #footer {
     padding: 5px;
     font-size: 0.85em;
 }
 
-#header, #skippers {
+#header, #secondary-nav, #skippers {
     margin-bottom: 10px;
 }
 
@@ -133,11 +133,6 @@ a:hover {
     font-weight: 800;
 }
 
-#header > h2.dot-between-spans > span:not(:last-child)::after {
-    content: " \00b7 ";
-    font-weight: 800;
-}
-
 #header > h2 > span {
     white-space: nowrap;
 }
@@ -151,6 +146,15 @@ a:hover {
     font-weight: 800;
 }
 
+.dot-between-spans > span:not(:last-child)::after {
+    content: " \00b7 ";
+    font-weight: 800;
+}
+
+.dot-between-spans > span {
+    white-space: nowrap;
+}
+
 #header .chronology {
     display: inline-block;
 }
@@ -158,6 +162,14 @@ a:hover {
 #header .chronology .heading,
 #header .chronology .buttons {
     display: inline-block;
+}
+
+#secondary-nav {
+    text-align: center;
+}
+
+#secondary-nav:not(.no-hide) {
+    display: none;
 }
 
 footer {
@@ -225,7 +237,7 @@ footer > :last-child {
     font-size: 1em;
 }
 
-.sidebar, #content, #header, #skippers, #footer {
+.sidebar, #content, #header, #secondary-nav, #skippers, #footer {
     background-color: rgba(0, 0, 0, 0.6);
     border: 1px dotted var(--primary-color);
     border-radius: 3px;
@@ -921,6 +933,10 @@ li > ul {
 @media (max-width: 900px) {
     .sidebar-column:not(.no-hide) {
         display: none;
+    }
+
+    #secondary-nav:not(.no-hide) {
+        display: block;
     }
 
     .layout-columns.vertical-when-thin {

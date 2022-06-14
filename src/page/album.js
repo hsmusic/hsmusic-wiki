@@ -269,7 +269,13 @@ export function write(album, {wikiData}) {
                         }
                     ],
                     content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
-                }
+                },
+
+                secondaryNav: generateAlbumSecondaryNav(album, null, {
+                    language,
+                    link,
+                    getLinkThemeString,
+                }),
             };
         }
     };
@@ -396,6 +402,42 @@ export function generateAlbumSidebar(album, currentTrack, {
             content: trackListPart
         };
     }
+}
+
+export function generateAlbumSecondaryNav(album, currentTrack, {
+    link,
+    language,
+    getLinkThemeString,
+}) {
+    const { groups } = album;
+
+    if (!groups.length) {
+        return null;
+    }
+
+    const groupParts = groups.map(group => {
+        const albums = group.albums.filter(album => album.date);
+        const index = albums.indexOf(album);
+        const next = index >= 0 && albums[index + 1];
+        const previous = index > 0 && albums[index - 1];
+        return {group, next, previous};
+    }).map(({group, next, previous}) => {
+        const previousNext = !currentTrack && [
+            previous && link.album(previous, {color: false, text: language.$('misc.nav.previous')}),
+            next && link.album(next, {color: false, text: language.$('misc.nav.next')})
+        ].filter(Boolean);
+        return html.tag('span', {style: getLinkThemeString(group.color)}, [
+            language.$('albumSidebar.groupBox.title', {
+                group: link.groupInfo(group)
+            }),
+            previousNext?.length && `(${previousNext.join(',\n')})`
+        ]);
+    });
+
+    return {
+        classes: ['dot-between-spans'],
+        content: groupParts.join('\n'),
+    };
 }
 
 export function generateAlbumNavLinks(album, currentTrack, {
