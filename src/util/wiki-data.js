@@ -1,7 +1,5 @@
 // Utility functions for interacting with wiki data.
 
-import { Album, Track } from '../data/things.js';
-
 // Generic value operations
 
 export function getKebabCase(name) {
@@ -216,12 +214,13 @@ export function sortByPositionInAlbum(data) {
     });
 }
 
-// Note that this function only checks constructor equality, not inheritence!
-// So it won't group subclasses together (as though they were the same type).
-export function sortByThingType(data, thingConstructors) {
+// Sorts data so that items are grouped together according to whichever of a
+// set of arbitrary given conditions is true first. If no conditions are met
+// for a given item, it's moved over to the end!
+export function sortByConditions(data, conditions) {
     data.sort((a, b) => {
-        const ai = thingConstructors.indexOf(a.constructor);
-        const bi = thingConstructors.indexOf(b.constructor);
+        const ai = conditions.findIndex(f => f(a));
+        const bi = conditions.findIndex(f => f(b));
 
         if (ai >= 0 && bi >= 0) {
             return ai - bi;
@@ -276,7 +275,7 @@ export function sortChronologically(data, {getDirectory, getName, getDate} = {})
 // This function also works for data lists which contain only tracks.
 export function sortAlbumsTracksChronologically(data, {getDate} = {}) {
     // Sort albums before tracks...
-    sortByThingType(data, [Album, Track]);
+    sortByConditions(data, [t => t.album === undefined]);
 
     // Group tracks by album...
     sortByDirectory(data, {
