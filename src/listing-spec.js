@@ -687,13 +687,16 @@ const listingSpec = [
         stringsKey: 'listTracks.withLyrics',
 
         data({wikiData}) {
-            return chunkByProperties(wikiData.trackData.filter(t => t.lyrics), ['album']);
+            return wikiData.albumData.map(album => ({
+                album,
+                tracks: album.tracks.filter(t => t.lyrics)
+            })).filter(({ tracks }) => tracks.length > 0);
         },
 
         html(chunks, {link, language}) {
             return fixWS`
                 <dl>
-                    ${chunks.map(({album, chunk: tracks}) => fixWS`
+                    ${chunks.map(({album, tracks}) => fixWS`
                         <dt>${language.$('listingPage.listTracks.withLyrics.album', {
                             album: link.album(album),
                             date: language.formatDate(album.date)
