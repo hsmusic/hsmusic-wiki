@@ -1712,6 +1712,7 @@ Object.assign(Language.prototype, {
     },
 
     // TODO: These are hard-coded. Is there a better way?
+    countAdditionalFiles: countHelper('additionalFiles', 'files'),
     countAlbums: countHelper('albums'),
     countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
     countContributions: countHelper('contributions'),

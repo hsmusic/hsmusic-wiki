@@ -51,7 +51,9 @@ export function generateAdditionalFilesList(additionalFiles, {language, getFileS
     const fileCount = additionalFiles.flatMap(g => g.files).length;
 
     return fixWS`
-        <p id="additional-files">${language.$('releaseInfo.additionalFiles.heading', {fileCount})}</p>
+        <p id="additional-files">${language.$('releaseInfo.additionalFiles.heading', {
+            additionalFiles: language.countAdditionalFiles(fileCount, {unit: true})
+        })}</p>
         <dl>
             ${additionalFiles.map(({ title, description, files }) => fixWS`
                 <dt>${(description
