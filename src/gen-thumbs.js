@@ -100,6 +100,7 @@ import {
 } from './util/cli.js';
 
 import {
+    commandExists,
     isMain,
     promisifyProcess,
 } from './util/node-utils.js';
@@ -133,18 +134,62 @@ function readFileMD5(filePath) {
     });
 }
 
-function generateImageThumbnails(filePath) {
+async function getImageMagickVersion(spawnConvert) {
+    const proc = spawnConvert(['--version'], false);
+
+    let allData = '';
+    proc.stdout.on('data', data => {
+        allData += data.toString();
+    });
+
+    await promisifyProcess(proc, false);
+
+    if (!allData.match(/ImageMagick/i)) {
+        return null;
+    }
+
+    const match = allData.match(/Version: (.*)/i);
+    if (!match) {
+        return 'unknown version';
+    }
+
+    return match[1];
+}
+
+async function getSpawnConvert() {
+    let fn, description, version;
+    if (await commandExists('convert')) {
+        fn = args => spawn('convert', args);
+        description = 'convert';
+    } else if (await commandExists('magick')) {
+        fn = (args, prefix = true) => spawn('magick',
+            (prefix ? ['convert', ...args] : args));
+        description = 'magick convert';
+    } else {
+        return [`no convert or magick binary`, null];
+    }
+
+    version = await getImageMagickVersion(fn);
+
+    if (version === null) {
+        return [`binary --version output didn't indicate it's ImageMagick`];
+    }
+
+    return [`${description} (${version})`, fn];
+}
+
+function generateImageThumbnails(filePath, {spawnConvert}) {
     const dirname = path.dirname(filePath);
     const extname = path.extname(filePath);
     const basename = path.basename(filePath, extname);
     const output = name => path.join(dirname, basename + name + '.jpg');
 
-    const convert = (name, {size, quality}) => spawn('convert', [
+    const convert = (name, {size, quality}) => spawnConvert([
+        filePath,
         '-strip',
         '-resize', `${size}x${size}>`,
         '-interlace', 'Plane',
         '-quality', `${quality}%`,
-        filePath,
         output(name)
     ]);
 
@@ -191,6 +236,20 @@ export default async function genThumbs(mediaPath, {
         if (name === '.git') return false;
         return true;
     };
+
+    const [convertInfo, spawnConvert] = await getSpawnConvert() ?? [];
+    if (!spawnConvert) {
+        logError`${`It looks like you don't have ImageMagick installed.`}`;
+        logError`ImageMagick is required to generate thumbnails for display on the wiki.`;
+        logError`(Error message: ${convertInfo})`;
+        logInfo`You can find info to help install ImageMagick on Linux, Windows, or macOS`;
+        logInfo`from its official website: ${`https://imagemagick.org/script/download.php`}`;
+        logInfo`If you have trouble working ImageMagick and would like some help, feel free`;
+        logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
+        return false;
+    } else {
+        logInfo`Found ImageMagick binary: ${convertInfo}`;
+    }
 
     let cache, firstRun = false, failedReadingCache = false;
     try {

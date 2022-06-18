@@ -2,6 +2,15 @@
 
 import { fileURLToPath } from 'url';
 
+import _commandExists from 'command-exists';
+
+// This package throws an error instead of returning false when the command
+// doesn't exist, for some reason. Yay for making logic more difficult!
+// Here's a straightforward workaround.
+export function commandExists(command) {
+    return _commandExists(command).then(() => true, () => false);
+}
+
 // Very cool function origin8ting in... http-music pro8a8ly!
 // Sorry if we happen to 8e violating past-us's copyright, lmao.
 export function promisifyProcess(proc, showLogging = true) {
