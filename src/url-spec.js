@@ -22,7 +22,7 @@ const urlSpec = {
             root: '',
             path: '<>',
 
-            home: '/',
+            home: '',
 
             album: 'album/<>/',
             albumCommentary: 'commentary/album/<>/',
