@@ -125,6 +125,7 @@ a:hover {
 
 #header.nav-has-main-links.nav-has-content {
     grid-template-columns: 2.5fr 3fr;
+    grid-template-rows: min-content 1fr;
     grid-template-areas:
         "main-links content"
         "bottom-row content";
@@ -148,6 +149,7 @@ a:hover {
 
 .nav-bottom-row {
     grid-area: bottom-row;
+    align-self: start;
 }
 
 .nav-main-links > span {
@@ -158,8 +160,7 @@ a:hover {
     font-weight: 800;
 }
 
-.nav-links-index > span:not(:first-child):not(.no-divider)::before,
-.nav-chronology-links > div.chronology:not(:last-child)::after {
+.nav-links-index > span:not(:first-child):not(.no-divider)::before {
     content: "\0020\00b7\0020";
     font-weight: 800;
 }
@@ -169,7 +170,7 @@ a:hover {
 }
 
 #header .chronology {
-    display: inline-block;
+    display: block;
 }
 
 #header .chronology .heading,
@@ -990,7 +991,7 @@ li > ul {
         display: block;
     }
 
-    #header > div {
+    #header > div:not(:first-child) {
         margin-top: 0.5em;
     }
 }

@@ -263,11 +263,8 @@ export function write(album, {wikiData}) {
                                 album: link.album(album, {class: 'current'})
                             })
                         },
-                        album.tracks.length > 1 && {
-                            divider: false,
-                            html: generateAlbumNavLinks(album, null, {language})
-                        },
                     ],
+                    bottomRowContent: generateAlbumNavLinks(album, null, {language}),
                     content: generateAlbumChronologyLinks(album, null, {generateChronologyLinks}),
                 },
 
