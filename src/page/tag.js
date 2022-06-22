@@ -87,6 +87,7 @@ function generateTagNav(tag, {
     });
 
     return {
+        linkContainerClasses: ['nav-links-hierarchy'],
         links: [
             {toHome: true},
             wikiData.wikiInfo.enableListings &&

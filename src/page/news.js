@@ -104,6 +104,7 @@ function generateNewsEntryNav(entry, {
     });
 
     return {
+        linkContainerClasses: ['nav-links-hierarchy'],
         links: [
             {toHome: true},
             {

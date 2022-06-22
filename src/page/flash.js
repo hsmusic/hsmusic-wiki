@@ -161,6 +161,7 @@ function generateNavForFlash(flash, {
     });
 
     return {
+        linkContainerClasses: ['nav-links-hierarchy'],
         links: [
             {toHome: true},
             {
@@ -172,12 +173,9 @@ function generateNavForFlash(flash, {
                     flash: link.flash(flash, {class: 'current'})
                 })
             },
-            previousNextLinks &&
-            {
-                divider: false,
-                html: `(${previousNextLinks})`
-            }
         ],
+
+        bottomRowContent: previousNextLinks && `(${previousNextLinks})`,
 
         content: fixWS`
             <div>

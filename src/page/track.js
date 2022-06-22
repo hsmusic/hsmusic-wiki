@@ -306,6 +306,7 @@ export function write(track, {wikiData}) {
                 }),
 
                 nav: {
+                    linkContainerClasses: ['nav-links-hierarchy'],
                     links: [
                         {toHome: true},
                         {
@@ -322,20 +323,13 @@ export function write(track, {wikiData}) {
                                 track: link.track(track, {class: 'current', to})
                             })
                         },
-                        album.tracks.length > 1 &&
-                        {
-                            divider: false,
-                            html: generateAlbumNavLinks(album, track, {
-                                generatePreviousNextLinks,
-                                language
-                            })
-                        }
                     ].filter(Boolean),
-                    content: fixWS`
-                        <div>
-                            ${generateAlbumChronologyLinks(album, track, {generateChronologyLinks})}
-                        </div>
-                    `
+                    content: generateAlbumChronologyLinks(album, track, {generateChronologyLinks}),
+                    bottomRowContent: (album.tracks.length > 1 &&
+                        generateAlbumNavLinks(album, track, {
+                            generatePreviousNextLinks,
+                            language,
+                        })),
                 },
 
                 secondaryNav: generateAlbumSecondaryNav(album, track, {

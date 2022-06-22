@@ -76,6 +76,7 @@ export function write(listing, {wikiData}) {
                 },
 
                 nav: {
+                    linkContainerClasses: ['nav-links-hierarchy'],
                     links: [
                         {toHome: true},
                         {

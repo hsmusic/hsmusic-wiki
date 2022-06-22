@@ -255,6 +255,7 @@ export function write(album, {wikiData}) {
                 }),
 
                 nav: {
+                    linkContainerClasses: ['nav-links-hierarchy'],
                     links: [
                         {toHome: true},
                         {
@@ -262,13 +263,12 @@ export function write(album, {wikiData}) {
                                 album: link.album(album, {class: 'current'})
                             })
                         },
-                        album.tracks.length > 1 &&
-                        {
+                        album.tracks.length > 1 && {
                             divider: false,
                             html: generateAlbumNavLinks(album, null, {language})
-                        }
+                        },
                     ],
-                    content: html.tag('div', generateAlbumChronologyLinks(album, null, {generateChronologyLinks}))
+                    content: generateAlbumChronologyLinks(album, null, {generateChronologyLinks}),
                 },
 
                 secondaryNav: generateAlbumSecondaryNav(album, null, {
@@ -464,7 +464,7 @@ export function generateAlbumNavLinks(album, currentTrack, {
 }
 
 export function generateAlbumChronologyLinks(album, currentTrack, {generateChronologyLinks}) {
-    return [
+    return html.tag('div', {class: 'nav-chronology-links'}, [
         currentTrack && generateChronologyLinks(currentTrack, {
             contribKey: 'artistContribs',
             getThings: artist => [...artist.tracksAsArtist, ...artist.tracksAsContributor],
@@ -481,5 +481,5 @@ export function generateAlbumChronologyLinks(album, currentTrack, {generateChron
             getThings: artist => [...artist.albumsAsCoverArtist, ...artist.tracksAsCoverArtist],
             headingString: 'misc.chronology.heading.coverArt'
         })
-    ].filter(Boolean).join('\n');
+    ].filter(Boolean).join('\n'));
 }

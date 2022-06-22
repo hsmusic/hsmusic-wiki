@@ -120,39 +120,42 @@ a:hover {
 }
 
 #header {
-    display: flex;
+    display: grid;
+    grid-template-columns: max-content 3fr;
+    grid-template-areas:
+        "main-links content"
+        "bottom-row content";
 }
 
-#header > h2 {
-    font-size: 1em;
-    margin: 0 20px 0 0;
-    font-weight: normal;
+.nav-main-links {
+    grid-area: main-links;
+    margin-right: 20px;
 }
 
-#header > h2 a.current {
-    font-weight: 800;
+.nav-content {
+    grid-area: content;
 }
 
-#header > h2 > span {
+.nav-bottom-row {
+    grid-area: bottom-row;
+}
+
+.nav-main-links > span {
     white-space: nowrap;
 }
 
-#header > div {
-    flex-grow: 1;
-}
-
-#header > div > *:not(:last-child)::after {
-    content: " \00b7 ";
+.nav-main-links > span > a.current {
     font-weight: 800;
 }
 
-.dot-between-spans > span:not(:last-child)::after {
-    content: " \00b7 ";
+.nav-links-index > span:not(:first-child):not(.no-divider)::before,
+.nav-chronology-links > div.chronology:not(:last-child)::after {
+    content: "\0020\00b7\0020";
     font-weight: 800;
 }
 
-.dot-between-spans > span {
-    white-space: nowrap;
+.nav-links-hierarchy > span:not(:first-child):not(.no-divider)::before {
+    content: "\0020/\0020";
 }
 
 #header .chronology {

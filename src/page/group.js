@@ -245,6 +245,7 @@ function generateGroupNav(currentGroup, isGallery, {
     });
 
     return {
+        linkContainerClasses: ['nav-links-hierarchy'],
         links: [
             {toHome: true},
             wikiInfo.enableListings &&

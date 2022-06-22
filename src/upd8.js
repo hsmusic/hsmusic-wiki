@@ -175,7 +175,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 9;
+const CACHEBUST = 10;
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
@@ -883,7 +883,9 @@ writePage.html = (pageInfo, {
 
     nav.classes ??= [];
     nav.content ??= '';
+    nav.bottomRowContent ??= '';
     nav.links ??= [];
+    nav.linkContainerClasses ??= [];
 
     secondaryNav ??= {};
     secondaryNav.content ??= '';
@@ -951,6 +953,7 @@ writePage.html = (pageInfo, {
     const sidebarRightHTML = generateSidebarHTML('sidebar-right', sidebarRight);
 
     if (nav.simple) {
+        nav.linkContainerClasses = ['nav-links-hierarchy'];
         nav.links = [
             {toHome: true},
             {toCurrentPage: true}
@@ -973,13 +976,14 @@ writePage.html = (pageInfo, {
             linkTitle ??= title;
         }
 
-        let part = prev && (cur.divider ?? true) ? '/ ' : '';
+        let partContent;
 
         if (typeof cur.html === 'string') {
             if (!cur.html) {
                 logWarn`Empty HTML in nav link ${JSON.stringify(cur)}`;
+                console.trace();
             }
-            part += `<span>${cur.html}</span>`;
+            partContent = cur.html;
         } else {
             const attributes = {
                 class: (cur.toCurrentPage || i === links.length - 1) && 'current',
@@ -996,8 +1000,13 @@ writePage.html = (pageInfo, {
             if (attributes.href === null) {
                 throw new Error(`Expected some href specifier for link to ${linkTitle} (${JSON.stringify(cur)})`);
             }
-            part += html.tag('a', attributes, linkTitle);
+            partContent = html.tag('a', attributes, linkTitle);
         }
+
+        const part = html.tag('span',
+            {class: cur.divider === false && 'no-divider'},
+            partContent);
+
         navLinkParts.push(part);
     }
 
@@ -1006,8 +1015,11 @@ writePage.html = (pageInfo, {
         id: 'header',
         class: nav.classes
     }, [
-        links.length && html.tag('h2', {class: 'highlight-last-link'}, navLinkParts),
-        nav.content
+        links.length && html.tag('div',
+            {class: ['nav-main-links', ...nav.linkContainerClasses]},
+            navLinkParts),
+        html.tag('div', {class: 'nav-content'}, nav.content),
+        nav.bottomRowContent && html.tag('div', {class: 'nav-bottom-row'}, nav.bottomRowContent),
     ]);
 
     const secondaryNavHTML = html.tag('nav', {

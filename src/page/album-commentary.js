@@ -69,6 +69,7 @@ export function write(album, {wikiData}) {
             },
 
             nav: {
+                linkContainerClasses: ['nav-links-hierarchy'],
                 links: [
                     {toHome: true},
                     {

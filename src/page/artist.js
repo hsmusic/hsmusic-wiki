@@ -495,6 +495,7 @@ function generateNavForArtist(artist, isGallery, hasGallery, {
         }))
 
     return {
+        linkContainerClasses: ['nav-links-hierarchy'],
         links: [
             {toHome: true},
             wikiInfo.enableListings &&

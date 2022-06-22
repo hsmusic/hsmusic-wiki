@@ -99,22 +99,23 @@ export function writeTargetless({wikiData}) {
             },
 
             nav: {
-                content: fixWS`
-                    <h2 class="dot-between-spans">
-                        ${[
-                            link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
-                            wikiInfo.enableListings &&
-                            link.listingIndex('', {text: language.$('listingIndex.title'), to}),
-                            wikiInfo.enableNews &&
-                            link.newsIndex('', {text: language.$('newsIndex.title'), to}),
-                            wikiInfo.enableFlashesAndGames &&
-                            link.flashIndex('', {text: language.$('flashIndex.title'), to}),
-                            ...(staticPageData
-                                .filter(page => page.showInNavigationBar)
-                                .map(page => link.staticPage(page, {text: page.nameShort})))
-                        ].filter(Boolean).map(link => `<span>${link}</span>`).join('\n')}
-                    </h2>
-                `
+                linkContainerClasses: ['nav-links-index'],
+                links: [
+                    link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
+
+                    wikiInfo.enableListings &&
+                    link.listingIndex('', {text: language.$('listingIndex.title'), to}),
+
+                    wikiInfo.enableNews &&
+                    link.newsIndex('', {text: language.$('newsIndex.title'), to}),
+
+                    wikiInfo.enableFlashesAndGames &&
+                    link.flashIndex('', {text: language.$('flashIndex.title'), to}),
+
+                    ...(staticPageData
+                        .filter(page => page.showInNavigationBar)
+                        .map(page => link.staticPage(page, {text: page.nameShort}))),
+                ].filter(Boolean).map(html => ({html})),
             }
         })
     };
