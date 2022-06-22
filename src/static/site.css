@@ -121,10 +121,20 @@ a:hover {
 
 #header {
     display: grid;
-    grid-template-columns: max-content 3fr;
+}
+
+#header.nav-has-main-links.nav-has-content {
+    grid-template-columns: 2.5fr 3fr;
     grid-template-areas:
         "main-links content"
         "bottom-row content";
+}
+
+#header.nav-has-main-links:not(.nav-has-content) {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "main-links"
+        "bottom-row";
 }
 
 .nav-main-links {

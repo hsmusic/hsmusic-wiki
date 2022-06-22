@@ -1013,12 +1013,17 @@ writePage.html = (pageInfo, {
     const navHTML = html.tag('nav', {
         [html.onlyIfContent]: true,
         id: 'header',
-        class: nav.classes
+        class: [
+            ...nav.classes,
+            links.length && 'nav-has-main-links',
+            nav.content && 'nav-has-content',
+            nav.bottomRowContent && 'nav-has-bottom-row',
+        ],
     }, [
         links.length && html.tag('div',
             {class: ['nav-main-links', ...nav.linkContainerClasses]},
             navLinkParts),
-        html.tag('div', {class: 'nav-content'}, nav.content),
+        nav.content && html.tag('div', {class: 'nav-content'}, nav.content),
         nav.bottomRowContent && html.tag('div', {class: 'nav-bottom-row'}, nav.bottomRowContent),
     ]);
 

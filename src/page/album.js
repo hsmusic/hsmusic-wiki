@@ -464,7 +464,10 @@ export function generateAlbumNavLinks(album, currentTrack, {
 }
 
 export function generateAlbumChronologyLinks(album, currentTrack, {generateChronologyLinks}) {
-    return html.tag('div', {class: 'nav-chronology-links'}, [
+    return html.tag('div', {
+        [html.onlyIfContent]: true,
+        class: 'nav-chronology-links',
+    }, [
         currentTrack && generateChronologyLinks(currentTrack, {
             contribKey: 'artistContribs',
             getThings: artist => [...artist.tracksAsArtist, ...artist.tracksAsContributor],
