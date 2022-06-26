@@ -8,117 +8,133 @@
 // actual path strings. More a8stract operations using wiki data o8jects is
 // the domain of link.js.
 
-import * as path from 'path';
-import { withEntries } from './sugar.js';
+import * as path from "path";
+import { withEntries } from "./sugar.js";
 
 export function generateURLs(urlSpec) {
-    const getValueForFullKey = (obj, fullKey, prop = null) => {
-        const [ groupKey, subKey ] = fullKey.split('.');
-        if (!groupKey || !subKey) {
-            throw new Error(`Expected group key and subkey (got ${fullKey})`);
-        }
+  const getValueForFullKey = (obj, fullKey, prop = null) => {
+    const [groupKey, subKey] = fullKey.split(".");
+    if (!groupKey || !subKey) {
+      throw new Error(`Expected group key and subkey (got ${fullKey})`);
+    }
 
-        if (!obj.hasOwnProperty(groupKey)) {
-            throw new Error(`Expected valid group key (got ${groupKey})`);
-        }
+    if (!obj.hasOwnProperty(groupKey)) {
+      throw new Error(`Expected valid group key (got ${groupKey})`);
+    }
 
-        const group = obj[groupKey];
+    const group = obj[groupKey];
 
-        if (!group.hasOwnProperty(subKey)) {
-            throw new Error(`Expected valid subkey (got ${subKey} for group ${groupKey})`);
-        }
+    if (!group.hasOwnProperty(subKey)) {
+      throw new Error(
+        `Expected valid subkey (got ${subKey} for group ${groupKey})`
+      );
+    }
 
-        return {
-            value: group[subKey],
-            group
-        };
+    return {
+      value: group[subKey],
+      group,
+    };
+  };
+
+  // This should be called on values which are going to be passed to
+  // path.relative, because relative will resolve a leading slash as the root
+  // directory of the working device, which we aren't looking for here.
+  const trimLeadingSlash = (P) => (P.startsWith("/") ? P.slice(1) : P);
+
+  const generateTo = (fromPath, fromGroup) => {
+    const A = trimLeadingSlash(fromPath);
+
+    const rebasePrefix = "../".repeat(
+      (fromGroup.prefix || "").split("/").filter(Boolean).length
+    );
+
+    const pathHelper = (toPath, toGroup) => {
+      let B = trimLeadingSlash(toPath);
+
+      let argIndex = 0;
+      B = B.replaceAll("<>", () => `<${argIndex++}>`);
+
+      if (toGroup.prefix !== fromGroup.prefix) {
+        // TODO: Handle differing domains in prefixes.
+        B = rebasePrefix + (toGroup.prefix || "") + B;
+      }
+
+      const suffix = toPath.endsWith("/") ? "/" : "";
+
+      return {
+        posix: path.posix.relative(A, B) + suffix,
+        device: path.relative(A, B) + suffix,
+      };
     };
 
-    // This should be called on values which are going to be passed to
-    // path.relative, because relative will resolve a leading slash as the root
-    // directory of the working device, which we aren't looking for here.
-    const trimLeadingSlash = P => P.startsWith('/') ? P.slice(1) : P;
+    const groupSymbol = Symbol();
 
-    const generateTo = (fromPath, fromGroup) => {
-        const A = trimLeadingSlash(fromPath);
+    const groupHelper = (urlGroup) => ({
+      [groupSymbol]: urlGroup,
+      ...withEntries(urlGroup.paths, (entries) =>
+        entries.map(([key, path]) => [key, pathHelper(path, urlGroup)])
+      ),
+    });
 
-        const rebasePrefix = '../'.repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
+    const relative = withEntries(urlSpec, (entries) =>
+      entries.map(([key, urlGroup]) => [key, groupHelper(urlGroup)])
+    );
 
-        const pathHelper = (toPath, toGroup) => {
-            let B = trimLeadingSlash(toPath);
+    const toHelper =
+      (delimiterMode) =>
+      (key, ...args) => {
+        const {
+          value: { [delimiterMode]: template },
+        } = getValueForFullKey(relative, key);
 
-            let argIndex = 0;
-            B = B.replaceAll('<>', () => `<${argIndex++}>`);
-
-            if (toGroup.prefix !== fromGroup.prefix) {
-                // TODO: Handle differing domains in prefixes.
-                B = rebasePrefix + (toGroup.prefix || '') + B;
-            }
-
-            const suffix = (toPath.endsWith('/') ? '/' : '');
-
-            return {
-                posix: path.posix.relative(A, B) + suffix,
-                device: path.relative(A, B) + suffix
-            };
-        };
-
-        const groupSymbol = Symbol();
-
-        const groupHelper = urlGroup => ({
-            [groupSymbol]: urlGroup,
-            ...withEntries(urlGroup.paths, entries => entries
-                .map(([key, path]) => [key, pathHelper(path, urlGroup)]))
+        let missing = 0;
+        let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => {
+          if (n < args.length) {
+            return args[n];
+          } else {
+            missing++;
+          }
         });
 
-        const relative = withEntries(urlSpec, entries => entries
-            .map(([key, urlGroup]) => [key, groupHelper(urlGroup)]));
+        if (missing) {
+          throw new Error(
+            `Expected ${missing + args.length} arguments, got ${
+              args.length
+            } (key ${key}, args [${args}])`
+          );
+        }
 
-        const toHelper = (delimiterMode) => (key, ...args) => {
-            const {
-                value: {[delimiterMode]: template}
-            } = getValueForFullKey(relative, key);
+        return result;
+      };
 
-            let missing = 0;
-            let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => {
-                if (n < args.length) {
-                    return args[n];
-                } else {
-                    missing++;
-                }
-            });
-
-            if (missing) {
-                throw new Error(`Expected ${missing + args.length} arguments, got ${args.length} (key ${key}, args [${args}])`);
-            }
-
-            return result;
-        };
-
-        return {
-            to: toHelper('posix'),
-            toDevice: toHelper('device')
-        };
+    return {
+      to: toHelper("posix"),
+      toDevice: toHelper("device"),
     };
+  };
 
-    const generateFrom = () => {
-        const map = withEntries(urlSpec, entries => entries
-            .map(([key, group]) => [key, withEntries(group.paths, entries => entries
-                .map(([key, path]) => [key, generateTo(path, group)])
-            )]));
+  const generateFrom = () => {
+    const map = withEntries(urlSpec, (entries) =>
+      entries.map(([key, group]) => [
+        key,
+        withEntries(group.paths, (entries) =>
+          entries.map(([key, path]) => [key, generateTo(path, group)])
+        ),
+      ])
+    );
 
-        const from = key => getValueForFullKey(map, key).value;
+    const from = (key) => getValueForFullKey(map, key).value;
 
-        return {from, map};
-    };
+    return { from, map };
+  };
 
-    return generateFrom();
+  return generateFrom();
 }
 
-const thumbnailHelper = name => file =>
-    file.replace(/\.(jpg|png)$/, name + '.jpg');
+const thumbnailHelper = (name) => (file) =>
+  file.replace(/\.(jpg|png)$/, name + ".jpg");
 
 export const thumb = {
-    medium: thumbnailHelper('.medium'),
-    small: thumbnailHelper('.small')
+  medium: thumbnailHelper(".medium"),
+  small: thumbnailHelper(".small"),
 };

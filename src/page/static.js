@@ -4,37 +4,34 @@
 
 // Imports
 
-import fixWS from 'fix-whitespace';
+import fixWS from "fix-whitespace";
 
 // Page exports
 
-export function targets({wikiData}) {
-    return wikiData.staticPageData;
+export function targets({ wikiData }) {
+  return wikiData.staticPageData;
 }
 
-export function write(staticPage, {wikiData}) {
-    const page = {
-        type: 'page',
-        path: ['staticPage', staticPage.directory],
-        page: ({
-            language,
-            transformMultiline
-        }) => ({
-            title: staticPage.name,
-            stylesheet: staticPage.stylesheet,
+export function write(staticPage, { wikiData }) {
+  const page = {
+    type: "page",
+    path: ["staticPage", staticPage.directory],
+    page: ({ language, transformMultiline }) => ({
+      title: staticPage.name,
+      stylesheet: staticPage.stylesheet,
 
-            main: {
-                content: fixWS`
+      main: {
+        content: fixWS`
                     <div class="long-content">
                         <h1>${staticPage.name}</h1>
                         ${transformMultiline(staticPage.content)}
                     </div>
-                `
-            },
+                `,
+      },
 
-            nav: {simple: true}
-        })
-    };
+      nav: { simple: true },
+    }),
+  };
 
-    return [page];
+  return [page];
 }

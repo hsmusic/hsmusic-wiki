@@ -4,16 +4,16 @@
  */
 
 html {
-    background-color: #222222;
-    color: white;
+  background-color: #222222;
+  color: white;
 }
 
 body {
-    padding: 15px;
+  padding: 15px;
 }
 
 main {
-    background-color: rgba(0, 0, 0, 0.6);
-    border: 1px dotted white;
-    padding: 20px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px dotted white;
+  padding: 20px;
 }

@@ -74,21 +74,21 @@
 //      function, which provides a mapping of exposed property names to whether
 //      or not their dependencies are yet met.
 
-import { color, ENABLE_COLOR } from '../util/cli.js';
+import { color, ENABLE_COLOR } from "../util/cli.js";
 
-import { inspect as nodeInspect } from 'util';
+import { inspect as nodeInspect } from "util";
 
 function inspect(value) {
-    return nodeInspect(value, {colors: ENABLE_COLOR});
+  return nodeInspect(value, { colors: ENABLE_COLOR });
 }
 
 export default class CacheableObject {
-    static instance = Symbol('CacheableObject `this` instance');
+  static instance = Symbol("CacheableObject `this` instance");
 
-    #propertyUpdateValues = Object.create(null);
-    #propertyUpdateCacheInvalidators = Object.create(null);
+  #propertyUpdateValues = Object.create(null);
+  #propertyUpdateCacheInvalidators = Object.create(null);
 
-    /*
+  /*
     // Note the constructor doesn't take an initial data source. Due to a quirk
     // of JavaScript, private members can't be accessed before the superclass's
     // constructor is finished processing - so if we call the overridden
@@ -99,211 +99,238 @@ export default class CacheableObject {
     // after constructing the new instance of the Thing (sub)class.
     */
 
-    constructor() {
-        this.#defineProperties();
-        this.#initializeUpdatingPropertyValues();
+  constructor() {
+    this.#defineProperties();
+    this.#initializeUpdatingPropertyValues();
 
-        if (CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
-            return new Proxy(this, {
-                get: (obj, key) => {
-                    if (!Object.hasOwn(obj, key)) {
-                        if (key !== 'constructor') {
-                            CacheableObject._invalidAccesses.add(`(${obj.constructor.name}).${key}`);
-                        }
-                    }
-                    return obj[key];
-                }
-            });
+    if (CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
+      return new Proxy(this, {
+        get: (obj, key) => {
+          if (!Object.hasOwn(obj, key)) {
+            if (key !== "constructor") {
+              CacheableObject._invalidAccesses.add(
+                `(${obj.constructor.name}).${key}`
+              );
+            }
+          }
+          return obj[key];
+        },
+      });
+    }
+  }
+
+  #initializeUpdatingPropertyValues() {
+    for (const [property, descriptor] of Object.entries(
+      this.constructor.propertyDescriptors
+    )) {
+      const { flags, update } = descriptor;
+
+      if (!flags.update) {
+        continue;
+      }
+
+      if (update?.default) {
+        this[property] = update?.default;
+      } else {
+        this[property] = null;
+      }
+    }
+  }
+
+  #defineProperties() {
+    if (!this.constructor.propertyDescriptors) {
+      throw new Error(
+        `Expected constructor ${this.constructor.name} to define propertyDescriptors`
+      );
+    }
+
+    for (const [property, descriptor] of Object.entries(
+      this.constructor.propertyDescriptors
+    )) {
+      const { flags } = descriptor;
+
+      const definition = {
+        configurable: false,
+        enumerable: true,
+      };
+
+      if (flags.update) {
+        definition.set =
+          this.#getUpdateObjectDefinitionSetterFunction(property);
+      }
+
+      if (flags.expose) {
+        definition.get =
+          this.#getExposeObjectDefinitionGetterFunction(property);
+      }
+
+      Object.defineProperty(this, property, definition);
+    }
+
+    Object.seal(this);
+  }
+
+  #getUpdateObjectDefinitionSetterFunction(property) {
+    const { update } = this.#getPropertyDescriptor(property);
+    const validate = update?.validate;
+    const allowNull = update?.allowNull;
+
+    return (newValue) => {
+      const oldValue = this.#propertyUpdateValues[property];
+
+      if (newValue === undefined) {
+        throw new TypeError(`Properties cannot be set to undefined`);
+      }
+
+      if (newValue === oldValue) {
+        return;
+      }
+
+      if (newValue !== null && validate) {
+        try {
+          const result = validate(newValue);
+          if (result === undefined) {
+            throw new TypeError(`Validate function returned undefined`);
+          } else if (result !== true) {
+            throw new TypeError(`Validation failed for value ${newValue}`);
+          }
+        } catch (error) {
+          error.message = `Property ${color.green(property)} (${inspect(
+            this[property]
+          )} -> ${inspect(newValue)}): ${error.message}`;
+          throw error;
         }
+      }
+
+      this.#propertyUpdateValues[property] = newValue;
+      this.#invalidateCachesDependentUpon(property);
+    };
+  }
+
+  #getUpdatePropertyValidateFunction(property) {
+    const descriptor = this.#getPropertyDescriptor(property);
+  }
+
+  #getPropertyDescriptor(property) {
+    return this.constructor.propertyDescriptors[property];
+  }
+
+  #invalidateCachesDependentUpon(property) {
+    for (const invalidate of this.#propertyUpdateCacheInvalidators[property] ||
+      []) {
+      invalidate();
     }
+  }
 
-    #initializeUpdatingPropertyValues() {
-        for (const [ property, descriptor ] of Object.entries(this.constructor.propertyDescriptors)) {
-            const { flags, update } = descriptor;
+  #getExposeObjectDefinitionGetterFunction(property) {
+    const { flags } = this.#getPropertyDescriptor(property);
+    const compute = this.#getExposeComputeFunction(property);
 
-            if (!flags.update) {
-                continue;
-            }
-
-            if (update?.default) {
-                this[property] = update?.default;
-            } else {
-                this[property] = null;
-            }
-        }
-    }
-
-    #defineProperties() {
-        if (!this.constructor.propertyDescriptors) {
-            throw new Error(`Expected constructor ${this.constructor.name} to define propertyDescriptors`);
-        }
-
-        for (const [ property, descriptor ] of Object.entries(this.constructor.propertyDescriptors)) {
-            const { flags } = descriptor;
-
-            const definition = {
-                configurable: false,
-                enumerable: true
-            };
-
-            if (flags.update) {
-                definition.set = this.#getUpdateObjectDefinitionSetterFunction(property);
-            }
-
-            if (flags.expose) {
-                definition.get = this.#getExposeObjectDefinitionGetterFunction(property);
-            }
-
-            Object.defineProperty(this, property, definition);
-        }
-
-        Object.seal(this);
-    }
-
-    #getUpdateObjectDefinitionSetterFunction(property) {
-        const { update } = this.#getPropertyDescriptor(property);
-        const validate = update?.validate;
-        const allowNull = update?.allowNull;
-
-        return (newValue) => {
-            const oldValue = this.#propertyUpdateValues[property];
-
-            if (newValue === undefined) {
-                throw new TypeError(`Properties cannot be set to undefined`);
-            }
-
-            if (newValue === oldValue) {
-                return;
-            }
-
-            if (newValue !== null && validate) {
-                try {
-                    const result = validate(newValue);
-                    if (result === undefined) {
-                        throw new TypeError(`Validate function returned undefined`);
-                    } else if (result !== true) {
-                        throw new TypeError(`Validation failed for value ${newValue}`);
-                    }
-                } catch (error) {
-                    error.message = `Property ${color.green(property)} (${inspect(this[property])} -> ${inspect(newValue)}): ${error.message}`;
-                    throw error;
-                }
-            }
-
-            this.#propertyUpdateValues[property] = newValue;
-            this.#invalidateCachesDependentUpon(property);
-        };
-    }
-
-    #getUpdatePropertyValidateFunction(property) {
-        const descriptor = this.#getPropertyDescriptor(property);
-    }
-
-    #getPropertyDescriptor(property) {
-        return this.constructor.propertyDescriptors[property];
-    }
-
-    #invalidateCachesDependentUpon(property) {
-        for (const invalidate of this.#propertyUpdateCacheInvalidators[property] || []) {
-            invalidate();
-        }
-    }
-
-    #getExposeObjectDefinitionGetterFunction(property) {
-        const { flags } = this.#getPropertyDescriptor(property);
-        const compute = this.#getExposeComputeFunction(property);
-
-        if (compute) {
-            let cachedValue;
-            const checkCacheValid = this.#getExposeCheckCacheValidFunction(property);
-            return () => {
-                if (checkCacheValid()) {
-                    return cachedValue;
-                } else {
-                    return (cachedValue = compute());
-                }
-            };
-        } else if (!flags.update && !compute) {
-            throw new Error(`Exposed property ${property} does not update and is missing compute function`);
+    if (compute) {
+      let cachedValue;
+      const checkCacheValid = this.#getExposeCheckCacheValidFunction(property);
+      return () => {
+        if (checkCacheValid()) {
+          return cachedValue;
         } else {
-            return () => this.#propertyUpdateValues[property];
+          return (cachedValue = compute());
         }
+      };
+    } else if (!flags.update && !compute) {
+      throw new Error(
+        `Exposed property ${property} does not update and is missing compute function`
+      );
+    } else {
+      return () => this.#propertyUpdateValues[property];
+    }
+  }
+
+  #getExposeComputeFunction(property) {
+    const { flags, expose } = this.#getPropertyDescriptor(property);
+
+    const compute = expose?.compute;
+    const transform = expose?.transform;
+
+    if (flags.update && !transform) {
+      return null;
+    } else if (flags.update && compute) {
+      throw new Error(
+        `Updating property ${property} has compute function, should be formatted as transform`
+      );
+    } else if (!flags.update && !compute) {
+      throw new Error(
+        `Exposed property ${property} does not update and is missing compute function`
+      );
     }
 
-    #getExposeComputeFunction(property) {
-        const { flags, expose } = this.#getPropertyDescriptor(property);
+    const dependencyKeys = expose.dependencies || [];
+    const dependencyGetters = dependencyKeys.map((key) => () => [
+      key,
+      this.#propertyUpdateValues[key],
+    ]);
+    const getAllDependencies = () =>
+      Object.fromEntries(
+        dependencyGetters
+          .map((f) => f())
+          .concat([[this.constructor.instance, this]])
+      );
 
-        const compute = expose?.compute;
-        const transform = expose?.transform;
+    if (flags.update) {
+      return () =>
+        transform(this.#propertyUpdateValues[property], getAllDependencies());
+    } else {
+      return () => compute(getAllDependencies());
+    }
+  }
 
-        if (flags.update && !transform) {
-            return null;
-        } else if (flags.update && compute) {
-            throw new Error(`Updating property ${property} has compute function, should be formatted as transform`);
-        } else if (!flags.update && !compute) {
-            throw new Error(`Exposed property ${property} does not update and is missing compute function`);
-        }
+  #getExposeCheckCacheValidFunction(property) {
+    const { flags, expose } = this.#getPropertyDescriptor(property);
 
-        const dependencyKeys = expose.dependencies || [];
-        const dependencyGetters = dependencyKeys.map(key => () => [key, this.#propertyUpdateValues[key]]);
-        const getAllDependencies = () => Object.fromEntries(dependencyGetters.map(f => f())
-            .concat([[this.constructor.instance, this]]));
+    let valid = false;
 
-        if (flags.update) {
-            return () => transform(this.#propertyUpdateValues[property], getAllDependencies());
-        } else {
-            return () => compute(getAllDependencies());
-        }
+    const invalidate = () => {
+      valid = false;
+    };
+
+    const dependencyKeys = new Set(expose?.dependencies);
+
+    if (flags.update) {
+      dependencyKeys.add(property);
     }
 
-    #getExposeCheckCacheValidFunction(property) {
-        const { flags, expose } = this.#getPropertyDescriptor(property);
-
-        let valid = false;
-
-        const invalidate = () => {
-            valid = false;
-        };
-
-        const dependencyKeys = new Set(expose?.dependencies);
-
-        if (flags.update) {
-            dependencyKeys.add(property);
-        }
-
-        for (const key of dependencyKeys) {
-            if (this.#propertyUpdateCacheInvalidators[key]) {
-                this.#propertyUpdateCacheInvalidators[key].push(invalidate);
-            } else {
-                this.#propertyUpdateCacheInvalidators[key] = [invalidate];
-            }
-        }
-
-        return () => {
-            if (!valid) {
-                valid = true;
-                return false;
-            } else {
-                return true;
-            }
-        };
+    for (const key of dependencyKeys) {
+      if (this.#propertyUpdateCacheInvalidators[key]) {
+        this.#propertyUpdateCacheInvalidators[key].push(invalidate);
+      } else {
+        this.#propertyUpdateCacheInvalidators[key] = [invalidate];
+      }
     }
 
-    static DEBUG_SLOW_TRACK_INVALID_PROPERTIES = false;
-    static _invalidAccesses = new Set();
+    return () => {
+      if (!valid) {
+        valid = true;
+        return false;
+      } else {
+        return true;
+      }
+    };
+  }
 
-    static showInvalidAccesses() {
-        if (!this.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
-            return;
-        }
+  static DEBUG_SLOW_TRACK_INVALID_PROPERTIES = false;
+  static _invalidAccesses = new Set();
 
-        if (!this._invalidAccesses.size) {
-            return;
-        }
-
-        console.log(`${this._invalidAccesses.size} unique invalid accesses:`);
-        for (const line of this._invalidAccesses) {
-            console.log(` - ${line}`);
-        }
+  static showInvalidAccesses() {
+    if (!this.DEBUG_SLOW_TRACK_INVALID_PROPERTIES) {
+      return;
     }
+
+    if (!this._invalidAccesses.size) {
+      return;
+    }
+
+    console.log(`${this._invalidAccesses.size} unique invalid accesses:`);
+    for (const line of this._invalidAccesses) {
+      console.log(` - ${line}`);
+    }
+  }
 }

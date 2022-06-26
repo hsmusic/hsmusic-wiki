@@ -17,84 +17,84 @@
 // This only processes files one at a time because I'm lazy and stat calls
 // are very, very fast.
 
-import { stat } from 'fs/promises';
-import { logWarn } from './util/cli.js';
+import { stat } from "fs/promises";
+import { logWarn } from "./util/cli.js";
 
 export default class FileSizePreloader {
-    #paths = [];
-    #sizes = [];
-    #loadedPathIndex = -1;
+  #paths = [];
+  #sizes = [];
+  #loadedPathIndex = -1;
 
-    #loadingPromise = null;
-    #resolveLoadingPromise = null;
+  #loadingPromise = null;
+  #resolveLoadingPromise = null;
 
-    loadPaths(...paths) {
-        this.#paths.push(...paths.filter(p => !this.#paths.includes(p)));
-        return this.#startLoadingPaths();
+  loadPaths(...paths) {
+    this.#paths.push(...paths.filter((p) => !this.#paths.includes(p)));
+    return this.#startLoadingPaths();
+  }
+
+  waitUntilDoneLoading() {
+    return this.#loadingPromise ?? Promise.resolve();
+  }
+
+  #startLoadingPaths() {
+    if (this.#loadingPromise) {
+      return this.#loadingPromise;
     }
 
-    waitUntilDoneLoading() {
-        return this.#loadingPromise ?? Promise.resolve();
+    this.#loadingPromise = new Promise((resolve) => {
+      this.#resolveLoadingPromise = resolve;
+    });
+
+    this.#loadNextPath();
+
+    return this.#loadingPromise;
+  }
+
+  async #loadNextPath() {
+    if (this.#loadedPathIndex === this.#paths.length - 1) {
+      return this.#doneLoadingPaths();
     }
 
-    #startLoadingPaths() {
-        if (this.#loadingPromise) {
-            return this.#loadingPromise;
-        }
+    let size;
 
-        this.#loadingPromise = new Promise((resolve => {
-            this.#resolveLoadingPromise = resolve;
-        }));
+    const path = this.#paths[this.#loadedPathIndex + 1];
 
-        this.#loadNextPath();
-
-        return this.#loadingPromise;
+    try {
+      size = await this.readFileSize(path);
+    } catch (error) {
+      // Oops! Discard that path, and don't increment the index before
+      // moving on, since the next path will now be in its place.
+      this.#paths.splice(this.#loadedPathIndex + 1, 1);
+      logWarn`Failed to process file size for ${path}: ${error.message}`;
+      return this.#loadNextPath();
     }
 
-    async #loadNextPath() {
-        if (this.#loadedPathIndex === this.#paths.length - 1) {
-            return this.#doneLoadingPaths();
-        }
+    this.#sizes.push(size);
+    this.#loadedPathIndex++;
+    return this.#loadNextPath();
+  }
 
-        let size;
+  #doneLoadingPaths() {
+    this.#resolveLoadingPromise();
+    this.#loadingPromise = null;
+    this.#resolveLoadingPromise = null;
+  }
 
-        const path = this.#paths[this.#loadedPathIndex + 1];
+  // Override me if you want?
+  // The rest of the code here is literally just a queue system, so you could
+  // pretty much repurpose it for anything... but there are probably cleaner
+  // ways than making an instance or subclass of this and overriding this one
+  // method!
+  async readFileSize(path) {
+    const stats = await stat(path);
+    return stats.size;
+  }
 
-        try {
-            size = await this.readFileSize(path);
-        } catch (error) {
-            // Oops! Discard that path, and don't increment the index before
-            // moving on, since the next path will now be in its place.
-            this.#paths.splice(this.#loadedPathIndex + 1, 1);
-            logWarn`Failed to process file size for ${path}: ${error.message}`;
-            return this.#loadNextPath();
-        }
-
-        this.#sizes.push(size);
-        this.#loadedPathIndex++;
-        return this.#loadNextPath();
-    }
-
-    #doneLoadingPaths() {
-        this.#resolveLoadingPromise();
-        this.#loadingPromise = null;
-        this.#resolveLoadingPromise = null;
-    }
-
-    // Override me if you want?
-    // The rest of the code here is literally just a queue system, so you could
-    // pretty much repurpose it for anything... but there are probably cleaner
-    // ways than making an instance or subclass of this and overriding this one
-    // method!
-    async readFileSize(path) {
-        const stats = await stat(path);
-        return stats.size;
-    }
-
-    getSizeOfPath(path) {
-        const index = this.#paths.indexOf(path);
-        if (index === -1) return null;
-        if (index > this.#loadedPathIndex) return null;
-        return this.#sizes[index];
-    }
+  getSizeOfPath(path) {
+    const index = this.#paths.indexOf(path);
+    if (index === -1) return null;
+    if (index > this.#loadedPathIndex) return null;
+    return this.#sizes[index];
+  }
 }

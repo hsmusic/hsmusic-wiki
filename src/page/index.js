@@ -39,15 +39,15 @@
 // These functions should be referenced only from adjacent modules, as they
 // pertain only to site page generation.
 
-export * as album from './album.js';
-export * as albumCommentary from './album-commentary.js';
-export * as artist from './artist.js';
-export * as artistAlias from './artist-alias.js';
-export * as flash from './flash.js';
-export * as group from './group.js';
-export * as homepage from './homepage.js';
-export * as listing from './listing.js';
-export * as news from './news.js';
-export * as static from './static.js';
-export * as tag from './tag.js';
-export * as track from './track.js';
+export * as album from "./album.js";
+export * as albumCommentary from "./album-commentary.js";
+export * as artist from "./artist.js";
+export * as artistAlias from "./artist-alias.js";
+export * as flash from "./flash.js";
+export * as group from "./group.js";
+export * as homepage from "./homepage.js";
+export * as listing from "./listing.js";
+export * as news from "./news.js";
+export * as static from "./static.js";
+export * as tag from "./tag.js";
+export * as track from "./track.js";

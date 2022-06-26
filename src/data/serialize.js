@@ -4,19 +4,19 @@
 // Utility functions
 
 export function id(x) {
-    return x;
+  return x;
 }
 
 export function toRef(thing) {
-    return thing?.constructor.getReference(thing);
+  return thing?.constructor.getReference(thing);
 }
 
 export function toRefs(things) {
-    return things?.map(toRef);
+  return things?.map(toRef);
 }
 
 export function toContribRefs(contribs) {
-    return contribs?.map(({ who, what }) => ({who: toRef(who), what}));
+  return contribs?.map(({ who, what }) => ({ who: toRef(who), what }));
 }
 
 // Interface
@@ -24,15 +24,21 @@ export function toContribRefs(contribs) {
 export const serializeDescriptors = Symbol();
 
 export function serializeThing(thing) {
-    const descriptors = thing.constructor[serializeDescriptors];
-    if (!descriptors) {
-        throw new Error(`Constructor ${thing.constructor.name} does not provide serialize descriptors`);
-    }
+  const descriptors = thing.constructor[serializeDescriptors];
+  if (!descriptors) {
+    throw new Error(
+      `Constructor ${thing.constructor.name} does not provide serialize descriptors`
+    );
+  }
 
-    return Object.fromEntries(Object.entries(descriptors)
-        .map(([ property, transform ]) => [property, transform(thing[property])]));
+  return Object.fromEntries(
+    Object.entries(descriptors).map(([property, transform]) => [
+      property,
+      transform(thing[property]),
+    ])
+  );
 }
 
 export function serializeThings(things) {
-    return things.map(serializeThing);
+  return things.map(serializeThing);
 }
