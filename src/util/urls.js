@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // Code that deals with URLs (really the pathnames that get referenced all
 // throughout the gener8ted HTML). Most nota8ly here is generateURLs, which
 // is in charge of pre-gener8ting a complete network of template strings
@@ -10,12 +10,12 @@
 // actual path strings. More a8stract operations using wiki data o8jects is
 // the domain of link.js.
 
-import * as path from "path";
-import { withEntries } from "./sugar.js";
+import * as path from 'path';
+import {withEntries} from './sugar.js';
 
 export function generateURLs(urlSpec) {
   const getValueForFullKey = (obj, fullKey, prop = null) => {
-    const [groupKey, subKey] = fullKey.split(".");
+    const [groupKey, subKey] = fullKey.split('.');
     if (!groupKey || !subKey) {
       throw new Error(`Expected group key and subkey (got ${fullKey})`);
     }
@@ -41,27 +41,27 @@ export function generateURLs(urlSpec) {
   // This should be called on values which are going to be passed to
   // path.relative, because relative will resolve a leading slash as the root
   // directory of the working device, which we aren't looking for here.
-  const trimLeadingSlash = (P) => (P.startsWith("/") ? P.slice(1) : P);
+  const trimLeadingSlash = (P) => (P.startsWith('/') ? P.slice(1) : P);
 
   const generateTo = (fromPath, fromGroup) => {
     const A = trimLeadingSlash(fromPath);
 
-    const rebasePrefix = "../".repeat(
-      (fromGroup.prefix || "").split("/").filter(Boolean).length
+    const rebasePrefix = '../'.repeat(
+      (fromGroup.prefix || '').split('/').filter(Boolean).length
     );
 
     const pathHelper = (toPath, toGroup) => {
       let B = trimLeadingSlash(toPath);
 
       let argIndex = 0;
-      B = B.replaceAll("<>", () => `<${argIndex++}>`);
+      B = B.replaceAll('<>', () => `<${argIndex++}>`);
 
       if (toGroup.prefix !== fromGroup.prefix) {
         // TODO: Handle differing domains in prefixes.
-        B = rebasePrefix + (toGroup.prefix || "") + B;
+        B = rebasePrefix + (toGroup.prefix || '') + B;
       }
 
-      const suffix = toPath.endsWith("/") ? "/" : "";
+      const suffix = toPath.endsWith('/') ? '/' : '';
 
       return {
         posix: path.posix.relative(A, B) + suffix,
@@ -86,7 +86,7 @@ export function generateURLs(urlSpec) {
       (delimiterMode) =>
       (key, ...args) => {
         const {
-          value: { [delimiterMode]: template },
+          value: {[delimiterMode]: template},
         } = getValueForFullKey(relative, key);
 
         let missing = 0;
@@ -110,8 +110,8 @@ export function generateURLs(urlSpec) {
       };
 
     return {
-      to: toHelper("posix"),
-      toDevice: toHelper("device"),
+      to: toHelper('posix'),
+      toDevice: toHelper('device'),
     };
   };
 
@@ -127,16 +127,16 @@ export function generateURLs(urlSpec) {
 
     const from = (key) => getValueForFullKey(map, key).value;
 
-    return { from, map };
+    return {from, map};
   };
 
   return generateFrom();
 }
 
 const thumbnailHelper = (name) => (file) =>
-  file.replace(/\.(jpg|png)$/, name + ".jpg");
+  file.replace(/\.(jpg|png)$/, name + '.jpg');
 
 export const thumb = {
-  medium: thumbnailHelper(".medium"),
-  small: thumbnailHelper(".small"),
+  medium: thumbnailHelper('.medium'),
+  small: thumbnailHelper('.small'),
 };

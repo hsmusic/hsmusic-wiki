@@ -1,16 +1,16 @@
-// @format
-//
+/** @format */
+
 // Artist page specification.
 //
 // NB: See artist-alias.js for artist alias redirect pages.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
-import * as html from "../util/html.js";
+import * as html from '../util/html.js';
 
-import { bindOpts, unique } from "../util/sugar.js";
+import {bindOpts, unique} from '../util/sugar.js';
 
 import {
   chunkByProperties,
@@ -19,18 +19,18 @@ import {
   sortByDate,
   sortByDirectory,
   sortChronologically,
-} from "../util/wiki-data.js";
+} from '../util/wiki-data.js';
 
 // Page exports
 
-export function targets({ wikiData }) {
+export function targets({wikiData}) {
   return wikiData.artistData;
 }
 
-export function write(artist, { wikiData }) {
-  const { groupData, wikiInfo } = wikiData;
+export function write(artist, {wikiData}) {
+  const {groupData, wikiInfo} = wikiData;
 
-  const { name, urls, contextNotes } = artist;
+  const {name, urls, contextNotes} = artist;
 
   const artThingsAll = sortAlbumsTracksChronologically(
     unique([
@@ -39,7 +39,7 @@ export function write(artist, { wikiData }) {
       ...(artist.albumsAsBannerArtist ?? []),
       ...(artist.tracksAsCoverArtist ?? []),
     ]),
-    { getDate: (o) => o.coverArtDate }
+    {getDate: (o) => o.coverArtDate}
   );
 
   const artThingsGallery = sortAlbumsTracksChronologically(
@@ -47,7 +47,7 @@ export function write(artist, { wikiData }) {
       ...(artist.albumsAsCoverArtist ?? []),
       ...(artist.tracksAsCoverArtist ?? []),
     ],
-    { getDate: (o) => o.coverArtDate }
+    {getDate: (o) => o.coverArtDate}
   );
 
   const commentaryThings = sortAlbumsTracksChronologically([
@@ -58,17 +58,17 @@ export function write(artist, { wikiData }) {
   const hasGallery = artThingsGallery.length > 0;
 
   const getArtistsAndContrib = (thing, key) => ({
-    artists: thing[key]?.filter(({ who }) => who !== artist),
-    contrib: thing[key]?.find(({ who }) => who === artist),
+    artists: thing[key]?.filter(({who}) => who !== artist),
+    contrib: thing[key]?.find(({who}) => who === artist),
     thing,
     key,
   });
 
   const artListChunks = chunkByProperties(
     artThingsAll.flatMap((thing) =>
-      ["coverArtistContribs", "wallpaperArtistContribs", "bannerArtistContribs"]
+      ['coverArtistContribs', 'wallpaperArtistContribs', 'bannerArtistContribs']
         .map((key) => getArtistsAndContrib(thing, key))
-        .filter(({ contrib }) => contrib)
+        .filter(({contrib}) => contrib)
         .map((props) => ({
           album: thing.album || thing,
           track: thing.album ? thing : null,
@@ -76,7 +76,7 @@ export function write(artist, { wikiData }) {
           ...props,
         }))
     ),
-    ["date", "album"]
+    ['date', 'album']
   );
 
   const commentaryListChunks = chunkByProperties(
@@ -84,7 +84,7 @@ export function write(artist, { wikiData }) {
       album: thing.album || thing,
       track: thing.album ? thing : null,
     })),
-    ["album"]
+    ['album']
   );
 
   const allTracks = sortAlbumsTracksChronologically(
@@ -101,19 +101,19 @@ export function write(artist, { wikiData }) {
         date: +track.date,
         album: track.album,
         duration: track.duration,
-        artists: track.artistContribs.some(({ who }) => who === artist)
-          ? track.artistContribs.filter(({ who }) => who !== artist)
-          : track.contributorContribs.filter(({ who }) => who !== artist),
+        artists: track.artistContribs.some(({who}) => who === artist)
+          ? track.artistContribs.filter(({who}) => who !== artist)
+          : track.contributorContribs.filter(({who}) => who !== artist),
         contrib: {
           who: artist,
           whatArray: [
-            track.artistContribs.find(({ who }) => who === artist)?.what,
-            track.contributorContribs.find(({ who }) => who === artist)?.what,
+            track.artistContribs.find(({who}) => who === artist)?.what,
+            track.contributorContribs.find(({who}) => who === artist)?.what,
           ].filter(Boolean),
         },
       })),
-      ["date", "album"]
-    ).map(({ date, album, chunk }) => ({
+      ['date', 'album']
+    ).map(({date, album, chunk}) => ({
       date,
       album,
       chunk,
@@ -132,7 +132,7 @@ export function write(artist, { wikiData }) {
         group,
         contributions: usedGroups.filter((g) => g === group).length,
       }))
-      .filter(({ contributions }) => contributions > 0)
+      .filter(({contributions}) => contributions > 0)
       .sort((a, b) => b.contributions - a.contributions);
   };
 
@@ -151,10 +151,10 @@ export function write(artist, { wikiData }) {
         // want to show the full list of other contri8utors inline.
         // (It can often 8e very, very large!)
         artists: [],
-        contrib: flash.contributorContribs.find(({ who }) => who === artist),
+        contrib: flash.contributorContribs.find(({who}) => who === artist),
       })),
-      ["act"]
-    ).map(({ act, chunk }) => ({
+      ['act']
+    ).map(({act, chunk}) => ({
       act,
       chunk,
       dateFirst: chunk[0].date,
@@ -171,11 +171,11 @@ export function write(artist, { wikiData }) {
     contrib,
   }) =>
     original
-      ? language.$("artistPage.creditList.entry.rerelease", { entry })
+      ? language.$('artistPage.creditList.entry.rerelease', {entry})
       : artists.length
       ? contrib.what || contrib.whatArray?.length
         ? language.$(
-            "artistPage.creditList.entry.withArtists.withContribution",
+            'artistPage.creditList.entry.withArtists.withContribution',
             {
               entry,
               artists: getArtistString(artists),
@@ -184,12 +184,12 @@ export function write(artist, { wikiData }) {
                 : contrib.what,
             }
           )
-        : language.$("artistPage.creditList.entry.withArtists", {
+        : language.$('artistPage.creditList.entry.withArtists', {
             entry,
             artists: getArtistString(artists),
           })
       : contrib.what || contrib.whatArray?.length
-      ? language.$("artistPage.creditList.entry.withContribution", {
+      ? language.$('artistPage.creditList.entry.withContribution', {
           entry,
           contribution: contrib.whatArray
             ? language.formatUnitList(contrib.whatArray)
@@ -199,16 +199,16 @@ export function write(artist, { wikiData }) {
 
   const unbound_generateTrackList = (
     chunks,
-    { getArtistString, link, language }
+    {getArtistString, link, language}
   ) => fixWS`
         <dl>
             ${chunks
               .map(
-                ({ date, album, chunk, duration }) => fixWS`
+                ({date, album, chunk, duration}) => fixWS`
                 <dt>${
                   date && duration
                     ? language.$(
-                        "artistPage.creditList.album.withDate.withDuration",
+                        'artistPage.creditList.album.withDate.withDuration',
                         {
                           album: link.album(album),
                           date: language.formatDate(date),
@@ -218,27 +218,27 @@ export function write(artist, { wikiData }) {
                         }
                       )
                     : date
-                    ? language.$("artistPage.creditList.album.withDate", {
+                    ? language.$('artistPage.creditList.album.withDate', {
                         album: link.album(album),
                         date: language.formatDate(date),
                       })
                     : duration
-                    ? language.$("artistPage.creditList.album.withDuration", {
+                    ? language.$('artistPage.creditList.album.withDuration', {
                         album: link.album(album),
                         duration: language.formatDuration(duration, {
                           approximate: true,
                         }),
                       })
-                    : language.$("artistPage.creditList.album", {
+                    : language.$('artistPage.creditList.album', {
                         album: link.album(album),
                       })
                 }</dt>
                 <dd><ul>
                     ${chunk
-                      .map(({ track, ...props }) => ({
+                      .map(({track, ...props}) => ({
                         original: track.originalReleaseTrack,
                         entry: language.$(
-                          "artistPage.creditList.entry.track.withDuration",
+                          'artistPage.creditList.entry.track.withDuration',
                           {
                             track: link.track(track),
                             duration: language.formatDuration(
@@ -248,10 +248,10 @@ export function write(artist, { wikiData }) {
                         ),
                         ...props,
                       }))
-                      .map(({ original, ...opts }) =>
+                      .map(({original, ...opts}) =>
                         html.tag(
-                          "li",
-                          { class: original && "rerelease" },
+                          'li',
+                          {class: original && 'rerelease'},
                           generateEntryAccents({
                             getArtistString,
                             language,
@@ -260,18 +260,18 @@ export function write(artist, { wikiData }) {
                           })
                         )
                       )
-                      .join("\n")}
+                      .join('\n')}
                 </ul></dd>
             `
               )
-              .join("\n")}
+              .join('\n')}
         </dl>
     `;
 
   const unbound_serializeArtistsAndContrib =
-    (key, { serializeContribs, serializeLink }) =>
+    (key, {serializeContribs, serializeLink}) =>
     (thing) => {
-      const { artists, contrib } = getArtistsAndContrib(thing, key);
+      const {artists, contrib} = getArtistsAndContrib(thing, key);
       const ret = {};
       ret.link = serializeLink(thing);
       if (contrib.what) ret.contribution = contrib.what;
@@ -279,21 +279,21 @@ export function write(artist, { wikiData }) {
       return ret;
     };
 
-  const unbound_serializeTrackListChunks = (chunks, { serializeLink }) =>
-    chunks.map(({ date, album, chunk, duration }) => ({
+  const unbound_serializeTrackListChunks = (chunks, {serializeLink}) =>
+    chunks.map(({date, album, chunk, duration}) => ({
       album: serializeLink(album),
       date,
       duration,
-      tracks: chunk.map(({ track }) => ({
+      tracks: chunk.map(({track}) => ({
         link: serializeLink(track),
         duration: track.duration,
       })),
     }));
 
   const data = {
-    type: "data",
-    path: ["artist", artist.directory],
-    data: ({ serializeContribs, serializeLink }) => {
+    type: 'data',
+    path: ['artist', artist.directory],
+    data: ({serializeContribs, serializeLink}) => {
       const serializeArtistsAndContrib = bindOpts(
         unbound_serializeArtistsAndContrib,
         {
@@ -312,22 +312,22 @@ export function write(artist, { wikiData }) {
       return {
         albums: {
           asCoverArtist: artist.albumsAsCoverArtist?.map(
-            serializeArtistsAndContrib("coverArtistContribs")
+            serializeArtistsAndContrib('coverArtistContribs')
           ),
           asWallpaperArtist: artist.albumsAsWallpaperArtist?.map(
-            serializeArtistsAndContrib("wallpaperArtistContribs")
+            serializeArtistsAndContrib('wallpaperArtistContribs')
           ),
           asBannerArtist: artist.albumsAsBannerArtist?.map(
-            serializeArtistsAndContrib("bannerArtistContribs")
+            serializeArtistsAndContrib('bannerArtistContribs')
           ),
         },
         flashes: wikiInfo.enableFlashesAndGames
           ? {
               asContributor: artist.flashesAsContributor
                 ?.map((flash) =>
-                  getArtistsAndContrib(flash, "contributorContribs")
+                  getArtistsAndContrib(flash, 'contributorContribs')
                 )
-                .map(({ contrib, thing: flash }) => ({
+                .map(({contrib, thing: flash}) => ({
                   link: serializeLink(flash),
                   contribution: contrib.what,
                 })),
@@ -335,10 +335,10 @@ export function write(artist, { wikiData }) {
           : null,
         tracks: {
           asArtist: artist.tracksAsArtist.map(
-            serializeArtistsAndContrib("artistContribs")
+            serializeArtistsAndContrib('artistContribs')
           ),
           asContributor: artist.tracksAsContributor.map(
-            serializeArtistsAndContrib("contributorContribs")
+            serializeArtistsAndContrib('contributorContribs')
           ),
           chunked: serializeTrackListChunks(trackListChunks),
         },
@@ -347,8 +347,8 @@ export function write(artist, { wikiData }) {
   };
 
   const infoPage = {
-    type: "page",
-    path: ["artist", artist.directory],
+    type: 'page',
+    path: ['artist', artist.directory],
     page: ({
       fancifyURL,
       generateCoverLink,
@@ -367,7 +367,7 @@ export function write(artist, { wikiData }) {
       });
 
       return {
-        title: language.$("artistPage.title", { artist: name }),
+        title: language.$('artistPage.title', {artist: name}),
 
         main: {
           content: fixWS`
@@ -375,16 +375,16 @@ export function write(artist, { wikiData }) {
                           artist.hasAvatar &&
                           generateCoverLink({
                             src: getArtistAvatar(artist),
-                            alt: language.$("misc.alt.artistAvatar"),
+                            alt: language.$('misc.alt.artistAvatar'),
                           })
                         }
-                        <h1>${language.$("artistPage.title", {
+                        <h1>${language.$('artistPage.title', {
                           artist: name,
                         })}</h1>
                         ${
                           contextNotes &&
                           fixWS`
-                            <p>${language.$("releaseInfo.note")}</p>
+                            <p>${language.$('releaseInfo.note')}</p>
                             <blockquote>
                                 ${transformMultiline(contextNotes)}
                             </blockquote>
@@ -393,41 +393,41 @@ export function write(artist, { wikiData }) {
                         }
                         ${
                           urls?.length &&
-                          `<p>${language.$("releaseInfo.visitOn", {
+                          `<p>${language.$('releaseInfo.visitOn', {
                             links: language.formatDisjunctionList(
-                              urls.map((url) => fancifyURL(url, { language }))
+                              urls.map((url) => fancifyURL(url, {language}))
                             ),
                           })}</p>`
                         }
                         ${
                           hasGallery &&
-                          `<p>${language.$("artistPage.viewArtGallery", {
+                          `<p>${language.$('artistPage.viewArtGallery', {
                             link: link.artistGallery(artist, {
                               text: language.$(
-                                "artistPage.viewArtGallery.link"
+                                'artistPage.viewArtGallery.link'
                               ),
                             }),
                           })}</p>`
                         }
-                        <p>${language.$("misc.jumpTo.withLinks", {
+                        <p>${language.$('misc.jumpTo.withLinks', {
                           links: language.formatUnitList(
                             [
                               allTracks.length &&
                                 `<a href="#tracks">${language.$(
-                                  "artistPage.trackList.title"
+                                  'artistPage.trackList.title'
                                 )}</a>`,
                               artThingsAll.length &&
                                 `<a href="#art">${language.$(
-                                  "artistPage.artList.title"
+                                  'artistPage.artList.title'
                                 )}</a>`,
                               wikiInfo.enableFlashesAndGames &&
                                 flashes.length &&
                                 `<a href="#flashes">${language.$(
-                                  "artistPage.flashList.title"
+                                  'artistPage.flashList.title'
                                 )}</a>`,
                               commentaryThings.length &&
                                 `<a href="#commentary">${language.$(
-                                  "artistPage.commentaryList.title"
+                                  'artistPage.commentaryList.title'
                                 )}</a>`,
                             ].filter(Boolean)
                           ),
@@ -436,22 +436,22 @@ export function write(artist, { wikiData }) {
                           allTracks.length &&
                           fixWS`
                             <h2 id="tracks">${language.$(
-                              "artistPage.trackList.title"
+                              'artistPage.trackList.title'
                             )}</h2>
                             <p>${language.$(
-                              "artistPage.contributedDurationLine",
+                              'artistPage.contributedDurationLine',
                               {
                                 artist: artist.name,
                                 duration: language.formatDuration(
                                   totalDuration,
-                                  { approximate: true, unit: true }
+                                  {approximate: true, unit: true}
                                 ),
                               }
                             )}</p>
-                            <p>${language.$("artistPage.musicGroupsLine", {
+                            <p>${language.$('artistPage.musicGroupsLine', {
                               groups: language.formatUnitList(
-                                musicGroups.map(({ group, contributions }) =>
-                                  language.$("artistPage.groupsLine.item", {
+                                musicGroups.map(({group, contributions}) =>
+                                  language.$('artistPage.groupsLine.item', {
                                     group: link.groupInfo(group),
                                     contributions:
                                       language.countContributions(
@@ -468,25 +468,25 @@ export function write(artist, { wikiData }) {
                           artThingsAll.length &&
                           fixWS`
                             <h2 id="art">${language.$(
-                              "artistPage.artList.title"
+                              'artistPage.artList.title'
                             )}</h2>
                             ${
                               hasGallery &&
                               `<p>${language.$(
-                                "artistPage.viewArtGallery.orBrowseList",
+                                'artistPage.viewArtGallery.orBrowseList',
                                 {
                                   link: link.artistGallery(artist, {
                                     text: language.$(
-                                      "artistPage.viewArtGallery.link"
+                                      'artistPage.viewArtGallery.link'
                                     ),
                                   }),
                                 }
                               )}</p>`
                             }
-                            <p>${language.$("artistPage.artGroupsLine", {
+                            <p>${language.$('artistPage.artGroupsLine', {
                               groups: language.formatUnitList(
-                                artGroups.map(({ group, contributions }) =>
-                                  language.$("artistPage.groupsLine.item", {
+                                artGroups.map(({group, contributions}) =>
+                                  language.$('artistPage.groupsLine.item', {
                                     group: link.groupInfo(group),
                                     contributions:
                                       language.countContributions(
@@ -499,9 +499,9 @@ export function write(artist, { wikiData }) {
                             <dl>
                                 ${artListChunks
                                   .map(
-                                    ({ date, album, chunk }) => fixWS`
+                                    ({date, album, chunk}) => fixWS`
                                     <dt>${language.$(
-                                      "artistPage.creditList.album.withDate",
+                                      'artistPage.creditList.album.withDate',
                                       {
                                         album: link.album(album),
                                         date: language.formatDate(date),
@@ -518,20 +518,20 @@ export function write(artist, { wikiData }) {
                                             }) => ({
                                               entry: track
                                                 ? language.$(
-                                                    "artistPage.creditList.entry.track",
+                                                    'artistPage.creditList.entry.track',
                                                     {
                                                       track: link.track(track),
                                                     }
                                                   )
                                                 : `<i>${language.$(
-                                                    "artistPage.creditList.entry.album." +
+                                                    'artistPage.creditList.entry.album.' +
                                                       {
                                                         wallpaperArtistContribs:
-                                                          "wallpaperArt",
+                                                          'wallpaperArt',
                                                         bannerArtistContribs:
-                                                          "bannerArt",
+                                                          'bannerArt',
                                                         coverArtistContribs:
-                                                          "coverArt",
+                                                          'coverArt',
                                                       }[key]
                                                   )}</i>`,
                                               ...props,
@@ -545,11 +545,11 @@ export function write(artist, { wikiData }) {
                                             })
                                           )
                                           .map((row) => `<li>${row}</li>`)
-                                          .join("\n")}
+                                          .join('\n')}
                                     </ul></dd>
                                 `
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </dl>
                         `
                         }
@@ -558,7 +558,7 @@ export function write(artist, { wikiData }) {
                           flashes.length &&
                           fixWS`
                             <h2 id="flashes">${language.$(
-                              "artistPage.flashList.title"
+                              'artistPage.flashList.title'
                             )}</h2>
                             <dl>
                                 ${flashListChunks
@@ -570,7 +570,7 @@ export function write(artist, { wikiData }) {
                                       dateLast,
                                     }) => fixWS`
                                     <dt>${language.$(
-                                      "artistPage.creditList.flashAct.withDateRange",
+                                      'artistPage.creditList.flashAct.withDateRange',
                                       {
                                         act: link.flash(chunk[0].flash, {
                                           text: act.name,
@@ -583,9 +583,9 @@ export function write(artist, { wikiData }) {
                                     )}</dt>
                                     <dd><ul>
                                         ${chunk
-                                          .map(({ flash, ...props }) => ({
+                                          .map(({flash, ...props}) => ({
                                             entry: language.$(
-                                              "artistPage.creditList.entry.flash",
+                                              'artistPage.creditList.entry.flash',
                                               {
                                                 flash: link.flash(flash),
                                               }
@@ -600,11 +600,11 @@ export function write(artist, { wikiData }) {
                                             })
                                           )
                                           .map((row) => `<li>${row}</li>`)
-                                          .join("\n")}
+                                          .join('\n')}
                                     </ul></dd>
                                 `
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </dl>
                         `
                         }
@@ -612,38 +612,38 @@ export function write(artist, { wikiData }) {
                           commentaryThings.length &&
                           fixWS`
                             <h2 id="commentary">${language.$(
-                              "artistPage.commentaryList.title"
+                              'artistPage.commentaryList.title'
                             )}</h2>
                             <dl>
                                 ${commentaryListChunks
                                   .map(
-                                    ({ album, chunk }) => fixWS`
+                                    ({album, chunk}) => fixWS`
                                     <dt>${language.$(
-                                      "artistPage.creditList.album",
+                                      'artistPage.creditList.album',
                                       {
                                         album: link.album(album),
                                       }
                                     )}</dt>
                                     <dd><ul>
                                         ${chunk
-                                          .map(({ album, track, ...props }) =>
+                                          .map(({album, track, ...props}) =>
                                             track
                                               ? language.$(
-                                                  "artistPage.creditList.entry.track",
+                                                  'artistPage.creditList.entry.track',
                                                   {
                                                     track: link.track(track),
                                                   }
                                                 )
                                               : `<i>${language.$(
-                                                  "artistPage.creditList.entry.album.commentary"
+                                                  'artistPage.creditList.entry.album.commentary'
                                                 )}</i>`
                                           )
                                           .map((row) => `<li>${row}</li>`)
-                                          .join("\n")}
+                                          .join('\n')}
                                     </ul></dd>
                                 `
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </dl>
                         `
                         }
@@ -661,8 +661,8 @@ export function write(artist, { wikiData }) {
   };
 
   const galleryPage = hasGallery && {
-    type: "page",
-    path: ["artistGallery", artist.directory],
+    type: 'page',
+    path: ['artistGallery', artist.directory],
     page: ({
       generateInfoGalleryLinks,
       getAlbumCover,
@@ -672,26 +672,26 @@ export function write(artist, { wikiData }) {
       language,
       to,
     }) => ({
-      title: language.$("artistGalleryPage.title", { artist: name }),
+      title: language.$('artistGalleryPage.title', {artist: name}),
 
       main: {
-        classes: ["top-index"],
+        classes: ['top-index'],
         content: fixWS`
-                    <h1>${language.$("artistGalleryPage.title", {
+                    <h1>${language.$('artistGalleryPage.title', {
                       artist: name,
                     })}</h1>
                     <p class="quick-info">${language.$(
-                      "artistGalleryPage.infoLine",
+                      'artistGalleryPage.infoLine',
                       {
                         coverArts: language.countCoverArts(
                           artThingsGallery.length,
-                          { unit: true }
+                          {unit: true}
                         ),
                       }
                     )}</p>
                     <div class="grid-listing">
                         ${getGridHTML({
-                          entries: artThingsGallery.map((item) => ({ item })),
+                          entries: artThingsGallery.map((item) => ({item})),
                           srcFn: (thing) =>
                             thing.album
                               ? getTrackCover(thing)
@@ -723,30 +723,30 @@ function generateNavForArtist(
   artist,
   isGallery,
   hasGallery,
-  { generateInfoGalleryLinks, link, language, wikiData }
+  {generateInfoGalleryLinks, link, language, wikiData}
 ) {
-  const { wikiInfo } = wikiData;
+  const {wikiInfo} = wikiData;
 
   const infoGalleryLinks =
     hasGallery &&
     generateInfoGalleryLinks(artist, isGallery, {
       link,
       language,
-      linkKeyGallery: "artistGallery",
-      linkKeyInfo: "artist",
+      linkKeyGallery: 'artistGallery',
+      linkKeyInfo: 'artist',
     });
 
   return {
-    linkContainerClasses: ["nav-links-hierarchy"],
+    linkContainerClasses: ['nav-links-hierarchy'],
     links: [
-      { toHome: true },
+      {toHome: true},
       wikiInfo.enableListings && {
-        path: ["localized.listingIndex"],
-        title: language.$("listingIndex.title"),
+        path: ['localized.listingIndex'],
+        title: language.$('listingIndex.title'),
       },
       {
-        html: language.$("artistPage.nav.artist", {
-          artist: link.artist(artist, { class: "current" }),
+        html: language.$('artistPage.nav.artist', {
+          artist: link.artist(artist, {class: 'current'}),
         }),
       },
       hasGallery && {

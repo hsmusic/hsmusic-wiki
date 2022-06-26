@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // Syntactic sugar! (Mostly.)
 // Generic functions - these are useful just a8out everywhere.
 //
@@ -8,7 +8,7 @@
 // It will likely only do exactly what I want it to, and only in the cases I
 // decided were relevant enough to 8other handling.
 
-import { color } from "./cli.js";
+import {color} from './cli.js';
 
 // Apparently JavaScript doesn't come with a function to split an array into
 // chunks! Weird. Anyway, this is an awesome place to use a generator, even
@@ -35,13 +35,13 @@ export const mapInPlace = (array, fn) =>
 
 export const filterEmptyLines = (string) =>
   string
-    .split("\n")
+    .split('\n')
     .filter((line) => line.trim())
-    .join("\n");
+    .join('\n');
 
 export const unique = (arr) => Array.from(new Set(arr));
 
-export const compareArrays = (arr1, arr2, { checkOrder = true } = {}) =>
+export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
   arr1.length === arr2.length &&
   (checkOrder
     ? arr1.every((x, i) => arr2[i] === x)
@@ -90,7 +90,7 @@ export function delay(ms) {
 // There's a proposal for a native JS function like this, 8ut it's not even
 // past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
 export function escapeRegex(string) {
-  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 export function bindOpts(fn, bind) {
@@ -98,10 +98,10 @@ export function bindOpts(fn, bind) {
 
   const bound = function (...args) {
     const opts = args[bindIndex] ?? {};
-    return fn(...args.slice(0, bindIndex), { ...bind, ...opts });
+    return fn(...args.slice(0, bindIndex), {...bind, ...opts});
   };
 
-  Object.defineProperty(bound, "name", {
+  Object.defineProperty(bound, 'name', {
     value: fn.name ? `(options-bound) ${fn.name}` : `(options-bound)`,
   });
 
@@ -132,7 +132,7 @@ export function openAggregate({
 
   // Optional human-readable message to describe the aggregate error, if
   // constructed.
-  message = "",
+  message = '',
 
   // Value to return when a provided function throws an error. If this is a
   // function, it will be called with the arguments given to the function.
@@ -151,7 +151,7 @@ export function openAggregate({
         return fn(...args);
       } catch (error) {
         errors.push(error);
-        return typeof returnOnFail === "function"
+        return typeof returnOnFail === 'function'
           ? returnOnFail(...args)
           : returnOnFail;
       }
@@ -164,7 +164,7 @@ export function openAggregate({
         (value) => value,
         (error) => {
           errors.push(error);
-          return typeof returnOnFail === "function"
+          return typeof returnOnFail === 'function'
             ? returnOnFail(...args)
             : returnOnFail;
         }
@@ -189,21 +189,21 @@ export function openAggregate({
 
   aggregate.map = (...args) => {
     const parent = aggregate;
-    const { result, aggregate: child } = mapAggregate(...args);
+    const {result, aggregate: child} = mapAggregate(...args);
     parent.call(child.close);
     return result;
   };
 
   aggregate.mapAsync = async (...args) => {
     const parent = aggregate;
-    const { result, aggregate: child } = await mapAggregateAsync(...args);
+    const {result, aggregate: child} = await mapAggregateAsync(...args);
     parent.call(child.close);
     return result;
   };
 
   aggregate.filter = (...args) => {
     const parent = aggregate;
-    const { result, aggregate: child } = filterAggregate(...args);
+    const {result, aggregate: child} = filterAggregate(...args);
     parent.call(child.close);
     return result;
   };
@@ -219,11 +219,11 @@ export function openAggregate({
   return aggregate;
 }
 
-openAggregate.errorClassSymbol = Symbol("error class");
+openAggregate.errorClassSymbol = Symbol('error class');
 
 // Utility function for providing {errorClass} parameter to aggregate functions.
 export function aggregateThrows(errorClass) {
-  return { [openAggregate.errorClassSymbol]: errorClass };
+  return {[openAggregate.errorClassSymbol]: errorClass};
 }
 
 // Performs an ordinary array map with the given function, collating into a
@@ -236,15 +236,15 @@ export function aggregateThrows(errorClass) {
 // use aggregate.close() to throw the error. (This aggregate may be passed to a
 // parent aggregate: `parent.call(aggregate.close)`!)
 export function mapAggregate(array, fn, aggregateOpts) {
-  return _mapAggregate("sync", null, array, fn, aggregateOpts);
+  return _mapAggregate('sync', null, array, fn, aggregateOpts);
 }
 
 export function mapAggregateAsync(
   array,
   fn,
-  { promiseAll = Promise.all.bind(Promise), ...aggregateOpts } = {}
+  {promiseAll = Promise.all.bind(Promise), ...aggregateOpts} = {}
 ) {
-  return _mapAggregate("async", promiseAll, array, fn, aggregateOpts);
+  return _mapAggregate('async', promiseAll, array, fn, aggregateOpts);
 }
 
 // Helper function for mapAggregate which holds code common between sync and
@@ -257,15 +257,15 @@ export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
     ...aggregateOpts,
   });
 
-  if (mode === "sync") {
+  if (mode === 'sync') {
     const result = array
       .map(aggregate.wrap(fn))
       .filter((value) => value !== failureSymbol);
-    return { result, aggregate };
+    return {result, aggregate};
   } else {
     return promiseAll(array.map(aggregate.wrapAsync(fn))).then((values) => {
       const result = values.filter((value) => value !== failureSymbol);
-      return { result, aggregate };
+      return {result, aggregate};
     });
   }
 }
@@ -278,15 +278,15 @@ export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 //
 // As with mapAggregate, the returned aggregate property is not yet closed.
 export function filterAggregate(array, fn, aggregateOpts) {
-  return _filterAggregate("sync", null, array, fn, aggregateOpts);
+  return _filterAggregate('sync', null, array, fn, aggregateOpts);
 }
 
 export async function filterAggregateAsync(
   array,
   fn,
-  { promiseAll = Promise.all.bind(Promise), ...aggregateOpts } = {}
+  {promiseAll = Promise.all.bind(Promise), ...aggregateOpts} = {}
 ) {
-  return _filterAggregate("async", promiseAll, array, fn, aggregateOpts);
+  return _filterAggregate('async', promiseAll, array, fn, aggregateOpts);
 }
 
 // Helper function for filterAggregate which holds code common between sync and
@@ -326,30 +326,30 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
     };
   }
 
-  if (mode === "sync") {
+  if (mode === 'sync') {
     const result = array
       .map(
         aggregate.wrap((input, index, array) => {
           const output = fn(input, index, array);
-          return { input, output };
+          return {input, output};
         })
       )
       .filter(filterFunction)
       .map(mapFunction);
 
-    return { result, aggregate };
+    return {result, aggregate};
   } else {
     return promiseAll(
       array.map(
         aggregate.wrapAsync(async (input, index, array) => {
           const output = await fn(input, index, array);
-          return { input, output };
+          return {input, output};
         })
       )
     ).then((values) => {
       const result = values.filter(filterFunction).map(mapFunction);
 
-      return { result, aggregate };
+      return {result, aggregate};
     });
   }
 }
@@ -358,22 +358,22 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 // function with it, then closing the function and returning the result (if
 // there's no throw).
 export function withAggregate(aggregateOpts, fn) {
-  return _withAggregate("sync", aggregateOpts, fn);
+  return _withAggregate('sync', aggregateOpts, fn);
 }
 
 export function withAggregateAsync(aggregateOpts, fn) {
-  return _withAggregate("async", aggregateOpts, fn);
+  return _withAggregate('async', aggregateOpts, fn);
 }
 
 export function _withAggregate(mode, aggregateOpts, fn) {
-  if (typeof aggregateOpts === "function") {
+  if (typeof aggregateOpts === 'function') {
     fn = aggregateOpts;
     aggregateOpts = {};
   }
 
   const aggregate = openAggregate(aggregateOpts);
 
-  if (mode === "sync") {
+  if (mode === 'sync') {
     const result = fn(aggregate);
     aggregate.close();
     return result;
@@ -387,56 +387,56 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 
 export function showAggregate(
   topError,
-  { pathToFile = (p) => p, showTraces = true } = {}
+  {pathToFile = (p) => p, showTraces = true} = {}
 ) {
-  const recursive = (error, { level }) => {
+  const recursive = (error, {level}) => {
     let header = showTraces
-      ? `[${error.constructor.name || "unnamed"}] ${
-          error.message || "(no message)"
+      ? `[${error.constructor.name || 'unnamed'}] ${
+          error.message || '(no message)'
         }`
       : error instanceof AggregateError
-      ? `[${error.message || "(no message)"}]`
-      : error.message || "(no message)";
+      ? `[${error.message || '(no message)'}]`
+      : error.message || '(no message)';
     if (showTraces) {
-      const stackLines = error.stack?.split("\n");
+      const stackLines = error.stack?.split('\n');
       const stackLine = stackLines?.find(
         (line) =>
-          line.trim().startsWith("at") &&
-          !line.includes("sugar") &&
-          !line.includes("node:") &&
-          !line.includes("<anonymous>")
+          line.trim().startsWith('at') &&
+          !line.includes('sugar') &&
+          !line.includes('node:') &&
+          !line.includes('<anonymous>')
       );
       const tracePart = stackLine
-        ? "- " +
+        ? '- ' +
           stackLine
             .trim()
             .replace(/file:\/\/(.*\.js)/, (match, pathname) =>
               pathToFile(pathname)
             )
-        : "(no stack trace)";
+        : '(no stack trace)';
       header += ` ${color.dim(tracePart)}`;
     }
-    const bar = level % 2 === 0 ? "\u2502" : color.dim("\u254e");
-    const head = level % 2 === 0 ? "\u257f" : color.dim("\u257f");
+    const bar = level % 2 === 0 ? '\u2502' : color.dim('\u254e');
+    const head = level % 2 === 0 ? '\u257f' : color.dim('\u257f');
 
     if (error instanceof AggregateError) {
       return (
         header +
-        "\n" +
+        '\n' +
         error.errors
-          .map((error) => recursive(error, { level: level + 1 }))
-          .flatMap((str) => str.split("\n"))
+          .map((error) => recursive(error, {level: level + 1}))
+          .flatMap((str) => str.split('\n'))
           .map((line, i, lines) =>
             i === 0 ? ` ${head} ${line}` : ` ${bar} ${line}`
           )
-          .join("\n")
+          .join('\n')
       );
     } else {
       return header;
     }
   };
 
-  console.error(recursive(topError, { level: 0 }));
+  console.error(recursive(topError, {level: 0}));
 }
 
 export function decorateErrorWithIndex(fn) {

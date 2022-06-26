@@ -1,40 +1,40 @@
-// @format
-//
+/** @format */
+
 // News entry & index page specifications.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
 // Page exports
 
-export function condition({ wikiData }) {
+export function condition({wikiData}) {
   return wikiData.wikiInfo.enableNews;
 }
 
-export function targets({ wikiData }) {
+export function targets({wikiData}) {
   return wikiData.newsData;
 }
 
-export function write(entry, { wikiData }) {
+export function write(entry, {wikiData}) {
   const page = {
-    type: "page",
-    path: ["newsEntry", entry.directory],
+    type: 'page',
+    path: ['newsEntry', entry.directory],
     page: ({
       generatePreviousNextLinks,
       link,
       language,
       transformMultiline,
     }) => ({
-      title: language.$("newsEntryPage.title", { entry: entry.name }),
+      title: language.$('newsEntryPage.title', {entry: entry.name}),
 
       main: {
         content: fixWS`
                     <div class="long-content">
-                        <h1>${language.$("newsEntryPage.title", {
+                        <h1>${language.$('newsEntryPage.title', {
                           entry: entry.name,
                         })}</h1>
-                        <p>${language.$("newsEntryPage.published", {
+                        <p>${language.$('newsEntryPage.published', {
                           date: language.formatDate(entry.date),
                         })}</p>
                         ${transformMultiline(entry.content)}
@@ -54,19 +54,19 @@ export function write(entry, { wikiData }) {
   return [page];
 }
 
-export function writeTargetless({ wikiData }) {
-  const { newsData } = wikiData;
+export function writeTargetless({wikiData}) {
+  const {newsData} = wikiData;
 
   const page = {
-    type: "page",
-    path: ["newsIndex"],
-    page: ({ link, language, transformMultiline }) => ({
-      title: language.$("newsIndex.title"),
+    type: 'page',
+    path: ['newsIndex'],
+    page: ({link, language, transformMultiline}) => ({
+      title: language.$('newsIndex.title'),
 
       main: {
         content: fixWS`
                     <div class="long-content news-index">
-                        <h1>${language.$("newsIndex.title")}</h1>
+                        <h1>${language.$('newsIndex.title')}</h1>
                         ${newsData
                           .map(
                             (entry) => fixWS`
@@ -79,19 +79,19 @@ export function writeTargetless({ wikiData }) {
                                   entry.contentShort !== entry.content &&
                                   `<p>${link.newsEntry(entry, {
                                     text: language.$(
-                                      "newsIndex.entry.viewRest"
+                                      'newsIndex.entry.viewRest'
                                     ),
                                   })}</p>`
                                 }
                             </article>
                         `
                           )
-                          .join("\n")}
+                          .join('\n')}
                     </div>
                 `,
       },
 
-      nav: { simple: true },
+      nav: {simple: true},
     }),
   };
 
@@ -102,9 +102,9 @@ export function writeTargetless({ wikiData }) {
 
 function generateNewsEntryNav(
   entry,
-  { generatePreviousNextLinks, link, language, wikiData }
+  {generatePreviousNextLinks, link, language, wikiData}
 ) {
-  const { wikiInfo, newsData } = wikiData;
+  const {wikiInfo, newsData} = wikiData;
 
   // The newsData list is sorted reverse chronologically (newest ones first),
   // so the way we find next/previous entries is flipped from normal.
@@ -112,21 +112,21 @@ function generateNewsEntryNav(
     link,
     language,
     data: newsData.slice().reverse(),
-    linkKey: "newsEntry",
+    linkKey: 'newsEntry',
   });
 
   return {
-    linkContainerClasses: ["nav-links-hierarchy"],
+    linkContainerClasses: ['nav-links-hierarchy'],
     links: [
-      { toHome: true },
+      {toHome: true},
       {
-        path: ["localized.newsIndex"],
-        title: language.$("newsEntryPage.nav.news"),
+        path: ['localized.newsIndex'],
+        title: language.$('newsEntryPage.nav.news'),
       },
       {
-        html: language.$("newsEntryPage.nav.entry", {
+        html: language.$('newsEntryPage.nav.entry', {
           date: language.formatDate(entry.date),
-          entry: link.newsEntry(entry, { class: "current" }),
+          entry: link.newsEntry(entry, {class: 'current'}),
         }),
       },
       previousNextLinks && {

@@ -1,23 +1,23 @@
-// @format
-//
+/** @format */
+
 // Some really simple functions for formatting HTML content.
 
 // COMPREHENSIVE!
 // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
 export const selfClosingTags = [
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "link",
-  "meta",
-  "source",
-  "track",
-  "wbr",
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'source',
+  'track',
+  'wbr',
 ];
 
 // Pass to tag() as an attri8utes key to make tag() return a 8lank string
@@ -32,7 +32,7 @@ export function tag(tagName, ...args) {
   let content;
   let attrs;
 
-  if (typeof args[0] === "object" && !Array.isArray(args[0])) {
+  if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
     attrs = args[0];
     content = args[1];
   } else {
@@ -44,7 +44,7 @@ export function tag(tagName, ...args) {
   }
 
   if (attrs?.[onlyIfContent] && !content) {
-    return "";
+    return '';
   }
 
   if (attrs) {
@@ -59,17 +59,17 @@ export function tag(tagName, ...args) {
   }
 
   if (Array.isArray(content)) {
-    content = content.filter(Boolean).join("\n");
+    content = content.filter(Boolean).join('\n');
   }
 
   if (content) {
-    if (content.includes("\n")) {
+    if (content.includes('\n')) {
       return (
         `<${openTag}>\n` +
         content
-          .split("\n")
-          .map((line) => "    " + line + "\n")
-          .join("") +
+          .split('\n')
+          .map((line) => '    ' + line + '\n')
+          .join('') +
         `</${tagName}>`
       );
     } else {
@@ -85,18 +85,18 @@ export function tag(tagName, ...args) {
 }
 
 export function escapeAttributeValue(value) {
-  return value.replaceAll('"', "&quot;").replaceAll("'", "&apos;");
+  return value.replaceAll('"', '&quot;').replaceAll("'", '&apos;');
 }
 
 export function attributes(attribs) {
   return Object.entries(attribs)
     .map(([key, val]) => {
-      if (typeof val === "undefined" || val === null) return [key, val, false];
-      else if (typeof val === "string") return [key, val, true];
-      else if (typeof val === "boolean") return [key, val, val];
-      else if (typeof val === "number") return [key, val.toString(), true];
+      if (typeof val === 'undefined' || val === null) return [key, val, false];
+      else if (typeof val === 'string') return [key, val, true];
+      else if (typeof val === 'boolean') return [key, val, val];
+      else if (typeof val === 'number') return [key, val.toString(), true];
       else if (Array.isArray(val))
-        return [key, val.filter(Boolean).join(" "), val.length > 0];
+        return [key, val.filter(Boolean).join(' '), val.length > 0];
       else
         throw new Error(
           `Attribute value for ${key} should be primitive or array, got ${typeof val}`
@@ -104,9 +104,9 @@ export function attributes(attribs) {
     })
     .filter(([key, val, keep]) => keep)
     .map(([key, val]) =>
-      typeof val === "boolean"
+      typeof val === 'boolean'
         ? `${key}`
         : `${key}="${escapeAttributeValue(val)}"`
     )
-    .join(" ");
+    .join(' ');
 }

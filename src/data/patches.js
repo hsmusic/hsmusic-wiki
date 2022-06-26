@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // --> Patch
 
 export class Patch {
@@ -76,7 +76,7 @@ export class Patch {
               inputs[inputName] = [Patch.INPUT_AVAILABLE, output[1]];
               break;
           }
-          throw new Error("Unreachable");
+          throw new Error('Unreachable');
         }
 
         case Patch.INPUT_MANAGED_CONNECTION: {
@@ -169,7 +169,7 @@ export class PatchManager extends Patch {
       return false;
     }
 
-    for (const inputNames of patch.inputNames) {
+    for (const inputName of patch.inputNames) {
       const input = patch.inputs[inputName];
       if (input[0] === Patch.INPUT_MANAGED_CONNECTION) {
         this.dropManagedInput(input[1]);
@@ -202,7 +202,7 @@ export class PatchManager extends Patch {
   }
 
   dropManagedInput(identifier) {
-    return delete this.managedInputs[key];
+    return delete this.managedInputs[identifier];
   }
 
   getManagedInput(identifier) {
@@ -213,7 +213,7 @@ export class PatchManager extends Patch {
     return this.computeManagedInput(patch, outputName, memory);
   }
 
-  computeManagedInput(patch, outputName, memory) {
+  computeManagedInput(patch, outputName) {
     // Override this function in subclasses to alter behavior of the "wire"
     // used for connecting patches.
 
@@ -255,7 +255,7 @@ export class PatchManager extends Patch {
 }
 
 class PatchManagerExternalInputPatch extends Patch {
-  constructor({ manager, ...rest }) {
+  constructor({manager, ...rest}) {
     super({
       manager,
       inputNames: manager.inputNames,
@@ -284,7 +284,7 @@ class PatchManagerExternalInputPatch extends Patch {
 }
 
 class PatchManagerExternalOutputPatch extends Patch {
-  constructor({ manager, ...rest }) {
+  constructor({manager, ...rest}) {
     super({
       manager,
       inputNames: manager.outputNames,
@@ -312,7 +312,6 @@ class PatchManagerExternalOutputPatch extends Patch {
 
 const caches = Symbol();
 const common = Symbol();
-const hsmusic = Symbol();
 
 Patch[caches] = {
   WireCachedPatchManager: class extends PatchManager {
@@ -327,8 +326,8 @@ Patch[caches] = {
     computeManagedInput(patch, outputName, memory) {
       let cache = true;
 
-      const { previousInputs } = memory;
-      const { inputs } = patch;
+      const {previousInputs} = memory;
+      const {inputs} = patch;
       if (memory.previousInputs) {
         for (const inputName of patch.inputNames) {
           // TODO: This doesn't account for connections whose values
@@ -348,7 +347,7 @@ Patch[caches] = {
 
       const outputs = patch.computeOutputs();
       memory.previousOutputs = outputs;
-      memory.previousInputs = { ...inputs };
+      memory.previousInputs = {...inputs};
       return outputs[outputName];
     }
   },
@@ -356,8 +355,8 @@ Patch[caches] = {
 
 Patch[common] = {
   Stringify: class extends Patch {
-    static inputNames = ["value"];
-    static outputNames = ["value"];
+    static inputNames = ['value'];
+    static outputNames = ['value'];
 
     compute(inputs, outputs) {
       if (inputs.value[0] === Patch.INPUT_AVAILABLE) {
@@ -369,8 +368,8 @@ Patch[common] = {
   },
 
   Echo: class extends Patch {
-    static inputNames = ["value"];
-    static outputNames = ["value"];
+    static inputNames = ['value'];
+    static outputNames = ['value'];
 
     compute(inputs, outputs) {
       if (inputs.value[0] === Patch.INPUT_AVAILABLE) {
@@ -383,16 +382,16 @@ Patch[common] = {
 };
 
 const PM = new Patch[caches].WireCachedPatchManager({
-  inputNames: ["externalInput"],
-  outputNames: ["externalOutput"],
+  inputNames: ['externalInput'],
+  outputNames: ['externalOutput'],
 });
 
-const P1 = new Patch[common].Stringify({ manager: PM });
-const P2 = new Patch[common].Echo({ manager: PM });
+const P1 = new Patch[common].Stringify({manager: PM});
+const P2 = new Patch[common].Echo({manager: PM});
 
-PM.addExternalInput(P1, "value", "externalInput");
-PM.addManagedInput(P2, "value", P1, "value");
-PM.setExternalOutput("externalOutput", P2, "value");
+PM.addExternalInput(P1, 'value', 'externalInput');
+PM.addManagedInput(P2, 'value', P1, 'value');
+PM.setExternalOutput('externalOutput', P2, 'value');
 
 PM.inputs.externalInput = [Patch.INPUT_CONSTANT, 123];
 console.log(PM.computeOutputs());

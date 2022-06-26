@@ -1,17 +1,17 @@
-// @format
-//
+/** @format */
+
 // Utility functions for interacting with wiki data.
 
 // Generic value operations
 
 export function getKebabCase(name) {
   return name
-    .split(" ")
-    .join("-")
-    .replace(/&/g, "and")
-    .replace(/[^a-zA-Z0-9\-]/g, "")
-    .replace(/-{2,}/g, "-")
-    .replace(/^-+|-+$/g, "")
+    .split(' ')
+    .join('-')
+    .replace(/&/g, 'and')
+    .replace(/[^a-zA-Z0-9\-]/g, '')
+    .replace(/-{2,}/g, '-')
+    .replace(/^-+|-+$/g, '')
     .toLowerCase();
 }
 
@@ -81,8 +81,8 @@ export function compareCaseLessSensitive(a, b) {
   const bl = b.toLowerCase();
 
   return al === bl
-    ? a.localeCompare(b, undefined, { numeric: true })
-    : al.localeCompare(bl, undefined, { numeric: true });
+    ? a.localeCompare(b, undefined, {numeric: true})
+    : al.localeCompare(bl, undefined, {numeric: true});
 }
 
 // Subtract common prefixes and other characters which some people don't like
@@ -92,22 +92,22 @@ export function normalizeName(s) {
   // Turn (some) ligatures into expanded variant for cleaner sorting, e.g.
   // "ﬀ" into "ff", in decompose mode, so that "ü" is represented as two
   // bytes ("u" + \u0308 combining diaeresis).
-  s = s.normalize("NFKD");
+  s = s.normalize('NFKD');
 
   // Replace one or more whitespace of any kind in a row, as well as certain
   // punctuation, with a single typical space, then trim the ends.
   s = s
     .replace(
       /[\p{Separator}\p{Dash_Punctuation}\p{Connector_Punctuation}]+/gu,
-      " "
+      ' '
     )
     .trim();
 
   // Discard anything that isn't a letter, number, or space.
-  s = s.replace(/[^\p{Letter}\p{Number} ]/gu, "");
+  s = s.replace(/[^\p{Letter}\p{Number} ]/gu, '');
 
   // Remove common English (only, for now) prefixes.
-  s = s.replace(/^(?:an?|the) /i, "");
+  s = s.replace(/^(?:an?|the) /i, '');
 
   return s;
 }
@@ -142,7 +142,7 @@ export function normalizeName(s) {
 // except when album and track directories overlap with each other.
 export function sortByDirectory(
   data,
-  { getDirectory = (o) => o.directory } = {}
+  {getDirectory = (o) => o.directory} = {}
 ) {
   return data.sort((a, b) => {
     const ad = getDirectory(a);
@@ -151,7 +151,7 @@ export function sortByDirectory(
   });
 }
 
-export function sortByName(data, { getName = (o) => o.name } = {}) {
+export function sortByName(data, {getName = (o) => o.name} = {}) {
   return data.sort((a, b) => {
     const an = getName(a);
     const bn = getName(b);
@@ -163,7 +163,7 @@ export function sortByName(data, { getName = (o) => o.name } = {}) {
   });
 }
 
-export function sortByDate(data, { getDate = (o) => o.date } = {}) {
+export function sortByDate(data, {getDate = (o) => o.date} = {}) {
   return data.sort((a, b) => {
     const ad = getDate(a);
     const bd = getDate(b);
@@ -254,9 +254,9 @@ export function sortByConditions(data, conditions) {
 // Expects thing properties:
 //  * directory (or override getDirectory)
 //  * name (or override getName)
-export function sortAlphabetically(data, { getDirectory, getName } = {}) {
-  sortByDirectory(data, { getDirectory });
-  sortByName(data, { getName });
+export function sortAlphabetically(data, {getDirectory, getName} = {}) {
+  sortByDirectory(data, {getDirectory});
+  sortByName(data, {getName});
   return data;
 }
 
@@ -266,10 +266,10 @@ export function sortAlphabetically(data, { getDirectory, getName } = {}) {
 //  * date (or override getDate)
 export function sortChronologically(
   data,
-  { getDirectory, getName, getDate } = {}
+  {getDirectory, getName, getDate} = {}
 ) {
-  sortAlphabetically(data, { getDirectory, getName });
-  sortByDate(data, { getDate });
+  sortAlphabetically(data, {getDirectory, getName});
+  sortByDate(data, {getDate});
   return data;
 }
 
@@ -281,7 +281,7 @@ export function sortChronologically(
 // release date but can be overridden) above all else.
 //
 // This function also works for data lists which contain only tracks.
-export function sortAlbumsTracksChronologically(data, { getDate } = {}) {
+export function sortAlbumsTracksChronologically(data, {getDate} = {}) {
   // Sort albums before tracks...
   sortByConditions(data, [(t) => t.album === undefined]);
 
@@ -297,7 +297,7 @@ export function sortAlbumsTracksChronologically(data, { getDate } = {}) {
   // released on the same date, they'll still be grouped together by album,
   // and tracks within an album will retain their relative positioning (i.e.
   // stay in the same order as part of the album's track listing).
-  sortByDate(data, { getDate });
+  sortByDate(data, {getDate});
 
   return data;
 }
@@ -310,17 +310,17 @@ export function filterAlbumsByCommentary(albums) {
   );
 }
 
-export function getAlbumCover(album, { to }) {
+export function getAlbumCover(album, {to}) {
   // Some albums don't have art! This function returns null in that case.
   if (album.hasCoverArt) {
-    return to("media.albumCover", album.directory, album.coverArtFileExtension);
+    return to('media.albumCover', album.directory, album.coverArtFileExtension);
   } else {
     return null;
   }
 }
 
 export function getAlbumListTag(album) {
-  return album.hasTrackNumbers ? "ol" : "ul";
+  return album.hasTrackNumbers ? 'ol' : 'ul';
 }
 
 // This gets all the track o8jects defined in every al8um, and sorts them 8y
@@ -352,8 +352,8 @@ export function getArtistNumContributions(artist) {
   );
 }
 
-export function getFlashCover(flash, { to }) {
-  return to("media.flashArt", flash.directory, flash.coverArtFileExtension);
+export function getFlashCover(flash, {to}) {
+  return to('media.flashArt', flash.directory, flash.coverArtFileExtension);
 }
 
 export function getFlashLink(flash) {
@@ -364,16 +364,16 @@ export function getTotalDuration(tracks) {
   return tracks.reduce((duration, track) => duration + track.duration, 0);
 }
 
-export function getTrackCover(track, { to }) {
+export function getTrackCover(track, {to}) {
   // Some albums don't have any track art at all, and in those, every track
   // just inherits the album's own cover art. Note that since cover art isn't
   // guaranteed on albums either, it's possible that this function returns
   // null!
   if (!track.hasCoverArt) {
-    return getAlbumCover(track.album, { to });
+    return getAlbumCover(track.album, {to});
   } else {
     return to(
-      "media.trackCover",
+      'media.trackCover',
       track.album.directory,
       track.directory,
       track.coverArtFileExtension
@@ -381,14 +381,14 @@ export function getTrackCover(track, { to }) {
   }
 }
 
-export function getArtistAvatar(artist, { to }) {
-  return to("media.artistAvatar", artist.directory, artist.avatarFileExtension);
+export function getArtistAvatar(artist, {to}) {
+  return to('media.artistAvatar', artist.directory, artist.avatarFileExtension);
 }
 
 // Big-ass homepage row functions
 
-export function getNewAdditions(numAlbums, { wikiData }) {
-  const { albumData } = wikiData;
+export function getNewAdditions(numAlbums, {wikiData}) {
+  const {albumData} = wikiData;
 
   // Sort al8ums, in descending order of priority, 8y...
   //
@@ -486,11 +486,11 @@ export function getNewAdditions(numAlbums, { wikiData }) {
   // Finally, do some quick mapping shenanigans to 8etter display the result
   // in a grid. (This should pro8a8ly 8e a separ8te, shared function, 8ut
   // whatevs.)
-  return albums.map((album) => ({ large: album.isMajorRelease, item: album }));
+  return albums.map((album) => ({large: album.isMajorRelease, item: album}));
 }
 
-export function getNewReleases(numReleases, { wikiData }) {
-  const { albumData } = wikiData;
+export function getNewReleases(numReleases, {wikiData}) {
+  const {albumData} = wikiData;
 
   const latestFirst = albumData
     .filter((album) => album.isListedOnHomepage)
@@ -503,7 +503,7 @@ export function getNewReleases(numReleases, { wikiData }) {
     .slice(0, numReleases - majorReleases.length);
 
   return [
-    ...majorReleases.map((album) => ({ large: true, item: album })),
-    ...otherReleases.map((album) => ({ large: false, item: album })),
+    ...majorReleases.map((album) => ({large: true, item: album})),
+    ...otherReleases.map((album) => ({large: false, item: album})),
   ];
 }

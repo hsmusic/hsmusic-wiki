@@ -1,7 +1,6 @@
 #!/usr/bin/env node
+/** @format */
 
-// @format
-//
 // Ok, so the d8te is 3 March 2021, and the music wiki was initially released
 // on 15 November 2019. That is 474 days or 11376 hours. In my opinion, and
 // pro8a8ly the opinions of at least one other person, that is WAY TOO LONG
@@ -74,18 +73,18 @@
 // unused). This is just to make the code more porta8le and sta8le, long-term,
 // since it avoids a lot of otherwise implic8ted maintenance.
 
-"use strict";
+'use strict';
 
-const CACHE_FILE = "thumbnail-cache.json";
+const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
-import { spawn } from "child_process";
-import { createHash } from "crypto";
-import * as path from "path";
+import {spawn} from 'child_process';
+import {createHash} from 'crypto';
+import * as path from 'path';
 
-import { readdir, readFile, writeFile } from "fs/promises"; // Whatcha know! Nice.
+import {readdir, readFile, writeFile} from 'fs/promises'; // Whatcha know! Nice.
 
-import { createReadStream } from "fs"; // Still gotta import from 8oth tho, for createReadStream.
+import {createReadStream} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
 
 import {
   logError,
@@ -93,15 +92,15 @@ import {
   logWarn,
   parseOptions,
   progressPromiseAll,
-} from "./util/cli.js";
+} from './util/cli.js';
 
-import { commandExists, isMain, promisifyProcess } from "./util/node-utils.js";
+import {commandExists, isMain, promisifyProcess} from './util/node-utils.js';
 
-import { delay, queue } from "./util/sugar.js";
+import {delay, queue} from './util/sugar.js';
 
 function traverse(
   startDirPath,
-  { filterFile = () => true, filterDir = () => true } = {}
+  {filterFile = () => true, filterDir = () => true} = {}
 ) {
   const recursive = (names, subDirPath) =>
     Promise.all(
@@ -116,24 +115,24 @@ function traverse(
       )
     ).then((pathArrays) => pathArrays.flatMap((x) => x));
 
-  return readdir(startDirPath).then((names) => recursive(names, ""));
+  return readdir(startDirPath).then((names) => recursive(names, ''));
 }
 
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
-    const md5 = createHash("md5");
+    const md5 = createHash('md5');
     const stream = createReadStream(filePath);
-    stream.on("data", (data) => md5.update(data));
-    stream.on("end", (data) => resolve(md5.digest("hex")));
-    stream.on("error", (err) => reject(err));
+    stream.on('data', (data) => md5.update(data));
+    stream.on('end', (data) => resolve(md5.digest('hex')));
+    stream.on('error', (err) => reject(err));
   });
 }
 
 async function getImageMagickVersion(spawnConvert) {
-  const proc = spawnConvert(["--version"], false);
+  const proc = spawnConvert(['--version'], false);
 
-  let allData = "";
-  proc.stdout.on("data", (data) => {
+  let allData = '';
+  proc.stdout.on('data', (data) => {
     allData += data.toString();
   });
 
@@ -145,7 +144,7 @@ async function getImageMagickVersion(spawnConvert) {
 
   const match = allData.match(/Version: (.*)/i);
   if (!match) {
-    return "unknown version";
+    return 'unknown version';
   }
 
   return match[1];
@@ -153,13 +152,13 @@ async function getImageMagickVersion(spawnConvert) {
 
 async function getSpawnConvert() {
   let fn, description, version;
-  if (await commandExists("convert")) {
-    fn = (args) => spawn("convert", args);
-    description = "convert";
-  } else if (await commandExists("magick")) {
+  if (await commandExists('convert')) {
+    fn = (args) => spawn('convert', args);
+    description = 'convert';
+  } else if (await commandExists('magick')) {
     fn = (args, prefix = true) =>
-      spawn("magick", prefix ? ["convert", ...args] : args);
-    description = "magick convert";
+      spawn('magick', prefix ? ['convert', ...args] : args);
+    description = 'magick convert';
   } else {
     return [`no convert or magick binary`, null];
   }
@@ -173,28 +172,28 @@ async function getSpawnConvert() {
   return [`${description} (${version})`, fn];
 }
 
-function generateImageThumbnails(filePath, { spawnConvert }) {
+function generateImageThumbnails(filePath, {spawnConvert}) {
   const dirname = path.dirname(filePath);
   const extname = path.extname(filePath);
   const basename = path.basename(filePath, extname);
-  const output = (name) => path.join(dirname, basename + name + ".jpg");
+  const output = (name) => path.join(dirname, basename + name + '.jpg');
 
-  const convert = (name, { size, quality }) =>
+  const convert = (name, {size, quality}) =>
     spawnConvert([
       filePath,
-      "-strip",
-      "-resize",
+      '-strip',
+      '-resize',
       `${size}x${size}>`,
-      "-interlace",
-      "Plane",
-      "-quality",
+      '-interlace',
+      'Plane',
+      '-quality',
       `${quality}%`,
       output(name),
     ]);
 
   return Promise.all([
-    promisifyProcess(convert(".medium", { size: 400, quality: 95 }), false),
-    promisifyProcess(convert(".small", { size: 250, quality: 85 }), false),
+    promisifyProcess(convert('.medium', {size: 400, quality: 95}), false),
+    promisifyProcess(convert('.small', {size: 250, quality: 85}), false),
   ]);
 
   return new Promise((resolve, reject) => {
@@ -208,10 +207,10 @@ function generateImageThumbnails(filePath, { spawnConvert }) {
 
 export default async function genThumbs(
   mediaPath,
-  { queueSize = 0, quiet = false } = {}
+  {queueSize = 0, quiet = false} = {}
 ) {
   if (!mediaPath) {
-    throw new Error("Expected mediaPath to be passed");
+    throw new Error('Expected mediaPath to be passed');
   }
 
   const quietInfo = quiet ? () => null : logInfo;
@@ -221,16 +220,16 @@ export default async function genThumbs(
     // thumbnail-cache.json is 8eing passed through, for some reason.
 
     const ext = path.extname(name);
-    if (ext !== ".jpg" && ext !== ".png") return false;
+    if (ext !== '.jpg' && ext !== '.png') return false;
 
     const rest = path.basename(name, ext);
-    if (rest.endsWith(".medium") || rest.endsWith(".small")) return false;
+    if (rest.endsWith('.medium') || rest.endsWith('.small')) return false;
 
     return true;
   };
 
   const filterDir = (name) => {
-    if (name === ".git") return false;
+    if (name === '.git') return false;
     return true;
   };
 
@@ -242,7 +241,7 @@ export default async function genThumbs(
     logInfo`You can find info to help install ImageMagick on Linux, Windows, or macOS`;
     logInfo`from its official website: ${`https://imagemagick.org/script/download.php`}`;
     logInfo`If you have trouble working ImageMagick and would like some help, feel free`;
-    logInfo`to drop a message in the HSMusic Discord server! ${"https://hsmusic.wiki/discord/"}`;
+    logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
     return false;
   } else {
     logInfo`Found ImageMagick binary: ${convertInfo}`;
@@ -256,7 +255,7 @@ export default async function genThumbs(
     quietInfo`Cache file successfully read.`;
   } catch (error) {
     cache = {};
-    if (error.code === "ENOENT") {
+    if (error.code === 'ENOENT') {
       firstRun = true;
     } else {
       failedReadingCache = true;
@@ -283,7 +282,7 @@ export default async function genThumbs(
     await delay(WARNING_DELAY_TIME);
   }
 
-  const imagePaths = await traverse(mediaPath, { filterFile, filterDir });
+  const imagePaths = await traverse(mediaPath, {filterFile, filterDir});
 
   const imageToMD5Entries = await progressPromiseAll(
     `Generating MD5s of image files`,
@@ -292,7 +291,7 @@ export default async function genThumbs(
         (imagePath) => () =>
           readFileMD5(path.join(mediaPath, imagePath)).then(
             (md5) => [imagePath, md5],
-            (error) => [imagePath, { error }]
+            (error) => [imagePath, {error}]
           )
       ),
       queueSize
@@ -385,24 +384,24 @@ export default async function genThumbs(
 if (isMain(import.meta.url)) {
   (async function () {
     const miscOptions = await parseOptions(process.argv.slice(2), {
-      "media-path": {
-        type: "value",
+      'media-path': {
+        type: 'value',
       },
-      "queue-size": {
-        type: "value",
+      'queue-size': {
+        type: 'value',
         validate(size) {
-          if (parseInt(size) !== parseFloat(size)) return "an integer";
-          if (parseInt(size) < 0) return "a counting number or zero";
+          if (parseInt(size) !== parseFloat(size)) return 'an integer';
+          if (parseInt(size) < 0) return 'a counting number or zero';
           return true;
         },
       },
-      queue: { alias: "queue-size" },
+      queue: {alias: 'queue-size'},
     });
 
-    const mediaPath = miscOptions["media-path"] || process.env.HSMUSIC_MEDIA;
-    const queueSize = +(miscOptions["queue-size"] ?? 0);
+    const mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+    const queueSize = +(miscOptions['queue-size'] ?? 0);
 
-    await genThumbs(mediaPath, { queueSize });
+    await genThumbs(mediaPath, {queueSize});
   })().catch((err) => {
     console.error(err);
   });

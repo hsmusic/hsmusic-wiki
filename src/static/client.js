@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // This is the JS file that gets loaded on the client! It's only really used for
 // the random track feature right now - the idea is we only use it for stuff
 // that cannot 8e done at static-site compile time, 8y its fundamentally
@@ -7,9 +7,9 @@
 //
 // Upd8: As of 04/02/2021, it's now used for info cards too! Nice.
 
-import { getColors } from "../util/colors.js";
+import {getColors} from '../util/colors.js';
 
-import { getArtistNumContributions } from "../util/wiki-data.js";
+import {getArtistNumContributions} from '../util/wiki-data.js';
 
 let albumData, artistData, flashData;
 let officialAlbumData, fandomAlbumData, artistNames;
@@ -18,25 +18,25 @@ let ready = false;
 
 // Localiz8tion nonsense ----------------------------------
 
-const language = document.documentElement.getAttribute("lang");
+const language = document.documentElement.getAttribute('lang');
 
 let list;
-if (typeof Intl === "object" && typeof Intl.ListFormat === "function") {
+if (typeof Intl === 'object' && typeof Intl.ListFormat === 'function') {
   const getFormat = (type) => {
-    const formatter = new Intl.ListFormat(language, { type });
+    const formatter = new Intl.ListFormat(language, {type});
     return formatter.format.bind(formatter);
   };
 
   list = {
-    conjunction: getFormat("conjunction"),
-    disjunction: getFormat("disjunction"),
-    unit: getFormat("unit"),
+    conjunction: getFormat('conjunction'),
+    disjunction: getFormat('disjunction'),
+    unit: getFormat('unit'),
   };
 } else {
   // Not a gr8 mock we've got going here, 8ut it's *mostly* language-free.
   // We use the same mock for every list 'cuz we don't have any of the
   // necessary CLDR info to appropri8tely distinguish 8etween them.
-  const arbitraryMock = (array) => array.join(", ");
+  const arbitraryMock = (array) => array.join(', ');
 
   list = {
     conjunction: arbitraryMock,
@@ -47,8 +47,8 @@ if (typeof Intl === "object" && typeof Intl.ListFormat === "function") {
 
 // Miscellaneous helpers ----------------------------------
 
-function rebase(href, rebaseKey = "rebaseLocalized") {
-  const relative = (document.documentElement.dataset[rebaseKey] || ".") + "/";
+function rebase(href, rebaseKey = 'rebaseLocalized') {
+  const relative = (document.documentElement.dataset[rebaseKey] || '.') + '/';
   if (relative) {
     return relative + href;
   } else {
@@ -65,16 +65,16 @@ function cssProp(el, key) {
 }
 
 function getRefDirectory(ref) {
-  return ref.split(":")[1];
+  return ref.split(':')[1];
 }
 
 function getAlbum(el) {
-  const directory = cssProp(el, "--album-directory");
+  const directory = cssProp(el, '--album-directory');
   return albumData.find((album) => album.directory === directory);
 }
 
 function getFlash(el) {
-  const directory = cssProp(el, "--flash-directory");
+  const directory = cssProp(el, '--flash-directory');
   return flashData.find((flash) => flash.directory === directory);
 }
 
@@ -88,17 +88,17 @@ const openFlash = (d) => rebase(`flash/${d}`);
 
 function getTrackListAndIndex() {
   const album = getAlbum(document.body);
-  const directory = cssProp(document.body, "--track-directory");
+  const directory = cssProp(document.body, '--track-directory');
   if (!directory && !album) return {};
-  if (!directory) return { list: album.tracks };
+  if (!directory) return {list: album.tracks};
   const trackIndex = album.tracks.findIndex(
     (track) => track.directory === directory
   );
-  return { list: album.tracks, index: trackIndex };
+  return {list: album.tracks, index: trackIndex};
 }
 
 function openRandomTrack() {
-  const { list } = getTrackListAndIndex();
+  const {list} = getTrackListAndIndex();
   if (!list) return;
   return openTrack(pick(list));
 }
@@ -106,38 +106,38 @@ function openRandomTrack() {
 function getFlashListAndIndex() {
   const list = flashData.filter((flash) => !flash.act8r8k);
   const flash = getFlash(document.body);
-  if (!flash) return { list };
+  if (!flash) return {list};
   const flashIndex = list.indexOf(flash);
-  return { list, index: flashIndex };
+  return {list, index: flashIndex};
 }
 
 // TODO: This should also use urlSpec.
 function fetchData(type, directory) {
-  return fetch(rebase(`${type}/${directory}/data.json`, "rebaseData")).then(
+  return fetch(rebase(`${type}/${directory}/data.json`, 'rebaseData')).then(
     (res) => res.json()
   );
 }
 
 // JS-based links -----------------------------------------
 
-for (const a of document.body.querySelectorAll("[data-random]")) {
-  a.addEventListener("click", (evt) => {
+for (const a of document.body.querySelectorAll('[data-random]')) {
+  a.addEventListener('click', (evt) => {
     if (!ready) {
       evt.preventDefault();
       return;
     }
 
     setTimeout(() => {
-      a.href = rebase("js-disabled");
+      a.href = rebase('js-disabled');
     });
     switch (a.dataset.random) {
-      case "album":
+      case 'album':
         return (a.href = openAlbum(pick(albumData).directory));
-      case "album-in-fandom":
+      case 'album-in-fandom':
         return (a.href = openAlbum(pick(fandomAlbumData).directory));
-      case "album-in-official":
+      case 'album-in-official':
         return (a.href = openAlbum(pick(officialAlbumData).directory));
-      case "track":
+      case 'track':
         return (a.href = openTrack(
           getRefDirectory(
             pick(
@@ -145,9 +145,9 @@ for (const a of document.body.querySelectorAll("[data-random]")) {
             )
           )
         ));
-      case "track-in-album":
+      case 'track-in-album':
         return (a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks))));
-      case "track-in-fandom":
+      case 'track-in-fandom':
         return (a.href = openTrack(
           getRefDirectory(
             pick(
@@ -158,7 +158,7 @@ for (const a of document.body.querySelectorAll("[data-random]")) {
             )
           )
         ));
-      case "track-in-official":
+      case 'track-in-official':
         return (a.href = openTrack(
           getRefDirectory(
             pick(
@@ -169,9 +169,9 @@ for (const a of document.body.querySelectorAll("[data-random]")) {
             )
           )
         ));
-      case "artist":
+      case 'artist':
         return (a.href = openArtist(pick(artistData).directory));
-      case "artist-more-than-one-contrib":
+      case 'artist-more-than-one-contrib':
         return (a.href = openArtist(
           pick(
             artistData.filter((artist) => getArtistNumContributions(artist) > 1)
@@ -181,51 +181,51 @@ for (const a of document.body.querySelectorAll("[data-random]")) {
   });
 }
 
-const next = document.getElementById("next-button");
-const previous = document.getElementById("previous-button");
-const random = document.getElementById("random-button");
+const next = document.getElementById('next-button');
+const previous = document.getElementById('previous-button');
+const random = document.getElementById('random-button');
 
 const prependTitle = (el, prepend) => {
-  const existing = el.getAttribute("title");
+  const existing = el.getAttribute('title');
   if (existing) {
-    el.setAttribute("title", prepend + " " + existing);
+    el.setAttribute('title', prepend + ' ' + existing);
   } else {
-    el.setAttribute("title", prepend);
+    el.setAttribute('title', prepend);
   }
 };
 
-if (next) prependTitle(next, "(Shift+N)");
-if (previous) prependTitle(previous, "(Shift+P)");
-if (random) prependTitle(random, "(Shift+R)");
+if (next) prependTitle(next, '(Shift+N)');
+if (previous) prependTitle(previous, '(Shift+P)');
+if (random) prependTitle(random, '(Shift+R)');
 
-document.addEventListener("keypress", (event) => {
+document.addEventListener('keypress', (event) => {
   if (event.shiftKey) {
-    if (event.charCode === "N".charCodeAt(0)) {
+    if (event.charCode === 'N'.charCodeAt(0)) {
       if (next) next.click();
-    } else if (event.charCode === "P".charCodeAt(0)) {
+    } else if (event.charCode === 'P'.charCodeAt(0)) {
       if (previous) previous.click();
-    } else if (event.charCode === "R".charCodeAt(0)) {
+    } else if (event.charCode === 'R'.charCodeAt(0)) {
       if (random && ready) random.click();
     }
   }
 });
 
-for (const reveal of document.querySelectorAll(".reveal")) {
-  reveal.addEventListener("click", (event) => {
-    if (!reveal.classList.contains("revealed")) {
-      reveal.classList.add("revealed");
+for (const reveal of document.querySelectorAll('.reveal')) {
+  reveal.addEventListener('click', (event) => {
+    if (!reveal.classList.contains('revealed')) {
+      reveal.classList.add('revealed');
       event.preventDefault();
       event.stopPropagation();
     }
   });
 }
 
-const elements1 = document.getElementsByClassName("js-hide-once-data");
-const elements2 = document.getElementsByClassName("js-show-once-data");
+const elements1 = document.getElementsByClassName('js-hide-once-data');
+const elements2 = document.getElementsByClassName('js-show-once-data');
 
-for (const element of elements1) element.style.display = "block";
+for (const element of elements1) element.style.display = 'block';
 
-fetch(rebase("data.json", "rebaseShared"))
+fetch(rebase('data.json', 'rebaseShared'))
   .then((data) => data.json())
   .then((data) => {
     albumData = data.albumData;
@@ -233,17 +233,17 @@ fetch(rebase("data.json", "rebaseShared"))
     flashData = data.flashData;
 
     officialAlbumData = albumData.filter((album) =>
-      album.groups.includes("group:official")
+      album.groups.includes('group:official')
     );
     fandomAlbumData = albumData.filter(
-      (album) => !album.groups.includes("group:official")
+      (album) => !album.groups.includes('group:official')
     );
     artistNames = artistData
       .filter((artist) => !artist.alias)
       .map((artist) => artist.name);
 
-    for (const element of elements1) element.style.display = "none";
-    for (const element of elements2) element.style.display = "block";
+    for (const element of elements1) element.style.display = 'none';
+    for (const element of elements2) element.style.display = 'block';
 
     ready = true;
   });
@@ -260,13 +260,13 @@ let endFastHoverTimeout = null;
 
 function colorLink(a, color) {
   if (color) {
-    const { primary, dim } = getColors(color);
-    a.style.setProperty("--primary-color", primary);
-    a.style.setProperty("--dim-color", dim);
+    const {primary, dim} = getColors(color);
+    a.style.setProperty('--primary-color', primary);
+    a.style.setProperty('--dim-color', dim);
   }
 }
 
-function link(a, type, { name, directory, color }) {
+function link(a, type, {name, directory, color}) {
   colorLink(a, color);
   a.innerText = name;
   a.href = getLinkHref(type, directory);
@@ -284,14 +284,14 @@ function joinElements(type, elements) {
 }
 
 const infoCard = (() => {
-  const container = document.getElementById("info-card-container");
+  const container = document.getElementById('info-card-container');
 
   let cancelShow = false;
   let hideTimeout = null;
   let showing = false;
 
-  container.addEventListener("mouseenter", cancelHide);
-  container.addEventListener("mouseleave", readyHide);
+  container.addEventListener('mouseenter', cancelHide);
+  container.addEventListener('mouseleave', readyHide);
 
   function show(type, target) {
     cancelShow = false;
@@ -307,91 +307,91 @@ const infoCard = (() => {
 
       const rect = target.getBoundingClientRect();
 
-      container.style.setProperty("--primary-color", data.color);
+      container.style.setProperty('--primary-color', data.color);
 
-      container.style.top = window.scrollY + rect.bottom + "px";
-      container.style.left = window.scrollX + rect.left + "px";
+      container.style.top = window.scrollY + rect.bottom + 'px';
+      container.style.left = window.scrollX + rect.left + 'px';
 
       // Use a short timeout to let a currently hidden (or not yet shown)
       // info card teleport to the position set a8ove. (If it's currently
       // shown, it'll transition to that position.)
       setTimeout(() => {
-        container.classList.remove("hide");
-        container.classList.add("show");
+        container.classList.remove('hide');
+        container.classList.add('show');
       }, 50);
 
       // 8asic details.
 
-      const nameLink = container.querySelector(".info-card-name a");
-      link(nameLink, "track", data);
+      const nameLink = container.querySelector('.info-card-name a');
+      link(nameLink, 'track', data);
 
-      const albumLink = container.querySelector(".info-card-album a");
-      link(albumLink, "album", data.album);
+      const albumLink = container.querySelector('.info-card-album a');
+      link(albumLink, 'album', data.album);
 
-      const artistSpan = container.querySelector(".info-card-artists span");
+      const artistSpan = container.querySelector('.info-card-artists span');
       artistSpan.innerHTML = joinElements(
-        "conjunction",
-        data.artists.map(({ artist }) => {
-          const a = document.createElement("a");
-          a.href = getLinkHref("artist", artist.directory);
+        'conjunction',
+        data.artists.map(({artist}) => {
+          const a = document.createElement('a');
+          a.href = getLinkHref('artist', artist.directory);
           a.innerText = artist.name;
           return a;
         })
       );
 
       const coverArtistParagraph = container.querySelector(
-        ".info-card-cover-artists"
+        '.info-card-cover-artists'
       );
-      const coverArtistSpan = coverArtistParagraph.querySelector("span");
+      const coverArtistSpan = coverArtistParagraph.querySelector('span');
       if (data.coverArtists.length) {
-        coverArtistParagraph.style.display = "block";
+        coverArtistParagraph.style.display = 'block';
         coverArtistSpan.innerHTML = joinElements(
-          "conjunction",
-          data.coverArtists.map(({ artist }) => {
-            const a = document.createElement("a");
-            a.href = getLinkHref("artist", artist.directory);
+          'conjunction',
+          data.coverArtists.map(({artist}) => {
+            const a = document.createElement('a');
+            a.href = getLinkHref('artist', artist.directory);
             a.innerText = artist.name;
             return a;
           })
         );
       } else {
-        coverArtistParagraph.style.display = "none";
+        coverArtistParagraph.style.display = 'none';
       }
 
       // Cover art.
 
       const [containerNoReveal, containerReveal] = [
-        container.querySelector(".info-card-art-container.no-reveal"),
-        container.querySelector(".info-card-art-container.reveal"),
+        container.querySelector('.info-card-art-container.no-reveal'),
+        container.querySelector('.info-card-art-container.reveal'),
       ];
 
       const [containerShow, containerHide] = data.cover.warnings.length
         ? [containerReveal, containerNoReveal]
         : [containerNoReveal, containerReveal];
 
-      containerHide.style.display = "none";
-      containerShow.style.display = "block";
+      containerHide.style.display = 'none';
+      containerShow.style.display = 'block';
 
-      const img = containerShow.querySelector(".info-card-art");
-      img.src = rebase(data.cover.paths.small, "rebaseMedia");
+      const img = containerShow.querySelector('.info-card-art');
+      img.src = rebase(data.cover.paths.small, 'rebaseMedia');
 
-      const imgLink = containerShow.querySelector("a");
+      const imgLink = containerShow.querySelector('a');
       colorLink(imgLink, data.color);
-      imgLink.href = rebase(data.cover.paths.original, "rebaseMedia");
+      imgLink.href = rebase(data.cover.paths.original, 'rebaseMedia');
 
       if (containerShow === containerReveal) {
-        const cw = containerShow.querySelector(".info-card-art-warnings");
+        const cw = containerShow.querySelector('.info-card-art-warnings');
         cw.innerText = list.unit(data.cover.warnings);
 
-        const reveal = containerShow.querySelector(".reveal");
-        reveal.classList.remove("revealed");
+        const reveal = containerShow.querySelector('.reveal');
+        reveal.classList.remove('revealed');
       }
     });
   }
 
   function hide() {
-    container.classList.remove("show");
-    container.classList.add("hide");
+    container.classList.remove('show');
+    container.classList.add('hide');
     cancelShow = true;
     showing = false;
   }
@@ -452,7 +452,7 @@ function makeInfoCardLinkHandlers(type) {
 }
 
 const infoCardLinkHandlers = {
-  track: makeInfoCardLinkHandlers("track"),
+  track: makeInfoCardLinkHandlers('track'),
 };
 
 function addInfoCardLinkHandlers(type) {
@@ -471,5 +471,5 @@ function addInfoCardLinkHandlers(type) {
 //     localStorage.tryInfoCards = true;
 //
 if (localStorage.tryInfoCards) {
-  addInfoCardLinkHandlers("track");
+  addInfoCardLinkHandlers('track');
 }

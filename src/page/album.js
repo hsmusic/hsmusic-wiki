@@ -1,33 +1,33 @@
-// @format
-//
+/** @format */
+
 // Album page specification.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
-import * as html from "../util/html.js";
+import * as html from '../util/html.js';
 
-import { bindOpts, compareArrays } from "../util/sugar.js";
+import {bindOpts, compareArrays} from '../util/sugar.js';
 
 import {
   getAlbumCover,
   getAlbumListTag,
   getTotalDuration,
-} from "../util/wiki-data.js";
+} from '../util/wiki-data.js';
 
 // Page exports
 
-export function targets({ wikiData }) {
+export function targets({wikiData}) {
   return wikiData.albumData;
 }
 
-export function write(album, { wikiData }) {
-  const { wikiInfo } = wikiData;
+export function write(album, {wikiData}) {
+  const {wikiInfo} = wikiData;
 
   const unbound_trackToListItem = (
     track,
-    { getArtistString, getLinkThemeString, link, language }
+    {getArtistString, getLinkThemeString, link, language}
   ) => {
     const itemOpts = {
       duration: language.formatDuration(track.duration ?? 0),
@@ -37,13 +37,13 @@ export function write(album, { wikiData }) {
       compareArrays(
         track.artistContribs.map((c) => c.who),
         album.artistContribs.map((c) => c.who),
-        { checkOrder: false }
+        {checkOrder: false}
       )
-        ? language.$("trackList.item.withDuration", itemOpts)
-        : language.$("trackList.item.withDuration.withArtists", {
+        ? language.$('trackList.item.withDuration', itemOpts)
+        : language.$('trackList.item.withDuration.withArtists', {
             ...itemOpts,
             by: `<span class="by">${language.$(
-              "trackList.item.withArtists.by",
+              'trackList.item.withArtists.by',
               {
                 artists: getArtistString(track.artistContribs),
               }
@@ -60,8 +60,8 @@ export function write(album, { wikiData }) {
   const listTag = getAlbumListTag(album);
 
   const data = {
-    type: "data",
-    path: ["album", album.directory],
+    type: 'data',
+    path: ['album', album.directory],
     data: ({
       serializeContribs,
       serializeCover,
@@ -97,8 +97,8 @@ export function write(album, { wikiData }) {
   };
 
   const page = {
-    type: "page",
-    path: ["album", album.directory],
+    type: 'page',
+    path: ['album', album.directory],
     page: ({
       fancifyURL,
       generateAdditionalFilesShortcut,
@@ -126,7 +126,7 @@ export function write(album, { wikiData }) {
       const cover = getAlbumCover(album);
 
       return {
-        title: language.$("albumPage.title", { album: album.name }),
+        title: language.$('albumPage.title', {album: album.name}),
         stylesheet: getAlbumStylesheet(album),
         theme: getThemeString(album.color, [
           `--album-directory: ${album.directory}`,
@@ -135,12 +135,12 @@ export function write(album, { wikiData }) {
         banner: album.bannerArtistContribs.length && {
           dimensions: album.bannerDimensions,
           path: [
-            "media.albumBanner",
+            'media.albumBanner',
             album.directory,
             album.bannerFileExtension,
           ],
-          alt: language.$("misc.alt.albumBanner"),
-          position: "top",
+          alt: language.$('misc.alt.albumBanner'),
+          position: 'top',
         },
 
         main: {
@@ -149,17 +149,17 @@ export function write(album, { wikiData }) {
                           cover &&
                           generateCoverLink({
                             src: cover,
-                            alt: language.$("misc.alt.albumCover"),
+                            alt: language.$('misc.alt.albumCover'),
                             tags: album.artTags,
                           })
                         }
-                        <h1>${language.$("albumPage.title", {
+                        <h1>${language.$('albumPage.title', {
                           album: album.name,
                         })}</h1>
                         <p>
                             ${[
                               album.artistContribs.length &&
-                                language.$("releaseInfo.by", {
+                                language.$('releaseInfo.by', {
                                   artists: getArtistString(
                                     album.artistContribs,
                                     {
@@ -169,7 +169,7 @@ export function write(album, { wikiData }) {
                                   ),
                                 }),
                               album.coverArtistContribs.length &&
-                                language.$("releaseInfo.coverArtBy", {
+                                language.$('releaseInfo.coverArtBy', {
                                   artists: getArtistString(
                                     album.coverArtistContribs,
                                     {
@@ -179,7 +179,7 @@ export function write(album, { wikiData }) {
                                   ),
                                 }),
                               album.wallpaperArtistContribs.length &&
-                                language.$("releaseInfo.wallpaperArtBy", {
+                                language.$('releaseInfo.wallpaperArtBy', {
                                   artists: getArtistString(
                                     album.wallpaperArtistContribs,
                                     {
@@ -189,7 +189,7 @@ export function write(album, { wikiData }) {
                                   ),
                                 }),
                               album.bannerArtistContribs.length &&
-                                language.$("releaseInfo.bannerArtBy", {
+                                language.$('releaseInfo.bannerArtBy', {
                                   artists: getArtistString(
                                     album.bannerArtistContribs,
                                     {
@@ -199,23 +199,23 @@ export function write(album, { wikiData }) {
                                   ),
                                 }),
                               album.date &&
-                                language.$("releaseInfo.released", {
+                                language.$('releaseInfo.released', {
                                   date: language.formatDate(album.date),
                                 }),
                               album.coverArtDate &&
                                 +album.coverArtDate !== +album.date &&
-                                language.$("releaseInfo.artReleased", {
+                                language.$('releaseInfo.artReleased', {
                                   date: language.formatDate(album.coverArtDate),
                                 }),
-                              language.$("releaseInfo.duration", {
+                              language.$('releaseInfo.duration', {
                                 duration: language.formatDuration(
                                   albumDuration,
-                                  { approximate: album.tracks.length > 1 }
+                                  {approximate: album.tracks.length > 1}
                                 ),
                               }),
                             ]
                               .filter(Boolean)
-                              .join("<br>\n")}
+                              .join('<br>\n')}
                         </p>
                         ${
                           (hasAdditionalFiles || hasCommentaryEntries) &&
@@ -224,26 +224,26 @@ export function write(album, { wikiData }) {
                               hasAdditionalFiles &&
                                 generateAdditionalFilesShortcut(
                                   album.additionalFiles,
-                                  { language }
+                                  {language}
                                 ),
                               hasCommentaryEntries &&
-                                language.$("releaseInfo.viewCommentary", {
+                                language.$('releaseInfo.viewCommentary', {
                                   link: link.albumCommentary(album, {
                                     text: language.$(
-                                      "releaseInfo.viewCommentary.link"
+                                      'releaseInfo.viewCommentary.link'
                                     ),
                                   }),
                                 }),
                             ]
                               .filter(Boolean)
-                              .join("<br>\n")}</p>`
+                              .join('<br>\n')}</p>`
                         }
                         ${
                           album.urls?.length &&
-                          `<p>${language.$("releaseInfo.listenOn", {
+                          `<p>${language.$('releaseInfo.listenOn', {
                             links: language.formatDisjunctionList(
                               album.urls.map((url) =>
-                                fancifyURL(url, { album: true })
+                                fancifyURL(url, {album: true})
                               )
                             ),
                           })}</p>`
@@ -263,32 +263,32 @@ export function write(album, { wikiData }) {
                                       tracks,
                                     }) => fixWS`
                                     <dt>${language.$(
-                                      "trackList.section.withDuration",
+                                      'trackList.section.withDuration',
                                       {
                                         duration: language.formatDuration(
                                           getTotalDuration(tracks),
-                                          { approximate: tracks.length > 1 }
+                                          {approximate: tracks.length > 1}
                                         ),
                                         section: name,
                                       }
                                     )}</dt>
                                     <dd><${
-                                      listTag === "ol"
+                                      listTag === 'ol'
                                         ? `ol start="${startIndex + 1}"`
                                         : listTag
                                     }>
                                         ${tracks
                                           .map(trackToListItem)
-                                          .join("\n")}
+                                          .join('\n')}
                                     </${listTag}></dd>
                                 `
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </dl>
                         `
                             : fixWS`
                             <${listTag}>
-                                ${album.tracks.map(trackToListItem).join("\n")}
+                                ${album.tracks.map(trackToListItem).join('\n')}
                             </${listTag}>
                         `
                         }
@@ -297,14 +297,14 @@ export function write(album, { wikiData }) {
                           fixWS`
                             <p>
                                 ${[
-                                  language.$("releaseInfo.addedToWiki", {
+                                  language.$('releaseInfo.addedToWiki', {
                                     date: language.formatDate(
                                       album.dateAddedToWiki
                                     ),
                                   }),
                                 ]
                                   .filter(Boolean)
-                                  .join("<br>\n")}
+                                  .join('<br>\n')}
                             </p>
                         `
                         }
@@ -315,21 +315,21 @@ export function write(album, { wikiData }) {
                             getFileSize: (file) =>
                               getSizeOfAdditionalFile(
                                 urls
-                                  .from("media.root")
+                                  .from('media.root')
                                   .to(
-                                    "media.albumAdditionalFile",
+                                    'media.albumAdditionalFile',
                                     album.directory,
                                     file
                                   )
                               ),
                             linkFile: (file) =>
-                              link.albumAdditionalFile({ album, file }),
+                              link.albumAdditionalFile({album, file}),
                           })
                         }
                         ${
                           album.commentary &&
                           fixWS`
-                            <p>${language.$("releaseInfo.artistCommentary")}</p>
+                            <p>${language.$('releaseInfo.artistCommentary')}</p>
                             <blockquote>
                                 ${transformMultiline(album.commentary)}
                             </blockquote>
@@ -348,16 +348,16 @@ export function write(album, { wikiData }) {
         }),
 
         nav: {
-          linkContainerClasses: ["nav-links-hierarchy"],
+          linkContainerClasses: ['nav-links-hierarchy'],
           links: [
-            { toHome: true },
+            {toHome: true},
             {
-              html: language.$("albumPage.nav.album", {
-                album: link.album(album, { class: "current" }),
+              html: language.$('albumPage.nav.album', {
+                album: link.album(album, {class: 'current'}),
               }),
             },
           ],
-          bottomRowContent: generateAlbumNavLinks(album, null, { language }),
+          bottomRowContent: generateAlbumNavLinks(album, null, {language}),
           content: generateAlbumChronologyLinks(album, null, {
             generateChronologyLinks,
           }),
@@ -380,14 +380,7 @@ export function write(album, { wikiData }) {
 export function generateAlbumSidebar(
   album,
   currentTrack,
-  {
-    fancifyURL,
-    getLinkThemeString,
-    link,
-    language,
-    transformMultiline,
-    wikiData,
-  }
+  {fancifyURL, getLinkThemeString, link, language, transformMultiline, wikiData}
 ) {
   const listTag = getAlbumListTag(album);
 
@@ -400,41 +393,41 @@ export function generateAlbumSidebar(
     }];
     */
 
-  const { trackGroups } = album;
+  const {trackGroups} = album;
 
   const trackToListItem = (track) =>
     html.tag(
-      "li",
-      { class: track === currentTrack && "current" },
-      language.$("albumSidebar.trackList.item", {
+      'li',
+      {class: track === currentTrack && 'current'},
+      language.$('albumSidebar.trackList.item', {
         track: link.track(track),
       })
     );
 
   const nameOrDefault = (isDefaultTrackGroup, name) =>
     isDefaultTrackGroup
-      ? language.$("albumSidebar.trackList.fallbackGroupName")
+      ? language.$('albumSidebar.trackList.fallbackGroupName')
       : name;
 
   const trackListPart = fixWS`
         <h1>${link.album(album)}</h1>
         ${trackGroups
-          .map(({ name, color, startIndex, tracks, isDefaultTrackGroup }) =>
+          .map(({name, color, startIndex, tracks, isDefaultTrackGroup}) =>
             html.tag(
-              "details",
+              'details',
               {
                 // Leave side8ar track groups collapsed on al8um homepage,
                 // since there's already a view of all the groups expanded
                 // in the main content area.
                 open: currentTrack && tracks.includes(currentTrack),
-                class: tracks.includes(currentTrack) && "current",
+                class: tracks.includes(currentTrack) && 'current',
               },
               [
                 html.tag(
-                  "summary",
-                  { style: getLinkThemeString(color) },
-                  listTag === "ol"
-                    ? language.$("albumSidebar.trackList.group.withRange", {
+                  'summary',
+                  {style: getLinkThemeString(color)},
+                  listTag === 'ol'
+                    ? language.$('albumSidebar.trackList.group.withRange', {
                         group: `<span class="group-name">${nameOrDefault(
                           isDefaultTrackGroup,
                           name
@@ -443,7 +436,7 @@ export function generateAlbumSidebar(
                           startIndex + tracks.length
                         }`,
                       })
-                    : language.$("albumSidebar.trackList.group", {
+                    : language.$('albumSidebar.trackList.group', {
                         group: `<span class="group-name">${nameOrDefault(
                           isDefaultTrackGroup,
                           name
@@ -452,20 +445,20 @@ export function generateAlbumSidebar(
                 ),
                 fixWS`
                     <${
-                      listTag === "ol"
+                      listTag === 'ol'
                         ? `ol start="${startIndex + 1}"`
                         : listTag
                     }>
-                        ${tracks.map(trackToListItem).join("\n")}
+                        ${tracks.map(trackToListItem).join('\n')}
                     </${listTag}>
                 `,
               ]
             )
           )
-          .join("\n")}
+          .join('\n')}
     `;
 
-  const { groups } = album;
+  const {groups} = album;
 
   const groupParts = groups
     .map((group) => {
@@ -473,17 +466,17 @@ export function generateAlbumSidebar(
       const index = albums.indexOf(album);
       const next = index >= 0 && albums[index + 1];
       const previous = index > 0 && albums[index - 1];
-      return { group, next, previous };
+      return {group, next, previous};
     })
     .map(
-      ({ group, next, previous }) => fixWS`
-        <h1>${language.$("albumSidebar.groupBox.title", {
+      ({group, next, previous}) => fixWS`
+        <h1>${language.$('albumSidebar.groupBox.title', {
           group: link.groupInfo(group),
         })}</h1>
         ${!currentTrack && transformMultiline(group.descriptionShort)}
         ${
           group.urls?.length &&
-          `<p>${language.$("releaseInfo.visitOn", {
+          `<p>${language.$('releaseInfo.visitOn', {
             links: language.formatDisjunctionList(
               group.urls.map((url) => fancifyURL(url))
             ),
@@ -495,7 +488,7 @@ export function generateAlbumSidebar(
             ${
               next &&
               `<p class="group-chronology-link">${language.$(
-                "albumSidebar.groupBox.next",
+                'albumSidebar.groupBox.next',
                 {
                   album: link.album(next),
                 }
@@ -504,7 +497,7 @@ export function generateAlbumSidebar(
             ${
               previous &&
               `<p class="group-chronology-link">${language.$(
-                "albumSidebar.groupBox.previous",
+                'albumSidebar.groupBox.previous',
                 {
                   album: link.album(previous),
                 }
@@ -517,7 +510,7 @@ export function generateAlbumSidebar(
 
   if (groupParts.length) {
     if (currentTrack) {
-      const combinedGroupPart = groupParts.join("\n<hr>\n");
+      const combinedGroupPart = groupParts.join('\n<hr>\n');
       return {
         multiple: [trackListPart, combinedGroupPart],
       };
@@ -536,9 +529,9 @@ export function generateAlbumSidebar(
 export function generateAlbumSecondaryNav(
   album,
   currentTrack,
-  { link, language, getLinkThemeString }
+  {link, language, getLinkThemeString}
 ) {
-  const { groups } = album;
+  const {groups} = album;
 
   if (!groups.length) {
     return null;
@@ -550,56 +543,56 @@ export function generateAlbumSecondaryNav(
       const index = albums.indexOf(album);
       const next = index >= 0 && albums[index + 1];
       const previous = index > 0 && albums[index - 1];
-      return { group, next, previous };
+      return {group, next, previous};
     })
-    .map(({ group, next, previous }) => {
+    .map(({group, next, previous}) => {
       const previousNext =
         !currentTrack &&
         [
           previous &&
             link.album(previous, {
               color: false,
-              text: language.$("misc.nav.previous"),
+              text: language.$('misc.nav.previous'),
             }),
           next &&
             link.album(next, {
               color: false,
-              text: language.$("misc.nav.next"),
+              text: language.$('misc.nav.next'),
             }),
         ].filter(Boolean);
-      return html.tag("span", { style: getLinkThemeString(group.color) }, [
-        language.$("albumSidebar.groupBox.title", {
+      return html.tag('span', {style: getLinkThemeString(group.color)}, [
+        language.$('albumSidebar.groupBox.title', {
           group: link.groupInfo(group),
         }),
-        previousNext?.length && `(${previousNext.join(",\n")})`,
+        previousNext?.length && `(${previousNext.join(',\n')})`,
       ]);
     });
 
   return {
-    classes: ["dot-between-spans"],
-    content: groupParts.join("\n"),
+    classes: ['dot-between-spans'],
+    content: groupParts.join('\n'),
   };
 }
 
 export function generateAlbumNavLinks(
   album,
   currentTrack,
-  { generatePreviousNextLinks, language }
+  {generatePreviousNextLinks, language}
 ) {
   if (album.tracks.length <= 1) {
-    return "";
+    return '';
   }
 
   const previousNextLinks =
     currentTrack &&
     generatePreviousNextLinks(currentTrack, {
       data: album.tracks,
-      linkKey: "track",
+      linkKey: 'track',
     });
   const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
     currentTrack
-      ? language.$("trackPage.nav.random")
-      : language.$("albumPage.nav.randomTrack")
+      ? language.$('trackPage.nav.random')
+      : language.$('albumPage.nav.randomTrack')
   }</a>`;
 
   return previousNextLinks
@@ -610,44 +603,44 @@ export function generateAlbumNavLinks(
 export function generateAlbumChronologyLinks(
   album,
   currentTrack,
-  { generateChronologyLinks }
+  {generateChronologyLinks}
 ) {
   return html.tag(
-    "div",
+    'div',
     {
       [html.onlyIfContent]: true,
-      class: "nav-chronology-links",
+      class: 'nav-chronology-links',
     },
     [
       currentTrack &&
         generateChronologyLinks(currentTrack, {
-          contribKey: "artistContribs",
+          contribKey: 'artistContribs',
           getThings: (artist) => [
             ...artist.tracksAsArtist,
             ...artist.tracksAsContributor,
           ],
-          headingString: "misc.chronology.heading.track",
+          headingString: 'misc.chronology.heading.track',
         }),
       currentTrack &&
         generateChronologyLinks(currentTrack, {
-          contribKey: "contributorContribs",
+          contribKey: 'contributorContribs',
           getThings: (artist) => [
             ...artist.tracksAsArtist,
             ...artist.tracksAsContributor,
           ],
-          headingString: "misc.chronology.heading.track",
+          headingString: 'misc.chronology.heading.track',
         }),
       generateChronologyLinks(currentTrack || album, {
-        contribKey: "coverArtistContribs",
-        dateKey: "coverArtDate",
+        contribKey: 'coverArtistContribs',
+        dateKey: 'coverArtDate',
         getThings: (artist) => [
           ...artist.albumsAsCoverArtist,
           ...artist.tracksAsCoverArtist,
         ],
-        headingString: "misc.chronology.heading.coverArt",
+        headingString: 'misc.chronology.heading.coverArt',
       }),
     ]
       .filter(Boolean)
-      .join("\n")
+      .join('\n')
   );
 }

@@ -1,37 +1,37 @@
-// @format
-//
+/** @format */
+
 // Miscellaneous utility functions which are useful across page specifications.
 // These are made available right on a page spec's ({wikiData, language, ...})
 // args object!
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
-import * as html from "./util/html.js";
+import * as html from './util/html.js';
 
-import { Track, Album } from "./data/things.js";
+import {Track, Album} from './data/things.js';
 
-import { getColors } from "./util/colors.js";
+import {getColors} from './util/colors.js';
 
-import { unique } from "./util/sugar.js";
+import {unique} from './util/sugar.js';
 
 import {
   getTotalDuration,
   sortAlbumsTracksChronologically,
   sortChronologically,
-} from "./util/wiki-data.js";
+} from './util/wiki-data.js';
 
-const BANDCAMP_DOMAINS = ["bc.s3m.us", "music.solatrux.com"];
+const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
 
-const MASTODON_DOMAINS = ["types.pl"];
+const MASTODON_DOMAINS = ['types.pl'];
 
 // "Additional Files" listing
 
-export function generateAdditionalFilesShortcut(additionalFiles, { language }) {
-  if (!additionalFiles?.length) return "";
+export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
+  if (!additionalFiles?.length) return '';
 
-  return language.$("releaseInfo.additionalFiles.shortcut", {
+  return language.$('releaseInfo.additionalFiles.shortcut', {
     anchorLink: `<a href="#additional-files">${language.$(
-      "releaseInfo.additionalFiles.shortcut.anchorLink"
+      'releaseInfo.additionalFiles.shortcut.anchorLink'
     )}</a>`,
     titles: language.formatUnitList(additionalFiles.map((g) => g.title)),
   });
@@ -39,15 +39,15 @@ export function generateAdditionalFilesShortcut(additionalFiles, { language }) {
 
 export function generateAdditionalFilesList(
   additionalFiles,
-  { language, getFileSize, linkFile }
+  {language, getFileSize, linkFile}
 ) {
-  if (!additionalFiles?.length) return "";
+  if (!additionalFiles?.length) return '';
 
   const fileCount = additionalFiles.flatMap((g) => g.files).length;
 
   return fixWS`
         <p id="additional-files">${language.$(
-          "releaseInfo.additionalFiles.heading",
+          'releaseInfo.additionalFiles.heading',
           {
             additionalFiles: language.countAdditionalFiles(fileCount, {
               unit: true,
@@ -57,14 +57,14 @@ export function generateAdditionalFilesList(
         <dl>
             ${additionalFiles
               .map(
-                ({ title, description, files }) => fixWS`
+                ({title, description, files}) => fixWS`
                 <dt>${
                   description
                     ? language.$(
-                        "releaseInfo.additionalFiles.entry.withDescription",
-                        { title, description }
+                        'releaseInfo.additionalFiles.entry.withDescription',
+                        {title, description}
                       )
-                    : language.$("releaseInfo.additionalFiles.entry", { title })
+                    : language.$('releaseInfo.additionalFiles.entry', {title})
                 }</dt>
                 <dd><ul>
                     ${files
@@ -72,7 +72,7 @@ export function generateAdditionalFilesList(
                         const size = getFileSize(file);
                         return size
                           ? `<li>${language.$(
-                              "releaseInfo.additionalFiles.file.withSize",
+                              'releaseInfo.additionalFiles.file.withSize',
                               {
                                 file: linkFile(file),
                                 size: language.formatFileSize(
@@ -81,17 +81,17 @@ export function generateAdditionalFilesList(
                               }
                             )}</li>`
                           : `<li>${language.$(
-                              "releaseInfo.additionalFiles.file",
+                              'releaseInfo.additionalFiles.file',
                               {
                                 file: linkFile(file),
                               }
                             )}</li>`;
                       })
-                      .join("\n")}
+                      .join('\n')}
                 </ul></dd>
             `
               )
-              .join("\n")}
+              .join('\n')}
         </dl>
     `;
 }
@@ -100,22 +100,22 @@ export function generateAdditionalFilesList(
 
 export function getArtistString(
   artists,
-  { iconifyURL, link, language, showIcons = false, showContrib = false }
+  {iconifyURL, link, language, showIcons = false, showContrib = false}
 ) {
   return language.formatConjunctionList(
-    artists.map(({ who, what }) => {
-      const { urls, directory, name } = who;
+    artists.map(({who, what}) => {
+      const {urls, directory, name} = who;
       return [
         link.artist(who),
         showContrib && what && `(${what})`,
         showIcons &&
           urls?.length &&
           `<span class="icons">(${language.formatUnitList(
-            urls.map((url) => iconifyURL(url, { language }))
+            urls.map((url) => iconifyURL(url, {language}))
           )})</span>`,
       ]
         .filter(Boolean)
-        .join(" ");
+        .join(' ');
     })
   );
 }
@@ -125,7 +125,7 @@ export function getArtistString(
 export function generateChronologyLinks(
   currentThing,
   {
-    dateKey = "date",
+    dateKey = 'date',
     contribKey,
     getThings,
     headingString,
@@ -135,28 +135,28 @@ export function generateChronologyLinks(
     wikiData,
   }
 ) {
-  const { albumData } = wikiData;
+  const {albumData} = wikiData;
 
   const contributions = currentThing[contribKey];
   if (!contributions) {
-    return "";
+    return '';
   }
 
   if (contributions.length > 8) {
     return `<div class="chronology">${language.$(
-      "misc.chronology.seeArtistPages"
+      'misc.chronology.seeArtistPages'
     )}</div>`;
   }
 
   return contributions
-    .map(({ who: artist }) => {
+    .map(({who: artist}) => {
       const thingsUnsorted = unique(getThings(artist)).filter(
         (t) => t[dateKey]
       );
 
       // Kinda a hack, but we automatically detect which is (probably) the
       // right function to use here.
-      const args = [thingsUnsorted, { getDate: (t) => t[dateKey] }];
+      const args = [thingsUnsorted, {getDate: (t) => t[dateKey]}];
       const things = thingsUnsorted.every(
         (t) => t instanceof Album || t instanceof Track
       )
@@ -165,7 +165,7 @@ export function generateChronologyLinks(
 
       const index = things.indexOf(currentThing);
 
-      if (index === -1) return "";
+      if (index === -1) return '';
 
       // TODO: This can pro8a8ly 8e made to use generatePreviousNextLinks?
       // We'd need to make generatePreviousNextLinks use toAnythingMan tho.
@@ -175,21 +175,21 @@ export function generateChronologyLinks(
         previous &&
           linkAnythingMan(previous, {
             color: false,
-            text: language.$("misc.nav.previous"),
+            text: language.$('misc.nav.previous'),
           }),
         next &&
           linkAnythingMan(next, {
             color: false,
-            text: language.$("misc.nav.next"),
+            text: language.$('misc.nav.next'),
           }),
       ].filter(Boolean);
 
       if (!parts.length) {
-        return "";
+        return '';
       }
 
       const stringOpts = {
-        index: language.formatIndex(index + 1, { language }),
+        index: language.formatIndex(index + 1, {language}),
         artist: link.artist(artist),
       };
 
@@ -201,27 +201,27 @@ export function generateChronologyLinks(
                 )}</span>
                 ${
                   parts.length &&
-                  `<span class="buttons">(${parts.join(", ")})</span>`
+                  `<span class="buttons">(${parts.join(', ')})</span>`
                 }
             </div>
         `;
     })
     .filter(Boolean)
-    .join("\n");
+    .join('\n');
 }
 
 // Content warning tags
 
-export function getRevealStringFromWarnings(warnings, { language }) {
+export function getRevealStringFromWarnings(warnings, {language}) {
   return (
-    language.$("misc.contentWarnings", { warnings }) +
+    language.$('misc.contentWarnings', {warnings}) +
     `<br><span class="reveal-interaction">${language.$(
-      "misc.contentWarnings.reveal"
+      'misc.contentWarnings.reveal'
     )}</span>`
   );
 }
 
-export function getRevealStringFromTags(tags, { language }) {
+export function getRevealStringFromTags(tags, {language}) {
   return (
     tags &&
     tags.some((tag) => tag.isContentWarning) &&
@@ -229,7 +229,7 @@ export function getRevealStringFromTags(tags, { language }) {
       language.formatUnitList(
         tags.filter((tag) => tag.isContentWarning).map((tag) => tag.name)
       ),
-      { language }
+      {language}
     )
   );
 }
@@ -247,7 +247,7 @@ export function generateCoverLink({
   alt,
   tags = [],
 }) {
-  const { wikiInfo } = wikiData;
+  const {wikiInfo} = wikiData;
 
   if (!src && path) {
     src = to(...path);
@@ -262,22 +262,22 @@ export function generateCoverLink({
             ${img({
               src,
               alt,
-              thumb: "medium",
-              id: "cover-art",
+              thumb: 'medium',
+              id: 'cover-art',
               link: true,
               square: true,
-              reveal: getRevealStringFromTags(tags, { language }),
+              reveal: getRevealStringFromTags(tags, {language}),
             })}
             ${
               wikiInfo.enableArtTagUI &&
               tags.filter((tag) => !tag.isContentWarning).length &&
               fixWS`
                 <p class="tags">
-                    ${language.$("releaseInfo.artTags")}
+                    ${language.$('releaseInfo.artTags')}
                     ${tags
                       .filter((tag) => !tag.isContentWarning)
                       .map(link.tag)
-                      .join(",\n")}
+                      .join(',\n')}
                 </p>
             `
             }
@@ -288,9 +288,9 @@ export function generateCoverLink({
 // CSS & color shenanigans
 
 export function getThemeString(color, additionalVariables = []) {
-  if (!color) return "";
+  if (!color) return '';
 
-  const { primary, dim, bg } = getColors(color);
+  const {primary, dim, bg} = getColors(color);
 
   const variables = [
     `--primary-color: ${primary}`,
@@ -299,19 +299,19 @@ export function getThemeString(color, additionalVariables = []) {
     ...additionalVariables,
   ].filter(Boolean);
 
-  if (!variables.length) return "";
+  if (!variables.length) return '';
 
   return (
-    `:root {\n` + variables.map((line) => `    ` + line + ";\n").join("") + `}`
+    `:root {\n` + variables.map((line) => `    ` + line + ';\n').join('') + `}`
   );
 }
-export function getAlbumStylesheet(album, { to }) {
+export function getAlbumStylesheet(album, {to}) {
   return [
     album.wallpaperArtistContribs.length &&
       fixWS`
             body::before {
                 background-image: url("${to(
-                  "media.albumWallpaper",
+                  'media.albumWallpaper',
                   album.directory,
                   album.wallpaperFileExtension
                 )}");
@@ -326,31 +326,31 @@ export function getAlbumStylesheet(album, { to }) {
         `,
   ]
     .filter(Boolean)
-    .join("\n");
+    .join('\n');
 }
 
 // Divided track lists
 
 export function generateTrackListDividedByGroups(
   tracks,
-  { getTrackItem, language, wikiData }
+  {getTrackItem, language, wikiData}
 ) {
-  const { divideTrackListsByGroups: groups } = wikiData.wikiInfo;
+  const {divideTrackListsByGroups: groups} = wikiData.wikiInfo;
 
   if (!groups?.length) {
     return html.tag(
-      "ul",
+      'ul',
       tracks.map((t) => getTrackItem(t))
     );
   }
 
   const lists = Object.fromEntries(
-    groups.map((group) => [group.directory, { group, tracks: [] }])
+    groups.map((group) => [group.directory, {group, tracks: []}])
   );
   const other = [];
 
   for (const track of tracks) {
-    const { album } = track;
+    const {album} = track;
     const group = groups.find((g) => g.albums.includes(album));
     if (group) {
       lists[group.directory].tracks.push(track);
@@ -361,26 +361,26 @@ export function generateTrackListDividedByGroups(
 
   const ddul = (tracks) => fixWS`
         <dd><ul>
-            ${tracks.map((t) => getTrackItem(t)).join("\n")}
+            ${tracks.map((t) => getTrackItem(t)).join('\n')}
         </ul></dd>
     `;
 
   return html.tag(
-    "dl",
+    'dl',
     Object.values(lists)
-      .filter(({ tracks }) => tracks.length)
-      .flatMap(({ group, tracks }) => [
+      .filter(({tracks}) => tracks.length)
+      .flatMap(({group, tracks}) => [
         html.tag(
-          "dt",
-          language.formatString("trackList.group", { group: group.name })
+          'dt',
+          language.formatString('trackList.group', {group: group.name})
         ),
         ddul(tracks),
       ])
       .concat(
         other.length
           ? [
-              `<dt>${language.formatString("trackList.group", {
-                group: language.formatString("trackList.group.other"),
+              `<dt>${language.formatString('trackList.group', {
+                group: language.formatString('trackList.group.other'),
               })}</dt>`,
               ddul(other),
             ]
@@ -391,7 +391,7 @@ export function generateTrackListDividedByGroups(
 
 // Fancy lookin' links
 
-export function fancifyURL(url, { language, album = false } = {}) {
+export function fancifyURL(url, {language, album = false} = {}) {
   let local = Symbol();
   let domain;
   try {
@@ -403,80 +403,80 @@ export function fancifyURL(url, { language, album = false } = {}) {
   }
   return fixWS`<a href="${url}" class="nowrap">${
     domain === local
-      ? language.$("misc.external.local")
-      : domain.includes("bandcamp.com")
-      ? language.$("misc.external.bandcamp")
+      ? language.$('misc.external.local')
+      : domain.includes('bandcamp.com')
+      ? language.$('misc.external.bandcamp')
       : BANDCAMP_DOMAINS.includes(domain)
-      ? language.$("misc.external.bandcamp.domain", { domain })
+      ? language.$('misc.external.bandcamp.domain', {domain})
       : MASTODON_DOMAINS.includes(domain)
-      ? language.$("misc.external.mastodon.domain", { domain })
-      : domain.includes("youtu")
+      ? language.$('misc.external.mastodon.domain', {domain})
+      : domain.includes('youtu')
       ? album
-        ? url.includes("list=")
-          ? language.$("misc.external.youtube.playlist")
-          : language.$("misc.external.youtube.fullAlbum")
-        : language.$("misc.external.youtube")
-      : domain.includes("soundcloud")
-      ? language.$("misc.external.soundcloud")
-      : domain.includes("tumblr.com")
-      ? language.$("misc.external.tumblr")
-      : domain.includes("twitter.com")
-      ? language.$("misc.external.twitter")
-      : domain.includes("deviantart.com")
-      ? language.$("misc.external.deviantart")
-      : domain.includes("wikipedia.org")
-      ? language.$("misc.external.wikipedia")
-      : domain.includes("poetryfoundation.org")
-      ? language.$("misc.external.poetryFoundation")
-      : domain.includes("instagram.com")
-      ? language.$("misc.external.instagram")
-      : domain.includes("patreon.com")
-      ? language.$("misc.external.patreon")
+        ? url.includes('list=')
+          ? language.$('misc.external.youtube.playlist')
+          : language.$('misc.external.youtube.fullAlbum')
+        : language.$('misc.external.youtube')
+      : domain.includes('soundcloud')
+      ? language.$('misc.external.soundcloud')
+      : domain.includes('tumblr.com')
+      ? language.$('misc.external.tumblr')
+      : domain.includes('twitter.com')
+      ? language.$('misc.external.twitter')
+      : domain.includes('deviantart.com')
+      ? language.$('misc.external.deviantart')
+      : domain.includes('wikipedia.org')
+      ? language.$('misc.external.wikipedia')
+      : domain.includes('poetryfoundation.org')
+      ? language.$('misc.external.poetryFoundation')
+      : domain.includes('instagram.com')
+      ? language.$('misc.external.instagram')
+      : domain.includes('patreon.com')
+      ? language.$('misc.external.patreon')
       : domain
   }</a>`;
 }
 
-export function fancifyFlashURL(url, flash, { language }) {
-  const link = fancifyURL(url, { language });
+export function fancifyFlashURL(url, flash, {language}) {
+  const link = fancifyURL(url, {language});
   return `<span class="nowrap">${
-    url.includes("homestuck.com")
+    url.includes('homestuck.com')
       ? isNaN(Number(flash.page))
-        ? language.$("misc.external.flash.homestuck.secret", { link })
-        : language.$("misc.external.flash.homestuck.page", {
+        ? language.$('misc.external.flash.homestuck.secret', {link})
+        : language.$('misc.external.flash.homestuck.page', {
             link,
             page: flash.page,
           })
-      : url.includes("bgreco.net")
-      ? language.$("misc.external.flash.bgreco", { link })
-      : url.includes("youtu")
-      ? language.$("misc.external.flash.youtube", { link })
+      : url.includes('bgreco.net')
+      ? language.$('misc.external.flash.bgreco', {link})
+      : url.includes('youtu')
+      ? language.$('misc.external.flash.youtube', {link})
       : link
   }</span>`;
 }
 
-export function iconifyURL(url, { language, to }) {
+export function iconifyURL(url, {language, to}) {
   const domain = new URL(url).hostname;
-  const [id, msg] = domain.includes("bandcamp.com")
-    ? ["bandcamp", language.$("misc.external.bandcamp")]
+  const [id, msg] = domain.includes('bandcamp.com')
+    ? ['bandcamp', language.$('misc.external.bandcamp')]
     : BANDCAMP_DOMAINS.includes(domain)
-    ? ["bandcamp", language.$("misc.external.bandcamp.domain", { domain })]
+    ? ['bandcamp', language.$('misc.external.bandcamp.domain', {domain})]
     : MASTODON_DOMAINS.includes(domain)
-    ? ["mastodon", language.$("misc.external.mastodon.domain", { domain })]
-    : domain.includes("youtu")
-    ? ["youtube", language.$("misc.external.youtube")]
-    : domain.includes("soundcloud")
-    ? ["soundcloud", language.$("misc.external.soundcloud")]
-    : domain.includes("tumblr.com")
-    ? ["tumblr", language.$("misc.external.tumblr")]
-    : domain.includes("twitter.com")
-    ? ["twitter", language.$("misc.external.twitter")]
-    : domain.includes("deviantart.com")
-    ? ["deviantart", language.$("misc.external.deviantart")]
-    : domain.includes("instagram.com")
-    ? ["instagram", language.$("misc.external.bandcamp")]
-    : ["globe", language.$("misc.external.domain", { domain })];
+    ? ['mastodon', language.$('misc.external.mastodon.domain', {domain})]
+    : domain.includes('youtu')
+    ? ['youtube', language.$('misc.external.youtube')]
+    : domain.includes('soundcloud')
+    ? ['soundcloud', language.$('misc.external.soundcloud')]
+    : domain.includes('tumblr.com')
+    ? ['tumblr', language.$('misc.external.tumblr')]
+    : domain.includes('twitter.com')
+    ? ['twitter', language.$('misc.external.twitter')]
+    : domain.includes('deviantart.com')
+    ? ['deviantart', language.$('misc.external.deviantart')]
+    : domain.includes('instagram.com')
+    ? ['instagram', language.$('misc.external.bandcamp')]
+    : ['globe', language.$('misc.external.domain', {domain})];
   return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to(
-    "shared.staticFile",
+    'shared.staticFile',
     `icons.svg#icon-${id}`
   )}"></use></svg></a>`;
 }
@@ -490,23 +490,23 @@ export function getGridHTML({
   entries,
   srcFn,
   linkFn,
-  noSrcTextFn = () => "",
-  altFn = () => "",
+  noSrcTextFn = () => '',
+  altFn = () => '',
   detailsFn = null,
   lazy = true,
 }) {
   return entries
-    .map(({ large, item }, i) =>
+    .map(({large, item}, i) =>
       linkFn(item, {
-        class: ["grid-item", "box", large && "large-grid-item"],
+        class: ['grid-item', 'box', large && 'large-grid-item'],
         text: fixWS`
                 ${img({
                   src: srcFn(item),
                   alt: altFn(item),
-                  thumb: "small",
-                  lazy: typeof lazy === "number" ? i >= lazy : lazy,
+                  thumb: 'small',
+                  lazy: typeof lazy === 'number' ? i >= lazy : lazy,
                   square: true,
-                  reveal: getRevealStringFromTags(item.artTags, { language }),
+                  reveal: getRevealStringFromTags(item.artTags, {language}),
                   noSrcText: noSrcTextFn(item),
                 })}
                 <span>${item.name}</span>
@@ -514,7 +514,7 @@ export function getGridHTML({
             `,
       })
     )
-    .join("\n");
+    .join('\n');
 }
 
 export function getAlbumGridHTML({
@@ -531,24 +531,19 @@ export function getAlbumGridHTML({
     detailsFn:
       details &&
       ((album) =>
-        language.$("misc.albumGrid.details", {
-          tracks: language.countTracks(album.tracks.length, { unit: true }),
+        language.$('misc.albumGrid.details', {
+          tracks: language.countTracks(album.tracks.length, {unit: true}),
           time: language.formatDuration(getTotalDuration(album.tracks)),
         })),
     noSrcTextFn: (album) =>
-      language.$("misc.albumGrid.noCoverArt", {
+      language.$('misc.albumGrid.noCoverArt', {
         album: album.name,
       }),
     ...props,
   });
 }
 
-export function getFlashGridHTML({
-  getFlashCover,
-  getGridHTML,
-  link,
-  ...props
-}) {
+export function getFlashGridHTML({getFlashCover, getGridHTML, link, ...props}) {
   return getGridHTML({
     srcFn: getFlashCover,
     linkFn: link.flash,
@@ -561,23 +556,23 @@ export function getFlashGridHTML({
 export function generateInfoGalleryLinks(
   currentThing,
   isGallery,
-  { link, language, linkKeyGallery, linkKeyInfo }
+  {link, language, linkKeyGallery, linkKeyInfo}
 ) {
   return [
     link[linkKeyInfo](currentThing, {
-      class: isGallery ? "" : "current",
-      text: language.$("misc.nav.info"),
+      class: isGallery ? '' : 'current',
+      text: language.$('misc.nav.info'),
     }),
     link[linkKeyGallery](currentThing, {
-      class: isGallery ? "current" : "",
-      text: language.$("misc.nav.gallery"),
+      class: isGallery ? 'current' : '',
+      text: language.$('misc.nav.gallery'),
     }),
-  ].join(", ");
+  ].join(', ');
 }
 
 export function generatePreviousNextLinks(
   current,
-  { data, link, linkKey, language }
+  {data, link, linkKey, language}
 ) {
   const linkFn = link[linkKey];
 
@@ -589,51 +584,51 @@ export function generatePreviousNextLinks(
     previous &&
       linkFn(previous, {
         attributes: {
-          id: "previous-button",
+          id: 'previous-button',
           title: previous.name,
         },
-        text: language.$("misc.nav.previous"),
+        text: language.$('misc.nav.previous'),
         color: false,
       }),
     next &&
       linkFn(next, {
         attributes: {
-          id: "next-button",
+          id: 'next-button',
           title: next.name,
         },
-        text: language.$("misc.nav.next"),
+        text: language.$('misc.nav.next'),
         color: false,
       }),
   ]
     .filter(Boolean)
-    .join(", ");
+    .join(', ');
 }
 
 // Footer stuff
 
 export function getFooterLocalizationLinks(
   pathname,
-  { defaultLanguage, languages, paths, language, to }
+  {defaultLanguage, languages, paths, language, to}
 ) {
-  const { toPath } = paths;
-  const keySuffix = toPath[0].replace(/^localized\./, ".");
+  const {toPath} = paths;
+  const keySuffix = toPath[0].replace(/^localized\./, '.');
   const toArgs = toPath.slice(1);
 
   const links = Object.entries(languages)
-    .filter(([code, language]) => code !== "default" && !language.hidden)
+    .filter(([code, language]) => code !== 'default' && !language.hidden)
     .map(([code, language]) => language)
-    .sort(({ name: a }, { name: b }) => (a < b ? -1 : a > b ? 1 : 0))
+    .sort(({name: a}, {name: b}) => (a < b ? -1 : a > b ? 1 : 0))
     .map((language) =>
       html.tag(
-        "span",
+        'span',
         html.tag(
-          "a",
+          'a',
           {
             href:
               language === defaultLanguage
-                ? to("localizedDefaultLanguage" + keySuffix, ...toArgs)
+                ? to('localizedDefaultLanguage' + keySuffix, ...toArgs)
                 : to(
-                    "localizedWithBaseDirectory" + keySuffix,
+                    'localizedWithBaseDirectory' + keySuffix,
                     language.code,
                     ...toArgs
                   ),
@@ -644,8 +639,8 @@ export function getFooterLocalizationLinks(
     );
 
   return html.tag(
-    "div",
-    { class: "footer-localization-links" },
-    language.$("misc.uiLanguage", { languages: links.join("\n") })
+    'div',
+    {class: 'footer-localization-links'},
+    language.$('misc.uiLanguage', {languages: links.join('\n')})
   );
 }

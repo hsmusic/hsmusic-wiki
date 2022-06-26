@@ -1,4 +1,4 @@
-// @format
+/** @format */
 
 export function serializeLink(thing) {
   const ret = {};
@@ -9,7 +9,7 @@ export function serializeLink(thing) {
 }
 
 export function serializeContribs(contribs) {
-  return contribs.map(({ who, what }) => {
+  return contribs.map(({who, what}) => {
     const ret = {};
     ret.artist = serializeLink(who);
     if (what) ret.contribution = what;
@@ -17,7 +17,7 @@ export function serializeContribs(contribs) {
   });
 }
 
-export function serializeImagePaths(original, { thumb }) {
+export function serializeImagePaths(original, {thumb}) {
   return {
     original,
     medium: thumb.medium(original),
@@ -28,13 +28,13 @@ export function serializeImagePaths(original, { thumb }) {
 export function serializeCover(
   thing,
   pathFunction,
-  { serializeImagePaths, urls }
+  {serializeImagePaths, urls}
 ) {
   const coverPath = pathFunction(thing, {
-    to: urls.from("media.root").to,
+    to: urls.from('media.root').to,
   });
 
-  const { artTags } = thing;
+  const {artTags} = thing;
 
   const cwTags = artTags.filter((tag) => tag.isContentWarning);
   const linkTags = artTags.filter((tag) => !tag.isContentWarning);
@@ -46,15 +46,15 @@ export function serializeCover(
   };
 }
 
-export function serializeGroupsForAlbum(album, { serializeLink }) {
+export function serializeGroupsForAlbum(album, {serializeLink}) {
   return album.groups
     .map((group) => {
       const index = group.albums.indexOf(album);
       const next = group.albums[index + 1] || null;
       const previous = group.albums[index - 1] || null;
-      return { group, index, next, previous };
+      return {group, index, next, previous};
     })
-    .map(({ group, index, next, previous }) => ({
+    .map(({group, index, next, previous}) => ({
       link: serializeLink(group),
       descriptionShort: group.descriptionShort,
       albumIndex: index,
@@ -64,7 +64,7 @@ export function serializeGroupsForAlbum(album, { serializeLink }) {
     }));
 }
 
-export function serializeGroupsForTrack(track, { serializeLink }) {
+export function serializeGroupsForTrack(track, {serializeLink}) {
   return track.album.groups.map((group) => ({
     link: serializeLink(group),
     urls: group.urls,

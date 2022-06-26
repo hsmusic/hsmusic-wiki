@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // Color and theming utility functions! Handy.
 
 // Graciously stolen from https://stackoverflow.com/a/54071699! ::::)

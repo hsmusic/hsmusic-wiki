@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // Very simple, bare-bones file size loader which takes a bunch of file
 // paths, gets their filesizes, and resolves a promise when it's done.
 //
@@ -19,8 +19,8 @@
 // This only processes files one at a time because I'm lazy and stat calls
 // are very, very fast.
 
-import { stat } from "fs/promises";
-import { logWarn } from "./util/cli.js";
+import {stat} from 'fs/promises';
+import {logWarn} from './util/cli.js';
 
 export default class FileSizePreloader {
   #paths = [];

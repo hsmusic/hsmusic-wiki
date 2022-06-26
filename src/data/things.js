@@ -1,9 +1,9 @@
-// @format
-//
+/** @format */
+
 // things.js: class definitions for various object types used across the wiki,
 // most of which correspond to an output page, such as Track, Album, Artist
 
-import CacheableObject from "./cacheable-object.js";
+import CacheableObject from './cacheable-object.js';
 
 import {
   isAdditionalFileList,
@@ -16,32 +16,30 @@ import {
   isDimensions,
   isDirectory,
   isDuration,
-  isInstance,
   isFileExtension,
   isLanguageCode,
   isName,
   isNumber,
   isURL,
   isString,
-  isWholeNumber,
   oneOf,
   validateArrayItems,
   validateInstanceOf,
   validateReference,
   validateReferenceList,
-} from "./validators.js";
+} from './validators.js';
 
-import * as S from "./serialize.js";
+import * as S from './serialize.js';
 
 import {
   getKebabCase,
   sortAlbumsTracksChronologically,
-} from "../util/wiki-data.js";
+} from '../util/wiki-data.js';
 
-import find from "../util/find.js";
+import find from '../util/find.js';
 
-import { inspect } from "util";
-import { color } from "../util/cli.js";
+import {inspect} from 'util';
+import {color} from '../util/cli.js';
 
 // Stub classes (and their exports) at the top of the file - these are
 // referenced later when we actually define static class fields. We deliberately
@@ -96,16 +94,16 @@ export class Language extends CacheableObject {}
 // Before initializing property descriptors, set additional independent
 // constants on the classes (which are referenced later).
 
-Thing.referenceType = Symbol("Thing.referenceType");
+Thing.referenceType = Symbol('Thing.referenceType');
 
-Album[Thing.referenceType] = "album";
-Track[Thing.referenceType] = "track";
-Artist[Thing.referenceType] = "artist";
-Group[Thing.referenceType] = "group";
-ArtTag[Thing.referenceType] = "tag";
-NewsEntry[Thing.referenceType] = "news-entry";
-StaticPage[Thing.referenceType] = "static";
-Flash[Thing.referenceType] = "flash";
+Album[Thing.referenceType] = 'album';
+Track[Thing.referenceType] = 'track';
+Artist[Thing.referenceType] = 'artist';
+Group[Thing.referenceType] = 'group';
+ArtTag[Thing.referenceType] = 'tag';
+NewsEntry[Thing.referenceType] = 'news-entry';
+StaticPage[Thing.referenceType] = 'static';
+Flash[Thing.referenceType] = 'flash';
 
 // -> Thing: base class for wiki data types, providing wiki-specific utility
 // functions on top of essential CacheableObject behavior.
@@ -115,21 +113,21 @@ Flash[Thing.referenceType] = "flash";
 // functions, so check each for how its own arguments behave!
 Thing.common = {
   name: (defaultName) => ({
-    flags: { update: true, expose: true },
-    update: { validate: isName, default: defaultName },
+    flags: {update: true, expose: true},
+    update: {validate: isName, default: defaultName},
   }),
 
   color: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isColor },
+    flags: {update: true, expose: true},
+    update: {validate: isColor},
   }),
 
   directory: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isDirectory },
+    flags: {update: true, expose: true},
+    update: {validate: isDirectory},
     expose: {
-      dependencies: ["name"],
-      transform(directory, { name }) {
+      dependencies: ['name'],
+      transform(directory, {name}) {
         if (directory === null && name === null) return null;
         else if (directory === null) return getKebabCase(name);
         else return directory;
@@ -138,27 +136,27 @@ Thing.common = {
   }),
 
   urls: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: validateArrayItems(isURL) },
+    flags: {update: true, expose: true},
+    update: {validate: validateArrayItems(isURL)},
   }),
 
   // A file extension! Or the default, if provided when calling this.
   fileExtension: (defaultFileExtension = null) => ({
-    flags: { update: true, expose: true },
-    update: { validate: isFileExtension },
-    expose: { transform: (value) => value ?? defaultFileExtension },
+    flags: {update: true, expose: true},
+    update: {validate: isFileExtension},
+    expose: {transform: (value) => value ?? defaultFileExtension},
   }),
 
   // Straightforward flag descriptor for a variety of property purposes.
   // Provide a default value, true or false!
   flag: (defaultValue = false) => {
-    if (typeof defaultValue !== "boolean") {
+    if (typeof defaultValue !== 'boolean') {
       throw new TypeError(`Always set explicit defaults for flags!`);
     }
 
     return {
-      flags: { update: true, expose: true },
-      update: { validate: isBoolean, default: defaultValue },
+      flags: {update: true, expose: true},
+      update: {validate: isBoolean, default: defaultValue},
     };
   },
 
@@ -166,23 +164,23 @@ Thing.common = {
   // This isn't dynamic though - it won't inherit from a date stored on
   // another object, for example.
   simpleDate: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isDate },
+    flags: {update: true, expose: true},
+    update: {validate: isDate},
   }),
 
   // General string type. This should probably generally be avoided in favor
   // of more specific validation, but using it makes it easy to find where we
   // might want to improve later, and it's a useful shorthand meanwhile.
   simpleString: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isString },
+    flags: {update: true, expose: true},
+    update: {validate: isString},
   }),
 
   // External function. These should only be used as dependencies for other
   // properties, so they're left unexposed.
   externalFunction: () => ({
-    flags: { update: true },
-    update: { validate: (t) => typeof t === "function" },
+    flags: {update: true},
+    update: {validate: (t) => typeof t === 'function'},
   }),
 
   // Super simple "contributions by reference" list, used for a variety of
@@ -197,14 +195,14 @@ Thing.common = {
   //
   // ...processed from YAML, spreadsheet, or any other kind of input.
   contribsByRef: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isContributionList },
+    flags: {update: true, expose: true},
+    update: {validate: isContributionList},
   }),
 
   // Artist commentary! Generally present on tracks and albums.
   commentary: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isCommentary },
+    flags: {update: true, expose: true},
+    update: {validate: isCommentary},
   }),
 
   // This is a somewhat more involved data structure - it's for additional
@@ -223,8 +221,8 @@ Thing.common = {
   //     ]
   //
   additionalFiles: () => ({
-    flags: { update: true, expose: true },
-    update: { validate: isAdditionalFileList },
+    flags: {update: true, expose: true},
+    update: {validate: isAdditionalFileList},
   }),
 
   // A reference list! Keep in mind this is for general references to wiki
@@ -236,7 +234,7 @@ Thing.common = {
   // string in multiple places by referencing the value saved on the class
   // instead.
   referenceList: (thingClass) => {
-    const { [Thing.referenceType]: referenceType } = thingClass;
+    const {[Thing.referenceType]: referenceType} = thingClass;
     if (!referenceType) {
       throw new Error(
         `The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`
@@ -244,14 +242,14 @@ Thing.common = {
     }
 
     return {
-      flags: { update: true, expose: true },
-      update: { validate: validateReferenceList(referenceType) },
+      flags: {update: true, expose: true},
+      update: {validate: validateReferenceList(referenceType)},
     };
   },
 
   // Corresponding function for a single reference.
   singleReference: (thingClass) => {
-    const { [Thing.referenceType]: referenceType } = thingClass;
+    const {[Thing.referenceType]: referenceType} = thingClass;
     if (!referenceType) {
       throw new Error(
         `The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`
@@ -259,8 +257,8 @@ Thing.common = {
     }
 
     return {
-      flags: { update: true, expose: true },
-      update: { validate: validateReference(referenceType) },
+      flags: {update: true, expose: true},
+      update: {validate: validateReference(referenceType)},
     };
   },
 
@@ -272,7 +270,7 @@ Thing.common = {
     thingDataProperty,
     findFn
   ) => ({
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
       dependencies: [referenceListProperty, thingDataProperty],
@@ -282,7 +280,7 @@ Thing.common = {
       }) =>
         refs && thingData
           ? refs
-              .map((ref) => findFn(ref, thingData, { mode: "quiet" }))
+              .map((ref) => findFn(ref, thingData, {mode: 'quiet'}))
               .filter(Boolean)
           : [],
     },
@@ -294,15 +292,14 @@ Thing.common = {
     thingDataProperty,
     findFn
   ) => ({
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
       dependencies: [singleReferenceProperty, thingDataProperty],
       compute: ({
         [singleReferenceProperty]: ref,
         [thingDataProperty]: thingData,
-      }) =>
-        ref && thingData ? findFn(ref, thingData, { mode: "quiet" }) : null,
+      }) => (ref && thingData ? findFn(ref, thingData, {mode: 'quiet'}) : null),
     },
   }),
 
@@ -322,17 +319,17 @@ Thing.common = {
   // reference list is somehow messed up, or artistData isn't being provided
   // properly.)
   dynamicContribs: (contribsByRefProperty) => ({
-    flags: { expose: true },
+    flags: {expose: true},
     expose: {
-      dependencies: ["artistData", contribsByRefProperty],
-      compute: ({ artistData, [contribsByRefProperty]: contribsByRef }) =>
+      dependencies: ['artistData', contribsByRefProperty],
+      compute: ({artistData, [contribsByRefProperty]: contribsByRef}) =>
         contribsByRef && artistData
           ? contribsByRef
-              .map(({ who: ref, what }) => ({
+              .map(({who: ref, what}) => ({
                 who: find.artist(ref, artistData),
                 what,
               }))
-              .filter(({ who }) => who)
+              .filter(({who}) => who)
           : [],
     },
   }),
@@ -350,9 +347,9 @@ Thing.common = {
     thingDataProperty,
     findFn
   ) => ({
-    flags: { expose: true },
+    flags: {expose: true},
     expose: {
-      dependencies: [contribsByRefProperty, thingDataProperty, "artistData"],
+      dependencies: [contribsByRefProperty, thingDataProperty, 'artistData'],
       compute({
         [Thing.instance]: thing,
         [contribsByRefProperty]: contribsByRef,
@@ -362,16 +359,16 @@ Thing.common = {
         if (!artistData) return [];
         const refs =
           contribsByRef ??
-          findFn(thing, thingData, { mode: "quiet" })?.[
+          findFn(thing, thingData, {mode: 'quiet'})?.[
             parentContribsByRefProperty
           ];
         if (!refs) return [];
         return refs
-          .map(({ who: ref, what }) => ({
+          .map(({who: ref, what}) => ({
             who: find.artist(ref, artistData),
             what,
           }))
-          .filter(({ who }) => who);
+          .filter(({who}) => who);
       },
     },
   }),
@@ -382,12 +379,12 @@ Thing.common = {
   // property. Naturally, the passed ref list property is of the things in the
   // wiki data provided, not the requesting Thing itself.
   reverseReferenceList: (wikiDataProperty, referencerRefListProperty) => ({
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
       dependencies: [wikiDataProperty],
 
-      compute: ({ [wikiDataProperty]: wikiData, [Thing.instance]: thing }) =>
+      compute: ({[wikiDataProperty]: wikiData, [Thing.instance]: thing}) =>
         wikiData
           ? wikiData.filter((t) =>
               t[referencerRefListProperty]?.includes(thing)
@@ -400,12 +397,12 @@ Thing.common = {
   // is still a list - this is for matching all the objects whose single
   // reference (in the given property) matches this Thing.
   reverseSingleReference: (wikiDataProperty, referencerRefListProperty) => ({
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
       dependencies: [wikiDataProperty],
 
-      compute: ({ [wikiDataProperty]: wikiData, [Thing.instance]: thing }) =>
+      compute: ({[wikiDataProperty]: wikiData, [Thing.instance]: thing}) =>
         wikiData?.filter((t) => t[referencerRefListProperty] === thing),
     },
   }),
@@ -413,7 +410,7 @@ Thing.common = {
   // General purpose wiki data constructor, for properties like artistData,
   // trackData, etc.
   wikiData: (thingClass) => ({
-    flags: { update: true },
+    flags: {update: true},
     update: {
       validate: validateArrayItems(validateInstanceOf(thingClass)),
     },
@@ -423,21 +420,21 @@ Thing.common = {
   // commentary content, and finds the matching artist for each reference.
   // This is mostly useful for credits and listings on artist pages.
   commentatorArtists: () => ({
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["artistData", "commentary"],
+      dependencies: ['artistData', 'commentary'],
 
-      compute: ({ artistData, commentary }) =>
+      compute: ({artistData, commentary}) =>
         artistData && commentary
           ? Array.from(
               new Set(
                 Array.from(
                   commentary
-                    .replace(/<\/?b>/g, "")
+                    .replace(/<\/?b>/g, '')
                     .matchAll(/<i>(?<who>.*?):<\/i>/g)
-                ).map(({ groups: { who } }) =>
-                  find.artist(who, artistData, { mode: "quiet" })
+                ).map(({groups: {who}}) =>
+                  find.artist(who, artistData, {mode: 'quiet'})
                 )
               )
             )
@@ -472,7 +469,7 @@ Thing.prototype[inspect.custom] = function () {
 
   return (
     (this.name ? `${cname} ${color.green(`"${this.name}"`)}` : `${cname}`) +
-    (this.directory ? ` (${color.blue(Thing.getReference(this))})` : "")
+    (this.directory ? ` (${color.blue(Thing.getReference(this))})` : '')
   );
 };
 
@@ -481,7 +478,7 @@ Thing.prototype[inspect.custom] = function () {
 Album.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Album"),
+  name: Thing.common.name('Unnamed Album'),
   color: Thing.common.color(),
   directory: Thing.common.directory(),
   urls: Thing.common.urls(),
@@ -491,13 +488,13 @@ Album.propertyDescriptors = {
   dateAddedToWiki: Thing.common.simpleDate(),
 
   coverArtDate: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
-    update: { validate: isDate },
+    update: {validate: isDate},
 
     expose: {
-      dependencies: ["date"],
-      transform: (coverArtDate, { date }) => coverArtDate ?? date ?? null,
+      dependencies: ['date'],
+      transform: (coverArtDate, {date}) => coverArtDate ?? date ?? null,
     },
   },
 
@@ -511,24 +508,24 @@ Album.propertyDescriptors = {
   artTagsByRef: Thing.common.referenceList(ArtTag),
 
   trackGroups: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
     update: {
       validate: validateArrayItems(validateInstanceOf(TrackGroup)),
     },
   },
 
-  coverArtFileExtension: Thing.common.fileExtension("jpg"),
-  trackCoverArtFileExtension: Thing.common.fileExtension("jpg"),
+  coverArtFileExtension: Thing.common.fileExtension('jpg'),
+  trackCoverArtFileExtension: Thing.common.fileExtension('jpg'),
 
   wallpaperStyle: Thing.common.simpleString(),
-  wallpaperFileExtension: Thing.common.fileExtension("jpg"),
+  wallpaperFileExtension: Thing.common.fileExtension('jpg'),
 
   bannerStyle: Thing.common.simpleString(),
-  bannerFileExtension: Thing.common.fileExtension("jpg"),
+  bannerFileExtension: Thing.common.fileExtension('jpg'),
   bannerDimensions: {
-    flags: { update: true, expose: true },
-    update: { validate: isDimensions },
+    flags: {update: true, expose: true},
+    update: {validate: isDimensions},
   },
 
   hasCoverArt: Thing.common.flag(true),
@@ -549,44 +546,44 @@ Album.propertyDescriptors = {
 
   // Expose only
 
-  artistContribs: Thing.common.dynamicContribs("artistContribsByRef"),
-  coverArtistContribs: Thing.common.dynamicContribs("coverArtistContribsByRef"),
+  artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
+  coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
   trackCoverArtistContribs: Thing.common.dynamicContribs(
-    "trackCoverArtistContribsByRef"
+    'trackCoverArtistContribsByRef'
   ),
   wallpaperArtistContribs: Thing.common.dynamicContribs(
-    "wallpaperArtistContribsByRef"
+    'wallpaperArtistContribsByRef'
   ),
   bannerArtistContribs: Thing.common.dynamicContribs(
-    "bannerArtistContribsByRef"
+    'bannerArtistContribsByRef'
   ),
 
   commentatorArtists: Thing.common.commentatorArtists(),
 
   tracks: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["trackGroups", "trackData"],
-      compute: ({ trackGroups, trackData }) =>
+      dependencies: ['trackGroups', 'trackData'],
+      compute: ({trackGroups, trackData}) =>
         trackGroups && trackData
           ? trackGroups
               .flatMap((group) => group.tracksByRef ?? [])
-              .map((ref) => find.track(ref, trackData, { mode: "quiet" }))
+              .map((ref) => find.track(ref, trackData, {mode: 'quiet'}))
               .filter(Boolean)
           : [],
     },
   },
 
   groups: Thing.common.dynamicThingsFromReferenceList(
-    "groupsByRef",
-    "groupData",
+    'groupsByRef',
+    'groupData',
     find.group
   ),
 
   artTags: Thing.common.dynamicThingsFromReferenceList(
-    "artTagsByRef",
-    "artTagData",
+    'artTagsByRef',
+    'artTagData',
     find.artTag
   ),
 };
@@ -632,17 +629,17 @@ Album[S.serializeDescriptors] = {
 TrackGroup.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Track Group"),
+  name: Thing.common.name('Unnamed Track Group'),
 
   color: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
-    update: { validate: isColor },
+    update: {validate: isColor},
 
     expose: {
-      dependencies: ["album"],
+      dependencies: ['album'],
 
-      transform(color, { album }) {
+      transform(color, {album}) {
         return color ?? album?.color ?? null;
       },
     },
@@ -657,8 +654,8 @@ TrackGroup.propertyDescriptors = {
   // Update only
 
   album: {
-    flags: { update: true },
-    update: { validate: validateInstanceOf(Album) },
+    flags: {update: true},
+    update: {validate: validateInstanceOf(Album)},
   },
 
   trackData: Thing.common.wikiData(Track),
@@ -666,11 +663,11 @@ TrackGroup.propertyDescriptors = {
   // Expose only
 
   tracks: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["tracksByRef", "trackData"],
-      compute: ({ tracksByRef, trackData }) =>
+      dependencies: ['tracksByRef', 'trackData'],
+      compute: ({tracksByRef, trackData}) =>
         tracksByRef && trackData
           ? tracksByRef.map((ref) => find.track(ref, trackData)).filter(Boolean)
           : [],
@@ -678,11 +675,11 @@ TrackGroup.propertyDescriptors = {
   },
 
   startIndex: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["album"],
-      compute: ({ album, [TrackGroup.instance]: trackGroup }) =>
+      dependencies: ['album'],
+      compute: ({album, [TrackGroup.instance]: trackGroup}) =>
         album.trackGroups
           .slice(0, album.trackGroups.indexOf(trackGroup))
           .reduce((acc, tg) => acc + tg.tracks.length, 0),
@@ -717,12 +714,12 @@ Track.hasCoverArt = (
 Track.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Track"),
+  name: Thing.common.name('Unnamed Track'),
   directory: Thing.common.directory(),
 
   duration: {
-    flags: { update: true, expose: true },
-    update: { validate: isDuration },
+    flags: {update: true, expose: true},
+    update: {validate: isDuration},
   },
 
   urls: Thing.common.urls(),
@@ -738,15 +735,15 @@ Track.propertyDescriptors = {
   artTagsByRef: Thing.common.referenceList(ArtTag),
 
   hasCoverArt: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
-    update: { validate: isBoolean },
+    update: {validate: isBoolean},
 
     expose: {
-      dependencies: ["albumData", "coverArtistContribsByRef"],
+      dependencies: ['albumData', 'coverArtistContribsByRef'],
       transform: (
         hasCoverArt,
-        { albumData, coverArtistContribsByRef, [Track.instance]: track }
+        {albumData, coverArtistContribsByRef, [Track.instance]: track}
       ) =>
         Track.hasCoverArt(
           track,
@@ -758,12 +755,12 @@ Track.propertyDescriptors = {
   },
 
   coverArtFileExtension: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
-    update: { validate: isFileExtension },
+    update: {validate: isFileExtension},
 
     expose: {
-      dependencies: ["albumData", "coverArtistContribsByRef"],
+      dependencies: ['albumData', 'coverArtistContribsByRef'],
       transform: (
         coverArtFileExtension,
         {
@@ -782,7 +779,7 @@ Track.propertyDescriptors = {
         )
           ? Track.findAlbum(track, albumData)?.trackCoverArtFileExtension
           : Track.findAlbum(track, albumData)?.coverArtFileExtension) ??
-        "jpg",
+        'jpg',
     },
   },
 
@@ -808,11 +805,11 @@ Track.propertyDescriptors = {
   commentatorArtists: Thing.common.commentatorArtists(),
 
   album: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData"],
-      compute: ({ [Track.instance]: track, albumData }) =>
+      dependencies: ['albumData'],
+      compute: ({[Track.instance]: track, albumData}) =>
         albumData?.find((album) => album.tracks.includes(track)) ?? null,
     },
   },
@@ -825,28 +822,28 @@ Track.propertyDescriptors = {
   // dataSourceAlbum is available (depending on the Track creator to optionally
   // provide dataSourceAlbumByRef).
   dataSourceAlbum: Thing.common.dynamicThingFromSingleReference(
-    "dataSourceAlbumByRef",
-    "albumData",
+    'dataSourceAlbumByRef',
+    'albumData',
     find.album
   ),
 
   date: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData", "dateFirstReleased"],
-      compute: ({ albumData, dateFirstReleased, [Track.instance]: track }) =>
+      dependencies: ['albumData', 'dateFirstReleased'],
+      compute: ({albumData, dateFirstReleased, [Track.instance]: track}) =>
         dateFirstReleased ?? Track.findAlbum(track, albumData)?.date ?? null,
     },
   },
 
   color: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData"],
+      dependencies: ['albumData'],
 
-      compute: ({ albumData, [Track.instance]: track }) =>
+      compute: ({albumData, [Track.instance]: track}) =>
         Track.findAlbum(track, albumData)?.trackGroups.find((tg) =>
           tg.tracks.includes(track)
         )?.color ?? null,
@@ -854,15 +851,15 @@ Track.propertyDescriptors = {
   },
 
   coverArtDate: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
-    update: { validate: isDate },
+    update: {validate: isDate},
 
     expose: {
-      dependencies: ["albumData", "dateFirstReleased"],
+      dependencies: ['albumData', 'dateFirstReleased'],
       transform: (
         coverArtDate,
-        { albumData, dateFirstReleased, [Track.instance]: track }
+        {albumData, dateFirstReleased, [Track.instance]: track}
       ) =>
         coverArtDate ??
         dateFirstReleased ??
@@ -873,16 +870,16 @@ Track.propertyDescriptors = {
   },
 
   originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
-    "originalReleaseTrackByRef",
-    "trackData",
+    'originalReleaseTrackByRef',
+    'trackData',
     find.track
   ),
 
   otherReleases: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["originalReleaseTrackByRef", "trackData"],
+      dependencies: ['originalReleaseTrackByRef', 'trackData'],
 
       compute: ({
         originalReleaseTrackByRef: t1origRef,
@@ -898,7 +895,7 @@ Track.propertyDescriptors = {
         return [
           t1orig,
           ...trackData.filter((t2) => {
-            const { originalReleaseTrack: t2orig } = t2;
+            const {originalReleaseTrack: t2orig} = t2;
             return t2 !== t1 && t2orig && (t2orig === t1orig || t2orig === t1);
           }),
         ].filter(Boolean);
@@ -908,27 +905,27 @@ Track.propertyDescriptors = {
 
   // Previously known as: (track).artists
   artistContribs: Thing.common.dynamicInheritContribs(
-    "artistContribsByRef",
-    "artistContribsByRef",
-    "albumData",
+    'artistContribsByRef',
+    'artistContribsByRef',
+    'albumData',
     Track.findAlbum
   ),
 
   // Previously known as: (track).contributors
-  contributorContribs: Thing.common.dynamicContribs("contributorContribsByRef"),
+  contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
   // Previously known as: (track).coverArtists
   coverArtistContribs: Thing.common.dynamicInheritContribs(
-    "coverArtistContribsByRef",
-    "trackCoverArtistContribsByRef",
-    "albumData",
+    'coverArtistContribsByRef',
+    'trackCoverArtistContribsByRef',
+    'albumData',
     Track.findAlbum
   ),
 
   // Previously known as: (track).references
   referencedTracks: Thing.common.dynamicThingsFromReferenceList(
-    "referencedTracksByRef",
-    "trackData",
+    'referencedTracksByRef',
+    'trackData',
     find.track
   ),
 
@@ -941,12 +938,12 @@ Track.propertyDescriptors = {
   // the "Tracks - by Times Referenced" listing page (or other data
   // processing).
   referencedByTracks: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["trackData"],
+      dependencies: ['trackData'],
 
-      compute: ({ trackData, [Track.instance]: track }) =>
+      compute: ({trackData, [Track.instance]: track}) =>
         trackData
           ? trackData
               .filter((t) => !t.originalReleaseTrack)
@@ -957,13 +954,13 @@ Track.propertyDescriptors = {
 
   // Previously known as: (track).flashes
   featuredInFlashes: Thing.common.reverseReferenceList(
-    "flashData",
-    "featuredTracks"
+    'flashData',
+    'featuredTracks'
   ),
 
   artTags: Thing.common.dynamicThingsFromReferenceList(
-    "artTagsByRef",
-    "artTagData",
+    'artTagsByRef',
+    'artTagData',
     find.artTag
   ),
 };
@@ -971,12 +968,12 @@ Track.propertyDescriptors = {
 Track.prototype[inspect.custom] = function () {
   const base = Thing.prototype[inspect.custom].apply(this);
 
-  const { album, dataSourceAlbum } = this;
+  const {album, dataSourceAlbum} = this;
   const albumName = album ? album.name : dataSourceAlbum?.name;
   const albumIndex =
     albumName &&
     (album ? album.tracks.indexOf(this) : dataSourceAlbum.tracks.indexOf(this));
-  const trackNum = albumIndex === -1 ? "#?" : `#${albumIndex + 1}`;
+  const trackNum = albumIndex === -1 ? '#?' : `#${albumIndex + 1}`;
 
   return albumName
     ? base + ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
@@ -986,13 +983,13 @@ Track.prototype[inspect.custom] = function () {
 // -> Artist
 
 Artist.filterByContrib = (thingDataProperty, contribsProperty) => ({
-  flags: { expose: true },
+  flags: {expose: true},
 
   expose: {
     dependencies: [thingDataProperty],
 
-    compute: ({ [thingDataProperty]: thingData, [Artist.instance]: artist }) =>
-      thingData?.filter(({ [contribsProperty]: contribs }) =>
+    compute: ({[thingDataProperty]: thingData, [Artist.instance]: artist}) =>
+      thingData?.filter(({[contribsProperty]: contribs}) =>
         contribs?.some((contrib) => contrib.who === artist)
       ),
   },
@@ -1001,16 +998,16 @@ Artist.filterByContrib = (thingDataProperty, contribsProperty) => ({
 Artist.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Artist"),
+  name: Thing.common.name('Unnamed Artist'),
   directory: Thing.common.directory(),
   urls: Thing.common.urls(),
   contextNotes: Thing.common.simpleString(),
 
   hasAvatar: Thing.common.flag(false),
-  avatarFileExtension: Thing.common.fileExtension("jpg"),
+  avatarFileExtension: Thing.common.fileExtension('jpg'),
 
   aliasNames: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
     update: {
       validate: validateArrayItems(isName),
     },
@@ -1029,87 +1026,87 @@ Artist.propertyDescriptors = {
   // Expose only
 
   aliasedArtist: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["artistData", "aliasedArtistRef"],
-      compute: ({ artistData, aliasedArtistRef }) =>
+      dependencies: ['artistData', 'aliasedArtistRef'],
+      compute: ({artistData, aliasedArtistRef}) =>
         aliasedArtistRef && artistData
-          ? find.artist(aliasedArtistRef, artistData, { mode: "quiet" })
+          ? find.artist(aliasedArtistRef, artistData, {mode: 'quiet'})
           : null,
     },
   },
 
-  tracksAsArtist: Artist.filterByContrib("trackData", "artistContribs"),
+  tracksAsArtist: Artist.filterByContrib('trackData', 'artistContribs'),
   tracksAsContributor: Artist.filterByContrib(
-    "trackData",
-    "contributorContribs"
+    'trackData',
+    'contributorContribs'
   ),
   tracksAsCoverArtist: Artist.filterByContrib(
-    "trackData",
-    "coverArtistContribs"
+    'trackData',
+    'coverArtistContribs'
   ),
 
   tracksAsAny: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["trackData"],
+      dependencies: ['trackData'],
 
-      compute: ({ trackData, [Artist.instance]: artist }) =>
+      compute: ({trackData, [Artist.instance]: artist}) =>
         trackData?.filter((track) =>
           [
             ...track.artistContribs,
             ...track.contributorContribs,
             ...track.coverArtistContribs,
-          ].some(({ who }) => who === artist)
+          ].some(({who}) => who === artist)
         ),
     },
   },
 
   tracksAsCommentator: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["trackData"],
+      dependencies: ['trackData'],
 
-      compute: ({ trackData, [Artist.instance]: artist }) =>
-        trackData.filter(({ commentatorArtists }) =>
+      compute: ({trackData, [Artist.instance]: artist}) =>
+        trackData.filter(({commentatorArtists}) =>
           commentatorArtists?.includes(artist)
         ),
     },
   },
 
-  albumsAsAlbumArtist: Artist.filterByContrib("albumData", "artistContribs"),
+  albumsAsAlbumArtist: Artist.filterByContrib('albumData', 'artistContribs'),
   albumsAsCoverArtist: Artist.filterByContrib(
-    "albumData",
-    "coverArtistContribs"
+    'albumData',
+    'coverArtistContribs'
   ),
   albumsAsWallpaperArtist: Artist.filterByContrib(
-    "albumData",
-    "wallpaperArtistContribs"
+    'albumData',
+    'wallpaperArtistContribs'
   ),
   albumsAsBannerArtist: Artist.filterByContrib(
-    "albumData",
-    "bannerArtistContribs"
+    'albumData',
+    'bannerArtistContribs'
   ),
 
   albumsAsCommentator: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData"],
+      dependencies: ['albumData'],
 
-      compute: ({ albumData, [Artist.instance]: artist }) =>
-        albumData.filter(({ commentatorArtists }) =>
+      compute: ({albumData, [Artist.instance]: artist}) =>
+        albumData.filter(({commentatorArtists}) =>
           commentatorArtists?.includes(artist)
         ),
     },
   },
 
   flashesAsContributor: Artist.filterByContrib(
-    "flashData",
-    "contributorContribs"
+    'flashData',
+    'contributorContribs'
   ),
 };
 
@@ -1143,7 +1140,7 @@ Artist[S.serializeDescriptors] = {
 Group.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Group"),
+  name: Thing.common.name('Unnamed Group'),
   directory: Thing.common.directory(),
 
   description: Thing.common.simpleString(),
@@ -1158,42 +1155,42 @@ Group.propertyDescriptors = {
   // Expose only
 
   descriptionShort: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["description"],
-      compute: ({ description }) => description.split('<hr class="split">')[0],
+      dependencies: ['description'],
+      compute: ({description}) => description.split('<hr class="split">')[0],
     },
   },
 
   albums: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData"],
-      compute: ({ albumData, [Group.instance]: group }) =>
+      dependencies: ['albumData'],
+      compute: ({albumData, [Group.instance]: group}) =>
         albumData?.filter((album) => album.groups.includes(group)) ?? [],
     },
   },
 
   color: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["groupCategoryData"],
+      dependencies: ['groupCategoryData'],
 
-      compute: ({ groupCategoryData, [Group.instance]: group }) =>
+      compute: ({groupCategoryData, [Group.instance]: group}) =>
         groupCategoryData.find((category) => category.groups.includes(group))
           ?.color ?? null,
     },
   },
 
   category: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["groupCategoryData"],
-      compute: ({ groupCategoryData, [Group.instance]: group }) =>
+      dependencies: ['groupCategoryData'],
+      compute: ({groupCategoryData, [Group.instance]: group}) =>
         groupCategoryData.find((category) => category.groups.includes(group)) ??
         null,
     },
@@ -1203,7 +1200,7 @@ Group.propertyDescriptors = {
 GroupCategory.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Group Category"),
+  name: Thing.common.name('Unnamed Group Category'),
   color: Thing.common.color(),
 
   groupsByRef: Thing.common.referenceList(Group),
@@ -1215,8 +1212,8 @@ GroupCategory.propertyDescriptors = {
   // Expose only
 
   groups: Thing.common.dynamicThingsFromReferenceList(
-    "groupsByRef",
-    "groupData",
+    'groupsByRef',
+    'groupData',
     find.group
   ),
 };
@@ -1226,7 +1223,7 @@ GroupCategory.propertyDescriptors = {
 ArtTag.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Art Tag"),
+  name: Thing.common.name('Unnamed Art Tag'),
   directory: Thing.common.directory(),
   color: Thing.common.color(),
   isContentWarning: Thing.common.flag(false),
@@ -1240,16 +1237,16 @@ ArtTag.propertyDescriptors = {
 
   // Previously known as: (tag).things
   taggedInThings: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["albumData", "trackData"],
-      compute: ({ albumData, trackData, [ArtTag.instance]: artTag }) =>
+      dependencies: ['albumData', 'trackData'],
+      compute: ({albumData, trackData, [ArtTag.instance]: artTag}) =>
         sortAlbumsTracksChronologically(
           [...albumData, ...trackData].filter((thing) =>
             thing.artTags?.includes(artTag)
           ),
-          { getDate: (o) => o.coverArtDate }
+          {getDate: (o) => o.coverArtDate}
         ),
     },
   },
@@ -1260,7 +1257,7 @@ ArtTag.propertyDescriptors = {
 NewsEntry.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed News Entry"),
+  name: Thing.common.name('Unnamed News Entry'),
   directory: Thing.common.directory(),
   date: Thing.common.simpleDate(),
 
@@ -1269,12 +1266,12 @@ NewsEntry.propertyDescriptors = {
   // Expose only
 
   contentShort: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["content"],
+      dependencies: ['content'],
 
-      compute: ({ content }) => content.split('<hr class="split">')[0],
+      compute: ({content}) => content.split('<hr class="split">')[0],
     },
   },
 };
@@ -1284,15 +1281,15 @@ NewsEntry.propertyDescriptors = {
 StaticPage.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Static Page"),
+  name: Thing.common.name('Unnamed Static Page'),
 
   nameShort: {
-    flags: { update: true, expose: true },
-    update: { validate: isName },
+    flags: {update: true, expose: true},
+    update: {validate: isName},
 
     expose: {
-      dependencies: ["name"],
-      transform: (value, { name }) => value ?? name,
+      dependencies: ['name'],
+      transform: (value, {name}) => value ?? name,
     },
   },
 
@@ -1310,7 +1307,7 @@ HomepageLayout.propertyDescriptors = {
   sidebarContent: Thing.common.simpleString(),
 
   rows: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
     update: {
       validate: validateArrayItems(validateInstanceOf(HomepageLayoutRow)),
@@ -1321,13 +1318,13 @@ HomepageLayout.propertyDescriptors = {
 HomepageLayoutRow.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Homepage Row"),
+  name: Thing.common.name('Unnamed Homepage Row'),
 
   type: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
 
     update: {
-      validate(value) {
+      validate() {
         throw new Error(`'type' property validator must be overridden`);
       },
     },
@@ -1350,10 +1347,10 @@ HomepageLayoutAlbumsRow.propertyDescriptors = {
   // Update & expose
 
   type: {
-    flags: { update: true, expose: true },
+    flags: {update: true, expose: true},
     update: {
       validate(value) {
-        if (value !== "albums") {
+        if (value !== 'albums') {
           throw new TypeError(`Expected 'albums'`);
         }
 
@@ -1366,25 +1363,25 @@ HomepageLayoutAlbumsRow.propertyDescriptors = {
   sourceAlbumsByRef: Thing.common.referenceList(Album),
 
   countAlbumsFromGroup: {
-    flags: { update: true, expose: true },
-    update: { validate: isCountingNumber },
+    flags: {update: true, expose: true},
+    update: {validate: isCountingNumber},
   },
 
   actionLinks: {
-    flags: { update: true, expose: true },
-    update: { validate: validateArrayItems(isString) },
+    flags: {update: true, expose: true},
+    update: {validate: validateArrayItems(isString)},
   },
 
   // Expose only
 
   sourceGroup: Thing.common.dynamicThingFromSingleReference(
-    "sourceGroupByRef",
-    "groupData",
+    'sourceGroupByRef',
+    'groupData',
     find.group
   ),
   sourceAlbums: Thing.common.dynamicThingsFromReferenceList(
-    "sourceAlbumsByRef",
-    "albumData",
+    'sourceAlbumsByRef',
+    'albumData',
     find.album
   ),
 };
@@ -1394,18 +1391,18 @@ HomepageLayoutAlbumsRow.propertyDescriptors = {
 Flash.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Flash"),
+  name: Thing.common.name('Unnamed Flash'),
 
   directory: {
-    flags: { update: true, expose: true },
-    update: { validate: isDirectory },
+    flags: {update: true, expose: true},
+    update: {validate: isDirectory},
 
     // Flashes expose directory differently from other Things! Their
     // default directory is dependent on the page number (or ID), not
     // the name.
     expose: {
-      dependencies: ["page"],
-      transform(directory, { page }) {
+      dependencies: ['page'],
+      transform(directory, {page}) {
         if (directory === null && page === null) return null;
         else if (directory === null) return page;
         else return directory;
@@ -1414,8 +1411,8 @@ Flash.propertyDescriptors = {
   },
 
   page: {
-    flags: { update: true, expose: true },
-    update: { validate: oneOf(isString, isNumber) },
+    flags: {update: true, expose: true},
+    update: {validate: oneOf(isString, isNumber)},
 
     expose: {
       transform: (value) => (value === null ? null : value.toString()),
@@ -1424,7 +1421,7 @@ Flash.propertyDescriptors = {
 
   date: Thing.common.simpleDate(),
 
-  coverArtFileExtension: Thing.common.fileExtension("jpg"),
+  coverArtFileExtension: Thing.common.fileExtension('jpg'),
 
   contributorContribsByRef: Thing.common.contribsByRef(),
 
@@ -1440,32 +1437,32 @@ Flash.propertyDescriptors = {
 
   // Expose only
 
-  contributorContribs: Thing.common.dynamicContribs("contributorContribsByRef"),
+  contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
   featuredTracks: Thing.common.dynamicThingsFromReferenceList(
-    "featuredTracksByRef",
-    "trackData",
+    'featuredTracksByRef',
+    'trackData',
     find.track
   ),
 
   act: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["flashActData"],
+      dependencies: ['flashActData'],
 
-      compute: ({ flashActData, [Flash.instance]: flash }) =>
+      compute: ({flashActData, [Flash.instance]: flash}) =>
         flashActData.find((act) => act.flashes.includes(flash)) ?? null,
     },
   },
 
   color: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["flashActData"],
+      dependencies: ['flashActData'],
 
-      compute: ({ flashActData, [Flash.instance]: flash }) =>
+      compute: ({flashActData, [Flash.instance]: flash}) =>
         flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
     },
   },
@@ -1485,7 +1482,7 @@ Flash[S.serializeDescriptors] = {
 FlashAct.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Flash Act"),
+  name: Thing.common.name('Unnamed Flash Act'),
   color: Thing.common.color(),
   anchor: Thing.common.simpleString(),
   jump: Thing.common.simpleString(),
@@ -1500,8 +1497,8 @@ FlashAct.propertyDescriptors = {
   // Expose only
 
   flashes: Thing.common.dynamicThingsFromReferenceList(
-    "flashesByRef",
-    "flashData",
+    'flashesByRef',
+    'flashData',
     find.flash
   ),
 };
@@ -1511,16 +1508,16 @@ FlashAct.propertyDescriptors = {
 WikiInfo.propertyDescriptors = {
   // Update & expose
 
-  name: Thing.common.name("Unnamed Wiki"),
+  name: Thing.common.name('Unnamed Wiki'),
 
   // Displayed in nav bar.
   nameShort: {
-    flags: { update: true, expose: true },
-    update: { validate: isName },
+    flags: {update: true, expose: true},
+    update: {validate: isName},
 
     expose: {
-      dependencies: ["name"],
-      transform: (value, { name }) => value ?? name,
+      dependencies: ['name'],
+      transform: (value, {name}) => value ?? name,
     },
   },
 
@@ -1532,13 +1529,13 @@ WikiInfo.propertyDescriptors = {
   footerContent: Thing.common.simpleString(),
 
   defaultLanguage: {
-    flags: { update: true, expose: true },
-    update: { validate: isLanguageCode },
+    flags: {update: true, expose: true},
+    update: {validate: isLanguageCode},
   },
 
   canonicalBase: {
-    flags: { update: true, expose: true },
-    update: { validate: isURL },
+    flags: {update: true, expose: true},
+    update: {validate: isURL},
   },
 
   divideTrackListsByGroupsByRef: Thing.common.referenceList(Group),
@@ -1557,8 +1554,8 @@ WikiInfo.propertyDescriptors = {
   // Expose only
 
   divideTrackListsByGroups: Thing.common.dynamicThingsFromReferenceList(
-    "divideTrackListsByGroupsByRef",
-    "groupData",
+    'divideTrackListsByGroupsByRef',
+    'groupData',
     find.group
   ),
 };
@@ -1566,10 +1563,10 @@ WikiInfo.propertyDescriptors = {
 // -> Language
 
 const intlHelper = (constructor, opts) => ({
-  flags: { expose: true },
+  flags: {expose: true},
   expose: {
-    dependencies: ["code", "intlCode"],
-    compute: ({ code, intlCode }) => {
+    dependencies: ['code', 'intlCode'],
+    compute: ({code, intlCode}) => {
       const constructCode = intlCode ?? code;
       if (!constructCode) return null;
       return Reflect.construct(constructor, [constructCode, opts]);
@@ -1584,8 +1581,8 @@ Language.propertyDescriptors = {
   // from other languages (similar to how "Directory" operates in many data
   // objects).
   code: {
-    flags: { update: true, expose: true },
-    update: { validate: isLanguageCode },
+    flags: {update: true, expose: true},
+    update: {validate: isLanguageCode},
   },
 
   // Human-readable name. This should be the language's own native name, not
@@ -1596,11 +1593,11 @@ Language.propertyDescriptors = {
   // Usually this will be the same as the language's general code, but it
   // may be overridden to provide Intl constructors an alternative value.
   intlCode: {
-    flags: { update: true, expose: true },
-    update: { validate: isLanguageCode },
+    flags: {update: true, expose: true},
+    update: {validate: isLanguageCode},
     expose: {
-      dependencies: ["code"],
-      transform: (intlCode, { code }) => intlCode ?? code,
+      dependencies: ['code'],
+      transform: (intlCode, {code}) => intlCode ?? code,
     },
   },
 
@@ -1617,13 +1614,13 @@ Language.propertyDescriptors = {
   // Mapping of translation keys to values (strings). Generally, don't
   // access this object directly - use methods instead.
   strings: {
-    flags: { update: true, expose: true },
-    update: { validate: (t) => typeof t === "object" },
+    flags: {update: true, expose: true},
+    update: {validate: (t) => typeof t === 'object'},
     expose: {
-      dependencies: ["inheritedStrings"],
-      transform(strings, { inheritedStrings }) {
+      dependencies: ['inheritedStrings'],
+      transform(strings, {inheritedStrings}) {
         if (strings || inheritedStrings) {
-          return { ...(inheritedStrings ?? {}), ...(strings ?? {}) };
+          return {...(inheritedStrings ?? {}), ...(strings ?? {})};
         } else {
           return null;
         }
@@ -1634,8 +1631,8 @@ Language.propertyDescriptors = {
   // May be provided to specify "default" strings, generally (but not
   // necessarily) inherited from another Language object.
   inheritedStrings: {
-    flags: { update: true, expose: true },
-    update: { validate: (t) => typeof t === "object" },
+    flags: {update: true, expose: true},
+    update: {validate: (t) => typeof t === 'object'},
   },
 
   // Update only
@@ -1644,20 +1641,20 @@ Language.propertyDescriptors = {
 
   // Expose only
 
-  intl_date: intlHelper(Intl.DateTimeFormat, { full: true }),
+  intl_date: intlHelper(Intl.DateTimeFormat, {full: true}),
   intl_number: intlHelper(Intl.NumberFormat),
-  intl_listConjunction: intlHelper(Intl.ListFormat, { type: "conjunction" }),
-  intl_listDisjunction: intlHelper(Intl.ListFormat, { type: "disjunction" }),
-  intl_listUnit: intlHelper(Intl.ListFormat, { type: "unit" }),
-  intl_pluralCardinal: intlHelper(Intl.PluralRules, { type: "cardinal" }),
-  intl_pluralOrdinal: intlHelper(Intl.PluralRules, { type: "ordinal" }),
+  intl_listConjunction: intlHelper(Intl.ListFormat, {type: 'conjunction'}),
+  intl_listDisjunction: intlHelper(Intl.ListFormat, {type: 'disjunction'}),
+  intl_listUnit: intlHelper(Intl.ListFormat, {type: 'unit'}),
+  intl_pluralCardinal: intlHelper(Intl.PluralRules, {type: 'cardinal'}),
+  intl_pluralOrdinal: intlHelper(Intl.PluralRules, {type: 'ordinal'}),
 
   validKeys: {
-    flags: { expose: true },
+    flags: {expose: true},
 
     expose: {
-      dependencies: ["strings", "inheritedStrings"],
-      compute: ({ strings, inheritedStrings }) =>
+      dependencies: ['strings', 'inheritedStrings'],
+      compute: ({strings, inheritedStrings}) =>
         Array.from(
           new Set([
             ...Object.keys(inheritedStrings ?? {}),
@@ -1668,12 +1665,12 @@ Language.propertyDescriptors = {
   },
 
   strings_htmlEscaped: {
-    flags: { expose: true },
+    flags: {expose: true},
     expose: {
-      dependencies: ["strings", "inheritedStrings", "escapeHTML"],
-      compute({ strings, inheritedStrings, escapeHTML }) {
+      dependencies: ['strings', 'inheritedStrings', 'escapeHTML'],
+      compute({strings, inheritedStrings, escapeHTML}) {
         if (!(strings || inheritedStrings) || !escapeHTML) return null;
-        const allStrings = { ...(inheritedStrings ?? {}), ...(strings ?? {}) };
+        const allStrings = {...(inheritedStrings ?? {}), ...(strings ?? {})};
         return Object.fromEntries(
           Object.entries(allStrings).map(([k, v]) => [k, escapeHTML(v)])
         );
@@ -1683,12 +1680,12 @@ Language.propertyDescriptors = {
 };
 
 const countHelper = (stringKey, argName = stringKey) =>
-  function (value, { unit = false } = {}) {
+  function (value, {unit = false} = {}) {
     return this.$(
       unit
         ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
         : `count.${stringKey}`,
-      { [argName]: this.formatNumber(value) }
+      {[argName]: this.formatNumber(value)}
     );
   };
 
@@ -1704,7 +1701,7 @@ Object.assign(Language.prototype, {
   },
 
   getUnitForm(value) {
-    this.assertIntlAvailable("intl_pluralCardinal");
+    this.assertIntlAvailable('intl_pluralCardinal');
     return this.intl_pluralCardinal.select(value);
   },
 
@@ -1738,7 +1735,7 @@ Object.assign(Language.prototype, {
     // like, who cares, dude?) Also, this is an array, 8ecause it's handy
     // for the iterating we're a8out to do.
     const processedArgs = Object.entries(args).map(([k, v]) => [
-      k.replace(/[A-Z]/g, "_$&").toUpperCase(),
+      k.replace(/[A-Z]/g, '_$&').toUpperCase(),
       v,
     ]);
 
@@ -1758,55 +1755,55 @@ Object.assign(Language.prototype, {
   },
 
   formatDate(date) {
-    this.assertIntlAvailable("intl_date");
+    this.assertIntlAvailable('intl_date');
     return this.intl_date.format(date);
   },
 
   formatDateRange(startDate, endDate) {
-    this.assertIntlAvailable("intl_date");
+    this.assertIntlAvailable('intl_date');
     return this.intl_date.formatRange(startDate, endDate);
   },
 
-  formatDuration(secTotal, { approximate = false, unit = false } = {}) {
+  formatDuration(secTotal, {approximate = false, unit = false} = {}) {
     if (secTotal === 0) {
-      return this.formatString("count.duration.missing");
+      return this.formatString('count.duration.missing');
     }
 
     const hour = Math.floor(secTotal / 3600);
     const min = Math.floor((secTotal - hour * 3600) / 60);
     const sec = Math.floor(secTotal - hour * 3600 - min * 60);
 
-    const pad = (val) => val.toString().padStart(2, "0");
+    const pad = (val) => val.toString().padStart(2, '0');
 
-    const stringSubkey = unit ? ".withUnit" : "";
+    const stringSubkey = unit ? '.withUnit' : '';
 
     const duration =
       hour > 0
-        ? this.formatString("count.duration.hours" + stringSubkey, {
+        ? this.formatString('count.duration.hours' + stringSubkey, {
             hours: hour,
             minutes: pad(min),
             seconds: pad(sec),
           })
-        : this.formatString("count.duration.minutes" + stringSubkey, {
+        : this.formatString('count.duration.minutes' + stringSubkey, {
             minutes: min,
             seconds: pad(sec),
           });
 
     return approximate
-      ? this.formatString("count.duration.approximate", { duration })
+      ? this.formatString('count.duration.approximate', {duration})
       : duration;
   },
 
   formatIndex(value) {
-    this.assertIntlAvailable("intl_pluralOrdinal");
+    this.assertIntlAvailable('intl_pluralOrdinal');
     return this.formatString(
-      "count.index." + this.intl_pluralOrdinal.select(value),
-      { index: value }
+      'count.index.' + this.intl_pluralOrdinal.select(value),
+      {index: value}
     );
   },
 
   formatNumber(value) {
-    this.assertIntlAvailable("intl_number");
+    this.assertIntlAvailable('intl_number');
     return this.intl_number.format(value);
   },
 
@@ -1817,70 +1814,70 @@ Object.assign(Language.prototype, {
 
     const words =
       value > 1000
-        ? this.formatString("count.words.thousand", { words: num })
-        : this.formatString("count.words", { words: num });
+        ? this.formatString('count.words.thousand', {words: num})
+        : this.formatString('count.words', {words: num});
 
     return this.formatString(
-      "count.words.withUnit." + this.getUnitForm(value),
-      { words }
+      'count.words.withUnit.' + this.getUnitForm(value),
+      {words}
     );
   },
 
   // Conjunction list: A, B, and C
   formatConjunctionList(array) {
-    this.assertIntlAvailable("intl_listConjunction");
+    this.assertIntlAvailable('intl_listConjunction');
     return this.intl_listConjunction.format(array);
   },
 
   // Disjunction lists: A, B, or C
   formatDisjunctionList(array) {
-    this.assertIntlAvailable("intl_listDisjunction");
+    this.assertIntlAvailable('intl_listDisjunction');
     return this.intl_listDisjunction.format(array);
   },
 
   // Unit lists: A, B, C
   formatUnitList(array) {
-    this.assertIntlAvailable("intl_listUnit");
+    this.assertIntlAvailable('intl_listUnit');
     return this.intl_listUnit.format(array);
   },
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
   formatFileSize(bytes) {
-    if (!bytes) return "";
+    if (!bytes) return '';
 
     bytes = parseInt(bytes);
-    if (isNaN(bytes)) return "";
+    if (isNaN(bytes)) return '';
 
     const round = (exp) => Math.round(bytes / 10 ** (exp - 1)) / 10;
 
     if (bytes >= 10 ** 12) {
-      return this.formatString("count.fileSize.terabytes", {
+      return this.formatString('count.fileSize.terabytes', {
         terabytes: round(12),
       });
     } else if (bytes >= 10 ** 9) {
-      return this.formatString("count.fileSize.gigabytes", {
+      return this.formatString('count.fileSize.gigabytes', {
         gigabytes: round(9),
       });
     } else if (bytes >= 10 ** 6) {
-      return this.formatString("count.fileSize.megabytes", {
+      return this.formatString('count.fileSize.megabytes', {
         megabytes: round(6),
       });
     } else if (bytes >= 10 ** 3) {
-      return this.formatString("count.fileSize.kilobytes", {
+      return this.formatString('count.fileSize.kilobytes', {
         kilobytes: round(3),
       });
     } else {
-      return this.formatString("count.fileSize.bytes", { bytes });
+      return this.formatString('count.fileSize.bytes', {bytes});
     }
   },
 
   // TODO: These are hard-coded. Is there a better way?
-  countAdditionalFiles: countHelper("additionalFiles", "files"),
-  countAlbums: countHelper("albums"),
-  countCommentaryEntries: countHelper("commentaryEntries", "entries"),
-  countContributions: countHelper("contributions"),
-  countCoverArts: countHelper("coverArts"),
-  countTimesReferenced: countHelper("timesReferenced"),
-  countTimesUsed: countHelper("timesUsed"),
-  countTracks: countHelper("tracks"),
+  countAdditionalFiles: countHelper('additionalFiles', 'files'),
+  countAlbums: countHelper('albums'),
+  countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
+  countContributions: countHelper('contributions'),
+  countCoverArts: countHelper('coverArts'),
+  countTimesReferenced: countHelper('timesReferenced'),
+  countTimesUsed: countHelper('timesUsed'),
+  countTracks: countHelper('tracks'),
 });

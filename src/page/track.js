@@ -1,37 +1,37 @@
-// @format
-//
+/** @format */
+
 // Track page specification.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
 import {
   generateAlbumChronologyLinks,
   generateAlbumNavLinks,
   generateAlbumSecondaryNav,
   generateAlbumSidebar,
-} from "./album.js";
+} from './album.js';
 
-import * as html from "../util/html.js";
+import * as html from '../util/html.js';
 
-import { bindOpts } from "../util/sugar.js";
+import {bindOpts} from '../util/sugar.js';
 
 import {
   getTrackCover,
   getAlbumListTag,
   sortChronologically,
-} from "../util/wiki-data.js";
+} from '../util/wiki-data.js';
 
 // Page exports
 
-export function targets({ wikiData }) {
+export function targets({wikiData}) {
   return wikiData.trackData;
 }
 
-export function write(track, { wikiData }) {
-  const { groupData, wikiInfo } = wikiData;
-  const { album, referencedByTracks, referencedTracks, otherReleases } = track;
+export function write(track, {wikiData}) {
+  const {groupData, wikiInfo} = wikiData;
+  const {album, referencedByTracks, referencedTracks, otherReleases} = track;
 
   const listTag = getAlbumListTag(album);
 
@@ -50,12 +50,12 @@ export function write(track, { wikiData }) {
     );
   }
 
-  const unbound_getTrackItem = (track, { getArtistString, link, language }) =>
+  const unbound_getTrackItem = (track, {getArtistString, link, language}) =>
     html.tag(
-      "li",
-      language.$("trackList.item.withArtists", {
+      'li',
+      language.$('trackList.item.withArtists', {
         track: link.track(track),
-        by: `<span class="by">${language.$("trackList.item.withArtists.by", {
+        by: `<span class="by">${language.$('trackList.item.withArtists.by', {
           artists: getArtistString(track.artistContribs),
         })}</span>`,
       })
@@ -63,46 +63,46 @@ export function write(track, { wikiData }) {
 
   const unbound_generateTrackList = (
     tracks,
-    { getArtistString, link, language }
+    {getArtistString, link, language}
   ) =>
     html.tag(
-      "ul",
+      'ul',
       tracks.map((track) =>
-        unbound_getTrackItem(track, { getArtistString, link, language })
+        unbound_getTrackItem(track, {getArtistString, link, language})
       )
     );
 
   const hasCommentary =
     track.commentary || otherReleases.some((t) => t.commentary);
-  const generateCommentary = ({ link, language, transformMultiline }) =>
+  const generateCommentary = ({link, language, transformMultiline}) =>
     transformMultiline(
       [
         track.commentary,
         ...otherReleases.map((track) =>
           track.commentary
-            ?.split("\n")
-            .filter((line) => line.replace(/<\/b>/g, "").includes(":</i>"))
+            ?.split('\n')
+            .filter((line) => line.replace(/<\/b>/g, '').includes(':</i>'))
             .map(
               (line) => fixWS`
                     ${line}
                     ${language.$(
-                      "releaseInfo.artistCommentary.seeOriginalRelease",
+                      'releaseInfo.artistCommentary.seeOriginalRelease',
                       {
                         original: link.track(track),
                       }
                     )}
                 `
             )
-            .join("\n")
+            .join('\n')
         ),
       ]
         .filter(Boolean)
-        .join("\n")
+        .join('\n')
     );
 
   const data = {
-    type: "data",
-    path: ["track", track.directory],
+    type: 'data',
+    path: ['track', track.directory],
     data: ({
       serializeContribs,
       serializeCover,
@@ -145,19 +145,19 @@ export function write(track, { wikiData }) {
         // they don't get parsed and displayed, generally speaking), so
         // override the link argument so that artist "links" just show
         // their names.
-        link: { artist: (artist) => artist.name },
+        link: {artist: (artist) => artist.name},
       });
-    if (!hasArtists && !hasCoverArtists) return "";
+    if (!hasArtists && !hasCoverArtists) return '';
     return language.formatString(
-      "trackPage.socialEmbed.body" +
-        [hasArtists && ".withArtists", hasCoverArtists && ".withCoverArtists"]
+      'trackPage.socialEmbed.body' +
+        [hasArtists && '.withArtists', hasCoverArtists && '.withCoverArtists']
           .filter(Boolean)
-          .join(""),
+          .join(''),
       Object.fromEntries(
         [
-          hasArtists && ["artists", getArtistString(track.artistContribs)],
+          hasArtists && ['artists', getArtistString(track.artistContribs)],
           hasCoverArtists && [
-            "coverArtists",
+            'coverArtists',
             getArtistString(track.coverArtistContribs),
           ],
         ].filter(Boolean)
@@ -166,8 +166,8 @@ export function write(track, { wikiData }) {
   };
 
   const page = {
-    type: "page",
-    path: ["track", track.directory],
+    type: 'page',
+    path: ['track', track.directory],
     page: ({
       absoluteTo,
       fancifyURL,
@@ -196,24 +196,23 @@ export function write(track, { wikiData }) {
       const cover = getTrackCover(track);
 
       return {
-        title: language.$("trackPage.title", { track: track.name }),
-        stylesheet: getAlbumStylesheet(album, { to }),
+        title: language.$('trackPage.title', {track: track.name}),
+        stylesheet: getAlbumStylesheet(album, {to}),
         theme: getThemeString(track.color, [
           `--album-directory: ${album.directory}`,
           `--track-directory: ${track.directory}`,
         ]),
 
         socialEmbed: {
-          heading: language.$("trackPage.socialEmbed.heading", {
+          heading: language.$('trackPage.socialEmbed.heading', {
             album: track.album.name,
           }),
-          headingLink: absoluteTo("localized.album", album.directory),
-          title: language.$("trackPage.socialEmbed.title", {
+          headingLink: absoluteTo('localized.album', album.directory),
+          title: language.$('trackPage.socialEmbed.title', {
             track: track.name,
           }),
-          description: getSocialEmbedDescription({ getArtistString, language }),
-          image:
-            "/" + getTrackCover(track, { to: urls.from("shared.root").to }),
+          description: getSocialEmbedDescription({getArtistString, language}),
+          image: '/' + getTrackCover(track, {to: urls.from('shared.root').to}),
           color: track.color,
         },
 
@@ -234,23 +233,23 @@ export function write(track, { wikiData }) {
                           cover &&
                           generateCoverLink({
                             src: cover,
-                            alt: language.$("misc.alt.trackCover"),
+                            alt: language.$('misc.alt.trackCover'),
                             tags: track.artTags,
                           })
                         }
-                        <h1>${language.$("trackPage.title", {
+                        <h1>${language.$('trackPage.title', {
                           track: track.name,
                         })}</h1>
                         <p>
                             ${[
-                              language.$("releaseInfo.by", {
+                              language.$('releaseInfo.by', {
                                 artists: getArtistString(track.artistContribs, {
                                   showContrib: true,
                                   showIcons: true,
                                 }),
                               }),
                               track.coverArtistContribs.length &&
-                                language.$("releaseInfo.coverArtBy", {
+                                language.$('releaseInfo.coverArtBy', {
                                   artists: getArtistString(
                                     track.coverArtistContribs,
                                     {
@@ -260,45 +259,45 @@ export function write(track, { wikiData }) {
                                   ),
                                 }),
                               track.date &&
-                                language.$("releaseInfo.released", {
+                                language.$('releaseInfo.released', {
                                   date: language.formatDate(track.date),
                                 }),
                               track.coverArtDate &&
                                 +track.coverArtDate !== +track.date &&
-                                language.$("releaseInfo.artReleased", {
+                                language.$('releaseInfo.artReleased', {
                                   date: language.formatDate(track.coverArtDate),
                                 }),
                               track.duration &&
-                                language.$("releaseInfo.duration", {
+                                language.$('releaseInfo.duration', {
                                   duration: language.formatDuration(
                                     track.duration
                                   ),
                                 }),
                             ]
                               .filter(Boolean)
-                              .join("<br>\n")}
+                              .join('<br>\n')}
                         </p>
                         <p>${
                           track.urls?.length
-                            ? language.$("releaseInfo.listenOn", {
+                            ? language.$('releaseInfo.listenOn', {
                                 links: language.formatDisjunctionList(
                                   track.urls.map((url) =>
-                                    fancifyURL(url, { language })
+                                    fancifyURL(url, {language})
                                   )
                                 ),
                               })
-                            : language.$("releaseInfo.listenOn.noLinks")
+                            : language.$('releaseInfo.listenOn.noLinks')
                         }</p>
                         ${
                           otherReleases.length &&
                           fixWS`
-                            <p>${language.$("releaseInfo.alsoReleasedAs")}</p>
+                            <p>${language.$('releaseInfo.alsoReleasedAs')}</p>
                             <ul>
                                 ${otherReleases
                                   .map(
                                     (track) => fixWS`
                                     <li>${language.$(
-                                      "releaseInfo.alsoReleasedAs.item",
+                                      'releaseInfo.alsoReleasedAs.item',
                                       {
                                         track: link.track(track),
                                         album: link.album(track.album),
@@ -306,14 +305,14 @@ export function write(track, { wikiData }) {
                                     )}</li>
                                 `
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </ul>
                         `
                         }
                         ${
                           track.contributorContribs.length &&
                           fixWS`
-                            <p>${language.$("releaseInfo.contributors")}</p>
+                            <p>${language.$('releaseInfo.contributors')}</p>
                             <ul>
                                 ${track.contributorContribs
                                   .map(
@@ -323,18 +322,18 @@ export function write(track, { wikiData }) {
                                         showIcons: true,
                                       })}</li>`
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </ul>
                         `
                         }
                         ${
                           referencedTracks.length &&
                           fixWS`
-                            <p>${language.$("releaseInfo.tracksReferenced", {
+                            <p>${language.$('releaseInfo.tracksReferenced', {
                               track: `<i>${track.name}</i>`,
                             })}</p>
                             ${html.tag(
-                              "ul",
+                              'ul',
                               referencedTracks.map(getTrackItem)
                             )}
                         `
@@ -342,7 +341,7 @@ export function write(track, { wikiData }) {
                         ${
                           referencedByTracks.length &&
                           fixWS`
-                            <p>${language.$("releaseInfo.tracksThatReference", {
+                            <p>${language.$('releaseInfo.tracksThatReference', {
                               track: `<i>${track.name}</i>`,
                             })}</p>
                             ${generateTrackListDividedByGroups(
@@ -358,24 +357,24 @@ export function write(track, { wikiData }) {
                           wikiInfo.enableFlashesAndGames &&
                           flashesThatFeature.length &&
                           fixWS`
-                            <p>${language.$("releaseInfo.flashesThatFeature", {
+                            <p>${language.$('releaseInfo.flashesThatFeature', {
                               track: `<i>${track.name}</i>`,
                             })}</p>
                             <ul>
                                 ${flashesThatFeature
-                                  .map(({ flash, as }) =>
+                                  .map(({flash, as}) =>
                                     html.tag(
-                                      "li",
-                                      { class: as !== track && "rerelease" },
+                                      'li',
+                                      {class: as !== track && 'rerelease'},
                                       as === track
                                         ? language.$(
-                                            "releaseInfo.flashesThatFeature.item",
+                                            'releaseInfo.flashesThatFeature.item',
                                             {
                                               flash: link.flash(flash),
                                             }
                                           )
                                         : language.$(
-                                            "releaseInfo.flashesThatFeature.item.asDifferentRelease",
+                                            'releaseInfo.flashesThatFeature.item.asDifferentRelease',
                                             {
                                               flash: link.flash(flash),
                                               track: link.track(as),
@@ -383,14 +382,14 @@ export function write(track, { wikiData }) {
                                           )
                                     )
                                   )
-                                  .join("\n")}
+                                  .join('\n')}
                             </ul>
                         `
                         }
                         ${
                           track.lyrics &&
                           fixWS`
-                            <p>${language.$("releaseInfo.lyrics")}</p>
+                            <p>${language.$('releaseInfo.lyrics')}</p>
                             <blockquote>
                                 ${transformLyrics(track.lyrics)}
                             </blockquote>
@@ -399,7 +398,7 @@ export function write(track, { wikiData }) {
                         ${
                           hasCommentary &&
                           fixWS`
-                            <p>${language.$("releaseInfo.artistCommentary")}</p>
+                            <p>${language.$('releaseInfo.artistCommentary')}</p>
                             <blockquote>
                                 ${generateCommentary({
                                   link,
@@ -422,23 +421,23 @@ export function write(track, { wikiData }) {
         }),
 
         nav: {
-          linkContainerClasses: ["nav-links-hierarchy"],
+          linkContainerClasses: ['nav-links-hierarchy'],
           links: [
-            { toHome: true },
+            {toHome: true},
             {
-              path: ["localized.album", album.directory],
+              path: ['localized.album', album.directory],
               title: album.name,
             },
-            listTag === "ol"
+            listTag === 'ol'
               ? {
-                  html: language.$("trackPage.nav.track.withNumber", {
+                  html: language.$('trackPage.nav.track.withNumber', {
                     number: album.tracks.indexOf(track) + 1,
-                    track: link.track(track, { class: "current", to }),
+                    track: link.track(track, {class: 'current', to}),
                   }),
                 }
               : {
-                  html: language.$("trackPage.nav.track", {
-                    track: link.track(track, { class: "current", to }),
+                  html: language.$('trackPage.nav.track', {
+                    track: link.track(track, {class: 'current', to}),
                   }),
                 },
           ].filter(Boolean),

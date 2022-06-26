@@ -1,5 +1,7 @@
-// @format
-//
+/**
+ * @format
+ */
+
 // Generally extendable class for caching properties and handling dependencies,
 // with a few key properties:
 //
@@ -76,16 +78,16 @@
 //      function, which provides a mapping of exposed property names to whether
 //      or not their dependencies are yet met.
 
-import { color, ENABLE_COLOR } from "../util/cli.js";
+import {color, ENABLE_COLOR} from '../util/cli.js';
 
-import { inspect as nodeInspect } from "util";
+import {inspect as nodeInspect} from 'util';
 
 function inspect(value) {
-  return nodeInspect(value, { colors: ENABLE_COLOR });
+  return nodeInspect(value, {colors: ENABLE_COLOR});
 }
 
 export default class CacheableObject {
-  static instance = Symbol("CacheableObject `this` instance");
+  static instance = Symbol('CacheableObject `this` instance');
 
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
@@ -109,7 +111,7 @@ export default class CacheableObject {
       return new Proxy(this, {
         get: (obj, key) => {
           if (!Object.hasOwn(obj, key)) {
-            if (key !== "constructor") {
+            if (key !== 'constructor') {
               CacheableObject._invalidAccesses.add(
                 `(${obj.constructor.name}).${key}`
               );
@@ -125,7 +127,7 @@ export default class CacheableObject {
     for (const [property, descriptor] of Object.entries(
       this.constructor.propertyDescriptors
     )) {
-      const { flags, update } = descriptor;
+      const {flags, update} = descriptor;
 
       if (!flags.update) {
         continue;
@@ -149,7 +151,7 @@ export default class CacheableObject {
     for (const [property, descriptor] of Object.entries(
       this.constructor.propertyDescriptors
     )) {
-      const { flags } = descriptor;
+      const {flags} = descriptor;
 
       const definition = {
         configurable: false,
@@ -173,9 +175,8 @@ export default class CacheableObject {
   }
 
   #getUpdateObjectDefinitionSetterFunction(property) {
-    const { update } = this.#getPropertyDescriptor(property);
+    const {update} = this.#getPropertyDescriptor(property);
     const validate = update?.validate;
-    const allowNull = update?.allowNull;
 
     return (newValue) => {
       const oldValue = this.#propertyUpdateValues[property];
@@ -209,10 +210,6 @@ export default class CacheableObject {
     };
   }
 
-  #getUpdatePropertyValidateFunction(property) {
-    const descriptor = this.#getPropertyDescriptor(property);
-  }
-
   #getPropertyDescriptor(property) {
     return this.constructor.propertyDescriptors[property];
   }
@@ -225,7 +222,7 @@ export default class CacheableObject {
   }
 
   #getExposeObjectDefinitionGetterFunction(property) {
-    const { flags } = this.#getPropertyDescriptor(property);
+    const {flags} = this.#getPropertyDescriptor(property);
     const compute = this.#getExposeComputeFunction(property);
 
     if (compute) {
@@ -248,7 +245,7 @@ export default class CacheableObject {
   }
 
   #getExposeComputeFunction(property) {
-    const { flags, expose } = this.#getPropertyDescriptor(property);
+    const {flags, expose} = this.#getPropertyDescriptor(property);
 
     const compute = expose?.compute;
     const transform = expose?.transform;
@@ -286,7 +283,7 @@ export default class CacheableObject {
   }
 
   #getExposeCheckCacheValidFunction(property) {
-    const { flags, expose } = this.#getPropertyDescriptor(property);
+    const {flags, expose} = this.#getPropertyDescriptor(property);
 
     let valid = false;
 

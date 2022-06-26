@@ -1,17 +1,17 @@
-// @format
-//
+/** @format */
+
 // Utility functions for CLI- and de8ugging-rel8ted stuff.
 //
 // A 8unch of these depend on process.stdout 8eing availa8le, so they won't
 // work within the 8rowser.
 
-const { process } = globalThis;
+const {process} = globalThis;
 
 export const ENABLE_COLOR =
   process &&
-  ((process.env.CLICOLOR_FORCE && process.env.CLICOLOR_FORCE === "1") ??
+  ((process.env.CLICOLOR_FORCE && process.env.CLICOLOR_FORCE === '1') ??
     (process.env.CLICOLOR &&
-      process.env.CLICOLOR === "1" &&
+      process.env.CLICOLOR === '1' &&
       process.stdout.hasColors &&
       process.stdout.hasColors()) ??
     (process.stdout.hasColors ? process.stdout.hasColors() : true));
@@ -20,17 +20,17 @@ const C = (n) =>
   ENABLE_COLOR ? (text) => `\x1b[${n}m${text}\x1b[0m` : (text) => text;
 
 export const color = {
-  bright: C("1"),
-  dim: C("2"),
-  normal: C("22"),
-  black: C("30"),
-  red: C("31"),
-  green: C("32"),
-  yellow: C("33"),
-  blue: C("34"),
-  magenta: C("35"),
-  cyan: C("36"),
-  white: C("37"),
+  bright: C('1'),
+  dim: C('2'),
+  normal: C('22'),
+  black: C('30'),
+  red: C('31'),
+  green: C('32'),
+  yellow: C('33'),
+  blue: C('34'),
+  magenta: C('35'),
+  cyan: C('36'),
+  white: C('37'),
 };
 
 const logColor =
@@ -51,7 +51,7 @@ const logColor =
       }
     }
     wc(`\x1b[0m`);
-    w("\n");
+    w('\n');
   };
 
 export const logInfo = logColor(2);
@@ -105,9 +105,9 @@ export async function parseOptions(options, optionDescriptorMap) {
   const result = Object.create(null);
   for (let i = 0; i < options.length; i++) {
     const option = options[i];
-    if (option.startsWith("--")) {
+    if (option.startsWith('--')) {
       // --x can be a flag or expect a value or series of values
-      let name = option.slice(2).split("=")[0]; // '--x'.split('=') = ['--x']
+      let name = option.slice(2).split('=')[0]; // '--x'.split('=') = ['--x']
       let descriptor = optionDescriptorMap[name];
       if (!descriptor) {
         if (handleUnknown) {
@@ -122,13 +122,13 @@ export async function parseOptions(options, optionDescriptorMap) {
         name = descriptor.alias;
         descriptor = optionDescriptorMap[name];
       }
-      if (descriptor.type === "flag") {
+      if (descriptor.type === 'flag') {
         result[name] = true;
-      } else if (descriptor.type === "value") {
-        let value = option.slice(2).split("=")[1];
+      } else if (descriptor.type === 'value') {
+        let value = option.slice(2).split('=')[1];
         if (!value) {
           value = options[++i];
-          if (!value || value.startsWith("-")) {
+          if (!value || value.startsWith('-')) {
             value = null;
           }
         }
@@ -137,14 +137,14 @@ export async function parseOptions(options, optionDescriptorMap) {
           process.exit(1);
         }
         result[name] = value;
-      } else if (descriptor.type === "series") {
-        if (!options.slice(i).includes(";")) {
+      } else if (descriptor.type === 'series') {
+        if (!options.slice(i).includes(';')) {
           console.error(
             `Expected a series of values concluding with ; (\\;) for --${name}`
           );
           process.exit(1);
         }
-        const endIndex = i + options.slice(i).indexOf(";");
+        const endIndex = i + options.slice(i).indexOf(';');
         result[name] = options.slice(i + 1, endIndex);
         i = endIndex;
       }
@@ -155,7 +155,7 @@ export async function parseOptions(options, optionDescriptorMap) {
           process.exit(1);
         }
       }
-    } else if (option.startsWith("-")) {
+    } else if (option.startsWith('-')) {
       // mtui doesn't use any -x=y or -x y format optionuments
       // -x will always just be a flag
       let name = option.slice(1);
@@ -173,7 +173,7 @@ export async function parseOptions(options, optionDescriptorMap) {
         name = descriptor.alias;
         descriptor = optionDescriptorMap[name];
       }
-      if (descriptor.type === "flag") {
+      if (descriptor.type === 'flag') {
         result[name] = true;
       } else {
         console.error(`Use --${name} (value) to specify ${name}`);
@@ -191,7 +191,7 @@ export const handleUnknown = Symbol();
 
 export function decorateTime(arg1, arg2) {
   const [id, functionToBeWrapped] =
-    typeof arg1 === "string" || typeof arg1 === "symbol"
+    typeof arg1 === 'string' || typeof arg1 === 'symbol'
       ? [arg1, arg2]
       : [Symbol(arg1.name), arg1];
 
@@ -202,7 +202,7 @@ export function decorateTime(arg1, arg2) {
     displayTime() {
       const averageTime = meta.timeSpent / meta.timesCalled;
       console.log(
-        `\x1b[1m${typeof id === "symbol" ? id.description : id}(...):\x1b[0m ${
+        `\x1b[1m${typeof id === 'symbol' ? id.description : id}(...):\x1b[0m ${
           meta.timeSpent
         } ms / ${meta.timesCalled} calls \x1b[2m(avg: ${averageTime} ms)\x1b[0m`
       );
@@ -236,7 +236,7 @@ decorateTime.displayTime = function () {
   ];
 
   if (keys.length) {
-    console.log(`\x1b[1mdecorateTime results: ` + "-".repeat(40) + "\x1b[0m");
+    console.log(`\x1b[1mdecorateTime results: ` + '-'.repeat(40) + '\x1b[0m');
     for (const key of keys) {
       map[key].displayTime();
     }
@@ -249,7 +249,7 @@ export function progressPromiseAll(msgOrMsgFn, array) {
   }
 
   const msgFn =
-    typeof msgOrMsgFn === "function" ? msgOrMsgFn : () => msgOrMsgFn;
+    typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
 
   let done = 0,
     total = array.length;
@@ -260,9 +260,9 @@ export function progressPromiseAll(msgOrMsgFn, array) {
       Promise.resolve(promise).then((val) => {
         done++;
         // const pc = `${done}/${total}`;
-        const pc = (Math.round((done / total) * 1000) / 10 + "%").padEnd(
-          "99.9%".length,
-          " "
+        const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd(
+          '99.9%'.length,
+          ' '
         );
         if (done === total) {
           const time = Date.now() - start;

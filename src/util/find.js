@@ -1,14 +1,14 @@
-// @format
+/** @format */
 
-import { color, logError, logWarn } from "./cli.js";
+import {color, logError, logWarn} from './cli.js';
 
-import { inspect } from "util";
+import {inspect} from 'util';
 
 function warnOrThrow(mode, message) {
   switch (mode) {
-    case "error":
+    case 'error':
       throw new Error(message);
-    case "warn":
+    case 'warn':
       logWarn(message);
     default:
       return null;
@@ -26,16 +26,16 @@ function findHelper(keys, findFns = {}) {
   const byName = findFns.byName || matchName;
 
   const keyRefRegex = new RegExp(
-    String.raw`^(?:(${keys.join("|")}):(?=\S))?(.*)$`
+    String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`
   );
 
   // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
   // errors for null matches (with details about the error), while 'warn' and
   // 'quiet' both return null, with 'warn' logging details directly to the
   // console.
-  return (fullRef, data, { mode = "warn" } = {}) => {
+  return (fullRef, data, {mode = 'warn'} = {}) => {
     if (!fullRef) return null;
-    if (typeof fullRef !== "string") {
+    if (typeof fullRef !== 'string') {
       throw new Error(
         `Got a reference that is ${typeof fullRef}, not string: ${fullRef}`
       );
@@ -81,19 +81,19 @@ function findHelper(keys, findFns = {}) {
 }
 
 function matchDirectory(ref, data, mode) {
-  return data.find(({ directory }) => directory === ref);
+  return data.find(({directory}) => directory === ref);
 }
 
 function matchName(ref, data, mode) {
   const matches = data.filter(
-    ({ name }) => name.toLowerCase() === ref.toLowerCase()
+    ({name}) => name.toLowerCase() === ref.toLowerCase()
   );
 
   if (matches.length > 1) {
     return warnOrThrow(
       mode,
       `Multiple matches for reference "${ref}". Please resolve:\n` +
-        matches.map((match) => `- ${inspect(match)}\n`).join("") +
+        matches.map((match) => `- ${inspect(match)}\n`).join('') +
         `Returning null for this reference.`
     );
   }
@@ -115,19 +115,19 @@ function matchName(ref, data, mode) {
 }
 
 function matchTagName(ref, data, quiet) {
-  return matchName(ref.startsWith("cw: ") ? ref.slice(4) : ref, data, quiet);
+  return matchName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data, quiet);
 }
 
 const find = {
-  album: findHelper(["album", "album-commentary"]),
-  artist: findHelper(["artist", "artist-gallery"]),
-  artTag: findHelper(["tag"], { byName: matchTagName }),
-  flash: findHelper(["flash"]),
-  group: findHelper(["group", "group-gallery"]),
-  listing: findHelper(["listing"]),
-  newsEntry: findHelper(["news-entry"]),
-  staticPage: findHelper(["static"]),
-  track: findHelper(["track"]),
+  album: findHelper(['album', 'album-commentary']),
+  artist: findHelper(['artist', 'artist-gallery']),
+  artTag: findHelper(['tag'], {byName: matchTagName}),
+  flash: findHelper(['flash']),
+  group: findHelper(['group', 'group-gallery']),
+  listing: findHelper(['listing']),
+  newsEntry: findHelper(['news-entry']),
+  staticPage: findHelper(['static']),
+  track: findHelper(['track']),
 };
 
 export default find;
@@ -140,15 +140,15 @@ export default find;
 export function bindFind(wikiData, opts1) {
   return Object.fromEntries(
     Object.entries({
-      album: "albumData",
-      artist: "artistData",
-      artTag: "artTagData",
-      flash: "flashData",
-      group: "groupData",
-      listing: "listingSpec",
-      newsEntry: "newsData",
-      staticPage: "staticPageData",
-      track: "trackData",
+      album: 'albumData',
+      artist: 'artistData',
+      artTag: 'artTagData',
+      flash: 'flashData',
+      group: 'groupData',
+      listing: 'listingSpec',
+      newsEntry: 'newsData',
+      staticPage: 'staticPageData',
+      track: 'trackData',
     }).map(([key, value]) => {
       const findFn = find[key];
       const thingData = wikiData[value];
@@ -157,7 +157,7 @@ export function bindFind(wikiData, opts1) {
         opts1
           ? (ref, opts2) =>
               opts2
-                ? findFn(ref, thingData, { ...opts1, ...opts2 })
+                ? findFn(ref, thingData, {...opts1, ...opts2})
                 : findFn(ref, thingData, opts1)
           : (ref, opts2) =>
               opts2 ? findFn(ref, thingData, opts2) : findFn(ref, thingData),

@@ -1,25 +1,25 @@
-// @format
-//
+/** @format */
+
 // Group page specifications.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
-import * as html from "../util/html.js";
+import * as html from '../util/html.js';
 
-import { getTotalDuration, sortChronologically } from "../util/wiki-data.js";
+import {getTotalDuration, sortChronologically} from '../util/wiki-data.js';
 
 // Page exports
 
-export function targets({ wikiData }) {
+export function targets({wikiData}) {
   return wikiData.groupData;
 }
 
-export function write(group, { wikiData }) {
-  const { listingSpec, wikiInfo } = wikiData;
+export function write(group, {wikiData}) {
+  const {listingSpec, wikiInfo} = wikiData;
 
-  const { albums } = group;
+  const {albums} = group;
   const tracks = albums.flatMap((album) => album.tracks);
   const totalDuration = getTotalDuration(tracks);
 
@@ -29,8 +29,8 @@ export function write(group, { wikiData }) {
   }));
 
   const infoPage = {
-    type: "page",
-    path: ["groupInfo", group.directory],
+    type: 'page',
+    path: ['groupInfo', group.directory],
     page: ({
       generateInfoGalleryLinks,
       generatePreviousNextLinks,
@@ -41,57 +41,57 @@ export function write(group, { wikiData }) {
       language,
       transformMultiline,
     }) => ({
-      title: language.$("groupInfoPage.title", { group: group.name }),
+      title: language.$('groupInfoPage.title', {group: group.name}),
       theme: getThemeString(group.color),
 
       main: {
         content: fixWS`
-                    <h1>${language.$("groupInfoPage.title", {
+                    <h1>${language.$('groupInfoPage.title', {
                       group: group.name,
                     })}</h1>
                     ${
                       group.urls?.length &&
-                      `<p>${language.$("releaseInfo.visitOn", {
+                      `<p>${language.$('releaseInfo.visitOn', {
                         links: language.formatDisjunctionList(
-                          group.urls.map((url) => fancifyURL(url, { language }))
+                          group.urls.map((url) => fancifyURL(url, {language}))
                         ),
                       })}</p>`
                     }
                     <blockquote>
                         ${transformMultiline(group.description)}
                     </blockquote>
-                    <h2>${language.$("groupInfoPage.albumList.title")}</h2>
-                    <p>${language.$("groupInfoPage.viewAlbumGallery", {
+                    <h2>${language.$('groupInfoPage.albumList.title')}</h2>
+                    <p>${language.$('groupInfoPage.viewAlbumGallery', {
                       link: link.groupGallery(group, {
-                        text: language.$("groupInfoPage.viewAlbumGallery.link"),
+                        text: language.$('groupInfoPage.viewAlbumGallery.link'),
                       }),
                     })}</p>
                     <ul>
                         ${albumLines
-                          .map(({ album, otherGroup }) => {
+                          .map(({album, otherGroup}) => {
                             const item = album.date
-                              ? language.$("groupInfoPage.albumList.item", {
+                              ? language.$('groupInfoPage.albumList.item', {
                                   year: album.date.getFullYear(),
                                   album: link.album(album),
                                 })
                               : language.$(
-                                  "groupInfoPage.albumList.item.withoutYear",
+                                  'groupInfoPage.albumList.item.withoutYear',
                                   {
                                     album: link.album(album),
                                   }
                                 );
                             return html.tag(
-                              "li",
+                              'li',
                               otherGroup
                                 ? language.$(
-                                    "groupInfoPage.albumList.item.withAccent",
+                                    'groupInfoPage.albumList.item.withAccent',
                                     {
                                       item,
                                       accent: html.tag(
-                                        "span",
-                                        { class: "other-group-accent" },
+                                        'span',
+                                        {class: 'other-group-accent'},
                                         language.$(
-                                          "groupInfoPage.albumList.item.otherGroupAccent",
+                                          'groupInfoPage.albumList.item.otherGroupAccent',
                                           {
                                             group: link.groupInfo(otherGroup, {
                                               color: false,
@@ -104,7 +104,7 @@ export function write(group, { wikiData }) {
                                 : item
                             );
                           })
-                          .join("\n")}
+                          .join('\n')}
                     </ul>
                 `,
       },
@@ -127,8 +127,8 @@ export function write(group, { wikiData }) {
   };
 
   const galleryPage = {
-    type: "page",
-    path: ["groupGallery", group.directory],
+    type: 'page',
+    path: ['groupGallery', group.directory],
     page: ({
       generateInfoGalleryLinks,
       generatePreviousNextLinks,
@@ -138,17 +138,17 @@ export function write(group, { wikiData }) {
       link,
       language,
     }) => ({
-      title: language.$("groupGalleryPage.title", { group: group.name }),
+      title: language.$('groupGalleryPage.title', {group: group.name}),
       theme: getThemeString(group.color),
 
       main: {
-        classes: ["top-index"],
+        classes: ['top-index'],
         content: fixWS`
-                    <h1>${language.$("groupGalleryPage.title", {
+                    <h1>${language.$('groupGalleryPage.title', {
                       group: group.name,
                     })}</h1>
                     <p class="quick-info">${language.$(
-                      "groupGalleryPage.infoLine",
+                      'groupGalleryPage.infoLine',
                       {
                         tracks: `<b>${language.countTracks(tracks.length, {
                           unit: true,
@@ -165,16 +165,16 @@ export function write(group, { wikiData }) {
                       wikiInfo.enableGroupUI &&
                       wikiInfo.enableListings &&
                       html.tag(
-                        "p",
-                        { class: "quick-info" },
-                        language.$("groupGalleryPage.anotherGroupLine", {
+                        'p',
+                        {class: 'quick-info'},
+                        language.$('groupGalleryPage.anotherGroupLine', {
                           link: link.listing(
                             listingSpec.find(
-                              (l) => l.directory === "groups/by-category"
+                              (l) => l.directory === 'groups/by-category'
                             ),
                             {
                               text: language.$(
-                                "groupGalleryPage.anotherGroupLine.link"
+                                'groupGalleryPage.anotherGroupLine.link'
                               ),
                             }
                           ),
@@ -222,45 +222,45 @@ export function write(group, { wikiData }) {
 function generateGroupSidebar(
   currentGroup,
   isGallery,
-  { getLinkThemeString, link, language, wikiData }
+  {getLinkThemeString, link, language, wikiData}
 ) {
-  const { groupCategoryData, wikiInfo } = wikiData;
+  const {groupCategoryData, wikiInfo} = wikiData;
 
   if (!wikiInfo.enableGroupUI) {
     return null;
   }
 
-  const linkKey = isGallery ? "groupGallery" : "groupInfo";
+  const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
 
   return {
     content: fixWS`
-            <h1>${language.$("groupSidebar.title")}</h1>
+            <h1>${language.$('groupSidebar.title')}</h1>
             ${groupCategoryData
               .map((category) =>
                 html.tag(
-                  "details",
+                  'details',
                   {
                     open: category === currentGroup.category,
-                    class: category === currentGroup.category && "current",
+                    class: category === currentGroup.category && 'current',
                   },
                   [
                     html.tag(
-                      "summary",
-                      { style: getLinkThemeString(category.color) },
-                      language.$("groupSidebar.groupList.category", {
+                      'summary',
+                      {style: getLinkThemeString(category.color)},
+                      language.$('groupSidebar.groupList.category', {
                         category: `<span class="group-name">${category.name}</span>`,
                       })
                     ),
                     html.tag(
-                      "ul",
+                      'ul',
                       category.groups.map((group) =>
                         html.tag(
-                          "li",
+                          'li',
                           {
-                            class: group === currentGroup && "current",
+                            class: group === currentGroup && 'current',
                             style: getLinkThemeString(group.color),
                           },
-                          language.$("groupSidebar.groupList.item", {
+                          language.$('groupSidebar.groupList.item', {
                             group: link[linkKey](group),
                           })
                         )
@@ -269,7 +269,7 @@ function generateGroupSidebar(
                   ]
                 )
               )
-              .join("\n")}
+              .join('\n')}
             </dl>
         `,
   };
@@ -286,18 +286,18 @@ function generateGroupNav(
     wikiData,
   }
 ) {
-  const { groupData, wikiInfo } = wikiData;
+  const {groupData, wikiInfo} = wikiData;
 
   if (!wikiInfo.enableGroupUI) {
-    return { simple: true };
+    return {simple: true};
   }
 
-  const urlKey = isGallery ? "localized.groupGallery" : "localized.groupInfo";
-  const linkKey = isGallery ? "groupGallery" : "groupInfo";
+  const urlKey = isGallery ? 'localized.groupGallery' : 'localized.groupInfo';
+  const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
 
   const infoGalleryLinks = generateInfoGalleryLinks(currentGroup, isGallery, {
-    linkKeyGallery: "groupGallery",
-    linkKeyInfo: "groupInfo",
+    linkKeyGallery: 'groupGallery',
+    linkKeyInfo: 'groupInfo',
   });
 
   const previousNextLinks = generatePreviousNextLinks(currentGroup, {
@@ -306,16 +306,16 @@ function generateGroupNav(
   });
 
   return {
-    linkContainerClasses: ["nav-links-hierarchy"],
+    linkContainerClasses: ['nav-links-hierarchy'],
     links: [
-      { toHome: true },
+      {toHome: true},
       wikiInfo.enableListings && {
-        path: ["localized.listingIndex"],
-        title: language.$("listingIndex.title"),
+        path: ['localized.listingIndex'],
+        title: language.$('listingIndex.title'),
       },
       {
-        html: language.$("groupPage.nav.group", {
-          group: link[linkKey](currentGroup, { class: "current" }),
+        html: language.$('groupPage.nav.group', {
+          group: link[linkKey](currentGroup, {class: 'current'}),
         }),
       },
       {

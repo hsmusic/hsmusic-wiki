@@ -8,7 +8,8 @@
         "hsmusic": "./src/upd8.js"
     },
     "scripts": {
-        "test": "tape test/**/*.js"
+        "test": "tape test/**/*.js",
+        "dev": "prettier --loglevel warn --write . && eslint src && node src/upd8.js"
     },
     "dependencies": {
         "fix-whitespace": "^1.0.4",

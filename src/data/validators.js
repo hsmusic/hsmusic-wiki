@@ -1,13 +1,13 @@
-// @format
+/** @format */
 
-import { withAggregate } from "../util/sugar.js";
+import {withAggregate} from '../util/sugar.js';
 
-import { color, ENABLE_COLOR, decorateTime } from "../util/cli.js";
+import {color, ENABLE_COLOR} from '../util/cli.js';
 
-import { inspect as nodeInspect } from "util";
+import {inspect as nodeInspect} from 'util';
 
 function inspect(value) {
-  return nodeInspect(value, { colors: ENABLE_COLOR });
+  return nodeInspect(value, {colors: ENABLE_COLOR});
 }
 
 // Basic types (primitives)
@@ -24,11 +24,11 @@ function isType(value, type) {
 }
 
 export function isBoolean(value) {
-  return isType(value, "boolean");
+  return isType(value, 'boolean');
 }
 
 export function isNumber(value) {
-  return isType(value, "number");
+  return isType(value, 'number');
 }
 
 export function isPositive(number) {
@@ -86,7 +86,7 @@ export function isWholeNumber(number) {
 }
 
 export function isString(value) {
-  return isType(value, "string");
+  return isType(value, 'string');
 }
 
 export function isStringNonEmpty(value) {
@@ -116,7 +116,7 @@ export function isDate(value) {
 }
 
 export function isObject(value) {
-  isType(value, "object");
+  isType(value, 'object');
 
   // Note: Please remember that null is always a valid value for properties
   // held by a CacheableObject. This assertion is exclusively for use in other
@@ -127,7 +127,7 @@ export function isObject(value) {
 }
 
 export function isArray(value) {
-  if (typeof value !== "object" || value === null || !Array.isArray(value))
+  if (typeof value !== 'object' || value === null || !Array.isArray(value))
     throw new TypeError(`Expected an array, got ${value}`);
 
   return true;
@@ -156,7 +156,7 @@ export function validateArrayItems(itemValidator) {
   return (array) => {
     isArray(array);
 
-    withAggregate({ message: "Errors validating array items" }, ({ wrap }) => {
+    withAggregate({message: 'Errors validating array items'}, ({wrap}) => {
       array.forEach(wrap(fn));
     });
 
@@ -173,7 +173,7 @@ export function validateInstanceOf(constructor) {
 export function isColor(color) {
   isStringNonEmpty(color);
 
-  if (color.startsWith("#")) {
+  if (color.startsWith('#')) {
     if (![1 + 3, 1 + 4, 1 + 6, 1 + 8].includes(color.length))
       throw new TypeError(
         `Expected #rgb, #rgba, #rrggbb, or #rrggbbaa, got length ${color.length}`
@@ -192,7 +192,7 @@ export function isCommentary(commentary) {
   return isString(commentary);
 }
 
-const isArtistRef = validateReference("artist");
+const isArtistRef = validateReference('artist');
 
 export function validateProperties(spec) {
   const specEntries = Object.entries(spec);
@@ -205,8 +205,8 @@ export function validateProperties(spec) {
       throw new TypeError(`Expected an object, got array`);
 
     withAggregate(
-      { message: `Errors validating object properties` },
-      ({ call }) => {
+      {message: `Errors validating object properties`},
+      ({call}) => {
         for (const [specKey, specValidator] of specEntries) {
           call(() => {
             const value = object[specKey];
@@ -229,7 +229,7 @@ export function validateProperties(spec) {
             throw new Error(
               `Unknown keys present (${
                 unknownKeys.length
-              }): [${unknownKeys.join(", ")}]`
+              }): [${unknownKeys.join(', ')}]`
             );
           });
         }
@@ -273,7 +273,7 @@ export function isDimensions(dimensions) {
 export function isDirectory(directory) {
   isStringNonEmpty(directory);
 
-  if (directory.match(/[^a-zA-Z0-9_\-]/))
+  if (directory.match(/[^a-zA-Z0-9_-]/))
     throw new TypeError(
       `Expected only letters, numbers, dash, and underscore, got "${directory}"`
     );
@@ -291,7 +291,7 @@ export function isDuration(duration) {
 export function isFileExtension(string) {
   isStringNonEmpty(string);
 
-  if (string[0] === ".")
+  if (string[0] === '.')
     throw new TypeError(`Expected no dot (.) at the start of file extension`);
 
   if (string.match(/[^a-zA-Z0-9_]/))
@@ -321,7 +321,7 @@ export function isURL(string) {
   return true;
 }
 
-export function validateReference(type = "track") {
+export function validateReference(type = 'track') {
   return (ref) => {
     isStringNonEmpty(ref);
 
@@ -332,7 +332,7 @@ export function validateReference(type = "track") {
     if (!match) throw new TypeError(`Malformed reference`);
 
     const {
-      groups: { typePart, directoryPart },
+      groups: {typePart, directoryPart},
     } = match;
 
     if (typePart && typePart !== type)
@@ -348,7 +348,7 @@ export function validateReference(type = "track") {
   };
 }
 
-export function validateReferenceList(type = "") {
+export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
 }
 

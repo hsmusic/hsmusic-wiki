@@ -1,10 +1,10 @@
-// @format
-//
+/** @format */
+
 // Utility functions which are only relevant to particular Node.js constructs.
 
-import { fileURLToPath } from "url";
+import {fileURLToPath} from 'url';
 
-import _commandExists from "command-exists";
+import _commandExists from 'command-exists';
 
 // This package throws an error instead of returning false when the command
 // doesn't exist, for some reason. Yay for making logic more difficult!
@@ -32,7 +32,7 @@ export function promisifyProcess(proc, showLogging = true) {
       proc.stderr.pipe(process.stderr);
     }
 
-    proc.on("exit", (code) => {
+    proc.on('exit', (code) => {
       if (code === 0) {
         resolve();
       } else {

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
-
-// @format
+/** @format */
 
 // HEY N8RDS!
 //
@@ -33,18 +32,18 @@
 // Oh yeah, like. Just run this through some relatively recent version of
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
-import * as path from "path";
-import { promisify } from "util";
-import { fileURLToPath } from "url";
+import * as path from 'path';
+import {promisify} from 'util';
+import {fileURLToPath} from 'url';
 
 // I made this dependency myself! A long, long time ago. It is pro8a8ly my
 // most useful li8rary ever. I'm not sure 8esides me actually uses it, though.
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 // Wait nevermind, I forgot a8out why-do-kids-love-the-taste-of-cinnamon-toast-
 // crunch. THAT is my 8est li8rary.
 
 // It stands for "HTML Entities", apparently. Cursed.
-import he from "he";
+import he from 'he';
 
 import {
   copyFile,
@@ -54,25 +53,25 @@ import {
   symlink,
   writeFile,
   unlink,
-} from "fs/promises";
+} from 'fs/promises';
 
-import { inspect as nodeInspect } from "util";
+import {inspect as nodeInspect} from 'util';
 
-import genThumbs from "./gen-thumbs.js";
-import { listingSpec, listingTargetSpec } from "./listing-spec.js";
-import urlSpec from "./url-spec.js";
-import * as pageSpecs from "./page/index.js";
+import genThumbs from './gen-thumbs.js';
+import {listingSpec, listingTargetSpec} from './listing-spec.js';
+import urlSpec from './url-spec.js';
+import * as pageSpecs from './page/index.js';
 
-import find, { bindFind } from "./util/find.js";
-import * as html from "./util/html.js";
-import unbound_link, { getLinkThemeString } from "./util/link.js";
-import { findFiles } from "./util/io.js";
+import find, {bindFind} from './util/find.js';
+import * as html from './util/html.js';
+import unbound_link, {getLinkThemeString} from './util/link.js';
+import {findFiles} from './util/io.js';
 
-import CacheableObject from "./data/cacheable-object.js";
+import CacheableObject from './data/cacheable-object.js';
 
-import { serializeThings } from "./data/serialize.js";
+import {serializeThings} from './data/serialize.js';
 
-import { Language } from "./data/things.js";
+import {Language} from './data/things.js';
 
 import {
   filterDuplicateDirectories,
@@ -81,7 +80,7 @@ import {
   loadAndProcessDataDocuments,
   sortWikiDataArrays,
   WIKI_INFO_FILE,
-} from "./data/yaml.js";
+} from './data/yaml.js';
 
 import {
   fancifyFlashURL,
@@ -103,7 +102,7 @@ import {
   getRevealStringFromWarnings,
   getThemeString,
   iconifyURL,
-} from "./misc-templates.js";
+} from './misc-templates.js';
 
 import {
   color,
@@ -114,9 +113,9 @@ import {
   parseOptions,
   progressPromiseAll,
   ENABLE_COLOR,
-} from "./util/cli.js";
+} from './util/cli.js';
 
-import { validateReplacerSpec, transformInline } from "./util/replacer.js";
+import {validateReplacerSpec, transformInline} from './util/replacer.js';
 
 import {
   chunkByConditions,
@@ -130,7 +129,7 @@ import {
   getKebabCase,
   getTotalDuration,
   getTrackCover,
-} from "./util/wiki-data.js";
+} from './util/wiki-data.js';
 
 import {
   serializeContribs,
@@ -139,7 +138,7 @@ import {
   serializeGroupsForTrack,
   serializeImagePaths,
   serializeLink,
-} from "./util/serialize.js";
+} from './util/serialize.js';
 
 import {
   bindOpts,
@@ -155,23 +154,23 @@ import {
   unique,
   withAggregate,
   withEntries,
-} from "./util/sugar.js";
+} from './util/sugar.js';
 
-import { generateURLs, thumb } from "./util/urls.js";
+import {generateURLs, thumb} from './util/urls.js';
 
 // Pensive emoji!
 import {
   FANDOM_GROUP_DIRECTORY,
   OFFICIAL_GROUP_DIRECTORY,
-} from "./util/magic-constants.js";
+} from './util/magic-constants.js';
 
-import FileSizePreloader from "./file-size-preloader.js";
+import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 10;
 
-const DEFAULT_STRINGS_FILE = "strings-default.json";
+const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
 // Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
 // site code should 8e put here. Which, uh, ~~only really means this one
@@ -180,20 +179,20 @@ const DEFAULT_STRINGS_FILE = "strings-default.json";
 // Rather than hard code it, anything in this directory can 8e shared across
 // 8oth ends of the code8ase.
 // (This gets symlinked into the --data-path directory.)
-const UTILITY_DIRECTORY = "util";
+const UTILITY_DIRECTORY = 'util';
 
 // Code that's used only in the static site! CSS, cilent JS, etc.
 // (This gets symlinked into the --data-path directory.)
-const STATIC_DIRECTORY = "static";
+const STATIC_DIRECTORY = 'static';
 
 // This exists adjacent to index.html for any page with oEmbed metadata.
-const OEMBED_JSON_FILE = "oembed.json";
+const OEMBED_JSON_FILE = 'oembed.json';
 
 // Automatically copied (if present) from media directory to site root.
-const FAVICON_FILE = "favicon.ico";
+const FAVICON_FILE = 'favicon.ico';
 
 function inspect(value) {
-  return nodeInspect(value, { colors: ENABLE_COLOR });
+  return nodeInspect(value, {colors: ENABLE_COLOR});
 }
 
 // Shared varia8les! These are more efficient to access than a shared varia8le
@@ -222,38 +221,38 @@ function splitLines(text) {
 
 const replacerSpec = {
   album: {
-    find: "album",
-    link: "album",
+    find: 'album',
+    link: 'album',
   },
-  "album-commentary": {
-    find: "album",
-    link: "albumCommentary",
+  'album-commentary': {
+    find: 'album',
+    link: 'albumCommentary',
   },
   artist: {
-    find: "artist",
-    link: "artist",
+    find: 'artist',
+    link: 'artist',
   },
-  "artist-gallery": {
-    find: "artist",
-    link: "artistGallery",
+  'artist-gallery': {
+    find: 'artist',
+    link: 'artistGallery',
   },
-  "commentary-index": {
+  'commentary-index': {
     find: null,
-    link: "commentaryIndex",
+    link: 'commentaryIndex',
   },
   date: {
     find: null,
     value: (ref) => new Date(ref),
-    html: (date, { language }) =>
+    html: (date, {language}) =>
       `<time datetime="${date.toString()}">${language.formatDate(date)}</time>`,
   },
   flash: {
-    find: "flash",
-    link: "flash",
+    find: 'flash',
+    link: 'flash',
     transformName(name, node, input) {
       const nextCharacter = input[node.iEnd];
       const lastCharacter = name[name.length - 1];
-      if (![" ", "\n", "<"].includes(nextCharacter) && lastCharacter === ".") {
+      if (![' ', '\n', '<'].includes(nextCharacter) && lastCharacter === '.') {
         return name.slice(0, -1);
       } else {
         return name;
@@ -261,69 +260,69 @@ const replacerSpec = {
     },
   },
   group: {
-    find: "group",
-    link: "groupInfo",
+    find: 'group',
+    link: 'groupInfo',
   },
-  "group-gallery": {
-    find: "group",
-    link: "groupGallery",
+  'group-gallery': {
+    find: 'group',
+    link: 'groupGallery',
   },
   home: {
     find: null,
-    link: "home",
+    link: 'home',
   },
-  "listing-index": {
+  'listing-index': {
     find: null,
-    link: "listingIndex",
+    link: 'listingIndex',
   },
   listing: {
-    find: "listing",
-    link: "listing",
+    find: 'listing',
+    link: 'listing',
   },
   media: {
     find: null,
-    link: "media",
+    link: 'media',
   },
-  "news-index": {
+  'news-index': {
     find: null,
-    link: "newsIndex",
+    link: 'newsIndex',
   },
-  "news-entry": {
-    find: "newsEntry",
-    link: "newsEntry",
+  'news-entry': {
+    find: 'newsEntry',
+    link: 'newsEntry',
   },
   root: {
     find: null,
-    link: "root",
+    link: 'root',
   },
   site: {
     find: null,
-    link: "site",
+    link: 'site',
   },
   static: {
-    find: "staticPage",
-    link: "staticPage",
+    find: 'staticPage',
+    link: 'staticPage',
   },
   string: {
     find: null,
     value: (ref) => ref,
-    html: (ref, { language, args }) => language.$(ref, args),
+    html: (ref, {language, args}) => language.$(ref, args),
   },
   tag: {
-    find: "artTag",
-    link: "tag",
+    find: 'artTag',
+    link: 'tag',
   },
   track: {
-    find: "track",
-    link: "track",
+    find: 'track',
+    link: 'track',
   },
 };
 
-if (!validateReplacerSpec(replacerSpec, { find, link: unbound_link })) {
+if (!validateReplacerSpec(replacerSpec, {find, link: unbound_link})) {
   process.exit();
 }
 
-function parseAttributes(string, { to }) {
+function parseAttributes(string, {to}) {
   const attributes = Object.create(null);
   const skipWhitespace = (i) => {
     const ws = /\s/;
@@ -345,7 +344,7 @@ function parseAttributes(string, { to }) {
     const aEnd = i + string.slice(i).match(/[\s=]|$/).index;
     const attribute = string.slice(aStart, aEnd);
     i = skipWhitespace(aEnd);
-    if (string[i] === "=") {
+    if (string[i] === '=') {
       i = skipWhitespace(i + 1);
       let end, endOffset;
       if (string[i] === '"' || string[i] === "'") {
@@ -353,15 +352,15 @@ function parseAttributes(string, { to }) {
         endOffset = 1;
         i++;
       } else {
-        end = "\\s";
+        end = '\\s';
         endOffset = 0;
       }
       const vStart = i;
       const vEnd = i + string.slice(i).match(new RegExp(`${end}|$`)).index;
       const value = string.slice(vStart, vEnd);
       i = vEnd + endOffset;
-      if (attribute === "src" && value.startsWith("media/")) {
-        attributes[attribute] = to("media.path", value.slice("media/".length));
+      if (attribute === 'src' && value.startsWith('media/')) {
+        attributes[attribute] = to('media.path', value.slice('media/'.length));
       } else {
         attributes[attribute] = value;
       }
@@ -372,9 +371,9 @@ function parseAttributes(string, { to }) {
   return Object.fromEntries(
     Object.entries(attributes).map(([key, val]) => [
       key,
-      val === "true"
+      val === 'true'
         ? true
-        : val === "false"
+        : val === 'false'
         ? false
         : val === key
         ? true
@@ -386,13 +385,13 @@ function parseAttributes(string, { to }) {
 function joinLineBreaks(sourceLines) {
   const outLines = [];
 
-  let lineSoFar = "";
+  let lineSoFar = '';
   for (let i = 0; i < sourceLines.length; i++) {
     const line = sourceLines[i];
     lineSoFar += line;
-    if (!line.endsWith("<br>")) {
+    if (!line.endsWith('<br>')) {
       outLines.push(lineSoFar);
-      lineSoFar = "";
+      lineSoFar = '';
     }
   }
 
@@ -403,14 +402,14 @@ function joinLineBreaks(sourceLines) {
   return outLines;
 }
 
-function transformMultiline(text, { parseAttributes, transformInline }) {
+function transformMultiline(text, {parseAttributes, transformInline}) {
   // Heck yes, HTML magics.
 
   text = transformInline(text.trim());
 
   const outLines = [];
 
-  const indentString = " ".repeat(4);
+  const indentString = ' '.repeat(4);
 
   let levelIndents = [];
   const openLevel = (indent) => {
@@ -418,13 +417,13 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
     // correct, we have to append the <ul> at the end of the existing
     // previous <li>
     const previousLine = outLines[outLines.length - 1];
-    if (previousLine?.endsWith("</li>")) {
+    if (previousLine?.endsWith('</li>')) {
       // we will re-close the <li> later
-      outLines[outLines.length - 1] = previousLine.slice(0, -5) + " <ul>";
+      outLines[outLines.length - 1] = previousLine.slice(0, -5) + ' <ul>';
     } else {
       // if the previous line isn't a list item, this is the opening of
       // the first list level, so no need for indent
-      outLines.push("<ul>");
+      outLines.push('<ul>');
     }
     levelIndents.push(indent);
   };
@@ -432,10 +431,10 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
     levelIndents.pop();
     if (levelIndents.length) {
       // closing a sublist, so close the list item containing it too
-      outLines.push(indentString.repeat(levelIndents.length) + "</ul></li>");
+      outLines.push(indentString.repeat(levelIndents.length) + '</ul></li>');
     } else {
       // closing the final list level! no need for indent here
-      outLines.push("</ul>");
+      outLines.push('</ul>');
     }
   };
 
@@ -448,19 +447,19 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
   let lines = splitLines(text);
   lines = joinLineBreaks(lines);
   for (let line of lines) {
-    const imageLine = line.startsWith("<img");
+    const imageLine = line.startsWith('<img');
     line = line.replace(/<img (.*?)>/g, (match, attributes) =>
       img({
         lazy: true,
         link: true,
-        thumb: "medium",
+        thumb: 'medium',
         ...parseAttributes(attributes),
       })
     );
 
     let indentThisLine = 0;
     let lineContent = line;
-    let lineTag = "p";
+    let lineTag = 'p';
 
     const listMatch = line.match(/^( *)- *(.*)$/);
     if (listMatch) {
@@ -498,7 +497,7 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
       // finally, set variables for appending content line
       indentThisLine = levelIndents.length;
       lineContent = listMatch[2];
-      lineTag = "li";
+      lineTag = 'li';
     } else {
       // not a list item! close any existing list levels
       while (levelIndents.length) closeLevel();
@@ -510,27 +509,27 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
         // is a quote! open a blockquote tag if it doesnt already exist
         if (!inBlockquote) {
           inBlockquote = true;
-          outLines.push("<blockquote>");
+          outLines.push('<blockquote>');
         }
         indentThisLine = 1;
         lineContent = quoteMatch[1];
       } else if (inBlockquote) {
         // not a quote! close a blockquote tag if it exists
         inBlockquote = false;
-        outLines.push("</blockquote>");
+        outLines.push('</blockquote>');
       }
 
       // let some escaped symbols display as the normal symbol, since the
       // point of escaping them is just to avoid having them be treated as
       // syntax markers!
       if (lineContent.match(/( *)\\-/)) {
-        lineContent = lineContent.replace("\\-", "-");
+        lineContent = lineContent.replace('\\-', '-');
       } else if (lineContent.match(/( *)\\>/)) {
-        lineContent = lineContent.replace("\\>", ">");
+        lineContent = lineContent.replace('\\>', '>');
       }
     }
 
-    if (lineTag === "p") {
+    if (lineTag === 'p') {
       // certain inline element tags should still be postioned within a
       // paragraph; other elements (e.g. headings) should be added as-is
       const elementMatch = line.match(/^<(.*?)[ >]/);
@@ -538,40 +537,40 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
         elementMatch &&
         !imageLine &&
         ![
-          "a",
-          "abbr",
-          "b",
-          "bdo",
-          "br",
-          "cite",
-          "code",
-          "data",
-          "datalist",
-          "del",
-          "dfn",
-          "em",
-          "i",
-          "img",
-          "ins",
-          "kbd",
-          "mark",
-          "output",
-          "picture",
-          "q",
-          "ruby",
-          "samp",
-          "small",
-          "span",
-          "strong",
-          "sub",
-          "sup",
-          "svg",
-          "time",
-          "var",
-          "wbr",
+          'a',
+          'abbr',
+          'b',
+          'bdo',
+          'br',
+          'cite',
+          'code',
+          'data',
+          'datalist',
+          'del',
+          'dfn',
+          'em',
+          'i',
+          'img',
+          'ins',
+          'kbd',
+          'mark',
+          'output',
+          'picture',
+          'q',
+          'ruby',
+          'samp',
+          'small',
+          'span',
+          'strong',
+          'sub',
+          'sup',
+          'svg',
+          'time',
+          'var',
+          'wbr',
         ].includes(elementMatch[1])
       ) {
-        lineTag = "";
+        lineTag = '';
       }
     }
 
@@ -592,43 +591,43 @@ function transformMultiline(text, { parseAttributes, transformInline }) {
   // if still in a blockquote, close its tag
   if (inBlockquote) {
     inBlockquote = false;
-    outLines.push("</blockquote>");
+    outLines.push('</blockquote>');
   }
 
-  return outLines.join("\n");
+  return outLines.join('\n');
 }
 
-function transformLyrics(text, { transformInline, transformMultiline }) {
+function transformLyrics(text, {transformInline, transformMultiline}) {
   // Different from transformMultiline 'cuz it joins multiple lines together
   // with line 8reaks (<br>); transformMultiline treats each line as its own
   // complete paragraph (or list, etc).
 
   // If it looks like old data, then like, oh god.
   // Use the normal transformMultiline tool.
-  if (text.includes("<br")) {
+  if (text.includes('<br')) {
     return transformMultiline(text);
   }
 
   text = transformInline(text.trim());
 
-  let buildLine = "";
+  let buildLine = '';
   const addLine = () => outLines.push(`<p>${buildLine}</p>`);
   const outLines = [];
-  for (const line of text.split("\n")) {
+  for (const line of text.split('\n')) {
     if (line.length) {
       if (buildLine.length) {
-        buildLine += "<br>";
+        buildLine += '<br>';
       }
       buildLine += line;
     } else if (buildLine.length) {
       addLine();
-      buildLine = "";
+      buildLine = '';
     }
   }
   if (buildLine.length) {
     addLine();
   }
-  return outLines.join("\n");
+  return outLines.join('\n');
 }
 
 function stringifyThings(thingData) {
@@ -638,7 +637,7 @@ function stringifyThings(thingData) {
 function img({
   src,
   alt,
-  noSrcText = "",
+  noSrcText = '',
   thumb: thumbKey,
   reveal,
   id,
@@ -650,13 +649,13 @@ function img({
   square = false,
 }) {
   const willSquare = square;
-  const willLink = typeof link === "string" || link;
+  const willLink = typeof link === 'string' || link;
 
   const originalSrc = src;
   const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
 
   const imgAttributes = html.attributes({
-    id: link ? "" : id,
+    id: link ? '' : id,
     class: className,
     alt,
     width,
@@ -701,21 +700,21 @@ function img({
     }
 
     if (willSquare) {
-      wrapped = html.tag("div", { class: "square-content" }, wrapped);
+      wrapped = html.tag('div', {class: 'square-content'}, wrapped);
       wrapped = html.tag(
-        "div",
-        { class: ["square", hide && !willLink && "js-hide"] },
+        'div',
+        {class: ['square', hide && !willLink && 'js-hide']},
         wrapped
       );
     }
 
     if (willLink) {
       wrapped = html.tag(
-        "a",
+        'a',
         {
           id,
-          class: ["box", hide && "js-hide"],
-          href: typeof link === "string" ? link : originalSrc,
+          class: ['box', hide && 'js-hide'],
+          href: typeof link === 'string' ? link : originalSrc,
         },
         wrapped
       );
@@ -727,16 +726,16 @@ function img({
 
 function validateWritePath(path, urlGroup) {
   if (!Array.isArray(path)) {
-    return { error: `Expected array, got ${path}` };
+    return {error: `Expected array, got ${path}`};
   }
 
-  const { paths } = urlGroup;
+  const {paths} = urlGroup;
 
   const definedKeys = Object.keys(paths);
   const specifiedKey = path[0];
 
   if (!definedKeys.includes(specifiedKey)) {
-    return { error: `Specified key ${specifiedKey} isn't defined` };
+    return {error: `Specified key ${specifiedKey} isn't defined`};
   }
 
   const expectedArgs = paths[specifiedKey].match(/<>/g)?.length ?? 0;
@@ -748,54 +747,54 @@ function validateWritePath(path, urlGroup) {
     };
   }
 
-  return { success: true };
+  return {success: true};
 }
 
 function validateWriteObject(obj) {
-  if (typeof obj !== "object") {
-    return { error: `Expected object, got ${typeof obj}` };
+  if (typeof obj !== 'object') {
+    return {error: `Expected object, got ${typeof obj}`};
   }
 
-  if (typeof obj.type !== "string") {
-    return { error: `Expected type to be string, got ${obj.type}` };
+  if (typeof obj.type !== 'string') {
+    return {error: `Expected type to be string, got ${obj.type}`};
   }
 
   switch (obj.type) {
-    case "legacy": {
-      if (typeof obj.write !== "function") {
-        return { error: `Expected write to be string, got ${obj.write}` };
+    case 'legacy': {
+      if (typeof obj.write !== 'function') {
+        return {error: `Expected write to be string, got ${obj.write}`};
       }
 
       break;
     }
 
-    case "page": {
+    case 'page': {
       const path = validateWritePath(obj.path, urlSpec.localized);
       if (path.error) {
-        return { error: `Path validation failed: ${path.error}` };
+        return {error: `Path validation failed: ${path.error}`};
       }
 
-      if (typeof obj.page !== "function") {
-        return { error: `Expected page to be function, got ${obj.content}` };
+      if (typeof obj.page !== 'function') {
+        return {error: `Expected page to be function, got ${obj.content}`};
       }
 
       break;
     }
 
-    case "data": {
+    case 'data': {
       const path = validateWritePath(obj.path, urlSpec.data);
       if (path.error) {
-        return { error: `Path validation failed: ${path.error}` };
+        return {error: `Path validation failed: ${path.error}`};
       }
 
-      if (typeof obj.data !== "function") {
-        return { error: `Expected data to be function, got ${obj.data}` };
+      if (typeof obj.data !== 'function') {
+        return {error: `Expected data to be function, got ${obj.data}`};
       }
 
       break;
     }
 
-    case "redirect": {
+    case 'redirect': {
       const fromPath = validateWritePath(obj.fromPath, urlSpec.localized);
       if (fromPath.error) {
         return {
@@ -805,22 +804,22 @@ function validateWriteObject(obj) {
 
       const toPath = validateWritePath(obj.toPath, urlSpec.localized);
       if (toPath.error) {
-        return { error: `Path (toPath) validation failed: ${toPath.error}` };
+        return {error: `Path (toPath) validation failed: ${toPath.error}`};
       }
 
-      if (typeof obj.title !== "function") {
-        return { error: `Expected title to be function, got ${obj.title}` };
+      if (typeof obj.title !== 'function') {
+        return {error: `Expected title to be function, got ${obj.title}`};
       }
 
       break;
     }
 
     default: {
-      return { error: `Unknown type: ${obj.type}` };
+      return {error: `Unknown type: ${obj.type}`};
     }
   }
 
-  return { success: true };
+  return {success: true};
 }
 
 /*
@@ -836,9 +835,9 @@ async function writeData(subKey, directory, data) {
 const writePage = {};
 
 writePage.to =
-  ({ baseDirectory, pageSubKey, paths }) =>
+  ({baseDirectory, pageSubKey, paths}) =>
   (targetFullKey, ...args) => {
-    const [groupKey, subKey] = targetFullKey.split(".");
+    const [groupKey, subKey] = targetFullKey.split('.');
     let path = paths.subdirectoryPrefix;
 
     let from;
@@ -847,27 +846,27 @@ writePage.to =
     // When linking to *outside* the localized area of the site, we need to
     // make sure the result is correctly relative to the 8ase directory.
     if (
-      groupKey !== "localized" &&
-      groupKey !== "localizedDefaultLanguage" &&
+      groupKey !== 'localized' &&
+      groupKey !== 'localizedDefaultLanguage' &&
       baseDirectory
     ) {
-      from = "localizedWithBaseDirectory." + pageSubKey;
+      from = 'localizedWithBaseDirectory.' + pageSubKey;
       to = targetFullKey;
-    } else if (groupKey === "localizedDefaultLanguage" && baseDirectory) {
+    } else if (groupKey === 'localizedDefaultLanguage' && baseDirectory) {
       // Special case for specifically linking *from* a page with base
       // directory *to* a page without! Used for the language switcher and
       // hopefully nothing else oh god.
-      from = "localizedWithBaseDirectory." + pageSubKey;
-      to = "localized." + subKey;
-    } else if (groupKey === "localizedDefaultLanguage") {
+      from = 'localizedWithBaseDirectory.' + pageSubKey;
+      to = 'localized.' + subKey;
+    } else if (groupKey === 'localizedDefaultLanguage') {
       // Linking to the default, except surprise, we're already IN the default
       // (no baseDirectory set).
-      from = "localized." + pageSubKey;
-      to = "localized." + subKey;
+      from = 'localized.' + pageSubKey;
+      to = 'localized.' + subKey;
     } else {
       // If we're linking inside the localized area (or there just is no
       // 8ase directory), the 8ase directory doesn't matter.
-      from = "localized." + pageSubKey;
+      from = 'localized.' + pageSubKey;
       to = targetFullKey;
     }
 
@@ -890,13 +889,13 @@ writePage.html = (
     wikiData,
   }
 ) => {
-  const { wikiInfo } = wikiData;
+  const {wikiInfo} = wikiData;
 
   let {
-    title = "",
+    title = '',
     meta = {},
-    theme = "",
-    stylesheet = "",
+    theme = '',
+    stylesheet = '',
 
     showWikiNameInTitle = true,
 
@@ -912,45 +911,45 @@ writePage.html = (
     socialEmbed = {},
   } = pageInfo;
 
-  body.style ??= "";
+  body.style ??= '';
 
   theme = theme || getThemeString(wikiInfo.color);
 
   banner ||= {};
   banner.classes ??= [];
-  banner.src ??= "";
-  banner.position ??= "";
+  banner.src ??= '';
+  banner.position ??= '';
   banner.dimensions ??= [0, 0];
 
   main.classes ??= [];
-  main.content ??= "";
+  main.content ??= '';
 
   sidebarLeft ??= {};
   sidebarRight ??= {};
 
   for (const sidebar of [sidebarLeft, sidebarRight]) {
     sidebar.classes ??= [];
-    sidebar.content ??= "";
+    sidebar.content ??= '';
     sidebar.collapse ??= true;
   }
 
   nav.classes ??= [];
-  nav.content ??= "";
-  nav.bottomRowContent ??= "";
+  nav.content ??= '';
+  nav.bottomRowContent ??= '';
   nav.links ??= [];
   nav.linkContainerClasses ??= [];
 
   secondaryNav ??= {};
-  secondaryNav.content ??= "";
-  secondaryNav.content ??= "";
+  secondaryNav.content ??= '';
+  secondaryNav.content ??= '';
 
   footer.classes ??= [];
   footer.content ??= wikiInfo.footerContent
     ? transformMultiline(wikiInfo.footerContent)
-    : "";
+    : '';
 
   footer.content +=
-    "\n" +
+    '\n' +
     getFooterLocalizationLinks(paths.pathname, {
       defaultLanguage,
       languages,
@@ -960,13 +959,13 @@ writePage.html = (
     });
 
   const canonical = wikiInfo.canonicalBase
-    ? wikiInfo.canonicalBase + (paths.pathname === "/" ? "" : paths.pathname)
-    : "";
+    ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
+    : '';
 
   const localizedCanonical = wikiInfo.canonicalBase
-    ? Object.entries(localizedPaths).map(([code, { pathname }]) => ({
+    ? Object.entries(localizedPaths).map(([code, {pathname}]) => ({
         lang: code,
-        href: wikiInfo.canonicalBase + (pathname === "/" ? "" : pathname),
+        href: wikiInfo.canonicalBase + (pathname === '/' ? '' : pathname),
       }))
     : [];
 
@@ -976,9 +975,9 @@ writePage.html = (
   const mainHTML =
     main.content &&
     html.tag(
-      "main",
+      'main',
       {
-        id: "content",
+        id: 'content',
         class: main.classes,
       },
       main.content
@@ -987,9 +986,9 @@ writePage.html = (
   const footerHTML =
     footer.content &&
     html.tag(
-      "footer",
+      'footer',
       {
-        id: "footer",
+        id: 'footer',
         class: footer.classes,
       },
       footer.content
@@ -997,18 +996,18 @@ writePage.html = (
 
   const generateSidebarHTML = (
     id,
-    { content, multiple, classes, collapse = true, wide = false }
+    {content, multiple, classes, collapse = true, wide = false}
   ) =>
     content
       ? html.tag(
-          "div",
+          'div',
           {
             id,
             class: [
-              "sidebar-column",
-              "sidebar",
-              wide && "wide",
-              !collapse && "no-hide",
+              'sidebar-column',
+              'sidebar',
+              wide && 'wide',
+              !collapse && 'no-hide',
               ...classes,
             ],
           },
@@ -1016,28 +1015,28 @@ writePage.html = (
         )
       : multiple
       ? html.tag(
-          "div",
+          'div',
           {
             id,
             class: [
-              "sidebar-column",
-              "sidebar-multiple",
-              wide && "wide",
-              !collapse && "no-hide",
+              'sidebar-column',
+              'sidebar-multiple',
+              wide && 'wide',
+              !collapse && 'no-hide',
             ],
           },
           multiple.map((content) =>
-            html.tag("div", { class: ["sidebar", ...classes] }, content)
+            html.tag('div', {class: ['sidebar', ...classes]}, content)
           )
         )
-      : "";
+      : '';
 
-  const sidebarLeftHTML = generateSidebarHTML("sidebar-left", sidebarLeft);
-  const sidebarRightHTML = generateSidebarHTML("sidebar-right", sidebarRight);
+  const sidebarLeftHTML = generateSidebarHTML('sidebar-left', sidebarLeft);
+  const sidebarRightHTML = generateSidebarHTML('sidebar-right', sidebarRight);
 
   if (nav.simple) {
-    nav.linkContainerClasses = ["nav-links-hierarchy"];
-    nav.links = [{ toHome: true }, { toCurrentPage: true }];
+    nav.linkContainerClasses = ['nav-links-hierarchy'];
+    nav.links = [{toHome: true}, {toCurrentPage: true}];
   }
 
   const links = (nav.links || []).filter(Boolean);
@@ -1048,7 +1047,7 @@ writePage.html = (
     const prev = links[i - 1];
     const next = links[i + 1];
 
-    let { title: linkTitle } = cur;
+    let {title: linkTitle} = cur;
 
     if (cur.toHome) {
       linkTitle ??= wikiInfo.nameShort;
@@ -1058,7 +1057,7 @@ writePage.html = (
 
     let partContent;
 
-    if (typeof cur.html === "string") {
+    if (typeof cur.html === 'string') {
       if (!cur.html) {
         logWarn`Empty HTML in nav link ${JSON.stringify(cur)}`;
         console.trace();
@@ -1066,11 +1065,11 @@ writePage.html = (
       partContent = cur.html;
     } else {
       const attributes = {
-        class: (cur.toCurrentPage || i === links.length - 1) && "current",
+        class: (cur.toCurrentPage || i === links.length - 1) && 'current',
         href: cur.toCurrentPage
-          ? ""
+          ? ''
           : cur.toHome
-          ? to("localized.home")
+          ? to('localized.home')
           : cur.path
           ? to(...cur.path)
           : cur.href
@@ -1087,12 +1086,12 @@ writePage.html = (
           )})`
         );
       }
-      partContent = html.tag("a", attributes, linkTitle);
+      partContent = html.tag('a', attributes, linkTitle);
     }
 
     const part = html.tag(
-      "span",
-      { class: cur.divider === false && "no-divider" },
+      'span',
+      {class: cur.divider === false && 'no-divider'},
       partContent
     );
 
@@ -1100,35 +1099,35 @@ writePage.html = (
   }
 
   const navHTML = html.tag(
-    "nav",
+    'nav',
     {
       [html.onlyIfContent]: true,
-      id: "header",
+      id: 'header',
       class: [
         ...nav.classes,
-        links.length && "nav-has-main-links",
-        nav.content && "nav-has-content",
-        nav.bottomRowContent && "nav-has-bottom-row",
+        links.length && 'nav-has-main-links',
+        nav.content && 'nav-has-content',
+        nav.bottomRowContent && 'nav-has-bottom-row',
       ],
     },
     [
       links.length &&
         html.tag(
-          "div",
-          { class: ["nav-main-links", ...nav.linkContainerClasses] },
+          'div',
+          {class: ['nav-main-links', ...nav.linkContainerClasses]},
           navLinkParts
         ),
-      nav.content && html.tag("div", { class: "nav-content" }, nav.content),
+      nav.content && html.tag('div', {class: 'nav-content'}, nav.content),
       nav.bottomRowContent &&
-        html.tag("div", { class: "nav-bottom-row" }, nav.bottomRowContent),
+        html.tag('div', {class: 'nav-bottom-row'}, nav.bottomRowContent),
     ]
   );
 
   const secondaryNavHTML = html.tag(
-    "nav",
+    'nav',
     {
       [html.onlyIfContent]: true,
-      id: "secondary-nav",
+      id: 'secondary-nav',
       class: secondaryNav.classes,
     },
     [secondaryNav.content]
@@ -1144,12 +1143,12 @@ writePage.html = (
     banner.position &&
     bannerSrc &&
     html.tag(
-      "div",
+      'div',
       {
-        id: "banner",
+        id: 'banner',
         class: banner.classes,
       },
-      html.tag("img", {
+      html.tag('img', {
         src: bannerSrc,
         alt: banner.alt,
         width: banner.dimensions[0] || 1100,
@@ -1159,18 +1158,18 @@ writePage.html = (
 
   const layoutHTML = [
     navHTML,
-    banner.position === "top" && bannerHTML,
+    banner.position === 'top' && bannerHTML,
     secondaryNavHTML,
     html.tag(
-      "div",
-      { class: ["layout-columns", !collapseSidebars && "vertical-when-thin"] },
+      'div',
+      {class: ['layout-columns', !collapseSidebars && 'vertical-when-thin']},
       [sidebarLeftHTML, mainHTML, sidebarRightHTML]
     ),
-    banner.position === "bottom" && bannerHTML,
+    banner.position === 'bottom' && bannerHTML,
     footerHTML,
   ]
     .filter(Boolean)
-    .join("\n");
+    .join('\n');
 
   const infoCardHTML = fixWS`
         <div id="info-card-container">
@@ -1178,36 +1177,36 @@ writePage.html = (
                 <div class="info-card">
                     <div class="info-card-art-container no-reveal">
                         ${img({
-                          class: "info-card-art",
-                          src: "",
+                          class: 'info-card-art',
+                          src: '',
                           link: true,
                           square: true,
                         })}
                     </div>
                     <div class="info-card-art-container reveal">
                         ${img({
-                          class: "info-card-art",
-                          src: "",
+                          class: 'info-card-art',
+                          src: '',
                           link: true,
                           square: true,
                           reveal: getRevealStringFromWarnings(
                             '<span class="info-card-art-warnings"></span>',
-                            { language }
+                            {language}
                           ),
                         })}
                     </div>
                     <h1 class="info-card-name"><a></a></h1>
                     <p class="info-card-album">${language.$(
-                      "releaseInfo.from",
-                      { album: "<a></a>" }
+                      'releaseInfo.from',
+                      {album: '<a></a>'}
                     )}</p>
                     <p class="info-card-artists">${language.$(
-                      "releaseInfo.by",
-                      { artists: "<span></span>" }
+                      'releaseInfo.by',
+                      {artists: '<span></span>'}
                     )}</p>
                     <p class="info-card-cover-artists">${language.$(
-                      "releaseInfo.coverArtBy",
-                      { artists: "<span></span>" }
+                      'releaseInfo.coverArtBy',
+                      {artists: '<span></span>'}
                     )}</p>
                 </div>
             </div>
@@ -1216,47 +1215,47 @@ writePage.html = (
 
   const socialEmbedHTML = [
     socialEmbed.title &&
-      html.tag("meta", { property: "og:title", content: socialEmbed.title }),
+      html.tag('meta', {property: 'og:title', content: socialEmbed.title}),
     socialEmbed.description &&
-      html.tag("meta", {
-        property: "og:description",
+      html.tag('meta', {
+        property: 'og:description',
         content: socialEmbed.description,
       }),
     socialEmbed.image &&
-      html.tag("meta", { property: "og:image", content: socialEmbed.image }),
+      html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
     socialEmbed.color &&
-      html.tag("meta", { name: "theme-color", content: socialEmbed.color }),
+      html.tag('meta', {name: 'theme-color', content: socialEmbed.color}),
     oEmbedJSONHref &&
-      html.tag("link", {
-        type: "application/json+oembed",
+      html.tag('link', {
+        type: 'application/json+oembed',
         href: oEmbedJSONHref,
       }),
   ]
     .filter(Boolean)
-    .join("\n");
+    .join('\n');
 
   return filterEmptyLines(fixWS`
         <!DOCTYPE html>
         <html ${html.attributes({
           lang: language.intlCode,
-          "data-language-code": language.code,
-          "data-url-key": paths.toPath[0],
+          'data-language-code': language.code,
+          'data-url-key': paths.toPath[0],
           ...Object.fromEntries(
-            paths.toPath.slice(1).map((v, i) => [["data-url-value" + i], v])
+            paths.toPath.slice(1).map((v, i) => [['data-url-value' + i], v])
           ),
-          "data-rebase-localized": to("localized.root"),
-          "data-rebase-shared": to("shared.root"),
-          "data-rebase-media": to("media.root"),
-          "data-rebase-data": to("data.root"),
+          'data-rebase-localized': to('localized.root'),
+          'data-rebase-shared': to('shared.root'),
+          'data-rebase-media': to('media.root'),
+          'data-rebase-data': to('data.root'),
         })}>
             <head>
                 <title>${
                   showWikiNameInTitle
-                    ? language.formatString("misc.pageTitle.withWikiName", {
+                    ? language.formatString('misc.pageTitle.withWikiName', {
                         title,
                         wikiName: wikiInfo.nameShort,
                       })
-                    : language.formatString("misc.pageTitle", { title })
+                    : language.formatString('misc.pageTitle', {title})
                 }</title>
                 <meta charset="utf-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1266,17 +1265,17 @@ writePage.html = (
                     ([key, value]) =>
                       `<meta ${key}="${html.escapeAttributeValue(value)}">`
                   )
-                  .join("\n")}
+                  .join('\n')}
                 ${canonical && `<link rel="canonical" href="${canonical}">`}
                 ${localizedCanonical
                   .map(
-                    ({ lang, href }) =>
+                    ({lang, href}) =>
                       `<link rel="alternate" hreflang="${lang}" href="${href}">`
                   )
-                  .join("\n")}
+                  .join('\n')}
                 ${socialEmbedHTML}
                 <link rel="stylesheet" href="${to(
-                  "shared.staticFile",
+                  'shared.staticFile',
                   `site.css?${CACHEBUST}`
                 )}">
                 ${
@@ -1289,11 +1288,11 @@ writePage.html = (
                 `
                 }
                 <script src="${to(
-                  "shared.staticFile",
+                  'shared.staticFile',
                   `lazy-loading.js?${CACHEBUST}`
                 )}"></script>
             </head>
-            <body ${html.attributes({ style: body.style || "" })}>
+            <body ${html.attributes({style: body.style || ''})}>
                 <div id="page-container">
                     ${
                       mainHTML &&
@@ -1301,28 +1300,28 @@ writePage.html = (
                         <div id="skippers">
                             ${[
                               [
-                                "#content",
-                                language.$("misc.skippers.skipToContent"),
+                                '#content',
+                                language.$('misc.skippers.skipToContent'),
                               ],
                               sidebarLeftHTML && [
-                                "#sidebar-left",
+                                '#sidebar-left',
                                 sidebarRightHTML
                                   ? language.$(
-                                      "misc.skippers.skipToSidebar.left"
+                                      'misc.skippers.skipToSidebar.left'
                                     )
-                                  : language.$("misc.skippers.skipToSidebar"),
+                                  : language.$('misc.skippers.skipToSidebar'),
                               ],
                               sidebarRightHTML && [
-                                "#sidebar-right",
+                                '#sidebar-right',
                                 sidebarLeftHTML
                                   ? language.$(
-                                      "misc.skippers.skipToSidebar.right"
+                                      'misc.skippers.skipToSidebar.right'
                                     )
-                                  : language.$("misc.skippers.skipToSidebar"),
+                                  : language.$('misc.skippers.skipToSidebar'),
                               ],
                               footerHTML && [
-                                "#footer",
-                                language.$("misc.skippers.skipToFooter"),
+                                '#footer',
+                                language.$('misc.skippers.skipToFooter'),
                               ],
                             ]
                               .filter(Boolean)
@@ -1331,7 +1330,7 @@ writePage.html = (
                                 <span class="skipper"><a href="${href}">${title}</a></span>
                             `
                               )
-                              .join("\n")}
+                              .join('\n')}
                         </div>
                     `
                     }
@@ -1339,7 +1338,7 @@ writePage.html = (
                 </div>
                 ${infoCardHTML}
                 <script type="module" src="${to(
-                  "shared.staticFile",
+                  'shared.staticFile',
                   `client.js?${CACHEBUST}`
                 )}"></script>
             </body>
@@ -1347,37 +1346,37 @@ writePage.html = (
     `);
 };
 
-writePage.oEmbedJSON = (pageInfo, { language, wikiData }) => {
-  const { socialEmbed } = pageInfo;
-  const { wikiInfo } = wikiData;
-  const { canonicalBase, nameShort } = wikiInfo;
+writePage.oEmbedJSON = (pageInfo, {language, wikiData}) => {
+  const {socialEmbed} = pageInfo;
+  const {wikiInfo} = wikiData;
+  const {canonicalBase, nameShort} = wikiInfo;
 
-  if (!socialEmbed) return "";
+  if (!socialEmbed) return '';
 
   const entries = [
     socialEmbed.heading && [
-      "author_name",
-      language.$("misc.socialEmbed.heading", {
+      'author_name',
+      language.$('misc.socialEmbed.heading', {
         wikiName: nameShort,
         heading: socialEmbed.heading,
       }),
     ],
     socialEmbed.headingLink &&
       canonicalBase && [
-        "author_url",
-        canonicalBase.replace(/\/$/, "") +
-          "/" +
-          socialEmbed.headingLink.replace(/^\//, ""),
+        'author_url',
+        canonicalBase.replace(/\/$/, '') +
+          '/' +
+          socialEmbed.headingLink.replace(/^\//, ''),
       ],
   ].filter(Boolean);
 
-  if (!entries.length) return "";
+  if (!entries.length) return '';
 
   return JSON.stringify(Object.fromEntries(entries));
 };
 
-writePage.write = async ({ html, oEmbedJSON = "", paths }) => {
-  await mkdir(paths.outputDirectory, { recursive: true });
+writePage.write = async ({html, oEmbedJSON = '', paths}) => {
+  await mkdir(paths.outputDirectory, {recursive: true});
   await Promise.all(
     [
       writeFile(paths.outputFile, html),
@@ -1390,25 +1389,25 @@ writePage.write = async ({ html, oEmbedJSON = "", paths }) => {
 writePage.paths = (
   baseDirectory,
   fullKey,
-  directory = "",
-  { file = "index.html" } = {}
+  directory = '',
+  {file = 'index.html'} = {}
 ) => {
-  const [groupKey, subKey] = fullKey.split(".");
+  const [groupKey, subKey] = fullKey.split('.');
 
   const pathname =
-    groupKey === "localized" && baseDirectory
+    groupKey === 'localized' && baseDirectory
       ? urls
-          .from("shared.root")
+          .from('shared.root')
           .toDevice(
-            "localizedWithBaseDirectory." + subKey,
+            'localizedWithBaseDirectory.' + subKey,
             baseDirectory,
             directory
           )
-      : urls.from("shared.root").toDevice(fullKey, directory);
+      : urls.from('shared.root').toDevice(fullKey, directory);
 
   // Needed for the rare directory which itself contains a slash, e.g. for
   // listings, with directories like 'albums/by-name'.
-  const subdirectoryPrefix = "../".repeat(directory.split("/").length - 1);
+  const subdirectoryPrefix = '../'.repeat(directory.split('/').length - 1);
 
   const outputDirectory = path.join(outputPath, pathname);
   const outputFile = path.join(outputDirectory, file);
@@ -1445,74 +1444,74 @@ async function writeFavicon() {
 }
 
 function writeSymlinks() {
-  return progressPromiseAll("Writing site symlinks.", [
-    link(path.join(__dirname, UTILITY_DIRECTORY), "shared.utilityRoot"),
-    link(path.join(__dirname, STATIC_DIRECTORY), "shared.staticRoot"),
-    link(mediaPath, "media.root"),
+  return progressPromiseAll('Writing site symlinks.', [
+    link(path.join(__dirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
+    link(path.join(__dirname, STATIC_DIRECTORY), 'shared.staticRoot'),
+    link(mediaPath, 'media.root'),
   ]);
 
   async function link(directory, urlKey) {
-    const pathname = urls.from("shared.root").toDevice(urlKey);
+    const pathname = urls.from('shared.root').toDevice(urlKey);
     const file = path.join(outputPath, pathname);
     try {
       await unlink(file);
     } catch (error) {
-      if (error.code !== "ENOENT") {
+      if (error.code !== 'ENOENT') {
         throw error;
       }
     }
     try {
       await symlink(path.resolve(directory), file);
     } catch (error) {
-      if (error.code === "EPERM") {
-        await symlink(path.resolve(directory), file, "junction");
+      if (error.code === 'EPERM') {
+        await symlink(path.resolve(directory), file, 'junction');
       }
     }
   }
 }
 
-function writeSharedFilesAndPages({ language, wikiData }) {
-  const { groupData, wikiInfo } = wikiData;
+function writeSharedFilesAndPages({language, wikiData}) {
+  const {groupData, wikiInfo} = wikiData;
 
   const redirect = async (title, from, urlKey, directory) => {
     const target = path.relative(
       from,
-      urls.from("shared.root").to(urlKey, directory)
+      urls.from('shared.root').to(urlKey, directory)
     );
-    const content = generateRedirectPage(title, target, { language });
-    await mkdir(path.join(outputPath, from), { recursive: true });
-    await writeFile(path.join(outputPath, from, "index.html"), content);
+    const content = generateRedirectPage(title, target, {language});
+    await mkdir(path.join(outputPath, from), {recursive: true});
+    await writeFile(path.join(outputPath, from, 'index.html'), content);
   };
 
   return progressPromiseAll(
     `Writing files & pages shared across languages.`,
     [
-      groupData?.some((group) => group.directory === "fandom") &&
+      groupData?.some((group) => group.directory === 'fandom') &&
         redirect(
-          "Fandom - Gallery",
-          "albums/fandom",
-          "localized.groupGallery",
-          "fandom"
+          'Fandom - Gallery',
+          'albums/fandom',
+          'localized.groupGallery',
+          'fandom'
         ),
 
-      groupData?.some((group) => group.directory === "official") &&
+      groupData?.some((group) => group.directory === 'official') &&
         redirect(
-          "Official - Gallery",
-          "albums/official",
-          "localized.groupGallery",
-          "official"
+          'Official - Gallery',
+          'albums/official',
+          'localized.groupGallery',
+          'official'
         ),
 
       wikiInfo.enableListings &&
         redirect(
-          "Album Commentary",
-          "list/all-commentary",
-          "localized.commentaryIndex",
-          ""
+          'Album Commentary',
+          'list/all-commentary',
+          'localized.commentaryIndex',
+          ''
         ),
 
       writeFile(
-        path.join(outputPath, "data.json"),
+        path.join(outputPath, 'data.json'),
         fixWS`
             {
                 "albumData": ${stringifyThings(wikiData.albumData)},
@@ -1528,12 +1527,12 @@ function writeSharedFilesAndPages({ language, wikiData }) {
   );
 }
 
-function generateRedirectPage(title, target, { language }) {
+function generateRedirectPage(title, target, {language}) {
   return fixWS`
         <!DOCTYPE html>
         <html>
             <head>
-                <title>${language.$("redirectPage.title", { title })}</title>
+                <title>${language.$('redirectPage.title', {title})}</title>
                 <meta charset="utf-8">
                 <meta http-equiv="refresh" content="0;url=${target}">
                 <link rel="canonical" href="${target}">
@@ -1541,8 +1540,8 @@ function generateRedirectPage(title, target, { language }) {
             </head>
             <body>
                 <main>
-                    <h1>${language.$("redirectPage.title", { title })}</h1>
-                    <p>${language.$("redirectPage.infoLine", {
+                    <h1>${language.$('redirectPage.title', {title})}</h1>
+                    <p>${language.$('redirectPage.infoLine', {
                       target: `<a href="${target}">${target}</a>`,
                     })}</p>
                 </main>
@@ -1553,41 +1552,41 @@ function generateRedirectPage(title, target, { language }) {
 
 // RIP toAnythingMan (previously getHrefOfAnythingMan), 2020-05-25<>2021-05-14.
 // ........Yet the function 8reathes life anew as linkAnythingMan! ::::)
-function linkAnythingMan(anythingMan, { link, wikiData, ...opts }) {
+function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
   return wikiData.albumData.includes(anythingMan)
     ? link.album(anythingMan, opts)
     : wikiData.trackData.includes(anythingMan)
     ? link.track(anythingMan, opts)
     : wikiData.flashData?.includes(anythingMan)
     ? link.flash(anythingMan, opts)
-    : "idk bud";
+    : 'idk bud';
 }
 
 async function processLanguageFile(file) {
-  const contents = await readFile(file, "utf-8");
+  const contents = await readFile(file, 'utf-8');
   const json = JSON.parse(contents);
 
-  const code = json["meta.languageCode"];
+  const code = json['meta.languageCode'];
   if (!code) {
     throw new Error(`Missing language code (file: ${file})`);
   }
-  delete json["meta.languageCode"];
+  delete json['meta.languageCode'];
 
-  const intlCode = json["meta.languageIntlCode"] ?? null;
-  delete json["meta.languageIntlCode"];
+  const intlCode = json['meta.languageIntlCode'] ?? null;
+  delete json['meta.languageIntlCode'];
 
-  const name = json["meta.languageName"];
+  const name = json['meta.languageName'];
   if (!name) {
     throw new Error(`Missing language name (${code})`);
   }
-  delete json["meta.languageName"];
+  delete json['meta.languageName'];
 
-  const hidden = json["meta.hidden"] ?? false;
-  delete json["meta.hidden"];
+  const hidden = json['meta.hidden'] ?? false;
+  delete json['meta.hidden'];
 
-  if (json["meta.baseDirectory"]) {
+  if (json['meta.baseDirectory']) {
     logWarn`(${code}) Language JSON still has unused meta.baseDirectory`;
-    delete json["meta.baseDirectory"];
+    delete json['meta.baseDirectory'];
   }
 
   const language = new Language();
@@ -1596,18 +1595,18 @@ async function processLanguageFile(file) {
   language.name = name;
   language.hidden = hidden;
   language.escapeHTML = (string) =>
-    he.encode(string, { useNamedReferences: true });
+    he.encode(string, {useNamedReferences: true});
   language.strings = json;
   return language;
 }
 
 // Wrapper function for running a function once for all languages.
-async function wrapLanguages(fn, { languages, writeOneLanguage = null }) {
+async function wrapLanguages(fn, {languages, writeOneLanguage = null}) {
   const k = writeOneLanguage;
-  const languagesToRun = k ? { [k]: languages[k] } : languages;
+  const languagesToRun = k ? {[k]: languages[k]} : languages;
 
   const entries = Object.entries(languagesToRun).filter(
-    ([key]) => key !== "default"
+    ([key]) => key !== 'default'
   );
 
   for (let i = 0; i < entries.length; i++) {
@@ -1629,15 +1628,15 @@ async function main() {
     // Data files for the site, including flash, artist, and al8um data,
     // and like a jillion other things too. Pretty much everything which
     // makes an individual wiki what it is goes here!
-    "data-path": {
-      type: "value",
+    'data-path': {
+      type: 'value',
     },
 
     // Static media will 8e referenced in the site here! The contents are
     // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
     // near the top of this file (upd8.js).
-    "media-path": {
-      type: "value",
+    'media-path': {
+      type: 'value',
     },
 
     // String files! For the most part, this is used for translating the
@@ -1650,8 +1649,8 @@ async function main() {
     // Unlike the other options here, this one's optional - the site will
     // 8uild with the default (English) strings if this path is left
     // unspecified.
-    "lang-path": {
-      type: "value",
+    'lang-path': {
+      type: 'value',
     },
 
     // This is the output directory. It's the one you'll upload online with
@@ -1660,78 +1659,78 @@ async function main() {
     // site. Just keep in mind that the gener8ted result will contain a
     // couple symlinked directories, so if you're uploading, you're pro8a8ly
     // gonna want to resolve those yourself.
-    "out-path": {
-      type: "value",
+    'out-path': {
+      type: 'value',
     },
 
     // Thum8nail gener8tion is *usually* something you want, 8ut it can 8e
     // kinda a pain to run every time, since it does necessit8te reading
     // every media file at run time. Pass this to skip it.
-    "skip-thumbs": {
-      type: "flag",
+    'skip-thumbs': {
+      type: 'flag',
     },
 
     // Or, if you *only* want to gener8te newly upd8ted thum8nails, you can
     // pass this flag! It exits 8efore 8uilding the rest of the site.
-    "thumbs-only": {
-      type: "flag",
+    'thumbs-only': {
+      type: 'flag',
     },
 
     // Just working on data entries and not interested in actually
     // generating site HTML yet? This flag will cut execution off right
     // 8efore any site 8uilding actually happens.
-    "no-build": {
-      type: "flag",
+    'no-build': {
+      type: 'flag',
     },
 
     // Only want to 8uild one language during testing? This can chop down
     // 8uild times a pretty 8ig chunk! Just pass a single language code.
     lang: {
-      type: "value",
+      type: 'value',
     },
 
     // Working without a dev server and just using file:// URLs in your we8
     // 8rowser? This will automatically append index.html to links across
     // the site. Not recommended for production, since it isn't guaranteed
     // 100% error-free (and index.html-style links are less pretty anyway).
-    "append-index-html": {
-      type: "flag",
+    'append-index-html': {
+      type: 'flag',
     },
 
     // Want sweet, sweet trace8ack info in aggreg8te error messages? This
     // will print all the juicy details (or at least the first relevant
     // line) right to your output, 8ut also pro8a8ly give you a headache
     // 8ecause wow that is a lot of visual noise.
-    "show-traces": {
-      type: "flag",
+    'show-traces': {
+      type: 'flag',
     },
 
-    "queue-size": {
-      type: "value",
+    'queue-size': {
+      type: 'value',
       validate(size) {
-        if (parseInt(size) !== parseFloat(size)) return "an integer";
-        if (parseInt(size) < 0) return "a counting number or zero";
+        if (parseInt(size) !== parseFloat(size)) return 'an integer';
+        if (parseInt(size) < 0) return 'a counting number or zero';
         return true;
       },
     },
-    queue: { alias: "queue-size" },
+    queue: {alias: 'queue-size'},
 
     // This option is super slow and has the potential for bugs! It puts
     // CacheableObject in a mode where every instance is a Proxy which will
     // keep track of invalid property accesses.
-    "show-invalid-property-accesses": {
-      type: "flag",
+    'show-invalid-property-accesses': {
+      type: 'flag',
     },
 
     [parseOptions.handleUnknown]: () => {},
   });
 
-  dataPath = miscOptions["data-path"] || process.env.HSMUSIC_DATA;
-  mediaPath = miscOptions["media-path"] || process.env.HSMUSIC_MEDIA;
-  langPath = miscOptions["lang-path"] || process.env.HSMUSIC_LANG; // Can 8e left unset!
-  outputPath = miscOptions["out-path"] || process.env.HSMUSIC_OUT;
+  dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
+  mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+  langPath = miscOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
+  outputPath = miscOptions['out-path'] || process.env.HSMUSIC_OUT;
 
-  const writeOneLanguage = miscOptions["lang"];
+  const writeOneLanguage = miscOptions['lang'];
 
   {
     let errored = false;
@@ -1752,16 +1751,16 @@ async function main() {
     }
   }
 
-  const appendIndexHTML = miscOptions["append-index-html"] ?? false;
+  const appendIndexHTML = miscOptions['append-index-html'] ?? false;
   if (appendIndexHTML) {
     logWarn`Appending index.html to link hrefs. (Note: not recommended for production release!)`;
     unbound_link.globalOptions.appendIndexHTML = true;
   }
 
-  const skipThumbs = miscOptions["skip-thumbs"] ?? false;
-  const thumbsOnly = miscOptions["thumbs-only"] ?? false;
-  const noBuild = miscOptions["no-build"] ?? false;
-  const showAggregateTraces = miscOptions["show-traces"] ?? false;
+  const skipThumbs = miscOptions['skip-thumbs'] ?? false;
+  const thumbsOnly = miscOptions['thumbs-only'] ?? false;
+  const noBuild = miscOptions['no-build'] ?? false;
+  const showAggregateTraces = miscOptions['show-traces'] ?? false;
 
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
@@ -1780,45 +1779,45 @@ async function main() {
     logInfo`Skipping thumbnail generation.`;
   } else {
     logInfo`Begin thumbnail generation... -----+`;
-    const result = await genThumbs(mediaPath, { queueSize, quiet: true });
+    const result = await genThumbs(mediaPath, {queueSize, quiet: true});
     logInfo`Done thumbnail generation! --------+`;
     if (!result) return;
     if (thumbsOnly) return;
   }
 
   const showInvalidPropertyAccesses =
-    miscOptions["show-invalid-property-accesses"] ?? false;
+    miscOptions['show-invalid-property-accesses'] ?? false;
 
   if (showInvalidPropertyAccesses) {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
-  const { aggregate: processDataAggregate, result: wikiDataResult } =
-    await loadAndProcessDataDocuments({ dataPath });
+  const {aggregate: processDataAggregate, result: wikiDataResult} =
+    await loadAndProcessDataDocuments({dataPath});
 
   Object.assign(wikiData, wikiDataResult);
 
   {
     const logThings = (thingDataProp, label) =>
       logInfo` - ${
-        wikiData[thingDataProp]?.length ?? color.red("(Missing!)")
+        wikiData[thingDataProp]?.length ?? color.red('(Missing!)')
       } ${color.normal(color.dim(label))}`;
     try {
       logInfo`Loaded data and processed objects:`;
-      logThings("albumData", "albums");
-      logThings("trackData", "tracks");
-      logThings("artistData", "artists");
+      logThings('albumData', 'albums');
+      logThings('trackData', 'tracks');
+      logThings('artistData', 'artists');
       if (wikiData.flashData) {
-        logThings("flashData", "flashes");
-        logThings("flashActData", "flash acts");
+        logThings('flashData', 'flashes');
+        logThings('flashActData', 'flash acts');
       }
-      logThings("groupData", "groups");
-      logThings("groupCategoryData", "group categories");
-      logThings("artTagData", "art tags");
+      logThings('groupData', 'groups');
+      logThings('groupCategoryData', 'group categories');
+      logThings('artTagData', 'art tags');
       if (wikiData.newsData) {
-        logThings("newsData", "news entries");
+        logThings('newsData', 'news entries');
       }
-      logThings("staticPageData", "static pages");
+      logThings('staticPageData', 'static pages');
       if (wikiData.homepageLayout) {
         logInfo` - ${1} homepage layout (${
           wikiData.homepageLayout.rows.length
@@ -1925,7 +1924,7 @@ async function main() {
   let languages;
   if (langPath) {
     const languageDataFiles = await findFiles(langPath, {
-      filter: (f) => path.extname(f) === ".json",
+      filter: (f) => path.extname(f) === '.json',
     });
 
     const results = await progressPromiseAll(
@@ -1953,7 +1952,7 @@ async function main() {
     if (langPath) {
       logError`Check if an appropriate file exists in ${langPath}?`;
     } else {
-      logError`Be sure to specify ${"--lang"} or ${"HSMUSIC_LANG"} with the path to language files.`;
+      logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
     }
     return;
   } else {
@@ -1969,7 +1968,7 @@ async function main() {
     language.inheritedStrings = finalDefaultLanguage.strings;
   }
 
-  logInfo`Loaded language strings: ${Object.keys(languages).join(", ")}`;
+  logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
 
   if (noBuild) {
     logInfo`Not generating any site or page files this run (--no-build passed).`;
@@ -2030,19 +2029,19 @@ async function main() {
           device: path.join(
             mediaPath,
             urls
-              .from("media.root")
-              .toDevice("media.albumAdditionalFile", album.directory, file)
+              .from('media.root')
+              .toDevice('media.albumAdditionalFile', album.directory, file)
           ),
           media: urls
-            .from("media.root")
-            .to("media.albumAdditionalFile", album.directory, file),
+            .from('media.root')
+            .to('media.albumAdditionalFile', album.directory, file),
         }))
     ),
   ];
 
   const getSizeOfAdditionalFile = (mediaPath) => {
-    const { device = null } =
-      additionalFilePaths.find(({ media }) => media === mediaPath) || {};
+    const {device = null} =
+      additionalFilePaths.find(({media}) => media === mediaPath) || {};
     if (!device) return null;
     return fileSizePreloader.getSizeOfPath(device);
   };
@@ -2062,7 +2061,7 @@ async function main() {
   // performance right now 'cuz it'll w8 for file writes to 8e completed
   // 8efore moving on to more data processing. So, defaults to zero, which
   // disa8les the queue feature altogether.
-  queueSize = +(miscOptions["queue-size"] ?? 0);
+  queueSize = +(miscOptions['queue-size'] ?? 0);
 
   const buildDictionary = pageSpecs;
 
@@ -2072,11 +2071,11 @@ async function main() {
   // on some particular area(s) of the site rather than making changes
   // across all of them.
   const writeFlags = await parseOptions(process.argv.slice(2), {
-    all: { type: "flag" }, // Defaults to true if none 8elow specified.
+    all: {type: 'flag'}, // Defaults to true if none 8elow specified.
 
     // Kinda a hack t8h!
     ...Object.fromEntries(
-      Object.keys(buildDictionary).map((key) => [key, { type: "flag" }])
+      Object.keys(buildDictionary).map((key) => [key, {type: 'flag'}])
     ),
 
     [parseOptions.handleUnknown]: () => {},
@@ -2085,12 +2084,12 @@ async function main() {
   const writeAll = !Object.keys(writeFlags).length || writeFlags.all;
 
   logInfo`Writing site pages: ${
-    writeAll ? "all" : Object.keys(writeFlags).join(", ")
+    writeAll ? 'all' : Object.keys(writeFlags).join(', ')
   }`;
 
   await writeFavicon();
   await writeSymlinks();
-  await writeSharedFilesAndPages({ language: finalDefaultLanguage, wikiData });
+  await writeSharedFilesAndPages({language: finalDefaultLanguage, wikiData});
 
   const buildSteps = writeAll
     ? Object.entries(buildDictionary)
@@ -2103,33 +2102,33 @@ async function main() {
     const buildStepsWithTargets = buildSteps
       .map(([flag, pageSpec]) => {
         // Condition not met: skip this build step altogether.
-        if (pageSpec.condition && !pageSpec.condition({ wikiData })) {
+        if (pageSpec.condition && !pageSpec.condition({wikiData})) {
           return null;
         }
 
         // May still call writeTargetless if present.
         if (!pageSpec.targets) {
-          return { flag, pageSpec, targets: [] };
+          return {flag, pageSpec, targets: []};
         }
 
         if (!pageSpec.write) {
-          logError`${flag + ".targets"} is specified, but ${
-            flag + ".write"
+          logError`${flag + '.targets'} is specified, but ${
+            flag + '.write'
           } is missing!`;
           error = true;
           return null;
         }
 
-        const targets = pageSpec.targets({ wikiData });
+        const targets = pageSpec.targets({wikiData});
         if (!Array.isArray(targets)) {
           logError`${
-            flag + ".targets"
+            flag + '.targets'
           } was called, but it didn't return an array! (${typeof targets})`;
           error = true;
           return null;
         }
 
-        return { flag, pageSpec, targets };
+        return {flag, pageSpec, targets};
       })
       .filter(Boolean);
 
@@ -2149,7 +2148,7 @@ async function main() {
 
       if (
         !(
-          writes.every((obj) => typeof obj === "object") &&
+          writes.every((obj) => typeof obj === 'object') &&
           writes.every((obj) => {
             const result = validateWriteObject(obj);
             if (result.error) {
@@ -2171,19 +2170,19 @@ async function main() {
 
     // return;
 
-    writes = buildStepsWithTargets.flatMap(({ flag, pageSpec, targets }) => {
+    writes = buildStepsWithTargets.flatMap(({flag, pageSpec, targets}) => {
       const writes = targets.flatMap(
-        (target) => pageSpec.write(target, { wikiData })?.slice() || []
+        (target) => pageSpec.write(target, {wikiData})?.slice() || []
       );
 
-      if (!validateWrites(writes, flag + ".write")) {
+      if (!validateWrites(writes, flag + '.write')) {
         return [];
       }
 
       if (pageSpec.writeTargetless) {
-        const writes2 = pageSpec.writeTargetless({ wikiData });
+        const writes2 = pageSpec.writeTargetless({wikiData});
 
-        if (!validateWrites(writes2, flag + ".writeTargetless")) {
+        if (!validateWrites(writes2, flag + '.writeTargetless')) {
           return [];
         }
 
@@ -2198,9 +2197,9 @@ async function main() {
     }
   }
 
-  const pageWrites = writes.filter(({ type }) => type === "page");
-  const dataWrites = writes.filter(({ type }) => type === "data");
-  const redirectWrites = writes.filter(({ type }) => type === "redirect");
+  const pageWrites = writes.filter(({type}) => type === 'page');
+  const dataWrites = writes.filter(({type}) => type === 'data');
+  const redirectWrites = writes.filter(({type}) => type === 'redirect');
 
   if (writes.length) {
     logInfo`Total of ${writes.length} writes returned. (${pageWrites.length} page, ${dataWrites.length} data [currently skipped], ${redirectWrites.length} redirect)`;
@@ -2247,20 +2246,20 @@ async function main() {
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
-      language === finalDefaultLanguage ? "" : language.code;
+      language === finalDefaultLanguage ? '' : language.code;
 
     console.log(
       `\x1b[34;1m${`[${i + 1}/${entries.length}] ${
         language.code
-      } (-> /${baseDirectory}) `.padEnd(60, "-")}\x1b[0m`
+      } (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`
     );
 
     await progressPromiseAll(
       `Writing ${language.code}`,
       queue(
         [
-          ...pageWrites.map(({ type, ...props }) => () => {
-            const { path, page } = props;
+          ...pageWrites.map(({type, ...props}) => () => {
+            const {path, page} = props;
 
             // TODO: This only supports one <>-style argument.
             const pageSubKey = path[0];
@@ -2269,13 +2268,13 @@ async function main() {
             const localizedPaths = Object.fromEntries(
               Object.entries(languages)
                 .filter(
-                  ([key, language]) => key !== "default" && !language.hidden
+                  ([key, language]) => key !== 'default' && !language.hidden
                 )
                 .map(([key, language]) => [
                   language.code,
                   writePage.paths(
-                    language === finalDefaultLanguage ? "" : language.code,
-                    "localized." + pageSubKey,
+                    language === finalDefaultLanguage ? '' : language.code,
+                    'localized.' + pageSubKey,
                     directory
                   ),
                 ])
@@ -2283,7 +2282,7 @@ async function main() {
 
             const paths = writePage.paths(
               baseDirectory,
-              "localized." + pageSubKey,
+              'localized.' + pageSubKey,
               directory
             );
 
@@ -2294,13 +2293,13 @@ async function main() {
             });
 
             const absoluteTo = (targetFullKey, ...args) => {
-              const [groupKey, subKey] = targetFullKey.split(".");
-              const from = urls.from("shared.root");
+              const [groupKey, subKey] = targetFullKey.split('.');
+              const from = urls.from('shared.root');
               return (
-                "/" +
-                (groupKey === "localized" && baseDirectory
+                '/' +
+                (groupKey === 'localized' && baseDirectory
                   ? from.to(
-                      "localizedWithBaseDirectory." + subKey,
+                      'localizedWithBaseDirectory.' + subKey,
                       baseDirectory,
                       ...args
                     )
@@ -2314,7 +2313,7 @@ async function main() {
             const bound = {};
 
             bound.link = withEntries(unbound_link, (entries) =>
-              entries.map(([key, fn]) => [key, bindOpts(fn, { to })])
+              entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
             );
 
             bound.linkAnythingMan = bindOpts(linkAnythingMan, {
@@ -2326,7 +2325,7 @@ async function main() {
               to,
             });
 
-            bound.find = bindFind(wikiData, { mode: "warn" });
+            bound.find = bindFind(wikiData, {mode: 'warn'});
 
             bound.transformInline = bindOpts(transformInline, {
               find: bound.find,
@@ -2501,8 +2500,8 @@ async function main() {
               wikiData.wikiInfo.canonicalBase &&
               wikiData.wikiInfo.canonicalBase +
                 urls
-                  .from("shared.root")
-                  .to("shared.path", paths.pathname + OEMBED_JSON_FILE);
+                  .from('shared.root')
+                  .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
 
             const html = writePage.html(pageInfo, {
               defaultLanguage: finalDefaultLanguage,
@@ -2522,30 +2521,27 @@ async function main() {
               paths,
             });
           }),
-          ...redirectWrites.map(
-            ({ fromPath, toPath, title: titleFn }) =>
-              () => {
-                const title = titleFn({
-                  language,
-                });
+          ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
+            const title = titleFn({
+              language,
+            });
 
-                // TODO: This only supports one <>-style argument.
-                const fromPaths = writePage.paths(
-                  baseDirectory,
-                  "localized." + fromPath[0],
-                  fromPath[1]
-                );
-                const to = writePage.to({
-                  baseDirectory,
-                  pageSubKey: fromPath[0],
-                  paths: fromPaths,
-                });
+            // TODO: This only supports one <>-style argument.
+            const fromPaths = writePage.paths(
+              baseDirectory,
+              'localized.' + fromPath[0],
+              fromPath[1]
+            );
+            const to = writePage.to({
+              baseDirectory,
+              pageSubKey: fromPath[0],
+              paths: fromPaths,
+            });
 
-                const target = to("localized." + toPath[0], ...toPath.slice(1));
-                const html = generateRedirectPage(title, target, { language });
-                return writePage.write({ html, paths: fromPaths });
-              }
-          ),
+            const target = to('localized.' + toPath[0], ...toPath.slice(1));
+            const html = generateRedirectPage(title, target, {language});
+            return writePage.write({html, paths: fromPaths});
+          }),
         ],
         queueSize
       )

@@ -1,23 +1,23 @@
-// @format
-//
+/** @format */
+
 // Homepage specification.
 
 // Imports
 
-import fixWS from "fix-whitespace";
+import fixWS from 'fix-whitespace';
 
-import * as html from "../util/html.js";
+import * as html from '../util/html.js';
 
-import { getNewAdditions, getNewReleases } from "../util/wiki-data.js";
+import {getNewAdditions, getNewReleases} from '../util/wiki-data.js';
 
 // Page exports
 
-export function writeTargetless({ wikiData }) {
-  const { newsData, staticPageData, homepageLayout, wikiInfo } = wikiData;
+export function writeTargetless({wikiData}) {
+  const {newsData, staticPageData, homepageLayout, wikiInfo} = wikiData;
 
   const page = {
-    type: "page",
-    path: ["home"],
+    type: 'page',
+    path: ['home'],
     page: ({
       getAlbumGridHTML,
       getLinkThemeString,
@@ -35,7 +35,7 @@ export function writeTargetless({ wikiData }) {
       },
 
       main: {
-        classes: ["top-index"],
+        classes: ['top-index'],
         content: fixWS`
                     <h1>${wikiInfo.name}</h1>
                     ${homepageLayout.rows
@@ -46,21 +46,21 @@ export function writeTargetless({ wikiData }) {
                         )}">
                             <h2>${row.name}</h2>
                             ${
-                              row.type === "albums" &&
+                              row.type === 'albums' &&
                               fixWS`
                                 <div class="grid-listing">
                                     ${getAlbumGridHTML({
                                       entries: (row.sourceGroupByRef ===
-                                      "new-releases"
+                                      'new-releases'
                                         ? getNewReleases(
                                             row.countAlbumsFromGroup,
-                                            { wikiData }
+                                            {wikiData}
                                           )
                                         : row.sourceGroupByRef ===
-                                          "new-additions"
+                                          'new-additions'
                                         ? getNewAdditions(
                                             row.countAlbumsFromGroup,
-                                            { wikiData }
+                                            {wikiData}
                                           )
                                         : (row.sourceGroup?.albums ?? [])
                                             .slice()
@@ -70,7 +70,7 @@ export function writeTargetless({ wikiData }) {
                                                 album.isListedOnHomepage
                                             )
                                             .slice(0, row.countAlbumsFromGroup)
-                                            .map((album) => ({ item: album }))
+                                            .map((album) => ({item: album}))
                                       ).concat(
                                         row.sourceAlbums.map((album) => ({
                                           item: album,
@@ -85,11 +85,11 @@ export function writeTargetless({ wikiData }) {
                                             ${row.actionLinks
                                               .map((action) =>
                                                 transformInline(action).replace(
-                                                  "<a",
+                                                  '<a',
                                                   '<a class="box grid-item"'
                                                 )
                                               )
-                                              .join("\n")}
+                                              .join('\n')}
                                         </div>
                                     `
                                     }
@@ -99,7 +99,7 @@ export function writeTargetless({ wikiData }) {
                         </section>
                     `
                       )
-                      .join("\n")}
+                      .join('\n')}
                 `,
       },
 
@@ -117,21 +117,21 @@ export function writeTargetless({ wikiData }) {
         // And no, I will not make [[news]] into part of transformMultiline
         // (even though that would 8e hilarious).
         content: transformMultiline(
-          homepageLayout.sidebarContent.replace("[[news]]", "__GENERATE_NEWS__")
+          homepageLayout.sidebarContent.replace('[[news]]', '__GENERATE_NEWS__')
         ).replace(
-          "<p>__GENERATE_NEWS__</p>",
+          '<p>__GENERATE_NEWS__</p>',
           wikiInfo.enableNews
             ? fixWS`
-                        <h1>${language.$("homepage.news.title")}</h1>
+                        <h1>${language.$('homepage.news.title')}</h1>
                         ${newsData
                           .slice(0, 3)
                           .map((entry, i) =>
                             html.tag(
-                              "article",
+                              'article',
                               {
                                 class: [
-                                  "news-entry",
-                                  i === 0 && "first-news-entry",
+                                  'news-entry',
+                                  i === 0 && 'first-news-entry',
                                 ],
                               },
                               fixWS`
@@ -143,42 +143,42 @@ export function writeTargetless({ wikiData }) {
                                   entry.contentShort !== entry.content &&
                                   link.newsEntry(entry, {
                                     text: language.$(
-                                      "homepage.news.entry.viewRest"
+                                      'homepage.news.entry.viewRest'
                                     ),
                                   })
                                 }
                             `
                             )
                           )
-                          .join("\n")}
+                          .join('\n')}
                     `
             : `<p><i>News requested in content description but this feature isn't enabled</i></p>`
         ),
       },
 
       nav: {
-        linkContainerClasses: ["nav-links-index"],
+        linkContainerClasses: ['nav-links-index'],
         links: [
-          link.home("", { text: wikiInfo.nameShort, class: "current", to }),
+          link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
 
           wikiInfo.enableListings &&
-            link.listingIndex("", {
-              text: language.$("listingIndex.title"),
+            link.listingIndex('', {
+              text: language.$('listingIndex.title'),
               to,
             }),
 
           wikiInfo.enableNews &&
-            link.newsIndex("", { text: language.$("newsIndex.title"), to }),
+            link.newsIndex('', {text: language.$('newsIndex.title'), to}),
 
           wikiInfo.enableFlashesAndGames &&
-            link.flashIndex("", { text: language.$("flashIndex.title"), to }),
+            link.flashIndex('', {text: language.$('flashIndex.title'), to}),
 
           ...staticPageData
             .filter((page) => page.showInNavigationBar)
-            .map((page) => link.staticPage(page, { text: page.nameShort })),
+            .map((page) => link.staticPage(page, {text: page.nameShort})),
         ]
           .filter(Boolean)
-          .map((html) => ({ html })),
+          .map((html) => ({html})),
       },
     }),
   };

@@ -1,14 +1,14 @@
-// @format
+/** @format */
 
-import { logError, logWarn } from "./cli.js";
-import { escapeRegex } from "./sugar.js";
+import {logError, logWarn} from './cli.js';
+import {escapeRegex} from './sugar.js';
 
-export function validateReplacerSpec(replacerSpec, { find, link }) {
+export function validateReplacerSpec(replacerSpec, {find, link}) {
   let success = true;
 
   for (const [
     key,
-    { link: linkKey, find: findKey, value, html },
+    {link: linkKey, find: findKey, value, html},
   ] of Object.entries(replacerSpec)) {
     if (!html && !link[linkKey]) {
       logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
@@ -24,15 +24,15 @@ export function validateReplacerSpec(replacerSpec, { find, link }) {
 }
 
 // Syntax literals.
-const tagBeginning = "[[";
-const tagEnding = "]]";
-const tagReplacerValue = ":";
-const tagHash = "#";
-const tagArgument = "*";
-const tagArgumentValue = "=";
-const tagLabel = "|";
+const tagBeginning = '[[';
+const tagEnding = ']]';
+const tagReplacerValue = ':';
+const tagHash = '#';
+const tagArgument = '*';
+const tagArgumentValue = '=';
+const tagLabel = '|';
 
-const noPrecedingWhitespace = "(?<!\\s)";
+const noPrecedingWhitespace = '(?<!\\s)';
 
 const R_tagBeginning = escapeRegex(tagBeginning);
 
@@ -51,7 +51,7 @@ const R_tagLabel = escapeRegex(tagLabel);
 
 const regexpCache = {};
 
-const makeError = (i, message) => ({ i, type: "error", data: { message } });
+const makeError = (i, message) => ({i, type: 'error', data: {message}});
 const endOfInput = (i, comment) =>
   makeError(i, `Unexpected end of input (${comment}).`);
 
@@ -67,7 +67,7 @@ function parseOneTextNode(input, i, stopAt) {
 function parseNodes(input, i, stopAt, textOnly) {
   let nodes = [];
   let escapeNext = false;
-  let string = "";
+  let string = '';
   let iString = 0;
 
   stopped = false;
@@ -82,8 +82,8 @@ function parseNodes(input, i, stopAt, textOnly) {
     }
 
     if (string.length) {
-      nodes.push({ i: iString, iEnd: i, type: "text", data: string });
-      string = "";
+      nodes.push({i: iString, iEnd: i, type: 'text', data: string});
+      string = '';
     }
   };
 
@@ -97,7 +97,7 @@ function parseNodes(input, i, stopAt, textOnly) {
   // should 8e counted only as part of the current string/text.
   //
   // Inspired 8y this: https://stackoverflow.com/a/41470813
-  const regexpSource = `(?<!\\\\)(?:\\\\{2})*(${literalsToMatch.join("|")})`;
+  const regexpSource = `(?<!\\\\)(?:\\\\{2})*(${literalsToMatch.join('|')})`;
 
   // There are 8asically only a few regular expressions we'll ever use,
   // 8ut it's a pain to hard-code them all, so we dynamically gener8te
@@ -271,7 +271,7 @@ function parseNodes(input, i, stopAt, textOnly) {
         const value = N;
         i = stop_iParse;
 
-        args.push({ key, value });
+        args.push({key, value});
       }
 
       let label;
@@ -289,8 +289,8 @@ function parseNodes(input, i, stopAt, textOnly) {
       nodes.push({
         i: iTag,
         iEnd: i,
-        type: "tag",
-        data: { replacerKey, replacerValue, hash, args, label },
+        type: 'tag',
+        data: {replacerKey, replacerValue, hash, args, label},
       });
 
       continue;
@@ -304,23 +304,23 @@ export function parseInput(input) {
   try {
     return parseNodes(input, 0);
   } catch (errorNode) {
-    if (errorNode.type !== "error") {
+    if (errorNode.type !== 'error') {
       throw errorNode;
     }
 
     const {
       i,
-      data: { message },
+      data: {message},
     } = errorNode;
 
-    let lineStart = input.slice(0, i).lastIndexOf("\n");
+    let lineStart = input.slice(0, i).lastIndexOf('\n');
     if (lineStart >= 0) {
       lineStart += 1;
     } else {
       lineStart = 0;
     }
 
-    let lineEnd = input.slice(i).indexOf("\n");
+    let lineEnd = input.slice(i).indexOf('\n');
     if (lineEnd >= 0) {
       lineEnd += i;
     } else {
@@ -334,18 +334,18 @@ export function parseInput(input) {
     throw new SyntaxError(fixWS`
             Parse error (at pos ${i}): ${message}
             ${line}
-            ${"-".repeat(cursor) + "^"}
+            ${'-'.repeat(cursor) + '^'}
         `);
   }
 }
 
 function evaluateTag(node, opts) {
-  const { find, input, language, link, replacerSpec, to, wikiData } = opts;
+  const {find, input, language, link, replacerSpec, to, wikiData} = opts;
 
   const source = input.slice(node.i, node.iEnd);
 
   const replacerKeyImplied = !node.data.replacerKey;
-  const replacerKey = replacerKeyImplied ? "track" : node.data.replacerKey.data;
+  const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
 
   if (!replacerSpec[replacerKey]) {
     logWarn`The link ${source} has an invalid replacer key!`;
@@ -395,7 +395,7 @@ function evaluateTag(node, opts) {
   const args =
     node.data.args &&
     Object.fromEntries(
-      node.data.args.map(({ key, value }) => [
+      node.data.args.map(({key, value}) => [
         transformNode(key, opts),
         transformNodes(value, opts),
       ])
@@ -404,7 +404,7 @@ function evaluateTag(node, opts) {
   const fn = htmlFn ? htmlFn : link[linkKey];
 
   try {
-    return fn(value, { text: label, hash, args, language, to });
+    return fn(value, {text: label, hash, args, language, to});
   } catch (error) {
     logError`The link ${source} failed to be processed: ${error}`;
     return source;
@@ -413,17 +413,17 @@ function evaluateTag(node, opts) {
 
 function transformNode(node, opts) {
   if (!node) {
-    throw new Error("Expected a node!");
+    throw new Error('Expected a node!');
   }
 
   if (Array.isArray(node)) {
-    throw new Error("Got an array - use transformNodes here!");
+    throw new Error('Got an array - use transformNodes here!');
   }
 
   switch (node.type) {
-    case "text":
+    case 'text':
       return node.data;
-    case "tag":
+    case 'tag':
       return evaluateTag(node, opts);
     default:
       throw new Error(`Unknown node type ${node.type}`);
@@ -435,19 +435,19 @@ function transformNodes(nodes, opts) {
     throw new Error(`Expected an array of nodes! Got: ${nodes}`);
   }
 
-  return nodes.map((node) => transformNode(node, opts)).join("");
+  return nodes.map((node) => transformNode(node, opts)).join('');
 }
 
 export function transformInline(
   input,
-  { replacerSpec, find, link, language, to, wikiData }
+  {replacerSpec, find, link, language, to, wikiData}
 ) {
-  if (!replacerSpec) throw new Error("Expected replacerSpec");
-  if (!find) throw new Error("Expected find");
-  if (!link) throw new Error("Expected link");
-  if (!language) throw new Error("Expected language");
-  if (!to) throw new Error("Expected to");
-  if (!wikiData) throw new Error("Expected wikiData");
+  if (!replacerSpec) throw new Error('Expected replacerSpec');
+  if (!find) throw new Error('Expected find');
+  if (!link) throw new Error('Expected link');
+  if (!language) throw new Error('Expected language');
+  if (!to) throw new Error('Expected to');
+  if (!wikiData) throw new Error('Expected wikiData');
 
   const nodes = parseInput(input);
   return transformNodes(nodes, {

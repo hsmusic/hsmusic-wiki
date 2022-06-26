@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // Lazy loading! Roll your own. Woot.
 // This file includes a 8unch of fall8acks and stuff like that, and is written
 // with fairly Olden JavaScript(TM), so as to work on pretty much any 8rowser
@@ -27,15 +27,15 @@ function lazyLoadMain() {
   // we'd 8e mutating its value just 8y interacting with the DOM elements it
   // contains. A while loop works just fine, even though you'd think reading
   // over this code that this would 8e an infinitely hanging loop. It isn't!
-  var elements = document.getElementsByClassName("js-hide");
+  var elements = document.getElementsByClassName('js-hide');
   while (elements.length) {
-    elements[0].classList.remove("js-hide");
+    elements[0].classList.remove('js-hide');
   }
 
-  var lazyElements = document.getElementsByClassName("lazy");
+  var lazyElements = document.getElementsByClassName('lazy');
   if (window.IntersectionObserver) {
     observer = new IntersectionObserver(lazyLoad, {
-      rootMargin: "200px",
+      rootMargin: '200px',
       threshold: 1.0,
     });
     for (var i = 0; i < lazyElements.length; i++) {
@@ -44,10 +44,10 @@ function lazyLoadMain() {
   } else {
     for (var i = 0; i < lazyElements.length; i++) {
       var element = lazyElements[i];
-      var original = element.getAttribute("data-original");
-      element.setAttribute("src", original);
+      var original = element.getAttribute('data-original');
+      element.setAttribute('src', original);
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded", lazyLoadMain);
+document.addEventListener('DOMContentLoaded', lazyLoadMain);

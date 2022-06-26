@@ -1,5 +1,5 @@
-// @format
-//
+/** @format */
+
 // serialize-util.js: simple interface and utility functions for converting
 // Things into a directly serializeable format
 
@@ -18,7 +18,7 @@ export function toRefs(things) {
 }
 
 export function toContribRefs(contribs) {
-  return contribs?.map(({ who, what }) => ({ who: toRef(who), what }));
+  return contribs?.map(({who, what}) => ({who: toRef(who), what}));
 }
 
 // Interface

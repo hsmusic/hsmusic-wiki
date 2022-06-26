@@ -1,18 +1,18 @@
-// @format
+/** @format */
 
-import { withEntries } from "./util/sugar.js";
+import {withEntries} from './util/sugar.js';
 
 const urlSpec = {
   data: {
-    prefix: "data/",
+    prefix: 'data/',
 
     paths: {
-      root: "",
-      path: "<>",
+      root: '',
+      path: '<>',
 
-      album: "album/<>",
-      artist: "artist/<>",
-      track: "track/<>",
+      album: 'album/<>',
+      artist: 'artist/<>',
+      track: 'track/<>',
     },
   },
 
@@ -21,64 +21,64 @@ const urlSpec = {
     // prefix: '_languageCode',
 
     paths: {
-      root: "",
-      path: "<>",
+      root: '',
+      path: '<>',
 
-      home: "",
+      home: '',
 
-      album: "album/<>/",
-      albumCommentary: "commentary/album/<>/",
+      album: 'album/<>/',
+      albumCommentary: 'commentary/album/<>/',
 
-      artist: "artist/<>/",
-      artistGallery: "artist/<>/gallery/",
+      artist: 'artist/<>/',
+      artistGallery: 'artist/<>/gallery/',
 
-      commentaryIndex: "commentary/",
+      commentaryIndex: 'commentary/',
 
-      flashIndex: "flash/",
-      flash: "flash/<>/",
+      flashIndex: 'flash/',
+      flash: 'flash/<>/',
 
-      groupInfo: "group/<>/",
-      groupGallery: "group/<>/gallery/",
+      groupInfo: 'group/<>/',
+      groupGallery: 'group/<>/gallery/',
 
-      listingIndex: "list/",
-      listing: "list/<>/",
+      listingIndex: 'list/',
+      listing: 'list/<>/',
 
-      newsIndex: "news/",
-      newsEntry: "news/<>/",
+      newsIndex: 'news/',
+      newsEntry: 'news/<>/',
 
-      staticPage: "<>/",
-      tag: "tag/<>/",
-      track: "track/<>/",
+      staticPage: '<>/',
+      tag: 'tag/<>/',
+      track: 'track/<>/',
     },
   },
 
   shared: {
     paths: {
-      root: "",
-      path: "<>",
+      root: '',
+      path: '<>',
 
-      utilityRoot: "util",
-      staticRoot: "static",
+      utilityRoot: 'util',
+      staticRoot: 'static',
 
-      utilityFile: "util/<>",
-      staticFile: "static/<>",
+      utilityFile: 'util/<>',
+      staticFile: 'static/<>',
     },
   },
 
   media: {
-    prefix: "media/",
+    prefix: 'media/',
 
     paths: {
-      root: "",
-      path: "<>",
+      root: '',
+      path: '<>',
 
-      albumCover: "album-art/<>/cover.<>",
-      albumWallpaper: "album-art/<>/bg.<>",
-      albumBanner: "album-art/<>/banner.<>",
-      trackCover: "album-art/<>/<>.<>",
-      artistAvatar: "artist-avatar/<>.<>",
-      flashArt: "flash-art/<>.<>",
-      albumAdditionalFile: "album-additional/<>/<>",
+      albumCover: 'album-art/<>/cover.<>',
+      albumWallpaper: 'album-art/<>/bg.<>',
+      albumBanner: 'album-art/<>/banner.<>',
+      trackCover: 'album-art/<>/<>.<>',
+      artistAvatar: 'artist-avatar/<>.<>',
+      flashArt: 'flash-art/<>.<>',
+      albumAdditionalFile: 'album-additional/<>/<>',
     },
   },
 };
@@ -87,7 +87,7 @@ const urlSpec = {
 // so it should never be referenced manually.
 urlSpec.localizedWithBaseDirectory = {
   paths: withEntries(urlSpec.localized.paths, (entries) =>
-    entries.map(([key, path]) => [key, "<>/" + path])
+    entries.map(([key, path]) => [key, '<>/' + path])
   ),
 };
 

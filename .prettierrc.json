@@ -1,6 +1,6 @@
 {
   "arrowParens": "always",
-  "bracketSpacing": true,
+  "bracketSpacing": false,
   "printWidth": 80,
   "proseWrap": "never",
   "quoteProps": "as-needed",
