@@ -1,1 +1,13 @@
-{}
+{
+  "arrowParens": "always",
+  "bracketSpacing": true,
+  "printWidth": 80,
+  "proseWrap": "never",
+  "quoteProps": "as-needed",
+  "requirePragma": true,
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "useTabs": false
+}
