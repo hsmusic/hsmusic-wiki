@@ -1,3 +1,5 @@
+// @format
+//
 // Generally extendable class for caching properties and handling dependencies,
 // with a few key properties:
 //

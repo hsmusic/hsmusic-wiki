@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// @format
+//
 // Ok, so the d8te is 3 March 2021, and the music wiki was initially released
 // on 15 November 2019. That is 474 days or 11376 hours. In my opinion, and
 // pro8a8ly the opinions of at least one other person, that is WAY TOO LONG

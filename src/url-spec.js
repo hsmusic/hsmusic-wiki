@@ -1,3 +1,5 @@
+// @format
+
 import { withEntries } from "./util/sugar.js";
 
 const urlSpec = {

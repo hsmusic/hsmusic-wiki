@@ -1,3 +1,5 @@
+// @format
+//
 // Utility functions which are only relevant to particular Node.js constructs.
 
 import { fileURLToPath } from "url";

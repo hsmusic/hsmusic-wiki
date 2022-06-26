@@ -1,3 +1,5 @@
+// @format
+//
 // Album page specification.
 
 // Imports

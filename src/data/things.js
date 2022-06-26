@@ -1,3 +1,5 @@
+// @format
+//
 // things.js: class definitions for various object types used across the wiki,
 // most of which correspond to an output page, such as Track, Album, Artist
 

@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+// @format
+
 // HEY N8RDS!
 //
 // This is one of the 8ACKEND FILES. It's not used anywhere on the actual site

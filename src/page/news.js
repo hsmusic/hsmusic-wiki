@@ -1,3 +1,5 @@
+// @format
+//
 // News entry & index page specifications.
 
 // Imports

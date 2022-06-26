@@ -1,3 +1,5 @@
+// @format
+
 export function serializeLink(thing) {
   const ret = {};
   ret.name = thing.name;

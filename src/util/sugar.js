@@ -1,3 +1,5 @@
+// @format
+//
 // Syntactic sugar! (Mostly.)
 // Generic functions - these are useful just a8out everywhere.
 //

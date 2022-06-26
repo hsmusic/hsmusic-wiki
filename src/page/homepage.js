@@ -1,3 +1,5 @@
+// @format
+//
 // Homepage specification.
 
 // Imports

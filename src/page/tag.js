@@ -1,3 +1,5 @@
+// @format
+//
 // Art tag page specification.
 
 // Imports

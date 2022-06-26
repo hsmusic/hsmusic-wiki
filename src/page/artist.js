@@ -1,3 +1,5 @@
+// @format
+//
 // Artist page specification.
 //
 // NB: See artist-alias.js for artist alias redirect pages.

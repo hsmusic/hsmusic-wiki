@@ -1,3 +1,5 @@
+// @format
+//
 // Code that deals with URLs (really the pathnames that get referenced all
 // throughout the gener8ted HTML). Most nota8ly here is generateURLs, which
 // is in charge of pre-gener8ting a complete network of template strings

@@ -1,3 +1,5 @@
+// @format
+//
 // Magic constants only! These are hard-coded, and any use of them should be
 // considered a flaw in the codebase - areas where we use hard-coded behavior
 // to support one use of the wiki software (i.e. HSMusic, usually), rather than

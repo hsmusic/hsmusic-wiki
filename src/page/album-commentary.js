@@ -1,3 +1,5 @@
+// @format
+//
 // Album commentary page and index specifications.
 
 // Imports

@@ -1,3 +1,5 @@
+// @format
+
 import { color, logError, logWarn } from "./cli.js";
 
 import { inspect } from "util";

@@ -1,3 +1,5 @@
+// @format
+//
 // Utility functions for interacting with wiki data.
 
 // Generic value operations

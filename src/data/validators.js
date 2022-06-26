@@ -1,3 +1,5 @@
+// @format
+
 import { withAggregate } from "../util/sugar.js";
 
 import { color, ENABLE_COLOR, decorateTime } from "../util/cli.js";

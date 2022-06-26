@@ -1,3 +1,5 @@
+// @format
+//
 // yaml.js - specification for HSMusic YAML data file format and utilities for
 // loading and processing YAML files and documents
 

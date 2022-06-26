@@ -1,3 +1,5 @@
+// @format
+//
 // Static content page specification. (These are static pages coded into the
 // wiki data folder, used for a variety of purposes, e.g. wiki info,
 // changelog, and so on.)

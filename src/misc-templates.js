@@ -1,3 +1,5 @@
+// @format
+//
 // Miscellaneous utility functions which are useful across page specifications.
 // These are made available right on a page spec's ({wikiData, language, ...})
 // args object!

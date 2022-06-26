@@ -1,3 +1,5 @@
+// @format
+//
 // serialize-util.js: simple interface and utility functions for converting
 // Things into a directly serializeable format
 

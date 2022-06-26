@@ -1,3 +1,5 @@
+// @format
+//
 // This file is essentially one level of a8straction a8ove urls.js (and the
 // urlSpec it gets its paths from). It's a 8unch of utility functions which
 // take certain types of wiki data o8jects (colloquially known as "things")

@@ -1,3 +1,5 @@
+// @format
+//
 // Flash page and index specifications.
 
 // Imports

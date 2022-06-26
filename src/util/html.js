@@ -1,3 +1,5 @@
+// @format
+//
 // Some really simple functions for formatting HTML content.
 
 // COMPREHENSIVE!

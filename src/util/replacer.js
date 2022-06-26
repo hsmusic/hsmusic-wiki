@@ -1,3 +1,5 @@
+// @format
+
 import { logError, logWarn } from "./cli.js";
 import { escapeRegex } from "./sugar.js";
 

@@ -1,3 +1,5 @@
+// @format
+
 import fixWS from "fix-whitespace";
 
 import {
