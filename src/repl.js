@@ -3,23 +3,15 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as repl from 'repl';
-import {fileURLToPath} from 'url';
-import {promisify} from 'util';
 
 import {quickLoadAllFromYAML} from './data/yaml.js';
 import {logError, parseOptions} from './util/cli.js';
 import {showAggregate} from './util/sugar.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 async function main() {
   const miscOptions = await parseOptions(process.argv.slice(2), {
     'data-path': {
       type: 'value',
-    },
-
-    'show-traces': {
-      type: 'flag',
     },
 
     'no-history': {
@@ -28,7 +20,6 @@ async function main() {
   });
 
   const dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
-  const showAggregateTraces = miscOptions['show-traces'] ?? false;
   const disableHistory = miscOptions['no-history'] ?? false;
 
   if (!dataPath) {

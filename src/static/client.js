@@ -11,8 +11,8 @@ import {getColors} from '../util/colors.js';
 
 import {getArtistNumContributions} from '../util/wiki-data.js';
 
-let albumData, artistData, flashData;
-let officialAlbumData, fandomAlbumData, artistNames;
+let albumData, artistData;
+let officialAlbumData, fandomAlbumData;
 
 let ready = false;
 
@@ -73,43 +73,12 @@ function getAlbum(el) {
   return albumData.find((album) => album.directory === directory);
 }
 
-function getFlash(el) {
-  const directory = cssProp(el, '--flash-directory');
-  return flashData.find((flash) => flash.directory === directory);
-}
-
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
 const openAlbum = (d) => rebase(`album/${d}`);
 const openTrack = (d) => rebase(`track/${d}`);
 const openArtist = (d) => rebase(`artist/${d}`);
-const openFlash = (d) => rebase(`flash/${d}`);
-
-function getTrackListAndIndex() {
-  const album = getAlbum(document.body);
-  const directory = cssProp(document.body, '--track-directory');
-  if (!directory && !album) return {};
-  if (!directory) return {list: album.tracks};
-  const trackIndex = album.tracks.findIndex(
-    (track) => track.directory === directory
-  );
-  return {list: album.tracks, index: trackIndex};
-}
-
-function openRandomTrack() {
-  const {list} = getTrackListAndIndex();
-  if (!list) return;
-  return openTrack(pick(list));
-}
-
-function getFlashListAndIndex() {
-  const list = flashData.filter((flash) => !flash.act8r8k);
-  const flash = getFlash(document.body);
-  if (!flash) return {list};
-  const flashIndex = list.indexOf(flash);
-  return {list, index: flashIndex};
-}
 
 // TODO: This should also use urlSpec.
 function fetchData(type, directory) {
@@ -230,7 +199,6 @@ fetch(rebase('data.json', 'rebaseShared'))
   .then((data) => {
     albumData = data.albumData;
     artistData = data.artistData;
-    flashData = data.flashData;
 
     officialAlbumData = albumData.filter((album) =>
       album.groups.includes('group:official')
@@ -238,9 +206,6 @@ fetch(rebase('data.json', 'rebaseShared'))
     fandomAlbumData = albumData.filter(
       (album) => !album.groups.includes('group:official')
     );
-    artistNames = artistData
-      .filter((artist) => !artist.alias)
-      .map((artist) => artist.name);
 
     for (const element of elements1) element.style.display = 'none';
     for (const element of elements2) element.style.display = 'block';
@@ -436,7 +401,7 @@ function makeInfoCardLinkHandlers(type) {
       infoCard.cancelHide();
     },
 
-    mouseleave(evt) {
+    mouseleave() {
       clearTimeout(hoverTimeout);
 
       if (fastHover && !endFastHoverTimeout) {

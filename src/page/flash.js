@@ -34,7 +34,6 @@ export function write(flash, {wikiData}) {
       getThemeString,
       link,
       language,
-      transformInline,
     }) => ({
       title: language.$('flashPage.title', {flash: flash.name}),
       theme: getThemeString(flash.color, [
@@ -188,7 +187,7 @@ function generateNavForFlash(
   flash,
   {generateChronologyLinks, generatePreviousNextLinks, link, language, wikiData}
 ) {
-  const {flashData, wikiInfo} = wikiData;
+  const {flashData} = wikiData;
 
   const previousNextLinks = generatePreviousNextLinks(flash, {
     data: flashData,

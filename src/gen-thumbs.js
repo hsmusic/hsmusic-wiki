@@ -110,7 +110,7 @@ function traverse(
             filterDir(name)
               ? recursive(names, path.join(subDirPath, name))
               : [],
-          (err) => (filterFile(name) ? [path.join(subDirPath, name)] : [])
+          () => (filterFile(name) ? [path.join(subDirPath, name)] : [])
         )
       )
     ).then((pathArrays) => pathArrays.flatMap((x) => x));
@@ -123,7 +123,7 @@ function readFileMD5(filePath) {
     const md5 = createHash('md5');
     const stream = createReadStream(filePath);
     stream.on('data', (data) => md5.update(data));
-    stream.on('end', (data) => resolve(md5.digest('hex')));
+    stream.on('end', () => resolve(md5.digest('hex')));
     stream.on('error', (err) => reject(err));
   });
 }
@@ -195,14 +195,6 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
     promisifyProcess(convert('.medium', {size: 400, quality: 95}), false),
     promisifyProcess(convert('.small', {size: 250, quality: 85}), false),
   ]);
-
-  return new Promise((resolve, reject) => {
-    if (Math.random() < 0.2) {
-      reject(new Error(`Them's the 8r8ks, kiddo!`));
-    } else {
-      resolve();
-    }
-  });
 }
 
 export default async function genThumbs(
@@ -248,8 +240,7 @@ export default async function genThumbs(
   }
 
   let cache,
-    firstRun = false,
-    failedReadingCache = false;
+    firstRun = false;
   try {
     cache = JSON.parse(await readFile(path.join(mediaPath, CACHE_FILE)));
     quietInfo`Cache file successfully read.`;
@@ -258,7 +249,6 @@ export default async function genThumbs(
     if (error.code === 'ENOENT') {
       firstRun = true;
     } else {
-      failedReadingCache = true;
       logWarn`Malformed or unreadable cache file: ${error}`;
       logWarn`You may want to cancel and investigate this!`;
       logWarn`All-new thumbnails and cache will be generated for this run.`;

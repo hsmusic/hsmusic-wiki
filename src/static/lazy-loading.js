@@ -33,16 +33,17 @@ function lazyLoadMain() {
   }
 
   var lazyElements = document.getElementsByClassName('lazy');
+  var i;
   if (window.IntersectionObserver) {
     observer = new IntersectionObserver(lazyLoad, {
       rootMargin: '200px',
       threshold: 1.0,
     });
-    for (var i = 0; i < lazyElements.length; i++) {
+    for (i = 0; i < lazyElements.length; i++) {
       observer.observe(lazyElements[i]);
     }
   } else {
-    for (var i = 0; i < lazyElements.length; i++) {
+    for (i = 0; i < lazyElements.length; i++) {
       var element = lazyElements[i];
       var original = element.getAttribute('data-original');
       element.setAttribute('src', original);

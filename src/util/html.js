@@ -102,7 +102,7 @@ export function attributes(attribs) {
           `Attribute value for ${key} should be primitive or array, got ${typeof val}`
         );
     })
-    .filter(([key, val, keep]) => keep)
+    .filter(([_key, _val, keep]) => keep)
     .map(([key, val]) =>
       typeof val === 'boolean'
         ? `${key}`

@@ -104,7 +104,7 @@ function generateNewsEntryNav(
   entry,
   {generatePreviousNextLinks, link, language, wikiData}
 ) {
-  const {wikiInfo, newsData} = wikiData;
+  const {newsData} = wikiData;
 
   // The newsData list is sorted reverse chronologically (newest ones first),
   // so the way we find next/previous entries is flipped from normal.

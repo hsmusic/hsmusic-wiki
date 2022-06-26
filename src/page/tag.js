@@ -17,7 +17,6 @@ export function targets({wikiData}) {
 }
 
 export function write(tag, {wikiData}) {
-  const {wikiInfo} = wikiData;
   const {taggedInThings: things} = tag;
 
   // Display things featuring this art tag in reverse chronological order,
@@ -30,14 +29,12 @@ export function write(tag, {wikiData}) {
     type: 'page',
     path: ['tag', tag.directory],
     page: ({
-      generatePreviousNextLinks,
       getAlbumCover,
       getGridHTML,
       getThemeString,
       getTrackCover,
       link,
       language,
-      to,
     }) => ({
       title: language.$('tagPage.title', {tag: tag.name}),
       theme: getThemeString(tag.color),
@@ -68,7 +65,6 @@ export function write(tag, {wikiData}) {
       },
 
       nav: generateTagNav(tag, {
-        generatePreviousNextLinks,
         link,
         language,
         wikiData,
@@ -83,13 +79,8 @@ export function write(tag, {wikiData}) {
 
 function generateTagNav(
   tag,
-  {generatePreviousNextLinks, link, language, wikiData}
+  {link, language, wikiData}
 ) {
-  const previousNextLinks = generatePreviousNextLinks(tag, {
-    data: wikiData.artTagData.filter((tag) => !tag.isContentWarning),
-    linkKey: 'tag',
-  });
-
   return {
     linkContainerClasses: ['nav-links-hierarchy'],
     links: [
@@ -103,12 +94,6 @@ function generateTagNav(
           tag: link.tag(tag, {class: 'current'}),
         }),
       },
-      /*
-            previousNextLinks && {
-                divider: false,
-                html: `(${previousNextLinks})`
-            }
-            */
     ],
   };
 }

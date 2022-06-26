@@ -1,18 +1,19 @@
 /** @format */
 
-import {color, logError, logWarn} from './cli.js';
+import {color, logWarn} from './cli.js';
 
 import {inspect} from 'util';
 
 function warnOrThrow(mode, message) {
-  switch (mode) {
-    case 'error':
-      throw new Error(message);
-    case 'warn':
-      logWarn(message);
-    default:
-      return null;
+  if (mode === 'error') {
+    throw new Error(message);
   }
+
+  if (mode === 'warn') {
+    logWarn(message);
+  }
+
+  return null;
 }
 
 function findHelper(keys, findFns = {}) {
@@ -80,7 +81,7 @@ function findHelper(keys, findFns = {}) {
   };
 }
 
-function matchDirectory(ref, data, mode) {
+function matchDirectory(ref, data) {
   return data.find(({directory}) => directory === ref);
 }
 

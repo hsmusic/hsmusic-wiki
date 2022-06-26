@@ -33,7 +33,6 @@
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
 import * as path from 'path';
-import {promisify} from 'util';
 import {fileURLToPath} from 'url';
 
 // I made this dependency myself! A long, long time ago. It is pro8a8ly my
@@ -54,8 +53,6 @@ import {
   writeFile,
   unlink,
 } from 'fs/promises';
-
-import {inspect as nodeInspect} from 'util';
 
 import genThumbs from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
@@ -112,25 +109,18 @@ import {
   logError,
   parseOptions,
   progressPromiseAll,
-  ENABLE_COLOR,
 } from './util/cli.js';
 
 import {validateReplacerSpec, transformInline} from './util/replacer.js';
 
 import {
-  chunkByConditions,
-  chunkByProperties,
   getAlbumCover,
-  getAlbumListTag,
-  getAllTracks,
   getArtistAvatar,
-  getArtistNumContributions,
   getFlashCover,
-  getKebabCase,
-  getTotalDuration,
   getTrackCover,
 } from './util/wiki-data.js';
 
+/*
 import {
   serializeContribs,
   serializeCover,
@@ -139,30 +129,20 @@ import {
   serializeImagePaths,
   serializeLink,
 } from './util/serialize.js';
+*/
 
 import {
   bindOpts,
-  decorateErrorWithIndex,
-  filterAggregateAsync,
   filterEmptyLines,
-  mapAggregate,
-  mapAggregateAsync,
-  openAggregate,
   queue,
   showAggregate,
-  splitArray,
-  unique,
-  withAggregate,
   withEntries,
 } from './util/sugar.js';
 
 import {generateURLs, thumb} from './util/urls.js';
 
 // Pensive emoji!
-import {
-  FANDOM_GROUP_DIRECTORY,
-  OFFICIAL_GROUP_DIRECTORY,
-} from './util/magic-constants.js';
+import { OFFICIAL_GROUP_DIRECTORY } from './util/magic-constants.js';
 
 import FileSizePreloader from './file-size-preloader.js';
 
@@ -190,10 +170,6 @@ const OEMBED_JSON_FILE = 'oembed.json';
 
 // Automatically copied (if present) from media directory to site root.
 const FAVICON_FILE = 'favicon.ico';
-
-function inspect(value) {
-  return nodeInspect(value, {colors: ENABLE_COLOR});
-}
 
 // Shared varia8les! These are more efficient to access than a shared varia8le
 // (or at least I h8pe so), and are easier to pass across functions than a
@@ -1044,8 +1020,6 @@ writePage.html = (
   const navLinkParts = [];
   for (let i = 0; i < links.length; i++) {
     let cur = links[i];
-    const prev = links[i - 1];
-    const next = links[i + 1];
 
     let {title: linkTitle} = cur;
 
@@ -1616,7 +1590,7 @@ async function wrapLanguages(fn, {languages, writeOneLanguage = null}) {
   );
 
   for (let i = 0; i < entries.length; i++) {
-    const [key, language] = entries[i];
+    const [_key, language] = entries[i];
 
     await fn(language, i, entries);
   }
@@ -2264,7 +2238,7 @@ async function main() {
       `Writing ${language.code}`,
       queue(
         [
-          ...pageWrites.map(({type, ...props}) => () => {
+          ...pageWrites.map((props) => () => {
             const {path, page} = props;
 
             // TODO: This only supports one <>-style argument.
@@ -2276,7 +2250,7 @@ async function main() {
                 .filter(
                   ([key, language]) => key !== 'default' && !language.hidden
                 )
-                .map(([key, language]) => [
+                .map(([_key, language]) => [
                   language.code,
                   writePage.paths(
                     language === finalDefaultLanguage ? '' : language.code,

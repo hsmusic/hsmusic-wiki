@@ -23,8 +23,6 @@ export function targets({wikiData}) {
 }
 
 export function write(album, {wikiData}) {
-  const {wikiInfo} = wikiData;
-
   const unbound_trackToListItem = (
     track,
     {getArtistString, getLinkThemeString, link, language}
@@ -262,7 +260,6 @@ export function write(album, {wikiData}) {
                                   .map(
                                     ({
                                       name,
-                                      color,
                                       startIndex,
                                       tracks,
                                     }) => fixWS`
@@ -383,21 +380,23 @@ export function write(album, {wikiData}) {
 
 // Utility functions
 
-export function generateAlbumSidebar(
-  album,
-  currentTrack,
-  {fancifyURL, getLinkThemeString, link, language, transformMultiline, wikiData}
-) {
+export function generateAlbumSidebar(album, currentTrack, {
+  fancifyURL,
+  getLinkThemeString,
+  link,
+  language,
+  transformMultiline,
+}) {
   const listTag = getAlbumListTag(album);
 
   /*
-    const trackGroups = album.trackGroups || [{
-        name: language.$('albumSidebar.trackList.fallbackGroupName'),
-        color: album.color,
-        startIndex: 0,
-        tracks: album.tracks
-    }];
-    */
+  const trackGroups = album.trackGroups || [{
+      name: language.$('albumSidebar.trackList.fallbackGroupName'),
+      color: album.color,
+      startIndex: 0,
+      tracks: album.tracks
+  }];
+  */
 
   const {trackGroups} = album;
 

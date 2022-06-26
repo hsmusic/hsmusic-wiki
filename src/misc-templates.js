@@ -107,7 +107,7 @@ export function getArtistString(
 ) {
   return language.formatConjunctionList(
     artists.map(({who, what}) => {
-      const {urls, directory, name} = who;
+      const {urls} = who;
       return [
         link.artist(who),
         showContrib && what && `(${what})`,
@@ -135,11 +135,8 @@ export function generateChronologyLinks(
     link,
     linkAnythingMan,
     language,
-    wikiData,
   }
 ) {
-  const {albumData} = wikiData;
-
   const contributions = currentThing[contribKey];
   if (!contributions) {
     return '';

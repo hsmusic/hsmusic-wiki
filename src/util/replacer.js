@@ -1,5 +1,7 @@
 /** @format */
 
+import fixWS from 'fix-whitespace';
+
 import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
 
@@ -8,7 +10,7 @@ export function validateReplacerSpec(replacerSpec, {find, link}) {
 
   for (const [
     key,
-    {link: linkKey, find: findKey, value, html},
+    {link: linkKey, find: findKey, html},
   ] of Object.entries(replacerSpec)) {
     if (!html && !link[linkKey]) {
       logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
@@ -58,7 +60,7 @@ const endOfInput = (i, comment) =>
 // These are 8asically stored on the glo8al scope, which might seem odd
 // for a recursive function, 8ut the values are only ever used immediately
 // after they're set.
-let stopped, stop_iMatch, stop_iParse, stop_literal;
+let stopped, stop_iParse, stop_literal;
 
 function parseOneTextNode(input, i, stopAt) {
   return parseNodes(input, i, stopAt, true)[0];
@@ -66,7 +68,6 @@ function parseOneTextNode(input, i, stopAt) {
 
 function parseNodes(input, i, stopAt, textOnly) {
   let nodes = [];
-  let escapeNext = false;
   let string = '';
   let iString = 0;
 
@@ -103,7 +104,7 @@ function parseNodes(input, i, stopAt, textOnly) {
   // 8ut it's a pain to hard-code them all, so we dynamically gener8te
   // and cache them for reuse instead.
   let regexp;
-  if (regexpCache.hasOwnProperty(regexpSource)) {
+  if (Object.hasOwn(regexpCache, regexpSource)) {
     regexp = regexpCache[regexpSource];
   } else {
     regexp = new RegExp(regexpSource);
@@ -151,7 +152,6 @@ function parseNodes(input, i, stopAt, textOnly) {
 
     if (stopHere) {
       stopped = true;
-      stop_iMatch = closestMatchIndex;
       stop_iParse = i;
       stop_literal = closestMatch;
       break;
@@ -332,15 +332,15 @@ export function parseInput(input) {
     const cursor = i - lineStart;
 
     throw new SyntaxError(fixWS`
-            Parse error (at pos ${i}): ${message}
-            ${line}
-            ${'-'.repeat(cursor) + '^'}
-        `);
+      Parse error (at pos ${i}): ${message}
+      ${line}
+      ${'-'.repeat(cursor) + '^'}
+    `);
   }
 }
 
 function evaluateTag(node, opts) {
-  const {find, input, language, link, replacerSpec, to, wikiData} = opts;
+  const {find, input, language, link, replacerSpec, to} = opts;
 
   const source = input.slice(node.i, node.iEnd);
 

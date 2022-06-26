@@ -33,8 +33,6 @@ export function write(listing, {wikiData}) {
     return null;
   }
 
-  const {wikiInfo} = wikiData;
-
   const data = listing.data ? listing.data({wikiData}) : null;
 
   const page = {

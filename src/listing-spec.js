@@ -967,7 +967,7 @@ const listingSpec = [
 
     html: (
       {officialAlbumData, fandomAlbumData},
-      {getLinkThemeString, language}
+      {getLinkThemeString}
     ) => fixWS`
             <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
             <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>

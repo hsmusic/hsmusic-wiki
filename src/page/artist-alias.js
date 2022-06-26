@@ -7,9 +7,7 @@ export function targets({wikiData}) {
   return wikiData.artistAliasData;
 }
 
-export function write(aliasArtist, {wikiData}) {
-  // This function doesn't actually use wikiData, 8ut, um, consistency?
-
+export function write(aliasArtist) {
   const {aliasedArtist} = aliasArtist;
 
   const redirect = {

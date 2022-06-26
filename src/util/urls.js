@@ -14,19 +14,19 @@ import * as path from 'path';
 import {withEntries} from './sugar.js';
 
 export function generateURLs(urlSpec) {
-  const getValueForFullKey = (obj, fullKey, prop = null) => {
+  const getValueForFullKey = (obj, fullKey) => {
     const [groupKey, subKey] = fullKey.split('.');
     if (!groupKey || !subKey) {
       throw new Error(`Expected group key and subkey (got ${fullKey})`);
     }
 
-    if (!obj.hasOwnProperty(groupKey)) {
+    if (!Object.hasOwn(obj, groupKey)) {
       throw new Error(`Expected valid group key (got ${groupKey})`);
     }
 
     const group = obj[groupKey];
 
-    if (!group.hasOwnProperty(subKey)) {
+    if (!Object.hasOwn(group, subKey)) {
       throw new Error(
         `Expected valid subkey (got ${subKey} for group ${groupKey})`
       );

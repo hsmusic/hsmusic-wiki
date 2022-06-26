@@ -90,7 +90,7 @@ export function delay(ms) {
 // There's a proposal for a native JS function like this, 8ut it's not even
 // past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
 export function escapeRegex(string) {
-  return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 export function bindOpts(fn, bind) {
@@ -319,13 +319,6 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
     return value === aggregateOpts.returnOnFail ? value : value.input;
   }
 
-  function wrapperFunction(x, ...rest) {
-    return {
-      input: x,
-      output: fn(x, ...rest),
-    };
-  }
-
   if (mode === 'sync') {
     const result = array
       .map(
@@ -426,9 +419,7 @@ export function showAggregate(
         error.errors
           .map((error) => recursive(error, {level: level + 1}))
           .flatMap((str) => str.split('\n'))
-          .map((line, i, lines) =>
-            i === 0 ? ` ${head} ${line}` : ` ${bar} ${line}`
-          )
+          .map((line, i) => i === 0 ? ` ${head} ${line}` : ` ${bar} ${line}`)
           .join('\n')
       );
     } else {

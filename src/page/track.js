@@ -30,7 +30,7 @@ export function targets({wikiData}) {
 }
 
 export function write(track, {wikiData}) {
-  const {groupData, wikiInfo} = wikiData;
+  const {wikiInfo} = wikiData;
   const {album, referencedByTracks, referencedTracks, otherReleases} = track;
 
   const listTag = getAlbumListTag(album);
@@ -59,17 +59,6 @@ export function write(track, {wikiData}) {
           artists: getArtistString(track.artistContribs),
         })}</span>`,
       })
-    );
-
-  const unbound_generateTrackList = (
-    tracks,
-    {getArtistString, link, language}
-  ) =>
-    html.tag(
-      'ul',
-      tracks.map((track) =>
-        unbound_getTrackItem(track, {getArtistString, link, language})
-      )
     );
 
   const hasCommentary =
@@ -182,7 +171,6 @@ export function write(track, {wikiData}) {
       getTrackCover,
       link,
       language,
-      transformInline,
       transformLyrics,
       transformMultiline,
       to,

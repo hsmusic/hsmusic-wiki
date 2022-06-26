@@ -14,11 +14,11 @@ export function targets({wikiData}) {
   return wikiData.staticPageData;
 }
 
-export function write(staticPage, {wikiData}) {
+export function write(staticPage) {
   const page = {
     type: 'page',
     path: ['staticPage', staticPage.directory],
-    page: ({language, transformMultiline}) => ({
+    page: ({transformMultiline}) => ({
       title: staticPage.name,
       stylesheet: staticPage.stylesheet,
 

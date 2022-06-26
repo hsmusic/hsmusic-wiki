@@ -9,7 +9,7 @@ export function getKebabCase(name) {
     .split(' ')
     .join('-')
     .replace(/&/g, 'and')
-    .replace(/[^a-zA-Z0-9\-]/g, '')
+    .replace(/[^a-zA-Z0-9-]/g, '')
     .replace(/-{2,}/g, '-')
     .replace(/^-+|-+$/g, '')
     .toLowerCase();

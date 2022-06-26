@@ -16,8 +16,6 @@ import {
   chunkByProperties,
   getTotalDuration,
   sortAlbumsTracksChronologically,
-  sortByDate,
-  sortByDirectory,
   sortChronologically,
 } from '../util/wiki-data.js';
 
@@ -357,7 +355,6 @@ export function write(artist, {wikiData}) {
       getArtistString,
       link,
       language,
-      to,
       transformMultiline,
     }) => {
       const generateTrackList = bindOpts(unbound_generateTrackList, {
@@ -514,7 +511,6 @@ export function write(artist, {wikiData}) {
                                         ${chunk
                                           .map(
                                             ({
-                                              album,
                                               track,
                                               key,
                                               ...props
@@ -629,7 +625,7 @@ export function write(artist, {wikiData}) {
                                     )}</dt>
                                     <dd><ul>
                                         ${chunk
-                                          .map(({album, track, ...props}) =>
+                                          .map(({track}) =>
                                             track
                                               ? language.$(
                                                   'artistPage.creditList.entry.track',
@@ -673,7 +669,6 @@ export function write(artist, {wikiData}) {
       getTrackCover,
       link,
       language,
-      to,
     }) => ({
       title: language.$('artistGalleryPage.title', {artist: name}),
 

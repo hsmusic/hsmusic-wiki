@@ -292,7 +292,6 @@ function generateGroupNav(
     return {simple: true};
   }
 
-  const urlKey = isGallery ? 'localized.groupGallery' : 'localized.groupInfo';
   const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
 
   const infoGalleryLinks = generateInfoGalleryLinks(currentGroup, isGallery, {

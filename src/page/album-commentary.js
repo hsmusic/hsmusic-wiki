@@ -18,9 +18,7 @@ export function targets({wikiData}) {
   return filterAlbumsByCommentary(wikiData.albumData);
 }
 
-export function write(album, {wikiData}) {
-  const {wikiInfo} = wikiData;
-
+export function write(album) {
   const entries = [album, ...album.tracks]
     .filter((x) => x.commentary)
     .map((x) => x.commentary);
@@ -35,7 +33,6 @@ export function write(album, {wikiData}) {
       getThemeString,
       link,
       language,
-      to,
       transformMultiline,
     }) => ({
       title: language.$('albumCommentaryPage.title', {album: album.name}),
