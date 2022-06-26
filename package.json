@@ -9,7 +9,7 @@
     },
     "scripts": {
         "test": "tape test/**/*.js",
-        "dev": "prettier --loglevel warn --write . && eslint src && node src/upd8.js"
+        "dev": "eslint src && node src/upd8.js"
     },
     "dependencies": {
         "fix-whitespace": "^1.0.4",
@@ -19,7 +19,6 @@
     "license": "GPL-3.0",
     "devDependencies": {
         "eslint": "^8.18.0",
-        "prettier": "2.7.1",
         "tape": "^5.4.1"
     }
 }
