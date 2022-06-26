@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "static wiki software cataloguing collaborative creation",
     "type": "module",
-    "main": "upd8.js",
+    "main": "src/upd8.js",
     "bin": {
         "hsmusic": "./src/upd8.js"
     },
