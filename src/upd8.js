@@ -1198,15 +1198,21 @@ writePage.html = (
                     <h1 class="info-card-name"><a></a></h1>
                     <p class="info-card-album">${language.$(
                       'releaseInfo.from',
-                      {album: '<a></a>'}
+                      {
+                        album: '<a></a>',
+                      }
                     )}</p>
                     <p class="info-card-artists">${language.$(
                       'releaseInfo.by',
-                      {artists: '<span></span>'}
+                      {
+                        artists: '<span></span>',
+                      }
                     )}</p>
                     <p class="info-card-cover-artists">${language.$(
                       'releaseInfo.coverArtBy',
-                      {artists: '<span></span>'}
+                      {
+                        artists: '<span></span>',
+                      }
                     )}</p>
                 </div>
             </div>

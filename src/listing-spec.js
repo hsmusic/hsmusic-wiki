@@ -205,7 +205,9 @@ const listingSpec = [
                                     artist: link.artist(artist),
                                     contributions: language.countContributions(
                                       contributions,
-                                      {unit: true}
+                                      {
+                                        unit: true,
+                                      }
                                     ),
                                   }
                                 )
@@ -230,7 +232,9 @@ const listingSpec = [
                                     artist: link.artist(artist),
                                     contributions: language.countContributions(
                                       contributions,
-                                      {unit: true}
+                                      {
+                                        unit: true,
+                                      }
                                     ),
                                   }
                                 )

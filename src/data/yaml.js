@@ -1391,7 +1391,9 @@ export function filterReferenceErrors(wikiData) {
                         const original = find.artist(
                           alias.aliasedArtistRef,
                           wikiData.artistData,
-                          {mode: 'quiet'}
+                          {
+                            mode: 'quiet',
+                          }
                         );
                         throw new Error(
                           `Reference ${color.red(

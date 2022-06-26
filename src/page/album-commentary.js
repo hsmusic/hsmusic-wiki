@@ -54,7 +54,9 @@ export function write(album, {wikiData}) {
                           })}</b>`,
                           entries: `<b>${language.countCommentaryEntries(
                             entries.length,
-                            {unit: true}
+                            {
+                              unit: true,
+                            }
                           )}</b>`,
                         })}</p>
                         ${
@@ -144,7 +146,9 @@ export function writeTargetless({wikiData}) {
                           })}</b>`,
                           entries: `<b>${language.countCommentaryEntries(
                             totalEntries,
-                            {unit: true}
+                            {
+                              unit: true,
+                            }
                           )}</b>`,
                         })}</p>
                         <p>${language.$('commentaryIndex.albumList.title')}</p>
@@ -162,7 +166,9 @@ export function writeTargetless({wikiData}) {
                                         entries:
                                           language.countCommentaryEntries(
                                             entries.length,
-                                            {unit: true}
+                                            {
+                                              unit: true,
+                                            }
                                           ),
                                       }
                                     )}</li>

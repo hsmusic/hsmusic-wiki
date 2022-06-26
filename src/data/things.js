@@ -1798,7 +1798,9 @@ Object.assign(Language.prototype, {
     this.assertIntlAvailable('intl_pluralOrdinal');
     return this.formatString(
       'count.index.' + this.intl_pluralOrdinal.select(value),
-      {index: value}
+      {
+        index: value,
+      }
     );
   },
 

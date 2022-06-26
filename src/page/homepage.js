@@ -54,13 +54,17 @@ export function writeTargetless({wikiData}) {
                                       'new-releases'
                                         ? getNewReleases(
                                             row.countAlbumsFromGroup,
-                                            {wikiData}
+                                            {
+                                              wikiData,
+                                            }
                                           )
                                         : row.sourceGroupByRef ===
                                           'new-additions'
                                         ? getNewAdditions(
                                             row.countAlbumsFromGroup,
-                                            {wikiData}
+                                            {
+                                              wikiData,
+                                            }
                                           )
                                         : (row.sourceGroup?.albums ?? [])
                                             .slice()

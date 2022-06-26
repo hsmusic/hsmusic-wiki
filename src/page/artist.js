@@ -444,7 +444,10 @@ export function write(artist, {wikiData}) {
                                 artist: artist.name,
                                 duration: language.formatDuration(
                                   totalDuration,
-                                  {approximate: true, unit: true}
+                                  {
+                                    approximate: true,
+                                    unit: true,
+                                  }
                                 ),
                               }
                             )}</p>
@@ -685,7 +688,9 @@ export function write(artist, {wikiData}) {
                       {
                         coverArts: language.countCoverArts(
                           artThingsGallery.length,
-                          {unit: true}
+                          {
+                            unit: true,
+                          }
                         ),
                       }
                     )}</p>

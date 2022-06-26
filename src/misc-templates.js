@@ -62,7 +62,10 @@ export function generateAdditionalFilesList(
                   description
                     ? language.$(
                         'releaseInfo.additionalFiles.entry.withDescription',
-                        {title, description}
+                        {
+                          title,
+                          description,
+                        }
                       )
                     : language.$('releaseInfo.additionalFiles.entry', {title})
                 }</dt>

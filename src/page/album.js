@@ -210,7 +210,9 @@ export function write(album, {wikiData}) {
                               language.$('releaseInfo.duration', {
                                 duration: language.formatDuration(
                                   albumDuration,
-                                  {approximate: album.tracks.length > 1}
+                                  {
+                                    approximate: album.tracks.length > 1,
+                                  }
                                 ),
                               }),
                             ]
@@ -224,7 +226,9 @@ export function write(album, {wikiData}) {
                               hasAdditionalFiles &&
                                 generateAdditionalFilesShortcut(
                                   album.additionalFiles,
-                                  {language}
+                                  {
+                                    language,
+                                  }
                                 ),
                               hasCommentaryEntries &&
                                 language.$('releaseInfo.viewCommentary', {
@@ -267,7 +271,9 @@ export function write(album, {wikiData}) {
                                       {
                                         duration: language.formatDuration(
                                           getTotalDuration(tracks),
-                                          {approximate: tracks.length > 1}
+                                          {
+                                            approximate: tracks.length > 1,
+                                          }
                                         ),
                                         section: name,
                                       }
