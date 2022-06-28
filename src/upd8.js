@@ -1742,6 +1742,28 @@ async function main() {
   const noBuild = miscOptions['no-build'] ?? false;
   const showAggregateTraces = miscOptions['show-traces'] ?? false;
 
+  // NOT for ena8ling or disa8ling specific features of the site!
+  // This is only in charge of what general groups of files to 8uild.
+  // They're here to make development quicker when you're only working
+  // on some particular area(s) of the site rather than making changes
+  // across all of them.
+  const writeFlags = await parseOptions(process.argv.slice(2), {
+    all: {type: 'flag'}, // Defaults to true if none 8elow specified.
+
+    // Kinda a hack t8h!
+    ...Object.fromEntries(
+      Object.keys(pageSpecs).map((key) => [key, {type: 'flag'}])
+    ),
+
+    [parseOptions.handleUnknown]: () => {},
+  });
+
+  const writeAll = !Object.keys(writeFlags).length || writeFlags.all;
+
+  logInfo`Writing site pages: ${
+    writeAll ? 'all' : Object.keys(writeFlags).join(', ')
+  }`;
+
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
       showTraces: showAggregateTraces,
@@ -2044,28 +2066,6 @@ async function main() {
   queueSize = +(miscOptions['queue-size'] ?? 0);
 
   const buildDictionary = pageSpecs;
-
-  // NOT for ena8ling or disa8ling specific features of the site!
-  // This is only in charge of what general groups of files to 8uild.
-  // They're here to make development quicker when you're only working
-  // on some particular area(s) of the site rather than making changes
-  // across all of them.
-  const writeFlags = await parseOptions(process.argv.slice(2), {
-    all: {type: 'flag'}, // Defaults to true if none 8elow specified.
-
-    // Kinda a hack t8h!
-    ...Object.fromEntries(
-      Object.keys(buildDictionary).map((key) => [key, {type: 'flag'}])
-    ),
-
-    [parseOptions.handleUnknown]: () => {},
-  });
-
-  const writeAll = !Object.keys(writeFlags).length || writeFlags.all;
-
-  logInfo`Writing site pages: ${
-    writeAll ? 'all' : Object.keys(writeFlags).join(', ')
-  }`;
 
   await writeFavicon();
   await writeSymlinks();
