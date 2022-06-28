@@ -4,8 +4,7 @@
 
 // Imports
 
-import fixWS from 'fix-whitespace';
-
+import * as html from '../util/html.js';
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';
 
 // Page exports
@@ -40,53 +39,29 @@ export function write(album) {
       theme: getThemeString(album.color),
 
       main: {
-        content: fixWS`
-                    <div class="long-content">
-                        <h1>${language.$('albumCommentaryPage.title', {
-                          album: link.album(album),
-                        })}</h1>
-                        <p>${language.$('albumCommentaryPage.infoLine', {
-                          words: `<b>${language.formatWordCount(words, {
-                            unit: true,
-                          })}</b>`,
-                          entries: `<b>${language.countCommentaryEntries(
-                            entries.length,
-                            {
-                              unit: true,
-                            }
-                          )}</b>`,
-                        })}</p>
-                        ${
-                          album.commentary &&
-                          fixWS`
-                            <h3>${language.$(
-                              'albumCommentaryPage.entry.title.albumCommentary'
-                            )}</h3>
-                            <blockquote>
-                                ${transformMultiline(album.commentary)}
-                            </blockquote>
-                        `
-                        }
-                        ${album.tracks
-                          .filter((t) => t.commentary)
-                          .map(
-                            (track) => fixWS`
-                            <h3 id="${track.directory}">${language.$(
-                              'albumCommentaryPage.entry.title.trackCommentary',
-                              {
-                                track: link.track(track),
-                              }
-                            )}</h3>
-                            <blockquote style="${getLinkThemeString(
-                              track.color
-                            )}">
-                                ${transformMultiline(track.commentary)}
-                            </blockquote>
-                        `
-                          )
-                          .join('\n')}
-                    </div>
-                `,
+        content: html.tag('div', {class: 'long-content'}, [
+          html.tag('h1', language.$('albumCommentaryPage.title', {
+            album: link.album(album),
+          })),
+          html.tag('p', language.$('albumCommentaryPage.infoLine', {
+            words: html.tag('b', language.formatWordCount(words, {unit: true})),
+            entries: html.tag('b', language.countCommentaryEntries(entries.length, {unit: true})),
+          })),
+          ...album.commentary ? [
+            html.tag('h3', language.$('albumCommentaryPage.entry.title.albumCommentary')),
+            html.tag('blockquote', transformMultiline(album.commentary)),
+          ] : [],
+          ...album.tracks.filter(t => t.commentary).flatMap(track => [
+            html.tag('h3',
+              {id: 'track.directory'},
+              language.$('albumCommentaryPage.entry.title.trackCommentary', {
+                track: link.track(track),
+              })),
+            html.tag('blockquote',
+              {style: getLinkThemeString(track.color)},
+              transformMultiline(track.commentary)),
+          ])
+        ]),
       },
 
       nav: {
@@ -134,47 +109,20 @@ export function writeTargetless({wikiData}) {
       title: language.$('commentaryIndex.title'),
 
       main: {
-        content: fixWS`
-                    <div class="long-content">
-                        <h1>${language.$('commentaryIndex.title')}</h1>
-                        <p>${language.$('commentaryIndex.infoLine', {
-                          words: `<b>${language.formatWordCount(totalWords, {
-                            unit: true,
-                          })}</b>`,
-                          entries: `<b>${language.countCommentaryEntries(
-                            totalEntries,
-                            {
-                              unit: true,
-                            }
-                          )}</b>`,
-                        })}</p>
-                        <p>${language.$('commentaryIndex.albumList.title')}</p>
-                        <ul>
-                            ${data
-                              .map(
-                                ({album, entries, words}) => fixWS`
-                                    <li>${language.$(
-                                      'commentaryIndex.albumList.item',
-                                      {
-                                        album: link.albumCommentary(album),
-                                        words: language.formatWordCount(words, {
-                                          unit: true,
-                                        }),
-                                        entries:
-                                          language.countCommentaryEntries(
-                                            entries.length,
-                                            {
-                                              unit: true,
-                                            }
-                                          ),
-                                      }
-                                    )}</li>
-                                `
-                              )
-                              .join('\n')}
-                        </ul>
-                    </div>
-                `,
+        content: html.tag('div', {class: 'long-content'}, [
+          html.tag('h1', language.$('commentaryIndex.title')),
+          html.tag('p', language.$('commentaryIndex.infoLine', {
+            words: html.tag('b', language.formatWordCount(totalWords, {unit: true})),
+            entries: html.tag('b', language.countCommentaryEntries(totalEntries, {unit: true})),
+          })),
+          html.tag('p', language.$('commentaryIndex.albumList.title')),
+          html.tag('ul', data.map(({album, entries, words}) =>
+            html.tag('li', language.$('commentaryIndex.albumList.item', {
+              album: link.albumCommentary(album),
+              words: language.formatWordCount(words, {unit: true}),
+              entries: language.countCommentaryEntries(entries.length, {unit: true}),
+            }))))
+        ]),
       },
 
       nav: {simple: true},
