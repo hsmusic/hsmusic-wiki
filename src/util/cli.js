@@ -286,23 +286,29 @@ export function progressCallAll(msgOrMsgFn, array) {
   const msgFn =
     typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
 
+  const updateInterval = 1000 / 60;
+
   let done = 0,
     total = array.length;
   process.stdout.write(`\r${msgFn()} [0/${total}]`);
   const start = Date.now();
   const vals = [];
+  let lastTime = 0;
 
   for (const fn of array) {
     const val = fn();
     done++;
-    const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
+
     if (done === total) {
+      const pc = '100%'.padEnd('99.9%'.length, ' ');
       const time = Date.now() - start;
       process.stdout.write(
         `\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`
       );
-    } else {
+    } else if (Date.now() - lastTime >= updateInterval) {
+      const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
       process.stdout.write(`\r${msgFn()} [${pc}] `);
+      lastTime = Date.now();
     }
     vals.push(val);
   }
