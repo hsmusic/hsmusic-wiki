@@ -1703,6 +1703,19 @@ async function main() {
       type: 'flag',
     },
 
+    // Compute ALL data properties before moving on to building. This ensures
+    // writes are processed at a stable speed (since they don't have to perform
+    // any additional data computation besides what is done for the page
+    // itself), but it'll also take a long while for the initial caching to
+    // complete. This shouldn't have any overall difference on efficiency as
+    // it's the same amount of processing being done regardless; the option is
+    // mostly present for optimization testing (i.e. if you want to focus on
+    // efficiency of data calculation or write generation separately instead of
+    // mixed together).
+    'precache-data': {
+      type: 'flag',
+    },
+
     [parseOptions.handleUnknown]: () => {},
   });
 
@@ -1742,6 +1755,7 @@ async function main() {
   const thumbsOnly = miscOptions['thumbs-only'] ?? false;
   const noBuild = miscOptions['no-build'] ?? false;
   const showAggregateTraces = miscOptions['show-traces'] ?? false;
+  const precacheData = miscOptions['precache-data'] ?? false;
 
   // NOT for ena8ling or disa8ling specific features of the site!
   // This is only in charge of what general groups of files to 8uild.
@@ -1919,6 +1933,21 @@ async function main() {
   // Sort data arrays so that they're all in order! This may use properties
   // which are only available after the initial linking.
   sortWikiDataArrays(wikiData);
+
+  if (precacheData) {
+    progressCallAll('Caching all data values', Object.entries(wikiData)
+      .filter(([key]) =>
+        key !== 'listingSpec' &&
+        key !== 'listingTargetSpec' &&
+        key !== 'officialAlbumData' &&
+        key !== 'fandomAlbumData')
+      .map(([key, value]) =>
+        key === 'wikiInfo' ? [key, [value]] :
+        key === 'homepageLayout' ? [key, [value]] :
+        [key, value])
+      .flatMap(([_key, things]) => things)
+      .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
+  }
 
   const internalDefaultLanguage = await processLanguageFile(
     path.join(__dirname, DEFAULT_STRINGS_FILE)

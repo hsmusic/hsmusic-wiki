@@ -1071,7 +1071,7 @@ Artist.propertyDescriptors = {
       dependencies: ['trackData'],
 
       compute: ({trackData, [Artist.instance]: artist}) =>
-        trackData.filter(({commentatorArtists}) =>
+        trackData?.filter(({commentatorArtists}) =>
           commentatorArtists?.includes(artist)
         ),
     },
@@ -1098,7 +1098,7 @@ Artist.propertyDescriptors = {
       dependencies: ['albumData'],
 
       compute: ({albumData, [Artist.instance]: artist}) =>
-        albumData.filter(({commentatorArtists}) =>
+        albumData?.filter(({commentatorArtists}) =>
           commentatorArtists?.includes(artist)
         ),
     },

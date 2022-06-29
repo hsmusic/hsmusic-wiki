@@ -315,6 +315,30 @@ export default class CacheableObject {
     };
   }
 
+  static cacheAllExposedProperties(obj) {
+    if (!(obj instanceof CacheableObject)) {
+      console.warn('Not a CacheableObject:', obj);
+      return;
+    }
+
+    if (!obj.constructor.propertyDescriptors) {
+      console.warn('Missing property descriptors:', obj);
+      return;
+    }
+
+    for (const [property, descriptor] of Object.entries(
+      obj.constructor.propertyDescriptors
+    )) {
+      const {flags} = descriptor;
+
+      if (!flags.expose) {
+        continue;
+      }
+
+      obj[property];
+    }
+  }
+
   static DEBUG_SLOW_TRACK_INVALID_PROPERTIES = false;
   static _invalidAccesses = new Set();
 
