@@ -216,187 +216,122 @@ export function write(track, {wikiData}) {
                 */
 
         main: {
-          content: fixWS`
-                        ${
-                          cover &&
-                          generateCoverLink({
-                            src: cover,
-                            alt: language.$('misc.alt.trackCover'),
-                            tags: track.artTags,
-                          })
-                        }
-                        <h1>${language.$('trackPage.title', {
-                          track: track.name,
-                        })}</h1>
-                        <p>
-                            ${[
-                              language.$('releaseInfo.by', {
-                                artists: getArtistString(track.artistContribs, {
-                                  showContrib: true,
-                                  showIcons: true,
-                                }),
-                              }),
-                              track.coverArtistContribs.length &&
-                                language.$('releaseInfo.coverArtBy', {
-                                  artists: getArtistString(
-                                    track.coverArtistContribs,
-                                    {
-                                      showContrib: true,
-                                      showIcons: true,
-                                    }
-                                  ),
-                                }),
-                              track.date &&
-                                language.$('releaseInfo.released', {
-                                  date: language.formatDate(track.date),
-                                }),
-                              track.coverArtDate &&
-                                +track.coverArtDate !== +track.date &&
-                                language.$('releaseInfo.artReleased', {
-                                  date: language.formatDate(track.coverArtDate),
-                                }),
-                              track.duration &&
-                                language.$('releaseInfo.duration', {
-                                  duration: language.formatDuration(
-                                    track.duration
-                                  ),
-                                }),
-                            ]
-                              .filter(Boolean)
-                              .join('<br>\n')}
-                        </p>
-                        <p>${
-                          track.urls?.length
-                            ? language.$('releaseInfo.listenOn', {
-                                links: language.formatDisjunctionList(
-                                  track.urls.map((url) =>
-                                    fancifyURL(url, {language})
-                                  )
-                                ),
-                              })
-                            : language.$('releaseInfo.listenOn.noLinks')
-                        }</p>
-                        ${
-                          otherReleases.length &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.alsoReleasedAs')}</p>
-                            <ul>
-                                ${otherReleases
-                                  .map(
-                                    (track) => fixWS`
-                                    <li>${language.$(
-                                      'releaseInfo.alsoReleasedAs.item',
-                                      {
-                                        track: link.track(track),
-                                        album: link.album(track.album),
-                                      }
-                                    )}</li>
-                                `
-                                  )
-                                  .join('\n')}
-                            </ul>
-                        `
-                        }
-                        ${
-                          track.contributorContribs.length &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.contributors')}</p>
-                            <ul>
-                                ${track.contributorContribs
-                                  .map(
-                                    (contrib) =>
-                                      `<li>${getArtistString([contrib], {
-                                        showContrib: true,
-                                        showIcons: true,
-                                      })}</li>`
-                                  )
-                                  .join('\n')}
-                            </ul>
-                        `
-                        }
-                        ${
-                          referencedTracks.length &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.tracksReferenced', {
-                              track: `<i>${track.name}</i>`,
-                            })}</p>
-                            ${html.tag(
-                              'ul',
-                              referencedTracks.map(getTrackItem)
-                            )}
-                        `
-                        }
-                        ${
-                          referencedByTracks.length &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.tracksThatReference', {
-                              track: `<i>${track.name}</i>`,
-                            })}</p>
-                            ${generateTrackListDividedByGroups(
-                              referencedByTracks,
-                              {
-                                getTrackItem,
-                                wikiData,
-                              }
-                            )}
-                        `
-                        }
-                        ${
-                          wikiInfo.enableFlashesAndGames &&
-                          flashesThatFeature.length &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.flashesThatFeature', {
-                              track: `<i>${track.name}</i>`,
-                            })}</p>
-                            <ul>
-                                ${flashesThatFeature
-                                  .map(({flash, as}) =>
-                                    html.tag(
-                                      'li',
-                                      {class: as !== track && 'rerelease'},
-                                      as === track
-                                        ? language.$(
-                                            'releaseInfo.flashesThatFeature.item',
-                                            {
-                                              flash: link.flash(flash),
-                                            }
-                                          )
-                                        : language.$(
-                                            'releaseInfo.flashesThatFeature.item.asDifferentRelease',
-                                            {
-                                              flash: link.flash(flash),
-                                              track: link.track(as),
-                                            }
-                                          )
-                                    )
-                                  )
-                                  .join('\n')}
-                            </ul>
-                        `
-                        }
-                        ${
-                          track.lyrics &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.lyrics')}</p>
-                            <blockquote>
-                                ${transformLyrics(track.lyrics)}
-                            </blockquote>
-                        `
-                        }
-                        ${
-                          hasCommentary &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.artistCommentary')}</p>
-                            <blockquote>
-                                ${generateCommentary({
-                                  link,
-                                  language,
-                                  transformMultiline,
-                                })}
-                            </blockquote>
-                        `
-                        }
-                    `,
+          content: [
+            cover && generateCoverLink({
+              src: cover,
+              alt: language.$('misc.alt.trackCover'),
+              tags: track.artTags,
+            }),
+
+            html.tag('h1', language.$('trackPage.title', {track: track.name})),
+
+            html.tag('p', [
+              language.$('releaseInfo.by', {
+                artists: getArtistString(track.artistContribs, {
+                  showContrib: true,
+                  showIcons: true,
+                }),
+              }),
+              track.coverArtistContribs.length && language.$('releaseInfo.coverArtBy', {
+                artists: getArtistString(
+                  track.coverArtistContribs,
+                  {
+                    showContrib: true,
+                    showIcons: true,
+                  }
+                ),
+              }),
+              track.date && language.$('releaseInfo.released', {
+                date: language.formatDate(track.date),
+              }),
+              track.coverArtDate && +track.coverArtDate !== +track.date &&
+                language.$('releaseInfo.artReleased', {
+                  date: language.formatDate(track.coverArtDate),
+                }),
+              track.duration && language.$('releaseInfo.duration', {
+                duration: language.formatDuration(
+                  track.duration
+                ),
+              }),
+            ].filter(Boolean).join('<br>\n')),
+
+            html.tag('p',
+              (track.urls?.length
+                ? language.$('releaseInfo.listenOn', {
+                    links: language.formatDisjunctionList(
+                      track.urls.map((url) =>
+                        fancifyURL(url, {language})
+                      )
+                    ),
+                  })
+                : language.$('releaseInfo.listenOn.noLinks'))),
+
+            ...otherReleases.length ? [
+              html.tag('p', language.$('releaseInfo.alsoReleasedAs')),
+              html.tag('ul', otherReleases.map(track =>
+                html.tag('li', language.$('releaseInfo.alsoReleasedAs.item', {
+                  track: link.track(track),
+                  album: link.album(track.album),
+                })))),
+            ] : [],
+
+            ...track.contributorContribs.length ? [
+              html.tag('p', language.$('releaseInfo.contributors')),
+              html.tag('ul', track.contributorContribs.map(contrib =>
+                html.tag('li', getArtistString([contrib], {
+                  showContrib: true,
+                  showIcons: true,
+                })))),
+            ] : [],
+
+            ...referencedTracks.length ? [
+              html.tag('p', language.$('releaseInfo.tracksReferenced', {
+                track: html.tag('i', track.name),
+              })),
+              html.tag('ul', referencedTracks.map(getTrackItem)),
+            ] : [],
+
+            ...referencedByTracks.length ? [
+              html.tag('p', language.$('releaseInfo.tracksThatReference', {
+                track: html.tag('i', track.name),
+              })),
+              generateTrackListDividedByGroups(referencedByTracks, {
+                getTrackItem,
+                wikiData,
+              }),
+            ] : [],
+
+            ...(wikiInfo.enableFlashesAndGames && flashesThatFeature.length) ? [
+              html.tag('p', language.$('releaseInfo.flashesThatFeature', {
+                track: `<i>${track.name}</i>`,
+              })),
+              html.tag('ul', flashesThatFeature.map(({flash, as}) =>
+                html.tag('li',
+                  {class: as !== track && 'rerelease'},
+                  (as === track
+                    ? language.$('releaseInfo.flashesThatFeature.item', {
+                      flash: link.flash(flash),
+                    })
+                    : language.$('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
+                      flash: link.flash(flash),
+                      track: link.track(as),
+                    }))))),
+            ] : [],
+
+            ...track.lyrics ? [
+              html.tag('p', language.$('releaseInfo.lyrics')),
+              html.tag('blockquote', transformLyrics(track.lyrics)),
+            ] : [],
+
+            ...hasCommentary ? [
+              html.tag('p', language.$('releaseInfo.artistCommentary')),
+              html.tag('blockquote', generateCommentary({
+                link,
+                language,
+                transformMultiline,
+              })),
+            ] : [],
+          ].filter(Boolean).join('\n'),
         },
 
         sidebarLeft: generateAlbumSidebar(album, track, {
