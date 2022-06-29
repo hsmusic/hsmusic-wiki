@@ -108,6 +108,7 @@ import {
   logInfo,
   logError,
   parseOptions,
+  progressCallAll,
   progressPromiseAll,
 } from './util/cli.js';
 
@@ -2150,27 +2151,21 @@ async function main() {
 
     // return;
 
-    writes = buildStepsWithTargets.flatMap(({flag, pageSpec, targets}) => {
-      const writes = targets.flatMap(
-        (target) => pageSpec.write(target, {wikiData})?.slice() || []
-      );
-
-      if (!validateWrites(writes, flag + '.write')) {
-        return [];
-      }
+    writes = progressCallAll('Computing page & data writes.', buildStepsWithTargets.flatMap(({flag, pageSpec, targets}) => {
+      const writesFns = targets.map(target => () => {
+        const writes = pageSpec.write(target, {wikiData})?.slice() || [];
+        return validateWrites(writes, flag + '.write') ? writes : [];
+      });
 
       if (pageSpec.writeTargetless) {
-        const writes2 = pageSpec.writeTargetless({wikiData});
-
-        if (!validateWrites(writes2, flag + '.writeTargetless')) {
-          return [];
-        }
-
-        writes.push(...writes2);
+        writesFns.push(() => {
+          const writes = pageSpec.writeTargetless({wikiData});
+          return validateWrites(writes, flag + '.writeTargetless') ? writes : [];
+        });
       }
 
-      return writes;
-    });
+      return writesFns;
+    })).flat();
 
     if (error) {
       return;
