@@ -149,7 +149,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 10;
+const CACHEBUST = 11;
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
@@ -951,33 +951,28 @@ writePage.html = (
 
   const mainHTML =
     main.content &&
-    html.tag(
-      'main',
+    html.tag('main',
       {
         id: 'content',
         class: main.classes,
       },
-      main.content
-    );
+      main.content);
 
   const footerHTML =
     footer.content &&
-    html.tag(
-      'footer',
+    html.tag('footer',
       {
         id: 'footer',
         class: footer.classes,
       },
-      footer.content
-    );
+      footer.content);
 
   const generateSidebarHTML = (
     id,
     {content, multiple, classes, collapse = true, wide = false}
   ) =>
     content
-      ? html.tag(
-          'div',
+      ? html.tag('div',
           {
             id,
             class: [
@@ -988,11 +983,9 @@ writePage.html = (
               ...classes,
             ],
           },
-          content
-        )
+          content)
       : multiple
-      ? html.tag(
-          'div',
+      ? html.tag('div',
           {
             id,
             class: [
@@ -1003,9 +996,7 @@ writePage.html = (
             ],
           },
           multiple.map((content) =>
-            html.tag('div', {class: ['sidebar', ...classes]}, content)
-          )
-        )
+            html.tag('div', {class: ['sidebar', ...classes]}, content)))
       : '';
 
   const sidebarLeftHTML = generateSidebarHTML('sidebar-left', sidebarLeft);
@@ -1064,17 +1055,14 @@ writePage.html = (
       partContent = html.tag('a', attributes, linkTitle);
     }
 
-    const part = html.tag(
-      'span',
+    const part = html.tag('span',
       {class: cur.divider === false && 'no-divider'},
-      partContent
-    );
+      partContent);
 
     navLinkParts.push(part);
   }
 
-  const navHTML = html.tag(
-    'nav',
+  const navHTML = html.tag('nav',
     {
       [html.onlyIfContent]: true,
       id: 'header',
@@ -1095,18 +1083,15 @@ writePage.html = (
       nav.content && html.tag('div', {class: 'nav-content'}, nav.content),
       nav.bottomRowContent &&
         html.tag('div', {class: 'nav-bottom-row'}, nav.bottomRowContent),
-    ]
-  );
+    ]);
 
-  const secondaryNavHTML = html.tag(
-    'nav',
+  const secondaryNavHTML = html.tag('nav',
     {
       [html.onlyIfContent]: true,
       id: 'secondary-nav',
       class: secondaryNav.classes,
     },
-    [secondaryNav.content]
-  );
+    secondaryNav.content);
 
   const bannerSrc = banner.src
     ? banner.src
@@ -1117,8 +1102,7 @@ writePage.html = (
   const bannerHTML =
     banner.position &&
     bannerSrc &&
-    html.tag(
-      'div',
+    html.tag('div',
       {
         id: 'banner',
         class: banner.classes,
@@ -1128,23 +1112,27 @@ writePage.html = (
         alt: banner.alt,
         width: banner.dimensions[0] || 1100,
         height: banner.dimensions[1] || 200,
-      })
-    );
+      }));
 
   const layoutHTML = [
     navHTML,
     banner.position === 'top' && bannerHTML,
     secondaryNavHTML,
-    html.tag(
-      'div',
-      {class: ['layout-columns', !collapseSidebars && 'vertical-when-thin']},
-      [sidebarLeftHTML, mainHTML, sidebarRightHTML]
-    ),
+    html.tag('div',
+      {
+        class: [
+          'layout-columns',
+          !collapseSidebars && 'vertical-when-thin',
+        ],
+      },
+      [
+        sidebarLeftHTML,
+        mainHTML,
+        sidebarRightHTML,
+      ]),
     banner.position === 'bottom' && bannerHTML,
     footerHTML,
-  ]
-    .filter(Boolean)
-    .join('\n');
+  ].filter(Boolean).join('\n');
 
   const infoCardHTML = fixWS`
         <div id="info-card-container">
@@ -1197,23 +1185,25 @@ writePage.html = (
   const socialEmbedHTML = [
     socialEmbed.title &&
       html.tag('meta', {property: 'og:title', content: socialEmbed.title}),
+
     socialEmbed.description &&
       html.tag('meta', {
         property: 'og:description',
         content: socialEmbed.description,
       }),
+
     socialEmbed.image &&
       html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
+
     socialEmbed.color &&
       html.tag('meta', {name: 'theme-color', content: socialEmbed.color}),
+
     oEmbedJSONHref &&
       html.tag('link', {
         type: 'application/json+oembed',
         href: oEmbedJSONHref,
       }),
-  ]
-    .filter(Boolean)
-    .join('\n');
+  ].filter(Boolean).join('\n');
 
   return filterEmptyLines(fixWS`
         <!DOCTYPE html>

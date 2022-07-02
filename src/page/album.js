@@ -4,8 +4,6 @@
 
 // Imports
 
-import fixWS from 'fix-whitespace';
-
 import * as html from '../util/html.js';
 
 import {bindOpts, compareArrays} from '../util/sugar.js';
@@ -31,7 +29,8 @@ export function write(album, {wikiData}) {
       duration: language.formatDuration(track.duration ?? 0),
       track: link.track(track),
     };
-    return `<li style="${getLinkThemeString(track.color)}">${
+    return html.tag('li',
+      {style: getLinkThemeString(track.color)},
       compareArrays(
         track.artistContribs.map((c) => c.who),
         album.artistContribs.map((c) => c.who),
@@ -40,20 +39,23 @@ export function write(album, {wikiData}) {
         ? language.$('trackList.item.withDuration', itemOpts)
         : language.$('trackList.item.withDuration.withArtists', {
             ...itemOpts,
-            by: `<span class="by">${language.$(
-              'trackList.item.withArtists.by',
-              {
+            by: html.tag('span',
+              {class: 'by'},
+              language.$('trackList.item.withArtists.by', {
                 artists: getArtistString(track.artistContribs),
-              }
-            )}</span>`,
-          })
-    }</li>`;
+              })),
+          }));
   };
 
   const hasCommentaryEntries =
     [album, ...album.tracks].filter((x) => x.commentary).length > 0;
   const hasAdditionalFiles = album.additionalFiles?.length > 0;
   const albumDuration = getTotalDuration(album.tracks);
+
+  const displayTrackGroups =
+    album.trackGroups &&
+      (album.trackGroups.length > 1 ||
+        !album.trackGroups[0].isDefaultTrackGroup);
 
   const listTag = getAlbumListTag(album);
 
@@ -142,203 +144,158 @@ export function write(album, {wikiData}) {
         },
 
         main: {
-          content: fixWS`
-                        ${
-                          cover &&
-                          generateCoverLink({
-                            src: cover,
-                            alt: language.$('misc.alt.albumCover'),
-                            tags: album.artTags,
-                          })
-                        }
-                        <h1>${language.$('albumPage.title', {
-                          album: album.name,
-                        })}</h1>
-                        <p>
-                            ${[
-                              album.artistContribs.length &&
-                                language.$('releaseInfo.by', {
-                                  artists: getArtistString(
-                                    album.artistContribs,
-                                    {
-                                      showContrib: true,
-                                      showIcons: true,
-                                    }
-                                  ),
-                                }),
-                              album.coverArtistContribs.length &&
-                                language.$('releaseInfo.coverArtBy', {
-                                  artists: getArtistString(
-                                    album.coverArtistContribs,
-                                    {
-                                      showContrib: true,
-                                      showIcons: true,
-                                    }
-                                  ),
-                                }),
-                              album.wallpaperArtistContribs.length &&
-                                language.$('releaseInfo.wallpaperArtBy', {
-                                  artists: getArtistString(
-                                    album.wallpaperArtistContribs,
-                                    {
-                                      showContrib: true,
-                                      showIcons: true,
-                                    }
-                                  ),
-                                }),
-                              album.bannerArtistContribs.length &&
-                                language.$('releaseInfo.bannerArtBy', {
-                                  artists: getArtistString(
-                                    album.bannerArtistContribs,
-                                    {
-                                      showContrib: true,
-                                      showIcons: true,
-                                    }
-                                  ),
-                                }),
-                              album.date &&
-                                language.$('releaseInfo.released', {
-                                  date: language.formatDate(album.date),
-                                }),
-                              album.coverArtDate &&
-                                +album.coverArtDate !== +album.date &&
-                                language.$('releaseInfo.artReleased', {
-                                  date: language.formatDate(album.coverArtDate),
-                                }),
-                              language.$('releaseInfo.duration', {
-                                duration: language.formatDuration(
-                                  albumDuration,
-                                  {
-                                    approximate: album.tracks.length > 1,
-                                  }
-                                ),
-                              }),
-                            ]
-                              .filter(Boolean)
-                              .join('<br>\n')}
-                        </p>
-                        ${
-                          (hasAdditionalFiles || hasCommentaryEntries) &&
-                          fixWS`<p>
-                            ${[
-                              hasAdditionalFiles &&
-                                generateAdditionalFilesShortcut(
-                                  album.additionalFiles,
-                                  {
-                                    language,
-                                  }
-                                ),
-                              hasCommentaryEntries &&
-                                language.$('releaseInfo.viewCommentary', {
-                                  link: link.albumCommentary(album, {
-                                    text: language.$(
-                                      'releaseInfo.viewCommentary.link'
-                                    ),
-                                  }),
-                                }),
-                            ]
-                              .filter(Boolean)
-                              .join('<br>\n')}</p>`
-                        }
-                        ${
-                          album.urls?.length &&
-                          `<p>${language.$('releaseInfo.listenOn', {
-                            links: language.formatDisjunctionList(
-                              album.urls.map((url) =>
-                                fancifyURL(url, {album: true})
-                              )
-                            ),
-                          })}</p>`
-                        }
-                        ${
-                          album.trackGroups &&
-                          (album.trackGroups.length > 1 ||
-                            !album.trackGroups[0].isDefaultTrackGroup)
-                            ? fixWS`
-                            <dl class="album-group-list">
-                                ${album.trackGroups
-                                  .map(
-                                    ({
-                                      name,
-                                      startIndex,
-                                      tracks,
-                                    }) => fixWS`
-                                    <dt>${language.$(
-                                      'trackList.section.withDuration',
-                                      {
-                                        duration: language.formatDuration(
-                                          getTotalDuration(tracks),
-                                          {
-                                            approximate: tracks.length > 1,
-                                          }
-                                        ),
-                                        section: name,
-                                      }
-                                    )}</dt>
-                                    <dd><${
-                                      listTag === 'ol'
-                                        ? `ol start="${startIndex + 1}"`
-                                        : listTag
-                                    }>
-                                        ${tracks
-                                          .map(trackToListItem)
-                                          .join('\n')}
-                                    </${listTag}></dd>
-                                `
-                                  )
-                                  .join('\n')}
-                            </dl>
-                        `
-                            : fixWS`
-                            <${listTag}>
-                                ${album.tracks.map(trackToListItem).join('\n')}
-                            </${listTag}>
-                        `
-                        }
-                        ${
-                          album.dateAddedToWiki &&
-                          fixWS`
-                            <p>
-                                ${[
-                                  language.$('releaseInfo.addedToWiki', {
-                                    date: language.formatDate(
-                                      album.dateAddedToWiki
-                                    ),
-                                  }),
-                                ]
-                                  .filter(Boolean)
-                                  .join('<br>\n')}
-                            </p>
-                        `
-                        }
-                        ${
-                          hasAdditionalFiles &&
-                          generateAdditionalFilesList(album.additionalFiles, {
-                            // TODO: Kinda near the metal here...
-                            getFileSize: (file) =>
-                              getSizeOfAdditionalFile(
-                                urls
-                                  .from('media.root')
-                                  .to(
-                                    'media.albumAdditionalFile',
-                                    album.directory,
-                                    file
-                                  )
-                              ),
-                            linkFile: (file) =>
-                              link.albumAdditionalFile({album, file}),
-                          })
-                        }
-                        ${
-                          album.commentary &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.artistCommentary')}</p>
-                            <blockquote>
-                                ${transformMultiline(album.commentary)}
-                            </blockquote>
-                        `
-                        }
-                    `,
+          content: [
+            cover && generateCoverLink({
+              src: cover,
+              alt: language.$('misc.alt.albumCover'),
+              tags: album.artTags,
+            }),
+
+            html.tag('h1', language.$('albumPage.title', {
+              album: album.name,
+            })),
+
+            html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                album.artistContribs.length &&
+                  language.$('releaseInfo.by', {
+                    artists: getArtistString(album.artistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
+                  }),
+
+                album.coverArtistContribs.length &&
+                  language.$('releaseInfo.coverArtBy', {
+                    artists: getArtistString(album.coverArtistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
+                  }),
+
+                album.wallpaperArtistContribs.length &&
+                  language.$('releaseInfo.wallpaperArtBy', {
+                    artists: getArtistString(album.wallpaperArtistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
+                  }),
+
+                album.bannerArtistContribs.length &&
+                  language.$('releaseInfo.bannerArtBy', {
+                    artists: getArtistString(album.bannerArtistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
+                  }),
+
+                album.date &&
+                  language.$('releaseInfo.released', {
+                    date: language.formatDate(album.date),
+                  }),
+
+                album.coverArtDate &&
+                +album.coverArtDate !== +album.date &&
+                  language.$('releaseInfo.artReleased', {
+                    date: language.formatDate(album.coverArtDate),
+                  }),
+
+                album.duration &&
+                  language.$('releaseInfo.duration', {
+                    duration: language.formatDuration(albumDuration, {
+                      approximate: album.tracks.length > 1,
+                    }),
+                  }),
+              ]),
+
+            html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                hasAdditionalFiles &&
+                  generateAdditionalFilesShortcut(album.additionalFiles, {
+                    language,
+                  }),
+
+                hasCommentaryEntries &&
+                  language.$('releaseInfo.viewCommentary', {
+                    link: link.albumCommentary(album, {
+                      text: language.$('releaseInfo.viewCommentary.link'),
+                    }),
+                  }),
+              ]),
+
+            album.urls?.length &&
+              html.tag('p',
+                language.$('releaseInfo.listenOn', {
+                  links: language.formatDisjunctionList(
+                    album.urls.map(url => fancifyURL(url, {album: true}))
+                  ),
+                })),
+
+            displayTrackGroups &&
+              html.tag('dl',
+                {class: 'album-group-list'},
+                album.trackGroups.flatMap(({
+                  name,
+                  startIndex,
+                  tracks,
+                }) => [
+                  html.tag('dt',
+                    language.$('trackList.section.withDuration', {
+                      duration: language.formatDuration(getTotalDuration(tracks), {
+                        approximate: tracks.length > 1,
+                      }),
+                      section: name,
+                    })),
+                  html.tag('dd',
+                    html.tag(listTag,
+                      listTag === 'ol' ? {start: startIndex + 1} : {},
+                      tracks.map(trackToListItem))),
+                ])),
+
+            !displayTrackGroups &&
+              html.tag(listTag,
+                album.tracks.map(trackToListItem)),
+
+            html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                album.dateAddedToWiki &&
+                  language.$('releaseInfo.addedToWiki', {
+                    date: language.formatDate(
+                      album.dateAddedToWiki
+                    ),
+                  })
+              ]),
+
+            hasAdditionalFiles &&
+              generateAdditionalFilesList(album.additionalFiles, {
+                // TODO: Kinda near the metal here...
+                getFileSize: (file) =>
+                  getSizeOfAdditionalFile(
+                    urls.from('media.root').to(
+                      'media.albumAdditionalFile',
+                      album.directory,
+                      file)),
+                linkFile: (file) =>
+                  link.albumAdditionalFile({album, file}),
+              }),
+
+            ...album.commentary ? [
+              html.tag('p', language.$('releaseInfo.artistCommentary')),
+              html.tag('blockquote', transformMultiline(album.commentary)),
+            ] : [],
+          ],
         },
 
         sidebarLeft: generateAlbumSidebar(album, null, {
@@ -387,81 +344,66 @@ export function generateAlbumSidebar(album, currentTrack, {
   language,
   transformMultiline,
 }) {
-  const listTag = getAlbumListTag(album);
+  const isAlbumPage = !currentTrack;
+  const isTrackPage = !!currentTrack;
 
-  /*
-  const trackGroups = album.trackGroups || [{
-      name: language.$('albumSidebar.trackList.fallbackGroupName'),
-      color: album.color,
-      startIndex: 0,
-      tracks: album.tracks
-  }];
-  */
+  const listTag = getAlbumListTag(album);
 
   const {trackGroups} = album;
 
   const trackToListItem = (track) =>
-    html.tag(
-      'li',
+    html.tag('li',
       {class: track === currentTrack && 'current'},
       language.$('albumSidebar.trackList.item', {
         track: link.track(track),
-      })
-    );
+      }));
 
   const nameOrDefault = (isDefaultTrackGroup, name) =>
     isDefaultTrackGroup
       ? language.$('albumSidebar.trackList.fallbackGroupName')
       : name;
 
-  const trackListPart = fixWS`
-        <h1>${link.album(album)}</h1>
-        ${trackGroups
-          .map(({name, color, startIndex, tracks, isDefaultTrackGroup}) =>
-            html.tag(
-              'details',
-              {
-                // Leave side8ar track groups collapsed on al8um homepage,
-                // since there's already a view of all the groups expanded
-                // in the main content area.
-                open: currentTrack && tracks.includes(currentTrack),
-                class: tracks.includes(currentTrack) && 'current',
-              },
-              [
-                html.tag(
-                  'summary',
-                  {style: getLinkThemeString(color)},
-                  listTag === 'ol'
-                    ? language.$('albumSidebar.trackList.group.withRange', {
-                        group: `<span class="group-name">${nameOrDefault(
-                          isDefaultTrackGroup,
-                          name
-                        )}</span>`,
-                        range: `${startIndex + 1}&ndash;${
-                          startIndex + tracks.length
-                        }`,
-                      })
-                    : language.$('albumSidebar.trackList.group', {
-                        group: `<span class="group-name">${nameOrDefault(
-                          isDefaultTrackGroup,
-                          name
-                        )}</span>`,
-                      })
-                ),
-                fixWS`
-                    <${
-                      listTag === 'ol'
-                        ? `ol start="${startIndex + 1}"`
-                        : listTag
-                    }>
-                        ${tracks.map(trackToListItem).join('\n')}
-                    </${listTag}>
-                `,
-              ]
-            )
-          )
-          .join('\n')}
-    `;
+  const trackListPart = [
+    html.tag('h1', link.album(album)),
+    ...trackGroups.map(({name, color, startIndex, tracks, isDefaultTrackGroup}) => {
+      const groupName =
+        html.tag('span',
+          {class: 'group-name'},
+          nameOrDefault(
+            isDefaultTrackGroup,
+            name
+          ));
+      return html.tag('details',
+        {
+          // Leave side8ar track groups collapsed on al8um homepage,
+          // since there's already a view of all the groups expanded
+          // in the main content area.
+          open: isTrackPage && tracks.includes(currentTrack),
+          class: tracks.includes(currentTrack) && 'current',
+        },
+        [
+          html.tag(
+            'summary',
+            {style: getLinkThemeString(color)},
+            [
+              listTag === 'ol' &&
+                language.$('albumSidebar.trackList.group.withRange', {
+                  group: groupName,
+                  range: `${startIndex + 1}&ndash;${
+                    startIndex + tracks.length
+                  }`,
+                }),
+              listTag === 'ul' &&
+                language.$('albumSidebar.trackList.group', {
+                  group: groupName,
+                }),
+            ]),
+          html.tag(listTag,
+            listTag === 'ol' ? {start: startIndex + 1} : {},
+            tracks.map(trackToListItem)),
+        ]);
+    }),
+  ];
 
   const {groups} = album;
 
@@ -473,49 +415,47 @@ export function generateAlbumSidebar(album, currentTrack, {
       const previous = index > 0 && albums[index - 1];
       return {group, next, previous};
     })
-    .map(
-      ({group, next, previous}) => fixWS`
-        <h1>${language.$('albumSidebar.groupBox.title', {
-          group: link.groupInfo(group),
-        })}</h1>
-        ${!currentTrack && transformMultiline(group.descriptionShort)}
-        ${
-          group.urls?.length &&
-          `<p>${language.$('releaseInfo.visitOn', {
-            links: language.formatDisjunctionList(
-              group.urls.map((url) => fancifyURL(url))
-            ),
-          })}</p>`
-        }
-        ${
-          !currentTrack &&
-          fixWS`
-            ${
-              next &&
-              `<p class="group-chronology-link">${language.$(
-                'albumSidebar.groupBox.next',
-                {
-                  album: link.album(next),
-                }
-              )}</p>`
-            }
-            ${
-              previous &&
-              `<p class="group-chronology-link">${language.$(
-                'albumSidebar.groupBox.previous',
-                {
-                  album: link.album(previous),
-                }
-              )}</p>`
-            }
-        `
-        }
-    `
-    );
+    // This is a map and not a flatMap because the distinction between which
+    // group sets of elements belong to matters. That means this variable is an
+    // array of arrays, and we'll need to treat it as such later!
+    .map(({group, next, previous}) => [
+      html.tag('h1', language.$('albumSidebar.groupBox.title', {
+        group: link.groupInfo(group),
+      })),
+
+      isAlbumPage &&
+        transformMultiline(group.descriptionShort),
+
+      group.urls?.length &&
+        html.tag('p', language.$('releaseInfo.visitOn', {
+          links: language.formatDisjunctionList(
+            group.urls.map((url) => fancifyURL(url))
+          ),
+        })),
+
+      ...isAlbumPage ? [
+        next &&
+          html.tag('p',
+            {class: 'group-chronology-link'},
+            language.$('albumSidebar.groupBox.next', {
+              album: link.album(next),
+            })),
+
+        previous &&
+          html.tag('p',
+            {class: 'group-chronology-link'},
+            language.$('albumSidebar.groupBox.previous', {
+              album: link.album(previous),
+            })),
+      ] : [],
+    ]);
 
   if (groupParts.length) {
-    if (currentTrack) {
-      const combinedGroupPart = groupParts.join('\n<hr>\n');
+    if (isTrackPage) {
+      const combinedGroupPart =
+        groupParts
+          .map(groupPart => groupPart.filter(Boolean).join('\n'))
+          .join('\n<hr>\n');
       return {
         multiple: [trackListPart, combinedGroupPart],
       };
@@ -536,6 +476,8 @@ export function generateAlbumSecondaryNav(
   currentTrack,
   {link, language, getLinkThemeString}
 ) {
+  const isAlbumPage = !currentTrack;
+
   const {groups} = album;
 
   if (!groups.length) {
@@ -552,20 +494,21 @@ export function generateAlbumSecondaryNav(
     })
     .map(({group, next, previous}) => {
       const previousNext =
-        !currentTrack &&
-        [
-          previous &&
-            link.album(previous, {
-              color: false,
-              text: language.$('misc.nav.previous'),
-            }),
-          next &&
-            link.album(next, {
-              color: false,
-              text: language.$('misc.nav.next'),
-            }),
-        ].filter(Boolean);
-      return html.tag('span', {style: getLinkThemeString(group.color)}, [
+        isAlbumPage &&
+          [
+            previous &&
+              link.album(previous, {
+                color: false,
+                text: language.$('misc.nav.previous'),
+              }),
+            next &&
+              link.album(next, {
+                color: false,
+                text: language.$('misc.nav.next'),
+              }),
+          ].filter(Boolean);
+      return html.tag('span',
+        {style: getLinkThemeString(group.color)}, [
         language.$('albumSidebar.groupBox.title', {
           group: link.groupInfo(group),
         }),
@@ -574,8 +517,8 @@ export function generateAlbumSecondaryNav(
     });
 
   return {
-    classes: ['dot-between-spans'],
-    content: groupParts.join('\n'),
+    classes: ['nav-links-groups'],
+    content: groupParts,
   };
 }
 
@@ -584,18 +527,21 @@ export function generateAlbumNavLinks(
   currentTrack,
   {generatePreviousNextLinks, language}
 ) {
+  const isTrackPage = !!currentTrack;
+
   if (album.tracks.length <= 1) {
     return '';
   }
 
   const previousNextLinks =
-    currentTrack &&
-    generatePreviousNextLinks(currentTrack, {
-      data: album.tracks,
-      linkKey: 'track',
-    });
+    isTrackPage &&
+      generatePreviousNextLinks(currentTrack, {
+        data: album.tracks,
+        linkKey: 'track',
+      });
+
   const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
-    currentTrack
+    isTrackPage
       ? language.$('trackPage.nav.random')
       : language.$('albumPage.nav.randomTrack')
   }</a>`;
@@ -610,6 +556,8 @@ export function generateAlbumChronologyLinks(
   currentTrack,
   {generateChronologyLinks}
 ) {
+  const isTrackPage = !!currentTrack;
+
   return html.tag(
     'div',
     {
@@ -617,7 +565,7 @@ export function generateAlbumChronologyLinks(
       class: 'nav-chronology-links',
     },
     [
-      currentTrack &&
+      isTrackPage &&
         generateChronologyLinks(currentTrack, {
           contribKey: 'artistContribs',
           getThings: (artist) => [
@@ -626,7 +574,8 @@ export function generateAlbumChronologyLinks(
           ],
           headingString: 'misc.chronology.heading.track',
         }),
-      currentTrack &&
+
+      isTrackPage &&
         generateChronologyLinks(currentTrack, {
           contribKey: 'contributorContribs',
           getThings: (artist) => [
@@ -635,6 +584,7 @@ export function generateAlbumChronologyLinks(
           ],
           headingString: 'misc.chronology.heading.track',
         }),
+
       generateChronologyLinks(currentTrack || album, {
         contribKey: 'coverArtistContribs',
         dateKey: 'coverArtDate',
@@ -644,8 +594,5 @@ export function generateAlbumChronologyLinks(
         ],
         headingString: 'misc.chronology.heading.coverArt',
       }),
-    ]
-      .filter(Boolean)
-      .join('\n')
-  );
+    ]);
 }

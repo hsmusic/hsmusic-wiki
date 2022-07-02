@@ -165,7 +165,8 @@ a:hover {
   font-weight: 800;
 }
 
-.nav-links-index > span:not(:first-child):not(.no-divider)::before {
+.nav-links-index > span:not(:first-child):not(.no-divider)::before,
+.nav-links-groups > span:not(:first-child):not(.no-divider)::before {
   content: "\0020\00b7\0020";
   font-weight: 800;
 }

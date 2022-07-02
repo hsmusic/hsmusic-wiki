@@ -20,10 +20,17 @@ export const selfClosingTags = [
   'wbr',
 ];
 
-// Pass to tag() as an attri8utes key to make tag() return a 8lank string
-// if the provided content is empty. Useful for when you'll only 8e showing
-// an element according to the presence of content that would 8elong there.
+// Pass to tag() as an attributes key to make tag() return a 8lank string if the
+// provided content is empty. Useful for when you'll only 8e showing an element
+// according to the presence of content that would 8elong there.
 export const onlyIfContent = Symbol();
+
+// Pass to tag() as an attributes key to make children be joined together by the
+// provided string. This is handy, for example, for joining lines by <br> tags,
+// or putting some other divider between each child. Note this will only have an
+// effect if the tag content is passed as an array of children and not a single
+// string.
+export const joinChildren = Symbol();
 
 export function tag(tagName, ...args) {
   const selfClosing = selfClosingTags.includes(tagName);
@@ -59,7 +66,11 @@ export function tag(tagName, ...args) {
   }
 
   if (Array.isArray(content)) {
-    content = content.filter(Boolean).join('\n');
+    const joiner = attrs?.[joinChildren];
+    content = content.filter(Boolean).join(
+      (joiner
+        ? `\n${joiner}\n`
+        : '\n'));
   }
 
   if (content) {

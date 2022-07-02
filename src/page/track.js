@@ -4,8 +4,6 @@
 
 // Imports
 
-import fixWS from 'fix-whitespace';
-
 import {
   generateAlbumChronologyLinks,
   generateAlbumNavLinks,
@@ -217,44 +215,55 @@ export function write(track, {wikiData}) {
 
             html.tag('h1', language.$('trackPage.title', {track: track.name})),
 
-            html.tag('p', [
-              language.$('releaseInfo.by', {
-                artists: getArtistString(track.artistContribs, {
-                  showContrib: true,
-                  showIcons: true,
-                }),
-              }),
-              track.coverArtistContribs.length && language.$('releaseInfo.coverArtBy', {
-                artists: getArtistString(
-                  track.coverArtistContribs,
-                  {
-                    showContrib: true,
-                    showIcons: true,
-                  }
-                ),
-              }),
-              track.date && language.$('releaseInfo.released', {
-                date: language.formatDate(track.date),
-              }),
-              track.coverArtDate && +track.coverArtDate !== +track.date &&
-                language.$('releaseInfo.artReleased', {
-                  date: language.formatDate(track.coverArtDate),
-                }),
-              track.duration && language.$('releaseInfo.duration', {
-                duration: language.formatDuration(
-                  track.duration
-                ),
-              }),
-            ].filter(Boolean).join('<br>\n')),
+            html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                track.artistContribs.length &&
+                  language.$('releaseInfo.by', {
+                    artists: getArtistString(track.artistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
+                  }),
+
+                track.coverArtistContribs.length &&
+                  language.$('releaseInfo.coverArtBy', {
+                    artists: getArtistString(
+                      track.coverArtistContribs,
+                      {
+                        showContrib: true,
+                        showIcons: true,
+                      }
+                    ),
+                  }),
+
+                track.date &&
+                  language.$('releaseInfo.released', {
+                    date: language.formatDate(track.date),
+                  }),
+
+                track.coverArtDate &&
+                +track.coverArtDate !== +track.date &&
+                  language.$('releaseInfo.artReleased', {
+                    date: language.formatDate(track.coverArtDate),
+                  }),
+
+                track.duration &&
+                  language.$('releaseInfo.duration', {
+                    duration: language.formatDuration(
+                      track.duration
+                    ),
+                  }),
+              ]),
 
             html.tag('p',
               (track.urls?.length
                 ? language.$('releaseInfo.listenOn', {
                     links: language.formatDisjunctionList(
-                      track.urls.map((url) =>
-                        fancifyURL(url, {language})
-                      )
-                    ),
+                      track.urls.map(url => fancifyURL(url, {language}))),
                   })
                 : language.$('releaseInfo.listenOn.noLinks'))),
 
@@ -323,7 +332,7 @@ export function write(track, {wikiData}) {
                 transformMultiline,
               })),
             ] : [],
-          ].filter(Boolean).join('\n'),
+          ],
         },
 
         sidebarLeft: generateAlbumSidebar(album, track, {
@@ -343,28 +352,31 @@ export function write(track, {wikiData}) {
               path: ['localized.album', album.directory],
               title: album.name,
             },
-            listTag === 'ol'
-              ? {
-                  html: language.$('trackPage.nav.track.withNumber', {
-                    number: album.tracks.indexOf(track) + 1,
-                    track: link.track(track, {class: 'current', to}),
-                  }),
-                }
-              : {
-                  html: language.$('trackPage.nav.track', {
-                    track: link.track(track, {class: 'current', to}),
-                  }),
-                },
+            listTag === 'ol' &&
+              {
+                html: language.$('trackPage.nav.track.withNumber', {
+                  number: album.tracks.indexOf(track) + 1,
+                  track: link.track(track, {class: 'current', to}),
+                }),
+              },
+            listTag === 'ul' &&
+              {
+                html: language.$('trackPage.nav.track', {
+                  track: link.track(track, {class: 'current', to}),
+                }),
+              },
           ].filter(Boolean),
+
           content: generateAlbumChronologyLinks(album, track, {
             generateChronologyLinks,
           }),
+
           bottomRowContent:
             album.tracks.length > 1 &&
-            generateAlbumNavLinks(album, track, {
-              generatePreviousNextLinks,
-              language,
-            }),
+              generateAlbumNavLinks(album, track, {
+                generatePreviousNextLinks,
+                language,
+              }),
         },
 
         secondaryNav: generateAlbumSecondaryNav(album, track, {
