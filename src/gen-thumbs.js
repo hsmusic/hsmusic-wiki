@@ -333,7 +333,7 @@ export default async function genThumbs(
       entriesToGenerate.map(
         ([filePath, md5]) =>
           () =>
-            generateImageThumbnails(path.join(mediaPath, filePath)).then(
+            generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
               () => {
                 updatedCache[filePath] = md5;
                 succeeded.push(filePath);
