@@ -51,43 +51,35 @@ export function write(track, {wikiData}) {
   }
 
   const unbound_getTrackItem = (track, {getArtistString, link, language}) =>
-    html.tag(
-      'li',
+    html.tag('li',
       language.$('trackList.item.withArtists', {
         track: link.track(track),
-        by: `<span class="by">${language.$('trackList.item.withArtists.by', {
-          artists: getArtistString(track.artistContribs),
-        })}</span>`,
-      })
-    );
+        by: html.tag('span',
+          {class: 'by'},
+          language.$('trackList.item.withArtists.by', {
+            artists: getArtistString(track.artistContribs),
+          })),
+      }));
 
   const hasCommentary =
     track.commentary || otherReleases.some((t) => t.commentary);
+
   const generateCommentary = ({link, language, transformMultiline}) =>
-    transformMultiline(
-      [
-        track.commentary,
-        ...otherReleases.map((track) =>
-          track.commentary
-            ?.split('\n')
-            .filter((line) => line.replace(/<\/b>/g, '').includes(':</i>'))
-            .map(
-              (line) => fixWS`
-                    ${line}
-                    ${language.$(
-                      'releaseInfo.artistCommentary.seeOriginalRelease',
-                      {
-                        original: link.track(track),
-                      }
-                    )}
-                `
-            )
-            .join('\n')
-        ),
-      ]
-        .filter(Boolean)
-        .join('\n')
-    );
+    transformMultiline([
+      track.commentary,
+      ...otherReleases.map((track) =>
+        track.commentary
+          ?.split('\n')
+          .filter((line) => line.replace(/<\/b>/g, '').includes(':</i>'))
+          .flatMap(line => [
+            line,
+            language.$('releaseInfo.artistCommentary.seeOriginalRelease', {
+              original: link.track(track),
+            }),
+          ])
+          .join('\n')
+      ),
+    ].filter(Boolean).join('\n'));
 
   const data = {
     type: 'data',
@@ -206,14 +198,14 @@ export function write(track, {wikiData}) {
 
         // disabled for now! shifting banner position per height of page is disorienting
         /*
-                banner: album.bannerArtistContribs.length && {
-                    classes: ['dim'],
-                    dimensions: album.bannerDimensions,
-                    path: ['media.albumBanner', album.directory, album.bannerFileExtension],
-                    alt: language.$('misc.alt.albumBanner'),
-                    position: 'bottom'
-                },
-                */
+        banner: album.bannerArtistContribs.length && {
+          classes: ['dim'],
+          dimensions: album.bannerDimensions,
+          path: ['media.albumBanner', album.directory, album.bannerFileExtension],
+          alt: language.$('misc.alt.albumBanner'),
+          position: 'bottom'
+        },
+        */
 
         main: {
           content: [
