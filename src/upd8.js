@@ -1247,7 +1247,7 @@ writePage.html = (
                 ${socialEmbedHTML}
                 <link rel="stylesheet" href="${to(
                   'shared.staticFile',
-                  `site.css?${CACHEBUST}`
+                  `site2.css?${CACHEBUST}`
                 )}">
                 ${
                   (theme || stylesheet) &&

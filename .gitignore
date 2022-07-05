@@ -1,1 +1,7 @@
 node_modules
+
+# FOR NOW: We are using site2.css instead of site.css,
+# thanks to breaking changes - we can't have the release
+# site reuse the same CSS as the staging/preview one
+# anymore!
+src/static/site.css
