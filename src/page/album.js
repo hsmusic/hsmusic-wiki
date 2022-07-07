@@ -2,10 +2,6 @@
 
 // Album page specification.
 
-// Imports
-
-import * as html from '../util/html.js';
-
 import {bindOpts, compareArrays} from '../util/sugar.js';
 
 import {
@@ -14,17 +10,18 @@ import {
   getTotalDuration,
 } from '../util/wiki-data.js';
 
-// Page exports
-
 export function targets({wikiData}) {
   return wikiData.albumData;
 }
 
 export function write(album, {wikiData}) {
-  const unbound_trackToListItem = (
-    track,
-    {getArtistString, getLinkThemeString, link, language}
-  ) => {
+  const unbound_trackToListItem = (track, {
+    getArtistString,
+    getLinkThemeString,
+    html,
+    language,
+    link,
+  }) => {
     const itemOpts = {
       duration: language.formatDuration(track.duration ?? 0),
       track: link.track(track),
@@ -111,6 +108,7 @@ export function write(album, {wikiData}) {
       getLinkThemeString,
       getSizeOfAdditionalFile,
       getThemeString,
+      html,
       link,
       language,
       transformMultiline,
@@ -119,8 +117,9 @@ export function write(album, {wikiData}) {
       const trackToListItem = bindOpts(unbound_trackToListItem, {
         getArtistString,
         getLinkThemeString,
-        link,
+        html,
         language,
+        link,
       });
 
       const cover = getAlbumCover(album);
@@ -301,6 +300,7 @@ export function write(album, {wikiData}) {
         sidebarLeft: generateAlbumSidebar(album, null, {
           fancifyURL,
           getLinkThemeString,
+          html,
           link,
           language,
           transformMultiline,
@@ -320,13 +320,15 @@ export function write(album, {wikiData}) {
           bottomRowContent: generateAlbumNavLinks(album, null, {language}),
           content: generateAlbumChronologyLinks(album, null, {
             generateChronologyLinks,
+            html,
           }),
         },
 
         secondaryNav: generateAlbumSecondaryNav(album, null, {
+          getLinkThemeString,
+          html,
           language,
           link,
-          getLinkThemeString,
         }),
       };
     },
@@ -340,8 +342,9 @@ export function write(album, {wikiData}) {
 export function generateAlbumSidebar(album, currentTrack, {
   fancifyURL,
   getLinkThemeString,
-  link,
+  html,
   language,
+  link,
   transformMultiline,
 }) {
   const isAlbumPage = !currentTrack;
@@ -471,11 +474,12 @@ export function generateAlbumSidebar(album, currentTrack, {
   }
 }
 
-export function generateAlbumSecondaryNav(
-  album,
-  currentTrack,
-  {link, language, getLinkThemeString}
-) {
+export function generateAlbumSecondaryNav(album, currentTrack, {
+  getLinkThemeString,
+  html,
+  language,
+  link,
+}) {
   const isAlbumPage = !currentTrack;
 
   const {groups} = album;
@@ -551,11 +555,10 @@ export function generateAlbumNavLinks(
     : `<span class="js-hide-until-data">(${randomLink})</span>`;
 }
 
-export function generateAlbumChronologyLinks(
-  album,
-  currentTrack,
-  {generateChronologyLinks}
-) {
+export function generateAlbumChronologyLinks(album, currentTrack, {
+  generateChronologyLinks,
+  html,
+}) {
   const isTrackPage = !!currentTrack;
 
   return html.tag(

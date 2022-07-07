@@ -2,12 +2,6 @@
 
 // Art tag page specification.
 
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-// Page exports
-
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableArtTagUI;
 }
@@ -33,6 +27,7 @@ export function write(tag, {wikiData}) {
       getGridHTML,
       getThemeString,
       getTrackCover,
+      html,
       link,
       language,
     }) => ({
@@ -41,27 +36,34 @@ export function write(tag, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: fixWS`
-                    <h1>${language.$('tagPage.title', {tag: tag.name})}</h1>
-                    <p class="quick-info">${language.$('tagPage.infoLine', {
-                      coverArts: language.countCoverArts(things.length, {
-                        unit: true,
-                      }),
-                    })}</p>
-                    <div class="grid-listing">
-                        ${getGridHTML({
-                          entries,
-                          srcFn: (thing) =>
-                            thing.album
-                              ? getTrackCover(thing)
-                              : getAlbumCover(thing),
-                          linkFn: (thing, opts) =>
-                            thing.album
-                              ? link.track(thing, opts)
-                              : link.album(thing, opts),
-                        })}
-                    </div>
-                `,
+        content: [
+          html.tag('h1',
+            language.$('tagPage.title', {
+              tag: tag.name,
+            })),
+
+          html.tag('p',
+            {class: 'quick-info'},
+            language.$('tagPage.infoLine', {
+              coverArts: language.countCoverArts(things.length, {
+                unit: true,
+              }),
+            })),
+
+          html.tag('div',
+            {class: 'grid-listing'},
+            getGridHTML({
+              entries,
+              srcFn: (thing) =>
+                thing.album
+                  ? getTrackCover(thing)
+                  : getAlbumCover(thing),
+              linkFn: (thing, opts) =>
+                thing.album
+                  ? link.track(thing, opts)
+                  : link.album(thing, opts),
+            })),
+        ],
       },
 
       nav: generateTagNav(tag, {

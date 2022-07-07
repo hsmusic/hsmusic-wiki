@@ -2306,6 +2306,8 @@ async function main() {
             // each page?
             const bound = {};
 
+            bound.html = html;
+
             bound.link = withEntries(unbound_link, (entries) =>
               entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
             );
@@ -2497,7 +2499,7 @@ async function main() {
                   .from('shared.root')
                   .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
 
-            const html = writePage.html(pageInfo, {
+            const pageHTML = writePage.html(pageInfo, {
               defaultLanguage: finalDefaultLanguage,
               language,
               languages,
@@ -2510,7 +2512,7 @@ async function main() {
             });
 
             return writePage.write({
-              html,
+              html: pageHTML,
               oEmbedJSON,
               paths,
             });

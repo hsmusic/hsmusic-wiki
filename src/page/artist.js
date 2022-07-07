@@ -4,12 +4,6 @@
 //
 // NB: See artist-alias.js for artist alias redirect pages.
 
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-import * as html from '../util/html.js';
-
 import {bindOpts, unique} from '../util/sugar.js';
 
 import {
@@ -18,8 +12,6 @@ import {
   sortAlbumsTracksChronologically,
   sortChronologically,
 } from '../util/wiki-data.js';
-
-// Page exports
 
 export function targets({wikiData}) {
   return wikiData.artistData;
@@ -37,16 +29,14 @@ export function write(artist, {wikiData}) {
       ...(artist.albumsAsBannerArtist ?? []),
       ...(artist.tracksAsCoverArtist ?? []),
     ]),
-    {getDate: (o) => o.coverArtDate}
-  );
+    {getDate: (o) => o.coverArtDate});
 
   const artThingsGallery = sortAlbumsTracksChronologically(
     [
       ...(artist.albumsAsCoverArtist ?? []),
       ...(artist.tracksAsCoverArtist ?? []),
     ],
-    {getDate: (o) => o.coverArtDate}
-  );
+    {getDate: (o) => o.coverArtDate});
 
   const commentaryThings = sortAlbumsTracksChronologically([
     ...(artist.albumsAsCommentator ?? []),
@@ -72,25 +62,21 @@ export function write(artist, {wikiData}) {
           track: thing.album ? thing : null,
           date: thing.date,
           ...props,
-        }))
-    ),
-    ['date', 'album']
-  );
+        }))),
+    ['date', 'album']);
 
   const commentaryListChunks = chunkByProperties(
     commentaryThings.map((thing) => ({
       album: thing.album || thing,
       track: thing.album ? thing : null,
     })),
-    ['album']
-  );
+    ['album']);
 
   const allTracks = sortAlbumsTracksChronologically(
     unique([
       ...(artist.tracksAsArtist ?? []),
       ...(artist.tracksAsContributor ?? []),
-    ])
-  );
+    ]));
 
   const chunkTracks = (tracks) =>
     chunkByProperties(
@@ -110,8 +96,8 @@ export function write(artist, {wikiData}) {
           ].filter(Boolean),
         },
       })),
-      ['date', 'album']
-    ).map(({date, album, chunk}) => ({
+      ['date', 'album'])
+    .map(({date, album, chunk}) => ({
       date,
       album,
       chunk,
@@ -123,12 +109,11 @@ export function write(artist, {wikiData}) {
 
   const countGroups = (things) => {
     const usedGroups = things.flatMap(
-      (thing) => thing.groups || thing.album?.groups || []
-    );
+      (thing) => thing.groups || thing.album?.groups || []);
     return groupData
       .map((group) => ({
         group,
-        contributions: usedGroups.filter((g) => g === group).length,
+        contributions: usedGroups.filter(g => g === group).length,
       }))
       .filter(({contributions}) => contributions > 0)
       .sort((a, b) => b.contributions - a.contributions);
@@ -195,76 +180,68 @@ export function write(artist, {wikiData}) {
         })
       : entry;
 
-  const unbound_generateTrackList = (
-    chunks,
-    {getArtistString, link, language}
-  ) => fixWS`
-        <dl>
-            ${chunks
-              .map(
-                ({date, album, chunk, duration}) => fixWS`
-                <dt>${
-                  date && duration
-                    ? language.$(
-                        'artistPage.creditList.album.withDate.withDuration',
-                        {
-                          album: link.album(album),
-                          date: language.formatDate(date),
-                          duration: language.formatDuration(duration, {
-                            approximate: true,
-                          }),
-                        }
-                      )
-                    : date
-                    ? language.$('artistPage.creditList.album.withDate', {
-                        album: link.album(album),
-                        date: language.formatDate(date),
-                      })
-                    : duration
-                    ? language.$('artistPage.creditList.album.withDuration', {
-                        album: link.album(album),
-                        duration: language.formatDuration(duration, {
-                          approximate: true,
-                        }),
-                      })
-                    : language.$('artistPage.creditList.album', {
-                        album: link.album(album),
-                      })
-                }</dt>
-                <dd><ul>
-                    ${chunk
-                      .map(({track, ...props}) => ({
-                        original: track.originalReleaseTrack,
-                        entry: language.$(
-                          'artistPage.creditList.entry.track.withDuration',
-                          {
-                            track: link.track(track),
-                            duration: language.formatDuration(
-                              track.duration ?? 0
-                            ),
-                          }
-                        ),
-                        ...props,
-                      }))
-                      .map(({original, ...opts}) =>
-                        html.tag(
-                          'li',
-                          {class: original && 'rerelease'},
-                          generateEntryAccents({
-                            getArtistString,
-                            language,
-                            original,
-                            ...opts,
-                          })
-                        )
-                      )
-                      .join('\n')}
-                </ul></dd>
-            `
-              )
-              .join('\n')}
-        </dl>
-    `;
+  const unbound_generateTrackList = (chunks, {
+    getArtistString,
+    html,
+    language,
+    link,
+  }) =>
+    html.tag('dl',
+      chunks.flatMap(({date, album, chunk, duration}) => [
+        html.tag('dt',
+          date && duration ?
+            language.$('artistPage.creditList.album.withDate.withDuration', {
+              album: link.album(album),
+              date: language.formatDate(date),
+              duration: language.formatDuration(duration, {
+                approximate: true,
+              }),
+            }) :
+
+          date ?
+            language.$('artistPage.creditList.album.withDate', {
+              album: link.album(album),
+              date: language.formatDate(date),
+            }) :
+
+          duration ?
+            language.$('artistPage.creditList.album.withDuration', {
+              album: link.album(album),
+              duration: language.formatDuration(duration, {
+                approximate: true,
+              }),
+            }) :
+
+          language.$('artistPage.creditList.album', {
+            album: link.album(album),
+          })),
+
+        html.tag('dd',
+          html.tag('ul',
+            chunk
+              .map(({track, ...props}) => ({
+                original: track.originalReleaseTrack,
+                entry: language.$('artistPage.creditList.entry.track.withDuration', {
+                  track: link.track(track),
+                  duration: language.formatDuration(
+                    track.duration ?? 0
+                  ),
+                }),
+                ...props,
+              }))
+              .map(({original, ...opts}) =>
+                html.tag(
+                  'li',
+                  {class: original && 'rerelease'},
+                  generateEntryAccents({
+                    getArtistString,
+                    language,
+                    original,
+                    ...opts,
+                  })
+                )
+              ))),
+      ]));
 
   const unbound_serializeArtistsAndContrib =
     (key, {serializeContribs, serializeLink}) =>
@@ -287,6 +264,15 @@ export function write(artist, {wikiData}) {
         duration: track.duration,
       })),
     }));
+
+  const jumpTo = {
+    tracks: allTracks.length > 0,
+    art: artThingsAll.length > 0,
+    flashes: wikiInfo.enableFlashesAndGames && flashes.length > 0,
+    commentary: commentaryThings.length > 0,
+  };
+
+  const showJumpTo = Object.values(jumpTo).includes(true);
 
   const data = {
     type: 'data',
@@ -353,300 +339,258 @@ export function write(artist, {wikiData}) {
       generateInfoGalleryLinks,
       getArtistAvatar,
       getArtistString,
+      html,
       link,
       language,
       transformMultiline,
     }) => {
       const generateTrackList = bindOpts(unbound_generateTrackList, {
         getArtistString,
-        link,
+        html,
         language,
+        link,
       });
 
       return {
         title: language.$('artistPage.title', {artist: name}),
 
         main: {
-          content: fixWS`
-                        ${
-                          artist.hasAvatar &&
-                          generateCoverLink({
-                            src: getArtistAvatar(artist),
-                            alt: language.$('misc.alt.artistAvatar'),
-                          })
-                        }
-                        <h1>${language.$('artistPage.title', {
-                          artist: name,
-                        })}</h1>
-                        ${
-                          contextNotes &&
-                          fixWS`
-                            <p>${language.$('releaseInfo.note')}</p>
-                            <blockquote>
-                                ${transformMultiline(contextNotes)}
-                            </blockquote>
-                            <hr>
-                        `
-                        }
-                        ${
-                          urls?.length &&
-                          `<p>${language.$('releaseInfo.visitOn', {
-                            links: language.formatDisjunctionList(
-                              urls.map((url) => fancifyURL(url, {language}))
+          content: [
+            artist.hasAvatar &&
+              generateCoverLink({
+                src: getArtistAvatar(artist),
+                alt: language.$('misc.alt.artistAvatar'),
+              }),
+
+            html.tag('h1',
+              language.$('artistPage.title', {
+                artist: name,
+              })),
+
+            ...contextNotes ? [
+              html.tag('p',
+                language.$('releaseInfo.note')),
+
+              html.tag('blockquote',
+                transformMultiline(contextNotes)),
+
+              html.tag('hr'),
+            ] : [],
+
+            urls?.length &&
+              html.tag('p',
+                language.$('releaseInfo.visitOn', {
+                  links: language.formatDisjunctionList(
+                    urls.map((url) => fancifyURL(url, {language}))
+                  ),
+                })),
+
+            hasGallery &&
+              html.tag('p',
+                language.$('artistPage.viewArtGallery', {
+                  link: link.artistGallery(artist, {
+                    text: language.$('artistPage.viewArtGallery.link'),
+                  }),
+                })),
+
+            showJumpTo &&
+              html.tag('p',
+                language.$('misc.jumpTo.withLinks', {
+                  links: language.formatUnitList(
+                    [
+                      jumpTo.tracks &&
+                        html.tag('a',
+                          {href: '#tracks'},
+                          language.$('artistPage.trackList.title')),
+
+                      jumpTo.art &&
+                        html.tag('a',
+                          {href: '#art'},
+                          language.$('artistPage.artList.title')),
+
+                      jumpTo.flashes &&
+                        html.tag('a',
+                          {href: '#flashes'},
+                          language.$('artistPage.flashList.title')),
+
+                      jumpTo.commentary &&
+                        html.tag('a',
+                          {href: '#commentary'},
+                          language.$('artistPage.commentaryList.title')),
+                    ].filter(Boolean)),
+                })),
+
+            ...allTracks.length ? [
+              html.tag('h2',
+                {id: 'tracks'},
+                language.$('artistPage.trackList.title')),
+
+              totalDuration &&
+                html.tag('p',
+                  language.$('artistPage.contributedDurationLine', {
+                    artist: artist.name,
+                    duration: language.formatDuration(
+                      totalDuration,
+                      {
+                        approximate: true,
+                        unit: true,
+                      }
+                    ),
+                  })),
+
+              musicGroups.length &&
+                html.tag('p',
+                  language.$('artistPage.musicGroupsLine', {
+                    groups: language.formatUnitList(
+                      musicGroups.map(({group, contributions}) =>
+                        language.$('artistPage.groupsLine.item', {
+                          group: link.groupInfo(group),
+                          contributions:
+                            language.countContributions(
+                              contributions
                             ),
-                          })}</p>`
-                        }
-                        ${
-                          hasGallery &&
-                          `<p>${language.$('artistPage.viewArtGallery', {
-                            link: link.artistGallery(artist, {
-                              text: language.$(
-                                'artistPage.viewArtGallery.link'
-                              ),
-                            }),
-                          })}</p>`
-                        }
-                        <p>${language.$('misc.jumpTo.withLinks', {
-                          links: language.formatUnitList(
-                            [
-                              allTracks.length &&
-                                `<a href="#tracks">${language.$(
-                                  'artistPage.trackList.title'
-                                )}</a>`,
-                              artThingsAll.length &&
-                                `<a href="#art">${language.$(
-                                  'artistPage.artList.title'
-                                )}</a>`,
-                              wikiInfo.enableFlashesAndGames &&
-                                flashes.length &&
-                                `<a href="#flashes">${language.$(
-                                  'artistPage.flashList.title'
-                                )}</a>`,
-                              commentaryThings.length &&
-                                `<a href="#commentary">${language.$(
-                                  'artistPage.commentaryList.title'
-                                )}</a>`,
-                            ].filter(Boolean)
+                        })
+                      )
+                    ),
+                  })),
+
+              generateTrackList(trackListChunks),
+            ] : [],
+
+            ...artThingsAll.length ? [
+              html.tag('h2',
+                {id: 'art'},
+                language.$('artistPage.artList.title')),
+
+              hasGallery &&
+                html.tag('p',
+                  language.$('artistPage.viewArtGallery.orBrowseList', {
+                    link: link.artistGallery(artist, {
+                      text: language.$('artistPage.viewArtGallery.link'),
+                    })
+                  })),
+
+              artGroups.length &&
+                html.tag('p',
+                  language.$('artistPage.artGroupsLine', {
+                  groups: language.formatUnitList(
+                    artGroups.map(({group, contributions}) =>
+                      language.$('artistPage.groupsLine.item', {
+                        group: link.groupInfo(group),
+                        contributions:
+                          language.countContributions(
+                            contributions
                           ),
-                        })}</p>
-                        ${
-                          allTracks.length &&
-                          fixWS`
-                            <h2 id="tracks">${language.$(
-                              'artistPage.trackList.title'
-                            )}</h2>
-                            <p>${language.$(
-                              'artistPage.contributedDurationLine',
-                              {
-                                artist: artist.name,
-                                duration: language.formatDuration(
-                                  totalDuration,
-                                  {
-                                    approximate: true,
-                                    unit: true,
-                                  }
-                                ),
-                              }
-                            )}</p>
-                            <p>${language.$('artistPage.musicGroupsLine', {
-                              groups: language.formatUnitList(
-                                musicGroups.map(({group, contributions}) =>
-                                  language.$('artistPage.groupsLine.item', {
-                                    group: link.groupInfo(group),
-                                    contributions:
-                                      language.countContributions(
-                                        contributions
-                                      ),
-                                  })
-                                )
-                              ),
-                            })}</p>
-                            ${generateTrackList(trackListChunks)}
-                        `
-                        }
-                        ${
-                          artThingsAll.length &&
-                          fixWS`
-                            <h2 id="art">${language.$(
-                              'artistPage.artList.title'
-                            )}</h2>
-                            ${
-                              hasGallery &&
-                              `<p>${language.$(
-                                'artistPage.viewArtGallery.orBrowseList',
-                                {
-                                  link: link.artistGallery(artist, {
-                                    text: language.$(
-                                      'artistPage.viewArtGallery.link'
-                                    ),
-                                  }),
-                                }
-                              )}</p>`
-                            }
-                            <p>${language.$('artistPage.artGroupsLine', {
-                              groups: language.formatUnitList(
-                                artGroups.map(({group, contributions}) =>
-                                  language.$('artistPage.groupsLine.item', {
-                                    group: link.groupInfo(group),
-                                    contributions:
-                                      language.countContributions(
-                                        contributions
-                                      ),
-                                  })
-                                )
-                              ),
-                            })}</p>
-                            <dl>
-                                ${artListChunks
-                                  .map(
-                                    ({date, album, chunk}) => fixWS`
-                                    <dt>${language.$(
-                                      'artistPage.creditList.album.withDate',
-                                      {
-                                        album: link.album(album),
-                                        date: language.formatDate(date),
-                                      }
-                                    )}</dt>
-                                    <dd><ul>
-                                        ${chunk
-                                          .map(
-                                            ({
-                                              track,
-                                              key,
-                                              ...props
-                                            }) => ({
-                                              entry: track
-                                                ? language.$(
-                                                    'artistPage.creditList.entry.track',
-                                                    {
-                                                      track: link.track(track),
-                                                    }
-                                                  )
-                                                : `<i>${language.$(
-                                                    'artistPage.creditList.entry.album.' +
-                                                      {
-                                                        wallpaperArtistContribs:
-                                                          'wallpaperArt',
-                                                        bannerArtistContribs:
-                                                          'bannerArt',
-                                                        coverArtistContribs:
-                                                          'coverArt',
-                                                      }[key]
-                                                  )}</i>`,
-                                              ...props,
-                                            })
-                                          )
-                                          .map((opts) =>
-                                            generateEntryAccents({
-                                              getArtistString,
-                                              language,
-                                              ...opts,
-                                            })
-                                          )
-                                          .map((row) => `<li>${row}</li>`)
-                                          .join('\n')}
-                                    </ul></dd>
-                                `
-                                  )
-                                  .join('\n')}
-                            </dl>
-                        `
-                        }
-                        ${
-                          wikiInfo.enableFlashesAndGames &&
-                          flashes.length &&
-                          fixWS`
-                            <h2 id="flashes">${language.$(
-                              'artistPage.flashList.title'
-                            )}</h2>
-                            <dl>
-                                ${flashListChunks
-                                  .map(
-                                    ({
-                                      act,
-                                      chunk,
-                                      dateFirst,
-                                      dateLast,
-                                    }) => fixWS`
-                                    <dt>${language.$(
-                                      'artistPage.creditList.flashAct.withDateRange',
-                                      {
-                                        act: link.flash(chunk[0].flash, {
-                                          text: act.name,
-                                        }),
-                                        dateRange: language.formatDateRange(
-                                          dateFirst,
-                                          dateLast
-                                        ),
-                                      }
-                                    )}</dt>
-                                    <dd><ul>
-                                        ${chunk
-                                          .map(({flash, ...props}) => ({
-                                            entry: language.$(
-                                              'artistPage.creditList.entry.flash',
-                                              {
-                                                flash: link.flash(flash),
-                                              }
-                                            ),
-                                            ...props,
-                                          }))
-                                          .map((opts) =>
-                                            generateEntryAccents({
-                                              getArtistString,
-                                              language,
-                                              ...opts,
-                                            })
-                                          )
-                                          .map((row) => `<li>${row}</li>`)
-                                          .join('\n')}
-                                    </ul></dd>
-                                `
-                                  )
-                                  .join('\n')}
-                            </dl>
-                        `
-                        }
-                        ${
-                          commentaryThings.length &&
-                          fixWS`
-                            <h2 id="commentary">${language.$(
-                              'artistPage.commentaryList.title'
-                            )}</h2>
-                            <dl>
-                                ${commentaryListChunks
-                                  .map(
-                                    ({album, chunk}) => fixWS`
-                                    <dt>${language.$(
-                                      'artistPage.creditList.album',
-                                      {
-                                        album: link.album(album),
-                                      }
-                                    )}</dt>
-                                    <dd><ul>
-                                        ${chunk
-                                          .map(({track}) =>
-                                            track
-                                              ? language.$(
-                                                  'artistPage.creditList.entry.track',
-                                                  {
-                                                    track: link.track(track),
-                                                  }
-                                                )
-                                              : `<i>${language.$(
-                                                  'artistPage.creditList.entry.album.commentary'
-                                                )}</i>`
-                                          )
-                                          .map((row) => `<li>${row}</li>`)
-                                          .join('\n')}
-                                    </ul></dd>
-                                `
-                                  )
-                                  .join('\n')}
-                            </dl>
-                        `
-                        }
-                    `,
+                      })
+                    )
+                  ),
+                })),
+
+              html.tag('dl',
+                artListChunks.flatMap(({date, album, chunk}) => [
+                  html.tag('dt', language.$('artistPage.creditList.album.withDate', {
+                    album: link.album(album),
+                    date: language.formatDate(date),
+                  })),
+
+                  html.tag('dd',
+                    html.tag('ul',
+                      chunk
+                        .map(({track, key, ...props}) => ({
+                          ...props,
+                          entry:
+                            track
+                              ? language.$('artistPage.creditList.entry.track', {
+                                  track: link.track(track),
+                                })
+                              : html.tag('i',
+                                  language.$('artistPage.creditList.entry.album.' + {
+                                    wallpaperArtistContribs:
+                                      'wallpaperArt',
+                                    bannerArtistContribs:
+                                      'bannerArt',
+                                    coverArtistContribs:
+                                      'coverArt',
+                                  }[key])),
+                        }))
+                        .map((opts) => generateEntryAccents({
+                          getArtistString,
+                          language,
+                          ...opts,
+                        }))
+                        .map(row => html.tag('li', row)))),
+                ])),
+            ] : [],
+
+            ...(
+              wikiInfo.enableFlashesAndGames &&
+              flashes.length
+            ) ? [
+              html.tag('h2',
+                {id: 'flashes'},
+                language.$('artistPage.flashList.title')),
+
+              html.tag('dl',
+                flashListChunks.flatMap(({
+                  act,
+                  chunk,
+                  dateFirst,
+                  dateLast,
+                }) => [
+                  html.tag('dt',
+                    language.$('artistPage.creditList.flashAct.withDateRange', {
+                      act: link.flash(chunk[0].flash, {
+                        text: act.name,
+                      }),
+                      dateRange: language.formatDateRange(
+                        dateFirst,
+                        dateLast
+                      ),
+                    })),
+
+                  html.tag('dd',
+                    html.tag('ul',
+                      chunk
+                        .map(({flash, ...props}) => ({
+                          ...props,
+                          entry: language.$('artistPage.creditList.entry.flash', {
+                            flash: link.flash(flash),
+                          }),
+                        }))
+                        .map(opts => generateEntryAccents({
+                          getArtistString,
+                          language,
+                          ...opts,
+                        }))
+                        .map(row => html.tag('li', row)))),
+                ])),
+            ] : [],
+
+            ...commentaryThings.length ? [
+              html.tag('h2',
+                {id: 'commentary'},
+                language.$('artistPage.commentaryList.title')),
+
+              html.tag('dl',
+                commentaryListChunks.flatMap(({album, chunk}) => [
+                  html.tag('dt',
+                    language.$('artistPage.creditList.album', {
+                      album: link.album(album),
+                    })),
+
+                  html.tag('dd',
+                    html.tag('ul',
+                      chunk
+                        .map(({track}) => track
+                          ? language.$('artistPage.creditList.entry.track', {
+                              track: link.track(track),
+                            })
+                          : html.tag('i',
+                              language.$('artistPage.creditList.entry.album.commentary')))
+                        .map(row => html.tag('li', row)))),
+                ])),
+            ] : [],
+          ],
         },
 
         nav: generateNavForArtist(artist, false, hasGallery, {
@@ -667,6 +611,7 @@ export function write(artist, {wikiData}) {
       getAlbumCover,
       getGridHTML,
       getTrackCover,
+      html,
       link,
       language,
     }) => ({
@@ -674,35 +619,34 @@ export function write(artist, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: fixWS`
-                    <h1>${language.$('artistGalleryPage.title', {
-                      artist: name,
-                    })}</h1>
-                    <p class="quick-info">${language.$(
-                      'artistGalleryPage.infoLine',
-                      {
-                        coverArts: language.countCoverArts(
-                          artThingsGallery.length,
-                          {
-                            unit: true,
-                          }
-                        ),
-                      }
-                    )}</p>
-                    <div class="grid-listing">
-                        ${getGridHTML({
-                          entries: artThingsGallery.map((item) => ({item})),
-                          srcFn: (thing) =>
-                            thing.album
-                              ? getTrackCover(thing)
-                              : getAlbumCover(thing),
-                          linkFn: (thing, opts) =>
-                            thing.album
-                              ? link.track(thing, opts)
-                              : link.album(thing, opts),
-                        })}
-                    </div>
-                `,
+        content: [
+          html.tag('h1',
+            language.$('artistGalleryPage.title', {
+              artist: name,
+            })),
+
+          html.tag('p',
+            {class: 'quick-info'},
+            language.$('artistGalleryPage.infoLine', {
+              coverArts: language.countCoverArts(artThingsGallery.length, {
+                unit: true,
+              }),
+            })),
+
+          html.tag('div',
+            {class: 'grid-listing'},
+            getGridHTML({
+              entries: artThingsGallery.map((item) => ({item})),
+              srcFn: (thing) =>
+                thing.album
+                  ? getTrackCover(thing)
+                  : getAlbumCover(thing),
+              linkFn: (thing, opts) =>
+                thing.album
+                  ? link.track(thing, opts)
+                  : link.album(thing, opts),
+            })),
+        ],
       },
 
       nav: generateNavForArtist(artist, true, hasGallery, {

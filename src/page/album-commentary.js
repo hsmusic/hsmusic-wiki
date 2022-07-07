@@ -2,12 +2,7 @@
 
 // Album commentary page and index specifications.
 
-// Imports
-
-import * as html from '../util/html.js';
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';
-
-// Page exports
 
 export function condition({wikiData}) {
   return filterAlbumsByCommentary(wikiData.albumData).length;
@@ -30,8 +25,9 @@ export function write(album) {
       getAlbumStylesheet,
       getLinkThemeString,
       getThemeString,
-      link,
+      html,
       language,
+      link,
       transformMultiline,
     }) => ({
       title: language.$('albumCommentaryPage.title', {album: album.name}),
@@ -105,7 +101,11 @@ export function writeTargetless({wikiData}) {
   const page = {
     type: 'page',
     path: ['commentaryIndex'],
-    page: ({link, language}) => ({
+    page: ({
+      html,
+      language,
+      link,
+    }) => ({
       title: language.$('commentaryIndex.title'),
 
       main: {

@@ -2,16 +2,12 @@
 
 // Track page specification.
 
-// Imports
-
 import {
   generateAlbumChronologyLinks,
   generateAlbumNavLinks,
   generateAlbumSecondaryNav,
   generateAlbumSidebar,
 } from './album.js';
-
-import * as html from '../util/html.js';
 
 import {bindOpts} from '../util/sugar.js';
 
@@ -20,8 +16,6 @@ import {
   getAlbumListTag,
   sortChronologically,
 } from '../util/wiki-data.js';
-
-// Page exports
 
 export function targets({wikiData}) {
   return wikiData.trackData;
@@ -48,7 +42,12 @@ export function write(track, {wikiData}) {
     );
   }
 
-  const unbound_getTrackItem = (track, {getArtistString, link, language}) =>
+  const unbound_getTrackItem = (track, {
+    getArtistString,
+    html,
+    language,
+    link,
+  }) =>
     html.tag('li',
       language.$('trackList.item.withArtists', {
         track: link.track(track),
@@ -159,6 +158,7 @@ export function write(track, {wikiData}) {
       getLinkThemeString,
       getThemeString,
       getTrackCover,
+      html,
       link,
       language,
       transformLyrics,
@@ -168,8 +168,9 @@ export function write(track, {wikiData}) {
     }) => {
       const getTrackItem = bindOpts(unbound_getTrackItem, {
         getArtistString,
-        link,
+        html,
         language,
+        link,
       });
       const cover = getTrackCover(track);
 
@@ -338,8 +339,9 @@ export function write(track, {wikiData}) {
         sidebarLeft: generateAlbumSidebar(album, track, {
           fancifyURL,
           getLinkThemeString,
-          link,
+          html,
           language,
+          link,
           transformMultiline,
           wikiData,
         }),
@@ -369,6 +371,7 @@ export function write(track, {wikiData}) {
 
           content: generateAlbumChronologyLinks(album, track, {
             generateChronologyLinks,
+            html,
           }),
 
           bottomRowContent:
@@ -380,9 +383,10 @@ export function write(track, {wikiData}) {
         },
 
         secondaryNav: generateAlbumSecondaryNav(album, track, {
+          getLinkThemeString,
+          html,
           language,
           link,
-          getLinkThemeString,
         }),
       };
     },

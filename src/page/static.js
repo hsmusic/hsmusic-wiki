@@ -4,12 +4,6 @@
 // wiki data folder, used for a variety of purposes, e.g. wiki info,
 // changelog, and so on.)
 
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-// Page exports
-
 export function targets({wikiData}) {
   return wikiData.staticPageData;
 }
@@ -18,17 +12,14 @@ export function write(staticPage) {
   const page = {
     type: 'page',
     path: ['staticPage', staticPage.directory],
-    page: ({transformMultiline}) => ({
+    page: ({html, transformMultiline}) => ({
       title: staticPage.name,
       stylesheet: staticPage.stylesheet,
 
       main: {
-        content: fixWS`
-                    <div class="long-content">
-                        <h1>${staticPage.name}</h1>
-                        ${transformMultiline(staticPage.content)}
-                    </div>
-                `,
+        content: html.tag('div',
+          {class: 'long-content'},
+          transformMultiline(staticPage.content)),
       },
 
       nav: {simple: true},
