@@ -54,6 +54,8 @@ import {
   unlink,
 } from 'fs/promises';
 
+import { execSync } from 'child_process';
+
 import genThumbs from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
@@ -150,6 +152,15 @@ import FileSizePreloader from './file-size-preloader.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const CACHEBUST = 11;
+
+let COMMIT;
+try {
+  COMMIT = execSync('git log --format="%h %B" -n 1 HEAD').toString().trim();
+} catch (error) {
+  COMMIT = '(failed to detect)';
+}
+
+const BUILD_TIME = new Date();
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
@@ -1219,6 +1230,31 @@ writePage.html = (
           'data-rebase-media': to('media.root'),
           'data-rebase-data': to('data.root'),
         })}>
+            <!--
+              ${[
+                wikiInfo.canonicalBase
+                  ? `hsmusic.wiki - ${wikiInfo.name}, ${wikiInfo.canonicalBase}`
+                  : `hsmusic.wiki - ${wikiInfo.name}`,
+                'Code copyright 2019-2022 Quasar Nebula et al (MIT License)',
+                ...wikiInfo.canonicalBase === 'https://hsmusic.wiki/' ? [
+                  'Data avidly compiled and localization brought to you',
+                  'by our awesome team and community of wiki contributors',
+                  '***',
+                  'Want to contribute? Join our Discord or leave feedback!',
+                  '- https://hsmusic.wiki/discord/',
+                  '- https://hsmusic.wiki/feedback/',
+                  '- https://github.com/hsmusic/',
+                ] : [
+                  'https://github.com/hsmusic/',
+                ],
+                '***',
+                `Site built: ${BUILD_TIME.toLocaleString('en-US', {
+                  dateStyle: 'long',
+                  timeStyle: 'long',
+                })}`,
+                `Latest code commit: ${COMMIT}`,
+              ].filter(Boolean).join('\n')}
+            -->
             <head>
                 <title>${
                   showWikiNameInTitle
