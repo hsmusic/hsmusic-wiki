@@ -55,7 +55,7 @@ export function tag(tagName, ...args) {
   }
 
   if (attrs) {
-    const attrString = attributes(args[0]);
+    const attrString = attributes(attrs);
     if (attrString) {
       openTag = `${tagName} ${attrString}`;
     }
@@ -120,4 +120,20 @@ export function attributes(attribs) {
         : `${key}="${escapeAttributeValue(val)}"`
     )
     .join(' ');
+}
+
+// Ensures the passed value is an array of elements, for usage in [...spread]
+// syntax. This may be used when it's not guaranteed whether the return value of
+// an external function is one child or an array, or in combination with
+// conditionals, e.g. fragment(cond && [x, y, z]).
+export function fragment(childOrChildren) {
+  if (!childOrChildren) {
+    return [];
+  }
+
+  if (Array.isArray(childOrChildren)) {
+    return childOrChildren;
+  }
+
+  return [childOrChildren];
 }

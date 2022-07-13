@@ -10,15 +10,7 @@
 // Individual listing specs are described in src/listing-spec.js, but are
 // provided via wikiData like other (normal) data objects.
 
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-import * as html from '../util/html.js';
-
 import {getTotalDuration} from '../util/wiki-data.js';
-
-// Page exports
 
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableListings;
@@ -39,40 +31,43 @@ export function write(listing, {wikiData}) {
     type: 'page',
     path: ['listing', listing.directory],
     page: (opts) => {
-      const {getLinkThemeString, link, language} = opts;
+      const {
+        getLinkThemeString,
+        html,
+        language,
+        link,
+      } = opts;
+
       const titleKey = `listingPage.${listing.stringsKey}.title`;
 
       return {
         title: language.$(titleKey),
 
         main: {
-          content: fixWS`
-                        <h1>${language.$(titleKey)}</h1>
-                        ${
-                          listing.html &&
-                          (listing.data
-                            ? listing.html(data, opts)
-                            : listing.html(opts))
-                        }
-                        ${
-                          listing.row &&
-                          fixWS`
-                            <ul>
-                                ${data
-                                  .map((item) => listing.row(item, opts))
-                                  .map((row) => `<li>${row}</li>`)
-                                  .join('\n')}
-                            </ul>
-                        `
-                        }
-                    `,
+          content: [
+            html.tag('h1',
+              language.$(titleKey)),
+
+            ...html.fragment(
+              listing.html &&
+                (listing.data
+                  ? listing.html(data, opts)
+                  : listing.html(opts))),
+
+            listing.row &&
+              html.tag('ul',
+                data.map((item) =>
+                  html.tag('li',
+                    listing.row(item, opts)))),
+          ],
         },
 
         sidebarLeft: {
           content: generateSidebarForListings(listing, {
             getLinkThemeString,
-            link,
+            html,
             language,
+            link,
             wikiData,
           }),
         },
@@ -103,40 +98,58 @@ export function writeTargetless({wikiData}) {
   const page = {
     type: 'page',
     path: ['listingIndex'],
-    page: ({getLinkThemeString, language, link}) => ({
+    page: ({
+      getLinkThemeString,
+      html,
+      language,
+      link,
+    }) => ({
       title: language.$('listingIndex.title'),
 
       main: {
-        content: fixWS`
-                    <h1>${language.$('listingIndex.title')}</h1>
-                    <p>${language.$('listingIndex.infoLine', {
-                      wiki: wikiInfo.name,
-                      tracks: `<b>${language.countTracks(trackData.length, {
-                        unit: true,
-                      })}</b>`,
-                      albums: `<b>${language.countAlbums(albumData.length, {
-                        unit: true,
-                      })}</b>`,
-                      duration: `<b>${language.formatDuration(totalDuration, {
-                        approximate: true,
-                        unit: true,
-                      })}</b>`,
-                    })}</p>
-                    <hr>
-                    <p>${language.$('listingIndex.exploreList')}</p>
-                    ${generateLinkIndexForListings(null, false, {
-                      link,
-                      language,
-                      wikiData,
-                    })}
-                `,
+        content: [
+          html.tag('h1',
+            language.$('listingIndex.title')),
+
+          html.tag('p',
+            language.$('listingIndex.infoLine', {
+              wiki: wikiInfo.name,
+              tracks: html.tag('b',
+                language.countTracks(trackData.length, {
+                  unit: true,
+                })),
+              albums: html.tag('b',
+                language.countAlbums(albumData.length, {
+                  unit: true,
+                })),
+              duration: html.tag('b',
+                language.formatDuration(totalDuration, {
+                  approximate: true,
+                  unit: true,
+                })),
+            })),
+
+          html.tag('hr'),
+
+          html.tag('p',
+            language.$('listingIndex.exploreList')),
+
+          ...html.fragment(
+            generateLinkIndexForListings(null, false, {
+              html,
+              link,
+              language,
+              wikiData,
+            })),
+        ],
       },
 
       sidebarLeft: {
         content: generateSidebarForListings(null, {
           getLinkThemeString,
-          link,
+          html,
           language,
+          link,
           wikiData,
         }),
       },
@@ -150,28 +163,37 @@ export function writeTargetless({wikiData}) {
 
 // Utility functions
 
-function generateSidebarForListings(
-  currentListing,
-  {getLinkThemeString, link, language, wikiData}
-) {
-  return fixWS`
-        <h1>${link.listingIndex('', {
-          text: language.$('listingIndex.title'),
-        })}</h1>
-        ${generateLinkIndexForListings(currentListing, true, {
-          getLinkThemeString,
-          link,
-          language,
-          wikiData,
-        })}
-    `;
+function generateSidebarForListings(currentListing, {
+  getLinkThemeString,
+  html,
+  language,
+  link,
+  wikiData,
+}) {
+  return [
+    html.tag('h1',
+      link.listingIndex('', {
+        text: language.$('listingIndex.title'),
+      })),
+
+    ...html.fragment(
+      generateLinkIndexForListings(currentListing, true, {
+        getLinkThemeString,
+        html,
+        language,
+        link,
+        wikiData,
+      })),
+  ];
 }
 
-function generateLinkIndexForListings(
-  currentListing,
-  forSidebar,
-  {getLinkThemeString, link, language, wikiData}
-) {
+function generateLinkIndexForListings(currentListing, forSidebar, {
+  getLinkThemeString,
+  html,
+  language,
+  link,
+  wikiData,
+}) {
   const {listingTargetSpec, wikiInfo} = wikiData;
 
   const filteredByCondition = listingTargetSpec
@@ -182,46 +204,34 @@ function generateLinkIndexForListings(
     .filter(({listings}) => listings.length > 0);
 
   const genUL = (listings) =>
-    html.tag(
-      'ul',
+    html.tag('ul',
       listings.map((listing) =>
-        html.tag(
-          'li',
+        html.tag('li',
           {class: [listing === currentListing && 'current']},
           link.listing(listing, {
             text: language.$(`listingPage.${listing.stringsKey}.title.short`),
-          })
-        )
-      )
-    );
+          }))));
 
-  if (forSidebar) {
-    return filteredByCondition
-      .map(({title, listings}) =>
-        html.tag(
-          'details',
+  return forSidebar
+    ? filteredByCondition.map(({title, listings}) =>
+        html.tag('details',
           {
-            open: !forSidebar || listings.includes(currentListing),
+            open: listings.includes(currentListing),
             class: listings.includes(currentListing) && 'current',
           },
           [
-            html.tag(
-              'summary',
+            html.tag('summary',
               {style: getLinkThemeString(wikiInfo.color)},
-              html.tag('span', {class: 'group-name'}, title({language}))
-            ),
+              html.tag('span',
+                {class: 'group-name'},
+                title({language}))),
             genUL(listings),
-          ]
-        )
-      )
-      .join('\n');
-  } else {
-    return html.tag(
-      'dl',
-      filteredByCondition.flatMap(({title, listings}) => [
-        html.tag('dt', title({language})),
-        html.tag('dd', genUL(listings)),
-      ])
-    );
-  }
+          ]))
+    : html.tag('dl',
+        filteredByCondition.flatMap(({title, listings}) => [
+          html.tag('dt',
+            title({language})),
+          html.tag('dd',
+            genUL(listings)),
+        ]));
 }

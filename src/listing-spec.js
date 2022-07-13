@@ -15,237 +15,198 @@ const listingSpec = [
     directory: 'albums/by-name',
     stringsKey: 'listAlbums.byName',
 
-    data({wikiData}) {
-      return sortAlphabetically(wikiData.albumData.slice());
-    },
+    data: ({wikiData: {albumData}}) =>
+      sortAlphabetically(albumData.slice()),
 
-    row(album, {link, language}) {
-      return language.$('listingPage.listAlbums.byName.item', {
+    row: (album, {language, link}) =>
+      language.$('listingPage.listAlbums.byName.item', {
         album: link.album(album),
         tracks: language.countTracks(album.tracks.length, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'albums/by-tracks',
     stringsKey: 'listAlbums.byTracks',
 
-    data({wikiData}) {
-      return wikiData.albumData
-        .slice()
-        .sort((a, b) => b.tracks.length - a.tracks.length);
-    },
+    data: ({wikiData: {albumData}}) =>
+      albumData.slice()
+        .sort((a, b) => b.tracks.length - a.tracks.length),
 
-    row(album, {link, language}) {
-      return language.$('listingPage.listAlbums.byTracks.item', {
+    row: (album, {language, link}) =>
+      language.$('listingPage.listAlbums.byTracks.item', {
         album: link.album(album),
         tracks: language.countTracks(album.tracks.length, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'albums/by-duration',
     stringsKey: 'listAlbums.byDuration',
 
-    data({wikiData}) {
-      return wikiData.albumData
-        .map((album) => ({album, duration: getTotalDuration(album.tracks)}))
-        .sort((a, b) => b.duration - a.duration);
-    },
+    data: ({wikiData: {albumData}}) =>
+      albumData
+        .map(album => ({
+          album,
+          duration: getTotalDuration(album.tracks),
+        }))
+        .filter(album => album.duration)
+        .sort((a, b) => b.duration - a.duration),
 
-    row({album, duration}, {link, language}) {
-      return language.$('listingPage.listAlbums.byDuration.item', {
+    row: ({album, duration}, {language, link}) =>
+      language.$('listingPage.listAlbums.byDuration.item', {
         album: link.album(album),
         duration: language.formatDuration(duration),
-      });
-    },
+      }),
   },
 
   {
     directory: 'albums/by-date',
     stringsKey: 'listAlbums.byDate',
 
-    data({wikiData}) {
-      return sortChronologically(
-        wikiData.albumData.filter((album) => album.date)
-      );
-    },
+    data: ({wikiData: {albumData}}) =>
+      sortChronologically(
+        albumData
+          .filter(album => album.date)),
 
-    row(album, {link, language}) {
-      return language.$('listingPage.listAlbums.byDate.item', {
+    row: (album, {language, link}) =>
+      language.$('listingPage.listAlbums.byDate.item', {
         album: link.album(album),
         date: language.formatDate(album.date),
-      });
-    },
+      }),
   },
 
   {
     directory: 'albums/by-date-added',
     stringsKey: 'listAlbums.byDateAdded',
 
-    data({wikiData}) {
-      return chunkByProperties(
-        wikiData.albumData
-          .filter((a) => a.dateAddedToWiki)
+    data: ({wikiData: {albumData}}) =>
+      chunkByProperties(
+        albumData
+          .filter(a => a.dateAddedToWiki)
           .sort((a, b) => {
             if (a.dateAddedToWiki < b.dateAddedToWiki) return -1;
             if (a.dateAddedToWiki > b.dateAddedToWiki) return 1;
           }),
-        ['dateAddedToWiki']
-      );
-    },
+        ['dateAddedToWiki']),
 
-    html(chunks, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${chunks
-                      .map(
-                        ({dateAddedToWiki, chunk: albums}) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listAlbums.byDateAdded.date',
-                          {
-                            date: language.formatDate(dateAddedToWiki),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${albums
-                              .map((album) =>
-                                language.$(
-                                  'listingPage.listAlbums.byDateAdded.album',
-                                  {
-                                    album: link.album(album),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul></dd>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    html: (chunks, {html, language, link}) =>
+      html.tag('dl',
+        chunks.flatMap(({dateAddedToWiki, chunk: albums}) => [
+          html.tag('dt',
+            language.$('listingPage.listAlbums.byDateAdded.date', {
+              date: language.formatDate(dateAddedToWiki),
+            })),
+          html.tag('dd',
+            html.tag('ul',
+              albums.map((album) =>
+                html.tag('li',
+                  language.$('listingPage.listAlbums.byDateAdded.album', {
+                    album: link.album(album),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'artists/by-name',
     stringsKey: 'listArtists.byName',
 
-    data({wikiData}) {
-      return sortAlphabetically(wikiData.artistData.slice()).map((artist) => ({
-        artist,
-        contributions: getArtistNumContributions(artist),
-      }));
-    },
+    data: ({wikiData: {artistData}}) =>
+      sortAlphabetically(artistData.slice())
+        .map(artist => ({
+          artist,
+          contributions: getArtistNumContributions(artist),
+        })),
 
-    row({artist, contributions}, {link, language}) {
-      return language.$('listingPage.listArtists.byName.item', {
+    row: ({artist, contributions}, {link, language}) =>
+      language.$('listingPage.listArtists.byName.item', {
         artist: link.artist(artist),
         contributions: language.countContributions(contributions, {
           unit: true,
         }),
-      });
-    },
+      }),
   },
 
   {
     directory: 'artists/by-contribs',
     stringsKey: 'listArtists.byContribs',
 
-    data({wikiData}) {
-      return {
-        toTracks: wikiData.artistData
-          .map((artist) => ({
-            artist,
-            contributions:
-              (artist.tracksAsContributor?.length ?? 0) +
-              (artist.tracksAsArtist?.length ?? 0),
-          }))
-          .sort((a, b) => b.contributions - a.contributions)
-          .filter(({contributions}) => contributions),
+    data: ({wikiData: {artistData, wikiInfo}}) => ({
+      toTracks: artistData
+        .map(artist => ({
+          artist,
+          contributions:
+            (artist.tracksAsContributor?.length ?? 0) +
+            (artist.tracksAsArtist?.length ?? 0),
+        }))
+        .sort((a, b) => b.contributions - a.contributions)
+        .filter(({contributions}) => contributions),
 
-        toArtAndFlashes: wikiData.artistData
-          .map((artist) => ({
-            artist,
-            contributions:
-              (artist.tracksAsCoverArtist?.length ?? 0) +
-              (artist.albumsAsCoverArtist?.length ?? 0) +
-              (artist.albumsAsWallpaperArtist?.length ?? 0) +
-              (artist.albumsAsBannerArtist?.length ?? 0) +
-              (wikiData.wikiInfo.enableFlashesAndGames
-                ? artist.flashesAsContributor?.length ?? 0
-                : 0),
-          }))
-          .sort((a, b) => b.contributions - a.contributions)
-          .filter(({contributions}) => contributions),
+      toArtAndFlashes: artistData
+        .map(artist => ({
+          artist,
+          contributions:
+            (artist.tracksAsCoverArtist?.length ?? 0) +
+            (artist.albumsAsCoverArtist?.length ?? 0) +
+            (artist.albumsAsWallpaperArtist?.length ?? 0) +
+            (artist.albumsAsBannerArtist?.length ?? 0) +
+            (wikiInfo.enableFlashesAndGames
+              ? artist.flashesAsContributor?.length ?? 0
+              : 0),
+        }))
+        .sort((a, b) => b.contributions - a.contributions)
+        .filter(({contributions}) => contributions),
 
-        // This is a kinda naughty hack, 8ut like, it's the only place
-        // we'd 8e passing wikiData to html() otherwise, so like....
-        // (Ok we do do this again once later.)
-        showAsFlashes: wikiData.wikiInfo.enableFlashesAndGames,
-      };
-    },
+      // This is a kinda naughty hack, 8ut like, it's the only place
+      // we'd 8e passing wikiData to html() otherwise, so like....
+      // (Ok we do do this again once later.)
+      showAsFlashes: wikiInfo.enableFlashesAndGames,
+    }),
 
-    html({toTracks, toArtAndFlashes, showAsFlashes}, {link, language}) {
-      return fixWS`
-                <div class="content-columns">
-                    <div class="column">
-                        <h2>${language.$(
-                          'listingPage.misc.trackContributors'
-                        )}</h2>
-                        <ul>
-                            ${toTracks
-                              .map(({artist, contributions}) =>
-                                language.$(
-                                  'listingPage.listArtists.byContribs.item',
-                                  {
-                                    artist: link.artist(artist),
-                                    contributions: language.countContributions(
-                                      contributions,
-                                      {
-                                        unit: true,
-                                      }
-                                    ),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                         </ul>
-                    </div>
-                    <div class="column">
-                        <h2>${language.$(
-                          'listingPage.misc' +
-                            (showAsFlashes
-                              ? '.artAndFlashContributors'
-                              : '.artContributors')
-                        )}</h2>
-                        <ul>
-                            ${toArtAndFlashes
-                              .map(({artist, contributions}) =>
-                                language.$(
-                                  'listingPage.listArtists.byContribs.item',
-                                  {
-                                    artist: link.artist(artist),
-                                    contributions: language.countContributions(
-                                      contributions,
-                                      {
-                                        unit: true,
-                                      }
-                                    ),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul>
-                    </div>
-                </div>
-            `;
-    },
+    html: (
+      {toTracks, toArtAndFlashes, showAsFlashes},
+      {html, language, link}
+    ) =>
+      html.tag('div',
+        {class: 'content-columns'},
+        [
+          html.tag('div',
+            {class: 'column'},
+            [
+              html.tag('h2',
+                language.$('listingPage.misc.trackContributors')),
+
+              html.tag('ul',
+                toTracks.map(({artist, contributions}) =>
+                  html.tag('li',
+                    language.$('listingPage.listArtists.byContribs.item', {
+                      artist: link.artist(artist),
+                      contributions: language.countContributions(contributions, {
+                        unit: true,
+                      }),
+                    })))),
+            ]),
+
+          html.tag('div',
+            {class: 'column'},
+            [
+              html.tag('h2',
+                language.$(
+                  'listingPage.misc' +
+                    (showAsFlashes
+                      ? '.artAndFlashContributors'
+                      : '.artContributors'))),
+
+              html.tag('ul',
+                toArtAndFlashes.map(({artist, contributions}) =>
+                  html.tag('li',
+                    language.$('listingPage.listArtists.byContribs.item', {
+                      artist: link.artist(artist),
+                      contributions:
+                        language.countContributions(contributions, {unit: true}),
+                    })))),
+            ]),
+        ]),
   },
 
   {
