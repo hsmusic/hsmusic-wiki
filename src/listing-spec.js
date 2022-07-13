@@ -7,6 +7,7 @@ import {
   getArtistNumContributions,
   getTotalDuration,
   sortAlphabetically,
+  sortByDate,
   sortChronologically,
 } from './util/wiki-data.js';
 
@@ -213,32 +214,30 @@ const listingSpec = [
     directory: 'artists/by-commentary',
     stringsKey: 'listArtists.byCommentary',
 
-    data({wikiData}) {
-      return wikiData.artistData
-        .map((artist) => ({
+    data: ({wikiData: {artistData}}) =>
+      artistData
+        .map(artist => ({
           artist,
           entries:
             (artist.tracksAsCommentator?.length ?? 0) +
             (artist.albumsAsCommentator?.length ?? 0),
         }))
         .filter(({entries}) => entries)
-        .sort((a, b) => b.entries - a.entries);
-    },
+        .sort((a, b) => b.entries - a.entries),
 
-    row({artist, entries}, {link, language}) {
-      return language.$('listingPage.listArtists.byCommentary.item', {
+    row: ({artist, entries}, {language, link}) =>
+      language.$('listingPage.listArtists.byCommentary.item', {
         artist: link.artist(artist),
         entries: language.countCommentaryEntries(entries, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'artists/by-duration',
     stringsKey: 'listArtists.byDuration',
 
-    data({wikiData}) {
-      return wikiData.artistData
+    data: ({wikiData: {artistData}}) =>
+      artistData
         .map((artist) => ({
           artist,
           duration: getTotalDuration([
@@ -247,128 +246,167 @@ const listingSpec = [
           ]),
         }))
         .filter(({duration}) => duration > 0)
-        .sort((a, b) => b.duration - a.duration);
-    },
+        .sort((a, b) => b.duration - a.duration),
 
-    row({artist, duration}, {link, language}) {
-      return language.$('listingPage.listArtists.byDuration.item', {
+    row: ({artist, duration}, {language, link}) =>
+      language.$('listingPage.listArtists.byDuration.item', {
         artist: link.artist(artist),
         duration: language.formatDuration(duration),
-      });
-    },
+      }),
   },
 
   {
     directory: 'artists/by-latest',
     stringsKey: 'listArtists.byLatest',
 
-    data({wikiData}) {
-      const reversedTracks = sortChronologically(
-        wikiData.trackData.filter((t) => t.date)
-      ).reverse();
-      const reversedArtThings = sortChronologically(
-        [...wikiData.trackData, ...wikiData.albumData].filter(
-          (t) => t.coverArtDate
-        )
-      ).reverse();
+    data({wikiData: {
+      albumData,
+      flashData,
+      trackData,
+      wikiInfo,
+    }}) {
+      const processContribs = values => {
+        const filteredValues = values
+          .filter(value => value.date && value.contribs.length);
 
-      return {
-        toTracks: sortChronologically(
-          wikiData.artistData
-            .map((artist) => ({
+        const datedArtistLists = sortByDate(filteredValues)
+          .map(({
+            contribs,
+            date,
+          }) => ({
+            artists: contribs.map(({who}) => who),
+            date,
+          }));
+
+        const remainingArtists = new Set(datedArtistLists.flatMap(({artists}) => artists));
+        const artistEntries = [];
+
+        for (let i = datedArtistLists.length - 1; i >= 0; i--) {
+          const {artists, date} = datedArtistLists[i];
+          for (const artist of artists) {
+            if (!remainingArtists.has(artist))
+              continue;
+
+            remainingArtists.delete(artist);
+            artistEntries.push({
               artist,
+              date,
+
+              // For sortChronologically!
               directory: artist.directory,
               name: artist.name,
-              date: reversedTracks.find((track) =>
-                [
-                  ...(track.artistContribs ?? []),
-                  ...(track.contributorContribs ?? []),
-                ].some(({who}) => who === artist)
-              )?.date,
-            }))
-            .filter(({date}) => date)
-        ).reverse(),
+            });
+          }
 
-        toArtAndFlashes: sortChronologically(
-          wikiData.artistData
-            .map((artist) => {
-              const thing = reversedArtThings.find((thing) =>
-                [
-                  ...(thing.coverArtistContribs ?? []),
-                  ...((!thing.album && thing.contributorContribs) || []),
-                ].some(({who}) => who === artist)
-              );
-              return (
-                thing && {
-                  artist,
-                  directory: artist.directory,
-                  name: artist.name,
-                  date: thing.coverArtistContribs?.some(
-                    ({who}) => who === artist
-                  )
-                    ? thing.coverArtDate
-                    : thing.date,
-                }
-              );
-            })
-            .filter(Boolean)
-            .sort((a, b) => (a.name < b.name ? 1 : a.name > b.name ? -1 : 0))
-        ).reverse(),
+          // Early exit: If we've gotten every artist, there's no need to keep
+          // going.
+          if (remainingArtists.size === 0)
+            break;
+        }
+
+        return sortChronologically(artistEntries).reverse();
+      };
+
+      // Tracks are super easy to sort because they only have one pertinent
+      // date: the date the track was released on.
+
+      const toTracks = processContribs(
+        trackData.map(({
+          artistContribs,
+          date,
+        }) => ({
+          contribs: artistContribs,
+          date,
+        })));
+
+      // Artworks are a bit more involved because there are multiple dates
+      // involved - cover artists correspond to one date, wallpaper artists to
+      // another, etc.
+
+      const toArtAndFlashes = processContribs([
+        ...trackData.map(({
+          coverArtistContribs,
+          coverArtDate,
+        }) => ({
+          contribs: coverArtistContribs,
+          date: coverArtDate,
+        })),
+
+        ...flashData
+          ? flashData.map(({
+              contributorContribs,
+              date,
+            }) => ({
+              contribs: contributorContribs,
+              date,
+            }))
+          : [],
+
+        ...albumData.flatMap(({
+          bannerArtistContribs,
+          coverArtistContribs,
+          coverArtDate,
+          date,
+          wallpaperArtistContribs,
+        }) => [
+          {
+            contribs: coverArtistContribs,
+            date: coverArtDate,
+          },
+          {
+            contribs: bannerArtistContribs,
+            date, // TODO: bannerArtDate (see issue #90)
+          },
+          {
+            contribs: wallpaperArtistContribs,
+            date, // TODO: wallpaperArtDate (see issue #90)
+          },
+        ]),
+      ]);
+
+      return {
+        toArtAndFlashes,
+        toTracks,
 
         // (Ok we did it again.)
         // This is a kinda naughty hack, 8ut like, it's the only place
         // we'd 8e passing wikiData to html() otherwise, so like....
-        showAsFlashes: wikiData.wikiInfo.enableFlashesAndGames,
+        showAsFlashes: wikiInfo.enableFlashesAndGames,
       };
     },
 
-    html({toTracks, toArtAndFlashes, showAsFlashes}, {link, language}) {
-      return fixWS`
-                <div class="content-columns">
-                    <div class="column">
-                        <h2>${language.$(
-                          'listingPage.misc.trackContributors'
-                        )}</h2>
-                        <ul>
-                            ${toTracks
-                              .map(({artist, date}) =>
-                                language.$(
-                                  'listingPage.listArtists.byLatest.item',
-                                  {
-                                    artist: link.artist(artist),
-                                    date: language.formatDate(date),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul>
-                    </div>
-                    <div class="column">
-                        <h2>${language.$(
-                          'listingPage.misc' +
-                            (showAsFlashes
-                              ? '.artAndFlashContributors'
-                              : '.artContributors')
-                        )}</h2>
-                        <ul>
-                            ${toArtAndFlashes
-                              .map(({artist, date}) =>
-                                language.$(
-                                  'listingPage.listArtists.byLatest.item',
-                                  {
-                                    artist: link.artist(artist),
-                                    date: language.formatDate(date),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul>
-                    </div>
-                </div>
-            `;
-    },
+    html: ({toTracks, toArtAndFlashes, showAsFlashes}, {html, language, link}) =>
+      html.tag('div', {class: 'content-columns'}, [
+        html.tag('div', {class: 'column'}, [
+          html.tag('h2',
+            language.$('listingPage.misc.trackContributors')),
+
+          html.tag('ul',
+            toTracks.map(({artist, date}) =>
+              html.tag('li',
+                language.$('listingPage.listArtists.byLatest.item', {
+                  artist: link.artist(artist),
+                  date: language.formatDate(date),
+                })))),
+        ]),
+
+        html.tag('div', {class: 'column'}, [
+          html.tag('h2',
+            language.$(
+              'listingPage.misc' +
+                (showAsFlashes
+                  ? '.artAndFlashContributors'
+                  : '.artContributors'))),
+
+          html.tag('ul',
+            toArtAndFlashes.map(({artist, date}) =>
+              html.tag('li',
+                language.$('listingPage.listArtists.byLatest.item', {
+                  artist: link.artist(artist),
+                  date: language.formatDate(date),
+                })))),
+        ]),
+      ]),
   },
 
   {
