@@ -152,14 +152,25 @@ export function sortByDirectory(
 }
 
 export function sortByName(data, {getName = (o) => o.name} = {}) {
+  const nameMap = new Map();
+  const normalizedNameMap = new Map();
+  for (const o of data) {
+    const name = getName(o);
+    const normalizedName = normalizeName(name);
+    nameMap.set(o, name);
+    normalizedNameMap.set(o, normalizedName);
+  }
+
   return data.sort((a, b) => {
-    const an = getName(a);
-    const bn = getName(b);
-    const ann = normalizeName(an);
-    const bnn = normalizeName(bn);
-    return (
-      compareCaseLessSensitive(ann, bnn) || compareCaseLessSensitive(an, bn)
-    );
+    const ann = normalizedNameMap.get(a);
+    const bnn = normalizedNameMap.get(b);
+    const comparison = compareCaseLessSensitive(ann, bnn);
+    if (comparison !== 0)
+      return comparison;
+
+    const an = nameMap.get(a);
+    const bn = nameMap.get(b);
+    return compareCaseLessSensitive(an, bn);
   });
 }
 
