@@ -1,12 +1,4 @@
-/** @format */
-
 // News entry & index page specifications.
-
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-// Page exports
 
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableNews;
@@ -22,30 +14,35 @@ export function write(entry, {wikiData}) {
     path: ['newsEntry', entry.directory],
     page: ({
       generatePreviousNextLinks,
-      link,
+      html,
       language,
+      link,
       transformMultiline,
     }) => ({
       title: language.$('newsEntryPage.title', {entry: entry.name}),
 
       main: {
-        content: fixWS`
-                    <div class="long-content">
-                        <h1>${language.$('newsEntryPage.title', {
-                          entry: entry.name,
-                        })}</h1>
-                        <p>${language.$('newsEntryPage.published', {
-                          date: language.formatDate(entry.date),
-                        })}</p>
-                        ${transformMultiline(entry.content)}
-                    </div>
-                `,
+        content:
+          html.tag('div', {class: 'long-content'}, [
+            html.tag('h1',
+              language.$('newsEntryPage.title', {
+                entry: entry.name,
+              })),
+
+            html.tag('p',
+              language.$('newsEntryPage.published', {
+                date: language.formatDate(entry.date),
+              })),
+
+            transformMultiline(entry.content)
+          ]),
       },
 
       nav: generateNewsEntryNav(entry, {
         generatePreviousNextLinks,
-        link,
+        html,
         language,
+        link,
         wikiData,
       }),
     }),
@@ -60,35 +57,43 @@ export function writeTargetless({wikiData}) {
   const page = {
     type: 'page',
     path: ['newsIndex'],
-    page: ({link, language, transformMultiline}) => ({
+    page: ({
+      html,
+      language,
+      link,
+      transformMultiline,
+    }) => ({
       title: language.$('newsIndex.title'),
 
       main: {
-        content: fixWS`
-                    <div class="long-content news-index">
-                        <h1>${language.$('newsIndex.title')}</h1>
-                        ${newsData
-                          .map(
-                            (entry) => fixWS`
-                            <article id="${entry.directory}">
-                                <h2><time>${language.formatDate(
-                                  entry.date
-                                )}</time> ${link.newsEntry(entry)}</h2>
-                                ${transformMultiline(entry.contentShort)}
-                                ${
-                                  entry.contentShort !== entry.content &&
-                                  `<p>${link.newsEntry(entry, {
-                                    text: language.$(
-                                      'newsIndex.entry.viewRest'
-                                    ),
-                                  })}</p>`
-                                }
-                            </article>
-                        `
-                          )
-                          .join('\n')}
-                    </div>
-                `,
+        content:
+          html.tag('div',
+            {class: ['long-content', 'news-index']},
+            [
+              html.tag('h1',
+                language.$('newsIndex.title')),
+
+              ...newsData.map(entry =>
+                html.tag('article',
+                  {id: entry.directory},
+                  [
+                    html.tag('h2', [
+                      html.tag('time',
+                        language.formatDate(entry.date)),
+                      link.newsEntry(entry),
+                    ]),
+
+                    transformMultiline(entry.contentShort),
+
+                    entry.contentShort !== entry.content &&
+                      html.tag('p',
+                        link.newsEntry(entry, {
+                          text: language.$(
+                            'newsIndex.entry.viewRest'
+                          ),
+                        })),
+                  ])),
+            ]),
       },
 
       nav: {simple: true},
@@ -98,21 +103,22 @@ export function writeTargetless({wikiData}) {
   return [page];
 }
 
-// Utility functions
-
-function generateNewsEntryNav(
-  entry,
-  {generatePreviousNextLinks, link, language, wikiData}
-) {
-  const {newsData} = wikiData;
-
+function generateNewsEntryNav(entry, {
+  generatePreviousNextLinks,
+  html,
+  language,
+  link,
+  wikiData: {newsData},
+}) {
   // The newsData list is sorted reverse chronologically (newest ones first),
   // so the way we find next/previous entries is flipped from normal.
   const previousNextLinks = generatePreviousNextLinks(entry, {
-    link,
-    language,
     data: newsData.slice().reverse(),
     linkKey: 'newsEntry',
+
+    html,
+    language,
+    link,
   });
 
   return {
