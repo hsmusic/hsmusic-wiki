@@ -30,6 +30,20 @@ export function* splitArray(array, fn) {
   }
 }
 
+// Sums the values in an array, optionally taking a function which maps each
+// item to a number (handy for accessing a certain property on an array of like
+// objects). This also coalesces null values to zero, so if the mapping function
+// returns null (or values in the array are nullish), they'll just be skipped in
+// the sum.
+export function accumulateSum(array, fn = x => x) {
+  return array.reduce(
+    (accumulator, value, index, array) =>
+      accumulator +
+        fn(value, index, array) ?? 0,
+    0
+  );
+}
+
 export const mapInPlace = (array, fn) =>
   array.splice(0, array.length, ...array.map(fn));
 

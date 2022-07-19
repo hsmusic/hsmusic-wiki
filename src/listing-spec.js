@@ -1,6 +1,8 @@
 /** @format */
 
-import fixWS from 'fix-whitespace';
+import {
+  accumulateSum,
+} from './util/sugar.js';
 
 import {
   chunkByProperties,
@@ -91,13 +93,14 @@ const listingSpec = [
           }),
         ['dateAddedToWiki']),
 
-    html: (chunks, {html, language, link}) =>
+    html: (data, {html, language, link}) =>
       html.tag('dl',
-        chunks.flatMap(({dateAddedToWiki, chunk: albums}) => [
+        data.flatMap(({dateAddedToWiki, chunk: albums}) => [
           html.tag('dt',
             language.$('listingPage.listAlbums.byDateAdded.date', {
               date: language.formatDate(dateAddedToWiki),
             })),
+
           html.tag('dd',
             html.tag('ul',
               albums.map((album) =>
@@ -119,7 +122,7 @@ const listingSpec = [
           contributions: getArtistNumContributions(artist),
         })),
 
-    row: ({artist, contributions}, {link, language}) =>
+    row: ({artist, contributions}, {language, link}) =>
       language.$('listingPage.listArtists.byName.item', {
         artist: link.artist(artist),
         contributions: language.countContributions(contributions, {
@@ -168,46 +171,40 @@ const listingSpec = [
       {toTracks, toArtAndFlashes, showAsFlashes},
       {html, language, link}
     ) =>
-      html.tag('div',
-        {class: 'content-columns'},
-        [
-          html.tag('div',
-            {class: 'column'},
-            [
-              html.tag('h2',
-                language.$('listingPage.misc.trackContributors')),
+      html.tag('div', {class: 'content-columns'}, [
+        html.tag('div', {class: 'column'}, [
+          html.tag('h2',
+            language.$('listingPage.misc.trackContributors')),
 
-              html.tag('ul',
-                toTracks.map(({artist, contributions}) =>
-                  html.tag('li',
-                    language.$('listingPage.listArtists.byContribs.item', {
-                      artist: link.artist(artist),
-                      contributions: language.countContributions(contributions, {
-                        unit: true,
-                      }),
-                    })))),
-            ]),
-
-          html.tag('div',
-            {class: 'column'},
-            [
-              html.tag('h2',
-                language.$(
-                  'listingPage.misc' +
-                    (showAsFlashes
-                      ? '.artAndFlashContributors'
-                      : '.artContributors'))),
-
-              html.tag('ul',
-                toArtAndFlashes.map(({artist, contributions}) =>
-                  html.tag('li',
-                    language.$('listingPage.listArtists.byContribs.item', {
-                      artist: link.artist(artist),
-                      contributions:
-                        language.countContributions(contributions, {unit: true}),
-                    })))),
-            ]),
+          html.tag('ul',
+            toTracks.map(({artist, contributions}) =>
+              html.tag('li',
+                language.$('listingPage.listArtists.byContribs.item', {
+                  artist: link.artist(artist),
+                  contributions: language.countContributions(contributions, {
+                    unit: true,
+                  }),
+                })))),
         ]),
+
+        html.tag('div', {class: 'column'}, [
+          html.tag('h2',
+            language.$(
+              'listingPage.misc' +
+                (showAsFlashes
+                  ? '.artAndFlashContributors'
+                  : '.artContributors'))),
+
+          html.tag('ul',
+            toArtAndFlashes.map(({artist, contributions}) =>
+              html.tag('li',
+                language.$('listingPage.listArtists.byContribs.item', {
+                  artist: link.artist(artist),
+                  contributions:
+                    language.countContributions(contributions, {unit: true}),
+                })))),
+        ]),
+    ]),
   },
 
   {
@@ -375,7 +372,10 @@ const listingSpec = [
       };
     },
 
-    html: ({toTracks, toArtAndFlashes, showAsFlashes}, {html, language, link}) =>
+    html: (
+      {toTracks, toArtAndFlashes, showAsFlashes},
+      {html, language, link}
+    ) =>
       html.tag('div', {class: 'content-columns'}, [
         html.tag('div', {class: 'column'}, [
           html.tag('h2',
@@ -412,151 +412,149 @@ const listingSpec = [
   {
     directory: 'groups/by-name',
     stringsKey: 'listGroups.byName',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
-    data: ({wikiData}) => sortAlphabetically(wikiData.groupData.slice()),
 
-    row(group, {link, language}) {
-      return language.$('listingPage.listGroups.byCategory.group', {
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
+
+    data: ({wikiData: {groupData}}) =>
+      sortAlphabetically(groupData.slice()),
+
+    row: (group, {language, link}) =>
+      language.$('listingPage.listGroups.byCategory.group', {
         group: link.groupInfo(group),
         gallery: link.groupGallery(group, {
           text: language.$('listingPage.listGroups.byCategory.group.gallery'),
         }),
-      });
-    },
+      }),
   },
 
   {
     directory: 'groups/by-category',
     stringsKey: 'listGroups.byCategory',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
-    data: ({wikiData}) => wikiData.groupCategoryData,
 
-    html(groupCategoryData, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${groupCategoryData
-                      .map(
-                        (category) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listGroups.byCategory.category',
-                          {
-                            category: link.groupInfo(category.groups[0], {
-                              text: category.name,
-                            }),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${category.groups
-                              .map((group) =>
-                                language.$(
-                                  'listingPage.listGroups.byCategory.group',
-                                  {
-                                    group: link.groupInfo(group),
-                                    gallery: link.groupGallery(group, {
-                                      text: language.$(
-                                        'listingPage.listGroups.byCategory.group.gallery'
-                                      ),
-                                    }),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul></dd>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
+
+    data: ({wikiData: {groupCategoryData}}) =>
+      groupCategoryData
+        .map(category => ({
+          category,
+          groups: category.groups,
+        })),
+
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({category, groups}) => [
+          html.tag('dt',
+            language.$('listingPage.listGroups.byCategory.category', {
+              category: groups.length
+                ? link.groupInfo(groups[0], {
+                    text: category.name,
+                  })
+                : category.name,
+            })),
+
+          html.tag('dd',
+            groups.length === 0
+              ? null // todo: #85
+              : html.tag('ul',
+                  category.groups.map(group =>
+                    html.tag('li',
+                      language.$('listingPage.listGroups.byCategory.group', {
+                        group: link.groupInfo(group),
+                        gallery: link.groupGallery(group, {
+                          text: language.$('listingPage.listGroups.byCategory.group.gallery'),
+                        }),
+                      }))))),
+        ])),
   },
 
   {
     directory: 'groups/by-albums',
     stringsKey: 'listGroups.byAlbums',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
-    data({wikiData}) {
-      return wikiData.groupData
-        .map((group) => ({group, albums: group.albums.length}))
-        .sort((a, b) => b.albums - a.albums);
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
 
-    row({group, albums}, {link, language}) {
-      return language.$('listingPage.listGroups.byAlbums.item', {
+    data: ({wikiData: {groupData}}) =>
+      groupData
+        .map(group => ({
+          group,
+          albums: group.albums.length
+        }))
+        .sort((a, b) => b.albums - a.albums),
+
+    row: ({group, albums}, {language, link}) =>
+      language.$('listingPage.listGroups.byAlbums.item', {
         group: link.groupInfo(group),
         albums: language.countAlbums(albums, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'groups/by-tracks',
     stringsKey: 'listGroups.byTracks',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
-    data({wikiData}) {
-      return wikiData.groupData
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
+
+    data: ({wikiData: {groupData}}) =>
+      groupData
         .map((group) => ({
           group,
-          tracks: group.albums.reduce(
-            (acc, album) => acc + album.tracks.length,
-            0
-          ),
+          tracks: accumulateSum(
+            group.albums,
+            ({tracks}) => tracks.length),
         }))
-        .sort((a, b) => b.tracks - a.tracks);
-    },
+        .sort((a, b) => b.tracks - a.tracks),
 
-    row({group, tracks}, {link, language}) {
-      return language.$('listingPage.listGroups.byTracks.item', {
+    row: ({group, tracks}, {language, link}) =>
+      language.$('listingPage.listGroups.byTracks.item', {
         group: link.groupInfo(group),
         tracks: language.countTracks(tracks, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'groups/by-duration',
     stringsKey: 'listGroups.byDuration',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
-    data({wikiData}) {
-      return wikiData.groupData
-        .map((group) => ({
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
+
+    data: ({wikiData: {groupData}}) =>
+      groupData
+        .map(group => ({
           group,
-          duration: getTotalDuration(
-            group.albums.flatMap((album) => album.tracks)
-          ),
+          duration: getTotalDuration(group.albums.flatMap(album => album.tracks)),
         }))
-        .sort((a, b) => b.duration - a.duration);
-    },
+        .sort((a, b) => b.duration - a.duration),
 
-    row({group, duration}, {link, language}) {
-      return language.$('listingPage.listGroups.byDuration.item', {
+    row: ({group, duration}, {language, link}) =>
+      language.$('listingPage.listGroups.byDuration.item', {
         group: link.groupInfo(group),
         duration: language.formatDuration(duration),
-      });
-    },
+      }),
   },
 
   {
     directory: 'groups/by-latest-album',
     stringsKey: 'listGroups.byLatest',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableGroupUI,
 
-    data({wikiData}) {
-      return sortChronologically(
-        wikiData.groupData
-          .map((group) => {
-            const albums = group.albums.filter((a) => a.date);
-            return (
-              albums.length && {
-                group,
-                directory: group.directory,
-                name: group.name,
-                date: albums[albums.length - 1].date,
-              }
-            );
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableGroupUI,
+
+    data: ({wikiData: {groupData}}) =>
+      sortChronologically(
+        groupData
+          .map(group => {
+            const albums = group.albums.filter(a => a.date);
+            return albums.length && {
+              group,
+              directory: group.directory,
+              name: group.name,
+              date: albums[albums.length - 1].date,
+            };
           })
           .filter(Boolean)
           // So this is kinda tough to explain, 8ut 8asically, when we
@@ -572,452 +570,400 @@ const listingSpec = [
           // groups that don't will 8e moved 8y the sortChronologically
           // call surrounding this).
           .reverse()
-      ).reverse();
-    },
+      ).reverse(),
 
-    row({group, date}, {link, language}) {
-      return language.$('listingPage.listGroups.byLatest.item', {
+    row: ({group, date}, {language, link}) =>
+      language.$('listingPage.listGroups.byLatest.item', {
         group: link.groupInfo(group),
         date: language.formatDate(date),
-      });
-    },
+      }),
   },
 
   {
     directory: 'tracks/by-name',
     stringsKey: 'listTracks.byName',
 
-    data({wikiData}) {
-      return sortAlphabetically(wikiData.trackData.slice());
-    },
+    data: ({wikiData: {trackData}}) =>
+      sortAlphabetically(trackData.slice()),
 
-    row(track, {link, language}) {
-      return language.$('listingPage.listTracks.byName.item', {
+    row: (track, {language, link}) =>
+      language.$('listingPage.listTracks.byName.item', {
         track: link.track(track),
-      });
-    },
+      }),
   },
 
   {
     directory: 'tracks/by-album',
     stringsKey: 'listTracks.byAlbum',
-    data: ({wikiData}) => wikiData.albumData,
 
-    html(albumData, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${albumData
-                      .map(
-                        (album) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.byAlbum.album',
-                          {
-                            album: link.album(album),
-                          }
-                        )}</dt>
-                        <dd><ol>
-                            ${album.tracks
-                              .map((track) =>
-                                language.$(
-                                  'listingPage.listTracks.byAlbum.track',
-                                  {
-                                    track: link.track(track),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ol></dd>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    data: ({wikiData: {albumData}}) =>
+      albumData.map(album => ({
+        album,
+        tracks: album.tracks,
+      })),
+
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.byAlbum.album', {
+              album: link.album(album),
+            })),
+
+          html.tag('dd',
+            html.tag('ol',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$('listingPage.listTracks.byAlbum.track', {
+                    track: link.track(track),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'tracks/by-date',
     stringsKey: 'listTracks.byDate',
 
-    data({wikiData}) {
-      return chunkByProperties(
-        sortChronologically(wikiData.trackData.filter((t) => t.date)),
-        ['album', 'date']
-      );
-    },
+    data: ({wikiData: {trackData}}) =>
+      chunkByProperties(
+        sortChronologically(trackData.filter(t => t.date)),
+        ['album', 'date']),
 
-    html(chunks, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${chunks
-                      .map(
-                        ({album, date, chunk: tracks}) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.byDate.album',
-                          {
-                            album: link.album(album),
-                            date: language.formatDate(date),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${tracks
-                              .map((track) =>
-                                track.aka
-                                  ? `<li class="rerelease">${language.$(
-                                      'listingPage.listTracks.byDate.track.rerelease',
-                                      {
-                                        track: link.track(track),
-                                      }
-                                    )}</li>`
-                                  : `<li>${language.$(
-                                      'listingPage.listTracks.byDate.track',
-                                      {
-                                        track: link.track(track),
-                                      }
-                                    )}</li>`
-                              )
-                              .join('\n')}
-                        </ul></dd>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, date, chunk: tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.byDate.album', {
+              album: link.album(album),
+              date: language.formatDate(date),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                track.aka
+                  ? html.tag('li',
+                      {class: 'rerelease'},
+                      language.$('listingPage.listTracks.byDate.track.rerelease', {
+                        track: link.track(track),
+                      }))
+                  : html.tag('li',
+                      language.$('listingPage.listTracks.byDate.track', {
+                        track: link.track(track),
+                      }))))),
+        ])),
   },
 
   {
     directory: 'tracks/by-duration',
     stringsKey: 'listTracks.byDuration',
 
-    data({wikiData}) {
-      return wikiData.trackData
-        .map((track) => ({track, duration: track.duration}))
+    data: ({wikiData: {trackData}}) =>
+      trackData
+        .map(track => ({
+          track,
+          duration: track.duration
+        }))
         .filter(({duration}) => duration > 0)
-        .sort((a, b) => b.duration - a.duration);
-    },
+        .sort((a, b) => b.duration - a.duration),
 
-    row({track, duration}, {link, language}) {
-      return language.$('listingPage.listTracks.byDuration.item', {
+    row: ({track, duration}, {language, link}) =>
+      language.$('listingPage.listTracks.byDuration.item', {
         track: link.track(track),
         duration: language.formatDuration(duration),
-      });
-    },
+      }),
   },
 
   {
     directory: 'tracks/by-duration-in-album',
     stringsKey: 'listTracks.byDurationInAlbum',
 
-    data({wikiData}) {
-      return wikiData.albumData.map((album) => ({
+    data: ({wikiData: {albumData}}) =>
+      albumData.map(album => ({
         album,
         tracks: album.tracks
           .slice()
           .sort((a, b) => (b.duration ?? 0) - (a.duration ?? 0)),
-      }));
-    },
+      })),
 
-    html(albums, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${albums
-                      .map(
-                        ({album, tracks}) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.byDurationInAlbum.album',
-                          {
-                            album: link.album(album),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${tracks
-                              .map((track) =>
-                                language.$(
-                                  'listingPage.listTracks.byDurationInAlbum.track',
-                                  {
-                                    track: link.track(track),
-                                    duration: language.formatDuration(
-                                      track.duration ?? 0
-                                    ),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </dd></ul>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.byDurationInAlbum.album', {
+              album: link.album(album),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$('listingPage.listTracks.byDurationInAlbum.track', {
+                    track: link.track(track),
+                    duration: language.formatDuration(track.duration ?? 0),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'tracks/by-times-referenced',
     stringsKey: 'listTracks.byTimesReferenced',
 
-    data({wikiData}) {
-      return wikiData.trackData
-        .map((track) => ({
+    data: ({wikiData: {trackData}}) =>
+      trackData
+        .map(track => ({
           track,
           timesReferenced: track.referencedByTracks.length,
         }))
-        .filter(({timesReferenced}) => timesReferenced > 0)
-        .sort((a, b) => b.timesReferenced - a.timesReferenced);
-    },
+        .filter(({timesReferenced}) => timesReferenced)
+        .sort((a, b) => b.timesReferenced - a.timesReferenced),
 
-    row({track, timesReferenced}, {link, language}) {
-      return language.$('listingPage.listTracks.byTimesReferenced.item', {
+    row: ({track, timesReferenced}, {language, link}) =>
+      language.$('listingPage.listTracks.byTimesReferenced.item', {
         track: link.track(track),
         timesReferenced: language.countTimesReferenced(timesReferenced, {
           unit: true,
         }),
-      });
-    },
+      }),
   },
 
   {
     directory: 'tracks/in-flashes/by-album',
     stringsKey: 'listTracks.inFlashes.byAlbum',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableFlashesAndGames,
 
-    data({wikiData}) {
-      return chunkByProperties(
-        wikiData.trackData.filter((t) => t.featuredInFlashes?.length > 0),
-        ['album']
-      );
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableFlashesAndGames,
 
-    html(chunks, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${chunks
-                      .map(
-                        ({album, chunk: tracks}) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.inFlashes.byAlbum.album',
-                          {
-                            album: link.album(album),
-                            date: language.formatDate(album.date),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${tracks
-                              .map((track) =>
-                                language.$(
-                                  'listingPage.listTracks.inFlashes.byAlbum.track',
-                                  {
-                                    track: link.track(track),
-                                    flashes: language.formatConjunctionList(
-                                      track.featuredInFlashes.map(link.flash)
-                                    ),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </dd></ul>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    data: ({wikiData: {trackData}}) =>
+      chunkByProperties(
+        trackData.filter(t => t.featuredInFlashes?.length > 0),
+        ['album']),
+
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, chunk: tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.inFlashes.byAlbum.album', {
+              album: link.album(album),
+              date: language.formatDate(album.date),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$('listingPage.listTracks.inFlashes.byAlbum.track', {
+                    track: link.track(track),
+                    flashes: language.formatConjunctionList(
+                      track.featuredInFlashes.map(link.flash)),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'tracks/in-flashes/by-flash',
     stringsKey: 'listTracks.inFlashes.byFlash',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableFlashesAndGames,
-    data: ({wikiData}) => wikiData.flashData,
 
-    html(flashData, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${sortChronologically(flashData.slice())
-                      .map(
-                        (flash) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.inFlashes.byFlash.flash',
-                          {
-                            flash: link.flash(flash),
-                            date: language.formatDate(flash.date),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${flash.featuredTracks
-                              .map((track) =>
-                                language.$(
-                                  'listingPage.listTracks.inFlashes.byFlash.track',
-                                  {
-                                    track: link.track(track),
-                                    album: link.album(track.album),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </ul></dd>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableFlashesAndGames,
+
+    data: ({wikiData: {flashData}}) =>
+      sortChronologically(flashData.slice())
+        .map(flash => ({
+          flash,
+          tracks: flash.featuredTracks,
+        })),
+
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({flash, tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.inFlashes.byFlash.flash', {
+              flash: link.flash(flash),
+              date: language.formatDate(flash.date),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$('listingPage.listTracks.inFlashes.byFlash.track', {
+                    track: link.track(track),
+                    album: link.album(track.album),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'tracks/with-lyrics',
     stringsKey: 'listTracks.withLyrics',
 
-    data({wikiData}) {
-      return wikiData.albumData
-        .map((album) => ({
+    data: ({wikiData: {albumData}}) =>
+      albumData
+        .map(album => ({
           album,
-          tracks: album.tracks.filter((t) => t.lyrics),
+          tracks: album.tracks.filter(t => t.lyrics),
         }))
-        .filter(({tracks}) => tracks.length > 0);
-    },
+        .filter(({tracks}) => tracks.length),
 
-    html(chunks, {link, language}) {
-      return fixWS`
-                <dl>
-                    ${chunks
-                      .map(
-                        ({album, tracks}) => fixWS`
-                        <dt>${language.$(
-                          'listingPage.listTracks.withLyrics.album',
-                          {
-                            album: link.album(album),
-                            date: language.formatDate(album.date),
-                          }
-                        )}</dt>
-                        <dd><ul>
-                            ${tracks
-                              .map((track) =>
-                                language.$(
-                                  'listingPage.listTracks.withLyrics.track',
-                                  {
-                                    track: link.track(track),
-                                  }
-                                )
-                              )
-                              .map((row) => `<li>${row}</li>`)
-                              .join('\n')}
-                        </dd></ul>
-                    `
-                      )
-                      .join('\n')}
-                </dl>
-            `;
-    },
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, tracks}) => [
+          html.tag('dt',
+            language.$('listingPage.listTracks.withLyrics.album', {
+              album: link.album(album),
+              date: language.formatDate(album.date),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$('listingPage.listTracks.withLyrics.track', {
+                    track: link.track(track),
+                  }))))),
+        ])),
   },
 
   {
     directory: 'tags/by-name',
     stringsKey: 'listTags.byName',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
-    data({wikiData}) {
-      return sortAlphabetically(
-        wikiData.artTagData.filter((tag) => !tag.isContentWarning)
-      ).map((tag) => ({tag, timesUsed: tag.taggedInThings?.length}));
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableArtTagUI,
 
-    row({tag, timesUsed}, {link, language}) {
-      return language.$('listingPage.listTags.byName.item', {
+    data: ({wikiData: {artTagData}}) =>
+      sortAlphabetically(
+        artTagData
+          .filter(tag => !tag.isContentWarning)
+          .map(tag => ({
+            tag,
+            timesUsed: tag.taggedInThings.length,
+
+            // For sortAlphabetically!
+            directory: tag.directory,
+            name: tag.name,
+          }))),
+
+    row: ({tag, timesUsed}, {language, link}) =>
+      language.$('listingPage.listTags.byName.item', {
         tag: link.tag(tag),
         timesUsed: language.countTimesUsed(timesUsed, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
     directory: 'tags/by-uses',
     stringsKey: 'listTags.byUses',
-    condition: ({wikiData}) => wikiData.wikiInfo.enableArtTagUI,
 
-    data({wikiData}) {
-      return wikiData.artTagData
-        .filter((tag) => !tag.isContentWarning)
-        .map((tag) => ({tag, timesUsed: tag.taggedInThings?.length}))
-        .sort((a, b) => b.timesUsed - a.timesUsed);
-    },
+    condition: ({wikiData: {wikiInfo}}) =>
+      wikiInfo.enableArtTagUI,
 
-    row({tag, timesUsed}, {link, language}) {
-      return language.$('listingPage.listTags.byUses.item', {
+    data: ({wikiData: {artTagData}}) =>
+      artTagData
+        .filter(tag => !tag.isContentWarning)
+        .map(tag => ({
+          tag,
+          timesUsed: tag.taggedInThings.length
+        }))
+        .sort((a, b) => b.timesUsed - a.timesUsed),
+
+    row: ({tag, timesUsed}, {language, link}) =>
+      language.$('listingPage.listTags.byUses.item', {
         tag: link.tag(tag),
         timesUsed: language.countTimesUsed(timesUsed, {unit: true}),
-      });
-    },
+      }),
   },
 
   {
+    // Holy beans the spaghetti LOL
+
     directory: 'random',
     stringsKey: 'other.randomPages',
 
-    data: ({wikiData}) => ({
-      officialAlbumData: wikiData.officialAlbumData,
-      fandomAlbumData: wikiData.fandomAlbumData,
-    }),
+    data: ({wikiData: {fandomAlbumData, officialAlbumData}}) => [
+      {
+        albums: officialAlbumData,
+        name: 'Official',
+        randomCode: 'official',
+      },
+      {
+        albums: fandomAlbumData,
+        name: 'Fandom',
+        randomCode: 'fandom',
+      },
+    ],
 
-    html: (
-      {officialAlbumData, fandomAlbumData},
-      {getLinkThemeString}
-    ) => fixWS`
-            <p>Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.</p>
-            <p class="js-hide-once-data">(Data files are downloading in the background! Please wait for data to load.)</p>
-            <p class="js-show-once-data">(Data files have finished being downloaded. The links should work!)</p>
-            <dl>
-                <dt>Miscellaneous:</dt>
-                <dd><ul>
-                    <li>
-                        <a href="#" data-random="artist">Random Artist</a>
-                        (<a href="#" data-random="artist-more-than-one-contrib">&gt;1 contribution</a>)
-                    </li>
-                    <li><a href="#" data-random="album">Random Album (whole site)</a></li>
-                    <li><a href="#" data-random="track">Random Track (whole site)</a></li>
-                </ul></dd>
-                ${[
-                  {
-                    name: 'Official',
-                    albumData: officialAlbumData,
-                    code: 'official',
-                  },
-                  {
-                    name: 'Fandom',
-                    albumData: fandomAlbumData,
-                    code: 'fandom',
-                  },
-                ]
-                  .map(
-                    (category) => fixWS`
-                    <dt>${category.name}: (<a href="#" data-random="album-in-${
-                      category.code
-                    }">Random Album</a>, <a href="#" data-random="track-in-${
-                      category.code
-                    }">Random Track</a>)</dt>
-                    <dd><ul>${category.albumData
-                      .map(
-                        (album) => fixWS`
-                        <li><a style="${getLinkThemeString(
-                          album.color
-                        )}; --album-directory: ${
-                          album.directory
-                        }" href="#" data-random="track-in-album">${
-                          album.name
-                        }</a></li>
-                    `
-                      )
-                      .join('\n')}</ul></dd>
-                `
-                  )
-                  .join('\n')}
-            </dl>
-        `,
+    html: (data, {getLinkThemeString, html}) =>
+      html.fragment([
+        html.tag('p',
+          `Choose a link to go to a random page in that category or album! If your browser doesn't support relatively modern JavaScript or you've disabled it, these links won't work - sorry.`),
+
+        html.tag('p',
+          {class: 'js-hide-once-data'},
+          `(Data files are downloading in the background! Please wait for data to load.)`),
+
+        html.tag('p',
+          {class: 'js-show-once-data'},
+          `(Data files have finished being downloaded. The links should work!)`),
+
+        html.tag('dl', [
+          html.tag('dt',
+            `Miscellaneous:`),
+
+          html.tag('dd',
+            html.tag('ul', [
+              html.tag('li', [
+                html.tag('a',
+                  {href: '#', 'data-random': 'artist'},
+                  `Random Artist`),
+                '(' +
+                  html.tag('a',
+                    {href: '#', 'data-random': 'artist-more-than-one-contrib'},
+                    `&gt;1 contribution`) +
+                  ')',
+              ]),
+
+              html.tag('li',
+                html.tag('a',
+                  {href: '#', 'data-random': 'album'},
+                  `Random Album (whole site)`)),
+
+              html.tag('li',
+                html.tag('a',
+                  {href: '#', 'data-random': 'track'},
+                  `Random Track (whole site)`)),
+            ])),
+
+          ...data.flatMap(({albums, name, randomCode}) => [
+            html.tag('dt', [
+              name + ':',
+              '(' +
+                html.tag('a',
+                  {href: '#', 'data-random': 'album-in-' + randomCode},
+                  `Random Album`) +
+                ', ' +
+                html.tag('a',
+                  {href: '#', 'data-random': 'track-in' + randomCode},
+                  'Random Track') +
+                ')',
+            ]),
+
+            html.tag('dd',
+              html.tag('ul',
+                albums.map(album =>
+                  html.tag('li',
+                    html.tag('a',
+                      {
+                        href: '#',
+                        'data-random': 'track-in-album',
+                        style: getLinkThemeString(album.color) +
+                          `; --album-directory: ${album.directory}`,
+                      },
+                      album.name))))),
+          ]),
+        ]),
+      ]),
   },
 ];
 
