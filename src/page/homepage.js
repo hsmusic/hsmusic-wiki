@@ -1,19 +1,45 @@
-/** @format */
-
 // Homepage specification.
-
-// Imports
-
-import fixWS from 'fix-whitespace';
-
-import * as html from '../util/html.js';
 
 import {getNewAdditions, getNewReleases} from '../util/wiki-data.js';
 
-// Page exports
-
 export function writeTargetless({wikiData}) {
   const {newsData, staticPageData, homepageLayout, wikiInfo} = wikiData;
+
+  const rowData = homepageLayout.rows?.map(row => {
+    const {color, name, type} = row;
+    const entry = {row, color, name, type};
+
+    switch (type) {
+      case 'albums': {
+        switch (row.sourceGroupByRef) {
+          case 'new-releases':
+            entry.gridEntries = getNewReleases(row.countAlbumsFromGroup, {wikiData});
+            break;
+          case 'new-additions':
+            entry.gridEntries = getNewAdditions(row.countAlbumsFromGroup, {wikiData});
+            break;
+          default:
+            entry.gridEntries = row.sourceGroup
+              ? row.sourceGroup.albums
+                  .slice()
+                  .reverse()
+                  .filter(album => album.isListedOnHomepage)
+                  .slice(0, row.countAlbumsFromGroup)
+                  .map(album => ({item: album}))
+              : [];
+        }
+
+        if (row.sourceAlbums.length) {
+          entry.gridEntries.push(...row.sourceAlbums.map(album => ({item: album})));
+        }
+
+        entry.actionLinks = row.actionLinks ?? [];
+        break;
+      }
+    }
+
+    return entry;
+  });
 
   const page = {
     type: 'page',
@@ -21,8 +47,9 @@ export function writeTargetless({wikiData}) {
     page: ({
       getAlbumGridHTML,
       getLinkThemeString,
-      link,
+      html,
       language,
+      link,
       to,
       transformInline,
       transformMultiline,
@@ -36,75 +63,37 @@ export function writeTargetless({wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: fixWS`
-                    <h1>${wikiInfo.name}</h1>
-                    ${homepageLayout.rows
-                      ?.map(
-                        (row, i) => fixWS`
-                        <section class="row" style="${getLinkThemeString(
-                          row.color
-                        )}">
-                            <h2>${row.name}</h2>
-                            ${
-                              row.type === 'albums' &&
-                              fixWS`
-                                <div class="grid-listing">
-                                    ${getAlbumGridHTML({
-                                      entries: (row.sourceGroupByRef ===
-                                      'new-releases'
-                                        ? getNewReleases(
-                                            row.countAlbumsFromGroup,
-                                            {
-                                              wikiData,
-                                            }
-                                          )
-                                        : row.sourceGroupByRef ===
-                                          'new-additions'
-                                        ? getNewAdditions(
-                                            row.countAlbumsFromGroup,
-                                            {
-                                              wikiData,
-                                            }
-                                          )
-                                        : (row.sourceGroup?.albums ?? [])
-                                            .slice()
-                                            .reverse()
-                                            .filter(
-                                              (album) =>
-                                                album.isListedOnHomepage
-                                            )
-                                            .slice(0, row.countAlbumsFromGroup)
-                                            .map((album) => ({item: album}))
-                                      ).concat(
-                                        row.sourceAlbums.map((album) => ({
-                                          item: album,
-                                        }))
-                                      ),
-                                      lazy: i > 0,
-                                    })}
-                                    ${
-                                      row.actionLinks?.length &&
-                                      fixWS`
-                                        <div class="grid-actions">
-                                            ${row.actionLinks
-                                              .map((action) =>
-                                                transformInline(action).replace(
-                                                  '<a',
-                                                  '<a class="box grid-item"'
-                                                )
-                                              )
-                                              .join('\n')}
-                                        </div>
-                                    `
-                                    }
-                                </div>
-                            `
-                            }
-                        </section>
-                    `
-                      )
-                      .join('\n')}
-                `,
+        content: html.fragment([
+          html.tag('h1',
+            wikiInfo.name),
+
+          ...html.fragment(
+            rowData.map((entry, i) =>
+              html.tag('section',
+                {
+                  class: 'row',
+                  style: getLinkThemeString(entry.color),
+                },
+                [
+                  html.tag('h2',
+                    entry.name),
+
+                  entry.type === 'albums' &&
+                    html.tag('div', {class: 'grid-listing'}, [
+                      ...html.fragment(
+                        getAlbumGridHTML({
+                          entries: entry.gridEntries,
+                          lazy: i > 0,
+                        })),
+
+                      entry.actionLinks.length &&
+                        html.tag('div', {class: 'grid-actions'},
+                          entry.actionLinks.map(action =>
+                            transformInline(action)
+                              .replace('<a', '<a class="box grid-item"'))),
+                    ]),
+                ]))),
+        ]),
       },
 
       sidebarLeft: homepageLayout.sidebarContent && {
@@ -120,44 +109,45 @@ export function writeTargetless({wikiData}) {
         //
         // And no, I will not make [[news]] into part of transformMultiline
         // (even though that would 8e hilarious).
-        content: transformMultiline(
-          homepageLayout.sidebarContent.replace('[[news]]', '__GENERATE_NEWS__')
-        ).replace(
-          '<p>__GENERATE_NEWS__</p>',
-          wikiInfo.enableNews
-            ? fixWS`
-                        <h1>${language.$('homepage.news.title')}</h1>
-                        ${newsData
-                          .slice(0, 3)
-                          .map((entry, i) =>
-                            html.tag(
-                              'article',
-                              {
-                                class: [
-                                  'news-entry',
-                                  i === 0 && 'first-news-entry',
-                                ],
-                              },
-                              fixWS`
-                                <h2><time>${language.formatDate(
-                                  entry.date
-                                )}</time> ${link.newsEntry(entry)}</h2>
-                                ${transformMultiline(entry.contentShort)}
-                                ${
-                                  entry.contentShort !== entry.content &&
-                                  link.newsEntry(entry, {
-                                    text: language.$(
-                                      'homepage.news.entry.viewRest'
-                                    ),
-                                  })
-                                }
-                            `
-                            )
-                          )
-                          .join('\n')}
-                    `
-            : `<p><i>News requested in content description but this feature isn't enabled</i></p>`
-        ),
+        content:
+          transformMultiline(
+            homepageLayout.sidebarContent
+              .replace('[[news]]', '__GENERATE_NEWS__')
+          )
+            .replace('<p>__GENERATE_NEWS__</p>',
+              wikiInfo.enableNews
+                ? [
+                    html.tag('h1',
+                      language.$('homepage.news.title')),
+
+                    ...newsData
+                      .slice(0, 3)
+                      .map((entry, i) =>
+                        html.tag('article',
+                          {
+                            class: [
+                              'news-entry',
+                              i === 0 && 'first-news-entry',
+                            ],
+                          },
+                          [
+                            html.tag('h2', [
+                              html.tag('time',
+                                language.formatDate(entry.date)),
+                              link.newsEntry(entry),
+                            ]),
+
+                            transformMultiline(entry.contentShort),
+
+                            entry.contentShort !== entry.content &&
+                              link.newsEntry(entry, {
+                                text: language.$('homepage.news.entry.viewRest')
+                              }),
+                          ])),
+                  ].join('\n')
+                : html.tag('p',
+                    html.tag('i',
+                      `News requested in content description but this feature isn't enabled`))),
       },
 
       nav: {
