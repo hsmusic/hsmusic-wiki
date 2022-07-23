@@ -155,7 +155,7 @@ const CACHEBUST = 11;
 
 let COMMIT;
 try {
-  COMMIT = execSync('git log --format="%h %B" -n 1 HEAD').toString().trim();
+  COMMIT = execSync('git log --format="%h %B" -n 1 HEAD', {cwd: __dirname}).toString().trim();
 } catch (error) {
   COMMIT = '(failed to detect)';
 }
