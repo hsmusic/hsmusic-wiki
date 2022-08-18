@@ -17,9 +17,10 @@ export function write(staticPage) {
       stylesheet: staticPage.stylesheet,
 
       main: {
-        content: html.tag('div',
-          {class: 'long-content'},
-          transformMultiline(staticPage.content)),
+        content: html.tag('div', {class: 'long-content'}, [
+          html.tag('h1', staticPage.name),
+          transformMultiline(staticPage.content),
+        ]),
       },
 
       nav: {simple: true},
