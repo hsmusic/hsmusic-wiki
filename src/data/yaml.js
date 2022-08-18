@@ -62,9 +62,9 @@ export const FLASH_DATA_FILE = 'flashes.yaml';
 export const NEWS_DATA_FILE = 'news.yaml';
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 export const GROUP_DATA_FILE = 'groups.yaml';
-export const STATIC_PAGE_DATA_FILE = 'static-pages.yaml';
 
 export const DATA_ALBUM_DIRECTORY = 'album';
+export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 
 // --> Document processing functions
 
@@ -670,10 +670,10 @@ export const dataSteps = [
     files: async (dataPath) =>
       (
         await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY), {
-          filter: (f) => path.extname(f) === '.yaml',
+          filter: f => path.extname(f) === '.yaml',
           joinParentDirectory: false,
         })
-      ).map((file) => path.join(DATA_ALBUM_DIRECTORY, file)),
+      ).map(file => path.join(DATA_ALBUM_DIRECTORY, file)),
 
     documentMode: documentModes.headerAndEntries,
     processHeaderDocument: processAlbumDocument,
@@ -913,10 +913,16 @@ export const dataSteps = [
   },
 
   {
-    title: `Process static pages file`,
-    file: STATIC_PAGE_DATA_FILE,
+    title: `Process static page files`,
+    files: async (dataPath) =>
+      (
+        await findFiles(path.join(dataPath, DATA_STATIC_PAGE_DIRECTORY), {
+          filter: f => path.extname(f) === '.yaml',
+          joinParentDirectory: false,
+        })
+      ).map(file => path.join(DATA_STATIC_PAGE_DIRECTORY, file)),
 
-    documentMode: documentModes.allInOne,
+    documentMode: documentModes.onePerFile,
     processDocument: processStaticPageDocument,
 
     save(staticPageData) {
@@ -1021,11 +1027,17 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           );
         }
 
-        const files = (
+        let files = (
           typeof dataStep.files === 'function'
             ? await callAsync(dataStep.files, dataPath)
             : dataStep.files
-        ).map((file) => path.join(dataPath, file));
+        )
+
+        if (!files) {
+          return;
+        }
+
+        files = files.map((file) => path.join(dataPath, file));
 
         const readResults = await mapAsync(
           files,
