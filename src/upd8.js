@@ -151,7 +151,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 11;
+const CACHEBUST = 12;
 
 let COMMIT;
 try {
@@ -936,16 +936,6 @@ writePage.html = (
     ? transformMultiline(wikiInfo.footerContent)
     : '';
 
-  footer.content +=
-    '\n' +
-    getFooterLocalizationLinks(paths.pathname, {
-      defaultLanguage,
-      languages,
-      paths,
-      language,
-      to,
-    });
-
   const canonical = wikiInfo.canonicalBase
     ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
     : '';
@@ -962,21 +952,36 @@ writePage.html = (
 
   const mainHTML =
     main.content &&
-    html.tag('main',
-      {
-        id: 'content',
-        class: main.classes,
-      },
-      main.content);
+      html.tag('main',
+        {
+          id: 'content',
+          class: main.classes,
+        },
+        main.content);
 
   const footerHTML =
-    footer.content &&
     html.tag('footer',
       {
+        [html.onlyIfContent]: true,
         id: 'footer',
         class: footer.classes,
       },
-      footer.content);
+      [
+        html.tag('div',
+          {
+            [html.onlyIfContent]: true,
+            class: 'footer-content',
+          },
+          footer.content),
+
+        getFooterLocalizationLinks(paths.pathname, {
+          defaultLanguage,
+          languages,
+          paths,
+          language,
+          to,
+        }),
+      ]);
 
   const generateSidebarHTML = (
     id,

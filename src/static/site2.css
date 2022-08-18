@@ -197,12 +197,20 @@ footer {
   font-style: oblique;
 }
 
-footer > :first-child {
+.footer-content {
+  margin: 5px 12%;
+}
+
+.footer-content > :first-child {
   margin-top: 0;
 }
 
-footer > :last-child {
+.footer-content > :last-child {
   margin-bottom: 0;
+}
+
+.footer-localization-links {
+  margin: 5px 12%;
 }
 
 .footer-localization-links > span:not(:last-child)::after {
