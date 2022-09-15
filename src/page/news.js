@@ -13,7 +13,7 @@ export function write(entry, {wikiData}) {
     type: 'page',
     path: ['newsEntry', entry.directory],
     page: ({
-      generatePreviousNextLinks,
+      generateNavigationLinks,
       html,
       language,
       link,
@@ -39,7 +39,7 @@ export function write(entry, {wikiData}) {
       },
 
       nav: generateNewsEntryNav(entry, {
-        generatePreviousNextLinks,
+        generateNavigationLinks,
         html,
         language,
         link,
@@ -104,7 +104,7 @@ export function writeTargetless({wikiData}) {
 }
 
 function generateNewsEntryNav(entry, {
-  generatePreviousNextLinks,
+  generateNavigationLinks,
   html,
   language,
   link,
@@ -112,7 +112,7 @@ function generateNewsEntryNav(entry, {
 }) {
   // The newsData list is sorted reverse chronologically (newest ones first),
   // so the way we find next/previous entries is flipped from normal.
-  const previousNextLinks = generatePreviousNextLinks(entry, {
+  const previousNextLinks = generateNavigationLinks(entry, {
     data: newsData.slice().reverse(),
     linkKey: 'newsEntry',
 

@@ -107,12 +107,26 @@ export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+// Binds default values for arguments in a {key: value} type function argument
+// (typically the second argument, but may be overridden by providing a
+// [bindOpts.bindIndex] argument). Typically useful for preparing a function for
+// reuse within one or multiple other contexts, which may not be aware of
+// required or relevant values provided in the initial context.
+//
+// This function also passes the identity of `this` through (the returned value
+// is not an arrow function), though note it's not a true bound function either
+// (since Function.prototype.bind only supports positional arguments, not
+// "options" specified via key/value).
+//
 export function bindOpts(fn, bind) {
   const bindIndex = bind[bindOpts.bindIndex] ?? 1;
 
   const bound = function (...args) {
     const opts = args[bindIndex] ?? {};
-    return fn(...args.slice(0, bindIndex), {...bind, ...opts});
+    return Reflect.apply(fn, this, [
+      ...args.slice(0, bindIndex),
+      {...bind, ...opts}
+    ]);
   };
 
   Object.defineProperty(bound, 'name', {

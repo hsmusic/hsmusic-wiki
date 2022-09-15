@@ -26,7 +26,7 @@ export function write(group, {wikiData}) {
     page: ({
       fancifyURL,
       generateInfoGalleryLinks,
-      generatePreviousNextLinks,
+      generateNavigationLinks,
       getLinkThemeString,
       getThemeString,
       html,
@@ -104,7 +104,7 @@ export function write(group, {wikiData}) {
 
       nav: generateGroupNav(group, false, {
         generateInfoGalleryLinks,
-        generatePreviousNextLinks,
+        generateNavigationLinks,
         language,
         link,
         wikiData,
@@ -117,7 +117,7 @@ export function write(group, {wikiData}) {
     path: ['groupGallery', group.directory],
     page: ({
       generateInfoGalleryLinks,
-      generatePreviousNextLinks,
+      generateNavigationLinks,
       getAlbumGridHTML,
       getLinkThemeString,
       getThemeString,
@@ -151,7 +151,7 @@ export function write(group, {wikiData}) {
                 language.formatDuration(totalDuration, {
                   unit: true,
                 })),
-              })),
+            })),
 
           wikiInfo.enableGroupUI &&
           wikiInfo.enableListings &&
@@ -191,7 +191,7 @@ export function write(group, {wikiData}) {
 
       nav: generateGroupNav(group, true, {
         generateInfoGalleryLinks,
-        generatePreviousNextLinks,
+        generateNavigationLinks,
         language,
         link,
         wikiData,
@@ -253,7 +253,7 @@ function generateGroupSidebar(currentGroup, isGallery, {
 
 function generateGroupNav(currentGroup, isGallery, {
   generateInfoGalleryLinks,
-  generatePreviousNextLinks,
+  generateNavigationLinks,
   link,
   language,
   wikiData,
@@ -271,7 +271,7 @@ function generateGroupNav(currentGroup, isGallery, {
     linkKeyInfo: 'groupInfo',
   });
 
-  const previousNextLinks = generatePreviousNextLinks(currentGroup, {
+  const previousNextLinks = generateNavigationLinks(currentGroup, {
     data: groupData,
     linkKey,
   });

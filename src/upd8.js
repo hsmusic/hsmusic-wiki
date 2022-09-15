@@ -89,7 +89,7 @@ import {
   generateChronologyLinks,
   generateCoverLink,
   generateInfoGalleryLinks,
-  generatePreviousNextLinks,
+  generateNavigationLinks,
   generateTrackListDividedByGroups,
   getAlbumGridHTML,
   getAlbumStylesheet,
@@ -1562,18 +1562,6 @@ function generateRedirectPage(title, target, {language}) {
     `;
 }
 
-// RIP toAnythingMan (previously getHrefOfAnythingMan), 2020-05-25<>2021-05-14.
-// ........Yet the function 8reathes life anew as linkAnythingMan! ::::)
-function linkAnythingMan(anythingMan, {link, wikiData, ...opts}) {
-  return wikiData.albumData.includes(anythingMan)
-    ? link.album(anythingMan, opts)
-    : wikiData.trackData.includes(anythingMan)
-    ? link.track(anythingMan, opts)
-    : wikiData.flashData?.includes(anythingMan)
-    ? link.flash(anythingMan, opts)
-    : 'idk bud';
-}
-
 async function processLanguageFile(file) {
   const contents = await readFile(file, 'utf-8');
   const json = JSON.parse(contents);
@@ -2353,11 +2341,6 @@ async function main() {
               entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
             );
 
-            bound.linkAnythingMan = bindOpts(linkAnythingMan, {
-              link: bound.link,
-              wikiData,
-            });
-
             bound.parseAttributes = bindOpts(parseAttributes, {
               to,
             });
@@ -2437,9 +2420,17 @@ async function main() {
               }
             );
 
+            bound.generateNavigationLinks = bindOpts(
+              generateNavigationLinks,
+              {
+                link: bound.link,
+                language,
+              }
+            );
+
             bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
+              generateNavigationLinks: bound.generateNavigationLinks,
               link: bound.link,
-              linkAnythingMan: bound.linkAnythingMan,
               language,
               wikiData,
             });
@@ -2457,14 +2448,6 @@ async function main() {
               generateInfoGalleryLinks,
               {
                 [bindOpts.bindIndex]: 2,
-                link: bound.link,
-                language,
-              }
-            );
-
-            bound.generatePreviousNextLinks = bindOpts(
-              generatePreviousNextLinks,
-              {
                 link: bound.link,
                 language,
               }

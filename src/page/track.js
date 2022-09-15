@@ -151,7 +151,7 @@ export function write(track, {wikiData}) {
       fancifyURL,
       generateChronologyLinks,
       generateCoverLink,
-      generatePreviousNextLinks,
+      generateNavigationLinks,
       generateTrackListDividedByGroups,
       getAlbumStylesheet,
       getArtistString,
@@ -377,7 +377,8 @@ export function write(track, {wikiData}) {
           bottomRowContent:
             album.tracks.length > 1 &&
               generateAlbumNavLinks(album, track, {
-                generatePreviousNextLinks,
+                generateNavigationLinks,
+                html,
                 language,
               }),
         },

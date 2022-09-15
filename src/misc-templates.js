@@ -30,10 +30,12 @@ export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
   if (!additionalFiles?.length) return '';
 
   return language.$('releaseInfo.additionalFiles.shortcut', {
-    anchorLink: `<a href="#additional-files">${language.$(
-      'releaseInfo.additionalFiles.shortcut.anchorLink'
-    )}</a>`,
-    titles: language.formatUnitList(additionalFiles.map((g) => g.title)),
+    anchorLink:
+      html.tag('a',
+        {href: '#additional-files'},
+        language.$('releaseInfo.additionalFiles.shortcut.anchorLink')),
+    titles: language.formatUnitList(
+      additionalFiles.map(g => g.title)),
   });
 }
 
@@ -41,62 +43,45 @@ export function generateAdditionalFilesList(
   additionalFiles,
   {language, getFileSize, linkFile}
 ) {
-  if (!additionalFiles?.length) return '';
+  if (!additionalFiles?.length) return [];
 
   const fileCount = additionalFiles.flatMap((g) => g.files).length;
 
-  return fixWS`
-        <p id="additional-files">${language.$(
-          'releaseInfo.additionalFiles.heading',
-          {
-            additionalFiles: language.countAdditionalFiles(fileCount, {
-              unit: true,
-            }),
-          }
-        )}</p>
-        <dl>
-            ${additionalFiles
-              .map(
-                ({title, description, files}) => fixWS`
-                <dt>${
-                  description
-                    ? language.$(
-                        'releaseInfo.additionalFiles.entry.withDescription',
-                        {
-                          title,
-                          description,
-                        }
-                      )
-                    : language.$('releaseInfo.additionalFiles.entry', {title})
-                }</dt>
-                <dd><ul>
-                    ${files
-                      .map((file) => {
-                        const size = getFileSize(file);
-                        return size
-                          ? `<li>${language.$(
-                              'releaseInfo.additionalFiles.file.withSize',
-                              {
-                                file: linkFile(file),
-                                size: language.formatFileSize(
-                                  getFileSize(file)
-                                ),
-                              }
-                            )}</li>`
-                          : `<li>${language.$(
-                              'releaseInfo.additionalFiles.file',
-                              {
-                                file: linkFile(file),
-                              }
-                            )}</li>`;
-                      })
-                      .join('\n')}
-                </ul></dd>
-            `
-              )
-              .join('\n')}
-        </dl>
-    `;
+  return html.fragment([
+    html.tag('p',
+      {id: 'additional-files'},
+      language.$('releaseInfo.additionalFiles.heading', {
+        additionalFiles: language.countAdditionalFiles(fileCount, {
+          unit: true,
+        }),
+      })),
+
+    html.tag('dl',
+      additionalFiles.flatMap(({title, description, files}) => [
+        html.tag('dt',
+          (description
+            ? language.$('releaseInfo.additionalFiles.entry.withDescription', {
+                title,
+                description,
+              })
+            : language.$('releaseInfo.additionalFiles.entry', {title}))),
+
+        html.tag('dd',
+          html.tag('ul',
+            files.map((file) => {
+              const size = getFileSize(file);
+              return html.tag('li',
+                (size
+                  ? language.$('releaseInfo.additionalFiles.file.withSize', {
+                      file: linkFile(file),
+                      size: language.formatFileSize(size),
+                    })
+                  : language.$('releaseInfo.additionalFiles.file', {
+                      file: linkFile(file),
+                    })));
+            }))),
+      ])),
+  ]);
 }
 
 // Artist strings
@@ -108,35 +93,53 @@ export function getArtistString(
   return language.formatConjunctionList(
     artists.map(({who, what}) => {
       const {urls} = who;
-      return [
-        link.artist(who),
-        showContrib && what && `(${what})`,
-        showIcons &&
-          urls?.length &&
-          `<span class="icons">(${language.formatUnitList(
-            urls.map((url) => iconifyURL(url, {language}))
-          )})</span>`,
-      ]
-        .filter(Boolean)
-        .join(' ');
-    })
-  );
+
+      const hasContribPart = !!(showContrib && what);
+      const hasExternalPart = !!(showIcons && urls?.length);
+
+      const artistLink = link.artist(who);
+
+      const externalLinks = hasExternalPart &&
+        html.tag('span',
+          {class: 'icons'},
+          language.formatUnitList(
+            urls.map(url => iconifyURL(url, {language}))));
+
+      return (
+        (hasContribPart
+          ? (hasExternalPart
+              ? language.$('misc.artistLink.withContribution.withExternalLinks', {
+                  artist: artistLink,
+                  contrib: what,
+                  links: externalLinks,
+                })
+              : language.$('misc.artistLink.withContribution', {
+                  artist: artistLink,
+                  contrib: what,
+                }))
+          : (hasExternalPart
+              ? language.$('misc.artistLink.withExternalLinks', {
+                  artist: artistLink,
+                  links: externalLinks,
+                })
+              : language.$('misc.artistLink', {
+                  artist: artistLink,
+                })))
+      );
+    }));
 }
 
 // Chronology links
 
-export function generateChronologyLinks(
-  currentThing,
-  {
-    dateKey = 'date',
-    contribKey,
-    getThings,
-    headingString,
-    link,
-    linkAnythingMan,
-    language,
-  }
-) {
+export function generateChronologyLinks(currentThing, {
+  dateKey = 'date',
+  contribKey,
+  getThings,
+  generateNavigationLinks,
+  headingString,
+  link,
+  language,
+}) {
   const contributions = currentThing[contribKey];
   if (!contributions) {
     return '';
@@ -157,55 +160,45 @@ export function generateChronologyLinks(
       // Kinda a hack, but we automatically detect which is (probably) the
       // right function to use here.
       const args = [thingsUnsorted, {getDate: (t) => t[dateKey]}];
-      const things = thingsUnsorted.every(
-        (t) => t instanceof Album || t instanceof Track
-      )
-        ? sortAlbumsTracksChronologically(...args)
-        : sortChronologically(...args);
+      const things = (
+        thingsUnsorted.every(t => t instanceof Album || t instanceof Track)
+          ? sortAlbumsTracksChronologically(...args)
+          : sortChronologically(...args));
+
+      if (things.length === 0) return '';
 
       const index = things.indexOf(currentThing);
 
       if (index === -1) return '';
 
-      // TODO: This can pro8a8ly 8e made to use generatePreviousNextLinks?
-      // We'd need to make generatePreviousNextLinks use toAnythingMan tho.
-      const previous = things[index - 1];
-      const next = things[index + 1];
-      const parts = [
-        previous &&
-          linkAnythingMan(previous, {
-            color: false,
-            text: language.$('misc.nav.previous'),
-          }),
-        next &&
-          linkAnythingMan(next, {
-            color: false,
-            text: language.$('misc.nav.next'),
-          }),
-      ].filter(Boolean);
+      const heading = (
+        html.tag('span', {class: 'heading'},
+          language.$(headingString, {
+            index: language.formatIndex(index + 1, {language}),
+            artist: link.artist(artist),
+          })));
 
-      if (!parts.length) {
-        return '';
-      }
+      const navigation = things.length > 1 &&
+        html.tag('span',
+          {
+            [html.onlyIfContent]: true,
+            class: 'buttons',
+          },
+          generateNavigationLinks(currentThing, {
+            data: things,
+            isMain: false,
+          }));
 
-      const stringOpts = {
-        index: language.formatIndex(index + 1, {language}),
-        artist: link.artist(artist),
-      };
-
-      return fixWS`
-            <div class="chronology">
-                <span class="heading">${language.$(
-                  headingString,
-                  stringOpts
-                )}</span>
-                ${
-                  parts.length &&
-                  `<span class="buttons">(${parts.join(', ')})</span>`
-                }
-            </div>
-        `;
+      return (
+        html.tag('div', {class: 'chronology'},
+          (navigation
+            ? language.$('misc.chronology.withNavigation', {
+                heading,
+                navigation,
+              })
+            : heading)));
     })
+    // TODO: use html.fragment when calling and get rid of these lines
     .filter(Boolean)
     .join('\n');
 }
@@ -570,38 +563,63 @@ export function generateInfoGalleryLinks(
   ].join(', ');
 }
 
-export function generatePreviousNextLinks(
-  current,
-  {data, link, linkKey, language}
-) {
-  const linkFn = link[linkKey];
+// Generate "previous" and "next" links relative to a given current thing and a
+// data set (array of things) which includes it, optionally including additional
+// provided links like "random". This is for use in navigation bars and other
+// inline areas.
+//
+// By default, generated links include ID attributes which enable client-side
+// keyboard shortcuts. Provide isMain: false to disable this (if the generated
+// links aren't the for the page's primary navigation).
+export function generateNavigationLinks(current, {
+  additionalLinks = [],
+  data,
+  isMain = true,
+  language,
+  link,
+  linkKey = 'anything',
+}) {
+  let previousLink, nextLink;
 
-  const index = data.indexOf(current);
-  const previous = data[index - 1];
-  const next = data[index + 1];
+  if (current) {
+    const linkFn = link[linkKey].bind(link);
 
-  return [
-    previous &&
-      linkFn(previous, {
+    const index = data.indexOf(current);
+    const previousThing = data[index - 1];
+    const nextThing = data[index + 1];
+
+    previousLink = previousThing &&
+      linkFn(previousThing, {
         attributes: {
-          id: 'previous-button',
-          title: previous.name,
+          id: isMain && 'previous-button',
+          title: previousThing.name,
         },
         text: language.$('misc.nav.previous'),
         color: false,
-      }),
-    next &&
-      linkFn(next, {
+      });
+
+    nextLink = nextThing &&
+      linkFn(nextThing, {
         attributes: {
-          id: 'next-button',
-          title: next.name,
+          id: isMain && 'next-button',
+          title: nextThing.name,
         },
         text: language.$('misc.nav.next'),
         color: false,
-      }),
-  ]
-    .filter(Boolean)
-    .join(', ');
+      });
+  }
+
+  const links = [
+    previousLink,
+    nextLink,
+    ...additionalLinks,
+  ].filter(Boolean);
+
+  if (!links.length) {
+    return '';
+  }
+
+  return language.formatUnitList(links);
 }
 
 // Footer stuff

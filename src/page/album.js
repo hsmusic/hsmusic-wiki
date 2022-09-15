@@ -102,6 +102,7 @@ export function write(album, {wikiData}) {
       generateAdditionalFilesList,
       generateChronologyLinks,
       generateCoverLink,
+      generateNavigationLinks,
       getAlbumCover,
       getAlbumStylesheet,
       getArtistString,
@@ -277,18 +278,19 @@ export function write(album, {wikiData}) {
                   })
               ]),
 
-            hasAdditionalFiles &&
-              generateAdditionalFilesList(album.additionalFiles, {
-                // TODO: Kinda near the metal here...
-                getFileSize: (file) =>
-                  getSizeOfAdditionalFile(
-                    urls.from('media.root').to(
-                      'media.albumAdditionalFile',
-                      album.directory,
-                      file)),
-                linkFile: (file) =>
-                  link.albumAdditionalFile({album, file}),
-              }),
+            ...html.fragment(
+              hasAdditionalFiles &&
+                generateAdditionalFilesList(album.additionalFiles, {
+                  // TODO: Kinda near the metal here...
+                  getFileSize: (file) =>
+                    getSizeOfAdditionalFile(
+                      urls.from('media.root').to(
+                        'media.albumAdditionalFile',
+                        album.directory,
+                        file)),
+                  linkFile: (file) =>
+                    link.albumAdditionalFile({album, file}),
+                })),
 
             ...album.commentary ? [
               html.tag('p', language.$('releaseInfo.artistCommentary')),
@@ -317,7 +319,11 @@ export function write(album, {wikiData}) {
               }),
             },
           ],
-          bottomRowContent: generateAlbumNavLinks(album, null, {language}),
+          bottomRowContent: generateAlbumNavLinks(album, null, {
+            generateNavigationLinks,
+            html,
+            language,
+          }),
           content: generateAlbumChronologyLinks(album, null, {
             generateChronologyLinks,
             html,
@@ -526,33 +532,35 @@ export function generateAlbumSecondaryNav(album, currentTrack, {
   };
 }
 
-export function generateAlbumNavLinks(
-  album,
-  currentTrack,
-  {generatePreviousNextLinks, language}
-) {
+export function generateAlbumNavLinks(album, currentTrack, {
+  generateNavigationLinks,
+  html,
+  language,
+}) {
   const isTrackPage = !!currentTrack;
 
   if (album.tracks.length <= 1) {
     return '';
   }
 
-  const previousNextLinks =
-    isTrackPage &&
-      generatePreviousNextLinks(currentTrack, {
-        data: album.tracks,
-        linkKey: 'track',
-      });
-
-  const randomLink = `<a href="#" data-random="track-in-album" id="random-button">${
-    isTrackPage
+  const randomLink = html.tag('a',
+    {
+      href: '#',
+      dataRandom: 'track-in-album',
+      id: 'random-button'
+    },
+    (isTrackPage
       ? language.$('trackPage.nav.random')
-      : language.$('albumPage.nav.randomTrack')
-  }</a>`;
+      : language.$('albumPage.nav.randomTrack')));
 
-  return previousNextLinks
-    ? `(${previousNextLinks}<span class="js-hide-until-data">, ${randomLink}</span>)`
-    : `<span class="js-hide-until-data">(${randomLink})</span>`;
+  const navigationLinks =
+    generateNavigationLinks(currentTrack, {
+      additionalLinks: [randomLink],
+      data: album.tracks,
+      linkKey: 'track',
+    });
+
+  return `(${navigationLinks})`;
 }
 
 export function generateAlbumChronologyLinks(album, currentTrack, {

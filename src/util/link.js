@@ -14,6 +14,17 @@
 import * as html from './html.js';
 import {getColors} from './colors.js';
 
+import {
+  Album,
+  Artist,
+  ArtTag,
+  Flash,
+  Group,
+  NewsEntry,
+  StaticPage,
+  Track,
+} from '../data/things.js';
+
 export function getLinkThemeString(color) {
   if (!color) return '';
 
@@ -80,6 +91,21 @@ const linkPathname = (key, conf) =>
 const linkIndex = (key, conf) =>
   linkHelper((_, {to}) => to('localized.' + key), conf);
 
+// Mapping of Thing constructor classes to the key for a link.x() function.
+// These represent a sensible "default" link, i.e. to the primary page for
+// the given thing based on what it's an instance of. This is used for the
+// link.anything() function.
+const linkAnythingMapping = [
+  [Album, 'album'],
+  [Artist, 'artist'],
+  [ArtTag, 'tag'],
+  [Flash, 'flash'],
+  [Group, 'groupInfo'],
+  [NewsEntry, 'newsEntry'],
+  [StaticPage, 'staticPage'],
+  [Track, 'track'],
+];
+
 const link = {
   globalOptions: {
     // This should usually only 8e used during development! It'll take any
@@ -134,6 +160,34 @@ const link = {
   root: linkPathname('shared.path', {color: false}),
   data: linkPathname('data.path', {color: false}),
   site: linkPathname('localized.path', {color: false}),
+
+  // This is NOT an arrow functions because it should be callable for other
+  // "this" objects - i.e, if we bind arguments in other functions on the same
+  // link object, link.anything() should use those bound functions, not the
+  // original ones we're exporting here.
+  //
+  // This function has been through a lot of names:
+  //   - getHrefOfAnythingMan (2020-05-25)
+  //   - toAnythingMan (2021-03-02)
+  //   - linkAnythingMan (2021-05-14)
+  //   - link.anything (2022-09-15)
+  // ...And it'll probably end up being renamed yet again one day!
+  //
+  anything(...args) {
+    if (!this) {
+      throw new Error(`Missing value for \`this\` - investigate JS call stack`);
+    }
+
+    const [thing] = args;
+
+    for (const [constructor, fnKey] of linkAnythingMapping) {
+      if (thing instanceof constructor) {
+        return Reflect.apply(this[fnKey], this, args);
+      }
+    }
+
+    throw new Error(`Unrecognized type of thing for linking: ${thing}`);
+  },
 };
 
 export default link;

@@ -20,7 +20,7 @@ export function write(flash, {wikiData}) {
       fancifyFlashURL,
       generateChronologyLinks,
       generateCoverLink,
-      generatePreviousNextLinks,
+      generateNavigationLinks,
       getArtistString,
       getFlashCover,
       getThemeString,
@@ -106,7 +106,7 @@ export function write(flash, {wikiData}) {
 
       nav: generateNavForFlash(flash, {
         generateChronologyLinks,
-        generatePreviousNextLinks,
+        generateNavigationLinks,
         html,
         link,
         language,
@@ -195,7 +195,7 @@ export function writeTargetless({
 
 function generateNavForFlash(flash, {
   generateChronologyLinks,
-  generatePreviousNextLinks,
+  generateNavigationLinks,
   html,
   language,
   link,
@@ -203,7 +203,7 @@ function generateNavForFlash(flash, {
 }) {
   const {flashData} = wikiData;
 
-  const previousNextLinks = generatePreviousNextLinks(flash, {
+  const previousNextLinks = generateNavigationLinks(flash, {
     data: flashData,
     linkKey: 'flash',
   });
