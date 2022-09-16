@@ -301,6 +301,7 @@ export function getThemeString(color, additionalVariables = []) {
 
 export function getAlbumStylesheet(album, {to}) {
   const hasWallpaper = album.wallpaperArtistContribs.length >= 1;
+  const hasWallpaperStyle = !!album.wallpaperStyle;
   const hasBannerStyle = !!album.bannerStyle;
 
   const wallpaperSource =
@@ -314,7 +315,12 @@ export function getAlbumStylesheet(album, {to}) {
     (hasWallpaper
       ? [
           `body::before {`,
-          `    background-image: url("${wallpaperSource}")`,
+          `    background-image: url("${wallpaperSource}");`,
+          ...html.fragment(
+            hasWallpaperStyle &&
+              album.wallpaperStyle
+              .split('\n')
+              .map(line => `    ${line}`)),
           `}`,
         ]
       : []);
