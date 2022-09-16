@@ -211,9 +211,9 @@ export function generateChronologyLinks(currentThing, {
 export function getRevealStringFromWarnings(warnings, {language}) {
   return (
     language.$('misc.contentWarnings', {warnings}) +
-    `<br><span class="reveal-interaction">${language.$(
-      'misc.contentWarnings.reveal'
-    )}</span>`
+    html.tag('br') +
+    html.tag('span', {class: 'reveal-interaction'},
+      language.$('misc.contentWarnings.reveal'))
   );
 }
 
@@ -221,12 +221,12 @@ export function getRevealStringFromTags(tags, {language}) {
   return (
     tags &&
     tags.some((tag) => tag.isContentWarning) &&
-    getRevealStringFromWarnings(
-      language.formatUnitList(
-        tags.filter((tag) => tag.isContentWarning).map((tag) => tag.name)
-      ),
-      {language}
-    )
+      getRevealStringFromWarnings(
+        language.formatUnitList(
+          tags
+            .filter(tag => tag.isContentWarning)
+            .map(tag => tag.name)),
+        {language})
   );
 }
 
@@ -253,32 +253,27 @@ export function generateCoverLink({
     throw new Error(`Expected src or path`);
   }
 
-  return fixWS`
-        <div id="cover-art-container">
-            ${img({
-              src,
-              alt,
-              thumb: 'medium',
-              id: 'cover-art',
-              link: true,
-              square: true,
-              reveal: getRevealStringFromTags(tags, {language}),
-            })}
-            ${
-              wikiInfo.enableArtTagUI &&
-              tags.filter((tag) => !tag.isContentWarning).length &&
-              fixWS`
-                <p class="tags">
-                    ${language.$('releaseInfo.artTags')}
-                    ${tags
-                      .filter((tag) => !tag.isContentWarning)
-                      .map(link.tag)
-                      .join(',\n')}
-                </p>
-            `
-            }
-        </div>
-    `;
+  const linkedTags = tags.filter(tag => !tag.isContentWarning);
+
+  return html.tag('div', {id: 'cover-art-container'}, [
+    img({
+      src,
+      alt,
+      thumb: 'medium',
+      id: 'cover-art',
+      link: true,
+      square: true,
+      reveal: getRevealStringFromTags(tags, {language}),
+    }),
+
+    wikiInfo.enableArtTagUI &&
+    linkedTags.length &&
+      html.tag('p', {class: 'tags'},
+        language.$('releaseInfo.artTags.inline', {
+          tags: language.formatUnitList(
+            linkedTags.map(tag => link.tag(tag))),
+        })),
+  ]);
 }
 
 // CSS & color shenanigans
@@ -297,29 +292,47 @@ export function getThemeString(color, additionalVariables = []) {
 
   if (!variables.length) return '';
 
-  return (
-    `:root {\n` + variables.map((line) => `    ` + line + ';\n').join('') + `}`
-  );
-}
-export function getAlbumStylesheet(album, {to}) {
   return [
-    album.wallpaperArtistContribs.length &&
-      fixWS`
-            body::before {
-                background-image: url("${to(
-                  'media.albumWallpaper',
-                  album.directory,
-                  album.wallpaperFileExtension
-                )}");
-                ${album.wallpaperStyle}
-            }
-        `,
-    album.bannerStyle &&
-      fixWS`
-            #banner img {
-                ${album.bannerStyle}
-            }
-        `,
+    `:root {`,
+    ...variables.map((line) => `    ${line};`),
+    `}`
+  ].join('\n');
+}
+
+export function getAlbumStylesheet(album, {to}) {
+  const hasWallpaper = album.wallpaperArtistContribs.length >= 1;
+  const hasBannerStyle = !!album.bannerStyle;
+
+  const wallpaperSource =
+    (hasWallpaper &&
+      to(
+        'media.albumWallpaper',
+        album.directory,
+        album.wallpaperFileExtension));
+
+  const wallpaperPart =
+    (hasWallpaper
+      ? [
+          `body::before {`,
+          `    background-image: url("${wallpaperSource}")`,
+          `}`,
+        ]
+      : []);
+
+  const bannerPart =
+    (hasBannerStyle
+      ? [
+          `#banner img {`,
+          ...album.bannerStyle
+            .split('\n')
+            .map(line => `    ${line}`),
+          `}`,
+        ]
+      : []);
+
+  return [
+    ...wallpaperPart,
+    ...bannerPart,
   ]
     .filter(Boolean)
     .join('\n');
@@ -327,22 +340,24 @@ export function getAlbumStylesheet(album, {to}) {
 
 // Divided track lists
 
-export function generateTrackListDividedByGroups(
-  tracks,
-  {getTrackItem, language, wikiData}
-) {
+export function generateTrackListDividedByGroups(tracks, {
+  getTrackItem,
+  language,
+  wikiData,
+}) {
   const {divideTrackListsByGroups: groups} = wikiData.wikiInfo;
 
   if (!groups?.length) {
-    return html.tag(
-      'ul',
-      tracks.map((t) => getTrackItem(t))
-    );
+    return html.tag('ul',
+      tracks.map(t => getTrackItem(t)));
   }
 
   const lists = Object.fromEntries(
-    groups.map((group) => [group.directory, {group, tracks: []}])
-  );
+    groups.map((group) => [
+      group.directory,
+      {group, tracks: []}
+    ]));
+
   const other = [];
 
   for (const track of tracks) {
@@ -355,34 +370,31 @@ export function generateTrackListDividedByGroups(
     }
   }
 
-  const ddul = (tracks) => fixWS`
-        <dd><ul>
-            ${tracks.map((t) => getTrackItem(t)).join('\n')}
-        </ul></dd>
-    `;
+  const dt = name =>
+    html.tag('dt',
+      language.$('trackList.group', {
+        group: name,
+      }));
 
-  return html.tag(
-    'dl',
-    Object.values(lists)
+  const ddul = tracks =>
+    html.tag('dd',
+      html.tag('ul',
+        tracks.map(t => getTrackItem(t))));
+
+  return html.tag('dl', [
+    ...Object.values(lists)
       .filter(({tracks}) => tracks.length)
       .flatMap(({group, tracks}) => [
-        html.tag(
-          'dt',
-          language.formatString('trackList.group', {group: group.name})
-        ),
+        dt(group.name),
         ddul(tracks),
-      ])
-      .concat(
-        other.length
-          ? [
-              `<dt>${language.formatString('trackList.group', {
-                group: language.formatString('trackList.group.other'),
-              })}</dt>`,
-              ddul(other),
-            ]
-          : []
-      )
-  );
+      ]),
+
+    ...html.fragment(
+      other.length && [
+        dt(language.$('trackList.group.other')),
+        ddul(other),
+      ]),
+  ]);
 }
 
 // Fancy lookin' links
@@ -397,44 +409,50 @@ export function fancifyURL(url, {language, album = false} = {}) {
     // be absolute relative to the domain name in order to work.)
     domain = local;
   }
-  return fixWS`<a href="${url}" class="nowrap">${
+  return html.tag('a',
+    {
+      href: url,
+      class: 'nowrap',
+    },
+
+    // truly unhinged indentation here
     domain === local
       ? language.$('misc.external.local')
-      : domain.includes('bandcamp.com')
-      ? language.$('misc.external.bandcamp')
-      : BANDCAMP_DOMAINS.includes(domain)
-      ? language.$('misc.external.bandcamp.domain', {domain})
-      : MASTODON_DOMAINS.includes(domain)
-      ? language.$('misc.external.mastodon.domain', {domain})
-      : domain.includes('youtu')
-      ? album
-        ? url.includes('list=')
-          ? language.$('misc.external.youtube.playlist')
-          : language.$('misc.external.youtube.fullAlbum')
-        : language.$('misc.external.youtube')
-      : domain.includes('soundcloud')
-      ? language.$('misc.external.soundcloud')
-      : domain.includes('tumblr.com')
-      ? language.$('misc.external.tumblr')
-      : domain.includes('twitter.com')
-      ? language.$('misc.external.twitter')
-      : domain.includes('deviantart.com')
-      ? language.$('misc.external.deviantart')
-      : domain.includes('wikipedia.org')
-      ? language.$('misc.external.wikipedia')
-      : domain.includes('poetryfoundation.org')
-      ? language.$('misc.external.poetryFoundation')
-      : domain.includes('instagram.com')
-      ? language.$('misc.external.instagram')
-      : domain.includes('patreon.com')
-      ? language.$('misc.external.patreon')
-      : domain
-  }</a>`;
+  : domain.includes('bandcamp.com')
+    ? language.$('misc.external.bandcamp')
+  : BANDCAMP_DOMAINS.includes(domain)
+    ? language.$('misc.external.bandcamp.domain', {domain})
+  : MASTODON_DOMAINS.includes(domain)
+    ? language.$('misc.external.mastodon.domain', {domain})
+  : domain.includes('youtu')
+    ? album
+      ? url.includes('list=')
+        ? language.$('misc.external.youtube.playlist')
+        : language.$('misc.external.youtube.fullAlbum')
+      : language.$('misc.external.youtube')
+  : domain.includes('soundcloud')
+    ? language.$('misc.external.soundcloud')
+  : domain.includes('tumblr.com')
+    ? language.$('misc.external.tumblr')
+  : domain.includes('twitter.com')
+    ? language.$('misc.external.twitter')
+  : domain.includes('deviantart.com')
+    ? language.$('misc.external.deviantart')
+  : domain.includes('wikipedia.org')
+    ? language.$('misc.external.wikipedia')
+  : domain.includes('poetryfoundation.org')
+    ? language.$('misc.external.poetryFoundation')
+  : domain.includes('instagram.com')
+    ? language.$('misc.external.instagram')
+  : domain.includes('patreon.com')
+    ? language.$('misc.external.patreon')
+    : domain);
 }
 
 export function fancifyFlashURL(url, flash, {language}) {
   const link = fancifyURL(url, {language});
-  return `<span class="nowrap">${
+  return html.tag('span',
+    {class: 'nowrap'},
     url.includes('homestuck.com')
       ? isNaN(Number(flash.page))
         ? language.$('misc.external.flash.homestuck.secret', {link})
@@ -442,39 +460,47 @@ export function fancifyFlashURL(url, flash, {language}) {
             link,
             page: flash.page,
           })
-      : url.includes('bgreco.net')
-      ? language.$('misc.external.flash.bgreco', {link})
-      : url.includes('youtu')
-      ? language.$('misc.external.flash.youtube', {link})
-      : link
-  }</span>`;
+  : url.includes('bgreco.net')
+    ? language.$('misc.external.flash.bgreco', {link})
+  : url.includes('youtu')
+    ? language.$('misc.external.flash.youtube', {link})
+    : link);
 }
 
 export function iconifyURL(url, {language, to}) {
   const domain = new URL(url).hostname;
-  const [id, msg] = domain.includes('bandcamp.com')
-    ? ['bandcamp', language.$('misc.external.bandcamp')]
+  const [id, msg] = (
+    domain.includes('bandcamp.com')
+      ? ['bandcamp', language.$('misc.external.bandcamp')]
     : BANDCAMP_DOMAINS.includes(domain)
-    ? ['bandcamp', language.$('misc.external.bandcamp.domain', {domain})]
+      ? ['bandcamp', language.$('misc.external.bandcamp.domain', {domain})]
     : MASTODON_DOMAINS.includes(domain)
-    ? ['mastodon', language.$('misc.external.mastodon.domain', {domain})]
+      ? ['mastodon', language.$('misc.external.mastodon.domain', {domain})]
     : domain.includes('youtu')
-    ? ['youtube', language.$('misc.external.youtube')]
+      ? ['youtube', language.$('misc.external.youtube')]
     : domain.includes('soundcloud')
-    ? ['soundcloud', language.$('misc.external.soundcloud')]
+      ? ['soundcloud', language.$('misc.external.soundcloud')]
     : domain.includes('tumblr.com')
-    ? ['tumblr', language.$('misc.external.tumblr')]
+      ? ['tumblr', language.$('misc.external.tumblr')]
     : domain.includes('twitter.com')
-    ? ['twitter', language.$('misc.external.twitter')]
+      ? ['twitter', language.$('misc.external.twitter')]
     : domain.includes('deviantart.com')
-    ? ['deviantart', language.$('misc.external.deviantart')]
+      ? ['deviantart', language.$('misc.external.deviantart')]
     : domain.includes('instagram.com')
-    ? ['instagram', language.$('misc.external.bandcamp')]
-    : ['globe', language.$('misc.external.domain', {domain})];
-  return fixWS`<a href="${url}" class="icon"><svg><title>${msg}</title><use href="${to(
-    'shared.staticFile',
-    `icons.svg#icon-${id}`
-  )}"></use></svg></a>`;
+      ? ['instagram', language.$('misc.external.bandcamp')]
+      : ['globe', language.$('misc.external.domain', {domain})]);
+
+  return html.tag('a',
+    {
+      href: url,
+      class: 'icon',
+    },
+    html.tag('svg', [
+      html.tag('title', msg),
+      html.tag('use', {
+        href: to('shared.staticFile', `icons.svg#icon-${id}`),
+      }),
+    ]));
 }
 
 // Grids

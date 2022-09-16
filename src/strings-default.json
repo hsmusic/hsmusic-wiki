@@ -110,6 +110,7 @@
   "releaseInfo.artistCommentary": "Artist commentary:",
   "releaseInfo.artistCommentary.seeOriginalRelease": "See {ORIGINAL}!",
   "releaseInfo.artTags": "Tags:",
+  "releaseInfo.artTags.inline": "Tags: {TAGS}",
   "releaseInfo.additionalFiles.shortcut": "{ANCHOR_LINK} {TITLES}",
   "releaseInfo.additionalFiles.shortcut.anchorLink": "Additional files:",
   "releaseInfo.additionalFiles.heading": "Has {ADDITIONAL_FILES}:",
