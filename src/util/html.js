@@ -32,6 +32,14 @@ export const onlyIfContent = Symbol();
 // string.
 export const joinChildren = Symbol();
 
+// Pass to tag() as an attributes key to prevent additional whitespace from
+// being added to the inner start and end of the tag's content - basically,
+// ensuring that the start of the content begins immediately after the ">"
+// ending the opening tag, and ends immediately before the "<" at the start of
+// the closing tag. This has effect when a single child spans multiple lines,
+// or when there are multiple children.
+export const noEdgeWhitespace = Symbol();
+
 export function tag(tagName, ...args) {
   const selfClosing = selfClosingTags.includes(tagName);
 
@@ -75,14 +83,20 @@ export function tag(tagName, ...args) {
 
   if (content) {
     if (content.includes('\n')) {
-      return (
-        `<${openTag}>\n` +
+      return [
+        `<${openTag}>`,
         content
           .split('\n')
-          .map((line) => '    ' + line + '\n')
-          .join('') +
-        `</${tagName}>`
-      );
+          .map((line, i) =>
+            (i === 0 && attrs?.[noEdgeWhitespace]
+              ? line
+              : '    ' + line))
+          .join('\n'),
+        `</${tagName}>`,
+      ].join(
+        (attrs?.[noEdgeWhitespace]
+          ? ''
+          : '\n'));
     } else {
       return `<${openTag}>${content}</${tagName}>`;
     }

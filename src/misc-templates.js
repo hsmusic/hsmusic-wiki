@@ -101,7 +101,10 @@ export function getArtistString(
 
       const externalLinks = hasExternalPart &&
         html.tag('span',
-          {class: 'icons'},
+          {
+            [html.noEdgeWhitespace]: true,
+            class: 'icons'
+          },
           language.formatUnitList(
             urls.map(url => iconifyURL(url, {language}))));
 
