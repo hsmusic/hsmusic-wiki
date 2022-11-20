@@ -47,12 +47,6 @@ export function accumulateSum(array, fn = x => x) {
 export const mapInPlace = (array, fn) =>
   array.splice(0, array.length, ...array.map(fn));
 
-export const filterEmptyLines = (string) =>
-  string
-    .split('\n')
-    .filter((line) => line.trim())
-    .join('\n');
-
 export const unique = (arr) => Array.from(new Set(arr));
 
 export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>

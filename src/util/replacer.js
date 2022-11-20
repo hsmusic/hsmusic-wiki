@@ -1,7 +1,5 @@
 /** @format */
 
-import fixWS from 'fix-whitespace';
-
 import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
 
@@ -331,11 +329,11 @@ export function parseInput(input) {
 
     const cursor = i - lineStart;
 
-    throw new SyntaxError(fixWS`
-      Parse error (at pos ${i}): ${message}
-      ${line}
-      ${'-'.repeat(cursor) + '^'}
-    `);
+    throw new SyntaxError([
+      `Parse error (at pos ${i}): ${message}`,
+      line,
+      '-'.repeat(cursor) + '^',
+    ].join('\n'));
   }
 }
 

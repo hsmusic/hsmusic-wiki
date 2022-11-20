@@ -35,12 +35,6 @@
 import * as path from 'path';
 import {fileURLToPath} from 'url';
 
-// I made this dependency myself! A long, long time ago. It is pro8a8ly my
-// most useful li8rary ever. I'm not sure 8esides me actually uses it, though.
-import fixWS from 'fix-whitespace';
-// Wait nevermind, I forgot a8out why-do-kids-love-the-taste-of-cinnamon-toast-
-// crunch. THAT is my 8est li8rary.
-
 // It stands for "HTML Entities", apparently. Cursed.
 import he from 'he';
 
@@ -136,7 +130,6 @@ import {
 
 import {
   bindOpts,
-  filterEmptyLines,
   queue,
   showAggregate,
   withEntries,
@@ -232,7 +225,9 @@ const replacerSpec = {
     find: null,
     value: (ref) => new Date(ref),
     html: (date, {language}) =>
-      `<time datetime="${date.toString()}">${language.formatDate(date)}</time>`,
+      html.tag('time',
+        {datetime: date.toString()},
+        language.formatDate(date)),
   },
   flash: {
     find: 'flash',
@@ -642,32 +637,45 @@ function img({
   const originalSrc = src;
   const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
 
-  const imgAttributes = html.attributes({
+  const imgAttributes = {
     id: link ? '' : id,
     class: className,
     alt,
     width,
     height,
-  });
+  };
 
   const noSrcHTML =
-    !src && wrap(`<div class="image-text-area">${noSrcText}</div>`);
-  const nonlazyHTML = src && wrap(`<img src="${thumbSrc}" ${imgAttributes}>`);
+    !src &&
+      wrap(
+        html.tag('div',
+          {class: 'image-text-area'},
+          noSrcText));
+
+  const nonlazyHTML =
+    src &&
+      wrap(
+        html.tag('img', {
+          ...imgAttributes,
+          src: thumbSrc,
+        }));
+
   const lazyHTML =
     src &&
     lazy &&
-    wrap(
-      `<img class="lazy" data-original="${thumbSrc}" ${imgAttributes}>`,
-      true
-    );
+      wrap(
+        html.tag('img',
+          {
+            ...imgAttributes,
+            class: [className, 'lazy'],
+            'data-original': thumbSrc,
+          }),
+        true);
 
   if (!src) {
     return noSrcHTML;
   } else if (lazy) {
-    return fixWS`
-            <noscript>${nonlazyHTML}</noscript>
-            ${lazyHTML}
-        `;
+    return html.tag('noscript', nonlazyHTML) + '\n' + lazyHTML;
   } else {
     return nonlazyHTML;
   }
@@ -675,37 +683,31 @@ function img({
   function wrap(input, hide = false) {
     let wrapped = input;
 
-    wrapped = `<div class="image-inner-area">${wrapped}</div>`;
-    wrapped = `<div class="image-container">${wrapped}</div>`;
+    wrapped = html.tag('div', {class: 'image-inner-area'}, wrapped);
+    wrapped = html.tag('div', {class: 'image-container'}, wrapped);
 
     if (reveal) {
-      wrapped = fixWS`
-                <div class="reveal">
-                    ${wrapped}
-                    <span class="reveal-text">${reveal}</span>
-                </div>
-            `;
+      wrapped = html.tag('div', {class: 'reveal'}, [
+        wrapped,
+        html.tag('span', {class: 'reveal-text'}, reveal),
+      ]);
     }
 
     if (willSquare) {
       wrapped = html.tag('div', {class: 'square-content'}, wrapped);
-      wrapped = html.tag(
-        'div',
+      wrapped = html.tag('div',
         {class: ['square', hide && !willLink && 'js-hide']},
-        wrapped
-      );
+        wrapped);
     }
 
     if (willLink) {
-      wrapped = html.tag(
-        'a',
+      wrapped = html.tag('a',
         {
           id,
           class: ['box', hide && 'js-hide'],
           href: typeof link === 'string' ? link : originalSrc,
         },
-        wrapped
-      );
+        wrapped);
     }
 
     return wrapped;
@@ -1210,141 +1212,140 @@ writePage.html = (
       }),
   ].filter(Boolean).join('\n');
 
-  return filterEmptyLines(fixWS`
-        <!DOCTYPE html>
-        <html ${html.attributes({
-          lang: language.intlCode,
-          'data-language-code': language.code,
-          'data-url-key': paths.toPath[0],
-          ...Object.fromEntries(
-            paths.toPath.slice(1).map((v, i) => [['data-url-value' + i], v])
-          ),
-          'data-rebase-localized': to('localized.root'),
-          'data-rebase-shared': to('shared.root'),
-          'data-rebase-media': to('media.root'),
-          'data-rebase-data': to('data.root'),
-        })}>
-            <!--
-              ${[
-                wikiInfo.canonicalBase
-                  ? `hsmusic.wiki - ${wikiInfo.name}, ${wikiInfo.canonicalBase}`
-                  : `hsmusic.wiki - ${wikiInfo.name}`,
-                'Code copyright 2019-2022 Quasar Nebula et al (MIT License)',
-                ...wikiInfo.canonicalBase === 'https://hsmusic.wiki/' ? [
-                  'Data avidly compiled and localization brought to you',
-                  'by our awesome team and community of wiki contributors',
-                  '***',
-                  'Want to contribute? Join our Discord or leave feedback!',
-                  '- https://hsmusic.wiki/discord/',
-                  '- https://hsmusic.wiki/feedback/',
-                  '- https://github.com/hsmusic/',
-                ] : [
-                  'https://github.com/hsmusic/',
-                ],
-                '***',
-                `Site built: ${BUILD_TIME.toLocaleString('en-US', {
-                  dateStyle: 'long',
-                  timeStyle: 'long',
-                })}`,
-                `Latest code commit: ${COMMIT}`,
-              ].filter(Boolean).join('\n')}
-            -->
-            <head>
-                <title>${
-                  showWikiNameInTitle
-                    ? language.formatString('misc.pageTitle.withWikiName', {
-                        title,
-                        wikiName: wikiInfo.nameShort,
-                      })
-                    : language.formatString('misc.pageTitle', {title})
-                }</title>
-                <meta charset="utf-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1">
-                ${Object.entries(meta)
-                  .filter(([key, value]) => value)
-                  .map(
-                    ([key, value]) =>
-                      `<meta ${key}="${html.escapeAttributeValue(value)}">`
-                  )
-                  .join('\n')}
-                ${canonical && `<link rel="canonical" href="${canonical}">`}
-                ${localizedCanonical
-                  .map(
-                    ({lang, href}) =>
-                      `<link rel="alternate" hreflang="${lang}" href="${href}">`
-                  )
-                  .join('\n')}
-                ${socialEmbedHTML}
-                <link rel="stylesheet" href="${to(
-                  'shared.staticFile',
-                  `site2.css?${CACHEBUST}`
-                )}">
-                ${
-                  (theme || stylesheet) &&
-                  fixWS`
-                    <style>
-                        ${theme}
-                        ${stylesheet}
-                    </style>
-                `
-                }
-                <script src="${to(
-                  'shared.staticFile',
-                  `lazy-loading.js?${CACHEBUST}`
-                )}"></script>
-            </head>
-            <body ${html.attributes({style: body.style || ''})}>
-                <div id="page-container">
-                    ${
-                      mainHTML &&
-                      fixWS`
-                        <div id="skippers">
-                            ${[
-                              [
-                                '#content',
-                                language.$('misc.skippers.skipToContent'),
-                              ],
-                              sidebarLeftHTML && [
-                                '#sidebar-left',
-                                sidebarRightHTML
-                                  ? language.$(
-                                      'misc.skippers.skipToSidebar.left'
-                                    )
-                                  : language.$('misc.skippers.skipToSidebar'),
-                              ],
-                              sidebarRightHTML && [
-                                '#sidebar-right',
-                                sidebarLeftHTML
-                                  ? language.$(
-                                      'misc.skippers.skipToSidebar.right'
-                                    )
-                                  : language.$('misc.skippers.skipToSidebar'),
-                              ],
-                              footerHTML && [
-                                '#footer',
-                                language.$('misc.skippers.skipToFooter'),
-                              ],
-                            ]
-                              .filter(Boolean)
-                              .map(
-                                ([href, title]) => fixWS`
-                                <span class="skipper"><a href="${href}">${title}</a></span>
-                            `
-                              )
-                              .join('\n')}
-                        </div>
-                    `
-                    }
-                    ${layoutHTML}
-                </div>
-                ${infoCardHTML}
-                <script type="module" src="${to(
-                  'shared.staticFile',
-                  `client.js?${CACHEBUST}`
-                )}"></script>
-            </body>
-        </html>
-    `);
+  return `<!DOCTYPE html>\n` + html.tag('html',
+    {
+      lang: language.intlCode,
+      'data-language-code': language.code,
+      'data-url-key': paths.toPath[0],
+      ...Object.fromEntries(
+        paths.toPath.slice(1).map((v, i) => [['data-url-value' + i], v])
+      ),
+      'data-rebase-localized': to('localized.root'),
+      'data-rebase-shared': to('shared.root'),
+      'data-rebase-media': to('media.root'),
+      'data-rebase-data': to('data.root'),
+    },
+    [
+      `<!--\n` + [
+        wikiInfo.canonicalBase
+          ? `hsmusic.wiki - ${wikiInfo.name}, ${wikiInfo.canonicalBase}`
+          : `hsmusic.wiki - ${wikiInfo.name}`,
+        'Code copyright 2019-2022 Quasar Nebula et al (MIT License)',
+        ...wikiInfo.canonicalBase === 'https://hsmusic.wiki/' ? [
+          'Data avidly compiled and localization brought to you',
+          'by our awesome team and community of wiki contributors',
+          '***',
+          'Want to contribute? Join our Discord or leave feedback!',
+          '- https://hsmusic.wiki/discord/',
+          '- https://hsmusic.wiki/feedback/',
+          '- https://github.com/hsmusic/',
+        ] : [
+          'https://github.com/hsmusic/',
+        ],
+        '***',
+        `Site built: ${BUILD_TIME.toLocaleString('en-US', {
+          dateStyle: 'long',
+          timeStyle: 'long',
+        })}`,
+        `Latest code commit: ${COMMIT}`,
+      ]
+        .filter(Boolean)
+        .map(line => `    ` + line)
+        .join('\n') + `\n-->`,
+
+      html.tag('head', [
+        html.tag('title',
+          showWikiNameInTitle
+            ? language.formatString('misc.pageTitle.withWikiName', {
+                title,
+                wikiName: wikiInfo.nameShort,
+              })
+            : language.formatString('misc.pageTitle', {title})),
+
+        html.tag('meta', {charset: 'utf-8'}),
+        html.tag('meta', {
+          name: 'viewport',
+          content: 'width=device-width, initial-scale=1',
+        }),
+
+        ...(
+          Object.entries(meta)
+            .filter(([key, value]) => value)
+            .map(([key, value]) => html.tag('meta', {[key]: value}))),
+
+        canonical &&
+          html.tag('link', {
+            rel: 'canonical',
+            href: canonical,
+          }),
+
+        ...(
+          localizedCanonical
+            .map(({lang, href}) => html.tag('link', {
+              rel: 'alternate',
+              hreflang: lang,
+              href,
+            }))),
+
+        socialEmbedHTML,
+
+        html.tag('link', {
+          rel: 'stylesheet',
+          href: to('shared.staticFile', `site2.css?${CACHEBUST}`),
+        }),
+
+        html.tag('style',
+          {[html.onlyIfContent]: true},
+          [
+            theme,
+            stylesheet,
+          ]),
+
+        html.tag('script', {
+          src: to('shared.staticFile', `lazy-loading.js?${CACHEBUST}`),
+        }),
+      ]),
+
+      html.tag('body',
+        {style: body.style || ''},
+        [
+          html.tag('div', {id: 'page-container'}, [
+            mainHTML &&
+              html.tag('div', {id: 'skippers'},
+                [
+                  ['#content', language.$('misc.skippers.skipToContent')],
+                  sidebarLeftHTML &&
+                    [
+                      '#sidebar-left',
+                      sidebarRightHTML
+                        ? language.$('misc.skippers.skipToSidebar.left')
+                        : language.$('misc.skippers.skipToSidebar'),
+                    ],
+                  sidebarRightHTML &&
+                    [
+                      '#sidebar-right',
+                      sidebarLeftHTML
+                        ? language.$('misc.skippers.skipToSidebar.right')
+                        : language.$('misc.skippers.skipToSidebar'),
+                    ],
+                  footerHTML &&
+                    ['#footer', language.$('misc.skippers.skipToFooter')],
+                ]
+                  .filter(Boolean)
+                  .map(([href, title]) =>
+                    html.tag('span', {class: 'skipper'},
+                      html.tag('a', {href}, title)))),
+            layoutHTML,
+          ]),
+
+          infoCardHTML,
+
+          html.tag('script', {
+            type: 'module',
+            src: to('shared.staticFile', `client.js?${CACHEBUST}`),
+          }),
+        ]),
+    ]);
 };
 
 writePage.oEmbedJSON = (pageInfo, {language, wikiData}) => {
@@ -1513,42 +1514,50 @@ function writeSharedFilesAndPages({language, wikiData}) {
 
       writeFile(
         path.join(outputPath, 'data.json'),
-        fixWS`
-            {
-                "albumData": ${stringifyThings(wikiData.albumData)},
-                ${
-                  wikiInfo.enableFlashesAndGames &&
-                  `"flashData": ${stringifyThings(wikiData.flashData)},`
-                }
-                "artistData": ${stringifyThings(wikiData.artistData)}
-            }
-        `
-      ),
+        (
+          '{\n' +
+          [
+            `"albumData": ${stringifyThings(wikiData.albumData)},`,
+            wikiInfo.enableFlashesAndGames &&
+              `"flashData": ${stringifyThings(wikiData.flashData)},`,
+            `"artistData": ${stringifyThings(wikiData.artistData)}`,
+          ]
+            .filter(Boolean)
+            .map(line => '  ' + line)
+            .join('\n') +
+          '\n}')),
     ].filter(Boolean)
   );
 }
 
 function generateRedirectPage(title, target, {language}) {
-  return fixWS`
-        <!DOCTYPE html>
-        <html>
-            <head>
-                <title>${language.$('redirectPage.title', {title})}</title>
-                <meta charset="utf-8">
-                <meta http-equiv="refresh" content="0;url=${target}">
-                <link rel="canonical" href="${target}">
-                <link rel="stylesheet" href="static/site-basic.css">
-            </head>
-            <body>
-                <main>
-                    <h1>${language.$('redirectPage.title', {title})}</h1>
-                    <p>${language.$('redirectPage.infoLine', {
-                      target: `<a href="${target}">${target}</a>`,
-                    })}</p>
-                </main>
-            </body>
-        </html>
-    `;
+  return `<!DOCTYPE html>\n` + html.tag('html', [
+    html.tag('head', [
+      html.tag('title', language.$('redirectPage.title', {title})),
+      html.tag('meta', {charset: 'utf-8'}),
+
+      html.tag('meta', {
+        'http-equiv': 'refresh',
+        content: `0;url=${target}`,
+      }),
+
+      // TODO: Is this OK for localized pages?
+      html.tag('link', {
+        rel: 'canonical',
+        href: target,
+      }),
+    ]),
+
+    html.tag('body',
+      html.tag('main', [
+        html.tag('h1',
+          language.$('redirectPage.title', {title})),
+        html.tag('p',
+          language.$('redirectPage.infoLine', {
+            target: html.tag('a', {href: target}, target),
+          })),
+      ])),
+  ]);
 }
 
 async function processLanguageFile(file) {
