@@ -1,4 +1,5 @@
 node_modules
+.DS_Store
 
 # FOR NOW: We are using site2.css instead of site.css,
 # thanks to breaking changes - we can't have the release

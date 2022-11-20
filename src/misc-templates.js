@@ -4,10 +4,6 @@
 // These are made available right on a page spec's ({wikiData, language, ...})
 // args object!
 
-import fixWS from 'fix-whitespace';
-
-import * as html from './util/html.js';
-
 import {Track, Album} from './data/things.js';
 
 import {getColors} from './util/colors.js';
@@ -26,7 +22,10 @@ const MASTODON_DOMAINS = ['types.pl'];
 
 // "Additional Files" listing
 
-export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
+function unbound_generateAdditionalFilesShortcut(additionalFiles, {
+  html,
+  language,
+}) {
   if (!additionalFiles?.length) return '';
 
   return language.$('releaseInfo.additionalFiles.shortcut', {
@@ -39,10 +38,13 @@ export function generateAdditionalFilesShortcut(additionalFiles, {language}) {
   });
 }
 
-export function generateAdditionalFilesList(
-  additionalFiles,
-  {language, getFileSize, linkFile}
-) {
+function unbound_generateAdditionalFilesList(additionalFiles, {
+  html,
+  language,
+
+  getFileSize,
+  linkFile,
+}) {
   if (!additionalFiles?.length) return [];
 
   const fileCount = additionalFiles.flatMap((g) => g.files).length;
@@ -86,10 +88,16 @@ export function generateAdditionalFilesList(
 
 // Artist strings
 
-export function getArtistString(
-  artists,
-  {iconifyURL, link, language, showIcons = false, showContrib = false}
-) {
+function unbound_getArtistString(artists, {
+  html,
+  language,
+  link,
+
+  iconifyURL,
+
+  showIcons = false,
+  showContrib = false,
+}) {
   return language.formatConjunctionList(
     artists.map(({who, what}) => {
       const {urls} = who;
@@ -134,14 +142,17 @@ export function getArtistString(
 
 // Chronology links
 
-export function generateChronologyLinks(currentThing, {
+function unbound_generateChronologyLinks(currentThing, {
+  html,
+  language,
+  link,
+
+  generateNavigationLinks,
+
   dateKey = 'date',
   contribKey,
   getThings,
-  generateNavigationLinks,
   headingString,
-  link,
-  language,
 }) {
   const contributions = currentThing[contribKey];
   if (!contributions) {
@@ -208,7 +219,10 @@ export function generateChronologyLinks(currentThing, {
 
 // Content warning tags
 
-export function getRevealStringFromWarnings(warnings, {language}) {
+function unbound_getRevealStringFromWarnings(warnings, {
+  html,
+  language,
+}) {
   return (
     language.$('misc.contentWarnings', {warnings}) +
     html.tag('br') +
@@ -217,31 +231,37 @@ export function getRevealStringFromWarnings(warnings, {language}) {
   );
 }
 
-export function getRevealStringFromTags(tags, {language}) {
+function unbound_getRevealStringFromTags(tags, {
+  language,
+
+  getRevealStringFromWarnings,
+}) {
   return (
-    tags &&
-    tags.some((tag) => tag.isContentWarning) &&
+    tags?.some(tag => tag.isContentWarning) &&
       getRevealStringFromWarnings(
         language.formatUnitList(
           tags
             .filter(tag => tag.isContentWarning)
-            .map(tag => tag.name)),
-        {language})
+            .map(tag => tag.name)))
   );
 }
 
 // Cover art links
 
-export function generateCoverLink({
+function unbound_generateCoverLink({
+  html,
   img,
-  link,
   language,
+  link,
+
+  getRevealStringFromTags,
+
+  alt,
+  path,
+  src,
+  tags = [],
   to,
   wikiData,
-  src,
-  path,
-  alt,
-  tags = [],
 }) {
   const {wikiInfo} = wikiData;
 
@@ -278,7 +298,7 @@ export function generateCoverLink({
 
 // CSS & color shenanigans
 
-export function getThemeString(color, additionalVariables = []) {
+function unbound_getThemeString(color, additionalVariables = []) {
   if (!color) return '';
 
   const {primary, dim, bg} = getColors(color);
@@ -299,7 +319,9 @@ export function getThemeString(color, additionalVariables = []) {
   ].join('\n');
 }
 
-export function getAlbumStylesheet(album, {to}) {
+function unbound_getAlbumStylesheet(album, {
+  to,
+}) {
   const hasWallpaper = album.wallpaperArtistContribs.length >= 1;
   const hasWallpaperStyle = !!album.wallpaperStyle;
   const hasBannerStyle = !!album.bannerStyle;
@@ -316,11 +338,11 @@ export function getAlbumStylesheet(album, {to}) {
       ? [
           `body::before {`,
           `    background-image: url("${wallpaperSource}");`,
-          ...html.fragment(
-            hasWallpaperStyle &&
-              album.wallpaperStyle
-              .split('\n')
-              .map(line => `    ${line}`)),
+          ...(hasWallpaperStyle
+            ? album.wallpaperStyle
+                .split('\n')
+                .map(line => `    ${line}`)
+            : []),
           `}`,
         ]
       : []);
@@ -346,9 +368,11 @@ export function getAlbumStylesheet(album, {to}) {
 
 // Divided track lists
 
-export function generateTrackListDividedByGroups(tracks, {
-  getTrackItem,
+function unbound_generateTrackListDividedByGroups(tracks, {
+  html,
   language,
+
+  getTrackItem,
   wikiData,
 }) {
   const {divideTrackListsByGroups: groups} = wikiData.wikiInfo;
@@ -405,7 +429,12 @@ export function generateTrackListDividedByGroups(tracks, {
 
 // Fancy lookin' links
 
-export function fancifyURL(url, {language, album = false} = {}) {
+function unbound_fancifyURL(url, {
+  html,
+  language,
+
+  album = false,
+} = {}) {
   let local = Symbol();
   let domain;
   try {
@@ -415,6 +444,7 @@ export function fancifyURL(url, {language, album = false} = {}) {
     // be absolute relative to the domain name in order to work.)
     domain = local;
   }
+
   return html.tag('a',
     {
       href: url,
@@ -455,8 +485,13 @@ export function fancifyURL(url, {language, album = false} = {}) {
     : domain);
 }
 
-export function fancifyFlashURL(url, flash, {language}) {
-  const link = fancifyURL(url, {language});
+function unbound_fancifyFlashURL(url, flash, {
+  html,
+  language,
+
+  fancifyURL,
+}) {
+  const link = fancifyURL(url);
   return html.tag('span',
     {class: 'nowrap'},
     url.includes('homestuck.com')
@@ -473,7 +508,11 @@ export function fancifyFlashURL(url, flash, {language}) {
     : link);
 }
 
-export function iconifyURL(url, {language, to}) {
+function unbound_iconifyURL(url, {
+  html,
+  language,
+  to,
+}) {
   const domain = new URL(url).hostname;
   const [id, msg] = (
     domain.includes('bandcamp.com')
@@ -511,9 +550,12 @@ export function iconifyURL(url, {language, to}) {
 
 // Grids
 
-export function getGridHTML({
+function unbound_getGridHTML({
   img,
+  html,
   language,
+
+  getRevealStringFromTags,
 
   entries,
   srcFn,
@@ -527,25 +569,25 @@ export function getGridHTML({
     .map(({large, item}, i) =>
       linkFn(item, {
         class: ['grid-item', 'box', large && 'large-grid-item'],
-        text: fixWS`
-                ${img({
-                  src: srcFn(item),
-                  alt: altFn(item),
-                  thumb: 'small',
-                  lazy: typeof lazy === 'number' ? i >= lazy : lazy,
-                  square: true,
-                  reveal: getRevealStringFromTags(item.artTags, {language}),
-                  noSrcText: noSrcTextFn(item),
-                })}
-                <span>${item.name}</span>
-                ${detailsFn && `<span>${detailsFn(item)}</span>`}
-            `,
-      })
-    )
+        text: html.fragment([
+          img({
+            src: srcFn(item),
+            alt: altFn(item),
+            thumb: 'small',
+            lazy: typeof lazy === 'number' ? i >= lazy : lazy,
+            square: true,
+            reveal: getRevealStringFromTags(item.artTags, {language}),
+            noSrcText: noSrcTextFn(item),
+          }),
+          html.tag('span', item.name),
+          detailsFn &&
+            html.tag('span', detailsFn(item)),
+        ]),
+      }))
     .join('\n');
 }
 
-export function getAlbumGridHTML({
+function unbound_getAlbumGridHTML({
   getAlbumCover,
   getGridHTML,
   link,
@@ -571,7 +613,13 @@ export function getAlbumGridHTML({
   });
 }
 
-export function getFlashGridHTML({getFlashCover, getGridHTML, link, ...props}) {
+function unbound_getFlashGridHTML({
+  link,
+
+  getFlashCover,
+  getGridHTML,
+  ...props
+}) {
   return getGridHTML({
     srcFn: getFlashCover,
     linkFn: link.flash,
@@ -581,11 +629,13 @@ export function getFlashGridHTML({getFlashCover, getGridHTML, link, ...props}) {
 
 // Nav-bar links
 
-export function generateInfoGalleryLinks(
-  currentThing,
-  isGallery,
-  {link, language, linkKeyGallery, linkKeyInfo}
-) {
+function unbound_generateInfoGalleryLinks(currentThing, isGallery, {
+  link,
+  language,
+
+  linkKeyGallery,
+  linkKeyInfo,
+}) {
   return [
     link[linkKeyInfo](currentThing, {
       class: isGallery ? '' : 'current',
@@ -606,12 +656,13 @@ export function generateInfoGalleryLinks(
 // By default, generated links include ID attributes which enable client-side
 // keyboard shortcuts. Provide isMain: false to disable this (if the generated
 // links aren't the for the page's primary navigation).
-export function generateNavigationLinks(current, {
+function unbound_generateNavigationLinks(current, {
+  language,
+  link,
+
   additionalLinks = [],
   data,
   isMain = true,
-  language,
-  link,
   linkKey = 'anything',
 }) {
   let previousLink, nextLink;
@@ -659,10 +710,15 @@ export function generateNavigationLinks(current, {
 
 // Footer stuff
 
-export function getFooterLocalizationLinks(
-  pathname,
-  {defaultLanguage, languages, paths, language, to}
-) {
+function unbound_getFooterLocalizationLinks(pathname, {
+  html,
+  language,
+  to,
+  paths,
+
+  defaultLanguage,
+  languages,
+}) {
   const {toPath} = paths;
   const keySuffix = toPath[0].replace(/^localized\./, '.');
   const toArgs = toPath.slice(1);
@@ -696,4 +752,38 @@ export function getFooterLocalizationLinks(
     {class: 'footer-localization-links'},
     language.$('misc.uiLanguage', {languages: links.join('\n')})
   );
+}
+
+// Exports
+
+export {
+  unbound_generateAdditionalFilesList as generateAdditionalFilesList,
+  unbound_generateAdditionalFilesShortcut as generateAdditionalFilesShortcut,
+
+  unbound_getArtistString as getArtistString,
+
+  unbound_generateChronologyLinks as generateChronologyLinks,
+
+  unbound_getRevealStringFromWarnings as getRevealStringFromWarnings,
+  unbound_getRevealStringFromTags as getRevealStringFromTags,
+
+  unbound_generateCoverLink as generateCoverLink,
+
+  unbound_getThemeString as getThemeString,
+  unbound_getAlbumStylesheet as getAlbumStylesheet,
+
+  unbound_generateTrackListDividedByGroups as generateTrackListDividedByGroups,
+
+  unbound_fancifyURL as fancifyURL,
+  unbound_fancifyFlashURL as fancifyFlashURL,
+  unbound_iconifyURL as iconifyURL,
+
+  unbound_getGridHTML as getGridHTML,
+  unbound_getAlbumGridHTML as getAlbumGridHTML,
+  unbound_getFlashGridHTML as getFlashGridHTML,
+
+  unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
+  unbound_generateNavigationLinks as generateNavigationLinks,
+
+  unbound_getFooterLocalizationLinks as getFooterLocalizationLinks,
 }

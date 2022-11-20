@@ -72,13 +72,10 @@ export function write(flash, {wikiData}) {
                 html.tag('li',
                   language.$('trackList.item.withArtists', {
                     track: link.track(track),
-                    by: `<span class="by">${
+                    by: html.tag('span', {class: 'by'},
                       language.$('trackList.item.withArtists.by', {
-                        artists: getArtistString(
-                          track.artistContribs
-                        ),
-                      })
-                    }</span>`,
+                        artists: getArtistString(track.artistContribs),
+                      })),
                   })))),
           ] : [],
 

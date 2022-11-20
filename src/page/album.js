@@ -219,9 +219,7 @@ export function write(album, {wikiData}) {
               },
               [
                 hasAdditionalFiles &&
-                  generateAdditionalFilesShortcut(album.additionalFiles, {
-                    language,
-                  }),
+                  generateAdditionalFilesShortcut(album.additionalFiles),
 
                 hasCommentaryEntries &&
                   language.$('releaseInfo.viewCommentary', {

@@ -976,9 +976,10 @@ writePage.html = (
 
         getFooterLocalizationLinks(paths.pathname, {
           defaultLanguage,
+          html,
+          language,
           languages,
           paths,
-          language,
           to,
         }),
       ]);
@@ -1150,53 +1151,41 @@ writePage.html = (
     footerHTML,
   ].filter(Boolean).join('\n');
 
-  const infoCardHTML = fixWS`
-        <div id="info-card-container">
-            <div class="info-card-decor">
-                <div class="info-card">
-                    <div class="info-card-art-container no-reveal">
-                        ${img({
-                          class: 'info-card-art',
-                          src: '',
-                          link: true,
-                          square: true,
-                        })}
-                    </div>
-                    <div class="info-card-art-container reveal">
-                        ${img({
-                          class: 'info-card-art',
-                          src: '',
-                          link: true,
-                          square: true,
-                          reveal: getRevealStringFromWarnings(
-                            '<span class="info-card-art-warnings"></span>',
-                            {language}
-                          ),
-                        })}
-                    </div>
-                    <h1 class="info-card-name"><a></a></h1>
-                    <p class="info-card-album">${language.$(
-                      'releaseInfo.from',
-                      {
-                        album: '<a></a>',
-                      }
-                    )}</p>
-                    <p class="info-card-artists">${language.$(
-                      'releaseInfo.by',
-                      {
-                        artists: '<span></span>',
-                      }
-                    )}</p>
-                    <p class="info-card-cover-artists">${language.$(
-                      'releaseInfo.coverArtBy',
-                      {
-                        artists: '<span></span>',
-                      }
-                    )}</p>
-                </div>
-            </div>
-        </div>
-    `;
+  const infoCardHTML = html.tag('div', {id: 'info-card-container'},
+    html.tag('div', {id: 'info-card-decor'},
+      html.tag('div', {id: 'info-card'}, [
+        html.tag('div', {class: ['info-card-art-container', 'no-reveal']},
+          img({
+            class: 'info-card-art',
+            src: '',
+            link: true,
+            square: true,
+          })),
+        html.tag('div', {class: ['info-card-art-container', 'reveal']},
+          img({
+            class: 'info-card-art',
+            src: '',
+            link: true,
+            square: true,
+            reveal: getRevealStringFromWarnings(
+              html.tag('span', {class: 'info-card-art-warnings'}),
+              {html, language}),
+          })),
+        html.tag('h1', {class: 'info-card-name'},
+          html.tag('a')),
+        html.tag('p', {class: 'info-card-album'},
+          language.$('releaseInfo.from', {
+            album: html.tag('a'),
+          })),
+        html.tag('p', {class: 'info-card-artists'},
+          language.$('releaseInfo.by', {
+            artists: html.tag('span'),
+          })),
+        html.tag('p', {class: 'info-card-cover-artists'},
+          language.$('releaseInfo.coverArtBy', {
+            artists: html.tag('span'),
+          })),
+      ])));
 
   const socialEmbedHTML = [
     socialEmbed.title &&
@@ -2367,17 +2356,33 @@ async function main() {
             });
 
             bound.iconifyURL = bindOpts(iconifyURL, {
+              html,
               language,
               to,
             });
 
             bound.fancifyURL = bindOpts(fancifyURL, {
+              html,
               language,
             });
 
             bound.fancifyFlashURL = bindOpts(fancifyFlashURL, {
               [bindOpts.bindIndex]: 2,
+              html,
               language,
+
+              fancifyURL: bound.fancifyURL,
+            });
+
+            bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
+              html,
+              language,
+            });
+
+            bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
+              language,
+
+              getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
             });
 
             bound.getLinkThemeString = getLinkThemeString;
@@ -2385,9 +2390,11 @@ async function main() {
             bound.getThemeString = getThemeString;
 
             bound.getArtistString = bindOpts(getArtistString, {
-              iconifyURL: bound.iconifyURL,
+              html,
               link: bound.link,
               language,
+
+              iconifyURL: bound.iconifyURL,
             });
 
             bound.getAlbumCover = bindOpts(getAlbumCover, {
@@ -2406,92 +2413,79 @@ async function main() {
               to,
             });
 
-            bound.generateAdditionalFilesShortcut = bindOpts(
-              generateAdditionalFilesShortcut,
-              {
-                language,
-              }
-            );
+            bound.generateAdditionalFilesShortcut = bindOpts(generateAdditionalFilesShortcut, {
+              html,
+              language,
+            });
 
-            bound.generateAdditionalFilesList = bindOpts(
-              generateAdditionalFilesList,
-              {
-                language,
-              }
-            );
+            bound.generateAdditionalFilesList = bindOpts(generateAdditionalFilesList, {
+              html,
+              language,
+            });
 
-            bound.generateNavigationLinks = bindOpts(
-              generateNavigationLinks,
-              {
-                link: bound.link,
-                language,
-              }
-            );
-
-            bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
-              generateNavigationLinks: bound.generateNavigationLinks,
+            bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
               link: bound.link,
               language,
+            });
+
+            bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
+              html,
+              language,
+              link: bound.link,
               wikiData,
+
+              generateNavigationLinks: bound.generateNavigationLinks,
             });
 
             bound.generateCoverLink = bindOpts(generateCoverLink, {
               [bindOpts.bindIndex]: 0,
+              html,
               img,
               link: bound.link,
               language,
               to,
               wikiData,
+
+              getRevealStringFromTags: bound.getRevealStringFromTags,
             });
 
-            bound.generateInfoGalleryLinks = bindOpts(
-              generateInfoGalleryLinks,
-              {
-                [bindOpts.bindIndex]: 2,
-                link: bound.link,
-                language,
-              }
-            );
+            bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
+              [bindOpts.bindIndex]: 2,
+              link: bound.link,
+              language,
+            });
 
-            bound.generateTrackListDividedByGroups = bindOpts(
-              generateTrackListDividedByGroups,
-              {
-                language,
-                wikiData,
-              }
-            );
+            bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
+              html,
+              language,
+              wikiData,
+            });
 
             bound.getGridHTML = bindOpts(getGridHTML, {
               [bindOpts.bindIndex]: 0,
               img,
+              html,
               language,
+
+              getRevealStringFromTags: bound.getRevealStringFromTags,
             });
 
             bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {
               [bindOpts.bindIndex]: 0,
-              getAlbumCover: bound.getAlbumCover,
-              getGridHTML: bound.getGridHTML,
               link: bound.link,
               language,
+
+              getAlbumCover: bound.getAlbumCover,
+              getGridHTML: bound.getGridHTML,
             });
 
             bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
               [bindOpts.bindIndex]: 0,
+              link: bound.link,
+
               getFlashCover: bound.getFlashCover,
               getGridHTML: bound.getGridHTML,
-              link: bound.link,
             });
-
-            bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
-              language,
-            });
-
-            bound.getRevealStringFromWarnings = bindOpts(
-              getRevealStringFromWarnings,
-              {
-                language,
-              }
-            );
 
             bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
               to,
