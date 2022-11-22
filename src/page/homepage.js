@@ -91,11 +91,14 @@ export function writeTargetless({wikiData}) {
                           lazy: i > 0,
                         })),
 
-                      !empty(entry.actionLinks) &&
-                        html.tag('div', {class: 'grid-actions'},
-                          entry.actionLinks.map(action =>
-                            transformInline(action)
-                              .replace('<a', '<a class="box grid-item"'))),
+                      html.tag('div',
+                        {
+                          [html.onlyIfContent]: true,
+                          class: 'grid-actions',
+                        },
+                        entry.actionLinks?.map(action =>
+                          transformInline(action)
+                            .replace('<a', '<a class="box grid-item"'))),
                     ]),
                 ]))),
         ]),
