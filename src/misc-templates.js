@@ -8,7 +8,10 @@ import {Track, Album} from './data/things.js';
 
 import {getColors} from './util/colors.js';
 
-import {unique} from './util/sugar.js';
+import {
+  empty,
+  unique,
+} from './util/sugar.js';
 
 import {
   getTotalDuration,
@@ -26,7 +29,7 @@ function unbound_generateAdditionalFilesShortcut(additionalFiles, {
   html,
   language,
 }) {
-  if (!additionalFiles?.length) return '';
+  if (empty(additionalFiles)) return '';
 
   return language.$('releaseInfo.additionalFiles.shortcut', {
     anchorLink:
@@ -45,7 +48,7 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
   getFileSize,
   linkFile,
 }) {
-  if (!additionalFiles?.length) return [];
+  if (empty(additionalFiles)) return [];
 
   const fileCount = additionalFiles.flatMap((g) => g.files).length;
 
@@ -103,7 +106,7 @@ function unbound_getArtistString(artists, {
       const {urls} = who;
 
       const hasContribPart = !!(showContrib && what);
-      const hasExternalPart = !!(showIcons && urls?.length);
+      const hasExternalPart = !!(showIcons && !empty(urls));
 
       const artistLink = link.artist(who);
 
@@ -377,7 +380,7 @@ function unbound_generateTrackListDividedByGroups(tracks, {
 }) {
   const {divideTrackListsByGroups: groups} = wikiData.wikiInfo;
 
-  if (!groups?.length) {
+  if (empty(groups)) {
     return html.tag('ul',
       tracks.map(t => getTrackItem(t)));
   }

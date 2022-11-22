@@ -141,8 +141,8 @@ const listingSpec = [
         .map(artist => ({
           artist,
           contributions:
-            (artist.tracksAsContributor?.length ?? 0) +
-            (artist.tracksAsArtist?.length ?? 0),
+            artist.tracksAsContributor.length +
+            artist.tracksAsArtist.length,
         }))
         .sort((a, b) => b.contributions - a.contributions)
         .filter(({contributions}) => contributions),
@@ -151,12 +151,12 @@ const listingSpec = [
         .map(artist => ({
           artist,
           contributions:
-            (artist.tracksAsCoverArtist?.length ?? 0) +
-            (artist.albumsAsCoverArtist?.length ?? 0) +
-            (artist.albumsAsWallpaperArtist?.length ?? 0) +
-            (artist.albumsAsBannerArtist?.length ?? 0) +
+            artist.tracksAsCoverArtist.length +
+            artist.albumsAsCoverArtist.length +
+            artist.albumsAsWallpaperArtist.length +
+            artist.albumsAsBannerArtist.length +
             (wikiInfo.enableFlashesAndGames
-              ? artist.flashesAsContributor?.length ?? 0
+              ? artist.flashesAsContributor.length
               : 0),
         }))
         .sort((a, b) => b.contributions - a.contributions)
@@ -217,8 +217,8 @@ const listingSpec = [
         .map(artist => ({
           artist,
           entries:
-            (artist.tracksAsCommentator?.length ?? 0) +
-            (artist.albumsAsCommentator?.length ?? 0),
+            artist.tracksAsCommentator.length +
+            artist.albumsAsCommentator.length,
         }))
         .filter(({entries}) => entries)
         .sort((a, b) => b.entries - a.entries),

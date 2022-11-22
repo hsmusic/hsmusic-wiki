@@ -128,7 +128,7 @@ export function write(artist, {wikiData}) {
 
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
-    flashes = sortChronologically(artist.flashesAsContributor?.slice() ?? []);
+    flashes = sortChronologically(artist.flashesAsContributor.slice());
     flashListChunks = chunkByProperties(
       flashes.map((flash) => ({
         act: flash.act,
@@ -299,22 +299,17 @@ export function write(artist, {wikiData}) {
 
       return {
         albums: {
-          asCoverArtist: artist.albumsAsCoverArtist?.map(
-            serializeArtistsAndContrib('coverArtistContribs')
-          ),
-          asWallpaperArtist: artist.albumsAsWallpaperArtist?.map(
-            serializeArtistsAndContrib('wallpaperArtistContribs')
-          ),
-          asBannerArtist: artist.albumsAsBannerArtist?.map(
-            serializeArtistsAndContrib('bannerArtistContribs')
-          ),
+          asCoverArtist: artist.albumsAsCoverArtist
+            .map(serializeArtistsAndContrib('coverArtistContribs')),
+          asWallpaperArtist: artist.albumsAsWallpaperArtist
+            .map(serializeArtistsAndContrib('wallpaperArtistContribs')),
+          asBannerArtist: artist.albumsAsBannerArtis
+            .map(serializeArtistsAndContrib('bannerArtistContribs')),
         },
         flashes: wikiInfo.enableFlashesAndGames
           ? {
               asContributor: artist.flashesAsContributor
-                ?.map((flash) =>
-                  getArtistsAndContrib(flash, 'contributorContribs')
-                )
+                .map(flash => getArtistsAndContrib(flash, 'contributorContribs'))
                 .map(({contrib, thing: flash}) => ({
                   link: serializeLink(flash),
                   contribution: contrib.what,
@@ -322,12 +317,10 @@ export function write(artist, {wikiData}) {
             }
           : null,
         tracks: {
-          asArtist: artist.tracksAsArtist.map(
-            serializeArtistsAndContrib('artistContribs')
-          ),
-          asContributor: artist.tracksAsContributor.map(
-            serializeArtistsAndContrib('contributorContribs')
-          ),
+          asArtist: artist.tracksAsArtist
+            .map(serializeArtistsAndContrib('artistContribs')),
+          asContributor: artist.tracksAsContributo
+            .map(serializeArtistsAndContrib('contributorContribs')),
           chunked: serializeTrackListChunks(trackListChunks),
         },
       };

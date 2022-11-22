@@ -359,9 +359,7 @@ Thing.common = {
         if (!artistData) return [];
         const refs =
           contribsByRef ??
-          findFn(thing, thingData, {mode: 'quiet'})?.[
-            parentContribsByRefProperty
-          ];
+          findFn(thing, thingData, {mode: 'quiet'})?.[parentContribsByRefProperty];
         if (!refs) return [];
         return refs
           .map(({who: ref, what}) => ({
@@ -378,32 +376,28 @@ Thing.common = {
   // you would use this to compute a corresponding "referenced *by* tracks"
   // property. Naturally, the passed ref list property is of the things in the
   // wiki data provided, not the requesting Thing itself.
-  reverseReferenceList: (wikiDataProperty, referencerRefListProperty) => ({
+  reverseReferenceList: (thingDataProperty, referencerRefListProperty) => ({
     flags: {expose: true},
 
     expose: {
-      dependencies: [wikiDataProperty],
+      dependencies: [thingDataProperty],
 
-      compute: ({[wikiDataProperty]: wikiData, [Thing.instance]: thing}) =>
-        wikiData
-          ? wikiData.filter((t) =>
-              t[referencerRefListProperty]?.includes(thing)
-            )
-          : [],
+      compute: ({[thingDataProperty]: thingData, [Thing.instance]: thing}) =>
+        thingData?.filter(t => t[referencerRefListProperty].includes(thing)) ?? [],
     },
   }),
 
   // Corresponding function for single references. Note that the return value
   // is still a list - this is for matching all the objects whose single
   // reference (in the given property) matches this Thing.
-  reverseSingleReference: (wikiDataProperty, referencerRefListProperty) => ({
+  reverseSingleReference: (thingDataProperty, referencerRefListProperty) => ({
     flags: {expose: true},
 
     expose: {
-      dependencies: [wikiDataProperty],
+      dependencies: [thingDataProperty],
 
-      compute: ({[wikiDataProperty]: wikiData, [Thing.instance]: thing}) =>
-        wikiData?.filter((t) => t[referencerRefListProperty] === thing),
+      compute: ({[thingDataProperty]: thingData, [Thing.instance]: thing}) =>
+        thingData?.filter((t) => t[referencerRefListProperty] === thing) ?? [],
     },
   }),
 
@@ -988,10 +982,13 @@ Artist.filterByContrib = (thingDataProperty, contribsProperty) => ({
   expose: {
     dependencies: [thingDataProperty],
 
-    compute: ({[thingDataProperty]: thingData, [Artist.instance]: artist}) =>
-      thingData?.filter(({[contribsProperty]: contribs}) =>
-        contribs?.some((contrib) => contrib.who === artist)
-      ),
+    compute: ({
+      [thingDataProperty]: thingData,
+      [Artist.instance]: artist
+    }) =>
+      thingData?.filter(thing =>
+        thing[contribsProperty]
+          .some(contrib => contrib.who === artist)) ?? [],
   },
 });
 
@@ -1037,15 +1034,12 @@ Artist.propertyDescriptors = {
     },
   },
 
-  tracksAsArtist: Artist.filterByContrib('trackData', 'artistContribs'),
-  tracksAsContributor: Artist.filterByContrib(
-    'trackData',
-    'contributorContribs'
-  ),
-  tracksAsCoverArtist: Artist.filterByContrib(
-    'trackData',
-    'coverArtistContribs'
-  ),
+  tracksAsArtist:
+    Artist.filterByContrib('trackData', 'artistContribs'),
+  tracksAsContributor:
+    Artist.filterByContrib('trackData', 'contributorContribs'),
+  tracksAsCoverArtist:
+    Artist.filterByContrib('trackData', 'coverArtistContribs'),
 
   tracksAsAny: {
     flags: {expose: true},
@@ -1059,8 +1053,7 @@ Artist.propertyDescriptors = {
             ...track.artistContribs,
             ...track.contributorContribs,
             ...track.coverArtistContribs,
-          ].some(({who}) => who === artist)
-        ),
+          ].some(({who}) => who === artist)) ?? [],
     },
   },
 
@@ -1072,24 +1065,18 @@ Artist.propertyDescriptors = {
 
       compute: ({trackData, [Artist.instance]: artist}) =>
         trackData?.filter(({commentatorArtists}) =>
-          commentatorArtists?.includes(artist)
-        ),
+          commentatorArtists.includes(artist)) ?? [],
     },
   },
 
-  albumsAsAlbumArtist: Artist.filterByContrib('albumData', 'artistContribs'),
-  albumsAsCoverArtist: Artist.filterByContrib(
-    'albumData',
-    'coverArtistContribs'
-  ),
-  albumsAsWallpaperArtist: Artist.filterByContrib(
-    'albumData',
-    'wallpaperArtistContribs'
-  ),
-  albumsAsBannerArtist: Artist.filterByContrib(
-    'albumData',
-    'bannerArtistContribs'
-  ),
+  albumsAsAlbumArtist:
+    Artist.filterByContrib('albumData', 'artistContribs'),
+  albumsAsCoverArtist:
+    Artist.filterByContrib('albumData', 'coverArtistContribs'),
+  albumsAsWallpaperArtist:
+    Artist.filterByContrib('albumData', 'wallpaperArtistContribs'),
+  albumsAsBannerArtist:
+    Artist.filterByContrib('albumData', 'bannerArtistContribs'),
 
   albumsAsCommentator: {
     flags: {expose: true},
@@ -1099,8 +1086,7 @@ Artist.propertyDescriptors = {
 
       compute: ({albumData, [Artist.instance]: artist}) =>
         albumData?.filter(({commentatorArtists}) =>
-          commentatorArtists?.includes(artist)
-        ),
+          commentatorArtists.includes(artist)) ?? [],
     },
   },
 
@@ -1181,7 +1167,7 @@ Group.propertyDescriptors = {
 
       compute: ({groupCategoryData, [Group.instance]: group}) =>
         groupCategoryData.find((category) => category.groups.includes(group))
-          ?.color ?? null,
+          ?.color,
     },
   },
 
@@ -1243,11 +1229,9 @@ ArtTag.propertyDescriptors = {
       dependencies: ['albumData', 'trackData'],
       compute: ({albumData, trackData, [ArtTag.instance]: artTag}) =>
         sortAlbumsTracksChronologically(
-          [...albumData, ...trackData].filter((thing) =>
-            thing.artTags?.includes(artTag)
-          ),
-          {getDate: (o) => o.coverArtDate}
-        ),
+          [...albumData, ...trackData]
+            .filter(({artTags}) => artTags.includes(artTag)),
+          {getDate: o => o.coverArtDate}),
     },
   },
 };
