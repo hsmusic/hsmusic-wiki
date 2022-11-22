@@ -43,10 +43,10 @@ export function write(album) {
             words: html.tag('b', language.formatWordCount(words, {unit: true})),
             entries: html.tag('b', language.countCommentaryEntries(entries.length, {unit: true})),
           })),
-          ...album.commentary ? [
+          ...html.fragment(album.commentary && [
             html.tag('h3', language.$('albumCommentaryPage.entry.title.albumCommentary')),
             html.tag('blockquote', transformMultiline(album.commentary)),
-          ] : [],
+          ]),
           ...album.tracks.filter(t => t.commentary).flatMap(track => [
             html.tag('h3',
               {id: 'track.directory'},

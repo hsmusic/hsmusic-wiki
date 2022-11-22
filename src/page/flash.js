@@ -61,36 +61,38 @@ export function write(flash, {wikiData}) {
                 ),
               })),
 
-          ...flash.featuredTracks?.length ? [
-            html.tag('p',
-              `Tracks featured in <i>${
-                flash.name.replace(/\.$/, '')
-              }</i>:`),
+          ...html.fragment(
+            flash.featuredTracks?.length && [
+              html.tag('p',
+                `Tracks featured in <i>${
+                  flash.name.replace(/\.$/, '')
+                }</i>:`),
 
-            html.tag('ul',
-              flash.featuredTracks.map(track =>
-                html.tag('li',
-                  language.$('trackList.item.withArtists', {
-                    track: link.track(track),
-                    by: html.tag('span', {class: 'by'},
-                      language.$('trackList.item.withArtists.by', {
-                        artists: getArtistString(track.artistContribs),
-                      })),
-                  })))),
-          ] : [],
+              html.tag('ul',
+                flash.featuredTracks.map(track =>
+                  html.tag('li',
+                    language.$('trackList.item.withArtists', {
+                      track: link.track(track),
+                      by: html.tag('span', {class: 'by'},
+                        language.$('trackList.item.withArtists.by', {
+                          artists: getArtistString(track.artistContribs),
+                        })),
+                    })))),
+            ]),
 
-          ...flash.contributorContribs.length ? [
-            html.tag('p',
-              language.$('releaseInfo.contributors')),
+          ...html.fragment(
+            flash.contributorContribs.length && [
+              html.tag('p',
+                language.$('releaseInfo.contributors')),
 
-            html.tag('ul',
-              flash.contributorContribs.map(contrib =>
-                html.tag('li',
-                  getArtistString([contrib], {
-                    showContrib: true,
-                    showIcons: true,
-                  })))),
-          ] : [],
+              html.tag('ul',
+                flash.contributorContribs.map(contrib =>
+                  html.tag('li',
+                    getArtistString([contrib], {
+                      showContrib: true,
+                      showIcons: true,
+                    })))),
+            ]),
         ],
       },
 

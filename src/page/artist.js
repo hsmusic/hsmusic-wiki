@@ -367,15 +367,16 @@ export function write(artist, {wikiData}) {
                 artist: name,
               })),
 
-            ...contextNotes ? [
-              html.tag('p',
-                language.$('releaseInfo.note')),
+            ...html.fragment(
+              contextNotes && [
+                html.tag('p',
+                  language.$('releaseInfo.note')),
 
-              html.tag('blockquote',
-                transformMultiline(contextNotes)),
+                html.tag('blockquote',
+                  transformMultiline(contextNotes)),
 
-              html.tag('hr'),
-            ] : [],
+                html.tag('hr'),
+              ]),
 
             urls?.length &&
               html.tag('p',
@@ -420,29 +421,63 @@ export function write(artist, {wikiData}) {
                     ].filter(Boolean)),
                 })),
 
-            ...allTracks.length ? [
-              html.tag('h2',
-                {id: 'tracks'},
-                language.$('artistPage.trackList.title')),
+            ...html.fragment(
+              allTracks.length && [
+                html.tag('h2',
+                  {id: 'tracks'},
+                  language.$('artistPage.trackList.title')),
 
-              totalDuration &&
-                html.tag('p',
-                  language.$('artistPage.contributedDurationLine', {
-                    artist: artist.name,
-                    duration: language.formatDuration(
-                      totalDuration,
-                      {
-                        approximate: true,
-                        unit: true,
-                      }
-                    ),
-                  })),
+                totalDuration &&
+                  html.tag('p',
+                    language.$('artistPage.contributedDurationLine', {
+                      artist: artist.name,
+                      duration: language.formatDuration(
+                        totalDuration,
+                        {
+                          approximate: true,
+                          unit: true,
+                        }
+                      ),
+                    })),
 
-              musicGroups.length &&
-                html.tag('p',
-                  language.$('artistPage.musicGroupsLine', {
+                musicGroups.length &&
+                  html.tag('p',
+                    language.$('artistPage.musicGroupsLine', {
+                      groups: language.formatUnitList(
+                        musicGroups.map(({group, contributions}) =>
+                          language.$('artistPage.groupsLine.item', {
+                            group: link.groupInfo(group),
+                            contributions:
+                              language.countContributions(
+                                contributions
+                              ),
+                          })
+                        )
+                      ),
+                    })),
+
+                generateTrackList(trackListChunks),
+              ]),
+
+            ...html.fragment(
+              artThingsAll.length && [
+                html.tag('h2',
+                  {id: 'art'},
+                  language.$('artistPage.artList.title')),
+
+                hasGallery &&
+                  html.tag('p',
+                    language.$('artistPage.viewArtGallery.orBrowseList', {
+                      link: link.artistGallery(artist, {
+                        text: language.$('artistPage.viewArtGallery.link'),
+                      })
+                    })),
+
+                artGroups.length &&
+                  html.tag('p',
+                    language.$('artistPage.artGroupsLine', {
                     groups: language.formatUnitList(
-                      musicGroups.map(({group, contributions}) =>
+                      artGroups.map(({group, contributions}) =>
                         language.$('artistPage.groupsLine.item', {
                           group: link.groupInfo(group),
                           contributions:
@@ -454,142 +489,110 @@ export function write(artist, {wikiData}) {
                     ),
                   })),
 
-              generateTrackList(trackListChunks),
-            ] : [],
-
-            ...artThingsAll.length ? [
-              html.tag('h2',
-                {id: 'art'},
-                language.$('artistPage.artList.title')),
-
-              hasGallery &&
-                html.tag('p',
-                  language.$('artistPage.viewArtGallery.orBrowseList', {
-                    link: link.artistGallery(artist, {
-                      text: language.$('artistPage.viewArtGallery.link'),
-                    })
-                  })),
-
-              artGroups.length &&
-                html.tag('p',
-                  language.$('artistPage.artGroupsLine', {
-                  groups: language.formatUnitList(
-                    artGroups.map(({group, contributions}) =>
-                      language.$('artistPage.groupsLine.item', {
-                        group: link.groupInfo(group),
-                        contributions:
-                          language.countContributions(
-                            contributions
-                          ),
-                      })
-                    )
-                  ),
-                })),
-
-              html.tag('dl',
-                artListChunks.flatMap(({date, album, chunk}) => [
-                  html.tag('dt', language.$('artistPage.creditList.album.withDate', {
-                    album: link.album(album),
-                    date: language.formatDate(date),
-                  })),
-
-                  html.tag('dd',
-                    html.tag('ul',
-                      chunk
-                        .map(({track, key, ...props}) => ({
-                          ...props,
-                          entry:
-                            track
-                              ? language.$('artistPage.creditList.entry.track', {
-                                  track: link.track(track),
-                                })
-                              : html.tag('i',
-                                  language.$('artistPage.creditList.entry.album.' + {
-                                    wallpaperArtistContribs:
-                                      'wallpaperArt',
-                                    bannerArtistContribs:
-                                      'bannerArt',
-                                    coverArtistContribs:
-                                      'coverArt',
-                                  }[key])),
-                        }))
-                        .map((opts) => generateEntryAccents({
-                          getArtistString,
-                          language,
-                          ...opts,
-                        }))
-                        .map(row => html.tag('li', row)))),
-                ])),
-            ] : [],
-
-            ...(
-              wikiInfo.enableFlashesAndGames &&
-              flashes.length
-            ) ? [
-              html.tag('h2',
-                {id: 'flashes'},
-                language.$('artistPage.flashList.title')),
-
-              html.tag('dl',
-                flashListChunks.flatMap(({
-                  act,
-                  chunk,
-                  dateFirst,
-                  dateLast,
-                }) => [
-                  html.tag('dt',
-                    language.$('artistPage.creditList.flashAct.withDateRange', {
-                      act: link.flash(chunk[0].flash, {
-                        text: act.name,
-                      }),
-                      dateRange: language.formatDateRange(
-                        dateFirst,
-                        dateLast
-                      ),
-                    })),
-
-                  html.tag('dd',
-                    html.tag('ul',
-                      chunk
-                        .map(({flash, ...props}) => ({
-                          ...props,
-                          entry: language.$('artistPage.creditList.entry.flash', {
-                            flash: link.flash(flash),
-                          }),
-                        }))
-                        .map(opts => generateEntryAccents({
-                          getArtistString,
-                          language,
-                          ...opts,
-                        }))
-                        .map(row => html.tag('li', row)))),
-                ])),
-            ] : [],
-
-            ...commentaryThings.length ? [
-              html.tag('h2',
-                {id: 'commentary'},
-                language.$('artistPage.commentaryList.title')),
-
-              html.tag('dl',
-                commentaryListChunks.flatMap(({album, chunk}) => [
-                  html.tag('dt',
-                    language.$('artistPage.creditList.album', {
+                html.tag('dl',
+                  artListChunks.flatMap(({date, album, chunk}) => [
+                    html.tag('dt', language.$('artistPage.creditList.album.withDate', {
                       album: link.album(album),
+                      date: language.formatDate(date),
                     })),
 
-                  html.tag('dd',
-                    html.tag('ul',
-                      chunk
-                        .map(({track}) => track
-                          ? language.$('artistPage.creditList.entry.track', {
-                              track: link.track(track),
-                            })
-                          : html.tag('i',
-                              language.$('artistPage.creditList.entry.album.commentary')))
-                        .map(row => html.tag('li', row)))),
-                ])),
-            ] : [],
+                    html.tag('dd',
+                      html.tag('ul',
+                        chunk
+                          .map(({track, key, ...props}) => ({
+                            ...props,
+                            entry:
+                              track
+                                ? language.$('artistPage.creditList.entry.track', {
+                                    track: link.track(track),
+                                  })
+                                : html.tag('i',
+                                    language.$('artistPage.creditList.entry.album.' + {
+                                      wallpaperArtistContribs:
+                                        'wallpaperArt',
+                                      bannerArtistContribs:
+                                        'bannerArt',
+                                      coverArtistContribs:
+                                        'coverArt',
+                                    }[key])),
+                          }))
+                          .map((opts) => generateEntryAccents({
+                            getArtistString,
+                            language,
+                            ...opts,
+                          }))
+                          .map(row => html.tag('li', row)))),
+                  ])),
+              ]),
+
+            ...html.fragment(
+              wikiInfo.enableFlashesAndGames &&
+              flashes.length && [
+                html.tag('h2',
+                  {id: 'flashes'},
+                  language.$('artistPage.flashList.title')),
+
+                html.tag('dl',
+                  flashListChunks.flatMap(({
+                    act,
+                    chunk,
+                    dateFirst,
+                    dateLast,
+                  }) => [
+                    html.tag('dt',
+                      language.$('artistPage.creditList.flashAct.withDateRange', {
+                        act: link.flash(chunk[0].flash, {
+                          text: act.name,
+                        }),
+                        dateRange: language.formatDateRange(
+                          dateFirst,
+                          dateLast
+                        ),
+                      })),
+
+                    html.tag('dd',
+                      html.tag('ul',
+                        chunk
+                          .map(({flash, ...props}) => ({
+                            ...props,
+                            entry: language.$('artistPage.creditList.entry.flash', {
+                              flash: link.flash(flash),
+                            }),
+                          }))
+                          .map(opts => generateEntryAccents({
+                            getArtistString,
+                            language,
+                            ...opts,
+                          }))
+                          .map(row => html.tag('li', row)))),
+                  ])),
+              ]),
+
+            ...html.fragment(
+              commentaryThings.length && [
+                html.tag('h2',
+                  {id: 'commentary'},
+                  language.$('artistPage.commentaryList.title')),
+
+                html.tag('dl',
+                  commentaryListChunks.flatMap(({album, chunk}) => [
+                    html.tag('dt',
+                      language.$('artistPage.creditList.album', {
+                        album: link.album(album),
+                      })),
+
+                    html.tag('dd',
+                      html.tag('ul',
+                        chunk
+                          .map(({track}) => track
+                            ? language.$('artistPage.creditList.entry.track', {
+                                track: link.track(track),
+                              })
+                            : html.tag('i',
+                                language.$('artistPage.creditList.entry.album.commentary')))
+                          .map(row => html.tag('li', row)))),
+                  ])),
+              ]),
           ],
         },
 

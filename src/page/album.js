@@ -290,10 +290,11 @@ export function write(album, {wikiData}) {
                     link.albumAdditionalFile({album, file}),
                 })),
 
-            ...album.commentary ? [
-              html.tag('p', language.$('releaseInfo.artistCommentary')),
-              html.tag('blockquote', transformMultiline(album.commentary)),
-            ] : [],
+            ...html.fragment(
+              album.commentary && [
+                html.tag('p', language.$('releaseInfo.artistCommentary')),
+                html.tag('blockquote', transformMultiline(album.commentary)),
+              ]),
           ],
         },
 
@@ -440,21 +441,22 @@ export function generateAlbumSidebar(album, currentTrack, {
           ),
         })),
 
-      ...isAlbumPage ? [
-        next &&
-          html.tag('p',
-            {class: 'group-chronology-link'},
-            language.$('albumSidebar.groupBox.next', {
-              album: link.album(next),
-            })),
+      ...html.fragment(
+        isAlbumPage && [
+          next &&
+            html.tag('p',
+              {class: 'group-chronology-link'},
+              language.$('albumSidebar.groupBox.next', {
+                album: link.album(next),
+              })),
 
-        previous &&
-          html.tag('p',
-            {class: 'group-chronology-link'},
-            language.$('albumSidebar.groupBox.previous', {
-              album: link.album(previous),
-            })),
-      ] : [],
+          previous &&
+            html.tag('p',
+              {class: 'group-chronology-link'},
+              language.$('albumSidebar.groupBox.previous', {
+                album: link.album(previous),
+              })),
+        ]),
     ]);
 
   if (groupParts.length) {

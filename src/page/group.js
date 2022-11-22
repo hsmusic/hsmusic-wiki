@@ -55,42 +55,43 @@ export function write(group, {wikiData}) {
             html.tag('blockquote',
               transformMultiline(group.description)),
 
-          ...group.albums ? [
-            html.tag('h2',
-              language.$('groupInfoPage.albumList.title')),
+          ...html.fragment(
+            group.albums && [
+              html.tag('h2',
+                language.$('groupInfoPage.albumList.title')),
 
-            html.tag('p',
-              language.$('groupInfoPage.viewAlbumGallery', {
-                link: link.groupGallery(group, {
-                  text: language.$('groupInfoPage.viewAlbumGallery.link'),
-                }),
-              })),
+              html.tag('p',
+                language.$('groupInfoPage.viewAlbumGallery', {
+                  link: link.groupGallery(group, {
+                    text: language.$('groupInfoPage.viewAlbumGallery.link'),
+                  }),
+                })),
 
-            html.tag('ul',
-              albumLines.map(({album, otherGroup}) => {
-                const item = album.date
-                  ? language.$('groupInfoPage.albumList.item', {
-                      year: album.date.getFullYear(),
-                      album: link.album(album),
-                    })
-                  : language.$('groupInfoPage.albumList.item.withoutYear', {
-                      album: link.album(album),
-                    });
-                return html.tag('li',
-                  otherGroup
-                    ? language.$('groupInfoPage.albumList.item.withAccent', {
-                        item,
-                        accent: html.tag('span',
-                          {class: 'other-group-accent'},
-                          language.$('groupInfoPage.albumList.item.otherGroupAccent', {
-                            group: link.groupInfo(otherGroup, {
-                              color: false,
-                            }),
-                          })),
+              html.tag('ul',
+                albumLines.map(({album, otherGroup}) => {
+                  const item = album.date
+                    ? language.$('groupInfoPage.albumList.item', {
+                        year: album.date.getFullYear(),
+                        album: link.album(album),
                       })
-                    : item);
-              })),
-          ] : [],
+                    : language.$('groupInfoPage.albumList.item.withoutYear', {
+                        album: link.album(album),
+                      });
+                  return html.tag('li',
+                    otherGroup
+                      ? language.$('groupInfoPage.albumList.item.withAccent', {
+                          item,
+                          accent: html.tag('span',
+                            {class: 'other-group-accent'},
+                            language.$('groupInfoPage.albumList.item.otherGroupAccent', {
+                              group: link.groupInfo(otherGroup, {
+                                color: false,
+                              }),
+                            })),
+                        })
+                      : item);
+                })),
+            ]),
         ],
       },
 
