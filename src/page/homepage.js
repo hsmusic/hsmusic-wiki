@@ -1,6 +1,11 @@
 // Homepage specification.
 
-import {getNewAdditions, getNewReleases} from '../util/wiki-data.js';
+import {empty} from '../util/sugar.js';
+
+import {
+  getNewAdditions,
+  getNewReleases,
+} from '../util/wiki-data.js';
 
 export function writeTargetless({wikiData}) {
   const {newsData, staticPageData, homepageLayout, wikiInfo} = wikiData;
@@ -29,7 +34,7 @@ export function writeTargetless({wikiData}) {
               : [];
         }
 
-        if (row.sourceAlbums.length) {
+        if (!empty(row.sourceAlbums)) {
           entry.gridEntries.push(...row.sourceAlbums.map(album => ({item: album})));
         }
 
@@ -86,7 +91,7 @@ export function writeTargetless({wikiData}) {
                           lazy: i > 0,
                         })),
 
-                      entry.actionLinks.length &&
+                      !empty(entry.actionLinks) &&
                         html.tag('div', {class: 'grid-actions'},
                           entry.actionLinks.map(action =>
                             transformInline(action)

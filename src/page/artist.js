@@ -4,7 +4,11 @@
 //
 // NB: See artist-alias.js for artist alias redirect pages.
 
-import {bindOpts, unique} from '../util/sugar.js';
+import {
+  bindOpts,
+  empty,
+  unique,
+} from '../util/sugar.js';
 
 import {
   chunkByProperties,
@@ -43,7 +47,7 @@ export function write(artist, {wikiData}) {
     ...(artist.tracksAsCommentator ?? []),
   ]);
 
-  const hasGallery = artThingsGallery.length > 0;
+  const hasGallery = !empty(artThingsGallery);
 
   const getArtistsAndContrib = (thing, key) => ({
     artists: thing[key]?.filter(({who}) => who !== artist),
@@ -155,7 +159,7 @@ export function write(artist, {wikiData}) {
   }) =>
     original
       ? language.$('artistPage.creditList.entry.rerelease', {entry})
-      : artists.length
+      : !empty(artists)
       ? contrib.what || contrib.whatArray?.length
         ? language.$(
             'artistPage.creditList.entry.withArtists.withContribution',
@@ -250,7 +254,7 @@ export function write(artist, {wikiData}) {
       const ret = {};
       ret.link = serializeLink(thing);
       if (contrib.what) ret.contribution = contrib.what;
-      if (artists.length) ret.otherArtists = serializeContribs(artists);
+      if (!empty(artists)) ret.otherArtists = serializeContribs(artists);
       return ret;
     };
 
@@ -266,10 +270,10 @@ export function write(artist, {wikiData}) {
     }));
 
   const jumpTo = {
-    tracks: allTracks.length > 0,
-    art: artThingsAll.length > 0,
-    flashes: wikiInfo.enableFlashesAndGames && flashes.length > 0,
-    commentary: commentaryThings.length > 0,
+    tracks: !empty(allTracks),
+    art: !empty(artThingsAll),
+    flashes: wikiInfo.enableFlashesAndGames && !empty(flashes),
+    commentary: !empty(commentaryThings),
   };
 
   const showJumpTo = Object.values(jumpTo).includes(true);
@@ -378,7 +382,7 @@ export function write(artist, {wikiData}) {
                 html.tag('hr'),
               ]),
 
-            urls?.length &&
+            !empty(urls) &&
               html.tag('p',
                 language.$('releaseInfo.visitOn', {
                   links: language.formatDisjunctionList(
@@ -422,12 +426,12 @@ export function write(artist, {wikiData}) {
                 })),
 
             ...html.fragment(
-              allTracks.length && [
+              !empty(allTracks) && [
                 html.tag('h2',
                   {id: 'tracks'},
                   language.$('artistPage.trackList.title')),
 
-                totalDuration &&
+                totalDuration > 0 &&
                   html.tag('p',
                     language.$('artistPage.contributedDurationLine', {
                       artist: artist.name,
@@ -440,7 +444,7 @@ export function write(artist, {wikiData}) {
                       ),
                     })),
 
-                musicGroups.length &&
+                !empty(musicGroups) &&
                   html.tag('p',
                     language.$('artistPage.musicGroupsLine', {
                       groups: language.formatUnitList(
@@ -460,7 +464,7 @@ export function write(artist, {wikiData}) {
               ]),
 
             ...html.fragment(
-              artThingsAll.length && [
+              !empty(artThingsAll) && [
                 html.tag('h2',
                   {id: 'art'},
                   language.$('artistPage.artList.title')),
@@ -473,7 +477,7 @@ export function write(artist, {wikiData}) {
                       })
                     })),
 
-                artGroups.length &&
+                !empty(artGroups) &&
                   html.tag('p',
                     language.$('artistPage.artGroupsLine', {
                     groups: language.formatUnitList(
@@ -527,7 +531,7 @@ export function write(artist, {wikiData}) {
 
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
-              flashes.length && [
+              !empty(flashes) && [
                 html.tag('h2',
                   {id: 'flashes'},
                   language.$('artistPage.flashList.title')),
@@ -569,7 +573,7 @@ export function write(artist, {wikiData}) {
               ]),
 
             ...html.fragment(
-              commentaryThings.length && [
+              !empty(commentaryThings) && [
                 html.tag('h2',
                   {id: 'commentary'},
                   language.$('artistPage.commentaryList.title')),

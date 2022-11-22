@@ -2,6 +2,8 @@
 
 // Utility functions for interacting with wiki data.
 
+import {empty} from './sugar.js';
+
 // Generic value operations
 
 export function getKebabCase(name) {
@@ -16,9 +18,11 @@ export function getKebabCase(name) {
 }
 
 export function chunkByConditions(array, conditions) {
-  if (array.length === 0) {
+  if (empty(array)) {
     return [];
-  } else if (conditions.length === 0) {
+  }
+
+  if (empty(conditions)) {
     return [array];
   }
 
@@ -469,7 +473,7 @@ export function getNewAdditions(numAlbums, {wikiData}) {
     // Then cycle over that sorted array, adding one al8um from each to
     // the main array until we've run out or have met the target num8er
     // of al8ums.
-    while (groupArray.length) {
+    while (!empty(groupArray)) {
       let j = 0;
       while (j < groupArray.length) {
         const entry = groupArray[j];
@@ -485,10 +489,10 @@ export function getNewAdditions(numAlbums, {wikiData}) {
           break outerLoop;
         }
 
-        if (entry.length) {
-          j++;
-        } else {
+        if (empty(entry)) {
           groupArray.splice(j, 1);
+        } else {
+          j++;
         }
       }
     }

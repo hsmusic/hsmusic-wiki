@@ -10,6 +10,8 @@
 // Individual listing specs are described in src/listing-spec.js, but are
 // provided via wikiData like other (normal) data objects.
 
+import {empty} from '../util/sugar.js';
+
 import {getTotalDuration} from '../util/wiki-data.js';
 
 export function condition({wikiData}) {
@@ -201,7 +203,7 @@ function generateLinkIndexForListings(currentListing, forSidebar, {
       ...rest,
       listings: listings.filter(({condition: c}) => !c || c({wikiData})),
     }))
-    .filter(({listings}) => listings.length > 0);
+    .filter(({listings}) => !empty(listings));
 
   const genUL = (listings) =>
     html.tag('ul',

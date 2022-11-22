@@ -30,6 +30,20 @@ export function* splitArray(array, fn) {
   }
 }
 
+// Null-accepting function to check if an array is empty. Accepts null (and
+// treats as empty) as a shorthand for "hey, check if this property is an array
+// with/without stuff in it" for objects where properties that are PRESENT but
+// don't currently have a VALUE are null (instead of undefined).
+export function empty(arrayOrNull) {
+  if (arrayOrNull === null) {
+    return true;
+  } else if (Array.isArray(arrayOrNull)) {
+    return arrayOrNull.length === 0;
+  } else {
+    throw new Error(`Expected array or null`);
+  }
+}
+
 // Sums the values in an array, optionally taking a function which maps each
 // item to a number (handy for accessing a certain property on an array of like
 // objects). This also coalesces null values to zero, so if the mapping function

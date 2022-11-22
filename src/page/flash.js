@@ -2,6 +2,7 @@
 
 // Flash page and index specifications.
 
+import {empty} from '../util/sugar.js';
 import {getFlashLink} from '../util/wiki-data.js';
 
 export function condition({wikiData}) {
@@ -50,7 +51,7 @@ export function write(flash, {wikiData}) {
               date: language.formatDate(flash.date),
             })),
 
-          (flash.page || flash.urls?.length) &&
+          (flash.page || !empty(flash.urls)) &&
             html.tag('p',
               language.$('releaseInfo.playOn', {
                 links: language.formatDisjunctionList(
@@ -62,7 +63,7 @@ export function write(flash, {wikiData}) {
               })),
 
           ...html.fragment(
-            flash.featuredTracks?.length && [
+            !empty(flash.featuredTracks) && [
               html.tag('p',
                 `Tracks featured in <i>${
                   flash.name.replace(/\.$/, '')
@@ -81,7 +82,7 @@ export function write(flash, {wikiData}) {
             ]),
 
           ...html.fragment(
-            flash.contributorContribs.length && [
+            !empty(flash.contributorContribs) && [
               html.tag('p',
                 language.$('releaseInfo.contributors')),
 

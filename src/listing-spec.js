@@ -1,6 +1,7 @@
 /** @format */
 
 import {
+  empty,
   accumulateSum,
 } from './util/sugar.js';
 
@@ -264,7 +265,7 @@ const listingSpec = [
     }}) {
       const processContribs = values => {
         const filteredValues = values
-          .filter(value => value.date && value.contribs.length);
+          .filter(value => value.date && !empty(value.contribs));
 
         const datedArtistLists = sortByDate(filteredValues)
           .map(({
@@ -447,15 +448,15 @@ const listingSpec = [
         data.flatMap(({category, groups}) => [
           html.tag('dt',
             language.$('listingPage.listGroups.byCategory.category', {
-              category: groups.length
-                ? link.groupInfo(groups[0], {
+              category: empty(groups)
+                ? category.name
+                : link.groupInfo(groups[0], {
                     text: category.name,
-                  })
-                : category.name,
+                  }),
             })),
 
           html.tag('dd',
-            groups.length === 0
+            empty(groups)
               ? null // todo: #85
               : html.tag('ul',
                   category.groups.map(group =>
@@ -549,7 +550,7 @@ const listingSpec = [
         groupData
           .map(group => {
             const albums = group.albums.filter(a => a.date);
-            return albums.length && {
+            return !empty(albums) && {
               group,
               directory: group.directory,
               name: group.name,
@@ -736,7 +737,7 @@ const listingSpec = [
 
     data: ({wikiData: {trackData}}) =>
       chunkByProperties(
-        trackData.filter(t => t.featuredInFlashes?.length > 0),
+        trackData.filter(t => !empty(t.featuredInFlashes)),
         ['album']),
 
     html: (data, {html, language, link}) =>
@@ -804,7 +805,7 @@ const listingSpec = [
           album,
           tracks: album.tracks.filter(t => t.lyrics),
         }))
-        .filter(({tracks}) => tracks.length),
+        .filter(({tracks}) => !empty(tracks)),
 
     html: (data, {html, language, link}) =>
       html.tag('dl',

@@ -9,7 +9,10 @@ import {
   generateAlbumSidebar,
 } from './album.js';
 
-import {bindOpts} from '../util/sugar.js';
+import {
+  bindOpts,
+  empty,
+} from '../util/sugar.js';
 
 import {
   getTrackCover,
@@ -115,8 +118,8 @@ export function write(track, {wikiData}) {
     getArtistString: _getArtistString,
     language,
   }) => {
-    const hasArtists = track.artistContribs?.length > 0;
-    const hasCoverArtists = track.coverArtistContribs?.length > 0;
+    const hasArtists = !empty(track.artistContribs);
+    const hasCoverArtists = !empty(track.coverArtistContribs);
     const getArtistString = (contribs) =>
       _getArtistString(contribs, {
         // We don't want to put actual HTML tags in social embeds (sadly
@@ -197,7 +200,7 @@ export function write(track, {wikiData}) {
 
         // disabled for now! shifting banner position per height of page is disorienting
         /*
-        banner: album.bannerArtistContribs.length && {
+        banner: !empty(album.bannerArtistContribs) && {
           classes: ['dim'],
           dimensions: album.bannerDimensions,
           path: ['media.albumBanner', album.directory, album.bannerFileExtension],
@@ -222,7 +225,7 @@ export function write(track, {wikiData}) {
                 [html.joinChildren]: '<br>',
               },
               [
-                track.artistContribs.length &&
+                !empty(track.artistContribs) &&
                   language.$('releaseInfo.by', {
                     artists: getArtistString(track.artistContribs, {
                       showContrib: true,
@@ -230,15 +233,12 @@ export function write(track, {wikiData}) {
                     }),
                   }),
 
-                track.coverArtistContribs.length &&
+                !empty(track.coverArtistContribs) &&
                   language.$('releaseInfo.coverArtBy', {
-                    artists: getArtistString(
-                      track.coverArtistContribs,
-                      {
-                        showContrib: true,
-                        showIcons: true,
-                      }
-                    ),
+                    artists: getArtistString(track.coverArtistContribs, {
+                      showContrib: true,
+                      showIcons: true,
+                    }),
                   }),
 
                 track.date &&
@@ -261,15 +261,15 @@ export function write(track, {wikiData}) {
               ]),
 
             html.tag('p',
-              (track.urls?.length
-                ? language.$('releaseInfo.listenOn', {
+              (empty(track.urls)
+                ? language.$('releaseInfo.listenOn.noLinks')
+                : language.$('releaseInfo.listenOn', {
                     links: language.formatDisjunctionList(
                       track.urls.map(url => fancifyURL(url, {language}))),
-                  })
-                : language.$('releaseInfo.listenOn.noLinks'))),
+                  }))),
 
             ...html.fragment(
-              otherReleases.length && [
+              !empty(otherReleases) && [
                 html.tag('p', language.$('releaseInfo.alsoReleasedAs')),
                 html.tag('ul', otherReleases.map(track =>
                   html.tag('li', language.$('releaseInfo.alsoReleasedAs.item', {
@@ -279,7 +279,7 @@ export function write(track, {wikiData}) {
               ]),
 
             ...html.fragment(
-              track.contributorContribs.length && [
+              !empty(track.contributorContribs) && [
                 html.tag('p', language.$('releaseInfo.contributors')),
                 html.tag('ul', track.contributorContribs.map(contrib =>
                   html.tag('li', getArtistString([contrib], {
@@ -289,7 +289,7 @@ export function write(track, {wikiData}) {
               ]),
 
             ...html.fragment(
-              referencedTracks.length && [
+              !empty(referencedTracks) && [
                 html.tag('p', language.$('releaseInfo.tracksReferenced', {
                   track: html.tag('i', track.name),
                 })),
@@ -297,7 +297,7 @@ export function write(track, {wikiData}) {
               ]),
 
             ...html.fragment(
-              referencedByTracks.length && [
+              !empty(referencedByTracks) && [
                 html.tag('p', language.$('releaseInfo.tracksThatReference', {
                   track: html.tag('i', track.name),
                 })),
@@ -309,7 +309,7 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
-              flashesThatFeature.length && [
+              !empty(flashesThatFeature) && [
                 html.tag('p', language.$('releaseInfo.flashesThatFeature', {
                   track: `<i>${track.name}</i>`,
                 })),

@@ -31,6 +31,7 @@ import {color, ENABLE_COLOR, logInfo, logWarn} from '../util/cli.js';
 
 import {
   decorateErrorWithIndex,
+  empty,
   mapAggregate,
   openAggregate,
   showAggregate,
@@ -143,7 +144,7 @@ function makeProcessDocument(
       .map(([field]) => field)
       .filter((field) => !knownFields.includes(field));
 
-    if (unknownFields.length) {
+    if (!empty(unknownFields)) {
       throw new makeProcessDocument.UnknownFieldsError(unknownFields);
     }
 
@@ -1253,7 +1254,7 @@ export function filterDuplicateDirectories(wikiData) {
             directoryPlaces[directory] = [thing];
           }
         }
-        if (!duplicateDirectories.length) return;
+        if (empty(duplicateDirectories)) return;
         duplicateDirectories.sort((a, b) => {
           const aL = a.toLowerCase();
           const bL = b.toLowerCase();

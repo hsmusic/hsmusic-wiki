@@ -11,6 +11,7 @@
 // the domain of link.js.
 
 import * as path from 'path';
+
 import {withEntries} from './sugar.js';
 
 export function generateURLs(urlSpec) {

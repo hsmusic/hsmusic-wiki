@@ -2,7 +2,11 @@
 
 // Album page specification.
 
-import {bindOpts, compareArrays} from '../util/sugar.js';
+import {
+  bindOpts,
+  compareArrays,
+  empty,
+} from '../util/sugar.js';
 
 import {
   getAlbumCover,
@@ -45,8 +49,8 @@ export function write(album, {wikiData}) {
   };
 
   const hasCommentaryEntries =
-    [album, ...album.tracks].filter((x) => x.commentary).length > 0;
-  const hasAdditionalFiles = album.additionalFiles?.length > 0;
+    !empty([album, ...album.tracks].filter((x) => x.commentary));
+  const hasAdditionalFiles = !empty(album.additionalFiles);
   const albumDuration = getTotalDuration(album.tracks);
 
   const displayTrackGroups =
@@ -132,7 +136,7 @@ export function write(album, {wikiData}) {
           `--album-directory: ${album.directory}`,
         ]),
 
-        banner: album.bannerArtistContribs.length && {
+        banner: !empty(album.bannerArtistContribs) && {
           dimensions: album.bannerDimensions,
           path: [
             'media.albumBanner',
@@ -161,7 +165,7 @@ export function write(album, {wikiData}) {
                 [html.joinChildren]: '<br>',
               },
               [
-                album.artistContribs.length &&
+                !empty(album.artistContribs) &&
                   language.$('releaseInfo.by', {
                     artists: getArtistString(album.artistContribs, {
                       showContrib: true,
@@ -169,7 +173,7 @@ export function write(album, {wikiData}) {
                     }),
                   }),
 
-                album.coverArtistContribs.length &&
+                !empty(album.coverArtistContribs) &&
                   language.$('releaseInfo.coverArtBy', {
                     artists: getArtistString(album.coverArtistContribs, {
                       showContrib: true,
@@ -177,7 +181,7 @@ export function write(album, {wikiData}) {
                     }),
                   }),
 
-                album.wallpaperArtistContribs.length &&
+                !empty(album.wallpaperArtistContribs) &&
                   language.$('releaseInfo.wallpaperArtBy', {
                     artists: getArtistString(album.wallpaperArtistContribs, {
                       showContrib: true,
@@ -185,7 +189,7 @@ export function write(album, {wikiData}) {
                     }),
                   }),
 
-                album.bannerArtistContribs.length &&
+                !empty(album.bannerArtistContribs) &&
                   language.$('releaseInfo.bannerArtBy', {
                     artists: getArtistString(album.bannerArtistContribs, {
                       showContrib: true,
@@ -204,7 +208,7 @@ export function write(album, {wikiData}) {
                     date: language.formatDate(album.coverArtDate),
                   }),
 
-                album.duration &&
+                album.duration > 0 &&
                   language.$('releaseInfo.duration', {
                     duration: language.formatDuration(albumDuration, {
                       approximate: album.tracks.length > 1,
@@ -229,7 +233,7 @@ export function write(album, {wikiData}) {
                   }),
               ]),
 
-            album.urls?.length &&
+            !empty(album.urls) &&
               html.tag('p',
                 language.$('releaseInfo.listenOn', {
                   links: language.formatDisjunctionList(
@@ -434,7 +438,7 @@ export function generateAlbumSidebar(album, currentTrack, {
       isAlbumPage &&
         transformMultiline(group.descriptionShort),
 
-      group.urls?.length &&
+      !empty(group.urls) &&
         html.tag('p', language.$('releaseInfo.visitOn', {
           links: language.formatDisjunctionList(
             group.urls.map((url) => fancifyURL(url))
@@ -459,24 +463,16 @@ export function generateAlbumSidebar(album, currentTrack, {
         ]),
     ]);
 
-  if (groupParts.length) {
-    if (isTrackPage) {
-      const combinedGroupPart =
-        groupParts
-          .map(groupPart => groupPart.filter(Boolean).join('\n'))
-          .join('\n<hr>\n');
-      return {
-        multiple: [trackListPart, combinedGroupPart],
-      };
-    } else {
-      return {
-        multiple: [...groupParts, trackListPart],
-      };
-    }
+  if (empty(groupParts)) {
+    return {content: trackListPart};
+  } else if (isTrackPage) {
+    const combinedGroupPart =
+      groupParts
+        .map(groupPart => groupPart.filter(Boolean).join('\n'))
+        .join('\n<hr>\n');
+    return {multiple: [trackListPart, combinedGroupPart]};
   } else {
-    return {
-      content: trackListPart,
-    };
+    return {multiple: [...groupParts, trackListPart]};
   }
 }
 
@@ -490,7 +486,7 @@ export function generateAlbumSecondaryNav(album, currentTrack, {
 
   const {groups} = album;
 
-  if (!groups.length) {
+  if (empty(groups)) {
     return null;
   }
 
@@ -503,27 +499,29 @@ export function generateAlbumSecondaryNav(album, currentTrack, {
       return {group, next, previous};
     })
     .map(({group, next, previous}) => {
-      const previousNext =
+      const previousLink =
         isAlbumPage &&
-          [
-            previous &&
-              link.album(previous, {
-                color: false,
-                text: language.$('misc.nav.previous'),
-              }),
-            next &&
-              link.album(next, {
-                color: false,
-                text: language.$('misc.nav.next'),
-              }),
-          ].filter(Boolean);
+        previous &&
+          link.album(previous, {
+            color: false,
+            text: language.$('misc.nav.previous'),
+          });
+      const nextLink =
+        isAlbumPage &&
+        next &&
+          link.album(next, {
+            color: false,
+            text: language.$('misc.nav.next'),
+          });
+      const links = [previousLink, nextLink].filter(Boolean);
       return html.tag('span',
-        {style: getLinkThemeString(group.color)}, [
-        language.$('albumSidebar.groupBox.title', {
-          group: link.groupInfo(group),
-        }),
-        previousNext?.length && `(${previousNext.join(',\n')})`,
-      ]);
+        {style: getLinkThemeString(group.color)},
+        [
+          language.$('albumSidebar.groupBox.title', {
+            group: link.groupInfo(group),
+          }),
+          !empty(links) && `(${language.formatUnitList(links)})`,
+        ]);
     });
 
   return {

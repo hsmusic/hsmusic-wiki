@@ -2,7 +2,14 @@
 
 // Group page specifications.
 
-import {getTotalDuration, sortChronologically} from '../util/wiki-data.js';
+import {
+  empty,
+} from '../util/sugar.js';
+
+import {
+  getTotalDuration,
+  sortChronologically,
+} from '../util/wiki-data.js';
 
 export function targets({wikiData}) {
   return wikiData.groupData;
@@ -44,7 +51,7 @@ export function write(group, {wikiData}) {
               group: group.name
             })),
 
-          group.urls?.length &&
+          !empty(group.urls) &&
             html.tag('p',
               language.$('releaseInfo.visitOn', {
                 links: language.formatDisjunctionList(
