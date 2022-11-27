@@ -109,7 +109,7 @@ export function normalizeName(s) {
     .trim();
 
   // Discard anything that isn't a letter, number, or space.
-  s = s.replace(/[^\p{Letter}\p{Number} ]/gu, '');
+  s = s.replace(/[^\p{Letter}\p{Number} ]/gu, '').trim();
 
   // Remove common English (only, for now) prefixes.
   s = s.replace(/^(?:an?|the) /i, '');
