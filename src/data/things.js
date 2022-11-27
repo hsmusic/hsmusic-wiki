@@ -1461,7 +1461,16 @@ FlashAct.propertyDescriptors = {
   color: Thing.common.color(),
   anchor: Thing.common.simpleString(),
   jump: Thing.common.simpleString(),
-  jumpColor: Thing.common.color(),
+
+  jumpColor: {
+    flags: {update: true, expose: true},
+    update: {validate: isColor},
+    expose: {
+      dependencies: ['color'],
+      transform: (jumpColor, {color}) =>
+        jumpColor ?? color,
+    }
+  },
 
   flashesByRef: Thing.common.referenceList(Flash),
 
