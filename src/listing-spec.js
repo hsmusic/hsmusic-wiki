@@ -239,7 +239,7 @@ const listingSpec = [
           duration: getTotalDuration([
             ...(artist.tracksAsArtist ?? []),
             ...(artist.tracksAsContributor ?? []),
-          ]),
+          ], {originalReleasesOnly: true}),
         }))
         .filter(({duration}) => duration > 0)
         .sort((a, b) => b.duration - a.duration),
@@ -525,7 +525,9 @@ const listingSpec = [
       groupData
         .map(group => ({
           group,
-          duration: getTotalDuration(group.albums.flatMap(album => album.tracks)),
+          duration: getTotalDuration(
+            group.albums.flatMap(album => album.tracks),
+            {originalReleasesOnly: true}),
         }))
         .sort((a, b) => b.duration - a.duration),
 

@@ -395,7 +395,13 @@ export function getFlashLink(flash) {
   return `https://homestuck.com/story/${flash.page}`;
 }
 
-export function getTotalDuration(tracks) {
+export function getTotalDuration(tracks, {
+  originalReleasesOnly = false,
+} = {}) {
+  if (originalReleasesOnly) {
+    tracks = tracks.filter(t => !t.originalReleaseTrack);
+  }
+
   return accumulateSum(tracks, track => track.duration);
 }
 

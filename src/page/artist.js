@@ -87,6 +87,7 @@ export function write(artist, {wikiData}) {
         date: +track.date,
         album: track.album,
         duration: track.duration,
+        originalReleaseTrack: track.originalReleaseTrack,
         artists: track.artistContribs.some(({who}) => who === artist)
           ? track.artistContribs.filter(({who}) => who !== artist)
           : track.contributorContribs.filter(({who}) => who !== artist),
@@ -103,11 +104,11 @@ export function write(artist, {wikiData}) {
       date,
       album,
       chunk,
-      duration: getTotalDuration(chunk),
+      duration: getTotalDuration(chunk, {originalReleasesOnly: true}),
     }));
 
   const trackListChunks = chunkTracks(allTracks);
-  const totalDuration = getTotalDuration(allTracks);
+  const totalDuration = getTotalDuration(allTracks.filter(t => !t.originalReleaseTrack));
 
   const countGroups = (things) => {
     const usedGroups = things.flatMap(

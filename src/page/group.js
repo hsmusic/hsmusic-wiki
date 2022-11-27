@@ -18,7 +18,7 @@ export function write(group, {wikiData}) {
 
   const {albums} = group;
   const tracks = albums.flatMap((album) => album.tracks);
-  const totalDuration = getTotalDuration(tracks);
+  const totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
 
   const albumLines = group.albums.map((album) => ({
     album,
