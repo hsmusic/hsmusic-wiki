@@ -1,5 +1,3 @@
-/** @format */
-
 // Artist alias redirect pages.
 // (Makes old permalinks bring visitors to the up-to-date page.)
 

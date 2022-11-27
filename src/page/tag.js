@@ -1,5 +1,3 @@
-/** @format */
-
 // Art tag page specification.
 
 export function condition({wikiData}) {
@@ -28,8 +26,8 @@ export function write(tag, {wikiData}) {
       getThemeString,
       getTrackCover,
       html,
-      link,
       language,
+      link,
     }) => ({
       title: language.$('tagPage.title', {tag: tag.name}),
       theme: getThemeString(tag.color),
@@ -79,10 +77,11 @@ export function write(tag, {wikiData}) {
 
 // Utility functions
 
-function generateTagNav(
-  tag,
-  {link, language, wikiData}
-) {
+function generateTagNav(tag, {
+  language,
+  link,
+  wikiData,
+}) {
   return {
     linkContainerClasses: ['nav-links-hierarchy'],
     links: [

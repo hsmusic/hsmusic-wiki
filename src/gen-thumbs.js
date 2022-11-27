@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/** @format */
 
 // Ok, so the d8te is 3 March 2021, and the music wiki was initially released
 // on 15 November 2019. That is 474 days or 11376 hours. In my opinion, and
@@ -98,10 +97,10 @@ import {commandExists, isMain, promisifyProcess} from './util/node-utils.js';
 
 import {delay, queue} from './util/sugar.js';
 
-function traverse(
-  startDirPath,
-  {filterFile = () => true, filterDir = () => true} = {}
-) {
+function traverse(startDirPath, {
+  filterFile = () => true,
+  filterDir = () => true
+} = {}) {
   const recursive = (names, subDirPath) =>
     Promise.all(
       names.map((name) =>
@@ -197,10 +196,10 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
   ]);
 }
 
-export default async function genThumbs(
-  mediaPath,
-  {queueSize = 0, quiet = false} = {}
-) {
+export default async function genThumbs(mediaPath, {
+  queueSize = 0,
+  quiet = false,
+} = {}) {
   if (!mediaPath) {
     throw new Error('Expected mediaPath to be passed');
   }

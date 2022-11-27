@@ -1,5 +1,3 @@
-/** @format */
-
 export function serializeLink(thing) {
   const ret = {};
   ret.name = thing.name;
@@ -25,11 +23,10 @@ export function serializeImagePaths(original, {thumb}) {
   };
 }
 
-export function serializeCover(
-  thing,
-  pathFunction,
-  {serializeImagePaths, urls}
-) {
+export function serializeCover(thing, pathFunction, {
+  serializeImagePaths,
+  urls,
+}) {
   const coverPath = pathFunction(thing, {
     to: urls.from('media.root').to,
   });

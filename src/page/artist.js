@@ -1,5 +1,3 @@
-/** @format */
-
 // Artist page specification.
 //
 // NB: See artist-alias.js for artist alias redirect pages.
@@ -161,16 +159,13 @@ export function write(artist, {wikiData}) {
       ? language.$('artistPage.creditList.entry.rerelease', {entry})
       : !empty(artists)
       ? contrib.what || contrib.whatArray?.length
-        ? language.$(
-            'artistPage.creditList.entry.withArtists.withContribution',
-            {
-              entry,
-              artists: getArtistString(artists),
-              contribution: contrib.whatArray
-                ? language.formatUnitList(contrib.whatArray)
-                : contrib.what,
-            }
-          )
+        ? language.$('artistPage.creditList.entry.withArtists.withContribution', {
+            entry,
+            artists: getArtistString(artists),
+            contribution: contrib.whatArray
+              ? language.formatUnitList(contrib.whatArray)
+              : contrib.what,
+          })
         : language.$('artistPage.creditList.entry.withArtists', {
             entry,
             artists: getArtistString(artists),
@@ -227,15 +222,12 @@ export function write(artist, {wikiData}) {
                 original: track.originalReleaseTrack,
                 entry: language.$('artistPage.creditList.entry.track.withDuration', {
                   track: link.track(track),
-                  duration: language.formatDuration(
-                    track.duration ?? 0
-                  ),
+                  duration: language.formatDuration(track.duration ?? 0),
                 }),
                 ...props,
               }))
               .map(({original, ...opts}) =>
-                html.tag(
-                  'li',
+                html.tag('li',
                   {class: original && 'rerelease'},
                   generateEntryAccents({
                     getArtistString,
@@ -282,20 +274,14 @@ export function write(artist, {wikiData}) {
     type: 'data',
     path: ['artist', artist.directory],
     data: ({serializeContribs, serializeLink}) => {
-      const serializeArtistsAndContrib = bindOpts(
-        unbound_serializeArtistsAndContrib,
-        {
-          serializeContribs,
-          serializeLink,
-        }
-      );
+      const serializeArtistsAndContrib = bindOpts(unbound_serializeArtistsAndContrib, {
+        serializeContribs,
+        serializeLink,
+      });
 
-      const serializeTrackListChunks = bindOpts(
-        unbound_serializeTrackListChunks,
-        {
-          serializeLink,
-        }
-      );
+      const serializeTrackListChunks = bindOpts(unbound_serializeTrackListChunks, {
+        serializeLink,
+      });
 
       return {
         albums: {
@@ -663,12 +649,12 @@ export function write(artist, {wikiData}) {
 
 // Utility functions
 
-function generateNavForArtist(
-  artist,
-  isGallery,
-  hasGallery,
-  {generateInfoGalleryLinks, link, language, wikiData}
-) {
+function generateNavForArtist(artist, isGallery, hasGallery, {
+  generateInfoGalleryLinks,
+  language,
+  link,
+  wikiData,
+}) {
   const {wikiInfo} = wikiData;
 
   const infoGalleryLinks =

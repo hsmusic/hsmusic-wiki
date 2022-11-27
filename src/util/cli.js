@@ -1,5 +1,3 @@
-/** @format */
-
 // Utility functions for CLI- and de8ugging-rel8ted stuff.
 //
 // A 8unch of these depend on process.stdout 8eing availa8le, so they won't

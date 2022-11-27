@@ -1,7 +1,3 @@
-/**
- * @format
- */
-
 // Generally extendable class for caching properties and handling dependencies,
 // with a few key properties:
 //
@@ -112,9 +108,7 @@ export default class CacheableObject {
         get: (obj, key) => {
           if (!Object.hasOwn(obj, key)) {
             if (key !== 'constructor') {
-              CacheableObject._invalidAccesses.add(
-                `(${obj.constructor.name}).${key}`
-              );
+              CacheableObject._invalidAccesses.add(`(${obj.constructor.name}).${key}`);
             }
           }
           return obj[key];
@@ -124,9 +118,7 @@ export default class CacheableObject {
   }
 
   #initializeUpdatingPropertyValues() {
-    for (const [property, descriptor] of Object.entries(
-      this.constructor.propertyDescriptors
-    )) {
+    for (const [property, descriptor] of Object.entries(this.constructor.propertyDescriptors)) {
       const {flags, update} = descriptor;
 
       if (!flags.update) {
@@ -143,14 +135,10 @@ export default class CacheableObject {
 
   #defineProperties() {
     if (!this.constructor.propertyDescriptors) {
-      throw new Error(
-        `Expected constructor ${this.constructor.name} to define propertyDescriptors`
-      );
+      throw new Error(`Expected constructor ${this.constructor.name} to define propertyDescriptors`);
     }
 
-    for (const [property, descriptor] of Object.entries(
-      this.constructor.propertyDescriptors
-    )) {
+    for (const [property, descriptor] of Object.entries(this.constructor.propertyDescriptors)) {
       const {flags} = descriptor;
 
       const definition = {
@@ -159,13 +147,11 @@ export default class CacheableObject {
       };
 
       if (flags.update) {
-        definition.set =
-          this.#getUpdateObjectDefinitionSetterFunction(property);
+        definition.set = this.#getUpdateObjectDefinitionSetterFunction(property);
       }
 
       if (flags.expose) {
-        definition.get =
-          this.#getExposeObjectDefinitionGetterFunction(property);
+        definition.get = this.#getExposeObjectDefinitionGetterFunction(property);
       }
 
       Object.defineProperty(this, property, definition);
@@ -198,9 +184,11 @@ export default class CacheableObject {
             throw new TypeError(`Validation failed for value ${newValue}`);
           }
         } catch (error) {
-          error.message = `Property ${color.green(property)} (${inspect(
-            this[property]
-          )} -> ${inspect(newValue)}): ${error.message}`;
+          error.message = [
+            `Property ${color.green(property)}`,
+            `(${inspect(this[property])} -> ${inspect(newValue)}):`,
+            error.message
+          ].join(' ');
           throw error;
         }
       }
@@ -215,8 +203,12 @@ export default class CacheableObject {
   }
 
   #invalidateCachesDependentUpon(property) {
-    for (const invalidate of this.#propertyUpdateCacheInvalidators[property] ||
-      []) {
+    const invalidators = this.#propertyUpdateCacheInvalidators[property];
+    if (!invalidators) {
+      return;
+    }
+
+    for (const invalidate of invalidators) {
       invalidate();
     }
   }
@@ -236,9 +228,7 @@ export default class CacheableObject {
         }
       };
     } else if (!flags.update && !compute) {
-      throw new Error(
-        `Exposed property ${property} does not update and is missing compute function`
-      );
+      throw new Error(`Exposed property ${property} does not update and is missing compute function`);
     } else {
       return () => this.#propertyUpdateValues[property];
     }
@@ -253,30 +243,31 @@ export default class CacheableObject {
     if (flags.update && !transform) {
       return null;
     } else if (flags.update && compute) {
-      throw new Error(
-        `Updating property ${property} has compute function, should be formatted as transform`
-      );
+      throw new Error(`Updating property ${property} has compute function, should be formatted as transform`);
     } else if (!flags.update && !compute) {
-      throw new Error(
-        `Exposed property ${property} does not update and is missing compute function`
-      );
+      throw new Error(`Exposed property ${property} does not update and is missing compute function`);
     }
 
-    const dependencyKeys = expose.dependencies || [];
-    const dependencyGetters = dependencyKeys.map((key) => () => [
-      key,
-      this.#propertyUpdateValues[key],
-    ]);
-    const getAllDependencies = () =>
-      Object.fromEntries(
-        dependencyGetters
-          .map((f) => f())
-          .concat([[this.constructor.instance, this]])
-      );
+    let getAllDependencies;
+
+    const dependencyKeys = expose.dependencies;
+    if (dependencyKeys?.length > 0) {
+      const reflectionEntry = [this.constructor.instance, this];
+      const dependencyGetters = dependencyKeys
+        .map(key => () => [key, this.#propertyUpdateValues[key]]);
+
+      getAllDependencies = () =>
+        Object.fromEntries(dependencyGetters
+          .map(f => f())
+          .concat([reflectionEntry]));
+    } else {
+      const allDependencies = {[this.constructor.instance]: this};
+      Object.freeze(allDependencies);
+      getAllDependencies = () => allDependencies;
+    }
 
     if (flags.update) {
-      return () =>
-        transform(this.#propertyUpdateValues[property], getAllDependencies());
+      return () => transform(this.#propertyUpdateValues[property], getAllDependencies());
     } else {
       return () => compute(getAllDependencies());
     }
@@ -321,14 +312,14 @@ export default class CacheableObject {
       return;
     }
 
-    if (!obj.constructor.propertyDescriptors) {
+    const {propertyDescriptors} = obj.constructor;
+
+    if (!propertyDescriptors) {
       console.warn('Missing property descriptors:', obj);
       return;
     }
 
-    for (const [property, descriptor] of Object.entries(
-      obj.constructor.propertyDescriptors
-    )) {
+    for (const [property, descriptor] of Object.entries(propertyDescriptors)) {
       const {flags} = descriptor;
 
       if (!flags.expose) {

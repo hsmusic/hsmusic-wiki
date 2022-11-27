@@ -1,5 +1,3 @@
-/** @format */
-
 // Code that deals with URLs (really the pathnames that get referenced all
 // throughout the gener8ted HTML). Most nota8ly here is generateURLs, which
 // is in charge of pre-gener8ting a complete network of template strings
@@ -28,9 +26,7 @@ export function generateURLs(urlSpec) {
     const group = obj[groupKey];
 
     if (!Object.hasOwn(group, subKey)) {
-      throw new Error(
-        `Expected valid subkey (got ${subKey} for group ${groupKey})`
-      );
+      throw new Error(`Expected valid subkey (got ${subKey} for group ${groupKey})`);
     }
 
     return {
@@ -47,9 +43,8 @@ export function generateURLs(urlSpec) {
   const generateTo = (fromPath, fromGroup) => {
     const A = trimLeadingSlash(fromPath);
 
-    const rebasePrefix = '../'.repeat(
-      (fromGroup.prefix || '').split('/').filter(Boolean).length
-    );
+    const rebasePrefix = '../'
+      .repeat((fromGroup.prefix || '').split('/').filter(Boolean).length);
 
     const pathHelper = (toPath, toGroup) => {
       let B = trimLeadingSlash(toPath);
@@ -117,14 +112,14 @@ export function generateURLs(urlSpec) {
   };
 
   const generateFrom = () => {
-    const map = withEntries(urlSpec, (entries) =>
-      entries.map(([key, group]) => [
+    const map = withEntries(
+      urlSpec,
+      (entries) => entries.map(([key, group]) => [
         key,
         withEntries(group.paths, (entries) =>
           entries.map(([key, path]) => [key, generateTo(path, group)])
         ),
-      ])
-    );
+      ]));
 
     const from = (key) => getValueForFullKey(map, key).value;
 

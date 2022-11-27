@@ -1,5 +1,3 @@
-/** @format */
-
 // Miscellaneous utility functions which are useful across page specifications.
 // These are made available right on a page spec's ({wikiData, language, ...})
 // args object!
@@ -163,9 +161,7 @@ function unbound_generateChronologyLinks(currentThing, {
   }
 
   if (contributions.length > 8) {
-    return `<div class="chronology">${language.$(
-      'misc.chronology.seeArtistPages'
-    )}</div>`;
+    return `<div class="chronology">${language.$('misc.chronology.seeArtistPages')}</div>`;
   }
 
   return contributions

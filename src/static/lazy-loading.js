@@ -1,5 +1,3 @@
-/** @format */
-
 // Lazy loading! Roll your own. Woot.
 // This file includes a 8unch of fall8acks and stuff like that, and is written
 // with fairly Olden JavaScript(TM), so as to work on pretty much any 8rowser

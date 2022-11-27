@@ -1,5 +1,3 @@
-/** @format */
-
 // This file is essentially one level of a8straction a8ove urls.js (and the
 // urlSpec it gets its paths from). It's a 8unch of utility functions which
 // take certain types of wiki data o8jects (colloquially known as "things")
@@ -35,18 +33,18 @@ export function getLinkThemeString(color) {
 const appendIndexHTMLRegex = /^(?!https?:\/\/).+\/$/;
 
 const linkHelper =
-  (hrefFn, {color = true, attr = null} = {}) =>
-  (
-    thing,
-    {
-      to,
-      text = '',
-      attributes = null,
-      class: className = '',
-      color: color2 = true,
-      hash = '',
-    }
-  ) => {
+  (hrefFn, {
+    color = true,
+    attr = null,
+  } = {}) =>
+  (thing, {
+    to,
+    text = '',
+    attributes = null,
+    class: className = '',
+    color: color2 = true,
+    hash = '',
+  }) => {
     let href = hrefFn(thing, {to});
 
     if (link.globalOptions.appendIndexHTML) {
@@ -88,6 +86,7 @@ const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
 
 const linkPathname = (key, conf) =>
   linkHelper(({directory: pathname}, {to}) => to(key, pathname), conf);
+
 const linkIndex = (key, conf) =>
   linkHelper((_, {to}) => to('localized.' + key), conf);
 
@@ -143,8 +142,7 @@ const link = {
       to(
         'media.albumAdditionalFile',
         fakeFileObject.album.directory,
-        fakeFileObject.name
-      ),
+        fakeFileObject.name),
     {color: false}
   ),
   albumAdditionalFile: ({file, album}, {to}) =>
@@ -153,8 +151,7 @@ const link = {
         name: file,
         album,
       },
-      {to}
-    ),
+      {to}),
 
   media: linkPathname('media.path', {color: false}),
   root: linkPathname('shared.path', {color: false}),

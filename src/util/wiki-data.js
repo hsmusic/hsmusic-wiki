@@ -1,5 +1,3 @@
-/** @format */
-
 // Utility functions for interacting with wiki data.
 
 import {empty} from './sugar.js';
@@ -144,10 +142,9 @@ export function normalizeName(s) {
 // ...trackData]), because the initial sort places albums before tracks - and
 // sortByDirectory will handle the rest, given all directories are unique
 // except when album and track directories overlap with each other.
-export function sortByDirectory(
-  data,
-  {getDirectory = (o) => o.directory} = {}
-) {
+export function sortByDirectory(data, {
+  getDirectory = (o) => o.directory,
+} = {}) {
   return data.sort((a, b) => {
     const ad = getDirectory(a);
     const bd = getDirectory(b);
@@ -155,7 +152,9 @@ export function sortByDirectory(
   });
 }
 
-export function sortByName(data, {getName = (o) => o.name} = {}) {
+export function sortByName(data, {
+  getName = (o) => o.name,
+} = {}) {
   const nameMap = new Map();
   const normalizedNameMap = new Map();
   for (const o of data) {
@@ -178,7 +177,9 @@ export function sortByName(data, {getName = (o) => o.name} = {}) {
   });
 }
 
-export function sortByDate(data, {getDate = (o) => o.date} = {}) {
+export function sortByDate(data, {
+  getDate = (o) => o.date,
+} = {}) {
   return data.sort((a, b) => {
     const ad = getDate(a);
     const bd = getDate(b);
@@ -269,7 +270,10 @@ export function sortByConditions(data, conditions) {
 // Expects thing properties:
 //  * directory (or override getDirectory)
 //  * name (or override getName)
-export function sortAlphabetically(data, {getDirectory, getName} = {}) {
+export function sortAlphabetically(data, {
+  getDirectory,
+  getName,
+} = {}) {
   sortByDirectory(data, {getDirectory});
   sortByName(data, {getName});
   return data;
@@ -279,10 +283,11 @@ export function sortAlphabetically(data, {getDirectory, getName} = {}) {
 //  * directory (or override getDirectory)
 //  * name (or override getName)
 //  * date (or override getDate)
-export function sortChronologically(
-  data,
-  {getDirectory, getName, getDate} = {}
-) {
+export function sortChronologically(data, {
+  getDirectory,
+  getName,
+  getDate,
+} = {}) {
   sortAlphabetically(data, {getDirectory, getName});
   sortByDate(data, {getDate});
   return data;
@@ -296,7 +301,9 @@ export function sortChronologically(
 // release date but can be overridden) above all else.
 //
 // This function also works for data lists which contain only tracks.
-export function sortAlbumsTracksChronologically(data, {getDate} = {}) {
+export function sortAlbumsTracksChronologically(data, {
+  getDate,
+} = {}) {
   // Sort albums before tracks...
   sortByConditions(data, [(t) => t.album === undefined]);
 
@@ -320,9 +327,8 @@ export function sortAlbumsTracksChronologically(data, {getDate} = {}) {
 // Specific data utilities
 
 export function filterAlbumsByCommentary(albums) {
-  return albums.filter((album) =>
-    [album, ...album.tracks].some((x) => x.commentary)
-  );
+  return albums
+    .filter((album) => [album, ...album.tracks].some((x) => x.commentary));
 }
 
 export function getAlbumCover(album, {to}) {
@@ -387,12 +393,7 @@ export function getTrackCover(track, {to}) {
   if (!track.hasCoverArt) {
     return getAlbumCover(track.album, {to});
   } else {
-    return to(
-      'media.trackCover',
-      track.album.directory,
-      track.directory,
-      track.coverArtFileExtension
-    );
+    return to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension);
   }
 }
 
@@ -455,11 +456,7 @@ export function getNewAdditions(numAlbums, {wikiData}) {
     const currentDate = sortedAlbums[i].dateAddedToWiki;
     const groupMap = new Map();
     const groupArray = [];
-    for (
-      let album;
-      (album = sortedAlbums[i]) && +album.dateAddedToWiki === +currentDate;
-      i++
-    ) {
+    for (let album; (album = sortedAlbums[i]) && +album.dateAddedToWiki === +currentDate; i++) {
       const primaryGroup = album.groups[0];
       if (groupMap.has(primaryGroup)) {
         groupMap.get(primaryGroup).push(album);
@@ -510,6 +507,7 @@ export function getNewReleases(numReleases, {wikiData}) {
   const latestFirst = albumData
     .filter((album) => album.isListedOnHomepage)
     .reverse();
+
   const majorReleases = latestFirst.filter((album) => album.isMajorRelease);
   majorReleases.splice(1);
 

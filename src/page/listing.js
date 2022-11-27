@@ -1,5 +1,3 @@
-/** @format */
-
 // Listing page specification.
 //
 // The targets here are a bit different than for most pages: rather than data

@@ -1,5 +1,3 @@
-/** @format */
-
 import {color, logWarn} from './cli.js';
 
 import {inspect} from 'util';
@@ -26,9 +24,7 @@ function findHelper(keys, findFns = {}) {
   const byDirectory = findFns.byDirectory || matchDirectory;
   const byName = findFns.byName || matchName;
 
-  const keyRefRegex = new RegExp(
-    String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`
-  );
+  const keyRefRegex = new RegExp(String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`);
 
   // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
   // errors for null matches (with details about the error), while 'warn' and
@@ -37,9 +33,7 @@ function findHelper(keys, findFns = {}) {
   return (fullRef, data, {mode = 'warn'} = {}) => {
     if (!fullRef) return null;
     if (typeof fullRef !== 'string') {
-      throw new Error(
-        `Got a reference that is ${typeof fullRef}, not string: ${fullRef}`
-      );
+      throw new Error(`Got a reference that is ${typeof fullRef}, not string: ${fullRef}`);
     }
 
     if (!data) {

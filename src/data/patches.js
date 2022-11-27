@@ -1,5 +1,3 @@
-/** @format */
-
 // --> Patch
 
 export class Patch {
@@ -137,6 +135,7 @@ export class PatchManager extends Patch {
     this.#externalInputPatch = new PatchManagerExternalInputPatch({
       manager: this,
     });
+
     this.#externalOutputPatch = new PatchManagerExternalOutputPatch({
       manager: this,
     });
@@ -184,9 +183,7 @@ export class PatchManager extends Patch {
 
   addManagedInput(patchWithInput, inputName, patchWithOutput, outputName) {
     if (patchWithInput.manager !== this || patchWithOutput.manager !== this) {
-      throw new Error(
-        `Input and output patches must belong to same manager (this)`
-      );
+      throw new Error(`Input and output patches must belong to same manager (this)`);
     }
 
     const input = patchWithInput.inputs[inputName];

@@ -1,5 +1,3 @@
-/** @format */
-
 import {withAggregate} from '../util/sugar.js';
 
 import {color, ENABLE_COLOR} from '../util/cli.js';
@@ -104,9 +102,7 @@ export function isInstance(value, constructor) {
   isObject(value);
 
   if (!(value instanceof constructor))
-    throw new TypeError(
-      `Expected ${constructor.name}, got ${value.constructor.name}`
-    );
+    throw new TypeError(`Expected ${constructor.name}, got ${value.constructor.name}`);
 
   return true;
 }
@@ -142,9 +138,7 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${
-        error.message
-      }`;
+      error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${error.message}`;
       throw error;
     }
   };
@@ -174,10 +168,8 @@ export function isColor(color) {
   isStringNonEmpty(color);
 
   if (color.startsWith('#')) {
-    if (![1 + 3, 1 + 4, 1 + 6, 1 + 8].includes(color.length))
-      throw new TypeError(
-        `Expected #rgb, #rgba, #rrggbb, or #rrggbbaa, got length ${color.length}`
-      );
+    if (![4, 5, 7, 9].includes(color.length))
+      throw new TypeError(`Expected #rgb, #rgba, #rrggbb, or #rrggbbaa, got length ${color.length}`);
 
     if (/[^0-9a-fA-F]/.test(color.slice(1)))
       throw new TypeError(`Expected hexadecimal digits`);
@@ -204,37 +196,26 @@ export function validateProperties(spec) {
     if (Array.isArray(object))
       throw new TypeError(`Expected an object, got array`);
 
-    withAggregate(
-      {message: `Errors validating object properties`},
-      ({call}) => {
-        for (const [specKey, specValidator] of specEntries) {
-          call(() => {
-            const value = object[specKey];
-            try {
-              specValidator(value);
-            } catch (error) {
-              error.message = `(key: ${color.green(specKey)}, value: ${inspect(
-                value
-              )}) ${error.message}`;
-              throw error;
-            }
-          });
-        }
-
-        const unknownKeys = Object.keys(object).filter(
-          (key) => !specKeys.includes(key)
-        );
-        if (unknownKeys.length > 0) {
-          call(() => {
-            throw new Error(
-              `Unknown keys present (${
-                unknownKeys.length
-              }): [${unknownKeys.join(', ')}]`
-            );
-          });
-        }
+    withAggregate({message: `Errors validating object properties`}, ({call}) => {
+      for (const [specKey, specValidator] of specEntries) {
+        call(() => {
+          const value = object[specKey];
+          try {
+            specValidator(value);
+          } catch (error) {
+            error.message = `(key: ${color.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
+            throw error;
+          }
+        });
       }
-    );
+
+      const unknownKeys = Object.keys(object).filter((key) => !specKeys.includes(key));
+      if (unknownKeys.length > 0) {
+        call(() => {
+          throw new Error(`Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`);
+        });
+      }
+    });
 
     return true;
   };
@@ -243,7 +224,9 @@ export function validateProperties(spec) {
 export const isContribution = validateProperties({
   who: isArtistRef,
   what: (value) =>
-    value === undefined || value === null || isStringNonEmpty(value),
+    value === undefined ||
+    value === null ||
+    isStringNonEmpty(value),
 });
 
 export const isContributionList = validateArrayItems(isContribution);
@@ -251,7 +234,9 @@ export const isContributionList = validateArrayItems(isContribution);
 export const isAdditionalFile = validateProperties({
   title: isString,
   description: (value) =>
-    value === undefined || value === null || isString(value),
+    value === undefined ||
+    value === null ||
+    isString(value),
   files: validateArrayItems(isString),
 });
 
@@ -274,9 +259,7 @@ export function isDirectory(directory) {
   isStringNonEmpty(directory);
 
   if (directory.match(/[^a-zA-Z0-9_-]/))
-    throw new TypeError(
-      `Expected only letters, numbers, dash, and underscore, got "${directory}"`
-    );
+    throw new TypeError(`Expected only letters, numbers, dash, and underscore, got "${directory}"`);
 
   return true;
 }
@@ -331,16 +314,14 @@ export function validateReference(type = 'track') {
 
     if (!match) throw new TypeError(`Malformed reference`);
 
-    const {
-      groups: {typePart, directoryPart},
-    } = match;
+    const {groups: {typePart, directoryPart}} = match;
 
-    if (typePart && typePart !== type)
-      throw new TypeError(
-        `Expected ref to begin with "${type}:", got "${typePart}:"`
-      );
+    if (typePart) {
+      if (typePart !== type)
+        throw new TypeError(`Expected ref to begin with "${type}:", got "${typePart}:"`);
 
-    if (typePart) isDirectory(directoryPart);
+      isDirectory(directoryPart);
+    }
 
     isName(ref);
 
@@ -381,9 +362,6 @@ export function oneOf(...checks) {
       error.check = check;
       errors.push(error);
     }
-    throw new AggregateError(
-      errors,
-      `Expected one of ${checks.length} possible checks, but none were true`
-    );
+    throw new AggregateError(errors, `Expected one of ${checks.length} possible checks, but none were true`);
   };
 }

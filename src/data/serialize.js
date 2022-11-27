@@ -1,6 +1,4 @@
-/** @format */
-
-// serialize-util.js: simple interface and utility functions for converting
+// serialize.js: simple interface and utility functions for converting
 // Things into a directly serializeable format
 
 // Utility functions
@@ -27,17 +25,14 @@ export const serializeDescriptors = Symbol();
 
 export function serializeThing(thing) {
   const descriptors = thing.constructor[serializeDescriptors];
+
   if (!descriptors) {
-    throw new Error(
-      `Constructor ${thing.constructor.name} does not provide serialize descriptors`
-    );
+    throw new Error(`Constructor ${thing.constructor.name} does not provide serialize descriptors`);
   }
 
   return Object.fromEntries(
-    Object.entries(descriptors).map(([property, transform]) => [
-      property,
-      transform(thing[property]),
-    ])
+    Object.entries(descriptors)
+      .map(([property, transform]) => [property, transform(thing[property])])
   );
 }
 

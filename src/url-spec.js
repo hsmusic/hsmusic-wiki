@@ -1,5 +1,3 @@
-/** @format */
-
 import {withEntries} from './util/sugar.js';
 
 const urlSpec = {
@@ -87,8 +85,7 @@ const urlSpec = {
 // so it should never be referenced manually.
 urlSpec.localizedWithBaseDirectory = {
   paths: withEntries(urlSpec.localized.paths, (entries) =>
-    entries.map(([key, path]) => [key, '<>/' + path])
-  ),
+    entries.map(([key, path]) => [key, '<>/' + path])),
 };
 
 export default urlSpec;

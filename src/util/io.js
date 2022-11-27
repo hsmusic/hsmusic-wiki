@@ -1,5 +1,3 @@
-/** @format */
-
 // Utility functions for interacting with files and other external data
 // interfacey constructs.
 

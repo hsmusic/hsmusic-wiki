@@ -1,5 +1,3 @@
-/** @format */
-
 // Album page specification.
 
 import {
@@ -30,6 +28,7 @@ export function write(album, {wikiData}) {
       duration: language.formatDuration(track.duration ?? 0),
       track: link.track(track),
     };
+
     return html.tag('li',
       {style: getLinkThemeString(track.color)},
       compareArrays(

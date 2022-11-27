@@ -1,5 +1,3 @@
-/** @format */
-
 // Syntactic sugar! (Mostly.)
 // Generic functions - these are useful just a8out everywhere.
 //
@@ -17,9 +15,7 @@ import {color} from './cli.js';
 export function* splitArray(array, fn) {
   let lastIndex = 0;
   while (lastIndex < array.length) {
-    let nextIndex = array.findIndex(
-      (item, index) => index >= lastIndex && fn(item)
-    );
+    let nextIndex = array.findIndex((item, index) => index >= lastIndex && fn(item));
     if (nextIndex === -1) {
       nextIndex = array.length;
     }
@@ -54,8 +50,7 @@ export function accumulateSum(array, fn = x => x) {
     (accumulator, value, index, array) =>
       accumulator +
         fn(value, index, array) ?? 0,
-    0
-  );
+    0);
 }
 
 export const mapInPlace = (array, fn) =>
@@ -275,11 +270,10 @@ export function mapAggregate(array, fn, aggregateOpts) {
   return _mapAggregate('sync', null, array, fn, aggregateOpts);
 }
 
-export function mapAggregateAsync(
-  array,
-  fn,
-  {promiseAll = Promise.all.bind(Promise), ...aggregateOpts} = {}
-) {
+export function mapAggregateAsync(array, fn, {
+  promiseAll = Promise.all.bind(Promise),
+  ...aggregateOpts
+} = {}) {
   return _mapAggregate('async', promiseAll, array, fn, aggregateOpts);
 }
 
@@ -299,10 +293,11 @@ export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
       .filter((value) => value !== failureSymbol);
     return {result, aggregate};
   } else {
-    return promiseAll(array.map(aggregate.wrapAsync(fn))).then((values) => {
-      const result = values.filter((value) => value !== failureSymbol);
-      return {result, aggregate};
-    });
+    return promiseAll(array.map(aggregate.wrapAsync(fn)))
+      .then((values) => {
+        const result = values.filter((value) => value !== failureSymbol);
+        return {result, aggregate};
+      });
   }
 }
 
@@ -317,11 +312,10 @@ export function filterAggregate(array, fn, aggregateOpts) {
   return _filterAggregate('sync', null, array, fn, aggregateOpts);
 }
 
-export async function filterAggregateAsync(
-  array,
-  fn,
-  {promiseAll = Promise.all.bind(Promise), ...aggregateOpts} = {}
-) {
+export async function filterAggregateAsync(array, fn, {
+  promiseAll = Promise.all.bind(Promise),
+  ...aggregateOpts
+} = {}) {
   return _filterAggregate('async', promiseAll, array, fn, aggregateOpts);
 }
 
@@ -357,24 +351,20 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 
   if (mode === 'sync') {
     const result = array
-      .map(
-        aggregate.wrap((input, index, array) => {
-          const output = fn(input, index, array);
-          return {input, output};
-        })
-      )
+      .map(aggregate.wrap((input, index, array) => {
+        const output = fn(input, index, array);
+        return {input, output};
+      }))
       .filter(filterFunction)
       .map(mapFunction);
 
     return {result, aggregate};
   } else {
     return promiseAll(
-      array.map(
-        aggregate.wrapAsync(async (input, index, array) => {
-          const output = await fn(input, index, array);
-          return {input, output};
-        })
-      )
+      array.map(aggregate.wrapAsync(async (input, index, array) => {
+        const output = await fn(input, index, array);
+        return {input, output};
+      }))
     ).then((values) => {
       const result = values.filter(filterFunction).map(mapFunction);
 
@@ -414,10 +404,10 @@ export function _withAggregate(mode, aggregateOpts, fn) {
   }
 }
 
-export function showAggregate(
-  topError,
-  {pathToFile = (p) => p, showTraces = true} = {}
-) {
+export function showAggregate(topError, {
+  pathToFile = (p) => p,
+  showTraces = true,
+} = {}) {
   const recursive = (error, {level}) => {
     let header = showTraces
       ? `[${error.constructor.name || 'unnamed'}] ${

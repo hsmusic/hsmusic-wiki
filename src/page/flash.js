@@ -1,5 +1,3 @@
-/** @format */
-
 // Flash page and index specifications.
 
 import {empty} from '../util/sugar.js';

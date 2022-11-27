@@ -1,5 +1,3 @@
-/** @format */
-
 // things.js: class definitions for various object types used across the wiki,
 // most of which correspond to an output page, such as Track, Album, Artist
 
@@ -236,9 +234,7 @@ Thing.common = {
   referenceList: (thingClass) => {
     const {[Thing.referenceType]: referenceType} = thingClass;
     if (!referenceType) {
-      throw new Error(
-        `The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`
-      );
+      throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
     }
 
     return {
@@ -251,9 +247,7 @@ Thing.common = {
   singleReference: (thingClass) => {
     const {[Thing.referenceType]: referenceType} = thingClass;
     if (!referenceType) {
-      throw new Error(
-        `The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`
-      );
+      throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
     }
 
     return {
@@ -441,15 +435,13 @@ Thing.common = {
 // constructor's [Thing.referenceType] as the prefix. This will throw an error
 // if the thing's directory isn't yet provided/computable.
 Thing.getReference = function (thing) {
-  if (!thing.constructor[Thing.referenceType])
-    throw TypeError(
-      `Passed Thing is ${thing.constructor.name}, which provides no [Thing.referenceType]`
-    );
+  if (!thing.constructor[Thing.referenceType]) {
+    throw TypeError(`Passed Thing is ${thing.constructor.name}, which provides no [Thing.referenceType]`);
+  }
 
-  if (!thing.directory)
-    throw TypeError(
-      `Passed ${thing.constructor.name} is missing its directory`
-    );
+  if (!thing.directory) {
+    throw TypeError(`Passed ${thing.constructor.name} is missing its directory`);
+  }
 
   return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
 };
@@ -735,10 +727,11 @@ Track.propertyDescriptors = {
 
     expose: {
       dependencies: ['albumData', 'coverArtistContribsByRef'],
-      transform: (
-        hasCoverArt,
-        {albumData, coverArtistContribsByRef, [Track.instance]: track}
-      ) =>
+      transform: (hasCoverArt, {
+        albumData,
+        coverArtistContribsByRef,
+        [Track.instance]: track,
+      }) =>
         Track.hasCoverArt(
           track,
           albumData,
@@ -755,15 +748,12 @@ Track.propertyDescriptors = {
 
     expose: {
       dependencies: ['albumData', 'coverArtistContribsByRef'],
-      transform: (
-        coverArtFileExtension,
-        {
-          albumData,
-          coverArtistContribsByRef,
-          hasCoverArt,
-          [Track.instance]: track,
-        }
-      ) =>
+      transform: (coverArtFileExtension, {
+        albumData,
+        coverArtistContribsByRef,
+        hasCoverArt,
+        [Track.instance]: track,
+      }) =>
         coverArtFileExtension ??
         (Track.hasCoverArt(
           track,
@@ -851,10 +841,11 @@ Track.propertyDescriptors = {
 
     expose: {
       dependencies: ['albumData', 'dateFirstReleased'],
-      transform: (
-        coverArtDate,
-        {albumData, dateFirstReleased, [Track.instance]: track}
-      ) =>
+      transform: (coverArtDate, {
+        albumData,
+        dateFirstReleased,
+        [Track.instance]: track,
+      }) =>
         coverArtDate ??
         dateFirstReleased ??
         Track.findAlbum(track, albumData)?.trackArtDate ??
@@ -1691,9 +1682,7 @@ Object.assign(Language.prototype, {
 
   formatString(key, args = {}) {
     if (this.strings && !this.strings_htmlEscaped) {
-      throw new Error(
-        `HTML-escaped strings unavailable - please ensure escapeHTML function is provided`
-      );
+      throw new Error(`HTML-escaped strings unavailable - please ensure escapeHTML function is provided`);
     }
 
     return this.formatStringHelper(this.strings_htmlEscaped, key, args);
@@ -1780,12 +1769,7 @@ Object.assign(Language.prototype, {
 
   formatIndex(value) {
     this.assertIntlAvailable('intl_pluralOrdinal');
-    return this.formatString(
-      'count.index.' + this.intl_pluralOrdinal.select(value),
-      {
-        index: value,
-      }
-    );
+    return this.formatString('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
   },
 
   formatNumber(value) {
@@ -1803,10 +1787,7 @@ Object.assign(Language.prototype, {
         ? this.formatString('count.words.thousand', {words: num})
         : this.formatString('count.words', {words: num});
 
-    return this.formatString(
-      'count.words.withUnit.' + this.getUnitForm(value),
-      {words}
-    );
+    return this.formatString('count.words.withUnit.' + this.getUnitForm(value), {words});
   },
 
   // Conjunction list: A, B, and C

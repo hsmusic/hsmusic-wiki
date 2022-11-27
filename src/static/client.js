@@ -1,5 +1,3 @@
-/** @format */
-
 // This is the JS file that gets loaded on the client! It's only really used for
 // the random track feature right now - the idea is we only use it for stuff
 // that cannot 8e done at static-site compile time, 8y its fundamentally
@@ -392,8 +390,7 @@ function makeInfoCardLinkHandlers(type) {
           fastHover = true;
           infoCard.show(type, evt.target);
         },
-        fastHover ? FAST_HOVER_INFO_DELAY : NORMAL_HOVER_INFO_DELAY
-      );
+        fastHover ? FAST_HOVER_INFO_DELAY : NORMAL_HOVER_INFO_DELAY);
 
       clearTimeout(endFastHoverTimeout);
       endFastHoverTimeout = null;

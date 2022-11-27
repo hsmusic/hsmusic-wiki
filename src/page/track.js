@@ -1,5 +1,3 @@
-/** @format */
-
 // Track page specification.
 
 import {
@@ -64,7 +62,7 @@ export function write(track, {wikiData}) {
   const hasCommentary =
     track.commentary || otherReleases.some((t) => t.commentary);
 
-  const generateCommentary = ({link, language, transformMultiline}) =>
+  const generateCommentary = ({language, link, transformMultiline}) =>
     transformMultiline([
       track.commentary,
       ...otherReleases.map((track) =>

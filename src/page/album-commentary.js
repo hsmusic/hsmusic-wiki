@@ -1,5 +1,3 @@
-/** @format */
-
 // Album commentary page and index specifications.
 
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';

@@ -1,5 +1,3 @@
-/** @format */
-
 // Very simple, bare-bones file size loader which takes a bunch of file
 // paths, gets their filesizes, and resolves a promise when it's done.
 //

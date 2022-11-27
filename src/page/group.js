@@ -1,5 +1,3 @@
-/** @format */
-
 // Group page specifications.
 
 import {

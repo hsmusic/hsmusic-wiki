@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/** @format */
 
 // HEY N8RDS!
 //
@@ -814,8 +813,8 @@ function validateWriteObject(obj) {
 
 /*
 async function writeData(subKey, directory, data) {
-    const paths = writePage.paths('', 'data.' + subKey, directory, {file: 'data.json'});
-    await writePage.write(JSON.stringify(data), {paths});
+  const paths = writePage.paths('', 'data.' + subKey, directory, {file: 'data.json'});
+  await writePage.write(JSON.stringify(data), {paths});
 }
 */
 
@@ -865,20 +864,17 @@ writePage.to =
     return path;
   };
 
-writePage.html = (
-  pageInfo,
-  {
-    defaultLanguage,
-    language,
-    languages,
-    localizedPaths,
-    paths,
-    oEmbedJSONHref,
-    to,
-    transformMultiline,
-    wikiData,
-  }
-) => {
+writePage.html = (pageInfo, {
+  defaultLanguage,
+  language,
+  languages,
+  localizedPaths,
+  paths,
+  oEmbedJSONHref,
+  to,
+  transformMultiline,
+  wikiData,
+}) => {
   const {wikiInfo} = wikiData;
 
   let {
@@ -986,10 +982,13 @@ writePage.html = (
         }),
       ]);
 
-  const generateSidebarHTML = (
-    id,
-    {content, multiple, classes, collapse = true, wide = false}
-  ) =>
+  const generateSidebarHTML = (id, {
+    content,
+    multiple,
+    classes,
+    collapse = true,
+    wide = false,
+  }) =>
     content
       ? html.tag('div',
           {
@@ -1388,12 +1387,9 @@ writePage.write = async ({html, oEmbedJSON = '', paths}) => {
 };
 
 // TODO: This only supports one <>-style argument.
-writePage.paths = (
-  baseDirectory,
-  fullKey,
-  directory = '',
-  {file = 'index.html'} = {}
-) => {
+writePage.paths = (baseDirectory, fullKey, directory = '', {
+  file = 'index.html',
+} = {}) => {
   const [groupKey, subKey] = fullKey.split('.');
 
   const pathname =
@@ -1485,49 +1481,46 @@ function writeSharedFilesAndPages({language, wikiData}) {
     await writeFile(path.join(outputPath, from, 'index.html'), content);
   };
 
-  return progressPromiseAll(
-    `Writing files & pages shared across languages.`,
-    [
-      groupData?.some((group) => group.directory === 'fandom') &&
-        redirect(
-          'Fandom - Gallery',
-          'albums/fandom',
-          'localized.groupGallery',
-          'fandom'
-        ),
+  return progressPromiseAll(`Writing files & pages shared across languages.`, [
+    groupData?.some((group) => group.directory === 'fandom') &&
+      redirect(
+        'Fandom - Gallery',
+        'albums/fandom',
+        'localized.groupGallery',
+        'fandom'
+      ),
 
-      groupData?.some((group) => group.directory === 'official') &&
-        redirect(
-          'Official - Gallery',
-          'albums/official',
-          'localized.groupGallery',
-          'official'
-        ),
+    groupData?.some((group) => group.directory === 'official') &&
+      redirect(
+        'Official - Gallery',
+        'albums/official',
+        'localized.groupGallery',
+        'official'
+      ),
 
-      wikiInfo.enableListings &&
-        redirect(
-          'Album Commentary',
-          'list/all-commentary',
-          'localized.commentaryIndex',
-          ''
-        ),
+    wikiInfo.enableListings &&
+      redirect(
+        'Album Commentary',
+        'list/all-commentary',
+        'localized.commentaryIndex',
+        ''
+      ),
 
-      writeFile(
-        path.join(outputPath, 'data.json'),
-        (
-          '{\n' +
-          [
-            `"albumData": ${stringifyThings(wikiData.albumData)},`,
-            wikiInfo.enableFlashesAndGames &&
-              `"flashData": ${stringifyThings(wikiData.flashData)},`,
-            `"artistData": ${stringifyThings(wikiData.artistData)}`,
-          ]
-            .filter(Boolean)
-            .map(line => '  ' + line)
-            .join('\n') +
-          '\n}')),
-    ].filter(Boolean)
-  );
+    writeFile(
+      path.join(outputPath, 'data.json'),
+      (
+        '{\n' +
+        [
+          `"albumData": ${stringifyThings(wikiData.albumData)},`,
+          wikiInfo.enableFlashesAndGames &&
+            `"flashData": ${stringifyThings(wikiData.flashData)},`,
+          `"artistData": ${stringifyThings(wikiData.artistData)}`,
+        ]
+          .filter(Boolean)
+          .map(line => '  ' + line)
+          .join('\n') +
+        '\n}')),
+  ].filter(Boolean));
 }
 
 function generateRedirectPage(title, target, {language}) {
@@ -1752,10 +1745,7 @@ async function main() {
       }
     };
     error(!dataPath, `Expected --data-path option or HSMUSIC_DATA to be set`);
-    error(
-      !mediaPath,
-      `Expected --media-path option or HSMUSIC_MEDIA to be set`
-    );
+    error(!mediaPath, `Expected --media-path option or HSMUSIC_MEDIA to be set`);
     error(!outputPath, `Expected --out-path option or HSMUSIC_OUT to be set`);
     if (errored) {
       return;
@@ -1833,9 +1823,7 @@ async function main() {
 
   {
     const logThings = (thingDataProp, label) =>
-      logInfo` - ${
-        wikiData[thingDataProp]?.length ?? color.red('(Missing!)')
-      } ${color.normal(color.dim(label))}`;
+      logInfo` - ${wikiData[thingDataProp]?.length ?? color.red('(Missing!)')} ${color.normal(color.dim(label))}`;
     try {
       logInfo`Loaded data and processed objects:`;
       logThings('albumData', 'albums');
@@ -2032,10 +2020,8 @@ async function main() {
 
   {
     const tagRefs = new Set(
-      [...WD.trackData, ...WD.albumData].flatMap(
-        (thing) => thing.artTagsByRef ?? []
-      )
-    );
+      [...WD.trackData, ...WD.albumData]
+        .flatMap((thing) => thing.artTagsByRef ?? []));
 
     for (const ref of tagRefs) {
       if (find.artTag(ref, WD.artTagData)) {
@@ -2051,12 +2037,10 @@ async function main() {
     }
   }
 
-  WD.officialAlbumData = WD.albumData.filter((album) =>
-    album.groups.some((group) => group.directory === OFFICIAL_GROUP_DIRECTORY)
-  );
-  WD.fandomAlbumData = WD.albumData.filter((album) =>
-    album.groups.every((group) => group.directory !== OFFICIAL_GROUP_DIRECTORY)
-  );
+  WD.officialAlbumData = WD.albumData
+    .filter((album) => album.groups.some((group) => group.directory === OFFICIAL_GROUP_DIRECTORY));
+  WD.fandomAlbumData = WD.albumData
+    .filter((album) => album.groups.every((group) => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
   const fileSizePreloader = new FileSizePreloader();
 
@@ -2089,7 +2073,7 @@ async function main() {
   ];
 
   const getSizeOfAdditionalFile = (mediaPath) => {
-    const {device = null} =
+    const {device} =
       additionalFilePaths.find(({media}) => media === mediaPath) || {};
     if (!device) return null;
     return fileSizePreloader.getSizeOfPath(device);
@@ -2097,9 +2081,7 @@ async function main() {
 
   logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
 
-  fileSizePreloader.loadPaths(
-    ...additionalFilePaths.map((path) => path.device)
-  );
+  fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
   await fileSizePreloader.waitUntilDoneLoading();
 
   logInfo`Done preloading filesizes!`;
@@ -2139,18 +2121,14 @@ async function main() {
         }
 
         if (!pageSpec.write) {
-          logError`${flag + '.targets'} is specified, but ${
-            flag + '.write'
-          } is missing!`;
+          logError`${flag + '.targets'} is specified, but ${flag + '.write'} is missing!`;
           error = true;
           return null;
         }
 
         const targets = pageSpec.targets({wikiData});
         if (!Array.isArray(targets)) {
-          logError`${
-            flag + '.targets'
-          } was called, but it didn't return an array! (${typeof targets})`;
+          logError`${flag + '.targets'} was called, but it didn't return an array! (${typeof targets})`;
           error = true;
           return null;
         }
@@ -2230,345 +2208,333 @@ async function main() {
   }
 
   /*
-    await progressPromiseAll(`Writing data files shared across languages.`, queue(
-        dataWrites.map(({path, data}) => () => {
-            const bound = {};
+  await progressPromiseAll(`Writing data files shared across languages.`, queue(
+    dataWrites.map(({path, data}) => () => {
+      const bound = {};
 
-            bound.serializeLink = bindOpts(serializeLink, {});
+      bound.serializeLink = bindOpts(serializeLink, {});
 
-            bound.serializeContribs = bindOpts(serializeContribs, {});
+      bound.serializeContribs = bindOpts(serializeContribs, {});
 
-            bound.serializeImagePaths = bindOpts(serializeImagePaths, {
-                thumb
-            });
+      bound.serializeImagePaths = bindOpts(serializeImagePaths, {
+        thumb
+      });
 
-            bound.serializeCover = bindOpts(serializeCover, {
-                [bindOpts.bindIndex]: 2,
-                serializeImagePaths: bound.serializeImagePaths,
-                urls
-            });
+      bound.serializeCover = bindOpts(serializeCover, {
+        [bindOpts.bindIndex]: 2,
+        serializeImagePaths: bound.serializeImagePaths,
+        urls
+      });
 
-            bound.serializeGroupsForAlbum = bindOpts(serializeGroupsForAlbum, {
-                serializeLink
-            });
+      bound.serializeGroupsForAlbum = bindOpts(serializeGroupsForAlbum, {
+        serializeLink
+      });
 
-            bound.serializeGroupsForTrack = bindOpts(serializeGroupsForTrack, {
-                serializeLink
-            });
+      bound.serializeGroupsForTrack = bindOpts(serializeGroupsForTrack, {
+        serializeLink
+      });
 
-            // TODO: This only supports one <>-style argument.
-            return writeData(path[0], path[1], data({
-                ...bound
-            }));
-        }),
-        queueSize
-    ));
-    */
+      // TODO: This only supports one <>-style argument.
+      return writeData(path[0], path[1], data({...bound}));
+    }),
+    queueSize
+  ));
+  */
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
       language === finalDefaultLanguage ? '' : language.code;
 
-    console.log(
-      `\x1b[34;1m${`[${i + 1}/${entries.length}] ${
-        language.code
-      } (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`
-    );
+    console.log(`\x1b[34;1m${`[${i + 1}/${entries.length}] ${language.code} (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`);
 
-    await progressPromiseAll(
-      `Writing ${language.code}`,
-      queue(
-        [
-          ...pageWrites.map((props) => () => {
-            const {path, page} = props;
+    await progressPromiseAll(`Writing ${language.code}`, queue([
+      ...pageWrites.map((props) => () => {
+        const {path, page} = props;
 
-            // TODO: This only supports one <>-style argument.
-            const pageSubKey = path[0];
-            const directory = path[1];
+        // TODO: This only supports one <>-style argument.
+        const pageSubKey = path[0];
+        const directory = path[1];
 
-            const localizedPaths = Object.fromEntries(
-              Object.entries(languages)
-                .filter(
-                  ([key, language]) => key !== 'default' && !language.hidden
+        const localizedPaths = Object.fromEntries(
+          Object.entries(languages)
+            .filter(
+              ([key, language]) => key !== 'default' && !language.hidden
+            )
+            .map(([_key, language]) => [
+              language.code,
+              writePage.paths(
+                language === finalDefaultLanguage ? '' : language.code,
+                'localized.' + pageSubKey,
+                directory
+              ),
+            ])
+        );
+
+        const paths = writePage.paths(
+          baseDirectory,
+          'localized.' + pageSubKey,
+          directory
+        );
+
+        const to = writePage.to({
+          baseDirectory,
+          pageSubKey,
+          paths,
+        });
+
+        const absoluteTo = (targetFullKey, ...args) => {
+          const [groupKey, subKey] = targetFullKey.split('.');
+          const from = urls.from('shared.root');
+          return (
+            '/' +
+            (groupKey === 'localized' && baseDirectory
+              ? from.to(
+                  'localizedWithBaseDirectory.' + subKey,
+                  baseDirectory,
+                  ...args
                 )
-                .map(([_key, language]) => [
-                  language.code,
-                  writePage.paths(
-                    language === finalDefaultLanguage ? '' : language.code,
-                    'localized.' + pageSubKey,
-                    directory
-                  ),
-                ])
-            );
+              : from.to(targetFullKey, ...args))
+          );
+        };
 
-            const paths = writePage.paths(
-              baseDirectory,
-              'localized.' + pageSubKey,
-              directory
-            );
+        // TODO: Is there some nicer way to define these,
+        // may8e without totally re-8inding everything for
+        // each page?
+        const bound = {};
 
-            const to = writePage.to({
-              baseDirectory,
-              pageSubKey,
-              paths,
-            });
+        bound.html = html;
 
-            const absoluteTo = (targetFullKey, ...args) => {
-              const [groupKey, subKey] = targetFullKey.split('.');
-              const from = urls.from('shared.root');
-              return (
-                '/' +
-                (groupKey === 'localized' && baseDirectory
-                  ? from.to(
-                      'localizedWithBaseDirectory.' + subKey,
-                      baseDirectory,
-                      ...args
-                    )
-                  : from.to(targetFullKey, ...args))
-              );
-            };
+        bound.link = withEntries(unbound_link, (entries) =>
+          entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
+        );
 
-            // TODO: Is there some nicer way to define these,
-            // may8e without totally re-8inding everything for
-            // each page?
-            const bound = {};
+        bound.parseAttributes = bindOpts(parseAttributes, {
+          to,
+        });
 
-            bound.html = html;
+        bound.find = bindFind(wikiData, {mode: 'warn'});
 
-            bound.link = withEntries(unbound_link, (entries) =>
-              entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
-            );
+        bound.transformInline = bindOpts(transformInline, {
+          find: bound.find,
+          link: bound.link,
+          replacerSpec,
+          language,
+          to,
+          wikiData,
+        });
 
-            bound.parseAttributes = bindOpts(parseAttributes, {
-              to,
-            });
+        bound.transformMultiline = bindOpts(transformMultiline, {
+          transformInline: bound.transformInline,
+          parseAttributes: bound.parseAttributes,
+        });
 
-            bound.find = bindFind(wikiData, {mode: 'warn'});
+        bound.transformLyrics = bindOpts(transformLyrics, {
+          transformInline: bound.transformInline,
+          transformMultiline: bound.transformMultiline,
+        });
 
-            bound.transformInline = bindOpts(transformInline, {
-              find: bound.find,
-              link: bound.link,
-              replacerSpec,
-              language,
-              to,
-              wikiData,
-            });
+        bound.iconifyURL = bindOpts(iconifyURL, {
+          html,
+          language,
+          to,
+        });
 
-            bound.transformMultiline = bindOpts(transformMultiline, {
-              transformInline: bound.transformInline,
-              parseAttributes: bound.parseAttributes,
-            });
+        bound.fancifyURL = bindOpts(fancifyURL, {
+          html,
+          language,
+        });
 
-            bound.transformLyrics = bindOpts(transformLyrics, {
-              transformInline: bound.transformInline,
-              transformMultiline: bound.transformMultiline,
-            });
+        bound.fancifyFlashURL = bindOpts(fancifyFlashURL, {
+          [bindOpts.bindIndex]: 2,
+          html,
+          language,
 
-            bound.iconifyURL = bindOpts(iconifyURL, {
-              html,
-              language,
-              to,
-            });
+          fancifyURL: bound.fancifyURL,
+        });
 
-            bound.fancifyURL = bindOpts(fancifyURL, {
-              html,
-              language,
-            });
+        bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
+          html,
+          language,
+        });
 
-            bound.fancifyFlashURL = bindOpts(fancifyFlashURL, {
-              [bindOpts.bindIndex]: 2,
-              html,
-              language,
+        bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
+          language,
 
-              fancifyURL: bound.fancifyURL,
-            });
+          getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
+        });
 
-            bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
-              html,
-              language,
-            });
+        bound.getLinkThemeString = getLinkThemeString;
 
-            bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
-              language,
+        bound.getThemeString = getThemeString;
 
-              getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
-            });
+        bound.getArtistString = bindOpts(getArtistString, {
+          html,
+          link: bound.link,
+          language,
 
-            bound.getLinkThemeString = getLinkThemeString;
+          iconifyURL: bound.iconifyURL,
+        });
 
-            bound.getThemeString = getThemeString;
+        bound.getAlbumCover = bindOpts(getAlbumCover, {
+          to,
+        });
 
-            bound.getArtistString = bindOpts(getArtistString, {
-              html,
-              link: bound.link,
-              language,
+        bound.getTrackCover = bindOpts(getTrackCover, {
+          to,
+        });
 
-              iconifyURL: bound.iconifyURL,
-            });
+        bound.getFlashCover = bindOpts(getFlashCover, {
+          to,
+        });
 
-            bound.getAlbumCover = bindOpts(getAlbumCover, {
-              to,
-            });
+        bound.getArtistAvatar = bindOpts(getArtistAvatar, {
+          to,
+        });
 
-            bound.getTrackCover = bindOpts(getTrackCover, {
-              to,
-            });
+        bound.generateAdditionalFilesShortcut = bindOpts(generateAdditionalFilesShortcut, {
+          html,
+          language,
+        });
 
-            bound.getFlashCover = bindOpts(getFlashCover, {
-              to,
-            });
+        bound.generateAdditionalFilesList = bindOpts(generateAdditionalFilesList, {
+          html,
+          language,
+        });
 
-            bound.getArtistAvatar = bindOpts(getArtistAvatar, {
-              to,
-            });
+        bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
+          link: bound.link,
+          language,
+        });
 
-            bound.generateAdditionalFilesShortcut = bindOpts(generateAdditionalFilesShortcut, {
-              html,
-              language,
-            });
+        bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
+          html,
+          language,
+          link: bound.link,
+          wikiData,
 
-            bound.generateAdditionalFilesList = bindOpts(generateAdditionalFilesList, {
-              html,
-              language,
-            });
+          generateNavigationLinks: bound.generateNavigationLinks,
+        });
 
-            bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
-              link: bound.link,
-              language,
-            });
+        bound.generateCoverLink = bindOpts(generateCoverLink, {
+          [bindOpts.bindIndex]: 0,
+          html,
+          img,
+          link: bound.link,
+          language,
+          to,
+          wikiData,
 
-            bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
-              html,
-              language,
-              link: bound.link,
-              wikiData,
+          getRevealStringFromTags: bound.getRevealStringFromTags,
+        });
 
-              generateNavigationLinks: bound.generateNavigationLinks,
-            });
+        bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
+          [bindOpts.bindIndex]: 2,
+          link: bound.link,
+          language,
+        });
 
-            bound.generateCoverLink = bindOpts(generateCoverLink, {
-              [bindOpts.bindIndex]: 0,
-              html,
-              img,
-              link: bound.link,
-              language,
-              to,
-              wikiData,
+        bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
+          html,
+          language,
+          wikiData,
+        });
 
-              getRevealStringFromTags: bound.getRevealStringFromTags,
-            });
+        bound.getGridHTML = bindOpts(getGridHTML, {
+          [bindOpts.bindIndex]: 0,
+          img,
+          html,
+          language,
 
-            bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
-              [bindOpts.bindIndex]: 2,
-              link: bound.link,
-              language,
-            });
+          getRevealStringFromTags: bound.getRevealStringFromTags,
+        });
 
-            bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
-              html,
-              language,
-              wikiData,
-            });
+        bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {
+          [bindOpts.bindIndex]: 0,
+          link: bound.link,
+          language,
 
-            bound.getGridHTML = bindOpts(getGridHTML, {
-              [bindOpts.bindIndex]: 0,
-              img,
-              html,
-              language,
+          getAlbumCover: bound.getAlbumCover,
+          getGridHTML: bound.getGridHTML,
+        });
 
-              getRevealStringFromTags: bound.getRevealStringFromTags,
-            });
+        bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
+          [bindOpts.bindIndex]: 0,
+          link: bound.link,
 
-            bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {
-              [bindOpts.bindIndex]: 0,
-              link: bound.link,
-              language,
+          getFlashCover: bound.getFlashCover,
+          getGridHTML: bound.getGridHTML,
+        });
 
-              getAlbumCover: bound.getAlbumCover,
-              getGridHTML: bound.getGridHTML,
-            });
+        bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
+          to,
+        });
 
-            bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
-              [bindOpts.bindIndex]: 0,
-              link: bound.link,
+        const pageInfo = page({
+          ...bound,
 
-              getFlashCover: bound.getFlashCover,
-              getGridHTML: bound.getGridHTML,
-            });
+          language,
 
-            bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
-              to,
-            });
+          absoluteTo,
+          relativeTo: to,
+          to,
+          urls,
 
-            const pageInfo = page({
-              ...bound,
+          getSizeOfAdditionalFile,
+        });
 
-              language,
+        const oEmbedJSON = writePage.oEmbedJSON(pageInfo, {
+          language,
+          wikiData,
+        });
 
-              absoluteTo,
-              relativeTo: to,
-              to,
-              urls,
+        const oEmbedJSONHref =
+          oEmbedJSON &&
+          wikiData.wikiInfo.canonicalBase &&
+          wikiData.wikiInfo.canonicalBase +
+            urls
+              .from('shared.root')
+              .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
 
-              getSizeOfAdditionalFile,
-            });
+        const pageHTML = writePage.html(pageInfo, {
+          defaultLanguage: finalDefaultLanguage,
+          language,
+          languages,
+          localizedPaths,
+          oEmbedJSONHref,
+          paths,
+          to,
+          transformMultiline: bound.transformMultiline,
+          wikiData,
+        });
 
-            const oEmbedJSON = writePage.oEmbedJSON(pageInfo, {
-              language,
-              wikiData,
-            });
+        return writePage.write({
+          html: pageHTML,
+          oEmbedJSON,
+          paths,
+        });
+      }),
+      ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
+        const title = titleFn({
+          language,
+        });
 
-            const oEmbedJSONHref =
-              oEmbedJSON &&
-              wikiData.wikiInfo.canonicalBase &&
-              wikiData.wikiInfo.canonicalBase +
-                urls
-                  .from('shared.root')
-                  .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
+        // TODO: This only supports one <>-style argument.
+        const fromPaths = writePage.paths(
+          baseDirectory,
+          'localized.' + fromPath[0],
+          fromPath[1]
+        );
+        const to = writePage.to({
+          baseDirectory,
+          pageSubKey: fromPath[0],
+          paths: fromPaths,
+        });
 
-            const pageHTML = writePage.html(pageInfo, {
-              defaultLanguage: finalDefaultLanguage,
-              language,
-              languages,
-              localizedPaths,
-              oEmbedJSONHref,
-              paths,
-              to,
-              transformMultiline: bound.transformMultiline,
-              wikiData,
-            });
-
-            return writePage.write({
-              html: pageHTML,
-              oEmbedJSON,
-              paths,
-            });
-          }),
-          ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
-            const title = titleFn({
-              language,
-            });
-
-            // TODO: This only supports one <>-style argument.
-            const fromPaths = writePage.paths(
-              baseDirectory,
-              'localized.' + fromPath[0],
-              fromPath[1]
-            );
-            const to = writePage.to({
-              baseDirectory,
-              pageSubKey: fromPath[0],
-              paths: fromPaths,
-            });
-
-            const target = to('localized.' + toPath[0], ...toPath.slice(1));
-            const html = generateRedirectPage(title, target, {language});
-            return writePage.write({html, paths: fromPaths});
-          }),
-        ],
-        queueSize
-      )
-    );
+        const target = to('localized.' + toPath[0], ...toPath.slice(1));
+        const html = generateRedirectPage(title, target, {language});
+        return writePage.write({html, paths: fromPaths});
+      }),
+    ], queueSize));
   };
 
   await wrapLanguages(perLanguageFn, {

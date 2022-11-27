@@ -1,15 +1,10 @@
-/** @format */
-
 import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
 
 export function validateReplacerSpec(replacerSpec, {find, link}) {
   let success = true;
 
-  for (const [
-    key,
-    {link: linkKey, find: findKey, html},
-  ] of Object.entries(replacerSpec)) {
+  for (const [key, {link: linkKey, find: findKey, html}] of Object.entries(replacerSpec)) {
     if (!html && !link[linkKey]) {
       logError`The replacer spec ${key} has invalid link key ${linkKey}! Specify it in link specs or fix typo.`;
       success = false;
@@ -436,14 +431,18 @@ function transformNodes(nodes, opts) {
   return nodes.map((node) => transformNode(node, opts)).join('');
 }
 
-export function transformInline(
-  input,
-  {replacerSpec, find, link, language, to, wikiData}
-) {
+export function transformInline(input, {
+  replacerSpec,
+  find,
+  language,
+  link,
+  to,
+  wikiData,
+}) {
   if (!replacerSpec) throw new Error('Expected replacerSpec');
   if (!find) throw new Error('Expected find');
-  if (!link) throw new Error('Expected link');
   if (!language) throw new Error('Expected language');
+  if (!link) throw new Error('Expected link');
   if (!to) throw new Error('Expected to');
   if (!wikiData) throw new Error('Expected wikiData');
 
