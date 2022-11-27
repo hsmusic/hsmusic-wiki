@@ -543,7 +543,7 @@ export function generateAlbumNavLinks(album, currentTrack, {
   const randomLink = html.tag('a',
     {
       href: '#',
-      dataRandom: 'track-in-album',
+      'data-random': 'track-in-album',
       id: 'random-button'
     },
     (isTrackPage
