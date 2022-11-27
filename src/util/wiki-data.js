@@ -287,12 +287,23 @@ export function sortAlphabetically(data, {
 //  * name (or override getName)
 //  * date (or override getDate)
 export function sortChronologically(data, {
+  latestFirst = false,
   getDirectory,
   getName,
   getDate,
 } = {}) {
-  sortAlphabetically(data, {getDirectory, getName});
-  sortByDate(data, {getDate});
+  if (latestFirst) {
+    // Double reverse: Since we reverse after sorting by date, also reverse
+    // after sorting A-Z, so the second reverse restores A-Z relative
+    // positioning (for entries with the same date).
+    sortAlphabetically(data, {getDirectory, getName});
+    data.reverse();
+    sortByDate(data, {getDate});
+    data.reverse();
+  } else {
+    sortAlphabetically(data, {getDirectory, getName});
+    sortByDate(data, {getDate});
+  }
   return data;
 }
 

@@ -300,7 +300,7 @@ const listingSpec = [
             break;
         }
 
-        return sortChronologically(artistEntries).reverse();
+        return sortChronologically(artistEntries, {latestFirst: true});
       };
 
       // Tracks are super easy to sort because they only have one pertinent
@@ -555,21 +555,8 @@ const listingSpec = [
               date: albums[albums.length - 1].date,
             };
           })
-          .filter(Boolean)
-          // So this is kinda tough to explain, 8ut 8asically, when we
-          // reverse the list after sorting it 8y d8te (so that the latest
-          // d8tes come first), it also flips the order of groups which
-          // share the same d8te.  This happens mostly when a single al8um
-          // is the l8test in two groups. So, say one such al8um is in the
-          // groups "Fandom" and "UMSPAF". Per category order, Fandom is
-          // meant to show up 8efore UMSPAF, 8ut when we do the reverse
-          // l8ter, that flips them, and UMSPAF ends up displaying 8efore
-          // Fandom. So we do an extra reverse here, which will fix that
-          // and only affect groups that share the same d8te (8ecause
-          // groups that don't will 8e moved 8y the sortChronologically
-          // call surrounding this).
-          .reverse()
-      ).reverse(),
+          .filter(Boolean),
+        {latestFirst: true}),
 
     row: ({group, date}, {language, link}) =>
       language.$('listingPage.listGroups.byLatest.item', {
