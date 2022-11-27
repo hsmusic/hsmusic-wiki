@@ -1,5 +1,6 @@
 // Album commentary page and index specifications.
 
+import {accumulateSum} from '../util/sugar.js';
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';
 
 export function condition({wikiData}) {
@@ -93,8 +94,8 @@ export function writeTargetless({wikiData}) {
       words: entries.join(' ').split(' ').length,
     }));
 
-  const totalEntries = data.reduce((acc, {entries}) => acc + entries.length, 0);
-  const totalWords = data.reduce((acc, {words}) => acc + words, 0);
+  const totalEntries = accumulateSum(data, ({entries}) => entries.length);
+  const totalWords = accumulateSum(data, ({words}) => words);
 
   const page = {
     type: 'page',

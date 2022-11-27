@@ -1,6 +1,9 @@
 // Utility functions for interacting with wiki data.
 
-import {empty} from './sugar.js';
+import {
+  accumulateSum,
+  empty,
+} from './sugar.js';
 
 // Generic value operations
 
@@ -382,7 +385,7 @@ export function getFlashLink(flash) {
 }
 
 export function getTotalDuration(tracks) {
-  return tracks.reduce((duration, track) => duration + track.duration, 0);
+  return accumulateSum(tracks, track => track.duration);
 }
 
 export function getTrackCover(track, {to}) {
