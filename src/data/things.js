@@ -718,6 +718,7 @@ Track.propertyDescriptors = {
   coverArtistContribsByRef: Thing.common.contribsByRef(),
 
   referencedTracksByRef: Thing.common.referenceList(Track),
+  sampledTracksByRef: Thing.common.referenceList(Track),
   artTagsByRef: Thing.common.referenceList(ArtTag),
 
   hasCoverArt: {
@@ -914,6 +915,12 @@ Track.propertyDescriptors = {
     find.track
   ),
 
+  sampledTracks: Thing.common.dynamicThingsFromReferenceList(
+    'sampledTracksByRef',
+    'trackData',
+    find.track
+  ),
+
   // Specifically exclude re-releases from this list - while it's useful to
   // get from a re-release to the tracks it references, re-releases aren't
   // generally relevant from the perspective of the tracks being referenced.
@@ -933,6 +940,22 @@ Track.propertyDescriptors = {
           ? trackData
               .filter((t) => !t.originalReleaseTrack)
               .filter((t) => t.referencedTracks?.includes(track))
+          : [],
+    },
+  },
+
+  // For the same reasoning, exclude re-releases from sampled tracks too.
+  sampledByTracks: {
+    flags: {expose: true},
+
+    expose: {
+      dependencies: ['trackData'],
+
+      compute: ({trackData, [Track.instance]: track}) =>
+        trackData
+          ? trackData
+              .filter((t) => !t.originalReleaseTrack)
+              .filter((t) => t.sampledTracks?.includes(track))
           : [],
     },
   },

@@ -24,7 +24,16 @@ export function targets({wikiData}) {
 
 export function write(track, {wikiData}) {
   const {wikiInfo} = wikiData;
-  const {album, referencedByTracks, referencedTracks, otherReleases} = track;
+
+  const {
+    album,
+    contributorContribs,
+    referencedByTracks,
+    referencedTracks,
+    sampledByTracks,
+    sampledTracks,
+    otherReleases,
+  } = track;
 
   const listTag = getAlbumListTag(album);
 
@@ -277,9 +286,9 @@ export function write(track, {wikiData}) {
               ]),
 
             ...html.fragment(
-              !empty(track.contributorContribs) && [
+              !empty(contributorContribs) && [
                 html.tag('p', language.$('releaseInfo.contributors')),
-                html.tag('ul', track.contributorContribs.map(contrib =>
+                html.tag('ul', contributorContribs.map(contrib =>
                   html.tag('li', getArtistString([contrib], {
                     showContrib: true,
                     showIcons: true,
@@ -303,6 +312,22 @@ export function write(track, {wikiData}) {
                   getTrackItem,
                   wikiData,
                 }),
+              ]),
+
+            ...html.fragment(
+              !empty(sampledTracks) && [
+                html.tag('p', language.$('releaseInfo.tracksSampled', {
+                  track: html.tag('i', track.name),
+                })),
+                html.tag('ul', sampledTracks.map(getTrackItem)),
+              ]),
+
+            ...html.fragment(
+              !empty(sampledByTracks) && [
+                html.tag('p', language.$('releaseInfo.tracksThatSample', {
+                  track: html.tag('i', track.name),
+                })),
+                html.tag('ul', sampledByTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(

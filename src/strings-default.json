@@ -103,6 +103,8 @@
   "releaseInfo.contributors": "Contributors:",
   "releaseInfo.tracksReferenced": "Tracks that {TRACK} references:",
   "releaseInfo.tracksThatReference": "Tracks that reference {TRACK}:",
+  "releaseInfo.tracksSampled": "Tracks that {TRACK} samples:",
+  "releaseInfo.tracksThatSample": "Tracks that sample {TRACK}:",
   "releaseInfo.flashesThatFeature": "Flashes & games that feature {TRACK}:",
   "releaseInfo.flashesThatFeature.item": "{FLASH}",
   "releaseInfo.flashesThatFeature.item.asDifferentRelease": "{FLASH} (as {TRACK})",

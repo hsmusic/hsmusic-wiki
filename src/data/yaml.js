@@ -278,6 +278,7 @@ export const processTrackDocument = makeProcessDocument(Track, {
     hasURLs: 'Has URLs',
 
     referencedTracksByRef: 'Referenced Tracks',
+    sampledTracksByRef: 'Sampled Tracks',
     artistContribsByRef: 'Artists',
     contributorContribsByRef: 'Contributors',
     coverArtistContribsByRef: 'Cover Artists',
@@ -289,8 +290,6 @@ export const processTrackDocument = makeProcessDocument(Track, {
 
     additionalFiles: 'Additional Files',
   },
-
-  ignoredFields: ['Sampled Tracks'],
 });
 
 export const processArtistDocument = makeProcessDocument(Artist, {
@@ -1264,6 +1263,7 @@ export function filterReferenceErrors(wikiData) {
       contributorContribsByRef: '_contrib',
       coverArtistContribsByRef: '_contrib',
       referencedTracksByRef: 'track',
+      sampledTracksByRef: 'track',
       artTagsByRef: 'artTag',
       originalReleaseTrackByRef: 'track',
     }],
