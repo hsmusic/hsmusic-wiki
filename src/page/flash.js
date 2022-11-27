@@ -63,9 +63,9 @@ export function write(flash, {wikiData}) {
           ...html.fragment(
             !empty(flash.featuredTracks) && [
               html.tag('p',
-                `Tracks featured in <i>${
-                  flash.name.replace(/\.$/, '')
-                }</i>:`),
+                language.$('releaseInfo.tracksFeatured', {
+                  flash: html.tag('i', flash.name),
+                })),
 
               html.tag('ul',
                 flash.featuredTracks.map(track =>

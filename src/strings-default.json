@@ -106,6 +106,7 @@
   "releaseInfo.flashesThatFeature": "Flashes & games that feature {TRACK}:",
   "releaseInfo.flashesThatFeature.item": "{FLASH}",
   "releaseInfo.flashesThatFeature.item.asDifferentRelease": "{FLASH} (as {TRACK})",
+  "releaseInfo.tracksFeatured": "Tracks that {FLASH} features:",
   "releaseInfo.lyrics": "Lyrics:",
   "releaseInfo.artistCommentary": "Artist commentary:",
   "releaseInfo.artistCommentary.seeOriginalRelease": "See {ORIGINAL}!",
