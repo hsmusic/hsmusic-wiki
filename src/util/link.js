@@ -10,7 +10,6 @@
 // gener8ting just a8out any link on the site.
 
 import * as html from './html.js';
-import {getColors} from './colors.js';
 
 import {
   Album,
@@ -23,7 +22,9 @@ import {
   Track,
 } from '../data/things.js';
 
-export function getLinkThemeString(color) {
+export function unbound_getLinkThemeString(color, {
+  getColors,
+}) {
   if (!color) return '';
 
   const {primary, dim} = getColors(color);
@@ -38,7 +39,9 @@ const linkHelper =
     attr = null,
   } = {}) =>
   (thing, {
+    getLinkThemeString,
     to,
+
     text = '',
     attributes = null,
     class: className = '',
@@ -185,6 +188,10 @@ const link = {
 
     throw new Error(`Unrecognized type of thing for linking: ${thing}`);
   },
+};
+
+export {
+  unbound_getLinkThemeString as getLinkThemeString,
 };
 
 export default link;

@@ -4,8 +4,6 @@
 
 import {Track, Album} from './data/things.js';
 
-import {getColors} from './util/colors.js';
-
 import {
   empty,
   unique,
@@ -297,15 +295,29 @@ function unbound_generateCoverLink({
 
 // CSS & color shenanigans
 
-function unbound_getThemeString(color, additionalVariables = []) {
+function unbound_getThemeString(color, {
+  getColors,
+
+  additionalVariables = [],
+} = {}) {
   if (!color) return '';
 
-  const {primary, dim, bg} = getColors(color);
+  const {
+    primary,
+    dark,
+    dim,
+    bg,
+    bgBlack,
+    shadow,
+  } = getColors(color);
 
   const variables = [
     `--primary-color: ${primary}`,
+    `--dark-color: ${dark}`,
     `--dim-color: ${dim}`,
     `--bg-color: ${bg}`,
+    `--bg-black-color: ${bgBlack}`,
+    `--shadow-color: ${shadow}`,
     ...additionalVariables,
   ].filter(Boolean);
 

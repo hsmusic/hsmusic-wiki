@@ -107,6 +107,7 @@ export function writeTargetless({wikiData}) {
       sidebarLeft: homepageLayout.sidebarContent && {
         wide: true,
         collapse: false,
+        stickyMode: 'none',
         // This is a pretty filthy hack! 8ut otherwise, the [[news]] part
         // gets treated like it's a reference to the track named "news",
         // which o8viously isn't what we're going for. Gotta catch that

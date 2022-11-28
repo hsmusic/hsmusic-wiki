@@ -40,6 +40,8 @@ export function write(group, {wikiData}) {
       transformMultiline,
     }) => ({
       title: language.$('groupInfoPage.title', {group: group.name}),
+
+      themeColor: group.color,
       theme: getThemeString(group.color),
 
       main: {
@@ -132,6 +134,8 @@ export function write(group, {wikiData}) {
       link,
     }) => ({
       title: language.$('groupGalleryPage.title', {group: group.name}),
+
+      themeColor: group.color,
       theme: getThemeString(group.color),
 
       main: {

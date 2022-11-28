@@ -28,21 +28,26 @@ export function write(flash, {wikiData}) {
       language,
     }) => ({
       title: language.$('flashPage.title', {flash: flash.name}),
-      theme: getThemeString(flash.color, [
-        `--flash-directory: ${flash.directory}`,
-      ]),
+
+      themeColor: flash.color,
+      theme:
+        getThemeString(flash.color, {
+          additionalVariables: [
+            `--flash-directory: ${flash.directory}`,
+          ],
+        }),
 
       main: {
         content: [
-          html.tag('h1',
-            language.$('flashPage.title', {
-              flash: flash.name,
-            })),
-
           generateCoverLink({
             src: getFlashCover(flash),
             alt: language.$('misc.alt.flashArt'),
           }),
+
+          html.tag('h1',
+            language.$('flashPage.title', {
+              flash: flash.name,
+            })),
 
           html.tag('p',
             language.$('releaseInfo.released', {

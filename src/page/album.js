@@ -131,9 +131,14 @@ export function write(album, {wikiData}) {
       return {
         title: language.$('albumPage.title', {album: album.name}),
         stylesheet: getAlbumStylesheet(album),
-        theme: getThemeString(album.color, [
-          `--album-directory: ${album.directory}`,
-        ]),
+
+        themeColor: album.color,
+        theme:
+          getThemeString(album.color, {
+            additionalVariables: [
+              `--album-directory: ${album.directory}`,
+            ],
+          }),
 
         banner: !empty(album.bannerArtistContribs) && {
           dimensions: album.bannerDimensions,
@@ -463,15 +468,26 @@ export function generateAlbumSidebar(album, currentTrack, {
     ]);
 
   if (empty(groupParts)) {
-    return {content: trackListPart};
+    return {
+      stickyMode: 'column',
+      content: trackListPart,
+    };
   } else if (isTrackPage) {
-    const combinedGroupPart =
-      groupParts
+    const combinedGroupPart = {
+      classes: ['no-sticky-header'],
+      content: groupParts
         .map(groupPart => groupPart.filter(Boolean).join('\n'))
-        .join('\n<hr>\n');
-    return {multiple: [trackListPart, combinedGroupPart]};
+        .join('\n<hr>\n'),
+    };
+    return {
+      stickyMode: 'column',
+      multiple: [trackListPart, combinedGroupPart],
+    };
   } else {
-    return {multiple: [...groupParts, trackListPart]};
+    return {
+      stickyMode: 'last',
+      multiple: [...groupParts, trackListPart],
+    };
   }
 }
 

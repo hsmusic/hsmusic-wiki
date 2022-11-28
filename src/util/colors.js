@@ -1,44 +1,36 @@
 // Color and theming utility functions! Handy.
 
-// Graciously stolen from https://stackoverflow.com/a/54071699! ::::)
-// in: r,g,b in [0,1], out: h in [0,360) and s,l in [0,1]
-export function rgb2hsl(r, g, b) {
-  let a = Math.max(r, g, b),
-      n = a - Math.min(r, g, b),
-      f = 1 - Math.abs(a + a - n - 1);
+export function getColors(themeColor, {
+  // chroma.js external dependency (https://gka.github.io/chroma.js/)
+  chroma,
+} = {}) {
+  if (!chroma) {
+    throw new Error('chroma.js library must be passed or bound for color manipulation');
+  }
 
-  let h =
-    n &&
-      a == r
-        ? (g - b) / n
-        : a == g
-          ? 2 + (b - r) / n
-          : 4 + (r - g) / n;
+  const primary = chroma(themeColor);
 
-  return [
-    60 * (h < 0 ? h + 6 : h),
-    f ? n / f : 0,
-    (a + a - n) / 2
-  ];
-}
+  const dark = primary.luminance(0.02);
+  const dim = primary.desaturate(2).darken(1.5);
 
-export function getColors(primary) {
-  const [r, g, b] = primary
-    .slice(1)
-    .match(/[0-9a-fA-F]{2,2}/g)
-    .slice(0, 3)
-    .map((val) => parseInt(val, 16) / 255);
+  const bg = primary.luminance(0.008).desaturate(3.5).alpha(0.8);
+  const bgBlack = primary.saturate(1).luminance(0.0025).alpha(0.8);
+  const shadow = primary.desaturate(4).set('hsl.l', 0.05).alpha(0.8);
 
-  const [h, s, l] = rgb2hsl(r, g, b);
-
-  const dim = `hsl(${Math.round(h)}deg, ${Math.round(s * 50)}%, ${Math.round(l * 80)}%)`;
-  const bg = `hsla(${Math.round(h)}deg, ${Math.round(s * 15)}%, 12%, 0.80)`;
+  const hsl = primary.hsl();
+  if (isNaN(hsl[0])) hsl[0] = 0;
 
   return {
-    primary,
-    dim,
-    bg,
-    rgb: [r, g, b],
-    hsl: [h, s, l],
+    primary: primary.hex(),
+
+    dark: dark.hex(),
+    dim: dim.hex(),
+
+    bg: bg.hex(),
+    bgBlack: bgBlack.hex(),
+    shadow: shadow.hex(),
+
+    rgb: primary.rgb(),
+    hsl,
   };
 }

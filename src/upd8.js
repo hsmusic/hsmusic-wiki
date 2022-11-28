@@ -37,6 +37,8 @@ import {fileURLToPath} from 'url';
 // It stands for "HTML Entities", apparently. Cursed.
 import he from 'he';
 
+import chroma from 'chroma-js';
+
 import {
   copyFile,
   mkdir,
@@ -56,7 +58,7 @@ import * as pageSpecs from './page/index.js';
 
 import find, {bindFind} from './util/find.js';
 import * as html from './util/html.js';
-import unbound_link, {getLinkThemeString} from './util/link.js';
+import {getColors} from './util/colors.js';
 import {findFiles} from './util/io.js';
 
 import CacheableObject from './data/cacheable-object.js';
@@ -92,9 +94,13 @@ import {
   getGridHTML,
   getRevealStringFromTags,
   getRevealStringFromWarnings,
-  getThemeString,
+  getThemeString as unbound_getThemeString,
   iconifyURL,
 } from './misc-templates.js';
+
+import unbound_link, {
+  getLinkThemeString as unbound_getLinkThemeString,
+} from './util/link.js';
 
 import {
   color,
@@ -866,6 +872,7 @@ writePage.to =
 
 writePage.html = (pageInfo, {
   defaultLanguage,
+  getThemeString,
   language,
   languages,
   localizedPaths,
@@ -884,6 +891,7 @@ writePage.html = (pageInfo, {
     stylesheet = '',
 
     showWikiNameInTitle = true,
+    themeColor = '',
 
     // missing properties are auto-filled, see below!
     body = {},
@@ -933,6 +941,10 @@ writePage.html = (pageInfo, {
   footer.content ??= wikiInfo.footerContent
     ? transformMultiline(wikiInfo.footerContent)
     : '';
+
+  const colors = themeColor
+    ? getColors(themeColor, {chroma})
+    : null;
 
   const canonical = wikiInfo.canonicalBase
     ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
@@ -988,6 +1000,11 @@ writePage.html = (pageInfo, {
     classes,
     collapse = true,
     wide = false,
+
+    // 'last' - last or only sidebar box is sticky
+    // 'column' - entire column, incl. multiple boxes from top, is sticky
+    // 'none' - sidebar not sticky at all, stays at top of page
+    stickyMode = 'last',
   }) =>
     content
       ? html.tag('div',
@@ -998,6 +1015,7 @@ writePage.html = (pageInfo, {
               'sidebar',
               wide && 'wide',
               !collapse && 'no-hide',
+              stickyMode !== 'none' && 'sticky-' + stickyMode,
               ...classes,
             ],
           },
@@ -1011,10 +1029,24 @@ writePage.html = (pageInfo, {
               'sidebar-multiple',
               wide && 'wide',
               !collapse && 'no-hide',
+              stickyMode !== 'none' && 'sticky-' + stickyMode,
             ],
           },
-          multiple.map((content) =>
-            html.tag('div', {class: ['sidebar', ...classes]}, content)))
+          multiple
+            .map((infoOrContent) =>
+              (typeof infoOrContent === 'object' && !Array.isArray(infoOrContent))
+                ? infoOrContent
+                : {content: infoOrContent})
+            .filter(({content}) => content)
+            .map(({
+              content,
+              classes: classes2 = [],
+            }) =>
+              html.tag('div',
+                {
+                  class: ['sidebar', ...classes, ...classes2],
+                },
+                html.fragment(content))))
       : '';
 
   const sidebarLeftHTML = generateSidebarHTML('sidebar-left', sidebarLeft);
@@ -1201,8 +1233,21 @@ writePage.html = (pageInfo, {
     socialEmbed.image &&
       html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
 
-    socialEmbed.color &&
-      html.tag('meta', {name: 'theme-color', content: socialEmbed.color}),
+    ...html.fragment(
+      colors && [
+        // Safari only respects the first media-matching meta tag here,
+        // so position the dark-specific entry first
+        html.tag('meta', {
+          name: 'theme-color',
+          content: colors.dark,
+          media: '(prefers-color-scheme: dark)'
+        }),
+
+        html.tag('meta', {
+          name: 'theme-color',
+          content: colors.primary,
+        }),
+      ]),
 
     oEmbedJSONHref &&
       html.tag('link', {
@@ -2304,9 +2349,24 @@ async function main() {
 
         bound.html = html;
 
+        bound.getColors = bindOpts(getColors, {
+          chroma,
+        });
+
+        bound.getLinkThemeString = bindOpts(unbound_getLinkThemeString, {
+          getColors: bound.getColors,
+        });
+
+        bound.getThemeString = bindOpts(unbound_getThemeString, {
+          getColors: bound.getColors,
+        });
+
         bound.link = withEntries(unbound_link, (entries) =>
-          entries.map(([key, fn]) => [key, bindOpts(fn, {to})])
-        );
+          entries
+            .map(([key, fn]) => [key, bindOpts(fn, {
+              getLinkThemeString: bound.getLinkThemeString,
+              to,
+            })]));
 
         bound.parseAttributes = bindOpts(parseAttributes, {
           to,
@@ -2362,10 +2422,6 @@ async function main() {
 
           getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
         });
-
-        bound.getLinkThemeString = getLinkThemeString;
-
-        bound.getThemeString = getThemeString;
 
         bound.getArtistString = bindOpts(getArtistString, {
           html,
@@ -2497,6 +2553,7 @@ async function main() {
 
         const pageHTML = writePage.html(pageInfo, {
           defaultLanguage: finalDefaultLanguage,
+          getThemeString: bound.getThemeString,
           language,
           languages,
           localizedPaths,

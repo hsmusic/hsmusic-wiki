@@ -187,10 +187,15 @@ export function write(track, {wikiData}) {
       return {
         title: language.$('trackPage.title', {track: track.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
-        theme: getThemeString(track.color, [
-          `--album-directory: ${album.directory}`,
-          `--track-directory: ${track.directory}`,
-        ]),
+
+        themeColor: track.color,
+        theme:
+          getThemeString(track.color, {
+            additionalVariables: [
+              `--album-directory: ${album.directory}`,
+              `--track-directory: ${track.directory}`,
+            ]
+          }),
 
         socialEmbed: {
           heading: language.$('trackPage.socialEmbed.heading', {

@@ -72,6 +72,10 @@ export function tag(tagName, ...args) {
   }
 
   if (Array.isArray(content)) {
+    if (content.some(item => Array.isArray(item))) {
+      throw new Error(`Found array instead of string (tag) or null/falsey, did you forget to \`...\` spread an array or fragment?`);
+    }
+
     const joiner = attrs?.[joinChildren];
     content = content.filter(Boolean).join(
       (joiner

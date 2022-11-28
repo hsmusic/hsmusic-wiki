@@ -222,8 +222,14 @@ let fastHover = false;
 let endFastHoverTimeout = null;
 
 function colorLink(a, color) {
+  console.warn('Info card link colors temporarily disabled: chroma.js required, no dependency linking for client.js yet');
+  return;
+
+  // eslint-disable-next-line no-unreachable
+  const chroma = {};
+
   if (color) {
-    const {primary, dim} = getColors(color);
+    const {primary, dim} = getColors(color, {chroma});
     a.style.setProperty('--primary-color', primary);
     a.style.setProperty('--dim-color', dim);
   }
