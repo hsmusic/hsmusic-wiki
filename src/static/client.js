@@ -1,3 +1,5 @@
+/* eslint-env browser */
+
 // This is the JS file that gets loaded on the client! It's only really used for
 // the random track feature right now - the idea is we only use it for stuff
 // that cannot 8e done at static-site compile time, 8y its fundamentally

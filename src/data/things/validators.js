@@ -1,6 +1,6 @@
-import {withAggregate} from '../util/sugar.js';
+import {withAggregate} from '../../util/sugar.js';
 
-import {color, ENABLE_COLOR} from '../util/cli.js';
+import {color, ENABLE_COLOR} from '../../util/cli.js';
 
 import {inspect as nodeInspect} from 'util';
 

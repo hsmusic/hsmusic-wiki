@@ -2,7 +2,7 @@
 // These are made available right on a page spec's ({wikiData, language, ...})
 // args object!
 
-import {Track, Album} from './data/things.js';
+import T from './data/things/index.js';
 
 import {
   empty,
@@ -173,7 +173,7 @@ function unbound_generateChronologyLinks(currentThing, {
       // right function to use here.
       const args = [thingsUnsorted, {getDate: (t) => t[dateKey]}];
       const things = (
-        thingsUnsorted.every(t => t instanceof Album || t instanceof Track)
+        thingsUnsorted.every(t => t instanceof T.Album || t instanceof T.Track)
           ? sortAlbumsTracksChronologically(...args)
           : sortChronologically(...args));
 

@@ -61,11 +61,11 @@ import * as html from './util/html.js';
 import {getColors} from './util/colors.js';
 import {findFiles} from './util/io.js';
 
-import CacheableObject from './data/cacheable-object.js';
+import CacheableObject from './data/things/cacheable-object.js';
 
 import {serializeThings} from './data/serialize.js';
 
-import {Language} from './data/things.js';
+import T from './data/things/index.js';
 
 import {
   filterDuplicateDirectories,
@@ -1625,7 +1625,7 @@ async function processLanguageFile(file) {
     delete json['meta.baseDirectory'];
   }
 
-  const language = new Language();
+  const language = new T.Language();
   language.code = code;
   language.intlCode = intlCode;
   language.name = name;
@@ -1834,7 +1834,7 @@ async function main() {
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
       showTraces: showAggregateTraces,
-      pathToFile: (f) => path.relative(__dirname, f),
+      pathToFileURL: (f) => path.relative(__dirname, fileURLToPath(f)),
       ...opts,
     });
   };

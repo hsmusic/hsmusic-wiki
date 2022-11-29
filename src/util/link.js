@@ -11,16 +11,7 @@
 
 import * as html from './html.js';
 
-import {
-  Album,
-  Artist,
-  ArtTag,
-  Flash,
-  Group,
-  NewsEntry,
-  StaticPage,
-  Track,
-} from '../data/things.js';
+import T from '../data/things/index.js';
 
 export function unbound_getLinkThemeString(color, {
   getColors,
@@ -98,14 +89,14 @@ const linkIndex = (key, conf) =>
 // the given thing based on what it's an instance of. This is used for the
 // link.anything() function.
 const linkAnythingMapping = [
-  [Album, 'album'],
-  [Artist, 'artist'],
-  [ArtTag, 'tag'],
-  [Flash, 'flash'],
-  [Group, 'groupInfo'],
-  [NewsEntry, 'newsEntry'],
-  [StaticPage, 'staticPage'],
-  [Track, 'track'],
+  [T.Album, 'album'],
+  [T.Artist, 'artist'],
+  [T.ArtTag, 'tag'],
+  [T.Flash, 'flash'],
+  [T.Group, 'groupInfo'],
+  [T.NewsEntry, 'newsEntry'],
+  [T.StaticPage, 'staticPage'],
+  [T.Track, 'track'],
 ];
 
 const link = {

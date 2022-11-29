@@ -405,7 +405,7 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 }
 
 export function showAggregate(topError, {
-  pathToFile = (p) => p,
+  pathToFileURL = f => f,
   showTraces = true,
 } = {}) {
   const recursive = (error, {level}) => {
@@ -429,9 +429,7 @@ export function showAggregate(topError, {
         ? '- ' +
           stackLine
             .trim()
-            .replace(/file:\/\/(.*\.js)/, (match, pathname) =>
-              pathToFile(pathname)
-            )
+            .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
         : '(no stack trace)';
       header += ` ${color.dim(tracePart)}`;
     }

@@ -7,23 +7,7 @@ import yaml from 'js-yaml';
 import {readFile} from 'fs/promises';
 import {inspect as nodeInspect} from 'util';
 
-import {
-  Album,
-  Artist,
-  ArtTag,
-  Flash,
-  FlashAct,
-  Group,
-  GroupCategory,
-  HomepageLayout,
-  HomepageLayoutAlbumsRow,
-  NewsEntry,
-  StaticPage,
-  Thing,
-  Track,
-  TrackGroup,
-  WikiInfo,
-} from './things.js';
+import T from './things/index.js';
 
 import {color, ENABLE_COLOR, logInfo, logWarn} from '../util/cli.js';
 
@@ -101,6 +85,10 @@ function makeProcessDocument(
     ignoredFields = [],
   }
 ) {
+  if (!thingClass) {
+    throw new Error(`Missing Thing class`);
+  }
+
   if (!propertyFieldMapping) {
     throw new Error(`Expected propertyFieldMapping to be provided`);
   }
@@ -178,7 +166,7 @@ makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error 
   }
 };
 
-export const processAlbumDocument = makeProcessDocument(Album, {
+export const processAlbumDocument = makeProcessDocument(T.Album, {
   fieldTransformations: {
     'Artists': parseContributors,
     'Cover Artists': parseContributors,
@@ -238,7 +226,7 @@ export const processAlbumDocument = makeProcessDocument(Album, {
   },
 });
 
-export const processTrackGroupDocument = makeProcessDocument(TrackGroup, {
+export const processTrackGroupDocument = makeProcessDocument(T.TrackGroup, {
   fieldTransformations: {
     'Date Originally Released': (value) => new Date(value),
   },
@@ -250,7 +238,7 @@ export const processTrackGroupDocument = makeProcessDocument(TrackGroup, {
   },
 });
 
-export const processTrackDocument = makeProcessDocument(Track, {
+export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
     'Duration': getDurationInSeconds,
 
@@ -292,7 +280,7 @@ export const processTrackDocument = makeProcessDocument(Track, {
   },
 });
 
-export const processArtistDocument = makeProcessDocument(Artist, {
+export const processArtistDocument = makeProcessDocument(T.Artist, {
   propertyFieldMapping: {
     name: 'Artist',
 
@@ -309,7 +297,7 @@ export const processArtistDocument = makeProcessDocument(Artist, {
   ignoredFields: ['Dead URLs'],
 });
 
-export const processFlashDocument = makeProcessDocument(Flash, {
+export const processFlashDocument = makeProcessDocument(T.Flash, {
   fieldTransformations: {
     'Date': (value) => new Date(value),
 
@@ -330,7 +318,7 @@ export const processFlashDocument = makeProcessDocument(Flash, {
   },
 });
 
-export const processFlashActDocument = makeProcessDocument(FlashAct, {
+export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
   propertyFieldMapping: {
     name: 'Act',
     color: 'Color',
@@ -340,7 +328,7 @@ export const processFlashActDocument = makeProcessDocument(FlashAct, {
   },
 });
 
-export const processNewsEntryDocument = makeProcessDocument(NewsEntry, {
+export const processNewsEntryDocument = makeProcessDocument(T.NewsEntry, {
   fieldTransformations: {
     'Date': (value) => new Date(value),
   },
@@ -353,7 +341,7 @@ export const processNewsEntryDocument = makeProcessDocument(NewsEntry, {
   },
 });
 
-export const processArtTagDocument = makeProcessDocument(ArtTag, {
+export const processArtTagDocument = makeProcessDocument(T.ArtTag, {
   propertyFieldMapping: {
     name: 'Tag',
     directory: 'Directory',
@@ -362,7 +350,7 @@ export const processArtTagDocument = makeProcessDocument(ArtTag, {
   },
 });
 
-export const processGroupDocument = makeProcessDocument(Group, {
+export const processGroupDocument = makeProcessDocument(T.Group, {
   propertyFieldMapping: {
     name: 'Group',
     directory: 'Directory',
@@ -371,14 +359,14 @@ export const processGroupDocument = makeProcessDocument(Group, {
   },
 });
 
-export const processGroupCategoryDocument = makeProcessDocument(GroupCategory, {
+export const processGroupCategoryDocument = makeProcessDocument(T.GroupCategory, {
   propertyFieldMapping: {
     name: 'Category',
     color: 'Color',
   },
 });
 
-export const processStaticPageDocument = makeProcessDocument(StaticPage, {
+export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
   propertyFieldMapping: {
     name: 'Name',
     nameShort: 'Short Name',
@@ -391,7 +379,7 @@ export const processStaticPageDocument = makeProcessDocument(StaticPage, {
   },
 });
 
-export const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
+export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
   propertyFieldMapping: {
     name: 'Name',
     nameShort: 'Short Name',
@@ -409,7 +397,7 @@ export const processWikiInfoDocument = makeProcessDocument(WikiInfo, {
   },
 });
 
-export const processHomepageLayoutDocument = makeProcessDocument(HomepageLayout, {
+export const processHomepageLayoutDocument = makeProcessDocument(T.HomepageLayout, {
   propertyFieldMapping: {
     sidebarContent: 'Sidebar Content',
   },
@@ -431,7 +419,7 @@ export function makeProcessHomepageLayoutRowDocument(rowClass, spec) {
 }
 
 export const homepageLayoutRowTypeProcessMapping = {
-  albums: makeProcessHomepageLayoutRowDocument(HomepageLayoutAlbumsRow, {
+  albums: makeProcessHomepageLayoutRowDocument(T.HomepageLayoutAlbumsRow, {
     propertyFieldMapping: {
       sourceGroupByRef: 'Group',
       countAlbumsFromGroup: 'Count',
@@ -678,7 +666,7 @@ export const dataSteps = [
         let currentTracksByRef = null;
         let currentTrackGroup = null;
 
-        const albumRef = Thing.getReference(album);
+        const albumRef = T.Thing.getReference(album);
 
         const closeCurrentTrackGroup = () => {
           if (currentTracksByRef) {
@@ -687,7 +675,7 @@ export const dataSteps = [
             if (currentTrackGroup) {
               trackGroup = currentTrackGroup;
             } else {
-              trackGroup = new TrackGroup();
+              trackGroup = new T.TrackGroup();
               trackGroup.name = `Default Track Group`;
               trackGroup.isDefaultTrackGroup = true;
             }
@@ -699,7 +687,7 @@ export const dataSteps = [
         };
 
         for (const entry of entries) {
-          if (entry instanceof TrackGroup) {
+          if (entry instanceof T.TrackGroup) {
             closeCurrentTrackGroup();
             currentTracksByRef = [];
             currentTrackGroup = entry;
@@ -710,7 +698,7 @@ export const dataSteps = [
 
           entry.dataSourceAlbumByRef = albumRef;
 
-          const trackRef = Thing.getReference(entry);
+          const trackRef = T.Thing.getReference(entry);
           if (currentTracksByRef) {
             currentTracksByRef.push(trackRef);
           } else {
@@ -739,9 +727,9 @@ export const dataSteps = [
       const artistData = results;
 
       const artistAliasData = results.flatMap((artist) => {
-        const origRef = Thing.getReference(artist);
+        const origRef = T.Thing.getReference(artist);
         return artist.aliasNames?.map((name) => {
-          const alias = new Artist();
+          const alias = new T.Artist();
           alias.name = name;
           alias.isAlias = true;
           alias.aliasedArtistRef = origRef;
@@ -770,12 +758,12 @@ export const dataSteps = [
       let flashAct;
       let flashesByRef = [];
 
-      if (results[0] && !(results[0] instanceof FlashAct)) {
+      if (results[0] && !(results[0] instanceof T.FlashAct)) {
         throw new Error(`Expected an act at top of flash data file`);
       }
 
       for (const thing of results) {
-        if (thing instanceof FlashAct) {
+        if (thing instanceof T.FlashAct) {
           if (flashAct) {
             Object.assign(flashAct, {flashesByRef});
           }
@@ -783,7 +771,7 @@ export const dataSteps = [
           flashAct = thing;
           flashesByRef = [];
         } else {
-          flashesByRef.push(Thing.getReference(thing));
+          flashesByRef.push(T.Thing.getReference(thing));
         }
       }
 
@@ -791,8 +779,8 @@ export const dataSteps = [
         Object.assign(flashAct, {flashesByRef});
       }
 
-      const flashData = results.filter((x) => x instanceof Flash);
-      const flashActData = results.filter((x) => x instanceof FlashAct);
+      const flashData = results.filter((x) => x instanceof T.Flash);
+      const flashActData = results.filter((x) => x instanceof T.FlashAct);
 
       return {flashData, flashActData};
     },
@@ -813,12 +801,12 @@ export const dataSteps = [
       let groupCategory;
       let groupsByRef = [];
 
-      if (results[0] && !(results[0] instanceof GroupCategory)) {
+      if (results[0] && !(results[0] instanceof T.GroupCategory)) {
         throw new Error(`Expected a category at top of group data file`);
       }
 
       for (const thing of results) {
-        if (thing instanceof GroupCategory) {
+        if (thing instanceof T.GroupCategory) {
           if (groupCategory) {
             Object.assign(groupCategory, {groupsByRef});
           }
@@ -826,7 +814,7 @@ export const dataSteps = [
           groupCategory = thing;
           groupsByRef = [];
         } else {
-          groupsByRef.push(Thing.getReference(thing));
+          groupsByRef.push(T.Thing.getReference(thing));
         }
       }
 
@@ -834,8 +822,8 @@ export const dataSteps = [
         Object.assign(groupCategory, {groupsByRef});
       }
 
-      const groupData = results.filter((x) => x instanceof Group);
-      const groupCategoryData = results.filter((x) => x instanceof GroupCategory);
+      const groupData = results.filter((x) => x instanceof T.Group);
+      const groupCategoryData = results.filter((x) => x instanceof T.GroupCategory);
 
       return {groupData, groupCategoryData};
     },
