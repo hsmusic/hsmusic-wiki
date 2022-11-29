@@ -229,6 +229,10 @@ function generateNavForFlash(flash, {
     bottomRowContent: previousNextLinks && `(${previousNextLinks})`,
 
     content: html.tag('div',
+      {
+        [html.onlyIfContent]: true,
+        class: 'nav-chronology-links',
+      },
       generateChronologyLinks(flash, {
         headingString: 'misc.chronology.heading.flash',
         contribKey: 'contributorContribs',

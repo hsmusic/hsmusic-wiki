@@ -56,6 +56,18 @@ export function tag(tagName, ...args) {
     throw new Error(`Tag <${tagName}> is self-closing but got content!`);
   }
 
+  if (Array.isArray(content)) {
+    if (content.some(item => Array.isArray(item))) {
+      throw new Error(`Found array instead of string (tag) or null/falsey, did you forget to \`...\` spread an array or fragment?`);
+    }
+
+    const joiner = attrs?.[joinChildren];
+    content = content.filter(Boolean).join(
+      (joiner
+        ? `\n${joiner}\n`
+        : '\n'));
+  }
+
   if (attrs?.[onlyIfContent] && !content) {
     return '';
   }
@@ -69,18 +81,6 @@ export function tag(tagName, ...args) {
 
   if (!openTag) {
     openTag = tagName;
-  }
-
-  if (Array.isArray(content)) {
-    if (content.some(item => Array.isArray(item))) {
-      throw new Error(`Found array instead of string (tag) or null/falsey, did you forget to \`...\` spread an array or fragment?`);
-    }
-
-    const joiner = attrs?.[joinChildren];
-    content = content.filter(Boolean).join(
-      (joiner
-        ? `\n${joiner}\n`
-        : '\n'));
   }
 
   if (content) {
@@ -102,12 +102,10 @@ export function tag(tagName, ...args) {
     } else {
       return `<${openTag}>${content}</${tagName}>`;
     }
+  } else if (selfClosing) {
+    return `<${openTag}>`;
   } else {
-    if (selfClosing) {
-      return `<${openTag}>`;
-    } else {
-      return `<${openTag}></${tagName}>`;
-    }
+    return `<${openTag}></${tagName}>`;
   }
 }
 

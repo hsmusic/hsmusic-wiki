@@ -154,19 +154,20 @@ function unbound_generateChronologyLinks(currentThing, {
   headingString,
 }) {
   const contributions = currentThing[contribKey];
-  if (!contributions) {
-    return '';
+
+  if (empty(contributions)) {
+    return [];
   }
 
   if (contributions.length > 8) {
-    return `<div class="chronology">${language.$('misc.chronology.seeArtistPages')}</div>`;
+    return html.tag('div', {class: 'chronology'},
+      language.$('misc.chronology.seeArtistPages'));
   }
 
   return contributions
     .map(({who: artist}) => {
-      const thingsUnsorted = unique(getThings(artist)).filter(
-        (t) => t[dateKey]
-      );
+      const thingsUnsorted = unique(getThings(artist))
+        .filter((t) => t[dateKey]);
 
       // Kinda a hack, but we automatically detect which is (probably) the
       // right function to use here.
@@ -208,10 +209,7 @@ function unbound_generateChronologyLinks(currentThing, {
                 navigation,
               })
             : heading)));
-    })
-    // TODO: use html.fragment when calling and get rid of these lines
-    .filter(Boolean)
-    .join('\n');
+    });
 }
 
 // Content warning tags

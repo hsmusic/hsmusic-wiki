@@ -580,8 +580,6 @@ export function generateAlbumChronologyLinks(album, currentTrack, {
   generateChronologyLinks,
   html,
 }) {
-  const isTrackPage = !!currentTrack;
-
   return html.tag(
     'div',
     {
@@ -589,34 +587,38 @@ export function generateAlbumChronologyLinks(album, currentTrack, {
       class: 'nav-chronology-links',
     },
     [
-      isTrackPage &&
-        generateChronologyLinks(currentTrack, {
-          contribKey: 'artistContribs',
-          getThings: (artist) => [
-            ...artist.tracksAsArtist,
-            ...artist.tracksAsContributor,
-          ],
-          headingString: 'misc.chronology.heading.track',
-        }),
+      ...html.fragment(
+        currentTrack && [
+          ...html.fragment(
+            generateChronologyLinks(currentTrack, {
+              contribKey: 'artistContribs',
+              getThings: (artist) => [
+                ...artist.tracksAsArtist,
+                ...artist.tracksAsContributor,
+              ],
+              headingString: 'misc.chronology.heading.track',
+            })),
 
-      isTrackPage &&
-        generateChronologyLinks(currentTrack, {
-          contribKey: 'contributorContribs',
-          getThings: (artist) => [
-            ...artist.tracksAsArtist,
-            ...artist.tracksAsContributor,
-          ],
-          headingString: 'misc.chronology.heading.track',
-        }),
+          ...html.fragment(
+            generateChronologyLinks(currentTrack, {
+              contribKey: 'contributorContribs',
+              getThings: (artist) => [
+                ...artist.tracksAsArtist,
+                ...artist.tracksAsContributor,
+              ],
+              headingString: 'misc.chronology.heading.track',
+            })),
+        ]),
 
-      generateChronologyLinks(currentTrack || album, {
-        contribKey: 'coverArtistContribs',
-        dateKey: 'coverArtDate',
-        getThings: (artist) => [
-          ...artist.albumsAsCoverArtist,
-          ...artist.tracksAsCoverArtist,
-        ],
-        headingString: 'misc.chronology.heading.coverArt',
-      }),
+      ...html.fragment(
+        generateChronologyLinks(currentTrack || album, {
+          contribKey: 'coverArtistContribs',
+          dateKey: 'coverArtDate',
+          getThings: (artist) => [
+            ...artist.albumsAsCoverArtist,
+            ...artist.tracksAsCoverArtist,
+          ],
+          headingString: 'misc.chronology.heading.coverArt',
+        })),
     ]);
 }
