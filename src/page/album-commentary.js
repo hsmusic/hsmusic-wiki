@@ -21,6 +21,7 @@ export function write(album) {
     type: 'page',
     path: ['albumCommentary', album.directory],
     page: ({
+      generateStickyHeadingContainer,
       getAlbumStylesheet,
       getLinkThemeString,
       getThemeString,
@@ -35,23 +36,32 @@ export function write(album) {
 
       main: {
         content: html.tag('div', {class: 'long-content'}, [
-          html.tag('h1', language.$('albumCommentaryPage.title', {
-            album: link.album(album),
-          })),
-          html.tag('p', language.$('albumCommentaryPage.infoLine', {
-            words: html.tag('b', language.formatWordCount(words, {unit: true})),
-            entries: html.tag('b', language.countCommentaryEntries(entries.length, {unit: true})),
-          })),
+          generateStickyHeadingContainer(
+            language.$('albumCommentaryPage.title', {
+              album: link.album(album),
+            })),
+
+          html.tag('p',
+            language.$('albumCommentaryPage.infoLine', {
+              words: html.tag('b', language.formatWordCount(words, {unit: true})),
+              entries: html.tag('b', language.countCommentaryEntries(entries.length, {unit: true})),
+            })),
+
           ...html.fragment(album.commentary && [
-            html.tag('h3', language.$('albumCommentaryPage.entry.title.albumCommentary')),
-            html.tag('blockquote', transformMultiline(album.commentary)),
+            html.tag('h3',
+              {class: ['content-heading']},
+              language.$('albumCommentaryPage.entry.title.albumCommentary')),
+            html.tag('blockquote',
+              transformMultiline(album.commentary)),
           ]),
+
           ...album.tracks.filter(t => t.commentary).flatMap(track => [
             html.tag('h3',
-              {id: 'track.directory'},
+              {id: 'track.directory', class: ['content-heading']},
               language.$('albumCommentaryPage.entry.title.trackCommentary', {
                 track: link.track(track),
               })),
+
             html.tag('blockquote',
               {style: getLinkThemeString(track.color)},
               transformMultiline(track.commentary)),

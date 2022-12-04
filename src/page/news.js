@@ -14,6 +14,7 @@ export function write(entry, {wikiData}) {
     path: ['newsEntry', entry.directory],
     page: ({
       generateNavigationLinks,
+      generateStickyHeadingContainer,
       html,
       language,
       link,
@@ -24,7 +25,7 @@ export function write(entry, {wikiData}) {
       main: {
         content:
           html.tag('div', {class: 'long-content'}, [
-            html.tag('h1',
+            generateStickyHeadingContainer(
               language.$('newsEntryPage.title', {
                 entry: entry.name,
               })),
@@ -58,6 +59,7 @@ export function writeTargetless({wikiData}) {
     type: 'page',
     path: ['newsIndex'],
     page: ({
+      generateStickyHeadingContainer,
       html,
       language,
       link,
@@ -70,7 +72,7 @@ export function writeTargetless({wikiData}) {
           html.tag('div',
             {class: ['long-content', 'news-index']},
             [
-              html.tag('h1',
+              generateStickyHeadingContainer(
                 language.$('newsIndex.title')),
 
               ...newsData.map(entry =>

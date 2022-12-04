@@ -321,6 +321,7 @@ export function write(artist, {wikiData}) {
       fancifyURL,
       generateCoverLink,
       generateInfoGalleryLinks,
+      generateStickyHeadingContainer,
       getArtistAvatar,
       getArtistString,
       html,
@@ -346,7 +347,7 @@ export function write(artist, {wikiData}) {
                 alt: language.$('misc.alt.artistAvatar'),
               }),
 
-            html.tag('h1',
+            generateStickyHeadingContainer(
               language.$('artistPage.title', {
                 artist: name,
               })),
@@ -408,7 +409,7 @@ export function write(artist, {wikiData}) {
             ...html.fragment(
               !empty(allTracks) && [
                 html.tag('h2',
-                  {id: 'tracks'},
+                  {id: 'tracks', class: ['content-heading']},
                   language.$('artistPage.trackList.title')),
 
                 totalDuration > 0 &&
@@ -446,7 +447,7 @@ export function write(artist, {wikiData}) {
             ...html.fragment(
               !empty(artThingsAll) && [
                 html.tag('h2',
-                  {id: 'art'},
+                  {id: 'art', class: ['content-heading']},
                   language.$('artistPage.artList.title')),
 
                 hasGallery &&
@@ -513,7 +514,7 @@ export function write(artist, {wikiData}) {
               wikiInfo.enableFlashesAndGames &&
               !empty(flashes) && [
                 html.tag('h2',
-                  {id: 'flashes'},
+                  {id: 'flashes', class: ['content-heading']},
                   language.$('artistPage.flashList.title')),
 
                 html.tag('dl',
@@ -555,7 +556,7 @@ export function write(artist, {wikiData}) {
             ...html.fragment(
               !empty(commentaryThings) && [
                 html.tag('h2',
-                  {id: 'commentary'},
+                  {id: 'commentary', class: ['content-heading']},
                   language.$('artistPage.commentaryList.title')),
 
                 html.tag('dl',

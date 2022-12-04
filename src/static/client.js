@@ -443,3 +443,90 @@ function addInfoCardLinkHandlers(type) {
 if (localStorage.tryInfoCards) {
   addInfoCardLinkHandlers('track');
 }
+
+// Sticky content heading ---------------------------------
+
+const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-heading-container'))
+  .map(stickyContainer => {
+    const {parentElement: contentContainer} = stickyContainer;
+    const stickySubheading = stickyContainer.querySelector('.content-sticky-subheading');
+    const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
+
+    return {
+      contentContainer,
+      contentHeadings,
+      stickyContainer,
+      stickySubheading,
+      state: {
+        displayedHeading: null,
+      },
+    };
+  });
+
+const topOfViewInside = (el, scroll = window.scrollY) => (
+  scroll > el.offsetTop &&
+  scroll < el.offsetTop + el.offsetHeight
+);
+
+function updateStickyHeading() {
+  for (const {
+    contentContainer,
+    contentHeadings,
+    stickyContainer,
+    stickySubheading,
+    state,
+  } of stickyHeadingInfo) {
+    let closestHeading = null;
+
+    if (topOfViewInside(contentContainer)) {
+      if (stickySubheading.childNodes.length === 0) {
+        // &nbsp; to ensure correct basic line height
+        stickySubheading.appendChild(document.createTextNode('\xA0'));
+      }
+
+      const stickyRect = stickyContainer.getBoundingClientRect();
+      const subheadingRect = stickySubheading.getBoundingClientRect();
+      const stickyBottom = stickyRect.bottom + subheadingRect.height;
+
+      // This array is reversed so that we're starting from the bottom when
+      // iterating over it.
+      for (let i = contentHeadings.length - 1; i >= 0; i--) {
+        const heading = contentHeadings[i];
+        const headingRect = heading.getBoundingClientRect();
+        if (headingRect.y + headingRect.height / 1.5 < stickyBottom) {
+          closestHeading = heading;
+          break;
+        }
+      }
+    }
+
+    if (state.displayedHeading !== closestHeading) {
+      if (closestHeading) {
+        // Array.from needed to iterate over a live array with for..of
+        for (const child of Array.from(stickySubheading.childNodes)) {
+          child.remove();
+        }
+
+        for (const child of closestHeading.childNodes) {
+          if (child.tagName === 'A') {
+            for (const grandchild of child.childNodes) {
+              stickySubheading.appendChild(grandchild.cloneNode(true));
+            }
+          } else {
+            stickySubheading.appendChild(child.cloneNode(true));
+          }
+        }
+
+        stickySubheading.classList.add('visible');
+      } else {
+        stickySubheading.classList.remove('visible');
+      }
+
+      state.displayedHeading = closestHeading;
+    }
+  }
+}
+
+document.addEventListener('scroll', updateStickyHeading);
+
+updateStickyHeading();

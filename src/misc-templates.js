@@ -50,7 +50,10 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
 
   return html.fragment([
     html.tag('p',
-      {id: 'additional-files'},
+      {
+        id: 'additional-files',
+        class: ['content-heading'],
+      },
       language.$('releaseInfo.additionalFiles.heading', {
         additionalFiles: language.countAdditionalFiles(fileCount, {
           unit: true,
@@ -717,6 +720,19 @@ function unbound_generateNavigationLinks(current, {
   return language.formatUnitList(links);
 }
 
+// Sticky heading, ooooo
+
+function unbound_generateStickyHeadingContainer(headingContent, {
+  html,
+}) {
+  return html.tag('div',
+    {class: 'content-sticky-heading-container'},
+    [
+      html.tag('h1', headingContent),
+      html.tag('h2', {class: 'content-sticky-subheading'}),
+    ]);
+}
+
 // Footer stuff
 
 function unbound_getFooterLocalizationLinks(pathname, {
@@ -793,6 +809,8 @@ export {
 
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,
+
+  unbound_generateStickyHeadingContainer as generateStickyHeadingContainer,
 
   unbound_getFooterLocalizationLinks as getFooterLocalizationLinks,
 }

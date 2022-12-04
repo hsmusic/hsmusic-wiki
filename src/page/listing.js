@@ -32,6 +32,7 @@ export function write(listing, {wikiData}) {
     path: ['listing', listing.directory],
     page: (opts) => {
       const {
+        generateStickyHeadingContainer,
         getLinkThemeString,
         html,
         language,
@@ -45,7 +46,7 @@ export function write(listing, {wikiData}) {
 
         main: {
           content: [
-            html.tag('h1',
+            generateStickyHeadingContainer(
               language.$(titleKey)),
 
             ...html.fragment(
@@ -230,6 +231,7 @@ function generateLinkIndexForListings(currentListing, forSidebar, {
     : html.tag('dl',
         filteredByCondition.flatMap(({title, listings}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             title({language})),
           html.tag('dd',
             genUL(listings)),

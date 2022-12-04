@@ -85,6 +85,7 @@ import {
   generateCoverLink,
   generateInfoGalleryLinks,
   generateNavigationLinks,
+  generateStickyHeadingContainer,
   generateTrackListDividedByGroups,
   getAlbumGridHTML,
   getAlbumStylesheet,
@@ -2460,6 +2461,10 @@ async function main() {
         bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
           link: bound.link,
           language,
+        });
+
+        bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {
+          html,
         });
 
         bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {

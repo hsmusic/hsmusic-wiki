@@ -96,6 +96,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({dateAddedToWiki, chunk: albums}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listAlbums.byDateAdded.date', {
               date: language.formatDate(dateAddedToWiki),
             })),
@@ -445,6 +446,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({category, groups}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listGroups.byCategory.category', {
               category: empty(groups)
                 ? category.name
@@ -594,6 +596,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({album, tracks}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listTracks.byAlbum.album', {
               album: link.album(album),
             })),
@@ -678,6 +681,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({album, tracks}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listTracks.byDurationInAlbum.album', {
               album: link.album(album),
             })),
@@ -731,6 +735,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({album, chunk: tracks}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listTracks.inFlashes.byAlbum.album', {
               album: link.album(album),
               date: language.formatDate(album.date),
@@ -766,6 +771,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({flash, tracks}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listTracks.inFlashes.byFlash.flash', {
               flash: link.flash(flash),
               date: language.formatDate(flash.date),
@@ -798,6 +804,7 @@ const listingSpec = [
       html.tag('dl',
         data.flatMap(({album, tracks}) => [
           html.tag('dt',
+            {class: ['content-heading']},
             language.$('listingPage.listTracks.withLyrics.album', {
               album: link.album(album),
               date: language.formatDate(album.date),

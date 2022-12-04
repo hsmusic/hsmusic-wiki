@@ -32,6 +32,7 @@ export function write(group, {wikiData}) {
       fancifyURL,
       generateInfoGalleryLinks,
       generateNavigationLinks,
+      generateStickyHeadingContainer,
       getLinkThemeString,
       getThemeString,
       html,
@@ -46,7 +47,7 @@ export function write(group, {wikiData}) {
 
       main: {
         content: [
-          html.tag('h1',
+          generateStickyHeadingContainer(
             language.$('groupInfoPage.title', {
               group: group.name
             })),
@@ -65,6 +66,7 @@ export function write(group, {wikiData}) {
           ...html.fragment(
             group.albums && [
               html.tag('h2',
+                {class: ['content-heading']},
                 language.$('groupInfoPage.albumList.title')),
 
               html.tag('p',

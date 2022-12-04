@@ -162,6 +162,7 @@ export function write(track, {wikiData}) {
       generateChronologyLinks,
       generateCoverLink,
       generateNavigationLinks,
+      generateStickyHeadingContainer,
       generateTrackListDividedByGroups,
       getAlbumStylesheet,
       getArtistString,
@@ -229,7 +230,8 @@ export function write(track, {wikiData}) {
               tags: track.artTags,
             }),
 
-            html.tag('h1', language.$('trackPage.title', {track: track.name})),
+            generateStickyHeadingContainer(
+              language.$('trackPage.title', {track: track.name})),
 
             html.tag('p',
               {
@@ -282,7 +284,9 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(otherReleases) && [
-                html.tag('p', language.$('releaseInfo.alsoReleasedAs')),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.alsoReleasedAs')),
+
                 html.tag('ul', otherReleases.map(track =>
                   html.tag('li', language.$('releaseInfo.alsoReleasedAs.item', {
                     track: link.track(track),
@@ -292,7 +296,9 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(contributorContribs) && [
-                html.tag('p', language.$('releaseInfo.contributors')),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.contributors')),
+
                 html.tag('ul', contributorContribs.map(contrib =>
                   html.tag('li', getArtistString([contrib], {
                     showContrib: true,
@@ -302,17 +308,21 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(referencedTracks) && [
-                html.tag('p', language.$('releaseInfo.tracksReferenced', {
-                  track: html.tag('i', track.name),
-                })),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.tracksReferenced', {
+                    track: html.tag('i', track.name),
+                  })),
+
                 html.tag('ul', referencedTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(
               !empty(referencedByTracks) && [
-                html.tag('p', language.$('releaseInfo.tracksThatReference', {
-                  track: html.tag('i', track.name),
-                })),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.tracksThatReference', {
+                    track: html.tag('i', track.name),
+                  })),
+
                 generateTrackListDividedByGroups(referencedByTracks, {
                   getTrackItem,
                   wikiData,
@@ -321,26 +331,32 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(sampledTracks) && [
-                html.tag('p', language.$('releaseInfo.tracksSampled', {
-                  track: html.tag('i', track.name),
-                })),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.tracksSampled', {
+                    track: html.tag('i', track.name),
+                  })),
+
                 html.tag('ul', sampledTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(
               !empty(sampledByTracks) && [
-                html.tag('p', language.$('releaseInfo.tracksThatSample', {
-                  track: html.tag('i', track.name),
-                })),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.tracksThatSample', {
+                    track: html.tag('i', track.name),
+                  })),
+
                 html.tag('ul', sampledByTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
               !empty(flashesThatFeature) && [
-                html.tag('p', language.$('releaseInfo.flashesThatFeature', {
-                  track: `<i>${track.name}</i>`,
-                })),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.flashesThatFeature', {
+                    track: html.tag('i', track.name),
+                  })),
+
                 html.tag('ul', flashesThatFeature.map(({flash, as}) =>
                   html.tag('li',
                     {class: as !== track && 'rerelease'},
@@ -356,13 +372,17 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               track.lyrics && [
-                html.tag('p', language.$('releaseInfo.lyrics')),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.lyrics')),
+
                 html.tag('blockquote', transformLyrics(track.lyrics)),
               ]),
 
             ...html.fragment(
               hasCommentary && [
-                html.tag('p', language.$('releaseInfo.artistCommentary')),
+                html.tag('p', {class: ['content-heading']},
+                  language.$('releaseInfo.artistCommentary')),
+
                 html.tag('blockquote', generateCommentary({
                   link,
                   language,

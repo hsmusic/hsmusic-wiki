@@ -296,7 +296,6 @@ export class Language extends Thing {
       return this.formatString('count.fileSize.bytes', {bytes});
     }
   }
-
 }
 
 const countHelper = (stringKey, argName = stringKey) =>

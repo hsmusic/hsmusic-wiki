@@ -106,6 +106,7 @@ export function write(album, {wikiData}) {
       generateChronologyLinks,
       generateCoverLink,
       generateNavigationLinks,
+      generateStickyHeadingContainer,
       getAlbumCover,
       getAlbumStylesheet,
       getArtistString,
@@ -159,9 +160,8 @@ export function write(album, {wikiData}) {
               tags: album.artTags,
             }),
 
-            html.tag('h1', language.$('albumPage.title', {
-              album: album.name,
-            })),
+            generateStickyHeadingContainer(
+              language.$('albumPage.title', {album: album.name})),
 
             html.tag('p',
               {
@@ -254,6 +254,7 @@ export function write(album, {wikiData}) {
                   tracks,
                 }) => [
                   html.tag('dt',
+                    {class: ['content-heading']},
                     language.$('trackList.section.withDuration', {
                       duration: language.formatDuration(getTotalDuration(tracks), {
                         approximate: tracks.length > 1,
@@ -300,7 +301,9 @@ export function write(album, {wikiData}) {
 
             ...html.fragment(
               album.commentary && [
-                html.tag('p', language.$('releaseInfo.artistCommentary')),
+                html.tag('p',
+                  {class: ['content-heading']},
+                  language.$('releaseInfo.artistCommentary')),
                 html.tag('blockquote', transformMultiline(album.commentary)),
               ]),
           ],

@@ -20,6 +20,7 @@ export function write(flash, {wikiData}) {
       generateChronologyLinks,
       generateCoverLink,
       generateNavigationLinks,
+      generateStickyHeadingContainer,
       getArtistString,
       getFlashCover,
       getThemeString,
@@ -44,7 +45,7 @@ export function write(flash, {wikiData}) {
             alt: language.$('misc.alt.flashArt'),
           }),
 
-          html.tag('h1',
+          generateStickyHeadingContainer(
             language.$('flashPage.title', {
               flash: flash.name,
             })),
@@ -68,6 +69,7 @@ export function write(flash, {wikiData}) {
           ...html.fragment(
             !empty(flash.featuredTracks) && [
               html.tag('p',
+                {class: ['content-heading']},
                 language.$('releaseInfo.tracksFeatured', {
                   flash: html.tag('i', flash.name),
                 })),
@@ -87,6 +89,7 @@ export function write(flash, {wikiData}) {
           ...html.fragment(
             !empty(flash.contributorContribs) && [
               html.tag('p',
+                {class: ['content-heading']},
                 language.$('releaseInfo.contributors')),
 
               html.tag('ul',
