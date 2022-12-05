@@ -1131,9 +1131,9 @@ writePage.html = (pageInfo, {
           {class: ['nav-main-links', ...nav.linkContainerClasses]},
           navLinkParts
         ),
-      nav.content && html.tag('div', {class: 'nav-content'}, nav.content),
       nav.bottomRowContent &&
         html.tag('div', {class: 'nav-bottom-row'}, nav.bottomRowContent),
+      nav.content && html.tag('div', {class: 'nav-content'}, nav.content),
     ]);
 
   const secondaryNavHTML = html.tag('nav',
