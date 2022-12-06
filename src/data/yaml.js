@@ -1379,7 +1379,7 @@ export async function quickLoadAllFromYAML(dataPath, {
     logInfo`No reference errors found. (complete data)`;
   } catch (error) {
     showAggregate(error);
-    logWarn`Duplicate directories found. (partial data)`;
+    logWarn`Reference errors found. (partial data)`;
   }
 
   sortWikiDataArrays(wikiData);
