@@ -151,7 +151,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 12;
+const CACHEBUST = 13;
 
 let COMMIT;
 try {
@@ -2456,7 +2456,10 @@ async function main() {
         });
 
         bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {
+          [bindOpts.bindIndex]: 0,
+          getRevealStringFromTags: bound.getRevealStringFromTags,
           html,
+          img,
         });
 
         bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {

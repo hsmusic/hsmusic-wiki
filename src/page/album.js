@@ -154,14 +154,19 @@ export function write(album, {wikiData}) {
 
         main: {
           content: [
+            generateStickyHeadingContainer({
+              title: language.$('albumPage.title', {album: album.name}),
+
+              coverSrc: cover,
+              coverAlt: language.$('misc.alt.albumCover'),
+              coverTags: album.artTags,
+            }),
+
             cover && generateCoverLink({
               src: cover,
               alt: language.$('misc.alt.albumCover'),
               tags: album.artTags,
             }),
-
-            generateStickyHeadingContainer(
-              language.$('albumPage.title', {album: album.name})),
 
             html.tag('p',
               {

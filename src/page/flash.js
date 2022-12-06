@@ -45,10 +45,11 @@ export function write(flash, {wikiData}) {
             alt: language.$('misc.alt.flashArt'),
           }),
 
-          generateStickyHeadingContainer(
-            language.$('flashPage.title', {
+          generateStickyHeadingContainer({
+            title: language.$('flashPage.title', {
               flash: flash.name,
-            })),
+            }),
+          }),
 
           html.tag('p',
             language.$('releaseInfo.released', {

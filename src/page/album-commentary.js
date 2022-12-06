@@ -36,10 +36,11 @@ export function write(album) {
 
       main: {
         content: html.tag('div', {class: 'long-content'}, [
-          generateStickyHeadingContainer(
-            language.$('albumCommentaryPage.title', {
+          generateStickyHeadingContainer({
+            title: language.$('albumCommentaryPage.title', {
               album: link.album(album),
-            })),
+            }),
+          }),
 
           html.tag('p',
             language.$('albumCommentaryPage.infoLine', {

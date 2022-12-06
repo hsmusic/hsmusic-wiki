@@ -165,6 +165,7 @@ body::before {
 }
 
 #content {
+  position: relative;
   --content-padding: 20px;
   box-sizing: border-box;
   padding: var(--content-padding);
@@ -188,16 +189,9 @@ body::before {
   margin: 5px 12%;
 }
 
-#cover-art-container {
-  float: right;
-  width: 40%;
-  max-width: 400px;
-  margin: -5px 0 10px 10px;
-}
-
 /* Layout - Wide (most computers) */
 
-@media not all and (max-width: 900px) {
+@media (min-width: 900px) {
   #secondary-nav:not(.no-hide) {
     display: none;
   }
@@ -210,15 +204,40 @@ body::before {
  * if so desired.
  */
 
-@media not all and (min-width: 900px), (max-width: 800px) {
-  body {
-    background: blue !important;
+@media (min-width: 600px) and (max-width: 899.98px) {
+}
+
+/* Layout - Wide or Medium */
+
+@media (min-width: 600px) {
+  .content-sticky-heading-container {
+    /* Safari doesn't always play nicely with position: sticky,
+     * this seems to fix images sometimes displaying above the
+     * position: absolute subheading (h2) child
+     *
+     * See also: https://stackoverflow.com/questions/50224855/
+     */
+    transform: translate3d(0, 0, 0);
+    z-index: 1;
+  }
+
+  /* Cover art floats to the right. It's positioned in HTML beneath the
+   * heading, so pull it up a little to "float" on top.
+   */
+  #cover-art-container {
+    float: right;
+    width: 40%;
+    max-width: 400px;
+    margin: -60px 0 10px 10px;
+
+    position: relative;
+    z-index: 2;
   }
 }
 
 /* Layout - Medium or Thin */
 
-@media (max-width: 900px) {
+@media (max-width: 899.98px) {
   .sidebar-column:not(.no-hide) {
     display: none;
   }
@@ -255,8 +274,7 @@ body::before {
   }
 
   #cover-art-container {
-    float: none;
-    margin: 0 0 40px 0;
+    margin: 25px 0 5px 0;
     width: 100%;
     max-width: unset;
   }
@@ -571,6 +589,9 @@ a:hover {
 
 #cover-art-container {
   font-size: 0.8em;
+}
+
+#cover-art {
   box-shadow: 0 0 3px 3px rgba(0, 0, 0, 0.25);
 }
 
@@ -1099,12 +1120,16 @@ img {
   top: 0;
 }
 
-#content .content-sticky-heading-container h1,
+.content-sticky-heading-container {
+  margin: calc(-1 * var(--content-padding));
+  margin-bottom: calc(0.5 * var(--content-padding));
+}
+
+.content-sticky-heading-row,
 #content:not(.no-sticky-heading) > h1:first-of-type
 /* , .sidebar:not(.no-sticky-heading) h1:first-of-type */
 {
-  margin: calc(-1 * var(--content-padding));
-  margin-bottom: calc(0.5 * var(--content-padding));
+  box-sizing: border-box;
   padding:
     calc(1.25 * var(--content-padding))
     20px
@@ -1118,34 +1143,66 @@ img {
           backdrop-filter: blur(6px);
 }
 
-#content .content-sticky-heading-container {
+.content-sticky-heading-row {
+  width: 100%;
+  margin: 0;
+}
+
+.content-sticky-heading-row,
+.content-sticky-subheading-row {
+  display: grid;
+  grid-template-areas:
+    "title cover";
+  grid-template-columns: 1fr min(40%, 400px);
+}
+
+.content-sticky-heading-row h1 {
+  margin: 0;
+}
+
+.content-sticky-heading-cover-container {
+  position: relative;
+  height: 0;
+  margin: -15px 0px -5px -5px;
+}
+
+.content-sticky-heading-cover {
+  position: absolute;
+  top: 0;
+  width: 80px;
+  right: 10px;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.35s, opacity 0.25s;
+}
+
+.content-sticky-heading-cover-container:not(.visible) .content-sticky-heading-cover {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.content-sticky-heading-cover .image-container {
+  border-width: 1px;
+  padding: 2px;
+}
+
+.content-sticky-heading-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.content-sticky-heading-container {
   position: sticky;
   top: 0;
-
-  /* Safari doesn't always play nicely with position: sticky,
-   * this seems to fix images sometimes displaying above the
-   * position: absolute subheading (h2) child
-   *
-   * See also: https://stackoverflow.com/questions/50224855/
-   */
-  transform: translate3d(0, 0, 0);
-  z-index: 1;
 }
 
-#content .content-sticky-heading-container h1 {
-  margin-bottom: 0;
-}
-
-#content .content-sticky-heading-container h2 {
+.content-sticky-subheading-row {
   position: absolute;
-  margin: 0 calc(-1 * var(--content-padding));
   width: 100%;
+  box-sizing: border-box;
   padding: 10px 40px 5px 20px;
-
-  font-size: 0.9em;
-  font-weight: normal;
-  font-style: oblique;
-  color: #eee;
+  margin-top: 0;
+  z-index: -1;
 
   background: var(--bg-black-color);
   border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
@@ -1156,14 +1213,35 @@ img {
   transition: margin-top 0.35s, opacity 0.25s;
 }
 
-#content .content-sticky-heading-container h2:not(.visible) {
+.content-sticky-subheading-row h2 {
+  margin: 0;
+
+  font-size: 0.9em;
+  font-weight: normal;
+  font-style: oblique;
+  color: #eee;
+}
+
+.content-sticky-subheading-row:not(.visible) {
   margin-top: -20px;
   opacity: 0;
 }
 
-#content .content-sticky-heading-container h2.visible {
+.content-sticky-heading-container h2.visible {
   margin-top: 0;
   opacity: 1;
+}
+
+.content-sticky-heading-row {
+  box-shadow:
+    inset 0 10px 10px -5px var(--shadow-color),
+    0 4px 4px rgba(0, 0, 0, 0.8);
+}
+
+.content-sticky-heading-container h2.visible {
+  box-shadow:
+    inset 0 10px 10px -5px var(--shadow-color),
+    0 4px 4px rgba(0, 0, 0, 0.8);
 }
 
 #content:not(.no-sticky-heading) > h1:first-of-type {
@@ -1173,33 +1251,10 @@ img {
     0 4px 4px rgba(0, 0, 0, 0.8);
 }
 
-#content .content-sticky-heading-container h1 {
-  box-shadow:
-    inset 0 10px 10px -5px var(--shadow-color),
-    0 4px 4px rgba(0, 0, 0, 0.8);
-}
-
-#content .content-sticky-heading-container h2.visible {
-  box-shadow:
-    inset 0 10px 10px -5px var(--shadow-color),
-    0 4px 4px rgba(0, 0, 0, 0.8);
-}
-
 #content:not(.no-sticky-heading) .long-content h1:first-of-type {
   margin-left: -40%;
   margin-right: -40%;
   padding-left: 40%;
-}
-
-#cover-art-container {
-  z-index: 2;
-  position: relative;
-}
-
-.sidebar:not(.no-sticky-heading) h1:first-of-type {
-  box-shadow:
-    inset 0 8px 8px -6px var(--shadow-color),
-    0 4px 4px rgba(0, 0, 0, 0.8);
 }
 
 #content, .sidebar {
@@ -1223,6 +1278,12 @@ img {
 
 .sidebar-multiple.sticky-column {
   align-self: flex-start;
+}
+
+.sidebar:not(.no-sticky-heading) h1:first-of-type {
+  box-shadow:
+    inset 0 8px 8px -6px var(--shadow-color),
+    0 4px 4px rgba(0, 0, 0, 0.8);
 }
 */
 

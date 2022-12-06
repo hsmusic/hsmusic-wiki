@@ -25,10 +25,11 @@ export function write(entry, {wikiData}) {
       main: {
         content:
           html.tag('div', {class: 'long-content'}, [
-            generateStickyHeadingContainer(
-              language.$('newsEntryPage.title', {
+            generateStickyHeadingContainer({
+              title: language.$('newsEntryPage.title', {
                 entry: entry.name,
-              })),
+              }),
+            }),
 
             html.tag('p',
               language.$('newsEntryPage.published', {

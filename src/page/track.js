@@ -224,14 +224,19 @@ export function write(track, {wikiData}) {
 
         main: {
           content: [
+            generateStickyHeadingContainer({
+              title: language.$('trackPage.title', {track: track.name}),
+
+              coverSrc: cover,
+              coverAlt: language.$('misc.alt.trackCover'),
+              coverTags: track.artTags,
+            }),
+
             cover && generateCoverLink({
               src: cover,
               alt: language.$('misc.alt.trackCover'),
               tags: track.artTags,
             }),
-
-            generateStickyHeadingContainer(
-              language.$('trackPage.title', {track: track.name})),
 
             html.tag('p',
               {

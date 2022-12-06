@@ -281,7 +281,7 @@ function unbound_generateCoverLink({
       id: 'cover-art',
       link: true,
       square: true,
-      reveal: getRevealStringFromTags(tags, {language}),
+      reveal: getRevealStringFromTags(tags),
     }),
 
     wikiInfo.enableArtTagUI &&
@@ -722,14 +722,37 @@ function unbound_generateNavigationLinks(current, {
 
 // Sticky heading, ooooo
 
-function unbound_generateStickyHeadingContainer(headingContent, {
+function unbound_generateStickyHeadingContainer({
+  getRevealStringFromTags,
   html,
+  img,
+
+  coverSrc,
+  coverAlt,
+  coverTags,
+  title,
 }) {
   return html.tag('div',
     {class: 'content-sticky-heading-container'},
     [
-      html.tag('h1', headingContent),
-      html.tag('h2', {class: 'content-sticky-subheading'}),
+      html.tag('div', {class: 'content-sticky-heading-row'}, [
+        html.tag('h1', title),
+
+        coverSrc &&
+          html.tag('div', {class: 'content-sticky-heading-cover-container'},
+            html.tag('div', {class: 'content-sticky-heading-cover'},
+              img({
+                src: coverSrc,
+                alt: coverAlt,
+                thumb: 'small',
+                link: false,
+                square: true,
+                reveal: getRevealStringFromTags(coverTags),
+              }))),
+      ]),
+
+      html.tag('div', {class: 'content-sticky-subheading-row'},
+        html.tag('h2', {class: 'content-sticky-subheading'})),
     ]);
 }
 

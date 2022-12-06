@@ -47,10 +47,11 @@ export function write(group, {wikiData}) {
 
       main: {
         content: [
-          generateStickyHeadingContainer(
-            language.$('groupInfoPage.title', {
+          generateStickyHeadingContainer({
+            title: language.$('groupInfoPage.title', {
               group: group.name
-            })),
+            }),
+          }),
 
           !empty(group.urls) &&
             html.tag('p',

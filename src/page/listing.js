@@ -46,8 +46,9 @@ export function write(listing, {wikiData}) {
 
         main: {
           content: [
-            generateStickyHeadingContainer(
-              language.$(titleKey)),
+            generateStickyHeadingContainer({
+              title: language.$(titleKey),
+            }),
 
             ...html.fragment(
               listing.html &&

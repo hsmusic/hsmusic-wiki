@@ -347,10 +347,11 @@ export function write(artist, {wikiData}) {
                 alt: language.$('misc.alt.artistAvatar'),
               }),
 
-            generateStickyHeadingContainer(
-              language.$('artistPage.title', {
+            generateStickyHeadingContainer({
+              title: language.$('artistPage.title', {
                 artist: name,
-              })),
+              }),
+            }),
 
             ...html.fragment(
               contextNotes && [

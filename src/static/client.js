@@ -449,14 +449,20 @@ if (localStorage.tryInfoCards) {
 const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-heading-container'))
   .map(stickyContainer => {
     const {parentElement: contentContainer} = stickyContainer;
-    const stickySubheading = stickyContainer.querySelector('.content-sticky-subheading');
+    const stickySubheadingRow = stickyContainer.querySelector('.content-sticky-subheading-row');
+    const stickySubheading = stickySubheadingRow.querySelector('h2');
+    const stickyCoverContainer = stickyContainer.querySelector('.content-sticky-heading-cover-container');
     const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
+    const contentCover = contentContainer.querySelector('#cover-art-container');
 
     return {
       contentContainer,
+      contentCover,
       contentHeadings,
       stickyContainer,
+      stickyCoverContainer,
       stickySubheading,
+      stickySubheadingRow,
       state: {
         displayedHeading: null,
       },
@@ -471,12 +477,21 @@ const topOfViewInside = (el, scroll = window.scrollY) => (
 function updateStickyHeading() {
   for (const {
     contentContainer,
+    contentCover,
     contentHeadings,
     stickyContainer,
+    stickyCoverContainer,
     stickySubheading,
+    stickySubheadingRow,
     state,
   } of stickyHeadingInfo) {
     let closestHeading = null;
+
+    if (contentCover.getBoundingClientRect().bottom < 0) {
+      stickyCoverContainer.classList.add('visible');
+    } else {
+      stickyCoverContainer.classList.remove('visible');
+    }
 
     if (topOfViewInside(contentContainer)) {
       if (stickySubheading.childNodes.length === 0) {
@@ -517,9 +532,9 @@ function updateStickyHeading() {
           }
         }
 
-        stickySubheading.classList.add('visible');
+        stickySubheadingRow.classList.add('visible');
       } else {
-        stickySubheading.classList.remove('visible');
+        stickySubheadingRow.classList.remove('visible');
       }
 
       state.displayedHeading = closestHeading;
