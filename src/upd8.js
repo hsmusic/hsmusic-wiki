@@ -2610,7 +2610,7 @@ async function main() {
   logInfo`Written!`;
 }
 
-if (isMain(import.meta.url)) {
+if (isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
   main()
     .catch((error) => {
       if (error instanceof AggregateError) {
