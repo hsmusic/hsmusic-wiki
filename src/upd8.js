@@ -1235,21 +1235,11 @@ writePage.html = (pageInfo, {
     socialEmbed.image &&
       html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
 
-    ...html.fragment(
-      colors && [
-        // Safari only respects the first media-matching meta tag here,
-        // so position the dark-specific entry first
-        html.tag('meta', {
-          name: 'theme-color',
-          content: colors.dark,
-          media: '(prefers-color-scheme: dark)'
-        }),
-
-        html.tag('meta', {
-          name: 'theme-color',
-          content: colors.primary,
-        }),
-      ]),
+    colors &&
+      html.tag('meta', {
+        name: 'theme-color',
+        content: colors.dark,
+      }),
 
     oEmbedJSONHref &&
       html.tag('link', {
