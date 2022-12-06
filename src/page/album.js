@@ -212,7 +212,7 @@ export function write(album, {wikiData}) {
                     date: language.formatDate(album.coverArtDate),
                   }),
 
-                album.duration > 0 &&
+                albumDuration > 0 &&
                   language.$('releaseInfo.duration', {
                     duration: language.formatDuration(albumDuration, {
                       approximate: album.tracks.length > 1,

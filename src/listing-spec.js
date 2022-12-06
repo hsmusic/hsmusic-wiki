@@ -52,7 +52,7 @@ const listingSpec = [
           album,
           duration: getTotalDuration(album.tracks),
         }))
-        .filter(album => album.duration)
+        .filter(({duration}) => duration > 0)
         .sort((a, b) => b.duration - a.duration),
 
     row: ({album, duration}, {language, link}) =>
@@ -531,6 +531,7 @@ const listingSpec = [
             group.albums.flatMap(album => album.tracks),
             {originalReleasesOnly: true}),
         }))
+        .filter(({duration}) => duration > 0)
         .sort((a, b) => b.duration - a.duration),
 
     row: ({group, duration}, {language, link}) =>
