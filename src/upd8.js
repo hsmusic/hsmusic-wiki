@@ -60,6 +60,7 @@ import find, {bindFind} from './util/find.js';
 import * as html from './util/html.js';
 import {getColors} from './util/colors.js';
 import {findFiles} from './util/io.js';
+import {isMain} from './util/node-utils.js';
 
 import CacheableObject from './data/things/cacheable-object.js';
 
@@ -1599,7 +1600,8 @@ function generateRedirectPage(title, target, {language}) {
   ]);
 }
 
-async function processLanguageFile(file) {
+// TODO: define somewhere besides upd8.js obviously
+export async function processLanguageFile(file) {
   const contents = await readFile(file, 'utf-8');
   const json = JSON.parse(contents);
 
@@ -2608,15 +2610,17 @@ async function main() {
   logInfo`Written!`;
 }
 
-main()
-  .catch((error) => {
-    if (error instanceof AggregateError) {
-      showAggregate(error);
-    } else {
-      console.error(error);
-    }
-  })
-  .then(() => {
-    decorateTime.displayTime();
-    CacheableObject.showInvalidAccesses();
-  });
+if (isMain(import.meta.url)) {
+  main()
+    .catch((error) => {
+      if (error instanceof AggregateError) {
+        showAggregate(error);
+      } else {
+        console.error(error);
+      }
+    })
+    .then(() => {
+      decorateTime.displayTime();
+      CacheableObject.showInvalidAccesses();
+    });
+}

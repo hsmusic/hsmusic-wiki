@@ -19,6 +19,7 @@
     },
     "license": "GPL-3.0",
     "devDependencies": {
+        "chokidar": "^3.5.3",
         "eslint": "^8.18.0",
         "tape": "^5.4.1"
     }
