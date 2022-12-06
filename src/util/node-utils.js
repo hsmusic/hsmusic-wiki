@@ -1,6 +1,7 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
 import {fileURLToPath} from 'url';
+import * as path from 'path';
 
 import _commandExists from 'command-exists';
 
@@ -45,5 +46,11 @@ export function promisifyProcess(proc, showLogging = true) {
 // is great 'cuz (module === require.main) doesn't work without CommonJS
 // modules.
 export function isMain(importMetaURL) {
-  return process.argv[1] === fileURLToPath(importMetaURL);
+  const metaPath = fileURLToPath(importMetaURL);
+  const relative = path.relative(process.argv[1], metaPath);
+  const isIndexJS = path.basename(metaPath) === 'index.js';
+  return [
+    '',
+    isIndexJS && 'index.js'
+  ].includes(relative);
 }
