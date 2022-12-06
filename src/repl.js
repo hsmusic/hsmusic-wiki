@@ -1,11 +1,16 @@
 import * as os from 'os';
 import * as path from 'path';
 import * as repl from 'repl';
+import {fileURLToPath} from 'url';
 
+import thingConstructors from './data/things/index.js';
 import {quickLoadAllFromYAML} from './data/yaml.js';
 import {logError, logWarn, parseOptions} from './util/cli.js';
-import {showAggregate} from './util/sugar.js';
+import {isMain} from './util/node-utils.js';
+import {bindOpts, showAggregate} from './util/sugar.js';
 import {generateURLs} from './util/urls.js';
+
+import {processLanguageFile} from './upd8.js';
 
 import * as serialize from './util/serialize.js';
 import * as sugar from './util/sugar.js';
@@ -13,6 +18,62 @@ import * as wikiDataUtils from './util/wiki-data.js';
 import _find, {bindFind} from './util/find.js';
 
 import urlSpec from './url-spec.js';
+
+export async function getContextAssignments({
+  wikiData,
+}) {
+  let urls;
+  try {
+    urls = generateURLs(urlSpec);
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to generate URL mappings for built-in urlSpec`;
+    logWarn`\`urls\` variable will be missing`;
+  }
+
+  let find;
+  try {
+    find = bindFind(wikiData);
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to prepare wikiData-bound find() functions`;
+    logWarn`\`find\` variable will be missing`;
+  }
+
+  let language;
+  try {
+    language = await processLanguageFile(
+      path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        'strings-default.json'));
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to create Language object`;
+    logWarn`\`language\` variable will be missing`;
+    language = undefined;
+  }
+
+  return {
+    wikiData,
+    ...wikiData,
+    WD: wikiData,
+
+    ...thingConstructors,
+    language,
+
+    ...sugar,
+    ...wikiDataUtils,
+
+    serialize,
+    S: serialize,
+
+    urls,
+
+    _find,
+    find,
+    bindFind,
+  };
+}
 
 async function main() {
   const miscOptions = await parseOptions(process.argv.slice(2), {
@@ -35,42 +96,17 @@ async function main() {
 
   console.log('HSMusic data REPL');
 
-  const wikiData = await quickLoadAllFromYAML(dataPath);
+  const wikiData = await quickLoadAllFromYAML(dataPath, {
+    showAggregate: bindOpts(showAggregate, {
+      showTraces: false,
+    }),
+  });
+
   const replServer = repl.start();
 
-  let urls;
-  try {
-    urls = generateURLs(urlSpec);
-  } catch (error) {
-    console.error(error);
-    logWarn`Failed to generate URL mappings for built-in urlSpec`;
-    logWarn`\`urls\` variable will be missing`;
-  }
-
-  let find;
-  try {
-    find = bindFind(wikiData);
-  } catch (error) {
-    console.error(error);
-    logWarn`Failed to prepare wikiData-bound find() functions`;
-    logWarn`\`find\` variable will be missing`;
-  }
-
-  Object.assign(replServer.context, wikiData, {
+  Object.assign(replServer.context, await getContextAssignments({
     wikiData,
-    WD: wikiData,
-
-    serialize,
-    S: serialize,
-
-    _find,
-    find,
-    bindFind,
-    urls,
-
-    ...sugar,
-    ...wikiDataUtils,
-  });
+  }));
 
   if (disableHistory) {
     console.log(`\rInput history disabled (--no-history provided)`);
@@ -92,10 +128,12 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  if (error instanceof AggregateError) {
-    showAggregate(error);
-  } else {
-    console.error(error);
-  }
-});
+if (isMain(import.meta.url)) {
+  main().catch((error) => {
+    if (error instanceof AggregateError) {
+      showAggregate(error);
+    } else {
+      console.error(error);
+    }
+  });
+}
