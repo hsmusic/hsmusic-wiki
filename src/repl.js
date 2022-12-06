@@ -3,8 +3,16 @@ import * as path from 'path';
 import * as repl from 'repl';
 
 import {quickLoadAllFromYAML} from './data/yaml.js';
-import {logError, parseOptions} from './util/cli.js';
+import {logError, logWarn, parseOptions} from './util/cli.js';
 import {showAggregate} from './util/sugar.js';
+import {generateURLs} from './util/urls.js';
+
+import * as serialize from './util/serialize.js';
+import * as sugar from './util/sugar.js';
+import * as wikiDataUtils from './util/wiki-data.js';
+import _find, {bindFind} from './util/find.js';
+
+import urlSpec from './url-spec.js';
 
 async function main() {
   const miscOptions = await parseOptions(process.argv.slice(2), {
@@ -30,7 +38,39 @@ async function main() {
   const wikiData = await quickLoadAllFromYAML(dataPath);
   const replServer = repl.start();
 
-  Object.assign(replServer.context, wikiData, {wikiData, WD: wikiData});
+  let urls;
+  try {
+    urls = generateURLs(urlSpec);
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to generate URL mappings for built-in urlSpec`;
+    logWarn`\`urls\` variable will be missing`;
+  }
+
+  let find;
+  try {
+    find = bindFind(wikiData);
+  } catch (error) {
+    console.error(error);
+    logWarn`Failed to prepare wikiData-bound find() functions`;
+    logWarn`\`find\` variable will be missing`;
+  }
+
+  Object.assign(replServer.context, wikiData, {
+    wikiData,
+    WD: wikiData,
+
+    serialize,
+    S: serialize,
+
+    _find,
+    find,
+    bindFind,
+    urls,
+
+    ...sugar,
+    ...wikiDataUtils,
+  });
 
   if (disableHistory) {
     console.log(`\rInput history disabled (--no-history provided)`);
