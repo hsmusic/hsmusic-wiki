@@ -10,7 +10,7 @@ import {isMain} from './util/node-utils.js';
 import {bindOpts, showAggregate} from './util/sugar.js';
 import {generateURLs} from './util/urls.js';
 
-import {processLanguageFile} from './upd8.js';
+import {processLanguageFile} from './data/language.js';
 
 import * as serialize from './util/serialize.js';
 import * as sugar from './util/sugar.js';

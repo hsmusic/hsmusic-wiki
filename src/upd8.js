@@ -34,15 +34,11 @@
 import * as path from 'path';
 import {fileURLToPath} from 'url';
 
-// It stands for "HTML Entities", apparently. Cursed.
-import he from 'he';
-
 import chroma from 'chroma-js';
 
 import {
   copyFile,
   mkdir,
-  readFile,
   stat,
   symlink,
   writeFile,
@@ -64,9 +60,8 @@ import {isMain} from './util/node-utils.js';
 
 import CacheableObject from './data/things/cacheable-object.js';
 
+import {processLanguageFile} from './data/language.js';
 import {serializeThings} from './data/serialize.js';
-
-import T from './data/things/index.js';
 
 import {
   filterDuplicateDirectories,
@@ -1602,45 +1597,6 @@ function generateRedirectHTML(title, target, {language}) {
   ]);
 }
 
-// TODO: define somewhere besides upd8.js obviously
-export async function processLanguageFile(file) {
-  const contents = await readFile(file, 'utf-8');
-  const json = JSON.parse(contents);
-
-  const code = json['meta.languageCode'];
-  if (!code) {
-    throw new Error(`Missing language code (file: ${file})`);
-  }
-  delete json['meta.languageCode'];
-
-  const intlCode = json['meta.languageIntlCode'] ?? null;
-  delete json['meta.languageIntlCode'];
-
-  const name = json['meta.languageName'];
-  if (!name) {
-    throw new Error(`Missing language name (${code})`);
-  }
-  delete json['meta.languageName'];
-
-  const hidden = json['meta.hidden'] ?? false;
-  delete json['meta.hidden'];
-
-  if (json['meta.baseDirectory']) {
-    logWarn`(${code}) Language JSON still has unused meta.baseDirectory`;
-    delete json['meta.baseDirectory'];
-  }
-
-  const language = new T.Language();
-  language.code = code;
-  language.intlCode = intlCode;
-  language.name = name;
-  language.hidden = hidden;
-  language.escapeHTML = (string) =>
-    he.encode(string, {useNamedReferences: true});
-  language.strings = json;
-  return language;
-}
-
 // Wrapper function for running a function once for all languages.
 async function wrapLanguages(fn, {languages, writeOneLanguage = null}) {
   const k = writeOneLanguage;
@@ -2616,7 +2572,9 @@ async function main() {
   logInfo`Written!`;
 }
 
-if (isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
+// TODO: isMain detection isn't consistent across platforms here
+/* eslint-disable-next-line no-constant-condition */
+if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
   main()
     .catch((error) => {
       if (error instanceof AggregateError) {
