@@ -36,8 +36,14 @@ export class Album extends Thing {
       update: {validate: isDate},
 
       expose: {
-        dependencies: ['date'],
-        transform: (coverArtDate, {date}) => coverArtDate ?? date ?? null,
+        dependencies: ['date', 'hasCoverArt'],
+        transform: (coverArtDate, {
+          date,
+          hasCoverArt,
+        }) =>
+          (hasCoverArt
+            ? coverArtDate ?? date ?? null
+            : null),
       },
     },
 
