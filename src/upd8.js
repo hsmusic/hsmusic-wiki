@@ -824,21 +824,12 @@ function validateWriteObject(obj) {
   return {success: true};
 }
 
-/*
-async function writeData(subKey, directory, data) {
-  const paths = writePage.paths('', 'data.' + subKey, directory, {file: 'data.json'});
-  await writePage.write(JSON.stringify(data), {paths});
-}
-*/
-
-// This used to 8e a function! It's long 8een divided into multiple helper
-// functions, and nowadays we just directly access those, rather than ever
-// touching the original one (which had contained everything).
-const writePage = {};
-
-writePage.to =
-  ({baseDirectory, pageSubKey, paths}) =>
-  (targetFullKey, ...args) => {
+export function getURLsFrom({
+  baseDirectory,
+  pageSubKey,
+  paths,
+}) {
+  return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
     let path = paths.subdirectoryPrefix;
 
@@ -876,8 +867,9 @@ writePage.to =
 
     return path;
   };
+}
 
-writePage.html = (pageInfo, {
+export function generateDocumentHTML(pageInfo, {
   defaultLanguage,
   getThemeString,
   language,
@@ -888,7 +880,7 @@ writePage.html = (pageInfo, {
   to,
   transformMultiline,
   wikiData,
-}) => {
+}) {
   const {wikiInfo} = wikiData;
 
   let {
@@ -1257,9 +1249,9 @@ writePage.html = (pageInfo, {
     {
       lang: language.intlCode,
       'data-language-code': language.code,
-      'data-url-key': paths.toPath[0],
+      'data-url-key': paths.urlPath[0],
       ...Object.fromEntries(
-        paths.toPath.slice(1).map((v, i) => [['data-url-value' + i], v])
+        paths.urlPath.slice(1).map((v, i) => [['data-url-value' + i], v])
       ),
       'data-rebase-localized': to('localized.root'),
       'data-rebase-shared': to('shared.root'),
@@ -1387,9 +1379,9 @@ writePage.html = (pageInfo, {
           }),
         ]),
     ]);
-};
+}
 
-writePage.oEmbedJSON = (pageInfo, {language, wikiData}) => {
+function generateOEmbedJSON(pageInfo, {language, wikiData}) {
   const {socialEmbed} = pageInfo;
   const {wikiInfo} = wikiData;
   const {canonicalBase, nameShort} = wikiInfo;
@@ -1416,22 +1408,32 @@ writePage.oEmbedJSON = (pageInfo, {language, wikiData}) => {
   if (!entries.length) return '';
 
   return JSON.stringify(Object.fromEntries(entries));
-};
+}
 
-writePage.write = async ({html, oEmbedJSON = '', paths}) => {
-  await mkdir(paths.outputDirectory, {recursive: true});
+async function writePage({
+  html,
+  oEmbedJSON = '',
+  paths,
+}) {
+  await mkdir(paths.output.directory, {recursive: true});
+
   await Promise.all(
     [
-      writeFile(paths.outputFile, html),
-      oEmbedJSON && writeFile(paths.oEmbedJSONFile, oEmbedJSON),
+      writeFile(paths.output.documentHTML, html),
+
+      oEmbedJSON &&
+        writeFile(paths.output.oEmbedJSON, oEmbedJSON),
     ].filter(Boolean)
   );
-};
+}
 
-// TODO: This only supports one <>-style argument.
-writePage.paths = (baseDirectory, fullKey, directory = '', {
+function getPagePaths({
+  baseDirectory,
+  fullKey,
+  urlArgs,
+
   file = 'index.html',
-} = {}) => {
+}) {
   const [groupKey, subKey] = fullKey.split('.');
 
   const pathname =
@@ -1441,27 +1443,32 @@ writePage.paths = (baseDirectory, fullKey, directory = '', {
           .toDevice(
             'localizedWithBaseDirectory.' + subKey,
             baseDirectory,
-            directory
-          )
-      : urls.from('shared.root').toDevice(fullKey, directory);
+            ...urlArgs)
+      : urls
+          .from('shared.root')
+          .toDevice(fullKey, ...urlArgs);
 
-  // Needed for the rare directory which itself contains a slash, e.g. for
-  // listings, with directories like 'albums/by-name'.
-  const subdirectoryPrefix = '../'.repeat(directory.split('/').length - 1);
+  // Needed for the rare path arguments which themselves contains one or more
+  // slashes, e.g. for listings, with arguments like 'albums/by-name'.
+  const subdirectoryPrefix =
+    '../'.repeat(urlArgs.join('/').split('/').length - 1);
 
   const outputDirectory = path.join(outputPath, pathname);
-  const outputFile = path.join(outputDirectory, file);
-  const oEmbedJSONFile = path.join(outputDirectory, OEMBED_JSON_FILE);
+
+  const output = {
+    directory: outputDirectory,
+    documentHTML: path.join(outputDirectory, file),
+    oEmbedJSON: path.join(outputDirectory, OEMBED_JSON_FILE)
+  };
 
   return {
-    toPath: [fullKey, directory],
+    urlPath: [fullKey, ...urlArgs],
+
+    output,
     pathname,
     subdirectoryPrefix,
-    outputDirectory,
-    outputFile,
-    oEmbedJSONFile,
   };
-};
+}
 
 async function writeFavicon() {
   try {
@@ -1518,7 +1525,7 @@ function writeSharedFilesAndPages({language, wikiData}) {
       from,
       urls.from('shared.root').to(urlKey, directory)
     );
-    const content = generateRedirectPage(title, target, {language});
+    const content = generateRedirectHTML(title, target, {language});
     await mkdir(path.join(outputPath, from), {recursive: true});
     await writeFile(path.join(outputPath, from, 'index.html'), content);
   };
@@ -1565,7 +1572,7 @@ function writeSharedFilesAndPages({language, wikiData}) {
   ].filter(Boolean));
 }
 
-function generateRedirectPage(title, target, {language}) {
+function generateRedirectHTML(title, target, {language}) {
   return `<!DOCTYPE html>\n` + html.tag('html', [
     html.tag('head', [
       html.tag('title', language.$('redirectPage.title', {title})),
@@ -2294,32 +2301,33 @@ async function main() {
       ...pageWrites.map((props) => () => {
         const {path, page} = props;
 
-        // TODO: This only supports one <>-style argument.
         const pageSubKey = path[0];
-        const directory = path[1];
+        const urlArgs = path.slice(1);
 
         const localizedPaths = Object.fromEntries(
           Object.entries(languages)
-            .filter(
-              ([key, language]) => key !== 'default' && !language.hidden
-            )
+            .filter(([key, language]) =>
+              key !== 'default' &&
+              !language.hidden)
             .map(([_key, language]) => [
               language.code,
-              writePage.paths(
-                language === finalDefaultLanguage ? '' : language.code,
-                'localized.' + pageSubKey,
-                directory
-              ),
-            ])
-        );
+              getPagePaths({
+                baseDirectory:
+                  (language === finalDefaultLanguage
+                    ? ''
+                    : language.code),
+                fullKey: 'localized.' + pageSubKey,
+                urlArgs,
+              }),
+            ]));
 
-        const paths = writePage.paths(
+        const paths = getPagePaths({
           baseDirectory,
-          'localized.' + pageSubKey,
-          directory
-        );
+          fullKey: 'localized.' + pageSubKey,
+          urlArgs,
+        });
 
-        const to = writePage.to({
+        const to = getURLsFrom({
           baseDirectory,
           pageSubKey,
           paths,
@@ -2543,7 +2551,7 @@ async function main() {
           getSizeOfAdditionalFile,
         });
 
-        const oEmbedJSON = writePage.oEmbedJSON(pageInfo, {
+        const oEmbedJSON = generateOEmbedJSON(pageInfo, {
           language,
           wikiData,
         });
@@ -2556,7 +2564,7 @@ async function main() {
               .from('shared.root')
               .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
 
-        const pageHTML = writePage.html(pageInfo, {
+        const pageHTML = generateDocumentHTML(pageInfo, {
           defaultLanguage: finalDefaultLanguage,
           getThemeString: bound.getThemeString,
           language,
@@ -2569,7 +2577,7 @@ async function main() {
           wikiData,
         });
 
-        return writePage.write({
+        return writePage({
           html: pageHTML,
           oEmbedJSON,
           paths,
@@ -2580,21 +2588,21 @@ async function main() {
           language,
         });
 
-        // TODO: This only supports one <>-style argument.
-        const fromPaths = writePage.paths(
+        const from = getPagePaths({
           baseDirectory,
-          'localized.' + fromPath[0],
-          fromPath[1]
-        );
-        const to = writePage.to({
+          fullKey: 'localized.' + fromPath[0],
+          urlArgs: fromPath.slice(1),
+        });
+
+        const to = getURLsFrom({
           baseDirectory,
           pageSubKey: fromPath[0],
-          paths: fromPaths,
+          paths: from,
         });
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
-        const html = generateRedirectPage(title, target, {language});
-        return writePage.write({html, paths: fromPaths});
+        const html = generateRedirectHTML(title, target, {language});
+        return writePage({html, paths: from});
       }),
     ], queueSize));
   };

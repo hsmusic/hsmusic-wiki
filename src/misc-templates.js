@@ -771,9 +771,9 @@ function unbound_getFooterLocalizationLinks(pathname, {
   defaultLanguage,
   languages,
 }) {
-  const {toPath} = paths;
-  const keySuffix = toPath[0].replace(/^localized\./, '.');
-  const toArgs = toPath.slice(1);
+  const {urlPath} = paths;
+  const keySuffix = urlPath[0].replace(/^localized\./, '.');
+  const toArgs = urlPath.slice(1);
 
   const links = Object.entries(languages)
     .filter(([code, language]) => code !== 'default' && !language.hidden)
