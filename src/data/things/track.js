@@ -164,17 +164,26 @@ export class Track extends Thing {
       update: {validate: isDate},
 
       expose: {
-        dependencies: ['albumData', 'dateFirstReleased'],
+        dependencies: [
+          'albumData',
+          'coverArtistContribsByRef',
+          'dateFirstReleased',
+          'hasCoverArt',
+        ],
         transform: (coverArtDate, {
           albumData,
+          coverArtistContribsByRef,
           dateFirstReleased,
+          hasCoverArt,
           [Track.instance]: track,
         }) =>
-          coverArtDate ??
-          dateFirstReleased ??
-          Track.findAlbum(track, albumData)?.trackArtDate ??
-          Track.findAlbum(track, albumData)?.date ??
-          null,
+          (Track.hasCoverArt(track, albumData, coverArtistContribsByRef, hasCoverArt)
+            ? coverArtDate ??
+              dateFirstReleased ??
+              Track.findAlbum(track, albumData)?.trackArtDate ??
+              Track.findAlbum(track, albumData)?.date ??
+              null
+            : null),
       },
     },
 

@@ -265,6 +265,7 @@ export function write(track, {wikiData}) {
                     date: language.formatDate(track.date),
                   }),
 
+                cover &&
                 track.coverArtDate &&
                 +track.coverArtDate !== +track.date &&
                   language.$('releaseInfo.artReleased', {
