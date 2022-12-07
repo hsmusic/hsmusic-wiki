@@ -717,8 +717,8 @@ blockquote {
 }
 
 .long-content {
-  margin-left: 12%;
-  margin-right: 12%;
+  padding-left: 12%;
+  padding-right: 12%;
 }
 
 p img {
@@ -1113,22 +1113,26 @@ img {
 
 /* Sticky heading */
 
-#content:not(.no-sticky-heading) > h1:first-of-type
-/* , .sidebar:not(.no-sticky-heading) h1:first-of-type */
-{
+.content-sticky-heading-container {
   position: sticky;
   top: 0;
-}
 
-.content-sticky-heading-container {
   margin: calc(-1 * var(--content-padding));
   margin-bottom: calc(0.5 * var(--content-padding));
 }
 
-.content-sticky-heading-row,
-#content:not(.no-sticky-heading) > h1:first-of-type
-/* , .sidebar:not(.no-sticky-heading) h1:first-of-type */
-{
+.content-sticky-heading-container.long-content {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.content-sticky-heading-container.long-content .content-sticky-heading-row,
+.content-sticky-heading-container.long-content .content-sticky-subheading-row {
+  padding-left: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
+  padding-right: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
+}
+
+.content-sticky-heading-row {
   box-sizing: border-box;
   padding:
     calc(1.25 * var(--content-padding))
@@ -1148,8 +1152,8 @@ img {
   margin: 0;
 }
 
-.content-sticky-heading-row,
-.content-sticky-subheading-row {
+.content-sticky-heading-container.has-cover .content-sticky-heading-row,
+.content-sticky-heading-container.has-cover .content-sticky-subheading-row {
   display: grid;
   grid-template-areas:
     "title cover";
@@ -1191,11 +1195,6 @@ img {
   height: 100%;
 }
 
-.content-sticky-heading-container {
-  position: sticky;
-  top: 0;
-}
-
 .content-sticky-subheading-row {
   position: absolute;
   width: 100%;
@@ -1216,7 +1215,7 @@ img {
 .content-sticky-subheading-row h2 {
   margin: 0;
 
-  font-size: 0.9em;
+  font-size: 0.9em !important;
   font-weight: normal;
   font-style: oblique;
   color: #eee;
@@ -1244,48 +1243,9 @@ img {
     0 4px 4px rgba(0, 0, 0, 0.8);
 }
 
-#content:not(.no-sticky-heading) > h1:first-of-type {
-  z-index: 1;
-  box-shadow:
-    inset 0 10px 10px -5px var(--shadow-color),
-    0 4px 4px rgba(0, 0, 0, 0.8);
-}
-
-#content:not(.no-sticky-heading) .long-content h1:first-of-type {
-  margin-left: -40%;
-  margin-right: -40%;
-  padding-left: 40%;
-}
-
 #content, .sidebar {
   contain: paint;
 }
-
-/* Sticky sidebar */
-
-/*
-.sidebar-column.sidebar.sticky-column,
-.sidebar-column.sidebar.sticky-last,
-.sidebar-multiple.sticky-last > .sidebar:last-child,
-.sidebar-multiple.sticky-column {
-  position: sticky;
-  top: 10px;
-}
-
-.sidebar-multiple.sticky-last {
-  align-self: stretch;
-}
-
-.sidebar-multiple.sticky-column {
-  align-self: flex-start;
-}
-
-.sidebar:not(.no-sticky-heading) h1:first-of-type {
-  box-shadow:
-    inset 0 8px 8px -6px var(--shadow-color),
-    0 4px 4px rgba(0, 0, 0, 0.8);
-}
-*/
 
 /* important easter egg mode */
 
