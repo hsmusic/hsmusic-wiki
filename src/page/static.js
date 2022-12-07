@@ -10,15 +10,23 @@ export function write(staticPage) {
   const page = {
     type: 'page',
     path: ['staticPage', staticPage.directory],
-    page: ({html, transformMultiline}) => ({
+    page: ({
+      generateStickyHeadingContainer,
+      html,
+      transformMultiline,
+    }) => ({
       title: staticPage.name,
       stylesheet: staticPage.stylesheet,
 
       main: {
-        content: html.tag('div', {class: 'long-content'}, [
-          html.tag('h1', staticPage.name),
-          transformMultiline(staticPage.content),
-        ]),
+        content: [
+          generateStickyHeadingContainer({
+            class: ['long-content'],
+            title: staticPage.name,
+          }),
+          html.tag('div', {class: 'long-content'},
+            transformMultiline(staticPage.content)),
+        ],
       },
 
       nav: {simple: true},

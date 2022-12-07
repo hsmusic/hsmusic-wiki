@@ -487,10 +487,12 @@ function updateStickyHeading() {
   } of stickyHeadingInfo) {
     let closestHeading = null;
 
-    if (contentCover.getBoundingClientRect().bottom < 0) {
-      stickyCoverContainer.classList.add('visible');
-    } else {
-      stickyCoverContainer.classList.remove('visible');
+    if (contentCover && stickyCoverContainer) {
+      if (contentCover.getBoundingClientRect().bottom < 0) {
+        stickyCoverContainer.classList.add('visible');
+      } else {
+        stickyCoverContainer.classList.remove('visible');
+      }
     }
 
     if (topOfViewInside(contentContainer)) {

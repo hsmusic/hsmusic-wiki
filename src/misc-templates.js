@@ -727,13 +727,17 @@ function unbound_generateStickyHeadingContainer({
   html,
   img,
 
+  class: classes,
   coverSrc,
   coverAlt,
   coverTags,
   title,
 }) {
   return html.tag('div',
-    {class: 'content-sticky-heading-container'},
+    {class: [
+      'content-sticky-heading-container',
+      coverSrc && 'has-cover',
+    ].concat(classes)},
     [
       html.tag('div', {class: 'content-sticky-heading-row'}, [
         html.tag('h1', title),

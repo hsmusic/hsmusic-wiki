@@ -562,6 +562,11 @@ function transformMultiline(text, {parseAttributes, transformInline}) {
       ) {
         lineTag = '';
       }
+
+      // for sticky headings!
+      if (elementMatch) {
+        lineContent = lineContent.replace(/<h2/, `<h2 class="content-heading"`)
+      }
     }
 
     let pushString = indentString.repeat(indentThisLine);
