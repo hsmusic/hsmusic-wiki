@@ -105,11 +105,12 @@ const link = {
     // href that ends with `/` and append `index.html` to the returned
     // value (for to.thing() functions). This is handy when developing
     // without a local server (i.e. using file:// protocol URLs in your
-    // 8rowser), 8ut isn't guaranteed to 8e 100% 8ug-free.
+    // we8 8rowser), 8ut isn't guaranteed to 8e 100% 8ug-free.
     appendIndexHTML: false,
   },
 
   album: linkDirectory('album'),
+  albumGallery: linkDirectory('albumGallery'),
   albumCommentary: linkDirectory('albumCommentary'),
   artist: linkDirectory('artist', {color: false}),
   artistGallery: linkDirectory('artistGallery', {color: false}),

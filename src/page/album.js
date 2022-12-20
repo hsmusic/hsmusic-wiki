@@ -52,6 +52,9 @@ export function write(album, {wikiData}) {
   const hasAdditionalFiles = !empty(album.additionalFiles);
   const albumDuration = getTotalDuration(album.tracks);
 
+  // TODO: code this obviously
+  const hasGalleryPage = true;
+
   const displayTrackGroups =
     album.trackGroups &&
       (album.trackGroups.length > 1 ||
@@ -96,7 +99,7 @@ export function write(album, {wikiData}) {
     }),
   };
 
-  const page = {
+  const infoPage = {
     type: 'page',
     path: ['album', album.directory],
     page: ({
@@ -234,6 +237,13 @@ export function write(album, {wikiData}) {
                 hasAdditionalFiles &&
                   generateAdditionalFilesShortcut(album.additionalFiles),
 
+                hasGalleryPage &&
+                  language.$('releaseInfo.viewGallery', {
+                    link: link.albumGallery(album, {
+                      text: language.$('releaseInfo.viewGallery.link'),
+                    }),
+                  }),
+
                 hasCommentaryEntries &&
                   language.$('releaseInfo.viewCommentary', {
                     link: link.albumCommentary(album, {
@@ -355,7 +365,78 @@ export function write(album, {wikiData}) {
     },
   };
 
-  return [page, data];
+  // TODO: only gen if there are any tracks with art
+  const galleryPage = {
+    type: 'page',
+    path: ['albumGallery', album.directory],
+    page: ({
+      // generateInfoGalleryLinks,
+      // generateNavigationLinks,
+      getAlbumCover,
+      getGridHTML,
+      getTrackCover,
+      // getLinkThemeString,
+      getThemeString,
+      html,
+      language,
+      link,
+    }) => ({
+      title: language.$('albumGalleryPage.title', {album: album.name}),
+
+      themeColor: album.color,
+      theme: getThemeString(album.color),
+
+      main: {
+        classes: ['top-index'],
+        content: [
+          html.tag('h1',
+            language.$('albumGalleryPage.title', {
+              album: album.name,
+            })),
+
+          html.tag('p',
+            {class: 'quick-info'},
+            (album.date
+              ? language.$('albumGalleryPage.infoLine.withDate', {
+                  tracks: html.tag('b',
+                    language.countTracks(album.tracks.length, {unit: true})),
+                  duration: html.tag('b',
+                    language.formatDuration(albumDuration, {unit: true})),
+                  date: html.tag('b',
+                    language.formatDate(album.date)),
+                })
+              : language.$('albumGalleryPage.infoLine', {
+                  tracks: html.tag('b',
+                    language.countTracks(album.tracks.length, {unit: true})),
+                  duration: html.tag('b',
+                    language.formatDuration(albumDuration, {unit: true})),
+                }))),
+
+          html.tag('div',
+            {class: 'grid-listing'},
+            getGridHTML({
+              srcFn: t => t.album ? getTrackCover(t) : getAlbumCover(t),
+              linkFn: (t, opts) => t.album ? link.track(t, opts) : link.album(t, opts),
+              noSrcTextFn: t =>
+                language.$('misc.albumGalleryGrid.noCoverArt', {
+                  name: t.name,
+                }),
+
+              entries: [
+                // {item: album},
+                ...album.tracks.map(track => ({item: track})),
+              ],
+            })),
+        ],
+      },
+    }),
+  };
+
+  return [
+    infoPage,
+    galleryPage,
+    data,
+  ];
 }
 
 // Utility functions

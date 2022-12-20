@@ -25,6 +25,7 @@ const urlSpec = {
       home: '',
 
       album: 'album/<>/',
+      albumGallery: 'album/<>/gallery/',
       albumCommentary: 'commentary/album/<>/',
 
       artist: 'artist/<>/',
