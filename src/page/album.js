@@ -47,13 +47,8 @@ export function write(album, {wikiData}) {
           }));
   };
 
-  const hasCommentaryEntries =
-    !empty([album, ...album.tracks].filter((x) => x.commentary));
   const hasAdditionalFiles = !empty(album.additionalFiles);
   const albumDuration = getTotalDuration(album.tracks);
-
-  // TODO: code this obviously
-  const hasGalleryPage = true;
 
   const displayTrackGroups =
     album.trackGroups &&
@@ -237,14 +232,14 @@ export function write(album, {wikiData}) {
                 hasAdditionalFiles &&
                   generateAdditionalFilesShortcut(album.additionalFiles),
 
-                hasGalleryPage &&
+                checkGalleryPage(album) &&
                   language.$('releaseInfo.viewGallery', {
                     link: link.albumGallery(album, {
                       text: language.$('releaseInfo.viewGallery.link'),
                     }),
                   }),
 
-                hasCommentaryEntries &&
+                checkCommentaryPage(album) &&
                   language.$('releaseInfo.viewCommentary', {
                     link: link.albumCommentary(album, {
                       text: language.$('releaseInfo.viewCommentary.link'),
@@ -343,12 +338,16 @@ export function write(album, {wikiData}) {
                 album: link.album(album, {class: 'current'}),
               }),
             },
+            {
+              divider: false,
+              html: generateAlbumNavLinks(album, null, {
+                generateNavigationLinks,
+                html,
+                language,
+                link,
+              }),
+            }
           ],
-          bottomRowContent: generateAlbumNavLinks(album, null, {
-            generateNavigationLinks,
-            html,
-            language,
-          }),
           content: generateAlbumChronologyLinks(album, null, {
             generateChronologyLinks,
             html,
@@ -373,6 +372,7 @@ export function write(album, {wikiData}) {
       // generateInfoGalleryLinks,
       // generateNavigationLinks,
       getAlbumCover,
+      getAlbumStylesheet,
       getGridHTML,
       getTrackCover,
       // getLinkThemeString,
@@ -382,6 +382,7 @@ export function write(album, {wikiData}) {
       link,
     }) => ({
       title: language.$('albumGalleryPage.title', {album: album.name}),
+      stylesheet: getAlbumStylesheet(album),
 
       themeColor: album.color,
       theme: getThemeString(album.color),
@@ -429,6 +430,12 @@ export function write(album, {wikiData}) {
             })),
         ],
       },
+
+      nav: generateAlbumExtrasPageNav(album, 'gallery', {
+        html,
+        language,
+        link,
+      }),
     }),
   };
 
@@ -634,35 +641,101 @@ export function generateAlbumSecondaryNav(album, currentTrack, {
   };
 }
 
+function checkGalleryPage(_album) {
+  return true;
+}
+
+function checkCommentaryPage(album) {
+  return !empty([album, ...album.tracks].filter((x) => x.commentary));
+}
+
 export function generateAlbumNavLinks(album, currentTrack, {
   generateNavigationLinks,
   html,
   language,
+  link,
+
+  currentExtra = null,
+  showTrackNavigation = true,
+  showExtraLinks = null,
 }) {
   const isTrackPage = !!currentTrack;
 
-  if (album.tracks.length <= 1) {
-    return '';
-  }
+  showExtraLinks ??= currentTrack ? false : true;
 
-  const randomLink = html.tag('a',
-    {
-      href: '#',
-      'data-random': 'track-in-album',
-      id: 'random-button'
-    },
-    (isTrackPage
-      ? language.$('trackPage.nav.random')
-      : language.$('albumPage.nav.randomTrack')));
+  const extraLinks = showExtraLinks ? [
+    checkGalleryPage(album) &&
+      link.albumGallery(album, {
+        class: [currentExtra === 'gallery' && 'current'],
+        text: language.$('albumPage.nav.gallery'),
+      }),
 
-  const navigationLinks =
-    generateNavigationLinks(currentTrack, {
-      additionalLinks: [randomLink],
-      data: album.tracks,
-      linkKey: 'track',
-    });
+    checkCommentaryPage(album) &&
+      link.albumCommentary(album, {
+        class: [currentExtra === 'commentary' && 'current'],
+        text: language.$('albumPage.nav.commentary'),
+      }),
+  ].filter(Boolean) : [];
 
-  return `(${navigationLinks})`;
+  const previousNextLinks =
+    showTrackNavigation &&
+    album.tracks.length > 1 &&
+      generateNavigationLinks(currentTrack, {
+        data: album.tracks,
+        linkKey: 'track',
+        returnAsArray: true,
+      })
+
+  const randomLink =
+    showTrackNavigation &&
+    album.tracks.length > 1 &&
+      html.tag('a',
+        {
+          href: '#',
+          'data-random': 'track-in-album',
+          id: 'random-button'
+        },
+        (isTrackPage
+          ? language.$('trackPage.nav.random')
+          : language.$('albumPage.nav.randomTrack')));
+
+  const allLinks = [
+    ...previousNextLinks || [],
+    ...extraLinks || [],
+    randomLink,
+  ].filter(Boolean);
+
+  return `(${language.formatUnitList(allLinks)})`;
+}
+
+export function generateAlbumExtrasPageNav(album, currentExtra, {
+  html,
+  language,
+  link,
+}) {
+  return {
+    linkContainerClasses: ['nav-links-hierarchy'],
+    links: [
+      {toHome: true},
+      {
+        html: language.$('albumPage.nav.album', {
+          album: link.album(album, {class: 'current'}),
+        }),
+      },
+      {
+        divider: false,
+        html: generateAlbumNavLinks(album, null, {
+          currentExtra,
+          showTrackNavigation: false,
+          showExtraLinks: true,
+
+          html,
+          language,
+          link,
+        }),
+      }
+    ],
+  };
 }
 
 export function generateAlbumChronologyLinks(album, currentTrack, {

@@ -200,6 +200,8 @@
   "albumPage.title": "{ALBUM}",
   "albumPage.nav.album": "{ALBUM}",
   "albumPage.nav.randomTrack": "Random Track",
+  "albumPage.nav.gallery": "Gallery",
+  "albumPage.nav.commentary": "Commentary",
   "albumGalleryPage.title": "{ALBUM} - Gallery",
   "albumGalleryPage.infoLine": "{TRACKS} totaling {DURATION}.",
   "albumGalleryPage.infoLine.withDate": "{TRACKS} totaling {DURATION}. Released {DATE}.",

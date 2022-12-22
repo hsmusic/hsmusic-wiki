@@ -1,5 +1,6 @@
 // Album commentary page and index specifications.
 
+import {generateAlbumExtrasPageNav} from './album.js';
 import {accumulateSum} from '../util/sugar.js';
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';
 
@@ -38,7 +39,7 @@ export function write(album) {
         content: html.tag('div', {class: 'long-content'}, [
           generateStickyHeadingContainer({
             title: language.$('albumCommentaryPage.title', {
-              album: link.album(album),
+              album: album.name,
             }),
           }),
 
@@ -70,21 +71,11 @@ export function write(album) {
         ]),
       },
 
-      nav: {
-        linkContainerClasses: ['nav-links-hierarchy'],
-        links: [
-          {toHome: true},
-          {
-            path: ['localized.commentaryIndex'],
-            title: language.$('commentaryIndex.title'),
-          },
-          {
-            html: language.$('albumCommentaryPage.nav.album', {
-              album: link.albumCommentary(album, {class: 'current'}),
-            }),
-          },
-        ],
-      },
+      nav: generateAlbumExtrasPageNav(album, 'commentary', {
+        html,
+        language,
+        link,
+      }),
     }),
   };
 

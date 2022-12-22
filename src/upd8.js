@@ -1068,10 +1068,6 @@ export function generateDocumentHTML(pageInfo, {
     let partContent;
 
     if (typeof cur.html === 'string') {
-      if (!cur.html) {
-        logWarn`Empty HTML in nav link ${JSON.stringify(cur)}`;
-        console.trace();
-      }
       partContent = cur.html;
     } else {
       const attributes = {
@@ -1098,6 +1094,8 @@ export function generateDocumentHTML(pageInfo, {
       }
       partContent = html.tag('a', attributes, linkTitle);
     }
+
+    if (!partContent) continue;
 
     const part = html.tag('span',
       {class: cur.divider === false && 'no-divider'},

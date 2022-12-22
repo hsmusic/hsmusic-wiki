@@ -676,6 +676,7 @@ function unbound_generateNavigationLinks(current, {
   data,
   isMain = true,
   linkKey = 'anything',
+  returnAsArray = false,
 }) {
   let previousLink, nextLink;
 
@@ -713,11 +714,13 @@ function unbound_generateNavigationLinks(current, {
     ...additionalLinks,
   ].filter(Boolean);
 
-  if (!links.length) {
+  if (returnAsArray) {
+    return links;
+  } else if (empty(links)) {
     return '';
+  } else {
+    return language.formatUnitList(links);
   }
-
-  return language.formatUnitList(links);
 }
 
 // Sticky heading, ooooo
