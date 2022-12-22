@@ -416,12 +416,21 @@ export function write(album, {wikiData}) {
           html.tag('div',
             {class: 'grid-listing'},
             getGridHTML({
-              srcFn: t => t.album ? getTrackCover(t) : getAlbumCover(t),
               linkFn: (t, opts) => t.album ? link.track(t, opts) : link.album(t, opts),
               noSrcTextFn: t =>
                 language.$('misc.albumGalleryGrid.noCoverArt', {
                   name: t.name,
                 }),
+
+              srcFn(t) {
+                if (!t.album) {
+                  return getAlbumCover(t);
+                } else if (t.hasUniqueCoverArt) {
+                  return getTrackCover(t);
+                } else {
+                  return null;
+                }
+              },
 
               entries: [
                 // {item: album},
@@ -641,12 +650,12 @@ export function generateAlbumSecondaryNav(album, currentTrack, {
   };
 }
 
-function checkGalleryPage(_album) {
-  return true;
+function checkGalleryPage(album) {
+  return album.tracks.some(t => t.hasUniqueCoverArt);
 }
 
 function checkCommentaryPage(album) {
-  return !empty([album, ...album.tracks].filter((x) => x.commentary));
+  return !!album.commentary || album.tracks.some(t => t.commentary);
 }
 
 export function generateAlbumNavLinks(album, currentTrack, {

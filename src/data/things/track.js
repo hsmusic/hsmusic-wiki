@@ -187,6 +187,26 @@ export class Track extends Thing {
       },
     },
 
+    hasUniqueCoverArt: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['albumData', 'coverArtistContribsByRef', 'hasCoverArt'],
+        compute: ({
+          albumData,
+          coverArtistContribsByRef,
+          hasCoverArt,
+          [Track.instance]: track,
+        }) =>
+          Track.hasUniqueCoverArt(
+            track,
+            albumData,
+            coverArtistContribsByRef,
+            hasCoverArt
+          ),
+      },
+    },
+
     originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
       'originalReleaseTrackByRef',
       'trackData',
@@ -323,6 +343,26 @@ export class Track extends Thing {
     Track.findAlbum(track, albumData)?.hasTrackArt ??
     true
   );
+
+  // Now this is a doozy!
+  static hasUniqueCoverArt(
+    track,
+    albumData,
+    coverArtistContribsByRef,
+    hasCoverArt
+  ) {
+    if (coverArtistContribsByRef?.length > 0) {
+      return true;
+    } else if (coverArtistContribsByRef) {
+      return false;
+    } else if (hasCoverArt === false) {
+      return false;
+    } else if (Track.findAlbum(track, albumData)?.hasTrackArt) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   [inspect.custom]() {
     const base = Thing.prototype[inspect.custom].apply(this);
