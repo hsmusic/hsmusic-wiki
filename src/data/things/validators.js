@@ -162,6 +162,16 @@ export function validateInstanceOf(constructor) {
   return (object) => isInstance(object, constructor);
 }
 
+export function validateFromConstants(...values) {
+  return (value) => {
+    if (!values.includes(value)) {
+      throw new TypeError(`Expected one of ${values.join(', ')}`);
+    }
+
+    return true;
+  };
+}
+
 // Wiki data (primitives & non-primitives)
 
 export function isColor(color) {

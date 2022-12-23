@@ -421,6 +421,7 @@ export function makeProcessHomepageLayoutRowDocument(rowClass, spec) {
 export const homepageLayoutRowTypeProcessMapping = {
   albums: makeProcessHomepageLayoutRowDocument(T.HomepageLayoutAlbumsRow, {
     propertyFieldMapping: {
+      displayStyle: 'Display Style',
       sourceGroupByRef: 'Group',
       countAlbumsFromGroup: 'Count',
       sourceAlbumsByRef: 'Albums',

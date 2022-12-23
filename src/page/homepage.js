@@ -16,15 +16,17 @@ export function writeTargetless({wikiData}) {
 
     switch (type) {
       case 'albums': {
+        entry.displayStyle = row.displayStyle;
+
         switch (row.sourceGroupByRef) {
           case 'new-releases':
-            entry.gridEntries = getNewReleases(row.countAlbumsFromGroup, {wikiData});
+            entry.entries = getNewReleases(row.countAlbumsFromGroup, {wikiData});
             break;
           case 'new-additions':
-            entry.gridEntries = getNewAdditions(row.countAlbumsFromGroup, {wikiData});
+            entry.entries = getNewAdditions(row.countAlbumsFromGroup, {wikiData});
             break;
           default:
-            entry.gridEntries = row.sourceGroup
+            entry.entries = row.sourceGroup
               ? row.sourceGroup.albums
                   .slice()
                   .reverse()
@@ -35,7 +37,7 @@ export function writeTargetless({wikiData}) {
         }
 
         if (!empty(row.sourceAlbums)) {
-          entry.gridEntries.push(...row.sourceAlbums.map(album => ({item: album})));
+          entry.entries.push(...row.sourceAlbums.map(album => ({item: album})));
         }
 
         entry.actionLinks = row.actionLinks ?? [];
@@ -46,12 +48,20 @@ export function writeTargetless({wikiData}) {
     return entry;
   });
 
+  const transformActionLinks = (actionLinks, {
+    transformInline,
+  }) =>
+    actionLinks?.map(transformInline)
+      .map(a => a.replace('<a', '<a class="box grid-item"'));
+
   const page = {
     type: 'page',
     path: ['home'],
     page: ({
       getAlbumGridHTML,
+      getAlbumCover,
       getLinkThemeString,
+      getMontageHTML,
       html,
       language,
       link,
@@ -84,10 +94,11 @@ export function writeTargetless({wikiData}) {
                     entry.name),
 
                   entry.type === 'albums' &&
+                  entry.displayStyle === 'grid' &&
                     html.tag('div', {class: 'grid-listing'}, [
                       ...html.fragment(
                         getAlbumGridHTML({
-                          entries: entry.gridEntries,
+                          entries: entry.entries,
                           lazy: i > 0,
                         })),
 
@@ -96,9 +107,27 @@ export function writeTargetless({wikiData}) {
                           [html.onlyIfContent]: true,
                           class: 'grid-actions',
                         },
-                        entry.actionLinks?.map(action =>
-                          transformInline(action)
-                            .replace('<a', '<a class="box grid-item"'))),
+                        transformActionLinks(entry.actionLinks, {
+                          transformInline,
+                        })),
+                    ]),
+
+                  ...html.fragment(
+                    entry.type === 'albums' &&
+                    entry.displayStyle === 'montage' && [
+                      getMontageHTML({
+                        items: entry.entries.map(e => e.item),
+                        lazy: i > 0,
+                        srcFn: getAlbumCover,
+                        linkFn: link.album,
+                      }),
+
+                      entry.actionLinks.length &&
+                        html.tag('div', {class: 'grid-listing'},
+                          html.tag('div', {class: 'grid-actions'},
+                            transformActionLinks(entry.actionLinks, {
+                              transformInline,
+                            }))),
                     ]),
                 ]))),
         ]),

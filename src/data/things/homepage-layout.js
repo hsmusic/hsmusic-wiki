@@ -65,6 +65,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       isCountingNumber,
       isString,
       validateArrayItems,
+      validateFromConstants,
     },
   } = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
@@ -81,6 +82,19 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
           return true;
         },
+      },
+    },
+
+    displayStyle: {
+      flags: {update: true, expose: true},
+
+      update: {
+        validate: validateFromConstants('grid', 'montage'),
+      },
+
+      expose: {
+        transform: (displayStyle) =>
+          displayStyle ?? 'grid',
       },
     },
 

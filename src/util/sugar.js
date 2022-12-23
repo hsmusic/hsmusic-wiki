@@ -40,6 +40,20 @@ export function empty(arrayOrNull) {
   }
 }
 
+// Repeats all the items of an array a number of times.
+export function repeat(times, array) {
+  if (typeof array === 'string') return repeat(times, [array]);
+  if (empty(array)) return [];
+  if (times === 0) return [];
+  if (times === 1) return array.slice();
+
+  const out = [];
+  for (let n = 1; n <= times; n++) {
+    out.push(...array);
+  }
+  return out;
+}
+
 // Sums the values in an array, optionally taking a function which maps each
 // item to a number (handy for accessing a certain property on an array of like
 // objects). This also coalesces null values to zero, so if the mapping function

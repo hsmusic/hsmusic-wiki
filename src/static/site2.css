@@ -930,7 +930,7 @@ img {
 
 .grid-actions {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   margin: 15px;
   align-self: center;
 }
@@ -953,6 +953,139 @@ img {
   min-width: 120px;
   max-width: 180px;
   font-size: 0.9em;
+}
+
+/* Montage */
+
+.montage-container {
+  position: relative;
+  overflow: hidden;
+  margin: 20px 0 5px 0;
+  padding: 8px 0;
+}
+
+.montage-container::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -20;
+  background-color: var(--dim-color);
+  filter: brightness(0.6);
+}
+
+.montage-container::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  z-index: 40;
+  box-shadow:
+    inset 20px 2px 40px var(--shadow-color),
+    inset -20px -2px 40px var(--shadow-color);
+}
+
+.montage-container:hover .montage-grid {
+  animation-play-state: running;
+}
+
+.montage-grid:nth-child(2),
+.montage-grid:nth-child(3) {
+  position: absolute;
+  top: 8px;
+  left: 0;
+  right: 0;
+}
+
+.montage-grid:nth-child(2) {
+  animation-name: montage-marquee2;
+}
+
+.montage-grid:nth-child(3) {
+  animation-name: montage-marquee3;
+}
+
+@keyframes montage-marquee1 {
+  0% {
+    transform: translateX(0%) translateX(-70px);
+  }
+
+  100% {
+    transform: translateX(-100%) translateX(-70px);
+  }
+}
+
+@keyframes montage-marquee2 {
+  0% {
+    transform: translateX(100%) translateX(-70px);
+  }
+
+  100% {
+    transform: translateX(0%) translateX(-70px);
+  }
+}
+
+@keyframes montage-marquee3 {
+  0% {
+    transform: translateX(200%) translateX(-70px);
+  }
+
+  100% {
+    transform: translateX(100%) translateX(-70px);
+  }
+}
+
+.montage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: dense;
+  grid-auto-rows: 0;
+  overflow: hidden;
+  margin: auto;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1;
+
+  transform: translateX(0);
+  animation: montage-marquee1 40s linear infinite;
+  animation-play-state: paused;
+  z-index: 5;
+  filter: brightness(0.6);
+}
+
+.montage-item {
+  display: inline-block;
+  margin: 0;
+  flex: 1 1 150px;
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.montage-item .image-container {
+  border: none;
+  padding: 0;
+}
+
+.montage-item img {
+  width: 100%;
+  height: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-radius: 6px;
+}
+
+.montage-item:hover {
+  filter: brightness(1.2);
+  background: var(--dim-color);
 }
 
 /* Squares */

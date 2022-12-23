@@ -6,6 +6,7 @@ import T from './data/things/index.js';
 
 import {
   empty,
+  repeat,
   unique,
 } from './util/sugar.js';
 
@@ -639,6 +640,46 @@ function unbound_getFlashGridHTML({
   });
 }
 
+// Montage reels
+
+function unbound_getMontageHTML({
+  html,
+  img,
+
+  items,
+  lazy = true,
+
+  altFn = () => '',
+  linkFn = (x, {text}) => text,
+  srcFn,
+}) {
+  return (x => x)(html.tag('div', {class: 'montage-container'},
+    repeat(3,
+      html.tag('div',
+        {
+          class: 'montage-grid',
+          'aria-hidden': 'true',
+        },
+        items
+          .filter(item => srcFn(item))
+          .filter(item => item.artTags.every(tag => !tag.isContentWarning))
+          .map((item, i) =>
+            html.tag('div', {class: 'montage-item'},
+              linkFn(item, {
+                attributes: {
+                  tabindex: '-1',
+                },
+                text:
+                  img({
+                    src: srcFn(item),
+                    alt: altFn(item),
+                    thumb: 'small',
+                    lazy: typeof lazy === 'number' ? i >= lazy : lazy,
+                    square: true,
+                  }),
+              })))))));
+}
+
 // Nav-bar links
 
 function unbound_generateInfoGalleryLinks(currentThing, isGallery, {
@@ -836,6 +877,8 @@ export {
   unbound_getGridHTML as getGridHTML,
   unbound_getAlbumGridHTML as getAlbumGridHTML,
   unbound_getFlashGridHTML as getFlashGridHTML,
+
+  unbound_getMontageHTML as getMontageHTML,
 
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,

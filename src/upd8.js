@@ -89,6 +89,7 @@ import {
   getFlashGridHTML,
   getFooterLocalizationLinks,
   getGridHTML,
+  getMontageHTML,
   getRevealStringFromTags,
   getRevealStringFromWarnings,
   getThemeString as unbound_getThemeString,
@@ -2487,6 +2488,12 @@ async function main() {
           getFlashCover: bound.getFlashCover,
           getGridHTML: bound.getGridHTML,
         });
+
+        bound.getMontageHTML = bindOpts(getMontageHTML, {
+          [bindOpts.bindIndex]: 0,
+          img,
+          html,
+        })
 
         bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
           to,
