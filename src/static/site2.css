@@ -933,6 +933,8 @@ img {
   flex-direction: row;
   margin: 15px;
   align-self: center;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .grid-actions > .grid-item {
