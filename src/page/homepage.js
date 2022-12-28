@@ -123,11 +123,10 @@ export function writeTargetless({wikiData}) {
                       }),
 
                       entry.actionLinks.length &&
-                        html.tag('div', {class: 'grid-listing'},
-                          html.tag('div', {class: 'grid-actions'},
-                            transformActionLinks(entry.actionLinks, {
-                              transformInline,
-                            }))),
+                        html.tag('div', {class: 'grid-actions'},
+                          transformActionLinks(entry.actionLinks, {
+                            transformInline,
+                          })),
                     ]),
                 ]))),
         ]),

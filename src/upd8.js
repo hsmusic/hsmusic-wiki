@@ -147,7 +147,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 14;
+const CACHEBUST = 15;
 
 let COMMIT;
 try {
@@ -1166,6 +1166,11 @@ export function generateDocumentHTML(pageInfo, {
         class: [
           'layout-columns',
           !collapseSidebars && 'vertical-when-thin',
+          (sidebarLeftHTML || sidebarRightHTML) && 'has-one-sidebar',
+          (sidebarLeftHTML && sidebarRightHTML) && 'has-two-sidebars',
+          !(sidebarLeftHTML || sidebarRightHTML) && 'has-zero-sidebars',
+          sidebarLeftHTML && 'has-sidebar-left',
+          sidebarRightHTML && 'has-sidebar-right',
         ],
       },
       [

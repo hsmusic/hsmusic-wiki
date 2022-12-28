@@ -586,7 +586,7 @@ function unbound_getGridHTML({
           img({
             src: srcFn(item),
             alt: altFn(item),
-            thumb: 'small',
+            thumb: 'medium',
             lazy: typeof lazy === 'number' ? i >= lazy : lazy,
             square: true,
             reveal: getRevealStringFromTags(item.artTags, {language}),
