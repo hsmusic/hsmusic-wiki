@@ -640,9 +640,9 @@ function unbound_getFlashGridHTML({
   });
 }
 
-// Montage reels
+// Carousel reels
 
-function unbound_getMontageHTML({
+function unbound_getCarouselHTML({
   html,
   img,
 
@@ -653,18 +653,18 @@ function unbound_getMontageHTML({
   linkFn = (x, {text}) => text,
   srcFn,
 }) {
-  return (x => x)(html.tag('div', {class: 'montage-container'},
+  return (x => x)(html.tag('div', {class: 'carousel-container'},
     repeat(3,
       html.tag('div',
         {
-          class: 'montage-grid',
+          class: 'carousel-grid',
           'aria-hidden': 'true',
         },
         items
           .filter(item => srcFn(item))
           .filter(item => item.artTags.every(tag => !tag.isContentWarning))
           .map((item, i) =>
-            html.tag('div', {class: 'montage-item'},
+            html.tag('div', {class: 'carousel-item'},
               linkFn(item, {
                 attributes: {
                   tabindex: '-1',
@@ -878,7 +878,7 @@ export {
   unbound_getAlbumGridHTML as getAlbumGridHTML,
   unbound_getFlashGridHTML as getFlashGridHTML,
 
-  unbound_getMontageHTML as getMontageHTML,
+  unbound_getCarouselHTML as getCarouselHTML,
 
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,

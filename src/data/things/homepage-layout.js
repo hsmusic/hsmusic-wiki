@@ -89,7 +89,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       flags: {update: true, expose: true},
 
       update: {
-        validate: validateFromConstants('grid', 'montage'),
+        validate: validateFromConstants('grid', 'carousel'),
       },
 
       expose: {

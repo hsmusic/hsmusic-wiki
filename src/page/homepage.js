@@ -60,8 +60,8 @@ export function writeTargetless({wikiData}) {
     page: ({
       getAlbumGridHTML,
       getAlbumCover,
+      getCarouselHTML,
       getLinkThemeString,
-      getMontageHTML,
       html,
       language,
       link,
@@ -114,8 +114,8 @@ export function writeTargetless({wikiData}) {
 
                   ...html.fragment(
                     entry.type === 'albums' &&
-                    entry.displayStyle === 'montage' && [
-                      getMontageHTML({
+                    entry.displayStyle === 'carousel' && [
+                      getCarouselHTML({
                         items: entry.entries.map(e => e.item),
                         lazy: i > 0,
                         srcFn: getAlbumCover,

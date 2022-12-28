@@ -89,7 +89,7 @@ import {
   getFlashGridHTML,
   getFooterLocalizationLinks,
   getGridHTML,
-  getMontageHTML,
+  getCarouselHTML,
   getRevealStringFromTags,
   getRevealStringFromWarnings,
   getThemeString as unbound_getThemeString,
@@ -147,7 +147,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 15;
+const CACHEBUST = 16;
 
 let COMMIT;
 try {
@@ -2494,7 +2494,7 @@ async function main() {
           getGridHTML: bound.getGridHTML,
         });
 
-        bound.getMontageHTML = bindOpts(getMontageHTML, {
+        bound.getCarouselHTML = bindOpts(getCarouselHTML, {
           [bindOpts.bindIndex]: 0,
           img,
           html,

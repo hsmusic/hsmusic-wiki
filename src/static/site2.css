@@ -189,131 +189,6 @@ body::before {
   margin: 5px 12%;
 }
 
-/* Layout - Wide (most computers) */
-
-@media (min-width: 900px) {
-  #secondary-nav:not(.no-hide) {
-    display: none;
-  }
-}
-
-/* Layout - Medium (tablets, some landscape mobiles)
- *
- * Note: Rules defined here are exclusive to "medium" width, i.e. they don't
- * additionally apply to "thin". Use the later section which applies to both
- * if so desired.
- */
-
-@media (min-width: 600px) and (max-width: 899.98px) {
-}
-
-/* Layout - Wide or Medium */
-
-@media (min-width: 600px) {
-  .content-sticky-heading-container {
-    /* Safari doesn't always play nicely with position: sticky,
-     * this seems to fix images sometimes displaying above the
-     * position: absolute subheading (h2) child
-     *
-     * See also: https://stackoverflow.com/questions/50224855/
-     */
-    transform: translate3d(0, 0, 0);
-    z-index: 1;
-  }
-
-  /* Cover art floats to the right. It's positioned in HTML beneath the
-   * heading, so pull it up a little to "float" on top.
-   */
-  #cover-art-container {
-    float: right;
-    width: 40%;
-    max-width: 400px;
-    margin: -60px 0 10px 10px;
-
-    position: relative;
-    z-index: 2;
-  }
-
-  .layout-columns.has-one-sidebar .grid-listing {
-    grid-template-columns: repeat(12, 1fr);
-  }
-
-  .layout-columns.has-one-sidebar .grid-listing > .grid-item:not(:nth-child(n+7)) {
-    grid-column: span 4;
-  }
-
-  .layout-columns.has-one-sidebar .grid-listing > .grid-item:nth-child(n+7) {
-    grid-column: span 3;
-  }
-
-  .layout-columns.has-zero-sidebars .grid-listing {
-    grid-template-columns: repeat(20, 1fr);
-  }
-
-  .layout-columns.has-zero-sidebars .grid-listing > .grid-item:not(:nth-child(n+9)) {
-    grid-column: span 5;
-  }
-
-  .layout-columns.has-zero-sidebars .grid-listing > .grid-item:nth-child(n+9) {
-    grid-column: span 4;
-  }
-}
-
-/* Layout - Medium or Thin */
-
-@media (max-width: 899.98px) {
-  .sidebar-column:not(.no-hide) {
-    display: none;
-  }
-
-  #secondary-nav {
-    display: block;
-  }
-
-  .layout-columns.vertical-when-thin {
-    flex-direction: column;
-  }
-
-  .layout-columns.vertical-when-thin > *:not(:last-child) {
-    margin-bottom: 10px;
-  }
-
-  .sidebar-column.no-hide {
-    max-width: unset !important;
-    flex-basis: unset !important;
-    margin-right: 0 !important;
-    margin-left: 0 !important;
-  }
-
-  .sidebar .news-entry:not(.first-news-entry) {
-    display: none;
-  }
-}
-
-/* Layout - Thin (phones) */
-
-@media (max-width: 600px) {
-  .content-columns {
-    columns: 1;
-  }
-
-  #cover-art-container {
-    margin: 25px 0 5px 0;
-    width: 100%;
-    max-width: unset;
-  }
-
-  /* Disable grid features, just line header children up vertically */
-
-  #header {
-    display: block;
-  }
-
-  #header > div:not(:first-child) {
-    margin-top: 0.5em;
-  }
-}
-
 /* Design & Appearance - Layout elements */
 
 body {
@@ -667,6 +542,11 @@ h1 {
   font-size: 2em;
 }
 
+html[data-url-key="localized.home"] #content h1 {
+  text-align: center;
+  font-size: 2.5em;
+}
+
 #content.flash-index h2 {
   text-align: center;
   font-size: 2.5em;
@@ -896,16 +776,11 @@ img {
 /* Grid listings */
 
 .grid-listing {
-  /*
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  */
-
-  display: grid;
-  padding: 15px;
-  grid-gap: 30px;
+  padding: 5px 15px;
 }
 
 .grid-item {
@@ -919,6 +794,7 @@ img {
   border: 1px dotted var(--primary-color);
   border-radius: 2px;
   padding: 5px;
+  margin: 10px;
 }
 
 .grid-item img {
@@ -958,11 +834,11 @@ img {
 }
 
 .grid-listing > .grid-item {
-  flex: 1 1 26%;
+  flex: 1 25%;
+  max-width: 200px;
 }
 
 .grid-actions {
-  grid-column: span 12;
   display: flex;
   flex-direction: row;
   margin: 15px;
@@ -979,16 +855,16 @@ img {
   --dim-color: inherit !important;
 }
 
-/* Montage */
+/* Carousel */
 
-.montage-container {
+.carousel-container {
   position: relative;
   overflow: hidden;
   margin: 20px 0 5px 0;
   padding: 8px 0;
 }
 
-.montage-container::before {
+.carousel-container::before {
   content: "";
   position: absolute;
   top: 0;
@@ -1000,7 +876,7 @@ img {
   filter: brightness(0.6);
 }
 
-.montage-container::after {
+.carousel-container::after {
   content: "";
   pointer-events: none;
   position: absolute;
@@ -1016,27 +892,27 @@ img {
     inset -20px -2px 40px var(--shadow-color);
 }
 
-.montage-container:hover .montage-grid {
+.carousel-container:hover .carousel-grid {
   animation-play-state: running;
 }
 
-.montage-grid:nth-child(2),
-.montage-grid:nth-child(3) {
+.carousel-grid:nth-child(2),
+.carousel-grid:nth-child(3) {
   position: absolute;
   top: 8px;
   left: 0;
   right: 0;
 }
 
-.montage-grid:nth-child(2) {
-  animation-name: montage-marquee2;
+.carousel-grid:nth-child(2) {
+  animation-name: carousel-marquee2;
 }
 
-.montage-grid:nth-child(3) {
-  animation-name: montage-marquee3;
+.carousel-grid:nth-child(3) {
+  animation-name: carousel-marquee3;
 }
 
-@keyframes montage-marquee1 {
+@keyframes carousel-marquee1 {
   0% {
     transform: translateX(0%) translateX(-70px);
   }
@@ -1046,7 +922,7 @@ img {
   }
 }
 
-@keyframes montage-marquee2 {
+@keyframes carousel-marquee2 {
   0% {
     transform: translateX(100%) translateX(-70px);
   }
@@ -1056,7 +932,7 @@ img {
   }
 }
 
-@keyframes montage-marquee3 {
+@keyframes carousel-marquee3 {
   0% {
     transform: translateX(200%) translateX(-70px);
   }
@@ -1066,7 +942,7 @@ img {
   }
 }
 
-.montage-grid {
+.carousel-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   grid-template-rows: repeat(2, auto);
@@ -1080,26 +956,26 @@ img {
   z-index: 1;
 
   transform: translateX(0);
-  animation: montage-marquee1 40s linear infinite;
+  animation: carousel-marquee1 40s linear infinite;
   animation-play-state: paused;
   z-index: 5;
-  filter: brightness(0.6);
 }
 
-.montage-item {
+.carousel-item {
   display: inline-block;
   margin: 0;
   flex: 1 1 150px;
   padding: 3px;
   border-radius: 10px;
+  filter: brightness(0.8);
 }
 
-.montage-item .image-container {
+.carousel-item .image-container {
   border: none;
   padding: 0;
 }
 
-.montage-item img {
+.carousel-item img {
   width: 100%;
   height: 100%;
   margin-top: auto;
@@ -1107,8 +983,8 @@ img {
   border-radius: 6px;
 }
 
-.montage-item:hover {
-  filter: brightness(1.2);
+.carousel-item:hover {
+  filter: brightness(1);
   background: var(--dim-color);
 }
 
@@ -1411,4 +1287,120 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   font-family: cursive;
   display: block;
   content: "(Preview Build)";
+  font-size: 0.8em;
+}
+
+/* Layout - Wide (most computers) */
+
+@media (min-width: 900px) {
+  #secondary-nav:not(.no-hide) {
+    display: none;
+  }
+}
+
+/* Layout - Medium (tablets, some landscape mobiles)
+ *
+ * Note: Rules defined here are exclusive to "medium" width, i.e. they don't
+ * additionally apply to "thin". Use the later section which applies to both
+ * if so desired.
+ */
+
+@media (min-width: 600px) and (max-width: 899.98px) {
+}
+
+/* Layout - Wide or Medium */
+
+@media (min-width: 600px) {
+  .content-sticky-heading-container {
+    /* Safari doesn't always play nicely with position: sticky,
+     * this seems to fix images sometimes displaying above the
+     * position: absolute subheading (h2) child
+     *
+     * See also: https://stackoverflow.com/questions/50224855/
+     */
+    transform: translate3d(0, 0, 0);
+    z-index: 1;
+  }
+
+  /* Cover art floats to the right. It's positioned in HTML beneath the
+   * heading, so pull it up a little to "float" on top.
+   */
+  #cover-art-container {
+    float: right;
+    width: 40%;
+    max-width: 400px;
+    margin: -60px 0 10px 10px;
+
+    position: relative;
+    z-index: 2;
+  }
+
+  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:not(:nth-child(n+7)) {
+    flex-basis: 23%;
+    margin: 15px;
+  }
+
+  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:nth-child(n+7) {
+    flex-basis: 18%;
+    margin: 10px;
+  }
+}
+
+/* Layout - Medium or Thin */
+
+@media (max-width: 899.98px) {
+  .sidebar-column:not(.no-hide) {
+    display: none;
+  }
+
+  #secondary-nav {
+    display: block;
+  }
+
+  .layout-columns.vertical-when-thin {
+    flex-direction: column;
+  }
+
+  .layout-columns.vertical-when-thin > *:not(:last-child) {
+    margin-bottom: 10px;
+  }
+
+  .sidebar-column.no-hide {
+    max-width: unset !important;
+    flex-basis: unset !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .sidebar .news-entry:not(.first-news-entry) {
+    display: none;
+  }
+
+  .grid-listing > .grid-item {
+    flex-basis: 40%;
+  }
+}
+
+/* Layout - Thin (phones) */
+
+@media (max-width: 600px) {
+  .content-columns {
+    columns: 1;
+  }
+
+  #cover-art-container {
+    margin: 25px 0 5px 0;
+    width: 100%;
+    max-width: unset;
+  }
+
+  /* Disable grid features, just line header children up vertically */
+
+  #header {
+    display: block;
+  }
+
+  #header > div:not(:first-child) {
+    margin-top: 0.5em;
+  }
 }
