@@ -943,23 +943,39 @@ img {
 }
 
 .carousel-grid {
+  --carousel-tile-min-width: 120px;
+  --carousel-row-count: 3;
+  --carousel-column-count: 6;
+
+  /* Thanks to: https://css-tricks.com/an-auto-filling-css-grid-with-max-columns/ */
+  --carousel-gap-count: calc(var(--carousel-column-count) - 1);
+  --carousel-total-gap-width: calc(var(--carousel-gap-count) * 10px);
+  --carousel-calculated-tile-max-width: calc((100% - var(--carousel-total-gap-width)) / var(--carousel-column-count));
+
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  grid-template-rows: repeat(2, auto);
+  grid-template-columns: repeat(auto-fill, minmax(max(var(--carousel-tile-min-width), var(--carousel-calculated-tile-max-width)), 1fr));
+  grid-template-rows: repeat(var(--carousel-row-count), auto);
   grid-auto-flow: dense;
   grid-auto-rows: 0;
   overflow: hidden;
   margin: auto;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  z-index: 1;
 
   transform: translateX(0);
   animation: carousel-marquee1 40s linear infinite;
   animation-play-state: paused;
   z-index: 5;
 }
+
+html[data-url-key="localized.home"] .carousel-grid {
+  --carousel-tile-size: 140px;
+}
+
+.carousel-grid[data-carousel-rows="1"] { --carousel-row-count: 1; }
+.carousel-grid[data-carousel-rows="2"] { --carousel-row-count: 2; }
+.carousel-grid[data-carousel-rows="3"] { --carousel-row-count: 3; }
+.carousel-grid[data-carousel-columns="4"] { --carousel-column-count: 4; }
+.carousel-grid[data-carousel-columns="5"] { --carousel-column-count: 5; }
+.carousel-grid[data-carousel-columns="6"] { --carousel-column-count: 6; }
 
 .carousel-item {
   display: inline-block;

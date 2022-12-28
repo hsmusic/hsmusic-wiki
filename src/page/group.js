@@ -129,7 +129,9 @@ export function write(group, {wikiData}) {
     page: ({
       generateInfoGalleryLinks,
       generateNavigationLinks,
+      getAlbumCover,
       getAlbumGridHTML,
+      getCarouselHTML,
       getLinkThemeString,
       getThemeString,
       html,
@@ -148,6 +150,12 @@ export function write(group, {wikiData}) {
             language.$('groupGalleryPage.title', {
               group: group.name,
             })),
+
+          getCarouselHTML({
+            items: group.featuredAlbums.slice(0, 12 + 1),
+            srcFn: getAlbumCover,
+            linkFn: link.album,
+          }),
 
           html.tag('p',
             {class: 'quick-info'},

@@ -356,6 +356,8 @@ export const processGroupDocument = makeProcessDocument(T.Group, {
     directory: 'Directory',
     description: 'Description',
     urls: 'URLs',
+
+    featuredAlbumsByRef: 'Featured Albums',
   },
 });
 

@@ -17,12 +17,16 @@ export class Group extends Thing {
 
     urls: Thing.common.urls(),
 
+    featuredAlbumsByRef: Thing.common.referenceList(Album),
+
     // Update only
 
     albumData: Thing.common.wikiData(Album),
     groupCategoryData: Thing.common.wikiData(GroupCategory),
 
     // Expose only
+
+    featuredAlbums: Thing.common.dynamicThingsFromReferenceList('featuredAlbumsByRef', 'albumData', find.album),
 
     descriptionShort: {
       flags: {expose: true},
