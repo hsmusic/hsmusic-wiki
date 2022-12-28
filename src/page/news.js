@@ -23,21 +23,23 @@ export function write(entry, {wikiData}) {
       title: language.$('newsEntryPage.title', {entry: entry.name}),
 
       main: {
-        content:
-          html.tag('div', {class: 'long-content'}, [
-            generateStickyHeadingContainer({
-              title: language.$('newsEntryPage.title', {
-                entry: entry.name,
-              }),
+        content: [
+          generateStickyHeadingContainer({
+            class: ['long-content'],
+            title: language.$('newsEntryPage.title', {
+              entry: entry.name,
             }),
+          }),
 
+          html.tag('div', {class: 'long-content'}, [
             html.tag('p',
               language.$('newsEntryPage.published', {
                 date: language.formatDate(entry.date),
               })),
 
-            transformMultiline(entry.content)
+            transformMultiline(entry.content),
           ]),
+        ],
       },
 
       nav: generateNewsEntryNav(entry, {
@@ -69,13 +71,15 @@ export function writeTargetless({wikiData}) {
       title: language.$('newsIndex.title'),
 
       main: {
-        content:
+        content: [
+          generateStickyHeadingContainer({
+            class: ['long-content'],
+            title: language.$('newsIndex.title'),
+          }),
+
           html.tag('div',
             {class: ['long-content', 'news-index']},
             [
-              generateStickyHeadingContainer(
-                language.$('newsIndex.title')),
-
               ...newsData.map(entry =>
                 html.tag('article',
                   {id: entry.directory},
@@ -97,6 +101,7 @@ export function writeTargetless({wikiData}) {
                         })),
                   ])),
             ]),
+        ],
       },
 
       nav: {simple: true},
