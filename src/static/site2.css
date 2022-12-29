@@ -916,31 +916,31 @@ img {
 
 @keyframes carousel-marquee1 {
   0% {
-    transform: translateX(0%) translateX(-70px);
+    transform: translateX(-100%) translateX(70px);
   }
 
   100% {
-    transform: translateX(-100%) translateX(-70px);
+    transform: translateX(-200%) translateX(70px);
   }
 }
 
 @keyframes carousel-marquee2 {
   0% {
-    transform: translateX(100%) translateX(-70px);
+    transform: translateX(0%) translateX(70px);
   }
 
   100% {
-    transform: translateX(0%) translateX(-70px);
+    transform: translateX(-100%) translateX(70px);
   }
 }
 
 @keyframes carousel-marquee3 {
   0% {
-    transform: translateX(200%) translateX(-70px);
+    transform: translateX(100%) translateX(70px);
   }
 
   100% {
-    transform: translateX(100%) translateX(-70px);
+    transform: translateX(0%) translateX(70px);
   }
 }
 
