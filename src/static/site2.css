@@ -248,6 +248,7 @@ body::before {
   transition: background-color 0.2s;
 }
 
+/*
 .sidebar:focus-within,
 #content:focus-within,
 #header:focus-within,
@@ -257,6 +258,7 @@ body::before {
   background-color: rgba(0, 0, 0, 0.85);
   border-style: solid;
 }
+*/
 
 .sidebar > h1,
 .sidebar > h2,
