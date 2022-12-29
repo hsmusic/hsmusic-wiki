@@ -689,7 +689,7 @@ function unbound_getCarouselHTML({
   img,
 
   items,
-  lazy = true,
+  lazy = false,
 
   altFn = () => '',
   linkFn = (x, {text}) => text,

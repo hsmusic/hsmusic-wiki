@@ -117,7 +117,8 @@ export function writeTargetless({wikiData}) {
                     entry.displayStyle === 'carousel' && [
                       getCarouselHTML({
                         items: entry.entries.map(e => e.item),
-                        lazy: i > 0,
+                        // Lazy carousels are kinda glitchy, possibly browser-dependant
+                        // lazy: i > 0,
                         srcFn: getAlbumCover,
                         linkFn: link.album,
                       }),
