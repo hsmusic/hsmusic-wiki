@@ -57,6 +57,31 @@ export function write(album, {wikiData}) {
 
   const listTag = getAlbumListTag(album);
 
+  const getSocialEmbedDescription = ({
+    getArtistString: _getArtistString,
+    language,
+  }) => {
+    const hasDuration = albumDuration > 0;
+    const hasTracks = album.tracks.length > 0;
+    const hasDate = !!album.date;
+    if (!hasDuration && !hasTracks && !hasDate) return '';
+
+    return language.formatString(
+      'albumPage.socialEmbed.body' + [
+        hasDuration && '.withDuration',
+        hasTracks && '.withTracks',
+        hasDate && '.withReleaseDate',
+      ].filter(Boolean).join(''),
+      Object.fromEntries([
+        hasDuration &&
+          ['duration', language.formatDuration(albumDuration)],
+        hasTracks &&
+          ['tracks', language.countTracks(album.tracks.length, {unit: true})],
+        hasDate &&
+          ['date', language.formatDate(album.date)],
+      ].filter(Boolean)));
+  };
+
   const data = {
     type: 'data',
     path: ['album', album.directory],
@@ -98,6 +123,7 @@ export function write(album, {wikiData}) {
     type: 'page',
     path: ['album', album.directory],
     page: ({
+      absoluteTo,
       fancifyURL,
       generateAdditionalFilesShortcut,
       generateAdditionalFilesList,
@@ -138,6 +164,25 @@ export function write(album, {wikiData}) {
               `--album-directory: ${album.directory}`,
             ],
           }),
+
+        socialEmbed: {
+          heading:
+            (empty(album.groups)
+              ? ''
+              : language.$('albumPage.socialEmbed.heading', {
+                  group: album.groups[0].name,
+                })),
+          headingLink:
+            (empty(album.groups)
+              ? null
+              : absoluteTo('localized.album', album.groups[0].directory)),
+          title: language.$('albumPage.socialEmbed.title', {
+            album: album.name,
+          }),
+          description: getSocialEmbedDescription({getArtistString, language}),
+          image: '/' + getAlbumCover(album, {to: urls.from('shared.root').to}),
+          color: album.color,
+        },
 
         banner: !empty(album.bannerArtistContribs) && {
           dimensions: album.bannerDimensions,
