@@ -1255,7 +1255,8 @@ export function filterReferenceErrors(wikiData) {
       contributorContribsByRef: '_contrib',
       coverArtistContribsByRef: '_contrib',
       referencedTracksByRef: 'track',
-      sampledTracksByRef: 'track',
+      // Skip sampled track ref errors for now
+      // sampledTracksByRef: 'track',
       artTagsByRef: 'artTag',
       originalReleaseTrackByRef: 'track',
     }],
