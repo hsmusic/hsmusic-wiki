@@ -1231,11 +1231,25 @@ export function generateDocumentHTML(pageInfo, {
     socialEmbed.image &&
       html.tag('meta', {property: 'og:image', content: socialEmbed.image}),
 
-    colors &&
-      html.tag('meta', {
-        name: 'theme-color',
-        content: colors.dark,
-      }),
+    ...html.fragment(
+      colors && [
+        html.tag('meta', {
+          name: 'theme-color',
+          content: colors.dark,
+          media: '(prefers-color-scheme: dark)',
+        }),
+
+        html.tag('meta', {
+          name: 'theme-color',
+          content: colors.light,
+          media: '(prefers-color-scheme: light)',
+        }),
+
+        html.tag('meta', {
+          name: 'theme-color',
+          content: colors.primary,
+        }),
+      ]),
 
     oEmbedJSONHref &&
       html.tag('link', {
