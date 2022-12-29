@@ -217,6 +217,7 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     hasTrackNumbers: 'Has Track Numbers',
     isMajorRelease: 'Major Release',
     isListedOnHomepage: 'Listed on Homepage',
+    isListedInGalleries: 'Listed in Galleries',
 
     groupsByRef: 'Groups',
     artTagsByRef: 'Art Tags',

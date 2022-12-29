@@ -82,6 +82,7 @@ export class Album extends Thing {
     hasTrackNumbers: Thing.common.flag(true),
     isMajorRelease: Thing.common.flag(false),
     isListedOnHomepage: Thing.common.flag(true),
+    isListedInGalleries: Thing.common.flag(true),
 
     commentary: Thing.common.commentary(),
     additionalFiles: Thing.common.additionalFiles(),

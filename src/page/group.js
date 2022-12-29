@@ -190,12 +190,14 @@ export function write(group, {wikiData}) {
             {class: 'grid-listing'},
             getAlbumGridHTML({
               entries: sortChronologically(
-                group.albums.map(album => ({
-                  item: album,
-                  directory: album.directory,
-                  name: album.name,
-                  date: album.date,
-                }))
+                group.albums
+                  .filter(album => album.isListedInGalleries)
+                  .map(album => ({
+                    item: album,
+                    directory: album.directory,
+                    name: album.name,
+                    date: album.date,
+                  }))
               ).reverse(),
               details: true,
             })),
