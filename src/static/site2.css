@@ -584,6 +584,10 @@ ul.quick-info li:not(:last-child)::after {
   font-weight: 800;
 }
 
+.carousel-container + .quick-info {
+  margin-top: 25px;
+}
+
 #intro-menu {
   margin: 24px 0;
   padding: 10px;
@@ -860,6 +864,10 @@ img {
 /* Carousel */
 
 .carousel-container {
+  --carousel-tile-min-width: 120px;
+  --carousel-row-count: 3;
+  --carousel-column-count: 6;
+
   position: relative;
   overflow: hidden;
   margin: 20px 0 5px 0;
@@ -897,6 +905,17 @@ img {
 .carousel-container:hover .carousel-grid {
   animation-play-state: running;
 }
+
+html[data-url-key="localized.home"] .carousel-container {
+  --carousel-tile-size: 140px;
+}
+
+.carousel-container[data-carousel-rows="1"] { --carousel-row-count: 1; }
+.carousel-container[data-carousel-rows="2"] { --carousel-row-count: 2; }
+.carousel-container[data-carousel-rows="3"] { --carousel-row-count: 3; }
+.carousel-container[data-carousel-columns="4"] { --carousel-column-count: 4; }
+.carousel-container[data-carousel-columns="5"] { --carousel-column-count: 5; }
+.carousel-container[data-carousel-columns="6"] { --carousel-column-count: 6; }
 
 .carousel-grid:nth-child(2),
 .carousel-grid:nth-child(3) {
@@ -945,10 +964,6 @@ img {
 }
 
 .carousel-grid {
-  --carousel-tile-min-width: 120px;
-  --carousel-row-count: 3;
-  --carousel-column-count: 6;
-
   /* Thanks to: https://css-tricks.com/an-auto-filling-css-grid-with-max-columns/ */
   --carousel-gap-count: calc(var(--carousel-column-count) - 1);
   --carousel-total-gap-width: calc(var(--carousel-gap-count) * 10px);
@@ -967,17 +982,6 @@ img {
   animation-play-state: paused;
   z-index: 5;
 }
-
-html[data-url-key="localized.home"] .carousel-grid {
-  --carousel-tile-size: 140px;
-}
-
-.carousel-grid[data-carousel-rows="1"] { --carousel-row-count: 1; }
-.carousel-grid[data-carousel-rows="2"] { --carousel-row-count: 2; }
-.carousel-grid[data-carousel-rows="3"] { --carousel-row-count: 3; }
-.carousel-grid[data-carousel-columns="4"] { --carousel-column-count: 4; }
-.carousel-grid[data-carousel-columns="5"] { --carousel-column-count: 5; }
-.carousel-grid[data-carousel-columns="6"] { --carousel-column-count: 6; }
 
 .carousel-item {
   display: inline-block;

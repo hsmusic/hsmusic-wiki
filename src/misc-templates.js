@@ -706,13 +706,16 @@ function unbound_getCarouselHTML({
 
   items = items.slice(0, maxCarouselLayoutItems + 1);
 
-  return (x => x)(html.tag('div', {class: 'carousel-container'},
+  return html.tag('div',
+    {
+      class: 'carousel-container',
+      'data-carousel-rows': rows,
+      'data-carousel-columns': columns,
+    },
     repeat(3,
       html.tag('div',
         {
           class: 'carousel-grid',
-          'data-carousel-rows': rows,
-          'data-carousel-columns': columns,
           'aria-hidden': 'true',
         },
         items
@@ -732,7 +735,7 @@ function unbound_getCarouselHTML({
                     lazy: typeof lazy === 'number' ? i >= lazy : lazy,
                     square: true,
                   }),
-              })))))));
+              }))))));
 }
 
 // Nav-bar links
