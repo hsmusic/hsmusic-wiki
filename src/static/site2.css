@@ -1230,7 +1230,7 @@ html[data-url-key="localized.home"] .carousel-grid {
 
 .content-sticky-heading-cover-container:not(.visible) .content-sticky-heading-cover {
   opacity: 0;
-  transform: translateX(40px);
+  transform: translateY(15px);
 }
 
 .content-sticky-heading-cover .image-container {
