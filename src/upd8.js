@@ -232,6 +232,10 @@ const replacerSpec = {
         {datetime: date.toString()},
         language.formatDate(date)),
   },
+  'flash-index': {
+    find: null,
+    link: 'flashIndex',
+  },
   flash: {
     find: 'flash',
     link: 'flash',
