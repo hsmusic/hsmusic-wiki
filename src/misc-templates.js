@@ -495,6 +495,8 @@ function unbound_fancifyURL(url, {
     ? language.$('misc.external.instagram')
   : domain.includes('patreon.com')
     ? language.$('misc.external.patreon')
+  : domain.includes('spotify.com')
+    ? language.$('misc.external.spotify')
     : domain);
 }
 
