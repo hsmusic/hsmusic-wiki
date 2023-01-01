@@ -376,12 +376,7 @@ function evaluateTag(node, opts) {
   const label =
     enteredLabel ||
     (transformName && transformName(value.name, node, input)) ||
-    value.name;
-
-  if (!valueFn && !label) {
-    logWarn`The link ${source} requires a label be entered!`;
-    return source;
-  }
+    null;
 
   const hash = node.data.hash && transformNodes(node.data.hash, opts);
 
