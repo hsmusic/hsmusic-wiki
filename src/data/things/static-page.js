@@ -25,6 +25,5 @@ export class StaticPage extends Thing {
     directory: Thing.common.directory(),
     content: Thing.common.simpleString(),
     stylesheet: Thing.common.simpleString(),
-    showInNavigationBar: Thing.common.flag(true),
   });
 }

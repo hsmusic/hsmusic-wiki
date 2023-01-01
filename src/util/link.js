@@ -38,6 +38,7 @@ const linkHelper =
     class: className = '',
     color: color2 = true,
     hash = '',
+    preferShortName = false,
   }) => {
     let href = hrefFn(thing, {to});
 
@@ -65,7 +66,10 @@ const linkHelper =
             : '',
         class: className,
       },
-      text || thing.name
+      (text ||
+        (preferShortName
+          ? thing.nameShort ?? thing.name
+          : thing.name))
     );
   };
 

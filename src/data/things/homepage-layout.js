@@ -7,6 +7,7 @@ export class HomepageLayout extends Thing {
     HomepageLayoutRow,
 
     validators: {
+      isStringNonEmpty,
       validateArrayItems,
       validateInstanceOf,
     },
@@ -14,6 +15,11 @@ export class HomepageLayout extends Thing {
     // Update & expose
 
     sidebarContent: Thing.common.simpleString(),
+
+    navbarLinks: {
+      flags: {update: true, expose: true},
+      update: {validate: validateArrayItems(isStringNonEmpty)},
+    },
 
     rows: {
       flags: {update: true, expose: true},

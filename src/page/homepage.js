@@ -1,6 +1,10 @@
 // Homepage specification.
 
-import {empty} from '../util/sugar.js';
+import {
+  bindOpts,
+  empty,
+  withEntries,
+} from '../util/sugar.js';
 
 import {
   getNewAdditions,
@@ -193,21 +197,16 @@ export function writeTargetless({wikiData}) {
         links: [
           link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
 
-          wikiInfo.enableListings &&
-            link.listingIndex('', {
-              text: language.$('listingIndex.title'),
-              to,
-            }),
-
-          wikiInfo.enableNews &&
-            link.newsIndex('', {text: language.$('newsIndex.title'), to}),
-
-          wikiInfo.enableFlashesAndGames &&
-            link.flashIndex('', {text: language.$('flashIndex.title'), to}),
-
-          ...staticPageData
-            .filter((page) => page.showInNavigationBar)
-            .map((page) => link.staticPage(page, {text: page.nameShort})),
+          ...html.fragment(
+            homepageLayout.navbarLinks?.map(text =>
+              transformInline(text, {
+                link:
+                  withEntries(link, entries =>
+                    entries.map(([key, fn]) =>
+                      [key, bindOpts(fn, {
+                        preferShortName: true,
+                      })])),
+              }))),
         ]
           .filter(Boolean)
           .map((html) => ({html})),

@@ -377,8 +377,6 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
 
     content: 'Content',
     stylesheet: 'Style',
-
-    showInNavigationBar: 'Show in Navigation Bar',
   },
 });
 
@@ -403,6 +401,7 @@ export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
 export const processHomepageLayoutDocument = makeProcessDocument(T.HomepageLayout, {
   propertyFieldMapping: {
     sidebarContent: 'Sidebar Content',
+    navbarLinks: 'Navbar Links',
   },
 
   ignoredFields: ['Homepage'],
@@ -896,6 +895,8 @@ export const dataSteps = [
     processDocument: processStaticPageDocument,
 
     save(staticPageData) {
+      sortAlphabetically(staticPageData);
+
       return {staticPageData};
     },
   },
