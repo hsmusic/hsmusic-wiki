@@ -154,8 +154,10 @@ export function writeTargetless({wikiData}) {
         content:
           transformMultiline(
             homepageLayout.sidebarContent
-              .replace('[[news]]', '__GENERATE_NEWS__')
-          )
+              .replace('[[news]]', '__GENERATE_NEWS__'),
+            {
+              thumb: 'medium',
+            })
             .replace('<p>__GENERATE_NEWS__</p>',
               wikiInfo.enableNews
                 ? [
@@ -179,7 +181,9 @@ export function writeTargetless({wikiData}) {
                               link.newsEntry(entry),
                             ]),
 
-                            transformMultiline(entry.contentShort),
+                            transformMultiline(entry.contentShort, {
+                              thumb: 'medium',
+                            }),
 
                             entry.contentShort !== entry.content &&
                               link.newsEntry(entry, {

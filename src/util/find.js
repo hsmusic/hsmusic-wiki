@@ -114,7 +114,7 @@ function matchTagName(ref, data, quiet) {
 }
 
 const find = {
-  album: findHelper(['album', 'album-commentary']),
+  album: findHelper(['album', 'album-commentary', 'album-gallery']),
   artist: findHelper(['artist', 'artist-gallery']),
   artTag: findHelper(['tag'], {byName: matchTagName}),
   flash: findHelper(['flash']),

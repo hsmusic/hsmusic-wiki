@@ -212,6 +212,10 @@ const replacerSpec = {
     find: 'album',
     link: 'albumCommentary',
   },
+  'album-gallery': {
+    find: 'album',
+    link: 'albumGallery',
+  },
   artist: {
     find: 'artist',
     link: 'artist',
@@ -392,7 +396,11 @@ function joinLineBreaks(sourceLines) {
   return outLines;
 }
 
-function transformMultiline(text, {parseAttributes, transformInline}) {
+function transformMultiline(text, {
+  parseAttributes,
+  transformInline,
+  thumb = null,
+}) {
   // Heck yes, HTML magics.
 
   text = transformInline(text.trim());
@@ -442,7 +450,7 @@ function transformMultiline(text, {parseAttributes, transformInline}) {
       img({
         lazy: true,
         link: true,
-        thumb: 'medium',
+        thumb,
         ...parseAttributes(attributes),
       })
     );
