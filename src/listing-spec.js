@@ -84,8 +84,7 @@ const listingSpec = [
 
     data: ({wikiData: {albumData}}) =>
       chunkByProperties(
-        albumData
-          .filter(a => a.dateAddedToWiki)
+        sortAlphabetically(albumData.filter(a => a.dateAddedToWiki))
           .sort((a, b) => {
             if (a.dateAddedToWiki < b.dateAddedToWiki) return -1;
             if (a.dateAddedToWiki > b.dateAddedToWiki) return 1;
