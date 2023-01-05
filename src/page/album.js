@@ -50,10 +50,10 @@ export function write(album, {wikiData}) {
   const hasAdditionalFiles = !empty(album.additionalFiles);
   const albumDuration = getTotalDuration(album.tracks);
 
-  const displayTrackGroups =
-    album.trackGroups &&
-      (album.trackGroups.length > 1 ||
-        !album.trackGroups[0].isDefaultTrackGroup);
+  const displayTrackSections =
+    album.trackSections &&
+      (album.trackSections.length > 1 ||
+        !album.trackSections[0].isDefaultTrackSection);
 
   const listTag = getAlbumListTag(album);
 
@@ -107,10 +107,10 @@ export function write(album, {wikiData}) {
       wallpaperArtistContribs: serializeContribs(album.wallpaperArtistContribs),
       bannerArtistContribs: serializeContribs(album.bannerArtistContribs),
       groups: serializeGroupsForAlbum(album),
-      trackGroups: album.trackGroups?.map((trackGroup) => ({
-        name: trackGroup.name,
-        color: trackGroup.color,
-        tracks: trackGroup.tracks.map((track) => track.directory),
+      trackSections: album.trackSections?.map((section) => ({
+        name: section.name,
+        color: section.color,
+        tracks: section.tracks.map((track) => track.directory),
       })),
       tracks: album.tracks.map((track) => ({
         link: serializeLink(track),
@@ -300,10 +300,10 @@ export function write(album, {wikiData}) {
                   ),
                 })),
 
-            displayTrackGroups &&
+            displayTrackSections &&
               html.tag('dl',
                 {class: 'album-group-list'},
-                album.trackGroups.flatMap(({
+                album.trackSections.flatMap(({
                   name,
                   startIndex,
                   tracks,
@@ -322,7 +322,7 @@ export function write(album, {wikiData}) {
                       tracks.map(trackToListItem))),
                 ])),
 
-            !displayTrackGroups &&
+            !displayTrackSections &&
               html.tag(listTag,
                 album.tracks.map(trackToListItem)),
 
@@ -515,7 +515,7 @@ export function generateAlbumSidebar(album, currentTrack, {
 
   const listTag = getAlbumListTag(album);
 
-  const {trackGroups} = album;
+  const {trackSections} = album;
 
   const trackToListItem = (track) =>
     html.tag('li',
@@ -524,19 +524,19 @@ export function generateAlbumSidebar(album, currentTrack, {
         track: link.track(track),
       }));
 
-  const nameOrDefault = (isDefaultTrackGroup, name) =>
-    isDefaultTrackGroup
+  const nameOrDefault = (isDefaultTrackSection, name) =>
+    isDefaultTrackSection
       ? language.$('albumSidebar.trackList.fallbackGroupName')
       : name;
 
   const trackListPart = [
     html.tag('h1', link.album(album)),
-    ...trackGroups.map(({name, color, startIndex, tracks, isDefaultTrackGroup}) => {
+    ...trackSections.map(({name, color, startIndex, tracks, isDefaultTrackSection}) => {
       const groupName =
         html.tag('span',
           {class: 'group-name'},
           nameOrDefault(
-            isDefaultTrackGroup,
+            isDefaultTrackSection,
             name
           ));
       return html.tag('details',

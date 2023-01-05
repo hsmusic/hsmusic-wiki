@@ -96,6 +96,10 @@ export function isStringNonEmpty(value) {
   return true;
 }
 
+export function optional(validator) {
+  return value => value === null || value === undefined || validator(value);
+}
+
 // Complex types (non-primitives)
 
 export function isInstance(value, constructor) {
@@ -251,6 +255,16 @@ export const isAdditionalFile = validateProperties({
 });
 
 export const isAdditionalFileList = validateArrayItems(isAdditionalFile);
+
+export const isTrackSection = validateProperties({
+  name: optional(isString),
+  color: optional(isColor),
+  dateOriginallyReleased: optional(isDate),
+  isDefaultTrackSection: optional(isBoolean),
+  tracksByRef: optional(validateReferenceList('track')),
+});
+
+export const isTrackSectionList = validateArrayItems(isTrackSection);
 
 export function isDimensions(dimensions) {
   isArray(dimensions);

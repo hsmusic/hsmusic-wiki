@@ -9,9 +9,11 @@ import {
 
 function stubAlbum(tracks) {
   const album = new Album();
-  const trackGroup = new TrackGroup();
-  trackGroup.tracksByRef = tracks.map(t => Thing.getReference(t));
-  album.trackGroups = [trackGroup];
+  album.trackSections = [
+    {
+      tracksByRef: tracks.map(t => Thing.getReference(t)),
+    },
+  ];
   album.trackData = tracks;
   return album;
 }

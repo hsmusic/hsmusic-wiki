@@ -10,13 +10,11 @@ export class Album extends Thing {
     Artist,
     Group,
     Track,
-    TrackGroup,
 
     validators: {
       isDate,
       isDimensions,
-      validateArrayItems,
-      validateInstanceOf,
+      isTrackSectionList,
     },
   }) => ({
     // Update & expose
@@ -56,11 +54,39 @@ export class Album extends Thing {
     groupsByRef: Thing.common.referenceList(Group),
     artTagsByRef: Thing.common.referenceList(ArtTag),
 
-    trackGroups: {
+    trackSections: {
       flags: {update: true, expose: true},
 
       update: {
-        validate: validateArrayItems(validateInstanceOf(TrackGroup)),
+        validate: isTrackSectionList,
+      },
+
+      expose: {
+        dependencies: ['color', 'trackData'],
+        transform(trackSections, {
+          color: albumColor,
+          trackData,
+        }) {
+          let startIndex = 0;
+          return trackSections?.map(section => ({
+            name: section.name ?? null,
+            color: section.color ?? albumColor ?? null,
+            dateOriginallyReleased: section.dateOriginallyReleased ?? null,
+            isDefaultTrackSection: section.isDefaultTrackSection ?? false,
+
+            startIndex: (
+              startIndex += section.tracksByRef.length,
+              startIndex - section.tracksByRef.length
+            ),
+
+            tracksByRef: section.tracksByRef ?? [],
+            tracks:
+              (trackData && section.tracksByRef
+                ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
+                .filter(Boolean)) ??
+              [],
+          }));
+        },
       },
     },
 
@@ -114,11 +140,11 @@ export class Album extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackGroups', 'trackData'],
-        compute: ({trackGroups, trackData}) =>
-          trackGroups && trackData
-            ? trackGroups
-                .flatMap((group) => group.tracksByRef ?? [])
+        dependencies: ['trackSections', 'trackData'],
+        compute: ({trackSections, trackData}) =>
+          trackSections && trackData
+            ? trackSections
+                .flatMap((section) => section.tracksByRef ?? [])
                 .map((ref) => find.track(ref, trackData, {mode: 'quiet'}))
                 .filter(Boolean)
             : [],
@@ -179,72 +205,11 @@ export class Album extends Thing {
   });
 }
 
-export class TrackGroup extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    isColor,
-    Track,
-
-    validators: {
-      validateInstanceOf,
-    },
-  }) => ({
-    // Update & expose
-
+export class TrackSectionHelper extends Thing {
+  static [Thing.getPropertyDescriptors] = () => ({
     name: Thing.common.name('Unnamed Track Group'),
-
-    color: {
-      flags: {update: true, expose: true},
-
-      update: {validate: isColor},
-
-      expose: {
-        dependencies: ['album'],
-
-        transform(color, {album}) {
-          return color ?? album?.color ?? null;
-        },
-      },
-    },
-
+    color: Thing.common.color(),
     dateOriginallyReleased: Thing.common.simpleDate(),
-
-    tracksByRef: Thing.common.referenceList(Track),
-
     isDefaultTrackGroup: Thing.common.flag(false),
-
-    // Update only
-
-    album: {
-      flags: {update: true},
-      update: {validate: validateInstanceOf(Album)},
-    },
-
-    trackData: Thing.common.wikiData(Track),
-
-    // Expose only
-
-    tracks: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['tracksByRef', 'trackData'],
-        compute: ({tracksByRef, trackData}) =>
-          tracksByRef && trackData
-            ? tracksByRef.map((ref) => find.track(ref, trackData)).filter(Boolean)
-            : [],
-      },
-    },
-
-    startIndex: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['album'],
-        compute: ({album, [TrackGroup.instance]: trackGroup}) =>
-          album.trackGroups
-            .slice(0, album.trackGroups.indexOf(trackGroup))
-            .reduce((acc, tg) => acc + tg.tracks.length, 0),
-      },
-    },
   })
 }
