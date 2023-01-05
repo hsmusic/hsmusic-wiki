@@ -12,7 +12,7 @@ import {
 } from '../util/wiki-data.js';
 
 export function writeTargetless({wikiData}) {
-  const {newsData, staticPageData, homepageLayout, wikiInfo} = wikiData;
+  const {newsData, homepageLayout, wikiInfo} = wikiData;
 
   const rowData = homepageLayout.rows?.map(row => {
     const {color, name, type} = row;
