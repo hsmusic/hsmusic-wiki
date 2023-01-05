@@ -730,12 +730,6 @@ li > ul {
 
 img {
   object-fit: cover;
-  /* these unfortunately dont take effect while loading, so...
-    text-align: center;
-    line-height: 2em;
-    text-shadow: 0 0 5px black;
-    font-style: oblique;
-    */
 }
 
 .reveal {
