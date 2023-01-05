@@ -1029,17 +1029,6 @@ html[data-url-key="localized.home"] .carousel-container {
   height: 100%;
 }
 
-.vertical-square {
-  position: relative;
-  height: 100%;
-}
-
-.vertical-square::after {
-  content: "";
-  display: block;
-  padding-right: 100%;
-}
-
 /* Info card */
 
 #info-card-container {
