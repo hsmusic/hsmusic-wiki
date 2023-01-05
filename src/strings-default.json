@@ -191,7 +191,7 @@
   "homepage.title": "{TITLE}",
   "homepage.news.title": "News",
   "homepage.news.entry.viewRest": "(View rest of entry!)",
-  "albumSidebar.trackList.fallbackGroupName": "Track list",
+  "albumSidebar.trackList.fallbackSectionName": "Track list",
   "albumSidebar.trackList.group": "{GROUP}",
   "albumSidebar.trackList.group.withRange": "{GROUP} ({RANGE})",
   "albumSidebar.trackList.item": "{TRACK}",

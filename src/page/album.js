@@ -526,7 +526,7 @@ export function generateAlbumSidebar(album, currentTrack, {
 
   const nameOrDefault = (isDefaultTrackSection, name) =>
     isDefaultTrackSection
-      ? language.$('albumSidebar.trackList.fallbackGroupName')
+      ? language.$('albumSidebar.trackList.fallbackSectionName')
       : name;
 
   const trackListPart = [
