@@ -19,6 +19,8 @@ import _find, {bindFind} from './util/find.js';
 
 import urlSpec from './url-spec.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export async function getContextAssignments({
   wikiData,
 }) {
@@ -84,10 +86,15 @@ async function main() {
     'no-history': {
       type: 'flag',
     },
+
+    'show-traces': {
+      type: 'flag',
+    },
   });
 
   const dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
   const disableHistory = miscOptions['no-history'] ?? false;
+  const showTraces = miscOptions['show-traces'] ?? false;
 
   if (!dataPath) {
     logError`Expected --data-path option or HSMUSIC_DATA to be set`;
@@ -98,7 +105,8 @@ async function main() {
 
   const wikiData = await quickLoadAllFromYAML(dataPath, {
     showAggregate: bindOpts(showAggregate, {
-      showTraces: false,
+      showTraces,
+      pathToFileURL: (f) => path.relative(__dirname, fileURLToPath(f)),
     }),
   });
 
