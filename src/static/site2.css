@@ -631,11 +631,6 @@ blockquote {
   padding-right: 12%;
 }
 
-p img {
-  max-width: 100%;
-  height: auto;
-}
-
 dl dt {
   padding-left: 40px;
   max-width: 600px;
