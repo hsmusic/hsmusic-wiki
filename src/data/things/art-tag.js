@@ -25,7 +25,6 @@ export class ArtTag extends Thing {
 
     // Expose only
 
-    // Previously known as: (tag).things
     taggedInThings: {
       flags: {expose: true},
 

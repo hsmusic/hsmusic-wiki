@@ -91,7 +91,6 @@ export class Track extends Thing {
       },
     },
 
-    // Previously known as: (track).aka
     originalReleaseTrackByRef: Thing.common.singleReference(Track),
 
     dataSourceAlbumByRef: Thing.common.singleReference(Album),
@@ -241,7 +240,6 @@ export class Track extends Thing {
       },
     },
 
-    // Previously known as: (track).artists
     artistContribs: Thing.common.dynamicInheritContribs(
       'artistContribsByRef',
       'artistContribsByRef',
@@ -249,10 +247,8 @@ export class Track extends Thing {
       Track.findAlbum
     ),
 
-    // Previously known as: (track).contributors
     contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
-    // Previously known as: (track).coverArtists
     coverArtistContribs: Thing.common.dynamicInheritContribs(
       'coverArtistContribsByRef',
       'trackCoverArtistContribsByRef',
@@ -260,7 +256,6 @@ export class Track extends Thing {
       Track.findAlbum
     ),
 
-    // Previously known as: (track).references
     referencedTracks: Thing.common.dynamicThingsFromReferenceList(
       'referencedTracksByRef',
       'trackData',
@@ -312,7 +307,6 @@ export class Track extends Thing {
       },
     },
 
-    // Previously known as: (track).flashes
     featuredInFlashes: Thing.common.reverseReferenceList(
       'flashData',
       'featuredTracks'
