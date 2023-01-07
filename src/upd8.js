@@ -31,10 +31,10 @@
 // Oh yeah, like. Just run this through some relatively recent version of
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
+import chroma from 'chroma-js';
+
 import * as path from 'path';
 import {fileURLToPath} from 'url';
-
-import chroma from 'chroma-js';
 
 import {
   copyFile,
@@ -52,16 +52,19 @@ import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
 import * as pageSpecs from './page/index.js';
 
-import find, {bindFind} from './util/find.js';
+import find from './util/find.js';
 import * as html from './util/html.js';
 import {getColors} from './util/colors.js';
 import {findFiles} from './util/io.js';
 import {isMain} from './util/node-utils.js';
+import {replacerSpec} from './util/transform-content.js';
 
 import CacheableObject from './data/things/cacheable-object.js';
 
 import {processLanguageFile} from './data/language.js';
 import {serializeThings} from './data/serialize.js';
+
+import {bindUtilities} from './write/bind-utilities.js';
 
 import {
   filterDuplicateDirectories,
@@ -73,32 +76,12 @@ import {
 } from './data/yaml.js';
 
 import {
-  fancifyFlashURL,
-  fancifyURL,
-  generateAdditionalFilesShortcut,
-  generateAdditionalFilesList,
-  generateChronologyLinks,
-  generateCoverLink,
-  generateInfoGalleryLinks,
-  generateNavigationLinks,
-  generateStickyHeadingContainer,
-  generateTrackListDividedByGroups,
-  getAlbumGridHTML,
-  getAlbumStylesheet,
-  getArtistString,
-  getFlashGridHTML,
   getFooterLocalizationLinks,
-  getGridHTML,
-  getCarouselHTML,
-  getRevealStringFromTags,
   getRevealStringFromWarnings,
-  getThemeString as unbound_getThemeString,
-  iconifyURL,
+  img,
 } from './misc-templates.js';
 
-import unbound_link, {
-  getLinkThemeString as unbound_getLinkThemeString,
-} from './util/link.js';
+import link from './util/link.js';
 
 import {
   color,
@@ -111,14 +94,7 @@ import {
   progressPromiseAll,
 } from './util/cli.js';
 
-import {validateReplacerSpec, transformInline} from './util/replacer.js';
-
-import {
-  getAlbumCover,
-  getArtistAvatar,
-  getFlashCover,
-  getTrackCover,
-} from './util/wiki-data.js';
+import {validateReplacerSpec} from './util/replacer.js';
 
 /*
 import {
@@ -131,14 +107,9 @@ import {
 } from './util/serialize.js';
 */
 
-import {
-  bindOpts,
-  queue,
-  showAggregate,
-  withEntries,
-} from './util/sugar.js';
+import {queue, showAggregate} from './util/sugar.js';
 
-import {generateURLs, thumb} from './util/urls.js';
+import {generateURLs} from './util/urls.js';
 
 // Pensive emoji!
 import { OFFICIAL_GROUP_DIRECTORY } from './util/magic-constants.js';
@@ -199,539 +170,12 @@ let queueSize;
 
 const urls = generateURLs(urlSpec);
 
-function splitLines(text) {
-  return text.split(/\r\n|\r|\n/);
-}
-
-const replacerSpec = {
-  album: {
-    find: 'album',
-    link: 'album',
-  },
-  'album-commentary': {
-    find: 'album',
-    link: 'albumCommentary',
-  },
-  'album-gallery': {
-    find: 'album',
-    link: 'albumGallery',
-  },
-  artist: {
-    find: 'artist',
-    link: 'artist',
-  },
-  'artist-gallery': {
-    find: 'artist',
-    link: 'artistGallery',
-  },
-  'commentary-index': {
-    find: null,
-    link: 'commentaryIndex',
-  },
-  date: {
-    find: null,
-    value: (ref) => new Date(ref),
-    html: (date, {language}) =>
-      html.tag('time',
-        {datetime: date.toString()},
-        language.formatDate(date)),
-  },
-  'flash-index': {
-    find: null,
-    link: 'flashIndex',
-  },
-  flash: {
-    find: 'flash',
-    link: 'flash',
-    transformName(name, node, input) {
-      const nextCharacter = input[node.iEnd];
-      const lastCharacter = name[name.length - 1];
-      if (![' ', '\n', '<'].includes(nextCharacter) && lastCharacter === '.') {
-        return name.slice(0, -1);
-      } else {
-        return name;
-      }
-    },
-  },
-  group: {
-    find: 'group',
-    link: 'groupInfo',
-  },
-  'group-gallery': {
-    find: 'group',
-    link: 'groupGallery',
-  },
-  home: {
-    find: null,
-    link: 'home',
-  },
-  'listing-index': {
-    find: null,
-    link: 'listingIndex',
-  },
-  listing: {
-    find: 'listing',
-    link: 'listing',
-  },
-  media: {
-    find: null,
-    link: 'media',
-  },
-  'news-index': {
-    find: null,
-    link: 'newsIndex',
-  },
-  'news-entry': {
-    find: 'newsEntry',
-    link: 'newsEntry',
-  },
-  root: {
-    find: null,
-    link: 'root',
-  },
-  site: {
-    find: null,
-    link: 'site',
-  },
-  static: {
-    find: 'staticPage',
-    link: 'staticPage',
-  },
-  string: {
-    find: null,
-    value: (ref) => ref,
-    html: (ref, {language, args}) => language.$(ref, args),
-  },
-  tag: {
-    find: 'artTag',
-    link: 'tag',
-  },
-  track: {
-    find: 'track',
-    link: 'track',
-  },
-};
-
-if (!validateReplacerSpec(replacerSpec, {find, link: unbound_link})) {
+if (!validateReplacerSpec(replacerSpec, {find, link})) {
   process.exit();
-}
-
-function parseAttributes(string, {to}) {
-  const attributes = Object.create(null);
-  const skipWhitespace = (i) => {
-    const ws = /\s/;
-    if (ws.test(string[i])) {
-      const match = string.slice(i).match(/[^\s]/);
-      if (match) {
-        return i + match.index;
-      } else {
-        return string.length;
-      }
-    } else {
-      return i;
-    }
-  };
-
-  for (let i = 0; i < string.length; ) {
-    i = skipWhitespace(i);
-    const aStart = i;
-    const aEnd = i + string.slice(i).match(/[\s=]|$/).index;
-    const attribute = string.slice(aStart, aEnd);
-    i = skipWhitespace(aEnd);
-    if (string[i] === '=') {
-      i = skipWhitespace(i + 1);
-      let end, endOffset;
-      if (string[i] === '"' || string[i] === "'") {
-        end = string[i];
-        endOffset = 1;
-        i++;
-      } else {
-        end = '\\s';
-        endOffset = 0;
-      }
-      const vStart = i;
-      const vEnd = i + string.slice(i).match(new RegExp(`${end}|$`)).index;
-      const value = string.slice(vStart, vEnd);
-      i = vEnd + endOffset;
-      if (attribute === 'src' && value.startsWith('media/')) {
-        attributes[attribute] = to('media.path', value.slice('media/'.length));
-      } else {
-        attributes[attribute] = value;
-      }
-    } else {
-      attributes[attribute] = attribute;
-    }
-  }
-  return Object.fromEntries(
-    Object.entries(attributes).map(([key, val]) => [
-      key,
-      val === 'true'
-        ? true
-        : val === 'false'
-        ? false
-        : val === key
-        ? true
-        : val,
-    ])
-  );
-}
-
-function joinLineBreaks(sourceLines) {
-  const outLines = [];
-
-  let lineSoFar = '';
-  for (let i = 0; i < sourceLines.length; i++) {
-    const line = sourceLines[i];
-    lineSoFar += line;
-    if (!line.endsWith('<br>')) {
-      outLines.push(lineSoFar);
-      lineSoFar = '';
-    }
-  }
-
-  if (lineSoFar) {
-    outLines.push(lineSoFar);
-  }
-
-  return outLines;
-}
-
-function transformMultiline(text, {
-  parseAttributes,
-  transformInline,
-  thumb = null,
-}) {
-  // Heck yes, HTML magics.
-
-  text = transformInline(text.trim());
-
-  const outLines = [];
-
-  const indentString = ' '.repeat(4);
-
-  let levelIndents = [];
-  const openLevel = (indent) => {
-    // opening a sublist is a pain: to be semantically *and* visually
-    // correct, we have to append the <ul> at the end of the existing
-    // previous <li>
-    const previousLine = outLines[outLines.length - 1];
-    if (previousLine?.endsWith('</li>')) {
-      // we will re-close the <li> later
-      outLines[outLines.length - 1] = previousLine.slice(0, -5) + ' <ul>';
-    } else {
-      // if the previous line isn't a list item, this is the opening of
-      // the first list level, so no need for indent
-      outLines.push('<ul>');
-    }
-    levelIndents.push(indent);
-  };
-  const closeLevel = () => {
-    levelIndents.pop();
-    if (levelIndents.length) {
-      // closing a sublist, so close the list item containing it too
-      outLines.push(indentString.repeat(levelIndents.length) + '</ul></li>');
-    } else {
-      // closing the final list level! no need for indent here
-      outLines.push('</ul>');
-    }
-  };
-
-  // okay yes we should support nested formatting, more than one blockquote
-  // layer, etc, but hear me out here: making all that work would basically
-  // be the same as implementing an entire markdown converter, which im not
-  // interested in doing lol. sorry!!!
-  let inBlockquote = false;
-
-  let lines = splitLines(text);
-  lines = joinLineBreaks(lines);
-  for (let line of lines) {
-    const imageLine = line.startsWith('<img');
-    line = line.replace(/<img (.*?)>/g, (match, attributes) =>
-      img({
-        lazy: true,
-        link: true,
-        thumb,
-        ...parseAttributes(attributes),
-      })
-    );
-
-    let indentThisLine = 0;
-    let lineContent = line;
-    let lineTag = 'p';
-
-    const listMatch = line.match(/^( *)- *(.*)$/);
-    if (listMatch) {
-      // is a list item!
-      if (!levelIndents.length) {
-        // first level is always indent = 0, regardless of actual line
-        // content (this is to avoid going to a lesser indent than the
-        // initial level)
-        openLevel(0);
-      } else {
-        // find level corresponding to indent
-        const indent = listMatch[1].length;
-        let i;
-        for (i = levelIndents.length - 1; i >= 0; i--) {
-          if (levelIndents[i] <= indent) break;
-        }
-        // note: i cannot equal -1 because the first indentation level
-        // is always 0, and the minimum indentation is also 0
-        if (levelIndents[i] === indent) {
-          // same indent! return to that level
-          while (levelIndents.length - 1 > i) closeLevel();
-          // (if this is already the current level, the above loop
-          // will do nothing)
-        } else if (levelIndents[i] < indent) {
-          // lesser indent! branch based on index
-          if (i === levelIndents.length - 1) {
-            // top level is lesser: add a new level
-            openLevel(indent);
-          } else {
-            // lower level is lesser: return to that level
-            while (levelIndents.length - 1 > i) closeLevel();
-          }
-        }
-      }
-      // finally, set variables for appending content line
-      indentThisLine = levelIndents.length;
-      lineContent = listMatch[2];
-      lineTag = 'li';
-    } else {
-      // not a list item! close any existing list levels
-      while (levelIndents.length) closeLevel();
-
-      // like i said, no nested shenanigans - quotes only appear outside
-      // of lists. sorry!
-      const quoteMatch = line.match(/^> *(.*)$/);
-      if (quoteMatch) {
-        // is a quote! open a blockquote tag if it doesnt already exist
-        if (!inBlockquote) {
-          inBlockquote = true;
-          outLines.push('<blockquote>');
-        }
-        indentThisLine = 1;
-        lineContent = quoteMatch[1];
-      } else if (inBlockquote) {
-        // not a quote! close a blockquote tag if it exists
-        inBlockquote = false;
-        outLines.push('</blockquote>');
-      }
-
-      // let some escaped symbols display as the normal symbol, since the
-      // point of escaping them is just to avoid having them be treated as
-      // syntax markers!
-      if (lineContent.match(/( *)\\-/)) {
-        lineContent = lineContent.replace('\\-', '-');
-      } else if (lineContent.match(/( *)\\>/)) {
-        lineContent = lineContent.replace('\\>', '>');
-      }
-    }
-
-    if (lineTag === 'p') {
-      // certain inline element tags should still be postioned within a
-      // paragraph; other elements (e.g. headings) should be added as-is
-      const elementMatch = line.match(/^<(.*?)[ >]/);
-      if (
-        elementMatch &&
-        !imageLine &&
-        ![
-          'a',
-          'abbr',
-          'b',
-          'bdo',
-          'br',
-          'cite',
-          'code',
-          'data',
-          'datalist',
-          'del',
-          'dfn',
-          'em',
-          'i',
-          'img',
-          'ins',
-          'kbd',
-          'mark',
-          'output',
-          'picture',
-          'q',
-          'ruby',
-          'samp',
-          'small',
-          'span',
-          'strong',
-          'sub',
-          'sup',
-          'svg',
-          'time',
-          'var',
-          'wbr',
-        ].includes(elementMatch[1])
-      ) {
-        lineTag = '';
-      }
-
-      // for sticky headings!
-      if (elementMatch) {
-        lineContent = lineContent.replace(/<h2/, `<h2 class="content-heading"`)
-      }
-    }
-
-    let pushString = indentString.repeat(indentThisLine);
-    if (lineTag) {
-      pushString += `<${lineTag}>${lineContent}</${lineTag}>`;
-    } else {
-      pushString += lineContent;
-    }
-    outLines.push(pushString);
-  }
-
-  // after processing all lines...
-
-  // if still in a list, close all levels
-  while (levelIndents.length) closeLevel();
-
-  // if still in a blockquote, close its tag
-  if (inBlockquote) {
-    inBlockquote = false;
-    outLines.push('</blockquote>');
-  }
-
-  return outLines.join('\n');
-}
-
-function transformLyrics(text, {transformInline, transformMultiline}) {
-  // Different from transformMultiline 'cuz it joins multiple lines together
-  // with line 8reaks (<br>); transformMultiline treats each line as its own
-  // complete paragraph (or list, etc).
-
-  // If it looks like old data, then like, oh god.
-  // Use the normal transformMultiline tool.
-  if (text.includes('<br')) {
-    return transformMultiline(text);
-  }
-
-  text = transformInline(text.trim());
-
-  let buildLine = '';
-  const addLine = () => outLines.push(`<p>${buildLine}</p>`);
-  const outLines = [];
-  for (const line of text.split('\n')) {
-    if (line.length) {
-      if (buildLine.length) {
-        buildLine += '<br>';
-      }
-      buildLine += line;
-    } else if (buildLine.length) {
-      addLine();
-      buildLine = '';
-    }
-  }
-  if (buildLine.length) {
-    addLine();
-  }
-  return outLines.join('\n');
 }
 
 function stringifyThings(thingData) {
   return JSON.stringify(serializeThings(thingData));
-}
-
-function img({
-  src,
-  alt,
-  noSrcText = '',
-  thumb: thumbKey,
-  reveal,
-  id,
-  class: className,
-  width,
-  height,
-  link = false,
-  lazy = false,
-  square = false,
-}) {
-  const willSquare = square;
-  const willLink = typeof link === 'string' || link;
-
-  const originalSrc = src;
-  const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
-
-  const imgAttributes = {
-    id: link ? '' : id,
-    class: className,
-    alt,
-    width,
-    height,
-  };
-
-  const noSrcHTML =
-    !src &&
-      wrap(
-        html.tag('div',
-          {class: 'image-text-area'},
-          noSrcText));
-
-  const nonlazyHTML =
-    src &&
-      wrap(
-        html.tag('img', {
-          ...imgAttributes,
-          src: thumbSrc,
-        }));
-
-  const lazyHTML =
-    src &&
-    lazy &&
-      wrap(
-        html.tag('img',
-          {
-            ...imgAttributes,
-            class: [className, 'lazy'],
-            'data-original': thumbSrc,
-          }),
-        true);
-
-  if (!src) {
-    return noSrcHTML;
-  } else if (lazy) {
-    return html.tag('noscript', nonlazyHTML) + '\n' + lazyHTML;
-  } else {
-    return nonlazyHTML;
-  }
-
-  function wrap(input, hide = false) {
-    let wrapped = input;
-
-    wrapped = html.tag('div', {class: 'image-inner-area'}, wrapped);
-    wrapped = html.tag('div', {class: 'image-container'}, wrapped);
-
-    if (reveal) {
-      wrapped = html.tag('div', {class: 'reveal'}, [
-        wrapped,
-        html.tag('span', {class: 'reveal-text'}, reveal),
-      ]);
-    }
-
-    if (willSquare) {
-      wrapped = html.tag('div', {class: 'square-content'}, wrapped);
-      wrapped = html.tag('div',
-        {class: ['square', hide && !willLink && 'js-hide']},
-        wrapped);
-    }
-
-    if (willLink) {
-      wrapped = html.tag('a',
-        {
-          id,
-          class: ['box', hide && 'js-hide'],
-          href: typeof link === 'string' ? link : originalSrc,
-        },
-        wrapped);
-    }
-
-    return wrapped;
-  }
 }
 
 function validateWritePath(path, urlGroup) {
@@ -1199,6 +643,7 @@ export function generateDocumentHTML(pageInfo, {
       html.tag('div', {id: 'info-card'}, [
         html.tag('div', {class: ['info-card-art-container', 'no-reveal']},
           img({
+            html,
             class: 'info-card-art',
             src: '',
             link: true,
@@ -1206,6 +651,7 @@ export function generateDocumentHTML(pageInfo, {
           })),
         html.tag('div', {class: ['info-card-art-container', 'reveal']},
           img({
+            html,
             class: 'info-card-art',
             src: '',
             link: true,
@@ -1791,7 +1237,7 @@ async function main() {
   const appendIndexHTML = miscOptions['append-index-html'] ?? false;
   if (appendIndexHTML) {
     logWarn`Appending index.html to link hrefs. (Note: not recommended for production release!)`;
-    unbound_link.globalOptions.appendIndexHTML = true;
+    link.globalOptions.appendIndexHTML = true;
   }
 
   const skipThumbs = miscOptions['skip-thumbs'] ?? false;
@@ -2334,200 +1780,10 @@ async function main() {
           );
         };
 
-        // TODO: Is there some nicer way to define these,
-        // may8e without totally re-8inding everything for
-        // each page?
-        const bound = {};
-
-        bound.html = html;
-
-        bound.getColors = bindOpts(getColors, {
-          chroma,
-        });
-
-        bound.getLinkThemeString = bindOpts(unbound_getLinkThemeString, {
-          getColors: bound.getColors,
-        });
-
-        bound.getThemeString = bindOpts(unbound_getThemeString, {
-          getColors: bound.getColors,
-        });
-
-        bound.link = withEntries(unbound_link, (entries) =>
-          entries
-            .map(([key, fn]) => [key, bindOpts(fn, {
-              getLinkThemeString: bound.getLinkThemeString,
-              to,
-            })]));
-
-        bound.parseAttributes = bindOpts(parseAttributes, {
-          to,
-        });
-
-        bound.find = bindFind(wikiData, {mode: 'warn'});
-
-        bound.transformInline = bindOpts(transformInline, {
-          find: bound.find,
-          link: bound.link,
-          replacerSpec,
+        const bound = bindUtilities({
           language,
           to,
           wikiData,
-        });
-
-        bound.transformMultiline = bindOpts(transformMultiline, {
-          transformInline: bound.transformInline,
-          parseAttributes: bound.parseAttributes,
-        });
-
-        bound.transformLyrics = bindOpts(transformLyrics, {
-          transformInline: bound.transformInline,
-          transformMultiline: bound.transformMultiline,
-        });
-
-        bound.iconifyURL = bindOpts(iconifyURL, {
-          html,
-          language,
-          to,
-        });
-
-        bound.fancifyURL = bindOpts(fancifyURL, {
-          html,
-          language,
-        });
-
-        bound.fancifyFlashURL = bindOpts(fancifyFlashURL, {
-          [bindOpts.bindIndex]: 2,
-          html,
-          language,
-
-          fancifyURL: bound.fancifyURL,
-        });
-
-        bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
-          html,
-          language,
-        });
-
-        bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
-          language,
-
-          getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
-        });
-
-        bound.getArtistString = bindOpts(getArtistString, {
-          html,
-          link: bound.link,
-          language,
-
-          iconifyURL: bound.iconifyURL,
-        });
-
-        bound.getAlbumCover = bindOpts(getAlbumCover, {
-          to,
-        });
-
-        bound.getTrackCover = bindOpts(getTrackCover, {
-          to,
-        });
-
-        bound.getFlashCover = bindOpts(getFlashCover, {
-          to,
-        });
-
-        bound.getArtistAvatar = bindOpts(getArtistAvatar, {
-          to,
-        });
-
-        bound.generateAdditionalFilesShortcut = bindOpts(generateAdditionalFilesShortcut, {
-          html,
-          language,
-        });
-
-        bound.generateAdditionalFilesList = bindOpts(generateAdditionalFilesList, {
-          html,
-          language,
-        });
-
-        bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
-          link: bound.link,
-          language,
-        });
-
-        bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {
-          [bindOpts.bindIndex]: 0,
-          getRevealStringFromTags: bound.getRevealStringFromTags,
-          html,
-          img,
-        });
-
-        bound.generateChronologyLinks = bindOpts(generateChronologyLinks, {
-          html,
-          language,
-          link: bound.link,
-          wikiData,
-
-          generateNavigationLinks: bound.generateNavigationLinks,
-        });
-
-        bound.generateCoverLink = bindOpts(generateCoverLink, {
-          [bindOpts.bindIndex]: 0,
-          html,
-          img,
-          link: bound.link,
-          language,
-          to,
-          wikiData,
-
-          getRevealStringFromTags: bound.getRevealStringFromTags,
-        });
-
-        bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
-          [bindOpts.bindIndex]: 2,
-          link: bound.link,
-          language,
-        });
-
-        bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
-          html,
-          language,
-          wikiData,
-        });
-
-        bound.getGridHTML = bindOpts(getGridHTML, {
-          [bindOpts.bindIndex]: 0,
-          img,
-          html,
-          language,
-
-          getRevealStringFromTags: bound.getRevealStringFromTags,
-        });
-
-        bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {
-          [bindOpts.bindIndex]: 0,
-          link: bound.link,
-          language,
-
-          getAlbumCover: bound.getAlbumCover,
-          getGridHTML: bound.getGridHTML,
-        });
-
-        bound.getFlashGridHTML = bindOpts(getFlashGridHTML, {
-          [bindOpts.bindIndex]: 0,
-          link: bound.link,
-
-          getFlashCover: bound.getFlashCover,
-          getGridHTML: bound.getGridHTML,
-        });
-
-        bound.getCarouselHTML = bindOpts(getCarouselHTML, {
-          [bindOpts.bindIndex]: 0,
-          img,
-          html,
-        })
-
-        bound.getAlbumStylesheet = bindOpts(getAlbumStylesheet, {
-          to,
         });
 
         const pageInfo = page({

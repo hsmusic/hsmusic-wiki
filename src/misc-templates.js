@@ -10,6 +10,8 @@ import {
   unique,
 } from './util/sugar.js';
 
+import {thumb} from './util/urls.js';
+
 import {
   getTotalDuration,
   sortAlbumsTracksChronologically,
@@ -642,6 +644,107 @@ function unbound_getFlashGridHTML({
   });
 }
 
+// Images
+
+function unbound_img({
+  html,
+
+  src,
+  alt,
+  noSrcText = '',
+  thumb: thumbKey,
+  reveal,
+  id,
+  class: className,
+  width,
+  height,
+  link = false,
+  lazy = false,
+  square = false,
+}) {
+  const willSquare = square;
+  const willLink = typeof link === 'string' || link;
+
+  const originalSrc = src;
+  const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
+
+  const imgAttributes = {
+    id: link ? '' : id,
+    class: className,
+    alt,
+    width,
+    height,
+  };
+
+  const noSrcHTML =
+    !src &&
+      wrap(
+        html.tag('div',
+          {class: 'image-text-area'},
+          noSrcText));
+
+  const nonlazyHTML =
+    src &&
+      wrap(
+        html.tag('img', {
+          ...imgAttributes,
+          src: thumbSrc,
+        }));
+
+  const lazyHTML =
+    src &&
+    lazy &&
+      wrap(
+        html.tag('img',
+          {
+            ...imgAttributes,
+            class: [className, 'lazy'],
+            'data-original': thumbSrc,
+          }),
+        true);
+
+  if (!src) {
+    return noSrcHTML;
+  } else if (lazy) {
+    return html.tag('noscript', nonlazyHTML) + '\n' + lazyHTML;
+  } else {
+    return nonlazyHTML;
+  }
+
+  function wrap(input, hide = false) {
+    let wrapped = input;
+
+    wrapped = html.tag('div', {class: 'image-inner-area'}, wrapped);
+    wrapped = html.tag('div', {class: 'image-container'}, wrapped);
+
+    if (reveal) {
+      wrapped = html.tag('div', {class: 'reveal'}, [
+        wrapped,
+        html.tag('span', {class: 'reveal-text'}, reveal),
+      ]);
+    }
+
+    if (willSquare) {
+      wrapped = html.tag('div', {class: 'square-content'}, wrapped);
+      wrapped = html.tag('div',
+        {class: ['square', hide && !willLink && 'js-hide']},
+        wrapped);
+    }
+
+    if (willLink) {
+      wrapped = html.tag('a',
+        {
+          id,
+          class: ['box', hide && 'js-hide'],
+          href: typeof link === 'string' ? link : originalSrc,
+        },
+        wrapped);
+    }
+
+    return wrapped;
+  }
+}
+
 // Carousel reels
 
 // Layout constants:
@@ -939,6 +1042,8 @@ export {
   unbound_getFlashGridHTML as getFlashGridHTML,
 
   unbound_getCarouselHTML as getCarouselHTML,
+
+  unbound_img as img,
 
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,
