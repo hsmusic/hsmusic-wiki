@@ -82,6 +82,18 @@ import {
   progressPromiseAll,
 } from './util/cli.js';
 
+import {
+  queue,
+  showAggregate,
+  withEntries,
+} from './util/sugar.js';
+
+import {
+  generateURLs,
+  getPagePaths,
+  getURLsFrom,
+} from './util/urls.js';
+
 import {bindUtilities} from './write/bind-utilities.js';
 import {validateWrites} from './write/validate-writes.js';
 
@@ -101,10 +113,6 @@ import {
   serializeLink,
 } from './util/serialize.js';
 */
-
-import {queue, showAggregate} from './util/sugar.js';
-
-import {generateURLs} from './util/urls.js';
 
 // Pensive emoji!
 import { OFFICIAL_GROUP_DIRECTORY } from './util/magic-constants.js';
@@ -139,9 +147,6 @@ const UTILITY_DIRECTORY = 'util';
 // (This gets symlinked into the --data-path directory.)
 const STATIC_DIRECTORY = 'static';
 
-// This exists adjacent to index.html for any page with oEmbed metadata.
-const OEMBED_JSON_FILE = 'oembed.json';
-
 // Automatically copied (if present) from media directory to site root.
 const FAVICON_FILE = 'favicon.ico';
 
@@ -173,51 +178,6 @@ function stringifyThings(thingData) {
   return JSON.stringify(serializeThings(thingData));
 }
 
-export function getURLsFrom({
-  baseDirectory,
-  pageSubKey,
-  paths,
-}) {
-  return (targetFullKey, ...args) => {
-    const [groupKey, subKey] = targetFullKey.split('.');
-    let path = paths.subdirectoryPrefix;
-
-    let from;
-    let to;
-
-    // When linking to *outside* the localized area of the site, we need to
-    // make sure the result is correctly relative to the 8ase directory.
-    if (
-      groupKey !== 'localized' &&
-      groupKey !== 'localizedDefaultLanguage' &&
-      baseDirectory
-    ) {
-      from = 'localizedWithBaseDirectory.' + pageSubKey;
-      to = targetFullKey;
-    } else if (groupKey === 'localizedDefaultLanguage' && baseDirectory) {
-      // Special case for specifically linking *from* a page with base
-      // directory *to* a page without! Used for the language switcher and
-      // hopefully nothing else oh god.
-      from = 'localizedWithBaseDirectory.' + pageSubKey;
-      to = 'localized.' + subKey;
-    } else if (groupKey === 'localizedDefaultLanguage') {
-      // Linking to the default, except surprise, we're already IN the default
-      // (no baseDirectory set).
-      from = 'localized.' + pageSubKey;
-      to = 'localized.' + subKey;
-    } else {
-      // If we're linking inside the localized area (or there just is no
-      // 8ase directory), the 8ase directory doesn't matter.
-      from = 'localized.' + pageSubKey;
-      to = targetFullKey;
-    }
-
-    path += urls.from(from).to(to, ...args);
-
-    return path;
-  };
-}
-
 async function writePage({
   html,
   oEmbedJSON = '',
@@ -233,49 +193,6 @@ async function writePage({
         writeFile(paths.output.oEmbedJSON, oEmbedJSON),
     ].filter(Boolean)
   );
-}
-
-function getPagePaths({
-  baseDirectory,
-  fullKey,
-  urlArgs,
-
-  file = 'index.html',
-}) {
-  const [groupKey, subKey] = fullKey.split('.');
-
-  const pathname =
-    groupKey === 'localized' && baseDirectory
-      ? urls
-          .from('shared.root')
-          .toDevice(
-            'localizedWithBaseDirectory.' + subKey,
-            baseDirectory,
-            ...urlArgs)
-      : urls
-          .from('shared.root')
-          .toDevice(fullKey, ...urlArgs);
-
-  // Needed for the rare path arguments which themselves contains one or more
-  // slashes, e.g. for listings, with arguments like 'albums/by-name'.
-  const subdirectoryPrefix =
-    '../'.repeat(urlArgs.join('/').split('/').length - 1);
-
-  const outputDirectory = path.join(outputPath, pathname);
-
-  const output = {
-    directory: outputDirectory,
-    documentHTML: path.join(outputDirectory, file),
-    oEmbedJSON: path.join(outputDirectory, OEMBED_JSON_FILE)
-  };
-
-  return {
-    urlPath: [fullKey, ...urlArgs],
-
-    output,
-    pathname,
-    subdirectoryPrefix,
-  };
 }
 
 async function writeFavicon() {
@@ -1019,30 +936,34 @@ async function main() {
         const pageSubKey = path[0];
         const urlArgs = path.slice(1);
 
-        const localizedPaths = Object.fromEntries(
-          Object.entries(languages)
-            .filter(([key, language]) =>
-              key !== 'default' &&
-              !language.hidden)
-            .map(([_key, language]) => [
-              language.code,
-              getPagePaths({
-                baseDirectory:
-                  (language === finalDefaultLanguage
-                    ? ''
-                    : language.code),
-                fullKey: 'localized.' + pageSubKey,
-                urlArgs,
-              }),
-            ]));
+        const localizedPaths = withEntries(languages, entries => entries
+          .filter(([key, language]) => key !== 'default' && !language.hidden)
+          .map(([_key, language]) => [
+            language.code,
+            getPagePaths({
+              outputPath,
+              urls,
+
+              baseDirectory:
+                (language === finalDefaultLanguage
+                  ? ''
+                  : language.code),
+              fullKey: 'localized.' + pageSubKey,
+              urlArgs,
+            }),
+          ]));
 
         const paths = getPagePaths({
+          outputPath,
+          urls,
+
           baseDirectory,
           fullKey: 'localized.' + pageSubKey,
           urlArgs,
         });
 
         const to = getURLsFrom({
+          urls,
           baseDirectory,
           pageSubKey,
           paths,
@@ -1093,7 +1014,7 @@ async function main() {
           wikiData.wikiInfo.canonicalBase +
             urls
               .from('shared.root')
-              .to('shared.path', paths.pathname + OEMBED_JSON_FILE);
+              .to('shared.path', paths.pathname + 'oembed.json');
 
         const pageHTML = generateDocumentHTML(pageInfo, {
           buildTime: BUILD_TIME,
@@ -1123,12 +1044,16 @@ async function main() {
         });
 
         const from = getPagePaths({
+          outputPath,
+          urls,
+
           baseDirectory,
           fullKey: 'localized.' + fromPath[0],
           urlArgs: fromPath.slice(1),
         });
 
         const to = getURLsFrom({
+          urls,
           baseDirectory,
           pageSubKey: fromPath[0],
           paths: from,
