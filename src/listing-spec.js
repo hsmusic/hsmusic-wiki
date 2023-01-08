@@ -1,3 +1,5 @@
+import {OFFICIAL_GROUP_DIRECTORY} from './util/magic-constants.js';
+
 import {
   empty,
   accumulateSum,
@@ -876,16 +878,20 @@ const listingSpec = [
     directory: 'random',
     stringsKey: 'other.randomPages',
 
-    data: ({wikiData: {fandomAlbumData, officialAlbumData}}) => [
+    data: ({wikiData: {albumData}}) => [
       {
-        albums: officialAlbumData,
         name: 'Official',
         randomCode: 'official',
+        albums: albumData
+          .filter((album) => album.groups
+            .some((group) => group.directory === OFFICIAL_GROUP_DIRECTORY)),
       },
       {
-        albums: fandomAlbumData,
         name: 'Fandom',
         randomCode: 'fandom',
+        albums: albumData
+          .filter((album) => album.groups
+            .every((group) => group.directory !== OFFICIAL_GROUP_DIRECTORY)),
       },
     ],
 

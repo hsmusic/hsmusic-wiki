@@ -112,9 +112,6 @@ import {
 } from './util/serialize.js';
 */
 
-// Pensive emoji!
-import { OFFICIAL_GROUP_DIRECTORY } from './util/magic-constants.js';
-
 import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -495,9 +492,7 @@ async function main() {
     progressCallAll('Caching all data values', Object.entries(wikiData)
       .filter(([key]) =>
         key !== 'listingSpec' &&
-        key !== 'listingTargetSpec' &&
-        key !== 'officialAlbumData' &&
-        key !== 'fandomAlbumData')
+        key !== 'listingTargetSpec')
       .map(([key, value]) =>
         key === 'wikiInfo' ? [key, [value]] :
         key === 'homepageLayout' ? [key, [value]] :
@@ -588,11 +583,6 @@ async function main() {
       return;
     }
   }
-
-  wikiData.officialAlbumData = wikiData.albumData
-    .filter((album) => album.groups.some((group) => group.directory === OFFICIAL_GROUP_DIRECTORY));
-  wikiData.fandomAlbumData = wikiData.albumData
-    .filter((album) => album.groups.every((group) => group.directory !== OFFICIAL_GROUP_DIRECTORY));
 
   const urls = generateURLs(urlSpec);
 
