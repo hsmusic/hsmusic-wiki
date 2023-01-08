@@ -132,26 +132,6 @@ const BUILD_TIME = new Date();
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
-// Shared varia8les! These are more efficient to access than a shared varia8le
-// (or at least I h8pe so), and are easier to pass across functions than a
-// 8unch of specific arguments.
-//
-// Upd8: Okay yeah these aren't actually any different. Still cleaner than
-// passing around a data object containing all this, though.
-let dataPath;
-let mediaPath;
-let langPath;
-let outputPath;
-
-// Glo8al data o8ject shared 8etween 8uild functions and all that. This keeps
-// everything encapsul8ted in one place, so it's easy to pass and share across
-// modules!
-let wikiData = {};
-
-let queueSize;
-
-const urls = generateURLs(urlSpec);
-
 if (!validateReplacerSpec(replacerSpec, {find, link})) {
   process.exit();
 }
@@ -175,10 +155,11 @@ async function wrapLanguages(fn, {languages, writeOneLanguage = null}) {
 async function main() {
   Error.stackTraceLimit = Infinity;
 
-  const WD = wikiData;
-
-  WD.listingSpec = listingSpec;
-  WD.listingTargetSpec = listingTargetSpec;
+  // This is about to get a whole lot more stuff put in it.
+  const wikiData = {
+    listingSpec,
+    listingTargetSpec,
+  };
 
   const miscOptions = await parseOptions(process.argv.slice(2), {
     // Data files for the site, including flash, artist, and al8um data,
@@ -294,12 +275,28 @@ async function main() {
     [parseOptions.handleUnknown]: () => {},
   });
 
-  dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
-  mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
-  langPath = miscOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
-  outputPath = miscOptions['out-path'] || process.env.HSMUSIC_OUT;
+  const dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
+  const mediaPath = miscOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+  const langPath = miscOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
+  const outputPath = miscOptions['out-path'] || process.env.HSMUSIC_OUT;
 
+  const skipThumbs = miscOptions['skip-thumbs'] ?? false;
+  const thumbsOnly = miscOptions['thumbs-only'] ?? false;
+  const noBuild = miscOptions['no-build'] ?? false;
   const writeOneLanguage = miscOptions['lang'];
+
+  const showAggregateTraces = miscOptions['show-traces'] ?? false;
+
+  const appendIndexHTML = miscOptions['append-index-html'] ?? false;
+
+  const precacheData = miscOptions['precache-data'] ?? false;
+  const showInvalidPropertyAccesses = miscOptions['show-invalid-property-accesses'] ?? false;
+
+  // Makes writing a little nicer on CPU theoretically, 8ut also costs in
+  // performance right now 'cuz it'll w8 for file writes to 8e completed
+  // 8efore moving on to more data processing. So, defaults to zero, which
+  // disa8les the queue feature altogether.
+  const queueSize = +(miscOptions['queue-size'] ?? 0);
 
   {
     let errored = false;
@@ -317,17 +314,10 @@ async function main() {
     }
   }
 
-  const appendIndexHTML = miscOptions['append-index-html'] ?? false;
   if (appendIndexHTML) {
     logWarn`Appending index.html to link hrefs. (Note: not recommended for production release!)`;
     link.globalOptions.appendIndexHTML = true;
   }
-
-  const skipThumbs = miscOptions['skip-thumbs'] ?? false;
-  const thumbsOnly = miscOptions['thumbs-only'] ?? false;
-  const noBuild = miscOptions['no-build'] ?? false;
-  const showAggregateTraces = miscOptions['show-traces'] ?? false;
-  const precacheData = miscOptions['precache-data'] ?? false;
 
   // NOT for ena8ling or disa8ling specific features of the site!
   // This is only in charge of what general groups of files to 8uild.
@@ -373,9 +363,6 @@ async function main() {
     if (!result) return;
     if (thumbsOnly) return;
   }
-
-  const showInvalidPropertyAccesses =
-    miscOptions['show-invalid-property-accesses'] ?? false;
 
   if (showInvalidPropertyAccesses) {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
@@ -435,7 +422,7 @@ async function main() {
     }
   }
 
-  if (!WD.wikiInfo) {
+  if (!wikiData.wikiInfo) {
     logError`Can't proceed without wiki info file (${WIKI_INFO_FILE}) successfully loading`;
     return;
   }
@@ -542,15 +529,15 @@ async function main() {
   }
 
   const customDefaultLanguage =
-    languages[WD.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
+    languages[wikiData.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
   let finalDefaultLanguage;
 
   if (customDefaultLanguage) {
     logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
     customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
     finalDefaultLanguage = customDefaultLanguage;
-  } else if (WD.wikiInfo.defaultLanguage) {
-    logError`Wiki info file specified default language is ${WD.wikiInfo.defaultLanguage}, but no such language file exists!`;
+  } else if (wikiData.wikiInfo.defaultLanguage) {
+    logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
     if (langPath) {
       logError`Check if an appropriate file exists in ${langPath}?`;
     } else {
@@ -585,11 +572,11 @@ async function main() {
 
   {
     const tagRefs = new Set(
-      [...WD.trackData, ...WD.albumData]
+      [...wikiData.trackData, ...wikiData.albumData]
         .flatMap((thing) => thing.artTagsByRef ?? []));
 
     for (const ref of tagRefs) {
-      if (find.artTag(ref, WD.artTagData)) {
+      if (find.artTag(ref, wikiData.artTagData)) {
         tagRefs.delete(ref);
       }
     }
@@ -602,10 +589,12 @@ async function main() {
     }
   }
 
-  WD.officialAlbumData = WD.albumData
+  wikiData.officialAlbumData = wikiData.albumData
     .filter((album) => album.groups.some((group) => group.directory === OFFICIAL_GROUP_DIRECTORY));
-  WD.fandomAlbumData = WD.albumData
+  wikiData.fandomAlbumData = wikiData.albumData
     .filter((album) => album.groups.every((group) => group.directory !== OFFICIAL_GROUP_DIRECTORY));
+
+  const urls = generateURLs(urlSpec);
 
   const fileSizePreloader = new FileSizePreloader();
 
@@ -617,7 +606,7 @@ async function main() {
   // function between them so that when site code requests a site path,
   // it'll get the size of the file at the corresponding device path.
   const additionalFilePaths = [
-    ...WD.albumData.flatMap((album) =>
+    ...wikiData.albumData.flatMap((album) =>
       [
         ...(album.additionalFiles ?? []),
         ...album.tracks.flatMap((track) => track.additionalFiles ?? []),
@@ -652,12 +641,6 @@ async function main() {
   logInfo`Done preloading filesizes!`;
 
   if (noBuild) return;
-
-  // Makes writing a little nicer on CPU theoretically, 8ut also costs in
-  // performance right now 'cuz it'll w8 for file writes to 8e completed
-  // 8efore moving on to more data processing. So, defaults to zero, which
-  // disa8les the queue feature altogether.
-  queueSize = +(miscOptions['queue-size'] ?? 0);
 
   const buildDictionary = pageSpecs;
 
