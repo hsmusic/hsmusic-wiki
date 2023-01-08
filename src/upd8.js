@@ -35,15 +35,6 @@ import {execSync} from 'child_process';
 import * as path from 'path';
 import {fileURLToPath} from 'url';
 
-import {
-  copyFile,
-  mkdir,
-  stat,
-  symlink,
-  writeFile,
-  unlink,
-} from 'fs/promises';
-
 import genThumbs from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
@@ -99,9 +90,16 @@ import {validateWrites} from './write/validate-writes.js';
 
 import {
   generateDocumentHTML,
-  generateRedirectHTML,
+  generateGlobalWikiDataJSON,
   generateOEmbedJSON,
+  generateRedirectHTML,
 } from './write/page-template.js';
+
+import {
+  writePage,
+  writeSharedFilesAndPages,
+  writeSymlinks,
+} from './write/write-files.js';
 
 /*
 import {
@@ -134,22 +132,6 @@ const BUILD_TIME = new Date();
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
-// Code that's common 8etween the 8uild code (i.e. upd8.js) and gener8ted
-// site code should 8e put here. Which, uh, ~~only really means this one
-// file~~ is now a variety of useful utilities!
-//
-// Rather than hard code it, anything in this directory can 8e shared across
-// 8oth ends of the code8ase.
-// (This gets symlinked into the --data-path directory.)
-const UTILITY_DIRECTORY = 'util';
-
-// Code that's used only in the static site! CSS, cilent JS, etc.
-// (This gets symlinked into the --data-path directory.)
-const STATIC_DIRECTORY = 'static';
-
-// Automatically copied (if present) from media directory to site root.
-const FAVICON_FILE = 'favicon.ico';
-
 // Shared varia8les! These are more efficient to access than a shared varia8le
 // (or at least I h8pe so), and are easier to pass across functions than a
 // 8unch of specific arguments.
@@ -172,129 +154,6 @@ const urls = generateURLs(urlSpec);
 
 if (!validateReplacerSpec(replacerSpec, {find, link})) {
   process.exit();
-}
-
-function stringifyThings(thingData) {
-  return JSON.stringify(serializeThings(thingData));
-}
-
-async function writePage({
-  html,
-  oEmbedJSON = '',
-  paths,
-}) {
-  await mkdir(paths.output.directory, {recursive: true});
-
-  await Promise.all(
-    [
-      writeFile(paths.output.documentHTML, html),
-
-      oEmbedJSON &&
-        writeFile(paths.output.oEmbedJSON, oEmbedJSON),
-    ].filter(Boolean)
-  );
-}
-
-async function writeFavicon() {
-  try {
-    await stat(path.join(mediaPath, FAVICON_FILE));
-  } catch (error) {
-    return;
-  }
-
-  try {
-    await copyFile(
-      path.join(mediaPath, FAVICON_FILE),
-      path.join(outputPath, FAVICON_FILE)
-    );
-  } catch (error) {
-    logWarn`Failed to copy favicon! ${error.message}`;
-    return;
-  }
-
-  logInfo`Copied favicon to site root.`;
-}
-
-function writeSymlinks() {
-  return progressPromiseAll('Writing site symlinks.', [
-    link(path.join(__dirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
-    link(path.join(__dirname, STATIC_DIRECTORY), 'shared.staticRoot'),
-    link(mediaPath, 'media.root'),
-  ]);
-
-  async function link(directory, urlKey) {
-    const pathname = urls.from('shared.root').toDevice(urlKey);
-    const file = path.join(outputPath, pathname);
-    try {
-      await unlink(file);
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
-      }
-    }
-    try {
-      await symlink(path.resolve(directory), file);
-    } catch (error) {
-      if (error.code === 'EPERM') {
-        await symlink(path.resolve(directory), file, 'junction');
-      }
-    }
-  }
-}
-
-function writeSharedFilesAndPages({language, wikiData}) {
-  const {groupData, wikiInfo} = wikiData;
-
-  const redirect = async (title, from, urlKey, directory) => {
-    const target = path.relative(
-      from,
-      urls.from('shared.root').to(urlKey, directory)
-    );
-    const content = generateRedirectHTML(title, target, {language});
-    await mkdir(path.join(outputPath, from), {recursive: true});
-    await writeFile(path.join(outputPath, from, 'index.html'), content);
-  };
-
-  return progressPromiseAll(`Writing files & pages shared across languages.`, [
-    groupData?.some((group) => group.directory === 'fandom') &&
-      redirect(
-        'Fandom - Gallery',
-        'albums/fandom',
-        'localized.groupGallery',
-        'fandom'
-      ),
-
-    groupData?.some((group) => group.directory === 'official') &&
-      redirect(
-        'Official - Gallery',
-        'albums/official',
-        'localized.groupGallery',
-        'official'
-      ),
-
-    wikiInfo.enableListings &&
-      redirect(
-        'Album Commentary',
-        'list/all-commentary',
-        'localized.commentaryIndex',
-        ''
-      ),
-
-    writeFile(
-      path.join(outputPath, 'data.json'),
-      (
-        '{\n' +
-        [
-          `"albumData": ${stringifyThings(wikiData.albumData)},`,
-          wikiInfo.enableFlashesAndGames &&
-            `"flashData": ${stringifyThings(wikiData.flashData)},`,
-          `"artistData": ${stringifyThings(wikiData.artistData)}`,
-        ]
-          .filter(Boolean)
-          .map(line => '  ' + line)
-          .join('\n') +
-        '\n}')),
-  ].filter(Boolean));
 }
 
 // Wrapper function for running a function once for all languages.
@@ -802,9 +661,25 @@ async function main() {
 
   const buildDictionary = pageSpecs;
 
-  await writeFavicon();
-  await writeSymlinks();
-  await writeSharedFilesAndPages({language: finalDefaultLanguage, wikiData});
+  await writeSymlinks({
+    srcRootDirname: __dirname,
+    mediaPath,
+    outputPath,
+    urls,
+  });
+
+  await writeSharedFilesAndPages({
+    mediaPath,
+    outputPath,
+    urls,
+
+    language: finalDefaultLanguage,
+    wikiData,
+    wikiDataJSON: generateGlobalWikiDataJSON({
+      serializeThings,
+      wikiData,
+    })
+  });
 
   const buildSteps = writeAll
     ? Object.entries(buildDictionary)

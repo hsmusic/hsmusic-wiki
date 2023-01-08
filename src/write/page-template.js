@@ -606,3 +606,24 @@ export function generateRedirectHTML(title, target, {
       ])),
   ]);
 }
+
+export function generateGlobalWikiDataJSON({
+  serializeThings,
+  wikiData,
+}) {
+  return '{\n' +
+    ([
+      `"albumData": ${stringifyThings(wikiData.albumData)},`,
+      wikiData.wikiInfo.enableFlashesAndGames &&
+        `"flashData": ${stringifyThings(wikiData.flashData)},`,
+      `"artistData": ${stringifyThings(wikiData.artistData)}`,
+    ]
+      .filter(Boolean)
+      .map(line => '  ' + line)
+      .join('\n')) +
+    '\n}';
+
+  function stringifyThings(thingData) {
+    return JSON.stringify(serializeThings(thingData));
+  }
+}
