@@ -1,4 +1,9 @@
-import {logInfo} from '../../util/cli.js';
+import * as pageSpecs from '../../page/index.js';
+
+import {
+  logInfo,
+  progressCallAll,
+} from '../../util/cli.js';
 
 export function getCLIOptions() {
   // Stub.
@@ -16,16 +21,40 @@ export async function go({
   _srcRootPath,
   _urls,
   _urlSpec,
-  _wikiData,
+  wikiData,
 
   _cachebust,
   _developersComment,
   _getSizeOfAdditionalFile,
 }) {
-  // Stub.
-  logInfo`So we are back in the mine!`;
-  logInfo`We are swinging our pickaxe in-`;
-  logInfo`...multiple directions,`;
-  logInfo`...multiple directions.`;
+  let targetSpecPairs = getPageSpecsWithTargets({wikiData});
+  const writes = progressCallAll(`Computing page data & paths for ${targetSpecPairs.length} targets.`,
+    targetSpecPairs.map(({
+      pageSpec,
+      target,
+      targetless,
+    }) => () =>
+      targetless
+        ? pageSpec.writeTargetless({wikiData})
+        : pageSpec.write(target, {wikiData}))).flat();
+
+  logInfo`Will be serving a total of ${writes.length} pages.`;
+
   return true;
+}
+
+function getPageSpecsWithTargets({
+  wikiData,
+}) {
+  return Object.values(pageSpecs)
+    .filter(pageSpec => pageSpec.condition?.({wikiData}) ?? true)
+    .flatMap(pageSpec => [
+      ...pageSpec.targets
+        ? pageSpec.targets({wikiData})
+            .map(target => ({pageSpec, target}))
+        : [],
+      Object.hasOwn(pageSpec, 'writeTargetless') &&
+        {pageSpec, targetless: true},
+    ])
+    .filter(Boolean);
 }
