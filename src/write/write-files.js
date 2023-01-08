@@ -46,14 +46,14 @@ export async function writePage({
 }
 
 export function writeSymlinks({
-  srcRootDirname,
+  srcRootPath,
   mediaPath,
   outputPath,
   urls,
 }) {
   return progressPromiseAll('Writing site symlinks.', [
-    link(path.join(srcRootDirname, UTILITY_DIRECTORY), 'shared.utilityRoot'),
-    link(path.join(srcRootDirname, STATIC_DIRECTORY), 'shared.staticRoot'),
+    link(path.join(srcRootPath, UTILITY_DIRECTORY), 'shared.utilityRoot'),
+    link(path.join(srcRootPath, STATIC_DIRECTORY), 'shared.staticRoot'),
     link(mediaPath, 'media.root'),
   ]);
 

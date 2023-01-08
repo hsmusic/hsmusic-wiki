@@ -10,11 +10,46 @@ import {
   img,
 } from '../misc-templates.js';
 
+export function generateDevelopersCommentHTML({
+  buildTime,
+  commit,
+  wikiData,
+}) {
+  const {name, canonicalBase} = wikiData.wikiInfo;
+  return `<!--\n` + [
+    canonicalBase
+      ? `hsmusic.wiki - ${name}, ${canonicalBase}`
+      : `hsmusic.wiki - ${name}`,
+    'Code copyright 2019-2023 Quasar Nebula et al (MIT License)',
+    ...canonicalBase === 'https://hsmusic.wiki/' ? [
+      'Data avidly compiled and localization brought to you',
+      'by our awesome team and community of wiki contributors',
+      '***',
+      'Want to contribute? Join our Discord or leave feedback!',
+      '- https://hsmusic.wiki/discord/',
+      '- https://hsmusic.wiki/feedback/',
+      '- https://github.com/hsmusic/',
+    ] : [
+      'https://github.com/hsmusic/',
+    ],
+    '***',
+    buildTime &&
+      `Site built: ${buildTime.toLocaleString('en-US', {
+        dateStyle: 'long',
+        timeStyle: 'long',
+      })}`,
+    commit &&
+      `Latest code commit: ${commit}`,
+  ]
+    .filter(Boolean)
+    .map(line => `    ` + line)
+    .join('\n') + `\n-->`;
+}
+
 export function generateDocumentHTML(pageInfo, {
-  buildTime = null,
-  cachebust = '',
-  commit = '',
+  cachebust,
   defaultLanguage,
+  developersComment,
   getThemeString,
   language,
   languages,
@@ -422,34 +457,7 @@ export function generateDocumentHTML(pageInfo, {
       'data-rebase-data': to('data.root'),
     },
     [
-      `<!--\n` + [
-        wikiInfo.canonicalBase
-          ? `hsmusic.wiki - ${wikiInfo.name}, ${wikiInfo.canonicalBase}`
-          : `hsmusic.wiki - ${wikiInfo.name}`,
-        'Code copyright 2019-2022 Quasar Nebula et al (MIT License)',
-        ...wikiInfo.canonicalBase === 'https://hsmusic.wiki/' ? [
-          'Data avidly compiled and localization brought to you',
-          'by our awesome team and community of wiki contributors',
-          '***',
-          'Want to contribute? Join our Discord or leave feedback!',
-          '- https://hsmusic.wiki/discord/',
-          '- https://hsmusic.wiki/feedback/',
-          '- https://github.com/hsmusic/',
-        ] : [
-          'https://github.com/hsmusic/',
-        ],
-        '***',
-        buildTime &&
-          `Site built: ${buildTime.toLocaleString('en-US', {
-            dateStyle: 'long',
-            timeStyle: 'long',
-          })}`,
-        commit &&
-          `Latest code commit: ${commit}`,
-      ]
-        .filter(Boolean)
-        .map(line => `    ` + line)
-        .join('\n') + `\n-->`,
+      developersComment,
 
       html.tag('head', [
         html.tag('title',
