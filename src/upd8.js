@@ -228,6 +228,8 @@ async function main() {
     'precache-data': {
       type: 'flag',
     },
+
+    [parseOptions.handleUnknown]: () => {},
   });
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
