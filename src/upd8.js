@@ -60,11 +60,11 @@ import {isMain} from './util/node-utils.js';
 import {replacerSpec} from './util/transform-content.js';
 
 import CacheableObject from './data/things/cacheable-object.js';
-
 import {processLanguageFile} from './data/language.js';
 import {serializeThings} from './data/serialize.js';
 
 import {bindUtilities} from './write/bind-utilities.js';
+import {validateWrites} from './write/validate-writes.js';
 
 import {
   filterDuplicateDirectories,
@@ -176,104 +176,6 @@ if (!validateReplacerSpec(replacerSpec, {find, link})) {
 
 function stringifyThings(thingData) {
   return JSON.stringify(serializeThings(thingData));
-}
-
-function validateWritePath(path, urlGroup) {
-  if (!Array.isArray(path)) {
-    return {error: `Expected array, got ${path}`};
-  }
-
-  const {paths} = urlGroup;
-
-  const definedKeys = Object.keys(paths);
-  const specifiedKey = path[0];
-
-  if (!definedKeys.includes(specifiedKey)) {
-    return {error: `Specified key ${specifiedKey} isn't defined`};
-  }
-
-  const expectedArgs = paths[specifiedKey].match(/<>/g)?.length ?? 0;
-  const specifiedArgs = path.length - 1;
-
-  if (specifiedArgs !== expectedArgs) {
-    return {
-      error: `Expected ${expectedArgs} arguments, got ${specifiedArgs}`,
-    };
-  }
-
-  return {success: true};
-}
-
-function validateWriteObject(obj) {
-  if (typeof obj !== 'object') {
-    return {error: `Expected object, got ${typeof obj}`};
-  }
-
-  if (typeof obj.type !== 'string') {
-    return {error: `Expected type to be string, got ${obj.type}`};
-  }
-
-  switch (obj.type) {
-    case 'legacy': {
-      if (typeof obj.write !== 'function') {
-        return {error: `Expected write to be string, got ${obj.write}`};
-      }
-
-      break;
-    }
-
-    case 'page': {
-      const path = validateWritePath(obj.path, urlSpec.localized);
-      if (path.error) {
-        return {error: `Path validation failed: ${path.error}`};
-      }
-
-      if (typeof obj.page !== 'function') {
-        return {error: `Expected page to be function, got ${obj.content}`};
-      }
-
-      break;
-    }
-
-    case 'data': {
-      const path = validateWritePath(obj.path, urlSpec.data);
-      if (path.error) {
-        return {error: `Path validation failed: ${path.error}`};
-      }
-
-      if (typeof obj.data !== 'function') {
-        return {error: `Expected data to be function, got ${obj.data}`};
-      }
-
-      break;
-    }
-
-    case 'redirect': {
-      const fromPath = validateWritePath(obj.fromPath, urlSpec.localized);
-      if (fromPath.error) {
-        return {
-          error: `Path (fromPath) validation failed: ${fromPath.error}`,
-        };
-      }
-
-      const toPath = validateWritePath(obj.toPath, urlSpec.localized);
-      if (toPath.error) {
-        return {error: `Path (toPath) validation failed: ${toPath.error}`};
-      }
-
-      if (typeof obj.title !== 'function') {
-        return {error: `Expected title to be function, got ${obj.title}`};
-      }
-
-      break;
-    }
-
-    default: {
-      return {error: `Unknown type: ${obj.type}`};
-    }
-  }
-
-  return {success: true};
 }
 
 export function getURLsFrom({
@@ -1623,50 +1525,26 @@ async function main() {
       return;
     }
 
-    const validateWrites = (writes, fnName) => {
-      // Do a quick valid8tion! If one of the writeThingPages functions go
-      // wrong, this will stall out early and tell us which did.
-
-      if (!Array.isArray(writes)) {
-        logError`${fnName} didn't return an array!`;
-        error = true;
-        return false;
-      }
-
-      if (
-        !(
-          writes.every((obj) => typeof obj === 'object') &&
-          writes.every((obj) => {
-            const result = validateWriteObject(obj);
-            if (result.error) {
-              logError`Validating write object failed: ${result.error}`;
-              return false;
-            } else {
-              return true;
-            }
-          })
-        )
-      ) {
-        logError`${fnName} returned invalid entries!`;
-        error = true;
-        return false;
-      }
-
-      return true;
-    };
-
-    // return;
-
     writes = progressCallAll('Computing page & data writes.', buildStepsWithTargets.flatMap(({flag, pageSpec, targets}) => {
       const writesFns = targets.map(target => () => {
         const writes = pageSpec.write(target, {wikiData})?.slice() || [];
-        return validateWrites(writes, flag + '.write') ? writes : [];
+        const valid = validateWrites(writes, {
+          functionName: flag + '.write',
+          urlSpec,
+        });
+        error ||=! valid;
+        return valid ? writes : [];
       });
 
       if (pageSpec.writeTargetless) {
         writesFns.push(() => {
           const writes = pageSpec.writeTargetless({wikiData});
-          return validateWrites(writes, flag + '.writeTargetless') ? writes : [];
+          const valid = validateWrites(writes, {
+            functionName: flag + '.writeTargetless',
+            urlSpec,
+          });
+          error ||=! valid;
+          return valid ? writes : [];
         });
       }
 
