@@ -1,3 +1,5 @@
+import * as path from 'path';
+
 import {bindUtilities} from '../bind-utilities.js';
 import {validateWrites} from '../validate-writes.js';
 
@@ -7,12 +9,6 @@ import {
   generateOEmbedJSON,
   generateRedirectHTML,
 } from '../page-template.js';
-
-import {
-  writePage,
-  writeSharedFilesAndPages,
-  writeSymlinks,
-} from '../write-files.js';
 
 import {serializeThings} from '../../data/serialize.js';
 
@@ -120,12 +116,15 @@ export async function go({
     urls,
   });
 
-  await writeSharedFilesAndPages({
+  await writeFavicon({
     mediaPath,
     outputPath,
-    urls,
+  });
 
+  await writeSharedFilesAndPages({
     language: defaultLanguage,
+    outputPath,
+    urls,
     wikiData,
     wikiDataJSON: generateGlobalWikiDataJSON({
       serializeThings,
@@ -419,5 +418,138 @@ async function wrapLanguages(fn, {
     const [_key, language] = entries[i];
 
     await fn(language, i, entries);
+  }
+}
+
+import {
+  copyFile,
+  mkdir,
+  stat,
+  symlink,
+  writeFile,
+  unlink,
+} from 'fs/promises';
+
+async function writePage({
+  html,
+  oEmbedJSON = '',
+  paths,
+}) {
+  await mkdir(paths.output.directory, {recursive: true});
+
+  await Promise.all([
+    writeFile(paths.output.documentHTML, html),
+
+    oEmbedJSON &&
+      writeFile(paths.output.oEmbedJSON, oEmbedJSON),
+  ].filter(Boolean));
+}
+
+function writeSymlinks({
+  srcRootPath,
+  mediaPath,
+  outputPath,
+  urls,
+}) {
+  return progressPromiseAll('Writing site symlinks.', [
+    link(path.join(srcRootPath, 'util'), 'shared.utilityRoot'),
+    link(path.join(srcRootPath, 'static'), 'shared.staticRoot'),
+    link(mediaPath, 'media.root'),
+  ]);
+
+  async function link(directory, urlKey) {
+    const pathname = urls.from('shared.root').toDevice(urlKey);
+    const file = path.join(outputPath, pathname);
+
+    try {
+      await unlink(file);
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    try {
+      await symlink(path.resolve(directory), file);
+    } catch (error) {
+      if (error.code === 'EPERM') {
+        await symlink(path.resolve(directory), file, 'junction');
+      }
+    }
+  }
+}
+
+async function writeFavicon({
+  mediaPath,
+  outputPath,
+}) {
+  const faviconFile = 'favicon.ico';
+
+  try {
+    await stat(path.join(mediaPath, faviconFile));
+  } catch (error) {
+    return;
+  }
+
+  try {
+    await copyFile(
+      path.join(mediaPath, faviconFile),
+      path.join(outputPath, faviconFile));
+  } catch (error) {
+    logWarn`Failed to copy favicon! ${error.message}`;
+    return;
+  }
+
+  logInfo`Copied favicon to site root.`;
+}
+
+async function writeSharedFilesAndPages({
+  language,
+  outputPath,
+  urls,
+  wikiData,
+  wikiDataJSON,
+}) {
+  const {groupData, wikiInfo} = wikiData;
+
+  return progressPromiseAll(`Writing files & pages shared across languages.`, [
+    groupData?.some((group) => group.directory === 'fandom') &&
+      redirect(
+        'Fandom - Gallery',
+        'albums/fandom',
+        'localized.groupGallery',
+        'fandom'
+      ),
+
+    groupData?.some((group) => group.directory === 'official') &&
+      redirect(
+        'Official - Gallery',
+        'albums/official',
+        'localized.groupGallery',
+        'official'
+      ),
+
+    wikiInfo.enableListings &&
+      redirect(
+        'Album Commentary',
+        'list/all-commentary',
+        'localized.commentaryIndex',
+        ''
+      ),
+
+    wikiDataJSON &&
+      writeFile(
+        path.join(outputPath, 'data.json'),
+        wikiDataJSON),
+  ].filter(Boolean));
+
+  async function redirect(title, from, urlKey, directory) {
+    const target = path.relative(
+      from,
+      urls.from('shared.root').to(urlKey, directory)
+    );
+    const content = generateRedirectHTML(title, target, {language});
+    await mkdir(path.join(outputPath, from), {recursive: true});
+    await writeFile(path.join(outputPath, from, 'index.html'), content);
   }
 }
