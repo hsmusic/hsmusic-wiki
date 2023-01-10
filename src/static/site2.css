@@ -631,11 +631,6 @@ blockquote {
   padding-right: 12%;
 }
 
-p img {
-  max-width: 100%;
-  height: auto;
-}
-
 dl dt {
   padding-left: 40px;
   max-width: 600px;
@@ -709,13 +704,6 @@ li > ul {
   height: 100%;
 }
 
-.image-inner-area {
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
 .image-text-area {
   position: absolute;
   top: 0;
@@ -737,12 +725,6 @@ li > ul {
 
 img {
   object-fit: cover;
-  /* these unfortunately dont take effect while loading, so...
-    text-align: center;
-    line-height: 2em;
-    text-shadow: 0 0 5px black;
-    font-style: oblique;
-    */
 }
 
 .reveal {
@@ -1027,17 +1009,6 @@ html[data-url-key="localized.home"] .carousel-container {
   position: absolute;
   width: 100%;
   height: 100%;
-}
-
-.vertical-square {
-  position: relative;
-  height: 100%;
-}
-
-.vertical-square::after {
-  content: "";
-  display: block;
-  padding-right: 100%;
 }
 
 /* Info card */
