@@ -264,11 +264,9 @@ export async function go({
     console.log(`\x1b[34;1m${`[${i + 1}/${entries.length}] ${language.code} (-> /${baseDirectory}) `.padEnd(60, '-')}\x1b[0m`);
 
     await progressPromiseAll(`Writing ${language.code}`, queue([
-      ...pageWrites.map((props) => () => {
-        const {path, page} = props;
-
-        const pageSubKey = path[0];
-        const urlArgs = path.slice(1);
+      ...pageWrites.map(page => () => {
+        const pageSubKey = page.path[0];
+        const urlArgs = page.path.slice(1);
 
         const localizedPathnames = withEntries(languages, entries => entries
           .filter(([key, language]) => key !== 'default' && !language.hidden)
@@ -317,7 +315,7 @@ export async function go({
           wikiData,
         });
 
-        const pageInfo = page(bound);
+        const pageInfo = page.page(bound);
 
         const oEmbedJSON = generateOEmbedJSON(pageInfo, {
           language,
@@ -341,9 +339,11 @@ export async function go({
           languages,
           localizedPathnames,
           oEmbedJSONHref,
-          paths,
+          pageSubKey,
+          pathname: paths.pathname,
           to,
           transformMultiline: bound.transformMultiline,
+          urlArgs,
           wikiData,
         });
 
