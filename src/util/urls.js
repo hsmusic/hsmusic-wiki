@@ -186,22 +186,25 @@ export function getURLsFrom({
 
 export function getPagePathname({
   baseDirectory,
+  device = false,
   fullKey,
   urlArgs,
   urls,
 }) {
   const [groupKey, subKey] = fullKey.split('.');
 
+  const toKey = device ? 'toDevice' : 'to';
+
   return (groupKey === 'localized' && baseDirectory
     ? urls
-        .from('shared.root')
-        .toDevice(
+        .from('shared.root')[toKey](
           'localizedWithBaseDirectory.' + subKey,
           baseDirectory,
           ...urlArgs)
     : urls
-        .from('shared.root')
-        .toDevice(fullKey, ...urlArgs));
+        .from('shared.root')[toKey](
+          fullKey,
+          ...urlArgs));
 }
 
 // Needed for the rare path arguments which themselves contains one or more
@@ -221,6 +224,7 @@ export function getPagePaths({
 
   const pathname = getPagePathname({
     baseDirectory,
+    device: true,
     fullKey,
     urlArgs,
     urls,
