@@ -51,8 +51,11 @@ import {
 } from '../util/wiki-data.js';
 
 export function bindUtilities({
+  absoluteTo,
+  getSizeOfAdditionalFile,
   language,
   to,
+  urls,
   wikiData,
 }) {
   // TODO: Is there some nicer way to define these,
@@ -60,8 +63,15 @@ export function bindUtilities({
   // each page?
   const bound = {};
 
-  bound.html = html;
-  bound.language = language;
+  Object.assign(bound, {
+    absoluteTo,
+    getSizeOfAdditionalFile,
+    html,
+    language,
+    to,
+    urls,
+    wikiData,
+  })
 
   bound.img = bindOpts(img, {
     [bindOpts.bindIndex]: 0,

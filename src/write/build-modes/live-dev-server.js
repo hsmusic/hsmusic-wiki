@@ -296,20 +296,15 @@ export async function go({
         ]));
 
       const bound = bindUtilities({
+        absoluteTo,
+        getSizeOfAdditionalFile,
         language,
         to,
+        urls,
         wikiData,
       });
 
-      const pageInfo = page.page({
-        ...bound,
-
-        absoluteTo,
-        to,
-        urls,
-
-        getSizeOfAdditionalFile,
-      });
+      const pageInfo = page.page(bound);
 
       const pageHTML = generateDocumentHTML(pageInfo, {
         cachebust,

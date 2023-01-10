@@ -309,20 +309,15 @@ export async function go({
         });
 
         const bound = bindUtilities({
+          absoluteTo,
+          getSizeOfAdditionalFile,
           language,
           to,
+          urls,
           wikiData,
         });
 
-        const pageInfo = page({
-          ...bound,
-
-          absoluteTo,
-          to,
-          urls,
-
-          getSizeOfAdditionalFile,
-        });
+        const pageInfo = page(bound);
 
         const oEmbedJSON = generateOEmbedJSON(pageInfo, {
           language,
