@@ -10,7 +10,7 @@ import {serializeThings} from '../../data/serialize.js';
 
 import * as pageSpecs from '../../page/index.js';
 
-import {logInfo, progressCallAll} from '../../util/cli.js';
+import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
 import {withEntries} from '../../util/sugar.js';
 
 import {
@@ -26,27 +26,39 @@ import {
 } from '../page-template.js';
 
 export function getCLIOptions() {
-  return {};
+  return {
+    host: {
+      type: 'value',
+    },
+
+    port: {
+      type: 'value',
+      validate(size) {
+        if (parseInt(size) !== parseFloat(size)) return 'an integer';
+        if (parseInt(size) < 1024 || parseInt(size) > 49151) return 'a user/registered port (1024-49151)';
+        return true;
+      },
+    },
+  };
 }
 
 export async function go({
-  _cliOptions,
+  cliOptions,
   _dataPath,
   mediaPath,
-  _queueSize,
 
   defaultLanguage,
   languages,
   srcRootPath,
   urls,
-  _urlSpec,
   wikiData,
 
   cachebust,
   developersComment,
   getSizeOfAdditionalFile,
 }) {
-  const port = 8002;
+  const host = cliOptions['host'] ?? '0.0.0.0';
+  const port = parseInt(cliOptions['port'] ?? 8002);
 
   let targetSpecPairs = getPageSpecsWithTargets({wikiData});
   const pages = progressCallAll(`Computing page data & paths for ${targetSpecPairs.length} targets.`,
@@ -95,7 +107,7 @@ export async function go({
 
   const server = http.createServer(async (request, response) => {
     const contentTypeHTML = {'Content-Type': 'text/html; charset=utf-8'};
-    const contentTypeJSON = {'Content-Type': 'text/json; charset=utf-8'};
+    const contentTypeJSON = {'Content-Type': 'application/json; charset=utf-8'};
     const contentTypePlain = {'Content-Type': 'text/plain; charset=utf-8'};
 
     const requestTime = new Date().toLocaleDateString('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
@@ -115,26 +127,35 @@ export async function go({
     // Specialized routes
 
     if (pathname === '/data.json') {
-      response.writeHead(200, contentTypeJSON);
-      response.end(generateGlobalWikiDataJSON({
-        serializeThings,
-        wikiData,
-      }));
+      try {
+        const json = generateGlobalWikiDataJSON({
+          serializeThings,
+          wikiData,
+        });
+        response.writeHead(200, contentTypeJSON);
+        response.end(json);
+        console.log(`${requestHead} [200] /data.json`);
+      } catch (error) {
+        response.writeHead(500, contentTypeJSON);
+        response.end({error: `Internal error serializing wiki JSON`});
+        console.error(`${requestHead} [500] /data.json`);
+        console.error(error);
+      }
       return;
     }
 
     const {
       area: localFileArea,
       path: localFilePath
-    } = pathname.match(/^\/(?<area>static|media)\/(?<path>.*)/)?.groups ?? {};
+    } = pathname.match(/^\/(?<area>static|util|media)\/(?<path>.*)/)?.groups ?? {};
 
     if (localFileArea) {
       // Not security tested, man, this is a dev server!!
       const safePath = path.resolve('/', localFilePath).replace(/^\//, '');
 
       let localDirectory;
-      if (localFileArea === 'static') {
-        localDirectory = path.join(srcRootPath, 'static');
+      if (localFileArea === 'static' || localFileArea === 'util') {
+        localDirectory = path.join(srcRootPath, localFileArea);
       } else if (localFileArea === 'media') {
         localDirectory = mediaPath;
       }
@@ -158,8 +179,42 @@ export async function go({
         return;
       }
 
+      const extname = path.extname(safePath).slice(1).toLowerCase();
+
+      const contentType = {
+        // BRB covering all my bases
+        'aac': 'audio/aac',
+        'bmp': 'image/bmp',
+        'css': 'text/css',
+        'csv': 'text/csv',
+        'gif': 'image/gif',
+        'ico': 'image/vnd.microsoft.icon',
+        'jpg': 'image/jpeg',
+        'jpeg:': 'image/jpeg',
+        'js': 'text/javascript',
+        'mjs': 'text/javascript',
+        'mp3': 'audio/mpeg',
+        'mp4': 'video/mp4',
+        'oga': 'audio/ogg',
+        'ogg': 'audio/ogg',
+        'ogv': 'video/ogg',
+        'opus': 'audio/opus',
+        'png': 'image/png',
+        'pdf': 'application/pdf',
+        'svg': 'image/svg+xml',
+        'ttf': 'font/ttf',
+        'txt': 'text/plain',
+        'wav': 'audio/wav',
+        'weba': 'audio/webm',
+        'webm': 'video/webm',
+        'woff': 'font/woff',
+        'woff2': 'font/woff2',
+        'xml': 'application/xml',
+        'zip': 'application/zip',
+      }[extname];
+
       try {
-        response.writeHead(200); // Sorry, no MIME type for now
+        response.writeHead(200, contentType ? {'Content-Type': contentType} : {});
         await pipeline(
           createReadStream(filePath),
           response);
@@ -169,8 +224,8 @@ export async function go({
         response.end(`Failed during file-to-response pipeline`);
         console.error(`${requestHead} [500] ${pathname}`);
         console.error(error);
-        return;
       }
+      return;
     }
 
     // Other routes determined by page and URL specs
@@ -293,8 +348,28 @@ export async function go({
     }
   });
 
-  server.listen(port);
-  logInfo`${'All done!'} Listening at ${`http://0.0.0.0:${port}/`}`;
+  const address = `http://${host}:${port}/`;
+
+  server.on('error', error => {
+    if (error.code === 'EADDRINUSE') {
+      logWarn`Port ${port} is already in use - will (continually) retry after 10 seconds.`;
+      logWarn`Press ^C here (control+C) to exit and change ${'--port'} number, or stop the server currently running on port ${port}.`;
+      setTimeout(() => {
+        server.close();
+        server.listen(port, host);
+      }, 10_000);
+    } else {
+      console.error(`Server error detected (code: ${error.code})`);
+      console.error(error);
+    }
+  });
+
+  server.on('listening', () => {
+    logInfo`${'All done!'} Listening at: ${address}`;
+    logInfo`Press ^C here (control+C) to stop the server and exit.`;
+  });
+
+  server.listen(port, host);
 
   // Just keep going... forever!!!
   await new Promise(() => {});
