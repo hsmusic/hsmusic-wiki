@@ -15,7 +15,7 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import link from '../../util/link.js';
-import {empty, queue, withEntries} from '../../util/sugar.js';
+import {empty, queue} from '../../util/sugar.js';
 
 import {
   logError,
@@ -27,6 +27,7 @@ import {
 
 import {
   getPagePathname,
+  getPagePathnameAcrossLanguages,
   getPageSubdirectoryPrefix,
   getURLsFrom,
   getURLsFromRoot,
@@ -268,20 +269,13 @@ export async function go({
         const urlArgs = page.path.slice(1);
         const fullKey = 'localized.' + pageSubKey;
 
-        const localizedPathnames = withEntries(languages, entries => entries
-          .filter(([key, language]) => key !== 'default' && !language.hidden)
-          .map(([_key, language]) => [
-            language.code,
-            getPagePathname({
-              baseDirectory:
-                (language === defaultLanguage
-                  ? ''
-                  : language.code),
-              fullKey,
-              urlArgs,
-              urls,
-            }),
-          ]));
+        const localizedPathnames = getPagePathnameAcrossLanguages({
+          defaultLanguage,
+          languages,
+          pageSubKey,
+          urlArgs,
+          urls,
+        });
 
         const pathname = getPagePathname({
           baseDirectory,

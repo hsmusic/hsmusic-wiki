@@ -11,10 +11,10 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
-import {withEntries} from '../../util/sugar.js';
 
 import {
   getPagePathname,
+  getPagePathnameAcrossLanguages,
   getPageSubdirectoryPrefix,
   getURLsFrom,
   getURLsFromRoot,
@@ -280,20 +280,13 @@ export async function go({
 
       response.writeHead(200, contentTypeHTML);
 
-      const localizedPathnames = withEntries(languages, entries => entries
-        .filter(([key, language]) => key !== 'default' && !language.hidden)
-        .map(([_key, language]) => [
-          language.code,
-          getPagePathname({
-            baseDirectory:
-              (language === defaultLanguage
-                ? ''
-                : language.code),
-            fullKey: 'localized.' + pageSubKey,
-            urlArgs,
-            urls,
-          }),
-        ]));
+      const localizedPathnames = getPagePathnameAcrossLanguages({
+        defaultLanguage,
+        languages,
+        pageSubKey,
+        urlArgs,
+        urls,
+      });
 
       const bound = bindUtilities({
         absoluteTo,
