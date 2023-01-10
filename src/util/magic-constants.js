@@ -7,4 +7,3 @@
 // (TM).
 
 export const OFFICIAL_GROUP_DIRECTORY = 'official';
-export const FANDOM_GROUP_DIRECTORY = 'fandom';

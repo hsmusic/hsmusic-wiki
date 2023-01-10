@@ -136,3 +136,138 @@ export const thumb = {
   medium: thumbnailHelper('.medium'),
   small: thumbnailHelper('.small'),
 };
+
+// Makes the generally-used and wiki-specialized "to" page utility.
+// "to" returns a relative path from the current page to the target.
+export function getURLsFrom({
+  urls,
+
+  baseDirectory,
+  pageSubKey,
+  subdirectoryPrefix,
+}) {
+  return (targetFullKey, ...args) => {
+    const [groupKey, subKey] = targetFullKey.split('.');
+    let path = subdirectoryPrefix;
+
+    let from;
+    let to;
+
+    // When linking to *outside* the localized area of the site, we need to
+    // make sure the result is correctly relative to the 8ase directory.
+    if (
+      groupKey !== 'localized' &&
+      groupKey !== 'localizedDefaultLanguage' &&
+      baseDirectory
+    ) {
+      from = 'localizedWithBaseDirectory.' + pageSubKey;
+      to = targetFullKey;
+    } else if (groupKey === 'localizedDefaultLanguage' && baseDirectory) {
+      // Special case for specifically linking *from* a page with base
+      // directory *to* a page without! Used for the language switcher and
+      // hopefully nothing else oh god.
+      from = 'localizedWithBaseDirectory.' + pageSubKey;
+      to = 'localized.' + subKey;
+    } else if (groupKey === 'localizedDefaultLanguage') {
+      // Linking to the default, except surprise, we're already IN the default
+      // (no baseDirectory set).
+      from = 'localized.' + pageSubKey;
+      to = 'localized.' + subKey;
+    } else {
+      // If we're linking inside the localized area (or there just is no
+      // 8ase directory), the 8ase directory doesn't matter.
+      from = 'localized.' + pageSubKey;
+      to = targetFullKey;
+    }
+
+    path += urls.from(from).to(to, ...args);
+
+    return path;
+  };
+}
+
+// Makes the generally-used and wiki-specialized "absoluteTo" page utility.
+// "absoluteTo" returns an absolute path, starting at site root (/) leading
+// to the target.
+export function getURLsFromRoot({
+  baseDirectory,
+  urls,
+}) {
+  const from = urls.from('shared.root');
+
+  return (targetFullKey, ...args) => {
+    const [groupKey, subKey] = targetFullKey.split('.');
+    return (
+      '/' +
+      (groupKey === 'localized' && baseDirectory
+        ? from.to(
+            'localizedWithBaseDirectory.' + subKey,
+            baseDirectory,
+            ...args
+          )
+        : from.to(targetFullKey, ...args))
+    );
+  };
+}
+
+export function getPagePathname({
+  baseDirectory,
+  device = false,
+  fullKey,
+  urlArgs,
+  urls,
+}) {
+  const [groupKey, subKey] = fullKey.split('.');
+
+  const toKey = device ? 'toDevice' : 'to';
+
+  return (groupKey === 'localized' && baseDirectory
+    ? urls
+        .from('shared.root')[toKey](
+          'localizedWithBaseDirectory.' + subKey,
+          baseDirectory,
+          ...urlArgs)
+    : urls
+        .from('shared.root')[toKey](
+          fullKey,
+          ...urlArgs));
+}
+
+// Needed for the rare path arguments which themselves contains one or more
+// slashes, e.g. for listings, with arguments like 'albums/by-name'.
+export function getPageSubdirectoryPrefix({urlArgs}) {
+  return '../'.repeat(urlArgs.join('/').split('/').length - 1);
+}
+
+export function getPagePaths({
+  baseDirectory,
+  fullKey,
+  outputPath,
+  urlArgs,
+  urls,
+}) {
+  const [groupKey, subKey] = fullKey.split('.');
+
+  const pathname = getPagePathname({
+    baseDirectory,
+    device: true,
+    fullKey,
+    urlArgs,
+    urls,
+  });
+
+  const outputDirectory = path.join(outputPath, pathname);
+
+  const output = {
+    directory: outputDirectory,
+    documentHTML: path.join(outputDirectory, 'index.html'),
+    oEmbedJSON: path.join(outputDirectory, 'oembed.json'),
+  };
+
+  return {
+    urlPath: [fullKey, ...urlArgs],
+
+    output,
+    pathname,
+  };
+}
