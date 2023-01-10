@@ -267,7 +267,6 @@ export async function go({
       ...pageWrites.map(page => () => {
         const pageSubKey = page.path[0];
         const urlArgs = page.path.slice(1);
-        const fullKey = 'localized.' + pageSubKey;
 
         const localizedPathnames = getPagePathnameAcrossLanguages({
           defaultLanguage,
@@ -279,7 +278,7 @@ export async function go({
 
         const pathname = getPagePathname({
           baseDirectory,
-          fullKey,
+          pageSubKey,
           urlArgs,
           urls,
         });
@@ -345,7 +344,7 @@ export async function go({
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
-            fullKey,
+            pageSubKey,
             urlArgs,
             urls,
           })),
@@ -373,7 +372,7 @@ export async function go({
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
-            fullKey: 'localized.' + fromPath[0],
+            pageSubKey: fromPath[0],
             urlArgs: fromPath.slice(1),
             urls,
           })),

@@ -83,17 +83,14 @@ export async function go({
       else if (page.type === 'redirect')
         servePath = page.fromPath;
 
-      const fullKey = 'localized.' + servePath[0];
-      const urlArgs = servePath.slice(1);
-
       return Object.values(languages).map(language => {
         const baseDirectory =
           language === defaultLanguage ? '' : language.code;
 
         const pathname = getPagePathname({
           baseDirectory,
-          fullKey,
-          urlArgs,
+          pageSubKey: servePath[0],
+          urlArgs: servePath.slice(1),
           urls,
         });
 

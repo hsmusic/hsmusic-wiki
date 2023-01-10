@@ -213,24 +213,14 @@ export function getURLsFromRoot({
 export function getPagePathname({
   baseDirectory,
   device = false,
-  fullKey,
+  pageSubKey,
   urlArgs,
   urls,
 }) {
-  const [groupKey, subKey] = fullKey.split('.');
-
-  const toKey = device ? 'toDevice' : 'to';
-
-  return (groupKey === 'localized' && baseDirectory
-    ? urls
-        .from('shared.root')[toKey](
-          'localizedWithBaseDirectory.' + subKey,
-          baseDirectory,
-          ...urlArgs)
-    : urls
-        .from('shared.root')[toKey](
-          fullKey,
-          ...urlArgs));
+  const to = urls.from('shared.root')[device ? 'toDevice' : 'to'];
+  return (baseDirectory
+    ? to('localizedWithBaseDirectory.' + pageSubKey, baseDirectory, ...urlArgs)
+    : to('localized.' + pageSubKey, ...urlArgs));
 }
 
 export function getPagePathnameAcrossLanguages({
@@ -249,7 +239,7 @@ export function getPagePathnameAcrossLanguages({
           (language === defaultLanguage
             ? ''
             : language.code),
-        fullKey: 'localized.' + pageSubKey,
+        pageSubKey,
         urlArgs,
         urls,
       }),
