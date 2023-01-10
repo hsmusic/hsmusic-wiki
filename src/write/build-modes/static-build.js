@@ -16,7 +16,6 @@ import * as pageSpecs from '../../page/index.js';
 
 import link from '../../util/link.js';
 import {empty, queue, withEntries} from '../../util/sugar.js';
-import {getPagePaths, getURLsFrom} from '../../util/urls.js';
 
 import {
   logError,
@@ -25,6 +24,13 @@ import {
   progressCallAll,
   progressPromiseAll,
 } from '../../util/cli.js';
+
+import {
+  getPagePathname,
+  getPagePaths,
+  getPageSubdirectoryPrefix,
+  getURLsFrom,
+} from '../../util/urls.js';
 
 const pageFlags = Object.keys(pageSpecs);
 
@@ -263,20 +269,18 @@ export async function go({
         const pageSubKey = path[0];
         const urlArgs = path.slice(1);
 
-        const localizedPaths = withEntries(languages, entries => entries
+        const localizedPathnames = withEntries(languages, entries => entries
           .filter(([key, language]) => key !== 'default' && !language.hidden)
           .map(([_key, language]) => [
             language.code,
-            getPagePaths({
-              outputPath,
-              urls,
-
+            getPagePathname({
               baseDirectory:
                 (language === defaultLanguage
                   ? ''
                   : language.code),
               fullKey: 'localized.' + pageSubKey,
               urlArgs,
+              urls,
             }),
           ]));
 
@@ -293,7 +297,9 @@ export async function go({
           urls,
           baseDirectory,
           pageSubKey,
-          paths,
+          subdirectoryPrefix: getPageSubdirectoryPrefix({
+            urlArgs: page.path.slice(1),
+          }),
         });
 
         const absoluteTo = (targetFullKey, ...args) => {
@@ -319,8 +325,6 @@ export async function go({
 
         const pageInfo = page({
           ...bound,
-
-          language,
 
           absoluteTo,
           relativeTo: to,
@@ -350,7 +354,7 @@ export async function go({
           getThemeString: bound.getThemeString,
           language,
           languages,
-          localizedPaths,
+          localizedPathnames,
           oEmbedJSONHref,
           paths,
           to,
@@ -382,7 +386,9 @@ export async function go({
           urls,
           baseDirectory,
           pageSubKey: fromPath[0],
-          paths: from,
+          subdirectoryPrefix: getPageSubdirectoryPrefix({
+            urlArgs: fromPath.slice(1),
+          }),
         });
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));

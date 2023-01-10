@@ -971,46 +971,37 @@ function unbound_generateStickyHeadingContainer({
 
 function unbound_getFooterLocalizationLinks(pathname, {
   html,
-  language,
-  to,
-  paths,
-
   defaultLanguage,
+  language,
   languages,
-}) {
-  const {urlPath} = paths;
-  const keySuffix = urlPath[0].replace(/^localized\./, '.');
-  const toArgs = urlPath.slice(1);
+  to,
 
+  pageSubKey,
+  urlArgs,
+}) {
   const links = Object.entries(languages)
     .filter(([code, language]) => code !== 'default' && !language.hidden)
     .map(([code, language]) => language)
     .sort(({name: a}, {name: b}) => (a < b ? -1 : a > b ? 1 : 0))
     .map((language) =>
-      html.tag(
-        'span',
-        html.tag(
-          'a',
+      html.tag('span',
+        html.tag('a',
           {
             href:
               language === defaultLanguage
-                ? to('localizedDefaultLanguage' + keySuffix, ...toArgs)
+                ? to(
+                    'localizedDefaultLanguage.' + pageSubKey,
+                    ...urlArgs)
                 : to(
-                    'localizedWithBaseDirectory' + keySuffix,
-                    language.code,
-                    ...toArgs
-                  ),
+                    'localizedWithBaseDirectory.' + pageSubKey,
+                    language.code, ...urlArgs),
           },
-          language.name
-        )
-      )
-    );
+          language.name)));
 
-  return html.tag(
-    'div',
-    {class: 'footer-localization-links'},
-    language.$('misc.uiLanguage', {languages: links.join('\n')})
-  );
+  return html.tag('div', {class: 'footer-localization-links'},
+    language.$('misc.uiLanguage', {
+      languages: links.join('\n'),
+    }));
 }
 
 // Exports

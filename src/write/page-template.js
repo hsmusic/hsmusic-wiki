@@ -53,11 +53,13 @@ export function generateDocumentHTML(pageInfo, {
   getThemeString,
   language,
   languages,
-  localizedPaths,
-  paths,
+  localizedPathnames,
   oEmbedJSONHref,
+  pageSubKey,
+  pathname,
   to,
   transformMultiline,
+  urlArgs,
   wikiData,
 }) {
   const {wikiInfo} = wikiData;
@@ -125,11 +127,11 @@ export function generateDocumentHTML(pageInfo, {
     : null;
 
   const canonical = wikiInfo.canonicalBase
-    ? wikiInfo.canonicalBase + (paths.pathname === '/' ? '' : paths.pathname)
+    ? wikiInfo.canonicalBase + (pathname === '/' ? '' : pathname)
     : '';
 
   const localizedCanonical = wikiInfo.canonicalBase
-    ? Object.entries(localizedPaths).map(([code, {pathname}]) => ({
+    ? Object.entries(localizedPathnames).map(([code, pathname]) => ({
         lang: code,
         href: wikiInfo.canonicalBase + (pathname === '/' ? '' : pathname),
       }))
@@ -162,13 +164,14 @@ export function generateDocumentHTML(pageInfo, {
           },
           footer.content),
 
-        getFooterLocalizationLinks(paths.pathname, {
+        getFooterLocalizationLinks(pathname, {
           defaultLanguage,
           html,
           language,
           languages,
-          paths,
+          pageSubKey,
           to,
+          urlArgs,
         }),
       ]);
 
@@ -264,7 +267,7 @@ export function generateDocumentHTML(pageInfo, {
           ? to(...cur.path)
           : cur.href
           ? (() => {
-              logWarn`Using legacy href format nav link in ${paths.pathname}`;
+              logWarn`Using legacy href format nav link in ${pathname}`;
               return cur.href;
             })()
           : null,
@@ -447,9 +450,9 @@ export function generateDocumentHTML(pageInfo, {
     {
       lang: language.intlCode,
       'data-language-code': language.code,
-      'data-url-key': paths.urlPath[0],
+      'data-url-key': 'localized.' + pageSubKey,
       ...Object.fromEntries(
-        paths.urlPath.slice(1).map((v, i) => [['data-url-value' + i], v])
+        urlArgs.map((v, i) => [['data-url-value' + i], v])
       ),
       'data-rebase-localized': to('localized.root'),
       'data-rebase-shared': to('shared.root'),

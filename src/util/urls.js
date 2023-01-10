@@ -142,11 +142,11 @@ export function getURLsFrom({
 
   baseDirectory,
   pageSubKey,
-  paths,
+  subdirectoryPrefix,
 }) {
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
-    let path = paths.subdirectoryPrefix;
+    let path = subdirectoryPrefix;
 
     let from;
     let to;
@@ -184,32 +184,47 @@ export function getURLsFrom({
   };
 }
 
-export function getPagePaths({
-  outputPath,
-  urls,
-
+export function getPagePathname({
   baseDirectory,
   fullKey,
   urlArgs,
+  urls,
 }) {
   const [groupKey, subKey] = fullKey.split('.');
 
-  const pathname =
-    groupKey === 'localized' && baseDirectory
-      ? urls
-          .from('shared.root')
-          .toDevice(
-            'localizedWithBaseDirectory.' + subKey,
-            baseDirectory,
-            ...urlArgs)
-      : urls
-          .from('shared.root')
-          .toDevice(fullKey, ...urlArgs);
+  return (groupKey === 'localized' && baseDirectory
+    ? urls
+        .from('shared.root')
+        .toDevice(
+          'localizedWithBaseDirectory.' + subKey,
+          baseDirectory,
+          ...urlArgs)
+    : urls
+        .from('shared.root')
+        .toDevice(fullKey, ...urlArgs));
+}
 
-  // Needed for the rare path arguments which themselves contains one or more
-  // slashes, e.g. for listings, with arguments like 'albums/by-name'.
-  const subdirectoryPrefix =
-    '../'.repeat(urlArgs.join('/').split('/').length - 1);
+// Needed for the rare path arguments which themselves contains one or more
+// slashes, e.g. for listings, with arguments like 'albums/by-name'.
+export function getPageSubdirectoryPrefix({urlArgs}) {
+  return '../'.repeat(urlArgs.join('/').split('/').length - 1);
+}
+
+export function getPagePaths({
+  baseDirectory,
+  fullKey,
+  outputPath,
+  urlArgs,
+  urls,
+}) {
+  const [groupKey, subKey] = fullKey.split('.');
+
+  const pathname = getPagePathname({
+    baseDirectory,
+    fullKey,
+    urlArgs,
+    urls,
+  });
 
   const outputDirectory = path.join(outputPath, pathname);
 
@@ -224,6 +239,5 @@ export function getPagePaths({
 
     output,
     pathname,
-    subdirectoryPrefix,
   };
 }

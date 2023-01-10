@@ -61,6 +61,7 @@ export function bindUtilities({
   const bound = {};
 
   bound.html = html;
+  bound.language = language;
 
   bound.img = bindOpts(img, {
     [bindOpts.bindIndex]: 0,
