@@ -238,36 +238,3 @@ export function getPagePathname({
 export function getPageSubdirectoryPrefix({urlArgs}) {
   return '../'.repeat(urlArgs.join('/').split('/').length - 1);
 }
-
-export function getPagePaths({
-  baseDirectory,
-  fullKey,
-  outputPath,
-  urlArgs,
-  urls,
-}) {
-  const [groupKey, subKey] = fullKey.split('.');
-
-  const pathname = getPagePathname({
-    baseDirectory,
-    device: true,
-    fullKey,
-    urlArgs,
-    urls,
-  });
-
-  const outputDirectory = path.join(outputPath, pathname);
-
-  const output = {
-    directory: outputDirectory,
-    documentHTML: path.join(outputDirectory, 'index.html'),
-    oEmbedJSON: path.join(outputDirectory, 'oembed.json'),
-  };
-
-  return {
-    urlPath: [fullKey, ...urlArgs],
-
-    output,
-    pathname,
-  };
-}

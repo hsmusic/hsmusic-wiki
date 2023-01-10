@@ -27,7 +27,6 @@ import {
 
 import {
   getPagePathname,
-  getPagePaths,
   getPageSubdirectoryPrefix,
   getURLsFrom,
   getURLsFromRoot,
@@ -267,6 +266,7 @@ export async function go({
       ...pageWrites.map(page => () => {
         const pageSubKey = page.path[0];
         const urlArgs = page.path.slice(1);
+        const fullKey = 'localized.' + pageSubKey;
 
         const localizedPathnames = withEntries(languages, entries => entries
           .filter(([key, language]) => key !== 'default' && !language.hidden)
@@ -277,19 +277,17 @@ export async function go({
                 (language === defaultLanguage
                   ? ''
                   : language.code),
-              fullKey: 'localized.' + pageSubKey,
+              fullKey,
               urlArgs,
               urls,
             }),
           ]));
 
-        const paths = getPagePaths({
-          outputPath,
-          urls,
-
+        const pathname = getPagePathname({
           baseDirectory,
-          fullKey: 'localized.' + pageSubKey,
+          fullKey,
           urlArgs,
+          urls,
         });
 
         const to = getURLsFrom({
@@ -328,7 +326,7 @@ export async function go({
           wikiData.wikiInfo.canonicalBase +
             urls
               .from('shared.root')
-              .to('shared.path', paths.pathname + 'oembed.json');
+              .to('shared.path', pathname + 'oembed.json');
 
         const pageHTML = generateDocumentHTML(pageInfo, {
           cachebust,
@@ -340,7 +338,7 @@ export async function go({
           localizedPathnames,
           oEmbedJSONHref,
           pageSubKey,
-          pathname: paths.pathname,
+          pathname,
           to,
           transformMultiline: bound.transformMultiline,
           urlArgs,
@@ -350,21 +348,18 @@ export async function go({
         return writePage({
           html: pageHTML,
           oEmbedJSON,
-          paths,
+          outputDirectory: path.join(outputPath, getPagePathname({
+            baseDirectory,
+            device: true,
+            fullKey,
+            urlArgs,
+            urls,
+          })),
         });
       }),
       ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
         const title = titleFn({
           language,
-        });
-
-        const from = getPagePaths({
-          outputPath,
-          urls,
-
-          baseDirectory,
-          fullKey: 'localized.' + fromPath[0],
-          urlArgs: fromPath.slice(1),
         });
 
         const to = getURLsFrom({
@@ -378,7 +373,17 @@ export async function go({
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
         const html = generateRedirectHTML(title, target, {language});
-        return writePage({html, paths: from});
+
+        return writePage({
+          html,
+          outputDirectory: path.join(outputPath, getPagePathname({
+            baseDirectory,
+            device: true,
+            fullKey: 'localized.' + fromPath[0],
+            urlArgs: fromPath.slice(1),
+            urls,
+          })),
+        });
       }),
     ], queueSize));
   };
@@ -424,15 +429,15 @@ import {
 async function writePage({
   html,
   oEmbedJSON = '',
-  paths,
+  outputDirectory,
 }) {
-  await mkdir(paths.output.directory, {recursive: true});
+  await mkdir(outputDirectory, {recursive: true});
 
   await Promise.all([
-    writeFile(paths.output.documentHTML, html),
+    writeFile(path.join(outputDirectory, 'index.html'), html),
 
     oEmbedJSON &&
-      writeFile(paths.output.oEmbedJSON, oEmbedJSON),
+      writeFile(path.join(outputDirectory, 'oembed.json'), oEmbedJSON),
   ].filter(Boolean));
 }
 
