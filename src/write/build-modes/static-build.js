@@ -30,6 +30,7 @@ import {
   getPagePaths,
   getPageSubdirectoryPrefix,
   getURLsFrom,
+  getURLsFromRoot,
 } from '../../util/urls.js';
 
 const pageFlags = Object.keys(pageSpecs);
@@ -302,20 +303,10 @@ export async function go({
           }),
         });
 
-        const absoluteTo = (targetFullKey, ...args) => {
-          const [groupKey, subKey] = targetFullKey.split('.');
-          const from = urls.from('shared.root');
-          return (
-            '/' +
-            (groupKey === 'localized' && baseDirectory
-              ? from.to(
-                  'localizedWithBaseDirectory.' + subKey,
-                  baseDirectory,
-                  ...args
-                )
-              : from.to(targetFullKey, ...args))
-          );
-        };
+        const absoluteTo = getURLsFromRoot({
+          baseDirectory,
+          urls,
+        });
 
         const bound = bindUtilities({
           language,
@@ -327,7 +318,6 @@ export async function go({
           ...bound,
 
           absoluteTo,
-          relativeTo: to,
           to,
           urls,
 

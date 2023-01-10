@@ -137,6 +137,8 @@ export const thumb = {
   small: thumbnailHelper('.small'),
 };
 
+// Makes the generally-used and wiki-specialized "to" page utility.
+// "to" returns a relative path from the current page to the target.
 export function getURLsFrom({
   urls,
 
@@ -181,6 +183,30 @@ export function getURLsFrom({
     path += urls.from(from).to(to, ...args);
 
     return path;
+  };
+}
+
+// Makes the generally-used and wiki-specialized "absoluteTo" page utility.
+// "absoluteTo" returns an absolute path, starting at site root (/) leading
+// to the target.
+export function getURLsFromRoot({
+  baseDirectory,
+  urls,
+}) {
+  const from = urls.from('shared.root');
+
+  return (targetFullKey, ...args) => {
+    const [groupKey, subKey] = targetFullKey.split('.');
+    return (
+      '/' +
+      (groupKey === 'localized' && baseDirectory
+        ? from.to(
+            'localizedWithBaseDirectory.' + subKey,
+            baseDirectory,
+            ...args
+          )
+        : from.to(targetFullKey, ...args))
+    );
   };
 }
 
