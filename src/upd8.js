@@ -703,7 +703,6 @@ function img({
   function wrap(input, hide = false) {
     let wrapped = input;
 
-    wrapped = html.tag('div', {class: 'image-inner-area'}, wrapped);
     wrapped = html.tag('div', {class: 'image-container'}, wrapped);
 
     if (reveal) {
