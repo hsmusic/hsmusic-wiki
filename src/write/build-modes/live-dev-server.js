@@ -151,7 +151,7 @@ export async function go({
 
     if (localFileArea) {
       // Not security tested, man, this is a dev server!!
-      const safePath = path.resolve('/', localFilePath).replace(/^\//, '');
+      const safePath = path.posix.resolve('/', localFilePath).replace(/^\//, '');
 
       let localDirectory;
       if (localFileArea === 'static' || localFileArea === 'util') {
@@ -160,7 +160,7 @@ export async function go({
         localDirectory = mediaPath;
       }
 
-      const filePath = path.resolve(localDirectory, safePath);
+      const filePath = path.resolve(localDirectory, safePath.split('/').join(path.sep));
 
       try {
         await stat(filePath);
