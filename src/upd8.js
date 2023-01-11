@@ -2126,7 +2126,7 @@ async function main() {
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
   // before proceeding to more page processing.
-  const queueSize = +(miscOptions['queue-size'] ?? 500);
+  queueSize = +(miscOptions['queue-size'] ?? 500);
 
   const buildDictionary = pageSpecs;
 
