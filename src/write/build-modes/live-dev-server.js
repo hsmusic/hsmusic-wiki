@@ -15,7 +15,6 @@ import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
 import {
   getPagePathname,
   getPagePathnameAcrossLanguages,
-  getPageSubdirectoryPrefix,
   getURLsFrom,
   getURLsFromRoot,
 } from '../../util/urls.js';
@@ -245,12 +244,9 @@ export async function go({
     } = urlToPageMap[pathnameKey];
 
     const to = getURLsFrom({
-      urls,
       baseDirectory,
       pagePath: servePath,
-      subdirectoryPrefix: getPageSubdirectoryPrefix({
-        pagePath: servePath,
-      }),
+      urls,
     });
 
     const absoluteTo = getURLsFromRoot({

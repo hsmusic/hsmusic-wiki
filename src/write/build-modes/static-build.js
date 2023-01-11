@@ -28,7 +28,6 @@ import {
 import {
   getPagePathname,
   getPagePathnameAcrossLanguages,
-  getPageSubdirectoryPrefix,
   getURLsFrom,
   getURLsFromRoot,
 } from '../../util/urls.js';
@@ -281,12 +280,9 @@ export async function go({
         });
 
         const to = getURLsFrom({
-          urls,
           baseDirectory,
           pagePath,
-          subdirectoryPrefix: getPageSubdirectoryPrefix({
-            pagePath,
-          }),
+          urls,
         });
 
         const absoluteTo = getURLsFromRoot({
@@ -351,12 +347,9 @@ export async function go({
         });
 
         const to = getURLsFrom({
-          urls,
           baseDirectory,
           pagePath: fromPath,
-          subdirectoryPrefix: getPageSubdirectoryPrefix({
-            pagePath: fromPath,
-          }),
+          urls,
         });
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));

@@ -140,20 +140,16 @@ export const thumb = {
 // Makes the generally-used and wiki-specialized "to" page utility.
 // "to" returns a relative path from the current page to the target.
 export function getURLsFrom({
-  urls,
-
   baseDirectory,
   pagePath,
-  subdirectoryPrefix,
+  urls,
 }) {
   const pageSubKey = pagePath[0];
+  const subdirectoryPrefix = getPageSubdirectoryPrefix({pagePath});
 
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
-    let path = subdirectoryPrefix;
-
-    let from;
-    let to;
+    let from, to;
 
     // When linking to *outside* the localized area of the site, we need to
     // make sure the result is correctly relative to the 8ase directory.
@@ -182,9 +178,9 @@ export function getURLsFrom({
       to = targetFullKey;
     }
 
-    path += urls.from(from).to(to, ...args);
-
-    return path;
+    return (
+      subdirectoryPrefix +
+      urls.from(from).to(to, ...args));
   };
 }
 
