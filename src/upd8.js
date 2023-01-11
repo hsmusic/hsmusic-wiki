@@ -2123,11 +2123,10 @@ async function main() {
 
   if (noBuild) return;
 
-  // Makes writing a little nicer on CPU theoretically, 8ut also costs in
-  // performance right now 'cuz it'll w8 for file writes to 8e completed
-  // 8efore moving on to more data processing. So, defaults to zero, which
-  // disa8les the queue feature altogether.
-  queueSize = +(miscOptions['queue-size'] ?? 0);
+  // Makes writing nicer on the CPU and file I/O parts of the OS, with a
+  // marginal performance deficit while waiting for file writes to finish
+  // before proceeding to more page processing.
+  const queueSize = +(miscOptions['queue-size'] ?? 500);
 
   const buildDictionary = pageSpecs;
 
