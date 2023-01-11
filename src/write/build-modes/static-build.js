@@ -309,7 +309,7 @@ export async function go({
         const oEmbedJSONHref =
           oEmbedJSON &&
           wikiData.wikiInfo.canonicalBase &&
-          wikiData.wikiInfo.canonicalBase +
+            wikiData.wikiInfo.canonicalBase +
             urls
               .from('shared.root')
               .to('shared.path', pathname + 'oembed.json');
