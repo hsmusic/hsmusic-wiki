@@ -55,11 +55,10 @@ export function generateDocumentHTML(pageInfo, {
   languages,
   localizedPathnames,
   oEmbedJSONHref,
-  pageSubKey,
+  pagePath,
   pathname,
   to,
   transformMultiline,
-  urlArgs,
   wikiData,
 }) {
   const {wikiInfo} = wikiData;
@@ -169,9 +168,8 @@ export function generateDocumentHTML(pageInfo, {
           html,
           language,
           languages,
-          pageSubKey,
+          pagePath,
           to,
-          urlArgs,
         }),
       ]);
 
@@ -450,10 +448,9 @@ export function generateDocumentHTML(pageInfo, {
     {
       lang: language.intlCode,
       'data-language-code': language.code,
-      'data-url-key': 'localized.' + pageSubKey,
+      'data-url-key': 'localized.' + pagePath[0],
       ...Object.fromEntries(
-        urlArgs.map((v, i) => [['data-url-value' + i], v])
-      ),
+        pagePath.slice(1).map((v, i) => [['data-url-value' + i], v])),
       'data-rebase-localized': to('localized.root'),
       'data-rebase-shared': to('shared.root'),
       'data-rebase-media': to('media.root'),

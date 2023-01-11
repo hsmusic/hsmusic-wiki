@@ -143,9 +143,11 @@ export function getURLsFrom({
   urls,
 
   baseDirectory,
-  pageSubKey,
+  pagePath,
   subdirectoryPrefix,
 }) {
+  const pageSubKey = pagePath[0];
+
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
     let path = subdirectoryPrefix;
@@ -193,19 +195,19 @@ export function getURLsFromRoot({
   baseDirectory,
   urls,
 }) {
-  const from = urls.from('shared.root');
+  const {to} = urls.from('shared.root');
 
   return (targetFullKey, ...args) => {
     const [groupKey, subKey] = targetFullKey.split('.');
     return (
       '/' +
       (groupKey === 'localized' && baseDirectory
-        ? from.to(
+        ? to(
             'localizedWithBaseDirectory.' + subKey,
             baseDirectory,
             ...args
           )
-        : from.to(targetFullKey, ...args))
+        : to(targetFullKey, ...args))
     );
   };
 }
@@ -213,21 +215,20 @@ export function getURLsFromRoot({
 export function getPagePathname({
   baseDirectory,
   device = false,
-  pageSubKey,
-  urlArgs,
+  pagePath,
   urls,
 }) {
-  const to = urls.from('shared.root')[device ? 'toDevice' : 'to'];
+  const {[device ? 'toDevice' : 'to']: to} = urls.from('shared.root');
+
   return (baseDirectory
-    ? to('localizedWithBaseDirectory.' + pageSubKey, baseDirectory, ...urlArgs)
-    : to('localized.' + pageSubKey, ...urlArgs));
+    ? to('localizedWithBaseDirectory.' + pagePath[0], baseDirectory, ...pagePath.slice(1))
+    : to('localized.' + pagePath[0], ...pagePath.slice(1)));
 }
 
 export function getPagePathnameAcrossLanguages({
   defaultLanguage,
   languages,
-  pageSubKey,
-  urlArgs,
+  pagePath,
   urls,
 }) {
   return withEntries(languages, entries => entries
@@ -239,8 +240,7 @@ export function getPagePathnameAcrossLanguages({
           (language === defaultLanguage
             ? ''
             : language.code),
-        pageSubKey,
-        urlArgs,
+        pagePath,
         urls,
       }),
     ]));
@@ -248,6 +248,13 @@ export function getPagePathnameAcrossLanguages({
 
 // Needed for the rare path arguments which themselves contains one or more
 // slashes, e.g. for listings, with arguments like 'albums/by-name'.
-export function getPageSubdirectoryPrefix({urlArgs}) {
-  return '../'.repeat(urlArgs.join('/').split('/').length - 1);
+export function getPageSubdirectoryPrefix({
+  pagePath,
+}) {
+  const timesNestedDeeply = (pagePath
+    .slice(1) // skip URL key, only check arguments
+    .join('/')
+    .split('/')
+    .length - 1);
+  return '../'.repeat(timesNestedDeeply);
 }

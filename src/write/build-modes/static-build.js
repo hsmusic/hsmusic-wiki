@@ -265,30 +265,27 @@ export async function go({
 
     await progressPromiseAll(`Writing ${language.code}`, queue([
       ...pageWrites.map(page => () => {
-        const pageSubKey = page.path[0];
-        const urlArgs = page.path.slice(1);
+        const pagePath = page.path;
 
         const localizedPathnames = getPagePathnameAcrossLanguages({
           defaultLanguage,
           languages,
-          pageSubKey,
-          urlArgs,
+          pagePath,
           urls,
         });
 
         const pathname = getPagePathname({
           baseDirectory,
-          pageSubKey,
-          urlArgs,
+          pagePath,
           urls,
         });
 
         const to = getURLsFrom({
           urls,
           baseDirectory,
-          pageSubKey,
+          pagePath,
           subdirectoryPrefix: getPageSubdirectoryPrefix({
-            urlArgs: page.path.slice(1),
+            pagePath,
           }),
         });
 
@@ -330,11 +327,10 @@ export async function go({
           languages,
           localizedPathnames,
           oEmbedJSONHref,
-          pageSubKey,
+          pagePath,
           pathname,
           to,
           transformMultiline: bound.transformMultiline,
-          urlArgs,
           wikiData,
         });
 
@@ -344,8 +340,7 @@ export async function go({
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
-            pageSubKey,
-            urlArgs,
+            pagePath,
             urls,
           })),
         });
@@ -358,9 +353,9 @@ export async function go({
         const to = getURLsFrom({
           urls,
           baseDirectory,
-          pageSubKey: fromPath[0],
+          pagePath: fromPath,
           subdirectoryPrefix: getPageSubdirectoryPrefix({
-            urlArgs: fromPath.slice(1),
+            pagePath: fromPath,
           }),
         });
 
@@ -372,8 +367,7 @@ export async function go({
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
-            pageSubKey: fromPath[0],
-            urlArgs: fromPath.slice(1),
+            pagePath: fromPath,
             urls,
           })),
         });

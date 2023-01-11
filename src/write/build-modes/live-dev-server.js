@@ -89,8 +89,7 @@ export async function go({
 
         const pathname = getPagePathname({
           baseDirectory,
-          pageSubKey: servePath[0],
-          urlArgs: servePath.slice(1),
+          pagePath: servePath,
           urls,
         });
 
@@ -248,9 +247,9 @@ export async function go({
     const to = getURLsFrom({
       urls,
       baseDirectory,
-      pageSubKey: servePath[0],
+      pagePath: servePath,
       subdirectoryPrefix: getPageSubdirectoryPrefix({
-        urlArgs: servePath.slice(1),
+        pagePath: servePath,
       }),
     });
 
@@ -260,9 +259,6 @@ export async function go({
     });
 
     try {
-      const pageSubKey = servePath[0];
-      const urlArgs = servePath.slice(1);
-
       if (page.type === 'redirect') {
         response.writeHead(301, contentTypeHTML);
 
@@ -280,8 +276,7 @@ export async function go({
       const localizedPathnames = getPagePathnameAcrossLanguages({
         defaultLanguage,
         languages,
-        pageSubKey,
-        urlArgs,
+        pagePath: servePath,
         urls,
       });
 
@@ -305,9 +300,8 @@ export async function go({
         languages,
         localizedPathnames,
         oEmbedJSONHref: null, // No oEmbed support for live dev server
-        pageSubKey,
+        pagePath: servePath,
         pathname,
-        urlArgs,
         to,
         transformMultiline: bound.transformMultiline,
         wikiData,

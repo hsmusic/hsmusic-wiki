@@ -973,10 +973,8 @@ function unbound_getFooterLocalizationLinks(pathname, {
   defaultLanguage,
   language,
   languages,
+  pagePath,
   to,
-
-  pageSubKey,
-  urlArgs,
 }) {
   const links = Object.entries(languages)
     .filter(([code, language]) => code !== 'default' && !language.hidden)
@@ -989,11 +987,12 @@ function unbound_getFooterLocalizationLinks(pathname, {
             href:
               language === defaultLanguage
                 ? to(
-                    'localizedDefaultLanguage.' + pageSubKey,
-                    ...urlArgs)
+                    'localizedDefaultLanguage.' + pagePath[0],
+                    ...pagePath.slice(1))
                 : to(
-                    'localizedWithBaseDirectory.' + pageSubKey,
-                    language.code, ...urlArgs),
+                    'localizedWithBaseDirectory.' + pagePath[0],
+                    language.code,
+                    ...pagePath.slice(1)),
           },
           language.name)));
 
