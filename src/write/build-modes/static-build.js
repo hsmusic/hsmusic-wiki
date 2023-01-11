@@ -292,8 +292,10 @@ export async function go({
 
         const bound = bindUtilities({
           absoluteTo,
+          defaultLanguage,
           getSizeOfAdditionalFile,
           language,
+          languages,
           to,
           urls,
           wikiData,
@@ -315,19 +317,13 @@ export async function go({
               .to('shared.path', pathname + 'oembed.json');
 
         const pageHTML = generateDocumentHTML(pageInfo, {
+          ...bound,
           cachebust,
-          defaultLanguage,
           developersComment,
-          getThemeString: bound.getThemeString,
-          language,
-          languages,
           localizedPathnames,
           oEmbedJSONHref,
           pagePath,
           pathname,
-          to,
-          transformMultiline: bound.transformMultiline,
-          wikiData,
         });
 
         return writePage({

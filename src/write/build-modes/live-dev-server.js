@@ -278,8 +278,10 @@ export async function go({
 
       const bound = bindUtilities({
         absoluteTo,
+        defaultLanguage,
         getSizeOfAdditionalFile,
         language,
+        languages,
         to,
         urls,
         wikiData,
@@ -288,19 +290,13 @@ export async function go({
       const pageInfo = page.page(bound);
 
       const pageHTML = generateDocumentHTML(pageInfo, {
+        ...bound,
         cachebust,
-        defaultLanguage,
         developersComment,
-        getThemeString: bound.getThemeString,
-        language,
-        languages,
         localizedPathnames,
         oEmbedJSONHref: null, // No oEmbed support for live dev server
         pagePath: servePath,
         pathname,
-        to,
-        transformMultiline: bound.transformMultiline,
-        wikiData,
       });
 
       console.log(`${requestHead} [200] ${pathname}`);

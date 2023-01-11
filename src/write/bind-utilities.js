@@ -52,8 +52,10 @@ import {
 
 export function bindUtilities({
   absoluteTo,
+  defaultLanguage,
   getSizeOfAdditionalFile,
   language,
+  languages,
   to,
   urls,
   wikiData,
@@ -65,9 +67,11 @@ export function bindUtilities({
 
   Object.assign(bound, {
     absoluteTo,
+    defaultLanguage,
     getSizeOfAdditionalFile,
     html,
     language,
+    languages,
     to,
     urls,
     wikiData,
