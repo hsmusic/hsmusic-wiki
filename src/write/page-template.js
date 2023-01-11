@@ -1,7 +1,6 @@
 import chroma from 'chroma-js';
 
 import * as html from '../util/html.js';
-import {logWarn} from '../util/cli.js';
 import {getColors} from '../util/colors.js';
 
 import {
@@ -263,11 +262,6 @@ export function generateDocumentHTML(pageInfo, {
           ? to('localized.home')
           : cur.path
           ? to(...cur.path)
-          : cur.href
-          ? (() => {
-              logWarn`Using legacy href format nav link in ${pathname}`;
-              return cur.href;
-            })()
           : null,
       };
       if (attributes.href === null) {
