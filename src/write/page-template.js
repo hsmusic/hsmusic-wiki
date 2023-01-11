@@ -163,7 +163,7 @@ export function generateDocumentHTML(pageInfo, {
           },
           footer.content),
 
-        getFooterLocalizationLinks(pathname, {
+        getFooterLocalizationLinks({
           defaultLanguage,
           html,
           language,

@@ -968,7 +968,7 @@ function unbound_generateStickyHeadingContainer({
 
 // Footer stuff
 
-function unbound_getFooterLocalizationLinks(pathname, {
+function unbound_getFooterLocalizationLinks({
   html,
   defaultLanguage,
   language,
