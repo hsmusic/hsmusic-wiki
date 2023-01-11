@@ -15,7 +15,7 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import link from '../../util/link.js';
-import {empty, queue, withEntries} from '../../util/sugar.js';
+import {empty, queue} from '../../util/sugar.js';
 
 import {
   logError,
@@ -27,8 +27,7 @@ import {
 
 import {
   getPagePathname,
-  getPagePaths,
-  getPageSubdirectoryPrefix,
+  getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
 } from '../../util/urls.js';
@@ -265,40 +264,25 @@ export async function go({
 
     await progressPromiseAll(`Writing ${language.code}`, queue([
       ...pageWrites.map(page => () => {
-        const pageSubKey = page.path[0];
-        const urlArgs = page.path.slice(1);
+        const pagePath = page.path;
 
-        const localizedPathnames = withEntries(languages, entries => entries
-          .filter(([key, language]) => key !== 'default' && !language.hidden)
-          .map(([_key, language]) => [
-            language.code,
-            getPagePathname({
-              baseDirectory:
-                (language === defaultLanguage
-                  ? ''
-                  : language.code),
-              fullKey: 'localized.' + pageSubKey,
-              urlArgs,
-              urls,
-            }),
-          ]));
-
-        const paths = getPagePaths({
-          outputPath,
+        const localizedPathnames = getPagePathnameAcrossLanguages({
+          defaultLanguage,
+          languages,
+          pagePath,
           urls,
+        });
 
+        const pathname = getPagePathname({
           baseDirectory,
-          fullKey: 'localized.' + pageSubKey,
-          urlArgs,
+          pagePath,
+          urls,
         });
 
         const to = getURLsFrom({
-          urls,
           baseDirectory,
-          pageSubKey,
-          subdirectoryPrefix: getPageSubdirectoryPrefix({
-            urlArgs: page.path.slice(1),
-          }),
+          pagePath,
+          urls,
         });
 
         const absoluteTo = getURLsFromRoot({
@@ -308,8 +292,10 @@ export async function go({
 
         const bound = bindUtilities({
           absoluteTo,
+          defaultLanguage,
           getSizeOfAdditionalFile,
           language,
+          languages,
           to,
           urls,
           wikiData,
@@ -325,32 +311,30 @@ export async function go({
         const oEmbedJSONHref =
           oEmbedJSON &&
           wikiData.wikiInfo.canonicalBase &&
-          wikiData.wikiInfo.canonicalBase +
+            wikiData.wikiInfo.canonicalBase +
             urls
               .from('shared.root')
-              .to('shared.path', paths.pathname + 'oembed.json');
+              .to('shared.path', pathname + 'oembed.json');
 
         const pageHTML = generateDocumentHTML(pageInfo, {
+          ...bound,
           cachebust,
-          defaultLanguage,
           developersComment,
-          getThemeString: bound.getThemeString,
-          language,
-          languages,
           localizedPathnames,
           oEmbedJSONHref,
-          pageSubKey,
-          pathname: paths.pathname,
-          to,
-          transformMultiline: bound.transformMultiline,
-          urlArgs,
-          wikiData,
+          pagePath,
+          pathname,
         });
 
         return writePage({
           html: pageHTML,
           oEmbedJSON,
-          paths,
+          outputDirectory: path.join(outputPath, getPagePathname({
+            baseDirectory,
+            device: true,
+            pagePath,
+            urls,
+          })),
         });
       }),
       ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
@@ -358,27 +342,24 @@ export async function go({
           language,
         });
 
-        const from = getPagePaths({
-          outputPath,
-          urls,
-
-          baseDirectory,
-          fullKey: 'localized.' + fromPath[0],
-          urlArgs: fromPath.slice(1),
-        });
-
         const to = getURLsFrom({
-          urls,
           baseDirectory,
-          pageSubKey: fromPath[0],
-          subdirectoryPrefix: getPageSubdirectoryPrefix({
-            urlArgs: fromPath.slice(1),
-          }),
+          pagePath: fromPath,
+          urls,
         });
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
         const html = generateRedirectHTML(title, target, {language});
-        return writePage({html, paths: from});
+
+        return writePage({
+          html,
+          outputDirectory: path.join(outputPath, getPagePathname({
+            baseDirectory,
+            device: true,
+            pagePath: fromPath,
+            urls,
+          })),
+        });
       }),
     ], queueSize));
   };
@@ -424,15 +405,15 @@ import {
 async function writePage({
   html,
   oEmbedJSON = '',
-  paths,
+  outputDirectory,
 }) {
-  await mkdir(paths.output.directory, {recursive: true});
+  await mkdir(outputDirectory, {recursive: true});
 
   await Promise.all([
-    writeFile(paths.output.documentHTML, html),
+    writeFile(path.join(outputDirectory, 'index.html'), html),
 
     oEmbedJSON &&
-      writeFile(paths.output.oEmbedJSON, oEmbedJSON),
+      writeFile(path.join(outputDirectory, 'oembed.json'), oEmbedJSON),
   ].filter(Boolean));
 }
 

@@ -1,7 +1,6 @@
 import chroma from 'chroma-js';
 
 import * as html from '../util/html.js';
-import {logWarn} from '../util/cli.js';
 import {getColors} from '../util/colors.js';
 
 import {
@@ -55,11 +54,10 @@ export function generateDocumentHTML(pageInfo, {
   languages,
   localizedPathnames,
   oEmbedJSONHref,
-  pageSubKey,
+  pagePath,
   pathname,
   to,
   transformMultiline,
-  urlArgs,
   wikiData,
 }) {
   const {wikiInfo} = wikiData;
@@ -164,14 +162,13 @@ export function generateDocumentHTML(pageInfo, {
           },
           footer.content),
 
-        getFooterLocalizationLinks(pathname, {
+        getFooterLocalizationLinks({
           defaultLanguage,
           html,
           language,
           languages,
-          pageSubKey,
+          pagePath,
           to,
-          urlArgs,
         }),
       ]);
 
@@ -265,11 +262,6 @@ export function generateDocumentHTML(pageInfo, {
           ? to('localized.home')
           : cur.path
           ? to(...cur.path)
-          : cur.href
-          ? (() => {
-              logWarn`Using legacy href format nav link in ${pathname}`;
-              return cur.href;
-            })()
           : null,
       };
       if (attributes.href === null) {
@@ -450,10 +442,9 @@ export function generateDocumentHTML(pageInfo, {
     {
       lang: language.intlCode,
       'data-language-code': language.code,
-      'data-url-key': 'localized.' + pageSubKey,
+      'data-url-key': 'localized.' + pagePath[0],
       ...Object.fromEntries(
-        urlArgs.map((v, i) => [['data-url-value' + i], v])
-      ),
+        pagePath.slice(1).map((v, i) => [['data-url-value' + i], v])),
       'data-rebase-localized': to('localized.root'),
       'data-rebase-shared': to('shared.root'),
       'data-rebase-media': to('media.root'),

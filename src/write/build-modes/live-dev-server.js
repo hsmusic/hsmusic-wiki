@@ -11,11 +11,10 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
-import {withEntries} from '../../util/sugar.js';
 
 import {
   getPagePathname,
-  getPageSubdirectoryPrefix,
+  getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
 } from '../../util/urls.js';
@@ -83,17 +82,13 @@ export async function go({
       else if (page.type === 'redirect')
         servePath = page.fromPath;
 
-      const fullKey = 'localized.' + servePath[0];
-      const urlArgs = servePath.slice(1);
-
       return Object.values(languages).map(language => {
         const baseDirectory =
           language === defaultLanguage ? '' : language.code;
 
         const pathname = getPagePathname({
           baseDirectory,
-          fullKey,
-          urlArgs,
+          pagePath: servePath,
           urls,
         });
 
@@ -249,12 +244,9 @@ export async function go({
     } = urlToPageMap[pathnameKey];
 
     const to = getURLsFrom({
-      urls,
       baseDirectory,
-      pageSubKey: servePath[0],
-      subdirectoryPrefix: getPageSubdirectoryPrefix({
-        urlArgs: servePath.slice(1),
-      }),
+      pagePath: servePath,
+      urls,
     });
 
     const absoluteTo = getURLsFromRoot({
@@ -263,9 +255,6 @@ export async function go({
     });
 
     try {
-      const pageSubKey = servePath[0];
-      const urlArgs = servePath.slice(1);
-
       if (page.type === 'redirect') {
         response.writeHead(301, contentTypeHTML);
 
@@ -280,25 +269,19 @@ export async function go({
 
       response.writeHead(200, contentTypeHTML);
 
-      const localizedPathnames = withEntries(languages, entries => entries
-        .filter(([key, language]) => key !== 'default' && !language.hidden)
-        .map(([_key, language]) => [
-          language.code,
-          getPagePathname({
-            baseDirectory:
-              (language === defaultLanguage
-                ? ''
-                : language.code),
-            fullKey: 'localized.' + pageSubKey,
-            urlArgs,
-            urls,
-          }),
-        ]));
+      const localizedPathnames = getPagePathnameAcrossLanguages({
+        defaultLanguage,
+        languages,
+        pagePath: servePath,
+        urls,
+      });
 
       const bound = bindUtilities({
         absoluteTo,
+        defaultLanguage,
         getSizeOfAdditionalFile,
         language,
+        languages,
         to,
         urls,
         wikiData,
@@ -307,20 +290,13 @@ export async function go({
       const pageInfo = page.page(bound);
 
       const pageHTML = generateDocumentHTML(pageInfo, {
+        ...bound,
         cachebust,
-        defaultLanguage,
         developersComment,
-        getThemeString: bound.getThemeString,
-        language,
-        languages,
         localizedPathnames,
         oEmbedJSONHref: null, // No oEmbed support for live dev server
-        pageSubKey,
+        pagePath: servePath,
         pathname,
-        urlArgs,
-        to,
-        transformMultiline: bound.transformMultiline,
-        wikiData,
       });
 
       console.log(`${requestHead} [200] ${pathname}`);
