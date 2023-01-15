@@ -236,6 +236,20 @@ export async function go({
       return;
     }
 
+    // All pages expect to be served at a URL with a trailing slash, which must
+    // be fulfilled for relative URLs (ex. href="../lofam5/") to work. Redirect
+    // if there is no trailing slash in the request URL.
+    if (!pathname.endsWith('/')) {
+      const target = pathname + '/';
+      response.writeHead(301, {
+        ...contentTypePlain,
+        'Location': target,
+      });
+      response.end(`Redirecting to: ${target}\n`);
+      console.log(`${requestHead} [301] (trl. slash) ${pathname}`);
+      return;
+    }
+
     const {
       baseDirectory,
       language,
@@ -256,9 +270,13 @@ export async function go({
 
     try {
       if (page.type === 'redirect') {
-        response.writeHead(301, contentTypeHTML);
-
         const target = to('localized.' + page.toPath[0], ...page.toPath.slice(1));
+
+        response.writeHead(301, {
+          ...contentTypeHTML,
+          'Location': target,
+        });
+
         const redirectHTML = generateRedirectHTML(page.title, target, {language});
 
         response.end(redirectHTML);
