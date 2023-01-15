@@ -615,9 +615,12 @@ const listingSpec = [
     directory: 'tracks/by-date',
     stringsKey: 'listTracks.byDate',
 
-    data: ({wikiData: {trackData}}) =>
+    data: ({wikiData: {albumData}}) =>
       chunkByProperties(
-        sortChronologically(trackData.filter(t => t.date)),
+        sortByDate(
+          sortChronologically(albumData)
+            .flatMap(album => album.tracks)
+            .filter(track => track.date)),
         ['album', 'date']),
 
     html: (data, {html, language, link}) =>
