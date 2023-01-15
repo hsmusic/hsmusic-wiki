@@ -635,7 +635,7 @@ const listingSpec = [
           html.tag('dd',
             html.tag('ul',
               tracks.map(track =>
-                track.aka
+                track.originalReleaseTrack
                   ? html.tag('li',
                       {class: 'rerelease'},
                       language.$('listingPage.listTracks.byDate.track.rerelease', {
