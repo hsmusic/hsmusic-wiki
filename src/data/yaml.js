@@ -968,7 +968,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
             });
           } else {
             const {result, aggregate} = mapAggregate(
-              yamlResult,
+              yamlResult.filter(Boolean),
               decorateErrorWithIndex(dataStep.processDocument),
               {message: `Errors processing documents`});
             processResults = result;
@@ -994,7 +994,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           typeof dataStep.files === 'function'
             ? await callAsync(dataStep.files, dataPath)
             : dataStep.files
-        )
+        );
 
         if (!files) {
           return;
@@ -1005,8 +1005,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
         const readResults = await mapAsync(
           files,
           (file) => readFile(file, 'utf-8').then((contents) => ({file, contents})),
-          {message: `Errors reading data files`}
-        );
+          {message: `Errors reading data files`});
 
         const yamlResults = map(
           readResults,
@@ -1014,8 +1013,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
             file,
             documents: yaml.loadAll(contents),
           })),
-          {message: `Errors parsing data files as valid YAML`}
-        );
+          {message: `Errors parsing data files as valid YAML`});
 
         let processResults;
 
@@ -1026,12 +1024,17 @@ export async function loadAndProcessDataDocuments({dataPath}) {
             yamlResults.forEach(({file, documents}) => {
               const [headerDocument, ...entryDocuments] = documents;
 
+              if (!headerDocument) {
+                call(decorateErrorWithFile(() => {
+                  throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
+                }), {file});
+                return;
+              }
+
               const header = call(
                 decorateErrorWithFile(({document}) =>
-                  dataStep.processHeaderDocument(document)
-                ),
-                {file, document: headerDocument}
-              );
+                  dataStep.processHeaderDocument(document)),
+                {file, document: headerDocument});
 
               // Don't continue processing files whose header
               // document is invalid - the entire file is excempt
@@ -1041,14 +1044,13 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               }
 
               const entries = map(
-                entryDocuments.map((document) => ({file, document})),
+                entryDocuments
+                  .filter(Boolean)
+                  .map((document) => ({file, document})),
                 decorateErrorWithFile(
                   decorateErrorWithIndex(({document}) =>
-                    dataStep.processEntryDocument(document)
-                  )
-                ),
-                {message: `Errors processing entry documents`}
-              );
+                    dataStep.processEntryDocument(document))),
+                {message: `Errors processing entry documents`});
 
               // Entries may be incomplete (i.e. any errored
               // documents won't have a processed output
@@ -1066,22 +1068,20 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
             yamlResults.forEach(({file, documents}) => {
               if (documents.length > 1) {
-                call(
-                  decorateErrorWithFile(() => {
-                    throw new Error(
-                      `Only expected one document to be present per file`
-                    );
-                  })
-                );
+                call(decorateErrorWithFile(() => {
+                  throw new Error(`Only expected one document to be present per file`);
+                }), {file});
                 return;
+              } else if (empty(documents) || !documents[0]) {
+                call(decorateErrorWithFile(() => {
+                  throw new Error(`Expected a document, this file is empty`);
+                }), {file});
               }
 
               const result = call(
                 decorateErrorWithFile(({document}) =>
-                  dataStep.processDocument(document)
-                ),
-                {file, document: documents[0]}
-              );
+                  dataStep.processDocument(document)),
+                {file, document: documents[0]});
 
               if (!result) {
                 return;
