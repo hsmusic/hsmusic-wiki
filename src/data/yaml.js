@@ -227,7 +227,7 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
   },
 });
 
-export const processTrackGroupDocument = makeProcessDocument(T.TrackGroup, {
+export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHelper, {
   fieldTransformations: {
     'Date Originally Released': (value) => new Date(value),
   },
@@ -652,7 +652,7 @@ export const dataSteps = [
     processHeaderDocument: processAlbumDocument,
     processEntryDocument(document) {
       return 'Group' in document
-        ? processTrackGroupDocument(document)
+        ? processTrackSectionDocument(document)
         : processTrackDocument(document);
     },
 
@@ -661,39 +661,39 @@ export const dataSteps = [
       const trackData = [];
 
       for (const {header: album, entries} of results) {
-        // We can't mutate an array once it's set as a property
-        // value, so prepare the tracks and track groups that will
-        // show up in a track list all the way before actually
-        // applying them.
-        const trackGroups = [];
-        let currentTracksByRef = null;
-        let currentTrackGroup = null;
+        // We can't mutate an array once it's set as a property value,
+        // so prepare the track sections that will show up in a track list
+        // all the way before actually applying them. (It's okay to mutate
+        // an individual section before applying it, since those are just
+        // generic objects; they aren't Things in and of themselves.)
+        const trackSections = [];
+
+        let currentTrackSection = {
+          name: `Default Track Section`,
+          isDefaultTrackSection: true,
+          tracksByRef: [],
+        };
 
         const albumRef = T.Thing.getReference(album);
 
-        const closeCurrentTrackGroup = () => {
-          if (currentTracksByRef) {
-            let trackGroup;
-
-            if (currentTrackGroup) {
-              trackGroup = currentTrackGroup;
-            } else {
-              trackGroup = new T.TrackGroup();
-              trackGroup.name = `Default Track Group`;
-              trackGroup.isDefaultTrackGroup = true;
-            }
-
-            trackGroup.album = album;
-            trackGroup.tracksByRef = currentTracksByRef;
-            trackGroups.push(trackGroup);
+        const closeCurrentTrackSection = () => {
+          if (!empty(currentTrackSection.tracksByRef)) {
+            trackSections.push(currentTrackSection);
           }
         };
 
         for (const entry of entries) {
-          if (entry instanceof T.TrackGroup) {
-            closeCurrentTrackGroup();
-            currentTracksByRef = [];
-            currentTrackGroup = entry;
+          if (entry instanceof T.TrackSectionHelper) {
+            closeCurrentTrackSection();
+
+            currentTrackSection = {
+              name: entry.name,
+              color: entry.color,
+              dateOriginallyReleased: entry.dateOriginallyReleased,
+              isDefaultTrackSection: false,
+              tracksByRef: [],
+            };
+
             continue;
           }
 
@@ -701,17 +701,12 @@ export const dataSteps = [
 
           entry.dataSourceAlbumByRef = albumRef;
 
-          const trackRef = T.Thing.getReference(entry);
-          if (currentTracksByRef) {
-            currentTracksByRef.push(trackRef);
-          } else {
-            currentTracksByRef = [trackRef];
-          }
+          currentTrackSection.tracksByRef.push(T.Thing.getReference(entry));
         }
 
-        closeCurrentTrackGroup();
+        closeCurrentTrackSection();
 
-        album.trackGroups = trackGroups;
+        album.trackSections = trackSections;
         albumData.push(album);
       }
 
@@ -1126,8 +1121,6 @@ export function linkWikiDataArrays(wikiData) {
   assignWikiData([WD.wikiInfo], 'groupData');
 
   assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
-  WD.albumData.forEach((album) => assignWikiData(album.trackGroups, 'trackData'));
-
   assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
   assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
   assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');

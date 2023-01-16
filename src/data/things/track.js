@@ -151,9 +151,9 @@ export class Track extends Thing {
         dependencies: ['albumData'],
 
         compute: ({albumData, [Track.instance]: track}) =>
-          Track.findAlbum(track, albumData)?.trackGroups.find((tg) =>
-            tg.tracks.includes(track)
-          )?.color ?? null,
+          Track.findAlbum(track, albumData)
+            ?.trackSections.find(({tracks}) => tracks.includes(track))
+              ?.color ?? null,
       },
     },
 
