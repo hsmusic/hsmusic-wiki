@@ -377,8 +377,14 @@ function unbound_transformMultiline(text, {
       }
 
       // for sticky headings!
-      if (elementMatch) {
-        lineContent = lineContent.replace(/<h2/, `<h2 class="content-heading"`)
+      if (elementMatch && elementMatch[1] === 'h2') {
+        lineContent = lineContent.replace(/<h2(.*?)>/g, (match, attributes) => {
+          const parsedAttributes = parseAttributes(attributes, {to});
+          return `<h2 ${html.attributes({
+            ...parsedAttributes,
+            class: [...parsedAttributes.class?.split(' ') ?? [], 'content-heading'],
+          })}>`;
+        });
       }
     }
 

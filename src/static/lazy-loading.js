@@ -37,7 +37,7 @@ function lazyLoadMain() {
   if (window.IntersectionObserver) {
     observer = new IntersectionObserver(lazyLoad, {
       rootMargin: '200px',
-      threshold: 1.0,
+      threshold: 0,
     });
     for (i = 0; i < lazyElements.length; i++) {
       observer.observe(lazyElements[i]);
