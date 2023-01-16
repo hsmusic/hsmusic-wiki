@@ -34,6 +34,7 @@
 import {execSync} from 'child_process';
 import * as path from 'path';
 import {fileURLToPath} from 'url';
+import wrap from 'word-wrap';
 
 import genThumbs from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
@@ -60,6 +61,7 @@ import {validateReplacerSpec} from './util/replacer.js';
 import {empty, showAggregate} from './util/sugar.js';
 import {replacerSpec} from './util/transform-content.js';
 import {generateURLs} from './util/urls.js';
+import {sortByName} from './util/wiki-data.js';
 
 import {generateDevelopersCommentHTML} from './write/page-template.js';
 import * as buildModes from './write/build-modes/index.js';
@@ -99,14 +101,15 @@ if (!validateReplacerSpec(replacerSpec, {find, link})) {
 async function main() {
   Error.stackTraceLimit = Infinity;
 
+  const buildModeFlagOptions = (
+    Object.fromEntries(
+      Object.keys(buildModes)
+        .map(key => [key, {type: 'flag'}])));
+
   const selectedBuildModeFlags = Object.keys(
     await parseOptions(process.argv.slice(2), {
-      // Ignore unknown options for now - we'll handle and error them later.
       [parseOptions.handleUnknown]: () => {},
-
-      ...Object.fromEntries(
-        Object.keys(buildModes)
-          .map((key) => [key, {type: 'flag'}])),
+      ...buildModeFlagOptions,
     }));
 
   let selectedBuildModeFlag;
@@ -131,15 +134,12 @@ async function main() {
     listingTargetSpec,
   };
 
-  const cliOptions = await parseOptions(process.argv.slice(2), {
-    // We don't want to error when we receive these options, so specify them
-    // here, even though we won't be doing anything with them later.
-    // (This is a bit of a hack.)
-    ...Object.fromEntries(
-      Object.keys(buildModes)
-        .map((key) => [key, {type: 'flag'}])),
+  const buildOptions = selectedBuildMode.getCLIOptions();
 
-    ...selectedBuildMode.getCLIOptions(),
+  const commonOptions = {
+    'help': {
+      type: 'flag',
+    },
 
     // Data files for the site, including flash, artist, and al8um data,
     // and like a jillion other things too. Pretty much everything which
@@ -226,7 +226,82 @@ async function main() {
     'precache-data': {
       type: 'flag',
     },
+  };
+
+  const cliOptions = await parseOptions(process.argv.slice(2), {
+    // We don't want to error when we receive these options, so specify them
+    // here, even though we won't be doing anything with them later.
+    // (This is a bit of a hack.)
+    ...buildModeFlagOptions,
+
+    ...commonOptions,
+    ...buildOptions,
   });
+
+  if (cliOptions['help']) {
+    const indentWrap = (spaces, str) => wrap(str, {width: 60 - spaces, indent: ' '.repeat(spaces)});
+
+    const showOptions = (msg, options) => {
+      console.log(color.bright(msg));
+
+      const entries = Object.entries(options);
+      const sortedOptions = sortByName(entries
+        .map(([name, descriptor]) => ({name, descriptor})));
+
+      if (!sortedOptions.length) {
+        console.log(`(No options available)`)
+      }
+
+      for (const {name, descriptor} of sortedOptions) {
+        if (descriptor.alias) {
+          continue;
+        }
+
+        const aliases = entries
+          .filter(([_name, {alias}]) => alias === name)
+          .map(([name]) => name);
+
+        console.log(color.bright(` --` + name) +
+          (aliases.length
+            ? ` (or: ${aliases.map(alias => color.bright(`--` + alias)).join(', ')})`
+            : '') +
+          (descriptor.help
+            ? ''
+            : color.dim('  (no help provided)')));
+
+        if (descriptor.help) {
+          console.log(indentWrap(4, descriptor.help));
+        }
+      }
+
+      console.log(``);
+    };
+
+    console.log(
+      color.bright(`hsmusic (aka. Homestuck Music Wiki)\n`) +
+      `static wiki software cataloguing collaborative creation\n`);
+
+    console.log(indentWrap(0,
+      `The \`hsmusic\` command provides basic control over all parts of generating user-visible HTML pages and website content/structure from provided data, media, and language directories.\n` +
+      `\n` +
+      `CLI options are divided into three groups:\n`));
+    console.log(` 1) ` + indentWrap(4,
+      `Common options: These are shared by all build modes and always have the same essential behavior`).trim());
+    console.log(` 2) ` + indentWrap(4,
+      `Build mode selection: One build mode may be selected (or else the default, --static-build, is used), and it decides which entire set of behavior to use for providing site content to the user`).trim());
+    console.log(` 3) ` + indentWrap(4,
+      `Build options: Each build mode has a set of unique options which customize behavior for that build mode`).trim());
+    console.log(``);
+
+    showOptions(`Common options`, commonOptions);
+    showOptions(`Build mode selection`, buildModeFlagOptions);
+
+    if (buildOptions) {
+      showOptions(`Build options for --${selectedBuildModeFlag}`, buildOptions);
+    }
+
+    return;
+  }
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
   const mediaPath = cliOptions['media-path'] || process.env.HSMUSIC_MEDIA;
