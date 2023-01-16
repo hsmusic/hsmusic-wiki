@@ -101,10 +101,12 @@ async function main() {
 
   const selectedBuildModeFlags = Object.keys(
     await parseOptions(process.argv.slice(2), {
+      // Ignore unknown options for now - we'll handle and error them later.
       [parseOptions.handleUnknown]: () => {},
 
-      ...Object.fromEntries(Object.keys(buildModes)
-        .map((key) => [key, {type: 'flag'}])),
+      ...Object.fromEntries(
+        Object.keys(buildModes)
+          .map((key) => [key, {type: 'flag'}])),
     }));
 
   let selectedBuildModeFlag;
@@ -130,6 +132,13 @@ async function main() {
   };
 
   const cliOptions = await parseOptions(process.argv.slice(2), {
+    // We don't want to error when we receive these options, so specify them
+    // here, even though we won't be doing anything with them later.
+    // (This is a bit of a hack.)
+    ...Object.fromEntries(
+      Object.keys(buildModes)
+        .map((key) => [key, {type: 'flag'}])),
+
     ...selectedBuildMode.getCLIOptions(),
 
     // Data files for the site, including flash, artist, and al8um data,
@@ -217,8 +226,6 @@ async function main() {
     'precache-data': {
       type: 'flag',
     },
-
-    [parseOptions.handleUnknown]: () => {},
   });
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
