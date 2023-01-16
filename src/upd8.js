@@ -398,6 +398,7 @@ function joinLineBreaks(sourceLines) {
 
 function transformMultiline(text, {
   parseAttributes,
+  to,
   transformInline,
   thumb = null,
 }) {
@@ -2382,6 +2383,7 @@ async function main() {
         bound.transformMultiline = bindOpts(transformMultiline, {
           transformInline: bound.transformInline,
           parseAttributes: bound.parseAttributes,
+          to,
         });
 
         bound.transformLyrics = bindOpts(transformLyrics, {
