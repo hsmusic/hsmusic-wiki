@@ -75,17 +75,6 @@ import {
   progressPromiseAll,
 } from './util/cli.js';
 
-/*
-import {
-  serializeContribs,
-  serializeCover,
-  serializeGroupsForAlbum,
-  serializeGroupsForTrack,
-  serializeImagePaths,
-  serializeLink,
-} from './util/serialize.js';
-*/
-
 import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
