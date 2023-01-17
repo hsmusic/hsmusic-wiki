@@ -252,6 +252,8 @@ async function main() {
         console.log(`(No options available)`)
       }
 
+      let justInsertedPaddingLine = false;
+
       for (const {name, descriptor} of sortedOptions) {
         if (descriptor.alias) {
           continue;
@@ -261,6 +263,16 @@ async function main() {
           .filter(([_name, {alias}]) => alias === name)
           .map(([name]) => name);
 
+        let wrappedHelp, wrappedHelpLines = 0;
+        if (descriptor.help) {
+          wrappedHelp = indentWrap(4, descriptor.help);
+          wrappedHelpLines = wrappedHelp.split('\n').length;
+        }
+
+        if (wrappedHelpLines > 1 && !justInsertedPaddingLine) {
+          console.log('');
+        }
+
         console.log(color.bright(` --` + name) +
           (aliases.length
             ? ` (or: ${aliases.map(alias => color.bright(`--` + alias)).join(', ')})`
@@ -269,12 +281,21 @@ async function main() {
             ? ''
             : color.dim('  (no help provided)')));
 
-        if (descriptor.help) {
-          console.log(indentWrap(4, descriptor.help));
+        if (wrappedHelp) {
+          console.log(wrappedHelp);
+        }
+
+        if (wrappedHelpLines > 1) {
+          console.log('');
+          justInsertedPaddingLine = true;
+        } else {
+          justInsertedPaddingLine = false;
         }
       }
 
-      console.log(``);
+      if (!justInsertedPaddingLine) {
+        console.log(``);
+      }
     };
 
     console.log(
