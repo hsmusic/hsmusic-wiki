@@ -101,6 +101,8 @@ if (!validateReplacerSpec(replacerSpec, {find, link})) {
 async function main() {
   Error.stackTraceLimit = Infinity;
 
+  const defaultQueueSize = 500;
+
   const buildModeFlagOptions = (
     Object.fromEntries(
       Object.keys(buildModes)
@@ -138,6 +140,7 @@ async function main() {
 
   const commonOptions = {
     'help': {
+      help: `Display usage info and basic information for the \`hsmusic\` command`,
       type: 'flag',
     },
 
@@ -145,6 +148,7 @@ async function main() {
     // and like a jillion other things too. Pretty much everything which
     // makes an individual wiki what it is goes here!
     'data-path': {
+      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure; always required for wiki building, but may be provided by the HSMUSIC_DATA environment variable instead`,
       type: 'value',
     },
 
@@ -152,6 +156,7 @@ async function main() {
     // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
     // near the top of this file (upd8.js).
     'media-path': {
+      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content; always required for wiki building, but may be provided by the HSMUSIC_MEDIA environment variable instead`,
       type: 'value',
     },
 
@@ -166,6 +171,7 @@ async function main() {
     // 8uild with the default (English) strings if this path is left
     // unspecified.
     'lang-path': {
+      help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata`,
       type: 'value',
     },
 
@@ -173,12 +179,14 @@ async function main() {
     // kinda a pain to run every time, since it does necessit8te reading
     // every media file at run time. Pass this to skip it.
     'skip-thumbs': {
+      help: `Skip processing and generating thumbnails in media directory (speeds up subsequent builds, but remove this option [or use --thumbs-only] and re-run once when you add or modify media files to ensure thumbnails stay up-to-date!)`,
       type: 'flag',
     },
 
     // Or, if you *only* want to gener8te newly upd8ted thum8nails, you can
     // pass this flag! It exits 8efore 8uilding the rest of the site.
     'thumbs-only': {
+      help: `Skip everything besides processing media directory and generating up-to-date thumbnails (useful when using --skip-thumbs for most runs)`,
       type: 'flag',
     },
 
@@ -186,6 +194,7 @@ async function main() {
     // generating site HTML yet? This flag will cut execution off right
     // 8efore any site 8uilding actually happens.
     'no-build': {
+      help: `Don't run a build of the site at all; only process data/media and report any errors detected`,
       type: 'flag',
     },
 
@@ -194,10 +203,12 @@ async function main() {
     // line) right to your output, 8ut also pro8a8ly give you a headache
     // 8ecause wow that is a lot of visual noise.
     'show-traces': {
+      help: `Show JavaScript source code paths for reported errors in "aggregate" error displays\n\n(Debugging use only, but please enable this if you're reporting bugs for our issue tracker!)`,
       type: 'flag',
     },
 
     'queue-size': {
+      help: `Process more or fewer disk files at once to optimize performance or avoid I/O errors, unlimited if set to 0 (between 500 and 700 is usually a safe range for building HSMusic on Windows machines)\nDefaults to ${defaultQueueSize}`,
       type: 'value',
       validate(size) {
         if (parseInt(size) !== parseFloat(size)) return 'an integer';
@@ -211,6 +222,7 @@ async function main() {
     // CacheableObject in a mode where every instance is a Proxy which will
     // keep track of invalid property accesses.
     'show-invalid-property-accesses': {
+      help: `Report accesses at runtime to nonexistant properties on wiki data objects, at a dramatic performance cost\n(Internal/development use only)`,
       type: 'flag',
     },
 
@@ -224,6 +236,7 @@ async function main() {
     // efficiency of data calculation or write generation separately instead of
     // mixed together).
     'precache-data': {
+      help: `Compute all runtime-cached values for wiki data objects before proceeding to site build (optimizes rate of content generation/serving, but waits a lot longer before build actually starts, and may compute data which is never required for this build)`,
       type: 'flag',
     },
   };
@@ -340,7 +353,7 @@ async function main() {
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
   // before proceeding to more page processing.
-  const queueSize = +(cliOptions['queue-size'] ?? 500);
+  const queueSize = +(cliOptions['queue-size'] ?? defaultQueueSize);
 
   {
     let errored = false;
