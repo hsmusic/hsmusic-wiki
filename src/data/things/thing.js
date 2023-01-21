@@ -14,6 +14,7 @@ import {
   isFileExtension,
   isName,
   isString,
+  isTrackSectionList,
   isURL,
   validateArrayItems,
   validateInstanceOf,
@@ -148,6 +149,60 @@ export default class Thing extends CacheableObject {
     additionalFiles: () => ({
       flags: {update: true, expose: true},
       update: {validate: isAdditionalFileList},
+    }),
+
+    // Ooo, custom update validation and expose transformation all in one!
+    // Very exciting. This is another involved data structure, following this
+    // form:
+    //
+    //     [
+    //         {name: 'Main album', tracksByRef: [
+    //             'track:showtime-piano-refrain',
+    //             'track:light-vol5',
+    //         ]},
+    //         {name: 'Bonus tracks', tracksByRef: [...]},
+    //         ...
+    //     ]
+    //
+    // ...with additional optional properties on eack track section, such as
+    // color and dateOriginallyReleased. When exposed, each track section is
+    // transformed with extra properties: tracks (the track refs resolved)
+    // and startIndex (the track number within the whole list for the first
+    // track in the section).
+    trackSections: () => ({
+      flags: {update: true, expose: true},
+
+      update: {
+        validate: isTrackSectionList,
+      },
+
+      expose: {
+        dependencies: ['color', 'trackData'],
+        transform(trackSections, {
+          color: albumColor,
+          trackData,
+        }) {
+          let startIndex = 0;
+          return trackSections?.map(section => ({
+            name: section.name ?? null,
+            color: section.color ?? albumColor ?? null,
+            dateOriginallyReleased: section.dateOriginallyReleased ?? null,
+            isDefaultTrackSection: section.isDefaultTrackSection ?? false,
+
+            startIndex: (
+              startIndex += section.tracksByRef.length,
+              startIndex - section.tracksByRef.length
+            ),
+
+            tracksByRef: section.tracksByRef ?? [],
+            tracks:
+              (trackData && section.tracksByRef
+                ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
+                .filter(Boolean)) ??
+              [],
+          }));
+        },
+      },
     }),
 
     // A reference list! Keep in mind this is for general references to wiki

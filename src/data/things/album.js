@@ -14,7 +14,6 @@ export class Album extends Thing {
     validators: {
       isDate,
       isDimensions,
-      isTrackSectionList,
     },
   }) => ({
     // Update & expose
@@ -54,41 +53,7 @@ export class Album extends Thing {
     groupsByRef: Thing.common.referenceList(Group),
     artTagsByRef: Thing.common.referenceList(ArtTag),
 
-    trackSections: {
-      flags: {update: true, expose: true},
-
-      update: {
-        validate: isTrackSectionList,
-      },
-
-      expose: {
-        dependencies: ['color', 'trackData'],
-        transform(trackSections, {
-          color: albumColor,
-          trackData,
-        }) {
-          let startIndex = 0;
-          return trackSections?.map(section => ({
-            name: section.name ?? null,
-            color: section.color ?? albumColor ?? null,
-            dateOriginallyReleased: section.dateOriginallyReleased ?? null,
-            isDefaultTrackSection: section.isDefaultTrackSection ?? false,
-
-            startIndex: (
-              startIndex += section.tracksByRef.length,
-              startIndex - section.tracksByRef.length
-            ),
-
-            tracksByRef: section.tracksByRef ?? [],
-            tracks:
-              (trackData && section.tracksByRef
-                ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
-                .filter(Boolean)) ??
-              [],
-          }));
-        },
-      },
-    },
+    trackSections: Thing.common.trackSections(),
 
     coverArtFileExtension: Thing.common.fileExtension('jpg'),
     trackCoverArtFileExtension: Thing.common.fileExtension('jpg'),
