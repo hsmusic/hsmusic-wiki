@@ -16,6 +16,7 @@ import * as groupClasses from './group.js';
 import * as homepageLayoutClasses from './homepage-layout.js';
 import * as languageClasses from './language.js';
 import * as newsEntryClasses from './news-entry.js';
+import * as releaseClasses from './release.js';
 import * as staticPageClasses from './static-page.js';
 import * as trackClasses from './track.js';
 import * as wikiInfoClasses from './wiki-info.js';
@@ -29,6 +30,7 @@ const allClassLists = {
   'homepage-layout.js': homepageLayoutClasses,
   'language.js': languageClasses,
   'news-entry.js': newsEntryClasses,
+  'release.js': releaseClasses,
   'static-page.js': staticPageClasses,
   'track.js': trackClasses,
   'wiki-info.js': wikiInfoClasses,

@@ -47,6 +47,7 @@ export const ART_TAG_DATA_FILE = 'tags.yaml';
 export const GROUP_DATA_FILE = 'groups.yaml';
 
 export const DATA_ALBUM_DIRECTORY = 'album';
+export const DATA_RELEASE_DIRECTORY = 'release';
 export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 
 // --> Document processing functions
@@ -278,6 +279,24 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     lyrics: 'Lyrics',
 
     additionalFiles: 'Additional Files',
+  },
+});
+
+export const processReleaseDocument = makeProcessDocument(T.Release, {
+  fieldTransformations: {
+    'Date': value => new Date(value),
+
+    'Track List': parseTrackList,
+  },
+
+  propertyFieldMapping: {
+    name: 'Release',
+    date: 'Date',
+    hasTrackArt: 'Has Track Art',
+    color: 'Color',
+
+    directory: 'Directory',
+    trackSections: 'Track List',
   },
 });
 
@@ -547,6 +566,58 @@ function parseDimensions(string) {
   return nums;
 }
 
+function parseTrackList(entries) {
+  const parseModes = {
+    trackRefsOnly: Symbol('Track references only'),
+    trackSections: Symbol('Track sections'),
+  };
+
+  let parseMode;
+
+  const msg = `Expected an array of track references or of list sections`;
+
+  if (!Array.isArray(entries)) {
+    throw new TypeError(msg + `, got something else (${typeof entries})`);
+  } if (entries.every(item => typeof item === 'string')) {
+    parseMode = parseModes.trackRefsOnly;
+  } else if (entries.every(item => typeof item === 'object')) {
+    parseMode = parseModes.trackSections;
+  } else {
+    throw new TypeError(msg + `, got a mixed array`);
+  }
+
+  switch (parseMode) {
+    case parseModes.trackRefsOnly: {
+      return [
+        // todo: deduplicate
+        {
+          name: `Default Track Section`,
+          isDefaultTrackSection: true,
+          tracksByRef: entries,
+        },
+      ];
+    }
+
+    case parseModes.trackSections: {
+      const trackSectionMap = {
+        'Color': 'color',
+      };
+
+      return entries
+        .flatMap(Object.entries)
+        .map(([name, data]) => ({
+          name,
+          ...Object.fromEntries(data
+            .filter(entry => typeof entry === 'object')
+            .flatMap(Object.entries)
+            .filter(([key]) => Object.keys(trackSectionMap).includes(key))
+            .map(([key, value]) => [trackSectionMap[key], value])),
+          tracksByRef: data.filter(entry => typeof entry === 'string'),
+        }));
+    }
+  }
+}
+
 // --> Data repository loading functions and descriptors
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
@@ -668,6 +739,7 @@ export const dataSteps = [
         // generic objects; they aren't Things in and of themselves.)
         const trackSections = [];
 
+        // todo: deduplicate
         let currentTrackSection = {
           name: `Default Track Section`,
           isDefaultTrackSection: true,
@@ -711,6 +783,24 @@ export const dataSteps = [
       }
 
       return {albumData, trackData};
+    },
+  },
+
+  {
+    title: `Process release files`,
+    files: async (dataPath) =>
+      (
+        await findFiles(path.join(dataPath, DATA_RELEASE_DIRECTORY), {
+          filter: (f) => path.extname(f) === '.yaml',
+          joinParentDirectory: false,
+        })
+      ).map(file => path.join(DATA_RELEASE_DIRECTORY, file)),
+
+    documentMode: documentModes.onePerFile,
+    processDocument: processReleaseDocument,
+
+    save(releaseData) {
+      return {releaseData};
     },
   },
 
@@ -1122,6 +1212,7 @@ export function linkWikiDataArrays(wikiData) {
 
   assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
   assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
+  assignWikiData(WD.releaseData, 'trackData');
   assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
   assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
   assignWikiData(WD.groupCategoryData, 'groupData');
