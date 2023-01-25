@@ -40,15 +40,15 @@ export function write(flash, {wikiData}) {
 
       main: {
         content: [
-          generateCoverLink({
-            src: getFlashCover(flash),
-            alt: language.$('misc.alt.flashArt'),
-          }),
-
           generateStickyHeadingContainer({
             title: language.$('flashPage.title', {
               flash: flash.name,
             }),
+          }),
+
+          generateCoverLink({
+            src: getFlashCover(flash),
+            alt: language.$('misc.alt.flashArt'),
           }),
 
           html.tag('p',
