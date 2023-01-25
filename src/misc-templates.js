@@ -220,7 +220,7 @@ function unbound_generateChronologyLinks(currentThing, {
 
 // Content warning tags
 
-function unbound_getRevealStringFromWarnings(warnings, {
+function unbound_getRevealStringFromContentWarningMessage(warnings, {
   html,
   language,
 }) {
@@ -232,14 +232,13 @@ function unbound_getRevealStringFromWarnings(warnings, {
   );
 }
 
-function unbound_getRevealStringFromTags(tags, {
+function unbound_getRevealStringFromArtTags(tags, {
+  getRevealStringFromContentWarningMessage,
   language,
-
-  getRevealStringFromWarnings,
 }) {
   return (
     tags?.some(tag => tag.isContentWarning) &&
-      getRevealStringFromWarnings(
+      getRevealStringFromContentWarningMessage(
         language.formatUnitList(
           tags
             .filter(tag => tag.isContentWarning)
@@ -255,7 +254,7 @@ function unbound_generateCoverLink({
   language,
   link,
 
-  getRevealStringFromTags,
+  getRevealStringFromArtTags,
 
   alt,
   path,
@@ -284,7 +283,7 @@ function unbound_generateCoverLink({
       id: 'cover-art',
       link: true,
       square: true,
-      reveal: getRevealStringFromTags(tags),
+      reveal: getRevealStringFromArtTags(tags),
     }),
 
     wikiInfo.enableArtTagUI &&
@@ -572,7 +571,7 @@ function unbound_getGridHTML({
   html,
   language,
 
-  getRevealStringFromTags,
+  getRevealStringFromArtTags,
 
   entries,
   srcFn,
@@ -593,7 +592,7 @@ function unbound_getGridHTML({
             thumb: 'medium',
             lazy: typeof lazy === 'number' ? i >= lazy : lazy,
             square: true,
-            reveal: getRevealStringFromTags(item.artTags, {language}),
+            reveal: getRevealStringFromArtTags(item.artTags, {language}),
             noSrcText: noSrcTextFn(item),
           }),
           html.tag('span', item.name),
@@ -929,14 +928,14 @@ function unbound_generateNavigationLinks(current, {
 // Sticky heading, ooooo
 
 function unbound_generateStickyHeadingContainer({
-  getRevealStringFromTags,
+  getRevealStringFromArtTags,
   html,
   img,
 
   class: classes,
   coverSrc,
   coverAlt,
-  coverTags,
+  coverArtTags,
   title,
 }) {
   return html.tag('div',
@@ -957,7 +956,7 @@ function unbound_generateStickyHeadingContainer({
                 thumb: 'small',
                 link: false,
                 square: true,
-                reveal: getRevealStringFromTags(coverTags),
+                reveal: getRevealStringFromArtTags(coverArtTags),
               }))),
       ]),
 
@@ -1012,8 +1011,8 @@ export {
 
   unbound_generateChronologyLinks as generateChronologyLinks,
 
-  unbound_getRevealStringFromWarnings as getRevealStringFromWarnings,
-  unbound_getRevealStringFromTags as getRevealStringFromTags,
+  unbound_getRevealStringFromContentWarningMessage as getRevealStringFromContentWarningMessage,
+  unbound_getRevealStringFromArtTags as getRevealStringFromArtTags,
 
   unbound_generateCoverLink as generateCoverLink,
 

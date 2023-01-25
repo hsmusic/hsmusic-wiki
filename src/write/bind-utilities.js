@@ -13,8 +13,8 @@ import {
   getCarouselHTML,
   getFlashGridHTML,
   getGridHTML,
-  getRevealStringFromTags,
-  getRevealStringFromWarnings,
+  getRevealStringFromArtTags,
+  getRevealStringFromContentWarningMessage,
   getThemeString,
   generateAdditionalFilesList,
   generateAdditionalFilesShortcut,
@@ -142,15 +142,15 @@ export function bindUtilities({
     fancifyURL: bound.fancifyURL,
   });
 
-  bound.getRevealStringFromWarnings = bindOpts(getRevealStringFromWarnings, {
+  bound.getRevealStringFromContentWarningMessage = bindOpts(getRevealStringFromContentWarningMessage, {
     html,
     language,
   });
 
-  bound.getRevealStringFromTags = bindOpts(getRevealStringFromTags, {
+  bound.getRevealStringFromArtTags = bindOpts(getRevealStringFromArtTags, {
     language,
 
-    getRevealStringFromWarnings: bound.getRevealStringFromWarnings,
+    getRevealStringFromContentWarningMessage: bound.getRevealStringFromContentWarningMessage,
   });
 
   bound.getArtistString = bindOpts(getArtistString, {
@@ -194,7 +194,7 @@ export function bindUtilities({
 
   bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {
     [bindOpts.bindIndex]: 0,
-    getRevealStringFromTags: bound.getRevealStringFromTags,
+    getRevealStringFromArtTags: bound.getRevealStringFromArtTags,
     html,
     img: bound.img,
   });
@@ -217,7 +217,7 @@ export function bindUtilities({
     to,
     wikiData,
 
-    getRevealStringFromTags: bound.getRevealStringFromTags,
+    getRevealStringFromArtTags: bound.getRevealStringFromArtTags,
   });
 
   bound.generateInfoGalleryLinks = bindOpts(generateInfoGalleryLinks, {
@@ -238,7 +238,7 @@ export function bindUtilities({
     html,
     language,
 
-    getRevealStringFromTags: bound.getRevealStringFromTags,
+    getRevealStringFromArtTags: bound.getRevealStringFromArtTags,
   });
 
   bound.getAlbumGridHTML = bindOpts(getAlbumGridHTML, {

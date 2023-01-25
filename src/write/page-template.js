@@ -5,7 +5,7 @@ import {getColors} from '../util/colors.js';
 
 import {
   getFooterLocalizationLinks,
-  getRevealStringFromWarnings,
+  getRevealStringFromContentWarningMessage,
   img,
 } from '../misc-templates.js';
 
@@ -378,7 +378,7 @@ export function generateDocumentHTML(pageInfo, {
             src: '',
             link: true,
             square: true,
-            reveal: getRevealStringFromWarnings(
+            reveal: getRevealStringFromContentWarningMessage(
               html.tag('span', {class: 'info-card-art-warnings'}),
               {html, language}),
           })),
