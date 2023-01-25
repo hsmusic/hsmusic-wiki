@@ -82,7 +82,9 @@ export function writeTargetless({wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: html.fragment([
+        headingMode: 'none',
+
+        content: [
           html.tag('h1',
             wikiInfo.name),
 
@@ -134,7 +136,7 @@ export function writeTargetless({wikiData}) {
                           })),
                     ]),
                 ]))),
-        ]),
+        ],
       },
 
       sidebarLeft: homepageLayout.sidebarContent && {

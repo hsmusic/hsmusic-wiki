@@ -18,9 +18,7 @@ export function write(flash, {wikiData}) {
     page: ({
       fancifyFlashURL,
       generateChronologyLinks,
-      generateCoverLink,
       generateNavigationLinks,
-      generateStickyHeadingContainer,
       getArtistString,
       getFlashCover,
       getThemeString,
@@ -38,19 +36,15 @@ export function write(flash, {wikiData}) {
           ],
         }),
 
+      cover: {
+        src: getFlashCover(flash),
+        alt: language.$('misc.alt.flashArt'),
+      },
+
       main: {
+        headingMode: 'sticky',
+
         content: [
-          generateCoverLink({
-            src: getFlashCover(flash),
-            alt: language.$('misc.alt.flashArt'),
-          }),
-
-          generateStickyHeadingContainer({
-            title: language.$('flashPage.title', {
-              flash: flash.name,
-            }),
-          }),
-
           html.tag('p',
             language.$('releaseInfo.released', {
               date: language.formatDate(flash.date),
@@ -144,30 +138,25 @@ export function writeTargetless({
 
       main: {
         classes: ['flash-index'],
+        headingMode: 'static',
+
         content: [
-          html.tag('h1',
-            language.$('flashIndex.title')),
+          html.tag('p',
+            {class: 'quick-info'},
+            language.$('misc.jumpTo')),
 
-          html.tag('div',
-            {class: 'long-content'},
-            [
-              html.tag('p',
-                {class: 'quick-info'},
-                language.$('misc.jumpTo')),
-
-              html.tag('ul',
-                {class: 'quick-info'},
-                flashActData
-                  .filter(act => act.jump)
-                  .map(({anchor, jump, jumpColor}) =>
-                    html.tag('li',
-                      html.tag('a',
-                        {
-                          href: '#' + anchor,
-                          style: getLinkThemeString(jumpColor),
-                        },
-                        jump)))),
-            ]),
+          html.tag('ul',
+            {class: 'quick-info'},
+            flashActData
+              .filter(act => act.jump)
+              .map(({anchor, jump, jumpColor}) =>
+                html.tag('li',
+                  html.tag('a',
+                    {
+                      href: '#' + anchor,
+                      style: getLinkThemeString(jumpColor),
+                    },
+                    jump)))),
 
           ...flashActData.flatMap((act, i) => [
             html.tag('h2',

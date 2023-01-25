@@ -49,6 +49,8 @@ export function generateDocumentHTML(pageInfo, {
   cachebust,
   defaultLanguage,
   developersComment,
+  generateCoverLink,
+  generateStickyHeadingContainer,
   getThemeString,
   language,
   languages,
@@ -74,6 +76,7 @@ export function generateDocumentHTML(pageInfo, {
     // missing properties are auto-filled, see below!
     body = {},
     banner = {},
+    cover = {},
     main = {},
     sidebarLeft = {},
     sidebarRight = {},
@@ -95,6 +98,11 @@ export function generateDocumentHTML(pageInfo, {
 
   main.classes ??= [];
   main.content ??= '';
+  main.headingMode ??= 'none';
+
+  cover.src ??= '';
+  cover.alt ??= '';
+  cover.artTags ??= [];
 
   sidebarLeft ??= {};
   sidebarRight ??= {};
@@ -139,13 +147,39 @@ export function generateDocumentHTML(pageInfo, {
     sidebarLeft.collapse !== false && sidebarRight.collapse !== false;
 
   const mainHTML =
-    main.content &&
-      html.tag('main',
+    html.tag('main', {
+      id: 'content',
+      class: main.classes,
+    }, [
+      ...html.fragment(
+          !title ?
+            null
+        : main.headingMode === 'sticky' ?
+            generateStickyHeadingContainer({
+              coverSrc: cover.src,
+              coverAlt: cover.alt,
+              coverArtTags: cover.artTags,
+              title,
+            })
+        : main.headingMode === 'static' ?
+            html.tag('h1', title)
+        : null),
+
+      ...html.fragment(
+        cover.src &&
+          generateCoverLink({
+            src: cover.src,
+            alt: cover.alt,
+            tags: cover.artTags,
+          })),
+
+      html.tag('div',
         {
-          id: 'content',
-          class: main.classes,
+          [html.onlyIfContent]: true,
+          class: 'main-content-container',
         },
-        main.content);
+        main.content),
+    ]);
 
   const footerHTML =
     html.tag('footer',

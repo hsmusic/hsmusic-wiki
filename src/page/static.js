@@ -11,22 +11,16 @@ export function write(staticPage) {
     type: 'page',
     path: ['staticPage', staticPage.directory],
     page: ({
-      generateStickyHeadingContainer,
-      html,
       transformMultiline,
     }) => ({
       title: staticPage.name,
       stylesheet: staticPage.stylesheet,
 
       main: {
-        content: [
-          generateStickyHeadingContainer({
-            class: ['long-content'],
-            title: staticPage.name,
-          }),
-          html.tag('div', {class: 'long-content'},
-            transformMultiline(staticPage.content)),
-        ],
+        classes: ['long-content'],
+        headingMode: 'sticky',
+
+        content: transformMultiline(staticPage.content),
       },
 
       nav: {simple: true},

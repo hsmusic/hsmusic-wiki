@@ -128,9 +128,7 @@ export function write(album, {wikiData}) {
       generateAdditionalFilesShortcut,
       generateAdditionalFilesList,
       generateChronologyLinks,
-      generateCoverLink,
       generateNavigationLinks,
-      generateStickyHeadingContainer,
       getAlbumCover,
       getAlbumStylesheet,
       getArtistString,
@@ -150,8 +148,6 @@ export function write(album, {wikiData}) {
         language,
         link,
       });
-
-      const cover = getAlbumCover(album);
 
       return {
         title: language.$('albumPage.title', {album: album.name}),
@@ -195,22 +191,16 @@ export function write(album, {wikiData}) {
           position: 'top',
         },
 
+        cover: {
+          src: getAlbumCover(album),
+          alt: language.$('misc.alt.albumCover'),
+          artTags: album.artTags,
+        },
+
         main: {
+          headingMode: 'sticky',
+
           content: [
-            generateStickyHeadingContainer({
-              title: language.$('albumPage.title', {album: album.name}),
-
-              coverSrc: cover,
-              coverAlt: language.$('misc.alt.albumCover'),
-              coverTags: album.artTags,
-            }),
-
-            cover && generateCoverLink({
-              src: cover,
-              alt: language.$('misc.alt.albumCover'),
-              tags: album.artTags,
-            }),
-
             html.tag('p',
               {
                 [html.onlyIfContent]: true,
@@ -254,6 +244,7 @@ export function write(album, {wikiData}) {
                     date: language.formatDate(album.date),
                   }),
 
+                album.hasCoverArt &&
                 album.coverArtDate &&
                 +album.coverArtDate !== +album.date &&
                   language.$('releaseInfo.artReleased', {
@@ -434,12 +425,9 @@ export function write(album, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: [
-          html.tag('h1',
-            language.$('albumGalleryPage.title', {
-              album: album.name,
-            })),
+        headingMode: 'static',
 
+        content: [
           html.tag('p',
             {class: 'quick-info'},
             (album.date
