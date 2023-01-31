@@ -36,12 +36,9 @@ export function write(tag, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: [
-          html.tag('h1',
-            language.$('tagPage.title', {
-              tag: tag.name,
-            })),
+        headingMode: 'static',
 
+        content: [
           html.tag('p',
             {class: 'quick-info'},
             language.$('tagPage.infoLine', {

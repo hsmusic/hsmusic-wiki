@@ -34,7 +34,6 @@ export function write(listing, {wikiData}) {
     path: ['listing', listing.directory],
     page: (opts) => {
       const {
-        generateStickyHeadingContainer,
         getLinkThemeString,
         html,
         language,
@@ -47,11 +46,9 @@ export function write(listing, {wikiData}) {
         title: language.$(titleKey),
 
         main: {
-          content: [
-            generateStickyHeadingContainer({
-              title: language.$(titleKey),
-            }),
+          headingMode: 'sticky',
 
+          content: [
             ...html.fragment(
               listing.html &&
                 (listing.data
@@ -111,10 +108,9 @@ export function writeTargetless({wikiData}) {
       title: language.$('listingIndex.title'),
 
       main: {
-        content: [
-          html.tag('h1',
-            language.$('listingIndex.title')),
+        headingMode: 'static',
 
+        content: [
           html.tag('p',
             language.$('listingIndex.infoLine', {
               wiki: wikiInfo.name,

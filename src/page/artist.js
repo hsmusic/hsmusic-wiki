@@ -321,9 +321,7 @@ export function write(artist, {wikiData}) {
     path: ['artist', artist.directory],
     page: ({
       fancifyURL,
-      generateCoverLink,
       generateInfoGalleryLinks,
-      generateStickyHeadingContainer,
       getArtistAvatar,
       getArtistString,
       html,
@@ -341,20 +339,15 @@ export function write(artist, {wikiData}) {
       return {
         title: language.$('artistPage.title', {artist: name}),
 
+        cover: artist.hasAvatar && {
+          src: getArtistAvatar(artist),
+          alt: language.$('misc.alt.artistAvatar'),
+        },
+
         main: {
+          headingMode: 'sticky',
+
           content: [
-            artist.hasAvatar &&
-              generateCoverLink({
-                src: getArtistAvatar(artist),
-                alt: language.$('misc.alt.artistAvatar'),
-              }),
-
-            generateStickyHeadingContainer({
-              title: language.$('artistPage.title', {
-                artist: name,
-              }),
-            }),
-
             ...html.fragment(
               contextNotes && [
                 html.tag('p',
@@ -610,12 +603,9 @@ export function write(artist, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: [
-          html.tag('h1',
-            language.$('artistGalleryPage.title', {
-              artist: name,
-            })),
+        headingMode: 'static',
 
+        content: [
           html.tag('p',
             {class: 'quick-info'},
             language.$('artistGalleryPage.infoLine', {

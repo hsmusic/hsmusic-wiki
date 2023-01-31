@@ -626,7 +626,8 @@ blockquote {
   margin-right: 0;
 }
 
-.long-content {
+main.long-content .main-content-container,
+main.long-content > h1 {
   padding-left: 12%;
   padding-right: 12%;
 }
@@ -1149,13 +1150,13 @@ html[data-url-key="localized.home"] .carousel-container {
   transform: translateY(-5px);
 }
 
-.content-sticky-heading-container.long-content {
+main.long-content .content-sticky-heading-container {
   padding-left: 0;
   padding-right: 0;
 }
 
-.content-sticky-heading-container.long-content .content-sticky-heading-row,
-.content-sticky-heading-container.long-content .content-sticky-subheading-row {
+main.long-content .content-sticky-heading-container .content-sticky-heading-row,
+main.long-content .content-sticky-heading-container .content-sticky-subheading-row {
   padding-left: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
   padding-right: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
 }

@@ -16,7 +16,6 @@ export function write(entry, {wikiData}) {
     path: ['newsEntry', entry.directory],
     page: ({
       generateNavigationLinks,
-      generateStickyHeadingContainer,
       html,
       language,
       link,
@@ -25,22 +24,16 @@ export function write(entry, {wikiData}) {
       title: language.$('newsEntryPage.title', {entry: entry.name}),
 
       main: {
+        classes: ['long-content'],
+        headingMode: 'sticky',
+
         content: [
-          generateStickyHeadingContainer({
-            class: ['long-content'],
-            title: language.$('newsEntryPage.title', {
-              entry: entry.name,
-            }),
-          }),
+          html.tag('p',
+            language.$('newsEntryPage.published', {
+              date: language.formatDate(entry.date),
+            })),
 
-          html.tag('div', {class: 'long-content'}, [
-            html.tag('p',
-              language.$('newsEntryPage.published', {
-                date: language.formatDate(entry.date),
-              })),
-
-            transformMultiline(entry.content),
-          ]),
+          transformMultiline(entry.content),
         ],
       },
 
@@ -64,7 +57,6 @@ export function writeTargetless({wikiData}) {
     type: 'page',
     path: ['newsIndex'],
     page: ({
-      generateStickyHeadingContainer,
       html,
       language,
       link,
@@ -73,37 +65,30 @@ export function writeTargetless({wikiData}) {
       title: language.$('newsIndex.title'),
 
       main: {
-        content: [
-          generateStickyHeadingContainer({
-            class: ['long-content'],
-            title: language.$('newsIndex.title'),
-          }),
+        classes: ['long-content', 'news-index'],
+        headingMode: 'sticky',
 
-          html.tag('div',
-            {class: ['long-content', 'news-index']},
-            [
-              ...newsData.map(entry =>
-                html.tag('article',
-                  {id: entry.directory},
-                  [
-                    html.tag('h2', [
-                      html.tag('time',
-                        language.formatDate(entry.date)),
-                      link.newsEntry(entry),
-                    ]),
+        content:
+          newsData.map(entry =>
+            html.tag('article',
+              {id: entry.directory},
+              [
+                html.tag('h2', [
+                  html.tag('time',
+                    language.formatDate(entry.date)),
+                  link.newsEntry(entry),
+                ]),
 
-                    transformMultiline(entry.contentShort),
+                transformMultiline(entry.contentShort),
 
-                    entry.contentShort !== entry.content &&
-                      html.tag('p',
-                        link.newsEntry(entry, {
-                          text: language.$(
-                            'newsIndex.entry.viewRest'
-                          ),
-                        })),
-                  ])),
-            ]),
-        ],
+                entry.contentShort !== entry.content &&
+                  html.tag('p',
+                    link.newsEntry(entry, {
+                      text: language.$(
+                        'newsIndex.entry.viewRest'
+                      ),
+                    })),
+              ])),
       },
 
       nav: {simple: true},

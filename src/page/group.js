@@ -34,7 +34,6 @@ export function write(group, {wikiData}) {
       fancifyURL,
       generateInfoGalleryLinks,
       generateNavigationLinks,
-      generateStickyHeadingContainer,
       getLinkThemeString,
       getThemeString,
       html,
@@ -48,13 +47,9 @@ export function write(group, {wikiData}) {
       theme: getThemeString(group.color),
 
       main: {
-        content: [
-          generateStickyHeadingContainer({
-            title: language.$('groupInfoPage.title', {
-              group: group.name
-            }),
-          }),
+        headingMode: 'sticky',
 
+        content: [
           !empty(group.urls) &&
             html.tag('p',
               language.$('releaseInfo.visitOn', {
@@ -147,12 +142,9 @@ export function write(group, {wikiData}) {
 
       main: {
         classes: ['top-index'],
-        content: [
-          html.tag('h1',
-            language.$('groupGalleryPage.title', {
-              group: group.name,
-            })),
+        headingMode: 'static',
 
+        content: [
           getCarouselHTML({
             items: group.featuredAlbums.slice(0, 12 + 1),
             srcFn: getAlbumCover,

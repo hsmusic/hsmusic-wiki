@@ -24,7 +24,6 @@ export function write(album) {
     type: 'page',
     path: ['albumCommentary', album.directory],
     page: ({
-      generateStickyHeadingContainer,
       getAlbumStylesheet,
       getLinkThemeString,
       getThemeString,
@@ -38,13 +37,10 @@ export function write(album) {
       theme: getThemeString(album.color),
 
       main: {
-        content: html.tag('div', {class: 'long-content'}, [
-          generateStickyHeadingContainer({
-            title: language.$('albumCommentaryPage.title', {
-              album: album.name,
-            }),
-          }),
+        classes: ['long-content'],
+        headingMode: 'sticky',
 
+        content: [
           html.tag('p',
             language.$('albumCommentaryPage.infoLine', {
               words: html.tag('b', language.formatWordCount(words, {unit: true})),
@@ -70,7 +66,7 @@ export function write(album) {
               {style: getLinkThemeString(track.color)},
               transformMultiline(track.commentary)),
           ])
-        ]),
+        ],
       },
 
       nav: generateAlbumExtrasPageNav(album, 'commentary', {
@@ -112,20 +108,24 @@ export function writeTargetless({wikiData}) {
       title: language.$('commentaryIndex.title'),
 
       main: {
-        content: html.tag('div', {class: 'long-content'}, [
-          html.tag('h1', language.$('commentaryIndex.title')),
+        classes: ['long-content'],
+        headingMode: 'static',
+
+        content: [
           html.tag('p', language.$('commentaryIndex.infoLine', {
             words: html.tag('b', language.formatWordCount(totalWords, {unit: true})),
             entries: html.tag('b', language.countCommentaryEntries(totalEntries, {unit: true})),
           })),
+
           html.tag('p', language.$('commentaryIndex.albumList.title')),
+
           html.tag('ul', data.map(({album, entries, words}) =>
             html.tag('li', language.$('commentaryIndex.albumList.item', {
               album: link.albumCommentary(album),
               words: language.formatWordCount(words, {unit: true}),
               entries: language.countCommentaryEntries(entries.length, {unit: true}),
-            }))))
-        ]),
+            })))),
+        ],
       },
 
       nav: {simple: true},

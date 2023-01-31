@@ -162,9 +162,7 @@ export function write(track, {wikiData}) {
       absoluteTo,
       fancifyURL,
       generateChronologyLinks,
-      generateCoverLink,
       generateNavigationLinks,
-      generateStickyHeadingContainer,
       generateTrackListDividedByGroups,
       getAlbumStylesheet,
       getArtistString,
@@ -185,7 +183,6 @@ export function write(track, {wikiData}) {
         language,
         link,
       });
-      const cover = getTrackCover(track);
 
       return {
         title: language.$('trackPage.title', {track: track.name}),
@@ -224,22 +221,16 @@ export function write(track, {wikiData}) {
         },
         */
 
+        cover: {
+          src: getTrackCover(track),
+          alt: language.$('misc.alt.trackCover'),
+          artTags: track.artTags,
+        },
+
         main: {
+          headingMode: 'sticky',
+
           content: [
-            generateStickyHeadingContainer({
-              title: language.$('trackPage.title', {track: track.name}),
-
-              coverSrc: cover,
-              coverAlt: language.$('misc.alt.trackCover'),
-              coverTags: track.artTags,
-            }),
-
-            cover && generateCoverLink({
-              src: cover,
-              alt: language.$('misc.alt.trackCover'),
-              tags: track.artTags,
-            }),
-
             html.tag('p',
               {
                 [html.onlyIfContent]: true,
@@ -267,7 +258,7 @@ export function write(track, {wikiData}) {
                     date: language.formatDate(track.date),
                   }),
 
-                cover &&
+                track.hasCoverArt &&
                 track.coverArtDate &&
                 +track.coverArtDate !== +track.date &&
                   language.$('releaseInfo.artReleased', {
