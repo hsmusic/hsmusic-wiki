@@ -525,7 +525,7 @@ export function generateDocumentHTML(pageInfo, {
 
         html.tag('link', {
           rel: 'stylesheet',
-          href: to('shared.staticFile', `site2.css?${cachebust}`),
+          href: to('shared.staticFile', `site3.css?${cachebust}`),
         }),
 
         html.tag('style',
