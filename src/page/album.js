@@ -12,6 +12,8 @@ import {
   getTotalDuration,
 } from '../util/wiki-data.js';
 
+export const description = `per-album info & track artwork gallery pages`;
+
 export function targets({wikiData}) {
   return wikiData.albumData;
 }

@@ -15,7 +15,7 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import link from '../../util/link.js';
-import {empty, queue} from '../../util/sugar.js';
+import {empty, queue, withEntries} from '../../util/sugar.js';
 
 import {
   logError,
@@ -34,6 +34,8 @@ import {
 
 const pageFlags = Object.keys(pageSpecs);
 
+export const description = `Generates all page content in one build (according to the contents of data files at build time) and writes them to disk, preparing the output folder for upload and serving by any static web host\n\nIntended for any production or public-facing release of a wiki; serviceable for local development, but can be a bit unwieldy and time/CPU-expensive`;
+
 export function getCLIOptions() {
   return {
     // This is the output directory. It's the one you'll upload online with
@@ -43,6 +45,7 @@ export function getCLIOptions() {
     // couple symlinked directories, so if you're uploading, you're pro8a8ly
     // gonna want to resolve those yourself.
     'out-path': {
+      help: `Specify path to output directory, into which HTML page files and other output are written and other directories are linked\n\nAlways required alongside --static-build mode, but may be provided via the HSMUSIC_OUT environment variable instead`,
       type: 'value',
     },
 
@@ -51,12 +54,14 @@ export function getCLIOptions() {
     // the site. Not recommended for production, since it isn't guaranteed
     // 100% error-free (and index.html-style links are less pretty anyway).
     'append-index-html': {
+      help: `Apply "index.html" to the end of page links, instead of just linking to the directory (ex. "/track/ng2yu/"); useful when no local server hosting option is available and browsing build output directly off the disk drive\n\nDefinitely not intended for production: this option isn't extensively tested and may include conspicuous oddities`,
       type: 'flag',
     },
 
     // Only want to 8uild one language during testing? This can chop down
     // 8uild times a pretty 8ig chunk! Just pass a single language code.
     'lang': {
+      help: `Skip rest and build only pages for this locale language (specify a language code)`,
       type: 'value',
     },
 
@@ -65,7 +70,12 @@ export function getCLIOptions() {
     // They're here to make development quicker when you're only working
     // on some particular area(s) of the site rather than making changes
     // across all of them.
-    ...Object.fromEntries(pageFlags.map((key) => [key, {type: 'flag'}])),
+    ...withEntries(pageSpecs, entries => entries.map(
+      ([key, spec]) => [key, {
+        help: spec.description &&
+          `Skip rest and build only:\n${spec.description}`,
+        type: 'flag',
+      }])),
   };
 }
 

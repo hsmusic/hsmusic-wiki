@@ -58,7 +58,7 @@ import {findFiles} from './util/io.js';
 import link from './util/link.js';
 import {isMain} from './util/node-utils.js';
 import {validateReplacerSpec} from './util/replacer.js';
-import {empty, showAggregate} from './util/sugar.js';
+import {empty, showAggregate, withEntries} from './util/sugar.js';
 import {replacerSpec} from './util/transform-content.js';
 import {generateURLs} from './util/urls.js';
 import {sortByName} from './util/wiki-data.js';
@@ -104,9 +104,11 @@ async function main() {
   const defaultQueueSize = 500;
 
   const buildModeFlagOptions = (
-    Object.fromEntries(
-      Object.keys(buildModes)
-        .map(key => [key, {type: 'flag'}])));
+    withEntries(buildModes, entries =>
+      entries.map(([key, mode]) => [key, {
+        help: mode.description,
+        type: 'flag',
+      }])));
 
   const selectedBuildModeFlags = Object.keys(
     await parseOptions(process.argv.slice(2), {
@@ -115,9 +117,11 @@ async function main() {
     }));
 
   let selectedBuildModeFlag;
+  let usingDefaultBuildMode;
 
   if (empty(selectedBuildModeFlags)) {
     selectedBuildModeFlag = 'static-build';
+    usingDefaultBuildMode = true;
     logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
   } else if (selectedBuildModeFlags.length > 1) {
     logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
@@ -125,6 +129,7 @@ async function main() {
     return;
   } else {
     selectedBuildModeFlag = selectedBuildModeFlags[0];
+    usingDefaultBuildMode = false;
     logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
   }
 
@@ -148,7 +153,7 @@ async function main() {
     // and like a jillion other things too. Pretty much everything which
     // makes an individual wiki what it is goes here!
     'data-path': {
-      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure; always required for wiki building, but may be provided by the HSMUSIC_DATA environment variable instead`,
+      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure\n\nAlways required for wiki building, but may be provided via the HSMUSIC_DATA environment variable instead`,
       type: 'value',
     },
 
@@ -156,7 +161,7 @@ async function main() {
     // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
     // near the top of this file (upd8.js).
     'media-path': {
-      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content; always required for wiki building, but may be provided by the HSMUSIC_MEDIA environment variable instead`,
+      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content\n\nAlways required for wiki building, but may be provided via the HSMUSIC_MEDIA environment variable instead`,
       type: 'value',
     },
 
@@ -282,7 +287,7 @@ async function main() {
           wrappedHelpLines = wrappedHelp.split('\n').length;
         }
 
-        if (wrappedHelpLines > 1 && !justInsertedPaddingLine) {
+        if (wrappedHelpLines > 0 && !justInsertedPaddingLine) {
           console.log('');
         }
 
@@ -331,7 +336,9 @@ async function main() {
     showOptions(`Build mode selection`, buildModeFlagOptions);
 
     if (buildOptions) {
-      showOptions(`Build options for --${selectedBuildModeFlag}`, buildOptions);
+      showOptions(`Build options for --${selectedBuildModeFlag} (${
+        usingDefaultBuildMode ? 'default' : 'selected'
+      })`, buildOptions);
     }
 
     return;

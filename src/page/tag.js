@@ -1,5 +1,7 @@
 // Art tag page specification.
 
+export const description = `per-artwork-tag gallery pages`;
+
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableArtTagUI;
 }

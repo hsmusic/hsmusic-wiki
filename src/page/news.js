@@ -1,5 +1,7 @@
 // News entry & index page specifications.
 
+export const description = `per-entry news pages & index`;
+
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableNews;
 }
