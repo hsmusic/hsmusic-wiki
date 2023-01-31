@@ -255,29 +255,26 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
 
   propertyFieldMapping: {
     name: 'Track',
-
     directory: 'Directory',
     duration: 'Duration',
     urls: 'URLs',
 
+    dateFirstReleased: 'Date First Released',
     coverArtDate: 'Cover Art Date',
     coverArtFileExtension: 'Cover Art File Extension',
-    dateFirstReleased: 'Date First Released',
     hasCoverArt: 'Has Cover Art',
-    hasURLs: 'Has URLs',
 
+    lyrics: 'Lyrics',
+    commentary: 'Commentary',
+    additionalFiles: 'Additional Files',
+
+    originalReleaseTrackByRef: 'Originally Released As',
     referencedTracksByRef: 'Referenced Tracks',
     sampledTracksByRef: 'Sampled Tracks',
     artistContribsByRef: 'Artists',
     contributorContribsByRef: 'Contributors',
     coverArtistContribsByRef: 'Cover Artists',
     artTagsByRef: 'Art Tags',
-    originalReleaseTrackByRef: 'Originally Released As',
-
-    commentary: 'Commentary',
-    lyrics: 'Lyrics',
-
-    additionalFiles: 'Additional Files',
   },
 });
 
