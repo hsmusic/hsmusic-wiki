@@ -11,6 +11,8 @@ import {
   getNewReleases,
 } from '../util/wiki-data.js';
 
+export const description = `main wiki homepage`;
+
 export function writeTargetless({wikiData}) {
   const {newsData, homepageLayout, wikiInfo} = wikiData;
 

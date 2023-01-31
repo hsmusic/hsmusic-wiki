@@ -64,8 +64,10 @@ export async function parseOptions(options, optionDescriptorMap) {
   // options is the array of options you want to process;
   // optionDescriptorMap is a mapping of option names to objects that describe
   // the expected value for their corresponding options.
-  // Returned is a mapping of any specified option names to their values, or
-  // a process.exit(1) and error message if there were any issues.
+  //
+  // Returned is...
+  // - a mapping of any specified option names to their values
+  // - a process.exit(1) and error message if there were any issues
   //
   // Here are examples of optionDescriptorMap to cover all the things you can
   // do with it:
@@ -95,11 +97,10 @@ export async function parseOptions(options, optionDescriptorMap) {
   // ['--directory', 'apple'] -> {'directory': 'apple'}
   // ['--directory', 'artichoke'] -> (error)
   // ['--files', 'a', 'b', 'c', ';'] -> {'files': ['a', 'b', 'c']}
-  //
-  // TODO: Be able to validate the values in a series option.
 
   const handleDashless = optionDescriptorMap[parseOptions.handleDashless];
   const handleUnknown = optionDescriptorMap[parseOptions.handleUnknown];
+
   const result = Object.create(null);
   for (let i = 0; i < options.length; i++) {
     const option = options[i];
@@ -107,6 +108,7 @@ export async function parseOptions(options, optionDescriptorMap) {
       // --x can be a flag or expect a value or series of values
       let name = option.slice(2).split('=')[0]; // '--x'.split('=') = ['--x']
       let descriptor = optionDescriptorMap[name];
+
       if (!descriptor) {
         if (handleUnknown) {
           handleUnknown(option);
@@ -116,36 +118,49 @@ export async function parseOptions(options, optionDescriptorMap) {
         }
         continue;
       }
+
       if (descriptor.alias) {
         name = descriptor.alias;
         descriptor = optionDescriptorMap[name];
       }
-      if (descriptor.type === 'flag') {
-        result[name] = true;
-      } else if (descriptor.type === 'value') {
-        let value = option.slice(2).split('=')[1];
-        if (!value) {
-          value = options[++i];
-          if (!value || value.startsWith('-')) {
-            value = null;
+
+      switch (descriptor.type) {
+        case 'flag': {
+          result[name] = true;
+          break;
+        }
+
+        case 'value': {
+          let value = option.slice(2).split('=')[1];
+          if (!value) {
+            value = options[++i];
+            if (!value || value.startsWith('-')) {
+              value = null;
+            }
           }
+
+          if (!value) {
+            console.error(`Expected a value for --${name}`);
+            process.exit(1);
+          }
+
+          result[name] = value;
+          break;
         }
-        if (!value) {
-          console.error(`Expected a value for --${name}`);
-          process.exit(1);
+
+        case 'series': {
+          if (!options.slice(i).includes(';')) {
+            console.error(`Expected a series of values concluding with ; (\\;) for --${name}`);
+            process.exit(1);
+          }
+
+          const endIndex = i + options.slice(i).indexOf(';');
+          result[name] = options.slice(i + 1, endIndex);
+          i = endIndex;
+          break;
         }
-        result[name] = value;
-      } else if (descriptor.type === 'series') {
-        if (!options.slice(i).includes(';')) {
-          console.error(
-            `Expected a series of values concluding with ; (\\;) for --${name}`
-          );
-          process.exit(1);
-        }
-        const endIndex = i + options.slice(i).indexOf(';');
-        result[name] = options.slice(i + 1, endIndex);
-        i = endIndex;
       }
+
       if (descriptor.validate) {
         const validation = await descriptor.validate(result[name]);
         if (validation !== true) {
@@ -167,10 +182,12 @@ export async function parseOptions(options, optionDescriptorMap) {
         }
         continue;
       }
+
       if (descriptor.alias) {
         name = descriptor.alias;
         descriptor = optionDescriptorMap[name];
       }
+
       if (descriptor.type === 'flag') {
         result[name] = true;
       } else {

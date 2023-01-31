@@ -18,6 +18,8 @@ import {
   sortChronologically,
 } from '../util/wiki-data.js';
 
+export const description = `per-track info pages`;
+
 export function targets({wikiData}) {
   return wikiData.trackData;
 }

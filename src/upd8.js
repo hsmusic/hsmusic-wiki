@@ -34,6 +34,7 @@
 import {execSync} from 'child_process';
 import * as path from 'path';
 import {fileURLToPath} from 'url';
+import wrap from 'word-wrap';
 
 import genThumbs from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
@@ -57,9 +58,10 @@ import {findFiles} from './util/io.js';
 import link from './util/link.js';
 import {isMain} from './util/node-utils.js';
 import {validateReplacerSpec} from './util/replacer.js';
-import {empty, showAggregate} from './util/sugar.js';
+import {empty, showAggregate, withEntries} from './util/sugar.js';
 import {replacerSpec} from './util/transform-content.js';
 import {generateURLs} from './util/urls.js';
+import {sortByName} from './util/wiki-data.js';
 
 import {generateDevelopersCommentHTML} from './write/page-template.js';
 import * as buildModes from './write/build-modes/index.js';
@@ -99,18 +101,27 @@ if (!validateReplacerSpec(replacerSpec, {find, link})) {
 async function main() {
   Error.stackTraceLimit = Infinity;
 
+  const defaultQueueSize = 500;
+
+  const buildModeFlagOptions = (
+    withEntries(buildModes, entries =>
+      entries.map(([key, mode]) => [key, {
+        help: mode.description,
+        type: 'flag',
+      }])));
+
   const selectedBuildModeFlags = Object.keys(
     await parseOptions(process.argv.slice(2), {
       [parseOptions.handleUnknown]: () => {},
-
-      ...Object.fromEntries(Object.keys(buildModes)
-        .map((key) => [key, {type: 'flag'}])),
+      ...buildModeFlagOptions,
     }));
 
   let selectedBuildModeFlag;
+  let usingDefaultBuildMode;
 
   if (empty(selectedBuildModeFlags)) {
     selectedBuildModeFlag = 'static-build';
+    usingDefaultBuildMode = true;
     logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
   } else if (selectedBuildModeFlags.length > 1) {
     logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
@@ -118,6 +129,7 @@ async function main() {
     return;
   } else {
     selectedBuildModeFlag = selectedBuildModeFlags[0];
+    usingDefaultBuildMode = false;
     logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
   }
 
@@ -129,13 +141,19 @@ async function main() {
     listingTargetSpec,
   };
 
-  const cliOptions = await parseOptions(process.argv.slice(2), {
-    ...selectedBuildMode.getCLIOptions(),
+  const buildOptions = selectedBuildMode.getCLIOptions();
+
+  const commonOptions = {
+    'help': {
+      help: `Display usage info and basic information for the \`hsmusic\` command`,
+      type: 'flag',
+    },
 
     // Data files for the site, including flash, artist, and al8um data,
     // and like a jillion other things too. Pretty much everything which
     // makes an individual wiki what it is goes here!
     'data-path': {
+      help: `Specify path to data directory, including YAML files that cover all info about wiki content, layout, and structure\n\nAlways required for wiki building, but may be provided via the HSMUSIC_DATA environment variable instead`,
       type: 'value',
     },
 
@@ -143,6 +161,7 @@ async function main() {
     // categorized; check out MEDIA_ALBUM_ART_DIRECTORY and other constants
     // near the top of this file (upd8.js).
     'media-path': {
+      help: `Specify path to media directory, including album artwork and additional files, as well as custom site layout media and other media files for reference or linking in wiki content\n\nAlways required for wiki building, but may be provided via the HSMUSIC_MEDIA environment variable instead`,
       type: 'value',
     },
 
@@ -157,6 +176,7 @@ async function main() {
     // 8uild with the default (English) strings if this path is left
     // unspecified.
     'lang-path': {
+      help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata`,
       type: 'value',
     },
 
@@ -164,12 +184,14 @@ async function main() {
     // kinda a pain to run every time, since it does necessit8te reading
     // every media file at run time. Pass this to skip it.
     'skip-thumbs': {
+      help: `Skip processing and generating thumbnails in media directory (speeds up subsequent builds, but remove this option [or use --thumbs-only] and re-run once when you add or modify media files to ensure thumbnails stay up-to-date!)`,
       type: 'flag',
     },
 
     // Or, if you *only* want to gener8te newly upd8ted thum8nails, you can
     // pass this flag! It exits 8efore 8uilding the rest of the site.
     'thumbs-only': {
+      help: `Skip everything besides processing media directory and generating up-to-date thumbnails (useful when using --skip-thumbs for most runs)`,
       type: 'flag',
     },
 
@@ -177,6 +199,7 @@ async function main() {
     // generating site HTML yet? This flag will cut execution off right
     // 8efore any site 8uilding actually happens.
     'no-build': {
+      help: `Don't run a build of the site at all; only process data/media and report any errors detected`,
       type: 'flag',
     },
 
@@ -185,10 +208,12 @@ async function main() {
     // line) right to your output, 8ut also pro8a8ly give you a headache
     // 8ecause wow that is a lot of visual noise.
     'show-traces': {
+      help: `Show JavaScript source code paths for reported errors in "aggregate" error displays\n\n(Debugging use only, but please enable this if you're reporting bugs for our issue tracker!)`,
       type: 'flag',
     },
 
     'queue-size': {
+      help: `Process more or fewer disk files at once to optimize performance or avoid I/O errors, unlimited if set to 0 (between 500 and 700 is usually a safe range for building HSMusic on Windows machines)\nDefaults to ${defaultQueueSize}`,
       type: 'value',
       validate(size) {
         if (parseInt(size) !== parseFloat(size)) return 'an integer';
@@ -202,6 +227,7 @@ async function main() {
     // CacheableObject in a mode where every instance is a Proxy which will
     // keep track of invalid property accesses.
     'show-invalid-property-accesses': {
+      help: `Report accesses at runtime to nonexistant properties on wiki data objects, at a dramatic performance cost\n(Internal/development use only)`,
       type: 'flag',
     },
 
@@ -215,11 +241,108 @@ async function main() {
     // efficiency of data calculation or write generation separately instead of
     // mixed together).
     'precache-data': {
+      help: `Compute all runtime-cached values for wiki data objects before proceeding to site build (optimizes rate of content generation/serving, but waits a lot longer before build actually starts, and may compute data which is never required for this build)`,
       type: 'flag',
     },
+  };
 
-    [parseOptions.handleUnknown]: () => {},
+  const cliOptions = await parseOptions(process.argv.slice(2), {
+    // We don't want to error when we receive these options, so specify them
+    // here, even though we won't be doing anything with them later.
+    // (This is a bit of a hack.)
+    ...buildModeFlagOptions,
+
+    ...commonOptions,
+    ...buildOptions,
   });
+
+  if (cliOptions['help']) {
+    const indentWrap = (spaces, str) => wrap(str, {width: 60 - spaces, indent: ' '.repeat(spaces)});
+
+    const showOptions = (msg, options) => {
+      console.log(color.bright(msg));
+
+      const entries = Object.entries(options);
+      const sortedOptions = sortByName(entries
+        .map(([name, descriptor]) => ({name, descriptor})));
+
+      if (!sortedOptions.length) {
+        console.log(`(No options available)`)
+      }
+
+      let justInsertedPaddingLine = false;
+
+      for (const {name, descriptor} of sortedOptions) {
+        if (descriptor.alias) {
+          continue;
+        }
+
+        const aliases = entries
+          .filter(([_name, {alias}]) => alias === name)
+          .map(([name]) => name);
+
+        let wrappedHelp, wrappedHelpLines = 0;
+        if (descriptor.help) {
+          wrappedHelp = indentWrap(4, descriptor.help);
+          wrappedHelpLines = wrappedHelp.split('\n').length;
+        }
+
+        if (wrappedHelpLines > 0 && !justInsertedPaddingLine) {
+          console.log('');
+        }
+
+        console.log(color.bright(` --` + name) +
+          (aliases.length
+            ? ` (or: ${aliases.map(alias => color.bright(`--` + alias)).join(', ')})`
+            : '') +
+          (descriptor.help
+            ? ''
+            : color.dim('  (no help provided)')));
+
+        if (wrappedHelp) {
+          console.log(wrappedHelp);
+        }
+
+        if (wrappedHelpLines > 1) {
+          console.log('');
+          justInsertedPaddingLine = true;
+        } else {
+          justInsertedPaddingLine = false;
+        }
+      }
+
+      if (!justInsertedPaddingLine) {
+        console.log(``);
+      }
+    };
+
+    console.log(
+      color.bright(`hsmusic (aka. Homestuck Music Wiki)\n`) +
+      `static wiki software cataloguing collaborative creation\n`);
+
+    console.log(indentWrap(0,
+      `The \`hsmusic\` command provides basic control over all parts of generating user-visible HTML pages and website content/structure from provided data, media, and language directories.\n` +
+      `\n` +
+      `CLI options are divided into three groups:\n`));
+    console.log(` 1) ` + indentWrap(4,
+      `Common options: These are shared by all build modes and always have the same essential behavior`).trim());
+    console.log(` 2) ` + indentWrap(4,
+      `Build mode selection: One build mode may be selected (or else the default, --static-build, is used), and it decides which entire set of behavior to use for providing site content to the user`).trim());
+    console.log(` 3) ` + indentWrap(4,
+      `Build options: Each build mode has a set of unique options which customize behavior for that build mode`).trim());
+    console.log(``);
+
+    showOptions(`Common options`, commonOptions);
+    showOptions(`Build mode selection`, buildModeFlagOptions);
+
+    if (buildOptions) {
+      showOptions(`Build options for --${selectedBuildModeFlag} (${
+        usingDefaultBuildMode ? 'default' : 'selected'
+      })`, buildOptions);
+    }
+
+    return;
+  }
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
   const mediaPath = cliOptions['media-path'] || process.env.HSMUSIC_MEDIA;
@@ -237,7 +360,7 @@ async function main() {
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
   // marginal performance deficit while waiting for file writes to finish
   // before proceeding to more page processing.
-  const queueSize = +(cliOptions['queue-size'] ?? 500);
+  const queueSize = +(cliOptions['queue-size'] ?? defaultQueueSize);
 
   {
     let errored = false;

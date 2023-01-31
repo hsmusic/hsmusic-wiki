@@ -3,6 +3,8 @@
 import {empty} from '../util/sugar.js';
 import {getFlashLink} from '../util/wiki-data.js';
 
+export const description = `flash & game pages`;
+
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableFlashesAndGames;
 }

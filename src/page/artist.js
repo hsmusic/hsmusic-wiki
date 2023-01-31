@@ -15,6 +15,8 @@ import {
   sortChronologically,
 } from '../util/wiki-data.js';
 
+export const description = `per-artist info & artwork gallery pages`;
+
 export function targets({wikiData}) {
   return wikiData.artistData;
 }

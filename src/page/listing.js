@@ -12,6 +12,8 @@ import {empty} from '../util/sugar.js';
 
 import {getTotalDuration} from '../util/wiki-data.js';
 
+export const description = `wiki-wide listing pages & index`;
+
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableListings;
 }

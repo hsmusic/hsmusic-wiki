@@ -4,6 +4,8 @@ import {generateAlbumExtrasPageNav} from './album.js';
 import {accumulateSum} from '../util/sugar.js';
 import {filterAlbumsByCommentary} from '../util/wiki-data.js';
 
+export const description = `per-album artist commentary pages & index`
+
 export function condition({wikiData}) {
   return filterAlbumsByCommentary(wikiData.albumData).length;
 }

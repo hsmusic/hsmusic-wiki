@@ -9,6 +9,8 @@ import {
   sortChronologically,
 } from '../util/wiki-data.js';
 
+export const description = `per-group info & album gallery pages`;
+
 export function targets({wikiData}) {
   return wikiData.groupData;
 }

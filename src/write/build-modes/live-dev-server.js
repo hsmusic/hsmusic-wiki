@@ -25,13 +25,20 @@ import {
   generateRedirectHTML,
 } from '../page-template.js';
 
+const defaultHost = '0.0.0.0';
+const defaultPort = 8002;
+
+export const description = `Hosts a local HTTP server which generates page content as it is requested, instead of all at once; reacts to changes in data files, so new reloads will be up-to-date with on-disk YAML data (<- not implemented yet, check back soon!)\n\nIntended for local development ONLY; this custom HTTP server is NOT rigorously tested and almost certainly has security flaws`;
+
 export function getCLIOptions() {
   return {
     host: {
+      help: `Hostname to which HTTP server is bound\nDefaults to ${defaultHost}`,
       type: 'value',
     },
 
     port: {
+      help: `Port to which HTTP server is bound\nDefaults to ${defaultPort}`,
       type: 'value',
       validate(size) {
         if (parseInt(size) !== parseFloat(size)) return 'an integer';
@@ -57,8 +64,8 @@ export async function go({
   developersComment,
   getSizeOfAdditionalFile,
 }) {
-  const host = cliOptions['host'] ?? '0.0.0.0';
-  const port = parseInt(cliOptions['port'] ?? 8002);
+  const host = cliOptions['host'] ?? defaultHost;
+  const port = parseInt(cliOptions['port'] ?? defaultPort);
 
   let targetSpecPairs = getPageSpecsWithTargets({wikiData});
   const pages = progressCallAll(`Computing page data & paths for ${targetSpecPairs.length} targets.`,
