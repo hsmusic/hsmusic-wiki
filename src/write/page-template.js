@@ -86,9 +86,10 @@ export function generateDocumentHTML(pageInfo, {
     socialEmbed = {},
   } = pageInfo;
 
+  body ||= {};
   body.style ??= '';
 
-  theme = theme || getThemeString(wikiInfo.color);
+  theme ||= getThemeString(wikiInfo.color);
 
   banner ||= {};
   banner.classes ??= [];
@@ -96,16 +97,18 @@ export function generateDocumentHTML(pageInfo, {
   banner.position ??= '';
   banner.dimensions ??= [0, 0];
 
+  main ||= {};
   main.classes ??= [];
   main.content ??= '';
   main.headingMode ??= 'none';
 
+  cover ||= {};
   cover.src ??= '';
   cover.alt ??= '';
   cover.artTags ??= [];
 
-  sidebarLeft ??= {};
-  sidebarRight ??= {};
+  sidebarLeft ||= {};
+  sidebarRight ||= {};
 
   for (const sidebar of [sidebarLeft, sidebarRight]) {
     sidebar.classes ??= [];
@@ -113,20 +116,24 @@ export function generateDocumentHTML(pageInfo, {
     sidebar.collapse ??= true;
   }
 
+  nav ||= {};
   nav.classes ??= [];
   nav.content ??= '';
   nav.bottomRowContent ??= '';
   nav.links ??= [];
   nav.linkContainerClasses ??= [];
 
-  secondaryNav ??= {};
+  secondaryNav ||= {};
   secondaryNav.content ??= '';
   secondaryNav.content ??= '';
 
+  footer ||= {};
   footer.classes ??= [];
   footer.content ??= wikiInfo.footerContent
     ? transformMultiline(wikiInfo.footerContent)
     : '';
+
+  socialEmbed ||= {};
 
   const colors = themeColor
     ? getColors(themeColor, {chroma})
