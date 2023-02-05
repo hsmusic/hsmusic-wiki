@@ -497,6 +497,8 @@ function unbound_fancifyURL(url, {
     ? language.$('misc.external.patreon')
   : domain.includes('spotify.com')
     ? language.$('misc.external.spotify')
+  : domain.includes('newgrounds.com')
+    ? language.$('misc.external.newgrounds')
     : domain);
 }
 
@@ -548,6 +550,8 @@ function unbound_iconifyURL(url, {
       ? ['deviantart', language.$('misc.external.deviantart')]
     : domain.includes('instagram.com')
       ? ['instagram', language.$('misc.external.bandcamp')]
+    : domain.includes('newgrounds.com')
+      ? ['newgrounds', language.$('misc.external.newgrounds')]
       : ['globe', language.$('misc.external.domain', {domain})]);
 
   return html.tag('a',
