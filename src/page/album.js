@@ -55,7 +55,7 @@ export function write(album, {wikiData}) {
   const displayTrackSections =
     album.trackSections &&
       (album.trackSections.length > 1 ||
-        !album.trackSections[0].isDefaultTrackSection);
+        !album.trackSections[0]?.isDefaultTrackSection);
 
   const listTag = getAlbumListTag(album);
 
@@ -294,6 +294,7 @@ export function write(album, {wikiData}) {
                 })),
 
             displayTrackSections &&
+            !empty(album.trackSections) &&
               html.tag('dl',
                 {class: 'album-group-list'},
                 album.trackSections.flatMap(({
@@ -316,6 +317,7 @@ export function write(album, {wikiData}) {
                 ])),
 
             !displayTrackSections &&
+            !empty(album.tracks) &&
               html.tag(listTag,
                 album.tracks.map(trackToListItem)),
 
@@ -748,6 +750,10 @@ export function generateAlbumNavLinks(album, currentTrack, {
     ...extraLinks || [],
     randomLink,
   ].filter(Boolean);
+
+  if (empty(allLinks)) {
+    return '';
+  }
 
   return `(${language.formatUnitList(allLinks)})`;
 }
