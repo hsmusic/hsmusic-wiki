@@ -4,7 +4,7 @@
 import * as path from 'path';
 import yaml from 'js-yaml';
 
-import {readFile} from 'fs/promises';
+import {readFile, stat} from 'fs/promises';
 import {inspect as nodeInspect} from 'util';
 
 import T from './things/index.js';
@@ -945,6 +945,30 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               ? await callAsync(dataStep.file, dataPath)
               : dataStep.file);
 
+          const statResult = await callAsync(() =>
+            stat(file).then(
+              () => true,
+              error => {
+                if (error.code === 'ENOENT') {
+                  return false;
+                } else {
+                  throw error;
+                }
+              }));
+
+          if (statResult === false) {
+            const saveResult = call(dataStep.save, {
+              [documentModes.allInOne]: [],
+              [documentModes.oneDocumentTotal]: {},
+            }[documentMode]);
+
+            if (!saveResult) return;
+
+            Object.assign(wikiDataResult, saveResult);
+
+            return;
+          }
+
           const readResult = await callAsync(readFile, file, 'utf-8');
 
           if (!readResult) {
@@ -992,7 +1016,16 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
         let files = (
           typeof dataStep.files === 'function'
-            ? await callAsync(dataStep.files, dataPath)
+            ? await callAsync(() =>
+                dataStep.files(dataPath).then(
+                  files => files,
+                  error => {
+                    if (error.code === 'ENOENT') {
+                      return [];
+                    } else {
+                      throw error;
+                    }
+                  }))
             : dataStep.files
         );
 
