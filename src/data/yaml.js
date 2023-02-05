@@ -241,7 +241,7 @@ export const processTrackGroupDocument = makeProcessDocument(T.TrackGroup, {
 
 export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
-    'Duration': getDurationInSeconds,
+    'Duration': parseDuration,
 
     'Date First Released': (value) => new Date(value),
     'Cover Art Date': (value) => new Date(value),
@@ -447,13 +447,9 @@ export function processHomepageLayoutRowDocument(document) {
 
 // --> Utilities shared across document parsing functions
 
-export function getDurationInSeconds(string) {
-  if (typeof string === 'number') {
-    return string;
-  }
-
+export function parseDuration(string) {
   if (typeof string !== 'string') {
-    throw new TypeError(`Expected a string or number, got ${string}`);
+    return string;
   }
 
   const parts = string.split(':').map((n) => parseInt(n));
@@ -467,7 +463,6 @@ export function getDurationInSeconds(string) {
 }
 
 export function parseAdditionalFiles(array) {
-  if (!array) return null;
   if (!Array.isArray(array)) {
     // Error will be caught when validating against whatever this value is
     return array;
@@ -493,8 +488,11 @@ export function parseCommentary(text) {
 }
 
 export function parseContributors(contributors) {
-  if (!contributors) {
-    return null;
+  // If this isn't something we can parse, just return it as-is.
+  // The Thing object's validators will handle the data error better
+  // than we're able to here.
+  if (!Array.isArray(contributors)) {
+    return contributors;
   }
 
   if (contributors.length === 1 && contributors[0].startsWith('<i>')) {
@@ -528,8 +526,11 @@ export function parseContributors(contributors) {
 }
 
 function parseDimensions(string) {
-  if (!string) {
-    return null;
+  // It's technically possible to pass an array like [30, 40] through here.
+  // That's not really an issue because if it isn't of the appropriate shape,
+  // the Thing object's validators will handle the error.
+  if (typeof string !== 'string') {
+    return string;
   }
 
   const parts = string.split(/[x,* ]+/g);
