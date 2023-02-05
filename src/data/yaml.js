@@ -186,14 +186,20 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
 
   propertyFieldMapping: {
     name: 'Album',
-
-    color: 'Color',
     directory: 'Directory',
+    date: 'Date',
+    color: 'Color',
     urls: 'URLs',
 
-    artistContribsByRef: 'Artists',
-    coverArtistContribsByRef: 'Cover Artists',
-    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
+    hasCoverArt: 'Has Cover Art',
+    hasTrackArt: 'Has Track Art',
+    hasTrackNumbers: 'Has Track Numbers',
+    isListedOnHomepage: 'Listed on Homepage',
+    isListedInGalleries: 'Listed in Galleries',
+
+    coverArtDate: 'Cover Art Date',
+    trackArtDate: 'Default Track Cover Art Date',
+    dateAddedToWiki: 'Date Added',
 
     coverArtFileExtension: 'Cover Art File Extension',
     trackCoverArtFileExtension: 'Track Art File Extension',
@@ -207,23 +213,14 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     bannerFileExtension: 'Banner File Extension',
     bannerDimensions: 'Banner Dimensions',
 
-    date: 'Date',
-    trackArtDate: 'Default Track Cover Art Date',
-    coverArtDate: 'Cover Art Date',
-    dateAddedToWiki: 'Date Added',
+    commentary: 'Commentary',
+    additionalFiles: 'Additional Files',
 
-    hasCoverArt: 'Has Cover Art',
-    hasTrackArt: 'Has Track Art',
-    hasTrackNumbers: 'Has Track Numbers',
-    isMajorRelease: 'Major Release',
-    isListedOnHomepage: 'Listed on Homepage',
-    isListedInGalleries: 'Listed in Galleries',
-
+    artistContribsByRef: 'Artists',
+    coverArtistContribsByRef: 'Cover Artists',
+    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
     groupsByRef: 'Groups',
     artTagsByRef: 'Art Tags',
-    commentary: 'Commentary',
-
-    additionalFiles: 'Additional Files',
   },
 });
 

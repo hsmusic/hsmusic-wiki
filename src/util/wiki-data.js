@@ -424,26 +424,14 @@ export function getArtistAvatar(artist, {to}) {
 // Big-ass homepage row functions
 
 export function getNewAdditions(numAlbums, {wikiData}) {
-  const {albumData} = wikiData;
-
-  // Sort al8ums, in descending order of priority, 8y...
-  //
-  // * D8te of addition to the wiki (descending).
-  // * Major releases first.
-  // * D8te of release (descending).
-  //
-  // Major releases go first to 8etter ensure they show up in the list (and
-  // are usually at the start of the final output for a given d8 of release
-  // too).
-  const sortedAlbums = albumData
+  const sortedAlbums = wikiData.albumData
     .filter((album) => album.isListedOnHomepage)
     .sort((a, b) => {
       if (a.dateAddedToWiki > b.dateAddedToWiki) return -1;
       if (a.dateAddedToWiki < b.dateAddedToWiki) return 1;
-      if (a.isMajorRelease && !b.isMajorRelease) return -1;
-      if (!a.isMajorRelease && b.isMajorRelease) return 1;
       if (a.date > b.date) return -1;
       if (a.date < b.date) return 1;
+      return 0;
     });
 
   // When multiple al8ums are added to the wiki at a time, we want to show
@@ -515,28 +503,13 @@ export function getNewAdditions(numAlbums, {wikiData}) {
     }
   }
 
-  // Finally, do some quick mapping shenanigans to 8etter display the result
-  // in a grid. (This should pro8a8ly 8e a separ8te, shared function, 8ut
-  // whatevs.)
-  return albums.map((album) => ({large: album.isMajorRelease, item: album}));
+  return albums.map((album) => ({item: album}));
 }
 
 export function getNewReleases(numReleases, {wikiData}) {
-  const {albumData} = wikiData;
-
-  const latestFirst = albumData
+  return wikiData.albumData
     .filter((album) => album.isListedOnHomepage)
-    .reverse();
-
-  const majorReleases = latestFirst.filter((album) => album.isMajorRelease);
-  majorReleases.splice(1);
-
-  const otherReleases = latestFirst
-    .filter((album) => !majorReleases.includes(album))
-    .slice(0, numReleases - majorReleases.length);
-
-  return [
-    ...majorReleases.map((album) => ({large: true, item: album})),
-    ...otherReleases.map((album) => ({large: false, item: album})),
-  ];
+    .reverse()
+    .slice(0, numReleases)
+    .map((album) => ({item: album}));
 }
