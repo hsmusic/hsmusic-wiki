@@ -12,7 +12,9 @@ export async function findFiles(dataPath, {
   try {
     files = await readdir(dataPath);
   } catch (error) {
-    throw new AggregateError([error], `Failed to list files from ${dataPath}`);
+    throw Object.assign(
+      new AggregateError([error], `Failed to list files from ${dataPath}`),
+      {code: error.code});
   }
 
   return files
