@@ -474,18 +474,6 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export function parseCommentary(text) {
-  if (text) {
-    const lines = String(text.trim()).split('\n');
-    if (!lines[0].replace(/<\/b>/g, '').includes(':</i>')) {
-      throw new Error(`Missing commentary citation: "${lines[0].slice(0, 40)}..."`);
-    }
-    return text;
-  } else {
-    return null;
-  }
-}
-
 export function parseContributors(contributors) {
   if (!contributors) {
     return null;

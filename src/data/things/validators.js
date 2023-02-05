@@ -195,7 +195,18 @@ export function isColor(color) {
 }
 
 export function isCommentary(commentary) {
-  return isString(commentary);
+  isString(commentary);
+
+  const [firstLine] = commentary.match(/.*/);
+  if (!firstLine.replace(/<\/b>/g, '').includes(':</i>')) {
+    throw new TypeError(`Missing commentary citation: "${
+      firstLine.length > 40
+        ? firstLine.slice(0, 40) + '...'
+        : firstLine
+    }"`);
+  }
+
+  return true;
 }
 
 const isArtistRef = validateReference('artist');
