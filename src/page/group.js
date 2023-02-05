@@ -18,8 +18,7 @@ export function targets({wikiData}) {
 export function write(group, {wikiData}) {
   const {listingSpec, wikiInfo} = wikiData;
 
-  const {albums} = group;
-  const tracks = albums.flatMap((album) => album.tracks);
+  const tracks = group.albums.flatMap((album) => album.tracks);
   const totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
 
   const albumLines = group.albums.map((album) => ({
@@ -62,7 +61,7 @@ export function write(group, {wikiData}) {
               transformMultiline(group.description)),
 
           ...html.fragment(
-            group.albums && [
+            !empty(group.albums) && [
               html.tag('h2',
                 {class: ['content-heading']},
                 language.$('groupInfoPage.albumList.title')),
@@ -120,7 +119,7 @@ export function write(group, {wikiData}) {
     }),
   };
 
-  const galleryPage = {
+  const galleryPage = !empty(group.albums) && {
     type: 'page',
     path: ['groupGallery', group.directory],
     page: ({
@@ -159,7 +158,7 @@ export function write(group, {wikiData}) {
                   unit: true,
                 })),
               albums: html.tag('b',
-                language.countAlbums(albums.length, {
+                language.countAlbums(group.albums.length, {
                   unit: true,
                 })),
               time: html.tag('b',
@@ -216,7 +215,7 @@ export function write(group, {wikiData}) {
     }),
   };
 
-  return [infoPage, galleryPage];
+  return [infoPage, galleryPage].filter(Boolean);
 }
 
 // Utility functions
@@ -233,8 +232,6 @@ function generateGroupSidebar(currentGroup, isGallery, {
   if (!wikiInfo.enableGroupUI) {
     return null;
   }
-
-  const linkKey = isGallery ? 'groupGallery' : 'groupInfo';
 
   return {
     content: [
@@ -254,15 +251,21 @@ function generateGroupSidebar(currentGroup, isGallery, {
                 category: `<span class="group-name">${category.name}</span>`,
               })),
             html.tag('ul',
-              category.groups.map((group) =>
-                html.tag('li',
+              category.groups.map((group) => {
+                const linkKey = (
+                  isGallery && !empty(group.albums)
+                    ? 'groupGallery'
+                    : 'groupInfo');
+
+                return html.tag('li',
                   {
                     class: group === currentGroup && 'current',
                     style: getLinkThemeString(group.color),
                   },
                   language.$('groupSidebar.groupList.item', {
                     group: link[linkKey](group),
-                  })))),
+                  }));
+              })),
           ])),
     ],
   };
