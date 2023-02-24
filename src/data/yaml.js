@@ -278,15 +278,14 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
 export const processArtistDocument = makeProcessDocument(T.Artist, {
   propertyFieldMapping: {
     name: 'Artist',
-
     directory: 'Directory',
     urls: 'URLs',
+    contextNotes: 'Context Notes',
+
     hasAvatar: 'Has Avatar',
     avatarFileExtension: 'Avatar File Extension',
 
     aliasNames: 'Aliases',
-
-    contextNotes: 'Context Notes',
   },
 
   ignoredFields: ['Dead URLs'],
@@ -301,15 +300,15 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
 
   propertyFieldMapping: {
     name: 'Flash',
-
     directory: 'Directory',
     page: 'Page',
+    urls: 'URLs',
+
     date: 'Date',
     coverArtFileExtension: 'Cover Art File Extension',
 
     featuredTracksByRef: 'Featured Tracks',
     contributorContribsByRef: 'Contributors',
-    urls: 'URLs',
   },
 });
 
@@ -369,8 +368,8 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
     nameShort: 'Short Name',
     directory: 'Directory',
 
-    content: 'Content',
     stylesheet: 'Style',
+    content: 'Content',
   },
 });
 
