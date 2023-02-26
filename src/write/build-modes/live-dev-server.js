@@ -163,7 +163,15 @@ export async function go({
         localDirectory = mediaPath;
       }
 
-      const filePath = path.resolve(localDirectory, safePath.split('/').join(path.sep));
+      let filePath;
+      try {
+        filePath = path.resolve(localDirectory, decodeURI(safePath.split('/').join(path.sep)));
+      } catch (error) {
+        response.writeHead(404, contentTypePlain);
+        response.end(`No ${localFileArea} file found for: ${safePath}`);
+        console.log(`${requestHead} [404] ${pathname}`);
+        console.log(`Failed to decode request pathname`);
+      }
 
       try {
         await stat(filePath);

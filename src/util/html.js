@@ -130,6 +130,14 @@ export function attributes(attribs) {
         throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
     })
     .filter(([_key, _val, keep]) => keep)
+    .map(([key, val]) => {
+      switch (key) {
+        case 'href':
+          return [key, encodeURI(val)];
+        default:
+          return [key, val];
+      }
+    })
     .map(([key, val]) =>
       typeof val === 'boolean'
         ? `${key}`
