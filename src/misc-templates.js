@@ -49,46 +49,31 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
 }) {
   if (empty(additionalFiles)) return [];
 
-  const fileCount = additionalFiles.flatMap((g) => g.files).length;
+  return html.tag('dl',
+    additionalFiles.flatMap(({title, description, files}) => [
+      html.tag('dt',
+        (description
+          ? language.$('releaseInfo.additionalFiles.entry.withDescription', {
+              title,
+              description,
+            })
+          : language.$('releaseInfo.additionalFiles.entry', {title}))),
 
-  return html.fragment([
-    html.tag('p',
-      {
-        id: 'additional-files',
-        class: ['content-heading'],
-      },
-      language.$('releaseInfo.additionalFiles.heading', {
-        additionalFiles: language.countAdditionalFiles(fileCount, {
-          unit: true,
-        }),
-      })),
-
-    html.tag('dl',
-      additionalFiles.flatMap(({title, description, files}) => [
-        html.tag('dt',
-          (description
-            ? language.$('releaseInfo.additionalFiles.entry.withDescription', {
-                title,
-                description,
-              })
-            : language.$('releaseInfo.additionalFiles.entry', {title}))),
-
-        html.tag('dd',
-          html.tag('ul',
-            files.map((file) => {
-              const size = getFileSize(file);
-              return html.tag('li',
-                (size
-                  ? language.$('releaseInfo.additionalFiles.file.withSize', {
-                      file: linkFile(file),
-                      size: language.formatFileSize(size),
-                    })
-                  : language.$('releaseInfo.additionalFiles.file', {
-                      file: linkFile(file),
-                    })));
-            }))),
-      ])),
-  ]);
+      html.tag('dd',
+        html.tag('ul',
+          files.map((file) => {
+            const size = (getFileSize && getFileSize(file));
+            return html.tag('li',
+              (size
+                ? language.$('releaseInfo.additionalFiles.file.withSize', {
+                    file: linkFile(file),
+                    size: language.formatFileSize(size),
+                  })
+                : language.$('releaseInfo.additionalFiles.file', {
+                    file: linkFile(file),
+                  })))
+          }))),
+    ]));
 }
 
 // Artist strings

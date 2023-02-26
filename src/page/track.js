@@ -5,6 +5,7 @@ import {
   generateAlbumNavLinks,
   generateAlbumSecondaryNav,
   generateAlbumSidebar,
+  generateAlbumAdditionalFilesList as unbound_generateAlbumAdditionalFilesList,
 } from './album.js';
 
 import {
@@ -72,6 +73,11 @@ export function write(track, {wikiData}) {
 
   const hasCommentary =
     track.commentary || otherReleases.some((t) => t.commentary);
+
+  const hasAdditionalFiles = !empty(track.additionalFiles);
+  const hasSheetMusicFiles = !empty(track.sheetMusicFiles);
+  const hasMidiProjectFiles = !empty(track.midiProjectFiles);
+  const numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
 
   const generateCommentary = ({language, link, transformMultiline}) =>
     transformMultiline([
@@ -161,12 +167,15 @@ export function write(track, {wikiData}) {
     page: ({
       absoluteTo,
       fancifyURL,
+      generateAdditionalFilesList,
+      generateAdditionalFilesShortcut,
       generateChronologyLinks,
       generateNavigationLinks,
       generateTrackListDividedByGroups,
       getAlbumStylesheet,
       getArtistString,
       getLinkThemeString,
+      getSizeOfAdditionalFile,
       getThemeString,
       getTrackCover,
       html,
@@ -182,6 +191,14 @@ export function write(track, {wikiData}) {
         html,
         language,
         link,
+      });
+
+      const generateAlbumAdditionalFilesList = bindOpts(unbound_generateAlbumAdditionalFilesList, {
+        [bindOpts.bindIndex]: 2,
+        generateAdditionalFilesList,
+        getSizeOfAdditionalFile,
+        link,
+        urls,
       });
 
       return {
@@ -271,6 +288,30 @@ export function write(track, {wikiData}) {
                       track.duration
                     ),
                   }),
+              ]),
+
+            html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                hasSheetMusicFiles &&
+                  language.$('releaseInfo.sheetMusicFiles.shortcut', {
+                    link: html.tag('a',
+                      {href: '#sheet-music-files'},
+                      language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
+                  }),
+
+                hasMidiProjectFiles &&
+                  language.$('releaseInfo.midiProjectFiles.shortcut', {
+                    link: html.tag('a',
+                      {href: '#midi-project-files'},
+                      language.$('releaseInfo.midiProjectFiles.shortcut.link')),
+                  }),
+
+                hasAdditionalFiles &&
+                  generateAdditionalFilesShortcut(track.additionalFiles),
               ]),
 
             html.tag('p',
@@ -375,6 +416,39 @@ export function write(track, {wikiData}) {
                   language.$('releaseInfo.lyrics')),
 
                 html.tag('blockquote', transformLyrics(track.lyrics)),
+              ]),
+
+            ...html.fragment(
+              hasSheetMusicFiles && [
+                html.tag('p',
+                  {id: 'sheet-music-files', class: ['content-heading']},
+                  language.$('releaseInfo.sheetMusicFiles.heading')),
+
+                generateAlbumAdditionalFilesList(album, track.sheetMusicFiles, {
+                  fileSize: false,
+                }),
+              ]),
+
+            ...html.fragment(
+              hasMidiProjectFiles && [
+                html.tag('p',
+                  {id: 'midi-project-files', class: ['content-heading']},
+                  language.$('releaseInfo.midiProjectFiles.heading')),
+
+                generateAlbumAdditionalFilesList(album, track.midiProjectFiles),
+              ]),
+
+            ...html.fragment(
+              hasAdditionalFiles && [
+                html.tag('p',
+                  {id: 'additional-files', class: ['content-heading']},
+                  language.$('releaseInfo.additionalFiles.heading', {
+                    additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
+                      unit: true,
+                    }),
+                  })),
+
+                generateAlbumAdditionalFilesList(album, track.additionalFiles),
               ]),
 
             ...html.fragment(

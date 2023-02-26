@@ -251,6 +251,8 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     'Cover Artists': parseContributors,
 
     'Additional Files': parseAdditionalFiles,
+    'Sheet Music Files': parseAdditionalFiles,
+    'MIDI Project Files': parseAdditionalFiles,
   },
 
   propertyFieldMapping: {
@@ -278,6 +280,8 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     lyrics: 'Lyrics',
 
     additionalFiles: 'Additional Files',
+    sheetMusicFiles: 'Sheet Music Files',
+    midiProjectFiles: 'MIDI Project Files',
   },
 });
 

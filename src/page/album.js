@@ -50,6 +50,8 @@ export function write(album, {wikiData}) {
   };
 
   const hasAdditionalFiles = !empty(album.additionalFiles);
+  const numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
+
   const albumDuration = getTotalDuration(album.tracks);
 
   const displayTrackSections =
@@ -336,18 +338,22 @@ export function write(album, {wikiData}) {
               ]),
 
             ...html.fragment(
-              hasAdditionalFiles &&
-                generateAdditionalFilesList(album.additionalFiles, {
-                  // TODO: Kinda near the metal here...
-                  getFileSize: (file) =>
-                    getSizeOfAdditionalFile(
-                      urls.from('media.root').to(
-                        'media.albumAdditionalFile',
-                        album.directory,
-                        file)),
-                  linkFile: (file) =>
-                    link.albumAdditionalFile({album, file}),
-                })),
+              hasAdditionalFiles && [
+                html.tag('p',
+                  {id: 'additional-files', class: ['content-heading']},
+                  language.$('releaseInfo.additionalFiles.heading', {
+                    additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
+                      unit: true,
+                    }),
+                  })),
+
+                generateAlbumAdditionalFilesList(album, album.additionalFiles, {
+                  generateAdditionalFilesList,
+                  getSizeOfAdditionalFile,
+                  link,
+                  urls,
+                }),
+              ]),
 
             ...html.fragment(
               album.commentary && [
@@ -833,4 +839,27 @@ export function generateAlbumChronologyLinks(album, currentTrack, {
           headingString: 'misc.chronology.heading.coverArt',
         })),
     ]);
+}
+
+export function generateAlbumAdditionalFilesList(album, additionalFiles, {
+  fileSize = true,
+
+  generateAdditionalFilesList,
+  getSizeOfAdditionalFile,
+  link,
+  urls,
+}) {
+  return generateAdditionalFilesList(additionalFiles, {
+    getFileSize:
+      (fileSize
+        ? (file) =>
+            // TODO: Kinda near the metal here...
+            getSizeOfAdditionalFile(
+              urls
+                .from('media.root')
+                .to('media.albumAdditionalFile', album.directory, file))
+        : () => null),
+    linkFile: (file) =>
+      link.albumAdditionalFile({album, file}),
+  });
 }

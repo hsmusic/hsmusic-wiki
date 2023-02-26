@@ -98,6 +98,8 @@ export class Track extends Thing {
     commentary: Thing.common.commentary(),
     lyrics: Thing.common.simpleString(),
     additionalFiles: Thing.common.additionalFiles(),
+    sheetMusicFiles: Thing.common.additionalFiles(),
+    midiProjectFiles: Thing.common.additionalFiles(),
 
     // Update only
 
