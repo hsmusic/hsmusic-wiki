@@ -106,7 +106,6 @@ export class Album extends Thing {
     hasCoverArt: Thing.common.flag(true),
     hasTrackArt: Thing.common.flag(true),
     hasTrackNumbers: Thing.common.flag(true),
-    isMajorRelease: Thing.common.flag(false),
     isListedOnHomepage: Thing.common.flag(true),
     isListedInGalleries: Thing.common.flag(true),
 
@@ -192,7 +191,6 @@ export class Album extends Thing {
     bannerDimensions: S.id,
 
     hasTrackArt: S.id,
-    isMajorRelease: S.id,
     isListedOnHomepage: S.id,
 
     commentary: S.id,
