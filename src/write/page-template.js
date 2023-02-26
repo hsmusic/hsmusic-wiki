@@ -439,6 +439,20 @@ export function generateDocumentHTML(pageInfo, {
           })),
       ])));
 
+  const imageOverlayHTML = html.tag('div', {id: 'image-overlay-container'},
+    html.tag('div', {id: 'image-overlay-content-container'}, [
+      html.tag('a', {id: 'image-overlay-image-container'}, [
+        html.tag('img', {id: 'image-overlay-image'}),
+        html.tag('img', {id: 'image-overlay-image-thumb'}),
+      ]),
+      html.tag('div', {id: 'image-overlay-action-container'}, [
+        language.$('releaseInfo.viewOriginalFile', {
+          link: html.tag('a', {id: 'image-overlay-view-original'},
+            language.$('releaseInfo.viewOriginalFile.link')),
+        }),
+      ]),
+    ]));
+
   const socialEmbedHTML = [
     socialEmbed.title &&
       html.tag('meta', {property: 'og:title', content: socialEmbed.title}),
@@ -580,6 +594,7 @@ export function generateDocumentHTML(pageInfo, {
           ]),
 
           infoCardHTML,
+          imageOverlayHTML,
 
           html.tag('script', {
             type: 'module',

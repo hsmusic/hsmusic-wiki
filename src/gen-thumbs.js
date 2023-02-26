@@ -191,6 +191,7 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
     ]);
 
   return Promise.all([
+    promisifyProcess(convert('.huge', {size: 1800, quality: 96}), false),
     promisifyProcess(convert('.medium', {size: 400, quality: 95}), false),
     promisifyProcess(convert('.small', {size: 250, quality: 85}), false),
   ]);

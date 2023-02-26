@@ -547,3 +547,77 @@ function updateStickyHeading() {
 document.addEventListener('scroll', updateStickyHeading);
 
 updateStickyHeading();
+
+// Image overlay ------------------------------------------
+
+function addImageOverlayClickHandlers() {
+  for (const img of document.querySelectorAll('.image-link')) {
+    img.addEventListener('click', handleImageLinkClicked);
+  }
+
+  const container = document.getElementById('image-overlay-container');
+  const actionContainer = document.getElementById('image-overlay-action-container');
+
+  container.addEventListener('click', handleContainerClicked);
+  document.body.addEventListener('keydown', handleKeyDown);
+
+  function handleContainerClicked(evt) {
+    // Only hide the image overlay if actually clicking the background.
+    if (evt.target !== container) {
+      return;
+    }
+
+    // If you clicked anything close to or beneath the action bar, don't hide
+    // the image overlay.
+    const rect = actionContainer.getBoundingClientRect();
+    if (evt.clientY >= rect.top - 40) {
+      return;
+    }
+
+    container.classList.remove('visible');
+  }
+
+  function handleKeyDown(evt) {
+    if (evt.key === 'Escape' || evt.key === 'Esc' || evt.keyCode === 27) {
+      container.classList.remove('visible');
+    }
+  }
+}
+
+function handleImageLinkClicked(evt) {
+  if (evt.metaKey || evt.shiftKey || evt.altKey) {
+    return;
+  }
+  evt.preventDefault();
+
+  const container = document.getElementById('image-overlay-container');
+  container.classList.add('visible');
+  container.classList.remove('loaded');
+  container.classList.remove('errored');
+
+  const viewOriginal = document.getElementById('image-overlay-view-original');
+  const mainImage = document.getElementById('image-overlay-image');
+  const thumbImage = document.getElementById('image-overlay-image-thumb');
+
+  const source = evt.target.closest('a').href;
+  mainImage.src = source.replace(/\.(jpg|png)$/, '.huge.jpg');
+  thumbImage.src = source.replace(/\.(jpg|png)$/, '.small.jpg');
+  viewOriginal.href = source;
+
+  mainImage.addEventListener('load', handleMainImageLoaded);
+  mainImage.addEventListener('error', handleMainImageErrored);
+
+  function handleMainImageLoaded() {
+    mainImage.removeEventListener('load', handleMainImageLoaded);
+    mainImage.removeEventListener('error', handleMainImageErrored);
+    container.classList.add('loaded');
+  }
+
+  function handleMainImageErrored() {
+    mainImage.removeEventListener('load', handleMainImageLoaded);
+    mainImage.removeEventListener('error', handleMainImageErrored);
+    container.classList.add('errored');
+  }
+}
+
+addImageOverlayClickHandlers();

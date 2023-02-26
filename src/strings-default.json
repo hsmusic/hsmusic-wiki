@@ -96,6 +96,8 @@
   "releaseInfo.viewCommentary.link": "commentary page",
   "releaseInfo.viewGallery": "View {LINK}!",
   "releaseInfo.viewGallery.link": "gallery page",
+  "releaseInfo.viewOriginalFile": "View {LINK}.",
+  "releaseInfo.viewOriginalFile.link":" original file",
   "releaseInfo.listenOn": "Listen on {LINKS}.",
   "releaseInfo.listenOn.noLinks": "This track has no URLs at which it can be listened.",
   "releaseInfo.visitOn": "Visit on {LINKS}.",

@@ -309,6 +309,7 @@ function unbound_getThemeString(color, {
     primary,
     dark,
     dim,
+    dimGhost,
     bg,
     bgBlack,
     shadow,
@@ -318,6 +319,7 @@ function unbound_getThemeString(color, {
     `--primary-color: ${primary}`,
     `--dark-color: ${dark}`,
     `--dim-color: ${dim}`,
+    `--dim-ghost-color: ${dimGhost}`,
     `--bg-color: ${bg}`,
     `--bg-black-color: ${bgBlack}`,
     `--shadow-color: ${shadow}`,
@@ -737,7 +739,7 @@ function unbound_img({
       wrapped = html.tag('a',
         {
           id,
-          class: ['box', hide && 'js-hide'],
+          class: ['box', hide && 'js-hide', 'image-link'],
           href: typeof link === 'string' ? link : originalSrc,
         },
         wrapped);
