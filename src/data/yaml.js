@@ -186,14 +186,20 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
 
   propertyFieldMapping: {
     name: 'Album',
-
-    color: 'Color',
     directory: 'Directory',
+    date: 'Date',
+    color: 'Color',
     urls: 'URLs',
 
-    artistContribsByRef: 'Artists',
-    coverArtistContribsByRef: 'Cover Artists',
-    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
+    hasCoverArt: 'Has Cover Art',
+    hasTrackArt: 'Has Track Art',
+    hasTrackNumbers: 'Has Track Numbers',
+    isListedOnHomepage: 'Listed on Homepage',
+    isListedInGalleries: 'Listed in Galleries',
+
+    coverArtDate: 'Cover Art Date',
+    trackArtDate: 'Default Track Cover Art Date',
+    dateAddedToWiki: 'Date Added',
 
     coverArtFileExtension: 'Cover Art File Extension',
     trackCoverArtFileExtension: 'Track Art File Extension',
@@ -207,23 +213,14 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     bannerFileExtension: 'Banner File Extension',
     bannerDimensions: 'Banner Dimensions',
 
-    date: 'Date',
-    trackArtDate: 'Default Track Cover Art Date',
-    coverArtDate: 'Cover Art Date',
-    dateAddedToWiki: 'Date Added',
+    commentary: 'Commentary',
+    additionalFiles: 'Additional Files',
 
-    hasCoverArt: 'Has Cover Art',
-    hasTrackArt: 'Has Track Art',
-    hasTrackNumbers: 'Has Track Numbers',
-    isMajorRelease: 'Major Release',
-    isListedOnHomepage: 'Listed on Homepage',
-    isListedInGalleries: 'Listed in Galleries',
-
+    artistContribsByRef: 'Artists',
+    coverArtistContribsByRef: 'Cover Artists',
+    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
     groupsByRef: 'Groups',
     artTagsByRef: 'Art Tags',
-    commentary: 'Commentary',
-
-    additionalFiles: 'Additional Files',
   },
 });
 
@@ -257,46 +254,42 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
 
   propertyFieldMapping: {
     name: 'Track',
-
     directory: 'Directory',
     duration: 'Duration',
     urls: 'URLs',
 
+    dateFirstReleased: 'Date First Released',
     coverArtDate: 'Cover Art Date',
     coverArtFileExtension: 'Cover Art File Extension',
-    dateFirstReleased: 'Date First Released',
     hasCoverArt: 'Has Cover Art',
-    hasURLs: 'Has URLs',
 
+    lyrics: 'Lyrics',
+    commentary: 'Commentary',
+    additionalFiles: 'Additional Files',
+    sheetMusicFiles: 'Sheet Music Files',
+    midiProjectFiles: 'MIDI Project Files',
+
+    originalReleaseTrackByRef: 'Originally Released As',
     referencedTracksByRef: 'Referenced Tracks',
     sampledTracksByRef: 'Sampled Tracks',
     artistContribsByRef: 'Artists',
     contributorContribsByRef: 'Contributors',
     coverArtistContribsByRef: 'Cover Artists',
     artTagsByRef: 'Art Tags',
-    originalReleaseTrackByRef: 'Originally Released As',
-
-    commentary: 'Commentary',
-    lyrics: 'Lyrics',
-
-    additionalFiles: 'Additional Files',
-    sheetMusicFiles: 'Sheet Music Files',
-    midiProjectFiles: 'MIDI Project Files',
   },
 });
 
 export const processArtistDocument = makeProcessDocument(T.Artist, {
   propertyFieldMapping: {
     name: 'Artist',
-
     directory: 'Directory',
     urls: 'URLs',
+    contextNotes: 'Context Notes',
+
     hasAvatar: 'Has Avatar',
     avatarFileExtension: 'Avatar File Extension',
 
     aliasNames: 'Aliases',
-
-    contextNotes: 'Context Notes',
   },
 
   ignoredFields: ['Dead URLs'],
@@ -311,15 +304,15 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
 
   propertyFieldMapping: {
     name: 'Flash',
-
     directory: 'Directory',
     page: 'Page',
+    urls: 'URLs',
+
     date: 'Date',
     coverArtFileExtension: 'Cover Art File Extension',
 
     featuredTracksByRef: 'Featured Tracks',
     contributorContribsByRef: 'Contributors',
-    urls: 'URLs',
   },
 });
 
@@ -379,8 +372,8 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
     nameShort: 'Short Name',
     directory: 'Directory',
 
-    content: 'Content',
     stylesheet: 'Style',
+    content: 'Content',
   },
 });
 
@@ -477,18 +470,6 @@ export function parseAdditionalFiles(array) {
     description: item['Description'] ?? null,
     files: item['Files'],
   }));
-}
-
-export function parseCommentary(text) {
-  if (text) {
-    const lines = String(text.trim()).split('\n');
-    if (!lines[0].replace(/<\/b>/g, '').includes(':</i>')) {
-      throw new Error(`Missing commentary citation: "${lines[0].slice(0, 40)}..."`);
-    }
-    return text;
-  } else {
-    return null;
-  }
 }
 
 export function parseContributors(contributors) {

@@ -34,8 +34,6 @@ export class Track extends Thing {
     urls: Thing.common.urls(),
     dateFirstReleased: Thing.common.simpleDate(),
 
-    hasURLs: Thing.common.flag(true),
-
     artistContribsByRef: Thing.common.contribsByRef(),
     contributorContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
