@@ -1140,6 +1140,16 @@ html[data-url-key="localized.home"] .carousel-container {
 
 /* Sticky heading */
 
+#content [id] {
+  /* Adjust scroll margin. */
+  scroll-margin-top: calc(
+      74px /* Sticky heading */
+    + 33px /* Sticky subheading */
+    - 1em  /* One line of text (align bottom) */
+    - 4px  /* Padding for hanging letters */
+  );
+}
+
 .content-sticky-heading-container {
   position: sticky;
   top: 0;
