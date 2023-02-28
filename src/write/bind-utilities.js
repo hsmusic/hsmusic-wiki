@@ -19,6 +19,7 @@ import {
   generateAdditionalFilesList,
   generateAdditionalFilesShortcut,
   generateChronologyLinks,
+  generateContentHeading,
   generateCoverLink,
   generateInfoGalleryLinks,
   generateTrackListDividedByGroups,
@@ -190,6 +191,11 @@ export function bindUtilities({
   bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {
     link: bound.link,
     language,
+  });
+
+  bound.generateContentHeading = bindOpts(generateContentHeading, {
+    [bindOpts.bindIndex]: 0,
+    html,
   });
 
   bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {

@@ -916,6 +916,21 @@ function unbound_generateNavigationLinks(current, {
 
 // Sticky heading, ooooo
 
+function unbound_generateContentHeading({
+  html,
+
+  id,
+  title,
+}) {
+  return html.tag('p',
+    {
+      class: 'content-heading',
+      id,
+      tabindex: '0',
+    },
+    title);
+}
+
 function unbound_generateStickyHeadingContainer({
   getRevealStringFromArtTags,
   html,
@@ -1025,6 +1040,7 @@ export {
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,
 
+  unbound_generateContentHeading as generateContentHeading,
   unbound_generateStickyHeadingContainer as generateStickyHeadingContainer,
 
   unbound_getFooterLocalizationLinks as getFooterLocalizationLinks,

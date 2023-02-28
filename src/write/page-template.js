@@ -401,6 +401,87 @@ export function generateDocumentHTML(pageInfo, {
     footerHTML,
   ].filter(Boolean).join('\n');
 
+  const processSkippers = skipperList =>
+    skipperList
+      .filter(Boolean)
+      .map(([href, stringSubkey]) =>
+        html.tag('span', {class: 'skipper'},
+          html.tag('a',
+            {href},
+            language.$(`misc.skippers.${stringSubkey}`))));
+
+  // Hilariously jank. Sorry!
+  const hasID = id => mainHTML.includes(`id="${id}"`);
+  const hasContributors = hasID('contributors');
+  const hasReferences = hasID('references');
+  const hasReferencedBy = hasID('referenced-by');
+  const hasSamples = hasID('samples');
+  const hasSampledBy = hasID('sampled-by');
+  const hasFeaturedIn = hasID('featured-in');
+  const hasLyrics = hasID('lyrics');
+  const hasSheetMusicFiles = hasID('sheet-music-files');
+  const hasMidiProjectFiles = hasID('midi-project-files');
+  const hasAdditionalFiles = hasID('additional-files');
+  const hasArtistCommentary = hasID('artist-commentary');
+
+  const skippersHTML =
+    mainHTML &&
+      html.tag('div', {id: 'skippers'}, [
+        html.tag('span', language.$('misc.skippers.skipTo')),
+        html.tag('div', {class: 'skipper-list'},
+          processSkippers([
+            ['#content', 'content'],
+            sidebarLeftHTML &&
+              [
+                '#sidebar-left',
+                sidebarRightHTML
+                  ? 'sidebar.left'
+                  : 'sidebar',
+              ],
+            sidebarRightHTML &&
+              [
+                '#sidebar-right',
+                sidebarLeftHTML
+                  ? 'sidebar.right'
+                  : 'sidebar',
+              ],
+            navHTML &&
+              ['#header', 'header'],
+            footerHTML &&
+              ['#footer', 'footer'],
+          ])),
+
+        html.tag('div',
+          {
+            [html.onlyIfContent]: true,
+            class: 'skipper-list'
+          },
+          processSkippers([
+            hasContributors &&
+              ['#contributors', 'contributors'],
+            hasReferences &&
+              ['#references', 'references'],
+            hasReferencedBy &&
+              ['#referenced-by', 'referencedBy'],
+            hasSamples &&
+              ['#samples', 'samples'],
+            hasSampledBy &&
+              ['#sampled-by', 'sampledBy'],
+            hasFeaturedIn &&
+              ['#featured-in', 'featuredIn'],
+            hasLyrics &&
+              ['#lyrics', 'lyrics'],
+            hasSheetMusicFiles &&
+              ['#sheet-music-files', 'sheetMusicFiles'],
+            hasMidiProjectFiles &&
+              ['#midi-project-files', 'midiProjectFiles'],
+            hasAdditionalFiles &&
+              ['#additional-files', 'additionalFiles'],
+            hasArtistCommentary &&
+              ['#artist-commentary', 'artistCommentary'],
+          ])),
+      ]);
+
   const infoCardHTML = html.tag('div', {id: 'info-card-container'},
     html.tag('div', {id: 'info-card-decor'},
       html.tag('div', {id: 'info-card'}, [
@@ -552,30 +633,7 @@ export function generateDocumentHTML(pageInfo, {
         [
           html.tag('div', {id: 'page-container'}, [
             mainHTML &&
-              html.tag('div', {id: 'skippers'},
-                [
-                  ['#content', language.$('misc.skippers.skipToContent')],
-                  sidebarLeftHTML &&
-                    [
-                      '#sidebar-left',
-                      sidebarRightHTML
-                        ? language.$('misc.skippers.skipToSidebar.left')
-                        : language.$('misc.skippers.skipToSidebar'),
-                    ],
-                  sidebarRightHTML &&
-                    [
-                      '#sidebar-right',
-                      sidebarLeftHTML
-                        ? language.$('misc.skippers.skipToSidebar.right')
-                        : language.$('misc.skippers.skipToSidebar'),
-                    ],
-                  footerHTML &&
-                    ['#footer', language.$('misc.skippers.skipToFooter')],
-                ]
-                  .filter(Boolean)
-                  .map(([href, title]) =>
-                    html.tag('span', {class: 'skipper'},
-                      html.tag('a', {href}, title)))),
+            skippersHTML,
             layoutHTML,
           ]),
 

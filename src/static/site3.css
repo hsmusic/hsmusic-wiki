@@ -208,7 +208,19 @@ body::before {
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
-#skippers > .skipper:not(:last-child)::after {
+#skippers > * {
+  display: inline-block;
+}
+
+#skippers > .skipper-list:not(:last-child)::after {
+  display: inline-block;
+  content: "\00a0";
+  margin-left: 2px;
+  margin-right: -2px;
+  border-left: 1px dotted;
+}
+
+#skippers .skipper-list > .skipper:not(:last-child)::after {
   content: " \00b7 ";
   font-weight: 800;
 }
@@ -1137,6 +1149,37 @@ html[data-url-key="localized.home"] .carousel-container {
   margin-bottom: 0;
 }
 
+/* Custom hash links */
+
+.content-heading {
+  border-bottom: 3px double transparent;
+  margin-bottom: -3px;
+}
+
+.content-heading.highlight-hash-link {
+  animation: highlight-hash-link 4s;
+  animation-delay: 125ms;
+}
+
+/* This animation's name is referenced in JavaScript */
+@keyframes highlight-hash-link {
+  0% {
+    border-bottom-color: transparent;
+  }
+
+  10% {
+    border-bottom-color: white;
+  }
+
+  25% {
+    border-bottom-color: white;
+  }
+
+  100% {
+    border-bottom-color: transparent;
+  }
+}
+
 /* Sticky heading */
 
 #content [id] {
@@ -1145,7 +1188,7 @@ html[data-url-key="localized.home"] .carousel-container {
       74px /* Sticky heading */
     + 33px /* Sticky subheading */
     - 1em  /* One line of text (align bottom) */
-    - 4px  /* Padding for hanging letters */
+    - 12px /* Padding for hanging letters & focus ring */
   );
 }
 
