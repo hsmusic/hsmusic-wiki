@@ -549,7 +549,7 @@ export function generateAlbumSidebar(album, currentTrack, {
           html.tag(
             'summary',
             {style: getLinkThemeString(color)},
-            [
+            html.tag('span', [
               listTag === 'ol' &&
                 language.$('albumSidebar.trackList.group.withRange', {
                   group: groupName,
@@ -561,7 +561,7 @@ export function generateAlbumSidebar(album, currentTrack, {
                 language.$('albumSidebar.trackList.group', {
                   group: groupName,
                 }),
-            ]),
+            ])),
           html.tag(listTag,
             listTag === 'ol' ? {start: startIndex + 1} : {},
             tracks.map(trackToListItem)),

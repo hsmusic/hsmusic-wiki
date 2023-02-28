@@ -247,9 +247,10 @@ function generateGroupSidebar(currentGroup, isGallery, {
           [
             html.tag('summary',
               {style: getLinkThemeString(category.color)},
-              language.$('groupSidebar.groupList.category', {
-                category: `<span class="group-name">${category.name}</span>`,
-              })),
+              html.tag('span',
+                language.$('groupSidebar.groupList.category', {
+                  category: `<span class="group-name">${category.name}</span>`,
+                }))),
             html.tag('ul',
               category.groups.map((group) => {
                 const linkKey = (

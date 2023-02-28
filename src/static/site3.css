@@ -342,14 +342,13 @@ body::before {
 .sidebar > details summary {
   margin-top: 0.5em;
   padding-left: 5px;
-  user-select: none;
 }
 
 .sidebar > details summary .group-name {
   color: var(--primary-color);
 }
 
-.sidebar > details summary:hover {
+.sidebar > details summary > span:hover {
   cursor: pointer;
   text-decoration: underline;
   text-decoration-color: var(--primary-color);
