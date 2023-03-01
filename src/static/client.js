@@ -444,6 +444,81 @@ if (localStorage.tryInfoCards) {
   addInfoCardLinkHandlers('track');
 }
 
+// Custom hash links --------------------------------------
+
+function addHashLinkHandlers() {
+  // Instead of defining a scroll offset (to account for the sticky heading)
+  // in JavaScript, we interface with the CSS property 'scroll-margin-top'.
+  // This lets the scroll offset be consolidated where it makes sense, and
+  // sets an appropriate offset when (re)loading a page with hash for free!
+
+  let wasHighlighted;
+
+  for (const a of document.links) {
+    const href = a.getAttribute('href');
+    if (!href || !href.startsWith('#')) {
+      continue;
+    }
+
+    a.addEventListener('click', handleHashLinkClicked);
+  }
+
+  function handleHashLinkClicked(evt) {
+    if (evt.metaKey || evt.shiftKey || evt.ctrlKey || evt.altKey) {
+      return;
+    }
+
+    const href = evt.target.getAttribute('href');
+    const id = href.slice(1);
+    const linked = document.getElementById(id);
+
+    if (!linked) {
+      return;
+    }
+
+    // Hide skipper box right away, so the layout is updated on time for the
+    // math operations coming up next.
+    const skipper = document.getElementById('skippers');
+    skipper.style.display = 'none';
+    setTimeout(() => skipper.style.display = '');
+
+    const box = linked.getBoundingClientRect();
+    const style = window.getComputedStyle(linked);
+
+    const scrollY =
+        window.scrollY
+      + box.top
+      - style['scroll-margin-top'].replace('px', '');
+
+    evt.preventDefault();
+    history.pushState({}, '', href);
+    window.scrollTo({top: scrollY, behavior: 'smooth'});
+    linked.focus({preventScroll: true});
+
+    const maxScroll =
+        document.body.scrollHeight
+      - window.innerHeight;
+
+    if (scrollY > maxScroll && linked.classList.contains('content-heading')) {
+      if (wasHighlighted) {
+        wasHighlighted.classList.remove('highlight-hash-link');
+      }
+
+      wasHighlighted = linked;
+      linked.classList.add('highlight-hash-link');
+      linked.addEventListener('animationend', function handle(evt) {
+        if (evt.animationName === 'highlight-hash-link') {
+          linked.removeEventListener('animationend', handle);
+          linked.classList.remove('highlight-hash-link');
+          wasHighlighted = null;
+        }
+      });
+    }
+  }
+}
+
+addHashLinkHandlers();
+
 // Sticky content heading ---------------------------------
 
 const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-heading-container'))
@@ -510,7 +585,7 @@ function updateStickyHeading() {
       for (let i = contentHeadings.length - 1; i >= 0; i--) {
         const heading = contentHeadings[i];
         const headingRect = heading.getBoundingClientRect();
-        if (headingRect.y + headingRect.height / 1.5 < stickyBottom) {
+        if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 20) {
           closestHeading = heading;
           break;
         }

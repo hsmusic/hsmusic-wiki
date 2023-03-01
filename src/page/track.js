@@ -5,6 +5,7 @@ import {
   generateAlbumNavLinks,
   generateAlbumSecondaryNav,
   generateAlbumSidebar,
+  generateAlbumAdditionalFilesList as unbound_generateAlbumAdditionalFilesList,
 } from './album.js';
 
 import {
@@ -72,6 +73,11 @@ export function write(track, {wikiData}) {
 
   const hasCommentary =
     track.commentary || otherReleases.some((t) => t.commentary);
+
+  const hasAdditionalFiles = !empty(track.additionalFiles);
+  const hasSheetMusicFiles = !empty(track.sheetMusicFiles);
+  const hasMidiProjectFiles = !empty(track.midiProjectFiles);
+  const numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
 
   const generateCommentary = ({language, link, transformMultiline}) =>
     transformMultiline([
@@ -161,12 +167,16 @@ export function write(track, {wikiData}) {
     page: ({
       absoluteTo,
       fancifyURL,
+      generateAdditionalFilesList,
+      generateAdditionalFilesShortcut,
       generateChronologyLinks,
+      generateContentHeading,
       generateNavigationLinks,
       generateTrackListDividedByGroups,
       getAlbumStylesheet,
       getArtistString,
       getLinkThemeString,
+      getSizeOfAdditionalFile,
       getThemeString,
       getTrackCover,
       html,
@@ -182,6 +192,14 @@ export function write(track, {wikiData}) {
         html,
         language,
         link,
+      });
+
+      const generateAlbumAdditionalFilesList = bindOpts(unbound_generateAlbumAdditionalFilesList, {
+        [bindOpts.bindIndex]: 2,
+        generateAdditionalFilesList,
+        getSizeOfAdditionalFile,
+        link,
+        urls,
       });
 
       return {
@@ -274,6 +292,30 @@ export function write(track, {wikiData}) {
               ]),
 
             html.tag('p',
+              {
+                [html.onlyIfContent]: true,
+                [html.joinChildren]: '<br>',
+              },
+              [
+                hasSheetMusicFiles &&
+                  language.$('releaseInfo.sheetMusicFiles.shortcut', {
+                    link: html.tag('a',
+                      {href: '#sheet-music-files'},
+                      language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
+                  }),
+
+                hasMidiProjectFiles &&
+                  language.$('releaseInfo.midiProjectFiles.shortcut', {
+                    link: html.tag('a',
+                      {href: '#midi-project-files'},
+                      language.$('releaseInfo.midiProjectFiles.shortcut.link')),
+                  }),
+
+                hasAdditionalFiles &&
+                  generateAdditionalFilesShortcut(track.additionalFiles),
+              ]),
+
+            html.tag('p',
               (empty(track.urls)
                 ? language.$('releaseInfo.listenOn.noLinks')
                 : language.$('releaseInfo.listenOn', {
@@ -283,8 +325,10 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(otherReleases) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.alsoReleasedAs')),
+                generateContentHeading({
+                  id: 'also-released-as',
+                  title: language.$('releaseInfo.alsoReleasedAs'),
+                }),
 
                 html.tag('ul', otherReleases.map(track =>
                   html.tag('li', language.$('releaseInfo.alsoReleasedAs.item', {
@@ -295,8 +339,10 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(contributorContribs) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.contributors')),
+                generateContentHeading({
+                  id: 'contributors',
+                  title: language.$('releaseInfo.contributors'),
+                }),
 
                 html.tag('ul', contributorContribs.map(contrib =>
                   html.tag('li', getArtistString([contrib], {
@@ -307,20 +353,26 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(referencedTracks) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.tracksReferenced', {
-                    track: html.tag('i', track.name),
-                  })),
+                generateContentHeading({
+                  id: 'references',
+                  title:
+                    language.$('releaseInfo.tracksReferenced', {
+                      track: html.tag('i', track.name),
+                    }),
+                }),
 
                 html.tag('ul', referencedTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(
               !empty(referencedByTracks) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.tracksThatReference', {
-                    track: html.tag('i', track.name),
-                  })),
+                generateContentHeading({
+                  id: 'referenced-by',
+                  title:
+                    language.$('releaseInfo.tracksThatReference', {
+                      track: html.tag('i', track.name),
+                    }),
+                }),
 
                 generateTrackListDividedByGroups(referencedByTracks, {
                   getTrackItem,
@@ -330,20 +382,26 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               !empty(sampledTracks) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.tracksSampled', {
-                    track: html.tag('i', track.name),
-                  })),
+                generateContentHeading({
+                  id: 'samples',
+                  title:
+                    language.$('releaseInfo.tracksSampled', {
+                      track: html.tag('i', track.name),
+                    }),
+                }),
 
                 html.tag('ul', sampledTracks.map(getTrackItem)),
               ]),
 
             ...html.fragment(
               !empty(sampledByTracks) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.tracksThatSample', {
-                    track: html.tag('i', track.name),
-                  })),
+                generateContentHeading({
+                  id: 'sampled-by',
+                  title:
+                    language.$('releaseInfo.tracksThatSample', {
+                      track: html.tag('i', track.name),
+                    })
+                }),
 
                 html.tag('ul', sampledByTracks.map(getTrackItem)),
               ]),
@@ -351,10 +409,13 @@ export function write(track, {wikiData}) {
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
               !empty(flashesThatFeature) && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.flashesThatFeature', {
-                    track: html.tag('i', track.name),
-                  })),
+                generateContentHeading({
+                  id: 'featured-in',
+                  title:
+                    language.$('releaseInfo.flashesThatFeature', {
+                      track: html.tag('i', track.name),
+                    }),
+                }),
 
                 html.tag('ul', flashesThatFeature.map(({flash, as}) =>
                   html.tag('li',
@@ -371,16 +432,56 @@ export function write(track, {wikiData}) {
 
             ...html.fragment(
               track.lyrics && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.lyrics')),
+                generateContentHeading({
+                  id: 'lyrics',
+                  title: language.$('releaseInfo.lyrics'),
+                }),
 
                 html.tag('blockquote', transformLyrics(track.lyrics)),
               ]),
 
             ...html.fragment(
+              hasSheetMusicFiles && [
+                generateContentHeading({
+                  id: 'sheet-music-files',
+                  title: language.$('releaseInfo.sheetMusicFiles.heading'),
+                }),
+
+                generateAlbumAdditionalFilesList(album, track.sheetMusicFiles, {
+                  fileSize: false,
+                }),
+              ]),
+
+            ...html.fragment(
+              hasMidiProjectFiles && [
+                generateContentHeading({
+                  id: 'midi-project-files',
+                  title: language.$('releaseInfo.midiProjectFiles.heading'),
+                }),
+
+                generateAlbumAdditionalFilesList(album, track.midiProjectFiles),
+              ]),
+
+            ...html.fragment(
+              hasAdditionalFiles && [
+                generateContentHeading({
+                  id: 'additional-files',
+                  title: language.$('releaseInfo.additionalFiles.heading', {
+                    additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
+                      unit: true,
+                    }),
+                  })
+                }),
+
+                generateAlbumAdditionalFilesList(album, track.additionalFiles),
+              ]),
+
+            ...html.fragment(
               hasCommentary && [
-                html.tag('p', {class: ['content-heading']},
-                  language.$('releaseInfo.artistCommentary')),
+                generateContentHeading({
+                  id: 'artist-commentary',
+                  title: language.$('releaseInfo.artistCommentary'),
+                }),
 
                 html.tag('blockquote', generateCommentary({
                   link,

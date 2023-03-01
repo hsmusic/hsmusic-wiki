@@ -627,7 +627,11 @@ async function main() {
     ...wikiData.albumData.flatMap((album) =>
       [
         ...(album.additionalFiles ?? []),
-        ...album.tracks.flatMap((track) => track.additionalFiles ?? []),
+        ...album.tracks.flatMap((track) => [
+          ...(track.additionalFiles ?? []),
+          ...(track.sheetMusicFiles ?? []),
+          ...(track.midiProjectFiles ?? []),
+        ]),
       ]
         .flatMap((fileGroup) => fileGroup.files)
         .map((file) => ({

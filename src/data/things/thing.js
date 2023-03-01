@@ -148,6 +148,10 @@ export default class Thing extends CacheableObject {
     additionalFiles: () => ({
       flags: {update: true, expose: true},
       update: {validate: isAdditionalFileList},
+      expose: {
+        transform: (additionalFiles) =>
+          additionalFiles ?? [],
+      },
     }),
 
     // A reference list! Keep in mind this is for general references to wiki
