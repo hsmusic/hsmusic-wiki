@@ -230,7 +230,7 @@ export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHel
   },
 
   propertyFieldMapping: {
-    name: 'Group',
+    name: 'Section',
     color: 'Color',
     dateOriginallyReleased: 'Date Originally Released',
   },
@@ -637,7 +637,7 @@ export const dataSteps = [
     documentMode: documentModes.headerAndEntries,
     processHeaderDocument: processAlbumDocument,
     processEntryDocument(document) {
-      return 'Group' in document
+      return 'Section' in document
         ? processTrackSectionDocument(document)
         : processTrackDocument(document);
     },
