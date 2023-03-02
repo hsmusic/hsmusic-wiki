@@ -36,7 +36,7 @@ import * as path from 'path';
 import {fileURLToPath} from 'url';
 import wrap from 'word-wrap';
 
-import genThumbs from './gen-thumbs.js';
+import genThumbs, {isThumb} from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
 
@@ -56,7 +56,7 @@ import {
 import find from './util/find.js';
 import {findFiles} from './util/io.js';
 import link from './util/link.js';
-import {isMain} from './util/node-utils.js';
+import {isMain, traverse} from './util/node-utils.js';
 import {validateReplacerSpec} from './util/replacer.js';
 import {empty, showAggregate, withEntries} from './util/sugar.js';
 import {replacerSpec} from './util/transform-content.js';
@@ -648,16 +648,41 @@ async function main() {
     ),
   ];
 
-  const getSizeOfAdditionalFile = (mediaPath) => {
-    const {device} =
-      additionalFilePaths.find(({media}) => media === mediaPath) || {};
-    if (!device) return null;
-    return fileSizePreloader.getSizeOfPath(device);
+  // Same dealio for images. Since just about any image can be embedded and
+  // we can't super easily know which ones are referenced at runtime, just
+  // cheat and get file sizes for all images under media. (This includes
+  // additional files which are images.)
+  const imageFilePaths = (await traverse(mediaPath, {
+    filterDir: dir => dir !== '.git',
+    filterFile: file => (
+      ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&
+        !isThumb(file)),
+  }))
+    .map(file => ({
+      device: path.join(mediaPath, file),
+      media:
+        urls
+          .from('media.root')
+          .to('media.path', file.split(path.sep).join('/')),
+    }));
+
+  const getSizeOfMediaFileHelper = paths => (mediaPath) => {
+    const pair = paths.find(({media}) => media === mediaPath);
+    if (!pair) return null;
+    return fileSizePreloader.getSizeOfPath(pair.device);
   };
+
+  const getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
+  const getSizeOfImageFile = getSizeOfMediaFileHelper(imageFilePaths);
 
   logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
 
   fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
+  await fileSizePreloader.waitUntilDoneLoading();
+
+  logInfo`Preloading filesizes for ${imageFilePaths.length} full-resolution images...`;
+
+  fileSizePreloader.loadPaths(...imageFilePaths.map((path) => path.device));
   await fileSizePreloader.waitUntilDoneLoading();
 
   logInfo`Done preloading filesizes!`;
@@ -686,6 +711,7 @@ async function main() {
     cachebust: '?' + CACHEBUST,
     developersComment,
     getSizeOfAdditionalFile,
+    getSizeOfImageFile,
   });
 }
 

@@ -55,6 +55,7 @@ export function bindUtilities({
   absoluteTo,
   defaultLanguage,
   getSizeOfAdditionalFile,
+  getSizeOfImageFile,
   language,
   languages,
   to,
@@ -70,6 +71,7 @@ export function bindUtilities({
     absoluteTo,
     defaultLanguage,
     getSizeOfAdditionalFile,
+    getSizeOfImageFile,
     html,
     language,
     languages,
@@ -80,7 +82,9 @@ export function bindUtilities({
 
   bound.img = bindOpts(img, {
     [bindOpts.bindIndex]: 0,
+    getSizeOfImageFile,
     html,
+    to,
   });
 
   bound.getColors = bindOpts(getColors, {

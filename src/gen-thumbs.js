@@ -77,11 +77,17 @@
 const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
+const thumbnailSpec = {
+  'huge': {size: 1600, quality: 95},
+  'medium': {size: 400, quality: 95},
+  'small': {size: 250, quality: 85},
+};
+
 import {spawn} from 'child_process';
 import {createHash} from 'crypto';
 import * as path from 'path';
 
-import {readdir, readFile, writeFile} from 'fs/promises'; // Whatcha know! Nice.
+import {readFile, writeFile} from 'fs/promises'; // Whatcha know! Nice.
 
 import {createReadStream} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
 
@@ -93,29 +99,14 @@ import {
   progressPromiseAll,
 } from './util/cli.js';
 
-import {commandExists, isMain, promisifyProcess} from './util/node-utils.js';
+import {
+  commandExists,
+  isMain,
+  promisifyProcess,
+  traverse,
+} from './util/node-utils.js';
 
 import {delay, queue} from './util/sugar.js';
-
-function traverse(startDirPath, {
-  filterFile = () => true,
-  filterDir = () => true
-} = {}) {
-  const recursive = (names, subDirPath) =>
-    Promise.all(
-      names.map((name) =>
-        readdir(path.join(startDirPath, subDirPath, name)).then(
-          (names) =>
-            filterDir(name)
-              ? recursive(names, path.join(subDirPath, name))
-              : [],
-          () => (filterFile(name) ? [path.join(subDirPath, name)] : [])
-        )
-      )
-    ).then((pathArrays) => pathArrays.flatMap((x) => x));
-
-  return readdir(startDirPath).then((names) => recursive(names, ''));
-}
 
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
@@ -190,11 +181,10 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
       output(name),
     ]);
 
-  return Promise.all([
-    promisifyProcess(convert('.huge', {size: 1800, quality: 96}), false),
-    promisifyProcess(convert('.medium', {size: 400, quality: 95}), false),
-    promisifyProcess(convert('.small', {size: 250, quality: 85}), false),
-  ]);
+  return Promise.all(
+    Object.entries(thumbnailSpec)
+      .map(([ext, details]) =>
+        promisifyProcess(convert('.' + ext, details), false)));
 }
 
 export default async function genThumbs(mediaPath, {
@@ -208,14 +198,9 @@ export default async function genThumbs(mediaPath, {
   const quietInfo = quiet ? () => null : logInfo;
 
   const filterFile = (name) => {
-    // TODO: Why is this not working????????
-    // thumbnail-cache.json is 8eing passed through, for some reason.
-
     const ext = path.extname(name);
     if (ext !== '.jpg' && ext !== '.png') return false;
-
-    const rest = path.basename(name, ext);
-    if (rest.endsWith('.medium') || rest.endsWith('.small')) return false;
+    if (isThumb(name)) return false;
 
     return true;
   };
@@ -369,6 +354,11 @@ export default async function genThumbs(mediaPath, {
   }
 
   return true;
+}
+
+export function isThumb(file) {
+  const thumbnailLabel = file.match(/\.([^.]+)\.[^.]+$/)?.[1];
+  return Object.keys(thumbnailSpec).includes(thumbnailLabel);
 }
 
 if (isMain(import.meta.url)) {

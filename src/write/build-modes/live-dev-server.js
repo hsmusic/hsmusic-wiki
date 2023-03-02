@@ -63,6 +63,7 @@ export async function go({
   cachebust,
   developersComment,
   getSizeOfAdditionalFile,
+  getSizeOfImageFile,
 }) {
   const host = cliOptions['host'] ?? defaultHost;
   const port = parseInt(cliOptions['port'] ?? defaultPort);
@@ -313,6 +314,7 @@ export async function go({
         absoluteTo,
         defaultLanguage,
         getSizeOfAdditionalFile,
+        getSizeOfImageFile,
         language,
         languages,
         to,

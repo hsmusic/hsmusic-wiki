@@ -6,7 +6,6 @@ import {getColors} from '../util/colors.js';
 import {
   getFooterLocalizationLinks,
   getRevealStringFromContentWarningMessage,
-  img,
 } from '../misc-templates.js';
 
 export function generateDevelopersCommentHTML({
@@ -51,6 +50,7 @@ export function generateDocumentHTML(pageInfo, {
   developersComment,
   generateCoverLink,
   generateStickyHeadingContainer,
+  img,
   getThemeString,
   language,
   languages,
@@ -487,7 +487,6 @@ export function generateDocumentHTML(pageInfo, {
       html.tag('div', {id: 'info-card'}, [
         html.tag('div', {class: ['info-card-art-container', 'no-reveal']},
           img({
-            html,
             class: 'info-card-art',
             src: '',
             link: true,
@@ -495,7 +494,6 @@ export function generateDocumentHTML(pageInfo, {
           })),
         html.tag('div', {class: ['info-card-art-container', 'reveal']},
           img({
-            html,
             class: 'info-card-art',
             src: '',
             link: true,
@@ -527,10 +525,33 @@ export function generateDocumentHTML(pageInfo, {
         html.tag('img', {id: 'image-overlay-image-thumb'}),
       ]),
       html.tag('div', {id: 'image-overlay-action-container'}, [
-        language.$('releaseInfo.viewOriginalFile', {
-          link: html.tag('a', {id: 'image-overlay-view-original'},
-            language.$('releaseInfo.viewOriginalFile.link')),
-        }),
+        html.tag('div', {id: 'image-overlay-action-content-without-size'},
+          language.$('releaseInfo.viewOriginalFile', {
+            link: html.tag('a', {class: 'image-overlay-view-original'},
+              language.$('releaseInfo.viewOriginalFile.link')),
+          })),
+
+        html.tag('div', {id: 'image-overlay-action-content-with-size'}, [
+          language.$('releaseInfo.viewOriginalFile.withSize', {
+            link: html.tag('a', {class: 'image-overlay-view-original'},
+              language.$('releaseInfo.viewOriginalFile.link')),
+            size: html.tag('span',
+              {[html.joinChildren]: ''},
+              [
+                html.tag('span', {id: 'image-overlay-file-size-kilobytes'},
+                  language.$('count.fileSize.kilobytes', {
+                    kilobytes: html.tag('span', {class: 'image-overlay-file-size-count'}),
+                  })),
+                html.tag('span', {id: 'image-overlay-file-size-megabytes'},
+                  language.$('count.fileSize.megabytes', {
+                    megabytes: html.tag('span', {class: 'image-overlay-file-size-count'}),
+                  })),
+              ]),
+          }),
+
+          html.tag('span', {id: 'image-overlay-file-size-warning'},
+            language.$('releaseInfo.viewOriginalFile.sizeWarning')),
+        ]),
       ]),
     ]));
 

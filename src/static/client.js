@@ -670,14 +670,19 @@ function handleImageLinkClicked(evt) {
   container.classList.remove('loaded');
   container.classList.remove('errored');
 
-  const viewOriginal = document.getElementById('image-overlay-view-original');
+  const allViewOriginal = document.getElementsByClassName('image-overlay-view-original');
   const mainImage = document.getElementById('image-overlay-image');
   const thumbImage = document.getElementById('image-overlay-image-thumb');
 
   const source = evt.target.closest('a').href;
   mainImage.src = source.replace(/\.(jpg|png)$/, '.huge.jpg');
   thumbImage.src = source.replace(/\.(jpg|png)$/, '.small.jpg');
-  viewOriginal.href = source;
+  for (const viewOriginal of allViewOriginal) {
+    viewOriginal.href = source;
+  }
+
+  const fileSize = evt.target.closest('a').querySelector('img').dataset.originalSize;
+  updateFileSizeInformation(fileSize);
 
   mainImage.addEventListener('load', handleMainImageLoaded);
   mainImage.addEventListener('error', handleMainImageErrored);
@@ -693,6 +698,50 @@ function handleImageLinkClicked(evt) {
     mainImage.removeEventListener('error', handleMainImageErrored);
     container.classList.add('errored');
   }
+}
+
+function updateFileSizeInformation(fileSize) {
+  const fileSizeWarningThreshold = 8 * 10 ** 6;
+
+  const actionContentWithoutSize = document.getElementById('image-overlay-action-content-without-size');
+  const actionContentWithSize = document.getElementById('image-overlay-action-content-with-size');
+
+  if (!fileSize) {
+    actionContentWithSize.classList.remove('visible');
+    actionContentWithoutSize.classList.add('visible');
+    return;
+  }
+
+  actionContentWithoutSize.classList.remove('visible');
+  actionContentWithSize.classList.add('visible');
+
+  const megabytesContainer = document.getElementById('image-overlay-file-size-megabytes');
+  const kilobytesContainer = document.getElementById('image-overlay-file-size-kilobytes');
+  const megabytesContent = megabytesContainer.querySelector('.image-overlay-file-size-count');
+  const kilobytesContent = kilobytesContainer.querySelector('.image-overlay-file-size-count');
+  const fileSizeWarning = document.getElementById('image-overlay-file-size-warning');
+
+  fileSize = parseInt(fileSize);
+  const round = (exp) => Math.round(fileSize / 10 ** (exp - 1)) / 10;
+  console.log(round(3));
+
+  if (fileSize > fileSizeWarningThreshold) {
+    fileSizeWarning.classList.add('visible');
+  } else {
+    fileSizeWarning.classList.remove('visible');
+  }
+
+  if (fileSize > 10 ** 6) {
+    megabytesContainer.classList.add('visible');
+    kilobytesContainer.classList.remove('visible');
+    megabytesContent.innerText = round(6);
+  } else {
+    megabytesContainer.classList.remove('visible');
+    kilobytesContainer.classList.add('visible');
+    kilobytesContent.innerText = round(3);
+  }
+
+  void fileSizeWarning;
 }
 
 addImageOverlayClickHandlers();

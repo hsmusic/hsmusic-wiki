@@ -1,5 +1,6 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
+import {readdir} from 'fs/promises';
 import {fileURLToPath} from 'url';
 import * as path from 'path';
 
@@ -53,4 +54,25 @@ export function isMain(importMetaURL) {
     '',
     isIndexJS && 'index.js'
   ].includes(relative);
+}
+
+// Like readdir... but it's recursive!
+export function traverse(startDirPath, {
+  filterFile = () => true,
+  filterDir = () => true
+} = {}) {
+  const recursive = (names, subDirPath) =>
+    Promise.all(
+      names.map((name) =>
+        readdir(path.join(startDirPath, subDirPath, name)).then(
+          (names) =>
+            filterDir(name)
+              ? recursive(names, path.join(subDirPath, name))
+              : [],
+          () => (filterFile(name) ? [path.join(subDirPath, name)] : [])
+        )
+      )
+    ).then((pathArrays) => pathArrays.flatMap((x) => x));
+
+  return readdir(startDirPath).then((names) => recursive(names, ''));
 }

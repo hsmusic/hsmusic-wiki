@@ -95,6 +95,7 @@ export async function go({
   cachebust,
   developersComment,
   getSizeOfAdditionalFile,
+  getSizeOfImageFile,
 }) {
   const outputPath = cliOptions['out-path'] || process.env.HSMUSIC_OUT;
   const appendIndexHTML = cliOptions['append-index-html'] ?? false;
@@ -304,6 +305,7 @@ export async function go({
           absoluteTo,
           defaultLanguage,
           getSizeOfAdditionalFile,
+          getSizeOfImageFile,
           language,
           languages,
           to,

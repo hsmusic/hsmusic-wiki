@@ -63,9 +63,11 @@ export function tag(tagName, ...args) {
 
     const joiner = attrs?.[joinChildren];
     content = content.filter(Boolean).join(
-      (joiner
-        ? `\n${joiner}\n`
-        : '\n'));
+      (joiner === ''
+        ? ''
+        : (joiner
+            ? `\n${joiner}\n`
+            : '\n')));
   }
 
   if (attrs?.[onlyIfContent] && !content) {

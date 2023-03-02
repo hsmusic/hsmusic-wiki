@@ -637,7 +637,9 @@ function unbound_getFlashGridHTML({
 // Images
 
 function unbound_img({
+  getSizeOfImageFile,
   html,
+  to,
 
   src,
   alt,
@@ -652,6 +654,12 @@ function unbound_img({
   lazy = false,
   square = false,
 }) {
+  let fileSize = null;
+  const mediaRoot = to('media.root');
+  if (src.startsWith(mediaRoot)) {
+    fileSize = getSizeOfImageFile(src.slice(mediaRoot.length).replace(/^\//, ''));
+  }
+
   const willSquare = square;
   const willLink = typeof link === 'string' || link;
 
@@ -664,6 +672,7 @@ function unbound_img({
     alt,
     width,
     height,
+    'data-original-size': fileSize,
   };
 
   const noSrcHTML =
