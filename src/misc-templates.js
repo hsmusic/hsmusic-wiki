@@ -654,17 +654,26 @@ function unbound_img({
   lazy = false,
   square = false,
 }) {
-  let fileSize = null;
-  const mediaRoot = to('media.root');
-  if (src.startsWith(mediaRoot)) {
-    fileSize = getSizeOfImageFile(src.slice(mediaRoot.length).replace(/^\//, ''));
-  }
-
   const willSquare = square;
   const willLink = typeof link === 'string' || link;
 
   const originalSrc = src;
   const thumbSrc = src && (thumbKey ? thumb[thumbKey](src) : src);
+
+  const href =
+    (willLink
+      ? (typeof link === 'string'
+          ? link
+          : originalSrc)
+      : null);
+
+  let fileSize = null;
+  const mediaRoot = to('media.root');
+  if (href?.startsWith(mediaRoot)) {
+    console.log(href.slice(mediaRoot.length).replace(/^\//, ''));
+    console.log(getSizeOfImageFile(href.slice(mediaRoot.length).replace(/^\//, '')));
+    fileSize = getSizeOfImageFile(href.slice(mediaRoot.length).replace(/^\//, ''));
+  }
 
   const imgAttributes = {
     id: link ? '' : id,
@@ -734,7 +743,7 @@ function unbound_img({
         {
           id,
           class: ['box', hide && 'js-hide', 'image-link'],
-          href: typeof link === 'string' ? link : originalSrc,
+          href,
         },
         wrapped);
     }
