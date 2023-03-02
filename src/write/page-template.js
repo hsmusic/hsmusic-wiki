@@ -242,6 +242,7 @@ export function generateDocumentHTML(pageInfo, {
       : multiple
       ? html.tag('div',
           {
+            [html.onlyIfContent]: true,
             id,
             class: [
               'sidebar-column',
@@ -252,6 +253,7 @@ export function generateDocumentHTML(pageInfo, {
             ],
           },
           multiple
+            .filter(Boolean)
             .map((infoOrContent) =>
               (typeof infoOrContent === 'object' && !Array.isArray(infoOrContent))
                 ? infoOrContent

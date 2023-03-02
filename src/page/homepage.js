@@ -141,63 +141,50 @@ export function writeTargetless({wikiData}) {
         ],
       },
 
-      sidebarLeft: homepageLayout.sidebarContent && {
-        wide: true,
+      sidebarLeft: {
         collapse: false,
+        wide: true,
         stickyMode: 'none',
-        // This is a pretty filthy hack! 8ut otherwise, the [[news]] part
-        // gets treated like it's a reference to the track named "news",
-        // which o8viously isn't what we're going for. Gotta catch that
-        // 8efore we pass it to transformMultiline, 'cuz otherwise it'll
-        // get repl8ced with just the word "news" (or anything else that
-        // transformMultiline does with references it can't match) -- and
-        // we can't match that for replacing it with the news column!
-        //
-        // And no, I will not make [[news]] into part of transformMultiline
-        // (even though that would 8e hilarious).
-        content:
-          transformMultiline(
-            homepageLayout.sidebarContent
-              .replace('[[news]]', '__GENERATE_NEWS__'),
-            {
+
+        multiple: [
+          homepageLayout.sidebarContent &&
+            transformMultiline(homepageLayout.sidebarContent, {
               thumb: 'medium',
-            })
-            .replace('<p>__GENERATE_NEWS__</p>',
-              wikiInfo.enableNews
-                ? [
-                    html.tag('h1',
-                      language.$('homepage.news.title')),
+            }),
 
-                    ...newsData
-                      .slice(0, 3)
-                      .map((entry, i) =>
-                        html.tag('article',
-                          {
-                            class: [
-                              'news-entry',
-                              i === 0 && 'first-news-entry',
-                            ],
-                          },
-                          [
-                            html.tag('h2', [
-                              html.tag('time',
-                                language.formatDate(entry.date)),
-                              link.newsEntry(entry),
-                            ]),
+          wikiInfo.enableNews &&
+            [
+              html.tag('h1',
+                language.$('homepage.news.title')),
 
-                            transformMultiline(entry.contentShort, {
-                              thumb: 'medium',
-                            }),
+              ...newsData
+                .slice(0, 3)
+                .map((entry, i) =>
+                  html.tag('article',
+                    {
+                      class: [
+                        'news-entry',
+                        i === 0 && 'first-news-entry',
+                      ],
+                    },
+                    [
+                      html.tag('h2', [
+                        html.tag('time',
+                          language.formatDate(entry.date)),
+                        link.newsEntry(entry),
+                      ]),
 
-                            entry.contentShort !== entry.content &&
-                              link.newsEntry(entry, {
-                                text: language.$('homepage.news.entry.viewRest')
-                              }),
-                          ])),
-                  ].join('\n')
-                : html.tag('p',
-                    html.tag('i',
-                      `News requested in content description but this feature isn't enabled`))),
+                      transformMultiline(entry.contentShort, {
+                        thumb: 'medium',
+                      }),
+
+                      entry.contentShort !== entry.content &&
+                        link.newsEntry(entry, {
+                          text: language.$('homepage.news.entry.viewRest')
+                        }),
+                    ])),
+            ],
+        ],
       },
 
       nav: {

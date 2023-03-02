@@ -135,6 +135,13 @@ body::before {
   align-self: flex-start;
 }
 
+.sidebar-column.wide {
+  max-width: 350px;
+  flex-basis: 300px;
+  flex-shrink: 0;
+  flex-grow: 1;
+}
+
 .sidebar-multiple {
   display: flex;
   flex-direction: column;
@@ -155,13 +162,6 @@ body::before {
 
 #sidebar-right {
   margin-left: 10px;
-}
-
-.sidebar.wide {
-  max-width: 350px;
-  flex-basis: 300px;
-  flex-shrink: 0;
-  flex-grow: 1;
 }
 
 #content {
