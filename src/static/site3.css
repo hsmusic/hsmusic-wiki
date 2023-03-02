@@ -24,6 +24,14 @@ body::before {
   width: 100%;
   height: 100%;
   z-index: -1;
+
+  /* NB: these are 100 LVW, "largest view width", etc.
+   * Stabilizes background on viewports with modal dimensions,
+   * e.g. expanding/shrinking tab bar or collapsible find bar.
+   * 100% dimensions are kept above for browser compatibility.
+   */
+  width: 100lvw;
+  height: 100lvh;
 }
 
 #page-container {
@@ -1562,6 +1570,12 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     margin: 25px 0 5px 0;
     width: 100%;
     max-width: unset;
+  }
+
+  /* Show sticky heading above cover art */
+
+  .content-sticky-heading-container {
+    z-index: 2;
   }
 
   /* Disable grid features, just line header children up vertically */
