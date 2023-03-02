@@ -781,6 +781,10 @@ img {
   display: none;
 }
 
+.sidebar .image-container {
+  max-width: 350px;
+}
+
 /* Grid listings */
 
 .grid-listing {
@@ -1548,6 +1552,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     flex-basis: unset !important;
     margin-right: 0 !important;
     margin-left: 0 !important;
+    width: 100%;
   }
 
   .sidebar .news-entry:not(.first-news-entry) {
