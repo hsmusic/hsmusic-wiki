@@ -727,7 +727,8 @@ function unbound_img({
     if (reveal) {
       wrapped = html.tag('div', {class: 'reveal'}, [
         wrapped,
-        html.tag('span', {class: 'reveal-text'}, reveal),
+        html.tag('span', {class: 'reveal-text-container'},
+          html.tag('span', {class: 'reveal-text'}, reveal)),
       ]);
     }
 
@@ -952,7 +953,6 @@ function unbound_generateContentHeading({
 }
 
 function unbound_generateStickyHeadingContainer({
-  getRevealStringFromArtTags,
   html,
   img,
 
@@ -971,16 +971,27 @@ function unbound_generateStickyHeadingContainer({
       html.tag('div', {class: 'content-sticky-heading-row'}, [
         html.tag('h1', title),
 
+        // Cover art in the sticky heading never uses the 'reveal' setting
+        // because it's too small to effectively display content warnings.
+        // Instead, if art has content warnings, it's hidden from the sticky
+        // heading by default, and will be enabled once the main cover art
+        // is revealed.
         coverSrc &&
           html.tag('div', {class: 'content-sticky-heading-cover-container'},
-            html.tag('div', {class: 'content-sticky-heading-cover'},
+            html.tag('div',
+              {
+                class: [
+                  'content-sticky-heading-cover',
+                  coverArtTags .some(tag => !tag.isContentWarning) &&
+                    'content-sticky-heading-cover-needs-reveal',
+                ],
+              },
               img({
                 src: coverSrc,
                 alt: coverAlt,
                 thumb: 'small',
                 link: false,
                 square: true,
-                reveal: getRevealStringFromArtTags(coverArtTags),
               }))),
       ]),
 

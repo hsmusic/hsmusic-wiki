@@ -204,7 +204,6 @@ export function bindUtilities({
 
   bound.generateStickyHeadingContainer = bindOpts(generateStickyHeadingContainer, {
     [bindOpts.bindIndex]: 0,
-    getRevealStringFromArtTags: bound.getRevealStringFromArtTags,
     html,
     img: bound.img,
   });

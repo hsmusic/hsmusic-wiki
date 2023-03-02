@@ -758,12 +758,19 @@ img {
   opacity: 0.4;
 }
 
-.reveal-text {
-  color: white;
+.reveal-text-container {
   position: absolute;
   top: 15px;
   left: 10px;
   right: 10px;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.reveal-text {
+  color: white;
   text-align: center;
   font-weight: bold;
 }
@@ -1259,6 +1266,10 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   position: relative;
   height: 0;
   margin: -15px 0px -5px -5px;
+}
+
+.content-sticky-heading-cover-needs-reveal {
+  display: none;
 }
 
 .content-sticky-heading-cover {
