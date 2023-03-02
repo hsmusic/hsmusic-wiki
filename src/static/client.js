@@ -674,8 +674,10 @@ function handleImageLinkClicked(evt) {
   const mainImage = document.getElementById('image-overlay-image');
   const thumbImage = document.getElementById('image-overlay-image-thumb');
 
+  const mainThumbSize = getPreferredThumbSize();
+
   const source = evt.target.closest('a').href;
-  mainImage.src = source.replace(/\.(jpg|png)$/, '.huge.jpg');
+  mainImage.src = source.replace(/\.(jpg|png)$/, `.${mainThumbSize}.jpg`);
   thumbImage.src = source.replace(/\.(jpg|png)$/, '.small.jpg');
   for (const viewOriginal of allViewOriginal) {
     viewOriginal.href = source;
@@ -697,6 +699,30 @@ function handleImageLinkClicked(evt) {
     mainImage.removeEventListener('load', handleMainImageLoaded);
     mainImage.removeEventListener('error', handleMainImageErrored);
     container.classList.add('errored');
+  }
+}
+
+function getPreferredThumbSize() {
+  // Assuming a square, the image will be constrained to the lesser window
+  // dimension. Coefficient here matches CSS dimensions for image overlay.
+  const constrainedLength = Math.floor(Math.min(
+    0.80 * window.innerWidth,
+    0.80 * window.innerHeight));
+
+  // Match device pixel ratio, which is 2x for "retina" displays and certain
+  // device configurations.
+  const visualLength = window.devicePixelRatio * constrainedLength;
+
+  const largeLength = 800;
+  const semihugeLength = 1200;
+  const goodEnoughThreshold = 0.90;
+
+  if (Math.floor(visualLength * goodEnoughThreshold) <= largeLength) {
+    return 'large';
+  } else if (Math.floor(visualLength * goodEnoughThreshold) <= semihugeLength) {
+    return 'semihuge';
+  } else {
+    return 'huge';
   }
 }
 
@@ -723,7 +749,6 @@ function updateFileSizeInformation(fileSize) {
 
   fileSize = parseInt(fileSize);
   const round = (exp) => Math.round(fileSize / 10 ** (exp - 1)) / 10;
-  console.log(round(3));
 
   if (fileSize > fileSizeWarningThreshold) {
     fileSizeWarning.classList.add('visible');

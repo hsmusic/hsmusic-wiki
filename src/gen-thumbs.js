@@ -78,7 +78,9 @@ const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
 const thumbnailSpec = {
-  'huge': {size: 1600, quality: 95},
+  'huge': {size: 1600, quality: 90},
+  'semihuge': {size: 1200, quality: 92},
+  'large': {size: 800, quality: 93},
   'medium': {size: 400, quality: 95},
   'small': {size: 250, quality: 85},
 };
