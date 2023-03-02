@@ -226,7 +226,11 @@ export async function go({
       }[extname];
 
       try {
-        response.writeHead(200, contentType ? {'Content-Type': contentType} : {});
+        const {size} = await stat(filePath);
+        response.writeHead(200, contentType ? {
+          'Content-Type': contentType,
+          'Content-Length': size,
+        } : {});
         await pipeline(
           createReadStream(filePath),
           response);

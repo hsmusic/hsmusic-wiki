@@ -1400,6 +1400,34 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   transition: opacity 0.25s;
 }
 
+#image-overlay-image-container::after {
+  content: "";
+  display: block;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  width: var(--download-progress);
+  background: var(--primary-color);
+  box-shadow: 0 -3px 12px 4px var(--primary-color);
+  transition: 0.25s;
+}
+
+#image-overlay-container.loaded #image-overlay-image-container::after {
+  width: 100%;
+  background: white;
+  opacity: 0;
+}
+
+#image-overlay-container.errored #image-overlay-image-container::after {
+  width: 100%;
+  background: red;
+}
+
+#image-overlay-container:not(.visible) #image-overlay-image-container::after {
+  width: 0 !important;
+}
+
 #image-overlay-action-container {
   padding: 4px 4px 6px 4px;
   border-radius: 0 0 5px 5px;
