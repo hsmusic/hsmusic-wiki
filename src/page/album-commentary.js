@@ -57,7 +57,7 @@ export function write(album) {
 
           ...album.tracks.filter(t => t.commentary).flatMap(track => [
             html.tag('h3',
-              {id: 'track.directory', class: ['content-heading']},
+              {id: track.directory, class: ['content-heading']},
               language.$('albumCommentaryPage.entry.title.trackCommentary', {
                 track: link.track(track),
               })),

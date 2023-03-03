@@ -528,7 +528,7 @@ const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-
     const stickySubheadingRow = stickyContainer.querySelector('.content-sticky-subheading-row');
     const stickySubheading = stickySubheadingRow.querySelector('h2');
     const stickyCoverContainer = stickyContainer.querySelector('.content-sticky-heading-cover-container');
-    const stickyCover = stickyCoverContainer.querySelector('.content-sticky-heading-cover');
+    const stickyCover = stickyCoverContainer?.querySelector('.content-sticky-heading-cover');
     const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
     const contentCover = contentContainer.querySelector('#cover-art-container');
 
@@ -557,7 +557,7 @@ function prepareStickyHeadings() {
     contentCover,
     stickyCover,
   } of stickyHeadingInfo) {
-    const coverRevealImage = contentCover.querySelector('.reveal');
+    const coverRevealImage = contentCover?.querySelector('.reveal');
     if (coverRevealImage) {
       coverRevealImage.addEventListener('hsmusic-reveal', () => {
         stickyCover.classList.remove('content-sticky-heading-cover-needs-reveal');

@@ -364,14 +364,14 @@ body::before {
   padding-left: 5px;
 }
 
-.sidebar > details summary .group-name {
-  color: var(--primary-color);
-}
-
-.sidebar > details summary > span:hover {
+summary > span:hover {
   cursor: pointer;
   text-decoration: underline;
   text-decoration-color: var(--primary-color);
+}
+
+summary .group-name {
+  color: var(--primary-color);
 }
 
 .sidebar > details ul,
@@ -668,6 +668,11 @@ dl ul,
 dl ol {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+ul > li.has-details {
+  list-style-type: none;
+  margin-left: -17px;
 }
 
 .album-group-list dt {

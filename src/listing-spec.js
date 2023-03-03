@@ -944,10 +944,63 @@ const listingSpec = [
   },
 
   {
-    // Holy beans the spaghetti LOL
+    directory: 'all-sheet-music',
+    stringsKey: 'other.allSheetMusic',
+    groupUnderOther: true,
 
+    data: ({wikiData: {albumData}}) =>
+      albumData
+        .map(album => ({
+          album,
+          tracks: album.tracks.filter(t => !empty(t.sheetMusicFiles)),
+        }))
+        .filter(({tracks}) => !empty(tracks)),
+
+    html: (data, {
+      html,
+      language,
+      link,
+    }) =>
+      data.flatMap(({album, tracks}) => [
+        html.tag('h3', link.album(album)),
+
+        html.tag('dl', tracks.flatMap(track => [
+          // No hash here since the full list of sheet music is already visible below.
+          // The track link serves more as a quick way to recall which track it is or
+          // visit listening links, all of which is positioned at the top of the page.
+          html.tag('dt', link.track(track)),
+          html.tag('dd',
+            // This page doesn't really look better with color-coded sheet music links.
+            // Track links are still colored.
+            /* {style: getLinkThemeString(track.color)}, */
+            html.tag('ul', track.sheetMusicFiles.map(({title, files}) =>
+              html.tag('li',
+                {class: [files.length > 1 && 'has-details']},
+                (files.length === 1
+                  ? link.albumAdditionalFile(
+                      {album, file: files[0]},
+                      {
+                        text: language.$('listingPage.other.allSheetMusic.sheetMusicLink', {title}),
+                      })
+                  : html.tag('details', [
+                      html.tag('summary',
+                        html.tag('span',
+                          language.$('listingPage.other.allSheetMusic.sheetMusicLink.withMultipleFiles', {
+                            title: html.tag('span', {class: 'group-name'}, title),
+                            files: language.countAdditionalFiles(files.length, {unit: true}),
+                          }))),
+                      html.tag('ul', files.map(file =>
+                        html.tag('li',
+                          link.albumAdditionalFile({album, file})))),
+                    ])))))),
+        ])),
+      ]),
+  },
+
+  {
     directory: 'random',
     stringsKey: 'other.randomPages',
+    groupUnderOther: true,
 
     data: ({wikiData: {albumData}}) => [
       {
@@ -1040,7 +1093,7 @@ const listingSpec = [
 ];
 
 const filterListings = (directoryPrefix) =>
-  listingSpec.filter((l) => l.directory.startsWith(directoryPrefix));
+  listingSpec.filter(l => l.directory.startsWith(directoryPrefix));
 
 const listingTargetSpec = [
   {
@@ -1065,7 +1118,7 @@ const listingTargetSpec = [
   },
   {
     title: ({language}) => language.$('listingPage.target.other'),
-    listings: [listingSpec.find((l) => l.directory === 'random')],
+    listings: listingSpec.filter(l => l.groupUnderOther),
   },
 ];
 

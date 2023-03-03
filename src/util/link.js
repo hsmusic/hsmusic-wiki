@@ -142,15 +142,15 @@ const link = {
         'media.albumAdditionalFile',
         fakeFileObject.album.directory,
         fakeFileObject.name),
-    {color: false}
-  ),
-  albumAdditionalFile: ({file, album}, {to}) =>
+    {color: false}),
+
+  albumAdditionalFile: ({file, album}, {to, ...opts}) =>
     link._albumAdditionalFileHelper(
       {
         name: file,
         album,
       },
-      {to}),
+      {to, ...opts}),
 
   media: linkPathname('media.path', {color: false}),
   root: linkPathname('shared.path', {color: false}),
