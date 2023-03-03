@@ -27,7 +27,21 @@ export function write(listing, {wikiData}) {
     return null;
   }
 
+  const {listingSpec, listingTargetSpec} = wikiData;
+
+  const getTitleKey = l => `listingPage.${l.stringsKey}.title`;
+
   const data = listing.data ? listing.data({wikiData}) : null;
+
+  // TODO: Invalid listing directories filtered here aren't warned about anywhere.
+  const seeAlso =
+    listing.seeAlso
+     ?.map(directory => listingSpec.find(l => l.directory === directory))
+      .filter(Boolean)
+    ?? null;
+
+  const currentTarget = listingTargetSpec.find(({listings}) => listings.includes(listing));
+  const currentListing = listing;
 
   const page = {
     type: 'page',
@@ -40,15 +54,39 @@ export function write(listing, {wikiData}) {
         link,
       } = opts;
 
-      const titleKey = `listingPage.${listing.stringsKey}.title`;
-
       return {
-        title: language.$(titleKey),
+        title: language.$(getTitleKey(listing)),
 
         main: {
           headingMode: 'sticky',
 
           content: [
+            currentTarget.listings.length > 1 &&
+              html.tag('p',
+                language.$('listingPage.listingsFor', {
+                  target: currentTarget.title({language}),
+                  listings:
+                    language.formatUnitList(
+                      currentTarget.listings.map(listing =>
+                        html.tag('span',
+                          {class: listing === currentListing ? 'current' : ''},
+                          link.listing(listing, {
+                            class: 'nowrap',
+                            text: language.$(getTitleKey(listing) + '.short'),
+                          })))),
+                })),
+
+            !empty(seeAlso) &&
+              html.tag('p',
+                language.$('listingPage.seeAlso', {
+                  listings:
+                    language.formatUnitList(
+                      seeAlso.map(listing =>
+                        link.listing(listing, {
+                          text: language.$(getTitleKey(listing)),
+                        }))),
+                })),
+
             ...html.fragment(
               listing.html &&
                 (listing.data

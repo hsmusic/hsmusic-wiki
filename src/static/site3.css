@@ -507,6 +507,10 @@ a:hover {
   font-size: 1em;
 }
 
+p .current {
+  font-weight: 800;
+}
+
 #cover-art-container {
   font-size: 0.8em;
 }

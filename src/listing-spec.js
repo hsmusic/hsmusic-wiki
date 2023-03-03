@@ -19,6 +19,10 @@ const listingSpec = [
     directory: 'albums/by-name',
     stringsKey: 'listAlbums.byName',
 
+    seeAlso: [
+      'tracks/by-album',
+    ],
+
     data: ({wikiData: {albumData}}) =>
       sortAlphabetically(albumData.slice()),
 
@@ -67,6 +71,10 @@ const listingSpec = [
   {
     directory: 'albums/by-date',
     stringsKey: 'listAlbums.byDate',
+
+    seeAlso: [
+      'tracks/by-date',
+    ],
 
     data: ({wikiData: {albumData}}) =>
       sortChronologically(
@@ -829,6 +837,10 @@ const listingSpec = [
     directory: 'tracks/with-sheet-music-files',
     stringsKey: 'listTracks.withSheetMusicFiles',
 
+    seeAlso: [
+      'all-sheet-music',
+    ],
+
     data: ({wikiData: {albumData}}) =>
       albumData
         .map(album => ({
@@ -947,6 +959,10 @@ const listingSpec = [
     directory: 'all-sheet-music',
     stringsKey: 'other.allSheetMusic',
     groupUnderOther: true,
+
+    seeAlso: [
+      'tracks/with-sheet-music-files',
+    ],
 
     data: ({wikiData: {albumData}}) =>
       albumData
