@@ -256,6 +256,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     name: 'Track',
     directory: 'Directory',
     duration: 'Duration',
+    color: 'Color',
     urls: 'URLs',
 
     dateFirstReleased: 'Date First Released',

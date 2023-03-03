@@ -16,6 +16,7 @@ export class Track extends Thing {
 
     validators: {
       isBoolean,
+      isColor,
       isDate,
       isDuration,
       isFileExtension,
@@ -145,15 +146,18 @@ export class Track extends Thing {
     },
 
     color: {
-      flags: {expose: true},
+      flags: {update: true, expose: true},
+
+      update: {validate: isColor},
 
       expose: {
         dependencies: ['albumData'],
 
-        compute: ({albumData, [Track.instance]: track}) =>
-          Track.findAlbum(track, albumData)
-            ?.trackSections.find(({tracks}) => tracks.includes(track))
-              ?.color ?? null,
+        transform: (color, {albumData, [Track.instance]: track}) =>
+          color ??
+            Track.findAlbum(track, albumData)
+              ?.trackSections.find(({tracks}) => tracks.includes(track))
+                ?.color ?? null,
       },
     },
 
