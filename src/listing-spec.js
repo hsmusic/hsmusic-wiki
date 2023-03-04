@@ -802,109 +802,67 @@ listingSpec.push({
       ])),
 });
 
-listingSpec.push({
+function listTracksWithProperty(property, {
+  directory,
+  stringsKey,
+  hash = '',
+}) {
+  return {
+    directory,
+    stringsKey,
+
+    data: ({wikiData: {albumData}}) =>
+      albumData
+        .map(album => ({
+          album,
+          tracks: album.tracks.filter(track => {
+            const value = track[property];
+            if (!value) return false;
+            if (Array.isArray(value)) {
+              return !empty(value);
+            }
+            return true;
+          }),
+        }))
+        .filter(({tracks}) => !empty(tracks)),
+
+    html: (data, {html, language, link}) =>
+      html.tag('dl',
+        data.flatMap(({album, tracks}) => [
+          html.tag('dt',
+            {class: ['content-heading']},
+            language.$(`listingPage.${stringsKey}.album`, {
+              album: link.album(album),
+              date: language.formatDate(album.date),
+            })),
+
+          html.tag('dd',
+            html.tag('ul',
+              tracks.map(track =>
+                html.tag('li',
+                  language.$(`listingPage.${stringsKey}.track`, {
+                    track: link.track(track, {hash}),
+                  }))))),
+        ])),
+  };
+}
+
+listingSpec.push(listTracksWithProperty('lyrics', {
   directory: 'tracks/with-lyrics',
   stringsKey: 'listTracks.withLyrics',
+}));
 
-  data: ({wikiData: {albumData}}) =>
-    albumData
-      .map(album => ({
-        album,
-        tracks: album.tracks.filter(t => t.lyrics),
-      }))
-      .filter(({tracks}) => !empty(tracks)),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, tracks}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listTracks.withLyrics.album', {
-            album: link.album(album),
-            date: language.formatDate(album.date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.withLyrics.track', {
-                  track: link.track(track),
-                }))))),
-      ])),
-});
-
-listingSpec.push({
+listingSpec.push(listTracksWithProperty('sheetMusicFiles', {
   directory: 'tracks/with-sheet-music-files',
   stringsKey: 'listTracks.withSheetMusicFiles',
+  hash: 'sheet-music-files',
+}));
 
-  seeAlso: [
-    'all-sheet-music',
-  ],
-
-  data: ({wikiData: {albumData}}) =>
-    albumData
-      .map(album => ({
-        album,
-        tracks: album.tracks.filter(t => !empty(t.sheetMusicFiles)),
-      }))
-      .filter(({tracks}) => !empty(tracks)),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, tracks}) => [
-        html.tag('dt',
-          {class: 'content-heading'},
-          language.$('listingPage.listTracks.withSheetMusicFiles.album', {
-            album: link.album(album),
-            date: language.formatDate(album.date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.withSheetMusicFiles.track', {
-                  track: link.track(track, {
-                    hash: 'sheet-music-files',
-                  }),
-                }))))),
-      ])),
-});
-
-listingSpec.push({
+listingSpec.push(listTracksWithProperty('midiProjectFiles', {
   directory: 'tracks/with-midi-project-files',
   stringsKey: 'listTracks.withMidiProjectFiles',
-
-  data: ({wikiData: {albumData}}) =>
-    albumData
-      .map(album => ({
-        album,
-        tracks: album.tracks.filter(t => !empty(t.midiProjectFiles)),
-      }))
-      .filter(({tracks}) => !empty(tracks)),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, tracks}) => [
-        html.tag('dt',
-          {class: 'content-heading'},
-          language.$('listingPage.listTracks.withMidiProjectFiles.album', {
-            album: link.album(album),
-            date: language.formatDate(album.date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.withMidiProjectFiles.track', {
-                  track: link.track(track, {
-                    hash: 'midi-project-files',
-                  }),
-                }))))),
-      ])),
-});
+  hash: 'midi-project-files',
+}));
 
 listingSpec.push({
   directory: 'tags/by-name',
