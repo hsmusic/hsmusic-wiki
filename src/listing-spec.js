@@ -805,11 +805,13 @@ listingSpec.push({
 function listTracksWithProperty(property, {
   directory,
   stringsKey,
+  seeAlso,
   hash = '',
 }) {
   return {
     directory,
     stringsKey,
+    seeAlso,
 
     data: ({wikiData: {albumData}}) =>
       albumData
@@ -856,12 +858,14 @@ listingSpec.push(listTracksWithProperty('sheetMusicFiles', {
   directory: 'tracks/with-sheet-music-files',
   stringsKey: 'listTracks.withSheetMusicFiles',
   hash: 'sheet-music-files',
+  seeAlso: ['all-sheet-music-files'],
 }));
 
 listingSpec.push(listTracksWithProperty('midiProjectFiles', {
   directory: 'tracks/with-midi-project-files',
   stringsKey: 'listTracks.withMidiProjectFiles',
   hash: 'midi-project-files',
+  seeAlso: ['all-midi-project-files'],
 }));
 
 listingSpec.push({
@@ -914,63 +918,77 @@ listingSpec.push({
     }),
 });
 
-listingSpec.push({
-  directory: 'all-sheet-music',
+function listAdditionalFilesInProperty(property, {
+  directory,
+  stringsKey,
+  seeAlso,
+}) {
+  return {
+    directory,
+    stringsKey,
+    seeAlso,
+    groupUnderOther: true,
+
+    data: ({wikiData: {albumData}}) =>
+      albumData
+        .map(album => ({
+          album,
+          tracks: album.tracks.filter(t => !empty(t[property])),
+        }))
+        .filter(({tracks}) => !empty(tracks)),
+
+    html: (data, {
+      html,
+      language,
+      link,
+    }) =>
+      data.flatMap(({album, tracks}) => [
+        html.tag('h3', link.album(album)),
+
+        html.tag('dl', tracks.flatMap(track => [
+          // No hash here since the full list of additional files is already visible
+          // below. The track link serves more as a way to quickly recall the track or
+          // to access listen links, all of which is positioned at the top of the page.
+          html.tag('dt', link.track(track)),
+          html.tag('dd',
+            // This page doesn't really look better with color-coded file links.
+            // Track links are still colored.
+            html.tag('ul', track[property].map(({title, files}) =>
+              html.tag('li',
+                {class: [files.length > 1 && 'has-details']},
+                (files.length === 1
+                  ? link.albumAdditionalFile(
+                      {album, file: files[0]},
+                      {
+                        text: language.$(`listingPage.${stringsKey}.file`, {title}),
+                      })
+                  : html.tag('details', [
+                      html.tag('summary',
+                        html.tag('span',
+                          language.$(`listingPage.${stringsKey}.file.withMultipleFiles`, {
+                            title: html.tag('span', {class: 'group-name'}, title),
+                            files: language.countAdditionalFiles(files.length, {unit: true}),
+                          }))),
+                      html.tag('ul', files.map(file =>
+                        html.tag('li',
+                          link.albumAdditionalFile({album, file})))),
+                    ])))))),
+        ])),
+      ]),
+  };
+}
+
+listingSpec.push(listAdditionalFilesInProperty('sheetMusicFiles', {
+  directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
-  groupUnderOther: true,
+  seeAlso: ['tracks/with-sheet-music-files'],
+}));
 
-  seeAlso: [
-    'tracks/with-sheet-music-files',
-  ],
-
-  data: ({wikiData: {albumData}}) =>
-    albumData
-      .map(album => ({
-        album,
-        tracks: album.tracks.filter(t => !empty(t.sheetMusicFiles)),
-      }))
-      .filter(({tracks}) => !empty(tracks)),
-
-  html: (data, {
-    html,
-    language,
-    link,
-  }) =>
-    data.flatMap(({album, tracks}) => [
-      html.tag('h3', link.album(album)),
-
-      html.tag('dl', tracks.flatMap(track => [
-        // No hash here since the full list of sheet music is already visible below.
-        // The track link serves more as a quick way to recall which track it is or
-        // visit listening links, all of which is positioned at the top of the page.
-        html.tag('dt', link.track(track)),
-        html.tag('dd',
-          // This page doesn't really look better with color-coded sheet music links.
-          // Track links are still colored.
-          /* {style: getLinkThemeString(track.color)}, */
-          html.tag('ul', track.sheetMusicFiles.map(({title, files}) =>
-            html.tag('li',
-              {class: [files.length > 1 && 'has-details']},
-              (files.length === 1
-                ? link.albumAdditionalFile(
-                    {album, file: files[0]},
-                    {
-                      text: language.$('listingPage.other.allSheetMusic.sheetMusicLink', {title}),
-                    })
-                : html.tag('details', [
-                    html.tag('summary',
-                      html.tag('span',
-                        language.$('listingPage.other.allSheetMusic.sheetMusicLink.withMultipleFiles', {
-                          title: html.tag('span', {class: 'group-name'}, title),
-                          files: language.countAdditionalFiles(files.length, {unit: true}),
-                        }))),
-                    html.tag('ul', files.map(file =>
-                      html.tag('li',
-                        link.albumAdditionalFile({album, file})))),
-                  ])))))),
-      ])),
-    ]),
-});
+listingSpec.push(listAdditionalFilesInProperty('midiProjectFiles', {
+  directory: 'all-midi-project-files',
+  stringsKey: 'other.allMidiProjectFiles',
+  seeAlso: ['tracks/with-midi-project-files'],
+}));
 
 listingSpec.push({
   directory: 'random',
