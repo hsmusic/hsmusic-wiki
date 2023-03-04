@@ -41,6 +41,8 @@ import genThumbs, {
   defaultMagickThreads,
   isThumb,
 } from './gen-thumbs.js';
+
+import bootRepl from './repl.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
 
@@ -126,7 +128,6 @@ async function main() {
   if (empty(selectedBuildModeFlags)) {
     selectedBuildModeFlag = 'static-build';
     usingDefaultBuildMode = true;
-    logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
   } else if (selectedBuildModeFlags.length > 1) {
     logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
     logError`Please specify a maximum of one build mode.`;
@@ -134,7 +135,6 @@ async function main() {
   } else {
     selectedBuildModeFlag = selectedBuildModeFlags[0];
     usingDefaultBuildMode = false;
-    logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
   }
 
   const selectedBuildMode = buildModes[selectedBuildModeFlag];
@@ -182,6 +182,16 @@ async function main() {
     'lang-path': {
       help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata`,
       type: 'value',
+    },
+
+    'repl': {
+      help: `Boot into the HSMusic REPL for command-line interactive access to data objects`,
+      type: 'flag',
+    },
+
+    'no-repl-history': {
+      help: `Disable locally logging commands entered into the REPL in your home directory`,
+      type: 'flag',
     },
 
     // Thum8nail gener8tion is *usually* something you want, 8ut it can 8e
@@ -367,6 +377,9 @@ async function main() {
   const clearThumbsFlag = cliOptions['clear-thumbs'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
 
+  const replFlag = cliOptions['repl'] ?? false;
+  const disableReplHistory = cliOptions['no-repl-history'] ?? false;
+
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
   const precacheData = cliOptions['precache-data'] ?? false;
@@ -392,6 +405,16 @@ async function main() {
     if (errored) {
       return;
     }
+  }
+
+  if (replFlag) {
+    return bootRepl({
+      dataPath,
+      mediaPath,
+
+      disableHistory: disableReplHistory,
+      showTraces: showAggregateTraces,
+    });
   }
 
   const niceShowAggregate = (error, ...opts) => {
@@ -429,6 +452,12 @@ async function main() {
     logInfo`Done thumbnail generation! --------+`;
     if (!result) return;
     if (thumbsOnly) return;
+  }
+
+  if (usingDefaultBuildMode) {
+    logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
+  } else {
+    logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
   }
 
   if (showInvalidPropertyAccesses) {

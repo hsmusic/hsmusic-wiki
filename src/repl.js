@@ -22,6 +22,8 @@ import urlSpec from './url-spec.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function getContextAssignments({
+  dataPath,
+  mediaPath,
   wikiData,
 }) {
   let urls;
@@ -56,6 +58,9 @@ export async function getContextAssignments({
   }
 
   return {
+    dataPath,
+    mediaPath,
+
     wikiData,
     ...wikiData,
     WD: wikiData,
@@ -77,27 +82,19 @@ export async function getContextAssignments({
   };
 }
 
-async function main() {
-  const miscOptions = await parseOptions(process.argv.slice(2), {
-    'data-path': {
-      type: 'value',
-    },
-
-    'no-history': {
-      type: 'flag',
-    },
-
-    'show-traces': {
-      type: 'flag',
-    },
-  });
-
-  const dataPath = miscOptions['data-path'] || process.env.HSMUSIC_DATA;
-  const disableHistory = miscOptions['no-history'] ?? false;
-  const showTraces = miscOptions['show-traces'] ?? false;
-
+export default async function bootRepl({
+  dataPath = process.env.HSMUSIC_DATA,
+  mediaPath = process.env.HSMUSIC_MEDIA,
+  disableHistory = false,
+  showTraces = false,
+}) {
   if (!dataPath) {
     logError`Expected --data-path option or HSMUSIC_DATA to be set`;
+    return;
+  }
+
+  if (!mediaPath) {
+    logError`Expected --media-path option or HSMUSIC_MEDIA to be set`;
     return;
   }
 
@@ -117,23 +114,55 @@ async function main() {
   }));
 
   if (disableHistory) {
-    console.log(`\rInput history disabled (--no-history provided)`);
+    console.log(`\rInput history disabled (--no-repl-history provided)`);
     replServer.displayPrompt(true);
   } else {
     const historyFile = path.join(os.homedir(), '.hsmusic_repl_history');
     replServer.setupHistory(historyFile, (err) => {
       if (err) {
         console.error(
-          `\rFailed to begin locally logging input history to ${historyFile} (provide --no-history to disable)`
+          `\rFailed to begin locally logging input history to ${historyFile} (provide --no-repl-history to disable)`
         );
       } else {
         console.log(
-          `\rLogging input history to ${historyFile} (provide --no-history to disable)`
+          `\rLogging input history to ${historyFile} (provide --no-repl-history to disable)`
         );
       }
       replServer.displayPrompt(true);
     });
   }
+
+  // Is this called breaking a promise?
+  await new Promise(() => {});
+
+  return true;
+}
+
+async function main() {
+  const miscOptions = await parseOptions(process.argv.slice(2), {
+    'data-path': {
+      type: 'value',
+    },
+
+    'media-path': {
+      type: 'value',
+    },
+
+    'no-repl-history': {
+      type: 'flag',
+    },
+
+    'show-traces': {
+      type: 'flag',
+    },
+  });
+
+  return bootRepl({
+    dataPath: miscOptions['data-path'],
+    mediaPath: miscOptions['media-path'],
+    disableHistory: miscOptions['no-repl-history'],
+    showTraces: miscOptions['show-traces'],
+  });
 }
 
 if (isMain(import.meta.url)) {
