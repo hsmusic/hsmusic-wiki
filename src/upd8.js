@@ -36,7 +36,11 @@ import * as path from 'path';
 import {fileURLToPath} from 'url';
 import wrap from 'word-wrap';
 
-import genThumbs, {isThumb} from './gen-thumbs.js';
+import genThumbs, {
+  clearThumbs,
+  defaultMagickThreads,
+  isThumb,
+} from './gen-thumbs.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import urlSpec from './url-spec.js';
 
@@ -195,6 +199,11 @@ async function main() {
       type: 'flag',
     },
 
+    'clear-thumbs': {
+      help: `Clear the thumbnail cache and remove generated thumbnail files from media directory\n\n(This skips building. Run again without --clear-thumbs to build the site.)`,
+      type: 'flag',
+    },
+
     // Just working on data entries and not interested in actually
     // generating site HTML yet? This flag will cut execution off right
     // 8efore any site 8uilding actually happens.
@@ -222,6 +231,11 @@ async function main() {
       },
     },
     queue: {alias: 'queue-size'},
+
+    'magick-threads': {
+      help: `Process more or fewer thumbnail files at once with ImageMagick when generating thumbnails. (Each ImageMagick thread may also make use of multi-core processing at its own utility.)`,
+    },
+    magick: {alias: 'magick-threads'},
 
     // This option is super slow and has the potential for bugs! It puts
     // CacheableObject in a mode where every instance is a Proxy which will
@@ -350,6 +364,7 @@ async function main() {
 
   const skipThumbs = cliOptions['skip-thumbs'] ?? false;
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
+  const clearThumbsFlag = cliOptions['clear-thumbs'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
 
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
@@ -361,6 +376,8 @@ async function main() {
   // marginal performance deficit while waiting for file writes to finish
   // before proceeding to more page processing.
   const queueSize = +(cliOptions['queue-size'] ?? defaultQueueSize);
+
+  const magickThreads = +(cliOptions['magick-threads'] ?? defaultMagickThreads);
 
   {
     let errored = false;
@@ -390,11 +407,25 @@ async function main() {
     return;
   }
 
+  if (clearThumbsFlag) {
+    await clearThumbs(mediaPath, {queueSize});
+
+    logInfo`All done! Remove ${'--clear-thumbs'} to run the next build.`;
+    if (skipThumbs) {
+      logInfo`And don't forget to remove ${'--skip-thumbs'} too, eh?`;
+    }
+    return;
+  }
+
   if (skipThumbs) {
     logInfo`Skipping thumbnail generation.`;
   } else {
     logInfo`Begin thumbnail generation... -----+`;
-    const result = await genThumbs(mediaPath, {queueSize, quiet: true});
+    const result = await genThumbs(mediaPath, {
+      queueSize,
+      magickThreads,
+      quiet: !thumbsOnly,
+    });
     logInfo`Done thumbnail generation! --------+`;
     if (!result) return;
     if (thumbsOnly) return;

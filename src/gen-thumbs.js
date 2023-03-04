@@ -89,11 +89,17 @@ import {spawn} from 'child_process';
 import {createHash} from 'crypto';
 import * as path from 'path';
 
-import {readFile, writeFile} from 'fs/promises'; // Whatcha know! Nice.
+import {
+  readFile,
+  stat,
+  unlink,
+  writeFile,
+} from 'fs/promises'; // Whatcha know! Nice.
 
 import {createReadStream} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
 
 import {
+  fileIssue,
   logError,
   logInfo,
   logWarn,
@@ -109,6 +115,8 @@ import {
 } from './util/node-utils.js';
 
 import {delay, queue} from './util/sugar.js';
+
+export const defaultMagickThreads = 8;
 
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
@@ -189,8 +197,95 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
         promisifyProcess(convert('.' + ext, details), false)));
 }
 
+export async function clearThumbs(mediaPath, {
+  queueSize = 0,
+} = {}) {
+  if (!mediaPath) {
+    throw new Error('Expected mediaPath to be passed');
+  }
+
+  logInfo`Looking for thumbnails to clear out...`;
+
+  const thumbFiles = await traverse(mediaPath, {
+    filterFile: file => isThumb(file),
+    filterDir: name => name !== '.git',
+  });
+
+  if (thumbFiles.length) {
+    // Double-check files. Since we're unlinking (deleting) files,
+    // we're better off safe than sorry!
+    const thumbtacks = Object.keys(thumbnailSpec);
+    const unsafeFiles = thumbFiles.filter(file => {
+      if (path.extname(file) !== '.jpg') return true;
+      if (thumbtacks.every(tack => !file.includes(tack))) return true;
+      return false;
+    });
+
+    if (unsafeFiles.length > 0) {
+      logError`Detected files which we thought were safe, but don't actually seem to be thumbnails!`;
+      logError`List of files that were invalid: ${`(Please remove any personal files before reporting)`}`;
+      for (const file of unsafeFiles) {
+        console.error(file);
+      }
+      fileIssue();
+      return;
+    }
+
+    logInfo`Clearing out ${thumbFiles.length} thumbs.`;
+
+    const errored = [];
+
+    await progressPromiseAll(`Removing thumbnail files`, queue(
+      thumbFiles.map(file => async () => {
+        try {
+          await unlink(path.join(mediaPath, file));
+        } catch (error) {
+          if (error.code !== 'ENOENT') {
+            errored.push(file);
+          }
+        }
+      }),
+      queueSize));
+
+    if (errored.length) {
+      logError`Couldn't remove these paths (${errored.length}):`;
+      for (const file of errored) {
+        console.error(file);
+      }
+      logError`Check for permission errors?`;
+    } else {
+      logInfo`Successfully deleted all ${thumbFiles.length} thumbnail files!`;
+    }
+  } else {
+    logInfo`Didn't find any thumbs in media directory.`;
+    logInfo`${mediaPath}`;
+  }
+
+  let cacheExists = false;
+  try {
+    await stat(path.join(mediaPath, CACHE_FILE));
+    cacheExists = true;
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      logInfo`Cache file already missing, nothing to remove there.`;
+    } else {
+      logWarn`Failed to access cache file. Check its permissions?`;
+    }
+  }
+
+  if (cacheExists) {
+    try {
+      unlink(path.join(mediaPath, CACHE_FILE));
+      logInfo`Removed thumbnail cache file.`;
+    } catch (error) {
+      logWarn`Failed to remove cache file. Check its permissions?`;
+    }
+  }
+}
+
 export default async function genThumbs(mediaPath, {
   queueSize = 0,
+  magickThreads = defaultMagickThreads,
   quiet = false,
 } = {}) {
   if (!mediaPath) {
@@ -225,6 +320,8 @@ export default async function genThumbs(mediaPath, {
   } else {
     logInfo`Found ImageMagick binary: ${convertInfo}`;
   }
+
+  quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
 
   let cache,
     firstRun = false;
@@ -306,32 +403,28 @@ export default async function genThumbs(mediaPath, {
     return true;
   }
 
+  logInfo`Generating thumbnails for ${entriesToGenerate.length} media files.`;
+  if (entriesToGenerate.length > 250) {
+    logInfo`Go get a latte - this could take a while!`;
+  }
+
   const failed = [];
   const succeeded = [];
   const writeMessageFn = () =>
     `Writing image thumbnails. [failed: ${failed.length}]`;
 
-  // This is actually sort of a lie, 8ecause we aren't doing synchronicity.
-  // (We pass queueSize = 1 to queue().) 8ut we still use progressPromiseAll,
-  // 'cuz the progress indic8tor is very cool and good.
-  await progressPromiseAll(
-    writeMessageFn,
+  await progressPromiseAll(writeMessageFn,
     queue(
-      entriesToGenerate.map(
-        ([filePath, md5]) =>
-          () =>
-            generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
-              () => {
-                updatedCache[filePath] = md5;
-                succeeded.push(filePath);
-              },
-              (error) => {
-                failed.push([filePath, error]);
-              }
-            )
-      )
-    )
-  );
+      entriesToGenerate.map(([filePath, md5]) => () =>
+        generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
+          () => {
+            updatedCache[filePath] = md5;
+            succeeded.push(filePath);
+          },
+          error => {
+            failed.push([filePath, error]);
+          })),
+      magickThreads));
 
   if (failed.length > 0) {
     for (const [path, error] of failed) {
@@ -359,7 +452,7 @@ export default async function genThumbs(mediaPath, {
 }
 
 export function isThumb(file) {
-  const thumbnailLabel = file.match(/\.([^.]+)\.[^.]+$/)?.[1];
+  const thumbnailLabel = file.match(/\.([^.]+)\.jpg$/)?.[1];
   return Object.keys(thumbnailSpec).includes(thumbnailLabel);
 }
 
@@ -369,6 +462,7 @@ if (isMain(import.meta.url)) {
       'media-path': {
         type: 'value',
       },
+
       'queue-size': {
         type: 'value',
         validate(size) {
@@ -377,6 +471,7 @@ if (isMain(import.meta.url)) {
           return true;
         },
       },
+
       queue: {alias: 'queue-size'},
     });
 
