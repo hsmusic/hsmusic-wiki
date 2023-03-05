@@ -670,8 +670,6 @@ function unbound_img({
   let fileSize = null;
   const mediaRoot = to('media.root');
   if (href?.startsWith(mediaRoot)) {
-    console.log(href.slice(mediaRoot.length).replace(/^\//, ''));
-    console.log(getSizeOfImageFile(href.slice(mediaRoot.length).replace(/^\//, '')));
     fileSize = getSizeOfImageFile(href.slice(mediaRoot.length).replace(/^\//, ''));
   }
 
