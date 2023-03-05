@@ -110,6 +110,8 @@ export default async function bootRepl({
   const replServer = repl.start();
 
   Object.assign(replServer.context, await getContextAssignments({
+    dataPath,
+    mediaPath,
     wikiData,
   }));
 
