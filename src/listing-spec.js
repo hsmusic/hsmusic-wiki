@@ -943,7 +943,8 @@ function listAdditionalFilesInProperty(property, {
       link,
     }) =>
       data.flatMap(({album, tracks}) => [
-        html.tag('h3', link.album(album)),
+        html.tag('h3', {class: 'content-heading'},
+          link.album(album)),
 
         html.tag('dl', tracks.flatMap(track => [
           // No hash here since the full list of additional files is already visible

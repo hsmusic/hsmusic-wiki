@@ -414,16 +414,21 @@ export function generateDocumentHTML(pageInfo, {
 
   // Hilariously jank. Sorry!
   const hasID = id => mainHTML.includes(`id="${id}"`);
+  const hasTracks = hasID('tracks');
+  const hasArt = hasID('art');
+  const hasFlashes = hasID('flashes');
   const hasContributors = hasID('contributors');
   const hasReferences = hasID('references');
   const hasReferencedBy = hasID('referenced-by');
   const hasSamples = hasID('samples');
   const hasSampledBy = hasID('sampled-by');
+  const hasFeatures = hasID('features');
   const hasFeaturedIn = hasID('featured-in');
   const hasLyrics = hasID('lyrics');
   const hasSheetMusicFiles = hasID('sheet-music-files');
   const hasMidiProjectFiles = hasID('midi-project-files');
   const hasAdditionalFiles = hasID('additional-files');
+  const hasCommentary = hasID('commentary');
   const hasArtistCommentary = hasID('artist-commentary');
 
   const skippersHTML =
@@ -459,6 +464,12 @@ export function generateDocumentHTML(pageInfo, {
             class: 'skipper-list'
           },
           processSkippers([
+            hasTracks &&
+              ['#tracks', 'tracks'],
+            hasArt &&
+              ['#art', 'art'],
+            hasFlashes &&
+              ['#flashes', 'flashes'],
             hasContributors &&
               ['#contributors', 'contributors'],
             hasReferences &&
@@ -469,6 +480,8 @@ export function generateDocumentHTML(pageInfo, {
               ['#samples', 'samples'],
             hasSampledBy &&
               ['#sampled-by', 'sampledBy'],
+            hasFeatures &&
+              ['#features', 'features'],
             hasFeaturedIn &&
               ['#featured-in', 'featuredIn'],
             hasLyrics &&
@@ -479,6 +492,8 @@ export function generateDocumentHTML(pageInfo, {
               ['#midi-project-files', 'midiProjectFiles'],
             hasAdditionalFiles &&
               ['#additional-files', 'additionalFiles'],
+            hasCommentary &&
+              ['#commentary', 'commentary'],
             hasArtistCommentary &&
               ['#artist-commentary', 'artistCommentary'],
           ])),

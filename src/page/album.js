@@ -132,6 +132,7 @@ export function write(album, {wikiData}) {
       generateAdditionalFilesShortcut,
       generateAdditionalFilesList,
       generateChronologyLinks,
+      generateContentHeading,
       generateNavigationLinks,
       getAlbumCover,
       getAlbumStylesheet,
@@ -339,13 +340,14 @@ export function write(album, {wikiData}) {
 
             ...html.fragment(
               hasAdditionalFiles && [
-                html.tag('p',
-                  {id: 'additional-files', class: ['content-heading']},
-                  language.$('releaseInfo.additionalFiles.heading', {
+                generateContentHeading({
+                  id: 'additional-files',
+                  title: language.$('releaseInfo.additionalFiles.heading', {
                     additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
                       unit: true,
                     }),
-                  })),
+                  }),
+                }),
 
                 generateAlbumAdditionalFilesList(album, album.additionalFiles, {
                   generateAdditionalFilesList,
@@ -357,9 +359,11 @@ export function write(album, {wikiData}) {
 
             ...html.fragment(
               album.commentary && [
-                html.tag('p',
-                  {class: ['content-heading']},
-                  language.$('releaseInfo.artistCommentary')),
+                generateContentHeading({
+                  id: 'artist-commentary',
+                  title: language.$('releaseInfo.artistCommentary'),
+                }),
+
                 html.tag('blockquote', transformMultiline(album.commentary)),
               ]),
           ],

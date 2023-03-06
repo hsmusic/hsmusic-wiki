@@ -51,6 +51,7 @@ export function write(album) {
             html.tag('h3',
               {class: ['content-heading']},
               language.$('albumCommentaryPage.entry.title.albumCommentary')),
+
             html.tag('blockquote',
               transformMultiline(album.commentary)),
           ]),
