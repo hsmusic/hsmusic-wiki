@@ -272,7 +272,7 @@
   "artistPage.artGroupsLine": "Contributed art to groups: {GROUPS}",
   "artistPage.groupsLine.item": "{GROUP} ({CONTRIBUTIONS})",
   "artistPage.trackList.title": "Tracks",
-  "artistPage.artList.title": "Art",
+  "artistPage.artList.title": "Artworks",
   "artistPage.flashList.title": "Flashes & Games",
   "artistPage.commentaryList.title": "Commentary",
   "artistPage.viewArtGallery": "View {LINK}!",
