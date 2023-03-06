@@ -150,6 +150,15 @@ export function bindOpts(fn, bind) {
     value: fn.name ? `(options-bound) ${fn.name}` : `(options-bound)`,
   });
 
+  for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(fn))) {
+    if (key === 'length') continue;
+    if (key === 'name') continue;
+    if (key === 'arguments') continue;
+    if (key === 'caller') continue;
+    if (key === 'prototype') continue;
+    Object.defineProperty(bound, key, descriptor);
+  }
+
   return bound;
 }
 

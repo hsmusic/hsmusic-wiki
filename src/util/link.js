@@ -24,23 +24,29 @@ export function unbound_getLinkThemeString(color, {
 
 const appendIndexHTMLRegex = /^(?!https?:\/\/).+\/$/;
 
-const linkHelper =
-  (hrefFn, {
-    color = true,
-    attr = null,
-  } = {}) =>
-  (thing, {
+function linkHelper({
+  path: pathOption,
+
+  expectThing = true,
+  color: colorOption = true,
+
+  attr: attrOption = null,
+  data: dataOption = null,
+  text: textOption = null,
+}) {
+  const generateLink = (data, {
     getLinkThemeString,
     to,
 
     text = '',
     attributes = null,
     class: className = '',
-    color: color2 = true,
+    color = true,
     hash = '',
     preferShortName = false,
   }) => {
-    let href = hrefFn(thing, {to});
+    const path = (expectThing ? pathOption(data) : pathOption());
+    let href = to(...path);
 
     if (link.globalOptions.appendIndexHTML) {
       if (appendIndexHTMLRegex.test(href)) {
@@ -52,41 +58,100 @@ const linkHelper =
       href += (hash.startsWith('#') ? '' : '#') + hash;
     }
 
-    return html.tag(
-      'a',
+    return html.tag('a',
       {
-        ...(attr ? attr(thing) : {}),
+        ...(attrOption ? attrOption(data) : {}),
         ...(attributes ? attributes : {}),
         href,
         style:
-          typeof color2 === 'string'
-            ? getLinkThemeString(color2)
-            : color2 && color
-            ? getLinkThemeString(thing.color)
+          typeof color === 'string'
+            ? getLinkThemeString(color)
+            : color && colorOption
+            ? getLinkThemeString(data.color)
             : '',
         class: className,
       },
+
       (text ||
-        (preferShortName
-          ? thing.nameShort ?? thing.name
-          : thing.name))
-    );
+        (textOption
+          ? textOption(data)
+          : (preferShortName
+              ? data.nameShort ?? data.name
+              : data.name))));
   };
 
-const linkDirectory = (key, {expose = null, attr = null, ...conf} = {}) =>
-  linkHelper((thing, {to}) => to('localized.' + key, thing.directory), {
-    attr: (thing) => ({
-      ...(attr ? attr(thing) : {}),
-      ...(expose ? {[expose]: thing.directory} : {}),
+  generateLink.data = thing => {
+    if (!expectThing) {
+      throw new Error(`This kind of link doesn't need any data serialized`);
+    }
+
+    const data = (dataOption ? dataOption(thing) : {});
+
+    if (colorOption) {
+      data.color = thing.color;
+    }
+
+    if (!textOption) {
+      data.name = thing.name;
+      data.nameShort = thing.nameShort ?? thing.name;
+    }
+
+    return data;
+  };
+
+  return generateLink;
+}
+
+function linkDirectory(key, {
+  exposeDirectory = null,
+  prependLocalized = true,
+
+  data = null,
+  attr = null,
+  ...conf
+}) {
+  return linkHelper({
+    data: thing => ({
+      ...(data ? data(thing) : {}),
+      directory: thing.directory,
     }),
+
+    path: data =>
+      (prependLocalized
+        ? ['localized.' + key, data.directory]
+        : [key, data.directory]),
+
+    attr: (data) => ({
+      ...(attr ? attr(data) : {}),
+      ...(exposeDirectory ? {[exposeDirectory]: data.directory} : {}),
+    }),
+
     ...conf,
   });
+}
 
-const linkPathname = (key, conf) =>
-  linkHelper(({directory: pathname}, {to}) => to(key, pathname), conf);
+function linkIndex(key, conf) {
+  return linkHelper({
+    path: () => [key],
 
-const linkIndex = (key, conf) =>
-  linkHelper((_, {to}) => to('localized.' + key), conf);
+    expectThing: false,
+    ...conf,
+  });
+}
+
+function linkAdditionalFile(key, conf) {
+  return linkHelper({
+    data: ({file, album}) => ({
+      directory: album.directory,
+      file,
+    }),
+
+    path: data => ['media.albumAdditionalFile', data.directory, data.file],
+
+    color: false,
+    ...conf,
+  });
+}
 
 // Mapping of Thing constructor classes to the key for a link.x() function.
 // These represent a sensible "default" link, i.e. to the primary page for
@@ -114,6 +179,7 @@ const link = {
   },
 
   album: linkDirectory('album'),
+  albumAdditionalFile: linkAdditionalFile('albumAdditionalFile'),
   albumGallery: linkDirectory('albumGallery'),
   albumCommentary: linkDirectory('albumCommentary'),
   artist: linkDirectory('artist', {color: false}),
@@ -130,32 +196,26 @@ const link = {
   newsEntry: linkDirectory('newsEntry', {color: false}),
   staticPage: linkDirectory('staticPage', {color: false}),
   tag: linkDirectory('tag'),
-  track: linkDirectory('track', {expose: 'data-track'}),
+  track: linkDirectory('track', {exposeDirectory: 'data-track'}),
 
-  // TODO: This is a bit hacky. Files are just strings (not objects), so we
-  // have to manually provide the album alongside the file. They also don't
-  // follow the usual {name: whatever} type shape, so we have to provide that
-  // ourselves.
-  _albumAdditionalFileHelper: linkHelper(
-    (fakeFileObject, {to}) =>
-      to(
-        'media.albumAdditionalFile',
-        fakeFileObject.album.directory,
-        fakeFileObject.name),
-    {color: false}),
+  media: linkDirectory('media.path', {
+    prependLocalized: false,
+    color: false,
+  }),
 
-  albumAdditionalFile: ({file, album}, {to, ...opts}) =>
-    link._albumAdditionalFileHelper(
-      {
-        name: file,
-        album,
-      },
-      {to, ...opts}),
+  root: linkDirectory('shared.path', {
+    prependLocalized: false,
+    color: false,
+  }),
+  data: linkDirectory('data.path', {
+    prependLocalized: false,
+    color: false,
+  }),
 
-  media: linkPathname('media.path', {color: false}),
-  root: linkPathname('shared.path', {color: false}),
-  data: linkPathname('data.path', {color: false}),
-  site: linkPathname('localized.path', {color: false}),
+  site: linkDirectory('localized.path', {
+    prependLocalized: false,
+    color: false,
+  }),
 
   // This is NOT an arrow functions because it should be callable for other
   // "this" objects - i.e, if we bind arguments in other functions on the same

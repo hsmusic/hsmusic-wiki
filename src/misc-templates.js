@@ -18,6 +18,8 @@ import {
   sortChronologically,
 } from './util/wiki-data.js';
 
+import u_link from './util/link.js';
+
 const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
 
 const MASTODON_DOMAINS = ['types.pl'];
@@ -78,45 +80,60 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
 
 // Artist strings
 
-function unbound_getArtistString(artists, {
+unbound_generateContributionLinks.data = (contributions, {
+  showContribution = false,
+  showIcons = false,
+}) => {
+  return {
+    showContribution,
+    showIcons,
+
+    contributionData:
+      contributions.map(({who, what}) => ({
+        artistLinkData: u_link.artist.data(who),
+
+        hasContributionPart: !!(showContribution && what),
+        hasExternalPart: !!(showIcons && !empty(who.urls)),
+
+        artistUrls: who.urls,
+        contribution: showContribution && what,
+      })),
+  };
+};
+
+function unbound_generateContributionLinks(data, {
   html,
+  iconifyURL,
   language,
   link,
-
-  iconifyURL,
-
-  showIcons = false,
-  showContrib = false,
 }) {
   return language.formatConjunctionList(
-    artists.map(({who, what}) => {
-      const {urls} = who;
-
-      const hasContribPart = !!(showContrib && what);
-      const hasExternalPart = !!(showIcons && !empty(urls));
-
-      const artistLink = link.artist(who);
+    data.contributionData.map(({
+      artistLinkData,
+      hasContributionPart,
+      hasExternalPart,
+      artistUrls,
+      contribution,
+    }) => {
+      const artistLink = link.artist(artistLinkData);
 
       const externalLinks = hasExternalPart &&
         html.tag('span',
-          {
-            [html.noEdgeWhitespace]: true,
-            class: 'icons'
-          },
+          {[html.noEdgeWhitespace]: true, class: 'icons'},
           language.formatUnitList(
-            urls.map(url => iconifyURL(url, {language}))));
+            artistUrls.map(url => iconifyURL(url, {language}))));
 
       return (
-        (hasContribPart
+        (hasContributionPart
           ? (hasExternalPart
               ? language.$('misc.artistLink.withContribution.withExternalLinks', {
                   artist: artistLink,
-                  contrib: what,
+                  contrib: contribution,
                   links: externalLinks,
                 })
               : language.$('misc.artistLink.withContribution', {
                   artist: artistLink,
-                  contrib: what,
+                  contrib: contribution,
                 }))
           : (hasExternalPart
               ? language.$('misc.artistLink.withExternalLinks', {
@@ -1040,7 +1057,7 @@ export {
   unbound_generateAdditionalFilesList as generateAdditionalFilesList,
   unbound_generateAdditionalFilesShortcut as generateAdditionalFilesShortcut,
 
-  unbound_getArtistString as getArtistString,
+  unbound_generateContributionLinks as generateContributionLinks,
 
   unbound_generateChronologyLinks as generateChronologyLinks,
 

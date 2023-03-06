@@ -12,55 +12,148 @@ import {
   getTotalDuration,
 } from '../util/wiki-data.js';
 
+import {
+  generateContributionLinks as u_generateContributionLinks,
+} from '../misc-templates.js';
+
+import u_link from '../util/link.js';
+
 export const description = `per-album info & track artwork gallery pages`;
 
 export function targets({wikiData}) {
   return wikiData.albumData;
 }
 
-export function write(album, {wikiData}) {
-  const unbound_trackToListItem = (track, {
-    getArtistString,
-    getLinkThemeString,
-    html,
-    language,
-    link,
-  }) => {
-    const itemOpts = {
-      duration: language.formatDuration(track.duration ?? 0),
-      track: link.track(track),
-    };
+export const dataSteps = {
+  computePathsForTarget(data, album) {
+    data.hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
+    data.hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);;
 
-    return html.tag('li',
-      {style: getLinkThemeString(track.color)},
-      compareArrays(
-        track.artistContribs.map((c) => c.who),
-        album.artistContribs.map((c) => c.who),
-        {checkOrder: false}
-      )
-        ? language.$('trackList.item.withDuration', itemOpts)
-        : language.$('trackList.item.withDuration.withArtists', {
-            ...itemOpts,
-            by: html.tag('span',
-              {class: 'by'},
-              language.$('trackList.item.withArtists.by', {
-                artists: getArtistString(track.artistContribs),
-              })),
-          }));
+    return [
+      {
+        type: 'page',
+        path: ['album', album.directory],
+      },
+
+      data.hasGalleryPage && {
+        type: 'page',
+        path: ['albumGallery', album.directory],
+      },
+
+      data.hasCommentaryPage && {
+        type: 'page',
+        path: ['albumCommentary', album.directory],
+      },
+
+      {
+        type: 'data',
+        path: ['album', album.directory],
+      },
+    ];
+  },
+
+  computeDataCommonAcrossMixedWrites(data, album) {
+    data.albumDuration = getTotalDuration(album.tracks);
+  },
+
+  computeDataCommonAcrossPageWrites(data, album) {
+    data.listTag = getAlbumListTag(album);
+  },
+
+  computeDataForPageWrite: {
+    album(data, album, _pathArgs) {
+      data.hasAdditionalFiles = !empty(album.additionalFiles);
+      data.numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
+
+      data.displayTrackSections =
+        album.trackSections &&
+          (album.trackSections.length > 1 ||
+            !album.trackSections[0]?.isDefaultTrackSection);
+    },
+  },
+
+  computeContentForPageWrite: {
+    album(data, {
+      absoluteTo,
+      fancifyURL,
+      generateAdditionalFilesShortcut,
+      generateAdditionalFilesList,
+      generateChronologyLinks,
+      generateContributionLinks,
+      generateContentHeading,
+      generateNavigationLinks,
+      getAlbumCover,
+      getAlbumStylesheet,
+      getLinkThemeString,
+      getSizeOfAdditionalFile,
+      getThemeString,
+      html,
+      link,
+      language,
+      transformMultiline,
+      urls,
+    }) {
+      const generateTrackListItem = bindOpts(u_generateTrackListItem, {
+        generateContributionLinks,
+        getLinkThemeString,
+        html,
+        language,
+        link,
+      });
+
+      void generateTrackListItem;
+    },
+  },
+};
+
+function u_generateTrackListItem(data, {
+  generateContributionLinks,
+  getLinkThemeString,
+  html,
+  language,
+  link,
+}) {
+  const stringOpts = {
+    duration: language.formatDuration(data.duration),
+    track: link.track(data.linkData),
   };
 
-  const hasAdditionalFiles = !empty(album.additionalFiles);
-  const numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
+  return html.tag('li',
+    {style: getLinkThemeString(data.color)},
+    (!data.showArtists
+      ? language.$('trackList.item.withDuration', stringOpts)
+      : language.$('trackList.item.withDuration.withArtists', {
+          ...stringOpts,
+          by:
+            html.tag('span', {class: 'by'},
+              language.$('trackList.item.withArtists.by', {
+                artists: generateContributionLinks(data.contributionLinksData),
+              })),
+        })));
+}
 
-  const albumDuration = getTotalDuration(album.tracks);
+u_generateTrackListItem.data = track => {
+  return {
+    color: track.color,
+    duration: track.duration ?? 0,
+    linkData: u_link.track.data(track),
 
-  const displayTrackSections =
-    album.trackSections &&
-      (album.trackSections.length > 1 ||
-        !album.trackSections[0]?.isDefaultTrackSection);
+    showArtists:
+      !compareArrays(
+        track.artistContribs.map((c) => c.who),
+        track.album.artistContribs.map((c) => c.who),
+        {checkOrder: false}),
 
-  const listTag = getAlbumListTag(album);
+    contributionLinksData:
+      u_generateContributionLinks.data(track.artistContribs, {
+        showContribution: false,
+        showIcons: false,
+      }),
+  };
+};
 
+/*
+export function write(album, {wikiData}) {
   const getSocialEmbedDescription = ({
     getArtistString: _getArtistString,
     language,
@@ -127,24 +220,6 @@ export function write(album, {wikiData}) {
     type: 'page',
     path: ['album', album.directory],
     page: ({
-      absoluteTo,
-      fancifyURL,
-      generateAdditionalFilesShortcut,
-      generateAdditionalFilesList,
-      generateChronologyLinks,
-      generateContentHeading,
-      generateNavigationLinks,
-      getAlbumCover,
-      getAlbumStylesheet,
-      getArtistString,
-      getLinkThemeString,
-      getSizeOfAdditionalFile,
-      getThemeString,
-      html,
-      link,
-      language,
-      transformMultiline,
-      urls,
     }) => {
       const trackToListItem = bindOpts(unbound_trackToListItem, {
         getArtistString,
@@ -867,3 +942,4 @@ export function generateAlbumAdditionalFilesList(album, additionalFiles, {
       link.albumAdditionalFile({album, file}),
   });
 }
+*/
