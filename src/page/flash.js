@@ -167,7 +167,7 @@ export function writeTargetless({
           ...flashActData.flatMap((act, i) => [
             html.tag('h2',
               {
-                id: '#' + act.anchor,
+                id: act.anchor,
                 style: getLinkThemeString(act.color),
               },
               link.flash(act.flashes[0], {
