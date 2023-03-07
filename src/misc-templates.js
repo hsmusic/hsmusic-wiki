@@ -18,6 +18,8 @@ import {
   sortChronologically,
 } from './util/wiki-data.js';
 
+import contentFunction from './util/content-function.js';
+
 import u_link from './util/link.js';
 
 const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
@@ -80,72 +82,74 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
 
 // Artist strings
 
-unbound_generateContributionLinks.data = (contributions, {
-  showContribution = false,
-  showIcons = false,
-}) => {
-  return {
-    showContribution,
-    showIcons,
+export const u_generateContributionLinks = contentFunction({
+  data: function(contributions, {
+    showContribution = false,
+    showIcons = false,
+  }) {
+    return {
+      showContribution,
+      showIcons,
 
-    contributionData:
-      contributions.map(({who, what}) => ({
-        artistLinkData: u_link.artist.data(who),
+      contributionData:
+        contributions.map(({who, what}) => ({
+          artistLinkData: u_link.artist.data(who),
 
-        hasContributionPart: !!(showContribution && what),
-        hasExternalPart: !!(showIcons && !empty(who.urls)),
+          hasContributionPart: !!(showContribution && what),
+          hasExternalPart: !!(showIcons && !empty(who.urls)),
 
-        artistUrls: who.urls,
-        contribution: showContribution && what,
-      })),
-  };
-};
+          artistUrls: who.urls,
+          contribution: showContribution && what,
+        })),
+    };
+  },
 
-function unbound_generateContributionLinks(data, {
-  html,
-  iconifyURL,
-  language,
-  link,
-}) {
-  return language.formatConjunctionList(
-    data.contributionData.map(({
-      artistLinkData,
-      hasContributionPart,
-      hasExternalPart,
-      artistUrls,
-      contribution,
-    }) => {
-      const artistLink = link.artist(artistLinkData);
+  generate: function generateContributionLinks(data, {
+    html,
+    iconifyURL,
+    language,
+    link,
+  }) {
+    return language.formatConjunctionList(
+      data.contributionData.map(({
+        artistLinkData,
+        hasContributionPart,
+        hasExternalPart,
+        artistUrls,
+        contribution,
+      }) => {
+        const artistLink = link.artist(artistLinkData);
 
-      const externalLinks = hasExternalPart &&
-        html.tag('span',
-          {[html.noEdgeWhitespace]: true, class: 'icons'},
-          language.formatUnitList(
-            artistUrls.map(url => iconifyURL(url, {language}))));
+        const externalLinks = hasExternalPart &&
+          html.tag('span',
+            {[html.noEdgeWhitespace]: true, class: 'icons'},
+            language.formatUnitList(
+              artistUrls.map(url => iconifyURL(url, {language}))));
 
-      return (
-        (hasContributionPart
-          ? (hasExternalPart
-              ? language.$('misc.artistLink.withContribution.withExternalLinks', {
-                  artist: artistLink,
-                  contrib: contribution,
-                  links: externalLinks,
-                })
-              : language.$('misc.artistLink.withContribution', {
-                  artist: artistLink,
-                  contrib: contribution,
-                }))
-          : (hasExternalPart
-              ? language.$('misc.artistLink.withExternalLinks', {
-                  artist: artistLink,
-                  links: externalLinks,
-                })
-              : language.$('misc.artistLink', {
-                  artist: artistLink,
-                })))
-      );
-    }));
-}
+        return (
+          (hasContributionPart
+            ? (hasExternalPart
+                ? language.$('misc.artistLink.withContribution.withExternalLinks', {
+                    artist: artistLink,
+                    contrib: contribution,
+                    links: externalLinks,
+                  })
+                : language.$('misc.artistLink.withContribution', {
+                    artist: artistLink,
+                    contrib: contribution,
+                  }))
+            : (hasExternalPart
+                ? language.$('misc.artistLink.withExternalLinks', {
+                    artist: artistLink,
+                    links: externalLinks,
+                  })
+                : language.$('misc.artistLink', {
+                    artist: artistLink,
+                  })))
+        );
+      }));
+  },
+});
 
 // Chronology links
 
@@ -337,52 +341,65 @@ function unbound_getThemeString(color, {
   ].join('\n');
 }
 
-function unbound_getAlbumStylesheet(album, {
-  to,
-}) {
-  const hasWallpaper = album.wallpaperArtistContribs.length >= 1;
-  const hasWallpaperStyle = !!album.wallpaperStyle;
-  const hasBannerStyle = !!album.bannerStyle;
+export const u_generateAlbumStylesheet = contentFunction({
+  extraDependencies: [
+    'to',
+  ],
 
-  const wallpaperSource =
-    (hasWallpaper &&
-      to(
-        'media.albumWallpaper',
-        album.directory,
-        album.wallpaperFileExtension));
+  data: function(album) {
+    const data = {};
 
-  const wallpaperPart =
-    (hasWallpaper
-      ? [
-          `body::before {`,
-          `    background-image: url("${wallpaperSource}");`,
-          ...(hasWallpaperStyle
-            ? album.wallpaperStyle
-                .split('\n')
-                .map(line => `    ${line}`)
-            : []),
-          `}`,
-        ]
-      : []);
+    data.hasWallpaper = !empty(album.wallpaperArtistContribs);
+    data.hasBanner = !empty(album.bannerArtistContribs);
 
-  const bannerPart =
-    (hasBannerStyle
-      ? [
-          `#banner img {`,
-          ...album.bannerStyle
-            .split('\n')
-            .map(line => `    ${line}`),
-          `}`,
-        ]
-      : []);
+    if (data.hasWallpaper) {
+      data.hasWallpaperStyle = !!album.wallpaperStyle;
+      data.wallpaperPath = ['media.albumWallpaper', album.directory, album.wallpaperFileExtension];
+      data.wallpaperStyle = album.wallpaperStyle;
+    }
 
-  return [
-    ...wallpaperPart,
-    ...bannerPart,
-  ]
-    .filter(Boolean)
-    .join('\n');
-}
+    if (data.hasBanner) {
+      data.hasBannerStyle = !!album.bannerStyle;
+      data.bannerStyle = album.bannerStyle;
+    }
+
+    return data;
+  },
+
+  generate: function generateAlbumStylesheet(data, {to}) {
+    const wallpaperPart =
+      (data.hasWallpaper
+        ? [
+            `body::before {`,
+            `    background-image: url("${to(...data.wallpaperPath)}");`,
+            ...(data.hasWallpaperStyle
+              ? data.wallpaperStyle
+                  .split('\n')
+                  .map(line => `    ${line}`)
+              : []),
+            `}`,
+          ]
+        : []);
+
+    const bannerPart =
+      (data.hasBannerStyle
+        ? [
+            `#banner img {`,
+            ...data.bannerStyle
+              .split('\n')
+              .map(line => `    ${line}`),
+            `}`,
+          ]
+        : []);
+
+    return [
+      ...wallpaperPart,
+      ...bannerPart,
+    ]
+      .filter(Boolean)
+      .join('\n');
+  },
+});
 
 // Divided track lists
 
@@ -1057,8 +1074,6 @@ export {
   unbound_generateAdditionalFilesList as generateAdditionalFilesList,
   unbound_generateAdditionalFilesShortcut as generateAdditionalFilesShortcut,
 
-  unbound_generateContributionLinks as generateContributionLinks,
-
   unbound_generateChronologyLinks as generateChronologyLinks,
 
   unbound_getRevealStringFromContentWarningMessage as getRevealStringFromContentWarningMessage,
@@ -1067,7 +1082,6 @@ export {
   unbound_generateCoverLink as generateCoverLink,
 
   unbound_getThemeString as getThemeString,
-  unbound_getAlbumStylesheet as getAlbumStylesheet,
 
   unbound_generateTrackListDividedByGroups as generateTrackListDividedByGroups,
 

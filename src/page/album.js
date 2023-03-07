@@ -13,10 +13,11 @@ import {
 } from '../util/wiki-data.js';
 
 import {
-  generateContributionLinks as u_generateContributionLinks,
+  u_generateAlbumStylesheet,
 } from '../misc-templates.js';
 
 import u_link from '../util/link.js';
+import contentFunction from '../util/content-function.js';
 
 export const description = `per-album info & track artwork gallery pages`;
 
@@ -27,7 +28,7 @@ export function targets({wikiData}) {
 export const dataSteps = {
   computePathsForTarget(data, album) {
     data.hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
-    data.hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);;
+    data.hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);
 
     return [
       {
@@ -62,6 +63,16 @@ export const dataSteps = {
 
   computeDataForPageWrite: {
     album(data, album, _pathArgs) {
+      // TODO: We can't use content-unfulfilled functions here.
+      // But how do we express that these need to be fulfilled
+      // from within data steps?
+      data.socialEmbedData = u_generateAlbumSocialEmbed.data(album);
+      data.stylesheetData = u_generateAlbumStylesheet.data(album);
+
+      data.name = album.name;
+      data.color = album.color;
+      data.directory = album.directory;
+
       data.hasAdditionalFiles = !empty(album.additionalFiles);
       data.numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
 
@@ -101,56 +112,455 @@ export const dataSteps = {
         link,
       });
 
+      const generateAlbumSocialEmbedDescription = u_generateAlbumSocialEmbedDescription.fulfill({
+        language,
+      });
+
+      const generateAlbumSocialEmbed = u_generateAlbumSocialEmbed.fulfill({
+        generateSocialEmbedDescription: generateAlbumSocialEmbedDescription,
+      });
+
       void generateTrackListItem;
+
+      return {
+        title: language.$('albumPage.title', {album: data.name}),
+        stylesheet: getAlbumStylesheet(data.stylesheetData),
+
+        themeColor: data.color,
+        theme:
+          getThemeString(data.color, {
+            additionalVariables: [
+              `--album-directory: ${data.directory}`,
+            ],
+          }),
+
+        socialEmbed: generateAlbumSocialEmbed(data.socialEmbedData, {
+          absoluteTo,
+          getAlbumCover,
+          getSocialEmbedDescription,
+          to,
+        }),
+      };
     },
   },
 };
 
-function u_generateTrackListItem(data, {
-  generateContributionLinks,
-  getLinkThemeString,
-  html,
-  language,
-  link,
-}) {
-  const stringOpts = {
-    duration: language.formatDuration(data.duration),
-    track: link.track(data.linkData),
-  };
+const u_generateAlbumSocialEmbedDescription = contentFunction({
+  extraDependencies: ['language'],
 
-  return html.tag('li',
-    {style: getLinkThemeString(data.color)},
-    (!data.showArtists
-      ? language.$('trackList.item.withDuration', stringOpts)
-      : language.$('trackList.item.withDuration.withArtists', {
-          ...stringOpts,
-          by:
-            html.tag('span', {class: 'by'},
-              language.$('trackList.item.withArtists.by', {
-                artists: generateContributionLinks(data.contributionLinksData),
+  data: function(album) {
+    const data = {};
+
+    const duration = getTotalDuration(album);
+
+    data.hasDuration = duration > 0;
+    data.hasTracks = album.tracks.length > 0;
+    data.hasDate = !!album.date;
+    data.hasAny = (data.hasDuration || data.hasTracks || data.hasDuration);
+
+    if (!data.hasAny)
+      return data;
+
+    if (data.hasDuration)
+      data.duration = duration;
+
+    if (data.hasTracks)
+      data.tracks = album.tracks.length;
+
+    if (data.hasDate)
+      data.date = album.date;
+
+    return data;
+  },
+
+  generate: function generateAlbumSocialEmbedDescription(data, {
+    language,
+  }) {
+    return language.formatString(
+      'albumPage.socialEmbed.body' + [
+        data.hasDuration && '.withDuration',
+        data.hasTracks && '.withTracks',
+        data.hasDate && '.withReleaseDate',
+      ].filter(Boolean).join(''),
+
+      Object.fromEntries([
+        data.hasDuration &&
+          ['duration', language.formatDuration(data.duration)],
+        data.hasTracks &&
+          ['tracks', language.countTracks(data.tracks, {unit: true})],
+        data.hasDate &&
+          ['date', language.formatDate(data.date)],
+      ].filter(Boolean)));
+  },
+});
+
+const u_generateAlbumSocialEmbed = contentFunction({
+  contentDependencies: [
+    'generateSocialEmbedDescription',
+  ],
+
+  extraDependencies: [
+    'absoluteTo',
+    'language',
+    'to',
+    'urls',
+  ],
+
+  data: function(album, {
+    generateSocialEmbedDescription,
+  }) {
+    const data = {};
+
+    data.descriptionData = generateSocialEmbedDescription.data(album);
+
+    data.hasHeading = !empty(album.groups);
+
+    if (data.hasHeading) {
+      const firstGroup = album.groups[0];
+      data.headingGroupName = firstGroup.directory;
+      data.headingGroupDirectory = firstGroup.directory;
+    }
+
+    data.albumName = album.name;
+    data.albumColor = album.color;
+
+    return data;
+  },
+
+  generate: function generateAlbumSocialEmbed(data, {
+    generateSocialEmbedDescription,
+
+    absoluteTo,
+    language,
+    to,
+    urls,
+  }) {
+    const socialEmbed = {};
+
+    if (data.hasHeading) {
+      socialEmbed.heading =
+        language.$('albumPage.socialEmbed.heading', {
+          group: data.headingGroupName,
+        });
+
+      socialEmbed.headingLink =
+        absoluteTo('localized.album', data.headingGroupDirectory);
+    } else {
+      socialEmbed.heading = '';
+      socialEmbed.headingLink = null;
+    }
+
+    socialEmbed.title =
+      language.$('albumPage.socialEmbed.title', {
+        album: data.albumName,
+      });
+
+    socialEmbed.description = generateSocialEmbedDescription(data.descriptionData);
+
+    socialEmbed.image =
+      '/' + getAlbumCover(album, {to: urls.from('shared.root').to});
+
+    socialEmbed.color = data.albumColor;
+
+    return socialEmbed;
+  },
+});
+
+const u_generateTrackListItem = contentFunction({
+  contentDependencies: [
+    'generateContributionLinks',
+  ],
+
+  extraDependencies: [
+    'getLinkThemeString',
+    'html',
+    'language',
+    'link',
+  ],
+
+  data: function(track, {
+    generateContributionLinks,
+  }) {
+    return {
+      color: track.color,
+      duration: track.duration ?? 0,
+      linkData: u_link.track.data(track),
+
+      showArtists:
+        !compareArrays(
+          track.artistContribs.map(c => c.who),
+          track.album.artistContribs.map(c => c.who),
+          {checkOrder: false}),
+
+      contributionLinksData:
+        generateContributionLinks.data(track.artistContribs, {
+          showContribution: false,
+          showIcons: false,
+        }),
+    };
+  },
+
+  generate: function generateTrackListItem(data, {
+    generateContributionLinks,
+
+    getLinkThemeString,
+    html,
+    language,
+    link,
+  }) {
+    const stringOpts = {
+      duration: language.formatDuration(data.duration),
+      track: link.track(data.linkData),
+    };
+
+    return html.tag('li',
+      {style: getLinkThemeString(data.color)},
+      (!data.showArtists
+        ? language.$('trackList.item.withDuration', stringOpts)
+        : language.$('trackList.item.withDuration.withArtists', {
+            ...stringOpts,
+            by:
+              html.tag('span', {class: 'by'},
+                language.$('trackList.item.withArtists.by', {
+                  artists: generateContributionLinks(data.contributionLinksData),
+                })),
+          })));
+  },
+});
+
+/*
+const infoPage = {
+  page: () => {
+    return {
+      banner: !empty(album.bannerArtistContribs) && {
+        dimensions: album.bannerDimensions,
+        path: [
+          'media.albumBanner',
+          album.directory,
+          album.bannerFileExtension,
+        ],
+        alt: language.$('misc.alt.albumBanner'),
+        position: 'top',
+      },
+
+      cover: {
+        src: getAlbumCover(album),
+        alt: language.$('misc.alt.albumCover'),
+        artTags: album.artTags,
+      },
+
+      main: {
+        headingMode: 'sticky',
+
+        content: [
+          html.tag('p',
+            {
+              [html.onlyIfContent]: true,
+              [html.joinChildren]: '<br>',
+            },
+            [
+              !empty(album.artistContribs) &&
+                language.$('releaseInfo.by', {
+                  artists: getArtistString(album.artistContribs, {
+                    showContrib: true,
+                    showIcons: true,
+                  }),
+                }),
+
+              !empty(album.coverArtistContribs) &&
+                language.$('releaseInfo.coverArtBy', {
+                  artists: getArtistString(album.coverArtistContribs, {
+                    showContrib: true,
+                    showIcons: true,
+                  }),
+                }),
+
+              !empty(album.wallpaperArtistContribs) &&
+                language.$('releaseInfo.wallpaperArtBy', {
+                  artists: getArtistString(album.wallpaperArtistContribs, {
+                    showContrib: true,
+                    showIcons: true,
+                  }),
+                }),
+
+              !empty(album.bannerArtistContribs) &&
+                language.$('releaseInfo.bannerArtBy', {
+                  artists: getArtistString(album.bannerArtistContribs, {
+                    showContrib: true,
+                    showIcons: true,
+                  }),
+                }),
+
+              album.date &&
+                language.$('releaseInfo.released', {
+                  date: language.formatDate(album.date),
+                }),
+
+              album.hasCoverArt &&
+              album.coverArtDate &&
+              +album.coverArtDate !== +album.date &&
+                language.$('releaseInfo.artReleased', {
+                  date: language.formatDate(album.coverArtDate),
+                }),
+
+              albumDuration > 0 &&
+                language.$('releaseInfo.duration', {
+                  duration: language.formatDuration(albumDuration, {
+                    approximate: album.tracks.length > 1,
+                  }),
+                }),
+            ]),
+
+          html.tag('p',
+            {
+              [html.onlyIfContent]: true,
+              [html.joinChildren]: '<br>',
+            },
+            [
+              hasAdditionalFiles &&
+                generateAdditionalFilesShortcut(album.additionalFiles),
+
+              checkGalleryPage(album) &&
+                language.$('releaseInfo.viewGallery', {
+                  link: link.albumGallery(album, {
+                    text: language.$('releaseInfo.viewGallery.link'),
+                  }),
+                }),
+
+              checkCommentaryPage(album) &&
+                language.$('releaseInfo.viewCommentary', {
+                  link: link.albumCommentary(album, {
+                    text: language.$('releaseInfo.viewCommentary.link'),
+                  }),
+                }),
+            ]),
+
+          !empty(album.urls) &&
+            html.tag('p',
+              language.$('releaseInfo.listenOn', {
+                links: language.formatDisjunctionList(
+                  album.urls.map(url => fancifyURL(url, {album: true}))
+                ),
               })),
-        })));
-}
 
-u_generateTrackListItem.data = track => {
-  return {
-    color: track.color,
-    duration: track.duration ?? 0,
-    linkData: u_link.track.data(track),
+          displayTrackSections &&
+          !empty(album.trackSections) &&
+            html.tag('dl',
+              {class: 'album-group-list'},
+              album.trackSections.flatMap(({
+                name,
+                startIndex,
+                tracks,
+              }) => [
+                html.tag('dt',
+                  {class: ['content-heading']},
+                  language.$('trackList.section.withDuration', {
+                    duration: language.formatDuration(getTotalDuration(tracks), {
+                      approximate: tracks.length > 1,
+                    }),
+                    section: name,
+                  })),
+                html.tag('dd',
+                  html.tag(listTag,
+                    listTag === 'ol' ? {start: startIndex + 1} : {},
+                    tracks.map(trackToListItem))),
+              ])),
 
-    showArtists:
-      !compareArrays(
-        track.artistContribs.map((c) => c.who),
-        track.album.artistContribs.map((c) => c.who),
-        {checkOrder: false}),
+          !displayTrackSections &&
+          !empty(album.tracks) &&
+            html.tag(listTag,
+              album.tracks.map(trackToListItem)),
 
-    contributionLinksData:
-      u_generateContributionLinks.data(track.artistContribs, {
-        showContribution: false,
-        showIcons: false,
+          html.tag('p',
+            {
+              [html.onlyIfContent]: true,
+              [html.joinChildren]: '<br>',
+            },
+            [
+              album.dateAddedToWiki &&
+                language.$('releaseInfo.addedToWiki', {
+                  date: language.formatDate(
+                    album.dateAddedToWiki
+                  ),
+                })
+            ]),
+
+          ...html.fragment(
+            hasAdditionalFiles && [
+              generateContentHeading({
+                id: 'additional-files',
+                title: language.$('releaseInfo.additionalFiles.heading', {
+                  additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
+                    unit: true,
+                  }),
+                }),
+              }),
+
+              generateAlbumAdditionalFilesList(album, album.additionalFiles, {
+                generateAdditionalFilesList,
+                getSizeOfAdditionalFile,
+                link,
+                urls,
+              }),
+            ]),
+
+          ...html.fragment(
+            album.commentary && [
+              generateContentHeading({
+                id: 'artist-commentary',
+                title: language.$('releaseInfo.artistCommentary'),
+              }),
+
+              html.tag('blockquote', transformMultiline(album.commentary)),
+            ]),
+        ],
+      },
+
+      sidebarLeft: generateAlbumSidebar(album, null, {
+        fancifyURL,
+        getLinkThemeString,
+        html,
+        link,
+        language,
+        transformMultiline,
+        wikiData,
       }),
-  };
+
+      nav: {
+        linkContainerClasses: ['nav-links-hierarchy'],
+        links: [
+          {toHome: true},
+          {
+            html: language.$('albumPage.nav.album', {
+              album: link.album(album, {class: 'current'}),
+            }),
+          },
+          {
+            divider: false,
+            html: generateAlbumNavLinks(album, null, {
+              generateNavigationLinks,
+              html,
+              language,
+              link,
+            }),
+          }
+        ],
+        content: generateAlbumChronologyLinks(album, null, {
+          generateChronologyLinks,
+          html,
+        }),
+      },
+
+      secondaryNav: generateAlbumSecondaryNav(album, null, {
+        getLinkThemeString,
+        html,
+        language,
+        link,
+      }),
+    };
+  },
 };
+*/
 
 /*
 export function write(album, {wikiData}) {
@@ -214,279 +624,6 @@ export function write(album, {wikiData}) {
         duration: track.duration,
       })),
     }),
-  };
-
-  const infoPage = {
-    type: 'page',
-    path: ['album', album.directory],
-    page: ({
-    }) => {
-      const trackToListItem = bindOpts(unbound_trackToListItem, {
-        getArtistString,
-        getLinkThemeString,
-        html,
-        language,
-        link,
-      });
-
-      return {
-        title: language.$('albumPage.title', {album: album.name}),
-        stylesheet: getAlbumStylesheet(album),
-
-        themeColor: album.color,
-        theme:
-          getThemeString(album.color, {
-            additionalVariables: [
-              `--album-directory: ${album.directory}`,
-            ],
-          }),
-
-        socialEmbed: {
-          heading:
-            (empty(album.groups)
-              ? ''
-              : language.$('albumPage.socialEmbed.heading', {
-                  group: album.groups[0].name,
-                })),
-          headingLink:
-            (empty(album.groups)
-              ? null
-              : absoluteTo('localized.album', album.groups[0].directory)),
-          title: language.$('albumPage.socialEmbed.title', {
-            album: album.name,
-          }),
-          description: getSocialEmbedDescription({getArtistString, language}),
-          image: '/' + getAlbumCover(album, {to: urls.from('shared.root').to}),
-          color: album.color,
-        },
-
-        banner: !empty(album.bannerArtistContribs) && {
-          dimensions: album.bannerDimensions,
-          path: [
-            'media.albumBanner',
-            album.directory,
-            album.bannerFileExtension,
-          ],
-          alt: language.$('misc.alt.albumBanner'),
-          position: 'top',
-        },
-
-        cover: {
-          src: getAlbumCover(album),
-          alt: language.$('misc.alt.albumCover'),
-          artTags: album.artTags,
-        },
-
-        main: {
-          headingMode: 'sticky',
-
-          content: [
-            html.tag('p',
-              {
-                [html.onlyIfContent]: true,
-                [html.joinChildren]: '<br>',
-              },
-              [
-                !empty(album.artistContribs) &&
-                  language.$('releaseInfo.by', {
-                    artists: getArtistString(album.artistContribs, {
-                      showContrib: true,
-                      showIcons: true,
-                    }),
-                  }),
-
-                !empty(album.coverArtistContribs) &&
-                  language.$('releaseInfo.coverArtBy', {
-                    artists: getArtistString(album.coverArtistContribs, {
-                      showContrib: true,
-                      showIcons: true,
-                    }),
-                  }),
-
-                !empty(album.wallpaperArtistContribs) &&
-                  language.$('releaseInfo.wallpaperArtBy', {
-                    artists: getArtistString(album.wallpaperArtistContribs, {
-                      showContrib: true,
-                      showIcons: true,
-                    }),
-                  }),
-
-                !empty(album.bannerArtistContribs) &&
-                  language.$('releaseInfo.bannerArtBy', {
-                    artists: getArtistString(album.bannerArtistContribs, {
-                      showContrib: true,
-                      showIcons: true,
-                    }),
-                  }),
-
-                album.date &&
-                  language.$('releaseInfo.released', {
-                    date: language.formatDate(album.date),
-                  }),
-
-                album.hasCoverArt &&
-                album.coverArtDate &&
-                +album.coverArtDate !== +album.date &&
-                  language.$('releaseInfo.artReleased', {
-                    date: language.formatDate(album.coverArtDate),
-                  }),
-
-                albumDuration > 0 &&
-                  language.$('releaseInfo.duration', {
-                    duration: language.formatDuration(albumDuration, {
-                      approximate: album.tracks.length > 1,
-                    }),
-                  }),
-              ]),
-
-            html.tag('p',
-              {
-                [html.onlyIfContent]: true,
-                [html.joinChildren]: '<br>',
-              },
-              [
-                hasAdditionalFiles &&
-                  generateAdditionalFilesShortcut(album.additionalFiles),
-
-                checkGalleryPage(album) &&
-                  language.$('releaseInfo.viewGallery', {
-                    link: link.albumGallery(album, {
-                      text: language.$('releaseInfo.viewGallery.link'),
-                    }),
-                  }),
-
-                checkCommentaryPage(album) &&
-                  language.$('releaseInfo.viewCommentary', {
-                    link: link.albumCommentary(album, {
-                      text: language.$('releaseInfo.viewCommentary.link'),
-                    }),
-                  }),
-              ]),
-
-            !empty(album.urls) &&
-              html.tag('p',
-                language.$('releaseInfo.listenOn', {
-                  links: language.formatDisjunctionList(
-                    album.urls.map(url => fancifyURL(url, {album: true}))
-                  ),
-                })),
-
-            displayTrackSections &&
-            !empty(album.trackSections) &&
-              html.tag('dl',
-                {class: 'album-group-list'},
-                album.trackSections.flatMap(({
-                  name,
-                  startIndex,
-                  tracks,
-                }) => [
-                  html.tag('dt',
-                    {class: ['content-heading']},
-                    language.$('trackList.section.withDuration', {
-                      duration: language.formatDuration(getTotalDuration(tracks), {
-                        approximate: tracks.length > 1,
-                      }),
-                      section: name,
-                    })),
-                  html.tag('dd',
-                    html.tag(listTag,
-                      listTag === 'ol' ? {start: startIndex + 1} : {},
-                      tracks.map(trackToListItem))),
-                ])),
-
-            !displayTrackSections &&
-            !empty(album.tracks) &&
-              html.tag(listTag,
-                album.tracks.map(trackToListItem)),
-
-            html.tag('p',
-              {
-                [html.onlyIfContent]: true,
-                [html.joinChildren]: '<br>',
-              },
-              [
-                album.dateAddedToWiki &&
-                  language.$('releaseInfo.addedToWiki', {
-                    date: language.formatDate(
-                      album.dateAddedToWiki
-                    ),
-                  })
-              ]),
-
-            ...html.fragment(
-              hasAdditionalFiles && [
-                generateContentHeading({
-                  id: 'additional-files',
-                  title: language.$('releaseInfo.additionalFiles.heading', {
-                    additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
-                      unit: true,
-                    }),
-                  }),
-                }),
-
-                generateAlbumAdditionalFilesList(album, album.additionalFiles, {
-                  generateAdditionalFilesList,
-                  getSizeOfAdditionalFile,
-                  link,
-                  urls,
-                }),
-              ]),
-
-            ...html.fragment(
-              album.commentary && [
-                generateContentHeading({
-                  id: 'artist-commentary',
-                  title: language.$('releaseInfo.artistCommentary'),
-                }),
-
-                html.tag('blockquote', transformMultiline(album.commentary)),
-              ]),
-          ],
-        },
-
-        sidebarLeft: generateAlbumSidebar(album, null, {
-          fancifyURL,
-          getLinkThemeString,
-          html,
-          link,
-          language,
-          transformMultiline,
-          wikiData,
-        }),
-
-        nav: {
-          linkContainerClasses: ['nav-links-hierarchy'],
-          links: [
-            {toHome: true},
-            {
-              html: language.$('albumPage.nav.album', {
-                album: link.album(album, {class: 'current'}),
-              }),
-            },
-            {
-              divider: false,
-              html: generateAlbumNavLinks(album, null, {
-                generateNavigationLinks,
-                html,
-                language,
-                link,
-              }),
-            }
-          ],
-          content: generateAlbumChronologyLinks(album, null, {
-            generateChronologyLinks,
-            html,
-          }),
-        },
-
-        secondaryNav: generateAlbumSecondaryNav(album, null, {
-          getLinkThemeString,
-          html,
-          language,
-          link,
-        }),
-      };
-    },
   };
 
   // TODO: only gen if there are any tracks with art
