@@ -146,8 +146,9 @@ export function bindOpts(fn, bind) {
     ]);
   };
 
-  Object.defineProperty(bound, 'name', {
-    value: fn.name ? `(options-bound) ${fn.name}` : `(options-bound)`,
+  annotateFunction(bound, {
+    name: fn,
+    trait: 'options-bound',
   });
 
   for (const [key, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(fn))) {
@@ -486,4 +487,75 @@ export function decorateErrorWithIndex(fn) {
       throw error;
     }
   };
+}
+
+// Delicious function annotations, such as:
+//
+//   (*bound) soWeAreBackInTheMine
+//   (data *unfulfilled) generateShrekTwo
+//
+export function annotateFunction(fn, {
+  name: nameOrFunction = null,
+  description: newDescription,
+  trait: newTrait,
+}) {
+  let name;
+
+  if (typeof nameOrFunction === 'function') {
+    name = nameOrFunction.name;
+  } else if (typeof nameOrFunction === 'string') {
+    name = nameOrFunction;
+  }
+
+  name ??= fn.name ?? 'anonymous';
+
+  const match = name.match(/^ *(?<prefix>.*?) *\((?<description>.*)( #(?<trait>.*))?\) *(?<suffix>.*) *$/);
+
+  let prefix, suffix, description, trait;
+  if (match) {
+    ({prefix, suffix, description, trait} = match.groups);
+  }
+
+  prefix ??= '';
+  suffix ??= name;
+  description ??= '';
+  trait ??= '';
+
+  if (newDescription) {
+    if (description) {
+      description += '; ' + newDescription;
+    } else {
+      description = newDescription;
+    }
+  }
+
+  if (newTrait) {
+    if (trait) {
+      trait += ' #' + newTrait;
+    } else {
+      trait = '#' + newTrait;
+    }
+  }
+
+  let parenthesesPart;
+
+  if (description && trait) {
+    parenthesesPart = `${description} ${trait}`;
+  } else if (description || trait) {
+    parenthesesPart = description || trait;
+  } else {
+    parenthesesPart = '';
+  }
+
+  let finalName;
+
+  if (prefix && parenthesesPart) {
+    finalName = `${prefix} (${parenthesesPart}) ${suffix}`;
+  } else if (parenthesesPart) {
+    finalName = `(${parenthesesPart}) ${suffix}`;
+  } else {
+    finalName = suffix;
+  }
+
+  Object.defineProperty(fn, 'name', {value: finalName});
 }

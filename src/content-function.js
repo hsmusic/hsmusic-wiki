@@ -1,4 +1,4 @@
-import {empty} from './util/sugar.js';
+import {annotateFunction, empty} from './util/sugar.js';
 
 export default function contentFunction({
   contentDependencies = [],
@@ -54,6 +54,7 @@ export function expectDependencies({
       throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${invalidatingDependencyKeys.join(', ')}`);
     };
 
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'invalidated'});
     wrappedGenerate.fulfilled ??= false;
   }
 
@@ -62,17 +63,19 @@ export function expectDependencies({
       return generate(data, fulfilledDependencies);
     };
 
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
+    wrappedGenerate.fulfilled ??= true;
+
     wrappedGenerate.fulfill = function() {
       throw new Error(`All dependencies already fulfilled`);
     };
-
-    wrappedGenerate.fulfilled ??= true;
   }
 
   wrappedGenerate ??= function() {
     throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
   };
 
+  annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
   wrappedGenerate.fulfilled ??= false;
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
 
@@ -84,6 +87,7 @@ export function expectDependencies({
         throw new Error(`Expected call to this dependency's .data()`);
       };
 
+      annotateFunction(wrappedGenerate, {name: fulfilledDependencies[key], description: 'data only'});
       wrappedDependency.data = fulfilledDependencies[key].data;
       dataDependencies[key] = wrappedDependency;
     }
@@ -91,13 +95,17 @@ export function expectDependencies({
     wrappedGenerate.data = function(...args) {
       return data(...args, dataDependencies);
     };
+
+    annotateFunction(wrappedGenerate.data, {name: data, trait: 'fulfilled'});
   }
 
   wrappedGenerate.data ??= function() {
     throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.join(', ')}`);
   };
 
-  wrappedGenerate.fulfill ??= function(dependencies) {
+  annotateFunction(wrappedGenerate.data, {name: data, trait: 'unfulfilled'});
+
+  wrappedGenerate.fulfill ??= function fulfill(dependencies) {
     return expectDependencies({
       generate,
       data,
