@@ -258,7 +258,9 @@ decorateTime.displayTime = function () {
   }
 };
 
-export function progressPromiseAll(msgOrMsgFn, array) {
+export function progressPromiseAll(msgOrMsgFn, array, {
+  updateInterval = 1000 / 4,
+} = {}) {
   if (!array.length) {
     return Promise.resolve([]);
   }
@@ -266,34 +268,38 @@ export function progressPromiseAll(msgOrMsgFn, array) {
   const msgFn =
     typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
 
-  let done = 0,
-    total = array.length;
-  process.stdout.write(`\r${msgFn()} [0/${total}]`);
   const start = Date.now();
-  return Promise.all(
-    array.map((promise) =>
-      Promise.resolve(promise).then((val) => {
-        done++;
-        // const pc = `${done}/${total}`;
-        const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd(
-          '99.9%'.length,
-          ' '
-        );
-        if (done === total) {
-          const time = Date.now() - start;
-          process.stdout.write(
-            `\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`
-          );
-        } else {
-          process.stdout.write(`\r${msgFn()} [${pc}] `);
-        }
-        return val;
-      })
-    )
-  );
+  const total = array.length;
+  let done = 0;
+  let lastStatus = ' 0.0%';
+  let lastTime = Date.now();
+
+  // process.stdout.write(`\r${msgFn()} [0/${total}]`);
+  process.stdout.write(`\r${msgFn()} [${lastStatus}]`);
+
+  return Promise.all(array.map((promise) => Promise.resolve(promise).then((val) => {
+    done++;
+
+    // const pc = `${done}/${total}`;
+    const pc = (Math.round((done / total) * 1000) / 10 + '%')
+      .padEnd('99.9%'.length, ' ');
+
+    if (done === total) {
+      const time = Date.now() - start;
+      process.stdout.write(`\r${color.dim(`${msgFn()} [${pc}]`)} ${color.green(`Done!`)} ${color.dim(`(${time} ms)`)}\n`);
+    } else if (pc !== lastStatus && Date.now() - lastTime > updateInterval) {
+      process.stdout.write(`\r${msgFn()} [${pc}] `);
+      lastStatus = pc;
+      lastTime = Date.now();
+    }
+
+    return val;
+  })));
 }
 
-export function progressCallAll(msgOrMsgFn, array) {
+export function progressCallAll(msgOrMsgFn, array, {
+  updateInterval = 1000 / 4,
+} = {}) {
   if (!array.length) {
     return [];
   }
@@ -301,31 +307,31 @@ export function progressCallAll(msgOrMsgFn, array) {
   const msgFn =
     typeof msgOrMsgFn === 'function' ? msgOrMsgFn : () => msgOrMsgFn;
 
-  const updateInterval = 1000 / 60;
-
-  let done = 0,
-    total = array.length;
-  process.stdout.write(`\r${msgFn()} [0/${total}]`);
   const start = Date.now();
-  const vals = [];
-  let lastTime = 0;
+  const total = array.length;
+  let done = 0;
+  let lastStatus = ' 0.0%';
+  let lastTime = Date.now();
 
-  for (const fn of array) {
+  process.stdout.write(`\r${msgFn()} [${lastStatus}]`);
+
+  return array.map(fn => {
     const val = fn();
     done++;
 
+    const pc = (Math.round((done / total) * 1000) / 10 + '%')
+      .padEnd('99.9%'.length, ' ');
+
     if (done === total) {
-      const pc = '100%'.padEnd('99.9%'.length, ' ');
+      const pc = ' 100%';
       const time = Date.now() - start;
-      process.stdout.write(
-        `\r\x1b[2m${msgFn()} [${pc}] \x1b[0;32mDone! \x1b[0;2m(${time} ms) \x1b[0m\n`
-      );
-    } else if (Date.now() - lastTime >= updateInterval) {
-      const pc = (Math.round((done / total) * 1000) / 10 + '%').padEnd('99.9%'.length, ' ');
+      process.stdout.write(`\r${color.dim(`${msgFn()} [${pc}]`)} ${color.green(`Done!`)} ${color.dim(`(${time} ms)`)}\n`);
+    } else if (pc !== lastStatus &&  Date.now() - lastTime >= updateInterval) {
       process.stdout.write(`\r${msgFn()} [${pc}] `);
       lastTime = Date.now();
     }
-    vals.push(val);
+
+    return val;
   }
 
   return vals;
