@@ -26,6 +26,11 @@ export function targets({wikiData}) {
 }
 
 export const dataSteps = {
+  contentDependencies: [
+    'generateAlbumSocialEmbed',
+    'generateAlbumStylesheet',
+  ],
+
   computePathsForTarget(data, album) {
     data.hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
     data.hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);
@@ -66,8 +71,8 @@ export const dataSteps = {
       // TODO: We can't use content-unfulfilled functions here.
       // But how do we express that these need to be fulfilled
       // from within data steps?
-      data.socialEmbedData = u_generateAlbumSocialEmbed.data(album);
-      data.stylesheetData = u_generateAlbumStylesheet.data(album);
+      data.socialEmbedData = data.dependencies.generateAlbumSocialEmbed.data(album);
+      data.stylesheetData = data.dependencies.generateAlbumStylesheet.data(album);
 
       data.name = album.name;
       data.color = album.color;
@@ -144,127 +149,6 @@ export const dataSteps = {
     },
   },
 };
-
-const u_generateAlbumSocialEmbedDescription = contentFunction({
-  extraDependencies: ['language'],
-
-  data: function(album) {
-    const data = {};
-
-    const duration = getTotalDuration(album);
-
-    data.hasDuration = duration > 0;
-    data.hasTracks = album.tracks.length > 0;
-    data.hasDate = !!album.date;
-    data.hasAny = (data.hasDuration || data.hasTracks || data.hasDuration);
-
-    if (!data.hasAny)
-      return data;
-
-    if (data.hasDuration)
-      data.duration = duration;
-
-    if (data.hasTracks)
-      data.tracks = album.tracks.length;
-
-    if (data.hasDate)
-      data.date = album.date;
-
-    return data;
-  },
-
-  generate: function generateAlbumSocialEmbedDescription(data, {
-    language,
-  }) {
-    return language.formatString(
-      'albumPage.socialEmbed.body' + [
-        data.hasDuration && '.withDuration',
-        data.hasTracks && '.withTracks',
-        data.hasDate && '.withReleaseDate',
-      ].filter(Boolean).join(''),
-
-      Object.fromEntries([
-        data.hasDuration &&
-          ['duration', language.formatDuration(data.duration)],
-        data.hasTracks &&
-          ['tracks', language.countTracks(data.tracks, {unit: true})],
-        data.hasDate &&
-          ['date', language.formatDate(data.date)],
-      ].filter(Boolean)));
-  },
-});
-
-const u_generateAlbumSocialEmbed = contentFunction({
-  contentDependencies: [
-    'generateSocialEmbedDescription',
-  ],
-
-  extraDependencies: [
-    'absoluteTo',
-    'language',
-    'to',
-    'urls',
-  ],
-
-  data: function(album, {
-    generateSocialEmbedDescription,
-  }) {
-    const data = {};
-
-    data.descriptionData = generateSocialEmbedDescription.data(album);
-
-    data.hasHeading = !empty(album.groups);
-
-    if (data.hasHeading) {
-      const firstGroup = album.groups[0];
-      data.headingGroupName = firstGroup.directory;
-      data.headingGroupDirectory = firstGroup.directory;
-    }
-
-    data.albumName = album.name;
-    data.albumColor = album.color;
-
-    return data;
-  },
-
-  generate: function generateAlbumSocialEmbed(data, {
-    generateSocialEmbedDescription,
-
-    absoluteTo,
-    language,
-    to,
-    urls,
-  }) {
-    const socialEmbed = {};
-
-    if (data.hasHeading) {
-      socialEmbed.heading =
-        language.$('albumPage.socialEmbed.heading', {
-          group: data.headingGroupName,
-        });
-
-      socialEmbed.headingLink =
-        absoluteTo('localized.album', data.headingGroupDirectory);
-    } else {
-      socialEmbed.heading = '';
-      socialEmbed.headingLink = null;
-    }
-
-    socialEmbed.title =
-      language.$('albumPage.socialEmbed.title', {
-        album: data.albumName,
-      });
-
-    socialEmbed.description = generateSocialEmbedDescription(data.descriptionData);
-
-    socialEmbed.image =
-      '/' + getAlbumCover(album, {to: urls.from('shared.root').to});
-
-    socialEmbed.color = data.albumColor;
-
-    return socialEmbed;
-  },
-});
 
 const u_generateTrackListItem = contentFunction({
   contentDependencies: [
