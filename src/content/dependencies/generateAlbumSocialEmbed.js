@@ -1,21 +1,29 @@
+import {accumulateSum, empty} from '../../util/sugar.js';
+
 export default {
   contentDependencies: [
-    'generateSocialEmbedDescription',
+    'generateAlbumSocialEmbedDescription',
   ],
 
   extraDependencies: [
     'absoluteTo',
     'language',
-    'to',
     'urls',
   ],
 
-  data(album, {
-    generateSocialEmbedDescription,
-  }) {
-    const data = {};
+  relations(album) {
+    const relations = {};
 
-    data.descriptionData = generateSocialEmbedDescription.data(album);
+    relations.description = {
+      dependency: 'generateAlbumSocialEmbedDescription',
+      args: [album],
+    };
+
+    return relations;
+  },
+
+  data(album) {
+    const data = {};
 
     data.hasHeading = !empty(album.groups);
 
@@ -25,18 +33,22 @@ export default {
       data.headingGroupDirectory = firstGroup.directory;
     }
 
+    data.hasImage = album.hasCoverArt;
+
+    if (data.hasImage) {
+      data.coverArtDirectory = album.directory;
+      data.coverArtFileExtension = album.coverArtFileExtension;
+    }
+
     data.albumName = album.name;
     data.albumColor = album.color;
 
     return data;
   },
 
-  generate(data, {
-    generateSocialEmbedDescription,
-
+  generate(data, relations, {
     absoluteTo,
     language,
-    to,
     urls,
   }) {
     const socialEmbed = {};
@@ -59,10 +71,14 @@ export default {
         album: data.albumName,
       });
 
-    socialEmbed.description = generateSocialEmbedDescription(data.descriptionData);
+    socialEmbed.description = relations.description;
 
-    socialEmbed.image =
-      '/' + getAlbumCover(album, {to: urls.from('shared.root').to});
+    if (data.hasImage) {
+      const imagePath = urls
+        .from('shared.root')
+        .to('media.albumColor', data.coverArtDirectory, data.coverArtFileExtension);
+      socialEmbed.image = '/' + imagePath;
+    }
 
     socialEmbed.color = data.albumColor;
 

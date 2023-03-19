@@ -1,3 +1,5 @@
+import {empty} from '../../util/sugar.js';
+
 export default {
   extraDependencies: [
     'to',

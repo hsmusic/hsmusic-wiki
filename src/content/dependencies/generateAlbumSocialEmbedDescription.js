@@ -1,10 +1,12 @@
+import {accumulateSum} from '../../util/sugar.js';
+
 export default {
   extraDependencies: ['language'],
 
   data(album) {
     const data = {};
 
-    const duration = getTotalDuration(album);
+    const duration = accumulateSum(album.tracks, track => track.duration);
 
     data.hasDuration = duration > 0;
     data.hasTracks = album.tracks.length > 0;
