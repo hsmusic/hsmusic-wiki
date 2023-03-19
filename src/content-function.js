@@ -6,10 +6,12 @@ export default function contentFunction({
 
   data,
   generate,
+  relations,
 }) {
   return expectDependencies({
     data,
     generate,
+    relations,
 
     expectedContentDependencyKeys: contentDependencies,
     expectedExtraDependencyKeys: extraDependencies,
@@ -20,8 +22,9 @@ export default function contentFunction({
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
 export function expectDependencies({
-  generate,
   data,
+  generate,
+  relations,
 
   expectedContentDependencyKeys,
   expectedExtraDependencyKeys,
@@ -59,8 +62,12 @@ export function expectDependencies({
   }
 
   if (empty(missingContentDependencyKeys) && empty(missingExtraDependencyKeys)) {
-    wrappedGenerate ??= function(data) {
-      return generate(data, fulfilledDependencies);
+    wrappedGenerate ??= function(data, relations) {
+      if (relations) {
+        return generate(data, relations, fulfilledDependencies);
+      } else {
+        return generate(data, fulfilledDependencies);
+      }
     };
 
     annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
@@ -71,15 +78,19 @@ export function expectDependencies({
     };
   }
 
-  wrappedGenerate ??= function() {
-    throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
-  };
+  if (!wrappedGenerate) {
+    wrappedGenerate = function() {
+      throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
+    };
 
-  annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
-  wrappedGenerate.fulfilled ??= false;
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
+    wrappedGenerate.fulfilled = false;
+  }
+
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
 
   if (empty(missingContentDependencyKeys)) {
+    /*
     const dataDependencies = {};
 
     for (const key of expectedContentDependencyKeys) {
@@ -97,18 +108,26 @@ export function expectDependencies({
     };
 
     annotateFunction(wrappedGenerate.data, {name: data, trait: 'fulfilled'});
+    */
+
+    wrappedGenerate.data = data;
   }
 
-  wrappedGenerate.data ??= function() {
-    throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.join(', ')}`);
-  };
+  if (!wrappedGenerate.data) {
+    wrappedGenerate.data = function() {
+      throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.join(', ')}`);
+    };
 
-  annotateFunction(wrappedGenerate.data, {name: data, trait: 'unfulfilled'});
+    annotateFunction(wrappedGenerate.data, {name: data, trait: 'unfulfilled'});
+  }
+
+  wrappedGenerate.relations = relations;
 
   wrappedGenerate.fulfill ??= function fulfill(dependencies) {
     return expectDependencies({
-      generate,
       data,
+      generate,
+      relations,
 
       expectedContentDependencyKeys,
       expectedExtraDependencyKeys,

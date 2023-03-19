@@ -227,45 +227,6 @@ function unbound_generateCoverLink({
   ]);
 }
 
-// CSS & color shenanigans
-
-function unbound_getThemeString(color, {
-  getColors,
-
-  additionalVariables = [],
-} = {}) {
-  if (!color) return '';
-
-  const {
-    primary,
-    dark,
-    dim,
-    dimGhost,
-    bg,
-    bgBlack,
-    shadow,
-  } = getColors(color);
-
-  const variables = [
-    `--primary-color: ${primary}`,
-    `--dark-color: ${dark}`,
-    `--dim-color: ${dim}`,
-    `--dim-ghost-color: ${dimGhost}`,
-    `--bg-color: ${bg}`,
-    `--bg-black-color: ${bgBlack}`,
-    `--shadow-color: ${shadow}`,
-    ...additionalVariables,
-  ].filter(Boolean);
-
-  if (!variables.length) return '';
-
-  return [
-    `:root {`,
-    ...variables.map((line) => `    ${line};`),
-    `}`
-  ].join('\n');
-}
-
 // Divided track lists
 
 function unbound_generateTrackListDividedByGroups(tracks, {

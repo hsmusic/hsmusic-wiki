@@ -5,6 +5,12 @@ export default {
     'linkArtist',
   ],
 
+  extraDependencies: [
+    'html',
+    'iconifyURL',
+    'language',
+  ],
+
   relations(relation, contributions) {
     const relations = {};
 
