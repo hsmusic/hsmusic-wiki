@@ -150,68 +150,6 @@ export const dataSteps = {
   },
 };
 
-const u_generateTrackListItem = contentFunction({
-  contentDependencies: [
-    'generateContributionLinks',
-  ],
-
-  extraDependencies: [
-    'getLinkThemeString',
-    'html',
-    'language',
-    'link',
-  ],
-
-  data: function(track, {
-    generateContributionLinks,
-  }) {
-    return {
-      color: track.color,
-      duration: track.duration ?? 0,
-      linkData: u_link.track.data(track),
-
-      showArtists:
-        !compareArrays(
-          track.artistContribs.map(c => c.who),
-          track.album.artistContribs.map(c => c.who),
-          {checkOrder: false}),
-
-      contributionLinksData:
-        generateContributionLinks.data(track.artistContribs, {
-          showContribution: false,
-          showIcons: false,
-        }),
-    };
-  },
-
-  generate: function generateTrackListItem(data, {
-    generateContributionLinks,
-
-    getLinkThemeString,
-    html,
-    language,
-    link,
-  }) {
-    const stringOpts = {
-      duration: language.formatDuration(data.duration),
-      track: link.track(data.linkData),
-    };
-
-    return html.tag('li',
-      {style: getLinkThemeString(data.color)},
-      (!data.showArtists
-        ? language.$('trackList.item.withDuration', stringOpts)
-        : language.$('trackList.item.withDuration.withArtists', {
-            ...stringOpts,
-            by:
-              html.tag('span', {class: 'by'},
-                language.$('trackList.item.withArtists.by', {
-                  artists: generateContributionLinks(data.contributionLinksData),
-                })),
-          })));
-  },
-});
-
 /*
 const infoPage = {
   page: () => {

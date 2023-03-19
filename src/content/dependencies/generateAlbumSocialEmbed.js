@@ -11,13 +11,11 @@ export default {
     'urls',
   ],
 
-  relations(album) {
+  relations(relation, album) {
     const relations = {};
 
-    relations.description = {
-      dependency: 'generateAlbumSocialEmbedDescription',
-      args: [album],
-    };
+    relations.description =
+      relation('generateAlbumSocialEmbedDescription', album);
 
     return relations;
   },

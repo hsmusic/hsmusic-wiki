@@ -18,10 +18,6 @@ import {
   sortChronologically,
 } from './util/wiki-data.js';
 
-import contentFunction from './util/content-function.js';
-
-import u_link from './util/link.js';
-
 const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
 
 const MASTODON_DOMAINS = ['types.pl'];
@@ -79,77 +75,6 @@ function unbound_generateAdditionalFilesList(additionalFiles, {
           }))),
     ]));
 }
-
-// Artist strings
-
-export const u_generateContributionLinks = contentFunction({
-  data: function(contributions, {
-    showContribution = false,
-    showIcons = false,
-  }) {
-    return {
-      showContribution,
-      showIcons,
-
-      contributionData:
-        contributions.map(({who, what}) => ({
-          artistLinkData: u_link.artist.data(who),
-
-          hasContributionPart: !!(showContribution && what),
-          hasExternalPart: !!(showIcons && !empty(who.urls)),
-
-          artistUrls: who.urls,
-          contribution: showContribution && what,
-        })),
-    };
-  },
-
-  generate: function generateContributionLinks(data, {
-    html,
-    iconifyURL,
-    language,
-    link,
-  }) {
-    return language.formatConjunctionList(
-      data.contributionData.map(({
-        artistLinkData,
-        hasContributionPart,
-        hasExternalPart,
-        artistUrls,
-        contribution,
-      }) => {
-        const artistLink = link.artist(artistLinkData);
-
-        const externalLinks = hasExternalPart &&
-          html.tag('span',
-            {[html.noEdgeWhitespace]: true, class: 'icons'},
-            language.formatUnitList(
-              artistUrls.map(url => iconifyURL(url, {language}))));
-
-        return (
-          (hasContributionPart
-            ? (hasExternalPart
-                ? language.$('misc.artistLink.withContribution.withExternalLinks', {
-                    artist: artistLink,
-                    contrib: contribution,
-                    links: externalLinks,
-                  })
-                : language.$('misc.artistLink.withContribution', {
-                    artist: artistLink,
-                    contrib: contribution,
-                  }))
-            : (hasExternalPart
-                ? language.$('misc.artistLink.withExternalLinks', {
-                    artist: artistLink,
-                    links: externalLinks,
-                  })
-                : language.$('misc.artistLink', {
-                    artist: artistLink,
-                  })))
-        );
-      }));
-  },
-});
 
 // Chronology links
 

@@ -5,7 +5,7 @@ export default {
     'to',
   ],
 
-  data: function(album) {
+  data(album) {
     const data = {};
 
     data.hasWallpaper = !empty(album.wallpaperArtistContribs);
