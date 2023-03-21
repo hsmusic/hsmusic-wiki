@@ -100,11 +100,11 @@ test(`CacheableObject combined update & expose (no transform)`, t => {
 
   t.plan(2);
 
-  t.directory = 'the-world-revolving';
-  t.is(t.directory, 'the-world-revolving');
+  obj.directory = 'the-world-revolving';
+  t.is(obj.directory, 'the-world-revolving');
 
-  t.directory = 'chaos-king';
-  t.is(t.directory, 'chaos-king');
+  obj.directory = 'chaos-king';
+  t.is(obj.directory, 'chaos-king');
 });
 
 test(`CacheableObject combined update & expose (basic transform)`, t => {
