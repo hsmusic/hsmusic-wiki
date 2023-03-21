@@ -107,7 +107,13 @@ export class Tag {
   }
 
   set content(value) {
-    if (this.selfClosing) {
+    if (
+      this.selfClosing &&
+      !(value === null ||
+        value === undefined ||
+        !Boolean(value) ||
+        Array.isArray(value) && value.filter(Boolean).length === 0)
+    ) {
       throw new Error(`Tag <${this.tagName}> is self-closing but got content`);
     }
 
@@ -331,7 +337,7 @@ export class Attributes {
         else if (typeof val === 'number')
           return [key, val.toString(), true];
         else if (Array.isArray(val))
-          return [key, val.filter(Boolean).join(' '), keep ?? val.length > 0];
+          return [key, val.filter(Boolean).join(' '), val.length > 0];
         else
           throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
       })
