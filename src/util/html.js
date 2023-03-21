@@ -150,15 +150,14 @@ export class Tag {
 
   #setAttributeFlag(attribute, value) {
     if (value) {
-      return this.attributes[attribute] = true;
+      this.attributes.set(attribute, true);
     } else {
-      delete this.attributes[attribute];
-      return false;
+      this.attributes.remove(attribute);
     }
   }
 
   #getAttributeFlag(attribute) {
-    return !!this.attributes[attribute];
+    return !!this.attributes.get(attribute);
   }
 
   #setAttributeString(attribute, value) {
@@ -166,15 +165,15 @@ export class Tag {
     // distinctly from null/undefined.
 
     if (value === undefined || value === null) {
-      delete this.attributes[value];
+      this.attributes.remove(attribute);
       return undefined;
     } else {
-      this.attributes[value] = String(value);
+      this.attributes.set(attribute, String(value));
     }
   }
 
   #getAttributeString(attribute) {
-    const value = this.attributes[attribute];
+    const value = this.attributes.get(attribute);
 
     if (value === undefined || value === null) {
       return undefined;
@@ -293,6 +292,23 @@ export class Attributes {
 
   get attributes() {
     return this.#attributes;
+  }
+
+  set(attribute, value) {
+    if (value === null || value === undefined) {
+      this.remove(attribute);
+    } else {
+      this.#attributes[attribute] = value;
+    }
+    return value;
+  }
+
+  get(attribute) {
+    return this.#attributes[attribute];
+  }
+
+  remove(attribute) {
+    return delete this.#attributes[attribute];
   }
 
   toString() {
