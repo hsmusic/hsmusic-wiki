@@ -1,11 +1,13 @@
 import test from 'tape';
 
-import {
+import thingConstructors from '../src/data/things/index.js';
+
+const {
   Album,
   Thing,
   Track,
   TrackGroup,
-} from '../src/data/things.js';
+} = thingConstructors;
 
 function stubAlbum(tracks) {
   const album = new Album();

@@ -24,7 +24,7 @@ import {
 
   // Compositional utilities
   oneOf,
-} from '../src/data/validators.js';
+} from '../src/data/things/validators.js';
 
 function test(msg, fn) {
   _test(msg, t => {

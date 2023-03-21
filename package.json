@@ -8,7 +8,7 @@
         "hsmusic": "./src/upd8.js"
     },
     "scripts": {
-        "test": "tape test/**/*.js",
+        "test": "tape test/*.js test/**/*.js",
         "dev": "eslint src && node src/upd8.js"
     },
     "dependencies": {
