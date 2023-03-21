@@ -39,127 +39,398 @@ export const joinChildren = Symbol();
 export const noEdgeWhitespace = Symbol();
 
 export function tag(tagName, ...args) {
-  const selfClosing = selfClosingTags.includes(tagName);
-
-  let openTag;
   let content;
-  let attrs;
+  let attributes;
 
-  if (typeof args[0] === 'object' && !Array.isArray(args[0])) {
-    attrs = args[0];
+  if (
+    typeof args[0] === 'object' &&
+    !(Array.isArray(args[0]) ||
+      args[0] instanceof Tag ||
+      args[0] instanceof Template ||
+      args[0] instanceof Slot)
+  ) {
+    attributes = args[0];
     content = args[1];
   } else {
     content = args[0];
   }
 
-  if (selfClosing && content) {
-    throw new Error(`Tag <${tagName}> is self-closing but got content!`);
+  return new Tag(tagName, attributes, content);
+}
+
+export class Tag {
+  #tagName = '';
+  #content = null;
+  #attributes = null;
+
+  constructor(tagName, attributes, content) {
+    this.tagName = tagName;
+    this.attributes = attributes;
+    this.content = content;
   }
 
-  if (Array.isArray(content)) {
-    if (content.some(item => Array.isArray(item))) {
-      throw new Error(`Found array instead of string (tag) or null/falsey, did you forget to \`...\` spread an array or fragment?`);
+  set tagName(value) {
+    if (value === undefined || value === null) {
+      this.tagName = '';
+      return;
     }
 
-    const joiner = attrs?.[joinChildren];
-    content = content.filter(Boolean).join(
-      (joiner === ''
-        ? ''
-        : (joiner
-            ? `\n${joiner}\n`
-            : '\n')));
-  }
-
-  if (attrs?.[onlyIfContent] && !content) {
-    return '';
-  }
-
-  if (attrs) {
-    const attrString = attributes(attrs);
-    if (attrString) {
-      openTag = `${tagName} ${attrString}`;
+    if (typeof value !== 'string') {
+      throw new Error(`Expected tagName to be a string`);
     }
+
+    if (selfClosingTags.includes(value) && this.content.length) {
+      throw new Error(`Tag <${value}> is self-closing but this tag has content`);
+    }
+
+    this.#tagName = value;
   }
 
-  if (!openTag) {
-    openTag = tagName;
+  get tagName() {
+    return this.#tagName;
   }
 
-  if (content) {
-    if (content.includes('\n')) {
-      return [
-        `<${openTag}>`,
-        content
-          .split('\n')
-          .map((line, i) =>
-            (i === 0 && attrs?.[noEdgeWhitespace]
-              ? line
-              : '    ' + line))
-          .join('\n'),
-        `</${tagName}>`,
-      ].join(
-        (attrs?.[noEdgeWhitespace]
-          ? ''
-          : '\n'));
+  set attributes(attributes) {
+    if (attributes instanceof Attributes) {
+      this.#attributes = attributes;
     } else {
-      return `<${openTag}>${content}</${tagName}>`;
+      this.#attributes = new Attributes(attributes);
     }
-  } else if (selfClosing) {
-    return `<${openTag}>`;
-  } else {
-    return `<${openTag}></${tagName}>`;
+  }
+
+  get attributes() {
+    if (this.#attributes === null) {
+      this.attributes = {};
+    }
+
+    return this.#attributes;
+  }
+
+  set content(value) {
+    if (this.selfClosing) {
+      throw new Error(`Tag <${this.tagName}> is self-closing but got content`);
+    }
+
+    let contentArray;
+
+    if (Array.isArray(value)) {
+      contentArray = value;
+    } else {
+      contentArray = [value];
+    }
+
+    this.#content = contentArray
+      .flatMap(value => {
+        if (Array.isArray(value)) {
+          return value;
+        } else {
+          return [value];
+        }
+      })
+      .filter(Boolean);
+
+    this.#content.toString = () => this.#stringifyContent();
+  }
+
+  get content() {
+    if (this.#content === null) {
+      this.#content = [];
+    }
+
+    return this.#content;
+  }
+
+  get selfClosing() {
+    if (this.tagName) {
+      return selfClosingTags.includes(this.tagName);
+    } else {
+      return false;
+    }
+  }
+
+  #setAttributeFlag(attribute, value) {
+    if (value) {
+      return this.attributes[attribute] = true;
+    } else {
+      delete this.attributes[attribute];
+      return false;
+    }
+  }
+
+  #getAttributeFlag(attribute) {
+    return !!this.attributes[attribute];
+  }
+
+  #setAttributeString(attribute, value) {
+    // Note: This function accepts and records the empty string ('')
+    // distinctly from null/undefined.
+
+    if (value === undefined || value === null) {
+      delete this.attributes[value];
+      return undefined;
+    } else {
+      this.attributes[value] = String(value);
+    }
+  }
+
+  #getAttributeString(attribute) {
+    const value = this.attributes[attribute];
+
+    if (value === undefined || value === null) {
+      return undefined;
+    } else {
+      return String(value);
+    }
+  }
+
+  set onlyIfContent(value) {
+    this.#setAttributeFlag(onlyIfContent, value);
+  }
+
+  get onlyIfContent() {
+    return this.#getAttributeFlag(onlyIfContent);
+  }
+
+  set joinChildren(value) {
+    this.#setAttributeString(joinChildren, value);
+  }
+
+  get joinChildren() {
+    return this.#getAttributeString(joinChildren);
+  }
+
+  set noEdgeWhitespace(value) {
+    this.#setAttributeFlag(noEdgeWhitespace, value);
+  }
+
+  get noEdgeWhitespace() {
+    return this.#getAttributeFlag(noEdgeWhitespace);
+  }
+
+  toString() {
+    const attributesString = this.attributes.toString();
+    const contentString = this.content.toString();
+
+    if (this.onlyIfContent && !contentString) {
+      return '';
+    }
+
+    const openTag = (attributesString
+      ? `<${this.tagName} ${attributesString}>`
+      : `<${this.tagName}>`);
+
+    if (this.selfClosing) {
+      return openTag;
+    }
+
+    const closeTag = `</${this.tagName}>`;
+
+    if (!this.content.length) {
+      return openTag + closeTag;
+    }
+
+    if (!contentString.includes('\n')) {
+      return openTag + contentString + closeTag;
+    }
+
+    const parts = [
+      openTag,
+      contentString
+        .split('\n')
+        .map((line, i) =>
+          (i === 0 && this.noEdgeWhitespace
+            ? line
+            : '    ' + line))
+        .join('\n'),
+      closeTag,
+    ];
+
+    return parts.join(
+      (this.noEdgeWhitespace
+        ? ''
+        : '\n'));
+  }
+
+  #stringifyContent() {
+    if (this.selfClosing) {
+      return '';
+    }
+
+    const joiner =
+      (this.joinChildren === undefined
+        ? '\n'
+        : (this.joinChildren === ''
+            ? ''
+            : `\n${this.joinChildren}\n`));
+
+    return this.content
+      .map(item => item.toString())
+      .filter(Boolean)
+      .join(joiner);
   }
 }
 
-export function escapeAttributeValue(value) {
-  return value.replaceAll('"', '&quot;').replaceAll("'", '&apos;');
-}
+export class Attributes {
+  #attributes = Object.create(null);
 
-export function attributes(attribs) {
-  return Object.entries(attribs)
-    .map(([key, val]) => {
-      if (typeof val === 'undefined' || val === null)
-        return [key, val, false];
-      else if (typeof val === 'string')
-        return [key, val, true];
-      else if (typeof val === 'boolean')
-        return [key, val, val];
-      else if (typeof val === 'number')
-        return [key, val.toString(), true];
-      else if (Array.isArray(val))
-        return [key, val.filter(Boolean).join(' '), val.length > 0];
-      else
-        throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
-    })
-    .filter(([_key, _val, keep]) => keep)
-    .map(([key, val]) => {
-      switch (key) {
-        case 'href':
-          return [key, encodeURI(val)];
-        default:
+  constructor(attributes) {
+    this.attributes = attributes;
+  }
+
+  set attributes(value) {
+    if (value === undefined || value === null) {
+      this.#attributes = {};
+      return;
+    }
+
+    if (typeof value !== 'object') {
+      throw new Error(`Expected attributes to be an object`);
+    }
+
+    this.#attributes = Object.create(null);
+    Object.assign(this.#attributes, value);
+  }
+
+  get attributes() {
+    return this.#attributes;
+  }
+
+  toString() {
+    return Object.entries(this.attributes)
+      .map(([key, val]) => {
+        if (val instanceof Slot) {
+          const content = val.toString();
+          return [key, content, !!content];
+        } else {
           return [key, val];
-      }
-    })
-    .map(([key, val]) =>
-      typeof val === 'boolean'
-        ? `${key}`
-        : `${key}="${escapeAttributeValue(val)}"`
-    )
-    .join(' ');
+        }
+      })
+      .map(([key, val, keepSlot]) => {
+        if (typeof val === 'undefined' || val === null)
+          return [key, val, false];
+        else if (typeof val === 'string')
+          return [key, val, keepSlot ?? true];
+        else if (typeof val === 'boolean')
+          return [key, val, val];
+        else if (typeof val === 'number')
+          return [key, val.toString(), true];
+        else if (Array.isArray(val))
+          return [key, val.filter(Boolean).join(' '), keep ?? val.length > 0];
+        else
+          throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
+      })
+      .filter(([_key, _val, keep]) => keep)
+      .map(([key, val]) => {
+        switch (key) {
+          case 'href':
+            return [key, encodeURI(val)];
+          default:
+            return [key, val];
+        }
+      })
+      .map(([key, val]) =>
+        typeof val === 'boolean'
+          ? `${key}`
+          : `${key}="${this.#escapeAttributeValue(val)}"`
+      )
+      .join(' ');
+  }
+
+  #escapeAttributeValue(value) {
+    return value
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&apos;');
+  }
 }
 
-// Ensures the passed value is an array of elements, for usage in [...spread]
-// syntax. This may be used when it's not guaranteed whether the return value of
-// an external function is one child or an array, or in combination with
-// conditionals, e.g. fragment(cond && [x, y, z]).
-export function fragment(childOrChildren) {
-  if (!childOrChildren) {
-    return [];
+export function template(getContent) {
+  return new Template(getContent);
+}
+
+export class Template {
+  #tag = new Tag();
+  #slotContents = {};
+
+  constructor(getContent) {
+    this.#prepareContent(getContent);
   }
 
-  if (Array.isArray(childOrChildren)) {
-    return childOrChildren;
+  #prepareContent(getContent) {
+    const slotFunction = (slotName, defaultValue) => {
+      return new Slot(this, slotName, defaultValue);
+    };
+
+    this.#tag.content = getContent(slotFunction);
   }
 
-  return [childOrChildren];
+  slot(slotName, content) {
+    this.setSlot(slotName, content);
+    return this;
+  }
+
+  setSlot(slotName, content) {
+    return this.#slotContents[slotName] = new Tag(null, null, content);
+  }
+
+  getSlot(slotName) {
+    if (this.#slotContents[slotName]) {
+      return this.#slotContents[slotName];
+    } else {
+      return [];
+    }
+  }
+
+  set content(_value) {
+    throw new Error(`Template content can't be changed after constructed`);
+  }
+
+  get content() {
+    return this.#tag.content;
+  }
+
+  toString() {
+    return this.content.toString();
+  }
+}
+
+export class Slot {
+  #defaultTag = new Tag();
+
+  constructor(template, slotName, defaultContent) {
+    if (!template) {
+      throw new Error(`Expected template`);
+    }
+
+    if (typeof slotName !== 'string') {
+      throw new Error(`Expected slotName to be string, got ${slotName}`);
+    }
+
+    this.template = template;
+    this.slotName = slotName;
+    this.defaultContent = defaultContent;
+  }
+
+  set defaultContent(value) {
+    this.#defaultTag.content = value;
+  }
+
+  get defaultContent() {
+    return this.#defaultTag.content;
+  }
+
+  set content(value) {
+    // Content is stored on the template rather than the slot itself so that
+    // a given slot name can be reused (i.e. two slots can share a name and
+    // will be filled with the same value).
+    this.template.setSlot(this.slotName, value);
+  }
+
+  get content() {
+    const contentTag = this.template.getSlot(this.slotName);
+    return contentTag?.content ?? this.#defaultTag.content;
+  }
+
+  toString() {
+    return this.content.toString();
+  }
 }
