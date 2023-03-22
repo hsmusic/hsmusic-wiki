@@ -20,13 +20,7 @@ export default {
     return relations;
   },
 
-  data(album) {
-    const data = {};
-
-    return data;
-  },
-
-  generate(data, relations, {
+  generate(relations, {
     language,
   }) {
     const page = {};

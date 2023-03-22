@@ -40,42 +40,6 @@ function unbound_generateAdditionalFilesShortcut(additionalFiles, {
   });
 }
 
-function unbound_generateAdditionalFilesList(additionalFiles, {
-  html,
-  language,
-
-  getFileSize,
-  linkFile,
-}) {
-  if (empty(additionalFiles)) return [];
-
-  return html.tag('dl',
-    additionalFiles.flatMap(({title, description, files}) => [
-      html.tag('dt',
-        (description
-          ? language.$('releaseInfo.additionalFiles.entry.withDescription', {
-              title,
-              description,
-            })
-          : language.$('releaseInfo.additionalFiles.entry', {title}))),
-
-      html.tag('dd',
-        html.tag('ul',
-          files.map((file) => {
-            const size = (getFileSize && getFileSize(file));
-            return html.tag('li',
-              (size
-                ? language.$('releaseInfo.additionalFiles.file.withSize', {
-                    file: linkFile(file),
-                    size: language.formatFileSize(size),
-                  })
-                : language.$('releaseInfo.additionalFiles.file', {
-                    file: linkFile(file),
-                  })))
-          }))),
-    ]));
-}
-
 // Chronology links
 
 function unbound_generateChronologyLinks(currentThing, {
@@ -794,21 +758,6 @@ function unbound_generateNavigationLinks(current, {
 }
 
 // Sticky heading, ooooo
-
-function unbound_generateContentHeading({
-  html,
-
-  id,
-  title,
-}) {
-  return html.tag('p',
-    {
-      class: 'content-heading',
-      id,
-      tabindex: '0',
-    },
-    title);
-}
 
 function unbound_generateStickyHeadingContainer({
   html,

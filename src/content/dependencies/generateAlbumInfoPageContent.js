@@ -2,12 +2,15 @@ import {accumulateSum, empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateAlbumAdditionalFilesList',
     'generateContributionLinks',
+    'generateContentHeading',
   ],
 
   extraDependencies: [
     'html',
     'language',
+    'transformMultiline',
   ],
 
   relations(relation, album) {
@@ -31,6 +34,20 @@ export default {
     relations.bannerArtistLinks =
       contributionLinksRelation(album.bannerArtistContribs);
 
+    const contentHeadingRelation = () =>
+      relation('generateContentHeading');
+
+    if (!empty(album.additionalFiles)) {
+      relations.additionalFilesHeading =
+        contentHeadingRelation();
+
+      relations.additionalFilesList =
+        relation('generateAlbumAdditionalFilesList', album);
+    }
+
+    relations.artistCommentaryHeading =
+      contentHeadingRelation();
+
     return relations;
   },
 
@@ -49,12 +66,19 @@ export default {
       data.coverArtDate = album.coverArtDate;
     }
 
+    if (!empty(album.additionalFiles)) {
+      data.numAdditionalFiles = album.additionalFiles.length;
+    }
+
+    data.artistCommentary = album.commentary;
+
     return data;
   },
 
   generate(data, relations, {
     html,
     language,
+    transformMultiline,
   }) {
     const content = {};
 
@@ -107,109 +131,120 @@ export default {
           ]),
 
         /*
-        html.tag('p',
-          {
-            [html.onlyIfContent]: true,
-            [html.joinChildren]: '<br>',
-          },
-          [
-            hasAdditionalFiles &&
-              generateAdditionalFilesShortcut(album.additionalFiles),
-
-            checkGalleryPage(album) &&
-              language.$('releaseInfo.viewGallery', {
-                link: link.albumGallery(album, {
-                  text: language.$('releaseInfo.viewGallery.link'),
-                }),
-              }),
-
-            checkCommentaryPage(album) &&
-              language.$('releaseInfo.viewCommentary', {
-                link: link.albumCommentary(album, {
-                  text: language.$('releaseInfo.viewCommentary.link'),
-                }),
-              }),
-          ]),
-
-        !empty(album.urls) &&
           html.tag('p',
-            language.$('releaseInfo.listenOn', {
-              links: language.formatDisjunctionList(
-                album.urls.map(url => fancifyURL(url, {album: true}))
-              ),
-            })),
+            {
+              [html.onlyIfContent]: true,
+              [html.joinChildren]: '<br>',
+            },
+            [
+              hasAdditionalFiles &&
+                generateAdditionalFilesShortcut(album.additionalFiles),
 
-        displayTrackSections &&
-        !empty(album.trackSections) &&
-          html.tag('dl',
-            {class: 'album-group-list'},
-            album.trackSections.flatMap(({
-              name,
-              startIndex,
-              tracks,
-            }) => [
-              html.tag('dt',
-                {class: ['content-heading']},
-                language.$('trackList.section.withDuration', {
-                  duration: language.formatDuration(getTotalDuration(tracks), {
-                    approximate: tracks.length > 1,
+              checkGalleryPage(album) &&
+                language.$('releaseInfo.viewGallery', {
+                  link: link.albumGallery(album, {
+                    text: language.$('releaseInfo.viewGallery.link'),
                   }),
-                  section: name,
-                })),
-              html.tag('dd',
-                html.tag(listTag,
-                  listTag === 'ol' ? {start: startIndex + 1} : {},
-                  tracks.map(trackToListItem))),
-            ])),
+                }),
 
-        !displayTrackSections &&
-        !empty(album.tracks) &&
-          html.tag(listTag,
-            album.tracks.map(trackToListItem)),
+              checkCommentaryPage(album) &&
+                language.$('releaseInfo.viewCommentary', {
+                  link: link.albumCommentary(album, {
+                    text: language.$('releaseInfo.viewCommentary.link'),
+                  }),
+                }),
+            ]),
 
-        html.tag('p',
-          {
-            [html.onlyIfContent]: true,
-            [html.joinChildren]: '<br>',
-          },
-          [
-            album.dateAddedToWiki &&
-              language.$('releaseInfo.addedToWiki', {
-                date: language.formatDate(
-                  album.dateAddedToWiki
+          !empty(album.urls) &&
+            html.tag('p',
+              language.$('releaseInfo.listenOn', {
+                links: language.formatDisjunctionList(
+                  album.urls.map(url => fancifyURL(url, {album: true}))
                 ),
-              })
-          ]),
+              })),
 
-        ...html.fragment(
-          hasAdditionalFiles && [
-            generateContentHeading({
-              id: 'additional-files',
-              title: language.$('releaseInfo.additionalFiles.heading', {
-                additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
-                  unit: true,
+          displayTrackSections &&
+          !empty(album.trackSections) &&
+            html.tag('dl',
+              {class: 'album-group-list'},
+              album.trackSections.flatMap(({
+                name,
+                startIndex,
+                tracks,
+              }) => [
+                html.tag('dt',
+                  {class: ['content-heading']},
+                  language.$('trackList.section.withDuration', {
+                    duration: language.formatDuration(getTotalDuration(tracks), {
+                      approximate: tracks.length > 1,
+                    }),
+                    section: name,
+                  })),
+                html.tag('dd',
+                  html.tag(listTag,
+                    listTag === 'ol' ? {start: startIndex + 1} : {},
+                    tracks.map(trackToListItem))),
+              ])),
+
+          !displayTrackSections &&
+          !empty(album.tracks) &&
+            html.tag(listTag,
+              album.tracks.map(trackToListItem)),
+
+          html.tag('p',
+            {
+              [html.onlyIfContent]: true,
+              [html.joinChildren]: '<br>',
+            },
+            [
+              album.dateAddedToWiki &&
+                language.$('releaseInfo.addedToWiki', {
+                  date: language.formatDate(
+                    album.dateAddedToWiki
+                  ),
+                })
+            ]),
+
+          ...html.fragment(
+            hasAdditionalFiles && [
+              generateContentHeading({
+                id: 'additional-files',
+                title: language.$('releaseInfo.additionalFiles.heading', {
+                  additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
+                    unit: true,
+                  }),
                 }),
               }),
-            }),
 
-            generateAlbumAdditionalFilesList(album, album.additionalFiles, {
-              generateAdditionalFilesList,
-              getSizeOfAdditionalFile,
-              link,
-              urls,
-            }),
-          ]),
-
-        ...html.fragment(
-          album.commentary && [
-            generateContentHeading({
-              id: 'artist-commentary',
-              title: language.$('releaseInfo.artistCommentary'),
-            }),
-
-            html.tag('blockquote', transformMultiline(album.commentary)),
-          ])
+              generateAlbumAdditionalFilesList(album, album.additionalFiles, {
+                generateAdditionalFilesList,
+                getSizeOfAdditionalFile,
+                link,
+                urls,
+              }),
+            ]),
         */
+
+        relations.additionalFilesList && [
+          relations.additionalFilesHeading
+            .slot('id', 'additional-files')
+            .slot('title',
+              language.$('releaseInfo.additionalFiles.heading', {
+                additionalFiles:
+                  language.countAdditionalFiles(data.numAdditionalFiles, {unit: true}),
+              })),
+
+          relations.additionalFilesList,
+        ],
+
+        data.artistCommentary && [
+          relations.artistCommentaryHeading
+            .slot('id', 'artist-commentary')
+            .slot('title', language.$('releaseDate.artistCommentary')),
+
+          html.tag('blockquote',
+            transformMultiline(data.artistCommentary)),
+        ],
       ]
     };
 

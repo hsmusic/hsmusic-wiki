@@ -695,27 +695,4 @@ export function generateAlbumChronologyLinks(album, currentTrack, {
         })),
     ]);
 }
-
-export function generateAlbumAdditionalFilesList(album, additionalFiles, {
-  fileSize = true,
-
-  generateAdditionalFilesList,
-  getSizeOfAdditionalFile,
-  link,
-  urls,
-}) {
-  return generateAdditionalFilesList(additionalFiles, {
-    getFileSize:
-      (fileSize
-        ? (file) =>
-            // TODO: Kinda near the metal here...
-            getSizeOfAdditionalFile(
-              urls
-                .from('media.root')
-                .to('media.albumAdditionalFile', album.directory, file))
-        : () => null),
-    linkFile: (file) =>
-      link.albumAdditionalFile({album, file}),
-  });
-}
 */

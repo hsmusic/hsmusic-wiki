@@ -411,8 +411,9 @@ export class Template {
 
 export class Slot {
   #defaultTag = new Tag();
+  #handleContent = null;
 
-  constructor(template, slotName, defaultContent) {
+  constructor(template, slotName, defaultContentOrHandleContent) {
     if (!template) {
       throw new Error(`Expected template`);
     }
@@ -423,7 +424,12 @@ export class Slot {
 
     this.template = template;
     this.slotName = slotName;
-    this.defaultContent = defaultContent;
+
+    if (typeof defaultContentOrHandleContent === 'function') {
+      this.#handleContent = defaultContentOrHandleContent;
+    } else {
+      this.defaultContent = defaultContentOrHandleContent;
+    }
   }
 
   set defaultContent(value) {
@@ -447,6 +453,14 @@ export class Slot {
   }
 
   toString() {
-    return this.content.toString();
+    return this.valueOf().toString();
+  }
+
+  valueOf() {
+    if (this.#handleContent) {
+      return this.#handleContent(this.content);
+    } else {
+      return this.content;
+    }
   }
 }
