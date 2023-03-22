@@ -126,13 +126,7 @@ export class Tag {
     }
 
     this.#content = contentArray
-      .flatMap(value => {
-        if (Array.isArray(value)) {
-          return value;
-        } else {
-          return [value];
-        }
-      })
+      .flat(Infinity)
       .filter(Boolean);
 
     this.#content.toString = () => this.#stringifyContent();

@@ -4,14 +4,14 @@ import * as html from '../src/util/html.js';
 const {Tag, Attributes, Template, Slot} = html;
 
 test(`html.tag`, t => {
-  t.plan(14);
+  t.plan(16);
 
   const tag1 =
     html.tag('div',
       {[html.onlyIfContent]: true, foo: 'bar'},
       'child');
 
-  // 1-5: Basic behavior when passing attributes
+  // 1-5: basic behavior when passing attributes
   t.ok(tag1 instanceof Tag);
   t.ok(tag1.onlyIfContent);
   t.is(tag1.attributes.get('foo'), 'bar');
@@ -20,7 +20,7 @@ test(`html.tag`, t => {
 
   const tag2 = html.tag('div', ['two', 'children']);
 
-  // 6-8: Basic behavior when not passing attributes
+  // 6-8: basic behavior when not passing attributes
   t.is(tag2.content.length, 2);
   t.is(tag2.content[0], 'two');
   t.is(tag2.content[1], 'children');
@@ -32,20 +32,32 @@ test(`html.tag`, t => {
     return [];
   });
 
-  // 9-10: Tag treated as content, not attributes
+  // 9-10: tag treated as content, not attributes
   const tag3 = html.tag('div', genericTag);
   t.is(tag3.content.length, 1);
   t.is(tag3.content[0], genericTag);
 
-  // 11-12: Template treated as content, not attributes
+  // 11-12: template treated as content, not attributes
   const tag4 = html.tag('div', genericTemplate);
   t.is(tag4.content.length, 1);
   t.is(tag4.content[0], genericTemplate);
 
-  // 13-14: Slot treated as content, not attributes
+  // 13-14: slot treated as content, not attributes
   const tag5 = html.tag('div', genericSlot);
   t.is(tag5.content.length, 1);
   t.is(tag5.content[0], genericSlot);
+
+  // 15-16: deep flattening support
+  const tag6 =
+    html.tag('div', [
+      true &&
+        [[[[[[
+          true &&
+            [[[[[`That's deep.`]]]]],
+        ]]]]]],
+    ]);
+  t.is(tag6.content.length, 1);
+  t.is(tag6.content[0], `That's deep.`);
 });
 
 test(`Tag (basic interface)`, t => {
@@ -53,7 +65,7 @@ test(`Tag (basic interface)`, t => {
 
   const tag1 = new Tag();
 
-  // 1-5: Essential properties & no arguments provided
+  // 1-5: essential properties & no arguments provided
   t.is(tag1.tagName, '');
   t.ok(Array.isArray(tag1.content));
   t.is(tag1.content.length, 0);
@@ -62,7 +74,7 @@ test(`Tag (basic interface)`, t => {
 
   const tag2 = new Tag('div', {id: 'banana'}, ['one', 'two', tag1]);
 
-  // 6-11: Properties on basic usage
+  // 6-11: properties on basic usage
   t.is(tag2.tagName, 'div');
   t.is(tag2.content.length, 3);
   t.is(tag2.content[0], 'one');
