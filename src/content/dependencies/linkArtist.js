@@ -1,9 +1,8 @@
 export default {
-  data(artist) {
-    return {directory: artist.directory};
-  },
+  contentDependencies: ['linkThing'],
 
-  generate(data) {
-    return `(stub artist link: "${data.directory}")`;
-  },
+  relations: (relation, artist) =>
+    ({link: relation('linkThing', 'localized.artist', artist)}),
+
+  generate: (relations) => relations.link,
 };

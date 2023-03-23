@@ -1,4 +1,14 @@
 export default {
+  contentDependencies: [
+    'linkTemplate',
+  ],
+
+  relations(relation) {
+    return {
+      linkTemplate: relation('linkTemplate'),
+    };
+  },
+
   data(album, file) {
     return {
       albumDirectory: album.directory,
@@ -6,7 +16,9 @@ export default {
     };
   },
 
-  generate(data) {
-    return `(stub album additional file link: ${data.albumDirectory}/${data.file})`;
+  generate(data, relations) {
+    return relations.linkTemplate
+      .slot('path', ['media.albumAdditionalFile', data.albumDirectory, data.file])
+      .slot('content', data.file);
   },
 };

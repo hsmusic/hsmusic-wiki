@@ -200,3 +200,224 @@ export function fulfillDependencies({
 
   return newFulfilledDependencies;
 }
+
+export function getRelationsTree(dependencies, contentFunctionName, ...args) {
+  const relationIdentifier = Symbol('Relation');
+
+  function recursive(contentFunctionName, ...args) {
+    const contentFunction = dependencies[contentFunctionName];
+    if (!contentFunctionName) {
+      throw new Error(`Couldn't find dependency ${contentFunctionName}`);
+    }
+
+    if (!contentFunction?.relations) {
+      return null;
+    }
+
+    const relationSlots = {};
+
+    const relationSymbolMessage = (() => {
+      let num = 1;
+      return name => `#${num++} ${name}`;
+    })();
+
+    const relationFunction = (name, ...args) => {
+      const relationSymbol = Symbol(relationSymbolMessage(name));
+      relationSlots[relationSymbol] = {name, args};
+      return {[relationIdentifier]: relationSymbol};
+    };
+
+    const relationsLayout = contentFunction.relations(relationFunction, ...args);
+
+    const relationsTree = Object.fromEntries(
+      Object.getOwnPropertySymbols(relationSlots)
+        .map(symbol => [symbol, relationSlots[symbol]])
+        .map(([symbol, {name, args}]) => [
+          symbol,
+          recursive(name, ...args),
+        ]));
+
+    return {
+      layout: relationsLayout,
+      slots: relationSlots,
+      tree: relationsTree,
+    };
+  }
+
+  const relationsTree = recursive(contentFunctionName, ...args);
+
+  return {
+    root: {
+      name: contentFunctionName,
+      args,
+      relations: relationsTree?.layout,
+    },
+
+    relationIdentifier,
+    relationsTree,
+  };
+}
+
+export function flattenRelationsTree({
+  root,
+  relationIdentifier,
+  relationsTree,
+}) {
+  const flatRelationSlots = {};
+
+  function recursive({layout, slots, tree}) {
+    for (const slot of Object.getOwnPropertySymbols(slots)) {
+      if (tree[slot]) {
+        recursive(tree[slot]);
+      }
+
+      flatRelationSlots[slot] = {
+        name: slots[slot].name,
+        args: slots[slot].args,
+        relations: tree[slot]?.layout ?? null,
+      };
+    }
+  }
+
+  recursive(relationsTree);
+
+  return {
+    root,
+    relationIdentifier,
+    flatRelationSlots,
+  };
+}
+
+export function fillRelationsLayoutFromSlotResults(relationIdentifier, results, layout) {
+  function recursive(object) {
+    if (typeof object !== 'object' || object === null) {
+      return object;
+    }
+
+    if (Array.isArray(object)) {
+      return object.map(recursive);
+    }
+
+    if (relationIdentifier in object) {
+      return results[object[relationIdentifier]];
+    }
+
+    if (object.constructor !== Object) {
+      throw new Error(`Expected primitive, array, relation, or normal {key: value} style Object`);
+    }
+
+    return Object.fromEntries(
+      Object.entries(object)
+        .map(([key, value]) => [key, recursive(value)]));
+  }
+
+  return recursive(layout);
+}
+
+function getNeededContentDependencyNames(contentDependencies, name) {
+  const set = new Set();
+
+  function recursive(name) {
+    const contentFunction = contentDependencies[name];
+    for (const dependencyName of contentFunction?.contentDependencies ?? []) {
+      recursive(dependencyName);
+    }
+    set.add(name);
+  }
+
+  recursive(name);
+
+  return set;
+}
+
+export function quickEvaluate({
+  contentDependencies: allContentDependencies,
+  extraDependencies: allExtraDependencies,
+
+  name,
+  args,
+}) {
+  const treeInfo = getRelationsTree(allContentDependencies, name, ...args);
+  const flatTreeInfo = flattenRelationsTree(treeInfo);
+  const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
+
+  const neededContentDependencyNames =
+    getNeededContentDependencyNames(allContentDependencies, name);
+
+  // Content functions aren't recursive, so by following the set above
+  // sequentually, we will always provide fulfilled content functions as the
+  // dependencies for later content functions.
+  const fulfilledContentDependencies = {};
+  for (const name of neededContentDependencyNames) {
+    const unfulfilledContentFunction = allContentDependencies[name];
+    if (!unfulfilledContentFunction) continue;
+
+    const {contentDependencies, extraDependencies} = unfulfilledContentFunction;
+
+    if (empty(contentDependencies) && empty(extraDependencies)) {
+      fulfilledContentDependencies[name] = unfulfilledContentFunction;
+      continue;
+    }
+
+    const fulfillments = {};
+
+    for (const dependencyName of contentDependencies ?? []) {
+      if (dependencyName in fulfilledContentDependencies) {
+        fulfillments[dependencyName] =
+          fulfilledContentDependencies[dependencyName];
+      }
+    }
+
+    for (const dependencyName of extraDependencies ?? []) {
+      if (dependencyName in allExtraDependencies) {
+        fulfillments[dependencyName] =
+          allExtraDependencies[dependencyName];
+      }
+    }
+
+    fulfilledContentDependencies[name] =
+      unfulfilledContentFunction.fulfill(fulfillments);
+  }
+
+  // There might still be unfulfilled content functions if dependencies weren't
+  // provided as part of allContentDependencies or allExtraDependencies.
+  // Catch and report these early, together in an aggregate error.
+  const unfulfilledErrors = [];
+  for (const name of neededContentDependencyNames) {
+    const contentFunction = fulfilledContentDependencies[name];
+    if (!contentFunction) continue;
+    if (!contentFunction.fulfilled) {
+      try {
+        contentFunction();
+      } catch (error) {
+        error.message = `(${name}) ${error.message}`;
+        unfulfilledErrors.push(error);
+      }
+    }
+  }
+
+  if (!empty(unfulfilledErrors)) {
+    throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled`);
+  }
+
+  const slotResults = {};
+
+  function runContentFunction({name, args, relations}) {
+    const contentFunction = fulfilledContentDependencies[name];
+    const filledRelations =
+      fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, relations);
+
+    const generateArgs = [
+      contentFunction.data?.(...args),
+      filledRelations,
+    ].filter(Boolean);
+
+    return contentFunction(...generateArgs);
+  }
+
+  for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
+    slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
+  }
+
+  return runContentFunction(root);
+}

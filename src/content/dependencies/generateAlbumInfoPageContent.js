@@ -2,9 +2,12 @@ import {accumulateSum, empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateContributionLinks',
     'generateContentHeading',
+    'linkAlbumCommentary',
+    'linkAlbumGallery',
   ],
 
   extraDependencies: [
@@ -18,9 +21,9 @@ export default {
 
     const contributionLinksRelation = contribs =>
       relation('generateContributionLinks', contribs, {
-        showContrib: true,
+        showContribution: true,
         showIcons: true,
-      })
+      });
 
     relations.artistLinks =
       contributionLinksRelation(album.artistContribs);
@@ -37,7 +40,20 @@ export default {
     const contentHeadingRelation = () =>
       relation('generateContentHeading');
 
+    if (album.tracks.some(t => t.hasUniqueCoverArt)) {
+      relations.galleryLink =
+        relation('linkAlbumGallery', album);
+    }
+
+    if (album.commentary || album.tracks.some(t => t.commentary)) {
+      relations.commentaryLink =
+        relation('linkAlbumCommentary', album);
+    }
+
     if (!empty(album.additionalFiles)) {
+      relations.additionalFilesShortcut =
+        relation('generateAdditionalFilesShortcut', album.additionalFiles);
+
       relations.additionalFilesHeading =
         contentHeadingRelation();
 
@@ -84,29 +100,29 @@ export default {
 
     content.main = {
       headingMode: 'sticky',
-      content: [
+      content: html.tag(null, [
         html.tag('p',
           {
             [html.onlyIfContent]: true,
             [html.joinChildren]: '<br>',
           },
           [
-            !empty(relations.artistLinks) &&
+            relations.artistLinks &&
               language.$('releaseInfo.by', {
                 artists: relations.artistLinks,
               }),
 
-            !empty(relations.coverArtistLinks) &&
+            relations.coverArtistLinks &&
               language.$('releaseInfo.coverArtBy', {
                 artists: relations.coverArtistLinks,
               }),
 
-            !empty(relations.wallpaperArtistLinks) &&
+            relations.wallpaperArtistLinks &&
               language.$('releaseInfo.wallpaperArtBy', {
                 artists: relations.wallpaperArtistLinks,
               }),
 
-            !empty(relations.bannerArtistLinks) &&
+            relations.bannerArtistLinks &&
               language.$('releaseInfo.bannerArtBy', {
                 artists: relations.bannerArtistLinks,
               }),
@@ -130,31 +146,30 @@ export default {
               }),
           ]),
 
+        html.tag('p',
+          {
+            [html.onlyIfContent]: true,
+            [html.joinChildren]: html.tag('br'),
+          },
+          [
+            relations.additionalFilesShortcut,
+
+            relations.galleryLink &&
+              language.$('releaseInfo.viewGallery', {
+                link:
+                  relations.galleryLink
+                    .slot('text', language.$('releaseInfo.viewGallery.link')),
+              }),
+
+            relations.commentaryLink &&
+              language.$('releaseInfo.viewCommentary', {
+                link:
+                  relations.commentaryLink
+                    .slot('text', language.$('releaseInfo.viewCommentary.link')),
+              }),
+          ]),
+
         /*
-          html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: '<br>',
-            },
-            [
-              hasAdditionalFiles &&
-                generateAdditionalFilesShortcut(album.additionalFiles),
-
-              checkGalleryPage(album) &&
-                language.$('releaseInfo.viewGallery', {
-                  link: link.albumGallery(album, {
-                    text: language.$('releaseInfo.viewGallery.link'),
-                  }),
-                }),
-
-              checkCommentaryPage(album) &&
-                language.$('releaseInfo.viewCommentary', {
-                  link: link.albumCommentary(album, {
-                    text: language.$('releaseInfo.viewCommentary.link'),
-                  }),
-                }),
-            ]),
-
           !empty(album.urls) &&
             html.tag('p',
               language.$('releaseInfo.listenOn', {
@@ -204,25 +219,6 @@ export default {
                   ),
                 })
             ]),
-
-          ...html.fragment(
-            hasAdditionalFiles && [
-              generateContentHeading({
-                id: 'additional-files',
-                title: language.$('releaseInfo.additionalFiles.heading', {
-                  additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
-                    unit: true,
-                  }),
-                }),
-              }),
-
-              generateAlbumAdditionalFilesList(album, album.additionalFiles, {
-                generateAdditionalFilesList,
-                getSizeOfAdditionalFile,
-                link,
-                urls,
-              }),
-            ]),
         */
 
         relations.additionalFilesList && [
@@ -240,12 +236,12 @@ export default {
         data.artistCommentary && [
           relations.artistCommentaryHeading
             .slot('id', 'artist-commentary')
-            .slot('title', language.$('releaseDate.artistCommentary')),
+            .slot('title', language.$('releaseInfo.artistCommentary')),
 
           html.tag('blockquote',
             transformMultiline(data.artistCommentary)),
         ],
-      ]
+      ]),
     };
 
     return content;
