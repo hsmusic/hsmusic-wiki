@@ -214,6 +214,10 @@ export class Tag {
       return '';
     }
 
+    if (!this.tagName) {
+      return contentString;
+    }
+
     const openTag = (attributesString
       ? `<${this.tagName} ${attributesString}>`
       : `<${this.tagName}>`);
@@ -385,12 +389,17 @@ export class Template {
   }
 
   setSlot(slotName, content) {
-    return this.#slotContents[slotName] = new Tag(null, null, content);
+    if (Array.isArray(content)) {
+      this.#slotContents[slotName] = content;
+    } else {
+      this.#slotContents[slotName] = [content];
+    }
   }
 
   getSlot(slotName) {
     if (this.#slotContents[slotName]) {
-      return this.#slotContents[slotName];
+      const contents = this.#slotContents[slotName].map(item => item.valueOf());
+      return new Tag(null, null, contents).valueOf();
     } else {
       return [];
     }
@@ -458,9 +467,13 @@ export class Slot {
 
   valueOf() {
     if (this.#handleContent) {
-      return this.#handleContent(this.content);
+      const result = this.#handleContent(this.content);
+      if (result === null || result === undefined) {
+        throw new Error(`Expected function for slot ${this.slotName} to return a value, got ${result}`);
+      }
+      return result.valueOf();
     } else {
-      return this.content;
+      return this.content.valueOf();
     }
   }
 }

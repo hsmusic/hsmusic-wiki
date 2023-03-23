@@ -203,7 +203,7 @@ test(`Tag (properties from attributes - mutating)`, t => {
 });
 
 test(`Tag.toString`, t => {
-  t.plan(7);
+  t.plan(9);
 
   // 1: basic behavior
 
@@ -294,6 +294,31 @@ test(`Tag.toString`, t => {
     `    <hr style="color: magenta">\n` +
     `    <p>Shenanigans!</p>\n` +
     `</article>`);
+
+  // 8-9: empty tagName passes content through directly
+
+  const tag8 =
+    html.tag(null, [
+      html.tag('h1', `Foo`),
+      html.tag(`h2`, `Bar`),
+    ]);
+
+  t.is(tag8.toString(),
+    `<h1>Foo</h1>\n` +
+    `<h2>Bar</h2>`);
+
+  const tag9 =
+    html.tag(null, {
+      [html.joinChildren]: html.tag('br'),
+    }, [
+      `Say it with me...`,
+      `Supercalifragilisticexpialidocious!`
+    ]);
+
+  t.is(tag9.toString(),
+    `Say it with me...\n` +
+    `<br>\n` +
+    `Supercalifragilisticexpialidocious!`);
 });
 
 test(`Tag.toString (onlyIfContent)`, t => {
