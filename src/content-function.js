@@ -383,6 +383,7 @@ export function quickEvaluate({
   // provided as part of allContentDependencies or allExtraDependencies.
   // Catch and report these early, together in an aggregate error.
   const unfulfilledErrors = [];
+  const unfulfilledNames = [];
   for (const name of neededContentDependencyNames) {
     const contentFunction = fulfilledContentDependencies[name];
     if (!contentFunction) continue;
@@ -392,12 +393,13 @@ export function quickEvaluate({
       } catch (error) {
         error.message = `(${name}) ${error.message}`;
         unfulfilledErrors.push(error);
+        unfulfilledNames.push(name);
       }
     }
   }
 
   if (!empty(unfulfilledErrors)) {
-    throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled`);
+    throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled (${unfulfilledNames.join(', ')})`);
   }
 
   const slotResults = {};

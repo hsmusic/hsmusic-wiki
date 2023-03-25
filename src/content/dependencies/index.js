@@ -7,12 +7,19 @@ import contentFunction from '../../content-function.js';
 import {color, logWarn} from '../../util/cli.js';
 import {annotateFunction} from '../../util/sugar.js';
 
-export function watchContentDependencies() {
+export function watchContentDependencies({
+  logging = true,
+} = {}) {
   const events = new EventEmitter();
   const contentDependencies = {};
 
+  let emittedReady = false;
+  let initialScanComplete = false;
+  let allDependenciesFulfilled = false;
+
   Object.assign(events, {
     contentDependencies,
+    close,
   });
 
   // Watch adjacent files
@@ -32,9 +39,41 @@ export function watchContentDependencies() {
       return;
     }
     handlePathRemoved(filePath);
-  })
+  });
+
+  watcher.on('ready', () => {
+    initialScanComplete = true;
+    checkReadyConditions();
+  });
 
   return events;
+
+  async function close() {
+    return watcher.close();
+  }
+
+  function checkReadyConditions() {
+    if (emittedReady) {
+      return;
+    }
+
+    if (!initialScanComplete) {
+      return;
+    }
+
+    checkAllDependenciesFulfilled();
+
+    if (!allDependenciesFulfilled) {
+      return;
+    }
+
+    events.emit('ready');
+    emittedReady = true;
+  }
+
+  function checkAllDependenciesFulfilled() {
+    allDependenciesFulfilled = !Object.values(contentDependencies).includes(null);
+  }
 
   function getFunctionName(filePath) {
     const shortPath = path.basename(filePath);
@@ -85,24 +124,54 @@ export function watchContentDependencies() {
       }
 
       contentDependencies[functionName] = fn;
+
+      events.emit('update', functionName);
+      checkReadyConditions();
     }
 
     if (!error) {
       return true;
     }
 
-    if (contentDependencies[functionName]) {
-      logWarn`Failed to import ${functionName} - using existing version`;
-    } else {
-      logWarn`Failed to import ${functionName} - no prior version loaded`;
+    if (!(functionName in contentDependencies)) {
+      contentDependencies[functionName] = null;
     }
 
-    if (typeof error === 'string') {
-      console.error(color.yellow(error));
-    } else {
-      console.error(error);
+    events.emit('error', functionName, error);
+
+    if (logging) {
+      if (contentDependencies[functionName]) {
+        logWarn`Failed to import ${functionName} - using existing version`;
+      } else {
+        logWarn`Failed to import ${functionName} - no prior version loaded`;
+      }
+
+      if (typeof error === 'string') {
+        console.error(color.yellow(error));
+      } else {
+        console.error(error);
+      }
     }
 
     return false;
   }
+}
+
+export function quickLoadContentDependencies() {
+  return new Promise((resolve, reject) => {
+    const watcher = watchContentDependencies();
+
+    watcher.on('error', (name, error) => {
+      watcher.close().then(() => {
+        error.message = `Error loading dependency ${name}: ${error}`;
+        reject(error);
+      });
+    });
+
+    watcher.on('ready', () => {
+      watcher.close().then(() => {
+        resolve(watcher.contentDependencies);
+      });
+    });
+  });
 }
