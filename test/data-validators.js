@@ -1,4 +1,4 @@
-import _test from 'tape';
+import t from 'tap';
 import { showAggregate } from '../src/util/sugar.js';
 
 import {
@@ -26,8 +26,8 @@ import {
   oneOf,
 } from '../src/data/things/validators.js';
 
-function test(msg, fn) {
-  _test(msg, t => {
+function test(t, msg, fn) {
+  t.test(msg, t => {
     try {
       fn(t);
     } catch (error) {
@@ -39,11 +39,9 @@ function test(msg, fn) {
   });
 }
 
-test.skip = _test.skip;
-
 // Basic types
 
-test('isBoolean', t => {
+test(t, 'isBoolean', t => {
   t.plan(4);
   t.ok(isBoolean(true));
   t.ok(isBoolean(false));
@@ -51,7 +49,7 @@ test('isBoolean', t => {
   t.throws(() => isBoolean('yes'), TypeError);
 });
 
-test('isNumber', t => {
+test(t, 'isNumber', t => {
   t.plan(6);
   t.ok(isNumber(123));
   t.ok(isNumber(0.05));
@@ -61,7 +59,7 @@ test('isNumber', t => {
   t.throws(() => isNumber(true), TypeError);
 });
 
-test('isCountingNumber', t => {
+test(t, 'isCountingNumber', t => {
   t.plan(6);
   t.ok(isCountingNumber(3));
   t.ok(isCountingNumber(1));
@@ -71,14 +69,14 @@ test('isCountingNumber', t => {
   t.throws(() => isCountingNumber('612'), TypeError);
 });
 
-test('isString', t => {
+test(t, 'isString', t => {
   t.plan(3);
   t.ok(isString('hello!'));
   t.ok(isString(''));
   t.throws(() => isString(100), TypeError);
 });
 
-test('isStringNonEmpty', t => {
+test(t, 'isStringNonEmpty', t => {
   t.plan(4);
   t.ok(isStringNonEmpty('hello!'));
   t.throws(() => isStringNonEmpty(''), TypeError);
@@ -88,25 +86,25 @@ test('isStringNonEmpty', t => {
 
 // Complex types
 
-test('isArray', t => {
+test(t, 'isArray', t => {
   t.plan(3);
   t.ok(isArray([]));
   t.throws(() => isArray({}), TypeError);
   t.throws(() => isArray('1, 2, 3'), TypeError);
 });
 
-test.skip('isDate', t => {
+t.skip('isDate', t => {
   // TODO
 });
 
-test('isObject', t => {
+test(t, 'isObject', t => {
   t.plan(3);
   t.ok(isObject({}));
   t.ok(isObject([]));
   t.throws(() => isObject(null), TypeError);
 });
 
-test('validateArrayItems', t => {
+test(t, 'validateArrayItems', t => {
   t.plan(6);
 
   t.ok(validateArrayItems(isNumber)([3, 4, 5]));
@@ -119,31 +117,31 @@ test('validateArrayItems', t => {
     caughtError = err;
   }
 
-  t.isNot(caughtError, null);
-  t.true(caughtError instanceof AggregateError);
-  t.is(caughtError.errors.length, 1);
-  t.true(caughtError.errors[0] instanceof TypeError);
+  t.not(caughtError, null);
+  t.ok(caughtError instanceof AggregateError);
+  t.equal(caughtError.errors.length, 1);
+  t.ok(caughtError.errors[0] instanceof TypeError);
 });
 
 // Wiki data
 
-test.skip('isColor', t => {
+t.skip('isColor', t => {
   // TODO
 });
 
-test.skip('isCommentary', t => {
+t.skip('isCommentary', t => {
   // TODO
 });
 
-test.skip('isContribution', t => {
+t.skip('isContribution', t => {
   // TODO
 });
 
-test.skip('isContributionList', t => {
+t.skip('isContributionList', t => {
   // TODO
 });
 
-test('isDimensions', t => {
+test(t, 'isDimensions', t => {
   t.plan(6);
   t.ok(isDimensions([1, 1]));
   t.ok(isDimensions([50, 50]));
@@ -153,7 +151,7 @@ test('isDimensions', t => {
   t.throws(() => isDimensions('800x200'), TypeError);
 });
 
-test('isDirectory', t => {
+test(t, 'isDirectory', t => {
   t.plan(6);
   t.ok(isDirectory('savior-of-the-waking-world'));
   t.ok(isDirectory('MeGaLoVania'));
@@ -163,7 +161,7 @@ test('isDirectory', t => {
   t.throws(() => isDirectory('troll saint nicholas and the quest for the holy pail'), TypeError);
 });
 
-test('isDuration', t => {
+test(t, 'isDuration', t => {
   t.plan(5);
   t.ok(isDuration(60));
   t.ok(isDuration(0.02));
@@ -172,7 +170,7 @@ test('isDuration', t => {
   t.throws(() => isDuration('10:25'), TypeError);
 });
 
-test('isFileExtension', t => {
+test(t, 'isFileExtension', t => {
   t.plan(6);
   t.ok(isFileExtension('png'));
   t.ok(isFileExtension('jpg'));
@@ -182,15 +180,15 @@ test('isFileExtension', t => {
   t.throws(() => isFileExtension('just an image bro!!!!'), TypeError);
 });
 
-test.skip('isName', t => {
+t.skip('isName', t => {
   // TODO
 });
 
-test.skip('isURL', t => {
+t.skip('isURL', t => {
   // TODO
 });
 
-test('validateReference', t => {
+test(t, 'validateReference', t => {
   t.plan(16);
 
   const typeless = validateReference();
@@ -217,7 +215,7 @@ test('validateReference', t => {
   t.throws(() => typeless('album:undertale-soundtrack'));
 });
 
-test('validateReferenceList', t => {
+test(t, 'validateReferenceList', t => {
   const track = validateReferenceList('track');
   const artist = validateReferenceList('artist');
 
@@ -235,14 +233,14 @@ test('validateReferenceList', t => {
     caughtError = err;
   }
 
-  t.isNot(caughtError, null);
-  t.true(caughtError instanceof AggregateError);
-  t.is(caughtError.errors.length, 2);
-  t.true(caughtError.errors[0] instanceof TypeError);
-  t.true(caughtError.errors[1] instanceof TypeError);
+  t.not(caughtError, null);
+  t.ok(caughtError instanceof AggregateError);
+  t.equal(caughtError.errors.length, 2);
+  t.ok(caughtError.errors[0] instanceof TypeError);
+  t.ok(caughtError.errors[1] instanceof TypeError);
 });
 
-test('oneOf', t => {
+test(t, 'oneOf', t => {
   t.plan(11);
 
   const isStringOrNumber = oneOf(isString, isNumber);
@@ -267,11 +265,11 @@ test('oneOf', t => {
     caughtError = err;
   }
 
-  t.isNot(caughtError, null);
-  t.true(caughtError instanceof AggregateError);
-  t.is(caughtError.errors.length, 2);
-  t.true(caughtError.errors[0] instanceof TypeError);
-  t.is(caughtError.errors[0].check, isString);
-  t.is(caughtError.errors[1], mockError);
-  t.is(caughtError.errors[1].check, neverSucceeds);
+  t.not(caughtError, null);
+  t.ok(caughtError instanceof AggregateError);
+  t.equal(caughtError.errors.length, 2);
+  t.ok(caughtError.errors[0] instanceof TypeError);
+  t.equal(caughtError.errors[0].check, isString);
+  t.equal(caughtError.errors[1], mockError);
+  t.equal(caughtError.errors[1].check, neverSucceeds);
 });

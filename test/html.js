@@ -1,9 +1,9 @@
-import test from 'tape';
+import t from 'tap';
 
 import * as html from '../src/util/html.js';
 const {Tag, Attributes, Template, Slot} = html;
 
-test(`html.tag`, t => {
+t.test(`html.tag`, t => {
   t.plan(16);
 
   const tag1 =
@@ -14,16 +14,16 @@ test(`html.tag`, t => {
   // 1-5: basic behavior when passing attributes
   t.ok(tag1 instanceof Tag);
   t.ok(tag1.onlyIfContent);
-  t.is(tag1.attributes.get('foo'), 'bar');
-  t.is(tag1.content.length, 1);
-  t.is(tag1.content[0], 'child');
+  t.equal(tag1.attributes.get('foo'), 'bar');
+  t.equal(tag1.content.length, 1);
+  t.equal(tag1.content[0], 'child');
 
   const tag2 = html.tag('div', ['two', 'children']);
 
   // 6-8: basic behavior when not passing attributes
-  t.is(tag2.content.length, 2);
-  t.is(tag2.content[0], 'two');
-  t.is(tag2.content[1], 'children');
+  t.equal(tag2.content.length, 2);
+  t.equal(tag2.content[0], 'two');
+  t.equal(tag2.content[1], 'children');
 
   const genericTag = html.tag('div');
   let genericSlot;
@@ -34,18 +34,18 @@ test(`html.tag`, t => {
 
   // 9-10: tag treated as content, not attributes
   const tag3 = html.tag('div', genericTag);
-  t.is(tag3.content.length, 1);
-  t.is(tag3.content[0], genericTag);
+  t.equal(tag3.content.length, 1);
+  t.equal(tag3.content[0], genericTag);
 
   // 11-12: template treated as content, not attributes
   const tag4 = html.tag('div', genericTemplate);
-  t.is(tag4.content.length, 1);
-  t.is(tag4.content[0], genericTemplate);
+  t.equal(tag4.content.length, 1);
+  t.equal(tag4.content[0], genericTemplate);
 
   // 13-14: slot treated as content, not attributes
   const tag5 = html.tag('div', genericSlot);
-  t.is(tag5.content.length, 1);
-  t.is(tag5.content[0], genericSlot);
+  t.equal(tag5.content.length, 1);
+  t.equal(tag5.content[0], genericSlot);
 
   // 15-16: deep flattening support
   const tag6 =
@@ -56,34 +56,34 @@ test(`html.tag`, t => {
             [[[[[`That's deep.`]]]]],
         ]]]]]],
     ]);
-  t.is(tag6.content.length, 1);
-  t.is(tag6.content[0], `That's deep.`);
+  t.equal(tag6.content.length, 1);
+  t.equal(tag6.content[0], `That's deep.`);
 });
 
-test(`Tag (basic interface)`, t => {
+t.test(`Tag (basic interface)`, t => {
   t.plan(11);
 
   const tag1 = new Tag();
 
   // 1-5: essential properties & no arguments provided
-  t.is(tag1.tagName, '');
+  t.equal(tag1.tagName, '');
   t.ok(Array.isArray(tag1.content));
-  t.is(tag1.content.length, 0);
+  t.equal(tag1.content.length, 0);
   t.ok(tag1.attributes instanceof Attributes);
-  t.is(tag1.attributes.toString(), '');
+  t.equal(tag1.attributes.toString(), '');
 
   const tag2 = new Tag('div', {id: 'banana'}, ['one', 'two', tag1]);
 
   // 6-11: properties on basic usage
-  t.is(tag2.tagName, 'div');
-  t.is(tag2.content.length, 3);
-  t.is(tag2.content[0], 'one');
-  t.is(tag2.content[1], 'two');
-  t.is(tag2.content[2], tag1);
-  t.is(tag2.attributes.get('id'), 'banana');
+  t.equal(tag2.tagName, 'div');
+  t.equal(tag2.content.length, 3);
+  t.equal(tag2.content[0], 'one');
+  t.equal(tag2.content[1], 'two');
+  t.equal(tag2.content[2], tag1);
+  t.equal(tag2.attributes.get('id'), 'banana');
 });
 
-test(`Tag (self-closing)`, t => {
+t.test(`Tag (self-closing)`, t => {
   t.plan(10);
 
   const tag1 = new Tag('br');
@@ -114,7 +114,7 @@ test(`Tag (self-closing)`, t => {
   t.throws(() => { tag4.tagName = 'br'; }, /self-closing/);
 });
 
-test(`Tag (properties from attributes - from constructor)`, t => {
+t.test(`Tag (properties from attributes - from constructor)`, t => {
   t.plan(6);
 
   const tag = new Tag('div', {
@@ -126,15 +126,15 @@ test(`Tag (properties from attributes - from constructor)`, t => {
   // 1-3: basic exposed properties from attributes in constructor
   t.ok(tag.onlyIfContent);
   t.ok(tag.noEdgeWhitespace);
-  t.is(tag.joinChildren, '<br>');
+  t.equal(tag.joinChildren, '<br>');
 
   // 4-6: property values stored on attributes with public symbols
-  t.is(tag.attributes.get(html.onlyIfContent), true);
-  t.is(tag.attributes.get(html.noEdgeWhitespace), true);
-  t.is(tag.attributes.get(html.joinChildren), '<br>');
+  t.equal(tag.attributes.get(html.onlyIfContent), true);
+  t.equal(tag.attributes.get(html.noEdgeWhitespace), true);
+  t.equal(tag.attributes.get(html.joinChildren), '<br>');
 });
 
-test(`Tag (properties from attributes - mutating)`, t => {
+t.test(`Tag (properties from attributes - mutating)`, t => {
   t.plan(12);
 
   // 1-3: exposed properties reflect reasonable attribute values
@@ -149,9 +149,9 @@ test(`Tag (properties from attributes - mutating)`, t => {
   tag1.attributes.remove(html.noEdgeWhitespace);
   tag1.attributes.set(html.joinChildren, '🍇');
 
-  t.is(tag1.onlyIfContent, false);
-  t.is(tag1.noEdgeWhitespace, false);
-  t.is(tag1.joinChildren, '🍇');
+  t.equal(tag1.onlyIfContent, false);
+  t.equal(tag1.noEdgeWhitespace, false);
+  t.equal(tag1.joinChildren, '🍇');
 
   // 4-6: exposed properties reflect unreasonable attribute values
 
@@ -165,9 +165,9 @@ test(`Tag (properties from attributes - mutating)`, t => {
   tag2.attributes.set(html.noEdgeWhitespace, 12345);
   tag2.attributes.set(html.joinChildren, 0.0001);
 
-  t.is(tag2.onlyIfContent, false);
-  t.is(tag2.noEdgeWhitespace, true);
-  t.is(tag2.joinChildren, '0.0001');
+  t.equal(tag2.onlyIfContent, false);
+  t.equal(tag2.noEdgeWhitespace, true);
+  t.equal(tag2.joinChildren, '0.0001');
 
   // 7-9: attribute values reflect reasonable mutated properties
 
@@ -181,9 +181,9 @@ test(`Tag (properties from attributes - mutating)`, t => {
   tag3.noEdgeWhitespace = false;
   tag3.joinChildren = '🦑';
 
-  t.is(tag3.attributes.get(html.onlyIfContent), true);
-  t.is(tag3.attributes.get(html.noEdgeWhitespace), undefined);
-  t.is(tag3.joinChildren, '🦑');
+  t.equal(tag3.attributes.get(html.onlyIfContent), true);
+  t.equal(tag3.attributes.get(html.noEdgeWhitespace), undefined);
+  t.equal(tag3.joinChildren, '🦑');
 
   // 10-12: attribute values reflect unreasonable mutated properties
 
@@ -197,12 +197,12 @@ test(`Tag (properties from attributes - mutating)`, t => {
   tag4.noEdgeWhitespace = 0;
   tag4.joinChildren = Infinity;
 
-  t.is(tag4.attributes.get(html.onlyIfContent), true);
-  t.is(tag4.attributes.get(html.noEdgeWhitespace), undefined);
-  t.is(tag4.attributes.get(html.joinChildren), 'Infinity');
+  t.equal(tag4.attributes.get(html.onlyIfContent), true);
+  t.equal(tag4.attributes.get(html.noEdgeWhitespace), undefined);
+  t.equal(tag4.attributes.get(html.joinChildren), 'Infinity');
 });
 
-test(`Tag.toString`, t => {
+t.test(`Tag.toString`, t => {
   t.plan(9);
 
   // 1: basic behavior
@@ -210,7 +210,7 @@ test(`Tag.toString`, t => {
   const tag1 =
     html.tag('div', 'Content');
 
-  t.is(tag1.toString(),
+  t.equal(tag1.toString(),
     `<div>Content</div>`);
 
   // 2: stringifies nested element
@@ -218,7 +218,7 @@ test(`Tag.toString`, t => {
   const tag2 =
     html.tag('div', html.tag('p', 'Content'));
 
-  t.is(tag2.toString(),
+  t.equal(tag2.toString(),
     `<div><p>Content</p></div>`);
 
   // 3: stringifies attributes
@@ -235,7 +235,7 @@ test(`Tag.toString`, t => {
       },
       'Content');
 
-  t.is(tag3.toString(),
+  t.equal(tag3.toString(),
     `<div id="banana" class="foo bar" contenteditable ` +
     `saying="&quot;To light a candle is to cast a shadow...&quot;" ` +
     `tabindex="413">Content</div>`);
@@ -247,7 +247,7 @@ test(`Tag.toString`, t => {
       {class: ['foo', 'bar'], id: 'banana'},
       'Content');
 
-  t.is(tag4.toString(),
+  t.equal(tag4.toString(),
     `<div class="foo bar" id="banana">Content</div>`);
 
   // 5: multiline contented indented
@@ -255,7 +255,7 @@ test(`Tag.toString`, t => {
   const tag5 =
     html.tag('div', 'foo\nbar');
 
-  t.is(tag5.toString(),
+  t.equal(tag5.toString(),
     `<div>\n` +
     `    foo\n` +
     `    bar\n` +
@@ -270,7 +270,7 @@ test(`Tag.toString`, t => {
       html.tag('span', `I'm on one line!`),
     ]);
 
-  t.is(tag6.toString(),
+  t.equal(tag6.toString(),
     `<div>\n` +
     `    <p>\n` +
     `        foo\n` +
@@ -288,7 +288,7 @@ test(`Tag.toString`, t => {
       html.tag('p', `Shenanigans!`),
     ]);
 
-  t.is(tag7.toString(),
+  t.equal(tag7.toString(),
     `<article>\n` +
     `    <h1>Title</h1>\n` +
     `    <hr style="color: magenta">\n` +
@@ -303,7 +303,7 @@ test(`Tag.toString`, t => {
       html.tag(`h2`, `Bar`),
     ]);
 
-  t.is(tag8.toString(),
+  t.equal(tag8.toString(),
     `<h1>Foo</h1>\n` +
     `<h2>Bar</h2>`);
 
@@ -315,13 +315,13 @@ test(`Tag.toString`, t => {
       `Supercalifragilisticexpialidocious!`
     ]);
 
-  t.is(tag9.toString(),
+  t.equal(tag9.toString(),
     `Say it with me...\n` +
     `<br>\n` +
     `Supercalifragilisticexpialidocious!`);
 });
 
-test(`Tag.toString (onlyIfContent)`, t => {
+t.test(`Tag.toString (onlyIfContent)`, t => {
   t.plan(4);
 
   // 1-2: basic behavior
@@ -331,7 +331,7 @@ test(`Tag.toString (onlyIfContent)`, t => {
       {[html.onlyIfContent]: true},
       `Hello!`);
 
-  t.is(tag1.toString(),
+  t.equal(tag1.toString(),
     `<div>Hello!</div>`);
 
   const tag2 =
@@ -339,7 +339,7 @@ test(`Tag.toString (onlyIfContent)`, t => {
       {[html.onlyIfContent]: true},
       '');
 
-  t.is(tag2.toString(),
+  t.equal(tag2.toString(),
     '');
 
   // 3-4: nested onlyIfContent with "more" content
@@ -358,7 +358,7 @@ test(`Tag.toString (onlyIfContent)`, t => {
         false,
       ]);
 
-  t.is(tag3.toString(),
+  t.equal(tag3.toString(),
     '');
 
   const tag4 =
@@ -374,11 +374,11 @@ test(`Tag.toString (onlyIfContent)`, t => {
         false,
       ]);
 
-  t.is(tag4.toString(),
+  t.equal(tag4.toString(),
     `<div><h1><strong></strong></h1></div>`);
 });
 
-test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
+t.test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
   t.plan(6);
 
   // 1: joinChildren: default (\n), noEdgeWhitespace: true
@@ -392,7 +392,7 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         'Baz',
       ]);
 
-  t.is(tag1.toString(),
+  t.equal(tag1.toString(),
     `<div>Foo\n` +
     `    Bar\n` +
     `    Baz</div>`);
@@ -411,7 +411,7 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         'Baz',
       ]);
 
-  t.is(tag2.toString(),
+  t.equal(tag2.toString(),
     `<div>\n` +
     `    Foo\n` +
     `    <br location="🍍">\n` +
@@ -431,7 +431,7 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         'Baz',
       ]);
 
-  t.is(tag3.toString(),
+  t.equal(tag3.toString(),
     `<div>FooBarBaz</div>`);
 
   const tag4 =
@@ -442,7 +442,7 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         `~`
       ]);
 
-  t.is(tag4.toString(),
+  t.equal(tag4.toString(),
     `<div>\n` +
     `    Ain't I\n` +
     `    a cute one?~\n` +
@@ -462,7 +462,7 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         'Baz',
       ]);
 
-  t.is(tag5.toString(),
+  t.equal(tag5.toString(),
     `<div>Foo\n` +
     `    <br>\n` +
     `    Bar\n` +
@@ -483,20 +483,20 @@ test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
         html.tag('sup', `💕`),
       ]);
 
-  t.is(tag6.toString(),
+  t.equal(tag6.toString(),
     `<span><i>Oh yes~ </i>You're a cute one<sup>💕</sup></span>`);
 });
 
-test(`Tag.toString (custom attributes)`, t => {
+t.test(`Tag.toString (custom attributes)`, t => {
   t.plan(1);
 
   t.test(`Tag.toString (custom attribute: href)`, t => {
     t.plan(2);
 
     const tag1 = html.tag('a', {href: `https://hsmusic.wiki/`});
-    t.is(tag1.toString(), `<a href="https://hsmusic.wiki/"></a>`);
+    t.equal(tag1.toString(), `<a href="https://hsmusic.wiki/"></a>`);
 
     const tag2 = html.tag('a', {href: `https://hsmusic.wiki/media/Album Booklet.pdf`});
-    t.is(tag2.toString(), `<a href="https://hsmusic.wiki/media/Album%20Booklet.pdf"></a>`);
+    t.equal(tag2.toString(), `<a href="https://hsmusic.wiki/media/Album%20Booklet.pdf"></a>`);
   });
 });

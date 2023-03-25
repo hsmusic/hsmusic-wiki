@@ -1,4 +1,4 @@
-import test from 'tape';
+import t from 'tap';
 
 import thingConstructors from '../src/data/things/index.js';
 
@@ -20,7 +20,7 @@ function stubAlbum(tracks) {
   return album;
 }
 
-test(`Track.coverArtDate`, t => {
+t.test(`Track.coverArtDate`, t => {
   t.plan(5);
 
   // Priority order is as follows, with the last (trackCoverArtDate) being
@@ -39,7 +39,7 @@ test(`Track.coverArtDate`, t => {
 
   // 1. coverArtDate defaults to null
 
-  t.is(track.coverArtDate, null);
+  t.equal(track.coverArtDate, null);
 
   // 2. coverArtDate inherits album release date
 
@@ -49,7 +49,7 @@ test(`Track.coverArtDate`, t => {
   track.albumData = [];
   track.albumData = [album];
 
-  t.is(track.coverArtDate, albumDate);
+  t.equal(track.coverArtDate, albumDate);
 
   // 3. coverArtDate inherits album trackArtDate
 
@@ -59,17 +59,17 @@ test(`Track.coverArtDate`, t => {
   track.albumData = [];
   track.albumData = [album];
 
-  t.is(track.coverArtDate, albumTrackArtDate);
+  t.equal(track.coverArtDate, albumTrackArtDate);
 
   // 4. coverArtDate is overridden dateFirstReleased
 
   track.dateFirstReleased = trackDateFirstReleased;
 
-  t.is(track.coverArtDate, trackDateFirstReleased);
+  t.equal(track.coverArtDate, trackDateFirstReleased);
 
   // 5. coverArtDate is overridden coverArtDate
 
   track.coverArtDate = trackCoverArtDate;
 
-  t.is(track.coverArtDate, trackCoverArtDate);
+  t.equal(track.coverArtDate, trackCoverArtDate);
 });

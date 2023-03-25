@@ -1,8 +1,6 @@
-import test from 'tape';
+import t from 'tap';
 
 import CacheableObject from '../src/data/things/cacheable-object.js';
-
-// Utility
 
 function newCacheableObject(PD) {
   return new (class extends CacheableObject {
@@ -10,9 +8,7 @@ function newCacheableObject(PD) {
   });
 }
 
-// Tests
-
-test(`CacheableObject simple separate update & expose`, t => {
+t.test(`CacheableObject simple separate update & expose`, t => {
   const obj = newCacheableObject({
     number: {
       flags: {
@@ -37,7 +33,7 @@ test(`CacheableObject simple separate update & expose`, t => {
   t.equal(obj.timesTwo, 10);
 });
 
-test(`CacheableObject basic cache behavior`, t => {
+t.test(`CacheableObject basic cache behavior`, t => {
   let computeCount = 0;
 
   const obj = newCacheableObject({
@@ -64,31 +60,31 @@ test(`CacheableObject basic cache behavior`, t => {
 
   t.plan(8);
 
-  t.is(computeCount, 0);
+  t.equal(computeCount, 0);
 
   obj.string = 'hello world';
-  t.is(computeCount, 0);
+  t.equal(computeCount, 0);
 
   obj.karkat;
-  t.is(computeCount, 1);
+  t.equal(computeCount, 1);
 
   obj.karkat;
-  t.is(computeCount, 1);
+  t.equal(computeCount, 1);
 
   obj.string = 'testing once again';
-  t.is(computeCount, 1);
+  t.equal(computeCount, 1);
 
   obj.karkat;
-  t.is(computeCount, 2);
+  t.equal(computeCount, 2);
 
   obj.string = 'testing once again';
-  t.is(computeCount, 2);
+  t.equal(computeCount, 2);
 
   obj.karkat;
-  t.is(computeCount, 2);
+  t.equal(computeCount, 2);
 });
 
-test(`CacheableObject combined update & expose (no transform)`, t => {
+t.test(`CacheableObject combined update & expose (no transform)`, t => {
   const obj = newCacheableObject({
     directory: {
       flags: {
@@ -101,13 +97,13 @@ test(`CacheableObject combined update & expose (no transform)`, t => {
   t.plan(2);
 
   obj.directory = 'the-world-revolving';
-  t.is(obj.directory, 'the-world-revolving');
+  t.equal(obj.directory, 'the-world-revolving');
 
   obj.directory = 'chaos-king';
-  t.is(obj.directory, 'chaos-king');
+  t.equal(obj.directory, 'chaos-king');
 });
 
-test(`CacheableObject combined update & expose (basic transform)`, t => {
+t.test(`CacheableObject combined update & expose (basic transform)`, t => {
   const obj = newCacheableObject({
     getsRepeated: {
       flags: {
@@ -124,10 +120,10 @@ test(`CacheableObject combined update & expose (basic transform)`, t => {
   t.plan(1);
 
   obj.getsRepeated = 'dog';
-  t.is(obj.getsRepeated, 'dogdog');
+  t.equal(obj.getsRepeated, 'dogdog');
 });
 
-test(`CacheableObject combined update & expose (transform with dependency)`, t => {
+t.test(`CacheableObject combined update & expose (transform with dependency)`, t => {
   const obj = newCacheableObject({
     customRepeat: {
       flags: {
@@ -152,16 +148,16 @@ test(`CacheableObject combined update & expose (transform with dependency)`, t =
 
   obj.customRepeat = 'dog';
   obj.times = 1;
-  t.is(obj.customRepeat, 'dog');
+  t.equal(obj.customRepeat, 'dog');
 
   obj.times = 5;
-  t.is(obj.customRepeat, 'dogdogdogdogdog');
+  t.equal(obj.customRepeat, 'dogdogdogdogdog');
 
   obj.customRepeat = 'cat';
-  t.is(obj.customRepeat, 'catcatcatcatcat');
+  t.equal(obj.customRepeat, 'catcatcatcatcat');
 });
 
-test(`CacheableObject validate on update`, t => {
+t.test(`CacheableObject validate on update`, t => {
   const mockError = new TypeError(`Expected a string, not ${typeof value}`);
 
   const obj = newCacheableObject({
@@ -197,7 +193,7 @@ test(`CacheableObject validate on update`, t => {
   t.plan(6);
 
   obj.directory = 'megalovania';
-  t.is(obj.directory, 'megalovania');
+  t.equal(obj.directory, 'megalovania');
 
   try {
     obj.directory = 25;
@@ -205,13 +201,13 @@ test(`CacheableObject validate on update`, t => {
     thrownError = err;
   }
 
-  t.is(thrownError, mockError);
-  t.is(obj.directory, 'megalovania');
+  t.equal(thrownError, mockError);
+  t.equal(obj.directory, 'megalovania');
 
   const date = new Date(`25 December 2009`);
 
   obj.date = date;
-  t.is(obj.date, date);
+  t.equal(obj.date, date);
 
   try {
     obj.date = `TWELFTH PERIGEE'S EVE`;
@@ -219,11 +215,11 @@ test(`CacheableObject validate on update`, t => {
     thrownError = err;
   }
 
-  t.is(thrownError?.constructor, TypeError);
-  t.is(obj.date, date);
+  t.equal(thrownError?.constructor, TypeError);
+  t.equal(obj.date, date);
 });
 
-test(`CacheableObject default update property value`, t => {
+t.test(`CacheableObject default update property value`, t => {
   const obj = newCacheableObject({
     fruit: {
       flags: {
@@ -238,10 +234,10 @@ test(`CacheableObject default update property value`, t => {
   });
 
   t.plan(1);
-  t.is(obj.fruit, 'potassium');
+  t.equal(obj.fruit, 'potassium');
 });
 
-test(`CacheableObject default property throws if invalid`, t => {
+t.test(`CacheableObject default property throws if invalid`, t => {
   const mockError = new TypeError(`Expected a string, not ${typeof value}`);
 
   t.plan(1);
@@ -270,5 +266,5 @@ test(`CacheableObject default property throws if invalid`, t => {
     thrownError = err;
   }
 
-  t.is(thrownError, mockError);
+  t.equal(thrownError, mockError);
 });
