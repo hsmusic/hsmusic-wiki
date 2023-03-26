@@ -26,7 +26,10 @@ export default {
         }
 
         if (appendIndexHTML) {
-          if (/^(?!https?:\/\/).+\/$/.test(href)) {
+          if (
+            /^(?!https?:\/\/).+\/$/.test(href) &&
+            href.endsWith('/')
+          ) {
             href += 'index.html';
           }
         }

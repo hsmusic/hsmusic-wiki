@@ -279,7 +279,9 @@ export function flattenRelationsTree({
     }
   }
 
-  recursive(relationsTree);
+  if (relationsTree) {
+    recursive(relationsTree);
+  }
 
   return {
     root,
@@ -335,7 +337,7 @@ export function quickEvaluate({
   extraDependencies: allExtraDependencies,
 
   name,
-  args,
+  args = [],
 }) {
   const treeInfo = getRelationsTree(allContentDependencies, name, ...args);
   const flatTreeInfo = flattenRelationsTree(treeInfo);
