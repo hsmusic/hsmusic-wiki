@@ -1,6 +1,6 @@
 import t from 'tap';
 
-import {testContentFunctions} from './_support.js';
+import {testContentFunctions} from '../lib/content-function.js';
 
 testContentFunctions(t, 'linkArtist', (t, evaluate) => {
   evaluate.snapshot({

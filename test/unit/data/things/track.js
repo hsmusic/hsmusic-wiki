@@ -1,6 +1,6 @@
 import t from 'tap';
 
-import thingConstructors from '../src/data/things/index.js';
+import thingConstructors from '../../../../src/data/things/index.js';
 
 const {
   Album,

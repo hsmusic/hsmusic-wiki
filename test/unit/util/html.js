@@ -1,6 +1,6 @@
 import t from 'tap';
 
-import * as html from '../src/util/html.js';
+import * as html from '../../../src/util/html.js';
 const {Tag, Attributes, Template, Slot} = html;
 
 t.test(`html.tag`, t => {

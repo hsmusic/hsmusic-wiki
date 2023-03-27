@@ -5,10 +5,10 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshots/linkArtist.js TAP linkArtist > output 1`] = `
+exports[`test/snapshot/linkArtist.js TAP linkArtist > output 1`] = `
 <a href="artist/toby-fox/">Toby Fox</a>
 `
 
-exports[`test/snapshots/linkArtist.js TAP linkArtist > output 2`] = `
+exports[`test/snapshot/linkArtist.js TAP linkArtist > output 2`] = `
 <a href="artist/55gore/">55gore</a>
 `
