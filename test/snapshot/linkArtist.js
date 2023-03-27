@@ -1,8 +1,9 @@
 import t from 'tap';
-
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'linkArtist', (t, evaluate) => {
+testContentFunctions(t, 'linkArtist', async (t, evaluate) => {
+  await evaluate.load();
+
   evaluate.snapshot({
     name: 'linkArtist',
     args: [

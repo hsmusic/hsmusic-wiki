@@ -8,7 +8,7 @@
         "hsmusic": "./src/upd8.js"
     },
     "scripts": {
-        "test": "tap test/snapshot/*.js test/unit/**/*.js",
+        "test": "tap 'test/snapshot/*.js' 'test/unit/**/*.js'",
         "dev": "eslint src && node src/upd8.js"
     },
     "dependencies": {
@@ -22,7 +22,8 @@
     "devDependencies": {
         "chokidar": "^3.5.3",
         "eslint": "^8.18.0",
-        "tap": "^16.3.4"
+        "tap": "^16.3.4",
+        "tcompare": "^6.0.0"
     },
     "tap": {
         "coverage": false,

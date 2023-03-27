@@ -8,6 +8,7 @@ import {color, logWarn} from '../../util/cli.js';
 import {annotateFunction} from '../../util/sugar.js';
 
 export function watchContentDependencies({
+  mock = null,
   logging = true,
 } = {}) {
   const events = new EventEmitter();
@@ -46,6 +47,23 @@ export function watchContentDependencies({
     checkReadyConditions();
   });
 
+  if (mock) {
+    const errors = [];
+    for (const [functionName, spec] of Object.entries(mock)) {
+      try {
+        const fn = processFunctionSpec(functionName, spec);
+        contentDependencies[functionName] = fn;
+      } catch (error) {
+        error.message = `(${functionName}) ${error.message}`;
+        errors.push(error);
+      }
+    }
+    if (errors.length) {
+      throw new AggregateError(errors, `Errors processing mocked content functions`);
+    }
+    checkReadyConditions();
+  }
+
   return events;
 
   async function close() {
@@ -81,13 +99,21 @@ export function watchContentDependencies({
     return functionName;
   }
 
+  function isMocked(functionName) {
+    return !!mock && Object.keys(mock).includes(functionName);
+  }
+
   async function handlePathRemoved(filePath) {
     const functionName = getFunctionName(filePath);
+    if (isMocked(functionName)) return;
+
     delete contentDependencies[functionName];
   }
 
   async function handlePathUpdated(filePath) {
     const functionName = getFunctionName(filePath);
+    if (isMocked(functionName)) return;
+
     let error = null;
 
     main: {
@@ -100,26 +126,11 @@ export function watchContentDependencies({
         break main;
       }
 
-      try {
-        if (typeof spec.data === 'function') {
-          annotateFunction(spec.data, {name: functionName, description: 'data'});
-        }
-
-        if (typeof spec.generate === 'function') {
-          annotateFunction(spec.generate, {name: functionName});
-        }
-      } catch (caughtError) {
-        error = caughtError;
-        error.message = `Error annotating functions: ${error.message}`;
-        break main;
-      }
-
       let fn;
       try {
-        fn = contentFunction(spec);
+        fn = processFunctionSpec(functionName, spec);
       } catch (caughtError) {
         error = caughtError;
-        error.message = `Error loading spec: ${error.message}`;
         break main;
       }
 
@@ -155,11 +166,31 @@ export function watchContentDependencies({
 
     return false;
   }
+
+  function processFunctionSpec(functionName, spec) {
+    if (typeof spec.data === 'function') {
+      annotateFunction(spec.data, {name: functionName, description: 'data'});
+    }
+
+    if (typeof spec.generate === 'function') {
+      annotateFunction(spec.generate, {name: functionName});
+    }
+
+    let fn;
+    try {
+      fn = contentFunction(spec);
+    } catch (error) {
+      error.message = `Error loading spec: ${error.message}`;
+      throw error;
+    }
+
+    return fn;
+  }
 }
 
-export function quickLoadContentDependencies() {
+export function quickLoadContentDependencies(opts) {
   return new Promise((resolve, reject) => {
-    const watcher = watchContentDependencies();
+    const watcher = watchContentDependencies(opts);
 
     watcher.on('error', (name, error) => {
       watcher.close().then(() => {

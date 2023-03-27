@@ -1,8 +1,9 @@
 import t from 'tap';
-
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'linkTemplate', (t, evaluate) => {
+testContentFunctions(t, 'linkTemplate', async (t, evaluate) => {
+  await evaluate.load();
+
   evaluate.snapshot({
     name: 'linkTemplate',
     extraDependencies: {
