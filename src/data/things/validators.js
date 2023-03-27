@@ -112,7 +112,12 @@ export function isInstance(value, constructor) {
 }
 
 export function isDate(value) {
-  return isInstance(value, Date);
+  isInstance(value, Date);
+
+  if (isNaN(value))
+    throw new TypeError(`Expected valid date`);
+
+  return true;
 }
 
 export function isObject(value) {

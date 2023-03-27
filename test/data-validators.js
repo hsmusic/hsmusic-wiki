@@ -5,6 +5,7 @@ import {
   // Basic types
   isBoolean,
   isCountingNumber,
+  isDate,
   isNumber,
   isString,
   isStringNonEmpty,
@@ -15,10 +16,16 @@ import {
   validateArrayItems,
 
   // Wiki data
+  isColor,
+  isCommentary,
+  isContribution,
+  isContributionList,
   isDimensions,
   isDirectory,
   isDuration,
   isFileExtension,
+  isName,
+  isURL,
   validateReference,
   validateReferenceList,
 
@@ -93,8 +100,11 @@ test(t, 'isArray', t => {
   t.throws(() => isArray('1, 2, 3'), TypeError);
 });
 
-t.skip('isDate', t => {
-  // TODO
+test(t, 'isDate', t => {
+  t.plan(3);
+  t.ok(isDate(new Date('2023-03-27 09:24:15')));
+  t.throws(() => isDate(new Date(Infinity)), TypeError);
+  t.throws(() => isDimensions('2023-03-27 09:24:15'), TypeError);
 });
 
 test(t, 'isObject', t => {
@@ -125,20 +135,45 @@ test(t, 'validateArrayItems', t => {
 
 // Wiki data
 
-t.skip('isColor', t => {
-  // TODO
+t.test('isColor', t => {
+  t.plan(9);
+  t.ok(isColor('#123'));
+  t.ok(isColor('#1234'));
+  t.ok(isColor('#112233'));
+  t.ok(isColor('#11223344'));
+  t.ok(isColor('#abcdef00'));
+  t.ok(isColor('#ABCDEF'));
+  t.throws(() => isColor('#ggg'), TypeError);
+  t.throws(() => isColor('red'), TypeError);
+  t.throws(() => isColor('hsl(150deg 30% 60%)'), TypeError);
 });
 
-t.skip('isCommentary', t => {
-  // TODO
+t.test('isCommentary', t => {
+  t.plan(6);
+  t.ok(isCommentary(`<i>Toby Fox:</i>\ndogsong.mp3`));
+  t.ok(isCommentary(`Technically, this works:</i>`));
+  t.ok(isCommentary(`<i><b>Whodunnit:</b></i>`));
+  t.throws(() => isCommentary(123), TypeError);
+  t.throws(() => isCommentary(``), TypeError);
+  t.throws(() => isCommentary(`<i><u>Toby Fox:</u></i>`));
 });
 
-t.skip('isContribution', t => {
-  // TODO
+t.test('isContribution', t => {
+  t.plan(4);
+  t.ok(isContribution({who: 'artist:toby-fox', what: 'Music'}));
+  t.ok(isContribution({who: 'Toby Fox'}));
+  t.throws(() => isContribution(({who: 'group:umspaf', what: 'Organizing'})),
+    {errors: /who/});
+  t.throws(() => isContribution(({who: 'artist:toby-fox', what: 123})),
+    {errors: /what/});
 });
 
-t.skip('isContributionList', t => {
-  // TODO
+t.test('isContributionList', t => {
+  t.plan(4);
+  t.ok(isContributionList([{who: 'Beavis'}, {who: 'Butthead', what: 'Wrangling'}]));
+  t.ok(isContributionList([]));
+  t.throws(() => isContributionList(2));
+  t.throws(() => isContributionList(['Charlie', 'Woodstock']));
 });
 
 test(t, 'isDimensions', t => {
@@ -180,12 +215,20 @@ test(t, 'isFileExtension', t => {
   t.throws(() => isFileExtension('just an image bro!!!!'), TypeError);
 });
 
-t.skip('isName', t => {
-  // TODO
+t.test('isName', t => {
+  t.plan(4);
+  t.ok(isName('Dogz 2.0'));
+  t.ok(isName('album:this-track-is-only-named-thusly-to-give-niklink-a-headache'));
+  t.ok(isName(''));
+  t.throws(() => isName(612));
 });
 
-t.skip('isURL', t => {
-  // TODO
+t.test('isURL', t => {
+  t.plan(4);
+  t.ok(isURL(`https://hsmusic.wiki/foo/bar/hi?baz=25#hash`));
+  t.throws(() => isURL(`/the/dog/zone/`));
+  t.throws(() => isURL(25));
+  t.throws(() => isURL(new URL(`https://hsmusic.wiki/perfectly/reasonable/`)));
 });
 
 test(t, 'validateReference', t => {
