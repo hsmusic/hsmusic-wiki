@@ -1,13 +1,19 @@
+import chroma from 'chroma-js';
+import * as path from 'path';
+import {fileURLToPath} from 'url';
+
+import mock from './generic-mock.js';
 import {quickEvaluate} from '../../src/content-function.js';
 import {quickLoadContentDependencies} from '../../src/content/dependencies/index.js';
 
-import chroma from 'chroma-js';
-import * as html from '../../src/util/html.js';
 import urlSpec from '../../src/url-spec.js';
+import * as html from '../../src/util/html.js';
+import {empty, showAggregate} from '../../src/util/sugar.js';
 import {getColors} from '../../src/util/colors.js';
 import {generateURLs} from '../../src/util/urls.js';
+import {processLanguageFile} from '../../src/data/language.js';
 
-import mock from './generic-mock.js';
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function testContentFunctions(t, message, fn) {
   const urls = generateURLs(urlSpec);
@@ -15,6 +21,7 @@ export function testContentFunctions(t, message, fn) {
   t.test(message, async t => {
     let loadedContentDependencies;
 
+    const language = await processLanguageFile('./src/strings-default.json');
     const mocks = [];
 
     const evaluate = ({
@@ -38,6 +45,7 @@ export function testContentFunctions(t, message, fn) {
           },
           extraDependencies: {
             html,
+            language,
             to,
             urls,
             appendIndexHTML: false,
@@ -74,7 +82,7 @@ export function testContentFunctions(t, message, fn) {
 
     await fn(t, evaluate);
 
-    if (mocks.length) {
+    if (!empty(mocks)) {
       cleanCatchAggregate(() => {
         const errors = [];
         for (const {close} of mocks) {
@@ -84,7 +92,7 @@ export function testContentFunctions(t, message, fn) {
             errors.push(error);
           }
         }
-        if (errors.length) {
+        if (!empty(errors)) {
           throw new AggregateError(errors, `Errors closing mocks`);
         }
       });
@@ -92,21 +100,13 @@ export function testContentFunctions(t, message, fn) {
   });
 }
 
-function cleanAggregate(error) {
-  if (error instanceof AggregateError) {
-    return new Error(`[AggregateError: ${error.message}\n${
-      error.errors
-        .map(cleanAggregate)
-        .map(err => ` * ${err.message.split('\n').map((l, i) => (i > 0 ? '   ' + l : l)).join('\n')}`)
-        .join('\n')}]`);
-  } else {
-    return error;
-  }
-}
-
 function printAggregate(error) {
   if (error instanceof AggregateError) {
-    const {message} = cleanAggregate(error);
+    const message = showAggregate(error, {
+      showTraces: true,
+      print: false,
+      pathToFileURL: f => path.relative(path.join(__dirname, '../..'), fileURLToPath(f)),
+    });
     for (const line of message.split('\n')) {
       console.error(line);
     }

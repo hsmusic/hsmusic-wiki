@@ -1,5 +1,7 @@
 import {same} from 'tcompare';
 
+import {empty} from '../../src/util/sugar.js';
+
 export default function mock(callback) {
   const mocks = [];
 
@@ -24,7 +26,7 @@ export default function mock(callback) {
           errors.push(error);
         }
       }
-      if (errors.length) {
+      if (!empty(errors)) {
         throw new AggregateError(errors, `Errors closing sub-mocks`);
       }
     },
@@ -120,8 +122,29 @@ export function mockFunction(...args) {
     return fn;
   };
 
+  fn.neverCalled = (...args) => {
+    if (!empty(args)) {
+      throw new TypeError(`Didn't expect any arguments`);
+    }
+
+    if (allCallDescriptions[0].described) {
+      throw new TypeError(`Unexpected .neverCalled() when any descriptions provided`);
+    }
+
+    limitCallCount = true;
+    allCallDescriptions.splice(0, allCallDescriptions.length);
+
+    currentCallDescription = new Proxy({}, {
+      set() {
+        throw new Error(`Unexpected description when .neverCalled() has been called`);
+      },
+    });
+
+    return fn;
+  };
+
   fn.once = (...args) => {
-    if (args.length) {
+    if (!empty(args)) {
       throw new TypeError(`Didn't expect any arguments`);
     }
 
@@ -129,6 +152,7 @@ export function mockFunction(...args) {
       throw new TypeError(`Unexpected .once() when providing multiple descriptions`);
     }
 
+    currentCallDescription.described = true;
     limitCallCount = true;
     markedAsOnce = true;
 
@@ -136,7 +160,7 @@ export function mockFunction(...args) {
   };
 
   fn.next = (...args) => {
-    if (args.length) {
+    if (!empty(args)) {
       throw new TypeError(`Didn't expect any arguments`);
     }
 
@@ -148,6 +172,7 @@ export function mockFunction(...args) {
     allCallDescriptions.push(currentCallDescription);
 
     limitCallCount = true;
+
     return fn;
   };
 
@@ -156,9 +181,9 @@ export function mockFunction(...args) {
     // call description which is being repeated.
 
     if (!(
-      typeof value === 'number' &&
-      value === parseInt(value) &&
-      value >= 2
+      typeof times === 'number' &&
+      times === parseInt(times) &&
+      times >= 2
     )) {
       throw new TypeError(`Expected whole number of at least 2`);
     }
@@ -185,6 +210,19 @@ export function mockFunction(...args) {
   return {
     value: fn,
     close: () => {
+      const totalCallCount = runningCallCount;
+      const expectedCallCount = countDescribedCalls();
+
+      if (limitCallCount && totalCallCount !== expectedCallCount) {
+        if (expectedCallCount > 1) {
+          topLevelErrors.push(new Error(`Expected ${expectedCallCount} calls, got ${totalCallCount}`));
+        } else if (expectedCallCount === 1) {
+          topLevelErrors.push(new Error(`Expected 1 call, got ${totalCallCount}`));
+        } else {
+          topLevelErrors.push(new Error(`Unexpectedly called at all`));
+        }
+      }
+
       if (topLevelErrors.length) {
         throw new AggregateError(topLevelErrors, `Errors in mock ${name}`);
       }
@@ -204,6 +242,13 @@ export function mockFunction(...args) {
     const callErrors = [];
 
     runningCallCount++;
+
+    // No further processing, this indicates the function shouldn't have been
+    // called at all and there aren't any descriptions to match this call with.
+    if (empty(allCallDescriptions)) {
+      return;
+    }
+
     const currentCallNumber = runningCallCount;
     const currentDescription = selectCallDescription(currentCallNumber);
 
@@ -212,10 +257,9 @@ export function mockFunction(...args) {
       argsPattern,
     } = currentDescription;
 
-    if (argumentCount !== null) {
-      if (args.length !== argumentCount) {
-        callErrors.push(new Error(`Argument count mismatch: expected ${argumentCount}, got ${args.length}`));
-      }
+    if (argumentCount !== null && args.length !== argumentCount) {
+      callErrors.push(
+        new Error(`Argument count mismatch: expected ${argumentCount}, got ${args.length}`));
     }
 
     if (argsPattern !== null) {
@@ -232,7 +276,7 @@ export function mockFunction(...args) {
       }
     }
 
-    if (callErrors.length) {
+    if (!empty(callErrors)) {
       const aggregate = new AggregateError(callErrors, `Errors in call #${currentCallNumber}`);
       topLevelErrors.push(aggregate);
     }
@@ -241,15 +285,8 @@ export function mockFunction(...args) {
   }
 
   function selectCallDescription(currentCallNumber) {
-    // console.log(currentCallNumber, allCallDescriptions[0]);
-
-    const lastDescription = allCallDescriptions[allCallDescriptions.length - 1];
-    const describedCount =
-      (lastDescription.described
-        ? allCallDescriptions.length
-        : allCallDescriptions.length - 1);
-
-    if (currentCallNumber > describedCount) {
+    if (currentCallNumber > countDescribedCalls()) {
+      const lastDescription = lastCallDescription();
       if (lastDescription.described) {
         return newCallDescription();
       } else {
@@ -258,5 +295,20 @@ export function mockFunction(...args) {
     } else {
       return allCallDescriptions[currentCallNumber - 1];
     }
+  }
+
+  function countDescribedCalls() {
+    if (empty(allCallDescriptions)) {
+      return 0;
+    }
+
+    return (
+      (lastCallDescription().described
+        ? allCallDescriptions.length
+        : allCallDescriptions.length - 1));
+  }
+
+  function lastCallDescription() {
+    return allCallDescriptions[allCallDescriptions.length - 1];
   }
 }

@@ -431,6 +431,7 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 export function showAggregate(topError, {
   pathToFileURL = f => f,
   showTraces = true,
+  print = true,
 } = {}) {
   const recursive = (error, {level}) => {
     let header = showTraces
@@ -475,7 +476,13 @@ export function showAggregate(topError, {
     }
   };
 
-  console.error(recursive(topError, {level: 0}));
+  const message = recursive(topError, {level: 0});
+
+  if (print) {
+    console.error(message);
+  } else {
+    return message;
+  }
 }
 
 export function decorateErrorWithIndex(fn) {
