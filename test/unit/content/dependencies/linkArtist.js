@@ -1,7 +1,7 @@
 import t from 'tap';
 import {testContentFunctions} from '../../../lib/content-function.js';
 
-testContentFunctions(t, 'linkArtist', async (t, evaluate) => {
+testContentFunctions(t, 'linkArtist (unit)', async (t, evaluate) => {
   const artistObject = {};
   const linkTemplate = {};
 
