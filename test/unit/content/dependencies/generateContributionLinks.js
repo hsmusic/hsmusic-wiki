@@ -48,13 +48,13 @@ t.test('generateContributionLinks (unit)', async t => {
             .repeat(3),
         },
 
-        generateIconForURL: {
-          data: mock.function('generateIconForURL.data', () => ({}))
+        linkExternalAsIcon: {
+          data: mock.function('linkExternalAsIcon.data', () => ({}))
             .args([artist1.urls[0]]).next()
             .args([artist3.urls[0]]).next()
             .args([artist3.urls[1]]),
 
-          generate: mock.function('generateIconForURL.generate', () => 'icon')
+          generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
             .repeat(3),
         }
       })),
@@ -89,11 +89,11 @@ t.test('generateContributionLinks (unit)', async t => {
             .repeat(3),
         },
 
-        generateIconForURL: {
-          data: mock.function('generateIconForURL.data', () => ({}))
+        linkExternalAsIcon: {
+          data: mock.function('linkExternalAsIcon.data', () => ({}))
             .neverCalled(),
 
-          generate: mock.function('generateIconForURL.generate', () => 'icon')
+          generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
             .neverCalled(),
         },
       })),

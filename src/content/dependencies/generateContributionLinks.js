@@ -3,7 +3,7 @@ import {empty} from '../../util/sugar.js';
 export default {
   contentDependencies: [
     'linkArtist',
-    'generateIconForURL',
+    'linkExternalAsIcon',
   ],
 
   extraDependencies: [
@@ -21,7 +21,7 @@ export default {
       relations.artistIcons =
         contributions.map(({who}) =>
           who.urls.map(url =>
-            relation('generateIconForURL', url)));
+            relation('linkExternalAsIcon', url)));
     }
 
     return relations;
