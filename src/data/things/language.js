@@ -252,19 +252,19 @@ export class Language extends Thing {
   // Conjunction list: A, B, and C
   formatConjunctionList(array) {
     this.assertIntlAvailable('intl_listConjunction');
-    return this.intl_listConjunction.format(array);
+    return this.intl_listConjunction.format(array.map(arr => arr.toString()));
   }
 
   // Disjunction lists: A, B, or C
   formatDisjunctionList(array) {
     this.assertIntlAvailable('intl_listDisjunction');
-    return this.intl_listDisjunction.format(array);
+    return this.intl_listDisjunction.format(array.map(arr => arr.toString()));
   }
 
   // Unit lists: A, B, C
   formatUnitList(array) {
     this.assertIntlAvailable('intl_listUnit');
-    return this.intl_listUnit.format(array);
+    return this.intl_listUnit.format(array.map(arr => arr.toString()));
   }
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
