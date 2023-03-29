@@ -1,11 +1,6 @@
-const BANDCAMP_DOMAINS = [
-  'bc.s3m.us',
-  'music.solatrux.com',
-];
-
-const MASTODON_DOMAINS = [
-  'types.pl',
-];
+// TODO: Define these as extra dependencies and pass them somewhere
+const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
+const MASTODON_DOMAINS = ['types.pl'];
 
 export default {
   extraDependencies: ['html', 'language', 'to'],
