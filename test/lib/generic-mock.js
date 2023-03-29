@@ -219,7 +219,7 @@ export function mockFunction(...args) {
         } else if (expectedCallCount === 1) {
           topLevelErrors.push(new Error(`Expected 1 call, got ${totalCallCount}`));
         } else {
-          topLevelErrors.push(new Error(`Unexpectedly called at all`));
+          topLevelErrors.push(new Error(`Expected no calls, got ${totalCallCount}`));
         }
       }
 
@@ -246,7 +246,7 @@ export function mockFunction(...args) {
     // No further processing, this indicates the function shouldn't have been
     // called at all and there aren't any descriptions to match this call with.
     if (empty(allCallDescriptions)) {
-      return;
+      return newCallDescription();
     }
 
     const currentCallNumber = runningCallCount;
