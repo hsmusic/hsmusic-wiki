@@ -398,7 +398,11 @@ export class Template {
 
   getSlot(slotName) {
     if (this.#slotContents[slotName]) {
-      const contents = this.#slotContents[slotName].map(item => item.valueOf());
+      const contents = this.#slotContents[slotName]
+        .map(item =>
+          (item === null || item === undefined
+            ? item
+            : item.valueOf()));
       return new Tag(null, null, contents).valueOf();
     } else {
       return [];
