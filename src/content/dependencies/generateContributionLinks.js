@@ -3,19 +3,26 @@ import {empty} from '../../util/sugar.js';
 export default {
   contentDependencies: [
     'linkArtist',
+    'generateIconForURL',
   ],
 
   extraDependencies: [
     'html',
-    'iconifyURL',
     'language',
   ],
 
-  relations(relation, contributions) {
+  relations(relation, contributions, {showIcons = false} = {}) {
     const relations = {};
 
     relations.artistLinks =
       contributions.map(({who}) => relation('linkArtist', who));
+
+    if (showIcons) {
+      relations.artistIcons =
+        contributions.map(({who}) =>
+          who.urls.map(url =>
+            relation('generateIconForURL', url)));
+    }
 
     return relations;
   },
@@ -23,17 +30,13 @@ export default {
   data(contributions, {
     showContribution = false,
     showIcons = false,
-  }) {
+  } = {}) {
     const data = {};
-
-    data.showContribution = showContribution;
-    data.showIcons = showIcons;
 
     data.contributionData =
       contributions.map(({who, what}) => ({
         hasContributionPart: !!(showContribution && what),
         hasExternalPart: !!(showIcons && !empty(who.urls)),
-        artistUrls: who.urls,
         contribution: showContribution && what,
       }));
 
@@ -42,23 +45,21 @@ export default {
 
   generate(data, relations, {
     html,
-    iconifyURL,
     language,
   }) {
     return language.formatConjunctionList(
       data.contributionData.map(({
         hasContributionPart,
         hasExternalPart,
-        artistUrls,
         contribution,
       }, index) => {
         const artistLink = relations.artistLinks[index];
+        const artistIcons = relations.artistIcons?.[index];
 
         const externalLinks = hasExternalPart &&
           html.tag('span',
             {[html.noEdgeWhitespace]: true, class: 'icons'},
-            language.formatUnitList(
-              artistUrls.map(url => iconifyURL(url, {language}))));
+            language.formatUnitList(artistIcons));
 
         return (
           (hasContributionPart

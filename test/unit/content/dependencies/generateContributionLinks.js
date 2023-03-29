@@ -2,28 +2,28 @@ import t from 'tap';
 import {testContentFunctions} from '../../../lib/content-function.js';
 
 t.test('generateContributionLinks (unit)', async t => {
+  const artist1 = {
+    name: 'Clark Powell',
+    urls: ['https://soundcloud.com/plazmataz'],
+  };
+
+  const artist2 = {
+    name: 'Grounder & Scratch',
+    urls: [],
+  };
+
+  const artist3 = {
+    name: 'Toby Fox',
+    urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
+  };
+
+  const contributions = [
+    {who: artist1, what: null},
+    {who: artist2, what: 'Snooping'},
+    {who: artist3, what: 'Arrangement'},
+  ];
+
   await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
-    const artist1 = {
-      name: 'Clark Powell',
-      urls: ['https://soundcloud.com/plazmataz'],
-    };
-
-    const artist2 = {
-      name: 'Grounder & Scratch',
-      urls: [],
-    };
-
-    const artist3 = {
-      name: 'Toby Fox',
-      urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
-    };
-
-    const contributions = [
-      {who: artist1, what: null},
-      {who: artist2, what: 'Snooping'},
-      {who: artist3, what: 'Arrangement'},
-    ];
-
     const config = {
       showContribution: true,
       showIcons: true,
@@ -44,46 +44,29 @@ t.test('generateContributionLinks (unit)', async t => {
 
           // This can be tweaked to return a specific (mocked) template
           // for each artist if we need to test for slots in the future.
-          generate: mock.function(() => 'artist link')
+          generate: mock.function('linkArtist.generate', () => 'artist link')
             .repeat(3),
         },
+
+        generateIconForURL: {
+          data: mock.function('generateIconForURL.data', () => ({}))
+            .args([artist1.urls[0]]).next()
+            .args([artist3.urls[0]]).next()
+            .args([artist3.urls[1]]),
+
+          generate: mock.function('generateIconForURL.generate', () => 'icon')
+            .repeat(3),
+        }
       })),
     });
 
     evaluate({
       name: 'generateContributionLinks',
       args: [contributions, config],
-      extraDependencies: evaluate.mock(mock => ({
-        iconifyURL: mock.function(() => 'icon')
-          .args([artist1.urls[0], undefined]).next()
-          .args([artist3.urls[0], undefined]).next()
-          .args([artist3.urls[1], undefined]),
-      })),
     });
   });
 
   await testContentFunctions(t, 'generateContributionLinks (unit 2)', async (t, evaluate) => {
-    const artist1 = {
-      name: 'Clark Powell',
-      urls: ['https://soundcloud.com/plazmataz'],
-    };
-
-    const artist2 = {
-      name: 'Grounder & Scratch',
-      urls: [],
-    };
-
-    const artist3 = {
-      name: 'Toby Fox',
-      urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
-    };
-
-    const contributions = [
-      {who: artist1, what: null},
-      {who: artist2, what: 'Snooping'},
-      {who: artist3, what: 'Arrangement'},
-    ];
-
     const config = {
       showContribution: false,
       showIcons: false,
@@ -105,16 +88,20 @@ t.test('generateContributionLinks (unit)', async t => {
           generate: mock.function(() => 'artist link')
             .repeat(3),
         },
+
+        generateIconForURL: {
+          data: mock.function('generateIconForURL.data', () => ({}))
+            .neverCalled(),
+
+          generate: mock.function('generateIconForURL.generate', () => 'icon')
+            .neverCalled(),
+        },
       })),
     });
 
     evaluate({
       name: 'generateContributionLinks',
       args: [contributions, config],
-      extraDependencies: evaluate.mock(mock => ({
-        iconifyURL: mock.function(() => 'icon')
-          .neverCalled(),
-      })),
     });
   });
 });
