@@ -7,6 +7,18 @@ import contentFunction from '../../content-function.js';
 import {color, logWarn} from '../../util/cli.js';
 import {annotateFunction} from '../../util/sugar.js';
 
+function cachebust(filePath) {
+  if (filePath in cachebust.cache) {
+    cachebust.cache[filePath] += 1;
+    return `${filePath}?cachebust${cachebust.cache[filePath]}`;
+  } else {
+    cachebust.cache[filePath] = 0;
+    return filePath;
+  }
+}
+
+cachebust.cache = Object.create(null);
+
 export function watchContentDependencies({
   mock = null,
   logging = true,
@@ -119,7 +131,7 @@ export function watchContentDependencies({
     main: {
       let spec;
       try {
-        spec = (await import(`${filePath}?${Date.now()}`)).default;
+        spec = (await import(cachebust(filePath))).default;
       } catch (caughtError) {
         error = caughtError;
         error.message = `Error importing: ${error.message}`;
