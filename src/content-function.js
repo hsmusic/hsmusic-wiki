@@ -339,6 +339,7 @@ export function quickEvaluate({
   name,
   args = [],
   multiple = null,
+  postprocess = null,
 }) {
   if (multiple !== null) {
     return multiple.map(opts =>
@@ -349,6 +350,7 @@ export function quickEvaluate({
         ...opts,
         name: opts.name ?? name,
         args: opts.args ?? args,
+        postprocess: opts.postprocess ?? postprocess,
       }));
   }
 
@@ -436,5 +438,11 @@ export function quickEvaluate({
     slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
   }
 
-  return runContentFunction(root);
+  const topLevelResult = runContentFunction(root);
+
+  if (postprocess !== null) {
+    return postprocess(topLevelResult);
+  } else {
+    return topLevelResult;
+  }
 }
