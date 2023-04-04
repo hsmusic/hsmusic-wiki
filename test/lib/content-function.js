@@ -70,16 +70,12 @@ export function testContentFunctions(t, message, fn) {
         throw new Error(`Await .load() before performing tests`);
       }
 
-      const [description, opts, fn] =
+      const [description, opts] =
         (typeof args[0] === 'string'
           ? args
           : ['output', ...args]);
 
       let result = evaluate(opts);
-
-      if (fn) {
-        result = fn(result);
-      }
 
       if (opts.multiple) {
         result = result.map(item => item.toString()).join('\n');
