@@ -369,7 +369,9 @@ export function template(getContent) {
 
 export class Template {
   #tag = new Tag();
+
   #slotContents = {};
+  #slotTraces = {};
 
   constructor(getContent) {
     this.#prepareContent(getContent);
@@ -394,6 +396,7 @@ export class Template {
     } else {
       this.#slotContents[slotName] = [content];
     }
+    this.#slotTraces[slotName] = getTopOfCallerTrace();
   }
 
   getSlot(slotName) {
@@ -409,6 +412,11 @@ export class Template {
     }
   }
 
+  // Dragons.
+  getSlotTrace(slotName) {
+    return this.#slotTraces[slotName] ?? '';
+  }
+
   set content(_value) {
     throw new Error(`Template content can't be changed after constructed`);
   }
@@ -422,9 +430,20 @@ export class Template {
   }
 }
 
+function getTopOfCallerTrace() {
+  const error = new Error();
+  return error.stack.split('\n')
+    .find(line => line.includes('at ') && !line.includes('/util/html.js'))
+    .replace('at ', '')
+    .trim();
+}
+
 export class Slot {
   #defaultTag = new Tag();
   #handleContent = null;
+
+  #stackIdentifier = '';
+  #stackTrace = '';
 
   constructor(template, slotName, defaultContentOrHandleContent) {
     if (!template) {
@@ -438,11 +457,43 @@ export class Slot {
     this.template = template;
     this.slotName = slotName;
 
+    this.#setupStackMutation();
+
     if (typeof defaultContentOrHandleContent === 'function') {
       this.#handleContent = defaultContentOrHandleContent;
     } else {
       this.defaultContent = defaultContentOrHandleContent;
     }
+  }
+
+  #setupStackMutation() {
+    // Here be dragons.
+
+    this.#stackIdentifier = `Slot.valueOf:${Math.floor(10000000 * Math.random())}`;
+
+    this.valueOf = () => this.constructor.prototype.valueOf.apply(this);
+    Object.defineProperty(this.valueOf, 'name', {
+      value: this.#stackIdentifier,
+    });
+
+    this.#stackTrace = getTopOfCallerTrace();
+  }
+
+  #mutateStack(error) {
+    // Splice the line marked with #stackIdentifier with a more descriptive message,
+    // and erase the line above as well because it's the trace for the constructor's
+    // valueOf().
+    const lines = error.stack.split('\n');
+    const index = lines.findIndex(line => line.includes(`at ${this.#stackIdentifier}`))
+    const setTrace = this.template.getSlotTrace(this.slotName);
+    console.log('index:', index);
+    lines.splice(
+      index - 1, 2,
+      `at Slot("${this.slotName}") (from ${this.#stackTrace})`,
+      (setTrace
+        ? `at …set from ${setTrace}`
+        : `at …left unset`));
+    error.stack = lines.join('\n');
   }
 
   set defaultContent(value) {
@@ -470,14 +521,19 @@ export class Slot {
   }
 
   valueOf() {
-    if (this.#handleContent) {
-      const result = this.#handleContent(this.content);
-      if (result === null || result === undefined) {
-        throw new Error(`Expected function for slot ${this.slotName} to return a value, got ${result}`);
+    try {
+      if (this.#handleContent) {
+        const result = this.#handleContent(this.content);
+        if (result === null || result === undefined) {
+          throw new Error(`Expected function for slot ${this.slotName} to return a value, got ${result}`);
+        }
+        return result.valueOf();
+      } else {
+        return this.content.valueOf();
       }
-      return result.valueOf();
-    } else {
-      return this.content.valueOf();
+    } catch (error) {
+      this.#mutateStack(error);
+      throw error;
     }
   }
 }
