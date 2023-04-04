@@ -51,7 +51,7 @@ export default {
 
     : domain.includes('youtu')
         ? data.type === 'album'
-          ? url.includes('list=')
+          ? data.url.includes('list=')
             ? language.$('misc.external.youtube.playlist')
             : language.$('misc.external.youtube.fullAlbum')
           : language.$('misc.external.youtube')
