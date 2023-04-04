@@ -158,14 +158,14 @@ export default {
               language.$('releaseInfo.viewGallery', {
                 link:
                   relations.galleryLink
-                    .slot('text', language.$('releaseInfo.viewGallery.link')),
+                    .slot('content', language.$('releaseInfo.viewGallery.link')),
               }),
 
             relations.commentaryLink &&
               language.$('releaseInfo.viewCommentary', {
                 link:
                   relations.commentaryLink
-                    .slot('text', language.$('releaseInfo.viewCommentary.link')),
+                    .slot('content', language.$('releaseInfo.viewCommentary.link')),
               }),
           ]),
 
