@@ -338,7 +338,20 @@ export function quickEvaluate({
 
   name,
   args = [],
+  multiple = null,
 }) {
+  if (multiple !== null) {
+    return multiple.map(opts =>
+      quickEvaluate({
+        contentDependencies: allContentDependencies,
+        extraDependencies: allExtraDependencies,
+
+        ...opts,
+        name: opts.name ?? name,
+        args: opts.args ?? args,
+      }));
+  }
+
   const treeInfo = getRelationsTree(allContentDependencies, name, ...args);
   const flatTreeInfo = flattenRelationsTree(treeInfo);
   const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
