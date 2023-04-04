@@ -8,6 +8,7 @@ export default {
     'generateContentHeading',
     'linkAlbumCommentary',
     'linkAlbumGallery',
+    'linkExternal',
   ],
 
   extraDependencies: [
@@ -48,6 +49,12 @@ export default {
     if (album.commentary || album.tracks.some(t => t.commentary)) {
       relations.commentaryLink =
         relation('linkAlbumCommentary', album);
+    }
+
+    if (!empty(album.urls)) {
+      relations.externalLinks =
+        album.urls.map(url =>
+          relation('linkExternal', url, {type: 'album'}));
     }
 
     if (!empty(album.additionalFiles)) {
@@ -168,6 +175,12 @@ export default {
                     .slot('content', language.$('releaseInfo.viewCommentary.link')),
               }),
           ]),
+
+        !empty(relations.externalLinks) &&
+          html.tag('p',
+            language.$('releaseInfo.listenOn', {
+              links: language.formatDisjunctionList(relations.externalLinks),
+            })),
 
         /*
           !empty(album.urls) &&
