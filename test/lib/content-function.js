@@ -65,13 +65,29 @@ export function testContentFunctions(t, message, fn) {
         quickLoadContentDependencies(opts));
     };
 
-    evaluate.snapshot = (opts, fn) => {
+    evaluate.snapshot = (...args) => {
       if (!loadedContentDependencies) {
         throw new Error(`Await .load() before performing tests`);
       }
 
-      const result = (fn ? fn(evaluate(opts)) : evaluate(opts));
-      t.matchSnapshot(result.toString(), 'output');
+      const [description, opts, fn] =
+        (typeof args[0] === 'string'
+          ? args
+          : ['output', ...args]);
+
+      let result = evaluate(opts);
+
+      if (fn) {
+        result = fn(result);
+      }
+
+      if (opts.multiple) {
+        result = result.map(item => item.toString()).join('\n');
+      } else {
+        result = result.toString();
+      }
+
+      t.matchSnapshot(result, description);
     };
 
     evaluate.mock = (...opts) => {
