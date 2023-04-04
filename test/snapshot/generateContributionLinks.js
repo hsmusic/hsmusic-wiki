@@ -28,22 +28,22 @@ testContentFunctions(t, 'generateContributionLinks (snapshot)', async (t, evalua
 
   await evaluate.load();
 
-  evaluate.snapshot({
+  evaluate.snapshot('showContribution & showIcons', {
     name: 'generateContributionLinks',
     args: [contributions, {showContribution: true, showIcons: true}],
   });
 
-  evaluate.snapshot({
+  evaluate.snapshot('only showContribution', {
     name: 'generateContributionLinks',
     args: [contributions, {showContribution: true, showIcons: false}],
   });
 
-  evaluate.snapshot({
+  evaluate.snapshot('only showIcons', {
     name: 'generateContributionLinks',
     args: [contributions, {showContribution: false, showIcons: true}],
   });
 
-  evaluate.snapshot({
+  evaluate.snapshot('no accents', {
     name: 'generateContributionLinks',
     args: [contributions, {showContribution: false, showIcons: false}],
   });

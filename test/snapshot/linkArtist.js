@@ -1,10 +1,10 @@
 import t from 'tap';
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'linkArtist', async (t, evaluate) => {
+testContentFunctions(t, 'linkArtist (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
-  evaluate.snapshot({
+  evaluate.snapshot('basic behavior', {
     name: 'linkArtist',
     args: [
       {
@@ -14,7 +14,7 @@ testContentFunctions(t, 'linkArtist', async (t, evaluate) => {
     ],
   });
 
-  evaluate.snapshot({
+  evaluate.snapshot('prefer short name', {
     name: 'linkArtist',
     args: [
       {

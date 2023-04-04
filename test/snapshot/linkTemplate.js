@@ -1,10 +1,10 @@
 import t from 'tap';
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'linkTemplate', async (t, evaluate) => {
+testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
-  evaluate.snapshot({
+  evaluate.snapshot('fill many slots', {
     name: 'linkTemplate',
     extraDependencies: {
       getColors: c => ({primary: c + 'ff', dim: c + '77'}),
@@ -17,7 +17,7 @@ testContentFunctions(t, 'linkTemplate', async (t, evaluate) => {
       .slot('attributes', {class: 'dog', id: 'cat1'})
       .slot('content', 'My Cool Link'));
 
-  evaluate.snapshot({
+  evaluate.snapshot('fill path slot', {
     name: 'linkTemplate',
     extraDependencies: {
       to: (...path) => '/c*lzone/' + path.join('/') + '/',

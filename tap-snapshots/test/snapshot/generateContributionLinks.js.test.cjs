@@ -5,30 +5,15 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > output 1`] = `
-<a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
-        <svg>
-            <title>SoundCloud</title>
-            <use href="static/icons.svg#icon-soundcloud"></use>
-        </svg>
-    </a></span>), <a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping), and <a href="artist/toby-fox/">Toby Fox</a> (Arrangement) (<span class="icons"><a href="https://tobyfox.bandcamp.com/" class="icon">
-        <svg>
-            <title>Bandcamp</title>
-            <use href="static/icons.svg#icon-bandcamp"></use>
-        </svg>
-    </a>, <a href="https://toby.fox/" class="icon">
-        <svg>
-            <title>External (toby.fox)</title>
-            <use href="static/icons.svg#icon-globe"></use>
-        </svg>
-    </a></span>)
+exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > no accents 1`] = `
+<a href="artist/clark-powell/">Clark Powell</a>, <a href="artist/the-big-baddies/">Grounder & Scratch</a>, and <a href="artist/toby-fox/">Toby Fox</a>
 `
 
-exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > output 2`] = `
+exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > only showContribution 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>, <a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping), and <a href="artist/toby-fox/">Toby Fox</a> (Arrangement)
 `
 
-exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > output 3`] = `
+exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > only showIcons 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
         <svg>
             <title>SoundCloud</title>
@@ -47,6 +32,21 @@ exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLink
     </a></span>)
 `
 
-exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > output 4`] = `
-<a href="artist/clark-powell/">Clark Powell</a>, <a href="artist/the-big-baddies/">Grounder & Scratch</a>, and <a href="artist/toby-fox/">Toby Fox</a>
+exports[`test/snapshot/generateContributionLinks.js TAP generateContributionLinks (snapshot) > showContribution & showIcons 1`] = `
+<a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
+        <svg>
+            <title>SoundCloud</title>
+            <use href="static/icons.svg#icon-soundcloud"></use>
+        </svg>
+    </a></span>), <a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping), and <a href="artist/toby-fox/">Toby Fox</a> (Arrangement) (<span class="icons"><a href="https://tobyfox.bandcamp.com/" class="icon">
+        <svg>
+            <title>Bandcamp</title>
+            <use href="static/icons.svg#icon-bandcamp"></use>
+        </svg>
+    </a>, <a href="https://toby.fox/" class="icon">
+        <svg>
+            <title>External (toby.fox)</title>
+            <use href="static/icons.svg#icon-globe"></use>
+        </svg>
+    </a></span>)
 `
