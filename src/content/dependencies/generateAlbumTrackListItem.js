@@ -7,7 +7,7 @@ export default {
   ],
 
   extraDependencies: [
-    'getLinkThemeString',
+    'getColors',
     'html',
     'language',
   ],
@@ -27,7 +27,7 @@ export default {
     return relations;
   },
 
-  data(track) {
+  data(track, album) {
     const data = {};
 
     data.color = track.color;
@@ -36,12 +36,14 @@ export default {
     data.showArtists =
       !compareArrays(
         track.artistContribs.map(c => c.who),
-        track.album.artistContribs.map(c => c.who),
+        album.artistContribs.map(c => c.who),
         {checkOrder: false});
+
+    return data;
   },
 
   generate(data, relations, {
-    getLinkThemeString,
+    getColors,
     html,
     language,
   }) {
@@ -50,8 +52,14 @@ export default {
       track: relations.trackLink,
     };
 
+    let style;
+    if (data.color) {
+      const {primary} = getColors(data.color);
+      style = `--primary-color: ${primary}`;
+    }
+
     return html.tag('li',
-      {style: getLinkThemeString(data.color)},
+      {style},
       (!data.showArtists
         ? language.$('trackList.item.withDuration', stringOpts)
         : language.$('trackList.item.withDuration.withArtists', {
