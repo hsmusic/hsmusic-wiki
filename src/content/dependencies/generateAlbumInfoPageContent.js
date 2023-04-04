@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
+    'generateAlbumTrackList',
     'generateContributionLinks',
     'generateContentHeading',
     'linkAlbumCommentary',
@@ -57,6 +58,8 @@ export default {
           relation('linkExternal', url, {type: 'album'}));
     }
 
+    relations.trackList = relation('generateAlbumTrackList', album);
+
     if (!empty(album.additionalFiles)) {
       relations.additionalFilesShortcut =
         relation('generateAdditionalFilesShortcut', album.additionalFiles);
@@ -93,6 +96,7 @@ export default {
       data.numAdditionalFiles = album.additionalFiles.length;
     }
 
+    data.dateAddedToWiki = album.dateAddedToWiki;
     data.artistCommentary = album.commentary;
 
     return data;
@@ -182,57 +186,19 @@ export default {
               links: language.formatDisjunctionList(relations.externalLinks),
             })),
 
-        /*
-          !empty(album.urls) &&
-            html.tag('p',
-              language.$('releaseInfo.listenOn', {
-                links: language.formatDisjunctionList(
-                  album.urls.map(url => fancifyURL(url, {album: true}))
-                ),
-              })),
+        relations.trackList,
 
-          displayTrackSections &&
-          !empty(album.trackSections) &&
-            html.tag('dl',
-              {class: 'album-group-list'},
-              album.trackSections.flatMap(({
-                name,
-                startIndex,
-                tracks,
-              }) => [
-                html.tag('dt',
-                  {class: ['content-heading']},
-                  language.$('trackList.section.withDuration', {
-                    duration: language.formatDuration(getTotalDuration(tracks), {
-                      approximate: tracks.length > 1,
-                    }),
-                    section: name,
-                  })),
-                html.tag('dd',
-                  html.tag(listTag,
-                    listTag === 'ol' ? {start: startIndex + 1} : {},
-                    tracks.map(trackToListItem))),
-              ])),
-
-          !displayTrackSections &&
-          !empty(album.tracks) &&
-            html.tag(listTag,
-              album.tracks.map(trackToListItem)),
-
-          html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: '<br>',
-            },
-            [
-              album.dateAddedToWiki &&
-                language.$('releaseInfo.addedToWiki', {
-                  date: language.formatDate(
-                    album.dateAddedToWiki
-                  ),
-                })
-            ]),
-        */
+        html.tag('p',
+          {
+            [html.onlyIfContent]: true,
+            [html.joinChildren]: '<br>',
+          },
+          [
+            data.dateAddedToWiki &&
+              language.$('releaseInfo.addedToWiki', {
+                date: language.formatDate(data.dateAddedToWiki),
+              }),
+          ]),
 
         relations.additionalFilesList && [
           relations.additionalFilesHeading
