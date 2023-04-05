@@ -121,6 +121,6 @@ export default {
       return html.tag(listTag, relations.itemsByTrack);
     }
 
-    return [];
+    return html.blank();
   }
 };

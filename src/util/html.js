@@ -38,6 +38,10 @@ export const joinChildren = Symbol();
 // or when there are multiple children.
 export const noEdgeWhitespace = Symbol();
 
+export function blank() {
+  return [];
+}
+
 export function tag(tagName, ...args) {
   let content;
   let attributes;
@@ -408,7 +412,7 @@ export class Template {
             : item.valueOf()));
       return new Tag(null, null, contents).valueOf();
     } else {
-      return [];
+      return blank();
     }
   }
 

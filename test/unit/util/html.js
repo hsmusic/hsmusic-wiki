@@ -29,7 +29,7 @@ t.test(`html.tag`, t => {
   let genericSlot;
   const genericTemplate = html.template(slot => {
     genericSlot = slot('title');
-    return [];
+    return html.blank();
   });
 
   // 9-10: tag treated as content, not attributes

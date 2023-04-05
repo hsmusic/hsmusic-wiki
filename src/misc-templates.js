@@ -53,7 +53,7 @@ function unbound_generateChronologyLinks(currentThing, {
   const contributions = currentThing[contribKey];
 
   if (empty(contributions)) {
-    return [];
+    return html.blank();
   }
 
   if (contributions.length > 8) {
