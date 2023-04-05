@@ -1,3 +1,5 @@
+import {empty} from '../../util/sugar.js';
+
 export default {
   extraDependencies: [
     'html',
@@ -14,6 +16,10 @@ export default {
     html,
     language,
   }) {
+    if (empty(data.titles)) {
+      return html.blank();
+    }
+
     return language.$('releaseInfo.additionalFiles.shortcut', {
       anchorLink:
         html.tag('a',
