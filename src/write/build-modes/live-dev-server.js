@@ -81,6 +81,8 @@ export async function go({
 
   const contentDependenciesWatcher = await watchContentDependencies();
   const {contentDependencies: allContentDependencies} = contentDependenciesWatcher;
+
+  contentDependenciesWatcher.on('error', () => {});
   await new Promise(resolve => contentDependenciesWatcher.once('ready', resolve));
 
   let targetSpecPairs = getPageSpecsWithTargets({wikiData});
@@ -333,6 +335,7 @@ export async function go({
 
       const bound = bindUtilities({
         absoluteTo,
+        cachebust,
         defaultLanguage,
         getSizeOfAdditionalFile,
         getSizeOfImageFile,
@@ -440,7 +443,7 @@ export async function go({
 
       // END PASTE
 
-      const pageHTML = topLevelResult.main.content.toString();
+      const pageHTML = topLevelResult.toString();
 
       /*
       const pageHTML = generateDocumentHTML(pageInfo, {

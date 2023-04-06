@@ -20,6 +20,7 @@ import {thumb} from '../util/urls.js';
 
 export function bindUtilities({
   absoluteTo,
+  cachebust,
   defaultLanguage,
   getSizeOfAdditionalFile,
   getSizeOfImageFile,
@@ -36,6 +37,7 @@ export function bindUtilities({
 
   Object.assign(bound, {
     absoluteTo,
+    cachebust,
     defaultLanguage,
     getSizeOfAdditionalFile,
     getSizeOfImageFile,

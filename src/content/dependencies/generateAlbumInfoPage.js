@@ -4,6 +4,7 @@ export default {
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
+    'generatePageLayout',
   ],
 
   extraDependencies: [
@@ -12,6 +13,8 @@ export default {
 
   relations(relation, album) {
     const relations = {};
+
+    relations.layout = relation('generatePageLayout');
 
     relations.content = relation('generateAlbumInfoPageContent', album);
     relations.socialEmbed = relation('generateAlbumSocialEmbed', album);
@@ -33,21 +36,21 @@ export default {
   generate(data, relations, {
     language,
   }) {
-    const page = {};
+    // page.title = language.$('albumPage.title', {album: data.name});
 
-    Object.assign(page, relations.content);
+    // page.themeColor = data.color;
 
-    page.title = language.$('albumPage.title', {album: data.name});
+    // page.styleRules = [
+    //   relations.albumStyleRules,
+    //   relations.colorStyleRules,
+    // ];
 
-    page.themeColor = data.color;
+    // page.socialEmbed = relations.socialEmbed;
 
-    page.styleRules = [
-      relations.albumStyleRules,
-      relations.colorStyleRules,
-    ];
-
-    page.socialEmbed = relations.socialEmbed;
-
-    return page;
+    return relations.layout
+      .slot('title', language.$('albumPage.title', {album: data.name}))
+      .slot('cover', relations.content.cover)
+      .slot('mainContent', relations.content.main.content)
+      .slot('socialEmbed', relations.socialEmbed);
   },
 };
