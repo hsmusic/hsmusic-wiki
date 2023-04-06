@@ -42,6 +42,25 @@ export function blank() {
   return [];
 }
 
+// Note: This is only guaranteed to return true for blanks (as returned by
+// html.blank()) and false for Tags and Slots (regardless of contents or
+// other properties). Don't depend on this to match any other values.
+export function isBlank(value) {
+  if (value instanceof Tag) {
+    return false;
+  }
+
+  if (value instanceof Slot) {
+    return false;
+  }
+
+  if (!Array.isArray(value)) {
+    return false;
+  }
+
+  return value.length === 0;
+}
+
 export function tag(tagName, ...args) {
   let content;
   let attributes;
@@ -60,6 +79,10 @@ export function tag(tagName, ...args) {
   }
 
   return new Tag(tagName, attributes, content);
+}
+
+export function tags(content) {
+  return new Tag(null, null, content);
 }
 
 export class Tag {
@@ -490,7 +513,6 @@ export class Slot {
     const lines = error.stack.split('\n');
     const index = lines.findIndex(line => line.includes(`at ${this.#stackIdentifier}`))
     const setTrace = this.template.getSlotTrace(this.slotName);
-    console.log('index:', index);
     lines.splice(
       index - 1, 2,
       `at Slot("${this.slotName}") (from ${this.#stackTrace})`,
