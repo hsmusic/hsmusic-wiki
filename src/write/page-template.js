@@ -5,7 +5,6 @@ import {getColors} from '../util/colors.js';
 
 import {
   getFooterLocalizationLinks,
-  getRevealStringFromContentWarningMessage,
 } from '../misc-templates.js';
 
 export function generateDevelopersCommentHTML({

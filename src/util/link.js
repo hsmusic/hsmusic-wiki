@@ -109,7 +109,7 @@ function linkDirectory(key, {
   data = null,
   attr = null,
   ...conf
-}) {
+} = {}) {
   return linkHelper({
     data: thing => ({
       ...(data ? data(thing) : {}),

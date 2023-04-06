@@ -1,205 +1,59 @@
 // Album page specification.
 
-import {
-  bindOpts,
-  compareArrays,
-  empty,
-} from '../util/sugar.js';
-
-import {
-  getAlbumCover,
-  getAlbumListTag,
-  getTotalDuration,
-} from '../util/wiki-data.js';
-
-import {
-  u_generateAlbumStylesheet,
-} from '../misc-templates.js';
-
 export const description = `per-album info & track artwork gallery pages`;
 
 export function targets({wikiData}) {
   return wikiData.albumData;
 }
 
-export const dataSteps = {
-  contentDependencies: [
-    'generateAlbumSocialEmbed',
-    'generateAlbumStylesheet',
-  ],
+export function pathsForTarget(album) {
+  const hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
+  const hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);
 
-  computePathsForTarget(data, album) {
-    data.hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
-    data.hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);
+  return [
+    {
+      type: 'page',
+      path: ['album', album.directory],
 
-    return [
-      {
-        type: 'page',
-        path: ['album', album.directory],
+      contentFunction: {
+        name: 'generateAlbumInfoPage',
+        args: [album],
       },
-
-      data.hasGalleryPage && {
-        type: 'page',
-        path: ['albumGallery', album.directory],
-      },
-
-      data.hasCommentaryPage && {
-        type: 'page',
-        path: ['albumCommentary', album.directory],
-      },
-
-      {
-        type: 'data',
-        path: ['album', album.directory],
-      },
-    ];
-  },
-
-  computeDataCommonAcrossMixedWrites(data, album) {
-    data.albumDuration = getTotalDuration(album.tracks);
-  },
-
-  computeDataCommonAcrossPageWrites(data, album) {
-    data.listTag = getAlbumListTag(album);
-  },
-
-  computeDataForPageWrite: {
-    album(data, album, _pathArgs) {
-      // TODO: We can't use content-unfulfilled functions here.
-      // But how do we express that these need to be fulfilled
-      // from within data steps?
-      data.socialEmbedData = data.dependencies.generateAlbumSocialEmbed.data(album);
-      data.stylesheetData = data.dependencies.generateAlbumStylesheet.data(album);
-
-      data.name = album.name;
-      data.color = album.color;
-      data.directory = album.directory;
-
-      data.hasAdditionalFiles = !empty(album.additionalFiles);
-      data.numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
-
-      data.displayTrackSections =
-        album.trackSections &&
-          (album.trackSections.length > 1 ||
-            !album.trackSections[0]?.isDefaultTrackSection);
     },
-  },
 
-  computeContentForPageWrite: {
-    album(data, {
-      absoluteTo,
-      fancifyURL,
-      generateAdditionalFilesShortcut,
-      generateAdditionalFilesList,
-      generateChronologyLinks,
-      generateContributionLinks,
-      generateContentHeading,
-      generateNavigationLinks,
-      getAlbumCover,
-      getAlbumStylesheet,
-      getLinkThemeString,
-      getSizeOfAdditionalFile,
-      getThemeString,
-      html,
-      link,
-      language,
-      transformMultiline,
-      urls,
-    }) {
-      const generateTrackListItem = bindOpts(u_generateTrackListItem, {
-        generateContributionLinks,
-        getLinkThemeString,
-        html,
-        language,
-        link,
-      });
+    /*
+    hasGalleryPage && {
+      type: 'page',
+      path: ['albumGallery', album.directory],
 
-      const generateAlbumSocialEmbedDescription = u_generateAlbumSocialEmbedDescription.fulfill({
-        language,
-      });
-
-      const generateAlbumSocialEmbed = u_generateAlbumSocialEmbed.fulfill({
-        generateSocialEmbedDescription: generateAlbumSocialEmbedDescription,
-      });
-
-      void generateTrackListItem;
+      contentFunction: {
+        name: 'generateAlbumGalleryPage',
+        args: [album],
+      },
     },
-  },
-};
 
-/*
-const infoPage = {
-  page: () => {
-    return {
-      banner: !empty(album.bannerArtistContribs) && {
-        dimensions: album.bannerDimensions,
-        path: [
-          'media.albumBanner',
-          album.directory,
-          album.bannerFileExtension,
-        ],
-        alt: language.$('misc.alt.albumBanner'),
-        position: 'top',
+    hasCommentaryPage && {
+      type: 'page',
+      path: ['albumCommentary', album.directory],
+
+      contentFunction: {
+        name: 'generateAlbumCommentaryPage',
+        args: [album],
       },
+    },
 
-      cover: {
-        src: getAlbumCover(album),
-        alt: language.$('misc.alt.albumCover'),
-        artTags: album.artTags,
+    {
+      type: 'data',
+      path: ['album', album.directory],
+
+      contentFunction: {
+        name: 'generateAlbumDataFile',
+        args: [album],
       },
-
-      main: {
-        headingMode: 'sticky',
-
-        content: [
-        ],
-      },
-
-      sidebarLeft: generateAlbumSidebar(album, null, {
-        fancifyURL,
-        getLinkThemeString,
-        html,
-        link,
-        language,
-        transformMultiline,
-        wikiData,
-      }),
-
-      nav: {
-        linkContainerClasses: ['nav-links-hierarchy'],
-        links: [
-          {toHome: true},
-          {
-            html: language.$('albumPage.nav.album', {
-              album: link.album(album, {class: 'current'}),
-            }),
-          },
-          {
-            divider: false,
-            html: generateAlbumNavLinks(album, null, {
-              generateNavigationLinks,
-              html,
-              language,
-              link,
-            }),
-          }
-        ],
-        content: generateAlbumChronologyLinks(album, null, {
-          generateChronologyLinks,
-          html,
-        }),
-      },
-
-      secondaryNav: generateAlbumSecondaryNav(album, null, {
-        getLinkThemeString,
-        html,
-        language,
-        link,
-      }),
-    };
-  },
-};
-*/
+    },
+    */
+  ];
+}
 
 /*
 export function write(album, {wikiData}) {

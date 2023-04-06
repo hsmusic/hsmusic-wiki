@@ -10,7 +10,7 @@ export default {
   generate(data, {
     getColors,
   }) {
-    if (!color) return '';
+    if (!data.color) return '';
 
     const {
       primary,
@@ -30,7 +30,6 @@ export default {
       `--bg-color: ${bg}`,
       `--bg-black-color: ${bgBlack}`,
       `--shadow-color: ${shadow}`,
-      ...additionalVariables,
     ];
 
     return [

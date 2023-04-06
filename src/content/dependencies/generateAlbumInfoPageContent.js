@@ -56,11 +56,11 @@ export default {
         relation('linkAlbumCommentary', album);
     }
 
-    if (!empty(album.urls)) {
-      relations.externalLinks =
-        album.urls.map(url =>
-          relation('linkExternal', url, {type: 'album'}));
-    }
+    relations.externalLinks =
+      (empty(album.urls)
+        ? null
+        : album.urls.map(url =>
+            relation('linkExternal', url, {type: 'album'})));
 
     relations.trackList = relation('generateAlbumTrackList', album);
 
@@ -237,3 +237,58 @@ export default {
     return content;
   },
 };
+
+/*
+  banner: !empty(album.bannerArtistContribs) && {
+    dimensions: album.bannerDimensions,
+    path: [
+      'media.albumBanner',
+      album.directory,
+      album.bannerFileExtension,
+    ],
+    alt: language.$('misc.alt.albumBanner'),
+    position: 'top',
+  },
+
+  sidebarLeft: generateAlbumSidebar(album, null, {
+    fancifyURL,
+    getLinkThemeString,
+    html,
+    link,
+    language,
+    transformMultiline,
+    wikiData,
+  }),
+
+  nav: {
+    linkContainerClasses: ['nav-links-hierarchy'],
+    links: [
+      {toHome: true},
+      {
+        html: language.$('albumPage.nav.album', {
+          album: link.album(album, {class: 'current'}),
+        }),
+      },
+      {
+        divider: false,
+        html: generateAlbumNavLinks(album, null, {
+          generateNavigationLinks,
+          html,
+          language,
+          link,
+        }),
+      }
+    ],
+    content: generateAlbumChronologyLinks(album, null, {
+      generateChronologyLinks,
+      html,
+    }),
+  },
+
+  secondaryNav: generateAlbumSecondaryNav(album, null, {
+    getLinkThemeString,
+    html,
+    language,
+    link,
+  }),
+*/

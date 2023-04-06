@@ -316,7 +316,7 @@ export function fillRelationsLayoutFromSlotResults(relationIdentifier, results, 
   return recursive(layout);
 }
 
-function getNeededContentDependencyNames(contentDependencies, name) {
+export function getNeededContentDependencyNames(contentDependencies, name) {
   const set = new Set();
 
   function recursive(name) {

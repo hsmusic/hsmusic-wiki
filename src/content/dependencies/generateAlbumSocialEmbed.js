@@ -74,7 +74,7 @@ export default {
     if (data.hasImage) {
       const imagePath = urls
         .from('shared.root')
-        .to('media.albumColor', data.coverArtDirectory, data.coverArtFileExtension);
+        .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension);
       socialEmbed.image = '/' + imagePath;
     }
 

@@ -18,24 +18,6 @@ import {
   sortChronologically,
 } from './util/wiki-data.js';
 
-// "Additional Files" listing
-
-function unbound_generateAdditionalFilesShortcut(additionalFiles, {
-  html,
-  language,
-}) {
-  if (empty(additionalFiles)) return '';
-
-  return language.$('releaseInfo.additionalFiles.shortcut', {
-    anchorLink:
-      html.tag('a',
-        {href: '#additional-files'},
-        language.$('releaseInfo.additionalFiles.shortcut.anchorLink')),
-    titles: language.formatUnitList(
-      additionalFiles.map(g => g.title)),
-  });
-}
-
 // Chronology links
 
 function unbound_generateChronologyLinks(currentThing, {
@@ -107,34 +89,6 @@ function unbound_generateChronologyLinks(currentThing, {
               })
             : heading)));
     });
-}
-
-// Content warning tags
-
-function unbound_getRevealStringFromContentWarningMessage(warnings, {
-  html,
-  language,
-}) {
-  return (
-    language.$('misc.contentWarnings', {warnings}) +
-    html.tag('br') +
-    html.tag('span', {class: 'reveal-interaction'},
-      language.$('misc.contentWarnings.reveal'))
-  );
-}
-
-function unbound_getRevealStringFromArtTags(tags, {
-  getRevealStringFromContentWarningMessage,
-  language,
-}) {
-  return (
-    tags?.some(tag => tag.isContentWarning) &&
-      getRevealStringFromContentWarningMessage(
-        language.formatUnitList(
-          tags
-            .filter(tag => tag.isContentWarning)
-            .map(tag => tag.name)))
-  );
 }
 
 // Divided track lists
@@ -548,23 +502,9 @@ function unbound_getFooterLocalizationLinks({
 // Exports
 
 export {
-  unbound_generateAdditionalFilesList as generateAdditionalFilesList,
-  unbound_generateAdditionalFilesShortcut as generateAdditionalFilesShortcut,
-
   unbound_generateChronologyLinks as generateChronologyLinks,
 
-  unbound_getRevealStringFromContentWarningMessage as getRevealStringFromContentWarningMessage,
-  unbound_getRevealStringFromArtTags as getRevealStringFromArtTags,
-
-  unbound_generateCoverLink as generateCoverLink,
-
-  unbound_getThemeString as getThemeString,
-
   unbound_generateTrackListDividedByGroups as generateTrackListDividedByGroups,
-
-  unbound_fancifyURL as fancifyURL,
-  unbound_fancifyFlashURL as fancifyFlashURL,
-  unbound_iconifyURL as iconifyURL,
 
   unbound_getGridHTML as getGridHTML,
   unbound_getAlbumGridHTML as getAlbumGridHTML,
@@ -572,12 +512,9 @@ export {
 
   unbound_getCarouselHTML as getCarouselHTML,
 
-  unbound_img as img,
-
   unbound_generateInfoGalleryLinks as generateInfoGalleryLinks,
   unbound_generateNavigationLinks as generateNavigationLinks,
 
-  unbound_generateContentHeading as generateContentHeading,
   unbound_generateStickyHeadingContainer as generateStickyHeadingContainer,
 
   unbound_getFooterLocalizationLinks as getFooterLocalizationLinks,

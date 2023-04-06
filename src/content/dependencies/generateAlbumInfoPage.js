@@ -21,7 +21,16 @@ export default {
     return relations;
   },
 
-  generate(relations, {
+  data(album) {
+    const data = {};
+
+    data.name = album.name;
+    data.color = album.color;
+
+    return data;
+  },
+
+  generate(data, relations, {
     language,
   }) {
     const page = {};
