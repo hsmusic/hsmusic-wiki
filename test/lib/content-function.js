@@ -10,7 +10,7 @@ import urlSpec from '../../src/url-spec.js';
 import * as html from '../../src/util/html.js';
 import {empty, showAggregate} from '../../src/util/sugar.js';
 import {getColors} from '../../src/util/colors.js';
-import {generateURLs} from '../../src/util/urls.js';
+import {generateURLs, thumb} from '../../src/util/urls.js';
 import {processLanguageFile} from '../../src/data/language.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,6 +46,7 @@ export function testContentFunctions(t, message, fn) {
           extraDependencies: {
             html,
             language,
+            thumb,
             to,
             urls,
             appendIndexHTML: false,
