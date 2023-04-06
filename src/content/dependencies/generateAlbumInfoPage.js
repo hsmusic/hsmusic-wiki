@@ -13,6 +13,7 @@ export default {
   relations(relation, album) {
     const relations = {};
 
+    relations.content = relation('generateAlbumInfoPageContent', album);
     relations.socialEmbed = relation('generateAlbumSocialEmbed', album);
     relations.albumStyleRules = relation('generateAlbumStyleRules', album);
     relations.colorStyleRules = relation('generateColorStyleRules', album.color);
@@ -24,6 +25,8 @@ export default {
     language,
   }) {
     const page = {};
+
+    Object.assign(page, relations.content);
 
     page.title = language.$('albumPage.title', {album: data.name});
 

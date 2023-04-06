@@ -7,6 +7,7 @@ export default {
     'generateAlbumTrackList',
     'generateContributionLinks',
     'generateContentHeading',
+    'generateCoverArtwork',
     'linkAlbumCommentary',
     'linkAlbumGallery',
     'linkExternal',
@@ -20,6 +21,9 @@ export default {
 
   relations(relation, album) {
     const relations = {};
+
+    relations.cover =
+      relation('generateCoverArtwork', album.artTags);
 
     const contributionLinksRelation = contribs =>
       relation('generateContributionLinks', contribs, {
@@ -80,6 +84,9 @@ export default {
   data(album) {
     const data = {};
 
+    data.coverArtDirectory = album.directory;
+    data.coverArtFileExtension = album.coverArtFileExtension;
+
     data.date = album.date;
     data.duration = accumulateSum(album.tracks, track => track.duration);
     data.durationApproximate = album.tracks.length > 1;
@@ -108,6 +115,10 @@ export default {
     transformMultiline,
   }) {
     const content = {};
+
+    content.cover = relations.cover
+      .slot('path', ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension])
+      .slot('alt', language.$('misc.alt.trackCover'));
 
     content.main = {
       headingMode: 'sticky',

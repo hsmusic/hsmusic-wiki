@@ -137,56 +137,6 @@ function unbound_getRevealStringFromArtTags(tags, {
   );
 }
 
-// Cover art links
-
-function unbound_generateCoverLink({
-  html,
-  img,
-  language,
-  link,
-
-  getRevealStringFromArtTags,
-
-  alt,
-  path,
-  src,
-  tags = [],
-  to,
-  wikiData,
-}) {
-  const {wikiInfo} = wikiData;
-
-  if (!src && path) {
-    src = to(...path);
-  }
-
-  if (!src) {
-    throw new Error(`Expected src or path`);
-  }
-
-  const linkedTags = tags.filter(tag => !tag.isContentWarning);
-
-  return html.tag('div', {id: 'cover-art-container'}, [
-    img({
-      src,
-      alt,
-      thumb: 'medium',
-      id: 'cover-art',
-      link: true,
-      square: true,
-      reveal: getRevealStringFromArtTags(tags),
-    }),
-
-    wikiInfo.enableArtTagUI &&
-    linkedTags.length &&
-      html.tag('p', {class: 'tags'},
-        language.$('releaseInfo.artTags.inline', {
-          tags: language.formatUnitList(
-            linkedTags.map(tag => link.tag(tag))),
-        })),
-  ]);
-}
-
 // Divided track lists
 
 function unbound_generateTrackListDividedByGroups(tracks, {
