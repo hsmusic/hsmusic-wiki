@@ -23,21 +23,38 @@ export default {
   },
 
   generate(relations, {html, language}) {
-    return html.template(slot =>
-      html.tag('div', {id: 'cover-art-container'}, [
-        relations.image
-          .slot('path', slot('path'))
-          .slot('alt', slot('alt'))
-          .slot('thumb', 'medium')
-          .slot('id', 'cover-art')
-          .slot('link', true)
-          .slot('square', true),
+    return html.template({
+      annotation: 'generateCoverArtwork',
 
-        !empty(relations.tagLinks) &&
-          html.tag('p',
-            language.$('releaseInfo.artTags.inline', {
-              tags: language.formatUnitList(relations.tagLinks),
-            })),
-      ]));
+      slots: {
+        path: {
+          validate: v => v.validateArrayItems(v.isString),
+        },
+
+        alt: {
+          type: 'string',
+        },
+      },
+
+      content(slots) {
+        return html.tag('div', {id: 'cover-art-container'}, [
+          relations.image
+            .slots({
+              path: slots.path,
+              alt: slots.alt,
+              thumb: 'medium',
+              id: 'cover-art',
+              link: true,
+              square: true,
+            }),
+
+          !empty(relations.tagLinks) &&
+            html.tag('p',
+              language.$('releaseInfo.artTags.inline', {
+                tags: language.formatUnitList(relations.tagLinks),
+              })),
+          ]);
+      },
+    });
   },
 };

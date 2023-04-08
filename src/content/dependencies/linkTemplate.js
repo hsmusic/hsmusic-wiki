@@ -14,15 +14,25 @@ export default {
     html,
     to,
   }) {
-    return html.template(slot =>
-      slot('color', ([color]) =>
-      slot('hash', ([hash]) =>
-      slot('href', ([href]) =>
-      slot('path', ([...path]) => {
+    return html.template({
+      annotation: 'linkTemplate',
+
+      slots: {
+        href: {type: 'string'},
+        path: {validate: v => v.validateArrayItems(v.isString)},
+        hash: {type: 'string'},
+
+        attributes: {validate: v => v.isAttributes},
+        color: {validate: v => v.isColor},
+        content: {type: 'html'},
+      },
+
+      content(slots) {
+        let href = slots.href;
         let style;
 
-        if (!href && !empty(path)) {
-          href = to(...path);
+        if (!href && !empty(slots.path)) {
+          href = to(...slots.path);
         }
 
         if (appendIndexHTML) {
@@ -34,23 +44,23 @@ export default {
           }
         }
 
-        if (hash) {
-          href += (hash.startsWith('#') ? '' : '#') + hash;
+        if (slots.hash) {
+          href += (slots.hash.startsWith('#') ? '' : '#') + slots.hash;
         }
 
-        if (color) {
-          const {primary, dim} = getColors(color);
+        if (slots.color) {
+          const {primary, dim} = getColors(slots.color);
           style = `--primary-color: ${primary}; --dim-color: ${dim}`;
         }
 
-        return slot('attributes', ([attributes]) =>
-          html.tag('a',
-            {
-              ...attributes ?? {},
-              href,
-              style,
-            },
-            slot('content')));
-      })))));
+        return html.tag('a',
+          {
+            ...slots.attributes ?? {},
+            href,
+            style,
+          },
+          slots.content);
+      },
+    });
   },
 }

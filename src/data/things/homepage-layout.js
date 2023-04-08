@@ -68,10 +68,10 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
     Group,
 
     validators: {
+      is,
       isCountingNumber,
       isString,
       validateArrayItems,
-      validateFromConstants,
     },
   } = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
@@ -95,7 +95,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       flags: {update: true, expose: true},
 
       update: {
-        validate: validateFromConstants('grid', 'carousel'),
+        validate: is('grid', 'carousel'),
       },
 
       expose: {

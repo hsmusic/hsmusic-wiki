@@ -1,5 +1,3 @@
-import {empty} from '../../util/sugar.js';
-
 export default {
   contentDependencies: [
     'linkTemplate',
@@ -30,22 +28,40 @@ export default {
   generate(data, relations, {html}) {
     const path = [data.pathKey, data.directory];
 
-    return html.template(slot =>
-      slot('content', ([...content]) =>
-      slot('preferShortName', ([preferShortName]) => {
-        if (empty(content)) {
+    return html.template({
+      annotation: 'linkThing',
+
+      slots: {
+        content: relations.linkTemplate.getSlotDescription('content'),
+        preferShortName: {type: 'boolean', default: false},
+
+        color: relations.linkTemplate.getSlotDescription('color'),
+        attributes: relations.linkTemplate.getSlotDescription('attributes'),
+        hash: relations.linkTemplate.getSlotDescription('hash'),
+      },
+
+      content(slots) {
+        let content = slots.content;
+
+        if (html.isBlank(content)) {
           content =
-            (preferShortName
+            (slots.preferShortName
               ? data.nameShort ?? data.name
               : data.name);
         }
 
+        const color = slots.color ?? data.color ?? null;
+
         return relations.linkTemplate
-          .slot('path', path)
-          .slot('color', slot('color', data.color))
-          .slot('attributes', slot('attributes', {}))
-          .slot('hash', slot('hash'))
-          .slot('content', content);
-      })));
+          .slots({
+            path,
+            content,
+            color,
+
+            attributes: slots.attributes,
+            hash: slots.hash,
+          });
+      },
+    });
   },
 }

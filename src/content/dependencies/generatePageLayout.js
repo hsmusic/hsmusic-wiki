@@ -1,5 +1,3 @@
-import {empty} from '../../util/sugar.js';
-
 export default {
   extraDependencies: [
     'html',
@@ -13,41 +11,63 @@ export default {
     language,
     to,
   }) {
-    return html.template(slot =>
-      slot('title', ([...title]) =>
-      slot('headingMode', ([headingMode = 'static']) => {
+    return html.template({
+      annotation: 'generatePageLayout',
+
+      slots: {
+        title: {type: 'html'},
+        cover: {type: 'html'},
+
+        mainContent: {type: 'html'},
+        socialEmbed: {type: 'html'},
+
+        headingMode: {
+          validate: v => v.is('sticky', 'static'),
+          default: 'static',
+        },
+
+        mainClasses: {
+          validate: v => v.arrayOf(v.isString),
+          default: [],
+        },
+      },
+
+      content(slots) {
         let titleHTML = null;
 
-        if (!empty(title)) {
-          if (headingMode === 'sticky') {
-            /*
-              generateStickyHeadingContainer({
-                coverSrc: cover.src,
-                coverAlt: cover.alt,
-                coverArtTags: cover.artTags,
-                title,
-              })
-            */
-          } else if (headingMode === 'static') {
-            titleHTML = html.tag('h1', title);
+        if (!html.isBlank(slots.title)) {
+          switch (slots.headingMode) {
+            case 'sticky':
+              /*
+                generateStickyHeadingContainer({
+                  coverSrc: cover.src,
+                  coverAlt: cover.alt,
+                  coverArtTags: cover.artTags,
+                  title,
+                })
+              */
+              break;
+            case 'static':
+              titleHTML = html.tag('h1', slots.title);
+              break;
           }
         }
 
         const mainHTML =
           html.tag('main', {
             id: 'content',
-            class: slot('mainClass'),
+            class: slots.mainClasses,
           }, [
             titleHTML,
 
-            slot('cover'),
+            slots.cover,
 
             html.tag('div',
               {
                 [html.onlyIfContent]: true,
                 class: 'main-content-container',
               },
-              slot('mainContent')),
+              slots.mainContent),
           ]);
 
         const layoutHTML = [
@@ -135,7 +155,7 @@ export default {
 
                 */
 
-                // slot('socialEmbed'),
+                // slots.socialEmbed,
 
                 html.tag('link', {
                   rel: 'stylesheet',
@@ -176,6 +196,7 @@ export default {
         ]);
 
         return documentHTML;
-      })));
+      },
+    });
   },
 };

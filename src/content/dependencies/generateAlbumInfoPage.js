@@ -36,8 +36,6 @@ export default {
   generate(data, relations, {
     language,
   }) {
-    // page.title = language.$('albumPage.title', {album: data.name});
-
     // page.themeColor = data.color;
 
     // page.styleRules = [
@@ -45,12 +43,14 @@ export default {
     //   relations.colorStyleRules,
     // ];
 
-    // page.socialEmbed = relations.socialEmbed;
-
     return relations.layout
-      .slot('title', language.$('albumPage.title', {album: data.name}))
-      .slot('cover', relations.content.cover)
-      .slot('mainContent', relations.content.main.content)
-      .slot('socialEmbed', relations.socialEmbed);
+      .slots({
+        title: language.$('albumPage.title', {album: data.name}),
+
+        cover: relations.content.cover,
+        mainContent: relations.content.main.content,
+
+        // socialEmbed: relations.socialEmbed,
+      });
   },
 };

@@ -18,15 +18,61 @@ export default {
     html,
     language,
   }) {
-    return html.template(slot =>
-      slot('additionalFileLinks', ([fileLinks]) =>
-      slot('additionalFileSizes', ([fileSizes]) => {
-        if (!fileSizes) {
+    const fileKeys = data.additionalFiles.flatMap(({files}) => files);
+    const validateFileMapping = (v, validateValue) => {
+      return value => {
+        v.isObject(value);
+
+        // It's OK to skip values for files, but if keys are provided for files
+        // which don't exist, that's an error.
+
+        const unexpectedKeys =
+          Object.keys(value).filter(key => !fileKeys.includes(key))
+
+        if (!empty(unexpectedKeys)) {
+          throw new TypeError(`Unexpected file keys: ${unexpectedKeys.join(', ')}`);
+        }
+
+        const valueErrors = [];
+        for (const [fileKey, fileValue] of Object.entries(value)) {
+          if (fileValue === null) {
+            continue;
+          }
+
+          try {
+            validateValue(fileValue);
+          } catch (error) {
+            error.message = `(${fileKey}) ` + error.message;
+            valueErrors.push(error);
+          }
+        }
+
+        if (!empty(valueErrors)) {
+          throw new AggregateError(valueErrors, `Errors validating values`);
+        }
+      };
+    };
+
+    return html.template({
+      annotation: 'generateAdditionalFilesList',
+
+      slots: {
+        fileLinks: {
+          validate: v => validateFileMapping(v, v.isHTML),
+        },
+
+        fileSizes: {
+          validate: v => validateFileMapping(v, v.isWholeNumber),
+        },
+      },
+
+      content(slots) {
+        if (!slots.fileSizes) {
           return html.blank();
         }
 
         const filesWithLinks = new Set(
-          Object.entries(fileLinks)
+          Object.entries(slots.fileLinks)
             .filter(([key, value]) => value)
             .map(([key]) => key));
 
@@ -60,15 +106,16 @@ export default {
               html.tag('ul',
                 files.map(file =>
                   html.tag('li',
-                    (fileSizes[file]
+                    (slots.fileSizes[file]
                       ? language.$('releaseInfo.additionalFiles.file.withSize', {
-                          file: fileLinks[file],
-                          size: language.formatFileSize(fileSizes[file]),
+                          file: slots.fileLinks[file],
+                          size: language.formatFileSize(slots.fileSizes[file]),
                         })
                       : language.$('releaseInfo.additionalFiles.file', {
-                          file: fileLinks[file],
+                          file: slots.fileLinks[file],
                         })))))),
           ]));
-      })));
+      },
+    });
   },
 };

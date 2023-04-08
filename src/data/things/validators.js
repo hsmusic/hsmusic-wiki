@@ -138,6 +138,34 @@ export function isArray(value) {
   return true;
 }
 
+// This one's shaped a bit different from other "is" functions.
+// More like validate functions, it returns a function.
+export function is(...values) {
+  if (Array.isArray(values)) {
+    values = new Set(values);
+  }
+
+  if (values.size === 1) {
+    const expected = Array.from(values)[0];
+
+    return (value) => {
+      if (value !== expected) {
+        throw new TypeError(`Expected ${expected}, got ${value}`);
+      }
+
+      return true;
+    };
+  }
+
+  return (value) => {
+    if (!values.has(value)) {
+      throw new TypeError(`Expected one of ${Array.from(values).join(' ')}, got ${value}`);
+    }
+
+    return true;
+  };
+}
+
 function validateArrayItemsHelper(itemValidator) {
   return (item, index) => {
     try {
@@ -167,18 +195,12 @@ export function validateArrayItems(itemValidator) {
   };
 }
 
-export function validateInstanceOf(constructor) {
-  return (object) => isInstance(object, constructor);
+export function arrayOf(itemValidator) {
+  return validateArrayItems(itemValidator);
 }
 
-export function validateFromConstants(...values) {
-  return (value) => {
-    if (!values.includes(value)) {
-      throw new TypeError(`Expected one of ${values.join(', ')}`);
-    }
-
-    return true;
-  };
+export function validateInstanceOf(constructor) {
+  return (object) => isInstance(object, constructor);
 }
 
 // Wiki data (primitives & non-primitives)

@@ -40,16 +40,18 @@ export default {
     urls,
   }) {
     return relations.additionalFilesList
-      .slot('additionalFileLinks', relations.additionalFileLinks)
-      .slot('additionalFileSizes',
-        Object.fromEntries(data.fileLocations.map(file => [
-          file,
-          (data.showFileSizes
-            ? getSizeOfAdditionalFile(
-                urls
-                  .from('media.root')
-                  .to('media.albumAdditionalFile', data.albumDirectory, file))
-            : 0),
-        ])));
+      .slots({
+        additionalFileLinks: relations.additionalFileLinks,
+        additionalFileSizes:
+          Object.fromEntries(data.fileLocations.map(file => [
+            file,
+            (data.showFileSizes
+              ? getSizeOfAdditionalFile(
+                  urls
+                    .from('media.root')
+                    .to('media.albumAdditionalFile', data.albumDirectory, file))
+              : 0),
+          ])),
+      });
   },
 };

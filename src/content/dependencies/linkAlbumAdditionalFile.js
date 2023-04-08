@@ -18,7 +18,9 @@ export default {
 
   generate(data, relations) {
     return relations.linkTemplate
-      .slot('path', ['media.albumAdditionalFile', data.albumDirectory, data.file])
-      .slot('content', data.file);
+      .slots({
+        path: ['media.albumAdditionalFile', data.albumDirectory, data.file],
+        content: data.file,
+      });
   },
 };

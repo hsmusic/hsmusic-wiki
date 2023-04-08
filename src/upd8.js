@@ -772,6 +772,7 @@ async function main() {
     developersComment,
     getSizeOfAdditionalFile,
     getSizeOfImageFile,
+    niceShowAggregate,
   });
 }
 

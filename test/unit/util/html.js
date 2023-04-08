@@ -1,10 +1,10 @@
 import t from 'tap';
 
 import * as html from '../../../src/util/html.js';
-const {Tag, Attributes, Template, Slot} = html;
+const {Tag, Attributes, Template} = html;
 
 t.test(`html.tag`, t => {
-  t.plan(16);
+  t.plan(14);
 
   const tag1 =
     html.tag('div',
@@ -26,10 +26,8 @@ t.test(`html.tag`, t => {
   t.equal(tag2.content[1], 'children');
 
   const genericTag = html.tag('div');
-  let genericSlot;
-  const genericTemplate = html.template(slot => {
-    genericSlot = slot('title');
-    return html.blank();
+  const genericTemplate = html.template({
+    content: () => html.blank(),
   });
 
   // 9-10: tag treated as content, not attributes
@@ -42,12 +40,7 @@ t.test(`html.tag`, t => {
   t.equal(tag4.content.length, 1);
   t.equal(tag4.content[0], genericTemplate);
 
-  // 13-14: slot treated as content, not attributes
-  const tag5 = html.tag('div', genericSlot);
-  t.equal(tag5.content.length, 1);
-  t.equal(tag5.content[0], genericSlot);
-
-  // 15-16: deep flattening support
+  // 13-14: deep flattening support
   const tag6 =
     html.tag('div', [
       true &&

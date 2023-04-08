@@ -75,7 +75,16 @@ export async function go({
   developersComment,
   getSizeOfAdditionalFile,
   getSizeOfImageFile,
+  niceShowAggregate,
 }) {
+  const showError = (error) => {
+    if (error instanceof AggregateError && niceShowAggregate) {
+      niceShowAggregate(error);
+    } else {
+      console.error(error);
+    }
+  };
+
   const host = cliOptions['host'] ?? defaultHost;
   const port = parseInt(cliOptions['port'] ?? defaultPort);
 
@@ -160,7 +169,7 @@ export async function go({
         response.writeHead(500, contentTypeJSON);
         response.end({error: `Internal error serializing wiki JSON`});
         console.error(`${requestHead} [500] /data.json`);
-        console.error(error);
+        showError(error);
       }
       return;
     }
@@ -203,7 +212,7 @@ export async function go({
           response.writeHead(500, contentTypePlain);
           response.end(`Internal error accessing ${localFileArea} file for: ${safePath}`);
           console.error(`${requestHead} [500] ${pathname}`);
-          console.error(error);
+          showError(error);
         }
         return;
       }
@@ -256,7 +265,7 @@ export async function go({
         response.writeHead(500, contentTypePlain);
         response.end(`Failed during file-to-response pipeline`);
         console.error(`${requestHead} [500] ${pathname}`);
-        console.error(error);
+        showError(error);
       }
       return;
     }
@@ -463,7 +472,7 @@ export async function go({
       response.writeHead(500, contentTypePlain);
       response.end(`Error generating page, view server log for details\n`);
       console.error(`${requestHead} [500] ${pathname}`);
-      console.error(error);
+      showError(error);
     }
   });
 
@@ -479,7 +488,7 @@ export async function go({
       }, 10_000);
     } else {
       console.error(`Server error detected (code: ${error.code})`);
-      console.error(error);
+      showError(error);
     }
   });
 

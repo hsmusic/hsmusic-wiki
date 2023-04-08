@@ -1,5 +1,8 @@
 // Some really simple functions for formatting HTML content.
 
+import * as commonValidators from '../data/things/validators.js';
+import {empty} from './sugar.js';
+
 // COMPREHENSIVE!
 // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
 export const selfClosingTags = [
@@ -38,19 +41,15 @@ export const joinChildren = Symbol();
 // or when there are multiple children.
 export const noEdgeWhitespace = Symbol();
 
-export function blank() {
-  return [];
-}
-
 // Note: This is only guaranteed to return true for blanks (as returned by
-// html.blank()) and false for Tags and Slots (regardless of contents or
+// html.blank()) and false for Tags and Templates (regardless of contents or
 // other properties). Don't depend on this to match any other values.
 export function isBlank(value) {
-  if (value instanceof Tag) {
+  if (isTag(value)) {
     return false;
   }
 
-  if (value instanceof Slot) {
+  if (isTemplate(value)) {
     return false;
   }
 
@@ -61,6 +60,102 @@ export function isBlank(value) {
   return value.length === 0;
 }
 
+export function isTag(value) {
+  return value instanceof Tag;
+}
+
+export function isTemplate(value) {
+  return value instanceof Template;
+}
+
+export function isHTML(value) {
+  if (typeof value === 'string') {
+    return true;
+  }
+
+  if (value === null || value === undefined) {
+    return true;
+  }
+
+  if (isBlank(value) || isTag(value) || isTemplate(value)) {
+    return true;
+  }
+
+  if (Array.isArray(value)) {
+    if (value.every(isHTML)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+export function isAttributes(value) {
+  if (typeof value !== 'object' || Array.isArray(value)) {
+    return false;
+  }
+
+  if (value === null) {
+    return false;
+  }
+
+  if (isTag(value) || isTemplate(value)) {
+    return false;
+  }
+
+  // TODO: Validate attribute values (just the general shape)
+
+  return true;
+}
+
+export const validators = {
+  // TODO: Move above implementations here and detail errors
+
+  isBlank(value) {
+    if (!isBlank(value)) {
+      throw new TypeError(`Expected html.blank()`);
+    }
+
+    return true;
+  },
+
+  isTag(value) {
+    if (!isTag(value)) {
+      throw new TypeError(`Expected HTML tag`);
+    }
+
+    return true;
+  },
+
+  isTemplate(value) {
+    if (!isTemplate(value)) {
+      throw new TypeError(`Expected HTML template`);
+    }
+
+    return true;
+  },
+
+  isHTML(value) {
+    if (!isHTML(value)) {
+      throw new TypeError(`Expected HTML content`);
+    }
+
+    return true;
+  },
+
+  isAttributes(value) {
+    if (!isAttributes(value)) {
+      throw new TypeError(`Expected HTML attributes`);
+    }
+
+    return true;
+  },
+};
+
+export function blank() {
+  return [];
+}
+
 export function tag(tagName, ...args) {
   let content;
   let attributes;
@@ -69,8 +164,7 @@ export function tag(tagName, ...args) {
     typeof args[0] === 'object' &&
     !(Array.isArray(args[0]) ||
       args[0] instanceof Tag ||
-      args[0] instanceof Template ||
-      args[0] instanceof Slot)
+      args[0] instanceof Template)
   ) {
     attributes = args[0];
     content = args[1];
@@ -345,18 +439,10 @@ export class Attributes {
   toString() {
     return Object.entries(this.attributes)
       .map(([key, val]) => {
-        if (val instanceof Slot) {
-          const content = val.toString();
-          return [key, content, !!content];
-        } else {
-          return [key, val];
-        }
-      })
-      .map(([key, val, keepSlot]) => {
         if (typeof val === 'undefined' || val === null)
           return [key, val, false];
         else if (typeof val === 'string')
-          return [key, val, keepSlot ?? true];
+          return [key, val, true];
         else if (typeof val === 'boolean')
           return [key, val, val];
         else if (typeof val === 'number')
@@ -390,58 +476,258 @@ export class Attributes {
   }
 }
 
-export function template(getContent) {
-  return new Template(getContent);
+export function template(description) {
+  return new Template(description);
 }
 
 export class Template {
-  #tag = new Tag();
+  #description = {};
+  #slotValues = {};
 
-  #slotContents = {};
-  #slotTraces = {};
-
-  constructor(getContent) {
-    this.#prepareContent(getContent);
+  constructor(description) {
+    Template.validateDescription(description);
+    this.#description = description;
   }
 
-  #prepareContent(getContent) {
-    const slotFunction = (slotName, defaultValue) => {
-      return new Slot(this, slotName, defaultValue);
-    };
+  static validateDescription(description) {
+    if (description === null) {
+      return;
+    }
 
-    this.#tag.content = getContent(slotFunction);
+    if (typeof description !== 'object') {
+      throw new TypeError(`Expected object or null, got ${typeof description}`);
+    }
+
+    const topErrors = [];
+
+    if (!('content' in description)) {
+      topErrors.push(new TypeError(`Expected description.content`));
+    } else if (typeof description.content !== 'function') {
+      topErrors.push(new TypeError(`Expected description.content to be function`));
+    }
+
+    if ('annotation' in description) {
+      if (typeof description.annotation !== 'string') {
+        topErrors.push(new TypeError(`Expected annotation to be string`));
+      }
+    }
+
+    const slotErrors = [];
+
+    if ('slots' in description) validateSlots: {
+      if (typeof description.slots !== 'object') {
+        slotErrors.push(new TypeError(`Expected description.slots to be object`));
+        break validateSlots;
+      }
+
+      for (const [key, value] of Object.entries(description.slots)) {
+        if (typeof value !== 'object' || value === null) {
+          slotErrors.push(new TypeError(`Expected slot description (of ${key}) to be object`));
+          continue;
+        }
+
+        if ('default' in value) validateDefault: {
+          if (value.default === undefined || value.default === null) {
+            slotErrors.push(new TypeError(`Leave slot default (of ${key}) unspecified instead of undefined or null`));
+            break validateDefault;
+          }
+
+          try {
+            Template.validateSlotValueAgainstDescription(value, description);
+          } catch (error) {
+            error.message = `Error validating slot "${key}" default value: ${error.message}`;
+            slotErrors.push(error);
+          }
+        }
+
+        if ('validate' in value && 'type' in value) {
+          slotErrors.push(new TypeError(`Don't specify both slot validate and type (of ${key})`));
+        } else if (!('validate' in value || 'type' in value)) {
+          slotErrors.push(new TypeError(`Expected either slot validate or type (of ${key})`));
+        } else if ('validate' in value) {
+          if (typeof value.validate !== 'function') {
+            slotErrors.push(new TypeError(`Expected slot validate of (${key}) to be function`));
+          }
+        } else if ('type' in value) {
+          const acceptableSlotTypes = [
+            'string',
+            'number',
+            'bigint',
+            'boolean',
+            'symbol',
+            'html',
+          ];
+
+          if (value.type === 'function') {
+            slotErrors.push(new TypeError(`Functions shouldn't be provided to slots (${key})`));
+          }
+
+          if (value.type === 'object') {
+            slotErrors.push(new TypeError(`Provide validate function instead of type: object (${key})`));
+          }
+
+          if (!acceptableSlotTypes.includes(value.type)) {
+            slotErrors.push(new TypeError(`Expected slot type (of ${key}) to be one of ${acceptableSlotTypes.join(', ')}`));
+          }
+        }
+      }
+    }
+
+    if (!empty(slotErrors)) {
+      topErrors.push(new AggregateError(slotErrors, `Errors in slot descriptions`));
+    }
+
+    if (!empty(topErrors)) {
+      throw new AggregateError(topErrors,
+        (description.annotation
+          ? `Errors validating template "${description.annotation}" description`
+          : `Errors validating template description`));
+    }
+
+    return true;
   }
 
-  slot(slotName, content) {
-    this.setSlot(slotName, content);
+  slot(slotName, value) {
+    this.setSlot(slotName, value);
     return this;
   }
 
-  setSlot(slotName, content) {
-    if (Array.isArray(content)) {
-      this.#slotContents[slotName] = content;
-    } else {
-      this.#slotContents[slotName] = [content];
-    }
-    this.#slotTraces[slotName] = getTopOfCallerTrace();
+  slots(slotNamesToValues) {
+    this.setSlots(slotNamesToValues);
+    return this;
   }
 
-  getSlot(slotName) {
-    if (this.#slotContents[slotName]) {
-      const contents = this.#slotContents[slotName]
-        .map(item =>
-          (item === null || item === undefined
-            ? item
-            : item.valueOf()));
-      return new Tag(null, null, contents).valueOf();
-    } else {
-      return blank();
+  setSlot(slotName, value) {
+    const description = this.#getSlotDescriptionOrError(slotName);
+
+    try {
+      Template.validateSlotValueAgainstDescription(value, description);
+    } catch (error) {
+      error.message =
+        (this.description.annotation
+          ? `Error validating template "${this.description.annotation}" slot "${slotName}" value: ${error.message}`
+          : `Error validating template slot "${slotName}" value: ${error.message}`);
+      throw error;
     }
+
+    this.#slotValues[slotName] = value;
   }
 
-  // Dragons.
-  getSlotTrace(slotName) {
-    return this.#slotTraces[slotName] ?? '';
+  setSlots(slotNamesToValues) {
+    if (
+      typeof slotNamesToValues !== 'object' ||
+      Array.isArray(slotNamesToValues) ||
+      slotNamesToValues === null
+    ) {
+      throw new TypeError(`Expected object mapping of slot names to values`);
+    }
+
+    const slotErrors = [];
+
+    for (const [slotName, value] of Object.entries(slotNamesToValues)) {
+      const description = this.#getSlotDescriptionNoError(slotName);
+      if (!description) {
+        slotErrors.push(new TypeError(`(${slotName}) Template doesn't have a "${slotName}" slot`));
+        continue;
+      }
+
+      try {
+        Template.validateSlotValueAgainstDescription(value, description);
+      } catch (error) {
+        error.message = `(${slotName}) ${error.message}`;
+        slotErrors.push(error);
+      }
+    }
+
+    if (!empty(slotErrors)) {
+      throw new AggregateError(slotErrors,
+        (this.description.annotation
+          ? `Error validating template "${this.description.annotation}" slots`
+          : `Error validating template slots`));
+    }
+
+    Object.assign(this.#slotValues, slotNamesToValues);
+  }
+
+  static validateSlotValueAgainstDescription(value, description) {
+    if (value === undefined) {
+      throw new TypeError(`Specify value as null or don't specify at all`);
+    }
+
+    // Null is always an acceptable slot value.
+    if (value !== null) {
+      if ('validate' in description) {
+        description.validate({
+          ...commonValidators,
+          ...validators,
+        })(value);
+      }
+
+      if ('type' in description) {
+        const {type} = description;
+        if (type === 'html') {
+          if (!isHTML(value)) {
+            throw new TypeError(`Slot expects html (tag, template or blank), got ${value}`);
+          }
+        } else {
+          if (typeof value !== type) {
+            throw new TypeError(`Slot expects ${type}, got ${value}`);
+          }
+        }
+      }
+    }
+
+    return true;
+  }
+
+  getSlotValue(slotName) {
+    const description = this.#getSlotDescriptionOrError(slotName);
+    const providedValue = this.#slotValues[slotName] ?? null;
+
+    if (description.type === 'html') {
+      if (!providedValue) {
+        return blank();
+      }
+
+      return providedValue;
+    }
+
+    if (providedValue) {
+      return providedValue;
+    }
+
+    if ('default' in description) {
+      return description.default;
+    }
+
+    return null;
+  }
+
+  getSlotDescription(slotName) {
+    return this.#getSlotDescriptionOrError(slotName);
+  }
+
+  #getSlotDescriptionNoError(slotName) {
+    if (this.#description.slots) {
+      if (Object.hasOwn(this.#description.slots, slotName)) {
+        return this.#description.slots[slotName];
+      }
+    }
+
+    return null;
+  }
+
+  #getSlotDescriptionOrError(slotName) {
+    const description = this.#getSlotDescriptionNoError(slotName);
+
+    if (!description) {
+      throw new TypeError(
+        (this.description.annotation
+          ? `Template "${this.description.annotation}" doesn't have a "${slotName}" slot`
+          : `Template doesn't have a "${slotName}" slot`));
+    }
+
+    return description;
   }
 
   set content(_value) {
@@ -449,117 +735,24 @@ export class Template {
   }
 
   get content() {
-    return this.#tag.content;
+    const slots = {};
+
+    for (const slotName of Object.keys(this.description.slots ?? {})) {
+      slots[slotName] = this.getSlotValue(slotName);
+    }
+
+    return this.description.content(slots);
+  }
+
+  set description(_value) {
+    throw new Error(`Template description can't be changed after constructed`);
+  }
+
+  get description() {
+    return this.#description;
   }
 
   toString() {
     return this.content.toString();
-  }
-}
-
-function getTopOfCallerTrace() {
-  const error = new Error();
-  return error.stack.split('\n')
-    .find(line => line.includes('at ') && !line.includes('/util/html.js'))
-    .replace('at ', '')
-    .trim();
-}
-
-export class Slot {
-  #defaultTag = new Tag();
-  #handleContent = null;
-
-  #stackIdentifier = '';
-  #stackTrace = '';
-
-  constructor(template, slotName, defaultContentOrHandleContent) {
-    if (!template) {
-      throw new Error(`Expected template`);
-    }
-
-    if (typeof slotName !== 'string') {
-      throw new Error(`Expected slotName to be string, got ${slotName}`);
-    }
-
-    this.template = template;
-    this.slotName = slotName;
-
-    this.#setupStackMutation();
-
-    if (typeof defaultContentOrHandleContent === 'function') {
-      this.#handleContent = defaultContentOrHandleContent;
-    } else {
-      this.defaultContent = defaultContentOrHandleContent;
-    }
-  }
-
-  #setupStackMutation() {
-    // Here be dragons.
-
-    this.#stackIdentifier = `Slot.valueOf:${Math.floor(10000000 * Math.random())}`;
-
-    this.valueOf = () => this.constructor.prototype.valueOf.apply(this);
-    Object.defineProperty(this.valueOf, 'name', {
-      value: this.#stackIdentifier,
-    });
-
-    this.#stackTrace = getTopOfCallerTrace();
-  }
-
-  #mutateStack(error) {
-    // Splice the line marked with #stackIdentifier with a more descriptive message,
-    // and erase the line above as well because it's the trace for the constructor's
-    // valueOf().
-    const lines = error.stack.split('\n');
-    const index = lines.findIndex(line => line.includes(`at ${this.#stackIdentifier}`))
-    const setTrace = this.template.getSlotTrace(this.slotName);
-    lines.splice(
-      index - 1, 2,
-      `at Slot("${this.slotName}") (from ${this.#stackTrace})`,
-      (setTrace
-        ? `at …set from ${setTrace}`
-        : `at …left unset`));
-    error.stack = lines.join('\n');
-  }
-
-  set defaultContent(value) {
-    this.#defaultTag.content = value;
-  }
-
-  get defaultContent() {
-    return this.#defaultTag.content;
-  }
-
-  set content(value) {
-    // Content is stored on the template rather than the slot itself so that
-    // a given slot name can be reused (i.e. two slots can share a name and
-    // will be filled with the same value).
-    this.template.setSlot(this.slotName, value);
-  }
-
-  get content() {
-    const contentTag = this.template.getSlot(this.slotName);
-    return contentTag?.content ?? this.#defaultTag.content;
-  }
-
-  toString() {
-    return this.valueOf().toString();
-  }
-
-  valueOf() {
-    try {
-      if (this.#handleContent) {
-        const result = this.#handleContent(this.content);
-        if (result === null || result === undefined) {
-          throw new Error(`Expected function for slot ${this.slotName} to return a value, got ${result}`);
-        }
-        return result.valueOf();
-      } else {
-        return this.content.valueOf();
-      }
-    } catch (error) {
-      this.#mutateStack(error);
-      throw error;
-    }
   }
 }

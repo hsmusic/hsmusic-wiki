@@ -31,39 +31,60 @@ export default {
     thumb,
     to,
   }) {
-    return html.template(slot =>
-      slot('src', ([src]) =>
-      slot('path', ([...path]) =>
-      slot('thumb', ([thumbKey = '']) =>
-      slot('link', ([link = false]) =>
-      slot('lazy', ([lazy = false]) =>
-      slot('square', ([willSquare = false]) => {
+    return html.template({
+      annotation: 'image',
+
+      slots: {
+        src: {
+          type: 'string',
+        },
+
+        path: {
+          validate: v => v.validateArrayItems(v.isString),
+        },
+
+        thumb: {type: 'string'},
+
+        link: {type: 'boolean', default: false},
+        lazy: {type: 'boolean', default: false},
+        square: {type: 'boolean', default: false},
+
+        id: {type: 'string'},
+        alt: {type: 'string'},
+        width: {type: 'number'},
+        height: {type: 'number'},
+
+        missingSourceContent: {type: 'html'},
+      },
+
+      content(slots) {
         let originalSrc;
 
-        if (src) {
-          originalSrc = src;
-        } else if (!empty(path)) {
-          originalSrc = to(...path);
+        if (slots.src) {
+          originalSrc = slots.src;
+        } else if (!empty(slots.path)) {
+          originalSrc = to(...slots.path);
         } else {
           originalSrc = '';
         }
 
         const thumbSrc =
           originalSrc &&
-            (thumbKey
-              ? thumb[thumbKey](originalSrc)
+            (slots.thumb
+              ? thumb[slots.thumb](originalSrc)
               : originalSrc);
 
-        const willLink = typeof link === 'string' || link;
+        const willLink = typeof slots.link === 'string' || slots.link;
         const willReveal = originalSrc && !empty(data.contentWarnings);
+        const willSquare = slots.square;
 
-        const idOnImg = willLink ? null : slot('id');
-        const idOnLink = willLink ? slot('id') : null;
+        const idOnImg = willLink ? null : slots.id;
+        const idOnLink = willLink ? slots.id : null;
 
         if (!originalSrc) {
           return prepare(
             html.tag('div', {class: 'image-text-area'},
-              slot('missingSourceContent')));
+              slots.missingSourceContent));
         }
 
         let fileSize = null;
@@ -90,13 +111,11 @@ export default {
           ];
         }
 
-        const className = slot('class');
         const imgAttributes = {
           id: idOnImg,
-          class: className,
-          alt: slot('alt'),
-          width: slot('width'),
-          height: slot('height'),
+          alt: slots.alt,
+          width: slots.width,
+          height: slots.height,
           'data-original-size': fileSize,
         };
 
@@ -108,14 +127,14 @@ export default {
                 src: thumbSrc,
               }));
 
-        if (lazy) {
+        if (slots.lazy) {
           return html.tags([
             html.tag('noscript', nonlazyHTML),
             prepare(
               html.tag('img',
                 {
                   ...imgAttributes,
-                  class: [className, 'lazy'],
+                  class: 'lazy',
                   'data-original': thumbSrc,
                 }),
               true),
@@ -166,8 +185,8 @@ export default {
                 ],
 
                 href:
-                  (typeof link === 'string'
-                    ? link
+                  (typeof slots.link === 'string'
+                    ? slots.link
                     : originalSrc),
               },
               wrapped);
@@ -175,6 +194,7 @@ export default {
 
           return wrapped;
         }
-      })))))));
-    },
+      },
+    });
+  }
 };

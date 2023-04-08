@@ -1,6 +1,7 @@
 import chokidar from 'chokidar';
 import EventEmitter from 'events';
 import * as path from 'path';
+import {ESLint} from 'eslint';
 import {fileURLToPath} from 'url';
 
 import contentFunction from '../../content-function.js';
@@ -34,6 +35,8 @@ export function watchContentDependencies({
     contentDependencies,
     close,
   });
+
+  const eslint = new ESLint();
 
   // Watch adjacent files
   const metaPath = fileURLToPath(import.meta.url);
@@ -129,6 +132,13 @@ export function watchContentDependencies({
     let error = null;
 
     main: {
+      const eslintResults = await eslint.lintFiles([filePath]);
+      const eslintFormatter = await eslint.loadFormatter('stylish');
+      const eslintResultText = eslintFormatter.format(eslintResults);
+      if (eslintResultText.trim().length) {
+        console.log(eslintResultText);
+      }
+
       let spec;
       try {
         spec = (await import(cachebust(filePath))).default;

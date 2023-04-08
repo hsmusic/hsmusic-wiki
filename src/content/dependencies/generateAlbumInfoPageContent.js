@@ -117,8 +117,10 @@ export default {
     const content = {};
 
     content.cover = relations.cover
-      .slot('path', ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension])
-      .slot('alt', language.$('misc.alt.trackCover'));
+      .slots({
+        path: ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension],
+        alt: language.$('misc.alt.trackCover')
+      });
 
     content.main = {
       headingMode: 'sticky',
@@ -213,20 +215,25 @@ export default {
 
         relations.additionalFilesList && [
           relations.additionalFilesHeading
-            .slot('id', 'additional-files')
-            .slot('title',
-              language.$('releaseInfo.additionalFiles.heading', {
-                additionalFiles:
-                  language.countAdditionalFiles(data.numAdditionalFiles, {unit: true}),
-              })),
+            .slots({
+              id: 'additional-files',
+
+              title:
+                language.$('releaseInfo.additionalFiles.heading', {
+                  additionalFiles:
+                    language.countAdditionalFiles(data.numAdditionalFiles, {unit: true}),
+                }),
+            }),
 
           relations.additionalFilesList,
         ],
 
         data.artistCommentary && [
           relations.artistCommentaryHeading
-            .slot('id', 'artist-commentary')
-            .slot('title', language.$('releaseInfo.artistCommentary')),
+            .slots({
+              id: 'artist-commentary',
+              title: language.$('releaseInfo.artistCommentary')
+            }),
 
           html.tag('blockquote',
             transformMultiline(data.artistCommentary)),

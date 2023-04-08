@@ -32,7 +32,7 @@ exports[`test/snapshot/image.js TAP image (snapshot) > id without link 1`] = `
 
 exports[`test/snapshot/image.js TAP image (snapshot) > lazy with square 1`] = `
 <noscript><div class="square"><div class="square-content"><div class="image-container"><img src="foobar"></div></div></div></noscript>
-<div class="square js-hide"><div class="square-content"><div class="image-container"><img class=" lazy" data-original="foobar"></div></div></div>
+<div class="square js-hide"><div class="square-content"><div class="image-container"><img class="lazy" data-original="foobar"></div></div></div>
 `
 
 exports[`test/snapshot/image.js TAP image (snapshot) > link with file size 1`] = `
