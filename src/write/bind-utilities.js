@@ -26,6 +26,7 @@ export function bindUtilities({
   getSizeOfImageFile,
   language,
   languages,
+  pagePath,
   to,
   urls,
   wikiData,
@@ -44,10 +45,11 @@ export function bindUtilities({
     html,
     language,
     languages,
+    pagePath,
     thumb,
     to,
     urls,
-    wikiData,
+    wikiInfo: wikiData.wikiInfo,
   });
 
   bound.getColors = bindOpts(getColors, {chroma});

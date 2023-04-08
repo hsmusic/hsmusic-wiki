@@ -3,10 +3,6 @@ import chroma from 'chroma-js';
 import * as html from '../util/html.js';
 import {getColors} from '../util/colors.js';
 
-import {
-  getFooterLocalizationLinks,
-} from '../misc-templates.js';
-
 export function generateDevelopersCommentHTML({
   buildTime,
   commit,

@@ -20,7 +20,6 @@ import {
 } from '../../util/urls.js';
 
 import {
-  generateDocumentHTML,
   generateGlobalWikiDataJSON,
   generateRedirectHTML,
 } from '../page-template.js';
@@ -350,6 +349,7 @@ export async function go({
         getSizeOfImageFile,
         language,
         languages,
+        pagePath: servePath,
         to,
         urls,
         wikiData,
