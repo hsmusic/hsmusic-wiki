@@ -148,7 +148,8 @@ export default {
 
           wrapped =
             html.tag('div', {class: 'image-container'},
-              wrapped);
+              html.tag('div', {class: 'image-inner-area'},
+                wrapped));
 
           if (willReveal) {
             wrapped =
