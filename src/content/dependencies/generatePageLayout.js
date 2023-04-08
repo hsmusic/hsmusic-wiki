@@ -26,6 +26,11 @@ export default {
           default: 'static',
         },
 
+        styleRules: {
+          validate: v => v.arrayOf(v.isString),
+          default: [],
+        },
+
         mainClasses: {
           validate: v => v.arrayOf(v.isString),
           default: [],
@@ -162,14 +167,9 @@ export default {
                   href: to('shared.staticFile', `site3.css?${cachebust}`),
                 }),
 
-                /*
                 html.tag('style',
                   {[html.onlyIfContent]: true},
-                  [
-                    theme,
-                    stylesheet,
-                  ]),
-                */
+                  slots.styleRules),
 
                 html.tag('script', {
                   src: to('shared.staticFile', `lazy-loading.js?${cachebust}`),

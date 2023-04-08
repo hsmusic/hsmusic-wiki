@@ -38,14 +38,13 @@ export default {
   }) {
     // page.themeColor = data.color;
 
-    // page.styleRules = [
-    //   relations.albumStyleRules,
-    //   relations.colorStyleRules,
-    // ];
-
     return relations.layout
       .slots({
         title: language.$('albumPage.title', {album: data.name}),
+        styleRules: [
+          relations.albumStyleRules,
+          relations.colorStyleRules,
+        ],
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
