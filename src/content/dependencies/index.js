@@ -156,6 +156,11 @@ export function watchContentDependencies({
         break main;
       }
 
+      if (logging && contentDependencies[functionName]) {
+        const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
+        console.log(color.green(`[${timestamp}] Updated ${functionName}`));
+      }
+
       contentDependencies[functionName] = fn;
 
       events.emit('update', functionName);
