@@ -156,7 +156,7 @@ export function watchContentDependencies({
         break main;
       }
 
-      if (logging && contentDependencies[functionName]) {
+      if (logging && initialScanComplete) {
         const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
         console.log(color.green(`[${timestamp}] Updated ${functionName}`));
       }

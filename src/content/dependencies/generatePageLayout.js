@@ -1,15 +1,33 @@
 export default {
+  contentDependencies: [
+    'generateFooterLocalizationLinks',
+  ],
+
   extraDependencies: [
+    'cachebust',
     'html',
     'language',
     'to',
+    'transformMultiline',
+    'wikiInfo',
   ],
 
-  generate({
+  relations(relation) {
+    const relations = {};
+
+    relations.footerLocalizationLinks =
+      relation('generateFooterLocalizationLinks');
+
+    return relations;
+  },
+
+  generate(relations, {
     cachebust,
     html,
     language,
     to,
+    transformMultiline,
+    wikiInfo,
   }) {
     return html.template({
       annotation: 'generatePageLayout',
@@ -19,6 +37,7 @@ export default {
         cover: {type: 'html'},
 
         mainContent: {type: 'html'},
+        footerContent: {type: 'html'},
         socialEmbed: {type: 'html'},
 
         headingMode: {
@@ -58,6 +77,12 @@ export default {
           }
         }
 
+        let footerContent = slots.footerContent;
+
+        if (html.isBlank(footerContent) && wikiInfo.footerContent) {
+          footerContent = transformMultiline(wikiInfo.footerContent);
+        }
+
         const mainHTML =
           html.tag('main', {
             id: 'content',
@@ -74,6 +99,20 @@ export default {
               },
               slots.mainContent),
           ]);
+
+        const footerHTML =
+          html.tag('footer',
+            {[html.onlyIfContent]: true, id: 'footer'},
+            [
+              html.tag('div',
+                {
+                  [html.onlyIfContent]: true,
+                  class: 'footer-content',
+                },
+                footerContent),
+
+              relations.footerLocalizationLinks,
+            ]);
 
         const layoutHTML = [
           // navHTML,
@@ -97,7 +136,7 @@ export default {
               // sidebarRightHTML,
             ]),
           // banner.position === 'bottom' && bannerHTML,
-          // footerHTML,
+          footerHTML,
         ].filter(Boolean).join('\n');
 
         const documentHTML = html.tags([
