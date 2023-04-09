@@ -3,6 +3,8 @@ import t from 'tap';
 import * as html from '../../../src/util/html.js';
 const {Tag, Attributes, Template} = html;
 
+import {strictlyThrows} from '../../lib/strict-match-error.js';
+
 t.test(`html.tag`, t => {
   t.plan(14);
 
@@ -478,6 +480,7 @@ t.test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
 
   t.equal(tag6.toString(),
     `<span><i>Oh yes~ </i>You're a cute one<sup>💕</sup></span>`);
+
 });
 
 t.test(`Tag.toString (custom attributes)`, t => {
@@ -492,4 +495,222 @@ t.test(`Tag.toString (custom attributes)`, t => {
     const tag2 = html.tag('a', {href: `https://hsmusic.wiki/media/Album Booklet.pdf`});
     t.equal(tag2.toString(), `<a href="https://hsmusic.wiki/media/Album%20Booklet.pdf"></a>`);
   });
+});
+
+t.test(`html.template`, t => {
+  t.plan(10);
+
+  let contentCalls;
+
+  // 1-4: basic behavior - no slots
+
+  contentCalls = 0;
+
+  const template1 = html.template({
+    content() {
+      contentCalls++;
+      return html.tag('hr');
+    },
+  });
+
+  t.equal(contentCalls, 0);
+  t.equal(template1.toString(), `<hr>`);
+  t.equal(contentCalls, 1);
+  template1.toString();
+  t.equal(contentCalls, 2);
+
+  // 5-10: basic behavior - slots
+
+  contentCalls = 0;
+
+  const template2 = html.template({
+    slots: {
+      foo: {
+        type: 'string',
+        default: 'Default Message',
+      },
+    },
+
+    content(slots) {
+      contentCalls++;
+      return html.tag('sub', slots.foo.toLowerCase());
+    },
+  });
+
+  t.equal(contentCalls, 0);
+  t.equal(template2.toString(), `<sub>default message</sub>`);
+  t.equal(contentCalls, 1);
+  template2.setSlot('foo', `R-r-really, me?`);
+  t.equal(contentCalls, 1);
+  t.equal(template2.toString(), `<sub>r-r-really, me?</sub>`);
+  t.equal(contentCalls, 2);
+});
+
+t.test(`Template - description errors`, t => {
+  t.plan(14);
+
+  // 1-3: top-level description is object
+
+  strictlyThrows(t,
+    () => Template.validateDescription('snooping as usual'),
+    new TypeError(`Expected object, got string`));
+
+  strictlyThrows(t,
+    () => Template.validateDescription(),
+    new TypeError(`Expected object, got undefined`));
+
+  strictlyThrows(t,
+    () => Template.validateDescription(null),
+    new TypeError(`Expected object, got null`));
+
+  // 4-5: description.content is function
+
+  strictlyThrows(t,
+    () => Template.validateDescription({}),
+    new AggregateError([
+      new TypeError(`Expected description.content`),
+    ], `Errors validating template description`));
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      content: 'pingas',
+    }),
+    new AggregateError([
+      new TypeError(`Expected description.content to be function`),
+    ], `Errors validating template description`));
+
+  // 6: aggregate error includes template annotation
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      annotation: `my cool template`,
+      content: 'pingas',
+    }),
+    new AggregateError([
+      new TypeError(`Expected description.content to be function`),
+    ], `Errors validating template "my cool template" description`));
+
+  // 7: description.slots is object
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: 'pingas',
+      content: () => {},
+    }),
+    new AggregateError([
+      new TypeError(`Expected description.slots to be object`),
+    ], `Errors validating template description`));
+
+  // 8: slot description is object
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        mySlot: 'pingas',
+      },
+
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`(mySlot) Expected slot description to be object`),
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`))
+
+  // 9-10: slot description has validate or default, not both
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        mySlot: {},
+      },
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`(mySlot) Expected either slot validate or type`),
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`));
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        mySlot: {
+          validate: 'pingas',
+          type: 'pingas',
+        },
+      },
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`(mySlot) Don't specify both slot validate and type`),
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`));
+
+  // 11: slot validate is function
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        mySlot: {
+          validate: 'pingas',
+        },
+      },
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`(mySlot) Expected slot validate to be function`),
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`));
+
+  // 12: slot type is name of built-in type
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        mySlot: {
+          type: 'pingas',
+        },
+      },
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        /\(mySlot\) Expected slot type to be one of/,
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`));
+
+  // 13: slot type has specific errors for function & object
+
+  strictlyThrows(t,
+    () => Template.validateDescription({
+      slots: {
+        slot1: {type: 'function'},
+        slot2: {type: 'object'},
+      },
+      content: () => {},
+    }),
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`(slot1) Functions shouldn't be provided to slots`),
+        new TypeError(`(slot2) Provide validate function instead of type: object`),
+      ], `Errors in slot descriptions`),
+    ], `Errors validating template description`));
+
+  // 14: all intended types are supported
+
+  t.doesNotThrow(
+    () => Template.validateDescription({
+      slots: {
+        slot1: {type: 'string'},
+        slot2: {type: 'number'},
+        slot3: {type: 'bigint'},
+        slot4: {type: 'boolean'},
+        slot5: {type: 'symbol'},
+        slot6: {type: 'html'},
+      },
+      content: () => {},
+    }));
 });
