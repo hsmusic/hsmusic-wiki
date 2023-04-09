@@ -714,3 +714,157 @@ t.test(`Template - description errors`, t => {
       content: () => {},
     }));
 });
+
+t.test(`Template - slot value errors`, t => {
+  t.plan(8);
+
+  const template1 = html.template({
+    slots: {
+      basicString: {type: 'string'},
+      basicNumber: {type: 'number'},
+      basicBigint: {type: 'bigint'},
+      basicBoolean: {type: 'boolean'},
+      basicSymbol: {type: 'symbol'},
+      basicHTML: {type: 'html'},
+    },
+
+    content: slots =>
+      html.tag('p', [
+        `string: ${slots.basicString}`,
+        `number: ${slots.basicNumber}`,
+        `bigint: ${slots.basicBigint}`,
+        `boolean: ${slots.basicBoolean}`,
+        `symbol: ${slots.basicSymbol?.toString()   ?? 'no symbol'}`,
+
+        `html:`,
+        slots.basicHTML,
+      ]),
+  });
+
+  // 1-2: basic values match type, no error & reflected in content
+
+  t.doesNotThrow(
+    () => template1.setSlots({
+      basicString: 'pingas',
+      basicNumber: 123,
+      basicBigint: 1234567891234567n,
+      basicBoolean: true,
+      basicSymbol: Symbol(`sup`),
+      basicHTML: html.tag('span', `SnooPING AS usual, I see!`),
+    }));
+
+  t.equal(
+    template1.toString(),
+    html.tag('p', [
+      `string: pingas`,
+      `number: 123`,
+      `bigint: 1234567891234567`,
+      `boolean: true`,
+      `symbol: Symbol(sup)`,
+      `html:`,
+      html.tag('span', `SnooPING AS usual, I see!`),
+    ]).toString());
+
+  // 3-4: null matches any type, no error & reflected in content
+
+  t.doesNotThrow(
+    () => template1.setSlots({
+      basicString: null,
+      basicNumber: null,
+      basicBigint: null,
+      basicBoolean: null,
+      basicSymbol: null,
+      basicHTML: null,
+    }));
+
+  t.equal(
+    template1.toString(),
+    html.tag('p', [
+      `string: null`,
+      `number: null`,
+      `bigint: null`,
+      `boolean: null`,
+      `symbol: no symbol`,
+      `html:`,
+    ]).toString());
+
+  // 5-6: type mismatch throws error, invalidates entire setSlots call
+
+  template1.setSlots({
+    basicString: 'pingas',
+    basicNumber: 123,
+  });
+
+  strictlyThrows(t,
+    () => template1.setSlots({
+      basicBoolean: false,
+      basicSymbol: `I'm not a symbol!`,
+    }),
+    new AggregateError([
+      new TypeError(`(basicSymbol) Slot expects symbol, got string`),
+    ], `Error validating template slots`))
+
+  t.equal(
+    template1.toString(),
+    html.tag('p', [
+      `string: pingas`,
+      `number: 123`,
+      `bigint: null`,
+      `boolean: null`,
+      `symbol: no symbol`,
+      `html:`,
+    ]).toString());
+
+  const template2 = html.template({
+    slots: {
+      arrayOfStrings: {
+        validate: v => v.arrayOf(v.isString),
+        default: `Array Of Strings Fallback`.split(' '),
+      },
+
+      arrayOfHTML: {
+        validate: v => v.arrayOf(v.isHTML),
+        default: [],
+      },
+    },
+
+    content: slots =>
+      html.tag('p', [
+        html.tag('strong', slots.arrayOfStrings),
+        `arrayOfHTML length: ${slots.arrayOfHTML.length}`,
+      ]),
+  });
+
+  // 7: isHTML behaves as it should, validate fails with validate throw
+
+  strictlyThrows(t,
+    () => template2.setSlots({
+      arrayOfStrings: ['you got it', 'pingas', 0xdeadbeef],
+      arrayOfHTML: [
+        html.tag('span'),
+        html.template({content: () => 'dog'}),
+        html.blank(),
+      ],
+    }),
+    new AggregateError([
+      {
+        name: 'AggregateError',
+        message: /^\(arrayOfStrings\)/,
+        errors: {length: 1},
+      },
+    ], `Error validating template slots`));
+
+  // 8: default slot values respected
+
+  t.equal(
+    template2.toString(),
+    html.tag('p', [
+      html.tag('strong', [
+        `Array`,
+        `Of`,
+        `Strings`,
+        `Fallback`,
+      ]),
+      `arrayOfHTML length: 0`,
+    ]).toString());
+});

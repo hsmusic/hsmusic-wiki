@@ -666,11 +666,11 @@ export class Template {
         const {type} = description;
         if (type === 'html') {
           if (!isHTML(value)) {
-            throw new TypeError(`Slot expects html (tag, template or blank), got ${value}`);
+            throw new TypeError(`Slot expects html (tag, template or blank), got ${typeof value}`);
           }
         } else {
           if (typeof value !== type) {
-            throw new TypeError(`Slot expects ${type}, got ${value}`);
+            throw new TypeError(`Slot expects ${type}, got ${typeof value}`);
           }
         }
       }
