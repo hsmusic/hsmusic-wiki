@@ -2,7 +2,7 @@ import {compareArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
-    'generateContributionLinks',
+    'linkContribution',
     'linkTrack',
   ],
 
@@ -16,10 +16,11 @@ export default {
     const relations = {};
 
     relations.contributionLinks =
-      relation('generateContributionLinks', track.artistContribs, {
-        showContribution: false,
-        showIcons: false,
-      });
+      track.artistContribs.map(({who, what}) =>
+        relation('linkContribution', who, what, {
+          showContribution: false,
+          showIcons: false,
+        }));
 
     relations.trackLink =
       relation('linkTrack', track);
@@ -67,7 +68,7 @@ export default {
             by:
               html.tag('span', {class: 'by'},
                 language.$('trackList.item.withArtists.by', {
-                  artists: relations.contributionLinks,
+                  artists: language.formatConjunctionList(relations.contributionLinks),
                 })),
           })));
   },

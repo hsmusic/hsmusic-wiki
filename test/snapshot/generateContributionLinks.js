@@ -1,7 +1,12 @@
+// todo: this dependency was replaced with linkContribution, restructure test
+// remove generateContributionLinks.js.test.cjs snapshot file too!
+
 import t from 'tap';
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'generateContributionLinks (snapshot)', async (t, evaluate) => {
+t.skip('generateContributionLinks (snapshot)');
+
+void (() => testContentFunctions(t, 'generateContributionLinks (snapshot)', async (t, evaluate) => {
   const artist1 = {
     name: 'Clark Powell',
     directory: 'clark-powell',
@@ -47,4 +52,4 @@ testContentFunctions(t, 'generateContributionLinks (snapshot)', async (t, evalua
     name: 'generateContributionLinks',
     args: [contributions, {showContribution: false, showIcons: false}],
   });
-});
+}));

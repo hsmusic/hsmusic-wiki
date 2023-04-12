@@ -41,8 +41,8 @@ export default {
   }) {
     return relations.additionalFilesList
       .slots({
-        additionalFileLinks: relations.additionalFileLinks,
-        additionalFileSizes:
+        fileLinks: relations.additionalFileLinks,
+        fileSizes:
           Object.fromEntries(data.fileLocations.map(file => [
             file,
             (data.showFileSizes

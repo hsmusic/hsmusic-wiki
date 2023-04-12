@@ -27,9 +27,8 @@ export class Artist extends Thing {
 
     aliasNames: {
       flags: {update: true, expose: true},
-      update: {
-        validate: validateArrayItems(isName),
-      },
+      update: {validate: validateArrayItems(isName)},
+      expose: {transform: (names) => names ?? []},
     },
 
     isAlias: Thing.common.flag(),

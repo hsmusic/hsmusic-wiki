@@ -433,6 +433,11 @@ export async function go({
 
       function runContentFunction({name, args, relations}) {
         const contentFunction = fulfilledContentDependencies[name];
+
+        if (!contentFunction) {
+          throw new Error(`Content function ${name} unfulfilled or not listed`);
+        }
+
         const filledRelations =
           fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, relations);
 

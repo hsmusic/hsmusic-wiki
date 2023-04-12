@@ -1,7 +1,6 @@
 export default {
   contentDependencies: [
-    'generateAlbumInfoPageContent',
-    'generateAlbumSocialEmbed',
+    'generateTrackInfoPageContent',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
     'generatePageLayout',
@@ -9,27 +8,26 @@ export default {
 
   extraDependencies: ['language'],
 
-  relations(relation, album) {
+  relations(relation, track) {
     return {
       layout: relation('generatePageLayout'),
 
-      content: relation('generateAlbumInfoPageContent', album),
-      socialEmbed: relation('generateAlbumSocialEmbed', album),
-      albumStyleRules: relation('generateAlbumStyleRules', album),
-      colorStyleRules: relation('generateColorStyleRules', album.color),
+      content: relation('generateTrackInfoPageContent', track),
+      albumStyleRules: relation('generateAlbumStyleRules', track.album),
+      colorStyleRules: relation('generateColorStyleRules', track.color),
     };
   },
 
-  data(album) {
+  data(track) {
     return {
-      name: album.name,
+      name: track.name,
     };
   },
 
   generate(data, relations, {language}) {
     return relations.layout
       .slots({
-        title: language.$('albumPage.title', {album: data.name}),
+        title: language.$('trackPage.title', {track: data.name}),
         styleRules: [
           relations.albumStyleRules,
           relations.colorStyleRules,
@@ -37,8 +35,6 @@ export default {
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
-
-        // socialEmbed: relations.socialEmbed,
       });
   },
-};
+}

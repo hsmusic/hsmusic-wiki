@@ -5,11 +5,11 @@ export default {
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateAlbumTrackList',
-    'generateContributionLinks',
     'generateContentHeading',
     'generateCoverArtwork',
     'linkAlbumCommentary',
     'linkAlbumGallery',
+    'linkContribution',
     'linkExternal',
   ],
 
@@ -22,14 +22,14 @@ export default {
   relations(relation, album) {
     const relations = {};
 
-    relations.cover =
-      relation('generateCoverArtwork', album.artTags);
-
     const contributionLinksRelation = contribs =>
-      relation('generateContributionLinks', contribs, {
-        showContribution: true,
-        showIcons: true,
-      });
+      contribs.map(contrib =>
+        relation('linkContribution', contrib.who, contrib.what));
+
+    if (album.hasCoverArt) {
+      relations.cover =
+        relation('generateCoverArtwork', album.artTags);
+    }
 
     relations.artistLinks =
       contributionLinksRelation(album.artistContribs);
@@ -43,9 +43,6 @@ export default {
     relations.bannerArtistLinks =
       contributionLinksRelation(album.bannerArtistContribs);
 
-    const contentHeadingRelation = () =>
-      relation('generateContentHeading');
-
     if (album.tracks.some(t => t.hasUniqueCoverArt)) {
       relations.galleryLink =
         relation('linkAlbumGallery', album);
@@ -57,10 +54,8 @@ export default {
     }
 
     relations.externalLinks =
-      (empty(album.urls)
-        ? null
-        : album.urls.map(url =>
-            relation('linkExternal', url, {type: 'album'})));
+      album.urls.map(url =>
+        relation('linkExternal', url, {type: 'album'}));
 
     relations.trackList = relation('generateAlbumTrackList', album);
 
@@ -69,14 +64,14 @@ export default {
         relation('generateAdditionalFilesShortcut', album.additionalFiles);
 
       relations.additionalFilesHeading =
-        contentHeadingRelation();
+        relation('generateContentHeading');
 
       relations.additionalFilesList =
         relation('generateAlbumAdditionalFilesList', album);
     }
 
     relations.artistCommentaryHeading =
-      contentHeadingRelation();
+      relation('generateContentHeading');
 
     return relations;
   },
@@ -84,19 +79,19 @@ export default {
   data(album) {
     const data = {};
 
-    data.coverArtDirectory = album.directory;
-    data.coverArtFileExtension = album.coverArtFileExtension;
-
     data.date = album.date;
     data.duration = accumulateSum(album.tracks, track => track.duration);
     data.durationApproximate = album.tracks.length > 1;
 
-    if (
-      album.hasCoverArt &&
-      album.coverArtDate &&
-      +album.coverArtDate !== +album.date
-    ) {
-      data.coverArtDate = album.coverArtDate;
+    data.hasCoverArt = album.hasCoverArt;
+
+    if (album.hasCoverArt) {
+      data.coverArtDirectory = album.directory;
+      data.coverArtFileExtension = album.coverArtFileExtension;
+
+      if (album.coverArtDate && +album.coverArtDate !== +album.date) {
+        data.coverArtDate = album.coverArtDate;
+      }
     }
 
     if (!empty(album.additionalFiles)) {
@@ -116,39 +111,50 @@ export default {
   }) {
     const content = {};
 
-    content.cover = relations.cover
-      .slots({
-        path: ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension],
-        alt: language.$('misc.alt.trackCover')
-      });
+    const formatContributions = contributionLinks =>
+      language.formatConjunctionList(
+        contributionLinks.map(link =>
+          link
+            .slots({
+              showContribution: true,
+              showIcons: true,
+            })));
+
+    if (data.hasCoverArt) {
+      content.cover = relations.cover
+        .slots({
+          path: ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension],
+          alt: language.$('misc.alt.trackCover')
+        });
+    }
 
     content.main = {
       headingMode: 'sticky',
-      content: html.tag(null, [
+      content: html.tags([
         html.tag('p',
           {
             [html.onlyIfContent]: true,
-            [html.joinChildren]: '<br>',
+            [html.joinChildren]: html.tag('br'),
           },
           [
-            relations.artistLinks &&
+            !empty(relations.artistLinks) &&
               language.$('releaseInfo.by', {
-                artists: relations.artistLinks,
+                artists: formatContributions(relations.artistLinks),
               }),
 
-            relations.coverArtistLinks &&
+            !empty(relations.coverArtistLinks) &&
               language.$('releaseInfo.coverArtBy', {
-                artists: relations.coverArtistLinks,
+                artists: formatContributions(relations.coverArtistLinks),
               }),
 
-            relations.wallpaperArtistLinks &&
+            !empty(relations.wallpaperArtistLinks) &&
               language.$('releaseInfo.wallpaperArtBy', {
-                artists: relations.wallpaperArtistLinks,
+                artists: formatContributions(relations.wallpaperArtistLinks),
               }),
 
-            relations.bannerArtistLinks &&
+            !empty(relations.bannerArtistLinks) &&
               language.$('releaseInfo.bannerArtBy', {
-                artists: relations.bannerArtistLinks,
+                artists: formatContributions(relations.bannerArtistLinks),
               }),
 
             data.date &&

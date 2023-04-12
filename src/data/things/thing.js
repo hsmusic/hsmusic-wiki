@@ -63,6 +63,7 @@ export default class Thing extends CacheableObject {
     urls: () => ({
       flags: {update: true, expose: true},
       update: {validate: validateArrayItems(isURL)},
+      expose: {transform: (value) => value ?? []},
     }),
 
     // A file extension! Or the default, if provided when calling this.

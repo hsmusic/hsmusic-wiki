@@ -19,7 +19,7 @@ export default {
             id: slots.id,
             tabindex: '0',
           },
-          slots.content);
+          slots.title);
       },
     });
   }
