@@ -104,9 +104,9 @@ function unbound_getArtistString(artists, {
             class: 'icons'
           },
           language.formatUnitList(
-            urls.map(url => iconifyURL(url, {language}))));
+            urls.slice(0, 4).map(url => iconifyURL(url, {language}))));
 
-      return (
+      return html.tag('span', {class: 'nowrap'},
         (hasContribPart
           ? (hasExternalPart
               ? language.$('misc.artistLink.withContribution.withExternalLinks', {
@@ -125,8 +125,7 @@ function unbound_getArtistString(artists, {
                 })
               : language.$('misc.artistLink', {
                   artist: artistLink,
-                })))
-      );
+                }))));
     }));
 }
 
