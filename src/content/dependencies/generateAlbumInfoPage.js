@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generateAlbumInfoPageContent',
+    'generateAlbumNavLinks',
     'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
@@ -13,6 +14,7 @@ export default {
   relations(relation, album) {
     return {
       layout: relation('generatePageLayout'),
+      albumNavLinks: relation('generateAlbumNavLinks', album, null),
 
       content: relation('generateAlbumInfoPageContent', album),
       sidebar: relation('generateAlbumSidebar', album, null),
@@ -39,6 +41,20 @@ export default {
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
+
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {
+            auto: 'current',
+            accent:
+              relations.albumNavLinks.slots({
+                showTrackNavigation: true,
+                showExtraLinks: true,
+              }),
+          },
+        ],
+        navContent: '(Chronology links here)',
 
         ...relations.sidebar,
 

@@ -22,6 +22,7 @@ export default {
         path: {validate: v => v.validateArrayItems(v.isString)},
         hash: {type: 'string'},
 
+        tooltip: {validate: v => v.isString},
         attributes: {validate: v => v.isAttributes},
         color: {validate: v => v.isColor},
         content: {type: 'html'},
@@ -30,6 +31,7 @@ export default {
       content(slots) {
         let href = slots.href;
         let style;
+        let title;
 
         if (!href && !empty(slots.path)) {
           href = to(...slots.path);
@@ -53,11 +55,16 @@ export default {
           style = `--primary-color: ${primary}; --dim-color: ${dim}`;
         }
 
+        if (slots.tooltip) {
+          title = slots.tooltip;
+        }
+
         return html.tag('a',
           {
             ...slots.attributes ?? {},
             href,
             style,
+            title,
           },
           slots.content);
       },

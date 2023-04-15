@@ -226,6 +226,10 @@ export function openAggregate({
       );
     };
 
+  aggregate.push = (error) => {
+    errors.push(error);
+  };
+
   aggregate.call = (fn, ...args) => {
     return aggregate.wrap(fn)(...args);
   };

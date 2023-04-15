@@ -1,3 +1,5 @@
+import {empty, openAggregate} from '../../util/sugar.js';
+
 export default {
   contentDependencies: [
     'generateFooterLocalizationLinks',
@@ -105,6 +107,58 @@ export default {
 
         // Nav & Footer
 
+        navContent: {type: 'html'},
+        navBottomRowContent: {type: 'html'},
+
+        navLinkStyle: {
+          validate: v => v.is('hierarchical', 'index'),
+          default: 'index',
+        },
+
+        navLinks: {
+          validate: v =>
+            v.arrayOf(object => {
+              v.isObject(object);
+
+              const aggregate = openAggregate({message: `Errors validating navigation link`});
+
+              aggregate.call(v.validateProperties({
+                auto: () => true,
+                html: () => true,
+
+                path: () => true,
+                title: () => true,
+                accent: () => true,
+              }), object);
+
+              if (object.auto || object.html) {
+                if (object.auto && object.html) {
+                  aggregate.push(new TypeError(`Don't specify both auto and html`));
+                } else if (object.auto) {
+                  aggregate.call(v.is('home', 'current'), object.auto);
+                } else {
+                  aggregate.call(v.isHTML, object.html);
+                }
+
+                if (object.path || object.title) {
+                  aggregate.push(new TypeError(`Don't specify path or title along with auto or html`));
+                }
+              } else {
+                aggregate.call(v.validateProperties({
+                  path: v.arrayOf(v.isString),
+                  title: v.isString,
+                }), {
+                  path: object.path,
+                  title: object.title,
+                });
+              }
+
+              aggregate.close();
+
+              return true;
+            })
+        },
+
         footerContent: {type: 'html'},
       },
 
@@ -166,6 +220,87 @@ export default {
               relations.footerLocalizationLinks,
             ]);
 
+        const navHTML = html.tag('nav',
+          {
+            [html.onlyIfContent]: true,
+            id: 'header',
+            class: [
+              !empty(slots.navLinks) && 'nav-has-main-links',
+              !html.isBlank(slots.navContent) && 'nav-has-content',
+              !html.isBlank(slots.navBottomRowContent) && 'nav-has-bottom-row',
+            ],
+          },
+          [
+            html.tag('div',
+              {
+                [html.onlyIfContent]: true,
+                class: [
+                  'nav-main-links',
+                  'nav-links-' + slots.navLinkStyle,
+                ],
+              },
+              slots.navLinks?.map((cur, i) => {
+                let content;
+
+                if (cur.html) {
+                  content = cur.html;
+                } else {
+                  let title;
+                  let href;
+
+                  switch (cur.auto) {
+                    case 'home':
+                      title = wikiInfo.nameShort;
+                      href = to('localized.home');
+                      break;
+                    case 'current':
+                      title = slots.title;
+                      href = '';
+                      break;
+                    case null:
+                    case undefined:
+                      title = cur.title;
+                      href = to(...cur.path);
+                      break;
+                  }
+
+                  content = html.tag('a',
+                    {href},
+                    title);
+                }
+
+                let className;
+
+                if (cur.auto === 'current') {
+                  className = 'current';
+                } else if (
+                  slots.navLinkStyle === 'hierarchical' &&
+                  i === slots.navLinks.length - 1
+                ) {
+                  className = 'current';
+                }
+
+                return html.tag('span',
+                  {class: className},
+                  [
+                    html.tag('span',
+                      {class: 'nav-link-content'},
+                      content),
+                    html.tag('span',
+                      {[html.onlyIfContent]: true, class: 'nav-link-accent'},
+                      cur.accent),
+                  ]);
+              })),
+
+            html.tag('div',
+              {[html.onlyIfContent]: true, class: 'nav-bottom-row'},
+              slots.navBottomRowContent),
+
+            html.tag('div',
+              {[html.onlyIfContent]: true, class: 'nav-content'},
+              slots.navContent),
+          ])
+
         const generateSidebarHTML = (side, id) => {
           const content = slots[side + 'Content'];
           const multiple = slots[side + 'Multiple'];
@@ -213,7 +348,7 @@ export default {
         const collapseSidebars = slots.leftSidebarCollapse && slots.rightSidebarCollapse;
 
         const layoutHTML = [
-          // navHTML,
+          navHTML,
           // banner.position === 'top' && bannerHTML,
           // secondaryNavHTML,
           html.tag('div',
@@ -301,7 +436,7 @@ export default {
 
                 html.tag('link', {
                   rel: 'stylesheet',
-                  href: to('shared.staticFile', `site3.css?${cachebust}`),
+                  href: to('shared.staticFile', `site4.css?${cachebust}`),
                 }),
 
                 html.tag('style',

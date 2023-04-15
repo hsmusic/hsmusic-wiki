@@ -1,10 +1,13 @@
 export default {
   contentDependencies: [
     'generateTrackInfoPageContent',
+    'generateAlbumNavLinks',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
     'generatePageLayout',
+    'linkAlbum',
+    'linkTrack',
   ],
 
   extraDependencies: ['language'],
@@ -12,6 +15,10 @@ export default {
   relations(relation, track) {
     return {
       layout: relation('generatePageLayout'),
+
+      albumLink: relation('linkAlbum', track.album),
+      trackLink: relation('linkTrack', track),
+      albumNavLinks: relation('generateAlbumNavLinks', track.album, track),
 
       content: relation('generateTrackInfoPageContent', track),
       sidebar: relation('generateAlbumSidebar', track.album, track),
@@ -23,6 +30,9 @@ export default {
   data(track) {
     return {
       name: track.name,
+
+      hasTrackNumbers: track.album.hasTrackNumbers,
+      trackNumber: track.album.tracks.indexOf(track) + 1,
     };
   },
 
@@ -37,6 +47,33 @@ export default {
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
+
+        navLinkStyle: 'hierarchical',
+        navLinks: [
+          {auto: 'home'},
+          {html: relations.albumLink},
+          {
+            html:
+              (data.hasTrackNumbers
+                ? language.$('trackPage.nav.track.withNumber', {
+                    number: data.trackNumber,
+                    track: relations.trackLink
+                      .slot('attributes', {class: 'current'}),
+                  })
+                : language.$('trackPage.nav.track', {
+                    track: relations.trackLink
+                      .slot('attributes', {class: 'current'}),
+                  })),
+          },
+        ],
+
+        navContent: '(Chronology links here)',
+
+        navBottomRowContent:
+          relations.albumNavLinks.slots({
+            showTrackNavigation: true,
+            showExtraLinks: false,
+          }),
 
         ...relations.sidebar,
       });

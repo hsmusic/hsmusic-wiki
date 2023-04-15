@@ -35,6 +35,10 @@ export default {
         content: relations.linkTemplate.getSlotDescription('content'),
         preferShortName: {type: 'boolean', default: false},
 
+        tooltip: {
+          validate: v => v.oneOf(v.isBoolean, v.isString),
+        },
+
         color: relations.linkTemplate.getSlotDescription('color'),
         attributes: relations.linkTemplate.getSlotDescription('attributes'),
         hash: relations.linkTemplate.getSlotDescription('hash'),
@@ -43,20 +47,30 @@ export default {
       content(slots) {
         let content = slots.content;
 
+        const name =
+          (slots.preferShortName
+            ? data.nameShort ?? data.name
+            : data.name);
+
         if (html.isBlank(content)) {
-          content =
-            (slots.preferShortName
-              ? data.nameShort ?? data.name
-              : data.name);
+          content = name;
         }
 
         const color = slots.color ?? data.color ?? null;
+
+        let tooltip = null;
+        if (slots.tooltip === true) {
+          tooltip = name;
+        } else if (typeof slots.tooltip === 'string') {
+          tooltip = slots.tooltip;
+        }
 
         return relations.linkTemplate
           .slots({
             path,
             content,
             color,
+            tooltip,
 
             attributes: slots.attributes,
             hash: slots.hash,

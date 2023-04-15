@@ -433,11 +433,15 @@ a:hover {
   text-decoration: underline;
 }
 
-.nav-main-links > span {
+a.current {
+  font-weight: 800;
+}
+
+.nav-main-links > span > span {
   white-space: nowrap;
 }
 
-.nav-main-links > span > a.current {
+.nav-main-links > span.current > span.nav-link-content > a {
   font-weight: 800;
 }
 
@@ -447,7 +451,7 @@ a:hover {
   font-weight: 800;
 }
 
-.nav-links-hierarchy > span:not(:first-child):not(.no-divider)::before {
+.nav-links-hierarchical > span:not(:first-child):not(.no-divider)::before {
   content: "\0020/\0020";
 }
 
