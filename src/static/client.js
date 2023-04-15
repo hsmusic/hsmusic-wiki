@@ -216,6 +216,7 @@ fetch(rebase('data.json', 'rebaseShared'))
 
 // Data & info card ---------------------------------------
 
+/*
 const NORMAL_HOVER_INFO_DELAY = 750;
 const FAST_HOVER_INFO_DELAY = 250;
 const END_FAST_HOVER_DELAY = 500;
@@ -444,6 +445,7 @@ function addInfoCardLinkHandlers(type) {
 if (localStorage.tryInfoCards) {
   addInfoCardLinkHandlers('track');
 }
+*/
 
 // Custom hash links --------------------------------------
 
