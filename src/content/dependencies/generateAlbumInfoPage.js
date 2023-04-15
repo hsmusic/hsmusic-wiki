@@ -1,3 +1,6 @@
+import getChronologyRelations from '../util/getChronologyRelations.js';
+import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
+
 export default {
   contentDependencies: [
     'generateAlbumInfoPageContent',
@@ -5,6 +8,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
+    'generateChronologyLinks',
     'generateColorStyleRules',
     'generatePageLayout',
   ],
@@ -14,7 +18,26 @@ export default {
   relations(relation, album) {
     return {
       layout: relation('generatePageLayout'),
+
+      coverArtistChronologyContributions: getChronologyRelations(album, {
+        contributions: album.coverArtistContribs,
+
+        linkArtist: artist => relation('linkArtist', artist),
+
+        linkThing: trackOrAlbum =>
+          (trackOrAlbum.album
+            ? relation('linkTrack', trackOrAlbum)
+            : relation('linkAlbum', trackOrAlbum)),
+
+        getThings: artist =>
+          sortAlbumsTracksChronologically([
+            ...artist.albumsAsCoverArtist,
+            ...artist.tracksAsCoverArtist,
+          ]),
+      }),
+
       albumNavLinks: relation('generateAlbumNavLinks', album, null),
+      chronologyLinks: relation('generateChronologyLinks'),
 
       content: relation('generateAlbumInfoPageContent', album),
       sidebar: relation('generateAlbumSidebar', album, null),
@@ -56,7 +79,16 @@ export default {
               }),
           },
         ],
-        navContent: '(Chronology links here)',
+
+        navContent:
+          relations.chronologyLinks.slots({
+            chronologyInfoSets: [
+              {
+                headingString: 'misc.chronology.heading.coverArt',
+                contributions: relations.coverArtistChronologyContributions,
+              },
+            ],
+          }),
 
         ...relations.sidebar,
 

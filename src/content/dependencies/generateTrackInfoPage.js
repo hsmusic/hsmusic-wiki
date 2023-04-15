@@ -7,11 +7,11 @@ export default {
     'generateAlbumNavLinks',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
+    'generateChronologyLinks',
     'generateColorStyleRules',
     'generatePageLayout',
     'linkAlbum',
     'linkTrack',
-    'generateChronologyLinks',
   ],
 
   extraDependencies: ['language'],
@@ -19,7 +19,6 @@ export default {
   relations(relation, track) {
     return {
       layout: relation('generatePageLayout'),
-      chronologyLinks: relation('generateChronologyLinks'),
 
       artistChronologyContributions: getChronologyRelations(track, {
         contributions: [...track.artistContribs, ...track.contributorContribs],
@@ -54,6 +53,7 @@ export default {
       albumLink: relation('linkAlbum', track.album),
       trackLink: relation('linkTrack', track),
       albumNavLinks: relation('generateAlbumNavLinks', track.album, track),
+      chronologyLinks: relation('generateChronologyLinks'),
 
       content: relation('generateTrackInfoPageContent', track),
       sidebar: relation('generateAlbumSidebar', track.album, track),
