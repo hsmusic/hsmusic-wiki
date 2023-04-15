@@ -70,12 +70,12 @@ export default {
         const {content: extraLinks = []} =
           slots.showExtraLinks &&
             {content: [
-              relations.albumGalleryLink.slots({
+              relations.albumGalleryLink?.slots({
                 attributes: {class: slots.currentExtra === 'gallery' && 'current'},
                 content: language.$('albumPage.nav.gallery'),
               }),
 
-              relations.albumCommentaryLink.slots({
+              relations.albumCommentaryLink?.slots({
                 attributes: {class: slots.currentExtra === 'commentary' && 'current'},
                 content: language.$('albumPage.nav.commentary'),
               }),
