@@ -691,7 +691,7 @@ export class Template {
       return providedValue;
     }
 
-    if (providedValue) {
+    if (providedValue !== null) {
       return providedValue;
     }
 

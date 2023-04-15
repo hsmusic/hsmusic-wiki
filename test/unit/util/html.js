@@ -498,7 +498,7 @@ t.test(`Tag.toString (custom attributes)`, t => {
 });
 
 t.test(`html.template`, t => {
-  t.plan(10);
+  t.plan(11);
 
   let contentCalls;
 
@@ -544,6 +544,35 @@ t.test(`html.template`, t => {
   t.equal(contentCalls, 1);
   t.equal(template2.toString(), `<sub>r-r-really, me?</sub>`);
   t.equal(contentCalls, 2);
+
+  // 11: slot uses default only for null, not falsey
+
+  const template3 = html.template({
+    slots: {
+      slot1: {type: 'number', default: 123},
+      slot2: {type: 'number', default: 456},
+      slot3: {type: 'boolean', default: true},
+      slot4: {type: 'string', default: 'banana'},
+    },
+
+    content(slots) {
+      return html.tag('span', [
+        slots.slot1,
+        slots.slot2,
+        slots.slot3,
+        `(length: ${slots.slot4.length})`,
+      ].join(' '));
+    },
+  });
+
+  template3.setSlots({
+    slot1: null,
+    slot2: 0,
+    slot3: false,
+    slot4: '',
+  });
+
+  t.equal(template3.toString(), `<span>123 0 false (length: 0)</span>`);
 });
 
 t.test(`Template - description errors`, t => {
