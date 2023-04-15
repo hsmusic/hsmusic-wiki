@@ -2,6 +2,7 @@ import {empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generatePreviousNextLinks',
     'linkTrack',
     'linkAlbumCommentary',
     'linkAlbumGallery',
@@ -11,6 +12,12 @@ export default {
 
   relations(relation, album, track) {
     const relations = {};
+
+    relations.previousNextLinks =
+      relation('generatePreviousNextLinks');
+
+    relations.previousTrackLink = null;
+    relations.nextTrackLink = null;
 
     if (track) {
       const index = album.tracks.indexOf(track);
@@ -60,36 +67,28 @@ export default {
       },
 
       content(slots) {
-        const extraLinks =
-          (slots.showExtraLinks
-            ? [
-                relations.albumGalleryLink.slots({
-                  attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-                  content: language.$('albumPage.nav.gallery'),
-                }),
+        const {content: extraLinks = []} =
+          slots.showExtraLinks &&
+            {content: [
+              relations.albumGalleryLink.slots({
+                attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+                content: language.$('albumPage.nav.gallery'),
+              }),
 
-                relations.albumCommentaryLink.slots({
-                  attributes: {class: slots.currentExtra === 'commentary' && 'current'},
-                  content: language.$('albumPage.nav.commentary'),
-                }),
-              ]
-            : []);
+              relations.albumCommentaryLink.slots({
+                attributes: {class: slots.currentExtra === 'commentary' && 'current'},
+                content: language.$('albumPage.nav.commentary'),
+              }),
+            ]};
 
-        const previousNextLinks =
-          (slots.showTrackNavigation
-            ? [
-                relations.previousTrackLink?.slots({
-                  tooltip: true,
-                  attributes: {id: 'previous-button'},
-                  content: language.$('misc.nav.previous'),
-                }),
-                relations.nextTrackLink?.slots({
-                  tooltip: true,
-                  attributes: {id: 'next-button'},
-                  content: language.$('misc.nav.next'),
-                }),
-              ]
-            : []);
+        const {content: previousNextLinks = []} =
+          slots.showTrackNavigation &&
+          data.isTrackPage &&
+          data.hasMultipleTracks &&
+            relations.previousNextLinks.slots({
+              previousLink: relations.previousTrackLink,
+              nextLink: relations.nextTrackLink,
+            });
 
         const randomLink =
           slots.showTrackNavigation &&

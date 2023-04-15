@@ -1,3 +1,6 @@
+import getChronologyRelations from '../util/getChronologyRelations.js';
+import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
+
 export default {
   contentDependencies: [
     'generateTrackInfoPageContent',
@@ -8,6 +11,7 @@ export default {
     'generatePageLayout',
     'linkAlbum',
     'linkTrack',
+    'generateChronologyLinks',
   ],
 
   extraDependencies: ['language'],
@@ -15,6 +19,37 @@ export default {
   relations(relation, track) {
     return {
       layout: relation('generatePageLayout'),
+      chronologyLinks: relation('generateChronologyLinks'),
+
+      artistChronologyContributions: getChronologyRelations(track, {
+        contributions: [...track.artistContribs, ...track.contributorContribs],
+
+        linkArtist: artist => relation('linkArtist', artist),
+        linkThing: track => relation('linkTrack', track),
+
+        getThings: artist =>
+          sortAlbumsTracksChronologically([
+            ...artist.tracksAsArtist,
+            ...artist.tracksAsContributor,
+          ]),
+      }),
+
+      coverArtistChronologyContributions: getChronologyRelations(track, {
+        contributions: track.coverArtistContribs,
+
+        linkArtist: artist => relation('linkArtist', artist),
+
+        linkThing: trackOrAlbum =>
+          (trackOrAlbum.album
+            ? relation('linkTrack', trackOrAlbum)
+            : relation('linkAlbum', trackOrAlbum)),
+
+        getThings: artist =>
+          sortAlbumsTracksChronologically([
+            ...artist.albumsAsCoverArtist,
+            ...artist.tracksAsCoverArtist,
+          ]),
+      }),
 
       albumLink: relation('linkAlbum', track.album),
       trackLink: relation('linkTrack', track),
@@ -67,12 +102,24 @@ export default {
           },
         ],
 
-        navContent: '(Chronology links here)',
-
         navBottomRowContent:
           relations.albumNavLinks.slots({
             showTrackNavigation: true,
             showExtraLinks: false,
+          }),
+
+        navContent:
+          relations.chronologyLinks.slots({
+            chronologyInfoSets: [
+              {
+                headingString: 'misc.chronology.heading.track',
+                contributions: relations.artistChronologyContributions,
+              },
+              {
+                headingString: 'misc.chronology.heading.coverArt',
+                contributions: relations.coverArtistChronologyContributions,
+              },
+            ],
           }),
 
         ...relations.sidebar,
