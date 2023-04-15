@@ -34,6 +34,8 @@ export default {
     return relations.layout
       .slots({
         title: language.$('albumPage.title', {album: data.name}),
+        headingMode: 'sticky',
+
         styleRules: [
           relations.albumStyleRules,
           relations.colorStyleRules,

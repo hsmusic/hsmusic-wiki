@@ -3,6 +3,7 @@ import {empty, openAggregate} from '../../util/sugar.js';
 export default {
   contentDependencies: [
     'generateFooterLocalizationLinks',
+    'generateStickyHeadingContainer',
   ],
 
   extraDependencies: [
@@ -19,6 +20,9 @@ export default {
 
     relations.footerLocalizationLinks =
       relation('generateFooterLocalizationLinks');
+
+    relations.stickyHeadingContainer =
+      relation('generateStickyHeadingContainer');
 
     return relations;
   },
@@ -168,14 +172,11 @@ export default {
         if (!html.isBlank(slots.title)) {
           switch (slots.headingMode) {
             case 'sticky':
-              /*
-                generateStickyHeadingContainer({
-                  coverSrc: cover.src,
-                  coverAlt: cover.alt,
-                  coverArtTags: cover.artTags,
-                  title,
-                })
-              */
+              titleHTML =
+                relations.stickyHeadingContainer.slots({
+                  title: slots.title,
+                  cover: slots.cover,
+                });
               break;
             case 'static':
               titleHTML = html.tag('h1', slots.title);

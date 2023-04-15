@@ -34,26 +34,47 @@ export default {
         alt: {
           type: 'string',
         },
+
+        displayMode: {
+          validate: v => v.is('primary', 'thumbnail'),
+          default: 'primary',
+        },
       },
 
       content(slots) {
-        return html.tag('div', {id: 'cover-art-container'}, [
-          relations.image
-            .slots({
-              path: slots.path,
-              alt: slots.alt,
-              thumb: 'medium',
-              id: 'cover-art',
-              link: true,
-              square: true,
-            }),
+        switch (slots.displayMode) {
+          case 'primary':
+            return html.tag('div', {id: 'cover-art-container'}, [
+              relations.image
+                .slots({
+                  path: slots.path,
+                  alt: slots.alt,
+                  thumb: 'medium',
+                  id: 'cover-art',
+                  link: true,
+                  square: true,
+                }),
 
-          !empty(relations.tagLinks) &&
-            html.tag('p',
-              language.$('releaseInfo.artTags.inline', {
-                tags: language.formatUnitList(relations.tagLinks),
-              })),
-          ]);
+              !empty(relations.tagLinks) &&
+                html.tag('p',
+                  language.$('releaseInfo.artTags.inline', {
+                    tags: language.formatUnitList(relations.tagLinks),
+                  })),
+              ]);
+
+          case 'thumbnail':
+            return relations.image
+              .slots({
+                path: slots.path,
+                alt: slots.alt,
+                thumb: 'small',
+                link: false,
+                square: true,
+              });
+
+          case 'default':
+            return html.blank();
+        }
       },
     });
   },

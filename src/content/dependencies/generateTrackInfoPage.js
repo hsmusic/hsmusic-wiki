@@ -75,6 +75,8 @@ export default {
     return relations.layout
       .slots({
         title: language.$('trackPage.title', {track: data.name}),
+        headingMode: 'sticky',
+
         styleRules: [
           relations.albumStyleRules,
           relations.colorStyleRules,
