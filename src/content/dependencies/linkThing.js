@@ -37,9 +37,14 @@ export default {
 
         tooltip: {
           validate: v => v.oneOf(v.isBoolean, v.isString),
+          default: false,
         },
 
-        color: relations.linkTemplate.getSlotDescription('color'),
+        color: {
+          validate: v => v.oneOf(v.isBoolean, v.isColor),
+          default: true,
+        },
+
         attributes: relations.linkTemplate.getSlotDescription('attributes'),
         hash: relations.linkTemplate.getSlotDescription('hash'),
       },
@@ -56,7 +61,12 @@ export default {
           content = name;
         }
 
-        const color = slots.color ?? data.color ?? null;
+        let color = null;
+        if (slots.color === true) {
+          color = data.color ?? null;
+        } else if (typeof slots.color === 'string') {
+          color = slots.color;
+        }
 
         let tooltip = null;
         if (slots.tooltip === true) {
