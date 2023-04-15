@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generateTrackInfoPageContent',
+    'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
     'generatePageLayout',
@@ -13,6 +14,7 @@ export default {
       layout: relation('generatePageLayout'),
 
       content: relation('generateTrackInfoPageContent', track),
+      sidebar: relation('generateAlbumSidebar', track.album, track),
       albumStyleRules: relation('generateAlbumStyleRules', track.album),
       colorStyleRules: relation('generateColorStyleRules', track.color),
     };
@@ -35,6 +37,8 @@ export default {
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
+
+        ...relations.sidebar,
       });
   },
 }

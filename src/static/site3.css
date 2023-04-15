@@ -1358,6 +1358,24 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   contain: paint;
 }
 
+/* Sticky sidebar */
+
+.sidebar-column.sidebar.sticky-column,
+.sidebar-column.sidebar.sticky-last,
+.sidebar-multiple.sticky-last > .sidebar:last-child,
+.sidebar-multiple.sticky-column {
+  position: sticky;
+  top: 10px;
+}
+
+.sidebar-multiple.sticky-last {
+  align-self: stretch;
+}
+
+.sidebar-multiple.sticky-column {
+  align-self: flex-start;
+}
+
 /* Image overlay */
 
 #image-overlay-container {

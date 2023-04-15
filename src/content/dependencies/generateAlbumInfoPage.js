@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generateAlbumInfoPageContent',
+    'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
@@ -14,6 +15,7 @@ export default {
       layout: relation('generatePageLayout'),
 
       content: relation('generateAlbumInfoPageContent', album),
+      sidebar: relation('generateAlbumSidebar', album, null),
       socialEmbed: relation('generateAlbumSocialEmbed', album),
       albumStyleRules: relation('generateAlbumStyleRules', album),
       colorStyleRules: relation('generateColorStyleRules', album.color),
@@ -37,6 +39,8 @@ export default {
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,
+
+        ...relations.sidebar,
 
         // socialEmbed: relations.socialEmbed,
       });

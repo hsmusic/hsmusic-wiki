@@ -33,6 +33,10 @@ export default {
     } else if (album.hasCoverArt) {
       relations.cover =
         relation('generateCoverArtwork', album.artTags);
+      relations.coverArtistLinks = null;
+    } else {
+      relations.cover = null;
+      relations.coverArtistLinks = null;
     }
 
     relations.artistLinks =
@@ -95,6 +99,15 @@ export default {
   }) {
     const content = {};
 
+    const formatContributions = contributionLinks =>
+      language.formatConjunctionList(
+        contributionLinks.map(link =>
+          link
+            .slots({
+              showContribution: true,
+              showIcons: true,
+            })));
+
     if (data.hasUniqueCoverArt) {
       content.cover = relations.cover
         .slots({
@@ -114,6 +127,8 @@ export default {
             data.coverArtFileExtension,
           ],
         });
+    } else {
+      content.cover = null;
     }
 
     content.main = {
@@ -125,10 +140,14 @@ export default {
           [html.joinChildren]: html.tag('br'),
         }, [
           !empty(relations.artistLinks) &&
-            language.$('releaseInfo.by', {artists: relations.artistLinks}),
+            language.$('releaseInfo.by', {
+              artists: formatContributions(relations.artistLinks),
+            }),
 
           !empty(relations.coverArtistLinks) &&
-            language.$('releaseInfo.coverArtBy', {artists: relations.coverArtistLinks}),
+            language.$('releaseInfo.coverArtBy', {
+              artists: formatContributions(relations.coverArtistLinks),
+            }),
 
           data.date &&
             language.$('releaseInfo.released', {
