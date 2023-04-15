@@ -190,6 +190,10 @@ export class Tag {
     this.content = content;
   }
 
+  clone() {
+    return new Tag(this.tagName, this.attributes, this.content);
+  }
+
   set tagName(value) {
     if (value === undefined || value === null) {
       this.tagName = '';
@@ -489,6 +493,12 @@ export class Template {
     this.#description = description;
   }
 
+  clone() {
+    const clone = new Template(this.#description);
+    clone.setSlots(this.#slotValues);
+    return clone;
+  }
+
   static validateDescription(description) {
     if (typeof description !== 'object') {
       throw new TypeError(`Expected object, got ${typeof description}`);
@@ -686,6 +696,10 @@ export class Template {
     if (description.type === 'html') {
       if (!providedValue) {
         return blank();
+      }
+
+      if (providedValue instanceof Tag || providedValue instanceof Template) {
+        return providedValue.clone();
       }
 
       return providedValue;
