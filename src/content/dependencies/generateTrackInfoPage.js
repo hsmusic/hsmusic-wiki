@@ -47,7 +47,9 @@ export default {
           sortAlbumsTracksChronologically([
             ...artist.albumsAsCoverArtist,
             ...artist.tracksAsCoverArtist,
-          ]),
+          ], {
+            getDate: albumOrTrack => albumOrTrack.coverArtDate,
+          }),
       }),
 
       albumLink: relation('linkAlbum', track.album),
