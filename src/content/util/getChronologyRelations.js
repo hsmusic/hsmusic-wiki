@@ -5,7 +5,7 @@ export default function getChronologyRelations(thing, {
   getThings,
 }) {
   return contributions.map(({who}) => {
-    const things = getThings(who);
+    const things = Array.from(new Set(getThings(who)));
     const index = things.indexOf(thing);
     const previous = things[index - 1];
     const next = things[index + 1];
