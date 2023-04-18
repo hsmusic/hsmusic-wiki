@@ -4,6 +4,29 @@ export default function getChronologyRelations(thing, {
   linkThing,
   getThings,
 }) {
+  // One call to getChronologyRelations is considered "lumping" together all
+  // contributions as carrying equivalent meaning (for example, "artist"
+  // contributions and "contributor" contributions are bunched together in
+  // one call to getChronologyRelations, while "cover artist" contributions
+  // are a separate call). getChronologyRelations prevents duplicates that
+  // carry the same meaning by only using the first instance of each artist
+  // in the contributions array passed to it. It's expected that the string
+  // identifying which kind of contribution ("track" or "cover art") is
+  // shared and applied to all contributions, as providing them together
+  // in one call to getChronologyRelations implies they carry the same
+  // meaning.
+
+  const artistsSoFar = new Set();
+
+  contributions = contributions.filter(({who}) => {
+    if (artistsSoFar.has(who)) {
+      return false;
+    } else {
+      artistsSoFar.add(who);
+      return true;
+    }
+  });
+
   return contributions.map(({who}) => {
     const things = Array.from(new Set(getThings(who)));
     const index = things.indexOf(thing);
