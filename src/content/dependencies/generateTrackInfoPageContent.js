@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateContentHeading',
     'generateCoverArtwork',
+    'generateTrackListDividedByGroups',
     'linkAlbum',
     'linkContribution',
     'linkExternal',
@@ -16,50 +17,102 @@ export default {
     'transformMultiline',
   ],
 
-  relations(relation, track) {
-    const relations = {};
-
+  relations(relation, track, {topLevelGroups}) {
     const {album} = track;
+
+    const relations = {};
+    const sections = relations.sections = {};
 
     const contributionLinksRelation = contribs =>
       contribs.map(contrib =>
         relation('linkContribution', contrib.who, contrib.what));
 
+    // Section: Release info
+
+    const releaseInfo = sections.releaseInfo = {};
+
+    releaseInfo.artistContributionLinks =
+      contributionLinksRelation(track.artistContribs);
+
     if (track.hasUniqueCoverArt) {
       relations.cover =
         relation('generateCoverArtwork', track.artTags);
-      relations.coverArtistLinks =
+      releaseInfo.coverArtistContributionLinks =
         contributionLinksRelation(track.coverArtistContribs);
     } else if (album.hasCoverArt) {
       relations.cover =
         relation('generateCoverArtwork', album.artTags);
-      relations.coverArtistLinks = null;
     } else {
       relations.cover = null;
-      relations.coverArtistLinks = null;
     }
 
-    relations.artistLinks =
-      contributionLinksRelation(track.artistContribs);
+    // Section: Listen on
 
-    relations.externalLinks =
-      track.urls.map(url =>
-        relation('linkExternal', url));
+    const listen = sections.listen = {};
 
-    relations.otherReleasesHeading =
+    listen.heading =
       relation('generateContentHeading');
 
-    relations.otherReleases =
-      track.otherReleases.map(track => ({
-        trackLink: relation('linkTrack', track),
-        albumLink: relation('linkAlbum', track.album),
-      }));
+    if (!empty(track.urls)) {
+      listen.externalLinks =
+        track.urls.map(url =>
+          relation('linkExternal', url));
+    }
+
+    // Section: Other releases
+
+    if (!empty(track.otherReleases)) {
+      const otherReleases = sections.otherReleases = {};
+
+      otherReleases.heading =
+        relation('generateContentHeading');
+
+      otherReleases.items =
+        track.otherReleases.map(track => ({
+          trackLink: relation('linkTrack', track),
+          albumLink: relation('linkAlbum', track.album),
+        }));
+    }
+
+    // Section: Contributors
 
     if (!empty(track.contributorContribs)) {
-      relations.contributorsHeading =
+      const contributors = sections.contributors = {};
+
+      contributors.heading =
         relation('generateContentHeading');
-      relations.contributorLinks =
+
+      contributors.contributionLinks =
         contributionLinksRelation(track.contributorContribs);
+    }
+
+    // Section: Referenced tracks
+
+    if (!empty(track.referencedTracks)) {
+      const references = sections.references = {};
+
+      references.heading =
+        relation('generateContentHeading');
+
+      references.items =
+        track.referencedTracks.map(track => ({
+          trackLink: relation('linkTrack', track),
+          contributionLinks: contributionLinksRelation(track.artistContribs),
+        }));
+    }
+
+    // Section: Tracks that reference
+
+    if (!empty(track.referencedByTracks)) {
+      const referencedBy = sections.referencedBy = {};
+
+      referencedBy.heading =
+        relation('generateContentHeading');
+
+      referencedBy.list =
+        relation('generateTrackListDividedByGroups',
+          track.referencedByTracks,
+          topLevelGroups);
     }
 
     return relations;
@@ -70,6 +123,7 @@ export default {
 
     const {album} = track;
 
+    data.name = track.name;
     data.date = track.date;
     data.duration = track.duration;
 
@@ -99,14 +153,28 @@ export default {
   }) {
     const content = {};
 
-    const formatContributions = contributionLinks =>
-      language.formatConjunctionList(
-        contributionLinks.map(link =>
-          link
-            .slots({
-              showContribution: true,
-              showIcons: true,
-            })));
+    const {sections: sec} = relations;
+
+    const formatContributions =
+      (contributionLinks, {showContribution = true, showIcons = true} = {}) =>
+        language.formatConjunctionList(
+          contributionLinks.map(link =>
+            link.slots({showContribution, showIcons})));
+
+    const formatTrackItem = ({trackLink, contributionLinks}) =>
+      html.tag('li',
+        language.$('trackList.item.withArtists', {
+          track: trackLink,
+          by:
+            html.tag('span', {class: 'by'},
+              language.$('trackList.item.withArtists.by', {
+                artists:
+                  formatContributions(contributionLinks, {
+                    showContribution: false,
+                    showIcons: false,
+                  }),
+              })),
+        }));
 
     if (data.hasUniqueCoverArt) {
       content.cover = relations.cover
@@ -139,14 +207,14 @@ export default {
           [html.onlyIfContent]: true,
           [html.joinChildren]: html.tag('br'),
         }, [
-          !empty(relations.artistLinks) &&
+          sec.releaseInfo.artistContributionLinks &&
             language.$('releaseInfo.by', {
-              artists: formatContributions(relations.artistLinks),
+              artists: formatContributions(sec.releaseInfo.artistContributionLinks),
             }),
 
-          !empty(relations.coverArtistLinks) &&
+          sec.releaseInfo.coverArtistContributionLinks &&
             language.$('releaseInfo.coverArtBy', {
-              artists: formatContributions(relations.coverArtistLinks),
+              artists: formatContributions(sec.releaseInfo.coverArtistContributionLinks),
             }),
 
           data.date &&
@@ -191,22 +259,25 @@ export default {
           ]),
         */
 
-        html.tag('p',
-          (empty(relations.externalLinks)
-            ? language.$('releaseInfo.listenOn.noLinks')
-            : language.$('releaseInfo.listenOn', {
-                links: language.formatDisjunctionList(relations.externalLinks),
-              }))),
+        sec.listen.heading.slots({
+          id: 'listen-on',
+          title:
+            (sec.listen.externalLinks
+              ? language.$('releaseInfo.listenOn', {
+                  links: language.formatDisjunctionList(sec.listen.externalLinks),
+                })
+              : language.$('releaseInfo.listenOn.noLinks')),
+        }),
 
-        !empty(relations.otherReleases) && [
-          relations.otherReleasesHeading
+        sec.otherReleases && [
+          sec.otherReleases.heading
             .slots({
               id: 'also-released-as',
               title: language.$('releaseInfo.alsoReleasedAs'),
             }),
 
           html.tag('ul',
-            relations.otherReleases.map(({trackLink, albumLink}) =>
+            sec.otherReleases.items.map(({trackLink, albumLink}) =>
               html.tag('li',
                 language.$('releaseInfo.alsoReleasedAs.item', {
                   track: trackLink,
@@ -214,20 +285,47 @@ export default {
                 })))),
         ],
 
-        relations.contributorLinks && [
-          relations.contributorsHeading
+        sec.contributors && [
+          sec.contributors.heading
             .slots({
               id: 'contributors',
               title: language.$('releaseInfo.contributors'),
             }),
 
-          html.tag('ul', relations.contributorLinks.map(contributorLink =>
+          html.tag('ul', sec.contributors.contributionLinks.map(contributionLink =>
             html.tag('li',
-              contributorLink
+              contributionLink
                 .slots({
                   showIcons: true,
                   showContribution: true,
                 })))),
+        ],
+
+        sec.references && [
+          sec.references.heading
+            .slots({
+              id: 'references',
+              title:
+                language.$('releaseInfo.tracksReferenced', {
+                  track: html.tag('i', data.name),
+                }),
+            }),
+
+          html.tag('ul',
+            sec.references.items.map(formatTrackItem)),
+        ],
+
+        sec.referencedBy && [
+          sec.referencedBy.heading
+            .slots({
+              id: 'referenced-by',
+              title:
+                language.$('releaseInfo.tracksThatReference', {
+                  track: html.tag('i', data.name),
+                }),
+            }),
+
+          sec.referencedBy.list,
         ],
       ]),
     };

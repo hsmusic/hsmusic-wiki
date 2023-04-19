@@ -6,7 +6,7 @@ export function targets({wikiData}) {
   return wikiData.trackData;
 }
 
-export function pathsForTarget(track) {
+export function pathsForTarget(track, {wikiInfo}) {
   return [
     {
       type: 'page',
@@ -14,7 +14,9 @@ export function pathsForTarget(track) {
 
       contentFunction: {
         name: 'generateTrackInfoPage',
-        args: [track],
+        args: [track, {
+          topLevelGroups: wikiInfo.divideTrackListsByGroups,
+        }],
       },
     },
   ];

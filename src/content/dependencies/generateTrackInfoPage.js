@@ -16,7 +16,7 @@ export default {
 
   extraDependencies: ['language'],
 
-  relations(relation, track) {
+  relations(relation, track, {topLevelGroups}) {
     return {
       layout: relation('generatePageLayout'),
 
@@ -57,7 +57,7 @@ export default {
       albumNavLinks: relation('generateAlbumNavLinks', track.album, track),
       chronologyLinks: relation('generateChronologyLinks'),
 
-      content: relation('generateTrackInfoPageContent', track),
+      content: relation('generateTrackInfoPageContent', track, {topLevelGroups}),
       sidebar: relation('generateAlbumSidebar', track.album, track),
       albumStyleRules: relation('generateAlbumStyleRules', track.album),
       colorStyleRules: relation('generateColorStyleRules', track.color),
