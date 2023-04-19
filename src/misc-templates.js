@@ -18,67 +18,6 @@ import {
   sortChronologically,
 } from './util/wiki-data.js';
 
-// Divided track lists
-
-function unbound_generateTrackListDividedByGroups(tracks, {
-  html,
-  language,
-
-  getTrackItem,
-  wikiData,
-}) {
-  const {divideTrackListsByGroups: groups} = wikiData.wikiInfo;
-
-  if (empty(groups)) {
-    return html.tag('ul',
-      tracks.map(t => getTrackItem(t)));
-  }
-
-  const lists = Object.fromEntries(
-    groups.map((group) => [
-      group.directory,
-      {group, tracks: []}
-    ]));
-
-  const other = [];
-
-  for (const track of tracks) {
-    const {album} = track;
-    const group = groups.find((g) => g.albums.includes(album));
-    if (group) {
-      lists[group.directory].tracks.push(track);
-    } else {
-      other.push(track);
-    }
-  }
-
-  const dt = name =>
-    html.tag('dt',
-      language.$('trackList.group', {
-        group: name,
-      }));
-
-  const ddul = tracks =>
-    html.tag('dd',
-      html.tag('ul',
-        tracks.map(t => getTrackItem(t))));
-
-  return html.tag('dl', [
-    ...Object.values(lists)
-      .filter(({tracks}) => tracks.length)
-      .flatMap(({group, tracks}) => [
-        dt(group.name),
-        ddul(tracks),
-      ]),
-
-    ...html.fragment(
-      other.length && [
-        dt(language.$('trackList.group.other')),
-        ddul(other),
-      ]),
-  ]);
-}
-
 // Grids
 
 function unbound_getGridHTML({
@@ -259,11 +198,8 @@ function unbound_getCarouselHTML({
 // Exports
 
 export {
-  unbound_generateTrackListDividedByGroups as generateTrackListDividedByGroups,
-
   unbound_getGridHTML as getGridHTML,
   unbound_getAlbumGridHTML as getAlbumGridHTML,
   unbound_getFlashGridHTML as getFlashGridHTML,
-
   unbound_getCarouselHTML as getCarouselHTML,
 }
