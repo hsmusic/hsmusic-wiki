@@ -27,7 +27,7 @@ export default {
     'transformMultiline',
   ],
 
-  relations(relation, album, track) {
+  relations(relation, album, _track) {
     const relations = {};
 
     relations.albumLink =
