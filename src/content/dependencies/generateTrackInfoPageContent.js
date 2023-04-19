@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateContentHeading',
     'generateCoverArtwork',
+    'generateTrackList',
     'generateTrackListDividedByGroups',
     'linkAlbum',
     'linkContribution',
@@ -94,11 +95,8 @@ export default {
       references.heading =
         relation('generateContentHeading');
 
-      references.items =
-        track.referencedTracks.map(track => ({
-          trackLink: relation('linkTrack', track),
-          contributionLinks: contributionLinksRelation(track.artistContribs),
-        }));
+      references.list =
+        relation('generateTrackList', track.referencedTracks);
     }
 
     // Section: Tracks that reference
@@ -160,21 +158,6 @@ export default {
         language.formatConjunctionList(
           contributionLinks.map(link =>
             link.slots({showContribution, showIcons})));
-
-    const formatTrackItem = ({trackLink, contributionLinks}) =>
-      html.tag('li',
-        language.$('trackList.item.withArtists', {
-          track: trackLink,
-          by:
-            html.tag('span', {class: 'by'},
-              language.$('trackList.item.withArtists.by', {
-                artists:
-                  formatContributions(contributionLinks, {
-                    showContribution: false,
-                    showIcons: false,
-                  }),
-              })),
-        }));
 
     if (data.hasUniqueCoverArt) {
       content.cover = relations.cover
@@ -311,8 +294,7 @@ export default {
                 }),
             }),
 
-          html.tag('ul',
-            sec.references.items.map(formatTrackItem)),
+          sec.references.list,
         ],
 
         sec.referencedBy && [

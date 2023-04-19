@@ -3,8 +3,7 @@ import {empty} from '../../util/sugar.js';
 import groupTracksByGroup from '../util/groupTracksByGroup.js';
 
 export default {
-  contentDependencies: ['linkTrack', 'linkContribution'],
-
+  contentDependencies: ['generateTrackList'],
   extraDependencies: ['html', 'language'],
 
   relations(relation, tracks, groups) {
@@ -12,66 +11,35 @@ export default {
       return {};
     }
 
-    const trackRelations = track => ({
-      trackLink:
-        relation('linkTrack', track),
-
-      contributionLinks:
-        track.artistContribs.map(contrib =>
-          relation('linkContribution', contrib.who, contrib.what)),
-    });
-
     if (empty(groups)) {
       return {
-        flatItems: tracks.map(trackRelations),
+        flatList:
+          relation('generateTrackList', tracks),
       };
     }
 
     const lists = groupTracksByGroup(tracks, groups);
 
     return {
-      groupedItems:
+      groupedLists:
         Array.from(lists.entries()).map(([groupOrOther, tracks]) => ({
           ...(groupOrOther === 'other'
                 ? {other: true}
                 : {groupLink: relation('linkGroup', groupOrOther)}),
 
-          items: tracks.map(trackRelations),
+          list:
+            relation('generateTrackList', tracks),
         })),
     };
   },
 
   generate(relations, {html, language}) {
-    // TODO: This is copy-pasted from generateTrackInfoPageContent, seems bad
-
-    const formatContributions =
-      (contributionLinks, {showContribution = true, showIcons = true} = {}) =>
-        language.formatConjunctionList(
-          contributionLinks.map(link =>
-            link.slots({showContribution, showIcons})));
-
-    const formatTrackItem = ({trackLink, contributionLinks}) =>
-      html.tag('li',
-        language.$('trackList.item.withArtists', {
-          track: trackLink,
-          by:
-            html.tag('span', {class: 'by'},
-              language.$('trackList.item.withArtists.by', {
-                artists:
-                  formatContributions(contributionLinks, {
-                    showContribution: false,
-                    showIcons: false,
-                  }),
-              })),
-        }));
-
-    if (relations.flatItems) {
-      return html.tag('ul',
-        relations.flatItems.map(formatTrackItem));
+    if (relations.flatList) {
+      return relations.flatList;
     }
 
     return html.tag('dl',
-      relations.groupedItems.map(({other, groupLink, items}) => [
+      relations.groupedLists.map(({other, groupLink, list}) => [
         html.tag('dt',
           (other
             ? language.$('trackList.group.fromOther')
@@ -79,9 +47,7 @@ export default {
                 group: groupLink
               }))),
 
-        html.tag('dd',
-          html.tag('ul',
-            items.map(formatTrackItem))),
+        html.tag('dd', list),
       ]));
   },
 };
