@@ -63,7 +63,10 @@ export function testContentFunctions(t, message, fn) {
       }
 
       loadedContentDependencies = await asyncCleanCatchAggregate(() =>
-        quickLoadContentDependencies(opts));
+        quickLoadContentDependencies({
+          logging: false,
+          ...opts,
+        }));
     };
 
     evaluate.snapshot = (...args) => {
