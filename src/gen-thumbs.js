@@ -99,6 +99,7 @@ import {
 import {createReadStream} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
 
 import {
+  color,
   fileIssue,
   logError,
   logInfo,
@@ -114,7 +115,7 @@ import {
   traverse,
 } from './util/node-utils.js';
 
-import {delay, queue} from './util/sugar.js';
+import {delay, empty, queue} from './util/sugar.js';
 
 export const defaultMagickThreads = 8;
 
@@ -294,19 +295,6 @@ export default async function genThumbs(mediaPath, {
 
   const quietInfo = quiet ? () => null : logInfo;
 
-  const filterFile = (name) => {
-    const ext = path.extname(name);
-    if (ext !== '.jpg' && ext !== '.png') return false;
-    if (isThumb(name)) return false;
-
-    return true;
-  };
-
-  const filterDir = (name) => {
-    if (name === '.git') return false;
-    return true;
-  };
-
   const [convertInfo, spawnConvert] = (await getSpawnConvert()) ?? [];
   if (!spawnConvert) {
     logError`${`It looks like you don't have ImageMagick installed.`}`;
@@ -356,7 +344,7 @@ export default async function genThumbs(mediaPath, {
     await delay(WARNING_DELAY_TIME);
   }
 
-  const imagePaths = await traverse(mediaPath, {filterFile, filterDir});
+  const imagePaths = await traverseSourceImagePaths(mediaPath);
 
   const imageToMD5Entries = await progressPromiseAll(
     `Generating MD5s of image files`,
@@ -398,7 +386,7 @@ export default async function genThumbs(mediaPath, {
     ([filePath, md5]) => md5 !== cache[filePath]
   );
 
-  if (entriesToGenerate.length === 0) {
+  if (empty(entriesToGenerate)) {
     logInfo`All image thumbnails are already up-to-date - nice!`;
     return true;
   }
@@ -426,14 +414,14 @@ export default async function genThumbs(mediaPath, {
           })),
       magickThreads));
 
-  if (failed.length > 0) {
+  if (empty(failed)) {
+    logInfo`Generated all (updated) thumbnails successfully!`;
+  } else {
     for (const [path, error] of failed) {
       logError`Thumbnails failed to generate for ${path} - ${error}`;
     }
     logWarn`Result is incomplete - the above ${failed.length} thumbnails should be checked for errors.`;
     logWarn`${succeeded.length} successfully generated images won't be regenerated next run, though!`;
-  } else {
-    logInfo`Generated all (updated) thumbnails successfully!`;
   }
 
   try {
@@ -449,6 +437,92 @@ export default async function genThumbs(mediaPath, {
   }
 
   return true;
+}
+
+export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
+  const fromRoot = urls.from('media.root');
+
+  return [
+    wikiData.albumData
+      .flatMap(album => [
+        album.hasCoverArt && fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
+        !empty(album.bannerArtistContribsByRef) && fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
+        !empty(album.wallpaperArtistContribsByRef) && fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
+      ])
+      .filter(Boolean),
+
+    wikiData.trackData
+      .filter(track => track.hasUniqueCoverArt)
+      .map(track => fromRoot.to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension)),
+
+    wikiData.artistData
+      .filter(artist => artist.hasAvatar)
+      .map(artist => fromRoot.to('media.artistAvatar', artist.directory, artist.avatarFileExtension)),
+
+    wikiData.flashData
+      .map(flash => fromRoot.to('media.flashArt', flash.directory, flash.coverArtFileExtension)),
+  ].flat();
+}
+
+export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImagePaths) {
+  return {
+    missing:
+      expectedImagePaths
+        .filter(f => !extantImagePaths.includes(f)),
+
+    misplaced:
+      extantImagePaths
+        .filter(f =>
+          // todo: This is a hack to match only certain directories - the ones
+          // which expectedImagePaths will detect. The rest of the code here is
+          // urls-agnostic (meaning you could swap out a different URL spec and
+          // it would still work), but this part is hard-coded.
+          f.includes('album-art/') ||
+          f.includes('artist-avatar/') ||
+          f.includes('flash-art/'))
+        .filter(f => !expectedImagePaths.includes(f)),
+  };
+}
+
+export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
+  const expectedPaths = getExpectedImagePaths(mediaPath, {urls, wikiData});
+  const extantPaths = await traverseSourceImagePaths(mediaPath);
+  const {missing, misplaced} = checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
+
+  if (empty(missing) && empty(misplaced)) {
+    logInfo`All image paths are good - nice! None are missing or misplaced.`;
+    return;
+  }
+
+  if (!empty(missing)) {
+    logWarn`** Some track art is missing! (${missing.length + ' files'}) **`;
+    for (const file of missing) {
+      console.warn(color.yellow(` - `) + file);
+    }
+  }
+
+  if (!empty(misplaced)) {
+    logWarn`** Some track art is misplaced! (${misplaced.length + ' files'}) **`;
+    for (const file of misplaced) {
+      console.warn(color.yellow(` - `) + file);
+    }
+  }
+}
+
+export async function traverseSourceImagePaths(mediaPath) {
+  return await traverse(mediaPath, {
+    filterFile(name) {
+      const ext = path.extname(name);
+      if (ext !== '.jpg' && ext !== '.png' && ext !== '.gif') return false;
+      if (isThumb(name)) return false;
+      return true;
+    },
+
+    filterDir(name) {
+      if (name === '.git') return false;
+      return true;
+    },
+  });
 }
 
 export function isThumb(file) {

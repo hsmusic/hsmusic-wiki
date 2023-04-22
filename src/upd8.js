@@ -40,6 +40,7 @@ import genThumbs, {
   clearThumbs,
   defaultMagickThreads,
   isThumb,
+  verifyImagePaths,
 } from './gen-thumbs.js';
 
 import bootRepl from './repl.js';
@@ -665,6 +666,8 @@ async function main() {
   }
 
   const urls = generateURLs(urlSpec);
+
+  await verifyImagePaths(mediaPath, {urls, wikiData});
 
   const fileSizePreloader = new FileSizePreloader();
 
