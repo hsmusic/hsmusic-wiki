@@ -260,7 +260,7 @@ export function sortByPositionInFlashAct(data) {
 // set of arbitrary given conditions is true first. If no conditions are met
 // for a given item, it's moved over to the end!
 export function sortByConditions(data, conditions) {
-  data.sort((a, b) => {
+  return data.sort((a, b) => {
     const ai = conditions.findIndex((f) => f(a));
     const bi = conditions.findIndex((f) => f(b));
 
