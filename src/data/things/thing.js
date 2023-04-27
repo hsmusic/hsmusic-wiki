@@ -262,26 +262,42 @@ export default class Thing extends CacheableObject {
     // Dynamically inherit a contribution list from some other object, if it
     // hasn't been overridden on this object. This is handy for solo albums
     // where all tracks have the same artist, for example.
-    //
-    // Note: The arguments of this function aren't currently final! The final
-    // format will look more like (contribsByRef, parentContribsByRef), e.g.
-    // ('artistContribsByRef', '@album/artistContribsByRef').
     dynamicInheritContribs: (
+      // If this property is explicitly false, the contribution list returned
+      // will always be empty.
+      nullerProperty,
+
+      // Property holding contributions on the current object.
       contribsByRefProperty,
+
+      // Property holding corresponding "default" contributions on the parent
+      // object, which will fallen back to if the object doesn't have its own
+      // contribs.
       parentContribsByRefProperty,
+
+      // Data array to search in and "find" function to locate parent object
+      // (which will be passed the child object and the wiki data array).
       thingDataProperty,
       findFn
     ) => ({
       flags: {expose: true},
       expose: {
-        dependencies: [contribsByRefProperty, thingDataProperty, 'artistData'],
+        dependencies: [
+          contribsByRefProperty,
+          thingDataProperty,
+          nullerProperty,
+          'artistData',
+        ].filter(Boolean),
+
         compute({
           [Thing.instance]: thing,
+          [nullerProperty]: nuller,
           [contribsByRefProperty]: contribsByRef,
           [thingDataProperty]: thingData,
           artistData,
         }) {
           if (!artistData) return [];
+          if (nuller === false) return [];
           const refs =
             contribsByRef ??
             findFn(thing, thingData, {mode: 'quiet'})?.[parentContribsByRefProperty];
