@@ -181,6 +181,7 @@ export function sortByName(data, {
 }
 
 export function sortByDate(data, {
+  latestFirst = false,
   getDate = (o) => o.date,
 } = {}) {
   return data.sort((a, b) => {
@@ -191,7 +192,7 @@ export function sortByDate(data, {
     // together in the same array. If that's the case, we put all items
     // without dates at the end.
     if (ad && bd) {
-      return ad - bd;
+      return (latestFirst ? bd - ad : ad - bd);
     } else if (ad) {
       return -1;
     } else if (bd) {
@@ -292,18 +293,8 @@ export function sortChronologically(data, {
   getName,
   getDate,
 } = {}) {
-  if (latestFirst) {
-    // Double reverse: Since we reverse after sorting by date, also reverse
-    // after sorting A-Z, so the second reverse restores A-Z relative
-    // positioning (for entries with the same date).
-    sortAlphabetically(data, {getDirectory, getName});
-    data.reverse();
-    sortByDate(data, {getDate});
-    data.reverse();
-  } else {
-    sortAlphabetically(data, {getDirectory, getName});
-    sortByDate(data, {getDate});
-  }
+  sortAlphabetically(data, {getDirectory, getName});
+  sortByDate(data, {latestFirst, getDate});
   return data;
 }
 
@@ -334,18 +325,7 @@ export function sortAlbumsTracksChronologically(data, {
   // released on the same date, they'll still be grouped together by album,
   // and tracks within an album will retain their relative positioning (i.e.
   // stay in the same order as part of the album's track listing).
-
-  if (latestFirst) {
-    // Like in sortChronologically, double reverse: Since we reverse after
-    // sorting by date, also reverse before, so that items with the same date
-    // are flipped relative to each other twice - that maintains the original
-    // relative ordering!
-    data.reverse();
-    sortByDate(data, {getDate});
-    data.reverse();
-  } else {
-    sortByDate(data, {getDate});
-  }
+  sortByDate(data, {latestFirst, getDate});
 
   return data;
 }
