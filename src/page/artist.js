@@ -40,7 +40,7 @@ export function write(artist, {wikiData}) {
       ...(artist.albumsAsCoverArtist ?? []),
       ...(artist.tracksAsCoverArtist ?? []),
     ],
-    {getDate: (o) => o.coverArtDate});
+    {latestFirst: true, getDate: (o) => o.coverArtDate});
 
   const commentaryThings = sortAlbumsTracksChronologically([
     ...(artist.albumsAsCommentator ?? []),

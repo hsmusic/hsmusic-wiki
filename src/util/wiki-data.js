@@ -316,6 +316,7 @@ export function sortChronologically(data, {
 //
 // This function also works for data lists which contain only tracks.
 export function sortAlbumsTracksChronologically(data, {
+  latestFirst = false,
   getDate,
 } = {}) {
   // Sort albums before tracks...
@@ -333,7 +334,18 @@ export function sortAlbumsTracksChronologically(data, {
   // released on the same date, they'll still be grouped together by album,
   // and tracks within an album will retain their relative positioning (i.e.
   // stay in the same order as part of the album's track listing).
-  sortByDate(data, {getDate});
+
+  if (latestFirst) {
+    // Like in sortChronologically, double reverse: Since we reverse after
+    // sorting by date, also reverse before, so that items with the same date
+    // are flipped relative to each other twice - that maintains the original
+    // relative ordering!
+    data.reverse();
+    sortByDate(data, {getDate});
+    data.reverse();
+  } else {
+    sortByDate(data, {getDate});
+  }
 
   return data;
 }
