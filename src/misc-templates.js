@@ -979,7 +979,7 @@ function unbound_generateStickyHeadingContainer({
               {
                 class: [
                   'content-sticky-heading-cover',
-                  coverArtTags .some(tag => !tag.isContentWarning) &&
+                  coverArtTags.some(tag => tag.isContentWarning) &&
                     'content-sticky-heading-cover-needs-reveal',
                 ],
               },
