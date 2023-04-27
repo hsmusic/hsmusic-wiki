@@ -16,7 +16,7 @@ import {
 import {
   getTrackCover,
   getAlbumListTag,
-  sortChronologically,
+  sortFlashesChronologically,
 } from '../util/wiki-data.js';
 
 export const description = `per-track info pages`;
@@ -42,7 +42,7 @@ export function write(track, {wikiData}) {
 
   let flashesThatFeature;
   if (wikiInfo.enableFlashesAndGames) {
-    flashesThatFeature = sortChronologically(
+    flashesThatFeature = sortFlashesChronologically(
       [track, ...otherReleases].flatMap((track) =>
         track.featuredInFlashes.map((flash) => ({
           flash,

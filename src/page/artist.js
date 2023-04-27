@@ -12,7 +12,7 @@ import {
   chunkByProperties,
   getTotalDuration,
   sortAlbumsTracksChronologically,
-  sortChronologically,
+  sortFlashesChronologically,
 } from '../util/wiki-data.js';
 
 export const description = `per-artist info & artwork gallery pages`;
@@ -129,7 +129,7 @@ export function write(artist, {wikiData}) {
 
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
-    flashes = sortChronologically(artist.flashesAsContributor.slice());
+    flashes = sortFlashesChronologically(artist.flashesAsContributor.slice());
     flashListChunks = chunkByProperties(
       flashes.map((flash) => ({
         act: flash.act,

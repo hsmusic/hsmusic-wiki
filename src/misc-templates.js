@@ -16,6 +16,7 @@ import {
   getTotalDuration,
   sortAlbumsTracksChronologically,
   sortChronologically,
+  sortFlashesChronologically,
 } from './util/wiki-data.js';
 
 const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
@@ -165,6 +166,8 @@ function unbound_generateChronologyLinks(currentThing, {
       const things = (
         thingsUnsorted.every(t => t instanceof T.Album || t instanceof T.Track)
           ? sortAlbumsTracksChronologically(...args)
+      : thingsUnsorted.every(t => t instanceof T.Flash)
+          ? sortFlashesChronologically(...args)
           : sortChronologically(...args));
 
       if (things.length === 0) return '';

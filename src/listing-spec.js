@@ -12,6 +12,7 @@ import {
   sortAlphabetically,
   sortByDate,
   sortChronologically,
+  sortFlashesChronologically,
 } from './util/wiki-data.js';
 
 const listingSpec = [];
@@ -775,7 +776,7 @@ listingSpec.push({
     wikiInfo.enableFlashesAndGames,
 
   data: ({wikiData: {flashData}}) =>
-    sortChronologically(flashData.slice())
+    sortFlashesChronologically(flashData.slice())
       .map(flash => ({
         flash,
         tracks: flash.featuredTracks,

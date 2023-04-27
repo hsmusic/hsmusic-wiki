@@ -207,35 +207,52 @@ export function sortByDate(data, {
   });
 }
 
-export function sortByPositionInAlbum(data) {
+export function sortByPositionInParent(data, {
+  getParent,
+  getChildren,
+}) {
   return data.sort((a, b) => {
-    const aa = a.album;
-    const ba = b.album;
+    const parentA = getParent(a);
+    const parentB = getParent(b);
 
-    // Don't change the sort when the two tracks are from separate albums.
-    // This function doesn't change the order of albums or try to "merge"
-    // two separated chunks of tracks from the same album together.
-    if (aa !== ba) {
+    // Don't change the sort when the two items are from separate parents.
+    // This function doesn't change the order of parents or try to "merge"
+    // two separated chunks of items from the same parent together.
+    if (parentA !== parentB) {
       return 0;
     }
 
-    // Don't change the sort when only one (or neither) item is actually
-    // a track (i.e. has an album).
-    if (!aa || !ba) {
+    // Don't change the sort when either (or both) of the items doesn't
+    // even have a parent (e.g. it's the passed data is a mixed array of
+    // children and parents).
+    if (!parentA || !parentB) {
       return 0;
     }
 
-    const ai = aa.tracks.indexOf(a);
-    const bi = ba.tracks.indexOf(b);
+    const indexA = getChildren(parentA).indexOf(a);
+    const indexB = getChildren(parentB).indexOf(b);
 
-    // There's no reason this two-way reference (a track's album and the
-    // album's track list) should be broken, but if for any reason it is,
-    // don't change the sort.
-    if (ai === -1 || bi === -1) {
+    // If the getParent/getChildren relationship doesn't go both ways for
+    // some reason, don't change the sort.
+    if (indexA === -1 || indexB === -1) {
       return 0;
     }
 
-    return ai - bi;
+    return indexA - indexB;
+  });
+}
+
+export function sortByPositionInAlbum(data) {
+  return sortByPositionInParent(data, {
+    getParent: track => track.album,
+    getChildren: album => album.tracks,
+  });
+}
+
+export function sortByPositionInFlashAct(data) {
+  return sortByPositionInParent(data, {
+    getParent: flash => flash.act,
+    getChildren: act => act.flashes,
   });
 }
 
@@ -325,6 +342,38 @@ export function sortAlbumsTracksChronologically(data, {
   // released on the same date, they'll still be grouped together by album,
   // and tracks within an album will retain their relative positioning (i.e.
   // stay in the same order as part of the album's track listing).
+  sortByDate(data, {latestFirst, getDate});
+
+  return data;
+}
+
+export function sortFlashesChronologically(data, {
+  latestFirst = false,
+  getDate,
+} = {}) {
+  // Flash acts don't actually have any identifying properties because they
+  // don't have dedicated pages (yet), so don't have a directory. Make up a
+  // fake key identifying them so flashes can be grouped together.
+  const flashActs = new Set(data.map(flash => flash.act));
+  const flashActIdentifiers = new Map();
+
+  let counter = 0;
+  for (const act of flashActs) {
+    flashActIdentifiers.set(act, ++counter);
+  }
+
+  // Group flashes by act...
+  data.sort((a, b) => {
+    return flashActIdentifiers.get(a.act) - flashActIdentifiers.get(b.act);
+  });
+
+  // Sort flashes by position in act...
+  sortByPositionInFlashAct(data);
+
+  // ...and finally sort by date. If flashes from more than one act were
+  // released on the same date, they'll still be grouped together by act,
+  // and flashes within an act will retain their relative positioning (i.e.
+  // stay in the same order as the act's flash listing).
   sortByDate(data, {latestFirst, getDate});
 
   return data;
