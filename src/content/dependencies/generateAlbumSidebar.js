@@ -30,44 +30,47 @@ export default {
   },
 
   generate(data, relations, {html}) {
-    const {isAlbumPage} = data;
+    const trackListBox = {
+      content:
+        html.tags([
+          html.tag('h1', relations.albumLink),
+          relations.trackSections,
+        ]),
+    };
 
-    const trackListPart = html.tags([
-      html.tag('h1', relations.albumLink),
-      relations.trackSections,
-    ]);
+    if (data.isAlbumPage) {
+      const groupBoxes =
+        relations.groupBoxes
+          .map(content => content.slot('isAlbumPage', true))
+          .map(content => ({content}));
 
-    if (isAlbumPage) {
       return {
-        // leftSidebarStickyMode: 'last',
         leftSidebarMultiple: [
-          ...(
-            relations.groupBoxes
-              .map(groupBox => groupBox.slot('isAlbumPage', true))
-              .map(content => ({content}))),
-          {content: trackListPart},
-        ],
-      };
-    } else {
-      return {
-        // leftSidebarStickyMode: 'column',
-        leftSidebarMultiple: [
-          {content: trackListPart},
-          // ...relations.groupBoxes.map(content => ({content})),
-          {
-            content:
-              relations.groupBoxes
-                .flatMap((content, i, {length}) => [
-                  content,
-                  i < length - 1 &&
-                    html.tag('hr', {
-                      style: `border-color: var(--primary-color); border-style: none none dotted none`
-                    }),
-                ])
-                .filter(Boolean),
-          },
+          ...groupBoxes,
+          trackListBox,
         ],
       };
     }
+
+    const conjoinedGroupBox = {
+      content:
+        relations.groupBoxes
+          .flatMap((content, i, {length}) => [
+            content,
+            i < length - 1 &&
+              html.tag('hr', {
+                style: `border-color: var(--primary-color); border-style: none none dotted none`
+              }),
+          ])
+          .filter(Boolean),
+    };
+
+    return {
+      // leftSidebarStickyMode: 'column',
+      leftSidebarMultiple: [
+        trackListBox,
+        conjoinedGroupBox,
+      ],
+    };
   },
 };
