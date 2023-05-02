@@ -4,20 +4,28 @@ export default {
   contentDependencies: ['linkAlbum', 'linkExternal', 'linkGroup'],
   extraDependencies: ['html', 'language', 'transformMultiline'],
 
-  relations(relation, album, group) {
+  contracts: {
+    relations(contract, [album, group]) {
+      contract.provide({
+        group, album,
+
+        urls: contract.selectProperty(group, 'urls'),
+        adjacentAlbums: contract.subcontract('adjacentAlbumsInGroup', album, group),
+      });
+    },
+  },
+
+  relations(relation, {group, album, urls, adjacentAlbums}) {
     const relations = {};
 
     relations.groupLink =
       relation('linkGroup', group);
 
     relations.externalLinks =
-      group.urls.map(url =>
-        relation('linkExternal', url));
+      urls.map(url =>
+        relation('linkExternal', urls));
 
-    const albums = group.albums.filter(album => album.date);
-    const index = albums.indexOf(album);
-    const previousAlbum = (index > 0) && albums[index - 1];
-    const nextAlbum = (index < albums.length - 1) && albums[index + 1];
+    const {previousAlbum, nextAlbum} = adjacentAlbums;
 
     if (previousAlbum) {
       relations.previousAlbumLink =
