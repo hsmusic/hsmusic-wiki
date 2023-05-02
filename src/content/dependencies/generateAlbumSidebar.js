@@ -1,22 +1,7 @@
-import {empty} from '../../util/sugar.js';
-
-function groupRelationships(album) {
-  return album.groups.map(group => {
-    const albums = group.albums.filter(album => album.date);
-    const index = albums.indexOf(album);
-
-    const previousAlbum = (index > 0) && albums[index - 1];
-    const nextAlbum = (index < albums.length - 1) && albums[index + 1];
-
-    return {group, previousAlbum, nextAlbum};
-  });
-}
-
 export default {
   contentDependencies: [
+    'generateAlbumSidebarGroupBox',
     'linkAlbum',
-    'linkExternal',
-    'linkGroup',
     'linkTrack',
   ],
 
@@ -24,7 +9,6 @@ export default {
     'getColors',
     'html',
     'language',
-    'transformMultiline',
   ],
 
   relations(relation, album, _track) {
@@ -38,24 +22,9 @@ export default {
         trackSection.tracks.map(track =>
           relation('linkTrack', track)));
 
-    relations.groupLinks =
-      groupRelationships(album)
-        .map(({group, previousAlbum, nextAlbum}) => ({
-          groupLink:
-            relation('linkGroup', group),
-
-          externalLinks:
-            group.urls.map(url =>
-              relation('linkExternal', url)),
-
-          previousAlbumLink:
-            previousAlbum &&
-              relation('linkAlbum', previousAlbum),
-
-          nextAlbumLink:
-            nextAlbum &&
-              relation('linkAlbum', nextAlbum),
-        }))
+    relations.groupBoxes =
+      album.groups.map(group =>
+        relation('generateAlbumSidebarGroupBox', album, group));
 
     return relations;
   },
@@ -81,11 +50,6 @@ export default {
         currentTrackIndex: trackSection.tracks.indexOf(track),
       }));
 
-    data.groupInfo =
-      album.groups.map(group => ({
-        description: group.descriptionShort,
-      }));
-
     return data;
   },
 
@@ -93,7 +57,6 @@ export default {
     getColors,
     html,
     language,
-    transformMultiline,
   }) {
     const {isTrackPage, isAlbumPage} = data;
 
@@ -173,46 +136,14 @@ export default {
         }),
     ]);
 
-    const groupParts = data.groupInfo.map(
-      ({description}, index) => {
-        const links = relations.groupLinks[index];
-
-        return html.tags([
-          html.tag('h1',
-            language.$('albumSidebar.groupBox.title', {
-              group: links.groupLink,
-            })),
-
-          isAlbumPage &&
-            transformMultiline(description),
-
-          !empty(links.externalLinks) &&
-            html.tag('p',
-              language.$('releaseInfo.visitOn', {
-                links: language.formatDisjunctionList(links.externalLinks),
-              })),
-
-          isAlbumPage &&
-          links.nextAlbumLink &&
-            html.tag('p', {class: 'group-chronology-link'},
-              language.$('albumSidebar.groupBox.next', {
-                album: links.nextAlbumLink,
-              })),
-
-          isAlbumPage &&
-          links.previousAlbumLink &&
-            html.tag('p', {class: 'group-chronology-link'},
-              language.$('albumSidebar.groupBox.previous', {
-                album: links.previousAlbumLink,
-              })),
-        ]);
-      });
-
     if (isAlbumPage) {
       return {
         // leftSidebarStickyMode: 'last',
         leftSidebarMultiple: [
-          ...groupParts.map(groupPart => ({content: groupPart})),
+          ...(
+            relations.groupBoxes
+              .map(groupBox => groupBox.slot('isAlbumPage', true))
+              .map(content => ({content}))),
           {content: trackListPart},
         ],
       };
@@ -221,16 +152,16 @@ export default {
         // leftSidebarStickyMode: 'column',
         leftSidebarMultiple: [
           {content: trackListPart},
-          // ...groupParts.map(groupPart => ({content: groupPart})),
+          // ...relations.groupBoxes.map(content => ({content})),
           {
             content:
-              groupParts
-                .flatMap((part, i) => [
-                  part,
-                  i < groupParts.length - 1 &&
+              relations.groupBoxes
+                .flatMap((content, i, {length}) => [
+                  content,
+                  i < length - 1 &&
                     html.tag('hr', {
                       style: `border-color: var(--primary-color); border-style: none none dotted none`
-                    })
+                    }),
                 ])
                 .filter(Boolean),
           },
