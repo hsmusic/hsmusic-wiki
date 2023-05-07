@@ -5,45 +5,53 @@ export default {
   extraDependencies: ['html', 'language', 'transformMultiline'],
 
   contracts: {
-    relations(contract, [album, group]) {
-      contract.provide({
-        group, album,
+    relations: {
+      hook(contract, [relation, album, group]) {
+        contract.provide({
+          group, album,
 
-        urls: contract.selectProperty(group, 'urls'),
-        adjacentAlbums: contract.subcontract('adjacentAlbumsInGroup', album, group),
-      });
+          urls: contract.selectProperty(group, 'urls'),
+          adjacentAlbums: contract.subcontract('adjacentAlbumsInGroup', album, group),
+        });
+      },
+
+      compute({relation, group, album, urls, adjacentAlbums}) {
+        const relations = {};
+
+        relations.groupLink =
+          relation('linkGroup', group);
+
+        relations.externalLinks =
+          urls.map(url =>
+            relation('linkExternal', urls));
+
+        const {previousAlbum, nextAlbum} = adjacentAlbums;
+
+        if (previousAlbum) {
+          relations.previousAlbumLink =
+            relation('linkAlbum', previousAlbum);
+        }
+
+        if (nextAlbum) {
+          relations.nextAlbumLink =
+            relation('linkAlbum', nextAlbum);
+        }
+
+        return relations;
+      },
     },
-  },
 
-  relations(relation, {group, album, urls, adjacentAlbums}) {
-    const relations = {};
+    data: {
+      hook(contract, [album, group]) {
+        contract.provide({
+          description: contract.selectProperty(group, 'descriptionShort'),
+        });
+      },
 
-    relations.groupLink =
-      relation('linkGroup', group);
-
-    relations.externalLinks =
-      urls.map(url =>
-        relation('linkExternal', urls));
-
-    const {previousAlbum, nextAlbum} = adjacentAlbums;
-
-    if (previousAlbum) {
-      relations.previousAlbumLink =
-        relation('linkAlbum', previousAlbum);
-    }
-
-    if (nextAlbum) {
-      relations.nextAlbumLink =
-        relation('linkAlbum', nextAlbum);
-    }
-
-    return relations;
-  },
-
-  data(album, group) {
-    return {
-      description: group.descriptionShort,
-    };
+      compute({description}) {
+        return {description};
+      },
+    },
   },
 
   generate(data, relations, {html, language, transformMultiline}) {
