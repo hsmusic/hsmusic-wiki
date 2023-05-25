@@ -7,44 +7,26 @@ export default {
 
   extraDependencies: ['html'],
 
-  contracts: {
-    relations: {
-      hook(contract, [relation, album, track]) {
-        contract.provide({
-          relation, album, track,
 
-          groups: contract.selectProperty(album, 'groups'),
-          trackSections: contract.selectProperty(album, 'trackSections'),
-        });
-      },
+  relations(relation, album, track) {
+    const relations = {};
 
-      compute({relation, album, track, groups, trackSections}) {
-        const relations = {};
+    relations.albumLink =
+      relation('linkAlbum', album);
 
-        relations.albumLink =
-          relation('linkAlbum', album);
+    relations.groupBoxes =
+      album.groups.map(group =>
+        relation('generateAlbumSidebarGroupBox', album, group));
 
-        relations.groupBoxes =
-          groups.map(group =>
-            relation('generateAlbumSidebarGroupBox', album, group));
+    relations.trackSections =
+      album.trackSections.map(trackSection =>
+        relation('generateAlbumSidebarTrackSection', album, track, trackSection));
 
-        relations.trackSections =
-          trackSections.map(trackSection =>
-            relation('generateAlbumSidebarTrackSection', album, track, trackSection));
+    return relations;
+  },
 
-        return relations;
-      },
-    },
-
-    data: {
-      hook(contract, [album, track]) {
-        contract.provide({track});
-      },
-
-      compute({track}) {
-        return {isAlbumPage: !track};
-      },
-    },
+  data(album, track) {
+    return {isAlbumPage: !track};
   },
 
   generate(data, relations, {html}) {
