@@ -3,7 +3,6 @@
 // interfaces for converting various content found in wiki data to HTML for
 // display on the site.
 
-import * as html from './html.js';
 export {transformInline} from './replacer.js';
 
 export const replacerSpec = {
@@ -34,7 +33,7 @@ export const replacerSpec = {
   date: {
     find: null,
     value: (ref) => new Date(ref),
-    html: (date, {language}) =>
+    html: (date, {html, language}) =>
       html.tag('time',
         {datetime: date.toString()},
         language.formatDate(date)),

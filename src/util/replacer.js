@@ -221,11 +221,10 @@ function parseNodes(input, i, stopAt, textOnly) {
       let hash;
 
       if (stop_literal === tagHash) {
-        N = parseNodes(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
+        N = parseOneTextNode(input, i, [R_tagArgument, R_tagLabel, R_tagEnding]);
 
         if (!stopped) throw endOfInput(i, `reading hash`);
-
-        if (!N) throw makeError(i, `Expected content (hash).`);
+        if (!N) throw makeError(i, `Expected text (hash).`);
 
         hash = N;
         i = stop_iParse;
@@ -294,6 +293,10 @@ function parseNodes(input, i, stopAt, textOnly) {
 }
 
 export function parseInput(input) {
+  if (typeof input !== 'string') {
+    throw new TypeError(`Expected input to be string, got ${input}`);
+  }
+
   try {
     return parseNodes(input, 0);
   } catch (errorNode) {
@@ -378,7 +381,7 @@ function evaluateTag(node, opts) {
     (transformName && transformName(value.name, node, input)) ||
     null;
 
-  const hash = node.data.hash && transformNodes(node.data.hash, opts);
+  const hash = node.data.hash && transformNode(node.data.hash, opts);
 
   const args =
     node.data.args &&

@@ -4,14 +4,16 @@ export default function contentFunction({
   contentDependencies = [],
   extraDependencies = [],
 
+  sprawl,
+  relations,
   data,
   generate,
-  relations,
 }) {
   return expectDependencies({
+    sprawl,
+    relations,
     data,
     generate,
-    relations,
 
     expectedContentDependencyKeys: contentDependencies,
     expectedExtraDependencyKeys: extraDependencies,
@@ -22,9 +24,10 @@ export default function contentFunction({
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
 export function expectDependencies({
+  sprawl,
+  relations,
   data,
   generate,
-  relations,
 
   expectedContentDependencyKeys,
   expectedExtraDependencyKeys,
@@ -34,8 +37,13 @@ export function expectDependencies({
     throw new Error(`Expected generate function`);
   }
 
-  const hasDataFunction = !!data;
+  const hasSprawlFunction = !!sprawl;
   const hasRelationsFunction = !!relations;
+  const hasDataFunction = !!data;
+
+  if (hasSprawlFunction && !expectedExtraDependencyKeys.includes('wikiData')) {
+    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
+  }
 
   const fulfilledDependencyKeys = Object.keys(fulfilledDependencies);
 
@@ -98,27 +106,24 @@ export function expectDependencies({
 
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
 
-  if (hasDataFunction) {
-    if (empty(missingContentDependencyKeys)) {
-      wrappedGenerate.data = data;
-    } else {
-      wrappedGenerate.data = function() {
-        throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.join(', ')}`);
-      };
-
-      annotateFunction(wrappedGenerate.data, {name: data, trait: 'unfulfilled'});
-    }
+  if (hasSprawlFunction) {
+    wrappedGenerate.sprawl = sprawl;
   }
 
   if (hasRelationsFunction) {
     wrappedGenerate.relations = relations;
   }
 
+  if (hasDataFunction) {
+    wrappedGenerate.data = data;
+  }
+
   wrappedGenerate.fulfill ??= function fulfill(dependencies) {
     return expectDependencies({
+      sprawl,
+      relations,
       data,
       generate,
-      relations,
 
       expectedContentDependencyKeys,
       expectedExtraDependencyKeys,
@@ -201,18 +206,24 @@ export function fulfillDependencies({
   return newFulfilledDependencies;
 }
 
-export function getRelationsTree(dependencies, contentFunctionName, ...args) {
+export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
   const relationIdentifier = Symbol('Relation');
 
   function recursive(contentFunctionName, ...args) {
     const contentFunction = dependencies[contentFunctionName];
-    if (!contentFunctionName) {
+    if (!contentFunction) {
       throw new Error(`Couldn't find dependency ${contentFunctionName}`);
     }
 
-    if (!contentFunction?.relations) {
+    if (!contentFunction.relations) {
       return null;
     }
+
+    // TODO: Evaluating a sprawl might belong somewhere better than here, lol...
+    const sprawl =
+      (contentFunction.sprawl
+        ? contentFunction.sprawl(wikiData, ...args)
+        : null)
 
     const relationSlots = {};
 
@@ -227,7 +238,10 @@ export function getRelationsTree(dependencies, contentFunctionName, ...args) {
       return {[relationIdentifier]: relationSymbol};
     };
 
-    const relationsLayout = contentFunction.relations(relationFunction, ...args);
+    const relationsLayout =
+      (sprawl
+        ? contentFunction.relations(relationFunction, sprawl, ...args)
+        : contentFunction.relations(relationFunction, ...args))
 
     const relationsTree = Object.fromEntries(
       Object.getOwnPropertySymbols(relationSlots)
@@ -354,7 +368,7 @@ export function quickEvaluate({
       }));
   }
 
-  const treeInfo = getRelationsTree(allContentDependencies, name, ...args);
+  const treeInfo = getRelationsTree(allContentDependencies, name, allExtraDependencies.wikiData ?? {}, ...args);
   const flatTreeInfo = flattenRelationsTree(treeInfo);
   const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
 
@@ -421,15 +435,25 @@ export function quickEvaluate({
 
   const slotResults = {};
 
-  function runContentFunction({name, args, relations}) {
+  function runContentFunction({name, args, relations: flatRelations}) {
     const contentFunction = fulfilledContentDependencies[name];
-    const filledRelations =
-      fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, relations);
 
-    const generateArgs = [
-      contentFunction.data?.(...args),
-      filledRelations,
-    ].filter(Boolean);
+    if (!contentFunction) {
+      throw new Error(`Content function ${name} unfulfilled or not listed`);
+    }
+
+    const sprawl =
+      contentFunction.sprawl?.(allExtraDependencies.wikiData, ...args);
+
+    const relations =
+      fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, flatRelations);
+
+    const data =
+      (sprawl
+        ? contentFunction.data?.(sprawl, ...args)
+        : contentFunction.data?.(...args));
+
+    const generateArgs = [data, relations].filter(Boolean);
 
     return contentFunction(...generateArgs);
   }

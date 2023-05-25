@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateFooterLocalizationLinks',
     'generateStickyHeadingContainer',
+    'transformContent',
   ],
 
   extraDependencies: [
@@ -12,10 +13,23 @@ export default {
     'language',
     'to',
     'transformMultiline',
-    'wikiInfo',
+    'wikiData',
   ],
 
-  relations(relation) {
+  sprawl({wikiInfo}) {
+    return {
+      footerContent: wikiInfo.footerContent,
+      wikiName: wikiInfo.nameShort,
+    };
+  },
+
+  data({wikiName}) {
+    return {
+      wikiName,
+    };
+  },
+
+  relations(relation, sprawl) {
     const relations = {};
 
     relations.footerLocalizationLinks =
@@ -24,16 +38,17 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
+    relations.defaultFooterContent =
+      relation('transformContent', sprawl.footerContent);
+
     return relations;
   },
 
-  generate(relations, {
+  generate(data, relations, {
     cachebust,
     html,
     language,
     to,
-    transformMultiline,
-    wikiInfo,
   }) {
     const sidebarSlots = side => ({
       // Content is a flat HTML array. It'll generate one sidebar section
@@ -186,8 +201,9 @@ export default {
 
         let footerContent = slots.footerContent;
 
-        if (html.isBlank(footerContent) && wikiInfo.footerContent) {
-          footerContent = transformMultiline(wikiInfo.footerContent);
+        if (html.isBlank(footerContent)) {
+          footerContent = relations.defaultFooterContent
+            .slot('mode', 'multiline');
         }
 
         const mainHTML =
@@ -251,7 +267,7 @@ export default {
 
                   switch (cur.auto) {
                     case 'home':
-                      title = wikiInfo.nameShort;
+                      title = data.wikiName;
                       href = to('localized.home');
                       break;
                     case 'current':
@@ -400,7 +416,7 @@ export default {
                   showWikiNameInTitle
                     ? language.formatString('misc.pageTitle.withWikiName', {
                         title,
-                        wikiName: wikiInfo.nameShort,
+                        wikiName: data.wikiName,
                       })
                     : language.formatString('misc.pageTitle', {title})),
                 */

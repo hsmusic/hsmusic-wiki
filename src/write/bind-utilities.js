@@ -49,6 +49,7 @@ export function bindUtilities({
     thumb,
     to,
     urls,
+    wikiData,
     wikiInfo: wikiData.wikiInfo,
   });
 

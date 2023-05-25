@@ -364,7 +364,7 @@ export async function go({
 
       // NOTE: ALL THIS STUFF IS PASTED, REVIEW AND INTEGRATE SOON(TM)
 
-      const treeInfo = getRelationsTree(allContentDependencies, name, ...args);
+      const treeInfo = getRelationsTree(allContentDependencies, name, wikiData, ...args);
       const flatTreeInfo = flattenRelationsTree(treeInfo);
       const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
 
@@ -431,20 +431,25 @@ export async function go({
 
       const slotResults = {};
 
-      function runContentFunction({name, args, relations}) {
+      function runContentFunction({name, args, relations: flatRelations}) {
         const contentFunction = fulfilledContentDependencies[name];
 
         if (!contentFunction) {
           throw new Error(`Content function ${name} unfulfilled or not listed`);
         }
 
-        const filledRelations =
-          fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, relations);
+        const sprawl =
+          contentFunction.sprawl?.(allExtraDependencies.wikiData, ...args);
 
-        const generateArgs = [
-          contentFunction.data?.(...args),
-          filledRelations,
-        ].filter(Boolean);
+        const relations =
+          fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, flatRelations);
+
+        const data =
+          (sprawl
+            ? contentFunction.data?.(sprawl, ...args)
+            : contentFunction.data?.(...args));
+
+        const generateArgs = [data, relations].filter(Boolean);
 
         return contentFunction(...generateArgs);
       }
