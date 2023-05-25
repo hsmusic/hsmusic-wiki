@@ -1,111 +1,3 @@
-export class NormalizedWeakMap extends WeakMap {
-  #cache = new WeakMap();
-
-  normalize(key) {
-    throw new Error(`normalize not implemented`);
-  }
-
-  #cachedNormalize(key) {
-    if (typeof key !== 'object') {
-      throw new TypeError(`Expected key to be an object`);
-    }
-
-    if (this.#cache.has(key)) {
-      return this.#cache.get(key);
-    } else {
-      const normalized = this.normalize(key);
-      this.#cache.set(key, normalized);
-      return normalized;
-    }
-  }
-
-  get(key) {
-    return super.get(this.#cachedNormalize(key));
-  }
-
-  set(key, value) {
-    return super.set(this.#cachedNormalize(key), value);
-  }
-
-  has(key) {
-    return super.has(this.#cachedNormalize(key));
-  }
-
-  delete(key) {
-    return super.delete(this.#cachedNormalize(key));
-  }
-}
-
-export class NormalizedArrayMap extends NormalizedWeakMap {
-  #topCache = this.#createCache([]);
-
-  normalize(array) {
-    let index = 0;
-    let cache = this.#topCache;
-    let infantCache = false;
-
-    while (index < array.length) {
-      const item = array[index];
-      const whichCache = (typeof item === 'object' ? 1 : 2);
-
-      let nextCache = undefined;
-
-      if (!infantCache) {
-        // Note: This could still be undefined - infantCache just skips the get
-        // op here because it would *definitely* be undefined.
-        nextCache = cache[whichCache].get(item);
-      }
-
-      if (nextCache === undefined) {
-        nextCache = this.#createCache();
-        cache[whichCache].set(item, nextCache);
-        infantCache = true;
-      }
-
-      cache = nextCache;
-      index++;
-    }
-
-    return cache[0];
-  }
-
-  #createCache() {
-    return [{}, new WeakMap(), new Map()];
-  }
-}
-
-export class BlackBox {
-  profiling = true; /* Unused for now */
-  caching = true;
-
-  #cache = new NormalizedArrayMap();
-  #computeFunction = null;
-
-  constructor(computeFunction) {
-    this.#computeFunction = computeFunction;
-  }
-
-  getEvaluator() {
-    return (...args) => {
-      if (this.caching) {
-        return this.evaluateCached(...args);
-      } else {
-        return this.#computeFunction(...args);
-      }
-    };
-  }
-
-  evaluateCached(...args) {
-    if (this.#cache.has(args)) {
-      return this.#cache.get(args);
-    } else {
-      const result = this.#computeFunction(...args);
-      this.#cache.set(args, result);
-      return result;
-    }
-  }
-}
-
 export class ContractManager {
   #registeredContracts = Object.create(null);
 
@@ -143,27 +35,55 @@ export class ContractManager {
     const subcontracts = {};
     const structure = {};
 
+    const contextualizeHook = (args, {type, ...hook}) => {
+      switch (type) {
+        case 'argument':
+          return {type: 'argument', index: hook.index};
+        case 'selectPropertyPath': {
+          /*
+          switch (hook.object.type) {
+            case 'argument':
+              console.log('select argument', hook.object.index, '=', args[hook.object.index]);
+              return {type: 'selectPropertyPath', object: args[hook.object.index], path: hook.path};
+            case 'selectPropertyPath':
+              console.log('merge', hook.object.path, 'with', hook.path);
+              return {type: 'selectPropertyPath', object: args[hook.object.object.index], path: [...hook.object.path, ...hook.path]};
+            default:
+              throw new Error(`Can't contextualize unknown hook type OF OBJECT ${hook.object.type}`);
+          }
+          */
+          const contextualizedObject = contextualizeHook(args, hook.object);
+          console.log(`contextualized property object:`, contextualizedObject);
+          switch (contextualizedObject.type) {
+            case 'argument':
+              return {type: 'selectPropertyPath', object: args[contextualizedObject.index], path: hook.path};
+            case 'selectPropertyPath':
+              return {type: 'selectPropertyPath', object: contextualizedObject.object, path: [...contextualizedObject.path, ...hook.path]};
+          }
+        }
+        default:
+          throw new Error(`Can't contextualize unknown hook type ${type}`);
+      }
+    };
+
     const contractUtility = {
       subcontract: (name, ...args) => {
-        const hook = {type: 'subcontract', name, args};
-        const shape = {type: 'subcontract', name, args};
+        const info = this.getContractInfo(name.startsWith('#') ? name.slice(1) : name);
 
-        hooks.push(hook);
-        return shape;
+        for (const hook of info.hooks) {
+          hooks.push(contextualizeHook(args, hook));
+        }
+
+        return {type: 'subcontract', name, args};
       },
 
       provide: (properties) => {
         Object.assign(structure, properties);
       },
 
-      selectProperty: (object, propertyString) => {
-        const propertyPath = propertyString.split('.');
-
-        const hook = {type: 'selectPropertyPath', object, path: propertyPath};
-        const shape = {type: 'selectPropertyPath', object, path: propertyPath};
-
-        hooks.push(hook);
-        return shape;
+      selectProperty: (object, property) => {
+        hooks.push(contextualizeHook(args, {type: 'selectPropertyPath', object, path: [property]}));
+        return {type: 'selectPropertyPath', object, path: [property]};
       },
     };
 
@@ -177,7 +97,6 @@ export class ContractManager {
   }
 }
 
-/*
 const {default: {contracts}} = await import('./content/dependencies/generateAlbumTrackList.js');
 const util = await import('util');
 
@@ -197,60 +116,3 @@ for (const hook of manager.getContractHooks(testContract)) {
 }
 
 // console.log(util.inspect(manager.getContractInfo(testContract).structure, {colors: true, depth: Infinity}));
-*/
-
-// lousy perf test
-if ((await import('./util/node-utils.js')).isMain(import.meta.url)) {
-  const obj1 = {foo: 3, bar: 4};
-  const obj2 = {baz: 5, qux: 6};
-
-  let fn = (object, key) => object[key] ** 2;
-  let bb = new BlackBox(fn);
-  let evaluate = bb.getEvaluator();
-
-  const gogogo = (once) => {
-    let iters = 0;
-    for (let end = Date.now() + 1000; Date.now() < end;) {
-      once(obj1, 'foo');
-      once(obj1, 'foo');
-      once(obj2, 'qux');
-      once(obj2, 'qux');
-      once(obj1, 'foo');
-      once(obj1, 'bar');
-      once(obj2, 'baz');
-      once(obj1, 'foo');
-      iters += 8;
-    }
-    return iters;
-  };
-
-  console.log(`Iterations - black box w/ cache:  ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/ cache:  ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/ cache:  ${gogogo(evaluate)}`);
-
-  bb.caching = false;
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-
-  bb.caching = false;
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-  console.log(`Iterations - black box w/o cache: ${gogogo(evaluate)}`);
-
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-  console.log(`Iterations - direct pass to fn:   ${gogogo(fn)}`);
-}
