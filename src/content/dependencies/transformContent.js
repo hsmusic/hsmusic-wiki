@@ -115,7 +115,7 @@ export default {
             data.label =
               enteredLabel ??
                 (transformName && data.thing.name
-                  ? transformName(data.thing.name)
+                  ? transformName(data.thing.name, node, content)
                   : null);
 
             data.hash = enteredHash ?? null;
