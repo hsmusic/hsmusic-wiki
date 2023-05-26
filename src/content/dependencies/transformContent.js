@@ -260,18 +260,27 @@ export default {
 
         // This is separated into its own function just since we're gonna reuse
         // it in a minute if everything goes to heck in lyrics mode.
-        const transformMultiline = () =>
-          marked.parse(
+        const transformMultiline = () => {
+          const markedInput =
             contentFromNodes
               .map(node => {
                 if (node.type === 'text') {
-                  return node.data.replace(/\n+/g, '\n\n');
+                  return node.data;
                 } else {
                   return node.data.toString();
                 }
               })
-              .join(''),
-            markedOptions);
+              .join('')
+
+              // Compress multiple line breaks into single line breaks.
+              .replace(/\n{2,}/g, '\n')
+              // Expand line breaks which don't follow a list.
+              .replace(/(?<!^ *-.*)\n+/gm, '\n\n')
+              // Expand line breaks which are at the end of a list.
+              .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n');
+
+          return marked.parse(markedInput, markedOptions);
+        }
 
         if (slots.mode === 'multiline') {
           // Unfortunately, we kind of have to be super evil here and stringify
