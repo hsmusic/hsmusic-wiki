@@ -8,6 +8,20 @@ export function targets({wikiData}) {
   return wikiData.staticPageData;
 }
 
+export function pathsForTarget(staticPage) {
+  return [
+    {
+      type: 'page',
+      path: ['staticPage', staticPage.directory],
+
+      contentFunction: {
+        name: 'generateStaticPage',
+        args: [staticPage],
+      },
+    },
+  ];
+}
+
 export function write(staticPage) {
   const page = {
     type: 'page',
