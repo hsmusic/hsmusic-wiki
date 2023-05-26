@@ -1,8 +1,14 @@
 import {empty} from '../../util/sugar.js';
 
 export default {
-  contentDependencies: ['linkAlbum', 'linkExternal', 'linkGroup'],
-  extraDependencies: ['html', 'language', 'transformMultiline'],
+  contentDependencies: [
+    'linkAlbum',
+    'linkExternal',
+    'linkGroup',
+    'transformContent',
+  ],
+
+  extraDependencies: ['html', 'language'],
 
   relations(relation, album, group) {
     const relations = {};
@@ -19,6 +25,11 @@ export default {
     const previousAlbum = (index > 0) && albums[index - 1];
     const nextAlbum = (index < albums.length - 1) && albums[index + 1];
 
+    if (group.descriptionShort) {
+      relations.description =
+        relation('transformContent', group.descriptionShort);
+    }
+
     if (previousAlbum) {
       relations.previousAlbumLink =
         relation('linkAlbum', previousAlbum);
@@ -32,13 +43,7 @@ export default {
     return relations;
   },
 
-  data(album, group) {
-    return {
-      description: group.descriptionShort,
-    };
-  },
-
-  generate(data, relations, {html, language, transformMultiline}) {
+  generate(relations, {html, language}) {
     return html.template({
       annotation: `generateAlbumSidebarGroupBox`,
 
@@ -54,7 +59,8 @@ export default {
             })),
 
           slots.isAlbumPage &&
-            transformMultiline(data.description),
+            relations.description
+              ?.slot('mode', 'multiline'),
 
           !empty(relations.externalLinks) &&
             html.tag('p',
