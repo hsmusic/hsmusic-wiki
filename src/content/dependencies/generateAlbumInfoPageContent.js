@@ -13,65 +13,104 @@ export default {
     'linkExternal',
   ],
 
-  extraDependencies: [
-    'html',
-    'language',
-    'transformMultiline',
-  ],
+  extraDependencies: ['html', 'language'],
 
   relations(relation, album) {
     const relations = {};
+    const sections = relations.sections = {};
 
     const contributionLinksRelation = contribs =>
       contribs.map(contrib =>
         relation('linkContribution', contrib.who, contrib.what));
 
+    // Section: Release info
+
+    const releaseInfo = sections.releaseInfo = {};
+
+    if (!empty(album.artistContribs)) {
+      releaseInfo.artistContributionLinks =
+        contributionLinksRelation(album.artistContribs);
+    }
+
     if (album.hasCoverArt) {
       relations.cover =
         relation('generateCoverArtwork', album.artTags);
+      releaseInfo.coverArtistContributionLinks =
+        contributionLinksRelation(album.coverArtistContribs);
+    } else {
+      relations.cover = null;
     }
 
-    relations.artistLinks =
-      contributionLinksRelation(album.artistContribs);
+    if (album.hasWallpaperArt) {
+      releaseInfo.wallpaperArtistContributionLinks =
+        contributionLinksRelation(album.wallpaperArtistContribs);
+    }
 
-    relations.coverArtistLinks =
-      contributionLinksRelation(album.coverArtistContribs);
+    if (album.hasBannerArt) {
+      releaseInfo.bannerArtistContributionLinks =
+        contributionLinksRelation(album.bannerArtistContribs);
+    }
 
-    relations.wallpaperArtistLinks =
-      contributionLinksRelation(album.wallpaperArtistContribs);
+    // Section: Listen on
 
-    relations.bannerArtistLinks =
-      contributionLinksRelation(album.bannerArtistContribs);
+    if (!empty(album.urls)) {
+      const listen = sections.listen = {};
+
+      listen.heading =
+        relation('generateContentHeading');
+
+      listen.externalLinks =
+        album.urls.map(url =>
+          relation('linkExternal', url, {type: 'album'}));
+    }
+
+    // Section: Extra links
+
+    const extra = sections.extra = {};
 
     if (album.tracks.some(t => t.hasUniqueCoverArt)) {
-      relations.galleryLink =
+      extra.galleryLink =
         relation('linkAlbumGallery', album);
     }
 
     if (album.commentary || album.tracks.some(t => t.commentary)) {
-      relations.commentaryLink =
+      extra.commentaryLink =
         relation('linkAlbumCommentary', album);
     }
 
-    relations.externalLinks =
-      album.urls.map(url =>
-        relation('linkExternal', url, {type: 'album'}));
-
-    relations.trackList = relation('generateAlbumTrackList', album);
-
     if (!empty(album.additionalFiles)) {
-      relations.additionalFilesShortcut =
+      extra.additionalFilesShortcut =
         relation('generateAdditionalFilesShortcut', album.additionalFiles);
-
-      relations.additionalFilesHeading =
-        relation('generateContentHeading');
-
-      relations.additionalFilesList =
-        relation('generateAlbumAdditionalFilesList', album);
     }
 
-    relations.artistCommentaryHeading =
-      relation('generateContentHeading');
+    // Section: Track list
+
+    relations.trackList =
+      relation('generateAlbumTrackList', album);
+
+    // Section: Additional files
+
+    if (!empty(album.additionalFiles)) {
+      const additionalFiles = sections.additionalFiles = {};
+
+      additionalFiles.heading =
+        relation('generateContentHeading');
+
+      additionalFiles.additionalFilesList =
+        relation('generateAlbumAdditionalFilesList', album, album.additionalFiles);
+    }
+
+    // Section: Artist commentary
+
+    if (album.commentary) {
+      const artistCommentary = sections.artistCommentary = {};
+
+      artistCommentary.heading =
+        relation('generateContentHeading');
+
+      artistCommentary.content =
+        relation('transformContent', album.commentary);
+    }
 
     return relations;
   },
@@ -99,7 +138,6 @@ export default {
     }
 
     data.dateAddedToWiki = album.dateAddedToWiki;
-    data.artistCommentary = album.commentary;
 
     return data;
   },
@@ -107,18 +145,20 @@ export default {
   generate(data, relations, {
     html,
     language,
-    transformMultiline,
   }) {
     const content = {};
 
-    const formatContributions = contributionLinks =>
-      language.formatConjunctionList(
-        contributionLinks.map(link =>
-          link
-            .slots({
-              showContribution: true,
-              showIcons: true,
-            })));
+    const {sections: sec} = relations;
+
+    const formatContributions =
+      (stringKey, contributionLinks, {showContribution = true, showIcons = true} = {}) =>
+        contributionLinks &&
+          language.$(stringKey, {
+            artists:
+              language.formatConjunctionList(
+                contributionLinks.map(link =>
+                  link.slots({showContribution, showIcons}))),
+          });
 
     if (data.hasCoverArt) {
       content.cover = relations.cover
@@ -126,6 +166,8 @@ export default {
           path: ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension],
           alt: language.$('misc.alt.trackCover')
         });
+    } else {
+      content.cover = null;
     }
 
     content.main = {
@@ -137,25 +179,10 @@ export default {
             [html.joinChildren]: html.tag('br'),
           },
           [
-            !empty(relations.artistLinks) &&
-              language.$('releaseInfo.by', {
-                artists: formatContributions(relations.artistLinks),
-              }),
-
-            !empty(relations.coverArtistLinks) &&
-              language.$('releaseInfo.coverArtBy', {
-                artists: formatContributions(relations.coverArtistLinks),
-              }),
-
-            !empty(relations.wallpaperArtistLinks) &&
-              language.$('releaseInfo.wallpaperArtBy', {
-                artists: formatContributions(relations.wallpaperArtistLinks),
-              }),
-
-            !empty(relations.bannerArtistLinks) &&
-              language.$('releaseInfo.bannerArtBy', {
-                artists: formatContributions(relations.bannerArtistLinks),
-              }),
+            formatContributions('releaseInfo.by', sec.releaseInfo.artistContributionLinks),
+            formatContributions('releaseInfo.coverArtBy', sec.releaseInfo.coverArtistContributionLinks),
+            formatContributions('releaseInfo.wallpaperArtBy', sec.releaseInfo.wallpaperArtistContributionLinks),
+            formatContributions('releaseInfo.bannerArtBy', sec.releaseInfo.bannerArtistContributionLinks),
 
             data.date &&
               language.$('releaseInfo.released', {
@@ -176,34 +203,47 @@ export default {
               }),
           ]),
 
+        sec.listen &&
+          sec.listen.heading.slots({
+            id: 'listen-on',
+            title:
+              language.$('releaseInfo.listenOn', {
+                links: language.formatDisjunctionList(sec.listen.externalLinks),
+              }),
+          }),
+
         html.tag('p',
           {
             [html.onlyIfContent]: true,
             [html.joinChildren]: html.tag('br'),
           },
           [
-            relations.additionalFilesShortcut,
+            sec.extra.additionalFilesShortcut,
 
-            relations.galleryLink &&
+            sec.extra.galleryLink && sec.extra.commentaryLink &&
+              language.$('releaseInfo.viewGalleryOrCommentary', {
+                gallery:
+                  sec.extra.galleryLink
+                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.gallery')),
+                commentary:
+                  sec.extra.commentaryLink
+                    .slot('content', language.$('releaseInfo.viewGalleryOrCommentary.commentary')),
+              }),
+
+            sec.extra.galleryLink && !sec.extra.commentaryLink &&
               language.$('releaseInfo.viewGallery', {
                 link:
-                  relations.galleryLink
+                  sec.extra.galleryLink
                     .slot('content', language.$('releaseInfo.viewGallery.link')),
               }),
 
-            relations.commentaryLink &&
+            !sec.extra.galleryLink && sec.extra.commentaryLink &&
               language.$('releaseInfo.viewCommentary', {
                 link:
-                  relations.commentaryLink
+                  sec.extra.commentaryLink
                     .slot('content', language.$('releaseInfo.viewCommentary.link')),
               }),
           ]),
-
-        !empty(relations.externalLinks) &&
-          html.tag('p',
-            language.$('releaseInfo.listenOn', {
-              links: language.formatDisjunctionList(relations.externalLinks),
-            })),
 
         relations.trackList,
 
@@ -219,11 +259,10 @@ export default {
               }),
           ]),
 
-        relations.additionalFilesList && [
-          relations.additionalFilesHeading
+        sec.additionalFiles && [
+          sec.additionalFiles.heading
             .slots({
               id: 'additional-files',
-
               title:
                 language.$('releaseInfo.additionalFiles.heading', {
                   additionalFiles:
@@ -231,18 +270,19 @@ export default {
                 }),
             }),
 
-          relations.additionalFilesList,
+          sec.additionalFiles.additionalFilesList,
         ],
 
-        data.artistCommentary && [
-          relations.artistCommentaryHeading
+        sec.artistCommentary && [
+          sec.artistCommentary.heading
             .slots({
               id: 'artist-commentary',
               title: language.$('releaseInfo.artistCommentary')
             }),
 
           html.tag('blockquote',
-            transformMultiline(data.artistCommentary)),
+            sec.artistCommentary.content
+              .slot('mode', 'multiline')),
         ],
       ]),
     };

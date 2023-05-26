@@ -2,6 +2,8 @@ import {empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateAdditionalFilesShortcut',
+    'generateAlbumAdditionalFilesList',
     'generateContentHeading',
     'generateCoverArtwork',
     'generateTrackList',
@@ -12,11 +14,7 @@ export default {
     'linkTrack',
   ],
 
-  extraDependencies: [
-    'html',
-    'language',
-    'transformMultiline',
-  ],
+  extraDependencies: ['html', 'language'],
 
   relations(relation, track, {topLevelGroups}) {
     const {album} = track;
@@ -27,6 +25,11 @@ export default {
     const contributionLinksRelation = contribs =>
       contribs.map(contrib =>
         relation('linkContribution', contrib.who, contrib.what));
+
+    const additionalFilesSection = additionalFiles => ({
+      heading: relation('generateContentHeading'),
+      list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
+    });
 
     // Section: Release info
 
@@ -58,6 +61,15 @@ export default {
       listen.externalLinks =
         track.urls.map(url =>
           relation('linkExternal', url));
+    }
+
+    // Section: Extra links
+
+    const extra = sections.extra = {};
+
+    if (!empty(track.additionalFiles)) {
+      extra.additionalFilesShortcut =
+        relation('generateAdditionalFilesShortcut', track.additionalFiles);
     }
 
     // Section: Other releases
@@ -113,6 +125,44 @@ export default {
           topLevelGroups);
     }
 
+    // Section: Lyrics
+
+    if (track.lyrics) {
+      const lyrics = sections.lyrics = {};
+
+      lyrics.heading =
+        relation('generateContentHeading');
+
+      lyrics.content =
+        relation('transformContent', track.lyrics);
+    }
+
+    // Sections: Sheet music files, MIDI/proejct files, additional files
+
+    if (!empty(track.sheetMusicFiles)) {
+      sections.sheetMusicFiles = additionalFilesSection(track.sheetMusicFiles);
+    }
+
+    if (!empty(track.midiProjectFiles)) {
+      sections.midiProjectFiles = additionalFilesSection(track.midiProjectFiles);
+    }
+
+    if (!empty(track.additionalFiles)) {
+      sections.additionalFiles = additionalFilesSection(track.additionalFiles);
+    }
+
+    // Section: Artist commentary
+
+    if (track.commentary) {
+      const artistCommentary = sections.artistCommentary = {};
+
+      artistCommentary.heading =
+        relation('generateContentHeading');
+
+      artistCommentary.content =
+        relation('transformContent', track.commentary);
+    }
+
     return relations;
   },
 
@@ -141,23 +191,27 @@ export default {
       data.coverArtFileExtension = album.coverArtFileExtension;
     }
 
+    if (!empty(track.additionalFiles)) {
+      data.numAdditionalFiles = track.additionalFiles.length;
+    }
+
     return data;
   },
 
-  generate(data, relations, {
-    html,
-    language,
-    // transformMultiline,
-  }) {
+  generate(data, relations, {html, language}) {
     const content = {};
 
     const {sections: sec} = relations;
 
     const formatContributions =
-      (contributionLinks, {showContribution = true, showIcons = true} = {}) =>
-        language.formatConjunctionList(
-          contributionLinks.map(link =>
-            link.slots({showContribution, showIcons})));
+      (stringKey, contributionLinks, {showContribution = true, showIcons = true} = {}) =>
+        contributionLinks &&
+          language.$(stringKey, {
+            artists:
+              language.formatConjunctionList(
+                contributionLinks.map(link =>
+                  link.slots({showContribution, showIcons}))),
+          });
 
     if (data.hasUniqueCoverArt) {
       content.cover = relations.cover
@@ -190,15 +244,8 @@ export default {
           [html.onlyIfContent]: true,
           [html.joinChildren]: html.tag('br'),
         }, [
-          sec.releaseInfo.artistContributionLinks &&
-            language.$('releaseInfo.by', {
-              artists: formatContributions(sec.releaseInfo.artistContributionLinks),
-            }),
-
-          sec.releaseInfo.coverArtistContributionLinks &&
-            language.$('releaseInfo.coverArtBy', {
-              artists: formatContributions(sec.releaseInfo.coverArtistContributionLinks),
-            }),
+          formatContributions('releaseInfo.by', sec.releaseInfo.artistContributionLinks),
+          formatContributions('releaseInfo.coverArtBy', sec.releaseInfo.coverArtistContributionLinks),
 
           data.date &&
             language.$('releaseInfo.released', {
@@ -216,32 +263,6 @@ export default {
             }),
         ]),
 
-        /*
-        html.tag('p',
-          {
-            [html.onlyIfContent]: true,
-            [html.joinChildren]: '<br>',
-          },
-          [
-            hasSheetMusicFiles &&
-              language.$('releaseInfo.sheetMusicFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#sheet-music-files'},
-                  language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
-              }),
-
-            hasMidiProjectFiles &&
-              language.$('releaseInfo.midiProjectFiles.shortcut', {
-                link: html.tag('a',
-                  {href: '#midi-project-files'},
-                  language.$('releaseInfo.midiProjectFiles.shortcut.link')),
-              }),
-
-            hasAdditionalFiles &&
-              generateAdditionalFilesShortcut(track.additionalFiles),
-          ]),
-        */
-
         sec.listen.heading.slots({
           id: 'listen-on',
           title:
@@ -249,8 +270,41 @@ export default {
               ? language.$('releaseInfo.listenOn', {
                   links: language.formatDisjunctionList(sec.listen.externalLinks),
                 })
-              : language.$('releaseInfo.listenOn.noLinks')),
+              : language.$('releaseInfo.listenOn.noLinks', {
+                  name: html.tag('i', data.name),
+                })),
         }),
+
+        html.tag('p',
+          {
+            [html.onlyIfContent]: true,
+            [html.joinChildren]: '<br>',
+          },
+          [
+            sec.sheetMusicFiles &&
+              language.$('releaseInfo.sheetMusicFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#sheet-music-files'},
+                  language.$('releaseInfo.sheetMusicFiles.shortcut.link')),
+              }),
+
+            sec.midiProjectFiles &&
+              language.$('releaseInfo.midiProjectFiles.shortcut', {
+                link: html.tag('a',
+                  {href: '#midi-project-files'},
+                  language.$('releaseInfo.midiProjectFiles.shortcut.link')),
+              }),
+
+            sec.additionalFiles &&
+              sec.extra.additionalFilesShortcut,
+
+            sec.artistCommentary &&
+              language.$('releaseInfo.readCommentary', {
+                link: html.tag('a',
+                  {href: '#artist-commentary'},
+                  language.$('releaseInfo.readCommentary.link')),
+              }),
+          ]),
 
         sec.otherReleases && [
           sec.otherReleases.heading
@@ -308,6 +362,64 @@ export default {
             }),
 
           sec.referencedBy.list,
+        ],
+
+        sec.lyrics && [
+          sec.lyrics.heading
+            .slots({
+              id: 'lyrics',
+              title: language.$('releaseInfo.lyrics'),
+            }),
+
+          html.tag('blockquote',
+            sec.lyrics.content
+              .slot('mode', 'lyrics')),
+        ],
+
+        sec.sheetMusicFiles && [
+          sec.sheetMusicFiles.heading
+            .slots({
+              id: 'sheet-music-files',
+              title: language.$('releaseInfo.sheetMusicFiles.heading'),
+            }),
+
+          sec.sheetMusicFiles.list,
+        ],
+
+        sec.midiProjectFiles && [
+          sec.midiProjectFiles.heading
+            .slots({
+              id: 'midi-project-files',
+              title: language.$('releaseInfo.midiProjectFiles.heading'),
+            }),
+
+          sec.midiProjectFiles.list,
+        ],
+
+        sec.additionalFiles && [
+          sec.additionalFiles.heading
+            .slots({
+              id: 'additional-files',
+              title:
+                language.$('releaseInfo.additionalFiles.heading', {
+                  additionalFiles:
+                    language.countAdditionalFiles(data.numAdditionalFiles, {unit: true}),
+                }),
+            }),
+
+          sec.additionalFiles.list,
+        ],
+
+        sec.artistCommentary && [
+          sec.artistCommentary.heading
+            .slots({
+              id: 'artist-commentary',
+              title: language.$('releaseInfo.artistCommentary')
+            }),
+
+          html.tag('blockquote',
+            sec.artistCommentary.content
+              .slot('mode', 'multiline')),
         ],
       ]),
     };

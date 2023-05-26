@@ -23,6 +23,7 @@ import {
 
 import {inspect} from 'util';
 import {color} from '../../util/cli.js';
+import {empty} from '../../util/sugar.js';
 import {getKebabCase} from '../../util/wiki-data.js';
 
 import find from '../../util/find.js';
@@ -295,6 +296,22 @@ export default class Thing extends CacheableObject {
             .filter(({who}) => who);
         },
       },
+    }),
+
+    // Nice 'n simple shorthand for an exposed-only flag which is true when any
+    // contributions are present in the specified property.
+    contribsPresent: (
+      contribsByRefProperty
+    ) => ({
+      flags: {expose: true},
+      expose: {
+        dependencies: [contribsByRefProperty],
+        compute({
+          [contribsByRefProperty]: contribsByRef,
+        }) {
+          return !empty(contribsByRef);
+        },
+      }
     }),
 
     // Neat little shortcut for "reversing" the reference lists stored on other

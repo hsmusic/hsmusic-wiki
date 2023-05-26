@@ -9,24 +9,24 @@ export default {
     'urls',
   ],
 
-  data(album, {fileSize = true} = {}) {
+  data(album, additionalFiles, {fileSize = true} = {}) {
     return {
       albumDirectory: album.directory,
-      fileLocations: album.additionalFiles.flatMap(({files}) => files),
+      fileLocations: additionalFiles.flatMap(({files}) => files),
       showFileSizes: fileSize,
     };
   },
 
-  relations(relation, album, {fileSize = true} = {}) {
+  relations(relation, album, additionalFiles, {fileSize = true} = {}) {
     return {
       additionalFilesList:
-        relation('generateAdditionalFilesList', album.additionalFiles, {
+        relation('generateAdditionalFilesList', additionalFiles, {
           fileSize,
         }),
 
       additionalFileLinks:
         Object.fromEntries(
-          album.additionalFiles
+          additionalFiles
             .flatMap(({files}) => files)
             .map(file => [
               file,

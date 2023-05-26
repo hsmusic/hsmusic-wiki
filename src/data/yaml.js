@@ -191,7 +191,6 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     color: 'Color',
     urls: 'URLs',
 
-    hasCoverArt: 'Has Cover Art',
     hasTrackArt: 'Has Track Art',
     hasTrackNumbers: 'Has Track Numbers',
     isListedOnHomepage: 'Listed on Homepage',

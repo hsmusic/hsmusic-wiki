@@ -101,7 +101,7 @@ export default {
         {class: 'album-group-list'},
         data.trackSectionInfo.map((info, index) => [
           html.tag('dt',
-            {class: 'content-heading'},
+            {class: 'content-heading', tabindex: '0'},
             language.$('trackList.section.withDuration', {
               section: info.name,
               duration:

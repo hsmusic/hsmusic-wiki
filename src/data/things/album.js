@@ -103,7 +103,6 @@ export class Album extends Thing {
       update: {validate: isDimensions},
     },
 
-    hasCoverArt: Thing.common.flag(true),
     hasTrackArt: Thing.common.flag(true),
     hasTrackNumbers: Thing.common.flag(true),
     isListedOnHomepage: Thing.common.flag(true),
@@ -123,17 +122,15 @@ export class Album extends Thing {
 
     artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
     coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
-    trackCoverArtistContribs: Thing.common.dynamicContribs(
-      'trackCoverArtistContribsByRef'
-    ),
-    wallpaperArtistContribs: Thing.common.dynamicContribs(
-      'wallpaperArtistContribsByRef'
-    ),
-    bannerArtistContribs: Thing.common.dynamicContribs(
-      'bannerArtistContribsByRef'
-    ),
+    trackCoverArtistContribs: Thing.common.dynamicContribs('trackCoverArtistContribsByRef'),
+    wallpaperArtistContribs: Thing.common.dynamicContribs('wallpaperArtistContribsByRef'),
+    bannerArtistContribs: Thing.common.dynamicContribs('bannerArtistContribsByRef'),
 
     commentatorArtists: Thing.common.commentatorArtists(),
+
+    hasCoverArt: Thing.common.contribsPresent('coverArtistContribsByRef'),
+    hasWallpaperArt: Thing.common.contribsPresent('wallpaperArtistContribsByRef'),
+    hasBannerArt: Thing.common.contribsPresent('bannerArtistContribsByRef'),
 
     tracks: {
       flags: {expose: true},

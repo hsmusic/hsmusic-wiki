@@ -1,3 +1,5 @@
+import {marked} from 'marked';
+
 import {bindFind} from '../../util/find.js';
 import {parseInput} from '../../util/replacer.js';
 import {replacerSpec} from '../../util/transform-content.js';
@@ -191,7 +193,13 @@ export default {
         }
 
         if (node.type === 'link') {
-          const {link, label, hash} = relations.links[linkIndex++];
+          const linkNode = relations.links[linkIndex++];
+          if (linkNode.type === 'text') {
+            return {type: 'text', data: linkNode.data};
+          }
+
+          const {link, label, hash} = linkNode;
+
           return {
             type: 'link',
             data: link.slots({content: label, hash}),
@@ -242,16 +250,65 @@ export default {
           return html.tags(contentFromNodes.map(node => node.data));
         }
 
-        // In multiline mode...
+        // Multiline mode has a secondary processing stage where it's passed...
+        // through marked! Rolling your own Markdown only gets you so far :D
+
+        const markedOptions = {
+          headerIds: false,
+          mangle: false,
+        };
+
+        // This is separated into its own function just since we're gonna reuse
+        // it in a minute if everything goes to heck in lyrics mode.
+        const transformMultiline = () =>
+          marked.parse(
+            contentFromNodes
+              .map(node => {
+                if (node.type === 'text') {
+                  return node.data.replace(/\n+/g, '\n\n');
+                } else {
+                  return node.data.toString();
+                }
+              })
+              .join(''),
+            markedOptions);
 
         if (slots.mode === 'multiline') {
-          return html.tags(contentFromNodes.map(node => node.data));
+          // Unfortunately, we kind of have to be super evil here and stringify
+          // the links, or else parse marked's output into html tags, which is
+          // very out of scope at the moment.
+          return transformMultiline();
         }
 
-        // In lyrics mode...
+        // Lyrics mode goes through marked too, but line breaks are processed
+        // differently. Instead of having each line get its own paragraph,
+        // "adjacent" lines are joined together (with blank lines separating
+        // each verse/paragraph).
 
         if (slots.mode === 'lyrics') {
-          return html.tags(contentFromNodes.map(node => node.data));
+          // If it looks like old data, using <br> instead of bunched together
+          // lines... then oh god... just use transformMultiline. Perishes.
+          if (
+            contentFromNodes.some(node =>
+              node.type === 'text' &&
+              node.data.includes('<br'))
+          ) {
+            return transformMultiline();
+          }
+
+          // Lyrics mode is also evil for the same stringifying reasons as
+          // multiline.
+          return marked.parse(
+            contentFromNodes
+              .map(node => {
+                if (node.type === 'text') {
+                  return node.data.replace(/\b\n\b/g, '<br>\n');
+                } else {
+                  return node.data.toString();
+                }
+              })
+              .join(''),
+            markedOptions);
         }
       },
     });
