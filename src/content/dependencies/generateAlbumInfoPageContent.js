@@ -56,9 +56,6 @@ export default {
     if (!empty(album.urls)) {
       const listen = sections.listen = {};
 
-      listen.heading =
-        relation('generateContentHeading');
-
       listen.externalLinks =
         album.urls.map(url =>
           relation('linkExternal', url, {type: 'album'}));
@@ -204,13 +201,10 @@ export default {
           ]),
 
         sec.listen &&
-          sec.listen.heading.slots({
-            id: 'listen-on',
-            title:
-              language.$('releaseInfo.listenOn', {
-                links: language.formatDisjunctionList(sec.listen.externalLinks),
-              }),
-          }),
+          html.tag('p',
+            language.$('releaseInfo.listenOn', {
+              links: language.formatDisjunctionList(sec.listen.externalLinks),
+            })),
 
         html.tag('p',
           {

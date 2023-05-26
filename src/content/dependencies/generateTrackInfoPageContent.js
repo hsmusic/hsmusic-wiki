@@ -54,9 +54,6 @@ export default {
 
     const listen = sections.listen = {};
 
-    listen.heading =
-      relation('generateContentHeading');
-
     if (!empty(track.urls)) {
       listen.externalLinks =
         track.urls.map(url =>
@@ -263,17 +260,14 @@ export default {
             }),
         ]),
 
-        sec.listen.heading.slots({
-          id: 'listen-on',
-          title:
-            (sec.listen.externalLinks
-              ? language.$('releaseInfo.listenOn', {
-                  links: language.formatDisjunctionList(sec.listen.externalLinks),
-                })
-              : language.$('releaseInfo.listenOn.noLinks', {
-                  name: html.tag('i', data.name),
-                })),
-        }),
+        html.tag('p',
+          (sec.listen.externalLinks
+            ? language.$('releaseInfo.listenOn', {
+                links: language.formatDisjunctionList(sec.listen.externalLinks),
+              })
+            : language.$('releaseInfo.listenOn.noLinks', {
+                name: html.tag('i', data.name),
+              }))),
 
         html.tag('p',
           {
