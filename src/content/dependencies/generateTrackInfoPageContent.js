@@ -669,64 +669,10 @@ export function write(track, {wikiData}) {
           color: track.color,
         },
 
-        // disabled for now! shifting banner position per height of page is disorienting
-        /*
-        banner: !empty(album.bannerArtistContribs) && {
-          classes: ['dim'],
-          dimensions: album.bannerDimensions,
-          path: ['media.albumBanner', album.directory, album.bannerFileExtension],
-          alt: language.$('misc.alt.albumBanner'),
-          position: 'bottom'
-        },
-        * /
-
         main: {
           headingMode: 'sticky',
 
           content: [
-            ...html.fragment(
-              !empty(contributorContribs) && [
-                generateContentHeading({
-                  id: 'contributors',
-                  title: language.$('releaseInfo.contributors'),
-                }),
-
-                html.tag('ul', contributorContribs.map(contrib =>
-                  html.tag('li', getArtistString([contrib], {
-                    showContrib: true,
-                    showIcons: true,
-                  })))),
-              ]),
-
-            ...html.fragment(
-              !empty(referencedTracks) && [
-                generateContentHeading({
-                  id: 'references',
-                  title:
-                    language.$('releaseInfo.tracksReferenced', {
-                      track: html.tag('i', track.name),
-                    }),
-                }),
-
-                html.tag('ul', referencedTracks.map(getTrackItem)),
-              ]),
-
-            ...html.fragment(
-              !empty(referencedByTracks) && [
-                generateContentHeading({
-                  id: 'referenced-by',
-                  title:
-                    language.$('releaseInfo.tracksThatReference', {
-                      track: html.tag('i', track.name),
-                    }),
-                }),
-
-                generateTrackListDividedByGroups(referencedByTracks, {
-                  getTrackItem,
-                  wikiData,
-                }),
-              ]),
-
             ...html.fragment(
               !empty(sampledTracks) && [
                 generateContentHeading({
@@ -751,66 +697,6 @@ export function write(track, {wikiData}) {
                 }),
 
                 html.tag('ul', sampledByTracks.map(getTrackItem)),
-              ]),
-
-            ...html.fragment(
-              track.lyrics && [
-                generateContentHeading({
-                  id: 'lyrics',
-                  title: language.$('releaseInfo.lyrics'),
-                }),
-
-                html.tag('blockquote', transformLyrics(track.lyrics)),
-              ]),
-
-            ...html.fragment(
-              hasSheetMusicFiles && [
-                generateContentHeading({
-                  id: 'sheet-music-files',
-                  title: language.$('releaseInfo.sheetMusicFiles.heading'),
-                }),
-
-                generateAlbumAdditionalFilesList(album, track.sheetMusicFiles, {
-                  fileSize: false,
-                }),
-              ]),
-
-            ...html.fragment(
-              hasMidiProjectFiles && [
-                generateContentHeading({
-                  id: 'midi-project-files',
-                  title: language.$('releaseInfo.midiProjectFiles.heading'),
-                }),
-
-                generateAlbumAdditionalFilesList(album, track.midiProjectFiles),
-              ]),
-
-            ...html.fragment(
-              hasAdditionalFiles && [
-                generateContentHeading({
-                  id: 'additional-files',
-                  title: language.$('releaseInfo.additionalFiles.heading', {
-                    additionalFiles: language.countAdditionalFiles(numAdditionalFiles, {
-                      unit: true,
-                    }),
-                  })
-                }),
-
-                generateAlbumAdditionalFilesList(album, track.additionalFiles),
-              ]),
-
-            ...html.fragment(
-              hasCommentary && [
-                generateContentHeading({
-                  id: 'artist-commentary',
-                  title: language.$('releaseInfo.artistCommentary'),
-                }),
-
-                html.tag('blockquote', generateCommentary({
-                  link,
-                  language,
-                  transformMultiline,
-                })),
               ]),
           ],
         },
