@@ -6,7 +6,7 @@
  */
 'use strict'
 exports[`test/snapshot/generateAdditionalFilesShortcut.js TAP generateAdditionalFilesShortcut (snapshot) > basic behavior 1`] = `
-<a href="#additional-files">Additional files:</a> SBURB Wallpaper, Alternate Covers
+View <a href="#additional-files">additional files</a>: SBURB Wallpaper, Alternate Covers
 `
 
 exports[`test/snapshot/generateAdditionalFilesShortcut.js TAP generateAdditionalFilesShortcut (snapshot) > no additional files 1`] = `
