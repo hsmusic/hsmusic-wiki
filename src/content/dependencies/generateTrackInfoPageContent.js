@@ -1,4 +1,5 @@
 import {empty} from '../../util/sugar.js';
+import {sortChronologically} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
@@ -14,9 +15,15 @@ export default {
     'linkTrack',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html', 'language', 'wikiData'],
 
-  relations(relation, track, {topLevelGroups}) {
+  sprawl({wikiInfo}) {
+    return {
+      enableFlashesAndGames: wikiInfo.enableFlashesAndGames,
+    };
+  },
+
+  relations(relation, sprawl, track, {topLevelGroups}) {
     const {album} = track;
 
     const relations = {};
@@ -122,6 +129,42 @@ export default {
           topLevelGroups);
     }
 
+    // Section: Flashes that feature
+
+    if (sprawl.enableFlashesAndGames) {
+      const sortedFeatures =
+        sortChronologically(
+          [track, ...track.otherReleases].flatMap(track =>
+            track.featuredInFlashes.map(flash => ({
+              // These aren't going to be exposed directly, they're processed
+              // into the appropriate relations after this sort.
+              flash, track,
+
+              // These properties are only used for the sort.
+              date: flash.date,
+              name: flash.name,
+              directory: flash.directory,
+            }))));
+
+      if (!empty(sortedFeatures)) {
+        const flashesThatFeature = sections.flashesThatFeature = {};
+
+        flashesThatFeature.heading =
+          relation('generateContentHeading');
+
+        flashesThatFeature.entries =
+          sortedFeatures.map(({flash, track: directlyFeaturedTrack}) =>
+            (directlyFeaturedTrack === track
+              ? {
+                  flashLink: relation('linkFlash', flash),
+                }
+              : {
+                  flashLink: relation('linkFlash', flash),
+                  trackLink: relation('linkTrack', directlyFeaturedTrack),
+                }));
+      }
+    }
+
     // Section: Lyrics
 
     if (track.lyrics) {
@@ -163,7 +206,7 @@ export default {
     return relations;
   },
 
-  data(track) {
+  data(sprawl, track) {
     const data = {};
 
     const {album} = track;
@@ -358,6 +401,29 @@ export default {
           sec.referencedBy.list,
         ],
 
+        sec.flashesThatFeature && [
+          sec.flashesThatFeature.heading
+            .slots({
+              id: 'featured-in',
+              title:
+                language.$('releaseInfo.flashesThatFeature', {
+                  track: html.tag('i', data.name),
+                }),
+            }),
+
+          html.tag('ul', sec.flashesThatFeature.entries.map(({flashLink, trackLink}) =>
+            (trackLink
+              ? html.tag('li', {class: 'rerelease'},
+                  language.$('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
+                    flash: flashLink,
+                    track: trackLink,
+                  }))
+              : html.tag('li',
+                  language.$('releaseInfo.flashesThatFeature.item', {
+                    flash: flashLink,
+                  }))))),
+        ],
+
         sec.lyrics && [
           sec.lyrics.heading
             .slots({
@@ -429,21 +495,6 @@ export function write(track, {wikiData}) {
   const {album, contributorContribs, referencedByTracks, referencedTracks, sampledByTracks, sampledTracks, otherReleases, } = track;
 
   const listTag = getAlbumListTag(album);
-
-  let flashesThatFeature;
-  if (wikiInfo.enableFlashesAndGames) {
-    flashesThatFeature = sortChronologically(
-      [track, ...otherReleases].flatMap((track) =>
-        track.featuredInFlashes.map((flash) => ({
-          flash,
-          as: track,
-          directory: flash.directory,
-          name: flash.name,
-          date: flash.date,
-        }))
-      )
-    );
-  }
 
   const unbound_getTrackItem = (track, {
     getArtistString,
@@ -700,30 +751,6 @@ export function write(track, {wikiData}) {
                 }),
 
                 html.tag('ul', sampledByTracks.map(getTrackItem)),
-              ]),
-
-            ...html.fragment(
-              wikiInfo.enableFlashesAndGames &&
-              !empty(flashesThatFeature) && [
-                generateContentHeading({
-                  id: 'featured-in',
-                  title:
-                    language.$('releaseInfo.flashesThatFeature', {
-                      track: html.tag('i', track.name),
-                    }),
-                }),
-
-                html.tag('ul', flashesThatFeature.map(({flash, as}) =>
-                  html.tag('li',
-                    {class: as !== track && 'rerelease'},
-                    (as === track
-                      ? language.$('releaseInfo.flashesThatFeature.item', {
-                        flash: link.flash(flash),
-                      })
-                      : language.$('releaseInfo.flashesThatFeature.item.asDifferentRelease', {
-                        flash: link.flash(flash),
-                        track: link.track(as),
-                      }))))),
               ]),
 
             ...html.fragment(
