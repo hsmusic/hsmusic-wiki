@@ -11,7 +11,7 @@ const linkThingRelationMap = {
   artist: 'linkArtist',
   artistGallery: 'linkArtistGallery',
   flash: 'linkFlash',
-  group: 'linkGroup',
+  groupInfo: 'linkGroup',
   groupGallery: 'linkGroupGallery',
   listing: 'linkListing',
   newsEntry: 'linkNewsEntry',
