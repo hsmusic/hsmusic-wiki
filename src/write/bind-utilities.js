@@ -106,12 +106,6 @@ export function bindUtilities({
     language,
   });
 
-  bound.generateTrackListDividedByGroups = bindOpts(generateTrackListDividedByGroups, {
-    html,
-    language,
-    wikiData,
-  });
-
   bound.getGridHTML = bindOpts(getGridHTML, {
     [bindOpts.bindIndex]: 0,
     img: bound.img,

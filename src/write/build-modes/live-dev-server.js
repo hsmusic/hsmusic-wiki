@@ -102,7 +102,7 @@ export async function go({
     }) => () =>
       targetless
         ? [pageSpec.writeTargetless({wikiData})]
-        : pageSpec.pathsForTarget(target, {wikiInfo: wikiData.wikiInfo}))).flat();
+        : pageSpec.pathsForTarget(target))).flat();
 
   logInfo`Will be serving a total of ${pages.length} pages.`;
 

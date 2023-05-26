@@ -19,11 +19,12 @@ export default {
 
   sprawl({wikiInfo}) {
     return {
+      divideTrackListsByGroups: wikiInfo.divideTrackListsByGroups,
       enableFlashesAndGames: wikiInfo.enableFlashesAndGames,
     };
   },
 
-  relations(relation, sprawl, track, {topLevelGroups}) {
+  relations(relation, sprawl, track) {
     const {album} = track;
 
     const relations = {};
@@ -126,7 +127,7 @@ export default {
       referencedBy.list =
         relation('generateTrackListDividedByGroups',
           track.referencedByTracks,
-          topLevelGroups);
+          sprawl.divideTrackListsByGroups);
     }
 
     // Section: Sampled tracks
@@ -152,7 +153,7 @@ export default {
       sampledBy.list =
         relation('generateTrackListDividedByGroups',
           track.sampledByTracks,
-          topLevelGroups);
+          sprawl.divideTrackListsByGroups);
     }
 
     // Section: Flashes that feature
