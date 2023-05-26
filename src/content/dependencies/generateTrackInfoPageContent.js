@@ -129,6 +129,32 @@ export default {
           topLevelGroups);
     }
 
+    // Section: Sampled tracks
+
+    if (!empty(track.sampledTracks)) {
+      const samples = sections.samples = {};
+
+      samples.heading =
+        relation('generateContentHeading');
+
+      samples.list =
+        relation('generateTrackList', track.sampledTracks);
+    }
+
+    // Section: Tracks that sample
+
+    if (!empty(track.sampledByTracks)) {
+      const sampledBy = sections.sampledBy = {};
+
+      sampledBy.heading =
+        relation('generateContentHeading');
+
+      sampledBy.list =
+        relation('generateTrackListDividedByGroups',
+          track.sampledByTracks,
+          topLevelGroups);
+    }
+
     // Section: Flashes that feature
 
     if (sprawl.enableFlashesAndGames) {
@@ -401,6 +427,31 @@ export default {
           sec.referencedBy.list,
         ],
 
+        sec.samples && [
+          sec.samples.heading
+            .slots({
+              id: 'samples',
+              title:
+                language.$('releaseInfo.tracksSampled', {
+                  track: html.tag('i', data.name),
+                }),
+            }),
+
+          sec.samples.list,
+        ],
+
+        sec.sampledBy && [
+          sec.sampledBy.heading
+            .slots({
+              id: 'referenced-by',
+              title:
+                language.$('releaseInfo.tracksThatSample', {
+                  track: html.tag('i', data.name),
+                }),
+            }),
+
+          sec.sampledBy.list,
+        ],
         sec.flashesThatFeature && [
           sec.flashesThatFeature.heading
             .slots({
@@ -667,38 +718,6 @@ export function write(track, {wikiData}) {
           description: getSocialEmbedDescription({getArtistString, language}),
           image: '/' + getTrackCover(track, {to: urls.from('shared.root').to}),
           color: track.color,
-        },
-
-        main: {
-          headingMode: 'sticky',
-
-          content: [
-            ...html.fragment(
-              !empty(sampledTracks) && [
-                generateContentHeading({
-                  id: 'samples',
-                  title:
-                    language.$('releaseInfo.tracksSampled', {
-                      track: html.tag('i', track.name),
-                    }),
-                }),
-
-                html.tag('ul', sampledTracks.map(getTrackItem)),
-              ]),
-
-            ...html.fragment(
-              !empty(sampledByTracks) && [
-                generateContentHeading({
-                  id: 'sampled-by',
-                  title:
-                    language.$('releaseInfo.tracksThatSample', {
-                      track: html.tag('i', track.name),
-                    })
-                }),
-
-                html.tag('ul', sampledByTracks.map(getTrackItem)),
-              ]),
-          ],
         },
 
         sidebarLeft: generateAlbumSidebar(album, track, {
