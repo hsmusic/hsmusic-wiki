@@ -38,6 +38,7 @@
         "command-exists": "^1.2.9",
         "eslint": "^8.37.0",
         "he": "^1.2.0",
+        "image-size": "^1.0.2",
         "js-yaml": "^4.1.0",
         "marked": "^5.0.2",
         "striptags": "^4.0.0-alpha.4",

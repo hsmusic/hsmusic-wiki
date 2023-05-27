@@ -91,6 +91,8 @@ import {createReadStream} from 'node:fs';
 import {readFile, stat, unlink, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
+import dimensionsOf from 'image-size';
+
 import {
   color,
   fileIssue,
@@ -122,46 +124,11 @@ function readFileMD5(filePath) {
   });
 }
 
-async function identifyImageDimensions(filePath, {spawnIdentify}) {
-  const maxTries = 5;
-
-  const recursive = async n => {
-    if (n > maxTries) {
-      throw new Error(`Didn't get any output after ${maxTries} tries`);
-    }
-
-    if (n > 1) {
-      logInfo`Attempt #${n} for ${filePath}`;
-    }
-
-    const stdoutText = await new Promise((resolve, reject) => {
-      let stdout = '';
-      let stderr = '';
-
-      const proc = spawnIdentify(['-format', '%w %h', filePath]);
-      proc.stdout.on('data', data => stdout += data);
-      proc.stderr.on('data', data => stderr += data);
-
-      proc.on('exit', code => {
-        if (code === 0) {
-          resolve(stdout);
-        } else {
-          reject(stderr);
-        }
-      });
-    });
-
-    if (stdoutText === '') {
-      return recursive(n + 1);
-    }
-
-    const words = stdoutText.split(' ');
-    const width = parseInt(words[0]);
-    const height = parseInt(words[1]);
-    return [width, height];
-  };
-
-  return recursive(1);
+async function identifyImageDimensions(filePath) {
+  // See: https://github.com/image-size/image-size/issues/96
+  const buffer = await readFile(filePath);
+  const dimensions = dimensionsOf(buffer);
+  return [dimensions.width, dimensions.height];
 }
 
 async function getImageMagickVersion(binary) {
@@ -343,12 +310,11 @@ export default async function genThumbs(mediaPath, {
   const quietInfo = quiet ? () => null : logInfo;
 
   const [convertInfo, spawnConvert] = await getSpawnMagick('convert');
-  const [identifyInfo, spawnIdentify] = await getSpawnMagick('identify');
 
-  if (!spawnConvert || !spawnIdentify) {
+  if (!spawnConvert) {
     logError`${`It looks like you don't have ImageMagick installed.`}`;
     logError`ImageMagick is required to generate thumbnails for display on the wiki.`;
-    for (const error of [convertInfo, identifyInfo].filter(Boolean)) {
+    for (const error of [convertInfo].filter(Boolean)) {
       logError`(Error message: ${error})`;
     }
     logInfo`You can find info to help install ImageMagick on Linux, Windows, or macOS`;
@@ -357,8 +323,7 @@ export default async function genThumbs(mediaPath, {
     logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
     return {success: false};
   } else {
-    logInfo`Found ImageMagick convert binary:  ${convertInfo}`;
-    logInfo`Found ImageMagick identify binary: ${identifyInfo}`;
+    logInfo`Found ImageMagick binary:  ${convertInfo}`;
   }
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
@@ -432,7 +397,7 @@ export default async function genThumbs(mediaPath, {
       `Identifying dimensions of image files`,
       queue(
         imagePaths.map(imagePath => () =>
-          identifyImageDimensions(path.join(mediaPath, imagePath), {spawnIdentify})
+          identifyImageDimensions(path.join(mediaPath, imagePath))
             .then(
               dimensions => [imagePath, dimensions],
               error => [imagePath, {error}])),
