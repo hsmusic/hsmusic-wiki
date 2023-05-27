@@ -122,8 +122,8 @@ function readFileMD5(filePath) {
   });
 }
 
-async function getImageMagickVersion(spawnConvert) {
-  const proc = spawnConvert(['--version'], false);
+async function getImageMagickVersion(binary) {
+  const proc = spawn(binary, ['--version']);
 
   let allData = '';
   proc.stdout.on('data', (data) => {
@@ -144,23 +144,33 @@ async function getImageMagickVersion(spawnConvert) {
   return match[1];
 }
 
-async function getSpawnConvert() {
-  let fn, description, version;
-  if (await commandExists('convert')) {
-    fn = (args) => spawn('convert', args);
-    description = 'convert';
-  } else if (await commandExists('magick')) {
-    fn = (args, prefix = true) =>
-      spawn('magick', prefix ? ['convert', ...args] : args);
-    description = 'magick convert';
-  } else {
-    return [`no convert or magick binary`, null];
+async function getSpawnMagick(tool) {
+  if (tool !== 'identify' && tool !== 'convert') {
+    throw new Error(`Expected identify or convert`);
   }
 
-  version = await getImageMagickVersion(fn);
+  let fn = null;
+  let description = null;
+  let version = null;
 
-  if (version === null) {
-    return [`binary --version output didn't indicate it's ImageMagick`];
+  if (await commandExists(tool)) {
+    version = await getImageMagickVersion(tool);
+    if (version !== null) {
+      fn = (args) => spawn(tool, args);
+      description = tool;
+    }
+  }
+
+  if (fn === null && await commandExists('magick')) {
+    version = await getImageMagickVersion(fn);
+    if (version !== null) {
+      fn = (args) => spawn('magick', [tool, ...args]);
+      description = `magick ${tool}`;
+    }
+  }
+
+  if (fn === null) {
+    return [`no ${tool} or magick binary`, null];
   }
 
   return [`${description} (${version})`, fn];
@@ -290,18 +300,23 @@ export default async function genThumbs(mediaPath, {
 
   const quietInfo = quiet ? () => null : logInfo;
 
-  const [convertInfo, spawnConvert] = (await getSpawnConvert()) ?? [];
-  if (!spawnConvert) {
+  const [convertInfo, spawnConvert] = await getSpawnMagick('convert');
+  const [identifyInfo, spawnIdentify] = await getSpawnMagick('convert');
+
+  if (!spawnConvert || !spawnIdentify) {
     logError`${`It looks like you don't have ImageMagick installed.`}`;
     logError`ImageMagick is required to generate thumbnails for display on the wiki.`;
-    logError`(Error message: ${convertInfo})`;
+    for (const error of [convertInfo, identifyInfo].filter(Boolean)) {
+      logError`(Error message: ${error})`;
+    }
     logInfo`You can find info to help install ImageMagick on Linux, Windows, or macOS`;
     logInfo`from its official website: ${`https://imagemagick.org/script/download.php`}`;
     logInfo`If you have trouble working ImageMagick and would like some help, feel free`;
     logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
     return false;
   } else {
-    logInfo`Found ImageMagick binary: ${convertInfo}`;
+    logInfo`Found ImageMagick convert binary:  ${convertInfo}`;
+    logInfo`Found ImageMagick identify binary: ${identifyInfo}`;
   }
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
