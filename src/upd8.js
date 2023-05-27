@@ -418,11 +418,12 @@ async function main() {
   }
 
   if (clearThumbsFlag) {
-    await clearThumbs(mediaPath, {queueSize});
-
-    logInfo`All done! Remove ${'--clear-thumbs'} to run the next build.`;
-    if (skipThumbs) {
-      logInfo`And don't forget to remove ${'--skip-thumbs'} too, eh?`;
+    const result = await clearThumbs(mediaPath, {queueSize});
+    if (result.success) {
+      logInfo`All done! Remove ${'--clear-thumbs'} to run the next build.`;
+      if (skipThumbs) {
+        logInfo`And don't forget to remove ${'--skip-thumbs'} too, eh?`;
+      }
     }
     return;
   }
@@ -437,7 +438,7 @@ async function main() {
       quiet: !thumbsOnly,
     });
     logInfo`Done thumbnail generation! --------+`;
-    if (!result) return;
+    if (!result.success) return;
     if (thumbsOnly) return;
   }
 

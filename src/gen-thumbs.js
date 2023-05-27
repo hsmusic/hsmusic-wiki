@@ -122,6 +122,48 @@ function readFileMD5(filePath) {
   });
 }
 
+async function identifyImageDimensions(filePath, {spawnIdentify}) {
+  const maxTries = 5;
+
+  const recursive = async n => {
+    if (n > maxTries) {
+      throw new Error(`Didn't get any output after ${maxTries} tries`);
+    }
+
+    if (n > 1) {
+      logInfo`Attempt #${n} for ${filePath}`;
+    }
+
+    const stdoutText = await new Promise((resolve, reject) => {
+      let stdout = '';
+      let stderr = '';
+
+      const proc = spawnIdentify(['-format', '%w %h', filePath]);
+      proc.stdout.on('data', data => stdout += data);
+      proc.stderr.on('data', data => stderr += data);
+
+      proc.on('exit', code => {
+        if (code === 0) {
+          resolve(stdout);
+        } else {
+          reject(stderr);
+        }
+      });
+    });
+
+    if (stdoutText === '') {
+      return recursive(n + 1);
+    }
+
+    const words = stdoutText.split(' ');
+    const width = parseInt(words[0]);
+    const height = parseInt(words[1]);
+    return [width, height];
+  };
+
+  return recursive(1);
+}
+
 async function getImageMagickVersion(binary) {
   const proc = spawn(binary, ['--version']);
 
@@ -301,7 +343,7 @@ export default async function genThumbs(mediaPath, {
   const quietInfo = quiet ? () => null : logInfo;
 
   const [convertInfo, spawnConvert] = await getSpawnMagick('convert');
-  const [identifyInfo, spawnIdentify] = await getSpawnMagick('convert');
+  const [identifyInfo, spawnIdentify] = await getSpawnMagick('identify');
 
   if (!spawnConvert || !spawnIdentify) {
     logError`${`It looks like you don't have ImageMagick installed.`}`;
@@ -313,7 +355,7 @@ export default async function genThumbs(mediaPath, {
     logInfo`from its official website: ${`https://imagemagick.org/script/download.php`}`;
     logInfo`If you have trouble working ImageMagick and would like some help, feel free`;
     logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
-    return false;
+    return {success: false};
   } else {
     logInfo`Found ImageMagick convert binary:  ${convertInfo}`;
     logInfo`Found ImageMagick identify binary: ${identifyInfo}`;
@@ -356,19 +398,16 @@ export default async function genThumbs(mediaPath, {
 
   const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
 
-  const imageToMD5Entries = await progressPromiseAll(
-    `Generating MD5s of image files`,
-    queue(
-      imagePaths.map(
-        (imagePath) => () =>
-          readFileMD5(path.join(mediaPath, imagePath)).then(
-            (md5) => [imagePath, md5],
-            (error) => [imagePath, {error}]
-          )
-      ),
-      queueSize
-    )
-  );
+  const imageToMD5Entries =
+    await progressPromiseAll(
+      `Generating MD5s of image files`,
+      queue(
+        imagePaths.map(imagePath => () =>
+          readFileMD5(path.join(mediaPath, imagePath))
+            .then(
+              md5 => [imagePath, md5],
+              error => [imagePath, {error}])),
+        queueSize));
 
   {
     let error = false;
@@ -382,23 +421,53 @@ export default async function genThumbs(mediaPath, {
       logError`Failed to read at least one image file!`;
       logError`This implies a thumbnail probably won't be generatable.`;
       logError`So, exiting early.`;
-      return false;
+      return {success: false};
     } else {
       quietInfo`All image files successfully read.`;
     }
   }
+
+  const imageToDimensionsEntries =
+    await progressPromiseAll(
+      `Identifying dimensions of image files`,
+      queue(
+        imagePaths.map(imagePath => () =>
+          identifyImageDimensions(path.join(mediaPath, imagePath), {spawnIdentify})
+            .then(
+              dimensions => [imagePath, dimensions],
+              error => [imagePath, {error}])),
+        queueSize));
+
+  {
+    let error = false;
+    for (const entry of imageToDimensionsEntries) {
+      if (entry[1].error) {
+        logError`Failed to identify dimensions ${entry[0]}: ${entry[1].error}`;
+        error = true;
+      }
+    }
+    if (error) {
+      logError`Failed to identify dimensions of at least one image file!`;
+      logError`This implies a thumbnail probably won't be generatable.`;
+      logError`So, exiting early.`;
+      return {success: false};
+    } else {
+      quietInfo`All image files successfully had dimensions identified.`;
+    }
+  }
+
+  const imageToDimensions = Object.fromEntries(imageToDimensionsEntries);
 
   // Technically we could pro8a8ly mut8te the cache varia8le in-place?
   // 8ut that seems kinda iffy.
   const updatedCache = Object.assign({}, cache);
 
   const entriesToGenerate = imageToMD5Entries.filter(
-    ([filePath, md5]) => md5 !== cache[filePath]
-  );
+    ([filePath, md5]) => md5 !== cache[filePath]?.[0]);
 
   if (empty(entriesToGenerate)) {
     logInfo`All image thumbnails are already up-to-date - nice!`;
-    return true;
+    return {success: true, cache};
   }
 
   logInfo`Generating thumbnails for ${entriesToGenerate.length} media files.`;
@@ -416,7 +485,7 @@ export default async function genThumbs(mediaPath, {
       entriesToGenerate.map(([filePath, md5]) => () =>
         generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
           () => {
-            updatedCache[filePath] = md5;
+            updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
             succeeded.push(filePath);
           },
           error => {
@@ -446,7 +515,7 @@ export default async function genThumbs(mediaPath, {
     logWarn`Sorry about that!`;
   }
 
-  return true;
+  return {success: true, cache: updatedCache};
 }
 
 export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
