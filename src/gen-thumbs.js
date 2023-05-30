@@ -114,6 +114,60 @@ import {delay, empty, queue} from '#sugar';
 
 export const defaultMagickThreads = 8;
 
+export function getThumbnailsAvailableForDimensions([width, height]) {
+  // This function is intended to be portable, so it can be used both for
+  // calculating which thumbnails to generate, and which ones will be ready
+  // to reference in generated code. Sizes are in array [name, size] form
+  // with larger sizes earlier in return. Keep in mind this isn't a direct
+  // 1:1 mapping with the sizes listed in the thumbnail spec, because the
+  // largest thumbnail (first in return) will be adjusted to the provided
+  // dimensions.
+
+  const {all} = getThumbnailsAvailableForDimensions;
+
+  // Find the largest size which is beneath the passed dimensions. We use the
+  // longer edge here (of width and height) so that each resulting thumbnail is
+  // fully constrained within the size*size square defined by its spec.
+  const longerEdge = Math.max(width, height);
+  const index = all.findIndex(([name, size]) => size <= longerEdge);
+
+  // Literal edge cases are handled specially. For dimensions which are bigger
+  // than the biggest thumbnail in the spec, return all possible results.
+  // These don't need any adjustments since the largest is already smaller than
+  // the provided dimensions.
+  if (index === 0) {
+    return [
+      ...all,
+    ];
+  }
+
+  // For dimensions which are smaller than the smallest thumbnail, return only
+  // the smallest, adjusted to the provided dimensions.
+  if (index === -1) {
+    const smallest = all[all.length - 1];
+    return [
+      [smallest[0], longerEdge],
+    ];
+  }
+
+  // For non-edge cases, we return the largest size below the dimensions
+  // as well as everything smaller, but also the next size larger - that way
+  // there's a size which is as big as the original, but still JPEG compressed.
+  // The size larger is adjusted to the provided dimensions to represent the
+  // actual dimensions it'll provide.
+  const larger = all[index - 1];
+  const rest = all.slice(index);
+  return [
+    [larger[0], longerEdge],
+    ...rest,
+  ];
+}
+
+getThumbnailsAvailableForDimensions.all =
+  Object.entries(thumbnailSpec)
+    .map(([name, {size}]) => [name, size])
+    .sort((a, b) => b[1] - a[1]);
+
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
     const md5 = createHash('md5');
@@ -185,7 +239,11 @@ async function getSpawnMagick(tool) {
   return [`${description} (${version})`, fn];
 }
 
-function generateImageThumbnails(filePath, {spawnConvert}) {
+function generateImageThumbnails({
+  filePath,
+  dimensions,
+  spawnConvert,
+}) {
   const dirname = path.dirname(filePath);
   const extname = path.extname(filePath);
   const basename = path.basename(filePath, extname);
@@ -205,9 +263,10 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
     ]);
 
   return Promise.all(
-    Object.entries(thumbnailSpec)
-      .map(([ext, details]) =>
-        promisifyProcess(convert('.' + ext, details), false)));
+    getThumbnailsAvailableForDimensions(dimensions)
+      .map(([name]) => [name, thumbnailSpec[name]])
+      .map(([name, details]) =>
+        promisifyProcess(convert('.' + name, details), false)));
 }
 
 export async function clearThumbs(mediaPath, {
@@ -448,7 +507,11 @@ export default async function genThumbs(mediaPath, {
   await progressPromiseAll(writeMessageFn,
     queue(
       entriesToGenerate.map(([filePath, md5]) => () =>
-        generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
+        generateImageThumbnails({
+          filePath: path.join(mediaPath, filePath),
+          dimensions: imageToDimensions[filePath],
+          spawnConvert,
+        }).then(
           () => {
             updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
             succeeded.push(filePath);
