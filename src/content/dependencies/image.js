@@ -2,10 +2,12 @@ import {empty} from '#sugar';
 
 export default {
   extraDependencies: [
-    'getSizeOfImageFile',
+    'getDimensionsOfImagePath',
+    'getSizeOfImagePath',
+    'getThumbnailEqualOrSmaller',
+    'getThumbnailsAvailableForDimensions',
     'html',
     'language',
-    'thumb',
     'to',
   ],
 
@@ -52,10 +54,12 @@ export default {
   },
 
   generate(data, slots, {
-    getSizeOfImageFile,
+    getDimensionsOfImagePath,
+    getSizeOfImagePath,
+    getThumbnailEqualOrSmaller,
+    getThumbnailsAvailableForDimensions,
     html,
     language,
-    thumb,
     to,
   }) {
     let originalSrc;
@@ -67,12 +71,6 @@ export default {
     } else {
       originalSrc = '';
     }
-
-    const thumbSrc =
-      originalSrc &&
-        (slots.thumb
-          ? thumb[slots.thumb](originalSrc)
-          : originalSrc);
 
     const willLink = typeof slots.link === 'string' || slots.link;
     const customLink = typeof slots.link === 'string';
@@ -95,18 +93,6 @@ export default {
           slots.missingSourceContent));
     }
 
-    let fileSize = null;
-    if (willLink) {
-      const mediaRoot = to('media.root');
-      if (originalSrc.startsWith(mediaRoot)) {
-        fileSize =
-          getSizeOfImageFile(
-            originalSrc
-              .slice(mediaRoot.length)
-              .replace(/^\//, ''));
-      }
-    }
-
     let reveal = null;
     if (willReveal) {
       reveal = [
@@ -119,15 +105,66 @@ export default {
       ];
     }
 
+    let mediaSrc = null;
+    if (originalSrc.startsWith(to('media.root'))) {
+      mediaSrc =
+        originalSrc
+          .slice(to('media.root').length)
+          .replace(/^\//, '');
+    }
+
+    let thumbSrc = null;
+    if (mediaSrc) {
+      // Note: This provides mediaSrc to getThumbnailEqualOrSmaller, since
+      // it's the identifier which thumbnail utilities use to query from the
+      // thumbnail cache. But we use the result to operate on originalSrc,
+      // which is the HTML output-appropriate path including `../../` or
+      // another alternate base path.
+      const selectedSize = getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
+      thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${selectedSize}.jpg`);
+    }
+
+    let originalWidth = null;
+    let originalHeight = null;
+    let availableThumbs = null;
+    if (mediaSrc) {
+      [originalWidth, originalHeight] =
+        getDimensionsOfImagePath(mediaSrc);
+      availableThumbs =
+        getThumbnailsAvailableForDimensions([originalWidth, originalHeight]);
+    }
+
+    let fileSize = null;
+    if (willLink && mediaSrc) {
+      fileSize = getSizeOfImagePath(mediaSrc);
+    }
+
     const imgAttributes = {
       id: idOnImg,
       class: classOnImg,
       alt: slots.alt,
       width: slots.width,
       height: slots.height,
-      'data-original-size': fileSize,
-      'data-no-image-preview': customLink,
     };
+
+    if (customLink) {
+      imgAttributes['data-no-image-preview'] = true;
+    }
+
+    if (fileSize) {
+      imgAttributes['data-original-size'] = fileSize;
+    }
+
+    if (originalWidth && originalHeight) {
+      imgAttributes['data-original-length'] = Math.max(originalWidth, originalHeight);
+    }
+
+    if (!empty(availableThumbs)) {
+      imgAttributes['data-thumbs'] =
+        availableThumbs
+          .map(([name, size]) => `${name}:${size}`)
+          .join(' ');
+    }
 
     const nonlazyHTML =
       originalSrc &&

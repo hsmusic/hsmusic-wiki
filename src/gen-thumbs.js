@@ -74,7 +74,7 @@
 
 'use strict';
 
-const CACHE_FILE = 'thumbnail-cache.json';
+export const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
 const thumbnailSpec = {
@@ -167,6 +167,30 @@ getThumbnailsAvailableForDimensions.all =
   Object.entries(thumbnailSpec)
     .map(([name, {size}]) => [name, size])
     .sort((a, b) => b[1] - a[1]);
+
+export function getDimensionsOfImagePath(imagePath, cache) {
+  // This function is really generic. It takes the gen-thumbs image cache and
+  // returns the dimensions in that cache, so that other functions don't need
+  // to hard-code the cache format.
+
+  const [width, height] = cache[imagePath].slice(1);
+  return [width, height];
+}
+
+export function getThumbnailEqualOrSmaller(preferred, imagePath, cache) {
+  // This function is totally exclusive to page generation. It's a shorthand
+  // for accessing dimensions from the thumbnail cache, calculating all the
+  // thumbnails available, and selecting the one which is equal to or smaller
+  // than the provided size. Since the path provided might not be the actual
+  // one which is being thumbnail-ified, this just returns the name of the
+  // selected thumbnail size.
+
+  const {size: preferredSize} = thumbnailSpec[preferred];
+  const [width, height] = getDimensionsOfImagePath(imagePath, cache);
+  const available = getThumbnailsAvailableForDimensions([width, height]);
+  const [selected] = available.find(([name, size]) => size <= preferredSize);
+  return selected;
+}
 
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
@@ -302,7 +326,7 @@ export async function clearThumbs(mediaPath, {
         console.error(file);
       }
       fileIssue();
-      return;
+      return {success: false};
     }
 
     logInfo`Clearing out ${thumbFiles.length} thumbs.`;
@@ -327,6 +351,7 @@ export async function clearThumbs(mediaPath, {
         console.error(file);
       }
       logError`Check for permission errors?`;
+      return {success: false};
     } else {
       logInfo`Successfully deleted all ${thumbFiles.length} thumbnail files!`;
     }
@@ -355,6 +380,8 @@ export async function clearThumbs(mediaPath, {
       logWarn`Failed to remove cache file. Check its permissions?`;
     }
   }
+
+  return {success: true};
 }
 
 export default async function genThumbs(mediaPath, {

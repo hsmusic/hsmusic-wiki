@@ -32,6 +32,7 @@
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
 import {execSync} from 'node:child_process';
+import {readFile} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -57,6 +58,7 @@ import {
 } from '#cli';
 
 import genThumbs, {
+  CACHE_FILE as thumbsCacheFile,
   clearThumbs,
   defaultMagickThreads,
   isThumb,
@@ -428,7 +430,33 @@ async function main() {
     return;
   }
 
+  let thumbsCache;
+
   if (skipThumbs) {
+    const thumbsCachePath = path.join(mediaPath, thumbsCacheFile);
+    try {
+      thumbsCache = JSON.parse(await readFile(thumbsCachePath));
+      logInfo`Thumbnail cache file successfully read.`;
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        logError`The thumbnail cache doesn't exist, and it's necessary to build`
+        logError`the website. Please run once without ${'--skip-thumbs'} - after`
+        logError`that you'll be good to go and don't need to process thumbnails`
+        logError`again!`;
+        return;
+      } else {
+        logError`Malformed or unreadable thumbnail cache file: ${error}`;
+        logError`Path: ${thumbsCachePath}`;
+        logError`The thumbbnail cache is necessary to build the site, so you'll`;
+        logError`have to investigate this to get the build working. Try running`;
+        logError`again without ${'--skip-thumbs'}. If you can't get it working,`;
+        logError`you're welcome to message in the HSMusic Discord and we'll try`;
+        logError`to help you out with troubleshooting!`;
+        logError`${'https://hsmusic.wiki/discord/'}`;
+        return;
+      }
+    }
+
     logInfo`Skipping thumbnail generation.`;
   } else {
     logInfo`Begin thumbnail generation... -----+`;
@@ -440,6 +468,7 @@ async function main() {
     logInfo`Done thumbnail generation! --------+`;
     if (!result.success) return;
     if (thumbsOnly) return;
+    thumbsCache = result.cache;
   }
 
   if (noBuild) {
@@ -705,7 +734,7 @@ async function main() {
   };
 
   const getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
-  const getSizeOfImageFile = getSizeOfMediaFileHelper(imageFilePaths);
+  const getSizeOfImagePath = getSizeOfMediaFileHelper(imageFilePaths);
 
   logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
 
@@ -760,14 +789,15 @@ async function main() {
 
     defaultLanguage: finalDefaultLanguage,
     languages,
-    wikiData,
+    thumbsCache,
     urls,
     urlSpec,
+    wikiData,
 
     cachebust: '?' + CACHEBUST,
     developersComment,
     getSizeOfAdditionalFile,
-    getSizeOfImageFile,
+    getSizeOfImagePath,
     niceShowAggregate,
   });
 }

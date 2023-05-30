@@ -59,13 +59,14 @@ export async function go({
   defaultLanguage,
   languages,
   srcRootPath,
+  thumbsCache,
   urls,
   wikiData,
 
   cachebust,
   developersComment,
   getSizeOfAdditionalFile,
-  getSizeOfImageFile,
+  getSizeOfImagePath,
   niceShowAggregate,
 }) {
   const showError = (error) => {
@@ -343,10 +344,11 @@ export async function go({
         cachebust,
         defaultLanguage,
         getSizeOfAdditionalFile,
-        getSizeOfImageFile,
+        getSizeOfImagePath,
         language,
         languages,
         pagePath: servePath,
+        thumbsCache,
         to,
         urls,
         wikiData,
@@ -367,10 +369,10 @@ export async function go({
       response.writeHead(200, contentTypeHTML);
       response.end(pageHTML);
     } catch (error) {
-      response.writeHead(500, contentTypePlain);
-      response.end(`Error generating page, view server log for details\n`);
       console.error(`${requestHead} [500] ${pathname}`);
       showError(error);
+      response.writeHead(500, contentTypePlain);
+      response.end(`Error generating page, view server log for details\n`);
     }
   });
 

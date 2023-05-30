@@ -8,7 +8,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     evaluate.snapshot(message, {
       name: 'image',
       extraDependencies: {
-        getSizeOfImageFile: () => 0,
+        getSizeOfImagePath: () => 0,
       },
       ...opts,
     });
@@ -79,7 +79,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
 
   quickSnapshot('link with file size', {
     extraDependencies: {
-      getSizeOfImageFile: () => 10 ** 6,
+      getSizeOfImagePath: () => 10 ** 6,
     },
     slots: {
       path: ['media.albumCover', 'pingas', 'png'],

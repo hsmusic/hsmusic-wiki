@@ -49,8 +49,15 @@ export function testContentFunctions(t, message, fn) {
             thumb,
             to,
             urls,
+
             appendIndexHTML: false,
+
             getColors: c => getColors(c, {chroma}),
+            getDimensionsOfImagePath: () => [600, 600],
+            getThumbnailEqualOrSmaller: () => 'medium',
+            getThumbnailsAvailableForDimensions: () =>
+              [['large', 800], ['medium', 400], ['small', 250]],
+
             ...extraDependencies,
           },
         });

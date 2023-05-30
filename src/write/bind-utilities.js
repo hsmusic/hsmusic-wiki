@@ -10,15 +10,22 @@ import * as html from '#html';
 import {bindOpts} from '#sugar';
 import {thumb} from '#urls';
 
+import {
+  getDimensionsOfImagePath,
+  getThumbnailEqualOrSmaller,
+  getThumbnailsAvailableForDimensions,
+} from '#thumbs';
+
 export function bindUtilities({
   absoluteTo,
   cachebust,
   defaultLanguage,
   getSizeOfAdditionalFile,
-  getSizeOfImageFile,
+  getSizeOfImagePath,
   language,
   languages,
   pagePath,
+  thumbsCache,
   to,
   urls,
   wikiData,
@@ -30,7 +37,8 @@ export function bindUtilities({
     cachebust,
     defaultLanguage,
     getSizeOfAdditionalFile,
-    getSizeOfImageFile,
+    getSizeOfImagePath,
+    getThumbnailsAvailableForDimensions,
     html,
     language,
     languages,
@@ -45,6 +53,14 @@ export function bindUtilities({
   bound.getColors = bindOpts(getColors, {chroma});
 
   bound.find = bindFind(wikiData, {mode: 'warn'});
+
+  bound.getDimensionsOfImagePath =
+    (imagePath) =>
+      getDimensionsOfImagePath(imagePath, thumbsCache);
+
+  bound.getThumbnailEqualOrSmaller =
+    (preferred, imagePath) =>
+      getThumbnailEqualOrSmaller(preferred, imagePath, thumbsCache);
 
   return bound;
 }
