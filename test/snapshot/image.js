@@ -98,4 +98,19 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
       path: ['media.albumCover', 'beyond-canon', 'png'],
     },
   });
+
+  evaluate.snapshot('thumbnail details', {
+    name: 'image',
+    extraDependencies: {
+      getSizeOfImagePath: () => 0,
+      getDimensionsOfImagePath: () => [900, 1200],
+      getThumbnailsAvailableForDimensions: () =>
+        [['voluminous', 1200], ['middling', 900], ['petite', 20]],
+      getThumbnailEqualOrSmaller: () => 'voluminous',
+    },
+    slots: {
+      thumb: 'gargantuan',
+      path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
+  });
 });

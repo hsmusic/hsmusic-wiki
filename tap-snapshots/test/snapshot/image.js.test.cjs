@@ -55,6 +55,10 @@ exports[`test/snapshot/image.js TAP image (snapshot) > square 1`] = `
 <div class="square"><div class="square-content"><div class="image-container"><div class="image-inner-area"><img></div></div></div></div>
 `
 
+exports[`test/snapshot/image.js TAP image (snapshot) > thumbnail details 1`] = `
+<div class="image-container"><div class="image-inner-area"><img data-original-length="1200" data-thumbs="voluminous:1200 middling:900 petite:20" src="media/album-art/beyond-canon/cover.voluminous.jpg"></div></div>
+`
+
 exports[`test/snapshot/image.js TAP image (snapshot) > width & height 1`] = `
 <div class="image-container"><div class="image-inner-area"><img width="600" height="400"></div></div>
 `
