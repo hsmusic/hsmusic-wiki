@@ -330,8 +330,6 @@ export async function go({
         return;
       }
 
-      response.writeHead(200, contentTypeHTML);
-
       const localizedPathnames = getPagePathnameAcrossLanguages({
         defaultLanguage,
         languages,
@@ -464,19 +462,8 @@ export async function go({
 
       const pageHTML = topLevelResult.toString();
 
-      /*
-      const pageHTML = generateDocumentHTML(pageInfo, {
-        ...bound,
-        cachebust,
-        developersComment,
-        localizedPathnames,
-        oEmbedJSONHref: null, // No oEmbed support for live dev server
-        pagePath: servePath,
-        pathname,
-      });
-      */
-
       console.log(`${requestHead} [200] ${pathname}`);
+      response.writeHead(200, contentTypeHTML);
       response.end(pageHTML);
     } catch (error) {
       response.writeHead(500, contentTypePlain);
