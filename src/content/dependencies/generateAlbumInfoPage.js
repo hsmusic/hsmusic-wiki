@@ -11,6 +11,9 @@ export default {
     'generateChronologyLinks',
     'generateColorStyleRules',
     'generatePageLayout',
+    'linkAlbum',
+    'linkArtist',
+    'linkTrack',
   ],
 
   extraDependencies: ['language'],

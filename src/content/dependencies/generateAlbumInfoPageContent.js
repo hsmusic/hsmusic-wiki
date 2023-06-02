@@ -11,6 +11,7 @@ export default {
     'linkAlbumGallery',
     'linkContribution',
     'linkExternal',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
