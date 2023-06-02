@@ -55,7 +55,7 @@ export default {
 
   generate(data, relations, {html, language}) {
     return html.template({
-      annotation: `generateAlbumNavLinks`,
+      annotation: `generateAlbumNavAccent`,
 
       slots: {
         showTrackNavigation: {type: 'boolean', default: false},

@@ -4,7 +4,7 @@ import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
 export default {
   contentDependencies: [
     'generateTrackInfoPageContent',
-    'generateAlbumNavLinks',
+    'generateAlbumNavAccent',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
@@ -54,7 +54,7 @@ export default {
 
       albumLink: relation('linkAlbum', track.album),
       trackLink: relation('linkTrack', track),
-      albumNavLinks: relation('generateAlbumNavLinks', track.album, track),
+      albumNavAccent: relation('generateAlbumNavAccent', track.album, track),
       chronologyLinks: relation('generateChronologyLinks'),
 
       content: relation('generateTrackInfoPageContent', track),
@@ -107,7 +107,7 @@ export default {
         ],
 
         navBottomRowContent:
-          relations.albumNavLinks.slots({
+          relations.albumNavAccent.slots({
             showTrackNavigation: true,
             showExtraLinks: false,
           }),
