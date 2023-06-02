@@ -129,29 +129,54 @@ export default {
         .map(({album, date, chunk}) => ({
           albumLink: relation('linkAlbum', album),
           date: +date,
-          entries: chunk.map(entry =>
-            filterProperties(entry, [
-              'contributionDescriptions',
-              'kind',
-              'otherArtistLinks',
-              'rerelease',
-              'trackLink',
-            ]))
+          entries:
+            chunk.map(entry =>
+              filterProperties(entry, [
+                'contributionDescriptions',
+                'kind',
+                'otherArtistLinks',
+                'rerelease',
+                'trackLink',
+              ])),
         }));
 
-    /*
-    const commentaryThings = sortAlbumsTracksChronologically([
-      ...(artist.albumsAsCommentator ?? []),
-      ...(artist.tracksAsCommentator ?? []),
-    ]);
+    // Commentary doesn't use the detailed contribution system where multiple
+    // artists are collaboratively credited for the same piece, so there isn't
+    // really anything special to do for processing or presenting it.
 
-    const commentaryListChunks = chunkByProperties(
-      commentaryThings.map((thing) => ({
-        album: thing.album || thing,
-        track: thing.album ? thing : null,
+    const commentaryEntries = [
+      ...artist.albumsAsCommentator.map(album => ({
+        kind: 'albumCommentary',
+        date: album.date,
+        thing: album,
+        album: album,
       })),
-      ['album']);
-    */
+
+      ...artist.tracksAsCommentator.map(track => ({
+        kind: 'trackCommentary',
+        date: track.date,
+        thing: track,
+        album: track.album,
+        trackLink: relation('linkTrack', track),
+      })),
+    ];
+
+    sortContributionEntries(commentaryEntries, sortAlbumsTracksChronologically);
+
+    // We still pass through (and chunk by) date here, even though it doesn't
+    // actually get displayed on the album page. See issue #193.
+    relations.commentaryChunks =
+      chunkByProperties(commentaryEntries, ['album', 'date'])
+        .map(({album, date, chunk}) => ({
+          albumLink: relation('linkAlbum', album),
+          date: +date,
+          entries:
+            chunk.map(entry =>
+              filterProperties(entry, [
+                'kind',
+                'trackLink',
+              ])),
+        }));
 
     return relations;
   },
@@ -260,6 +285,32 @@ export default {
                       .map(entry => html.tag('li', entry)))),
               ])),
           ],
+
+          !empty(relations.commentaryChunks) && [
+            html.tag('h2',
+              {id: 'commentary', class: ['content-heading']},
+              language.$('artistPage.commentaryList.title')),
+
+            html.tag('dl',
+              relations.commentaryChunks.map(({albumLink, entries}) => [
+                html.tag('dt',
+                  language.$('artistPage.creditList.album', {
+                    album: albumLink,
+                  })),
+
+                html.tag('dd',
+                  html.tag('ul',
+                    entries
+                      .map(({kind, trackLink}) =>
+                        (kind === 'trackCommentary'
+                          ? language.$('artistPage.creditList.entry.track', {
+                              track: trackLink,
+                            })
+                          : html.tag('i',
+                              language.$('artistPage.creditList.entry.album.commentary'))))
+                      .map(entry => html.tag('li', entry)))),
+              ])),
+          ],
         ],
 
         navLinkStyle: 'hierarchical',
@@ -280,55 +331,12 @@ export function write(artist, {wikiData}) {
 
   const {name, urls, contextNotes} = artist;
 
-  const artThingsAll = sortAlbumsTracksChronologically(
-    unique([
-      ...(artist.albumsAsCoverArtist ?? []),
-      ...(artist.albumsAsWallpaperArtist ?? []),
-      ...(artist.albumsAsBannerArtist ?? []),
-      ...(artist.tracksAsCoverArtist ?? []),
-    ]),
-    {getDate: (o) => o.coverArtDate});
-
-  const artThingsGallery = sortAlbumsTracksChronologically(
-    [
-      ...(artist.albumsAsCoverArtist ?? []),
-      ...(artist.tracksAsCoverArtist ?? []),
-    ],
-    {getDate: (o) => o.coverArtDate});
-
-  const commentaryThings = sortAlbumsTracksChronologically([
-    ...(artist.albumsAsCommentator ?? []),
-    ...(artist.tracksAsCommentator ?? []),
-  ]);
-
-  const hasGallery = !empty(artThingsGallery);
-
   const getArtistsAndContrib = (thing, key) => ({
     artists: thing[key]?.filter(({who}) => who !== artist),
     contrib: thing[key]?.find(({who}) => who === artist),
     thing,
     key,
   });
-
-  const artListChunks = chunkByProperties(
-    artThingsAll.flatMap((thing) =>
-      ['coverArtistContribs', 'wallpaperArtistContribs', 'bannerArtistContribs']
-        .map((key) => getArtistsAndContrib(thing, key))
-        .filter(({contrib}) => contrib)
-        .map((props) => ({
-          album: thing.album || thing,
-          track: thing.album ? thing : null,
-          date: thing.date,
-          ...props,
-        }))),
-    ['date', 'album']);
-
-  const commentaryListChunks = chunkByProperties(
-    commentaryThings.map((thing) => ({
-      album: thing.album || thing,
-      track: thing.album ? thing : null,
-    })),
-    ['album']);
 
   const allTracks = sortAlbumsTracksChronologically(
     unique([
@@ -707,31 +715,7 @@ export function write(artist, {wikiData}) {
                   ])),
               ]),
 
-            ...html.fragment(
-              !empty(commentaryThings) && [
-                html.tag('h2',
-                  {id: 'commentary', class: ['content-heading']},
-                  language.$('artistPage.commentaryList.title')),
-
-                html.tag('dl',
-                  commentaryListChunks.flatMap(({album, chunk}) => [
-                    html.tag('dt',
-                      language.$('artistPage.creditList.album', {
-                        album: link.album(album),
-                      })),
-
-                    html.tag('dd',
-                      html.tag('ul',
-                        chunk
-                          .map(({track}) => track
-                            ? language.$('artistPage.creditList.entry.track', {
-                                track: link.track(track),
-                              })
-                            : html.tag('i',
-                                language.$('artistPage.creditList.entry.album.commentary')))
-                          .map(row => html.tag('li', row)))),
-                  ])),
-              ]),
+            <commentary>
           ],
         },
 
