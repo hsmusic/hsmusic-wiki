@@ -33,7 +33,6 @@ import {
   flattenRelationsTree,
   getRelationsTree,
   getNeededContentDependencyNames,
-  sourceAnnotation,
 } from '../../content-function.js';
 
 const defaultHost = '0.0.0.0';
@@ -430,16 +429,11 @@ export async function go({
 
       const slotResults = {};
 
-      function runContentFunction({
-        name,
-        args,
-        relations: flatRelations,
-        [sourceAnnotation]: sourceName,
-      }) {
+      function runContentFunction({name, args, relations: flatRelations}) {
         const contentFunction = fulfilledContentDependencies[name];
 
         if (!contentFunction) {
-          throw new Error(`Content function ${name} unfulfilled or not listed (from ${sourceName})`);
+          throw new Error(`Content function ${name} unfulfilled or not listed`);
         }
 
         const sprawl =
