@@ -206,6 +206,8 @@ export function fulfillDependencies({
   return newFulfilledDependencies;
 }
 
+export const sourceAnnotation = Symbol('Source');
+
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
   const relationIdentifier = Symbol('Relation');
 
@@ -234,7 +236,11 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
 
     const relationFunction = (name, ...args) => {
       const relationSymbol = Symbol(relationSymbolMessage(name));
-      relationSlots[relationSymbol] = {name, args};
+      relationSlots[relationSymbol] = {
+        name,
+        args,
+        [sourceAnnotation]: contentFunctionName,
+      };
       return {[relationIdentifier]: relationSymbol};
     };
 
@@ -252,6 +258,7 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
         ]));
 
     return {
+      [sourceAnnotation]: contentFunctionName,
       layout: relationsLayout,
       slots: relationSlots,
       tree: relationsTree,
@@ -289,6 +296,7 @@ export function flattenRelationsTree({
         name: slots[slot].name,
         args: slots[slot].args,
         relations: tree[slot]?.layout ?? null,
+        [sourceAnnotation]: slots[slot][sourceAnnotation],
       };
     }
   }
@@ -435,11 +443,16 @@ export function quickEvaluate({
 
   const slotResults = {};
 
-  function runContentFunction({name, args, relations: flatRelations}) {
+  function runContentFunction({
+    name,
+    args,
+    relations: flatRelations,
+    [sourceAnnotation]: sourceName,
+  }) {
     const contentFunction = fulfilledContentDependencies[name];
 
     if (!contentFunction) {
-      throw new Error(`Content function ${name} unfulfilled or not listed`);
+      throw new Error(`Content function ${name} unfulfilled or not listed (from ${sourceName})`);
     }
 
     const sprawl =
