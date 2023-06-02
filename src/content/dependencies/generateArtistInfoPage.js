@@ -8,6 +8,7 @@ import {
 export default {
   contentDependencies: [
     'generateArtistNavLinks',
+    'generateContentHeading',
     'generatePageLayout',
     'linkAlbum',
     'linkArtist',
@@ -19,20 +20,13 @@ export default {
 
   relations(relation, artist) {
     const relations = {};
+    const sections = relations.sections = {};
 
     relations.layout =
       relation('generatePageLayout');
 
     relations.artistNavLinks =
       relation('generateArtistNavLinks', artist);
-
-    if (
-      !empty(artist.albumsAsCoverArtist) ||
-      !empty(artist.tracksAsCoverArtist)
-    ) {
-      relations.artistGalleryLink =
-        relation('linkArtistGallery', artist);
-    }
 
     const processContribs = (...contribArrays) => {
       const properties = {};
@@ -124,7 +118,7 @@ export default {
 
     sortContributionEntries(artContributionEntries, sortAlbumsTracksChronologically);
 
-    relations.artContributionChunks =
+    const artContributionChunks =
       chunkByProperties(artContributionEntries, ['album', 'date'])
         .map(({album, date, chunk}) => ({
           albumLink: relation('linkAlbum', album),
@@ -139,6 +133,20 @@ export default {
                 'trackLink',
               ])),
         }));
+
+    if (!empty(artContributionChunks)) {
+      const artworks = sections.artworks = {};
+      artworks.heading = relation('generateContentHeading');
+      artworks.chunks = artContributionChunks;
+
+      if (
+        !empty(artist.albumsAsCoverArtist) ||
+        !empty(artist.tracksAsCoverArtist)
+      ) {
+        artworks.artistGalleryLink =
+          relation('linkArtistGallery', artist);
+      }
+    }
 
     // Commentary doesn't use the detailed contribution system where multiple
     // artists are collaboratively credited for the same piece, so there isn't
@@ -165,7 +173,7 @@ export default {
 
     // We still pass through (and chunk by) date here, even though it doesn't
     // actually get displayed on the album page. See issue #193.
-    relations.commentaryChunks =
+    const commentaryChunks =
       chunkByProperties(commentaryEntries, ['album', 'date'])
         .map(({album, date, chunk}) => ({
           albumLink: relation('linkAlbum', album),
@@ -178,6 +186,12 @@ export default {
               ])),
         }));
 
+    if (!empty(commentaryChunks)) {
+      const commentary = sections.commentary = {};
+      commentary.heading = relation('generateContentHeading');
+      commentary.chunks = commentaryChunks;
+    }
+
     return relations;
   },
 
@@ -188,6 +202,8 @@ export default {
   },
 
   generate(data, relations, {html, language}) {
+    const {sections: sec} = relations;
+
     const addAccentsToEntry = ({
       rerelease,
       entry,
@@ -227,15 +243,18 @@ export default {
 
         mainClasses: ['long-content'],
         mainContent: [
-          !empty(relations.artContributionChunks) && [
-            html.tag('h2',
-              {id: 'art', class: ['content-heading']},
-              language.$('artistPage.artList.title')),
+          sec.artworks && [
+            sec.artworks.heading
+              .slots({
+                tag: 'h2',
+                id: 'art',
+                title: language.$('artistPage.artList.title'),
+              }),
 
-            relations.artistGalleryLink &&
+            sec.artworks.artistGalleryLink &&
               html.tag('p',
                 language.$('artistPage.viewArtGallery.orBrowseList', {
-                  link: relations.artistGalleryLink.slots({
+                  link: sec.artworks.artistGalleryLink.slots({
                     content: language.$('artistPage.viewArtGallery.link'),
                   }),
                 })),
@@ -257,7 +276,7 @@ export default {
             */
 
             html.tag('dl',
-              relations.artContributionChunks.flatMap(({albumLink, date, entries}) => [
+              sec.artworks.chunks.map(({albumLink, date, entries}) => [
                 html.tag('dt',
                   language.$('artistPage.creditList.album.withDate', {
                     album: albumLink,
@@ -286,13 +305,16 @@ export default {
               ])),
           ],
 
-          !empty(relations.commentaryChunks) && [
-            html.tag('h2',
-              {id: 'commentary', class: ['content-heading']},
-              language.$('artistPage.commentaryList.title')),
+          sec.commentary && [
+            sec.commentary.heading
+              .slots({
+                tag: 'h2',
+                id: 'commentary',
+                title: language.$('artistPage.commentaryList.title'),
+              }),
 
             html.tag('dl',
-              relations.commentaryChunks.map(({albumLink, entries}) => [
+              sec.commentary.chunks.map(({albumLink, entries}) => [
                 html.tag('dt',
                   language.$('artistPage.creditList.album', {
                     album: albumLink,
