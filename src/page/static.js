@@ -21,27 +21,3 @@ export function pathsForTarget(staticPage) {
     },
   ];
 }
-
-export function write(staticPage) {
-  const page = {
-    type: 'page',
-    path: ['staticPage', staticPage.directory],
-    page: ({
-      transformMultiline,
-    }) => ({
-      title: staticPage.name,
-      stylesheet: staticPage.stylesheet,
-
-      main: {
-        classes: ['long-content'],
-        headingMode: 'sticky',
-
-        content: transformMultiline(staticPage.content),
-      },
-
-      nav: {simple: true},
-    }),
-  };
-
-  return [page];
-}
