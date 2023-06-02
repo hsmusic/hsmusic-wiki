@@ -11,6 +11,7 @@ export default {
     'generatePageLayout',
     'linkAlbum',
     'linkArtist',
+    'linkArtistGallery',
     'linkTrack',
   ],
 
@@ -25,11 +26,13 @@ export default {
     relations.artistNavLinks =
       relation('generateArtistNavLinks', artist);
 
-    /*
-    const hasGallery =
+    if (
       !empty(artist.albumsAsCoverArtist) ||
-      !empty(artist.tracksAsCoverArtist);
-    */
+      !empty(artist.tracksAsCoverArtist)
+    ) {
+      relations.artistGalleryLink =
+        relation('linkArtistGallery', artist);
+    }
 
     const processContribs = (...contribArrays) => {
       const properties = {};
@@ -202,15 +205,13 @@ export default {
               {id: 'art', class: ['content-heading']},
               language.$('artistPage.artList.title')),
 
-            /*
-            hasGallery &&
+            relations.artistGalleryLink &&
               html.tag('p',
                 language.$('artistPage.viewArtGallery.orBrowseList', {
-                  link: link.artistGallery(artist, {
-                    text: language.$('artistPage.viewArtGallery.link'),
-                  })
+                  link: relations.artistGalleryLink.slots({
+                    content: language.$('artistPage.viewArtGallery.link'),
+                  }),
                 })),
-            */
 
             /*
             !empty(artGroups) &&
