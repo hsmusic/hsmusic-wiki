@@ -42,8 +42,14 @@ export default {
           .map(contribs => contribs.find(({who}) => who === artist))
           .filter(Boolean);
 
-      properties.contributionDescriptions =
-        ownContribs.map(({what}) => what).filter(Boolean);
+      const contributionDescriptions =
+        ownContribs
+          .map(({what}) => what)
+          .filter(Boolean);
+
+      if (!empty(contributionDescriptions)) {
+        properties.contributionDescriptions = contributionDescriptions;
+      }
 
       const otherArtistContribs =
         contribArrays
