@@ -1,5 +1,6 @@
 import Thing from './thing.js';
 
+import {empty} from '../../util/sugar.js';
 import find from '../../util/find.js';
 
 export class Album extends Thing {
@@ -34,12 +35,12 @@ export class Album extends Thing {
       update: {validate: isDate},
 
       expose: {
-        dependencies: ['date', 'hasCoverArt'],
+        dependencies: ['date', 'coverArtistContribsByRef'],
         transform: (coverArtDate, {
+          coverArtistContribsByRef,
           date,
-          hasCoverArt,
         }) =>
-          (hasCoverArt
+          (!empty(coverArtistContribsByRef)
             ? coverArtDate ?? date ?? null
             : null),
       },

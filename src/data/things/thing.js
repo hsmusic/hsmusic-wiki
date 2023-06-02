@@ -300,9 +300,7 @@ export default class Thing extends CacheableObject {
 
     // Nice 'n simple shorthand for an exposed-only flag which is true when any
     // contributions are present in the specified property.
-    contribsPresent: (
-      contribsByRefProperty
-    ) => ({
+    contribsPresent: (contribsByRefProperty) => ({
       flags: {expose: true},
       expose: {
         dependencies: [contribsByRefProperty],
