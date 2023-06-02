@@ -219,6 +219,8 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
       return null;
     }
 
+    const listedDependencies = new Set(contentFunction.contentDependencies);
+
     // TODO: Evaluating a sprawl might belong somewhere better than here, lol...
     const sprawl =
       (contentFunction.sprawl
@@ -233,6 +235,10 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     })();
 
     const relationFunction = (name, ...args) => {
+      if (!listedDependencies.has(name)) {
+        throw new Error(`Called relation('${name}') but ${contentFunctionName} doesn't list that dependency`);
+      }
+
       const relationSymbol = Symbol(relationSymbolMessage(name));
       relationSlots[relationSymbol] = {name, args};
       return {[relationIdentifier]: relationSymbol};
