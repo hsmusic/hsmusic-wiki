@@ -92,7 +92,6 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        track: null,
         ...processContribs(album.coverArtistContribs),
       })),
 
@@ -101,7 +100,6 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        track: null,
         ...processContribs(album.wallpaperArtistContribs),
       })),
 
@@ -110,7 +108,6 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        track: null,
         ...processContribs(album.bannerArtistContribs),
       })),
 
@@ -119,7 +116,6 @@ export default {
         date: track.coverArtDate,
         thing: track,
         album: track.album,
-        track: track,
         rerelease: track.originalReleaseTrack !== null,
         trackLink: relation('linkTrack', track),
         ...processContribs(track.coverArtistContribs),
