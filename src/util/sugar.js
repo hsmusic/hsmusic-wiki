@@ -82,6 +82,14 @@ export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
 export const withEntries = (obj, fn) =>
   Object.fromEntries(fn(Object.entries(obj)));
 
+export function filterProperties(obj, properties) {
+  const set = new Set(properties);
+  return Object.fromEntries(
+    Object
+      .entries(obj)
+      .filter(([key]) => set.has(key)));
+}
+
 export function queue(array, max = 50) {
   if (max === 0) {
     return array.map((fn) => fn());

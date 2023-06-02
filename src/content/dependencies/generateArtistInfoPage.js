@@ -1,18 +1,152 @@
+import {empty, filterProperties, unique} from '../../util/sugar.js';
+
+import {
+  chunkByProperties,
+  sortAlbumsTracksChronologically,
+} from '../../util/wiki-data.js';
+
 export default {
   contentDependencies: [
     'generateArtistNavLinks',
     'generatePageLayout',
+    'linkAlbum',
+    'linkArtist',
+    'linkTrack',
   ],
+
+  extraDependencies: ['html', 'language'],
 
   relations(relation, artist) {
     const relations = {};
-    const sections = relations.sections = {};
 
     relations.layout =
       relation('generatePageLayout');
 
     relations.artistNavLinks =
       relation('generateArtistNavLinks', artist);
+
+    /*
+    const hasGallery =
+      !empty(artist.albumsAsCoverArtist) ||
+      !empty(artist.tracksAsCoverArtist);
+    */
+
+    const processContribs = (...contribArrays) => {
+      const properties = {};
+
+      const ownContribs =
+        contribArrays
+          .map(contribs => contribs.find(({who}) => who === artist))
+          .filter(Boolean);
+
+      properties.contributionDescriptions =
+        ownContribs.map(({what}) => what).filter(Boolean);
+
+      const otherArtistContribs =
+        contribArrays
+          .map(contribs => contribs.filter(({who}) => who !== artist))
+          .flat();
+
+      if (!empty(otherArtistContribs)) {
+        properties.otherArtistLinks =
+          otherArtistContribs
+            .map(({who}) => relation('linkArtist', who));
+      }
+
+      return properties;
+    };
+
+    const sortContributionEntries = (entries, sortFunction) => {
+      const things = unique(entries.map(({thing}) => thing));
+      sortFunction(things);
+
+      const outputArrays = [];
+      const thingToOutputArray = [];
+
+      for (const thing of things) {
+        const array = [];
+        thingToOutputArray[thing] = array;
+        outputArrays.push(array);
+      }
+
+      for (const entry of entries) {
+        thingToOutputArray[entry.thing].push(entry);
+      }
+
+      return outputArrays.flat();
+    };
+
+    // TODO: Add and integrate wallpaper and banner date fields (#90)
+    const artContributionEntries = [
+      ...artist.albumsAsCoverArtist.map(album => ({
+        kind: 'albumCover',
+        date: album.coverArtDate,
+        thing: album,
+        album: album,
+        track: null,
+        ...processContribs(album.coverArtistContribs),
+      })),
+
+      ...artist.albumsAsWallpaperArtist.map(album => ({
+        kind: 'albumWallpaper',
+        date: album.coverArtDate,
+        thing: album,
+        album: album,
+        track: null,
+        ...processContribs(album.wallpaperArtistContribs),
+      })),
+
+      ...artist.albumsAsBannerArtist.map(album => ({
+        kind: 'albumBanner',
+        date: album.coverArtDate,
+        thing: album,
+        album: album,
+        track: null,
+        ...processContribs(album.bannerArtistContribs),
+      })),
+
+      ...artist.tracksAsCoverArtist.map(track => ({
+        kind: 'trackCover',
+        date: track.coverArtDate,
+        thing: track,
+        album: track.album,
+        track: track,
+        rerelease: track.originalReleaseTrack !== null,
+        trackLink: relation('linkTrack', track),
+        ...processContribs(track.coverArtistContribs),
+      })),
+    ];
+
+    sortContributionEntries(artContributionEntries, sortAlbumsTracksChronologically);
+
+    relations.artContributionChunks =
+      chunkByProperties(artContributionEntries, ['album', 'date'])
+        .map(({album, date, chunk}) => ({
+          albumLink: relation('linkAlbum', album),
+          date: +date,
+          entries: chunk.map(entry =>
+            filterProperties(entry, [
+              'contributionDescriptions',
+              'kind',
+              'otherArtistLinks',
+              'rerelease',
+              'trackLink',
+            ]))
+        }));
+
+    /*
+    const commentaryThings = sortAlbumsTracksChronologically([
+      ...(artist.albumsAsCommentator ?? []),
+      ...(artist.tracksAsCommentator ?? []),
+    ]);
+
+    const commentaryListChunks = chunkByProperties(
+      commentaryThings.map((thing) => ({
+        album: thing.album || thing,
+        track: thing.album ? thing : null,
+      })),
+      ['album']);
+    */
 
     return relations;
   },
@@ -23,7 +157,37 @@ export default {
     };
   },
 
-  generate(data, relations) {
+  generate(data, relations, {html, language}) {
+    const addAccentsToEntry = ({
+      rerelease,
+      entry,
+      otherArtistLinks,
+      contributionDescriptions,
+    }) => {
+      if (rerelease) {
+        return language.$('artistPage.creditList.entry.rerelease', {entry});
+      }
+
+      const options = {entry};
+      const parts = ['artistPage.creditList.entry'];
+
+      if (otherArtistLinks) {
+        parts.push('withArtists');
+        options.artists = language.formatConjunctionList(otherArtistLinks);
+      }
+
+      if (contributionDescriptions) {
+        parts.push('withContribution');
+        options.contribution = language.formatUnitList(contributionDescriptions);
+      }
+
+      if (parts.length === 1) {
+        return entry;
+      }
+
+      return language.formatString(parts.join('.'), options);
+    };
+
     return relations.layout
       .slots({
         title: data.name,
@@ -33,6 +197,66 @@ export default {
 
         mainClasses: ['long-content'],
         mainContent: [
+          !empty(relations.artContributionChunks) && [
+            html.tag('h2',
+              {id: 'art', class: ['content-heading']},
+              language.$('artistPage.artList.title')),
+
+            /*
+            hasGallery &&
+              html.tag('p',
+                language.$('artistPage.viewArtGallery.orBrowseList', {
+                  link: link.artistGallery(artist, {
+                    text: language.$('artistPage.viewArtGallery.link'),
+                  })
+                })),
+            */
+
+            /*
+            !empty(artGroups) &&
+              html.tag('p',
+                language.$('artistPage.artGroupsLine', {
+                groups: language.formatUnitList(
+                  artGroups.map(({groupLink, numContributions}) =>
+                    language.$('artistPage.groupsLine.item', {
+                      group: groupLink,
+                      contributions:
+                        language.countContributions(numContributions),
+                    })
+                  )
+                ),
+              })),
+            */
+
+            html.tag('dl',
+              relations.artContributionChunks.flatMap(({albumLink, date, entries}) => [
+                html.tag('dt',
+                  language.$('artistPage.creditList.album.withDate', {
+                    album: albumLink,
+                    date: language.formatDate(new Date(date)),
+                  })),
+
+                html.tag('dd',
+                  html.tag('ul',
+                    entries
+                      .map(({kind, trackLink, ...properties}) => ({
+                        entry:
+                          (kind === 'trackCover'
+                            ? language.$('artistPage.creditList.entry.track', {
+                                track: trackLink,
+                              })
+                            : html.tag('i',
+                                language.$('artistPage.creditList.entry.album.' + {
+                                  albumWallpaper: 'wallpaperArt',
+                                  albumBanner: 'bannerArt',
+                                  albumCover: 'coverArt',
+                                }[kind]))),
+                        ...properties,
+                      }))
+                      .map(addAccentsToEntry)
+                      .map(entry => html.tag('li', entry)))),
+              ])),
+          ],
         ],
 
         navLinkStyle: 'hierarchical',
@@ -176,38 +400,6 @@ export function write(artist, {wikiData}) {
       dateLast: chunk[chunk.length - 1].date,
     }));
   }
-
-  const generateEntryAccents = ({
-    getArtistString,
-    language,
-    original,
-    entry,
-    artists,
-    contrib,
-  }) =>
-    original
-      ? language.$('artistPage.creditList.entry.rerelease', {entry})
-      : !empty(artists)
-      ? contrib.what || contrib.whatArray?.length
-        ? language.$('artistPage.creditList.entry.withArtists.withContribution', {
-            entry,
-            artists: getArtistString(artists),
-            contribution: contrib.whatArray
-              ? language.formatUnitList(contrib.whatArray)
-              : contrib.what,
-          })
-        : language.$('artistPage.creditList.entry.withArtists', {
-            entry,
-            artists: getArtistString(artists),
-          })
-      : contrib.what || contrib.whatArray?.length
-      ? language.$('artistPage.creditList.entry.withContribution', {
-          entry,
-          contribution: contrib.whatArray
-            ? language.formatUnitList(contrib.whatArray)
-            : contrib.what,
-        })
-      : entry;
 
   const unbound_generateTrackList = (chunks, {
     getArtistString,
@@ -467,71 +659,7 @@ export function write(artist, {wikiData}) {
                 generateTrackList(trackListChunks),
               ]),
 
-            ...html.fragment(
-              !empty(artThingsAll) && [
-                html.tag('h2',
-                  {id: 'art', class: ['content-heading']},
-                  language.$('artistPage.artList.title')),
-
-                hasGallery &&
-                  html.tag('p',
-                    language.$('artistPage.viewArtGallery.orBrowseList', {
-                      link: link.artistGallery(artist, {
-                        text: language.$('artistPage.viewArtGallery.link'),
-                      })
-                    })),
-
-                !empty(artGroups) &&
-                  html.tag('p',
-                    language.$('artistPage.artGroupsLine', {
-                    groups: language.formatUnitList(
-                      artGroups.map(({group, contributions}) =>
-                        language.$('artistPage.groupsLine.item', {
-                          group: link.groupInfo(group),
-                          contributions:
-                            language.countContributions(
-                              contributions
-                            ),
-                        })
-                      )
-                    ),
-                  })),
-
-                html.tag('dl',
-                  artListChunks.flatMap(({date, album, chunk}) => [
-                    html.tag('dt', language.$('artistPage.creditList.album.withDate', {
-                      album: link.album(album),
-                      date: language.formatDate(date),
-                    })),
-
-                    html.tag('dd',
-                      html.tag('ul',
-                        chunk
-                          .map(({track, key, ...props}) => ({
-                            ...props,
-                            entry:
-                              track
-                                ? language.$('artistPage.creditList.entry.track', {
-                                    track: link.track(track),
-                                  })
-                                : html.tag('i',
-                                    language.$('artistPage.creditList.entry.album.' + {
-                                      wallpaperArtistContribs:
-                                        'wallpaperArt',
-                                      bannerArtistContribs:
-                                        'bannerArt',
-                                      coverArtistContribs:
-                                        'coverArt',
-                                    }[key])),
-                          }))
-                          .map((opts) => generateEntryAccents({
-                            getArtistString,
-                            language,
-                            ...opts,
-                          }))
-                          .map(row => html.tag('li', row)))),
-                  ])),
-              ]),
+            <art things>
 
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
