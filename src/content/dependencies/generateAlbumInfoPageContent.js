@@ -297,41 +297,6 @@ export default {
     position: 'top',
   },
 
-  sidebarLeft: generateAlbumSidebar(album, null, {
-    fancifyURL,
-    getLinkThemeString,
-    html,
-    link,
-    language,
-    transformMultiline,
-    wikiData,
-  }),
-
-  nav: {
-    linkContainerClasses: ['nav-links-hierarchy'],
-    links: [
-      {toHome: true},
-      {
-        html: language.$('albumPage.nav.album', {
-          album: link.album(album, {class: 'current'}),
-        }),
-      },
-      {
-        divider: false,
-        html: generateAlbumNavLinks(album, null, {
-          generateNavigationLinks,
-          html,
-          language,
-          link,
-        }),
-      }
-    ],
-    content: generateAlbumChronologyLinks(album, null, {
-      generateChronologyLinks,
-      html,
-    }),
-  },
-
   secondaryNav: generateAlbumSecondaryNav(album, null, {
     getLinkThemeString,
     html,

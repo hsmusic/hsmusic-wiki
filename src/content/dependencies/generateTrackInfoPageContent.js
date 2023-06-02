@@ -541,37 +541,6 @@ export default {
 };
 
 /*
-export function write(track, {wikiData}) {
-  const {wikiInfo} = wikiData;
-
-  const {album, contributorContribs, referencedByTracks, referencedTracks, sampledByTracks, sampledTracks, otherReleases, } = track;
-
-  const listTag = getAlbumListTag(album);
-
-  const unbound_getTrackItem = (track, {
-    getArtistString,
-    html,
-    language,
-    link,
-  }) =>
-    html.tag('li',
-      language.$('trackList.item.withArtists', {
-        track: link.track(track),
-        by: html.tag('span',
-          {class: 'by'},
-          language.$('trackList.item.withArtists.by', {
-            artists: getArtistString(track.artistContribs),
-          })),
-      }));
-
-  const hasCommentary =
-    track.commentary || otherReleases.some((t) => t.commentary);
-
-  const hasAdditionalFiles = !empty(track.additionalFiles);
-  const hasSheetMusicFiles = !empty(track.sheetMusicFiles);
-  const hasMidiProjectFiles = !empty(track.midiProjectFiles);
-  const numAdditionalFiles = album.additionalFiles.flatMap((g) => g.files).length;
-
   const generateCommentary = ({language, link, transformMultiline}) =>
     transformMultiline([
       track.commentary,
@@ -655,46 +624,7 @@ export function write(track, {wikiData}) {
   };
 
   const page = {
-    type: 'page',
-    path: ['track', track.directory],
-    page: ({
-      absoluteTo,
-      fancifyURL,
-      generateAdditionalFilesList,
-      generateAdditionalFilesShortcut,
-      generateChronologyLinks,
-      generateContentHeading,
-      generateNavigationLinks,
-      generateTrackListDividedByGroups,
-      getAlbumStylesheet,
-      getArtistString,
-      getLinkThemeString,
-      getSizeOfAdditionalFile,
-      getThemeString,
-      getTrackCover,
-      html,
-      link,
-      language,
-      transformLyrics,
-      transformMultiline,
-      to,
-      urls,
-    }) => {
-      const getTrackItem = bindOpts(unbound_getTrackItem, {
-        getArtistString,
-        html,
-        language,
-        link,
-      });
-
-      const generateAlbumAdditionalFilesList = bindOpts(unbound_generateAlbumAdditionalFilesList, {
-        [bindOpts.bindIndex]: 2,
-        generateAdditionalFilesList,
-        getSizeOfAdditionalFile,
-        link,
-        urls,
-      });
-
+    page: () => {
       return {
         title: language.$('trackPage.title', {track: track.name}),
         stylesheet: getAlbumStylesheet(album, {to}),
@@ -721,53 +651,6 @@ export function write(track, {wikiData}) {
           color: track.color,
         },
 
-        sidebarLeft: generateAlbumSidebar(album, track, {
-          fancifyURL,
-          getLinkThemeString,
-          html,
-          language,
-          link,
-          transformMultiline,
-          wikiData,
-        }),
-
-        nav: {
-          linkContainerClasses: ['nav-links-hierarchy'],
-          links: [
-            {toHome: true},
-            {
-              path: ['localized.album', album.directory],
-              title: album.name,
-            },
-            listTag === 'ol' &&
-              {
-                html: language.$('trackPage.nav.track.withNumber', {
-                  number: album.tracks.indexOf(track) + 1,
-                  track: link.track(track, {class: 'current', to}),
-                }),
-              },
-            listTag === 'ul' &&
-              {
-                html: language.$('trackPage.nav.track', {
-                  track: link.track(track, {class: 'current', to}),
-                }),
-              },
-          ].filter(Boolean),
-
-          content: generateAlbumChronologyLinks(album, track, {
-            generateChronologyLinks,
-            html,
-          }),
-
-          bottomRowContent:
-            album.tracks.length > 1 &&
-              generateAlbumNavLinks(album, track, {
-                generateNavigationLinks,
-                html,
-                language,
-              }),
-        },
-
         secondaryNav: generateAlbumSecondaryNav(album, track, {
           getLinkThemeString,
           html,
@@ -777,7 +660,4 @@ export function write(track, {wikiData}) {
       };
     },
   };
-
-  return [data, page];
-}
 */
