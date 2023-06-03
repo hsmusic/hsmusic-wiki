@@ -1,12 +1,8 @@
-import {
-  accumulateSum,
-  empty,
-  filterProperties,
-  unique,
-} from '../../util/sugar.js';
+import {empty, filterProperties, unique} from '../../util/sugar.js';
 
 import {
   chunkByProperties,
+  getTotalDuration,
   sortAlbumsTracksChronologically,
 } from '../../util/wiki-data.js';
 
@@ -113,7 +109,7 @@ export default {
         .map(({album, date, chunk}) => ({
           albumLink: relation('linkAlbum', album),
           date: +date,
-          duration: accumulateSum(chunk.map(track => track.duration)),
+          duration: getTotalDuration(chunk),
           entries: chunk
             .map(entry =>
               filterProperties(entry, [
@@ -248,9 +244,15 @@ export default {
   },
 
   data(artist) {
-    return {
-      name: artist.name,
-    };
+    const data = {};
+
+    data.name = artist.name;
+
+    const allTracks = unique([...artist.tracksAsArtist, ...artist.tracksAsContributor]);
+    data.totalTrackCount = allTracks.length;
+    data.totalDuration = getTotalDuration(allTracks, {originalReleasesOnly: true});
+
+    return data;
   },
 
   generate(data, relations, {html, language}) {
@@ -324,6 +326,17 @@ export default {
                 id: 'tracks',
                 title: language.$('artistPage.trackList.title'),
               }),
+
+            data.totalDuration > 0 &&
+              html.tag('p',
+                language.$('artistPage.contributedDurationLine', {
+                  artist: data.name,
+                  duration:
+                    language.formatDuration(data.totalDuration, {
+                      approximate: data.totalTrackCount > 1,
+                      unit: true,
+                    }),
+                })),
 
             html.tag('dl',
               sec.tracks.chunks.map(({albumLink, date, duration, entries}) => [
@@ -463,8 +476,6 @@ export function write(artist, {wikiData}) {
     thing,
     key,
   });
-
-  const totalDuration = getTotalDuration(allTracks.filter(t => !t.originalReleaseTrack));
 
   const countGroups = (things) => {
     const usedGroups = things.flatMap(
@@ -729,19 +740,6 @@ export function write(artist, {wikiData}) {
                 html.tag('h2',
                   {id: 'tracks', class: ['content-heading']},
                   language.$('artistPage.trackList.title')),
-
-                totalDuration > 0 &&
-                  html.tag('p',
-                    language.$('artistPage.contributedDurationLine', {
-                      artist: artist.name,
-                      duration: language.formatDuration(
-                        totalDuration,
-                        {
-                          approximate: true,
-                          unit: true,
-                        }
-                      ),
-                    })),
 
                 !empty(musicGroups) &&
                   html.tag('p',
