@@ -524,13 +524,6 @@ export function write(artist, {wikiData}) {
 
   const {name, urls, contextNotes} = artist;
 
-  const getArtistsAndContrib = (thing, key) => ({
-    artists: thing[key]?.filter(({who}) => who !== artist),
-    contrib: thing[key]?.find(({who}) => who === artist),
-    thing,
-    key,
-  });
-
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
     flashes = sortChronologically(artist.flashesAsContributor.slice());
@@ -553,66 +546,6 @@ export function write(artist, {wikiData}) {
       dateLast: chunk[chunk.length - 1].date,
     }));
   }
-
-  const unbound_generateTrackList = (chunks, {
-    getArtistString,
-    html,
-    language,
-    link,
-  }) =>
-    html.tag('dl',
-      chunks.flatMap(({date, album, chunk, duration}) => [
-        html.tag('dt',
-          date && duration ?
-            language.$('artistPage.creditList.album.withDate.withDuration', {
-              album: link.album(album),
-              date: language.formatDate(date),
-              duration: language.formatDuration(duration, {
-                approximate: true,
-              }),
-            }) :
-
-          date ?
-            language.$('artistPage.creditList.album.withDate', {
-              album: link.album(album),
-              date: language.formatDate(date),
-            }) :
-
-          duration ?
-            language.$('artistPage.creditList.album.withDuration', {
-              album: link.album(album),
-              duration: language.formatDuration(duration, {
-                approximate: true,
-              }),
-            }) :
-
-          language.$('artistPage.creditList.album', {
-            album: link.album(album),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            chunk
-              .map(({track, ...props}) => ({
-                original: track.originalReleaseTrack,
-                entry: language.$('artistPage.creditList.entry.track.withDuration', {
-                  track: link.track(track),
-                  duration: language.formatDuration(track.duration ?? 0),
-                }),
-                ...props,
-              }))
-              .map(({original, ...opts}) =>
-                html.tag('li',
-                  {class: original && 'rerelease'},
-                  generateEntryAccents({
-                    getArtistString,
-                    language,
-                    original,
-                    ...opts,
-                  })
-                )
-              ))),
-      ]));
 
   const unbound_serializeArtistsAndContrib =
     (key, {serializeContribs, serializeLink}) =>
@@ -775,17 +708,6 @@ export function write(artist, {wikiData}) {
                 })),
 
             ...html.fragment(
-              !empty(allTracks) && [
-                html.tag('h2',
-                  {id: 'tracks', class: ['content-heading']},
-                  language.$('artistPage.trackList.title')),
-
-                generateTrackList(trackListChunks),
-              ]),
-
-            <art things>
-
-            ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
               !empty(flashes) && [
                 html.tag('h2',
@@ -827,8 +749,6 @@ export function write(artist, {wikiData}) {
                           .map(row => html.tag('li', row)))),
                   ])),
               ]),
-
-            <commentary>
           ],
         },
       };
