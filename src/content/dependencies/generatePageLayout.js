@@ -2,6 +2,7 @@ import {empty, openAggregate} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateColorStyleRules',
     'generateFooterLocalizationLinks',
     'generateStickyHeadingContainer',
     'transformContent',
@@ -19,6 +20,7 @@ export default {
   sprawl({wikiInfo}) {
     return {
       footerContent: wikiInfo.footerContent,
+      wikiColor: wikiInfo.color,
       wikiName: wikiInfo.nameShort,
     };
   },
@@ -40,6 +42,9 @@ export default {
 
     relations.defaultFooterContent =
       relation('transformContent', sprawl.footerContent);
+
+    relations.defaultColorStyleRules =
+      relation('generateColorStyleRules', sprawl.wikiColor);
 
     return relations;
   },
@@ -100,7 +105,12 @@ export default {
 
         socialEmbed: {type: 'html'},
 
-        styleRules: {
+        colorStyleRules: {
+          validate: v => v.arrayOf(v.isString),
+          default: [],
+        },
+
+        additionalStyleRules: {
           validate: v => v.arrayOf(v.isString),
           default: [],
         },
@@ -456,9 +466,12 @@ export default {
                   href: to('shared.staticFile', `site4.css?${cachebust}`),
                 }),
 
-                html.tag('style',
-                  {[html.onlyIfContent]: true},
-                  slots.styleRules),
+                html.tag('style', [
+                  (empty(slots.colorStyleRules)
+                    ? relations.defaultColorStyleRules
+                    : slots.colorStyleRules),
+                  slots.additionalStyleRules,
+                ]),
 
                 html.tag('script', {
                   src: to('shared.staticFile', `lazy-loading.js?${cachebust}`),

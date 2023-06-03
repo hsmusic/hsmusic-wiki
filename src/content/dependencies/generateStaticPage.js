@@ -21,7 +21,10 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        styleRules: [data.stylesheet].filter(Boolean),
+        additionalStyleRules:
+          (data.stylesheet
+            ? [data.stylesheet]
+            : []),
 
         mainClasses: ['long-content'],
         mainContent: relations.content,

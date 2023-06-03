@@ -79,10 +79,8 @@ export default {
         title: language.$('trackPage.title', {track: data.name}),
         headingMode: 'sticky',
 
-        styleRules: [
-          relations.albumStyleRules,
-          relations.colorStyleRules,
-        ],
+        colorStyleRules: [relations.colorStyleRules],
+        additionalStyleRules: [relations.albumStyleRules],
 
         cover: relations.content.cover,
         mainContent: relations.content.main.content,

@@ -239,8 +239,6 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        styleRules: [data.stylesheet].filter(Boolean),
-
         mainClasses: ['long-content'],
         mainContent: [
           sec.artworks && [
