@@ -740,13 +740,6 @@ export function write(artist, {wikiData}) {
             <commentary>
           ],
         },
-
-        nav: generateNavForArtist(artist, false, hasGallery, {
-          generateInfoGalleryLinks,
-          link,
-          language,
-          wikiData,
-        }),
       };
     },
   };
@@ -793,57 +786,10 @@ export function write(artist, {wikiData}) {
             })),
         ],
       },
-
-      nav: generateNavForArtist(artist, true, hasGallery, {
-        generateInfoGalleryLinks,
-        link,
-        language,
-        wikiData,
-      }),
     }),
   };
 
   return [data, infoPage, galleryPage].filter(Boolean);
-}
-
-// Utility functions
-
-function generateNavForArtist(artist, isGallery, hasGallery, {
-  generateInfoGalleryLinks,
-  language,
-  link,
-  wikiData,
-}) {
-  const {wikiInfo} = wikiData;
-
-  const infoGalleryLinks =
-    hasGallery &&
-    generateInfoGalleryLinks(artist, isGallery, {
-      link,
-      language,
-      linkKeyGallery: 'artistGallery',
-      linkKeyInfo: 'artist',
-    });
-
-  return {
-    linkContainerClasses: ['nav-links-hierarchy'],
-    links: [
-      {toHome: true},
-      wikiInfo.enableListings && {
-        path: ['localized.listingIndex'],
-        title: language.$('listingIndex.title'),
-      },
-      {
-        html: language.$('artistPage.nav.artist', {
-          artist: link.artist(artist, {class: 'current'}),
-        }),
-      },
-      hasGallery && {
-        divider: false,
-        html: `(${infoGalleryLinks})`,
-      },
-    ],
-  };
 }
 
 */
