@@ -17,6 +17,9 @@ export default {
   relations(relation, sprawl, artist) {
     const relations = {};
 
+    relations.artistMainLink =
+      relation('linkArtist', artist);
+
     relations.artistInfoLink =
       relation('linkArtist', artist);
 
@@ -81,12 +84,20 @@ export default {
 
         return [
           {auto: 'home'},
+
           data.enableListings &&
             {
               path: ['localized.listingIndex'],
               title: language.$('listingIndex.title'),
             },
-          {auto: 'current', accent},
+
+          {
+            accent,
+            html:
+              language.$('artistPage.nav.artist', {
+                artist: relations.artistMainLink,
+              }),
+          },
         ];
       },
     });
