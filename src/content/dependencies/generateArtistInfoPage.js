@@ -14,6 +14,7 @@ export default {
     'linkAlbum',
     'linkArtist',
     'linkArtistGallery',
+    'linkGroup',
     'linkTrack',
   ],
 
@@ -80,6 +81,33 @@ export default {
       entries.splice(0, entries.length, ...outputArrays.flat());
     };
 
+    const getGroupInfo = (entries) => {
+      const allGroups = new Set();
+      const groupToDuration = new Map();
+      const groupToCount = new Map();
+
+      for (const entry of entries) {
+        for (const group of entry.album.groups) {
+          allGroups.add(group);
+          groupToCount.set(group, (groupToCount.get(group) ?? 0) + 1);
+          groupToDuration.set(group, (groupToDuration.get(group) ?? 0) + entry.duration ?? 0);
+        }
+      }
+
+      const groupInfo =
+        Array.from(allGroups)
+          .map(group => ({
+            groupLink: relation('linkGroup', group),
+            duration: groupToDuration.get(group) ?? 0,
+            count: groupToCount.get(group),
+          }));
+
+      groupInfo.sort((a, b) => b.count - a.count);
+      groupInfo.sort((a, b) => b.duration - a.duration);
+
+      return groupInfo;
+    };
+
     const trackContributionEntries = [
       ...artist.tracksAsArtist.map(track => ({
         date: track.date,
@@ -121,10 +149,16 @@ export default {
               ])),
         }));
 
+    const trackGroupInfo = getGroupInfo(trackContributionEntries, 'duration');
+
     if (!empty(trackContributionChunks)) {
       const tracks = sections.tracks = {};
       tracks.heading = relation('generateContentHeading');
       tracks.chunks = trackContributionChunks;
+
+      if (!empty(trackGroupInfo)) {
+        tracks.groupInfo = trackGroupInfo;
+      }
     }
 
     // TODO: Add and integrate wallpaper and banner date fields (#90)
@@ -182,6 +216,8 @@ export default {
               ])),
         }));
 
+    const artGroupInfo = getGroupInfo(artContributionEntries, 'count');
+
     if (!empty(artContributionChunks)) {
       const artworks = sections.artworks = {};
       artworks.heading = relation('generateContentHeading');
@@ -193,6 +229,10 @@ export default {
       ) {
         artworks.artistGalleryLink =
           relation('linkArtistGallery', artist);
+      }
+
+      if (!empty(artGroupInfo)) {
+        artworks.groupInfo = artGroupInfo;
       }
     }
 
@@ -338,6 +378,23 @@ export default {
                     }),
                 })),
 
+            sec.tracks.groupInfo &&
+              html.tag('p',
+                language.$('artistPage.musicGroupsLine', {
+                  groups:
+                    language.formatUnitList(
+                      sec.tracks.groupInfo.map(({groupLink, count, duration}) =>
+                        (duration
+                          ? language.$('artistPage.groupsLine.item.withDuration', {
+                              group: groupLink,
+                              duration: language.formatDuration(duration, {approximate: count > 1}),
+                            })
+                          : language.$('artistPage.groupsLine.item.withCount', {
+                              group: groupLink,
+                              count: language.countContributions(count),
+                            })))),
+                })),
+
             html.tag('dl',
               sec.tracks.chunks.map(({albumLink, date, duration, entries}) => [
                 html.tag('dt',
@@ -379,21 +436,18 @@ export default {
                   }),
                 })),
 
-            /*
-            !empty(artGroups) &&
+            sec.artworks.groupInfo &&
               html.tag('p',
                 language.$('artistPage.artGroupsLine', {
-                groups: language.formatUnitList(
-                  artGroups.map(({groupLink, numContributions}) =>
-                    language.$('artistPage.groupsLine.item', {
-                      group: groupLink,
-                      contributions:
-                        language.countContributions(numContributions),
-                    })
-                  )
-                ),
-              })),
-            */
+                  groups:
+                    language.formatUnitList(
+                      sec.artworks.groupInfo.map(({groupLink, count}) =>
+                        language.$('artistPage.groupsLine.item.withCount', {
+                          group: groupLink,
+                          count:
+                            language.countContributions(count),
+                        }))),
+                })),
 
             html.tag('dl',
               sec.artworks.chunks.map(({albumLink, date, entries}) => [
@@ -476,21 +530,6 @@ export function write(artist, {wikiData}) {
     thing,
     key,
   });
-
-  const countGroups = (things) => {
-    const usedGroups = things.flatMap(
-      (thing) => thing.groups || thing.album?.groups || []);
-    return groupData
-      .map((group) => ({
-        group,
-        contributions: usedGroups.filter(g => g === group).length,
-      }))
-      .filter(({contributions}) => contributions > 0)
-      .sort((a, b) => b.contributions - a.contributions);
-  };
-
-  const musicGroups = countGroups(allTracks);
-  const artGroups = countGroups(artThingsAll);
 
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
@@ -740,22 +779,6 @@ export function write(artist, {wikiData}) {
                 html.tag('h2',
                   {id: 'tracks', class: ['content-heading']},
                   language.$('artistPage.trackList.title')),
-
-                !empty(musicGroups) &&
-                  html.tag('p',
-                    language.$('artistPage.musicGroupsLine', {
-                      groups: language.formatUnitList(
-                        musicGroups.map(({group, contributions}) =>
-                          language.$('artistPage.groupsLine.item', {
-                            group: link.groupInfo(group),
-                            contributions:
-                              language.countContributions(
-                                contributions
-                              ),
-                          })
-                        )
-                      ),
-                    })),
 
                 generateTrackList(trackListChunks),
               ]),
