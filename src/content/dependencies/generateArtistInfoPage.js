@@ -64,19 +64,19 @@ export default {
       sortFunction(things);
 
       const outputArrays = [];
-      const thingToOutputArray = [];
+      const thingToOutputArray = new Map();
 
       for (const thing of things) {
         const array = [];
-        thingToOutputArray[thing] = array;
+        thingToOutputArray.set(thing, array);
         outputArrays.push(array);
       }
 
       for (const entry of entries) {
-        thingToOutputArray[entry.thing].push(entry);
+        thingToOutputArray.get(entry.thing).push(entry);
       }
 
-      return outputArrays.flat();
+      entries.splice(0, entries.length, ...outputArrays.flat());
     };
 
     // TODO: Add and integrate wallpaper and banner date fields (#90)
