@@ -11,6 +11,7 @@ export default {
     'generateColorStyleRules',
     'generatePageLayout',
     'linkAlbum',
+    'linkArtist',
     'linkTrack',
   ],
 

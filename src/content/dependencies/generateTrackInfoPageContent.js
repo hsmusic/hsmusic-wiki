@@ -13,6 +13,7 @@ export default {
     'linkContribution',
     'linkExternal',
     'linkTrack',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],

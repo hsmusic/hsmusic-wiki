@@ -3,7 +3,7 @@ import {empty} from '../../util/sugar.js';
 import groupTracksByGroup from '../util/groupTracksByGroup.js';
 
 export default {
-  contentDependencies: ['generateTrackList'],
+  contentDependencies: ['generateTrackList', 'linkGroup'],
   extraDependencies: ['html', 'language'],
 
   relations(relation, tracks, groups) {
