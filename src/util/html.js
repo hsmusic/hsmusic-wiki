@@ -73,7 +73,7 @@ export function isHTML(value) {
     return true;
   }
 
-  if (value === null || value === undefined) {
+  if (value === null || value === undefined || value === false) {
     return true;
   }
 
