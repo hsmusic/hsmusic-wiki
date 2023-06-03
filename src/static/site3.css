@@ -3,13 +3,7 @@
  * no need to re-run upd8.js when tweaking values here. Handy!
  */
 
-:root {
-  --primary-color: #0088ff;
-}
-
-/* Layout - Common
- *
- */
+/* Layout - Common */
 
 body {
   margin: 10px;

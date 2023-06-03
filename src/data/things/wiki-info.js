@@ -2,11 +2,16 @@ import Thing from './thing.js';
 
 import find from '../../util/find.js';
 
+// Running your own wiki? Don't change this here!
+// Set a wiki-specific color in your data directory's wiki-info.yaml file.
+const defaultWikiColor = '#0088ff';
+
 export class WikiInfo extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     Group,
 
     validators: {
+      isColor,
       isLanguageCode,
       isName,
       isURL,
@@ -27,7 +32,10 @@ export class WikiInfo extends Thing {
       },
     },
 
-    color: Thing.common.color(),
+    color: ({
+      flags: {update: true, expose: true},
+      update: {validate: isColor, default: defaultWikiColor},
+    }),
 
     // One-line description used for <meta rel="description"> tag.
     description: Thing.common.simpleString(),
