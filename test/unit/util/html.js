@@ -873,6 +873,13 @@ t.test(`Template - slot value errors`, t => {
         html.tag('span'),
         html.template({content: () => 'dog'}),
         html.blank(),
+        false && 'dogs',
+        null,
+        undefined,
+        html.tags([
+          html.tag('span', 'usual'),
+          html.tag('span', 'i'),
+        ]),
       ],
     }),
     new AggregateError([
