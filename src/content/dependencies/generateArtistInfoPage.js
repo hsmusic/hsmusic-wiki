@@ -1,4 +1,9 @@
-import {empty, filterProperties, unique} from '../../util/sugar.js';
+import {
+  accumulateSum,
+  empty,
+  filterProperties,
+  unique,
+} from '../../util/sugar.js';
 
 import {
   chunkByProperties,
@@ -78,6 +83,53 @@ export default {
 
       entries.splice(0, entries.length, ...outputArrays.flat());
     };
+
+    const trackContributionEntries = [
+      ...artist.tracksAsArtist.map(track => ({
+        date: track.date,
+        thing: track,
+        album: track.album,
+        duration: track.duration,
+        rerelease: track.originalReleaseTrack !== null,
+        trackLink: relation('linkTrack', track),
+        ...processContribs(track.artistContribs),
+      })),
+
+      ...artist.tracksAsContributor.map(track => ({
+        date: track.date,
+        thing: track,
+        album: track.album,
+        duration: track.duration,
+        rerelease: track.originalReleaseTrack !== null,
+        trackLink: relation('linkTrack', track),
+        ...processContribs(track.contributorContribs),
+      })),
+    ];
+
+    sortContributionEntries(trackContributionEntries, sortAlbumsTracksChronologically);
+
+    const trackContributionChunks =
+      chunkByProperties(trackContributionEntries, ['album', 'date'])
+        .map(({album, date, chunk}) => ({
+          albumLink: relation('linkAlbum', album),
+          date: +date,
+          duration: accumulateSum(chunk.map(track => track.duration)),
+          entries: chunk
+            .map(entry =>
+              filterProperties(entry, [
+                'contributionDescriptions',
+                'duration',
+                'otherArtistLinks',
+                'rerelease',
+                'trackLink',
+              ])),
+        }));
+
+    if (!empty(trackContributionChunks)) {
+      const tracks = sections.tracks = {};
+      tracks.heading = relation('generateContentHeading');
+      tracks.chunks = trackContributionChunks;
+    }
 
     // TODO: Add and integrate wallpaper and banner date fields (#90)
     const artContributionEntries = [
@@ -234,6 +286,30 @@ export default {
       return language.formatString(parts.join('.'), options);
     };
 
+    const addAccentsToAlbumLink = ({
+      albumLink,
+      date,
+      duration,
+      entries,
+    }) => {
+      const options = {album: albumLink};
+      const parts = ['artistPage.creditList.album'];
+
+      if (date) {
+        parts.push('withDate');
+        options.date = language.formatDate(new Date(date));
+      }
+
+      if (duration) {
+        parts.push('withDuration');
+        options.duration = language.formatDuration(duration, {
+          approximate: entries.length > 1,
+        });
+      }
+
+      return language.formatString(parts.join('.'), options);
+    };
+
     return relations.layout
       .slots({
         title: data.name,
@@ -241,6 +317,39 @@ export default {
 
         mainClasses: ['long-content'],
         mainContent: [
+          sec.tracks && [
+            sec.tracks.heading
+              .slots({
+                tag: 'h2',
+                id: 'tracks',
+                title: language.$('artistPage.trackList.title'),
+              }),
+
+            html.tag('dl',
+              sec.tracks.chunks.map(({albumLink, date, duration, entries}) => [
+                html.tag('dt',
+                  addAccentsToAlbumLink({albumLink, date, duration, entries})),
+
+                html.tag('dd',
+                  html.tag('ul',
+                    entries
+                      .map(({trackLink, duration, ...properties}) => ({
+                        entry:
+                          (duration
+                            ? language.$('artistPage.creditList.entry.track.withDuration', {
+                                track: trackLink,
+                                duration: language.formatDuration(duration),
+                              })
+                            : language.$('artistPage.creditList.entry.track', {
+                                track: trackLink,
+                              })),
+                        ...properties,
+                      }))
+                      .map(addAccentsToEntry)
+                      .map(entry => html.tag('li', entry)))),
+              ])),
+          ],
+
           sec.artworks && [
             sec.artworks.heading
               .slots({
@@ -276,10 +385,7 @@ export default {
             html.tag('dl',
               sec.artworks.chunks.map(({albumLink, date, entries}) => [
                 html.tag('dt',
-                  language.$('artistPage.creditList.album.withDate', {
-                    album: albumLink,
-                    date: language.formatDate(new Date(date)),
-                  })),
+                  addAccentsToAlbumLink({albumLink, date, entries})),
 
                 html.tag('dd',
                   html.tag('ul',
@@ -358,40 +464,6 @@ export function write(artist, {wikiData}) {
     key,
   });
 
-  const allTracks = sortAlbumsTracksChronologically(
-    unique([
-      ...(artist.tracksAsArtist ?? []),
-      ...(artist.tracksAsContributor ?? []),
-    ]));
-
-  const chunkTracks = (tracks) =>
-    chunkByProperties(
-      tracks.map((track) => ({
-        track,
-        date: +track.date,
-        album: track.album,
-        duration: track.duration,
-        originalReleaseTrack: track.originalReleaseTrack,
-        artists: track.artistContribs.some(({who}) => who === artist)
-          ? track.artistContribs.filter(({who}) => who !== artist)
-          : track.contributorContribs.filter(({who}) => who !== artist),
-        contrib: {
-          who: artist,
-          whatArray: [
-            track.artistContribs.find(({who}) => who === artist)?.what,
-            track.contributorContribs.find(({who}) => who === artist)?.what,
-          ].filter(Boolean),
-        },
-      })),
-      ['date', 'album'])
-    .map(({date, album, chunk}) => ({
-      date,
-      album,
-      chunk,
-      duration: getTotalDuration(chunk, {originalReleasesOnly: true}),
-    }));
-
-  const trackListChunks = chunkTracks(allTracks);
   const totalDuration = getTotalDuration(allTracks.filter(t => !t.originalReleaseTrack));
 
   const countGroups = (things) => {
