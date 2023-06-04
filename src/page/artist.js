@@ -2,6 +2,8 @@
 //
 // NB: See artist-alias.js for artist alias redirect pages.
 
+import {empty} from '../util/sugar.js';
+
 export const description = `per-artist info & artwork gallery pages`;
 
 export function targets({wikiData}) {
@@ -9,6 +11,10 @@ export function targets({wikiData}) {
 }
 
 export function pathsForTarget(artist) {
+  const hasGalleryPage =
+    !empty(artist.tracksAsCoverArtist) ||
+    !empty(artist.albumsAsCoverArtist);
+
   return [
     {
       type: 'page',
@@ -16,6 +22,16 @@ export function pathsForTarget(artist) {
 
       contentFunction: {
         name: 'generateArtistInfoPage',
+        args: [artist],
+      },
+    },
+
+    hasGalleryPage && {
+      type: 'page',
+      path: ['artistGallery', artist.directory],
+
+      contentFunction: {
+        name: 'generateArtistGalleryPage',
         args: [artist],
       },
     },
