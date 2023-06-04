@@ -4,6 +4,7 @@ import {
   chunkByProperties,
   getTotalDuration,
   sortAlbumsTracksChronologically,
+  sortFlashesChronologically,
 } from '../../util/wiki-data.js';
 
 export default {
@@ -15,14 +16,21 @@ export default {
     'linkArtist',
     'linkArtistGallery',
     'linkExternal',
+    'linkFlash',
     'linkGroup',
     'linkTrack',
     'transformContent',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html', 'language', 'wikiData'],
 
-  relations(relation, artist) {
+  sprawl({wikiInfo}) {
+    return {
+      enableFlashesAndGames: wikiInfo.enableFlashesAndGames,
+    };
+  },
+
+  relations(relation, sprawl, artist) {
     const relations = {};
     const sections = relations.sections = {};
 
@@ -32,9 +40,7 @@ export default {
     relations.artistNavLinks =
       relation('generateArtistNavLinks', artist);
 
-    const processContribs = (...contribArrays) => {
-      const properties = {};
-
+    function getContributionDescriptions(...contribArrays) {
       const ownContribs =
         contribArrays
           .map(contribs => contribs.find(({who}) => who === artist))
@@ -45,25 +51,31 @@ export default {
           .map(({what}) => what)
           .filter(Boolean);
 
-      if (!empty(contributionDescriptions)) {
-        properties.contributionDescriptions = contributionDescriptions;
+      if (empty(contributionDescriptions)) {
+        return {};
       }
 
+      return {contributionDescriptions};
+    }
+
+    function getOtherArtistLinks(...contribArrays) {
       const otherArtistContribs =
         contribArrays
           .map(contribs => contribs.filter(({who}) => who !== artist))
           .flat();
 
-      if (!empty(otherArtistContribs)) {
-        properties.otherArtistLinks =
-          otherArtistContribs
-            .map(({who}) => relation('linkArtist', who));
+      if (empty(otherArtistContribs)) {
+        return {};
       }
 
-      return properties;
-    };
+      const otherArtistLinks =
+        otherArtistContribs
+          .map(({who}) => relation('linkArtist', who));
 
-    const sortContributionEntries = (entries, sortFunction) => {
+      return {otherArtistLinks};
+    }
+
+    function sortContributionEntries(entries, sortFunction) {
       const things = unique(entries.map(({thing}) => thing));
       sortFunction(things);
 
@@ -81,9 +93,9 @@ export default {
       }
 
       entries.splice(0, entries.length, ...outputArrays.flat());
-    };
+    }
 
-    const getGroupInfo = (entries) => {
+    function getGroupInfo(entries) {
       const allGroups = new Set();
       const groupToDuration = new Map();
       const groupToCount = new Map();
@@ -108,7 +120,7 @@ export default {
       groupInfo.sort((a, b) => b.duration - a.duration);
 
       return groupInfo;
-    };
+    }
 
     if (artist.contextNotes) {
       const contextNotes = sections.contextNotes = {};
@@ -130,7 +142,8 @@ export default {
         duration: track.duration,
         rerelease: track.originalReleaseTrack !== null,
         trackLink: relation('linkTrack', track),
-        ...processContribs(track.artistContribs),
+        ...getContributionDescriptions(track.artistContribs),
+        ...getOtherArtistLinks(track.artistContribs),
       })),
 
       ...artist.tracksAsContributor.map(track => ({
@@ -140,7 +153,8 @@ export default {
         duration: track.duration,
         rerelease: track.originalReleaseTrack !== null,
         trackLink: relation('linkTrack', track),
-        ...processContribs(track.contributorContribs),
+        ...getContributionDescriptions(track.contributorContribs),
+        ...getOtherArtistLinks(track.contributorContribs),
       })),
     ];
 
@@ -182,7 +196,8 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        ...processContribs(album.coverArtistContribs),
+        ...getContributionDescriptions(album.coverArtistContribs),
+        ...getOtherArtistLinks(album.coverArtistContribs),
       })),
 
       ...artist.albumsAsWallpaperArtist.map(album => ({
@@ -190,7 +205,8 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        ...processContribs(album.wallpaperArtistContribs),
+        ...getContributionDescriptions(album.wallpaperArtistContribs),
+        ...getOtherArtistLinks(album.wallpaperArtistContribs),
       })),
 
       ...artist.albumsAsBannerArtist.map(album => ({
@@ -198,7 +214,8 @@ export default {
         date: album.coverArtDate,
         thing: album,
         album: album,
-        ...processContribs(album.bannerArtistContribs),
+        ...getContributionDescriptions(album.bannerArtistContribs),
+        ...getOtherArtistLinks(album.bannerArtistContribs),
       })),
 
       ...artist.tracksAsCoverArtist.map(track => ({
@@ -208,7 +225,8 @@ export default {
         album: track.album,
         rerelease: track.originalReleaseTrack !== null,
         trackLink: relation('linkTrack', track),
-        ...processContribs(track.coverArtistContribs),
+        ...getContributionDescriptions(track.coverArtistContribs),
+        ...getOtherArtistLinks(track.coverArtistContribs),
       })),
     ];
 
@@ -247,6 +265,47 @@ export default {
 
       if (!empty(artGroupInfo)) {
         artworks.groupInfo = artGroupInfo;
+      }
+    }
+
+    // Flashes and games can list multiple contributors as collaborative
+    // credits, but we don't display these on the artist page, since they
+    // usually involve many artists crediting a larger team where collaboration
+    // isn't as relevant (without more particular details that aren't tracked
+    // on the wiki).
+
+    if (sprawl.enableFlashesAndGames) {
+      const flashEntries = [
+        ...artist.flashesAsContributor.map(flash => ({
+          date: +flash.date,
+          thing: flash,
+          act: flash.act,
+          flashLink: relation('linkFlash', flash),
+          ...getContributionDescriptions(flash.contributorContribs),
+        })),
+      ];
+
+      sortContributionEntries(flashEntries, sortFlashesChronologically);
+
+      const flashChunks =
+        chunkByProperties(flashEntries, ['act'])
+          .map(({act, chunk}) => ({
+            actName: act.name,
+            actLink: relation('linkFlash', chunk[0].thing),
+            dateFirst: +chunk[0].date,
+            dateLast: +chunk[chunk.length - 1].date,
+            entries:
+              chunk.map(entry =>
+                filterProperties(entry, [
+                  'contributionDescriptions',
+                  'flashLink',
+                ])),
+          }));
+
+      if (!empty(flashChunks)) {
+        const flashes = sections.flashes = {};
+        flashes.heading = relation('generateContentHeading');
+        flashes.chunks = flashChunks;
       }
     }
 
@@ -297,7 +356,7 @@ export default {
     return relations;
   },
 
-  data(artist) {
+  data(sprawl, artist) {
     const data = {};
 
     data.name = artist.name;
@@ -312,12 +371,12 @@ export default {
   generate(data, relations, {html, language}) {
     const {sections: sec} = relations;
 
-    const addAccentsToEntry = ({
+    function addAccentsToEntry({
       rerelease,
       entry,
       otherArtistLinks,
       contributionDescriptions,
-    }) => {
+    }) {
       if (rerelease) {
         return language.$('artistPage.creditList.entry.rerelease', {entry});
       }
@@ -340,14 +399,14 @@ export default {
       }
 
       return language.formatString(parts.join('.'), options);
-    };
+    }
 
-    const addAccentsToAlbumLink = ({
+    function addAccentsToAlbumLink({
       albumLink,
       date,
       duration,
       entries,
-    }) => {
+    }) {
       const options = {album: albumLink};
       const parts = ['artistPage.creditList.album'];
 
@@ -364,7 +423,7 @@ export default {
       }
 
       return language.formatString(parts.join('.'), options);
-    };
+    }
 
     return relations.layout
       .slots({
@@ -537,6 +596,42 @@ export default {
               ])),
           ],
 
+          sec.flashes && [
+            sec.flashes.heading
+              .slots({
+                tag: 'h2',
+                id: 'flashes',
+                title: language.$('artistPage.flashList.title'),
+              }),
+
+            html.tag('dl',
+              sec.flashes.chunks.map(({
+                actName,
+                actLink,
+                entries,
+                dateFirst,
+                dateLast,
+              }) => [
+                html.tag('dt',
+                  language.$('artistPage.creditList.flashAct.withDateRange', {
+                    act: actLink.slot('content', actName),
+                    dateRange: language.formatDateRange(dateFirst, dateLast),
+                  })),
+
+                html.tag('dd',
+                  html.tag('ul',
+                    entries
+                      .map(({flashLink, ...properties}) => ({
+                        ...properties,
+                        entry: language.$('artistPage.creditList.entry.flash', {
+                          flash: flashLink,
+                        }),
+                      }))
+                      .map(addAccentsToEntry)
+                      .map(row => html.tag('li', row)))),
+              ])),
+          ],
+
           sec.commentary && [
             sec.commentary.heading
               .slots({
@@ -706,55 +801,6 @@ export function write(artist, {wikiData}) {
         cover: artist.hasAvatar && {
           src: getArtistAvatar(artist),
           alt: language.$('misc.alt.artistAvatar'),
-        },
-
-        main: {
-          headingMode: 'sticky',
-
-          content: [
-            ...html.fragment(
-              wikiInfo.enableFlashesAndGames &&
-              !empty(flashes) && [
-                html.tag('h2',
-                  {id: 'flashes', class: ['content-heading']},
-                  language.$('artistPage.flashList.title')),
-
-                html.tag('dl',
-                  flashListChunks.flatMap(({
-                    act,
-                    chunk,
-                    dateFirst,
-                    dateLast,
-                  }) => [
-                    html.tag('dt',
-                      language.$('artistPage.creditList.flashAct.withDateRange', {
-                        act: link.flash(chunk[0].flash, {
-                          text: act.name,
-                        }),
-                        dateRange: language.formatDateRange(
-                          dateFirst,
-                          dateLast
-                        ),
-                      })),
-
-                    html.tag('dd',
-                      html.tag('ul',
-                        chunk
-                          .map(({flash, ...props}) => ({
-                            ...props,
-                            entry: language.$('artistPage.creditList.entry.flash', {
-                              flash: link.flash(flash),
-                            }),
-                          }))
-                          .map(opts => generateEntryAccents({
-                            getArtistString,
-                            language,
-                            ...opts,
-                          }))
-                          .map(row => html.tag('li', row)))),
-                  ])),
-              ]),
-          ],
         },
       };
     },
