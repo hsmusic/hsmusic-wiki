@@ -138,7 +138,7 @@
   "releaseInfo.midiProjectFiles.shortcut": "Download {LINK}.",
   "releaseInfo.midiProjectFiles.shortcut.link": "MIDI/project files",
   "releaseInfo.midiProjectFiles.heading": "Download MIDI/project files:",
-  "releaseInfo.note": "Note:",
+  "releaseInfo.note": "Context notes:",
   "trackList.section.withDuration": "{SECTION} ({DURATION}):",
   "trackList.group": "From {GROUP}:",
   "trackList.group.fromOther": "From somewhere else:",

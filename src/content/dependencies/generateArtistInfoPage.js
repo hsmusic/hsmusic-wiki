@@ -14,8 +14,10 @@ export default {
     'linkAlbum',
     'linkArtist',
     'linkArtistGallery',
+    'linkExternal',
     'linkGroup',
     'linkTrack',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -107,6 +109,18 @@ export default {
 
       return groupInfo;
     };
+
+    if (artist.contextNotes) {
+      const contextNotes = sections.contextNotes = {};
+      contextNotes.content = relation('transformContent', artist.contextNotes);
+    }
+
+    if (!empty(artist.urls)) {
+      const visit = sections.visit = {};
+      visit.externalLinks =
+        artist.urls.map(url =>
+          relation('linkExternal', url));
+    }
 
     const trackContributionEntries = [
       ...artist.tracksAsArtist.map(track => ({
@@ -359,6 +373,18 @@ export default {
 
         mainClasses: ['long-content'],
         mainContent: [
+          sec.contextNotes && [
+            html.tag('p', language.$('releaseInfo.note')),
+            html.tag('blockquote',
+              sec.contextNotes.content),
+          ],
+
+          sec.visit &&
+            html.tag('p',
+              language.$('releaseInfo.visitOn', {
+                links: language.formatDisjunctionList(sec.visit.externalLinks),
+              })),
+
           sec.tracks && [
             sec.tracks.heading
               .slots({
@@ -522,8 +548,6 @@ export default {
 export function write(artist, {wikiData}) {
   const {groupData, wikiInfo} = wikiData;
 
-  const {name, urls, contextNotes} = artist;
-
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
     flashes = sortChronologically(artist.flashesAsContributor.slice());
@@ -653,25 +677,6 @@ export function write(artist, {wikiData}) {
           headingMode: 'sticky',
 
           content: [
-            ...html.fragment(
-              contextNotes && [
-                html.tag('p',
-                  language.$('releaseInfo.note')),
-
-                html.tag('blockquote',
-                  transformMultiline(contextNotes)),
-
-                html.tag('hr'),
-              ]),
-
-            !empty(urls) &&
-              html.tag('p',
-                language.$('releaseInfo.visitOn', {
-                  links: language.formatDisjunctionList(
-                    urls.map((url) => fancifyURL(url, {language}))
-                  ),
-                })),
-
             hasGallery &&
               html.tag('p',
                 language.$('artistPage.viewArtGallery', {
