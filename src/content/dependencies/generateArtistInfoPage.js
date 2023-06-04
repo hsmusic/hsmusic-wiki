@@ -696,33 +696,6 @@ export default {
 };
 
 /*
-
-export function write(artist, {wikiData}) {
-  const {groupData, wikiInfo} = wikiData;
-
-  let flashes, flashListChunks;
-  if (wikiInfo.enableFlashesAndGames) {
-    flashes = sortFlashesChronologically(artist.flashesAsContributor.slice());
-    flashListChunks = chunkByProperties(
-      flashes.map((flash) => ({
-        act: flash.act,
-        flash,
-        date: flash.date,
-        // Manual artists/contrib properties here, 8ecause we don't
-        // want to show the full list of other contri8utors inline.
-        // (It can often 8e very, very large!)
-        artists: [],
-        contrib: flash.contributorContribs.find(({who}) => who === artist),
-      })),
-      ['act']
-    ).map(({act, chunk}) => ({
-      act,
-      chunk,
-      dateFirst: chunk[0].date,
-      dateLast: chunk[chunk.length - 1].date,
-    }));
-  }
-
   const unbound_serializeArtistsAndContrib =
     (key, {serializeContribs, serializeLink}) =>
     (thing) => {
@@ -744,15 +717,6 @@ export function write(artist, {wikiData}) {
         duration: track.duration,
       })),
     }));
-
-  const jumpTo = {
-    tracks: !empty(allTracks),
-    art: !empty(artThingsAll),
-    flashes: wikiInfo.enableFlashesAndGames && !empty(flashes),
-    commentary: !empty(commentaryThings),
-  };
-
-  const showJumpTo = Object.values(jumpTo).includes(true);
 
   const data = {
     type: 'data',
@@ -792,37 +756,6 @@ export function write(artist, {wikiData}) {
           asContributor: artist.tracksAsContributo
             .map(serializeArtistsAndContrib('contributorContribs')),
           chunked: serializeTrackListChunks(trackListChunks),
-        },
-      };
-    },
-  };
-
-  const infoPage = {
-    type: 'page',
-    path: ['artist', artist.directory],
-    page: ({
-      fancifyURL,
-      generateInfoGalleryLinks,
-      getArtistAvatar,
-      getArtistString,
-      html,
-      link,
-      language,
-      transformMultiline,
-    }) => {
-      const generateTrackList = bindOpts(unbound_generateTrackList, {
-        getArtistString,
-        html,
-        language,
-        link,
-      });
-
-      return {
-        title: language.$('artistPage.title', {artist: name}),
-
-        cover: artist.hasAvatar && {
-          src: getArtistAvatar(artist),
-          alt: language.$('misc.alt.artistAvatar'),
         },
       };
     },
@@ -879,8 +812,4 @@ export function write(artist, {wikiData}) {
       },
     }),
   };
-
-  return [data, infoPage, galleryPage].filter(Boolean);
-}
-
 */
