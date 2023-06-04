@@ -11,6 +11,7 @@ export default {
   contentDependencies: [
     'generateArtistNavLinks',
     'generateContentHeading',
+    'generateCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
     'linkArtist',
@@ -120,6 +121,11 @@ export default {
       groupInfo.sort((a, b) => b.duration - a.duration);
 
       return groupInfo;
+    }
+
+    if (artist.hasAvatar) {
+      relations.cover =
+        relation('generateCoverArtwork', []);
     }
 
     if (artist.contextNotes) {
@@ -360,6 +366,11 @@ export default {
     const data = {};
 
     data.name = artist.name;
+    data.directory = artist.directory;
+
+    if (artist.hasAvatar) {
+      data.avatarFileExtension = artist.avatarFileExtension;
+    }
 
     const allTracks = unique([...artist.tracksAsArtist, ...artist.tracksAsContributor]);
     data.totalTrackCount = allTracks.length;
@@ -429,6 +440,17 @@ export default {
       .slots({
         title: data.name,
         headingMode: 'sticky',
+
+        cover:
+          (relations.cover
+            ? relations.cover.slots({
+                path: [
+                  'media.artistAvatar',
+                  data.directory,
+                  data.avatarFileExtension,
+                ],
+              })
+            : null),
 
         mainClasses: ['long-content'],
         mainContent: [
