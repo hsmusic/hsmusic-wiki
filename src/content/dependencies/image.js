@@ -45,6 +45,7 @@ export default {
 
         thumb: {type: 'string'},
 
+        reveal: {type: 'boolean', default: true},
         link: {type: 'boolean', default: false},
         lazy: {type: 'boolean', default: false},
         square: {type: 'boolean', default: false},
@@ -75,7 +76,12 @@ export default {
               : originalSrc);
 
         const willLink = typeof slots.link === 'string' || slots.link;
-        const willReveal = originalSrc && !empty(data.contentWarnings);
+
+        const willReveal =
+          slots.reveal &&
+          originalSrc &&
+          !empty(data.contentWarnings);
+
         const willSquare = slots.square;
 
         const idOnImg = willLink ? null : slots.id;

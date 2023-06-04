@@ -84,6 +84,7 @@ export default {
         additionalStyleRules: [relations.albumStyleRules],
 
         cover: relations.content.cover,
+        coverNeedsReveal: relations.content.coverNeedsReveal,
         mainContent: relations.content.main.content,
 
         navLinkStyle: 'hierarchical',

@@ -245,6 +245,7 @@ export class Track extends Thing {
     },
 
     artistContribs: Thing.common.dynamicInheritContribs(
+      null,
       'artistContribsByRef',
       'artistContribsByRef',
       'albumData',
@@ -254,6 +255,7 @@ export class Track extends Thing {
     contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
     coverArtistContribs: Thing.common.dynamicInheritContribs(
+      'hasCoverArt',
       'coverArtistContribsByRef',
       'trackCoverArtistContribsByRef',
       'albumData',

@@ -87,7 +87,7 @@ import FileSizePreloader from './file-size-preloader.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 19;
+const CACHEBUST = 20;
 
 let COMMIT;
 try {

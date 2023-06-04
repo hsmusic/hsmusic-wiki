@@ -8,6 +8,7 @@ export default {
       slots: {
         title: {type: 'html'},
         cover: {type: 'html'},
+        needsReveal: {type: 'boolean', default: false},
       },
 
       content(slots) {
@@ -26,7 +27,12 @@ export default {
 
               hasCover &&
                 html.tag('div', {class: 'content-sticky-heading-cover-container'},
-                  html.tag('div', {class: 'content-sticky-heading-cover'},
+                  html.tag('div',
+                    {class: [
+                      'content-sticky-heading-cover',
+                      slots.needsReveal &&
+                        'content-sticky-heading-cover-needs-reveal',
+                    ]},
                     slots.cover.slot('displayMode', 'thumbnail')))
             ]),
 

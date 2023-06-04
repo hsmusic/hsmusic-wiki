@@ -24,6 +24,7 @@ import {
   sortAlbumsTracksChronologically,
   sortAlphabetically,
   sortChronologically,
+  sortFlashesChronologically,
 } from '../util/wiki-data.js';
 
 import find, {bindFind} from '../util/find.js';
@@ -1154,6 +1155,7 @@ export function sortWikiDataArrays(wikiData) {
   Object.assign(wikiData, {
     albumData: sortChronologically(wikiData.albumData.slice()),
     trackData: sortAlbumsTracksChronologically(wikiData.trackData.slice()),
+    flashData: sortFlashesChronologically(wikiData.flashData.slice()),
   });
 
   // Re-link data arrays, so that every object has the new, sorted versions.

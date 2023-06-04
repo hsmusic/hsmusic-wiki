@@ -585,7 +585,7 @@ export function write(artist, {wikiData}) {
 
   let flashes, flashListChunks;
   if (wikiInfo.enableFlashesAndGames) {
-    flashes = sortChronologically(artist.flashesAsContributor.slice());
+    flashes = sortFlashesChronologically(artist.flashesAsContributor.slice());
     flashListChunks = chunkByProperties(
       flashes.map((flash) => ({
         act: flash.act,
@@ -759,6 +759,13 @@ export function write(artist, {wikiData}) {
       };
     },
   };
+
+  const artThingsGallery = sortAlbumsTracksChronologically(
+    [
+      ...(artist.albumsAsCoverArtist ?? []),
+      ...(artist.tracksAsCoverArtist ?? []),
+    ],
+    {latestFirst: true, getDate: (o) => o.coverArtDate});
 
   const galleryPage = hasGallery && {
     type: 'page',

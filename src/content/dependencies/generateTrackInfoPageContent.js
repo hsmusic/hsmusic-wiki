@@ -1,5 +1,5 @@
 import {empty} from '../../util/sugar.js';
-import {sortChronologically} from '../../util/wiki-data.js';
+import {sortFlashesChronologically} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
@@ -12,6 +12,7 @@ export default {
     'linkAlbum',
     'linkContribution',
     'linkExternal',
+    'linkFlash',
     'linkTrack',
     'transformContent',
   ],
@@ -32,8 +33,10 @@ export default {
     const sections = relations.sections = {};
 
     const contributionLinksRelation = contribs =>
-      contribs.map(contrib =>
-        relation('linkContribution', contrib.who, contrib.what));
+      contribs
+        .slice(0, 4)
+        .map(contrib =>
+          relation('linkContribution', contrib.who, contrib.what));
 
     const additionalFilesSection = additionalFiles => ({
       heading: relation('generateContentHeading'),
@@ -161,7 +164,7 @@ export default {
 
     if (sprawl.enableFlashesAndGames) {
       const sortedFeatures =
-        sortChronologically(
+        sortFlashesChronologically(
           [track, ...track.otherReleases].flatMap(track =>
             track.featuredInFlashes.map(flash => ({
               // These aren't going to be exposed directly, they're processed
@@ -169,9 +172,8 @@ export default {
               flash, track,
 
               // These properties are only used for the sort.
+              act: flash.act,
               date: flash.date,
-              name: flash.name,
-              directory: flash.directory,
             }))));
 
       if (!empty(sortedFeatures)) {
@@ -250,6 +252,7 @@ export default {
       data.albumCoverArtDirectory = album.directory;
       data.trackCoverArtDirectory = track.directory;
       data.coverArtFileExtension = track.coverArtFileExtension;
+      data.coverNeedsReveal = track.artTags.some(t => t.isContentWarning);
 
       if (track.coverArtDate && +track.coverArtDate !== +track.date) {
         data.coverArtDate = track.coverArtDate;
@@ -257,6 +260,7 @@ export default {
     } else if (track.album.hasCoverArt) {
       data.albumCoverArtDirectory = album.directory;
       data.coverArtFileExtension = album.coverArtFileExtension;
+      data.coverNeedsReveal = album.artTags.some(t => t.isContentWarning);
     }
 
     if (!empty(track.additionalFiles)) {
@@ -291,6 +295,7 @@ export default {
             data.coverArtFileExtension,
           ],
         });
+      content.coverNeedsReveal = data.coverNeedsReveal;
     } else if (data.hasAlbumCoverArt) {
       content.cover = relations.cover
         .slots({
@@ -300,8 +305,10 @@ export default {
             data.coverArtFileExtension,
           ],
         });
+      content.coverNeedsReveal = data.coverNeedsReveal;
     } else {
       content.cover = null;
+      content.coverNeedsReveal = null;
     }
 
     content.main = {

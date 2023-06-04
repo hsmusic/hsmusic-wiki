@@ -51,6 +51,7 @@ export default {
                   alt: slots.alt,
                   thumb: 'medium',
                   id: 'cover-art',
+                  reveal: true,
                   link: true,
                   square: true,
                 }),
@@ -68,6 +69,7 @@ export default {
                 path: slots.path,
                 alt: slots.alt,
                 thumb: 'small',
+                reveal: false,
                 link: false,
                 square: true,
               });
