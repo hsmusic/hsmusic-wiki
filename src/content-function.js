@@ -325,7 +325,7 @@ export function fillRelationsLayoutFromSlotResults(relationIdentifier, results, 
     }
 
     if (object.constructor !== Object) {
-      throw new Error(`Expected primitive, array, relation, or normal {key: value} style Object`);
+      throw new Error(`Expected primitive, array, relation, or normal {key: value} style Object, got constructor ${object.constructor?.name}`);
     }
 
     return Object.fromEntries(
