@@ -385,6 +385,41 @@ export default {
                 links: language.formatDisjunctionList(sec.visit.externalLinks),
               })),
 
+          sec.artworks?.artistGalleryLink &&
+            html.tag('p',
+              language.$('artistPage.viewArtGallery', {
+                link: sec.artworks.artistGalleryLink.slots({
+                  content: language.$('artistPage.viewArtGallery.link'),
+                }),
+              })),
+
+          (sec.tracks || sec.artworsk || sec.flashes || sec.commentary) &&
+            html.tag('p',
+              language.$('misc.jumpTo.withLinks', {
+                links: language.formatUnitList(
+                  [
+                    sec.tracks &&
+                      html.tag('a',
+                        {href: '#tracks'},
+                        language.$('artistPage.trackList.title')),
+
+                    sec.artworks &&
+                      html.tag('a',
+                        {href: '#art'},
+                        language.$('artistPage.artList.title')),
+
+                    sec.flashes &&
+                      html.tag('a',
+                        {href: '#flashes'},
+                        language.$('artistPage.flashList.title')),
+
+                    sec.commentary &&
+                      html.tag('a',
+                        {href: '#commentary'},
+                        language.$('artistPage.commentaryList.title')),
+                  ].filter(Boolean)),
+              })),
+
           sec.tracks && [
             sec.tracks.heading
               .slots({
@@ -677,41 +712,6 @@ export function write(artist, {wikiData}) {
           headingMode: 'sticky',
 
           content: [
-            hasGallery &&
-              html.tag('p',
-                language.$('artistPage.viewArtGallery', {
-                  link: link.artistGallery(artist, {
-                    text: language.$('artistPage.viewArtGallery.link'),
-                  }),
-                })),
-
-            showJumpTo &&
-              html.tag('p',
-                language.$('misc.jumpTo.withLinks', {
-                  links: language.formatUnitList(
-                    [
-                      jumpTo.tracks &&
-                        html.tag('a',
-                          {href: '#tracks'},
-                          language.$('artistPage.trackList.title')),
-
-                      jumpTo.art &&
-                        html.tag('a',
-                          {href: '#art'},
-                          language.$('artistPage.artList.title')),
-
-                      jumpTo.flashes &&
-                        html.tag('a',
-                          {href: '#flashes'},
-                          language.$('artistPage.flashList.title')),
-
-                      jumpTo.commentary &&
-                        html.tag('a',
-                          {href: '#commentary'},
-                          language.$('artistPage.commentaryList.title')),
-                    ].filter(Boolean)),
-                })),
-
             ...html.fragment(
               wikiInfo.enableFlashesAndGames &&
               !empty(flashes) && [
