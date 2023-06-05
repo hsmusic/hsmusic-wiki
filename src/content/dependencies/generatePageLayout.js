@@ -101,6 +101,8 @@ export default {
 
       slots: {
         title: {type: 'html'},
+        showWikiNameInTitle: {type: 'boolean', default: true},
+
         cover: {type: 'html'},
         coverNeedsReveal: {type: 'boolean'},
 
@@ -423,15 +425,15 @@ export default {
               // developersComment,
 
               html.tag('head', [
-                /*
                 html.tag('title',
-                  showWikiNameInTitle
+                  (slots.showWikiNameInTitle
                     ? language.formatString('misc.pageTitle.withWikiName', {
-                        title,
+                        title: slots.title,
                         wikiName: data.wikiName,
                       })
-                    : language.formatString('misc.pageTitle', {title})),
-                */
+                    : language.formatString('misc.pageTitle', {
+                        title: slots.title,
+                      }))),
 
                 html.tag('meta', {charset: 'utf-8'}),
                 html.tag('meta', {
