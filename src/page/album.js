@@ -21,7 +21,6 @@ export function pathsForTarget(album) {
       },
     },
 
-    /*
     hasGalleryPage && {
       type: 'page',
       path: ['albumGallery', album.directory],
@@ -32,6 +31,7 @@ export function pathsForTarget(album) {
       },
     },
 
+    /*
     hasCommentaryPage && {
       type: 'page',
       path: ['albumCommentary', album.directory],
