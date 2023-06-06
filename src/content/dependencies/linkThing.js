@@ -45,6 +45,8 @@ export default {
           default: true,
         },
 
+        anchor: {type: 'boolean', default: false},
+
         attributes: relations.linkTemplate.getSlotDescription('attributes'),
         hash: relations.linkTemplate.getSlotDescription('hash'),
       },
@@ -77,7 +79,8 @@ export default {
 
         return relations.linkTemplate
           .slots({
-            path,
+            path: slots.anchor ? [] : path,
+            href: slots.anchor ? '' : null,
             content,
             color,
             tooltip,
