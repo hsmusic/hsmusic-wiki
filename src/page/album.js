@@ -1,6 +1,6 @@
 // Album page specification.
 
-export const description = `per-album info & track artwork gallery pages`;
+export const description = `per-album info, artwork gallery & commentary pages`;
 
 export function targets({wikiData}) {
   return wikiData.albumData;
@@ -31,7 +31,6 @@ export function pathsForTarget(album) {
       },
     },
 
-    /*
     hasCommentaryPage && {
       type: 'page',
       path: ['albumCommentary', album.directory],
@@ -42,6 +41,7 @@ export function pathsForTarget(album) {
       },
     },
 
+    /*
     {
       type: 'data',
       path: ['album', album.directory],
