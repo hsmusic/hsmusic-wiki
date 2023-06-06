@@ -533,6 +533,13 @@ p .current {
   margin-top: 5px;
 }
 
+.commentary-art {
+  float: right;
+  width: 30%;
+  max-width: 250px;
+  margin: 15px 0 10px 20px;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {
@@ -1248,6 +1255,10 @@ html[data-url-key="localized.home"] .carousel-container {
 .content-heading.highlight-hash-link {
   animation: highlight-hash-link 4s;
   animation-delay: 125ms;
+}
+
+h3.content-heading {
+  clear: both;
 }
 
 /* This animation's name is referenced in JavaScript */
