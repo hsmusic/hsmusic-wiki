@@ -2,10 +2,13 @@ import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
+    'generateAlbumSidebarTrackSection',
     'generateAlbumStyleRules',
     'generateColorStyleVariables',
     'generateContentHeading',
+    'generateTrackCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
     'linkTrack',
@@ -30,6 +33,9 @@ export default {
       relation('generateAlbumNavAccent', album, null);
 
     if (album.commentary) {
+      relations.albumCommentaryCover =
+        relation('generateAlbumCoverArtwork', album);
+
       relations.albumCommentaryContent =
         relation('transformContent', album.commentary);
     }
@@ -46,6 +52,13 @@ export default {
       tracksWithCommentary
         .map(track => relation('linkTrack', track));
 
+    relations.trackCommentaryCovers =
+      tracksWithCommentary
+        .map(track =>
+          (track.hasUniqueCoverArt
+            ? relation('generateTrackCoverArtwork', track)
+            : null));
+
     relations.trackCommentaryContent =
       tracksWithCommentary
         .map(track => relation('transformContent', track.commentary));
@@ -56,6 +69,13 @@ export default {
           (track.color === album.color
             ? null
             : relation('generateColorStyleVariables')));
+
+    relations.sidebarAlbumLink =
+      relation('linkAlbum', album);
+
+    relations.sidebarTrackSections =
+      album.trackSections.map(trackSection =>
+        relation('generateAlbumSidebarTrackSection', album, null, trackSection));
 
     return relations;
   },
@@ -129,6 +149,11 @@ export default {
               {class: ['content-heading']},
               language.$('albumCommentaryPage.entry.title.albumCommentary')),
 
+            relations.albumCommentaryCover
+              ?.slots({
+                displayMode: 'commentary',
+              }),
+
             html.tag('blockquote',
               relations.albumCommentaryContent),
           ],
@@ -137,15 +162,19 @@ export default {
             heading: relations.trackCommentaryHeadings,
             link: relations.trackCommentaryLinks,
             directory: data.trackCommentaryDirectories,
+            cover: relations.trackCommentaryCovers,
             content: relations.trackCommentaryContent,
             colorVariables: relations.trackCommentaryColorVariables,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, content, colorVariables, color}) => [
+          }).map(({heading, link, directory, cover, content, colorVariables, color}) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
                 title: link,
               }),
+
+              cover?.slots({mode: 'commentary'}),
+
               html.tag('blockquote',
                 (color
                   ? {style: colorVariables.slot('color', color).content}
@@ -169,6 +198,16 @@ export default {
                 currentExtra: 'commentary',
               }),
           },
+        ],
+
+        leftSidebarStickyMode: 'column',
+        leftSidebarContent: [
+          html.tag('h1', relations.sidebarAlbumLink),
+          relations.sidebarTrackSections.map(section =>
+            section.slots({
+              anchor: true,
+              open: true,
+            })),
         ],
       });
   },
