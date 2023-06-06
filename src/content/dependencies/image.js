@@ -51,6 +51,7 @@ export default {
         square: {type: 'boolean', default: false},
 
         id: {type: 'string'},
+        class: {type: 'string'},
         alt: {type: 'string'},
         width: {type: 'number'},
         height: {type: 'number'},
@@ -86,6 +87,8 @@ export default {
 
         const idOnImg = willLink ? null : slots.id;
         const idOnLink = willLink ? slots.id : null;
+        const classOnImg = willLink ? null : slots.class;
+        const classOnLink = willLink ? slots.class : null;
 
         if (!originalSrc) {
           return prepare(
@@ -119,6 +122,7 @@ export default {
 
         const imgAttributes = {
           id: idOnImg,
+          class: classOnImg,
           alt: slots.alt,
           width: slots.width,
           height: slots.height,
@@ -189,6 +193,7 @@ export default {
                   'box',
                   'image-link',
                   hide && 'js-hide',
+                  classOnLink,
                 ],
 
                 href:
