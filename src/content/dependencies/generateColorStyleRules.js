@@ -1,40 +1,26 @@
 export default {
-  extraDependencies: [
-    'getColors',
+  contentDependencies: [
+    'generateColorStyleVariables',
   ],
 
-  data(color) {
-    return {color};
+  relations(relation, color) {
+    const relations = {};
+
+    if (color) {
+      relations.variables =
+        relation('generateColorStyleVariables', color);
+    }
+
+    return relations;
   },
 
-  generate(data, {
-    getColors,
-  }) {
-    if (!data.color) return '';
-
-    const {
-      primary,
-      dark,
-      dim,
-      dimGhost,
-      bg,
-      bgBlack,
-      shadow,
-    } = getColors(data.color);
-
-    const variables = [
-      `--primary-color: ${primary}`,
-      `--dark-color: ${dark}`,
-      `--dim-color: ${dim}`,
-      `--dim-ghost-color: ${dimGhost}`,
-      `--bg-color: ${bg}`,
-      `--bg-black-color: ${bgBlack}`,
-      `--shadow-color: ${shadow}`,
-    ];
+  generate(relations) {
+    if (!relations.variables) return '';
 
     return [
       `:root {`,
-      ...variables.map((line) => `    ${line};`),
+      // This is pretty hilariously hacky.
+      ...relations.variables.split(';').map(line => line + ';'),
       `}`,
     ].join('\n');
   },
