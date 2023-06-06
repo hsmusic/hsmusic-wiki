@@ -33,10 +33,19 @@ export default {
       }
     }
 
+    data.trackDirectories =
+      trackSection.tracks
+        .map(track => track.directory);
+
     return data;
   },
 
-  generate(data, relations, {getColors, html, language}) {
+  slots: {
+    anchor: {type: 'boolean'},
+    open: {type: 'boolean'},
+  },
+
+  generate(slots, data, relations, {getColors, html, language}) {
     const sectionName =
       html.tag('span', {class: 'group-name'},
         (data.isDefaultTrackSection
@@ -59,7 +68,13 @@ export default {
               'current',
           },
           language.$('albumSidebar.trackList.item', {
-            track: trackLink,
+            track:
+              (slots.anchor
+                ? trackLink.slots({
+                    anchor: true,
+                    hash: data.trackDirectories[index],
+                  })
+                : trackLink),
           })));
 
     return html.tag('details',
@@ -67,6 +82,11 @@ export default {
         class: data.includesCurrentTrack && 'current',
 
         open: (
+          // Allow forcing open via a template slot.
+          // This isn't exactly janky, but the rest of this function
+          // kind of is when you contextualize it in a template...
+          slots.open ||
+
           // Leave sidebar track sections collapsed on album info page,
           // since there's already a view of the full track listing
           // in the main content area.
