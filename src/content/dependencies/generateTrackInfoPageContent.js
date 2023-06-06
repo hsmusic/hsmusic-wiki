@@ -6,7 +6,7 @@ export default {
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateContentHeading',
-    'generateCoverArtwork',
+    'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
     'linkAlbum',
@@ -43,6 +43,11 @@ export default {
       list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
     });
 
+    if (track.hasUniqueCoverArt || album.hasCoverArt) {
+      relations.cover =
+        relation('generateTrackCoverArtwork', track);
+    }
+
     // Section: Release info
 
     const releaseInfo = sections.releaseInfo = {};
@@ -51,15 +56,8 @@ export default {
       contributionLinksRelation(track.artistContribs);
 
     if (track.hasUniqueCoverArt) {
-      relations.cover =
-        relation('generateCoverArtwork', track.artTags);
       releaseInfo.coverArtistContributionLinks =
         contributionLinksRelation(track.coverArtistContribs);
-    } else if (album.hasCoverArt) {
-      relations.cover =
-        relation('generateCoverArtwork', album.artTags);
-    } else {
-      relations.cover = null;
     }
 
     // Section: Listen on
@@ -285,25 +283,10 @@ export default {
                   link.slots({showContribution, showIcons}))),
           });
 
-    if (data.hasUniqueCoverArt) {
+    if (data.hasUniqueCoverArt || data.hasAlbumCoverArt) {
       content.cover = relations.cover
         .slots({
-          path: [
-            'media.trackCover',
-            data.albumCoverArtDirectory,
-            data.trackCoverArtDirectory,
-            data.coverArtFileExtension,
-          ],
-        });
-      content.coverNeedsReveal = data.coverNeedsReveal;
-    } else if (data.hasAlbumCoverArt) {
-      content.cover = relations.cover
-        .slots({
-          path: [
-            'media.albumCover',
-            data.albumCoverArtDirectory,
-            data.coverArtFileExtension,
-          ],
+          alt: language.$('misc.alt.trackCover'),
         });
       content.coverNeedsReveal = data.coverNeedsReveal;
     } else {

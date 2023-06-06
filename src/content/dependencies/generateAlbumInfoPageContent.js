@@ -4,9 +4,9 @@ export default {
   contentDependencies: [
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
+    'generateAlbumCoverArtwork',
     'generateAlbumTrackList',
     'generateContentHeading',
-    'generateCoverArtwork',
     'linkAlbumCommentary',
     'linkAlbumGallery',
     'linkContribution',
@@ -35,7 +35,7 @@ export default {
 
     if (album.hasCoverArt) {
       relations.cover =
-        relation('generateCoverArtwork', album.artTags);
+        relation('generateAlbumCoverArtwork', album);
       releaseInfo.coverArtistContributionLinks =
         contributionLinksRelation(album.coverArtistContribs);
     } else {
@@ -161,8 +161,7 @@ export default {
     if (data.hasCoverArt) {
       content.cover = relations.cover
         .slots({
-          path: ['media.albumCover', data.coverArtDirectory, data.coverArtFileExtension],
-          alt: language.$('misc.alt.trackCover')
+          alt: language.$('misc.alt.albumCover'),
         });
     } else {
       content.cover = null;
