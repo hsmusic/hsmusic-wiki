@@ -645,11 +645,17 @@ updateStickyHeading();
 // Image overlay ------------------------------------------
 
 function addImageOverlayClickHandlers() {
+  const container = document.getElementById('image-overlay-container');
+
+  if (!container) {
+    console.warn(`#image-overlay-container missing, image overlay module disabled.`);
+    return;
+  }
+
   for (const img of document.querySelectorAll('.image-link')) {
     img.addEventListener('click', handleImageLinkClicked);
   }
 
-  const container = document.getElementById('image-overlay-container');
   const actionContainer = document.getElementById('image-overlay-action-container');
 
   container.addEventListener('click', handleContainerClicked);
