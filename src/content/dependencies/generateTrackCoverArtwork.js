@@ -7,7 +7,7 @@ export default {
         relation('generateCoverArtwork',
           (track.hasUniqueCoverArt
             ? track.artTags
-            : album.artTags)),
+            : track.album.artTags)),
     };
   },
 
