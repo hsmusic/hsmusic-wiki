@@ -359,10 +359,12 @@ export default {
         colorStyleRules: [relations.colorStyleRules],
         additionalStyleRules: [relations.albumStyleRules],
 
-        cover: relations.cover
-          ?.slots({
-            alt: language.$('misc.alt.trackCover'),
-          }),
+        cover:
+          (relations.cover
+            ? relations.cover.slots({
+                alt: language.$('misc.alt.trackCover'),
+              })
+            : null),
 
         mainContent: [
           html.tag('p', {

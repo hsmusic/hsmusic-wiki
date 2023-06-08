@@ -208,10 +208,11 @@ export default {
         additionalStyleRules: [relations.albumStyleRules],
 
         cover:
-          relations.cover
-            ?.slots({
-              alt: language.$('misc.alt.albumCover'),
-            }),
+          (relations.cover
+            ? relations.cover.slots({
+                alt: language.$('misc.alt.albumCover'),
+              })
+            : null),
 
         mainContent: [
           html.tag('p',
