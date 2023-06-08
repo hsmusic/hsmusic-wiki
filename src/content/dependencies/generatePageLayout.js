@@ -104,7 +104,6 @@ export default {
         showWikiNameInTitle: {type: 'boolean', default: true},
 
         cover: {type: 'html'},
-        coverNeedsReveal: {type: 'boolean'},
 
         socialEmbed: {type: 'html'},
 
@@ -204,7 +203,6 @@ export default {
                 relations.stickyHeadingContainer.slots({
                   title: slots.title,
                   cover: slots.cover,
-                  needsReveal: slots.coverNeedsReveal,
                 });
               break;
             case 'static':

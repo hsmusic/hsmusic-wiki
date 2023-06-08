@@ -319,7 +319,6 @@ export default {
       data.albumCoverArtDirectory = album.directory;
       data.trackCoverArtDirectory = track.directory;
       data.coverArtFileExtension = track.coverArtFileExtension;
-      data.coverNeedsReveal = track.artTags.some(t => t.isContentWarning);
 
       if (track.coverArtDate && +track.coverArtDate !== +track.date) {
         data.coverArtDate = track.coverArtDate;
@@ -327,9 +326,6 @@ export default {
     } else if (track.album.hasCoverArt) {
       data.albumCoverArtDirectory = album.directory;
       data.coverArtFileExtension = album.coverArtFileExtension;
-      data.coverNeedsReveal = album.artTags.some(t => t.isContentWarning);
-    } else {
-      data.coverNeedsReveal = null;
     }
 
     data.hasTrackNumbers = album.hasTrackNumbers;
@@ -367,8 +363,6 @@ export default {
           ?.slots({
             alt: language.$('misc.alt.trackCover'),
           }),
-
-        coverNeedsReveal: data.coverNeedsReveal,
 
         mainContent: [
           html.tag('p', {

@@ -173,12 +173,8 @@ export default {
     data.duration = accumulateSum(album.tracks, track => track.duration);
     data.durationApproximate = album.tracks.length > 1;
 
-    if (album.hasCoverArt) {
-      data.coverNeedsReveal = album.artTags.some(t => t.isContentWarning);
-
-      if (album.coverArtDate && +album.coverArtDate !== +album.date) {
-        data.coverArtDate = album.coverArtDate;
-      }
+    if (album.coverArtDate && +album.coverArtDate !== +album.date) {
+      data.coverArtDate = album.coverArtDate;
     }
 
     if (!empty(album.additionalFiles)) {
@@ -216,7 +212,6 @@ export default {
             ?.slots({
               alt: language.$('misc.alt.albumCover'),
             }),
-        coverNeedsReveal: relations.content.coverNeedsReveal,
 
         mainContent: [
           html.tag('p',
