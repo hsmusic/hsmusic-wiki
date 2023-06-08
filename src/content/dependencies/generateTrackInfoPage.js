@@ -18,6 +18,7 @@ export default {
     'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
+    'generateReleaseInfoContributionsLine',
     'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
@@ -102,12 +103,6 @@ export default {
     relations.sidebar =
       relation('generateAlbumSidebar', track.album, track);
 
-    const contributionLinksRelation = contribs =>
-      contribs
-        .slice(0, 4)
-        .map(contrib =>
-          relation('linkContribution', contrib.who, contrib.what));
-
     const additionalFilesSection = additionalFiles => ({
       heading: relation('generateContentHeading'),
       list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
@@ -123,11 +118,11 @@ export default {
     const releaseInfo = sections.releaseInfo = {};
 
     releaseInfo.artistContributionLinks =
-      contributionLinksRelation(track.artistContribs);
+      relation('generateReleaseInfoContributionsLine', track.artistContribs);
 
     if (track.hasUniqueCoverArt) {
-      releaseInfo.coverArtistContributionLinks =
-        contributionLinksRelation(track.coverArtistContribs);
+      releaseInfo.coverArtistContributionsLine =
+        relation('generateReleaseInfoContributionsLine', track.coverArtistContribs);
     }
 
     // Section: Listen on
@@ -173,7 +168,8 @@ export default {
         relation('generateContentHeading');
 
       contributors.contributionLinks =
-        contributionLinksRelation(track.contributorContribs);
+        track.contributorContribs.map(({who, what}) =>
+          relation('linkContribution', who, what));
     }
 
     // Section: Referenced tracks
@@ -341,16 +337,6 @@ export default {
   generate(data, relations, {html, language}) {
     const {sections: sec} = relations;
 
-    const formatContributions =
-      (stringKey, contributionLinks, {showContribution = true, showIcons = true} = {}) =>
-        contributionLinks &&
-          language.$(stringKey, {
-            artists:
-              language.formatConjunctionList(
-                contributionLinks.map(link =>
-                  link.slots({showContribution, showIcons}))),
-          });
-
     return relations.layout
       .slots({
         title: language.$('trackPage.title', {track: data.name}),
@@ -371,8 +357,11 @@ export default {
             [html.onlyIfContent]: true,
             [html.joinChildren]: html.tag('br'),
           }, [
-            formatContributions('releaseInfo.by', sec.releaseInfo.artistContributionLinks),
-            formatContributions('releaseInfo.coverArtBy', sec.releaseInfo.coverArtistContributionLinks),
+            sec.releaseInfo.artistContributionLinks
+              .slots({stringKey: 'releaseInfo.by'}),
+
+            sec.releaseInfo.coverArtistContributionsLine
+              ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
 
             data.date &&
               language.$('releaseInfo.released', {
@@ -453,13 +442,14 @@ export default {
                 title: language.$('releaseInfo.contributors'),
               }),
 
-            html.tag('ul', sec.contributors.contributionLinks.map(contributionLink =>
-              html.tag('li',
-                contributionLink
-                  .slots({
-                    showIcons: true,
-                    showContribution: true,
-                  })))),
+            html.tag('ul',
+              sec.contributors.contributionLinks.map(contributionLink =>
+                html.tag('li',
+                  contributionLink
+                    .slots({
+                      showIcons: true,
+                      showContribution: true,
+                    })))),
           ],
 
           sec.references && [

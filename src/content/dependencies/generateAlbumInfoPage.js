@@ -16,11 +16,11 @@ export default {
     'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
+    'generateReleaseInfoContributionsLine',
     'linkAlbum',
     'linkAlbumCommentary',
     'linkAlbumGallery',
     'linkArtist',
-    'linkContribution',
     'linkExternal',
     'linkTrack',
     'transformContent',
@@ -71,37 +71,26 @@ export default {
     relations.sidebar =
       relation('generateAlbumSidebar', album, null);
 
-    const contributionLinksRelation = contribs =>
-      contribs.map(contrib =>
-        relation('linkContribution', contrib.who, contrib.what));
+    if (album.hasCoverArt) {
+      relations.cover =
+        relation('generateAlbumCoverArtwork', album);
+    }
 
     // Section: Release info
 
     const releaseInfo = sections.releaseInfo = {};
 
-    if (!empty(album.artistContribs)) {
-      releaseInfo.artistContributionLinks =
-        contributionLinksRelation(album.artistContribs);
-    }
+    releaseInfo.artistContributionsLine =
+      relation('generateReleaseInfoContributionsLine', album.artistContribs);
 
-    if (album.hasCoverArt) {
-      relations.cover =
-        relation('generateAlbumCoverArtwork', album);
-      releaseInfo.coverArtistContributionLinks =
-        contributionLinksRelation(album.coverArtistContribs);
-    } else {
-      relations.cover = null;
-    }
+    releaseInfo.coverArtistContributionsLine =
+      relation('generateReleaseInfoContributionsLine', album.coverArtistContribs);
 
-    if (album.hasWallpaperArt) {
-      releaseInfo.wallpaperArtistContributionLinks =
-        contributionLinksRelation(album.wallpaperArtistContribs);
-    }
+    releaseInfo.wallpaperArtistContributionsLine =
+      relation('generateReleaseInfoContributionsLine', album.wallpaperArtistContribs);
 
-    if (album.hasBannerArt) {
-      releaseInfo.bannerArtistContributionLinks =
-        contributionLinksRelation(album.bannerArtistContribs);
-    }
+    releaseInfo.bannerArtistContributionsLine =
+      relation('generateReleaseInfoContributionsLine', album.bannerArtistContribs);
 
     // Section: Listen on
 
@@ -189,16 +178,6 @@ export default {
   generate(data, relations, {html, language}) {
     const {sections: sec} = relations;
 
-    const formatContributions =
-      (stringKey, contributionLinks, {showContribution = true, showIcons = true} = {}) =>
-        contributionLinks &&
-          language.$(stringKey, {
-            artists:
-              language.formatConjunctionList(
-                contributionLinks.map(link =>
-                  link.slots({showContribution, showIcons}))),
-          });
-
     return relations.layout
       .slots({
         title: language.$('albumPage.title', {album: data.name}),
@@ -221,10 +200,17 @@ export default {
               [html.joinChildren]: html.tag('br'),
             },
             [
-              formatContributions('releaseInfo.by', sec.releaseInfo.artistContributionLinks),
-              formatContributions('releaseInfo.coverArtBy', sec.releaseInfo.coverArtistContributionLinks),
-              formatContributions('releaseInfo.wallpaperArtBy', sec.releaseInfo.wallpaperArtistContributionLinks),
-              formatContributions('releaseInfo.bannerArtBy', sec.releaseInfo.bannerArtistContributionLinks),
+              sec.releaseInfo.artistContributionsLine
+                .slots({stringKey: 'releaseInfo.by'}),
+
+              sec.releaseInfo.coverArtistContributionsLine
+                .slots({stringKey: 'releaseInfo.coverArtBy'}),
+
+              sec.releaseInfo.wallpaperArtistContributionsLine
+                .slots({stringKey: 'releaseInfo.wallpaperArtBy'}),
+
+              sec.releaseInfo.bannerArtistContributionsLine
+                .slots({stringKey: 'releasInfo.bannerArtBy'}),
 
               data.date &&
                 language.$('releaseInfo.released', {
