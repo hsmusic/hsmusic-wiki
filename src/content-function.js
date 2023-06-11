@@ -108,7 +108,7 @@ export function expectDependencies({
     wrappedGenerate.fulfilled = true;
 
     wrappedGenerate.fulfill = function() {
-      throw new Error(`All dependencies already fulfilled`);
+      throw new Error(`All dependencies already fulfilled (${generate.name})`);
     };
   }
 
@@ -127,6 +127,21 @@ export function expectDependencies({
   }
 
   wrappedGenerate.fulfill ??= function fulfill(dependencies) {
+    let newlyFulfilledDependencies;
+
+    try {
+      newlyFulfilledDependencies =
+        fulfillDependencies({
+          dependencies,
+          expectedContentDependencyKeys,
+          expectedExtraDependencyKeys,
+          fulfilledDependencies,
+        });
+    } catch (error) {
+      error.message += ` (${generate.name})`;
+      throw error;
+    }
+
     return expectDependencies({
       sprawl,
       relations,
@@ -136,15 +151,9 @@ export function expectDependencies({
       expectedContentDependencyKeys,
       expectedExtraDependencyKeys,
 
-      fulfilledDependencies: fulfillDependencies({
-        name: generate.name,
-        dependencies,
-
-        expectedContentDependencyKeys,
-        expectedExtraDependencyKeys,
-        fulfilledDependencies,
-      }),
+      fulfilledDependencies: newlyFulfilledDependencies,
     });
+
   };
 
   Object.assign(wrappedGenerate, {
@@ -156,7 +165,6 @@ export function expectDependencies({
 }
 
 export function fulfillDependencies({
-  name,
   dependencies,
   expectedContentDependencyKeys,
   expectedExtraDependencyKeys,
@@ -208,7 +216,7 @@ export function fulfillDependencies({
   }
 
   if (!empty(errors)) {
-    throw new AggregateError(errors, `Errors fulfilling dependencies for ${name}`);
+    throw new AggregateError(errors, `Errors fulfilling dependencies`);
   }
 
   return newFulfilledDependencies;
