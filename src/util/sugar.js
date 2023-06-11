@@ -26,18 +26,24 @@ export function* splitArray(array, fn) {
   }
 }
 
-// Null-accepting function to check if an array is empty. Accepts null (and
-// treats as empty) as a shorthand for "hey, check if this property is an array
-// with/without stuff in it" for objects where properties that are PRESENT but
-// don't currently have a VALUE are null (instead of undefined).
-export function empty(arrayOrNull) {
-  if (arrayOrNull === null) {
+// Null-accepting function to check if an array or set is empty. Accepts null
+// (which is treated as empty) as a shorthand for "hey, check if this property
+// is an array with/without stuff in it" for objects where properties that are
+// PRESENT but don't currently have a VALUE are null (rather than undefined).
+export function empty(value) {
+  if (value === null) {
     return true;
-  } else if (Array.isArray(arrayOrNull)) {
-    return arrayOrNull.length === 0;
-  } else {
-    throw new Error(`Expected array or null`);
   }
+
+  if (Array.isArray(value)) {
+    return value.length === 0;
+  }
+
+  if (value instanceof Set) {
+    return value.size === 0;
+  }
+
+  throw new Error(`Expected array, set, or null`);
 }
 
 // Repeats all the items of an array a number of times.
@@ -81,6 +87,16 @@ export const compareArrays = (arr1, arr2, {checkOrder = true} = {}) =>
 // Stolen from jq! Which pro8a8ly stole the concept from other places. Nice.
 export const withEntries = (obj, fn) =>
   Object.fromEntries(fn(Object.entries(obj)));
+
+export function setIntersection(set1, set2) {
+  const intersection = new Set();
+  for (const item of set1) {
+    if (set2.has(item)) {
+      intersection.add(item);
+    }
+  }
+  return intersection;
+}
 
 export function filterProperties(obj, properties) {
   const set = new Set(properties);
