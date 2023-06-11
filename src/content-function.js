@@ -118,12 +118,12 @@ export function expectDependencies({
       }
     };
 
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
-    wrappedGenerate.fulfilled = true;
-
     wrappedGenerate.fulfill = function() {
       throw new Error(`All dependencies already fulfilled (${generate.name})`);
     };
+
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
+    wrappedGenerate.fulfilled = true;
   }
 
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
@@ -222,7 +222,11 @@ export function fulfillDependencies(dependencies, {
       continue;
     }
 
-    const isContentFunction = !!value?.[contentFunction.identifyingSymbol];
+    const isContentFunction =
+      !!value?.[contentFunction.identifyingSymbol];
+
+    const isFulfilledContentFunction =
+      isContentFunction && value.fulfilled;
 
     if (isContentKey) {
       if (!isContentFunction) {
@@ -230,7 +234,7 @@ export function fulfillDependencies(dependencies, {
         continue;
       }
 
-      if (!value.fulfilled) {
+      if (!isFulfilledContentFunction) {
         invalidatingDependencyKeys.add(key);
       }
 
