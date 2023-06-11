@@ -49,6 +49,7 @@ export default function contentFunction({
     expectedExtraDependencyKeys,
     missingContentDependencyKeys: new Set(expectedContentDependencyKeys),
     missingExtraDependencyKeys: new Set(expectedExtraDependencyKeys),
+    invalidatingDependencyKeys: new Set(),
     fulfilledDependencyKeys: new Set(),
     fulfilledDependencies: {},
   });
@@ -66,17 +67,13 @@ export function expectDependencies({
   expectedExtraDependencyKeys,
   missingContentDependencyKeys,
   missingExtraDependencyKeys,
+  invalidatingDependencyKeys,
   fulfilledDependencyKeys,
   fulfilledDependencies,
 }) {
   const hasSprawlFunction = !!sprawl;
   const hasRelationsFunction = !!relations;
   const hasDataFunction = !!data;
-
-  const invalidatingDependencyKeys =
-    Object.entries(fulfilledDependencies)
-      .filter(([key, value]) => value?.fulfilled === false)
-      .map(([key]) => key);
 
   const isInvalidated = !empty(invalidatingDependencyKeys);
   const isMissingContentDependencies = !empty(missingContentDependencyKeys);
@@ -86,7 +83,7 @@ export function expectDependencies({
 
   if (isInvalidated) {
     wrappedGenerate = function() {
-      throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${invalidatingDependencyKeys.join(', ')}`);
+      throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${[...invalidatingDependencyKeys].join(', ')}`);
     };
 
     annotateFunction(wrappedGenerate, {name: generate, trait: 'invalidated'});
@@ -150,6 +147,7 @@ export function expectDependencies({
     // calls to this same `fulfill`.
     const newlyMissingContentDependencyKeys = new Set(missingContentDependencyKeys);
     const newlyMissingExtraDependencyKeys = new Set(missingExtraDependencyKeys);
+    const newlyInvalidatingDependencyKeys = new Set(invalidatingDependencyKeys);
     const newlyFulfilledDependencyKeys = new Set(fulfilledDependencyKeys);
     const newlyFulfilledDependencies = {...fulfilledDependencies};
 
@@ -157,6 +155,7 @@ export function expectDependencies({
       fulfillDependencies(dependencies, {
         missingContentDependencyKeys: newlyMissingContentDependencyKeys,
         missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
+        invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
         fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
         fulfilledDependencies: newlyFulfilledDependencies,
       });
@@ -175,6 +174,7 @@ export function expectDependencies({
       expectedExtraDependencyKeys,
       missingContentDependencyKeys: newlyMissingContentDependencyKeys,
       missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
+      invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
       fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
       fulfilledDependencies: newlyFulfilledDependencies,
     });
@@ -192,6 +192,7 @@ export function expectDependencies({
 export function fulfillDependencies(dependencies, {
   missingContentDependencyKeys,
   missingExtraDependencyKeys,
+  invalidatingDependencyKeys,
   fulfilledDependencyKeys,
   fulfilledDependencies,
 }) {
@@ -228,12 +229,18 @@ export function fulfillDependencies(dependencies, {
         errors.push(new Error(`Content dependency ${key} is not a content function (got ${value})`));
         continue;
       }
+
+      if (!value.fulfilled) {
+        invalidatingDependencyKeys.add(key);
+      }
+
       missingContentDependencyKeys.delete(key);
     } else if (isExtraKey) {
       if (isContentFunction) {
         errors.push(new Error(`Extra dependency ${key} is a content function`));
         continue;
       }
+
       missingExtraDependencyKeys.delete(key);
     }
 
