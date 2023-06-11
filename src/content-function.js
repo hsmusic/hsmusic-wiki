@@ -9,6 +9,22 @@ export default function contentFunction({
   data,
   generate,
 }) {
+  // Initial checks. These only need to be run once per description of a
+  // content function, and don't depend on any mutable context (e.g. which
+  // dependencies have been fulfilled so far).
+
+  if (!generate) {
+    throw new Error(`Expected generate function`);
+  }
+
+  if (sprawl && !extraDependencies.includes('wikiData')) {
+    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
+  }
+
+  // Pass all the details to expectDependencies, which will recursively build
+  // up a set of fulfilled dependencies and make functions like `relations`
+  // and `generate` callable only with sufficient fulfilled dependencies.
+
   return expectDependencies({
     sprawl,
     relations,
@@ -33,17 +49,9 @@ export function expectDependencies({
   expectedExtraDependencyKeys,
   fulfilledDependencies,
 }) {
-  if (!generate) {
-    throw new Error(`Expected generate function`);
-  }
-
   const hasSprawlFunction = !!sprawl;
   const hasRelationsFunction = !!relations;
   const hasDataFunction = !!data;
-
-  if (hasSprawlFunction && !expectedExtraDependencyKeys.includes('wikiData')) {
-    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
-  }
 
   const fulfilledDependencyKeys = Object.keys(fulfilledDependencies);
 
