@@ -74,7 +74,14 @@ export function expectDependencies({
 
     annotateFunction(wrappedGenerate, {name: generate, trait: 'invalidated'});
     wrappedGenerate.fulfilled = false;
-  } else if (empty(missingContentDependencyKeys) && empty(missingExtraDependencyKeys)) {
+  } else if (!empty(missingContentDependencyKeys) || !empty(missingExtraDependencyKeys)) {
+    wrappedGenerate = function() {
+      throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
+    };
+
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
+    wrappedGenerate.fulfilled = false;
+  } else {
     wrappedGenerate = function(arg1, arg2) {
       if (hasDataFunction && !arg1) {
         throw new Error(`Expected data`);
@@ -103,13 +110,6 @@ export function expectDependencies({
     wrappedGenerate.fulfill = function() {
       throw new Error(`All dependencies already fulfilled`);
     };
-  } else {
-    wrappedGenerate = function() {
-      throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
-    };
-
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
-    wrappedGenerate.fulfilled = false;
   }
 
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
