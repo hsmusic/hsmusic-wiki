@@ -1,6 +1,6 @@
 import getChronologyRelations from '../util/getChronologyRelations.js';
 import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
-import {accumulateSum, empty} from '../../util/sugar.js';
+import {empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
@@ -8,6 +8,7 @@ export default {
     'generateAlbumAdditionalFilesList',
     'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
+    'generateAlbumReleaseInfo',
     'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
@@ -16,12 +17,10 @@ export default {
     'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
-    'generateReleaseInfoContributionsLine',
     'linkAlbum',
     'linkAlbumCommentary',
     'linkAlbumGallery',
     'linkArtist',
-    'linkExternal',
     'linkTrack',
     'transformContent',
   ],
@@ -78,29 +77,8 @@ export default {
 
     // Section: Release info
 
-    const releaseInfo = sections.releaseInfo = {};
-
-    releaseInfo.artistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.artistContribs);
-
-    releaseInfo.coverArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.coverArtistContribs);
-
-    releaseInfo.wallpaperArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.wallpaperArtistContribs);
-
-    releaseInfo.bannerArtistContributionsLine =
-      relation('generateReleaseInfoContributionsLine', album.bannerArtistContribs);
-
-    // Section: Listen on
-
-    if (!empty(album.urls)) {
-      const listen = sections.listen = {};
-
-      listen.externalLinks =
-        album.urls.map(url =>
-          relation('linkExternal', url));
-    }
+    relations.releaseInfo =
+      relation('generateAlbumReleaseInfo', album);
 
     // Section: Extra links
 
@@ -157,14 +135,6 @@ export default {
     const data = {};
 
     data.name = album.name;
-    data.date = album.date;
-
-    data.duration = accumulateSum(album.tracks, track => track.duration);
-    data.durationApproximate = album.tracks.length > 1;
-
-    if (album.coverArtDate && +album.coverArtDate !== +album.date) {
-      data.coverArtDate = album.coverArtDate;
-    }
 
     if (!empty(album.additionalFiles)) {
       data.numAdditionalFiles = album.additionalFiles.length;
@@ -194,51 +164,7 @@ export default {
             : null),
 
         mainContent: [
-          html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: html.tag('br'),
-            },
-            [
-              sec.releaseInfo.artistContributionsLine
-                .slots({stringKey: 'releaseInfo.by'}),
-
-              sec.releaseInfo.coverArtistContributionsLine
-                .slots({stringKey: 'releaseInfo.coverArtBy'}),
-
-              sec.releaseInfo.wallpaperArtistContributionsLine
-                .slots({stringKey: 'releaseInfo.wallpaperArtBy'}),
-
-              sec.releaseInfo.bannerArtistContributionsLine
-                .slots({stringKey: 'releaseInfo.bannerArtBy'}),
-
-              data.date &&
-                language.$('releaseInfo.released', {
-                  date: language.formatDate(data.date),
-                }),
-
-              data.coverArtDate &&
-                language.$('releaseInfo.artReleased', {
-                  date: language.formatDate(data.coverArtDate),
-                }),
-
-              data.duration &&
-                language.$('releaseInfo.duration', {
-                  duration:
-                    language.formatDuration(data.duration, {
-                      approximate: data.durationApproximate,
-                    }),
-                }),
-            ]),
-
-          sec.listen &&
-            html.tag('p',
-              language.$('releaseInfo.listenOn', {
-                links:
-                  language.formatDisjunctionList(
-                    sec.listen.externalLinks
-                      .map(link => link.slot('mode', 'album'))),
-              })),
+          relations.releaseInfo,
 
           html.tag('p',
             {

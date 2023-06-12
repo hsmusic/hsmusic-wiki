@@ -18,14 +18,13 @@ export default {
     'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
-    'generateReleaseInfoContributionsLine',
     'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
+    'generateTrackReleaseInfo',
     'linkAlbum',
     'linkArtist',
     'linkContribution',
-    'linkExternal',
     'linkFlash',
     'linkTrack',
     'transformContent',
@@ -115,25 +114,8 @@ export default {
 
     // Section: Release info
 
-    const releaseInfo = sections.releaseInfo = {};
-
-    releaseInfo.artistContributionLinks =
-      relation('generateReleaseInfoContributionsLine', track.artistContribs);
-
-    if (track.hasUniqueCoverArt) {
-      releaseInfo.coverArtistContributionsLine =
-        relation('generateReleaseInfoContributionsLine', track.coverArtistContribs);
-    }
-
-    // Section: Listen on
-
-    const listen = sections.listen = {};
-
-    if (!empty(track.urls)) {
-      listen.externalLinks =
-        track.urls.map(url =>
-          relation('linkExternal', url));
-    }
+    relations.releaseInfo =
+      relation('generateTrackReleaseInfo', track);
 
     // Section: Extra links
 
@@ -301,37 +283,14 @@ export default {
   },
 
   data(sprawl, track) {
-    const data = {};
-    const {album} = track;
+    return {
+      name: track.name,
 
-    data.name = track.name;
-    data.date = track.date;
-    data.duration = track.duration;
+      hasTrackNumbers: track.album.hasTrackNumbers,
+      trackNumber: track.album.tracks.indexOf(track) + 1,
 
-    data.hasUniqueCoverArt = track.hasUniqueCoverArt;
-    data.hasAlbumCoverArt = album.hasCoverArt;
-
-    if (track.hasUniqueCoverArt) {
-      data.albumCoverArtDirectory = album.directory;
-      data.trackCoverArtDirectory = track.directory;
-      data.coverArtFileExtension = track.coverArtFileExtension;
-
-      if (track.coverArtDate && +track.coverArtDate !== +track.date) {
-        data.coverArtDate = track.coverArtDate;
-      }
-    } else if (track.album.hasCoverArt) {
-      data.albumCoverArtDirectory = album.directory;
-      data.coverArtFileExtension = album.coverArtFileExtension;
-    }
-
-    data.hasTrackNumbers = album.hasTrackNumbers;
-    data.trackNumber = album.tracks.indexOf(track) + 1;
-
-    if (!empty(track.additionalFiles)) {
-      data.numAdditionalFiles = track.additionalFiles.length;
-    }
-
-    return data;
+      numAdditionalFiles: track.additionalFiles.length,
+    };
   },
 
   generate(data, relations, {html, language}) {
@@ -353,40 +312,7 @@ export default {
             : null),
 
         mainContent: [
-          html.tag('p', {
-            [html.onlyIfContent]: true,
-            [html.joinChildren]: html.tag('br'),
-          }, [
-            sec.releaseInfo.artistContributionLinks
-              .slots({stringKey: 'releaseInfo.by'}),
-
-            sec.releaseInfo.coverArtistContributionsLine
-              ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
-
-            data.date &&
-              language.$('releaseInfo.released', {
-                date: language.formatDate(data.date),
-              }),
-
-            data.coverArtDate &&
-              language.$('releaseInfo.artReleased', {
-                date: language.formatDate(data.coverArtDate),
-              }),
-
-            data.duration &&
-              language.$('releaseInfo.duration', {
-                duration: language.formatDuration(data.duration),
-              }),
-          ]),
-
-          html.tag('p',
-            (sec.listen.externalLinks
-              ? language.$('releaseInfo.listenOn', {
-                  links: language.formatDisjunctionList(sec.listen.externalLinks),
-                })
-              : language.$('releaseInfo.listenOn.noLinks', {
-                  name: html.tag('i', data.name),
-                }))),
+          relations.releaseInfo,
 
           html.tag('p',
             {
