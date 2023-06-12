@@ -28,9 +28,7 @@ export default {
     return data;
   },
 
-  generate(data, {
-    language,
-  }) {
+  generate(data, {language}) {
     return language.formatString(
       'albumPage.socialEmbed.body' + [
         data.hasDuration && '.withDuration',

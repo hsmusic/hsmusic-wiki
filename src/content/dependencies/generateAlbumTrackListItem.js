@@ -6,11 +6,7 @@ export default {
     'linkTrack',
   ],
 
-  extraDependencies: [
-    'getColors',
-    'html',
-    'language',
-  ],
+  extraDependencies: ['getColors', 'html', 'language'],
 
   relations(relation, track) {
     const relations = {};
@@ -43,11 +39,7 @@ export default {
     return data;
   },
 
-  generate(data, relations, {
-    getColors,
-    html,
-    language,
-  }) {
+  generate(data, relations, {getColors, html, language}) {
     const stringOpts = {
       duration: language.formatDuration(data.duration),
       track: relations.trackLink,

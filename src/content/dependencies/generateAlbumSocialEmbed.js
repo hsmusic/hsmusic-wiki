@@ -5,11 +5,7 @@ export default {
     'generateAlbumSocialEmbedDescription',
   ],
 
-  extraDependencies: [
-    'absoluteTo',
-    'language',
-    'urls',
-  ],
+  extraDependencies: ['absoluteTo', 'language', 'urls'],
 
   relations(relation, album) {
     const relations = {};
@@ -44,11 +40,7 @@ export default {
     return data;
   },
 
-  generate(data, relations, {
-    absoluteTo,
-    language,
-    urls,
-  }) {
+  generate(data, relations, {absoluteTo, language, urls}) {
     const socialEmbed = {};
 
     if (data.hasHeading) {

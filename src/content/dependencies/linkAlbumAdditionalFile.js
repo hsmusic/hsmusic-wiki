@@ -1,7 +1,5 @@
 export default {
-  contentDependencies: [
-    'linkTemplate',
-  ],
+  contentDependencies: ['linkTemplate'],
 
   relations(relation) {
     return {

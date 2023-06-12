@@ -42,15 +42,3 @@ export default {
       }));
   },
 };
-
-/*
-function unbound_getFooterLocalizationLinks({
-  html,
-  defaultLanguage,
-  language,
-  languages,
-  pagePath,
-  to,
-}) {
-}
-*/

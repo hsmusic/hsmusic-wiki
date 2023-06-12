@@ -1,9 +1,7 @@
 import {empty} from '../../util/sugar.js';
 
 export default {
-  extraDependencies: [
-    'to',
-  ],
+  extraDependencies: ['to'],
 
   data(album) {
     const data = {};

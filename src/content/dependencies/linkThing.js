@@ -1,11 +1,6 @@
 export default {
-  contentDependencies: [
-    'linkTemplate',
-  ],
-
-  extraDependencies: [
-    'html',
-  ],
+  contentDependencies: ['linkTemplate'],
+  extraDependencies: ['html'],
 
   relations(relation) {
     return {
@@ -26,7 +21,6 @@ export default {
   },
 
   slots: {
-    // content: relations.linkTemplate.getSlotDescription('content'),
     content: {type: 'html'},
 
     preferShortName: {type: 'boolean', default: false},
@@ -43,8 +37,6 @@ export default {
 
     anchor: {type: 'boolean', default: false},
 
-    // attributes: relations.linkTemplate.getSlotDescription('attributes'),
-    // hash: relations.linkTemplate.getSlotDescription('hash'),
     attributes: {validate: v => v.isAttributes},
     hash: {type: 'string'},
   },

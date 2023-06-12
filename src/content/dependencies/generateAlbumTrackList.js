@@ -39,10 +39,7 @@ export default {
     'generateAlbumTrackListItem',
   ],
 
-  extraDependencies: [
-    'html',
-    'language',
-  ],
+  extraDependencies: ['html', 'language'],
 
   relations(relation, album) {
     const relations = {};
@@ -90,10 +87,7 @@ export default {
     return data;
   },
 
-  generate(data, relations, {
-    html,
-    language,
-  }) {
+  generate(data, relations, {html, language}) {
     const listTag = (data.hasTrackNumbers ? 'ol' : 'ul');
 
     if (relations.itemsByTrackSection) {

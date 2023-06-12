@@ -1,10 +1,7 @@
 import {empty} from '../../util/sugar.js';
 
 export default {
-  extraDependencies: [
-    'html',
-    'language',
-  ],
+  extraDependencies: ['html', 'language'],
 
   data(additionalFiles) {
     return {
@@ -12,10 +9,7 @@ export default {
     };
   },
 
-  generate(data, {
-    html,
-    language,
-  }) {
+  generate(data, {html, language}) {
     if (empty(data.titles)) {
       return html.blank();
     }

@@ -25,10 +25,7 @@ function validateFileMapping(v, validateValue) {
 }
 
 export default {
-  extraDependencies: [
-    'html',
-    'language',
-  ],
+  extraDependencies: ['html', 'language'],
 
   data(additionalFiles) {
     return {
@@ -47,10 +44,7 @@ export default {
     },
   },
 
-  generate(data, slots, {
-    html,
-    language,
-  }) {
+  generate(data, slots, {html, language}) {
     if (!slots.fileLinks) {
       return html.blank();
     }
