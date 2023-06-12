@@ -6,23 +6,21 @@ export default {
 
   extraDependencies: [
     'getSizeOfAdditionalFile',
+    'html',
     'urls',
   ],
 
-  data(album, additionalFiles, {fileSize = true} = {}) {
+  data(album, additionalFiles) {
     return {
       albumDirectory: album.directory,
       fileLocations: additionalFiles.flatMap(({files}) => files),
-      showFileSizes: fileSize,
     };
   },
 
-  relations(relation, album, additionalFiles, {fileSize = true} = {}) {
+  relations(relation, album, additionalFiles) {
     return {
       additionalFilesList:
-        relation('generateAdditionalFilesList', additionalFiles, {
-          fileSize,
-        }),
+        relation('generateAdditionalFilesList', additionalFiles),
 
       additionalFileLinks:
         Object.fromEntries(
@@ -35,7 +33,11 @@ export default {
     };
   },
 
-  generate(data, relations, {
+  slots: {
+    showFileSizes: {type: 'boolean', default: true},
+  },
+
+  generate(data, relations, slots, {
     getSizeOfAdditionalFile,
     urls,
   }) {
@@ -45,7 +47,7 @@ export default {
         fileSizes:
           Object.fromEntries(data.fileLocations.map(file => [
             file,
-            (data.showFileSizes
+            (slots.showFileSizes
               ? getSizeOfAdditionalFile(
                   urls
                     .from('media.root')

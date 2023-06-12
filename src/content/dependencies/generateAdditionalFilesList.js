@@ -30,11 +30,10 @@ export default {
     'language',
   ],
 
-  data(additionalFiles, {fileSize = true} = {}) {
+  data(additionalFiles) {
     return {
       // Additional files are already a serializable format.
       additionalFiles,
-      showFileSizes: fileSize,
     };
   },
 
@@ -52,7 +51,7 @@ export default {
     html,
     language,
   }) {
-    if (!slots.fileSizes) {
+    if (!slots.fileLinks) {
       return html.blank();
     }
 
@@ -61,7 +60,7 @@ export default {
         .filter(([key, value]) => value)
         .map(([key]) => key));
 
-    if (filesWithLinks.size === 0) {
+    if (empty(filesWithLinks)) {
       return html.blank();
     }
 
@@ -91,7 +90,7 @@ export default {
           html.tag('ul',
             files.map(file =>
               html.tag('li',
-                (slots.fileSizes[file]
+                (slots.fileSizes?.[file]
                   ? language.$('releaseInfo.additionalFiles.file.withSize', {
                       file: slots.fileLinks[file],
                       size: language.formatFileSize(slots.fileSizes[file]),
