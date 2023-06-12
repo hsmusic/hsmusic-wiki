@@ -22,62 +22,56 @@ export default {
     return relations;
   },
 
-  generate(relations, {html, language}) {
-    return html.template({
-      annotation: 'generateCoverArtwork',
+  slots: {
+    path: {
+      validate: v => v.validateArrayItems(v.isString),
+    },
 
-      slots: {
-        path: {
-          validate: v => v.validateArrayItems(v.isString),
-        },
+    alt: {
+      type: 'string',
+    },
 
-        alt: {
-          type: 'string',
-        },
+    displayMode: {
+      validate: v => v.is('primary', 'thumbnail'),
+      default: 'primary',
+    },
+  },
 
-        displayMode: {
-          validate: v => v.is('primary', 'thumbnail'),
-          default: 'primary',
-        },
-      },
+  generate(relations, slots, {html, language}) {
+    switch (slots.displayMode) {
+      case 'primary':
+        return html.tag('div', {id: 'cover-art-container'}, [
+          relations.image
+            .slots({
+              path: slots.path,
+              alt: slots.alt,
+              thumb: 'medium',
+              id: 'cover-art',
+              reveal: true,
+              link: true,
+              square: true,
+            }),
 
-      content(slots) {
-        switch (slots.displayMode) {
-          case 'primary':
-            return html.tag('div', {id: 'cover-art-container'}, [
-              relations.image
-                .slots({
-                  path: slots.path,
-                  alt: slots.alt,
-                  thumb: 'medium',
-                  id: 'cover-art',
-                  reveal: true,
-                  link: true,
-                  square: true,
-                }),
+          !empty(relations.tagLinks) &&
+            html.tag('p',
+              language.$('releaseInfo.artTags.inline', {
+                tags: language.formatUnitList(relations.tagLinks),
+              })),
+          ]);
 
-              !empty(relations.tagLinks) &&
-                html.tag('p',
-                  language.$('releaseInfo.artTags.inline', {
-                    tags: language.formatUnitList(relations.tagLinks),
-                  })),
-              ]);
+      case 'thumbnail':
+        return relations.image
+          .slots({
+            path: slots.path,
+            alt: slots.alt,
+            thumb: 'small',
+            reveal: false,
+            link: false,
+            square: true,
+          });
 
-          case 'thumbnail':
-            return relations.image
-              .slots({
-                path: slots.path,
-                alt: slots.alt,
-                thumb: 'small',
-                reveal: false,
-                link: false,
-                square: true,
-              });
-
-          case 'default':
-            return html.blank();
-        }
-      },
-    });
+      default:
+        return html.blank();
+    }
   },
 };

@@ -24,189 +24,181 @@ export default {
     return data;
   },
 
-  generate(data, {
+  slots: {
+    src: {type: 'string'},
+
+    path: {
+      validate: v => v.validateArrayItems(v.isString),
+    },
+
+    thumb: {type: 'string'},
+
+    reveal: {type: 'boolean', default: true},
+    link: {type: 'boolean', default: false},
+    lazy: {type: 'boolean', default: false},
+    square: {type: 'boolean', default: false},
+
+    id: {type: 'string'},
+    class: {type: 'string'},
+    alt: {type: 'string'},
+    width: {type: 'number'},
+    height: {type: 'number'},
+
+    missingSourceContent: {type: 'html'},
+  },
+
+  generate(data, slots, {
     getSizeOfImageFile,
     html,
     language,
     thumb,
     to,
   }) {
-    return html.template({
-      annotation: 'image',
+    let originalSrc;
 
-      slots: {
-        src: {
-          type: 'string',
-        },
+    if (slots.src) {
+      originalSrc = slots.src;
+    } else if (!empty(slots.path)) {
+      originalSrc = to(...slots.path);
+    } else {
+      originalSrc = '';
+    }
 
-        path: {
-          validate: v => v.validateArrayItems(v.isString),
-        },
+    const thumbSrc =
+      originalSrc &&
+        (slots.thumb
+          ? thumb[slots.thumb](originalSrc)
+          : originalSrc);
 
-        thumb: {type: 'string'},
+    const willLink = typeof slots.link === 'string' || slots.link;
 
-        reveal: {type: 'boolean', default: true},
-        link: {type: 'boolean', default: false},
-        lazy: {type: 'boolean', default: false},
-        square: {type: 'boolean', default: false},
+    const willReveal =
+      slots.reveal &&
+      originalSrc &&
+      !empty(data.contentWarnings);
 
-        id: {type: 'string'},
-        class: {type: 'string'},
-        alt: {type: 'string'},
-        width: {type: 'number'},
-        height: {type: 'number'},
+    const willSquare = slots.square;
 
-        missingSourceContent: {type: 'html'},
-      },
+    const idOnImg = willLink ? null : slots.id;
+    const idOnLink = willLink ? slots.id : null;
+    const classOnImg = willLink ? null : slots.class;
+    const classOnLink = willLink ? slots.class : null;
 
-      content(slots) {
-        let originalSrc;
+    if (!originalSrc) {
+      return prepare(
+        html.tag('div', {class: 'image-text-area'},
+          slots.missingSourceContent));
+    }
 
-        if (slots.src) {
-          originalSrc = slots.src;
-        } else if (!empty(slots.path)) {
-          originalSrc = to(...slots.path);
-        } else {
-          originalSrc = '';
-        }
+    let fileSize = null;
+    if (willLink) {
+      const mediaRoot = to('media.root');
+      if (originalSrc.startsWith(mediaRoot)) {
+        fileSize =
+          getSizeOfImageFile(
+            originalSrc
+              .slice(mediaRoot.length)
+              .replace(/^\//, ''));
+      }
+    }
 
-        const thumbSrc =
-          originalSrc &&
-            (slots.thumb
-              ? thumb[slots.thumb](originalSrc)
-              : originalSrc);
+    let reveal = null;
+    if (willReveal) {
+      reveal = [
+        language.$('misc.contentWarnings', {
+          warnings: language.formatUnitList(data.contentWarnings),
+        }),
+        html.tag('br'),
+        html.tag('span', {class: 'reveal-interaction'},
+          language.$('misc.contentWarnings.reveal')),
+      ];
+    }
 
-        const willLink = typeof slots.link === 'string' || slots.link;
+    const imgAttributes = {
+      id: idOnImg,
+      class: classOnImg,
+      alt: slots.alt,
+      width: slots.width,
+      height: slots.height,
+      'data-original-size': fileSize,
+    };
 
-        const willReveal =
-          slots.reveal &&
-          originalSrc &&
-          !empty(data.contentWarnings);
+    const nonlazyHTML =
+      originalSrc &&
+        prepare(
+          html.tag('img', {
+            ...imgAttributes,
+            src: thumbSrc,
+          }));
 
-        const willSquare = slots.square;
-
-        const idOnImg = willLink ? null : slots.id;
-        const idOnLink = willLink ? slots.id : null;
-        const classOnImg = willLink ? null : slots.class;
-        const classOnLink = willLink ? slots.class : null;
-
-        if (!originalSrc) {
-          return prepare(
-            html.tag('div', {class: 'image-text-area'},
-              slots.missingSourceContent));
-        }
-
-        let fileSize = null;
-        if (willLink) {
-          const mediaRoot = to('media.root');
-          if (originalSrc.startsWith(mediaRoot)) {
-            fileSize =
-              getSizeOfImageFile(
-                originalSrc
-                  .slice(mediaRoot.length)
-                  .replace(/^\//, ''));
-          }
-        }
-
-        let reveal = null;
-        if (willReveal) {
-          reveal = [
-            language.$('misc.contentWarnings', {
-              warnings: language.formatUnitList(data.contentWarnings),
+    if (slots.lazy) {
+      return html.tags([
+        html.tag('noscript', nonlazyHTML),
+        prepare(
+          html.tag('img',
+            {
+              ...imgAttributes,
+              class: 'lazy',
+              'data-original': thumbSrc,
             }),
-            html.tag('br'),
-            html.tag('span', {class: 'reveal-interaction'},
-              language.$('misc.contentWarnings.reveal')),
-          ];
-        }
+          true),
+      ]);
+    }
 
-        const imgAttributes = {
-          id: idOnImg,
-          class: classOnImg,
-          alt: slots.alt,
-          width: slots.width,
-          height: slots.height,
-          'data-original-size': fileSize,
-        };
+    return nonlazyHTML;
 
-        const nonlazyHTML =
-          originalSrc &&
-            prepare(
-              html.tag('img', {
-                ...imgAttributes,
-                src: thumbSrc,
-              }));
+    function prepare(content, hide = false) {
+      let wrapped = content;
 
-        if (slots.lazy) {
-          return html.tags([
-            html.tag('noscript', nonlazyHTML),
-            prepare(
-              html.tag('img',
-                {
-                  ...imgAttributes,
-                  class: 'lazy',
-                  'data-original': thumbSrc,
-                }),
-              true),
+      wrapped =
+        html.tag('div', {class: 'image-container'},
+          html.tag('div', {class: 'image-inner-area'},
+            wrapped));
+
+      if (willReveal) {
+        wrapped =
+          html.tag('div', {class: 'reveal'}, [
+            wrapped,
+            html.tag('span', {class: 'reveal-text-container'},
+              html.tag('span', {class: 'reveal-text'},
+                reveal)),
           ]);
-        }
+      }
 
-        return nonlazyHTML;
+      if (willSquare) {
+        wrapped =
+          html.tag('div',
+            {
+              class: [
+                'square',
+                hide && !willLink && 'js-hide'
+              ],
+            },
 
-        function prepare(content, hide = false) {
-          let wrapped = content;
+            html.tag('div', {class: 'square-content'},
+              wrapped));
+      }
 
-          wrapped =
-            html.tag('div', {class: 'image-container'},
-              html.tag('div', {class: 'image-inner-area'},
-                wrapped));
+      if (willLink) {
+        wrapped = html.tag('a',
+          {
+            id: idOnLink,
+            class: [
+              'box',
+              'image-link',
+              hide && 'js-hide',
+              classOnLink,
+            ],
 
-          if (willReveal) {
-            wrapped =
-              html.tag('div', {class: 'reveal'}, [
-                wrapped,
-                html.tag('span', {class: 'reveal-text-container'},
-                  html.tag('span', {class: 'reveal-text'},
-                    reveal)),
-              ]);
-          }
+            href:
+              (typeof slots.link === 'string'
+                ? slots.link
+                : originalSrc),
+          },
+          wrapped);
+      }
 
-          if (willSquare) {
-            wrapped =
-              html.tag('div',
-                {
-                  class: [
-                    'square',
-                    hide && !willLink && 'js-hide'
-                  ],
-                },
-
-                html.tag('div', {class: 'square-content'},
-                  wrapped));
-          }
-
-          if (willLink) {
-            wrapped = html.tag('a',
-              {
-                id: idOnLink,
-                class: [
-                  'box',
-                  'image-link',
-                  hide && 'js-hide',
-                  classOnLink,
-                ],
-
-                href:
-                  (typeof slots.link === 'string'
-                    ? slots.link
-                    : originalSrc),
-              },
-              wrapped);
-          }
-
-          return wrapped;
-        }
-      },
-    });
-  }
+      return wrapped;
+    }
+  },
 };

@@ -53,68 +53,62 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return html.template({
-      annotation: `generateAlbumNavAccent`,
+  slots: {
+    showTrackNavigation: {type: 'boolean', default: false},
+    showExtraLinks: {type: 'boolean', default: false},
 
-      slots: {
-        showTrackNavigation: {type: 'boolean', default: false},
-        showExtraLinks: {type: 'boolean', default: false},
+    currentExtra: {
+      validate: v => v.is('gallery', 'commentary'),
+    },
+  },
 
-        currentExtra: {
-          validate: v => v.is('gallery', 'commentary'),
-        },
-      },
+  generate(data, relations, slots, {html, language}) {
+    const {content: extraLinks = []} =
+      slots.showExtraLinks &&
+        {content: [
+          relations.albumGalleryLink?.slots({
+            attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+            content: language.$('albumPage.nav.gallery'),
+          }),
 
-      content(slots) {
-        const {content: extraLinks = []} =
-          slots.showExtraLinks &&
-            {content: [
-              relations.albumGalleryLink?.slots({
-                attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-                content: language.$('albumPage.nav.gallery'),
-              }),
+          relations.albumCommentaryLink?.slots({
+            attributes: {class: slots.currentExtra === 'commentary' && 'current'},
+            content: language.$('albumPage.nav.commentary'),
+          }),
+        ]};
 
-              relations.albumCommentaryLink?.slots({
-                attributes: {class: slots.currentExtra === 'commentary' && 'current'},
-                content: language.$('albumPage.nav.commentary'),
-              }),
-            ]};
+    const {content: previousNextLinks = []} =
+      slots.showTrackNavigation &&
+      data.isTrackPage &&
+      data.hasMultipleTracks &&
+        relations.previousNextLinks.slots({
+          previousLink: relations.previousTrackLink,
+          nextLink: relations.nextTrackLink,
+        });
 
-        const {content: previousNextLinks = []} =
-          slots.showTrackNavigation &&
-          data.isTrackPage &&
-          data.hasMultipleTracks &&
-            relations.previousNextLinks.slots({
-              previousLink: relations.previousTrackLink,
-              nextLink: relations.nextTrackLink,
-            });
+    const randomLink =
+      slots.showTrackNavigation &&
+      data.hasMultipleTracks &&
+        html.tag('a',
+          {
+            href: '#',
+            'data-random': 'track-in-album',
+            id: 'random-button',
+          },
+          (data.isTrackPage
+            ? language.$('trackPage.nav.random')
+            : language.$('albumPage.nav.randomTrack')));
 
-        const randomLink =
-          slots.showTrackNavigation &&
-          data.hasMultipleTracks &&
-            html.tag('a',
-              {
-                href: '#',
-                'data-random': 'track-in-album',
-                id: 'random-button',
-              },
-              (data.isTrackPage
-                ? language.$('trackPage.nav.random')
-                : language.$('albumPage.nav.randomTrack')));
+    const allLinks = [
+      ...previousNextLinks,
+      ...extraLinks,
+      randomLink,
+    ].filter(Boolean);
 
-        const allLinks = [
-          ...previousNextLinks,
-          ...extraLinks,
-          randomLink,
-        ].filter(Boolean);
+    if (empty(allLinks)) {
+      return html.blank();
+    }
 
-        if (empty(allLinks)) {
-          return html.blank();
-        }
-
-        return `(${language.formatUnitList(allLinks)})`
-      },
-    });
+    return `(${language.formatUnitList(allLinks)})`;
   },
 };

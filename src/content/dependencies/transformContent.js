@@ -180,7 +180,14 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
+  slots: {
+    mode: {
+      validate: v => v.is('inline', 'multiline', 'lyrics'),
+      default: 'multiline',
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
     let linkIndex = 0;
 
     // This array contains only straight text and link nodes, which are directly
@@ -233,93 +240,80 @@ export default {
         return getPlaceholder(node, data.content);
       });
 
-    return html.template({
-      annotation: `transformContent`,
+    // In inline mode, no further processing is needed!
 
-      slots: {
-        mode: {
-          validate: v => v.is('inline', 'multiline', 'lyrics'),
-          default: 'multiline',
-        },
-      },
+    if (slots.mode === 'inline') {
+      return html.tags(contentFromNodes.map(node => node.data));
+    }
 
-      content(slots) {
-        // In inline mode, no further processing is needed!
+    // Multiline mode has a secondary processing stage where it's passed...
+    // through marked! Rolling your own Markdown only gets you so far :D
 
-        if (slots.mode === 'inline') {
-          return html.tags(contentFromNodes.map(node => node.data));
-        }
+    const markedOptions = {
+      headerIds: false,
+      mangle: false,
+    };
 
-        // Multiline mode has a secondary processing stage where it's passed...
-        // through marked! Rolling your own Markdown only gets you so far :D
+    // This is separated into its own function just since we're gonna reuse
+    // it in a minute if everything goes to heck in lyrics mode.
+    const transformMultiline = () => {
+      const markedInput =
+        contentFromNodes
+          .map(node => {
+            if (node.type === 'text') {
+              return node.data;
+            } else {
+              return node.data.toString();
+            }
+          })
+          .join('')
 
-        const markedOptions = {
-          headerIds: false,
-          mangle: false,
-        };
+          // Compress multiple line breaks into single line breaks.
+          .replace(/\n{2,}/g, '\n')
+          // Expand line breaks which don't follow a list.
+          .replace(/(?<!^ *-.*)\n+/gm, '\n\n')
+          // Expand line breaks which are at the end of a list.
+          .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n');
 
-        // This is separated into its own function just since we're gonna reuse
-        // it in a minute if everything goes to heck in lyrics mode.
-        const transformMultiline = () => {
-          const markedInput =
-            contentFromNodes
-              .map(node => {
-                if (node.type === 'text') {
-                  return node.data;
-                } else {
-                  return node.data.toString();
-                }
-              })
-              .join('')
+      return marked.parse(markedInput, markedOptions);
+    }
 
-              // Compress multiple line breaks into single line breaks.
-              .replace(/\n{2,}/g, '\n')
-              // Expand line breaks which don't follow a list.
-              .replace(/(?<!^ *-.*)\n+/gm, '\n\n')
-              // Expand line breaks which are at the end of a list.
-              .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n');
+    if (slots.mode === 'multiline') {
+      // Unfortunately, we kind of have to be super evil here and stringify
+      // the links, or else parse marked's output into html tags, which is
+      // very out of scope at the moment.
+      return transformMultiline();
+    }
 
-          return marked.parse(markedInput, markedOptions);
-        }
+    // Lyrics mode goes through marked too, but line breaks are processed
+    // differently. Instead of having each line get its own paragraph,
+    // "adjacent" lines are joined together (with blank lines separating
+    // each verse/paragraph).
 
-        if (slots.mode === 'multiline') {
-          // Unfortunately, we kind of have to be super evil here and stringify
-          // the links, or else parse marked's output into html tags, which is
-          // very out of scope at the moment.
-          return transformMultiline();
-        }
+    if (slots.mode === 'lyrics') {
+      // If it looks like old data, using <br> instead of bunched together
+      // lines... then oh god... just use transformMultiline. Perishes.
+      if (
+        contentFromNodes.some(node =>
+          node.type === 'text' &&
+          node.data.includes('<br'))
+      ) {
+        return transformMultiline();
+      }
 
-        // Lyrics mode goes through marked too, but line breaks are processed
-        // differently. Instead of having each line get its own paragraph,
-        // "adjacent" lines are joined together (with blank lines separating
-        // each verse/paragraph).
-
-        if (slots.mode === 'lyrics') {
-          // If it looks like old data, using <br> instead of bunched together
-          // lines... then oh god... just use transformMultiline. Perishes.
-          if (
-            contentFromNodes.some(node =>
-              node.type === 'text' &&
-              node.data.includes('<br'))
-          ) {
-            return transformMultiline();
-          }
-
-          // Lyrics mode is also evil for the same stringifying reasons as
-          // multiline.
-          return marked.parse(
-            contentFromNodes
-              .map(node => {
-                if (node.type === 'text') {
-                  return node.data.replace(/\b\n\b/g, '<br>\n');
-                } else {
-                  return node.data.toString();
-                }
-              })
-              .join(''),
-            markedOptions);
-        }
-      },
-    });
+      // Lyrics mode is also evil for the same stringifying reasons as
+      // multiline.
+      return marked.parse(
+        contentFromNodes
+          .map(node => {
+            if (node.type === 'text') {
+              return node.data.replace(/\b\n\b/g, '<br>\n');
+            } else {
+              return node.data.toString();
+            }
+          })
+          .join(''),
+        markedOptions);
+    }
   },
 }

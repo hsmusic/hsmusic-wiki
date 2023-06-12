@@ -5,32 +5,26 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  generate({html, language}) {
-    return html.template({
-      annotation: `generatePreviousNextLinks`,
+  slots: {
+    previousLink: {type: 'html'},
+    nextLink: {type: 'html'},
+  },
 
-      slots: {
-        previousLink: {type: 'html'},
-        nextLink: {type: 'html'},
-      },
+  generate(slots, {html, language}) {
+    return html.tags([
+      !html.isBlank(slots.previousLink) &&
+        slots.previousLink.slots({
+          tooltip: true,
+          attributes: {id: 'previous-button'},
+          content: language.$('misc.nav.previous'),
+        }),
 
-      content(slots) {
-        return [
-          !html.isBlank(slots.previousLink) &&
-            slots.previousLink.slots({
-              tooltip: true,
-              attributes: {id: 'previous-button'},
-              content: language.$('misc.nav.previous'),
-            }),
-
-          !html.isBlank(slots.nextLink) &&
-            slots.nextLink?.slots({
-              tooltip: true,
-              attributes: {id: 'next-button'},
-              content: language.$('misc.nav.next'),
-            }),
-        ].filter(Boolean);
-      },
-    });
+      !html.isBlank(slots.nextLink) &&
+        slots.nextLink?.slots({
+          tooltip: true,
+          attributes: {id: 'next-button'},
+          content: language.$('misc.nav.next'),
+        }),
+    ]);
   },
 };

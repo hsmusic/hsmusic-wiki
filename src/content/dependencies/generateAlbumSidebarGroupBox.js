@@ -43,46 +43,40 @@ export default {
     return relations;
   },
 
-  generate(relations, {html, language}) {
-    return html.template({
-      annotation: `generateAlbumSidebarGroupBox`,
+  slots: {
+    isAlbumPage: {type: 'boolean', default: false},
+  },
 
-      slots: {
-        isAlbumPage: {type: 'boolean', default: false},
-      },
+  generate(relations, slots, {html, language}) {
+    return html.tags([
+      html.tag('h1',
+        language.$('albumSidebar.groupBox.title', {
+          group: relations.groupLink,
+        })),
 
-      content(slots) {
-        return html.tags([
-          html.tag('h1',
-            language.$('albumSidebar.groupBox.title', {
-              group: relations.groupLink,
-            })),
+      slots.isAlbumPage &&
+        relations.description
+          ?.slot('mode', 'multiline'),
 
-          slots.isAlbumPage &&
-            relations.description
-              ?.slot('mode', 'multiline'),
+      !empty(relations.externalLinks) &&
+        html.tag('p',
+          language.$('releaseInfo.visitOn', {
+            links: language.formatDisjunctionList(relations.externalLinks),
+          })),
 
-          !empty(relations.externalLinks) &&
-            html.tag('p',
-              language.$('releaseInfo.visitOn', {
-                links: language.formatDisjunctionList(relations.externalLinks),
-              })),
+      slots.isAlbumPage &&
+      relations.nextAlbumLink &&
+        html.tag('p', {class: 'group-chronology-link'},
+          language.$('albumSidebar.groupBox.next', {
+            album: relations.nextAlbumLink,
+          })),
 
-          slots.isAlbumPage &&
-          relations.nextAlbumLink &&
-            html.tag('p', {class: 'group-chronology-link'},
-              language.$('albumSidebar.groupBox.next', {
-                album: relations.nextAlbumLink,
-              })),
-
-          slots.isAlbumPage &&
-          relations.previousAlbumLink &&
-            html.tag('p', {class: 'group-chronology-link'},
-              language.$('albumSidebar.groupBox.previous', {
-                album: relations.previousAlbumLink,
-              })),
-        ]);
-      },
-    });
+      slots.isAlbumPage &&
+      relations.previousAlbumLink &&
+        html.tag('p', {class: 'group-chronology-link'},
+          language.$('albumSidebar.groupBox.previous', {
+            album: relations.previousAlbumLink,
+          })),
+    ]);
   },
 };

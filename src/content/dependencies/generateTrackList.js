@@ -22,34 +22,28 @@ export default {
     };
   },
 
-  generate(relations, {html, language}) {
-    return html.template({
-      annotation: `generateTrackList`,
+  slots: {
+    showContribution: {type: 'boolean', default: false},
+    showIcons: {type: 'boolean', default: false},
+  },
 
-      slots: {
-        showContribution: {type: 'boolean', default: false},
-        showIcons: {type: 'boolean', default: false},
-      },
-
-      content(slots) {
-        return html.tag('ul',
-          relations.items.map(({trackLink, contributionLinks}) =>
-            html.tag('li',
-              language.$('trackList.item.withArtists', {
-                track: trackLink,
-                by:
-                  html.tag('span', {class: 'by'},
-                    language.$('trackList.item.withArtists.by', {
-                      artists:
-                        language.formatConjunctionList(
-                          contributionLinks.map(link =>
-                            link.slots({
-                              showContribution: slots.showContribution,
-                              showIcons: slots.showIcons,
-                            }))),
-                    })),
-              }))));
-      },
-    });
+  generate(relations, slots, {html, language}) {
+    return html.tag('ul',
+      relations.items.map(({trackLink, contributionLinks}) =>
+        html.tag('li',
+          language.$('trackList.item.withArtists', {
+            track: trackLink,
+            by:
+              html.tag('span', {class: 'by'},
+                language.$('trackList.item.withArtists.by', {
+                  artists:
+                    language.formatConjunctionList(
+                      contributionLinks.map(link =>
+                        link.slots({
+                          showContribution: slots.showContribution,
+                          showIcons: slots.showIcons,
+                        }))),
+                })),
+          }))));
   },
 };

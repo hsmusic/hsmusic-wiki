@@ -40,66 +40,61 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return html.template({
-      annotation: `generateArtistNav`,
-      slots: {
-        showExtraLinks: {type: 'boolean', default: false},
+  slots: {
+    showExtraLinks: {type: 'boolean', default: false},
 
-        currentExtra: {
-          validate: v => v.is('gallery'),
+    currentExtra: {
+      validate: v => v.is('gallery'),
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
+    const infoLink =
+      relations.artistInfoLink?.slots({
+        attributes: {class: slots.currentExtra === null && 'current'},
+        content: language.$('misc.nav.info'),
+      });
+
+    const {content: extraLinks = []} =
+      slots.showExtraLinks &&
+        {content: [
+          relations.artistGalleryLink?.slots({
+            attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+            content: language.$('misc.nav.gallery'),
+          }),
+        ]};
+
+    const mostAccentLinks = [
+      ...extraLinks,
+    ].filter(Boolean);
+
+    // Don't show the info accent link all on its own.
+    const allAccentLinks =
+      (empty(mostAccentLinks)
+        ? []
+        : [infoLink, ...mostAccentLinks]);
+
+    const accent =
+      (empty(allAccentLinks)
+        ? html.blank()
+        : `(${language.formatUnitList(allAccentLinks)})`);
+
+    return [
+      {auto: 'home'},
+
+      data.enableListings &&
+        {
+          path: ['localized.listingIndex'],
+          title: language.$('listingIndex.title'),
         },
+
+      {
+        accent,
+        html:
+          language.$('artistPage.nav.artist', {
+            artist: relations.artistMainLink,
+          }),
       },
-
-      content(slots) {
-        const infoLink =
-          relations.artistInfoLink?.slots({
-            attributes: {class: slots.currentExtra === null && 'current'},
-            content: language.$('misc.nav.info'),
-          });
-
-        const {content: extraLinks = []} =
-          slots.showExtraLinks &&
-            {content: [
-              relations.artistGalleryLink?.slots({
-                attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-                content: language.$('misc.nav.gallery'),
-              }),
-            ]};
-
-        const mostAccentLinks = [
-          ...extraLinks,
-        ].filter(Boolean);
-
-        // Don't show the info accent link all on its own.
-        const allAccentLinks =
-          (empty(mostAccentLinks)
-            ? []
-            : [infoLink, ...mostAccentLinks]);
-
-        const accent =
-          (empty(allAccentLinks)
-            ? html.blank()
-            : `(${language.formatUnitList(allAccentLinks)})`);
-
-        return [
-          {auto: 'home'},
-
-          data.enableListings &&
-            {
-              path: ['localized.listingIndex'],
-              title: language.$('listingIndex.title'),
-            },
-
-          {
-            accent,
-            html:
-              language.$('artistPage.nav.artist', {
-                artist: relations.artistMainLink,
-              }),
-          },
-        ];
-      },
-    });
+    ];
   },
 };

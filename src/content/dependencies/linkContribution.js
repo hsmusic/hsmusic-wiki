@@ -27,48 +27,39 @@ export default {
     return {contribution};
   },
 
-  generate(data, relations, {
-    html,
-    language,
-  }) {
-    return html.template({
-      annotation: 'linkContribution',
+  slots: {
+    showContribution: {type: 'boolean', default: false},
+    showIcons: {type: 'boolean', default: false},
+  },
 
-      slots: {
-        showContribution: {type: 'boolean', default: false},
-        showIcons: {type: 'boolean', default: false},
-      },
+  generate(data, relations, slots, {html, language}) {
+    const hasContributionPart = !!(slots.showContribution && data.contribution);
+    const hasExternalPart = !!(slots.showIcons && !empty(relations.artistIcons));
 
-      content(slots) {
-        const hasContributionPart = !!(slots.showContribution && data.contribution);
-        const hasExternalPart = !!(slots.showIcons && !empty(relations.artistIcons));
+    const externalLinks = hasExternalPart &&
+      html.tag('span',
+        {[html.noEdgeWhitespace]: true, class: 'icons'},
+        language.formatUnitList(relations.artistIcons));
 
-        const externalLinks = hasExternalPart &&
-          html.tag('span',
-            {[html.noEdgeWhitespace]: true, class: 'icons'},
-            language.formatUnitList(relations.artistIcons));
-
-        return (
-          (hasContributionPart
-            ? (hasExternalPart
-                ? language.$('misc.artistLink.withContribution.withExternalLinks', {
-                    artist: relations.artistLink,
-                    contrib: data.contribution,
-                    links: externalLinks,
-                  })
-                : language.$('misc.artistLink.withContribution', {
-                    artist: relations.artistLink,
-                    contrib: data.contribution,
-                  }))
-            : (hasExternalPart
-                ? language.$('misc.artistLink.withExternalLinks', {
-                    artist: relations.artistLink,
-                    links: externalLinks,
-                  })
-                : language.$('misc.artistLink', {
-                    artist: relations.artistLink,
-                  }))));
-      },
-    });
+    return (
+      (hasContributionPart
+        ? (hasExternalPart
+            ? language.$('misc.artistLink.withContribution.withExternalLinks', {
+                artist: relations.artistLink,
+                contrib: data.contribution,
+                links: externalLinks,
+              })
+            : language.$('misc.artistLink.withContribution', {
+                artist: relations.artistLink,
+                contrib: data.contribution,
+              }))
+        : (hasExternalPart
+            ? language.$('misc.artistLink.withExternalLinks', {
+                artist: relations.artistLink,
+                links: externalLinks,
+              })
+            : language.$('misc.artistLink', {
+                artist: relations.artistLink,
+              }))));
   },
 };

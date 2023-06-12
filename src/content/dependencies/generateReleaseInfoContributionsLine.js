@@ -18,32 +18,26 @@ export default {
     };
   },
 
-  generate(relations, {html, language}) {
-    return html.template({
-      annotation: `generateReleaseInfoContributionsLine`,
+  slots: {
+    stringKey: {type: 'string'},
 
-      slots: {
-        stringKey: {type: 'string'},
+    showContribution: {type: 'boolean', default: true},
+    showIcons: {type: 'boolean', default: true},
+  },
 
-        showContribution: {type: 'boolean', default: true},
-        showIcons: {type: 'boolean', default: true},
-      },
+  generate(relations, slots, {html, language}) {
+    if (!relations.contributionLinks) {
+      return html.blank();
+    }
 
-      content(slots) {
-        if (!relations.contributionLinks) {
-          return html.blank();
-        }
-
-        return language.$(slots.stringKey, {
-          artists:
-            language.formatConjunctionList(
-              relations.contributionLinks.map(link =>
-                link.slots({
-                  showContribution: slots.showContribution,
-                  showIcons: slots.showIcons,
-                }))),
-        });
-      },
+    return language.$(slots.stringKey, {
+      artists:
+        language.formatConjunctionList(
+          relations.contributionLinks.map(link =>
+            link.slots({
+              showContribution: slots.showContribution,
+              showIcons: slots.showIcons,
+            }))),
     });
   },
 };
