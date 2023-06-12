@@ -37,13 +37,9 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
       {args: ['https://youtu.be/abc', {type: 'album'}]},
       {args: ['https://youtube.com/watch?v=abc', {type: 'album'}]},
       {args: ['https://youtube.com/Playlist?list=kweh', {type: 'album'}]},
-
-      // Reuse default when no type specified
-      {args: ['https://youtu.be/abc']},
-      {args: ['https://youtu.be/abc?list=kweh']},
-      {args: ['https://youtube.com/watch?v=abc']},
-      {args: ['https://youtube.com/watch?v=abc&list=kweh']},
     ],
+    postprocess:
+      link => link.slot('mode', 'album'),
   });
 
   evaluate.snapshot('custom domains for common platforms', {

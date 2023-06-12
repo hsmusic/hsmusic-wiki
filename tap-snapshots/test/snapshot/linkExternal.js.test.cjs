@@ -28,10 +28,6 @@ exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom matc
 <a href="https://youtu.be/abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube (playlist)</a>
-<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
-<a href="https://youtu.be/abc?list=kweh" class="nowrap">YouTube</a>
-<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
-<a href="https://youtube.com/watch?v=abc&list=kweh" class="nowrap">YouTube</a>
 `
 
 exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > missing domain (arbitrary local path) 1`] = `

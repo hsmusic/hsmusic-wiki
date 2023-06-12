@@ -5,21 +5,18 @@ const MASTODON_DOMAINS = ['types.pl'];
 export default {
   extraDependencies: ['html', 'language'],
 
-  data(url, {
-    type = 'generic',
-  } = {}) {
-    const types = ['generic', 'album'];
-    if (!types.includes(type)) {
-      throw new TypeError(`Expected type to be one of ${types}`);
-    }
-
-    return {
-      url,
-      type,
-    };
+  data(url) {
+    return {url};
   },
 
-  generate(data, {html, language}) {
+  slots: {
+    mode: {
+      validate: v => v.is('generic', 'album'),
+      default: 'generic',
+    },
+  },
+
+  generate(data, slots, {html, language}) {
     let isLocal;
     let domain;
     try {
@@ -50,7 +47,7 @@ export default {
         ? language.$('misc.external.mastodon.domain', {domain})
 
     : domain.includes('youtu')
-        ? data.type === 'album'
+        ? slots.mode === 'album'
           ? data.url.includes('list=')
             ? language.$('misc.external.youtube.playlist')
             : language.$('misc.external.youtube.fullAlbum')

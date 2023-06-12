@@ -99,7 +99,7 @@ export default {
 
       listen.externalLinks =
         album.urls.map(url =>
-          relation('linkExternal', url, {type: 'album'}));
+          relation('linkExternal', url));
     }
 
     // Section: Extra links
@@ -234,7 +234,10 @@ export default {
           sec.listen &&
             html.tag('p',
               language.$('releaseInfo.listenOn', {
-                links: language.formatDisjunctionList(sec.listen.externalLinks),
+                links:
+                  language.formatDisjunctionList(
+                    sec.listen.externalLinks
+                      .map(link => link.slot('mode', 'album'))),
               })),
 
           html.tag('p',
