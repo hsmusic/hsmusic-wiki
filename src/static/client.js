@@ -561,6 +561,7 @@ function prepareStickyHeadings() {
   } of stickyHeadingInfo) {
     const coverRevealImage = contentCover?.querySelector('.reveal');
     if (coverRevealImage) {
+      stickyCover.classList.add('content-sticky-heading-cover-needs-reveal');
       coverRevealImage.addEventListener('hsmusic-reveal', () => {
         stickyCover.classList.remove('content-sticky-heading-cover-needs-reveal');
       });

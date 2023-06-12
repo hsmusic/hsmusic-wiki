@@ -1,22 +1,62 @@
-import {annotateFunction, empty} from './util/sugar.js';
+import {
+  annotateFunction,
+  empty,
+  setIntersection,
+} from './util/sugar.js';
 
 export default function contentFunction({
   contentDependencies = [],
   extraDependencies = [],
 
+  slots,
   sprawl,
   relations,
   data,
   generate,
 }) {
+  const expectedContentDependencyKeys = new Set(contentDependencies);
+  const expectedExtraDependencyKeys = new Set(extraDependencies);
+
+  // Initial checks. These only need to be run once per description of a
+  // content function, and don't depend on any mutable context (e.g. which
+  // dependencies have been fulfilled so far).
+
+  const overlappingContentExtraDependencyKeys =
+    setIntersection(expectedContentDependencyKeys, expectedExtraDependencyKeys);
+
+  if (!empty(overlappingContentExtraDependencyKeys)) {
+    throw new Error(`Overlap in content and extra dependency keys: ${[...overlappingContentExtraDependencyKeys].join(', ')}`);
+  }
+
+  if (!generate) {
+    throw new Error(`Expected generate function`);
+  }
+
+  if (sprawl && !expectedExtraDependencyKeys.has('wikiData')) {
+    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
+  }
+
+  if (slots && !expectedExtraDependencyKeys.has('html')) {
+    throw new Error(`Content functions with slots must specify html in extraDependencies`);
+  }
+
+  // Pass all the details to expectDependencies, which will recursively build
+  // up a set of fulfilled dependencies and make functions like `relations`
+  // and `generate` callable only with sufficient fulfilled dependencies.
+
   return expectDependencies({
+    slots,
     sprawl,
     relations,
     data,
     generate,
 
-    expectedContentDependencyKeys: contentDependencies,
-    expectedExtraDependencyKeys: extraDependencies,
+    expectedContentDependencyKeys,
+    expectedExtraDependencyKeys,
+    missingContentDependencyKeys: new Set(expectedContentDependencyKeys),
+    missingExtraDependencyKeys: new Set(expectedExtraDependencyKeys),
+    invalidatingDependencyKeys: new Set(),
+    fulfilledDependencyKeys: new Set(),
     fulfilledDependencies: {},
   });
 }
@@ -24,6 +64,7 @@ export default function contentFunction({
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
 export function expectDependencies({
+  slots,
   sprawl,
   relations,
   data,
@@ -31,43 +72,39 @@ export function expectDependencies({
 
   expectedContentDependencyKeys,
   expectedExtraDependencyKeys,
+  missingContentDependencyKeys,
+  missingExtraDependencyKeys,
+  invalidatingDependencyKeys,
+  fulfilledDependencyKeys,
   fulfilledDependencies,
 }) {
-  if (!generate) {
-    throw new Error(`Expected generate function`);
-  }
-
   const hasSprawlFunction = !!sprawl;
   const hasRelationsFunction = !!relations;
   const hasDataFunction = !!data;
+  const hasSlotsDescription = !!slots;
 
-  if (hasSprawlFunction && !expectedExtraDependencyKeys.includes('wikiData')) {
-    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
-  }
-
-  const fulfilledDependencyKeys = Object.keys(fulfilledDependencies);
-
-  const invalidatingDependencyKeys = Object.entries(fulfilledDependencies)
-    .filter(([key, value]) => value?.fulfilled === false)
-    .map(([key]) => key);
-
-  const missingContentDependencyKeys = expectedContentDependencyKeys
-    .filter(key => !fulfilledDependencyKeys.includes(key));
-
-  const missingExtraDependencyKeys = expectedExtraDependencyKeys
-    .filter(key => !fulfilledDependencyKeys.includes(key));
+  const isInvalidated = !empty(invalidatingDependencyKeys);
+  const isMissingContentDependencies = !empty(missingContentDependencyKeys);
+  const isMissingExtraDependencies = !empty(missingExtraDependencyKeys);
 
   let wrappedGenerate;
 
-  if (!empty(invalidatingDependencyKeys)) {
+  if (isInvalidated) {
     wrappedGenerate = function() {
-      throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${invalidatingDependencyKeys.join(', ')}`);
+      throw new Error(`Generate invalidated because unfulfilled dependencies provided: ${[...invalidatingDependencyKeys].join(', ')}`);
     };
 
     annotateFunction(wrappedGenerate, {name: generate, trait: 'invalidated'});
     wrappedGenerate.fulfilled = false;
-  } else if (empty(missingContentDependencyKeys) && empty(missingExtraDependencyKeys)) {
-    wrappedGenerate = function(arg1, arg2) {
+  } else if (isMissingContentDependencies || isMissingExtraDependencies) {
+    wrappedGenerate = function() {
+      throw new Error(`Dependencies still needed: ${[...missingContentDependencyKeys, ...missingExtraDependencyKeys].join(', ')}`);
+    };
+
+    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
+    wrappedGenerate.fulfilled = false;
+  } else {
+    const callUnderlyingGenerate = ([arg1, arg2], ...extraArgs) => {
       if (hasDataFunction && !arg1) {
         throw new Error(`Expected data`);
       }
@@ -81,27 +118,52 @@ export function expectDependencies({
       }
 
       if (hasDataFunction && hasRelationsFunction) {
-        return generate(arg1, arg2, fulfilledDependencies);
+        return generate(arg1, arg2, ...extraArgs, fulfilledDependencies);
       } else if (hasDataFunction || hasRelationsFunction) {
-        return generate(arg1, fulfilledDependencies);
+        return generate(arg1, ...extraArgs, fulfilledDependencies);
       } else {
-        return generate(fulfilledDependencies);
+        return generate(...extraArgs, fulfilledDependencies);
       }
+    };
+
+    if (hasSlotsDescription) {
+      const stationery = fulfilledDependencies.html.stationery({
+        annotation: generate.name,
+
+        // These extra slots are for the data and relations (positional) args.
+        // No hacks to store them temporarily or otherwise "invisibly" alter
+        // the behavior of the template description's `content`, since that
+        // would be expressly against the purpose of templates!
+        slots: {
+          _cfArg1: {validate: v => v.isObject},
+          _cfArg2: {validate: v => v.isObject},
+          ...slots,
+        },
+
+        content(slots) {
+          const args = [slots._cfArg1, slots._cfArg2];
+          return callUnderlyingGenerate(args, slots);
+        },
+      });
+
+      wrappedGenerate = function(...args) {
+        return stationery.template().slots({
+          _cfArg1: args[0] ?? null,
+          _cfArg2: args[1] ?? null,
+        });
+      };
+    } else {
+      wrappedGenerate = function(...args) {
+        return callUnderlyingGenerate(args);
+      };
+    }
+
+    wrappedGenerate.fulfill = function() {
+      throw new Error(`All dependencies already fulfilled (${generate.name})`);
     };
 
     annotateFunction(wrappedGenerate, {name: generate, trait: 'fulfilled'});
     wrappedGenerate.fulfilled = true;
-
-    wrappedGenerate.fulfill = function() {
-      throw new Error(`All dependencies already fulfilled`);
-    };
-  } else {
-    wrappedGenerate = function() {
-      throw new Error(`Dependencies still needed: ${missingContentDependencyKeys.concat(missingExtraDependencyKeys).join(', ')}`);
-    };
-
-    annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
-    wrappedGenerate.fulfilled = false;
   }
 
   wrappedGenerate[contentFunction.identifyingSymbol] = true;
@@ -119,7 +181,31 @@ export function expectDependencies({
   }
 
   wrappedGenerate.fulfill ??= function fulfill(dependencies) {
+    // To avoid unneeded destructuring, `fullfillDependencies` is a mutating
+    // function. But `fulfill` itself isn't meant to mutate! We create a copy
+    // of these variables, so their original values are kept for additional
+    // calls to this same `fulfill`.
+    const newlyMissingContentDependencyKeys = new Set(missingContentDependencyKeys);
+    const newlyMissingExtraDependencyKeys = new Set(missingExtraDependencyKeys);
+    const newlyInvalidatingDependencyKeys = new Set(invalidatingDependencyKeys);
+    const newlyFulfilledDependencyKeys = new Set(fulfilledDependencyKeys);
+    const newlyFulfilledDependencies = {...fulfilledDependencies};
+
+    try {
+      fulfillDependencies(dependencies, {
+        missingContentDependencyKeys: newlyMissingContentDependencyKeys,
+        missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
+        invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
+        fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
+        fulfilledDependencies: newlyFulfilledDependencies,
+      });
+    } catch (error) {
+      error.message += ` (${generate.name})`;
+      throw error;
+    }
+
     return expectDependencies({
+      slots,
       sprawl,
       relations,
       data,
@@ -127,16 +213,13 @@ export function expectDependencies({
 
       expectedContentDependencyKeys,
       expectedExtraDependencyKeys,
-
-      fulfilledDependencies: fulfillDependencies({
-        name: generate.name,
-        dependencies,
-
-        expectedContentDependencyKeys,
-        expectedExtraDependencyKeys,
-        fulfilledDependencies,
-      }),
+      missingContentDependencyKeys: newlyMissingContentDependencyKeys,
+      missingExtraDependencyKeys: newlyMissingExtraDependencyKeys,
+      invalidatingDependencyKeys: newlyInvalidatingDependencyKeys,
+      fulfilledDependencyKeys: newlyFulfilledDependencyKeys,
+      fulfilledDependencies: newlyFulfilledDependencies,
     });
+
   };
 
   Object.assign(wrappedGenerate, {
@@ -147,63 +230,72 @@ export function expectDependencies({
   return wrappedGenerate;
 }
 
-export function fulfillDependencies({
-  name,
-  dependencies,
-  expectedContentDependencyKeys,
-  expectedExtraDependencyKeys,
+export function fulfillDependencies(dependencies, {
+  missingContentDependencyKeys,
+  missingExtraDependencyKeys,
+  invalidatingDependencyKeys,
+  fulfilledDependencyKeys,
   fulfilledDependencies,
 }) {
-  const newFulfilledDependencies = {...fulfilledDependencies};
-  const fulfilledDependencyKeys = Object.keys(fulfilledDependencies);
+  // This is a mutating function. Be aware: it WILL mutate the provided sets
+  // and objects EVEN IF there are errors. This function doesn't exit early,
+  // so all provided dependencies which don't have an associated error should
+  // be treated as fulfilled (this is reflected via fulfilledDependencyKeys).
 
   const errors = [];
-  let bail = false;
 
   for (let [key, value] of Object.entries(dependencies)) {
-    if (fulfilledDependencyKeys.includes(key)) {
+    if (fulfilledDependencyKeys.has(key)) {
       errors.push(new Error(`Dependency ${key} is already fulfilled`));
-      bail = true;
       continue;
     }
 
-    const isContentKey = expectedContentDependencyKeys.includes(key);
-    const isExtraKey = expectedExtraDependencyKeys.includes(key);
+    const isContentKey = missingContentDependencyKeys.has(key);
+    const isExtraKey = missingExtraDependencyKeys.has(key);
 
     if (!isContentKey && !isExtraKey) {
       errors.push(new Error(`Dependency ${key} is not expected`));
-      bail = true;
       continue;
     }
 
     if (value === undefined) {
       errors.push(new Error(`Dependency ${key} was provided undefined`));
-      bail = true;
       continue;
     }
 
-    if (isContentKey && !value?.[contentFunction.identifyingSymbol]) {
-      errors.push(new Error(`Content dependency ${key} is not a content function (got ${value})`));
-      bail = true;
-      continue;
+    const isContentFunction =
+      !!value?.[contentFunction.identifyingSymbol];
+
+    const isFulfilledContentFunction =
+      isContentFunction && value.fulfilled;
+
+    if (isContentKey) {
+      if (!isContentFunction) {
+        errors.push(new Error(`Content dependency ${key} is not a content function (got ${value})`));
+        continue;
+      }
+
+      if (!isFulfilledContentFunction) {
+        invalidatingDependencyKeys.add(key);
+      }
+
+      missingContentDependencyKeys.delete(key);
+    } else if (isExtraKey) {
+      if (isContentFunction) {
+        errors.push(new Error(`Extra dependency ${key} is a content function`));
+        continue;
+      }
+
+      missingExtraDependencyKeys.delete(key);
     }
 
-    if (isExtraKey && value?.[contentFunction.identifyingSymbol]) {
-      errors.push(new Error(`Extra dependency ${key} is a content function`));
-      bail = true;
-      continue;
-    }
-
-    if (!bail) {
-      newFulfilledDependencies[key] = value;
-    }
+    fulfilledDependencyKeys.add(key);
+    fulfilledDependencies[key] = value;
   }
 
   if (!empty(errors)) {
-    throw new AggregateError(errors, `Errors fulfilling dependencies for ${name}`);
+    throw new AggregateError(errors, `Errors fulfilling dependencies`);
   }
-
-  return newFulfilledDependencies;
 }
 
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
