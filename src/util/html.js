@@ -528,61 +528,10 @@ export class Template {
         break validateSlots;
       }
 
-      const slotErrors = [];
-
-      for (const [slotName, slotDescription] of Object.entries(description.slots)) {
-        if (typeof slotDescription !== 'object' || slotDescription === null) {
-          slotErrors.push(new TypeError(`(${slotName}) Expected slot description to be object`));
-          continue;
-        }
-
-        if ('default' in slotDescription) validateDefault: {
-          if (
-            slotDescription.default === undefined ||
-            slotDescription.default === null
-          ) {
-            slotErrors.push(new TypeError(`(${slotName}) Leave slot default unspecified instead of undefined or null`));
-            break validateDefault;
-          }
-
-          try {
-            Template.validateSlotValueAgainstDescription(slotDescription.default, slotDescription);
-          } catch (error) {
-            error.message = `(${slotName}) Error validating slot default value: ${error.message}`;
-            slotErrors.push(error);
-          }
-        }
-
-        if ('validate' in slotDescription && 'type' in slotDescription) {
-          slotErrors.push(new TypeError(`(${slotName}) Don't specify both slot validate and type`));
-        } else if (!('validate' in slotDescription || 'type' in slotDescription)) {
-          slotErrors.push(new TypeError(`(${slotName}) Expected either slot validate or type`));
-        } else if ('validate' in slotDescription) {
-          if (typeof slotDescription.validate !== 'function') {
-            slotErrors.push(new TypeError(`(${slotName}) Expected slot validate to be function`));
-          }
-        } else if ('type' in slotDescription) {
-          const acceptableSlotTypes = [
-            'string',
-            'number',
-            'bigint',
-            'boolean',
-            'symbol',
-            'html',
-          ];
-
-          if (slotDescription.type === 'function') {
-            slotErrors.push(new TypeError(`(${slotName}) Functions shouldn't be provided to slots`));
-          } else if (slotDescription.type === 'object') {
-            slotErrors.push(new TypeError(`(${slotName}) Provide validate function instead of type: object`));
-          } else if (!acceptableSlotTypes.includes(slotDescription.type)) {
-            slotErrors.push(new TypeError(`(${slotName}) Expected slot type to be one of ${acceptableSlotTypes.join(', ')}`));
-          }
-        }
-      }
-
-      if (!empty(slotErrors)) {
-        topErrors.push(new AggregateError(slotErrors, `Errors in slot descriptions`));
+      try {
+        this.validateSlotsDescription(description.slots);
+      } catch (slotError) {
+        topErrors.push(slotError);
       }
     }
 
@@ -591,6 +540,67 @@ export class Template {
         (typeof description.annotation === 'string'
           ? `Errors validating template "${description.annotation}" description`
           : `Errors validating template description`));
+    }
+
+    return true;
+  }
+
+  static validateSlotsDescription(slots) {
+    const slotErrors = [];
+
+    for (const [slotName, slotDescription] of Object.entries(slots)) {
+      if (typeof slotDescription !== 'object' || slotDescription === null) {
+        slotErrors.push(new TypeError(`(${slotName}) Expected slot description to be object`));
+        continue;
+      }
+
+      if ('default' in slotDescription) validateDefault: {
+        if (
+          slotDescription.default === undefined ||
+          slotDescription.default === null
+        ) {
+          slotErrors.push(new TypeError(`(${slotName}) Leave slot default unspecified instead of undefined or null`));
+          break validateDefault;
+        }
+
+        try {
+          Template.validateSlotValueAgainstDescription(slotDescription.default, slotDescription);
+        } catch (error) {
+          error.message = `(${slotName}) Error validating slot default value: ${error.message}`;
+          slotErrors.push(error);
+        }
+      }
+
+      if ('validate' in slotDescription && 'type' in slotDescription) {
+        slotErrors.push(new TypeError(`(${slotName}) Don't specify both slot validate and type`));
+      } else if (!('validate' in slotDescription || 'type' in slotDescription)) {
+        slotErrors.push(new TypeError(`(${slotName}) Expected either slot validate or type`));
+      } else if ('validate' in slotDescription) {
+        if (typeof slotDescription.validate !== 'function') {
+          slotErrors.push(new TypeError(`(${slotName}) Expected slot validate to be function`));
+        }
+      } else if ('type' in slotDescription) {
+        const acceptableSlotTypes = [
+          'string',
+          'number',
+          'bigint',
+          'boolean',
+          'symbol',
+          'html',
+        ];
+
+        if (slotDescription.type === 'function') {
+          slotErrors.push(new TypeError(`(${slotName}) Functions shouldn't be provided to slots`));
+        } else if (slotDescription.type === 'object') {
+          slotErrors.push(new TypeError(`(${slotName}) Provide validate function instead of type: object`));
+        } else if (!acceptableSlotTypes.includes(slotDescription.type)) {
+          slotErrors.push(new TypeError(`(${slotName}) Expected slot type to be one of ${acceptableSlotTypes.join(', ')}`));
+        }
+      }
+    }
+
+    if (!empty(slotErrors)) {
+      throw new AggregateError(slotErrors, `Errors in slot descriptions`);
     }
 
     return true;
