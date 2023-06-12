@@ -8,6 +8,7 @@ export default function contentFunction({
   contentDependencies = [],
   extraDependencies = [],
 
+  slots,
   sprawl,
   relations,
   data,
@@ -35,11 +36,16 @@ export default function contentFunction({
     throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
   }
 
+  if (slots && !expectedExtraDependencyKeys.has('html')) {
+    throw new Error(`Content functions with slots must specify html in extraDependencies`);
+  }
+
   // Pass all the details to expectDependencies, which will recursively build
   // up a set of fulfilled dependencies and make functions like `relations`
   // and `generate` callable only with sufficient fulfilled dependencies.
 
   return expectDependencies({
+    slots,
     sprawl,
     relations,
     data,
@@ -58,6 +64,7 @@ export default function contentFunction({
 contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 
 export function expectDependencies({
+  slots,
   sprawl,
   relations,
   data,
@@ -74,6 +81,7 @@ export function expectDependencies({
   const hasSprawlFunction = !!sprawl;
   const hasRelationsFunction = !!relations;
   const hasDataFunction = !!data;
+  const hasSlotsDescription = !!slots;
 
   const isInvalidated = !empty(invalidatingDependencyKeys);
   const isMissingContentDependencies = !empty(missingContentDependencyKeys);
@@ -96,7 +104,7 @@ export function expectDependencies({
     annotateFunction(wrappedGenerate, {name: generate, trait: 'unfulfilled'});
     wrappedGenerate.fulfilled = false;
   } else {
-    wrappedGenerate = function(arg1, arg2) {
+    const callUnderlyingGenerate = ([arg1, arg2], ...extraArgs) => {
       if (hasDataFunction && !arg1) {
         throw new Error(`Expected data`);
       }
@@ -110,13 +118,45 @@ export function expectDependencies({
       }
 
       if (hasDataFunction && hasRelationsFunction) {
-        return generate(arg1, arg2, fulfilledDependencies);
+        return generate(arg1, arg2, ...extraArgs, fulfilledDependencies);
       } else if (hasDataFunction || hasRelationsFunction) {
-        return generate(arg1, fulfilledDependencies);
+        return generate(arg1, ...extraArgs, fulfilledDependencies);
       } else {
-        return generate(fulfilledDependencies);
+        return generate(...extraArgs, fulfilledDependencies);
       }
     };
+
+    if (hasSlotsDescription) {
+      const stationery = fulfilledDependencies.html.stationery({
+        annotation: generate.name,
+
+        // These extra slots are for the data and relations (positional) args.
+        // No hacks to store them temporarily or otherwise "invisibly" alter
+        // the behavior of the template description's `content`, since that
+        // would be expressly against the purpose of templates!
+        slots: {
+          _cfArg1: {validate: v => v.isObject},
+          _cfArg2: {validate: v => v.isObject},
+          ...slots,
+        },
+
+        content(slots) {
+          const args = [slots._cfArg1, slots._cfArg2];
+          return callUnderlyingGenerate(args, slots);
+        },
+      });
+
+      wrappedGenerate = function(...args) {
+        return stationery.template().slots({
+          _cfArg1: args[0] ?? null,
+          _cfArg2: args[1] ?? null,
+        });
+      };
+    } else {
+      wrappedGenerate = function(...args) {
+        return callUnderlyingGenerate(args);
+      };
+    }
 
     wrappedGenerate.fulfill = function() {
       throw new Error(`All dependencies already fulfilled (${generate.name})`);
@@ -165,6 +205,7 @@ export function expectDependencies({
     }
 
     return expectDependencies({
+      slots,
       sprawl,
       relations,
       data,
