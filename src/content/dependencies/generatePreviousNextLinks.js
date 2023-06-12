@@ -11,7 +11,7 @@ export default {
   },
 
   generate(slots, {html, language}) {
-    return html.tags([
+    return [
       !html.isBlank(slots.previousLink) &&
         slots.previousLink.slots({
           tooltip: true,
@@ -25,6 +25,6 @@ export default {
           attributes: {id: 'next-button'},
           content: language.$('misc.nav.next'),
         }),
-    ]);
+    ];
   },
 };
