@@ -489,7 +489,10 @@ export class Template {
   #slotValues = {};
 
   constructor(description) {
-    Template.validateDescription(description);
+    if (!description[Stationery.validated]) {
+      Template.validateDescription(description);
+    }
+
     this.#description = description;
   }
 
@@ -777,5 +780,25 @@ export class Template {
 
   toString() {
     return this.content.toString();
+  }
+}
+
+export function stationery(description) {
+  return new Stationery(description);
+}
+
+export class Stationery {
+  #templateDescription = null;
+
+  static validated = Symbol('Stationery.validated');
+
+  constructor(templateDescription) {
+    Template.validateDescription(templateDescription);
+    templateDescription[Stationery.validated] = true;
+    this.#templateDescription = templateDescription;
+  }
+
+  template() {
+    return new Template(this.#templateDescription);
   }
 }

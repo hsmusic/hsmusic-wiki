@@ -904,3 +904,31 @@ t.test(`Template - slot value errors`, t => {
       `arrayOfHTML length: 0`,
     ]).toString());
 });
+
+t.test(`Stationery`, t => {
+  t.plan(3);
+
+  // 1-3: basic behavior
+
+  const stationery1 = new html.Stationery({
+    slots: {
+      slot1: {type: 'string', default: 'apricot'},
+      slot2: {type: 'string', default: 'disaster'},
+    },
+
+    content: ({slot1, slot2}) => html.tag('span', `${slot1} ${slot2}`),
+  });
+
+  const template1 = stationery1.template();
+  const template2 = stationery1.template();
+
+  template2.setSlots({slot1: 'aquaduct', slot2: 'dichotomy'});
+
+  const template3 = stationery1.template();
+
+  template3.setSlots({slot2: 'vinaigrette'});
+
+  t.equal(template1.toString(), `<span>apricot disaster</span>`);
+  t.equal(template2.toString(), `<span>aquaduct dichotomy</span>`);
+  t.equal(template3.toString(), `<span>apricot vinaigrette</span>`);
+});
