@@ -210,7 +210,7 @@ export default {
                 .slots({stringKey: 'releaseInfo.wallpaperArtBy'}),
 
               sec.releaseInfo.bannerArtistContributionsLine
-                .slots({stringKey: 'releasInfo.bannerArtBy'}),
+                .slots({stringKey: 'releaseInfo.bannerArtBy'}),
 
               data.date &&
                 language.$('releaseInfo.released', {
