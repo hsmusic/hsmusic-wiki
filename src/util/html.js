@@ -1,5 +1,7 @@
 // Some really simple functions for formatting HTML content.
 
+import {inspect} from 'util';
+
 import * as commonValidators from '../data/things/validators.js';
 import {empty} from './sugar.js';
 
@@ -396,6 +398,22 @@ export class Tag {
       .filter(Boolean)
       .join(joiner);
   }
+
+  [inspect.custom]() {
+    if (this.tagName) {
+      if (empty(this.content)) {
+        return `Tag <${this.tagName} />`;
+      } else {
+        return `Tag <${this.tagName}> (${this.content.length} items)`;
+      }
+    } else {
+      if (empty(this.content)) {
+        return `Tag (no name)`;
+      } else {
+        return `Tag (no name, ${this.content.length} items)`;
+      }
+    }
+  }
 }
 
 export class Attributes {
@@ -781,6 +799,15 @@ export class Template {
   toString() {
     return this.content.toString();
   }
+
+  [inspect.custom]() {
+    const {annotation} = this.description;
+    if (annotation) {
+      return `Template "${annotation}"`;
+    } else {
+      return `Template (no annotation)`;
+    }
+  }
 }
 
 export function stationery(description) {
@@ -800,5 +827,14 @@ export class Stationery {
 
   template() {
     return new Template(this.#templateDescription);
+  }
+
+  [inspect.custom]() {
+    const {annotation} = this.#templateDescription;
+    if (annotation) {
+      return `Stationery "${annotation}"`;
+    } else {
+      return `Stationery (no annotation)`;
+    }
   }
 }
