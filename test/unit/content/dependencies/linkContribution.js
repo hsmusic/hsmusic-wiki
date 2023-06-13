@@ -1,32 +1,31 @@
-// todo: this dependency was replaced with linkContribution, restructure test
-
 import t from 'tap';
 import {testContentFunctions} from '../../../lib/content-function.js';
 
-t.skip('generateContributionLinks (unit)', async t => {
-  const artist1 = {
+t.test('generateContributionLinks (unit)', async t => {
+  const who1 = {
     name: 'Clark Powell',
+    directory: 'clark-powell',
     urls: ['https://soundcloud.com/plazmataz'],
   };
 
-  const artist2 = {
+  const who2 = {
     name: 'Grounder & Scratch',
+    directory: 'the-big-baddies',
     urls: [],
   };
 
-  const artist3 = {
+  const who3 = {
     name: 'Toby Fox',
+    directory: 'toby-fox',
     urls: ['https://tobyfox.bandcamp.com/', 'https://toby.fox/'],
   };
 
-  const contributions = [
-    {who: artist1, what: null},
-    {who: artist2, what: 'Snooping'},
-    {who: artist3, what: 'Arrangement'},
-  ];
+  const what1 = null;
+  const what2 = 'Snooping';
+  const what3 = 'Arrangement';
 
   await testContentFunctions(t, 'generateContributionLinks (unit 1)', async (t, evaluate) => {
-    const config = {
+    const slots = {
       showContribution: true,
       showIcons: true,
     };
@@ -35,14 +34,14 @@ t.skip('generateContributionLinks (unit)', async t => {
       mock: evaluate.mock(mock => ({
         linkArtist: {
           relations: mock.function('linkArtist.relations', () => ({}))
-            .args([undefined, artist1]).next()
-            .args([undefined, artist2]).next()
-            .args([undefined, artist3]),
+            .args([undefined, who1]).next()
+            .args([undefined, who2]).next()
+            .args([undefined, who3]),
 
           data: mock.function('linkArtist.data', () => ({}))
-            .args([artist1]).next()
-            .args([artist2]).next()
-            .args([artist3]),
+            .args([who1]).next()
+            .args([who2]).next()
+            .args([who3]),
 
           // This can be tweaked to return a specific (mocked) template
           // for each artist if we need to test for slots in the future.
@@ -52,9 +51,9 @@ t.skip('generateContributionLinks (unit)', async t => {
 
         linkExternalAsIcon: {
           data: mock.function('linkExternalAsIcon.data', () => ({}))
-            .args([artist1.urls[0]]).next()
-            .args([artist3.urls[0]]).next()
-            .args([artist3.urls[1]]),
+            .args([who1.urls[0]]).next()
+            .args([who3.urls[0]]).next()
+            .args([who3.urls[1]]),
 
           generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
             .repeat(3),
@@ -63,13 +62,18 @@ t.skip('generateContributionLinks (unit)', async t => {
     });
 
     evaluate({
-      name: 'generateContributionLinks',
-      args: [contributions, config],
+      name: 'linkContribution',
+      multiple: [
+        {args: [who1, what1]},
+        {args: [who2, what2]},
+        {args: [who3, what3]},
+      ],
+      slots,
     });
   });
 
   await testContentFunctions(t, 'generateContributionLinks (unit 2)', async (t, evaluate) => {
-    const config = {
+    const slots = {
       showContribution: false,
       showIcons: false,
     };
@@ -78,32 +82,41 @@ t.skip('generateContributionLinks (unit)', async t => {
       mock: evaluate.mock(mock => ({
         linkArtist: {
           relations: mock.function('linkArtist.relations', () => ({}))
-            .args([undefined, artist1]).next()
-            .args([undefined, artist2]).next()
-            .args([undefined, artist3]),
+            .args([undefined, who1]).next()
+            .args([undefined, who2]).next()
+            .args([undefined, who3]),
 
           data: mock.function('linkArtist.data', () => ({}))
-            .args([artist1]).next()
-            .args([artist2]).next()
-            .args([artist3]),
+            .args([who1]).next()
+            .args([who2]).next()
+            .args([who3]),
 
           generate: mock.function(() => 'artist link')
             .repeat(3),
         },
 
+        // Even though icons are hidden, these are still called! The dependency
+        // tree is the same since whether or not the external icon links are
+        // shown is dependent on a slot, which is undefined and arbitrary at
+        // relations/data time (it might change on a whim at generate time).
         linkExternalAsIcon: {
           data: mock.function('linkExternalAsIcon.data', () => ({}))
-            .neverCalled(),
+            .repeat(3),
 
           generate: mock.function('linkExternalAsIcon.generate', () => 'icon')
-            .neverCalled(),
+            .repeat(3),
         },
       })),
     });
 
     evaluate({
-      name: 'generateContributionLinks',
-      args: [contributions, config],
+      name: 'linkContribution',
+      multiple: [
+        {args: [who1, what1]},
+        {args: [who2, what2]},
+        {args: [who3, what3]},
+      ],
+      slots,
     });
   });
 });
