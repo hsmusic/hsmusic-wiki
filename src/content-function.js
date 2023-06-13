@@ -450,6 +450,7 @@ export function quickEvaluate({
 
   name,
   args = [],
+  slots = null,
   multiple = null,
   postprocess = null,
 }) {
@@ -462,6 +463,7 @@ export function quickEvaluate({
         ...opts,
         name: opts.name ?? name,
         args: opts.args ?? args,
+        slots: opts.slots ?? slots,
         postprocess: opts.postprocess ?? postprocess,
       }));
   }
@@ -560,11 +562,15 @@ export function quickEvaluate({
     slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
   }
 
-  const topLevelResult = runContentFunction(root);
+  let topLevelResult = runContentFunction(root);
 
-  if (postprocess !== null) {
-    return postprocess(topLevelResult);
-  } else {
-    return topLevelResult;
+  if (slots) {
+    topLevelResult.setSlots(slots);
   }
+
+  if (postprocess) {
+    topLevelResult = postprocess(topLevelResult);
+  }
+
+  return topLevelResult;
 }
