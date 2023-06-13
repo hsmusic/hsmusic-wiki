@@ -14,68 +14,77 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     });
 
   quickSnapshot('source via path', {
-    postprocess: template => template
-      .slot('path', ['media.albumCover', 'beyond-canon', 'png']),
+    slots: {
+      path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
   });
 
   quickSnapshot('source via src', {
-    postprocess: template => template
-      .slot('src', 'https://example.com/bananas.gif'),
+    slots: {
+      src: 'https://example.com/bananas.gif',
+    },
   });
 
   quickSnapshot('source missing', {
-    postprocess: template => template
-      .slot('missingSourceContent', 'Example of missing source message.'),
+    slots: {
+      missingSourceContent: 'Example of missing source message.',
+    },
   });
 
   quickSnapshot('id without link', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('id', 'banana'),
+    slots: {
+      src: 'foobar',
+      id: 'banana',
+    },
   });
 
   quickSnapshot('id with link', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('link', true)
-      .slot('id', 'banana'),
+    slots: {
+      src: 'foobar',
+      link: true,
+      id: 'banana',
+    },
   });
 
   quickSnapshot('id with square', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('square', true)
-      .slot('id', 'banana'),
-  })
+    slots: {
+      src: 'foobar',
+      square: true,
+      id: 'banana',
+    },
+  });
 
   quickSnapshot('width & height', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('width', 600)
-      .slot('height', 400),
+    slots: {
+      src: 'foobar',
+      width: 600,
+      height: 400,
+    },
   });
 
   quickSnapshot('square', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('square', true),
+    slots: {
+      src: 'foobar',
+      square: true,
+    },
   });
 
   quickSnapshot('lazy with square', {
-    postprocess: template => template
-      .slot('src', 'foobar')
-      .slot('lazy', true)
-      .slot('square', true),
+    slots: {
+      src: 'foobar',
+      lazy: true,
+      square: true,
+    },
   });
 
   quickSnapshot('link with file size', {
     extraDependencies: {
       getSizeOfImageFile: () => 10 ** 6,
     },
-
-    postprocess: template => template
-      .slot('path', ['media.albumCover', 'pingas', 'png'])
-      .slot('link', true),
+    slots: {
+      path: ['media.albumCover', 'pingas', 'png'],
+      link: true,
+    },
   });
 
   quickSnapshot('content warnings via tags', {
@@ -85,8 +94,8 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
         {name: 'too cool for school', isContentWarning: true},
       ],
     ],
-
-    postprocess: template => template
-      .slot('path', ['media.albumCover', 'beyond-canon', 'png']),
-  })
+    slots: {
+      path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
+  });
 });

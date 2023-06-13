@@ -31,15 +31,16 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     ],
   });
 
-  evaluate.snapshot('custom matches - type: album', {
+  evaluate.snapshot('custom matches - album', {
     name: 'linkExternal',
     multiple: [
-      {args: ['https://youtu.be/abc', {type: 'album'}]},
-      {args: ['https://youtube.com/watch?v=abc', {type: 'album'}]},
-      {args: ['https://youtube.com/Playlist?list=kweh', {type: 'album'}]},
+      {args: ['https://youtu.be/abc']},
+      {args: ['https://youtube.com/watch?v=abc']},
+      {args: ['https://youtube.com/Playlist?list=kweh']},
     ],
-    postprocess:
-      link => link.slot('mode', 'album'),
+    slots: {
+      mode: 'album',
+    },
   });
 
   evaluate.snapshot('custom domains for common platforms', {

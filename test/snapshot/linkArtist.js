@@ -23,8 +23,8 @@ testContentFunctions(t, 'linkArtist (snapshot)', async (t, evaluate) => {
         directory: '55gore',
       },
     ],
-
-    postprocess: v => v
-      .slot('preferShortName', true),
+    slots: {
+      preferShortName: true,
+    },
   });
 });

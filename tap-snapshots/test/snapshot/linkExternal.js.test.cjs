@@ -24,7 +24,7 @@ exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom doma
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
 `
 
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom matches - type: album 1`] = `
+exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom matches - album 1`] = `
 <a href="https://youtu.be/abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube (playlist)</a>

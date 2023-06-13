@@ -41,16 +41,16 @@ testContentFunctions(t, 'generateAdditionalFilesList (snapshot)', async (t, eval
         },
       ],
     ],
-    postprocess: template => template
-      .slot('fileLinks', {
+    slots: {
+      fileLinks: {
         'sburbwp_1280x1024.jpg': 'link to 1280x1024',
         'sburbwp_1440x900.jpg': 'link to 1440x900',
         'sburbwp_1920x1080.jpg': null,
         'Homestuck_Vol4_alt1.jpg': 'link to alt1',
         'Homestuck_Vol4_alt2.jpg': null,
         'Homestuck_Vol4_alt3.jpg': 'link to alt3',
-      })
-      .slot('fileSizes', {
+      },
+      fileSizes: {
         'sburbwp_1280x1024.jpg': 2500,
         'sburbwp_1440x900.jpg': null,
         'sburbwp_1920x1080.jpg': null,
@@ -58,6 +58,7 @@ testContentFunctions(t, 'generateAdditionalFilesList (snapshot)', async (t, eval
         'Homestuck_Vol4_alt1.jpg': 1234567,
         'Homestuck_Vol4_alt2.jpg': 1234567,
         'Homestuck_Vol4_alt3.jpg': 1234567,
-      }),
+      }
+    },
   });
 });
