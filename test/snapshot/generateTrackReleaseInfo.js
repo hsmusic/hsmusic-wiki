@@ -1,7 +1,7 @@
 import t from 'tap';
 import {testContentFunctions} from '../lib/content-function.js';
 
-testContentFunctions(t, 'linkArtist (snapshot)', async (t, evaluate) => {
+testContentFunctions(t, 'generateTrackReleaseInfo (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
   const artistContribs = [{who: {name: 'Toby Fox', directory: 'toby-fox'}, what: null}];
