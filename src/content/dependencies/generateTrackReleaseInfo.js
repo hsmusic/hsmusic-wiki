@@ -31,6 +31,7 @@ export default {
   data(track) {
     const data = {};
 
+    data.name = track.name;
     data.date = track.date;
     data.duration = track.duration;
 
