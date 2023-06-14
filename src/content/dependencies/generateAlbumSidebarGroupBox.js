@@ -46,7 +46,10 @@ export default {
   },
 
   slots: {
-    isAlbumPage: {type: 'boolean', default: false},
+    mode: {
+      validate: v => v.is('album', 'track'),
+      default: 'track',
+    },
   },
 
   generate(relations, slots, {html, language}) {
@@ -56,7 +59,7 @@ export default {
           group: relations.groupLink,
         })),
 
-      slots.isAlbumPage &&
+      slots.mode === 'album' &&
         relations.description
           ?.slot('mode', 'multiline'),
 
@@ -66,14 +69,14 @@ export default {
             links: language.formatDisjunctionList(relations.externalLinks),
           })),
 
-      slots.isAlbumPage &&
+      slots.mode === 'album' &&
       relations.nextAlbumLink &&
         html.tag('p', {class: 'group-chronology-link'},
           language.$('albumSidebar.groupBox.next', {
             album: relations.nextAlbumLink,
           })),
 
-      slots.isAlbumPage &&
+      slots.mode === 'album' &&
       relations.previousAlbumLink &&
         html.tag('p', {class: 'group-chronology-link'},
           language.$('albumSidebar.groupBox.previous', {

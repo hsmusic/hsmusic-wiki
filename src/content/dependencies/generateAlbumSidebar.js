@@ -7,7 +7,6 @@ export default {
 
   extraDependencies: ['html'],
 
-
   relations(relation, album, track) {
     const relations = {};
 
@@ -41,7 +40,7 @@ export default {
     if (data.isAlbumPage) {
       const groupBoxes =
         relations.groupBoxes
-          .map(content => content.slot('isAlbumPage', true))
+          .map(content => content.slot('mode', 'album'))
           .map(content => ({content}));
 
       return {
@@ -56,7 +55,7 @@ export default {
       content:
         relations.groupBoxes
           .flatMap((content, i, {length}) => [
-            content,
+            content.slot('mode', 'track'),
             i < length - 1 &&
               html.tag('hr', {
                 style: `border-color: var(--primary-color); border-style: none none dotted none`
