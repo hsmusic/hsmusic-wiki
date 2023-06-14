@@ -20,24 +20,26 @@ export default {
       group.urls.map(url =>
         relation('linkExternal', url));
 
-    const albums = group.albums.filter(album => album.date);
-    const index = albums.indexOf(album);
-    const previousAlbum = (index > 0) && albums[index - 1];
-    const nextAlbum = (index < albums.length - 1) && albums[index + 1];
-
     if (group.descriptionShort) {
       relations.description =
         relation('transformContent', group.descriptionShort);
     }
 
-    if (previousAlbum) {
-      relations.previousAlbumLink =
-        relation('linkAlbum', previousAlbum);
-    }
+    if (album.date) {
+      const albums = group.albums.filter(album => album.date);
+      const index = albums.indexOf(album);
+      const previousAlbum = (index > 0) && albums[index - 1];
+      const nextAlbum = (index < albums.length - 1) && albums[index + 1];
 
-    if (nextAlbum) {
-      relations.nextAlbumLink =
-        relation('linkAlbum', nextAlbum);
+      if (previousAlbum) {
+        relations.previousAlbumLink =
+          relation('linkAlbum', previousAlbum);
+      }
+
+      if (nextAlbum) {
+        relations.nextAlbumLink =
+          relation('linkAlbum', nextAlbum);
+      }
     }
 
     return relations;
