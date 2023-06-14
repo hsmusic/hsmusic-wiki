@@ -1,8 +1,10 @@
 import chokidar from 'chokidar';
-import EventEmitter from 'events';
-import * as path from 'path';
 import {ESLint} from 'eslint';
-import {fileURLToPath} from 'url';
+
+import EventEmitter from 'node:events';
+import {readdir} from 'node:fs/promises';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 import contentFunction from '../../content-function.js';
 import {color, logWarn} from '../../util/cli.js';
@@ -28,8 +30,10 @@ export function watchContentDependencies({
   const contentDependencies = {};
 
   let emittedReady = false;
-  let initialScanComplete = false;
   let allDependenciesFulfilled = false;
+  let closed = false;
+
+  let _close = () => {};
 
   Object.assign(events, {
     contentDependencies,
@@ -38,33 +42,16 @@ export function watchContentDependencies({
 
   const eslint = new ESLint();
 
-  // Watch adjacent files
   const metaPath = fileURLToPath(import.meta.url);
   const metaDirname = path.dirname(metaPath);
-  const watcher = chokidar.watch(metaDirname);
+  const watchPath = metaDirname;
 
-  watcher.on('all', (event, filePath) => {
-    if (!['add', 'change'].includes(event)) return;
-    if (filePath === metaPath) return;
-    handlePathUpdated(filePath);
-  });
-
-  watcher.on('unlink', (filePath) => {
-    if (filePath === metaPath) {
-      console.error(`Yeowzers content dependencies just got nuked.`);
-      return;
-    }
-    handlePathRemoved(filePath);
-  });
-
-  watcher.on('ready', () => {
-    initialScanComplete = true;
-    checkReadyConditions();
-  });
-
+  const mockKeys = new Set();
   if (mock) {
     const errors = [];
+
     for (const [functionName, spec] of Object.entries(mock)) {
+      mockKeys.add(functionName);
       try {
         const fn = processFunctionSpec(functionName, spec);
         contentDependencies[functionName] = fn;
@@ -73,39 +60,71 @@ export function watchContentDependencies({
         errors.push(error);
       }
     }
+
     if (errors.length) {
       throw new AggregateError(errors, `Errors processing mocked content functions`);
     }
-    checkReadyConditions();
   }
+
+  // Chokidar's 'ready' event is supposed to only fire once an 'add' event
+  // has been fired for everything in the watched directory, but it's not
+  // totally reliable. https://github.com/paulmillr/chokidar/issues/1011
+  //
+  // Workaround here is to readdir for the names of all dependencies ourselves,
+  // and enter null for each into the contentDependencies object. We'll emit
+  // 'ready' ourselves only once no nulls remain. And we won't actually start
+  // watching until the readdir is done and nulls are entered (so we don't
+  // prematurely find out there aren't any nulls - before the nulls have
+  // been entered at all!).
+
+  readdir(metaDirname).then(files => {
+    if (closed) {
+      return;
+    }
+
+    const filePaths = files.map(file => path.join(metaDirname, file));
+    for (const filePath of filePaths) {
+      if (filePath === metaPath) continue;
+      const functionName = getFunctionName(filePath);
+      if (!isMocked(functionName)) {
+        contentDependencies[functionName] = null;
+      }
+    }
+
+    const watcher = chokidar.watch(metaDirname);
+
+    watcher.on('all', (event, filePath) => {
+      if (!['add', 'change'].includes(event)) return;
+      if (filePath === metaPath) return;
+      handlePathUpdated(filePath);
+
+    });
+
+    watcher.on('unlink', (filePath) => {
+      if (filePath === metaPath) {
+        console.error(`Yeowzers content dependencies just got nuked.`);
+        return;
+      }
+
+      handlePathRemoved(filePath);
+    });
+
+    _close = () => watcher.close();
+  });
 
   return events;
 
   async function close() {
-    return watcher.close();
+    closed = true;
+    return _close();
   }
 
   function checkReadyConditions() {
-    if (emittedReady) {
-      return;
-    }
-
-    if (!initialScanComplete) {
-      return;
-    }
-
-    checkAllDependenciesFulfilled();
-
-    if (!allDependenciesFulfilled) {
-      return;
-    }
+    if (emittedReady) return;
+    if (Object.values(contentDependencies).includes(null)) return;
 
     events.emit('ready');
     emittedReady = true;
-  }
-
-  function checkAllDependenciesFulfilled() {
-    allDependenciesFulfilled = !Object.values(contentDependencies).includes(null);
   }
 
   function getFunctionName(filePath) {
@@ -115,7 +134,7 @@ export function watchContentDependencies({
   }
 
   function isMocked(functionName) {
-    return !!mock && Object.keys(mock).includes(functionName);
+    return mockKeys.has(functionName);
   }
 
   async function handlePathRemoved(filePath) {
@@ -156,7 +175,7 @@ export function watchContentDependencies({
         break main;
       }
 
-      if (logging && initialScanComplete) {
+      if (logging && emittedReady) {
         const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
         console.log(color.green(`[${timestamp}] Updated ${functionName}`));
       }
