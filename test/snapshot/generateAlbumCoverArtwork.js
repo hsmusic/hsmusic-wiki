@@ -22,14 +22,14 @@ testContentFunctions(t, 'generateAlbumCoverArtwork (snapshot)', async (t, evalua
   evaluate.snapshot('display: primary', {
     name: 'generateAlbumCoverArtwork',
     args: [album],
-    slots: {displayMode: 'primary'},
+    slots: {mode: 'primary'},
     extraDependencies,
   });
 
   evaluate.snapshot('display: thumbnail', {
     name: 'generateAlbumCoverArtwork',
     args: [album],
-    slots: {displayMode: 'thumbnail'},
+    slots: {mode: 'thumbnail'},
     extraDependencies,
   });
 });

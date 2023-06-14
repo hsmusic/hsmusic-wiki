@@ -36,28 +36,28 @@ testContentFunctions(t, 'generateTrackCoverArtwork (snapshot)', async (t, evalua
   evaluate.snapshot('display: primary - unique art', {
     name: 'generateTrackCoverArtwork',
     args: [track1],
-    slots: {displayMode: 'primary'},
+    slots: {mode: 'primary'},
     extraDependencies,
   });
 
   evaluate.snapshot('display: thumbnail - unique art', {
     name: 'generateTrackCoverArtwork',
     args: [track1],
-    slots: {displayMode: 'thumbnail'},
+    slots: {mode: 'thumbnail'},
     extraDependencies,
   });
 
   evaluate.snapshot('display: primary - no unique art', {
     name: 'generateTrackCoverArtwork',
     args: [track2],
-    slots: {displayMode: 'primary'},
+    slots: {mode: 'primary'},
     extraDependencies,
   });
 
   evaluate.snapshot('display: thumbnail - no unique art', {
     name: 'generateTrackCoverArtwork',
     args: [track2],
-    slots: {displayMode: 'thumbnail'},
+    slots: {mode: 'thumbnail'},
     extraDependencies,
   });
 });

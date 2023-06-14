@@ -23,7 +23,7 @@ export default {
           hasCover &&
             html.tag('div', {class: 'content-sticky-heading-cover-container'},
               html.tag('div', {class: 'content-sticky-heading-cover'},
-                slots.cover.slot('displayMode', 'thumbnail'))),
+                slots.cover.slot('mode', 'thumbnail'))),
         ]),
 
         html.tag('div', {class: 'content-sticky-subheading-row'},

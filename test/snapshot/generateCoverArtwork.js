@@ -20,14 +20,14 @@ testContentFunctions(t, 'generateCoverArtwork (snapshot)', async (t, evaluate) =
   evaluate.snapshot('display: primary', {
     name: 'generateCoverArtwork',
     args: [artTags],
-    slots: {path, displayMode: 'primary'},
+    slots: {path, mode: 'primary'},
     extraDependencies,
   });
 
   evaluate.snapshot('display: thumbnail', {
     name: 'generateCoverArtwork',
     args: [artTags],
-    slots: {path, displayMode: 'thumbnail'},
+    slots: {path, mode: 'thumbnail'},
     extraDependencies,
   });
 });

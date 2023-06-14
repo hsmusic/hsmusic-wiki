@@ -31,14 +31,14 @@ export default {
       type: 'string',
     },
 
-    displayMode: {
+    mode: {
       validate: v => v.is('primary', 'thumbnail'),
       default: 'primary',
     },
   },
 
   generate(relations, slots, {html, language}) {
-    switch (slots.displayMode) {
+    switch (slots.mode) {
       case 'primary':
         return html.tag('div', {id: 'cover-art-container'}, [
           relations.image
