@@ -96,6 +96,15 @@ export function testContentFunctions(t, message, fn) {
       return value;
     };
 
+    evaluate.mock.transformContent = {
+      transformContent: {
+        extraDependencies: ['html'],
+        data: content => ({content}),
+        slots: {mode: {type: 'string'}},
+        generate: ({content}) => content,
+      },
+    };
+
     await fn(t, evaluate);
 
     if (!empty(mocks)) {
