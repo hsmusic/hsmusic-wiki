@@ -16,9 +16,12 @@ export default {
 
     relations.artistLink = relation('linkArtist', artist);
 
-    relations.artistIcons =
-      (artist.urls ?? []).map(url =>
-        relation('linkExternalAsIcon', url));
+    if (!empty(artist.urls)) {
+      relations.artistIcons =
+        artist.urls
+          .slice(0, 4)
+          .map(url => relation('linkExternalAsIcon', url));
+    }
 
     return relations;
   },
@@ -34,7 +37,7 @@ export default {
 
   generate(data, relations, slots, {html, language}) {
     const hasContributionPart = !!(slots.showContribution && data.contribution);
-    const hasExternalPart = !!(slots.showIcons && !empty(relations.artistIcons));
+    const hasExternalPart = !!(slots.showIcons && relations.artistIcons);
 
     const externalLinks = hasExternalPart &&
       html.tag('span',

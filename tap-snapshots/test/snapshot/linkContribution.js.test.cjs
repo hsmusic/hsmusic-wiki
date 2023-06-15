@@ -5,6 +5,30 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > loads of links 1`] = `
+<span class="nowrap"><a href="artist/lorem-ipsum-lover/">Lorem Ipsum Lover</a> (<span class="icons"><a href="https://loremipsum.io" class="icon">
+            <svg>
+                <title>External (loremipsum.io)</title>
+                <use href="static/icons.svg#icon-globe"></use>
+            </svg>
+        </a>, <a href="https://loremipsum.io/generator/" class="icon">
+            <svg>
+                <title>External (loremipsum.io)</title>
+                <use href="static/icons.svg#icon-globe"></use>
+            </svg>
+        </a>, <a href="https://loremipsum.io/#meaning" class="icon">
+            <svg>
+                <title>External (loremipsum.io)</title>
+                <use href="static/icons.svg#icon-globe"></use>
+            </svg>
+        </a>, <a href="https://loremipsum.io/#usage-and-examples" class="icon">
+            <svg>
+                <title>External (loremipsum.io)</title>
+                <use href="static/icons.svg#icon-globe"></use>
+            </svg>
+        </a></span>)</span>
+`
+
 exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no accents 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>
 <a href="artist/the-big-baddies/">Grounder & Scratch</a>

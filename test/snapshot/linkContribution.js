@@ -51,4 +51,22 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
   });
 
   quickSnapshot('no accents', {});
+
+  evaluate.snapshot('loads of links', {
+    name: 'linkContribution',
+    args: [
+      {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
+        'https://loremipsum.io',
+        'https://loremipsum.io/generator/',
+        'https://loremipsum.io/#meaning',
+        'https://loremipsum.io/#usage-and-examples',
+        'https://loremipsum.io/#controversy',
+        'https://loremipsum.io/#when-to-use-lorem-ipsum',
+        'https://loremipsum.io/#lorem-ipsum-all-the-things',
+        'https://loremipsum.io/#original-source',
+      ]},
+      null,
+    ],
+    slots: {showIcons: true},
+  });
 });
