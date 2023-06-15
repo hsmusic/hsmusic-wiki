@@ -98,12 +98,6 @@ export default {
 
     cover: {type: 'html'},
 
-    banner: {type: 'html'},
-    bannerPosition: {
-      validate: v => v.is('top', 'bottom'),
-      default: 'top',
-    },
-
     socialEmbed: {type: 'html'},
 
     colorStyleRules: {
@@ -134,6 +128,14 @@ export default {
 
     ...sidebarSlots('leftSidebar'),
     ...sidebarSlots('rightSidebar'),
+
+    // Banner
+
+    banner: {type: 'html'},
+    bannerPosition: {
+      validate: v => v.is('top', 'bottom'),
+      default: 'top',
+    },
 
     // Nav & Footer
 
@@ -188,6 +190,8 @@ export default {
           return true;
         })
     },
+
+    secondaryNav: {type: 'html'},
 
     footerContent: {type: 'html'},
   },
@@ -420,7 +424,7 @@ export default {
     const layoutHTML = [
       navHTML,
       slots.bannerPosition === 'top' && slots.banner,
-      // secondaryNavHTML,
+      slots.secondaryNav,
       html.tag('div',
         {
           class: [

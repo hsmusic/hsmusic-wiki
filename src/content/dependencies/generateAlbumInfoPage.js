@@ -10,6 +10,7 @@ export default {
     'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
     'generateAlbumReleaseInfo',
+    'generateAlbumSecondaryNav',
     'generateAlbumSidebar',
     'generateAlbumSocialEmbed',
     'generateAlbumStyleRules',
@@ -67,6 +68,9 @@ export default {
 
     relations.chronologyLinks =
       relation('generateChronologyLinks');
+
+    relations.secondaryNav =
+      relation('generateAlbumSecondaryNav', album);
 
     relations.sidebar =
       relation('generateAlbumSidebar', album, null);
@@ -272,18 +276,11 @@ export default {
         banner: relations.banner ?? null,
         bannerPosition: 'top',
 
+        secondaryNav: relations.secondaryNav,
+
         ...relations.sidebar,
 
         // socialEmbed: relations.socialEmbed,
       });
   },
 };
-
-/*
-  secondaryNav: generateAlbumSecondaryNav(album, null, {
-    getLinkThemeString,
-    html,
-    language,
-    link,
-  }),
-*/
