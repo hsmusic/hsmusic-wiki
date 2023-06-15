@@ -1,3 +1,5 @@
+import {empty} from '../../util/sugar.js';
+
 export default {
   contentDependencies: [
     'generateColorStyleVariables',
@@ -80,7 +82,7 @@ export default {
           ].filter(Boolean);
 
           return (
-            (slots.mode === 'album'
+            (slots.mode === 'album' && !empty(links)
               ? html.tag('span', {style: colorVariables}, [
                   language.$('albumSidebar.groupBox.title', {
                     group: groupLink,
