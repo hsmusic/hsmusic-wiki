@@ -41,25 +41,26 @@ export default {
         {[html.noEdgeWhitespace]: true, class: 'icons'},
         language.formatUnitList(relations.artistIcons));
 
+    const parts = ['misc.artistLink'];
+    const options = {artist: relations.artistLink};
+
+    if (hasContributionPart) {
+      parts.push('withContribution');
+      options.contrib = data.contribution;
+    }
+
+    if (hasExternalPart) {
+      parts.push('withExternalLinks');
+      options.links = externalLinks;
+    }
+
+    const content = language.formatString(parts.join('.'), options);
+
     return (
-      (hasContributionPart
-        ? (hasExternalPart
-            ? language.$('misc.artistLink.withContribution.withExternalLinks', {
-                artist: relations.artistLink,
-                contrib: data.contribution,
-                links: externalLinks,
-              })
-            : language.$('misc.artistLink.withContribution', {
-                artist: relations.artistLink,
-                contrib: data.contribution,
-              }))
-        : (hasExternalPart
-            ? language.$('misc.artistLink.withExternalLinks', {
-                artist: relations.artistLink,
-                links: externalLinks,
-              })
-            : language.$('misc.artistLink', {
-                artist: relations.artistLink,
-              }))));
-  },
+      (parts.length > 1
+        ? html.tag('span',
+            {[html.noEdgeWhitespace]: true, class: 'nowrap'},
+            content)
+        : content));
+    },
 };

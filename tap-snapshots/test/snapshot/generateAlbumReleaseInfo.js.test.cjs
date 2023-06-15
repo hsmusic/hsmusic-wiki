@@ -11,18 +11,18 @@ exports[`test/snapshot/generateAlbumReleaseInfo.js TAP generateAlbumReleaseInfo 
 
 exports[`test/snapshot/generateAlbumReleaseInfo.js TAP generateAlbumReleaseInfo (snapshot) > basic behavior 1`] = `
 <p>
-    By <a href="artist/toby-fox/">Toby Fox</a> (music probably) and <a href="artist/tensei/">Tensei</a> (hot jams) (<span class="icons"><a href="https://tenseimusic.bandcamp.com/" class="icon">
-            <svg>
-                <title>Bandcamp</title>
-                <use href="static/icons.svg#icon-bandcamp"></use>
-            </svg>
-        </a></span>).
+    By <span class="nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="nowrap"><a href="artist/tensei/">Tensei</a> (hot jams) (<span class="icons"><a href="https://tenseimusic.bandcamp.com/" class="icon">
+                <svg>
+                    <title>Bandcamp</title>
+                    <use href="static/icons.svg#icon-bandcamp"></use>
+                </svg>
+            </a></span>)</span>.
     <br>
     Cover art by <a href="artist/hb/">Hanni Brosh</a>.
     <br>
-    Wallpaper art by <a href="artist/hb/">Hanni Brosh</a> and <a href="artist/niklink/">Niklink</a> (edits).
+    Wallpaper art by <a href="artist/hb/">Hanni Brosh</a> and <span class="nowrap"><a href="artist/niklink/">Niklink</a> (edits)</span>.
     <br>
-    Banner art by <a href="artist/hb/">Hanni Brosh</a> and <a href="artist/niklink/">Niklink</a> (edits).
+    Banner art by <a href="artist/hb/">Hanni Brosh</a> and <span class="nowrap"><a href="artist/niklink/">Niklink</a> (edits)</span>.
     <br>
     Released 3/14/2011.
     <br>
