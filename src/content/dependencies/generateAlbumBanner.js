@@ -1,5 +1,5 @@
 export default {
-  contentDependencies: ['generatePageBanner'],
+  contentDependencies: ['generateBanner'],
   extraDependencies: ['html', 'language'],
 
   relations(relation, album) {
@@ -8,7 +8,7 @@ export default {
     }
 
     return {
-      banner: relation('generatePageBanner'),
+      banner: relation('generateBanner'),
     };
   },
 
