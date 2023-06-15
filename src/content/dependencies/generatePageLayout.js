@@ -98,6 +98,12 @@ export default {
 
     cover: {type: 'html'},
 
+    banner: {type: 'html'},
+    bannerPosition: {
+      validate: v => v.is('top', 'bottom'),
+      default: 'top',
+    },
+
     socialEmbed: {type: 'html'},
 
     colorStyleRules: {
@@ -413,7 +419,7 @@ export default {
 
     const layoutHTML = [
       navHTML,
-      // banner.position === 'top' && bannerHTML,
+      slots.bannerPosition === 'top' && slots.banner,
       // secondaryNavHTML,
       html.tag('div',
         {
@@ -432,7 +438,7 @@ export default {
           mainHTML,
           sidebarRightHTML,
         ]),
-      // banner.position === 'bottom' && bannerHTML,
+      slots.bannerPosition === 'bottom' && slots.banner,
       footerHTML,
     ].filter(Boolean).join('\n');
 

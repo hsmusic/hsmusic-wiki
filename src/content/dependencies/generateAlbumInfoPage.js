@@ -6,6 +6,7 @@ export default {
   contentDependencies: [
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
+    'generateAlbumBanner',
     'generateAlbumCoverArtwork',
     'generateAlbumNavAccent',
     'generateAlbumReleaseInfo',
@@ -73,6 +74,11 @@ export default {
     if (album.hasCoverArt) {
       relations.cover =
         relation('generateAlbumCoverArtwork', album);
+    }
+
+    if (album.hasBannerArt) {
+      relations.banner =
+        relation('generateAlbumBanner', album);
     }
 
     // Section: Release info
@@ -157,11 +163,11 @@ export default {
         additionalStyleRules: [relations.albumStyleRules],
 
         cover:
-          (relations.cover
-            ? relations.cover.slots({
-                alt: language.$('misc.alt.albumCover'),
-              })
-            : null),
+          relations.cover
+            ?.slots({
+              alt: language.$('misc.alt.albumCover'),
+            })
+            ?? null,
 
         mainContent: [
           relations.releaseInfo,
@@ -263,6 +269,9 @@ export default {
             ],
           }),
 
+        banner: relations.banner ?? null,
+        bannerPosition: 'top',
+
         ...relations.sidebar,
 
         // socialEmbed: relations.socialEmbed,
@@ -271,17 +280,6 @@ export default {
 };
 
 /*
-  banner: !empty(album.bannerArtistContribs) && {
-    dimensions: album.bannerDimensions,
-    path: [
-      'media.albumBanner',
-      album.directory,
-      album.bannerFileExtension,
-    ],
-    alt: language.$('misc.alt.albumBanner'),
-    position: 'top',
-  },
-
   secondaryNav: generateAlbumSecondaryNav(album, null, {
     getLinkThemeString,
     html,
