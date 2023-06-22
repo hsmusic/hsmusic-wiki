@@ -7,15 +7,15 @@ export function targets({wikiData}) {
   return wikiData.artistAliasData;
 }
 
-export function write(aliasArtist) {
+export function pathsForTarget(aliasArtist) {
   const {aliasedArtist} = aliasArtist;
 
-  const redirect = {
-    type: 'redirect',
-    fromPath: ['artist', aliasArtist.directory],
-    toPath: ['artist', aliasedArtist.directory],
-    title: () => aliasedArtist.name,
-  };
-
-  return [redirect];
+  return [
+    {
+      type: 'redirect',
+      fromPath: ['artist', aliasArtist.directory],
+      toPath: ['artist', aliasedArtist.directory],
+      title: () => aliasedArtist.name,
+    },
+  ];
 }
