@@ -1,14 +1,18 @@
 import * as path from 'path';
 
 import {bindUtilities} from '../bind-utilities.js';
-import {validateWrites} from '../validate-writes.js';
+// import {validateWrites} from '../validate-writes.js';
 
 import {
-  generateDocumentHTML,
-  generateGlobalWikiDataJSON,
-  generateOEmbedJSON,
-  generateRedirectHTML,
-} from '../page-template.js';
+  quickLoadContentDependencies,
+} from '../../content/dependencies/index.js';
+
+import {
+  fillRelationsLayoutFromSlotResults,
+  flattenRelationsTree,
+  getRelationsTree,
+  getNeededContentDependencyNames,
+} from '../../content-function.js';
 
 import {serializeThings} from '../../data/serialize.js';
 
@@ -143,10 +147,12 @@ export async function go({
     outputPath,
     urls,
     wikiData,
+    /*
     wikiDataJSON: generateGlobalWikiDataJSON({
       serializeThings,
       wikiData,
     })
+    */
   });
 
   const buildSteps = writeAll
@@ -158,7 +164,8 @@ export async function go({
   {
     let error = false;
 
-    const buildStepsWithTargets = buildSteps
+    // TODO: Port this to aggregate error
+    writes = buildSteps
       .map(([flag, pageSpec]) => {
         // Condition not met: skip this build step altogether.
         if (pageSpec.condition && !pageSpec.condition({wikiData})) {
@@ -170,52 +177,28 @@ export async function go({
           return {flag, pageSpec, targets: []};
         }
 
-        if (!pageSpec.write) {
-          logError`${flag + '.targets'} is specified, but ${flag + '.write'} is missing!`;
+        if (!pageSpec.pathsForTarget) {
+          logError`${flag + '.targets'} is specified, but ${flag + '.pathsForTarget'} is missing!`;
           error = true;
           return null;
         }
 
         const targets = pageSpec.targets({wikiData});
+
         if (!Array.isArray(targets)) {
-          logError`${flag + '.targets'} was called, but it didn't return an array! (${typeof targets})`;
+          logError`${flag + '.targets'} was called, but it didn't return an array! (${targets})`;
           error = true;
           return null;
         }
 
-        return {flag, pageSpec, targets};
+        const pathsForTargets = targets.flatMap(target => pageSpec.pathsForTarget(target));
+
+        // TODO: Validate each pathsForTargets entry
+
+        return pathsForTargets;
       })
-      .filter(Boolean);
-
-    if (error) {
-      return false;
-    }
-
-    writes = progressCallAll('Computing page & data writes.', buildStepsWithTargets.flatMap(({flag, pageSpec, targets}) => {
-      const writesFns = targets.map(target => () => {
-        const writes = pageSpec.write(target, {wikiData})?.slice() || [];
-        const valid = validateWrites(writes, {
-          functionName: flag + '.write',
-          urlSpec,
-        });
-        error ||=! valid;
-        return valid ? writes : [];
-      });
-
-      if (pageSpec.writeTargetless) {
-        writesFns.push(() => {
-          const writes = pageSpec.writeTargetless({wikiData});
-          const valid = validateWrites(writes, {
-            functionName: flag + '.writeTargetless',
-            urlSpec,
-          });
-          error ||=! valid;
-          return valid ? writes : [];
-        });
-      }
-
-      return writesFns;
-    })).flat();
+      .filter(Boolean)
+      .flat();
 
     if (error) {
       return false;
@@ -267,6 +250,8 @@ export async function go({
   ));
   */
 
+  const allContentDependencies = await quickLoadContentDependencies();
+
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
       language === defaultLanguage ? '' : language.code;
@@ -303,16 +288,19 @@ export async function go({
 
         const bound = bindUtilities({
           absoluteTo,
+          cachebust,
           defaultLanguage,
           getSizeOfAdditionalFile,
           getSizeOfImageFile,
           language,
           languages,
+          pagePath,
           to,
           urls,
           wikiData,
         });
 
+        /*
         const pageInfo = page.page(bound);
 
         const oEmbedJSON = generateOEmbedJSON(pageInfo, {
@@ -327,20 +315,114 @@ export async function go({
             urls
               .from('shared.root')
               .to('shared.path', pathname + 'oembed.json');
+        */
 
-        const pageHTML = generateDocumentHTML(pageInfo, {
+        const allExtraDependencies = {
           ...bound,
-          cachebust,
-          developersComment,
-          localizedPathnames,
-          oEmbedJSONHref,
-          pagePath,
-          pathname,
-        });
+          appendIndexHTML: false,
+        };
+
+        const {name, args} = page.contentFunction;
+        const treeInfo = getRelationsTree(allContentDependencies, name, wikiData, ...args);
+        const flatTreeInfo = flattenRelationsTree(treeInfo);
+        const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
+
+        const neededContentDependencyNames =
+          getNeededContentDependencyNames(allContentDependencies, name);
+
+        // Content functions aren't recursive, so by following the set above
+        // sequentually, we will always provide fulfilled content functions as the
+        // dependencies for later content functions.
+        const fulfilledContentDependencies = {};
+        for (const name of neededContentDependencyNames) {
+          const unfulfilledContentFunction = allContentDependencies[name];
+          if (!unfulfilledContentFunction) continue;
+
+          const {contentDependencies, extraDependencies} = unfulfilledContentFunction;
+
+          if (empty(contentDependencies) && empty(extraDependencies)) {
+            fulfilledContentDependencies[name] = unfulfilledContentFunction;
+            continue;
+          }
+
+          const fulfillments = {};
+
+          for (const dependencyName of contentDependencies ?? []) {
+            if (dependencyName in fulfilledContentDependencies) {
+              fulfillments[dependencyName] =
+                fulfilledContentDependencies[dependencyName];
+            }
+          }
+
+          for (const dependencyName of extraDependencies ?? []) {
+            if (dependencyName in allExtraDependencies) {
+              fulfillments[dependencyName] =
+                allExtraDependencies[dependencyName];
+            }
+          }
+
+          fulfilledContentDependencies[name] =
+            unfulfilledContentFunction.fulfill(fulfillments);
+        }
+
+        // There might still be unfulfilled content functions if dependencies weren't
+        // provided as part of allContentDependencies or allExtraDependencies.
+        // Catch and report these early, together in an aggregate error.
+        const unfulfilledErrors = [];
+        const unfulfilledNames = [];
+        for (const name of neededContentDependencyNames) {
+          const contentFunction = fulfilledContentDependencies[name];
+          if (!contentFunction) continue;
+          if (!contentFunction.fulfilled) {
+            try {
+              contentFunction();
+            } catch (error) {
+              error.message = `(${name}) ${error.message}`;
+              unfulfilledErrors.push(error);
+              unfulfilledNames.push(name);
+            }
+          }
+        }
+
+        if (!empty(unfulfilledErrors)) {
+          throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled (${unfulfilledNames.join(', ')})`);
+        }
+
+        const slotResults = {};
+
+        function runContentFunction({name, args, relations: flatRelations}) {
+          const contentFunction = fulfilledContentDependencies[name];
+
+          if (!contentFunction) {
+            throw new Error(`Content function ${name} unfulfilled or not listed`);
+          }
+
+          const sprawl =
+            contentFunction.sprawl?.(allExtraDependencies.wikiData, ...args);
+
+          const relations =
+            fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, flatRelations);
+
+          const data =
+            (sprawl
+              ? contentFunction.data?.(sprawl, ...args)
+              : contentFunction.data?.(...args));
+
+          const generateArgs = [data, relations].filter(Boolean);
+
+          return contentFunction(...generateArgs);
+        }
+
+        for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
+          slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
+        }
+
+        const topLevelResult = runContentFunction(root);
+        const pageHTML = topLevelResult.toString();
 
         return writePage({
           html: pageHTML,
-          oEmbedJSON,
+          // oEmbedJSON,
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
@@ -497,6 +579,7 @@ async function writeSharedFilesAndPages({
   const {groupData, wikiInfo} = wikiData;
 
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
+    /*
     groupData?.some((group) => group.directory === 'fandom') &&
       redirect(
         'Fandom - Gallery',
@@ -520,6 +603,7 @@ async function writeSharedFilesAndPages({
         'localized.commentaryIndex',
         ''
       ),
+    */
 
     wikiDataJSON &&
       writeFile(

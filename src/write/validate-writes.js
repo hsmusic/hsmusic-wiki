@@ -1,3 +1,5 @@
+// TODO: All this is for an outdated spec + should use aggregate errors
+
 import {logError} from '../util/cli.js';
 
 function validateWritePath(path, urlGroup) {

@@ -357,7 +357,6 @@ export async function go({
         ...bound,
 
         appendIndexHTML: false,
-        transformMultiline: text => `<p>${text}</p>`,
       };
 
       // NOTE: ALL THIS STUFF IS PASTED, REVIEW AND INTEGRATE SOON(TM)
