@@ -15,6 +15,7 @@ export default {
       !html.isBlank(slots.previousLink) &&
         slots.previousLink.slots({
           tooltip: true,
+          color: false,
           attributes: {id: 'previous-button'},
           content: language.$('misc.nav.previous'),
         }),
@@ -22,6 +23,7 @@ export default {
       !html.isBlank(slots.nextLink) &&
         slots.nextLink?.slots({
           tooltip: true,
+          color: false,
           attributes: {id: 'next-button'},
           content: language.$('misc.nav.next'),
         }),
