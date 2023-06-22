@@ -56,7 +56,6 @@ export default {
     'html',
     'language',
     'to',
-    'transformMultiline',
     'wikiData',
   ],
 
