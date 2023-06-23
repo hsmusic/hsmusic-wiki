@@ -4,6 +4,8 @@ import {
   setIntersection,
 } from './util/sugar.js';
 
+export class ContentFunctionSpecError extends Error {}
+
 export default function contentFunction({
   contentDependencies = [],
   extraDependencies = [],
@@ -25,19 +27,19 @@ export default function contentFunction({
     setIntersection(expectedContentDependencyKeys, expectedExtraDependencyKeys);
 
   if (!empty(overlappingContentExtraDependencyKeys)) {
-    throw new Error(`Overlap in content and extra dependency keys: ${[...overlappingContentExtraDependencyKeys].join(', ')}`);
+    throw new ContentFunctionSpecError(`Overlap in content and extra dependency keys: ${[...overlappingContentExtraDependencyKeys].join(', ')}`);
   }
 
   if (!generate) {
-    throw new Error(`Expected generate function`);
+    throw new ContentFunctionSpecError(`Expected generate function`);
   }
 
   if (sprawl && !expectedExtraDependencyKeys.has('wikiData')) {
-    throw new Error(`Content functions which sprawl must specify wikiData in extraDependencies`);
+    throw new ContentFunctionSpecError(`Content functions which sprawl must specify wikiData in extraDependencies`);
   }
 
   if (slots && !expectedExtraDependencyKeys.has('html')) {
-    throw new Error(`Content functions with slots must specify html in extraDependencies`);
+    throw new ContentFunctionSpecError(`Content functions with slots must specify html in extraDependencies`);
   }
 
   // Pass all the details to expectDependencies, which will recursively build

@@ -6,7 +6,7 @@ import {readdir} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import contentFunction from '../../content-function.js';
+import contentFunction, {ContentFunctionSpecError} from '../../content-function.js';
 import {color, logWarn} from '../../util/cli.js';
 import {annotateFunction} from '../../util/sugar.js';
 
@@ -205,6 +205,8 @@ export function watchContentDependencies({
 
       if (typeof error === 'string') {
         console.error(color.yellow(error));
+      } else if (error instanceof ContentFunctionSpecError) {
+        console.error(color.yellow(error.message));
       } else {
         console.error(error);
       }
@@ -214,23 +216,15 @@ export function watchContentDependencies({
   }
 
   function processFunctionSpec(functionName, spec) {
-    if (typeof spec.data === 'function') {
+    if (typeof spec?.data === 'function') {
       annotateFunction(spec.data, {name: functionName, description: 'data'});
     }
 
-    if (typeof spec.generate === 'function') {
+    if (typeof spec?.generate === 'function') {
       annotateFunction(spec.generate, {name: functionName});
     }
 
-    let fn;
-    try {
-      fn = contentFunction(spec);
-    } catch (error) {
-      error.message = `Error loading spec: ${error.message}`;
-      throw error;
-    }
-
-    return fn;
+    return contentFunction(spec);
   }
 }
 
