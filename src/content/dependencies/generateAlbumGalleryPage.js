@@ -60,6 +60,12 @@ export default {
     data.names =
       album.tracks.map(track => track.name);
 
+    data.coverArtists =
+      album.tracks.map(track =>
+        (track.hasUniqueCoverArt
+          ? track.coverArtistContribs.map(({who: artist}) => artist.name)
+          : null));
+
     data.paths =
       album.tracks.map(track =>
         (track.hasUniqueCoverArt
@@ -101,6 +107,13 @@ export default {
                       missingSourceContent:
                         language.$('misc.albumGalleryGrid.noCoverArt', {name}),
                     })),
+              info:
+                data.coverArtists.map(names =>
+                  (names === null
+                    ? null
+                    : language.$('misc.albumGrid.details.coverArtists', {
+                        artists: language.formatUnitList(names),
+                      }))),
             }),
         ],
 
