@@ -80,24 +80,27 @@ export function stitchArrays(keyToArray) {
   const errors = [];
 
   for (const [key, value] of Object.entries(keyToArray)) {
-    if (!Array.isArray(value)) {
-      errors.push(new TypeError(`(${key}) Expected array, got ${value}`));
-    }
+    if (value === null) continue;
+    if (Array.isArray(value)) continue;
+    errors.push(new TypeError(`(${key}) Expected array or null, got ${value}`));
   }
 
   if (!empty(errors)) {
-    throw new AggregateError(errors, `Expected all values to be arrays`);
+    throw new AggregateError(errors, `Expected arrays or null`);
   }
 
   const keys = Object.keys(keyToArray);
-  const arrays = Object.values(keyToArray);
+  const arrays = Object.values(keyToArray).filter(val => Array.isArray(val));
   const length = Math.max(...arrays.map(({length}) => length));
   const results = [];
 
   for (let i = 0; i < length; i++) {
     const object = {};
     for (const key of keys) {
-      object[key] = keyToArray[key][i];
+      object[key] =
+        (Array.isArray(keyToArray[key])
+          ? keyToArray[key][i]
+          : null);
     }
     results.push(object);
   }
