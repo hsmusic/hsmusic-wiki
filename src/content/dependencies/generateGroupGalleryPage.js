@@ -1,4 +1,7 @@
+import {empty, stitchArrays} from '../../util/sugar.js';
+
 import {
+  filterItemsForCarousel,
   getTotalDuration,
   sortChronologically,
 } from '../../util/wiki-data.js';
@@ -6,6 +9,7 @@ import {
 export default {
   contentDependencies: [
     'generateColorStyleRules',
+    'generateCoverCarousel',
     'generateCoverGrid',
     'generateGroupNavLinks',
     'generateGroupSidebar',
@@ -55,14 +59,29 @@ export default {
         relation('linkListing', sprawl.groupsByCategoryListing);
     }
 
+    const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
+
+    if (!empty(carouselAlbums)) {
+      relations.coverCarousel =
+        relation('generateCoverCarousel');
+
+      relations.carouselLinks =
+        carouselAlbums
+          .map(album => relation('linkAlbum', album));
+
+      relations.carouselImages =
+        carouselAlbums
+          .map(album => relation('image', album.artTags));
+    }
+
     relations.coverGrid =
       relation('generateCoverGrid');
 
-    relations.links =
+    relations.gridLinks =
       albums
         .map(album => relation('linkAlbum', album));
 
-    relations.images =
+    relations.gridImages =
       albums.map(album =>
         (album.hasCoverArt
           ? relation('image', album.artTags)
@@ -72,25 +91,35 @@ export default {
   },
 
   data(sprawl, group) {
-    const albums =
-      sortChronologically(group.albums.slice(), {latestFirst: true});
+    const data = {};
 
+    data.name = group.name;
+
+    const albums = sortChronologically(group.albums.slice(), {latestFirst: true});
     const tracks = albums.flatMap((album) => album.tracks);
-    const totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
 
-    return {
-      name: group.name,
+    data.numAlbums = albums.length;
+    data.numTracks = tracks.length;
+    data.totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
 
-      numAlbums: albums.length,
-      numTracks: tracks.length,
-      totalDuration,
-
-      names: albums.map(album => album.name),
-      paths: albums.map(album =>
+    data.gridNames = albums.map(album => album.name);
+    data.gridPaths =
+      albums.map(album =>
         (album.hasCoverArt
           ? ['media.albumCover', album.directory, album.coverArtFileExtension]
-          : null)),
-    };
+          : null));
+
+    const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
+
+    if (!empty(group.featuredAlbums)) {
+      data.carouselPaths =
+        carouselAlbums.map(album =>
+          (album.hasCoverArt
+            ? ['media.albumCover', album.directory, album.coverArtFileExtension]
+            : null));
+    }
+
+    return data;
   },
 
   generate(data, relations, {html, language}) {
@@ -103,13 +132,16 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          /*
-          getCarouselHTML({
-            items: group.featuredAlbums.slice(0, 12 + 1),
-            srcFn: getAlbumCover,
-            linkFn: link.album,
-          }),
-          */
+          relations.coverCarousel
+            ?.slots({
+              links: relations.carouselLinks,
+              images:
+                stitchArrays({
+                  image: relations.carouselImages,
+                  path: data.carouselPaths,
+                }).map(({image, path}) =>
+                    image.slot('path', path)),
+            }),
 
           html.tag('p',
             {class: 'quick-info'},
@@ -139,17 +171,21 @@ export default {
 
           relations.coverGrid
             .slots({
-              links: relations.links,
-              names: data.names,
+              links: relations.gridLinks,
+              names: data.gridNames,
               images:
-                relations.images.map((image, i) =>
-                  image.slots({
-                    path: data.paths[i],
-                    missingSourceContent:
-                      language.$('misc.albumGrid.noCoverArt', {
-                        album: data.names[i],
-                      }),
-                  })),
+                stitchArrays({
+                  image: relations.gridImages,
+                  path: data.gridPaths,
+                  name: data.gridNames,
+                }).map(({image, path, name}) =>
+                    image.slots({
+                      path,
+                      missingSourceContent:
+                        language.$('misc.albumGrid.noCoverArt', {
+                          album: name,
+                        }),
+                    })),
             }),
         ],
 

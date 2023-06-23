@@ -73,6 +73,38 @@ export function accumulateSum(array, fn = x => x) {
     0);
 }
 
+// Stitches together the items of separate arrays into one array of objects
+// whose keys are the corresponding items from each array at that index.
+// This is mostly useful for iterating over multiple arrays at once!
+export function stitchArrays(keyToArray) {
+  const errors = [];
+
+  for (const [key, value] of Object.entries(keyToArray)) {
+    if (!Array.isArray(value)) {
+      errors.push(new TypeError(`(${key}) Expected array, got ${value}`));
+    }
+  }
+
+  if (!empty(errors)) {
+    throw new AggregateError(errors, `Expected all values to be arrays`);
+  }
+
+  const keys = Object.keys(keyToArray);
+  const arrays = Object.values(keyToArray);
+  const length = Math.max(...arrays.map(({length}) => length));
+  const results = [];
+
+  for (let i = 0; i < length; i++) {
+    const object = {};
+    for (const key of keys) {
+      object[key] = keyToArray[key][i];
+    }
+    results.push(object);
+  }
+
+  return results;
+}
+
 export const mapInPlace = (array, fn) =>
   array.splice(0, array.length, ...array.map(fn));
 

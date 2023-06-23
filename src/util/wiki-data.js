@@ -554,3 +554,65 @@ export function getNewReleases(numReleases, {wikiData}) {
     .slice(0, numReleases)
     .map((album) => ({item: album}));
 }
+
+// Carousel layout and utilities
+
+// Layout constants:
+//
+// Carousels support fitting 4-18 items, with a few "dead" zones to watch out
+// for, namely when a multiple of 6, 5, or 4 columns would drop the last tiles.
+//
+// Carousels are limited to 1-3 rows and 4-6 columns.
+// Lower edge case: 1-3 items are treated as 4 items (with blank space).
+// Upper edge case: all items past 18 are dropped (treated as 18 items).
+//
+// This is all done through JS instead of CSS because it's just... ANNOYING...
+// to write a mapping like this in CSS lol.
+const carouselLayoutMap = [
+  // 0-3
+  null, null, null, null,
+
+  // 4-6
+  {rows: 1, columns: 4}, //  4: 1x4, drop 0
+  {rows: 1, columns: 5}, //  5: 1x5, drop 0
+  {rows: 1, columns: 6}, //  6: 1x6, drop 0
+
+  // 7-12
+  {rows: 1, columns: 6}, //  7: 1x6, drop 1
+  {rows: 2, columns: 4}, //  8: 2x4, drop 0
+  {rows: 2, columns: 4}, //  9: 2x4, drop 1
+  {rows: 2, columns: 5}, // 10: 2x5, drop 0
+  {rows: 2, columns: 5}, // 11: 2x5, drop 1
+  {rows: 2, columns: 6}, // 12: 2x6, drop 0
+
+  // 13-18
+  {rows: 2, columns: 6}, // 13: 2x6, drop 1
+  {rows: 2, columns: 6}, // 14: 2x6, drop 2
+  {rows: 3, columns: 5}, // 15: 3x5, drop 0
+  {rows: 3, columns: 5}, // 16: 3x5, drop 1
+  {rows: 3, columns: 5}, // 17: 3x5, drop 2
+  {rows: 3, columns: 6}, // 18: 3x6, drop 0
+];
+
+const minCarouselLayoutItems = carouselLayoutMap.findIndex(x => x !== null);
+const maxCarouselLayoutItems = carouselLayoutMap.length - 1;
+const shortestCarouselLayout = carouselLayoutMap[minCarouselLayoutItems];
+const longestCarouselLayout = carouselLayoutMap[maxCarouselLayoutItems];
+
+export function getCarouselLayoutForNumberOfItems(numItems) {
+  return (
+    numItems < minCarouselLayoutItems ? shortestCarouselLayout :
+    numItems > maxCarouselLayoutItems ? longestCarouselLayout :
+    carouselLayoutMap[numItems]);
+}
+
+export function filterItemsForCarousel(items) {
+  if (empty(items)) {
+    return [];
+  }
+
+  return items
+    .filter(item => item.hasCoverArt)
+    .filter(item => item.artTags.every(tag => !tag.isContentWarning))
+    .slice(0, maxCarouselLayoutItems + 1);
+}
