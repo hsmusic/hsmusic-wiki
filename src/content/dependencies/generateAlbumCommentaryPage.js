@@ -1,3 +1,5 @@
+import {stitchArrays} from '../../util/sugar.js';
+
 export default {
   contentDependencies: [
     'generateAlbumNavAccent',
@@ -127,18 +129,20 @@ export default {
               relations.albumCommentaryContent),
           ],
 
-          relations.trackCommentaryContent.map((commentaryContent, i) => [
-            relations.trackCommentaryHeadings[i]
-              .slots({
+          stitchArrays({
+            heading: relations.trackCommentaryHeadings,
+            link: relations.trackCommentaryLinks,
+            directory: data.trackCommentaryDirectories,
+            content: relations.trackCommentaryContent,
+            colorVariables: relations.trackCommentaryColorVariables,
+          }).map(({heading, link, directory, content, colorVariables}) => [
+              heading.slots({
                 tag: 'h3',
-                id: data.trackCommentaryDirectories[i],
-                title: relations.trackCommentaryLinks[i],
+                id: directory,
+                title: link,
               }),
-
-            html.tag('blockquote',
-              {style: relations.trackCommentaryColorVariables[i]},
-              relations.trackCommentaryContent[i]),
-          ]),
+              html.tag('blockquote', {style: colorVariables}, content),
+            ]),
         ],
 
         navLinkStyle: 'hierarchical',

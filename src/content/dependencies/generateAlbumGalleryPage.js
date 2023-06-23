@@ -1,3 +1,5 @@
+import {stitchArrays} from '../../util/sugar.js';
+
 export default {
   contentDependencies: [
     'generateAlbumGalleryInfoLine',
@@ -89,14 +91,16 @@ export default {
               links: relations.links,
               names: data.names,
               images:
-                relations.images.map((image, i) =>
-                  image.slots({
-                    path: data.paths[i],
-                    missingSourceContent:
-                      language.$('misc.albumGalleryGrid.noCoverArt', {
-                        name: data.names[i],
-                      }),
-                  })),
+                stitchArrays({
+                  image: relations.images,
+                  path: data.paths,
+                  name: data.names,
+                }).map(({image, path, name}) =>
+                    image.slots({
+                      path,
+                      missingSourceContent:
+                        language.$('misc.albumGalleryGrid.noCoverArt', {name}),
+                    })),
             }),
         ],
 

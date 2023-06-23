@@ -1,3 +1,4 @@
+import {stitchArrays} from '../../util/sugar.js';
 import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
 
 // TODO: Very awkward we have to duplicate this functionality in relations and data.
@@ -92,10 +93,11 @@ export default {
               links: relations.links,
               names: data.names,
               images:
-                relations.images.map((image, i) =>
-                  image.slots({
-                    path: data.paths[i],
-                  })),
+                stitchArrays({
+                  image: relations.images,
+                  path: data.paths,
+                }).map(({image, path}) =>
+                    image.slot('path', path)),
             }),
         ],
 
