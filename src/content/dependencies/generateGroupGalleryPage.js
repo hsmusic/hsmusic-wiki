@@ -103,6 +103,9 @@ export default {
     data.totalDuration = getTotalDuration(tracks, {originalReleasesOnly: true});
 
     data.gridNames = albums.map(album => album.name);
+    data.gridDurations = albums.map(album => getTotalDuration(album.tracks));
+    data.gridNumTracks = albums.map(album => album.tracks.length);
+
     data.gridPaths =
       albums.map(album =>
         (album.hasCoverArt
@@ -185,6 +188,15 @@ export default {
                         language.$('misc.albumGrid.noCoverArt', {
                           album: name,
                         }),
+                    })),
+              info:
+                stitchArrays({
+                  numTracks: data.gridNumTracks,
+                  duration: data.gridDurations,
+                }).map(({numTracks, duration}) =>
+                    language.$('misc.albumGrid.details', {
+                      tracks: language.countTracks(numTracks, {unit: true}),
+                      time: language.formatDuration(duration),
                     })),
             }),
         ],
