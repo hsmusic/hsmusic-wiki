@@ -841,11 +841,6 @@ img {
   margin-bottom: auto;
 }
 
-.grid-item span {
-  overflow-wrap: break-word;
-  hyphens: auto;
-}
-
 .grid-item:hover {
   text-decoration: none;
 }
@@ -856,6 +851,8 @@ img {
 
 .grid-item > span {
   display: block;
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .grid-item > span:not(:first-child) {
@@ -864,6 +861,11 @@ img {
 
 .grid-item > span:first-of-type {
   margin-top: 6px;
+}
+
+.grid-item > span:not(:first-of-type) {
+  font-size: 0.9em;
+  opacity: 0.8;
 }
 
 .grid-item:hover > span:first-of-type {
