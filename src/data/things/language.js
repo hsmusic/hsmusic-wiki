@@ -101,7 +101,7 @@ export class Language extends Thing {
         dependencies: ['strings', 'inheritedStrings', 'escapeHTML'],
         compute({strings, inheritedStrings, escapeHTML}) {
           if (!(strings || inheritedStrings) || !escapeHTML) return null;
-          const allStrings = {...(inheritedStrings ?? {}), ...(strings ?? {})};
+          const allStrings = {...inheritedStrings, ...strings};
           return Object.fromEntries(
             Object.entries(allStrings).map(([k, v]) => [k, escapeHTML(v)])
           );

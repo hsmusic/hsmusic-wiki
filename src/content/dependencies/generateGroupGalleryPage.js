@@ -153,11 +153,10 @@ export default {
             }),
         ],
 
-        ...(
+        ...
           relations.sidebar
             ?.slot('currentExtra', 'gallery')
-            ?.content
-          ?? {}),
+            ?.content,
 
         navLinkStyle: 'hierarchical',
         navLinks:
