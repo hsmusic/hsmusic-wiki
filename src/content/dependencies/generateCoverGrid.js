@@ -7,6 +7,7 @@ export default {
     images: {validate: v => v.arrayOf(v.isHTML)},
     links: {validate: v => v.arrayOf(v.isHTML)},
     names: {validate: v => v.arrayOf(v.isString)},
+    info: {validate: v => v.arrayOf(v.isString)},
 
     lazy: {validate: v => v.oneOf(v.isWholeNumber, v.isBoolean)},
   },
@@ -18,7 +19,8 @@ export default {
           image: slots.images,
           link: slots.links,
           name: slots.names,
-        }).map(({image, link, name}, index) =>
+          info: slots.info,
+        }).map(({image, link, name, info}, index) =>
             link.slots({
               attributes: {class: ['grid-item', 'box']},
               content: [
@@ -32,7 +34,8 @@ export default {
                       ? slots.lazy
                       : false),
                 }),
-                html.tag('span', name),
+                html.tag('span', {[html.onlyIfContent]: true}, name),
+                html.tag('span', {[html.onlyIfContent]: true}, info),
               ],
             }))));
   },
