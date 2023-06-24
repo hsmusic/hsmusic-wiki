@@ -1,4 +1,4 @@
-import {accumulateSum, empty} from '../../util/sugar.js';
+import {accumulateSum, empty, stitchArrays} from '../../util/sugar.js';
 
 function displayTrackSections(album) {
   if (empty(album.trackSections)) {
@@ -41,47 +41,56 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album) {
+  query(album) {
+    return {
+      displayMode: getDisplayMode(album),
+    };
+  },
+
+  relations(relation, query, album) {
     const relations = {};
 
-    const displayMode = getDisplayMode(album);
+    switch (query.displayMode) {
+      case 'trackSections':
+        relations.itemsByTrackSection =
+          album.trackSections.map(section =>
+            section.tracks.map(track =>
+              relation('generateAlbumTrackListItem', track, album)));
+        break;
 
-    if (displayMode === 'trackSections') {
-      relations.itemsByTrackSection =
-        album.trackSections.map(section =>
-          section.tracks.map(track =>
-            relation('generateAlbumTrackListItem', track, album)));
-    }
-
-    if (displayMode === 'tracks') {
-      relations.itemsByTrack =
-        album.tracks.map(track =>
-          relation('generateAlbumTrackListItem', track, album));
+      case 'tracks':
+        relations.itemsByTrack =
+          album.tracks.map(track =>
+            relation('generateAlbumTrackListItem', track, album));
+        break;
     }
 
     return relations;
   },
 
-  data(album) {
+  data(query, album) {
     const data = {};
 
+    data.displayMode = query.displayMode;
     data.hasTrackNumbers = album.hasTrackNumbers;
 
-    if (displayTrackSections(album)) {
-      data.trackSectionInfo =
-        album.trackSections.map(section => {
-          const info = {};
+    switch (query.displayMode) {
+      case 'trackSections':
+        data.trackSectionInfo =
+          album.trackSections.map(section => {
+            const info = {};
 
-          info.name = section.name;
-          info.duration = accumulateSum(section.tracks, track => track.duration);
-          info.durationApproximate = section.tracks.length > 1;
+            info.name = section.name;
+            info.duration = accumulateSum(section.tracks, track => track.duration);
+            info.durationApproximate = section.tracks.length > 1;
 
-          if (album.hasTrackNumbers) {
-            info.startIndex = section.startIndex;
-          }
+            if (album.hasTrackNumbers) {
+              info.startIndex = section.startIndex;
+            }
 
-          return info;
-        });
+            return info;
+          });
+        break;
     }
 
     return data;
@@ -90,31 +99,34 @@ export default {
   generate(data, relations, {html, language}) {
     const listTag = (data.hasTrackNumbers ? 'ol' : 'ul');
 
-    if (relations.itemsByTrackSection) {
-      return html.tag('dl',
-        {class: 'album-group-list'},
-        data.trackSectionInfo.map((info, index) => [
-          html.tag('dt',
-            {class: 'content-heading', tabindex: '0'},
-            language.$('trackList.section.withDuration', {
-              section: info.name,
-              duration:
-                language.formatDuration(info.duration, {
-                  approximate: info.durationApproximate,
-                }),
-            })),
+    switch (data.displayMode) {
+      case 'trackSections':
+        return html.tag('dl', {class: 'album-group-list'},
+          stitchArrays({
+            info: data.trackSectionInfo,
+            item: relations.itemsByTrackSection,
+          }).map(({info, item}) => [
+              html.tag('dt',
+                {class: 'content-heading', tabindex: '0'},
+                language.$('trackList.section.withDuration', {
+                  section: info.name,
+                  duration:
+                    language.formatDuration(info.duration, {
+                      approximate: info.durationApproximate,
+                    }),
+                })),
 
-          html.tag('dd',
-            html.tag(listTag,
-              data.hasTrackNumbers ? {start: info.startIndex + 1} : {},
-              relations.itemsByTrackSection[index])),
-        ]));
+              html.tag('dd',
+                html.tag(listTag,
+                  data.hasTrackNumbers ? {start: info.startIndex + 1} : {},
+                  item)),
+            ]));
+
+      case 'tracks':
+        return html.tag(listTag, relations.itemsByTrack);
+
+      default:
+        return html.blank();
     }
-
-    if (relations.itemsByTrack) {
-      return html.tag(listTag, relations.itemsByTrack);
-    }
-
-    return html.blank();
   }
 };
