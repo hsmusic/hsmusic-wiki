@@ -13,7 +13,7 @@ export default {
 
     relations.contributionLinks =
       track.artistContribs
-        .map(({who, what}) => relation('linkContribution', who, what));
+        .map(contrib => relation('linkContribution', contrib));
 
     relations.trackLink =
       relation('linkTrack', track);

@@ -16,8 +16,8 @@ export default {
           relation('linkTrack', track),
 
         contributionLinks:
-          track.artistContribs.map(contrib =>
-            relation('linkContribution', contrib.who, contrib.what)),
+          track.artistContribs
+            .map(contrib => relation('linkContribution', contrib)),
       })),
     };
   },

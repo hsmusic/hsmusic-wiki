@@ -13,8 +13,7 @@ export default {
       contributionLinks:
         contributions
           .slice(0, 4)
-          .map(({who, what}) =>
-            relation('linkContribution', who, what)),
+          .map(contrib => relation('linkContribution', contrib)),
     };
   },
 

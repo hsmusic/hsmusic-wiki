@@ -11,14 +11,15 @@ export default {
     'language',
   ],
 
-  relations(relation, artist) {
+  relations(relation, contribution) {
     const relations = {};
 
-    relations.artistLink = relation('linkArtist', artist);
+    relations.artistLink =
+      relation('linkArtist', contribution.who);
 
-    if (!empty(artist.urls)) {
+    if (!empty(contribution.who.urls)) {
       relations.artistIcons =
-        artist.urls
+        contribution.who.urls
           .slice(0, 4)
           .map(url => relation('linkExternalAsIcon', url));
     }
@@ -26,8 +27,10 @@ export default {
     return relations;
   },
 
-  data(artist, contribution) {
-    return {contribution};
+  data(contribution) {
+    return {
+      what: contribution.what,
+    };
   },
 
   slots: {
@@ -36,7 +39,7 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const hasContributionPart = !!(slots.showContribution && data.contribution);
+    const hasContributionPart = !!(slots.showContribution && data.what);
     const hasExternalPart = !!(slots.showIcons && relations.artistIcons);
 
     const externalLinks = hasExternalPart &&
@@ -49,7 +52,7 @@ export default {
 
     if (hasContributionPart) {
       parts.push('withContribution');
-      options.contrib = data.contribution;
+      options.contrib = data.what;
     }
 
     if (hasExternalPart) {

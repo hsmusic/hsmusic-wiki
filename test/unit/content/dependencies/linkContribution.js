@@ -64,9 +64,9 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [who1, what1]},
-        {args: [who2, what2]},
-        {args: [who3, what3]},
+        {args: [{who: who1, what: what1}]},
+        {args: [{who: who2, what: what2}]},
+        {args: [{who: who3, what: what3}]},
       ],
       slots,
     });
@@ -112,9 +112,9 @@ t.test('generateContributionLinks (unit)', async t => {
     evaluate({
       name: 'linkContribution',
       multiple: [
-        {args: [who1, what1]},
-        {args: [who2, what2]},
-        {args: [who3, what3]},
+        {args: [{who: who1, what: what1}]},
+        {args: [{who: who2, what: what2}]},
+        {args: [{who: who3, what: what3}]},
       ],
       slots,
     });

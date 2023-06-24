@@ -150,8 +150,8 @@ export default {
         relation('generateContentHeading');
 
       contributors.contributionLinks =
-        track.contributorContribs.map(({who, what}) =>
-          relation('linkContribution', who, what));
+        track.contributorContribs
+          .map(contrib => relation('linkContribution', contrib));
     }
 
     // Section: Referenced tracks
