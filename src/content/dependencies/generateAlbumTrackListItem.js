@@ -12,11 +12,8 @@ export default {
     const relations = {};
 
     relations.contributionLinks =
-      track.artistContribs.map(({who, what}) =>
-        relation('linkContribution', who, what, {
-          showContribution: false,
-          showIcons: false,
-        }));
+      track.artistContribs
+        .map(({who, what}) => relation('linkContribution', who, what));
 
     relations.trackLink =
       relation('linkTrack', track);
