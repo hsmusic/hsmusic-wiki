@@ -101,7 +101,7 @@ export async function go({
       targetless,
     }) => () => {
       if (targetless) {
-        const result = pageSpec.writeTargetless({wikiData});
+        const result = pageSpec.pathsTargetless({wikiData});
         return Array.isArray(result) ? result : [result];
       } else {
         return pageSpec.pathsForTarget(target);
@@ -512,7 +512,7 @@ function getPageSpecsWithTargets({
         ? pageSpec.targets({wikiData})
             .map(target => ({pageSpec, target}))
         : [],
-      Object.hasOwn(pageSpec, 'writeTargetless') &&
+      Object.hasOwn(pageSpec, 'pathsTargetless') &&
         {pageSpec, targetless: true},
     ])
     .filter(Boolean);

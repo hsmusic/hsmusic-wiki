@@ -173,8 +173,8 @@ export async function go({
 
         const paths = [];
 
-        if (pageSpec.writeTargetless) {
-          const result = pageSpec.writeTargetless({wikiData});
+        if (pageSpec.pathsTargetless) {
+          const result = pageSpec.pathsTargetless({wikiData});
           if (Array.isArray(result)) {
             paths.push(...result);
           } else {
