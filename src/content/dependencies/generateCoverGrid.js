@@ -6,8 +6,8 @@ export default {
   slots: {
     images: {validate: v => v.arrayOf(v.isHTML)},
     links: {validate: v => v.arrayOf(v.isHTML)},
-    names: {validate: v => v.arrayOf(v.isString)},
-    info: {validate: v => v.arrayOf(v.isString)},
+    names: {validate: v => v.arrayOf(v.isHTML)},
+    info: {validate: v => v.arrayOf(v.isHTML)},
 
     lazy: {validate: v => v.oneOf(v.isWholeNumber, v.isBoolean)},
   },
