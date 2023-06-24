@@ -167,35 +167,41 @@ export async function go({
     // TODO: Port this to aggregate error
     writes = buildSteps
       .map(([flag, pageSpec]) => {
-        // Condition not met: skip this build step altogether.
         if (pageSpec.condition && !pageSpec.condition({wikiData})) {
           return null;
         }
 
-        // May still call writeTargetless if present.
-        if (!pageSpec.targets) {
-          return {flag, pageSpec, targets: []};
+        const paths = [];
+
+        if (pageSpec.writeTargetless) {
+          const result = pageSpec.writeTargetless({wikiData});
+          if (Array.isArray(result)) {
+            paths.push(...result);
+          } else {
+            paths.push(result);
+          }
         }
 
-        if (!pageSpec.pathsForTarget) {
-          logError`${flag + '.targets'} is specified, but ${flag + '.pathsForTarget'} is missing!`;
-          error = true;
-          return null;
+        if (pageSpec.targets) {
+          if (!pageSpec.pathsForTarget) {
+            logError`${flag + '.targets'} is specified, but ${flag + '.pathsForTarget'} is missing!`;
+            error = true;
+            return null;
+          }
+
+          const targets = pageSpec.targets({wikiData});
+
+          if (!Array.isArray(targets)) {
+            logError`${flag + '.targets'} was called, but it didn't return an array! (${targets})`;
+            error = true;
+            return null;
+          }
+
+          paths.push(...targets.flatMap(target => pageSpec.pathsForTarget(target)));
+          // TODO: Validate each pathsForTargets entry
         }
 
-        const targets = pageSpec.targets({wikiData});
-
-        if (!Array.isArray(targets)) {
-          logError`${flag + '.targets'} was called, but it didn't return an array! (${targets})`;
-          error = true;
-          return null;
-        }
-
-        const pathsForTargets = targets.flatMap(target => pageSpec.pathsForTarget(target));
-
-        // TODO: Validate each pathsForTargets entry
-
-        return pathsForTargets;
+        return paths;
       })
       .filter(Boolean)
       .flat();
@@ -322,7 +328,7 @@ export async function go({
           appendIndexHTML: false,
         };
 
-        const {name, args} = page.contentFunction;
+        const {name, args = []} = page.contentFunction;
         const treeInfo = getRelationsTree(allContentDependencies, name, wikiData, ...args);
         const flatTreeInfo = flattenRelationsTree(treeInfo);
         const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;

@@ -99,10 +99,14 @@ export async function go({
       pageSpec,
       target,
       targetless,
-    }) => () =>
-      targetless
-        ? [pageSpec.writeTargetless({wikiData})]
-        : pageSpec.pathsForTarget(target))).flat();
+    }) => () => {
+      if (targetless) {
+        const result = pageSpec.writeTargetless({wikiData});
+        return Array.isArray(result) ? result : [result];
+      } else {
+        return pageSpec.pathsForTarget(target);
+      }
+    })).flat();
 
   logInfo`Will be serving a total of ${pages.length} pages.`;
 
@@ -337,7 +341,7 @@ export async function go({
         urls,
       });
 
-      const {name, args} = page.contentFunction;
+      const {name, args = []} = page.contentFunction;
 
       const bound = bindUtilities({
         absoluteTo,
