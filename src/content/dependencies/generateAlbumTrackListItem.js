@@ -37,28 +37,29 @@ export default {
   },
 
   generate(data, relations, {getColors, html, language}) {
-    const stringOpts = {
-      duration: language.formatDuration(data.duration),
-      track: relations.trackLink,
-    };
-
     let style;
+
     if (data.color) {
       const {primary} = getColors(data.color);
       style = `--primary-color: ${primary}`;
     }
 
-    return html.tag('li',
-      {style},
-      (!data.showArtists
-        ? language.$('trackList.item.withDuration', stringOpts)
-        : language.$('trackList.item.withDuration.withArtists', {
-            ...stringOpts,
-            by:
-              html.tag('span', {class: 'by'},
-                language.$('trackList.item.withArtists.by', {
-                  artists: language.formatConjunctionList(relations.contributionLinks),
-                })),
-          })));
+    const parts = ['trackList.item.withDuration'];
+    const options = {};
+
+    options.duration = language.formatDuration(data.duration);
+    options.track = relations.trackLink;
+
+    if (data.showArtists) {
+      parts.push('withArtists');
+      options.by =
+        html.tag('span', {class: 'by'},
+          language.$('trackList.item.withArtists.by', {
+            artists: language.formatConjunctionList(relations.contributionLinks),
+          }));
+    }
+
+    return html.tag('li', {style},
+      language.formatString(parts.join('.'), options));
   },
 };
