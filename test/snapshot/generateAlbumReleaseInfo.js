@@ -8,22 +8,22 @@ testContentFunctions(t, 'generateAlbumReleaseInfo (snapshot)', async (t, evaluat
     name: 'generateAlbumReleaseInfo',
     args: [{
       artistContribs: [
-        {who: {name: 'Toby Fox', directory: 'toby-fox'}, what: 'music probably'},
+        {who: {name: 'Toby Fox', directory: 'toby-fox', urls: null}, what: 'music probably'},
         {who: {name: 'Tensei', directory: 'tensei', urls: ['https://tenseimusic.bandcamp.com/']}, what: 'hot jams'},
       ],
 
       coverArtistContribs: [
-        {who: {name: 'Hanni Brosh', directory: 'hb'}, what: null},
+        {who: {name: 'Hanni Brosh', directory: 'hb', urls: null}, what: null},
       ],
 
       wallpaperArtistContribs: [
-        {who: {name: 'Hanni Brosh', directory: 'hb'}, what: null},
-        {who: {name: 'Niklink', directory: 'niklink'}, what: 'edits'},
+        {who: {name: 'Hanni Brosh', directory: 'hb', urls: null}, what: null},
+        {who: {name: 'Niklink', directory: 'niklink', urls: null}, what: 'edits'},
       ],
 
       bannerArtistContribs: [
-        {who: {name: 'Hanni Brosh', directory: 'hb'}, what: null},
-        {who: {name: 'Niklink', directory: 'niklink'}, what: 'edits'},
+        {who: {name: 'Hanni Brosh', directory: 'hb', urls: null}, what: null},
+        {who: {name: 'Niklink', directory: 'niklink', urls: null}, what: 'edits'},
       ],
 
       name: 'AlterniaBound',

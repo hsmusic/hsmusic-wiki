@@ -4,8 +4,8 @@ import {testContentFunctions} from '../lib/content-function.js';
 testContentFunctions(t, 'generateTrackReleaseInfo (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
-  const artistContribs = [{who: {name: 'Toby Fox', directory: 'toby-fox'}, what: null}];
-  const coverArtistContribs = [{who: {name: 'Alpaca', directory: 'alpaca'}, what: '🔥'}];
+  const artistContribs = [{who: {name: 'Toby Fox', directory: 'toby-fox', urls: null}, what: null}];
+  const coverArtistContribs = [{who: {name: 'Alpaca', directory: 'alpaca', urls: null}, what: '🔥'}];
 
   evaluate.snapshot('basic behavior', {
     name: 'generateTrackReleaseInfo',
