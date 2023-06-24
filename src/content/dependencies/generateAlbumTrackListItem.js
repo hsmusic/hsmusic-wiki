@@ -24,8 +24,11 @@ export default {
   data(track, album) {
     const data = {};
 
-    data.color = track.color;
     data.duration = track.duration ?? 0;
+
+    if (track.color !== album.color) {
+      data.color = track.color;
+    }
 
     data.showArtists =
       !compareArrays(
@@ -47,8 +50,12 @@ export default {
     const parts = ['trackList.item.withDuration'];
     const options = {};
 
-    options.duration = language.formatDuration(data.duration);
-    options.track = relations.trackLink;
+    options.duration =
+      language.formatDuration(data.duration);
+
+    options.track =
+      relations.trackLink
+        .slot('color', false);
 
     if (data.showArtists) {
       parts.push('withArtists');
