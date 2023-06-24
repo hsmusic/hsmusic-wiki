@@ -14,6 +14,16 @@ import {getTotalDuration} from '../util/wiki-data.js';
 
 export const description = `wiki-wide listing pages & index`;
 
+export function pathsTargetless() {
+  return [
+    {
+      type: 'page', path: ['listing', 'albums/by-name'],
+      contentFunction: {name: 'listAlbumsByName'},
+    },
+  ];
+}
+
+/*
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableListings;
 }
@@ -274,3 +284,4 @@ function generateLinkIndexForListings(currentListing, forSidebar, {
             genUL(listings)),
         ]));
 }
+*/
