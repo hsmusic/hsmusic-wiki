@@ -167,6 +167,13 @@ export function watchContentDependencies({
         break main;
       }
 
+      // Just skip newly created files. They'll be processed again when
+      // written.
+      if (spec === undefined) {
+        contentDependencies[functionName] = null;
+        return;
+      }
+
       let fn;
       try {
         fn = processFunctionSpec(functionName, spec);
