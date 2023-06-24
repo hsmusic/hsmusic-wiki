@@ -67,7 +67,7 @@ export default {
 
     data.hasTrackNumbers = album.hasTrackNumbers;
 
-    if (displayTrackSections && !empty(album.trackSections)) {
+    if (displayTrackSections(album)) {
       data.trackSectionInfo =
         album.trackSections.map(section => {
           const info = {};
