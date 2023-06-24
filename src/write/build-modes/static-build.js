@@ -390,25 +390,22 @@ export async function go({
 
         const slotResults = {};
 
-        function runContentFunction({name, args, relations: flatRelations}) {
+        function runContentFunction({name, args, relations: layout}) {
           const contentFunction = fulfilledContentDependencies[name];
 
           if (!contentFunction) {
             throw new Error(`Content function ${name} unfulfilled or not listed`);
           }
 
-          const sprawl =
-            contentFunction.sprawl?.(allExtraDependencies.wikiData, ...args);
+          const generateArgs = [];
 
-          const relations =
-            fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, flatRelations);
+          if (contentFunction.data) {
+            generateArgs.push(contentFunction.data(...args));
+          }
 
-          const data =
-            (sprawl
-              ? contentFunction.data?.(sprawl, ...args)
-              : contentFunction.data?.(...args));
-
-          const generateArgs = [data, relations].filter(Boolean);
+          if (layout) {
+            generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
+          }
 
           return contentFunction(...generateArgs);
         }

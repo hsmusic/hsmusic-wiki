@@ -12,6 +12,7 @@ export default function contentFunction({
 
   slots,
   sprawl,
+  query,
   relations,
   data,
   generate,
@@ -49,6 +50,7 @@ export default function contentFunction({
   return expectDependencies({
     slots,
     sprawl,
+    query,
     relations,
     data,
     generate,
@@ -68,6 +70,7 @@ contentFunction.identifyingSymbol = Symbol(`Is a content function?`);
 export function expectDependencies({
   slots,
   sprawl,
+  query,
   relations,
   data,
   generate,
@@ -81,6 +84,7 @@ export function expectDependencies({
   fulfilledDependencies,
 }) {
   const hasSprawlFunction = !!sprawl;
+  const hasQueryFunction = !!query;
   const hasRelationsFunction = !!relations;
   const hasDataFunction = !!data;
   const hasSlotsDescription = !!slots;
@@ -174,6 +178,10 @@ export function expectDependencies({
     wrappedGenerate.sprawl = sprawl;
   }
 
+  if (hasQueryFunction) {
+    wrappedGenerate.query = query;
+  }
+
   if (hasRelationsFunction) {
     wrappedGenerate.relations = relations;
   }
@@ -209,6 +217,7 @@ export function expectDependencies({
     return expectDependencies({
       slots,
       sprawl,
+      query,
       relations,
       data,
       generate,
@@ -300,6 +309,26 @@ export function fulfillDependencies(dependencies, {
   }
 }
 
+export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
+  const insertArgs = [];
+
+  if (contentFunction.sprawl) {
+    insertArgs.push(contentFunction.sprawl(wikiData, ...args));
+  }
+
+  if (contentFunction.query) {
+    insertArgs.unshift(contentFunction.query(...insertArgs, ...args));
+  }
+
+  // Note: Query is generally intended to "filter" the provided args/sprawl,
+  // so in most cases it shouldn't be necessary to access the original args
+  // or sprawl afterwards. These are left available for now (as the second
+  // and later arguments in relations/data), but if they don't find any use,
+  // we can refactor this step to remove them.
+
+  return [...insertArgs, ...args];
+}
+
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
   const relationIdentifier = Symbol('Relation');
 
@@ -309,96 +338,88 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
       throw new Error(`Couldn't find dependency ${contentFunctionName}`);
     }
 
-    if (!contentFunction.relations) {
-      return null;
-    }
+    // TODO: It's a bit awkward to pair this list of arguments with the output of
+    // getRelationsTree, but we do need to evaluate it right away (for the upcoming
+    // call to relations), and we're going to be reusing the same results for a
+    // later call to data (outside of getRelationsTree). There might be a nicer way
+    // of handling this.
+    const argsForRelationsAndData =
+      getArgsForRelationsAndData(
+        contentFunction,
+        wikiData,
+        ...args);
 
-    const listedDependencies = new Set(contentFunction.contentDependencies);
-
-    // TODO: Evaluating a sprawl might belong somewhere better than here, lol...
-    const sprawl =
-      (contentFunction.sprawl
-        ? contentFunction.sprawl(wikiData, ...args)
-        : null)
-
-    const relationSlots = {};
-
-    const relationSymbolMessage = (() => {
-      let num = 1;
-      return name => `#${num++} ${name}`;
-    })();
-
-    const relationFunction = (name, ...args) => {
-      if (!listedDependencies.has(name)) {
-        throw new Error(`Called relation('${name}') but ${contentFunctionName} doesn't list that dependency`);
-      }
-
-      const relationSymbol = Symbol(relationSymbolMessage(name));
-      relationSlots[relationSymbol] = {name, args};
-      return {[relationIdentifier]: relationSymbol};
-    };
-
-    const relationsLayout =
-      (sprawl
-        ? contentFunction.relations(relationFunction, sprawl, ...args)
-        : contentFunction.relations(relationFunction, ...args))
-
-    const relationsTree = Object.fromEntries(
-      Object.getOwnPropertySymbols(relationSlots)
-        .map(symbol => [symbol, relationSlots[symbol]])
-        .map(([symbol, {name, args}]) => [
-          symbol,
-          recursive(name, ...args),
-        ]));
-
-    return {
-      layout: relationsLayout,
-      slots: relationSlots,
-      tree: relationsTree,
-    };
-  }
-
-  const relationsTree = recursive(contentFunctionName, ...args);
-
-  return {
-    root: {
+    const result = {
       name: contentFunctionName,
-      args,
-      relations: relationsTree?.layout,
-    },
+      args: argsForRelationsAndData,
+    };
 
-    relationIdentifier,
-    relationsTree,
-  };
-}
+    if (contentFunction.relations) {
+      const listedDependencies = new Set(contentFunction.contentDependencies);
 
-export function flattenRelationsTree({
-  root,
-  relationIdentifier,
-  relationsTree,
-}) {
-  const flatRelationSlots = {};
+      const relationSlots = {};
 
-  function recursive({layout, slots, tree}) {
-    for (const slot of Object.getOwnPropertySymbols(slots)) {
-      if (tree[slot]) {
-        recursive(tree[slot]);
-      }
+      const relationSymbolMessage = (() => {
+        let num = 1;
+        return name => `#${num++} ${name}`;
+      })();
 
-      flatRelationSlots[slot] = {
-        name: slots[slot].name,
-        args: slots[slot].args,
-        relations: tree[slot]?.layout ?? null,
+      const relationFunction = (name, ...args) => {
+        if (!listedDependencies.has(name)) {
+          throw new Error(`Called relation('${name}') but ${contentFunctionName} doesn't list that dependency`);
+        }
+
+        const relationSymbol = Symbol(relationSymbolMessage(name));
+        relationSlots[relationSymbol] = {name, args};
+        return {[relationIdentifier]: relationSymbol};
+      };
+
+      const relationsLayout =
+        contentFunction.relations(relationFunction, ...argsForRelationsAndData);
+
+      const relationsTree = Object.fromEntries(
+        Object.getOwnPropertySymbols(relationSlots)
+          .map(symbol => [symbol, relationSlots[symbol]])
+          .map(([symbol, {name, args}]) => [
+            symbol,
+            recursive(name, ...args),
+          ]));
+
+      result.relations = {
+        layout: relationsLayout,
+        slots: relationSlots,
+        tree: relationsTree,
       };
     }
+
+    return result;
   }
 
-  if (relationsTree) {
-    recursive(relationsTree);
+  const root = recursive(contentFunctionName, ...args);
+
+  return {root, relationIdentifier};
+}
+
+export function flattenRelationsTree({root, relationIdentifier}) {
+  const flatRelationSlots = {};
+
+  function recursive(node) {
+    if (node.relations) {
+      const {tree, slots} = node.relations;
+      for (const slot of Object.getOwnPropertySymbols(slots)) {
+        flatRelationSlots[slot] = recursive(tree[slot]);
+      }
+    }
+
+    return {
+      name: node.name,
+      args: node.args,
+      relations: node.relations?.layout ?? null,
+    };
   }
 
   return {
-    root,
+    root: recursive(root),
     relationIdentifier,
     flatRelationSlots,
   };
@@ -537,25 +558,22 @@ export function quickEvaluate({
 
   const slotResults = {};
 
-  function runContentFunction({name, args, relations: flatRelations}) {
+  function runContentFunction({name, args, relations: layout}) {
     const contentFunction = fulfilledContentDependencies[name];
 
     if (!contentFunction) {
       throw new Error(`Content function ${name} unfulfilled or not listed`);
     }
 
-    const sprawl =
-      contentFunction.sprawl?.(allExtraDependencies.wikiData, ...args);
+    const generateArgs = [];
 
-    const relations =
-      fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, flatRelations);
+    if (contentFunction.data) {
+      generateArgs.push(contentFunction.data(...args));
+    }
 
-    const data =
-      (sprawl
-        ? contentFunction.data?.(sprawl, ...args)
-        : contentFunction.data?.(...args));
-
-    const generateArgs = [data, relations].filter(Boolean);
+    if (layout) {
+      generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
+    }
 
     return contentFunction(...generateArgs);
   }
