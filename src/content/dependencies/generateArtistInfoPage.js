@@ -452,7 +452,6 @@ export default {
               })
             : null),
 
-        mainClasses: ['long-content'],
         mainContent: [
           sec.contextNotes && [
             html.tag('p', language.$('releaseInfo.note')),
