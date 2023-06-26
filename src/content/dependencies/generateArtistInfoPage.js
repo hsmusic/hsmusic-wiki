@@ -3,6 +3,7 @@ import {getTotalDuration} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
+    'generateArtistInfoPageArtworksChunkedList',
     'generateArtistInfoPageTracksChunkedList',
     'generateArtistNavLinks',
     'generateContentHeading',
@@ -86,73 +87,35 @@ export default {
       const tracks = sections.tracks = {};
       tracks.heading = relation('generateContentHeading');
       tracks.list = relation('generateArtistInfoPageTracksChunkedList', artist);
+
+      // const groupInfo = getGroupInfo(query.trackContributionEntries, 'duration');
+      // if (!empty(groupInfo)) {
+      //   tracks.groupInfo = groupInfo;
+      // }
+    }
+
+    if (
+      !empty(artist.albumsAsCoverArtist) ||
+      !empty(artist.albumsAsWallpaperArtist) ||
+      !empty(artist.albumsAsBannerArtist) ||
+      !empty(artist.tracksAsCoverArtist)
+    ) {
+      const artworks = sections.artworks = {};
+      artworks.heading = relation('generateContentHeading');
+      artworks.list = relation('generateArtistInfoPageArtworksChunkedList', artist);
+
+      if (!empty(artist.albumsAsCoverArtist) || !empty(artist.tracksAsCoverArtist)) {
+        artworks.artistGalleryLink =
+          relation('linkArtistGallery', artist);
+      }
+
+      // const groupInfo = getGroupInfo(artContributionEntries, 'count');
+      // if (!empty(groupInfo)) {
+      //   artworks.groupInfo = groupInfo;
+      // }
     }
 
     /*
-    const trackContributionChunks =
-      query.trackContributionChunks.map(({album, chunk}) => ({
-        albumLink: relation('linkAlbum', album),
-        entries:
-          chunk.map(entry => ({
-            // ...getContributionDescription(entry.contribs),
-            ...getOtherArtistLinks(entry.contribs),
-            trackLink: relation('linkTrack', entry.track),
-          })),
-      }));
-
-    const trackGroupInfo = getGroupInfo(query.trackContributionEntries, 'duration');
-
-    if (!empty(trackContributionChunks)) {
-      const tracks = sections.tracks = {};
-      tracks.heading = relation('generateContentHeading');
-      tracks.chunks = trackContributionChunks;
-
-      if (!empty(trackGroupInfo)) {
-        tracks.groupInfo = trackGroupInfo;
-      }
-    }
-
-    // TODO: Add and integrate wallpaper and banner date fields (#90)
-    const artContributionEntries = [
-      ...artist.albumsAsCoverArtist.map(album => ({
-        kind: 'albumCover',
-        date: album.coverArtDate,
-        thing: album,
-        album: album,
-        // ...getContributionDescription(album.coverArtistContribs),
-        ...getOtherArtistLinks(album.coverArtistContribs),
-      })),
-
-      ...artist.albumsAsWallpaperArtist.map(album => ({
-        kind: 'albumWallpaper',
-        date: album.coverArtDate,
-        thing: album,
-        album: album,
-        // ...getContributionDescription(album.wallpaperArtistContribs),
-        ...getOtherArtistLinks(album.wallpaperArtistContribs),
-      })),
-
-      ...artist.albumsAsBannerArtist.map(album => ({
-        kind: 'albumBanner',
-        date: album.coverArtDate,
-        thing: album,
-        album: album,
-        // ...getContributionDescription(album.bannerArtistContribs),
-        ...getOtherArtistLinks(album.bannerArtistContribs),
-      })),
-
-      ...artist.tracksAsCoverArtist.map(track => ({
-        kind: 'trackCover',
-        date: track.coverArtDate,
-        thing: track,
-        album: track.album,
-        rerelease: track.originalReleaseTrack !== null,
-        trackLink: relation('linkTrack', track),
-        // ...getContributionDescription(track.coverArtistContribs),
-        ...getOtherArtistLinks(track.coverArtistContribs),
-      })),
-    ];
-
     sortContributionEntries(artContributionEntries, sortAlbumsTracksChronologically);
 
     const artContributionChunks =
@@ -170,27 +133,9 @@ export default {
                 'trackLink',
               ])),
         }));
+    */
 
-    const artGroupInfo = getGroupInfo(artContributionEntries, 'count');
-
-    if (!empty(artContributionChunks)) {
-      const artworks = sections.artworks = {};
-      artworks.heading = relation('generateContentHeading');
-      artworks.chunks = artContributionChunks;
-
-      if (
-        !empty(artist.albumsAsCoverArtist) ||
-        !empty(artist.tracksAsCoverArtist)
-      ) {
-        artworks.artistGalleryLink =
-          relation('linkArtistGallery', artist);
-      }
-
-      if (!empty(artGroupInfo)) {
-        artworks.groupInfo = artGroupInfo;
-      }
-    }
-
+    /*
     // Flashes and games can list multiple contributors as collaborative
     // credits, but we don't display these on the artist page, since they
     // usually involve many artists crediting a larger team where collaboration
@@ -296,34 +241,7 @@ export default {
     data.totalTrackCount = allTracks.length;
     data.totalDuration = getTotalDuration(allTracks, {originalReleasesOnly: true});
 
-    /*
-    data.trackContributionInfo =
-      query.trackContributionChunks
-        .map(({date, chunk}) => ({
-          date: +date,
-          duration: accumulateSum(chunk, ({track}) => track.duration),
-          tracks: chunk.map(({track, contribs}) => ({
-            ...getContributionDescription(contribs),
-            rerelease: track.originalReleaseTrack !== null,
-            duration: track.duration,
-          }))
-        }))
-    */
-
     return data;
-
-    /*
-    function getContributionDescription(contribs) {
-      const ownContrib =
-        contribs.find(({who}) => who === artist);
-
-      if (!ownContrib) {
-        return {};
-      }
-
-      return {contributionDescription: ownContrib.what};
-    }
-    */
   },
 
   generate(data, relations, {html, language}) {
@@ -412,6 +330,7 @@ export default {
                     }),
                 })),
 
+            /*
             sec.tracks.groupInfo &&
               html.tag('p',
                 language.$('artistPage.musicGroupsLine', {
@@ -428,61 +347,11 @@ export default {
                               count: language.countContributions(count),
                             })))),
                 })),
+            */
 
             sec.tracks.list,
-
-            /*
-            html.tag('dl',
-              stitchArrays({
-                chunkAlbumLink:         relations.sections.tracks.chunkAlbumLink,
-                trackLinks:             relations.sections.tracks.trackLinks,
-                trackOtherArtistLinks:  relations.sections.tracks.trackOtherArtistLinks,
-                chunkDate:        data.sections.tracks.chunkDates,
-                chunkDuration:    data.sections.tracks.chunkDurations,
-                chunkApproximate: data.sections.tracks.chunkApproximates,
-                trackDurations:   data.sections.tracks.trackDurations,
-              }).map(({
-                  chunkAlbumLink,
-                  trackLinks,
-                  trackOtherArtistLinks,
-                  chunkDate,
-                  chunkDuration,
-                  chunkApproximate,
-                  trackDurations,
-                }) => [
-                  html.tag('dt',
-                    addAccentsToAlbumLink({
-                      albumLink: chunkAlbumLink,
-                      date: chunkDate,
-                      duration: chunkDuration,
-                      approximate: chunkApproximate,
-                    })),
-
-                  html.tag('dd',
-                    html.tag('ul',
-                      stitchArrays({
-                        trackLink:         trackLinks,
-                        otherArtistLinks:  trackOtherArtistLinks,
-                        duration:          trackDurations,
-                      }).map(({trackLink, duration, ...properties}) => ({
-                          entry:
-                            (duration
-                              ? language.$('artistPage.creditList.entry.track.withDuration', {
-                                  track: trackLink,
-                                  duration: language.formatDuration(duration),
-                                })
-                              : language.$('artistPage.creditList.entry.track', {
-                                  track: trackLink,
-                                })),
-                          ...properties,
-                        }))
-                        .map(addAccentsToEntry)
-                        .map(entry => html.tag('li', entry)))),
-                ])),
-            */
           ],
 
-          /*
           sec.artworks && [
             sec.artworks.heading
               .slots({
@@ -499,6 +368,9 @@ export default {
                   }),
                 })),
 
+            sec.artworks.list,
+
+            /*
             sec.artworks.groupInfo &&
               html.tag('p',
                 language.$('artistPage.artGroupsLine', {
@@ -511,7 +383,9 @@ export default {
                             language.countContributions(count),
                         }))),
                 })),
+            */
 
+            /*
             html.tag('dl',
               sec.artworks.chunks.map(({albumLink, date, entries}) => [
                 html.tag('dt',
@@ -537,8 +411,10 @@ export default {
                       .map(addAccentsToEntry)
                       .map(entry => html.tag('li', entry)))),
               ])),
+            */
           ],
 
+          /*
           sec.flashes && [
             sec.flashes.heading
               .slots({

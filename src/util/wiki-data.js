@@ -343,6 +343,33 @@ export function sortEntryThingPairs(data, sortFunction) {
   return data;
 }
 
+/*
+// Alternate draft version of sortEntryThingPairs.
+// See: https://github.com/hsmusic/hsmusic-wiki/issues/90#issuecomment-1607412168
+
+// Maps the provided "preparation" function across a list of arbitrary values,
+// building up a list of sortable values; sorts these with the provided sorting
+// function; and reorders the sources to match their corresponding prepared
+// values. As usual, if multiple source items correspond to the same sorting
+// data, this retains the source relative positioning.
+export function prepareAndSort(sources, prepareForSort, sortFunction) {
+  const prepared = [];
+  const preparedToSource = new Map();
+
+  for (const original of originals) {
+    const prep = prepareForSort(source);
+    prepared.push(prep);
+    preparedToSource.set(prep, source);
+  }
+
+  sortFunction(prepared);
+
+  sources.splice(0, ...sources.length, prepared.map(prep => preparedToSource.get(prep)));
+
+  return sources;
+}
+*/
+
 // Highly contextual sort functions - these are only for very specific types
 // of Things, and have appropriately hard-coded behavior.
 
