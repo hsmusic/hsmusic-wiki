@@ -1,26 +1,10 @@
-import {accumulateSum, stitchArrays, unique} from '../../util/sugar.js';
-import {chunkByProperties, sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
+import {accumulateSum, stitchArrays} from '../../util/sugar.js';
 
-// TODO: This obviously needs to be more generalized.
-function sortContributionEntries(entries, sortFunction) {
-  const things = unique(entries.map(({thing}) => thing));
-  sortFunction(things);
-
-  const outputArrays = [];
-  const thingToOutputArray = new Map();
-
-  for (const thing of things) {
-    const array = [];
-    thingToOutputArray.set(thing, array);
-    outputArrays.push(array);
-  }
-
-  for (const entry of entries) {
-    thingToOutputArray.get(entry.thing).push(entry);
-  }
-
-  entries.splice(0, entries.length, ...outputArrays.flat());
-}
+import {
+  chunkByProperties,
+  sortAlbumsTracksChronologically,
+  sortEntryThingPairs,
+} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
@@ -36,27 +20,34 @@ export default {
   query(artist) {
     const entries = [
       ...artist.tracksAsArtist.map(track => ({
-        track,
-        date: track.date,
         thing: track,
-        album: track.album,
-        contribs: track.artistContribs,
+        entry: {
+          track,
+          album: track.album,
+          date: track.date,
+          contribs: track.artistContribs,
+        },
       })),
 
       ...artist.tracksAsContributor.map(track => ({
-        track,
-        date: track.date,
         thing: track,
-        album: track.album,
-        contribs: track.contributorContribs,
+        entry: {
+          track,
+          date: track.date,
+          album: track.album,
+          contribs: track.contributorContribs,
+        },
       })),
     ];
 
-    sortContributionEntries(entries, sortAlbumsTracksChronologically);
+    sortEntryThingPairs(entries, sortAlbumsTracksChronologically);
 
-    const chunks = chunkByProperties(entries, ['album', 'date']);
+    const chunks =
+      chunkByProperties(
+        entries.map(({entry}) => entry),
+        ['album', 'date']);
 
-    return {entries, chunks};
+    return {chunks};
   },
 
   relations(relation, query, artist) {

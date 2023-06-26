@@ -3,6 +3,7 @@
 import {
   accumulateSum,
   empty,
+  unique,
 } from './sugar.js';
 
 // Generic value operations
@@ -312,6 +313,33 @@ export function sortChronologically(data, {
 } = {}) {
   sortAlphabetically(data, {getDirectory, getName});
   sortByDate(data, {latestFirst, getDate});
+  return data;
+}
+
+// This one's a little odd! Sorts an array of {entry, thing} pairs using
+// the provided sortFunction, which will operate on each item's `thing`, not
+// its entry (or the item as a whole). If multiple entries are associated
+// with the same thing, they'll end up bunched together in the output,
+// retaining their original relative positioning.
+export function sortEntryThingPairs(data, sortFunction) {
+  const things = unique(data.map(item => item.thing));
+  sortFunction(things);
+
+  const outputArrays = [];
+  const thingToOutputArray = new Map();
+
+  for (const thing of things) {
+    const array = [];
+    thingToOutputArray.set(thing, array);
+    outputArrays.push(array);
+  }
+
+  for (const item of data) {
+    thingToOutputArray.get(item.thing).push(item);
+  }
+
+  data.splice(0, data.length, ...outputArrays.flat());
+
   return data;
 }
 
