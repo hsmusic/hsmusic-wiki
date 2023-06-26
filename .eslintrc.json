@@ -10,6 +10,7 @@
   },
   "rules": {
     "indent": ["off"],
+    "no-unused-labels": ["off"],
     "no-unused-vars": ["error", {
       "argsIgnorePattern": "^_",
       "destructuredArrayIgnorePattern": "^"
