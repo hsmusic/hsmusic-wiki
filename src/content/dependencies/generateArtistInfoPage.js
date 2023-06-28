@@ -4,16 +4,15 @@ import {getTotalDuration} from '../../util/wiki-data.js';
 export default {
   contentDependencies: [
     'generateArtistInfoPageArtworksChunkedList',
+    'generateArtistInfoPageFlashesChunkedList',
     'generateArtistInfoPageTracksChunkedList',
     'generateArtistNavLinks',
     'generateContentHeading',
     'generateCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
-    'linkArtist',
     'linkArtistGallery',
     'linkExternal',
-    'linkFlash',
     'linkGroup',
     'linkTrack',
     'transformContent',
@@ -115,68 +114,11 @@ export default {
       // }
     }
 
-    /*
-    sortContributionEntries(artContributionEntries, sortAlbumsTracksChronologically);
-
-    const artContributionChunks =
-      chunkByProperties(artContributionEntries, ['album', 'date'])
-        .map(({album, date, chunk}) => ({
-          albumLink: relation('linkAlbum', album),
-          date: +date,
-          entries:
-            chunk.map(entry =>
-              filterProperties(entry, [
-                'contributionDescription',
-                'kind',
-                'otherArtistLinks',
-                'rerelease',
-                'trackLink',
-              ])),
-        }));
-    */
-
-    /*
-    // Flashes and games can list multiple contributors as collaborative
-    // credits, but we don't display these on the artist page, since they
-    // usually involve many artists crediting a larger team where collaboration
-    // isn't as relevant (without more particular details that aren't tracked
-    // on the wiki).
-
-    if (sprawl.enableFlashesAndGames) {
-      const flashEntries = [
-        ...artist.flashesAsContributor.map(flash => ({
-          date: +flash.date,
-          thing: flash,
-          act: flash.act,
-          flashLink: relation('linkFlash', flash),
-          // ...getContributionDescription(flash.contributorContribs),
-        })),
-      ];
-
-      sortContributionEntries(flashEntries, sortFlashesChronologically);
-
-      const flashChunks =
-        chunkByProperties(flashEntries, ['act'])
-          .map(({act, chunk}) => ({
-            actName: act.name,
-            actLink: relation('linkFlash', chunk[0].thing),
-            dateFirst: +chunk[0].date,
-            dateLast: +chunk[chunk.length - 1].date,
-            entries:
-              chunk.map(entry =>
-                filterProperties(entry, [
-                  'contributionDescription',
-                  'flashLink',
-                ])),
-          }));
-
-      if (!empty(flashChunks)) {
-        const flashes = sections.flashes = {};
-        flashes.heading = relation('generateContentHeading');
-        flashes.chunks = flashChunks;
-      }
+    if (sprawl.enableFlashesAndGames && !empty(artist.flashesAsContributor)) {
+      const flashes = sections.flashes = {};
+      flashes.heading = relation('generateContentHeading');
+      flashes.list = relation('generateArtistInfoPageFlashesChunkedList', artist);
     }
-    */
 
     /*
     // Commentary doesn't use the detailed contribution system where multiple
@@ -414,7 +356,6 @@ export default {
             */
           ],
 
-          /*
           sec.flashes && [
             sec.flashes.heading
               .slots({
@@ -423,34 +364,8 @@ export default {
                 title: language.$('artistPage.flashList.title'),
               }),
 
-            html.tag('dl',
-              sec.flashes.chunks.map(({
-                actName,
-                actLink,
-                entries,
-                dateFirst,
-                dateLast,
-              }) => [
-                html.tag('dt',
-                  language.$('artistPage.creditList.flashAct.withDateRange', {
-                    act: actLink.slot('content', actName),
-                    dateRange: language.formatDateRange(dateFirst, dateLast),
-                  })),
-
-                html.tag('dd',
-                  html.tag('ul',
-                    entries
-                      .map(({flashLink, ...properties}) => ({
-                        ...properties,
-                        entry: language.$('artistPage.creditList.entry.flash', {
-                          flash: flashLink,
-                        }),
-                      }))
-                      .map(addAccentsToEntry)
-                      .map(row => html.tag('li', row)))),
-              ])),
+            sec.flashes.list,
           ],
-          */
 
           /*
           sec.commentary && [

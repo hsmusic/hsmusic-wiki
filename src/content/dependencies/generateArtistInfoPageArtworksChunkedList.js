@@ -140,10 +140,10 @@ export default {
           itemTrackLinks,
           itemOtherArtistLinks,
           itemTypes,
-          itemTrackRereleases,
           itemContributions,
         }) =>
           chunk.slots({
+            mode: 'album',
             albumLink,
             date,
 

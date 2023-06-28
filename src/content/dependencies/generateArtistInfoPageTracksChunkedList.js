@@ -137,6 +137,7 @@ export default {
           trackRereleases,
         }) =>
           chunk.slots({
+            mode: 'album',
             albumLink,
             date,
             duration,

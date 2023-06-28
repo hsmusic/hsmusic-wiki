@@ -261,6 +261,7 @@
   "artistPage.creditList.album.withDuration": "{ALBUM} ({DURATION})",
   "artistPage.creditList.album.withDate.withDuration": "{ALBUM} ({DATE}; {DURATION})",
   "artistPage.creditList.flashAct": "{ACT}",
+  "artistPage.creditList.flashAct.withDate": "{ACT} ({DATE})",
   "artistPage.creditList.flashAct.withDateRange": "{ACT} ({DATE_RANGE})",
   "artistPage.creditList.entry.track": "{TRACK}",
   "artistPage.creditList.entry.track.withDuration": "({DURATION}) {TRACK}",
