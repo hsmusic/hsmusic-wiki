@@ -32,8 +32,6 @@ export default {
           date: album.coverArtDate,
           contribs: album.coverArtistContribs,
         },
-        // ...getContributionDescription(album.coverArtistContribs),
-        // ...getOtherArtistLinks(album.coverArtistContribs),
       })),
 
       ...artist.albumsAsWallpaperArtist.map(album => ({
@@ -44,8 +42,6 @@ export default {
           date: album.coverArtDate,
           contribs: album.wallpaperArtistContribs,
         },
-        // ...getContributionDescription(album.wallpaperArtistContribs),
-        // ...getOtherArtistLinks(album.wallpaperArtistContribs),
       })),
 
       ...artist.albumsAsBannerArtist.map(album => ({
@@ -56,8 +52,6 @@ export default {
           date: album.coverArtDate,
           contribs: album.bannerArtistContribs,
         },
-        // ...getContributionDescription(album.bannerArtistContribs),
-        // ...getOtherArtistLinks(album.bannerArtistContribs),
       })),
 
       ...artist.tracksAsCoverArtist.map(track => ({
@@ -69,10 +63,6 @@ export default {
           track: track,
           contribs: track.coverArtistContribs,
         },
-        // rerelease: track.originalReleaseTrack !== null,
-        // trackLink: relation('linkTrack', track),
-        // ...getContributionDescription(track.coverArtistContribs),
-        // ...getOtherArtistLinks(track.coverArtistContribs),
       })),
     ];
 
@@ -120,10 +110,6 @@ export default {
         query.chunks.map(({chunk}) =>
           chunk.map(({type}) => type)),
 
-      itemTrackRereleases:
-        query.chunks.map(({chunk}) =>
-          chunk.map(({track}) => track ? !!track.originalReleaseTrack : null)),
-
       itemContributions:
         query.chunks.map(({chunk}) =>
           chunk.map(({contribs}) =>
@@ -144,7 +130,6 @@ export default {
         itemTrackLinks: relations.itemTrackLinks,
         itemOtherArtistLinks: relations.itemOtherArtistLinks,
         itemTypes: data.itemTypes,
-        itemTrackRereleases: data.itemTrackRereleases,
         itemContributions: data.itemContributions,
       }).map(({
           chunk,
@@ -169,19 +154,16 @@ export default {
                 otherArtistLinks: itemOtherArtistLinks,
                 type: itemTypes,
                 contribution: itemContributions,
-                rerelease: itemTrackRereleases,
               }).map(({
                   item,
                   trackLink,
                   otherArtistLinks,
                   type,
                   contribution,
-                  rerelease,
                 }) =>
                   item.slots({
                     otherArtistLinks,
                     contribution,
-                    rerelease,
 
                     content:
                       (type === 'trackCover'
