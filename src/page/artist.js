@@ -37,3 +37,70 @@ export function pathsForTarget(artist) {
     },
   ];
 }
+
+/*
+const unbound_serializeArtistsAndContrib =
+  (key, {serializeContribs, serializeLink}) =>
+  (thing) => {
+    const {artists, contrib} = getArtistsAndContrib(thing, key);
+    const ret = {};
+    ret.link = serializeLink(thing);
+    if (contrib.what) ret.contribution = contrib.what;
+    if (!empty(artists)) ret.otherArtists = serializeContribs(artists);
+    return ret;
+  };
+
+const unbound_serializeTrackListChunks = (chunks, {serializeLink}) =>
+  chunks.map(({date, album, chunk, duration}) => ({
+    album: serializeLink(album),
+    date,
+    duration,
+    tracks: chunk.map(({track}) => ({
+      link: serializeLink(track),
+      duration: track.duration,
+    })),
+  }));
+
+const data = {
+  type: 'data',
+  path: ['artist', artist.directory],
+  data: ({serializeContribs, serializeLink}) => {
+    const serializeArtistsAndContrib = bindOpts(unbound_serializeArtistsAndContrib, {
+      serializeContribs,
+      serializeLink,
+    });
+
+    const serializeTrackListChunks = bindOpts(unbound_serializeTrackListChunks, {
+      serializeLink,
+    });
+
+    return {
+      albums: {
+        asCoverArtist: artist.albumsAsCoverArtist
+          .map(serializeArtistsAndContrib('coverArtistContribs')),
+        asWallpaperArtist: artist.albumsAsWallpaperArtist
+          .map(serializeArtistsAndContrib('wallpaperArtistContribs')),
+        asBannerArtist: artist.albumsAsBannerArtis
+          .map(serializeArtistsAndContrib('bannerArtistContribs')),
+      },
+      flashes: wikiInfo.enableFlashesAndGames
+        ? {
+            asContributor: artist.flashesAsContributor
+              .map(flash => getArtistsAndContrib(flash, 'contributorContribs'))
+              .map(({contrib, thing: flash}) => ({
+                link: serializeLink(flash),
+                contribution: contrib.what,
+              })),
+          }
+        : null,
+      tracks: {
+        asArtist: artist.tracksAsArtist
+          .map(serializeArtistsAndContrib('artistContribs')),
+        asContributor: artist.tracksAsContributo
+          .map(serializeArtistsAndContrib('contributorContribs')),
+        chunked: serializeTrackListChunks(trackListChunks),
+      },
+    };
+  },
+};
+*/
