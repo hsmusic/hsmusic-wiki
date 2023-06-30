@@ -30,7 +30,27 @@ export default {
 
   query(sprawl, artist) {
     return {
-      allTracks: unique([...artist.tracksAsArtist, ...artist.tracksAsContributor]),
+      // Even if an artist has served as both "artist" (compositional) and
+      // "contributor" (instruments, production, etc) on the same track, that
+      // track only counts as one unique contribution.
+      allTracks:
+        unique([...artist.tracksAsArtist, ...artist.tracksAsContributor]),
+
+      // Artworks are different, though. We intentionally duplicate album data
+      // objects when the artist has contributed some combination of cover art,
+      // wallpaper, and banner - these each count as a unique contribution.
+      allArtworks: [
+        ...artist.albumsAsCoverArtist,
+        ...artist.albumsAsWallpaperArtist,
+        ...artist.albumsAsBannerArtist,
+        ...artist.tracksAsCoverArtist,
+      ],
+
+      // Banners and wallpapers don't show up in the artist gallery page, only
+      // cover art.
+      hasGallery:
+        !empty(artist.albumsAsCoverArtist) ||
+        !empty(artist.tracksAsCoverArtist),
     };
   },
 
@@ -68,30 +88,17 @@ export default {
       tracks.groupInfo = relation('generateArtistGroupContributionsInfo', query.allTracks);
     }
 
-    if (
-      !empty(artist.albumsAsCoverArtist) ||
-      !empty(artist.albumsAsWallpaperArtist) ||
-      !empty(artist.albumsAsBannerArtist) ||
-      !empty(artist.tracksAsCoverArtist)
-    ) {
+    if (!empty(query.allArtworks)) {
       const artworks = sections.artworks = {};
       artworks.heading = relation('generateContentHeading');
       artworks.list = relation('generateArtistInfoPageArtworksChunkedList', artist);
+      artworks.groupInfo =
+        relation('generateArtistGroupContributionsInfo', query.allArtworks);
 
-      if (!empty(artist.albumsAsCoverArtist) || !empty(artist.tracksAsCoverArtist)) {
+      if (query.hasGallery) {
         artworks.artistGalleryLink =
           relation('linkArtistGallery', artist);
       }
-
-      // We intentionally duplicate album data objects when the artist has contributed
-      // at least two of cover art / wallpaper / banner! These each count as one.
-      artworks.groupInfo =
-        relation('generateArtistGroupContributionsInfo', [
-          ...artist.albumsAsCoverArtist,
-          ...artist.albumsAsWallpaperArtist,
-          ...artist.albumsAsBannerArtist,
-          ...artist.tracksAsCoverArtist,
-        ]);
     }
 
     if (sprawl.enableFlashesAndGames && !empty(artist.flashesAsContributor)) {
