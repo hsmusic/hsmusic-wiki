@@ -32,7 +32,7 @@ export default {
         },
       })),
 
-      ...artist.tracksAsContributor.map(track => ({
+      ...artist.tracksAsCommentator.map(track => ({
         thing: track,
         entry: {
           type: 'track',
