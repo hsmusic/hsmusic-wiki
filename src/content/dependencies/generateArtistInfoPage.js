@@ -5,6 +5,7 @@ export default {
   contentDependencies: [
     'generateArtistGroupContributionsInfo',
     'generateArtistInfoPageArtworksChunkedList',
+    'generateArtistInfoPageCommentaryChunkedList',
     'generateArtistInfoPageFlashesChunkedList',
     'generateArtistInfoPageTracksChunkedList',
     'generateArtistNavLinks',
@@ -99,51 +100,11 @@ export default {
       flashes.list = relation('generateArtistInfoPageFlashesChunkedList', artist);
     }
 
-    /*
-    // Commentary doesn't use the detailed contribution system where multiple
-    // artists are collaboratively credited for the same piece, so there isn't
-    // really anything special to do for processing or presenting it.
-
-    const commentaryEntries = [
-      ...artist.albumsAsCommentator.map(album => ({
-        kind: 'albumCommentary',
-        date: album.date,
-        thing: album,
-        album: album,
-      })),
-
-      ...artist.tracksAsCommentator.map(track => ({
-        kind: 'trackCommentary',
-        date: track.date,
-        thing: track,
-        album: track.album,
-        trackLink: relation('linkTrack', track),
-      })),
-    ];
-
-    sortContributionEntries(commentaryEntries, sortAlbumsTracksChronologically);
-
-    // We still pass through (and chunk by) date here, even though it doesn't
-    // actually get displayed on the album page. See issue #193.
-    const commentaryChunks =
-      chunkByProperties(commentaryEntries, ['album', 'date'])
-        .map(({album, date, chunk}) => ({
-          albumLink: relation('linkAlbum', album),
-          date: +date,
-          entries:
-            chunk.map(entry =>
-              filterProperties(entry, [
-                'kind',
-                'trackLink',
-              ])),
-        }));
-
-    if (!empty(commentaryChunks)) {
+    if (!empty(artist.albumsAsCommentator) || !empty(artist.tracksAsCommentator)) {
       const commentary = sections.commentary = {};
       commentary.heading = relation('generateContentHeading');
-      commentary.chunks = commentaryChunks;
+      commentary.list = relation('generateArtistInfoPageCommentaryChunkedList', artist);
     }
-    */
 
     return relations;
   },
@@ -295,7 +256,6 @@ export default {
             sec.flashes.list,
           ],
 
-          /*
           sec.commentary && [
             sec.commentary.heading
               .slots({
@@ -304,27 +264,8 @@ export default {
                 title: language.$('artistPage.commentaryList.title'),
               }),
 
-            html.tag('dl',
-              sec.commentary.chunks.map(({albumLink, entries}) => [
-                html.tag('dt',
-                  language.$('artistPage.creditList.album', {
-                    album: albumLink,
-                  })),
-
-                html.tag('dd',
-                  html.tag('ul',
-                    entries
-                      .map(({kind, trackLink}) =>
-                        (kind === 'trackCommentary'
-                          ? language.$('artistPage.creditList.entry.track', {
-                              track: trackLink,
-                            })
-                          : html.tag('i',
-                              language.$('artistPage.creditList.entry.album.commentary'))))
-                      .map(entry => html.tag('li', entry)))),
-              ])),
+            sec.commentary.list,
           ],
-          */
         ],
 
         navLinkStyle: 'hierarchical',
