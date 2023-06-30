@@ -9,6 +9,7 @@ import {
 export default {
   contentDependencies: [
     'generateArtistInfoPageChunk',
+    'generateArtistInfoPageChunkedList',
     'generateArtistInfoPageChunkItem',
     'generateArtistInfoPageOtherArtistLinks',
     'linkAlbum',
@@ -81,6 +82,9 @@ export default {
 
   relations(relation, query, artist) {
     return {
+      chunkedList:
+        relation('generateArtistInfoPageChunkedList'),
+
       chunks:
         query.chunks.map(() => relation('generateArtistInfoPageChunk')),
 
@@ -120,63 +124,65 @@ export default {
   },
 
   generate(data, relations, {html, language}) {
-    return html.tag('dl',
-      stitchArrays({
-        chunk: relations.chunks,
-        albumLink: relations.albumLinks,
-        date: data.chunkDates,
+    return relations.chunkedList.slots({
+      chunks:
+        stitchArrays({
+          chunk: relations.chunks,
+          albumLink: relations.albumLinks,
+          date: data.chunkDates,
 
-        items: relations.items,
-        itemTrackLinks: relations.itemTrackLinks,
-        itemOtherArtistLinks: relations.itemOtherArtistLinks,
-        itemTypes: data.itemTypes,
-        itemContributions: data.itemContributions,
-      }).map(({
-          chunk,
-          albumLink,
-          date,
-
-          items,
-          itemTrackLinks,
-          itemOtherArtistLinks,
-          itemTypes,
-          itemContributions,
-        }) =>
-          chunk.slots({
-            mode: 'album',
+          items: relations.items,
+          itemTrackLinks: relations.itemTrackLinks,
+          itemOtherArtistLinks: relations.itemOtherArtistLinks,
+          itemTypes: data.itemTypes,
+          itemContributions: data.itemContributions,
+        }).map(({
+            chunk,
             albumLink,
             date,
 
-            items:
-              stitchArrays({
-                item: items,
-                trackLink: itemTrackLinks,
-                otherArtistLinks: itemOtherArtistLinks,
-                type: itemTypes,
-                contribution: itemContributions,
-              }).map(({
-                  item,
-                  trackLink,
-                  otherArtistLinks,
-                  type,
-                  contribution,
-                }) =>
-                  item.slots({
-                    otherArtistLinks,
-                    contribution,
+            items,
+            itemTrackLinks,
+            itemOtherArtistLinks,
+            itemTypes,
+            itemContributions,
+          }) =>
+            chunk.slots({
+              mode: 'album',
+              albumLink,
+              date,
 
-                    content:
-                      (type === 'trackCover'
-                        ? language.$('artistPage.creditList.entry.track', {
-                            track: trackLink,
-                          })
-                        : html.tag('i',
-                            language.$('artistPage.creditList.entry.album.' + {
-                              albumWallpaper: 'wallpaperArt',
-                              albumBanner: 'bannerArt',
-                              albumCover: 'coverArt',
-                            }[type]))),
-                  })),
-          })));
+              items:
+                stitchArrays({
+                  item: items,
+                  trackLink: itemTrackLinks,
+                  otherArtistLinks: itemOtherArtistLinks,
+                  type: itemTypes,
+                  contribution: itemContributions,
+                }).map(({
+                    item,
+                    trackLink,
+                    otherArtistLinks,
+                    type,
+                    contribution,
+                  }) =>
+                    item.slots({
+                      otherArtistLinks,
+                      contribution,
+
+                      content:
+                        (type === 'trackCover'
+                          ? language.$('artistPage.creditList.entry.track', {
+                              track: trackLink,
+                            })
+                          : html.tag('i',
+                              language.$('artistPage.creditList.entry.album.' + {
+                                albumWallpaper: 'wallpaperArt',
+                                albumBanner: 'bannerArt',
+                                albumCover: 'coverArt',
+                              }[type]))),
+                    })),
+            })),
+    });
   },
 };

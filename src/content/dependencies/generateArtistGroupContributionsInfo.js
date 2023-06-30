@@ -1,4 +1,9 @@
-import {stitchArrays, unique} from '../../util/sugar.js';
+import {
+  empty,
+  filterProperties,
+  stitchArrays,
+  unique,
+} from '../../util/sugar.js';
 
 export default {
   contentDependencies: ['linkGroup'],
@@ -47,29 +52,48 @@ export default {
       allGroupsOrdered
         .sort((a, b) => groupToCountMap.get(b) - groupToCountMap.get(a));
 
+    // The filter here ensures all displayed groups have at least some duration
+    // when sorting by duration.
     const groupsSortedByDuration =
       allGroupsOrdered
         .filter(group => groupToDurationMap.get(group) > 0)
         .sort((a, b) => groupToDurationMap.get(b) - groupToDurationMap.get(a));
 
-    const groupCounts =
+    const groupCountsSortedByCount =
       groupsSortedByCount
         .map(group => groupToCountMap.get(group));
 
-    const groupDurations =
+    const groupDurationsSortedByCount =
+      groupsSortedByCount
+        .map(group => groupToDurationMap.get(group));
+
+    const groupDurationsApproximateSortedByCount =
+      groupsSortedByCount
+        .map(group => groupToDurationCountMap.get(group) > 1);
+
+    const groupCountsSortedByDuration =
+      groupsSortedByDuration
+        .map(group => groupToCountMap.get(group));
+
+    const groupDurationsSortedByDuration =
       groupsSortedByDuration
         .map(group => groupToDurationMap.get(group));
 
-    const groupDurationsApproximate =
+    const groupDurationsApproximateSortedByDuration =
       groupsSortedByDuration
         .map(group => groupToDurationCountMap.get(group) > 1);
 
     return {
       groupsSortedByCount,
       groupsSortedByDuration,
-      groupCounts,
-      groupDurations,
-      groupDurationsApproximate,
+
+      groupCountsSortedByCount,
+      groupDurationsSortedByCount,
+      groupDurationsApproximateSortedByCount,
+
+      groupCountsSortedByDuration,
+      groupDurationsSortedByDuration,
+      groupDurationsApproximateSortedByDuration,
     };
   },
 
@@ -86,39 +110,104 @@ export default {
   },
 
   data(query) {
-    return {
-      groupCounts: query.groupCounts,
-      groupDurations: query.groupDurations,
-      groupDurationsApproximate: query.groupDurationsApproximate,
-    };
+    return filterProperties(query, [
+      'groupCountsSortedByCount',
+      'groupDurationsSortedByCount',
+      'groupDurationsApproximateSortedByCount',
+
+      'groupCountsSortedByDuration',
+      'groupDurationsSortedByDuration',
+      'groupDurationsApproximateSortedByDuration',
+    ]);
   },
 
   slots: {
-    mode: {
-      validate: v => v.is('count', 'duration'),
-    },
+    title: {type: 'html'},
+    showBothColumns: {type: 'boolean'},
+    showSortButton: {type: 'boolean'},
+    visible: {type: 'boolean', default: true},
+
+    sort: {validate: v => v.is('count', 'duration')},
+    countUnit: {validate: v => v.is('tracks', 'artworks')},
   },
 
-  generate(data, relations, slots, {language}) {
-    return (
-      language.formatUnitList(
-        (slots.mode === 'count'
-          ? stitchArrays({
-              groupLink: relations.groupLinksSortedByCount,
-              count: data.groupCounts,
-            }).map(({groupLink, count}) =>
-                language.$('artistPage.groupsLine.item.withCount', {
-                  group: groupLink,
-                  count,
-                }))
-          : stitchArrays({
-              groupLink: relations.groupLinksSortedByDuration,
-              duration: data.groupDurations,
-              approximate: data.groupDurationsApproximate,
-            }).map(({groupLink, duration, approximate}) =>
-                language.$('artistPage.groupsLine.item.withDuration', {
-                  group: groupLink,
-                  duration: language.formatDuration(duration, {approximate}),
-                })))));
+  generate(data, relations, slots, {html, language}) {
+    if (slots.sort === 'count' && empty(relations.groupLinksSortedByCount)) {
+      return html.blank();
+    } else if (slots.sort === 'duration' && empty(relations.groupLinksSortedByDuration)) {
+      return html.blank();
+    }
+
+    const getCounts = counts =>
+      counts.map(count => {
+        switch (slots.countUnit) {
+          case 'tracks': return language.countTracks(count, {unit: true});
+          case 'artworks': return language.countArtworks(count, {unit: true});
+        }
+      });
+
+    // We aren't displaying the "~" approximate symbol here for now.
+    // The general notion that these sums aren't going to be 100% accurate
+    // is made clear by the "XYZ has contributed ~1:23:45 hours of music..."
+    // line that's always displayed above this table.
+    const getDurations = (durations, approximate) =>
+      stitchArrays({
+        duration: durations,
+        approximate: approximate,
+      }).map(({duration}) => language.formatDuration(duration));
+
+    const topLevelClasses = [
+      'group-contributions-sorted-by-' + slots.sort,
+      slots.visible && 'visible',
+    ];
+
+    return html.tags([
+      html.tag('dt', {class: topLevelClasses},
+        (slots.showSortButton
+          ? language.$('artistPage.groupContributions.title.withSortButton', {
+              title: slots.title,
+              sort:
+                html.tag('a', {href: '#', class: 'group-contributions-sort-button'},
+                  (slots.sort === 'count'
+                    ? language.$('artistPage.groupContributions.title.sorting.count')
+                    : language.$('artistPage.groupContributions.title.sorting.duration'))),
+            })
+          : slots.title)),
+
+      html.tag('dd', {class: topLevelClasses},
+        html.tag('ul', {class: 'group-contributions-table', role: 'list'},
+          (slots.sort === 'count'
+            ? stitchArrays({
+                group: relations.groupLinksSortedByCount,
+                count: getCounts(data.groupCountsSortedByCount),
+                duration: getDurations(data.groupDurationsSortedByCount, data.groupDurationsApproximateSortedByCount),
+              }).map(({group, count, duration}) =>
+                html.tag('li',
+                  html.tag('div', {class: 'group-contributions-row'}, [
+                    group,
+                    html.tag('span', {class: 'group-contributions-metrics'},
+                      // When sorting by count, duration details aren't necessarily
+                      // available for all items.
+                      (slots.showBothColumns && duration
+                        ? language.$('artistPage.groupContributions.item.countDurationAccent', {count, duration})
+                        : language.$('artistPage.groupContributions.item.countAccent', {count}))),
+                  ])))
+            : stitchArrays({
+                group: relations.groupLinksSortedByDuration,
+                count: getCounts(data.groupCountsSortedByDuration),
+                duration: getDurations(data.groupDurationsSortedByDuration, data.groupDurationsApproximateSortedByCount),
+              }).map(({group, count, duration}) =>
+                html.tag('li',
+                  html.tag('div', {class: 'group-contributions-row'}, [
+                    group,
+                    html.tag('span', {class: 'group-contributions-metrics'},
+                      // Count details are always available, since they're just the
+                      // number of contributions directly. And duration details are
+                      // guaranteed for every item when sorting by duration.
+                      (slots.showBothColumns
+                        ? language.$('artistPage.groupContributions.item.durationCountAccent', {duration, count})
+                        : language.$('artistPage.groupContributions.item.durationAccent', {duration}))),
+                  ])))))),
+    ]);
   },
 };

@@ -218,14 +218,30 @@ export default {
                     }),
                 })),
 
-            // TODO: How to check if a template is blank!?
-            // !html.isBlank(sec.tracks.groupInfo.content) &&
-              html.tag('p',
-                language.$('artistPage.musicGroupsLine', {
-                  groups: sec.tracks.groupInfo.slot('mode', 'duration'),
-                })),
+            sec.tracks.list
+              .slots({
+                groupInfo: [
+                  sec.tracks.groupInfo
+                    .clone()
+                    .slots({
+                      title: language.$('artistPage.groupContributions.title.music'),
+                      showSortButton: true,
+                      sort: 'count',
+                      countUnit: 'tracks',
+                      visible: true,
+                    }),
 
-            sec.tracks.list,
+                  sec.tracks.groupInfo
+                    .clone()
+                    .slots({
+                      title: language.$('artistPage.groupContributions.title.music'),
+                      showSortButton: true,
+                      sort: 'duration',
+                      countUnit: 'tracks',
+                      visible: false,
+                    }),
+                ],
+              }),
           ],
 
           sec.artworks && [
@@ -236,11 +252,6 @@ export default {
                 title: language.$('artistPage.artList.title'),
               }),
 
-            html.tag('p',
-              language.$('artistPage.artGroupsLine', {
-                groups: sec.artworks.groupInfo.slot('mode', 'count'),
-              })),
-
             sec.artworks.artistGalleryLink &&
               html.tag('p',
                 language.$('artistPage.viewArtGallery.orBrowseList', {
@@ -249,7 +260,17 @@ export default {
                   }),
                 })),
 
-            sec.artworks.list,
+            sec.artworks.list
+              .slots({
+                groupInfo:
+                  sec.artworks.groupInfo
+                    .slots({
+                      title: language.$('artistPage.groupContributions.title.artworks'),
+                      showBothColumns: false,
+                      sort: 'count',
+                      countUnit: 'artworks',
+                    }),
+              }),
           ],
 
           sec.flashes && [

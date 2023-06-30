@@ -311,6 +311,7 @@ const countHelper = (stringKey, argName = stringKey) =>
 Object.assign(Language.prototype, {
   countAdditionalFiles: countHelper('additionalFiles', 'files'),
   countAlbums: countHelper('albums'),
+  countArtworks: countHelper('artworks'),
   countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
   countContributions: countHelper('contributions'),
   countCoverArts: countHelper('coverArts'),

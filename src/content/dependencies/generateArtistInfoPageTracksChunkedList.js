@@ -9,13 +9,14 @@ import {
 export default {
   contentDependencies: [
     'generateArtistInfoPageChunk',
+    'generateArtistInfoPageChunkedList',
     'generateArtistInfoPageChunkItem',
     'generateArtistInfoPageOtherArtistLinks',
     'linkAlbum',
     'linkTrack',
   ],
 
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['language'],
 
   query(artist) {
     const entries = [
@@ -52,6 +53,9 @@ export default {
 
   relations(relation, query, artist) {
     return {
+      chunkedList:
+        relation('generateArtistInfoPageChunkedList'),
+
       chunks:
         query.chunks.map(() => relation('generateArtistInfoPageChunk')),
 
@@ -107,73 +111,75 @@ export default {
     };
   },
 
-  generate(data, relations, {html, language}) {
-    return html.tag('dl',
-      stitchArrays({
-        chunk: relations.chunks,
-        albumLink: relations.albumLinks,
-        date: data.chunkDates,
-        duration: data.chunkDurations,
-        durationApproximate: data.chunkDurationsApproximate,
+  generate(data, relations, {language}) {
+    return relations.chunkedList.slots({
+      chunks:
+        stitchArrays({
+          chunk: relations.chunks,
+          albumLink: relations.albumLinks,
+          date: data.chunkDates,
+          duration: data.chunkDurations,
+          durationApproximate: data.chunkDurationsApproximate,
 
-        items: relations.items,
-        trackLinks: relations.trackLinks,
-        trackOtherArtistLinks: relations.trackOtherArtistLinks,
-        trackDurations: data.trackDurations,
-        trackContributions: data.trackContributions,
-        trackRereleases: data.trackRereleases,
-      }).map(({
-          chunk,
-          albumLink,
-          date,
-          duration,
-          durationApproximate,
-
-          items,
-          trackLinks,
-          trackOtherArtistLinks,
-          trackDurations,
-          trackContributions,
-          trackRereleases,
-        }) =>
-          chunk.slots({
-            mode: 'album',
+          items: relations.items,
+          trackLinks: relations.trackLinks,
+          trackOtherArtistLinks: relations.trackOtherArtistLinks,
+          trackDurations: data.trackDurations,
+          trackContributions: data.trackContributions,
+          trackRereleases: data.trackRereleases,
+        }).map(({
+            chunk,
             albumLink,
             date,
             duration,
             durationApproximate,
 
-            items:
-              stitchArrays({
-                item: items,
-                trackLink: trackLinks,
-                otherArtistLinks: trackOtherArtistLinks,
-                duration: trackDurations,
-                contribution: trackContributions,
-                rerelease: trackRereleases,
-              }).map(({
-                  item,
-                  trackLink,
-                  otherArtistLinks,
-                  duration,
-                  contribution,
-                  rerelease,
-                }) =>
-                  item.slots({
+            items,
+            trackLinks,
+            trackOtherArtistLinks,
+            trackDurations,
+            trackContributions,
+            trackRereleases,
+          }) =>
+            chunk.slots({
+              mode: 'album',
+              albumLink,
+              date,
+              duration,
+              durationApproximate,
+
+              items:
+                stitchArrays({
+                  item: items,
+                  trackLink: trackLinks,
+                  otherArtistLinks: trackOtherArtistLinks,
+                  duration: trackDurations,
+                  contribution: trackContributions,
+                  rerelease: trackRereleases,
+                }).map(({
+                    item,
+                    trackLink,
                     otherArtistLinks,
+                    duration,
                     contribution,
                     rerelease,
+                  }) =>
+                    item.slots({
+                      otherArtistLinks,
+                      contribution,
+                      rerelease,
 
-                    content:
-                      (duration
-                        ? language.$('artistPage.creditList.entry.track.withDuration', {
-                            track: trackLink,
-                            duration: language.formatDuration(duration),
-                          })
-                        : language.$('artistPage.creditList.entry.track', {
-                            track: trackLink,
-                          })),
-                  })),
-          })));
+                      content:
+                        (duration
+                          ? language.$('artistPage.creditList.entry.track.withDuration', {
+                              track: trackLink,
+                              duration: language.formatDuration(duration),
+                            })
+                          : language.$('artistPage.creditList.entry.track', {
+                              track: trackLink,
+                            })),
+                    })),
+            })),
+    });
   },
 };

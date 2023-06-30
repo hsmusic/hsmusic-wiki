@@ -722,6 +722,25 @@ li > ul {
   margin-top: 5px;
 }
 
+.group-contributions-table {
+  display: inline-block;
+}
+
+.group-contributions-table .group-contributions-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.group-contributions-table .group-contributions-metrics {
+  margin-left: 1.5ch;
+  white-space: nowrap;
+}
+
+.group-contributions-sorted-by-count:not(.visible),
+.group-contributions-sorted-by-duration:not(.visible) {
+  display: none;
+}
+
 /* Images */
 
 .image-container {
