@@ -2,6 +2,7 @@ import {empty, stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateListingSidebar',
     'generatePageLayout',
     'linkListing',
     'linkListingIndex',
@@ -14,6 +15,9 @@ export default {
 
     relations.layout =
       relation('generatePageLayout');
+
+    relations.sidebar =
+      relation('generateListingSidebar', listing);
 
     relations.listingsIndexLink =
       relation('linkListingIndex');
@@ -102,6 +106,8 @@ export default {
         {html: relations.listingsIndexLink},
         {auto: 'current'},
       ],
+
+      ...relations.sidebar,
     });
   },
 };
