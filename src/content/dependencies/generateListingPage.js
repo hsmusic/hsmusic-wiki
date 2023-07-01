@@ -1,12 +1,50 @@
-export default {
-  contentDependencies: ['generatePageLayout', 'linkListingIndex'],
-  extraDependencies: ['html'],
+import {empty} from '../../util/sugar.js';
 
-  relations(relation) {
+export default {
+  contentDependencies: [
+    'generatePageLayout',
+    'linkListing',
+    'linkListingIndex',
+  ],
+
+  extraDependencies: ['html', 'language', 'wikiData'],
+
+  sprawl({listingSpec}) {
+    return {listingSpec};
+  },
+
+  query(sprawl, listing) {
     return {
-      layout: relation('generatePageLayout'),
-      listingsIndexLink: relation('linkListingIndex'),
+      seeAlso:
+        (listing.seeAlso
+          ? listing.seeAlso.map(directory =>
+              sprawl.listingSpec
+                .find(listing => listing.directory === directory))
+          : null),
     };
+  },
+
+  relations(relation, query) {
+    const relations = {};
+
+    relations.layout =
+      relation('generatePageLayout');
+
+    relations.listingsIndexLink =
+      relation('linkListingIndex');
+
+    if (!empty(query.seeAlso)) {
+      // TODO: Invalid listing directories filtered here aren't warned about anywhere.
+      // Honestly we shouldn't be searching listingSpec here at all - listings should
+      // be implemented as proper things which search listingSpec themselves, and
+      // expose seeAlso as a list of listing objects rather than by reference.
+      relations.seeAlsoLinks =
+        query.seeAlso
+          .map(listing => relation('linkListing', listing))
+          .filter(Boolean);
+    }
+
+    return relations;
   },
 
   data(query, sprawl, listing) {
@@ -25,12 +63,18 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html}) {
+  generate(data, relations, slots, {html, language}) {
     return relations.layout.slots({
       title: language.$(`listingPage.${data.stringsKey}.title`),
       headingMode: 'sticky',
 
       mainContent: [
+        relations.seeAlsoLinks &&
+          html.tag('p',
+            language.$('listingPage.seeAlso', {
+              listings: language.formatUnitList(relations.seeAlsoLinks),
+            })),
+
         slots.type === 'rows' &&
           html.tag('ul',
             slots.rows.map(row =>
