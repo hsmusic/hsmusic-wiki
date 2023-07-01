@@ -1,4 +1,4 @@
-import {empty} from '../../util/sugar.js';
+import {empty, stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
@@ -9,22 +9,7 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({listingSpec}) {
-    return {listingSpec};
-  },
-
-  query(sprawl, listing) {
-    return {
-      seeAlso:
-        (listing.seeAlso
-          ? listing.seeAlso.map(directory =>
-              sprawl.listingSpec
-                .find(listing => listing.directory === directory))
-          : null),
-    };
-  },
-
-  relations(relation, query) {
+  relations(relation, listing) {
     const relations = {};
 
     relations.layout =
@@ -33,23 +18,34 @@ export default {
     relations.listingsIndexLink =
       relation('linkListingIndex');
 
-    if (!empty(query.seeAlso)) {
-      // TODO: Invalid listing directories filtered here aren't warned about anywhere.
-      // Honestly we shouldn't be searching listingSpec here at all - listings should
-      // be implemented as proper things which search listingSpec themselves, and
-      // expose seeAlso as a list of listing objects rather than by reference.
+    if (listing.target.listings.length > 1) {
+      relations.sameTargetListingLinks =
+        listing.target.listings
+          .map(listing => relation('linkListing', listing));
+    }
+
+    if (!empty(listing.seeAlso)) {
       relations.seeAlsoLinks =
-        query.seeAlso
-          .map(listing => relation('linkListing', listing))
-          .filter(Boolean);
+        listing.seeAlso
+          .map(listing => relation('linkListing', listing));
     }
 
     return relations;
   },
 
-  data(query, sprawl, listing) {
+  data(listing) {
     return {
       stringsKey: listing.stringsKey,
+
+      targetStringsKey: listing.target.stringsKey,
+
+      sameTargetListingStringsKeys:
+        listing.target.listings
+          .map(listing => listing.stringsKey),
+
+      sameTargetListingsCurrentIndex:
+        listing.target.listings
+          .indexOf(listing),
     };
   },
 
@@ -69,6 +65,24 @@ export default {
       headingMode: 'sticky',
 
       mainContent: [
+        relations.sameTargetListingLinks &&
+          html.tag('p',
+            language.$('listingPage.listingsFor', {
+              target: language.$(`listingPage.target.${data.targetStringsKey}`),
+              listings:
+                language.formatUnitList(
+                  stitchArrays({
+                    link: relations.sameTargetListingLinks,
+                    stringsKey: data.sameTargetListingStringsKeys,
+                  }).map(({link, stringsKey}, index) =>
+                      html.tag('span',
+                        {class: index === data.sameTargetListingsCurrentIndex && 'current'},
+                        link.slots({
+                          attributes: {class: 'nowrap'},
+                          content: language.$(`listingPage.${stringsKey}.title.short`),
+                        })))),
+            })),
+
         relations.seeAlsoLinks &&
           html.tag('p',
             language.$('listingPage.seeAlso', {
