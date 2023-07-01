@@ -20,19 +20,11 @@ const listingSpec = [];
 listingSpec.push({
   directory: 'albums/by-name',
   stringsKey: 'listAlbums.byName',
+  contentFunction: 'listAlbumsByName',
 
   seeAlso: [
     'tracks/by-album',
   ],
-
-  data: ({wikiData: {albumData}}) =>
-    sortAlphabetically(albumData.slice()),
-
-  row: (album, {language, link}) =>
-    language.$('listingPage.listAlbums.byName.item', {
-      album: link.album(album),
-      tracks: language.countTracks(album.tracks.length, {unit: true}),
-    }),
 });
 
 listingSpec.push({

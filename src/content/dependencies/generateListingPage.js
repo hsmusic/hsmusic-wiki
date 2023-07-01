@@ -9,28 +9,33 @@ export default {
     };
   },
 
-  slots: {
-    title: {type: 'string'},
+  data(query, sprawl, listing) {
+    return {
+      stringsKey: listing.stringsKey,
+    };
+  },
 
+  slots: {
     type: {
       validate: v => v.is('rows'),
     },
 
     rows: {
-      validate: v => v.arrayOf(v.isHTML),
+      validate: v => v.arrayOf(v.isObject),
     },
   },
 
-  generate(relations, slots, {html}) {
+  generate(data, relations, slots, {html}) {
     return relations.layout.slots({
-      title: slots.title,
+      title: language.$(`listingPage.${data.stringsKey}.title`),
       headingMode: 'sticky',
 
       mainContent: [
         slots.type === 'rows' &&
           html.tag('ul',
-            slots.rows
-              .map(row => html.tag('li', row))),
+            slots.rows.map(row =>
+              html.tag('li',
+                language.$(`listingPage.${data.stringsKey}.item`, row)))),
       ],
 
       navLinkStyle: 'hierarchical',

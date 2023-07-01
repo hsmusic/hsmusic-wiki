@@ -14,11 +14,21 @@ import {getTotalDuration} from '../util/wiki-data.js';
 
 export const description = `wiki-wide listing pages & index`;
 
-export function pathsTargetless() {
+export function targets({wikiData}) {
+  return (
+    wikiData.listingSpec
+      .filter(listing => listing.contentFunction));
+}
+
+export function pathsForTarget(listing) {
   return [
     {
-      type: 'page', path: ['listing', 'albums/by-name'],
-      contentFunction: {name: 'listAlbumsByName'},
+      type: 'page',
+      path: ['listing', listing.directory],
+      contentFunction: {
+        name: listing.contentFunction,
+        args: [listing],
+      },
     },
   ];
 }
