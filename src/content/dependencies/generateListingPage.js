@@ -2,6 +2,7 @@ import {empty, stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateContentHeading',
     'generateListingSidebar',
     'generatePageLayout',
     'linkListing',
@@ -21,6 +22,9 @@ export default {
 
     relations.listingsIndexLink =
       relation('linkListingIndex');
+
+    relations.chunkHeading =
+      relation('generateContentHeading');
 
     if (listing.target.listings.length > 1) {
       relations.sameTargetListingLinks =
@@ -54,13 +58,12 @@ export default {
   },
 
   slots: {
-    type: {
-      validate: v => v.is('rows'),
-    },
+    type: {validate: v => v.is('rows', 'chunks'),},
 
-    rows: {
-      validate: v => v.arrayOf(v.isObject),
-    },
+    rows: {validate: v => v.arrayOf(v.isObject)},
+
+    chunkTitles: {validate: v => v.arrayOf(v.isObject)},
+    chunkRows: {validate: v => v.arrayOf(v.isObject)},
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -98,6 +101,27 @@ export default {
             slots.rows.map(row =>
               html.tag('li',
                 language.$(`listingPage.${data.stringsKey}.item`, row)))),
+
+        slots.type === 'chunks' &&
+          html.tag('dl',
+            stitchArrays({
+              title: slots.chunkTitles,
+              rows: slots.chunkRows,
+            }).map(({title, rows}) => [
+                relations.chunkHeading
+                  .clone()
+                  .slots({
+                    tag: 'dt',
+                    title:
+                      language.$(`listingPage.${data.stringsKey}.chunk.title`, title),
+                  }),
+
+                html.tag('dd',
+                  html.tag('ul',
+                    rows.map(row =>
+                      html.tag('li',
+                        language.$(`listingPage.${data.stringsKey}.chunk.item`, row))))),
+              ])),
       ],
 
       navLinkStyle: 'hierarchical',

@@ -53,33 +53,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'albums/by-date-added',
   stringsKey: 'listAlbums.byDateAdded',
-
-  data: ({wikiData: {albumData}}) =>
-    chunkByProperties(
-      sortAlphabetically(albumData.filter(a => a.dateAddedToWiki))
-        .sort((a, b) => {
-          if (a.dateAddedToWiki < b.dateAddedToWiki) return -1;
-          if (a.dateAddedToWiki > b.dateAddedToWiki) return 1;
-        }),
-      ['dateAddedToWiki']),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({dateAddedToWiki, chunk: albums}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listAlbums.byDateAdded.date', {
-            date: language.formatDate(dateAddedToWiki),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            albums.map((album) =>
-              html.tag('li',
-                language.$('listingPage.listAlbums.byDateAdded.album', {
-                  album: link.album(album),
-                }))))),
-      ])),
+  contentFunction: 'listAlbumsByDateAdded',
 });
 
 listingSpec.push({
