@@ -35,10 +35,7 @@ function getDisplayMode(album) {
 }
 
 export default {
-  contentDependencies: [
-    'generateAlbumTrackListItem',
-  ],
-
+  contentDependencies: ['generateAlbumTrackListItem', 'generateContentHeading'],
   extraDependencies: ['html', 'language'],
 
   query(album) {
@@ -52,10 +49,15 @@ export default {
 
     switch (query.displayMode) {
       case 'trackSections':
+        relations.trackSectionHeadings =
+          album.trackSections.map(() =>
+            relation('generateContentHeading'));
+
         relations.itemsByTrackSection =
           album.trackSections.map(section =>
             section.tracks.map(track =>
               relation('generateAlbumTrackListItem', track, album)));
+
         break;
 
       case 'tracks':
@@ -103,23 +105,26 @@ export default {
       case 'trackSections':
         return html.tag('dl', {class: 'album-group-list'},
           stitchArrays({
+            heading: relations.trackSectionHeadings,
+            items: relations.itemsByTrackSection,
             info: data.trackSectionInfo,
-            item: relations.itemsByTrackSection,
-          }).map(({info, item}) => [
-              html.tag('dt',
-                {class: 'content-heading', tabindex: '0'},
-                language.$('trackList.section.withDuration', {
-                  section: info.name,
-                  duration:
-                    language.formatDuration(info.duration, {
-                      approximate: info.durationApproximate,
-                    }),
-                })),
+          }).map(({heading, items, info}) => [
+              heading.slots({
+                tag: 'dt',
+                title:
+                  language.$('trackList.section.withDuration', {
+                    section: info.name,
+                    duration:
+                      language.formatDuration(info.duration, {
+                        approximate: info.durationApproximate,
+                      }),
+                  }),
+              }),
 
               html.tag('dd',
                 html.tag(listTag,
                   data.hasTrackNumbers ? {start: info.startIndex + 1} : {},
-                  item)),
+                  items)),
             ]));
 
       case 'tracks':
