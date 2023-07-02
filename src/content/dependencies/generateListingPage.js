@@ -58,12 +58,14 @@ export default {
   },
 
   slots: {
-    type: {validate: v => v.is('rows', 'chunks'),},
+    type: {validate: v => v.is('rows', 'chunks', 'custom')},
 
     rows: {validate: v => v.arrayOf(v.isObject)},
 
     chunkTitles: {validate: v => v.arrayOf(v.isObject)},
     chunkRows: {validate: v => v.arrayOf(v.isObject)},
+
+    content: {type: 'html'},
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -122,6 +124,9 @@ export default {
                       html.tag('li',
                         language.$(`listingPage.${data.stringsKey}.chunk.item`, row))))),
               ])),
+
+        slots.type === 'custom' &&
+          slots.content,
       ],
 
       navLinkStyle: 'hierarchical',

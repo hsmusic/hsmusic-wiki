@@ -79,77 +79,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'artists/by-contribs',
   stringsKey: 'listArtists.byContribs',
-
-  data: ({wikiData: {artistData, wikiInfo}}) => ({
-    toTracks: artistData
-      .map(artist => ({
-        artist,
-        contributions:
-          artist.tracksAsContributor.length +
-          artist.tracksAsArtist.length,
-      }))
-      .sort((a, b) => b.contributions - a.contributions)
-      .filter(({contributions}) => contributions),
-
-    toArtAndFlashes: artistData
-      .map(artist => ({
-        artist,
-        contributions:
-          artist.tracksAsCoverArtist.length +
-          artist.albumsAsCoverArtist.length +
-          artist.albumsAsWallpaperArtist.length +
-          artist.albumsAsBannerArtist.length +
-          (wikiInfo.enableFlashesAndGames
-            ? artist.flashesAsContributor.length
-            : 0),
-      }))
-      .sort((a, b) => b.contributions - a.contributions)
-      .filter(({contributions}) => contributions),
-
-    // This is a kinda naughty hack, 8ut like, it's the only place
-    // we'd 8e passing wikiData to html() otherwise, so like....
-    // (Ok we do do this again once later.)
-    showAsFlashes: wikiInfo.enableFlashesAndGames,
-  }),
-
-  html: (
-    {toTracks, toArtAndFlashes, showAsFlashes},
-    {html, language, link}
-  ) =>
-    html.tag('div', {class: 'content-columns'}, [
-      html.tag('div', {class: 'column'}, [
-        html.tag('h2',
-          language.$('listingPage.misc.trackContributors')),
-
-        html.tag('ul',
-          toTracks.map(({artist, contributions}) =>
-            html.tag('li',
-              language.$('listingPage.listArtists.byContribs.item', {
-                artist: link.artist(artist),
-                contributions: language.countContributions(contributions, {
-                  unit: true,
-                }),
-              })))),
-      ]),
-
-      html.tag('div', {class: 'column'}, [
-        html.tag('h2',
-          language.$(
-            'listingPage.misc' +
-              (showAsFlashes
-                ? '.artAndFlashContributors'
-                : '.artContributors'))),
-
-        html.tag('ul',
-          toArtAndFlashes.map(({artist, contributions}) =>
-            html.tag('li',
-              language.$('listingPage.listArtists.byContribs.item', {
-                artist: link.artist(artist),
-                contributions:
-                  language.countContributions(contributions, {unit: true}),
-              })))),
-      ]),
-  ]),
+  contentFunction: 'listArtistsByContributions',
 });
 
 listingSpec.push({
