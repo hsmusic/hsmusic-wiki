@@ -31,56 +31,23 @@ listingSpec.push({
 listingSpec.push({
   directory: 'albums/by-tracks',
   stringsKey: 'listAlbums.byTracks',
-
-  data: ({wikiData: {albumData}}) =>
-    albumData.slice()
-      .sort((a, b) => b.tracks.length - a.tracks.length),
-
-  row: (album, {language, link}) =>
-    language.$('listingPage.listAlbums.byTracks.item', {
-      album: link.album(album),
-      tracks: language.countTracks(album.tracks.length, {unit: true}),
-    }),
+  contentFunction: 'listAlbumsByTracks',
 });
 
 listingSpec.push({
   directory: 'albums/by-duration',
   stringsKey: 'listAlbums.byDuration',
-
-  data: ({wikiData: {albumData}}) =>
-    albumData
-      .map(album => ({
-        album,
-        duration: getTotalDuration(album.tracks),
-      }))
-      .filter(({duration}) => duration > 0)
-      .sort((a, b) => b.duration - a.duration),
-
-  row: ({album, duration}, {language, link}) =>
-    language.$('listingPage.listAlbums.byDuration.item', {
-      album: link.album(album),
-      duration: language.formatDuration(duration),
-    }),
+  contentFunction: 'listAlbumsByDuration',
 });
 
 listingSpec.push({
   directory: 'albums/by-date',
   stringsKey: 'listAlbums.byDate',
+  contentFunction: 'listAlbumsByDate',
 
   seeAlso: [
     'tracks/by-date',
   ],
-
-  data: ({wikiData: {albumData}}) =>
-    sortChronologically(
-      albumData
-        .filter(album => album.date)),
-
-  row: (album, {language, link}) =>
-    language.$('listingPage.listAlbums.byDate.item', {
-      album: link.album(album),
-      date: language.formatDate(album.date),
-    }),
 });
 
 listingSpec.push({
@@ -1103,6 +1070,8 @@ listingSpec.push({
       if (!empty(suberrors)) {
         errors.push(new AggregateError(suberrors, `Errors matching "see also" listings for ${listing.directory}`));
       }
+    } else {
+      listing.seeAlso = null;
     }
   }
 
