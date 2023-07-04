@@ -1,4 +1,5 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
+import {stitchArrays} from '../../util/sugar.js';
+import {filterByCount, sortByCount} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],
@@ -9,14 +10,13 @@ export default {
   },
 
   query({albumData}, spec) {
-    return {
-      spec,
+    const albums = albumData.slice();
+    const counts = albums.map(album => album.tracks.length);
 
-      albums:
-        albumData
-          .filter(album => !empty(album.tracks))
-          .sort((a, b) => b.tracks.length - a.tracks.length),
-    };
+    filterByCount(albums, counts);
+    sortByCount(albums, counts, {greatestFirst: true});
+
+    return {spec, albums, counts};
   },
 
   relations(relation, query) {
@@ -31,9 +31,7 @@ export default {
 
   data(query) {
     return {
-      counts:
-        query.albums
-          .map(album => album.tracks.length),
+      counts: query.counts,
     };
   },
 

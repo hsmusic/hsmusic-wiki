@@ -1,5 +1,5 @@
 import {stitchArrays} from '../../util/sugar.js';
-import {getTotalDuration} from '../../util/wiki-data.js';
+import {filterByCount, getTotalDuration, sortByCount} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],
@@ -10,17 +10,13 @@ export default {
   },
 
   query({albumData}, spec) {
-    const albumToDuration =
-      new Map(albumData.map(album => [album, getTotalDuration(album.tracks)]));
+    const albums = albumData.slice();
+    const durations = albums.map(album => getTotalDuration(album.tracks));
 
-    return {
-      spec,
+    filterByCount(albums, durations);
+    sortByCount(albums, durations, {greatestFirst: true});
 
-      albums:
-        albumData
-          .filter(album => albumToDuration.get(album) > 0)
-          .sort((a, b) => albumToDuration.get(b) - albumToDuration.get(a)),
-    };
+    return {spec, albums, durations};
   },
 
   relations(relation, query) {
@@ -35,9 +31,7 @@ export default {
 
   data(query) {
     return {
-      durations:
-        query.albums
-          .map(album => getTotalDuration(album.tracks)),
+      durations: query.durations,
     };
   },
 

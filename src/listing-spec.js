@@ -59,21 +59,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'artists/by-name',
   stringsKey: 'listArtists.byName',
-
-  data: ({wikiData: {artistData}}) =>
-    sortAlphabetically(artistData.slice())
-      .map(artist => ({
-        artist,
-        contributions: getArtistNumContributions(artist),
-      })),
-
-  row: ({artist, contributions}, {language, link}) =>
-    language.$('listingPage.listArtists.byName.item', {
-      artist: link.artist(artist),
-      contributions: language.countContributions(contributions, {
-        unit: true,
-      }),
-    }),
+  contentFunction: 'listArtistsByName',
 });
 
 listingSpec.push({
@@ -85,23 +71,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'artists/by-commentary',
   stringsKey: 'listArtists.byCommentary',
-
-  data: ({wikiData: {artistData}}) =>
-    artistData
-      .map(artist => ({
-        artist,
-        entries:
-          artist.tracksAsCommentator.length +
-          artist.albumsAsCommentator.length,
-      }))
-      .filter(({entries}) => entries)
-      .sort((a, b) => b.entries - a.entries),
-
-  row: ({artist, entries}, {language, link}) =>
-    language.$('listingPage.listArtists.byCommentary.item', {
-      artist: link.artist(artist),
-      entries: language.countCommentaryEntries(entries, {unit: true}),
-    }),
+  contentFunction: 'listArtistsByCommentaryEntries',
 });
 
 listingSpec.push({

@@ -1,4 +1,5 @@
 import {stitchArrays, unique} from '../../util/sugar.js';
+import {filterByCount, sortByCount} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -12,34 +13,45 @@ export default {
   },
 
   query(sprawl, spec) {
-    const query = {spec};
+    const query = {
+      spec,
+      enableFlashesAndGames: sprawl.enableFlashesAndGames,
+    };
 
-    const queryContributionInfo = fn =>
-      sprawl.artistData
-        .map(artist => ({artist, contributions: fn(artist)}))
-        .filter(({contributions}) => contributions)
-        .sort((a, b) => b.contributions - a.contributions);
+    const queryContributionInfo = (artistsKey, countsKey, fn) => {
+      const artists = sprawl.artistData.slice();
+      const counts = artists.map(artist => fn(artist));
 
-    query.enableFlashesAndGames =
-      sprawl.enableFlashesAndGames;
+      filterByCount(artists, counts);
+      sortByCount(artists, counts, {greatestFirst: true});
 
-    query.trackContributionInfo =
-      queryContributionInfo(artist =>
+      query[artistsKey] = artists;
+      query[countsKey] = counts;
+    };
+
+    queryContributionInfo(
+      'artistsByTrackContributions',
+      'countsByTrackContributions',
+      artist =>
         unique([
           ...artist.tracksAsContributor,
           ...artist.tracksAsArtist,
         ]).length);
 
-    query.artworkContributionInfo =
-      queryContributionInfo(artist =>
+    queryContributionInfo(
+      'artistsByArtworkContributions',
+      'countsByArtworkContributions',
+      artist =>
         artist.tracksAsCoverArtist.length +
         artist.albumsAsCoverArtist.length +
         artist.albumsAsWallpaperArtist.length +
         artist.albumsAsBannerArtist.length);
 
     if (sprawl.enableFlashesAndGames) {
-      query.flashContributionInfo =
-        queryContributionInfo(artist =>
+      queryContributionInfo(
+        'artistsByFlashContributions',
+        'countsByFlashContributions',
+        artist =>
           artist.flashesAsContributor.length);
     }
 
@@ -53,17 +65,17 @@ export default {
       relation('generateListingPage', query.spec);
 
     relations.artistLinksByTrackContributions =
-      query.trackContributionInfo
-        .map(({artist}) => relation('linkArtist', artist));
+      query.artistsByTrackContributions
+        .map(artist => relation('linkArtist', artist));
 
     relations.artistLinksByArtworkContributions =
-      query.artworkContributionInfo
-        .map(({artist}) => relation('linkArtist', artist));
+      query.artistsByArtworkContributions
+        .map(artist => relation('linkArtist', artist));
 
     if (query.enableFlashesAndGames) {
       relations.artistLinksByFlashContributions =
-        query.flashContributionInfo
-          .map(({artist}) => relation('linkArtist', artist));
+        query.artistsByFlashContributions
+          .map(artist => relation('linkArtist', artist));
     }
 
     return relations;
@@ -72,21 +84,13 @@ export default {
   data(query) {
     const data = {};
 
-    data.enableFlashesAndGames =
-      query.enableFlashesAndGames;
+    data.enableFlashesAndGames = query.enableFlashesAndGames;
 
-    data.countsByTrackContributions =
-      query.trackContributionInfo
-        .map(({contributions}) => contributions);
-
-    data.countsByArtworkContributions =
-      query.artworkContributionInfo
-        .map(({contributions}) => contributions);
+    data.countsByTrackContributions = query.countsByTrackContributions;
+    data.countsByArtworkContributions = query.countsByArtworkContributions;
 
     if (query.enableFlashesAndGames) {
-      data.countsByFlashContributions =
-        query.flashContributionInfo
-          .map(({contributions}) => contributions);
+      data.countsByFlashContributions = query.countsByFlashContributions;
     }
 
     return data;

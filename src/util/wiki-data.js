@@ -3,6 +3,7 @@
 import {
   accumulateSum,
   empty,
+  stitchArrays,
   unique,
 } from './sugar.js';
 
@@ -206,6 +207,44 @@ export function sortByDate(data, {
       return 0;
     }
   });
+}
+
+// Funky sort which takes a data set and a corresponding list of "counts",
+// which are really arbitrary numbers representing some property of each data
+// object defined by the caller. It sorts and mutates *both* of these, so the
+// sorted data will still correspond to the same indexed count.
+export function sortByCount(data, counts, {
+  greatestFirst = false,
+} = {}) {
+  const thingToCount = new Map(
+    stitchArrays({thing: data, count: counts})
+      .map(({thing, count}) => [thing, count]));
+
+  data.sort((a, b) =>
+    (greatestFirst
+      ? thingToCount.get(b) - thingToCount.get(a)
+      : thingToCount.get(a) - thingToCount.get(b)));
+
+  counts.sort((a, b) =>
+    (greatestFirst
+      ? b - a
+      : a - b));
+
+  return data;
+}
+
+// Corresponding filter function for the above sort. By default, items whose
+// corresponding count is zero will be removed.
+export function filterByCount(data, counts, {
+  min = 1,
+  max = Infinity,
+} = {}) {
+  for (let i = counts.length - 1; i >= 0; i--) {
+    if (counts[i] < min || counts[i] > max) {
+      data.splice(i, 1);
+      counts.splice(i, 1);
+    }
+  }
 }
 
 export function sortByPositionInParent(data, {
