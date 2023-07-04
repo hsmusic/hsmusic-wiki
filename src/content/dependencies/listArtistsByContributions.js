@@ -152,7 +152,7 @@ export default {
 
             lists.flashes && [
               html.tag('h2',
-                language.$('listingPage.misc.artAndFlashContributors')),
+                language.$('listingPage.misc.flashContributors')),
 
               lists.flashes,
             ],
