@@ -209,6 +209,62 @@ export function sortByDate(data, {
   });
 }
 
+// Sorts multiple arrays by an arbitrary function (which is the last argument).
+// Values from each array are paired: (a_fromFirstArray, b_fromFirstArray,
+// a_fromSecondArray, b_fromSecondArray), etc. This definitely only works if
+// all arrays are of the same length.
+export function sortMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  const length = arrays[0].length;
+  const symbols = new Array(length).fill(null).map(() => Symbol());
+  const indexes = Object.fromEntries(symbols.map((symbol, index) => [symbol, index]));
+
+  symbols.sort((a, b) => {
+    const indexA = indexes[a];
+    const indexB = indexes[b];
+
+    const args = [];
+    for (let i = 0; i < arrays.length; i++) {
+      args.push(arrays[i][indexA]);
+      args.push(arrays[i][indexB]);
+    }
+
+    return fn(...args);
+  });
+
+  for (const array of arrays) {
+    // Note: We're mutating this array pulling values from itself, but only all
+    // at once after all those values have been pulled.
+    array.splice(0, array.length, ...symbols.map(symbol => array[indexes[symbol]]));
+  }
+
+  return arrays;
+}
+
+// Filters multiple arrays by an arbitrary function (which is the last argument).
+// Values from each array are sequential: (value_fromFirstArray,
+// value_fromSecondArray, value_fromThirdArray, index, [firstArray, secondArray,
+// thirdArray]), etc. This definitely only works if all arrays are of the same
+// length.
+export function filterMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  const length = arrays[0].length;
+
+  for (let i = length - 1; i >= 0; i--) {
+    const args = arrays.map(array => array[i]);
+
+    if (!fn(...args)) {
+      for (const array of arrays) {
+        array.splice(i, 1);
+      }
+    }
+  }
+}
+
 // Funky sort which takes a data set and a corresponding list of "counts",
 // which are really arbitrary numbers representing some property of each data
 // object defined by the caller. It sorts and mutates *both* of these, so the
@@ -216,19 +272,10 @@ export function sortByDate(data, {
 export function sortByCount(data, counts, {
   greatestFirst = false,
 } = {}) {
-  const thingToCount = new Map(
-    stitchArrays({thing: data, count: counts})
-      .map(({thing, count}) => [thing, count]));
-
-  data.sort((a, b) =>
+  sortMultipleArrays(data, counts, (data1, data2, count1, count2) =>
     (greatestFirst
-      ? thingToCount.get(b) - thingToCount.get(a)
-      : thingToCount.get(a) - thingToCount.get(b)));
-
-  counts.sort((a, b) =>
-    (greatestFirst
-      ? b - a
-      : a - b));
+      ? count2 - count1
+      : count1 - count2));
 
   return data;
 }
@@ -239,12 +286,8 @@ export function filterByCount(data, counts, {
   min = 1,
   max = Infinity,
 } = {}) {
-  for (let i = counts.length - 1; i >= 0; i--) {
-    if (counts[i] < min || counts[i] > max) {
-      data.splice(i, 1);
-      counts.splice(i, 1);
-    }
-  }
+  filterMultipleArrays(data, counts, (data, count) =>
+    count >= min && count <= max);
 }
 
 export function sortByPositionInParent(data, {
