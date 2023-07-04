@@ -119,96 +119,6 @@ export function normalizeName(s) {
   return s;
 }
 
-// Component sort functions - these sort by one particular property, applying
-// unique particulars where appropriate. Usually you don't want to use these
-// directly, but if you're making a custom sort they can come in handy.
-
-// Universal method for sorting things into a predictable order, as directory
-// is taken to be unique. There are two exceptions where this function (and
-// thus any of the composite functions that start with it) *can't* be taken as
-// deterministic:
-//
-//  1) Mixed data of two different Things, as directories are only taken as
-//     unique within one given class of Things. For example, this function
-//     won't be deterministic if its array contains both <album:ithaca> and
-//     <track:ithaca>.
-//
-//  2) Duplicate directories, or multiple instances of the "same" Thing.
-//     This function doesn't differentiate between two objects of the same
-//     directory, regardless of any other properties or the overall "identity"
-//     of the object.
-//
-// These exceptions are unavoidable except for not providing that kind of data
-// in the first place, but you can still ensure the overall program output is
-// deterministic by ensuring the input is arbitrarily sorted according to some
-// other criteria - ex, although sortByDirectory itself isn't determinstic when
-// given mixed track and album data, the final output (what goes on the site)
-// will always be the same if you're doing sortByDirectory([...albumData,
-// ...trackData]), because the initial sort places albums before tracks - and
-// sortByDirectory will handle the rest, given all directories are unique
-// except when album and track directories overlap with each other.
-export function sortByDirectory(data, {
-  getDirectory = (o) => o.directory,
-} = {}) {
-  return data.sort((a, b) => {
-    const ad = getDirectory(a);
-    const bd = getDirectory(b);
-    return compareCaseLessSensitive(ad, bd);
-  });
-}
-
-export function sortByName(data, {
-  getName = (o) => o.name,
-} = {}) {
-  const nameMap = new Map();
-  const normalizedNameMap = new Map();
-  for (const o of data) {
-    const name = getName(o);
-    const normalizedName = normalizeName(name);
-    nameMap.set(o, name);
-    normalizedNameMap.set(o, normalizedName);
-  }
-
-  return data.sort((a, b) => {
-    const ann = normalizedNameMap.get(a);
-    const bnn = normalizedNameMap.get(b);
-    const comparison = compareCaseLessSensitive(ann, bnn);
-    if (comparison !== 0)
-      return comparison;
-
-    const an = nameMap.get(a);
-    const bn = nameMap.get(b);
-    return compareCaseLessSensitive(an, bn);
-  });
-}
-
-export function sortByDate(data, {
-  latestFirst = false,
-  getDate = (o) => o.date,
-} = {}) {
-  return data.sort((a, b) => {
-    const ad = getDate(a);
-    const bd = getDate(b);
-
-    // It's possible for objects with and without dates to be mixed
-    // together in the same array. If that's the case, we put all items
-    // without dates at the end.
-    if (ad && bd) {
-      return (latestFirst ? bd - ad : ad - bd);
-    } else if (ad) {
-      return -1;
-    } else if (bd) {
-      return 1;
-    } else {
-      // If neither of the items being compared have a date, don't move
-      // them relative to each other. This is basically the same as
-      // filtering out all non-date items and then pushing them at the
-      // end after sorting the rest.
-      return 0;
-    }
-  });
-}
-
 // Sorts multiple arrays by an arbitrary function (which is the last argument).
 // Values from each array are paired: (a_fromFirstArray, b_fromFirstArray,
 // a_fromSecondArray, b_fromSecondArray), etc. This definitely only works if
@@ -253,16 +163,148 @@ export function filterMultipleArrays(...args) {
   const fn = args.at(-1);
 
   const length = arrays[0].length;
+  const removed = new Array(length).fill(null).map(() => []);
 
   for (let i = length - 1; i >= 0; i--) {
     const args = arrays.map(array => array[i]);
 
     if (!fn(...args)) {
-      for (const array of arrays) {
-        array.splice(i, 1);
+      for (let j = 0; j < arrays.length; j++) {
+        const item = arrays[j][i];
+        arrays[j].splice(i, 1);
+        removed[j].unshift(item);
       }
     }
   }
+
+  Object.assign(arrays, {removed});
+  return arrays;
+}
+
+// Component sort functions - these sort by one particular property, applying
+// unique particulars where appropriate. Usually you don't want to use these
+// directly, but if you're making a custom sort they can come in handy.
+
+// Universal method for sorting things into a predictable order, as directory
+// is taken to be unique. There are two exceptions where this function (and
+// thus any of the composite functions that start with it) *can't* be taken as
+// deterministic:
+//
+//  1) Mixed data of two different Things, as directories are only taken as
+//     unique within one given class of Things. For example, this function
+//     won't be deterministic if its array contains both <album:ithaca> and
+//     <track:ithaca>.
+//
+//  2) Duplicate directories, or multiple instances of the "same" Thing.
+//     This function doesn't differentiate between two objects of the same
+//     directory, regardless of any other properties or the overall "identity"
+//     of the object.
+//
+// These exceptions are unavoidable except for not providing that kind of data
+// in the first place, but you can still ensure the overall program output is
+// deterministic by ensuring the input is arbitrarily sorted according to some
+// other criteria - ex, although sortByDirectory itself isn't determinstic when
+// given mixed track and album data, the final output (what goes on the site)
+// will always be the same if you're doing sortByDirectory([...albumData,
+// ...trackData]), because the initial sort places albums before tracks - and
+// sortByDirectory will handle the rest, given all directories are unique
+// except when album and track directories overlap with each other.
+export function sortByDirectory(data, {
+  getDirectory = object => object.directory,
+} = {}) {
+  const directories = data.map(getDirectory);
+
+  sortMultipleArrays(data, directories,
+    (a, b, directoryA, directoryB) =>
+      compareCaseLessSensitive(directoryA, directoryB));
+
+  return data;
+}
+
+export function sortByName(data, {
+  getName = object => object.name,
+} = {}) {
+  const names = data.map(getName);
+  const normalizedNames = names.map(normalizeName);
+
+  sortMultipleArrays(data, normalizedNames, names,
+    (
+      a, b,
+      normalizedA, normalizedB,
+      nonNormalizedA, nonNormalizedB,
+    ) =>
+      compareNormalizedNames(
+        normalizedA, normalizedB,
+        nonNormalizedA, nonNormalizedB,
+      ));
+
+  return data;
+}
+
+export function compareNormalizedNames(
+  normalizedA, normalizedB,
+  nonNormalizedA, nonNormalizedB,
+) {
+  const comparison = compareCaseLessSensitive(normalizedA, normalizedB);
+  return (
+    (comparison === 0
+      ? compareCaseLessSensitive(nonNormalizedA, nonNormalizedB)
+      : comparison));
+}
+
+export function sortByDate(data, {
+  getDate = object => object.date,
+  latestFirst = false,
+} = {}) {
+  const dates = data.map(getDate);
+
+  sortMultipleArrays(data, dates,
+    (a, b, dateA, dateB) =>
+      compareDates(dateA, dateB, {latestFirst}));
+
+  return data;
+}
+
+export function compareDates(a, b, {
+  latestFirst = false,
+} = {}) {
+  if (a && b) {
+    return (latestFirst ? b - a : a - b);
+  }
+
+  // It's possible for objects with and without dates to be mixed
+  // together in the same array. If that's the case, we put all items
+  // without dates at the end.
+  if (a) return -1;
+  if (b) return 1;
+
+  // If neither of the items being compared have a date, don't move
+  // them relative to each other. This is basically the same as
+  // filtering out all non-date items and then pushing them at the
+  // end after sorting the rest.
+  return 0;
+}
+
+export function getLatestDate(dates) {
+  const filtered = dates.filter(Boolean);
+  if (empty(filtered)) return null;
+
+  return filtered
+    .reduce(
+      (accumulator, date) =>
+        date > accumulator ? date : accumulator,
+      -Infinity);
+}
+
+export function getEarliestDate(dates) {
+  const filtered = dates.filter(Boolean);
+  if (empty(filtered)) return null;
+
+  return filtered
+    .reduce(
+      (accumulator, date) =>
+        date < accumulator ? date : accumulator,
+      Infinity);
 }
 
 // Funky sort which takes a data set and a corresponding list of "counts",
