@@ -167,6 +167,7 @@ export function filterMultipleArrays(...args) {
 
   for (let i = length - 1; i >= 0; i--) {
     const args = arrays.map(array => array[i]);
+    args.push(i, arrays);
 
     if (!fn(...args)) {
       for (let j = 0; j < arrays.length; j++) {
