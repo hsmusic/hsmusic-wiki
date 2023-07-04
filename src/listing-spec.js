@@ -77,24 +77,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'artists/by-duration',
   stringsKey: 'listArtists.byDuration',
-
-  data: ({wikiData: {artistData}}) =>
-    artistData
-      .map((artist) => ({
-        artist,
-        duration: getTotalDuration([
-          ...(artist.tracksAsArtist ?? []),
-          ...(artist.tracksAsContributor ?? []),
-        ], {originalReleasesOnly: true}),
-      }))
-      .filter(({duration}) => duration > 0)
-      .sort((a, b) => b.duration - a.duration),
-
-  row: ({artist, duration}, {language, link}) =>
-    language.$('listingPage.listArtists.byDuration.item', {
-      artist: link.artist(artist),
-      duration: language.formatDuration(duration),
-    }),
+  contentFunction: 'listArtistsByDuration',
 });
 
 listingSpec.push({
