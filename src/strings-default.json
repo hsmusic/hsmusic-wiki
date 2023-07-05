@@ -376,6 +376,8 @@
   "listingPage.listArtists.byLatest.title": "Artists - by Latest Contribution",
   "listingPage.listArtists.byLatest.title.short": "...by Latest Contribution",
   "listingPage.listArtists.byLatest.item": "{ARTIST} ({DATE})",
+  "listingPage.listArtists.byLatest.dateless.title": "These artists' contributions aren't dated:",
+  "listingPage.listArtists.byLatest.dateless.item": "{ARTIST}",
   "listingPage.listGroups.byName.title": "Groups - by Name",
   "listingPage.listGroups.byName.title.short": "...by Name",
   "listingPage.listGroups.byName.item": "{GROUP} ({GALLERY})",
