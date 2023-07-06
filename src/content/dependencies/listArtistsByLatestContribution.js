@@ -81,7 +81,7 @@ export default {
               reduceMultipleArrays(
                 chunkThings, dates,
                 (accChunkThing, accDate, chunkThing, date) =>
-                  (date && date < accDate
+                  (date && date > accDate
                     ? [chunkThing, date]
                     : [accChunkThing, accDate]))));
 
@@ -118,16 +118,16 @@ export default {
       'albumsByTrackContributions',
       'datesByTrackContributions',
       'datelessArtistsByTrackContributions',
-      artist => [
-        [
-          ...artist.tracksAsArtist.map(track => track.album),
-          ...artist.tracksAsContributor.map(track => track.album),
-        ],
-        [
-          ...artist.tracksAsArtist.map(track => track.date),
-          ...artist.tracksAsContributor.map(track => track.date),
-        ],
-      ]);
+      artist => {
+        const tracks =
+          [...artist.tracksAsArtist, ...artist.tracksAsContributor]
+            .filter(track => !track.originalReleaseTrack);
+
+        const albums = tracks.map(track => track.album);
+        const dates = tracks.map(track => track.date);
+
+        return [albums, dates];
+      });
 
     queryContributionInfo(
       'artistsByArtworkContributions',
