@@ -72,6 +72,36 @@ export function chunkByProperties(array, properties) {
   }));
 }
 
+export function chunkMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  const newChunk = index => arrays.map(array => [array[index]]);
+  const results = [newChunk(0)];
+
+  for (let i = 1; i < arrays[0].length; i++) {
+    const current = results.at(-1);
+
+    const args = [];
+    for (let j = 0; j < arrays.length; j++) {
+      const item = arrays[j][i];
+      const previous = current[j].at(-1);
+      args.push(item, previous);
+    }
+
+    if (fn(...args)) {
+      results.push(newChunk(i));
+      continue;
+    }
+
+    for (let j = 0; j < arrays.length; j++) {
+      current[j].push(arrays[j][i]);
+    }
+  }
+
+  return results;
+}
+
 // Sorting functions - all utils here are mutating, so make sure to initially
 // slice/filter/somehow generate a new array from input data if retaining the
 // initial sort matters! (Spoilers: If what you're doing involves any kind of
@@ -120,9 +150,14 @@ export function normalizeName(s) {
 }
 
 // Sorts multiple arrays by an arbitrary function (which is the last argument).
-// Values from each array are paired: (a_fromFirstArray, b_fromFirstArray,
-// a_fromSecondArray, b_fromSecondArray), etc. This definitely only works if
-// all arrays are of the same length.
+// Paired values from each array are provided to the callback sequentially:
+//
+//   (a_fromFirstArray, b_fromFirstArray,
+//    a_fromSecondArray, b_fromSecondArray,
+//    a_fromThirdArray, b_fromThirdArray) =>
+//     relative positioning (negative, positive, or zero)
+//
+// Like native single-array sort, this is a mutating function.
 export function sortMultipleArrays(...args) {
   const arrays = args.slice(0, -1);
   const fn = args.at(-1);
@@ -154,18 +189,25 @@ export function sortMultipleArrays(...args) {
 }
 
 // Filters multiple arrays by an arbitrary function (which is the last argument).
-// Values from each array are sequential: (value_fromFirstArray,
-// value_fromSecondArray, value_fromThirdArray, index, [firstArray, secondArray,
-// thirdArray]), etc. This definitely only works if all arrays are of the same
-// length.
+// Values from each array are provided to the callback sequentially:
+//
+//   (value_fromFirstArray,
+//    value_fromSecondArray,
+//    value_fromThirdArray,
+//    index,
+//    [firstArray, secondArray, thirdArray]) =>
+//      true or false
+//
+// Please be aware that this is a mutating function, unlike native single-array
+// filter. The mutated arrays are returned. Also attached under `.removed` are
+// corresponding arrays of items filtered out.
 export function filterMultipleArrays(...args) {
   const arrays = args.slice(0, -1);
   const fn = args.at(-1);
 
-  const length = arrays[0].length;
-  const removed = new Array(length).fill(null).map(() => []);
+  const removed = new Array(arrays.length).fill(null).map(() => []);
 
-  for (let i = length - 1; i >= 0; i--) {
+  for (let i = arrays[0].length - 1; i >= 0; i--) {
     const args = arrays.map(array => array[i]);
     args.push(i, arrays);
 
@@ -180,6 +222,48 @@ export function filterMultipleArrays(...args) {
 
   Object.assign(arrays, {removed});
   return arrays;
+}
+
+// Reduces multiple arrays with an arbitrary function (which is the last
+// argument). Note that this reduces into multiple accumulators, one for
+// each input array, not just a single value. That's reflected in both the
+// callback parameters:
+//
+//   (accumulator1,
+//    accumulator2,
+//    value_fromFirstArray,
+//    value_fromSecondArray,
+//    index,
+//    [firstArray, secondArray]) =>
+//      [newAccumulator1, newAccumulator2]
+//
+// As well as the final return value of reduceMultipleArrays:
+//
+//   [finalAccumulator1, finalAccumulator2]
+//
+// This is not a mutating function.
+export function reduceMultipleArrays(...args) {
+  const [arrays, fn, initialAccumulators] =
+    (typeof args.at(-1) === 'function'
+      ? [args.slice(0, -1), args.at(-1), null]
+      : [args.slice(0, -2), args.at(-2), args.at(-1)]);
+
+  if (empty(arrays[0])) {
+    throw new TypeError(`Reduce of empty arrays with no initial value`);
+  }
+
+  let [accumulators, i] =
+    (initialAccumulators
+      ? [initialAccumulators, 0]
+      : [arrays.map(array => array[0]), 1]);
+
+  for (; i < arrays[0].length; i++) {
+    const args = [...accumulators, ...arrays.map(array => array[i])];
+    args.push(i, arrays);
+    accumulators = fn(...args);
+  }
+
+  return accumulators;
 }
 
 // Component sort functions - these sort by one particular property, applying

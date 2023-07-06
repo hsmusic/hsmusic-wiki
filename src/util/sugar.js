@@ -108,6 +108,41 @@ export function stitchArrays(keyToArray) {
   return results;
 }
 
+// Turns this:
+//
+//   [
+//     [123, 'orange', null],
+//     [456, 'apple', true],
+//     [789, 'banana', false],
+//     [1000, 'pear', undefined],
+//   ]
+//
+// Into this:
+//
+//   [
+//     [123, 456, 789, 1000],
+//     ['orange', 'apple', 'banana', 'pear'],
+//     [null, true, false, undefined],
+//   ]
+//
+// And back again, if you call it again on its results.
+export function transposeArrays(arrays) {
+  if (empty(arrays)) {
+    return [];
+  }
+
+  const length = arrays[0].length;
+  const results = new Array(length).fill(null).map(() => []);
+
+  for (const array of arrays) {
+    for (let i = 0; i < length; i++) {
+      results[i].push(array[i]);
+    }
+  }
+
+  return results;
+}
+
 export const mapInPlace = (array, fn) =>
   array.splice(0, array.length, ...array.map(fn));
 

@@ -1,15 +1,23 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
+import {transposeArrays, empty, stitchArrays} from '../../util/sugar.js';
 
 import {
+  chunkMultipleArrays,
+  compareCaseLessSensitive,
   compareDates,
   filterMultipleArrays,
-  getLatestDate,
+  reduceMultipleArrays,
   sortAlphabetically,
   sortMultipleArrays,
 } from '../../util/wiki-data.js';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtist'],
+  contentDependencies: [
+    'generateListingPage',
+    'linkAlbum',
+    'linkArtist',
+    'linkFlash',
+  ],
+
   extraDependencies: ['html', 'language', 'wikiData'],
 
   sprawl({artistData, wikiInfo}) {
@@ -25,66 +33,136 @@ export default {
       enableFlashesAndGames: sprawl.enableFlashesAndGames,
     };
 
-    const queryContributionInfo = (artistsKey, datesKey, datelessArtistsKey, fn) => {
+    const queryContributionInfo = (
+      artistsKey,
+      chunkThingsKey,
+      datesKey,
+      datelessArtistsKey,
+      fn,
+    ) => {
       const artists = sortAlphabetically(sprawl.artistData.slice());
 
-      // Each value stored in this list, corresponding to each artist,
+      // Each value stored in dateLists, corresponding to each artist,
       // is going to be a list of dates and nulls. Any nulls represent
       // a contribution which isn't associated with a particular date.
-      const dateLists = artists.map(artist => fn(artist));
+      const [chunkThingLists, dateLists] =
+        transposeArrays(artists.map(artist => fn(artist)));
 
       // Scrap artists who don't even have any relevant contributions.
       // These artists may still have other contributions across the wiki, but
       // they weren't returned by the callback and so aren't relevant to this
       // list.
-      filterMultipleArrays(artists, dateLists, (artist, dates) => !empty(dates));
+      filterMultipleArrays(
+        artists,
+        chunkThingLists,
+        dateLists,
+        (artists, chunkThings, dates) => !empty(dates));
 
-      const dates = dateLists.map(dates => getLatestDate(dates));
-
-      // Also exclude artists whose remaining contributions are all dateless -
-      // in this case getLatestDate above will have returned null. But keep
-      // track of the artists removed here, since they'll be displayed in an
-      // additional list in the final listing page.
+      // Also exclude artists whose remaining contributions are all dateless.
+      // But keep track of the artists removed here, since they'll be displayed
+      // in an additional list in the final listing page.
       const {removed: [datelessArtists]} =
-        filterMultipleArrays(artists, dates, (artist, date) => date);
+        filterMultipleArrays(
+          artists,
+          chunkThingLists,
+          dateLists,
+          (artist, chunkThings, dates) => !empty(dates.filter(Boolean)));
 
-      sortMultipleArrays(artists, dates,
-        (a, b, dateA, dateB) =>
-          compareDates(dateA, dateB, {latestFirst: true}));
+      // Cut out dateless contributions. They're not relevant to finding the
+      // latest date.
+      for (const [chunkThings, dates] of transposeArrays([chunkThingLists, dateLists])) {
+        filterMultipleArrays(chunkThings, dates, (chunkThing, date) => date);
+      }
 
-      query[artistsKey] = artists;
-      query[datesKey] = dates.map(dateNumber => new Date(dateNumber));
+      const [chunkThings, dates] =
+        transposeArrays(
+          transposeArrays([chunkThingLists, dateLists])
+            .map(([chunkThings, dates]) =>
+              reduceMultipleArrays(
+                chunkThings, dates,
+                (accChunkThing, accDate, chunkThing, date) =>
+                  (date && date < accDate
+                    ? [chunkThing, date]
+                    : [accChunkThing, accDate]))));
+
+      sortMultipleArrays(artists, dates, chunkThings,
+        (artistA, artistB, dateA, dateB, chunkThingA, chunkThingB) => {
+          const dateComparison = compareDates(dateA, dateB, {latestFirst: true});
+          if (dateComparison !== 0) {
+            return dateComparison;
+          }
+
+          // TODO: Compare alphabetically, not just by directory.
+          return compareCaseLessSensitive(chunkThingA.directory, chunkThingB.directory);
+        });
+
+      const chunks =
+        chunkMultipleArrays(artists, dates, chunkThings,
+          (artist, lastArtist, date, lastDate, chunkThing, lastChunkThing) =>
+            +date !== +lastDate || chunkThing !== lastChunkThing);
+
+      query[chunkThingsKey] =
+        chunks.map(([artists, dates, chunkThings]) => chunkThings[0]);
+
+      query[datesKey] =
+        chunks.map(([artists, dates, chunkThings]) => dates[0]);
+
+      query[artistsKey] =
+        chunks.map(([artists, dates, chunkThings]) => artists);
+
       query[datelessArtistsKey] = datelessArtists;
     };
 
     queryContributionInfo(
       'artistsByTrackContributions',
+      'albumsByTrackContributions',
       'datesByTrackContributions',
       'datelessArtistsByTrackContributions',
       artist => [
-        ...artist.tracksAsContributor.map(track => +track.date),
-        ...artist.tracksAsArtist.map(track => +track.date),
+        [
+          ...artist.tracksAsArtist.map(track => track.album),
+          ...artist.tracksAsContributor.map(track => track.album),
+        ],
+        [
+          ...artist.tracksAsArtist.map(track => track.date),
+          ...artist.tracksAsContributor.map(track => track.date),
+        ],
       ]);
 
     queryContributionInfo(
       'artistsByArtworkContributions',
+      'albumsByArtworkContributions',
       'datesByArtworkContributions',
       'datelessArtistsByArtworkContributions',
       artist => [
-        // TODO: Per-artwork dates, see #90.
-        ...artist.tracksAsCoverArtist.map(track => +track.coverArtDate),
-        ...artist.albumsAsCoverArtist.map(album => +album.coverArtDate),
-        ...artist.albumsAsWallpaperArtist.map(album => +album.coverArtDate),
-        ...artist.albumsAsBannerArtist.map(album => +album.coverArtDate),
+        [
+          ...artist.tracksAsCoverArtist.map(track => track.album),
+          ...artist.albumsAsCoverArtist,
+          ...artist.albumsAsWallpaperArtist,
+          ...artist.albumsAsBannerArtist,
+        ],
+        [
+          // TODO: Per-artwork dates, see #90.
+          ...artist.tracksAsCoverArtist.map(track => track.coverArtDate),
+          ...artist.albumsAsCoverArtist.map(album => album.coverArtDate),
+          ...artist.albumsAsWallpaperArtist.map(album => album.coverArtDate),
+          ...artist.albumsAsBannerArtist.map(album => album.coverArtDate),
+        ],
       ]);
 
     if (sprawl.enableFlashesAndGames) {
       queryContributionInfo(
         'artistsByFlashContributions',
+        'flashesByFlashContributions',
         'datesByFlashContributions',
         'datelessArtistsByFlashContributions',
         artist => [
-          ...artist.flashesAsContributor.map(flash => +flash.date),
+          [
+            ...artist.flashesAsContributor,
+          ],
+          [
+            ...artist.flashesAsContributor.map(flash => flash.date),
+          ],
         ]);
     }
 
@@ -97,26 +175,47 @@ export default {
     relations.page =
       relation('generateListingPage', query.spec);
 
+    // Track contributors
+
+    relations.albumLinksByTrackContributions =
+      query.albumsByTrackContributions
+        .map(album => relation('linkAlbum', album));
+
     relations.artistLinksByTrackContributions =
       query.artistsByTrackContributions
-        .map(artist => relation('linkArtist', artist));
+        .map(artists =>
+          artists.map(artist => relation('linkArtist', artist)));
 
     relations.datelessArtistLinksByTrackContributions =
       query.datelessArtistsByTrackContributions
         .map(artist => relation('linkArtist', artist));
 
+    // Artwork contributors
+
+    relations.albumLinksByArtworkContributions =
+      query.albumsByArtworkContributions
+        .map(album => relation('linkAlbum', album));
+
     relations.artistLinksByArtworkContributions =
       query.artistsByArtworkContributions
-        .map(artist => relation('linkArtist', artist));
+        .map(artists =>
+          artists.map(artist => relation('linkArtist', artist)));
 
     relations.datelessArtistLinksByArtworkContributions =
       query.datelessArtistsByArtworkContributions
         .map(artist => relation('linkArtist', artist));
 
+    // Flash contributors
+
     if (query.enableFlashesAndGames) {
+      relations.flashLinksByFlashContributions =
+        query.flashesByFlashContributions
+          .map(flash => relation('linkFlash', flash));
+
       relations.artistLinksByFlashContributions =
         query.artistsByFlashContributions
-          .map(artist => relation('linkArtist', artist));
+          .map(artists =>
+            artists.map(artist => relation('linkArtist', artist)));
 
       relations.datelessArtistLinksByFlashContributions =
         query.datelessArtistsByFlashContributions
@@ -142,40 +241,86 @@ export default {
   },
 
   generate(data, relations, {html, language}) {
-    const lists = Object.fromEntries(
+    const chunkTitles = Object.fromEntries(
       ([
         ['tracks', [
-          relations.artistLinksByTrackContributions,
-          relations.datelessArtistLinksByTrackContributions,
+          'album',
+          relations.albumLinksByTrackContributions,
           data.datesByTrackContributions,
         ]],
 
         ['artworks', [
-          relations.artistLinksByArtworkContributions,
-          relations.datelessArtistLinksByArtworkContributions,
+          'album',
+          relations.albumLinksByArtworkContributions,
           data.datesByArtworkContributions,
         ]],
 
         data.enableFlashesAndGames &&
           ['flashes', [
-            relations.artistLinksByFlashContributions,
-            relations.datelessArtistLinksByFlashContributions,
+            'flash',
+            relations.flashLinksByFlashContributions,
             data.datesByFlashContributions,
           ]],
       ]).filter(Boolean)
-        .map(([key, [artistLinks, datelessArtistLinks, dates]]) => [
+        .map(([key, [stringsKey, links, dates]]) => [
+          key,
+          stitchArrays({link: links, date: dates})
+            .map(({link, date}) =>
+              html.tag('dt',
+                language.$(`listingPage.listArtists.byLatest.chunk.title.${stringsKey}`, {
+                  [stringsKey]: link,
+                  date: language.formatDate(date),
+                }))),
+        ]));
+
+    const chunkItems = Object.fromEntries(
+      ([
+        ['tracks', relations.artistLinksByTrackContributions],
+        ['artworks', relations.artistLinksByArtworkContributions],
+        data.enableFlashesAndGames &&
+          ['flashes', relations.artistLinksByFlashContributions],
+      ]).filter(Boolean)
+        .map(([key, artistLinkLists]) => [
+          key,
+          artistLinkLists.map(artistLinks =>
+            html.tag('dd',
+              html.tag('ul',
+                artistLinks.map(artistLink =>
+                  html.tag('li',
+                    language.$('listingPage.listArtists.byLatest.chunk.item', {
+                      artist: artistLink,
+                    })))))),
+        ]));
+
+    const lists = Object.fromEntries(
+      ([
+        ['tracks', [
+          chunkTitles.tracks,
+          chunkItems.tracks,
+          relations.datelessArtistLinksByTrackContributions,
+        ]],
+
+        ['artworks', [
+          chunkTitles.artworks,
+          chunkItems.artworks,
+          relations.datelessArtistLinksByArtworkContributions,
+        ]],
+
+        data.enableFlashesAndGames &&
+          ['flashes', [
+            chunkTitles.flashes,
+            chunkItems.flashes,
+            relations.datelessArtistLinksByFlashContributions,
+          ]],
+      ]).filter(Boolean)
+        .map(([key, [titles, items, datelessArtistLinks]]) => [
           key,
           html.tags([
-            html.tag('ul',
+            html.tag('dl',
               stitchArrays({
-                artistLink: artistLinks,
-                date: dates,
-              }).map(({artistLink, date}) =>
-                  html.tag('li',
-                    language.$('listingPage.listArtists.byLatest.item', {
-                      artist: artistLink,
-                      date: language.formatDate(date),
-                    })))),
+                title: titles,
+                items: items,
+              }).map(({title, items}) => [title, items])),
 
             !empty(datelessArtistLinks) && [
               html.tag('p',
