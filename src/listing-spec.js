@@ -89,28 +89,14 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-name',
   stringsKey: 'listGroups.byName',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
-
-  data: ({wikiData: {groupData}}) =>
-    sortAlphabetically(groupData.slice()),
-
-  row: (group, {language, link}) =>
-    language.$('listingPage.listGroups.byCategory.group', {
-      group: link.groupInfo(group),
-      gallery: link.groupGallery(group, {
-        text: language.$('listingPage.listGroups.byCategory.group.gallery'),
-      }),
-    }),
+  contentFunction: 'listGroupsByName',
+  featureFlag: 'enableGroupUI',
 });
 
 listingSpec.push({
   directory: 'groups/by-category',
   stringsKey: 'listGroups.byCategory',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
+  featureFlag: 'enableGroupUI',
 
   data: ({wikiData: {groupCategoryData}}) =>
     groupCategoryData
@@ -150,9 +136,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-albums',
   stringsKey: 'listGroups.byAlbums',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
+  featureFlag: 'enableGroupUI',
 
   data: ({wikiData: {groupData}}) =>
     groupData
@@ -172,9 +156,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-tracks',
   stringsKey: 'listGroups.byTracks',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
+  featureFlag: 'enableGroupUI',
 
   data: ({wikiData: {groupData}}) =>
     groupData
@@ -196,9 +178,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-duration',
   stringsKey: 'listGroups.byDuration',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
+  featureFlag: 'enableGroupUI',
 
   data: ({wikiData: {groupData}}) =>
     groupData
@@ -221,9 +201,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-latest-album',
   stringsKey: 'listGroups.byLatest',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableGroupUI,
+  featureFlag: 'enableGroupUI',
 
   data: ({wikiData: {groupData}}) =>
     sortChronologically(
@@ -403,9 +381,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'tracks/in-flashes/by-album',
   stringsKey: 'listTracks.inFlashes.byAlbum',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableFlashesAndGames,
+  featureFlag: 'enableFlashesAndGames',
 
   data: ({wikiData: {trackData}}) =>
     chunkByProperties(
@@ -437,9 +413,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'tracks/in-flashes/by-flash',
   stringsKey: 'listTracks.inFlashes.byFlash',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableFlashesAndGames,
+  featureFlag: 'enableFlashesAndGames',
 
   data: ({wikiData: {flashData}}) =>
     sortFlashesChronologically(flashData.slice())
@@ -538,9 +512,7 @@ listingSpec.push(listTracksWithProperty('midiProjectFiles', {
 listingSpec.push({
   directory: 'tags/by-name',
   stringsKey: 'listTags.byName',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableArtTagUI,
+  featureFlag: 'enableArtTagUI',
 
   data: ({wikiData: {artTagData}}) =>
     sortAlphabetically(
@@ -565,9 +537,7 @@ listingSpec.push({
 listingSpec.push({
   directory: 'tags/by-uses',
   stringsKey: 'listTags.byUses',
-
-  condition: ({wikiData: {wikiInfo}}) =>
-    wikiInfo.enableArtTagUI,
+  featureFlag: 'enableArtTagUI',
 
   data: ({wikiData: {artTagData}}) =>
     artTagData

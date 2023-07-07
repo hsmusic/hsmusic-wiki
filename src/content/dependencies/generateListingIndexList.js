@@ -14,9 +14,10 @@ export default {
     const targetListings =
       sprawl.listingTargetSpec
         .map(({listings}) =>
-          listings.filter(({condition: c}) =>
-            !c ||
-            c({wikiData: {wikiInfo: sprawl.wikiInfo}})));
+          listings
+            .filter(listing =>
+              !listing.featureFlag ||
+              sprawl.wikiInfo[listing.featureFlag]));
 
     query.wikiColor = sprawl.wikiInfo.color;
 

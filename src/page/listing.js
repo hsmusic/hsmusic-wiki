@@ -17,7 +17,10 @@ export const description = `wiki-wide listing pages & index`;
 export function targets({wikiData}) {
   return (
     wikiData.listingSpec
-      .filter(listing => listing.contentFunction));
+      .filter(listing => listing.contentFunction)
+      .filter(listing =>
+        !listing.featureFlag ||
+        wikiData.wikiInfo[listing.featureFlag]));
 }
 
 export function pathsForTarget(listing) {
