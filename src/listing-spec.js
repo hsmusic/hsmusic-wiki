@@ -96,41 +96,8 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-category',
   stringsKey: 'listGroups.byCategory',
+  contentFunction: 'listGroupsByCategory',
   featureFlag: 'enableGroupUI',
-
-  data: ({wikiData: {groupCategoryData}}) =>
-    groupCategoryData
-      .map(category => ({
-        category,
-        groups: category.groups,
-      })),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({category, groups}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listGroups.byCategory.category', {
-            category: empty(groups)
-              ? category.name
-              : link.groupInfo(groups[0], {
-                  text: category.name,
-                }),
-          })),
-
-        html.tag('dd',
-          empty(groups)
-            ? null // todo: #85
-            : html.tag('ul',
-                category.groups.map(group =>
-                  html.tag('li',
-                    language.$('listingPage.listGroups.byCategory.group', {
-                      group: link.groupInfo(group),
-                      gallery: link.groupGallery(group, {
-                        text: language.$('listingPage.listGroups.byCategory.group.gallery'),
-                      }),
-                    }))))),
-      ])),
 });
 
 listingSpec.push({
