@@ -103,66 +103,22 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-albums',
   stringsKey: 'listGroups.byAlbums',
+  contentFunction: 'listGroupsByAlbums',
   featureFlag: 'enableGroupUI',
-
-  data: ({wikiData: {groupData}}) =>
-    groupData
-      .map(group => ({
-        group,
-        albums: group.albums.length
-      }))
-      .sort((a, b) => b.albums - a.albums),
-
-  row: ({group, albums}, {language, link}) =>
-    language.$('listingPage.listGroups.byAlbums.item', {
-      group: link.groupInfo(group),
-      albums: language.countAlbums(albums, {unit: true}),
-    }),
 });
 
 listingSpec.push({
   directory: 'groups/by-tracks',
   stringsKey: 'listGroups.byTracks',
+  contentFunction: 'listGroupsByTracks',
   featureFlag: 'enableGroupUI',
-
-  data: ({wikiData: {groupData}}) =>
-    groupData
-      .map((group) => ({
-        group,
-        tracks: accumulateSum(
-          group.albums,
-          ({tracks}) => tracks.length),
-      }))
-      .sort((a, b) => b.tracks - a.tracks),
-
-  row: ({group, tracks}, {language, link}) =>
-    language.$('listingPage.listGroups.byTracks.item', {
-      group: link.groupInfo(group),
-      tracks: language.countTracks(tracks, {unit: true}),
-    }),
 });
 
 listingSpec.push({
   directory: 'groups/by-duration',
   stringsKey: 'listGroups.byDuration',
+  contentFunction: 'listGroupsByDuration',
   featureFlag: 'enableGroupUI',
-
-  data: ({wikiData: {groupData}}) =>
-    groupData
-      .map(group => ({
-        group,
-        duration: getTotalDuration(
-          group.albums.flatMap(album => album.tracks),
-          {originalReleasesOnly: true}),
-      }))
-      .filter(({duration}) => duration > 0)
-      .sort((a, b) => b.duration - a.duration),
-
-  row: ({group, duration}, {language, link}) =>
-    language.$('listingPage.listGroups.byDuration.item', {
-      group: link.groupInfo(group),
-      duration: language.formatDuration(duration),
-    }),
 });
 
 listingSpec.push({
