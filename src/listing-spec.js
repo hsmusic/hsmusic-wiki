@@ -124,28 +124,8 @@ listingSpec.push({
 listingSpec.push({
   directory: 'groups/by-latest-album',
   stringsKey: 'listGroups.byLatest',
+  contentFunction: 'listGroupsByLatestAlbum',
   featureFlag: 'enableGroupUI',
-
-  data: ({wikiData: {groupData}}) =>
-    sortChronologically(
-      groupData
-        .map(group => {
-          const albums = group.albums.filter(a => a.date);
-          return !empty(albums) && {
-            group,
-            directory: group.directory,
-            name: group.name,
-            date: albums[albums.length - 1].date,
-          };
-        })
-        .filter(Boolean),
-      {latestFirst: true}),
-
-  row: ({group, date}, {language, link}) =>
-    language.$('listingPage.listGroups.byLatest.item', {
-      group: link.groupInfo(group),
-      date: language.formatDate(date),
-    }),
 });
 
 listingSpec.push({
