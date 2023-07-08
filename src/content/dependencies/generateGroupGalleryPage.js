@@ -85,7 +85,7 @@ export default {
       albums.map(album =>
         (album.hasCoverArt
           ? relation('image', album.artTags)
-          : relation('iamge')));
+          : relation('image')));
 
     return relations;
   },
