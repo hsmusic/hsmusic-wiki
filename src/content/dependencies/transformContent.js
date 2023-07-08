@@ -270,10 +270,13 @@ export default {
 
           // Compress multiple line breaks into single line breaks.
           .replace(/\n{2,}/g, '\n')
-          // Expand line breaks which don't follow a list.
-          .replace(/(?<!^ *-.*)\n+/gm, '\n\n')
+          // Expand line breaks which don't follow a list, quote,
+          // or <br> / "  ".
+          .replace(/(?<!^ *-.*|^>.*|  $|<br>$)\n+/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
           // Expand line breaks which are at the end of a list.
-          .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n');
+          .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n')
+          // Expand line breaks which are at the end of a quote.
+          .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
       return marked.parse(markedInput, markedOptions);
     }
