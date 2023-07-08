@@ -9,7 +9,7 @@ export default function groupTracksByGroup(tracks, groups) {
     if (group) {
       lists.get(group).push(track);
     } else {
-      other.get('other').push(track);
+      lists.get('other').push(track);
     }
   }
 
