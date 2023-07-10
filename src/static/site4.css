@@ -647,10 +647,27 @@ p code {
   font-weight: 800;
 }
 
-blockquote {
+#content blockquote {
   margin-left: 40px;
   max-width: 600px;
   margin-right: 0;
+}
+
+#content blockquote blockquote {
+  margin-left: 10px;
+  padding-left: 10px;
+  margin-right: 20px;
+  border-left: dotted 1px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+#content blockquote blockquote > :first-child {
+  margin-top: 0;
+}
+
+#content blockquote blockquote > :last-child {
+  margin-bottom: 0;
 }
 
 main.long-content .main-content-container,
