@@ -552,7 +552,7 @@ function unbound_iconifyURL(url, {
     html.tag('svg', [
       html.tag('title', msg),
       html.tag('use', {
-        href: to('shared.staticFile', `icons.svg#icon-${id}`),
+        href: to('shared.staticIcon', id),
       }),
     ]));
 }

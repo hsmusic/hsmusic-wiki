@@ -60,7 +60,9 @@ const urlSpec = {
       staticRoot: 'static',
 
       utilityFile: 'util/<>',
-      staticFile: 'static/<>',
+      staticFile: 'static/<>?<>',
+
+      staticIcon: 'static/icons.svg#icon-<>',
     },
   },
 

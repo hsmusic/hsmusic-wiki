@@ -665,7 +665,7 @@ export function generateDocumentHTML(pageInfo, {
 
         html.tag('link', {
           rel: 'stylesheet',
-          href: to('shared.staticFile', `site3.css?${cachebust}`),
+          href: to('shared.staticFile', 'site3.css', cachebust),
         }),
 
         html.tag('style',
@@ -676,7 +676,7 @@ export function generateDocumentHTML(pageInfo, {
           ]),
 
         html.tag('script', {
-          src: to('shared.staticFile', `lazy-loading.js?${cachebust}`),
+          src: to('shared.staticFile', 'lazy-loading.js', cachebust),
         }),
       ]),
 
@@ -694,7 +694,7 @@ export function generateDocumentHTML(pageInfo, {
 
           html.tag('script', {
             type: 'module',
-            src: to('shared.staticFile', `client.js?${cachebust}`),
+            src: to('shared.staticFile', 'client.js', cachebust),
           }),
         ]),
     ]);

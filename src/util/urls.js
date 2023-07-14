@@ -79,16 +79,23 @@ export function generateURLs(urlSpec) {
     );
 
     const toHelper =
-      (delimiterMode) =>
+      ({device}) =>
       (key, ...args) => {
         const {
-          value: {[delimiterMode]: template},
+          value: {
+            [device ? 'device' : 'posix']: template,
+          },
         } = getValueForFullKey(relative, key);
 
         let missing = 0;
         let result = template.replaceAll(/<([0-9]+)>/g, (match, n) => {
           if (n < args.length) {
-            return args[n];
+            const value = args[n];
+            if (device) {
+              return value;
+            } else {
+              return encodeURIComponent(value);
+            }
           } else {
             missing++;
           }
@@ -106,8 +113,8 @@ export function generateURLs(urlSpec) {
       };
 
     return {
-      to: toHelper('posix'),
-      toDevice: toHelper('device'),
+      to: toHelper({device: false}),
+      toDevice: toHelper({device: true}),
     };
   };
 
