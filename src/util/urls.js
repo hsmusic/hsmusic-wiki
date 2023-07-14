@@ -94,7 +94,9 @@ export function generateURLs(urlSpec) {
             if (device) {
               return value;
             } else {
-              return encodeURIComponent(value);
+              let encoded = encodeURIComponent(value);
+              encoded = encoded.replaceAll('%2F', '/');
+              return encoded;
             }
           } else {
             missing++;
