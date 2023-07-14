@@ -509,7 +509,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', `site4.css?${cachebust}`),
+              href: to('shared.staticFile', 'site4.css', cachebust),
             }),
 
             html.tag('style', [
@@ -520,7 +520,7 @@ export default {
             ]),
 
             html.tag('script', {
-              src: to('shared.staticFile', `lazy-loading.js?${cachebust}`),
+              src: to('shared.staticFile', 'lazy-loading.js', cachebust),
             }),
           ]),
 
@@ -537,7 +537,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('shared.staticFile', `client.js?${cachebust}`),
+                src: to('shared.staticFile', 'client.js', cachebust),
               }),
             ]),
         ])
