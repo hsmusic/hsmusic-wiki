@@ -195,8 +195,18 @@ export function validateArrayItems(itemValidator) {
   };
 }
 
-export function arrayOf(itemValidator) {
+export function strictArrayOf(itemValidator) {
   return validateArrayItems(itemValidator);
+}
+
+export function sparseArrayOf(itemValidator) {
+  return validateArrayItems(item => {
+    if (item === false || item === null) {
+      return true;
+    }
+
+    return itemValidator(item);
+  });
 }
 
 export function validateInstanceOf(constructor) {

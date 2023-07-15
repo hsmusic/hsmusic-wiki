@@ -10,7 +10,7 @@ function sidebarSlots(side) {
     // will generate one sidebar section.
     [side + 'Multiple']: {
       validate: v =>
-        v.arrayOf(
+        v.sparseArrayOf(
           v.validateProperties({
             content: v.isHTML,
           })),
@@ -100,17 +100,17 @@ export default {
     socialEmbed: {type: 'html'},
 
     colorStyleRules: {
-      validate: v => v.arrayOf(v.isString),
+      validate: v => v.sparseArrayOf(v.isString),
       default: [],
     },
 
     additionalStyleRules: {
-      validate: v => v.arrayOf(v.isString),
+      validate: v => v.sparseArrayOf(v.isString),
       default: [],
     },
 
     mainClasses: {
-      validate: v => v.arrayOf(v.isString),
+      validate: v => v.sparseArrayOf(v.isString),
       default: [],
     },
 
@@ -148,7 +148,7 @@ export default {
 
     navLinks: {
       validate: v =>
-        v.arrayOf(object => {
+        v.sparseArrayOf(object => {
           v.isObject(object);
 
           const aggregate = openAggregate({message: `Errors validating navigation link`});
@@ -176,7 +176,7 @@ export default {
             }
           } else {
             aggregate.call(v.validateProperties({
-              path: v.arrayOf(v.isString),
+              path: v.strictArrayOf(v.isString),
               title: v.isString,
             }), {
               path: object.path,
@@ -275,58 +275,60 @@ export default {
               'nav-links-' + slots.navLinkStyle,
             ],
           },
-          slots.navLinks?.map((cur, i) => {
-            let content;
+          slots.navLinks
+            ?.filter(Boolean)
+            ?.map((cur, i) => {
+              let content;
 
-            if (cur.html) {
-              content = cur.html;
-            } else {
-              let title;
-              let href;
+              if (cur.html) {
+                content = cur.html;
+              } else {
+                let title;
+                let href;
 
-              switch (cur.auto) {
-                case 'home':
-                  title = data.wikiName;
-                  href = to('localized.home');
-                  break;
-                case 'current':
-                  title = slots.title;
-                  href = '';
-                  break;
-                case null:
-                case undefined:
-                  title = cur.title;
-                  href = to(...cur.path);
-                  break;
+                switch (cur.auto) {
+                  case 'home':
+                    title = data.wikiName;
+                    href = to('localized.home');
+                    break;
+                  case 'current':
+                    title = slots.title;
+                    href = '';
+                    break;
+                  case null:
+                  case undefined:
+                    title = cur.title;
+                    href = to(...cur.path);
+                    break;
+                }
+
+                content = html.tag('a',
+                  {href},
+                  title);
               }
 
-              content = html.tag('a',
-                {href},
-                title);
-            }
+              let className;
 
-            let className;
+              if (cur.auto === 'current') {
+                className = 'current';
+              } else if (
+                slots.navLinkStyle === 'hierarchical' &&
+                i === slots.navLinks.length - 1
+              ) {
+                className = 'current';
+              }
 
-            if (cur.auto === 'current') {
-              className = 'current';
-            } else if (
-              slots.navLinkStyle === 'hierarchical' &&
-              i === slots.navLinks.length - 1
-            ) {
-              className = 'current';
-            }
-
-            return html.tag('span',
-              {class: className},
-              [
-                html.tag('span',
-                  {class: 'nav-link-content'},
-                  content),
-                html.tag('span',
-                  {[html.onlyIfContent]: true, class: 'nav-link-accent'},
-                  cur.accent),
-              ]);
-          })),
+              return html.tag('span',
+                {class: className},
+                [
+                  html.tag('span',
+                    {class: 'nav-link-content'},
+                    content),
+                  html.tag('span',
+                    {[html.onlyIfContent]: true, class: 'nav-link-accent'},
+                    cur.accent),
+                ]);
+            })),
 
         html.tag('div',
           {[html.onlyIfContent]: true, class: 'nav-bottom-row'},

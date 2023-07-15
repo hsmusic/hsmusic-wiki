@@ -5,7 +5,7 @@ export default {
     content: {type: 'html'},
 
     class: {
-      validate: v => v.oneOf(v.isString, v.arrayOf(v.isString)),
+      validate: v => v.oneOf(v.isString, v.sparseArrayOf(v.isString)),
     },
   },
 

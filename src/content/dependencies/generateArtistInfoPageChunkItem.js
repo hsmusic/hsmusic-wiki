@@ -4,7 +4,7 @@ export default {
   slots: {
     content: {type: 'html'},
 
-    otherArtistLinks: {validate: v => v.arrayOf(v.isHTML)},
+    otherArtistLinks: {validate: v => v.strictArrayOf(v.isHTML)},
     contribution: {type: 'string'},
     rerelease: {type: 'boolean'},
   },

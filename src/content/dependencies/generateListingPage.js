@@ -60,10 +60,10 @@ export default {
   slots: {
     type: {validate: v => v.is('rows', 'chunks', 'custom')},
 
-    rows: {validate: v => v.arrayOf(v.isObject)},
+    rows: {validate: v => v.strictArrayOf(v.isObject)},
 
-    chunkTitles: {validate: v => v.arrayOf(v.isObject)},
-    chunkRows: {validate: v => v.arrayOf(v.isObject)},
+    chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
+    chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
 
     content: {type: 'html'},
   },

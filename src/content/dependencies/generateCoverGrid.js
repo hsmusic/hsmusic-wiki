@@ -4,10 +4,10 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
-    images: {validate: v => v.arrayOf(v.isHTML)},
-    links: {validate: v => v.arrayOf(v.isHTML)},
-    names: {validate: v => v.arrayOf(v.isHTML)},
-    info: {validate: v => v.arrayOf(v.isHTML)},
+    images: {validate: v => v.strictArrayOf(v.isHTML)},
+    links: {validate: v => v.strictArrayOf(v.isHTML)},
+    names: {validate: v => v.strictArrayOf(v.isHTML)},
+    info: {validate: v => v.strictArrayOf(v.isHTML)},
 
     lazy: {validate: v => v.oneOf(v.isWholeNumber, v.isBoolean)},
   },

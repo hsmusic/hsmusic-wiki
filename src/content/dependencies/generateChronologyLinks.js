@@ -6,10 +6,10 @@ export default {
   slots: {
     chronologyInfoSets: {
       validate: v =>
-        v.arrayOf(
+        v.strictArrayOf(
           v.validateProperties({
             headingString: v.isString,
-            contributions: v.arrayOf(v.validateProperties({
+            contributions: v.strictArrayOf(v.validateProperties({
               index: v.isCountingNumber,
               artistLink: v.isHTML,
               previousLink: v.isHTML,
