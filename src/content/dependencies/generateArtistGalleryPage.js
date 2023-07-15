@@ -1,13 +1,6 @@
 import {stitchArrays} from '../../util/sugar.js';
 import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
 
-// TODO: Very awkward we have to duplicate this functionality in relations and data.
-function getGalleryThings(artist) {
-  const galleryThings = [...artist.albumsAsCoverArtist, ...artist.tracksAsCoverArtist];
-  sortAlbumsTracksChronologically(galleryThings, {latestFirst: true});
-  return galleryThings;
-}
-
 export default {
   contentDependencies: [
     'generateArtistNavLinks',
@@ -20,7 +13,13 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, artist) {
+  query(artist) {
+    const things = [...artist.albumsAsCoverArtist, ...artist.tracksAsCoverArtist];
+    sortAlbumsTracksChronologically(things, {latestFirst: true});
+    return {things};
+  },
+
+  relations(relation, query, artist) {
     const relations = {};
 
     relations.layout =
@@ -32,35 +31,31 @@ export default {
     relations.coverGrid =
       relation('generateCoverGrid');
 
-    const galleryThings = getGalleryThings(artist);
-
     relations.links =
-      galleryThings.map(thing =>
+      query.things.map(thing =>
         (thing.album
           ? relation('linkTrack', thing)
           : relation('linkAlbum', thing)));
 
     relations.images =
-      galleryThings.map(thing =>
+      query.things.map(thing =>
         relation('image', thing.artTags));
 
     return relations;
   },
 
-  data(artist) {
+  data(query, artist) {
     const data = {};
 
     data.name = artist.name;
 
-    const galleryThings = getGalleryThings(artist);
-
-    data.numArtworks = galleryThings.length;
+    data.numArtworks = query.things.length;
 
     data.names =
-      galleryThings.map(thing => thing.name);
+      query.things.map(thing => thing.name);
 
     data.paths =
-      galleryThings.map(thing =>
+      query.things.map(thing =>
         (thing.album
           ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
           : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
