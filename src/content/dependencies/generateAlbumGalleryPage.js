@@ -1,8 +1,9 @@
-import {stitchArrays} from '../../util/sugar.js';
+import {compareArrays, stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
-    'generateAlbumGalleryInfoLine',
+    'generateAlbumGalleryCoverArtistsLine',
+    'generateAlbumGalleryStatsLine',
     'generateAlbumNavAccent',
     'generateAlbumStyleRules',
     'generateColorStyleRules',
@@ -15,7 +16,36 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album) {
+  query(album) {
+    const query = {};
+
+    const tracksWithUniqueCoverArt =
+      album.tracks
+        .filter(track => track.hasUniqueCoverArt);
+
+    // Don't display "all artwork by..." for albums where there's
+    // only one unique artwork in the first place.
+    if (tracksWithUniqueCoverArt.length > 1) {
+      const allCoverArtistArrays =
+        tracksWithUniqueCoverArt
+          .map(track => track.coverArtistContribs)
+          .map(contribs => contribs.map(contrib => contrib.who));
+
+      const allSameCoverArtists =
+        allCoverArtistArrays
+          .slice(1)
+          .every(artists => compareArrays(artists, allCoverArtistArrays[0]));
+
+      if (allSameCoverArtists) {
+        query.coverArtistsForAllTracks =
+          allCoverArtistArrays[0];
+      }
+    }
+
+    return query;
+  },
+
+  relations(relation, query, album) {
     const relations = {};
 
     relations.layout =
@@ -33,8 +63,13 @@ export default {
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
 
-    relations.infoLine =
-      relation('generateAlbumGalleryInfoLine', album);
+    relations.statsLine =
+      relation('generateAlbumGalleryStatsLine', album);
+
+    if (query.coverArtistsForAllTracks) {
+      relations.coverArtistsLine =
+        relation('generateAlbumGalleryCoverArtistsLine', query.coverArtistsForAllTracks);
+    }
 
     relations.coverGrid =
       relation('generateCoverGrid');
@@ -52,7 +87,7 @@ export default {
     return relations;
   },
 
-  data(album) {
+  data(query, album) {
     const data = {};
 
     data.name = album.name;
@@ -61,10 +96,17 @@ export default {
       album.tracks.map(track => track.name);
 
     data.coverArtists =
-      album.tracks.map(track =>
-        (track.hasUniqueCoverArt
-          ? track.coverArtistContribs.map(({who: artist}) => artist.name)
-          : null));
+      album.tracks.map(track => {
+        if (query.coverArtistsForAllTracks) {
+          return null;
+        }
+
+        if (track.hasUniqueCoverArt) {
+          return track.coverArtistContribs.map(({who: artist}) => artist.name);
+        }
+
+        return null;
+      });
 
     data.paths =
       album.tracks.map(track =>
@@ -90,7 +132,8 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          relations.infoLine,
+          relations.statsLine,
+          relations.coverArtistsLine,
 
           relations.coverGrid
             .slots({

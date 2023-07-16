@@ -13,7 +13,7 @@ export default {
   },
 
   generate(data, {html, language}) {
-    const parts = ['albumGalleryPage.infoLine'];
+    const parts = ['albumGalleryPage.statsLine'];
     const options = {};
 
     options.tracks =
