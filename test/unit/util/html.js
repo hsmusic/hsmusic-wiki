@@ -831,20 +831,26 @@ t.test(`Template - slot value errors`, t => {
 
   const template2 = html.template({
     slots: {
-      arrayOfStrings: {
-        validate: v => v.arrayOf(v.isString),
+      strictArrayOfStrings: {
+        validate: v => v.strictArrayOf(v.isString),
         default: `Array Of Strings Fallback`.split(' '),
       },
 
+      sparseArrayOfStrings: {
+        validate: v => v.sparseArrayOf(v.isString),
+        default: ['sparse', null, false, 'strings'],
+      },
+
       arrayOfHTML: {
-        validate: v => v.arrayOf(v.isHTML),
+        validate: v => v.strictArrayOf(v.isHTML),
         default: [],
       },
     },
 
     content: slots =>
       html.tag('p', [
-        html.tag('strong', slots.arrayOfStrings),
+        html.tag('strong', slots.strictArrayOfStrings),
+        `sparseArrayOfStrings length: ${slots.sparseArrayOfStrings.length}`,
         `arrayOfHTML length: ${slots.arrayOfHTML.length}`,
       ]),
   });
@@ -853,7 +859,8 @@ t.test(`Template - slot value errors`, t => {
 
   strictlyThrows(t,
     () => template2.setSlots({
-      arrayOfStrings: ['you got it', 'pingas', 0xdeadbeef],
+      strictArrayOfStrings: ['you got it', 'pingas', 0xdeadbeef],
+      sparseArrayOfStrings: ['you got it', null, false, 'pingas'],
       arrayOfHTML: [
         html.tag('span'),
         html.template({content: () => 'dog'}),
@@ -870,7 +877,7 @@ t.test(`Template - slot value errors`, t => {
     new AggregateError([
       {
         name: 'AggregateError',
-        message: /^\(arrayOfStrings\)/,
+        message: /^\(strictArrayOfStrings\)/,
         errors: {length: 1},
       },
     ], `Error validating template slots`));
@@ -886,6 +893,7 @@ t.test(`Template - slot value errors`, t => {
         `Strings`,
         `Fallback`,
       ]),
+      `sparseArrayOfStrings length: 4`,
       `arrayOfHTML length: 0`,
     ]).toString());
 });
