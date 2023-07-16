@@ -29,7 +29,9 @@ export default {
     let style;
     let title;
 
-    if (!href && !empty(slots.path)) {
+    if (href) {
+      href = encodeURI(href);
+    } else if (!empty(slots.path)) {
       href = to(...slots.path);
     }
 
