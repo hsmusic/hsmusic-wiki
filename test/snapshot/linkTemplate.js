@@ -32,4 +32,15 @@ testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
       path: ['myCoolPath', 'ham', 'pineapple', 'tomato'],
     },
   });
+
+  evaluate.snapshot('special characters in path argument', {
+    name: 'linkTemplate',
+    slots: {
+      path: [
+        'media.albumAdditionalFile',
+        'homestuck-vol-1',
+        'Showtime (Piano Refrain) - #xXxAwesomeSheetMusick?rxXx#.pdf',
+      ],
+    },
+  });
 });

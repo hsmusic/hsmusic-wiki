@@ -12,3 +12,7 @@ exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > fill many s
 exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > fill path slot & provide appendIndexHTML 1`] = `
 <a href="/c*lzone/myCoolPath/ham/pineapple/tomato/index.html"></a>
 `
+
+exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > special characters in path argument 1`] = `
+<a href="media/album-additional/homestuck-vol-1/Showtime%20(Piano%20Refrain)%20-%20%23xXxAwesomeSheetMusick%3FrxXx%23.pdf"></a>
+`
