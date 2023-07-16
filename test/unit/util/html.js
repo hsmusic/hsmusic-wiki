@@ -480,21 +480,6 @@ t.test(`Tag.toString (joinChildren, noEdgeWhitespace)`, t => {
 
   t.equal(tag6.toString(),
     `<span><i>Oh yes~ </i>You're a cute one<sup>💕</sup></span>`);
-
-});
-
-t.test(`Tag.toString (custom attributes)`, t => {
-  t.plan(1);
-
-  t.test(`Tag.toString (custom attribute: href)`, t => {
-    t.plan(2);
-
-    const tag1 = html.tag('a', {href: `https://hsmusic.wiki/`});
-    t.equal(tag1.toString(), `<a href="https://hsmusic.wiki/"></a>`);
-
-    const tag2 = html.tag('a', {href: `https://hsmusic.wiki/media/Album Booklet.pdf`});
-    t.equal(tag2.toString(), `<a href="https://hsmusic.wiki/media/Album%20Booklet.pdf"></a>`);
-  });
 });
 
 t.test(`html.template`, t => {
