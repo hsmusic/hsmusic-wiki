@@ -27,7 +27,7 @@ export default {
 
       artistLinks:
         query.artists
-          .map(album => relation('linkArtist', album)),
+          .map(artist => relation('linkArtist', artist)),
     };
   },
 

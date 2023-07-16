@@ -415,47 +415,15 @@ listingSpec.push(listTracksWithProperty('midiProjectFiles', {
 listingSpec.push({
   directory: 'tags/by-name',
   stringsKey: 'listTags.byName',
+  contentFunction: 'listTagsByName',
   featureFlag: 'enableArtTagUI',
-
-  data: ({wikiData: {artTagData}}) =>
-    sortAlphabetically(
-      artTagData
-        .filter(tag => !tag.isContentWarning)
-        .map(tag => ({
-          tag,
-          timesUsed: tag.taggedInThings.length,
-
-          // For sortAlphabetically!
-          directory: tag.directory,
-          name: tag.name,
-        }))),
-
-  row: ({tag, timesUsed}, {language, link}) =>
-    language.$('listingPage.listTags.byName.item', {
-      tag: link.tag(tag),
-      timesUsed: language.countTimesUsed(timesUsed, {unit: true}),
-    }),
 });
 
 listingSpec.push({
   directory: 'tags/by-uses',
   stringsKey: 'listTags.byUses',
+  contentFunction: 'listTagsByUses',
   featureFlag: 'enableArtTagUI',
-
-  data: ({wikiData: {artTagData}}) =>
-    artTagData
-      .filter(tag => !tag.isContentWarning)
-      .map(tag => ({
-        tag,
-        timesUsed: tag.taggedInThings.length
-      }))
-      .sort((a, b) => b.timesUsed - a.timesUsed),
-
-  row: ({tag, timesUsed}, {language, link}) =>
-    language.$('listingPage.listTags.byUses.item', {
-      tag: link.tag(tag),
-      timesUsed: language.countTimesUsed(timesUsed, {unit: true}),
-    }),
 });
 
 function listAdditionalFilesInProperty(property, {
