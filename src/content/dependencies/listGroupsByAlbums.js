@@ -1,5 +1,9 @@
 import {stitchArrays} from '../../util/sugar.js';
-import {filterByCount, sortByCount} from '../../util/wiki-data.js';
+import {
+  filterByCount,
+  sortAlphabetically,
+  sortByCount,
+} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkGroup'],
@@ -10,7 +14,7 @@ export default {
   },
 
   query({groupData}, spec) {
-    const groups = groupData.slice();
+    const groups = sortAlphabetically(groupData.slice());
     const counts = groups.map(group => group.albums.length);
 
     filterByCount(groups, counts);

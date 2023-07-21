@@ -1,5 +1,10 @@
 import {stitchArrays} from '../../util/sugar.js';
-import {filterByCount, sortByCount} from '../../util/wiki-data.js';
+
+import {
+  filterByCount,
+  sortAlphabetically,
+  sortByCount,
+} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtTag'],
@@ -10,8 +15,14 @@ export default {
   },
 
   query({artTagData}, spec) {
-    const artTags = artTagData.filter(tag => !tag.isContentWarning);
-    const counts = artTags.map(tag => tag.taggedInThings.length);
+    const artTags =
+      sortAlphabetically(
+        artTagData
+          .filter(tag => !tag.isContentWarning));
+
+    const counts =
+      artTags
+        .map(tag => tag.taggedInThings.length);
 
     filterByCount(artTags, counts);
     sortByCount(artTags, counts, {greatestFirst: true});

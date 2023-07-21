@@ -1,5 +1,10 @@
 import {stitchArrays, unique} from '../../util/sugar.js';
-import {filterByCount, sortByCount} from '../../util/wiki-data.js';
+
+import {
+  filterByCount,
+  sortAlphabetically,
+  sortByCount,
+} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -19,7 +24,7 @@ export default {
     };
 
     const queryContributionInfo = (artistsKey, countsKey, fn) => {
-      const artists = sprawl.artistData.slice();
+      const artists = sortAlphabetically(sprawl.artistData.slice());
       const counts = artists.map(artist => fn(artist));
 
       filterByCount(artists, counts);

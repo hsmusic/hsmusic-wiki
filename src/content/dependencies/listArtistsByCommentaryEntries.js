@@ -1,5 +1,9 @@
 import {stitchArrays} from '../../util/sugar.js';
-import {filterByCount, sortByCount} from '../../util/wiki-data.js';
+import {
+  filterByCount,
+  sortAlphabetically,
+  sortByCount,
+} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -10,7 +14,7 @@ export default {
   },
 
   query({artistData}, spec) {
-    const artists = artistData.slice();
+    const artists = sortAlphabetically(artistData.slice());
     const counts =
       artists.map(artist =>
         artist.tracksAsCommentator.length +
