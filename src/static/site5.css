@@ -427,6 +427,7 @@ a {
 
 a:hover {
   text-decoration: underline;
+  text-decoration-style: solid !important;
 }
 
 a.current {
@@ -472,9 +473,50 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
+.contribution {
+  position: relative;
+}
+
+.contribution.has-tooltip a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
 .icons {
   font-style: normal;
   white-space: nowrap;
+}
+
+.icons-tooltip {
+  position: absolute;
+  z-index: 999;
+  left: -12px;
+  top: calc(1em - 2px);
+  padding: 4px 12px 6px 8px;
+}
+
+.icons-tooltip:not(.visible) {
+  display: none;
+}
+
+.icons-tooltip-content {
+  display: block;
+  padding: 6px 2px 2px 2px;
+  background: var(--bg-black-color);
+  border: 1px dotted var(--primary-color);
+  border-radius: 4px;
+
+  -webkit-user-select: none;
+  user-select: none;
+  cursor: default;
+}
+
+.icons a:hover {
+  filter: brightness(1.4);
+}
+
+.icons a {
+  padding: 0 3px;
 }
 
 .icon {

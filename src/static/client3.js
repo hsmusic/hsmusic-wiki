@@ -958,6 +958,8 @@ clientSteps.addPageListeners.push(addScrollListenerForStickyHeadings);
 
 // Image overlay ------------------------------------------
 
+// TODO: Update to clientSteps style.
+
 function addImageOverlayClickHandlers() {
   const container = document.getElementById('image-overlay-container');
 
@@ -1245,6 +1247,8 @@ function loadImage(imageUrl, onprogress) {
 
 // Group contributions table ------------------------------
 
+// TODO: Update to clientSteps style.
+
 const groupContributionsTableInfo =
   Array.from(document.querySelectorAll('#content dl'))
     .filter(dl => dl.querySelector('a.group-contributions-sort-button'))
@@ -1274,6 +1278,152 @@ for (const info of groupContributionsTableInfo) {
   info.sortingByDurationLink.addEventListener('click', evt => {
     evt.preventDefault();
     sortGroupContributionsTableBy(info, 'count');
+  });
+}
+
+// Artist link icon tooltips ------------------------------
+
+// TODO: Update to clientSteps style.
+
+const linkIconTooltipInfo =
+  Array.from(document.querySelectorAll('span.contribution.has-tooltip'))
+    .map(span => ({
+      mainLink: span.querySelector('a'),
+      iconsContainer: span.querySelector('span.icons-tooltip'),
+      iconLinks: span.querySelectorAll('span.icons-tooltip a'),
+    }));
+
+for (const info of linkIconTooltipInfo) {
+  const focusElements =
+    [info.mainLink, ...info.iconLinks];
+
+  const hoverElements =
+    [info.mainLink, info.iconsContainer];
+
+  let hidden = true;
+
+  const show = () => {
+    info.iconsContainer.classList.add('visible');
+    info.iconsContainer.inert = false;
+    hidden = false;
+  };
+
+  const hide = () => {
+    info.iconsContainer.classList.remove('visible');
+    info.iconsContainer.inert = true;
+    hidden = true;
+  };
+
+  const considerHiding = () => {
+    if (hoverElements.some(el => el.matches(':hover'))) {
+      return;
+    }
+
+    if (focusElements.includes(document.activeElement)) {
+      return;
+    }
+
+    if (justTouched) {
+      return;
+    }
+
+    hide();
+  };
+
+  // Hover (pointer)
+
+  let hoverTimeout;
+
+  info.mainLink.addEventListener('mouseenter', () => {
+    if (hidden) {
+      hoverTimeout = setTimeout(show, 250);
+    }
+  });
+
+  info.mainLink.addEventListener('mouseout', () => {
+    if (hidden) {
+      clearTimeout(hoverTimeout);
+    } else {
+      considerHiding();
+    }
+  });
+
+  info.iconsContainer.addEventListener('mouseout', () => {
+    if (!hidden) {
+      considerHiding();
+    }
+  });
+
+  // Focus (keyboard)
+
+  let focusTimeout;
+
+  info.mainLink.addEventListener('focus', () => {
+    focusTimeout = setTimeout(show, 750);
+  });
+
+  info.mainLink.addEventListener('blur', () => {
+    clearTimeout(focusTimeout);
+  });
+
+  info.iconsContainer.addEventListener('focusout', () => {
+    requestAnimationFrame(considerHiding);
+  });
+
+  info.mainLink.addEventListener('blur', () => {
+    requestAnimationFrame(considerHiding);
+  });
+
+  // Touch (finger)
+
+  let justTouched = false;
+  let touchTimeout;
+
+  info.mainLink.addEventListener('touchend', event => {
+    let wasTarget = false;
+
+    for (const touch of event.changedTouches) {
+      if (touch.target === info.mainLink) {
+        wasTarget = true;
+        break;
+      }
+    }
+
+    if (!wasTarget) {
+      return;
+    }
+
+    justTouched = true;
+
+    clearTimeout(touchTimeout);
+    touchTimeout = setTimeout(() => {
+      justTouched = false;
+    }, 250);
+
+    show();
+  });
+
+  info.mainLink.addEventListener('click', event => {
+    if (hidden && justTouched) {
+      event.preventDefault();
+      event.target.focus();
+      show();
+    }
+  });
+
+  document.body.addEventListener('touchend', event => {
+    const touches = [...event.changedTouches, ...event.touches];
+    for (const {clientX, clientY} of touches) {
+      const touchEl = document.elementFromPoint(clientX, clientY);
+      if (!touchEl) continue;
+
+      for (const hoverEl of hoverElements) {
+        if (touchEl === hoverEl) return;
+        if (hoverEl.contains(touchEl)) return;
+      }
+    }
+
+    hide();
   });
 }
 
