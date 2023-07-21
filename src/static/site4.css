@@ -364,10 +364,15 @@ body::before {
   padding-left: 5px;
 }
 
+summary > span {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--primary-color);
+}
+
 summary > span:hover {
   cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: var(--primary-color);
+  text-decoration-style: solid;
 }
 
 summary .group-name {
