@@ -27,11 +27,11 @@ const linkValueRelationMap = {
 };
 
 const linkIndexRelationMap = {
-  // commentaryIndex: 'linkCommentaryIndex',
-  // flashIndex: 'linkFlashIndex',
-  // home: 'linkHome',
-  // listingIndex: 'linkListingIndex',
-  // newsIndex: 'linkNewsIndex',
+  commentaryIndex: 'linkCommentaryIndex',
+  flashIndex: 'linkFlashIndex',
+  home: 'linkWikiHome',
+  listingIndex: 'linkListingIndex',
+  newsIndex: 'linkNewsIndex',
 };
 
 function getPlaceholder(node, content) {
@@ -79,13 +79,15 @@ export default {
 
             determineData: {
               // No value at all: this is an index link.
-              if (!replacerValue) {
+              if (!replacerValue || replacerValue === '-') {
+                data.toIndex = true;
                 break determineData;
               }
 
               // Nothing to find: the link operates on a path or string, not a data object.
               if (!spec.find) {
                 data.value = replacerValue;
+                data.toIndex = false;
                 break determineData;
               }
 
@@ -103,6 +105,7 @@ export default {
 
               // Something was found: the link operates on that thing.
               data.thing = thing;
+              data.toIndex = false;
             }
 
             const {transformName} = spec;
@@ -159,6 +162,7 @@ export default {
               link: relation(name, arg),
               label: node.data.label,
               hash: node.data.hash,
+              toIndex: node.data.toIndex,
             }
           : getPlaceholder(node, content));
 
@@ -171,7 +175,7 @@ export default {
 
             if (thing) {
               return relationOrPlaceholder(node, linkThingRelationMap[key], thing);
-            } else if (value) {
+            } else if (value && value !== '-') {
               return relationOrPlaceholder(node, linkValueRelationMap[key], value);
             } else {
               return relationOrPlaceholder(node, linkIndexRelationMap[key]);
@@ -184,6 +188,11 @@ export default {
     mode: {
       validate: v => v.is('inline', 'multiline', 'lyrics'),
       default: 'multiline',
+    },
+
+    preferShortLinkNames: {
+      type: 'boolean',
+      default: false,
     },
   },
 
@@ -205,11 +214,17 @@ export default {
             return {type: 'text', data: linkNode.data};
           }
 
-          const {link, label, hash} = linkNode;
+          const {link, label, hash, toIndex} = linkNode;
 
           return {
             type: 'link',
-            data: link.slots({content: label, hash}),
+            data:
+              (toIndex
+                ? link.slots({content: label, hash})
+                : link.slots({
+                    content: label, hash,
+                    preferShortName: slots.preferShortLinkNames,
+                  })),
           };
         }
 
