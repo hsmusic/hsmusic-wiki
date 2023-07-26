@@ -1,7 +1,14 @@
 import {stitchArrays} from '../../util/sugar.js';
 
 export default {
+  contentDependencies: ['generateGridActionLinks'],
   extraDependencies: ['html'],
+
+  relations(relation) {
+    return {
+      actionLinks: relation('generateGridActionLinks'),
+    };
+  },
 
   slots: {
     images: {validate: v => v.strictArrayOf(v.isHTML)},
@@ -10,11 +17,12 @@ export default {
     info: {validate: v => v.strictArrayOf(v.isHTML)},
 
     lazy: {validate: v => v.oneOf(v.isWholeNumber, v.isBoolean)},
+    actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 
-  generate(slots, {html}) {
+  generate(relations, slots, {html}) {
     return (
-      html.tag('div', {class: 'grid-listing'},
+      html.tag('div', {class: 'grid-listing'}, [
         stitchArrays({
           image: slots.images,
           link: slots.links,
@@ -37,6 +45,10 @@ export default {
                 html.tag('span', {[html.onlyIfContent]: true}, name),
                 html.tag('span', {[html.onlyIfContent]: true}, info),
               ],
-            }))));
+            })),
+
+        relations.actionLinks
+          .slot('actionLinks', slots.actionLinks),
+      ]));
   },
 };
