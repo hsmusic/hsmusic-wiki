@@ -194,6 +194,10 @@ export default {
       type: 'boolean',
       default: false,
     },
+
+    thumb: {
+      validate: v => v.is('small', 'medium', 'large'),
+    },
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -292,6 +296,8 @@ export default {
           .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n')
           // Expand line breaks which are at the end of a quote.
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
+
+      // TODO for images: make sure to use slots.thumb!
 
       return marked.parse(markedInput, markedOptions);
     }
