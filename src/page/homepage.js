@@ -13,6 +13,21 @@ import {
 
 export const description = `main wiki homepage`;
 
+export function pathsTargetless({wikiData}) {
+  return [
+    {
+      type: 'page',
+      path: ['home'],
+
+      contentFunction: {
+        name: 'generateWikiHomePage',
+        args: [wikiData.homepageLayout],
+      },
+    },
+  ];
+}
+
+/*
 export function writeTargetless({wikiData}) {
   const {newsData, homepageLayout, wikiInfo} = wikiData;
 
@@ -140,74 +155,9 @@ export function writeTargetless({wikiData}) {
                 ]))),
         ],
       },
-
-      sidebarLeft: {
-        collapse: false,
-        wide: true,
-        stickyMode: 'none',
-
-        multiple: [
-          homepageLayout.sidebarContent &&
-            transformMultiline(homepageLayout.sidebarContent, {
-              thumb: 'medium',
-            }),
-
-          wikiInfo.enableNews &&
-            [
-              html.tag('h1',
-                language.$('homepage.news.title')),
-
-              ...newsData
-                .slice(0, 3)
-                .map((entry, i) =>
-                  html.tag('article',
-                    {
-                      class: [
-                        'news-entry',
-                        i === 0 && 'first-news-entry',
-                      ],
-                    },
-                    [
-                      html.tag('h2', [
-                        html.tag('time',
-                          language.formatDate(entry.date)),
-                        link.newsEntry(entry),
-                      ]),
-
-                      transformMultiline(entry.contentShort, {
-                        thumb: 'medium',
-                      }),
-
-                      entry.contentShort !== entry.content &&
-                        link.newsEntry(entry, {
-                          text: language.$('homepage.news.entry.viewRest')
-                        }),
-                    ])),
-            ],
-        ],
-      },
-
-      nav: {
-        linkContainerClasses: ['nav-links-index'],
-        links: [
-          link.home('', {text: wikiInfo.nameShort, class: 'current', to}),
-
-          ...html.fragment(
-            homepageLayout.navbarLinks?.map(text =>
-              transformInline(text, {
-                link:
-                  withEntries(link, entries =>
-                    entries.map(([key, fn]) =>
-                      [key, bindOpts(fn, {
-                        preferShortName: true,
-                      })])),
-              }))),
-        ]
-          .filter(Boolean)
-          .map((html) => ({html})),
-      },
     }),
   };
 
   return [page];
 }
+*/
