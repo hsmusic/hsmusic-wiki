@@ -728,8 +728,8 @@ export function getArtistAvatar(artist, {to}) {
 
 // Big-ass homepage row functions
 
-export function getNewAdditions(numAlbums, {wikiData}) {
-  const sortedAlbums = wikiData.albumData
+export function getNewAdditions(numAlbums, {albumData}) {
+  const sortedAlbums = albumData
     .filter((album) => album.isListedOnHomepage)
     .sort((a, b) => {
       if (a.dateAddedToWiki > b.dateAddedToWiki) return -1;
@@ -808,15 +808,14 @@ export function getNewAdditions(numAlbums, {wikiData}) {
     }
   }
 
-  return albums.map((album) => ({item: album}));
+  return albums;
 }
 
-export function getNewReleases(numReleases, {wikiData}) {
-  return wikiData.albumData
+export function getNewReleases(numReleases, {albumData}) {
+  return albumData
     .filter((album) => album.isListedOnHomepage)
     .reverse()
-    .slice(0, numReleases)
-    .map((album) => ({item: album}));
+    .slice(0, numReleases);
 }
 
 // Carousel layout and utilities

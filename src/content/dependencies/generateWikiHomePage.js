@@ -1,6 +1,7 @@
 export default {
   contentDependencies: [
     'generatePageLayout',
+    'generateWikiHomeAlbumsRow',
     'generateWikiHomeNewsBox',
     'transformContent',
   ],
@@ -37,6 +38,16 @@ export default {
           .map(content => relation('transformContent', content));
     }
 
+    relations.contentRows =
+      homepageLayout.rows.map(row => {
+        switch (row.type) {
+          case 'albums':
+            return relation('generateWikiHomeAlbumsRow', row);
+          default:
+            return null;
+        }
+      });
+
     return relations;
   },
 
@@ -54,7 +65,9 @@ export default {
       mainClasses: ['top-index'],
       headingMode: 'static',
 
-      mainContent: [],
+      mainContent: [
+        relations.contentRows,
+      ],
 
       leftSidebarCollapse: false,
       leftSidebarWide: true,
