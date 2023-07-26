@@ -55,6 +55,7 @@ export default {
     'cachebust',
     'html',
     'language',
+    'pagePath',
     'to',
     'wikiData',
   ],
@@ -205,6 +206,7 @@ export default {
     cachebust,
     html,
     language,
+    pagePath,
     to,
   }) {
     let titleHTML = null;
@@ -460,11 +462,11 @@ export default {
           lang: language.intlCode,
           'data-language-code': language.code,
 
-          /*
           'data-url-key': 'localized.' + pagePath[0],
           ...Object.fromEntries(
-            pagePath.slice(1).map((v, i) => [['data-url-value' + i], v])),
-          */
+            pagePath
+              .slice(1)
+              .map((v, i) => [['data-url-value' + i], v])),
 
           'data-rebase-localized': to('localized.root'),
           'data-rebase-shared': to('shared.root'),
