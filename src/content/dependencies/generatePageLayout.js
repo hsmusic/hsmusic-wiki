@@ -160,7 +160,13 @@ export default {
             path: () => true,
             title: () => true,
             accent: () => true,
+
+            current: () => true,
           }), object);
+
+          if (object.current !== undefined) {
+            aggregate.call(v.isBoolean, object.current);
+          }
 
           if (object.auto || object.html) {
             if (object.auto && object.html) {
@@ -309,11 +315,11 @@ export default {
 
               let className;
 
-              if (cur.auto === 'current') {
-                className = 'current';
-              } else if (
-                slots.navLinkStyle === 'hierarchical' &&
-                i === slots.navLinks.length - 1
+              if (
+                cur.current ||
+                cur.auto === 'current' ||
+                (slots.navLinkStyle === 'hierarchical' &&
+                  i === slots.navLinks.length - 1)
               ) {
                 className = 'current';
               }
