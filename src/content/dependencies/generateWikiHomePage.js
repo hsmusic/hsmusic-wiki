@@ -80,7 +80,7 @@ export default {
             ?.map(content => ({
               html:
                 content.slots({
-                  mode: 'inline',
+                  mode: 'single-link',
                   preferShortLinkNames: true,
                 }),
             }))

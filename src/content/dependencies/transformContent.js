@@ -186,7 +186,7 @@ export default {
 
   slots: {
     mode: {
-      validate: v => v.is('inline', 'multiline', 'lyrics'),
+      validate: v => v.is('inline', 'multiline', 'lyrics', 'single-link'),
       default: 'multiline',
     },
 
@@ -258,6 +258,19 @@ export default {
 
         return getPlaceholder(node, data.content);
       });
+
+    // In single-link mode, return the link node exactly as is - exposing
+    // access to its slots.
+
+    if (slots.mode === 'single-link') {
+      const link = contentFromNodes.find(node => node.type === 'link');
+
+      if (!link) {
+        return html.blank();
+      }
+
+      return link.data;
+    }
 
     // In inline mode, no further processing is needed!
 
