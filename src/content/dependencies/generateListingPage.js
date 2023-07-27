@@ -65,10 +65,20 @@ export default {
     chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
     chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
 
+    listStyle: {
+      validate: v => v.is('ordered', 'unordered'),
+      default: 'unordered',
+    },
+
     content: {type: 'html'},
   },
 
   generate(data, relations, slots, {html, language}) {
+    const listTag =
+      (slots.listStyle === 'ordered'
+        ? 'ol'
+        : 'ul');
+
     return relations.layout.slots({
       title: language.$(`listingPage.${data.stringsKey}.title`),
       headingMode: 'sticky',
@@ -99,7 +109,7 @@ export default {
             })),
 
         slots.type === 'rows' &&
-          html.tag('ul',
+          html.tag(listTag,
             slots.rows.map(row =>
               html.tag('li',
                 language.$(`listingPage.${data.stringsKey}.item`, row)))),
@@ -119,7 +129,7 @@ export default {
                   }),
 
                 html.tag('dd',
-                  html.tag('ul',
+                  html.tag(listTag,
                     rows.map(row =>
                       html.tag('li',
                         language.$(`listingPage.${data.stringsKey}.chunk.item`, row))))),
