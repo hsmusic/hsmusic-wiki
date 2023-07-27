@@ -79,8 +79,21 @@ export default {
         ? 'ol'
         : 'ul');
 
+    const formatListingString = (contextStringsKey, options = {}) => {
+      const baseStringsKey = `listingPage.${data.stringsKey}`;
+
+      const parts = [baseStringsKey, contextStringsKey];
+
+      if (options.stringsKey) {
+        parts.push(options.stringsKey);
+        delete options.stringsKey;
+      }
+
+      return language.formatString(parts.join('.'), options);
+    };
+
     return relations.layout.slots({
-      title: language.$(`listingPage.${data.stringsKey}.title`),
+      title: formatListingString('title'),
       headingMode: 'sticky',
 
       mainContent: [
@@ -112,7 +125,7 @@ export default {
           html.tag(listTag,
             slots.rows.map(row =>
               html.tag('li',
-                language.$(`listingPage.${data.stringsKey}.item`, row)))),
+                formatListingString('item', row)))),
 
         slots.type === 'chunks' &&
           html.tag('dl',
@@ -124,15 +137,15 @@ export default {
                   .clone()
                   .slots({
                     tag: 'dt',
-                    title:
-                      language.$(`listingPage.${data.stringsKey}.chunk.title`, title),
+                    title: formatListingString('chunk.title', title),
                   }),
 
                 html.tag('dd',
                   html.tag(listTag,
                     rows.map(row =>
                       html.tag('li',
-                        language.$(`listingPage.${data.stringsKey}.chunk.item`, row))))),
+                        {class: row.stringsKey === 'rerelease' && 'rerelease'},
+                        formatListingString('chunk.item', row))))),
               ])),
 
         slots.type === 'custom' &&
