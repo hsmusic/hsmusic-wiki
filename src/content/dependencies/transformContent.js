@@ -208,55 +208,57 @@ export default {
     // individual nodes).
     const contentFromNodes =
       data.nodes.map(node => {
-        if (node.type === 'text') {
-          return {type: 'text', data: node.data};
-        }
+        switch (node.type) {
+          case 'text':
+            return {type: 'text', data: node.data};
 
-        if (node.type === 'link') {
-          const linkNode = relations.links[linkIndex++];
-          if (linkNode.type === 'text') {
-            return {type: 'text', data: linkNode.data};
+          case 'link': {
+            const linkNode = relations.links[linkIndex++];
+            if (linkNode.type === 'text') {
+              return {type: 'text', data: linkNode.data};
+            }
+
+            const {link, label, hash, toIndex} = linkNode;
+
+            return {
+              type: 'link',
+              data:
+                (toIndex
+                  ? link.slots({content: label, hash})
+                  : link.slots({
+                      content: label, hash,
+                      preferShortName: slots.preferShortLinkNames,
+                    })),
+            };
           }
 
-          const {link, label, hash, toIndex} = linkNode;
+          case 'tag': {
+            const {replacerKey, replacerValue} = node.data;
 
-          return {
-            type: 'link',
-            data:
-              (toIndex
-                ? link.slots({content: label, hash})
-                : link.slots({
-                    content: label, hash,
-                    preferShortName: slots.preferShortLinkNames,
-                  })),
-          };
-        }
+            const spec = replacerSpec[replacerKey];
 
-        if (node.type === 'tag') {
-          const {replacerKey, replacerValue} = node.data;
+            if (!spec) {
+              return getPlaceholder(node, data.content);
+            }
 
-          const spec = replacerSpec[replacerKey];
+            const {value: valueFn, html: htmlFn} = spec;
 
-          if (!spec) {
+            const value =
+              (valueFn
+                ? valueFn(replacerValue)
+                : replacerValue);
+
+            const contents =
+              (htmlFn
+                ? htmlFn(value, {html, language})
+                : value);
+
+            return {type: 'text', data: contents};
+          }
+
+          default:
             return getPlaceholder(node, data.content);
-          }
-
-          const {value: valueFn, html: htmlFn} = spec;
-
-          const value =
-            (valueFn
-              ? valueFn(replacerValue)
-              : replacerValue);
-
-          const contents =
-            (htmlFn
-              ? htmlFn(value, {html, language})
-              : value);
-
-          return {type: 'text', data: contents};
         }
-
-        return getPlaceholder(node, data.content);
       });
 
     // In single-link mode, return the link node exactly as is - exposing
