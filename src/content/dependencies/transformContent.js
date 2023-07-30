@@ -43,9 +43,10 @@ export default {
     ...Object.values(linkThingRelationMap),
     ...Object.values(linkValueRelationMap),
     ...Object.values(linkIndexRelationMap),
+    'image',
   ],
 
-  extraDependencies: ['html', 'language', 'wikiData'],
+  extraDependencies: ['html', 'language', 'to', 'wikiData'],
 
   sprawl(wikiData, content) {
     const find = bindFind(wikiData);
@@ -140,14 +141,16 @@ export default {
       nodes:
         sprawl.nodes
           .map(node => {
-            // Replace link nodes with a stub. It'll be replaced (by position)
-            // with an item from relations.
-            if (node.type === 'link') {
-              return {type: 'link'};
-            }
+            switch (node.type) {
+              // Replace link nodes with a stub. It'll be replaced (by position)
+              // with an item from relations.
+              case 'link':
+                return {type: 'link'};
 
-            // Other nodes will get processed in generate.
-            return node;
+              // Other nodes will get processed in generate.
+              default:
+                return node;
+            }
           }),
     };
   },
@@ -181,6 +184,12 @@ export default {
               return relationOrPlaceholder(node, linkIndexRelationMap[key]);
             }
           }),
+
+      images:
+        nodes
+          .filter(({type}) => type === 'image')
+          .filter(({inline}) => !inline)
+          .map(() => relation('image')),
     };
   },
 
@@ -200,8 +209,9 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html, language}) {
+  generate(data, relations, slots, {html, language, to}) {
     let linkIndex = 0;
+    let imageIndex = 0;
 
     // This array contains only straight text and link nodes, which are directly
     // representable in html (so no further processing is needed on the level of
@@ -211,6 +221,36 @@ export default {
         switch (node.type) {
           case 'text':
             return {type: 'text', data: node.data};
+
+          case 'image': {
+            const src =
+              (node.src.startsWith('media/')
+                ? to('media.path', node.src.slice('media/'.length))
+                : node.src);
+
+            const {width, height} = node;
+
+            if (node.inline) {
+              return {
+                type: 'image',
+                data:
+                  html.tag('img', {src, width, height}),
+              };
+            }
+
+            const image = relations.images[imageIndex++];
+
+            return {
+              type: 'image',
+              data:
+                image.slots({
+                  src,
+                  link: true,
+                  width: width ?? null,
+                  height: height ?? null,
+                }),
+            };
+          }
 
           case 'link': {
             const linkNode = relations.links[linkIndex++];

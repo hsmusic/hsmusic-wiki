@@ -292,13 +292,157 @@ function parseNodes(input, i, stopAt, textOnly) {
   return nodes;
 }
 
+function parseAttributes(string) {
+  const attributes = Object.create(null);
+
+  const skipWhitespace = i => {
+    if (!/\s/.test(string[i])) {
+      return i;
+    }
+
+    const match = string.slice(i).match(/[^\s]/);
+    if (match) {
+      return i + match.index;
+    }
+
+    return string.length;
+  };
+
+  for (let i = 0; i < string.length; ) {
+    i = skipWhitespace(i);
+    const aStart = i;
+    const aEnd = i + string.slice(i).match(/[\s=]|$/).index;
+    const attribute = string.slice(aStart, aEnd);
+    i = skipWhitespace(aEnd);
+    if (string[i] === '=') {
+      i = skipWhitespace(i + 1);
+      let end, endOffset;
+      if (string[i] === '"' || string[i] === "'") {
+        end = string[i];
+        endOffset = 1;
+        i++;
+      } else {
+        end = '\\s';
+        endOffset = 0;
+      }
+      const vStart = i;
+      const vEnd = i + string.slice(i).match(new RegExp(`${end}|$`)).index;
+      const value = string.slice(vStart, vEnd);
+      i = vEnd + endOffset;
+      attributes[attribute] = value;
+    } else {
+      attributes[attribute] = attribute;
+    }
+  }
+
+  return (
+    Object.fromEntries(
+      Object.entries(attributes)
+        .map(([key, val]) => [
+          key,
+          val === 'true'
+            ? true
+            : val === 'false'
+            ? false
+            : val === key
+            ? true
+            : val,
+        ])));
+}
+
+export function postprocessImages(inputNodes) {
+  const outputNodes = [];
+
+  let atStartOfLine = true;
+
+  const lastNode = inputNodes[inputNodes.length - 1];
+
+  for (const node of inputNodes) {
+    if (node.type === 'tag') {
+      atStartOfLine = false;
+    }
+
+    if (node.type === 'text') {
+      const imageRegexp = /<img (.*?)>/g;
+
+      let match = null, parseFrom = 0;
+      while (match = imageRegexp.exec(node.data)) {
+        const previousText = node.data.slice(parseFrom, match.index);
+        outputNodes.push({type: 'text', data: previousText});
+        parseFrom = match.index + match[0].length;
+
+        const imageNode = {type: 'image'};
+        const attributes = parseAttributes(match[1]);
+
+        imageNode.src = attributes.src;
+
+        if (previousText.endsWith('\n')) {
+          atStartOfLine = true;
+        }
+
+        imageNode.inline = (() => {
+          // If we've already determined we're in the middle of a line,
+          // we're inline. (Of course!)
+          if (!atStartOfLine) {
+            return true;
+          }
+
+          // If there's more text to go in this text node, and what's
+          // remaining doesn't start with a line break, we're inline.
+          if (
+            parseFrom !== node.data.length &&
+            node.data[parseFrom] !== '\n'
+          ) {
+            return true;
+          }
+
+          // If we're at the end of this text node, but this text node
+          // isn't the last node overall, we're inline.
+          if (
+            parseFrom === node.data.length &&
+            node !== lastNode
+          ) {
+            return true;
+          }
+
+          // If no other condition matches, this image is on its own line.
+          return false;
+        })();
+
+        if (attributes.width) imageNode.width = parseInt(attributes.width);
+        if (attributes.height) imageNode.height = parseInt(attributes.height);
+
+        outputNodes.push(imageNode);
+
+        // No longer at the start of a line after an image - there will at
+        // least be a text node with only '\n' before the next image that's
+        // on its own line.
+        atStartOfLine = false;
+      }
+
+      if (parseFrom !== node.data.length) {
+        outputNodes.push({
+          type: 'text',
+          data: node.data.slice(parseFrom),
+        });
+      }
+
+      continue;
+    }
+
+    outputNodes.push(node);
+  }
+
+  return outputNodes;
+}
+
 export function parseInput(input) {
   if (typeof input !== 'string') {
     throw new TypeError(`Expected input to be string, got ${input}`);
   }
 
   try {
-    return parseNodes(input, 0);
+    return postprocessImages(parseNodes(input, 0));
   } catch (errorNode) {
     if (errorNode.type !== 'error') {
       throw errorNode;
