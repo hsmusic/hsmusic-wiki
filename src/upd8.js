@@ -63,9 +63,7 @@ import find from './util/find.js';
 import {findFiles} from './util/io.js';
 import link from './util/link.js';
 import {isMain, traverse} from './util/node-utils.js';
-import {validateReplacerSpec} from './util/replacer.js';
 import {empty, showAggregate, withEntries} from './util/sugar.js';
-import {replacerSpec} from './util/transform-content.js';
 import {generateURLs} from './util/urls.js';
 import {sortByName} from './util/wiki-data.js';
 
@@ -99,10 +97,6 @@ try {
 const BUILD_TIME = new Date();
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
-
-if (!validateReplacerSpec(replacerSpec, {find, link})) {
-  process.exit();
-}
 
 async function main() {
   Error.stackTraceLimit = Infinity;

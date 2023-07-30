@@ -4,13 +4,6 @@
 
 import chroma from 'chroma-js';
 
-import {
-  replacerSpec,
-  transformInline,
-  // transformLyrics,
-  // transformMultiline,
-} from '../util/transform-content.js';
-
 import * as html from '../util/html.js';
 
 import {bindOpts} from '../util/sugar.js';
@@ -56,28 +49,6 @@ export function bindUtilities({
   bound.getColors = bindOpts(getColors, {chroma});
 
   bound.find = bindFind(wikiData, {mode: 'warn'});
-
-  bound.transformInline = bindOpts(transformInline, {
-    find: bound.find,
-    link: bound.link,
-    replacerSpec,
-    language,
-    to,
-    wikiData,
-  });
-
-  /*
-  bound.transformMultiline = bindOpts(transformMultiline, {
-    img: bound.img,
-    to,
-    transformInline: bound.transformInline,
-  });
-
-  bound.transformLyrics = bindOpts(transformLyrics, {
-    transformInline: bound.transformInline,
-    transformMultiline: bound.transformMultiline,
-  });
-  */
 
   /*
   bound.generateNavigationLinks = bindOpts(generateNavigationLinks, {

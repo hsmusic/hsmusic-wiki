@@ -2,7 +2,115 @@ import {marked} from 'marked';
 
 import {bindFind} from '../../util/find.js';
 import {parseInput} from '../../util/replacer.js';
-import {replacerSpec} from '../../util/transform-content.js';
+
+export const replacerSpec = {
+  album: {
+    find: 'album',
+    link: 'album',
+  },
+  'album-commentary': {
+    find: 'album',
+    link: 'albumCommentary',
+  },
+  'album-gallery': {
+    find: 'album',
+    link: 'albumGallery',
+  },
+  artist: {
+    find: 'artist',
+    link: 'artist',
+  },
+  'artist-gallery': {
+    find: 'artist',
+    link: 'artistGallery',
+  },
+  'commentary-index': {
+    find: null,
+    link: 'commentaryIndex',
+  },
+  date: {
+    find: null,
+    value: (ref) => new Date(ref),
+    html: (date, {html, language}) =>
+      html.tag('time',
+        {datetime: date.toString()},
+        language.formatDate(date)),
+  },
+  'flash-index': {
+    find: null,
+    link: 'flashIndex',
+  },
+  flash: {
+    find: 'flash',
+    link: 'flash',
+    transformName(name, node, input) {
+      const nextCharacter = input[node.iEnd];
+      const lastCharacter = name[name.length - 1];
+      if (![' ', '\n', '<'].includes(nextCharacter) && lastCharacter === '.') {
+        return name.slice(0, -1);
+      } else {
+        return name;
+      }
+    },
+  },
+  group: {
+    find: 'group',
+    link: 'groupInfo',
+  },
+  'group-gallery': {
+    find: 'group',
+    link: 'groupGallery',
+  },
+  home: {
+    find: null,
+    link: 'home',
+  },
+  'listing-index': {
+    find: null,
+    link: 'listingIndex',
+  },
+  listing: {
+    find: 'listing',
+    link: 'listing',
+  },
+  media: {
+    find: null,
+    link: 'media',
+  },
+  'news-index': {
+    find: null,
+    link: 'newsIndex',
+  },
+  'news-entry': {
+    find: 'newsEntry',
+    link: 'newsEntry',
+  },
+  root: {
+    find: null,
+    link: 'root',
+  },
+  site: {
+    find: null,
+    link: 'site',
+  },
+  static: {
+    find: 'staticPage',
+    link: 'staticPage',
+  },
+  string: {
+    find: null,
+    value: (ref) => ref,
+    html: (ref, {language, args}) => language.$(ref, args),
+  },
+  tag: {
+    find: 'artTag',
+    link: 'tag',
+  },
+  track: {
+    find: 'track',
+    link: 'track',
+  },
+};
 
 const linkThingRelationMap = {
   album: 'linkAlbum',
