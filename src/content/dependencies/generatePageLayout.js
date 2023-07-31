@@ -393,6 +393,71 @@ export default {
     const sidebarRightHTML = generateSidebarHTML('rightSidebar', 'sidebar-right');
     const collapseSidebars = slots.leftSidebarCollapse && slots.rightSidebarCollapse;
 
+    const hasID = (() => {
+      // Hilariously jank. Sorry!
+      const mainContentHTML = slots.mainContent.toString();
+      return id => mainContentHTML.includes(`id="${id}"`);
+    })();
+
+    const processSkippers = skipperList =>
+      skipperList
+        .filter(({condition, id}) =>
+          (condition === undefined
+            ? hasID(id)
+            : condition))
+        .map(({id, string}) =>
+          html.tag('span', {class: 'skipper'},
+            html.tag('a',
+              {href: `#${id}`},
+              language.$(`misc.skippers.${string}`))));
+
+    const skippersHTML =
+      mainHTML &&
+        html.tag('div', {id: 'skippers'}, [
+          html.tag('span', language.$('misc.skippers.skipTo')),
+          html.tag('div', {class: 'skipper-list'},
+            processSkippers([
+              {condition: true, id: 'content', string: 'content'},
+              {
+                condition: sidebarLeftHTML,
+                id: 'sidebar-left',
+                string:
+                  (sidebarRightHTML
+                    ? 'sidebar.left'
+                    : 'sidebar'),
+              },
+              {
+                condition: sidebarRightHTML,
+                id: 'sidebar-right',
+                string:
+                  (sidebarLeftHTML
+                    ? 'sidebar.right'
+                    : 'sidebar'),
+              },
+              {condition: navHTML, id: 'header', string: 'header'},
+              {condition: footerHTML, id: 'footer', string: 'footer'},
+            ])),
+
+          html.tag('div',
+            {[html.onlyIfContent]: true, class: 'skipper-list'},
+            processSkippers([
+              {id: 'tracks', string: 'tracks'},
+              {id: 'art', string: 'flashes'},
+              {id: 'contributors', string: 'contributors'},
+              {id: 'references', string: 'references'},
+              {id: 'referenced-by', string: 'referencedBy'},
+              {id: 'samples', string: 'samples'},
+              {id: 'sampled-by', string: 'sampledBy'},
+              {id: 'features', string: 'features'},
+              {id: 'featured-in', string: 'featuredIn'},
+              {id: 'sheet-music-files', string: 'sheetMusicFiles'},
+              {id: 'midi-project-files', string: 'midiProjectFiles'},
+              {id: 'additional-files', string: 'additionalFiles'},
+              {id: 'commentary', string: 'commentary'},
+              {id: 'artist-commentary', string: 'artistCommentary'},
+            ])),
+        ]);
+
     const imageOverlayHTML = html.tag('div', {id: 'image-overlay-container'},
       html.tag('div', {id: 'image-overlay-content-container'}, [
         html.tag('a', {id: 'image-overlay-image-container'}, [
@@ -538,7 +603,7 @@ export default {
             // {style: body.style || ''},
             [
               html.tag('div', {id: 'page-container'}, [
-                // mainHTML && skippersHTML,
+                skippersHTML,
                 layoutHTML,
               ]),
 
