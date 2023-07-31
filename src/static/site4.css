@@ -553,6 +553,11 @@ a.box img {
   height: auto;
 }
 
+a.box .image-container.placeholder-image {
+  width: 100%;
+  height: 100%;
+}
+
 h1 {
   font-size: 1.5em;
 }
@@ -871,7 +876,7 @@ img {
 
 .grid-item img {
   width: 100%;
-  height: 100%;
+  height: 100% !important;
   margin-top: auto;
   margin-bottom: auto;
 }

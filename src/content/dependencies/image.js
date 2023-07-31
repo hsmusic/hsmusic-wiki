@@ -157,7 +157,7 @@ export default {
       let wrapped = content;
 
       wrapped =
-        html.tag('div', {class: 'image-container'},
+        html.tag('div', {class: ['image-container', !originalSrc && 'placeholder-image']},
           html.tag('div', {class: 'image-inner-area'},
             wrapped));
 
