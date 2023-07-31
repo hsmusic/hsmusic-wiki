@@ -75,6 +75,7 @@ export default {
           : originalSrc);
 
     const willLink = typeof slots.link === 'string' || slots.link;
+    const customLink = typeof slots.link === 'string';
 
     const willReveal =
       slots.reveal &&
@@ -125,6 +126,7 @@ export default {
       width: slots.width,
       height: slots.height,
       'data-original-size': fileSize,
+      'data-no-image-preview': customLink,
     };
 
     const nonlazyHTML =

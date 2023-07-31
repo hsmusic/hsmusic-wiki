@@ -653,8 +653,12 @@ function addImageOverlayClickHandlers() {
     return;
   }
 
-  for (const img of document.querySelectorAll('.image-link')) {
-    img.addEventListener('click', handleImageLinkClicked);
+  for (const link of document.querySelectorAll('.image-link')) {
+    if (link.querySelector('img').hasAttribute('data-no-image-preview')) {
+      continue;
+    }
+
+    link.addEventListener('click', handleImageLinkClicked);
   }
 
   const actionContainer = document.getElementById('image-overlay-action-container');
