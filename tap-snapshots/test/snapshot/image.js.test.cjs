@@ -40,7 +40,7 @@ exports[`test/snapshot/image.js TAP image (snapshot) > link with file size 1`] =
 `
 
 exports[`test/snapshot/image.js TAP image (snapshot) > source missing 1`] = `
-<div class="image-container"><div class="image-inner-area"><div class="image-text-area">Example of missing source message.</div></div></div>
+<div class="image-container placeholder-image"><div class="image-inner-area"><div class="image-text-area">Example of missing source message.</div></div></div>
 `
 
 exports[`test/snapshot/image.js TAP image (snapshot) > source via path 1`] = `
