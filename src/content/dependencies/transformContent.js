@@ -356,6 +356,7 @@ export default {
                   link: true,
                   width: width ?? null,
                   height: height ?? null,
+                  thumb: slots.thumb,
                 }),
             };
           }
@@ -459,8 +460,6 @@ export default {
           .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n')
           // Expand line breaks which are at the end of a quote.
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
-
-      // TODO for images: make sure to use slots.thumb!
 
       return marked.parse(markedInput, markedOptions);
     }
