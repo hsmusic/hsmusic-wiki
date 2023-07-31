@@ -1682,3 +1682,83 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     margin-top: 0.5em;
   }
 }
+
+/* Customization - Prefer increased contrast */
+
+@media (prefers-contrast: more) {
+  :root {
+    --box-background: black;
+    --box-border-style: solid;
+
+    --focus-color: #aaaaff;
+  }
+
+  #page-container {
+    border: 1px solid white;
+    border-radius: 6px;
+    background: rgba(35, 35, 35, 1);
+  }
+
+  body::before {
+    opacity: 0.3 !important;
+    filter: contrast(0.75) brightness(0.5);
+  }
+
+  .grid-item:hover,
+
+  a.box:focus {
+    outline: 3px double var(--focus-color);
+  }
+
+  a:not(.box) {
+    text-decoration: underline;
+  }
+
+  a:not(.box):hover,
+  a:not(.box):focus {
+    color: var(--focus-color);
+    text-decoration-color: var(--focus-color) !important;
+  }
+
+  summary > span:hover,
+  summary:focus-visible > span {
+    text-decoration: underline;
+    text-decoration-color: var(--focus-color);
+  }
+
+  summary > span:hover .group-name,
+  summary:focus-visible > span .group-name {
+    color: var(--focus-color);
+  }
+
+  .icon:hover > svg,
+  .icon:focus > svg {
+    fill: var(--focus-color);
+  }
+
+  .rerelease,
+  .other-group-accent,
+  .reveal-interaction,
+  .grid-item > span:not(:first-of-type),
+  #image-overlay-file-size-warning {
+    opacity: 1;
+  }
+}
+
+/* Customization - Prefer reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Note - info cards currently aren't covered here, their animation will need updating. */
+
+  .carousel-container:hover .carousel-grid {
+    animation-play-state: paused;
+  }
+
+  .content-sticky-subheading-row:not(.visible) {
+    margin-top: 0;
+  }
+
+  .content-sticky-heading-cover-container:not(.visible) .content-sticky-heading-cover {
+    transform: translateY(0);
+  }
+}
