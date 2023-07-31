@@ -66,9 +66,12 @@ export default {
 
               content.slot('thumb', 'medium'),
 
-              readMoreLink?.slots({
-                content: language.$('homepage.news.entry.viewRest'),
-              }),
+              html.tag('p',
+                {[html.onlyIfContent]: true},
+                readMoreLink
+                  ?.slots({
+                    content: language.$('homepage.news.entry.viewRest'),
+                  })),
             ])),
       ],
     };
