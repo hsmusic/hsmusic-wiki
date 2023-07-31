@@ -65,12 +65,35 @@ export default {
     chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
     chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
 
+    listStyle: {
+      validate: v => v.is('ordered', 'unordered'),
+      default: 'unordered',
+    },
+
     content: {type: 'html'},
   },
 
   generate(data, relations, slots, {html, language}) {
+    const listTag =
+      (slots.listStyle === 'ordered'
+        ? 'ol'
+        : 'ul');
+
+    const formatListingString = (contextStringsKey, options = {}) => {
+      const baseStringsKey = `listingPage.${data.stringsKey}`;
+
+      const parts = [baseStringsKey, contextStringsKey];
+
+      if (options.stringsKey) {
+        parts.push(options.stringsKey);
+        delete options.stringsKey;
+      }
+
+      return language.formatString(parts.join('.'), options);
+    };
+
     return relations.layout.slots({
-      title: language.$(`listingPage.${data.stringsKey}.title`),
+      title: formatListingString('title'),
       headingMode: 'sticky',
 
       mainContent: [
@@ -99,10 +122,10 @@ export default {
             })),
 
         slots.type === 'rows' &&
-          html.tag('ul',
+          html.tag(listTag,
             slots.rows.map(row =>
               html.tag('li',
-                language.$(`listingPage.${data.stringsKey}.item`, row)))),
+                formatListingString('item', row)))),
 
         slots.type === 'chunks' &&
           html.tag('dl',
@@ -114,15 +137,15 @@ export default {
                   .clone()
                   .slots({
                     tag: 'dt',
-                    title:
-                      language.$(`listingPage.${data.stringsKey}.chunk.title`, title),
+                    title: formatListingString('chunk.title', title),
                   }),
 
                 html.tag('dd',
-                  html.tag('ul',
+                  html.tag(listTag,
                     rows.map(row =>
                       html.tag('li',
-                        language.$(`listingPage.${data.stringsKey}.chunk.item`, row))))),
+                        {class: row.stringsKey === 'rerelease' && 'rerelease'},
+                        formatListingString('chunk.item', row))))),
               ])),
 
         slots.type === 'custom' &&

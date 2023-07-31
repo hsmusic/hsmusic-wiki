@@ -131,286 +131,72 @@ listingSpec.push({
 listingSpec.push({
   directory: 'tracks/by-name',
   stringsKey: 'listTracks.byName',
-
-  data: ({wikiData: {trackData}}) =>
-    sortAlphabetically(trackData.slice()),
-
-  row: (track, {language, link}) =>
-    language.$('listingPage.listTracks.byName.item', {
-      track: link.track(track),
-    }),
+  contentFunction: 'listTracksByName',
 });
 
 listingSpec.push({
   directory: 'tracks/by-album',
   stringsKey: 'listTracks.byAlbum',
-
-  data: ({wikiData: {albumData}}) =>
-    albumData.map(album => ({
-      album,
-      tracks: album.tracks,
-    })),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, tracks}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listTracks.byAlbum.album', {
-            album: link.album(album),
-          })),
-
-        html.tag('dd',
-          html.tag('ol',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.byAlbum.track', {
-                  track: link.track(track),
-                }))))),
-      ])),
+  contentFunction: 'listTracksByAlbum',
 });
 
 listingSpec.push({
   directory: 'tracks/by-date',
   stringsKey: 'listTracks.byDate',
-
-  data: ({wikiData: {albumData}}) =>
-    chunkByProperties(
-      sortByDate(
-        sortChronologically(albumData)
-          .flatMap(album => album.tracks)
-          .filter(track => track.date)),
-      ['album', 'date']),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, date, chunk: tracks}) => [
-        html.tag('dt',
-          language.$('listingPage.listTracks.byDate.album', {
-            album: link.album(album),
-            date: language.formatDate(date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              track.originalReleaseTrack
-                ? html.tag('li',
-                    {class: 'rerelease'},
-                    language.$('listingPage.listTracks.byDate.track.rerelease', {
-                      track: link.track(track),
-                    }))
-                : html.tag('li',
-                    language.$('listingPage.listTracks.byDate.track', {
-                      track: link.track(track),
-                    }))))),
-      ])),
+  contentFunction: 'listTracksByDate',
 });
 
 listingSpec.push({
   directory: 'tracks/by-duration',
   stringsKey: 'listTracks.byDuration',
-
-  data: ({wikiData: {trackData}}) =>
-    trackData
-      .map(track => ({
-        track,
-        duration: track.duration
-      }))
-      .filter(({duration}) => duration > 0)
-      .sort((a, b) => b.duration - a.duration),
-
-  row: ({track, duration}, {language, link}) =>
-    language.$('listingPage.listTracks.byDuration.item', {
-      track: link.track(track),
-      duration: language.formatDuration(duration),
-    }),
+  contentFunction: 'listTracksByDuration',
 });
 
 listingSpec.push({
   directory: 'tracks/by-duration-in-album',
   stringsKey: 'listTracks.byDurationInAlbum',
-
-  data: ({wikiData: {albumData}}) =>
-    albumData.map(album => ({
-      album,
-      tracks: album.tracks
-        .slice()
-        .sort((a, b) => (b.duration ?? 0) - (a.duration ?? 0)),
-    })),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, tracks}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listTracks.byDurationInAlbum.album', {
-            album: link.album(album),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.byDurationInAlbum.track', {
-                  track: link.track(track),
-                  duration: language.formatDuration(track.duration ?? 0),
-                }))))),
-      ])),
+  contentFunction: 'listTracksByDurationInAlbum',
 });
 
 listingSpec.push({
   directory: 'tracks/by-times-referenced',
   stringsKey: 'listTracks.byTimesReferenced',
-
-  data: ({wikiData: {trackData}}) =>
-    trackData
-      .map(track => ({
-        track,
-        timesReferenced: track.referencedByTracks.length,
-      }))
-      .filter(({timesReferenced}) => timesReferenced)
-      .sort((a, b) => b.timesReferenced - a.timesReferenced),
-
-  row: ({track, timesReferenced}, {language, link}) =>
-    language.$('listingPage.listTracks.byTimesReferenced.item', {
-      track: link.track(track),
-      timesReferenced: language.countTimesReferenced(timesReferenced, {
-        unit: true,
-      }),
-    }),
+  contentFunction: 'listTracksByTimesReferenced',
 });
 
 listingSpec.push({
   directory: 'tracks/in-flashes/by-album',
   stringsKey: 'listTracks.inFlashes.byAlbum',
+  contentFunction: 'listTracksInFlashesByAlbum',
   featureFlag: 'enableFlashesAndGames',
-
-  data: ({wikiData: {trackData}}) =>
-    chunkByProperties(
-      trackData.filter(t => !empty(t.featuredInFlashes)),
-      ['album']),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({album, chunk: tracks}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listTracks.inFlashes.byAlbum.album', {
-            album: link.album(album),
-            date: language.formatDate(album.date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.inFlashes.byAlbum.track', {
-                  track: link.track(track),
-                  flashes: language.formatConjunctionList(
-                    track.featuredInFlashes.map(link.flash)),
-                }))))),
-      ])),
 });
 
 listingSpec.push({
   directory: 'tracks/in-flashes/by-flash',
   stringsKey: 'listTracks.inFlashes.byFlash',
+  contentFunction: 'listTracksInFlashesByFlash',
   featureFlag: 'enableFlashesAndGames',
-
-  data: ({wikiData: {flashData}}) =>
-    sortFlashesChronologically(flashData.slice())
-      .map(flash => ({
-        flash,
-        tracks: flash.featuredTracks,
-      })),
-
-  html: (data, {html, language, link}) =>
-    html.tag('dl',
-      data.flatMap(({flash, tracks}) => [
-        html.tag('dt',
-          {class: ['content-heading']},
-          language.$('listingPage.listTracks.inFlashes.byFlash.flash', {
-            flash: link.flash(flash),
-            date: language.formatDate(flash.date),
-          })),
-
-        html.tag('dd',
-          html.tag('ul',
-            tracks.map(track =>
-              html.tag('li',
-                language.$('listingPage.listTracks.inFlashes.byFlash.track', {
-                  track: link.track(track),
-                  album: link.album(track.album),
-                }))))),
-      ])),
 });
 
-function listTracksWithProperty(property, {
-  directory,
-  stringsKey,
-  seeAlso,
-  hash = '',
-}) {
-  return {
-    directory,
-    stringsKey,
-    seeAlso,
-
-    data: ({wikiData: {albumData}}) =>
-      albumData
-        .map(album => ({
-          album,
-          tracks: album.tracks.filter(track => {
-            const value = track[property];
-            if (!value) return false;
-            if (Array.isArray(value)) {
-              return !empty(value);
-            }
-            return true;
-          }),
-        }))
-        .filter(({tracks}) => !empty(tracks)),
-
-    html: (data, {html, language, link}) =>
-      html.tag('dl',
-        data.flatMap(({album, tracks}) => [
-          html.tag('dt',
-            {class: ['content-heading']},
-            language.$(`listingPage.${stringsKey}.album`, {
-              album: link.album(album),
-              date: language.formatDate(album.date),
-            })),
-
-          html.tag('dd',
-            html.tag('ul',
-              tracks.map(track =>
-                html.tag('li',
-                  language.$(`listingPage.${stringsKey}.track`, {
-                    track: link.track(track, {hash}),
-                  }))))),
-        ])),
-  };
-}
-
-listingSpec.push(listTracksWithProperty('lyrics', {
+listingSpec.push({
   directory: 'tracks/with-lyrics',
   stringsKey: 'listTracks.withLyrics',
-}));
+  contentFunction: 'listTracksWithLyrics',
+});
 
-listingSpec.push(listTracksWithProperty('sheetMusicFiles', {
+listingSpec.push({
   directory: 'tracks/with-sheet-music-files',
   stringsKey: 'listTracks.withSheetMusicFiles',
-  hash: 'sheet-music-files',
+  contentFunction: 'listTracksWithSheetMusicFiles',
   seeAlso: ['all-sheet-music-files'],
-}));
+});
 
-listingSpec.push(listTracksWithProperty('midiProjectFiles', {
+listingSpec.push({
   directory: 'tracks/with-midi-project-files',
   stringsKey: 'listTracks.withMidiProjectFiles',
-  hash: 'midi-project-files',
+  contentFunction: 'listTracksWithMidiProjectFiles',
   seeAlso: ['all-midi-project-files'],
-}));
+});
 
 listingSpec.push({
   directory: 'tags/by-name',
