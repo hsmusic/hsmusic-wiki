@@ -336,7 +336,7 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {width, height} = node;
+            const {link, width, height} = node;
 
             if (node.inline) {
               return {
@@ -353,7 +353,7 @@ export default {
               data:
                 image.slots({
                   src,
-                  link: true,
+                  link: link ?? true,
                   width: width ?? null,
                   height: height ?? null,
                   thumb: slots.thumb,

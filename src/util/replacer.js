@@ -392,6 +392,7 @@ export function postprocessImages(inputNodes) {
           return false;
         })();
 
+        if (attributes.link) imageNode.link = attributes.link;
         if (attributes.width) imageNode.width = parseInt(attributes.width);
         if (attributes.height) imageNode.height = parseInt(attributes.height);
 

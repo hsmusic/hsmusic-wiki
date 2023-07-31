@@ -33,8 +33,12 @@ export default {
 
     thumb: {type: 'string'},
 
+    link: {
+      validate: v => v.oneOf(v.isBoolean, v.isString),
+      default: false,
+    },
+
     reveal: {type: 'boolean', default: true},
-    link: {type: 'boolean', default: false},
     lazy: {type: 'boolean', default: false},
     square: {type: 'boolean', default: false},
 
