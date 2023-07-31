@@ -353,6 +353,7 @@ export default {
               data:
                 image.slots({
                   src,
+                  class: 'content-image',
                   link: link ?? true,
                   width: width ?? null,
                   height: height ?? null,

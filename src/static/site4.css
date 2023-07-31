@@ -539,6 +539,12 @@ p .current {
   display: none;
 }
 
+a.box.content-image {
+  display: block;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
 a.box:focus {
   outline: 3px double var(--primary-color);
 }
