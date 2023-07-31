@@ -461,7 +461,17 @@ export default {
           // Expand line breaks which are at the end of a quote.
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
-      return marked.parse(markedInput, markedOptions);
+      const markedOutput =
+        marked.parse(markedInput, markedOptions)
+          // Images that were all on their own line need to be removed from
+          // the surrounding <p> tag that marked generates. The HTML parser
+          // treats a <div> that starts inside a <p> as a Crocker-class
+          // misgiving, and will treat you very badly if you feed it that.
+          .replace(
+            /^<p>(<a class="[^"]*?image-link.*?<\/a>)<\/p>$/gm,
+            (match, a) => a);
+
+      return markedOutput;
     }
 
     if (slots.mode === 'multiline') {

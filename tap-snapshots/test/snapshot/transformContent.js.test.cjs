@@ -23,18 +23,18 @@ exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > lin
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #1 1`] = `
-<p><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></p>
+<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
 
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #2 1`] = `
 <p>Rad.</p>
-<p><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></p>
+<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
 
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #3 1`] = `
-<p><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></p>
+<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
 <p>Baller.</p>
 
 `
