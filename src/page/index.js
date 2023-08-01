@@ -14,7 +14,7 @@ export * as artistAlias from './artist-alias.js';
 export * as group from './group.js';
 export * as homepage from './homepage.js';
 export * as listing from './listing.js';
-// export * as news from './news.js';
+export * as news from './news.js';
 export * as static from './static.js';
 export * as tag from './tag.js';
 export * as track from './track.js';
