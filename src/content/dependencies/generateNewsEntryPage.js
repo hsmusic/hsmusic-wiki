@@ -95,20 +95,9 @@ export default {
       navLinkStyle: 'hierarchical',
       navLinks: [
         {auto: 'home'},
+        {html: relations.newsIndexLink},
         {
-          html:
-            relations.newsIndexLink
-              .slot('content', language.$('newsEntryPage.nav.news')),
-        },
-        {
-          html:
-            language.$('newsEntryPage.nav.entry', {
-              date: language.formatDate(data.date),
-              entry:
-                relations.currentEntryLink
-                  .slot('attributes', {class: 'current'}),
-            }),
-
+          auto: 'current',
           accent:
             (relations.previousNextLinks
               ? `(${language.formatUnitList(relations.previousNextLinks.slots({

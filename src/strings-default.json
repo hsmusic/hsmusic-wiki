@@ -468,8 +468,6 @@
   "newsIndex.entry.viewRest": "(View rest of entry!)",
   "newsEntryPage.title": "{ENTRY}",
   "newsEntryPage.published": "(Published {DATE}.)",
-  "newsEntryPage.nav.news": "News",
-  "newsEntryPage.nav.entry": "{DATE}: {ENTRY}",
   "redirectPage.title": "Moved to {TITLE}",
   "redirectPage.infoLine": "This page has been moved to {TARGET}.",
   "tagPage.title": "{TAG}",
