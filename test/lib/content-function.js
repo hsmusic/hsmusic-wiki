@@ -90,6 +90,29 @@ export function testContentFunctions(t, message, fn) {
       t.matchSnapshot(result, description);
     };
 
+    evaluate.stubTemplate = name => {
+      // Creates a particularly permissable template, allowing any slot values
+      // to be stored and just outputting the contents of those slots as-are.
+
+      return new (class extends html.Template {
+        #slotValues = {};
+
+        constructor() {
+          super({
+            content: () => `${name}: ${JSON.stringify(this.#slotValues)}`,
+          });
+        }
+
+        setSlots(slotNamesToValues) {
+          Object.assign(this.#slotValues, slotNamesToValues);
+        }
+
+        setSlot(slotName, slotValue) {
+          this.#slotValues[slotName] = slotValue;
+        }
+      });
+    };
+
     evaluate.mock = (...opts) => {
       const {value, close} = mock(...opts);
       mocks.push({close});
