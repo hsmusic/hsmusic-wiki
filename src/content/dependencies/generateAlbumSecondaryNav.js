@@ -1,8 +1,9 @@
-import {empty} from '../../util/sugar.js';
+import {stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
     'generateColorStyleVariables',
+    'generatePreviousNextLinks',
     'generateSecondaryNav',
     'linkAlbum',
     'linkGroup',
@@ -11,43 +12,77 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album) {
+  query(album) {
+    const query = {};
+
+    if (album.date) {
+      query.adjacentGroupInfo =
+        album.groups.map(group => {
+          const albums = group.albums.filter(album => album.date);
+          const index = albums.indexOf(album);
+
+          return {
+            previousAlbum:
+              (index > 0
+                ? albums[index - 1]
+                : null),
+
+            nextAlbum:
+              (index < albums.length - 1
+                ? albums[index + 1]
+                : null),
+          };
+        });
+    }
+
+    return query;
+  },
+
+  relations(relation, query, album) {
     const relations = {};
 
     relations.secondaryNav =
       relation('generateSecondaryNav');
 
-    relations.groupParts =
-      album.groups.map(group => {
-        const relations = {};
+    relations.groupLinks =
+      album.groups
+        .map(group => relation('linkGroup', group));
 
-        relations.groupLink =
-          relation('linkGroup', group);
+    relations.colorVariables =
+      album.groups
+        .map(() => relation('generateColorStyleVariables'));
 
-        relations.colorVariables =
-          relation('generateColorStyleVariables', group.color);
+    if (query.adjacentGroupInfo) {
+      relations.previousNextLinks =
+        query.adjacentGroupInfo
+          .map(({previousAlbum, nextAlbum}) =>
+            (previousAlbum || nextAlbum
+              ? relation('generatePreviousNextLinks')
+              : null));
 
-        if (album.date) {
-          const albums = group.albums.filter(album => album.date);
-          const index = albums.indexOf(album);
-          const previousAlbum = (index > 0) && albums[index - 1];
-          const nextAlbum = (index < albums.length - 1) && albums[index + 1];
+      relations.previousAlbumLinks =
+        query.adjacentGroupInfo
+          .map(({previousAlbum}) =>
+            (previousAlbum
+              ? relation('linkAlbum', previousAlbum)
+              : null));
 
-          if (previousAlbum) {
-            relations.previousAlbumLink =
-              relation('linkAlbum', previousAlbum);
-          }
-
-          if (nextAlbum) {
-            relations.nextAlbumLink =
-              relation('linkAlbum', nextAlbum);
-          }
-        }
-
-        return relations;
-      });
+      relations.nextAlbumLinks =
+        query.adjacentGroupInfo
+          .map(({nextAlbum}) =>
+            (nextAlbum
+              ? relation('linkAlbum', nextAlbum)
+              : null));
+    }
 
     return relations;
+  },
+
+  data(query, album) {
+    return {
+      groupColors:
+        album.groups.map(group => group.color),
+    };
   },
 
   slots: {
@@ -57,42 +92,51 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
+  generate(data, relations, slots, {html, language}) {
     return relations.secondaryNav.slots({
       class: 'nav-links-groups',
       content:
-        relations.groupParts.map(({
-          colorVariables,
-          groupLink,
-          previousAlbumLink,
-          nextAlbumLink,
-        }) => {
-          const links = [
-            previousAlbumLink
-              ?.slots({
-                color: false,
-                content: language.$('misc.nav.previous'),
-              }),
+        stitchArrays({
+          colorVariables: relations.colorVariables,
+          groupLink: relations.groupLinks,
+          previousNextLinks: relations.previousNextLinks ?? null,
+          previousAlbumLink: relations.previousAlbumLinks ?? null,
+          nextAlbumLink: relations.nextAlbumLinks ?? null,
+          groupColor: data.groupColors,
+        }).map(({
+            colorVariables,
+            groupLink,
+            previousNextLinks,
+            previousAlbumLink,
+            nextAlbumLink,
+            groupColor,
+          }) => {
+            if (
+              slots.mode === 'track' ||
+              !previousAlbumLink && !nextAlbumLink
+            ) {
+              return language.$('albumSidebar.groupBox.title', {
+                group: groupLink,
+              });
+            }
 
-            nextAlbumLink
-              ?.slots({
-                color: false,
-                content: language.$('misc.nav.next'),
-              }),
-          ].filter(Boolean);
+            const {content: previousNextPart} =
+              previousNextLinks.slots({
+                previousLink: previousAlbumLink,
+                nextLink: nextAlbumLink,
+                id: false,
+              });
 
-          return (
-            (slots.mode === 'album' && !empty(links)
-              ? html.tag('span', {style: colorVariables}, [
+            return (
+              html.tag('span',
+                {style: colorVariables.slot('color', groupColor).content},
+                [
                   language.$('albumSidebar.groupBox.title', {
-                    group: groupLink,
+                    group: groupLink.slot('color', false),
                   }),
-                  `(${language.formatUnitList(links)})`,
-                ])
-              : language.$('albumSidebar.groupBox.title', {
-                  group: groupLink,
-                })));
-        }),
+                  `(${language.formatUnitList(previousNextPart)})`,
+                ]));
+          }),
     });
   },
 };
