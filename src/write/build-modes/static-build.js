@@ -7,12 +7,7 @@ import {
   quickLoadContentDependencies,
 } from '../../content/dependencies/index.js';
 
-import {
-  fillRelationsLayoutFromSlotResults,
-  flattenRelationsTree,
-  getRelationsTree,
-  getNeededContentDependencyNames,
-} from '../../content-function.js';
+import {quickEvaluate} from '../../content-function.js';
 
 import {serializeThings} from '../../data/serialize.js';
 
@@ -112,7 +107,6 @@ export async function go({
 
   if (appendIndexHTML) {
     logWarn`Appending index.html to link hrefs. (Note: not recommended for production release!)`;
-    link.globalOptions.appendIndexHTML = true;
   }
 
   if (writeOneLanguage && !(writeOneLanguage in languages)) {
@@ -256,7 +250,7 @@ export async function go({
   ));
   */
 
-  const allContentDependencies = await quickLoadContentDependencies();
+  const contentDependencies = await quickLoadContentDependencies();
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =
@@ -306,126 +300,19 @@ export async function go({
           wikiData,
         });
 
-        /*
-        const pageInfo = page.page(bound);
+        const topLevelResult =
+          quickEvaluate({
+            contentDependencies,
+            extraDependencies: {...bound, appendIndexHTML},
 
-        const oEmbedJSON = generateOEmbedJSON(pageInfo, {
-          language,
-          wikiData,
-        });
+            name: page.contentFunction.name,
+            args: page.contentFunction.args ?? [],
+          });
 
-        const oEmbedJSONHref =
-          oEmbedJSON &&
-          wikiData.wikiInfo.canonicalBase &&
-            wikiData.wikiInfo.canonicalBase +
-            urls
-              .from('shared.root')
-              .to('shared.path', pathname + 'oembed.json');
-        */
-
-        const allExtraDependencies = {
-          ...bound,
-          appendIndexHTML: false,
-        };
-
-        const {name, args = []} = page.contentFunction;
-        const treeInfo = getRelationsTree(allContentDependencies, name, wikiData, ...args);
-        const flatTreeInfo = flattenRelationsTree(treeInfo);
-        const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
-
-        const neededContentDependencyNames =
-          getNeededContentDependencyNames(allContentDependencies, name);
-
-        // Content functions aren't recursive, so by following the set above
-        // sequentually, we will always provide fulfilled content functions as the
-        // dependencies for later content functions.
-        const fulfilledContentDependencies = {};
-        for (const name of neededContentDependencyNames) {
-          const unfulfilledContentFunction = allContentDependencies[name];
-          if (!unfulfilledContentFunction) continue;
-
-          const {contentDependencies, extraDependencies} = unfulfilledContentFunction;
-
-          if (empty(contentDependencies) && empty(extraDependencies)) {
-            fulfilledContentDependencies[name] = unfulfilledContentFunction;
-            continue;
-          }
-
-          const fulfillments = {};
-
-          for (const dependencyName of contentDependencies ?? []) {
-            if (dependencyName in fulfilledContentDependencies) {
-              fulfillments[dependencyName] =
-                fulfilledContentDependencies[dependencyName];
-            }
-          }
-
-          for (const dependencyName of extraDependencies ?? []) {
-            if (dependencyName in allExtraDependencies) {
-              fulfillments[dependencyName] =
-                allExtraDependencies[dependencyName];
-            }
-          }
-
-          fulfilledContentDependencies[name] =
-            unfulfilledContentFunction.fulfill(fulfillments);
-        }
-
-        // There might still be unfulfilled content functions if dependencies weren't
-        // provided as part of allContentDependencies or allExtraDependencies.
-        // Catch and report these early, together in an aggregate error.
-        const unfulfilledErrors = [];
-        const unfulfilledNames = [];
-        for (const name of neededContentDependencyNames) {
-          const contentFunction = fulfilledContentDependencies[name];
-          if (!contentFunction) continue;
-          if (!contentFunction.fulfilled) {
-            try {
-              contentFunction();
-            } catch (error) {
-              error.message = `(${name}) ${error.message}`;
-              unfulfilledErrors.push(error);
-              unfulfilledNames.push(name);
-            }
-          }
-        }
-
-        if (!empty(unfulfilledErrors)) {
-          throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled (${unfulfilledNames.join(', ')})`);
-        }
-
-        const slotResults = {};
-
-        function runContentFunction({name, args, relations: layout}) {
-          const contentFunction = fulfilledContentDependencies[name];
-
-          if (!contentFunction) {
-            throw new Error(`Content function ${name} unfulfilled or not listed`);
-          }
-
-          const generateArgs = [];
-
-          if (contentFunction.data) {
-            generateArgs.push(contentFunction.data(...args));
-          }
-
-          if (layout) {
-            generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
-          }
-
-          return contentFunction(...generateArgs);
-        }
-
-        for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
-          slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
-        }
-
-        const topLevelResult = runContentFunction(root);
         const pageHTML = topLevelResult.toString();
 
         return writePage({
           html: pageHTML,
-          // oEmbedJSON,
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,

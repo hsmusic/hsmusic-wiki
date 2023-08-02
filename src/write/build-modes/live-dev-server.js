@@ -28,12 +28,7 @@ import {
   watchContentDependencies,
 } from '../../content/dependencies/index.js';
 
-import {
-  fillRelationsLayoutFromSlotResults,
-  flattenRelationsTree,
-  getRelationsTree,
-  getNeededContentDependencyNames,
-} from '../../content-function.js';
+import {quickEvaluate} from '../../content-function.js';
 
 const defaultHost = '0.0.0.0';
 const defaultPort = 8002;
@@ -94,7 +89,7 @@ export async function go({
   const quietResponses = cliOptions['quiet-responses'] ?? false;
 
   const contentDependenciesWatcher = await watchContentDependencies();
-  const {contentDependencies: allContentDependencies} = contentDependenciesWatcher;
+  const {contentDependencies} = contentDependenciesWatcher;
 
   contentDependenciesWatcher.on('error', () => {});
   await new Promise(resolve => contentDependenciesWatcher.once('ready', resolve));
@@ -347,8 +342,6 @@ export async function go({
         urls,
       });
 
-      const {name, args = []} = page.contentFunction;
-
       const bound = bindUtilities({
         absoluteTo,
         cachebust,
@@ -363,108 +356,14 @@ export async function go({
         wikiData,
       });
 
-      const allExtraDependencies = {
-        ...bound,
+      const topLevelResult =
+        quickEvaluate({
+          contentDependencies,
+          extraDependencies: {...bound, appendIndexHTML: false},
 
-        appendIndexHTML: false,
-      };
-
-      // NOTE: ALL THIS STUFF IS PASTED, REVIEW AND INTEGRATE SOON(TM)
-
-      const treeInfo = getRelationsTree(allContentDependencies, name, wikiData, ...args);
-      const flatTreeInfo = flattenRelationsTree(treeInfo);
-      const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
-
-      const neededContentDependencyNames =
-        getNeededContentDependencyNames(allContentDependencies, name);
-
-      // Content functions aren't recursive, so by following the set above
-      // sequentually, we will always provide fulfilled content functions as the
-      // dependencies for later content functions.
-      const fulfilledContentDependencies = {};
-      for (const name of neededContentDependencyNames) {
-        const unfulfilledContentFunction = allContentDependencies[name];
-        if (!unfulfilledContentFunction) continue;
-
-        const {contentDependencies, extraDependencies} = unfulfilledContentFunction;
-
-        if (empty(contentDependencies) && empty(extraDependencies)) {
-          fulfilledContentDependencies[name] = unfulfilledContentFunction;
-          continue;
-        }
-
-        const fulfillments = {};
-
-        for (const dependencyName of contentDependencies ?? []) {
-          if (dependencyName in fulfilledContentDependencies) {
-            fulfillments[dependencyName] =
-              fulfilledContentDependencies[dependencyName];
-          }
-        }
-
-        for (const dependencyName of extraDependencies ?? []) {
-          if (dependencyName in allExtraDependencies) {
-            fulfillments[dependencyName] =
-              allExtraDependencies[dependencyName];
-          }
-        }
-
-        fulfilledContentDependencies[name] =
-          unfulfilledContentFunction.fulfill(fulfillments);
-      }
-
-      // There might still be unfulfilled content functions if dependencies weren't
-      // provided as part of allContentDependencies or allExtraDependencies.
-      // Catch and report these early, together in an aggregate error.
-      const unfulfilledErrors = [];
-      const unfulfilledNames = [];
-      for (const name of neededContentDependencyNames) {
-        const contentFunction = fulfilledContentDependencies[name];
-        if (!contentFunction) continue;
-        if (!contentFunction.fulfilled) {
-          try {
-            contentFunction();
-          } catch (error) {
-            error.message = `(${name}) ${error.message}`;
-            unfulfilledErrors.push(error);
-            unfulfilledNames.push(name);
-          }
-        }
-      }
-
-      if (!empty(unfulfilledErrors)) {
-        throw new AggregateError(unfulfilledErrors, `Content functions unfulfilled (${unfulfilledNames.join(', ')})`);
-      }
-
-      const slotResults = {};
-
-      function runContentFunction({name, args, relations: layout}) {
-        const contentFunction = fulfilledContentDependencies[name];
-
-        if (!contentFunction) {
-          throw new Error(`Content function ${name} unfulfilled or not listed`);
-        }
-
-        const generateArgs = [];
-
-        if (contentFunction.data) {
-          generateArgs.push(contentFunction.data(...args));
-        }
-
-        if (layout) {
-          generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
-        }
-
-        return contentFunction(...generateArgs);
-      }
-
-      for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
-        slotResults[slot] = runContentFunction(flatRelationSlots[slot]);
-      }
-
-      const topLevelResult = runContentFunction(root);
-
-      // END PASTE
+          name: page.contentFunction.name,
+          args: page.contentFunction.args ?? [],
+        });
 
       const pageHTML = topLevelResult.toString();
 
