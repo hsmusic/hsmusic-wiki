@@ -1,4 +1,4 @@
-import {empty} from '../../util/sugar.js';
+import {empty, stitchArrays} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
@@ -11,20 +11,18 @@ export default {
 
   relations(relation, category) {
     return {
-      colorVariables: relation('generateColorStyleVariables', category.color),
+      colorVariables:
+        relation('generateColorStyleVariables'),
 
-      // Which of these is used depends on the currentExtra slot, so all
-      // available links are included here.
-      groupLinks: category.groups.map(group => {
-        const links = {};
-        links.info = relation('linkGroup', group);
+      groupInfoLinks:
+        category.groups.map(group =>
+          relation('linkGroup', group)),
 
-        if (!empty(group.albums)) {
-          links.gallery = relation('linkGroupGallery', group);
-        }
-
-        return links;
-      }),
+      groupGalleryLinks:
+        category.groups.map(group =>
+          (empty(group.albums)
+            ? null
+            : relation('linkGroupGallery', group))),
     };
   },
 
@@ -32,6 +30,8 @@ export default {
     const data = {};
 
     data.name = category.name;
+    data.color = category.color;
+
     data.isCurrentCategory = category === group.category;
 
     if (data.isCurrentCategory) {
@@ -55,7 +55,7 @@ export default {
       },
       [
         html.tag('summary',
-          {style: relations.colorVariables},
+          {style: relations.colorVariables.slot('color', data.color).content},
           html.tag('span',
             language.$('groupSidebar.groupList.category', {
               category:
@@ -64,14 +64,18 @@ export default {
             }))),
 
         html.tag('ul',
-          relations.groupLinks.map((links, index) =>
-            html.tag('li',
-              {class: index === data.currentGroupIndex && 'current'},
-              language.$('groupSidebar.groupList.item', {
-                group:
-                  links[slots.currentExtra ?? 'info'] ??
-                  links.info,
-              })))),
+          stitchArrays(({
+            infoLink: relations.groupInfoLinks,
+            galleryLink: relations.groupGalleryLinks,
+          })).map(({infoLink, galleryLink}, index) =>
+                html.tag('li',
+                  {class: index === data.currentGroupIndex && 'current'},
+                  language.$('groupSidebar.groupList.item', {
+                    group:
+                      (slots.currentExtra === 'gallery'
+                        ? galleryLink ?? infoLink
+                        : infoLink),
+                  })))),
       ]);
   },
 };
