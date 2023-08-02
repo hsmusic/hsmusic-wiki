@@ -377,8 +377,14 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
         }
 
         const relationSymbol = Symbol(relationSymbolMessage(name));
+
+        const {stackTraceLimit} = Error;
+        Error.stackTraceLimit = 0;
         const subCause = new Error(`Error in relation('${name}') within ${contentFunctionName}`);
+        Error.stackTraceLimit = stackTraceLimit;
+        Error.captureStackTrace(subCause, relationFunction);
         if (superCause) subCause.cause = superCause;
+
         relationSlots[relationSymbol] = {name, args, cause: subCause};
         return {[relationIdentifier]: relationSymbol};
       };
