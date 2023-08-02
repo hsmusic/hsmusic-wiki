@@ -68,8 +68,9 @@ export default {
     };
   },
 
-  data({wikiName}) {
+  data({wikiColor, wikiName}) {
     return {
+      wikiColor,
       wikiName,
     };
   },
@@ -86,8 +87,8 @@ export default {
     relations.defaultFooterContent =
       relation('transformContent', sprawl.footerContent);
 
-    relations.defaultColorStyleRules =
-      relation('generateColorStyleRules', sprawl.wikiColor);
+    relations.colorStyleRules =
+      relation('generateColorStyleRules');
 
     return relations;
   },
@@ -100,12 +101,9 @@ export default {
 
     socialEmbed: {type: 'html'},
 
-    colorStyleRules: {
-      validate: v => v.sparseArrayOf(v.isString),
-      default: [],
-    },
+    color: {validate: v => v.isColor},
 
-    additionalStyleRules: {
+    styleRules: {
       validate: v => v.sparseArrayOf(v.isString),
       default: [],
     },
@@ -588,10 +586,9 @@ export default {
             }),
 
             html.tag('style', [
-              (empty(slots.colorStyleRules)
-                ? relations.defaultColorStyleRules
-                : slots.colorStyleRules),
-              slots.additionalStyleRules,
+              relations.colorStyleRules
+                .slot('color', slots.color ?? data.wikiColor),
+              slots.styleRules,
             ]),
 
             html.tag('script', {

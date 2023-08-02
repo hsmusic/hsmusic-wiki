@@ -3,7 +3,6 @@ import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
-    'generateColorStyleRules',
     'generateCoverGrid',
     'generatePageLayout',
     'image',
@@ -37,9 +36,6 @@ export default {
     relations.layout =
       relation('generatePageLayout');
 
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', tag.color);
-
     relations.artTagMainLink =
       relation('linkArtTag', tag);
 
@@ -59,12 +55,13 @@ export default {
     return relations;
   },
 
-  data(query, sprawl, artist) {
+  data(query, sprawl, tag) {
     const data = {};
 
     data.enableListings = sprawl.enableListings;
 
-    data.name = artist.name;
+    data.name = tag.name;
+    data.color = tag.color;
 
     data.numArtworks = query.things.length;
 
@@ -90,7 +87,7 @@ export default {
 
         headingMode: 'static',
 
-        colorStyleRules: [relations.colorStyleRules],
+        color: data.color,
 
         mainClasses: ['top-index'],
         mainContent: [

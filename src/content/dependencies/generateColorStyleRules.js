@@ -1,26 +1,27 @@
 export default {
-  contentDependencies: [
-    'generateColorStyleVariables',
-  ],
+  contentDependencies: ['generateColorStyleVariables'],
+  extraDependencies: ['html'],
 
-  relations(relation, color) {
-    const relations = {};
+  relations: (relation) =>
+    ({variables: relation('generateColorStyleVariables')}),
 
-    if (color) {
-      relations.variables =
-        relation('generateColorStyleVariables', color);
-    }
-
-    return relations;
+  slots: {
+    color: {validate: v => v.isColor},
   },
 
-  generate(relations) {
-    if (!relations.variables) return '';
+  generate(relations, slots) {
+    if (!slots.color) {
+      return '';
+    }
 
     return [
       `:root {`,
-      // This is pretty hilariously hacky.
-      ...relations.variables.split(';').map(line => line + ';'),
+      ...(
+        relations.variables
+          .slot('color', slots.color)
+          .content
+          .split(';')
+          .map(line => line + ';')),
       `}`,
     ].join('\n');
   },

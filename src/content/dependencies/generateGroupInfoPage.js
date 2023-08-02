@@ -2,7 +2,6 @@ import {empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
-    'generateColorStyleRules',
     'generateContentHeading',
     'generateGroupNavLinks',
     'generateGroupSidebar',
@@ -36,9 +35,6 @@ export default {
       relations.sidebar =
         relation('generateGroupSidebar', group);
     }
-
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', group.color);
 
     sec.info = {};
 
@@ -83,6 +79,7 @@ export default {
     const data = {};
 
     data.name = group.name;
+    data.color = group.color;
 
     if (!empty(group.albums)) {
       data.albumYears =
@@ -100,8 +97,7 @@ export default {
       .slots({
         title: language.$('groupInfoPage.title', {group: data.name}),
         headingMode: 'sticky',
-
-        colorStyleRules: [relations.colorStyleRules],
+        color: data.color,
 
         mainContent: [
           sec.info.visitLinks &&

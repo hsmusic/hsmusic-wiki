@@ -15,7 +15,6 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
-    'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
     'generateTrackCoverArtwork',
@@ -49,9 +48,6 @@ export default {
 
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', track.album);
-
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', track.color);
 
     relations.artistChronologyContributions =
       getChronologyRelations(track, {
@@ -285,6 +281,7 @@ export default {
   data(sprawl, track) {
     return {
       name: track.name,
+      color: track.color,
 
       hasTrackNumbers: track.album.hasTrackNumbers,
       trackNumber: track.album.tracks.indexOf(track) + 1,
@@ -301,8 +298,8 @@ export default {
         title: language.$('trackPage.title', {track: data.name}),
         headingMode: 'sticky',
 
-        colorStyleRules: [relations.colorStyleRules],
-        additionalStyleRules: [relations.albumStyleRules],
+        color: data.color,
+        styleRules: [relations.albumStyleRules],
 
         cover:
           (relations.cover

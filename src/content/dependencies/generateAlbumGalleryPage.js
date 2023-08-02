@@ -6,7 +6,6 @@ export default {
     'generateAlbumGalleryStatsLine',
     'generateAlbumNavAccent',
     'generateAlbumStyleRules',
-    'generateColorStyleRules',
     'generateCoverGrid',
     'generatePageLayout',
     'image',
@@ -54,9 +53,6 @@ export default {
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', album);
 
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', album.color);
-
     relations.albumLink =
       relation('linkAlbum', album);
 
@@ -91,6 +87,7 @@ export default {
     const data = {};
 
     data.name = album.name;
+    data.color = album.color;
 
     data.names =
       album.tracks.map(track => track.name);
@@ -127,8 +124,8 @@ export default {
 
         headingMode: 'static',
 
-        colorStyleRules: [relations.colorStyleRules],
-        additionalStyleRules: [relations.albumStyleRules],
+        color: data.color,
+        styleRules: [relations.albumStyleRules],
 
         mainClasses: ['top-index'],
         mainContent: [

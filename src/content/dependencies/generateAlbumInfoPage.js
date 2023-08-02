@@ -16,7 +16,6 @@ export default {
     'generateAlbumStyleRules',
     'generateAlbumTrackList',
     'generateChronologyLinks',
-    'generateColorStyleRules',
     'generateContentHeading',
     'generatePageLayout',
     'linkAlbum',
@@ -38,9 +37,6 @@ export default {
 
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', album);
-
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', album.color);
 
     relations.socialEmbed =
       relation('generateAlbumSocialEmbed', album);
@@ -145,6 +141,7 @@ export default {
     const data = {};
 
     data.name = album.name;
+    data.color = album.color;
 
     if (!empty(album.additionalFiles)) {
       data.numAdditionalFiles = album.additionalFiles.length;
@@ -163,8 +160,8 @@ export default {
         title: language.$('albumPage.title', {album: data.name}),
         headingMode: 'sticky',
 
-        colorStyleRules: [relations.colorStyleRules],
-        additionalStyleRules: [relations.albumStyleRules],
+        color: data.color,
+        styleRules: [relations.albumStyleRules],
 
         cover:
           relations.cover

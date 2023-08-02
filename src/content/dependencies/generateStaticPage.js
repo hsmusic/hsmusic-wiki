@@ -21,7 +21,7 @@ export default {
         title: data.name,
         headingMode: 'sticky',
 
-        additionalStyleRules:
+        styleRules:
           (data.stylesheet
             ? [data.stylesheet]
             : []),

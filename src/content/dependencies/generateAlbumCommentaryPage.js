@@ -4,7 +4,6 @@ export default {
   contentDependencies: [
     'generateAlbumNavAccent',
     'generateAlbumStyleRules',
-    'generateColorStyleRules',
     'generateColorStyleVariables',
     'generateContentHeading',
     'generatePageLayout',
@@ -23,9 +22,6 @@ export default {
 
     relations.albumStyleRules =
       relation('generateAlbumStyleRules', album);
-
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', album.color);
 
     relations.albumLink =
       relation('linkAlbum', album);
@@ -59,7 +55,7 @@ export default {
         .map(track =>
           (track.color === album.color
             ? null
-            : relation('generateColorStyleVariables', track.color)));
+            : relation('generateColorStyleVariables')));
 
     return relations;
   },
@@ -68,6 +64,7 @@ export default {
     const data = {};
 
     data.name = album.name;
+    data.color = album.color;
 
     const tracksWithCommentary =
       album.tracks
@@ -91,6 +88,13 @@ export default {
       tracksWithCommentary
         .map(track => track.directory);
 
+    data.trackCommentaryColors =
+      tracksWithCommentary
+        .map(track =>
+          (track.color === album.color
+            ? null
+            : track.color));
+
     return data;
   },
 
@@ -104,8 +108,8 @@ export default {
 
         headingMode: 'sticky',
 
-        colorStyleRules: [relations.colorStyleRules],
-        additionalStyleRules: [relations.albumStyleRules],
+        color: data.color,
+        styleRules: [relations.albumStyleRules],
 
         mainClasses: ['long-content'],
         mainContent: [
@@ -135,13 +139,18 @@ export default {
             directory: data.trackCommentaryDirectories,
             content: relations.trackCommentaryContent,
             colorVariables: relations.trackCommentaryColorVariables,
-          }).map(({heading, link, directory, content, colorVariables}) => [
+            color: data.trackCommentaryColors,
+          }).map(({heading, link, directory, content, colorVariables, color}) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
                 title: link,
               }),
-              html.tag('blockquote', {style: colorVariables}, content),
+              html.tag('blockquote',
+                (color
+                  ? {style: colorVariables.slot('color', color).content}
+                  : {}),
+                content),
             ]),
         ],
 

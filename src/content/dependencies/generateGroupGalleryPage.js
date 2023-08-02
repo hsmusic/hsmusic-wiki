@@ -8,7 +8,6 @@ import {
 
 export default {
   contentDependencies: [
-    'generateColorStyleRules',
     'generateCoverCarousel',
     'generateCoverGrid',
     'generateGroupNavLinks',
@@ -51,9 +50,6 @@ export default {
         relation('generateGroupSidebar', group);
     }
 
-    relations.colorStyleRules =
-      relation('generateColorStyleRules', group.color);
-
     if (sprawl.groupsByCategoryListing) {
       relations.groupListingLink =
         relation('linkListing', sprawl.groupsByCategoryListing);
@@ -94,6 +90,7 @@ export default {
     const data = {};
 
     data.name = group.name;
+    data.color = group.color;
 
     const albums = sortChronologically(group.albums.slice(), {latestFirst: true});
     const tracks = albums.flatMap((album) => album.tracks);
@@ -131,7 +128,7 @@ export default {
         title: language.$('groupGalleryPage.title', {group: data.name}),
         headingMode: 'static',
 
-        colorStyleRules: [relations.colorStyleRules],
+        color: data.color,
 
         mainClasses: ['top-index'],
         mainContent: [

@@ -1,14 +1,12 @@
 export default {
-  extraDependencies: [
-    'getColors',
-  ],
+  extraDependencies: ['html', 'getColors'],
 
-  data(color) {
-    return {color};
+  slots: {
+    color: {validate: v => v.isColor},
   },
 
-  generate(data, {getColors}) {
-    if (!data.color) return [];
+  generate(slots, {getColors}) {
+    if (!slots.color) return [];
 
     const {
       primary,
@@ -18,7 +16,7 @@ export default {
       bg,
       bgBlack,
       shadow,
-    } = getColors(data.color);
+    } = getColors(slots.color);
 
     return [
       `--primary-color: ${primary}`,
