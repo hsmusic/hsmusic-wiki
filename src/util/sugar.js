@@ -594,6 +594,17 @@ export function decorateErrorWithIndex(fn) {
   };
 }
 
+export function decorateErrorWithCause(fn, cause) {
+  return (...args) => {
+    try {
+      return fn(...args);
+    } catch (error) {
+      error.cause = cause;
+      throw error;
+    }
+  };
+}
+
 // Delicious function annotations, such as:
 //
 //   (*bound) soWeAreBackInTheMine

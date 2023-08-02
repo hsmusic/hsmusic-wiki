@@ -1,5 +1,6 @@
 import {
   annotateFunction,
+  decorateErrorWithCause,
   empty,
   setIntersection,
 } from './util/sugar.js';
@@ -332,7 +333,7 @@ export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
   const relationIdentifier = Symbol('Relation');
 
-  function recursive(contentFunctionName, ...args) {
+  function recursive(contentFunctionName, args, superCause = null) {
     const contentFunction = dependencies[contentFunctionName];
     if (!contentFunction) {
       throw new Error(`Couldn't find dependency ${contentFunctionName}`);
@@ -352,11 +353,17 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     const result = {
       name: contentFunctionName,
       args: argsForRelationsAndData,
+      cause: superCause,
     };
 
     if (contentFunction.relations) {
       const listedDependencies = new Set(contentFunction.contentDependencies);
 
+      // Note: "slots" here is a completely separate concept from HTML template
+      // slots, which are handled completely within the content function. Here,
+      // relation slots are just references to a position within the relations
+      // layout that are referred to by a symbol - when the relation is ready,
+      // its result will be "slotted" into the layout.
       const relationSlots = {};
 
       const relationSymbolMessage = (() => {
@@ -370,7 +377,9 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
         }
 
         const relationSymbol = Symbol(relationSymbolMessage(name));
-        relationSlots[relationSymbol] = {name, args};
+        const subCause = new Error(`Error in relation('${name}') within ${contentFunctionName}`);
+        if (superCause) subCause.cause = superCause;
+        relationSlots[relationSymbol] = {name, args, cause: subCause};
         return {[relationIdentifier]: relationSymbol};
       };
 
@@ -380,9 +389,9 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
       const relationsTree = Object.fromEntries(
         Object.getOwnPropertySymbols(relationSlots)
           .map(symbol => [symbol, relationSlots[symbol]])
-          .map(([symbol, {name, args}]) => [
+          .map(([symbol, {name, args, cause: subCause}]) => [
             symbol,
-            recursive(name, ...args),
+            recursive(name, args, subCause),
           ]));
 
       result.relations = {
@@ -395,7 +404,7 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     return result;
   }
 
-  const root = recursive(contentFunctionName, ...args);
+  const root = recursive(contentFunctionName, args, null);
 
   return {root, relationIdentifier};
 }
@@ -404,6 +413,13 @@ export function flattenRelationsTree({root, relationIdentifier}) {
   const flatRelationSlots = {};
 
   function recursive(node) {
+    const flatNode = {
+      name: node.name,
+      args: node.args,
+      cause: node.cause,
+      relations: node.relations?.layout ?? null,
+    };
+
     if (node.relations) {
       const {tree, slots} = node.relations;
       for (const slot of Object.getOwnPropertySymbols(slots)) {
@@ -411,15 +427,11 @@ export function flattenRelationsTree({root, relationIdentifier}) {
       }
     }
 
-    return {
-      name: node.name,
-      args: node.args,
-      relations: node.relations?.layout ?? null,
-    };
+    return flatNode;
   }
 
   return {
-    root: recursive(root),
+    root: recursive(root, []),
     relationIdentifier,
     flatRelationSlots,
   };
@@ -558,7 +570,7 @@ export function quickEvaluate({
 
   const slotResults = {};
 
-  function runContentFunction({name, args, relations: layout}) {
+  function runContentFunction({name, args, relations: layout, cause}) {
     const contentFunction = fulfilledContentDependencies[name];
 
     if (!contentFunction) {
@@ -568,14 +580,16 @@ export function quickEvaluate({
     const generateArgs = [];
 
     if (contentFunction.data) {
-      generateArgs.push(contentFunction.data(...args));
+      generateArgs.push(
+        decorateErrorWithCause(contentFunction.data, cause)(...args));
     }
 
     if (layout) {
       generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
     }
 
-    return contentFunction(...generateArgs);
+    return (
+      decorateErrorWithCause(contentFunction, cause)(...generateArgs));
   }
 
   for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
