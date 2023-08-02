@@ -2,16 +2,17 @@ export default {
   contentDependencies: ['generateColorStyleVariables'],
   extraDependencies: ['html'],
 
-  relations(relation, row) {
+  relations(relation) {
     return {
       colorVariables:
-        relation('generateColorStyleVariables', row.color),
+        relation('generateColorStyleVariables'),
     };
   },
 
   data(row) {
     return {
       name: row.name,
+      color: row.color,
     };
   },
 
@@ -24,7 +25,7 @@ export default {
       html.tag('section',
         {
           class: 'row',
-          style: [relations.colorVariables],
+          style: relations.colorVariables.slot('color', data.color).content,
         },
         [
           html.tag('h2', data.name),
