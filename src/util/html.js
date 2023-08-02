@@ -193,7 +193,11 @@ export class Tag {
   }
 
   clone() {
-    return new Tag(this.tagName, this.attributes, this.content);
+    return Reflect.construct(this.constructor, [
+      this.tagName,
+      this.attributes,
+      this.content,
+    ]);
   }
 
   set tagName(value) {
@@ -507,8 +511,12 @@ export class Template {
   }
 
   clone() {
-    const clone = new Template(this.#description);
+    const clone = Reflect.construct(this.constructor, [
+      this.#description,
+    ]);
+
     clone.setSlots(this.#slotValues);
+
     return clone;
   }
 
