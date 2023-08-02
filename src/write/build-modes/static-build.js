@@ -309,10 +309,11 @@ export async function go({
             args: page.contentFunction.args ?? [],
           });
 
-        const pageHTML = topLevelResult.toString();
+        const {pageHTML, oEmbedJSON} = topLevelResult.content;
 
         return writePage({
-          html: pageHTML,
+          pageHTML,
+          oEmbedJSON,
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
@@ -333,10 +334,10 @@ export async function go({
         });
 
         const target = to('localized.' + toPath[0], ...toPath.slice(1));
-        const html = generateRedirectHTML(title, target, {language});
+        const pageHTML = generateRedirectHTML(title, target, {language});
 
         return writePage({
-          html,
+          pageHTML,
           outputDirectory: path.join(outputPath, getPagePathname({
             baseDirectory,
             device: true,
@@ -387,14 +388,14 @@ import {
 } from 'fs/promises';
 
 async function writePage({
-  html,
+  pageHTML,
   oEmbedJSON = '',
   outputDirectory,
 }) {
   await mkdir(outputDirectory, {recursive: true});
 
   await Promise.all([
-    writeFile(path.join(outputDirectory, 'index.html'), html),
+    writeFile(path.join(outputDirectory, 'index.html'), pageHTML),
 
     oEmbedJSON &&
       writeFile(path.join(outputDirectory, 'oembed.json'), oEmbedJSON),

@@ -210,6 +210,7 @@ export default {
     to,
   }) {
     const colors = getColors(slots.color ?? data.wikiColor);
+    const hasSocialEmbed = !html.isBlank(slots.socialEmbed);
 
     let titleHTML = null;
 
@@ -522,7 +523,7 @@ export default {
       footerHTML,
     ].filter(Boolean).join('\n');
 
-    return html.tags([
+    const pageHTML = html.tags([
       `<!DOCTYPE html>`,
       html.tag('html',
         {
@@ -601,7 +602,10 @@ export default {
 
             */
 
-            // slots.socialEmbed,
+            hasSocialEmbed &&
+              slots.socialEmbed
+                .clone()
+                .slot('mode', 'html'),
 
             html.tag('link', {
               rel: 'stylesheet',
@@ -636,6 +640,16 @@ export default {
               }),
             ]),
         ])
-    ]);
+    ]).toString();
+
+    const oEmbedJSON =
+      (hasSocialEmbed
+        ? slots.socialEmbed
+            .clone()
+            .slot('mode', 'json')
+            .content
+        : null);
+
+    return {pageHTML, oEmbedJSON};
   },
 };

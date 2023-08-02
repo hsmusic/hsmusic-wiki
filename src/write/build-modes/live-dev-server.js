@@ -365,7 +365,7 @@ export async function go({
           args: page.contentFunction.args ?? [],
         });
 
-      const pageHTML = topLevelResult.toString();
+      const {pageHTML} = topLevelResult.content;
 
       if (!quietResponses) console.log(`${requestHead} [200] ${pathname}`);
       response.writeHead(200, contentTypeHTML);
