@@ -8,25 +8,32 @@ export default {
   slots: {
     previousLink: {type: 'html'},
     nextLink: {type: 'html'},
+    id: {type: 'boolean', default: true},
   },
 
   generate(slots, {html, language}) {
-    return [
-      !html.isBlank(slots.previousLink) &&
+    const previousNext = [];
+
+    if (!html.isBlank(slots.previousLink)) {
+      previousNext.push(
         slots.previousLink.slots({
           tooltip: true,
           color: false,
-          attributes: {id: 'previous-button'},
+          attributes: {id: slots.id && 'previous-button'},
           content: language.$('misc.nav.previous'),
-        }),
+        }));
+    }
 
-      !html.isBlank(slots.nextLink) &&
-        slots.nextLink?.slots({
+    if (!html.isBlank(slots.nextLink)) {
+      previousNext.push(
+        slots.nextLink.slots({
           tooltip: true,
           color: false,
-          attributes: {id: 'next-button'},
+          attributes: {id: slots.id && 'next-button'},
           content: language.$('misc.nav.next'),
-        }),
-    ];
+        }));
+    }
+
+    return previousNext;
   },
 };
