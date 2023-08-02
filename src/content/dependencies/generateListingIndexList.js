@@ -1,7 +1,7 @@
 import {empty, stitchArrays} from '../../util/sugar.js';
 
 export default {
-  contentDependencies: ['generateColorStyleVariables', 'linkListing'],
+  contentDependencies: ['linkListing'],
   extraDependencies: ['html', 'language', 'wikiData'],
 
   sprawl({listingTargetSpec, wikiInfo}) {
@@ -19,8 +19,6 @@ export default {
               !listing.featureFlag ||
               sprawl.wikiInfo[listing.featureFlag]));
 
-    query.wikiColor = sprawl.wikiInfo.color;
-
     query.targets =
       sprawl.listingTargetSpec
         .filter((target, index) => !empty(targetListings[index]));
@@ -34,8 +32,6 @@ export default {
 
   relations(relation, query) {
     return {
-      wikiColorVariables: relation('generateColorStyleVariables', query.wikiColor),
-
       listingLinks:
         query.targetListings
           .map(listings =>
@@ -109,7 +105,7 @@ export default {
                   class: targetIndex === data.currentTargetIndex && 'current',
                 },
                 [
-                  html.tag('summary', {style: relations.wikiColorVariables},
+                  html.tag('summary',
                     html.tag('span', {class: 'group-name'}, targetTitle)),
 
                   listingLinkList,
