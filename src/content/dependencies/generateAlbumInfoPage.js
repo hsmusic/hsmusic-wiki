@@ -277,7 +277,7 @@ export default {
 
         ...relations.sidebar,
 
-        // socialEmbed: relations.socialEmbed,
+        socialEmbed: relations.socialEmbed,
       });
   },
 };

@@ -2,18 +2,20 @@ import {empty} from '../../util/sugar.js';
 
 export default {
   contentDependencies: [
+    'generateSocialEmbed',
     'generateAlbumSocialEmbedDescription',
   ],
 
   extraDependencies: ['absoluteTo', 'language', 'urls'],
 
   relations(relation, album) {
-    const relations = {};
+    return {
+      socialEmbed:
+        relation('generateSocialEmbed'),
 
-    relations.description =
-      relation('generateAlbumSocialEmbedDescription', album);
-
-    return relations;
+      description:
+        relation('generateAlbumSocialEmbedDescription', album),
+    };
   },
 
   data(album) {
@@ -35,43 +37,38 @@ export default {
     }
 
     data.albumName = album.name;
-    data.albumColor = album.color;
 
     return data;
   },
 
   generate(data, relations, {absoluteTo, language, urls}) {
-    const socialEmbed = {};
+    return relations.socialEmbed.slots({
+      title:
+        language.$('albumPage.socialEmbed.title', {
+          album: data.albumName,
+        }),
 
-    if (data.hasHeading) {
-      socialEmbed.heading =
-        language.$('albumPage.socialEmbed.heading', {
-          group: data.headingGroupName,
-        });
+      description: relations.description,
 
-      socialEmbed.headingLink =
-        absoluteTo('localized.album', data.headingGroupDirectory);
-    } else {
-      socialEmbed.heading = '';
-      socialEmbed.headingLink = null;
-    }
+      headingContent:
+        (data.hasHeading
+          ? language.$('albumPage.socialEmbed.heading', {
+              group: data.headingGroupName,
+            })
+          : null),
 
-    socialEmbed.title =
-      language.$('albumPage.socialEmbed.title', {
-        album: data.albumName,
-      });
+      headingLink:
+        (data.hasHeading
+          ? absoluteTo('localized.groupGallery', data.headingGroupDirectory)
+          : null),
 
-    socialEmbed.description = relations.description;
-
-    if (data.hasImage) {
-      const imagePath = urls
-        .from('shared.root')
-        .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension);
-      socialEmbed.image = '/' + imagePath;
-    }
-
-    socialEmbed.color = data.albumColor;
-
-    return socialEmbed;
+      imagePath:
+        (data.hasImage
+          ? '/' +
+            urls
+              .from('shared.root')
+              .to('media.albumCover', data.coverArtDirectory, data.coverArtFileExtension)
+          : null),
+    });
   },
 };
