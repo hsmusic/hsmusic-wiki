@@ -785,7 +785,13 @@ export class Template {
       slots[slotName] = this.getSlotValue(slotName);
     }
 
-    return this.description.content(slots);
+    // Get outta here with that recursive Template bollocks!
+    const content = this.description.content(slots);
+    if (content instanceof Template) {
+      return content.content;
+    } else {
+      return content;
+    }
   }
 
   set description(_value) {
