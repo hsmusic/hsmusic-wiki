@@ -53,6 +53,7 @@ export default {
 
   extraDependencies: [
     'cachebust',
+    'getColors',
     'html',
     'language',
     'pagePath',
@@ -202,11 +203,14 @@ export default {
 
   generate(data, relations, slots, {
     cachebust,
+    getColors,
     html,
     language,
     pagePath,
     to,
   }) {
+    const colors = getColors(slots.color ?? data.wikiColor);
+
     let titleHTML = null;
 
     if (!html.isBlank(slots.title)) {
@@ -555,6 +559,25 @@ export default {
               name: 'viewport',
               content: 'width=device-width, initial-scale=1',
             }),
+
+            slots.color && [
+              html.tag('meta', {
+                name: 'theme-color',
+                content: colors.dark,
+                media: '(prefers-color-scheme: dark)',
+              }),
+
+              html.tag('meta', {
+                name: 'theme-color',
+                content: colors.light,
+                media: '(prefers-color-scheme: light)',
+              }),
+
+              html.tag('meta', {
+                name: 'theme-color',
+                content: colors.primary,
+              }),
+            ],
 
             /*
             ...(
