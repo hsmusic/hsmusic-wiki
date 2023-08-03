@@ -322,6 +322,8 @@ export async function go({
           })),
         });
       }),
+
+      /*
       ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
         const title = titleFn({
           language,
@@ -346,6 +348,7 @@ export async function go({
           })),
         });
       }),
+      */
     ], queueSize));
   };
 
