@@ -11,6 +11,7 @@ import {serializeThings} from '../../data/serialize.js';
 import * as pageSpecs from '../../page/index.js';
 
 import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
+import * as html from '../../util/html.js';
 import {empty} from '../../util/sugar.js';
 import {
   getPagePathname,
@@ -365,7 +366,7 @@ export async function go({
           args: page.contentFunction.args ?? [],
         });
 
-      const {pageHTML} = topLevelResult.content;
+      const {pageHTML} = html.resolve(topLevelResult);
 
       if (!quietResponses) console.log(`${requestHead} [200] ${pathname}`);
       response.writeHead(200, contentTypeHTML);

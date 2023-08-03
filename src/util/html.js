@@ -494,6 +494,10 @@ export class Attributes {
   }
 }
 
+export function resolve(tagOrTemplate) {
+  return Template.resolve(tagOrTemplate);
+}
+
 export function template(description) {
   return new Template(description);
 }
@@ -785,13 +789,7 @@ export class Template {
       slots[slotName] = this.getSlotValue(slotName);
     }
 
-    // Get outta here with that recursive Template bollocks!
-    const content = this.description.content(slots);
-    if (content instanceof Template) {
-      return content.content;
-    } else {
-      return content;
-    }
+    return this.description.content(slots);
   }
 
   set description(_value) {
@@ -804,6 +802,24 @@ export class Template {
 
   toString() {
     return this.content.toString();
+  }
+
+  static resolve(tagOrTemplate) {
+    // Flattens contents of a template, recursively "resolving" until a
+    // non-template is ready (or just returns a provided non-template
+    // argument as-is).
+
+    if (!(tagOrTemplate instanceof Template)) {
+      return tagOrTemplate;
+    }
+
+    let {content} = tagOrTemplate;
+
+    while (content instanceof Template) {
+      content = content.content;
+    }
+
+    return content;
   }
 
   [inspect.custom]() {

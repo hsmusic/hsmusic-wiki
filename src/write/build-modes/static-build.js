@@ -309,7 +309,7 @@ export async function go({
             args: page.contentFunction.args ?? [],
           });
 
-        const {pageHTML, oEmbedJSON} = topLevelResult.content;
+        const {pageHTML, oEmbedJSON} = html.resolve(topLevelResult);
 
         return writePage({
           pageHTML,
