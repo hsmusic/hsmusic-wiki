@@ -212,6 +212,7 @@ listingSpec.push({
   featureFlag: 'enableArtTagUI',
 });
 
+/*
 function listAdditionalFilesInProperty(property, {
   directory,
   stringsKey,
@@ -272,24 +273,33 @@ function listAdditionalFilesInProperty(property, {
       ]),
   };
 }
+*/
 
-listingSpec.push(listAdditionalFilesInProperty('sheetMusicFiles', {
+listingSpec.push({
+  /* listAdditionalFilesInProperty('sheetMusicFiles') */
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
+  contentFunction: 'listAllSheetMusicFiles',
   seeAlso: ['tracks/with-sheet-music-files'],
-}));
+  groupUnderOther: true,
+});
 
-listingSpec.push(listAdditionalFilesInProperty('midiProjectFiles', {
+listingSpec.push({
+  /* listAdditionalFilesInProperty('midiProjectFiles') */
   directory: 'all-midi-project-files',
   stringsKey: 'other.allMidiProjectFiles',
+  contentFunction: 'listAllMidiProjectFiles',
   seeAlso: ['tracks/with-midi-project-files'],
-}));
+  groupUnderOther: true,
+});
 
 listingSpec.push({
   directory: 'random',
   stringsKey: 'other.randomPages',
+  contentFunction: 'listRandomPageLinks',
   groupUnderOther: true,
 
+  /*
   data: ({wikiData: {albumData}}) => [
     {
       name: 'Official',
@@ -377,6 +387,7 @@ listingSpec.push({
         ]),
       ]),
     ]),
+  */
 });
 
 {
