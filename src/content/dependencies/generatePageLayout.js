@@ -636,7 +636,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('shared.staticFile', 'client.js', cachebust),
+                src: to('shared.staticFile', 'client2.js', cachebust),
               }),
             ]),
         ])
