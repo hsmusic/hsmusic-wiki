@@ -1,5 +1,5 @@
 export default {
-  contentDependencies: ['linkStationaryIndex'],
+  contentDependencies: ['linkTemplate'],
   extraDependencies: ['wikiData'],
 
   sprawl({wikiInfo}) {
@@ -14,7 +14,7 @@ export default {
 
   generate: (data, relations) =>
     relations.link.slots({
-      path: ['home'],
+      path: ['localized.home'],
       content: data.wikiShortName,
     }),
 };
