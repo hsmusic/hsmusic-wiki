@@ -13,7 +13,7 @@ import {serializeThings} from '../../data/serialize.js';
 
 import * as pageSpecs from '../../page/index.js';
 
-import link from '../../util/link.js';
+import * as html from '../../util/html.js';
 import {empty, queue, withEntries} from '../../util/sugar.js';
 
 import {
