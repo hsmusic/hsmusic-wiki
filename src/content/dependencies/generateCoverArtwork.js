@@ -55,7 +55,10 @@ export default {
           !empty(relations.tagLinks) &&
             html.tag('p',
               language.$('releaseInfo.artTags.inline', {
-                tags: language.formatUnitList(relations.tagLinks),
+                tags:
+                  language.formatUnitList(
+                    relations.tagLinks
+                      .map(tagLink => tagLink.slot('preferShortName', true))),
               })),
           ]);
 
