@@ -516,7 +516,7 @@ export default {
         navLinkStyle: 'hierarchical',
         navLinks: [
           {auto: 'home'},
-          {html: relations.albumLink},
+          {html: relations.albumLink.slot('color', false)},
           {
             html:
               (data.hasTrackNumbers
