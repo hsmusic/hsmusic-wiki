@@ -343,7 +343,9 @@ export const processNewsEntryDocument = makeProcessDocument(T.NewsEntry, {
 export const processArtTagDocument = makeProcessDocument(T.ArtTag, {
   propertyFieldMapping: {
     name: 'Tag',
+    nameShort: 'Short Name',
     directory: 'Directory',
+
     color: 'Color',
     isContentWarning: 'Is CW',
   },

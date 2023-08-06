@@ -18,6 +18,16 @@ export class ArtTag extends Thing {
     color: Thing.common.color(),
     isContentWarning: Thing.common.flag(false),
 
+    nameShort: {
+      flags: {update: true, expose: true},
+
+      expose: {
+        dependencies: ['name'],
+        transform: (value, {name}) =>
+          value ?? name.replace(/ \(.*?\)$/, ''),
+      },
+    },
+
     // Update only
 
     albumData: Thing.common.wikiData(Album),
