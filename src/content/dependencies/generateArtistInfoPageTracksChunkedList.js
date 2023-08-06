@@ -19,8 +19,30 @@ export default {
   extraDependencies: ['language'],
 
   query(artist) {
+    const tracksAsArtistAndContributor =
+      artist.tracksAsArtist
+        .filter(track => artist.tracksAsContributor.includes(track));
+
+    const tracksAsArtistOnly =
+      artist.tracksAsArtist
+        .filter(track => !artist.tracksAsContributor.includes(track));
+
+    const tracksAsContributorOnly =
+      artist.tracksAsContributor
+        .filter(track => !artist.tracksAsArtist.includes(track));
+
     const entries = [
-      ...artist.tracksAsArtist.map(track => ({
+      ...tracksAsArtistAndContributor.map(track => ({
+        thing: track,
+        entry: {
+          track,
+          album: track.album,
+          date: track.date,
+          contribs: [...track.artistContribs, ...track.contributorContribs],
+        },
+      })),
+
+      ...tracksAsArtistOnly.map(track => ({
         thing: track,
         entry: {
           track,
@@ -30,7 +52,7 @@ export default {
         },
       })),
 
-      ...artist.tracksAsContributor.map(track => ({
+      ...tracksAsContributorOnly.map(track => ({
         thing: track,
         entry: {
           track,
@@ -102,8 +124,9 @@ export default {
         query.chunks.map(({chunk}) =>
           chunk.map(({contribs}) =>
             contribs
-              .find(({who}) => who === artist)
-              .what)),
+              .filter(({who}) => who === artist)
+              .filter(({what}) => what)
+              .map(({what}) => what))),
 
       trackRereleases:
         query.chunks.map(({chunk}) =>
@@ -166,8 +189,10 @@ export default {
                   }) =>
                     item.slots({
                       otherArtistLinks,
-                      contribution,
                       rerelease,
+
+                      contribution:
+                        language.formatUnitList(contribution),
 
                       content:
                         (duration
