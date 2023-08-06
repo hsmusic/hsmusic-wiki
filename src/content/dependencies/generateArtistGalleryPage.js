@@ -60,6 +60,14 @@ export default {
           ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
           : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
 
+    data.otherCoverArtists =
+      query.things.map(thing =>
+        (thing.coverArtistContribs.length > 1
+          ? thing.coverArtistContribs
+              .filter(({who}) => who !== artist)
+              .map(({who}) => who.name)
+          : null));
+
     return data;
   },
 
@@ -87,12 +95,21 @@ export default {
             .slots({
               links: relations.links,
               names: data.names,
+
               images:
                 stitchArrays({
                   image: relations.images,
                   path: data.paths,
                 }).map(({image, path}) =>
                     image.slot('path', path)),
+
+              info:
+                data.otherCoverArtists.map(names =>
+                  (names === null
+                    ? null
+                    : language.$('misc.albumGrid.details.otherCoverArtists', {
+                        artists: language.formatUnitList(names),
+                      }))),
             }),
         ],
 

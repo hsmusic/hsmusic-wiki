@@ -233,6 +233,7 @@
   "misc.contentWarnings.reveal": "click to show",
   "misc.albumGrid.details": "({TRACKS}, {TIME})",
   "misc.albumGrid.details.coverArtists": "(Illust. {ARTISTS})",
+  "misc.albumGrid.details.otherCoverArtists": "(With {ARTISTS})",
   "misc.albumGrid.noCoverArt": "{ALBUM}",
   "misc.albumGalleryGrid.noCoverArt": "{NAME}",
   "misc.uiLanguage": "UI Language: {LANGUAGES}",
