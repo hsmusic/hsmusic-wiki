@@ -57,6 +57,12 @@ export function pathsForTarget(album) {
 
 export function pathsTargetless({wikiData: {wikiInfo}}) {
   return [
+    {
+      type: 'page',
+      path: ['commentaryIndex'],
+      contentFunction: {name: 'generateCommentaryIndexPage'},
+    },
+
     wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
       {
         type: 'redirect',
