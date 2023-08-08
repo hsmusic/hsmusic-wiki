@@ -321,6 +321,10 @@ export async function go({
 
     try {
       if (page.type === 'redirect') {
+        const title =
+          page.title ??
+          page.getTitle?.({language});
+
         const target = to('localized.' + page.toPath[0], ...page.toPath.slice(1));
 
         response.writeHead(301, {
@@ -328,7 +332,7 @@ export async function go({
           'Location': target,
         });
 
-        const redirectHTML = generateRedirectHTML(page.title, target, {language});
+        const redirectHTML = generateRedirectHTML(title, target, {language});
 
         response.end(redirectHTML);
 

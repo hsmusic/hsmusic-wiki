@@ -15,7 +15,7 @@ export function pathsForTarget(aliasArtist) {
       type: 'redirect',
       fromPath: ['artist', aliasArtist.directory],
       toPath: ['artist', aliasedArtist.directory],
-      title: () => aliasedArtist.name,
+      title: aliasedArtist.name,
     },
   ];
 }

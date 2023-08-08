@@ -355,10 +355,8 @@ export async function go({
         });
       }),
 
-      ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
-        const title = titleFn({
-          language,
-        });
+      ...redirectWrites.map(({fromPath, toPath, title, getTitle}) => () => {
+        title ??= getTitle?.({language});
 
         const to = getURLsFrom({
           baseDirectory,

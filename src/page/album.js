@@ -68,6 +68,7 @@ export function pathsTargetless({wikiData: {wikiInfo}}) {
         type: 'redirect',
         fromPath: ['page', 'list/all-commentary'],
         toPath: ['commentaryIndex'],
+        title: 'Album Commentary',
       },
   ];
 }
