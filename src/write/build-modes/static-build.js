@@ -78,6 +78,36 @@ export function getCLIOptions() {
   };
 }
 
+function generateRedirectHTML(title, target, {language}) {
+  return `<!DOCTYPE html>\n` + html.tag('html', [
+    html.tag('head', [
+      html.tag('title', language.$('redirectPage.title', {title})),
+      html.tag('meta', {charset: 'utf-8'}),
+
+      html.tag('meta', {
+        'http-equiv': 'refresh',
+        content: `0;url=${target}`,
+      }),
+
+      // TODO: Is this OK for localized pages?
+      html.tag('link', {
+        rel: 'canonical',
+        href: target,
+      }),
+    ]),
+
+    html.tag('body',
+      html.tag('main', [
+        html.tag('h1',
+          language.$('redirectPage.title', {title})),
+        html.tag('p',
+          language.$('redirectPage.infoLine', {
+            target: html.tag('a', {href: target}, target),
+          })),
+      ])),
+  ]);
+}
+
 export async function go({
   cliOptions,
   _dataPath,
@@ -323,7 +353,6 @@ export async function go({
         });
       }),
 
-      /*
       ...redirectWrites.map(({fromPath, toPath, title: titleFn}) => () => {
         const title = titleFn({
           language,
@@ -348,7 +377,6 @@ export async function go({
           })),
         });
       }),
-      */
     ], queueSize));
   };
 
@@ -473,31 +501,26 @@ async function writeSharedFilesAndPages({
   const {groupData, wikiInfo} = wikiData;
 
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
-    /*
     groupData?.some((group) => group.directory === 'fandom') &&
-      redirect(
-        'Fandom - Gallery',
-        'albums/fandom',
-        'localized.groupGallery',
-        'fandom'
-      ),
+      redirect({
+        title: 'Fandom - Gallery',
+        from: 'albums/fandom',
+        to: ['localized.groupGallery', 'fandom'],
+      }),
 
     groupData?.some((group) => group.directory === 'official') &&
-      redirect(
-        'Official - Gallery',
-        'albums/official',
-        'localized.groupGallery',
-        'official'
-      ),
+      redirect({
+        title: 'Official - Gallery',
+        from: 'albums/official',
+        to: ['localized.groupGallery', 'official'],
+      }),
 
     wikiInfo.enableListings &&
-      redirect(
-        'Album Commentary',
-        'list/all-commentary',
-        'localized.commentaryIndex',
-        ''
-      ),
-    */
+      redirect({
+        title: 'Album Commentary',
+        from: 'list/all-commentary',
+        to: ['localized.commentaryIndex'],
+      }),
 
     wikiDataJSON &&
       writeFile(
@@ -505,11 +528,12 @@ async function writeSharedFilesAndPages({
         wikiDataJSON),
   ].filter(Boolean));
 
-  async function redirect(title, from, urlKey, directory) {
-    const target = path.relative(
-      from,
-      urls.from('shared.root').to(urlKey, directory)
-    );
+  async function redirect({title, from, to: toPath}) {
+    const target =
+      path.relative(
+        from,
+        urls.from('shared.root').to(...toPath));
+
     const content = generateRedirectHTML(title, target, {language});
     await mkdir(path.join(outputPath, from), {recursive: true});
     await writeFile(path.join(outputPath, from, 'index.html'), content);
