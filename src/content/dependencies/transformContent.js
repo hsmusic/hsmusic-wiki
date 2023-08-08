@@ -351,14 +351,14 @@ export default {
             return {
               type: 'image',
               data:
-                image.slots({
-                  src,
-                  class: 'content-image',
-                  link: link ?? true,
-                  width: width ?? null,
-                  height: height ?? null,
-                  thumb: slots.thumb,
-                }),
+                html.tag('div', {class: 'content-image'},
+                  image.slots({
+                    src,
+                    link: link ?? true,
+                    width: width ?? null,
+                    height: height ?? null,
+                    thumb: slots.thumb,
+                  })),
             };
           }
 

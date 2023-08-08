@@ -539,8 +539,7 @@ p .current {
   display: none;
 }
 
-a.box.content-image {
-  display: block;
+.content-image {
   margin-top: 1em;
   margin-bottom: 1em;
 }
