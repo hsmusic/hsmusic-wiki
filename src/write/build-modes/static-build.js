@@ -503,41 +503,9 @@ async function writeSharedFilesAndPages({
   const {groupData, wikiInfo} = wikiData;
 
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
-    groupData?.some((group) => group.directory === 'fandom') &&
-      redirect({
-        title: 'Fandom - Gallery',
-        from: 'albums/fandom',
-        to: ['localized.groupGallery', 'fandom'],
-      }),
-
-    groupData?.some((group) => group.directory === 'official') &&
-      redirect({
-        title: 'Official - Gallery',
-        from: 'albums/official',
-        to: ['localized.groupGallery', 'official'],
-      }),
-
-    wikiInfo.enableListings &&
-      redirect({
-        title: 'Album Commentary',
-        from: 'list/all-commentary',
-        to: ['localized.commentaryIndex'],
-      }),
-
     wikiDataJSON &&
       writeFile(
         path.join(outputPath, 'data.json'),
         wikiDataJSON),
   ].filter(Boolean));
-
-  async function redirect({title, from, to: toPath}) {
-    const target =
-      path.relative(
-        from,
-        urls.from('shared.root').to(...toPath));
-
-    const content = generateRedirectHTML(title, target, {language});
-    await mkdir(path.join(outputPath, from), {recursive: true});
-    await writeFile(path.join(outputPath, from, 'index.html'), content);
-  }
 }
