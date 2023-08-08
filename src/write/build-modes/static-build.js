@@ -154,6 +154,8 @@ export async function go({
   const writeAll = empty(selectedPageFlags) || selectedPageFlags.includes('all');
   logInfo`Writing site pages: ${writeAll ? 'all' : selectedPageFlags.join(', ')}`;
 
+  await mkdir(outputPath, {recursive: true});
+
   await writeSymlinks({
     srcRootPath,
     mediaPath,
