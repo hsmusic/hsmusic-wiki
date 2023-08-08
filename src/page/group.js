@@ -46,14 +46,14 @@ export function pathsTargetless({wikiData: {wikiInfo}}) {
     wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
       {
         type: 'redirect',
-        fromPath: ['path', 'albums/fandom/'],
+        fromPath: ['page', 'albums/fandom'],
         toPath: ['groupGallery', 'fandom'],
       },
 
     wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
       {
         type: 'redirect',
-        fromPath: ['path', 'albums/official/'],
+        fromPath: ['page', 'albums/official'],
         toPath: ['groupGallery', 'official'],
       },
   ];

@@ -66,7 +66,7 @@ export function pathsTargetless({wikiData: {wikiInfo}}) {
     wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
       {
         type: 'redirect',
-        fromPath: ['path', 'list/all-commentary/'],
+        fromPath: ['page', 'list/all-commentary'],
         toPath: ['commentaryIndex'],
       },
   ];

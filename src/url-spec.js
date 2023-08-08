@@ -21,6 +21,7 @@ const urlSpec = {
     paths: {
       root: '',
       path: '<>',
+      page: '<>/',
 
       home: '',
 
