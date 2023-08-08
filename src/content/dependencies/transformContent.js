@@ -370,16 +370,18 @@ export default {
 
             const {link, label, hash, toIndex} = linkNode;
 
-            return {
-              type: 'link',
-              data:
-                (toIndex
-                  ? link.slots({content: label, hash})
-                  : link.slots({
-                      content: label, hash,
-                      preferShortName: slots.preferShortLinkNames,
-                    })),
-            };
+            // These are removed from the typical combined slots({})-style
+            // because we don't want to override slots that were already set
+            // by something that's wrapping the linkTemplate or linkThing
+            // template.
+            if (label) link.setSlot('content', label);
+            if (hash) link.setSlot('hash', hash);
+
+            if (toIndex) {
+              link.setSlot('preferShortName', slots.preferShortLinkNames);
+            }
+
+            return {type: 'link', data: link};
           }
 
           case 'tag': {
