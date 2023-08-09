@@ -57,4 +57,12 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
   quickSnapshot(
     'non-inline image #3',
       `<img src="spark.png">\nBaller.`);
+
+  quickSnapshot(
+    'dates',
+      `[[date:2023-04-13]] Yep!\nVery nice: [[date:25 October 2413]]`);
+
+  quickSnapshot(
+    'super basic string',
+      `Neat listing: [[string:listingPage.listAlbums.byDate.title]]`);
 });

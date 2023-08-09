@@ -5,6 +5,12 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > dates 1`] = `
+<p><time datetime="Thu, 13 Apr 2023 00:00:00 GMT">4/12/2023</time> Yep!</p>
+<p>Very nice: <time datetime="Fri, 25 Oct 2413 03:00:00 GMT">10/25/2413</time></p>
+
+`
+
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > inline images 1`] = `
 <p><img src="snooping.png"> as USUAL...</p>
 <p>What do you know? <img src="cowabunga.png" width="24" height="32"></p>
@@ -36,6 +42,11 @@ exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #3 1`] = `
 <a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
 <p>Baller.</p>
+
+`
+
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > super basic string 1`] = `
+<p>Neat listing: Albums - by Date</p>
 
 `
 
