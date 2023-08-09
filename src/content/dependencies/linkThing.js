@@ -44,16 +44,15 @@ export default {
   generate(data, relations, slots, {html}) {
     const path = [data.pathKey, data.directory];
 
-    let content = slots.content;
-
     const name =
       (slots.preferShortName
-        ? data.nameShort ?? data.name
-        : data.name);
+        ? data.nameShort ?? data.name ?? null
+        : data.name ?? null);
 
-    if (html.isBlank(content)) {
-      content = name;
-    }
+    const content =
+      (html.isBlank(slots.content)
+        ? name
+        : slots.content);
 
     let color = null;
     if (slots.color === true) {

@@ -33,7 +33,7 @@ export const replacerSpec = {
     value: (ref) => new Date(ref),
     html: (date, {html, language}) =>
       html.tag('time',
-        {datetime: date.toString()},
+        {datetime: date.toUTCString()},
         language.formatDate(date)),
   },
   'flash-index': {
@@ -129,9 +129,9 @@ const linkThingRelationMap = {
 };
 
 const linkValueRelationMap = {
-  // media: 'linkPathFromMedia',
-  // root: 'linkPathFromRoot',
-  // site: 'linkPathFromSite',
+  media: 'linkPathFromMedia',
+  root: 'linkPathFromRoot',
+  site: 'linkPathFromSite',
 };
 
 const linkIndexRelationMap = {
@@ -189,14 +189,12 @@ export default {
             determineData: {
               // No value at all: this is an index link.
               if (!replacerValue || replacerValue === '-') {
-                data.toIndex = true;
                 break determineData;
               }
 
               // Nothing to find: the link operates on a path or string, not a data object.
               if (!spec.find) {
                 data.value = replacerValue;
-                data.toIndex = false;
                 break determineData;
               }
 
@@ -214,7 +212,6 @@ export default {
 
               // Something was found: the link operates on that thing.
               data.thing = thing;
-              data.toIndex = false;
             }
 
             const {transformName} = spec;
@@ -236,8 +233,16 @@ export default {
           }
 
           // This will be another {type: 'tag'} node which gets processed in
-          // generate.
-          return node;
+          // generate. Extract replacerKey and replacerValue now, since it'd
+          // be a pain to deal with later.
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              replacerKey: node.data.replacerKey.data,
+              replacerValue: node.data.replacerValue[0].data,
+            },
+          };
         }),
     };
   },
@@ -273,7 +278,6 @@ export default {
               link: relation(name, arg),
               label: node.data.label,
               hash: node.data.hash,
-              toIndex: node.data.toIndex,
             }
           : getPlaceholder(node, content));
 
@@ -368,18 +372,29 @@ export default {
               return {type: 'text', data: linkNode.data};
             }
 
-            const {link, label, hash, toIndex} = linkNode;
+            const {link, label, hash} = linkNode;
 
-            return {
-              type: 'link',
-              data:
-                (toIndex
-                  ? link.slots({content: label, hash})
-                  : link.slots({
-                      content: label, hash,
-                      preferShortName: slots.preferShortLinkNames,
-                    })),
-            };
+            // These are removed from the typical combined slots({})-style
+            // because we don't want to override slots that were already set
+            // by something that's wrapping the linkTemplate or linkThing
+            // template.
+            if (label) link.setSlot('content', label);
+            if (hash) link.setSlot('hash', hash);
+
+            // TODO: This is obviously hacky.
+            let hasPreferShortNameSlot;
+            try {
+              link.getSlotDescription('preferShortName');
+              hasPreferShortNameSlot = true;
+            } catch (error) {
+              hasPreferShortNameSlot = false;
+            }
+
+            if (hasPreferShortNameSlot) {
+              link.setSlot('preferShortName', slots.preferShortLinkNames);
+            }
+
+            return {type: 'link', data: link};
           }
 
           case 'tag': {

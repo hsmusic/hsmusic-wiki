@@ -10,9 +10,13 @@ exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > fill many s
 `
 
 exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > fill path slot & provide appendIndexHTML 1`] = `
-<a href="/c*lzone/myCoolPath/ham/pineapple/tomato/index.html"></a>
+<a href="/c*lzone/myCoolPath/ham/pineapple/tomato/index.html">delish</a>
+`
+
+exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > missing content 1`] = `
+<a href="banana">(Missing link content)</a>
 `
 
 exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > special characters in path argument 1`] = `
-<a href="media/album-additional/homestuck-vol-1/Showtime%20(Piano%20Refrain)%20-%20%23xXxAwesomeSheetMusick%3FrxXx%23.pdf"></a>
+<a href="media/album-additional/homestuck-vol-1/Showtime%20(Piano%20Refrain)%20-%20%23xXxAwesomeSheetMusick%3FrxXx%23.pdf">Damn, that's some good sheet music</a>
 `

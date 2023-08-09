@@ -5,6 +5,7 @@ export default {
     'appendIndexHTML',
     'getColors',
     'html',
+    'language',
     'to',
   ],
 
@@ -23,6 +24,7 @@ export default {
     appendIndexHTML,
     getColors,
     html,
+    language,
     to,
   }) {
     let href = slots.href;
@@ -64,6 +66,8 @@ export default {
         style,
         title,
       },
-      slots.content);
+      (html.isBlank(slots.content)
+        ? language.$('misc.missingLinkContent')
+        : slots.content));
   },
 }

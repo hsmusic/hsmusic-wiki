@@ -30,6 +30,7 @@ testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
 
     slots: {
       path: ['myCoolPath', 'ham', 'pineapple', 'tomato'],
+      content: 'delish',
     },
   });
 
@@ -41,6 +42,12 @@ testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
         'homestuck-vol-1',
         'Showtime (Piano Refrain) - #xXxAwesomeSheetMusick?rxXx#.pdf',
       ],
+      content: `Damn, that's some good sheet music`,
     },
+  });
+
+  evaluate.snapshot('missing content', {
+    name: 'linkTemplate',
+    slots: {href: 'banana'},
   });
 });
