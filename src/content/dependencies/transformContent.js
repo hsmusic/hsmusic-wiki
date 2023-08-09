@@ -129,9 +129,9 @@ const linkThingRelationMap = {
 };
 
 const linkValueRelationMap = {
-  // media: 'linkPathFromMedia',
-  // root: 'linkPathFromRoot',
-  // site: 'linkPathFromSite',
+  media: 'linkPathFromMedia',
+  root: 'linkPathFromRoot',
+  site: 'linkPathFromSite',
 };
 
 const linkIndexRelationMap = {
