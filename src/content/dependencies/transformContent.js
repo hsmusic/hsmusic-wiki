@@ -236,8 +236,16 @@ export default {
           }
 
           // This will be another {type: 'tag'} node which gets processed in
-          // generate.
-          return node;
+          // generate. Extract replacerKey and replacerValue now, since it'd
+          // be a pain to deal with later.
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              replacerKey: node.data.replacerKey.data,
+              replacerValue: node.data.replacerValue[0].data,
+            },
+          };
         }),
     };
   },
