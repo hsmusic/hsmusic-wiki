@@ -62,7 +62,7 @@ export default {
             options.dateRange = language.formatDateRange(slots.dateRangeStart, slots.dateRangeEnd);
           } else if (slots.dateRangeStart || slots.date) {
             parts.push('withDate');
-            options.date = language.formatDate(slots.dateFirst);
+            options.date = language.formatDate(slots.dateRangeStart ?? slots.date);
           }
 
           accentedLink = language.formatString(parts.join('.'), options);
