@@ -517,12 +517,29 @@ export default {
       // multiline.
       return marked.parse(
         contentFromNodes
-          .map(node => {
-            if (node.type === 'text') {
-              return node.data.replace(/\b\n\b/g, '<br>\n');
-            } else {
+          .map((node, index) => {
+            if (node.type !== 'text') {
               return node.data.toString();
             }
+
+            // First, replace line breaks that follow text content with
+            // <br> tags.
+            let content = node.data.replace(/(?!^)\n/gm, '<br>\n');
+
+            // Scrap line breaks that are at the end of a verse.
+            content = content.replace(/<br>$(?=\n\n)/gm, '');
+
+            // If the node started with a line break, and it's not the
+            // very first node, then whatever came before it was inline.
+            // (This is an assumption based on text links being basically
+            // the only tag that shows up in lyrics.) Since this text is
+            // following content that was already inline, restore that
+            // initial line break.
+            if (node.data[0] === '\n' && index !== 0) {
+              content = '<br>' + content;
+            }
+
+            return content;
           })
           .join(''),
         markedOptions);
