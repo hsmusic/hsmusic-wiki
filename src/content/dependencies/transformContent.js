@@ -385,7 +385,7 @@ export default {
             if (label) link.setSlot('content', label);
             if (hash) link.setSlot('hash', hash);
 
-            if (toIndex) {
+            if (!toIndex) {
               link.setSlot('preferShortName', slots.preferShortLinkNames);
             }
 
