@@ -24,8 +24,6 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
       slots,
     });
 
-  // TODO: Snapshots for different transformContent modes
-
   quickSnapshot(
     'two text paragraphs',
       `Hello, world!\n` +
@@ -65,4 +63,38 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
   quickSnapshot(
     'super basic string',
       `Neat listing: [[string:listingPage.listAlbums.byDate.title]]`);
+
+  quickSnapshot(
+    'lyrics - basic line breaks',
+      `Hey, ho\n` +
+      `And away we go\n` +
+      `Truly, music\n` +
+      `\n` +
+      `(Oh yeah)\n` +
+      `(That's right)`,
+      {mode: 'lyrics'});
+
+  quickSnapshot(
+    'lyrics - repeated and edge line breaks',
+      `\n\nWell, you know\nHow it goes\n\n\nYessiree\n\n\n`,
+      {mode: 'lyrics'});
+
+  quickSnapshot(
+    'lyrics - line breaks around tags',
+      `The date be [[date:13 April 2004]]\n` +
+      `I say, the date be [[date:13 April 2004]]\n` +
+      `[[date:13 April 2004]]\n` +
+      `[[date:13 April 2004]][[date:13 April 2004]][[date:13 April 2004]]\n` +
+      `(Aye!)\n` +
+      `\n` +
+      `[[date:13 April 2004]]\n` +
+      `[[date:13 April 2004]][[date:13 April 2004]]\n` +
+      `[[date:13 April 2004]]\n` +
+      `\n` +
+      `[[date:13 April 2004]]\n` +
+      `[[date:13 April 2004]], and don't ye forget it`,
+      {mode: 'lyrics'});
+
+  // TODO: Snapshots for mode: inline
+  // TODO: Snapshots for mode: single-link
 });

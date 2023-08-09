@@ -28,19 +28,48 @@ exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > lin
 
 `
 
-exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #1 1`] = `
-<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > lyrics - basic line breaks 1`] = `
+<p>Hey, ho<br>
+And away we go<br>
+Truly, music</p>
+<p>(Oh yeah)<br>
+(That&#39;s right)</p>
 
+`
+
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > lyrics - line breaks around tags 1`] = `
+<p>The date be <time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+I say, the date be <time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+<time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+<time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+(Aye!)</p>
+<p><time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+<time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+<time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br></p>
+<p><time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time><br>
+<time datetime="Tue, 13 Apr 2004 03:00:00 GMT">4/13/2004</time>, and don&#39;t ye forget it</p>
+
+`
+
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > lyrics - repeated and edge line breaks 1`] = `
+<p>Well, you know<br>
+How it goes</p>
+<p>Yessiree</p>
+
+`
+
+exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #1 1`] = `
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #2 1`] = `
 <p>Rad.</p>
-<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
-
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #3 1`] = `
-<a class="box image-link content-image" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a>
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
+
 <p>Baller.</p>
 
 `
