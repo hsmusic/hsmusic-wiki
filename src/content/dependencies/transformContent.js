@@ -189,14 +189,12 @@ export default {
             determineData: {
               // No value at all: this is an index link.
               if (!replacerValue || replacerValue === '-') {
-                data.toIndex = true;
                 break determineData;
               }
 
               // Nothing to find: the link operates on a path or string, not a data object.
               if (!spec.find) {
                 data.value = replacerValue;
-                data.toIndex = false;
                 break determineData;
               }
 
@@ -214,7 +212,6 @@ export default {
 
               // Something was found: the link operates on that thing.
               data.thing = thing;
-              data.toIndex = false;
             }
 
             const {transformName} = spec;
@@ -281,7 +278,6 @@ export default {
               link: relation(name, arg),
               label: node.data.label,
               hash: node.data.hash,
-              toIndex: node.data.toIndex,
             }
           : getPlaceholder(node, content));
 
@@ -376,7 +372,7 @@ export default {
               return {type: 'text', data: linkNode.data};
             }
 
-            const {link, label, hash, toIndex} = linkNode;
+            const {link, label, hash} = linkNode;
 
             // These are removed from the typical combined slots({})-style
             // because we don't want to override slots that were already set
@@ -385,7 +381,16 @@ export default {
             if (label) link.setSlot('content', label);
             if (hash) link.setSlot('hash', hash);
 
-            if (!toIndex) {
+            // TODO: This is obviously hacky.
+            let hasPreferShortNameSlot;
+            try {
+              link.getSlotDescription('preferShortName');
+              hasPreferShortNameSlot = true;
+            } catch (error) {
+              hasPreferShortNameSlot = false;
+            }
+
+            if (hasPreferShortNameSlot) {
               link.setSlot('preferShortName', slots.preferShortLinkNames);
             }
 
