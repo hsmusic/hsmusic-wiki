@@ -418,7 +418,7 @@ export default {
                 ? htmlFn(value, {html, language})
                 : value);
 
-            return {type: 'text', data: contents};
+            return {type: 'text', data: contents.toString()};
           }
 
           default:
