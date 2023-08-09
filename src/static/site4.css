@@ -539,8 +539,7 @@ p .current {
   display: none;
 }
 
-a.box.content-image {
-  display: block;
+.content-image {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -559,7 +558,7 @@ a.box img {
   height: auto;
 }
 
-a.box .image-container.placeholder-image {
+a.box .square .image-container {
   width: 100%;
   height: 100%;
 }

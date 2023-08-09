@@ -55,6 +55,24 @@ export function pathsForTarget(album) {
   ];
 }
 
+export function pathsTargetless({wikiData: {wikiInfo}}) {
+  return [
+    {
+      type: 'page',
+      path: ['commentaryIndex'],
+      contentFunction: {name: 'generateCommentaryIndexPage'},
+    },
+
+    wikiInfo.canonicalBase === 'https://hsmusic.wiki/' &&
+      {
+        type: 'redirect',
+        fromPath: ['page', 'list/all-commentary'],
+        toPath: ['commentaryIndex'],
+        title: 'Album Commentary',
+      },
+  ];
+}
+
 /*
 export function write(album, {wikiData}) {
   const getSocialEmbedDescription = ({

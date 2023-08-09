@@ -174,7 +174,7 @@ async function main() {
     // 8uild with the default (English) strings if this path is left
     // unspecified.
     'lang-path': {
-      help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata`,
+      help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata\n\nOptional for wiki building, unless the wiki's default language is not English; may be provided via the HSMUSIC_LANG environment variable instead`,
       type: 'value',
     },
 
