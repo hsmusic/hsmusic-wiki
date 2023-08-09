@@ -1,28 +1,9 @@
 export default {
-  contentDependencies: ['generateListingPage'],
-  extraDependencies: ['html', 'wikiData'],
+  contentDependencies: ['listAllAdditionalFilesTemplate'],
 
-  sprawl() {
-    return {};
-  },
+  relations: (relation, spec) =>
+    ({page: relation('listAllAdditionalFilesTemplate', spec, 'midiProjectFiles')}),
 
-  query(sprawl, spec) {
-    return {
-      spec,
-    };
-  },
-
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
-    };
-  },
-
-  generate(relations, {html}) {
-    return relations.page.slots({
-      type: 'custom',
-      content:
-        html.tag('p', `Alright alright, this is a stub page! Coming soon!`),
-    });
-  },
+  generate: (relations) =>
+    relations.page.slot('stringsKey', 'other.allMidiProjectFiles'),
 };
