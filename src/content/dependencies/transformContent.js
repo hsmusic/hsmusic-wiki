@@ -33,7 +33,7 @@ export const replacerSpec = {
     value: (ref) => new Date(ref),
     html: (date, {html, language}) =>
       html.tag('time',
-        {datetime: date.toString()},
+        {datetime: date.toUTCString()},
         language.formatDate(date)),
   },
   'flash-index': {
