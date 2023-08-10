@@ -11,7 +11,7 @@ export default {
 
   slots: {
     mode: {
-      validate: v => v.is('generic', 'album'),
+      validate: v => v.is('generic', 'album', 'flash'),
       default: 'generic',
     },
   },
@@ -19,15 +19,18 @@ export default {
   generate(data, slots, {html, language}) {
     let isLocal;
     let domain;
+    let pathname;
     try {
-      domain = new URL(data.url).hostname;
+      const url = new URL(data.url);
+      domain = url.hostname;
+      pathname = url.pathname;
     } catch (error) {
       // No support for relative local URLs yet, sorry! (I.e, local URLs must
       // be absolute relative to the domain name in order to work.)
       isLocal = true;
     }
 
-    const a = html.tag('a',
+    const link = html.tag('a',
       {
         href: data.url,
         class: 'nowrap',
@@ -85,6 +88,34 @@ export default {
 
         : domain);
 
-    return a;
+    switch (slots.mode) {
+      case 'flash': {
+        const wrap = content =>
+          html.tag('span', {class: 'nowrap'}, content);
+
+        if (domain.includes('homestuck.com')) {
+          const match = pathname.match(/\/story\/(.*)\/?/);
+          if (match) {
+            if (isNaN(Number(match[1]))) {
+              return wrap(language.$('misc.external.flash.homestuck.secret', {link}));
+            } else {
+              return wrap(language.$('misc.external.flash.homestuck.page', {
+                link,
+                page: match[1],
+              }));
+            }
+          }
+        } else if (domain.includes('bgreco.net')) {
+          return wrap(language.$('misc.external.flash.bgreco', {link}));
+        } else if (domain.includes('youtu')) {
+          return wrap(language.$('misc.external.flash.youtube', {link}));
+        }
+
+        return link;
+      }
+
+      default:
+        return link;
+    }
   }
 };

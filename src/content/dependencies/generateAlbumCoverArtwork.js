@@ -1,23 +1,12 @@
 export default {
   contentDependencies: ['generateCoverArtwork'],
 
-  relations(relation, album) {
-    return {
-      coverArtwork:
-        relation('generateCoverArtwork', album.artTags),
-    };
-  },
+  relations: (relation, album) =>
+    ({coverArtwork: relation('generateCoverArtwork', album.artTags)}),
 
-  data(album) {
-    return {
-      path: ['media.albumCover', album.directory, album.coverArtFileExtension],
-    };
-  },
+  data: (album) =>
+    ({path: ['media.albumCover', album.directory, album.coverArtFileExtension]}),
 
-  generate(data, relations) {
-    return relations.coverArtwork
-      .slots({
-        path: data.path,
-      });
-  },
+  generate: (data, relations) =>
+    relations.coverArtwork.slot('path', data.path),
 };
