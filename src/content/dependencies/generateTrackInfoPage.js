@@ -16,6 +16,7 @@ export default {
     'generateAlbumStyleRules',
     'generateChronologyLinks',
     'generateContentHeading',
+    'generateContributionList',
     'generatePageLayout',
     'generateTrackCoverArtwork',
     'generateTrackList',
@@ -24,7 +25,6 @@ export default {
     'generateTrackSocialEmbed',
     'linkAlbum',
     'linkArtist',
-    'linkContribution',
     'linkFlash',
     'linkTrack',
     'transformContent',
@@ -149,9 +149,8 @@ export default {
       contributors.heading =
         relation('generateContentHeading');
 
-      contributors.contributionLinks =
-        track.contributorContribs
-          .map(contrib => relation('linkContribution', contrib));
+      contributors.list =
+        relation('generateContributionList', track.contributorContribs);
     }
 
     // Section: Referenced tracks
@@ -369,14 +368,7 @@ export default {
                 title: language.$('releaseInfo.contributors'),
               }),
 
-            html.tag('ul',
-              sec.contributors.contributionLinks.map(contributionLink =>
-                html.tag('li',
-                  contributionLink
-                    .slots({
-                      showIcons: true,
-                      showContribution: true,
-                    })))),
+            sec.contributors.list,
           ],
 
           sec.references && [
