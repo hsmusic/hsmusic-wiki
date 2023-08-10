@@ -36,6 +36,7 @@ export default {
   slots: {
     showContribution: {type: 'boolean', default: false},
     showIcons: {type: 'boolean', default: false},
+    preventWrapping: {type: 'boolean', default: true},
   },
 
   generate(data, relations, slots, {html, language}) {
@@ -63,7 +64,7 @@ export default {
     const content = language.formatString(parts.join('.'), options);
 
     return (
-      (parts.length > 1
+      (parts.length > 1 && slots.preventWrapping
         ? html.tag('span',
             {[html.noEdgeWhitespace]: true, class: 'nowrap'},
             content)

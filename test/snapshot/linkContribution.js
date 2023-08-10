@@ -64,4 +64,10 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
     ],
     slots: {showIcons: true},
   });
+
+  quickSnapshot('no preventWrapping', {
+    showContribution: true,
+    showIcons: true,
+    preventWrapping: false,
+  });
 });
