@@ -6,6 +6,7 @@ export default {
     'generateContributionList',
     'generateFlashCoverArtwork',
     'generateFlashNavAccent',
+    'generateFlashSidebar',
     'generatePageLayout',
     'generateTrackList',
     'linkExternal',
@@ -38,6 +39,9 @@ export default {
 
     relations.layout =
       relation('generatePageLayout');
+
+    relations.sidebar =
+      relation('generateFlashSidebar', flash);
 
     if (query.urls) {
       relations.externalLinks =
@@ -167,6 +171,8 @@ export default {
         sec.nav.flashNavAccent.slots({
           showFlashNavigation: true,
         }),
+
+      ...relations.sidebar,
     });
   },
 };
