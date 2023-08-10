@@ -1,5 +1,4 @@
 import {empty} from '../../util/sugar.js';
-import {sortFlashesChronologically} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: [
@@ -9,13 +8,16 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({flashData}) {
-    return {flashData};
+  sprawl({flashActData}) {
+    return {flashActData};
   },
 
   query(sprawl, flash) {
+    // Don't sort chronologically here. The previous/next buttons should match
+    // the order in the sidebar, by act rather than date.
     const flashes =
-      sortFlashesChronologically(sprawl.flashData.slice());
+      sprawl.flashActData
+        .flatMap(act => act.flashes);
 
     const index = flashes.indexOf(flash);
 
