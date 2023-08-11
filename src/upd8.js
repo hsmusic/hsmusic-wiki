@@ -448,7 +448,9 @@ async function main() {
     if (thumbsOnly) return;
   }
 
-  if (usingDefaultBuildMode) {
+  if (noBuild) {
+    logInfo`Not generating any site or page files this run (--no-build passed).`;
+  } else if (usingDefaultBuildMode) {
     logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
   } else {
     logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
@@ -642,10 +644,6 @@ async function main() {
   }
 
   logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
-
-  if (noBuild) {
-    logInfo`Not generating any site or page files this run (--no-build passed).`;
-  }
 
   {
     const tagRefs = new Set(
