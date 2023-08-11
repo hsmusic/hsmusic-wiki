@@ -605,6 +605,20 @@ export function decorateErrorWithCause(fn, cause) {
   };
 }
 
+export function conditionallySuppressError(conditionFn, callbackFn) {
+  return (...args) => {
+    try {
+      return callbackFn(...args);
+    } catch (error) {
+      if (conditionFn(error, ...args) === true) {
+        return;
+      }
+
+      throw error;
+    }
+  };
+}
+
 // Delicious function annotations, such as:
 //
 //   (*bound) soWeAreBackInTheMine

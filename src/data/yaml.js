@@ -12,6 +12,7 @@ import T from './things/index.js';
 import {color, ENABLE_COLOR, logInfo, logWarn} from '../util/cli.js';
 
 import {
+  conditionallySuppressError,
   decorateErrorWithIndex,
   empty,
   mapAggregate,
@@ -1272,8 +1273,7 @@ export function filterReferenceErrors(wikiData) {
       contributorContribsByRef: '_contrib',
       coverArtistContribsByRef: '_contrib',
       referencedTracksByRef: 'track',
-      // Skip sampled track ref errors for now
-      // sampledTracksByRef: 'track',
+      sampledTracksByRef: 'track',
       artTagsByRef: 'artTag',
       originalReleaseTrackByRef: 'track',
     }],
@@ -1335,20 +1335,38 @@ export function filterReferenceErrors(wikiData) {
             const findFn = boundFind[findFnKey];
             const value = thing[property];
 
+            const suppress = fn => conditionallySuppressError(error => {
+              if (property === 'sampledTracksByRef') {
+                // Suppress "didn't match anything" errors in particular, just for samples.
+                // In hsmusic-data we have a lot of "stub" sample data which don't have
+                // corresponding tracks yet, so it won't be useful to report such reference
+                // errors until we take the time to address that. But other errors, like
+                // malformed reference strings or miscapitalized existing tracks, should
+                // still be reported, as samples of existing tracks *do* display on the
+                // website!
+                if (error.message.includes(`Didn't match anything`)) {
+                  return true;
+                }
+              }
+
+              return false;
+            }, fn);
+
             if (Array.isArray(value)) {
               thing[property] = filter(
                 value,
-                decorateErrorWithIndex(findFn),
+                decorateErrorWithIndex(suppress(findFn)),
                 {message: `Reference errors in property ${color.green(property)} (${color.green('find.' + findFnKey)})`});
             } else {
-              nest({message: `Reference error in property ${color.green(property)} (${color.green('find.' + findFnKey)})`}, ({call}) => {
-                try {
-                  call(findFn, value);
-                } catch (error) {
-                  thing[property] = null;
-                  throw error;
-                }
-              });
+              nest({message: `Reference error in property ${color.green(property)} (${color.green('find.' + findFnKey)})`},
+                suppress(({call}) => {
+                  try {
+                    call(findFn, value);
+                  } catch (error) {
+                    thing[property] = null;
+                    throw error;
+                  }
+                }));
             }
           }
         });
