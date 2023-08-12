@@ -916,6 +916,80 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
         }
 
+        // Hear me out, it's been like 1200 years since I wrote the rest of
+        // this beautifully error-containing code and I don't know how to
+        // integrate this nicely. So I'm just returning the result and the
+        // error that should be thrown. Yes, we're back in callback hell,
+        // just without the callbacks. Thank you.
+        const filterBlankDocuments = documents => {
+          const aggregate = openAggregate({
+            message: `Found blank documents - check for extra '${color.cyan(`---`)}'`,
+          });
+
+          const filteredDocuments =
+            documents
+              .filter(doc => doc !== null);
+
+          if (filteredDocuments.length !== documents.length) {
+            const blankIndexRangeInfo =
+              documents
+                .map((doc, index) => [doc, index])
+                .filter(([doc]) => doc === null)
+                .map(([doc, index]) => index)
+                .reduce((accumulator, index) => {
+                  if (accumulator.length === 0) {
+                    return [[index, index]];
+                  }
+                  const current = accumulator.at(-1);
+                  const rest = accumulator.slice(0, -1);
+                  if (current[1] === index - 1) {
+                    return rest.concat([[current[0], index]]);
+                  } else {
+                    return accumulator.concat([[index, index]]);
+                  }
+                }, [])
+                .map(([start, end]) => ({
+                  start,
+                  end,
+                  count: end - start + 1,
+                  previous:
+                    (start > 0
+                      ? documents[start - 1]
+                      : null),
+                  next:
+                    (end < documents.length - 1
+                      ? documents[end + 1]
+                      : null),
+                }));
+
+            for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
+              const parts = [];
+
+              if (count === 1) {
+                const range = `#${start + 1}`;
+                parts.push(`${count} document (${color.yellow(range)}), `);
+              } else {
+                const range = `#${start + 1}-${end + 1}`;
+                parts.push(`${count} documents (${color.yellow(range)}), `);
+              }
+
+              if (previous === null) {
+                parts.push(`at start of file`);
+              } else if (next === null) {
+                parts.push(`at end of file`);
+              } else {
+                const previousDescription = Object.entries(previous).at(0).join(': ');
+                const nextDescription = Object.entries(next).at(0).join(': ');
+                parts.push(`between "${color.cyan(previousDescription)}" and "${color.cyan(nextDescription)}"`);
+              }
+
+              aggregate.push(new Error(parts.join('')));
+            }
+          }
+
+          return {documents: filteredDocuments, aggregate};
+        };
+
         if (
           documentMode === documentModes.allInOne ||
           documentMode === documentModes.oneDocumentTotal
@@ -976,12 +1050,16 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               processResults = call(dataStep.processDocument, yamlResult);
             });
           } else {
-            const {result, aggregate} = mapAggregate(
-              yamlResult.filter(Boolean),
+            const {documents, aggregate: aggregate1} = filterBlankDocuments(yamlResult);
+            call(aggregate1.close);
+
+            const {result, aggregate: aggregate2} = mapAggregate(
+              documents,
               decorateErrorWithIndex(dataStep.processDocument),
               {message: `Errors processing documents`});
+            call(aggregate2.close);
+
             processResults = result;
-            call(aggregate.close);
           }
 
           if (!processResults) return;
@@ -1025,13 +1103,19 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           (file) => readFile(file, 'utf-8').then((contents) => ({file, contents})),
           {message: `Errors reading data files`});
 
-        const yamlResults = map(
+        let yamlResults = map(
           readResults,
           decorateErrorWithFile(({file, contents}) => ({
             file,
             documents: yaml.loadAll(contents),
           })),
           {message: `Errors parsing data files as valid YAML`});
+
+        yamlResults = yamlResults.map(({file, documents}) => {
+          const {documents: filteredDocuments, aggregate} = filterBlankDocuments(documents);
+          call(decorateErrorWithFile(aggregate.close), {file});
+          return {file, documents: filteredDocuments};
+        });
 
         let processResults;
 
