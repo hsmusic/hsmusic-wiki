@@ -12,7 +12,6 @@ export default {
     return {
       contributionLinks:
         contributions
-          .slice(0, 4)
           .map(contrib => relation('linkContribution', contrib)),
     };
   },
