@@ -81,6 +81,8 @@ const thumbnailSpec = {
   'huge': {size: 1600, quality: 90},
   'semihuge': {size: 1200, quality: 92},
   'large': {size: 800, quality: 93},
+  'semilarge': {size: 600, quality: 94},
+  'cover': {size: 600, quality: 94, square: true},
   'medium': {size: 400, quality: 95, square: true},
   'small': {size: 250, quality: 85, square: true},
 };
