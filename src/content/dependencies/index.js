@@ -160,7 +160,13 @@ export function watchContentDependencies({
 
       let spec;
       try {
-        spec = (await import(cachebust(filePath))).default;
+        const module =
+          await import(
+            cachebust(
+              '.' +
+              path.sep +
+              path.relative(metaDirname, filePath)));
+        spec = module.default;
       } catch (caughtError) {
         error = caughtError;
         error.message = `Error importing: ${error.message}`;
