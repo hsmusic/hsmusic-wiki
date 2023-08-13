@@ -756,13 +756,18 @@ function getPreferredThumbSize() {
   // device configurations.
   const visualLength = window.devicePixelRatio * constrainedLength;
 
+  const semilargeLength = 600;
   const largeLength = 800;
   const semihugeLength = 1200;
   const goodEnoughThreshold = 0.90;
 
-  if (Math.floor(visualLength * goodEnoughThreshold) <= largeLength) {
+  const goodEnoughLength = Math.floor(visualLength * goodEnoughThreshold);
+
+  if (goodEnoughLength <= semilargeLength) {
+    return 'semilarge';
+  } else if (goodEnoughLength <= largeLength) {
     return 'large';
-  } else if (Math.floor(visualLength * goodEnoughThreshold) <= semihugeLength) {
+  } else if (goodEnoughLength <= semihugeLength) {
     return 'semihuge';
   } else {
     return 'huge';
