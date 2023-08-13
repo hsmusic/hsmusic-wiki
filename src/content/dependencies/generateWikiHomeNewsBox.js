@@ -64,7 +64,7 @@ export default {
                 mainLink,
               ]),
 
-              content.slot('thumb', 'medium'),
+              content,
 
               html.tag('p',
                 {[html.onlyIfContent]: true},
