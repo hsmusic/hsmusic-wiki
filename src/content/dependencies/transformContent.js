@@ -318,6 +318,7 @@ export default {
 
     thumb: {
       validate: v => v.is('small', 'medium', 'large'),
+      default: 'large',
     },
   },
 

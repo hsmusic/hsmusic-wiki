@@ -142,6 +142,7 @@ const thumbnailHelper = (name) => (file) =>
   file.replace(/\.(jpg|png)$/, name + '.jpg');
 
 export const thumb = {
+  large: thumbnailHelper('.large'),
   medium: thumbnailHelper('.medium'),
   small: thumbnailHelper('.small'),
 };

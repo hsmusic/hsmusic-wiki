@@ -59,16 +59,16 @@ How it goes</p>
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #1 1`] = `
-<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.large.jpg"></div></div></a></div>
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #2 1`] = `
 <p>Rad.</p>
-<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.large.jpg"></div></div></a></div>
 `
 
 exports[`test/snapshot/transformContent.js TAP transformContent (snapshot) > non-inline image #3 1`] = `
-<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.png"></div></div></a></div>
+<div class="content-image"><a class="box image-link" href="spark.png"><div class="image-container"><div class="image-inner-area"><img src="spark.large.jpg"></div></div></a></div>
 
 <p>Baller.</p>
 
