@@ -163,9 +163,11 @@ export function watchContentDependencies({
         const module =
           await import(
             cachebust(
-              '.' +
-              path.sep +
-              path.relative(metaDirname, filePath)));
+              './' +
+              path
+                .relative(metaDirname, filePath)
+                .split(path.sep)
+                .join('/')));
         spec = module.default;
       } catch (caughtError) {
         error = caughtError;
