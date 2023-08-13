@@ -143,6 +143,7 @@ const thumbnailHelper = (name) => (file) =>
 
 export const thumb = {
   large: thumbnailHelper('.large'),
+  cover: thumbnailHelper('.cover'),
   medium: thumbnailHelper('.medium'),
   small: thumbnailHelper('.small'),
 };
