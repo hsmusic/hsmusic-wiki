@@ -12,7 +12,7 @@ import {getColors} from '../util/colors.js';
 import {getArtistNumContributions} from '../util/wiki-data.js';
 
 let albumData, artistData;
-let officialAlbumData, fandomAlbumData;
+let officialAlbumData, fandomAlbumData, beyondAlbumData;
 
 let ready = false;
 
@@ -96,56 +96,62 @@ for (const a of document.body.querySelectorAll('[data-random]')) {
       return;
     }
 
+    const tracks = albumData =>
+      albumData
+        .map(album => album.tracks)
+        .reduce((acc, tracks) => acc.concat(tracks), []);
+
     setTimeout(() => {
       a.href = rebase('js-disabled');
     });
+
     switch (a.dataset.random) {
       case 'album':
-        return (a.href = openAlbum(pick(albumData).directory));
-      case 'album-in-fandom':
-        return (a.href = openAlbum(pick(fandomAlbumData).directory));
+        a.href = openAlbum(pick(albumData).directory);
+        break;
+
       case 'album-in-official':
-        return (a.href = openAlbum(pick(officialAlbumData).directory));
+        a.href = openAlbum(pick(officialAlbumData).directory);
+        break;
+
+      case 'album-in-fandom':
+        a.href = openAlbum(pick(fandomAlbumData).directory);
+        break;
+
+      case 'album-in-beyond':
+        a.href = openAlbum(pick(beyondAlbumData).directory);
+        break;
+
       case 'track':
-        return (a.href = openTrack(
-          getRefDirectory(
-            pick(
-              albumData.map((a) => a.tracks).reduce((a, b) => a.concat(b), [])
-            )
-          )
-        ));
+        a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
+        break;
+
       case 'track-in-album':
-        return (a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks))));
-      case 'track-in-fandom':
-        return (a.href = openTrack(
-          getRefDirectory(
-            pick(
-              fandomAlbumData.reduce(
-                (acc, album) => acc.concat(album.tracks),
-                []
-              )
-            )
-          )
-        ));
+        a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
+        break;
+
       case 'track-in-official':
-        return (a.href = openTrack(
-          getRefDirectory(
-            pick(
-              officialAlbumData.reduce(
-                (acc, album) => acc.concat(album.tracks),
-                []
-              )
-            )
-          )
-        ));
+        a.href = openTrack(getRefDirectory(pick(tracks(officialAlbumData))));
+        break;
+
+      case 'track-in-fandom':
+        a.href = openTrack(getRefDirectory(pick(tracks(fandomAlbumData))));
+        break;
+
+      case 'track-in-beyond':
+        a.href = openTrack(getRefDirectory(pick(tracks(beyondAlbumData))));
+        break;
+
       case 'artist':
-        return (a.href = openArtist(pick(artistData).directory));
+        a.href = openArtist(pick(artistData).directory);
+        break;
+
       case 'artist-more-than-one-contrib':
-        return (a.href = openArtist(
-          pick(
-            artistData.filter((artist) => getArtistNumContributions(artist) > 1)
-          ).directory
-        ));
+        a.href =
+          openArtist(
+            pick(artistData.filter((artist) => getArtistNumContributions(artist) > 1))
+              .directory);
+        break;
     }
   });
 }
@@ -201,12 +207,14 @@ fetch(rebase('data.json', 'rebaseShared'))
     albumData = data.albumData;
     artistData = data.artistData;
 
-    officialAlbumData = albumData.filter((album) =>
-      album.groups.includes('group:official')
-    );
-    fandomAlbumData = albumData.filter(
-      (album) => !album.groups.includes('group:official')
-    );
+    const albumsInGroup = directory =>
+      albumData
+        .filter(album =>
+          album.groups.includes(`group:${directory}`));
+
+    officialAlbumData = albumsInGroup('official');
+    fandomAlbumData = albumsInGroup('fandom');
+    beyondAlbumData = albumsInGroup('beyond');
 
     for (const element of elements1) element.style.display = 'none';
     for (const element of elements2) element.style.display = 'block';
