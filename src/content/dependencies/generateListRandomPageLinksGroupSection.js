@@ -1,4 +1,5 @@
 import {stitchArrays} from '../../util/sugar.js';
+import {sortChronologically} from '../../util/wiki-data.js';
 
 export default {
   contentDependencies: ['generateColorStyleVariables', 'linkGroup'],
@@ -8,7 +9,7 @@ export default {
 
   query: (sprawl, group) => ({
     albums:
-      sprawl.albumData
+      sortChronologically(sprawl.albumData.slice())
         .filter(album => album.groups.includes(group)),
   }),
 
