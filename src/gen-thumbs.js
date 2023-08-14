@@ -344,7 +344,7 @@ export default async function genThumbs(mediaPath, {
     await delay(WARNING_DELAY_TIME);
   }
 
-  const imagePaths = await traverseSourceImagePaths(mediaPath);
+  const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
 
   const imageToMD5Entries = await progressPromiseAll(
     `Generating MD5s of image files`,
@@ -486,7 +486,7 @@ export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImageP
 
 export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   const expectedPaths = getExpectedImagePaths(mediaPath, {urls, wikiData});
-  const extantPaths = await traverseSourceImagePaths(mediaPath);
+  const extantPaths = await traverseSourceImagePaths(mediaPath, {target: 'verify'});
   const {missing, misplaced} = checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
 
   if (empty(missing) && empty(misplaced)) {
@@ -509,17 +509,41 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   }
 }
 
-export async function traverseSourceImagePaths(mediaPath) {
+// Recursively traverses the provided (extant) media path, filtering so only
+// "source" images are returned - no thumbnails and no non-images. Provide
+// target as 'generate' or 'verify' to indicate the desired use of the results.
+// Under 'verify', all source files are returned, so that their existence can
+// be verified against a list of expected source files. Under 'generate', files
+// which shouldn't actually get thumbnails are excluded.
+export async function traverseSourceImagePaths(mediaPath, {target}) {
+  if (target !== 'verify' && target !== 'generate') {
+    throw new Error(`Expected target to be 'verify' or 'generate', got ${target}`);
+  }
+
   return await traverse(mediaPath, {
     filterFile(name) {
       const ext = path.extname(name);
-      if (ext !== '.jpg' && ext !== '.png' && ext !== '.gif') return false;
-      if (isThumb(name)) return false;
+
+      if (!['.jpg', '.png', '.gif'].includes(ext)) {
+        return false;
+      }
+
+      if (target === 'generate' && ext === '.gif') {
+        return false;
+      }
+
+      if (isThumb(name)) {
+        return false;
+      }
+
       return true;
     },
 
     filterDir(name) {
-      if (name === '.git') return false;
+      if (name === '.git') {
+        return false;
+      }
+
       return true;
     },
   });
