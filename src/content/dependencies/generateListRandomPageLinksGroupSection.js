@@ -10,7 +10,8 @@ export default {
   query: (sprawl, group) => ({
     albums:
       sortChronologically(sprawl.albumData.slice())
-        .filter(album => album.groups.includes(group)),
+        .filter(album => album.groups.includes(group))
+        .filter(album => album.tracks.length > 1),
   }),
 
   relations: (relation, query, sprawl, group) => ({
