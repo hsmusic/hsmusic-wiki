@@ -377,18 +377,18 @@ export default {
                 content));
       }
 
+      if (html.isBlank(sidebarContent)) {
+        return html.blank();
+      }
+
       return html.tag('div',
-        {
-          [html.onlyIfContent]: true,
-          id,
-          class: [
-            'sidebar-column',
-            wide && 'wide',
-            !collapse && 'no-hide',
-            stickyMode !== 'static' && `sticky-${stickyMode}`,
-            ...sidebarClasses,
-          ],
-        },
+        {id, class: [
+          'sidebar-column',
+          wide && 'wide',
+          !collapse && 'no-hide',
+          stickyMode !== 'static' && `sticky-${stickyMode}`,
+          ...sidebarClasses,
+        ]},
         sidebarContent);
     }
 
@@ -422,20 +422,20 @@ export default {
             processSkippers([
               {condition: true, id: 'content', string: 'content'},
               {
-                condition: sidebarLeftHTML,
+                condition: !html.isBlank(sidebarLeftHTML),
                 id: 'sidebar-left',
                 string:
-                  (sidebarRightHTML
-                    ? 'sidebar.left'
-                    : 'sidebar'),
+                  (html.isBlank(sidebarRightHTML)
+                    ? 'sidebar'
+                    : 'sidebar.left'),
               },
               {
-                condition: sidebarRightHTML,
+                condition: !html.isBlank(sidebarRightHTML),
                 id: 'sidebar-right',
                 string:
-                  (sidebarLeftHTML
-                    ? 'sidebar.right'
-                    : 'sidebar'),
+                  (html.isBlank(sidebarLeftHTML)
+                    ? 'sidebar'
+                    : 'sidebar.right'),
               },
               {condition: navHTML, id: 'header', string: 'header'},
               {condition: footerHTML, id: 'footer', string: 'footer'},
