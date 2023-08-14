@@ -29,6 +29,10 @@ export default function getChronologyRelations(thing, {
 
   return contributions.map(({who}) => {
     const things = Array.from(new Set(getThings(who)));
+    if (things.length === 1) {
+      return;
+    }
+
     const index = things.indexOf(thing);
     const previous = things[index - 1];
     const next = things[index + 1];
@@ -38,5 +42,5 @@ export default function getChronologyRelations(thing, {
       previousLink: previous ? linkThing(previous) : null,
       nextLink: next ? linkThing(next) : null,
     };
-  });
+  }).filter(Boolean);
 }
