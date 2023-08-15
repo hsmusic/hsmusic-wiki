@@ -376,15 +376,35 @@ export class Track extends Thing {
   [inspect.custom]() {
     const base = Thing.prototype[inspect.custom].apply(this);
 
+    const rereleasePart =
+      (this.originalReleaseTrackByRef
+        ? `${color.yellow('[rerelease]')} `
+        : ``);
+
     const {album, dataSourceAlbum} = this;
-    const albumName = album ? album.name : dataSourceAlbum?.name;
+
+    const albumName =
+      (album
+        ? album.name
+        : dataSourceAlbum?.name);
+
     const albumIndex =
       albumName &&
-      (album ? album.tracks.indexOf(this) : dataSourceAlbum.tracks.indexOf(this));
-    const trackNum = albumIndex === -1 ? '#?' : `#${albumIndex + 1}`;
+        (album
+          ? album.tracks.indexOf(this)
+          : dataSourceAlbum.tracks.indexOf(this));
 
-    return albumName
-      ? base + ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
-      : base;
+    const trackNum =
+      albumName &&
+        (albumIndex === -1
+          ? '#?'
+          : `#${albumIndex + 1}`);
+
+    const albumPart =
+      albumName
+        ? ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
+        : ``;
+
+    return rereleasePart + base + albumPart;
   }
 }
