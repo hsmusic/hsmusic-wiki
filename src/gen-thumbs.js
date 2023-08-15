@@ -495,14 +495,14 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   }
 
   if (!empty(missing)) {
-    logWarn`** Some track art is missing! (${missing.length + ' files'}) **`;
+    logWarn`** Some image files are missing! (${missing.length + ' files'}) **`;
     for (const file of missing) {
       console.warn(color.yellow(` - `) + file);
     }
   }
 
   if (!empty(misplaced)) {
-    logWarn`** Some track art is misplaced! (${misplaced.length + ' files'}) **`;
+    logWarn`** Some image files are misplaced! (${misplaced.length + ' files'}) **`;
     for (const file of misplaced) {
       console.warn(color.yellow(` - `) + file);
     }
