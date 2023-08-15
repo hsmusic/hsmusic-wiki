@@ -45,7 +45,7 @@ export default {
             .slots({
               path: slots.path,
               alt: slots.alt,
-              thumb: 'medium',
+              thumb: 'cover',
               id: 'cover-art',
               reveal: true,
               link: true,
