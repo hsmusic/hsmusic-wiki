@@ -1,5 +1,6 @@
 import {logError, logWarn} from './cli.js';
 import {escapeRegex} from './sugar.js';
+import * as html from './html.js';
 
 // Syntax literals.
 const tagBeginning = '[[';
@@ -420,13 +421,55 @@ export function postprocessImages(inputNodes) {
   return outputNodes;
 }
 
+export function postprocessHeadings(inputNodes) {
+  const outputNodes = [];
+
+  for (const node of inputNodes) {
+    if (node.type !== 'text') {
+      outputNodes.push(node);
+      continue;
+    }
+
+    const headingRegexp = /<h2 (.*?)>/g;
+
+    let textContent = '';
+
+    let match = null, parseFrom = 0;
+    while (match = headingRegexp.exec(node.data)) {
+      textContent += node.data.slice(parseFrom, match.index);
+      parseFrom = match.index + match[0].length;
+
+      const attributes = html.attributes(parseAttributes(match[1]));
+
+      attributes.set('class',
+        (attributes.get('class') ?? [])
+          .concat(['content-heading']));
+
+      // We're only modifying the opening tag here. The remaining content,
+      // including the closing tag, will be pushed as-is.
+      textContent += `<h2 ${attributes}>`;
+    }
+
+    if (parseFrom !== node.data.length) {
+      textContent += node.data.slice(parseFrom);
+    }
+
+    outputNodes.push({type: 'text', data: textContent});
+  }
+
+  return outputNodes;
+}
+
 export function parseInput(input) {
   if (typeof input !== 'string') {
     throw new TypeError(`Expected input to be string, got ${input}`);
   }
 
   try {
-    return postprocessImages(parseNodes(input, 0));
+    let output = parseNodes(input, 0);
+    output = postprocessImages(output);
+    output = postprocessHeadings(output);
+    return output;
   } catch (errorNode) {
     if (errorNode.type !== 'error') {
       throw errorNode;
