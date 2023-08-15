@@ -1325,6 +1325,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 .content-sticky-heading-row h1 {
   margin: 0;
+  padding-right: 10px;
 }
 
 .content-sticky-heading-cover-container {
