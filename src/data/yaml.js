@@ -120,7 +120,7 @@ function makeProcessDocument(
     };
   };
 
-  return decorateErrorWithName((document) => {
+  const fn = decorateErrorWithName((document) => {
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
 
@@ -159,6 +159,13 @@ function makeProcessDocument(
 
     return thing;
   });
+
+  Object.assign(fn, {
+    propertyFieldMapping,
+    fieldPropertyMapping,
+  });
+
+  return fn;
 }
 
 makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
@@ -1337,11 +1344,11 @@ export function filterDuplicateDirectories(wikiData) {
 // data array.
 export function filterReferenceErrors(wikiData) {
   const referenceSpec = [
-    ['wikiInfo', {
+    ['wikiInfo', processWikiInfoDocument, {
       divideTrackListsByGroupsByRef: 'group',
     }],
 
-    ['albumData', {
+    ['albumData', processAlbumDocument, {
       artistContribsByRef: '_contrib',
       coverArtistContribsByRef: '_contrib',
       trackCoverArtistContribsByRef: '_contrib',
@@ -1351,31 +1358,31 @@ export function filterReferenceErrors(wikiData) {
       artTagsByRef: 'artTag',
     }],
 
-    ['trackData', {
+    ['trackData', processTrackDocument, {
       artistContribsByRef: '_contrib',
       contributorContribsByRef: '_contrib',
       coverArtistContribsByRef: '_contrib',
-      referencedTracksByRef: 'track',
-      sampledTracksByRef: 'track',
+      referencedTracksByRef: '_trackNotRerelease',
+      sampledTracksByRef: '_trackNotRerelease',
       artTagsByRef: 'artTag',
-      originalReleaseTrackByRef: 'track',
+      originalReleaseTrackByRef: '_trackNotRerelease',
     }],
 
-    ['groupCategoryData', {
+    ['groupCategoryData', processGroupCategoryDocument, {
       groupsByRef: 'group',
     }],
 
-    ['homepageLayout.rows', {
-      sourceGroupsByRef: 'group',
+    ['homepageLayout.rows', undefined, {
+      sourceGroupByRef: 'group',
       sourceAlbumsByRef: 'album',
     }],
 
-    ['flashData', {
+    ['flashData', processFlashDocument, {
       contributorContribsByRef: '_contrib',
       featuredTracksByRef: 'track',
     }],
 
-    ['flashActData', {
+    ['flashActData', processFlashActDocument, {
       flashesByRef: 'flash',
     }],
   ];
@@ -1389,34 +1396,77 @@ export function filterReferenceErrors(wikiData) {
 
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   const boundFind = bindFind(wikiData, {mode: 'error'});
-  for (const [thingDataProp, propSpec] of referenceSpec) {
+  for (const [thingDataProp, providedProcessDocumentFn, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
 
     aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       const things = Array.isArray(thingData) ? thingData : [thingData];
 
       for (const thing of things) {
-        nest({message: `Reference errors in ${inspect(thing)}`}, ({filter}) => {
-          for (const [property, findFnKey] of Object.entries(propSpec)) {
-            if (!thing[property]) continue;
+        let processDocumentFn = providedProcessDocumentFn;
 
-            if (findFnKey === '_contrib') {
-              thing[property] = filter(
-                thing[property],
-                decorateErrorWithIndex(({who}) => {
-                  const alias = find.artist(who, wikiData.artistAliasData, {mode: 'quiet'});
-                  if (alias) {
-                    const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
-                    throw new Error(`Reference ${color.red(who)} is to an alias, should be ${color.green(original.name)}`);
-                  }
-                  return boundFind.artist(who);
-                }),
-                {message: `Reference errors in contributions ${color.green(property)} (${color.green('find.artist')})`});
+        if (processDocumentFn === undefined) {
+          switch (thingDataProp) {
+            case 'homepageLayout.rows':
+              processDocumentFn = homepageLayoutRowTypeProcessMapping[thing.type]
+              break;
+          }
+        }
+
+        nest({message: `Reference errors in ${inspect(thing)}`}, ({push, filter}) => {
+          for (const [property, findFnKey] of Object.entries(propSpec)) {
+            const value = thing[property];
+
+            if (value === undefined) {
+              push(new TypeError(`Property ${color.red(property)} isn't valid for ${color.green(thing.constructor.name)}`));
               continue;
             }
 
-            const findFn = boundFind[findFnKey];
-            const value = thing[property];
+            if (value === null) {
+              continue;
+            }
+
+            let findFn;
+
+            switch (findFnKey) {
+              case '_contrib':
+                findFn = contribRef => {
+                  const alias = find.artist(contribRef.who, wikiData.artistAliasData, {mode: 'quiet'});
+                  if (alias) {
+                    // No need to check if the original exists here. Aliases are automatically
+                    // created from a field on the original, so the original certainly exists.
+                    const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
+                    throw new Error(`Reference ${color.red(contribRef.who)} is to an alias, should be ${color.green(original.name)}`);
+                  }
+
+                  return boundFind.artist(contribRef.who);
+                };
+                break;
+
+              case '_trackNotRerelease':
+                findFn = trackRef => {
+                  const track = find.track(trackRef, wikiData.trackData, {mode: 'quiet'});
+
+                  if (track?.originalReleaseTrackByRef) {
+                    // It's possible for the original to not actually exist, in this case.
+                    // It should still be reported since the 'Originally Released As' field
+                    // was present.
+                    const original = find.track(track.originalReleaseTrackByRef, wikiData.trackData, {mode: 'quiet'});
+                    const shouldBeMessage =
+                      (original
+                        ? color.green('track:' + original.directory)
+                        : color.green(track.originalReleaseTrackByRef));
+                    throw new Error(`Reference ${color.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
+                  }
+
+                  return track;
+                };
+                break;
+
+              default:
+                findFn = boundFind[findFnKey];
+                break;
+            }
 
             const suppress = fn => conditionallySuppressError(error => {
               if (property === 'sampledTracksByRef') {
@@ -1435,13 +1485,28 @@ export function filterReferenceErrors(wikiData) {
               return false;
             }, fn);
 
+            const fieldPropertyMessage =
+              (processDocumentFn?.propertyFieldMapping?.[property]
+                ? ` in field ${color.green(processDocumentFn.propertyFieldMapping[property])}`
+                : ` in property ${color.green(property)}`);
+
+            const findFnMessage =
+              (findFnKey.startsWith('_')
+                ? ``
+                : ` (${color.green('find.' + findFnKey)})`);
+
+            const errorMessage =
+              (Array.isArray(value)
+                ? `Reference errors` + fieldPropertyMessage + findFnMessage
+                : `Reference error` + fieldPropertyMessage + findFnMessage);
+
             if (Array.isArray(value)) {
               thing[property] = filter(
                 value,
                 decorateErrorWithIndex(suppress(findFn)),
-                {message: `Reference errors in property ${color.green(property)} (${color.green('find.' + findFnKey)})`});
+                {message: errorMessage});
             } else {
-              nest({message: `Reference error in property ${color.green(property)} (${color.green('find.' + findFnKey)})`},
+              nest({message: errorMessage},
                 suppress(({call}) => {
                   try {
                     call(findFn, value);
