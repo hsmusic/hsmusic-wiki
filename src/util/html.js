@@ -420,6 +420,10 @@ export class Tag {
   }
 }
 
+export function attributes(attributes) {
+  return new Attributes(attributes);
+}
+
 export class Attributes {
   #attributes = Object.create(null);
 
