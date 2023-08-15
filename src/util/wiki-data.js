@@ -715,7 +715,7 @@ export function getTrackCover(track, {to}) {
   // just inherits the album's own cover art. Note that since cover art isn't
   // guaranteed on albums either, it's possible that this function returns
   // null!
-  if (!track.hasCoverArt) {
+  if (!track.hasUniqueCoverArt) {
     return getAlbumCover(track.album, {to});
   } else {
     return to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension);

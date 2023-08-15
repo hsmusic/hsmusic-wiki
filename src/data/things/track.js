@@ -1,9 +1,10 @@
 import Thing from './thing.js';
 
 import {inspect} from 'util';
-import {color} from '../../util/cli.js';
 
+import {color} from '../../util/cli.js';
 import find from '../../util/find.js';
+import {empty} from '../../util/sugar.js';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
@@ -332,36 +333,44 @@ export class Track extends Thing {
     albumData?.find((album) => album.tracks.includes(track));
 
   // Another reused utility function. This one's logic is a bit more complicated.
-  static hasCoverArt = (
+  static hasCoverArt(
     track,
     albumData,
     coverArtistContribsByRef,
     hasCoverArt
-  ) => (
-    hasCoverArt ??
-    (coverArtistContribsByRef?.length > 0 || null) ??
-    Track.findAlbum(track, albumData)?.hasTrackArt ??
-    true
-  );
+  ) {
+    if (!empty(coverArtistContribsByRef)) {
+      return true;
+    }
 
-  // Now this is a doozy!
+    const album = Track.findAlbum(track, albumData);
+    if (album && !empty(album.trackCoverArtistContribsByRef)) {
+      return true;
+    }
+
+    return false;
+  }
+
   static hasUniqueCoverArt(
     track,
     albumData,
     coverArtistContribsByRef,
     hasCoverArt
   ) {
-    if (coverArtistContribsByRef?.length > 0) {
+    if (!empty(coverArtistContribsByRef)) {
       return true;
-    } else if (coverArtistContribsByRef) {
-      return false;
-    } else if (hasCoverArt === false) {
-      return false;
-    } else if (Track.findAlbum(track, albumData)?.hasTrackArt) {
-      return true;
-    } else {
+    }
+
+    if (hasCoverArt === false) {
       return false;
     }
+
+    const album = Track.findAlbum(track, albumData);
+    if (album && !empty(album.trackCoverArtistContribsByRef)) {
+      return true;
+    }
+
+    return false;
   }
 
   [inspect.custom]() {

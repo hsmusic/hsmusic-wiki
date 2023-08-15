@@ -104,7 +104,6 @@ export class Album extends Thing {
       update: {validate: isDimensions},
     },
 
-    hasTrackArt: Thing.common.flag(true),
     hasTrackNumbers: Thing.common.flag(true),
     isListedOnHomepage: Thing.common.flag(true),
     isListedInGalleries: Thing.common.flag(true),
