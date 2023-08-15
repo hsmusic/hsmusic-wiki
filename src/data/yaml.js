@@ -1452,10 +1452,20 @@ export function filterReferenceErrors(wikiData) {
                     // It should still be reported since the 'Originally Released As' field
                     // was present.
                     const original = find.track(track.originalReleaseTrackByRef, wikiData.trackData, {mode: 'quiet'});
-                    const shouldBeMessage =
+
+                    // Prefer references by name, but only if it's unambiguous.
+                    const originalByName =
                       (original
+                        ? find.track(original.name, wikiData.trackData, {mode: 'quiet'})
+                        : null);
+
+                    const shouldBeMessage =
+                      (originalByName
+                        ? color.green(original.name)
+                     : original
                         ? color.green('track:' + original.directory)
                         : color.green(track.originalReleaseTrackByRef));
+
                     throw new Error(`Reference ${color.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
                   }
 
