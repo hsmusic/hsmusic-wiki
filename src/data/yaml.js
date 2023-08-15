@@ -1445,7 +1445,7 @@ export function filterReferenceErrors(wikiData) {
 
               case '_trackNotRerelease':
                 findFn = trackRef => {
-                  const track = find.track(trackRef, wikiData.trackData, {mode: 'quiet'});
+                  const track = find.track(trackRef, wikiData.trackData, {mode: 'error'});
 
                   if (track?.originalReleaseTrackByRef) {
                     // It's possible for the original to not actually exist, in this case.
