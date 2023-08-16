@@ -177,8 +177,8 @@ export function tag(tagName, ...args) {
   return new Tag(tagName, attributes, content);
 }
 
-export function tags(content) {
-  return new Tag(null, null, content);
+export function tags(content, attributes = null) {
+  return new Tag(null, attributes, content);
 }
 
 export class Tag {
