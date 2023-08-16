@@ -572,6 +572,10 @@ export class Attributes {
             ])),
       ]));
   }
+
+  [inspect.custom]() {
+    return `Attributes <${this.toString() || 'no attributes'}>`;
+  }
 }
 
 export function resolve(tagOrTemplate) {
