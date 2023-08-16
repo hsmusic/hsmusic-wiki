@@ -723,18 +723,23 @@ ul > li.has-details {
   font-style: oblique;
 }
 
-hr.split::before {
+#content hr {
+  border: 1px inset #808080;
+  width: 100%;
+}
+
+#content hr.split::before {
   content: "(split)";
   color: #808080;
 }
 
-hr.split {
+#content hr.split {
   position: relative;
   overflow: hidden;
   border: none;
 }
 
-hr.split::after {
+#content hr.split::after {
   display: inline-block;
   content: "";
   border: 1px inset #808080;
