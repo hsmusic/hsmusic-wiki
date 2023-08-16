@@ -382,10 +382,7 @@ export function postprocessHeadings(inputNodes) {
       parseFrom = match.index + match[0].length;
 
       const attributes = html.attributes(parseAttributes(match[1]));
-
-      attributes.set('class',
-        (attributes.get('class') ?? [])
-          .concat(['content-heading']));
+      attributes.push('class', 'content-heading');
 
       // We're only modifying the opening tag here. The remaining content,
       // including the closing tag, will be pushed as-is.

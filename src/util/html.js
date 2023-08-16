@@ -470,6 +470,18 @@ export class Attributes {
     return delete this.#attributes[attribute];
   }
 
+  push(attribute, ...values) {
+    const oldValue = this.get(attribute);
+    const newValue =
+      (Array.isArray(oldValue)
+        ? oldValue.concat(values)
+     : oldValue
+        ? [oldValue, ...values]
+        : values);
+    this.set(attribute, newValue);
+    return newValue;
+  }
+
   toString() {
     return Object.entries(this.attributes)
       .map(([key, val]) => {
