@@ -14,7 +14,7 @@ export default {
     return (
       html.tag('p', {class: 'quick-info'},
         language.$('albumGalleryPage.coverArtistsLine', {
-          artists: relations.coverArtistLinks,
+          artists: language.formatConjunctionList(relations.coverArtistLinks),
         })));
   },
 };
