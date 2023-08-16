@@ -708,6 +708,7 @@ async function main() {
   // cheat and get file sizes for all images under media. (This includes
   // additional files which are images.)
   const imageFilePaths = (await traverse(mediaPath, {
+    pathStyle: 'device',
     filterDir: dir => dir !== '.git',
     filterFile: file => (
       ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&

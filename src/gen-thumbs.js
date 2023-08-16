@@ -208,6 +208,7 @@ export async function clearThumbs(mediaPath, {
   logInfo`Looking for thumbnails to clear out...`;
 
   const thumbFiles = await traverse(mediaPath, {
+    pathStyle: 'device',
     filterFile: file => isThumb(file),
     filterDir: name => name !== '.git',
   });
@@ -512,15 +513,33 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
 // Recursively traverses the provided (extant) media path, filtering so only
 // "source" images are returned - no thumbnails and no non-images. Provide
 // target as 'generate' or 'verify' to indicate the desired use of the results.
-// Under 'verify', all source files are returned, so that their existence can
-// be verified against a list of expected source files. Under 'generate', files
-// which shouldn't actually get thumbnails are excluded.
+//
+// Under 'verify':
+//
+// * All source files are returned, so that their existence can be verified
+//   against a list of expected source files.
+//
+// * Source files are returned in "wiki" path style, AKA with POSIX-style
+//   forward slashes, regardless the system being run on.
+//
+// Under 'generate':
+//
+// * All files which shouldn't actually have thumbnails generated are excluded.
+//
+// * Source files are returned in device-style, with backslashes on Windows.
+//   These are suitable to be passed as command-line arguments to ImageMagick.
+//
+// Both modes return paths relative to mediaPath, with no ./ or .\ at the
+// front.
+//
 export async function traverseSourceImagePaths(mediaPath, {target}) {
   if (target !== 'verify' && target !== 'generate') {
     throw new Error(`Expected target to be 'verify' or 'generate', got ${target}`);
   }
 
   return await traverse(mediaPath, {
+    pathStyle: (target === 'verify' ? 'posix' : 'device'),
+
     filterFile(name) {
       const ext = path.extname(name);
 

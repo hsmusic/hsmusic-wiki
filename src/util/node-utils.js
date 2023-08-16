@@ -58,21 +58,32 @@ export function isMain(importMetaURL) {
 
 // Like readdir... but it's recursive!
 export function traverse(startDirPath, {
+  pathStyle = 'device',
   filterFile = () => true,
   filterDir = () => true
 } = {}) {
-  const recursive = (names, subDirPath) =>
-    Promise.all(
-      names.map((name) =>
-        readdir(path.join(startDirPath, subDirPath, name)).then(
-          (names) =>
-            filterDir(name)
-              ? recursive(names, path.join(subDirPath, name))
-              : [],
-          () => (filterFile(name) ? [path.join(subDirPath, name)] : [])
-        )
-      )
-    ).then((pathArrays) => pathArrays.flatMap((x) => x));
+  const pathJoin = {
+    'device': path.join,
+    'posix': path.posix.join,
+    'win32': path.win32.join,
+  }[pathStyle];
 
-  return readdir(startDirPath).then((names) => recursive(names, ''));
+  if (!pathJoin) {
+    throw new Error(`Expected pathStyle to be device, posix, or win32`);
+  }
+
+  const recursive = (names, subDirPath) =>
+    Promise.all(names.map(name =>
+      readdir(pathJoin(startDirPath, subDirPath, name)).then(
+        names =>
+          (filterDir(name)
+            ? recursive(names, pathJoin(subDirPath, name))
+            : []),
+        () =>
+          (filterFile(name)
+            ? [pathJoin(subDirPath, name)]
+            : []))))
+      .then(pathArrays => pathArrays.flat());
+
+  return readdir(startDirPath).then(names => recursive(names, ''));
 }
