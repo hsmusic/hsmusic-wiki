@@ -70,6 +70,7 @@ function makeProcessDocument(
     // Each key and value are a field name (not an update() property) and a
     // function which takes the value for that field and returns the value which
     // will be passed on to update().
+    //
     fieldTransformations = {},
 
     // Mapping of Thing.update() source properties to field names.
@@ -78,13 +79,36 @@ function makeProcessDocument(
     // shorthand convenience because properties are generally typical
     // camel-cased JS properties, while fields may contain whitespace and be
     // more easily represented as quoted strings.
+    //
     propertyFieldMapping,
 
     // Completely ignored fields. These won't throw an unknown field error if
     // they're present in a document, but they won't be used for Thing property
     // generation, either. Useful for stuff that's present in data files but not
     // yet implemented as part of a Thing's data model!
+    //
     ignoredFields = [],
+
+    // List of fields which are invalid when coexisting in a document.
+    // Data objects are generally allowing with regards to what properties go
+    // together, allowing for properties to be set separately from each other
+    // instead of complaining about invalid or unused-data cases. But it's
+    // useful to see these kinds of errors when actually validating YAML files!
+    //
+    // Each item of this array should itself be an object with a descriptive
+    // message and a list of fields. Of those fields, none should ever coexist
+    // with any other. For example:
+    //
+    //   [
+    //     {message: '...', fields: ['A', 'B', 'C']},
+    //     {message: '...', fields: ['C', 'D']},
+    //   ]
+    //
+    // ...means A can't coexist with B or C, B can't coexist with A or C, and
+    // C can't coexist iwth A, B, or D - but it's okay for D to coexist with
+    // A or B.
+    //
+    invalidFieldCombinations = [],
   }
 ) {
   if (!thingClass) {
@@ -132,6 +156,19 @@ function makeProcessDocument(
       throw new makeProcessDocument.UnknownFieldsError(unknownFields);
     }
 
+    const presentFields = Object.keys(document);
+
+    const fieldCombinationErrors = [];
+    for (const {message, fields} of invalidFieldCombinations) {
+      const fieldsPresent = presentFields.filter(field => fields.includes(field));
+      if (fieldsPresent.length > 1) {
+        fieldCombinationErrors.push(new makeProcessDocument.FieldCombinationError(fieldsPresent, message));
+      }
+    }
+    if (!empty(fieldCombinationErrors)) {
+      throw new makeProcessDocument.FieldCombinationsError(fieldCombinationErrors);
+    }
+
     const fieldValues = {};
 
     for (const [field, value] of documentEntries) {
@@ -174,6 +211,26 @@ makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error 
     this.fields = fields;
   }
 };
+
+makeProcessDocument.FieldCombinationsError = class FieldCombinationsError extends AggregateError {
+  constructor(errors) {
+    super(errors, `Errors in combinations of fields present`);
+  }
+};
+
+makeProcessDocument.FieldCombinationError = class FieldCombinationError extends Error {
+  constructor(fields, message) {
+    const combinePart = `Don't combine ${fields.map(field => color.red(field)).join(', ')}`;
+
+    const messagePart =
+      (message
+        ? `: ${message}`
+        : ``);
+
+    super(combinePart + messagePart);
+    this.fields = fields;
+  }
+}
 
 export const processAlbumDocument = makeProcessDocument(T.Album, {
   fieldTransformations: {
@@ -285,6 +342,28 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     coverArtistContribsByRef: 'Cover Artists',
     artTagsByRef: 'Art Tags',
   },
+
+  invalidFieldCombinations: [
+    {message: `Re-releases inherit references from the original`, fields: [
+      'Originally Released As',
+      'Referenced Tracks',
+    ]},
+
+    {message: `Re-releases inherit samples from the original`, fields: [
+      'Originally Released As',
+      'Sampled Tracks',
+    ]},
+
+    {message: `Re-releases inherit artists from the original`, fields: [
+      'Originally Released As',
+      'Artists',
+    ]},
+
+    {message: `Re-releases inherit contributors from the original`, fields: [
+      'Originally Released As',
+      'Contributors',
+    ]},
+  ],
 });
 
 export const processArtistDocument = makeProcessDocument(T.Artist, {

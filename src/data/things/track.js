@@ -245,35 +245,43 @@ export class Track extends Thing {
       },
     },
 
-    artistContribs: Thing.common.dynamicInheritContribs(
-      null,
-      'artistContribsByRef',
-      'artistContribsByRef',
-      'albumData',
-      Track.findAlbum
-    ),
+    artistContribs:
+      Track.inheritFromOriginalRelease('artistContribs', [],
+        Thing.common.dynamicInheritContribs(
+          null,
+          'artistContribsByRef',
+          'artistContribsByRef',
+          'albumData',
+          Track.findAlbum)),
 
-    contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
+    contributorContribs:
+      Track.inheritFromOriginalRelease('contributorContribs', [],
+        Thing.common.dynamicContribs('contributorContribsByRef')),
 
-    coverArtistContribs: Thing.common.dynamicInheritContribs(
-      'hasCoverArt',
-      'coverArtistContribsByRef',
-      'trackCoverArtistContribsByRef',
-      'albumData',
-      Track.findAlbum
-    ),
+    // Cover artists aren't inherited from the original release, since it
+    // typically varies by release and isn't defined by the musical qualities
+    // of the track.
+    coverArtistContribs:
+      Thing.common.dynamicInheritContribs(
+        'hasCoverArt',
+        'coverArtistContribsByRef',
+        'trackCoverArtistContribsByRef',
+        'albumData',
+        Track.findAlbum),
 
-    referencedTracks: Thing.common.dynamicThingsFromReferenceList(
-      'referencedTracksByRef',
-      'trackData',
-      find.track
-    ),
+    referencedTracks:
+      Track.inheritFromOriginalRelease('referencedTracks', [],
+        Thing.common.dynamicThingsFromReferenceList(
+          'referencedTracksByRef',
+          'trackData',
+          find.track)),
 
-    sampledTracks: Thing.common.dynamicThingsFromReferenceList(
-      'sampledTracksByRef',
-      'trackData',
-      find.track
-    ),
+    sampledTracks:
+      Track.inheritFromOriginalRelease('sampledTracks', [],
+        Thing.common.dynamicThingsFromReferenceList(
+          'sampledTracksByRef',
+          'trackData',
+          find.track)),
 
     // Specifically exclude re-releases from this list - while it's useful to
     // get from a re-release to the tracks it references, re-releases aren't
@@ -371,6 +379,40 @@ export class Track extends Thing {
     }
 
     return false;
+  }
+
+  static inheritFromOriginalRelease(
+    originalProperty,
+    originalMissingValue,
+    ownPropertyDescriptor
+  ) {
+    return {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: [
+          ...ownPropertyDescriptor.expose.dependencies,
+          'originalReleaseTrackByRef',
+          'trackData',
+        ],
+
+        compute(dependencies) {
+          const {
+            originalReleaseTrackByRef,
+            trackData,
+          } = dependencies;
+
+          if (originalReleaseTrackByRef) {
+            if (!trackData) return originalMissingValue;
+            const original = find.track(originalReleaseTrackByRef, trackData, {mode: 'quiet'});
+            if (!original) return originalMissingValue;
+            return original[originalProperty];
+          }
+
+          return ownPropertyDescriptor.expose.compute(dependencies);
+        },
+      },
+    };
   }
 
   [inspect.custom]() {
