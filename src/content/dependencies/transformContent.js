@@ -346,6 +346,7 @@ export default {
             if (node.inline) {
               return {
                 type: 'image',
+                inline: true,
                 data:
                   html.tag('img', {src, width, height}),
               };
@@ -355,6 +356,7 @@ export default {
 
             return {
               type: 'image',
+              inline: false,
               data:
                 html.tag('div', {class: 'content-image'},
                   image.slots({
@@ -454,20 +456,84 @@ export default {
       mangle: false,
     };
 
+    // The content of non-text nodes can end up getting mangled by marked.
+    // To avoid this, we replace them with mundane placeholders, then
+    // reinsert the content in the correct positions. This also avoids
+    // having to stringify tag content within this generate() function.
+
+    const extractNonTextNodes = ({
+      getTextNodeContents = node => node.data,
+    } = {}) =>
+      contentFromNodes
+        .map((node, index) => {
+          if (node.type === 'text') {
+            return getTextNodeContents(node, index);
+          }
+
+          const attributes = html.attributes({
+            class: 'INSERT-NON-TEXT',
+            'data-type': node.type,
+          });
+
+          if (node.type === 'image') {
+            attributes.set('data-inline', node.inline);
+          }
+
+          return `<span ${attributes}>${index}</span>`;
+        })
+        .join('');
+
+    const reinsertNonTextNodes = (markedOutput) => {
+      markedOutput = markedOutput.trim();
+
+      const tags = [];
+      const regexp = /<span class="INSERT-NON-TEXT" (.*?)>([0-9]+?)<\/span>/g;
+
+      let deleteParagraph = false;
+
+      const addText = (text) => {
+        if (deleteParagraph) {
+          text = text.replace(/^<\/p>/, '');
+          deleteParagraph = false;
+        }
+
+        tags.push(text);
+      };
+
+      let match = null, parseFrom = 0;
+      while (match = regexp.exec(markedOutput)) {
+        addText(markedOutput.slice(parseFrom, match.index));
+        parseFrom = match.index + match[0].length;
+
+        const attributes = html.parseAttributes(match[1]);
+
+        // Images that were all on their own line need to be removed from
+        // the surrounding <p> tag that marked generates. The HTML parser
+        // treats a <div> that starts inside a <p> as a Crocker-class
+        // misgiving, and will treat you very badly if you feed it that.
+        if (attributes.get('data-type') === 'image') {
+          if (!attributes.get('data-inline')) {
+            tags[tags.length - 1] = tags[tags.length - 1].replace(/<p>$/, '');
+            deleteParagraph = true;
+          }
+        }
+
+        const nonTextNodeIndex = match[2];
+        tags.push(contentFromNodes[nonTextNodeIndex].data);
+      }
+
+      if (parseFrom !== markedOutput.length) {
+        addText(markedOutput.slice(parseFrom));
+      }
+
+      return html.tags(tags, {[html.joinChildren]: ''});
+    };
+
     // This is separated into its own function just since we're gonna reuse
     // it in a minute if everything goes to heck in lyrics mode.
     const transformMultiline = () => {
       const markedInput =
-        contentFromNodes
-          .map(node => {
-            if (node.type === 'text') {
-              return node.data;
-            } else {
-              return node.data.toString();
-            }
-          })
-          .join('')
-
+        extractNonTextNodes()
           // Compress multiple line breaks into single line breaks.
           .replace(/\n{2,}/g, '\n')
           // Expand line breaks which don't follow a list, quote,
@@ -479,22 +545,12 @@ export default {
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
       const markedOutput =
-        marked.parse(markedInput, markedOptions)
-          // Images that were all on their own line need to be removed from
-          // the surrounding <p> tag that marked generates. The HTML parser
-          // treats a <div> that starts inside a <p> as a Crocker-class
-          // misgiving, and will treat you very badly if you feed it that.
-          .replace(
-            /^<p>(<a class="[^"]*?image-link.*?<\/a>)<\/p>$/gm,
-            (match, a) => a);
+        marked.parse(markedInput, markedOptions);
 
-      return markedOutput;
+      return reinsertNonTextNodes(markedOutput);
     }
 
     if (slots.mode === 'multiline') {
-      // Unfortunately, we kind of have to be super evil here and stringify
-      // the links, or else parse marked's output into html tags, which is
-      // very out of scope at the moment.
       return transformMultiline();
     }
 
@@ -514,15 +570,9 @@ export default {
         return transformMultiline();
       }
 
-      // Lyrics mode is also evil for the same stringifying reasons as
-      // multiline.
-      return marked.parse(
-        contentFromNodes
-          .map((node, index) => {
-            if (node.type !== 'text') {
-              return node.data.toString();
-            }
-
+      const markedInput =
+        extractNonTextNodes({
+          getTextNodeContents(node, index) {
             // First, replace line breaks that follow text content with
             // <br> tags.
             let content = node.data.replace(/(?!^)\n/gm, '<br>\n');
@@ -541,9 +591,13 @@ export default {
             }
 
             return content;
-          })
-          .join(''),
-        markedOptions);
+          },
+        });
+
+      const markedOutput =
+        marked.parse(markedInput, markedOptions);
+
+      return reinsertNonTextNodes(markedOutput);
     }
   },
 }
