@@ -1617,12 +1617,12 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     z-index: 2;
   }
 
-  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:not(:nth-child(n+7)) {
+  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:not(:nth-child(n+10)) {
     flex-basis: 23%;
     margin: 15px;
   }
 
-  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:nth-child(n+7) {
+  html[data-url-key="localized.home"] .layout-columns.has-one-sidebar .grid-listing > .grid-item:nth-child(n+10) {
     flex-basis: 18%;
     margin: 10px;
   }
