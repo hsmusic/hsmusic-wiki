@@ -1,4 +1,4 @@
-import {empty} from '../../util/sugar.js';
+import {empty} from '#sugar';
 
 export default {
   extraDependencies: [

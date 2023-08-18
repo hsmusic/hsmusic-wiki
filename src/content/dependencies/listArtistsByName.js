@@ -1,9 +1,9 @@
-import {stitchArrays} from '../../util/sugar.js';
+import {stitchArrays} from '#sugar';
 
 import {
   getArtistNumContributions,
   sortAlphabetically,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],

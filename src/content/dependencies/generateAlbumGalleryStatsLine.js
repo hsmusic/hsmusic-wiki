@@ -1,4 +1,4 @@
-import {getTotalDuration} from '../../util/wiki-data.js';
+import {getTotalDuration} from '#wiki-data';
 
 export default {
   extraDependencies: ['html', 'language'],

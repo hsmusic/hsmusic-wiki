@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['linkNewsEntry', 'transformContent'],

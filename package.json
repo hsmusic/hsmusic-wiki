@@ -11,6 +11,10 @@
         "test": "tap 'test/snapshot/*.js' 'test/unit/**/*.js'",
         "dev": "eslint src && node src/upd8.js"
     },
+    "imports": {
+        "#sugar": "./src/util/sugar.js",
+        "#wiki-data": "./src/util/wiki-data.js"
+    },
     "dependencies": {
         "chroma-js": "^2.4.2",
         "command-exists": "^1.2.9",

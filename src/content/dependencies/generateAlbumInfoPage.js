@@ -1,6 +1,6 @@
 import getChronologyRelations from '../util/getChronologyRelations.js';
-import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
-import {empty} from '../../util/sugar.js';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
+import {empty} from '#sugar';
 
 export default {
   contentDependencies: [

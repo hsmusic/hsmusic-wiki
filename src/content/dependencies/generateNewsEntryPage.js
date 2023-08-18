@@ -1,4 +1,4 @@
-import {sortChronologically} from '../../util/wiki-data.js';
+import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [

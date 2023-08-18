@@ -3,7 +3,7 @@ import {
   filterProperties,
   stitchArrays,
   unique,
-} from '../../util/sugar.js';
+} from '#sugar';
 
 export default {
   contentDependencies: ['linkGroup'],

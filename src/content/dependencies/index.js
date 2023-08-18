@@ -8,7 +8,7 @@ import {fileURLToPath} from 'node:url';
 
 import contentFunction, {ContentFunctionSpecError} from '../../content-function.js';
 import {color, logWarn} from '../../util/cli.js';
-import {annotateFunction} from '../../util/sugar.js';
+import {annotateFunction} from '#sugar';
 
 function cachebust(filePath) {
   if (filePath in cachebust.cache) {

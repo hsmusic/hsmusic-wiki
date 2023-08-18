@@ -1,5 +1,5 @@
-import {empty, repeat, stitchArrays} from '../../util/sugar.js';
-import {getCarouselLayoutForNumberOfItems} from '../../util/wiki-data.js';
+import {empty, repeat, stitchArrays} from '#sugar';
+import {getCarouselLayoutForNumberOfItems} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateGridActionLinks'],

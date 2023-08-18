@@ -1,4 +1,4 @@
-import {sortAlphabetically} from '../../util/wiki-data.js';
+import {sortAlphabetically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkTrack'],

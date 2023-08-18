@@ -1,5 +1,5 @@
-import {stitchArrays} from '../../util/sugar.js';
-import {sortChronologically} from '../../util/wiki-data.js';
+import {stitchArrays} from '#sugar';
+import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateColorStyleVariables', 'linkGroup'],

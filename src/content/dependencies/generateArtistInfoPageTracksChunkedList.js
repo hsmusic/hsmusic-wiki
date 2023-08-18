@@ -1,10 +1,10 @@
-import {accumulateSum, stitchArrays} from '../../util/sugar.js';
+import {accumulateSum, stitchArrays} from '#sugar';
 
 import {
   chunkByProperties,
   sortAlbumsTracksChronologically,
   sortEntryThingPairs,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: [

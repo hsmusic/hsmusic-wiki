@@ -1,10 +1,10 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
+import {empty, stitchArrays} from '#sugar';
 
 import {
   filterItemsForCarousel,
   getTotalDuration,
   sortChronologically,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: [

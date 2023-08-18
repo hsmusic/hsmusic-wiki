@@ -1,5 +1,5 @@
-import {empty, unique} from '../../util/sugar.js';
-import {getTotalDuration} from '../../util/wiki-data.js';
+import {empty, unique} from '#sugar';
+import {getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [

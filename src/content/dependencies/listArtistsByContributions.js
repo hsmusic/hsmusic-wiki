@@ -1,10 +1,10 @@
-import {stitchArrays, unique} from '../../util/sugar.js';
+import {stitchArrays, unique} from '#sugar';
 
 import {
   filterByCount,
   sortAlphabetically,
   sortByCount,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],

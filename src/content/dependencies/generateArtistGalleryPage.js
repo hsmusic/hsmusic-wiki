@@ -1,5 +1,5 @@
-import {stitchArrays} from '../../util/sugar.js';
-import {sortAlbumsTracksChronologically} from '../../util/wiki-data.js';
+import {stitchArrays} from '#sugar';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [

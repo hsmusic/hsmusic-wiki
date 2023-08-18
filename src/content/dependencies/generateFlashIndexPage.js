@@ -1,4 +1,4 @@
-import {stitchArrays} from '../../util/sugar.js';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [

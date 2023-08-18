@@ -1,5 +1,5 @@
-import {accumulateSum, stitchArrays} from '../../util/sugar.js';
-import {filterMultipleArrays, sortChronologically} from '../../util/wiki-data.js';
+import {accumulateSum, stitchArrays} from '#sugar';
+import {filterMultipleArrays, sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generatePageLayout', 'linkAlbumCommentary'],

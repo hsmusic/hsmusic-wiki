@@ -1,11 +1,11 @@
-import {stitchArrays} from '../../util/sugar.js';
+import {stitchArrays} from '#sugar';
 
 import {
   compareDates,
   filterMultipleArrays,
   sortChronologically,
   sortMultipleArrays,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: [

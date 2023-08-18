@@ -1,4 +1,4 @@
-import {accumulateSum} from '../../util/sugar.js';
+import {accumulateSum} from '#sugar';
 
 export default {
   extraDependencies: ['language'],

@@ -1,5 +1,5 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
-import {filterMultipleArrays, sortChronologically} from '../../util/wiki-data.js';
+import {empty, stitchArrays} from '#sugar';
+import {filterMultipleArrays, sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],

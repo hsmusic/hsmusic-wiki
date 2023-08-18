@@ -1,5 +1,5 @@
-import {empty, stitchArrays} from '../../util/sugar.js';
-import {getNewAdditions, getNewReleases} from '../../util/wiki-data.js';
+import {empty, stitchArrays} from '#sugar';
+import {getNewAdditions, getNewReleases} from '#wiki-data';
 
 export default {
   contentDependencies: [

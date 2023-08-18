@@ -1,4 +1,4 @@
-import {chunkByProperties, sortAlphabetically} from '../../util/wiki-data.js';
+import {chunkByProperties, sortAlphabetically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],

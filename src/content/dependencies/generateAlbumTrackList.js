@@ -1,4 +1,4 @@
-import {accumulateSum, empty, stitchArrays} from '../../util/sugar.js';
+import {accumulateSum, empty, stitchArrays} from '#sugar';
 
 function displayTrackSections(album) {
   if (empty(album.trackSections)) {

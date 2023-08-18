@@ -1,4 +1,4 @@
-import {compareArrays} from '../../util/sugar.js';
+import {compareArrays} from '#sugar';
 
 export default {
   contentDependencies: [

@@ -1,4 +1,4 @@
-import {transposeArrays, empty, stitchArrays} from '../../util/sugar.js';
+import {transposeArrays, empty, stitchArrays} from '#sugar';
 
 import {
   chunkMultipleArrays,
@@ -8,7 +8,7 @@ import {
   reduceMultipleArrays,
   sortAlphabetically,
   sortMultipleArrays,
-} from '../../util/wiki-data.js';
+} from '#wiki-data';
 
 export default {
   contentDependencies: [
