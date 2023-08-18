@@ -381,7 +381,7 @@ export function postprocessHeadings(inputNodes) {
       textContent += node.data.slice(parseFrom, match.index);
       parseFrom = match.index + match[0].length;
 
-      const attributes = html.attributes(parseAttributes(match[1]));
+      const attributes = html.parseAttributes(match[1]);
       attributes.push('class', 'content-heading');
 
       // We're only modifying the opening tag here. The remaining content,
