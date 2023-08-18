@@ -15,6 +15,7 @@ import {
   conditionallySuppressError,
   decorateErrorWithIndex,
   empty,
+  filterProperties,
   mapAggregate,
   openAggregate,
   showAggregate,
@@ -159,12 +160,20 @@ function makeProcessDocument(
     const presentFields = Object.keys(document);
 
     const fieldCombinationErrors = [];
+
     for (const {message, fields} of invalidFieldCombinations) {
       const fieldsPresent = presentFields.filter(field => fields.includes(field));
-      if (fieldsPresent.length > 1) {
-        fieldCombinationErrors.push(new makeProcessDocument.FieldCombinationError(fieldsPresent, message));
+
+      if (fieldsPresent.length <= 1) {
+        continue;
       }
+
+      fieldCombinationErrors.push(
+        new makeProcessDocument.FieldCombinationError(
+          filterProperties(document, fieldsPresent),
+          message));
     }
+
     if (!empty(fieldCombinationErrors)) {
       throw new makeProcessDocument.FieldCombinationsError(fieldCombinationErrors);
     }
@@ -220,10 +229,13 @@ makeProcessDocument.FieldCombinationsError = class FieldCombinationsError extend
 
 makeProcessDocument.FieldCombinationError = class FieldCombinationError extends Error {
   constructor(fields, message) {
-    const combinePart = `Don't combine ${fields.map(field => color.red(field)).join(', ')}`;
+    const fieldNames = Object.keys(fields);
+    const combinePart = `Don't combine ${fieldNames.map(field => color.red(field)).join(', ')}`;
 
     const messagePart =
-      (message
+      (typeof message === 'function'
+        ? `: ${message(fields)}`
+     : typeof message === 'string'
         ? `: ${message}`
         : ``);
 
@@ -363,6 +375,18 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
       'Originally Released As',
       'Contributors',
     ]},
+
+    {
+      message: ({'Has Cover Art': hasCoverArt}) =>
+        (hasCoverArt
+          ? `"Has Cover Art: true" is inferred from cover artist credits`
+          : `Tracks without cover art must not have cover artist credits`),
+
+      fields: [
+        'Has Cover Art',
+        'Cover Artists',
+      ],
+    },
   ],
 });
 
