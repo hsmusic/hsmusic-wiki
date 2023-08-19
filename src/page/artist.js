@@ -1,11 +1,8 @@
-// Artist page specification.
-//
-// NB: See artist-alias.js for artist alias redirect pages.
-
-import {empty} from '../util/sugar.js';
+import {empty} from '#sugar';
 
 export const description = `per-artist info & artwork gallery pages`;
 
+// NB: See artist-alias.js for artist alias redirect pages.
 export function targets({wikiData}) {
   return wikiData.artistData;
 }

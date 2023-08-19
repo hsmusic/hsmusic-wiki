@@ -1,8 +1,8 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
-import {readdir, stat} from 'fs/promises';
-import {fileURLToPath} from 'url';
-import * as path from 'path';
+import {readdir, stat} from 'node:fs/promises';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 import _commandExists from 'command-exists';
 

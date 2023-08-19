@@ -85,18 +85,11 @@ const thumbnailSpec = {
   'small': {size: 250, quality: 85},
 };
 
-import {spawn} from 'child_process';
-import {createHash} from 'crypto';
-import * as path from 'path';
-
-import {
-  readFile,
-  stat,
-  unlink,
-  writeFile,
-} from 'fs/promises'; // Whatcha know! Nice.
-
-import {createReadStream} from 'fs'; // Still gotta import from 8oth tho, for createReadStream.
+import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
+import {createReadStream} from 'node:fs';
+import {readFile, stat, unlink, writeFile} from 'node:fs/promises';
+import * as path from 'node:path';
 
 import {
   color,
@@ -106,16 +99,16 @@ import {
   logWarn,
   parseOptions,
   progressPromiseAll,
-} from './util/cli.js';
+} from '#cli';
 
 import {
   commandExists,
   isMain,
   promisifyProcess,
   traverse,
-} from './util/node-utils.js';
+} from '#node-utils';
 
-import {delay, empty, queue} from './util/sugar.js';
+import {delay, empty, queue} from '#sugar';
 
 export const defaultMagickThreads = 8;
 

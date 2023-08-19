@@ -1,35 +1,26 @@
-import * as http from 'http';
-import {createReadStream} from 'fs';
-import {stat} from 'fs/promises';
-import * as path from 'path';
-import {pipeline} from 'stream/promises'
+import * as http from 'node:http';
+import {createReadStream} from 'node:fs';
+import {stat} from 'node:fs/promises';
+import * as path from 'node:path';
+import {pipeline} from 'node:stream/promises'
 
-import {bindUtilities} from '../bind-utilities.js';
+import {logInfo, logWarn, progressCallAll} from '#cli';
+import {watchContentDependencies} from '#content-dependencies';
+import {quickEvaluate} from '#content-function';
+import * as html from '#html';
+import * as pageSpecs from '#page-specs';
+import {serializeThings} from '#serialize';
+import {empty} from '#sugar';
 
-import {serializeThings} from '../../data/serialize.js';
-
-import * as pageSpecs from '../../page/index.js';
-
-import {logInfo, logWarn, progressCallAll} from '../../util/cli.js';
-import * as html from '../../util/html.js';
-import {empty} from '../../util/sugar.js';
 import {
   getPagePathname,
   getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
-} from '../../util/urls.js';
+} from '#urls';
 
-import {
-  generateGlobalWikiDataJSON,
-  generateRedirectHTML,
-} from '../page-template.js';
-
-import {
-  watchContentDependencies,
-} from '../../content/dependencies/index.js';
-
-import {quickEvaluate} from '../../content-function.js';
+import {bindUtilities} from '../bind-utilities.js';
+import {generateGlobalWikiDataJSON, generateRedirectHTML} from '../common-templates.js';
 
 const defaultHost = '0.0.0.0';
 const defaultPort = 8002;

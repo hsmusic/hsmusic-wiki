@@ -1,3 +1,10 @@
+// Utils used when per-wiki-object data files.
+// Retained for reference and/or later reorganization.
+//
+// Not to be confused with data/serialize.js, which provides a generic
+// interface for serializing any Thing object.
+
+/*
 export function serializeLink(thing) {
   const ret = {};
   ret.name = thing.name;
@@ -67,3 +74,4 @@ export function serializeGroupsForTrack(track, {serializeLink}) {
     urls: group.urls,
   }));
 }
+*/

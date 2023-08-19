@@ -17,8 +17,9 @@
 // This only processes files one at a time because I'm lazy and stat calls
 // are very, very fast.
 
-import {stat} from 'fs/promises';
-import {logWarn} from './util/cli.js';
+import {stat} from 'node:fs/promises';
+
+import {logWarn} from '#cli';
 
 export default class FileSizePreloader {
   #paths = [];

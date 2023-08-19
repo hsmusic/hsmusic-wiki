@@ -1,7 +1,4 @@
-// Flash page and index specifications.
-
-import {empty} from '../util/sugar.js';
-import {getFlashLink} from '../util/wiki-data.js';
+import {empty} from '#sugar';
 
 export const description = `flash & game pages`;
 

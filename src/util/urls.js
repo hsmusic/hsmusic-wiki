@@ -4,9 +4,19 @@
 // which can really quickly take su8stitute parameters to link from any one
 // place to another; 8ut there are also a few other utilities, too.
 
-import * as path from 'path';
+import * as path from 'node:path';
 
-import {withEntries} from './sugar.js';
+import {withEntries} from '#sugar';
+
+// This export is only provided for convenience, i.e. to enable the following:
+//
+//   import {urlSpec} from '#urls';
+//
+// It's not actually defined in this module's variable scope, and functions
+// exported here require a urlSpec (whether this default one or another) to be
+// passed directly.
+//
+export {default as urlSpec} from '../url-spec.js';
 
 export function generateURLs(urlSpec) {
   const getValueForFullKey = (obj, fullKey) => {

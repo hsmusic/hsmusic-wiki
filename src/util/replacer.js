@@ -1,6 +1,13 @@
-import {logError, logWarn} from './cli.js';
-import {escapeRegex} from './sugar.js';
-import * as html from './html.js';
+// Regex-based forward parser for wiki content, breaking up text input into
+// text and (possibly nested) tag nodes.
+//
+// The behavior here is quite tied into the `transformContent` content
+// function, which converts nodes parsed here into actual HTML, links, etc
+// for embedding in a wiki webpage.
+
+import {logError, logWarn} from '#cli';
+import * as html from '#html';
+import {escapeRegex} from '#sugar';
 
 // Syntax literals.
 const tagBeginning = '[[';

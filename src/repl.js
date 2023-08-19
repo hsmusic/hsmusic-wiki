@@ -1,23 +1,20 @@
-import * as os from 'os';
-import * as path from 'path';
-import * as repl from 'repl';
-import {fileURLToPath} from 'url';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as repl from 'node:repl';
+import {fileURLToPath} from 'node:url';
 
-import thingConstructors from './data/things/index.js';
-import {quickLoadAllFromYAML} from './data/yaml.js';
-import {logError, logWarn, parseOptions} from './util/cli.js';
-import {isMain} from './util/node-utils.js';
-import {bindOpts, showAggregate} from './util/sugar.js';
-import {generateURLs} from './util/urls.js';
+import {logError, logWarn, parseOptions} from '#cli';
+import {isMain} from '#node-utils';
+import {processLanguageFile} from '#language';
+import {bindOpts, showAggregate} from '#sugar';
+import {generateURLs, urlSpec} from '#urls';
+import {quickLoadAllFromYAML} from '#yaml';
 
-import {processLanguageFile} from './data/language.js';
-
-import * as serialize from './util/serialize.js';
-import * as sugar from './util/sugar.js';
-import * as wikiDataUtils from './util/wiki-data.js';
-import _find, {bindFind} from './util/find.js';
-
-import urlSpec from './url-spec.js';
+import _find, {bindFind} from '#find';
+import thingConstructors from '#things';
+import * as serialize from '#serialize';
+import * as sugar from '#sugar';
+import * as wikiDataUtils from '#wiki-data';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

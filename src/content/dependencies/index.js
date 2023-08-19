@@ -1,13 +1,13 @@
-import chokidar from 'chokidar';
-import {ESLint} from 'eslint';
-
 import EventEmitter from 'node:events';
 import {readdir} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-import contentFunction, {ContentFunctionSpecError} from '../../content-function.js';
-import {color, logWarn} from '../../util/cli.js';
+import chokidar from 'chokidar';
+import {ESLint} from 'eslint';
+
+import {color, logWarn} from '#cli';
+import contentFunction, {ContentFunctionSpecError} from '#content-function';
 import {annotateFunction} from '#sugar';
 
 function cachebust(filePath) {

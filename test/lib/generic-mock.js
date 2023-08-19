@@ -1,6 +1,6 @@
 import {same} from 'tcompare';
 
-import {empty} from '../../src/util/sugar.js';
+import {empty} from '#sugar';
 
 export default function mock(callback) {
   const mocks = [];

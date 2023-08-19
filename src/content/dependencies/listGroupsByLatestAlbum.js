@@ -1,11 +1,5 @@
 import {stitchArrays} from '#sugar';
-
-import {
-  compareDates,
-  filterMultipleArrays,
-  sortChronologically,
-  sortMultipleArrays,
-} from '#wiki-data';
+import {compareDates, filterMultipleArrays, sortChronologically, sortMultipleArrays} from '#wiki-data';
 
 export default {
   contentDependencies: [

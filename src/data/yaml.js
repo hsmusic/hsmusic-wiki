@@ -1,15 +1,16 @@
 // yaml.js - specification for HSMusic YAML data file format and utilities for
-// loading and processing YAML files and documents
+// loading, processing, and validating YAML files and documents
 
-import * as path from 'path';
+import {readFile, stat} from 'node:fs/promises';
+import * as path from 'node:path';
+import {inspect as nodeInspect} from 'node:util';
+
 import yaml from 'js-yaml';
 
-import {readFile, stat} from 'fs/promises';
-import {inspect as nodeInspect} from 'util';
-
-import T from './things/index.js';
-
-import {color, ENABLE_COLOR, logInfo, logWarn} from '../util/cli.js';
+import {color, ENABLE_COLOR, logInfo, logWarn} from '#cli';
+import find, {bindFind} from '#find';
+import {traverse} from '#node-utils';
+import T from '#things';
 
 import {
   conditionallySuppressError,
@@ -20,17 +21,14 @@ import {
   openAggregate,
   showAggregate,
   withAggregate,
-} from '../util/sugar.js';
+} from '#sugar';
 
 import {
   sortAlbumsTracksChronologically,
   sortAlphabetically,
   sortChronologically,
   sortFlashesChronologically,
-} from '../util/wiki-data.js';
-
-import find, {bindFind} from '../util/find.js';
-import {traverse} from '../util/node-utils.js';
+} from '#wiki-data';
 
 // --> General supporting stuff
 

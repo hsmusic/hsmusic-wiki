@@ -1,19 +1,13 @@
-// Listing page specification.
-//
+export const description = `wiki-wide listing pages & index`;
+
 // The targets here are a bit different than for most pages: rather than data
 // objects loaded from text files in the wiki data directory, they're hard-
-// coded specifications, with various JS functions for processing wiki data
-// and turning it into user-readable HTML listings.
+// coded specifications, each directly identifying the hard-coded content
+// function used to generate that listing.
 //
 // Individual listing specs are described in src/listing-spec.js, but are
 // provided via wikiData like other (normal) data objects.
-
-import {empty} from '../util/sugar.js';
-
-import {getTotalDuration} from '../util/wiki-data.js';
-
-export const description = `wiki-wide listing pages & index`;
-
+//
 export function targets({wikiData}) {
   return (
     wikiData.listingSpec

@@ -1,11 +1,10 @@
-import {readFile} from 'fs/promises';
+import {readFile} from 'node:fs/promises';
 
 // It stands for "HTML Entities", apparently. Cursed.
 import he from 'he';
 
-import T from './things/index.js';
+import T from '#things';
 
-// TODO: define somewhere besides upd8.js obviously
 export async function processLanguageFile(file) {
   const contents = await readFile(file, 'utf-8');
   const json = JSON.parse(contents);

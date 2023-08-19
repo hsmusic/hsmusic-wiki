@@ -74,9 +74,9 @@
 //      function, which provides a mapping of exposed property names to whether
 //      or not their dependencies are yet met.
 
-import {color, ENABLE_COLOR} from '../../util/cli.js';
+import {inspect as nodeInspect} from 'node:util';
 
-import {inspect as nodeInspect} from 'util';
+import {color, ENABLE_COLOR} from '#cli';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});

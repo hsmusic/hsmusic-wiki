@@ -1,20 +1,20 @@
-import * as path from 'path';
-
-import {bindUtilities} from '../bind-utilities.js';
-// import {validateWrites} from '../validate-writes.js';
+import * as path from 'node:path';
 
 import {
-  quickLoadContentDependencies,
-} from '../../content/dependencies/index.js';
+  copyFile,
+  mkdir,
+  stat,
+  symlink,
+  writeFile,
+  unlink,
+} from 'node:fs/promises';
 
-import {quickEvaluate} from '../../content-function.js';
-
-import {serializeThings} from '../../data/serialize.js';
-
-import * as pageSpecs from '../../page/index.js';
-
-import * as html from '../../util/html.js';
-import {empty, queue, withEntries} from '../../util/sugar.js';
+import {quickLoadContentDependencies} from '#content-dependencies';
+import {quickEvaluate} from '#content-function';
+import * as html from '#html';
+import * as pageSpecs from '#page-specs';
+import {serializeThings} from '#serialize';
+import {empty, queue, withEntries} from '#sugar';
 
 import {
   logError,
@@ -22,14 +22,17 @@ import {
   logWarn,
   progressCallAll,
   progressPromiseAll,
-} from '../../util/cli.js';
+} from '#cli';
 
 import {
   getPagePathname,
   getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
-} from '../../util/urls.js';
+} from '#urls';
+
+import {bindUtilities} from '../bind-utilities.js';
+import {generateRedirectHTML, generateGlobalWikiDataJSON} from '../common-templates.js';
 
 const pageFlags = Object.keys(pageSpecs);
 
@@ -76,36 +79,6 @@ export function getCLIOptions() {
         type: 'flag',
       }])),
   };
-}
-
-function generateRedirectHTML(title, target, {language}) {
-  return `<!DOCTYPE html>\n` + html.tag('html', [
-    html.tag('head', [
-      html.tag('title', language.$('redirectPage.title', {title})),
-      html.tag('meta', {charset: 'utf-8'}),
-
-      html.tag('meta', {
-        'http-equiv': 'refresh',
-        content: `0;url=${target}`,
-      }),
-
-      // TODO: Is this OK for localized pages?
-      html.tag('link', {
-        rel: 'canonical',
-        href: target,
-      }),
-    ]),
-
-    html.tag('body',
-      html.tag('main', [
-        html.tag('h1',
-          language.$('redirectPage.title', {title})),
-        html.tag('p',
-          language.$('redirectPage.infoLine', {
-            target: html.tag('a', {href: target}, target),
-          })),
-      ])),
-  ]);
 }
 
 export async function go({
@@ -173,12 +146,10 @@ export async function go({
     outputPath,
     urls,
     wikiData,
-    /*
     wikiDataJSON: generateGlobalWikiDataJSON({
       serializeThings,
       wikiData,
-    })
-    */
+    }),
   });
 
   const buildSteps = writeAll
@@ -408,15 +379,6 @@ async function wrapLanguages(fn, {
     await fn(language, i, entries);
   }
 }
-
-import {
-  copyFile,
-  mkdir,
-  stat,
-  symlink,
-  writeFile,
-  unlink,
-} from 'fs/promises';
 
 async function writePage({
   pageHTML,

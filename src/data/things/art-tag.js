@@ -1,8 +1,6 @@
-import Thing from './thing.js';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
 
-import {
-  sortAlbumsTracksChronologically,
-} from '../../util/wiki-data.js';
+import Thing from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';

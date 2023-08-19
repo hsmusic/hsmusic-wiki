@@ -1,8 +1,7 @@
-import {withAggregate} from '../../util/sugar.js';
+import {inspect as nodeInspect} from 'node:util';
 
-import {color, ENABLE_COLOR} from '../../util/cli.js';
-
-import {inspect as nodeInspect} from 'util';
+import {color, ENABLE_COLOR} from '#cli';
+import {withAggregate} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});

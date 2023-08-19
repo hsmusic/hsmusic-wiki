@@ -3,7 +3,7 @@ import {
   decorateErrorWithCause,
   empty,
   setIntersection,
-} from './util/sugar.js';
+} from '#sugar';
 
 export class ContentFunctionSpecError extends Error {}
 

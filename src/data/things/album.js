@@ -1,7 +1,7 @@
-import Thing from './thing.js';
+import {empty} from '#sugar';
+import find from '#find';
 
-import {empty} from '../../util/sugar.js';
-import find from '../../util/find.js';
+import Thing from './thing.js';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';

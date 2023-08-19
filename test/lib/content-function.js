@@ -1,17 +1,17 @@
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
 import chroma from 'chroma-js';
-import * as path from 'path';
-import {fileURLToPath} from 'url';
+
+import {getColors} from '#colors';
+import {quickLoadContentDependencies} from '#content-dependencies';
+import {quickEvaluate} from '#content-function';
+import * as html from '#html';
+import {processLanguageFile} from '#language';
+import {empty, showAggregate} from '#sugar';
+import {generateURLs, thumb, urlSpec} from '#urls';
 
 import mock from './generic-mock.js';
-import {quickEvaluate} from '../../src/content-function.js';
-import {quickLoadContentDependencies} from '../../src/content/dependencies/index.js';
-
-import urlSpec from '../../src/url-spec.js';
-import * as html from '../../src/util/html.js';
-import {empty, showAggregate} from '../../src/util/sugar.js';
-import {getColors} from '../../src/util/colors.js';
-import {generateURLs, thumb} from '../../src/util/urls.js';
-import {processLanguageFile} from '../../src/data/language.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

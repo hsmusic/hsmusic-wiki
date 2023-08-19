@@ -1,9 +1,9 @@
 import t from 'tap';
 
-import * as html from '../../../src/util/html.js';
-const {Tag, Attributes, Template} = html;
+import * as html from '#html';
+import {strictlyThrows} from '#test-lib';
 
-import {strictlyThrows} from '../../lib/strict-match-error.js';
+const {Tag, Attributes, Template} = html;
 
 t.test(`html.tag`, t => {
   t.plan(14);

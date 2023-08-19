@@ -1,9 +1,5 @@
 import {stitchArrays} from '#sugar';
-
-import {
-  chunkByProperties,
-  sortAlbumsTracksChronologically,
-} from '#wiki-data';
+import {chunkByProperties, sortAlbumsTracksChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],

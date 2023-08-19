@@ -31,42 +31,19 @@
 // Oh yeah, like. Just run this through some relatively recent version of
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
-import {execSync} from 'child_process';
-import * as path from 'path';
-import {fileURLToPath} from 'url';
+import {execSync} from 'node:child_process';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
 import wrap from 'word-wrap';
 
-import genThumbs, {
-  clearThumbs,
-  defaultMagickThreads,
-  isThumb,
-  verifyImagePaths,
-} from './gen-thumbs.js';
-
-import bootRepl from './repl.js';
-import {listingSpec, listingTargetSpec} from './listing-spec.js';
-import urlSpec from './url-spec.js';
-
-import {processLanguageFile} from './data/language.js';
-
-import CacheableObject from './data/things/cacheable-object.js';
-
-import {
-  filterDuplicateDirectories,
-  filterReferenceErrors,
-  linkWikiDataArrays,
-  loadAndProcessDataDocuments,
-  sortWikiDataArrays,
-  WIKI_INFO_FILE,
-} from './data/yaml.js';
-
-import {isMain, traverse} from './util/node-utils.js';
-import {empty, showAggregate, withEntries} from './util/sugar.js';
-import {generateURLs} from './util/urls.js';
-import {sortByName} from './util/wiki-data.js';
-
-import {generateDevelopersCommentHTML} from './write/page-template.js';
-import * as buildModes from './write/build-modes/index.js';
+import {processLanguageFile} from '#language';
+import {isMain, traverse} from '#node-utils';
+import bootRepl from '#repl';
+import {empty, showAggregate, withEntries} from '#sugar';
+import {CacheableObject} from '#things';
+import {generateURLs, urlSpec} from '#urls';
+import {sortByName} from '#wiki-data';
 
 import {
   color,
@@ -77,9 +54,27 @@ import {
   parseOptions,
   progressCallAll,
   progressPromiseAll,
-} from './util/cli.js';
+} from '#cli';
+
+import genThumbs, {
+  clearThumbs,
+  defaultMagickThreads,
+  isThumb,
+  verifyImagePaths,
+} from '#thumbs';
+
+import {
+  filterDuplicateDirectories,
+  filterReferenceErrors,
+  linkWikiDataArrays,
+  loadAndProcessDataDocuments,
+  sortWikiDataArrays,
+  WIKI_INFO_FILE,
+} from '#yaml';
 
 import FileSizePreloader from './file-size-preloader.js';
+import {listingSpec, listingTargetSpec} from './listing-spec.js';
+import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -725,11 +720,35 @@ async function main() {
 
   if (noBuild) return;
 
-  const developersComment = generateDevelopersCommentHTML({
-    buildTime: BUILD_TIME,
-    commit: COMMIT,
-    wikiData,
-  });
+  const developersComment =
+    `<!--\n` + [
+      wikiData.wikiInfo.canonicalBase
+        ? `hsmusic.wiki - ${wikiData.wikiInfo.name}, ${wikiData.wikiInfo.canonicalBase}`
+        : `hsmusic.wiki - ${wikiData.wikiInfo.name}`,
+      'Code copyright 2019-2023 Quasar Nebula et al (MIT License)',
+      ...wikiData.wikiInfo.canonicalBase === 'https://hsmusic.wiki/' ? [
+        'Data avidly compiled and localization brought to you',
+        'by our awesome team and community of wiki contributors',
+        '***',
+        'Want to contribute? Join our Discord or leave feedback!',
+        '- https://hsmusic.wiki/discord/',
+        '- https://hsmusic.wiki/feedback/',
+        '- https://github.com/hsmusic/',
+      ] : [
+        'https://github.com/hsmusic/',
+      ],
+      '***',
+      BUILD_TIME &&
+        `Site built: ${BUILD_TIME.toLocaleString('en-US', {
+          dateStyle: 'long',
+          timeStyle: 'long',
+        })}`,
+      COMMIT &&
+        `Latest code commit: ${COMMIT}`,
+    ]
+      .filter(Boolean)
+      .map(line => `    ` + line)
+      .join('\n') + `\n-->`;
 
   return selectedBuildMode.go({
     cliOptions,

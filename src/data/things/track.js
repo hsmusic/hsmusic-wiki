@@ -1,10 +1,10 @@
+import {inspect} from 'node:util';
+
+import {color} from '#cli';
+import find from '#find';
+import {empty} from '#sugar';
+
 import Thing from './thing.js';
-
-import {inspect} from 'util';
-
-import {color} from '../../util/cli.js';
-import find from '../../util/find.js';
-import {empty} from '../../util/sugar.js';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
@@ -47,7 +47,15 @@ export class Track extends Thing {
     hasCoverArt: {
       flags: {update: true, expose: true},
 
-      update: {validate: isBoolean},
+      update: {
+        validate(value) {
+          if (value !== false) {
+            throw new TypeError(`Expected false or null`);
+          }
+
+          return true;
+        },
+      },
 
       expose: {
         dependencies: ['albumData', 'coverArtistContribsByRef'],

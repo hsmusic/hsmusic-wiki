@@ -1,6 +1,6 @@
-import {color, logWarn} from './cli.js';
+import {inspect} from 'node:util';
 
-import {inspect} from 'util';
+import {color, logWarn} from '#cli';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {

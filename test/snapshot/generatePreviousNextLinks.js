@@ -1,7 +1,6 @@
 import t from 'tap';
-import {testContentFunctions} from '../lib/content-function.js';
-
-import * as html from '../../src/util/html.js';
+import * as html from '#html';
+import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'generatePreviousNextLinks (snapshot)', async (t, evaluate) => {
   await evaluate.load();

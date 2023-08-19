@@ -1,6 +1,6 @@
 import t from 'tap';
 
-import CacheableObject from '../../../../src/data/things/cacheable-object.js';
+import {CacheableObject} from '#things';
 
 function newCacheableObject(PD) {
   return new (class extends CacheableObject {

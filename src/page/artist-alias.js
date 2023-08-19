@@ -1,6 +1,3 @@
-// Artist alias redirect pages.
-// (Makes old permalinks bring visitors to the up-to-date page.)
-
 export const description = `redirects for aliased artist names`;
 
 export function targets({wikiData}) {

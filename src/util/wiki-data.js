@@ -1,11 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {
-  accumulateSum,
-  empty,
-  stitchArrays,
-  unique,
-} from './sugar.js';
+import {accumulateSum, empty, stitchArrays, unique} from './sugar.js';
 
 // Generic value operations
 

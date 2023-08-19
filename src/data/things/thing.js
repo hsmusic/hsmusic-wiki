@@ -1,7 +1,12 @@
 // Thing: base class for wiki data types, providing wiki-specific utility
 // functions on top of essential CacheableObject behavior.
 
-import CacheableObject from './cacheable-object.js';
+import {inspect} from 'node:util';
+
+import {color} from '#cli';
+import find from '#find';
+import {empty} from '#sugar';
+import {getKebabCase} from '#wiki-data';
 
 import {
   isAdditionalFileList,
@@ -19,14 +24,9 @@ import {
   validateInstanceOf,
   validateReference,
   validateReferenceList,
-} from './validators.js';
+} from '#validators';
 
-import {inspect} from 'util';
-import {color} from '../../util/cli.js';
-import {empty} from '../../util/sugar.js';
-import {getKebabCase} from '../../util/wiki-data.js';
-
-import find from '../../util/find.js';
+import CacheableObject from './cacheable-object.js';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol('Thing.referenceType');

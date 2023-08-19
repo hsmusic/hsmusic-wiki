@@ -1,8 +1,4 @@
-import {
-  accumulateSum,
-  empty,
-  showAggregate,
-} from './util/sugar.js';
+import {accumulateSum, empty, showAggregate} from '#sugar';
 
 import {
   chunkByProperties,
@@ -12,7 +8,7 @@ import {
   sortByDate,
   sortChronologically,
   sortFlashesChronologically,
-} from './util/wiki-data.js';
+} from '#wiki-data';
 
 const listingSpec = [];
 

@@ -1,4 +1,4 @@
-import * as util from 'util';
+import {inspect} from 'node:util';
 
 export default function({
   albumData,
@@ -38,7 +38,7 @@ export default function({
   for (const album of badAlbums) {
     console.log('-', album);
     for (const group of album.groups) {
-      console.log(`  - ${util.inspect(group)}`)
+      console.log(`  - ${inspect(group)}`)
     }
   }
 

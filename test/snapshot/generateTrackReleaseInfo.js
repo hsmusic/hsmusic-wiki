@@ -1,5 +1,5 @@
 import t from 'tap';
-import {testContentFunctions} from '../lib/content-function.js';
+import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'generateTrackReleaseInfo (snapshot)', async (t, evaluate) => {
   await evaluate.load();

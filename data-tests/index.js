@@ -1,23 +1,13 @@
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
 import chokidar from 'chokidar';
-import * as path from 'path';
-import {fileURLToPath} from 'url';
 
-import {quickLoadAllFromYAML} from '../../src/data/yaml.js';
-import {isMain} from '../../src/util/node-utils.js';
-import {getContextAssignments} from '../../src/repl.js';
-
-import {
-  color,
-  logError,
-  logInfo,
-  logWarn,
-  parseOptions,
-} from '../../src/util/cli.js';
-
-import {
-  bindOpts,
-  showAggregate,
-} from '../../src/util/sugar.js';
+import {color, logError, logInfo, logWarn, parseOptions} from '#cli';
+import {isMain} from '#node-utils';
+import {getContextAssignments} from '#repl';
+import {bindOpts, showAggregate} from '#sugar';
+import {quickLoadAllFromYAML} from '#yaml';
 
 async function main() {
   const miscOptions = await parseOptions(process.argv.slice(2), {

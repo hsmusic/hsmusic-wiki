@@ -1,7 +1,7 @@
-import {marked} from 'marked';
+import {bindFind} from '#find';
+import {parseInput} from '#replacer';
 
-import {bindFind} from '../../util/find.js';
-import {parseInput} from '../../util/replacer.js';
+import {marked} from 'marked';
 
 export const replacerSpec = {
   album: {

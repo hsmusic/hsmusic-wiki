@@ -1,9 +1,4 @@
-import {
-  empty,
-  filterProperties,
-  stitchArrays,
-  unique,
-} from '#sugar';
+import {empty, filterProperties, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: ['linkGroup'],

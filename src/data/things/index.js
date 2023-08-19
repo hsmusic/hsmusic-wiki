@@ -1,12 +1,12 @@
-import {logError} from '../../util/cli.js';
-import {openAggregate, showAggregate} from '../../util/sugar.js';
+import * as path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
-import * as path from 'path';
-import {fileURLToPath} from 'url';
+import {logError} from '#cli';
+import * as serialize from '#serialize';
+import {openAggregate, showAggregate} from '#sugar';
+import * as validators from '#validators';
 
 import Thing from './thing.js';
-import * as validators from './validators.js';
-import * as serialize from '../serialize.js';
 
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
@@ -19,6 +19,9 @@ import * as newsEntryClasses from './news-entry.js';
 import * as staticPageClasses from './static-page.js';
 import * as trackClasses from './track.js';
 import * as wikiInfoClasses from './wiki-info.js';
+
+export {default as Thing} from './thing.js';
+export {default as CacheableObject} from './cacheable-object.js';
 
 const allClassLists = {
   'album.js': albumClasses,

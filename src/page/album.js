@@ -1,5 +1,3 @@
-// Album page specification.
-
 export const description = `per-album info, artwork gallery & commentary pages`;
 
 export function targets({wikiData}) {

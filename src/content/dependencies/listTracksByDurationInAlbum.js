@@ -1,11 +1,5 @@
 import {stitchArrays} from '#sugar';
-
-import {
-  filterByCount,
-  filterMultipleArrays,
-  sortByCount,
-  sortChronologically,
-} from '#wiki-data';
+import {filterByCount, filterMultipleArrays, sortByCount, sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum', 'linkTrack'],

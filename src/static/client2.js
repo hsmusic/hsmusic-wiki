@@ -4,11 +4,8 @@
 // the random track feature right now - the idea is we only use it for stuff
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
-//
-// Upd8: As of 04/02/2021, it's now used for info cards too! Nice.
 
 import {getColors} from '../util/colors.js';
-
 import {getArtistNumContributions} from '../util/wiki-data.js';
 
 let albumData, artistData;

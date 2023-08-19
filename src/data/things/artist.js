@@ -1,6 +1,6 @@
-import Thing from './thing.js';
+import find from '#find';
 
-import find from '../../util/find.js';
+import Thing from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';

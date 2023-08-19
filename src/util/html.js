@@ -1,9 +1,9 @@
-// Some really simple functions for formatting HTML content.
+// Some really, really simple functions for formatting HTML content.
 
-import {inspect} from 'util';
+import {inspect} from 'node:util';
 
-import * as commonValidators from '../data/things/validators.js';
-import {empty} from './sugar.js';
+import {empty} from '#sugar';
+import * as commonValidators from '#validators';
 
 // COMPREHENSIVE!
 // https://html.spec.whatwg.org/multipage/syntax.html#void-elements

@@ -12,8 +12,26 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
+        "#colors": "./src/util/colors.js",
+        "#content-dependencies": "./src/content/dependencies/index.js",
+        "#content-function": "./src/content-function.js",
+        "#cli": "./src/util/cli.js",
+        "#find": "./src/find.js",
+        "#html": "./src/util/html.js",
+        "#language": "./src/data/language.js",
+        "#page-specs": "./src/page/index.js",
+        "#node-utils": "./src/util/node-utils.js",
+        "#repl": "./src/repl.js",
+        "#replacer": "./src/util/replacer.js",
+        "#serialize": "./src/data/serialize.js",
         "#sugar": "./src/util/sugar.js",
-        "#wiki-data": "./src/util/wiki-data.js"
+        "#test-lib": "./test/lib/index.js",
+        "#things": "./src/data/things/index.js",
+        "#thumbs": "./src/gen-thumbs.js",
+        "#urls": "./src/util/urls.js",
+        "#validators": "./src/data/things/validators.js",
+        "#wiki-data": "./src/util/wiki-data.js",
+        "#yaml": "./src/data/yaml.js"
     },
     "dependencies": {
         "chroma-js": "^2.4.2",

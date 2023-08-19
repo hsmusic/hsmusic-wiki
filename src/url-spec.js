@@ -1,4 +1,4 @@
-import {withEntries} from './util/sugar.js';
+import {withEntries} from '#sugar';
 
 const urlSpec = {
   data: {

@@ -1,13 +1,4 @@
-// Group page specifications.
-
-import {
-  empty,
-} from '../util/sugar.js';
-
-import {
-  getTotalDuration,
-  sortChronologically,
-} from '../util/wiki-data.js';
+import {empty} from '#sugar';
 
 export const description = `per-group info & album gallery pages`;
 

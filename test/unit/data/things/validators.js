@@ -1,5 +1,5 @@
 import t from 'tap';
-import { showAggregate } from '../../../../src/util/sugar.js';
+import {showAggregate} from '#sugar';
 
 import {
   // Basic types
@@ -31,7 +31,7 @@ import {
 
   // Compositional utilities
   oneOf,
-} from '../../../../src/data/things/validators.js';
+} from '#validators';
 
 function test(t, msg, fn) {
   t.test(msg, t => {
