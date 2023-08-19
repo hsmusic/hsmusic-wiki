@@ -467,6 +467,9 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
 }
 
 export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImagePaths) {
+  expectedImagePaths = expectedImagePaths.map(path => path.toLowerCase());
+  extantImagePaths = extantImagePaths.map(path => path.toLowerCase());
+
   return {
     missing:
       expectedImagePaths
