@@ -60,7 +60,6 @@ import {
   WIKI_INFO_FILE,
 } from './data/yaml.js';
 
-import {findFiles} from './util/io.js';
 import link from './util/link.js';
 import {isMain, traverse} from './util/node-utils.js';
 import {empty, showAggregate, withEntries} from './util/sugar.js';
@@ -601,8 +600,9 @@ async function main() {
 
   let languages;
   if (langPath) {
-    const languageDataFiles = await findFiles(langPath, {
-      filter: (f) => path.extname(f) === '.json',
+    const languageDataFiles = await traverse(langPath, {
+      filterFile: name => path.extname(name) === '.json',
+      pathStyle: 'device',
     });
 
     const results = await progressPromiseAll(`Reading & processing language files.`,
@@ -687,20 +687,21 @@ async function main() {
   // we can't super easily know which ones are referenced at runtime, just
   // cheat and get file sizes for all images under media. (This includes
   // additional files which are images.)
-  const imageFilePaths = (await traverse(mediaPath, {
-    pathStyle: 'device',
-    filterDir: dir => dir !== '.git',
-    filterFile: file => (
-      ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&
-        !isThumb(file)),
-  }))
-    .map(file => ({
-      device: path.join(mediaPath, file),
-      media:
-        urls
-          .from('media.root')
-          .to('media.path', file.split(path.sep).join('/')),
-    }));
+  const imageFilePaths =
+    await traverse(mediaPath, {
+      pathStyle: 'device',
+      filterDir: dir => dir !== '.git',
+      filterFile: file =>
+        ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&
+        !isThumb(file),
+    }).then(files => files
+        .map(file => ({
+          device: file,
+          media:
+            urls
+              .from('media.root')
+              .to('media.path', path.relative(mediaPath, file).split(path.sep).join('/')),
+        })));
 
   const getSizeOfMediaFileHelper = paths => (mediaPath) => {
     const pair = paths.find(({media}) => media === mediaPath);

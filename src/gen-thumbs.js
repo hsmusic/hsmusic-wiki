@@ -220,6 +220,7 @@ export async function clearThumbs(mediaPath, {
     const unsafeFiles = thumbFiles.filter(file => {
       if (path.extname(file) !== '.jpg') return true;
       if (thumbtacks.every(tack => !file.includes(tack))) return true;
+      if (path.relative(mediaPath, file).startsWith('../')) return true;
       return false;
     });
 
@@ -240,7 +241,7 @@ export async function clearThumbs(mediaPath, {
     await progressPromiseAll(`Removing thumbnail files`, queue(
       thumbFiles.map(file => async () => {
         try {
-          await unlink(path.join(mediaPath, file));
+          await unlink(file);
         } catch (error) {
           if (error.code !== 'ENOENT') {
             errored.push(file);
@@ -539,6 +540,7 @@ export async function traverseSourceImagePaths(mediaPath, {target}) {
 
   return await traverse(mediaPath, {
     pathStyle: (target === 'verify' ? 'posix' : 'device'),
+    prefixPath: '',
 
     filterFile(name) {
       const ext = path.extname(name);

@@ -30,7 +30,7 @@ import {
 } from '../util/wiki-data.js';
 
 import find, {bindFind} from '../util/find.js';
-import {findFiles} from '../util/io.js';
+import {traverse} from '../util/node-utils.js';
 
 // --> General supporting stuff
 
@@ -739,13 +739,12 @@ export const dataSteps = [
 
   {
     title: `Process album files`,
-    files: async (dataPath) =>
-      (
-        await findFiles(path.join(dataPath, DATA_ALBUM_DIRECTORY), {
-          filter: (f) => path.extname(f) === '.yaml',
-          joinParentDirectory: false,
-        })
-      ).map(file => path.join(DATA_ALBUM_DIRECTORY, file)),
+
+    files: dataPath =>
+      traverse(path.join(dataPath, DATA_ALBUM_DIRECTORY), {
+        filterFile: name => path.extname(name) === '.yaml',
+        prefixPath: DATA_ALBUM_DIRECTORY,
+      }),
 
     documentMode: documentModes.headerAndEntries,
     processHeaderDocument: processAlbumDocument,
@@ -977,13 +976,12 @@ export const dataSteps = [
 
   {
     title: `Process static page files`,
-    files: async (dataPath) =>
-      (
-        await findFiles(path.join(dataPath, DATA_STATIC_PAGE_DIRECTORY), {
-          filter: f => path.extname(f) === '.yaml',
-          joinParentDirectory: false,
-        })
-      ).map(file => path.join(DATA_STATIC_PAGE_DIRECTORY, file)),
+
+    files: dataPath =>
+      traverse(path.join(dataPath, DATA_STATIC_PAGE_DIRECTORY), {
+        filterFile: name => path.extname(name) === '.yaml',
+        prefixPath: DATA_STATIC_PAGE_DIRECTORY,
+      }),
 
     documentMode: documentModes.onePerFile,
     processDocument: processStaticPageDocument,

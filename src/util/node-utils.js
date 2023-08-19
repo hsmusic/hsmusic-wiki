@@ -1,6 +1,6 @@
 // Utility functions which are only relevant to particular Node.js constructs.
 
-import {readdir} from 'fs/promises';
+import {readdir, stat} from 'fs/promises';
 import {fileURLToPath} from 'url';
 import * as path from 'path';
 
@@ -56,34 +56,47 @@ export function isMain(importMetaURL) {
   ].includes(relative);
 }
 
-// Like readdir... but it's recursive!
-export function traverse(startDirPath, {
+// Like readdir... but it's recursive! This returns a flat list of file paths.
+// By default, the paths include the provided top/root path, but this can be
+// changed with prefixPath to prefix some other path, or to just return paths
+// relative to the root. Change pathStyle to specify posix or win32, or leave
+// it as the default device-correct style. Provide a filterDir function to
+// control which directory names are traversed at all, and filterFile to
+// select which filenames are included in the final list.
+export async function traverse(rootPath, {
   pathStyle = 'device',
   filterFile = () => true,
-  filterDir = () => true
+  filterDir = () => true,
+  prefixPath = rootPath,
 } = {}) {
-  const pathJoin = {
+  const pathJoinDevice = path.join;
+  const pathJoinStyle = {
     'device': path.join,
     'posix': path.posix.join,
     'win32': path.win32.join,
   }[pathStyle];
 
-  if (!pathJoin) {
+  if (!pathJoinStyle) {
     throw new Error(`Expected pathStyle to be device, posix, or win32`);
   }
 
-  const recursive = (names, subDirPath) =>
-    Promise.all(names.map(name =>
-      readdir(pathJoin(startDirPath, subDirPath, name)).then(
-        names =>
-          (filterDir(name)
-            ? recursive(names, pathJoin(subDirPath, name))
-            : []),
-        () =>
-          (filterFile(name)
-            ? [pathJoin(subDirPath, name)]
-            : []))))
-      .then(pathArrays => pathArrays.flat());
+  const recursive = (names, ...subdirectories) =>
+    Promise.all(names.map(async name => {
+      const devicePath = pathJoinDevice(rootPath, ...subdirectories, name);
+      const stats = await stat(devicePath);
 
-  return readdir(startDirPath).then(names => recursive(names, ''));
+      if (stats.isDirectory() && !filterDir(name)) return [];
+      else if (stats.isFile() && !filterFile(name)) return [];
+      else if (!stats.isDirectory() && !stats.isFile()) return [];
+
+      if (stats.isDirectory()) {
+        return recursive(await readdir(devicePath), ...subdirectories, name);
+      } else {
+        return pathJoinStyle(prefixPath, ...subdirectories, name);
+      }
+    }));
+
+  const names = await readdir(rootPath);
+  const results = await recursive(names);
+  return results.flat(Infinity);
 }
