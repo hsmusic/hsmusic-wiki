@@ -1,5 +1,3 @@
-import {OFFICIAL_GROUP_DIRECTORY} from './util/magic-constants.js';
-
 import {
   accumulateSum,
   empty,

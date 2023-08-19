@@ -153,7 +153,6 @@ The source code for HSMusic is divided across a number of source files, loosely 
   - `gen-thumbs.js`: Standalone utility also called every time HSMusic is run (unless `--skip-thumbs` is provided) which keeps a persistent cache of media MD5s and (re)generates thumbnails for new or updated image files
   - `repl.js`: Standalone utility for loading all wiki data and providing a convenient REPL to run filters and transformations on data objects right from the Node.js command line
   - `listing-spec.js`: Descriptors for computations and HTML templates used for the Listings part of the site
-  - `misc-templates.js`: General collection of HTML patterns used across page generation
   - `url-spec.js`: Index of output paths where generated HTML ends up; also controls where `<a>`, `<img>`, etc tags link
   - `file-size-preloader.js`: Simple utility for calculating size of files in media directory
   - `strings-default.json`: Template for localization strings and index of default (English) strings used all across the site layout

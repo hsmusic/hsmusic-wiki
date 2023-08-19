@@ -60,7 +60,6 @@ import {
   WIKI_INFO_FILE,
 } from './data/yaml.js';
 
-import link from './util/link.js';
 import {isMain, traverse} from './util/node-utils.js';
 import {empty, showAggregate, withEntries} from './util/sugar.js';
 import {generateURLs} from './util/urls.js';

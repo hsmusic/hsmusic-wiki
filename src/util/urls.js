@@ -3,10 +3,6 @@
 // is in charge of pre-gener8ting a complete network of template strings
 // which can really quickly take su8stitute parameters to link from any one
 // place to another; 8ut there are also a few other utilities, too.
-//
-// Nota8ly, everything here is string-8ased, for gener8ting and transforming
-// actual path strings. More a8stract operations using wiki data o8jects is
-// the domain of link.js.
 
 import * as path from 'path';
 
