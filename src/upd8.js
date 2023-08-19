@@ -60,7 +60,6 @@ import {
   WIKI_INFO_FILE,
 } from './data/yaml.js';
 
-import find from './util/find.js';
 import {findFiles} from './util/io.js';
 import link from './util/link.js';
 import {isMain, traverse} from './util/node-utils.js';
@@ -645,25 +644,6 @@ async function main() {
   }
 
   logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
-
-  {
-    const tagRefs = new Set(
-      [...wikiData.trackData, ...wikiData.albumData]
-        .flatMap((thing) => thing.artTagsByRef ?? []));
-
-    for (const ref of tagRefs) {
-      if (find.artTag(ref, wikiData.artTagData)) {
-        tagRefs.delete(ref);
-      }
-    }
-
-    if (tagRefs.size) {
-      for (const ref of Array.from(tagRefs).sort()) {
-        console.log(`\x1b[33;1m- Missing tag: "${ref}"\x1b[0m`);
-      }
-      return;
-    }
-  }
 
   const urls = generateURLs(urlSpec);
 
