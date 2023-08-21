@@ -44,59 +44,58 @@ export class Track extends Thing {
     sampledTracksByRef: Thing.common.referenceList(Track),
     artTagsByRef: Thing.common.referenceList(ArtTag),
 
-    hasCoverArt: {
-      flags: {update: true, expose: true},
+    // Disables presenting the track as though it has its own unique artwork.
+    // This flag should only be used in select circumstances, i.e. to override
+    // an album's trackCoverArtists. This flag supercedes that property, as well
+    // as the track's own coverArtists.
+    disableUniqueCoverArt: Thing.common.flag(),
 
-      update: {
-        validate(value) {
-          if (value !== false) {
-            throw new TypeError(`Expected false or null`);
-          }
-
-          return true;
-        },
-      },
-
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef'],
-        transform: (hasCoverArt, {
-          albumData,
-          coverArtistContribsByRef,
-          [Track.instance]: track,
-        }) =>
-          Track.hasCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          ),
-      },
-    },
-
+    // File extension for track's corresponding media file. This represents the
+    // track's unique cover artwork, if any, and does not inherit the cover's
+    // main artwork. (It does inherit `trackCoverArtFileExtension` if present
+    // on the album.)
     coverArtFileExtension: {
       flags: {update: true, expose: true},
 
       update: {validate: isFileExtension},
 
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef'],
-        transform: (coverArtFileExtension, {
-          albumData,
+      expose: Track.withAlbumProperties(['trackCoverArtistContribsByRef', 'trackCoverArtFileExtension'], {
+        dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+
+        transform(coverArtFileExtension, {
           coverArtistContribsByRef,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          coverArtFileExtension ??
-          (Track.hasCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          )
-            ? Track.findAlbum(track, albumData)?.trackCoverArtFileExtension
-            : Track.findAlbum(track, albumData)?.coverArtFileExtension) ??
-          'jpg',
-      },
+          disableUniqueCoverArt,
+          album: {trackCoverArtistContribsByRef, trackCoverArtFileExtension},
+        }) {
+          if (disableUniqueCoverArt) return null;
+          if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
+          return coverArtFileExtension ?? trackCoverArtFileExtension ?? 'jpg';
+        },
+      }),
+    },
+
+    // Date of cover art release. Like coverArtFileExtension, this represents
+    // only the track's own unique cover artwork, if any. This exposes only as
+    // the track's own coverArtDate or its album's trackArtDate, so if neither
+    // is specified, this value is null.
+    coverArtDate: {
+      flags: {update: true, expose: true},
+
+      update: {validate: isDate},
+
+      expose: Track.withAlbumProperties(['trackArtDate', 'trackCoverArtistContribsByRef'], {
+        dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+
+        transform(coverArtDate, {
+          coverArtistContribsByRef,
+          disableUniqueCoverArt,
+          album: {trackArtDate, trackCoverArtistContribsByRef},
+        }) {
+          if (disableUniqueCoverArt) return null;
+          if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
+          return coverArtDate ?? trackArtDate;
+        },
+      }),
     },
 
     originalReleaseTrackByRef: Thing.common.singleReference(Track),
@@ -170,53 +169,29 @@ export class Track extends Thing {
       },
     },
 
-    coverArtDate: {
-      flags: {update: true, expose: true},
-
-      update: {validate: isDate},
-
-      expose: {
-        dependencies: [
-          'albumData',
-          'coverArtistContribsByRef',
-          'dateFirstReleased',
-          'hasCoverArt',
-        ],
-        transform: (coverArtDate, {
-          albumData,
-          coverArtistContribsByRef,
-          dateFirstReleased,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          (Track.hasCoverArt(track, albumData, coverArtistContribsByRef, hasCoverArt)
-            ? coverArtDate ??
-              dateFirstReleased ??
-              Track.findAlbum(track, albumData)?.trackArtDate ??
-              Track.findAlbum(track, albumData)?.date ??
-              null
-            : null),
-      },
-    },
-
+    // Whether or not the track has "unique" cover artwork - a cover which is
+    // specifically associated with this track in particular, rather than with
+    // the track's album as a whole. This is typically used to select between
+    // displaying the track artwork and a fallback, such as the album artwork
+    // or a placeholder. (This property is named hasUniqueCoverArt instead of
+    // the usual hasCoverArt to emphasize that it does not inherit from the
+    // album.)
     hasUniqueCoverArt: {
       flags: {expose: true},
 
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef', 'hasCoverArt'],
-        compute: ({
-          albumData,
+      expose: Track.withAlbumProperties(['trackCoverArtistContribsByRef'], {
+        dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+        compute({
           coverArtistContribsByRef,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          Track.hasUniqueCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          ),
-      },
+          disableUniqueCoverArt,
+          album: {trackCoverArtistContribsByRef},
+        }) {
+          if (disableUniqueCoverArt) return false;
+          if (!empty(coverArtistContribsByRef)) true;
+          if (!empty(trackCoverArtistContribsByRef)) return true;
+          return false;
+        },
+      }),
     },
 
     originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
@@ -342,53 +317,6 @@ export class Track extends Thing {
     ),
   });
 
-  // This is a quick utility function for now, since the same code is reused in
-  // several places. Ideally it wouldn't be - we'd just reuse the `album`
-  // property - but support for that hasn't been coded yet :P
-  static findAlbum = (track, albumData) =>
-    albumData?.find((album) => album.tracks.includes(track));
-
-  // Another reused utility function. This one's logic is a bit more complicated.
-  static hasCoverArt(
-    track,
-    albumData,
-    coverArtistContribsByRef,
-    hasCoverArt
-  ) {
-    if (!empty(coverArtistContribsByRef)) {
-      return true;
-    }
-
-    const album = Track.findAlbum(track, albumData);
-    if (album && !empty(album.trackCoverArtistContribsByRef)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  static hasUniqueCoverArt(
-    track,
-    albumData,
-    coverArtistContribsByRef,
-    hasCoverArt
-  ) {
-    if (!empty(coverArtistContribsByRef)) {
-      return true;
-    }
-
-    if (hasCoverArt === false) {
-      return false;
-    }
-
-    const album = Track.findAlbum(track, albumData);
-    if (album && !empty(album.trackCoverArtistContribsByRef)) {
-      return true;
-    }
-
-    return false;
-  }
-
   static inheritFromOriginalRelease(
     originalProperty,
     originalMissingValue,
@@ -421,6 +349,39 @@ export class Track extends Thing {
         },
       },
     };
+  }
+
+  static withAlbumProperties(albumProperties, oldExpose) {
+    const applyAlbumDependency = dependencies => {
+      const track = dependencies[Track.instance];
+      const album =
+        dependencies.albumData
+          ?.find((album) => album.tracks.includes(track));
+
+      const filteredAlbum = Object.create(null);
+      for (const property of albumProperties) {
+        filteredAlbum[property] =
+          (album
+            ? album[property]
+            : null);
+      }
+
+      return {...dependencies, album: filteredAlbum};
+    };
+
+    const newExpose = {dependencies: [...oldExpose.dependencies, 'albumData']};
+
+    if (oldExpose.compute) {
+      newExpose.compute = dependencies =>
+        oldExpose.compute(applyAlbumDependency(dependencies));
+    }
+
+    if (oldExpose.transform) {
+      newExpose.transform = (value, dependencies) =>
+        oldExpose.transform(value, applyAlbumDependency(dependencies));
+    }
+
+    return newExpose;
   }
 
   [inspect.custom]() {

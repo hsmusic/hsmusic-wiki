@@ -316,6 +316,10 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
 
     'Date First Released': (value) => new Date(value),
     'Cover Art Date': (value) => new Date(value),
+    'Has Cover Art': (value) =>
+      (value === true ? false :
+       value === false ? true :
+       value),
 
     'Artists': parseContributors,
     'Contributors': parseContributors,
@@ -336,7 +340,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     dateFirstReleased: 'Date First Released',
     coverArtDate: 'Cover Art Date',
     coverArtFileExtension: 'Cover Art File Extension',
-    hasCoverArt: 'Has Cover Art',
+    disableCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
 
     lyrics: 'Lyrics',
     commentary: 'Commentary',
