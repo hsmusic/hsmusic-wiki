@@ -367,6 +367,8 @@
   "listingPage.listArtists.byName.title": "Artists - by Name",
   "listingPage.listArtists.byName.title.short": "...by Name",
   "listingPage.listArtists.byName.item": "{ARTIST} ({CONTRIBUTIONS})",
+  "listingPage.listArtists.byName.chunk.title": "Contributed to {GROUP}:",
+  "listingPage.listArtists.byName.chunk.item": "{ARTIST} ({CONTRIBUTIONS})",
   "listingPage.listArtists.byContribs.title": "Artists - by Contributions",
   "listingPage.listArtists.byContribs.title.short": "...by Contributions",
   "listingPage.listArtists.byContribs.item": "{ARTIST} ({CONTRIBUTIONS})",
