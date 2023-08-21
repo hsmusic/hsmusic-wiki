@@ -403,6 +403,21 @@ export class Tag {
       .join(joiner);
   }
 
+  static normalize(content) {
+    // Normalizes contents that are valid from an `isHTML` perspective so
+    // that it's always a pure, single Tag object.
+
+    if (content instanceof Template) {
+      return Tag.normalize(Template.resolve(content));
+    }
+
+    if (content instanceof Tag) {
+      return content;
+    }
+
+    return new Tag(null, null, content);
+  }
+
   [inspect.custom]() {
     if (this.tagName) {
       if (empty(this.content)) {
@@ -578,8 +593,16 @@ export class Attributes {
   }
 }
 
-export function resolve(tagOrTemplate) {
-  return Template.resolve(tagOrTemplate);
+export function resolve(tagOrTemplate, {normalize = null} = {}) {
+  if (normalize === 'tag') {
+    return Tag.normalize(tagOrTemplate);
+  } else if (normalize === 'string') {
+    return Tag.normalize(tagOrTemplate).toString();
+  } else if (normalize) {
+    throw new TypeError(`Expected normalize to be 'tag', 'string', or null`);
+  } else {
+    return Template.resolve(tagOrTemplate);
+  }
 }
 
 export function template(description) {
