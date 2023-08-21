@@ -348,6 +348,7 @@
   "listingPage.target.other": "Other",
   "listingPage.listingsFor": "Listings for {TARGET}: {LISTINGS}",
   "listingPage.seeAlso": "Also check out: {LISTINGS}",
+  "listingPage.skipToSection": "Skip to a section:",
   "listingPage.listAlbums.byName.title": "Albums - by Name",
   "listingPage.listAlbums.byName.title.short": "...by Name",
   "listingPage.listAlbums.byName.item": "{ALBUM} ({TRACKS})",

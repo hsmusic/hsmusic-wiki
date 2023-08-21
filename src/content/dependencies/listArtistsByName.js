@@ -1,5 +1,10 @@
 import {empty, stitchArrays, unique} from '#sugar';
-import {getArtistNumContributions, sortAlphabetically} from '#wiki-data';
+
+import {
+  filterMultipleArrays,
+  getArtistNumContributions,
+  sortAlphabetically,
+} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],
@@ -28,6 +33,9 @@ export default {
     const artistsByGroup =
       groups.map(group =>
         artists.filter((artist, index) => artistGroups[index].includes(group)));
+
+    filterMultipleArrays(groups, artistsByGroup,
+      (group, artists) => !empty(artists));
 
     return {spec, groups, artistsByGroup};
   },
@@ -68,6 +76,10 @@ export default {
     }
 
     if (query.artistsByGroup) {
+      data.groupDirectories =
+        query.groups
+          .map(group => group.directory);
+
       data.countsByGroup =
         query.artistsByGroup
           .map(artists => artists
@@ -82,6 +94,11 @@ export default {
       (relations.artistLinksByGroup
         ? relations.page.slots({
             type: 'chunks',
+
+            showSkipToSection: true,
+            chunkIDs:
+              data.groupDirectories
+                .map(directory => `contributed-to-${directory}`),
 
             chunkTitles:
               relations.groupLinks.map(groupLink => ({

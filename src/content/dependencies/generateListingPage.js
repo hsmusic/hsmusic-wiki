@@ -7,6 +7,7 @@ export default {
     'generatePageLayout',
     'linkListing',
     'linkListingIndex',
+    'linkTemplate',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -25,6 +26,9 @@ export default {
 
     relations.chunkHeading =
       relation('generateContentHeading');
+
+    relations.showSkipToSectionLinkTemplate =
+      relation('linkTemplate');
 
     if (listing.target.listings.length > 1) {
       relations.sameTargetListingLinks =
@@ -64,6 +68,9 @@ export default {
 
     chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
     chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
+
+    showSkipToSection: {type: 'boolean', default: false},
+    chunkIDs: {validate: v => v.strictArrayOf(v.isString)},
 
     listStyle: {
       validate: v => v.is('ordered', 'unordered'),
@@ -128,16 +135,40 @@ export default {
                 formatListingString('item', row)))),
 
         slots.type === 'chunks' &&
-          html.tag('dl',
+          html.tag('dl', [
+            slots.showSkipToSection && [
+              html.tag('dt',
+                language.$('listingPage.skipToSection')),
+
+              html.tag('dd',
+                html.tag('ul',
+                  stitchArrays({
+                    title: slots.chunkTitles,
+                    id: slots.chunkIDs,
+                  }).filter(({id}) => id)
+                    .map(({title, id}) =>
+                      html.tag('li',
+                        relations.showSkipToSectionLinkTemplate
+                          .clone()
+                          .slots({
+                            hash: id,
+                            content:
+                              formatListingString('chunk.title', title)
+                                .replace(/:$/, ''),
+                          }))))),
+            ],
+
             stitchArrays({
               title: slots.chunkTitles,
               rows: slots.chunkRows,
-            }).map(({title, rows}) => [
+              id: slots.chunkIDs,
+            }).map(({title, rows, id}) => [
                 relations.chunkHeading
                   .clone()
                   .slots({
                     tag: 'dt',
                     title: formatListingString('chunk.title', title),
+                    id,
                   }),
 
                 html.tag('dd',
@@ -146,7 +177,8 @@ export default {
                       html.tag('li',
                         {class: row.stringsKey === 'rerelease' && 'rerelease'},
                         formatListingString('chunk.item', row))))),
-              ])),
+              ]),
+          ]),
 
         slots.type === 'custom' &&
           slots.content,
