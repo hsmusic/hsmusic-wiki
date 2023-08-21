@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {color} from '#cli';
 import find from '#find';
-import {empty} from '#sugar';
+import {empty, openAggregate} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 import {
@@ -418,4 +418,144 @@ export default class Thing extends CacheableObject {
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
   }
+
+  static findArtistsFromContribs(contribsByRef, artistData) {
+    return (
+      contribsByRef
+        .map(({who, what}) => ({
+          who: find.artist(who, artistData),
+          what,
+        }))
+        .filter(({who}) => who));
+  }
+
+  static composite = {
+    from(composition) {
+      const base = composition.at(-1);
+      const steps = composition.slice(0, -1);
+
+      const aggregate = openAggregate({message: `Errors preparing Thing.composite.from() composition`});
+
+      if (base.flags.compose) {
+        aggregate.push(new TypeError(`Base (bottom item) must not be {compose: true}`));
+      }
+
+      const exposeFunctionOrder = [];
+      const exposeDependencies = new Set(base.expose?.dependencies);
+
+      for (let i = 0; i < steps.length; i++) {
+        const step = steps[i];
+        const message =
+          (step.annotation
+            ? `Errors in step #${i + 1} (${step.annotation})`
+            : `Errors in step #${i + 1}`);
+
+        aggregate.nest({message}, ({push}) => {
+          if (!step.flags.compose) {
+            push(new TypeError(`Steps (all but bottom item) must be {compose: true}`));
+          }
+
+          if (step.flags.update) {
+            push(new Error(`Steps which update aren't supported yet`));
+          }
+
+          if (step.flags.expose) expose: {
+            if (!step.expose.transform && !step.expose.compute) {
+              push(new TypeError(`Steps which expose must provide at least one of transform or compute`));
+              break expose;
+            }
+
+            if (step.expose.dependencies) {
+              for (const dependency of step.expose.dependencies) {
+                exposeDependencies.add(dependency);
+              }
+            }
+
+            if (base.flags.update) {
+              if (step.expose.transform) {
+                exposeFunctionOrder.push({type: 'transform', fn: step.expose.transform});
+              } else {
+                exposeFunctionOrder.push({type: 'compute', fn: step.expose.compute});
+              }
+            } else {
+              if (step.expose.transform && !step.expose.compute) {
+                push(new TypeError(`Steps which only transform can't be composed with a non-updating base`));
+                break expose;
+              }
+
+              exposeFunctionOrder.push({type: 'compute', fn: step.expose.compute});
+            }
+          }
+        });
+      }
+
+      aggregate.close();
+
+      const constructedDescriptor = {};
+
+      constructedDescriptor.flags = {
+        update: !!base.flags.update,
+        expose: !!base.flags.expose,
+        compose: false,
+      };
+
+      if (base.flags.update) {
+        constructedDescriptor.update = base.flags.update;
+      }
+
+      if (base.flags.expose) {
+        const expose = constructedDescriptor.expose = {};
+        expose.dependencies = Array.from(exposeDependencies);
+
+        const continuationSymbol = Symbol();
+
+        if (base.flags.update) {
+          expose.transform = (value, initialDependencies) => {
+            const dependencies = {...initialDependencies};
+            let valueSoFar = value;
+
+            for (const {type, fn} of exposeFunctionOrder) {
+              const result =
+                (type === 'transform'
+                  ? fn(valueSoFar, dependencies, (updatedValue, providedDependencies) => {
+                      valueSoFar = updatedValue;
+                      Object.assign(dependencies, providedDependencies ?? {});
+                      return continuationSymbol;
+                    })
+                  : fn(dependencies, providedDependencies => {
+                      Object.assign(dependencies, providedDependencies ?? {});
+                      return continuationSymbol;
+                    }));
+
+              if (result !== continuationSymbol) {
+                return result;
+              }
+            }
+
+            return base.expose.transform(valueSoFar, dependencies);
+          };
+        } else {
+          expose.compute = (initialDependencies) => {
+            const dependencies = {...initialDependencies};
+
+            for (const {fn} of exposeFunctionOrder) {
+              const result =
+                fn(valueSoFar, dependencies, providedDependencies => {
+                  Object.assign(dependencies, providedDependencies ?? {});
+                  return continuationSymbol;
+                });
+
+              if (result !== continuationSymbol) {
+                return result;
+              }
+            }
+
+            return base.expose.compute(dependencies);
+          };
+        }
+      }
+
+      return constructedDescriptor;
+    },
+  };
 }
