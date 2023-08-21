@@ -13,6 +13,16 @@ exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > fill path s
 <a href="/c*lzone/myCoolPath/ham/pineapple/tomato/index.html">delish</a>
 `
 
+exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > link in content 1`] = `
+<a href="#the-more-ye-know">
+    Oh geez oh heck
+    There's a link in here!!
+    But here's <b>a normal tag.</b>
+    <div>Gotta keep them normal tags.</div>
+    <div>But not... NESTED LINKS, OOO.</div>
+</a>
+`
+
 exports[`test/snapshot/linkTemplate.js TAP linkTemplate (snapshot) > missing content 1`] = `
 <a href="banana">(Missing link content)</a>
 `

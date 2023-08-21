@@ -1,5 +1,7 @@
 import {empty} from '#sugar';
 
+import striptags from 'striptags';
+
 export default {
   extraDependencies: [
     'appendIndexHTML',
@@ -59,15 +61,18 @@ export default {
       title = slots.tooltip;
     }
 
-    return html.tag('a',
-      {
-        ...slots.attributes ?? {},
-        href,
-        style,
-        title,
-      },
+    const content =
       (html.isBlank(slots.content)
         ? language.$('misc.missingLinkContent')
-        : slots.content));
+        : striptags(html.resolve(slots.content, {normalize: 'string'}), {
+            disallowedTags: new Set(['a']),
+          }));
+
+    return html.tag('a', {
+      ...slots.attributes ?? {},
+      href,
+      style,
+      title,
+    }, content);
   },
 }

@@ -1,4 +1,5 @@
 import t from 'tap';
+import * as html from '#html';
 import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
@@ -49,5 +50,19 @@ testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
   evaluate.snapshot('missing content', {
     name: 'linkTemplate',
     slots: {href: 'banana'},
+  });
+
+  evaluate.snapshot('link in content', {
+    name: 'linkTemplate',
+    slots: {
+      hash: 'the-more-ye-know',
+      content: [
+        `Oh geez oh heck`,
+        html.tag('a', {href: 'dogs'}, `There's a link in here!!`),
+        `But here's <b>a normal tag.</b>`,
+        html.tag('div', `Gotta keep them normal tags.`),
+        html.tag('div', `But not... <a href="#">NESTED LINKS, OOO.</a>`),
+      ],
+    },
   });
 });
