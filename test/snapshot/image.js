@@ -9,6 +9,10 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
       name: 'image',
       extraDependencies: {
         getSizeOfImagePath: () => 0,
+        getDimensionsOfImagePath: () => [600, 600],
+        getThumbnailEqualOrSmaller: () => 'medium',
+        getThumbnailsAvailableForDimensions: () =>
+          [['large', 800], ['medium', 400], ['small', 250]],
       },
       ...opts,
     });
