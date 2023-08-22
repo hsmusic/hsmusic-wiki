@@ -174,7 +174,7 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${error.message}`;
+      error.message = `(index: ${color.yellow(`#${index}`)}, item: ${inspect(item)}) ${error.message}`;
       throw error;
     }
   };
