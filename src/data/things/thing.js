@@ -577,14 +577,18 @@ export default class Thing extends CacheableObject {
       return constructedDescriptor;
     },
 
-    withDynamicContribs: (contribsByRefProperty, dependencyName) => ({
+    // Resolves the contribsByRef contained in the provided dependency,
+    // providing (named by the second argument) the result. "Resolving"
+    // means mapping the "who" reference of each contribution to an artist
+    // object, and filtering out those whose "who" doesn't match any artist.
+    withResolvedContribs: ({from: contribsByRefDependency, to: outputDependency}) => ({
       flags: {expose: true, compose: true},
 
       expose: {
-        dependencies: ['artistData', contribsByRefProperty],
-        compute: ({artistData, [contribsByRefProperty]: contribsByRef}, callback) =>
+        dependencies: ['artistData', contribsByRefDependency],
+        compute: ({artistData, [contribsByRefDependency]: contribsByRef}, callback) =>
           callback({
-            [dependencyName]:
+            [outputDependency]:
               Thing.findArtistsFromContribs(contribsByRef, artistData),
           }),
       },

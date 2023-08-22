@@ -53,7 +53,9 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties(['color']),
+      Track.composite.withAlbumProperties({
+        properties: ['color'],
+      }),
 
       {
         flags: {update: true, expose: true},
@@ -76,10 +78,12 @@ export class Track extends Thing {
     // main artwork. (It does inherit `trackCoverArtFileExtension` if present
     // on the album.)
     coverArtFileExtension: Thing.composite.from([
-      Track.composite.withAlbumProperties([
-        'trackCoverArtistContribsByRef',
-        'trackCoverArtFileExtension',
-      ]),
+      Track.composite.withAlbumProperties({
+        properties: [
+          'trackCoverArtistContribsByRef',
+          'trackCoverArtFileExtension',
+        ],
+      }),
 
       {
         flags: {update: true, expose: true},
@@ -111,10 +115,12 @@ export class Track extends Thing {
     // the track's own coverArtDate or its album's trackArtDate, so if neither
     // is specified, this value is null.
     coverArtDate: Thing.composite.from([
-      Track.composite.withAlbumProperties([
-        'trackArtDate',
-        'trackCoverArtistContribsByRef',
-      ]),
+      Track.composite.withAlbumProperties({
+        properties: [
+          'trackArtDate',
+          'trackCoverArtistContribsByRef',
+        ],
+      }),
 
       {
         flags: {update: true, expose: true},
@@ -196,7 +202,9 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties(['date']),
+      Track.composite.withAlbumProperties({
+        properties: ['date'],
+      }),
 
       {
         flags: {expose: true},
@@ -215,7 +223,9 @@ export class Track extends Thing {
     // the usual hasCoverArt to emphasize that it does not inherit from the
     // album.)
     hasUniqueCoverArt: Thing.composite.from([
-      Track.composite.withAlbumProperties(['trackCoverArtistContribsByRef']),
+      Track.composite.withAlbumProperties({
+        properties: ['trackCoverArtistContribsByRef'],
+      }),
 
       {
         flags: {expose: true},
@@ -277,8 +287,14 @@ export class Track extends Thing {
     artistContribs: Thing.composite.from([
       Track.composite.inheritFromOriginalRelease('artistContribs'),
 
-      Thing.composite.withDynamicContribs('artistContribsByRef', '#artistContribs'),
-      Track.composite.withAlbumProperties(['artistContribs']),
+      Track.composite.withAlbumProperties({
+        properties: 'artistContribs',
+      }),
+
+      Thing.composite.withResolvedContribs({
+        from: 'artistContribsByRef',
+        to: '#artistContribs',
+      }),
 
       {
         flags: {expose: true},
@@ -315,8 +331,14 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties(['trackCoverArtistContribs']),
-      Thing.composite.withDynamicContribs('coverArtistContribsByRef', '#coverArtistContribs'),
+      Track.composite.withAlbumProperties({
+        properties: ['trackCoverArtistContribs'],
+      }),
+
+      Thing.composite.withResolvedContribs({
+        from: 'coverArtistContribsByRef',
+        to: '#coverArtistContribs',
+      }),
 
       {
         flags: {expose: true},
@@ -395,7 +417,12 @@ export class Track extends Thing {
   });
 
   static composite = {
-    inheritFromOriginalRelease: originalProperty => ({
+    // Returns a value inherited from the original release, if this track
+    // is a rerelease, and otherwise continues with no further provided
+    // dependencies. If the second argument is provided true, then the
+    // continuation will also be called if the original release exposed
+    // the requested property as null.
+    inheritFromOriginalRelease: (originalProperty, allowOverride = false) => ({
       flags: {expose: true, compose: true},
 
       expose: {
@@ -407,12 +434,20 @@ export class Track extends Thing {
           if (!trackData) return null;
           const original = find.track(originalReleaseTrackByRef, trackData, {mode: 'quiet'});
           if (!original) return null;
-          return original[originalProperty];
+
+          const value = original[originalProperty];
+          if (allowOverride && value === null) return continuation();
+
+          return value;
         },
       },
     }),
 
-    withAlbumProperties: albumProperties => ({
+    // Gets the listed properties from this track's album, providing them as
+    // dependencies (by default) with '#album.' prefixed before each property
+    // name. If the track's album isn't available, the same dependency names
+    // will each be provided as null.
+    withAlbumProperties: ({properties, prefix = '#album'}) => ({
       flags: {expose: true, compose: true},
 
       expose: {
@@ -422,8 +457,8 @@ export class Track extends Thing {
           const album = albumData?.find((album) => album.tracks.includes(track));
           const newDependencies = {};
 
-          for (const property of albumProperties) {
-            newDependencies['#album.' + property] =
+          for (const property of properties) {
+            newDependencies[prefix + '.' + property] =
               (album
                 ? album[property]
                 : null);
