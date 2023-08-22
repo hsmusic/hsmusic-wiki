@@ -420,6 +420,8 @@ export default class Thing extends CacheableObject {
   }
 
   static findArtistsFromContribs(contribsByRef, artistData) {
+    if (empty(contribsByRef)) return null;
+
     return (
       contribsByRef
         .map(({who, what}) => ({
@@ -518,7 +520,7 @@ export default class Thing extends CacheableObject {
               const result =
                 (type === 'transform'
                   ? fn(valueSoFar, dependencies, (updatedValue, providedDependencies) => {
-                      valueSoFar = updatedValue;
+                      valueSoFar = updatedValue ?? null;
                       Object.assign(dependencies, providedDependencies ?? {});
                       return continuationSymbol;
                     })
@@ -532,7 +534,11 @@ export default class Thing extends CacheableObject {
               }
             }
 
-            return base.expose.transform(valueSoFar, dependencies);
+            if (base.expose.transform) {
+              return base.expose.transform(valueSoFar, dependencies);
+            } else {
+              return base.expose.compute(dependencies);
+            }
           };
         } else {
           expose.compute = (initialDependencies) => {
@@ -540,7 +546,7 @@ export default class Thing extends CacheableObject {
 
             for (const {fn} of exposeFunctionOrder) {
               const result =
-                fn(valueSoFar, dependencies, providedDependencies => {
+                fn(dependencies, providedDependencies => {
                   Object.assign(dependencies, providedDependencies ?? {});
                   return continuationSymbol;
                 });
