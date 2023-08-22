@@ -574,7 +574,12 @@ export function showAggregate(topError, {
     }
   };
 
-  const message = recursive(topError, {level: 0});
+  const message =
+    (topError instanceof AggregateError
+      ? recursive(topError, {level: 0})
+      : (showTraces
+          ? topError.stack
+          : topError.toString()));
 
   if (print) {
     console.error(message);
