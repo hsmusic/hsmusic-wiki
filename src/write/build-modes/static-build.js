@@ -17,6 +17,7 @@ import {serializeThings} from '#serialize';
 import {empty, queue, withEntries} from '#sugar';
 
 import {
+  fileIssue,
   logError,
   logInfo,
   logWarn,
@@ -98,6 +99,7 @@ export async function go({
   developersComment,
   getSizeOfAdditionalFile,
   getSizeOfImageFile,
+  niceShowAggregate,
 }) {
   const outputPath = cliOptions['out-path'] || process.env.HSMUSIC_OUT;
   const appendIndexHTML = cliOptions['append-index-html'] ?? false;
@@ -253,6 +255,8 @@ export async function go({
   ));
   */
 
+  let errored = false;
+
   const contentDependencies = await quickLoadContentDependencies();
 
   const perLanguageFn = async (language, i, entries) => {
@@ -303,14 +307,22 @@ export async function go({
           wikiData,
         });
 
-        const topLevelResult =
-          quickEvaluate({
-            contentDependencies,
-            extraDependencies: {...bound, appendIndexHTML},
+        let topLevelResult;
+        try {
+          topLevelResult =
+            quickEvaluate({
+              contentDependencies,
+              extraDependencies: {...bound, appendIndexHTML},
 
-            name: page.contentFunction.name,
-            args: page.contentFunction.args ?? [],
-          });
+              name: page.contentFunction.name,
+              args: page.contentFunction.args ?? [],
+            });
+        } catch (error) {
+          logError`\rError generating page: ${pathname}`;
+          niceShowAggregate(error);
+          errored = true;
+          return;
+        }
 
         const {pageHTML, oEmbedJSON} = html.resolve(topLevelResult);
 
@@ -358,6 +370,16 @@ export async function go({
 
   // The single most important step.
   logInfo`Written!`;
+
+  if (errored) {
+    logWarn`The code generating content for some pages ended up erroring.`;
+    logWarn`These pages were skipped, so if you ran a build previously and`;
+    logWarn`they didn't error that time, then the old version is still`;
+    logWarn`available - albeit possibly outdated! Please scroll up and send`;
+    logWarn`the HSMusic developers a copy of the errors:`;
+    fileIssue({topMessage: null});
+  }
+
   return true;
 }
 

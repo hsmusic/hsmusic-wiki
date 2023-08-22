@@ -334,7 +334,9 @@ export function progressCallAll(msgOrMsgFn, array) {
 export function fileIssue({
   topMessage = `This shouldn't happen.`,
 } = {}) {
-  console.error(color.red(`${topMessage} Please let the HSMusic developers know:`));
+  if (topMessage) {
+    console.error(color.red(`${topMessage} Please let the HSMusic developers know:`));
+  }
   console.error(color.red(`- https://hsmusic.wiki/feedback/`));
   console.error(color.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
 }
