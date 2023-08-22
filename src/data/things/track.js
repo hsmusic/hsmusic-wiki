@@ -78,7 +78,7 @@ export class Track extends Thing {
       Track.composite.withAlbumProperties(['trackCoverArtistContribsByRef', 'trackCoverArtFileExtension']),
 
       {
-        flags: {update: true, expos: true},
+        flags: {update: true, expose: true},
         update: {validate: isFileExtension},
         expose: {
           dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
@@ -207,7 +207,7 @@ export class Track extends Thing {
             album: {trackCoverArtistContribsByRef},
           }) {
             if (disableUniqueCoverArt) return false;
-            if (!empty(coverArtistContribsByRef)) true;
+            if (!empty(coverArtistContribsByRef)) return true;
             if (!empty(trackCoverArtistContribsByRef)) return true;
             return false;
           },
