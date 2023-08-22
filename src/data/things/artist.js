@@ -156,7 +156,7 @@ export class Artist extends Thing {
       }) =>
         thingData?.filter(thing =>
           thing[contribsProperty]
-            .some(contrib => contrib.who === artist)) ?? [],
+            ?.some(contrib => contrib.who === artist)) ?? [],
     },
   });
 }

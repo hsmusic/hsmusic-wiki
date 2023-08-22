@@ -44,7 +44,7 @@ export default {
 
     relations.coverArtistChronologyContributions =
       getChronologyRelations(album, {
-        contributions: album.coverArtistContribs,
+        contributions: album.coverArtistContribs ?? [],
 
         linkArtist: artist => relation('linkArtist', artist),
 

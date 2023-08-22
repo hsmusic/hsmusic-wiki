@@ -1,4 +1,4 @@
-import {compareArrays} from '#sugar';
+import {compareArrays, empty} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -31,6 +31,8 @@ export default {
     }
 
     data.showArtists =
+      empty(track.artistContribs) ||
+      empty(album.artistContribs) ||
       !compareArrays(
         track.artistContribs.map(c => c.who),
         album.artistContribs.map(c => c.who),
