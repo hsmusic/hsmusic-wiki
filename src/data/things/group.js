@@ -41,8 +41,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData'],
-        compute: ({albumData, [Group.instance]: group}) =>
+        dependencies: ['this', 'albumData'],
+        compute: ({this: group, albumData}) =>
           albumData?.filter((album) => album.groups.includes(group)) ?? [],
       },
     },
@@ -51,9 +51,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['groupCategoryData'],
-
-        compute: ({groupCategoryData, [Group.instance]: group}) =>
+        dependencies: ['this', 'groupCategoryData'],
+        compute: ({this: group, groupCategoryData}) =>
           groupCategoryData.find((category) => category.groups.includes(group))
             ?.color,
       },
@@ -63,8 +62,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['groupCategoryData'],
-        compute: ({groupCategoryData, [Group.instance]: group}) =>
+        dependencies: ['this', 'groupCategoryData'],
+        compute: ({this: group, groupCategoryData}) =>
           groupCategoryData.find((category) => category.groups.includes(group)) ??
           null,
       },

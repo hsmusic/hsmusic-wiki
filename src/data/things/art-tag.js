@@ -37,8 +37,8 @@ export class ArtTag extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData', 'trackData'],
-        compute: ({albumData, trackData, [ArtTag.instance]: artTag}) =>
+        dependencies: ['this', 'albumData', 'trackData'],
+        compute: ({this: artTag, albumData, trackData}) =>
           sortAlbumsTracksChronologically(
             [...albumData, ...trackData]
               .filter(({artTags}) => artTags.includes(artTag)),

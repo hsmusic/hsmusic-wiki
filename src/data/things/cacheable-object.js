@@ -83,8 +83,6 @@ function inspect(value) {
 }
 
 export default class CacheableObject {
-  static instance = Symbol('CacheableObject `this` instance');
-
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
 
@@ -250,20 +248,27 @@ export default class CacheableObject {
 
     let getAllDependencies;
 
-    const dependencyKeys = expose.dependencies;
-    if (dependencyKeys?.length > 0) {
-      const reflectionEntry = [this.constructor.instance, this];
-      const dependencyGetters = dependencyKeys
-        .map(key => () => [key, this.#propertyUpdateValues[key]]);
+    if (expose.dependencies?.length > 0) {
+      const dependencyKeys = expose.dependencies.slice();
+      const shouldReflect = dependencyKeys.includes('this');
 
-      getAllDependencies = () =>
-        Object.fromEntries(dependencyGetters
-          .map(f => f())
-          .concat([reflectionEntry]));
+      getAllDependencies = () => {
+        const dependencies = Object.create(null);
+
+        for (const key of dependencyKeys) {
+          dependencies[key] = this.#propertyUpdateValues[key];
+        }
+
+        if (shouldReflect) {
+          dependencies.this = this;
+        }
+
+        return dependencies;
+      };
     } else {
-      const allDependencies = {[this.constructor.instance]: this};
-      Object.freeze(allDependencies);
-      getAllDependencies = () => allDependencies;
+      const dependencies = Object.create(null);
+      Object.freeze(dependencies);
+      getAllDependencies = () => dependencies;
     }
 
     if (flags.update) {

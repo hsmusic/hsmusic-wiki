@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {color} from '#cli';
 import find from '#find';
-import {empty, openAggregate} from '#sugar';
+import {empty, filterProperties, openAggregate} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 import {
@@ -278,6 +278,7 @@ export default class Thing extends CacheableObject {
       flags: {expose: true},
       expose: {
         dependencies: [
+          'this',
           contribsByRefProperty,
           thingDataProperty,
           nullerProperty,
@@ -285,7 +286,7 @@ export default class Thing extends CacheableObject {
         ].filter(Boolean),
 
         compute({
-          [Thing.instance]: thing,
+          this: thing,
           [nullerProperty]: nuller,
           [contribsByRefProperty]: contribsByRef,
           [thingDataProperty]: thingData,
@@ -330,9 +331,9 @@ export default class Thing extends CacheableObject {
       flags: {expose: true},
 
       expose: {
-        dependencies: [thingDataProperty],
+        dependencies: ['this', thingDataProperty],
 
-        compute: ({[thingDataProperty]: thingData, [Thing.instance]: thing}) =>
+        compute: ({this: thing, [thingDataProperty]: thingData}) =>
           thingData?.filter(t => t[referencerRefListProperty].includes(thing)) ?? [],
       },
     }),
@@ -344,9 +345,9 @@ export default class Thing extends CacheableObject {
       flags: {expose: true},
 
       expose: {
-        dependencies: [thingDataProperty],
+        dependencies: ['this', thingDataProperty],
 
-        compute: ({[thingDataProperty]: thingData, [Thing.instance]: thing}) =>
+        compute: ({this: thing, [thingDataProperty]: thingData}) =>
           thingData?.filter((t) => t[referencerRefListProperty] === thing) ?? [],
       },
     }),
@@ -462,15 +463,19 @@ export default class Thing extends CacheableObject {
 
             if (step.expose.dependencies) {
               for (const dependency of step.expose.dependencies) {
+                if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
                 exposeDependencies.add(dependency);
               }
             }
 
+            let fn, type;
             if (base.flags.update) {
               if (step.expose.transform) {
-                exposeFunctionOrder.push({type: 'transform', fn: step.expose.transform});
+                type = 'transform';
+                fn = step.expose.transform;
               } else {
-                exposeFunctionOrder.push({type: 'compute', fn: step.expose.compute});
+                type = 'compute';
+                fn = step.expose.compute;
               }
             } else {
               if (step.expose.transform && !step.expose.compute) {
@@ -478,8 +483,15 @@ export default class Thing extends CacheableObject {
                 break expose;
               }
 
-              exposeFunctionOrder.push({type: 'compute', fn: step.expose.compute});
+              type = 'compute';
+              fn = step.expose.compute;
             }
+
+            exposeFunctionOrder.push({
+              type,
+              fn,
+              ownDependencies: step.expose.dependencies,
+            });
           }
         });
       }
@@ -509,15 +521,20 @@ export default class Thing extends CacheableObject {
             const dependencies = {...initialDependencies};
             let valueSoFar = value;
 
-            for (const {type, fn} of exposeFunctionOrder) {
+            for (const {type, fn, ownDependencies} of exposeFunctionOrder) {
+              const filteredDependencies =
+                (ownDependencies
+                  ? filterProperties(dependencies, ownDependencies)
+                  : {})
+
               const result =
                 (type === 'transform'
-                  ? fn(valueSoFar, dependencies, (updatedValue, providedDependencies) => {
+                  ? fn(valueSoFar, filteredDependencies, (updatedValue, providedDependencies) => {
                       valueSoFar = updatedValue ?? null;
                       Object.assign(dependencies, providedDependencies ?? {});
                       return continuationSymbol;
                     })
-                  : fn(dependencies, providedDependencies => {
+                  : fn(filteredDependencies, providedDependencies => {
                       Object.assign(dependencies, providedDependencies ?? {});
                       return continuationSymbol;
                     }));
@@ -527,10 +544,13 @@ export default class Thing extends CacheableObject {
               }
             }
 
+            const filteredDependencies =
+              filterProperties(dependencies, base.expose.dependencies);
+
             if (base.expose.transform) {
-              return base.expose.transform(valueSoFar, dependencies);
+              return base.expose.transform(valueSoFar, filteredDependencies);
             } else {
-              return base.expose.compute(dependencies);
+              return base.expose.compute(filteredDependencies);
             }
           };
         } else {

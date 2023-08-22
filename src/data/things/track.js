@@ -59,7 +59,8 @@ export class Track extends Thing {
         flags: {update: true, expose: true},
         update: {validate: isColor},
         expose: {
-          compute: ({album: {color}}) => color,
+          dependencies: ['#album.color'],
+          compute: ({'#album.color': color}) => color,
         },
       },
     ]),
@@ -75,18 +76,27 @@ export class Track extends Thing {
     // main artwork. (It does inherit `trackCoverArtFileExtension` if present
     // on the album.)
     coverArtFileExtension: Thing.composite.from([
-      Track.composite.withAlbumProperties(['trackCoverArtistContribsByRef', 'trackCoverArtFileExtension']),
+      Track.composite.withAlbumProperties([
+        'trackCoverArtistContribsByRef',
+        'trackCoverArtFileExtension',
+      ]),
 
       {
         flags: {update: true, expose: true},
         update: {validate: isFileExtension},
         expose: {
-          dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+          dependencies: [
+            'coverArtistContribsByRef',
+            'disableUniqueCoverArt',
+            '#album.trackCoverArtistContribsByRef',
+            '#album.trackCoverArtFileExtension',
+          ],
 
           transform(coverArtFileExtension, {
             coverArtistContribsByRef,
             disableUniqueCoverArt,
-            album: {trackCoverArtistContribsByRef, trackCoverArtFileExtension},
+            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
+            '#album.trackCoverArtFileExtension': trackCoverArtFileExtension,
           }) {
             if (disableUniqueCoverArt) return null;
             if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
@@ -101,18 +111,27 @@ export class Track extends Thing {
     // the track's own coverArtDate or its album's trackArtDate, so if neither
     // is specified, this value is null.
     coverArtDate: Thing.composite.from([
-      Track.composite.withAlbumProperties(['trackArtDate', 'trackCoverArtistContribsByRef']),
+      Track.composite.withAlbumProperties([
+        'trackArtDate',
+        'trackCoverArtistContribsByRef',
+      ]),
 
       {
         flags: {update: true, expose: true},
         update: {validate: isDate},
         expose: {
-          dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+          dependencies: [
+            'coverArtistContribsByRef',
+            'disableUniqueCoverArt',
+            '#album.trackArtDate',
+            '#album.trackCoverArtistContribsByRef',
+          ],
 
           transform(coverArtDate, {
             coverArtistContribsByRef,
             disableUniqueCoverArt,
-            album: {trackArtDate, trackCoverArtistContribsByRef},
+            '#album.trackArtDate': trackArtDate,
+            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
           }) {
             if (disableUniqueCoverArt) return null;
             if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
@@ -148,8 +167,8 @@ export class Track extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData'],
-        compute: ({[Track.instance]: track, albumData}) =>
+        dependencies: ['this', 'albumData'],
+        compute: ({this: track, albumData}) =>
           albumData?.find((album) => album.tracks.includes(track)) ?? null,
       },
     },
@@ -182,7 +201,8 @@ export class Track extends Thing {
       {
         flags: {expose: true},
         expose: {
-          compute: ({album: {date}}) => date,
+          dependencies: ['#album.date'],
+          compute: ({'#album.date': date}) => date,
         },
       },
     ]),
@@ -200,11 +220,16 @@ export class Track extends Thing {
       {
         flags: {expose: true},
         expose: {
-          dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
+          dependencies: [
+            'coverArtistContribsByRef',
+            'disableUniqueCoverArt',
+            '#album.trackCoverArtistContribsByRef',
+          ],
+
           compute({
             coverArtistContribsByRef,
             disableUniqueCoverArt,
-            album: {trackCoverArtistContribsByRef},
+            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
           }) {
             if (disableUniqueCoverArt) return false;
             if (!empty(coverArtistContribsByRef)) return true;
@@ -225,12 +250,12 @@ export class Track extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['originalReleaseTrackByRef', 'trackData'],
+        dependencies: ['this', 'originalReleaseTrackByRef', 'trackData'],
 
         compute: ({
+          this: t1,
           originalReleaseTrackByRef: t1origRef,
           trackData,
-          [Track.instance]: t1,
         }) => {
           if (!trackData) {
             return [];
@@ -252,15 +277,16 @@ export class Track extends Thing {
     artistContribs: Thing.composite.from([
       Track.composite.inheritFromOriginalRelease('artistContribs'),
 
-      Thing.composite.withDynamicContribs('artistContribsByRef', 'artistContribs'),
+      Thing.composite.withDynamicContribs('artistContribsByRef', '#artistContribs'),
       Track.composite.withAlbumProperties(['artistContribs']),
 
       {
         flags: {expose: true},
         expose: {
+          dependencies: ['#artistContribs', '#album.artistContribs'],
           compute: ({
-            artistContribs: contribsFromTrack,
-            album: {artistContribs: contribsFromAlbum},
+            '#artistContribs': contribsFromTrack,
+            '#album.artistContribs': contribsFromAlbum,
           }) =>
             (empty(contribsFromTrack)
               ? contribsFromAlbum
@@ -290,14 +316,15 @@ export class Track extends Thing {
       },
 
       Track.composite.withAlbumProperties(['trackCoverArtistContribs']),
-      Thing.composite.withDynamicContribs('coverArtistContribsByRef', 'coverArtistContribs'),
+      Thing.composite.withDynamicContribs('coverArtistContribsByRef', '#coverArtistContribs'),
 
       {
         flags: {expose: true},
         expose: {
+          dependencies: ['#coverArtistContribs', '#album.trackCoverArtistContribs'],
           compute: ({
-            coverArtistContribs: contribsFromTrack,
-            album: {trackCoverArtistContribs: contribsFromAlbum},
+            '#coverArtistContribs': contribsFromTrack,
+            '#album.trackCoverArtistContribs': contribsFromAlbum,
           }) =>
             (empty(contribsFromTrack)
               ? contribsFromAlbum
@@ -328,9 +355,9 @@ export class Track extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Track.instance]: track}) =>
+        compute: ({this: track, trackData}) =>
           trackData
             ? trackData
                 .filter((t) => !t.originalReleaseTrack)
@@ -344,9 +371,9 @@ export class Track extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Track.instance]: track}) =>
+        compute: ({this: track, trackData}) =>
           trackData
             ? trackData
                 .filter((t) => !t.originalReleaseTrack)
@@ -389,20 +416,20 @@ export class Track extends Thing {
       flags: {expose: true, compose: true},
 
       expose: {
-        dependencies: ['albumData'],
+        dependencies: ['this', 'albumData'],
 
-        compute({albumData, [Track.instance]: track}, continuation) {
+        compute({this: track, albumData}, continuation) {
           const album = albumData?.find((album) => album.tracks.includes(track));
+          const newDependencies = {};
 
-          const filteredAlbum = Object.create(null);
           for (const property of albumProperties) {
-            filteredAlbum[property] =
+            newDependencies['#album.' + property] =
               (album
                 ? album[property]
                 : null);
           }
 
-          return continuation({album: filteredAlbum});
+          return continuation(newDependencies);
         },
       },
     }),

@@ -77,9 +77,9 @@ export class Flash extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['flashActData'],
+        dependencies: ['this', 'flashActData'],
 
-        compute: ({flashActData, [Flash.instance]: flash}) =>
+        compute: ({this: flash, flashActData}) =>
           flashActData.find((act) => act.flashes.includes(flash)) ?? null,
       },
     },
@@ -88,9 +88,9 @@ export class Flash extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['flashActData'],
+        dependencies: ['this', 'flashActData'],
 
-        compute: ({flashActData, [Flash.instance]: flash}) =>
+        compute: ({this: flash, flashActData}) =>
           flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
       },
     },

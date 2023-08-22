@@ -66,9 +66,9 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, trackData}) =>
           trackData?.filter((track) =>
             [
               ...track.artistContribs ?? [],
@@ -82,9 +82,9 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, trackData}) =>
           trackData?.filter(({commentatorArtists}) =>
             commentatorArtists.includes(artist)) ?? [],
       },
@@ -103,9 +103,9 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData'],
+        dependencies: [this, 'albumData'],
 
-        compute: ({albumData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, albumData}) =>
           albumData?.filter(({commentatorArtists}) =>
             commentatorArtists.includes(artist)) ?? [],
       },
@@ -148,11 +148,11 @@ export class Artist extends Thing {
     flags: {expose: true},
 
     expose: {
-      dependencies: [thingDataProperty],
+      dependencies: ['this', thingDataProperty],
 
       compute: ({
+        this: artist,
         [thingDataProperty]: thingData,
-        [Artist.instance]: artist
       }) =>
         thingData?.filter(thing =>
           thing[contribsProperty]

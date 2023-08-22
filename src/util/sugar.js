@@ -168,12 +168,24 @@ export function setIntersection(set1, set2) {
   return intersection;
 }
 
-export function filterProperties(obj, properties) {
-  const set = new Set(properties);
-  return Object.fromEntries(
-    Object
-      .entries(obj)
-      .filter(([key]) => set.has(key)));
+export function filterProperties(object, properties) {
+  if (typeof object !== 'object' || object === null) {
+    throw new TypeError(`Expected object to be an object, got ${object}`);
+  }
+
+  if (!Array.isArray(properties)) {
+    throw new TypeError(`Expected properties to be an array, got ${properties}`);
+  }
+
+  const filteredObject = {};
+
+  for (const property of properties) {
+    if (Object.hasOwn(object, property)) {
+      filteredObject[property] = object[property];
+    }
+  }
+
+  return filteredObject;
 }
 
 export function queue(array, max = 50) {
