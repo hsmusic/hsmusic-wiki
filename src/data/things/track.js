@@ -44,6 +44,26 @@ export class Track extends Thing {
     sampledTracksByRef: Thing.common.referenceList(Track),
     artTagsByRef: Thing.common.referenceList(ArtTag),
 
+    color: Thing.composite.from([
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          transform: (color, {}, continuation) =>
+            color ?? continuation(),
+        },
+      },
+
+      Track.composite.withAlbumProperties(['color']),
+
+      {
+        flags: {update: true, expose: true},
+        update: {validate: isColor},
+        expose: {
+          compute: ({album: {color}}) => color,
+        },
+      },
+    ]),
+
     // Disables presenting the track as though it has its own unique artwork.
     // This flag should only be used in select circumstances, i.e. to override
     // an album's trackCoverArtists. This flag supercedes that property, as well
@@ -55,7 +75,7 @@ export class Track extends Thing {
     // main artwork. (It does inherit `trackCoverArtFileExtension` if present
     // on the album.)
     coverArtFileExtension: Thing.composite.from([
-      Track.withAlbumProperties(['trackCoverArtistContribsByRef', 'trackCoverArtFileExtension']),
+      Track.composite.withAlbumProperties(['trackCoverArtistContribsByRef', 'trackCoverArtFileExtension']),
 
       {
         flags: {update: true, expos: true},
@@ -81,7 +101,7 @@ export class Track extends Thing {
     // the track's own coverArtDate or its album's trackArtDate, so if neither
     // is specified, this value is null.
     coverArtDate: Thing.composite.from([
-      Track.withAlbumProperties(['trackArtDate', 'trackCoverArtistContribsByRef']),
+      Track.composite.withAlbumProperties(['trackArtDate', 'trackCoverArtistContribsByRef']),
 
       {
         flags: {update: true, expose: true},
@@ -147,31 +167,25 @@ export class Track extends Thing {
       find.album
     ),
 
-    date: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['albumData', 'dateFirstReleased'],
-        compute: ({albumData, dateFirstReleased, [Track.instance]: track}) =>
-          dateFirstReleased ?? Track.findAlbum(track, albumData)?.date ?? null,
+    date: Thing.composite.from([
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          dependencies: ['dateFirstReleased'],
+          compute: ({dateFirstReleased}, continuation) =>
+            dateFirstReleased ?? continuation(),
+        },
       },
-    },
 
-    color: {
-      flags: {update: true, expose: true},
+      Track.composite.withAlbumProperties(['date']),
 
-      update: {validate: isColor},
-
-      expose: {
-        dependencies: ['albumData'],
-
-        transform: (color, {albumData, [Track.instance]: track}) =>
-          color ??
-            Track.findAlbum(track, albumData)
-              ?.trackSections.find(({tracks}) => tracks.includes(track))
-                ?.color ?? null,
+      {
+        flags: {expose: true},
+        expose: {
+          compute: ({album: {date}}) => date,
+        },
       },
-    },
+    ]),
 
     // Whether or not the track has "unique" cover artwork - a cover which is
     // specifically associated with this track in particular, rather than with
@@ -181,7 +195,7 @@ export class Track extends Thing {
     // the usual hasCoverArt to emphasize that it does not inherit from the
     // album.)
     hasUniqueCoverArt: Thing.composite.from([
-      Track.withAlbumProperties(['trackCoverArtistContribsByRef']),
+      Track.composite.withAlbumProperties(['trackCoverArtistContribsByRef']),
 
       {
         flags: {expose: true},
@@ -236,29 +250,27 @@ export class Track extends Thing {
     },
 
     artistContribs: Thing.composite.from([
-      Track.inheritFromOriginalRelease('artistContribs'),
+      Track.composite.inheritFromOriginalRelease('artistContribs'),
+
+      Thing.composite.withDynamicContribs('artistContribsByRef', 'artistContribs'),
+      Track.composite.withAlbumProperties(['artistContribs']),
 
       {
         flags: {expose: true},
         expose: {
-          dependencies: ['artistContribs'],
-
-          compute({
-            artistContribsByRef: contribsFromTrack,
-            album: {artistContribsByRef: contribsFromAlbum},
-          }) {
-            let contribsByRef = contribsFromTrack;
-            if (empty(contribsByRef)) contribsByRef = contribsFromAlbum;
-            if (empty(contribsByRef)) return null;
-
-            return Thing.findArtistsFromContribs(contribsByRef, artistData);
-          },
+          compute: ({
+            artistContribs: contribsFromTrack,
+            album: {artistContribs: contribsFromAlbum},
+          }) =>
+            (empty(contribsFromTrack)
+              ? contribsFromAlbum
+              : contribsFromTrack),
         },
       },
     ]),
 
     contributorContribs: Thing.composite.from([
-      Track.inheritFromOriginalRelease('contributorContribs'),
+      Track.composite.inheritFromOriginalRelease('contributorContribs'),
       Thing.common.dynamicContribs('contributorContribsByRef'),
     ]),
 
@@ -266,37 +278,41 @@ export class Track extends Thing {
     // typically varies by release and isn't defined by the musical qualities
     // of the track.
     coverArtistContribs: Thing.composite.from([
-      Track.withAlbumProperties(['trackCoverArtistContribsByRef']),
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          dependencies: ['disableUniqueCoverArt'],
+          compute: ({disableUniqueCoverArt}, continuation) =>
+            (disableUniqueCoverArt
+              ? null
+              : continuation()),
+        },
+      },
+
+      Track.composite.withAlbumProperties(['trackCoverArtistContribs']),
+      Thing.composite.withDynamicContribs('coverArtistContribsByRef', 'coverArtistContribs'),
 
       {
         flags: {expose: true},
         expose: {
-          dependencies: ['coverArtistContribsByRef', 'disableUniqueCoverArt'],
-
-          compute({
-            coverArtistContribsByRef: contribsFromTrack,
-            disableUniqueCoverArt,
-            album: {trackCoverArtistContribsByRef: contribsFromAlbum},
-          }) {
-            if (disableUniqueCoverArt) return null;
-
-            let contribsByRef = contribsFromTrack;
-            if (empty(contribsByRef)) contribsByRef = contribsFromAlbum;
-            if (empty(contribsByRef)) return null;
-
-            return Thing.findArtistsFromContribs(contribsByRef, artistData);
-          },
+          compute: ({
+            coverArtistContribs: contribsFromTrack,
+            album: {trackCoverArtistContribs: contribsFromAlbum},
+          }) =>
+            (empty(contribsFromTrack)
+              ? contribsFromAlbum
+              : contribsFromTrack),
         },
       },
     ]),
 
     referencedTracks: Thing.composite.from([
-      Track.inheritFromOriginalRelease('referencedTracks'),
+      Track.composite.inheritFromOriginalRelease('referencedTracks'),
       Thing.common.dynamicThingsFromReferenceList('referencedTracksByRef', 'trackData', find.track),
     ]),
 
     sampledTracks: Thing.composite.from([
-      Track.inheritFromOriginalRelease('sampledTracks'),
+      Track.composite.inheritFromOriginalRelease('sampledTracks'),
       Thing.common.dynamicThingsFromReferenceList('sampledTracksByRef', 'trackData', find.track),
     ]),
 
@@ -351,44 +367,46 @@ export class Track extends Thing {
     ),
   });
 
-  static inheritFromOriginalRelease = originalProperty => ({
-    flags: {expose: true, compose: true},
+  static composite = {
+    inheritFromOriginalRelease: originalProperty => ({
+      flags: {expose: true, compose: true},
 
-    expose: {
-      dependencies: ['originalReleaseTrackByRef', 'trackData'],
+      expose: {
+        dependencies: ['originalReleaseTrackByRef', 'trackData'],
 
-      compute({originalReleaseTrackByRef, trackData}, callback) {
-        if (!originalReleaseTrackByRef) return callback();
+        compute({originalReleaseTrackByRef, trackData}, continuation) {
+          if (!originalReleaseTrackByRef) return continuation();
 
-        if (!trackData) return null;
-        const original = find.track(originalReleaseTrackByRef, trackData, {mode: 'quiet'});
-        if (!original) return null;
-        return original[originalProperty];
+          if (!trackData) return null;
+          const original = find.track(originalReleaseTrackByRef, trackData, {mode: 'quiet'});
+          if (!original) return null;
+          return original[originalProperty];
+        },
       },
-    },
-  });
+    }),
 
-  static withAlbumProperties = albumProperties => ({
-    flags: {expose: true, compose: true},
+    withAlbumProperties: albumProperties => ({
+      flags: {expose: true, compose: true},
 
-    expose: {
-      dependencies: ['albumData'],
+      expose: {
+        dependencies: ['albumData'],
 
-      compute({albumData, [Track.instance]: track}, callback) {
-        const album = albumData?.find((album) => album.tracks.includes(track));
+        compute({albumData, [Track.instance]: track}, continuation) {
+          const album = albumData?.find((album) => album.tracks.includes(track));
 
-        const filteredAlbum = Object.create(null);
-        for (const property of albumProperties) {
-          filteredAlbum[property] =
-            (album
-              ? album[property]
-              : null);
-        }
+          const filteredAlbum = Object.create(null);
+          for (const property of albumProperties) {
+            filteredAlbum[property] =
+              (album
+                ? album[property]
+                : null);
+          }
 
-        return callback({album: filteredAlbum});
+          return continuation({album: filteredAlbum});
+        },
       },
-    },
-  });
+    }),
+  };
 
   [inspect.custom]() {
     const base = Thing.prototype[inspect.custom].apply(this);

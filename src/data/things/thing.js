@@ -250,14 +250,7 @@ export default class Thing extends CacheableObject {
       expose: {
         dependencies: ['artistData', contribsByRefProperty],
         compute: ({artistData, [contribsByRefProperty]: contribsByRef}) =>
-          contribsByRef && artistData
-            ? contribsByRef
-                .map(({who: ref, what}) => ({
-                  who: find.artist(ref, artistData),
-                  what,
-                }))
-                .filter(({who}) => who)
-            : [],
+          Thing.findArtistsFromContribs(contribsByRef, artistData),
       },
     }),
 
@@ -563,5 +556,18 @@ export default class Thing extends CacheableObject {
 
       return constructedDescriptor;
     },
+
+    withDynamicContribs: (contribsByRefProperty, dependencyName) => ({
+      flags: {expose: true, compose: true},
+
+      expose: {
+        dependencies: ['artistData', contribsByRefProperty],
+        compute: ({artistData, [contribsByRefProperty]: contribsByRef}, callback) =>
+          callback({
+            [dependencyName]:
+              Thing.findArtistsFromContribs(contribsByRef, artistData),
+          }),
+      },
+    }),
   };
 }
