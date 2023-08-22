@@ -11,9 +11,11 @@ export default {
   relations(relation, track) {
     const relations = {};
 
-    relations.contributionLinks =
-      track.artistContribs
-        .map(contrib => relation('linkContribution', contrib));
+    if (!empty(track.artistContribs)) {
+      relations.contributionLinks =
+        track.artistContribs
+          .map(contrib => relation('linkContribution', contrib));
+    }
 
     relations.trackLink =
       relation('linkTrack', track);
@@ -31,12 +33,12 @@ export default {
     }
 
     data.showArtists =
-      empty(track.artistContribs) ||
-      empty(album.artistContribs) ||
-      !compareArrays(
-        track.artistContribs.map(c => c.who),
-        album.artistContribs.map(c => c.who),
-        {checkOrder: false});
+      !empty(track.artistContribs) &&
+       (empty(album.artistContribs) ||
+        !compareArrays(
+          track.artistContribs.map(c => c.who),
+          album.artistContribs.map(c => c.who),
+          {checkOrder: false}));
 
     return data;
   },

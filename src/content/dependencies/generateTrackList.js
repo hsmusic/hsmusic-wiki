@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['linkTrack', 'linkContribution'],
@@ -11,14 +11,17 @@ export default {
     }
 
     return {
-      items: tracks.map(track => ({
-        trackLink:
-          relation('linkTrack', track),
+      trackLinks:
+        tracks
+          .map(track => relation('linkTrack', track)),
 
-        contributionLinks:
-          track.artistContribs
-            .map(contrib => relation('linkContribution', contrib)),
-      })),
+      contributionLinks:
+        tracks
+          .map(track =>
+            (empty(track.artistContribs)
+              ? null
+              : track.artistContribs
+                  .map(contrib => relation('linkContribution', contrib)))),
     };
   },
 
@@ -28,22 +31,28 @@ export default {
   },
 
   generate(relations, slots, {html, language}) {
-    return html.tag('ul',
-      relations.items.map(({trackLink, contributionLinks}) =>
-        html.tag('li',
-          language.$('trackList.item.withArtists', {
-            track: trackLink,
-            by:
-              html.tag('span', {class: 'by'},
-                language.$('trackList.item.withArtists.by', {
-                  artists:
-                    language.formatConjunctionList(
-                      contributionLinks.map(link =>
-                        link.slots({
-                          showContribution: slots.showContribution,
-                          showIcons: slots.showIcons,
-                        }))),
-                })),
-          }))));
+    return (
+      html.tag('ul',
+        stitchArrays({
+          trackLink: relations.trackLinks,
+          contributionLinks: relations.contributionLinks,
+        }).map(({trackLink, contributionLinks}) =>
+            html.tag('li',
+              (empty(contributionLinks)
+                ? trackLink
+                : language.$('trackList.item.withArtists', {
+                    track: trackLink,
+                    by:
+                      html.tag('span', {class: 'by'},
+                        language.$('trackList.item.withArtists.by', {
+                          artists:
+                            language.formatConjunctionList(
+                              contributionLinks.map(link =>
+                                link.slots({
+                                  showContribution: slots.showContribution,
+                                  showIcons: slots.showIcons,
+                                }))),
+                        })),
+                  }))))));
   },
 };

@@ -71,9 +71,9 @@ export class Artist extends Thing {
         compute: ({trackData, [Artist.instance]: artist}) =>
           trackData?.filter((track) =>
             [
-              ...track.artistContribs,
-              ...track.contributorContribs,
-              ...track.coverArtistContribs,
+              ...track.artistContribs ?? [],
+              ...track.contributorContribs ?? [],
+              ...track.coverArtistContribs ?? [],
             ].some(({who}) => who === artist)) ?? [],
       },
     },
