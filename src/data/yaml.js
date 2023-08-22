@@ -340,7 +340,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     dateFirstReleased: 'Date First Released',
     coverArtDate: 'Cover Art Date',
     coverArtFileExtension: 'Cover Art File Extension',
-    disableCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
+    disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
 
     lyrics: 'Lyrics',
     commentary: 'Commentary',
