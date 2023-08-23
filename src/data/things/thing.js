@@ -797,7 +797,7 @@ export default class Thing extends CacheableObject {
                 return result;
               }
 
-              return exportDependencies;
+              return continuationIfApplicable(exportDependencies);
             } else {
               return base.expose.compute(dependencies);
             }
