@@ -223,29 +223,45 @@ export class Track extends Thing {
     // the usual hasCoverArt to emphasize that it does not inherit from the
     // album.)
     hasUniqueCoverArt: Thing.composite.from(`Track.hasUniqueCoverArt`, [
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          dependencies: ['disableUniqueCoverArt'],
+          compute: ({disableUniqueCoverArt}, continuation) =>
+            (disableUniqueCoverArt
+              ? false
+              : continuation()),
+        },
+      },
+
+      Thing.composite.withResolvedContribs({
+        from: 'coverArtistContribsByRef',
+        to: '#coverArtistContribs',
+      }),
+
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          dependencies: ['#coverArtistContribs'],
+          compute: ({'#coverArtistContribs': coverArtistContribs}, continuation) =>
+            (empty(coverArtistContribs)
+              ? continuation()
+              : true),
+        },
+      },
+
       Track.composite.withAlbumProperties({
-        properties: ['trackCoverArtistContribsByRef'],
+        properties: ['trackCoverArtistContribs'],
       }),
 
       {
         flags: {expose: true},
         expose: {
-          dependencies: [
-            'coverArtistContribsByRef',
-            'disableUniqueCoverArt',
-            '#album.trackCoverArtistContribsByRef',
-          ],
-
-          compute({
-            coverArtistContribsByRef,
-            disableUniqueCoverArt,
-            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
-          }) {
-            if (disableUniqueCoverArt) return false;
-            if (!empty(coverArtistContribsByRef)) return true;
-            if (!empty(trackCoverArtistContribsByRef)) return true;
-            return false;
-          },
+          dependencies: ['#album.trackCoverArtistContribs'],
+          compute: ({'#album.trackCoverArtistContribs': trackCoverArtistContribs}) =>
+            (empty(trackCoverArtistContribs)
+              ? false
+              : true),
         },
       },
     ]),
