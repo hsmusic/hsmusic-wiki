@@ -419,7 +419,7 @@ export default class Thing extends CacheableObject {
     return (
       contribsByRef
         .map(({who, what}) => ({
-          who: find.artist(who, artistData),
+          who: find.artist(who, artistData, {mode: 'quiet'}),
           what,
         }))
         .filter(({who}) => who));
