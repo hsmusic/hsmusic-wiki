@@ -854,8 +854,8 @@ export default class Thing extends CacheableObject {
 
       expose: {
         dependencies: ['artistData', contribsByRefDependency],
-        compute: ({artistData, [contribsByRefDependency]: contribsByRef}, callback) =>
-          callback({
+        compute: ({artistData, [contribsByRefDependency]: contribsByRef}, continuation) =>
+          continuation({
             [outputDependency]:
               Thing.findArtistsFromContribs(contribsByRef, artistData),
           }),

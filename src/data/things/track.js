@@ -301,12 +301,9 @@ export class Track extends Thing {
     },
 
     artistContribs: Thing.composite.from(`Track.artistContribs`, [
-      Track.composite.inheritFromOriginalRelease('artistContribs'),
+      Track.composite.inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      Track.composite.withAlbumProperties({
-        properties: 'artistContribs',
-      }),
-
+      Track.composite.withAlbumProperties({properties: ['artistContribs']}),
       Thing.composite.withResolvedContribs({
         from: 'artistContribsByRef',
         to: '#artistContribs',
@@ -328,7 +325,7 @@ export class Track extends Thing {
     ]),
 
     contributorContribs: Thing.composite.from(`Track.contributorContribs`, [
-      Track.composite.inheritFromOriginalRelease('contributorContribs'),
+      Track.composite.inheritFromOriginalRelease({property: 'contributorContribs'}),
       Thing.common.dynamicContribs('contributorContribsByRef'),
     ]),
 
@@ -372,12 +369,12 @@ export class Track extends Thing {
     ]),
 
     referencedTracks: Thing.composite.from(`Track.referencedTracks`, [
-      Track.composite.inheritFromOriginalRelease('referencedTracks'),
+      Track.composite.inheritFromOriginalRelease({property: 'referencedTracks'}),
       Thing.common.dynamicThingsFromReferenceList('referencedTracksByRef', 'trackData', find.track),
     ]),
 
     sampledTracks: Thing.composite.from(`Track.sampledTracks`, [
-      Track.composite.inheritFromOriginalRelease('sampledTracks'),
+      Track.composite.inheritFromOriginalRelease({property: 'sampledTracks'}),
       Thing.common.dynamicThingsFromReferenceList('sampledTracksByRef', 'trackData', find.track),
     ]),
 
