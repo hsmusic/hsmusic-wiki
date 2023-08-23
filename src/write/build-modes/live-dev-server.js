@@ -163,7 +163,7 @@ export async function go({
         if (!quietResponses) console.log(`${requestHead} [200] /data.json`);
       } catch (error) {
         response.writeHead(500, contentTypeJSON);
-        response.end({error: `Internal error serializing wiki JSON`});
+        response.end(`Internal error serializing wiki JSON`);
         console.error(`${requestHead} [500] /data.json`);
         showError(error);
       }
