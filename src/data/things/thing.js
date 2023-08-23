@@ -866,8 +866,9 @@ export default class Thing extends CacheableObject {
     // within the provided thingData dependency. This will early exit if the
     // data dependency is null, or, if earlyExitIfNotFound is set to true,
     // if the find function doesn't match anything for the reference.
-    // Otherwise, the data object (or null, if not found) is provided on
-    // the output dependency.
+    // Otherwise, the data object is provided on the output dependency;
+    // or null, if the reference doesn't match anything or itself was null
+    // to begin with.
     withResolvedReference({
       ref: refDependency,
       data: dataDependency,
@@ -883,6 +884,8 @@ export default class Thing extends CacheableObject {
           dependencies: [refDependency, dataDependency],
 
           compute({[refDependency]: ref, [dataDependency]: data}, continuation) {
+            if (!ref) return continuation({[outputDependency]: null});
+
             if (data === null) return null;
 
             const match = findFunction(ref, data, {mode: 'quiet'});
