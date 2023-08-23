@@ -424,7 +424,7 @@ export class Track extends Thing {
     // property as null.
     inheritFromOriginalRelease: ({property: originalProperty, allowOverride = false}) =>
       Thing.composite.from(`Track.composite.inheritFromOriginalRelease`, [
-        Track.composite.withOriginalRelease({to: '#originalRelease'}),
+        Track.composite.withOriginalRelease(),
 
         {
           flags: {expose: true, compose: true},
@@ -474,8 +474,8 @@ export class Track extends Thing {
     // Just includes the original release of this track as a dependency, or
     // null, if it's not a rerelease. Note that this will early exit if the
     // original release is specified by reference and that reference doesn't
-    // resolve to anything.
-    withOriginalRelease: ({to: outputDependency = '#originalRelease'}) =>
+    // resolve to anything. Outputs to '#originalRelease' by default.
+    withOriginalRelease: ({to: outputDependency = '#originalRelease'} = {}) =>
       Thing.composite.from(`Track.composite.withOriginalRelease`, [
         Thing.composite.withResolvedReference({
           ref: 'originalReleaseTrackByRef',
