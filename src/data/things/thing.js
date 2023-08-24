@@ -644,7 +644,7 @@ export default class Thing extends CacheableObject {
         push(new TypeError(`Base which composes can't also update yet`));
       }
 
-      const exposeFunctionOrder = [];
+      const exposeSteps = [];
       const exposeDependencies = new Set(base.expose?.dependencies);
 
       for (let i = 0; i < steps.length; i++) {
@@ -695,11 +695,7 @@ export default class Thing extends CacheableObject {
               fn = step.expose.compute;
             }
 
-            exposeFunctionOrder.push({
-              type,
-              fn,
-              ownDependencies: step.expose.dependencies,
-            });
+            exposeSteps.push(step.expose);
           }
         });
       }
@@ -727,81 +723,104 @@ export default class Thing extends CacheableObject {
         expose.dependencies = Array.from(exposeDependencies);
 
         const continuationSymbol = Symbol();
+        const noTransformSymbol = Symbol();
 
-        if (base.flags.update) {
-          expose.transform = (value, initialDependencies) => {
-            const dependencies = {...initialDependencies};
-            let valueSoFar = value;
+        const _filterDependencies = (dependencies, step) => {
+          const filteredDependencies =
+            (step.dependencies
+              ? filterProperties(dependencies, step.dependencies)
+              : {});
 
-            for (const {type, fn, ownDependencies} of exposeFunctionOrder) {
-              const filteredDependencies =
-                (ownDependencies
-                  ? filterProperties(dependencies, ownDependencies)
-                  : {})
+          if (step.mapDependencies) {
+            for (const [to, from] of Object.entries(step.mapDependencies)) {
+              filteredDependencies[to] = dependencies[from] ?? null;
+            }
+          }
 
-              const result =
-                (type === 'transform'
-                  ? fn(valueSoFar, filteredDependencies, (updatedValue, providedDependencies) => {
+          return filteredDependencies;
+        };
+
+        const _assignDependencies = (continuationAssignment, step) => {
+          if (!step.mapContinuation) {
+            return continuationAssignment;
+          }
+
+          const assignDependencies = {};
+
+          for (const [from, to] of Object.entries(step.mapContinuation)) {
+            assignDependencies[to] = continuationAssignment[from] ?? null;
+          }
+
+          return assignDependencies;
+        };
+
+        const _computeOrTransform = (value, initialDependencies) => {
+          const dependencies = {...initialDependencies};
+
+          let valueSoFar = value;
+
+          for (const step of exposeSteps) {
+            const filteredDependencies = _filterDependencies(dependencies, step);
+
+            let assignDependencies = null;
+
+            const result =
+              (valueSoFar !== noTransformSymbol && step.transform
+                ? step.transform(
+                    valueSoFar, filteredDependencies,
+                    (updatedValue, providedDependencies) => {
                       valueSoFar = updatedValue ?? null;
-                      Object.assign(dependencies, providedDependencies ?? {});
+                      assignDependencies = providedDependencies;
                       return continuationSymbol;
                     })
-                  : fn(filteredDependencies, providedDependencies => {
-                      Object.assign(dependencies, providedDependencies ?? {});
+                : step.compute(
+                    filteredDependencies,
+                    (providedDependencies) => {
+                      assignDependencies = providedDependencies;
                       return continuationSymbol;
                     }));
 
-              if (result !== continuationSymbol) {
-                return result;
-              }
+            if (result !== continuationSymbol) {
+              return result;
             }
 
-            const filteredDependencies =
-              filterProperties(dependencies, base.expose.dependencies);
+            Object.assign(dependencies, _assignDependencies(assignDependencies, step));
+          }
 
-            // Note: base.flags.compose is not compatible with base.flags.update,
-            // so the base.flags.compose case is not handled here.
+          const filteredDependencies = _filterDependencies(dependencies, base.expose);
 
-            if (base.expose.transform) {
-              return base.expose.transform(valueSoFar, filteredDependencies);
-            } else {
-              return base.expose.compute(filteredDependencies);
+          // Note: base.flags.compose is not compatible with base.flags.update.
+          if (base.expose.transform) {
+            return base.expose.transform(valueSoFar, filteredDependencies);
+          } else if (base.flags.compose) {
+            const continuation = continuationIfApplicable;
+
+            let exportDependencies;
+
+            const result =
+              base.expose.compute(filteredDependencies, providedDependencies => {
+                exportDependencies = providedDependencies;
+                return continuationSymbol;
+              });
+
+            if (result !== continuationSymbol) {
+              return result;
             }
-          };
+
+            return continuation(_assignDependencies(exportDependencies, base.expose));
+          } else {
+            return base.expose.compute(filteredDependencies);
+          }
+        };
+
+        if (base.flags.update) {
+          expose.transform =
+            (value, initialDependencies) =>
+              _computeOrTransform(value, initialDependencies);
         } else {
-          expose.compute = (initialDependencies, continuationIfApplicable) => {
-            const dependencies = {...initialDependencies};
-
-            for (const {fn} of exposeFunctionOrder) {
-              const result =
-                fn(dependencies, providedDependencies => {
-                  Object.assign(dependencies, providedDependencies ?? {});
-                  return continuationSymbol;
-                });
-
-              if (result !== continuationSymbol) {
-                return result;
-              }
-            }
-
-            if (base.flags.compose) {
-              let exportDependencies;
-
-              const result =
-                base.expose.compute(dependencies, providedDependencies => {
-                  exportDependencies = providedDependencies;
-                  return continuationSymbol;
-                });
-
-              if (result !== continuationSymbol) {
-                return result;
-              }
-
-              return continuationIfApplicable(exportDependencies);
-            } else {
-              return base.expose.compute(dependencies);
-            }
-          };
+          expose.compute =
+            (initialDependencies) =>
+              _computeOrTransform(undefined, initialDependencies);
         }
       }
 
@@ -848,16 +867,17 @@ export default class Thing extends CacheableObject {
     // providing (named by the second argument) the result. "Resolving"
     // means mapping the "who" reference of each contribution to an artist
     // object, and filtering out those whose "who" doesn't match any artist.
-    withResolvedContribs: ({from: contribsByRefDependency, to: outputDependency}) => ({
+    withResolvedContribs: ({from, to}) => ({
       annotation: `Thing.composite.withResolvedContribs`,
       flags: {expose: true, compose: true},
 
       expose: {
-        dependencies: ['artistData', contribsByRefDependency],
-        compute: ({artistData, [contribsByRefDependency]: contribsByRef}, continuation) =>
+        dependencies: ['artistData'],
+        mapDependencies: {from},
+        mapContinuation: {to},
+        compute: ({artistData, from}, continuation) =>
           continuation({
-            [outputDependency]:
-              Thing.findArtistsFromContribs(contribsByRef, artistData),
+            to: Thing.findArtistsFromContribs(from, artistData),
           }),
       },
     }),
