@@ -561,6 +561,97 @@ export default class Thing extends CacheableObject {
     //       },
     //     ]);
     //
+    // == Cache-safe dependency names: ==
+    //
+    // [Disclosure: The caching engine hasn't actually been implemented yet.
+    //  As such, this section is subject to change, and simply provides sound
+    //  forward-facing advice and interfaces.]
+    //
+    // It's a good idea to write individual compositional steps in such a way
+    // that they're "cache-safe" - meaning the same input (dependency) values
+    // will always result in the same output (continuation or early exit).
+    //
+    // In order to facilitate this, compositional step descriptors may specify
+    // unique `mapDependencies`, `mapContinuation`, and `options` values.
+    //
+    // Consider the `withResolvedContribs` example adjusted to make use of
+    // two of these options below:
+    //
+    //   static Thing.composite.withResolvedContribs = ({
+    //     from: contribsByRefDependency,
+    //     to: outputDependency,
+    //   }) => ({
+    //     flags: {expose: true, compose: true},
+    //     expose: {
+    //       dependencies: ['artistData'],
+    //       mapDependencies: {contribsByRef: contribsByRefDependency},
+    //       mapContinuation: {outputDependency},
+    //       compute({
+    //         contribsByRef, /* no longer in square brackets */
+    //         artistData,
+    //       }, continuation) {
+    //         if (!artistData) return null;
+    //         return continuation({
+    //           outputDependency: /* no longer in square brackets */
+    //             (..resolve contributions one way or another..),
+    //         });
+    //       },
+    //     },
+    //   });
+    //
+    // With a little destructuring and restructuring JavaScript sugar, the
+    // above can be simplified some more:
+    //
+    //   static Thing.composite.withResolvedContribs = ({from, to}) => ({
+    //     flags: {expose: true, compose: true},
+    //     expose: {
+    //       dependencies: ['artistData'],
+    //       mapDependencies: {from},
+    //       mapContinuation: {to},
+    //       compute({artistData, from: contribsByRef}, continuation) {
+    //         if (!artistData) return null;
+    //         return continuation({
+    //           to: (..resolve contributions one way or another..),
+    //         });
+    //       },
+    //     },
+    //   });
+    //
+    // These two properties let you separate the name-mapping behavior (for
+    // dependencies and the continuation) from the main body of the compute
+    // function. That means the compute function will *always* get inputs in
+    // the same form (dependencies 'artistData' and 'from' above), and will
+    // *always* provide its output in the same form (early return or 'to').
+    //
+    // Thanks to that, this `compute` function is cache-safe! Its outputs can
+    // be cached corresponding to each set of mapped inputs. So it won't matter
+    // whether the `from` dependency is named `coverArtistContribsByRef` or
+    // `contributorContribsByRef` or something else - the compute function
+    // doesn't care, and only expects that value to be provided via its `from`
+    // argument. Likewise, it doesn't matter if the output should be sent to
+    // '#coverArtistContribs` or `#contributorContribs` or some other name;
+    // the mapping is handled automatically outside, and compute will always
+    // output its value to the continuation's `to`.
+    //
+    // Note that `mapDependencies` and `mapContinuation` should be objects of
+    // the same "shape" each run - that is, the values will change depending on
+    // outside context, but the keys are always the same. You shouldn't use
+    // `mapDependencies` to dynamically select more or fewer dependencies.
+    // If you need to dynamically select a range of dependencies, just specify
+    // them in the `dependencies` array like usual. The caching engine will
+    // understand that differently named `dependencies` indicate separate
+    // input-output caches should be used.
+    //
+    // The 'options' property makes it possible to specify external arguments
+    // that fundamentally change the behavior of the `compute` function, while
+    // still remaining cache-safe. It indicates that the caching engine should
+    // use a completely different input-to-output cache for each permutation
+    // of the 'options' values. This way, those functions are still cacheable
+    // at all; they'll just be cached separately for each set of option values.
+    // Values on the 'options' property will always be provided in compute's
+    // dependencies under '#options' (to avoid name conflicts with other
+    // dependencies).
+    //
     // == To compute or to transform: ==
     //
     // A compositional step can work directly on a property's stored update
@@ -725,7 +816,7 @@ export default class Thing extends CacheableObject {
         const continuationSymbol = Symbol();
         const noTransformSymbol = Symbol();
 
-        const _filterDependencies = (dependencies, step) => {
+        function _filterDependencies(dependencies, step) {
           const filteredDependencies =
             (step.dependencies
               ? filterProperties(dependencies, step.dependencies)
@@ -737,10 +828,14 @@ export default class Thing extends CacheableObject {
             }
           }
 
-          return filteredDependencies;
-        };
+          if (step.options) {
+            filteredDependencies['#options'] = step.options;
+          }
 
-        const _assignDependencies = (continuationAssignment, step) => {
+          return filteredDependencies;
+        }
+
+        function _assignDependencies(continuationAssignment, step) {
           if (!step.mapContinuation) {
             return continuationAssignment;
           }
@@ -752,9 +847,9 @@ export default class Thing extends CacheableObject {
           }
 
           return assignDependencies;
-        };
+        }
 
-        const _computeOrTransform = (value, initialDependencies) => {
+        function _computeOrTransform(value, initialDependencies) {
           const dependencies = {...initialDependencies};
 
           let valueSoFar = value;
@@ -811,7 +906,7 @@ export default class Thing extends CacheableObject {
           } else {
             return base.expose.compute(filteredDependencies);
           }
-        };
+        }
 
         if (base.flags.update) {
           expose.transform =
@@ -842,9 +937,10 @@ export default class Thing extends CacheableObject {
         flags: {expose: true, compose: true},
 
         expose: {
+          options: {mappingEntries},
           dependencies: Object.values(mapping),
 
-          compute(dependencies, continuation) {
+          compute({'#options': {mappingEntries}, ...dependencies}, continuation) {
             const exports = {};
 
             // Note: This is slightly different behavior from filterProperties,
@@ -890,9 +986,9 @@ export default class Thing extends CacheableObject {
     // or null, if the reference doesn't match anything or itself was null
     // to begin with.
     withResolvedReference({
-      ref: refDependency,
-      data: dataDependency,
-      to: outputDependency,
+      ref,
+      data,
+      to,
       find: findFunction,
       earlyExitIfNotFound = false,
     }) {
@@ -901,17 +997,19 @@ export default class Thing extends CacheableObject {
         flags: {expose: true, compose: true},
 
         expose: {
-          dependencies: [refDependency, dataDependency],
+          options: {findFunction, earlyExitIfNotFound},
+          mapDependencies: {ref, data},
+          mapContinuation: {to},
 
-          compute({[refDependency]: ref, [dataDependency]: data}, continuation) {
-            if (!ref) return continuation({[outputDependency]: null});
+          compute({ref, data, findFunction, earlyExitIfNotFound}, continuation) {
+            if (!ref) return continuation({to: null});
 
             if (data === null) return null;
 
             const match = findFunction(ref, data, {mode: 'quiet'});
             if (match === null && earlyExitIfNotFound) return null;
 
-            return continuation({[outputDependency]: match});
+            return continuation({to: match});
           },
         },
       };
