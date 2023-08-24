@@ -820,7 +820,7 @@ export default class Thing extends CacheableObject {
         } else {
           expose.compute =
             (initialDependencies) =>
-              _computeOrTransform(undefined, initialDependencies);
+              _computeOrTransform(noTransformSymbol, initialDependencies);
         }
       }
 
