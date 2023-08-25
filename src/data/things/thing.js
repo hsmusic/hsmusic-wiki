@@ -922,7 +922,7 @@ export default class Thing extends CacheableObject {
           return {continuation, continuationStorage};
         }
 
-        function _computeOrTransform(value, initialDependencies) {
+        function _computeOrTransform(value, initialDependencies, continuationIfApplicable) {
           const dependencies = {...initialDependencies};
 
           let valueSoFar = value;         // Set only for {update: true} compositions
@@ -1020,15 +1020,11 @@ export default class Thing extends CacheableObject {
 
             return result;
           } else if (base.flags.compose) {
-            const {continuation, continuationStorage} = _prepareContinuation(transform, base.expose);
+            const {continuation, continuationStorage} = _prepareContinuation(false, base.expose);
 
             debug(() => `base - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
 
-            const result =
-              base.expose.compute(filteredDependencies, providedDependencies => {
-                exportDependencies = providedDependencies;
-                return continuationSymbol;
-              });
+            const result = base.expose.compute(filteredDependencies, continuation);
 
             if (result !== continuationSymbol) {
               throw new TypeError(`Use continuation.exit() or continuation.raise() in {compose: true} composition`);
@@ -1069,12 +1065,12 @@ export default class Thing extends CacheableObject {
 
         if (base.flags.update) {
           expose.transform =
-            (value, initialDependencies) =>
-              _computeOrTransform(value, initialDependencies);
+            (value, initialDependencies, continuationIfApplicable) =>
+              _computeOrTransform(value, initialDependencies, continuationIfApplicable);
         } else {
           expose.compute =
-            (initialDependencies) =>
-              _computeOrTransform(noTransformSymbol, initialDependencies);
+            (initialDependencies, continuationIfApplicable) =>
+              _computeOrTransform(noTransformSymbol, initialDependencies, continuationIfApplicable);
         }
       }
 
