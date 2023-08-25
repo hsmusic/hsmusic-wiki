@@ -475,8 +475,9 @@ export class Track extends Thing {
 
       expose: {
         dependencies: ['this', 'albumData'],
+        options: {properties, prefix},
 
-        compute({this: track, albumData}, continuation) {
+        compute({this: track, albumData, '#options': {properties, prefix}}, continuation) {
           const album = albumData?.find((album) => album.tracks.includes(track));
           const newDependencies = {};
 

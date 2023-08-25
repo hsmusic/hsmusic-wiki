@@ -508,7 +508,9 @@ export default class Thing extends CacheableObject {
     //   }
     //
     // Performing an early exit is as simple as returning some other value,
-    // instead of the continuation.
+    // instead of the continuation. You may also use `continuation.exit(value)`
+    // to perform the exact same kind of early exit - it's just a different
+    // syntax that might fit in better in certain longer compositions.
     //
     // It may be fine to simply provide new dependencies under a hard-coded
     // name, such as '#excitingProperty' above, but if you're writing a utility
@@ -715,6 +717,17 @@ export default class Thing extends CacheableObject {
     // still dynamically provided dependencies!)
     //
     from(firstArg, secondArg) {
+      const debug = fn => {
+        if (Thing.composite.from.debug === true) {
+          const result = fn();
+          if (Array.isArray(result)) {
+            console.log(`[composite]`, ...result);
+          } else {
+            console.log(`[composite]`, result);
+          }
+        }
+      };
+
       let annotation, composition;
       if (typeof firstArg === 'string') {
         [annotation, composition] = [firstArg, secondArg];
@@ -737,6 +750,13 @@ export default class Thing extends CacheableObject {
 
       const exposeSteps = [];
       const exposeDependencies = new Set(base.expose?.dependencies);
+
+      if (base.expose?.mapDependencies) {
+        for (const dependency of Object.values(base.expose.mapDependencies)) {
+          if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
+          exposeDependencies.add(dependency);
+        }
+      }
 
       for (let i = 0; i < steps.length; i++) {
         const step = steps[i];
@@ -762,6 +782,13 @@ export default class Thing extends CacheableObject {
 
             if (step.expose.dependencies) {
               for (const dependency of step.expose.dependencies) {
+                if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
+                exposeDependencies.add(dependency);
+              }
+            }
+
+            if (step.expose.mapDependencies) {
+              for (const dependency of Object.values(step.expose.mapDependencies)) {
                 if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
                 exposeDependencies.add(dependency);
               }
@@ -813,8 +840,8 @@ export default class Thing extends CacheableObject {
         const expose = constructedDescriptor.expose = {};
         expose.dependencies = Array.from(exposeDependencies);
 
-        const continuationSymbol = Symbol();
-        const noTransformSymbol = Symbol();
+        const continuationSymbol = Symbol('continuation symbol');
+        const noTransformSymbol = Symbol('no-transform symbol');
 
         function _filterDependencies(dependencies, step) {
           const filteredDependencies =
@@ -849,48 +876,153 @@ export default class Thing extends CacheableObject {
           return assignDependencies;
         }
 
+        function _prepareContinuation(transform, step) {
+          const continuationStorage = {
+            returnedWith: null,
+            providedDependencies: null,
+            providedValue: null,
+          };
+
+          const continuation =
+            (transform
+              ? (providedValue, providedDependencies = null) => {
+                  continuationStorage.returnedWith = 'continuation';
+                  continuationStorage.providedDependencies = providedDependencies;
+                  continuationStorage.providedValue = providedValue;
+                  return continuationSymbol;
+                }
+              : (providedDependencies = null) => {
+                  continuationStorage.returnedWith = 'continuation';
+                  continuationStorage.providedDependencies = providedDependencies;
+                  return continuationSymbol;
+                });
+
+          continuation.exit = (providedValue) => {
+            continuationStorage.returnedWith = 'exit';
+            continuationStorage.providedValue = providedValue;
+            return continuationSymbol;
+          };
+
+          if (base.flags.compose) {
+            continuation.raise =
+              (transform
+                ? (providedValue, providedDependencies = null) => {
+                    continuationStorage.returnedWith = 'raise';
+                    continuationStorage.providedDependencies = providedDependencies;
+                    continuationStorage.providedValue = providedValue;
+                    return continuationSymbol;
+                  }
+                : (providedDependencies = null) => {
+                    continuationStorage.returnedWith = 'raise';
+                    continuationStorage.providedDependencies = providedDependencies;
+                    return continuationSymbol;
+                  });
+          }
+
+          return {continuation, continuationStorage};
+        }
+
         function _computeOrTransform(value, initialDependencies) {
           const dependencies = {...initialDependencies};
 
-          let valueSoFar = value;
+          let valueSoFar = value;         // Set only for {update: true} compositions
+          let exportDependencies = null;  // Set only for {compose: true} compositions
 
-          for (const step of exposeSteps) {
+          debug(() => color.bright(`begin composition (annotation: ${annotation})`));
+
+          for (let i = 0; i < exposeSteps.length; i++) {
+            const step = exposeSteps[i];
+            debug(() => [`step #${i+1}:`, step]);
+
+            const transform =
+              valueSoFar !== noTransformSymbol &&
+              step.transform;
+
             const filteredDependencies = _filterDependencies(dependencies, step);
+            const {continuation, continuationStorage} = _prepareContinuation(transform, step);
 
-            let assignDependencies = null;
+            if (transform) {
+              debug(() => `step #${i+1} - transform with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+            } else {
+              debug(() => `step #${i+1} - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+            }
 
             const result =
-              (valueSoFar !== noTransformSymbol && step.transform
-                ? step.transform(
-                    valueSoFar, filteredDependencies,
-                    (updatedValue, providedDependencies) => {
-                      valueSoFar = updatedValue ?? null;
-                      assignDependencies = providedDependencies;
-                      return continuationSymbol;
-                    })
-                : step.compute(
-                    filteredDependencies,
-                    (providedDependencies) => {
-                      assignDependencies = providedDependencies;
-                      return continuationSymbol;
-                    }));
+              (transform
+                ? step.transform(valueSoFar, filteredDependencies, continuation)
+                : step.compute(filteredDependencies, continuation));
 
             if (result !== continuationSymbol) {
+              if (base.flags.compose) {
+                throw new TypeError(`Use continuation.exit() or continuation.raise() in {compose: true} compositions`);
+              }
+
+              debug(() => `step #${i+1} - early-exit (inferred)`);
+              debug(() => `early-exit: ${inspect(result, {compact: true})}`);
+              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+
               return result;
             }
 
-            Object.assign(dependencies, _assignDependencies(assignDependencies, step));
+            if (continuationStorage.returnedWith === 'exit') {
+              debug(() => `step #${i+1} - result: early-exit (explicit)`);
+              debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
+              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+
+              return continuationSymbol.providedValue;
+            }
+
+            if (continuationStorage.returnedWith === 'raise') {
+              if (transform) {
+                valueSoFar = continuationStorage.providedValue;
+              }
+
+              exportDependencies = _assignDependencies(continuationStorage.providedDependencies, step);
+
+              debug(() => `step #${i+1} - result: raise`);
+
+              break;
+            }
+
+            if (continuationStorage.returnedWith === 'continuation') {
+              if (transform) {
+                valueSoFar = continuationStorage.providedValue;
+              }
+
+              debug(() => `step #${i+1} - result: continuation`);
+
+              if (continuationStorage.providedDependencies) {
+                const assignDependencies = _assignDependencies(continuationStorage.providedDependencies, step);
+                Object.assign(dependencies, assignDependencies);
+
+                debug(() => [`assign dependencies:`, assignDependencies]);
+              }
+            }
           }
+
+          if (exportDependencies) {
+            debug(() => [`raise dependencies:`, exportDependencies]);
+            debug(() => color.bright(`end composition (annotation: ${annotation})`));
+            return continuationIfApplicable(exportDependencies);
+          }
+
+          debug(() => `completed all steps, reached base`);
 
           const filteredDependencies = _filterDependencies(dependencies, base.expose);
 
           // Note: base.flags.compose is not compatible with base.flags.update.
           if (base.expose.transform) {
-            return base.expose.transform(valueSoFar, filteredDependencies);
-          } else if (base.flags.compose) {
-            const continuation = continuationIfApplicable;
+            debug(() => `base - transform with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
 
-            let exportDependencies;
+            const result = base.expose.transform(valueSoFar, filteredDependencies);
+
+            debug(() => `base - non-compose (final) result: ${inspect(result, {compact: true})}`);
+
+            return result;
+          } else if (base.flags.compose) {
+            const {continuation, continuationStorage} = _prepareContinuation(transform, base.expose);
+
+            debug(() => `base - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
 
             const result =
               base.expose.compute(filteredDependencies, providedDependencies => {
@@ -899,12 +1031,39 @@ export default class Thing extends CacheableObject {
               });
 
             if (result !== continuationSymbol) {
-              return result;
+              throw new TypeError(`Use continuation.exit() or continuation.raise() in {compose: true} composition`);
             }
 
-            return continuation(_assignDependencies(exportDependencies, base.expose));
+            if (continuationStorage.returnedWith === 'continuation') {
+              throw new TypeError(`Use continuation.raise() in base of {compose: true} composition`);
+            }
+
+            if (continuationStorage.returnedWith === 'exit') {
+              debug(() => `base - result: early-exit (explicit)`);
+              debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
+              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+
+              return continuationStorage.providedValue;
+            }
+
+            if (continuationStorage.returnedWith === 'raise') {
+              exportDependencies = _assignDependencies(continuationStorage.providedDependencies, base.expose);
+
+              debug(() => `base - result: raise`);
+              debug(() => `raise dependencies: ${inspect(exportDependencies, {compact: true})}`);
+              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+
+              return continuationIfApplicable(exportDependencies);
+            }
           } else {
-            return base.expose.compute(filteredDependencies);
+            debug(() => `base - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+
+            const result = base.expose.compute(filteredDependencies);
+
+            debug(() => `base - non-compose (final) result: ${inspect(result, {compact: true})}`);
+            debug(() => color.bright(`end composition (annotation: ${annotation})`));
+
+            return result;
           }
         }
 
@@ -953,7 +1112,7 @@ export default class Thing extends CacheableObject {
                   : null);
             }
 
-            return continuation(exports);
+            return continuation.raise(exports);
           }
         },
       };
@@ -985,34 +1144,57 @@ export default class Thing extends CacheableObject {
     // Otherwise, the data object is provided on the output dependency;
     // or null, if the reference doesn't match anything or itself was null
     // to begin with.
-    withResolvedReference({
+    withResolvedReference: ({
       ref,
       data,
       to,
       find: findFunction,
       earlyExitIfNotFound = false,
-    }) {
-      return {
-        annotation: `Thing.composite.withResolvedReference`,
-        flags: {expose: true, compose: true},
+    }) =>
+      Thing.composite.from(`Thing.composite.withResolvedReference`, [
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {ref},
+            mapContinuation: {to},
 
-        expose: {
-          options: {findFunction, earlyExitIfNotFound},
-          mapDependencies: {ref, data},
-          mapContinuation: {to},
-
-          compute({ref, data, findFunction, earlyExitIfNotFound}, continuation) {
-            if (!ref) return continuation({to: null});
-
-            if (data === null) return null;
-
-            const match = findFunction(ref, data, {mode: 'quiet'});
-            if (match === null && earlyExitIfNotFound) return null;
-
-            return continuation({to: match});
+            compute: ({ref}, continuation) =>
+              (ref
+                ? continuation()
+                : continuation.raise({to: null})),
           },
         },
-      };
-    }
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {data},
+
+            compute: ({data}, continuation) =>
+              (data === null
+                ? continuation.exit(null)
+                : continuation()),
+          },
+        },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            options: {findFunction, earlyExitIfNotFound},
+            mapDependencies: {ref, data},
+            mapContinuation: {match: to},
+
+            compute({ref, data, '#options': {findFunction, earlyExitIfNotFound}}, continuation) {
+              const match = findFunction(ref, data, {mode: 'quiet'});
+
+              if (match === null && earlyExitIfNotFound) {
+                return continuation.exit(null);
+              }
+
+              return continuation({match});
+            },
+          },
+        },
+      ]),
   };
 }
