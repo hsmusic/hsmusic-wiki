@@ -303,23 +303,32 @@ export class Track extends Thing {
     artistContribs: Thing.composite.from(`Track.artistContribs`, [
       Track.composite.inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      Track.composite.withAlbumProperties({properties: ['artistContribs']}),
       Thing.composite.withResolvedContribs({
         from: 'artistContribsByRef',
         to: '#artistContribs',
       }),
 
       {
+        flags: {expose: true, compose: true},
+        expose: {
+          mapDependencies: {contribsFromTrack: '#artistContribs'},
+          compute: ({contribsFromTrack}, continuation) =>
+            (empty(contribsFromTrack)
+              ? continuation()
+              : contribsFromTrack),
+        },
+      },
+
+      Track.composite.withAlbumProperties({properties: ['artistContribs']}),
+
+      {
         flags: {expose: true},
         expose: {
-          dependencies: ['#artistContribs', '#album.artistContribs'],
-          compute: ({
-            '#artistContribs': contribsFromTrack,
-            '#album.artistContribs': contribsFromAlbum,
-          }) =>
-            (empty(contribsFromTrack)
-              ? contribsFromAlbum
-              : contribsFromTrack),
+          mapDependencies: {contribsFromAlbum: '#album.artistContribs'},
+          compute: ({contribsFromAlbum}) =>
+            (empty(contribsFromAlbum)
+              ? null
+              : contribsFromAlbum),
         },
       },
     ]),
