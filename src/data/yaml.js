@@ -1320,13 +1320,27 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
 // Data linking! Basically, provide (portions of) wikiData to the Things which
 // require it - they'll expose dynamically computed properties as a result (many
-// of which are required for page HTML generation).
-export function linkWikiDataArrays(wikiData) {
+// of which are required for page HTML generation and other expected behavior).
+//
+// The XXX_decacheWikiData option should be used specifically to mark
+// points where you *aren't* replacing any of the arrays under wikiData with
+// new values, and are using linkWikiDataArrays to instead "decache" data
+// properties which depend on any of them. It's currently not possible for
+// a CacheableObject to depend directly on the value of a property exposed
+// on some other CacheableObject, so when those values change, you have to
+// manually decache before the object will realize its cache isn't valid
+// anymore.
+export function linkWikiDataArrays(wikiData, {
+  XXX_decacheWikiData = false,
+} = {}) {
   function assignWikiData(things, ...keys) {
+    if (things === undefined) return;
     for (let i = 0; i < things.length; i++) {
       const thing = things[i];
       for (let j = 0; j < keys.length; j++) {
         const key = keys[j];
+        if (!(key in wikiData)) continue;
+        if (XXX_decacheWikiData) thing[key] = [];
         thing[key] = wikiData[key];
       }
     }
@@ -1344,7 +1358,7 @@ export function linkWikiDataArrays(wikiData) {
   assignWikiData(WD.flashData, 'artistData', 'flashActData', 'trackData');
   assignWikiData(WD.flashActData, 'flashData');
   assignWikiData(WD.artTagData, 'albumData', 'trackData');
-  assignWikiData(WD.homepageLayout.rows, 'albumData', 'groupData');
+  assignWikiData(WD.homepageLayout?.rows, 'albumData', 'groupData');
 }
 
 export function sortWikiDataArrays(wikiData) {

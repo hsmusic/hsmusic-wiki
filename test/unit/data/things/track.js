@@ -1,4 +1,6 @@
 import t from 'tap';
+
+import {linkAndBindWikiData} from '#test-lib';
 import thingConstructors from '#things';
 
 const {
@@ -6,30 +8,28 @@ const {
   Artist,
   Thing,
   Track,
-  TrackGroup,
 } = thingConstructors;
 
-function stubAlbum(tracks) {
+function stubAlbum(tracks, directory = 'bar') {
   const album = new Album();
-  album.trackSections = [
-    {
-      tracksByRef: tracks.map(t => Thing.getReference(t)),
-    },
-  ];
-  album.trackData = tracks;
+  album.directory = directory;
+
+  const tracksByRef = tracks.map(t => Thing.getReference(t));
+  album.trackSections = [{tracksByRef}];
+
   return album;
 }
 
 function stubTrack(directory = 'foo') {
   const track = new Track();
   track.directory = directory;
+
   return track;
 }
 
-function stubTrackAndAlbum(trackDirectory = 'foo') {
+function stubTrackAndAlbum(trackDirectory = 'foo', albumDirectory = 'bar') {
   const track = stubTrack(trackDirectory);
-  const album = stubAlbum([track]);
-  track.albumData = [album];
+  const album = stubAlbum([track], albumDirectory);
   return {track, album};
 }
 
@@ -39,33 +39,8 @@ function stubArtistAndContribs() {
 
   const contribs = [{who: `Test Artist`, what: null}];
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
+
   return {artist, contribs, badContribs};
-}
-
-function assignWikiData({
-  XXX_DECACHE = false,
-  albumData,
-  trackData,
-}) {
-  for (const album of albumData ?? []) {
-    if (XXX_DECACHE) {
-      album.trackData = [];
-    }
-    album.trackData = trackData ?? [];
-  }
-
-  for (const track of trackData ?? []) {
-    if (XXX_DECACHE) {
-      track.albumData = [];
-      track.trackData = [];
-    }
-    track.albumData = albumData ?? [];
-    track.trackData = trackData ?? [];
-  }
-}
-
-function XXX_CLEAR_TRACK_ALBUM_CACHE(track, album) {
-  assignWikiData({XXX_DECACHE: true, albumData: [album], trackData: [track]});
 }
 
 t.test(`Track.color`, t => {
@@ -73,11 +48,16 @@ t.test(`Track.color`, t => {
 
   const {track, album} = stubTrackAndAlbum();
 
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    trackData: [track],
+  });
+
   t.equal(track.color, null,
     `color #1: defaults to null`);
 
   album.color = '#abcdef';
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+  XXX_decacheWikiData();
 
   t.equal(track.color, '#abcdef',
     `color #2: inherits from album`);
@@ -94,14 +74,20 @@ t.test(`Track.coverArtDate`, t => {
   const {track, album} = stubTrackAndAlbum();
   const {artist, contribs} = stubArtistAndContribs();
 
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    trackData: [track],
+    albumData: [album],
+    artistData: [artist],
+  });
+
   track.coverArtistContribsByRef = contribs;
-  track.artistData = [artist];
 
   t.equal(track.coverArtDate, null,
     `coverArtDate #1: defaults to null`);
 
   album.trackArtDate = new Date('2012-12-12');
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+
+  XXX_decacheWikiData();
 
   t.same(track.coverArtDate, new Date('2012-12-12'),
     `coverArtDate #2: inherits album trackArtDate`);
@@ -117,7 +103,8 @@ t.test(`Track.coverArtDate`, t => {
     `coverArtDate #4: is null if track is missing coverArtists`);
 
   album.trackCoverArtistContribsByRef = contribs;
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+
+  XXX_decacheWikiData();
 
   t.same(track.coverArtDate, new Date('2009-09-09'),
     `coverArtDate #5: is not null if album specifies trackCoverArtistContribs`);
@@ -133,11 +120,16 @@ t.test(`Track.date`, t => {
 
   const {track, album} = stubTrackAndAlbum();
 
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    trackData: [track],
+  });
+
   t.equal(track.date, null,
     `date #1: defaults to null`);
 
   album.date = new Date('2012-12-12');
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+  XXX_decacheWikiData();
 
   t.same(track.date, album.date,
     `date #2: inherits from album`);
@@ -154,14 +146,17 @@ t.test(`Track.hasUniqueCoverArt`, t => {
   const {track, album} = stubTrackAndAlbum();
   const {artist, contribs, badContribs} = stubArtistAndContribs();
 
-  track.artistData = [artist];
-  album.artistData = [artist];
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+    trackData: [track],
+  });
 
   t.equal(track.hasUniqueCoverArt, false,
     `hasUniqueCoverArt #1: defaults to false`);
 
   album.trackCoverArtistContribsByRef = contribs;
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+  XXX_decacheWikiData();
 
   t.equal(track.hasUniqueCoverArt, true,
     `hasUniqueCoverArt #2: is true if album specifies trackCoverArtistContribs`);
@@ -174,7 +169,7 @@ t.test(`Track.hasUniqueCoverArt`, t => {
   track.disableUniqueCoverArt = false;
 
   album.trackCoverArtistContribsByRef = badContribs;
-  XXX_CLEAR_TRACK_ALBUM_CACHE(track, album);
+  XXX_decacheWikiData();
 
   t.equal(track.hasUniqueCoverArt, false,
     `hasUniqueCoverArt #4: is false if album's trackCoverArtistContribsByRef resolve empty`);
@@ -205,9 +200,10 @@ t.test(`Track.otherReleases`, t => {
   const {track: track3, album: album3} = stubTrackAndAlbum('track3');
   const {track: track4, album: album4} = stubTrackAndAlbum('track4');
 
-  let trackData = [track1, track2, track3, track4];
-  let albumData = [album1, album2, album3, album4];
-  assignWikiData({trackData, albumData});
+  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
+    trackData: [track1, track2, track3, track4],
+    albumData: [album1, album2, album3, album4],
+  });
 
   t.same(track1.otherReleases, [],
     `otherReleases #1: defaults to empty array`);
@@ -215,19 +211,20 @@ t.test(`Track.otherReleases`, t => {
   track2.originalReleaseTrackByRef = 'track:track1';
   track3.originalReleaseTrackByRef = 'track:track1';
   track4.originalReleaseTrackByRef = 'track:track1';
-  assignWikiData({trackData, albumData, XXX_DECACHE: true});
+
+  XXX_decacheWikiData();
 
   t.same(track1.otherReleases, [track2, track3, track4],
     `otherReleases #2: otherReleases of original release are its rereleases`);
 
-  trackData = [track1, track3, track2, track4];
-  assignWikiData({trackData, albumData});
+  wikiData.trackData = [track1, track3, track2, track4];
+  linkWikiDataArrays();
 
   t.same(track1.otherReleases, [track3, track2, track4],
     `otherReleases #3: otherReleases matches trackData order`);
 
-  trackData = [track3, track2, track1, track4];
-  assignWikiData({trackData, albumData});
+  wikiData.trackData = [track3, track2, track1, track4];
+  linkWikiDataArrays();
 
   t.same(track2.otherReleases, [track1, track3, track4],
     `otherReleases #4: otherReleases of rerelease are original track then other rereleases (1/3)`);
