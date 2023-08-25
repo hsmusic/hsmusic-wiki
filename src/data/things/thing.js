@@ -1187,7 +1187,7 @@ export default class Thing extends CacheableObject {
                 return continuation.exit(null);
               }
 
-              return continuation({match});
+              return continuation.raise({match});
             },
           },
         },

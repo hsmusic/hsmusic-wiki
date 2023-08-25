@@ -454,12 +454,12 @@ export class Track extends Thing {
             dependencies: ['#originalRelease'],
 
             compute({'#originalRelease': originalRelease}, continuation) {
-              if (!originalRelease) return continuation();
+              if (!originalRelease) return continuation.raise();
 
               const value = originalRelease[originalProperty];
-              if (allowOverride && value === null) return continuation();
+              if (allowOverride && value === null) return continuation.raise();
 
-              return value;
+              return continuation.exit(value);
             },
           },
         }
