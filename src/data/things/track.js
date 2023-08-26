@@ -474,33 +474,84 @@ export class Track extends Thing {
         }
       ]),
 
-    // Gets the listed properties from this track's album, providing them as
-    // dependencies (by default) with '#album.' prefixed before each property
-    // name. If the track's album isn't available, the same dependency names
-    // will each be provided as null.
-    withAlbumProperties: ({properties, prefix = '#album'}) => ({
-      annotation: `Track.composite.withAlbumProperties`,
+    // Gets the track's album. Unless earlyExitIfNotFound is overridden false,
+    // this will early-exit with null in two cases - albumData being missing,
+    // or not including an album whose .tracks array includes this track.
+    withAlbum: ({to = '#album', earlyExitIfNotFound = true} = {}) => ({
+      annotation: `Track.composite.withAlbum`,
       flags: {expose: true, compose: true},
 
       expose: {
         dependencies: ['this', 'albumData'],
-        options: {properties, prefix},
+        mapContinuation: {to},
+        options: {earlyExitIfNotFound},
 
-        compute({this: track, albumData, '#options': {properties, prefix}}, continuation) {
-          const album = albumData?.find((album) => album.tracks.includes(track));
-          const newDependencies = {};
-
-          for (const property of properties) {
-            newDependencies[prefix + '.' + property] =
-              (album
-                ? album[property]
-                : null);
+        compute({
+          this: track,
+          albumData,
+          '#options': {earlyExitIfNotFound},
+        }, continuation) {
+          if (empty(albumData)) {
+            return (
+              (earlyExitIfNotFound
+                ? continuation.exit(null)
+                : continuation({to: null})));
           }
 
-          return continuation(newDependencies);
+          const album =
+            albumData?.find(album => album.tracks.includes(track));
+
+          if (!album) {
+            return (
+              (earlyExitIfNotFound
+                ? continuation.exit(null)
+                : continuation({to: null})));
+          }
+
+          return continuation({to: album});
         },
       },
     }),
+
+    // Gets the listed properties from this track's album, providing them as
+    // dependencies (by default) with '#album.' prefixed before each property
+    // name. If the track's album isn't available, and earlyExitIfNotFound
+    // hasn't been set, the same dependency names will be provided as null.
+    withAlbumProperties: ({
+      properties,
+      prefix = '#album',
+      earlyExitIfNotFound = false,
+    }) =>
+      Thing.composite.from(`Track.composite.withAlbumProperties`, [
+        Track.composite.withAlbum({earlyExitIfNotFound}),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#album'],
+            options: {properties, prefix},
+
+            compute({
+              '#album': album,
+              '#options': {properties, prefix},
+            }, continuation) {
+              const raise = {};
+
+              if (album) {
+                for (const property of properties) {
+                  raise[prefix + '.' + property] = album[property];
+                }
+              } else {
+                for (const property of properties) {
+                  raise[prefix + '.' + property] = null;
+                }
+              }
+
+              return continuation.raise(raise);
+            },
+          },
+        },
+      ]),
 
     // Just includes the original release of this track as a dependency, or
     // null, if it's not a rerelease. Note that this will early exit if the
