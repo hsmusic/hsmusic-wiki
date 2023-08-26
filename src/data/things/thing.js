@@ -1116,9 +1116,11 @@ export default class Thing extends CacheableObject {
 
     // Exposes a dependency exactly as it is; this is typically the base of a
     // composition which was created to serve as one property's descriptor.
-    // Since this serves as a base, specify {update: true} to indicate that
-    // the property as a whole updates (and some previous compositional step
-    // works with that update value).
+    // Since this serves as a base, specify a value for {update} to indicate
+    // that the property as a whole updates (and some previous compositional
+    // step works with that update value). Set {update: true} to only enable
+    // the update flag, or set update to an object to specify a descriptor
+    // (e.g. for custom value validation).
     //
     // Please note that this *doesn't* verify that the dependency exists, so
     // if you provide the wrong name or it hasn't been set by a previous
@@ -1127,17 +1129,23 @@ export default class Thing extends CacheableObject {
     //
     expose: (dependency, {update = false} = {}) => ({
       annotation: `Thing.composite.expose`,
-      flags: {expose: true, update},
+      flags: {expose: true, update: !!update},
 
       expose: {
         mapDependencies: {dependency},
         compute: ({dependency}) => dependency,
       },
+
+      update:
+        (typeof update === 'object'
+          ? update
+          : null),
     }),
 
     // Exposes the update value of an {update: true} property, or continues if
     // it's unavailable. By default, "unavailable" means value === null, but
-    // set {mode: 'empty'} to
+    // set {mode: 'empty'} to check with empty() instead, continuing for empty
+    // arrays also.
     exposeUpdateValueOrContinue({mode = 'null'} = {}) {
       if (mode !== 'null' && mode !== 'empty') {
         throw new TypeError(`Expected mode to be null or empty`);
@@ -1156,7 +1164,7 @@ export default class Thing extends CacheableObject {
                 : value === null);
 
             if (shouldContinue) {
-              return continuation();
+              return continuation(value);
             } else {
               return continuation.exit(value);
             }

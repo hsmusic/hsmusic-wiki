@@ -47,7 +47,9 @@ export class Track extends Thing {
     color: Thing.composite.from(`Track.color`, [
       Thing.composite.exposeUpdateValueOrContinue(),
       Track.composite.withAlbumProperty('color'),
-      Thing.composite.expose('#album.color', {update: true}),
+      Thing.composite.expose('#album.color', {
+        update: {validate: isColor},
+      }),
     ]),
 
     // Disables presenting the track as though it has its own unique artwork.

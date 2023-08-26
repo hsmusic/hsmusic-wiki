@@ -97,7 +97,7 @@ t.test(`Track.album`, t => {
 });
 
 t.test(`Track.color`, t => {
-  t.plan(3);
+  t.plan(4);
 
   const {track, album} = stubTrackAndAlbum();
 
@@ -119,6 +119,9 @@ t.test(`Track.color`, t => {
 
   t.equal(track.color, '#123456',
     `color #3: is own value`);
+
+  t.throws(() => { track.color = '#aeiouw'; }, TypeError,
+    `color #4: must be set to valid color`);
 });
 
 t.test(`Track.coverArtDate`, t => {
