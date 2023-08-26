@@ -45,26 +45,9 @@ export class Track extends Thing {
     artTagsByRef: Thing.common.referenceList(ArtTag),
 
     color: Thing.composite.from(`Track.color`, [
-      {
-        flags: {expose: true, compose: true},
-        expose: {
-          transform: (color, {}, continuation) =>
-            color ?? continuation(),
-        },
-      },
-
-      Track.composite.withAlbumProperties({
-        properties: ['color'],
-      }),
-
-      {
-        flags: {update: true, expose: true},
-        update: {validate: isColor},
-        expose: {
-          dependencies: ['#album.color'],
-          compute: ({'#album.color': color}) => color,
-        },
-      },
+      Thing.composite.exposeUpdateValueOrContinue(),
+      Track.composite.withAlbumProperty('color'),
+      Thing.composite.expose('#album.color', {update: true}),
     ]),
 
     // Disables presenting the track as though it has its own unique artwork.
@@ -169,15 +152,11 @@ export class Track extends Thing {
 
     commentatorArtists: Thing.common.commentatorArtists(),
 
-    album: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'albumData'],
-        compute: ({this: track, albumData}) =>
-          albumData?.find((album) => album.tracks.includes(track)) ?? null,
-      },
-    },
+    album:
+      Thing.composite.from(`Track.album`, [
+        Track.composite.withAlbum(),
+        Thing.composite.expose('#album'),
+      ]),
 
     // Note - this is an internal property used only to help identify a track.
     // It should not be assumed in general that the album and dataSourceAlbum match
@@ -202,17 +181,8 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties({
-        properties: ['date'],
-      }),
-
-      {
-        flags: {expose: true},
-        expose: {
-          dependencies: ['#album.date'],
-          compute: ({'#album.date': date}) => date,
-        },
-      },
+      Track.composite.withAlbumProperties({properties: ['date']}),
+      Thing.composite.expose('#album.date'),
     ]),
 
     // Whether or not the track has "unique" cover artwork - a cover which is
@@ -369,20 +339,8 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties({
-        properties: ['trackCoverArtistContribs'],
-      }),
-
-      {
-        flags: {expose: true},
-        expose: {
-          mapDependencies: {contribsFromAlbum: '#album.trackCoverArtistContribs'},
-          compute: ({contribsFromAlbum}) =>
-            (empty(contribsFromAlbum)
-              ? null
-              : contribsFromAlbum),
-        },
-      },
+      Track.composite.withAlbumProperty('trackCoverArtistContribs'),
+      Thing.composite.expose('#album.trackCoverArtistContribs'),
     ]),
 
     referencedTracks: Thing.composite.from(`Track.referencedTracks`, [
@@ -512,6 +470,35 @@ export class Track extends Thing {
         },
       },
     }),
+
+    // Gets a single property from this track's album, providing it as the same
+    // property name prefixed with '#album.' (by default). If the track's album
+    // isn't available, and earlyExitIfNotFound hasn't been set, the property
+    // will be provided as null.
+    withAlbumProperty: (property, {
+      to = '#album.' + property,
+      earlyExitIfNotFound = false,
+    } = {}) =>
+      Thing.composite.from(`Track.composite.withAlbumProperty`, [
+        Track.composite.withAlbum({earlyExitIfNotFound}),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#album'],
+            options: {property},
+            mapContinuation: {to},
+
+            compute: ({
+              '#album': album,
+              '#options': {property},
+            }, continuation) =>
+              (album
+                ? continuation.raise({to: album[property]})
+                : continuation.raise({to: null})),
+          },
+        },
+      ]),
 
     // Gets the listed properties from this track's album, providing them as
     // dependencies (by default) with '#album.' prefixed before each property

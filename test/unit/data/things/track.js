@@ -43,6 +43,59 @@ function stubArtistAndContribs() {
   return {artist, contribs, badContribs};
 }
 
+t.test(`Track.album`, t => {
+  t.plan(6);
+
+  // Note: These asserts use manual albumData/trackData relationships
+  // to illustrate more specifically the properties which are expected to
+  // be relevant for this case. Other properties use the same underlying
+  // get-album behavior as Track.album so aren't tested as aggressively.
+
+  const track1 = stubTrack('track1');
+  const track2 = stubTrack('track2');
+  const album1 = new Album();
+  const album2 = new Album();
+
+  t.equal(track1.album, null,
+    `album #1: defaults to null`);
+
+  track1.albumData = [album1, album2];
+  track2.albumData = [album1, album2];
+  album1.trackData = [track1, track2];
+  album2.trackData = [track1, track2];
+  album1.trackSections = [{tracksByRef: ['track:track1']}];
+  album2.trackSections = [{tracksByRef: ['track:track2']}];
+
+  t.equal(track1.album, album1,
+    `album #2: is album when album's trackSections matches track`);
+
+  track1.albumData = [album2, album1];
+
+  t.equal(track1.album, album1,
+    `album #3: is album when albumData is in different order`);
+
+  track1.albumData = [];
+
+  t.equal(track1.album, null,
+    `album #4: is null when track missing albumData`);
+
+  album1.trackData = [];
+  track1.albumData = [album1, album2];
+
+  t.equal(track1.album, null,
+    `album #5: is null when album missing trackData`);
+
+  album1.trackData = [track1, track2];
+  album1.trackSections = [{tracksByRef: ['track:track2']}];
+
+  // XXX_decacheWikiData
+  track1.albumData = [];
+  track1.albumData = [album1, album2];
+
+  t.equal(track1.album, null,
+    `album #6: is null when album's trackSections don't match track`);
+});
+
 t.test(`Track.color`, t => {
   t.plan(3);
 

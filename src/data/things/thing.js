@@ -1114,6 +1114,57 @@ export default class Thing extends CacheableObject {
       };
     },
 
+    // Exposes a dependency exactly as it is; this is typically the base of a
+    // composition which was created to serve as one property's descriptor.
+    // Since this serves as a base, specify {update: true} to indicate that
+    // the property as a whole updates (and some previous compositional step
+    // works with that update value).
+    //
+    // Please note that this *doesn't* verify that the dependency exists, so
+    // if you provide the wrong name or it hasn't been set by a previous
+    // compositional step, the property will be exposed as undefined instead
+    // of null.
+    //
+    expose: (dependency, {update = false} = {}) => ({
+      annotation: `Thing.composite.expose`,
+      flags: {expose: true, update},
+
+      expose: {
+        mapDependencies: {dependency},
+        compute: ({dependency}) => dependency,
+      },
+    }),
+
+    // Exposes the update value of an {update: true} property, or continues if
+    // it's unavailable. By default, "unavailable" means value === null, but
+    // set {mode: 'empty'} to
+    exposeUpdateValueOrContinue({mode = 'null'} = {}) {
+      if (mode !== 'null' && mode !== 'empty') {
+        throw new TypeError(`Expected mode to be null or empty`);
+      }
+
+      return {
+        annotation: `Thing.composite.exposeUpdateValueOrContinue`,
+        flags: {expose: true, compose: true},
+        expose: {
+          options: {mode},
+
+          transform(value, {'#options': {mode}}, continuation) {
+            const shouldContinue =
+              (mode === 'empty'
+                ? empty(value)
+                : value === null);
+
+            if (shouldContinue) {
+              return continuation();
+            } else {
+              return continuation.exit(value);
+            }
+          }
+        },
+      };
+    },
+
     // Resolves the contribsByRef contained in the provided dependency,
     // providing (named by the second argument) the result. "Resolving"
     // means mapping the "who" reference of each contribution to an artist
