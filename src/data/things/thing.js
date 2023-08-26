@@ -969,7 +969,7 @@ export default class Thing extends CacheableObject {
               debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
               debug(() => color.bright(`end composition (annotation: ${annotation})`));
 
-              return continuationSymbol.providedValue;
+              return continuationStorage.providedValue;
             }
 
             if (continuationStorage.returnedWith === 'raise') {
