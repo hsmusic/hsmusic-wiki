@@ -780,6 +780,16 @@ export default class Thing extends CacheableObject {
               break expose;
             }
 
+            if (
+              step.expose.transform &&
+              !step.expose.compute &&
+              !base.flags.update &&
+              !base.flags.compose
+            ) {
+              push(new TypeError(`Steps which only transform can't be composed with a non-updating base`));
+              break expose;
+            }
+
             if (step.expose.dependencies) {
               for (const dependency of step.expose.dependencies) {
                 if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
@@ -794,26 +804,7 @@ export default class Thing extends CacheableObject {
               }
             }
 
-            let fn, type;
-            if (base.flags.update) {
-              if (step.expose.transform) {
-                type = 'transform';
-                fn = step.expose.transform;
-              } else {
-                type = 'compute';
-                fn = step.expose.compute;
-              }
-            } else {
-              if (step.expose.transform && !step.expose.compute) {
-                push(new TypeError(`Steps which only transform can't be composed with a non-updating base`));
-                break expose;
-              }
-
-              type = 'compute';
-              fn = step.expose.compute;
-            }
-
-            exposeSteps.push(step.expose);
+            exposeSteps.push(step);
           }
         });
       }
@@ -845,38 +836,38 @@ export default class Thing extends CacheableObject {
 
         function _filterDependencies(dependencies, step) {
           const filteredDependencies =
-            (step.dependencies
-              ? filterProperties(dependencies, step.dependencies)
+            (step.expose.dependencies
+              ? filterProperties(dependencies, step.expose.dependencies)
               : {});
 
-          if (step.mapDependencies) {
-            for (const [to, from] of Object.entries(step.mapDependencies)) {
+          if (step.expose.mapDependencies) {
+            for (const [to, from] of Object.entries(step.expose.mapDependencies)) {
               filteredDependencies[to] = dependencies[from] ?? null;
             }
           }
 
-          if (step.options) {
-            filteredDependencies['#options'] = step.options;
+          if (step.expose.options) {
+            filteredDependencies['#options'] = step.expose.options;
           }
 
           return filteredDependencies;
         }
 
         function _assignDependencies(continuationAssignment, step) {
-          if (!step.mapContinuation) {
+          if (!step.expose.mapContinuation) {
             return continuationAssignment;
           }
 
           const assignDependencies = {};
 
-          for (const [from, to] of Object.entries(step.mapContinuation)) {
+          for (const [from, to] of Object.entries(step.expose.mapContinuation)) {
             assignDependencies[to] = continuationAssignment[from] ?? null;
           }
 
           return assignDependencies;
         }
 
-        function _prepareContinuation(transform, step) {
+        function _prepareContinuation(transform) {
           const continuationStorage = {
             returnedWith: null,
             providedDependencies: null,
@@ -930,27 +921,25 @@ export default class Thing extends CacheableObject {
 
           debug(() => color.bright(`begin composition (annotation: ${annotation})`));
 
-          for (let i = 0; i < exposeSteps.length; i++) {
+          stepLoop: for (let i = 0; i < exposeSteps.length; i++) {
             const step = exposeSteps[i];
             debug(() => [`step #${i+1}:`, step]);
 
             const transform =
               valueSoFar !== noTransformSymbol &&
-              step.transform;
+              step.expose.transform;
 
             const filteredDependencies = _filterDependencies(dependencies, step);
-            const {continuation, continuationStorage} = _prepareContinuation(transform, step);
+            const {continuation, continuationStorage} = _prepareContinuation(transform);
 
-            if (transform) {
-              debug(() => `step #${i+1} - transform with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
-            } else {
-              debug(() => `step #${i+1} - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
-            }
+            debug(() =>
+              `step #${i+1} - ${transform ? 'transform' : 'compute'} ` +
+              `with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
 
             const result =
               (transform
-                ? step.transform(valueSoFar, filteredDependencies, continuation)
-                : step.compute(filteredDependencies, continuation));
+                ? step.expose.transform(valueSoFar, filteredDependencies, continuation)
+                : step.expose.compute(filteredDependencies, continuation));
 
             if (result !== continuationSymbol) {
               if (base.flags.compose) {
@@ -964,39 +953,34 @@ export default class Thing extends CacheableObject {
               return result;
             }
 
-            if (continuationStorage.returnedWith === 'exit') {
-              debug(() => `step #${i+1} - result: early-exit (explicit)`);
-              debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
-              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+            switch (continuationStorage.returnedWith) {
+              case 'exit':
+                debug(() => `step #${i+1} - result: early-exit (explicit)`);
+                debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
+                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                return continuationStorage.providedValue;
 
-              return continuationStorage.providedValue;
-            }
+              case 'raise':
+                debug(() => `step #${i+1} - result: raise`);
+                exportDependencies = _assignDependencies(continuationStorage.providedDependencies, step) ?? {};
+                if (transform) valueSoFar = continuationStorage.providedValue;
+                break stepLoop;
 
-            if (continuationStorage.returnedWith === 'raise') {
-              if (transform) {
-                valueSoFar = continuationStorage.providedValue;
-              }
+              case 'continuation':
+                if (transform) {
+                  valueSoFar = continuationStorage.providedValue;
+                }
 
-              exportDependencies = _assignDependencies(continuationStorage.providedDependencies, step);
+                if (continuationStorage.providedDependencies) {
+                  const assignDependencies = _assignDependencies(continuationStorage.providedDependencies, step);
+                  Object.assign(dependencies, assignDependencies);
+                  debug(() => `step #${i+1} - result: continuation`);
+                  debug(() => [`assign dependencies:`, assignDependencies]);
+                } else {
+                  debug(() => `step #${i+1} - result: continuation (no provided dependencies)`);
+                }
 
-              debug(() => `step #${i+1} - result: raise`);
-
-              break;
-            }
-
-            if (continuationStorage.returnedWith === 'continuation') {
-              if (transform) {
-                valueSoFar = continuationStorage.providedValue;
-              }
-
-              debug(() => `step #${i+1} - result: continuation`);
-
-              if (continuationStorage.providedDependencies) {
-                const assignDependencies = _assignDependencies(continuationStorage.providedDependencies, step);
-                Object.assign(dependencies, assignDependencies);
-
-                debug(() => [`assign dependencies:`, assignDependencies]);
-              }
+                break;
             }
           }
 
@@ -1008,53 +992,50 @@ export default class Thing extends CacheableObject {
 
           debug(() => `completed all steps, reached base`);
 
-          const filteredDependencies = _filterDependencies(dependencies, base.expose);
+          const filteredDependencies = _filterDependencies(dependencies, base);
 
-          // Note: base.flags.compose is not compatible with base.flags.update.
-          if (base.expose.transform) {
-            debug(() => `base - transform with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+          const transform =
+            valueSoFar !== noTransformSymbol &&
+            base.expose.transform;
 
-            const result = base.expose.transform(valueSoFar, filteredDependencies);
+          debug(() =>
+            `base - ${transform ? 'transform' : 'compute'} ` +
+            `with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
 
-            debug(() => `base - non-compose (final) result: ${inspect(result, {compact: true})}`);
+          if (base.flags.compose) {
+            const {continuation, continuationStorage} = _prepareContinuation(transform);
 
-            return result;
-          } else if (base.flags.compose) {
-            const {continuation, continuationStorage} = _prepareContinuation(false, base.expose);
-
-            debug(() => `base - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
-
-            const result = base.expose.compute(filteredDependencies, continuation);
+            const result =
+              (transform
+                ? base.expose.transform(valueSoFar, filteredDependencies, continuation)
+                : base.expose.compute(filteredDependencies, continuation));
 
             if (result !== continuationSymbol) {
               throw new TypeError(`Use continuation.exit() or continuation.raise() in {compose: true} composition`);
             }
 
-            if (continuationStorage.returnedWith === 'continuation') {
-              throw new TypeError(`Use continuation.raise() in base of {compose: true} composition`);
-            }
+            switch (continuationStorage.returnedWith) {
+              case 'continuation':
+                throw new TypeError(`Use continuation.raise() in base of {compose: true} composition`);
 
-            if (continuationStorage.returnedWith === 'exit') {
-              debug(() => `base - result: early-exit (explicit)`);
-              debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
-              debug(() => color.bright(`end composition (annotation: ${annotation})`));
+              case 'exit':
+                debug(() => `base - result: early-exit (explicit)`);
+                debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
+                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                return continuationStorage.providedValue;
 
-              return continuationStorage.providedValue;
-            }
-
-            if (continuationStorage.returnedWith === 'raise') {
-              exportDependencies = _assignDependencies(continuationStorage.providedDependencies, base.expose);
-
-              debug(() => `base - result: raise`);
-              debug(() => `raise dependencies: ${inspect(exportDependencies, {compact: true})}`);
-              debug(() => color.bright(`end composition (annotation: ${annotation})`));
-
-              return continuationIfApplicable(exportDependencies);
+              case 'raise':
+                exportDependencies = _assignDependencies(continuationStorage.providedDependencies, base);
+                debug(() => `base - result: raise`);
+                debug(() => `raise dependencies: ${inspect(exportDependencies, {compact: true})}`);
+                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                return continuationIfApplicable(exportDependencies);
             }
           } else {
-            debug(() => `base - compute with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
-
-            const result = base.expose.compute(filteredDependencies);
+            const result =
+              (transform
+                ? base.expose.transform(valueSoFar, filteredDependencies)
+                : base.expose.compute(filteredDependencies));
 
             debug(() => `base - non-compose (final) result: ${inspect(result, {compact: true})}`);
             debug(() => color.bright(`end composition (annotation: ${annotation})`));
@@ -1063,14 +1044,23 @@ export default class Thing extends CacheableObject {
           }
         }
 
-        if (base.flags.update) {
-          expose.transform =
-            (value, initialDependencies, continuationIfApplicable) =>
-              _computeOrTransform(value, initialDependencies, continuationIfApplicable);
+        const transformFn =
+          (value, initialDependencies, continuationIfApplicable) =>
+            _computeOrTransform(value, initialDependencies, continuationIfApplicable);
+
+        const computeFn =
+          (initialDependencies, continuationIfApplicable) =>
+            _computeOrTransform(noTransformSymbol, initialDependencies, continuationIfApplicable);
+
+        if (base.flags.compose) {
+          if (exposeSteps.some(step => step.expose.transform)) {
+            expose.transform = transformFn;
+          }
+          expose.compute = computeFn;
+        } else if (base.flags.update) {
+          expose.transform = transformFn;
         } else {
-          expose.compute =
-            (initialDependencies, continuationIfApplicable) =>
-              _computeOrTransform(noTransformSymbol, initialDependencies, continuationIfApplicable);
+          expose.compute = computeFn;
         }
       }
 
@@ -1146,68 +1136,177 @@ export default class Thing extends CacheableObject {
           : null),
     }),
 
-    // Exposes a dependency as it is, or continues if it's unavailable.
-    // By default, "unavailable" means dependency === null; provide
-    // {mode: 'empty'} to check with empty() instead, continuing for
-    // empty arrays also.
-    exposeDependencyOrContinue(dependency, {mode = 'null'} = {}) {
-      if (mode !== 'null' && mode !== 'empty') {
-        throw new TypeError(`Expected mode to be null or empty`);
+    // Exposes a constant value exactly as it is; like exposeDependency, this
+    // is typically the base of a composition serving as a particular property
+    // descriptor. It generally follows steps which will conditionally early
+    // exit with some other value, with the exposeConstant base serving as the
+    // fallback default value. Like exposeDependency, set {update} to true or
+    // an object to indicate that the property as a whole updates.
+    exposeConstant: (value, {update = false} = {}) => ({
+      annotation: `Thing.composite.exposeConstant`,
+      flags: {expose: true, update: !!update},
+
+      expose: {
+        options: {value},
+        compute: ({'#options': {value}}) => value,
+      },
+
+      update:
+        (typeof update === 'object'
+          ? update
+          : null),
+    }),
+
+    // Checks the availability of a dependency or the update value and provides
+    // the result to later steps under '#availability' (by default). This is
+    // mainly intended for use by the more specific utilities, which you should
+    // consider using instead. Customize {mode} to select one of these modes,
+    // or leave unset and default to 'null':
+    //
+    // * 'null':  Check that the value isn't null.
+    // * 'empty': Check that the value is neither null nor an empty array.
+    // * 'falsy': Check that the value isn't false when treated as a boolean
+    //            (nor an empty array). Keep in mind this will also be false
+    //            for values like zero and the empty string!
+    //
+    withResultOfAvailabilityCheck({
+      fromUpdateValue,
+      fromDependency,
+      mode = 'null',
+      to = '#availability',
+    }) {
+      if (!['null', 'empty', 'falsy'].includes(mode)) {
+        throw new TypeError(`Expected mode to be null, empty, or falsy`);
       }
 
-      return {
-        annotation: `Thing.composite.exposeDependencyOrContinue`,
-        flags: {expose: true, compose: true},
-        expose: {
-          options: {mode},
-          mapDependencies: {dependency},
+      if (fromUpdateValue && fromDependency) {
+        throw new TypeError(`Don't provide both fromUpdateValue and fromDependency`);
+      }
 
-          compute({dependency, '#options': {mode}}, continuation) {
-            const shouldContinue =
-              (mode === 'empty'
-                ? empty(dependency)
-                : dependency === null);
+      if (!fromUpdateValue && !fromDependency) {
+        throw new TypeError(`Missing dependency name (or fromUpdateValue)`);
+      }
 
-            if (shouldContinue) {
-              return continuation();
-            } else {
-              return continuation.exit(dependency);
-            }
+      const checkAvailability = (value, mode) => {
+        switch (mode) {
+          case 'null': return value !== null;
+          case 'empty': return !empty(value);
+          case 'falsy': return !empty(value) && !!value;
+          default: return false;
+        }
+      };
+
+      if (fromDependency) {
+        return {
+          annotation: `Thing.composite.withResultOfCommonComparison.fromDependency`,
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {from: fromDependency},
+            mapContinuation: {to},
+            options: {mode},
+            compute: ({from, '#options': {mode}}, continuation) =>
+              continuation({to: checkAvailability(from, mode)}),
+          },
+        };
+      } else {
+        return {
+          annotation: `Thing.composite.withResultOfCommonComparison.fromUpdateValue`,
+          flags: {expose: true, compose: true},
+          expose: {
+            mapContinuation: {to},
+            options: {mode},
+            transform: (value, {'#options': {mode}}, continuation) =>
+              continuation(value, {to: checkAvailability(value, mode)}),
+          },
+        };
+      }
+    },
+
+    // Exposes a dependency as it is, or continues if it's unavailable.
+    // See withResultOfAvailabilityCheck for {mode} options!
+    exposeDependencyOrContinue: (dependency, {mode = 'null'} = {}) =>
+      Thing.composite.from(`Thing.composite.exposeDependencyOrContinue`, [
+        Thing.composite.withResultOfAvailabilityCheck({
+          fromDependency: dependency,
+          mode,
+        }),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#availability'],
+            compute: ({'#availability': availability}, continuation) =>
+              (availability
+                ? continuation()
+                : continuation.raise()),
           },
         },
-      };
-    },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {dependency},
+            compute: ({dependency}, continuation) =>
+              continuation.exit(dependency),
+          },
+        },
+      ]),
 
     // Exposes the update value of an {update: true} property as it is,
-    // or continues if it's unavailable. By default, "unavailable" means
-    // value === null; provide {mode: 'empty'} to check with empty() instead,
-    // continuing for empty arrays also.
-    exposeUpdateValueOrContinue({mode = 'null'} = {}) {
-      if (mode !== 'null' && mode !== 'empty') {
-        throw new TypeError(`Expected mode to be null or empty`);
-      }
+    // or continues if it's unavailable. See withResultOfAvailabilityCheck
+    // for {mode} options!
+    exposeUpdateValueOrContinue: ({mode = 'null'} = {}) =>
+      Thing.composite.from(`Thing.composite.exposeUpdateValueOrContinue`, [
+        Thing.composite.withResultOfAvailabilityCheck({
+          fromUpdateValue: true,
+          mode,
+        }),
 
-      return {
-        annotation: `Thing.composite.exposeUpdateValueOrContinue`,
-        flags: {expose: true, compose: true},
-        expose: {
-          options: {mode},
-
-          transform(value, {'#options': {mode}}, continuation) {
-            const shouldContinue =
-              (mode === 'empty'
-                ? empty(value)
-                : value === null);
-
-            if (shouldContinue) {
-              return continuation(value);
-            } else {
-              return continuation.exit(value);
-            }
-          }
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#availability'],
+            compute: ({'#availability': availability}, continuation) =>
+              (availability
+                ? continuation()
+                : continuation.raise()),
+          },
         },
-      };
-    },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            transform: (value, {}, continuation) =>
+              continuation.exit(value),
+          },
+        },
+      ]),
+
+    // Early exits if a dependency isn't available.
+    // See withResultOfAvailabilityCheck for {mode} options!
+    earlyExitWithoutDependency: (dependency, {mode = 'null', value = null} = {}) =>
+      Thing.composite.from(`Thing.composite.earlyExitWithoutDependency`, [
+        Thing.composite.withResultOfAvailabilityCheck({
+          fromDependency: dependency,
+          mode,
+        }),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#availability'],
+            options: {value},
+
+            compute: ({
+              '#availability': availability,
+              '#options': {value},
+            }, continuation) =>
+              (availability
+                ? continuation()
+                : continuation.exit(value)),
+          },
+        },
+      ]),
 
     // -- Compositional steps for processing data --
 

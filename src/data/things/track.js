@@ -76,40 +76,24 @@ export class Track extends Thing {
     disableUniqueCoverArt: Thing.common.flag(),
 
     // File extension for track's corresponding media file. This represents the
-    // track's unique cover artwork, if any, and does not inherit the cover's
-    // main artwork. (It does inherit `trackCoverArtFileExtension` if present
-    // on the album.)
+    // track's unique cover artwork, if any, and does not inherit the extension
+    // of the album's main artwork. It does inherit trackCoverArtFileExtension,
+    // if present on the album.
     coverArtFileExtension: Thing.composite.from(`Track.coverArtFileExtension`, [
-      Track.composite.withAlbumProperties({
-        properties: [
-          'trackCoverArtistContribsByRef',
-          'trackCoverArtFileExtension',
-        ],
-      }),
+      // No cover art file extension if the track doesn't have unique artwork
+      // in the first place.
+      Track.composite.withHasUniqueCoverArt(),
+      Thing.composite.earlyExitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
 
-      {
-        flags: {update: true, expose: true},
-        update: {validate: isFileExtension},
-        expose: {
-          dependencies: [
-            'coverArtistContribsByRef',
-            'disableUniqueCoverArt',
-            '#album.trackCoverArtistContribsByRef',
-            '#album.trackCoverArtFileExtension',
-          ],
+      // Expose custom coverArtFileExtension update value first.
+      Thing.composite.exposeUpdateValueOrContinue(),
 
-          transform(coverArtFileExtension, {
-            coverArtistContribsByRef,
-            disableUniqueCoverArt,
-            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
-            '#album.trackCoverArtFileExtension': trackCoverArtFileExtension,
-          }) {
-            if (disableUniqueCoverArt) return null;
-            if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
-            return coverArtFileExtension ?? trackCoverArtFileExtension ?? 'jpg';
-          },
-        },
-      },
+      // Expose album's trackCoverArtFileExtension if no update value set.
+      Track.composite.withAlbumProperty('trackCoverArtFileExtension'),
+      Thing.composite.exposeDependencyOrContinue('#album.trackCoverArtFileExtension'),
+
+      // Fallback to 'jpg'.
+      Thing.composite.exposeConstant('jpg'),
     ]),
 
     // Date of cover art release. Like coverArtFileExtension, this represents
@@ -204,47 +188,8 @@ export class Track extends Thing {
     // the usual hasCoverArt to emphasize that it does not inherit from the
     // album.)
     hasUniqueCoverArt: Thing.composite.from(`Track.hasUniqueCoverArt`, [
-      {
-        flags: {expose: true, compose: true},
-        expose: {
-          dependencies: ['disableUniqueCoverArt'],
-          compute: ({disableUniqueCoverArt}, continuation) =>
-            (disableUniqueCoverArt
-              ? false
-              : continuation()),
-        },
-      },
-
-      Thing.composite.withResolvedContribs({
-        from: 'coverArtistContribsByRef',
-        to: '#coverArtistContribs',
-      }),
-
-      {
-        flags: {expose: true, compose: true},
-        expose: {
-          dependencies: ['#coverArtistContribs'],
-          compute: ({'#coverArtistContribs': coverArtistContribs}, continuation) =>
-            (empty(coverArtistContribs)
-              ? continuation()
-              : true),
-        },
-      },
-
-      Track.composite.withAlbumProperties({
-        properties: ['trackCoverArtistContribs'],
-      }),
-
-      {
-        flags: {expose: true},
-        expose: {
-          dependencies: ['#album.trackCoverArtistContribs'],
-          compute: ({'#album.trackCoverArtistContribs': trackCoverArtistContribs}) =>
-            (empty(trackCoverArtistContribs)
-              ? false
-              : true),
-        },
-      },
+      Track.composite.withHasUniqueCoverArt(),
+      Thing.composite.exposeDependency('#hasUniqueCoverArt'),
     ]),
 
     originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
@@ -608,6 +553,54 @@ export class Track extends Thing {
         Thing.composite.export({
           [outputDependency]: '#originalRelease',
         }),
+      ]),
+
+    // The algorithm for checking if a track has unique cover art is used in a
+    // couple places, so it's defined in full as a compositional step.
+    withHasUniqueCoverArt: ({to = '#hasUniqueCoverArt'} = {}) =>
+      Thing.composite.from(`Track.composite.withHasUniqueCoverArt`, [
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['disableUniqueCoverArt'],
+            mapContinuation: {to},
+            compute: ({disableUniqueCoverArt}, continuation) =>
+              (disableUniqueCoverArt
+                ? continuation.raise({to: false})
+                : continuation()),
+          },
+        },
+
+        Thing.composite.withResolvedContribs({
+          from: 'coverArtistContribsByRef',
+          to: '#coverArtistContribs',
+        }),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#coverArtistContribs'],
+            mapContinuation: {to},
+            compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
+              (empty(contribsFromTrack)
+                ? continuation()
+                : continuation.raise({to: true})),
+          },
+        },
+
+        Track.composite.withAlbumProperty('trackCoverArtistContribs'),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#album.trackCoverArtistContribs'],
+            mapContinuation: {to},
+            compute: ({'#album.trackCoverArtistContribs': contribsFromAlbum}, continuation) =>
+              (empty(contribsFromAlbum)
+                ? continuation.raise({to: false})
+                : continuation.raise({to: true})),
+          },
+        },
       ]),
   };
 
