@@ -46,8 +46,25 @@ export class Track extends Thing {
 
     color: Thing.composite.from(`Track.color`, [
       Thing.composite.exposeUpdateValueOrContinue(),
+      Track.composite.withContainingTrackSection({earlyExitIfNotFound: false}),
+
+      {
+        flags: {expose: true, compose: true},
+        expose: {
+          dependencies: ['#trackSection'],
+          compute: ({'#trackSection': trackSection}, continuation) =>
+            // Album.trackSections guarantees the track section will have a
+            // color property (inheriting from the album's own color), but only
+            // if it's actually present! Color will be inherited directly from
+            // album otherwise.
+            (trackSection
+              ? trackSection.color
+              : continuation()),
+        },
+      },
+
       Track.composite.withAlbumProperty('color'),
-      Thing.composite.expose('#album.color', {
+      Thing.composite.exposeDependency('#album.color', {
         update: {validate: isColor},
       }),
     ]),
@@ -157,7 +174,7 @@ export class Track extends Thing {
     album:
       Thing.composite.from(`Track.album`, [
         Track.composite.withAlbum(),
-        Thing.composite.expose('#album'),
+        Thing.composite.exposeDependency('#album'),
       ]),
 
     // Note - this is an internal property used only to help identify a track.
@@ -183,8 +200,8 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties({properties: ['date']}),
-      Thing.composite.expose('#album.date'),
+      Track.composite.withAlbumProperty('date'),
+      Thing.composite.exposeDependency('#album.date'),
     ]),
 
     // Whether or not the track has "unique" cover artwork - a cover which is
@@ -342,7 +359,7 @@ export class Track extends Thing {
       },
 
       Track.composite.withAlbumProperty('trackCoverArtistContribs'),
-      Thing.composite.expose('#album.trackCoverArtistContribs'),
+      Thing.composite.exposeDependency('#album.trackCoverArtistContribs'),
     ]),
 
     referencedTracks: Thing.composite.from(`Track.referencedTracks`, [
@@ -435,7 +452,7 @@ export class Track extends Thing {
       ]),
 
     // Gets the track's album. Unless earlyExitIfNotFound is overridden false,
-    // this will early-exit with null in two cases - albumData being missing,
+    // this will early exit with null in two cases - albumData being missing,
     // or not including an album whose .tracks array includes this track.
     withAlbum: ({to = '#album', earlyExitIfNotFound = true} = {}) => ({
       annotation: `Track.composite.withAlbum`,
@@ -537,6 +554,46 @@ export class Track extends Thing {
               }
 
               return continuation.raise(raise);
+            },
+          },
+        },
+      ]),
+
+    // Gets the track section containing this track from its album's track list.
+    // Unless earlyExitIfNotFound is overridden false, this will early exit if
+    // the album can't be found or if none of its trackSections includes the
+    // track for some reason.
+    withContainingTrackSection: ({
+      to = '#trackSection',
+      earlyExitIfNotFound = true,
+    } = {}) =>
+      Thing.composite.from(`Track.composite.withContainingTrackSection`, [
+        Track.composite.withAlbumProperty('trackSections', {earlyExitIfNotFound}),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['this', '#album.trackSections'],
+            mapContinuation: {to},
+
+            compute({
+              this: track,
+              '#album.trackSections': trackSections,
+            }, continuation) {
+              if (!trackSections) {
+                return continuation.raise({to: null});
+              }
+
+              const trackSection =
+                trackSections.find(({tracks}) => tracks.includes(track));
+
+              if (trackSection) {
+                return continuation.raise({to: trackSection});
+              } else if (earlyExitIfNotFound) {
+                return continuation.exit(null);
+              } else {
+                return continuation.raise({to: null});
+              }
             },
           },
         },

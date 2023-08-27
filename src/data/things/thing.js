@@ -1127,7 +1127,7 @@ export default class Thing extends CacheableObject {
     // compositional step, the property will be exposed as undefined instead
     // of null.
     //
-    expose: (dependency, {update = false} = {}) => ({
+    exposeDependency: (dependency, {update = false} = {}) => ({
       annotation: `Thing.composite.expose`,
       flags: {expose: true, update: !!update},
 

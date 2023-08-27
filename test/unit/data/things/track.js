@@ -97,11 +97,11 @@ t.test(`Track.album`, t => {
 });
 
 t.test(`Track.color`, t => {
-  t.plan(4);
+  t.plan(5);
 
   const {track, album} = stubTrackAndAlbum();
 
-  const {XXX_decacheWikiData} = linkAndBindWikiData({
+  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
     albumData: [album],
     trackData: [track],
   });
@@ -110,18 +110,42 @@ t.test(`Track.color`, t => {
     `color #1: defaults to null`);
 
   album.color = '#abcdef';
+  album.trackSections = [{
+    color: '#beeeef',
+    tracksByRef: [Thing.getReference(track)],
+  }];
   XXX_decacheWikiData();
 
+  t.equal(track.color, '#beeeef',
+    `color #2: inherits from track section before album`);
+
+  // Replace the album with a completely fake one. This isn't realistic, since
+  // in correct data, Album.tracks depends on Albums.trackSections and so the
+  // track's album will always have a corresponding track section. But if that
+  // connection breaks for some future reason (with the album still present),
+  // Track.color should still inherit directly from the album.
+  wikiData.albumData = [
+    new Proxy({
+      color: '#abcdef',
+      tracks: [track],
+      trackSections: [
+        {color: '#baaaad', tracks: []},
+      ],
+    }, {getPrototypeOf: () => Album.prototype}),
+  ];
+
+  linkWikiDataArrays();
+
   t.equal(track.color, '#abcdef',
-    `color #2: inherits from album`);
+    `color #3: inherits from album without matching track section`);
 
   track.color = '#123456';
 
   t.equal(track.color, '#123456',
-    `color #3: is own value`);
+    `color #4: is own value`);
 
   t.throws(() => { track.color = '#aeiouw'; }, TypeError,
-    `color #4: must be set to valid color`);
+    `color #5: must be set to valid color`);
 });
 
 t.test(`Track.coverArtDate`, t => {
