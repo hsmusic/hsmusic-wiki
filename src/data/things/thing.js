@@ -1077,6 +1077,8 @@ export default class Thing extends CacheableObject {
       return constructedDescriptor;
     },
 
+    // -- Compositional steps for compositions to nest --
+
     // Provides dependencies exactly as they are (or null if not defined) to the
     // continuation. Although this can *technically* be used to alias existing
     // dependencies to some other name within the middle of a composition, it's
@@ -1114,6 +1116,8 @@ export default class Thing extends CacheableObject {
       };
     },
 
+    // -- Compositional steps for top-level property descriptors --
+
     // Exposes a dependency exactly as it is; this is typically the base of a
     // composition which was created to serve as one property's descriptor.
     // Since this serves as a base, specify a value for {update} to indicate
@@ -1128,7 +1132,7 @@ export default class Thing extends CacheableObject {
     // of null.
     //
     exposeDependency: (dependency, {update = false} = {}) => ({
-      annotation: `Thing.composite.expose`,
+      annotation: `Thing.composite.exposeDependency`,
       flags: {expose: true, update: !!update},
 
       expose: {
@@ -1142,10 +1146,42 @@ export default class Thing extends CacheableObject {
           : null),
     }),
 
-    // Exposes the update value of an {update: true} property, or continues if
-    // it's unavailable. By default, "unavailable" means value === null, but
-    // set {mode: 'empty'} to check with empty() instead, continuing for empty
-    // arrays also.
+    // Exposes a dependency as it is, or continues if it's unavailable.
+    // By default, "unavailable" means dependency === null; provide
+    // {mode: 'empty'} to check with empty() instead, continuing for
+    // empty arrays also.
+    exposeDependencyOrContinue(dependency, {mode = 'null'} = {}) {
+      if (mode !== 'null' && mode !== 'empty') {
+        throw new TypeError(`Expected mode to be null or empty`);
+      }
+
+      return {
+        annotation: `Thing.composite.exposeDependencyOrContinue`,
+        flags: {expose: true, compose: true},
+        expose: {
+          options: {mode},
+          mapDependencies: {dependency},
+
+          compute({dependency, '#options': {mode}}, continuation) {
+            const shouldContinue =
+              (mode === 'empty'
+                ? empty(dependency)
+                : dependency === null);
+
+            if (shouldContinue) {
+              return continuation();
+            } else {
+              return continuation.exit(dependency);
+            }
+          },
+        },
+      };
+    },
+
+    // Exposes the update value of an {update: true} property as it is,
+    // or continues if it's unavailable. By default, "unavailable" means
+    // value === null; provide {mode: 'empty'} to check with empty() instead,
+    // continuing for empty arrays also.
     exposeUpdateValueOrContinue({mode = 'null'} = {}) {
       if (mode !== 'null' && mode !== 'empty') {
         throw new TypeError(`Expected mode to be null or empty`);
@@ -1172,6 +1208,8 @@ export default class Thing extends CacheableObject {
         },
       };
     },
+
+    // -- Compositional steps for processing data --
 
     // Resolves the contribsByRef contained in the provided dependency,
     // providing (named by the second argument) the result. "Resolving"

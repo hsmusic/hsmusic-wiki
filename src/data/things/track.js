@@ -191,15 +191,7 @@ export class Track extends Thing {
     ),
 
     date: Thing.composite.from(`Track.date`, [
-      {
-        flags: {expose: true, compose: true},
-        expose: {
-          dependencies: ['dateFirstReleased'],
-          compute: ({dateFirstReleased}, continuation) =>
-            dateFirstReleased ?? continuation(),
-        },
-      },
-
+      Thing.composite.exposeDependencyOrContinue('dateFirstReleased'),
       Track.composite.withAlbumProperty('date'),
       Thing.composite.exposeDependency('#album.date'),
     ]),
