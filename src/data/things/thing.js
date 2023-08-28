@@ -1198,7 +1198,7 @@ export default class Thing extends CacheableObject {
 
       if (fromDependency) {
         return {
-          annotation: `Thing.composite.withResultOfCommonComparison.fromDependency`,
+          annotation: `Thing.composite.withResultOfAvailabilityCheck.fromDependency`,
           flags: {expose: true, compose: true},
           expose: {
             mapDependencies: {from: fromDependency},
@@ -1210,7 +1210,7 @@ export default class Thing extends CacheableObject {
         };
       } else {
         return {
-          annotation: `Thing.composite.withResultOfCommonComparison.fromUpdateValue`,
+          annotation: `Thing.composite.withResultOfAvailabilityCheck.fromUpdateValue`,
           flags: {expose: true, compose: true},
           expose: {
             mapContinuation: {to},
