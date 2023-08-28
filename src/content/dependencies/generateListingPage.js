@@ -91,12 +91,13 @@ export default {
 
       const parts = [baseStringsKey, contextStringsKey];
 
-      if (options.stringsKey) {
+      const {stringsKey, ...passOptions} = options;
+
+      if (stringsKey) {
         parts.push(options.stringsKey);
-        delete options.stringsKey;
       }
 
-      return language.formatString(parts.join('.'), options);
+      return language.formatString(parts.join('.'), passOptions);
     };
 
     return relations.layout.slots({
