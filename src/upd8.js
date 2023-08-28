@@ -233,6 +233,12 @@ async function main() {
 
     'magick-threads': {
       help: `Process more or fewer thumbnail files at once with ImageMagick when generating thumbnails. (Each ImageMagick thread may also make use of multi-core processing at its own utility.)`,
+      type: 'value',
+      validate(threads) {
+        if (parseInt(threads) !== parseFloat(threads)) return 'an integer';
+        if (parseInt(threads) < 0) return 'a counting number or zero';
+        return true;
+      }
     },
     magick: {alias: 'magick-threads'},
 
