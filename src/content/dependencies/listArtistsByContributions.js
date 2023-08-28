@@ -1,5 +1,11 @@
-import {stitchArrays, unique} from '#sugar';
-import {filterByCount, sortAlphabetically, sortByCount} from '#wiki-data';
+import {empty, stitchArrays, unique} from '#sugar';
+
+import {
+  filterByCount,
+  filterMultipleArrays,
+  sortAlphabetically,
+  sortByCount,
+} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist'],
@@ -96,68 +102,54 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    const lists = Object.fromEntries(
-      ([
-        ['tracks', [
-          relations.artistLinksByTrackContributions,
-          data.countsByTrackContributions,
-          'countTracks',
-        ]],
+  generate(data, relations, {language}) {
+    const listChunkIDs = ['tracks', 'artworks', 'flashes'];
+    const listTitleStringsKeys = ['trackContributors', 'artContributors', 'flashContributors'];
+    const listCountFunctions = ['countTracks', 'countArtworks', 'countFlashes'];
 
-        ['artworks', [
-          relations.artistLinksByArtworkContributions,
-          data.countsByArtworkContributions,
-          'countArtworks',
-        ]],
+    const listArtistLinks = [
+      relations.artistLinksByTrackContributions,
+      relations.artistLinksByArtworkContributions,
+      relations.artistLinksByFlashContributions,
+    ];
 
-        data.enableFlashesAndGames &&
-          ['flashes', [
-            relations.artistLinksByFlashContributions,
-            data.countsByFlashContributions,
-            'countFlashes',
-          ]],
-      ]).filter(Boolean)
-        .map(([key, [artistLinks, counts, countFunction]]) => [
-          key,
-          html.tag('ul',
-            stitchArrays({
-              artistLink: artistLinks,
-              count: counts,
-            }).map(({artistLink, count}) =>
-                html.tag('li',
-                  language.$('listingPage.listArtists.byContribs.item', {
-                    artist: artistLink,
-                    contributions: language[countFunction](count, {unit: true}),
-                  })))),
-        ]));
+    const listArtistCounts = [
+      data.countsByTrackContributions,
+      data.countsByArtworkContributions,
+      data.countsByFlashContributions,
+    ];
+
+    filterMultipleArrays(
+      listChunkIDs,
+      listTitleStringsKeys,
+      listCountFunctions,
+      listArtistLinks,
+      listArtistCounts,
+      (_chunkID, _titleStringsKey, _countFunction, artistLinks, _artistCounts) =>
+        !empty(artistLinks));
 
     return relations.page.slots({
-      type: 'custom',
-      content:
-        html.tag('div', {class: 'content-columns'}, [
-          html.tag('div', {class: 'column'}, [
-            html.tag('h2',
-              language.$('listingPage.misc.trackContributors')),
+      type: 'chunks',
 
-            lists.tracks,
-          ]),
+      showSkipToSection: true,
+      chunkIDs: listChunkIDs,
 
-          html.tag('div', {class: 'column'}, [
-            html.tag('h2',
-              language.$(
-                'listingPage.misc.artContributors')),
+      chunkTitles:
+        listTitleStringsKeys.map(stringsKey => ({stringsKey})),
 
-            lists.artworks,
-
-            lists.flashes && [
-              html.tag('h2',
-                language.$('listingPage.misc.flashContributors')),
-
-              lists.flashes,
-            ],
-          ]),
-        ]),
+      chunkRows:
+        stitchArrays({
+          artistLinks: listArtistLinks,
+          artistCounts: listArtistCounts,
+          countFunction: listCountFunctions,
+        }).map(({artistLinks, artistCounts, countFunction}) =>
+            stitchArrays({
+              artistLink: artistLinks,
+              artistCount: artistCounts,
+            }).map(({artistLink, artistCount}) => ({
+                artist: artistLink,
+                contributions: language[countFunction](artistCount, {unit: true}),
+              }))),
     });
   },
 };
