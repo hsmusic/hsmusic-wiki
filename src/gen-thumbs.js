@@ -263,6 +263,8 @@ async function getSpawnMagick(tool) {
   return [`${description} (${version})`, fn];
 }
 
+// Note: This returns an array of no-argument functions, suitable for passing
+// to queue().
 function generateImageThumbnails({
   filePath,
   dimensions,
@@ -286,10 +288,10 @@ function generateImageThumbnails({
       output(name),
     ]);
 
-  return Promise.all(
+  return (
     getThumbnailsAvailableForDimensions(dimensions)
       .map(([name]) => [name, thumbnailSpec[name]])
-      .map(([name, details]) =>
+      .map(([name, details]) => () =>
         promisifyProcess(convert('.' + name, details), false)));
 }
 
@@ -527,35 +529,45 @@ export default async function genThumbs(mediaPath, {
   }
 
   const failed = [];
-  const succeeded = [];
+
   const writeMessageFn = () =>
     `Writing image thumbnails. [failed: ${failed.length}]`;
 
+  const generateCalls =
+    entriesToGenerate.flatMap(([filePath, md5]) =>
+      generateImageThumbnails({
+        filePath: path.join(mediaPath, filePath),
+        dimensions: imageToDimensions[filePath],
+        spawnConvert,
+      }).map(call => async () => {
+        try {
+          await call();
+        } catch (error) {
+          failed.push([filePath, error]);
+        }
+      }));
+
   await progressPromiseAll(writeMessageFn,
-    queue(
-      entriesToGenerate.map(([filePath, md5]) => () =>
-        generateImageThumbnails({
-          filePath: path.join(mediaPath, filePath),
-          dimensions: imageToDimensions[filePath],
-          spawnConvert,
-        }).then(
-          () => {
-            updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
-            succeeded.push(filePath);
-          },
-          error => {
-            failed.push([filePath, error]);
-          })),
-      magickThreads));
+    queue(generateCalls, magickThreads));
+
+  // Sort by file path.
+  failed.sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+
+  const failedFilePaths = new Set(failed.map(([filePath]) => filePath));
+
+  for (const [filePath, md5] of entriesToGenerate) {
+    if (failedFilePaths.has(filePath)) continue;
+    updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
+  }
 
   if (empty(failed)) {
     logInfo`Generated all (updated) thumbnails successfully!`;
   } else {
     for (const [path, error] of failed) {
-      logError`Thumbnails failed to generate for ${path} - ${error}`;
+      logError`Thumbnail failed to generate for ${path} - ${error}`;
     }
-    logWarn`Result is incomplete - the above ${failed.length} thumbnails should be checked for errors.`;
-    logWarn`${succeeded.length} successfully generated images won't be regenerated next run, though!`;
+    logWarn`Result is incomplete - the above thumbnails should be checked for errors.`;
+    logWarn`Successfully generated images won't be regenerated next run, though!`;
   }
 
   try {
