@@ -198,33 +198,30 @@ export class Track extends Thing {
       find.track
     ),
 
-    otherReleases: {
-      flags: {expose: true},
+    otherReleases:
+      Thing.composite.from(`Track.otherReleases`, [
+        Thing.composite.earlyExitWithoutDependency('trackData'),
+        Track.composite.withOriginalRelease({selfIfOriginal: true}),
 
-      expose: {
-        dependencies: ['this', 'originalReleaseTrackByRef', 'trackData'],
-
-        compute: ({
-          this: t1,
-          originalReleaseTrackByRef: t1origRef,
-          trackData,
-        }) => {
-          if (!trackData) {
-            return [];
-          }
-
-          const t1orig = find.track(t1origRef, trackData);
-
-          return [
-            t1orig,
-            ...trackData.filter((t2) => {
-              const {originalReleaseTrack: t2orig} = t2;
-              return t2 !== t1 && t2orig && (t2orig === t1orig || t2orig === t1);
-            }),
-          ].filter(Boolean);
+        {
+          flags: {expose: true},
+          expose: {
+            dependencies: ['this', 'trackData', '#originalRelease'],
+            compute: ({
+              this: thisTrack,
+              trackData,
+              '#originalRelease': originalRelease,
+            }) =>
+              (originalRelease === thisTrack
+                ? []
+                : [originalRelease])
+                .concat(trackData.filter(track =>
+                  track !== originalRelease &&
+                  track !== thisTrack &&
+                  track.originalReleaseTrack === originalRelease)),
+          },
         },
-      },
-    },
+      ]),
 
     artistContribs: Thing.composite.from(`Track.artistContribs`, [
       Track.composite.inheritFromOriginalRelease({property: 'artistContribs'}),
@@ -545,12 +542,15 @@ export class Track extends Thing {
       ]);
     },
 
-    // Just includes the original release of this track as a dependency, or
-    // null, if it's not a rerelease. Note that this will early exit if the
-    // original release is specified by reference and that reference doesn't
-    // resolve to anything. Outputs to '#originalRelease' by default.
+    // Just includes the original release of this track as a dependency.
+    // If this track isn't a rerelease, then it'll provide null, unless the
+    // {selfIfOriginal} option is set, in which case it'll provide this track
+    // itself. Note that this will early exit if the original release is
+    // specified by reference and that reference doesn't resolve to anything.
+    // Outputs to '#originalRelease' by default.
     withOriginalRelease({
       to = '#originalRelease',
+      selfIfOriginal = false,
     } = {}) {
       return Thing.composite.from(`Track.composite.withOriginalRelease`, [
         Thing.composite.withResolvedReference({
@@ -561,9 +561,26 @@ export class Track extends Thing {
           earlyExitIfNotFound: true,
         }),
 
-        Thing.composite.export({
-          [outputDependency]: '#originalRelease',
-        }),
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['this', '#originalRelease'],
+            options: {selfIfOriginal},
+            mapContinuation: {to},
+            compute: ({
+              this: track,
+              '#originalRelease': originalRelease,
+              '#options': {selfIfOriginal},
+            }, continuation) =>
+              continuation.raise({
+                to:
+                  (originalRelease ??
+                    (selfIfOriginal
+                      ? track
+                      : null)),
+              }),
+          },
+        },
       ]);
     },
 
