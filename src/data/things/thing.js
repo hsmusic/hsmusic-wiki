@@ -1325,15 +1325,21 @@ export default class Thing extends CacheableObject {
           flags: {expose: true, compose: true},
           expose: {
             dependencies: ['#availability'],
+            compute: ({'#availability': availability}, continuation) =>
+              (availability
+                ? continuation.raise()
+                : continuation()),
+          },
+        },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#availability'],
             options: {value},
 
-            compute: ({
-              '#availability': availability,
-              '#options': {value},
-            }, continuation) =>
-              (availability
-                ? continuation()
-                : continuation.exit(value)),
+            compute: ({'#options': {value}}, continuation) =>
+              continuation.exit(value),
           },
         },
       ]),
