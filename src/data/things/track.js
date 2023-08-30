@@ -366,8 +366,11 @@ export class Track extends Thing {
     // dependencies provided. If allowOverride is true, then the continuation
     // will also be called if the original release exposed the requested
     // property as null.
-    inheritFromOriginalRelease: ({property: originalProperty, allowOverride = false}) =>
-      Thing.composite.from(`Track.composite.inheritFromOriginalRelease`, [
+    inheritFromOriginalRelease({
+      property: originalProperty,
+      allowOverride = false,
+    }) {
+      return Thing.composite.from(`Track.composite.inheritFromOriginalRelease`, [
         Track.composite.withOriginalRelease(),
 
         {
@@ -386,56 +389,59 @@ export class Track extends Thing {
             },
           },
         }
-      ]),
+      ]);
+    },
 
     // Gets the track's album. Unless earlyExitIfNotFound is overridden false,
     // this will early exit with null in two cases - albumData being missing,
     // or not including an album whose .tracks array includes this track.
-    withAlbum: ({to = '#album', earlyExitIfNotFound = true} = {}) => ({
-      annotation: `Track.composite.withAlbum`,
-      flags: {expose: true, compose: true},
+    withAlbum({to = '#album', earlyExitIfNotFound = true} = {}) {
+      return {
+        annotation: `Track.composite.withAlbum`,
+        flags: {expose: true, compose: true},
 
-      expose: {
-        dependencies: ['this', 'albumData'],
-        mapContinuation: {to},
-        options: {earlyExitIfNotFound},
+        expose: {
+          dependencies: ['this', 'albumData'],
+          mapContinuation: {to},
+          options: {earlyExitIfNotFound},
 
-        compute({
-          this: track,
-          albumData,
-          '#options': {earlyExitIfNotFound},
-        }, continuation) {
-          if (empty(albumData)) {
-            return (
-              (earlyExitIfNotFound
-                ? continuation.exit(null)
-                : continuation({to: null})));
-          }
+          compute({
+            this: track,
+            albumData,
+            '#options': {earlyExitIfNotFound},
+          }, continuation) {
+            if (empty(albumData)) {
+              return (
+                (earlyExitIfNotFound
+                  ? continuation.exit(null)
+                  : continuation({to: null})));
+            }
 
-          const album =
-            albumData?.find(album => album.tracks.includes(track));
+            const album =
+              albumData?.find(album => album.tracks.includes(track));
 
-          if (!album) {
-            return (
-              (earlyExitIfNotFound
-                ? continuation.exit(null)
-                : continuation({to: null})));
-          }
+            if (!album) {
+              return (
+                (earlyExitIfNotFound
+                  ? continuation.exit(null)
+                  : continuation({to: null})));
+            }
 
-          return continuation({to: album});
+            return continuation({to: album});
+          },
         },
-      },
-    }),
+      };
+    },
 
     // Gets a single property from this track's album, providing it as the same
     // property name prefixed with '#album.' (by default). If the track's album
     // isn't available, and earlyExitIfNotFound hasn't been set, the property
     // will be provided as null.
-    withAlbumProperty: (property, {
+    withAlbumProperty(property, {
       to = '#album.' + property,
       earlyExitIfNotFound = false,
-    } = {}) =>
-      Thing.composite.from(`Track.composite.withAlbumProperty`, [
+    } = {}) {
+      return Thing.composite.from(`Track.composite.withAlbumProperty`, [
         Track.composite.withAlbum({earlyExitIfNotFound}),
 
         {
@@ -454,18 +460,19 @@ export class Track extends Thing {
                 : continuation.raise({to: null})),
           },
         },
-      ]),
+      ]);
+    },
 
     // Gets the listed properties from this track's album, providing them as
     // dependencies (by default) with '#album.' prefixed before each property
     // name. If the track's album isn't available, and earlyExitIfNotFound
     // hasn't been set, the same dependency names will be provided as null.
-    withAlbumProperties: ({
+    withAlbumProperties({
       properties,
       prefix = '#album',
       earlyExitIfNotFound = false,
-    }) =>
-      Thing.composite.from(`Track.composite.withAlbumProperties`, [
+    }) {
+      return Thing.composite.from(`Track.composite.withAlbumProperties`, [
         Track.composite.withAlbum({earlyExitIfNotFound}),
 
         {
@@ -494,17 +501,18 @@ export class Track extends Thing {
             },
           },
         },
-      ]),
+      ]);
+    },
 
     // Gets the track section containing this track from its album's track list.
     // Unless earlyExitIfNotFound is overridden false, this will early exit if
     // the album can't be found or if none of its trackSections includes the
     // track for some reason.
-    withContainingTrackSection: ({
+    withContainingTrackSection({
       to = '#trackSection',
       earlyExitIfNotFound = true,
-    } = {}) =>
-      Thing.composite.from(`Track.composite.withContainingTrackSection`, [
+    } = {}) {
+      return Thing.composite.from(`Track.composite.withContainingTrackSection`, [
         Track.composite.withAlbumProperty('trackSections', {earlyExitIfNotFound}),
 
         {
@@ -534,14 +542,17 @@ export class Track extends Thing {
             },
           },
         },
-      ]),
+      ]);
+    },
 
     // Just includes the original release of this track as a dependency, or
     // null, if it's not a rerelease. Note that this will early exit if the
     // original release is specified by reference and that reference doesn't
     // resolve to anything. Outputs to '#originalRelease' by default.
-    withOriginalRelease: ({to: outputDependency = '#originalRelease'} = {}) =>
-      Thing.composite.from(`Track.composite.withOriginalRelease`, [
+    withOriginalRelease({
+      to = '#originalRelease',
+    } = {}) {
+      return Thing.composite.from(`Track.composite.withOriginalRelease`, [
         Thing.composite.withResolvedReference({
           ref: 'originalReleaseTrackByRef',
           data: 'trackData',
@@ -553,12 +564,15 @@ export class Track extends Thing {
         Thing.composite.export({
           [outputDependency]: '#originalRelease',
         }),
-      ]),
+      ]);
+    },
 
     // The algorithm for checking if a track has unique cover art is used in a
     // couple places, so it's defined in full as a compositional step.
-    withHasUniqueCoverArt: ({to = '#hasUniqueCoverArt'} = {}) =>
-      Thing.composite.from(`Track.composite.withHasUniqueCoverArt`, [
+    withHasUniqueCoverArt({
+      to = '#hasUniqueCoverArt',
+    } = {}) {
+      return Thing.composite.from(`Track.composite.withHasUniqueCoverArt`, [
         {
           flags: {expose: true, compose: true},
           expose: {
@@ -601,7 +615,8 @@ export class Track extends Thing {
                 : continuation.raise({to: true})),
           },
         },
-      ]),
+      ]);
+    },
   };
 
   [inspect.custom](depth) {

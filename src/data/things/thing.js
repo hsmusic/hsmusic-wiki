@@ -1151,20 +1151,24 @@ export default class Thing extends CacheableObject {
     // compositional step, the property will be exposed as undefined instead
     // of null.
     //
-    exposeDependency: (dependency, {update = false} = {}) => ({
-      annotation: `Thing.composite.exposeDependency`,
-      flags: {expose: true, update: !!update},
+    exposeDependency(dependency, {
+      update = false,
+    } = {}) {
+      return {
+        annotation: `Thing.composite.exposeDependency`,
+        flags: {expose: true, update: !!update},
 
-      expose: {
-        mapDependencies: {dependency},
-        compute: ({dependency}) => dependency,
-      },
+        expose: {
+          mapDependencies: {dependency},
+          compute: ({dependency}) => dependency,
+        },
 
-      update:
-        (typeof update === 'object'
-          ? update
-          : null),
-    }),
+        update:
+          (typeof update === 'object'
+            ? update
+            : null),
+      };
+    },
 
     // Exposes a constant value exactly as it is; like exposeDependency, this
     // is typically the base of a composition serving as a particular property
@@ -1172,20 +1176,24 @@ export default class Thing extends CacheableObject {
     // exit with some other value, with the exposeConstant base serving as the
     // fallback default value. Like exposeDependency, set {update} to true or
     // an object to indicate that the property as a whole updates.
-    exposeConstant: (value, {update = false} = {}) => ({
-      annotation: `Thing.composite.exposeConstant`,
-      flags: {expose: true, update: !!update},
+    exposeConstant(value, {
+      update = false,
+    } = {}) {
+      return {
+        annotation: `Thing.composite.exposeConstant`,
+        flags: {expose: true, update: !!update},
 
-      expose: {
-        options: {value},
-        compute: ({'#options': {value}}) => value,
-      },
+        expose: {
+          options: {value},
+          compute: ({'#options': {value}}) => value,
+        },
 
-      update:
-        (typeof update === 'object'
-          ? update
-          : null),
-    }),
+        update:
+          (typeof update === 'object'
+            ? update
+            : null),
+      };
+    },
 
     // Checks the availability of a dependency or the update value and provides
     // the result to later steps under '#availability' (by default). This is
@@ -1254,8 +1262,10 @@ export default class Thing extends CacheableObject {
 
     // Exposes a dependency as it is, or continues if it's unavailable.
     // See withResultOfAvailabilityCheck for {mode} options!
-    exposeDependencyOrContinue: (dependency, {mode = 'null'} = {}) =>
-      Thing.composite.from(`Thing.composite.exposeDependencyOrContinue`, [
+    exposeDependencyOrContinue(dependency, {
+      mode = 'null',
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.exposeDependencyOrContinue`, [
         Thing.composite.withResultOfAvailabilityCheck({
           fromDependency: dependency,
           mode,
@@ -1280,13 +1290,16 @@ export default class Thing extends CacheableObject {
               continuation.exit(dependency),
           },
         },
-      ]),
+      ]);
+    },
 
     // Exposes the update value of an {update: true} property as it is,
     // or continues if it's unavailable. See withResultOfAvailabilityCheck
     // for {mode} options!
-    exposeUpdateValueOrContinue: ({mode = 'null'} = {}) =>
-      Thing.composite.from(`Thing.composite.exposeUpdateValueOrContinue`, [
+    exposeUpdateValueOrContinue({
+      mode = 'null',
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.exposeUpdateValueOrContinue`, [
         Thing.composite.withResultOfAvailabilityCheck({
           fromUpdateValue: true,
           mode,
@@ -1310,12 +1323,16 @@ export default class Thing extends CacheableObject {
               continuation.exit(value),
           },
         },
-      ]),
+      ]);
+    },
 
     // Early exits if a dependency isn't available.
     // See withResultOfAvailabilityCheck for {mode} options!
-    earlyExitWithoutDependency: (dependency, {mode = 'null', value = null} = {}) =>
-      Thing.composite.from(`Thing.composite.earlyExitWithoutDependency`, [
+    earlyExitWithoutDependency(dependency, {
+      mode = 'null',
+      value = null,
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.earlyExitWithoutDependency`, [
         Thing.composite.withResultOfAvailabilityCheck({
           fromDependency: dependency,
           mode,
@@ -1342,7 +1359,8 @@ export default class Thing extends CacheableObject {
               continuation.exit(value),
           },
         },
-      ]),
+      ]);
+    },
 
     // -- Compositional steps for processing data --
 
@@ -1350,20 +1368,22 @@ export default class Thing extends CacheableObject {
     // providing (named by the second argument) the result. "Resolving"
     // means mapping the "who" reference of each contribution to an artist
     // object, and filtering out those whose "who" doesn't match any artist.
-    withResolvedContribs: ({from, to}) => ({
-      annotation: `Thing.composite.withResolvedContribs`,
-      flags: {expose: true, compose: true},
+    withResolvedContribs({from, to}) {
+      return {
+        annotation: `Thing.composite.withResolvedContribs`,
+        flags: {expose: true, compose: true},
 
-      expose: {
-        dependencies: ['artistData'],
-        mapDependencies: {from},
-        mapContinuation: {to},
-        compute: ({artistData, from}, continuation) =>
-          continuation({
-            to: Thing.findArtistsFromContribs(from, artistData),
-          }),
-      },
-    }),
+        expose: {
+          dependencies: ['artistData'],
+          mapDependencies: {from},
+          mapContinuation: {to},
+          compute: ({artistData, from}, continuation) =>
+            continuation({
+              to: Thing.findArtistsFromContribs(from, artistData),
+            }),
+        },
+      };
+    },
 
     // Resolves a reference by using the provided find function to match it
     // within the provided thingData dependency. This will early exit if the
@@ -1372,14 +1392,14 @@ export default class Thing extends CacheableObject {
     // Otherwise, the data object is provided on the output dependency;
     // or null, if the reference doesn't match anything or itself was null
     // to begin with.
-    withResolvedReference: ({
+    withResolvedReference({
       ref,
       data,
       to,
       find: findFunction,
       earlyExitIfNotFound = false,
-    }) =>
-      Thing.composite.from(`Thing.composite.withResolvedReference`, [
+    }) {
+      return Thing.composite.from(`Thing.composite.withResolvedReference`, [
         {
           flags: {expose: true, compose: true},
           expose: {
@@ -1423,6 +1443,7 @@ export default class Thing extends CacheableObject {
             },
           },
         },
-      ]),
+      ]);
+    },
   };
 }
