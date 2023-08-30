@@ -756,7 +756,14 @@ export default class Thing extends CacheableObject {
       }
 
       const exposeSteps = [];
-      const exposeDependencies = new Set(base.expose?.dependencies);
+      const exposeDependencies = new Set();
+
+      if (base.expose?.dependencies) {
+        for (const dependency of base.expose.dependencies) {
+          if (typeof dependency === 'string' && dependency.startsWith('#')) continue;
+          exposeDependencies.add(dependency);
+        }
+      }
 
       if (base.expose?.mapDependencies) {
         for (const dependency of Object.values(base.expose.mapDependencies)) {
