@@ -393,41 +393,61 @@ export class Track extends Thing {
     // this will early exit with null in two cases - albumData being missing,
     // or not including an album whose .tracks array includes this track.
     withAlbum({to = '#album', earlyExitIfNotFound = true} = {}) {
-      return {
-        annotation: `Track.composite.withAlbum`,
-        flags: {expose: true, compose: true},
+      return Thing.composite.from(`Track.composite.withAlbum`, [
+        Thing.composite.withResultOfAvailabilityCheck({
+          fromDependency: 'albumData',
+          mode: 'empty',
+          to: '#albumDataAvailability',
+        }),
 
-        expose: {
-          dependencies: ['this', 'albumData'],
-          mapContinuation: {to},
-          options: {earlyExitIfNotFound},
-
-          compute({
-            this: track,
-            albumData,
-            '#options': {earlyExitIfNotFound},
-          }, continuation) {
-            if (empty(albumData)) {
-              return (
-                (earlyExitIfNotFound
-                  ? continuation.exit(null)
-                  : continuation({to: null})));
-            }
-
-            const album =
-              albumData?.find(album => album.tracks.includes(track));
-
-            if (!album) {
-              return (
-                (earlyExitIfNotFound
-                  ? continuation.exit(null)
-                  : continuation({to: null})));
-            }
-
-            return continuation({to: album});
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#albumDataAvailability'],
+            options: {earlyExitIfNotFound},
+            mapContinuation: {to},
+            compute: ({
+              '#albumDataAvailability': albumDataAvailability,
+              '#options': {earlyExitIfNotFound},
+            }, continuation) =>
+              (albumDataAvailability
+                ? continuation()
+                : (earlyExitIfNotFound
+                    ? continuation.exit(null)
+                    : continuation.raise({to: null}))),
           },
         },
-      };
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['this', 'albumData'],
+            compute: ({this: track, albumData}, continuation) =>
+              continuation({
+                '#album':
+                  albumData.find(album => album.tracks.includes(track)),
+              }),
+          },
+        },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            dependencies: ['#album'],
+            options: {earlyExitIfNotFound},
+            mapContinuation: {to},
+            compute: ({
+              '#album': album,
+              '#options': {earlyExitIfNotFound},
+            }, continuation) =>
+              (album
+                ? continuation.raise({to: album})
+                : (earlyExitIfNotFound
+                    ? continuation.exit(null)
+                    : continuation.raise({to: album}))),
+          },
+        },
+      ]);
     },
 
     // Gets a single property from this track's album, providing it as the same
