@@ -141,7 +141,7 @@ export default class CacheableObject {
 
       const definition = {
         configurable: false,
-        enumerable: true,
+        enumerable: flags.expose,
       };
 
       if (flags.update) {
