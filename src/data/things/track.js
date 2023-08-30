@@ -200,7 +200,7 @@ export class Track extends Thing {
 
     otherReleases:
       Thing.composite.from(`Track.otherReleases`, [
-        Thing.composite.earlyExitWithoutDependency('trackData'),
+        Thing.composite.earlyExitWithoutDependency('trackData', {mode: 'empty'}),
         Track.composite.withOriginalRelease({selfIfOriginal: true}),
 
         {
@@ -242,7 +242,7 @@ export class Track extends Thing {
         },
       },
 
-      Track.composite.withAlbumProperties({properties: ['artistContribs']}),
+      Track.composite.withAlbumProperty('artistContribs'),
 
       {
         flags: {expose: true},
