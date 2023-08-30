@@ -604,38 +604,26 @@ export class Track extends Thing {
       ]),
   };
 
-  [inspect.custom]() {
-    const base = Thing.prototype[inspect.custom].apply(this);
+  [inspect.custom](depth) {
+    const parts = [];
 
-    const rereleasePart =
-      (this.originalReleaseTrackByRef
-        ? `${color.yellow('[rerelease]')} `
-        : ``);
+    parts.push(Thing.prototype[inspect.custom].apply(this));
 
-    const {album, dataSourceAlbum} = this;
+    if (this.originalReleaseTrackByRef) {
+      parts.unshift(`${color.yellow('[rerelease]')} `);
+    }
 
-    const albumName =
-      (album
-        ? album.name
-        : dataSourceAlbum?.name);
-
-    const albumIndex =
-      albumName &&
-        (album
-          ? album.tracks.indexOf(this)
-          : dataSourceAlbum.tracks.indexOf(this));
-
-    const trackNum =
-      albumName &&
+    let album;
+    if (depth >= 0 && (album = this.album ?? this.dataSourceAlbum)) {
+      const albumName = album.name;
+      const albumIndex = album.tracks.indexOf(this);
+      const trackNum =
         (albumIndex === -1
           ? '#?'
           : `#${albumIndex + 1}`);
+      parts.push(` (${color.yellow(trackNum)} in ${color.green(albumName)})`);
+    }
 
-    const albumPart =
-      albumName
-        ? ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
-        : ``;
-
-    return rereleasePart + base + albumPart;
+    return parts.join('');
   }
 }

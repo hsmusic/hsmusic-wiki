@@ -719,11 +719,18 @@ export default class Thing extends CacheableObject {
     from(firstArg, secondArg) {
       const debug = fn => {
         if (Thing.composite.from.debug === true) {
+          const label =
+            (annotation
+              ? color.dim(`[composite: ${annotation}]`)
+              : color.dim(`[composite]`));
           const result = fn();
           if (Array.isArray(result)) {
-            console.log(`[composite]`, ...result);
+            console.log(label, ...result.map(value =>
+              (typeof value === 'object'
+                ? inspect(value, {depth: 0, colors: true, compact: true, breakLength: Infinity})
+                : value)));
           } else {
-            console.log(`[composite]`, result);
+            console.log(label, result);
           }
         }
       };
@@ -919,7 +926,7 @@ export default class Thing extends CacheableObject {
           let valueSoFar = value;         // Set only for {update: true} compositions
           let exportDependencies = null;  // Set only for {compose: true} compositions
 
-          debug(() => color.bright(`begin composition (annotation: ${annotation})`));
+          debug(() => color.bright(`begin composition`));
 
           stepLoop: for (let i = 0; i < exposeSteps.length; i++) {
             const step = exposeSteps[i];
@@ -932,9 +939,9 @@ export default class Thing extends CacheableObject {
             const filteredDependencies = _filterDependencies(dependencies, step);
             const {continuation, continuationStorage} = _prepareContinuation(transform);
 
-            debug(() =>
-              `step #${i+1} - ${transform ? 'transform' : 'compute'} ` +
-              `with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+            debug(() => [
+              `step #${i+1} - ${transform ? 'transform' : 'compute'}`,
+              `with dependencies:`, filteredDependencies]);
 
             const result =
               (transform
@@ -946,18 +953,15 @@ export default class Thing extends CacheableObject {
                 throw new TypeError(`Use continuation.exit() or continuation.raise() in {compose: true} compositions`);
               }
 
-              debug(() => `step #${i+1} - early-exit (inferred)`);
-              debug(() => `early-exit: ${inspect(result, {compact: true})}`);
-              debug(() => color.bright(`end composition (annotation: ${annotation})`));
-
+              debug(() => [`step #${i+1} - early-exit (inferred) ->`, result]);
+              debug(() => color.bright(`end composition`));
               return result;
             }
 
             switch (continuationStorage.returnedWith) {
               case 'exit':
-                debug(() => `step #${i+1} - result: early-exit (explicit)`);
-                debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
-                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                debug(() => [`step #${i+1} - result: early-exit (explicit) ->`, continuationStorage.providedValue]);
+                debug(() => color.bright(`end composition`));
                 return continuationStorage.providedValue;
 
               case 'raise':
@@ -986,7 +990,7 @@ export default class Thing extends CacheableObject {
 
           if (exportDependencies) {
             debug(() => [`raise dependencies:`, exportDependencies]);
-            debug(() => color.bright(`end composition (annotation: ${annotation})`));
+            debug(() => color.bright(`end composition`));
             return continuationIfApplicable(exportDependencies);
           }
 
@@ -998,9 +1002,9 @@ export default class Thing extends CacheableObject {
             valueSoFar !== noTransformSymbol &&
             base.expose.transform;
 
-          debug(() =>
-            `base - ${transform ? 'transform' : 'compute'} ` +
-            `with dependencies: ${inspect(filteredDependencies, {depth: 0})}`);
+          debug(() => [
+            `base - ${transform ? 'transform' : 'compute'}`,
+            `with dependencies:`, filteredDependencies]);
 
           if (base.flags.compose) {
             const {continuation, continuationStorage} = _prepareContinuation(transform);
@@ -1020,15 +1024,15 @@ export default class Thing extends CacheableObject {
 
               case 'exit':
                 debug(() => `base - result: early-exit (explicit)`);
-                debug(() => `early-exit: ${inspect(continuationStorage.providedValue, {compact: true})}`);
-                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                debug(() => [`early-exit:`, continuationStorage.providedValue]);
+                debug(() => color.bright(`end composition`));
                 return continuationStorage.providedValue;
 
               case 'raise':
                 exportDependencies = _assignDependencies(continuationStorage.providedDependencies, base);
                 debug(() => `base - result: raise`);
-                debug(() => `raise dependencies: ${inspect(exportDependencies, {compact: true})}`);
-                debug(() => color.bright(`end composition (annotation: ${annotation})`));
+                debug(() => [`raise dependencies:`, exportDependencies]);
+                debug(() => color.bright(`end composition`));
                 return continuationIfApplicable(exportDependencies);
             }
           } else {
@@ -1037,8 +1041,8 @@ export default class Thing extends CacheableObject {
                 ? base.expose.transform(valueSoFar, filteredDependencies)
                 : base.expose.compute(filteredDependencies));
 
-            debug(() => `base - non-compose (final) result: ${inspect(result, {compact: true})}`);
-            debug(() => color.bright(`end composition (annotation: ${annotation})`));
+            debug(() => [`base - non-compose (final) result:`, result]);
+            debug(() => color.bright(`end composition`));
 
             return result;
           }
@@ -1065,6 +1069,25 @@ export default class Thing extends CacheableObject {
       }
 
       return constructedDescriptor;
+    },
+
+    // Evaluates a function with composite debugging enabled, turns debugging
+    // off again, and returns the result of the function. This is mostly syntax
+    // sugar, but also helps avoid unit tests avoid accidentally printing debug
+    // info for a bunch of unrelated composites (due to property enumeration
+    // when displaying an unexpected result). Use as so:
+    //
+    //   Without debugging:
+    //     t.same(thing.someProp, value)
+    //
+    //   With debugging:
+    //     t.same(Thing.composite.debug(() => thing.someProp), value)
+    //
+    debug(fn) {
+      Thing.composite.from.debug = true;
+      const value = fn();
+      Thing.composite.from.debug = false;
+      return value;
     },
 
     // -- Compositional steps for compositions to nest --
