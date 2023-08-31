@@ -128,6 +128,9 @@ export class Album extends Thing {
 
     commentatorArtists: Thing.common.commentatorArtists(),
 
+    groups: Thing.common.dynamicThingsFromReferenceList('groupsByRef', 'groupData', find.group),
+    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
+
     hasCoverArt: Thing.common.contribsPresent('coverArtistContribsByRef'),
     hasWallpaperArt: Thing.common.contribsPresent('wallpaperArtistContribsByRef'),
     hasBannerArt: Thing.common.contribsPresent('bannerArtistContribsByRef'),
@@ -146,18 +149,6 @@ export class Album extends Thing {
             : [],
       },
     },
-
-    groups: Thing.common.dynamicThingsFromReferenceList(
-      'groupsByRef',
-      'groupData',
-      find.group
-    ),
-
-    artTags: Thing.common.dynamicThingsFromReferenceList(
-      'artTagsByRef',
-      'artTagData',
-      find.artTag
-    ),
   });
 
   static [Thing.getSerializeDescriptors] = ({

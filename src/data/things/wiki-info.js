@@ -59,10 +59,6 @@ export class WikiInfo extends Thing {
 
     // Expose only
 
-    divideTrackListsByGroups: Thing.common.dynamicThingsFromReferenceList(
-      'divideTrackListsByGroupsByRef',
-      'groupData',
-      find.group
-    ),
+    divideTrackListsByGroups: Thing.common.dynamicThingsFromReferenceList('divideTrackListsByGroupsByRef', 'groupData', find.group),
   });
 }

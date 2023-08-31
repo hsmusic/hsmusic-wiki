@@ -141,10 +141,6 @@ export class FlashAct extends Thing {
 
     // Expose only
 
-    flashes: Thing.common.dynamicThingsFromReferenceList(
-      'flashesByRef',
-      'flashData',
-      find.flash
-    ),
+    flashes: Thing.common.dynamicThingsFromReferenceList('flashesByRef', 'flashData', find.flash),
   })
 }

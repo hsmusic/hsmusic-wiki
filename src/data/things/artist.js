@@ -111,10 +111,8 @@ export class Artist extends Thing {
       },
     },
 
-    flashesAsContributor: Artist.filterByContrib(
-      'flashData',
-      'contributorContribs'
-    ),
+    flashesAsContributor:
+      Artist.filterByContrib('flashData', 'contributorContribs'),
   });
 
   static [Thing.getSerializeDescriptors] = ({

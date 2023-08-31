@@ -167,11 +167,7 @@ export class Track extends Thing {
     // not generally relevant information). It's also not guaranteed that
     // dataSourceAlbum is available (depending on the Track creator to optionally
     // provide dataSourceAlbumByRef).
-    dataSourceAlbum: Thing.common.dynamicThingFromSingleReference(
-      'dataSourceAlbumByRef',
-      'albumData',
-      find.album
-    ),
+    dataSourceAlbum: Thing.common.dynamicThingFromSingleReference('dataSourceAlbumByRef', 'albumData', find.album),
 
     date: Thing.composite.from(`Track.date`, [
       Thing.composite.exposeDependencyOrContinue('dateFirstReleased'),
@@ -303,6 +299,8 @@ export class Track extends Thing {
       Thing.common.dynamicThingsFromReferenceList('sampledTracksByRef', 'trackData', find.track),
     ]),
 
+    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
+
     // Specifically exclude re-releases from this list - while it's useful to
     // get from a re-release to the tracks it references, re-releases aren't
     // generally relevant from the perspective of the tracks being referenced.
@@ -342,16 +340,7 @@ export class Track extends Thing {
       },
     },
 
-    featuredInFlashes: Thing.common.reverseReferenceList(
-      'flashData',
-      'featuredTracks'
-    ),
-
-    artTags: Thing.common.dynamicThingsFromReferenceList(
-      'artTagsByRef',
-      'artTagData',
-      find.artTag
-    ),
+    featuredInFlashes: Thing.common.reverseReferenceList('flashData', 'featuredTracks'),
   });
 
   static composite = {
