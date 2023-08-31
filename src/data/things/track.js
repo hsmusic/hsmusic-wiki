@@ -203,25 +203,15 @@ export class Track extends Thing {
       }),
 
       {
-        mapDependencies: {contribsFromTrack: '#artistContribs'},
-        compute: ({contribsFromTrack}, continuation) =>
+        dependencies: ['#artistContribs'],
+        compute: ({'#artistContribs': contribsFromTrack}, continuation) =>
           (empty(contribsFromTrack)
             ? continuation()
             : contribsFromTrack),
       },
 
       Track.composite.withAlbumProperty('artistContribs'),
-
-      {
-        flags: {expose: true},
-        expose: {
-          mapDependencies: {contribsFromAlbum: '#album.artistContribs'},
-          compute: ({contribsFromAlbum}) =>
-            (empty(contribsFromAlbum)
-              ? null
-              : contribsFromAlbum),
-        },
-      },
+      Thing.composite.exposeDependency('#album.artistContribs'),
     ]),
 
     contributorContribs: Thing.composite.from(`Track.contributorContribs`, [
@@ -247,8 +237,8 @@ export class Track extends Thing {
       }),
 
       {
-        mapDependencies: {contribsFromTrack: '#coverArtistContribs'},
-        compute: ({contribsFromTrack}, continuation) =>
+        dependencies: ['#coverArtistContribs'],
+        compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
           (empty(contribsFromTrack)
             ? continuation()
             : contribsFromTrack),
