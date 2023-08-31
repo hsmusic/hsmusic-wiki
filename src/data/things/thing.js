@@ -192,26 +192,29 @@ export default class Thing extends CacheableObject {
     // Corresponding dynamic property to referenceList, which takes the values
     // in the provided property and searches the specified wiki data for
     // matching actual Thing-subclass objects.
-    dynamicThingsFromReferenceList: (
-      referenceListProperty,
-      thingDataProperty,
-      findFn
-    ) => ({
-      flags: {expose: true},
+    dynamicThingsFromReferenceList(
+      refs,
+      data,
+      findFunction
+    ) {
+      return Thing.composite.from(`Thing.common.dynamicThingsFromReferenceList`, [
+        Thing.composite.earlyExitWithoutDependency(refs, {value: []}),
+        Thing.composite.earlyExitWithoutDependency(data, {value: []}),
 
-      expose: {
-        dependencies: [referenceListProperty, thingDataProperty],
-        compute: ({
-          [referenceListProperty]: refs,
-          [thingDataProperty]: thingData,
-        }) =>
-          refs && thingData
-            ? refs
-                .map((ref) => findFn(ref, thingData, {mode: 'quiet'}))
-                .filter(Boolean)
-            : [],
-      },
-    }),
+        {
+          flags: {expose: true},
+          expose: {
+            mapDependencies: {refs, data},
+            options: {findFunction},
+
+            compute: ({refs, data, '#options': {findFunction}}) =>
+              refs
+                .map(ref => findFunction(ref, data, {mode: 'quiet'}))
+                .filter(Boolean),
+          },
+        },
+      ]);
+    },
 
     // Corresponding function for a single reference.
     dynamicThingFromSingleReference: (
