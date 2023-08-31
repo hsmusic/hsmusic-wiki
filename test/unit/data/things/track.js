@@ -272,6 +272,31 @@ t.test(`Track.hasUniqueCoverArt`, t => {
     `hasUniqueCoverArt #7: is false if track's coverArtistContribsByRef resolve empty`);
 });
 
+t.only(`Track.originalReleaseTrack`, t => {
+  t.plan(3);
+
+  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
+  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
+
+  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
+    trackData: [track1, track2],
+    albumData: [album1, album2],
+  });
+
+  t.equal(track2.originalReleaseTrack, null,
+    `originalReleaseTrack #1: defaults to null`);
+
+  track2.originalReleaseTrackByRef = 'track:track1';
+
+  t.equal(track2.originalReleaseTrack, track1,
+    `originalReleaseTrack #2: is resolved from originalReleaseTrackByRef`);
+
+  track2.trackData = [];
+
+  t.equal(track2.originalReleaseTrack, null,
+    `originalReleaseTrack #3: is null when track missing trackData`);
+});
+
 t.test(`Track.otherReleases`, t => {
   t.plan(6);
 

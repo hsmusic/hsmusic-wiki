@@ -192,11 +192,10 @@ export class Track extends Thing {
       Thing.composite.exposeDependency('#hasUniqueCoverArt'),
     ]),
 
-    originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
-      'originalReleaseTrackByRef',
-      'trackData',
-      find.track
-    ),
+    originalReleaseTrack: Thing.composite.from(`Track.originalReleaseTrack`, [
+      Track.composite.withOriginalRelease(),
+      Thing.composite.exposeDependency('#originalRelease'),
+    ]),
 
     otherReleases:
       Thing.composite.from(`Track.otherReleases`, [
