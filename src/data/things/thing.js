@@ -1542,30 +1542,8 @@ export default class Thing extends CacheableObject {
       earlyExitIfNotFound = false,
     }) {
       return Thing.composite.from(`Thing.composite.withResolvedReference`, [
-        {
-          flags: {expose: true, compose: true},
-          expose: {
-            mapDependencies: {ref},
-            mapContinuation: {to},
-
-            compute: ({ref}, continuation) =>
-              (ref
-                ? continuation()
-                : continuation.raise({to: null})),
-          },
-        },
-
-        {
-          flags: {expose: true, compose: true},
-          expose: {
-            mapDependencies: {data},
-
-            compute: ({data}, continuation) =>
-              (data === null
-                ? continuation.exit(null)
-                : continuation()),
-          },
-        },
+        Thing.composite.raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
+        Thing.composite.earlyExitWithoutDependency(data),
 
         {
           flags: {expose: true, compose: true},
