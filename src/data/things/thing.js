@@ -1384,6 +1384,36 @@ export default class Thing extends CacheableObject {
       ]);
     },
 
+    // Early exits if an availability check fails.
+    // This is for internal use only - use `earlyExitWithoutDependency` or
+    // `earlyExitWIthoutUpdateValue` instead.
+    earlyExitIfAvailabilityCheckFailed({
+      availability = '#availability',
+      value = null,
+    }) {
+      return Thing.composite.from(`Thing.composite.earlyExitIfAvailabilityCheckFailed`, [
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {availability},
+            compute: ({availability}, continuation) =>
+              (availability
+                ? continuation.raise()
+                : continuation()),
+          },
+        },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            options: {value},
+            compute: ({'#options': {value}}, continuation) =>
+              continuation.exit(value),
+          },
+        },
+      ]);
+    },
+
     // Early exits if a dependency isn't available.
     // See withResultOfAvailabilityCheck for {mode} options!
     earlyExitWithoutDependency(dependency, {
@@ -1391,10 +1421,32 @@ export default class Thing extends CacheableObject {
       value = null,
     } = {}) {
       return Thing.composite.from(`Thing.composite.earlyExitWithoutDependency`, [
-        Thing.composite.withResultOfAvailabilityCheck({
-          fromDependency: dependency,
-          mode,
-        }),
+        Thing.composite.withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
+        Thing.composite.earlyExitIfAvailabilityCheckFailed({value}),
+      ]);
+    },
+
+    // Early exits if this property's update value isn't available.
+    // See withResultOfAvailabilityCheck for {mode} options!
+    earlyExitWithoutUpdateValue({
+      mode = 'null',
+      value = null,
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.earlyExitWithoutDependency`, [
+        Thing.composite.withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
+        Thing.composite.earlyExitIfAvailabilityCheckFailed({value}),
+      ]);
+    },
+
+    // Raises if a dependency isn't available.
+    // See withResultOfAvailabilityCheck for {mode} options!
+    raiseWithoutDependency(dependency, {
+      mode = 'null',
+      map = {},
+      raise = {},
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.raiseWithoutDependency`, [
+        Thing.composite.withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
 
         {
           flags: {expose: true, compose: true},
@@ -1410,11 +1462,43 @@ export default class Thing extends CacheableObject {
         {
           flags: {expose: true, compose: true},
           expose: {
-            dependencies: ['#availability'],
-            options: {value},
+            options: {raise},
+            mapContinuation: map,
+            compute: ({'#options': {raise}}, continuation) =>
+              continuation.raiseAbove(raise),
+          },
+        },
+      ]);
+    },
 
-            compute: ({'#options': {value}}, continuation) =>
-              continuation.exit(value),
+    // Raises if this property's update value isn't available.
+    // See withResultOfAvailabilityCheck for {mode} options!
+    raiseWithoutUpdateValue({
+      mode = 'null',
+      map = {},
+      raise = {},
+    } = {}) {
+      return Thing.composite.from(`Thing.composite.raiseWithoutUpdateValue`, [
+        Thing.composite.withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            mapDependencies: {availability},
+            compute: ({availability}, continuation) =>
+              (availability
+                ? continuation.raise()
+                : continuation()),
+          },
+        },
+
+        {
+          flags: {expose: true, compose: true},
+          expose: {
+            options: {raise},
+            mapContinuation: map,
+            compute: ({'#options': {raise}}, continuation) =>
+              continuation.raiseAbove(raise),
           },
         },
       ]);
