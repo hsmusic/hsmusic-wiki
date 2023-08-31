@@ -993,7 +993,7 @@ export default class Thing extends CacheableObject {
             debug(() => color.bright(`begin composition - not transforming`));
           }
 
-          stepLoop: for (let i = 0; i < steps.length; i++) {
+          for (let i = 0; i < steps.length; i++) {
             const step = steps[i];
             const isBase = i === steps.length - 1;
 
@@ -1021,8 +1021,8 @@ export default class Thing extends CacheableObject {
 
             const result =
               (callingTransformForThisStep
-                ? step.expose.transform(valueSoFar, filteredDependencies, continuation)
-                : step.expose.compute(filteredDependencies, continuation));
+                ? expose.transform(valueSoFar, filteredDependencies, continuation)
+                : expose.compute(filteredDependencies, continuation));
 
             if (result !== continuationSymbol) {
               debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
