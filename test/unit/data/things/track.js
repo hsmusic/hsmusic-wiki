@@ -6,6 +6,8 @@ import thingConstructors from '#things';
 const {
   Album,
   Artist,
+  Flash,
+  FlashAct,
   Thing,
   Track,
 } = thingConstructors;
@@ -41,6 +43,16 @@ function stubArtistAndContribs() {
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
 
   return {artist, contribs, badContribs};
+}
+
+function stubFlashAndAct(directory = 'zam') {
+  const flash = new Flash();
+  flash.directory = directory;
+
+  const flashAct = new FlashAct();
+  flashAct.flashesByRef = [Thing.getReference(flash)];
+
+  return {flash, flashAct};
 }
 
 t.test(`Track.album`, t => {
@@ -155,9 +167,9 @@ t.test(`Track.coverArtDate`, t => {
   const {artist, contribs} = stubArtistAndContribs();
 
   const {XXX_decacheWikiData} = linkAndBindWikiData({
-    trackData: [track],
     albumData: [album],
     artistData: [artist],
+    trackData: [track],
   });
 
   track.coverArtistContribsByRef = contribs;
@@ -202,9 +214,9 @@ t.test(`Track.coverArtFileExtension`, t => {
   const {artist, contribs} = stubArtistAndContribs();
 
   const {XXX_decacheWikiData} = linkAndBindWikiData({
-    trackData: [track],
     albumData: [album],
     artistData: [artist],
+    trackData: [track],
   });
 
   t.equal(track.coverArtFileExtension, null,
@@ -280,6 +292,32 @@ t.test(`Track.date`, t => {
     `date #3: is own dateFirstReleased`);
 });
 
+t.test(`Track.featuredInFlashes`, t => {
+  t.plan(2);
+
+  const {track, album} = stubTrackAndAlbum('track1');
+
+  const {flash: flash1, flashAct: flashAct1} = stubFlashAndAct('flash1');
+  const {flash: flash2, flashAct: flashAct2} = stubFlashAndAct('flash2');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    trackData: [track],
+    flashData: [flash1, flash2],
+    flashActData: [flashAct1, flashAct2],
+  });
+
+  t.same(track.featuredInFlashes, [],
+    `featuredInFlashes #1: defaults to empty array`);
+
+  flash1.featuredTracksByRef = ['track:track1'];
+  flash2.featuredTracksByRef = ['track:track1'];
+  XXX_decacheWikiData();
+
+  t.same(track.featuredInFlashes, [flash1, flash2],
+    `featuredInFlashes #2: matches flashes' featuredTracks`);
+});
+
 t.test(`Track.hasUniqueCoverArt`, t => {
   t.plan(7);
 
@@ -339,8 +377,8 @@ t.only(`Track.originalReleaseTrack`, t => {
   const {track: track2, album: album2} = stubTrackAndAlbum('track2');
 
   const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
-    trackData: [track1, track2],
     albumData: [album1, album2],
+    trackData: [track1, track2],
   });
 
   t.equal(track2.originalReleaseTrack, null,
@@ -366,8 +404,8 @@ t.test(`Track.otherReleases`, t => {
   const {track: track4, album: album4} = stubTrackAndAlbum('track4');
 
   const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
-    trackData: [track1, track2, track3, track4],
     albumData: [album1, album2, album3, album4],
+    trackData: [track1, track2, track3, track4],
   });
 
   t.same(track1.otherReleases, [],
@@ -376,7 +414,6 @@ t.test(`Track.otherReleases`, t => {
   track2.originalReleaseTrackByRef = 'track:track1';
   track3.originalReleaseTrackByRef = 'track:track1';
   track4.originalReleaseTrackByRef = 'track:track1';
-
   XXX_decacheWikiData();
 
   t.same(track1.otherReleases, [track2, track3, track4],
@@ -399,4 +436,76 @@ t.test(`Track.otherReleases`, t => {
 
   t.same(track4.otherReleases, [track1, track3, track2],
     `otherReleases #6: otherReleases of rerelease are original track then other rereleases (1/3)`);
+});
+
+t.test(`Track.referencedByTracks`, t => {
+  t.plan(4);
+
+  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
+  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
+  const {track: track3, album: album3} = stubTrackAndAlbum('track3');
+  const {track: track4, album: album4} = stubTrackAndAlbum('track4');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album1, album2, album3, album4],
+    trackData: [track1, track2, track3, track4],
+  });
+
+  t.same(track1.referencedByTracks, [],
+    `referencedByTracks #1: defaults to empty array`);
+
+  track2.referencedTracksByRef = ['track:track1'];
+  track3.referencedTracksByRef = ['track:track1'];
+  XXX_decacheWikiData();
+
+  t.same(track1.referencedByTracks, [track2, track3],
+    `referencedByTracks #2: matches tracks' referencedTracks`);
+
+  track4.sampledTracksByRef = ['track:track1'];
+  XXX_decacheWikiData();
+
+  t.same(track1.referencedByTracks, [track2, track3],
+    `referencedByTracks #3: doesn't match tracks' sampledTracks`);
+
+  track3.originalReleaseTrackByRef = 'track:track2';
+  XXX_decacheWikiData();
+
+  t.same(track1.referencedByTracks, [track2],
+    `referencedByTracks #4: doesn't include re-releases`);
+});
+
+t.test(`Track.sampledByTracks`, t => {
+  t.plan(4);
+
+  const {track: track1, album: album1} = stubTrackAndAlbum('track1');
+  const {track: track2, album: album2} = stubTrackAndAlbum('track2');
+  const {track: track3, album: album3} = stubTrackAndAlbum('track3');
+  const {track: track4, album: album4} = stubTrackAndAlbum('track4');
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album1, album2, album3, album4],
+    trackData: [track1, track2, track3, track4],
+  });
+
+  t.same(track1.sampledByTracks, [],
+    `sampledByTracks #1: defaults to empty array`);
+
+  track2.sampledTracksByRef = ['track:track1'];
+  track3.sampledTracksByRef = ['track:track1'];
+  XXX_decacheWikiData();
+
+  t.same(track1.sampledByTracks, [track2, track3],
+    `sampledByTracks #2: matches tracks' sampledTracks`);
+
+  track4.referencedTracksByRef = ['track:track1'];
+  XXX_decacheWikiData();
+
+  t.same(track1.sampledByTracks, [track2, track3],
+    `sampledByTracks #3: doesn't match tracks' referencedTracks`);
+
+  track3.originalReleaseTrackByRef = 'track:track2';
+  XXX_decacheWikiData();
+
+  t.same(track1.sampledByTracks, [track2],
+    `sampledByTracks #4: doesn't include re-releases`);
 });

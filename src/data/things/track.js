@@ -278,38 +278,15 @@ export class Track extends Thing {
     // counting the number of times a track has been referenced, for use in
     // the "Tracks - by Times Referenced" listing page (or other data
     // processing).
-    referencedByTracks: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'trackData'],
-
-        compute: ({this: track, trackData}) =>
-          trackData
-            ? trackData
-                .filter((t) => !t.originalReleaseTrack)
-                .filter((t) => t.referencedTracks?.includes(track))
-            : [],
-      },
-    },
+    referencedByTracks: Track.composite.trackReverseReferenceList('referencedTracks'),
 
     // For the same reasoning, exclude re-releases from sampled tracks too.
-    sampledByTracks: {
-      flags: {expose: true},
+    sampledByTracks: Track.composite.trackReverseReferenceList('sampledTracks'),
 
-      expose: {
-        dependencies: ['this', 'trackData'],
-
-        compute: ({this: track, trackData}) =>
-          trackData
-            ? trackData
-                .filter((t) => !t.originalReleaseTrack)
-                .filter((t) => t.sampledTracks?.includes(track))
-            : [],
-      },
-    },
-
-    featuredInFlashes: Thing.common.reverseReferenceList('flashData', 'featuredTracks'),
+    featuredInFlashes: Thing.common.reverseReferenceList({
+      data: 'flashData',
+      refList: 'featuredTracks',
+    }),
   });
 
   static composite = {
@@ -572,6 +549,25 @@ export class Track extends Thing {
             (empty(contribsFromAlbum)
               ? continuation.raise({to: false})
               : continuation.raise({to: true})),
+        },
+      ]);
+    },
+
+    trackReverseReferenceList(refListProperty) {
+      return Thing.composite.from(`Track.composite.trackReverseReferenceList`, [
+        Thing.composite.withReverseReferenceList({
+          data: 'trackData',
+          refList: refListProperty,
+          originalTracksOnly: true,
+        }),
+
+        {
+          flags: {expose: true},
+          expose: {
+            dependencies: ['#reverseReferenceList'],
+            compute: ({'#reverseReferenceList': reverseReferenceList}) =>
+              reverseReferenceList.filter(track => !track.originalReleaseTrack),
+          },
         },
       ]);
     },

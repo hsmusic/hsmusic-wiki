@@ -330,16 +330,15 @@ export default class Thing extends CacheableObject {
     // you would use this to compute a corresponding "referenced *by* tracks"
     // property. Naturally, the passed ref list property is of the things in the
     // wiki data provided, not the requesting Thing itself.
-    reverseReferenceList: (thingDataProperty, referencerRefListProperty) => ({
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', thingDataProperty],
-
-        compute: ({this: thing, [thingDataProperty]: thingData}) =>
-          thingData?.filter(t => t[referencerRefListProperty].includes(thing)) ?? [],
-      },
-    }),
+    reverseReferenceList({
+      data,
+      refList,
+    }) {
+      return Thing.composite.from(`Thing.common.reverseReferenceList`, [
+        Thing.composite.withReverseReferenceList({data, refList}),
+        Thing.composite.exposeDependency('#reverseReferenceList'),
+      ]);
+    },
 
     // Corresponding function for single references. Note that the return value
     // is still a list - this is for matching all the objects whose single
@@ -1532,6 +1531,30 @@ export default class Thing extends CacheableObject {
 
             return continuation.raise({match});
           },
+        },
+      ]);
+    },
+
+    // Check out the info on Thing.common.reverseReferenceList!
+    // This is its composable form.
+    withReverseReferenceList({
+      data,
+      to = '#reverseReferenceList',
+      refList: refListProperty,
+    }) {
+      return Thing.composite.from(`Thing.common.reverseReferenceList`, [
+        Thing.composite.earlyExitWithoutDependency(data, {value: []}),
+
+        {
+          dependencies: ['this'],
+          mapDependencies: {data},
+          mapContinuation: {to},
+          options: {refListProperty},
+
+          compute: ({this: thisThing, data, '#options': {refListProperty}}, continuation) =>
+            continuation({
+              to: data.filter(thing => thing[refListProperty].includes(thisThing)),
+            }),
         },
       ]);
     },
