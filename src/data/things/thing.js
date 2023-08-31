@@ -565,6 +565,14 @@ export default class Thing extends CacheableObject {
     //       },
     //     ]);
     //
+    // One last note! A super common code pattern when creating more complex
+    // compositions is to have several steps which *only* expose and compose.
+    // As a syntax shortcut, you can skip the outer section. It's basically
+    // like writing out just the {expose: {...}} part. Remember that this
+    // indicates that the step you're defining is compositional, so you have
+    // to specify the flags manually for the base, even if this property isn't
+    // going to get an {update: true} flag.
+    //
     // == Cache-safe dependency names: ==
     //
     // [Disclosure: The caching engine hasn't actually been implemented yet.
@@ -705,7 +713,7 @@ export default class Thing extends CacheableObject {
     // expanded to the scope of the composition instead of following steps.
     //
     // For example, suppose your composition (which you expect to include in
-    // other compositions) brings about several internal, hash-prefixed
+    // other compositions) brings about several private, hash-prefixed
     // dependencies to contribute to its own results. Those dependencies won't
     // end up "bleeding" into the dependency list of whichever composition is
     // nesting this one - they will totally disappear once all the steps in
@@ -717,6 +725,40 @@ export default class Thing extends CacheableObject {
     // continuation passed to the base. (Customarily, those should start with
     // a hash just like the exports from any other compositional step; they're
     // still dynamically provided dependencies!)
+    //
+    // Another way to "export" dependencies is by using calling *any* step's
+    // `continuation.raise()` function. This is sort of like early exiting,
+    // but instead of quitting out the whole entire property, it will just
+    // break out of the current, nested composition's list of steps, acting
+    // as though the composition had finished naturally. The dependencies
+    // passed to `raise` will be the ones which get exported.
+    //
+    // Since `raise` is another way to export dependencies, if you're using
+    // dynamic export names, you should specify `mapContinuation` on the step
+    // calling `continuation.raise` as well.
+    //
+    // An important note on `mapDependencies` here: A nested composition gets
+    // free access to all the ordinary properties defined on the thing it's
+    // working on, but if you want it to depend on *private* dependencies -
+    // ones prefixed with '#' - which were provided by some other compositional
+    // step preceding wherever this one gets nested, then you *have* to use
+    // `mapDependencies` to gain access. Check out the section on "cache-safe
+    // dependency names" for information on this syntax!
+    //
+    // Also - on rare occasion - you might want to make a reusable composition
+    // that itself causes the composition *it's* nested in to raise. If that's
+    // the case, give `composition.raiseAbove()` a go! This effectively means
+    // kicking out of *two* layers of nested composition - the one including
+    // the step with the `raiseAbove` call, and the composition which that one
+    // is nested within. You don't need to use `raiseAbove` if the reusable
+    // utility function just returns a single compositional step, but if you
+    // want to make use of other compositional steps, it gives you access to
+    // the same conditional-raise capabilities.
+    //
+    // Have some syntax sugar! Since nested compositions are defined by having
+    // the base be {compose: true}, the composition will infer as much if you
+    // don't specifying the base's flags at all. Simply use the same shorthand
+    // syntax as for other compositional steps, and it'll work out cleanly!
     //
     from(firstArg, secondArg) {
       const debug = fn => {
