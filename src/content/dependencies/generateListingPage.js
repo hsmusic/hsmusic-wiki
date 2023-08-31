@@ -129,6 +129,8 @@ export default {
               listings: language.formatUnitList(relations.seeAlsoLinks),
             })),
 
+        slots.content,
+
         slots.type === 'rows' &&
           html.tag(listTag,
             slots.rows.map(row =>
@@ -180,9 +182,6 @@ export default {
                         formatListingString('chunk.item', row))))),
               ]),
           ]),
-
-        slots.type === 'custom' &&
-          slots.content,
       ],
 
       navLinkStyle: 'hierarchical',
