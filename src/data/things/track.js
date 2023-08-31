@@ -98,36 +98,15 @@ export class Track extends Thing {
     // the track's own coverArtDate or its album's trackArtDate, so if neither
     // is specified, this value is null.
     coverArtDate: Thing.composite.from(`Track.coverArtDate`, [
-      Track.composite.withAlbumProperties({
-        properties: [
-          'trackArtDate',
-          'trackCoverArtistContribsByRef',
-        ],
-      }),
+      Track.composite.withHasUniqueCoverArt(),
+      Thing.composite.earlyExitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
 
-      {
-        flags: {update: true, expose: true},
+      Thing.composite.exposeUpdateValueOrContinue(),
+
+      Track.composite.withAlbumProperty('trackArtDate'),
+      Thing.composite.exposeDependency('#album.trackArtDate', {
         update: {validate: isDate},
-        expose: {
-          dependencies: [
-            'coverArtistContribsByRef',
-            'disableUniqueCoverArt',
-            '#album.trackArtDate',
-            '#album.trackCoverArtistContribsByRef',
-          ],
-
-          transform(coverArtDate, {
-            coverArtistContribsByRef,
-            disableUniqueCoverArt,
-            '#album.trackArtDate': trackArtDate,
-            '#album.trackCoverArtistContribsByRef': trackCoverArtistContribsByRef,
-          }) {
-            if (disableUniqueCoverArt) return null;
-            if (empty(coverArtistContribsByRef) && empty(trackCoverArtistContribsByRef)) return null;
-            return coverArtDate ?? trackArtDate;
-          },
-        },
-      }
+      }),
     ]),
 
     originalReleaseTrackByRef: Thing.common.singleReference(Track),
