@@ -195,6 +195,66 @@ t.test(`Track.coverArtDate`, t => {
     `coverArtDate #6: is null if track disables unique cover artwork`);
 });
 
+t.test(`Track.coverArtFileExtension`, t => {
+  t.plan(8);
+
+  const {track, album} = stubTrackAndAlbum();
+  const {artist, contribs} = stubArtistAndContribs();
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    trackData: [track],
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(track.coverArtFileExtension, null,
+    `coverArtFileExtension #1: defaults to null`);
+
+  track.coverArtistContribsByRef = contribs;
+
+  t.equal(track.coverArtFileExtension, 'jpg',
+    `coverArtFileExtension #2: is jpg if has cover art and not further specified`);
+
+  track.coverArtistContribsByRef = [];
+
+  album.coverArtistContribsByRef = contribs;
+  XXX_decacheWikiData();
+
+  t.equal(track.coverArtFileExtension, null,
+    `coverArtFileExtension #3: only has value for unique cover art`);
+
+  track.coverArtistContribsByRef = contribs;
+
+  album.trackCoverArtFileExtension = 'png';
+  XXX_decacheWikiData();
+
+  t.equal(track.coverArtFileExtension, 'png',
+    `coverArtFileExtension #4: inherits album trackCoverArtFileExtension (1/2)`);
+
+  track.coverArtFileExtension = 'gif';
+
+  t.equal(track.coverArtFileExtension, 'gif',
+    `coverArtFileExtension #5: is own value (1/2)`);
+
+  track.coverArtistContribsByRef = [];
+
+  album.trackCoverArtistContribsByRef = contribs;
+  XXX_decacheWikiData();
+
+  t.equal(track.coverArtFileExtension, 'gif',
+    `coverArtFileExtension #6: is own value (2/2)`);
+
+  track.coverArtFileExtension = null;
+
+  t.equal(track.coverArtFileExtension, 'png',
+    `coverArtFileExtension #7: inherits album trackCoverArtFileExtension (2/2)`);
+
+  track.disableUniqueCoverArt = true;
+
+  t.equal(track.coverArtFileExtension, null,
+    `coverArtFileExtension #8: is null if track disables unique cover art`);
+});
+
 t.test(`Track.date`, t => {
   t.plan(3);
 

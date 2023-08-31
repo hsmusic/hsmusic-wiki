@@ -90,7 +90,9 @@ export class Track extends Thing {
       Thing.composite.exposeDependencyOrContinue('#album.trackCoverArtFileExtension'),
 
       // Fallback to 'jpg'.
-      Thing.composite.exposeConstant('jpg'),
+      Thing.composite.exposeConstant('jpg', {
+        update: {validate: isFileExtension},
+      }),
     ]),
 
     // Date of cover art release. Like coverArtFileExtension, this represents
