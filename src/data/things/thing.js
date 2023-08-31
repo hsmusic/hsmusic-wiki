@@ -1333,23 +1333,17 @@ export default class Thing extends CacheableObject {
         }),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#availability'],
-            compute: ({'#availability': availability}, continuation) =>
-              (availability
-                ? continuation()
-                : continuation.raise()),
-          },
+          dependencies: ['#availability'],
+          compute: ({'#availability': availability}, continuation) =>
+            (availability
+              ? continuation()
+              : continuation.raise()),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            mapDependencies: {dependency},
-            compute: ({dependency}, continuation) =>
-              continuation.exit(dependency),
-          },
+          mapDependencies: {dependency},
+          compute: ({dependency}, continuation) =>
+            continuation.exit(dependency),
         },
       ]);
     },
@@ -1367,22 +1361,16 @@ export default class Thing extends CacheableObject {
         }),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#availability'],
-            compute: ({'#availability': availability}, continuation) =>
-              (availability
-                ? continuation()
-                : continuation.raise()),
-          },
+          dependencies: ['#availability'],
+          compute: ({'#availability': availability}, continuation) =>
+            (availability
+              ? continuation()
+              : continuation.raise()),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            transform: (value, {}, continuation) =>
-              continuation.exit(value),
-          },
+          transform: (value, {}, continuation) =>
+            continuation.exit(value),
         },
       ]);
     },
@@ -1396,23 +1384,17 @@ export default class Thing extends CacheableObject {
     }) {
       return Thing.composite.from(`Thing.composite.earlyExitIfAvailabilityCheckFailed`, [
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            mapDependencies: {availability},
-            compute: ({availability}, continuation) =>
-              (availability
-                ? continuation.raise()
-                : continuation()),
-          },
+          mapDependencies: {availability},
+          compute: ({availability}, continuation) =>
+            (availability
+              ? continuation.raise()
+              : continuation()),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            options: {value},
-            compute: ({'#options': {value}}, continuation) =>
-              continuation.exit(value),
-          },
+          options: {value},
+          compute: ({'#options': {value}}, continuation) =>
+            continuation.exit(value),
         },
       ]);
     },
@@ -1452,24 +1434,18 @@ export default class Thing extends CacheableObject {
         Thing.composite.withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#availability'],
-            compute: ({'#availability': availability}, continuation) =>
-              (availability
-                ? continuation.raise()
-                : continuation()),
-          },
+          dependencies: ['#availability'],
+          compute: ({'#availability': availability}, continuation) =>
+            (availability
+              ? continuation.raise()
+              : continuation()),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            options: {raise},
-            mapContinuation: map,
-            compute: ({'#options': {raise}}, continuation) =>
-              continuation.raiseAbove(raise),
-          },
+          options: {raise},
+          mapContinuation: map,
+          compute: ({'#options': {raise}}, continuation) =>
+            continuation.raiseAbove(raise),
         },
       ]);
     },
@@ -1485,24 +1461,18 @@ export default class Thing extends CacheableObject {
         Thing.composite.withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            mapDependencies: {availability},
-            compute: ({availability}, continuation) =>
-              (availability
-                ? continuation.raise()
-                : continuation()),
-          },
+          mapDependencies: {availability},
+          compute: ({availability}, continuation) =>
+            (availability
+              ? continuation.raise()
+              : continuation()),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            options: {raise},
-            mapContinuation: map,
-            compute: ({'#options': {raise}}, continuation) =>
-              continuation.raiseAbove(raise),
-          },
+          options: {raise},
+          mapContinuation: map,
+          compute: ({'#options': {raise}}, continuation) =>
+            continuation.raiseAbove(raise),
         },
       ]);
     },
@@ -1549,21 +1519,18 @@ export default class Thing extends CacheableObject {
         Thing.composite.earlyExitWithoutDependency(data),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            options: {findFunction, earlyExitIfNotFound},
-            mapDependencies: {ref, data},
-            mapContinuation: {match: to},
+          options: {findFunction, earlyExitIfNotFound},
+          mapDependencies: {ref, data},
+          mapContinuation: {match: to},
 
-            compute({ref, data, '#options': {findFunction, earlyExitIfNotFound}}, continuation) {
-              const match = findFunction(ref, data, {mode: 'quiet'});
+          compute({ref, data, '#options': {findFunction, earlyExitIfNotFound}}, continuation) {
+            const match = findFunction(ref, data, {mode: 'quiet'});
 
-              if (match === null && earlyExitIfNotFound) {
-                return continuation.exit(null);
-              }
+            if (match === null && earlyExitIfNotFound) {
+              return continuation.exit(null);
+            }
 
-              return continuation.raise({match});
-            },
+            return continuation.raise({match});
           },
         },
       ]);

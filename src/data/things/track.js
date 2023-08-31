@@ -49,18 +49,15 @@ export class Track extends Thing {
       Track.composite.withContainingTrackSection({earlyExitIfNotFound: false}),
 
       {
-        flags: {expose: true, compose: true},
-        expose: {
-          dependencies: ['#trackSection'],
-          compute: ({'#trackSection': trackSection}, continuation) =>
-            // Album.trackSections guarantees the track section will have a
-            // color property (inheriting from the album's own color), but only
-            // if it's actually present! Color will be inherited directly from
-            // album otherwise.
-            (trackSection
-              ? trackSection.color
-              : continuation()),
-        },
+        dependencies: ['#trackSection'],
+        compute: ({'#trackSection': trackSection}, continuation) =>
+          // Album.trackSections guarantees the track section will have a
+          // color property (inheriting from the album's own color), but only
+          // if it's actually present! Color will be inherited directly from
+          // album otherwise.
+          (trackSection
+            ? trackSection.color
+            : continuation()),
       },
 
       Track.composite.withAlbumProperty('color'),
@@ -225,14 +222,11 @@ export class Track extends Thing {
       }),
 
       {
-        flags: {expose: true, compose: true},
-        expose: {
-          mapDependencies: {contribsFromTrack: '#artistContribs'},
-          compute: ({contribsFromTrack}, continuation) =>
-            (empty(contribsFromTrack)
-              ? continuation()
-              : contribsFromTrack),
-        },
+        mapDependencies: {contribsFromTrack: '#artistContribs'},
+        compute: ({contribsFromTrack}, continuation) =>
+          (empty(contribsFromTrack)
+            ? continuation()
+            : contribsFromTrack),
       },
 
       Track.composite.withAlbumProperty('artistContribs'),
@@ -259,14 +253,11 @@ export class Track extends Thing {
     // of the track.
     coverArtistContribs: Thing.composite.from(`Track.coverArtistContribs`, [
       {
-        flags: {expose: true, compose: true},
-        expose: {
-          dependencies: ['disableUniqueCoverArt'],
-          compute: ({disableUniqueCoverArt}, continuation) =>
-            (disableUniqueCoverArt
-              ? null
-              : continuation()),
-        },
+        dependencies: ['disableUniqueCoverArt'],
+        compute: ({disableUniqueCoverArt}, continuation) =>
+          (disableUniqueCoverArt
+            ? null
+            : continuation()),
       },
 
       Thing.composite.withResolvedContribs({
@@ -275,14 +266,11 @@ export class Track extends Thing {
       }),
 
       {
-        flags: {expose: true, compose: true},
-        expose: {
-          mapDependencies: {contribsFromTrack: '#coverArtistContribs'},
-          compute: ({contribsFromTrack}, continuation) =>
-            (empty(contribsFromTrack)
-              ? continuation()
-              : contribsFromTrack),
-        },
+        mapDependencies: {contribsFromTrack: '#coverArtistContribs'},
+        compute: ({contribsFromTrack}, continuation) =>
+          (empty(contribsFromTrack)
+            ? continuation()
+            : contribsFromTrack),
       },
 
       Track.composite.withAlbumProperty('trackCoverArtistContribs'),
@@ -357,21 +345,16 @@ export class Track extends Thing {
         Track.composite.withOriginalRelease(),
 
         {
-          flags: {expose: true, compose: true},
+          dependencies: ['#originalRelease'],
+          compute({'#originalRelease': originalRelease}, continuation) {
+            if (!originalRelease) return continuation.raise();
 
-          expose: {
-            dependencies: ['#originalRelease'],
+            const value = originalRelease[originalProperty];
+            if (allowOverride && value === null) return continuation.raise();
 
-            compute({'#originalRelease': originalRelease}, continuation) {
-              if (!originalRelease) return continuation.raise();
-
-              const value = originalRelease[originalProperty];
-              if (allowOverride && value === null) return continuation.raise();
-
-              return continuation.exit(value);
-            },
+            return continuation.exit(value);
           },
-        }
+        },
       ]);
     },
 
@@ -387,51 +370,43 @@ export class Track extends Thing {
         }),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#albumDataAvailability'],
-            options: {earlyExitIfNotFound},
-            mapContinuation: {to},
-            compute: ({
-              '#albumDataAvailability': albumDataAvailability,
-              '#options': {earlyExitIfNotFound},
-            }, continuation) =>
-              (albumDataAvailability
-                ? continuation()
-                : (earlyExitIfNotFound
-                    ? continuation.exit(null)
-                    : continuation.raise({to: null}))),
-          },
+          dependencies: ['#albumDataAvailability'],
+          options: {earlyExitIfNotFound},
+          mapContinuation: {to},
+
+          compute: ({
+            '#albumDataAvailability': albumDataAvailability,
+            '#options': {earlyExitIfNotFound},
+          }, continuation) =>
+            (albumDataAvailability
+              ? continuation()
+              : (earlyExitIfNotFound
+                  ? continuation.exit(null)
+                  : continuation.raise({to: null}))),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['this', 'albumData'],
-            compute: ({this: track, albumData}, continuation) =>
-              continuation({
-                '#album':
-                  albumData.find(album => album.tracks.includes(track)),
-              }),
-          },
+          dependencies: ['this', 'albumData'],
+          compute: ({this: track, albumData}, continuation) =>
+            continuation({
+              '#album':
+                albumData.find(album => album.tracks.includes(track)),
+            }),
         },
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#album'],
-            options: {earlyExitIfNotFound},
-            mapContinuation: {to},
-            compute: ({
-              '#album': album,
-              '#options': {earlyExitIfNotFound},
-            }, continuation) =>
-              (album
-                ? continuation.raise({to: album})
-                : (earlyExitIfNotFound
-                    ? continuation.exit(null)
-                    : continuation.raise({to: album}))),
-          },
+          dependencies: ['#album'],
+          options: {earlyExitIfNotFound},
+          mapContinuation: {to},
+          compute: ({
+            '#album': album,
+            '#options': {earlyExitIfNotFound},
+          }, continuation) =>
+            (album
+              ? continuation.raise({to: album})
+              : (earlyExitIfNotFound
+                  ? continuation.exit(null)
+                  : continuation.raise({to: album}))),
         },
       ]);
     },
@@ -448,20 +423,17 @@ export class Track extends Thing {
         Track.composite.withAlbum({earlyExitIfNotFound}),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#album'],
-            options: {property},
-            mapContinuation: {to},
+          dependencies: ['#album'],
+          options: {property},
+          mapContinuation: {to},
 
-            compute: ({
-              '#album': album,
-              '#options': {property},
-            }, continuation) =>
-              (album
-                ? continuation.raise({to: album[property]})
-                : continuation.raise({to: null})),
-          },
+          compute: ({
+            '#album': album,
+            '#options': {property},
+          }, continuation) =>
+            (album
+              ? continuation.raise({to: album[property]})
+              : continuation.raise({to: null})),
         },
       ]);
     },
@@ -479,29 +451,26 @@ export class Track extends Thing {
         Track.composite.withAlbum({earlyExitIfNotFound}),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#album'],
-            options: {properties, prefix},
+          dependencies: ['#album'],
+          options: {properties, prefix},
 
-            compute({
-              '#album': album,
-              '#options': {properties, prefix},
-            }, continuation) {
-              const raise = {};
+          compute({
+            '#album': album,
+            '#options': {properties, prefix},
+          }, continuation) {
+            const raise = {};
 
-              if (album) {
-                for (const property of properties) {
-                  raise[prefix + '.' + property] = album[property];
-                }
-              } else {
-                for (const property of properties) {
-                  raise[prefix + '.' + property] = null;
-                }
+            if (album) {
+              for (const property of properties) {
+                raise[prefix + '.' + property] = album[property];
               }
+            } else {
+              for (const property of properties) {
+                raise[prefix + '.' + property] = null;
+              }
+            }
 
-              return continuation.raise(raise);
-            },
+            return continuation.raise(raise);
           },
         },
       ]);
@@ -519,30 +488,27 @@ export class Track extends Thing {
         Track.composite.withAlbumProperty('trackSections', {earlyExitIfNotFound}),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['this', '#album.trackSections'],
-            mapContinuation: {to},
+          dependencies: ['this', '#album.trackSections'],
+          mapContinuation: {to},
 
-            compute({
-              this: track,
-              '#album.trackSections': trackSections,
-            }, continuation) {
-              if (!trackSections) {
-                return continuation.raise({to: null});
-              }
+          compute({
+            this: track,
+            '#album.trackSections': trackSections,
+          }, continuation) {
+            if (!trackSections) {
+              return continuation.raise({to: null});
+            }
 
-              const trackSection =
-                trackSections.find(({tracks}) => tracks.includes(track));
+            const trackSection =
+              trackSections.find(({tracks}) => tracks.includes(track));
 
-              if (trackSection) {
-                return continuation.raise({to: trackSection});
-              } else if (earlyExitIfNotFound) {
-                return continuation.exit(null);
-              } else {
-                return continuation.raise({to: null});
-              }
-            },
+            if (trackSection) {
+              return continuation.raise({to: trackSection});
+            } else if (earlyExitIfNotFound) {
+              return continuation.exit(null);
+            } else {
+              return continuation.raise({to: null});
+            }
           },
         },
       ]);
@@ -568,24 +534,21 @@ export class Track extends Thing {
         }),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['this', '#originalRelease'],
-            options: {selfIfOriginal},
-            mapContinuation: {to},
-            compute: ({
-              this: track,
-              '#originalRelease': originalRelease,
-              '#options': {selfIfOriginal},
-            }, continuation) =>
-              continuation.raise({
-                to:
-                  (originalRelease ??
-                    (selfIfOriginal
-                      ? track
-                      : null)),
-              }),
-          },
+          dependencies: ['this', '#originalRelease'],
+          options: {selfIfOriginal},
+          mapContinuation: {to},
+          compute: ({
+            this: track,
+            '#originalRelease': originalRelease,
+            '#options': {selfIfOriginal},
+          }, continuation) =>
+            continuation.raise({
+              to:
+                (originalRelease ??
+                  (selfIfOriginal
+                    ? track
+                    : null)),
+            }),
         },
       ]);
     },
@@ -597,15 +560,12 @@ export class Track extends Thing {
     } = {}) {
       return Thing.composite.from(`Track.composite.withHasUniqueCoverArt`, [
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['disableUniqueCoverArt'],
-            mapContinuation: {to},
-            compute: ({disableUniqueCoverArt}, continuation) =>
-              (disableUniqueCoverArt
-                ? continuation.raise({to: false})
-                : continuation()),
-          },
+          dependencies: ['disableUniqueCoverArt'],
+          mapContinuation: {to},
+          compute: ({disableUniqueCoverArt}, continuation) =>
+            (disableUniqueCoverArt
+              ? continuation.raise({to: false})
+              : continuation()),
         },
 
         Thing.composite.withResolvedContribs({
@@ -614,29 +574,23 @@ export class Track extends Thing {
         }),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#coverArtistContribs'],
-            mapContinuation: {to},
-            compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
-              (empty(contribsFromTrack)
-                ? continuation()
-                : continuation.raise({to: true})),
-          },
+          dependencies: ['#coverArtistContribs'],
+          mapContinuation: {to},
+          compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
+            (empty(contribsFromTrack)
+              ? continuation()
+              : continuation.raise({to: true})),
         },
 
         Track.composite.withAlbumProperty('trackCoverArtistContribs'),
 
         {
-          flags: {expose: true, compose: true},
-          expose: {
-            dependencies: ['#album.trackCoverArtistContribs'],
-            mapContinuation: {to},
-            compute: ({'#album.trackCoverArtistContribs': contribsFromAlbum}, continuation) =>
-              (empty(contribsFromAlbum)
-                ? continuation.raise({to: false})
-                : continuation.raise({to: true})),
-          },
+          dependencies: ['#album.trackCoverArtistContribs'],
+          mapContinuation: {to},
+          compute: ({'#album.trackCoverArtistContribs': contribsFromAlbum}, continuation) =>
+            (empty(contribsFromAlbum)
+              ? continuation.raise({to: false})
+              : continuation.raise({to: true})),
         },
       ]);
     },
