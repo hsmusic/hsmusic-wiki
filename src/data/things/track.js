@@ -155,11 +155,10 @@ export class Track extends Thing {
 
     commentatorArtists: Thing.common.commentatorArtists(),
 
-    album:
-      Thing.composite.from(`Track.album`, [
-        Track.composite.withAlbum(),
-        Thing.composite.exposeDependency('#album'),
-      ]),
+    album: Thing.composite.from(`Track.album`, [
+      Track.composite.withAlbum(),
+      Thing.composite.exposeDependency('#album'),
+    ]),
 
     // Note - this is an internal property used only to help identify a track.
     // It should not be assumed in general that the album and dataSourceAlbum match
@@ -197,30 +196,29 @@ export class Track extends Thing {
       Thing.composite.exposeDependency('#originalRelease'),
     ]),
 
-    otherReleases:
-      Thing.composite.from(`Track.otherReleases`, [
-        Thing.composite.earlyExitWithoutDependency('trackData', {mode: 'empty'}),
-        Track.composite.withOriginalRelease({selfIfOriginal: true}),
+    otherReleases: Thing.composite.from(`Track.otherReleases`, [
+      Thing.composite.earlyExitWithoutDependency('trackData', {mode: 'empty'}),
+      Track.composite.withOriginalRelease({selfIfOriginal: true}),
 
-        {
-          flags: {expose: true},
-          expose: {
-            dependencies: ['this', 'trackData', '#originalRelease'],
-            compute: ({
-              this: thisTrack,
-              trackData,
-              '#originalRelease': originalRelease,
-            }) =>
-              (originalRelease === thisTrack
-                ? []
-                : [originalRelease])
-                .concat(trackData.filter(track =>
-                  track !== originalRelease &&
-                  track !== thisTrack &&
-                  track.originalReleaseTrack === originalRelease)),
-          },
+      {
+        flags: {expose: true},
+        expose: {
+          dependencies: ['this', 'trackData', '#originalRelease'],
+          compute: ({
+            this: thisTrack,
+            trackData,
+            '#originalRelease': originalRelease,
+          }) =>
+            (originalRelease === thisTrack
+              ? []
+              : [originalRelease])
+              .concat(trackData.filter(track =>
+                track !== originalRelease &&
+                track !== thisTrack &&
+                track.originalReleaseTrack === originalRelease)),
         },
-      ]),
+      },
+    ]),
 
     artistContribs: Thing.composite.from(`Track.artistContribs`, [
       Track.composite.inheritFromOriginalRelease({property: 'artistContribs'}),
