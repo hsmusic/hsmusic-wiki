@@ -7,6 +7,13 @@
   --primary-color: #0088ff;
 }
 
+:root {
+  --wiki-color: #0088ff;
+
+  --box-background: rgba(0, 0, 0, 0.6);
+  --box-border-style: dotted;
+}
+
 /* Layout - Common
  *
  */
@@ -262,10 +269,10 @@ body::before {
 #secondary-nav,
 #skippers,
 #footer {
-  background-color: rgba(0, 0, 0, 0.6);
-  border: 1px dotted var(--primary-color);
+  background: var(--box-background);
+  border: 1px var(--box-border-style) var(--primary-color);
   border-radius: 3px;
-  transition: background-color 0.2s;
+  transition: background 0.2s;
 }
 
 /*
@@ -275,7 +282,7 @@ body::before {
 #secondary-nav:focus-within,
 #skippers:focus-within,
 #footer:focus-within {
-  background-color: rgba(0, 0, 0, 0.85);
+  background: rgba(0, 0, 0, 0.85);
   border-style: solid;
 }
 */
@@ -878,7 +885,7 @@ img {
   display: inline-block;
   text-align: center;
   background-color: #111111;
-  border: 1px dotted var(--primary-color);
+  border: 1px var(--box-border-style) var(--primary-color);
   border-radius: 2px;
   padding: 5px;
   margin: 10px;
@@ -1691,5 +1698,65 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   #header > div:not(:first-child) {
     margin-top: 0.5em;
+  }
+}
+
+/* Customizatino - Prefer increased contrast */
+
+@media (prefers-contrast: more) {
+  :root {
+    --box-background: black;
+    --box-border-style: solid;
+
+    --focus-color: #aaaaff;
+  }
+
+  #page-container {
+    border: 1px solid white;
+    border-radius: 6px;
+    background: rgba(35, 35, 35, 1);
+  }
+
+  body::before {
+    opacity: 0.3 !important;
+    filter: contrast(0.75) brightness(0.5);
+  }
+
+  .grid-item:hover, a.box:focus {
+    outline: 3px double var(--focus-color);
+  }
+
+  a:not(.box) {
+    text-decoration: underline;
+  }
+
+  a:not(.box):hover,
+  a:not(.box):focus {
+    color: var(--focus-color);
+    text-decoration-color: var(--focus-color) !important;
+  }
+
+  summary > span:hover,
+  summary:focus-visible > span {
+    text-decoration: underline;
+    text-decoration-color: var(--focus-color);
+  }
+
+  summary > span:hover .group-name,
+  summary:focus-visible > span .group-name {
+    color: var(--focus-color);
+  }
+
+  .icon:hover > svg,
+  .icon:focus > svg {
+    fill: var(--focus-color);
+  }
+
+  .rerelease,
+  .other-group-accent,
+  .reveal-interaction,
+  .grid-item > span:not(:first-of-type),
+  #image-overlay-file-size-warning {
+    opacity: 1;
   }
 }
