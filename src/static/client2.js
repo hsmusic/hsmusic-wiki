@@ -709,23 +709,33 @@ function handleImageLinkClicked(evt) {
   const mainImage = document.getElementById('image-overlay-image');
   const thumbImage = document.getElementById('image-overlay-image-thumb');
 
-  const mainThumbSize = getPreferredThumbSize();
+  const {href: originalSrc} = evt.target.closest('a');
+  const {dataset: {
+    originalSize: originalFileSize,
+    thumbs: availableThumbList,
+  }} = evt.target.closest('a').querySelector('img');
 
-  const source = evt.target.closest('a').href;
+  updateFileSizeInformation(originalFileSize);
 
-  const mainSrc = source.replace(/\.(jpg|png)$/, `.${mainThumbSize}.jpg`);
-  const thumbSrc = source.replace(/\.(jpg|png)$/, '.small.jpg');
+  const {thumb: mainThumb, length: mainLength} = getPreferredThumbSize(availableThumbList);
+  const {thumb: smallThumb, length: smallLength} = getSmallestThumbSize(availableThumbList);
+
+  const mainSrc = originalSrc.replace(/\.(jpg|png)$/, `.${mainThumb}.jpg`);
+  const thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${smallThumb}.jpg`);
 
   thumbImage.src = thumbSrc;
+
+  // Show the thumbnail size on each <img> element's data attributes.
+  // Y'know, just for debugging convenience.
+  mainImage.dataset.displayingThumb = `${mainThumb}:${mainLength}`;
+  thumbImage.dataset.displayingThumb = `${smallThumb}:${smallLength}`;
+
   for (const viewOriginal of allViewOriginal) {
-    viewOriginal.href = source;
+    viewOriginal.href = originalSrc;
   }
 
   mainImage.addEventListener('load', handleMainImageLoaded);
   mainImage.addEventListener('error', handleMainImageErrored);
-
-  const fileSize = evt.target.closest('a').querySelector('img').dataset.originalSize;
-  updateFileSizeInformation(fileSize);
 
   container.style.setProperty('--download-progress', '0%');
   loadImage(mainSrc, progress => {
@@ -750,7 +760,21 @@ function handleImageLinkClicked(evt) {
   }
 }
 
-function getPreferredThumbSize() {
+function parseThumbList(availableThumbList) {
+  // Parse all the available thumbnail sizes! These are provided by the actual
+  // content generation on each image.
+  const defaultThumbList = 'huge:1400 semihuge:1200 large:800 medium:400 small:250'
+  const availableSizes =
+    (availableThumbList || defaultThumbList)
+      .split(' ')
+      .map(part => part.split(':'))
+      .map(([thumb, length]) => ({thumb, length: parseInt(length)}))
+      .sort((a, b) => a.length - b.length);
+
+  return availableSizes;
+}
+
+function getPreferredThumbSize(availableThumbList) {
   // Assuming a square, the image will be constrained to the lesser window
   // dimension. Coefficient here matches CSS dimensions for image overlay.
   const constrainedLength = Math.floor(Math.min(
@@ -761,17 +785,30 @@ function getPreferredThumbSize() {
   // device configurations.
   const visualLength = window.devicePixelRatio * constrainedLength;
 
-  const largeLength = 800;
-  const semihugeLength = 1200;
+  const availableSizes = parseThumbList(availableThumbList);
+
+  // Starting from the smallest dimensions, find (and return) the first
+  // available length which hits a "good enough" threshold - it's got to be
+  // at least that percent of the way to the actual displayed dimensions.
   const goodEnoughThreshold = 0.90;
 
-  if (Math.floor(visualLength * goodEnoughThreshold) <= largeLength) {
-    return 'large';
-  } else if (Math.floor(visualLength * goodEnoughThreshold) <= semihugeLength) {
-    return 'semihuge';
-  } else {
-    return 'huge';
+  // (The last item is skipped since we'd be falling back to it anyway.)
+  for (const {thumb, length} of availableSizes.slice(0, -1)) {
+    if (Math.floor(visualLength * goodEnoughThreshold) <= length) {
+      return {thumb, length};
+    }
   }
+
+  // If none of the items in the list were big enough to hit the "good enough"
+  // threshold, just use the largest size available.
+  return availableSizes[availableSizes.length - 1];
+}
+
+function getSmallestThumbSize(availableThumbList) {
+  // Just snag the smallest size. This'll be used for displaying the "preview"
+  // as the bigger one is loading.
+  const availableSizes = parseThumbList(availableThumbList);
+  return availableSizes[0];
 }
 
 function updateFileSizeInformation(fileSize) {
