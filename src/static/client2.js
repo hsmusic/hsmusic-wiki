@@ -717,18 +717,32 @@ function handleImageLinkClicked(evt) {
 
   updateFileSizeInformation(originalFileSize);
 
-  const {thumb: mainThumb, length: mainLength} = getPreferredThumbSize(availableThumbList);
-  const {thumb: smallThumb, length: smallLength} = getSmallestThumbSize(availableThumbList);
+  let mainSrc = null;
+  let thumbSrc = null;
 
-  const mainSrc = originalSrc.replace(/\.(jpg|png)$/, `.${mainThumb}.jpg`);
-  const thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${smallThumb}.jpg`);
+  if (availableThumbList) {
+    const {thumb: mainThumb, length: mainLength} = getPreferredThumbSize(availableThumbList);
+    const {thumb: smallThumb, length: smallLength} = getSmallestThumbSize(availableThumbList);
+    mainSrc = originalSrc.replace(/\.(jpg|png)$/, `.${mainThumb}.jpg`);
+    thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${smallThumb}.jpg`);
+    // Show the thumbnail size on each <img> element's data attributes.
+    // Y'know, just for debugging convenience.
+    mainImage.dataset.displayingThumb = `${mainThumb}:${mainLength}`;
+    thumbImage.dataset.displayingThumb = `${smallThumb}:${smallLength}`;
+  } else {
+    mainSrc = originalSrc;
+    thumbSrc = null;
+    mainImage.dataset.displayingThumb = '';
+    thumbImage.dataset.displayingThumb = '';
+  }
 
-  thumbImage.src = thumbSrc;
-
-  // Show the thumbnail size on each <img> element's data attributes.
-  // Y'know, just for debugging convenience.
-  mainImage.dataset.displayingThumb = `${mainThumb}:${mainLength}`;
-  thumbImage.dataset.displayingThumb = `${smallThumb}:${smallLength}`;
+  if (thumbSrc) {
+    thumbImage.src = thumbSrc;
+    thumbImage.style.display = null;
+  } else {
+    thumbImage.src = '';
+    thumbImage.style.display = 'none';
+  }
 
   for (const viewOriginal of allViewOriginal) {
     viewOriginal.href = originalSrc;
