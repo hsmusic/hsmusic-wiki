@@ -1,7 +1,9 @@
+import {logWarn} from '#cli';
 import {empty} from '#sugar';
 
 export default {
   extraDependencies: [
+    'checkIfImagePathHasCachedThumbnails',
     'getDimensionsOfImagePath',
     'getSizeOfImagePath',
     'getThumbnailEqualOrSmaller',
@@ -54,6 +56,7 @@ export default {
   },
 
   generate(data, slots, {
+    checkIfImagePathHasCachedThumbnails,
     getDimensionsOfImagePath,
     getSizeOfImagePath,
     getThumbnailEqualOrSmaller,
@@ -113,8 +116,27 @@ export default {
           .replace(/^\//, '');
     }
 
+    const hasThumbnails =
+      mediaSrc &&
+      checkIfImagePathHasCachedThumbnails(mediaSrc);
+
+    // Warn for images that *should* have cached thumbnail information but are
+    // missing from the thumbs cache.
+    if (
+      slots.thumb &&
+      !hasThumbnails &&
+      !mediaSrc.endsWith('.gif')
+    ) {
+      logWarn`No thumbnail info cached: ${mediaSrc} - displaying original image here (instead of ${slots.thumb})`;
+    }
+
+    // Important to note that these might not be set at all, even if
+    // slots.thumb was provided.
     let thumbSrc = null;
-    if (mediaSrc) {
+    let availableThumbs = null;
+    let originalLength = null;
+
+    if (hasThumbnails && slots.thumb) {
       // Note: This provides mediaSrc to getThumbnailEqualOrSmaller, since
       // it's the identifier which thumbnail utilities use to query from the
       // thumbnail cache. But we use the result to operate on originalSrc,
@@ -122,16 +144,12 @@ export default {
       // another alternate base path.
       const selectedSize = getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
       thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${selectedSize}.jpg`);
-    }
 
-    let originalWidth = null;
-    let originalHeight = null;
-    let availableThumbs = null;
-    if (mediaSrc) {
-      [originalWidth, originalHeight] =
-        getDimensionsOfImagePath(mediaSrc);
-      availableThumbs =
-        getThumbnailsAvailableForDimensions([originalWidth, originalHeight]);
+      const dimensions = getDimensionsOfImagePath(mediaSrc);
+      availableThumbs = getThumbnailsAvailableForDimensions(dimensions);
+
+      const [width, height] = dimensions;
+      originalLength = Math.max(width, height)
     }
 
     let fileSize = null;
@@ -151,19 +169,23 @@ export default {
       imgAttributes['data-no-image-preview'] = true;
     }
 
-    if (fileSize) {
-      imgAttributes['data-original-size'] = fileSize;
-    }
+    // These attributes are only relevant when a thumbnail are available *and*
+    // being used.
+    if (hasThumbnails && slots.thumb) {
+      if (fileSize) {
+        imgAttributes['data-original-size'] = fileSize;
+      }
 
-    if (originalWidth && originalHeight) {
-      imgAttributes['data-original-length'] = Math.max(originalWidth, originalHeight);
-    }
+      if (originalLength) {
+        imgAttributes['data-original-length'] = originalLength;
+      }
 
-    if (!empty(availableThumbs)) {
-      imgAttributes['data-thumbs'] =
-        availableThumbs
-          .map(([name, size]) => `${name}:${size}`)
-          .join(' ');
+      if (!empty(availableThumbs)) {
+        imgAttributes['data-thumbs'] =
+          availableThumbs
+            .map(([name, size]) => `${name}:${size}`)
+            .join(' ');
+      }
     }
 
     const nonlazyHTML =
@@ -171,7 +193,7 @@ export default {
         prepare(
           html.tag('img', {
             ...imgAttributes,
-            src: thumbSrc,
+            src: thumbSrc ?? originalSrc,
           }));
 
     if (slots.lazy) {
@@ -182,7 +204,7 @@ export default {
             {
               ...imgAttributes,
               class: 'lazy',
-              'data-original': thumbSrc,
+              'data-original': thumbSrc ?? originalSrc,
             }),
           true),
       ]);
