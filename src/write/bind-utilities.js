@@ -11,6 +11,7 @@ import {bindOpts} from '#sugar';
 import {thumb} from '#urls';
 
 import {
+  checkIfImagePathHasCachedThumbnails,
   getDimensionsOfImagePath,
   getThumbnailEqualOrSmaller,
   getThumbnailsAvailableForDimensions,
@@ -53,6 +54,10 @@ export function bindUtilities({
   bound.getColors = bindOpts(getColors, {chroma});
 
   bound.find = bindFind(wikiData, {mode: 'warn'});
+
+  bound.checkIfImagePathHasCachedThumbnails =
+    (imagePath) =>
+      checkIfImagePathHasCachedThumbnails(imagePath, thumbsCache);
 
   bound.getDimensionsOfImagePath =
     (imagePath) =>

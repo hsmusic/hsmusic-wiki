@@ -168,10 +168,22 @@ getThumbnailsAvailableForDimensions.all =
     .map(([name, {size}]) => [name, size])
     .sort((a, b) => b[1] - a[1]);
 
+export function checkIfImagePathHasCachedThumbnails(imagePath, cache) {
+  // Generic utility for checking if the thumbnail cache includes any info for
+  // the provided image path, so that the other functions don't hard-code the
+  // cache format.
+
+  return !!cache[imagePath];
+}
+
 export function getDimensionsOfImagePath(imagePath, cache) {
   // This function is really generic. It takes the gen-thumbs image cache and
   // returns the dimensions in that cache, so that other functions don't need
   // to hard-code the cache format.
+
+  if (!cache[imagePath]) {
+    throw new Error(`Expected imagePath to be included in cache, got ${imagePath}`);
+  }
 
   const [width, height] = cache[imagePath].slice(1);
   return [width, height];
@@ -184,6 +196,10 @@ export function getThumbnailEqualOrSmaller(preferred, imagePath, cache) {
   // than the provided size. Since the path provided might not be the actual
   // one which is being thumbnail-ified, this just returns the name of the
   // selected thumbnail size.
+
+  if (!cache[imagePath]) {
+    throw new Error(`Expected imagePath to be included in cache, got ${imagePath}`);
+  }
 
   const {size: preferredSize} = thumbnailSpec[preferred];
   const [width, height] = getDimensionsOfImagePath(imagePath, cache);
