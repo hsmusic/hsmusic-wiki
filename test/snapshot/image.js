@@ -4,15 +4,17 @@ import {testContentFunctions} from '#test-lib';
 testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
-  const quickSnapshot = (message, opts) =>
+  const quickSnapshot = (message, {extraDependencies, ...opts}) =>
     evaluate.snapshot(message, {
       name: 'image',
       extraDependencies: {
+        checkIfImagePathHasCachedThumbnails: path => !path.endsWith('.gif'),
         getSizeOfImagePath: () => 0,
         getDimensionsOfImagePath: () => [600, 600],
         getThumbnailEqualOrSmaller: () => 'medium',
         getThumbnailsAvailableForDimensions: () =>
           [['large', 800], ['medium', 400], ['small', 250]],
+        ...extraDependencies,
       },
       ...opts,
     });
@@ -106,6 +108,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
   evaluate.snapshot('thumbnail details', {
     name: 'image',
     extraDependencies: {
+      checkIfImagePathHasCachedThumbnails: () => true,
       getSizeOfImagePath: () => 0,
       getDimensionsOfImagePath: () => [900, 1200],
       getThumbnailsAvailableForDimensions: () =>
@@ -115,6 +118,13 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     slots: {
       thumb: 'gargantuan',
       path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
+  });
+
+  quickSnapshot('thumb requested but source is gif', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.flashArt', '5426', 'gif'],
     },
   });
 });
