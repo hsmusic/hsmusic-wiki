@@ -1,5 +1,6 @@
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {inspect} from 'node:util';
 
 import chroma from 'chroma-js';
 
@@ -99,7 +100,7 @@ export function testContentFunctions(t, message, fn) {
 
         constructor() {
           super({
-            content: () => `${name}: ${JSON.stringify(this.#slotValues)}`,
+            content: () => this.#getContent(this),
           });
         }
 
@@ -109,6 +110,24 @@ export function testContentFunctions(t, message, fn) {
 
         setSlot(slotName, slotValue) {
           this.#slotValues[slotName] = slotValue;
+        }
+
+        #getContent() {
+          const toInspect =
+            Object.fromEntries(
+              Object.entries(this.#slotValues)
+                .filter(([key, value]) => value !== null));
+
+          const inspected =
+            inspect(toInspect, {
+              breakLength: Infinity,
+              colors: false,
+              compact: true,
+              depth: Infinity,
+              sort: true,
+            });
+
+          return `${name}: ${inspected}`;
         }
       });
     };
