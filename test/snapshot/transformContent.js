@@ -2,7 +2,11 @@ import t from 'tap';
 import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
-  await evaluate.load();
+  await evaluate.load({
+    mock: {
+      image: evaluate.stubContentFunction('image'),
+    },
+  });
 
   const extraDependencies = {
     wikiData: {
@@ -10,8 +14,6 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
         {directory: 'cool-album', name: 'Cool Album', color: '#123456'},
       ],
     },
-
-    getSizeOfImageFile: () => 0,
 
     to: (key, ...args) => `to-${key}/${args.join('/')}`,
   };
@@ -50,15 +52,18 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
 
   quickSnapshot(
     'non-inline image #2',
-      `Rad.\n<img src="spark.png">`);
+      `Rad.\n` +
+      `<img src="spark.png">`);
 
   quickSnapshot(
     'non-inline image #3',
-      `<img src="spark.png">\nBaller.`);
+      `<img src="spark.png">\n` +
+      `Baller.`);
 
   quickSnapshot(
     'dates',
-      `[[date:2023-04-13]] Yep!\nVery nice: [[date:25 October 2413]]`);
+      `[[date:2023-04-13]] Yep!\n` +
+      `Very nice: [[date:25 October 2413]]`);
 
   quickSnapshot(
     'super basic string',
