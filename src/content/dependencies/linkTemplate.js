@@ -29,14 +29,16 @@ export default {
     language,
     to,
   }) {
-    let href = slots.href;
+    let href;
     let style;
     let title;
 
-    if (href) {
-      href = encodeURI(href);
+    if (slots.href) {
+      href = encodeURI(slots.href);
     } else if (!empty(slots.path)) {
       href = to(...slots.path);
+    } else {
+      href = '';
     }
 
     if (appendIndexHTML) {
