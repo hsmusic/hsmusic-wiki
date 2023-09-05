@@ -91,45 +91,92 @@ export function testContentFunctions(t, message, fn) {
       t.matchSnapshot(result, description);
     };
 
-    evaluate.stubTemplate = name => {
+    evaluate.stubTemplate = name =>
       // Creates a particularly permissable template, allowing any slot values
       // to be stored and just outputting the contents of those slots as-are.
+      _stubTemplate(name, false);
 
-      return new (class extends html.Template {
-        #slotValues = {};
+    evaluate.stubContentFunction = name =>
+      // Like stubTemplate, but instead of a template directly, returns
+      // an object describing a content function - suitable for passing
+      // into evaluate.mock.
+      _stubTemplate(name, true);
 
-        constructor() {
-          super({
-            content: () => this.#getContent(this),
-          });
-        }
+    const _stubTemplate = (name, mockContentFunction) => {
+      const inspectNicely = (value, opts = {}) =>
+        inspect(value, {
+          ...opts,
+          colors: false,
+          sort: true,
+        });
 
-        setSlots(slotNamesToValues) {
-          Object.assign(this.#slotValues, slotNamesToValues);
-        }
+      const makeTemplate = formatContentFn =>
+        new (class extends html.Template {
+          #slotValues = {};
 
-        setSlot(slotName, slotValue) {
-          this.#slotValues[slotName] = slotValue;
-        }
-
-        #getContent() {
-          const toInspect =
-            Object.fromEntries(
-              Object.entries(this.#slotValues)
-                .filter(([key, value]) => value !== null));
-
-          const inspected =
-            inspect(toInspect, {
-              breakLength: Infinity,
-              colors: false,
-              compact: true,
-              depth: Infinity,
-              sort: true,
+          constructor() {
+            super({
+              content: () => this.#getContent(formatContentFn),
             });
+          }
 
-          return `${name}: ${inspected}`;
-        }
-      });
+          setSlots(slotNamesToValues) {
+            Object.assign(this.#slotValues, slotNamesToValues);
+          }
+
+          setSlot(slotName, slotValue) {
+            this.#slotValues[slotName] = slotValue;
+          }
+
+          #getContent(formatContentFn) {
+            const toInspect =
+              Object.fromEntries(
+                Object.entries(this.#slotValues)
+                  .filter(([key, value]) => value !== null));
+
+            const inspected =
+              inspectNicely(toInspect, {
+                breakLength: Infinity,
+                compact: true,
+                depth: Infinity,
+              });
+
+            return formatContentFn(inspected); `${name}: ${inspected}`;
+          }
+        });
+
+      if (mockContentFunction) {
+        return {
+          data: (...args) => ({args}),
+          generate: (data) =>
+            makeTemplate(slots => {
+              const argsLines =
+                (empty(data.args)
+                  ? []
+                  : inspectNicely(data.args, {depth: Infinity})
+                      .split('\n'));
+
+              return (`[mocked: ${name}` +
+
+                (empty(data.args)
+                  ? ``
+               : argsLines.length === 1
+                  ? `\n args: ${argsLines[0]}`
+                  : `\n args: ${argsLines[0]}\n` +
+                    argsLines.slice(1).join('\n').replace(/^/gm, ' ')) +
+
+                (!empty(data.args)
+                  ? `\n `
+                  : ` - `) +
+
+                (slots
+                  ? `slots: ${slots}]`
+                  : `slots: none]`));
+            }),
+        };
+      } else {
+        return makeTemplate(slots => `${name}: ${slots}`);
+      }
     };
 
     evaluate.mock = (...opts) => {
