@@ -1,3 +1,15 @@
+import find from '#find';
+import {filterMultipleArrays} from '#wiki-data';
+
+import {
+  empty,
+  filterProperties,
+  openAggregate,
+  stitchArrays,
+} from '#sugar';
+
+import Thing from './thing.js';
+
 // Composes multiple compositional "steps" and a "base" to form a property
 // descriptor out of modular building blocks. This is an extension to the
 // more general-purpose CacheableObject property descriptor syntax, and
@@ -330,11 +342,6 @@
 // don't specifying the base's flags at all. Simply use the same shorthand
 // syntax as for other compositional steps, and it'll work out cleanly!
 //
-
-import find from '#find';
-import {empty, filterProperties, openAggregate} from '#sugar';
-
-import Thing from './thing.js';
 
 export {compositeFrom as from};
 function compositeFrom(firstArg, secondArg) {
@@ -1104,10 +1111,6 @@ export function raiseWithoutUpdateValue({
 // object, and filtering out those whose "who" doesn't match any artist.
 export function withResolvedContribs({from, to}) {
   return Thing.composite.from(`Thing.composite.withResolvedContribs`, [
-    Thing.composite.earlyExitWithoutDependency('artistData', {
-      value: [],
-    }),
-
     Thing.composite.raiseWithoutDependency(from, {
       mode: 'empty',
       map: {to},
@@ -1115,19 +1118,31 @@ export function withResolvedContribs({from, to}) {
     }),
 
     {
-      dependencies: ['artistData'],
       mapDependencies: {from},
-      mapContinuation: {to},
-      compute: ({artistData, from}, continuation) =>
+      compute: ({from}, continuation) =>
         continuation({
-          to:
-            from
-              .map(({who, what}) => ({
-                who: find.artist(who, artistData, {mode: 'quiet'}),
-                what,
-              }))
-              .filter(({who}) => who),
+          '#whoByRef': from.map(({who}) => who),
+          '#what': from.map(({what}) => what),
         }),
+    },
+
+    withResolvedReferenceList({
+      refList: '#whoByRef',
+      data: 'artistData',
+      to: '#who',
+      find: find.artist,
+      notFoundMode: 'null',
+    }),
+
+    {
+      dependencies: ['#who', '#what'],
+      mapContinuation: {to},
+      compute({'#who': who, '#what': what}, continuation) {
+        filterMultipleArrays(who, what, (who, _what) => who);
+        return continuation({
+          to: stitchArrays({who, what}),
+        });
+      },
     },
   ]);
 }
@@ -1163,6 +1178,60 @@ export function withResolvedReference({
         }
 
         return continuation.raise({match});
+      },
+    },
+  ]);
+}
+
+// Resolves a list of references, with each reference matched with provided
+// data in the same way as withResolvedReference. This will early exit if the
+// data dependency is null (even if the reference list is empty). By default
+// it will filter out references which don't match, but this can be changed
+// to early exit ({notFoundMode: 'exit'}) or leave null in place ('null').
+export function withResolvedReferenceList({
+  refList,
+  data,
+  to,
+  find: findFunction,
+  notFoundMode = 'filter',
+}) {
+  if (!['filter', 'exit', 'null'].includes(notFoundMode)) {
+    throw new TypeError(`Expected notFoundMode to be filter, exit, or null`);
+  }
+
+  return compositeFrom(`Thing.composite.withResolvedReferenceList`, [
+    earlyExitWithoutDependency(data, {value: []}),
+
+    raiseWithoutDependency(refList, {
+      map: {to},
+      raise: [],
+      mode: 'empty',
+    }),
+
+    {
+      options: {findFunction, notFoundMode},
+      mapDependencies: {refList, data},
+      mapContinuation: {matches: to},
+
+      compute({refList, data, '#options': {findFunction, notFoundMode}}, continuation) {
+        const matches =
+          refList.map(ref => findFunction(ref, data, {mode: 'quiet'}));
+
+        if (!matches.includes(null)) {
+          return continuation.raise({matches});
+        }
+
+        switch (notFoundMode) {
+          case 'filter':
+            matches = matches.filter(value => value !== null);
+            return contination.raise({matches});
+
+          case 'exit':
+            return continuation.exit([]);
+
+          case 'null':
+            return continuation.raise({matches});
+        }
       },
     },
   ]);
