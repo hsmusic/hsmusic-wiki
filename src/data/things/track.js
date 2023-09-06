@@ -16,7 +16,6 @@ export class Track extends Thing {
     Flash,
 
     validators: {
-      isBoolean,
       isColor,
       isDate,
       isDuration,

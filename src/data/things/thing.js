@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {color} from '#cli';
 import find from '#find';
-import {empty, filterProperties, openAggregate} from '#sugar';
+import {empty} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 import {
