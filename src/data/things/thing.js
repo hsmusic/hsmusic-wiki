@@ -257,60 +257,6 @@ export default class Thing extends CacheableObject {
       },
     }),
 
-    // Dynamically inherit a contribution list from some other object, if it
-    // hasn't been overridden on this object. This is handy for solo albums
-    // where all tracks have the same artist, for example.
-    dynamicInheritContribs: (
-      // If this property is explicitly false, the contribution list returned
-      // will always be empty.
-      nullerProperty,
-
-      // Property holding contributions on the current object.
-      contribsByRefProperty,
-
-      // Property holding corresponding "default" contributions on the parent
-      // object, which will fallen back to if the object doesn't have its own
-      // contribs.
-      parentContribsByRefProperty,
-
-      // Data array to search in and "find" function to locate parent object
-      // (which will be passed the child object and the wiki data array).
-      thingDataProperty,
-      findFn
-    ) => ({
-      flags: {expose: true},
-      expose: {
-        dependencies: [
-          'this',
-          contribsByRefProperty,
-          thingDataProperty,
-          nullerProperty,
-          'artistData',
-        ].filter(Boolean),
-
-        compute({
-          this: thing,
-          [nullerProperty]: nuller,
-          [contribsByRefProperty]: contribsByRef,
-          [thingDataProperty]: thingData,
-          artistData,
-        }) {
-          if (!artistData) return [];
-          if (nuller === false) return [];
-          const refs =
-            contribsByRef ??
-            findFn(thing, thingData, {mode: 'quiet'})?.[parentContribsByRefProperty];
-          if (!refs) return [];
-          return refs
-            .map(({who: ref, what}) => ({
-              who: find.artist(ref, artistData),
-              what,
-            }))
-            .filter(({who}) => who);
-        },
-      },
-    }),
-
     // Nice 'n simple shorthand for an exposed-only flag which is true when any
     // contributions are present in the specified property.
     contribsPresent: (contribsByRefProperty) => ({
@@ -339,20 +285,6 @@ export default class Thing extends CacheableObject {
         Thing.composite.exposeDependency('#reverseReferenceList'),
       ]);
     },
-
-    // Corresponding function for single references. Note that the return value
-    // is still a list - this is for matching all the objects whose single
-    // reference (in the given property) matches this Thing.
-    reverseSingleReference: (thingDataProperty, referencerRefListProperty) => ({
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', thingDataProperty],
-
-        compute: ({this: thing, [thingDataProperty]: thingData}) =>
-          thingData?.filter((t) => t[referencerRefListProperty] === thing) ?? [],
-      },
-    }),
 
     // General purpose wiki data constructor, for properties like artistData,
     // trackData, etc.
