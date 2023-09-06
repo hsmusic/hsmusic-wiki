@@ -275,10 +275,10 @@ export default class Thing extends CacheableObject {
     // wiki data provided, not the requesting Thing itself.
     reverseReferenceList({
       data,
-      refList,
+      list,
     }) {
       return Thing.composite.from(`Thing.common.reverseReferenceList`, [
-        Thing.composite.withReverseReferenceList({data, refList}),
+        Thing.composite.withReverseReferenceList({data, list}),
         Thing.composite.exposeDependency('#reverseReferenceList'),
       ]);
     },

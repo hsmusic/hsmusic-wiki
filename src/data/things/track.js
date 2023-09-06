@@ -287,7 +287,7 @@ export class Track extends Thing {
 
     featuredInFlashes: Thing.common.reverseReferenceList({
       data: 'flashData',
-      refList: 'featuredTracks',
+      list: 'featuredTracks',
     }),
   });
 
@@ -559,8 +559,7 @@ export class Track extends Thing {
       return Thing.composite.from(`Track.composite.trackReverseReferenceList`, [
         Thing.composite.withReverseReferenceList({
           data: 'trackData',
-          refList: refListProperty,
-          originalTracksOnly: true,
+          list: refListProperty,
         }),
 
         {

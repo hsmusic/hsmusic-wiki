@@ -1244,8 +1244,8 @@ export function withResolvedReferenceList({
 // This is its composable form.
 export function withReverseReferenceList({
   data,
+  list: refListProperty,
   to = '#reverseReferenceList',
-  refList: refListProperty,
 }) {
   return compositeFrom(`Thing.common.reverseReferenceList`, [
     earlyExitWithoutDependency(data, {value: []}),
