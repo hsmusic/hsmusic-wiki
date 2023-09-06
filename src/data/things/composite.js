@@ -496,6 +496,236 @@ function compositeFrom(firstArg, secondArg) {
 
   aggregate.close();
 
+  function _filterDependencies(availableDependencies, {
+    dependencies,
+    mapDependencies,
+    options,
+  }) {
+    const filteredDependencies =
+      (dependencies
+        ? filterProperties(availableDependencies, dependencies)
+        : {});
+
+    if (mapDependencies) {
+      for (const [to, from] of Object.entries(mapDependencies)) {
+        filteredDependencies[to] = availableDependencies[from] ?? null;
+      }
+    }
+
+    if (options) {
+      filteredDependencies['#options'] = options;
+    }
+
+    return filteredDependencies;
+  }
+
+  function _assignDependencies(continuationAssignment, {mapContinuation}) {
+    if (!mapContinuation) {
+      return continuationAssignment;
+    }
+
+    const assignDependencies = {};
+
+    for (const [from, to] of Object.entries(mapContinuation)) {
+      assignDependencies[to] = continuationAssignment[from] ?? null;
+    }
+
+    return assignDependencies;
+  }
+
+  function _prepareContinuation(callingTransformForThisStep) {
+    const continuationStorage = {
+      returnedWith: null,
+      providedDependencies: undefined,
+      providedValue: undefined,
+    };
+
+    const continuation =
+      (callingTransformForThisStep
+        ? (providedValue, providedDependencies = null) => {
+            continuationStorage.returnedWith = 'continuation';
+            continuationStorage.providedDependencies = providedDependencies;
+            continuationStorage.providedValue = providedValue;
+            return continuationSymbol;
+          }
+        : (providedDependencies = null) => {
+            continuationStorage.returnedWith = 'continuation';
+            continuationStorage.providedDependencies = providedDependencies;
+            return continuationSymbol;
+          });
+
+    continuation.exit = (providedValue) => {
+      continuationStorage.returnedWith = 'exit';
+      continuationStorage.providedValue = providedValue;
+      return continuationSymbol;
+    };
+
+    if (baseComposes) {
+      const makeRaiseLike = returnWith =>
+        (callingTransformForThisStep
+          ? (providedValue, providedDependencies = null) => {
+              continuationStorage.returnedWith = returnWith;
+              continuationStorage.providedDependencies = providedDependencies;
+              continuationStorage.providedValue = providedValue;
+              return continuationSymbol;
+            }
+          : (providedDependencies = null) => {
+              continuationStorage.returnedWith = returnWith;
+              continuationStorage.providedDependencies = providedDependencies;
+              return continuationSymbol;
+            });
+
+      continuation.raise = makeRaiseLike('raise');
+      continuation.raiseAbove = makeRaiseLike('raiseAbove');
+    }
+
+    return {continuation, continuationStorage};
+  }
+
+  const continuationSymbol = Symbol('continuation symbol');
+  const noTransformSymbol = Symbol('no-transform symbol');
+
+  function _computeOrTransform(initialValue, initialDependencies, continuationIfApplicable) {
+    const expectingTransform = initialValue !== noTransformSymbol;
+
+    let valueSoFar =
+      (expectingTransform
+        ? initialValue
+        : undefined);
+
+    const availableDependencies = {...initialDependencies};
+
+    if (expectingTransform) {
+      debug(() => [color.bright(`begin composition - transforming from:`), initialValue]);
+    } else {
+      debug(() => color.bright(`begin composition - not transforming`));
+    }
+
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      const isBase = i === steps.length - 1;
+
+      debug(() => [
+        `step #${i+1}` +
+        (isBase
+          ? ` (base):`
+          : ` of ${steps.length}:`),
+        step]);
+
+      const expose =
+        (step.flags
+          ? step.expose
+          : step);
+
+      const callingTransformForThisStep =
+        expectingTransform && expose.transform;
+
+      const filteredDependencies = _filterDependencies(availableDependencies, expose);
+      const {continuation, continuationStorage} = _prepareContinuation(callingTransformForThisStep);
+
+      debug(() => [
+        `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
+        `with dependencies:`, filteredDependencies]);
+
+      const result =
+        (callingTransformForThisStep
+          ? expose.transform(valueSoFar, filteredDependencies, continuation)
+          : expose.compute(filteredDependencies, continuation));
+
+      if (result !== continuationSymbol) {
+        debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
+
+        if (baseComposes) {
+          throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
+        }
+
+        debug(() => color.bright(`end composition - exit (inferred)`));
+
+        return result;
+      }
+
+      const {returnedWith} = continuationStorage;
+
+      if (returnedWith === 'exit') {
+        const {providedValue} = continuationStorage;
+
+        debug(() => [`step #${i+1} - result: exit (explicit) ->`, providedValue]);
+        debug(() => color.bright(`end composition - exit (explicit)`));
+
+        if (baseComposes) {
+          return continuationIfApplicable.exit(providedValue);
+        } else {
+          return providedValue;
+        }
+      }
+
+      const {providedValue, providedDependencies} = continuationStorage;
+
+      const continuingWithValue =
+        (expectingTransform
+          ? (callingTransformForThisStep
+              ? providedValue ?? null
+              : valueSoFar ?? null)
+          : undefined);
+
+      const continuingWithDependencies =
+        (providedDependencies
+          ? _assignDependencies(providedDependencies, expose)
+          : null);
+
+      const continuationArgs = [];
+      if (continuingWithValue !== undefined) continuationArgs.push(continuingWithValue);
+      if (continuingWithDependencies !== null) continuationArgs.push(continuingWithDependencies);
+
+      debug(() => {
+        const base = `step #${i+1} - result: ` + returnedWith;
+        const parts = [];
+
+        if (callingTransformForThisStep) {
+          if (continuingWithValue === undefined) {
+            parts.push(`(no value)`);
+          } else {
+            parts.push(`value:`, providedValue);
+          }
+        }
+
+        if (continuingWithDependencies !== null) {
+          parts.push(`deps:`, continuingWithDependencies);
+        } else {
+          parts.push(`(no deps)`);
+        }
+
+        if (empty(parts)) {
+          return base;
+        } else {
+          return [base + ' ->', ...parts];
+        }
+      });
+
+      switch (returnedWith) {
+        case 'raise':
+          debug(() =>
+            (isBase
+              ? color.bright(`end composition - raise (base: explicit)`)
+              : color.bright(`end composition - raise`)));
+          return continuationIfApplicable(...continuationArgs);
+
+        case 'raiseAbove':
+          debug(() => color.bright(`end composition - raiseAbove`));
+          return continuationIfApplicable.raise(...continuationArgs);
+
+        case 'continuation':
+          if (isBase) {
+            debug(() => color.bright(`end composition - raise (inferred)`));
+            return continuationIfApplicable(...continuationArgs);
+          } else {
+            Object.assign(availableDependencies, continuingWithDependencies);
+            break;
+          }
+      }
+    }
+  }
+
   const constructedDescriptor = {};
 
   if (annotation) {
@@ -515,236 +745,6 @@ function compositeFrom(firstArg, secondArg) {
   if (baseExposes) {
     const expose = constructedDescriptor.expose = {};
     expose.dependencies = Array.from(exposeDependencies);
-
-    const continuationSymbol = Symbol('continuation symbol');
-    const noTransformSymbol = Symbol('no-transform symbol');
-
-    function _filterDependencies(availableDependencies, {
-      dependencies,
-      mapDependencies,
-      options,
-    }) {
-      const filteredDependencies =
-        (dependencies
-          ? filterProperties(availableDependencies, dependencies)
-          : {});
-
-      if (mapDependencies) {
-        for (const [to, from] of Object.entries(mapDependencies)) {
-          filteredDependencies[to] = availableDependencies[from] ?? null;
-        }
-      }
-
-      if (options) {
-        filteredDependencies['#options'] = options;
-      }
-
-      return filteredDependencies;
-    }
-
-    function _assignDependencies(continuationAssignment, {mapContinuation}) {
-      if (!mapContinuation) {
-        return continuationAssignment;
-      }
-
-      const assignDependencies = {};
-
-      for (const [from, to] of Object.entries(mapContinuation)) {
-        assignDependencies[to] = continuationAssignment[from] ?? null;
-      }
-
-      return assignDependencies;
-    }
-
-    function _prepareContinuation(callingTransformForThisStep) {
-      const continuationStorage = {
-        returnedWith: null,
-        providedDependencies: undefined,
-        providedValue: undefined,
-      };
-
-      const continuation =
-        (callingTransformForThisStep
-          ? (providedValue, providedDependencies = null) => {
-              continuationStorage.returnedWith = 'continuation';
-              continuationStorage.providedDependencies = providedDependencies;
-              continuationStorage.providedValue = providedValue;
-              return continuationSymbol;
-            }
-          : (providedDependencies = null) => {
-              continuationStorage.returnedWith = 'continuation';
-              continuationStorage.providedDependencies = providedDependencies;
-              return continuationSymbol;
-            });
-
-      continuation.exit = (providedValue) => {
-        continuationStorage.returnedWith = 'exit';
-        continuationStorage.providedValue = providedValue;
-        return continuationSymbol;
-      };
-
-      if (baseComposes) {
-        const makeRaiseLike = returnWith =>
-          (callingTransformForThisStep
-            ? (providedValue, providedDependencies = null) => {
-                continuationStorage.returnedWith = returnWith;
-                continuationStorage.providedDependencies = providedDependencies;
-                continuationStorage.providedValue = providedValue;
-                return continuationSymbol;
-              }
-            : (providedDependencies = null) => {
-                continuationStorage.returnedWith = returnWith;
-                continuationStorage.providedDependencies = providedDependencies;
-                return continuationSymbol;
-              });
-
-        continuation.raise = makeRaiseLike('raise');
-        continuation.raiseAbove = makeRaiseLike('raiseAbove');
-      }
-
-      return {continuation, continuationStorage};
-    }
-
-    function _computeOrTransform(initialValue, initialDependencies, continuationIfApplicable) {
-      const expectingTransform = initialValue !== noTransformSymbol;
-
-      let valueSoFar =
-        (expectingTransform
-          ? initialValue
-          : undefined);
-
-      const availableDependencies = {...initialDependencies};
-
-      if (expectingTransform) {
-        debug(() => [color.bright(`begin composition - transforming from:`), initialValue]);
-      } else {
-        debug(() => color.bright(`begin composition - not transforming`));
-      }
-
-      for (let i = 0; i < steps.length; i++) {
-        const step = steps[i];
-        const isBase = i === steps.length - 1;
-
-        debug(() => [
-          `step #${i+1}` +
-          (isBase
-            ? ` (base):`
-            : ` of ${steps.length}:`),
-          step]);
-
-        const expose =
-          (step.flags
-            ? step.expose
-            : step);
-
-        const callingTransformForThisStep =
-          expectingTransform && expose.transform;
-
-        const filteredDependencies = _filterDependencies(availableDependencies, expose);
-        const {continuation, continuationStorage} = _prepareContinuation(callingTransformForThisStep);
-
-        debug(() => [
-          `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
-          `with dependencies:`, filteredDependencies]);
-
-        const result =
-          (callingTransformForThisStep
-            ? expose.transform(valueSoFar, filteredDependencies, continuation)
-            : expose.compute(filteredDependencies, continuation));
-
-        if (result !== continuationSymbol) {
-          debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
-
-          if (baseComposes) {
-            throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
-          }
-
-          debug(() => color.bright(`end composition - exit (inferred)`));
-
-          return result;
-        }
-
-        const {returnedWith} = continuationStorage;
-
-        if (returnedWith === 'exit') {
-          const {providedValue} = continuationStorage;
-
-          debug(() => [`step #${i+1} - result: exit (explicit) ->`, providedValue]);
-          debug(() => color.bright(`end composition - exit (explicit)`));
-
-          if (baseComposes) {
-            return continuationIfApplicable.exit(providedValue);
-          } else {
-            return providedValue;
-          }
-        }
-
-        const {providedValue, providedDependencies} = continuationStorage;
-
-        const continuingWithValue =
-          (expectingTransform
-            ? (callingTransformForThisStep
-                ? providedValue ?? null
-                : valueSoFar ?? null)
-            : undefined);
-
-        const continuingWithDependencies =
-          (providedDependencies
-            ? _assignDependencies(providedDependencies, expose)
-            : null);
-
-        const continuationArgs = [];
-        if (continuingWithValue !== undefined) continuationArgs.push(continuingWithValue);
-        if (continuingWithDependencies !== null) continuationArgs.push(continuingWithDependencies);
-
-        debug(() => {
-          const base = `step #${i+1} - result: ` + returnedWith;
-          const parts = [];
-
-          if (callingTransformForThisStep) {
-            if (continuingWithValue === undefined) {
-              parts.push(`(no value)`);
-            } else {
-              parts.push(`value:`, providedValue);
-            }
-          }
-
-          if (continuingWithDependencies !== null) {
-            parts.push(`deps:`, continuingWithDependencies);
-          } else {
-            parts.push(`(no deps)`);
-          }
-
-          if (empty(parts)) {
-            return base;
-          } else {
-            return [base + ' ->', ...parts];
-          }
-        });
-
-        switch (returnedWith) {
-          case 'raise':
-            debug(() =>
-              (isBase
-                ? color.bright(`end composition - raise (base: explicit)`)
-                : color.bright(`end composition - raise`)));
-            return continuationIfApplicable(...continuationArgs);
-
-          case 'raiseAbove':
-            debug(() => color.bright(`end composition - raiseAbove`));
-            return continuationIfApplicable.raise(...continuationArgs);
-
-          case 'continuation':
-            if (isBase) {
-              debug(() => color.bright(`end composition - raise (inferred)`));
-              return continuationIfApplicable(...continuationArgs);
-            } else {
-              Object.assign(availableDependencies, continuingWithDependencies);
-              break;
-            }
-        }
-      }
-    }
 
     const transformFn =
       (value, initialDependencies, continuationIfApplicable) =>
