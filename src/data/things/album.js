@@ -128,8 +128,17 @@ export class Album extends Thing {
 
     commentatorArtists: Thing.common.commentatorArtists(),
 
-    groups: Thing.common.dynamicThingsFromReferenceList('groupsByRef', 'groupData', find.group),
-    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
+    groups: Thing.common.resolvedReferenceList({
+      list: 'groupsByRef',
+      data: 'groupData',
+      find: find.group,
+    }),
+
+    artTags: Thing.common.resolvedReferenceList({
+      list: 'artTagsByRef',
+      data: 'artTagData',
+      find: find.artTag,
+    }),
 
     hasCoverArt: Thing.common.contribsPresent('coverArtistContribsByRef'),
     hasWallpaperArt: Thing.common.contribsPresent('wallpaperArtistContribsByRef'),

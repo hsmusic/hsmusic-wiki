@@ -26,7 +26,11 @@ export class Group extends Thing {
 
     // Expose only
 
-    featuredAlbums: Thing.common.dynamicThingsFromReferenceList('featuredAlbumsByRef', 'albumData', find.album),
+    featuredAlbums: Thing.common.resolvedReferenceList({
+      list: 'featuredAlbumsByRef',
+      data: 'albumData',
+      find: find.album,
+    }),
 
     descriptionShort: {
       flags: {expose: true},
@@ -88,10 +92,10 @@ export class GroupCategory extends Thing {
 
     // Expose only
 
-    groups: Thing.common.dynamicThingsFromReferenceList(
-      'groupsByRef',
-      'groupData',
-      find.group
-    ),
+    groups: Thing.common.resolvedReferenceList({
+      list: 'groupsByRef',
+      data: 'groupData',
+      find: find.group,
+    }),
   });
 }

@@ -250,15 +250,27 @@ export class Track extends Thing {
 
     referencedTracks: Thing.composite.from(`Track.referencedTracks`, [
       Track.composite.inheritFromOriginalRelease({property: 'referencedTracks'}),
-      Thing.common.dynamicThingsFromReferenceList('referencedTracksByRef', 'trackData', find.track),
+      Thing.common.resolvedReferenceList({
+        list: 'referencedTracksByRef',
+        data: 'trackData',
+        find: find.track,
+      }),
     ]),
 
     sampledTracks: Thing.composite.from(`Track.sampledTracks`, [
       Track.composite.inheritFromOriginalRelease({property: 'sampledTracks'}),
-      Thing.common.dynamicThingsFromReferenceList('sampledTracksByRef', 'trackData', find.track),
+      Thing.common.resolvedReferenceList({
+        list: 'sampledTracksByRef',
+        data: 'trackData',
+        find: find.track,
+      }),
     ]),
 
-    artTags: Thing.common.dynamicThingsFromReferenceList('artTagsByRef', 'artTagData', find.artTag),
+    artTags: Thing.common.resolvedReferenceList({
+      list: 'artTagsByRef',
+      data: 'artTagData',
+      find: find.artTag,
+    }),
 
     // Specifically exclude re-releases from this list - while it's useful to
     // get from a re-release to the tracks it references, re-releases aren't

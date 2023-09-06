@@ -67,11 +67,11 @@ export class Flash extends Thing {
 
     contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
 
-    featuredTracks: Thing.common.dynamicThingsFromReferenceList(
-      'featuredTracksByRef',
-      'trackData',
-      find.track
-    ),
+    featuredTracks: Thing.common.resolvedReferenceList({
+      list: 'featuredTracksByRef',
+      data: 'trackData',
+      find: find.track,
+    }),
 
     act: {
       flags: {expose: true},
@@ -141,6 +141,10 @@ export class FlashAct extends Thing {
 
     // Expose only
 
-    flashes: Thing.common.dynamicThingsFromReferenceList('flashesByRef', 'flashData', find.flash),
+    flashes: Thing.common.resolvedReferenceList({
+      list: 'flashesByRef',
+      data: 'flashData',
+      find: find.flash,
+    }),
   })
 }

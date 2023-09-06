@@ -193,14 +193,14 @@ export default class Thing extends CacheableObject {
     // Corresponding dynamic property to referenceList, which takes the values
     // in the provided property and searches the specified wiki data for
     // matching actual Thing-subclass objects.
-    dynamicThingsFromReferenceList(
-      refList,
+    resolvedReferenceList({
+      list,
       data,
-      findFunction
-    ) {
-      return Thing.composite.from(`Thing.common.dynamicThingsFromReferenceList`, [
+      find: findFunction,
+    }) {
+      return Thing.composite.from(`Thing.common.resolvedReferenceList`, [
         Thing.composite.withResolvedReferenceList({
-          refList,
+          list,
           data,
           to: '#things',
           find: findFunction,

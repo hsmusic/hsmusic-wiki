@@ -1130,7 +1130,7 @@ export function withResolvedContribs({from, to}) {
     },
 
     withResolvedReferenceList({
-      refList: '#whoByRef',
+      list: '#whoByRef',
       data: 'artistData',
       to: '#who',
       find: find.artist,
@@ -1192,7 +1192,7 @@ export function withResolvedReference({
 // it will filter out references which don't match, but this can be changed
 // to early exit ({notFoundMode: 'exit'}) or leave null in place ('null').
 export function withResolvedReferenceList({
-  refList,
+  list,
   data,
   to,
   find: findFunction,
@@ -1205,7 +1205,7 @@ export function withResolvedReferenceList({
   return compositeFrom(`Thing.composite.withResolvedReferenceList`, [
     earlyExitWithoutDependency(data, {value: []}),
 
-    raiseWithoutDependency(refList, {
+    raiseWithoutDependency(list, {
       map: {to},
       raise: {to: []},
       mode: 'empty',
@@ -1213,12 +1213,12 @@ export function withResolvedReferenceList({
 
     {
       options: {findFunction, notFoundMode},
-      mapDependencies: {refList, data},
+      mapDependencies: {list, data},
       mapContinuation: {matches: to},
 
-      compute({refList, data, '#options': {findFunction, notFoundMode}}, continuation) {
+      compute({list, data, '#options': {findFunction, notFoundMode}}, continuation) {
         let matches =
-          refList.map(ref => findFunction(ref, data, {mode: 'quiet'}));
+          list.map(ref => findFunction(ref, data, {mode: 'quiet'}));
 
         if (!matches.includes(null)) {
           return continuation.raise({matches});

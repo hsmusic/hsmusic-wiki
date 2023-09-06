@@ -125,10 +125,10 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       find.group
     ),
 
-    sourceAlbums: Thing.common.dynamicThingsFromReferenceList(
-      'sourceAlbumsByRef',
-      'albumData',
-      find.album
-    ),
+    sourceAlbums: Thing.common.resolvedReferenceList({
+      list: 'sourceAlbumsByRef',
+      data: 'albumData',
+      find: find.album,
+    }),
   });
 }
