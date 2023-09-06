@@ -1,3 +1,6 @@
+import {inspect} from 'node:util';
+
+import {color} from '#cli';
 import find from '#find';
 import {filterMultipleArrays} from '#wiki-data';
 
@@ -482,11 +485,11 @@ function compositeFrom(firstArg, secondArg) {
   if (!baseComposes) {
     if (baseUpdates) {
       if (!anyStepsTransform) {
-        push(new TypeError(`Expected at least one step to transform`));
+        aggregate.push(new TypeError(`Expected at least one step to transform`));
       }
     } else {
       if (!anyStepsCompute) {
-        push(new TypeError(`Expected at least one step to compute`));
+        aggregate.push(new TypeError(`Expected at least one step to compute`));
       }
     }
   }
@@ -1087,8 +1090,8 @@ export function raiseWithoutUpdateValue({
     withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
 
     {
-      mapDependencies: {availability},
-      compute: ({availability}, continuation) =>
+      dependencies: ['#availability'],
+      compute: ({'#availability': availability}, continuation) =>
         (availability
           ? continuation.raise()
           : continuation()),
@@ -1214,7 +1217,7 @@ export function withResolvedReferenceList({
       mapContinuation: {matches: to},
 
       compute({refList, data, '#options': {findFunction, notFoundMode}}, continuation) {
-        const matches =
+        let matches =
           refList.map(ref => findFunction(ref, data, {mode: 'quiet'}));
 
         if (!matches.includes(null)) {
@@ -1224,7 +1227,7 @@ export function withResolvedReferenceList({
         switch (notFoundMode) {
           case 'filter':
             matches = matches.filter(value => value !== null);
-            return contination.raise({matches});
+            return continuation.raise({matches});
 
           case 'exit':
             return continuation.exit([]);
