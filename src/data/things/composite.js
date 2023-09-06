@@ -1207,7 +1207,7 @@ export function withResolvedReferenceList({
 
     raiseWithoutDependency(refList, {
       map: {to},
-      raise: [],
+      raise: {to: []},
       mode: 'empty',
     }),
 
