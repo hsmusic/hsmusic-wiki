@@ -145,7 +145,11 @@ export class Track extends Thing {
     // not generally relevant information). It's also not guaranteed that
     // dataSourceAlbum is available (depending on the Track creator to optionally
     // provide dataSourceAlbumByRef).
-    dataSourceAlbum: Thing.common.dynamicThingFromSingleReference('dataSourceAlbumByRef', 'albumData', find.album),
+    dataSourceAlbum: Thing.common.resolvedReference({
+      ref: 'dataSourceAlbumByRef',
+      data: 'albumData',
+      find: find.album,
+    }),
 
     date: Thing.composite.from(`Track.date`, [
       Thing.composite.exposeDependencyOrContinue('dateFirstReleased'),

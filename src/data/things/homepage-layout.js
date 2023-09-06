@@ -119,11 +119,11 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
     // Expose only
 
-    sourceGroup: Thing.common.dynamicThingFromSingleReference(
-      'sourceGroupByRef',
-      'groupData',
-      find.group
-    ),
+    sourceGroup: Thing.common.resolvedReference({
+      ref: 'sourceGroupByRef',
+      data: 'groupData',
+      find: find.group,
+    }),
 
     sourceAlbums: Thing.common.resolvedReferenceList({
       list: 'sourceAlbumsByRef',

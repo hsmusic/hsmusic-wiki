@@ -193,40 +193,23 @@ export default class Thing extends CacheableObject {
     // Corresponding dynamic property to referenceList, which takes the values
     // in the provided property and searches the specified wiki data for
     // matching actual Thing-subclass objects.
-    resolvedReferenceList({
-      list,
-      data,
-      find: findFunction,
-    }) {
+    resolvedReferenceList({list, data, find}) {
       return Thing.composite.from(`Thing.common.resolvedReferenceList`, [
         Thing.composite.withResolvedReferenceList({
-          list,
-          data,
-          to: '#things',
-          find: findFunction,
+          list, data, find,
           notFoundMode: 'filter',
         }),
-
-        Thing.composite.exposeDependency('#things'),
+        Thing.composite.exposeDependency('#resolvedReferenceList'),
       ]);
     },
 
     // Corresponding function for a single reference.
-    dynamicThingFromSingleReference: (
-      singleReferenceProperty,
-      thingDataProperty,
-      findFn
-    ) => ({
-      flags: {expose: true},
-
-      expose: {
-        dependencies: [singleReferenceProperty, thingDataProperty],
-        compute: ({
-          [singleReferenceProperty]: ref,
-          [thingDataProperty]: thingData,
-        }) => (ref && thingData ? findFn(ref, thingData, {mode: 'quiet'}) : null),
-      },
-    }),
+    resolvedReference({ref, data, find}) {
+      return Thing.composite.from(`Thing.common.resolvedReference`, [
+        Thing.composite.withResolvedReference({ref, data, find}),
+        Thing.composite.exposeDependency('#resolvedReference'),
+      ]);
+    },
 
     // Corresponding dynamic property to contribsByRef, which takes the values
     // in the provided property and searches the object's artistData for
@@ -273,10 +256,7 @@ export default class Thing extends CacheableObject {
     // you would use this to compute a corresponding "referenced *by* tracks"
     // property. Naturally, the passed ref list property is of the things in the
     // wiki data provided, not the requesting Thing itself.
-    reverseReferenceList({
-      data,
-      list,
-    }) {
+    reverseReferenceList({data, list}) {
       return Thing.composite.from(`Thing.common.reverseReferenceList`, [
         Thing.composite.withReverseReferenceList({data, list}),
         Thing.composite.exposeDependency('#reverseReferenceList'),

@@ -1160,8 +1160,8 @@ export function withResolvedContribs({from, to}) {
 export function withResolvedReference({
   ref,
   data,
-  to,
   find: findFunction,
+  to = '#resolvedReference',
   earlyExitIfNotFound = false,
 }) {
   return compositeFrom(`Thing.composite.withResolvedReference`, [
@@ -1194,8 +1194,8 @@ export function withResolvedReference({
 export function withResolvedReferenceList({
   list,
   data,
-  to,
   find: findFunction,
+  to = '#resolvedReferenceList',
   notFoundMode = 'filter',
 }) {
   if (!['filter', 'exit', 'null'].includes(notFoundMode)) {
