@@ -501,6 +501,10 @@ function compositeFrom(firstArg, secondArg) {
     mapDependencies,
     options,
   }) {
+    if (!dependencies && !mapDependencies && !options) {
+      return null;
+    }
+
     const filteredDependencies =
       (dependencies
         ? filterProperties(availableDependencies, dependencies)
@@ -629,8 +633,12 @@ function compositeFrom(firstArg, secondArg) {
 
       const result =
         (callingTransformForThisStep
-          ? expose.transform(valueSoFar, filteredDependencies, continuation)
-          : expose.compute(filteredDependencies, continuation));
+          ? (filteredDependencies
+              ? expose.transform(valueSoFar, filteredDependencies, continuation)
+              : expose.transform(valueSoFar, continuation))
+          : (filteredDependencies
+              ? expose.compute(filteredDependencies, continuation)
+              : expose.compute(continuation)));
 
       if (result !== continuationSymbol) {
         debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
@@ -998,7 +1006,7 @@ export function exposeUpdateValueOrContinue({
     },
 
     {
-      transform: (value, {}, continuation) =>
+      transform: (value, continuation) =>
         continuation.exit(value),
     },
   ]);
