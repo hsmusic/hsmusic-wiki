@@ -331,6 +331,7 @@
 // syntax as for other compositional steps, and it'll work out cleanly!
 //
 
+import find from '#find';
 import {empty, filterProperties, openAggregate} from '#sugar';
 
 import Thing from './thing.js';
@@ -1102,20 +1103,33 @@ export function raiseWithoutUpdateValue({
 // means mapping the "who" reference of each contribution to an artist
 // object, and filtering out those whose "who" doesn't match any artist.
 export function withResolvedContribs({from, to}) {
-  return {
-    annotation: `Thing.composite.withResolvedContribs`,
-    flags: {expose: true, compose: true},
+  return Thing.composite.from(`Thing.composite.withResolvedContribs`, [
+    Thing.composite.earlyExitWithoutDependency('artistData', {
+      value: [],
+    }),
 
-    expose: {
+    Thing.composite.raiseWithoutDependency(from, {
+      mode: 'empty',
+      map: {to},
+      raise: {to: []},
+    }),
+
+    {
       dependencies: ['artistData'],
       mapDependencies: {from},
       mapContinuation: {to},
       compute: ({artistData, from}, continuation) =>
         continuation({
-          to: Thing.findArtistsFromContribs(from, artistData),
+          to:
+            from
+              .map(({who, what}) => ({
+                who: find.artist(who, artistData, {mode: 'quiet'}),
+                what,
+              }))
+              .filter(({who}) => who),
         }),
     },
-  };
+  ]);
 }
 
 // Resolves a reference by using the provided find function to match it

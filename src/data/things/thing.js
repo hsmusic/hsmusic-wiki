@@ -249,14 +249,16 @@ export default class Thing extends CacheableObject {
     // filtered out. (So if the list is all empty, chances are that either the
     // reference list is somehow messed up, or artistData isn't being provided
     // properly.)
-    dynamicContribs: (contribsByRefProperty) => ({
-      flags: {expose: true},
-      expose: {
-        dependencies: ['artistData', contribsByRefProperty],
-        compute: ({artistData, [contribsByRefProperty]: contribsByRef}) =>
-          Thing.findArtistsFromContribs(contribsByRef, artistData),
-      },
-    }),
+    dynamicContribs(contribsByRefProperty) {
+      return Thing.composite.from(`Thing.common.dynamicContribs`, [
+        Thing.composite.withResolvedContribs({
+          from: contribsByRefProperty,
+          to: '#contribs',
+        }),
+
+        Thing.composite.exposeDependency('#contribs'),
+      ]);
+    },
 
     // Nice 'n simple shorthand for an exposed-only flag which is true when any
     // contributions are present in the specified property.
@@ -346,18 +348,6 @@ export default class Thing extends CacheableObject {
     }
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
-  }
-
-  static findArtistsFromContribs(contribsByRef, artistData) {
-    if (empty(contribsByRef)) return null;
-
-    return (
-      contribsByRef
-        .map(({who, what}) => ({
-          who: find.artist(who, artistData, {mode: 'quiet'}),
-          what,
-        }))
-        .filter(({who}) => who));
   }
 
   static composite = composite;
