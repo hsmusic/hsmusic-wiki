@@ -106,7 +106,7 @@ import {
 //
 //   withResolvedContribs = ({
 //     from: contribsByRefDependency,
-//     to: outputDependency,
+//     into: outputDependency,
 //   }) => ({
 //     flags: {expose: true, compose: true},
 //     expose: {
@@ -132,7 +132,7 @@ import {
 //
 //       withResolvedContribs({
 //         from: 'coverArtistContribsByRef',
-//         to: '#coverArtistContribs',
+//         into: '#coverArtistContribs',
 //       }),
 //
 //       {
@@ -171,7 +171,7 @@ import {
 //
 //   withResolvedContribs = ({
 //     from: contribsByRefDependency,
-//     to: outputDependency,
+//     into: outputDependency,
 //   }) => ({
 //     flags: {expose: true, compose: true},
 //     expose: {
@@ -199,11 +199,11 @@ import {
 //     expose: {
 //       dependencies: ['artistData'],
 //       mapDependencies: {from},
-//       mapContinuation: {to},
+//       mapContinuation: {into},
 //       compute({artistData, from: contribsByRef}, continuation) {
 //         if (!artistData) return null;
 //         return continuation({
-//           to: (..resolve contributions one way or another..),
+//           into: (..resolve contributions one way or another..),
 //         });
 //       },
 //     },
@@ -505,8 +505,8 @@ export function compositeFrom(firstArg, secondArg) {
         : {});
 
     if (mapDependencies) {
-      for (const [to, from] of Object.entries(mapDependencies)) {
-        filteredDependencies[to] = availableDependencies[from] ?? null;
+      for (const [into, from] of Object.entries(mapDependencies)) {
+        filteredDependencies[into] = availableDependencies[from] ?? null;
       }
     }
 
@@ -524,8 +524,8 @@ export function compositeFrom(firstArg, secondArg) {
 
     const assignDependencies = {};
 
-    for (const [from, to] of Object.entries(mapContinuation)) {
-      assignDependencies[to] = continuationAssignment[from] ?? null;
+    for (const [from, into] of Object.entries(mapContinuation)) {
+      assignDependencies[into] = continuationAssignment[from] ?? null;
     }
 
     return assignDependencies;
@@ -861,7 +861,7 @@ export function withResultOfAvailabilityCheck({
   fromUpdateValue,
   fromDependency,
   mode = 'null',
-  to = '#availability',
+  into = '#availability',
 }) {
   if (!['null', 'empty', 'falsy'].includes(mode)) {
     throw new TypeError(`Expected mode to be null, empty, or falsy`);
@@ -890,10 +890,10 @@ export function withResultOfAvailabilityCheck({
       flags: {expose: true, compose: true},
       expose: {
         mapDependencies: {from: fromDependency},
-        mapContinuation: {to},
+        mapContinuation: {into},
         options: {mode},
         compute: ({from, '#options': {mode}}, continuation) =>
-          continuation({to: checkAvailability(from, mode)}),
+          continuation({into: checkAvailability(from, mode)}),
       },
     };
   } else {
@@ -901,10 +901,10 @@ export function withResultOfAvailabilityCheck({
       annotation: `withResultOfAvailabilityCheck.fromUpdateValue`,
       flags: {expose: true, compose: true},
       expose: {
-        mapContinuation: {to},
+        mapContinuation: {into},
         options: {mode},
         transform: (value, {'#options': {mode}}, continuation) =>
-          continuation(value, {to: checkAvailability(value, mode)}),
+          continuation(value, {into: checkAvailability(value, mode)}),
       },
     };
   }

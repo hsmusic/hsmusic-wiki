@@ -236,7 +236,7 @@ export default class Thing extends CacheableObject {
       return compositeFrom(`Thing.common.dynamicContribs`, [
         withResolvedContribs({
           from: contribsByRefProperty,
-          to: '#contribs',
+          into: '#contribs',
         }),
 
         exposeDependency('#contribs'),
@@ -335,12 +335,12 @@ export default class Thing extends CacheableObject {
 // providing (named by the second argument) the result. "Resolving"
 // means mapping the "who" reference of each contribution to an artist
 // object, and filtering out those whose "who" doesn't match any artist.
-export function withResolvedContribs({from, to}) {
+export function withResolvedContribs({from, into}) {
   return compositeFrom(`withResolvedContribs`, [
     raiseWithoutDependency(from, {
       mode: 'empty',
-      map: {to},
-      raise: {to: []},
+      map: {into},
+      raise: {into: []},
     }),
 
     {
@@ -355,18 +355,18 @@ export function withResolvedContribs({from, to}) {
     withResolvedReferenceList({
       list: '#whoByRef',
       data: 'artistData',
-      to: '#who',
+      into: '#who',
       find: find.artist,
       notFoundMode: 'null',
     }),
 
     {
       dependencies: ['#who', '#what'],
-      mapContinuation: {to},
+      mapContinuation: {into},
       compute({'#who': who, '#what': what}, continuation) {
         filterMultipleArrays(who, what, (who, _what) => who);
         return continuation({
-          to: stitchArrays({who, what}),
+          into: stitchArrays({who, what}),
         });
       },
     },
@@ -383,7 +383,7 @@ export function withResolvedReference({
   ref,
   data,
   find: findFunction,
-  to = '#resolvedReference',
+  into = '#resolvedReference',
   notFoundMode = 'null',
 }) {
   if (!['exit', 'null'].includes(notFoundMode)) {
@@ -391,13 +391,13 @@ export function withResolvedReference({
   }
 
   return compositeFrom(`withResolvedReference`, [
-    raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
+    raiseWithoutDependency(ref, {map: {into}, raise: {into: null}}),
     exitWithoutDependency(data),
 
     {
       options: {findFunction, notFoundMode},
       mapDependencies: {ref, data},
-      mapContinuation: {match: to},
+      mapContinuation: {match: into},
 
       compute({ref, data, '#options': {findFunction, notFoundMode}}, continuation) {
         const match = findFunction(ref, data, {mode: 'quiet'});
@@ -421,7 +421,7 @@ export function withResolvedReferenceList({
   list,
   data,
   find: findFunction,
-  to = '#resolvedReferenceList',
+  into = '#resolvedReferenceList',
   notFoundMode = 'filter',
 }) {
   if (!['filter', 'exit', 'null'].includes(notFoundMode)) {
@@ -431,15 +431,15 @@ export function withResolvedReferenceList({
   return compositeFrom(`withResolvedReferenceList`, [
     exitWithoutDependency(data, {value: []}),
     raiseWithoutDependency(list, {
-      map: {to},
-      raise: {to: []},
+      map: {into},
+      raise: {into: []},
       mode: 'empty',
     }),
 
     {
       options: {findFunction, notFoundMode},
       mapDependencies: {list, data},
-      mapContinuation: {matches: to},
+      mapContinuation: {matches: into},
 
       compute({list, data, '#options': {findFunction, notFoundMode}}, continuation) {
         let matches =
@@ -470,7 +470,7 @@ export function withResolvedReferenceList({
 export function withReverseReferenceList({
   data,
   list: refListProperty,
-  to = '#reverseReferenceList',
+  into = '#reverseReferenceList',
 }) {
   return compositeFrom(`Thing.common.reverseReferenceList`, [
     exitWithoutDependency(data, {value: []}),
@@ -478,12 +478,12 @@ export function withReverseReferenceList({
     {
       dependencies: ['this'],
       mapDependencies: {data},
-      mapContinuation: {to},
+      mapContinuation: {into},
       options: {refListProperty},
 
       compute: ({this: thisThing, data, '#options': {refListProperty}}, continuation) =>
         continuation({
-          to: data.filter(thing => thing[refListProperty].includes(thisThing)),
+          into: data.filter(thing => thing[refListProperty].includes(thisThing)),
         }),
     },
   ]);

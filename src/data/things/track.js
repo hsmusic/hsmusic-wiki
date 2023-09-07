@@ -216,7 +216,7 @@ export class Track extends Thing {
 
       withResolvedContribs({
         from: 'artistContribsByRef',
-        to: '#artistContribs',
+        into: '#artistContribs',
       }),
 
       {
@@ -250,7 +250,7 @@ export class Track extends Thing {
 
       withResolvedContribs({
         from: 'coverArtistContribsByRef',
-        to: '#coverArtistContribs',
+        into: '#coverArtistContribs',
       }),
 
       {
@@ -363,20 +363,20 @@ function inheritFromOriginalRelease({
 // the output dependency will be null; set {notFoundMode: 'exit'} to early
 // exit instead.
 function withAlbum({
-  to = '#album',
+  into = '#album',
   notFoundMode = 'null',
 } = {}) {
   return compositeFrom(`withAlbum`, [
     withResultOfAvailabilityCheck({
       fromDependency: 'albumData',
       mode: 'empty',
-      to: '#albumDataAvailability',
+      into: '#albumDataAvailability',
     }),
 
     {
       dependencies: ['#albumDataAvailability'],
       options: {notFoundMode},
-      mapContinuation: {to},
+      mapContinuation: {into},
 
       compute: ({
         '#albumDataAvailability': albumDataAvailability,
@@ -386,7 +386,7 @@ function withAlbum({
           ? continuation()
           : (notFoundMode === 'exit'
               ? continuation.exit(null)
-              : continuation.raise({to: null}))),
+              : continuation.raise({into: null}))),
     },
 
     {
@@ -400,17 +400,17 @@ function withAlbum({
     {
       dependencies: ['#album'],
       options: {notFoundMode},
-      mapContinuation: {to},
+      mapContinuation: {into},
 
       compute: ({
         '#album': album,
         '#options': {notFoundMode},
       }, continuation) =>
         (album
-          ? continuation.raise({to: album})
+          ? continuation.raise({into: album})
           : (notFoundMode === 'exit'
               ? continuation.exit(null)
-              : continuation.raise({to: null}))),
+              : continuation.raise({into: null}))),
     },
   ]);
 }
@@ -420,7 +420,7 @@ function withAlbum({
 // isn't available, then by default, the property will be provided as null;
 // set {notFoundMode: 'exit'} to early exit instead.
 function withAlbumProperty(property, {
-  to = '#album.' + property,
+  into = '#album.' + property,
   notFoundMode = 'null',
 } = {}) {
   return compositeFrom(`withAlbumProperty`, [
@@ -429,15 +429,15 @@ function withAlbumProperty(property, {
     {
       dependencies: ['#album'],
       options: {property},
-      mapContinuation: {to},
+      mapContinuation: {into},
 
       compute: ({
         '#album': album,
         '#options': {property},
       }, continuation) =>
         (album
-          ? continuation.raise({to: album[property]})
-          : continuation.raise({to: null})),
+          ? continuation.raise({into: album[property]})
+          : continuation.raise({into: null})),
     },
   ]);
 }
@@ -485,7 +485,7 @@ function withAlbumProperties({
 // If notFoundMode is set to 'exit', this will early exit if the album can't be
 // found or if none of its trackSections includes the track for some reason.
 function withContainingTrackSection({
-  to = '#trackSection',
+  into = '#trackSection',
   notFoundMode = 'null',
 } = {}) {
   if (!['exit', 'null'].includes(notFoundMode)) {
@@ -498,7 +498,7 @@ function withContainingTrackSection({
     {
       dependencies: ['this', '#album.trackSections'],
       options: {notFoundMode},
-      mapContinuation: {to},
+      mapContinuation: {into},
 
       compute({
         this: track,
@@ -506,18 +506,18 @@ function withContainingTrackSection({
         '#options': {notFoundMode},
       }, continuation) {
         if (!trackSections) {
-          return continuation.raise({to: null});
+          return continuation.raise({into: null});
         }
 
         const trackSection =
           trackSections.find(({tracks}) => tracks.includes(track));
 
         if (trackSection) {
-          return continuation.raise({to: trackSection});
+          return continuation.raise({into: trackSection});
         } else if (notFoundMode === 'exit') {
           return continuation.exit(null);
         } else {
-          return continuation.raise({to: null});
+          return continuation.raise({into: null});
         }
       },
     },
@@ -531,14 +531,14 @@ function withContainingTrackSection({
 // specified by reference and that reference doesn't resolve to anything.
 // Outputs to '#originalRelease' by default.
 function withOriginalRelease({
-  to = '#originalRelease',
+  into = '#originalRelease',
   selfIfOriginal = false,
 } = {}) {
   return compositeFrom(`withOriginalRelease`, [
     withResolvedReference({
       ref: 'originalReleaseTrackByRef',
       data: 'trackData',
-      to: '#originalRelease',
+      into: '#originalRelease',
       find: find.track,
       notFoundMode: 'exit',
     }),
@@ -546,14 +546,14 @@ function withOriginalRelease({
     {
       dependencies: ['this', '#originalRelease'],
       options: {selfIfOriginal},
-      mapContinuation: {to},
+      mapContinuation: {into},
       compute: ({
         this: track,
         '#originalRelease': originalRelease,
         '#options': {selfIfOriginal},
       }, continuation) =>
         continuation.raise({
-          to:
+          into:
             (originalRelease ??
               (selfIfOriginal
                 ? track
@@ -566,41 +566,41 @@ function withOriginalRelease({
 // The algorithm for checking if a track has unique cover art is used in a
 // couple places, so it's defined in full as a compositional step.
 function withHasUniqueCoverArt({
-  to = '#hasUniqueCoverArt',
+  into = '#hasUniqueCoverArt',
 } = {}) {
   return compositeFrom(`withHasUniqueCoverArt`, [
     {
       dependencies: ['disableUniqueCoverArt'],
-      mapContinuation: {to},
+      mapContinuation: {into},
       compute: ({disableUniqueCoverArt}, continuation) =>
         (disableUniqueCoverArt
-          ? continuation.raise({to: false})
+          ? continuation.raise({into: false})
           : continuation()),
     },
 
     withResolvedContribs({
       from: 'coverArtistContribsByRef',
-      to: '#coverArtistContribs',
+      into: '#coverArtistContribs',
     }),
 
     {
       dependencies: ['#coverArtistContribs'],
-      mapContinuation: {to},
+      mapContinuation: {into},
       compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
         (empty(contribsFromTrack)
           ? continuation()
-          : continuation.raise({to: true})),
+          : continuation.raise({into: true})),
     },
 
     withAlbumProperty('trackCoverArtistContribs'),
 
     {
       dependencies: ['#album.trackCoverArtistContribs'],
-      mapContinuation: {to},
+      mapContinuation: {into},
       compute: ({'#album.trackCoverArtistContribs': contribsFromAlbum}, continuation) =>
         (empty(contribsFromAlbum)
-          ? continuation.raise({to: false})
-          : continuation.raise({to: true})),
+          ? continuation.raise({into: false})
+          : continuation.raise({into: true})),
     },
   ]);
 }
