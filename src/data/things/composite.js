@@ -801,9 +801,10 @@ export function debugComposite(fn) {
 // compositional step, the property will be exposed as undefined instead
 // of null.
 //
-export function exposeDependency(dependency, {
+export function exposeDependency({
+  dependency,
   update = false,
-} = {}) {
+}) {
   return {
     annotation: `exposeDependency`,
     flags: {expose: true, update: !!update},
@@ -826,9 +827,10 @@ export function exposeDependency(dependency, {
 // exit with some other value, with the exposeConstant base serving as the
 // fallback default value. Like exposeDependency, set {update} to true or
 // an object to indicate that the property as a whole updates.
-export function exposeConstant(value, {
+export function exposeConstant({
+  value,
   update = false,
-} = {}) {
+}) {
   return {
     annotation: `exposeConstant`,
     flags: {expose: true, update: !!update},
@@ -912,9 +914,10 @@ export function withResultOfAvailabilityCheck({
 
 // Exposes a dependency as it is, or continues if it's unavailable.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function exposeDependencyOrContinue(dependency, {
+export function exposeDependencyOrContinue({
+  dependency,
   mode = 'null',
-} = {}) {
+}) {
   return compositeFrom(`exposeDependencyOrContinue`, [
     withResultOfAvailabilityCheck({
       fromDependency: dependency,
@@ -990,10 +993,11 @@ export function exitIfAvailabilityCheckFailed({
 
 // Early exits if a dependency isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function exitWithoutDependency(dependency, {
+export function exitWithoutDependency({
+  dependency,
   mode = 'null',
   value = null,
-} = {}) {
+}) {
   return compositeFrom(`exitWithoutDependency`, [
     withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
     exitIfAvailabilityCheckFailed({value}),
@@ -1014,11 +1018,12 @@ export function exitWithoutUpdateValue({
 
 // Raises if a dependency isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function raiseWithoutDependency(dependency, {
+export function raiseWithoutDependency({
+  dependency,
   mode = 'null',
   map = {},
   raise = {},
-} = {}) {
+}) {
   return compositeFrom(`raiseWithoutDependency`, [
     withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
 

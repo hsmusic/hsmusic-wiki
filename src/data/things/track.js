@@ -73,8 +73,10 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      withAlbumProperty('color'),
-      exposeDependency('#album.color', {
+      withAlbumProperty({property: 'color'}),
+
+      exposeDependency({
+        dependency: '#album.color',
         update: {validate: isColor},
       }),
     ]),
@@ -93,17 +95,18 @@ export class Track extends Thing {
       // No cover art file extension if the track doesn't have unique artwork
       // in the first place.
       withHasUniqueCoverArt(),
-      exitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
+      exitWithoutDependency({dependency: '#hasUniqueCoverArt', mode: 'falsy'}),
 
       // Expose custom coverArtFileExtension update value first.
       exposeUpdateValueOrContinue(),
 
       // Expose album's trackCoverArtFileExtension if no update value set.
-      withAlbumProperty('trackCoverArtFileExtension'),
-      exposeDependencyOrContinue('#album.trackCoverArtFileExtension'),
+      withAlbumProperty({property: 'trackCoverArtFileExtension'}),
+      exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
 
       // Fallback to 'jpg'.
-      exposeConstant('jpg', {
+      exposeConstant({
+        value: 'jpg',
         update: {validate: isFileExtension},
       }),
     ]),
@@ -114,12 +117,13 @@ export class Track extends Thing {
     // is specified, this value is null.
     coverArtDate: compositeFrom(`Track.coverArtDate`, [
       withHasUniqueCoverArt(),
-      exitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
+      exitWithoutDependency({dependency: '#hasUniqueCoverArt', mode: 'falsy'}),
 
       exposeUpdateValueOrContinue(),
 
-      withAlbumProperty('trackArtDate'),
-      exposeDependency('#album.trackArtDate', {
+      withAlbumProperty({property: 'trackArtDate'}),
+      exposeDependency({
+        dependency: '#album.trackArtDate',
         update: {validate: isDate},
       }),
     ]),
@@ -148,7 +152,7 @@ export class Track extends Thing {
 
     album: compositeFrom(`Track.album`, [
       withAlbum(),
-      exposeDependency('#album'),
+      exposeDependency({dependency: '#album'}),
     ]),
 
     // Note - this is an internal property used only to help identify a track.
@@ -165,9 +169,9 @@ export class Track extends Thing {
     }),
 
     date: compositeFrom(`Track.date`, [
-      exposeDependencyOrContinue('dateFirstReleased'),
-      withAlbumProperty('date'),
-      exposeDependency('#album.date'),
+      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
+      withAlbumProperty({property: 'date'}),
+      exposeDependency({dependency: '#album.date'}),
     ]),
 
     // Whether or not the track has "unique" cover artwork - a cover which is
@@ -179,16 +183,16 @@ export class Track extends Thing {
     // album.)
     hasUniqueCoverArt: compositeFrom(`Track.hasUniqueCoverArt`, [
       withHasUniqueCoverArt(),
-      exposeDependency('#hasUniqueCoverArt'),
+      exposeDependency({dependency: '#hasUniqueCoverArt'}),
     ]),
 
     originalReleaseTrack: compositeFrom(`Track.originalReleaseTrack`, [
       withOriginalRelease(),
-      exposeDependency('#originalRelease'),
+      exposeDependency({dependency: '#originalRelease'}),
     ]),
 
     otherReleases: compositeFrom(`Track.otherReleases`, [
-      exitWithoutDependency('trackData', {mode: 'empty'}),
+      exitWithoutDependency({dependency: 'trackData', mode: 'empty'}),
       withOriginalRelease({selfIfOriginal: true}),
 
       {
@@ -227,8 +231,8 @@ export class Track extends Thing {
             : contribsFromTrack),
       },
 
-      withAlbumProperty('artistContribs'),
-      exposeDependency('#album.artistContribs'),
+      withAlbumProperty({property: 'artistContribs'}),
+      exposeDependency({dependency: '#album.artistContribs'}),
     ]),
 
     contributorContribs: compositeFrom(`Track.contributorContribs`, [
@@ -261,8 +265,8 @@ export class Track extends Thing {
             : contribsFromTrack),
       },
 
-      withAlbumProperty('trackCoverArtistContribs'),
-      exposeDependency('#album.trackCoverArtistContribs'),
+      withAlbumProperty({property: 'trackCoverArtistContribs'}),
+      exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
     ]),
 
     referencedTracks: compositeFrom(`Track.referencedTracks`, [
@@ -297,10 +301,14 @@ export class Track extends Thing {
     // counting the number of times a track has been referenced, for use in
     // the "Tracks - by Times Referenced" listing page (or other data
     // processing).
-    referencedByTracks: trackReverseReferenceList('referencedTracks'),
+    referencedByTracks: trackReverseReferenceList({
+      property: 'referencedTracks',
+    }),
 
     // For the same reasoning, exclude re-releases from sampled tracks too.
-    sampledByTracks: trackReverseReferenceList('sampledTracks'),
+    sampledByTracks: trackReverseReferenceList({
+      property: 'sampledTracks',
+    }),
 
     featuredInFlashes: Thing.common.reverseReferenceList({
       data: 'flashData',
@@ -419,10 +427,11 @@ function withAlbum({
 // property name prefixed with '#album.' (by default). If the track's album
 // isn't available, then by default, the property will be provided as null;
 // set {notFoundMode: 'exit'} to early exit instead.
-function withAlbumProperty(property, {
+function withAlbumProperty({
+  property,
   into = '#album.' + property,
   notFoundMode = 'null',
-} = {}) {
+}) {
   return compositeFrom(`withAlbumProperty`, [
     withAlbum({notFoundMode}),
 
@@ -493,7 +502,7 @@ function withContainingTrackSection({
   }
 
   return compositeFrom(`withContainingTrackSection`, [
-    withAlbumProperty('trackSections', {notFoundMode}),
+    withAlbumProperty({property: 'trackSections', notFoundMode}),
 
     {
       dependencies: ['this', '#album.trackSections'],
@@ -592,7 +601,7 @@ function withHasUniqueCoverArt({
           : continuation.raise({into: true})),
     },
 
-    withAlbumProperty('trackCoverArtistContribs'),
+    withAlbumProperty({property: 'trackCoverArtistContribs'}),
 
     {
       dependencies: ['#album.trackCoverArtistContribs'],
@@ -605,7 +614,9 @@ function withHasUniqueCoverArt({
   ]);
 }
 
-function trackReverseReferenceList(refListProperty) {
+function trackReverseReferenceList({
+  property: refListProperty,
+}) {
   return compositeFrom(`trackReverseReferenceList`, [
     withReverseReferenceList({
       data: 'trackData',

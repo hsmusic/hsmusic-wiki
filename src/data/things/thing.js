@@ -205,7 +205,8 @@ export default class Thing extends CacheableObject {
           list, data, find,
           notFoundMode: 'filter',
         }),
-        exposeDependency('#resolvedReferenceList'),
+
+        exposeDependency({dependency: '#resolvedReferenceList'}),
       ]);
     },
 
@@ -213,7 +214,7 @@ export default class Thing extends CacheableObject {
     resolvedReference({ref, data, find}) {
       return compositeFrom(`Thing.common.resolvedReference`, [
         withResolvedReference({ref, data, find}),
-        exposeDependency('#resolvedReference'),
+        exposeDependency({dependency: '#resolvedReference'}),
       ]);
     },
 
@@ -239,7 +240,7 @@ export default class Thing extends CacheableObject {
           into: '#contribs',
         }),
 
-        exposeDependency('#contribs'),
+        exposeDependency({dependency: '#contribs'}),
       ]);
     },
 
@@ -265,7 +266,7 @@ export default class Thing extends CacheableObject {
     reverseReferenceList({data, list}) {
       return compositeFrom(`Thing.common.reverseReferenceList`, [
         withReverseReferenceList({data, list}),
-        exposeDependency('#reverseReferenceList'),
+        exposeDependency({dependency: '#reverseReferenceList'}),
       ]);
     },
 
@@ -337,7 +338,8 @@ export default class Thing extends CacheableObject {
 // object, and filtering out those whose "who" doesn't match any artist.
 export function withResolvedContribs({from, into}) {
   return compositeFrom(`withResolvedContribs`, [
-    raiseWithoutDependency(from, {
+    raiseWithoutDependency({
+      dependency: from,
       mode: 'empty',
       map: {into},
       raise: {into: []},
@@ -391,8 +393,15 @@ export function withResolvedReference({
   }
 
   return compositeFrom(`withResolvedReference`, [
-    raiseWithoutDependency(ref, {map: {into}, raise: {into: null}}),
-    exitWithoutDependency(data),
+    raiseWithoutDependency({
+      dependency: ref,
+      map: {into},
+      raise: {into: null},
+    }),
+
+    exitWithoutDependency({
+      dependency: data,
+    }),
 
     {
       options: {findFunction, notFoundMode},
@@ -429,11 +438,16 @@ export function withResolvedReferenceList({
   }
 
   return compositeFrom(`withResolvedReferenceList`, [
-    exitWithoutDependency(data, {value: []}),
-    raiseWithoutDependency(list, {
+    exitWithoutDependency({
+      dependency: data,
+      value: [],
+    }),
+
+    raiseWithoutDependency({
+      dependency: list,
+      mode: 'empty',
       map: {into},
       raise: {into: []},
-      mode: 'empty',
     }),
 
     {
@@ -473,7 +487,10 @@ export function withReverseReferenceList({
   into = '#reverseReferenceList',
 }) {
   return compositeFrom(`Thing.common.reverseReferenceList`, [
-    exitWithoutDependency(data, {value: []}),
+    exitWithoutDependency({
+      dependency: data,
+      value: [],
+    }),
 
     {
       dependencies: ['this'],
