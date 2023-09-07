@@ -1,22 +1,19 @@
 import find from '#find';
 
+import {
+  isColor,
+  isDirectory,
+  isNumber,
+  isString,
+  oneOf,
+} from '#validators';
+
 import Thing from './thing.js';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Artist,
-    Track,
-    FlashAct,
-
-    validators: {
-      isDirectory,
-      isNumber,
-      isString,
-      oneOf,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Flash'),
@@ -111,11 +108,7 @@ export class Flash extends Thing {
 }
 
 export class FlashAct extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    validators: {
-      isColor,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Flash Act'),

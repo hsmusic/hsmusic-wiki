@@ -4,7 +4,6 @@ import {fileURLToPath} from 'node:url';
 import {logError} from '#cli';
 import * as serialize from '#serialize';
 import {openAggregate, showAggregate} from '#sugar';
-import * as validators from '#validators';
 
 import Thing from './thing.js';
 
@@ -121,7 +120,7 @@ function descriptorAggregateHelper({
 }
 
 function evaluatePropertyDescriptors() {
-  const opts = {...allClasses, validators};
+  const opts = {...allClasses};
 
   return descriptorAggregateHelper({
     message: `Errors evaluating Thing class property descriptors`,

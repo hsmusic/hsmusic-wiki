@@ -1,17 +1,18 @@
 import find from '#find';
 
+import {
+  is,
+  isCountingNumber,
+  isString,
+  isStringNonEmpty,
+  validateArrayItems,
+  validateInstanceOf,
+} from '#validators';
+
 import Thing from './thing.js';
 
 export class HomepageLayout extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    HomepageLayoutRow,
-
-    validators: {
-      isStringNonEmpty,
-      validateArrayItems,
-      validateInstanceOf,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
     sidebarContent: Thing.common.simpleString(),
@@ -32,10 +33,7 @@ export class HomepageLayout extends Thing {
 }
 
 export class HomepageLayoutRow extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Group,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Homepage Row'),
@@ -63,17 +61,7 @@ export class HomepageLayoutRow extends Thing {
 }
 
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
-  static [Thing.getPropertyDescriptors] = (opts, {
-    Album,
-    Group,
-
-    validators: {
-      is,
-      isCountingNumber,
-      isString,
-      validateArrayItems,
-    },
-  } = opts) => ({
+  static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
     // Update & expose

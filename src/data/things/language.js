@@ -1,11 +1,9 @@
+import {isLanguageCode} from '#validators';
+
 import Thing from './thing.js';
 
 export class Language extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    validators: {
-      isLanguageCode,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     // General language code. This is used to identify the language distinctly

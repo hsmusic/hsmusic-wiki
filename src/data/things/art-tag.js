@@ -5,10 +5,7 @@ import Thing from './thing.js';
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Track,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Art Tag'),

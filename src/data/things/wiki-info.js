@@ -1,17 +1,10 @@
 import find from '#find';
+import {isLanguageCode, isName, isURL} from '#validators';
 
 import Thing from './thing.js';
 
 export class WikiInfo extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Group,
-
-    validators: {
-      isLanguageCode,
-      isName,
-      isURL,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Wiki'),

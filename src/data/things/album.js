@@ -1,23 +1,13 @@
-import {empty} from '#sugar';
 import find from '#find';
+import {empty} from '#sugar';
+import {isDate, isDimensions, isTrackSectionList} from '#validators';
 
 import Thing from './thing.js';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({
-    ArtTag,
-    Artist,
-    Group,
-    Track,
-
-    validators: {
-      isDate,
-      isDimensions,
-      isTrackSectionList,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Album'),

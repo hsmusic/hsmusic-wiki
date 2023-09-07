@@ -3,6 +3,7 @@ import {inspect} from 'node:util';
 import {color} from '#cli';
 import find from '#find';
 import {empty} from '#sugar';
+import {isColor, isDate, isDuration, isFileExtension} from '#validators';
 
 import {
   compositeFrom,
@@ -23,19 +24,7 @@ import Thing, {
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    ArtTag,
-    Artist,
-    Flash,
-
-    validators: {
-      isColor,
-      isDate,
-      isDuration,
-      isFileExtension,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Track'),

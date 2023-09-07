@@ -1,20 +1,12 @@
 import find from '#find';
+import {isName, validateArrayItems} from '#validators';
 
 import Thing from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Flash,
-    Track,
-
-    validators: {
-      isName,
-      validateArrayItems,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Flash, Track}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Artist'),

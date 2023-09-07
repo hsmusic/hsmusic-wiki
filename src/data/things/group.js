@@ -5,9 +5,7 @@ import Thing from './thing.js';
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Group'),
@@ -76,9 +74,7 @@ export class Group extends Thing {
 }
 
 export class GroupCategory extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Group,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Group Category'),

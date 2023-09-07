@@ -1,13 +1,11 @@
+import {isName} from '#validators';
+
 import Thing from './thing.js';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
 
-  static [Thing.getPropertyDescriptors] = ({
-    validators: {
-      isName,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     name: Thing.common.name('Unnamed Static Page'),
