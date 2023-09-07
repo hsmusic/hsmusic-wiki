@@ -59,7 +59,7 @@ export class Track extends Thing {
 
     color: compositeFrom(`Track.color`, [
       exposeUpdateValueOrContinue(),
-      withContainingTrackSection({earlyExitIfNotFound: false}),
+      withContainingTrackSection(),
 
       {
         dependencies: ['#trackSection'],
@@ -358,12 +358,13 @@ function inheritFromOriginalRelease({
   ]);
 }
 
-// Gets the track's album. Unless earlyExitIfNotFound is overridden false,
-// this will early exit with null in two cases - albumData being missing,
-// or not including an album whose .tracks array includes this track.
+// Gets the track's album. This will early exit if albumData is missing.
+// By default, if there's no album whose list of tracks includes this track,
+// the output dependency will be null; set {notFoundMode: 'exit'} to early
+// exit instead.
 function withAlbum({
   to = '#album',
-  earlyExitIfNotFound = true,
+  notFoundMode = 'null',
 } = {}) {
   return compositeFrom(`withAlbum`, [
     withResultOfAvailabilityCheck({
@@ -374,16 +375,16 @@ function withAlbum({
 
     {
       dependencies: ['#albumDataAvailability'],
-      options: {earlyExitIfNotFound},
+      options: {notFoundMode},
       mapContinuation: {to},
 
       compute: ({
         '#albumDataAvailability': albumDataAvailability,
-        '#options': {earlyExitIfNotFound},
+        '#options': {notFoundMode},
       }, continuation) =>
         (albumDataAvailability
           ? continuation()
-          : (earlyExitIfNotFound
+          : (notFoundMode === 'exit'
               ? continuation.exit(null)
               : continuation.raise({to: null}))),
     },
@@ -392,38 +393,38 @@ function withAlbum({
       dependencies: ['this', 'albumData'],
       compute: ({this: track, albumData}, continuation) =>
         continuation({
-          '#album':
-            albumData.find(album => album.tracks.includes(track)),
+          '#album': albumData.find(album => album.tracks.includes(track)),
         }),
     },
 
     {
       dependencies: ['#album'],
-      options: {earlyExitIfNotFound},
+      options: {notFoundMode},
       mapContinuation: {to},
+
       compute: ({
         '#album': album,
-        '#options': {earlyExitIfNotFound},
+        '#options': {notFoundMode},
       }, continuation) =>
         (album
           ? continuation.raise({to: album})
-          : (earlyExitIfNotFound
+          : (notFoundMode === 'exit'
               ? continuation.exit(null)
-              : continuation.raise({to: album}))),
+              : continuation.raise({to: null}))),
     },
   ]);
 }
 
 // Gets a single property from this track's album, providing it as the same
 // property name prefixed with '#album.' (by default). If the track's album
-// isn't available, and earlyExitIfNotFound hasn't been set, the property
-// will be provided as null.
+// isn't available, then by default, the property will be provided as null;
+// set {notFoundMode: 'exit'} to early exit instead.
 function withAlbumProperty(property, {
   to = '#album.' + property,
-  earlyExitIfNotFound = false,
+  notFoundMode = 'null',
 } = {}) {
   return compositeFrom(`withAlbumProperty`, [
-    withAlbum({earlyExitIfNotFound}),
+    withAlbum({notFoundMode}),
 
     {
       dependencies: ['#album'],
@@ -443,15 +444,16 @@ function withAlbumProperty(property, {
 
 // Gets the listed properties from this track's album, providing them as
 // dependencies (by default) with '#album.' prefixed before each property
-// name. If the track's album isn't available, and earlyExitIfNotFound
-// hasn't been set, the same dependency names will be provided as null.
+// name. If the track's album isn't available, then by default, the same
+// dependency names will be provided as null; set {notFoundMode: 'exit'}
+// to early exit instead.
 function withAlbumProperties({
   properties,
   prefix = '#album',
-  earlyExitIfNotFound = false,
+  notFoundMode = 'null',
 }) {
   return compositeFrom(`withAlbumProperties`, [
-    withAlbum({earlyExitIfNotFound}),
+    withAlbum({notFoundMode}),
 
     {
       dependencies: ['#album'],
@@ -480,23 +482,28 @@ function withAlbumProperties({
 }
 
 // Gets the track section containing this track from its album's track list.
-// Unless earlyExitIfNotFound is overridden false, this will early exit if
-// the album can't be found or if none of its trackSections includes the
-// track for some reason.
+// If notFoundMode is set to 'exit', this will early exit if the album can't be
+// found or if none of its trackSections includes the track for some reason.
 function withContainingTrackSection({
   to = '#trackSection',
-  earlyExitIfNotFound = true,
+  notFoundMode = 'null',
 } = {}) {
+  if (!['exit', 'null'].includes(notFoundMode)) {
+    throw new TypeError(`Expected notFoundMode to be exit or null`);
+  }
+
   return compositeFrom(`withContainingTrackSection`, [
-    withAlbumProperty('trackSections', {earlyExitIfNotFound}),
+    withAlbumProperty('trackSections', {notFoundMode}),
 
     {
       dependencies: ['this', '#album.trackSections'],
+      options: {notFoundMode},
       mapContinuation: {to},
 
       compute({
         this: track,
         '#album.trackSections': trackSections,
+        '#options': {notFoundMode},
       }, continuation) {
         if (!trackSections) {
           return continuation.raise({to: null});
@@ -507,7 +514,7 @@ function withContainingTrackSection({
 
         if (trackSection) {
           return continuation.raise({to: trackSection});
-        } else if (earlyExitIfNotFound) {
+        } else if (notFoundMode === 'exit') {
           return continuation.exit(null);
         } else {
           return continuation.raise({to: null});
@@ -533,7 +540,7 @@ function withOriginalRelease({
       data: 'trackData',
       to: '#originalRelease',
       find: find.track,
-      earlyExitIfNotFound: true,
+      notFoundMode: 'exit',
     }),
 
     {

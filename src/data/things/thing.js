@@ -375,31 +375,34 @@ export function withResolvedContribs({from, to}) {
 
 // Resolves a reference by using the provided find function to match it
 // within the provided thingData dependency. This will early exit if the
-// data dependency is null, or, if earlyExitIfNotFound is set to true,
-// if the find function doesn't match anything for the reference.
-// Otherwise, the data object is provided on the output dependency;
-// or null, if the reference doesn't match anything or itself was null
-// to begin with.
+// data dependency is null, or, if notFoundMode is set to 'exit', if the find
+// function doesn't match anything for the reference. Otherwise, the data
+// object is provided on the output dependency; or null, if the reference
+// doesn't match anything or itself was null to begin with.
 export function withResolvedReference({
   ref,
   data,
   find: findFunction,
   to = '#resolvedReference',
-  earlyExitIfNotFound = false,
+  notFoundMode = 'null',
 }) {
+  if (!['exit', 'null'].includes(notFoundMode)) {
+    throw new TypeError(`Expected notFoundMode to be exit or null`);
+  }
+
   return compositeFrom(`withResolvedReference`, [
     raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
     exitWithoutDependency(data),
 
     {
-      options: {findFunction, earlyExitIfNotFound},
+      options: {findFunction, notFoundMode},
       mapDependencies: {ref, data},
       mapContinuation: {match: to},
 
-      compute({ref, data, '#options': {findFunction, earlyExitIfNotFound}}, continuation) {
+      compute({ref, data, '#options': {findFunction, notFoundMode}}, continuation) {
         const match = findFunction(ref, data, {mode: 'quiet'});
 
-        if (match === null && earlyExitIfNotFound) {
+        if (match === null && notFoundMode === 'exit') {
           return continuation.exit(null);
         }
 
