@@ -308,7 +308,7 @@ export const isTrackSection = validateProperties({
   color: optional(isColor),
   dateOriginallyReleased: optional(isDate),
   isDefaultTrackSection: optional(isBoolean),
-  tracksByRef: optional(validateReferenceList('track')),
+  tracks: optional(validateReferenceList('track')),
 });
 
 export const isTrackSectionList = validateArrayItems(isTrackSection);

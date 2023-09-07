@@ -1071,3 +1071,18 @@ export function raiseWithoutUpdateValue({
     },
   ]);
 }
+
+export function withUpdateValueAsDependency({
+  into = '#updateValue',
+} = {}) {
+  return {
+    annotation: `withUpdateValueAsDependency`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapContinuation: {into},
+      transform: (value, continuation) =>
+        continuation(value, {into: value}),
+    },
+  };
+}

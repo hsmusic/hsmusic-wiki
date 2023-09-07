@@ -16,8 +16,8 @@ function stubAlbum(tracks, directory = 'bar') {
   const album = new Album();
   album.directory = directory;
 
-  const tracksByRef = tracks.map(t => Thing.getReference(t));
-  album.trackSections = [{tracksByRef}];
+  const trackRefs = tracks.map(t => Thing.getReference(t));
+  album.trackSections = [{tracks: trackRefs}];
 
   return album;
 }
@@ -50,7 +50,7 @@ function stubFlashAndAct(directory = 'zam') {
   flash.directory = directory;
 
   const flashAct = new FlashAct();
-  flashAct.flashesByRef = [Thing.getReference(flash)];
+  flashAct.flashes = [Thing.getReference(flash)];
 
   return {flash, flashAct};
 }
@@ -75,8 +75,8 @@ t.test(`Track.album`, t => {
   track2.albumData = [album1, album2];
   album1.trackData = [track1, track2];
   album2.trackData = [track1, track2];
-  album1.trackSections = [{tracksByRef: ['track:track1']}];
-  album2.trackSections = [{tracksByRef: ['track:track2']}];
+  album1.trackSections = [{tracks: ['track:track1']}];
+  album2.trackSections = [{tracks: ['track:track2']}];
 
   t.equal(track1.album, album1,
     `album #2: is album when album's trackSections matches track`);
@@ -98,7 +98,7 @@ t.test(`Track.album`, t => {
     `album #5: is null when album missing trackData`);
 
   album1.trackData = [track1, track2];
-  album1.trackSections = [{tracksByRef: ['track:track2']}];
+  album1.trackSections = [{tracks: ['track:track2']}];
 
   // XXX_decacheWikiData
   track1.albumData = [];
@@ -124,7 +124,7 @@ t.test(`Track.color`, t => {
   album.color = '#abcdef';
   album.trackSections = [{
     color: '#beeeef',
-    tracksByRef: [Thing.getReference(track)],
+    tracks: [Thing.getReference(track)],
   }];
   XXX_decacheWikiData();
 
@@ -172,7 +172,7 @@ t.test(`Track.coverArtDate`, t => {
     trackData: [track],
   });
 
-  track.coverArtistContribsByRef = contribs;
+  track.coverArtistContribs = contribs;
 
   t.equal(track.coverArtDate, null,
     `coverArtDate #1: defaults to null`);
@@ -189,12 +189,12 @@ t.test(`Track.coverArtDate`, t => {
   t.same(track.coverArtDate, new Date('2009-09-09'),
     `coverArtDate #3: is own value`);
 
-  track.coverArtistContribsByRef = [];
+  track.coverArtistContribs = [];
 
   t.equal(track.coverArtDate, null,
     `coverArtDate #4: is null if track is missing coverArtists`);
 
-  album.trackCoverArtistContribsByRef = contribs;
+  album.trackCoverArtistContribs = contribs;
 
   XXX_decacheWikiData();
 
@@ -222,20 +222,20 @@ t.test(`Track.coverArtFileExtension`, t => {
   t.equal(track.coverArtFileExtension, null,
     `coverArtFileExtension #1: defaults to null`);
 
-  track.coverArtistContribsByRef = contribs;
+  track.coverArtistContribs = contribs;
 
   t.equal(track.coverArtFileExtension, 'jpg',
     `coverArtFileExtension #2: is jpg if has cover art and not further specified`);
 
-  track.coverArtistContribsByRef = [];
+  track.coverArtistContribs = [];
 
-  album.coverArtistContribsByRef = contribs;
+  album.coverArtistContribs = contribs;
   XXX_decacheWikiData();
 
   t.equal(track.coverArtFileExtension, null,
     `coverArtFileExtension #3: only has value for unique cover art`);
 
-  track.coverArtistContribsByRef = contribs;
+  track.coverArtistContribs = contribs;
 
   album.trackCoverArtFileExtension = 'png';
   XXX_decacheWikiData();
@@ -248,9 +248,9 @@ t.test(`Track.coverArtFileExtension`, t => {
   t.equal(track.coverArtFileExtension, 'gif',
     `coverArtFileExtension #5: is own value (1/2)`);
 
-  track.coverArtistContribsByRef = [];
+  track.coverArtistContribs = [];
 
-  album.trackCoverArtistContribsByRef = contribs;
+  album.trackCoverArtistContribs = contribs;
   XXX_decacheWikiData();
 
   t.equal(track.coverArtFileExtension, 'gif',
@@ -310,8 +310,8 @@ t.test(`Track.featuredInFlashes`, t => {
   t.same(track.featuredInFlashes, [],
     `featuredInFlashes #1: defaults to empty array`);
 
-  flash1.featuredTracksByRef = ['track:track1'];
-  flash2.featuredTracksByRef = ['track:track1'];
+  flash1.featuredTracks = ['track:track1'];
+  flash2.featuredTracks = ['track:track1'];
   XXX_decacheWikiData();
 
   t.same(track.featuredInFlashes, [flash1, flash2],
@@ -333,7 +333,7 @@ t.test(`Track.hasUniqueCoverArt`, t => {
   t.equal(track.hasUniqueCoverArt, false,
     `hasUniqueCoverArt #1: defaults to false`);
 
-  album.trackCoverArtistContribsByRef = contribs;
+  album.trackCoverArtistContribs = contribs;
   XXX_decacheWikiData();
 
   t.equal(track.hasUniqueCoverArt, true,
@@ -346,13 +346,13 @@ t.test(`Track.hasUniqueCoverArt`, t => {
 
   track.disableUniqueCoverArt = false;
 
-  album.trackCoverArtistContribsByRef = badContribs;
+  album.trackCoverArtistContribs = badContribs;
   XXX_decacheWikiData();
 
   t.equal(track.hasUniqueCoverArt, false,
-    `hasUniqueCoverArt #4: is false if album's trackCoverArtistContribsByRef resolve empty`);
+    `hasUniqueCoverArt #4: is false if album's trackCoverArtistContribs resolve empty`);
 
-  track.coverArtistContribsByRef = contribs;
+  track.coverArtistContribs = contribs;
 
   t.equal(track.hasUniqueCoverArt, true,
     `hasUniqueCoverArt #5: is true if track specifies coverArtistContribs`);
@@ -364,10 +364,10 @@ t.test(`Track.hasUniqueCoverArt`, t => {
 
   track.disableUniqueCoverArt = false;
 
-  track.coverArtistContribsByRef = badContribs;
+  track.coverArtistContribs = badContribs;
 
   t.equal(track.hasUniqueCoverArt, false,
-    `hasUniqueCoverArt #7: is false if track's coverArtistContribsByRef resolve empty`);
+    `hasUniqueCoverArt #7: is false if track's coverArtistContribs resolve empty`);
 });
 
 t.only(`Track.originalReleaseTrack`, t => {
@@ -384,10 +384,10 @@ t.only(`Track.originalReleaseTrack`, t => {
   t.equal(track2.originalReleaseTrack, null,
     `originalReleaseTrack #1: defaults to null`);
 
-  track2.originalReleaseTrackByRef = 'track:track1';
+  track2.originalReleaseTrack = 'track:track1';
 
   t.equal(track2.originalReleaseTrack, track1,
-    `originalReleaseTrack #2: is resolved from originalReleaseTrackByRef`);
+    `originalReleaseTrack #2: is resolved from own value`);
 
   track2.trackData = [];
 
@@ -411,9 +411,9 @@ t.test(`Track.otherReleases`, t => {
   t.same(track1.otherReleases, [],
     `otherReleases #1: defaults to empty array`);
 
-  track2.originalReleaseTrackByRef = 'track:track1';
-  track3.originalReleaseTrackByRef = 'track:track1';
-  track4.originalReleaseTrackByRef = 'track:track1';
+  track2.originalReleaseTrack = 'track:track1';
+  track3.originalReleaseTrack = 'track:track1';
+  track4.originalReleaseTrack = 'track:track1';
   XXX_decacheWikiData();
 
   t.same(track1.otherReleases, [track2, track3, track4],
@@ -435,7 +435,7 @@ t.test(`Track.otherReleases`, t => {
     `otherReleases #5: otherReleases of rerelease are original track then other rereleases (2/3)`);
 
   t.same(track4.otherReleases, [track1, track3, track2],
-    `otherReleases #6: otherReleases of rerelease are original track then other rereleases (1/3)`);
+    `otherReleases #6: otherReleases of rerelease are original track then other rereleases (3/3)`);
 });
 
 t.test(`Track.referencedByTracks`, t => {
@@ -454,20 +454,20 @@ t.test(`Track.referencedByTracks`, t => {
   t.same(track1.referencedByTracks, [],
     `referencedByTracks #1: defaults to empty array`);
 
-  track2.referencedTracksByRef = ['track:track1'];
-  track3.referencedTracksByRef = ['track:track1'];
+  track2.referencedTracks = ['track:track1'];
+  track3.referencedTracks = ['track:track1'];
   XXX_decacheWikiData();
 
   t.same(track1.referencedByTracks, [track2, track3],
     `referencedByTracks #2: matches tracks' referencedTracks`);
 
-  track4.sampledTracksByRef = ['track:track1'];
+  track4.sampledTracks = ['track:track1'];
   XXX_decacheWikiData();
 
   t.same(track1.referencedByTracks, [track2, track3],
     `referencedByTracks #3: doesn't match tracks' sampledTracks`);
 
-  track3.originalReleaseTrackByRef = 'track:track2';
+  track3.originalReleaseTrack = 'track:track2';
   XXX_decacheWikiData();
 
   t.same(track1.referencedByTracks, [track2],
@@ -490,20 +490,20 @@ t.test(`Track.sampledByTracks`, t => {
   t.same(track1.sampledByTracks, [],
     `sampledByTracks #1: defaults to empty array`);
 
-  track2.sampledTracksByRef = ['track:track1'];
-  track3.sampledTracksByRef = ['track:track1'];
+  track2.sampledTracks = ['track:track1'];
+  track3.sampledTracks = ['track:track1'];
   XXX_decacheWikiData();
 
   t.same(track1.sampledByTracks, [track2, track3],
     `sampledByTracks #2: matches tracks' sampledTracks`);
 
-  track4.referencedTracksByRef = ['track:track1'];
+  track4.referencedTracks = ['track:track1'];
   XXX_decacheWikiData();
 
   t.same(track1.sampledByTracks, [track2, track3],
     `sampledByTracks #3: doesn't match tracks' referencedTracks`);
 
-  track3.originalReleaseTrackByRef = 'track:track2';
+  track3.originalReleaseTrack = 'track:track2';
   XXX_decacheWikiData();
 
   t.same(track1.sampledByTracks, [track2],

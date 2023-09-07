@@ -1,23 +1,29 @@
 import find from '#find';
 
 import {
+  compositeFrom,
+  exposeDependency,
+  withUpdateValueAsDependency,
+} from '#composite';
+
+import {
   is,
   isCountingNumber,
   isString,
   isStringNonEmpty,
+  oneOf,
   validateArrayItems,
   validateInstanceOf,
+  validateReference,
 } from '#validators';
 
 import Thing, {
   color,
   name,
   referenceList,
-  resolvedReference,
-  resolvedReferenceList,
   simpleString,
-  singleReference,
   wikiData,
+  withResolvedReference,
 } from './thing.js';
 
 export class HomepageLayout extends Thing {
@@ -101,8 +107,38 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       },
     },
 
-    sourceGroupByRef: singleReference(Group),
-    sourceAlbumsByRef: referenceList(Album),
+    sourceGroup: compositeFrom(`HomepageLayoutAlbumsRow.sourceGroup`, [
+      {
+        transform: (value, continuation) =>
+          (value === 'new-releases' || value === 'new-additions'
+            ? value
+            : continuation(value)),
+      },
+
+      withUpdateValueAsDependency(),
+
+      withResolvedReference({
+        ref: '#updateValue',
+        data: 'groupData',
+        find: find.group,
+      }),
+
+      exposeDependency({
+        dependency: '#resolvedReference',
+        update: {
+          validate:
+            oneOf(
+              is('new-releases', 'new-additions'),
+              validateReference(Group[Thing.referenceType])),
+        },
+      }),
+    ]),
+
+    sourceAlbums: referenceList({
+      class: Album,
+      find: find.album,
+      data: 'albumData',
+    }),
 
     countAlbumsFromGroup: {
       flags: {update: true, expose: true},
@@ -113,19 +149,5 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       flags: {update: true, expose: true},
       update: {validate: validateArrayItems(isString)},
     },
-
-    // Expose only
-
-    sourceGroup: resolvedReference({
-      ref: 'sourceGroupByRef',
-      data: 'groupData',
-      find: find.group,
-    }),
-
-    sourceAlbums: resolvedReferenceList({
-      list: 'sourceAlbumsByRef',
-      data: 'albumData',
-      find: find.album,
-    }),
   });
 }

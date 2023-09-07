@@ -3,7 +3,6 @@ import {inspect} from 'node:util';
 import {colors} from '#cli';
 import find from '#find';
 import {empty} from '#sugar';
-import {isColor, isDate, isDuration, isFileExtension} from '#validators';
 
 import {
   compositeFrom,
@@ -13,20 +12,28 @@ import {
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
   withResultOfAvailabilityCheck,
+  withUpdateValueAsDependency,
 } from '#composite';
+
+import {
+  isColor,
+  isContributionList,
+  isDate,
+  isDuration,
+  isFileExtension,
+} from '#validators';
+
+import CacheableObject from './cacheable-object.js';
 
 import Thing, {
   additionalFiles,
   commentary,
   commentatorArtists,
-  contribsByRef,
+  contributionList,
   directory,
-  dynamicContribs,
   flag,
   name,
   referenceList,
-  resolvedReference,
-  resolvedReferenceList,
   reverseReferenceList,
   simpleDate,
   singleReference,
@@ -55,13 +62,11 @@ export class Track extends Thing {
     urls: urls(),
     dateFirstReleased: simpleDate(),
 
-    artistContribsByRef: contribsByRef(),
-    contributorContribsByRef: contribsByRef(),
-    coverArtistContribsByRef: contribsByRef(),
-
-    referencedTracksByRef: referenceList(Track),
-    sampledTracksByRef: referenceList(Track),
-    artTagsByRef: referenceList(ArtTag),
+    artTags: referenceList({
+      class: ArtTag,
+      find: find.artTag,
+      data: 'artTagData',
+    }),
 
     color: compositeFrom(`Track.color`, [
       exposeUpdateValueOrContinue(),
@@ -134,9 +139,24 @@ export class Track extends Thing {
       }),
     ]),
 
-    originalReleaseTrackByRef: singleReference(Track),
+    originalReleaseTrack: singleReference({
+      class: Track,
+      find: find.track,
+      data: 'trackData',
+    }),
 
-    dataSourceAlbumByRef: singleReference(Album),
+    // Note - this is an internal property used only to help identify a track.
+    // It should not be assumed in general that the album and dataSourceAlbum match
+    // (i.e. a track may dynamically be moved from one album to another, at
+    // which point dataSourceAlbum refers to where it was originally from, and is
+    // not generally relevant information). It's also not guaranteed that
+    // dataSourceAlbum is available (depending on the Track creator to optionally
+    // provide this property's update value).
+    dataSourceAlbum: singleReference({
+      class: Album,
+      find: find.album,
+      data: 'albumData',
+    }),
 
     commentary: commentary(),
     lyrics: simpleString(),
@@ -161,19 +181,6 @@ export class Track extends Thing {
       exposeDependency({dependency: '#album'}),
     ]),
 
-    // Note - this is an internal property used only to help identify a track.
-    // It should not be assumed in general that the album and dataSourceAlbum match
-    // (i.e. a track may dynamically be moved from one album to another, at
-    // which point dataSourceAlbum refers to where it was originally from, and is
-    // not generally relevant information). It's also not guaranteed that
-    // dataSourceAlbum is available (depending on the Track creator to optionally
-    // provide dataSourceAlbumByRef).
-    dataSourceAlbum: resolvedReference({
-      ref: 'dataSourceAlbumByRef',
-      data: 'albumData',
-      find: find.album,
-    }),
-
     date: compositeFrom(`Track.date`, [
       exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
       withAlbumProperty({property: 'date'}),
@@ -190,11 +197,6 @@ export class Track extends Thing {
     hasUniqueCoverArt: compositeFrom(`Track.hasUniqueCoverArt`, [
       withHasUniqueCoverArt(),
       exposeDependency({dependency: '#hasUniqueCoverArt'}),
-    ]),
-
-    originalReleaseTrack: compositeFrom(`Track.originalReleaseTrack`, [
-      withOriginalRelease(),
-      exposeDependency({dependency: '#originalRelease'}),
     ]),
 
     otherReleases: compositeFrom(`Track.otherReleases`, [
@@ -224,26 +226,20 @@ export class Track extends Thing {
     artistContribs: compositeFrom(`Track.artistContribs`, [
       inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      withResolvedContribs({
-        from: 'artistContribsByRef',
-        into: '#artistContribs',
-      }),
-
-      {
-        dependencies: ['#artistContribs'],
-        compute: ({'#artistContribs': contribsFromTrack}, continuation) =>
-          (empty(contribsFromTrack)
-            ? continuation()
-            : contribsFromTrack),
-      },
+      withUpdateValueAsDependency(),
+      withResolvedContribs({from: '#updateValue', into: '#artistContribs'}),
+      exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
       withAlbumProperty({property: 'artistContribs'}),
-      exposeDependency({dependency: '#album.artistContribs'}),
+      exposeDependency({
+        dependency: '#album.artistContribs',
+        update: {validate: isContributionList},
+      }),
     ]),
 
     contributorContribs: compositeFrom(`Track.contributorContribs`, [
       inheritFromOriginalRelease({property: 'contributorContribs'}),
-      dynamicContribs('contributorContribsByRef'),
+      contributionList(),
     ]),
 
     // Cover artists aren't inherited from the original release, since it
@@ -258,46 +254,34 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      withResolvedContribs({
-        from: 'coverArtistContribsByRef',
-        into: '#coverArtistContribs',
-      }),
-
-      {
-        dependencies: ['#coverArtistContribs'],
-        compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
-          (empty(contribsFromTrack)
-            ? continuation()
-            : contribsFromTrack),
-      },
+      withUpdateValueAsDependency(),
+      withResolvedContribs({from: '#updateValue', into: '#coverArtistContribs'}),
+      exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
       withAlbumProperty({property: 'trackCoverArtistContribs'}),
-      exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
+      exposeDependency({
+        dependency: '#album.trackCoverArtistContribs',
+        update: {validate: isContributionList},
+      }),
     ]),
 
     referencedTracks: compositeFrom(`Track.referencedTracks`, [
       inheritFromOriginalRelease({property: 'referencedTracks'}),
-      resolvedReferenceList({
-        list: 'referencedTracksByRef',
-        data: 'trackData',
+      referenceList({
+        class: Track,
         find: find.track,
+        data: 'trackData',
       }),
     ]),
 
     sampledTracks: compositeFrom(`Track.sampledTracks`, [
       inheritFromOriginalRelease({property: 'sampledTracks'}),
-      resolvedReferenceList({
-        list: 'sampledTracksByRef',
-        data: 'trackData',
+      referenceList({
+        class: Track,
         find: find.track,
+        data: 'trackData',
       }),
     ]),
-
-    artTags: resolvedReferenceList({
-      list: 'artTagsByRef',
-      data: 'artTagData',
-      find: find.artTag,
-    }),
 
     // Specifically exclude re-releases from this list - while it's useful to
     // get from a re-release to the tracks it references, re-releases aren't
@@ -327,7 +311,7 @@ export class Track extends Thing {
 
     parts.push(Thing.prototype[inspect.custom].apply(this));
 
-    if (this.originalReleaseTrackByRef) {
+    if (CacheableObject.getUpdateValue(this, 'originalReleaseTrack')) {
       parts.unshift(`${colors.yellow('[rerelease]')} `);
     }
 
@@ -564,7 +548,7 @@ function withOriginalRelease({
 } = {}) {
   return compositeFrom(`withOriginalRelease`, [
     withResolvedReference({
-      ref: 'originalReleaseTrackByRef',
+      ref: 'originalReleaseTrack',
       data: 'trackData',
       into: '#originalRelease',
       find: find.track,
@@ -607,7 +591,7 @@ function withHasUniqueCoverArt({
     },
 
     withResolvedContribs({
-      from: 'coverArtistContribsByRef',
+      from: 'coverArtistContribs',
       into: '#coverArtistContribs',
     }),
 

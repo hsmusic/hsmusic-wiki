@@ -11,8 +11,11 @@ import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 import {
   compositeFrom,
   exitWithoutDependency,
+  exposeConstant,
   exposeDependency,
+  exposeDependencyOrContinue,
   raiseWithoutDependency,
+  withUpdateValueAsDependency,
 } from '#composite';
 
 import {
@@ -162,22 +165,31 @@ export function externalFunction() {
   };
 }
 
-// Super simple "contributions by reference" list, used for a variety of
-// properties (Artists, Cover Artists, etc). This is the property which is
-// externally provided, in the form:
+// Strong 'n sturdy contribution list, rolling a list of references (provided
+// as this property's update value) and the resolved results (as get exposed)
+// into one property. Update value will look something like this:
 //
-//     [
-//         {who: 'Artist Name', what: 'Viola'},
-//         {who: 'artist:john-cena', what: null},
-//         ...
-//     ]
+//   [
+//     {who: 'Artist Name', what: 'Viola'},
+//     {who: 'artist:john-cena', what: null},
+//     ...
+//   ]
 //
-// ...processed from YAML, spreadsheet, or any other kind of input.
-export function contribsByRef() {
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: isContributionList},
-  };
+// ...typically as processed from YAML, spreadsheet, or elsewhere.
+// Exposes as the same, but with the "who" replaced with matches found in
+// artistData - which means this always depends on an `artistData` property
+// also existing on this object!
+//
+export function contributionList() {
+  return compositeFrom(`contributionList`, [
+    withUpdateValueAsDependency(),
+    withResolvedContribs({from: '#updateValue'}),
+    exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
+    exposeConstant({
+      value: [],
+      update: {validate: isContributionList},
+    }),
+  ]);
 }
 
 // Artist commentary! Generally present on tracks and albums.
@@ -222,88 +234,77 @@ export function additionalFiles() {
 // 'artist' or 'track', but this utility keeps from having to hard-code the
 // string in multiple places by referencing the value saved on the class
 // instead.
-export function referenceList(thingClass) {
+export function referenceList({
+  class: thingClass,
+  data,
+  find,
+}) {
+  if (!thingClass) {
+    throw new TypeError(`Expected a Thing class`);
+  }
+
   const {[Thing.referenceType]: referenceType} = thingClass;
   if (!referenceType) {
     throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
   }
 
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: validateReferenceList(referenceType)},
-  };
-}
+  return compositeFrom(`referenceList`, [
+    withUpdateValueAsDependency(),
 
-// Corresponding function for a single reference.
-export function singleReference(thingClass) {
-  const {[Thing.referenceType]: referenceType} = thingClass;
-  if (!referenceType) {
-    throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
-  }
-
-  return {
-    flags: {update: true, expose: true},
-    update: {validate: validateReference(referenceType)},
-  };
-}
-
-// Corresponding dynamic property to referenceList, which takes the values
-// in the provided property and searches the specified wiki data for
-// matching actual Thing-subclass objects.
-export function resolvedReferenceList({list, data, find}) {
-  return compositeFrom(`resolvedReferenceList`, [
     withResolvedReferenceList({
-      list, data, find,
+      data, find,
+      list: '#updateValue',
       notFoundMode: 'filter',
     }),
 
-    exposeDependency({dependency: '#resolvedReferenceList'}),
+    exposeDependency({
+      dependency: '#resolvedReferenceList',
+      update: {
+        validate: validateReferenceList(referenceType),
+      },
+    }),
   ]);
 }
 
 // Corresponding function for a single reference.
-export function resolvedReference({ref, data, find}) {
-  return compositeFrom(`resolvedReference`, [
-    withResolvedReference({ref, data, find}),
-    exposeDependency({dependency: '#resolvedReference'}),
-  ]);
-}
+export function singleReference({
+  class: thingClass,
+  data,
+  find,
+}) {
+  if (!thingClass) {
+    throw new TypeError(`Expected a Thing class`);
+  }
 
-// Corresponding dynamic property to contribsByRef, which takes the values
-// in the provided property and searches the object's artistData for
-// matching actual Artist objects. The computed structure has the same form
-// as contribsByRef, but with Artist objects instead of string references:
-//
-//     [
-//         {who: (an Artist), what: 'Viola'},
-//         {who: (an Artist), what: null},
-//         ...
-//     ]
-//
-// Contributions whose "who" values don't match anything in artistData are
-// filtered out. (So if the list is all empty, chances are that either the
-// reference list is somehow messed up, or artistData isn't being provided
-// properly.)
-export function dynamicContribs(contribsByRefProperty) {
-  return compositeFrom(`dynamicContribs`, [
-    withResolvedContribs({from: contribsByRefProperty}),
-    exposeDependency({dependency: '#resolvedContribs'}),
+  const {[Thing.referenceType]: referenceType} = thingClass;
+  if (!referenceType) {
+    throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
+  }
+
+  return compositeFrom(`singleReference`, [
+    withUpdateValueAsDependency(),
+
+    withResolvedReference({ref: '#updateValue', data, find}),
+
+    exposeDependency({
+      dependency: '#resolvedReference',
+      update: {
+        validate: validateReference(referenceType),
+      },
+    }),
   ]);
 }
 
 // Nice 'n simple shorthand for an exposed-only flag which is true when any
 // contributions are present in the specified property.
-export function contribsPresent(contribsByRefProperty) {
+export function contribsPresent(contribsProperty) {
   return {
     flags: {expose: true},
     expose: {
-      dependencies: [contribsByRefProperty],
-      compute({
-        [contribsByRefProperty]: contribsByRef,
-      }) {
-        return !empty(contribsByRef);
-      },
-    }
+      dependencies: [contribsProperty],
+      compute: ({[contribsProperty]: contribs}) =>
+        !empty(contribs),
+    },
   };
 }
 
@@ -380,13 +381,13 @@ export function withResolvedContribs({
       mapDependencies: {from},
       compute: ({from}, continuation) =>
         continuation({
-          '#whoByRef': from.map(({who}) => who),
+          '#artistRefs': from.map(({who}) => who),
           '#what': from.map(({what}) => what),
         }),
     },
 
     withResolvedReferenceList({
-      list: '#whoByRef',
+      list: '#artistRefs',
       data: 'artistData',
       into: '#who',
       find: find.artist,

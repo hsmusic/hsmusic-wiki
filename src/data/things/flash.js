@@ -9,13 +9,11 @@ import {
 } from '#validators';
 
 import Thing, {
-  dynamicContribs,
   color,
-  contribsByRef,
+  contributionList,
   fileExtension,
   name,
   referenceList,
-  resolvedReferenceList,
   simpleDate,
   simpleString,
   urls,
@@ -60,9 +58,13 @@ export class Flash extends Thing {
 
     coverArtFileExtension: fileExtension('jpg'),
 
-    contributorContribsByRef: contribsByRef(),
+    contributorContribs: contributionList(),
 
-    featuredTracksByRef: referenceList(Track),
+    featuredTracks: referenceList({
+      class: Track,
+      find: find.track,
+      data: 'trackData',
+    }),
 
     urls: urls(),
 
@@ -73,14 +75,6 @@ export class Flash extends Thing {
     flashActData: wikiData(FlashAct),
 
     // Expose only
-
-    contributorContribs: dynamicContribs('contributorContribsByRef'),
-
-    featuredTracks: resolvedReferenceList({
-      list: 'featuredTracksByRef',
-      data: 'trackData',
-      find: find.track,
-    }),
 
     act: {
       flags: {expose: true},
@@ -138,18 +132,14 @@ export class FlashAct extends Thing {
       }
     },
 
-    flashesByRef: referenceList(Flash),
+    flashes: referenceList({
+      class: Flash,
+      data: 'flashData',
+      find: find.flash,
+    }),
 
     // Update only
 
     flashData: wikiData(Flash),
-
-    // Expose only
-
-    flashes: resolvedReferenceList({
-      list: 'flashesByRef',
-      data: 'flashData',
-      find: find.flash,
-    }),
   })
 }

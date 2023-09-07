@@ -16,7 +16,7 @@ export default {
   sprawl({albumData}, row) {
     const sprawl = {};
 
-    switch (row.sourceGroupByRef) {
+    switch (row.sourceGroup) {
       case 'new-releases':
         sprawl.albums = getNewReleases(row.countAlbumsFromGroup, {albumData});
         break;

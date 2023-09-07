@@ -10,7 +10,7 @@ import yaml from 'js-yaml';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
-import T from '#things';
+import T, {CacheableObject, Thing} from '#things';
 
 import {
   conditionallySuppressError,
@@ -278,11 +278,11 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     coverArtFileExtension: 'Cover Art File Extension',
     trackCoverArtFileExtension: 'Track Art File Extension',
 
-    wallpaperArtistContribsByRef: 'Wallpaper Artists',
+    wallpaperArtistContribs: 'Wallpaper Artists',
     wallpaperStyle: 'Wallpaper Style',
     wallpaperFileExtension: 'Wallpaper File Extension',
 
-    bannerArtistContribsByRef: 'Banner Artists',
+    bannerArtistContribs: 'Banner Artists',
     bannerStyle: 'Banner Style',
     bannerFileExtension: 'Banner File Extension',
     bannerDimensions: 'Banner Dimensions',
@@ -290,11 +290,11 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     commentary: 'Commentary',
     additionalFiles: 'Additional Files',
 
-    artistContribsByRef: 'Artists',
-    coverArtistContribsByRef: 'Cover Artists',
-    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
-    groupsByRef: 'Groups',
-    artTagsByRef: 'Art Tags',
+    artistContribs: 'Artists',
+    coverArtistContribs: 'Cover Artists',
+    trackCoverArtistContribs: 'Default Track Cover Artists',
+    groups: 'Groups',
+    artTags: 'Art Tags',
   },
 });
 
@@ -348,13 +348,13 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     sheetMusicFiles: 'Sheet Music Files',
     midiProjectFiles: 'MIDI Project Files',
 
-    originalReleaseTrackByRef: 'Originally Released As',
-    referencedTracksByRef: 'Referenced Tracks',
-    sampledTracksByRef: 'Sampled Tracks',
-    artistContribsByRef: 'Artists',
-    contributorContribsByRef: 'Contributors',
-    coverArtistContribsByRef: 'Cover Artists',
-    artTagsByRef: 'Art Tags',
+    originalReleaseTrack: 'Originally Released As',
+    referencedTracks: 'Referenced Tracks',
+    sampledTracks: 'Sampled Tracks',
+    artistContribs: 'Artists',
+    contributorContribs: 'Contributors',
+    coverArtistContribs: 'Cover Artists',
+    artTags: 'Art Tags',
   },
 
   invalidFieldCombinations: [
@@ -424,8 +424,8 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
     date: 'Date',
     coverArtFileExtension: 'Cover Art File Extension',
 
-    featuredTracksByRef: 'Featured Tracks',
-    contributorContribsByRef: 'Contributors',
+    featuredTracks: 'Featured Tracks',
+    contributorContribs: 'Contributors',
   },
 });
 
@@ -470,7 +470,7 @@ export const processGroupDocument = makeProcessDocument(T.Group, {
     description: 'Description',
     urls: 'URLs',
 
-    featuredAlbumsByRef: 'Featured Albums',
+    featuredAlbums: 'Featured Albums',
   },
 });
 
@@ -501,7 +501,7 @@ export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
     footerContent: 'Footer Content',
     defaultLanguage: 'Default Language',
     canonicalBase: 'Canonical Base',
-    divideTrackListsByGroupsByRef: 'Divide Track Lists By Groups',
+    divideTrackListsByGroups: 'Divide Track Lists By Groups',
     enableFlashesAndGames: 'Enable Flashes & Games',
     enableListings: 'Enable Listings',
     enableNews: 'Enable News',
@@ -536,9 +536,9 @@ export const homepageLayoutRowTypeProcessMapping = {
   albums: makeProcessHomepageLayoutRowDocument(T.HomepageLayoutAlbumsRow, {
     propertyFieldMapping: {
       displayStyle: 'Display Style',
-      sourceGroupByRef: 'Group',
+      sourceGroup: 'Group',
       countAlbumsFromGroup: 'Count',
-      sourceAlbumsByRef: 'Albums',
+      sourceAlbums: 'Albums',
       actionLinks: 'Actions',
     },
   }),
@@ -771,13 +771,13 @@ export const dataSteps = [
         let currentTrackSection = {
           name: `Default Track Section`,
           isDefaultTrackSection: true,
-          tracksByRef: [],
+          tracks: [],
         };
 
-        const albumRef = T.Thing.getReference(album);
+        const albumRef = Thing.getReference(album);
 
         const closeCurrentTrackSection = () => {
-          if (!empty(currentTrackSection.tracksByRef)) {
+          if (!empty(currentTrackSection.tracks)) {
             trackSections.push(currentTrackSection);
           }
         };
@@ -791,7 +791,7 @@ export const dataSteps = [
               color: entry.color,
               dateOriginallyReleased: entry.dateOriginallyReleased,
               isDefaultTrackSection: false,
-              tracksByRef: [],
+              tracks: [],
             };
 
             continue;
@@ -799,9 +799,9 @@ export const dataSteps = [
 
           trackData.push(entry);
 
-          entry.dataSourceAlbumByRef = albumRef;
+          entry.dataSourceAlbum = albumRef;
 
-          currentTrackSection.tracksByRef.push(T.Thing.getReference(entry));
+          currentTrackSection.tracks.push(Thing.getReference(entry));
         }
 
         closeCurrentTrackSection();
@@ -825,12 +825,12 @@ export const dataSteps = [
       const artistData = results;
 
       const artistAliasData = results.flatMap((artist) => {
-        const origRef = T.Thing.getReference(artist);
+        const origRef = Thing.getReference(artist);
         return artist.aliasNames?.map((name) => {
           const alias = new T.Artist();
           alias.name = name;
           alias.isAlias = true;
-          alias.aliasedArtistRef = origRef;
+          alias.aliasedArtist = origRef;
           alias.artistData = artistData;
           return alias;
         }) ?? [];
@@ -854,7 +854,7 @@ export const dataSteps = [
 
     save(results) {
       let flashAct;
-      let flashesByRef = [];
+      let flashRefs = [];
 
       if (results[0] && !(results[0] instanceof T.FlashAct)) {
         throw new Error(`Expected an act at top of flash data file`);
@@ -863,18 +863,18 @@ export const dataSteps = [
       for (const thing of results) {
         if (thing instanceof T.FlashAct) {
           if (flashAct) {
-            Object.assign(flashAct, {flashesByRef});
+            Object.assign(flashAct, {flashes: flashRefs});
           }
 
           flashAct = thing;
-          flashesByRef = [];
+          flashRefs = [];
         } else {
-          flashesByRef.push(T.Thing.getReference(thing));
+          flashRefs.push(Thing.getReference(thing));
         }
       }
 
       if (flashAct) {
-        Object.assign(flashAct, {flashesByRef});
+        Object.assign(flashAct, {flashes: flashRefs});
       }
 
       const flashData = results.filter((x) => x instanceof T.Flash);
@@ -897,7 +897,7 @@ export const dataSteps = [
 
     save(results) {
       let groupCategory;
-      let groupsByRef = [];
+      let groupRefs = [];
 
       if (results[0] && !(results[0] instanceof T.GroupCategory)) {
         throw new Error(`Expected a category at top of group data file`);
@@ -906,18 +906,18 @@ export const dataSteps = [
       for (const thing of results) {
         if (thing instanceof T.GroupCategory) {
           if (groupCategory) {
-            Object.assign(groupCategory, {groupsByRef});
+            Object.assign(groupCategory, {groups: groupRefs});
           }
 
           groupCategory = thing;
-          groupsByRef = [];
+          groupRefs = [];
         } else {
-          groupsByRef.push(T.Thing.getReference(thing));
+          groupRefs.push(Thing.getReference(thing));
         }
       }
 
       if (groupCategory) {
-        Object.assign(groupCategory, {groupsByRef});
+        Object.assign(groupCategory, {groups: groupRefs});
       }
 
       const groupData = results.filter((x) => x instanceof T.Group);
@@ -1462,45 +1462,45 @@ export function filterDuplicateDirectories(wikiData) {
 export function filterReferenceErrors(wikiData) {
   const referenceSpec = [
     ['wikiInfo', processWikiInfoDocument, {
-      divideTrackListsByGroupsByRef: 'group',
+      divideTrackListsByGroups: 'group',
     }],
 
     ['albumData', processAlbumDocument, {
-      artistContribsByRef: '_contrib',
-      coverArtistContribsByRef: '_contrib',
-      trackCoverArtistContribsByRef: '_contrib',
-      wallpaperArtistContribsByRef: '_contrib',
-      bannerArtistContribsByRef: '_contrib',
-      groupsByRef: 'group',
-      artTagsByRef: 'artTag',
+      artistContribs: '_contrib',
+      coverArtistContribs: '_contrib',
+      trackCoverArtistContribs: '_contrib',
+      wallpaperArtistContribs: '_contrib',
+      bannerArtistContribs: '_contrib',
+      groups: 'group',
+      artTags: 'artTag',
     }],
 
     ['trackData', processTrackDocument, {
-      artistContribsByRef: '_contrib',
-      contributorContribsByRef: '_contrib',
-      coverArtistContribsByRef: '_contrib',
-      referencedTracksByRef: '_trackNotRerelease',
-      sampledTracksByRef: '_trackNotRerelease',
-      artTagsByRef: 'artTag',
-      originalReleaseTrackByRef: '_trackNotRerelease',
+      artistContribs: '_contrib',
+      contributorContribs: '_contrib',
+      coverArtistContribs: '_contrib',
+      referencedTracks: '_trackNotRerelease',
+      sampledTracks: '_trackNotRerelease',
+      artTags: 'artTag',
+      originalReleaseTrack: '_trackNotRerelease',
     }],
 
     ['groupCategoryData', processGroupCategoryDocument, {
-      groupsByRef: 'group',
+      groups: 'group',
     }],
 
     ['homepageLayout.rows', undefined, {
-      sourceGroupByRef: '_homepageSourceGroup',
-      sourceAlbumsByRef: 'album',
+      sourceGroup: '_homepageSourceGroup',
+      sourceAlbums: 'album',
     }],
 
     ['flashData', processFlashDocument, {
-      contributorContribsByRef: '_contrib',
-      featuredTracksByRef: 'track',
+      contributorContribs: '_contrib',
+      featuredTracks: 'track',
     }],
 
     ['flashActData', processFlashActDocument, {
-      flashesByRef: 'flash',
+      flashes: 'flash',
     }],
   ];
 
@@ -1532,7 +1532,7 @@ export function filterReferenceErrors(wikiData) {
 
         nest({message: `Reference errors in ${inspect(thing)}`}, ({push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
-            const value = thing[property];
+            const value = CacheableObject.getUpdateValue(thing, property);
 
             if (value === undefined) {
               push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
@@ -1552,7 +1552,7 @@ export function filterReferenceErrors(wikiData) {
                   if (alias) {
                     // No need to check if the original exists here. Aliases are automatically
                     // created from a field on the original, so the original certainly exists.
-                    const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
+                    const original = alias.aliasedArtist;
                     throw new Error(`Reference ${colors.red(contribRef.who)} is to an alias, should be ${colors.green(original.name)}`);
                   }
 
@@ -1573,12 +1573,13 @@ export function filterReferenceErrors(wikiData) {
               case '_trackNotRerelease':
                 findFn = trackRef => {
                   const track = find.track(trackRef, wikiData.trackData, {mode: 'error'});
+                  const originalRef = track && CacheableObject.getUpdateValue(track, 'originalReleaseTrack');
 
-                  if (track?.originalReleaseTrackByRef) {
+                  if (originalRef) {
                     // It's possible for the original to not actually exist, in this case.
                     // It should still be reported since the 'Originally Released As' field
                     // was present.
-                    const original = find.track(track.originalReleaseTrackByRef, wikiData.trackData, {mode: 'quiet'});
+                    const original = find.track(originalRef, wikiData.trackData, {mode: 'quiet'});
 
                     // Prefer references by name, but only if it's unambiguous.
                     const originalByName =
@@ -1591,7 +1592,7 @@ export function filterReferenceErrors(wikiData) {
                         ? colors.green(original.name)
                      : original
                         ? colors.green('track:' + original.directory)
-                        : colors.green(track.originalReleaseTrackByRef));
+                        : colors.green(originalRef));
 
                     throw new Error(`Reference ${colors.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
                   }
@@ -1606,7 +1607,7 @@ export function filterReferenceErrors(wikiData) {
             }
 
             const suppress = fn => conditionallySuppressError(error => {
-              if (property === 'sampledTracksByRef') {
+              if (property === 'sampledTracks') {
                 // Suppress "didn't match anything" errors in particular, just for samples.
                 // In hsmusic-data we have a lot of "stub" sample data which don't have
                 // corresponding tracks yet, so it won't be useful to report such reference

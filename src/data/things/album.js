@@ -7,14 +7,12 @@ import Thing, {
   commentary,
   color,
   commentatorArtists,
-  contribsByRef,
   contribsPresent,
+  contributionList,
   directory,
-  dynamicContribs,
   fileExtension,
   flag,
   name,
-  resolvedReferenceList,
   referenceList,
   simpleDate,
   simpleString,
@@ -43,25 +41,31 @@ export class Album extends Thing {
       update: {validate: isDate},
 
       expose: {
-        dependencies: ['date', 'coverArtistContribsByRef'],
-        transform: (coverArtDate, {
-          coverArtistContribsByRef,
-          date,
-        }) =>
-          (!empty(coverArtistContribsByRef)
+        dependencies: ['date', 'coverArtistContribs'],
+        transform: (coverArtDate, {coverArtistContribs, date}) =>
+          (!empty(coverArtistContribs)
             ? coverArtDate ?? date ?? null
             : null),
       },
     },
 
-    artistContribsByRef: contribsByRef(),
-    coverArtistContribsByRef: contribsByRef(),
-    trackCoverArtistContribsByRef: contribsByRef(),
-    wallpaperArtistContribsByRef: contribsByRef(),
-    bannerArtistContribsByRef: contribsByRef(),
+    artistContribs: contributionList(),
+    coverArtistContribs: contributionList(),
+    trackCoverArtistContribs: contributionList(),
+    wallpaperArtistContribs: contributionList(),
+    bannerArtistContribs: contributionList(),
 
-    groupsByRef: referenceList(Group),
-    artTagsByRef: referenceList(ArtTag),
+    groups: referenceList({
+      class: Group,
+      find: find.group,
+      data: 'groupData',
+    }),
+
+    artTags: referenceList({
+      class: ArtTag,
+      find: find.artTag,
+      data: 'artTagData',
+    }),
 
     trackSections: {
       flags: {update: true, expose: true},
@@ -84,13 +88,12 @@ export class Album extends Thing {
             isDefaultTrackSection: section.isDefaultTrackSection ?? false,
 
             startIndex: (
-              startIndex += section.tracksByRef.length,
-              startIndex - section.tracksByRef.length
+              startIndex += section.tracks.length,
+              startIndex - section.tracks.length
             ),
 
-            tracksByRef: section.tracksByRef ?? [],
             tracks:
-              (trackData && section.tracksByRef
+              (trackData && section.tracks
                 ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
                 .filter(Boolean)) ??
               [],
@@ -128,29 +131,11 @@ export class Album extends Thing {
 
     // Expose only
 
-    artistContribs: dynamicContribs('artistContribsByRef'),
-    coverArtistContribs: dynamicContribs('coverArtistContribsByRef'),
-    trackCoverArtistContribs: dynamicContribs('trackCoverArtistContribsByRef'),
-    wallpaperArtistContribs: dynamicContribs('wallpaperArtistContribsByRef'),
-    bannerArtistContribs: dynamicContribs('bannerArtistContribsByRef'),
-
     commentatorArtists: commentatorArtists(),
 
-    groups: resolvedReferenceList({
-      list: 'groupsByRef',
-      data: 'groupData',
-      find: find.group,
-    }),
-
-    artTags: resolvedReferenceList({
-      list: 'artTagsByRef',
-      data: 'artTagData',
-      find: find.artTag,
-    }),
-
-    hasCoverArt: contribsPresent('coverArtistContribsByRef'),
-    hasWallpaperArt: contribsPresent('wallpaperArtistContribsByRef'),
-    hasBannerArt: contribsPresent('bannerArtistContribsByRef'),
+    hasCoverArt: contribsPresent('coverArtistContribs'),
+    hasWallpaperArt: contribsPresent('wallpaperArtistContribs'),
+    hasBannerArt: contribsPresent('bannerArtistContribs'),
 
     tracks: {
       flags: {expose: true},
@@ -158,12 +143,12 @@ export class Album extends Thing {
       expose: {
         dependencies: ['trackSections', 'trackData'],
         compute: ({trackSections, trackData}) =>
-          trackSections && trackData
+          (trackSections && trackData
             ? trackSections
-                .flatMap((section) => section.tracksByRef ?? [])
-                .map((ref) => find.track(ref, trackData, {mode: 'quiet'}))
+                .flatMap(section => section.tracks ?? [])
+                .map(ref => find.track(ref, trackData, {mode: 'quiet'}))
                 .filter(Boolean)
-            : [],
+            : []),
       },
     },
   });

@@ -5,7 +5,6 @@ import Thing, {
   directory,
   name,
   referenceList,
-  resolvedReferenceList,
   simpleString,
   urls,
   wikiData,
@@ -24,7 +23,11 @@ export class Group extends Thing {
 
     urls: urls(),
 
-    featuredAlbumsByRef: referenceList(Album),
+    featuredAlbums: referenceList({
+      class: Album,
+      find: find.album,
+      data: 'albumData',
+    }),
 
     // Update only
 
@@ -32,12 +35,6 @@ export class Group extends Thing {
     groupCategoryData: wikiData(GroupCategory),
 
     // Expose only
-
-    featuredAlbums: resolvedReferenceList({
-      list: 'featuredAlbumsByRef',
-      data: 'albumData',
-      find: find.album,
-    }),
 
     descriptionShort: {
       flags: {expose: true},
@@ -89,18 +86,14 @@ export class GroupCategory extends Thing {
     name: name('Unnamed Group Category'),
     color: color(),
 
-    groupsByRef: referenceList(Group),
+    groups: referenceList({
+      class: Group,
+      find: find.group,
+      data: 'groupData',
+    }),
 
     // Update only
 
     groupData: wikiData(Group),
-
-    // Expose only
-
-    groups: resolvedReferenceList({
-      list: 'groupsByRef',
-      data: 'groupData',
-      find: find.group,
-    }),
   });
 }

@@ -86,16 +86,14 @@ export default class CacheableObject {
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
 
-  /*
-    // Note the constructor doesn't take an initial data source. Due to a quirk
-    // of JavaScript, private members can't be accessed before the superclass's
-    // constructor is finished processing - so if we call the overridden
-    // update() function from inside this constructor, it will error when
-    // writing to private members. Pretty bad!
-    //
-    // That means initial data must be provided by following up with update()
-    // after constructing the new instance of the Thing (sub)class.
-    */
+  // Note the constructor doesn't take an initial data source. Due to a quirk
+  // of JavaScript, private members can't be accessed before the superclass's
+  // constructor is finished processing - so if we call the overridden
+  // update() function from inside this constructor, it will error when
+  // writing to private members. Pretty bad!
+  //
+  // That means initial data must be provided by following up with update()
+  // after constructing the new instance of the Thing (sub)class.
 
   constructor() {
     this.#defineProperties();
@@ -351,5 +349,13 @@ export default class CacheableObject {
     for (const line of this._invalidAccesses) {
       console.log(` - ${line}`);
     }
+  }
+
+  static getUpdateValue(object, key) {
+    if (!Object.hasOwn(object, key)) {
+      return undefined;
+    }
+
+    return object.#propertyUpdateValues[key] ?? null;
   }
 }

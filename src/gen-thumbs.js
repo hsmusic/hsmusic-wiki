@@ -93,6 +93,9 @@ import * as path from 'node:path';
 
 import dimensionsOf from 'image-size';
 
+import {delay, empty, queue} from '#sugar';
+import {CacheableObject} from '#things';
+
 import {
   colors,
   fileIssue,
@@ -109,8 +112,6 @@ import {
   promisifyProcess,
   traverse,
 } from '#node-utils';
-
-import {delay, empty, queue} from '#sugar';
 
 export const defaultMagickThreads = 8;
 
@@ -608,8 +609,8 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
     wikiData.albumData
       .flatMap(album => [
         album.hasCoverArt && fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
-        !empty(album.bannerArtistContribsByRef) && fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
-        !empty(album.wallpaperArtistContribsByRef) && fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
+        !empty(CacheableObject.getUpdateValue(album, 'bannerArtistContribs')) && fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
+        !empty(CacheableObject.getUpdateValue(album, 'wallpaperArtistContribs')) && fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
       ])
       .filter(Boolean),
 

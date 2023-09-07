@@ -6,7 +6,6 @@ import Thing, {
   flag,
   name,
   referenceList,
-  resolvedReferenceList,
   simpleString,
   wikiData,
 } from './thing.js';
@@ -45,7 +44,11 @@ export class WikiInfo extends Thing {
       update: {validate: isURL},
     },
 
-    divideTrackListsByGroupsByRef: referenceList(Group),
+    divideTrackListsByGroups: referenceList({
+      class: Group,
+      find: find.group,
+      data: 'groupData',
+    }),
 
     // Feature toggles
     enableFlashesAndGames: flag(false),
@@ -57,13 +60,5 @@ export class WikiInfo extends Thing {
     // Update only
 
     groupData: wikiData(Group),
-
-    // Expose only
-
-    divideTrackListsByGroups: resolvedReferenceList({
-      list: 'divideTrackListsByGroupsByRef',
-      data: 'groupData',
-      find: find.group,
-    }),
   });
 }

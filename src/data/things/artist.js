@@ -33,7 +33,12 @@ export class Artist extends Thing {
     },
 
     isAlias: flag(),
-    aliasedArtistRef: singleReference(Artist),
+
+    aliasedArtist: singleReference({
+      class: Artist,
+      find: find.artist,
+      data: 'artistData',
+    }),
 
     // Update only
 
@@ -43,18 +48,6 @@ export class Artist extends Thing {
     trackData: wikiData(Track),
 
     // Expose only
-
-    aliasedArtist: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['artistData', 'aliasedArtistRef'],
-        compute: ({artistData, aliasedArtistRef}) =>
-          aliasedArtistRef && artistData
-            ? find.artist(aliasedArtistRef, artistData, {mode: 'quiet'})
-            : null,
-      },
-    },
 
     tracksAsArtist:
       Artist.filterByContrib('trackData', 'artistContribs'),
