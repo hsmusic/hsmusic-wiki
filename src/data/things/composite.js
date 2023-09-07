@@ -788,44 +788,6 @@ export function debugComposite(fn) {
   return value;
 }
 
-// Provides dependencies exactly as they are (or null if not defined) to the
-// continuation. Although this can *technically* be used to alias existing
-// dependencies to some other name within the middle of a composition, it's
-// intended to be used only as a composition's base - doing so makes the
-// composition as a whole suitable as a step in some other composition,
-// providing the listed (internal) dependencies to later steps just like
-// other compositional steps.
-export {_export as export};
-function _export(mapping) {
-  const mappingEntries = Object.entries(mapping);
-
-  return {
-    annotation: `export`,
-    flags: {expose: true, compose: true},
-
-    expose: {
-      options: {mappingEntries},
-      dependencies: Object.values(mapping),
-
-      compute({'#options': {mappingEntries}, ...dependencies}, continuation) {
-        const exports = {};
-
-        // Note: This is slightly different behavior from filterProperties,
-        // as defined in sugar.js, which doesn't fall back to null for
-        // properties which don't exist on the original object.
-        for (const [exportKey, dependencyKey] of mappingEntries) {
-          exports[exportKey] =
-            (Object.hasOwn(dependencies, dependencyKey)
-              ? dependencies[dependencyKey]
-              : null);
-        }
-
-        return continuation.raise(exports);
-      }
-    },
-  };
-}
-
 // Exposes a dependency exactly as it is; this is typically the base of a
 // composition which was created to serve as one property's descriptor.
 // Since this serves as a base, specify a value for {update} to indicate
