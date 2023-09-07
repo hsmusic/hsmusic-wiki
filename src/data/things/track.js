@@ -5,7 +5,7 @@ import find from '#find';
 import {empty} from '#sugar';
 
 import {
-  from as compositeFrom,
+  compositeFrom,
   exitWithoutDependency,
   exposeConstant,
   exposeDependency,

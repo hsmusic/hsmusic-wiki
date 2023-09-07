@@ -104,7 +104,7 @@ import {
 // on a provided dependency name, and then providing a result in another
 // also-provided dependency name:
 //
-//   static Thing.composite.withResolvedContribs = ({
+//   withResolvedContribs = ({
 //     from: contribsByRefDependency,
 //     to: outputDependency,
 //   }) => ({
@@ -126,10 +126,11 @@ import {
 //
 // And how you might work that into a composition:
 //
-//   static Track[Thing.getPropertyDescriptors].coverArtists =
-//     Thing.composite.from([
-//       Track.composite.doSomethingWhichMightEarlyExit(),
-//       Thing.composite.withResolvedContribs({
+//   Track.coverArtists =
+//     compositeFrom([
+//       doSomethingWhichMightEarlyExit(),
+//
+//       withResolvedContribs({
 //         from: 'coverArtistContribsByRef',
 //         to: '#coverArtistContribs',
 //       }),
@@ -138,9 +139,8 @@ import {
 //         flags: {expose: true},
 //         expose: {
 //           dependencies: ['#coverArtistContribs'],
-//           compute({'#coverArtistContribs': coverArtistContribs}) {
-//             return coverArtistContribs.map(({who}) => who);
-//           },
+//           compute: ({'#coverArtistContribs': coverArtistContribs}) =>
+//             coverArtistContribs.map(({who}) => who),
 //         },
 //       },
 //     ]);
@@ -169,7 +169,7 @@ import {
 // Consider the `withResolvedContribs` example adjusted to make use of
 // two of these options below:
 //
-//   static Thing.composite.withResolvedContribs = ({
+//   withResolvedContribs = ({
 //     from: contribsByRefDependency,
 //     to: outputDependency,
 //   }) => ({
@@ -194,7 +194,7 @@ import {
 // With a little destructuring and restructuring JavaScript sugar, the
 // above can be simplified some more:
 //
-//   static Thing.composite.withResolvedContribs = ({from, to}) => ({
+//   withResolvedContribs = ({from, to}) => ({
 //     flags: {expose: true, compose: true},
 //     expose: {
 //       dependencies: ['artistData'],
@@ -281,7 +281,7 @@ import {
 //
 // In order to allow for this while helping to ensure internal dependencies
 // remain neatly isolated from the composition which nests your bundle,
-// the Thing.composite.from() function will accept and adapt to a base that
+// the compositeFrom() function will accept and adapt to a base that
 // specifies the {compose: true} flag, just like the steps preceding it.
 //
 // The continuation function that gets provided to the base will be mildly
@@ -341,8 +341,7 @@ import {
 // syntax as for other compositional steps, and it'll work out cleanly!
 //
 
-export {compositeFrom as from};
-function compositeFrom(firstArg, secondArg) {
+export function compositeFrom(firstArg, secondArg) {
   const debug = fn => {
     if (compositeFrom.debug === true) {
       const label =
@@ -373,7 +372,7 @@ function compositeFrom(firstArg, secondArg) {
 
   const aggregate = openAggregate({
     message:
-      `Errors preparing Thing.composite.from() composition` +
+      `Errors preparing composition` +
       (annotation ? ` (${annotation})` : ''),
   });
 
@@ -780,9 +779,9 @@ function compositeFrom(firstArg, secondArg) {
 //     t.same(thing.someProp, value)
 //
 //   With debugging:
-//     t.same(Thing.composite.debug(() => thing.someProp), value)
+//     t.same(debugComposite(() => thing.someProp), value)
 //
-export function debug(fn) {
+export function debugComposite(fn) {
   compositeFrom.debug = true;
   const value = fn();
   compositeFrom.debug = false;

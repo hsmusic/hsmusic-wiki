@@ -9,7 +9,7 @@ import {empty, stitchArrays} from '#sugar';
 import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 
 import {
-  from as compositeFrom,
+  compositeFrom,
   exitWithoutDependency,
   exposeDependency,
   raiseWithoutDependency,
