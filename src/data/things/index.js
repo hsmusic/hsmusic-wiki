@@ -82,6 +82,8 @@ function errorDuplicateClassNames() {
 function flattenClassLists() {
   for (const classes of Object.values(allClassLists)) {
     for (const [name, constructor] of Object.entries(classes)) {
+      if (typeof constructor !== 'function') continue;
+      if (!(constructor.prototype instanceof Thing)) continue;
       allClasses[name] = constructor;
     }
   }
