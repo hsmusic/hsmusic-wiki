@@ -1490,7 +1490,7 @@ export function filterReferenceErrors(wikiData) {
     }],
 
     ['homepageLayout.rows', undefined, {
-      sourceGroupByRef: 'group',
+      sourceGroupByRef: '_homepageSourceGroup',
       sourceAlbumsByRef: 'album',
     }],
 
@@ -1557,6 +1557,16 @@ export function filterReferenceErrors(wikiData) {
                   }
 
                   return boundFind.artist(contribRef.who);
+                };
+                break;
+
+              case '_homepageSourceGroup':
+                findFn = groupRef => {
+                  if (groupRef === 'new-additions' || groupRef === 'new-releases') {
+                    return true;
+                  }
+
+                  return boundFind.group(groupRef);
                 };
                 break;
 
