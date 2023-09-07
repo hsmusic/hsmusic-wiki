@@ -853,8 +853,9 @@ export function exposeConstant({
 // consider using instead. Customize {mode} to select one of these modes,
 // or leave unset and default to 'null':
 //
-// * 'null':  Check that the value isn't null.
+// * 'null':  Check that the value isn't null (and not undefined either).
 // * 'empty': Check that the value is neither null nor an empty array.
+//            This will outright error for undefined.
 // * 'falsy': Check that the value isn't false when treated as a boolean
 //            (nor an empty array). Keep in mind this will also be false
 //            for values like zero and the empty string!
@@ -879,7 +880,7 @@ export function withResultOfAvailabilityCheck({
 
   const checkAvailability = (value, mode) => {
     switch (mode) {
-      case 'null': return value !== null;
+      case 'null': return value !== null && value !== undefined;
       case 'empty': return !empty(value);
       case 'falsy': return !!value && (!Array.isArray(value) || !empty(value));
       default: return false;

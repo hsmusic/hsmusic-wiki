@@ -411,20 +411,33 @@ function withAlbum({
         }),
     },
 
+    withResultOfAvailabilityCheck({
+      fromDependency: '#album',
+      mode: 'null',
+      into: '#albumAvailability',
+    }),
+
     {
-      dependencies: ['#album'],
+      dependencies: ['#albumAvailability'],
       options: {notFoundMode},
       mapContinuation: {into},
 
       compute: ({
-        '#album': album,
+        '#albumAvailability': albumAvailability,
         '#options': {notFoundMode},
       }, continuation) =>
-        (album
-          ? continuation.raise({into: album})
+        (albumAvailability
+          ? continuation()
           : (notFoundMode === 'exit'
               ? continuation.exit(null)
               : continuation.raise({into: null}))),
+    },
+
+    {
+      dependencies: ['#album'],
+      mapContinuation: {into},
+      compute: ({'#album': album}, continuation) =>
+        continuation({into: album}),
     },
   ]);
 }
