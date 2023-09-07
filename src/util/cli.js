@@ -17,7 +17,7 @@ export const ENABLE_COLOR =
 const C = (n) =>
   ENABLE_COLOR ? (text) => `\x1b[${n}m${text}\x1b[0m` : (text) => text;
 
-export const color = {
+export const colors = {
   bright: C('1'),
   dim: C('2'),
   normal: C('22'),

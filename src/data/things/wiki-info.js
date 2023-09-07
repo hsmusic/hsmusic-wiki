@@ -1,13 +1,21 @@
 import find from '#find';
 import {isLanguageCode, isName, isURL} from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  color,
+  flag,
+  name,
+  referenceList,
+  resolvedReferenceList,
+  simpleString,
+  wikiData,
+} from './thing.js';
 
 export class WikiInfo extends Thing {
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Wiki'),
+    name: name('Unnamed Wiki'),
 
     // Displayed in nav bar.
     nameShort: {
@@ -20,12 +28,12 @@ export class WikiInfo extends Thing {
       },
     },
 
-    color: Thing.common.color(),
+    color: color(),
 
     // One-line description used for <meta rel="description"> tag.
-    description: Thing.common.simpleString(),
+    description: simpleString(),
 
-    footerContent: Thing.common.simpleString(),
+    footerContent: simpleString(),
 
     defaultLanguage: {
       flags: {update: true, expose: true},
@@ -37,22 +45,22 @@ export class WikiInfo extends Thing {
       update: {validate: isURL},
     },
 
-    divideTrackListsByGroupsByRef: Thing.common.referenceList(Group),
+    divideTrackListsByGroupsByRef: referenceList(Group),
 
     // Feature toggles
-    enableFlashesAndGames: Thing.common.flag(false),
-    enableListings: Thing.common.flag(false),
-    enableNews: Thing.common.flag(false),
-    enableArtTagUI: Thing.common.flag(false),
-    enableGroupUI: Thing.common.flag(false),
+    enableFlashesAndGames: flag(false),
+    enableListings: flag(false),
+    enableNews: flag(false),
+    enableArtTagUI: flag(false),
+    enableGroupUI: flag(false),
 
     // Update only
 
-    groupData: Thing.common.wikiData(Group),
+    groupData: wikiData(Group),
 
     // Expose only
 
-    divideTrackListsByGroups: Thing.common.resolvedReferenceList({
+    divideTrackListsByGroups: resolvedReferenceList({
       list: 'divideTrackListsByGroupsByRef',
       data: 'groupData',
       find: find.group,

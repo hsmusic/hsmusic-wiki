@@ -2,7 +2,25 @@ import find from '#find';
 import {empty} from '#sugar';
 import {isDate, isDimensions, isTrackSectionList} from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  additionalFiles,
+  commentary,
+  color,
+  commentatorArtists,
+  contribsByRef,
+  contribsPresent,
+  directory,
+  dynamicContribs,
+  fileExtension,
+  flag,
+  name,
+  resolvedReferenceList,
+  referenceList,
+  simpleDate,
+  simpleString,
+  urls,
+  wikiData,
+} from './thing.js';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
@@ -10,14 +28,14 @@ export class Album extends Thing {
   static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Album'),
-    color: Thing.common.color(),
-    directory: Thing.common.directory(),
-    urls: Thing.common.urls(),
+    name: name('Unnamed Album'),
+    color: color(),
+    directory: directory(),
+    urls: urls(),
 
-    date: Thing.common.simpleDate(),
-    trackArtDate: Thing.common.simpleDate(),
-    dateAddedToWiki: Thing.common.simpleDate(),
+    date: simpleDate(),
+    trackArtDate: simpleDate(),
+    dateAddedToWiki: simpleDate(),
 
     coverArtDate: {
       flags: {update: true, expose: true},
@@ -36,14 +54,14 @@ export class Album extends Thing {
       },
     },
 
-    artistContribsByRef: Thing.common.contribsByRef(),
-    coverArtistContribsByRef: Thing.common.contribsByRef(),
-    trackCoverArtistContribsByRef: Thing.common.contribsByRef(),
-    wallpaperArtistContribsByRef: Thing.common.contribsByRef(),
-    bannerArtistContribsByRef: Thing.common.contribsByRef(),
+    artistContribsByRef: contribsByRef(),
+    coverArtistContribsByRef: contribsByRef(),
+    trackCoverArtistContribsByRef: contribsByRef(),
+    wallpaperArtistContribsByRef: contribsByRef(),
+    bannerArtistContribsByRef: contribsByRef(),
 
-    groupsByRef: Thing.common.referenceList(Group),
-    artTagsByRef: Thing.common.referenceList(ArtTag),
+    groupsByRef: referenceList(Group),
+    artTagsByRef: referenceList(ArtTag),
 
     trackSections: {
       flags: {update: true, expose: true},
@@ -81,58 +99,58 @@ export class Album extends Thing {
       },
     },
 
-    coverArtFileExtension: Thing.common.fileExtension('jpg'),
-    trackCoverArtFileExtension: Thing.common.fileExtension('jpg'),
+    coverArtFileExtension: fileExtension('jpg'),
+    trackCoverArtFileExtension: fileExtension('jpg'),
 
-    wallpaperStyle: Thing.common.simpleString(),
-    wallpaperFileExtension: Thing.common.fileExtension('jpg'),
+    wallpaperStyle: simpleString(),
+    wallpaperFileExtension: fileExtension('jpg'),
 
-    bannerStyle: Thing.common.simpleString(),
-    bannerFileExtension: Thing.common.fileExtension('jpg'),
+    bannerStyle: simpleString(),
+    bannerFileExtension: fileExtension('jpg'),
     bannerDimensions: {
       flags: {update: true, expose: true},
       update: {validate: isDimensions},
     },
 
-    hasTrackNumbers: Thing.common.flag(true),
-    isListedOnHomepage: Thing.common.flag(true),
-    isListedInGalleries: Thing.common.flag(true),
+    hasTrackNumbers: flag(true),
+    isListedOnHomepage: flag(true),
+    isListedInGalleries: flag(true),
 
-    commentary: Thing.common.commentary(),
-    additionalFiles: Thing.common.additionalFiles(),
+    commentary: commentary(),
+    additionalFiles: additionalFiles(),
 
     // Update only
 
-    artistData: Thing.common.wikiData(Artist),
-    artTagData: Thing.common.wikiData(ArtTag),
-    groupData: Thing.common.wikiData(Group),
-    trackData: Thing.common.wikiData(Track),
+    artistData: wikiData(Artist),
+    artTagData: wikiData(ArtTag),
+    groupData: wikiData(Group),
+    trackData: wikiData(Track),
 
     // Expose only
 
-    artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
-    coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
-    trackCoverArtistContribs: Thing.common.dynamicContribs('trackCoverArtistContribsByRef'),
-    wallpaperArtistContribs: Thing.common.dynamicContribs('wallpaperArtistContribsByRef'),
-    bannerArtistContribs: Thing.common.dynamicContribs('bannerArtistContribsByRef'),
+    artistContribs: dynamicContribs('artistContribsByRef'),
+    coverArtistContribs: dynamicContribs('coverArtistContribsByRef'),
+    trackCoverArtistContribs: dynamicContribs('trackCoverArtistContribsByRef'),
+    wallpaperArtistContribs: dynamicContribs('wallpaperArtistContribsByRef'),
+    bannerArtistContribs: dynamicContribs('bannerArtistContribsByRef'),
 
-    commentatorArtists: Thing.common.commentatorArtists(),
+    commentatorArtists: commentatorArtists(),
 
-    groups: Thing.common.resolvedReferenceList({
+    groups: resolvedReferenceList({
       list: 'groupsByRef',
       data: 'groupData',
       find: find.group,
     }),
 
-    artTags: Thing.common.resolvedReferenceList({
+    artTags: resolvedReferenceList({
       list: 'artTagsByRef',
       data: 'artTagData',
       find: find.artTag,
     }),
 
-    hasCoverArt: Thing.common.contribsPresent('coverArtistContribsByRef'),
-    hasWallpaperArt: Thing.common.contribsPresent('wallpaperArtistContribsByRef'),
-    hasBannerArt: Thing.common.contribsPresent('bannerArtistContribsByRef'),
+    hasCoverArt: contribsPresent('coverArtistContribsByRef'),
+    hasWallpaperArt: contribsPresent('wallpaperArtistContribsByRef'),
+    hasBannerArt: contribsPresent('bannerArtistContribsByRef'),
 
     tracks: {
       flags: {expose: true},
@@ -192,9 +210,9 @@ export class Album extends Thing {
 
 export class TrackSectionHelper extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
-    name: Thing.common.name('Unnamed Track Group'),
-    color: Thing.common.color(),
-    dateOriginallyReleased: Thing.common.simpleDate(),
-    isDefaultTrackGroup: Thing.common.flag(false),
+    name: name('Unnamed Track Group'),
+    color: color(),
+    dateOriginallyReleased: simpleDate(),
+    isDefaultTrackGroup: flag(false),
   })
 }

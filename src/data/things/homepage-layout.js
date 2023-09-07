@@ -9,13 +9,22 @@ import {
   validateInstanceOf,
 } from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  color,
+  name,
+  referenceList,
+  resolvedReference,
+  resolvedReferenceList,
+  simpleString,
+  singleReference,
+  wikiData,
+} from './thing.js';
 
 export class HomepageLayout extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
-    sidebarContent: Thing.common.simpleString(),
+    sidebarContent: simpleString(),
 
     navbarLinks: {
       flags: {update: true, expose: true},
@@ -36,7 +45,7 @@ export class HomepageLayoutRow extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Homepage Row'),
+    name: name('Unnamed Homepage Row'),
 
     type: {
       flags: {update: true, expose: true},
@@ -48,15 +57,15 @@ export class HomepageLayoutRow extends Thing {
       },
     },
 
-    color: Thing.common.color(),
+    color: color(),
 
     // Update only
 
     // These aren't necessarily used by every HomepageLayoutRow subclass, but
     // for convenience of providing this data, every row accepts all wiki data
     // arrays depended upon by any subclass's behavior.
-    albumData: Thing.common.wikiData(Album),
-    groupData: Thing.common.wikiData(Group),
+    albumData: wikiData(Album),
+    groupData: wikiData(Group),
   });
 }
 
@@ -92,8 +101,8 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       },
     },
 
-    sourceGroupByRef: Thing.common.singleReference(Group),
-    sourceAlbumsByRef: Thing.common.referenceList(Album),
+    sourceGroupByRef: singleReference(Group),
+    sourceAlbumsByRef: referenceList(Album),
 
     countAlbumsFromGroup: {
       flags: {update: true, expose: true},
@@ -107,13 +116,13 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
     // Expose only
 
-    sourceGroup: Thing.common.resolvedReference({
+    sourceGroup: resolvedReference({
       ref: 'sourceGroupByRef',
       data: 'groupData',
       find: find.group,
     }),
 
-    sourceAlbums: Thing.common.resolvedReferenceList({
+    sourceAlbums: resolvedReferenceList({
       list: 'sourceAlbumsByRef',
       data: 'albumData',
       find: find.album,

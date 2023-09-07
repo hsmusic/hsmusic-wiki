@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import chokidar from 'chokidar';
 import {ESLint} from 'eslint';
 
-import {color, logWarn} from '#cli';
+import {colors, logWarn} from '#cli';
 import contentFunction, {ContentFunctionSpecError} from '#content-function';
 import {annotateFunction} from '#sugar';
 
@@ -192,7 +192,7 @@ export function watchContentDependencies({
 
       if (logging && emittedReady) {
         const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
-        console.log(color.green(`[${timestamp}] Updated ${functionName}`));
+        console.log(colors.green(`[${timestamp}] Updated ${functionName}`));
       }
 
       contentDependencies[functionName] = fn;
@@ -219,9 +219,9 @@ export function watchContentDependencies({
       }
 
       if (typeof error === 'string') {
-        console.error(color.yellow(error));
+        console.error(colors.yellow(error));
       } else if (error instanceof ContentFunctionSpecError) {
-        console.error(color.yellow(error.message));
+        console.error(colors.yellow(error.message));
       } else {
         console.error(error);
       }

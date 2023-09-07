@@ -1,6 +1,6 @@
 import {inspect} from 'node:util';
 
-import {color} from '#cli';
+import {colors} from '#cli';
 import find from '#find';
 import {empty} from '#sugar';
 import {isColor, isDate, isDuration, isFileExtension} from '#validators';
@@ -16,6 +16,23 @@ import {
 } from '#composite';
 
 import Thing, {
+  additionalFiles,
+  commentary,
+  commentatorArtists,
+  contribsByRef,
+  directory,
+  dynamicContribs,
+  flag,
+  name,
+  referenceList,
+  resolvedReference,
+  resolvedReferenceList,
+  reverseReferenceList,
+  simpleDate,
+  singleReference,
+  simpleString,
+  urls,
+  wikiData,
   withResolvedContribs,
   withResolvedReference,
   withReverseReferenceList,
@@ -27,24 +44,24 @@ export class Track extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Track'),
-    directory: Thing.common.directory(),
+    name: name('Unnamed Track'),
+    directory: directory(),
 
     duration: {
       flags: {update: true, expose: true},
       update: {validate: isDuration},
     },
 
-    urls: Thing.common.urls(),
-    dateFirstReleased: Thing.common.simpleDate(),
+    urls: urls(),
+    dateFirstReleased: simpleDate(),
 
-    artistContribsByRef: Thing.common.contribsByRef(),
-    contributorContribsByRef: Thing.common.contribsByRef(),
-    coverArtistContribsByRef: Thing.common.contribsByRef(),
+    artistContribsByRef: contribsByRef(),
+    contributorContribsByRef: contribsByRef(),
+    coverArtistContribsByRef: contribsByRef(),
 
-    referencedTracksByRef: Thing.common.referenceList(Track),
-    sampledTracksByRef: Thing.common.referenceList(Track),
-    artTagsByRef: Thing.common.referenceList(ArtTag),
+    referencedTracksByRef: referenceList(Track),
+    sampledTracksByRef: referenceList(Track),
+    artTagsByRef: referenceList(ArtTag),
 
     color: compositeFrom(`Track.color`, [
       exposeUpdateValueOrContinue(),
@@ -74,7 +91,7 @@ export class Track extends Thing {
     // This flag should only be used in select circumstances, i.e. to override
     // an album's trackCoverArtists. This flag supercedes that property, as well
     // as the track's own coverArtists.
-    disableUniqueCoverArt: Thing.common.flag(),
+    disableUniqueCoverArt: flag(),
 
     // File extension for track's corresponding media file. This represents the
     // track's unique cover artwork, if any, and does not inherit the extension
@@ -117,27 +134,27 @@ export class Track extends Thing {
       }),
     ]),
 
-    originalReleaseTrackByRef: Thing.common.singleReference(Track),
+    originalReleaseTrackByRef: singleReference(Track),
 
-    dataSourceAlbumByRef: Thing.common.singleReference(Album),
+    dataSourceAlbumByRef: singleReference(Album),
 
-    commentary: Thing.common.commentary(),
-    lyrics: Thing.common.simpleString(),
-    additionalFiles: Thing.common.additionalFiles(),
-    sheetMusicFiles: Thing.common.additionalFiles(),
-    midiProjectFiles: Thing.common.additionalFiles(),
+    commentary: commentary(),
+    lyrics: simpleString(),
+    additionalFiles: additionalFiles(),
+    sheetMusicFiles: additionalFiles(),
+    midiProjectFiles: additionalFiles(),
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    artistData: Thing.common.wikiData(Artist),
-    artTagData: Thing.common.wikiData(ArtTag),
-    flashData: Thing.common.wikiData(Flash),
-    trackData: Thing.common.wikiData(Track),
+    albumData: wikiData(Album),
+    artistData: wikiData(Artist),
+    artTagData: wikiData(ArtTag),
+    flashData: wikiData(Flash),
+    trackData: wikiData(Track),
 
     // Expose only
 
-    commentatorArtists: Thing.common.commentatorArtists(),
+    commentatorArtists: commentatorArtists(),
 
     album: compositeFrom(`Track.album`, [
       withAlbum(),
@@ -151,7 +168,7 @@ export class Track extends Thing {
     // not generally relevant information). It's also not guaranteed that
     // dataSourceAlbum is available (depending on the Track creator to optionally
     // provide dataSourceAlbumByRef).
-    dataSourceAlbum: Thing.common.resolvedReference({
+    dataSourceAlbum: resolvedReference({
       ref: 'dataSourceAlbumByRef',
       data: 'albumData',
       find: find.album,
@@ -226,7 +243,7 @@ export class Track extends Thing {
 
     contributorContribs: compositeFrom(`Track.contributorContribs`, [
       inheritFromOriginalRelease({property: 'contributorContribs'}),
-      Thing.common.dynamicContribs('contributorContribsByRef'),
+      dynamicContribs('contributorContribsByRef'),
     ]),
 
     // Cover artists aren't inherited from the original release, since it
@@ -260,7 +277,7 @@ export class Track extends Thing {
 
     referencedTracks: compositeFrom(`Track.referencedTracks`, [
       inheritFromOriginalRelease({property: 'referencedTracks'}),
-      Thing.common.resolvedReferenceList({
+      resolvedReferenceList({
         list: 'referencedTracksByRef',
         data: 'trackData',
         find: find.track,
@@ -269,14 +286,14 @@ export class Track extends Thing {
 
     sampledTracks: compositeFrom(`Track.sampledTracks`, [
       inheritFromOriginalRelease({property: 'sampledTracks'}),
-      Thing.common.resolvedReferenceList({
+      resolvedReferenceList({
         list: 'sampledTracksByRef',
         data: 'trackData',
         find: find.track,
       }),
     ]),
 
-    artTags: Thing.common.resolvedReferenceList({
+    artTags: resolvedReferenceList({
       list: 'artTagsByRef',
       data: 'artTagData',
       find: find.artTag,
@@ -299,7 +316,7 @@ export class Track extends Thing {
       property: 'sampledTracks',
     }),
 
-    featuredInFlashes: Thing.common.reverseReferenceList({
+    featuredInFlashes: reverseReferenceList({
       data: 'flashData',
       list: 'featuredTracks',
     }),
@@ -311,7 +328,7 @@ export class Track extends Thing {
     parts.push(Thing.prototype[inspect.custom].apply(this));
 
     if (this.originalReleaseTrackByRef) {
-      parts.unshift(`${color.yellow('[rerelease]')} `);
+      parts.unshift(`${colors.yellow('[rerelease]')} `);
     }
 
     let album;
@@ -322,7 +339,7 @@ export class Track extends Thing {
         (albumIndex === -1
           ? '#?'
           : `#${albumIndex + 1}`);
-      parts.push(` (${color.yellow(trackNum)} in ${color.green(albumName)})`);
+      parts.push(` (${colors.yellow(trackNum)} in ${colors.green(albumName)})`);
     }
 
     return parts.join('');

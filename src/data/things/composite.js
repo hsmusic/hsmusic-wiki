@@ -1,6 +1,6 @@
 import {inspect} from 'node:util';
 
-import {color} from '#cli';
+import {colors} from '#cli';
 
 import {
   empty,
@@ -346,8 +346,8 @@ export function compositeFrom(firstArg, secondArg) {
     if (compositeFrom.debug === true) {
       const label =
         (annotation
-          ? color.dim(`[composite: ${annotation}]`)
-          : color.dim(`[composite]`));
+          ? colors.dim(`[composite: ${annotation}]`)
+          : colors.dim(`[composite]`));
       const result = fn();
       if (Array.isArray(result)) {
         console.log(label, ...result.map(value =>
@@ -594,9 +594,9 @@ export function compositeFrom(firstArg, secondArg) {
     const availableDependencies = {...initialDependencies};
 
     if (expectingTransform) {
-      debug(() => [color.bright(`begin composition - transforming from:`), initialValue]);
+      debug(() => [colors.bright(`begin composition - transforming from:`), initialValue]);
     } else {
-      debug(() => color.bright(`begin composition - not transforming`));
+      debug(() => colors.bright(`begin composition - not transforming`));
     }
 
     for (let i = 0; i < steps.length; i++) {
@@ -641,7 +641,7 @@ export function compositeFrom(firstArg, secondArg) {
           throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
         }
 
-        debug(() => color.bright(`end composition - exit (inferred)`));
+        debug(() => colors.bright(`end composition - exit (inferred)`));
 
         return result;
       }
@@ -652,7 +652,7 @@ export function compositeFrom(firstArg, secondArg) {
         const {providedValue} = continuationStorage;
 
         debug(() => [`step #${i+1} - result: exit (explicit) ->`, providedValue]);
-        debug(() => color.bright(`end composition - exit (explicit)`));
+        debug(() => colors.bright(`end composition - exit (explicit)`));
 
         if (baseComposes) {
           return continuationIfApplicable.exit(providedValue);
@@ -708,17 +708,17 @@ export function compositeFrom(firstArg, secondArg) {
         case 'raise':
           debug(() =>
             (isBase
-              ? color.bright(`end composition - raise (base: explicit)`)
-              : color.bright(`end composition - raise`)));
+              ? colors.bright(`end composition - raise (base: explicit)`)
+              : colors.bright(`end composition - raise`)));
           return continuationIfApplicable(...continuationArgs);
 
         case 'raiseAbove':
-          debug(() => color.bright(`end composition - raiseAbove`));
+          debug(() => colors.bright(`end composition - raiseAbove`));
           return continuationIfApplicable.raise(...continuationArgs);
 
         case 'continuation':
           if (isBase) {
-            debug(() => color.bright(`end composition - raise (inferred)`));
+            debug(() => colors.bright(`end composition - raise (inferred)`));
             return continuationIfApplicable(...continuationArgs);
           } else {
             Object.assign(availableDependencies, continuingWithDependencies);

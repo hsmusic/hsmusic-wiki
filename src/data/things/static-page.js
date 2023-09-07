@@ -1,6 +1,10 @@
 import {isName} from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  directory,
+  name,
+  simpleString,
+} from './thing.js';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
@@ -8,7 +12,7 @@ export class StaticPage extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Static Page'),
+    name: name('Unnamed Static Page'),
 
     nameShort: {
       flags: {update: true, expose: true},
@@ -20,8 +24,8 @@ export class StaticPage extends Thing {
       },
     },
 
-    directory: Thing.common.directory(),
-    content: Thing.common.simpleString(),
-    stylesheet: Thing.common.simpleString(),
+    directory: directory(),
+    content: simpleString(),
+    stylesheet: simpleString(),
   });
 }

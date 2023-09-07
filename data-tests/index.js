@@ -3,7 +3,7 @@ import {fileURLToPath} from 'node:url';
 
 import chokidar from 'chokidar';
 
-import {color, logError, logInfo, logWarn, parseOptions} from '#cli';
+import {colors, logError, logInfo, logWarn, parseOptions} from '#cli';
 import {isMain} from '#node-utils';
 import {getContextAssignments} from '#repl';
 import {bindOpts, showAggregate} from '#sugar';
@@ -24,7 +24,7 @@ async function main() {
   }
 
   console.log(`HSMusic automated data tests`);
-  console.log(`${color.bright(color.yellow(`:star:`))} Now featuring quick-reloading! ${color.bright(color.cyan(`:earth:`))}`);
+  console.log(`${colors.bright(colors.yellow(`:star:`))} Now featuring quick-reloading! ${colors.bright(colors.cyan(`:earth:`))}`);
 
   // Watch adjacent files in data-tests directory
   const metaPath = fileURLToPath(import.meta.url);

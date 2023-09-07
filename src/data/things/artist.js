@@ -1,7 +1,16 @@
 import find from '#find';
 import {isName, validateArrayItems} from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  directory,
+  fileExtension,
+  flag,
+  name,
+  simpleString,
+  singleReference,
+  urls,
+  wikiData,
+} from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
@@ -9,13 +18,13 @@ export class Artist extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, Flash, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Artist'),
-    directory: Thing.common.directory(),
-    urls: Thing.common.urls(),
-    contextNotes: Thing.common.simpleString(),
+    name: name('Unnamed Artist'),
+    directory: directory(),
+    urls: urls(),
+    contextNotes: simpleString(),
 
-    hasAvatar: Thing.common.flag(false),
-    avatarFileExtension: Thing.common.fileExtension('jpg'),
+    hasAvatar: flag(false),
+    avatarFileExtension: fileExtension('jpg'),
 
     aliasNames: {
       flags: {update: true, expose: true},
@@ -23,15 +32,15 @@ export class Artist extends Thing {
       expose: {transform: (names) => names ?? []},
     },
 
-    isAlias: Thing.common.flag(),
-    aliasedArtistRef: Thing.common.singleReference(Artist),
+    isAlias: flag(),
+    aliasedArtistRef: singleReference(Artist),
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    artistData: Thing.common.wikiData(Artist),
-    flashData: Thing.common.wikiData(Flash),
-    trackData: Thing.common.wikiData(Track),
+    albumData: wikiData(Album),
+    artistData: wikiData(Artist),
+    flashData: wikiData(Flash),
+    trackData: wikiData(Track),
 
     // Expose only
 

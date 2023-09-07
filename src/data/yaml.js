@@ -7,7 +7,7 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
-import {color, ENABLE_COLOR, logInfo, logWarn} from '#cli';
+import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
 import T from '#things';
@@ -137,7 +137,7 @@ function makeProcessDocument(
         const name = document[nameField];
         error.message = name
           ? `(name: ${inspect(name)}) ${error.message}`
-          : `(${color.dim(`no name found`)}) ${error.message}`;
+          : `(${colors.dim(`no name found`)}) ${error.message}`;
         throw error;
       }
     };
@@ -195,7 +195,7 @@ function makeProcessDocument(
 
     const thing = Reflect.construct(thingClass, []);
 
-    withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({call}) => {
+    withAggregate({message: `Errors applying ${colors.green(thingClass.name)} properties`}, ({call}) => {
       for (const [property, value] of Object.entries(sourceProperties)) {
         call(() => (thing[property] = value));
       }
@@ -228,7 +228,7 @@ makeProcessDocument.FieldCombinationsError = class FieldCombinationsError extend
 makeProcessDocument.FieldCombinationError = class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
-    const combinePart = `Don't combine ${fieldNames.map(field => color.red(field)).join(', ')}`;
+    const combinePart = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
 
     const messagePart =
       (typeof message === 'function'
@@ -1009,7 +1009,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
       } catch (error) {
         error.message +=
           (error.message.includes('\n') ? '\n' : ' ') +
-          `(file: ${color.bright(color.blue(path.relative(dataPath, x.file)))})`;
+          `(file: ${colors.bright(colors.blue(path.relative(dataPath, x.file)))})`;
         throw error;
       }
     };
@@ -1032,7 +1032,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
         // just without the callbacks. Thank you.
         const filterBlankDocuments = documents => {
           const aggregate = openAggregate({
-            message: `Found blank documents - check for extra '${color.cyan(`---`)}'`,
+            message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
           });
 
           const filteredDocuments =
@@ -1076,10 +1076,10 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
               if (count === 1) {
                 const range = `#${start + 1}`;
-                parts.push(`${count} document (${color.yellow(range)}), `);
+                parts.push(`${count} document (${colors.yellow(range)}), `);
               } else {
                 const range = `#${start + 1}-${end + 1}`;
-                parts.push(`${count} documents (${color.yellow(range)}), `);
+                parts.push(`${count} documents (${colors.yellow(range)}), `);
               }
 
               if (previous === null) {
@@ -1089,7 +1089,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               } else {
                 const previousDescription = Object.entries(previous).at(0).join(': ');
                 const nextDescription = Object.entries(next).at(0).join(': ');
-                parts.push(`between "${color.cyan(previousDescription)}" and "${color.cyan(nextDescription)}"`);
+                parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
               }
 
               aggregate.push(new Error(parts.join('')));
@@ -1395,7 +1395,7 @@ export function filterDuplicateDirectories(wikiData) {
   const aggregate = openAggregate({message: `Duplicate directories found`});
   for (const thingDataProp of deduplicateSpec) {
     const thingData = wikiData[thingDataProp];
-    aggregate.nest({message: `Duplicate directories found in ${color.green('wikiData.' + thingDataProp)}`}, ({call}) => {
+    aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({call}) => {
       const directoryPlaces = Object.create(null);
       const duplicateDirectories = [];
 
@@ -1421,7 +1421,7 @@ export function filterDuplicateDirectories(wikiData) {
         const places = directoryPlaces[directory];
         call(() => {
           throw new Error(
-            `Duplicate directory ${color.green(directory)}:\n` +
+            `Duplicate directory ${colors.green(directory)}:\n` +
               places.map((thing) => ` - ` + inspect(thing)).join('\n')
           );
         });
@@ -1516,7 +1516,7 @@ export function filterReferenceErrors(wikiData) {
   for (const [thingDataProp, providedProcessDocumentFn, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
 
-    aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
+    aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       const things = Array.isArray(thingData) ? thingData : [thingData];
 
       for (const thing of things) {
@@ -1535,7 +1535,7 @@ export function filterReferenceErrors(wikiData) {
             const value = thing[property];
 
             if (value === undefined) {
-              push(new TypeError(`Property ${color.red(property)} isn't valid for ${color.green(thing.constructor.name)}`));
+              push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
               continue;
             }
 
@@ -1553,7 +1553,7 @@ export function filterReferenceErrors(wikiData) {
                     // No need to check if the original exists here. Aliases are automatically
                     // created from a field on the original, so the original certainly exists.
                     const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
-                    throw new Error(`Reference ${color.red(contribRef.who)} is to an alias, should be ${color.green(original.name)}`);
+                    throw new Error(`Reference ${colors.red(contribRef.who)} is to an alias, should be ${colors.green(original.name)}`);
                   }
 
                   return boundFind.artist(contribRef.who);
@@ -1578,12 +1578,12 @@ export function filterReferenceErrors(wikiData) {
 
                     const shouldBeMessage =
                       (originalByName
-                        ? color.green(original.name)
+                        ? colors.green(original.name)
                      : original
-                        ? color.green('track:' + original.directory)
-                        : color.green(track.originalReleaseTrackByRef));
+                        ? colors.green('track:' + original.directory)
+                        : colors.green(track.originalReleaseTrackByRef));
 
-                    throw new Error(`Reference ${color.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
+                    throw new Error(`Reference ${colors.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
                   }
 
                   return track;
@@ -1614,13 +1614,13 @@ export function filterReferenceErrors(wikiData) {
 
             const fieldPropertyMessage =
               (processDocumentFn?.propertyFieldMapping?.[property]
-                ? ` in field ${color.green(processDocumentFn.propertyFieldMapping[property])}`
-                : ` in property ${color.green(property)}`);
+                ? ` in field ${colors.green(processDocumentFn.propertyFieldMapping[property])}`
+                : ` in property ${colors.green(property)}`);
 
             const findFnMessage =
               (findFnKey.startsWith('_')
                 ? ``
-                : ` (${color.green('find.' + findFnKey)})`);
+                : ` (${colors.green('find.' + findFnKey)})`);
 
             const errorMessage =
               (Array.isArray(value)

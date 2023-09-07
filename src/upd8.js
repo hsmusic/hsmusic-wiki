@@ -47,7 +47,7 @@ import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
 
 import {
-  color,
+  colors,
   decorateTime,
   logWarn,
   logInfo,
@@ -279,7 +279,7 @@ async function main() {
     const indentWrap = (spaces, str) => wrap(str, {width: 60 - spaces, indent: ' '.repeat(spaces)});
 
     const showOptions = (msg, options) => {
-      console.log(color.bright(msg));
+      console.log(colors.bright(msg));
 
       const entries = Object.entries(options);
       const sortedOptions = sortByName(entries
@@ -310,13 +310,13 @@ async function main() {
           console.log('');
         }
 
-        console.log(color.bright(` --` + name) +
+        console.log(colors.bright(` --` + name) +
           (aliases.length
-            ? ` (or: ${aliases.map(alias => color.bright(`--` + alias)).join(', ')})`
+            ? ` (or: ${aliases.map(alias => colors.bright(`--` + alias)).join(', ')})`
             : '') +
           (descriptor.help
             ? ''
-            : color.dim('  (no help provided)')));
+            : colors.dim('  (no help provided)')));
 
         if (wrappedHelp) {
           console.log(wrappedHelp);
@@ -336,7 +336,7 @@ async function main() {
     };
 
     console.log(
-      color.bright(`hsmusic (aka. Homestuck Music Wiki)\n`) +
+      colors.bright(`hsmusic (aka. Homestuck Music Wiki)\n`) +
       `static wiki software cataloguing collaborative creation\n`);
 
     console.log(indentWrap(0,
@@ -496,7 +496,7 @@ async function main() {
 
   {
     const logThings = (thingDataProp, label) =>
-      logInfo` - ${wikiData[thingDataProp]?.length ?? color.red('(Missing!)')} ${color.normal(color.dim(label))}`;
+      logInfo` - ${wikiData[thingDataProp]?.length ?? colors.red('(Missing!)')} ${colors.normal(colors.dim(label))}`;
     try {
       logInfo`Loaded data and processed objects:`;
       logThings('albumData', 'albums');

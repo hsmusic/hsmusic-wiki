@@ -94,7 +94,7 @@ import * as path from 'node:path';
 import dimensionsOf from 'image-size';
 
 import {
-  color,
+  colors,
   fileIssue,
   logError,
   logInfo,
@@ -662,14 +662,14 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   if (!empty(missing)) {
     logWarn`** Some image files are missing! (${missing.length + ' files'}) **`;
     for (const file of missing) {
-      console.warn(color.yellow(` - `) + file);
+      console.warn(colors.yellow(` - `) + file);
     }
   }
 
   if (!empty(misplaced)) {
     logWarn`** Some image files are misplaced! (${misplaced.length + ' files'}) **`;
     for (const file of misplaced) {
-      console.warn(color.yellow(` - `) + file);
+      console.warn(colors.yellow(` - `) + file);
     }
   }
 }

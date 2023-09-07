@@ -8,7 +8,19 @@ import {
   oneOf,
 } from '#validators';
 
-import Thing from './thing.js';
+import Thing, {
+  dynamicContribs,
+  color,
+  contribsByRef,
+  fileExtension,
+  name,
+  referenceList,
+  resolvedReferenceList,
+  simpleDate,
+  simpleString,
+  urls,
+  wikiData,
+} from './thing.js';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
@@ -16,7 +28,7 @@ export class Flash extends Thing {
   static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Flash'),
+    name: name('Unnamed Flash'),
 
     directory: {
       flags: {update: true, expose: true},
@@ -44,27 +56,27 @@ export class Flash extends Thing {
       },
     },
 
-    date: Thing.common.simpleDate(),
+    date: simpleDate(),
 
-    coverArtFileExtension: Thing.common.fileExtension('jpg'),
+    coverArtFileExtension: fileExtension('jpg'),
 
-    contributorContribsByRef: Thing.common.contribsByRef(),
+    contributorContribsByRef: contribsByRef(),
 
-    featuredTracksByRef: Thing.common.referenceList(Track),
+    featuredTracksByRef: referenceList(Track),
 
-    urls: Thing.common.urls(),
+    urls: urls(),
 
     // Update only
 
-    artistData: Thing.common.wikiData(Artist),
-    trackData: Thing.common.wikiData(Track),
-    flashActData: Thing.common.wikiData(FlashAct),
+    artistData: wikiData(Artist),
+    trackData: wikiData(Track),
+    flashActData: wikiData(FlashAct),
 
     // Expose only
 
-    contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
+    contributorContribs: dynamicContribs('contributorContribsByRef'),
 
-    featuredTracks: Thing.common.resolvedReferenceList({
+    featuredTracks: resolvedReferenceList({
       list: 'featuredTracksByRef',
       data: 'trackData',
       find: find.track,
@@ -111,10 +123,10 @@ export class FlashAct extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Flash Act'),
-    color: Thing.common.color(),
-    anchor: Thing.common.simpleString(),
-    jump: Thing.common.simpleString(),
+    name: name('Unnamed Flash Act'),
+    color: color(),
+    anchor: simpleString(),
+    jump: simpleString(),
 
     jumpColor: {
       flags: {update: true, expose: true},
@@ -126,15 +138,15 @@ export class FlashAct extends Thing {
       }
     },
 
-    flashesByRef: Thing.common.referenceList(Flash),
+    flashesByRef: referenceList(Flash),
 
     // Update only
 
-    flashData: Thing.common.wikiData(Flash),
+    flashData: wikiData(Flash),
 
     // Expose only
 
-    flashes: Thing.common.resolvedReferenceList({
+    flashes: resolvedReferenceList({
       list: 'flashesByRef',
       data: 'flashData',
       find: find.flash,

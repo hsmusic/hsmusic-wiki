@@ -1,6 +1,6 @@
 import {inspect} from 'node:util';
 
-import {color, logWarn} from '#cli';
+import {colors, logWarn} from '#cli';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -66,7 +66,7 @@ function findHelper(keys, findFns = {}) {
     const found = key ? byDirectory(ref, data, mode) : byName(ref, data, mode);
 
     if (!found) {
-      warnOrThrow(mode, `Didn't match anything for ${color.bright(fullRef)}`);
+      warnOrThrow(mode, `Didn't match anything for ${colors.bright(fullRef)}`);
     }
 
     cacheForThisData[fullRef] = found;
@@ -102,7 +102,7 @@ function matchName(ref, data, mode) {
   if (ref !== thing.name) {
     warnOrThrow(
       mode,
-      `Bad capitalization: ${color.red(ref)} -> ${color.green(thing.name)}`
+      `Bad capitalization: ${colors.red(ref)} -> ${colors.green(thing.name)}`
     );
   }
 

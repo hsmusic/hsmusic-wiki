@@ -76,7 +76,7 @@
 
 import {inspect as nodeInspect} from 'node:util';
 
-import {color, ENABLE_COLOR} from '#cli';
+import {colors, ENABLE_COLOR} from '#cli';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -183,7 +183,7 @@ export default class CacheableObject {
           }
         } catch (error) {
           error.message = [
-            `Property ${color.green(property)}`,
+            `Property ${colors.green(property)}`,
             `(${inspect(this[property])} -> ${inspect(newValue)}):`,
             error.message
           ].join(' ');

@@ -1,6 +1,15 @@
 import find from '#find';
 
-import Thing from './thing.js';
+import Thing, {
+  color,
+  directory,
+  name,
+  referenceList,
+  resolvedReferenceList,
+  simpleString,
+  urls,
+  wikiData,
+} from './thing.js';
 
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
@@ -8,23 +17,23 @@ export class Group extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Group'),
-    directory: Thing.common.directory(),
+    name: name('Unnamed Group'),
+    directory: directory(),
 
-    description: Thing.common.simpleString(),
+    description: simpleString(),
 
-    urls: Thing.common.urls(),
+    urls: urls(),
 
-    featuredAlbumsByRef: Thing.common.referenceList(Album),
+    featuredAlbumsByRef: referenceList(Album),
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    groupCategoryData: Thing.common.wikiData(GroupCategory),
+    albumData: wikiData(Album),
+    groupCategoryData: wikiData(GroupCategory),
 
     // Expose only
 
-    featuredAlbums: Thing.common.resolvedReferenceList({
+    featuredAlbums: resolvedReferenceList({
       list: 'featuredAlbumsByRef',
       data: 'albumData',
       find: find.album,
@@ -77,18 +86,18 @@ export class GroupCategory extends Thing {
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Group Category'),
-    color: Thing.common.color(),
+    name: name('Unnamed Group Category'),
+    color: color(),
 
-    groupsByRef: Thing.common.referenceList(Group),
+    groupsByRef: referenceList(Group),
 
     // Update only
 
-    groupData: Thing.common.wikiData(Group),
+    groupData: wikiData(Group),
 
     // Expose only
 
-    groups: Thing.common.resolvedReferenceList({
+    groups: resolvedReferenceList({
       list: 'groupsByRef',
       data: 'groupData',
       find: find.group,

@@ -1,6 +1,12 @@
 import {sortAlbumsTracksChronologically} from '#wiki-data';
 
-import Thing from './thing.js';
+import Thing, {
+  color,
+  directory,
+  flag,
+  name,
+  wikiData,
+} from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -8,10 +14,10 @@ export class ArtTag extends Thing {
   static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Art Tag'),
-    directory: Thing.common.directory(),
-    color: Thing.common.color(),
-    isContentWarning: Thing.common.flag(false),
+    name: name('Unnamed Art Tag'),
+    directory: directory(),
+    color: color(),
+    isContentWarning: flag(false),
 
     nameShort: {
       flags: {update: true, expose: true},
@@ -25,8 +31,8 @@ export class ArtTag extends Thing {
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    trackData: Thing.common.wikiData(Track),
+    albumData: wikiData(Album),
+    trackData: wikiData(Track),
 
     // Expose only
 

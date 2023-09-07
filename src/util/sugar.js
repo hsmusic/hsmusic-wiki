@@ -6,7 +6,7 @@
 // It will likely only do exactly what I want it to, and only in the cases I
 // decided were relevant enough to 8other handling.
 
-import {color} from './cli.js';
+import {colors} from './cli.js';
 
 // Apparently JavaScript doesn't come with a function to split an array into
 // chunks! Weird. Anyway, this is an awesome place to use a generator, even
@@ -566,10 +566,10 @@ export function showAggregate(topError, {
             .trim()
             .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
         : '(no stack trace)';
-      header += ` ${color.dim(tracePart)}`;
+      header += ` ${colors.dim(tracePart)}`;
     }
-    const bar = level % 2 === 0 ? '\u2502' : color.dim('\u254e');
-    const head = level % 2 === 0 ? '\u257f' : color.dim('\u257f');
+    const bar = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
+    const head = level % 2 === 0 ? '\u257f' : colors.dim('\u257f');
 
     if (error instanceof AggregateError) {
       return (
@@ -605,7 +605,7 @@ export function decorateErrorWithIndex(fn) {
     try {
       return fn(x, index, array);
     } catch (error) {
-      error.message = `(${color.yellow(`#${index + 1}`)}) ${error.message}`;
+      error.message = `(${colors.yellow(`#${index + 1}`)}) ${error.message}`;
       throw error;
     }
   };

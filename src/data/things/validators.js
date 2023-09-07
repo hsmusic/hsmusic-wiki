@@ -1,6 +1,6 @@
 import {inspect as nodeInspect} from 'node:util';
 
-import {color, ENABLE_COLOR} from '#cli';
+import {colors, ENABLE_COLOR} from '#cli';
 import {withAggregate} from '#sugar';
 
 function inspect(value) {
@@ -174,7 +174,7 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${color.yellow(`#${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      error.message = `(index: ${colors.yellow(`#${index}`)}, item: ${inspect(item)}) ${error.message}`;
       throw error;
     }
   };
@@ -264,7 +264,7 @@ export function validateProperties(spec) {
           try {
             specValidator(value);
           } catch (error) {
-            error.message = `(key: ${color.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
+            error.message = `(key: ${colors.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
             throw error;
           }
         });
