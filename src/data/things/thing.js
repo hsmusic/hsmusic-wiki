@@ -9,6 +9,15 @@ import {empty} from '#sugar';
 import {getKebabCase} from '#wiki-data';
 
 import {
+  from as compositeFrom,
+  exposeDependency,
+  withReverseReferenceList,
+  withResolvedContribs,
+  withResolvedReference,
+  withResolvedReferenceList,
+} from '#composite';
+
+import {
   isAdditionalFileList,
   isBoolean,
   isCommentary,
@@ -27,7 +36,6 @@ import {
 } from '#validators';
 
 import CacheableObject from './cacheable-object.js';
-import * as composite from './composite.js';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol('Thing.referenceType');
@@ -194,20 +202,20 @@ export default class Thing extends CacheableObject {
     // in the provided property and searches the specified wiki data for
     // matching actual Thing-subclass objects.
     resolvedReferenceList({list, data, find}) {
-      return Thing.composite.from(`Thing.common.resolvedReferenceList`, [
-        Thing.composite.withResolvedReferenceList({
+      return compositeFrom(`Thing.common.resolvedReferenceList`, [
+        withResolvedReferenceList({
           list, data, find,
           notFoundMode: 'filter',
         }),
-        Thing.composite.exposeDependency('#resolvedReferenceList'),
+        exposeDependency('#resolvedReferenceList'),
       ]);
     },
 
     // Corresponding function for a single reference.
     resolvedReference({ref, data, find}) {
-      return Thing.composite.from(`Thing.common.resolvedReference`, [
-        Thing.composite.withResolvedReference({ref, data, find}),
-        Thing.composite.exposeDependency('#resolvedReference'),
+      return compositeFrom(`Thing.common.resolvedReference`, [
+        withResolvedReference({ref, data, find}),
+        exposeDependency('#resolvedReference'),
       ]);
     },
 
@@ -227,13 +235,13 @@ export default class Thing extends CacheableObject {
     // reference list is somehow messed up, or artistData isn't being provided
     // properly.)
     dynamicContribs(contribsByRefProperty) {
-      return Thing.composite.from(`Thing.common.dynamicContribs`, [
-        Thing.composite.withResolvedContribs({
+      return compositeFrom(`Thing.common.dynamicContribs`, [
+        withResolvedContribs({
           from: contribsByRefProperty,
           to: '#contribs',
         }),
 
-        Thing.composite.exposeDependency('#contribs'),
+        exposeDependency('#contribs'),
       ]);
     },
 
@@ -257,9 +265,9 @@ export default class Thing extends CacheableObject {
     // property. Naturally, the passed ref list property is of the things in the
     // wiki data provided, not the requesting Thing itself.
     reverseReferenceList({data, list}) {
-      return Thing.composite.from(`Thing.common.reverseReferenceList`, [
-        Thing.composite.withReverseReferenceList({data, list}),
-        Thing.composite.exposeDependency('#reverseReferenceList'),
+      return compositeFrom(`Thing.common.reverseReferenceList`, [
+        withReverseReferenceList({data, list}),
+        exposeDependency('#reverseReferenceList'),
       ]);
     },
 
@@ -323,6 +331,4 @@ export default class Thing extends CacheableObject {
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
   }
-
-  static composite = composite;
 }

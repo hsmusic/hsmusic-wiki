@@ -13,6 +13,7 @@
     },
     "imports": {
         "#colors": "./src/util/colors.js",
+        "#composite": "./src/data/things/composite.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",

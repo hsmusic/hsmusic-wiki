@@ -808,7 +808,7 @@ function _export(mapping) {
   const mappingEntries = Object.entries(mapping);
 
   return {
-    annotation: `Thing.composite.export`,
+    annotation: `export`,
     flags: {expose: true, compose: true},
 
     expose: {
@@ -853,7 +853,7 @@ export function exposeDependency(dependency, {
   update = false,
 } = {}) {
   return {
-    annotation: `Thing.composite.exposeDependency`,
+    annotation: `exposeDependency`,
     flags: {expose: true, update: !!update},
 
     expose: {
@@ -878,7 +878,7 @@ export function exposeConstant(value, {
   update = false,
 } = {}) {
   return {
-    annotation: `Thing.composite.exposeConstant`,
+    annotation: `exposeConstant`,
     flags: {expose: true, update: !!update},
 
     expose: {
@@ -934,7 +934,7 @@ export function withResultOfAvailabilityCheck({
 
   if (fromDependency) {
     return {
-      annotation: `Thing.composite.withResultOfAvailabilityCheck.fromDependency`,
+      annotation: `withResultOfAvailabilityCheck.fromDependency`,
       flags: {expose: true, compose: true},
       expose: {
         mapDependencies: {from: fromDependency},
@@ -946,7 +946,7 @@ export function withResultOfAvailabilityCheck({
     };
   } else {
     return {
-      annotation: `Thing.composite.withResultOfAvailabilityCheck.fromUpdateValue`,
+      annotation: `withResultOfAvailabilityCheck.fromUpdateValue`,
       flags: {expose: true, compose: true},
       expose: {
         mapContinuation: {to},
@@ -963,7 +963,7 @@ export function withResultOfAvailabilityCheck({
 export function exposeDependencyOrContinue(dependency, {
   mode = 'null',
 } = {}) {
-  return compositeFrom(`Thing.composite.exposeDependencyOrContinue`, [
+  return compositeFrom(`exposeDependencyOrContinue`, [
     withResultOfAvailabilityCheck({
       fromDependency: dependency,
       mode,
@@ -991,7 +991,7 @@ export function exposeDependencyOrContinue(dependency, {
 export function exposeUpdateValueOrContinue({
   mode = 'null',
 } = {}) {
-  return compositeFrom(`Thing.composite.exposeUpdateValueOrContinue`, [
+  return compositeFrom(`exposeUpdateValueOrContinue`, [
     withResultOfAvailabilityCheck({
       fromUpdateValue: true,
       mode,
@@ -1019,7 +1019,7 @@ export function earlyExitIfAvailabilityCheckFailed({
   availability = '#availability',
   value = null,
 } = {}) {
-  return compositeFrom(`Thing.composite.earlyExitIfAvailabilityCheckFailed`, [
+  return compositeFrom(`earlyExitIfAvailabilityCheckFailed`, [
     {
       mapDependencies: {availability},
       compute: ({availability}, continuation) =>
@@ -1042,7 +1042,7 @@ export function earlyExitWithoutDependency(dependency, {
   mode = 'null',
   value = null,
 } = {}) {
-  return compositeFrom(`Thing.composite.earlyExitWithoutDependency`, [
+  return compositeFrom(`earlyExitWithoutDependency`, [
     withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
     earlyExitIfAvailabilityCheckFailed({value}),
   ]);
@@ -1054,7 +1054,7 @@ export function earlyExitWithoutUpdateValue({
   mode = 'null',
   value = null,
 } = {}) {
-  return compositeFrom(`Thing.composite.earlyExitWithoutDependency`, [
+  return compositeFrom(`earlyExitWithoutDependency`, [
     withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
     earlyExitIfAvailabilityCheckFailed({value}),
   ]);
@@ -1067,7 +1067,7 @@ export function raiseWithoutDependency(dependency, {
   map = {},
   raise = {},
 } = {}) {
-  return compositeFrom(`Thing.composite.raiseWithoutDependency`, [
+  return compositeFrom(`raiseWithoutDependency`, [
     withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
 
     {
@@ -1094,7 +1094,7 @@ export function raiseWithoutUpdateValue({
   map = {},
   raise = {},
 } = {}) {
-  return compositeFrom(`Thing.composite.raiseWithoutUpdateValue`, [
+  return compositeFrom(`raiseWithoutUpdateValue`, [
     withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
 
     {
@@ -1121,8 +1121,8 @@ export function raiseWithoutUpdateValue({
 // means mapping the "who" reference of each contribution to an artist
 // object, and filtering out those whose "who" doesn't match any artist.
 export function withResolvedContribs({from, to}) {
-  return Thing.composite.from(`Thing.composite.withResolvedContribs`, [
-    Thing.composite.raiseWithoutDependency(from, {
+  return compositeFrom(`withResolvedContribs`, [
+    raiseWithoutDependency(from, {
       mode: 'empty',
       map: {to},
       raise: {to: []},
@@ -1172,7 +1172,7 @@ export function withResolvedReference({
   to = '#resolvedReference',
   earlyExitIfNotFound = false,
 }) {
-  return compositeFrom(`Thing.composite.withResolvedReference`, [
+  return compositeFrom(`withResolvedReference`, [
     raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
     earlyExitWithoutDependency(data),
 
@@ -1210,7 +1210,7 @@ export function withResolvedReferenceList({
     throw new TypeError(`Expected notFoundMode to be filter, exit, or null`);
   }
 
-  return compositeFrom(`Thing.composite.withResolvedReferenceList`, [
+  return compositeFrom(`withResolvedReferenceList`, [
     earlyExitWithoutDependency(data, {value: []}),
 
     raiseWithoutDependency(list, {
