@@ -11,13 +11,14 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
-  withResolvedContribs,
-  withResolvedReference,
   withResultOfAvailabilityCheck,
-  withReverseReferenceList,
 } from '#composite';
 
-import Thing from './thing.js';
+import Thing, {
+  withResolvedContribs,
+  withResolvedReference,
+  withReverseReferenceList,
+} from './thing.js';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';

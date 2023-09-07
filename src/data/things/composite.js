@@ -1,17 +1,12 @@
 import {inspect} from 'node:util';
 
 import {color} from '#cli';
-import find from '#find';
-import {filterMultipleArrays} from '#wiki-data';
 
 import {
   empty,
   filterProperties,
   openAggregate,
-  stitchArrays,
 } from '#sugar';
-
-import Thing from './thing.js';
 
 // Composes multiple compositional "steps" and a "base" to form a property
 // descriptor out of modular building blocks. This is an extension to the
@@ -794,8 +789,6 @@ export function debug(fn) {
   return value;
 }
 
-// -- Compositional steps for compositions to nest --
-
 // Provides dependencies exactly as they are (or null if not defined) to the
 // continuation. Although this can *technically* be used to alias existing
 // dependencies to some other name within the middle of a composition, it's
@@ -833,8 +826,6 @@ function _export(mapping) {
     },
   };
 }
-
-// -- Compositional steps for top-level property descriptors --
 
 // Exposes a dependency exactly as it is; this is typically the base of a
 // composition which was created to serve as one property's descriptor.
@@ -1110,164 +1101,6 @@ export function raiseWithoutUpdateValue({
       mapContinuation: map,
       compute: ({'#options': {raise}}, continuation) =>
         continuation.raiseAbove(raise),
-    },
-  ]);
-}
-
-// -- Compositional steps for processing data --
-
-// Resolves the contribsByRef contained in the provided dependency,
-// providing (named by the second argument) the result. "Resolving"
-// means mapping the "who" reference of each contribution to an artist
-// object, and filtering out those whose "who" doesn't match any artist.
-export function withResolvedContribs({from, to}) {
-  return compositeFrom(`withResolvedContribs`, [
-    raiseWithoutDependency(from, {
-      mode: 'empty',
-      map: {to},
-      raise: {to: []},
-    }),
-
-    {
-      mapDependencies: {from},
-      compute: ({from}, continuation) =>
-        continuation({
-          '#whoByRef': from.map(({who}) => who),
-          '#what': from.map(({what}) => what),
-        }),
-    },
-
-    withResolvedReferenceList({
-      list: '#whoByRef',
-      data: 'artistData',
-      to: '#who',
-      find: find.artist,
-      notFoundMode: 'null',
-    }),
-
-    {
-      dependencies: ['#who', '#what'],
-      mapContinuation: {to},
-      compute({'#who': who, '#what': what}, continuation) {
-        filterMultipleArrays(who, what, (who, _what) => who);
-        return continuation({
-          to: stitchArrays({who, what}),
-        });
-      },
-    },
-  ]);
-}
-
-// Resolves a reference by using the provided find function to match it
-// within the provided thingData dependency. This will early exit if the
-// data dependency is null, or, if earlyExitIfNotFound is set to true,
-// if the find function doesn't match anything for the reference.
-// Otherwise, the data object is provided on the output dependency;
-// or null, if the reference doesn't match anything or itself was null
-// to begin with.
-export function withResolvedReference({
-  ref,
-  data,
-  find: findFunction,
-  to = '#resolvedReference',
-  earlyExitIfNotFound = false,
-}) {
-  return compositeFrom(`withResolvedReference`, [
-    raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
-    earlyExitWithoutDependency(data),
-
-    {
-      options: {findFunction, earlyExitIfNotFound},
-      mapDependencies: {ref, data},
-      mapContinuation: {match: to},
-
-      compute({ref, data, '#options': {findFunction, earlyExitIfNotFound}}, continuation) {
-        const match = findFunction(ref, data, {mode: 'quiet'});
-
-        if (match === null && earlyExitIfNotFound) {
-          return continuation.exit(null);
-        }
-
-        return continuation.raise({match});
-      },
-    },
-  ]);
-}
-
-// Resolves a list of references, with each reference matched with provided
-// data in the same way as withResolvedReference. This will early exit if the
-// data dependency is null (even if the reference list is empty). By default
-// it will filter out references which don't match, but this can be changed
-// to early exit ({notFoundMode: 'exit'}) or leave null in place ('null').
-export function withResolvedReferenceList({
-  list,
-  data,
-  find: findFunction,
-  to = '#resolvedReferenceList',
-  notFoundMode = 'filter',
-}) {
-  if (!['filter', 'exit', 'null'].includes(notFoundMode)) {
-    throw new TypeError(`Expected notFoundMode to be filter, exit, or null`);
-  }
-
-  return compositeFrom(`withResolvedReferenceList`, [
-    earlyExitWithoutDependency(data, {value: []}),
-
-    raiseWithoutDependency(list, {
-      map: {to},
-      raise: {to: []},
-      mode: 'empty',
-    }),
-
-    {
-      options: {findFunction, notFoundMode},
-      mapDependencies: {list, data},
-      mapContinuation: {matches: to},
-
-      compute({list, data, '#options': {findFunction, notFoundMode}}, continuation) {
-        let matches =
-          list.map(ref => findFunction(ref, data, {mode: 'quiet'}));
-
-        if (!matches.includes(null)) {
-          return continuation.raise({matches});
-        }
-
-        switch (notFoundMode) {
-          case 'filter':
-            matches = matches.filter(value => value !== null);
-            return continuation.raise({matches});
-
-          case 'exit':
-            return continuation.exit([]);
-
-          case 'null':
-            return continuation.raise({matches});
-        }
-      },
-    },
-  ]);
-}
-
-// Check out the info on Thing.common.reverseReferenceList!
-// This is its composable form.
-export function withReverseReferenceList({
-  data,
-  list: refListProperty,
-  to = '#reverseReferenceList',
-}) {
-  return compositeFrom(`Thing.common.reverseReferenceList`, [
-    earlyExitWithoutDependency(data, {value: []}),
-
-    {
-      dependencies: ['this'],
-      mapDependencies: {data},
-      mapContinuation: {to},
-      options: {refListProperty},
-
-      compute: ({this: thisThing, data, '#options': {refListProperty}}, continuation) =>
-        continuation({
-          to: data.filter(thing => thing[refListProperty].includes(thisThing)),
-        }),
     },
   ]);
 }
