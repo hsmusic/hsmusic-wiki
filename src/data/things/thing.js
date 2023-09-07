@@ -10,7 +10,7 @@ import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 
 import {
   from as compositeFrom,
-  earlyExitWithoutDependency,
+  exitWithoutDependency,
   exposeDependency,
   raiseWithoutDependency,
 } from '#composite';
@@ -389,7 +389,7 @@ export function withResolvedReference({
 }) {
   return compositeFrom(`withResolvedReference`, [
     raiseWithoutDependency(ref, {map: {to}, raise: {to: null}}),
-    earlyExitWithoutDependency(data),
+    exitWithoutDependency(data),
 
     {
       options: {findFunction, earlyExitIfNotFound},
@@ -426,8 +426,7 @@ export function withResolvedReferenceList({
   }
 
   return compositeFrom(`withResolvedReferenceList`, [
-    earlyExitWithoutDependency(data, {value: []}),
-
+    exitWithoutDependency(data, {value: []}),
     raiseWithoutDependency(list, {
       map: {to},
       raise: {to: []},
@@ -471,7 +470,7 @@ export function withReverseReferenceList({
   to = '#reverseReferenceList',
 }) {
   return compositeFrom(`Thing.common.reverseReferenceList`, [
-    earlyExitWithoutDependency(data, {value: []}),
+    exitWithoutDependency(data, {value: []}),
 
     {
       dependencies: ['this'],

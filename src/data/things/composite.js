@@ -1004,13 +1004,13 @@ export function exposeUpdateValueOrContinue({
 }
 
 // Early exits if an availability check has failed.
-// This is for internal use only - use `earlyExitWithoutDependency` or
-// `earlyExitWIthoutUpdateValue` instead.
-export function earlyExitIfAvailabilityCheckFailed({
+// This is for internal use only - use `exitWithoutDependency` or
+// `exitWithoutUpdateValue` instead.
+export function exitIfAvailabilityCheckFailed({
   availability = '#availability',
   value = null,
 } = {}) {
-  return compositeFrom(`earlyExitIfAvailabilityCheckFailed`, [
+  return compositeFrom(`exitIfAvailabilityCheckFailed`, [
     {
       mapDependencies: {availability},
       compute: ({availability}, continuation) =>
@@ -1029,25 +1029,25 @@ export function earlyExitIfAvailabilityCheckFailed({
 
 // Early exits if a dependency isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function earlyExitWithoutDependency(dependency, {
+export function exitWithoutDependency(dependency, {
   mode = 'null',
   value = null,
 } = {}) {
-  return compositeFrom(`earlyExitWithoutDependency`, [
+  return compositeFrom(`exitWithoutDependency`, [
     withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
-    earlyExitIfAvailabilityCheckFailed({value}),
+    exitIfAvailabilityCheckFailed({value}),
   ]);
 }
 
 // Early exits if this property's update value isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function earlyExitWithoutUpdateValue({
+export function exitWithoutUpdateValue({
   mode = 'null',
   value = null,
 } = {}) {
-  return compositeFrom(`earlyExitWithoutDependency`, [
+  return compositeFrom(`exitWithoutUpdateValue`, [
     withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
-    earlyExitIfAvailabilityCheckFailed({value}),
+    exitIfAvailabilityCheckFailed({value}),
   ]);
 }
 

@@ -6,7 +6,7 @@ import {empty} from '#sugar';
 
 import {
   from as compositeFrom,
-  earlyExitWithoutDependency,
+  exitWithoutDependency,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -93,7 +93,7 @@ export class Track extends Thing {
       // No cover art file extension if the track doesn't have unique artwork
       // in the first place.
       withHasUniqueCoverArt(),
-      earlyExitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
+      exitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
 
       // Expose custom coverArtFileExtension update value first.
       exposeUpdateValueOrContinue(),
@@ -114,7 +114,7 @@ export class Track extends Thing {
     // is specified, this value is null.
     coverArtDate: compositeFrom(`Track.coverArtDate`, [
       withHasUniqueCoverArt(),
-      earlyExitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
+      exitWithoutDependency('#hasUniqueCoverArt', {mode: 'falsy'}),
 
       exposeUpdateValueOrContinue(),
 
@@ -188,7 +188,7 @@ export class Track extends Thing {
     ]),
 
     otherReleases: compositeFrom(`Track.otherReleases`, [
-      earlyExitWithoutDependency('trackData', {mode: 'empty'}),
+      exitWithoutDependency('trackData', {mode: 'empty'}),
       withOriginalRelease({selfIfOriginal: true}),
 
       {
