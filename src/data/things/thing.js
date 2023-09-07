@@ -286,12 +286,8 @@ export function resolvedReference({ref, data, find}) {
 // properly.)
 export function dynamicContribs(contribsByRefProperty) {
   return compositeFrom(`dynamicContribs`, [
-    withResolvedContribs({
-      from: contribsByRefProperty,
-      into: '#contribs',
-    }),
-
-    exposeDependency({dependency: '#contribs'}),
+    withResolvedContribs({from: contribsByRefProperty}),
+    exposeDependency({dependency: '#resolvedContribs'}),
   ]);
 }
 
@@ -368,7 +364,10 @@ export function commentatorArtists(){
 // providing (named by the second argument) the result. "Resolving"
 // means mapping the "who" reference of each contribution to an artist
 // object, and filtering out those whose "who" doesn't match any artist.
-export function withResolvedContribs({from, into}) {
+export function withResolvedContribs({
+  from,
+  into = '#resolvedContribs',
+}) {
   return compositeFrom(`withResolvedContribs`, [
     raiseWithoutDependency({
       dependency: from,
