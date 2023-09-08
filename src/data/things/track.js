@@ -62,12 +62,6 @@ export class Track extends Thing {
     urls: urls(),
     dateFirstReleased: simpleDate(),
 
-    artTags: referenceList({
-      class: ArtTag,
-      find: find.artTag,
-      data: 'artTagData',
-    }),
-
     color: compositeFrom(`Track.color`, [
       exposeUpdateValueOrContinue(),
       withContainingTrackSection(),
@@ -139,89 +133,27 @@ export class Track extends Thing {
       }),
     ]),
 
+    commentary: commentary(),
+    lyrics: simpleString(),
+
+    additionalFiles: additionalFiles(),
+    sheetMusicFiles: additionalFiles(),
+    midiProjectFiles: additionalFiles(),
+
     originalReleaseTrack: singleReference({
       class: Track,
       find: find.track,
       data: 'trackData',
     }),
 
-    // Note - this is an internal property used only to help identify a track.
-    // It should not be assumed in general that the album and dataSourceAlbum match
-    // (i.e. a track may dynamically be moved from one album to another, at
-    // which point dataSourceAlbum refers to where it was originally from, and is
-    // not generally relevant information). It's also not guaranteed that
-    // dataSourceAlbum is available (depending on the Track creator to optionally
-    // provide this property's update value).
+    // Internal use only - for directly identifying an album inside a track's
+    // util.inspect display, if it isn't indirectly available (by way of being
+    // included in an album's track list).
     dataSourceAlbum: singleReference({
       class: Album,
       find: find.album,
       data: 'albumData',
     }),
-
-    commentary: commentary(),
-    lyrics: simpleString(),
-    additionalFiles: additionalFiles(),
-    sheetMusicFiles: additionalFiles(),
-    midiProjectFiles: additionalFiles(),
-
-    // Update only
-
-    albumData: wikiData(Album),
-    artistData: wikiData(Artist),
-    artTagData: wikiData(ArtTag),
-    flashData: wikiData(Flash),
-    trackData: wikiData(Track),
-
-    // Expose only
-
-    commentatorArtists: commentatorArtists(),
-
-    album: compositeFrom(`Track.album`, [
-      withAlbum(),
-      exposeDependency({dependency: '#album'}),
-    ]),
-
-    date: compositeFrom(`Track.date`, [
-      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
-      withAlbumProperty({property: 'date'}),
-      exposeDependency({dependency: '#album.date'}),
-    ]),
-
-    // Whether or not the track has "unique" cover artwork - a cover which is
-    // specifically associated with this track in particular, rather than with
-    // the track's album as a whole. This is typically used to select between
-    // displaying the track artwork and a fallback, such as the album artwork
-    // or a placeholder. (This property is named hasUniqueCoverArt instead of
-    // the usual hasCoverArt to emphasize that it does not inherit from the
-    // album.)
-    hasUniqueCoverArt: compositeFrom(`Track.hasUniqueCoverArt`, [
-      withHasUniqueCoverArt(),
-      exposeDependency({dependency: '#hasUniqueCoverArt'}),
-    ]),
-
-    otherReleases: compositeFrom(`Track.otherReleases`, [
-      exitWithoutDependency({dependency: 'trackData', mode: 'empty'}),
-      withOriginalRelease({selfIfOriginal: true}),
-
-      {
-        flags: {expose: true},
-        expose: {
-          dependencies: ['this', 'trackData', '#originalRelease'],
-          compute: ({
-            this: thisTrack,
-            trackData,
-            '#originalRelease': originalRelease,
-          }) =>
-            (originalRelease === thisTrack
-              ? []
-              : [originalRelease])
-              .concat(trackData.filter(track =>
-                track !== originalRelease &&
-                track !== thisTrack &&
-                track.originalReleaseTrack === originalRelease)),
-        },
-      },
-    ]),
 
     artistContribs: compositeFrom(`Track.artistContribs`, [
       inheritFromOriginalRelease({property: 'artistContribs'}),
@@ -281,6 +213,71 @@ export class Track extends Thing {
         find: find.track,
         data: 'trackData',
       }),
+    ]),
+
+    artTags: referenceList({
+      class: ArtTag,
+      find: find.artTag,
+      data: 'artTagData',
+    }),
+
+    // Update only
+
+    albumData: wikiData(Album),
+    artistData: wikiData(Artist),
+    artTagData: wikiData(ArtTag),
+    flashData: wikiData(Flash),
+    trackData: wikiData(Track),
+
+    // Expose only
+
+    commentatorArtists: commentatorArtists(),
+
+    album: compositeFrom(`Track.album`, [
+      withAlbum(),
+      exposeDependency({dependency: '#album'}),
+    ]),
+
+    date: compositeFrom(`Track.date`, [
+      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
+      withAlbumProperty({property: 'date'}),
+      exposeDependency({dependency: '#album.date'}),
+    ]),
+
+    // Whether or not the track has "unique" cover artwork - a cover which is
+    // specifically associated with this track in particular, rather than with
+    // the track's album as a whole. This is typically used to select between
+    // displaying the track artwork and a fallback, such as the album artwork
+    // or a placeholder. (This property is named hasUniqueCoverArt instead of
+    // the usual hasCoverArt to emphasize that it does not inherit from the
+    // album.)
+    hasUniqueCoverArt: compositeFrom(`Track.hasUniqueCoverArt`, [
+      withHasUniqueCoverArt(),
+      exposeDependency({dependency: '#hasUniqueCoverArt'}),
+    ]),
+
+    otherReleases: compositeFrom(`Track.otherReleases`, [
+      exitWithoutDependency({dependency: 'trackData', mode: 'empty'}),
+      withOriginalRelease({selfIfOriginal: true}),
+
+      {
+        flags: {expose: true},
+        expose: {
+          dependencies: ['this', 'trackData', '#originalRelease'],
+          compute: ({
+            this: thisTrack,
+            trackData,
+            '#originalRelease': originalRelease,
+          }) =>
+            (originalRelease === thisTrack
+              ? []
+              : [originalRelease])
+              .concat(trackData.filter(track =>
+                track !== originalRelease &&
+                track !== thisTrack &&
+                track.originalReleaseTrack === originalRelease)),
+        },
+      },
     ]),
 
     // Specifically exclude re-releases from this list - while it's useful to
