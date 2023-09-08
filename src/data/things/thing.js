@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {colors} from '#cli';
 import find from '#find';
-import {empty, stitchArrays} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 
 import {
@@ -334,29 +334,40 @@ export function wikiData(thingClass) {
 // This one's kinda tricky: it parses artist "references" from the
 // commentary content, and finds the matching artist for each reference.
 // This is mostly useful for credits and listings on artist pages.
-export function commentatorArtists(){
-  return {
-    flags: {expose: true},
+export function commentatorArtists() {
+  return compositeFrom(`commentatorArtists`, [
+    exitWithoutDependency({dependency: 'commentary', mode: 'falsy', value: []}),
 
-    expose: {
-      dependencies: ['artistData', 'commentary'],
-
-      compute: ({artistData, commentary}) =>
-        artistData && commentary
-          ? Array.from(
-              new Set(
-                Array.from(
-                  commentary
-                    .replace(/<\/?b>/g, '')
-                    .matchAll(/<i>(?<who>.*?):<\/i>/g)
-                ).map(({groups: {who}}) =>
-                  find.artist(who, artistData, {mode: 'quiet'})
-                )
-              )
-            )
-          : [],
+    {
+      dependencies: ['commentary'],
+      compute: ({commentary}, continuation) =>
+        continuation({
+          '#artistRefs':
+            Array.from(
+              commentary
+                .replace(/<\/?b>/g, '')
+                .matchAll(/<i>(?<who>.*?):<\/i>/g))
+              .map(({groups: {who}}) => who),
+        }),
     },
-  };
+
+    withResolvedReferenceList({
+      list: '#artistRefs',
+      data: 'artistData',
+      into: '#artists',
+      find: find.artist,
+    }),
+
+    {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['#artists'],
+        compute: ({'#artists': artists}) =>
+          unique(artists),
+      },
+    },
+  ]);
 }
 
 // Compositional utilities
