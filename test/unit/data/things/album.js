@@ -6,7 +6,6 @@ import thingConstructors from '#things';
 const {
   Album,
   Artist,
-  Thing,
   Track,
 } = thingConstructors;
 
@@ -18,6 +17,13 @@ function stubArtistAndContribs() {
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
 
   return {artist, contribs, badContribs};
+}
+
+function stubTrack(directory = 'foo') {
+  const track = new Track();
+  track.directory = directory;
+
+  return track;
 }
 
 t.test(`Album.coverArtDate`, t => {
@@ -94,4 +100,46 @@ t.test(`Album.coverArtFileExtension`, t => {
 
   t.equal(album.coverArtFileExtension, null,
     `Album.coverArtFileExtension #5: is null if coverArtistContribs resolves empty`);
+});
+
+t.test(`Album.tracks`, t => {
+  t.plan(4);
+
+  const album = new Album();
+  const track1 = stubTrack('track1');
+  const track2 = stubTrack('track2');
+  const track3 = stubTrack('track3');
+
+  linkAndBindWikiData({
+    albumData: [album],
+    trackData: [track1, track2, track3],
+  });
+
+  t.same(album.tracks, [],
+    `Album.tracks #1: defaults to empty array`);
+
+  album.trackSections = [
+    {tracks: ['track:track1', 'track:track2', 'track:track3']},
+  ];
+
+  t.same(album.tracks, [track1, track2, track3],
+    `Album.tracks #2: pulls tracks from one track section`);
+
+  album.trackSections = [
+    {tracks: ['track:track1']},
+    {tracks: ['track:track2', 'track:track3']},
+  ];
+
+  t.same(album.tracks, [track1, track2, track3],
+    `Album.tracks #3: pulls tracks from multiple track sections`);
+
+  album.trackSections = [
+    {tracks: ['track:track1', 'track:does-not-exist']},
+    {tracks: ['track:this-one-neither', 'track:track2']},
+    {tracks: ['track:effectively-empty-section']},
+    {tracks: ['track:track3']},
+  ];
+
+  t.same(album.tracks, [track1, track2, track3],
+    `Album.tracks #4: filters out references without matches`);
 });
