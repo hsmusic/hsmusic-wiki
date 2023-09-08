@@ -32,14 +32,20 @@ function stubTrack(directory = 'foo') {
 function stubTrackAndAlbum(trackDirectory = 'foo', albumDirectory = 'bar') {
   const track = stubTrack(trackDirectory);
   const album = stubAlbum([track], albumDirectory);
+
   return {track, album};
 }
 
-function stubArtistAndContribs() {
+function stubArtist(artistName = `Test Artist`) {
   const artist = new Artist();
-  artist.name = `Test Artist`;
+  artist.name = artistName;
 
-  const contribs = [{who: `Test Artist`, what: null}];
+  return artist;
+}
+
+function stubArtistAndContribs(artistName = `Test Artist`) {
+  const artist = stubArtist(artistName);
+  const contribs = [{who: artistName, what: null}];
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
 
   return {artist, contribs, badContribs};
@@ -158,6 +164,62 @@ t.test(`Track.color`, t => {
 
   t.throws(() => { track.color = '#aeiouw'; }, TypeError,
     `color #5: must be set to valid color`);
+});
+
+t.test(`Track.commentatorArtists`, t => {
+  t.plan(6);
+
+  const track = new Track();
+  const artist1 = stubArtist(`SnooPING`);
+  const artist2 = stubArtist(`ASUsual`);
+  const artist3 = stubArtist(`Icy`);
+
+  linkAndBindWikiData({
+    trackData: [track],
+    artistData: [artist1, artist2, artist3],
+  });
+
+  track.commentary =
+    `<i>SnooPING:</i>\n` +
+    `Wow.\n`;
+
+  t.same(track.commentatorArtists, [artist1],
+    `Track.commentatorArtists #1: works with one commentator`);
+
+  track.commentary +=
+    `<i>ASUsual:</i>\n` +
+    `Yes!\n`;
+
+  t.same(track.commentatorArtists, [artist1, artist2],
+    `Track.commentatorArtists #2: works with two commentators`);
+
+  track.commentary +=
+    `<i><b>Icy:</b></i>\n` +
+    `Incredible.\n`;
+
+  t.same(track.commentatorArtists, [artist1, artist2, artist3],
+    `Track.commentatorArtists #3: works with boldface name`);
+
+  track.commentary =
+    `<i>Icy:</i> (project manager)\n` +
+    `Very good track.\n`;
+
+  t.same(track.commentatorArtists, [artist3],
+    `Track.commentatorArtists #4: works with parenthical accent`);
+
+  track.commentary +=
+    `<i>SNooPING ASUsual Icy:</i>\n` +
+    `WITH ALL THREE POWERS COMBINED...`;
+
+  t.same(track.commentatorArtists, [artist3],
+    `Track.commentatorArtists #5: ignores artist names not found`);
+
+  track.commentary +=
+    `<i>Icy:</i>\n` +
+    `I'm back!\n`;
+
+  t.same(track.commentatorArtists, [artist3],
+    `Track.commentatorArtists #6: ignores duplicate artist`);
 });
 
 t.test(`Track.coverArtDate`, t => {
