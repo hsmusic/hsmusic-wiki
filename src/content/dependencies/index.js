@@ -77,12 +77,12 @@ export function watchContentDependencies({
   // prematurely find out there aren't any nulls - before the nulls have
   // been entered at all!).
 
-  readdir(metaDirname).then(files => {
+  readdir(watchPath).then(files => {
     if (closed) {
       return;
     }
 
-    const filePaths = files.map(file => path.join(metaDirname, file));
+    const filePaths = files.map(file => path.join(watchPath, file));
     for (const filePath of filePaths) {
       if (filePath === metaPath) continue;
       const functionName = getFunctionName(filePath);
@@ -91,7 +91,7 @@ export function watchContentDependencies({
       }
     }
 
-    const watcher = chokidar.watch(metaDirname);
+    const watcher = chokidar.watch(watchPath);
 
     watcher.on('all', (event, filePath) => {
       if (!['add', 'change'].includes(event)) return;
