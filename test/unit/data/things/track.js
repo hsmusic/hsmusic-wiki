@@ -161,10 +161,10 @@ t.test(`Track.color`, t => {
 });
 
 t.test(`Track.coverArtDate`, t => {
-  t.plan(6);
+  t.plan(8);
 
   const {track, album} = stubTrackAndAlbum();
-  const {artist, contribs} = stubArtistAndContribs();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
 
   const {XXX_decacheWikiData} = linkAndBindWikiData({
     albumData: [album],
@@ -192,19 +192,32 @@ t.test(`Track.coverArtDate`, t => {
   track.coverArtistContribs = [];
 
   t.equal(track.coverArtDate, null,
-    `coverArtDate #4: is null if track is missing coverArtists`);
+    `coverArtDate #4: is null if track coverArtistContribs empty`);
 
   album.trackCoverArtistContribs = contribs;
 
   XXX_decacheWikiData();
 
   t.same(track.coverArtDate, new Date('2009-09-09'),
-    `coverArtDate #5: is not null if album specifies trackCoverArtistContribs`);
+    `coverArtDate #5: is not null if album trackCoverArtistContribs specified`);
 
+  album.trackCoverArtistContribs = badContribs;
+
+  XXX_decacheWikiData();
+
+  t.equal(track.coverArtDate, null,
+    `coverArtDate #6: is null if album trackCoverArtistContribs resolves empty`);
+
+  track.coverArtistContribs = badContribs;
+
+  t.equal(track.coverArtDate, null,
+    `coverArtDate #7: is null if track coverArtistContribs resolves empty`);
+
+  track.coverArtistContribs = contribs;
   track.disableUniqueCoverArt = true;
 
   t.equal(track.coverArtDate, null,
-    `coverArtDate #6: is null if track disables unique cover artwork`);
+    `coverArtDate #8: is null if track disables unique cover artwork`);
 });
 
 t.test(`Track.coverArtFileExtension`, t => {
