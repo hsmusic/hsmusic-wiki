@@ -1,6 +1,6 @@
 import find from '#find';
 import {stitchArrays} from '#sugar';
-import {isDate, isDimensions, isTrackSectionList} from '#validators';
+import {isDate, isTrackSectionList} from '#validators';
 
 import {
   compositeFrom,
@@ -19,6 +19,7 @@ import Thing, {
   commentatorArtists,
   contribsPresent,
   contributionList,
+  dimensions,
   directory,
   fileExtension,
   flag,
@@ -171,10 +172,7 @@ export class Album extends Thing {
 
     bannerStyle: simpleString(),
     bannerFileExtension: fileExtension('jpg'),
-    bannerDimensions: {
-      flags: {update: true, expose: true},
-      update: {validate: isDimensions},
-    },
+    bannerDimensions: dimensions(),
 
     hasTrackNumbers: flag(true),
     isListedOnHomepage: flag(true),

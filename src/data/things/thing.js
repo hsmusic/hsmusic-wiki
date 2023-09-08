@@ -25,6 +25,7 @@ import {
   isColor,
   isContributionList,
   isDate,
+  isDimensions,
   isDirectory,
   isFileExtension,
   isName,
@@ -119,6 +120,15 @@ export function fileExtension(defaultFileExtension = null) {
     flags: {update: true, expose: true},
     update: {validate: isFileExtension},
     expose: {transform: (value) => value ?? defaultFileExtension},
+  };
+}
+
+// Plain ol' image dimensions. This is a two-item array of positive integers,
+// corresponding to width and height respectively.
+export function dimensions() {
+  return {
+    flags: {update: true, expose: true},
+    update: {validate: isDimensions},
   };
 }
 
