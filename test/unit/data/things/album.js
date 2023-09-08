@@ -59,3 +59,39 @@ t.test(`Album.coverArtDate`, t => {
   t.equal(album.coverArtDate, null,
     `Album.coverArtDate #6: is null if coverArtistContribs resolves empty`);
 });
+
+t.test(`Album.coverArtFileExtension`, t => {
+  t.plan(5);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.coverArtFileExtension, null,
+    `Album.coverArtFileExtension #1: is null if coverArtistContribs empty (1/2)`);
+
+  album.coverArtFileExtension = 'png';
+
+  t.equal(album.coverArtFileExtension, null,
+    `Album.coverArtFileExtension #2: is null if coverArtistContribs empty (2/2)`);
+
+  album.coverArtFileExtension = null;
+  album.coverArtistContribs = contribs;
+
+  t.equal(album.coverArtFileExtension, 'jpg',
+    `Album.coverArtFileExtension #3: defaults to jpg`);
+
+  album.coverArtFileExtension = 'png';
+
+  t.equal(album.coverArtFileExtension, 'png',
+    `Album.coverArtFileExtension #4: is own value`);
+
+  album.coverArtistContribs = badContribs;
+
+  t.equal(album.coverArtFileExtension, null,
+    `Album.coverArtFileExtension #5: is null if coverArtistContribs resolves empty`);
+});
