@@ -1072,6 +1072,8 @@ export function raiseWithoutUpdateValue({
   ]);
 }
 
+// Turns an updating property's update value into a dependency, so it can be
+// conveniently passed to other functions.
 export function withUpdateValueAsDependency({
   into = '#updateValue',
 } = {}) {
@@ -1083,6 +1085,79 @@ export function withUpdateValueAsDependency({
       mapContinuation: {into},
       transform: (value, continuation) =>
         continuation(value, {into: value}),
+    },
+  };
+}
+
+// Flattens an array with one level of nested arrays, providing as dependencies
+// both the flattened array as well as the original starting indices of each
+// successive source array.
+export function withFlattenedArray({
+  from,
+  into = '#flattenedArray',
+  intoIndices = '#flattenedIndices',
+}) {
+  return {
+    annotation: `withFlattenedArray`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {from},
+      mapContinuation: {into, intoIndices},
+
+      compute({from: sourceArray}, continuation) {
+        const into = sourceArray.flat();
+        const intoIndices = [];
+
+        let lastEndIndex = 0;
+        for (const {length} of sourceArray) {
+          intoIndices.push(lastEndIndex);
+          lastEndIndex += length;
+        }
+
+        return continuation({into, intoIndices});
+      },
+    },
+  };
+}
+
+// After mapping the contents of a flattened array in-place (being careful to
+// retain the original indices by replacing unmatched results with null instead
+// of filtering them out), this function allows for recombining them. It will
+// filter out null and undefined items by default (pass {filter: false} to
+// disable this).
+export function withUnflattenedArray({
+  from,
+  fromIndices = '#flattenedIndices',
+  into = '#unflattenedArray',
+  filter = true,
+}) {
+  return {
+    annotation: `withUnflattenedArray`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {from, fromIndices},
+      mapContinuation: {into},
+      compute({from, fromIndices}, continuation) {
+        const arrays = [];
+
+        for (let i = 0; i < fromIndices.length; i++) {
+          const startIndex = fromIndices[i];
+          const endIndex =
+            (i === fromIndices.length - 1
+              ? from.length
+              : fromIndices[i + 1]);
+
+          const values = from.slice(startIndex, endIndex);
+          arrays.push(
+            (filter
+              ? values.filter(value => value !== null && value !== undefined)
+              : values));
+        }
+
+        return continuation({into: arrays});
+      },
     },
   };
 }
