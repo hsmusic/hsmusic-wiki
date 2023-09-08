@@ -21,13 +21,11 @@ import {
   logError,
   logInfo,
   logWarn,
-  progressCallAll,
   progressPromiseAll,
 } from '#cli';
 
 import {
   getPagePathname,
-  getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
 } from '#urls';
@@ -269,13 +267,6 @@ export async function go({
     await progressPromiseAll(`Writing ${language.code}`, queue([
       ...pageWrites.map(page => () => {
         const pagePath = page.path;
-
-        const localizedPathnames = getPagePathnameAcrossLanguages({
-          defaultLanguage,
-          languages,
-          pagePath,
-          urls,
-        });
 
         const pathname = getPagePathname({
           baseDirectory,

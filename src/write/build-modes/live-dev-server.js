@@ -14,7 +14,6 @@ import {empty} from '#sugar';
 
 import {
   getPagePathname,
-  getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
 } from '#urls';
@@ -331,13 +330,6 @@ export async function go({
         console.log(`${requestHead} [301] (redirect) ${pathname}`);
         return;
       }
-
-      const localizedPathnames = getPagePathnameAcrossLanguages({
-        defaultLanguage,
-        languages,
-        pagePath: servePath,
-        urls,
-      });
 
       const bound = bindUtilities({
         absoluteTo,
