@@ -2,6 +2,13 @@ import find from '#find';
 import {empty} from '#sugar';
 import {isDate, isDimensions, isTrackSectionList} from '#validators';
 
+import {
+  compositeFrom,
+  exitWithoutDependency,
+  exposeDependency,
+  exposeUpdateValueOrContinue,
+} from '#composite';
+
 import Thing, {
   additionalFiles,
   commentary,
@@ -18,6 +25,7 @@ import Thing, {
   simpleString,
   urls,
   wikiData,
+  withResolvedContribs,
 } from './thing.js';
 
 export class Album extends Thing {
@@ -35,19 +43,16 @@ export class Album extends Thing {
     trackArtDate: simpleDate(),
     dateAddedToWiki: simpleDate(),
 
-    coverArtDate: {
-      flags: {update: true, expose: true},
+    coverArtDate: compositeFrom(`Album.coverArtDate`, [
+      withResolvedContribs({from: 'coverArtistContribs'}),
+      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
 
-      update: {validate: isDate},
-
-      expose: {
-        dependencies: ['date', 'coverArtistContribs'],
-        transform: (coverArtDate, {coverArtistContribs, date}) =>
-          (!empty(coverArtistContribs)
-            ? coverArtDate ?? date ?? null
-            : null),
-      },
-    },
+      exposeUpdateValueOrContinue(),
+      exposeDependency({
+        dependency: 'date',
+        update: {validate: isDate},
+      }),
+    ]),
 
     artistContribs: contributionList(),
     coverArtistContribs: contributionList(),
@@ -102,7 +107,12 @@ export class Album extends Thing {
       },
     },
 
-    coverArtFileExtension: fileExtension('jpg'),
+    coverArtFileExtension: compositeFrom(`Album.coverArtFileExtension`, [
+      withResolvedContribs({from: 'coverArtistContribs'}),
+      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
+      fileExtension('jpg'),
+    ]),
+
     trackCoverArtFileExtension: fileExtension('jpg'),
 
     wallpaperStyle: simpleString(),
