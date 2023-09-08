@@ -1,12 +1,15 @@
 import find from '#find';
-import {empty} from '#sugar';
+import {stitchArrays} from '#sugar';
 import {isDate, isDimensions, isTrackSectionList} from '#validators';
 
 import {
   compositeFrom,
   exitWithoutDependency,
+  exitWithoutUpdateValue,
   exposeDependency,
   exposeUpdateValueOrContinue,
+  withFlattenedArray,
+  withUnflattenedArray,
 } from '#composite';
 
 import Thing, {
@@ -73,40 +76,87 @@ export class Album extends Thing {
       data: 'artTagData',
     }),
 
-    trackSections: {
-      flags: {update: true, expose: true},
+    trackSections: compositeFrom(`Album.trackSections`, [
+      exitWithoutDependency({dependency: 'trackData', value: []}),
+      exitWithoutUpdateValue({value: [], mode: 'empty'}),
 
-      update: {
-        validate: isTrackSectionList,
+      {
+        transform: (trackSections, continuation) =>
+          continuation(trackSections, {
+            '#sectionTrackRefs':
+              trackSections.map(section => section.tracks),
+
+            '#sectionDateOriginallyReleased':
+              trackSections
+                .map(({dateOriginallyReleased}) => dateOriginallyReleased ?? null),
+
+            '#sectionIsDefaultTrackSection':
+              trackSections
+                .map(({isDefaultTrackSection}) => isDefaultTrackSection ?? false),
+          }),
       },
 
-      expose: {
-        dependencies: ['color', 'trackData'],
-        transform(trackSections, {
-          color: albumColor,
-          trackData,
-        }) {
-          let startIndex = 0;
-          return trackSections?.map(section => ({
-            name: section.name ?? null,
-            color: section.color ?? albumColor ?? null,
-            dateOriginallyReleased: section.dateOriginallyReleased ?? null,
-            isDefaultTrackSection: section.isDefaultTrackSection ?? false,
+      {
+        dependencies: ['color'],
+        transform: (trackSections, {color: albumColor}, continuation) =>
+          continuation(trackSections, {
+            '#sectionColor':
+              trackSections
+                .map(({color: sectionColor}) => sectionColor ?? albumColor),
+          }),
+      },
 
-            startIndex: (
-              startIndex += section.tracks.length,
-              startIndex - section.tracks.length
-            ),
+      withFlattenedArray({
+        from: '#sectionTrackRefs',
+        into: '#trackRefs',
+        intoIndices: '#sectionStartIndex',
+      }),
 
-            tracks:
-              (trackData && section.tracks
-                ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
-                .filter(Boolean)) ??
-              [],
-          }));
+      withResolvedReferenceList({
+        list: '#trackRefs',
+        data: 'trackData',
+        mode: 'null',
+        find: find.track,
+        into: '#tracks',
+      }),
+
+      withUnflattenedArray({
+        from: '#tracks',
+        fromIndices: '#sectionStartIndex',
+        into: '#sectionTracks',
+      }),
+
+      {
+        flags: {update: true, expose: true},
+
+        update: {validate: isTrackSectionList},
+
+        expose: {
+          dependencies: [
+            '#sectionTracks',
+            '#sectionColor',
+            '#sectionDateOriginallyReleased',
+            '#sectionIsDefaultTrackSection',
+            '#sectionStartIndex',
+          ],
+
+          transform: (trackSections, {
+            '#sectionTracks': tracks,
+            '#sectionColor': color,
+            '#sectionDateOriginallyReleased': dateOriginallyReleased,
+            '#sectionIsDefaultTrackSection': isDefaultTrackSection,
+            '#sectionStartIndex': startIndex,
+          }) =>
+            stitchArrays({
+              tracks,
+              color,
+              dateOriginallyReleased,
+              isDefaultTrackSection,
+              startIndex,
+            }),
         },
       },
-    },
+    ]),
 
     coverArtFileExtension: compositeFrom(`Album.coverArtFileExtension`, [
       withResolvedContribs({from: 'coverArtistContribs'}),
@@ -149,15 +199,12 @@ export class Album extends Thing {
     hasBannerArt: contribsPresent('bannerArtistContribs'),
 
     tracks: compositeFrom(`Album.tracks`, [
-      exitWithoutDependency({
-        dependency: 'trackSections',
-        mode: 'empty',
-        value: [],
-      }),
+      exitWithoutDependency({dependency: 'trackData', value: []}),
+      exitWithoutDependency({dependency: 'trackSections', mode: 'empty', value: []}),
 
       {
-        dependencies: ['trackSections', 'trackData'],
-        compute: ({trackSections, trackData}, continuation) =>
+        dependencies: ['trackSections'],
+        compute: ({trackSections}, continuation) =>
           continuation({
             '#trackRefs': trackSections
               .flatMap(section => section.tracks ?? []),
