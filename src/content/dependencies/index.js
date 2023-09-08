@@ -30,7 +30,6 @@ export function watchContentDependencies({
   const contentDependencies = {};
 
   let emittedReady = false;
-  let allDependenciesFulfilled = false;
   let closed = false;
 
   let _close = () => {};

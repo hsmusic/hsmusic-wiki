@@ -91,7 +91,6 @@ export async function go({
   srcRootPath,
   thumbsCache,
   urls,
-  urlSpec,
   wikiData,
 
   cachebust,
@@ -469,14 +468,9 @@ async function writeFavicon({
 }
 
 async function writeSharedFilesAndPages({
-  language,
   outputPath,
-  urls,
-  wikiData,
   wikiDataJSON,
 }) {
-  const {groupData, wikiInfo} = wikiData;
-
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
     wikiDataJSON &&
       writeFile(

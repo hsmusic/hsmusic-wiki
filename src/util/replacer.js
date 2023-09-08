@@ -5,7 +5,6 @@
 // function, which converts nodes parsed here into actual HTML, links, etc
 // for embedding in a wiki webpage.
 
-import {logError, logWarn} from '#cli';
 import * as html from '#html';
 import {escapeRegex} from '#sugar';
 

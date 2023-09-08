@@ -1,14 +1,4 @@
-import {accumulateSum, empty, showAggregate} from '#sugar';
-
-import {
-  chunkByProperties,
-  getArtistNumContributions,
-  getTotalDuration,
-  sortAlphabetically,
-  sortByDate,
-  sortChronologically,
-  sortFlashesChronologically,
-} from '#wiki-data';
+import {empty, showAggregate} from '#sugar';
 
 const listingSpec = [];
 

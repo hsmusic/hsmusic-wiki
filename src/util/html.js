@@ -242,7 +242,7 @@ export class Tag {
       this.selfClosing &&
       !(value === null ||
         value === undefined ||
-        !Boolean(value) ||
+        !value ||
         Array.isArray(value) && value.filter(Boolean).length === 0)
     ) {
       throw new Error(`Tag <${this.tagName}> is self-closing but got content`);

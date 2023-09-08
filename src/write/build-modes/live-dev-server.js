@@ -10,7 +10,6 @@ import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import * as pageSpecs from '#page-specs';
 import {serializeThings} from '#serialize';
-import {empty} from '#sugar';
 
 import {
   getPagePathname,

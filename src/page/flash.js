@@ -1,5 +1,3 @@
-import {empty} from '#sugar';
-
 export const description = `flash & game pages`;
 
 export function condition({wikiData}) {
