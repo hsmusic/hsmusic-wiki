@@ -335,8 +335,8 @@ export function fileIssue({
   topMessage = `This shouldn't happen.`,
 } = {}) {
   if (topMessage) {
-    console.error(color.red(`${topMessage} Please let the HSMusic developers know:`));
+    console.error(colors.red(`${topMessage} Please let the HSMusic developers know:`));
   }
-  console.error(color.red(`- https://hsmusic.wiki/feedback/`));
-  console.error(color.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
+  console.error(colors.red(`- https://hsmusic.wiki/feedback/`));
+  console.error(colors.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
 }
