@@ -491,19 +491,20 @@ export function withResolvedReferenceList({
         let matches =
           list.map(ref => findFunction(ref, data, {mode: 'quiet'}));
 
-        if (!matches.includes(null)) {
+        if (matches.every(match => match)) {
           return continuation.raise({matches});
         }
 
         switch (notFoundMode) {
           case 'filter':
-            matches = matches.filter(value => value !== null);
+            matches = matches.filter(match => match);
             return continuation.raise({matches});
 
           case 'exit':
             return continuation.exit([]);
 
           case 'null':
+            matches = matches.map(match => match ?? null);
             return continuation.raise({matches});
         }
       },
