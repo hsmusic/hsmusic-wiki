@@ -19,7 +19,6 @@ import {
   isColor,
   isContributionList,
   isDate,
-  isDuration,
   isFileExtension,
 } from '#validators';
 
@@ -31,6 +30,7 @@ import Thing, {
   commentatorArtists,
   contributionList,
   directory,
+  duration,
   flag,
   name,
   referenceList,
@@ -54,11 +54,7 @@ export class Track extends Thing {
     name: name('Unnamed Track'),
     directory: directory(),
 
-    duration: {
-      flags: {update: true, expose: true},
-      update: {validate: isDuration},
-    },
-
+    duration: duration(),
     urls: urls(),
     dateFirstReleased: simpleDate(),
 

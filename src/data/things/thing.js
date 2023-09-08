@@ -27,6 +27,7 @@ import {
   isDate,
   isDimensions,
   isDirectory,
+  isDuration,
   isFileExtension,
   isName,
   isString,
@@ -129,6 +130,15 @@ export function dimensions() {
   return {
     flags: {update: true, expose: true},
     update: {validate: isDimensions},
+  };
+}
+
+// Duration! This is a number of seconds, possibly floating point, always
+// at minimum zero.
+export function duration() {
+  return {
+    flags: {update: true, expose: true},
+    update: {validate: isDuration},
   };
 }
 
