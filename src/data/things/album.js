@@ -26,6 +26,7 @@ import Thing, {
   urls,
   wikiData,
   withResolvedContribs,
+  withResolvedReferenceList,
 } from './thing.js';
 
 export class Album extends Thing {
@@ -147,20 +148,30 @@ export class Album extends Thing {
     hasWallpaperArt: contribsPresent('wallpaperArtistContribs'),
     hasBannerArt: contribsPresent('bannerArtistContribs'),
 
-    tracks: {
-      flags: {expose: true},
+    tracks: compositeFrom(`Album.tracks`, [
+      exitWithoutDependency({
+        dependency: 'trackSections',
+        mode: 'empty',
+        value: [],
+      }),
 
-      expose: {
+      {
         dependencies: ['trackSections', 'trackData'],
-        compute: ({trackSections, trackData}) =>
-          (trackSections && trackData
-            ? trackSections
-                .flatMap(section => section.tracks ?? [])
-                .map(ref => find.track(ref, trackData, {mode: 'quiet'}))
-                .filter(Boolean)
-            : []),
+        compute: ({trackSections, trackData}, continuation) =>
+          continuation({
+            '#trackRefs': trackSections
+              .flatMap(section => section.tracks ?? []),
+          }),
       },
-    },
+
+      withResolvedReferenceList({
+        list: '#trackRefs',
+        data: 'trackData',
+        find: find.track,
+      }),
+
+      exposeDependency({dependency: '#resolvedReferenceList'}),
+    ]),
   });
 
   static [Thing.getSerializeDescriptors] = ({
