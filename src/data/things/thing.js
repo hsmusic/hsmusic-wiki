@@ -514,29 +514,45 @@ export function withResolvedReferenceList({
     }),
 
     {
-      options: {findFunction, notFoundMode},
       mapDependencies: {list, data},
-      mapContinuation: {matches: into},
+      options: {findFunction},
 
-      compute({list, data, '#options': {findFunction, notFoundMode}}, continuation) {
-        let matches =
-          list.map(ref => findFunction(ref, data, {mode: 'quiet'}));
+      compute: ({list, data, '#options': {findFunction}}, continuation) =>
+        continuation({
+          '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
+        }),
+    },
 
-        if (matches.every(match => match)) {
-          return continuation.raise({matches});
-        }
+    {
+      dependencies: ['#matches'],
+      mapContinuation: {into},
 
+      compute: ({'#matches': matches}, continuation) =>
+        (matches.every(match => match)
+          ? continuation.raise({into: matches})
+          : continuation()),
+    },
+
+    {
+      dependencies: ['#matches'],
+      options: {notFoundMode},
+      mapContinuation: {into},
+
+      compute({
+        '#matches': matches,
+        '#options': {notFoundMode},
+      }, continuation) {
         switch (notFoundMode) {
-          case 'filter':
-            matches = matches.filter(match => match);
-            return continuation.raise({matches});
-
           case 'exit':
             return continuation.exit([]);
 
+          case 'filter':
+            matches = matches.filter(match => match);
+            return continuation.raise({into: matches});
+
           case 'null':
             matches = matches.map(match => match ?? null);
-            return continuation.raise({matches});
+            return continuation.raise({into: matches});
         }
       },
     },
