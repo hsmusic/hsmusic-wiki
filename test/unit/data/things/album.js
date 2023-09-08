@@ -143,3 +143,71 @@ t.test(`Album.tracks`, t => {
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #4: filters out references without matches`);
 });
+
+t.test(`Album.trackSections`, t => {
+  t.plan(5);
+
+  const album = new Album();
+  const track1 = stubTrack('track1');
+  const track2 = stubTrack('track2');
+  const track3 = stubTrack('track3');
+  const track4 = stubTrack('track4');
+
+  linkAndBindWikiData({
+    albumData: [album],
+    trackData: [track1, track2, track3, track4],
+  });
+
+  album.trackSections = [
+    {tracks: ['track:track1', 'track:track2']},
+    {tracks: ['track:track3', 'track:track4']},
+  ];
+
+  t.match(album.trackSections, [
+    {tracks: [track1, track2]},
+    {tracks: [track3, track4]},
+  ], `Album.trackSections #1: exposes tracks`);
+
+  t.match(album.trackSections, [
+    {tracks: [track1, track2], startIndex: 0},
+    {tracks: [track3, track4], startIndex: 2},
+  ], `Album.trackSections #2: exposes startIndex`);
+
+  album.color = '#123456';
+
+  album.trackSections = [
+    {tracks: ['track:track1'], color: null},
+    {tracks: ['track:track2'], color: '#abcdef'},
+    {tracks: ['track:track3'], color: null},
+  ];
+
+  t.match(album.trackSections, [
+    {tracks: [track1], color: '#123456'},
+    {tracks: [track2], color: '#abcdef'},
+    {tracks: [track3], color: '#123456'},
+  ], `Album.trackSections #3: exposes color, inherited from album`);
+
+  album.trackSections = [
+    {tracks: ['track:track1'], dateOriginallyReleased: null},
+    {tracks: ['track:track2'], dateOriginallyReleased: new Date('2009-04-11')},
+    {tracks: ['track:track3'], dateOriginallyReleased: null},
+  ];
+
+  t.match(album.trackSections, [
+    {tracks: [track1], dateOriginallyReleased: null},
+    {tracks: [track2], dateOriginallyReleased: new Date('2009-04-11')},
+    {tracks: [track3], dateOriginallyReleased: null},
+  ], `Album.trackSections #4: exposes dateOriginallyReleased, if present`);
+
+  album.trackSections = [
+    {tracks: ['track:track1'], isDefaultTrackSection: true},
+    {tracks: ['track:track2'], isDefaultTrackSection: false},
+    {tracks: ['track:track3'], isDefaultTrackSection: null},
+  ];
+
+  t.match(album.trackSections, [
+    {tracks: [track1], isDefaultTrackSection: true},
+    {tracks: [track2], isDefaultTrackSection: false},
+    {tracks: [track3], isDefaultTrackSection: false},
+  ], `Album.trackSections #5: exposes isDefaultTrackSection, defaults to false`);
+});

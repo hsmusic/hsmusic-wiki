@@ -383,7 +383,7 @@ t.test(`Track.hasUniqueCoverArt`, t => {
     `hasUniqueCoverArt #7: is false if track's coverArtistContribs resolve empty`);
 });
 
-t.only(`Track.originalReleaseTrack`, t => {
+t.test(`Track.originalReleaseTrack`, t => {
   t.plan(3);
 
   const {track: track1, album: album1} = stubTrackAndAlbum('track1');
