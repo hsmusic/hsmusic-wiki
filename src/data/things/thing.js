@@ -15,6 +15,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   raiseWithoutDependency,
+  withResultOfAvailabilityCheck,
   withUpdateValueAsDependency,
 } from '#composite';
 
@@ -297,15 +298,11 @@ export function singleReference({
 
 // Nice 'n simple shorthand for an exposed-only flag which is true when any
 // contributions are present in the specified property.
-export function contribsPresent(contribsProperty) {
-  return {
-    flags: {expose: true},
-    expose: {
-      dependencies: [contribsProperty],
-      compute: ({[contribsProperty]: contribs}) =>
-        !empty(contribs),
-    },
-  };
+export function contribsPresent({contribs}) {
+  return compositeFrom(`contribsPresent`, [
+    withResultOfAvailabilityCheck({fromDependency: contribs, mode: 'empty'}),
+    exposeDependency({dependency: '#availability'}),
+  ]);
 }
 
 // Neat little shortcut for "reversing" the reference lists stored on other

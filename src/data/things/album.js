@@ -194,9 +194,9 @@ export class Album extends Thing {
 
     commentatorArtists: commentatorArtists(),
 
-    hasCoverArt: contribsPresent('coverArtistContribs'),
-    hasWallpaperArt: contribsPresent('wallpaperArtistContribs'),
-    hasBannerArt: contribsPresent('bannerArtistContribs'),
+    hasCoverArt: contribsPresent({contribs: 'coverArtistContribs'}),
+    hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),
+    hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
 
     tracks: compositeFrom(`Album.tracks`, [
       exitWithoutDependency({dependency: 'trackData', value: []}),
