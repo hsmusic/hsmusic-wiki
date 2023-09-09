@@ -3,7 +3,6 @@ import {stitchArrays} from '#sugar';
 import {isDate, isTrackSectionList} from '#validators';
 
 import {
-  compositeFrom,
   exitWithoutDependency,
   exitWithoutUpdateValue,
   exposeDependency,
@@ -51,7 +50,7 @@ export class Album extends Thing {
     trackArtDate: simpleDate(),
     dateAddedToWiki: simpleDate(),
 
-    coverArtDate: compositeFrom(`Album.coverArtDate`, [
+    coverArtDate: [
       withResolvedContribs({from: 'coverArtistContribs'}),
       exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
 
@@ -60,7 +59,7 @@ export class Album extends Thing {
         dependency: 'date',
         update: {validate: isDate},
       }),
-    ]),
+    ],
 
     artistContribs: contributionList(),
     coverArtistContribs: contributionList(),
@@ -80,7 +79,7 @@ export class Album extends Thing {
       data: 'artTagData',
     }),
 
-    trackSections: compositeFrom(`Album.trackSections`, [
+    trackSections: [
       exitWithoutDependency({dependency: 'trackData', value: []}),
       exitWithoutUpdateValue({value: [], mode: 'empty'}),
 
@@ -150,13 +149,13 @@ export class Album extends Thing {
             }),
         },
       },
-    ]),
+    ],
 
-    coverArtFileExtension: compositeFrom(`Album.coverArtFileExtension`, [
+    coverArtFileExtension: [
       withResolvedContribs({from: 'coverArtistContribs'}),
       exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
       fileExtension('jpg'),
-    ]),
+    ],
 
     trackCoverArtFileExtension: fileExtension('jpg'),
 
@@ -189,7 +188,7 @@ export class Album extends Thing {
     hasWallpaperArt: contribsPresent('wallpaperArtistContribs'),
     hasBannerArt: contribsPresent('bannerArtistContribs'),
 
-    tracks: compositeFrom(`Album.tracks`, [
+    tracks: [
       exitWithoutDependency({dependency: 'trackData', value: []}),
       exitWithoutDependency({dependency: 'trackSections', mode: 'empty', value: []}),
 
@@ -209,7 +208,7 @@ export class Album extends Thing {
       }),
 
       exposeDependency({dependency: '#resolvedReferenceList'}),
-    ]),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({

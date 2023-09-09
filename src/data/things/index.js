@@ -2,6 +2,7 @@ import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {logError} from '#cli';
+import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
 import {openAggregate, showAggregate} from '#sugar';
 
@@ -130,8 +131,16 @@ function evaluatePropertyDescriptors() {
         throw new Error(`Missing [Thing.getPropertyDescriptors] function`);
       }
 
-      constructor.propertyDescriptors =
-        constructor[Thing.getPropertyDescriptors](opts);
+      const results = constructor[Thing.getPropertyDescriptors](opts);
+
+      for (const [key, value] of Object.entries(results)) {
+        if (Array.isArray(value)) {
+          results[key] = compositeFrom(`${constructor.name}.${key}`, value);
+          continue;
+        }
+      }
+
+      constructor.propertyDescriptors = results;
     },
 
     showFailedClasses(failedClasses) {
