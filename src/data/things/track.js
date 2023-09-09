@@ -61,22 +61,12 @@ export class Track extends Thing {
 
     color: compositeFrom(`Track.color`, [
       exposeUpdateValueOrContinue(),
-      withContainingTrackSection(),
 
-      {
-        dependencies: ['#trackSection'],
-        compute: ({'#trackSection': trackSection}, continuation) =>
-          // Album.trackSections guarantees the track section will have a
-          // color property (inheriting from the album's own color), but only
-          // if it's actually present! Color will be inherited directly from
-          // album otherwise.
-          (trackSection
-            ? trackSection.color
-            : continuation()),
-      },
+      withContainingTrackSection(),
+      withPropertyFromObject({object: '#trackSection', property: 'color'}),
+      exposeDependencyOrContinue({dependency: '#trackSection.color'}),
 
       withPropertyFromAlbum({property: 'color'}),
-
       exposeDependency({
         dependency: '#album.color',
         update: {validate: isColor},
@@ -94,19 +84,13 @@ export class Track extends Thing {
     // of the album's main artwork. It does inherit trackCoverArtFileExtension,
     // if present on the album.
     coverArtFileExtension: compositeFrom(`Track.coverArtFileExtension`, [
-      // No cover art file extension if the track doesn't have unique artwork
-      // in the first place.
-      withHasUniqueCoverArt(),
-      exitWithoutDependency({dependency: '#hasUniqueCoverArt', mode: 'falsy'}),
+      exitWithoutUniqueCoverArt(),
 
-      // Expose custom coverArtFileExtension update value first.
       exposeUpdateValueOrContinue(),
 
-      // Expose album's trackCoverArtFileExtension if no update value set.
       withPropertyFromAlbum({property: 'trackCoverArtFileExtension'}),
       exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
 
-      // Fallback to 'jpg'.
       exposeConstant({
         value: 'jpg',
         update: {validate: isFileExtension},
@@ -175,13 +159,7 @@ export class Track extends Thing {
     // typically varies by release and isn't defined by the musical qualities
     // of the track.
     coverArtistContribs: compositeFrom(`Track.coverArtistContribs`, [
-      {
-        dependencies: ['disableUniqueCoverArt'],
-        compute: ({disableUniqueCoverArt}, continuation) =>
-          (disableUniqueCoverArt
-            ? null
-            : continuation()),
-      },
+      exitWithoutUniqueCoverArt(),
 
       withUpdateValueAsDependency(),
       withResolvedContribs({from: '#updateValue', into: '#coverArtistContribs'}),
@@ -556,6 +534,21 @@ function withHasUniqueCoverArt({
           ? continuation.raise({into: false})
           : continuation.raise({into: true})),
     },
+  ]);
+}
+
+// Shorthand for checking if the track has unique cover art and exposing a
+// fallback value if it isn't.
+function exitWithoutUniqueCoverArt({
+  value = null,
+} = {}) {
+  return compositeFrom(`exitWithoutUniqueCoverArt`, [
+    withHasUniqueCoverArt(),
+    exitWithoutDependency({
+      dependency: '#hasUniqueCoverArt',
+      mode: 'falsy',
+      value,
+    }),
   ]);
 }
 
