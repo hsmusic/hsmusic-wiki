@@ -603,7 +603,31 @@ export function compositeFrom(firstArg, secondArg) {
           : step);
 
       if (!expose) {
-        debug(() => `step #${i+1} - no expose description, nothing to do for this step`);
+        if (!isBase) {
+          debug(() => `step #${i+1} - no expose description, nothing to do for this step`);
+          continue;
+        }
+
+        if (expectingTransform) {
+          debug(() => `step #${i+1} (base) - no expose description, returning so-far update value:`, valueSoFar);
+          if (continuationIfApplicable) {
+            debug(() => colors.bright(`end composition - raise (inferred - composing)`));
+            return continuationIfApplicable(valueSoFar);
+          } else {
+            debug(() => colors.bright(`end composition - exit (inferred - not composing)`));
+            return valueSoFar;
+          }
+        } else {
+          debug(() => `step #${i+1} (base) - no expose description, nothing to continue with`);
+          if (continuationIfApplicable) {
+            debug(() => colors.bright(`end composition - raise (inferred - composing)`));
+            return continuationIfApplicable();
+          } else {
+            debug(() => colors.bright(`end composition - exit (inferred - not composing)`));
+            return null;
+          }
+        }
+
         continue;
       }
 
