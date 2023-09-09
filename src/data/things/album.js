@@ -23,6 +23,7 @@ import Thing, {
   contributionList,
   dimensions,
   directory,
+  exitWithoutContribs,
   fileExtension,
   flag,
   name,
@@ -31,7 +32,6 @@ import Thing, {
   simpleString,
   urls,
   wikiData,
-  withResolvedContribs,
   withResolvedReferenceList,
 } from './thing.js';
 
@@ -51,9 +51,7 @@ export class Album extends Thing {
     dateAddedToWiki: simpleDate(),
 
     coverArtDate: [
-      withResolvedContribs({from: 'coverArtistContribs'}),
-      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
-
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
       exposeUpdateValueOrContinue(),
       exposeDependency({
         dependency: 'date',
@@ -152,8 +150,7 @@ export class Album extends Thing {
     ],
 
     coverArtFileExtension: [
-      withResolvedContribs({from: 'coverArtistContribs'}),
-      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
       fileExtension('jpg'),
     ],
 

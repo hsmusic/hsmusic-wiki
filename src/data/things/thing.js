@@ -436,6 +436,23 @@ export function withResolvedContribs({
   ]);
 }
 
+// Shorthand for exiting if the contribution list (usually a property's update
+// value) resolves to empty - ensuring that the later computed results are only
+// returned if these contributions are present.
+export function exitWithoutContribs({
+  contribs,
+  value = null,
+}) {
+  return compositeFrom(`exitWithoutContribs`, [
+    withResolvedContribs({from: contribs}),
+    exitWithoutDependency({
+      dependency: '#resolvedContribs',
+      mode: 'empty',
+      value,
+    }),
+  ]);
+}
+
 // Resolves a reference by using the provided find function to match it
 // within the provided thingData dependency. This will early exit if the
 // data dependency is null, or, if notFoundMode is set to 'exit', if the find
