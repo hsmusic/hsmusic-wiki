@@ -26,6 +26,101 @@ function stubTrack(directory = 'foo') {
   return track;
 }
 
+t.test(`Album.bannerDimensions`, t => {
+  t.plan(4);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.bannerDimensions, null,
+    `Album.bannerDimensions #1: defaults to null`);
+
+  album.bannerDimensions = [1200, 275];
+
+  t.equal(album.bannerDimensions, null,
+    `Album.bannerDimensions #2: is null if bannerArtistContribs empty`);
+
+  album.bannerArtistContribs = badContribs;
+
+  t.equal(album.bannerDimensions, null,
+    `Album.bannerDimensions #3: is null if bannerArtistContribs resolves empty`);
+
+  album.bannerArtistContribs = contribs;
+
+  t.same(album.bannerDimensions, [1200, 275],
+    `Album.bannerDimensions #4: is own value`);
+});
+
+t.test(`Album.bannerFileExtension`, t => {
+  t.plan(5);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.bannerFileExtension, null,
+    `Album.bannerFileExtension #1: defaults to null`);
+
+  album.bannerFileExtension = 'png';
+
+  t.equal(album.bannerFileExtension, null,
+    `Album.bannerFileExtension #2: is null if bannerArtistContribs empty`);
+
+  album.bannerArtistContribs = badContribs;
+
+  t.equal(album.bannerFileExtension, null,
+    `Album.bannerFileExtension #3: is null if bannerArtistContribs resolves empty`);
+
+  album.bannerArtistContribs = contribs;
+
+  t.equal(album.bannerFileExtension, 'png',
+    `Album.bannerFileExtension #4: is own value`);
+
+  album.bannerFileExtension = null;
+
+  t.equal(album.bannerFileExtension, 'jpg',
+    `Album.bannerFileExtension #5: defaults to jpg`);
+});
+
+t.test(`Album.bannerStyle`, t => {
+  t.plan(4);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.bannerStyle, null,
+    `Album.bannerStyle #1: defaults to null`);
+
+  album.bannerStyle = `opacity: 0.5`;
+
+  t.equal(album.bannerStyle, null,
+    `Album.bannerStyle #2: is null if bannerArtistContribs empty`);
+
+  album.bannerArtistContribs = badContribs;
+
+  t.equal(album.bannerStyle, null,
+    `Album.bannerStyle #3: is null if bannerArtistContribs resolves empty`);
+
+  album.bannerArtistContribs = contribs;
+
+  t.equal(album.bannerStyle, `opacity: 0.5`,
+    `Album.bannerStyle #4: is own value`);
+});
+
 t.test(`Album.coverArtDate`, t => {
   t.plan(6);
 
@@ -210,4 +305,69 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track2], isDefaultTrackSection: false},
     {tracks: [track3], isDefaultTrackSection: false},
   ], `Album.trackSections #5: exposes isDefaultTrackSection, defaults to false`);
+});
+
+t.test(`Album.wallpaperFileExtension`, t => {
+  t.plan(5);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.wallpaperFileExtension, null,
+    `Album.wallpaperFileExtension #1: defaults to null`);
+
+  album.wallpaperFileExtension = 'png';
+
+  t.equal(album.wallpaperFileExtension, null,
+    `Album.wallpaperFileExtension #2: is null if wallpaperArtistContribs empty`);
+
+  album.wallpaperArtistContribs = contribs;
+
+  t.equal(album.wallpaperFileExtension, 'png',
+    `Album.wallpaperFileExtension #3: is own value`);
+
+  album.wallpaperFileExtension = null;
+
+  t.equal(album.wallpaperFileExtension, 'jpg',
+    `Album.wallpaperFileExtension #4: defaults to jpg`);
+
+  album.wallpaperArtistContribs = badContribs;
+
+  t.equal(album.wallpaperFileExtension, null,
+    `Album.wallpaperFileExtension #5: is null if wallpaperArtistContribs resolves empty`);
+});
+
+t.test(`Album.wallpaperStyle`, t => {
+  t.plan(4);
+
+  const album = new Album();
+  const {artist, contribs, badContribs} = stubArtistAndContribs();
+
+  linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+  });
+
+  t.equal(album.wallpaperStyle, null,
+    `Album.wallpaperStyle #1: defaults to null`);
+
+  album.wallpaperStyle = `opacity: 0.5`;
+
+  t.equal(album.wallpaperStyle, null,
+    `Album.wallpaperStyle #2: is null if wallpaperArtistContribs empty`);
+
+  album.wallpaperArtistContribs = badContribs;
+
+  t.equal(album.wallpaperStyle, null,
+    `Album.wallpaperStyle #3: is null if wallpaperArtistContribs resolves empty`);
+
+  album.wallpaperArtistContribs = contribs;
+
+  t.equal(album.wallpaperStyle, `opacity: 0.5`,
+    `Album.wallpaperStyle #4: is own value`);
 });
