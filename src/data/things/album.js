@@ -59,23 +59,44 @@ export class Album extends Thing {
       }),
     ],
 
-    artistContribs: contributionList(),
-    coverArtistContribs: contributionList(),
-    trackCoverArtistContribs: contributionList(),
-    wallpaperArtistContribs: contributionList(),
-    bannerArtistContribs: contributionList(),
+    coverArtFileExtension: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      fileExtension('jpg'),
+    ],
 
-    groups: referenceList({
-      class: Group,
-      find: find.group,
-      data: 'groupData',
-    }),
+    trackCoverArtFileExtension: fileExtension('jpg'),
 
-    artTags: referenceList({
-      class: ArtTag,
-      find: find.artTag,
-      data: 'artTagData',
-    }),
+    wallpaperFileExtension: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      fileExtension('jpg'),
+    ],
+
+    bannerFileExtension: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      fileExtension('jpg'),
+    ],
+
+    wallpaperStyle: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      simpleString(),
+    ],
+
+    bannerStyle: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      simpleString(),
+    ],
+
+    bannerDimensions: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      dimensions(),
+    ],
+
+    hasTrackNumbers: flag(true),
+    isListedOnHomepage: flag(true),
+    isListedInGalleries: flag(true),
+
+    commentary: commentary(),
+    additionalFiles: additionalFiles(),
 
     trackSections: [
       exitWithoutDependency({dependency: 'trackData', value: []}),
@@ -149,26 +170,23 @@ export class Album extends Thing {
       },
     ],
 
-    coverArtFileExtension: [
-      exitWithoutContribs({contribs: 'coverArtistContribs'}),
-      fileExtension('jpg'),
-    ],
+    artistContribs: contributionList(),
+    coverArtistContribs: contributionList(),
+    trackCoverArtistContribs: contributionList(),
+    wallpaperArtistContribs: contributionList(),
+    bannerArtistContribs: contributionList(),
 
-    trackCoverArtFileExtension: fileExtension('jpg'),
+    groups: referenceList({
+      class: Group,
+      find: find.group,
+      data: 'groupData',
+    }),
 
-    wallpaperStyle: simpleString(),
-    wallpaperFileExtension: fileExtension('jpg'),
-
-    bannerStyle: simpleString(),
-    bannerFileExtension: fileExtension('jpg'),
-    bannerDimensions: dimensions(),
-
-    hasTrackNumbers: flag(true),
-    isListedOnHomepage: flag(true),
-    isListedInGalleries: flag(true),
-
-    commentary: commentary(),
-    additionalFiles: additionalFiles(),
+    artTags: referenceList({
+      class: ArtTag,
+      find: find.artTag,
+      data: 'artTagData',
+    }),
 
     // Update only
 
