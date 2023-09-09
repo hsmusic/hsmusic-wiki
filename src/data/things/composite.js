@@ -432,13 +432,8 @@ export function compositeFrom(firstArg, secondArg) {
           ? step.expose
           : step);
 
-      const stepComputes = !!expose.compute;
-      const stepTransforms = !!expose.transform;
-
-      if (!stepComputes && !stepTransforms) {
-        push(new TypeError(`Steps must provide compute or transform (or both)`));
-        return;
-      }
+      const stepComputes = !!expose?.compute;
+      const stepTransforms = !!expose?.transform;
 
       if (
         stepTransforms && !stepComputes &&
@@ -459,7 +454,7 @@ export function compositeFrom(firstArg, secondArg) {
       // Unmapped dependencies are exposed on the final composition only if
       // they're "public", i.e. pointing to update values of other properties
       // on the CacheableObject.
-      for (const dependency of expose.dependencies ?? []) {
+      for (const dependency of expose?.dependencies ?? []) {
         if (typeof dependency === 'string' && dependency.startsWith('#')) {
           continue;
         }
@@ -470,22 +465,14 @@ export function compositeFrom(firstArg, secondArg) {
       // Mapped dependencies are always exposed on the final composition.
       // These are explicitly for reading values which are named outside of
       // the current compositional step.
-      for (const dependency of Object.values(expose.mapDependencies ?? {})) {
+      for (const dependency of Object.values(expose?.mapDependencies ?? {})) {
         exposeDependencies.add(dependency);
       }
     });
   }
 
-  if (!baseComposes) {
-    if (baseUpdates) {
-      if (!anyStepsTransform) {
-        aggregate.push(new TypeError(`Expected at least one step to transform`));
-      }
-    } else {
-      if (!anyStepsCompute) {
-        aggregate.push(new TypeError(`Expected at least one step to compute`));
-      }
-    }
+  if (!baseComposes && !baseUpdates && !anyStepsCompute) {
+    aggregate.push(new TypeError(`Expected at least one step to compute`));
   }
 
   aggregate.close();
@@ -614,6 +601,11 @@ export function compositeFrom(firstArg, secondArg) {
         (step.flags
           ? step.expose
           : step);
+
+      if (!expose) {
+        debug(() => `step #${i+1} - no expose description, nothing to do for this step`);
+        continue;
+      }
 
       const callingTransformForThisStep =
         expectingTransform && expose.transform;
