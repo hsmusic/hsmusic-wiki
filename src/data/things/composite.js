@@ -1090,10 +1090,8 @@ export function withUpdateValueAsDependency({
 }
 
 // Gets a property of some object (in a dependency) and provides that value.
-// If the object itself is null, the provided dependency will also always be
-// null. By default, it'll also be null if the object doesn't have the listed
-// property (or its value is undefined/null); provide a value on {missing} to
-// default to something else here.
+// If the object itself is null, or the object doesn't have the listed property,
+// the provided dependency will also be null.
 export function withPropertyFromObject({
   object,
   property,
@@ -1113,11 +1111,10 @@ export function withPropertyFromObject({
       mapContinuation: {into},
       options: {property},
 
-      compute({object, '#options': {property}}, continuation) {
-        if (object === null || object === undefined) return continuation({into: null});
-        if (!Object.hasOwn(object, property)) return continuation({into: null});
-        return continuation({into: object[property] ?? null});
-      },
+      compute: ({object, '#options': {property}}, continuation) =>
+        (object === null || object === undefined
+          ? continuation({into: null})
+          : continuation({into: object[property] ?? null})),
     },
   };
 }
@@ -1125,13 +1122,11 @@ export function withPropertyFromObject({
 // Gets a property from each of a list of objects (in a dependency) and
 // provides the results. This doesn't alter any list indices, so positions
 // which were null in the original list are kept null here. Objects which don't
-// have the specified property are also included in-place as null, by default;
-// provide a value on {missing} to default to something else here.
+// have the specified property are retained in-place as null.
 export function withPropertyFromList({
   list,
   property,
   into = null,
-  missing = null,
 }) {
   into ??=
     (list.startsWith('#')
@@ -1154,11 +1149,10 @@ export function withPropertyFromList({
 
         return continuation({
           into:
-            list.map(item => {
-              if (item === null || item === undefined) return null;
-              if (!Object.hasOwn(item, property)) return missing;
-              return item[property] ?? missing;
-            }),
+            list.map(item =>
+              (item === null || item === undefined
+                ? null
+                : item[property] ?? null)),
         });
       },
     },
