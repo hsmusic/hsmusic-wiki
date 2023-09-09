@@ -240,7 +240,7 @@ t.test(`Album.tracks`, t => {
 });
 
 t.test(`Album.trackSections`, t => {
-  t.plan(5);
+  t.plan(6);
 
   const album = new Album();
   const track1 = stubTrack('track1');
@@ -305,6 +305,20 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track2], isDefaultTrackSection: false},
     {tracks: [track3], isDefaultTrackSection: false},
   ], `Album.trackSections #5: exposes isDefaultTrackSection, defaults to false`);
+
+  album.trackSections = [
+    {tracks: ['track:track1', 'track:track2', 'track:snooping'], color: '#112233'},
+    {tracks: ['track:track3', 'track:as-usual'],                 color: '#334455'},
+    {tracks: [],                                                 color: '#bbbbba'},
+    {tracks: ['track:icy', 'track:chilly', 'track:frigid'],      color: '#556677'},
+    {tracks: ['track:track4'],                                   color: '#778899'},
+  ];
+
+  t.match(album.trackSections, [
+    {tracks: [track1, track2], color: '#112233'},
+    {tracks: [track3],         color: '#334455'},
+    {tracks: [track4],         color: '#778899'},
+  ], `Album.trackSections #6: filters out references without matches & empty sections`);
 });
 
 t.test(`Album.wallpaperFileExtension`, t => {

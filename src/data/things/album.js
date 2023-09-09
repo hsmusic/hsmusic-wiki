@@ -1,6 +1,7 @@
 import find from '#find';
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 import {isDate, isTrackSectionList} from '#validators';
+import {filterMultipleArrays} from '#wiki-data';
 
 import {
   exitWithoutDependency,
@@ -152,20 +153,25 @@ export class Album extends Thing {
             '#sections.startIndex',
           ],
 
-          transform: (trackSections, {
+          transform(trackSections, {
             '#sections.tracks': tracks,
             '#sections.color': color,
             '#sections.dateOriginallyReleased': dateOriginallyReleased,
             '#sections.isDefaultTrackSection': isDefaultTrackSection,
             '#sections.startIndex': startIndex,
-          }) =>
-            stitchArrays({
+          }) {
+            filterMultipleArrays(
+              tracks, color, dateOriginallyReleased, isDefaultTrackSection, startIndex,
+              tracks => !empty(tracks));
+
+            return stitchArrays({
               tracks,
               color,
               dateOriginallyReleased,
               isDefaultTrackSection,
               startIndex,
-            }),
+            });
+          }
         },
       },
     ],
