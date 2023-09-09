@@ -75,7 +75,7 @@ export class Track extends Thing {
             : continuation()),
       },
 
-      withAlbumProperty({property: 'color'}),
+      withPropertyFromAlbum({property: 'color'}),
 
       exposeDependency({
         dependency: '#album.color',
@@ -103,7 +103,7 @@ export class Track extends Thing {
       exposeUpdateValueOrContinue(),
 
       // Expose album's trackCoverArtFileExtension if no update value set.
-      withAlbumProperty({property: 'trackCoverArtFileExtension'}),
+      withPropertyFromAlbum({property: 'trackCoverArtFileExtension'}),
       exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
 
       // Fallback to 'jpg'.
@@ -123,7 +123,7 @@ export class Track extends Thing {
 
       exposeUpdateValueOrContinue(),
 
-      withAlbumProperty({property: 'trackArtDate'}),
+      withPropertyFromAlbum({property: 'trackArtDate'}),
       exposeDependency({
         dependency: '#album.trackArtDate',
         update: {validate: isDate},
@@ -159,7 +159,7 @@ export class Track extends Thing {
       withResolvedContribs({from: '#updateValue', into: '#artistContribs'}),
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
-      withAlbumProperty({property: 'artistContribs'}),
+      withPropertyFromAlbum({property: 'artistContribs'}),
       exposeDependency({
         dependency: '#album.artistContribs',
         update: {validate: isContributionList},
@@ -187,7 +187,7 @@ export class Track extends Thing {
       withResolvedContribs({from: '#updateValue', into: '#coverArtistContribs'}),
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
-      withAlbumProperty({property: 'trackCoverArtistContribs'}),
+      withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
       exposeDependency({
         dependency: '#album.trackCoverArtistContribs',
         update: {validate: isContributionList},
@@ -237,7 +237,7 @@ export class Track extends Thing {
 
     date: compositeFrom(`Track.date`, [
       exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
-      withAlbumProperty({property: 'date'}),
+      withPropertyFromAlbum({property: 'date'}),
       exposeDependency({dependency: '#album.date'}),
     ]),
 
@@ -424,53 +424,14 @@ function withAlbum({
 // property name prefixed with '#album.' (by default). If the track's album
 // isn't available, then by default, the property will be provided as null;
 // set {notFoundMode: 'exit'} to early exit instead.
-function withAlbumProperty({
+function withPropertyFromAlbum({
   property,
   into = '#album.' + property,
   notFoundMode = 'null',
 }) {
-  return compositeFrom(`withAlbumProperty`, [
+  return compositeFrom(`withPropertyFromAlbum`, [
     withAlbum({notFoundMode}),
     withPropertyFromObject({object: '#album', property, into}),
-  ]);
-}
-
-// Gets the listed properties from this track's album, providing them as
-// dependencies (by default) with '#album.' prefixed before each property
-// name. If the track's album isn't available, then by default, the same
-// dependency names will be provided as null; set {notFoundMode: 'exit'}
-// to early exit instead.
-function withAlbumProperties({
-  properties,
-  prefix = '#album',
-  notFoundMode = 'null',
-}) {
-  return compositeFrom(`withAlbumProperties`, [
-    withAlbum({notFoundMode}),
-
-    {
-      dependencies: ['#album'],
-      options: {properties, prefix},
-
-      compute({
-        '#album': album,
-        '#options': {properties, prefix},
-      }, continuation) {
-        const raise = {};
-
-        if (album) {
-          for (const property of properties) {
-            raise[prefix + '.' + property] = album[property];
-          }
-        } else {
-          for (const property of properties) {
-            raise[prefix + '.' + property] = null;
-          }
-        }
-
-        return continuation.raise(raise);
-      },
-    },
   ]);
 }
 
@@ -486,7 +447,7 @@ function withContainingTrackSection({
   }
 
   return compositeFrom(`withContainingTrackSection`, [
-    withAlbumProperty({property: 'trackSections', notFoundMode}),
+    withPropertyFromAlbum({property: 'trackSections', notFoundMode}),
 
     {
       dependencies: ['this', '#album.trackSections'],
@@ -585,7 +546,7 @@ function withHasUniqueCoverArt({
           : continuation.raise({into: true})),
     },
 
-    withAlbumProperty({property: 'trackCoverArtistContribs'}),
+    withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
 
     {
       dependencies: ['#album.trackCoverArtistContribs'],
