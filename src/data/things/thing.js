@@ -15,6 +15,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   raiseWithoutDependency,
+  withPropertyFromList,
   withUpdateValueAsDependency,
 } from '#composite';
 
@@ -408,14 +409,8 @@ export function withResolvedContribs({
       raise: {into: []},
     }),
 
-    {
-      mapDependencies: {from},
-      compute: ({from}, continuation) =>
-        continuation({
-          '#artistRefs': from.map(({who}) => who),
-          '#what': from.map(({what}) => what),
-        }),
-    },
+    withPropertyFromList({list: from, property: 'who', into: '#artistRefs'}),
+    withPropertyFromList({list: from, property: 'what', into: '#what'}),
 
     withResolvedReferenceList({
       list: '#artistRefs',

@@ -1089,6 +1089,133 @@ export function withUpdateValueAsDependency({
   };
 }
 
+// Gets a property of some object (in a dependency) and provides that value.
+// If the object itself is null, the provided dependency will also always be
+// null. By default, it'll also be null if the object doesn't have the listed
+// property (or its value is undefined/null); provide a value on {missing} to
+// default to something else here.
+export function withPropertyFromObject({
+  object,
+  property,
+  into = null,
+}) {
+  into ??=
+    (object.startsWith('#')
+      ? `${object}.${property}`
+      : `#${object}.${property}`);
+
+  return {
+    annotation: `withPropertyFromObject`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {object},
+      mapContinuation: {into},
+      options: {property},
+
+      compute({object, '#options': {property}}, continuation) {
+        if (object === null || object === undefined) return continuation({into: null});
+        if (!Object.hasOwn(object, property)) return continuation({into: null});
+        return continuation({into: object[property] ?? null});
+      },
+    },
+  };
+}
+
+// Gets a property from each of a list of objects (in a dependency) and
+// provides the results. This doesn't alter any list indices, so positions
+// which were null in the original list are kept null here. Objects which don't
+// have the specified property are also included in-place as null, by default;
+// provide a value on {missing} to default to something else here.
+export function withPropertyFromList({
+  list,
+  property,
+  into = null,
+  missing = null,
+}) {
+  into ??=
+    (list.startsWith('#')
+      ? `${list}.${property}`
+      : `#${list}.${property}`);
+
+  return {
+    annotation: `withPropertyFromList`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {list},
+      mapContinuation: {into},
+      options: {property},
+
+      compute({list, '#options': {property}}, continuation) {
+        if (list === undefined || empty(list)) {
+          return continuation({into: []});
+        }
+
+        return continuation({
+          into:
+            list.map(item => {
+              if (item === null || item === undefined) return null;
+              if (!Object.hasOwn(item, property)) return missing;
+              return item[property] ?? missing;
+            }),
+        });
+      },
+    },
+  };
+}
+
+// Replaces items of a list, which are null or undefined, with some fallback
+// value, either a constant (set {value}) or from a dependency ({dependency}).
+// By default, this replaces the passed dependency.
+export function fillMissingListItems({
+  list,
+  value,
+  dependency,
+  into = list,
+}) {
+  if (value !== undefined && dependency !== undefined) {
+    throw new TypeError(`Don't provide both value and dependency`);
+  }
+
+  if (value === undefined && dependency === undefined) {
+    throw new TypeError(`Missing value or dependency`);
+  }
+
+  if (dependency) {
+    return {
+      annotation: `fillMissingListItems.fromDependency`,
+      flags: {expose: true, compose: true},
+
+      expose: {
+        mapDependencies: {list, dependency},
+        mapContinuation: {into},
+
+        compute: ({list, dependency}, continuation) =>
+          continuation({
+            into: list.map(item => item ?? dependency),
+          }),
+      },
+    };
+  } else {
+    return {
+      annotation: `fillMissingListItems.fromValue`,
+      flags: {expose: true, compose: true},
+
+      expose: {
+        mapDependencies: {list},
+        mapContinuation: {into},
+        options: {value},
+
+        compute: ({list, '#options': {value}}, continuation) =>
+          continuation({
+            into: list.map(item => item ?? value),
+          }),
+      },
+    };
+  }
+}
+
 // Flattens an array with one level of nested arrays, providing as dependencies
 // both the flattened array as well as the original starting indices of each
 // successive source array.

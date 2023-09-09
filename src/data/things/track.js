@@ -11,6 +11,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  withPropertyFromObject,
   withResultOfAvailabilityCheck,
   withUpdateValueAsDependency,
 } from '#composite';
@@ -430,20 +431,7 @@ function withAlbumProperty({
 }) {
   return compositeFrom(`withAlbumProperty`, [
     withAlbum({notFoundMode}),
-
-    {
-      dependencies: ['#album'],
-      options: {property},
-      mapContinuation: {into},
-
-      compute: ({
-        '#album': album,
-        '#options': {property},
-      }, continuation) =>
-        (album
-          ? continuation.raise({into: album[property]})
-          : continuation.raise({into: null})),
-    },
+    withPropertyFromObject({object: '#album', property, into}),
   ]);
 }
 

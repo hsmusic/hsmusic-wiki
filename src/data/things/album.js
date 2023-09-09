@@ -8,8 +8,11 @@ import {
   exitWithoutUpdateValue,
   exposeDependency,
   exposeUpdateValueOrContinue,
+  fillMissingListItems,
   withFlattenedArray,
+  withPropertyFromList,
   withUnflattenedArray,
+  withUpdateValueAsDependency,
 } from '#composite';
 
 import Thing, {
@@ -81,50 +84,35 @@ export class Album extends Thing {
       exitWithoutDependency({dependency: 'trackData', value: []}),
       exitWithoutUpdateValue({value: [], mode: 'empty'}),
 
-      {
-        transform: (trackSections, continuation) =>
-          continuation(trackSections, {
-            '#sectionTrackRefs':
-              trackSections.map(section => section.tracks),
+      withUpdateValueAsDependency({into: '#sections'}),
 
-            '#sectionDateOriginallyReleased':
-              trackSections
-                .map(({dateOriginallyReleased}) => dateOriginallyReleased ?? null),
+      withPropertyFromList({list: '#sections', property: 'tracks', into: '#sections.trackRefs'}),
+      withPropertyFromList({list: '#sections', property: 'dateOriginallyReleased'}),
+      withPropertyFromList({list: '#sections', property: 'isDefaultTrackSection'}),
+      withPropertyFromList({list: '#sections', property: 'color'}),
 
-            '#sectionIsDefaultTrackSection':
-              trackSections
-                .map(({isDefaultTrackSection}) => isDefaultTrackSection ?? false),
-          }),
-      },
-
-      {
-        dependencies: ['color'],
-        transform: (trackSections, {color: albumColor}, continuation) =>
-          continuation(trackSections, {
-            '#sectionColor':
-              trackSections
-                .map(({color: sectionColor}) => sectionColor ?? albumColor),
-          }),
-      },
+      fillMissingListItems({list: '#sections.trackRefs', value: []}),
+      fillMissingListItems({list: '#sections.isDefaultTrackSection', value: false}),
+      fillMissingListItems({list: '#sections.color', dependency: 'color'}),
 
       withFlattenedArray({
-        from: '#sectionTrackRefs',
+        from: '#sections.trackRefs',
         into: '#trackRefs',
-        intoIndices: '#sectionStartIndex',
+        intoIndices: '#sections.startIndex',
       }),
 
       withResolvedReferenceList({
         list: '#trackRefs',
         data: 'trackData',
-        mode: 'null',
+        notFoundMode: 'null',
         find: find.track,
         into: '#tracks',
       }),
 
       withUnflattenedArray({
         from: '#tracks',
-        fromIndices: '#sectionStartIndex',
-        into: '#sectionTracks',
+        fromIndices: '#sections.startIndex',
+        into: '#sections.tracks',
       }),
 
       {
@@ -134,19 +122,19 @@ export class Album extends Thing {
 
         expose: {
           dependencies: [
-            '#sectionTracks',
-            '#sectionColor',
-            '#sectionDateOriginallyReleased',
-            '#sectionIsDefaultTrackSection',
-            '#sectionStartIndex',
+            '#sections.tracks',
+            '#sections.color',
+            '#sections.dateOriginallyReleased',
+            '#sections.isDefaultTrackSection',
+            '#sections.startIndex',
           ],
 
           transform: (trackSections, {
-            '#sectionTracks': tracks,
-            '#sectionColor': color,
-            '#sectionDateOriginallyReleased': dateOriginallyReleased,
-            '#sectionIsDefaultTrackSection': isDefaultTrackSection,
-            '#sectionStartIndex': startIndex,
+            '#sections.tracks': tracks,
+            '#sections.color': color,
+            '#sections.dateOriginallyReleased': dateOriginallyReleased,
+            '#sections.isDefaultTrackSection': isDefaultTrackSection,
+            '#sections.startIndex': startIndex,
           }) =>
             stitchArrays({
               tracks,
