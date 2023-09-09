@@ -10,7 +10,7 @@ import {
   exposeUpdateValueOrContinue,
   fillMissingListItems,
   withFlattenedArray,
-  withPropertyFromList,
+  withPropertiesFromList,
   withUnflattenedArray,
   withUpdateValueAsDependency,
 } from '#composite';
@@ -86,17 +86,22 @@ export class Album extends Thing {
 
       withUpdateValueAsDependency({into: '#sections'}),
 
-      withPropertyFromList({list: '#sections', property: 'tracks', into: '#sections.trackRefs'}),
-      withPropertyFromList({list: '#sections', property: 'dateOriginallyReleased'}),
-      withPropertyFromList({list: '#sections', property: 'isDefaultTrackSection'}),
-      withPropertyFromList({list: '#sections', property: 'color'}),
+      withPropertiesFromList({
+        list: '#sections',
+        properties: [
+          'tracks',
+          'dateOriginallyReleased',
+          'isDefaultTrackSection',
+          'color',
+        ],
+      }),
 
-      fillMissingListItems({list: '#sections.trackRefs', value: []}),
+      fillMissingListItems({list: '#sections.tracks', value: []}),
       fillMissingListItems({list: '#sections.isDefaultTrackSection', value: false}),
       fillMissingListItems({list: '#sections.color', dependency: 'color'}),
 
       withFlattenedArray({
-        from: '#sections.trackRefs',
+        from: '#sections.tracks',
         into: '#trackRefs',
         intoIndices: '#sections.startIndex',
       }),

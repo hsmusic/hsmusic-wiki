@@ -15,7 +15,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   raiseWithoutDependency,
-  withPropertyFromList,
+  withPropertiesFromList,
   withUpdateValueAsDependency,
 } from '#composite';
 
@@ -409,21 +409,24 @@ export function withResolvedContribs({
       raise: {into: []},
     }),
 
-    withPropertyFromList({list: from, property: 'who', into: '#artistRefs'}),
-    withPropertyFromList({list: from, property: 'what', into: '#what'}),
+    withPropertiesFromList({
+      list: from,
+      properties: ['who', 'what'],
+      prefix: '#contribs',
+    }),
 
     withResolvedReferenceList({
-      list: '#artistRefs',
+      list: '#contribs.who',
       data: 'artistData',
-      into: '#who',
+      into: '#contribs.who',
       find: find.artist,
       notFoundMode: 'null',
     }),
 
     {
-      dependencies: ['#who', '#what'],
+      dependencies: ['#contribs.who', '#contribs.what'],
       mapContinuation: {into},
-      compute({'#who': who, '#what': what}, continuation) {
+      compute({'#contribs.who': who, '#contribs.what': what}, continuation) {
         filterMultipleArrays(who, what, (who, _what) => who);
         return continuation({
           into: stitchArrays({who, what}),

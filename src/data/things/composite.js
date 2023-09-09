@@ -1119,6 +1119,39 @@ export function withPropertyFromObject({
   };
 }
 
+// Gets the listed properties from some object, providing each property's value
+// as a dependency prefixed with the same name as the object (by default).
+// If the object itself is null, all provided dependencies will be null;
+// if it's missing only select properties, those will be provided as null.
+export function withPropertiesFromObject({
+  object,
+  properties,
+  prefix =
+    (object.startsWith('#')
+      ? object
+      : `#${object}`),
+}) {
+  return {
+    annotation: `withPropertiesFromObject`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {object},
+      options: {prefix, properties},
+
+      compute: ({object, '#options': {prefix, properties}}, continuation) =>
+        continuation(
+          Object.fromEntries(
+            properties.map(property => [
+              `${prefix}.${property}`,
+              (object === null || object === undefined
+                ? null
+                : object[property] ?? null),
+            ]))),
+    },
+  };
+}
+
 // Gets a property from each of a list of objects (in a dependency) and
 // provides the results. This doesn't alter any list indices, so positions
 // which were null in the original list are kept null here. Objects which don't
@@ -1157,6 +1190,45 @@ export function withPropertyFromList({
       },
     },
   };
+}
+
+// Gets the listed properties from each of a list of objects, providing lists
+// of property values each into a dependency prefixed with the same name as the
+// list (by default). Like withPropertyFromList, this doesn't alter indices.
+export function withPropertiesFromList({
+  list,
+  properties,
+  prefix =
+    (list.startsWith('#')
+      ? list
+      : `#${list}`),
+}) {
+  return {
+    annotation: `withPropertiesFromList`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {list},
+      options: {prefix, properties},
+
+      compute({list, '#options': {prefix, properties}}, continuation) {
+        const lists =
+          Object.fromEntries(
+            properties.map(property => [`${prefix}.${property}`, []]));
+
+        for (const item of list) {
+          for (const property of properties) {
+            lists[`${prefix}.${property}`].push(
+              (item === null || item === undefined
+                ? null
+                : item[property] ?? null));
+          }
+        }
+
+        return continuation(lists);
+      }
+    }
+  }
 }
 
 // Replaces items of a list, which are null or undefined, with some fallback
