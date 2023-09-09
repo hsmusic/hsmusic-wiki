@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {colors} from '#cli';
 import find from '#find';
-import {empty, stitchArrays} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 
 import {
@@ -16,6 +16,7 @@ import {
   exposeDependencyOrContinue,
   raiseWithoutDependency,
   withResultOfAvailabilityCheck,
+  withPropertiesFromList,
   withUpdateValueAsDependency,
 } from '#composite';
 
@@ -26,7 +27,9 @@ import {
   isColor,
   isContributionList,
   isDate,
+  isDimensions,
   isDirectory,
+  isDuration,
   isFileExtension,
   isName,
   isString,
@@ -120,6 +123,24 @@ export function fileExtension(defaultFileExtension = null) {
     flags: {update: true, expose: true},
     update: {validate: isFileExtension},
     expose: {transform: (value) => value ?? defaultFileExtension},
+  };
+}
+
+// Plain ol' image dimensions. This is a two-item array of positive integers,
+// corresponding to width and height respectively.
+export function dimensions() {
+  return {
+    flags: {update: true, expose: true},
+    update: {validate: isDimensions},
+  };
+}
+
+// Duration! This is a number of seconds, possibly floating point, always
+// at minimum zero.
+export function duration() {
+  return {
+    flags: {update: true, expose: true},
+    update: {validate: isDuration},
   };
 }
 
@@ -331,29 +352,40 @@ export function wikiData(thingClass) {
 // This one's kinda tricky: it parses artist "references" from the
 // commentary content, and finds the matching artist for each reference.
 // This is mostly useful for credits and listings on artist pages.
-export function commentatorArtists(){
-  return {
-    flags: {expose: true},
+export function commentatorArtists() {
+  return compositeFrom(`commentatorArtists`, [
+    exitWithoutDependency({dependency: 'commentary', mode: 'falsy', value: []}),
 
-    expose: {
-      dependencies: ['artistData', 'commentary'],
-
-      compute: ({artistData, commentary}) =>
-        artistData && commentary
-          ? Array.from(
-              new Set(
-                Array.from(
-                  commentary
-                    .replace(/<\/?b>/g, '')
-                    .matchAll(/<i>(?<who>.*?):<\/i>/g)
-                ).map(({groups: {who}}) =>
-                  find.artist(who, artistData, {mode: 'quiet'})
-                )
-              )
-            )
-          : [],
+    {
+      dependencies: ['commentary'],
+      compute: ({commentary}, continuation) =>
+        continuation({
+          '#artistRefs':
+            Array.from(
+              commentary
+                .replace(/<\/?b>/g, '')
+                .matchAll(/<i>(?<who>.*?):<\/i>/g))
+              .map(({groups: {who}}) => who),
+        }),
     },
-  };
+
+    withResolvedReferenceList({
+      list: '#artistRefs',
+      data: 'artistData',
+      into: '#artists',
+      find: find.artist,
+    }),
+
+    {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['#artists'],
+        compute: ({'#artists': artists}) =>
+          unique(artists),
+      },
+    },
+  ]);
 }
 
 // Compositional utilities
@@ -374,33 +406,47 @@ export function withResolvedContribs({
       raise: {into: []},
     }),
 
-    {
-      mapDependencies: {from},
-      compute: ({from}, continuation) =>
-        continuation({
-          '#artistRefs': from.map(({who}) => who),
-          '#what': from.map(({what}) => what),
-        }),
-    },
+    withPropertiesFromList({
+      list: from,
+      properties: ['who', 'what'],
+      prefix: '#contribs',
+    }),
 
     withResolvedReferenceList({
-      list: '#artistRefs',
+      list: '#contribs.who',
       data: 'artistData',
-      into: '#who',
+      into: '#contribs.who',
       find: find.artist,
       notFoundMode: 'null',
     }),
 
     {
-      dependencies: ['#who', '#what'],
+      dependencies: ['#contribs.who', '#contribs.what'],
       mapContinuation: {into},
-      compute({'#who': who, '#what': what}, continuation) {
+      compute({'#contribs.who': who, '#contribs.what': what}, continuation) {
         filterMultipleArrays(who, what, (who, _what) => who);
         return continuation({
           into: stitchArrays({who, what}),
         });
       },
     },
+  ]);
+}
+
+// Shorthand for exiting if the contribution list (usually a property's update
+// value) resolves to empty - ensuring that the later computed results are only
+// returned if these contributions are present.
+export function exitWithoutContribs({
+  contribs,
+  value = null,
+}) {
+  return compositeFrom(`exitWithoutContribs`, [
+    withResolvedContribs({from: contribs}),
+    exitWithoutDependency({
+      dependency: '#resolvedContribs',
+      mode: 'empty',
+      value,
+    }),
   ]);
 }
 
@@ -480,29 +526,45 @@ export function withResolvedReferenceList({
     }),
 
     {
-      options: {findFunction, notFoundMode},
       mapDependencies: {list, data},
-      mapContinuation: {matches: into},
+      options: {findFunction},
 
-      compute({list, data, '#options': {findFunction, notFoundMode}}, continuation) {
-        let matches =
-          list.map(ref => findFunction(ref, data, {mode: 'quiet'}));
+      compute: ({list, data, '#options': {findFunction}}, continuation) =>
+        continuation({
+          '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
+        }),
+    },
 
-        if (matches.every(match => match)) {
-          return continuation.raise({matches});
-        }
+    {
+      dependencies: ['#matches'],
+      mapContinuation: {into},
 
+      compute: ({'#matches': matches}, continuation) =>
+        (matches.every(match => match)
+          ? continuation.raise({into: matches})
+          : continuation()),
+    },
+
+    {
+      dependencies: ['#matches'],
+      options: {notFoundMode},
+      mapContinuation: {into},
+
+      compute({
+        '#matches': matches,
+        '#options': {notFoundMode},
+      }, continuation) {
         switch (notFoundMode) {
-          case 'filter':
-            matches = matches.filter(match => match);
-            return continuation.raise({matches});
-
           case 'exit':
             return continuation.exit([]);
 
+          case 'filter':
+            matches = matches.filter(match => match);
+            return continuation.raise({into: matches});
+
           case 'null':
             matches = matches.map(match => match ?? null);
-            return continuation.raise({matches});
+            return continuation.raise({into: matches});
         }
       },
     },

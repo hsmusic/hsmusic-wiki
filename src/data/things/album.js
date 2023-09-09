@@ -1,15 +1,17 @@
 import find from '#find';
 import {stitchArrays} from '#sugar';
-import {isDate, isDimensions, isTrackSectionList} from '#validators';
+import {isDate, isTrackSectionList} from '#validators';
 
 import {
-  compositeFrom,
   exitWithoutDependency,
   exitWithoutUpdateValue,
   exposeDependency,
   exposeUpdateValueOrContinue,
+  fillMissingListItems,
   withFlattenedArray,
+  withPropertiesFromList,
   withUnflattenedArray,
+  withUpdateValueAsDependency,
 } from '#composite';
 
 import Thing, {
@@ -19,7 +21,9 @@ import Thing, {
   commentatorArtists,
   contribsPresent,
   contributionList,
+  dimensions,
   directory,
+  exitWithoutContribs,
   fileExtension,
   flag,
   name,
@@ -28,7 +32,6 @@ import Thing, {
   simpleString,
   urls,
   wikiData,
-  withResolvedContribs,
   withResolvedReferenceList,
 } from './thing.js';
 
@@ -47,16 +50,125 @@ export class Album extends Thing {
     trackArtDate: simpleDate(),
     dateAddedToWiki: simpleDate(),
 
-    coverArtDate: compositeFrom(`Album.coverArtDate`, [
-      withResolvedContribs({from: 'coverArtistContribs'}),
-      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
-
+    coverArtDate: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
       exposeUpdateValueOrContinue(),
       exposeDependency({
         dependency: 'date',
         update: {validate: isDate},
       }),
-    ]),
+    ],
+
+    coverArtFileExtension: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      fileExtension('jpg'),
+    ],
+
+    trackCoverArtFileExtension: fileExtension('jpg'),
+
+    wallpaperFileExtension: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      fileExtension('jpg'),
+    ],
+
+    bannerFileExtension: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      fileExtension('jpg'),
+    ],
+
+    wallpaperStyle: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      simpleString(),
+    ],
+
+    bannerStyle: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      simpleString(),
+    ],
+
+    bannerDimensions: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      dimensions(),
+    ],
+
+    hasTrackNumbers: flag(true),
+    isListedOnHomepage: flag(true),
+    isListedInGalleries: flag(true),
+
+    commentary: commentary(),
+    additionalFiles: additionalFiles(),
+
+    trackSections: [
+      exitWithoutDependency({dependency: 'trackData', value: []}),
+      exitWithoutUpdateValue({value: [], mode: 'empty'}),
+
+      withUpdateValueAsDependency({into: '#sections'}),
+
+      withPropertiesFromList({
+        list: '#sections',
+        properties: [
+          'tracks',
+          'dateOriginallyReleased',
+          'isDefaultTrackSection',
+          'color',
+        ],
+      }),
+
+      fillMissingListItems({list: '#sections.tracks', value: []}),
+      fillMissingListItems({list: '#sections.isDefaultTrackSection', value: false}),
+      fillMissingListItems({list: '#sections.color', dependency: 'color'}),
+
+      withFlattenedArray({
+        from: '#sections.tracks',
+        into: '#trackRefs',
+        intoIndices: '#sections.startIndex',
+      }),
+
+      withResolvedReferenceList({
+        list: '#trackRefs',
+        data: 'trackData',
+        notFoundMode: 'null',
+        find: find.track,
+        into: '#tracks',
+      }),
+
+      withUnflattenedArray({
+        from: '#tracks',
+        fromIndices: '#sections.startIndex',
+        into: '#sections.tracks',
+      }),
+
+      {
+        flags: {update: true, expose: true},
+
+        update: {validate: isTrackSectionList},
+
+        expose: {
+          dependencies: [
+            '#sections.tracks',
+            '#sections.color',
+            '#sections.dateOriginallyReleased',
+            '#sections.isDefaultTrackSection',
+            '#sections.startIndex',
+          ],
+
+          transform: (trackSections, {
+            '#sections.tracks': tracks,
+            '#sections.color': color,
+            '#sections.dateOriginallyReleased': dateOriginallyReleased,
+            '#sections.isDefaultTrackSection': isDefaultTrackSection,
+            '#sections.startIndex': startIndex,
+          }) =>
+            stitchArrays({
+              tracks,
+              color,
+              dateOriginallyReleased,
+              isDefaultTrackSection,
+              startIndex,
+            }),
+        },
+      },
+    ],
 
     artistContribs: contributionList(),
     coverArtistContribs: contributionList(),
@@ -76,113 +188,6 @@ export class Album extends Thing {
       data: 'artTagData',
     }),
 
-    trackSections: compositeFrom(`Album.trackSections`, [
-      exitWithoutDependency({dependency: 'trackData', value: []}),
-      exitWithoutUpdateValue({value: [], mode: 'empty'}),
-
-      {
-        transform: (trackSections, continuation) =>
-          continuation(trackSections, {
-            '#sectionTrackRefs':
-              trackSections.map(section => section.tracks),
-
-            '#sectionDateOriginallyReleased':
-              trackSections
-                .map(({dateOriginallyReleased}) => dateOriginallyReleased ?? null),
-
-            '#sectionIsDefaultTrackSection':
-              trackSections
-                .map(({isDefaultTrackSection}) => isDefaultTrackSection ?? false),
-          }),
-      },
-
-      {
-        dependencies: ['color'],
-        transform: (trackSections, {color: albumColor}, continuation) =>
-          continuation(trackSections, {
-            '#sectionColor':
-              trackSections
-                .map(({color: sectionColor}) => sectionColor ?? albumColor),
-          }),
-      },
-
-      withFlattenedArray({
-        from: '#sectionTrackRefs',
-        into: '#trackRefs',
-        intoIndices: '#sectionStartIndex',
-      }),
-
-      withResolvedReferenceList({
-        list: '#trackRefs',
-        data: 'trackData',
-        mode: 'null',
-        find: find.track,
-        into: '#tracks',
-      }),
-
-      withUnflattenedArray({
-        from: '#tracks',
-        fromIndices: '#sectionStartIndex',
-        into: '#sectionTracks',
-      }),
-
-      {
-        flags: {update: true, expose: true},
-
-        update: {validate: isTrackSectionList},
-
-        expose: {
-          dependencies: [
-            '#sectionTracks',
-            '#sectionColor',
-            '#sectionDateOriginallyReleased',
-            '#sectionIsDefaultTrackSection',
-            '#sectionStartIndex',
-          ],
-
-          transform: (trackSections, {
-            '#sectionTracks': tracks,
-            '#sectionColor': color,
-            '#sectionDateOriginallyReleased': dateOriginallyReleased,
-            '#sectionIsDefaultTrackSection': isDefaultTrackSection,
-            '#sectionStartIndex': startIndex,
-          }) =>
-            stitchArrays({
-              tracks,
-              color,
-              dateOriginallyReleased,
-              isDefaultTrackSection,
-              startIndex,
-            }),
-        },
-      },
-    ]),
-
-    coverArtFileExtension: compositeFrom(`Album.coverArtFileExtension`, [
-      withResolvedContribs({from: 'coverArtistContribs'}),
-      exitWithoutDependency({dependency: '#resolvedContribs', mode: 'empty'}),
-      fileExtension('jpg'),
-    ]),
-
-    trackCoverArtFileExtension: fileExtension('jpg'),
-
-    wallpaperStyle: simpleString(),
-    wallpaperFileExtension: fileExtension('jpg'),
-
-    bannerStyle: simpleString(),
-    bannerFileExtension: fileExtension('jpg'),
-    bannerDimensions: {
-      flags: {update: true, expose: true},
-      update: {validate: isDimensions},
-    },
-
-    hasTrackNumbers: flag(true),
-    isListedOnHomepage: flag(true),
-    isListedInGalleries: flag(true),
-
-    commentary: commentary(),
-    additionalFiles: additionalFiles(),
-
     // Update only
 
     artistData: wikiData(Artist),
@@ -198,7 +203,7 @@ export class Album extends Thing {
     hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),
     hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
 
-    tracks: compositeFrom(`Album.tracks`, [
+    tracks: [
       exitWithoutDependency({dependency: 'trackData', value: []}),
       exitWithoutDependency({dependency: 'trackSections', mode: 'empty', value: []}),
 
@@ -218,7 +223,7 @@ export class Album extends Thing {
       }),
 
       exposeDependency({dependency: '#resolvedReferenceList'}),
-    ]),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({

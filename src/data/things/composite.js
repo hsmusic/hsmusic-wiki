@@ -432,13 +432,8 @@ export function compositeFrom(firstArg, secondArg) {
           ? step.expose
           : step);
 
-      const stepComputes = !!expose.compute;
-      const stepTransforms = !!expose.transform;
-
-      if (!stepComputes && !stepTransforms) {
-        push(new TypeError(`Steps must provide compute or transform (or both)`));
-        return;
-      }
+      const stepComputes = !!expose?.compute;
+      const stepTransforms = !!expose?.transform;
 
       if (
         stepTransforms && !stepComputes &&
@@ -459,7 +454,7 @@ export function compositeFrom(firstArg, secondArg) {
       // Unmapped dependencies are exposed on the final composition only if
       // they're "public", i.e. pointing to update values of other properties
       // on the CacheableObject.
-      for (const dependency of expose.dependencies ?? []) {
+      for (const dependency of expose?.dependencies ?? []) {
         if (typeof dependency === 'string' && dependency.startsWith('#')) {
           continue;
         }
@@ -470,22 +465,14 @@ export function compositeFrom(firstArg, secondArg) {
       // Mapped dependencies are always exposed on the final composition.
       // These are explicitly for reading values which are named outside of
       // the current compositional step.
-      for (const dependency of Object.values(expose.mapDependencies ?? {})) {
+      for (const dependency of Object.values(expose?.mapDependencies ?? {})) {
         exposeDependencies.add(dependency);
       }
     });
   }
 
-  if (!baseComposes) {
-    if (baseUpdates) {
-      if (!anyStepsTransform) {
-        aggregate.push(new TypeError(`Expected at least one step to transform`));
-      }
-    } else {
-      if (!anyStepsCompute) {
-        aggregate.push(new TypeError(`Expected at least one step to compute`));
-      }
-    }
+  if (!baseComposes && !baseUpdates && !anyStepsCompute) {
+    aggregate.push(new TypeError(`Expected at least one step to compute`));
   }
 
   aggregate.close();
@@ -614,6 +601,11 @@ export function compositeFrom(firstArg, secondArg) {
         (step.flags
           ? step.expose
           : step);
+
+      if (!expose) {
+        debug(() => `step #${i+1} - no expose description, nothing to do for this step`);
+        continue;
+      }
 
       const callingTransformForThisStep =
         expectingTransform && expose.transform;
@@ -1087,6 +1079,199 @@ export function withUpdateValueAsDependency({
         continuation(value, {into: value}),
     },
   };
+}
+
+// Gets a property of some object (in a dependency) and provides that value.
+// If the object itself is null, or the object doesn't have the listed property,
+// the provided dependency will also be null.
+export function withPropertyFromObject({
+  object,
+  property,
+  into = null,
+}) {
+  into ??=
+    (object.startsWith('#')
+      ? `${object}.${property}`
+      : `#${object}.${property}`);
+
+  return {
+    annotation: `withPropertyFromObject`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {object},
+      mapContinuation: {into},
+      options: {property},
+
+      compute: ({object, '#options': {property}}, continuation) =>
+        (object === null || object === undefined
+          ? continuation({into: null})
+          : continuation({into: object[property] ?? null})),
+    },
+  };
+}
+
+// Gets the listed properties from some object, providing each property's value
+// as a dependency prefixed with the same name as the object (by default).
+// If the object itself is null, all provided dependencies will be null;
+// if it's missing only select properties, those will be provided as null.
+export function withPropertiesFromObject({
+  object,
+  properties,
+  prefix =
+    (object.startsWith('#')
+      ? object
+      : `#${object}`),
+}) {
+  return {
+    annotation: `withPropertiesFromObject`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {object},
+      options: {prefix, properties},
+
+      compute: ({object, '#options': {prefix, properties}}, continuation) =>
+        continuation(
+          Object.fromEntries(
+            properties.map(property => [
+              `${prefix}.${property}`,
+              (object === null || object === undefined
+                ? null
+                : object[property] ?? null),
+            ]))),
+    },
+  };
+}
+
+// Gets a property from each of a list of objects (in a dependency) and
+// provides the results. This doesn't alter any list indices, so positions
+// which were null in the original list are kept null here. Objects which don't
+// have the specified property are retained in-place as null.
+export function withPropertyFromList({
+  list,
+  property,
+  into = null,
+}) {
+  into ??=
+    (list.startsWith('#')
+      ? `${list}.${property}`
+      : `#${list}.${property}`);
+
+  return {
+    annotation: `withPropertyFromList`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {list},
+      mapContinuation: {into},
+      options: {property},
+
+      compute({list, '#options': {property}}, continuation) {
+        if (list === undefined || empty(list)) {
+          return continuation({into: []});
+        }
+
+        return continuation({
+          into:
+            list.map(item =>
+              (item === null || item === undefined
+                ? null
+                : item[property] ?? null)),
+        });
+      },
+    },
+  };
+}
+
+// Gets the listed properties from each of a list of objects, providing lists
+// of property values each into a dependency prefixed with the same name as the
+// list (by default). Like withPropertyFromList, this doesn't alter indices.
+export function withPropertiesFromList({
+  list,
+  properties,
+  prefix =
+    (list.startsWith('#')
+      ? list
+      : `#${list}`),
+}) {
+  return {
+    annotation: `withPropertiesFromList`,
+    flags: {expose: true, compose: true},
+
+    expose: {
+      mapDependencies: {list},
+      options: {prefix, properties},
+
+      compute({list, '#options': {prefix, properties}}, continuation) {
+        const lists =
+          Object.fromEntries(
+            properties.map(property => [`${prefix}.${property}`, []]));
+
+        for (const item of list) {
+          for (const property of properties) {
+            lists[`${prefix}.${property}`].push(
+              (item === null || item === undefined
+                ? null
+                : item[property] ?? null));
+          }
+        }
+
+        return continuation(lists);
+      }
+    }
+  }
+}
+
+// Replaces items of a list, which are null or undefined, with some fallback
+// value, either a constant (set {value}) or from a dependency ({dependency}).
+// By default, this replaces the passed dependency.
+export function fillMissingListItems({
+  list,
+  value,
+  dependency,
+  into = list,
+}) {
+  if (value !== undefined && dependency !== undefined) {
+    throw new TypeError(`Don't provide both value and dependency`);
+  }
+
+  if (value === undefined && dependency === undefined) {
+    throw new TypeError(`Missing value or dependency`);
+  }
+
+  if (dependency) {
+    return {
+      annotation: `fillMissingListItems.fromDependency`,
+      flags: {expose: true, compose: true},
+
+      expose: {
+        mapDependencies: {list, dependency},
+        mapContinuation: {into},
+
+        compute: ({list, dependency}, continuation) =>
+          continuation({
+            into: list.map(item => item ?? dependency),
+          }),
+      },
+    };
+  } else {
+    return {
+      annotation: `fillMissingListItems.fromValue`,
+      flags: {expose: true, compose: true},
+
+      expose: {
+        mapDependencies: {list},
+        mapContinuation: {into},
+        options: {value},
+
+        compute: ({list, '#options': {value}}, continuation) =>
+          continuation({
+            into: list.map(item => item ?? value),
+          }),
+      },
+    };
+  }
 }
 
 // Flattens an array with one level of nested arrays, providing as dependencies
