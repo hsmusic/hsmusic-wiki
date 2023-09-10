@@ -874,3 +874,71 @@ export function filterItemsForCarousel(items) {
     .filter(item => item.artTags.every(tag => !tag.isContentWarning))
     .slice(0, maxCarouselLayoutItems + 1);
 }
+
+// Ridiculous caching support nonsense
+
+export class TupleMap {
+  static maxNestedTupleLength = 25;
+
+  #store = [undefined, null, null, null];
+
+  #lifetime(value) {
+    if (Array.isArray(value) && value.length <= TupleMap.maxNestedTupleLength) {
+      return 'tuple';
+    } else if (
+      typeof value === 'object' && value !== null ||
+      typeof value === 'function'
+    ) {
+      return 'weak';
+    } else {
+      return 'strong';
+    }
+  }
+
+  #getSubstoreShallow(value, store) {
+    const lifetime = this.#lifetime(value);
+    const mapIndex = {weak: 1, strong: 2, tuple: 3}[lifetime];
+
+    let map = store[mapIndex];
+    if (map === null) {
+      map = store[mapIndex] =
+        (lifetime === 'weak' ? new WeakMap()
+       : lifetime === 'strong' ? new Map()
+       : lifetime === 'tuple' ? new TupleMap()
+       : null);
+    }
+
+    if (map.has(value)) {
+      return map.get(value);
+    } else {
+      const substore = [undefined, null, null, null];
+      map.set(value, substore);
+      return substore;
+    }
+  }
+
+  #getSubstoreDeep(tuple, store = this.#store) {
+    if (tuple.length === 0) {
+      return store;
+    } else {
+      const [first, ...rest] = tuple;
+      return this.#getSubstoreDeep(rest, this.#getSubstoreShallow(first, store));
+    }
+  }
+
+  get(tuple) {
+    const store = this.#getSubstoreDeep(tuple);
+    return store[0];
+  }
+
+  has(tuple) {
+    const store = this.#getSubstoreDeep(tuple);
+    return store[0] !== undefined;
+  }
+
+  set(tuple, value) {
+    const store = this.#getSubstoreDeep(tuple);
+    store[0] = value;
+    return value;
+  }
+}

@@ -38,6 +38,7 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
+import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile} from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
@@ -612,6 +613,10 @@ async function main() {
   // which are only available after the initial linking.
   sortWikiDataArrays(wikiData);
 
+  console.log(
+    CacheableObject.getUpdateValue(wikiData.albumData[0], 'trackSections'),
+    wikiData.albumData[0].trackSections);
+
   if (precacheData) {
     progressCallAll('Caching all data values', Object.entries(wikiData)
       .filter(([key]) =>
@@ -623,6 +628,11 @@ async function main() {
         [key, value])
       .flatMap(([_key, things]) => things)
       .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
+  }
+
+  if (noBuild) {
+    displayCompositeCacheAnalysis();
+    if (precacheData) return;
   }
 
   const internalDefaultLanguage = await processLanguageFile(
@@ -754,7 +764,9 @@ async function main() {
 
   logInfo`Done preloading filesizes!`;
 
-  if (noBuild) return;
+  if (noBuild) {
+    return;
+  }
 
   const developersComment =
     `<!--\n` + [

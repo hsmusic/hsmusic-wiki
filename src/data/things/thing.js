@@ -512,7 +512,7 @@ export function withResolvedReferenceList({
     throw new TypeError(`Expected notFoundMode to be filter, exit, or null`);
   }
 
-  return compositeFrom(`withResolvedReferenceList`, [
+  const composite = compositeFrom(`withResolvedReferenceList`, [
     exitWithoutDependency({
       dependency: data,
       value: [],
@@ -526,13 +526,19 @@ export function withResolvedReferenceList({
     }),
 
     {
-      mapDependencies: {list, data},
-      options: {findFunction},
+      cache: 'aggressive',
+      annotation: `withResolvedReferenceList.getMatches`,
+      flags: {expose: true, compose: true},
 
-      compute: ({list, data, '#options': {findFunction}}, continuation) =>
-        continuation({
-          '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
-        }),
+      compute: {
+        mapDependencies: {list, data},
+        options: {findFunction},
+
+        compute: ({list, data, '#options': {findFunction}}, continuation) =>
+          continuation({
+            '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
+          }),
+      },
     },
 
     {
@@ -569,6 +575,9 @@ export function withResolvedReferenceList({
       },
     },
   ]);
+
+  console.log(composite.expose);
+  return composite;
 }
 
 // Check out the info on reverseReferenceList!

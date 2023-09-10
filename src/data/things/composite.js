@@ -1,6 +1,7 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
+import {TupleMap} from '#wiki-data';
 
 import {
   empty,
@@ -341,6 +342,8 @@ import {
 // syntax as for other compositional steps, and it'll work out cleanly!
 //
 
+const globalCompositeCache = {};
+
 export function compositeFrom(firstArg, secondArg) {
   const debug = fn => {
     if (compositeFrom.debug === true) {
@@ -567,8 +570,8 @@ export function compositeFrom(firstArg, secondArg) {
     return {continuation, continuationStorage};
   }
 
-  const continuationSymbol = Symbol('continuation symbol');
-  const noTransformSymbol = Symbol('no-transform symbol');
+  const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
+  const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
 
   function _computeOrTransform(initialValue, initialDependencies, continuationIfApplicable) {
     const expectingTransform = initialValue !== noTransformSymbol;
@@ -634,21 +637,83 @@ export function compositeFrom(firstArg, secondArg) {
       const callingTransformForThisStep =
         expectingTransform && expose.transform;
 
+      let continuationStorage;
+
       const filteredDependencies = _filterDependencies(availableDependencies, expose);
-      const {continuation, continuationStorage} = _prepareContinuation(callingTransformForThisStep);
 
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
         `with dependencies:`, filteredDependencies]);
 
-      const result =
+      let result;
+
+      const getExpectedEvaluation = () =>
         (callingTransformForThisStep
           ? (filteredDependencies
-              ? expose.transform(valueSoFar, filteredDependencies, continuation)
-              : expose.transform(valueSoFar, continuation))
+              ? ['transform', valueSoFar, filteredDependencies]
+              : ['transform', valueSoFar])
           : (filteredDependencies
-              ? expose.compute(filteredDependencies, continuation)
-              : expose.compute(continuation)));
+              ? ['compute', filteredDependencies]
+              : ['compute']));
+
+      const naturalEvaluate = () => {
+        const [name, ...args] = getExpectedEvaluation();
+        let continuation;
+        ({continuation, continuationStorage} = _prepareContinuation(callingTransformForThisStep));
+        return expose[name](...args, continuation);
+      }
+
+      switch (step.cache) {
+        // Warning! Highly WIP!
+        case 'aggressive': {
+          const hrnow = () => {
+            const hrTime = process.hrtime();
+            return hrTime[0] * 1000000000 + hrTime[1];
+          };
+
+          const [name, ...args] = getExpectedEvaluation();
+
+          let cache = globalCompositeCache[step.annotation];
+          if (!cache) {
+            cache = globalCompositeCache[step.annotation] = {
+              transform: new TupleMap(),
+              compute: new TupleMap(),
+              times: {
+                read: [],
+                evaluate: [],
+              },
+            };
+          }
+
+          const tuplefied = args
+            .flatMap(arg => [
+              Symbol.for('compositeFrom: tuplefied arg divider'),
+              ...(typeof arg !== 'object' || Array.isArray(arg)
+                ? [arg]
+                : Object.entries(arg).flat()),
+            ]);
+
+          const readTime = hrnow();
+          const cacheContents = cache[name].get(tuplefied);
+          cache.times.read.push(hrnow() - readTime);
+
+          if (cacheContents) {
+            ({result, continuationStorage} = cacheContents);
+          } else {
+            const evaluateTime = hrnow();
+            result = naturalEvaluate();
+            cache.times.evaluate.push(hrnow() - evaluateTime);
+            cache[name].set(tuplefied, {result, continuationStorage});
+          }
+
+          break;
+        }
+
+        default: {
+          result = naturalEvaluate();
+          break;
+        }
+      }
 
       if (result !== continuationSymbol) {
         debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
@@ -775,6 +840,7 @@ export function compositeFrom(firstArg, secondArg) {
     if (baseComposes) {
       if (anyStepsTransform) expose.transform = transformFn;
       if (anyStepsCompute) expose.compute = computeFn;
+      if (base.cacheComposition) expose.cache = base.cacheComposition;
     } else if (baseUpdates) {
       expose.transform = transformFn;
     } else {
@@ -783,6 +849,35 @@ export function compositeFrom(firstArg, secondArg) {
   }
 
   return constructedDescriptor;
+}
+
+export function displayCompositeCacheAnalysis() {
+  const showTimes = (cache, key) => {
+    const times = cache.times[key].slice().sort();
+
+    const all = times;
+    const worst10pc = times.slice(-times.length / 10);
+    const best10pc = times.slice(0, times.length / 10);
+    const middle50pc = times.slice(times.length / 4, -times.length / 4);
+    const middle80pc = times.slice(times.length / 10, -times.length / 10);
+
+    const fmt = val => `${(val / 1000).toFixed(2)}ms`.padStart(9);
+    const avg = times => times.reduce((a, b) => a + b, 0) / times.length;
+
+    const left = ` - ${key}: `;
+    const indn = ' '.repeat(left.length);
+    console.log(left + `${fmt(avg(all))} (all ${all.length})`);
+    console.log(indn + `${fmt(avg(worst10pc))} (worst 10%)`);
+    console.log(indn + `${fmt(avg(best10pc))} (best 10%)`);
+    console.log(indn + `${fmt(avg(middle80pc))} (middle 80%)`);
+    console.log(indn + `${fmt(avg(middle50pc))} (middle 50%)`);
+  };
+
+  for (const [annotation, cache] of Object.entries(globalCompositeCache)) {
+    console.log(`Cached ${annotation}:`);
+    showTimes(cache, 'evaluate');
+    showTimes(cache, 'read');
+  }
 }
 
 // Evaluates a function with composite debugging enabled, turns debugging

@@ -125,6 +125,14 @@ export class Album extends Thing {
         intoIndices: '#sections.startIndex',
       }),
 
+      {
+        dependencies: ['#trackRefs'],
+        compute: ({'#trackRefs': tracks}, continuation) => {
+          console.log(tracks);
+          return continuation();
+        }
+      },
+
       withResolvedReferenceList({
         list: '#trackRefs',
         data: 'trackData',
