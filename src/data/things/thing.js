@@ -105,8 +105,8 @@ export default class Thing extends CacheableObject {
 
     // External function. These should only be used as dependencies for other
     // properties, so they're left unexposed.
-    externalFunction: () => ({
-      flags: {update: true},
+    externalFunction: ({expose = false} = {}) => ({
+      flags: {update: true, expose},
       update: {validate: (t) => typeof t === 'function'},
     }),
 

@@ -1,5 +1,10 @@
 import Thing from './thing.js';
 
+import {Tag} from '#html';
+import {isLanguageCode} from '#validators';
+
+import CacheableObject from './cacheable-object.js';
+
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = ({
     validators: {
@@ -68,7 +73,7 @@ export class Language extends Thing {
 
     // Update only
 
-    escapeHTML: Thing.common.externalFunction(),
+    escapeHTML: Thing.common.externalFunction({expose: true}),
 
     // Expose only
 
@@ -140,19 +145,9 @@ export class Language extends Thing {
   }
 
   formatString(key, args = {}) {
-    if (this.strings && !this.strings_htmlEscaped) {
-      throw new Error(`HTML-escaped strings unavailable - please ensure escapeHTML function is provided`);
-    }
+    const strings = this.strings_htmlEscaped;
 
-    return this.formatStringHelper(this.strings_htmlEscaped, key, args);
-  }
-
-  formatStringNoHTMLEscape(key, args = {}) {
-    return this.formatStringHelper(this.strings, key, args);
-  }
-
-  formatStringHelper(strings, key, args = {}) {
-    if (!strings) {
+    if (!this.strings) {
       throw new Error(`Strings unavailable`);
     }
 
@@ -160,22 +155,25 @@ export class Language extends Thing {
       throw new Error(`Invalid key ${key} accessed`);
     }
 
-    const template = strings[key];
+    const template = this.strings[key];
 
     // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
     // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
     // like, who cares, dude?) Also, this is an array, 8ecause it's handy
-    // for the iterating we're a8out to do.
-    const processedArgs = Object.entries(args).map(([k, v]) => [
-      k.replace(/[A-Z]/g, '_$&').toUpperCase(),
-      v,
-    ]);
+    // for the iterating we're a8out to do. Also strip HTML from arguments
+    // that are literal strings - real HTML content should always be proper
+    // HTML objects (see html.js).
+    const processedArgs =
+      Object.entries(args).map(([k, v]) => [
+        k.replace(/[A-Z]/g, '_$&').toUpperCase(),
+        this.#sanitizeStringArg(v),
+      ]);
 
     // Replacement time! Woot. Reduce comes in handy here!
-    const output = processedArgs.reduce(
-      (x, [k, v]) => x.replaceAll(`{${k}}`, v),
-      template
-    );
+    const output =
+      processedArgs.reduce(
+        (x, [k, v]) => x.replaceAll(`{${k}}`, v),
+        template);
 
     // Post-processing: if any expected arguments *weren't* replaced, that
     // is almost definitely an error.
@@ -183,7 +181,37 @@ export class Language extends Thing {
       throw new Error(`Args in ${key} were missing - output: ${output}`);
     }
 
-    return output;
+    // Last caveat: Wrap the output in an HTML tag so that it doesn't get
+    // treated as unsanitized HTML if *it* gets passed as an argument to
+    // *another* formatString call.
+    return this.#wrapSanitized(output);
+  }
+
+  // Escapes HTML special characters so they're displayed as-are instead of
+  // treated by the browser as a tag. This does *not* have an effect on actual
+  // html.Tag objects, which are treated as sanitized by default (so that they
+  // can be nested inside strings at all).
+  #sanitizeStringArg(arg) {
+    const escapeHTML = this.escapeHTML;
+
+    if (!escapeHTML) {
+      throw new Error(`escapeHTML unavailable`);
+    }
+
+    if (typeof arg !== 'string') {
+      return arg.toString();
+    }
+
+    return escapeHTML(arg);
+  }
+
+  // Wraps the output of a formatting function in a no-name-nor-attributes
+  // HTML tag, which will indicate to other calls to formatString that this
+  // content is a string *that may contain HTML* and doesn't need to
+  // sanitized any further. It'll still .toString() to just the string
+  // contents, if needed.
+  #wrapSanitized(output) {
+    return new Tag(null, null, output);
   }
 
   formatDate(date) {
@@ -252,19 +280,25 @@ export class Language extends Thing {
   // Conjunction list: A, B, and C
   formatConjunctionList(array) {
     this.assertIntlAvailable('intl_listConjunction');
-    return this.intl_listConjunction.format(array.map(arr => arr.toString()));
+    return this.#wrapSanitized(
+      this.intl_listConjunction.format(
+        array.map(item => this.#sanitizeStringArg(item))));
   }
 
   // Disjunction lists: A, B, or C
   formatDisjunctionList(array) {
     this.assertIntlAvailable('intl_listDisjunction');
-    return this.intl_listDisjunction.format(array.map(arr => arr.toString()));
+    return this.#wrapSanitized(
+      this.intl_listDisjunction.format(
+        array.map(item => this.#sanitizeStringArg(item))));
   }
 
   // Unit lists: A, B, C
   formatUnitList(array) {
     this.assertIntlAvailable('intl_listUnit');
-    return this.intl_listUnit.format(array.map(arr => arr.toString()));
+    return this.#wrapSanitized(
+      this.intl_listUnit.format(
+        array.map(item => this.#sanitizeStringArg(item))));
   }
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
