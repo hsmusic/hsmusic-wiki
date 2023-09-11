@@ -689,6 +689,8 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
       console.warn(color.yellow(` - `) + file);
     }
   }
+
+  return {missing, misplaced};
 }
 
 // Recursively traverses the provided (extant) media path, filtering so only

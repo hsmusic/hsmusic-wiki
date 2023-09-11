@@ -677,7 +677,8 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  await verifyImagePaths(mediaPath, {urls, wikiData});
+  const {missing: missingImagePaths} =
+    await verifyImagePaths(mediaPath, {urls, wikiData});
 
   const fileSizePreloader = new FileSizePreloader();
 
@@ -795,6 +796,7 @@ async function main() {
 
     defaultLanguage: finalDefaultLanguage,
     languages,
+    missingImagePaths,
     thumbsCache,
     urls,
     urlSpec,
