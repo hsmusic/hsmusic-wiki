@@ -56,6 +56,7 @@ export async function go({
 
   defaultLanguage,
   languages,
+  missingImagePaths,
   srcRootPath,
   thumbsCache,
   urls,
@@ -338,6 +339,7 @@ export async function go({
         getSizeOfImagePath,
         language,
         languages,
+        missingImagePaths,
         pagePath: servePath,
         thumbsCache,
         to,

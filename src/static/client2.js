@@ -534,10 +534,16 @@ const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-
     const {parentElement: contentContainer} = stickyContainer;
     const stickySubheadingRow = stickyContainer.querySelector('.content-sticky-subheading-row');
     const stickySubheading = stickySubheadingRow.querySelector('h2');
-    const stickyCoverContainer = stickyContainer.querySelector('.content-sticky-heading-cover-container');
-    const stickyCover = stickyCoverContainer?.querySelector('.content-sticky-heading-cover');
+    let stickyCoverContainer = stickyContainer.querySelector('.content-sticky-heading-cover-container');
+    let stickyCover = stickyCoverContainer?.querySelector('.content-sticky-heading-cover');
     const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
     const contentCover = contentContainer.querySelector('#cover-art-container');
+
+    if (stickyCover.querySelector('.image-text-area')) {
+      stickyCoverContainer.remove();
+      stickyCoverContainer = null;
+      stickyCover = null;
+    }
 
     return {
       contentContainer,

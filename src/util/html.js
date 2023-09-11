@@ -806,24 +806,43 @@ export class Template {
     }
 
     // Null is always an acceptable slot value.
-    if (value !== null) {
-      if ('validate' in description) {
-        description.validate({
-          ...commonValidators,
-          ...validators,
-        })(value);
-      }
+    if (value === null) {
+      return true;
+    }
 
-      if ('type' in description) {
-        const {type} = description;
-        if (type === 'html') {
-          if (!isHTML(value)) {
+    if ('validate' in description) {
+      description.validate({
+        ...commonValidators,
+        ...validators,
+      })(value);
+    }
+
+    if ('type' in description) {
+      switch (description.type) {
+        case 'html': {
+          if (!isHTML(value))
             throw new TypeError(`Slot expects html (tag, template or blank), got ${typeof value}`);
-          }
-        } else {
-          if (typeof value !== type) {
-            throw new TypeError(`Slot expects ${type}, got ${typeof value}`);
-          }
+
+          return true;
+        }
+
+        case 'string': {
+          // Tags and templates are valid in string arguments - they'll be
+          // stringified when exposed to the description's .content() function.
+          if (isTag(value) || isTemplate(value))
+            return true;
+
+          if (typeof value !== 'string')
+            throw new TypeError(`Slot expects string, got ${typeof value}`);
+
+          return true;
+        }
+
+        default: {
+          if (typeof value !== description.type)
+            throw new TypeError(`Slot expects ${description.type}, got ${typeof value}`);
+
+          return true;
         }
       }
     }
@@ -845,6 +864,12 @@ export class Template {
       }
 
       return providedValue;
+    }
+
+    if (description.type === 'string') {
+      if (isTag(providedValue) || isTemplate(providedValue)) {
+        return providedValue.toString();
+      }
     }
 
     if (providedValue !== null) {

@@ -81,7 +81,7 @@ import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 20;
+const CACHEBUST = 21;
 
 let COMMIT;
 try {
@@ -687,7 +687,8 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  await verifyImagePaths(mediaPath, {urls, wikiData});
+  const {missing: missingImagePaths} =
+    await verifyImagePaths(mediaPath, {urls, wikiData});
 
   const fileSizePreloader = new FileSizePreloader();
 
@@ -807,6 +808,7 @@ async function main() {
 
     defaultLanguage: finalDefaultLanguage,
     languages,
+    missingImagePaths,
     thumbsCache,
     urls,
     urlSpec,

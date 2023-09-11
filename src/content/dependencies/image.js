@@ -1,4 +1,4 @@
-import {logWarn} from '#cli';
+import {logInfo, logWarn} from '#cli';
 import {empty} from '#sugar';
 
 export default {
@@ -10,6 +10,7 @@ export default {
     'getThumbnailsAvailableForDimensions',
     'html',
     'language',
+    'missingImagePaths',
     'to',
   ],
 
@@ -63,6 +64,7 @@ export default {
     getThumbnailsAvailableForDimensions,
     html,
     language,
+    missingImagePaths,
     to,
   }) {
     let originalSrc;
@@ -75,8 +77,27 @@ export default {
       originalSrc = '';
     }
 
-    const willLink = typeof slots.link === 'string' || slots.link;
-    const customLink = typeof slots.link === 'string';
+    let mediaSrc = null;
+    if (originalSrc.startsWith(to('media.root'))) {
+      mediaSrc =
+        originalSrc
+          .slice(to('media.root').length)
+          .replace(/^\//, '');
+    }
+
+    const isMissingImageFile =
+      missingImagePaths.includes(mediaSrc);
+
+    if (isMissingImageFile) {
+      logInfo`No image file for ${mediaSrc} - build again for list of missing images.`;
+    }
+
+    const willLink =
+      !isMissingImageFile &&
+      (typeof slots.link === 'string' || slots.link);
+
+    const customLink =
+      typeof slots.link === 'string';
 
     const willReveal =
       slots.reveal &&
@@ -87,13 +108,16 @@ export default {
 
     const idOnImg = willLink ? null : slots.id;
     const idOnLink = willLink ? slots.id : null;
+
     const classOnImg = willLink ? null : slots.class;
     const classOnLink = willLink ? slots.class : null;
 
-    if (!originalSrc) {
+    if (!originalSrc || isMissingImageFile) {
       return prepare(
         html.tag('div', {class: 'image-text-area'},
-          slots.missingSourceContent));
+          (html.isBlank(slots.missingSourceContent)
+            ? language.$(`misc.missingImage`)
+            : slots.missingSourceContent)));
     }
 
     let reveal = null;
@@ -106,14 +130,6 @@ export default {
         html.tag('span', {class: 'reveal-interaction'},
           language.$('misc.contentWarnings.reveal')),
       ];
-    }
-
-    let mediaSrc = null;
-    if (originalSrc.startsWith(to('media.root'))) {
-      mediaSrc =
-        originalSrc
-          .slice(to('media.root').length)
-          .replace(/^\//, '');
     }
 
     const hasThumbnails =
