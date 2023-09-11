@@ -168,28 +168,45 @@ getThumbnailsAvailableForDimensions.all =
     .map(([name, {size}]) => [name, size])
     .sort((a, b) => b[1] - a[1]);
 
-export function checkIfImagePathHasCachedThumbnails(imagePath, cache) {
+function getCacheEntryForMediaPath(mediaPath, cache) {
+  // Gets the cache entry for the provided image path, which should always be
+  // a forward-slashes path (i.e. suitable for display online). Since the cache
+  // file may have forward or back-slashes, this checks both.
+
+  const entryFromMediaPath = cache[mediaPath];
+  if (entryFromMediaPath) return entryFromMediaPath;
+
+  const winPath = mediaPath.split(path.posix.sep).join(path.win32.sep);
+  const entryFromWinPath = cache[winPath];
+  if (entryFromWinPath) return entryFromWinPath;
+
+  return null;
+}
+
+export function checkIfImagePathHasCachedThumbnails(mediaPath, cache) {
   // Generic utility for checking if the thumbnail cache includes any info for
   // the provided image path, so that the other functions don't hard-code the
   // cache format.
 
-  return !!cache[imagePath];
+  return !!getCacheEntryForMediaPath(mediaPath, cache);
 }
 
-export function getDimensionsOfImagePath(imagePath, cache) {
+export function getDimensionsOfImagePath(mediaPath, cache) {
   // This function is really generic. It takes the gen-thumbs image cache and
   // returns the dimensions in that cache, so that other functions don't need
   // to hard-code the cache format.
 
-  if (!cache[imagePath]) {
-    throw new Error(`Expected imagePath to be included in cache, got ${imagePath}`);
+  const cacheEntry = getCacheEntryForMediaPath(mediaPath, cache);
+
+  if (!cacheEntry) {
+    throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
   }
 
-  const [width, height] = cache[imagePath].slice(1);
+  const [width, height] = cacheEntry.slice(1);
   return [width, height];
 }
 
-export function getThumbnailEqualOrSmaller(preferred, imagePath, cache) {
+export function getThumbnailEqualOrSmaller(preferred, mediaPath, cache) {
   // This function is totally exclusive to page generation. It's a shorthand
   // for accessing dimensions from the thumbnail cache, calculating all the
   // thumbnails available, and selecting the one which is equal to or smaller
@@ -197,12 +214,12 @@ export function getThumbnailEqualOrSmaller(preferred, imagePath, cache) {
   // one which is being thumbnail-ified, this just returns the name of the
   // selected thumbnail size.
 
-  if (!cache[imagePath]) {
-    throw new Error(`Expected imagePath to be included in cache, got ${imagePath}`);
+  if (!getCacheEntryForMediaPath(mediaPath, cache)) {
+    throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
   }
 
   const {size: preferredSize} = thumbnailSpec[preferred];
-  const [width, height] = getDimensionsOfImagePath(imagePath, cache);
+  const [width, height] = getDimensionsOfImagePath(mediaPath, cache);
   const available = getThumbnailsAvailableForDimensions([width, height]);
   const [selected] = available.find(([name, size]) => size <= preferredSize);
   return selected;
