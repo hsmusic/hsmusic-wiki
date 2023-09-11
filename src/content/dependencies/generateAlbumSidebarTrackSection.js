@@ -82,7 +82,7 @@ export default {
             (data.hasTrackNumbers
               ? language.$('albumSidebar.trackList.group.withRange', {
                   group: sectionName,
-                  range: `${data.firstTrackNumber}&ndash;${data.lastTrackNumber}`
+                  range: `${data.firstTrackNumber}–${data.lastTrackNumber}`
                 })
               : language.$('albumSidebar.trackList.group', {
                   group: sectionName,
