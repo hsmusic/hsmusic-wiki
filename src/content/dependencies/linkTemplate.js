@@ -16,7 +16,7 @@ export default {
     path: {validate: v => v.validateArrayItems(v.isString)},
     hash: {type: 'string'},
 
-    tooltip: {validate: v => v.isString},
+    tooltip: {type: 'string'},
     attributes: {validate: v => v.isAttributes},
     color: {validate: v => v.isColor},
     content: {type: 'html'},

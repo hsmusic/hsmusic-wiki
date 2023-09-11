@@ -214,6 +214,28 @@ export class Language extends Thing {
     return new Tag(null, null, output);
   }
 
+  // Similar to the above internal methods, but this one is public.
+  // It should be used when embedding content that may not have previously
+  // been sanitized directly into an HTML tag or template's contents.
+  // The templating engine usually handles this on its own, as does passing
+  // a value (sanitized or not) directly as an argument to formatString,
+  // but if you used a custom validation function ({validate: v => v.isHTML}
+  // instead of {type: 'string'} / {type: 'html'}) and are embedding the
+  // contents of a slot directly, it should be manually sanitized with this
+  // function first.
+  sanitize(arg) {
+    const escapeHTML = this.escapeHTML;
+
+    if (!escapeHTML) {
+      throw new Error(`escapeHTML unavailable`);
+    }
+
+    return (
+      (typeof arg === 'string'
+        ? new Tag(null, null, escapeHTML(arg))
+        : arg));
+  }
+
   formatDate(date) {
     this.assertIntlAvailable('intl_date');
     return this.intl_date.format(date);
@@ -299,6 +321,13 @@ export class Language extends Thing {
     return this.#wrapSanitized(
       this.intl_listUnit.format(
         array.map(item => this.#sanitizeStringArg(item))));
+  }
+
+  // Lists without separator: A B C
+  formatListWithoutSeparator(array) {
+    return this.#wrapSanitized(
+      array.map(item => this.#sanitizeStringArg(item))
+        .join(' '));
   }
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB

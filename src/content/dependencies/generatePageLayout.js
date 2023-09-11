@@ -105,7 +105,7 @@ export default {
     color: {validate: v => v.isColor},
 
     styleRules: {
-      validate: v => v.sparseArrayOf(v.isString),
+      validate: v => v.sparseArrayOf(v.isHTML),
       default: [],
     },
 
@@ -183,7 +183,7 @@ export default {
           } else {
             aggregate.call(v.validateProperties({
               path: v.strictArrayOf(v.isString),
-              title: v.isString,
+              title: v.isHTML,
             }), {
               path: object.path,
               title: object.title,
@@ -521,7 +521,7 @@ export default {
         ]),
       slots.bannerPosition === 'bottom' && slots.banner,
       footerHTML,
-    ].filter(Boolean).join('\n');
+    ];
 
     const pageHTML = html.tags([
       `<!DOCTYPE html>`,

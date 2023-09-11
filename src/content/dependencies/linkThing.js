@@ -26,7 +26,7 @@ export default {
     preferShortName: {type: 'boolean', default: false},
 
     tooltip: {
-      validate: v => v.oneOf(v.isBoolean, v.isString),
+      validate: v => v.oneOf(v.isBoolean, v.isHTML),
       default: false,
     },
 
