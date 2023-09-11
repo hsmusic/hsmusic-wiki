@@ -197,6 +197,7 @@
   "misc.external.flash.homestuck.page": "{LINK} (page {PAGE})",
   "misc.external.flash.homestuck.secret": "{LINK} (secret page)",
   "misc.external.flash.youtube": "{LINK} (on any device)",
+  "misc.missingImage": "(This image file is missing)",
   "misc.missingLinkContent": "(Missing link content)",
   "misc.nav.previous": "Previous",
   "misc.nav.next": "Next",
