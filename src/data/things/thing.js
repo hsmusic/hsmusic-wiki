@@ -203,15 +203,18 @@ export function externalFunction() {
 // also existing on this object!
 //
 export function contributionList() {
-  return compositeFrom(`contributionList`, [
-    withUpdateValueAsDependency(),
-    withResolvedContribs({from: '#updateValue'}),
-    exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
-    exposeConstant({
-      value: [],
-      update: {validate: isContributionList},
-    }),
-  ]);
+  return compositeFrom({
+    annotation: `contributionList`,
+
+    update: {validate: isContributionList},
+
+    steps: [
+      withUpdateValueAsDependency(),
+      withResolvedContribs({from: '#updateValue'}),
+      exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
+      exposeConstant({value: []}),
+    ],
+  });
 }
 
 // Artist commentary! Generally present on tracks and albums.
@@ -259,7 +262,7 @@ export function additionalFiles() {
 export function referenceList({
   class: thingClass,
   data,
-  find,
+  find: findFunction,
 }) {
   if (!thingClass) {
     throw new TypeError(`Expected a Thing class`);
@@ -270,29 +273,40 @@ export function referenceList({
     throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
   }
 
-  return compositeFrom(`referenceList`, [
-    withUpdateValueAsDependency(),
+  return compositeFrom({
+    annotation: `referenceList`,
 
-    withResolvedReferenceList({
-      data, find,
-      list: '#updateValue',
-      notFoundMode: 'filter',
-    }),
+    update: {
+      validate: validateReferenceList(referenceType),
+    },
 
-    exposeDependency({
-      dependency: '#resolvedReferenceList',
-      update: {
-        validate: validateReferenceList(referenceType),
-      },
-    }),
-  ]);
+    mapDependencies: {
+      '#composition.data': data,
+    },
+
+    constantDependencies: {
+      '#composition.findFunction': findFunction,
+    },
+
+    steps: [
+      withUpdateValueAsDependency(),
+
+      withResolvedReferenceList({
+        list: '#updateValue',
+        data: '#composition.data',
+        find: '#composition.findFunction',
+      }),
+
+      exposeDependency({dependency: '#resolvedReferenceList'}),
+    ],
+  });
 }
 
 // Corresponding function for a single reference.
 export function singleReference({
   class: thingClass,
   data,
-  find,
+  find: findFunction,
 }) {
   if (!thingClass) {
     throw new TypeError(`Expected a Thing class`);
@@ -303,27 +317,56 @@ export function singleReference({
     throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
   }
 
-  return compositeFrom(`singleReference`, [
-    withUpdateValueAsDependency(),
+  return compositeFrom({
+    annotation: `singleReference`,
 
-    withResolvedReference({ref: '#updateValue', data, find}),
+    update: {
+      validate: validateReference(referenceType),
+    },
 
-    exposeDependency({
-      dependency: '#resolvedReference',
-      update: {
-        validate: validateReference(referenceType),
-      },
-    }),
-  ]);
+    mapDependencies: {
+      '#composition.data': data,
+    },
+
+    constantDependencies: {
+      '#composition.findFunction': findFunction,
+    },
+
+    steps: [
+      withUpdateValueAsDependency(),
+
+      withResolvedReference({
+        ref: '#updateValue',
+        data: '#composition.data',
+        find: '#composition.findFunction',
+      }),
+
+      exposeDependency({dependency: '#resolvedReference'}),
+    ],
+  });
 }
 
 // Nice 'n simple shorthand for an exposed-only flag which is true when any
 // contributions are present in the specified property.
-export function contribsPresent({contribs}) {
-  return compositeFrom(`contribsPresent`, [
-    withResultOfAvailabilityCheck({fromDependency: contribs, mode: 'empty'}),
-    exposeDependency({dependency: '#availability'}),
-  ]);
+export function contribsPresent({
+  contribs,
+}) {
+  return compositeFrom({
+    annotation: `contribsPresent`,
+
+    mapDependencies: {
+      '#composition.contribs': contribs,
+    },
+
+    steps: [
+      withResultOfAvailabilityCheck({
+        fromDependency: '#composition.contribs',
+        mode: 'empty',
+      }),
+
+      exposeDependency({dependency: '#availability'}),
+    ],
+  });
 }
 
 // Neat little shortcut for "reversing" the reference lists stored on other
@@ -332,10 +375,23 @@ export function contribsPresent({contribs}) {
 // property. Naturally, the passed ref list property is of the things in the
 // wiki data provided, not the requesting Thing itself.
 export function reverseReferenceList({data, list}) {
-  return compositeFrom(`reverseReferenceList`, [
-    withReverseReferenceList({data, list}),
-    exposeDependency({dependency: '#reverseReferenceList'}),
-  ]);
+  return compositeFrom({
+    annotation: `reverseReferenceList`,
+
+    mapDependencies: {
+      '#composition.data': data,
+      '#composition.list': list,
+    },
+
+    steps: [
+      withReverseReferenceList({
+        data: '#composition.data',
+        list: '#composition.list',
+      }),
+
+      exposeDependency({dependency: '#reverseReferenceList'}),
+    ],
+  });
 }
 
 // General purpose wiki data constructor, for properties like artistData,
@@ -353,39 +409,51 @@ export function wikiData(thingClass) {
 // commentary content, and finds the matching artist for each reference.
 // This is mostly useful for credits and listings on artist pages.
 export function commentatorArtists() {
-  return compositeFrom(`commentatorArtists`, [
-    exitWithoutDependency({dependency: 'commentary', mode: 'falsy', value: []}),
+  return compositeFrom({
+    annotation: `commentatorArtists`,
 
-    {
-      dependencies: ['commentary'],
-      compute: ({commentary}, continuation) =>
-        continuation({
-          '#artistRefs':
-            Array.from(
-              commentary
-                .replace(/<\/?b>/g, '')
-                .matchAll(/<i>(?<who>.*?):<\/i>/g))
-              .map(({groups: {who}}) => who),
-        }),
+    constantDependencies: {
+      '#composition.findFunction': find.artists,
     },
 
-    withResolvedReferenceList({
-      list: '#artistRefs',
-      data: 'artistData',
-      into: '#artists',
-      find: find.artist,
-    }),
+    steps: [
+      exitWithoutDependency({
+        dependency: 'commentary',
+        mode: 'falsy',
+        value: [],
+      }),
 
-    {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['#artists'],
-        compute: ({'#artists': artists}) =>
-          unique(artists),
+      {
+        dependencies: ['commentary'],
+        compute: ({commentary}, continuation) =>
+          continuation({
+            '#artistRefs':
+              Array.from(
+                commentary
+                  .replace(/<\/?b>/g, '')
+                  .matchAll(/<i>(?<who>.*?):<\/i>/g))
+                .map(({groups: {who}}) => who),
+          }),
       },
-    },
-  ]);
+
+      withResolvedReferenceList({
+        list: '#artistRefs',
+        data: 'artistData',
+        into: '#artists',
+        find: '#composition.findFunction',
+      }),
+
+      {
+        flags: {expose: true},
+
+        expose: {
+          dependencies: ['#artists'],
+          compute: ({'#artists': artists}) =>
+            unique(artists),
+        },
+      },
+    ],
+  });
 }
 
 // Compositional utilities
@@ -398,39 +466,54 @@ export function withResolvedContribs({
   from,
   into = '#resolvedContribs',
 }) {
-  return compositeFrom(`withResolvedContribs`, [
-    raiseWithoutDependency({
-      dependency: from,
-      mode: 'empty',
-      map: {into},
-      raise: {into: []},
-    }),
+  return compositeFrom({
+    annotation: `withResolvedContribs`,
 
-    withPropertiesFromList({
-      list: from,
-      properties: ['who', 'what'],
-      prefix: '#contribs',
-    }),
-
-    withResolvedReferenceList({
-      list: '#contribs.who',
-      data: 'artistData',
-      into: '#contribs.who',
-      find: find.artist,
-      notFoundMode: 'null',
-    }),
-
-    {
-      dependencies: ['#contribs.who', '#contribs.what'],
-      mapContinuation: {into},
-      compute({'#contribs.who': who, '#contribs.what': what}, continuation) {
-        filterMultipleArrays(who, what, (who, _what) => who);
-        return continuation({
-          into: stitchArrays({who, what}),
-        });
-      },
+    mapDependencies: {
+      '#composition.from': from,
     },
-  ]);
+
+    mapContinuation: {
+      '#composition.into': into,
+    },
+
+    constantDependencies: {
+      '#composition.findFunction': find.artist,
+      '#composition.notFoundMode': 'null',
+    },
+
+    steps: [
+      raiseWithoutDependency({
+        dependency: '#composition.from',
+        raise: {'#composition.into': []},
+        mode: 'empty',
+      }),
+
+      withPropertiesFromList({
+        list: '#composition.from',
+        prefix: '#contribs',
+        properties: ['who', 'what'],
+      }),
+
+      withResolvedReferenceList({
+        list: '#contribs.who',
+        data: 'artistData',
+        into: '#contribs.who',
+        find: '#composition.findFunction',
+        notFoundMode: '#composition.notFoundMode',
+      }),
+
+      {
+        dependencies: ['#contribs.who', '#contribs.what'],
+        compute({'#contribs.who': who, '#contribs.what': what}, continuation) {
+          filterMultipleArrays(who, what, (who, _what) => who);
+          return continuation({
+            '#composition.into': stitchArrays({who, what}),
+          });
+        },
+      },
+    ],
+  });
 }
 
 // Shorthand for exiting if the contribution list (usually a property's update
@@ -440,14 +523,37 @@ export function exitWithoutContribs({
   contribs,
   value = null,
 }) {
-  return compositeFrom(`exitWithoutContribs`, [
-    withResolvedContribs({from: contribs}),
-    exitWithoutDependency({
-      dependency: '#resolvedContribs',
-      mode: 'empty',
-      value,
-    }),
-  ]);
+  return compositeFrom({
+    annotation: `exitWithoutContribs`,
+
+    mapDependencies: {
+      '#composition.contribs': contribs,
+    },
+
+    constantDependencies: {
+      '#composition.value': value,
+    },
+
+    steps: [
+      withResolvedContribs({from: '#composition.contribs'}),
+
+      withResultOfAvailabilityCheck({
+        fromDependency: '#resolvedContribs',
+        mode: 'empty',
+      }),
+
+      {
+        dependencies: ['#availability', '#composition.value'],
+        compute: ({
+          '#availability': availability,
+          '#composition.value': value,
+        }, continuation) =>
+          (availability
+            ? continuation()
+            : continuation.exit(value)),
+      },
+    ],
+  });
 }
 
 // Resolves a reference by using the provided find function to match it
@@ -461,39 +567,54 @@ export function withResolvedReference({
   data,
   find: findFunction,
   into = '#resolvedReference',
-  notFoundMode = 'null',
+  notFoundMode,
 }) {
-  if (!['exit', 'null'].includes(notFoundMode)) {
-    throw new TypeError(`Expected notFoundMode to be exit or null`);
-  }
+  return compositeFrom({
+    annotation: `withResolvedReference`,
 
-  return compositeFrom(`withResolvedReference`, [
-    raiseWithoutDependency({
-      dependency: ref,
-      map: {into},
-      raise: {into: null},
-    }),
-
-    exitWithoutDependency({
-      dependency: data,
-    }),
-
-    {
-      options: {findFunction, notFoundMode},
-      mapDependencies: {ref, data},
-      mapContinuation: {match: into},
-
-      compute({ref, data, '#options': {findFunction, notFoundMode}}, continuation) {
-        const match = findFunction(ref, data, {mode: 'quiet'});
-
-        if (match === null && notFoundMode === 'exit') {
-          return continuation.exit(null);
-        }
-
-        return continuation.raise({match});
-      },
+    mapDependencies: {
+      '#composition.ref': ref,
+      '#composition.data': data,
+      '#composition.findFunction': findFunction,
+      '#composition.notFoundMode': notFoundMode,
     },
-  ]);
+
+    constantDependencies: {
+      '#composition.notFoundMode': 'null',
+    },
+
+    mapContinuation: {
+      '#composition.into': into,
+    },
+
+    steps: [
+      raiseWithoutDependency({
+        dependency: '#composition.ref',
+        raise: {'#composition.into': null},
+      }),
+
+      exitWithoutDependency({
+        dependency: '#composition.data',
+      }),
+
+      {
+        compute({
+          '#composition.ref': ref,
+          '#composition.data': data,
+          '#composition.findFunction': findFunction,
+          '#composition.notFoundMode': notFoundMode,
+        }, continuation) {
+          const match = findFunction(ref, data, {mode: 'quiet'});
+
+          if (match === null && notFoundMode === 'exit') {
+            return continuation.exit(null);
+          }
+
+          return continuation.raise({match});
+        },
+      },
+    ],
+  });
 }
 
 // Resolves a list of references, with each reference matched with provided
@@ -505,79 +626,93 @@ export function withResolvedReferenceList({
   list,
   data,
   find: findFunction,
+  notFoundMode,
   into = '#resolvedReferenceList',
-  notFoundMode = 'filter',
 }) {
   if (!['filter', 'exit', 'null'].includes(notFoundMode)) {
     throw new TypeError(`Expected notFoundMode to be filter, exit, or null`);
   }
 
-  const composite = compositeFrom(`withResolvedReferenceList`, [
-    exitWithoutDependency({
-      dependency: data,
-      value: [],
-    }),
+  return compositeFrom({
+    annotation: `withResolvedReferenceList`,
 
-    raiseWithoutDependency({
-      dependency: list,
-      mode: 'empty',
-      map: {into},
-      raise: {into: []},
-    }),
+    mapDependencies: {
+      '#composition.list': list,
+      '#composition.data': data,
+      '#composition.findFunction': findFunction,
+      '#composition.notFoundMode': notFoundMode,
+    },
 
-    {
-      cache: 'aggressive',
-      annotation: `withResolvedReferenceList.getMatches`,
-      flags: {expose: true, compose: true},
+    constantDependencies: {
+      '#composition.notFoundMode': 'filter',
+    },
 
-      compute: {
-        mapDependencies: {list, data},
-        options: {findFunction},
+    mapContinuation: {
+      '#composition.into': into,
+    },
 
-        compute: ({list, data, '#options': {findFunction}}, continuation) =>
+    steps: [
+      exitWithoutDependency({
+        dependency: '#composition.data',
+        value: [],
+      }),
+
+      raiseWithoutDependency({
+        dependency: '#composition.list',
+        raise: {'#composition.into': []},
+        mode: 'empty',
+      }),
+
+      {
+        dependencies: [
+          '#composition.list',
+          '#composition.data',
+          '#composition.findFunction',
+        ],
+
+        compute: ({
+          '#composition.list': list,
+          '#composition.data': data,
+          '#composition.findFunction': findFunction,
+        }, continuation) =>
           continuation({
             '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
           }),
       },
-    },
 
-    {
-      dependencies: ['#matches'],
-      mapContinuation: {into},
-
-      compute: ({'#matches': matches}, continuation) =>
-        (matches.every(match => match)
-          ? continuation.raise({into: matches})
-          : continuation()),
-    },
-
-    {
-      dependencies: ['#matches'],
-      options: {notFoundMode},
-      mapContinuation: {into},
-
-      compute({
-        '#matches': matches,
-        '#options': {notFoundMode},
-      }, continuation) {
-        switch (notFoundMode) {
-          case 'exit':
-            return continuation.exit([]);
-
-          case 'filter':
-            matches = matches.filter(match => match);
-            return continuation.raise({into: matches});
-
-          case 'null':
-            matches = matches.map(match => match ?? null);
-            return continuation.raise({into: matches});
-        }
+      {
+        dependencies: ['#matches'],
+        compute: ({'#matches': matches}, continuation) =>
+          (matches.every(match => match)
+            ? continuation.raise({'#continuation.into': matches})
+            : continuation()),
       },
-    },
-  ]);
 
-  console.log(composite.expose);
-  return composite;
+      {
+        dependencies: ['#matches', '#composition.notFoundMode'],
+        compute({
+          '#matches': matches,
+          '#composition.notFoundMode': notFoundMode,
+        }, continuation) {
+          switch (notFoundMode) {
+            case 'exit':
+              return continuation.exit([]);
+
+            case 'filter':
+              matches = matches.filter(match => match);
+              return continuation.raise({'#continuation.into': matches});
+
+            case 'null':
+              matches = matches.map(match => match ?? null);
+              return continuation.raise({'#continuation.into': matches});
+
+            default:
+              throw new TypeError(`Expected notFoundMode to be exit, filter, or null`);
+          }
+        },
+      },
+    ],
+  });
 }
 
 // Check out the info on reverseReferenceList!
@@ -587,22 +722,44 @@ export function withReverseReferenceList({
   list: refListProperty,
   into = '#reverseReferenceList',
 }) {
-  return compositeFrom(`withReverseReferenceList`, [
-    exitWithoutDependency({
-      dependency: data,
-      value: [],
-    }),
+  return compositeFrom({
+    annotation: `withReverseReferenceList`,
 
-    {
-      dependencies: ['this'],
-      mapDependencies: {data},
-      mapContinuation: {into},
-      options: {refListProperty},
-
-      compute: ({this: thisThing, data, '#options': {refListProperty}}, continuation) =>
-        continuation({
-          into: data.filter(thing => thing[refListProperty].includes(thisThing)),
-        }),
+    mapDependencies: {
+      '#composition.data': data,
     },
-  ]);
+
+    constantDependencies: {
+      '#composition.refListProperty': refListProperty,
+    },
+
+    mapContinuation: {
+      '#composition.into': into,
+    },
+
+    steps: [
+      exitWithoutDependency({
+        dependency: '#composition.data',
+        value: [],
+      }),
+
+      {
+        dependencies: [
+          'this',
+          '#composition.data',
+          '#composition.refListProperty',
+        ],
+
+        compute: ({
+          this: thisThing,
+          '#composition.data': data,
+          '#composition.refListProperty': refListProperty,
+        }, continuation) =>
+          continuation({
+            '#composition.into':
+              data.filter(thing => thing[refListProperty].includes(thisThing)),
+          }),
+      },
+    ],
+  });
 }

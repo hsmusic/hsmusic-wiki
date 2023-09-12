@@ -344,7 +344,9 @@ import {
 
 const globalCompositeCache = {};
 
-export function compositeFrom(firstArg, secondArg) {
+export function compositeFrom(description) {
+  const {annotation, steps: composition} = description;
+
   const debug = fn => {
     if (compositeFrom.debug === true) {
       const label =
@@ -362,13 +364,6 @@ export function compositeFrom(firstArg, secondArg) {
       }
     }
   };
-
-  let annotation, composition;
-  if (typeof firstArg === 'string') {
-    [annotation, composition] = [firstArg, secondArg];
-  } else {
-    [annotation, composition] = [null, firstArg];
-  }
 
   const base = composition.at(-1);
   const steps = composition.slice();
@@ -974,6 +969,7 @@ export function exposeConstant({
 export function withResultOfAvailabilityCheck({
   fromUpdateValue,
   fromDependency,
+  modeDependency,
   mode = 'null',
   into = '#availability',
 }) {
@@ -1026,31 +1022,40 @@ export function withResultOfAvailabilityCheck({
 
 // Exposes a dependency as it is, or continues if it's unavailable.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function exposeDependencyOrContinue({
-  dependency,
-  mode = 'null',
-}) {
-  return compositeFrom(`exposeDependencyOrContinue`, [
-    withResultOfAvailabilityCheck({
-      fromDependency: dependency,
-      mode,
-    }),
+export const exposeDependencyOrContinue =
+  templateCompositeFrom({
+    annotation: `exposeDependencyOrContinue`,
 
-    {
-      dependencies: ['#availability'],
-      compute: ({'#availability': availability}, continuation) =>
-        (availability
-          ? continuation()
-          : continuation.raise()),
+    inputs: {
+      dependency: input(),
+      mode: input.default('null'),
     },
 
-    {
-      mapDependencies: {dependency},
-      compute: ({dependency}, continuation) =>
-        continuation.exit(dependency),
-    },
-  ]);
-}
+    steps: () => [
+      withResultOfAvailabilityCheck({
+        from: input('dependency'),
+        mode: input('mode'),
+      }),
+
+      {
+        dependencies: ['#availability'],
+        compute: (continuation, {
+          ['#availability']: availability,
+        }) =>
+          (availability
+            ? continuation()
+            : continuation.raise()),
+      },
+
+      {
+        dependencies: [input('#dependency')],
+        compute: (continuation, {
+          [input('#dependency')]: dependency,
+        }) =>
+          continuation.exit(dependency),
+      },
+    ],
+  });
 
 // Exposes the update value of an {update: true} property as it is,
 // or continues if it's unavailable. See withResultOfAvailabilityCheck
