@@ -673,7 +673,7 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
 
   if (empty(missing) && empty(misplaced)) {
     logInfo`All image paths are good - nice! None are missing or misplaced.`;
-    return;
+    return {missing, misplaced};
   }
 
   if (!empty(missing)) {
