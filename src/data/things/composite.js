@@ -953,11 +953,10 @@ export function exposeConstant({
   };
 }
 
-// Checks the availability of a dependency or the update value and provides
-// the result to later steps under '#availability' (by default). This is
-// mainly intended for use by the more specific utilities, which you should
-// consider using instead. Customize {mode} to select one of these modes,
-// or leave unset and default to 'null':
+// Checks the availability of a dependency and provides the result to later
+// steps under '#availability' (by default). This is mainly intended for use
+// by the more specific utilities, which you should consider using instead.
+// Customize {mode} to select one of these modes, or default to 'null':
 //
 // * 'null':  Check that the value isn't null (and not undefined either).
 // * 'empty': Check that the value is neither null nor an empty array.
@@ -966,274 +965,249 @@ export function exposeConstant({
 //            (nor an empty array). Keep in mind this will also be false
 //            for values like zero and the empty string!
 //
-export function withResultOfAvailabilityCheck({
-  fromUpdateValue,
-  fromDependency,
-  modeDependency,
-  mode = 'null',
-  into = '#availability',
-}) {
-  if (!['null', 'empty', 'falsy'].includes(mode)) {
-    throw new TypeError(`Expected mode to be null, empty, or falsy`);
-  }
 
-  if (fromUpdateValue && fromDependency) {
-    throw new TypeError(`Don't provide both fromUpdateValue and fromDependency`);
-  }
+const availabilityCheckMode = {
+  validate: oneOf('null', 'empty', 'falsy'),
+  defaultValue: 'null',
+};
 
-  if (!fromUpdateValue && !fromDependency) {
-    throw new TypeError(`Missing dependency name (or fromUpdateValue)`);
-  }
+export const withResultOfAvailabilityCheck = templateCompositeFrom({
+  annotation: `withResultOfAvailabilityCheck`,
 
-  const checkAvailability = (value, mode) => {
-    switch (mode) {
-      case 'null': return value !== null && value !== undefined;
-      case 'empty': return !empty(value);
-      case 'falsy': return !!value && (!Array.isArray(value) || !empty(value));
-      default: return false;
-    }
-  };
+  inputs: {
+    from: input(),
+    mode: input(availabilityCheckMode),
+  },
 
-  if (fromDependency) {
-    return {
-      annotation: `withResultOfAvailabilityCheck.fromDependency`,
-      flags: {expose: true, compose: true},
-      expose: {
-        mapDependencies: {from: fromDependency},
-        mapContinuation: {into},
-        options: {mode},
-        compute: ({from, '#options': {mode}}, continuation) =>
-          continuation({into: checkAvailability(from, mode)}),
+  outputs: {
+    into: '#availability',
+  },
+
+  steps: [
+    {
+      dependencies: [input('from'), input('mode')],
+
+      compute: (continuation, {
+        [input('from')]: dependency,
+        [input('mode')]: mode,
+      }) => {
+        let availability;
+
+        switch (mode) {
+          case 'null':
+            availability = value !== null && value !== undefined;
+            break;
+
+          case 'empty':
+            availability = !empty(value);
+            break;
+
+          case 'falsy':
+            availability = !!value && (!Array.isArray(value) || !empty(value));
+            break;
+        }
+
+        return continuation({into: availability});
       },
-    };
-  } else {
-    return {
-      annotation: `withResultOfAvailabilityCheck.fromUpdateValue`,
-      flags: {expose: true, compose: true},
-      expose: {
-        mapContinuation: {into},
-        options: {mode},
-        transform: (value, {'#options': {mode}}, continuation) =>
-          continuation(value, {into: checkAvailability(value, mode)}),
-      },
-    };
-  }
-}
+    },
+  ],
+});
 
 // Exposes a dependency as it is, or continues if it's unavailable.
 // See withResultOfAvailabilityCheck for {mode} options!
-export const exposeDependencyOrContinue =
-  templateCompositeFrom({
-    annotation: `exposeDependencyOrContinue`,
+export const exposeDependencyOrContinue = templateCompositeFrom({
+  annotation: `exposeDependencyOrContinue`,
 
-    inputs: {
-      dependency: input(),
-      mode: input.default('null'),
+  inputs: {
+    dependency: input(),
+    mode: input(availabilityCheckMode),
+  },
+
+  steps: () => [
+    withResultOfAvailabilityCheck({
+      from: input('dependency'),
+      mode: input('mode'),
+    }),
+
+    {
+      dependencies: ['#availability', input('dependency')],
+      compute: (continuation, {
+        ['#availability']: availability,
+        [input('dependency')]: dependency,
+      }) =>
+        (availability
+          ? continuation.exit(dependency)
+          : continuation()),
     },
-
-    steps: () => [
-      withResultOfAvailabilityCheck({
-        from: input('dependency'),
-        mode: input('mode'),
-      }),
-
-      {
-        dependencies: ['#availability'],
-        compute: (continuation, {
-          ['#availability']: availability,
-        }) =>
-          (availability
-            ? continuation()
-            : continuation.raise()),
-      },
-
-      {
-        dependencies: [input('#dependency')],
-        compute: (continuation, {
-          [input('#dependency')]: dependency,
-        }) =>
-          continuation.exit(dependency),
-      },
-    ],
-  });
+  ],
+});
 
 // Exposes the update value of an {update: true} property as it is,
 // or continues if it's unavailable. See withResultOfAvailabilityCheck
 // for {mode} options!
-export function exposeUpdateValueOrContinue({
-  mode = 'null',
-} = {}) {
-  return compositeFrom(`exposeUpdateValueOrContinue`, [
-    withResultOfAvailabilityCheck({
-      fromUpdateValue: true,
-      mode,
+export const exposeUpdateValueOrContinue = templateCompositeFrom({
+  annotation: `exposeUpdateValueOrContinue`,
+
+  inputs: {
+    mode: input(availabilityCheckMode),
+  },
+
+  steps: () => [
+    exposeDependencyOrContinue({
+      dependency: input.updateValue(),
+      mode: input('mode'),
     }),
-
-    {
-      dependencies: ['#availability'],
-      compute: ({'#availability': availability}, continuation) =>
-        (availability
-          ? continuation()
-          : continuation.raise()),
-    },
-
-    {
-      transform: (value, continuation) =>
-        continuation.exit(value),
-    },
-  ]);
-}
-
-// Early exits if an availability check has failed.
-// This is for internal use only - use `exitWithoutDependency` or
-// `exitWithoutUpdateValue` instead.
-export function exitIfAvailabilityCheckFailed({
-  availability = '#availability',
-  value = null,
-} = {}) {
-  return compositeFrom(`exitIfAvailabilityCheckFailed`, [
-    {
-      mapDependencies: {availability},
-      compute: ({availability}, continuation) =>
-        (availability
-          ? continuation.raise()
-          : continuation()),
-    },
-
-    {
-      options: {value},
-      compute: ({'#options': {value}}, continuation) =>
-        continuation.exit(value),
-    },
-  ]);
-}
+  ],
+});
 
 // Early exits if a dependency isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function exitWithoutDependency({
-  dependency,
-  mode = 'null',
-  value = null,
-}) {
-  return compositeFrom(`exitWithoutDependency`, [
-    withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
-    exitIfAvailabilityCheckFailed({value}),
-  ]);
-}
+export const exitWithoutDependency = templateCompositeFrom({
+  annotation: `exitWithoutDependency`,
+
+  inputs: {
+    dependency: input.required(),
+    mode: input(availabilityCheckMode),
+    value: input({defaultValue: null}),
+  },
+
+  steps: [
+    withResultOfAvailabilityCheck({
+      from: input('dependency'),
+      mode: input('mode'),
+    }),
+
+    {
+      dependencies: ['#availability', input('value')],
+      continuation: (continuation, {
+        ['#availability']: availability,
+        [input('value')]: value,
+      }) =>
+        (availability
+          ? continuation()
+          : continuation.exit(value)),
+    },
+  ],
+});
 
 // Early exits if this property's update value isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function exitWithoutUpdateValue({
-  mode = 'null',
-  value = null,
-} = {}) {
-  return compositeFrom(`exitWithoutUpdateValue`, [
-    withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
-    exitIfAvailabilityCheckFailed({value}),
-  ]);
-}
+export const exitWithoutUpdateValue = templateCompositeFrom({
+  annotation: `exitWithoutUpdateValue`,
+
+  inputs: {
+    mode: input(availabilityCheckMode),
+    value: input({defaultValue: null}),
+  },
+
+  steps: [
+    exitWithoutDependency({
+      dependency: input.updateValue(),
+      mode: input('mode'),
+    }),
+  ],
+});
 
 // Raises if a dependency isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function raiseWithoutDependency({
-  dependency,
-  mode = 'null',
-  map = {},
-  raise = {},
-}) {
-  return compositeFrom(`raiseWithoutDependency`, [
-    withResultOfAvailabilityCheck({fromDependency: dependency, mode}),
+export const raiseOutputWithoutDependency = templateCompositeFrom({
+  annotation: `raiseOutputWithoutDependency`,
+
+  inputs: {
+    dependency: input.required(),
+    mode: input(availabilityCheckMode),
+    output: input({defaultValue: {}}),
+  },
+
+  steps: [
+    withResultOfAvailabilityCheck({
+      from: input('dependency'),
+      mode: input('mode'),
+    }),
 
     {
-      dependencies: ['#availability'],
-      compute: ({'#availability': availability}, continuation) =>
+      dependencies: ['#availability', input('output')],
+      compute: (continuation, {
+        ['#availability']: availability,
+        [input('output')]: output,
+      }) =>
         (availability
-          ? continuation.raise()
-          : continuation()),
+          ? continuation()
+          : continuation.raiseOutputAbove(output)),
     },
-
-    {
-      options: {raise},
-      mapContinuation: map,
-      compute: ({'#options': {raise}}, continuation) =>
-        continuation.raiseAbove(raise),
-    },
-  ]);
-}
+  ],
+});
 
 // Raises if this property's update value isn't available.
 // See withResultOfAvailabilityCheck for {mode} options!
-export function raiseWithoutUpdateValue({
-  mode = 'null',
-  map = {},
-  raise = {},
-} = {}) {
-  return compositeFrom(`raiseWithoutUpdateValue`, [
-    withResultOfAvailabilityCheck({fromUpdateValue: true, mode}),
+export const raiseOutputWithoutUpdateValue = templateCompositeFrom({
+  annotation: `raiseOutputWithoutUpdateValue`,
+
+  inputs: {
+    mode: input(availabilityCheckMode),
+    output: input({defaultValue: {}}),
+  },
+
+  steps: [
+    withResultOfAvailabilityCheck({
+      from: input.updateValue(),
+      mode: input('mode'),
+    }),
 
     {
-      dependencies: ['#availability'],
-      compute: ({'#availability': availability}, continuation) =>
+      dependencies: ['#availability', input('output')],
+      compute: (continuation, {
+        ['#availability']: availability,
+        [input('output')]: output,
+      }) =>
         (availability
-          ? continuation.raise()
-          : continuation()),
+          ? continuation()
+          : continuation.raiseOutputAbove(output)),
     },
-
-    {
-      options: {raise},
-      mapContinuation: map,
-      compute: ({'#options': {raise}}, continuation) =>
-        continuation.raiseAbove(raise),
-    },
-  ]);
-}
-
-// Turns an updating property's update value into a dependency, so it can be
-// conveniently passed to other functions.
-export function withUpdateValueAsDependency({
-  into = '#updateValue',
-} = {}) {
-  return {
-    annotation: `withUpdateValueAsDependency`,
-    flags: {expose: true, compose: true},
-
-    expose: {
-      mapContinuation: {into},
-      transform: (value, continuation) =>
-        continuation(value, {into: value}),
-    },
-  };
-}
+  ],
+});
 
 // Gets a property of some object (in a dependency) and provides that value.
 // If the object itself is null, or the object doesn't have the listed property,
 // the provided dependency will also be null.
-export function withPropertyFromObject({
-  object,
-  property,
-  into = null,
-}) {
-  into ??=
-    (object.startsWith('#')
-      ? `${object}.${property}`
-      : `#${object}.${property}`);
+export const withPropertyFromObject = templateCompositeFrom({
+  annotation: `withPropertyFromObject`,
 
-  return {
-    annotation: `withPropertyFromObject`,
-    flags: {expose: true, compose: true},
+  inputs: {
+    object: input({type: 'object', null: true}),
+    property: input.required({type: 'string'}),
+  }
 
-    expose: {
-      mapDependencies: {object},
-      mapContinuation: {into},
-      options: {property},
+  outputs: {
+    into: {
+      dependencies: [
+        input.staticDependency('object'),
+        input.staticValue('property'),
+      ],
 
-      compute: ({object, '#options': {property}}, continuation) =>
-        (object === null || object === undefined
+      default: ({
+        [input.staticDependency('object')]: object,
+        [input.staticValue('property')]: property,
+      }) =>
+        (object.startsWith('#')
+          ? `${object}.${property}`
+          : `#${object}.${property}`),
+    },
+  },
+
+  steps: [
+    {
+      dependencies: [input('object'), input('property')],
+      compute: (continuation, {
+        [input('object')]: object,
+        [input('property')]: property,
+      }) =>
+        (object === null
           ? continuation({into: null})
           : continuation({into: object[property] ?? null})),
     },
-  };
-}
+  ],
+});
 
 // Gets the listed properties from some object, providing each property's value
 // as a dependency prefixed with the same name as the object (by default).
