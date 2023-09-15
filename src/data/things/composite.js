@@ -1,6 +1,7 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
+import {oneOf} from '#validators';
 import {TupleMap} from '#wiki-data';
 
 import {
@@ -1357,7 +1358,7 @@ export const withResultOfAvailabilityCheck = templateCompositeFrom({
     into: '#availability',
   },
 
-  steps: [
+  steps: () => [
     {
       dependencies: [input('from'), input('mode')],
 
@@ -1440,12 +1441,12 @@ export const exitWithoutDependency = templateCompositeFrom({
   annotation: `exitWithoutDependency`,
 
   inputs: {
-    dependency: input.required(),
+    dependency: input(),
     mode: input(availabilityCheckMode),
-    value: input({defaultValue: null}),
+    value: input({null: true}),
   },
 
-  steps: [
+  steps: () => [
     withResultOfAvailabilityCheck({
       from: input('dependency'),
       mode: input('mode'),
@@ -1474,7 +1475,7 @@ export const exitWithoutUpdateValue = templateCompositeFrom({
     value: input({defaultValue: null}),
   },
 
-  steps: [
+  steps: () => [
     exitWithoutDependency({
       dependency: input.updateValue(),
       mode: input('mode'),
@@ -1488,12 +1489,12 @@ export const raiseOutputWithoutDependency = templateCompositeFrom({
   annotation: `raiseOutputWithoutDependency`,
 
   inputs: {
-    dependency: input.required(),
+    dependency: input(),
     mode: input(availabilityCheckMode),
     output: input({defaultValue: {}}),
   },
 
-  steps: [
+  steps: () => [
     withResultOfAvailabilityCheck({
       from: input('dependency'),
       mode: input('mode'),
@@ -1522,7 +1523,7 @@ export const raiseOutputWithoutUpdateValue = templateCompositeFrom({
     output: input({defaultValue: {}}),
   },
 
-  steps: [
+  steps: () => [
     withResultOfAvailabilityCheck({
       from: input.updateValue(),
       mode: input('mode'),
@@ -1549,8 +1550,8 @@ export const withPropertyFromObject = templateCompositeFrom({
 
   inputs: {
     object: input({type: 'object', null: true}),
-    property: input.required({type: 'string'}),
-  }
+    property: input({type: 'string'}),
+  },
 
   outputs: {
     into: {
@@ -1569,7 +1570,7 @@ export const withPropertyFromObject = templateCompositeFrom({
     },
   },
 
-  steps: [
+  steps: () => [
     {
       dependencies: [input('object'), input('property')],
       compute: (continuation, {

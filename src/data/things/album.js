@@ -12,7 +12,6 @@ import {
   withFlattenedArray,
   withPropertiesFromList,
   withUnflattenedArray,
-  withUpdateValueAsDependency,
 } from '#composite';
 
 import Thing, {
@@ -103,16 +102,15 @@ export class Album extends Thing {
       exitWithoutDependency({dependency: 'trackData', value: []}),
       exitWithoutUpdateValue({value: [], mode: 'empty'}),
 
-      withUpdateValueAsDependency({into: '#sections'}),
-
       withPropertiesFromList({
-        list: '#sections',
-        properties: [
+        list: input.updateValue(),
+        prefix: input.value('#sections'),
+        properties: input.value([
           'tracks',
           'dateOriginallyReleased',
           'isDefaultTrackSection',
           'color',
-        ],
+        ]),
       }),
 
       fillMissingListItems({list: '#sections.tracks', value: []}),

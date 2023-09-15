@@ -3,7 +3,6 @@ import find from '#find';
 import {
   compositeFrom,
   exposeDependency,
-  withUpdateValueAsDependency,
 } from '#composite';
 
 import {
@@ -115,22 +114,20 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
             : continuation(value)),
       },
 
-      withUpdateValueAsDependency(),
-
       withResolvedReference({
-        ref: '#updateValue',
+        ref: input.updateValue(),
         data: 'groupData',
-        find: find.group,
+        find: input.value(find.group),
       }),
 
       exposeDependency({
         dependency: '#resolvedReference',
-        update: {
+        update: input.value({
           validate:
             oneOf(
               is('new-releases', 'new-additions'),
               validateReference(Group[Thing.referenceType])),
-        },
+        }),
       }),
     ]),
 

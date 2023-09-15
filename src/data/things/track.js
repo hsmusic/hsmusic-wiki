@@ -11,9 +11,11 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  input,
+  raiseOutputWithoutDependency,
+  templateCompositeFrom,
   withPropertyFromObject,
   withResultOfAvailabilityCheck,
-  withUpdateValueAsDependency,
 } from '#composite';
 
 import {
@@ -21,6 +23,7 @@ import {
   isContributionList,
   isDate,
   isFileExtension,
+  oneOf,
 } from '#validators';
 
 import CacheableObject from './cacheable-object.js';
@@ -139,8 +142,10 @@ export class Track extends Thing {
     artistContribs: [
       inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      withUpdateValueAsDependency(),
-      withResolvedContribs({from: '#updateValue', into: '#artistContribs'}),
+      withResolvedContribs({
+        from: input.updateValue(),
+      }).outputs({into: '#artistContribs'}),
+
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
       withPropertyFromAlbum({property: 'artistContribs'}),
@@ -161,8 +166,10 @@ export class Track extends Thing {
     coverArtistContribs: [
       exitWithoutUniqueCoverArt(),
 
-      withUpdateValueAsDependency(),
-      withResolvedContribs({from: '#updateValue', into: '#coverArtistContribs'}),
+      withResolvedContribs({
+        from: input.updateValue(),
+      }).outputs({into: '#coverArtistContribs'}),
+
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
       withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
@@ -302,6 +309,7 @@ export class Track extends Thing {
   }
 }
 
+/*
 // Early exits with a value inherited from the original release, if
 // this track is a rerelease, and otherwise continues with no further
 // dependencies provided. If allowOverride is true, then the continuation
@@ -327,77 +335,55 @@ function inheritFromOriginalRelease({
     },
   ]);
 }
+*/
 
 // Gets the track's album. This will early exit if albumData is missing.
 // By default, if there's no album whose list of tracks includes this track,
 // the output dependency will be null; set {notFoundMode: 'exit'} to early
 // exit instead.
-function withAlbum({
-  into = '#album',
-  notFoundMode = 'null',
-} = {}) {
-  return compositeFrom(`withAlbum`, [
-    withResultOfAvailabilityCheck({
-      fromDependency: 'albumData',
-      mode: 'empty',
-      into: '#albumDataAvailability',
+export const withAlbum = templateCompositeFrom({
+  annotation: `Track.withAlbum`,
+
+  inputs: {
+    notFoundMode: input({
+      validate: oneOf('exit', 'null'),
+      defaultValue: 'null',
+    }),
+  },
+
+  outputs: {
+    into: '#album',
+  },
+
+  steps: () => [
+    raiseOutputWithoutDependency({
+      dependency: 'albumData',
+      mode: input.value('empty'),
+      output: input.value({into: null}),
     }),
 
     {
-      dependencies: ['#albumDataAvailability'],
-      options: {notFoundMode},
-      mapContinuation: {into},
-
-      compute: ({
-        '#albumDataAvailability': albumDataAvailability,
-        '#options': {notFoundMode},
-      }, continuation) =>
-        (albumDataAvailability
-          ? continuation()
-          : (notFoundMode === 'exit'
-              ? continuation.exit(null)
-              : continuation.raise({into: null}))),
-    },
-
-    {
       dependencies: ['this', 'albumData'],
-      compute: ({this: track, albumData}, continuation) =>
+      compute: (continuation, {this: track, albumData}) =>
         continuation({
           '#album': albumData.find(album => album.tracks.includes(track)),
         }),
     },
 
-    withResultOfAvailabilityCheck({
-      fromDependency: '#album',
-      mode: 'null',
-      into: '#albumAvailability',
+    raiseOutputWithoutDependency({
+      dependency: '#album',
+      output: input.value({into: null}),
     }),
 
     {
-      dependencies: ['#albumAvailability'],
-      options: {notFoundMode},
-      mapContinuation: {into},
-
-      compute: ({
-        '#albumAvailability': albumAvailability,
-        '#options': {notFoundMode},
-      }, continuation) =>
-        (albumAvailability
-          ? continuation()
-          : (notFoundMode === 'exit'
-              ? continuation.exit(null)
-              : continuation.raise({into: null}))),
-    },
-
-    {
       dependencies: ['#album'],
-      mapContinuation: {into},
-      compute: ({'#album': album}, continuation) =>
+      compute: (continuation, {'#album': album}) =>
         continuation({into: album}),
     },
-  ]);
-}
+  ],
+});
 
+/*
 // Gets a single property from this track's album, providing it as the same
 // property name prefixed with '#album.' (by default). If the track's album
 // isn't available, then by default, the property will be provided as null;
@@ -571,3 +557,4 @@ function trackReverseReferenceList({
     },
   ]);
 }
+*/
