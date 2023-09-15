@@ -7,6 +7,7 @@ import {
   empty,
   filterProperties,
   openAggregate,
+  decorateErrorWithIndex,
 } from '#sugar';
 
 // Composes multiple compositional "steps" and a "base" to form a property
@@ -343,6 +344,379 @@ import {
 //
 
 const globalCompositeCache = {};
+
+export function input(nameOrDescription) {
+  if (typeof nameOrDescription === 'string') {
+    return Symbol.for(`hsmusic.composite.input:${nameOrDescription}`);
+  } else {
+    return {
+      symbol: Symbol.for('hsmusic.composite.input'),
+      shape: 'input',
+      value: nameOrDescription,
+    };
+  }
+}
+
+input.symbol = Symbol.for('hsmusic.composite.input');
+
+input.updateValue = () => Symbol.for('hsmusic.composite.input.updateValue');
+input.value = value => ({symbol: input.symbol, shape: 'input.value', value});
+input.dependency = name => Symbol.for(`hsmusic.composite.input.dependency:${name}`);
+input.staticDependency = name => Symbol.for(`hsmusic.composite.input.staticDependency:${name}`);
+input.staticValue = name => Symbol.for(`hsmusic.composite.input.staticValue:${name}`);
+
+function isInputToken(token) {
+  if (typeof token === 'object') {
+    return token.symbol === Symbol.for('hsmusic.composite.input');
+  } else if (typeof token === 'symbol') {
+    return token.description.startsWith('hsmusic.composite.input');
+  } else {
+    return false;
+  }
+}
+
+function getInputTokenShape(token) {
+  if (!isInputToken(token)) {
+    throw new TypeError(`Expected an input token, got ${token}`);
+  }
+
+  if (typeof token === 'object') {
+    return token.shape;
+  } else {
+    return token.description.match(/hsmusic\.composite\.(input.*?)(:|$)/)[1];
+  }
+}
+
+function getInputTokenValue(token) {
+  if (!isInputToken(token)) {
+    throw new TypeError(`Expected an input token, got ${token}`);
+  }
+
+  if (typeof token === 'object') {
+    return token.value;
+  } else {
+    return token.description.match(/hsmusic\.composite\.input.*?:(.*)/)?.[1] ?? null;
+  }
+}
+
+export function templateCompositeFrom(description) {
+  const compositeName =
+    (description.annotation
+      ? description.annotation
+      : `unnamed composite`);
+
+  const descriptionAggregate = openAggregate({message: `Errors in description for ${compositeName}`});
+
+  if ('steps' in description) {
+    if (Array.isArray(description.steps)) {
+      descriptionAggregate.push(new TypeError(`Wrap steps array in a function`));
+    } else if (typeof description.steps !== 'function') {
+      descriptionAggregate.push(new TypeError(`Expected steps to be a function (returning an array)`));
+    }
+  }
+
+  descriptionAggregate.nest({message: `Errors in input descriptions for ${compositeName}`}, ({push}) => {
+    const missingCallsToInput = [];
+    const wrongCallsToInput = [];
+
+    for (const [name, value] of Object.entries(description.inputs)) {
+      if (!isInputToken(value)) {
+        missingCallsToInput.push(name);
+        continue;
+      }
+
+      if (getInputTokenShape(value) !== 'input') {
+        wrongCallsToInput.push(name);
+      }
+    }
+
+    for (const name of missingCallsToInput) {
+      push(new Error(`${name}: Missing call to input()`));
+    }
+
+    for (const name of wrongCallsToInput) {
+      const shape = getInputTokenShape(description.inputs[name]);
+      push(new Error(`${name}: Expected call to input(), got ${shape}`));
+    }
+  });
+
+  descriptionAggregate.nest({message: `Errors in output descriptions for ${compositeName}`}, ({map, push}) => {
+    const wrongType = [];
+    const notPrivate = [];
+
+    const missingDependenciesDefault = [];
+    const wrongDependenciesType = [];
+    const wrongDefaultType = [];
+
+    for (const [name, value] of Object.entries(description.outputs ?? {})) {
+      if (typeof value === 'object') {
+        if (!('dependencies' in value && 'default' in value)) {
+          missingDependenciesDefault.push(name);
+          continue;
+        }
+
+        if (!Array.isArray(value.dependencies)) {
+          wrongDependenciesType.push(name);
+        }
+
+        if (typeof value.default !== 'function') {
+          wrongDefaultType.push(name);
+        }
+
+        continue;
+      }
+
+      if (typeof value !== 'string') {
+        wrongType.push(name);
+        continue;
+      }
+
+      if (!value.startsWith('#')) {
+        notPrivate.push(name);
+        continue;
+      }
+    }
+
+    for (const name of wrongType) {
+      const type = typeof description.outputs[name];
+      push(new Error(`${name}: Expected string, got ${type}`));
+    }
+
+    for (const name of notPrivate) {
+      const into = description.outputs[name];
+      push(new Error(`${name}: Expected "#" at start, got ${into}`));
+    }
+
+    for (const name of missingDependenciesDefault) {
+      push(new Error(`${name}: Expected both dependencies & default`));
+    }
+
+    for (const name of wrongDependenciesType) {
+      const {dependencies} = description.outputs[name];
+      push(new Error(`${name}: Expected dependencies to be array, got ${dependencies}`));
+    }
+
+    for (const name of wrongDefaultType) {
+      const type = typeof description.outputs[name].default;
+      push(new Error(`${name}: Expected default to be function, got ${type}`));
+    }
+
+    for (const [name, value] of Object.entries(description.outputs ?? {})) {
+      if (typeof value !== 'object') continue;
+
+      map(
+        description.outputs[name].dependencies,
+        decorateErrorWithIndex(dependency => {
+          if (!isInputToken(dependency)) {
+            throw new Error(`Expected call to input.staticValue or input.staticDependency, got ${dependency}`);
+          }
+
+          const shape = getInputTokenShape(dependency);
+          if (shape !== 'input.staticValue' && shape !== 'input.staticDependency') {
+            throw new Error(`Expected call to input.staticValue or input.staticDependency, got ${shape}`);
+          }
+        }),
+        {message: `${name}: Errors in dependencies`});
+    }
+  });
+
+  descriptionAggregate.close();
+
+  const expectedInputNames =
+    (description.inputs
+      ? Object.keys(description.inputs)
+      : []);
+
+  const expectedOutputNames =
+    (description.outputs
+      ? Object.keys(description.outputs)
+      : []);
+
+  return (inputOptions = {}) => {
+    const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositeName}`});
+
+    const providedInputNames = Object.keys(inputOptions);
+
+    const misplacedInputNames =
+      providedInputNames
+        .filter(name => !expectedInputNames.includes(name));
+
+    const missingInputNames =
+      expectedInputNames
+        .filter(name => !providedInputNames.includes(name))
+        .filter(name => {
+          const inputDescription = description.inputs[name].value;
+          if (!inputDescription) return true;
+          if ('defaultValue' in inputDescription) return false;
+          if ('defaultDependency' in inputDescription) return false;
+          if (inputDescription.null === true) return false;
+          return true;
+        });
+
+    const wrongTypeInputNames = [];
+    const wrongInputCallInputNames = [];
+
+    for (const [name, value] of Object.entries(inputOptions)) {
+      if (misplacedInputNames.includes(name)) {
+        continue;
+      }
+
+      if (typeof value !== 'string' && !isInputToken(value)) {
+        wrongTypeInputNames.push(name);
+        continue;
+      }
+    }
+
+    if (!empty(misplacedInputNames)) {
+      inputOptionsAggregate.push(new Error(`Unexpected input names: ${misplacedInputNames.join(', ')}`));
+    }
+
+    if (!empty(missingInputNames)) {
+      inputOptionsAggregate.push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
+    }
+
+    for (const name of wrongTypeInputNames) {
+      const type = typeof inputOptions[name];
+      inputOptionsAggregate.push(new Error(`${name}: Expected string or input() call, got ${type}`));
+    }
+
+    inputOptionsAggregate.close();
+
+    const outputOptions = {};
+
+    const instantiatedTemplate = {
+      symbol: templateCompositeFrom.symbol,
+
+      outputs(providedOptions) {
+        const outputOptionsAggregate = openAggregate({message: `Errors in output options passed to ${compositeName}`});
+
+        const misplacedOutputNames = [];
+        const wrongTypeOutputNames = [];
+        const notPrivateOutputNames = [];
+
+        for (const [name, value] of Object.entries(providedOptions)) {
+          if (!expectedOutputNames.includes(name)) {
+            misplacedOutputNames.push(name);
+            continue;
+          }
+
+          if (typeof value !== 'string') {
+            wrongTypeOutputNames.push(name);
+            continue;
+          }
+
+          if (!value.startsWith('#')) {
+            notPrivateOutputNames.push(name);
+            continue;
+          }
+        }
+
+        if (!empty(misplacedOutputNames)) {
+          outputOptionsAggregate.push(new Error(`Unexpected output names: ${misplacedOutputNames}`));
+        }
+
+        for (const name of wrongTypeOutputNames) {
+          const type = typeof providedOptions[name];
+          outputOptionsAggregate.push(new Error(`${name}: Expected string, got ${type}`));
+        }
+
+        for (const name of notPrivateOutputNames) {
+          const into = providedOptions[name];
+          outputOptionsAggregate.push(new Error(`${name}: Expected "#" at start, got ${into}`));
+        }
+
+        outputOptionsAggregate.close();
+
+        Object.assign(outputOptions, providedOptions);
+        return instantiatedTemplate;
+      },
+
+      toDescription() {
+        const finalDescription = {};
+
+        if ('annotation' in description) {
+          finalDescription.annotation = description.annotation;
+        }
+
+        if ('update' in description) {
+          finalDescription.update = description.update;
+        }
+
+        if ('inputs' in description) {
+          const finalInputs = {};
+
+          for (const [name, description_] of Object.entries(description.inputs)) {
+            const description = description_;
+            if (name in inputOptions) {
+              if (typeof inputOptions[name] === 'string') {
+                finalInputs[name] = input.dependency(inputOptions[name]);
+              } else {
+                finalInputs[name] = inputOptions[name];
+              }
+            } else if (description.defaultValue) {
+              finalInputs[name] = input.value(defaultValue);
+            } else if (description.defaultDependency) {
+              finalInputs[name] = input.dependency(defaultValue);
+            } else {
+              finalInputs[name] = input.value(null);
+            }
+          }
+
+          finalDescription.inputs = finalInputs;
+        }
+
+        if ('outputs' in description) {
+          const finalOutputs = {};
+
+          for (const [name, defaultDependency] of Object.entries(description.outputs)) {
+            if (name in outputOptions) {
+              finalOutputs[name] = outputOptions[name];
+            } else {
+              finalOutputs[name] = defaultDependency;
+            }
+          }
+
+          finalDescription.outputs = finalOutputs;
+        }
+
+        if ('steps' in description) {
+          finalDescription.steps = description.steps;
+        }
+
+        return finalDescription;
+      },
+
+      toResolvedComposition() {
+        const ownDescription = instantiatedTemplate.toDescription();
+
+        const finalDescription = {...ownDescription};
+
+        const aggregate = openAggregate({message: `Errors resolving ${compositeName}`});
+
+        const steps = ownDescription.steps();
+
+        const resolvedSteps =
+          aggregate.map(
+            steps,
+            decorateErrorWithIndex(step =>
+              (step.symbol === templateCompositeFrom.symbol
+                ? step.toResolvedComposition()
+                : step)),
+            {message: `Errors resolving steps`});
+
+        aggregate.close();
+
+        finalDescription.steps = resolvedSteps;
+
+        return finalDescription;
+      },
+    };
+
+    return instantiatedTemplate;
+  };
+}
+
+templateCompositeFrom.symbol = Symbol();
 
 export function compositeFrom(description) {
   const {annotation, steps: composition} = description;
