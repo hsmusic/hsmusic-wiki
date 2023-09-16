@@ -5,7 +5,6 @@ import find from '#find';
 import {empty} from '#sugar';
 
 import {
-  compositeFrom,
   exitWithoutDependency,
   exposeConstant,
   exposeDependency,
@@ -15,7 +14,6 @@ import {
   raiseOutputWithoutDependency,
   templateCompositeFrom,
   withPropertyFromObject,
-  withResultOfAvailabilityCheck,
 } from '#composite';
 
 import {
@@ -142,9 +140,9 @@ export class Track extends Thing {
     artistContribs: [
       inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      withResolvedContribs({
-        from: input.updateValue(),
-      }).outputs({into: '#artistContribs'}),
+      withResolvedContribs
+        .inputs({from: input.updateValue()})
+        .outputs({into: '#artistContribs'}),
 
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
@@ -166,9 +164,9 @@ export class Track extends Thing {
     coverArtistContribs: [
       exitWithoutUniqueCoverArt(),
 
-      withResolvedContribs({
-        from: input.updateValue(),
-      }).outputs({into: '#coverArtistContribs'}),
+      withResolvedContribs
+        .inputs({from: input.updateValue()})
+        .outputs({into: '#coverArtistContribs'}),
 
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
@@ -271,12 +269,12 @@ export class Track extends Thing {
     // the "Tracks - by Times Referenced" listing page (or other data
     // processing).
     referencedByTracks: trackReverseReferenceList({
-      property: 'referencedTracks',
+      list: 'referencedTracks',
     }),
 
     // For the same reasoning, exclude re-releases from sampled tracks too.
     sampledByTracks: trackReverseReferenceList({
-      property: 'sampledTracks',
+      list: 'sampledTracks',
     }),
 
     featuredInFlashes: reverseReferenceList({
@@ -309,33 +307,44 @@ export class Track extends Thing {
   }
 }
 
-/*
 // Early exits with a value inherited from the original release, if
 // this track is a rerelease, and otherwise continues with no further
 // dependencies provided. If allowOverride is true, then the continuation
 // will also be called if the original release exposed the requested
 // property as null.
-function inheritFromOriginalRelease({
-  property: originalProperty,
-  allowOverride = false,
-}) {
-  return compositeFrom(`inheritFromOriginalRelease`, [
+export const inheritFromOriginalRelease = templateCompositeFrom({
+  annotation: `Track.inheritFromOriginalRelease`,
+
+  inputs: {
+    property: input({type: 'string'}),
+    allowOverride: input({type: 'boolean', defaultValue: false}),
+  },
+
+  steps: () => [
     withOriginalRelease(),
 
     {
-      dependencies: ['#originalRelease'],
-      compute({'#originalRelease': originalRelease}, continuation) {
-        if (!originalRelease) return continuation.raise();
+      dependencies: [
+        '#originalRelease',
+        input('property'),
+        input('allowOverride'),
+      ],
+
+      compute: (continuation, {
+        ['#originalRelease']: originalRelease,
+        [input('property')]: originalProperty,
+        [input('allowOverride')]: allowOverride,
+      }) => {
+        if (!originalRelease) return continuation();
 
         const value = originalRelease[originalProperty];
-        if (allowOverride && value === null) return continuation.raise();
+        if (allowOverride && value === null) return continuation();
 
         return continuation.exit(value);
       },
     },
-  ]);
-}
-*/
+  ],
+});
 
 // Gets the track's album. This will early exit if albumData is missing.
 // By default, if there's no album whose list of tracks includes this track,
@@ -383,64 +392,95 @@ export const withAlbum = templateCompositeFrom({
   ],
 });
 
-/*
 // Gets a single property from this track's album, providing it as the same
 // property name prefixed with '#album.' (by default). If the track's album
 // isn't available, then by default, the property will be provided as null;
 // set {notFoundMode: 'exit'} to early exit instead.
-function withPropertyFromAlbum({
-  property,
-  into = '#album.' + property,
-  notFoundMode = 'null',
-}) {
-  return compositeFrom(`withPropertyFromAlbum`, [
-    withAlbum({notFoundMode}),
-    withPropertyFromObject({object: '#album', property, into}),
-  ]);
-}
+export const withPropertyFromAlbum = templateCompositeFrom({
+  annotation: `withPropertyFromAlbum`,
+
+  inputs: {
+    property: input({type: 'string'}),
+
+    notFoundMode: input({
+      validate: oneOf('exit', 'null'),
+      defaultValue: 'null',
+    }),
+  },
+
+  outputs: {
+    into: {
+      dependencies: [input.staticValue('property')],
+      default: ({
+        [input.staticValue('property')]: property,
+      }) => '#album.' + property,
+    },
+  },
+
+  steps: () => [
+    withAlbum({
+      notFoundMode: input('notFoundMode'),
+    }),
+
+    withPropertyFromObject
+      .inputs({object: '#album', property: input('property')})
+      .outputs({into: 'into'}),
+  ],
+});
 
 // Gets the track section containing this track from its album's track list.
 // If notFoundMode is set to 'exit', this will early exit if the album can't be
 // found or if none of its trackSections includes the track for some reason.
-function withContainingTrackSection({
-  into = '#trackSection',
-  notFoundMode = 'null',
-} = {}) {
-  if (!['exit', 'null'].includes(notFoundMode)) {
-    throw new TypeError(`Expected notFoundMode to be exit or null`);
-  }
+export const withContainingTrackSection = templateCompositeFrom({
+  annotation: `withContainingTrackSection`,
 
-  return compositeFrom(`withContainingTrackSection`, [
-    withPropertyFromAlbum({property: 'trackSections', notFoundMode}),
+  inputs: {
+    notFoundMode: input({
+      validate: oneOf('exit', 'null'),
+      defaultValue: 'null',
+    }),
+  },
+
+  outputs: {
+    into: '#trackSection',
+  },
+
+  steps: () => [
+    withPropertyFromAlbum({
+      property: input.value('trackSections'),
+      notFoundMode: input('notFoundMode'),
+    }),
 
     {
-      dependencies: ['this', '#album.trackSections'],
-      options: {notFoundMode},
-      mapContinuation: {into},
+      dependencies: [
+        input.myself(),
+        input('notFoundMode'),
+        '#album.trackSections',
+      ],
 
-      compute({
-        this: track,
-        '#album.trackSections': trackSections,
-        '#options': {notFoundMode},
-      }, continuation) {
+      compute(continuation, {
+        [input.myself()]: track,
+        [input('notFoundMode')]: notFoundMode,
+        ['#album.trackSections']: trackSections,
+      }) {
         if (!trackSections) {
-          return continuation.raise({into: null});
+          return continuation({into: null});
         }
 
         const trackSection =
           trackSections.find(({tracks}) => tracks.includes(track));
 
         if (trackSection) {
-          return continuation.raise({into: trackSection});
+          return continuation({into: trackSection});
         } else if (notFoundMode === 'exit') {
           return continuation.exit(null);
         } else {
-          return continuation.raise({into: null});
+          return continuation({into: null});
         }
       },
     },
-  ]);
-}
+  ],
+});
 
 // Just includes the original release of this track as a dependency.
 // If this track isn't a rerelease, then it'll provide null, unless the
@@ -448,29 +488,40 @@ function withContainingTrackSection({
 // itself. Note that this will early exit if the original release is
 // specified by reference and that reference doesn't resolve to anything.
 // Outputs to '#originalRelease' by default.
-function withOriginalRelease({
-  into = '#originalRelease',
-  selfIfOriginal = false,
-} = {}) {
-  return compositeFrom(`withOriginalRelease`, [
-    withResolvedReference({
-      ref: 'originalReleaseTrack',
-      data: 'trackData',
-      into: '#originalRelease',
-      find: find.track,
-      notFoundMode: 'exit',
-    }),
+export const withOriginalRelease = templateCompositeFrom({
+  annotation: `withOriginalRelease`,
+
+  inputs: {
+    selfIfOriginal: input({type: 'boolean', defaultValue: false}),
+  },
+
+  outputs: {
+    into: '#originalRelease',
+  },
+
+  steps: () => [
+    withResolvedReference
+      .inputs({
+        ref: 'originalReleaseTrack',
+        data: 'trackData',
+        find: input.value(find.track),
+        notFoundMode: input.value('exit'),
+      })
+      .outputs({into: '#originalRelease'}),
 
     {
-      dependencies: ['this', '#originalRelease'],
-      options: {selfIfOriginal},
-      mapContinuation: {into},
-      compute: ({
-        this: track,
-        '#originalRelease': originalRelease,
-        '#options': {selfIfOriginal},
-      }, continuation) =>
-        continuation.raise({
+      dependencies: [
+        input.myself(),
+        input('selfIfOriginal'),
+        '#originalRelease',
+      ],
+
+      compute: (continuation, {
+        [input.myself()]: track,
+        [input('selfIfOriginal')]: selfIfOriginal,
+        ['#originalRelease']: originalRelease,
+      }) =>
+        continuation({
           into:
             (originalRelease ??
               (selfIfOriginal
@@ -478,83 +529,97 @@ function withOriginalRelease({
                 : null)),
         }),
     },
-  ]);
-}
+  ],
+});
 
 // The algorithm for checking if a track has unique cover art is used in a
 // couple places, so it's defined in full as a compositional step.
-function withHasUniqueCoverArt({
-  into = '#hasUniqueCoverArt',
-} = {}) {
-  return compositeFrom(`withHasUniqueCoverArt`, [
+export const withHasUniqueCoverArt = templateCompositeFrom({
+  annotation: 'withHasUniqueCoverArt',
+
+  outputs: {
+    into: '#hasUniqueCoverArt',
+  },
+
+  steps: () => [
     {
       dependencies: ['disableUniqueCoverArt'],
-      mapContinuation: {into},
-      compute: ({disableUniqueCoverArt}, continuation) =>
+      compute: (continuation, {disableUniqueCoverArt}) =>
         (disableUniqueCoverArt
-          ? continuation.raise({into: false})
+          ? continuation.raiseOutput({into: false})
           : continuation()),
     },
 
-    withResolvedContribs({
-      from: 'coverArtistContribs',
-      into: '#coverArtistContribs',
-    }),
+    withResolvedContribs
+      .inputs({from: 'coverArtistContribs'})
+      .outputs({into: '#coverArtistContribs'}),
 
     {
       dependencies: ['#coverArtistContribs'],
-      mapContinuation: {into},
-      compute: ({'#coverArtistContribs': contribsFromTrack}, continuation) =>
+      compute: (continuation, {
+        ['#coverArtistContribs']: contribsFromTrack,
+      }) =>
         (empty(contribsFromTrack)
           ? continuation()
-          : continuation.raise({into: true})),
+          : continuation.raiseOutput({into: true})),
     },
 
     withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
 
     {
       dependencies: ['#album.trackCoverArtistContribs'],
-      mapContinuation: {into},
-      compute: ({'#album.trackCoverArtistContribs': contribsFromAlbum}, continuation) =>
-        (empty(contribsFromAlbum)
-          ? continuation.raise({into: false})
-          : continuation.raise({into: true})),
+      compute: (continuation, {
+        ['#album.trackCoverArtistContribs']: contribsFromAlbum,
+      }) =>
+        continuation({
+          into: !empty(contribsFromAlbum),
+        }),
     },
-  ]);
-}
+  ],
+});
 
 // Shorthand for checking if the track has unique cover art and exposing a
 // fallback value if it isn't.
-function exitWithoutUniqueCoverArt({
-  value = null,
-} = {}) {
-  return compositeFrom(`exitWithoutUniqueCoverArt`, [
+export const exitWithoutUniqueCoverArt = templateCompositeFrom({
+  annotation: `exitWithoutUniqueCoverArt`,
+
+  inputs: {
+    value: input({null: true}),
+  },
+
+  steps: () => [
     withHasUniqueCoverArt(),
+
     exitWithoutDependency({
       dependency: '#hasUniqueCoverArt',
       mode: 'falsy',
-      value,
+      value: input('value'),
     }),
-  ]);
-}
+  ],
+});
 
-function trackReverseReferenceList({
-  property: refListProperty,
-}) {
-  return compositeFrom(`trackReverseReferenceList`, [
+export const trackReverseReferenceList = templateCompositeFrom({
+  annotation: `trackReverseReferenceList`,
+
+  inputs: {
+    list: input({type: 'string'}),
+  },
+
+  steps: () => [
     withReverseReferenceList({
       data: 'trackData',
-      list: refListProperty,
+      list: input('list'),
     }),
 
     {
       flags: {expose: true},
       expose: {
         dependencies: ['#reverseReferenceList'],
-        compute: ({'#reverseReferenceList': reverseReferenceList}) =>
+        compute: ({
+          ['#reverseReferenceList']: reverseReferenceList,
+        }) =>
           reverseReferenceList.filter(track => !track.originalReleaseTrack),
       },
     },
-  ]);
-}
-*/
+  ],
+});

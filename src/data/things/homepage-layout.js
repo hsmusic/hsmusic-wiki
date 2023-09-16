@@ -3,6 +3,7 @@ import find from '#find';
 import {
   compositeFrom,
   exposeDependency,
+  input,
 } from '#composite';
 
 import {

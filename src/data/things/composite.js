@@ -420,7 +420,7 @@ export function templateCompositeFrom(description) {
     const missingCallsToInput = [];
     const wrongCallsToInput = [];
 
-    for (const [name, value] of Object.entries(description.inputs)) {
+    for (const [name, value] of Object.entries(description.inputs ?? {})) {
       if (!isInputToken(value)) {
         missingCallsToInput.push(name);
         continue;
@@ -533,7 +533,7 @@ export function templateCompositeFrom(description) {
       ? Object.keys(description.outputs)
       : []);
 
-  return (inputOptions = {}) => {
+  const instantiate = (inputOptions = {}) => {
     const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositeName}`});
 
     const providedInputNames = Object.keys(inputOptions);
@@ -593,7 +593,7 @@ export function templateCompositeFrom(description) {
 
         const misplacedOutputNames = [];
         const wrongTypeOutputNames = [];
-        const notPrivateOutputNames = [];
+        // const notPrivateOutputNames = [];
 
         for (const [name, value] of Object.entries(providedOptions)) {
           if (!expectedOutputNames.includes(name)) {
@@ -606,10 +606,12 @@ export function templateCompositeFrom(description) {
             continue;
           }
 
+          /*
           if (!value.startsWith('#')) {
             notPrivateOutputNames.push(name);
             continue;
           }
+          */
         }
 
         if (!empty(misplacedOutputNames)) {
@@ -621,10 +623,12 @@ export function templateCompositeFrom(description) {
           outputOptionsAggregate.push(new Error(`${name}: Expected string, got ${type}`));
         }
 
+        /*
         for (const name of notPrivateOutputNames) {
           const into = providedOptions[name];
           outputOptionsAggregate.push(new Error(`${name}: Expected "#" at start, got ${into}`));
         }
+        */
 
         outputOptionsAggregate.close();
 
@@ -715,6 +719,10 @@ export function templateCompositeFrom(description) {
 
     return instantiatedTemplate;
   };
+
+  instantiate.inputs = instantiate;
+
+  return instantiate;
 }
 
 templateCompositeFrom.symbol = Symbol();

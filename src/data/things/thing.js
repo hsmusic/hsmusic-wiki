@@ -35,6 +35,7 @@ import {
   isFileExtension,
   isName,
   isString,
+  isType,
   isURL,
   validateArrayItems,
   validateInstanceOf,
@@ -211,8 +212,7 @@ export function contributionList() {
     update: {validate: isContributionList},
 
     steps: () => [
-      withUpdateValueAsDependency(),
-      withResolvedContribs({from: '#updateValue'}),
+      withResolvedContribs({from: input.updateValue()}),
       exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
       exposeConstant({value: []}),
     ],
@@ -261,26 +261,60 @@ export function additionalFiles() {
 // 'artist' or 'track', but this utility keeps from having to hard-code the
 // string in multiple places by referencing the value saved on the class
 // instead.
+export const referenceList = templateCompositeFrom({
+  annotation: `referenceList`,
+
+  compose: false,
+
+  inputs: {
+    class: input({
+      validate(thingClass) {
+        isType(thingClass, 'function');
+
+        if (!Object.hasOwn(thingClass, Thing.referenceType)) {
+          throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
+        }
+
+        return true;
+      },
+    }),
+
+    find: input({type: 'function'}),
+
+    // todo: validate
+    data: input(),
+  },
+
+  update: {
+    dependencies: [
+      input.staticValue('class'),
+    ],
+
+    compute({
+      [input.staticValue('class')]: thingClass,
+    }) {
+      const {[Thing.referenceType]: referenceType} = thingClass;
+      return {validate: validateReferenceList(referenceType)};
+    },
+  },
+
+  steps: () => [
+    withResolvedReferenceList({
+      list: '#updateValue',
+      data: '#composition.data',
+      find: '#composition.findFunction',
+    }),
+
+    exposeDependency({dependency: '#resolvedReferenceList'}),
+  ],
+})
 export function referenceList({
   class: thingClass,
   data,
   find: findFunction,
 }) {
-  if (!thingClass) {
-    throw new TypeError(`Expected a Thing class`);
-  }
-
-  const {[Thing.referenceType]: referenceType} = thingClass;
-  if (!referenceType) {
-    throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
-  }
-
   return compositeFrom({
     annotation: `referenceList`,
-
-    update: {
-      validate: validateReferenceList(referenceType),
-    },
 
     mapDependencies: {
       '#composition.data': data,
@@ -292,14 +326,6 @@ export function referenceList({
 
     steps: () => [
       withUpdateValueAsDependency(),
-
-      withResolvedReferenceList({
-        list: '#updateValue',
-        data: '#composition.data',
-        find: '#composition.findFunction',
-      }),
-
-      exposeDependency({dependency: '#resolvedReferenceList'}),
     ],
   });
 }

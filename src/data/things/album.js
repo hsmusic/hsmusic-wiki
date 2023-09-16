@@ -8,6 +8,7 @@ import {
   exitWithoutUpdateValue,
   exposeDependency,
   exposeUpdateValueOrContinue,
+  input,
   fillMissingListItems,
   withFlattenedArray,
   withPropertiesFromList,
