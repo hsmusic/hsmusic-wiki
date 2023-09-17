@@ -539,7 +539,7 @@ const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-
     const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
     const contentCover = contentContainer.querySelector('#cover-art-container');
 
-    if (stickyCover.querySelector('.image-text-area')) {
+    if (stickyCover?.querySelector('.image-text-area')) {
       stickyCoverContainer.remove();
       stickyCoverContainer = null;
       stickyCover = null;
