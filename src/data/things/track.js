@@ -140,9 +140,11 @@ export class Track extends Thing {
     artistContribs: [
       inheritFromOriginalRelease({property: 'artistContribs'}),
 
-      withResolvedContribs
-        .inputs({from: input.updateValue()})
-        .outputs({into: '#artistContribs'}),
+      withResolvedContribs({
+        from: input.updateValue(),
+      }).outputs({
+        '#resolvedContribs': '#artistContribs',
+      }),
 
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
@@ -164,9 +166,11 @@ export class Track extends Thing {
     coverArtistContribs: [
       exitWithoutUniqueCoverArt(),
 
-      withResolvedContribs
-        .inputs({from: input.updateValue()})
-        .outputs({into: '#coverArtistContribs'}),
+      withResolvedContribs({
+        from: input.updateValue(),
+      }).outputs({
+        '#resolvedContribs': '#coverArtistContribs',
+      }),
 
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
@@ -400,7 +404,7 @@ export const withPropertyFromAlbum = templateCompositeFrom({
   annotation: `withPropertyFromAlbum`,
 
   inputs: {
-    property: input({type: 'string'}),
+    property: input.staticValue({type: 'string'}),
 
     notFoundMode: input({
       validate: oneOf('exit', 'null'),
@@ -409,12 +413,10 @@ export const withPropertyFromAlbum = templateCompositeFrom({
   },
 
   outputs: {
-    into: {
-      dependencies: [input.staticValue('property')],
-      default: ({
-        [input.staticValue('property')]: property,
-      }) => '#album.' + property,
-    },
+    dependencies: [input.staticValue('property')],
+    compute: ({
+      [input.staticValue('property')]: property,
+    }) => ['#album.' + property],
   },
 
   steps: () => [
@@ -422,9 +424,20 @@ export const withPropertyFromAlbum = templateCompositeFrom({
       notFoundMode: input('notFoundMode'),
     }),
 
-    withPropertyFromObject
-      .inputs({object: '#album', property: input('property')})
-      .outputs({into: 'into'}),
+    withPropertyFromObject({
+      object: '#album',
+      property: input('property'),
+    }),
+
+    {
+      dependencies: ['#value', input.staticValue('property')],
+      compute: (continuation, {
+        ['#value']: value,
+        [input.staticValue('property')]: property,
+      }) => continuation({
+        ['#album.' + property]: value,
+      }),
+    },
   ],
 });
 

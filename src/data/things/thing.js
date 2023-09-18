@@ -5,7 +5,7 @@ import {inspect} from 'node:util';
 
 import {colors} from '#cli';
 import find from '#find';
-import {empty, stitchArrays, unique} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
 import {filterMultipleArrays, getKebabCase} from '#wiki-data';
 import {oneOf} from '#validators';
 
@@ -253,6 +253,18 @@ export function additionalFiles() {
   };
 }
 
+const thingClassInput = {
+  validate(thingClass) {
+    isType(thingClass, 'function');
+
+    if (!Object.hasOwn(thingClass, Thing.referenceType)) {
+      throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
+    }
+
+    return true;
+  },
+};
+
 // A reference list! Keep in mind this is for general references to wiki
 // objects of (usually) other Thing subclasses, not specifically leitmotif
 // references in tracks (although that property uses referenceList too!).
@@ -267,18 +279,7 @@ export const referenceList = templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: input({
-      validate(thingClass) {
-        isType(thingClass, 'function');
-
-        if (!Object.hasOwn(thingClass, Thing.referenceType)) {
-          throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
-        }
-
-        return true;
-      },
-    }),
-
+    class: input(thingClassInput),
     find: input({type: 'function'}),
 
     // todo: validate
@@ -300,127 +301,100 @@ export const referenceList = templateCompositeFrom({
 
   steps: () => [
     withResolvedReferenceList({
-      list: '#updateValue',
-      data: '#composition.data',
-      find: '#composition.findFunction',
+      list: input.updateValue(),
+      data: input('data'),
+      find: input('find'),
     }),
 
     exposeDependency({dependency: '#resolvedReferenceList'}),
   ],
-})
-export function referenceList({
-  class: thingClass,
-  data,
-  find: findFunction,
-}) {
-  return compositeFrom({
-    annotation: `referenceList`,
-
-    mapDependencies: {
-      '#composition.data': data,
-    },
-
-    constantDependencies: {
-      '#composition.findFunction': findFunction,
-    },
-
-    steps: () => [
-      withUpdateValueAsDependency(),
-    ],
-  });
-}
+});
 
 // Corresponding function for a single reference.
-export function singleReference({
-  class: thingClass,
-  data,
-  find: findFunction,
-}) {
-  if (!thingClass) {
-    throw new TypeError(`Expected a Thing class`);
-  }
+export const singleReference = templateCompositeFrom({
+  annotation: `singleReference`,
 
-  const {[Thing.referenceType]: referenceType} = thingClass;
-  if (!referenceType) {
-    throw new Error(`The passed constructor ${thingClass.name} doesn't define Thing.referenceType!`);
-  }
+  compose: false,
 
-  return compositeFrom({
-    annotation: `singleReference`,
+  inputs: {
+    class: input(thingClassInput),
+    find: input({type: 'function'}),
 
-    update: {
-      validate: validateReference(referenceType),
-    },
+    // todo: validate
+    data: input(),
+  },
 
-    mapDependencies: {
-      '#composition.data': data,
-    },
-
-    constantDependencies: {
-      '#composition.findFunction': findFunction,
-    },
-
-    steps: () => [
-      withUpdateValueAsDependency(),
-
-      withResolvedReference({
-        ref: '#updateValue',
-        data: '#composition.data',
-        find: '#composition.findFunction',
-      }),
-
-      exposeDependency({dependency: '#resolvedReference'}),
+  update: {
+    dependencies: [
+      input.staticValue('class'),
     ],
-  });
-}
+
+    compute({
+      [input.staticValue('class')]: thingClass,
+    }) {
+      const {[Thing.referenceType]: referenceType} = thingClass;
+      return {validate: validateReference(referenceType)};
+    },
+  },
+
+  steps: () => [
+    withResolvedReference({
+      ref: input.updateValue(),
+      data: input('data'),
+      find: input('findFunction'),
+    }),
+
+    exposeDependency({dependency: '#resolvedReference'}),
+  ],
+});
 
 // Nice 'n simple shorthand for an exposed-only flag which is true when any
 // contributions are present in the specified property.
-export function contribsPresent({
-  contribs,
-}) {
-  return compositeFrom({
-    annotation: `contribsPresent`,
+export const contribsPresent = templateCompositeFrom({
+  annotation: `contribsPresent`,
 
-    mapDependencies: {
-      '#composition.contribs': contribs,
-    },
+  compose: false,
 
-    steps: () => [
-      withResultOfAvailabilityCheck({
-        fromDependency: '#composition.contribs',
-        mode: 'empty',
-      }),
+  inputs: {
+    contribs: input({type: 'string'}),
+  },
 
-      exposeDependency({dependency: '#availability'}),
-    ],
-  });
-}
+  steps: () => [
+    withResultOfAvailabilityCheck({
+      fromDependency: input('contribs'),
+      mode: input.value('empty'),
+    }),
+
+    exposeDependency({dependency: '#availability'}),
+  ],
+});
 
 // Neat little shortcut for "reversing" the reference lists stored on other
 // things - for example, tracks specify a "referenced tracks" property, and
 // you would use this to compute a corresponding "referenced *by* tracks"
 // property. Naturally, the passed ref list property is of the things in the
 // wiki data provided, not the requesting Thing itself.
-export function reverseReferenceList({data, list}) {
-  return compositeFrom({
-    annotation: `reverseReferenceList`,
+export const reverseReferenceList = templateCompositeFrom({
+  annotation: `reverseReferenceList`,
 
-    mapDependencies: {
-      '#composition.data': data,
-      '#composition.list': list,
-    },
+  compose: false,
 
-    steps: () => [
-      withReverseReferenceList({
-        data: '#composition.data',
-        list: '#composition.list',
-      }),
+  inputs: {
+    // todo: validate
+    data: input(),
 
-      exposeDependency({dependency: '#reverseReferenceList'}),
-    ],
-  });
-}
+    list: input({type: 'string'}),
+  },
+
+  steps: () => [
+    withReverseReferenceList({
+      data: input('data'),
+      list: input('list'),
+    }),
+
+    exposeDependency({dependency: '#reverseReferenceList'}),
+  ],
+});
 
 // General purpose wiki data constructor, for properties like artistData,
 // trackData, etc.
@@ -436,53 +410,50 @@ export function wikiData(thingClass) {
 // This one's kinda tricky: it parses artist "references" from the
 // commentary content, and finds the matching artist for each reference.
 // This is mostly useful for credits and listings on artist pages.
-export function commentatorArtists() {
-  return compositeFrom({
-    annotation: `commentatorArtists`,
+export const commentatorArtists = templateCompositeFrom({
+  annotation: `commentatorArtists`,
 
-    constantDependencies: {
-      '#composition.findFunction': find.artists,
+  compose: false,
+
+  steps: () => [
+    exitWithoutDependency({
+      dependency: 'commentary',
+      mode: input.value('falsy'),
+      value: input.value([]),
+    }),
+
+    {
+      dependencies: ['commentary'],
+      compute: (continuation, {commentary}) =>
+        continuation({
+          '#artistRefs':
+            Array.from(
+              commentary
+                .replace(/<\/?b>/g, '')
+                .matchAll(/<i>(?<who>.*?):<\/i>/g))
+              .map(({groups: {who}}) => who),
+        }),
     },
 
-    steps: () => [
-      exitWithoutDependency({
-        dependency: 'commentary',
-        mode: 'falsy',
-        value: [],
-      }),
+    withResolvedReferenceList({
+      list: '#artistRefs',
+      data: 'artistData',
+      find: input.value(find.artist),
+    }).outputs({
+      '#resolvedReferenceList': '#artists',
+    }),
 
-      {
-        dependencies: ['commentary'],
-        compute: ({commentary}, continuation) =>
-          continuation({
-            '#artistRefs':
-              Array.from(
-                commentary
-                  .replace(/<\/?b>/g, '')
-                  .matchAll(/<i>(?<who>.*?):<\/i>/g))
-                .map(({groups: {who}}) => who),
-          }),
+    {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['#artists'],
+        compute: ({'#artists': artists}) =>
+          unique(artists),
       },
-
-      withResolvedReferenceList({
-        list: '#artistRefs',
-        data: 'artistData',
-        into: '#artists',
-        find: '#composition.findFunction',
-      }),
-
-      {
-        flags: {expose: true},
-
-        expose: {
-          dependencies: ['#artists'],
-          compute: ({'#artists': artists}) =>
-            unique(artists),
-        },
-      },
-    ],
-  });
-}
+    },
+  ],
+});
 
 // Compositional utilities
 

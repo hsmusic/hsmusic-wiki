@@ -1349,7 +1349,7 @@ export function exposeConstant({
 //            for values like zero and the empty string!
 //
 
-const availabilityCheckMode = {
+const availabilityCheckModeInput = {
   validate: oneOf('null', 'empty', 'falsy'),
   defaultValue: 'null',
 };
@@ -1359,7 +1359,7 @@ export const withResultOfAvailabilityCheck = templateCompositeFrom({
 
   inputs: {
     from: input(),
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
   },
 
   outputs: {
@@ -1403,7 +1403,7 @@ export const exposeDependencyOrContinue = templateCompositeFrom({
 
   inputs: {
     dependency: input(),
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
   },
 
   steps: () => [
@@ -1432,7 +1432,7 @@ export const exposeUpdateValueOrContinue = templateCompositeFrom({
   annotation: `exposeUpdateValueOrContinue`,
 
   inputs: {
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
   },
 
   steps: () => [
@@ -1450,7 +1450,7 @@ export const exitWithoutDependency = templateCompositeFrom({
 
   inputs: {
     dependency: input(),
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
     value: input({null: true}),
   },
 
@@ -1479,7 +1479,7 @@ export const exitWithoutUpdateValue = templateCompositeFrom({
   annotation: `exitWithoutUpdateValue`,
 
   inputs: {
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
     value: input({defaultValue: null}),
   },
 
@@ -1498,7 +1498,7 @@ export const raiseOutputWithoutDependency = templateCompositeFrom({
 
   inputs: {
     dependency: input(),
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
     output: input({defaultValue: {}}),
   },
 
@@ -1527,7 +1527,7 @@ export const raiseOutputWithoutUpdateValue = templateCompositeFrom({
   annotation: `raiseOutputWithoutUpdateValue`,
 
   inputs: {
-    mode: input(availabilityCheckMode),
+    mode: input(availabilityCheckModeInput),
     output: input({defaultValue: {}}),
   },
 
@@ -1562,19 +1562,21 @@ export const withPropertyFromObject = templateCompositeFrom({
   },
 
   outputs: {
-    into: {
-      dependencies: [
-        input.staticDependency('object'),
-        input.staticValue('property'),
-      ],
+    dependencies: [
+      input.staticDependency('object'),
+      input.staticValue('property'),
+    ],
 
-      default: ({
-        [input.staticDependency('object')]: object,
-        [input.staticValue('property')]: property,
-      }) =>
-        (object.startsWith('#')
-          ? `${object}.${property}`
-          : `#${object}.${property}`),
+    compute: ({
+      [input.staticDependency('object')]: object,
+      [input.staticValue('property')]: property,
+    }) => {
+      return (
+        (object && property
+          ? (object.startsWith('#')
+              ? `${object}.${property}`
+              : `#${object}.${property}`)
+          : '#value'));
     },
   },
 
