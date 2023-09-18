@@ -338,6 +338,8 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     coverArtFileExtension: 'Cover Art File Extension',
     hasCoverArt: 'Has Cover Art',
 
+    alwaysReferenceByDirectory: 'Always Reference By Directory',
+
     lyrics: 'Lyrics',
     commentary: 'Commentary',
     additionalFiles: 'Additional Files',

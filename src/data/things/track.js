@@ -36,6 +36,41 @@ export class Track extends Thing {
     urls: Thing.common.urls(),
     dateFirstReleased: Thing.common.simpleDate(),
 
+    // Controls how find.track works - it'll never be matched by a reference
+    // just to the track's name, which means you don't have to always reference
+    // some *other* (much more commonly referenced) track by directory instead
+    // of more naturally by name.
+    alwaysReferenceByDirectory: {
+      flags: {update: true, expose: true},
+
+      // Deliberately defaults to null - this will fall back to false in most
+      // cases.
+      update: {validate: isBoolean, default: null},
+
+      expose: {
+        dependencies: ['name', 'originalReleaseTrackByRef', 'trackData'],
+
+        transform(value, {
+          name,
+          originalReleaseTrackByRef,
+          trackData,
+          [Track.instance]: thisTrack,
+        }) {
+          if (value !== null) return value;
+
+          const original =
+            find.track(
+              originalReleaseTrackByRef,
+              trackData.filter(track => track !== thisTrack),
+              {quiet: true});
+
+          if (!original) return false;
+
+          return name === original.name;
+        }
+      },
+    },
+
     artistContribsByRef: Thing.common.contribsByRef(),
     contributorContribsByRef: Thing.common.contribsByRef(),
     coverArtistContribsByRef: Thing.common.contribsByRef(),
