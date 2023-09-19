@@ -1,4 +1,4 @@
-import {accumulateSum, stitchArrays} from '#sugar';
+import {accumulateSum, empty, stitchArrays} from '#sugar';
 
 import {
   chunkByProperties,
@@ -16,7 +16,7 @@ export default {
     'linkTrack',
   ],
 
-  extraDependencies: ['language'],
+  extraDependencies: ['html', 'language'],
 
   query(artist) {
     const tracksAsArtistAndContributor =
@@ -122,11 +122,16 @@ export default {
 
       trackContributions:
         query.chunks.map(({chunk}) =>
-          chunk.map(({contribs}) =>
-            contribs
-              .filter(({who}) => who === artist)
-              .filter(({what}) => what)
-              .map(({what}) => what))),
+          chunk
+            .map(({contribs}) =>
+              contribs
+                .filter(({who}) => who === artist)
+                .filter(({what}) => what)
+                .map(({what}) => what))
+            .map(contributions =>
+              (empty(contributions)
+                ? null
+                : contributions))),
 
       trackRereleases:
         query.chunks.map(({chunk}) =>
@@ -134,7 +139,7 @@ export default {
     };
   },
 
-  generate(data, relations, {language}) {
+  generate(data, relations, {html, language}) {
     return relations.chunkedList.slots({
       chunks:
         stitchArrays({
@@ -192,7 +197,9 @@ export default {
                       rerelease,
 
                       contribution:
-                        language.formatUnitList(contribution),
+                        (contribution
+                          ? language.formatUnitList(contribution)
+                          : html.blank()),
 
                       content:
                         (duration

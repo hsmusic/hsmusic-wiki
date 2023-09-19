@@ -61,17 +61,51 @@ export class Track extends Thing {
     dateFirstReleased: simpleDate(),
 
     color: [
-      exposeUpdateValueOrContinue(),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
 
       withContainingTrackSection(),
       withPropertyFromObject({object: '#trackSection', property: 'color'}),
       exposeDependencyOrContinue({dependency: '#trackSection.color'}),
 
       withPropertyFromAlbum({property: 'color'}),
-      exposeDependency({
-        dependency: '#album.color',
-        update: {validate: isColor},
+      exposeDependency({dependency: '#album.color'}),
+    ],
+
+    // Controls how find.track works - it'll never be matched by a reference
+    // just to the track's name, which means you don't have to always reference
+    // some *other* (much more commonly referenced) track by directory instead
+    // of more naturally by name.
+    alwaysReferenceByDirectory: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isBoolean),
       }),
+
+      excludeFromList({
+        list: 'trackData',
+        item: input.myself(),
+      }),
+
+      withOriginalRelease({
+        data: '#trackData',
+      }),
+
+      exitWithoutDependency({
+        dependency: '#originalRelease',
+        value: input.value(false),
+      }),
+
+      withPropertyFromObject({
+        object: '#originalRelease',
+        property: input.value('name'),
+      }),
+
+      {
+        dependencies: ['name', '#originalRelease.name'],
+        compute({name, '#originalRelease.name': originalName}) =>
+          name === originalName,
+      },
     ],
 
     // Disables presenting the track as though it has its own unique artwork.
@@ -506,6 +540,9 @@ export const withOriginalRelease = templateCompositeFrom({
 
   inputs: {
     selfIfOriginal: input({type: 'boolean', defaultValue: false}),
+
+    // todo: validate
+    data: input({defaultDependency: 'trackData'}),
   },
 
   outputs: {
@@ -513,14 +550,14 @@ export const withOriginalRelease = templateCompositeFrom({
   },
 
   steps: () => [
-    withResolvedReference
-      .inputs({
-        ref: 'originalReleaseTrack',
-        data: 'trackData',
-        find: input.value(find.track),
-        notFoundMode: input.value('exit'),
-      })
-      .outputs({into: '#originalRelease'}),
+    withResolvedReference({
+      ref: 'originalReleaseTrack',
+      data: input('data'),
+      find: input.value(find.track),
+      notFoundMode: input.value('exit'),
+    }).outputs({
+      '#resolvedReference': '#originalRelease',
+    }),
 
     {
       dependencies: [

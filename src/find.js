@@ -80,17 +80,19 @@ function matchDirectory(ref, data) {
 }
 
 function matchName(ref, data, mode) {
-  const matches = data.filter(
-    ({name}) => name.toLowerCase() === ref.toLowerCase()
-  );
+  const matches =
+    data
+      .filter(({name}) => name.toLowerCase() === ref.toLowerCase())
+      .filter(thing =>
+        (Object.hasOwn(thing, 'alwaysReferenceByDirectory')
+          ? !thing.alwaysReferenceByDirectory
+          : true));
 
   if (matches.length > 1) {
-    return warnOrThrow(
-      mode,
+    return warnOrThrow(mode,
       `Multiple matches for reference "${ref}". Please resolve:\n` +
-        matches.map((match) => `- ${inspect(match)}\n`).join('') +
-        `Returning null for this reference.`
-    );
+      matches.map(match => `- ${inspect(match)}\n`).join('') +
+      `Returning null for this reference.`);
   }
 
   if (matches.length === 0) {
@@ -100,10 +102,8 @@ function matchName(ref, data, mode) {
   const thing = matches[0];
 
   if (ref !== thing.name) {
-    warnOrThrow(
-      mode,
-      `Bad capitalization: ${colors.red(ref)} -> ${colors.green(thing.name)}`
-    );
+    warnOrThrow(mode,
+      `Bad capitalization: ${colors.red(ref)} -> ${colors.green(thing.name)}`);
   }
 
   return thing;

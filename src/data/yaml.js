@@ -342,6 +342,8 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     coverArtFileExtension: 'Cover Art File Extension',
     disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
 
+    alwaysReferenceByDirectory: 'Always Reference By Directory',
+
     lyrics: 'Lyrics',
     commentary: 'Commentary',
     additionalFiles: 'Additional Files',
