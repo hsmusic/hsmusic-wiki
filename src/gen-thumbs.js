@@ -250,7 +250,11 @@ async function getImageMagickVersion(binary) {
     allData += data.toString();
   });
 
-  await promisifyProcess(proc, false);
+  try {
+    await promisifyProcess(proc, false);
+  } catch (error) {
+    return null;
+  }
 
   if (!allData.match(/ImageMagick/i)) {
     return null;
