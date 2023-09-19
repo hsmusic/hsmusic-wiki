@@ -53,11 +53,12 @@ export class Album extends Thing {
 
     coverArtDate: [
       exitWithoutContribs({contribs: 'coverArtistContribs'}),
-      exposeUpdateValueOrContinue(),
-      exposeDependency({
-        dependency: 'date',
-        update: {validate: isDate},
+
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
       }),
+
+      exposeDependency({dependency: 'date'}),
     ],
 
     coverArtFileExtension: [

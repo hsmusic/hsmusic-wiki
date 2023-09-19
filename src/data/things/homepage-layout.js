@@ -109,10 +109,21 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
     sourceGroup: compositeFrom(`HomepageLayoutAlbumsRow.sourceGroup`, [
       {
-        transform: (value, continuation) =>
-          (value === 'new-releases' || value === 'new-additions'
-            ? value
-            : continuation(value)),
+        flags: {expose: true, update: true, compose: true},
+
+        update: {
+          validate:
+            oneOf(
+              is('new-releases', 'new-additions'),
+              validateReference(Group[Thing.referenceType])),
+        },
+
+        expose: {
+          transform: (value, continuation) =>
+            (value === 'new-releases' || value === 'new-additions'
+              ? value
+              : continuation(value)),
+        },
       },
 
       withResolvedReference({
@@ -121,15 +132,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
         find: input.value(find.group),
       }),
 
-      exposeDependency({
-        dependency: '#resolvedReference',
-        update: input.value({
-          validate:
-            oneOf(
-              is('new-releases', 'new-additions'),
-              validateReference(Group[Thing.referenceType])),
-        }),
-      }),
+      exposeDependency({dependency: '#resolvedReference'}),
     ]),
 
     sourceAlbums: referenceList({

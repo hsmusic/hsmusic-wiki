@@ -1279,34 +1279,21 @@ export function debugComposite(fn) {
 
 // Exposes a dependency exactly as it is; this is typically the base of a
 // composition which was created to serve as one property's descriptor.
-// Since this serves as a base, specify a value for {update} to indicate
-// that the property as a whole updates (and some previous compositional
-// step works with that update value). Set {update: true} to only enable
-// the update flag, or set update to an object to specify a descriptor
-// (e.g. for custom value validation).
 //
 // Please note that this *doesn't* verify that the dependency exists, so
 // if you provide the wrong name or it hasn't been set by a previous
 // compositional step, the property will be exposed as undefined instead
 // of null.
 //
-export function exposeDependency({
-  dependency,
-  update = false,
-}) {
+export function exposeDependency({dependency}) {
   return {
     annotation: `exposeDependency`,
-    flags: {expose: true, update: !!update},
+    flags: {expose: true},
 
     expose: {
       mapDependencies: {dependency},
       compute: ({dependency}) => dependency,
     },
-
-    update:
-      (typeof update === 'object'
-        ? update
-        : null),
   };
 }
 
@@ -1314,25 +1301,16 @@ export function exposeDependency({
 // is typically the base of a composition serving as a particular property
 // descriptor. It generally follows steps which will conditionally early
 // exit with some other value, with the exposeConstant base serving as the
-// fallback default value. Like exposeDependency, set {update} to true or
-// an object to indicate that the property as a whole updates.
-export function exposeConstant({
-  value,
-  update = false,
-}) {
+// fallback default value.
+export function exposeConstant({value}) {
   return {
     annotation: `exposeConstant`,
-    flags: {expose: true, update: !!update},
+    flags: {expose: true},
 
     expose: {
       options: {value},
       compute: ({'#options': {value}}) => value,
     },
-
-    update:
-      (typeof update === 'object'
-        ? update
-        : null),
   };
 }
 
@@ -1427,12 +1405,24 @@ export const exposeDependencyOrContinue = templateCompositeFrom({
 
 // Exposes the update value of an {update: true} property as it is,
 // or continues if it's unavailable. See withResultOfAvailabilityCheck
-// for {mode} options!
+// for {mode} options! Also provide {validate} here to conveniently
+// set a custom validation check for this property's update value.
 export const exposeUpdateValueOrContinue = templateCompositeFrom({
   annotation: `exposeUpdateValueOrContinue`,
 
   inputs: {
     mode: input(availabilityCheckModeInput),
+    validate: input({type: 'function', null: true}),
+  },
+
+  update: {
+    dependencies: [input.staticValue('validate')],
+    compute: ({
+      [input.staticValue('validate')]: validate,
+    }) =>
+      (validate
+        ? {validate}
+        : {}),
   },
 
   steps: () => [
@@ -1756,6 +1746,52 @@ export function fillMissingListItems({
     };
   }
 }
+
+// Filters particular values out of a list. Note that this will always
+// completely skip over null, but can be used to filter out any other
+// primitive or object value.
+export const excludeFromList = templateCompositeFrom({
+  annotation: `excludeFromList`,
+
+  inputs: {
+    list: input(),
+
+    item: input({null: true}),
+    items: input({validate: isArray, null: true}),
+  },
+
+  outputs: {
+    dependencies: [input.staticDependency('list')],
+    compute: ({
+      [input.staticDependency('list')]: list,
+    }) => [list ?? '#list'],
+  },
+
+  steps: [
+    {
+      dependencies: [
+        input.staticDependency('list'),
+        input('list'),
+        input('item'),
+        input('items'),
+      ],
+
+      compute: (continuation, {
+        [input.staticDependency('list')]: listName,
+        [input('list')]: listContents,
+        [input('item')]: excludeItem,
+        [input('items')]: excludeItems,
+      }) => continuation({
+        [listName ?? '#list']:
+          listContents.filter(item => {
+            if (excludeItem !== null && item === excludeItem) return false;
+            if (!empty(excludeItems) && exclueItems.includes(item)) return false;
+            return true;
+          }),
+      }),
+    },
+  ],
+});
 
 // Flattens an array with one level of nested arrays, providing as dependencies
 // both the flattened array as well as the original starting indices of each

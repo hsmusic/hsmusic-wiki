@@ -121,15 +121,13 @@ export class Track extends Thing {
     coverArtFileExtension: [
       exitWithoutUniqueCoverArt(),
 
-      exposeUpdateValueOrContinue(),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isFileExtension),
+      }),
 
       withPropertyFromAlbum({property: 'trackCoverArtFileExtension'}),
       exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
-
-      exposeConstant({
-        value: 'jpg',
-        update: {validate: isFileExtension},
-      }),
+      exposeConstant({value: 'jpg'}),
     ],
 
     // Date of cover art release. Like coverArtFileExtension, this represents
@@ -140,13 +138,12 @@ export class Track extends Thing {
       withHasUniqueCoverArt(),
       exitWithoutDependency({dependency: '#hasUniqueCoverArt', mode: 'falsy'}),
 
-      exposeUpdateValueOrContinue(),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
 
       withPropertyFromAlbum({property: 'trackArtDate'}),
-      exposeDependency({
-        dependency: '#album.trackArtDate',
-        update: {validate: isDate},
-      }),
+      exposeDependency({dependency: '#album.trackArtDate'}),
     ],
 
     commentary: commentary(),
@@ -175,7 +172,7 @@ export class Track extends Thing {
       inheritFromOriginalRelease({property: 'artistContribs'}),
 
       withResolvedContribs({
-        from: input.updateValue(),
+        from: input.updateValue({validate: isContributionList}),
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -183,10 +180,7 @@ export class Track extends Thing {
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
       withPropertyFromAlbum({property: 'artistContribs'}),
-      exposeDependency({
-        dependency: '#album.artistContribs',
-        update: {validate: isContributionList},
-      }),
+      exposeDependency({dependency: '#album.artistContribs'}),
     ],
 
     contributorContribs: [
@@ -201,7 +195,7 @@ export class Track extends Thing {
       exitWithoutUniqueCoverArt(),
 
       withResolvedContribs({
-        from: input.updateValue(),
+        from: input.updateValue({validate: isContributionList}),
       }).outputs({
         '#resolvedContribs': '#coverArtistContribs',
       }),
@@ -209,10 +203,7 @@ export class Track extends Thing {
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
       withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
-      exposeDependency({
-        dependency: '#album.trackCoverArtistContribs',
-        update: {validate: isContributionList},
-      }),
+      exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
     ],
 
     referencedTracks: [
