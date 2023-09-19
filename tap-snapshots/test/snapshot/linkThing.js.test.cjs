@@ -15,6 +15,10 @@ exports[`test/snapshot/linkThing.js TAP linkThing (snapshot) > color 1`] = `
 <a href="track/showtime-piano-refrain/" style="--primary-color: #aaccff; --dim-color: #828282">Showtime (Piano Refrain)</a>
 `
 
+exports[`test/snapshot/linkThing.js TAP linkThing (snapshot) > nested links in content stripped 1`] = `
+<a href="foo/"><b>Oooo! Very spooky.</b></a>
+`
+
 exports[`test/snapshot/linkThing.js TAP linkThing (snapshot) > preferShortName 1`] = `
 <a href="tag/five-oceanfalls/">Five</a>
 `

@@ -73,4 +73,15 @@ testContentFunctions(t, 'linkThing (snapshot)', async (t, evaluate) => {
       name: '<3',
     }]},
   ]);
+
+  quickSnapshot('nested links in content stripped', {
+    args: ['localized.staticPage', {directory: 'foo', name: 'Foo'}],
+    slots: {
+      content:
+        html.tag('b', {[html.joinChildren]: ''}, [
+          html.tag('a', {href: 'bar'}, `Oooo!`),
+          ` Very spooky.`,
+        ]),
+    },
+  });
 });
