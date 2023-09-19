@@ -286,7 +286,7 @@ async function getSpawnMagick(tool) {
   }
 
   if (fn === null && await commandExists('magick')) {
-    version = await getImageMagickVersion(fn);
+    version = await getImageMagickVersion('magick');
     if (version !== null) {
       fn = (args) => spawn('magick', [tool, ...args]);
       description = `magick ${tool}`;
