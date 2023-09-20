@@ -5,10 +5,11 @@ import {isArray, oneOf} from '#validators';
 import {TupleMap} from '#wiki-data';
 
 import {
+  decorateErrorWithIndex,
   empty,
   filterProperties,
   openAggregate,
-  decorateErrorWithIndex,
+  stitchArrays,
 } from '#sugar';
 
 // Composes multiple compositional "steps" and a "base" to form a property
@@ -361,6 +362,8 @@ export function input(nameOrDescription) {
 input.symbol = Symbol.for('hsmusic.composite.input');
 
 input.updateValue = () => Symbol.for('hsmusic.composite.input.updateValue');
+input.myself = () => Symbol.for(`hsmusic.composite.input.myself`);
+
 input.value = value => ({symbol: input.symbol, shape: 'input.value', value});
 input.dependency = name => Symbol.for(`hsmusic.composite.input.dependency:${name}`);
 input.staticDependency = name => Symbol.for(`hsmusic.composite.input.staticDependency:${name}`);
@@ -398,6 +401,35 @@ function getInputTokenValue(token) {
   } else {
     return token.description.match(/hsmusic\.composite\.input.*?:(.*)/)?.[1] ?? null;
   }
+}
+
+function getStaticInputMetadata(inputOptions) {
+  const metadata = {};
+
+  for (const [name, token] of Object.entries(inputOptions)) {
+    if (typeof token === 'string') {
+      metadata[input.staticDependency(name)] = token;
+      metadata[input.staticValue(name)] = null;
+    } else if (isInputToken(token)) {
+      const tokenShape = getInputTokenShape(token);
+      const tokenValue = getInputTokenValue(token);
+
+      metadata[input.staticDependency(name)] =
+        (tokenShape === 'input.dependency'
+          ? tokenValue
+          : null);
+
+      metadata[input.staticValue(name)] =
+        (tokenShape === 'input.value'
+          ? tokenValue
+          : null);
+    } else {
+      metadata[input.staticDependency(name)] = null;
+      metadata[input.staticValue(name)] = null;
+    }
+  }
+
+  return metadata;
 }
 
 export function templateCompositeFrom(description) {
@@ -483,11 +515,6 @@ export function templateCompositeFrom(description) {
       ? Object.keys(description.inputs)
       : []);
 
-  const expectedOutputNames =
-    (description.outputs
-      ? Object.keys(description.outputs)
-      : []);
-
   const instantiate = (inputOptions = {}) => {
     const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositeName}`});
 
@@ -538,6 +565,13 @@ export function templateCompositeFrom(description) {
 
     inputOptionsAggregate.close();
 
+    const expectedOutputNames =
+      (Array.isArray(description.outputs)
+        ? description.outputs
+     : typeof description.outputs === 'function'
+        ? description.outputs(getStaticInputMetadata(inputOptions))
+        : []);
+
     const outputOptions = {};
 
     const instantiatedTemplate = {
@@ -570,7 +604,7 @@ export function templateCompositeFrom(description) {
         }
 
         if (!empty(misplacedOutputNames)) {
-          outputOptionsAggregate.push(new Error(`Unexpected output names: ${misplacedOutputNames}`));
+          outputOptionsAggregate.push(new Error(`Unexpected output names: ${misplacedOutputNames.join(', ')}`));
         }
 
         for (const name of wrongTypeOutputNames) {
@@ -703,6 +737,12 @@ export function compositeFrom(description) {
     }
   };
 
+  if (!Array.isArray(composition)) {
+    throw new TypeError(
+      `Expected steps to be array, got ${typeof composition}` +
+      (annotation ? ` (${annotation})` : ''));
+  }
+
   const base = composition.at(-1);
   const steps = composition.slice();
 
@@ -714,17 +754,17 @@ export function compositeFrom(description) {
 
   const baseExposes =
     (base.flags
-      ? base.flags.expose
+      ? base.flags.expose ?? false
       : true);
 
   const baseUpdates =
     (base.flags
-      ? base.flags.update
+      ? base.flags.update ?? false
       : false);
 
   const baseComposes =
     (base.flags
-      ? base.flags.compose
+      ? base.flags.compose ?? false
       : true);
 
   // TODO: Check description.compose ?? true instead.
@@ -848,6 +888,12 @@ export function compositeFrom(description) {
       ) {
         return push(new TypeError(
           `Steps which only transform can't be used in a composition that doesn't update`));
+      }
+
+      if (update) {
+        // TODO: This is a dumb assign statement, and it could probably do more
+        // interesting things, like combining validation functions.
+        Object.assign(updateDescription, update);
       }
 
       /*
@@ -1028,8 +1074,6 @@ export function compositeFrom(description) {
             return null;
           }
         }
-
-        continue;
       }
 
       const callingTransformForThisStep =
@@ -1821,7 +1865,7 @@ export const excludeFromList = templateCompositeFrom({
         [listName ?? '#list']:
           listContents.filter(item => {
             if (excludeItem !== null && item === excludeItem) return false;
-            if (!empty(excludeItems) && exclueItems.includes(item)) return false;
+            if (!empty(excludeItems) && excludeItems.includes(item)) return false;
             return true;
           }),
       }),
