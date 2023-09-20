@@ -16,6 +16,7 @@ import {
   filterProperties,
   openAggregate,
   stitchArrays,
+  unique,
 } from '#sugar';
 
 // Composes multiple compositional "steps" and a "base" to form a property
@@ -638,6 +639,10 @@ export function templateCompositeFrom(description) {
           finalDescription.annotation = description.annotation;
         }
 
+        if ('compose' in description) {
+          finalDescription.compose = description.compose;
+        }
+
         if ('update' in description) {
           finalDescription.update = description.update;
         }
@@ -700,7 +705,7 @@ export function templateCompositeFrom(description) {
             steps,
             decorateErrorWithIndex(step =>
               (step.symbol === templateCompositeFrom.symbol
-                ? step.toResolvedComposition()
+                ? compositeFrom(step.toResolvedComposition())
                 : step)),
             {message: `Errors resolving steps`});
 
@@ -723,7 +728,7 @@ export function templateCompositeFrom(description) {
 templateCompositeFrom.symbol = Symbol();
 
 export function compositeFrom(description) {
-  const {annotation, steps: composition} = description;
+  const {annotation} = description;
 
   const debug = fn => {
     if (compositeFrom.debug === true) {
@@ -743,11 +748,36 @@ export function compositeFrom(description) {
     }
   };
 
-  if (!Array.isArray(composition)) {
+  if (!Array.isArray(description.steps)) {
     throw new TypeError(
-      `Expected steps to be array, got ${typeof composition}` +
+      `Expected steps to be array, got ${typeof description.steps}` +
       (annotation ? ` (${annotation})` : ''));
   }
+
+  const composition =
+    description.steps.map(step =>
+      ('toResolvedComposition' in step
+        ? compositeFrom(step.toResolvedComposition())
+        : step));
+
+  const inputMetadata = getStaticInputMetadata(description.inputs ?? {});
+
+  // These dependencies were all provided by the composition which this one is
+  // nested inside, so input('name')-shaped tokens are going to be evaluated
+  // in the context of the containing composition.
+  const dependenciesFromInputs =
+    Object.values(description.inputs ?? {})
+      .map(token => {
+        switch (getInputTokenShape(token)) {
+          case 'input.dependency':
+            return getInputTokenValue(token);
+          case 'input':
+            return token;
+          default:
+            return null;
+        }
+      })
+      .filter(Boolean);
 
   const base = composition.at(-1);
   const steps = composition.slice();
@@ -758,23 +788,8 @@ export function compositeFrom(description) {
       (annotation ? ` (${annotation})` : ''),
   });
 
-  const baseExposes =
-    (base.flags
-      ? base.flags.expose ?? false
-      : true);
-
-  const baseUpdates =
-    (base.flags
-      ? base.flags.update ?? false
-      : false);
-
-  const baseComposes =
-    (base.flags
-      ? base.flags.compose ?? false
-      : true);
-
   // TODO: Check description.compose ?? true instead.
-  const compositionNests = baseComposes;
+  const compositionNests = description.compose ?? true;
 
   const exposeDependencies = new Set();
   const updateDescription = {};
@@ -837,6 +852,18 @@ export function compositeFrom(description) {
   const stepsTransform =
     stepExposeDescriptions
       .map(expose => !!expose?.transform);
+
+  const dependenciesFromSteps =
+    unique(
+      stepExposeDescriptions
+        .flatMap(expose => expose?.dependencies ?? [])
+        .map(dependency =>
+          (typeof dependency === 'string'
+            ? dependency
+         : getInputTokenShape(dependency) === 'input.dependency'
+            ? getInputTokenValue(dependency)
+            : null))
+        .filter(Boolean));
 
   const anyStepsExpose =
     stepsExpose.includes(true);
@@ -924,38 +951,11 @@ export function compositeFrom(description) {
     });
   }
 
-  if (!baseComposes && !baseUpdates && !anyStepsCompute) {
-    aggregate.push(new TypeError(`Expected at least one step to compute`));
+  if (!compositionNests && !anyStepsUpdate && !anyStepsCompute) {
+    aggregate.push(new TypeError(`Expected at least one step to compute or update`));
   }
 
   aggregate.close();
-
-  function _filterDependencies(availableDependencies, {
-    dependencies,
-    mapDependencies,
-    options,
-  }) {
-    if (!dependencies && !mapDependencies && !options) {
-      return null;
-    }
-
-    const filteredDependencies =
-      (dependencies
-        ? filterProperties(availableDependencies, dependencies)
-        : {});
-
-    if (mapDependencies) {
-      for (const [into, from] of Object.entries(mapDependencies)) {
-        filteredDependencies[into] = availableDependencies[from] ?? null;
-      }
-    }
-
-    if (options) {
-      filteredDependencies['#options'] = options;
-    }
-
-    return filteredDependencies;
-  }
 
   function _assignDependencies(continuationAssignment, {mapContinuation}) {
     if (!mapContinuation) {
@@ -998,7 +998,7 @@ export function compositeFrom(description) {
       return continuationSymbol;
     };
 
-    if (baseComposes) {
+    if (compositionNests) {
       const makeRaiseLike = returnWith =>
         (callingTransformForThisStep
           ? (providedValue, providedDependencies = null) => {
@@ -1032,6 +1032,31 @@ export function compositeFrom(description) {
         : undefined);
 
     const availableDependencies = {...initialDependencies};
+
+    // console.log('input description:', description.inputs);
+    const inputValues =
+      ('inputs' in description
+        ? Object.fromEntries(Object.entries(description.inputs)
+            .map(([name, token]) => {
+              const tokenShape = getInputTokenShape(token);
+              const tokenValue = getInputTokenValue(token);
+              switch (tokenShape) {
+                case 'input.dependency':
+                  return [input(name), initialDependencies[tokenValue]];
+                case 'input.value':
+                  return [input(name), tokenValue];
+                case 'input.updateValue':
+                  return [input(name), initialValue];
+                case 'myself':
+                  return [input(name), myself];
+                case 'input':
+                  return [input(name), initialDependencies[token]];
+                default:
+                  throw new TypeError(`Unexpected input shape ${tokenShape}`);
+              }
+            }))
+        : {});
+    // console.log('input values:', inputValues);
 
     if (expectingTransform) {
       debug(() => [colors.bright(`begin composition - transforming from:`), initialValue]);
@@ -1087,7 +1112,12 @@ export function compositeFrom(description) {
 
       let continuationStorage;
 
-      const filteredDependencies = _filterDependencies(availableDependencies, expose);
+      const filteredDependencies =
+        filterProperties({
+          ...availableDependencies,
+          ...inputMetadata,
+          ...inputValues,
+        }, expose.dependencies);
 
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
@@ -1106,9 +1136,17 @@ export function compositeFrom(description) {
 
       const naturalEvaluate = () => {
         const [name, ...args] = getExpectedEvaluation();
-        let continuation;
-        ({continuation, continuationStorage} = _prepareContinuation(callingTransformForThisStep));
-        return expose[name](...args, continuation);
+
+        if (isBase && !compositionNests) {
+          return expose[name](...args);
+        } else {
+          let continuation;
+
+          ({continuation, continuationStorage} =
+            _prepareContinuation(callingTransformForThisStep));
+
+          return expose[name](continuation, ...args);
+        }
       }
 
       switch (step.cache) {
@@ -1166,7 +1204,7 @@ export function compositeFrom(description) {
       if (result !== continuationSymbol) {
         debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
 
-        if (baseComposes) {
+        if (compositionNests) {
           throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
         }
 
@@ -1183,7 +1221,7 @@ export function compositeFrom(description) {
         debug(() => [`step #${i+1} - result: exit (explicit) ->`, providedValue]);
         debug(() => colors.bright(`end composition - exit (explicit)`));
 
-        if (baseComposes) {
+        if (composiitonNests) {
           return continuationIfApplicable.exit(providedValue);
         } else {
           return providedValue;
@@ -1273,26 +1311,35 @@ export function compositeFrom(description) {
     constructedDescriptor.update = updateDescription;
   }
 
-  if (baseExposes) {
+  if (anyStepsExpose) {
     const expose = constructedDescriptor.expose = {};
-    expose.dependencies = Array.from(exposeDependencies);
 
-    const transformFn =
-      (value, initialDependencies, continuationIfApplicable) =>
-        _computeOrTransform(value, initialDependencies, continuationIfApplicable);
+    expose.dependencies =
+      unique([
+        ...dependenciesFromInputs,
+        ...dependenciesFromSteps,
+      ]);
 
-    const computeFn =
-      (initialDependencies, continuationIfApplicable) =>
-        _computeOrTransform(noTransformSymbol, initialDependencies, continuationIfApplicable);
+    if (compositionNests) {
+      if (anyStepsTransform) {
+        expose.transform = (value, continuation, dependencies) =>
+          _computeOrTransform(value, dependencies, continuation);
+      }
 
-    if (baseComposes) {
-      if (anyStepsTransform) expose.transform = transformFn;
-      if (anyStepsCompute) expose.compute = computeFn;
-      if (base.cacheComposition) expose.cache = base.cacheComposition;
-    } else if (baseUpdates) {
-      expose.transform = transformFn;
+      if (anyStepsCompute) {
+        expose.compute = (continuation, dependencies) =>
+          _computeOrTransform(noTransformSymbol, dependencies, continuation);
+      }
+
+      if (base.cacheComposition) {
+        expose.cache = base.cacheComposition;
+      }
+    } else if (anyStepsUpdate) {
+      expose.transform = (value, dependencies) =>
+        _computeOrTransform(value, dependencies, null);
     } else {
-      expose.compute = computeFn;
+      expose.compute = (dependencies) =>
+        _computeOrTransform(noTransformSymbol, dependencies, null);
     }
   }
 
