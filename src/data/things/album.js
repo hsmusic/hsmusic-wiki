@@ -10,9 +10,9 @@ import {
   exposeUpdateValueOrContinue,
   input,
   fillMissingListItems,
-  withFlattenedArray,
+  withFlattenedList,
   withPropertiesFromList,
-  withUnflattenedArray,
+  withUnflattenedList,
 } from '#composite';
 
 import Thing, {
@@ -101,8 +101,15 @@ export class Album extends Thing {
     additionalFiles: additionalFiles(),
 
     trackSections: [
-      exitWithoutDependency({dependency: 'trackData', value: []}),
-      exitWithoutUpdateValue({value: [], mode: 'empty'}),
+      exitWithoutDependency({
+        dependency: 'trackData',
+        value: input.value([]),
+      }),
+
+      exitWithoutUpdateValue({
+        mode: input.value('empty'),
+        value: input.value([]),
+      }),
 
       withPropertiesFromList({
         list: input.updateValue(),
@@ -119,32 +126,27 @@ export class Album extends Thing {
       fillMissingListItems({list: '#sections.isDefaultTrackSection', value: false}),
       fillMissingListItems({list: '#sections.color', dependency: 'color'}),
 
-      withFlattenedArray({
-        from: '#sections.tracks',
-        into: '#trackRefs',
-        intoIndices: '#sections.startIndex',
+      withFlattenedList({
+        list: '#sections.tracks',
+      }).outputs({
+        ['#flattenedList']: '#trackRefs',
+        ['#flattenedIndices']: '#sections.startIndex',
       }),
-
-      {
-        dependencies: ['#trackRefs'],
-        compute: ({'#trackRefs': tracks}, continuation) => {
-          console.log(tracks);
-          return continuation();
-        }
-      },
 
       withResolvedReferenceList({
         list: '#trackRefs',
         data: 'trackData',
-        notFoundMode: 'null',
-        find: find.track,
-        into: '#tracks',
+        notFoundMode: input.value('null'),
+        find: input.value(find.track),
+      }).outputs({
+        ['#resolvedReferenceList']: '#tracks',
       }),
 
-      withUnflattenedArray({
-        from: '#tracks',
-        fromIndices: '#sections.startIndex',
-        into: '#sections.tracks',
+      withUnflattenedList({
+        list: '#tracks',
+        indices: '#sections.startIndex',
+      }).outputs({
+        ['#unflattenedList']: '#sections.tracks',
       }),
 
       {
@@ -191,14 +193,14 @@ export class Album extends Thing {
     bannerArtistContribs: contributionList(),
 
     groups: referenceList({
-      class: Group,
-      find: find.group,
+      class: input.value(Group),
+      find: input.value(find.group),
       data: 'groupData',
     }),
 
     artTags: referenceList({
-      class: ArtTag,
-      find: find.artTag,
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
       data: 'artTagData',
     }),
 
@@ -218,8 +220,16 @@ export class Album extends Thing {
     hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
 
     tracks: [
-      exitWithoutDependency({dependency: 'trackData', value: []}),
-      exitWithoutDependency({dependency: 'trackSections', mode: 'empty', value: []}),
+      exitWithoutDependency({
+        dependency: 'trackData',
+        value: input.value([]),
+      }),
+
+      exitWithoutDependency({
+        dependency: 'trackSections',
+        mode: input.value('empty'),
+        value: input.value([]),
+      }),
 
       {
         dependencies: ['trackSections'],
@@ -233,7 +243,7 @@ export class Album extends Thing {
       withResolvedReferenceList({
         list: '#trackRefs',
         data: 'trackData',
-        find: find.track,
+        find: input.value(find.track),
       }),
 
       exposeDependency({dependency: '#resolvedReferenceList'}),

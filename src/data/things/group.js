@@ -1,3 +1,4 @@
+import {input} from '#composite';
 import find from '#find';
 
 import Thing, {
@@ -24,8 +25,8 @@ export class Group extends Thing {
     urls: urls(),
 
     featuredAlbums: referenceList({
-      class: Album,
-      find: find.album,
+      class: input.value(Album),
+      find: input.value(find.album),
       data: 'albumData',
     }),
 
@@ -87,8 +88,8 @@ export class GroupCategory extends Thing {
     color: color(),
 
     groups: referenceList({
-      class: Group,
-      find: find.group,
+      class: input.value(Group),
+      find: input.value(find.group),
       data: 'groupData',
     }),
 

@@ -1,3 +1,4 @@
+import {input} from '#composite';
 import find from '#find';
 
 import {
@@ -61,8 +62,8 @@ export class Flash extends Thing {
     contributorContribs: contributionList(),
 
     featuredTracks: referenceList({
-      class: Track,
-      find: find.track,
+      class: input.value(Track),
+      find: input.value(find.track),
       data: 'trackData',
     }),
 
@@ -133,9 +134,9 @@ export class FlashAct extends Thing {
     },
 
     flashes: referenceList({
-      class: Flash,
+      class: input.value(Flash),
+      find: input.value(find.flash),
       data: 'flashData',
-      find: find.flash,
     }),
 
     // Update only

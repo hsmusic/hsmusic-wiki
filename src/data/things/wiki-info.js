@@ -1,3 +1,4 @@
+import {input} from '#composite';
 import find from '#find';
 import {isLanguageCode, isName, isURL} from '#validators';
 
@@ -45,8 +46,8 @@ export class WikiInfo extends Thing {
     },
 
     divideTrackListsByGroups: referenceList({
-      class: Group,
-      find: find.group,
+      class: input.value(Group),
+      find: input.value(find.group),
       data: 'groupData',
     }),
 

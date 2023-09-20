@@ -211,7 +211,7 @@ export function contributionList() {
 
     update: {validate: isContributionList},
 
-    steps: () => [
+    steps: [
       withResolvedContribs({from: input.updateValue()}),
       exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
       exposeConstant({value: []}),
@@ -468,8 +468,6 @@ export const withResolvedContribs = templateCompositeFrom({
     // todo: validate
     from: input(),
 
-    findFunction: input({type: 'function'}),
-
     notFoundMode: input({
       validate: oneOf('exit', 'filter', 'null'),
       defaultValue: 'null',
@@ -496,7 +494,7 @@ export const withResolvedContribs = templateCompositeFrom({
     withResolvedReferenceList({
       list: '#contribs.who',
       data: 'artistData',
-      find: input('find'),
+      find: input.value(find.artist),
       notFoundMode: input('notFoundMode'),
     }).outputs({
       ['#resolvedReferenceList']: '#contribs.who',
@@ -728,7 +726,7 @@ export const withReverseReferenceList = templateCompositeFrom({
   steps: () => [
     exitWithoutDependency({
       dependency: input('data'),
-      value: [],
+      value: input.value([]),
     }),
 
     {

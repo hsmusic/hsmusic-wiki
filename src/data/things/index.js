@@ -135,7 +135,12 @@ function evaluatePropertyDescriptors() {
 
       for (const [key, value] of Object.entries(results)) {
         if (Array.isArray(value)) {
-          results[key] = compositeFrom(`${constructor.name}.${key}`, value);
+          results[key] = compositeFrom({
+            annotation: `${constructor.name}.${key}`,
+            compose: false,
+            steps: value,
+          });
+
           continue;
         }
       }

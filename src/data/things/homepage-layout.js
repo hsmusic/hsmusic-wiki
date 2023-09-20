@@ -107,7 +107,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       },
     },
 
-    sourceGroup: compositeFrom(`HomepageLayoutAlbumsRow.sourceGroup`, [
+    sourceGroup: [
       {
         flags: {expose: true, update: true, compose: true},
 
@@ -133,11 +133,11 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       }),
 
       exposeDependency({dependency: '#resolvedReference'}),
-    ]),
+    ],
 
     sourceAlbums: referenceList({
-      class: Album,
-      find: find.album,
+      class: input.value(Album),
+      find: input.value(find.album),
       data: 'albumData',
     }),
 

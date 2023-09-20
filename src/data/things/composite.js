@@ -1,8 +1,14 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {isArray, oneOf} from '#validators';
 import {TupleMap} from '#wiki-data';
+
+import {
+  isArray,
+  isWholeNumber,
+  oneOf,
+  validateArrayItems,
+} from '#validators';
 
 import {
   decorateErrorWithIndex,
@@ -1876,72 +1882,93 @@ export const excludeFromList = templateCompositeFrom({
 // Flattens an array with one level of nested arrays, providing as dependencies
 // both the flattened array as well as the original starting indices of each
 // successive source array.
-export function withFlattenedArray({
-  from,
-  into = '#flattenedArray',
-  intoIndices = '#flattenedIndices',
-}) {
-  return {
-    annotation: `withFlattenedArray`,
-    flags: {expose: true, compose: true},
+export const withFlattenedList = templateCompositeFrom({
+  annotation: `withFlattenedList`,
 
-    expose: {
-      mapDependencies: {from},
-      mapContinuation: {into, intoIndices},
+  inputs: {
+    list: input({type: 'array'}),
+  },
 
-      compute({from: sourceArray}, continuation) {
-        const into = sourceArray.flat();
-        const intoIndices = [];
+  outputs: ['#flattenedList', '#flattenedIndices'],
 
+  steps: () => [
+    {
+      dependencies: [input('list')],
+      compute(continuation, {
+        [input('list')]: sourceList,
+      }) {
+        const flattenedList = sourceList.flat();
+        const indices = [];
         let lastEndIndex = 0;
         for (const {length} of sourceArray) {
-          intoIndices.push(lastEndIndex);
+          indices.push(lastEndIndex);
           lastEndIndex += length;
         }
 
-        return continuation({into, intoIndices});
+        return continuation({
+          ['#flattenedList']: flattenedList,
+          ['#flattenedIndices']: indices,
+        });
       },
     },
-  };
-}
+  ],
+});
 
 // After mapping the contents of a flattened array in-place (being careful to
 // retain the original indices by replacing unmatched results with null instead
 // of filtering them out), this function allows for recombining them. It will
 // filter out null and undefined items by default (pass {filter: false} to
 // disable this).
-export function withUnflattenedArray({
-  from,
-  fromIndices = '#flattenedIndices',
-  into = '#unflattenedArray',
-  filter = true,
-}) {
-  return {
-    annotation: `withUnflattenedArray`,
-    flags: {expose: true, compose: true},
+export const withUnflattenedList = templateCompositeFrom({
+  annotation: `withUnflattenedList`,
 
-    expose: {
-      mapDependencies: {from, fromIndices},
-      mapContinuation: {into},
-      compute({from, fromIndices}, continuation) {
-        const arrays = [];
+  inputs: {
+    list: input({
+      type: 'array',
+      defaultDependency: '#flattenedList',
+    }),
 
-        for (let i = 0; i < fromIndices.length; i++) {
-          const startIndex = fromIndices[i];
+    indices: input({
+      validate: validateArrayItems(isWholeNumber),
+      defaultDependency: '#flattenedIndices',
+    }),
+
+    filter: input({
+      type: 'boolean',
+      defaultValue: true,
+    }),
+  },
+
+  outputs: ['#unflattenedList'],
+
+  steps: () => [
+    {
+      dependencies: [input('list'), input('indices')],
+      compute({
+        [input('list')]: list,
+        [input('indices')]: indices,
+        [input('filter')]: filter,
+      }) {
+        const unflattenedList = [];
+
+        for (let i = 0; i < indices.length; i++) {
+          const startIndex = indices[i];
           const endIndex =
-            (i === fromIndices.length - 1
-              ? from.length
-              : fromIndices[i + 1]);
+            (i === indices.length - 1
+              ? list.length
+              : indices[i + 1]);
 
-          const values = from.slice(startIndex, endIndex);
-          arrays.push(
+          const values = list.slice(startIndex, endIndex);
+          unflattenedList.push(
             (filter
               ? values.filter(value => value !== null && value !== undefined)
               : values));
         }
 
-        return continuation({into: arrays});
+        return continuation({
+          ['#unflattenedList']: unflattenedList,
+        });
       },
     },
-  };
-}
+  ],
+});

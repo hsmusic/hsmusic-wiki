@@ -6,6 +6,7 @@ import {empty} from '#sugar';
 
 import {
   exitWithoutDependency,
+  excludeFromList,
   exposeConstant,
   exposeDependency,
   exposeDependencyOrContinue,
@@ -17,6 +18,7 @@ import {
 } from '#composite';
 
 import {
+  isBoolean,
   isColor,
   isContributionList,
   isDate,
@@ -136,7 +138,11 @@ export class Track extends Thing {
     // is specified, this value is null.
     coverArtDate: [
       withHasUniqueCoverArt(),
-      exitWithoutDependency({dependency: '#hasUniqueCoverArt', mode: 'falsy'}),
+
+      exitWithoutDependency({
+        dependency: '#hasUniqueCoverArt',
+        mode: input.value('falsy'),
+      }),
 
       exposeUpdateValueOrContinue({
         validate: input.value(isDate),
@@ -154,8 +160,8 @@ export class Track extends Thing {
     midiProjectFiles: additionalFiles(),
 
     originalReleaseTrack: singleReference({
-      class: Track,
-      find: find.track,
+      class: input.value(Track),
+      find: input.value(find.track),
       data: 'trackData',
     }),
 
@@ -163,8 +169,8 @@ export class Track extends Thing {
     // util.inspect display, if it isn't indirectly available (by way of being
     // included in an album's track list).
     dataSourceAlbum: singleReference({
-      class: Album,
-      find: find.album,
+      class: input.value(Album),
+      find: input.value(find.album),
       data: 'albumData',
     }),
 
@@ -208,25 +214,27 @@ export class Track extends Thing {
 
     referencedTracks: [
       inheritFromOriginalRelease({property: 'referencedTracks'}),
+
       referenceList({
-        class: Track,
-        find: find.track,
+        class: input.value(Track),
+        find: input.value(find.track),
         data: 'trackData',
       }),
     ],
 
     sampledTracks: [
       inheritFromOriginalRelease({property: 'sampledTracks'}),
+
       referenceList({
-        class: Track,
-        find: find.track,
+        class: input.value(Track),
+        find: input.value(find.track),
         data: 'trackData',
       }),
     ],
 
     artTags: referenceList({
-      class: ArtTag,
-      find: find.artTag,
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
       data: 'artTagData',
     }),
 
@@ -266,8 +274,14 @@ export class Track extends Thing {
     ],
 
     otherReleases: [
-      exitWithoutDependency({dependency: 'trackData', mode: 'empty'}),
-      withOriginalRelease({selfIfOriginal: true}),
+      exitWithoutDependency({
+        dependency: 'trackData',
+        mode: input.value('empty'),
+      }),
+
+      withOriginalRelease({
+        selfIfOriginal: input.value(true),
+      }),
 
       {
         flags: {expose: true},
@@ -594,14 +608,14 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
           : continuation()),
     },
 
-    withResolvedContribs
-      .inputs({from: 'coverArtistContribs'})
-      .outputs({into: '#coverArtistContribs'}),
+    withResolvedContribs({
+      from: 'coverArtistContribs',
+    }),
 
     {
-      dependencies: ['#coverArtistContribs'],
+      dependencies: ['#resolvedContribs'],
       compute: (continuation, {
-        ['#coverArtistContribs']: contribsFromTrack,
+        ['#resolvedContribs']: contribsFromTrack,
       }) =>
         (empty(contribsFromTrack)
           ? continuation()
@@ -640,7 +654,7 @@ export const exitWithoutUniqueCoverArt = templateCompositeFrom({
 
     exitWithoutDependency({
       dependency: '#hasUniqueCoverArt',
-      mode: 'falsy',
+      mode: input.value('falsy'),
       value: input('value'),
     }),
   ],

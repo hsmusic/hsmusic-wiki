@@ -1,3 +1,4 @@
+import {input} from '#composite';
 import find from '#find';
 import {isName, validateArrayItems} from '#validators';
 
@@ -35,8 +36,8 @@ export class Artist extends Thing {
     isAlias: flag(),
 
     aliasedArtist: singleReference({
-      class: Artist,
-      find: find.artist,
+      class: input.value(Artist),
+      find: input.value(find.artist),
       data: 'artistData',
     }),
 
