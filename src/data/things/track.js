@@ -103,7 +103,7 @@ export class Track extends Thing {
 
       {
         dependencies: ['name', '#originalRelease.name'],
-        compute({name, '#originalRelease.name': originalName}) =>
+        compute: ({name, '#originalRelease.name': originalName}) =>
           name === originalName,
       },
     ],
@@ -389,34 +389,40 @@ export const withAlbum = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    into: '#album',
-  },
+  outputs: ['#album'],
 
   steps: () => [
     raiseOutputWithoutDependency({
       dependency: 'albumData',
       mode: input.value('empty'),
-      output: input.value({into: null}),
+      output: input.value({
+        ['#album']: null,
+      }),
     }),
 
     {
-      dependencies: ['this', 'albumData'],
-      compute: (continuation, {this: track, albumData}) =>
+      dependencies: [input.myself(), 'albumData'],
+      compute: (continuation, {
+        [input.myself()]: track,
+        ['albumData']: albumData,
+      }) =>
         continuation({
-          '#album': albumData.find(album => album.tracks.includes(track)),
+          ['#album']:
+            albumData.find(album => album.tracks.includes(track)),
         }),
     },
 
     raiseOutputWithoutDependency({
       dependency: '#album',
-      output: input.value({into: null}),
+      output: input.value({
+        ['#album']: null,
+      }),
     }),
 
     {
       dependencies: ['#album'],
       compute: (continuation, {'#album': album}) =>
-        continuation({into: album}),
+        continuation.raiseOutput({'#album': album}),
     },
   ],
 });
@@ -437,12 +443,9 @@ export const withPropertyFromAlbum = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    dependencies: [input.staticValue('property')],
-    compute: ({
-      [input.staticValue('property')]: property,
-    }) => ['#album.' + property],
-  },
+  outputs: ({
+    [input.staticValue('property')]: property,
+  }) => ['#album.' + property],
 
   steps: () => [
     withAlbum({
@@ -479,9 +482,7 @@ export const withContainingTrackSection = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    into: '#trackSection',
-  },
+  outputs: ['#trackSection'],
 
   steps: () => [
     withPropertyFromAlbum({
@@ -502,18 +503,24 @@ export const withContainingTrackSection = templateCompositeFrom({
         ['#album.trackSections']: trackSections,
       }) {
         if (!trackSections) {
-          return continuation({into: null});
+          return continuation.raiseOutput({
+            ['#trackSection']: null,
+          });
         }
 
         const trackSection =
           trackSections.find(({tracks}) => tracks.includes(track));
 
         if (trackSection) {
-          return continuation({into: trackSection});
+          return continuation.raiseOutput({
+            ['#trackSection']: trackSection,
+          });
         } else if (notFoundMode === 'exit') {
           return continuation.exit(null);
         } else {
-          return continuation({into: null});
+          return continuation.raiseOutput({
+            ['#trackSection']: null,
+          });
         }
       },
     },
@@ -536,9 +543,7 @@ export const withOriginalRelease = templateCompositeFrom({
     data: input({defaultDependency: 'trackData'}),
   },
 
-  outputs: {
-    into: '#originalRelease',
-  },
+  outputs: ['#originalRelease'],
 
   steps: () => [
     withResolvedReference({
@@ -547,7 +552,7 @@ export const withOriginalRelease = templateCompositeFrom({
       find: input.value(find.track),
       notFoundMode: input.value('exit'),
     }).outputs({
-      '#resolvedReference': '#originalRelease',
+      ['#resolvedReference']: '#originalRelease',
     }),
 
     {
@@ -563,7 +568,7 @@ export const withOriginalRelease = templateCompositeFrom({
         ['#originalRelease']: originalRelease,
       }) =>
         continuation({
-          into:
+          ['#originalRelease']:
             (originalRelease ??
               (selfIfOriginal
                 ? track
@@ -578,9 +583,7 @@ export const withOriginalRelease = templateCompositeFrom({
 export const withHasUniqueCoverArt = templateCompositeFrom({
   annotation: 'withHasUniqueCoverArt',
 
-  outputs: {
-    into: '#hasUniqueCoverArt',
-  },
+  outputs: ['#hasUniqueCoverArt'],
 
   steps: () => [
     {
@@ -602,7 +605,10 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
       }) =>
         (empty(contribsFromTrack)
           ? continuation()
-          : continuation.raiseOutput({into: true})),
+          : continuation.raiseOutput({
+              ['#hasUniqueCoverArt']:
+                true,
+            })),
     },
 
     withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
@@ -612,8 +618,9 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
       compute: (continuation, {
         ['#album.trackCoverArtistContribs']: contribsFromAlbum,
       }) =>
-        continuation({
-          into: !empty(contribsFromAlbum),
+        continuation.raiseOutput({
+          ['#hasUniqueCoverArt']:
+            !empty(contribsFromAlbum),
         }),
     },
   ],

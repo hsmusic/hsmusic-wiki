@@ -1,7 +1,7 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {oneOf} from '#validators';
+import {isArray, oneOf} from '#validators';
 import {TupleMap} from '#wiki-data';
 
 import {
@@ -1193,7 +1193,7 @@ export function compositeFrom(description) {
 
         case 'raiseAbove':
           debug(() => colors.bright(`end composition - raiseAbove`));
-          return continuationIfApplicable.raise(...continuationArgs);
+          return continuationIfApplicable.raiseOutput(...continuationArgs);
 
         case 'continuation':
           if (isBase) {
@@ -1360,9 +1360,7 @@ export const withResultOfAvailabilityCheck = templateCompositeFrom({
     mode: input(availabilityCheckModeInput),
   },
 
-  outputs: {
-    into: '#availability',
-  },
+  outputs: ['#availability'],
 
   steps: () => [
     {
@@ -1388,7 +1386,7 @@ export const withResultOfAvailabilityCheck = templateCompositeFrom({
             break;
         }
 
-        return continuation({into: availability});
+        return continuation({'#availability': availability});
       },
     },
   ],
@@ -1571,35 +1569,56 @@ export const withPropertyFromObject = templateCompositeFrom({
     property: input({type: 'string'}),
   },
 
-  outputs: {
-    dependencies: [
-      input.staticDependency('object'),
-      input.staticValue('property'),
-    ],
-
-    compute: ({
-      [input.staticDependency('object')]: object,
-      [input.staticValue('property')]: property,
-    }) => {
-      return (
-        (object && property
-          ? (object.startsWith('#')
-              ? `${object}.${property}`
-              : `#${object}.${property}`)
-          : '#value'));
-    },
+  outputs: ({
+    [input.staticDependency('object')]: object,
+    [input.staticValue('property')]: property,
+  }) => {
+    return [
+      (object && property
+        ? (object.startsWith('#')
+            ? `${object}.${property}`
+            : `#${object}.${property}`)
+        : '#value'),
+    ];
   },
 
   steps: () => [
     {
-      dependencies: [input('object'), input('property')],
+      dependencies: [
+        input.staticDependency('object'),
+        input.staticValue('property'),
+      ],
+
       compute: (continuation, {
+        [input.staticDependency('object')]: object,
+        [input.staticValue('property')]: property,
+      }) => continuation({
+        '#output':
+          (object && property
+            ? (object.startsWith('#')
+                ? `${object}.${property}`
+                : `#${object}.${property}`)
+            : '#value'),
+      }),
+    },
+
+    {
+      dependencies: [
+        '#output',
+        input('object'),
+        input('property'),
+      ],
+
+      compute: (continuation, {
+        ['#output']: output,
         [input('object')]: object,
         [input('property')]: property,
-      }) =>
-        (object === null
-          ? continuation({into: null})
-          : continuation({into: object[property] ?? null})),
+      }) => continuation({
+        [output]:
+          (object === null
+            ? null
+            : object[property] ?? null),
+      }),
     },
   ],
 });
@@ -1780,14 +1799,11 @@ export const excludeFromList = templateCompositeFrom({
     items: input({validate: isArray, null: true}),
   },
 
-  outputs: {
-    dependencies: [input.staticDependency('list')],
-    compute: ({
-      [input.staticDependency('list')]: list,
-    }) => [list ?? '#list'],
-  },
+  outputs: ({
+    [input.staticDependency('list')]: list,
+  }) => [list ?? '#list'],
 
-  steps: [
+  steps: () => [
     {
       dependencies: [
         input.staticDependency('list'),

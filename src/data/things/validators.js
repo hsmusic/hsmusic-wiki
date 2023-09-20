@@ -9,11 +9,11 @@ function inspect(value) {
 
 // Basic types (primitives)
 
-function a(noun) {
+export function a(noun) {
   return /[aeiou]/.test(noun[0]) ? `an ${noun}` : `a ${noun}`;
 }
 
-function isType(value, type) {
+export function isType(value, type) {
   if (typeof value !== type)
     throw new TypeError(`Expected ${a(type)}, got ${typeof value}`);
 

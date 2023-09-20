@@ -476,15 +476,15 @@ export const withResolvedContribs = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    into: '#resolvedContribs',
-  },
+  outputs: ['#resolvedContribs'],
 
   steps: () => [
     raiseOutputWithoutDependency({
       dependency: input('from'),
       mode: input.value('empty'),
-      output: input.value({into: []}),
+      output: input.value({
+        ['#resolvedContribs']: [],
+      }),
     }),
 
     withPropertiesFromList({
@@ -496,9 +496,10 @@ export const withResolvedContribs = templateCompositeFrom({
     withResolvedReferenceList({
       list: '#contribs.who',
       data: 'artistData',
-      into: '#contribs.who',
       find: input('find'),
       notFoundMode: input('notFoundMode'),
+    }).outputs({
+      ['#resolvedReferenceList']: '#contribs.who',
     }),
 
     {
@@ -510,7 +511,7 @@ export const withResolvedContribs = templateCompositeFrom({
       }) {
         filterMultipleArrays(who, what, (who, _what) => who);
         return continuation({
-          '#composition.into': stitchArrays({who, what}),
+          ['#resolvedContribs']: stitchArrays({who, what}),
         });
       },
     },
@@ -577,14 +578,14 @@ export const withResolvedReference = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    into: '#resolvedReference',
-  },
+  outputs: ['#resolvedReference'],
 
   steps: () => [
     raiseOutputWithoutDependency({
       dependency: input('ref'),
-      output: input.value({into: null}),
+      output: input.value({
+        ['#resolvedReference']: null,
+      }),
     }),
 
     exitWithoutDependency({
@@ -611,7 +612,9 @@ export const withResolvedReference = templateCompositeFrom({
           return continuation.exit(null);
         }
 
-        return continuation.raise({match});
+        return continuation.raiseOutput({
+          ['#resolvedReference']: match,
+        });
       },
     },
   ],
@@ -640,9 +643,7 @@ export const withResolvedReferenceList = templateCompositeFrom({
     }),
   },
 
-  outputs: {
-    into: '#resolvedReferenceList',
-  },
+  outputs: ['#resolvedReferenceList'],
 
   steps: () => [
     exitWithoutDependency({
@@ -653,7 +654,9 @@ export const withResolvedReferenceList = templateCompositeFrom({
     raiseOutputWithoutDependency({
       dependency: input('list'),
       mode: input.value('empty'),
-      output: input.value({into: []}),
+      output: input.value({
+        ['#resolvedReferenceList']: [],
+      }),
     }),
 
     {
@@ -672,7 +675,9 @@ export const withResolvedReferenceList = templateCompositeFrom({
       dependencies: ['#matches'],
       compute: ({'#matches': matches}, continuation) =>
         (matches.every(match => match)
-          ? continuation.raise({'#continuation.into': matches})
+          ? continuation.raiseOutput({
+              ['#resolvedReferenceList']: matches,
+            })
           : continuation()),
     },
 
@@ -687,12 +692,16 @@ export const withResolvedReferenceList = templateCompositeFrom({
             return continuation.exit([]);
 
           case 'filter':
-            matches = matches.filter(match => match);
-            return continuation.raise({'#continuation.into': matches});
+            return continuation.raiseOutput({
+              ['#resolvedReferenceList']:
+                matches.filter(match => match),
+            });
 
           case 'null':
-            matches = matches.map(match => match ?? null);
-            return continuation.raise({'#continuation.into': matches});
+            return continuation.raiseOutput({
+              ['#resolvedReferenceList']:
+                matches.map(match => match ?? null),
+            });
 
           default:
             throw new TypeError(`Expected notFoundMode to be exit, filter, or null`);
@@ -714,30 +723,24 @@ export const withReverseReferenceList = templateCompositeFrom({
     list: input({type: 'string'}),
   },
 
-  outputs: {
-    into: '#reverseReferenceList',
-  },
+  outputs: ['#reverseReferenceList'],
 
   steps: () => [
     exitWithoutDependency({
-      dependency: '#composition.data',
+      dependency: input('data'),
       value: [],
     }),
 
     {
-      dependencies: [
-        'this',
-        '#composition.data',
-        '#composition.refListProperty',
-      ],
+      dependencies: [input.myself(), input('data'), input('list')],
 
       compute: ({
-        this: thisThing,
-        '#composition.data': data,
-        '#composition.refListProperty': refListProperty,
+        [input.myself()]: thisThing,
+        [input('data')]: data,
+        [input('list')]: refListProperty,
       }, continuation) =>
         continuation({
-          '#composition.into':
+          ['#reverseReferenceList']:
             data.filter(thing => thing[refListProperty].includes(thisThing)),
         }),
     },
