@@ -209,6 +209,8 @@ export function contributionList() {
   return compositeFrom({
     annotation: `contributionList`,
 
+    compose: false,
+
     update: {validate: isContributionList},
 
     steps: [
@@ -598,12 +600,12 @@ export const withResolvedReference = templateCompositeFrom({
         input('notFoundMode'),
       ],
 
-      compute({
+      compute(continuation, {
         [input('ref')]: ref,
         [input('data')]: data,
         [input('find')]: findFunction,
         [input('notFoundMode')]: notFoundMode,
-      }, continuation) {
+      }) {
         const match = findFunction(ref, data, {mode: 'quiet'});
 
         if (match === null && notFoundMode === 'exit') {
@@ -659,11 +661,11 @@ export const withResolvedReferenceList = templateCompositeFrom({
 
     {
       dependencies: [input('list'), input('data'), input('find')],
-      compute: ({
+      compute: (continuation, {
         [input('list')]: list,
         [input('data')]: data,
         [input('find')]: findFunction,
-      }, continuation) =>
+      }) =>
         continuation({
           '#matches': list.map(ref => findFunction(ref, data, {mode: 'quiet'})),
         }),
@@ -671,7 +673,7 @@ export const withResolvedReferenceList = templateCompositeFrom({
 
     {
       dependencies: ['#matches'],
-      compute: ({'#matches': matches}, continuation) =>
+      compute: (continuation, {'#matches': matches}) =>
         (matches.every(match => match)
           ? continuation.raiseOutput({
               ['#resolvedReferenceList']: matches,
@@ -681,10 +683,10 @@ export const withResolvedReferenceList = templateCompositeFrom({
 
     {
       dependencies: ['#matches', input('notFoundMode')],
-      compute({
+      compute(continuation, {
         ['#matches']: matches,
         [input('notFoundMode')]: notFoundMode,
-      }, continuation) {
+      }) {
         switch (notFoundMode) {
           case 'exit':
             return continuation.exit([]);
@@ -732,11 +734,11 @@ export const withReverseReferenceList = templateCompositeFrom({
     {
       dependencies: [input.myself(), input('data'), input('list')],
 
-      compute: ({
+      compute: (continuation, {
         [input.myself()]: thisThing,
         [input('data')]: data,
         [input('list')]: refListProperty,
-      }, continuation) =>
+      }) =>
         continuation({
           ['#reverseReferenceList']:
             data.filter(thing => thing[refListProperty].includes(thisThing)),

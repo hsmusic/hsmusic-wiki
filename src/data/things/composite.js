@@ -1693,7 +1693,7 @@ export function withPropertiesFromObject({
       mapDependencies: {object},
       options: {prefix, properties},
 
-      compute: ({object, '#options': {prefix, properties}}, continuation) =>
+      compute: (continuation, {object, '#options': {prefix, properties}}) =>
         continuation(
           Object.fromEntries(
             properties.map(property => [
@@ -1729,7 +1729,7 @@ export function withPropertyFromList({
       mapContinuation: {into},
       options: {property},
 
-      compute({list, '#options': {property}}, continuation) {
+      compute(continuation, {list, '#options': {property}}) {
         if (list === undefined || empty(list)) {
           return continuation({into: []});
         }
@@ -1765,7 +1765,7 @@ export function withPropertiesFromList({
       mapDependencies: {list},
       options: {prefix, properties},
 
-      compute({list, '#options': {prefix, properties}}, continuation) {
+      compute(continuation, {list, '#options': {prefix, properties}}) {
         const lists =
           Object.fromEntries(
             properties.map(property => [`${prefix}.${property}`, []]));
@@ -1811,7 +1811,7 @@ export function fillMissingListItems({
         mapDependencies: {list, dependency},
         mapContinuation: {into},
 
-        compute: ({list, dependency}, continuation) =>
+        compute: (continuation, {list, dependency}) =>
           continuation({
             into: list.map(item => item ?? dependency),
           }),
@@ -1827,7 +1827,7 @@ export function fillMissingListItems({
         mapContinuation: {into},
         options: {value},
 
-        compute: ({list, '#options': {value}}, continuation) =>
+        compute: (continuation, {list, '#options': {value}}) =>
           continuation({
             into: list.map(item => item ?? value),
           }),

@@ -1,4 +1,4 @@
-import {exposeUpdateValueOrContinue} from '#composite';
+import {exposeUpdateValueOrContinue, input} from '#composite';
 import {sortAlbumsTracksChronologically} from '#wiki-data';
 import {isName} from '#validators';
 
@@ -22,17 +22,14 @@ export class ArtTag extends Thing {
     isContentWarning: flag(false),
 
     nameShort: [
-      exposeUpdateValueOrContinue(),
+      exposeUpdateValueOrContinue({
+        validate: input.value(isName),
+      }),
 
       {
         dependencies: ['name'],
         compute: ({name}) =>
           name.replace(/ \([^)]*?\)$/, ''),
-      },
-
-      {
-        flags: {update: true, expose: true},
-        validate: {isName},
       },
     ],
 

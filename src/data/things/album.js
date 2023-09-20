@@ -233,7 +233,7 @@ export class Album extends Thing {
 
       {
         dependencies: ['trackSections'],
-        compute: ({trackSections}, continuation) =>
+        compute: (continuation, {trackSections}) =>
           continuation({
             '#trackRefs': trackSections
               .flatMap(section => section.tracks ?? []),
