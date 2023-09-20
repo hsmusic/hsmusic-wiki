@@ -416,110 +416,65 @@ export function templateCompositeFrom(description) {
     }
   }
 
-  descriptionAggregate.nest({message: `Errors in input descriptions for ${compositeName}`}, ({push}) => {
-    const missingCallsToInput = [];
-    const wrongCallsToInput = [];
-
-    for (const [name, value] of Object.entries(description.inputs ?? {})) {
-      if (!isInputToken(value)) {
-        missingCallsToInput.push(name);
-        continue;
-      }
-
-      if (getInputTokenShape(value) !== 'input') {
-        wrongCallsToInput.push(name);
-      }
+  validateInputs:
+  if ('inputs' in description) {
+    if (Array.isArray(description.inputs)) {
+      descriptionAggregate.push(new Error(`Expected inputs to be object, got array`));
+      break validateInputs;
+    } else if (typeof description.inputs !== 'object') {
+      descriptionAggregate.push(new Error(`Expected inputs to be object, got ${typeof description.inputs}`));
+      break validateInputs;
     }
 
-    for (const name of missingCallsToInput) {
-      push(new Error(`${name}: Missing call to input()`));
-    }
+    descriptionAggregate.nest({message: `Errors in input descriptions for ${compositeName}`}, ({push}) => {
+      const missingCallsToInput = [];
+      const wrongCallsToInput = [];
 
-    for (const name of wrongCallsToInput) {
-      const shape = getInputTokenShape(description.inputs[name]);
-      push(new Error(`${name}: Expected call to input(), got ${shape}`));
-    }
-  });
-
-  descriptionAggregate.nest({message: `Errors in output descriptions for ${compositeName}`}, ({map, push}) => {
-    const wrongType = [];
-    const notPrivate = [];
-
-    const missingDependenciesDefault = [];
-    const wrongDependenciesType = [];
-    const wrongDefaultType = [];
-
-    for (const [name, value] of Object.entries(description.outputs ?? {})) {
-      if (typeof value === 'object') {
-        if (!('dependencies' in value && 'default' in value)) {
-          missingDependenciesDefault.push(name);
+      for (const [name, value] of Object.entries(description.inputs)) {
+        if (!isInputToken(value)) {
+          missingCallsToInput.push(name);
           continue;
         }
 
-        if (!Array.isArray(value.dependencies)) {
-          wrongDependenciesType.push(name);
+        if (!['input', 'input.staticDependency', 'input.staticValue'].includes(getInputTokenShape(value))) {
+          wrongCallsToInput.push(name);
         }
-
-        if (typeof value.default !== 'function') {
-          wrongDefaultType.push(name);
-        }
-
-        continue;
       }
 
-      if (typeof value !== 'string') {
-        wrongType.push(name);
-        continue;
+      for (const name of missingCallsToInput) {
+        push(new Error(`${name}: Missing call to input()`));
       }
 
-      if (!value.startsWith('#')) {
-        notPrivate.push(name);
-        continue;
+      for (const name of wrongCallsToInput) {
+        const shape = getInputTokenShape(description.inputs[name]);
+        push(new Error(`${name}: Expected call to input, input.staticDependency, or input.staticValue, got ${shape}`));
       }
+    });
+  }
+
+  validateOutputs:
+  if ('outputs' in description) {
+    if (
+      !Array.isArray(description.outputs) &&
+      typeof description.outputs !== 'function'
+    ) {
+      descriptionAggregate.push(new Error(`Expected outputs to be array or function, got ${typeof description.outputs}`));
+      break validateOutputs;
     }
 
-    for (const name of wrongType) {
-      const type = typeof description.outputs[name];
-      push(new Error(`${name}: Expected string, got ${type}`));
-    }
-
-    for (const name of notPrivate) {
-      const into = description.outputs[name];
-      push(new Error(`${name}: Expected "#" at start, got ${into}`));
-    }
-
-    for (const name of missingDependenciesDefault) {
-      push(new Error(`${name}: Expected both dependencies & default`));
-    }
-
-    for (const name of wrongDependenciesType) {
-      const {dependencies} = description.outputs[name];
-      push(new Error(`${name}: Expected dependencies to be array, got ${dependencies}`));
-    }
-
-    for (const name of wrongDefaultType) {
-      const type = typeof description.outputs[name].default;
-      push(new Error(`${name}: Expected default to be function, got ${type}`));
-    }
-
-    for (const [name, value] of Object.entries(description.outputs ?? {})) {
-      if (typeof value !== 'object') continue;
-
-      map(
-        description.outputs[name].dependencies,
-        decorateErrorWithIndex(dependency => {
-          if (!isInputToken(dependency)) {
-            throw new Error(`Expected call to input.staticValue or input.staticDependency, got ${dependency}`);
-          }
-
-          const shape = getInputTokenShape(dependency);
-          if (shape !== 'input.staticValue' && shape !== 'input.staticDependency') {
-            throw new Error(`Expected call to input.staticValue or input.staticDependency, got ${shape}`);
+    if (Array.isArray(description.outputs)) {
+      descriptionAggregate.map(
+        description.outputs,
+        decorateErrorWithIndex(value => {
+          if (typeof value !== 'string') {
+            throw new Error(`${value}: Expected string, got ${typeof value}`)
+          } else if (!value.startsWith('#')) {
+            throw new Error(`${value}: Expected "#" at start`);
           }
         }),
-        {message: `${name}: Errors in dependencies`});
+        {message: `Errors in output descriptions for ${compositeName}`});
     }
-  });
+  }
 
   descriptionAggregate.close();
 
@@ -772,66 +727,130 @@ export function compositeFrom(description) {
       ? base.flags.compose
       : true);
 
-  if (!baseExposes) {
-    aggregate.push(new TypeError(`All steps, including base, must expose`));
-  }
+  // TODO: Check description.compose ?? true instead.
+  const compositionNests = baseComposes;
 
   const exposeDependencies = new Set();
+  const updateDescription = {};
 
-  let anyStepsCompute = false;
-  let anyStepsTransform = false;
+  // Steps default to exposing if using a shorthand syntax where flags aren't
+  // specified at all.
+  const stepsExpose =
+    steps
+      .map(step =>
+        (step.flags
+          ? step.flags.expose ?? false
+          : true));
 
-  for (let i = 0; i < steps.length; i++) {
-    const step = steps[i];
-    const isBase = i === steps.length - 1;
+  // Steps default to composing if using a shorthand syntax where flags aren't
+  // specified at all - *and* aren't the base (final step), unless the whole
+  // composition is nestable.
+  const stepsCompose =
+    steps
+      .map((step, index, {length}) =>
+        (step.flags
+          ? step.flags.compose ?? false
+          : (index === length - 1
+              ? compositionNests
+              : true)));
+
+  // Steps don't update unless the corresponding flag is explicitly set.
+  const stepsUpdate =
+    steps
+      .map(step =>
+        (step.flags
+          ? step.flags.update ?? false
+          : false));
+
+  // The expose description for a step is just the entire step object, when
+  // using the shorthand syntax where {flags: {expose: true}} is left implied.
+  const stepExposeDescriptions =
+    steps
+      .map((step, index) =>
+        (stepsExpose[index]
+          ? (step.flags
+              ? step.expose ?? null
+              : step)
+          : null));
+
+  // The update description for a step, if present at all, is always set
+  // explicitly.
+  const stepUpdateDescriptions =
+    steps
+      .map((step, index) =>
+        (stepsUpdate[index]
+          ? step.update ?? null
+          : null));
+
+  // Indicates presence of a {compute} function on the expose description.
+  const stepsCompute =
+    stepExposeDescriptions
+      .map(expose => !!expose?.compute);
+
+  // Indicates presence of a {transform} function on the expose description.
+  const stepsTransform =
+    stepExposeDescriptions
+      .map(expose => !!expose?.transform);
+
+  const anyStepsExpose =
+    stepsExpose.includes(true);
+
+  const anyStepsUpdate =
+    stepsUpdate.includes(true);
+
+  const anyStepsCompute =
+    stepsCompute.includes(true);
+
+  const anyStepsTransform =
+    stepsTransform.includes(true);
+
+  const stepEntries = stitchArrays({
+    step: steps,
+    expose: stepExposeDescriptions,
+    update: stepUpdateDescriptions,
+    stepComposes: stepsCompose,
+    stepComputes: stepsCompute,
+    stepTransforms: stepsTransform,
+  });
+
+  for (let i = 0; i < stepEntries.length; i++) {
+    const {
+      step,
+      expose,
+      update,
+      stepComposes,
+      stepComputes,
+      stepTransforms,
+    } = stepEntries[i];
+
+    const isBase = i === stepEntries.length - 1;
     const message =
       `Errors in step #${i + 1}` +
       (isBase ? ` (base)` : ``) +
       (step.annotation ? ` (${step.annotation})` : ``);
 
     aggregate.nest({message}, ({push}) => {
-      if (step.flags) {
-        let flagsErrored = false;
-
-        if (!step.flags.compose && !isBase) {
-          push(new TypeError(`All steps but base must compose`));
-          flagsErrored = true;
-        }
-
-        if (!step.flags.expose) {
-          push(new TypeError(`All steps must expose`));
-          flagsErrored = true;
-        }
-
-        if (flagsErrored) {
-          return;
-        }
+      if (isBase && stepComposes !== compositionNests) {
+        return push(new TypeError(
+          (compositionNests
+            ? `Base must compose, this composition is nestable`
+            : `Base must not compose, this composition isn't nestable`)));
+      } else if (!isBase && !stepComposes) {
+        return push(new TypeError(
+          (compositionNests
+            ? `All steps must compose`
+            : `All steps (except base) must compose`)));
       }
-
-      const expose =
-        (step.flags
-          ? step.expose
-          : step);
-
-      const stepComputes = !!expose?.compute;
-      const stepTransforms = !!expose?.transform;
 
       if (
-        stepTransforms && !stepComputes &&
-        !baseUpdates && !baseComposes
+        !compositionNests && !anyStepsUpdate &&
+        stepTransforms && !stepComputes
       ) {
-        push(new TypeError(`Steps which only transform can't be composed with a non-updating base`));
-        return;
+        return push(new TypeError(
+          `Steps which only transform can't be used in a composition that doesn't update`));
       }
 
-      if (stepComputes) {
-        anyStepsCompute = true;
-      }
-
-      if (stepTransforms) {
-        anyStepsTransform = true;
-      }
-
+      /*
       // Unmapped dependencies are exposed on the final composition only if
       // they're "public", i.e. pointing to update values of other properties
       // on the CacheableObject.
@@ -849,6 +868,7 @@ export function compositeFrom(description) {
       for (const dependency of Object.values(expose?.mapDependencies ?? {})) {
         exposeDependencies.add(dependency);
       }
+      */
     });
   }
 
@@ -1194,13 +1214,13 @@ export function compositeFrom(description) {
   }
 
   constructedDescriptor.flags = {
-    update: baseUpdates,
-    expose: baseExposes,
-    compose: baseComposes,
+    update: anyStepsUpdate,
+    expose: anyStepsExpose,
+    compose: compositionNests,
   };
 
-  if (baseUpdates) {
-    constructedDescriptor.update = base.update;
+  if (constructedDescriptor.update) {
+    constructedDescriptor.update = updateDescription;
   }
 
   if (baseExposes) {
