@@ -369,7 +369,15 @@ export function input(nameOrDescription) {
 
 input.symbol = Symbol.for('hsmusic.composite.input');
 
-input.updateValue = () => Symbol.for('hsmusic.composite.input.updateValue');
+input.updateValue = (description = null) =>
+  (description
+    ? {
+        symbol: input.symbol,
+        shape: 'input.updateValue',
+        value: description,
+      }
+    : Symbol.for('hsmusic.composite.input.updateValue'));
+
 input.myself = () => Symbol.for(`hsmusic.composite.input.myself`);
 
 input.value = value => ({symbol: input.symbol, shape: 'input.value', value});
@@ -814,7 +822,9 @@ export function compositeFrom(description) {
       .filter(Boolean);
 
   const anyInputsUseUpdateValue =
-    dependenciesFromInputs.includes(input.updateValue());
+    dependenciesFromInputs
+      .filter(dependency => isInputToken(dependency))
+      .some(token => getInputTokenShape(token) === 'input.updateValue');
 
   const base = composition.at(-1);
   const steps = composition.slice();
@@ -871,13 +881,22 @@ export function compositeFrom(description) {
           : null));
 
   // The update description for a step, if present at all, is always set
-  // explicitly.
+  // explicitly. There may be multiple per step - namely that step's own
+  // {update} description, and any descriptions passed as the value in an
+  // input.updateValue({...}) token.
   const stepUpdateDescriptions =
     steps
       .map((step, index) =>
         (stepsUpdate[index]
-          ? step.update ?? null
-          : null));
+          ? [
+              step.update ?? null,
+              ...(stepExposeDescriptions[index]?.dependencies ?? [])
+                .filter(dependency => isInputToken(dependency))
+                .filter(token => getInputTokenShape(token) === 'input.updateValue')
+                .map(token => getInputTokenValue(token))
+                .filter(Boolean),
+            ]
+          : []));
 
   // Indicates presence of a {compute} function on the expose description.
   const stepsCompute =
@@ -1338,7 +1357,7 @@ export function compositeFrom(description) {
     constructedDescriptor.update =
       Object.assign(
         {...description.update ?? {}},
-        ...stepUpdateDescriptions.filter(Boolean));
+        ...stepUpdateDescriptions.flat());
   }
 
   if (compositionExposes) {
