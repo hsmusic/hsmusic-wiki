@@ -588,6 +588,10 @@ export function templateCompositeFrom(description) {
         ? description.outputs
      : typeof description.outputs === 'function'
         ? description.outputs(inputMetadata)
+            .map(name =>
+              (name.startsWith('#')
+                ? name
+                : '#' + name))
         : []);
 
     const ownUpdateDescription =
@@ -797,7 +801,9 @@ export function compositeFrom(description) {
         Object.entries(description.outputs)
           .map(([continuationName, outputName]) => [
             outputName,
-            providedDependencies[continuationName],
+            (continuationName in providedDependencies
+              ? providedDependencies[continuationName]
+              : providedDependencies[continuationName.replace(/^#/, '')]),
           ])));
   }
 
