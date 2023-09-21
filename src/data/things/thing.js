@@ -363,7 +363,7 @@ export const contribsPresent = templateCompositeFrom({
 
   steps: () => [
     withResultOfAvailabilityCheck({
-      fromDependency: input('contribs'),
+      from: input('contribs'),
       mode: input.value('empty'),
     }),
 

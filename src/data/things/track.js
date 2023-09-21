@@ -68,10 +68,18 @@ export class Track extends Thing {
       }),
 
       withContainingTrackSection(),
-      withPropertyFromObject({object: '#trackSection', property: 'color'}),
+
+      withPropertyFromObject({
+        object: '#trackSection',
+        property: input.value('color'),
+      }),
+
       exposeDependencyOrContinue({dependency: '#trackSection.color'}),
 
-      withPropertyFromAlbum({property: 'color'}),
+      withPropertyFromAlbum({
+        property: input.value('color'),
+      }),
+
       exposeDependency({dependency: '#album.color'}),
     ],
 
@@ -127,9 +135,15 @@ export class Track extends Thing {
         validate: input.value(isFileExtension),
       }),
 
-      withPropertyFromAlbum({property: 'trackCoverArtFileExtension'}),
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtFileExtension'),
+      }),
+
       exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
-      exposeConstant({value: 'jpg'}),
+
+      exposeConstant({
+        value: input.value('jpg'),
+      }),
     ],
 
     // Date of cover art release. Like coverArtFileExtension, this represents
@@ -148,7 +162,10 @@ export class Track extends Thing {
         validate: input.value(isDate),
       }),
 
-      withPropertyFromAlbum({property: 'trackArtDate'}),
+      withPropertyFromAlbum({
+        property: input.value('trackArtDate'),
+      }),
+
       exposeDependency({dependency: '#album.trackArtDate'}),
     ],
 
@@ -185,7 +202,10 @@ export class Track extends Thing {
 
       exposeDependencyOrContinue({dependency: '#artistContribs'}),
 
-      withPropertyFromAlbum({property: 'artistContribs'}),
+      withPropertyFromAlbum({
+        property: input.value('artistContribs'),
+      }),
+
       exposeDependency({dependency: '#album.artistContribs'}),
     ],
 
@@ -208,7 +228,10 @@ export class Track extends Thing {
 
       exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
 
-      withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtistContribs'),
+      }),
+
       exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
     ],
 
@@ -257,7 +280,11 @@ export class Track extends Thing {
 
     date: [
       exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
-      withPropertyFromAlbum({property: 'date'}),
+
+      withPropertyFromAlbum({
+        property: input.value('date'),
+      }),
+
       exposeDependency({dependency: '#album.date'}),
     ],
 
@@ -608,9 +635,7 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
           : continuation()),
     },
 
-    withResolvedContribs({
-      from: 'coverArtistContribs',
-    }),
+    withResolvedContribs({from: 'coverArtistContribs'}),
 
     {
       dependencies: ['#resolvedContribs'],
@@ -625,7 +650,9 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
             })),
     },
 
-    withPropertyFromAlbum({property: 'trackCoverArtistContribs'}),
+    withPropertyFromAlbum({
+      property: input.value('trackCoverArtistContribs'),
+    }),
 
     {
       dependencies: ['#album.trackCoverArtistContribs'],
@@ -662,6 +689,8 @@ export const exitWithoutUniqueCoverArt = templateCompositeFrom({
 
 export const trackReverseReferenceList = templateCompositeFrom({
   annotation: `trackReverseReferenceList`,
+
+  compose: false,
 
   inputs: {
     list: input({type: 'string'}),

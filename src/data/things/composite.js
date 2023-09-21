@@ -5,6 +5,7 @@ import {TupleMap} from '#wiki-data';
 
 import {
   isArray,
+  isString,
   isWholeNumber,
   oneOf,
   validateArrayItems,
@@ -1426,17 +1427,24 @@ export function debugComposite(fn) {
 // compositional step, the property will be exposed as undefined instead
 // of null.
 //
-export function exposeDependency({dependency}) {
-  return {
-    annotation: `exposeDependency`,
-    flags: {expose: true},
+export const exposeDependency = templateCompositeFrom({
+  annotation: `exposeDependency`,
 
-    expose: {
-      mapDependencies: {dependency},
-      compute: ({dependency}) => dependency,
+  compose: false,
+
+  inputs: {
+    dependency: input.staticDependency(),
+  },
+
+  steps: () => [
+    {
+      dependencies: [input('dependency')],
+      compute: ({
+        [input('dependency')]: dependency
+      }) => dependency,
     },
-  };
-}
+  ],
+});
 
 // Exposes a constant value exactly as it is; like exposeDependency, this
 // is typically the base of a composition serving as a particular property
@@ -1488,7 +1496,7 @@ export const withResultOfAvailabilityCheck = templateCompositeFrom({
       dependencies: [input('from'), input('mode')],
 
       compute: (continuation, {
-        [input('from')]: dependency,
+        [input('from')]: value,
         [input('mode')]: mode,
       }) => {
         let availability;
@@ -1591,7 +1599,7 @@ export const exitWithoutDependency = templateCompositeFrom({
 
     {
       dependencies: ['#availability', input('value')],
-      continuation: (continuation, {
+      compute: (continuation, {
         ['#availability']: availability,
         [input('value')]: value,
       }) =>
@@ -1628,8 +1636,12 @@ export const raiseOutputWithoutDependency = templateCompositeFrom({
   inputs: {
     dependency: input(),
     mode: input(availabilityCheckModeInput),
-    output: input({defaultValue: {}}),
+    output: input.staticValue({defaultValue: {}}),
   },
+
+  outputs: ({
+    [input.staticValue('output')]: output,
+  }) => Object.keys(output),
 
   steps: () => [
     withResultOfAvailabilityCheck({
@@ -1657,8 +1669,12 @@ export const raiseOutputWithoutUpdateValue = templateCompositeFrom({
 
   inputs: {
     mode: input(availabilityCheckModeInput),
-    output: input({defaultValue: {}}),
+    output: input.staticValue({defaultValue: {}}),
   },
+
+  outputs: ({
+    [input.staticValue('output')]: output,
+  }) => Object.keys(output),
 
   steps: () => [
     withResultOfAvailabilityCheck({
@@ -1820,41 +1836,81 @@ export function withPropertyFromList({
 // Gets the listed properties from each of a list of objects, providing lists
 // of property values each into a dependency prefixed with the same name as the
 // list (by default). Like withPropertyFromList, this doesn't alter indices.
-export function withPropertiesFromList({
-  list,
-  properties,
-  prefix =
-    (list.startsWith('#')
-      ? list
-      : `#${list}`),
-}) {
-  return {
-    annotation: `withPropertiesFromList`,
-    flags: {expose: true, compose: true},
+export const withPropertiesFromList = templateCompositeFrom({
+  annotation: `withPropertiesFromList`,
 
-    expose: {
-      mapDependencies: {list},
-      options: {prefix, properties},
+  inputs: {
+    list: input({type: 'array'}),
 
-      compute(continuation, {list, '#options': {prefix, properties}}) {
-        const lists =
+    properties: input({
+      validate: validateArrayItems(isString),
+    }),
+
+    prefix: input({
+      type: 'string',
+      null: true,
+    }),
+  },
+
+  outputs: ({
+    [input.staticDependency('list')]: list,
+    [input.staticValue('properties')]: properties,
+    [input.staticValue('prefix')]: prefix,
+  }) =>
+    (properties
+      ? properties.map(property =>
+          (prefix
+            ? `${prefix}.${property}`
+         : list
+            ? `${list}.${property}`
+            : `#list.${property}`))
+      : '#lists'),
+
+  steps: () => [
+    {
+      dependencies: [input('list'), input('properties')],
+      compute: (continuation, {
+        [input('list')]: list,
+        [input('properties')]: properties,
+      }) => continuation({
+        ['#lists']:
           Object.fromEntries(
-            properties.map(property => [`${prefix}.${property}`, []]));
+            properties.map(property => [
+              property,
+              list.map(item => item[property] ?? null),
+            ])),
+      }),
+    },
 
-        for (const item of list) {
-          for (const property of properties) {
-            lists[`${prefix}.${property}`].push(
-              (item === null || item === undefined
-                ? null
-                : item[property] ?? null));
-          }
-        }
+    {
+      dependencies: [
+        input.staticDependency('list'),
+        input.staticValue('properties'),
+        input.staticValue('prefix'),
+        '#lists',
+      ],
 
-        return continuation(lists);
-      }
-    }
-  }
-}
+      compute: (continuation, {
+        [input.staticDependency('list')]: list,
+        [input.staticValue('properties')]: properties,
+        [input.staticValue('prefix')]: prefix,
+        ['#lists']: lists,
+      }) =>
+        (properties
+          ? continuation(
+              Object.fromEntries(
+                properties.map(property => [
+                  (prefix
+                    ? `${prefix}.${property}`
+                 : list
+                    ? `${list}.${property}`
+                    : `#list.${property}`),
+                  lists[property],
+                ])))
+          : continuation({'#lists': lists})),
+    },
+  ],
+});
 
 // Replaces items of a list, which are null or undefined, with some fallback
 // value, either a constant (set {value}) or from a dependency ({dependency}).
