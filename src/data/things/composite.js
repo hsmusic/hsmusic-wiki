@@ -651,7 +651,10 @@ export function templateCompositeFrom(description) {
           const finalInputs = {};
 
           for (const [name, description_] of Object.entries(description.inputs)) {
-            const description = description_;
+            // TODO: Validate inputOptions[name] against staticValue, staticDependency shapes
+            const description = getInputTokenValue(description_);
+            const tokenShape = getInputTokenShape(description_);
+
             if (name in inputOptions) {
               if (typeof inputOptions[name] === 'string') {
                 finalInputs[name] = input.dependency(inputOptions[name]);
@@ -659,9 +662,9 @@ export function templateCompositeFrom(description) {
                 finalInputs[name] = inputOptions[name];
               }
             } else if (description.defaultValue) {
-              finalInputs[name] = input.value(defaultValue);
+              finalInputs[name] = input.value(description.defaultValue);
             } else if (description.defaultDependency) {
-              finalInputs[name] = input.dependency(defaultValue);
+              finalInputs[name] = input.dependency(description.defaultDependency);
             } else {
               finalInputs[name] = input.value(null);
             }
@@ -673,11 +676,11 @@ export function templateCompositeFrom(description) {
         if ('outputs' in description) {
           const finalOutputs = {};
 
-          for (const [name, defaultDependency] of Object.entries(description.outputs)) {
+          for (const name of expectedOutputNames) {
             if (name in outputOptions) {
               finalOutputs[name] = outputOptions[name];
             } else {
-              finalOutputs[name] = defaultDependency;
+              finalOutputs[name] = name;
             }
           }
 
@@ -740,7 +743,7 @@ export function compositeFrom(description) {
       if (Array.isArray(result)) {
         console.log(label, ...result.map(value =>
           (typeof value === 'object'
-            ? inspect(value, {depth: 0, colors: true, compact: true, breakLength: Infinity})
+            ? inspect(value, {depth: 1, colors: true, compact: true, breakLength: Infinity})
             : value)));
       } else {
         console.log(label, result);
@@ -762,22 +765,46 @@ export function compositeFrom(description) {
 
   const inputMetadata = getStaticInputMetadata(description.inputs ?? {});
 
+  function _mapDependenciesToOutputs(providedDependencies) {
+    if (!description.outputs) {
+      return {};
+    }
+
+    if (!providedDependencies) {
+      return {};
+    }
+
+    return (
+      Object.fromEntries(
+        Object.entries(description.outputs)
+          .map(([continuationName, outputName]) => [
+            outputName,
+            providedDependencies[continuationName],
+          ])));
+  }
+
   // These dependencies were all provided by the composition which this one is
   // nested inside, so input('name')-shaped tokens are going to be evaluated
   // in the context of the containing composition.
   const dependenciesFromInputs =
     Object.values(description.inputs ?? {})
       .map(token => {
-        switch (getInputTokenShape(token)) {
+        const tokenShape = getInputTokenShape(token);
+        const tokenValue = getInputTokenValue(token);
+        switch (tokenShape) {
           case 'input.dependency':
-            return getInputTokenValue(token);
+            return tokenValue;
           case 'input':
+          case 'input.updateValue':
             return token;
           default:
             return null;
         }
       })
       .filter(Boolean);
+
+  const anyInputsUseUpdateValue =
+    dependenciesFromInputs.includes(input.updateValue());
 
   const base = composition.at(-1);
   const steps = composition.slice();
@@ -857,13 +884,29 @@ export function compositeFrom(description) {
     unique(
       stepExposeDescriptions
         .flatMap(expose => expose?.dependencies ?? [])
-        .map(dependency =>
-          (typeof dependency === 'string'
-            ? dependency
-         : getInputTokenShape(dependency) === 'input.dependency'
-            ? getInputTokenValue(dependency)
-            : null))
+        .map(dependency => {
+          if (typeof dependency === 'string')
+            return (dependency.startsWith('#') ? null : dependency);
+
+          const tokenShape = getInputTokenShape(dependency);
+          const tokenValue = getInputTokenValue(dependency);
+          switch (tokenShape) {
+            case 'input.dependency':
+              return (tokenValue.startsWith('#') ? null : tokenValue);
+            case 'input.myself':
+              return 'this';
+            default:
+              return null;
+          }
+        })
         .filter(Boolean));
+
+  const anyStepsUseUpdateValue =
+    stepExposeDescriptions
+      .some(expose =>
+        (expose?.dependencies
+          ? expose.dependencies.includes(input.updateValue())
+          : false));
 
   const anyStepsExpose =
     stepsExpose.includes(true);
@@ -876,6 +919,14 @@ export function compositeFrom(description) {
 
   const anyStepsTransform =
     stepsTransform.includes(true);
+
+  const compositionExposes =
+    anyStepsExpose;
+
+  const compositionUpdates =
+    anyInputsUseUpdateValue ||
+    anyStepsUseUpdateValue ||
+    anyStepsUpdate;
 
   const stepEntries = stitchArrays({
     step: steps,
@@ -916,7 +967,7 @@ export function compositeFrom(description) {
       }
 
       if (
-        !compositionNests && !anyStepsUpdate &&
+        !compositionNests && !compositionUpdates &&
         stepTransforms && !stepComputes
       ) {
         return push(new TypeError(
@@ -928,26 +979,6 @@ export function compositeFrom(description) {
         // interesting things, like combining validation functions.
         Object.assign(updateDescription, update);
       }
-
-      /*
-      // Unmapped dependencies are exposed on the final composition only if
-      // they're "public", i.e. pointing to update values of other properties
-      // on the CacheableObject.
-      for (const dependency of expose?.dependencies ?? []) {
-        if (typeof dependency === 'string' && dependency.startsWith('#')) {
-          continue;
-        }
-
-        exposeDependencies.add(dependency);
-      }
-
-      // Mapped dependencies are always exposed on the final composition.
-      // These are explicitly for reading values which are named outside of
-      // the current compositional step.
-      for (const dependency of Object.values(expose?.mapDependencies ?? {})) {
-        exposeDependencies.add(dependency);
-      }
-      */
     });
   }
 
@@ -956,20 +987,6 @@ export function compositeFrom(description) {
   }
 
   aggregate.close();
-
-  function _assignDependencies(continuationAssignment, {mapContinuation}) {
-    if (!mapContinuation) {
-      return continuationAssignment;
-    }
-
-    const assignDependencies = {};
-
-    for (const [from, into] of Object.entries(mapContinuation)) {
-      assignDependencies[into] = continuationAssignment[from] ?? null;
-    }
-
-    return assignDependencies;
-  }
 
   function _prepareContinuation(callingTransformForThisStep) {
     const continuationStorage = {
@@ -1013,8 +1030,8 @@ export function compositeFrom(description) {
               return continuationSymbol;
             });
 
-      continuation.raise = makeRaiseLike('raise');
-      continuation.raiseAbove = makeRaiseLike('raiseAbove');
+      continuation.raiseOutput = makeRaiseLike('raiseOutput');
+      continuation.raiseOutputAbove = makeRaiseLike('raiseOutputAbove');
     }
 
     return {continuation, continuationStorage};
@@ -1023,7 +1040,7 @@ export function compositeFrom(description) {
   const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
   const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
 
-  function _computeOrTransform(initialValue, initialDependencies, continuationIfApplicable) {
+  function _computeOrTransform(initialValue, continuationIfApplicable, initialDependencies) {
     const expectingTransform = initialValue !== noTransformSymbol;
 
     let valueSoFar =
@@ -1033,7 +1050,6 @@ export function compositeFrom(description) {
 
     const availableDependencies = {...initialDependencies};
 
-    // console.log('input description:', description.inputs);
     const inputValues =
       ('inputs' in description
         ? Object.fromEntries(Object.entries(description.inputs)
@@ -1046,9 +1062,12 @@ export function compositeFrom(description) {
                 case 'input.value':
                   return [input(name), tokenValue];
                 case 'input.updateValue':
-                  return [input(name), initialValue];
-                case 'myself':
-                  return [input(name), myself];
+                  if (!expectingTransform) {
+                    throw new Error(`Unexpected input.updateValue() accessed on non-transform call`);
+                  }
+                  return [input(name), valueSoFar];
+                case 'input.myself':
+                  return [input(name), initialDependencies['this']];
                 case 'input':
                   return [input(name), initialDependencies[token]];
                 default:
@@ -1056,7 +1075,6 @@ export function compositeFrom(description) {
               }
             }))
         : {});
-    // console.log('input values:', inputValues);
 
     if (expectingTransform) {
       debug(() => [colors.bright(`begin composition - transforming from:`), initialValue]);
@@ -1117,36 +1135,51 @@ export function compositeFrom(description) {
           ...availableDependencies,
           ...inputMetadata,
           ...inputValues,
-        }, expose.dependencies);
+          ...
+            (callingTransformForThisStep
+              ? {[input.updateValue()]: valueSoFar}
+              : {}),
+          [input.myself()]: initialDependencies['this'],
+        }, expose.dependencies ?? []);
 
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
-        `with dependencies:`, filteredDependencies]);
+        `with dependencies:`, filteredDependencies,
+        ...callingTransformForThisStep ? [`from value:`, valueSoFar] : []]);
 
       let result;
 
       const getExpectedEvaluation = () =>
         (callingTransformForThisStep
           ? (filteredDependencies
-              ? ['transform', valueSoFar, filteredDependencies]
-              : ['transform', valueSoFar])
+              ? ['transform', valueSoFar, continuationSymbol, filteredDependencies]
+              : ['transform', valueSoFar, continuationSymbol])
           : (filteredDependencies
-              ? ['compute', filteredDependencies]
-              : ['compute']));
+              ? ['compute', continuationSymbol, filteredDependencies]
+              : ['compute', continuationSymbol]));
 
       const naturalEvaluate = () => {
-        const [name, ...args] = getExpectedEvaluation();
+        const [name, ...argsLayout] = getExpectedEvaluation();
+
+        let args;
 
         if (isBase && !compositionNests) {
-          return expose[name](...args);
+          args =
+            argsLayout.filter(arg => arg !== continuationSymbol);
         } else {
           let continuation;
 
           ({continuation, continuationStorage} =
             _prepareContinuation(callingTransformForThisStep));
 
-          return expose[name](continuation, ...args);
+          args =
+            argsLayout.map(arg =>
+              (arg === continuationSymbol
+                ? continuation
+                : arg));
         }
+
+        return expose[name](...args);
       }
 
       switch (step.cache) {
@@ -1221,7 +1254,7 @@ export function compositeFrom(description) {
         debug(() => [`step #${i+1} - result: exit (explicit) ->`, providedValue]);
         debug(() => colors.bright(`end composition - exit (explicit)`));
 
-        if (composiitonNests) {
+        if (compositionNests) {
           return continuationIfApplicable.exit(providedValue);
         } else {
           return providedValue;
@@ -1230,36 +1263,24 @@ export function compositeFrom(description) {
 
       const {providedValue, providedDependencies} = continuationStorage;
 
-      const continuingWithValue =
-        (expectingTransform
-          ? (callingTransformForThisStep
-              ? providedValue ?? null
-              : valueSoFar ?? null)
-          : undefined);
-
-      const continuingWithDependencies =
-        (providedDependencies
-          ? _assignDependencies(providedDependencies, expose)
-          : null);
-
       const continuationArgs = [];
-      if (continuingWithValue !== undefined) continuationArgs.push(continuingWithValue);
-      if (continuingWithDependencies !== null) continuationArgs.push(continuingWithDependencies);
+      if (expectingTransform) {
+        continuationArgs.push(
+          (callingTransformForThisStep
+            ? providedValue ?? null
+            : valueSoFar ?? null));
+      }
 
       debug(() => {
         const base = `step #${i+1} - result: ` + returnedWith;
         const parts = [];
 
         if (callingTransformForThisStep) {
-          if (continuingWithValue === undefined) {
-            parts.push(`(no value)`);
-          } else {
-            parts.push(`value:`, providedValue);
-          }
+          parts.push('value:', providedValue);
         }
 
-        if (continuingWithDependencies !== null) {
-          parts.push(`deps:`, continuingWithDependencies);
+        if (providedDependencies !== null) {
+          parts.push(`deps:`, providedDependencies);
         } else {
           parts.push(`(no deps)`);
         }
@@ -1272,23 +1293,26 @@ export function compositeFrom(description) {
       });
 
       switch (returnedWith) {
-        case 'raise':
+        case 'raiseOutput':
           debug(() =>
             (isBase
-              ? colors.bright(`end composition - raise (base: explicit)`)
-              : colors.bright(`end composition - raise`)));
+              ? colors.bright(`end composition - raiseOutput (base: explicit)`)
+              : colors.bright(`end composition - raiseOutput`)));
+          continuationArgs.push(_mapDependenciesToOutputs(providedDependencies));
           return continuationIfApplicable(...continuationArgs);
 
-        case 'raiseAbove':
-          debug(() => colors.bright(`end composition - raiseAbove`));
+        case 'raiseOutputAbove':
+          debug(() => colors.bright(`end composition - raiseOutputAbove`));
+          continuationArgs.push(_mapDependenciesToOutputs(providedDependencies));
           return continuationIfApplicable.raiseOutput(...continuationArgs);
 
         case 'continuation':
           if (isBase) {
-            debug(() => colors.bright(`end composition - raise (inferred)`));
+            debug(() => colors.bright(`end composition - raiseOutput (inferred)`));
+            continuationArgs.push(_mapDependenciesToOutputs(providedDependencies));
             return continuationIfApplicable(...continuationArgs);
           } else {
-            Object.assign(availableDependencies, continuingWithDependencies);
+            Object.assign(availableDependencies, providedDependencies);
             break;
           }
       }
@@ -1302,8 +1326,8 @@ export function compositeFrom(description) {
   }
 
   constructedDescriptor.flags = {
-    update: anyStepsUpdate,
-    expose: anyStepsExpose,
+    update: compositionUpdates,
+    expose: compositionExposes,
     compose: compositionNests,
   };
 
@@ -1311,7 +1335,7 @@ export function compositeFrom(description) {
     constructedDescriptor.update = updateDescription;
   }
 
-  if (anyStepsExpose) {
+  if (compositionExposes) {
     const expose = constructedDescriptor.expose = {};
 
     expose.dependencies =
@@ -1321,25 +1345,25 @@ export function compositeFrom(description) {
       ]);
 
     if (compositionNests) {
-      if (anyStepsTransform) {
+      if (compositionUpdates) {
         expose.transform = (value, continuation, dependencies) =>
-          _computeOrTransform(value, dependencies, continuation);
+          _computeOrTransform(value, continuation, dependencies);
       }
 
       if (anyStepsCompute) {
         expose.compute = (continuation, dependencies) =>
-          _computeOrTransform(noTransformSymbol, dependencies, continuation);
+          _computeOrTransform(noTransformSymbol, continuation, dependencies);
       }
 
       if (base.cacheComposition) {
         expose.cache = base.cacheComposition;
       }
-    } else if (anyStepsUpdate) {
+    } else if (compositionUpdates) {
       expose.transform = (value, dependencies) =>
-        _computeOrTransform(value, dependencies, null);
+        _computeOrTransform(value, null, dependencies);
     } else {
       expose.compute = (dependencies) =>
-        _computeOrTransform(noTransformSymbol, dependencies, null);
+        _computeOrTransform(noTransformSymbol, null, dependencies);
     }
   }
 

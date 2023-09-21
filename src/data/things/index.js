@@ -140,8 +140,8 @@ function evaluatePropertyDescriptors() {
             compose: false,
             steps: value,
           });
-
-          continue;
+        } else if (value.toResolvedComposition) {
+          results[key] = compositeFrom(value.toResolvedComposition());
         }
       }
 

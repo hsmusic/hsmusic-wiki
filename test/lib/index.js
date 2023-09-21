@@ -1,3 +1,5 @@
+Error.stackTraceLimit = Infinity;
+
 export * from './content-function.js';
 export * from './generic-mock.js';
 export * from './wiki-data.js';
