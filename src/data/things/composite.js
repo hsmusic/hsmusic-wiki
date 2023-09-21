@@ -1451,17 +1451,24 @@ export const exposeDependency = templateCompositeFrom({
 // descriptor. It generally follows steps which will conditionally early
 // exit with some other value, with the exposeConstant base serving as the
 // fallback default value.
-export function exposeConstant({value}) {
-  return {
-    annotation: `exposeConstant`,
-    flags: {expose: true},
+export const exposeConstant = templateCompositeFrom({
+  annotation: `exposeConstant`,
 
-    expose: {
-      options: {value},
-      compute: ({'#options': {value}}) => value,
+  compose: false,
+
+  inputs: {
+    value: input.staticValue(),
+  },
+
+  steps: () => [
+    {
+      dependencies: [input('value')],
+      compute: ({
+        [input('value')]: value,
+      }) => value,
     },
-  };
-}
+  ],
+});
 
 // Checks the availability of a dependency and provides the result to later
 // steps under '#availability' (by default). This is mainly intended for use
@@ -1964,55 +1971,43 @@ export const withPropertiesFromList = templateCompositeFrom({
 });
 
 // Replaces items of a list, which are null or undefined, with some fallback
-// value, either a constant (set {value}) or from a dependency ({dependency}).
-// By default, this replaces the passed dependency.
-export function fillMissingListItems({
-  list,
-  value,
-  dependency,
-  into = list,
-}) {
-  if (value !== undefined && dependency !== undefined) {
-    throw new TypeError(`Don't provide both value and dependency`);
-  }
+// value. By default, this replaces the passed dependency.
+export const fillMissingListItems = templateCompositeFrom({
+  annotation: `fillMissingListItems`,
 
-  if (value === undefined && dependency === undefined) {
-    throw new TypeError(`Missing value or dependency`);
-  }
+  inputs: {
+    list: input({type: 'array'}),
+    fill: input(),
+  },
 
-  if (dependency) {
-    return {
-      annotation: `fillMissingListItems.fromDependency`,
-      flags: {expose: true, compose: true},
+  outputs: ({
+    [input.staticDependency('list')]: list,
+  }) => [list ?? '#list'],
 
-      expose: {
-        mapDependencies: {list, dependency},
-        mapContinuation: {into},
+  steps: () => [
+    {
+      dependencies: [input('list'), input('fill')],
+      compute: (continuation, {
+        [input('list')]: list,
+        [input('fill')]: fill,
+      }) => continuation({
+        ['#filled']:
+          list.map(item => item ?? fill),
+      }),
+    },
 
-        compute: (continuation, {list, dependency}) =>
-          continuation({
-            into: list.map(item => item ?? dependency),
-          }),
-      },
-    };
-  } else {
-    return {
-      annotation: `fillMissingListItems.fromValue`,
-      flags: {expose: true, compose: true},
-
-      expose: {
-        mapDependencies: {list},
-        mapContinuation: {into},
-        options: {value},
-
-        compute: (continuation, {list, '#options': {value}}) =>
-          continuation({
-            into: list.map(item => item ?? value),
-          }),
-      },
-    };
-  }
-}
+    {
+      dependencies: [input.staticDependency('list'), '#filled'],
+      compute: (continuation, {
+        [input.staticDependency('list')]: list,
+        ['#filled']: filled,
+      }) => continuation({
+        [list ?? '#list']:
+          filled,
+      }),
+    },
+  ],
+});
 
 // Filters particular values out of a list. Note that this will always
 // completely skip over null, but can be used to filter out any other
