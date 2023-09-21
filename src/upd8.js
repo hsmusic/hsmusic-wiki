@@ -613,10 +613,6 @@ async function main() {
   // which are only available after the initial linking.
   sortWikiDataArrays(wikiData);
 
-  console.log(
-    CacheableObject.getUpdateValue(wikiData.albumData[0], 'trackSections'),
-    wikiData.albumData[0].trackSections);
-
   if (precacheData) {
     progressCallAll('Caching all data values', Object.entries(wikiData)
       .filter(([key]) =>

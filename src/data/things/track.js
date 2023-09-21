@@ -192,7 +192,9 @@ export class Track extends Thing {
     }),
 
     artistContribs: [
-      inheritFromOriginalRelease({property: 'artistContribs'}),
+      inheritFromOriginalRelease({
+        property: input.value('artistContribs'),
+      }),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
