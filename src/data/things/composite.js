@@ -1764,34 +1764,85 @@ export const withPropertyFromObject = templateCompositeFrom({
 // as a dependency prefixed with the same name as the object (by default).
 // If the object itself is null, all provided dependencies will be null;
 // if it's missing only select properties, those will be provided as null.
-export function withPropertiesFromObject({
-  object,
-  properties,
-  prefix =
-    (object.startsWith('#')
-      ? object
-      : `#${object}`),
-}) {
-  return {
-    annotation: `withPropertiesFromObject`,
-    flags: {expose: true, compose: true},
+export const withPropertiesFromObject = templateCompositeFrom({
+  annotation: `withPropertiesFromObject`,
 
-    expose: {
-      mapDependencies: {object},
-      options: {prefix, properties},
+  inputs: {
+    object: input({
+      type: 'object',
+      null: true,
+    }),
 
-      compute: (continuation, {object, '#options': {prefix, properties}}) =>
-        continuation(
-          Object.fromEntries(
-            properties.map(property => [
-              `${prefix}.${property}`,
-              (object === null || object === undefined
-                ? null
-                : object[property] ?? null),
-            ]))),
+    properties: input({
+      validate: validateArrayItems(isString),
+    }),
+
+    prefix: input.staticValue({
+      type: 'string',
+      null: true,
+    }),
+  },
+
+  outputs: ({
+    [input.staticDependency('object')]: object,
+    [input.staticValue('properties')]: properties,
+    [input.staticValue('prefix')]: prefix,
+  }) =>
+    (properties
+      ? properties.map(property =>
+          (prefix
+            ? `${prefix}.${property}`
+         : object
+            ? `${object}.${property}`
+            : `#object.${property}`))
+      : '#object'),
+
+  steps: () => [
+    {
+      dependencies: [input('object'), input('properties')],
+      compute: (continuation, {
+        [input('object')]: object,
+        [input('properties')]: properties,
+      }) => continuation({
+        ['#entries']:
+          (object === null
+            ? properties.map(property => [property, null])
+            : properties.map(property => [property, object[property]])),
+      }),
     },
-  };
-}
+
+    {
+      dependencies: [
+        input.staticDependency('object'),
+        input.staticValue('properties'),
+        input.staticValue('prefix'),
+        '#entries',
+      ],
+
+      compute: ({
+        [input.staticDependency('object')]: object,
+        [input.staticValue('properties')]: properties,
+        [input.staticValue('prefix')]: prefix,
+        ['#entries']: entries,
+      }) =>
+        (properties
+          ? continuation(
+              Object.fromEntries(
+                entries.map(([property, value]) => [
+                  (prefix
+                    ? `${prefix}.${property}`
+                 : object
+                    ? `${object}.${property}`
+                    : `#object.${property}`),
+                  value ?? null,
+                ])))
+          : continuation({
+              ['#object']:
+                Object.fromEntries(entries),
+            })),
+    },
+  ],
+});
 
 // Gets a property from each of a list of objects (in a dependency) and
 // provides the results. This doesn't alter any list indices, so positions
@@ -1846,7 +1897,7 @@ export const withPropertiesFromList = templateCompositeFrom({
       validate: validateArrayItems(isString),
     }),
 
-    prefix: input({
+    prefix: input.staticValue({
       type: 'string',
       null: true,
     }),
