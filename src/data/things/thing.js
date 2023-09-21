@@ -602,7 +602,7 @@ export const withResolvedReference = templateCompositeFrom({
         }
 
         return continuation.raiseOutput({
-          ['#resolvedReference']: match,
+          ['#resolvedReference']: match ?? null,
         });
       },
     },

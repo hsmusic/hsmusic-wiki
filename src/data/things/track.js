@@ -638,7 +638,9 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
       dependencies: ['disableUniqueCoverArt'],
       compute: (continuation, {disableUniqueCoverArt}) =>
         (disableUniqueCoverArt
-          ? continuation.raiseOutput({into: false})
+          ? continuation.raiseOutput({
+              ['#hasUniqueCoverArt']: false,
+            })
           : continuation()),
     },
 
@@ -652,8 +654,7 @@ export const withHasUniqueCoverArt = templateCompositeFrom({
         (empty(contribsFromTrack)
           ? continuation()
           : continuation.raiseOutput({
-              ['#hasUniqueCoverArt']:
-                true,
+              ['#hasUniqueCoverArt']: true,
             })),
     },
 
