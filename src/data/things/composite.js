@@ -821,6 +821,8 @@ export function compositeFrom(description) {
           case 'input':
           case 'input.updateValue':
             return token;
+          case 'input.myself':
+            return 'this';
           default:
             return null;
         }
