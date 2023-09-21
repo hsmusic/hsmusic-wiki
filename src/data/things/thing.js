@@ -216,7 +216,7 @@ export function contributionList() {
     steps: [
       withResolvedContribs({from: input.updateValue()}),
       exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
-      exposeConstant({value: []}),
+      exposeConstant({value: input.value([])}),
     ],
   });
 }
@@ -343,7 +343,7 @@ export const singleReference = templateCompositeFrom({
     withResolvedReference({
       ref: input.updateValue(),
       data: input('data'),
-      find: input('findFunction'),
+      find: input('find'),
     }),
 
     exposeDependency({dependency: '#resolvedReference'}),

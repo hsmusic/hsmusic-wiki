@@ -2073,7 +2073,7 @@ export const withFlattenedList = templateCompositeFrom({
         const flattenedList = sourceList.flat();
         const indices = [];
         let lastEndIndex = 0;
-        for (const {length} of sourceArray) {
+        for (const {length} of sourceList) {
           indices.push(lastEndIndex);
           lastEndIndex += length;
         }
@@ -2116,8 +2116,8 @@ export const withUnflattenedList = templateCompositeFrom({
 
   steps: () => [
     {
-      dependencies: [input('list'), input('indices')],
-      compute({
+      dependencies: [input('list'), input('indices'), input('filter')],
+      compute(continuation, {
         [input('list')]: list,
         [input('indices')]: indices,
         [input('filter')]: filter,

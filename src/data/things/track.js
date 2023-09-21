@@ -210,7 +210,10 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      inheritFromOriginalRelease({property: 'contributorContribs'}),
+      inheritFromOriginalRelease({
+        property: input.value('contributorContribs'),
+      }),
+
       contributionList(),
     ],
 
@@ -236,7 +239,9 @@ export class Track extends Thing {
     ],
 
     referencedTracks: [
-      inheritFromOriginalRelease({property: 'referencedTracks'}),
+      inheritFromOriginalRelease({
+        property: input.value('referencedTracks'),
+      }),
 
       referenceList({
         class: input.value(Track),
@@ -246,7 +251,9 @@ export class Track extends Thing {
     ],
 
     sampledTracks: [
-      inheritFromOriginalRelease({property: 'sampledTracks'}),
+      inheritFromOriginalRelease({
+        property: input.value('sampledTracks'),
+      }),
 
       referenceList({
         class: input.value(Track),
@@ -313,11 +320,11 @@ export class Track extends Thing {
       {
         flags: {expose: true},
         expose: {
-          dependencies: ['this', 'trackData', '#originalRelease'],
+          dependencies: [input.myself(), '#originalRelease', 'trackData'],
           compute: ({
-            this: thisTrack,
+            [input.myself()]: thisTrack,
+            ['#originalRelease']: originalRelease,
             trackData,
-            '#originalRelease': originalRelease,
           }) =>
             (originalRelease === thisTrack
               ? []
@@ -339,17 +346,17 @@ export class Track extends Thing {
     // the "Tracks - by Times Referenced" listing page (or other data
     // processing).
     referencedByTracks: trackReverseReferenceList({
-      list: 'referencedTracks',
+      list: input.value('referencedTracks'),
     }),
 
     // For the same reasoning, exclude re-releases from sampled tracks too.
     sampledByTracks: trackReverseReferenceList({
-      list: 'sampledTracks',
+      list: input.value('sampledTracks'),
     }),
 
     featuredInFlashes: reverseReferenceList({
       data: 'flashData',
-      list: 'featuredTracks',
+      list: input.value('featuredTracks'),
     }),
   });
 

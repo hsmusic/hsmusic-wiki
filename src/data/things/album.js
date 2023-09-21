@@ -122,9 +122,20 @@ export class Album extends Thing {
         ]),
       }),
 
-      fillMissingListItems({list: '#sections.tracks', value: []}),
-      fillMissingListItems({list: '#sections.isDefaultTrackSection', value: false}),
-      fillMissingListItems({list: '#sections.color', dependency: 'color'}),
+      fillMissingListItems({
+        list: '#sections.tracks',
+        fill: input.value([]),
+      }),
+
+      fillMissingListItems({
+        list: '#sections.isDefaultTrackSection',
+        fill: input.value(false),
+      }),
+
+      fillMissingListItems({
+        list: '#sections.color',
+        fill: input.dependency('color'),
+      }),
 
       withFlattenedList({
         list: '#sections.tracks',
