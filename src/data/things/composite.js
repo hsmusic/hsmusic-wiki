@@ -1369,15 +1369,27 @@ export function compositeFrom(description) {
         ...dependenciesFromSteps,
       ]);
 
+    const _wrapper = (...args) => {
+      try {
+        return _computeOrTransform(...args);
+      } catch (thrownError) {
+        const error = new Error(
+          `Error computing composition` +
+          (annotation ? ` ${annotation}` : ''));
+        error.cause = thrownError;
+        throw error;
+      }
+    };
+
     if (compositionNests) {
       if (compositionUpdates) {
         expose.transform = (value, continuation, dependencies) =>
-          _computeOrTransform(value, continuation, dependencies);
+          _wrapper(value, continuation, dependencies);
       }
 
       if (anyStepsCompute) {
         expose.compute = (continuation, dependencies) =>
-          _computeOrTransform(noTransformSymbol, continuation, dependencies);
+          _wrapper(noTransformSymbol, continuation, dependencies);
       }
 
       if (base.cacheComposition) {
@@ -1385,10 +1397,10 @@ export function compositeFrom(description) {
       }
     } else if (compositionUpdates) {
       expose.transform = (value, dependencies) =>
-        _computeOrTransform(value, null, dependencies);
+        _wrapper(value, null, dependencies);
     } else {
       expose.compute = (dependencies) =>
-        _computeOrTransform(noTransformSymbol, null, dependencies);
+        _wrapper(noTransformSymbol, null, dependencies);
     }
   }
 
