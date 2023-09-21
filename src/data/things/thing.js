@@ -281,24 +281,19 @@ export const referenceList = templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: input(thingClassInput),
+    class: input.staticValue(thingClassInput),
+
     find: input({type: 'function'}),
 
     // todo: validate
     data: input(),
   },
 
-  update: {
-    dependencies: [
-      input.staticValue('class'),
-    ],
-
-    compute({
-      [input.staticValue('class')]: thingClass,
-    }) {
-      const {[Thing.referenceType]: referenceType} = thingClass;
-      return {validate: validateReferenceList(referenceType)};
-    },
+  update: ({
+    [input.staticValue('class')]: thingClass,
+  }) => {
+    const {[Thing.referenceType]: referenceType} = thingClass;
+    return {validate: validateReferenceList(referenceType)};
   },
 
   steps: () => [
@@ -326,17 +321,11 @@ export const singleReference = templateCompositeFrom({
     data: input(),
   },
 
-  update: {
-    dependencies: [
-      input.staticValue('class'),
-    ],
-
-    compute({
-      [input.staticValue('class')]: thingClass,
-    }) {
-      const {[Thing.referenceType]: referenceType} = thingClass;
-      return {validate: validateReference(referenceType)};
-    },
+  update: ({
+    [input.staticValue('class')]: thingClass,
+  }) => {
+    const {[Thing.referenceType]: referenceType} = thingClass;
+    return {validate: validateReference(referenceType)};
   },
 
   steps: () => [

@@ -573,12 +573,21 @@ export function templateCompositeFrom(description) {
 
     inputOptionsAggregate.close();
 
+    const inputMetadata = getStaticInputMetadata(inputOptions);
+
     const expectedOutputNames =
       (Array.isArray(description.outputs)
         ? description.outputs
      : typeof description.outputs === 'function'
-        ? description.outputs(getStaticInputMetadata(inputOptions))
+        ? description.outputs(inputMetadata)
         : []);
+
+    const ownUpdateDescription =
+      (typeof description.update === 'object'
+        ? description.update
+     : typeof description.update === 'function'
+        ? description.update(inputMetadata)
+        : null);
 
     const outputOptions = {};
 
@@ -644,8 +653,8 @@ export function templateCompositeFrom(description) {
           finalDescription.compose = description.compose;
         }
 
-        if ('update' in description) {
-          finalDescription.update = description.update;
+        if (ownUpdateDescription) {
+          finalDescription.update = ownUpdateDescription;
         }
 
         if ('inputs' in description) {
@@ -820,7 +829,6 @@ export function compositeFrom(description) {
   const compositionNests = description.compose ?? true;
 
   const exposeDependencies = new Set();
-  const updateDescription = {};
 
   // Steps default to exposing if using a shorthand syntax where flags aren't
   // specified at all.
@@ -932,7 +940,6 @@ export function compositeFrom(description) {
   const stepEntries = stitchArrays({
     step: steps,
     expose: stepExposeDescriptions,
-    update: stepUpdateDescriptions,
     stepComposes: stepsCompose,
     stepComputes: stepsCompute,
     stepTransforms: stepsTransform,
@@ -942,7 +949,6 @@ export function compositeFrom(description) {
     const {
       step,
       expose,
-      update,
       stepComposes,
       stepComputes,
       stepTransforms,
@@ -973,12 +979,6 @@ export function compositeFrom(description) {
       ) {
         return push(new TypeError(
           `Steps which only transform can't be used in a composition that doesn't update`));
-      }
-
-      if (update) {
-        // TODO: This is a dumb assign statement, and it could probably do more
-        // interesting things, like combining validation functions.
-        Object.assign(updateDescription, update);
       }
     });
   }
@@ -1332,8 +1332,13 @@ export function compositeFrom(description) {
     compose: compositionNests,
   };
 
-  if (constructedDescriptor.update) {
-    constructedDescriptor.update = updateDescription;
+  if (compositionUpdates) {
+    // TODO: This is a dumb assign statement, and it could probably do more
+    // interesting things, like combining validation functions.
+    constructedDescriptor.update =
+      Object.assign(
+        {...description.update ?? {}},
+        ...stepUpdateDescriptions.filter(Boolean));
   }
 
   if (compositionExposes) {
@@ -1569,15 +1574,12 @@ export const exposeUpdateValueOrContinue = templateCompositeFrom({
     validate: input({type: 'function', null: true}),
   },
 
-  update: {
-    dependencies: [input.staticValue('validate')],
-    compute: ({
-      [input.staticValue('validate')]: validate,
-    }) =>
-      (validate
-        ? {validate}
-        : {}),
-  },
+  update: ({
+    [input.staticValue('validate')]: validate,
+  }) =>
+    (validate
+      ? {validate}
+      : {}),
 
   steps: () => [
     exposeDependencyOrContinue({
