@@ -1163,21 +1163,46 @@ export function compositeFrom(description) {
 
       let continuationStorage;
 
+      const filterableDependencies = {
+        ...availableDependencies,
+        ...inputMetadata,
+        ...inputValues,
+        ...
+          (expectingTransform
+            ? {[input.updateValue()]: valueSoFar}
+            : {}),
+        [input.myself()]: initialDependencies?.['this'] ?? null,
+      };
+
+      const selectDependencies =
+        (expose.dependencies ?? []).map(dependency => {
+          if (!isInputToken(dependency)) return dependency;
+          const tokenShape = getInputTokenShape(dependency);
+          const tokenValue = getInputTokenValue(dependency);
+          switch (tokenShape) {
+            case 'input':
+            case 'input.staticDependency':
+            case 'input.staticValue':
+              return dependency;
+            case 'input.myself':
+              return input.myself();
+            case 'input.dependency':
+              return tokenValue;
+            case 'input.updateValue':
+              return input.updateValue();
+            default:
+              throw new Error(`Unexpected token ${tokenShape} as dependency`);
+          }
+        })
+
       const filteredDependencies =
-        filterProperties({
-          ...availableDependencies,
-          ...inputMetadata,
-          ...inputValues,
-          ...
-            (callingTransformForThisStep
-              ? {[input.updateValue()]: valueSoFar}
-              : {}),
-          [input.myself()]: initialDependencies['this'],
-        }, expose.dependencies ?? []);
+        filterProperties(filterableDependencies, selectDependencies);
 
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
         `with dependencies:`, filteredDependencies,
+        `selecting:`, selectDependencies,
+        `from available:`, filterableDependencies,
         ...callingTransformForThisStep ? [`from value:`, valueSoFar] : []]);
 
       let result;
