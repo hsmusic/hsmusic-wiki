@@ -869,13 +869,18 @@ export function compositeFrom(description) {
               ? compositionNests
               : true)));
 
-  // Steps don't update unless the corresponding flag is explicitly set.
+  // Steps update if the corresponding flag is explicitly set, if a transform
+  // function is provided, or if the dependencies include an input.updateValue
+  // token.
   const stepsUpdate =
     steps
       .map(step =>
         (step.flags
           ? step.flags.update ?? false
-          : false));
+          : !!step.transform ||
+            !!step.dependencies?.some(dependency =>
+                isInputToken(dependency) &&
+                getInputTokenShape(dependency) === 'input.updateValue')));
 
   // The expose description for a step is just the entire step object, when
   // using the shorthand syntax where {flags: {expose: true}} is left implied.
@@ -901,9 +906,8 @@ export function compositeFrom(description) {
               ...(stepExposeDescriptions[index]?.dependencies ?? [])
                 .filter(dependency => isInputToken(dependency))
                 .filter(token => getInputTokenShape(token) === 'input.updateValue')
-                .map(token => getInputTokenValue(token))
-                .filter(Boolean),
-            ]
+                .map(token => getInputTokenValue(token)),
+            ].filter(Boolean)
           : []));
 
   // Indicates presence of a {compute} function on the expose description.
@@ -960,6 +964,7 @@ export function compositeFrom(description) {
     anyStepsExpose;
 
   const compositionUpdates =
+    'update' in description ||
     anyInputsUseUpdateValue ||
     anyStepsUseUpdateValue ||
     anyStepsUpdate;
@@ -1010,8 +1015,8 @@ export function compositeFrom(description) {
     });
   }
 
-  if (!compositionNests && !anyStepsUpdate && !anyStepsCompute) {
-    aggregate.push(new TypeError(`Expected at least one step to compute or update`));
+  if (!compositionNests && !anyStepsCompute && !anyStepsTransform) {
+    aggregate.push(new TypeError(`Expected at least one step to compute or transform`));
   }
 
   aggregate.close();
@@ -1341,6 +1346,7 @@ export function compositeFrom(description) {
             return continuationIfApplicable(...continuationArgs);
           } else {
             Object.assign(availableDependencies, providedDependencies);
+            if (providedValue !== null) valueSoFar = providedValue;
             break;
           }
       }
@@ -1395,7 +1401,7 @@ export function compositeFrom(description) {
           _wrapper(value, continuation, dependencies);
       }
 
-      if (anyStepsCompute) {
+      if (anyStepsCompute && !anyStepsUseUpdateValue && !anyInputsUseUpdateValue) {
         expose.compute = (continuation, dependencies) =>
           _wrapper(noTransformSymbol, continuation, dependencies);
       }
