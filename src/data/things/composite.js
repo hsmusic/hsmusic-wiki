@@ -752,6 +752,9 @@ export function templateCompositeFrom(description) {
 
 templateCompositeFrom.symbol = Symbol();
 
+export const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
+export const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
+
 export function compositeFrom(description) {
   const {annotation} = description;
 
@@ -1069,9 +1072,6 @@ export function compositeFrom(description) {
 
     return {continuation, continuationStorage};
   }
-
-  const continuationSymbol = Symbol.for('compositeFrom: continuation symbol');
-  const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol');
 
   function _computeOrTransform(initialValue, continuationIfApplicable, initialDependencies) {
     const expectingTransform = initialValue !== noTransformSymbol;
