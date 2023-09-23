@@ -172,7 +172,7 @@ t.test(`compositeFrom: dependencies from inputs`, t => {
 });
 
 t.test(`compositeFrom: update from various sources`, t => {
-  t.plan(2);
+  t.plan(3);
 
   const match = {
     flags: {update: true, expose: true, compose: false},
@@ -232,6 +232,54 @@ t.test(`compositeFrom: update from various sources`, t => {
     });
 
     t.match(composite, match);
-    t.equal(debugComposite(() => composite.expose.transform('foo')), 'Xx_foofoo_xX');
+    t.equal(composite.expose.transform('foo'), 'Xx_foofoo_xX');
+  });
+
+  t.test(`compositeFrom: update from inputs`, t => {
+    t.plan(3);
+
+    const composite = compositeFrom({
+      inputs: {
+        myInput: input.updateValue({
+          validate: isString,
+          default: 'foo',
+        }),
+      },
+
+      steps: [
+        {
+          dependencies: [input('myInput')],
+          compute: (continuation, {
+            [input('myInput')]: value,
+          }) => continuation({
+            '#value': `Xx_${value.repeat(2)}_xX`,
+          }),
+        },
+
+        {
+          dependencies: ['#value'],
+          transform: (_value, continuation, {'#value': value}) =>
+            continuation(value),
+        },
+      ],
+    });
+
+    let continuationValue = null;
+    const continuation = value => {
+      continuationValue = value;
+      return continuationSymbol;
+    };
+
+    t.match(composite, {
+      ...match,
+
+      flags: {update: true, expose: true, compose: true},
+    });
+
+    t.equal(
+      composite.expose.transform('foo', continuation),
+      continuationSymbol);
+
+    t.equal(continuationValue, 'Xx_foofoo_xX');
   });
 });

@@ -837,6 +837,16 @@ export function compositeFrom(description) {
       .filter(dependency => isInputToken(dependency))
       .some(token => getInputTokenShape(token) === 'input.updateValue');
 
+  // Update descriptions passed as the value in an input.updateValue() token,
+  // as provided as inputs for this composition.
+  const inputUpdateDescriptions =
+    Object.values(description.inputs ?? {})
+      .map(token =>
+        (getInputTokenShape(token) === 'input.updateValue'
+          ? getInputTokenValue(token)
+          : null))
+      .filter(Boolean);
+
   const base = composition.at(-1);
   const steps = composition.slice();
 
@@ -1396,6 +1406,7 @@ export function compositeFrom(description) {
     constructedDescriptor.update =
       Object.assign(
         {...description.update ?? {}},
+        ...inputUpdateDescriptions,
         ...stepUpdateDescriptions.flat());
   }
 
