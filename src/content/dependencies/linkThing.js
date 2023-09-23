@@ -1,6 +1,6 @@
 export default {
   contentDependencies: ['linkTemplate'],
-  extraDependencies: ['html'],
+  extraDependencies: ['html', 'language'],
 
   relations(relation) {
     return {
@@ -41,7 +41,7 @@ export default {
     hash: {type: 'string'},
   },
 
-  generate(data, relations, slots, {html}) {
+  generate(data, relations, slots, {html, language}) {
     const path = [data.pathKey, data.directory];
 
     const name =
@@ -51,7 +51,7 @@ export default {
 
     const content =
       (html.isBlank(slots.content)
-        ? name
+        ? language.sanitize(name)
         : slots.content);
 
     let color = null;

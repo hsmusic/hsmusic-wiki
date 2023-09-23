@@ -251,7 +251,11 @@ async function getImageMagickVersion(binary) {
     allData += data.toString();
   });
 
-  await promisifyProcess(proc, false);
+  try {
+    await promisifyProcess(proc, false);
+  } catch (error) {
+    return null;
+  }
 
   if (!allData.match(/ImageMagick/i)) {
     return null;
@@ -283,7 +287,7 @@ async function getSpawnMagick(tool) {
   }
 
   if (fn === null && await commandExists('magick')) {
-    version = await getImageMagickVersion(fn);
+    version = await getImageMagickVersion('magick');
     if (version !== null) {
       fn = (args) => spawn('magick', [tool, ...args]);
       description = `magick ${tool}`;

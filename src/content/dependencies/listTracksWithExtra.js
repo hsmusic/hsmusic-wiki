@@ -65,10 +65,14 @@ export default {
         stitchArrays({
           albumLink: relations.albumLinks,
           date: data.dates,
-        }).map(({albumLink, date}) => ({
-            album: albumLink,
-            date: language.formatDate(date),
-          })),
+        }).map(({albumLink, date}) =>
+            (date
+              ? {
+                  stringsKey: 'withDate',
+                  album: albumLink,
+                  date: language.formatDate(date),
+                }
+              : {album: albumLink})),
 
       chunkRows:
         relations.trackLinks

@@ -7,6 +7,12 @@ export function targets({wikiData}) {
 export function pathsForTarget(aliasArtist) {
   const {aliasedArtist} = aliasArtist;
 
+  // Don't generate a redirect page if this aliased name resolves to the same
+  // directory as the original artist! See issue #280.
+  if (aliasArtist.directory === aliasedArtist.directory) {
+    return [];
+  }
+
   return [
     {
       type: 'redirect',
