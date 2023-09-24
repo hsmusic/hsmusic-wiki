@@ -544,15 +544,17 @@ export function showAggregate(topError, {
   print = true,
 } = {}) {
   const recursive = (error, {level}) => {
-    let header = showTraces
+    let headerPart = showTraces
       ? `[${error.constructor.name || 'unnamed'}] ${
           error.message || '(no message)'
         }`
       : error instanceof AggregateError
       ? `[${error.message || '(no message)'}]`
       : error.message || '(no message)';
+
     if (showTraces) {
       const stackLines = error.stack?.split('\n');
+
       const stackLine = stackLines?.find(
         (line) =>
           line.trim().startsWith('at') &&
@@ -560,30 +562,41 @@ export function showAggregate(topError, {
           !line.includes('node:') &&
           !line.includes('<anonymous>')
       );
+
       const tracePart = stackLine
         ? '- ' +
           stackLine
             .trim()
             .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
         : '(no stack trace)';
-      header += ` ${colors.dim(tracePart)}`;
-    }
-    const bar = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
-    const head = level % 2 === 0 ? '\u257f' : colors.dim('\u257f');
 
-    if (error instanceof AggregateError) {
-      return (
-        header +
-        '\n' +
-        error.errors
-          .map((error) => recursive(error, {level: level + 1}))
-          .flatMap((str) => str.split('\n'))
-          .map((line, i) => i === 0 ? ` ${head} ${line}` : ` ${bar} ${line}`)
-          .join('\n')
-      );
-    } else {
-      return header;
+      headerPart += ` ${colors.dim(tracePart)}`;
     }
+
+    const head1 = level % 2 === 0 ? '\u21aa' : colors.dim('\u21aa');
+    const bar1 = ' ';
+
+    const causePart =
+      (error.cause
+        ? recursive(error.cause, {level: level + 1})
+            .split('\n')
+            .map((line, i) => i === 0 ? ` ${head1} ${line}` : ` ${bar1} ${line}`)
+            .join('\n')
+        : '');
+
+    const head2 = level % 2 === 0 ? '\u257f' : colors.dim('\u257f');
+    const bar2 = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
+
+    const aggregatePart =
+      (error instanceof AggregateError
+        ? error.errors
+            .map(error => recursive(error, {level: level + 1}))
+            .flatMap(str => str.split('\n'))
+            .map((line, i) => i === 0 ? ` ${head2} ${line}` : ` ${bar2} ${line}`)
+            .join('\n')
+        : '');
+
+    return [headerPart, causePart, aggregatePart].filter(Boolean).join('\n');
   };
 
   const message =
