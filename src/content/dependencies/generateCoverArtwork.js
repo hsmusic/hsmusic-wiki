@@ -83,6 +83,7 @@ export default {
             reveal: true,
             link: true,
             square: true,
+            lazy: true,
           });
 
       default:
