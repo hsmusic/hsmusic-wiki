@@ -31,7 +31,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > loa
 
 exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no accents 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>
-<a href="artist/the-big-baddies/">Grounder & Scratch</a>
+<a href="artist/the-big-baddies/">Grounder &amp; Scratch</a>
 <a href="artist/toby-fox/">Toby Fox</a>
 `
 
@@ -42,7 +42,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no 
             <use href="static/icons.svg#icon-soundcloud"></use>
         </svg>
     </a></span>)
-<a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping)
+<a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)
 <a href="artist/toby-fox/">Toby Fox</a> (Arrangement) (<span class="icons"><a href="https://tobyfox.bandcamp.com/" class="icon">
         <svg>
             <title>Bandcamp</title>
@@ -58,7 +58,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no 
 
 exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > only showContribution 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>
-<span class="nowrap"><a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping)</span>
+<span class="nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="nowrap"><a href="artist/toby-fox/">Toby Fox</a> (Arrangement)</span>
 `
 
@@ -69,7 +69,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > onl
                 <use href="static/icons.svg#icon-soundcloud"></use>
             </svg>
         </a></span>)</span>
-<a href="artist/the-big-baddies/">Grounder & Scratch</a>
+<a href="artist/the-big-baddies/">Grounder &amp; Scratch</a>
 <span class="nowrap"><a href="artist/toby-fox/">Toby Fox</a> (<span class="icons"><a href="https://tobyfox.bandcamp.com/" class="icon">
             <svg>
                 <title>Bandcamp</title>
@@ -90,7 +90,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > sho
                 <use href="static/icons.svg#icon-soundcloud"></use>
             </svg>
         </a></span>)</span>
-<span class="nowrap"><a href="artist/the-big-baddies/">Grounder & Scratch</a> (Snooping)</span>
+<span class="nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="nowrap"><a href="artist/toby-fox/">Toby Fox</a> (Arrangement) (<span class="icons"><a href="https://tobyfox.bandcamp.com/" class="icon">
             <svg>
                 <title>Bandcamp</title>

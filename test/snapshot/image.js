@@ -14,6 +14,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
         getThumbnailEqualOrSmaller: () => 'medium',
         getThumbnailsAvailableForDimensions: () =>
           [['large', 800], ['medium', 400], ['small', 250]],
+        missingImagePaths: ['album-art/missing/cover.png'],
         ...extraDependencies,
       },
       ...opts,
@@ -114,6 +115,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
       getThumbnailsAvailableForDimensions: () =>
         [['voluminous', 1200], ['middling', 900], ['petite', 20]],
       getThumbnailEqualOrSmaller: () => 'voluminous',
+      missingImagePaths: [],
     },
     slots: {
       thumb: 'gargantuan',
@@ -125,6 +127,22 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     slots: {
       thumb: 'medium',
       path: ['media.flashArt', '5426', 'gif'],
+    },
+  });
+
+  quickSnapshot('missing image path', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.albumCover', 'missing', 'png'],
+      link: true,
+    },
+  });
+
+  quickSnapshot('missing image path w/ missingSourceContent', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.albumCover', 'missing', 'png'],
+      missingSourceContent: `Cover's missing, whoops`,
     },
   });
 });
