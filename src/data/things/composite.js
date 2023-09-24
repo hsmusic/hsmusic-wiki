@@ -1381,7 +1381,9 @@ export function compositeFrom(description) {
             return continuationIfApplicable(...continuationArgs);
           } else {
             Object.assign(availableDependencies, providedDependencies);
-            if (providedValue !== null) valueSoFar = providedValue;
+            if (callingTransformForThisStep && providedValue !== null) {
+              valueSoFar = providedValue;
+            }
             break;
           }
       }
