@@ -45,7 +45,7 @@ export default {
     open: {type: 'boolean'},
   },
 
-  generate(slots, data, relations, {getColors, html, language}) {
+  generate(data, relations, slots, {getColors, html, language}) {
     const sectionName =
       html.tag('span', {class: 'group-name'},
         (data.isDefaultTrackSection

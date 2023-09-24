@@ -150,9 +150,7 @@ export default {
               language.$('albumCommentaryPage.entry.title.albumCommentary')),
 
             relations.albumCommentaryCover
-              ?.slots({
-                displayMode: 'commentary',
-              }),
+              ?.slots({mode: 'commentary'}),
 
             html.tag('blockquote',
               relations.albumCommentaryContent),
