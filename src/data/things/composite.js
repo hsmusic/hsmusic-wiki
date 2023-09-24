@@ -4,10 +4,10 @@ import {colors} from '#cli';
 import {TupleMap} from '#wiki-data';
 
 import {
+  is,
   isArray,
   isString,
   isWholeNumber,
-  oneOf,
   validateArrayItems,
 } from '#validators';
 
@@ -1567,7 +1567,7 @@ export const exposeConstant = templateCompositeFrom({
 //
 
 const availabilityCheckModeInput = {
-  validate: oneOf('null', 'empty', 'falsy'),
+  validate: is('null', 'empty', 'falsy'),
   defaultValue: 'null',
 };
 

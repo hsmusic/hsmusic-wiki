@@ -7,7 +7,7 @@ import {colors} from '#cli';
 import find from '#find';
 import {stitchArrays, unique} from '#sugar';
 import {filterMultipleArrays, getKebabCase} from '#wiki-data';
-import {oneOf} from '#validators';
+import {is} from '#validators';
 
 import {
   compositeFrom,
@@ -460,7 +460,7 @@ export const withResolvedContribs = templateCompositeFrom({
     from: input(),
 
     notFoundMode: input({
-      validate: oneOf('exit', 'filter', 'null'),
+      validate: is('exit', 'filter', 'null'),
       defaultValue: 'null',
     }),
   },
@@ -562,7 +562,7 @@ export const withResolvedReference = templateCompositeFrom({
     find: input({type: 'function'}),
 
     notFoundMode: input({
-      validate: oneOf('null', 'exit'),
+      validate: is('null', 'exit'),
       defaultValue: 'null',
     }),
   },
@@ -627,7 +627,7 @@ export const withResolvedReferenceList = templateCompositeFrom({
     find: input({type: 'function'}),
 
     notFoundMode: input({
-      validate: oneOf('exit', 'filter', 'null'),
+      validate: is('exit', 'filter', 'null'),
       defaultValue: 'filter',
     }),
   },
