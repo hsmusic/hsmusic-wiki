@@ -39,6 +39,14 @@ exports[`test/snapshot/image.js TAP image (snapshot) > link with file size 1`] =
 <a class="box image-link" href="media/album-art/pingas/cover.png"><div class="image-container"><div class="image-inner-area"><img src="media/album-art/pingas/cover.png"></div></div></a>
 `
 
+exports[`test/snapshot/image.js TAP image (snapshot) > missing image path 1`] = `
+<div class="image-container"><div class="image-inner-area"><div class="image-text-area">(This image file is missing)</div></div></div>
+`
+
+exports[`test/snapshot/image.js TAP image (snapshot) > missing image path w/ missingSourceContent 1`] = `
+<div class="image-container"><div class="image-inner-area"><div class="image-text-area">Cover's missing, whoops</div></div></div>
+`
+
 exports[`test/snapshot/image.js TAP image (snapshot) > source missing 1`] = `
 <div class="image-container placeholder-image"><div class="image-inner-area"><div class="image-text-area">Example of missing source message.</div></div></div>
 `
