@@ -548,7 +548,12 @@ export function templateCompositeFrom(description) {
         });
 
     const wrongTypeInputNames = [];
-    const wrongInputCallInputNames = [];
+
+    const expectedStaticValueInputNames = [];
+    const expectedStaticDependencyInputNames = [];
+
+    const validateFailedInputNames = [];
+    const validateFailedErrors = [];
 
     for (const [name, value] of Object.entries(inputOptions)) {
       if (misplacedInputNames.includes(name)) {
@@ -559,6 +564,37 @@ export function templateCompositeFrom(description) {
         wrongTypeInputNames.push(name);
         continue;
       }
+
+      const descriptionShape = getInputTokenShape(description.inputs[name]);
+      const descriptionValue = getInputTokenValue(description.inputs[name]);
+
+      const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
+      const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
+
+      if (descriptionShape === 'input.staticValue') {
+        if (tokenShape !== 'input.value') {
+          expectedStaticValueInputNames.push(name);
+          continue;
+        }
+      }
+
+      if (descriptionShape === 'input.staticDependency') {
+        if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
+          expectedStaticDependencyInputNames.push(name);
+          continue;
+        }
+      }
+
+      if (descriptionValue && 'validate' in descriptionValue) {
+        if (tokenShape === 'input.value') {
+          try {
+            descriptionValue.validate(tokenValue);
+          } catch (error) {
+            validateFailedInputNames.push(name);
+            validateFailedErrors.push(error);
+          }
+        }
+      }
     }
 
     if (!empty(misplacedInputNames)) {
@@ -567,6 +603,23 @@ export function templateCompositeFrom(description) {
 
     if (!empty(missingInputNames)) {
       inputOptionsAggregate.push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
+    }
+
+    if (!empty(expectedStaticDependencyInputNames)) {
+      inputOptionsAggregate.push(new Error(`Expected static dependencies: ${expectedStaticDependencyInputNames.join(', ')}`));
+    }
+
+    if (!empty(expectedStaticValueInputNames)) {
+      inputOptionsAggregate.push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
+    }
+
+    for (const {name, validationError} of stitchArrays({
+      name: validateFailedInputNames,
+      validationError: validateFailedErrors,
+    })) {
+      const error = new Error(`${name}: Validation failed for static value`);
+      error.cause = validationError;
+      inputOptionsAggregate.push(error);
     }
 
     for (const name of wrongTypeInputNames) {
