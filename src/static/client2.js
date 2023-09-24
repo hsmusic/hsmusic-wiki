@@ -6,12 +6,27 @@
 // ephemeral nature.
 
 import {getColors} from '../util/colors.js';
-import {getArtistNumContributions} from '../util/wiki-data.js';
+import {empty, stitchArrays} from '../util/sugar.js';
+
+import {
+  filterMultipleArrays,
+  getArtistNumContributions,
+} from '../util/wiki-data.js';
 
 let albumData, artistData;
 let officialAlbumData, fandomAlbumData, beyondAlbumData;
 
 let ready = false;
+
+const clientInfo = window.hsmusicClientInfo = Object.create(null);
+
+const clientSteps = {
+  getPageReferences: [],
+  addInternalListeners: [],
+  mutatePageContent: [],
+  initializeState: [],
+  addPageListeners: [],
+};
 
 // Localiz8tion nonsense ----------------------------------
 
@@ -86,112 +101,147 @@ function fetchData(type, directory) {
 
 // JS-based links -----------------------------------------
 
-for (const a of document.body.querySelectorAll('[data-random]')) {
-  a.addEventListener('click', (evt) => {
-    if (!ready) {
-      evt.preventDefault();
-      return;
-    }
+const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
+  randomLinks: null,
+  revealLinks: null,
 
-    const tracks = albumData =>
-      albumData
-        .map(album => album.tracks)
-        .reduce((acc, tracks) => acc.concat(tracks), []);
-
-    setTimeout(() => {
-      a.href = rebase('js-disabled');
-    });
-
-    switch (a.dataset.random) {
-      case 'album':
-        a.href = openAlbum(pick(albumData).directory);
-        break;
-
-      case 'album-in-official':
-        a.href = openAlbum(pick(officialAlbumData).directory);
-        break;
-
-      case 'album-in-fandom':
-        a.href = openAlbum(pick(fandomAlbumData).directory);
-        break;
-
-      case 'album-in-beyond':
-        a.href = openAlbum(pick(beyondAlbumData).directory);
-        break;
-
-      case 'track':
-        a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
-        break;
-
-      case 'track-in-album':
-        a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
-        break;
-
-      case 'track-in-official':
-        a.href = openTrack(getRefDirectory(pick(tracks(officialAlbumData))));
-        break;
-
-      case 'track-in-fandom':
-        a.href = openTrack(getRefDirectory(pick(tracks(fandomAlbumData))));
-        break;
-
-      case 'track-in-beyond':
-        a.href = openTrack(getRefDirectory(pick(tracks(beyondAlbumData))));
-        break;
-
-      case 'artist':
-        a.href = openArtist(pick(artistData).directory);
-        break;
-
-      case 'artist-more-than-one-contrib':
-        a.href =
-          openArtist(
-            pick(artistData.filter((artist) => getArtistNumContributions(artist) > 1))
-              .directory);
-        break;
-    }
-  });
-}
-
-const next = document.getElementById('next-button');
-const previous = document.getElementById('previous-button');
-const random = document.getElementById('random-button');
-
-const prependTitle = (el, prepend) => {
-  const existing = el.getAttribute('title');
-  if (existing) {
-    el.setAttribute('title', prepend + ' ' + existing);
-  } else {
-    el.setAttribute('title', prepend);
-  }
+  nextLink: null,
+  previousLink: null,
+  randomLink: null,
 };
 
-if (next) prependTitle(next, '(Shift+N)');
-if (previous) prependTitle(previous, '(Shift+P)');
-if (random) prependTitle(random, '(Shift+R)');
+function getScriptedLinkReferences() {
+  scriptedLinkInfo.randomLinks =
+    document.querySelectorAll('[data-random]');
 
-document.addEventListener('keypress', (event) => {
-  if (event.shiftKey) {
-    if (event.charCode === 'N'.charCodeAt(0)) {
-      if (next) next.click();
-    } else if (event.charCode === 'P'.charCodeAt(0)) {
-      if (previous) previous.click();
-    } else if (event.charCode === 'R'.charCodeAt(0)) {
-      if (random && ready) random.click();
-    }
+  scriptedLinkInfo.revealLinks =
+    document.getElementsByClassName('reveal');
+
+  scriptedLinkInfo.nextNavLink =
+    document.getElementById('next-button');
+
+  scriptedLinkInfo.previousNavLink =
+    document.getElementById('previous-button');
+
+  scriptedLinkInfo.randomNavLink =
+    document.getElementById('random-button');
+}
+
+function addRandomLinkListeners() {
+  for (const a of scriptedLinkInfo.randomLinks ?? []) {
+    a.addEventListener('click', evt => {
+      if (!ready) {
+        evt.preventDefault();
+        return;
+      }
+
+      const tracks = albumData =>
+        albumData
+          .map(album => album.tracks)
+          .reduce((acc, tracks) => acc.concat(tracks), []);
+
+      setTimeout(() => {
+        a.href = rebase('js-disabled');
+      });
+
+      switch (a.dataset.random) {
+        case 'album':
+          a.href = openAlbum(pick(albumData).directory);
+          break;
+
+        case 'album-in-official':
+          a.href = openAlbum(pick(officialAlbumData).directory);
+          break;
+
+        case 'album-in-fandom':
+          a.href = openAlbum(pick(fandomAlbumData).directory);
+          break;
+
+        case 'album-in-beyond':
+          a.href = openAlbum(pick(beyondAlbumData).directory);
+          break;
+
+        case 'track':
+          a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
+          break;
+
+        case 'track-in-album':
+          a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
+          break;
+
+        case 'track-in-official':
+          a.href = openTrack(getRefDirectory(pick(tracks(officialAlbumData))));
+          break;
+
+        case 'track-in-fandom':
+          a.href = openTrack(getRefDirectory(pick(tracks(fandomAlbumData))));
+          break;
+
+        case 'track-in-beyond':
+          a.href = openTrack(getRefDirectory(pick(tracks(beyondAlbumData))));
+          break;
+
+        case 'artist':
+          a.href = openArtist(pick(artistData).directory);
+          break;
+
+        case 'artist-more-than-one-contrib':
+          a.href =
+            openArtist(
+              pick(artistData.filter((artist) => getArtistNumContributions(artist) > 1))
+                .directory);
+          break;
+      }
+    });
   }
-});
+}
 
-for (const reveal of document.querySelectorAll('.reveal')) {
-  reveal.addEventListener('click', (event) => {
-    if (!reveal.classList.contains('revealed')) {
-      reveal.classList.add('revealed');
-      event.preventDefault();
-      event.stopPropagation();
-      reveal.dispatchEvent(new CustomEvent('hsmusic-reveal'));
+function mutateNavigationLinkContent() {
+  const prependTitle = (el, prepend) =>
+    el?.setAttribute('title',
+      (el.hasAttribute('title')
+        ? prepend + ' ' + el.getAttribute('title')
+        : prepend));
+
+  prependTitle(scriptedLinkInfo.nextNavLink, '(Shift+N)');
+  prependTitle(scriptedLinkInfo.previousNavLink, '(Shift+P)');
+  prependTitle(scriptedLinkInfo.randomNavLink, '(Shift+R)');
+}
+
+function addNavigationKeyPressListeners() {
+  document.addEventListener('keypress', (event) => {
+    if (event.shiftKey) {
+      if (event.charCode === 'N'.charCodeAt(0)) {
+        scriptedLinkInfo.nextNavLink?.click();
+      } else if (event.charCode === 'P'.charCodeAt(0)) {
+        scriptedLinkInfo.previousNavLink?.click();
+      } else if (event.charCode === 'R'.charCodeAt(0)) {
+        if (ready) {
+          scriptedLinkInfo.randomNavLink?.click();
+        }
+      }
     }
   });
 }
+
+function addRevealLinkClickListeners() {
+  for (const reveal of scriptedLinkInfo.revealLinks ?? []) {
+    reveal.addEventListener('click', (event) => {
+      if (!reveal.classList.contains('revealed')) {
+        reveal.classList.add('revealed');
+        event.preventDefault();
+        event.stopPropagation();
+        reveal.dispatchEvent(new CustomEvent('hsmusic-reveal'));
+      }
+    });
+  }
+}
+
+clientSteps.getPageReferences.push(getScriptedLinkReferences);
+clientSteps.addPageListeners.push(addRandomLinkListeners);
+clientSteps.addPageListeners.push(addNavigationKeyPressListeners);
+clientSteps.addPageListeners.push(addRevealLinkClickListeners);
+clientSteps.mutatePageContent.push(mutateNavigationLinkContent);
 
 const elements1 = document.getElementsByClassName('js-hide-once-data');
 const elements2 = document.getElementsByClassName('js-show-once-data');
@@ -454,205 +504,393 @@ if (localStorage.tryInfoCards) {
 
 // Custom hash links --------------------------------------
 
-function addHashLinkHandlers() {
+const hashLinkInfo = clientInfo.hashLinkInfo = {
+  links: null,
+  hrefs: null,
+  targets: null,
+
+  state: {
+    highlightedTarget: null,
+    scrollingAfterClick: false,
+    concludeScrollingStateInterval: null,
+  },
+
+  event: {
+    whenHashLinkClicked: [],
+  },
+};
+
+function getHashLinkReferences() {
+  const info = hashLinkInfo;
+
+  info.links =
+    Array.from(document.querySelectorAll('a[href^="#"]:not([href="#"])'));
+
+  info.hrefs =
+    info.links
+      .map(link => link.getAttribute('href'));
+
+  info.targets =
+    info.hrefs
+      .map(href => document.getElementById(href.slice(1)));
+
+  filterMultipleArrays(
+    info.links,
+    info.hrefs,
+    info.targets,
+    (_link, _href, target) => target);
+}
+
+function processScrollingAfterHashLinkClicked() {
+  const {state} = hashLinkInfo;
+
+  if (state.concludeScrollingStateInterval) return;
+
+  let lastScroll = window.scrollY;
+  state.scrollingAfterClick = true;
+  state.concludeScrollingStateInterval = setInterval(() => {
+    if (Math.abs(window.scrollY - lastScroll) < 10) {
+      clearInterval(state.concludeScrollingStateInterval);
+      state.scrollingAfterClick = false;
+      state.concludeScrollingStateInterval = null;
+    } else {
+      lastScroll = window.scrollY;
+    }
+  }, 200);
+}
+
+function addHashLinkListeners() {
   // Instead of defining a scroll offset (to account for the sticky heading)
   // in JavaScript, we interface with the CSS property 'scroll-margin-top'.
   // This lets the scroll offset be consolidated where it makes sense, and
   // sets an appropriate offset when (re)loading a page with hash for free!
 
-  let wasHighlighted;
+  const info = hashLinkInfo;
+  const {state, event} = info;
 
-  for (const a of document.links) {
-    const href = a.getAttribute('href');
-    if (!href || !href.startsWith('#')) {
-      continue;
-    }
-
-    a.addEventListener('click', handleHashLinkClicked);
-  }
-
-  function handleHashLinkClicked(evt) {
-    if (evt.metaKey || evt.shiftKey || evt.ctrlKey || evt.altKey) {
-      return;
-    }
-
-    const href = evt.target.getAttribute('href');
-    const id = href.slice(1);
-    const linked = document.getElementById(id);
-
-    if (!linked) {
-      return;
-    }
-
-    // Hide skipper box right away, so the layout is updated on time for the
-    // math operations coming up next.
-    const skipper = document.getElementById('skippers');
-    skipper.style.display = 'none';
-    setTimeout(() => skipper.style.display = '');
-
-    const box = linked.getBoundingClientRect();
-    const style = window.getComputedStyle(linked);
-
-    const scrollY =
-        window.scrollY
-      + box.top
-      - style['scroll-margin-top'].replace('px', '');
-
-    evt.preventDefault();
-    history.pushState({}, '', href);
-    window.scrollTo({top: scrollY, behavior: 'smooth'});
-    linked.focus({preventScroll: true});
-
-    const maxScroll =
-        document.body.scrollHeight
-      - window.innerHeight;
-
-    if (scrollY > maxScroll && linked.classList.contains('content-heading')) {
-      if (wasHighlighted) {
-        wasHighlighted.classList.remove('highlight-hash-link');
+  for (const {hashLink, href, target} of stitchArrays({
+    hashLink: info.links,
+    href: info.hrefs,
+    target: info.targets,
+  })) {
+    hashLink.addEventListener('click', evt => {
+      if (evt.metaKey || evt.shiftKey || evt.ctrlKey || evt.altKey) {
+        return;
       }
 
-      wasHighlighted = linked;
-      linked.classList.add('highlight-hash-link');
-      linked.addEventListener('animationend', function handle(evt) {
-        if (evt.animationName === 'highlight-hash-link') {
-          linked.removeEventListener('animationend', handle);
-          linked.classList.remove('highlight-hash-link');
-          wasHighlighted = null;
+      // Hide skipper box right away, so the layout is updated on time for the
+      // math operations coming up next.
+      const skipper = document.getElementById('skippers');
+      skipper.style.display = 'none';
+      setTimeout(() => skipper.style.display = '');
+
+      const box = target.getBoundingClientRect();
+      const style = window.getComputedStyle(target);
+
+      const scrollY =
+          window.scrollY
+        + box.top
+        - style['scroll-margin-top'].replace('px', '');
+
+      evt.preventDefault();
+      history.pushState({}, '', href);
+      window.scrollTo({top: scrollY, behavior: 'smooth'});
+      target.focus({preventScroll: true});
+
+      const maxScroll =
+          document.body.scrollHeight
+        - window.innerHeight;
+
+      if (scrollY > maxScroll && target.classList.contains('content-heading')) {
+        if (state.highlightedTarget) {
+          state.highlightedTarget.classList.remove('highlight-hash-link');
         }
-      });
-    }
+
+        target.classList.add('highlight-hash-link');
+        state.highlightedTarget = target;
+      }
+
+      processScrollingAfterHashLinkClicked();
+
+      for (const handler of event.whenHashLinkClicked) {
+        handler({
+          link: hashLink,
+        });
+      }
+    });
+  }
+
+  for (const target of info.targets) {
+    target.addEventListener('animationend', evt => {
+      if (evt.animationName !== 'highlight-hash-link') return;
+      target.classList.remove('highlight-hash-link');
+      if (target !== state.highlightedTarget) return;
+      state.highlightedTarget = null;
+    });
   }
 }
 
-addHashLinkHandlers();
+clientSteps.getPageReferences.push(getHashLinkReferences);
+clientSteps.addPageListeners.push(addHashLinkListeners);
 
 // Sticky content heading ---------------------------------
 
-const stickyHeadingInfo = Array.from(document.querySelectorAll('.content-sticky-heading-container'))
-  .map(stickyContainer => {
-    const {parentElement: contentContainer} = stickyContainer;
-    const stickySubheadingRow = stickyContainer.querySelector('.content-sticky-subheading-row');
-    const stickySubheading = stickySubheadingRow.querySelector('h2');
-    let stickyCoverContainer = stickyContainer.querySelector('.content-sticky-heading-cover-container');
-    let stickyCover = stickyCoverContainer?.querySelector('.content-sticky-heading-cover');
-    const contentHeadings = Array.from(contentContainer.querySelectorAll('.content-heading'));
-    const contentCover = contentContainer.querySelector('#cover-art-container');
+const stickyHeadingInfo = clientInfo.stickyHeadingInfo = {
+  stickyContainers: null,
 
-    if (stickyCover?.querySelector('.image-text-area')) {
-      stickyCoverContainer.remove();
-      stickyCoverContainer = null;
-      stickyCover = null;
+  stickySubheadingRows: null,
+  stickySubheadings: null,
+
+  stickyCoverContainers: null,
+  stickyCoverTextAreas: null,
+  stickyCovers: null,
+
+  contentContainers: null,
+  contentHeadings: null,
+  contentCovers: null,
+  contentCoversReveal: null,
+
+  state: {
+    displayedHeading: null,
+  },
+
+  event: {
+    whenDisplayedHeadingChanges: [],
+  },
+};
+
+function getStickyHeadingReferences() {
+  const info = stickyHeadingInfo;
+
+  info.stickyContainers =
+    Array.from(document.getElementsByClassName('content-sticky-heading-container'));
+
+  info.stickyCoverContainers =
+    info.stickyContainers
+      .map(el => el.querySelector('.content-sticky-heading-cover-container'));
+
+  info.stickyCovers =
+    info.stickyCoverContainers
+      .map(el => el?.querySelector('.content-sticky-heading-cover'));
+
+  info.stickyCoverTextAreas =
+    info.stickyCovers
+      .map(el => el?.querySelector('.image-text-area'));
+
+  info.stickySubheadingRows =
+    info.stickyContainers
+      .map(el => el.querySelector('.content-sticky-subheading-row'));
+
+  info.stickySubheadings =
+    info.stickySubheadingRows
+      .map(el => el.querySelector('h2'));
+
+  info.contentContainers =
+    info.stickyContainers
+      .map(el => el.parentElement);
+
+  info.contentCovers =
+    info.contentContainers
+      .map(el => el.querySelector('#cover-art-container'));
+
+  info.contentCoversReveal =
+    info.contentCovers
+      .map(el => el ? !!el.querySelector('.reveal') : null);
+
+  info.contentHeadings =
+    info.contentContainers
+      .map(el => Array.from(el.querySelectorAll('.content-heading')));
+}
+
+function removeTextPlaceholderStickyHeadingCovers() {
+  const info = stickyHeadingInfo;
+
+  const hasTextArea =
+    info.stickyCoverTextAreas.map(el => !!el);
+
+  const coverContainersWithTextArea =
+    info.stickyCoverContainers
+      .filter((_el, index) => hasTextArea[index]);
+
+  for (const el of coverContainersWithTextArea) {
+    el.remove();
+  }
+
+  info.stickyCoverContainers =
+    info.stickyCoverContainers
+      .map((el, index) => hasTextArea[index] ? null : el);
+
+  info.stickyCovers =
+    info.stickyCovers
+      .map((el, index) => hasTextArea[index] ? null : el);
+
+  info.stickyCoverTextAreas =
+    info.stickyCoverTextAreas
+      .slice()
+      .fill(null);
+}
+
+function addRevealClassToStickyHeadingCovers() {
+  const info = stickyHeadingInfo;
+
+  const stickyCoversWhichReveal =
+    info.stickyCovers
+      .filter((_el, index) => info.contentCoversReveal[index]);
+
+  for (const el of stickyCoversWhichReveal) {
+    el.classList.add('content-sticky-heading-cover-needs-reveal');
+  }
+}
+
+function addRevealListenersForStickyHeadingCovers() {
+  const info = stickyHeadingInfo;
+
+  const stickyCovers = info.stickyCovers.slice();
+  const contentCovers = info.contentCovers.slice();
+
+  filterMultipleArrays(
+    stickyCovers,
+    contentCovers,
+    (_stickyCover, _contentCover, index) => info.contentCoversReveal[index]);
+
+  for (const {stickyCover, contentCover} of stitchArrays({
+    stickyCover: stickyCovers,
+    contentCover: contentCovers,
+  })) {
+    // TODO: Janky - should use internal event instead of DOM event
+    contentCover.querySelector('.reveal').addEventListener('hsmusic-reveal', () => {
+      stickyCover.classList.remove('content-sticky-heading-cover-needs-reveal');
+    });
+  }
+}
+
+function topOfViewInside(el, scroll = window.scrollY) {
+  return (
+    scroll > el.offsetTop &&
+    scroll < el.offsetTop + el.offsetHeight);
+}
+
+function updateStickyCoverVisibility(index) {
+  const info = stickyHeadingInfo;
+
+  const stickyCoverContainer = info.stickyCoverContainers[index];
+  const contentCover = info.contentCovers[index];
+
+  if (contentCover && stickyCoverContainer) {
+    if (contentCover.getBoundingClientRect().bottom < 0) {
+      stickyCoverContainer.classList.add('visible');
+    } else {
+      stickyCoverContainer.classList.remove('visible');
+    }
+  }
+}
+
+function getContentHeadingClosestToStickySubheading(index) {
+  const info = stickyHeadingInfo;
+
+  const contentContainer = info.contentContainers[index];
+
+  if (!topOfViewInside(contentContainer)) {
+    return null;
+  }
+
+  const stickySubheading = info.stickySubheadings[index];
+
+  if (stickySubheading.childNodes.length === 0) {
+    // Supply a non-breaking space to ensure correct basic line height.
+    stickySubheading.appendChild(document.createTextNode('\xA0'));
+  }
+
+  const stickyContainer = info.stickyContainers[index];
+  const stickyRect = stickyContainer.getBoundingClientRect();
+
+  // TODO: Should this compute with the subheading row instead of h2?
+  const subheadingRect = stickySubheading.getBoundingClientRect();
+
+  const stickyBottom = stickyRect.bottom + subheadingRect.height;
+
+  // Iterate from bottom to top of the content area.
+  const contentHeadings = info.contentHeadings[index];
+  for (const heading of contentHeadings.slice().reverse()) {
+    const headingRect = heading.getBoundingClientRect();
+    if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 20) {
+      return heading;
+    }
+  }
+
+  return null;
+}
+
+function updateStickySubheadingContent(index) {
+  const info = stickyHeadingInfo;
+  const {event, state} = info;
+
+  const closestHeading = getContentHeadingClosestToStickySubheading(index);
+
+  if (state.displayedHeading === closestHeading) return;
+
+  const stickySubheadingRow = info.stickySubheadingRows[index];
+
+  if (closestHeading) {
+    const stickySubheading = info.stickySubheadings[index];
+
+    // Array.from needed to iterate over a live array with for..of
+    for (const child of Array.from(stickySubheading.childNodes)) {
+      child.remove();
     }
 
-    return {
-      contentContainer,
-      contentCover,
-      contentHeadings,
-      stickyContainer,
-      stickyCover,
-      stickyCoverContainer,
-      stickySubheading,
-      stickySubheadingRow,
-      state: {
-        displayedHeading: null,
-      },
-    };
+    for (const child of closestHeading.childNodes) {
+      if (child.tagName === 'A') {
+        for (const grandchild of child.childNodes) {
+          stickySubheading.appendChild(grandchild.cloneNode(true));
+        }
+      } else {
+        stickySubheading.appendChild(child.cloneNode(true));
+      }
+    }
+
+    stickySubheadingRow.classList.add('visible');
+  } else {
+    stickySubheadingRow.classList.remove('visible');
+  }
+
+  const oldDisplayedHeading = state.displayedHeading;
+
+  state.displayedHeading = closestHeading;
+
+  for (const handler of event.whenDisplayedHeadingChanges) {
+    handler(index, {
+      oldHeading: oldDisplayedHeading,
+      newHeading: closestHeading,
+    });
+  }
+}
+
+function updateStickyHeadings(index) {
+  updateStickyCoverVisibility(index);
+  updateStickySubheadingContent(index);
+}
+
+function initializeStateForStickyHeadings() {
+  for (let i = 0; i < stickyHeadingInfo.stickyContainers.length; i++) {
+    updateStickyHeadings(i);
+  }
+}
+
+function addScrollListenerForStickyHeadings() {
+  document.addEventListener('scroll', () => {
+    for (let i = 0; i < stickyHeadingInfo.stickyContainers.length; i++) {
+      updateStickyHeadings(i);
+    }
   });
-
-const topOfViewInside = (el, scroll = window.scrollY) => (
-  scroll > el.offsetTop &&
-  scroll < el.offsetTop + el.offsetHeight
-);
-
-function prepareStickyHeadings() {
-  for (const {
-    contentCover,
-    stickyCover,
-  } of stickyHeadingInfo) {
-    const coverRevealImage = contentCover?.querySelector('.reveal');
-    if (coverRevealImage) {
-      stickyCover.classList.add('content-sticky-heading-cover-needs-reveal');
-      coverRevealImage.addEventListener('hsmusic-reveal', () => {
-        stickyCover.classList.remove('content-sticky-heading-cover-needs-reveal');
-      });
-    }
-  }
 }
 
-function updateStickyHeading() {
-  for (const {
-    contentContainer,
-    contentCover,
-    contentHeadings,
-    stickyContainer,
-    stickyCoverContainer,
-    stickySubheading,
-    stickySubheadingRow,
-    state,
-  } of stickyHeadingInfo) {
-    let closestHeading = null;
-
-    if (contentCover && stickyCoverContainer) {
-      if (contentCover.getBoundingClientRect().bottom < 0) {
-        stickyCoverContainer.classList.add('visible');
-      } else {
-        stickyCoverContainer.classList.remove('visible');
-      }
-    }
-
-    if (topOfViewInside(contentContainer)) {
-      if (stickySubheading.childNodes.length === 0) {
-        // &nbsp; to ensure correct basic line height
-        stickySubheading.appendChild(document.createTextNode('\xA0'));
-      }
-
-      const stickyRect = stickyContainer.getBoundingClientRect();
-      const subheadingRect = stickySubheading.getBoundingClientRect();
-      const stickyBottom = stickyRect.bottom + subheadingRect.height;
-
-      // This array is reversed so that we're starting from the bottom when
-      // iterating over it.
-      for (let i = contentHeadings.length - 1; i >= 0; i--) {
-        const heading = contentHeadings[i];
-        const headingRect = heading.getBoundingClientRect();
-        if (headingRect.y + headingRect.height / 1.5 < stickyBottom + 20) {
-          closestHeading = heading;
-          break;
-        }
-      }
-    }
-
-    if (state.displayedHeading !== closestHeading) {
-      if (closestHeading) {
-        // Array.from needed to iterate over a live array with for..of
-        for (const child of Array.from(stickySubheading.childNodes)) {
-          child.remove();
-        }
-
-        for (const child of closestHeading.childNodes) {
-          if (child.tagName === 'A') {
-            for (const grandchild of child.childNodes) {
-              stickySubheading.appendChild(grandchild.cloneNode(true));
-            }
-          } else {
-            stickySubheading.appendChild(child.cloneNode(true));
-          }
-        }
-
-        stickySubheadingRow.classList.add('visible');
-      } else {
-        stickySubheadingRow.classList.remove('visible');
-      }
-
-      state.displayedHeading = closestHeading;
-    }
-  }
-}
-
-document.addEventListener('scroll', updateStickyHeading);
-prepareStickyHeadings();
-updateStickyHeading();
+clientSteps.getPageReferences.push(getStickyHeadingReferences);
+clientSteps.mutatePageContent.push(removeTextPlaceholderStickyHeadingCovers);
+clientSteps.mutatePageContent.push(addRevealClassToStickyHeadingCovers);
+clientSteps.initializeState.push(initializeStateForStickyHeadings);
+clientSteps.addPageListeners.push(addRevealListenersForStickyHeadingCovers);
+clientSteps.addPageListeners.push(addScrollListenerForStickyHeadings);
 
 // Image overlay ------------------------------------------
 
@@ -969,4 +1207,17 @@ for (const info of groupContributionsTableInfo) {
     evt.preventDefault();
     sortGroupContributionsTableBy(info, 'count');
   });
+}
+
+// Run setup steps ----------------------------------------
+
+for (const [key, steps] of Object.entries(clientSteps)) {
+  for (const step of steps) {
+    try {
+      step();
+    } catch (error) {
+      console.warn(`During ${key}, failed to run ${step.name}`);
+      console.debug(error);
+    }
+  }
 }
