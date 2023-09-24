@@ -355,35 +355,30 @@ import {
 
 const globalCompositeCache = {};
 
-export function input(nameOrDescription) {
-  if (typeof nameOrDescription === 'string') {
-    return Symbol.for(`hsmusic.composite.input:${nameOrDescription}`);
-  } else {
-    return {
-      symbol: Symbol.for('hsmusic.composite.input'),
-      shape: 'input',
-      value: nameOrDescription,
-    };
-  }
-}
+const _valueIntoToken = shape =>
+  (value = null) =>
+    (value === null
+      ? Symbol.for(`hsmusic.composite.${shape}`)
+   : typeof value === 'string'
+      ? Symbol.for(`hsmusic.composite.${shape}:${value}`)
+      : {
+          symbol: Symbol.for(`hsmusic.composite.input`),
+          shape,
+          value,
+        });
 
+export const input = _valueIntoToken('input');
 input.symbol = Symbol.for('hsmusic.composite.input');
 
-input.updateValue = (description = null) =>
-  (description
-    ? {
-        symbol: input.symbol,
-        shape: 'input.updateValue',
-        value: description,
-      }
-    : Symbol.for('hsmusic.composite.input.updateValue'));
+input.value = _valueIntoToken('input.value');
+input.dependency = _valueIntoToken('input.dependency');
 
 input.myself = () => Symbol.for(`hsmusic.composite.input.myself`);
 
-input.value = value => ({symbol: input.symbol, shape: 'input.value', value});
-input.dependency = name => Symbol.for(`hsmusic.composite.input.dependency:${name}`);
-input.staticDependency = name => Symbol.for(`hsmusic.composite.input.staticDependency:${name}`);
-input.staticValue = name => Symbol.for(`hsmusic.composite.input.staticValue:${name}`);
+input.updateValue = _valueIntoToken('input.updateValue');
+
+input.staticDependency = _valueIntoToken('input.staticDependency');
+input.staticValue = _valueIntoToken('input.staticValue');
 
 function isInputToken(token) {
   if (typeof token === 'object') {
