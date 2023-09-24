@@ -1,13 +1,7 @@
 import t from 'tap';
 
+import {compositeFrom, continuationSymbol, input} from '#composite';
 import {isString} from '#validators';
-
-import {
-  compositeFrom,
-  continuationSymbol,
-  debugComposite,
-  input,
-} from '#composite';
 
 t.test(`compositeFrom: basic behavior`, t => {
   t.plan(2);
