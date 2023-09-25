@@ -721,7 +721,6 @@ export function templateCompositeFrom(description) {
           const finalInputs = {};
 
           for (const [name, description_] of Object.entries(description.inputs)) {
-            // TODO: Validate inputOptions[name] against staticValue, staticDependency shapes
             const description = getInputTokenValue(description_);
             const tokenShape = getInputTokenShape(description_);
 
