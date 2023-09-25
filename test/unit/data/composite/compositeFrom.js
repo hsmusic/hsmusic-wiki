@@ -98,12 +98,20 @@ t.test(`compositeFrom: dependencies from inputs`, t => {
 
     compose: true,
 
-    inputs: {
-      foo: input('bar'),
-      pomelo: input.value('delicious'),
+    inputMapping: {
+      foo:      input('bar'),
+      pomelo:   input.value('delicious'),
       humorous: input.dependency('#mammal'),
-      data: input.dependency('albumData'),
-      ref: input.updateValue(),
+      data:     input.dependency('albumData'),
+      ref:      input.updateValue(),
+    },
+
+    inputDescriptions: {
+      foo:      input(),
+      pomelo:   input(),
+      humorous: input(),
+      data:     input(),
+      ref:      input(),
     },
 
     steps: [
@@ -233,11 +241,15 @@ t.test(`compositeFrom: update from various sources`, t => {
     t.plan(3);
 
     const composite = compositeFrom({
-      inputs: {
+      inputMapping: {
         myInput: input.updateValue({
           validate: isString,
           default: 'foo',
         }),
+      },
+
+      inputDescriptions: {
+        myInput: input(),
       },
 
       steps: [
@@ -275,5 +287,59 @@ t.test(`compositeFrom: update from various sources`, t => {
       continuationSymbol);
 
     t.equal(continuationValue, 'Xx_foofoo_xX');
+  });
+});
+
+t.test(`compositeFrom: dynamic input validation from type`, t => {
+  t.plan(2);
+
+  const composite = compositeFrom({
+    inputMapping: {
+      string:   input('string'),
+      number:   input('number'),
+      boolean:  input('boolean'),
+      function: input('function'),
+      object:   input('object'),
+      array:    input('array'),
+    },
+
+    inputDescriptions: {
+      string:   input({null: true, type: 'string'}),
+      number:   input({null: true, type: 'number'}),
+      boolean:  input({null: true, type: 'boolean'}),
+      function: input({null: true, type: 'function'}),
+      object:   input({null: true, type: 'object'}),
+      array:    input({null: true, type: 'array'}),
+    },
+
+    outputs: {'#result': '#result'},
+
+    steps: [
+      {compute: continuation => continuation({'#result': 'OK'})},
+    ],
+  });
+
+  const notCalledSymbol = Symbol('continuation not called');
+
+  let continuationValue;
+  const continuation = value => {
+    continuationValue = value;
+    return continuationSymbol;
+  };
+
+  let thrownError;
+
+  try {
+    continuationValue = notCalledSymbol;
+    thrownError = null;
+    composite.expose.compute(continuation, {
+      [input('string')]: 123,
+    });
+  } catch (error) {
+    thrownError = error;
+  }
+
+  t.equal(continuationValue, notCalledSymbol);
+  t.match(thrownError, {
   });
 });

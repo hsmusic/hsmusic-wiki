@@ -5,7 +5,6 @@ import {TupleMap} from '#wiki-data';
 
 import {
   is,
-  isArray,
   isString,
   isWholeNumber,
   validateArrayItems,
@@ -18,6 +17,7 @@ import {
   openAggregate,
   stitchArrays,
   unique,
+  withAggregate,
 } from '#sugar';
 
 // Composes multiple compositional "steps" and a "base" to form a property
@@ -443,13 +443,53 @@ function getStaticInputMetadata(inputOptions) {
   return metadata;
 }
 
-export function templateCompositeFrom(description) {
-  const compositeName =
+function getCompositionName(description) {
+  return (
     (description.annotation
       ? description.annotation
-      : `unnamed composite`);
+      : `unnamed composite`));
+}
 
-  const descriptionAggregate = openAggregate({message: `Errors in description for ${compositeName}`});
+function validateInputValue(value, description) {
+  const tokenValue = getInputTokenValue(description);
+
+  const {acceptsNull, defaultValue, type, validate} = tokenValue || {};
+
+  if (value === null || value === undefined) {
+    if (acceptsNull || defaultValue === null) {
+      return true;
+    } else {
+      throw new TypeError(
+        (type
+          ? `Expected ${type}, got ${value}`
+          : `Expected value, got ${value}`));
+    }
+  }
+
+  if (type) {
+    // Note: null is already handled earlier in this function, so it won't
+    // cause any trouble here.
+    const typeofValue =
+      (typeof value === 'object'
+        ? Array.isArray(value) ? 'array' : 'object'
+        : typeof value);
+
+    if (typeofValue !== type) {
+      throw new TypeError(`Expected ${type}, got ${typeofValue}`);
+    }
+  }
+
+  if (validate) {
+    validate(value);
+  }
+
+  return true;
+}
+
+export function templateCompositeFrom(description) {
+  const compositionName = getCompositionName(description);
+
+  const descriptionAggregate = openAggregate({message: `Errors in description for ${compositionName}`});
 
   if ('steps' in description) {
     if (Array.isArray(description.steps)) {
@@ -469,7 +509,7 @@ export function templateCompositeFrom(description) {
       break validateInputs;
     }
 
-    descriptionAggregate.nest({message: `Errors in input descriptions for ${compositeName}`}, ({push}) => {
+    descriptionAggregate.nest({message: `Errors in static input descriptions for ${compositionName}`}, ({push}) => {
       const missingCallsToInput = [];
       const wrongCallsToInput = [];
 
@@ -515,7 +555,7 @@ export function templateCompositeFrom(description) {
             throw new Error(`${value}: Expected "#" at start`);
           }
         }),
-        {message: `Errors in output descriptions for ${compositeName}`});
+        {message: `Errors in output descriptions for ${compositionName}`});
     }
   }
 
@@ -527,7 +567,7 @@ export function templateCompositeFrom(description) {
       : []);
 
   const instantiate = (inputOptions = {}) => {
-    const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositeName}`});
+    const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositionName}`});
 
     const providedInputNames = Object.keys(inputOptions);
 
@@ -543,7 +583,6 @@ export function templateCompositeFrom(description) {
           if (!inputDescription) return true;
           if ('defaultValue' in inputDescription) return false;
           if ('defaultDependency' in inputDescription) return false;
-          if (inputDescription.null === true) return false;
           return true;
         });
 
@@ -655,7 +694,7 @@ export function templateCompositeFrom(description) {
       symbol: templateCompositeFrom.symbol,
 
       outputs(providedOptions) {
-        const outputOptionsAggregate = openAggregate({message: `Errors in output options passed to ${compositeName}`});
+        const outputOptionsAggregate = openAggregate({message: `Errors in output options passed to ${compositionName}`});
 
         const misplacedOutputNames = [];
         const wrongTypeOutputNames = [];
@@ -718,28 +757,27 @@ export function templateCompositeFrom(description) {
         }
 
         if ('inputs' in description) {
-          const finalInputs = {};
+          const inputMapping = {};
 
-          for (const [name, description_] of Object.entries(description.inputs)) {
-            const description = getInputTokenValue(description_);
-            const tokenShape = getInputTokenShape(description_);
-
+          for (const [name, token] of Object.entries(description.inputs)) {
+            const tokenValue = getInputTokenValue(token);
             if (name in inputOptions) {
               if (typeof inputOptions[name] === 'string') {
-                finalInputs[name] = input.dependency(inputOptions[name]);
+                inputMapping[name] = input.dependency(inputOptions[name]);
               } else {
-                finalInputs[name] = inputOptions[name];
+                inputMapping[name] = inputOptions[name];
               }
-            } else if (description.defaultValue) {
-              finalInputs[name] = input.value(description.defaultValue);
-            } else if (description.defaultDependency) {
-              finalInputs[name] = input.dependency(description.defaultDependency);
+            } else if (tokenValue.defaultValue) {
+              inputMapping[name] = input.value(tokenValue.defaultValue);
+            } else if (tokenValue.defaultDependency) {
+              inputMapping[name] = input.dependency(tokenValue.defaultDependency);
             } else {
-              finalInputs[name] = input.value(null);
+              inputMapping[name] = input.value(null);
             }
           }
 
-          finalDescription.inputs = finalInputs;
+          finalDescription.inputMapping = inputMapping;
+          finalDescription.inputDescriptions = description.inputs;
         }
 
         if ('outputs' in description) {
@@ -768,7 +806,7 @@ export function templateCompositeFrom(description) {
 
         const finalDescription = {...ownDescription};
 
-        const aggregate = openAggregate({message: `Errors resolving ${compositeName}`});
+        const aggregate = openAggregate({message: `Errors resolving ${compositionName}`});
 
         const steps = ownDescription.steps();
 
@@ -804,6 +842,7 @@ export const noTransformSymbol = Symbol.for('compositeFrom: no-transform symbol'
 
 export function compositeFrom(description) {
   const {annotation} = description;
+  const compositionName = getCompositionName(description);
 
   const debug = fn => {
     if (compositeFrom.debug === true) {
@@ -835,7 +874,7 @@ export function compositeFrom(description) {
         ? compositeFrom(step.toResolvedComposition())
         : step));
 
-  const inputMetadata = getStaticInputMetadata(description.inputs ?? {});
+  const inputMetadata = getStaticInputMetadata(description.inputMapping ?? {});
 
   function _mapDependenciesToOutputs(providedDependencies) {
     if (!description.outputs) {
@@ -861,7 +900,7 @@ export function compositeFrom(description) {
   // nested inside, so input('name')-shaped tokens are going to be evaluated
   // in the context of the containing composition.
   const dependenciesFromInputs =
-    Object.values(description.inputs ?? {})
+    Object.values(description.inputMapping ?? {})
       .map(token => {
         const tokenShape = getInputTokenShape(token);
         const tokenValue = getInputTokenValue(token);
@@ -884,10 +923,41 @@ export function compositeFrom(description) {
       .filter(dependency => isInputToken(dependency))
       .some(token => getInputTokenShape(token) === 'input.updateValue');
 
+  const inputNames =
+    Object.keys(description.inputMapping ?? {});
+
+  const inputSymbols =
+    inputNames.map(name => input(name));
+
+  const inputsMayBeDynamicValue =
+    stitchArrays({
+      mappingToken: Object.values(description.inputMapping ?? {}),
+      descriptionToken: Object.values(description.inputDescriptions ?? {}),
+    }).map(({mappingToken, descriptionToken}) => {
+        if (getInputTokenShape(descriptionToken) === 'input.staticValue') return false;
+        if (getInputTokenShape(mappingToken) === 'input.value') return false;
+        return true;
+      });
+
+  const inputDescriptions =
+    Object.values(description.inputDescriptions ?? {});
+
+  /*
+  const inputsAcceptNull =
+    Object.values(description.inputDescriptions ?? {})
+      .map(token => {
+        const tokenValue = getInputTokenValue(token);
+        if (!tokenValue) return false;
+        if ('acceptsNull' in tokenValue) return tokenValue.acceptsNull;
+        if ('defaultValue' in tokenValue) return tokenValue.defaultValue === null;
+        return false;
+      });
+  */
+
   // Update descriptions passed as the value in an input.updateValue() token,
   // as provided as inputs for this composition.
   const inputUpdateDescriptions =
-    Object.values(description.inputs ?? {})
+    Object.values(description.inputMapping ?? {})
       .map(token =>
         (getInputTokenShape(token) === 'input.updateValue'
           ? getInputTokenValue(token)
@@ -903,7 +973,6 @@ export function compositeFrom(description) {
       (annotation ? ` (${annotation})` : ''),
   });
 
-  // TODO: Check description.compose ?? true instead.
   const compositionNests = description.compose ?? true;
 
   const exposeDependencies = new Set();
@@ -1141,30 +1210,44 @@ export function compositeFrom(description) {
     const availableDependencies = {...initialDependencies};
 
     const inputValues =
-      ('inputs' in description
-        ? Object.fromEntries(Object.entries(description.inputs)
-            .map(([name, token]) => {
-              const tokenShape = getInputTokenShape(token);
-              const tokenValue = getInputTokenValue(token);
-              switch (tokenShape) {
-                case 'input.dependency':
-                  return [input(name), initialDependencies[tokenValue]];
-                case 'input.value':
-                  return [input(name), tokenValue];
-                case 'input.updateValue':
-                  if (!expectingTransform) {
-                    throw new Error(`Unexpected input.updateValue() accessed on non-transform call`);
-                  }
-                  return [input(name), valueSoFar];
-                case 'input.myself':
-                  return [input(name), initialDependencies['this']];
-                case 'input':
-                  return [input(name), initialDependencies[token]];
-                default:
-                  throw new TypeError(`Unexpected input shape ${tokenShape}`);
-              }
-            }))
-        : {});
+      Object.values(description.inputMapping ?? {})
+        .map(token => {
+          const tokenShape = getInputTokenShape(token);
+          const tokenValue = getInputTokenValue(token);
+          switch (tokenShape) {
+            case 'input.dependency':
+              return initialDependencies[tokenValue];
+            case 'input.value':
+              return tokenValue;
+            case 'input.updateValue':
+              if (!expectingTransform)
+                throw new Error(`Unexpected input.updateValue() accessed on non-transform call`);
+              return valueSoFar;
+            case 'input.myself':
+              return initialDependencies['this'];
+            case 'input':
+              return initialDependencies[token];
+            default:
+              throw new TypeError(`Unexpected input shape ${tokenShape}`);
+          }
+        });
+
+    withAggregate({message: `Errors in dynamic input values provided to ${compositionName}`}, ({push}) => {
+      for (const {dynamic, name, value, description} of stitchArrays({
+        dynamic: inputsMayBeDynamicValue,
+        name: inputNames,
+        value: inputValues,
+        description: inputDescriptions,
+      })) {
+        if (!dynamic) continue;
+        try {
+          validateInputValue(value, description);
+        } catch (error) {
+          error.message = `${name}: ${error.message}`;
+          throw error;
+        }
+      }
+    });
 
     if (expectingTransform) {
       debug(() => [colors.bright(`begin composition - transforming from:`), initialValue]);
@@ -1220,10 +1303,15 @@ export function compositeFrom(description) {
 
       let continuationStorage;
 
+      const inputDictionary =
+        Object.fromEntries(
+          stitchArrays({symbol: inputSymbols, value: inputValues})
+            .map(({symbol, value}) => [symbol, value]));
+
       const filterableDependencies = {
         ...availableDependencies,
         ...inputMetadata,
-        ...inputValues,
+        ...inputDictionary,
         ...
           (expectingTransform
             ? {[input.updateValue()]: valueSoFar}
@@ -1568,7 +1656,7 @@ export const exposeDependency = templateCompositeFrom({
   compose: false,
 
   inputs: {
-    dependency: input.staticDependency(),
+    dependency: input.staticDependency({acceptsNull: true}),
   },
 
   steps: () => [
@@ -1618,17 +1706,17 @@ export const exposeConstant = templateCompositeFrom({
 //            for values like zero and the empty string!
 //
 
-const availabilityCheckModeInput = {
+const inputAvailabilityCheckMode = () => input({
   validate: is('null', 'empty', 'falsy'),
   defaultValue: 'null',
-};
+});
 
 export const withResultOfAvailabilityCheck = templateCompositeFrom({
   annotation: `withResultOfAvailabilityCheck`,
 
   inputs: {
-    from: input(),
-    mode: input(availabilityCheckModeInput),
+    from: input({acceptsNull: true}),
+    mode: inputAvailabilityCheckMode(),
   },
 
   outputs: ['#availability'],
@@ -1669,8 +1757,8 @@ export const exposeDependencyOrContinue = templateCompositeFrom({
   annotation: `exposeDependencyOrContinue`,
 
   inputs: {
-    dependency: input(),
-    mode: input(availabilityCheckModeInput),
+    dependency: input({acceptsNull: true}),
+    mode: inputAvailabilityCheckMode(),
   },
 
   steps: () => [
@@ -1700,8 +1788,12 @@ export const exposeUpdateValueOrContinue = templateCompositeFrom({
   annotation: `exposeUpdateValueOrContinue`,
 
   inputs: {
-    mode: input(availabilityCheckModeInput),
-    validate: input({type: 'function', null: true}),
+    mode: inputAvailabilityCheckMode(),
+
+    validate: input({
+      type: 'function',
+      defaultValue: null,
+    }),
   },
 
   update: ({
@@ -1725,9 +1817,9 @@ export const exitWithoutDependency = templateCompositeFrom({
   annotation: `exitWithoutDependency`,
 
   inputs: {
-    dependency: input(),
-    mode: input(availabilityCheckModeInput),
-    value: input({null: true}),
+    dependency: input({acceptsNull: true}),
+    mode: inputAvailabilityCheckMode(),
+    value: input({defaultValue: null}),
   },
 
   steps: () => [
@@ -1755,7 +1847,7 @@ export const exitWithoutUpdateValue = templateCompositeFrom({
   annotation: `exitWithoutUpdateValue`,
 
   inputs: {
-    mode: input(availabilityCheckModeInput),
+    mode: inputAvailabilityCheckMode(),
     value: input({defaultValue: null}),
   },
 
@@ -1763,6 +1855,7 @@ export const exitWithoutUpdateValue = templateCompositeFrom({
     exitWithoutDependency({
       dependency: input.updateValue(),
       mode: input('mode'),
+      value: input('value'),
     }),
   ],
 });
@@ -1773,8 +1866,8 @@ export const raiseOutputWithoutDependency = templateCompositeFrom({
   annotation: `raiseOutputWithoutDependency`,
 
   inputs: {
-    dependency: input(),
-    mode: input(availabilityCheckModeInput),
+    dependency: input({acceptsNull: true}),
+    mode: inputAvailabilityCheckMode(),
     output: input.staticValue({defaultValue: {}}),
   },
 
@@ -1807,7 +1900,7 @@ export const raiseOutputWithoutUpdateValue = templateCompositeFrom({
   annotation: `raiseOutputWithoutUpdateValue`,
 
   inputs: {
-    mode: input(availabilityCheckModeInput),
+    mode: inputAvailabilityCheckMode(),
     output: input.staticValue({defaultValue: {}}),
   },
 
@@ -1841,7 +1934,7 @@ export const withPropertyFromObject = templateCompositeFrom({
   annotation: `withPropertyFromObject`,
 
   inputs: {
-    object: input({type: 'object', null: true}),
+    object: input({type: 'object', acceptsNull: true}),
     property: input({type: 'string'}),
   },
 
@@ -1907,19 +2000,13 @@ export const withPropertiesFromObject = templateCompositeFrom({
   annotation: `withPropertiesFromObject`,
 
   inputs: {
-    object: input({
-      type: 'object',
-      null: true,
-    }),
+    object: input({type: 'object', acceptsNull: true}),
 
     properties: input({
       validate: validateArrayItems(isString),
     }),
 
-    prefix: input.staticValue({
-      type: 'string',
-      null: true,
-    }),
+    prefix: input.staticValue({type: 'string', defaultValue: null}),
   },
 
   outputs: ({
@@ -2036,10 +2123,7 @@ export const withPropertiesFromList = templateCompositeFrom({
       validate: validateArrayItems(isString),
     }),
 
-    prefix: input.staticValue({
-      type: 'string',
-      null: true,
-    }),
+    prefix: input.staticValue({type: 'string', defaultValue: null}),
   },
 
   outputs: ({
@@ -2109,7 +2193,7 @@ export const fillMissingListItems = templateCompositeFrom({
 
   inputs: {
     list: input({type: 'array'}),
-    fill: input(),
+    fill: input({acceptsNull: true}),
   },
 
   outputs: ({
@@ -2150,8 +2234,8 @@ export const excludeFromList = templateCompositeFrom({
   inputs: {
     list: input(),
 
-    item: input({null: true}),
-    items: input({validate: isArray, null: true}),
+    item: input({defaultValue: null}),
+    items: input({type: 'array', defaultValue: null}),
   },
 
   outputs: ({

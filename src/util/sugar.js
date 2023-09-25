@@ -599,12 +599,7 @@ export function showAggregate(topError, {
     return [headerPart, causePart, aggregatePart].filter(Boolean).join('\n');
   };
 
-  const message =
-    (topError instanceof AggregateError
-      ? recursive(topError, {level: 0})
-      : (showTraces
-          ? topError.stack
-          : topError.toString()));
+  const message = recursive(topError, {level: 0});
 
   if (print) {
     console.error(message);

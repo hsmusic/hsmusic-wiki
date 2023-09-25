@@ -103,7 +103,7 @@ t.test(`withResultOfAvailabilityCheck: default mode`, t => {
   });
 
   t.match(template.toDescription(), {
-    inputs: {
+    inputMapping: {
       from: input.dependency('foo'),
       mode: input.value('null'),
     },

@@ -25,8 +25,8 @@ import {
 import {
   isAdditionalFileList,
   isBoolean,
-  isCommentary,
   isColor,
+  isCommentary,
   isContributionList,
   isDate,
   isDimensions,
@@ -41,12 +41,13 @@ import {
   validateInstanceOf,
   validateReference,
   validateReferenceList,
+  validateWikiData,
 } from '#validators';
 
 import CacheableObject from './cacheable-object.js';
 
 export default class Thing extends CacheableObject {
-  static referenceType = Symbol('Thing.referenceType');
+  static referenceType = Symbol.for('Thing.referenceType');
 
   static getPropertyDescriptors = Symbol('Thing.getPropertyDescriptors');
   static getSerializeDescriptors = Symbol('Thing.getSerializeDescriptors');
@@ -283,10 +284,8 @@ export const referenceList = templateCompositeFrom({
   inputs: {
     class: input.staticValue(thingClassInput),
 
+    data: inputWikiData({allowMixedTypes: false}),
     find: input({type: 'function'}),
-
-    // todo: validate
-    data: input(),
   },
 
   update: ({
@@ -316,9 +315,7 @@ export const singleReference = templateCompositeFrom({
   inputs: {
     class: input(thingClassInput),
     find: input({type: 'function'}),
-
-    // todo: validate
-    data: input(),
+    data: inputWikiData({allowMixedTypes: false}),
   },
 
   update: ({
@@ -347,7 +344,10 @@ export const contribsPresent = templateCompositeFrom({
   compose: false,
 
   inputs: {
-    contribs: input({type: 'string'}),
+    contribs: input.staticDependency({
+      validate: isContributionList,
+      acceptsNull: true,
+    }),
   },
 
   steps: () => [
@@ -371,9 +371,7 @@ export const reverseReferenceList = templateCompositeFrom({
   compose: false,
 
   inputs: {
-    // todo: validate
-    data: input(),
-
+    data: inputWikiData({allowMixedTypes: false}),
     list: input({type: 'string'}),
   },
 
@@ -448,6 +446,21 @@ export const commentatorArtists = templateCompositeFrom({
 
 // Compositional utilities
 
+// TODO: This doesn't access a class's own ThingSubclass[Thing.referenceType]
+// value because classes aren't initialized by when templateCompositeFrom gets
+// called (see: circular imports). So the reference types have to be hard-coded,
+// which somewhat defeats the point of storing them on the class in the first
+// place...
+export function inputWikiData({
+  referenceType = '',
+  allowMixedTypes = false,
+} = {}) {
+  return input({
+    validate: validateWikiData(referenceType),
+    acceptsNull: true,
+  });
+}
+
 // Resolves the contribsByRef contained in the provided dependency,
 // providing (named by the second argument) the result. "Resolving"
 // means mapping the "who" reference of each contribution to an artist
@@ -456,8 +469,10 @@ export const withResolvedContribs = templateCompositeFrom({
   annotation: `withResolvedContribs`,
 
   inputs: {
-    // todo: validate
-    from: input(),
+    from: input({
+      validate: isContributionList,
+      acceptsNull: true,
+    }),
 
     notFoundMode: input({
       validate: is('exit', 'filter', 'null'),
@@ -514,10 +529,12 @@ export const exitWithoutContribs = templateCompositeFrom({
   annotation: `exitWithoutContribs`,
 
   inputs: {
-    // todo: validate
-    contribs: input(),
+    contribs: input({
+      validate: isContributionList,
+      acceptsNull: true,
+    }),
 
-    value: input({null: true}),
+    value: input({defaultValue: null}),
   },
 
   steps: () => [
@@ -553,12 +570,9 @@ export const withResolvedReference = templateCompositeFrom({
   annotation: `withResolvedReference`,
 
   inputs: {
-    // todo: validate
-    ref: input(),
+    ref: input({type: 'string', acceptsNull: true}),
 
-    // todo: validate
-    data: input(),
-
+    data: inputWikiData({allowMixedTypes: false}),
     find: input({type: 'function'}),
 
     notFoundMode: input({
@@ -618,12 +632,12 @@ export const withResolvedReferenceList = templateCompositeFrom({
   annotation: `withResolvedReferenceList`,
 
   inputs: {
-    // todo: validate
-    list: input(),
+    list: input({
+      validate: validateArrayItems(isString),
+      acceptsNull: true,
+    }),
 
-    // todo: validate
-    data: input(),
-
+    data: inputWikiData({allowMixedTypes: false}),
     find: input({type: 'function'}),
 
     notFoundMode: input({
@@ -706,9 +720,7 @@ export const withReverseReferenceList = templateCompositeFrom({
   annotation: `withReverseReferenceList`,
 
   inputs: {
-    // todo: validate
-    data: input(),
-
+    data: inputWikiData({allowMixedTypes: false}),
     list: input({type: 'string'}),
   },
 

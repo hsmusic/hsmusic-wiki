@@ -1,7 +1,7 @@
 import {inspect as nodeInspect} from 'node:util';
 
 import {colors, ENABLE_COLOR} from '#cli';
-import {withAggregate} from '#sugar';
+import {empty, withAggregate} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -402,6 +402,62 @@ export function validateReference(type = 'track') {
 
 export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
+}
+
+export function validateWikiData({
+  referenceType = '',
+  allowMixedTypes = false,
+}) {
+  if (referenceType && allowMixedTypes) {
+    throw new TypeError(`Don't specify both referenceType and allowMixedTypes`);
+  }
+
+  const isArrayOfObjects = validateArrayItems(isObject);
+
+  return (array) => {
+    isArrayOfObjects(array);
+
+    if (empty(array)) {
+      return true;
+    }
+
+    const allRefTypes =
+      new Set(array.map(object =>
+        object.constructor[Symbol.for('Thing.referenceType')]));
+
+    if (allRefTypes.has(undefined)) {
+      if (allRefTypes.size === 1) {
+        throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
+      } else {
+        throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+      }
+    }
+
+    if (allRefTypes.size > 1) {
+      if (allowMixedTypes) {
+        return true;
+      }
+
+      const types = () => Array.from(allRefTypes).join(', ');
+
+      if (referenceType) {
+        if (allRefTypes.has(referenceType)) {
+          allRefTypes.remove(referenceType);
+          throw new TypeError(`Expected array of only ${referenceType}, also got other types: ${types()}`)
+        } else {
+          throw new TypeError(`Expected array of only ${referenceType}, got other types: ${types()}`);
+        }
+      }
+
+      throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
+    }
+
+    if (referenceType && !allRefTypes.has(referenceType)) {
+      throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
+    }
+
+    return true;
+  };
 }
 
 // Compositional utilities

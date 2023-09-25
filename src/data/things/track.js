@@ -18,12 +18,13 @@ import {
 } from '#composite';
 
 import {
+  is,
   isBoolean,
   isColor,
   isContributionList,
   isDate,
   isFileExtension,
-  oneOf,
+  validateWikiData,
 } from '#validators';
 
 import CacheableObject from './cacheable-object.js';
@@ -434,7 +435,7 @@ export const withAlbum = templateCompositeFrom({
 
   inputs: {
     notFoundMode: input({
-      validate: oneOf('exit', 'null'),
+      validate: is('exit', 'null'),
       defaultValue: 'null',
     }),
   },
@@ -488,7 +489,7 @@ export const withPropertyFromAlbum = templateCompositeFrom({
     property: input.staticValue({type: 'string'}),
 
     notFoundMode: input({
-      validate: oneOf('exit', 'null'),
+      validate: is('exit', 'null'),
       defaultValue: 'null',
     }),
   },
@@ -527,7 +528,7 @@ export const withContainingTrackSection = templateCompositeFrom({
 
   inputs: {
     notFoundMode: input({
-      validate: oneOf('exit', 'null'),
+      validate: is('exit', 'null'),
       defaultValue: 'null',
     }),
   },
@@ -589,8 +590,10 @@ export const withOriginalRelease = templateCompositeFrom({
   inputs: {
     selfIfOriginal: input({type: 'boolean', defaultValue: false}),
 
-    // todo: validate
-    data: input({defaultDependency: 'trackData'}),
+    data: input({
+      validate: validateWikiData({referenceType: 'track'}),
+      defaultDependency: 'trackData',
+    }),
   },
 
   outputs: ['#originalRelease'],
@@ -683,7 +686,7 @@ export const exitWithoutUniqueCoverArt = templateCompositeFrom({
   annotation: `exitWithoutUniqueCoverArt`,
 
   inputs: {
-    value: input({null: true}),
+    value: input({defaultValue: null}),
   },
 
   steps: () => [
