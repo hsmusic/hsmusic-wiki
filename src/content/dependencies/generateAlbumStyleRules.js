@@ -64,8 +64,9 @@ export default {
       ]);
 
     return (
-      [...wallpaperRule, ...bannerRule, ...dataRule]
+      [wallpaperRule, bannerRule, dataRule]
         .filter(Boolean)
+        .flat()
         .join('\n'));
   },
 };
