@@ -576,7 +576,7 @@ export function templateCompositeFrom(description) {
         expectedInputNames
           .filter(name => !providedInputNames.includes(name))
           .filter(name => {
-            const inputDescription = description.inputs[name].value;
+            const inputDescription = getInputTokenValue(description.inputs[name]);
             if (!inputDescription) return true;
             if ('defaultValue' in inputDescription) return false;
             if ('defaultDependency' in inputDescription) return false;
@@ -587,6 +587,7 @@ export function templateCompositeFrom(description) {
 
       const expectedStaticValueInputNames = [];
       const expectedStaticDependencyInputNames = [];
+      const expectedValueProvidingTokenInputNames = [];
 
       const validateFailedErrors = [];
 
@@ -605,18 +606,33 @@ export function templateCompositeFrom(description) {
         const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
         const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
 
-        if (descriptionShape === 'input.staticValue') {
-          if (tokenShape !== 'input.value') {
-            expectedStaticValueInputNames.push(name);
-            continue;
-          }
-        }
+        switch (descriptionShape) {
+          case'input.staticValue':
+            if (tokenShape !== 'input.value') {
+              expectedStaticValueInputNames.push(name);
+              continue;
+            }
+            break;
 
-        if (descriptionShape === 'input.staticDependency') {
-          if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
-            expectedStaticDependencyInputNames.push(name);
-            continue;
-          }
+          case 'input.staticDependency':
+            if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
+              expectedStaticDependencyInputNames.push(name);
+              continue;
+            }
+            break;
+
+          case 'input':
+            if (typeof value !== 'string' && ![
+              'input',
+              'input.value',
+              'input.dependency',
+              'input.myself',
+              'input.updateValue',
+            ].includes(tokenShape)) {
+              expectedValueProvidingTokenInputNames.push(name);
+              continue;
+            }
+            break;
         }
 
         if (tokenShape === 'input.value') {
@@ -643,6 +659,15 @@ export function templateCompositeFrom(description) {
 
       if (!empty(expectedStaticValueInputNames)) {
         push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
+      }
+
+      for (const name of expectedValueProvidingTokenInputNames) {
+        const shapeOrType =
+          (isInputToken(inputOptions[name])
+            ? getInputTokenShape(inputOptions[name])
+            : typeof inputOptions[name]);
+
+        push(new Error(`${name}: Expected dependency name or value-providing input() call, got ${shapeOrType}`));
       }
 
       for (const name of wrongTypeInputNames) {
