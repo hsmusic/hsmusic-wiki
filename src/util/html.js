@@ -2,7 +2,7 @@
 
 import {inspect} from 'node:util';
 
-import {empty} from '#sugar';
+import {empty, typeAppearance} from '#sugar';
 import * as commonValidators from '#validators';
 
 // COMPREHENSIVE!
@@ -633,7 +633,7 @@ export class Template {
 
   static validateDescription(description) {
     if (typeof description !== 'object') {
-      throw new TypeError(`Expected object, got ${typeof description}`);
+      throw new TypeError(`Expected object, got ${typeAppearance(description)}`);
     }
 
     if (description === null) {

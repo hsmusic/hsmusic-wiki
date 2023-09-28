@@ -395,7 +395,7 @@ function isInputToken(token) {
 
 function getInputTokenShape(token) {
   if (!isInputToken(token)) {
-    throw new TypeError(`Expected an input token, got ${token}`);
+    throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }
 
   if (typeof token === 'object') {
@@ -407,7 +407,7 @@ function getInputTokenShape(token) {
 
 function getInputTokenValue(token) {
   if (!isInputToken(token)) {
-    throw new TypeError(`Expected an input token, got ${token}`);
+    throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }
 
   if (typeof token === 'object') {
@@ -464,8 +464,8 @@ function validateInputValue(value, description) {
     } else {
       throw new TypeError(
         (type
-          ? `Expected ${type}, got ${value}`
-          : `Expected value, got ${value}`));
+          ? `Expected ${type}, got ${typeAppearance(value)}`
+          : `Expected value, got ${typeAppearance(value)}`));
     }
   }
 
@@ -478,7 +478,7 @@ function validateInputValue(value, description) {
         : typeof value);
 
     if (typeofValue !== type) {
-      throw new TypeError(`Expected ${type}, got ${typeofValue}`);
+      throw new TypeError(`Expected ${type}, got ${typeAppearance(value)}`);
     }
   }
 
@@ -503,11 +503,11 @@ export function templateCompositeFrom(description) {
 
     validateInputs:
     if ('inputs' in description) {
-      if (Array.isArray(description.inputs)) {
-        push(new Error(`Expected inputs to be object, got array`));
-        break validateInputs;
-      } else if (typeof description.inputs !== 'object') {
-        push(new Error(`Expected inputs to be object, got ${typeof description.inputs}`));
+      if (
+        Array.isArray(description.inputs) ||
+        typeof description.inputs !== 'object'
+      ) {
+        push(new Error(`Expected inputs to be object, got ${typeAppearance(description.inputs)}`));
         break validateInputs;
       }
 
@@ -543,7 +543,7 @@ export function templateCompositeFrom(description) {
         !Array.isArray(description.outputs) &&
         typeof description.outputs !== 'function'
       ) {
-        push(new Error(`Expected outputs to be array or function, got ${typeof description.outputs}`));
+        push(new Error(`Expected outputs to be array or function, got ${typeAppearance(description.outputs)}`));
         break validateOutputs;
       }
 
@@ -552,7 +552,7 @@ export function templateCompositeFrom(description) {
           description.outputs,
           decorateErrorWithIndex(value => {
             if (typeof value !== 'string') {
-              throw new Error(`${value}: Expected string, got ${typeof value}`)
+              throw new Error(`${value}: Expected string, got ${typeAppearance(value)}`)
             } else if (!value.startsWith('#')) {
               throw new Error(`${value}: Expected "#" at start`);
             }
@@ -733,8 +733,8 @@ export function templateCompositeFrom(description) {
           }
 
           for (const name of wrongTypeOutputNames) {
-            const type = typeof providedOptions[name];
-            push(new Error(`${name}: Expected string, got ${type}`));
+            const appearance = typeAppearance(providedOptions[name]);
+            push(new Error(`${name}: Expected string, got ${appearance}`));
           }
         });
 
@@ -865,7 +865,7 @@ export function compositeFrom(description) {
 
   if (!Array.isArray(description.steps)) {
     throw new TypeError(
-      `Expected steps to be array, got ${typeof description.steps}` +
+      `Expected steps to be array, got ${typeAppearance(description.steps)}` +
       (annotation ? ` (${annotation})` : ''));
   }
 

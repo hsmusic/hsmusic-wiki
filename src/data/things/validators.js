@@ -1,7 +1,7 @@
 import {inspect as nodeInspect} from 'node:util';
 
 import {colors, ENABLE_COLOR} from '#cli';
-import {empty, withAggregate} from '#sugar';
+import {empty, typeAppearance, withAggregate} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -15,7 +15,7 @@ export function a(noun) {
 
 export function isType(value, type) {
   if (typeof value !== type)
-    throw new TypeError(`Expected ${a(type)}, got ${typeof value}`);
+    throw new TypeError(`Expected ${a(type)}, got ${typeAppearance(value)}`);
 
   return true;
 }
@@ -132,7 +132,7 @@ export function isObject(value) {
 
 export function isArray(value) {
   if (typeof value !== 'object' || value === null || !Array.isArray(value))
-    throw new TypeError(`Expected an array, got ${value}`);
+    throw new TypeError(`Expected an array, got ${typeAppearance(value)}`);
 
   return true;
 }

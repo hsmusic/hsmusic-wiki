@@ -82,7 +82,7 @@ export function stitchArrays(keyToArray) {
   for (const [key, value] of Object.entries(keyToArray)) {
     if (value === null) continue;
     if (Array.isArray(value)) continue;
-    errors.push(new TypeError(`(${key}) Expected array or null, got ${value}`));
+    errors.push(new TypeError(`(${key}) Expected array or null, got ${typeAppearance(value)}`));
   }
 
   if (!empty(errors)) {
@@ -170,11 +170,11 @@ export function setIntersection(set1, set2) {
 
 export function filterProperties(object, properties) {
   if (typeof object !== 'object' || object === null) {
-    throw new TypeError(`Expected object to be an object, got ${object}`);
+    throw new TypeError(`Expected object to be an object, got ${typeAppearance(object)}`);
   }
 
   if (!Array.isArray(properties)) {
-    throw new TypeError(`Expected properties to be an array, got ${properties}`);
+    throw new TypeError(`Expected properties to be an array, got ${typeAppearance(properties)}`);
   }
 
   const filteredObject = {};
