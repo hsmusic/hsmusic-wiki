@@ -230,6 +230,16 @@ export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+// Gets the "look" of some arbitrary value. It's like typeof, but smarter.
+// Don't use this for actually validating types - it's only suitable for
+// inclusion in error messages.
+export function typeAppearance(value) {
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  if (Array.isArray(value)) return 'array';
+  return typeof value;
+}
+
 // Binds default values for arguments in a {key: value} type function argument
 // (typically the second argument, but may be overridden by providing a
 // [bindOpts.bindIndex] argument). Typically useful for preparing a function for

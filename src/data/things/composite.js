@@ -16,6 +16,7 @@ import {
   filterProperties,
   openAggregate,
   stitchArrays,
+  typeAppearance,
   unique,
   withAggregate,
 } from '#sugar';
@@ -381,7 +382,9 @@ input.staticDependency = _valueIntoToken('input.staticDependency');
 input.staticValue = _valueIntoToken('input.staticValue');
 
 function isInputToken(token) {
-  if (typeof token === 'object') {
+  if (token === null) {
+    return false;
+  } else if (typeof token === 'object') {
     return token.symbol === Symbol.for('hsmusic.composite.input');
   } else if (typeof token === 'symbol') {
     return token.description.startsWith('hsmusic.composite.input');
@@ -653,26 +656,29 @@ export function templateCompositeFrom(description) {
         push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
       }
 
-      if (!empty(expectedStaticDependencyInputNames)) {
-        push(new Error(`Expected static dependencies: ${expectedStaticDependencyInputNames.join(', ')}`));
+      const inputAppearance = name =>
+        (isInputToken(inputOptions[name])
+          ? `${getInputTokenShape(inputOptions[name])}() call`
+          : `dependency name`);
+
+      for (const name of expectedStaticDependencyInputNames) {
+        const appearance = inputAppearance(name);
+        push(new Error(`${name}: Expected dependency name, got ${appearance}`));
       }
 
-      if (!empty(expectedStaticValueInputNames)) {
-        push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
+      for (const name of expectedStaticValueInputNames) {
+        const appearance = inputAppearance(name)
+        push(new Error(`${name}: Expected input.value() call, got ${appearance}`));
       }
 
       for (const name of expectedValueProvidingTokenInputNames) {
-        const shapeOrType =
-          (isInputToken(inputOptions[name])
-            ? getInputTokenShape(inputOptions[name])
-            : typeof inputOptions[name]);
-
-        push(new Error(`${name}: Expected dependency name or value-providing input() call, got ${shapeOrType}`));
+        const appearance = getInputTokenShape(inputOptions[name]);
+        push(new Error(`${name}: Expected dependency name or value-providing input() call, got ${appearance}`));
       }
 
       for (const name of wrongTypeInputNames) {
-        const type = typeof inputOptions[name];
-        push(new Error(`${name}: Expected string or input() call, got ${type}`));
+        const type = typeAppearance(inputOptions[name]);
+        push(new Error(`${name}: Expected dependency name or input() call, got ${type}`));
       }
 
       for (const error of validateFailedErrors) {
