@@ -588,7 +588,6 @@ export function templateCompositeFrom(description) {
       const expectedStaticValueInputNames = [];
       const expectedStaticDependencyInputNames = [];
 
-      const validateFailedInputNames = [];
       const validateFailedErrors = [];
 
       for (const [name, value] of Object.entries(inputOptions)) {
@@ -602,7 +601,6 @@ export function templateCompositeFrom(description) {
         }
 
         const descriptionShape = getInputTokenShape(description.inputs[name]);
-        const descriptionValue = getInputTokenValue(description.inputs[name]);
 
         const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
         const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
@@ -621,14 +619,12 @@ export function templateCompositeFrom(description) {
           }
         }
 
-        if (descriptionValue && 'validate' in descriptionValue) {
-          if (tokenShape === 'input.value') {
-            try {
-              descriptionValue.validate(tokenValue);
-            } catch (error) {
-              validateFailedInputNames.push(name);
-              validateFailedErrors.push(error);
-            }
+        if (tokenShape === 'input.value') {
+          try {
+            validateInputValue(tokenValue, description.inputs[name]);
+          } catch (error) {
+            error.message = `${name}: ${error.message}`;
+            validateFailedErrors.push(error);
           }
         }
       }
@@ -649,18 +645,13 @@ export function templateCompositeFrom(description) {
         push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
       }
 
-      for (const {name, validationError} of stitchArrays({
-        name: validateFailedInputNames,
-        validationError: validateFailedErrors,
-      })) {
-        const error = new Error(`${name}: Validation failed for static value`);
-        error.cause = validationError;
-        push(error);
-      }
-
       for (const name of wrongTypeInputNames) {
         const type = typeof inputOptions[name];
         push(new Error(`${name}: Expected string or input() call, got ${type}`));
+      }
+
+      for (const error of validateFailedErrors) {
+        push(error);
       }
     });
 
@@ -1211,7 +1202,7 @@ export function compositeFrom(description) {
           }
         });
 
-    withAggregate({message: `Errors in dynamic input values provided to ${compositionName}`}, ({push}) => {
+    withAggregate({message: `Errors in input values provided to ${compositionName}`}, ({push}) => {
       for (const {dynamic, name, value, description} of stitchArrays({
         dynamic: inputsMayBeDynamicValue,
         name: inputNames,
@@ -1223,7 +1214,7 @@ export function compositeFrom(description) {
           validateInputValue(value, description);
         } catch (error) {
           error.message = `${name}: ${error.message}`;
-          throw error;
+          push(error);
         }
       }
     });
