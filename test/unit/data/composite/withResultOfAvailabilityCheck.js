@@ -110,8 +110,8 @@ t.test(`withResultOfAvailabilityCheck: default mode`, t => {
   });
 });
 
-t.test(`withResultOfAvailabilityCheck: validate inputs`, t => {
-  t.plan(4);
+t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
+  t.plan(5);
 
   let caughtError;
 
@@ -134,7 +134,7 @@ t.test(`withResultOfAvailabilityCheck: validate inputs`, t => {
 
   t.doesNotThrow(() =>
     withResultOfAvailabilityCheck({
-      from: input.value('static'),
+      from: input.value('some static value'),
       mode: input.value('null'),
     }));
 
@@ -149,11 +149,78 @@ t.test(`withResultOfAvailabilityCheck: validate inputs`, t => {
   }
 
   t.match(caughtError, {
+    message: /Errors in input options passed to withResultOfAvailabilityCheck/,
     errors: [
-      {
-        message: /mode: Validation failed for static value/,
-        cause: /Expected one of null empty falsy, got invalid/,
-      },
+      /mode: Expected one of null empty falsy, got invalid/,
     ],
+  });
+
+  try {
+    caughtError = null;
+    withResultOfAvailabilityCheck({
+      from: input.value(null),
+      mode: input.value(null),
+    });
+  } catch (error) {
+    caughtError = error;
+  }
+
+  t.match(caughtError, {
+    message: /Errors in input options passed to withResultOfAvailabilityCheck/,
+    errors: [
+      /mode: Expected value, got null/,
+    ],
+  });
+});
+
+t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
+  t.plan(2);
+
+  let caughtError;
+
+  try {
+    caughtError = null;
+    composite.expose.compute({
+      from: 'apple',
+      mode: 'banana',
+    });
+  } catch (error) {
+    caughtError = error;
+  }
+
+  t.match(caughtError, {
+    message: /Error computing composition/,
+    cause: {
+      message: /Error computing composition withResultOfAvailabilityCheck/,
+      cause: {
+        message: /Errors in input values provided to withResultOfAvailabilityCheck/,
+        errors: [
+          /mode: Expected one of null empty falsy, got banana/,
+        ],
+      },
+    },
+  });
+
+  try {
+    caughtError = null;
+    composite.expose.compute({
+      from: null,
+      mode: null,
+    });
+  } catch (error) {
+    caughtError = error;
+  }
+
+  t.match(caughtError, {
+    message: /Error computing composition/,
+    cause: {
+      message: /Error computing composition withResultOfAvailabilityCheck/,
+      cause: {
+        message: /Errors in input values provided to withResultOfAvailabilityCheck/,
+        errors: [
+          /mode: Expected value, got null/,
+        ],
+      },
+    },
   });
 });

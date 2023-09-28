@@ -32,29 +32,21 @@ t.test(`exposeConstant: basic behavior`, t => {
 t.test(`exposeConstant: validate inputs`, t => {
   t.plan(2);
 
-  let caughtError;
-
-  try {
-    caughtError = null;
-    exposeConstant({});
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    errors: [/Required these inputs: value/],
-  });
-
-  try {
-    caughtError = null;
-    exposeConstant({
-      value: 'some dependency',
+  t.throws(
+    () => exposeConstant({}),
+    {
+      message: `Errors in input options passed to exposeConstant`,
+      errors: [
+        {message: `Required these inputs: value`},
+      ],
     });
-  } catch (error) {
-    caughtError = error;
-  }
 
-  t.match(caughtError, {
-    errors: [/Expected static values: value/],
-  });
+  t.throws(
+    () => exposeConstant({value: 'some dependency'}),
+    {
+      message: `Errors in input options passed to exposeConstant`,
+      errors: [
+        {message: `value: Expected input.value() call, got dependency name`},
+      ],
+    });
 });

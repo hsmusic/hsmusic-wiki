@@ -52,29 +52,23 @@ t.test(`exposeDependency: basic behavior`, t => {
 t.test(`exposeDependency: validate inputs`, t => {
   t.plan(2);
 
-  let caughtError;
-
-  try {
-    caughtError = null;
-    exposeDependency({});
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    errors: [/Required these inputs: dependency/],
-  });
-
-  try {
-    caughtError = null;
-    exposeDependency({
-      dependency: input.value('some static value'),
+  t.throws(
+    () => exposeDependency({}),
+    {
+      message: `Errors in input options passed to exposeDependency`,
+      errors: [
+        {message: `Required these inputs: dependency`},
+      ],
     });
-  } catch (error) {
-    caughtError = error;
-  }
 
-  t.match(caughtError, {
-    errors: [/Expected static dependencies: dependency/],
-  });
+  t.throws(
+    () => exposeDependency({
+      dependency: input.value('some static value'),
+    }),
+    {
+      message: `Errors in input options passed to exposeDependency`,
+      errors: [
+        {message: `dependency: Expected dependency name, got input.value() call`},
+      ],
+    });
 });
