@@ -489,77 +489,75 @@ function validateInputValue(value, description) {
 export function templateCompositeFrom(description) {
   const compositionName = getCompositionName(description);
 
-  const descriptionAggregate = openAggregate({message: `Errors in description for ${compositionName}`});
-
-  if ('steps' in description) {
-    if (Array.isArray(description.steps)) {
-      descriptionAggregate.push(new TypeError(`Wrap steps array in a function`));
-    } else if (typeof description.steps !== 'function') {
-      descriptionAggregate.push(new TypeError(`Expected steps to be a function (returning an array)`));
-    }
-  }
-
-  validateInputs:
-  if ('inputs' in description) {
-    if (Array.isArray(description.inputs)) {
-      descriptionAggregate.push(new Error(`Expected inputs to be object, got array`));
-      break validateInputs;
-    } else if (typeof description.inputs !== 'object') {
-      descriptionAggregate.push(new Error(`Expected inputs to be object, got ${typeof description.inputs}`));
-      break validateInputs;
+  withAggregate({message: `Errors in description for ${compositionName}`}, ({map, nest, push}) => {
+    if ('steps' in description) {
+      if (Array.isArray(description.steps)) {
+        push(new TypeError(`Wrap steps array in a function`));
+      } else if (typeof description.steps !== 'function') {
+        push(new TypeError(`Expected steps to be a function (returning an array)`));
+      }
     }
 
-    descriptionAggregate.nest({message: `Errors in static input descriptions for ${compositionName}`}, ({push}) => {
-      const missingCallsToInput = [];
-      const wrongCallsToInput = [];
-
-      for (const [name, value] of Object.entries(description.inputs)) {
-        if (!isInputToken(value)) {
-          missingCallsToInput.push(name);
-          continue;
-        }
-
-        if (!['input', 'input.staticDependency', 'input.staticValue'].includes(getInputTokenShape(value))) {
-          wrongCallsToInput.push(name);
-        }
+    validateInputs:
+    if ('inputs' in description) {
+      if (Array.isArray(description.inputs)) {
+        push(new Error(`Expected inputs to be object, got array`));
+        break validateInputs;
+      } else if (typeof description.inputs !== 'object') {
+        push(new Error(`Expected inputs to be object, got ${typeof description.inputs}`));
+        break validateInputs;
       }
 
-      for (const name of missingCallsToInput) {
-        push(new Error(`${name}: Missing call to input()`));
-      }
+      nest({message: `Errors in static input descriptions for ${compositionName}`}, ({push}) => {
+        const missingCallsToInput = [];
+        const wrongCallsToInput = [];
 
-      for (const name of wrongCallsToInput) {
-        const shape = getInputTokenShape(description.inputs[name]);
-        push(new Error(`${name}: Expected call to input, input.staticDependency, or input.staticValue, got ${shape}`));
-      }
-    });
-  }
-
-  validateOutputs:
-  if ('outputs' in description) {
-    if (
-      !Array.isArray(description.outputs) &&
-      typeof description.outputs !== 'function'
-    ) {
-      descriptionAggregate.push(new Error(`Expected outputs to be array or function, got ${typeof description.outputs}`));
-      break validateOutputs;
-    }
-
-    if (Array.isArray(description.outputs)) {
-      descriptionAggregate.map(
-        description.outputs,
-        decorateErrorWithIndex(value => {
-          if (typeof value !== 'string') {
-            throw new Error(`${value}: Expected string, got ${typeof value}`)
-          } else if (!value.startsWith('#')) {
-            throw new Error(`${value}: Expected "#" at start`);
+        for (const [name, value] of Object.entries(description.inputs)) {
+          if (!isInputToken(value)) {
+            missingCallsToInput.push(name);
+            continue;
           }
-        }),
-        {message: `Errors in output descriptions for ${compositionName}`});
-    }
-  }
 
-  descriptionAggregate.close();
+          if (!['input', 'input.staticDependency', 'input.staticValue'].includes(getInputTokenShape(value))) {
+            wrongCallsToInput.push(name);
+          }
+        }
+
+        for (const name of missingCallsToInput) {
+          push(new Error(`${name}: Missing call to input()`));
+        }
+
+        for (const name of wrongCallsToInput) {
+          const shape = getInputTokenShape(description.inputs[name]);
+          push(new Error(`${name}: Expected call to input, input.staticDependency, or input.staticValue, got ${shape}`));
+        }
+      });
+    }
+
+    validateOutputs:
+    if ('outputs' in description) {
+      if (
+        !Array.isArray(description.outputs) &&
+        typeof description.outputs !== 'function'
+      ) {
+        push(new Error(`Expected outputs to be array or function, got ${typeof description.outputs}`));
+        break validateOutputs;
+      }
+
+      if (Array.isArray(description.outputs)) {
+        map(
+          description.outputs,
+          decorateErrorWithIndex(value => {
+            if (typeof value !== 'string') {
+              throw new Error(`${value}: Expected string, got ${typeof value}`)
+            } else if (!value.startsWith('#')) {
+              throw new Error(`${value}: Expected "#" at start`);
+            }
+          }),
+          {message: `Errors in output descriptions for ${compositionName}`});
+      }
+    }
+  });
 
   const expectedInputNames =
     (description.inputs
@@ -567,106 +565,104 @@ export function templateCompositeFrom(description) {
       : []);
 
   const instantiate = (inputOptions = {}) => {
-    const inputOptionsAggregate = openAggregate({message: `Errors in input options passed to ${compositionName}`});
+    withAggregate({message: `Errors in input options passed to ${compositionName}`}, ({push}) => {
+      const providedInputNames = Object.keys(inputOptions);
 
-    const providedInputNames = Object.keys(inputOptions);
+      const misplacedInputNames =
+        providedInputNames
+          .filter(name => !expectedInputNames.includes(name));
 
-    const misplacedInputNames =
-      providedInputNames
-        .filter(name => !expectedInputNames.includes(name));
+      const missingInputNames =
+        expectedInputNames
+          .filter(name => !providedInputNames.includes(name))
+          .filter(name => {
+            const inputDescription = description.inputs[name].value;
+            if (!inputDescription) return true;
+            if ('defaultValue' in inputDescription) return false;
+            if ('defaultDependency' in inputDescription) return false;
+            return true;
+          });
 
-    const missingInputNames =
-      expectedInputNames
-        .filter(name => !providedInputNames.includes(name))
-        .filter(name => {
-          const inputDescription = description.inputs[name].value;
-          if (!inputDescription) return true;
-          if ('defaultValue' in inputDescription) return false;
-          if ('defaultDependency' in inputDescription) return false;
-          return true;
-        });
+      const wrongTypeInputNames = [];
 
-    const wrongTypeInputNames = [];
+      const expectedStaticValueInputNames = [];
+      const expectedStaticDependencyInputNames = [];
 
-    const expectedStaticValueInputNames = [];
-    const expectedStaticDependencyInputNames = [];
+      const validateFailedInputNames = [];
+      const validateFailedErrors = [];
 
-    const validateFailedInputNames = [];
-    const validateFailedErrors = [];
-
-    for (const [name, value] of Object.entries(inputOptions)) {
-      if (misplacedInputNames.includes(name)) {
-        continue;
-      }
-
-      if (typeof value !== 'string' && !isInputToken(value)) {
-        wrongTypeInputNames.push(name);
-        continue;
-      }
-
-      const descriptionShape = getInputTokenShape(description.inputs[name]);
-      const descriptionValue = getInputTokenValue(description.inputs[name]);
-
-      const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
-      const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
-
-      if (descriptionShape === 'input.staticValue') {
-        if (tokenShape !== 'input.value') {
-          expectedStaticValueInputNames.push(name);
+      for (const [name, value] of Object.entries(inputOptions)) {
+        if (misplacedInputNames.includes(name)) {
           continue;
         }
-      }
 
-      if (descriptionShape === 'input.staticDependency') {
-        if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
-          expectedStaticDependencyInputNames.push(name);
+        if (typeof value !== 'string' && !isInputToken(value)) {
+          wrongTypeInputNames.push(name);
           continue;
         }
-      }
 
-      if (descriptionValue && 'validate' in descriptionValue) {
-        if (tokenShape === 'input.value') {
-          try {
-            descriptionValue.validate(tokenValue);
-          } catch (error) {
-            validateFailedInputNames.push(name);
-            validateFailedErrors.push(error);
+        const descriptionShape = getInputTokenShape(description.inputs[name]);
+        const descriptionValue = getInputTokenValue(description.inputs[name]);
+
+        const tokenShape = (isInputToken(value) ? getInputTokenShape(value) : null);
+        const tokenValue = (isInputToken(value) ? getInputTokenValue(value) : null);
+
+        if (descriptionShape === 'input.staticValue') {
+          if (tokenShape !== 'input.value') {
+            expectedStaticValueInputNames.push(name);
+            continue;
+          }
+        }
+
+        if (descriptionShape === 'input.staticDependency') {
+          if (typeof value !== 'string' && tokenShape !== 'input.dependency') {
+            expectedStaticDependencyInputNames.push(name);
+            continue;
+          }
+        }
+
+        if (descriptionValue && 'validate' in descriptionValue) {
+          if (tokenShape === 'input.value') {
+            try {
+              descriptionValue.validate(tokenValue);
+            } catch (error) {
+              validateFailedInputNames.push(name);
+              validateFailedErrors.push(error);
+            }
           }
         }
       }
-    }
 
-    if (!empty(misplacedInputNames)) {
-      inputOptionsAggregate.push(new Error(`Unexpected input names: ${misplacedInputNames.join(', ')}`));
-    }
+      if (!empty(misplacedInputNames)) {
+        push(new Error(`Unexpected input names: ${misplacedInputNames.join(', ')}`));
+      }
 
-    if (!empty(missingInputNames)) {
-      inputOptionsAggregate.push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
-    }
+      if (!empty(missingInputNames)) {
+        push(new Error(`Required these inputs: ${missingInputNames.join(', ')}`));
+      }
 
-    if (!empty(expectedStaticDependencyInputNames)) {
-      inputOptionsAggregate.push(new Error(`Expected static dependencies: ${expectedStaticDependencyInputNames.join(', ')}`));
-    }
+      if (!empty(expectedStaticDependencyInputNames)) {
+        push(new Error(`Expected static dependencies: ${expectedStaticDependencyInputNames.join(', ')}`));
+      }
 
-    if (!empty(expectedStaticValueInputNames)) {
-      inputOptionsAggregate.push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
-    }
+      if (!empty(expectedStaticValueInputNames)) {
+        push(new Error(`Expected static values: ${expectedStaticValueInputNames.join(', ')}`));
+      }
 
-    for (const {name, validationError} of stitchArrays({
-      name: validateFailedInputNames,
-      validationError: validateFailedErrors,
-    })) {
-      const error = new Error(`${name}: Validation failed for static value`);
-      error.cause = validationError;
-      inputOptionsAggregate.push(error);
-    }
+      for (const {name, validationError} of stitchArrays({
+        name: validateFailedInputNames,
+        validationError: validateFailedErrors,
+      })) {
+        const error = new Error(`${name}: Validation failed for static value`);
+        error.cause = validationError;
+        push(error);
+      }
 
-    for (const name of wrongTypeInputNames) {
-      const type = typeof inputOptions[name];
-      inputOptionsAggregate.push(new Error(`${name}: Expected string or input() call, got ${type}`));
-    }
-
-    inputOptionsAggregate.close();
+      for (const name of wrongTypeInputNames) {
+        const type = typeof inputOptions[name];
+        push(new Error(`${name}: Expected string or input() call, got ${type}`));
+      }
+    });
 
     const inputMetadata = getStaticInputMetadata(inputOptions);
 
@@ -694,48 +690,31 @@ export function templateCompositeFrom(description) {
       symbol: templateCompositeFrom.symbol,
 
       outputs(providedOptions) {
-        const outputOptionsAggregate = openAggregate({message: `Errors in output options passed to ${compositionName}`});
+        withAggregate({message: `Errors in output options passed to ${compositionName}`}, ({push}) => {
+          const misplacedOutputNames = [];
+          const wrongTypeOutputNames = [];
 
-        const misplacedOutputNames = [];
-        const wrongTypeOutputNames = [];
-        // const notPrivateOutputNames = [];
+          for (const [name, value] of Object.entries(providedOptions)) {
+            if (!expectedOutputNames.includes(name)) {
+              misplacedOutputNames.push(name);
+              continue;
+            }
 
-        for (const [name, value] of Object.entries(providedOptions)) {
-          if (!expectedOutputNames.includes(name)) {
-            misplacedOutputNames.push(name);
-            continue;
+            if (typeof value !== 'string') {
+              wrongTypeOutputNames.push(name);
+              continue;
+            }
           }
 
-          if (typeof value !== 'string') {
-            wrongTypeOutputNames.push(name);
-            continue;
+          if (!empty(misplacedOutputNames)) {
+            push(new Error(`Unexpected output names: ${misplacedOutputNames.join(', ')}`));
           }
 
-          /*
-          if (!value.startsWith('#')) {
-            notPrivateOutputNames.push(name);
-            continue;
+          for (const name of wrongTypeOutputNames) {
+            const type = typeof providedOptions[name];
+            push(new Error(`${name}: Expected string, got ${type}`));
           }
-          */
-        }
-
-        if (!empty(misplacedOutputNames)) {
-          outputOptionsAggregate.push(new Error(`Unexpected output names: ${misplacedOutputNames.join(', ')}`));
-        }
-
-        for (const name of wrongTypeOutputNames) {
-          const type = typeof providedOptions[name];
-          outputOptionsAggregate.push(new Error(`${name}: Expected string, got ${type}`));
-        }
-
-        /*
-        for (const name of notPrivateOutputNames) {
-          const into = providedOptions[name];
-          outputOptionsAggregate.push(new Error(`${name}: Expected "#" at start, got ${into}`));
-        }
-        */
-
-        outputOptionsAggregate.close();
+        });
 
         Object.assign(outputOptions, providedOptions);
         return instantiatedTemplate;
