@@ -456,7 +456,7 @@ export function inputWikiData({
   allowMixedTypes = false,
 } = {}) {
   return input({
-    validate: validateWikiData(referenceType),
+    validate: validateWikiData({referenceType, allowMixedTypes}),
     acceptsNull: true,
   });
 }

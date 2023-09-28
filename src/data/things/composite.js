@@ -976,8 +976,6 @@ export function compositeFrom(description) {
 
   const compositionNests = description.compose ?? true;
 
-  const exposeDependencies = new Set();
-
   // Steps default to exposing if using a shorthand syntax where flags aren't
   // specified at all.
   const stepsExpose =
@@ -1101,7 +1099,6 @@ export function compositeFrom(description) {
 
   const stepEntries = stitchArrays({
     step: steps,
-    expose: stepExposeDescriptions,
     stepComposes: stepsCompose,
     stepComputes: stepsCompute,
     stepTransforms: stepsTransform,
@@ -1110,7 +1107,6 @@ export function compositeFrom(description) {
   for (let i = 0; i < stepEntries.length; i++) {
     const {
       step,
-      expose,
       stepComposes,
       stepComputes,
       stepTransforms,
@@ -2046,7 +2042,7 @@ export const withPropertiesFromObject = templateCompositeFrom({
         '#entries',
       ],
 
-      compute: ({
+      compute: (continuation, {
         [input.staticDependency('object')]: object,
         [input.staticValue('properties')]: properties,
         [input.staticValue('prefix')]: prefix,
