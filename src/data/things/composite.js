@@ -1938,15 +1938,12 @@ export const withPropertyFromObject = templateCompositeFrom({
   outputs: ({
     [input.staticDependency('object')]: object,
     [input.staticValue('property')]: property,
-  }) => {
-    return [
-      (object && property
-        ? (object.startsWith('#')
-            ? `${object}.${property}`
-            : `#${object}.${property}`)
-        : '#value'),
-    ];
-  },
+  }) =>
+    (object && property
+      ? (object.startsWith('#')
+          ? [`${object}.${property}`]
+          : [`#${object}.${property}`])
+      : ['#value']),
 
   steps: () => [
     {
@@ -2018,7 +2015,7 @@ export const withPropertiesFromObject = templateCompositeFrom({
          : object
             ? `${object}.${property}`
             : `#object.${property}`))
-      : '#object'),
+      : ['#object']),
 
   steps: () => [
     {
@@ -2135,7 +2132,7 @@ export const withPropertiesFromList = templateCompositeFrom({
          : list
             ? `${list}.${property}`
             : `#list.${property}`))
-      : '#lists'),
+      : ['#lists']),
 
   steps: () => [
     {
