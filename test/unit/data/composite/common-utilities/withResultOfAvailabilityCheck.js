@@ -113,18 +113,14 @@ t.test(`withResultOfAvailabilityCheck: default mode`, t => {
 t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
   t.plan(5);
 
-  let caughtError;
-
-  try {
-    caughtError = null;
-    withResultOfAvailabilityCheck({});
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    errors: [/Required these inputs: from/],
-  });
+  t.throws(
+    () => withResultOfAvailabilityCheck({}),
+    {
+      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
+      errors: [
+        {message: `Required these inputs: from`}
+      ],
+    });
 
   t.doesNotThrow(() =>
     withResultOfAvailabilityCheck({
@@ -138,89 +134,67 @@ t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
       mode: input.value('null'),
     }));
 
-  try {
-    caughtError = null;
-    withResultOfAvailabilityCheck({
+  t.throws(
+    () => withResultOfAvailabilityCheck({
       from: 'foo',
       mode: input.value('invalid'),
+    }),
+    {
+      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
+      errors: [
+        {message: `mode: Expected one of null empty falsy, got invalid`},
+      ],
     });
-  } catch (error) {
-    caughtError = error;
-  }
 
-  t.match(caughtError, {
-    message: /Errors in input options passed to withResultOfAvailabilityCheck/,
-    errors: [
-      /mode: Expected one of null empty falsy, got invalid/,
-    ],
-  });
-
-  try {
-    caughtError = null;
+  t.throws(() =>
     withResultOfAvailabilityCheck({
       from: input.value(null),
       mode: input.value(null),
+    }),
+    {
+      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
+      errors: [
+        {message: `mode: Expected a value, got null`},
+      ],
     });
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    message: /Errors in input options passed to withResultOfAvailabilityCheck/,
-    errors: [
-      /mode: Expected a value, got null/,
-    ],
-  });
 });
 
 t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
   t.plan(2);
 
-  let caughtError;
-
-  try {
-    caughtError = null;
-    composite.expose.compute({
+  t.throws(
+    () => composite.expose.compute({
       from: 'apple',
       mode: 'banana',
-    });
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    message: /Error computing composition/,
-    cause: {
-      message: /Error computing composition withResultOfAvailabilityCheck/,
+    }),
+    {
+      message: `Error computing composition`,
       cause: {
-        message: /Errors in input values provided to withResultOfAvailabilityCheck/,
-        errors: [
-          /mode: Expected one of null empty falsy, got banana/,
-        ],
+        message: `Error computing composition withResultOfAvailabilityCheck`,
+        cause: {
+          message: `Errors in input values provided to withResultOfAvailabilityCheck`,
+          errors: [
+            {message: `mode: Expected one of null empty falsy, got banana`},
+          ],
+        },
       },
-    },
-  });
+    });
 
-  try {
-    caughtError = null;
-    composite.expose.compute({
+  t.throws(
+    () => composite.expose.compute({
       from: null,
       mode: null,
-    });
-  } catch (error) {
-    caughtError = error;
-  }
-
-  t.match(caughtError, {
-    message: /Error computing composition/,
-    cause: {
-      message: /Error computing composition withResultOfAvailabilityCheck/,
+    }),
+    {
+      message: `Error computing composition`,
       cause: {
-        message: /Errors in input values provided to withResultOfAvailabilityCheck/,
-        errors: [
-          /mode: Expected a value, got null/,
-        ],
+        message: `Error computing composition withResultOfAvailabilityCheck`,
+        cause: {
+          message: `Errors in input values provided to withResultOfAvailabilityCheck`,
+          errors: [
+            {message: `mode: Expected a value, got null`},
+          ],
+        },
       },
-    },
-  });
+    });
 });
