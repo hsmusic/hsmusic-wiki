@@ -4,6 +4,7 @@ import {colors} from '#cli';
 import {TupleMap} from '#wiki-data';
 
 import {
+  a,
   is,
   isString,
   isWholeNumber,
@@ -464,8 +465,8 @@ function validateInputValue(value, description) {
     } else {
       throw new TypeError(
         (type
-          ? `Expected ${type}, got ${typeAppearance(value)}`
-          : `Expected value, got ${typeAppearance(value)}`));
+          ? `Expected ${a(type)}, got ${typeAppearance(value)}`
+          : `Expected a value, got ${typeAppearance(value)}`));
     }
   }
 
@@ -478,7 +479,7 @@ function validateInputValue(value, description) {
         : typeof value);
 
     if (typeofValue !== type) {
-      throw new TypeError(`Expected ${type}, got ${typeAppearance(value)}`);
+      throw new TypeError(`Expected ${a(type)}, got ${typeAppearance(value)}`);
     }
   }
 
@@ -1997,6 +1998,7 @@ export const withPropertiesFromObject = templateCompositeFrom({
     object: input({type: 'object', acceptsNull: true}),
 
     properties: input({
+      type: 'array',
       validate: validateArrayItems(isString),
     }),
 

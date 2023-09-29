@@ -168,7 +168,7 @@ t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
   t.match(caughtError, {
     message: /Errors in input options passed to withResultOfAvailabilityCheck/,
     errors: [
-      /mode: Expected value, got null/,
+      /mode: Expected a value, got null/,
     ],
   });
 });
@@ -218,7 +218,7 @@ t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
       cause: {
         message: /Errors in input values provided to withResultOfAvailabilityCheck/,
         errors: [
-          /mode: Expected value, got null/,
+          /mode: Expected a value, got null/,
         ],
       },
     },
