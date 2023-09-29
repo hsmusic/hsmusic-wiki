@@ -46,7 +46,7 @@ t.test(`withPropertyFromObject: basic behavior`, t => {
 });
 
 t.test(`withPropertyFromObject: output shapes & values`, t => {
-  t.plan(3 * 3 * 2);
+  t.plan(2 * 3 ** 2);
 
   const dependencies = {
     ['object_dependency']:
@@ -59,7 +59,7 @@ t.test(`withPropertyFromObject: output shapes & values`, t => {
       'baz',
   };
 
-  const map = [
+  const mapLevel1 = [
     ['object_dependency', [
       ['property_dependency', {
         '#value': 'apple',
@@ -94,31 +94,32 @@ t.test(`withPropertyFromObject: output shapes & values`, t => {
       }]]],
   ];
 
-  for (const [objectInput, submap] of map) {
-    for (const [propertyInput, dict] of submap) {
+  for (const [objectInput, mapLevel2] of mapLevel1) {
+    for (const [propertyInput, outputDict] of mapLevel2) {
       const step = withPropertyFromObject({
         object: objectInput,
         property: propertyInput,
       });
 
-      t.same(
-        Object.keys(step.toDescription().outputs),
-        Object.keys(dict));
-
-      const composite = compositeFrom({
-        compose: false,
-
-        steps: [
-          step,
-
-          {
-            dependencies: Object.keys(dict),
-            compute: dependencies => dependencies,
-          },
-        ],
-      });
-
-      t.same(composite.expose.compute(dependencies), dict);
+      quickCheckOutputs(step, outputDict);
     }
+  }
+
+  function quickCheckOutputs(step, outputDict) {
+    t.same(
+      Object.keys(step.toDescription().outputs),
+      Object.keys(outputDict));
+
+    const composite = compositeFrom({
+      compose: false,
+      steps: [step, {
+        dependencies: Object.keys(outputDict),
+        compute: dependencies => dependencies,
+      }],
+    });
+
+    t.same(
+      composite.expose.compute(dependencies),
+      outputDict);
   }
 });
