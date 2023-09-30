@@ -8,7 +8,7 @@
         "hsmusic": "./src/upd8.js"
     },
     "scripts": {
-        "test": "tap 'test/snapshot/*.js' 'test/unit/**/*.js'",
+        "test": "tap",
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
@@ -47,7 +47,7 @@
     "license": "GPL-3.0",
     "devDependencies": {
         "chokidar": "^3.5.3",
-        "tap": "^16.3.4",
+        "tap": "^18.4.0",
         "tcompare": "^6.0.0"
     },
     "tap": {

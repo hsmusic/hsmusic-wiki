@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/generateAdditionalFilesList.js TAP generateAdditionalFilesList (snapshot) > basic behavior 1`] = `
+exports[`test/snapshot/generateAdditionalFilesList.js > TAP > generateAdditionalFilesList (snapshot) > basic behavior 1`] = `
 <dl>
     <dt>SBURB Wallpaper</dt>
     <dd>
@@ -24,6 +24,6 @@ exports[`test/snapshot/generateAdditionalFilesList.js TAP generateAdditionalFile
 </dl>
 `
 
-exports[`test/snapshot/generateAdditionalFilesList.js TAP generateAdditionalFilesList (snapshot) > no additional files 1`] = `
+exports[`test/snapshot/generateAdditionalFilesList.js > TAP > generateAdditionalFilesList (snapshot) > no additional files 1`] = `
 
 `

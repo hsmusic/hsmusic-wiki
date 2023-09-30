@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/generateCoverArtwork.js TAP generateCoverArtwork (snapshot) > display: primary 1`] = `
+exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (snapshot) > display: primary 1`] = `
 <div id="cover-art-container">
     [mocked: image
      args: [
@@ -21,7 +21,7 @@ exports[`test/snapshot/generateCoverArtwork.js TAP generateCoverArtwork (snapsho
 </div>
 `
 
-exports[`test/snapshot/generateCoverArtwork.js TAP generateCoverArtwork (snapshot) > display: thumbnail 1`] = `
+exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (snapshot) > display: thumbnail 1`] = `
 [mocked: image
  args: [
    [

@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > basic domain matches 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > basic domain matches 1`] = `
 <a href="https://homestuck.bandcamp.com/" class="nowrap">Bandcamp</a>
 <a href="https://soundcloud.com/plazmataz" class="nowrap">SoundCloud</a>
 <a href="https://aeritus.tumblr.com/" class="nowrap">Tumblr</a>
@@ -19,21 +19,21 @@ exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > basic domai
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">Newgrounds</a>
 `
 
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom domains for common platforms 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > custom domains for common platforms 1`] = `
 <a href="https://music.solatrus.com/" class="nowrap">music.solatrus.com</a>
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
 `
 
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > custom matches - album 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > custom matches - album 1`] = `
 <a href="https://youtu.be/abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube (playlist)</a>
 `
 
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > missing domain (arbitrary local path) 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > missing domain (arbitrary local path) 1`] = `
 <a href="/foo/bar/baz.mp3" class="nowrap">Wiki Archive (local upload)</a>
 `
 
-exports[`test/snapshot/linkExternal.js TAP linkExternal (snapshot) > unknown domain (arbitrary world wide web path) 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > unknown domain (arbitrary world wide web path) 1`] = `
 <a href="https://snoo.ping.as/usual/i/see/" class="nowrap">snoo.ping.as</a>
 `
