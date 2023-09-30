@@ -54,21 +54,15 @@ t.test(`exposeDependency: validate inputs`, t => {
 
   t.throws(
     () => exposeDependency({}),
-    {
-      message: `Errors in input options passed to exposeDependency`,
-      errors: [
-        {message: `Required these inputs: dependency`},
-      ],
-    });
+    {message: `Errors in input options passed to exposeDependency`, errors: [
+      {message: `Required these inputs: dependency`},
+    ]});
 
   t.throws(
     () => exposeDependency({
       dependency: input.value('some static value'),
     }),
-    {
-      message: `Errors in input options passed to exposeDependency`,
-      errors: [
-        {message: `dependency: Expected dependency name, got input.value() call`},
-      ],
-    });
+    {message: `Errors in input options passed to exposeDependency`, errors: [
+      {message: `dependency: Expected dependency name, got input.value() call`},
+    ]});
 });

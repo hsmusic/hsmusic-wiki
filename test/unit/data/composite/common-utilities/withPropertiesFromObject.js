@@ -185,12 +185,9 @@ t.test(`withPropertiesFromObject: validate static inputs`, t => {
 
   t.throws(
     () => withPropertiesFromObject({}),
-    {
-      message: `Errors in input options passed to withPropertiesFromObject`,
-      errors: [
-        {message: `Required these inputs: object, properties`},
-      ],
-    });
+    {message: `Errors in input options passed to withPropertiesFromObject`, errors: [
+      {message: `Required these inputs: object, properties`},
+    ]});
 
   t.throws(
     () => withPropertiesFromObject({
@@ -198,14 +195,11 @@ t.test(`withPropertiesFromObject: validate static inputs`, t => {
       properties: input.value('very'),
       prefix: input.value({yes: 'yup'}),
     }),
-    {
-      message: `Errors in input options passed to withPropertiesFromObject`,
-      errors: [
-        {message: `object: Expected an object, got string`},
-        {message: 'properties: Expected an array, got string'},
-        {message: 'prefix: Expected a string, got object'},
-      ],
-    });
+    {message: `Errors in input options passed to withPropertiesFromObject`, errors: [
+      {message: `object: Expected an object, got string`},
+      {message: `properties: Expected an array, got string`},
+      {message: `prefix: Expected a string, got object`},
+    ]});
 
   t.throws(
     () => withPropertiesFromObject({
@@ -213,8 +207,8 @@ t.test(`withPropertiesFromObject: validate static inputs`, t => {
       properties: input.value(['abc', 'def', 123]),
     }),
     {message: `Errors in input options passed to withPropertiesFromObject`, errors: [
-      {message: 'object: Expected an object, got array'},
-      {message: 'properties: Errors validating array items', errors: [
+      {message: `object: Expected an object, got array`},
+      {message: `properties: Errors validating array items`, errors: [
         {
           [Symbol.for('hsmusic.decorate.indexInSourceArray')]: 2,
           message: /Expected a string, got number/,

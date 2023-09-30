@@ -3,8 +3,8 @@ import t from 'tap';
 import {
   compositeFrom,
   continuationSymbol,
-  withResultOfAvailabilityCheck,
   input,
+  withResultOfAvailabilityCheck,
 } from '#composite';
 
 const composite = compositeFrom({
@@ -115,12 +115,9 @@ t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
 
   t.throws(
     () => withResultOfAvailabilityCheck({}),
-    {
-      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
-      errors: [
-        {message: `Required these inputs: from`}
-      ],
-    });
+    {message: `Errors in input options passed to withResultOfAvailabilityCheck`, errors: [
+      {message: `Required these inputs: from`},
+    ]});
 
   t.doesNotThrow(() =>
     withResultOfAvailabilityCheck({
@@ -139,24 +136,18 @@ t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
       from: 'foo',
       mode: input.value('invalid'),
     }),
-    {
-      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
-      errors: [
-        {message: `mode: Expected one of null empty falsy, got invalid`},
-      ],
-    });
+    {message: `Errors in input options passed to withResultOfAvailabilityCheck`, errors: [
+      {message: `mode: Expected one of null empty falsy, got invalid`},
+    ]});
 
   t.throws(() =>
     withResultOfAvailabilityCheck({
       from: input.value(null),
       mode: input.value(null),
     }),
-    {
-      message: `Errors in input options passed to withResultOfAvailabilityCheck`,
-      errors: [
-        {message: `mode: Expected a value, got null`},
-      ],
-    });
+    {message: `Errors in input options passed to withResultOfAvailabilityCheck`, errors: [
+      {message: `mode: Expected a value, got null`},
+    ]});
 });
 
 t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
@@ -167,34 +158,20 @@ t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
       from: 'apple',
       mode: 'banana',
     }),
-    {
-      message: `Error computing composition`,
-      cause: {
-        message: `Error computing composition withResultOfAvailabilityCheck`,
-        cause: {
-          message: `Errors in input values provided to withResultOfAvailabilityCheck`,
-          errors: [
-            {message: `mode: Expected one of null empty falsy, got banana`},
-          ],
-        },
-      },
-    });
+    {message: `Error computing composition`, cause:
+      {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
+        {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
+          {message: `mode: Expected one of null empty falsy, got banana`},
+        ]}}});
 
   t.throws(
     () => composite.expose.compute({
       from: null,
       mode: null,
     }),
-    {
-      message: `Error computing composition`,
-      cause: {
-        message: `Error computing composition withResultOfAvailabilityCheck`,
-        cause: {
-          message: `Errors in input values provided to withResultOfAvailabilityCheck`,
-          errors: [
-            {message: `mode: Expected a value, got null`},
-          ],
-        },
-      },
-    });
+    {message: `Error computing composition`, cause:
+      {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
+        {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
+          {message: `mode: Expected a value, got null`},
+        ]}}});
 });

@@ -161,13 +161,10 @@ t.test(`templateCompositeFrom: validate static input values`, t => {
         baz: 'aeiou',
         raz: input.value(123),
       }),
-      {
-        message: `Errors in input options passed to stubComposite`,
-        errors: [
-          {message: `Unexpected input names: baz, raz`},
-          {message: `Required these inputs: foo, bar`},
-        ],
-      });
+      {message: `Errors in input options passed to stubComposite`, errors: [
+        {message: `Unexpected input names: baz, raz`},
+        {message: `Required these inputs: foo, bar`},
+      ]});
   });
 
   t.test(`templateCompositeFrom: validate acceptsNull / defaultValue: null`, t => {
@@ -181,12 +178,9 @@ t.test(`templateCompositeFrom: validate static input values`, t => {
 
     t.throws(
       () => template1({}),
-      {
-        message: `Errors in input options passed to stubComposite`,
-        errors: [
-          {message: `Required these inputs: foo`},
-        ],
-      },
+      {message: `Errors in input options passed to stubComposite`, errors: [
+        {message: `Required these inputs: foo`},
+      ]},
       `throws if input missing and not marked specially`);
 
     const template2 = templateCompositeFrom({
@@ -197,12 +191,9 @@ t.test(`templateCompositeFrom: validate static input values`, t => {
 
     t.throws(
       () => template2({}),
-      {
-        message: `Errors in input options passed to stubComposite`,
-        errors: [
-          {message: `Required these inputs: bar`},
-        ],
-      },
+      {message: `Errors in input options passed to stubComposite`, errors: [
+        {message: `Required these inputs: bar`},
+      ]},
       `throws if input missing even if marked {acceptsNull}`);
 
     const template3 = templateCompositeFrom({
