@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > loads of links 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > loads of links 1`] = `
 <span class="nowrap"><a href="artist/lorem-ipsum-lover/">Lorem Ipsum Lover</a> (<span class="icons"><a href="https://loremipsum.io" class="icon">
             <svg>
                 <title>External (loremipsum.io)</title>
@@ -29,13 +29,13 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > loa
         </a></span>)</span>
 `
 
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no accents 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > no accents 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>
 <a href="artist/the-big-baddies/">Grounder &amp; Scratch</a>
 <a href="artist/toby-fox/">Toby Fox</a>
 `
 
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no preventWrapping 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > no preventWrapping 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
         <svg>
             <title>SoundCloud</title>
@@ -56,13 +56,13 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > no 
     </a></span>)
 `
 
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > only showContribution 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > only showContribution 1`] = `
 <a href="artist/clark-powell/">Clark Powell</a>
 <span class="nowrap"><a href="artist/the-big-baddies/">Grounder &amp; Scratch</a> (Snooping)</span>
 <span class="nowrap"><a href="artist/toby-fox/">Toby Fox</a> (Arrangement)</span>
 `
 
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > only showIcons 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > only showIcons 1`] = `
 <span class="nowrap"><a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
             <svg>
                 <title>SoundCloud</title>
@@ -83,7 +83,7 @@ exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > onl
         </a></span>)</span>
 `
 
-exports[`test/snapshot/linkContribution.js TAP linkContribution (snapshot) > showContribution & showIcons 1`] = `
+exports[`test/snapshot/linkContribution.js > TAP > linkContribution (snapshot) > showContribution & showIcons 1`] = `
 <span class="nowrap"><a href="artist/clark-powell/">Clark Powell</a> (<span class="icons"><a href="https://soundcloud.com/plazmataz" class="icon">
             <svg>
                 <title>SoundCloud</title>

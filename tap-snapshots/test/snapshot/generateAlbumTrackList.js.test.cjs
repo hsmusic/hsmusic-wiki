@@ -5,7 +5,7 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/generateAlbumTrackList.js TAP generateAlbumTrackList (snapshot) > basic behavior, default track section 1`] = `
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, default track section 1`] = `
 <ul>
     <li>(0:20) <a href="track/t1/">Track 1</a></li>
     <li>(0:30) <a href="track/t2/">Track 2</a></li>
@@ -14,7 +14,7 @@ exports[`test/snapshot/generateAlbumTrackList.js TAP generateAlbumTrackList (sna
 </ul>
 `
 
-exports[`test/snapshot/generateAlbumTrackList.js TAP generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
 <dl class="album-group-list">
     <dt class="content-heading" tabindex="0">First section (~1:30):</dt>
     <dd>

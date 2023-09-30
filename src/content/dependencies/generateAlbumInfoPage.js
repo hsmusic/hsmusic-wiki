@@ -37,7 +37,7 @@ export default {
       relation('generatePageLayout');
 
     relations.albumStyleRules =
-      relation('generateAlbumStyleRules', album);
+      relation('generateAlbumStyleRules', album, null);
 
     relations.socialEmbed =
       relation('generateAlbumSocialEmbed', album);
