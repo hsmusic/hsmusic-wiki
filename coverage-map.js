@@ -22,9 +22,29 @@ export default function map(F) {
   if (match) {
     const f = match[1];
 
+    match = f.match(/^composite\/(.*?)\//);
+    if (match) {
+      switch (match[1]) {
+        case 'common-utilities':
+          return `src/data/things/composite.js`;
+        default:
+          return null;
+      }
+    }
+
     match = f.match(/^things\/(.*)\.js$/);
     if (match) {
       return `src/data/things/${match[1]}.js`;
+    }
+
+    match = f.match(/^cacheable-object\.js$/);
+    if (match) {
+      return `src/data/things/cacheable-object.js`;
+    }
+
+    match = f.match(/^(templateCompositeFrom|compositeFrom)\.js$/);
+    if (match) {
+      return `src/data/things/composite.js`;
     }
   }
 
