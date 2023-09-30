@@ -7,21 +7,21 @@ import {
   withPropertiesFromObject,
 } from '#composite';
 
+const composite = compositeFrom({
+  compose: false,
+
+  steps: [
+    withPropertiesFromObject({
+      object: 'object',
+      properties: 'properties',
+    }),
+
+    exposeDependency({dependency: '#object'}),
+  ],
+});
+
 t.test(`withPropertiesFromObject: basic behavior`, t => {
   t.plan(4);
-
-  const composite = compositeFrom({
-    compose: false,
-
-    steps: [
-      withPropertiesFromObject({
-        object: 'object',
-        properties: 'properties',
-      }),
-
-      exposeDependency({dependency: '#object'}),
-    ],
-  });
 
   t.match(composite, {
     expose: {
@@ -215,4 +215,37 @@ t.test(`withPropertiesFromObject: validate static inputs`, t => {
         },
       ]},
     ]});
+});
+
+t.test(`withPropertiesFromObject: validate dynamic inputs`, t => {
+  t.plan(2);
+
+  t.throws(
+    () => composite.expose.compute({
+      object: 'intriguing',
+      properties: 'onceMore',
+    }),
+    {message: `Error computing composition`, cause:
+      {message: `Error computing composition withPropertiesFromObject`, cause:
+        {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
+          {message: `object: Expected an object, got string`},
+          {message: `properties: Expected an array, got string`},
+        ]}}});
+
+  t.throws(
+    () => composite.expose.compute({
+      object: [['abc', 1], ['def', 2], [123, 3]],
+      properties: ['abc', 'def', 123],
+    }),
+    {message: `Error computing composition`, cause:
+      {message: `Error computing composition withPropertiesFromObject`, cause:
+        {message: `Errors in input values provided to withPropertiesFromObject`, errors: [
+          {message: `object: Expected an object, got array`},
+          {message: `properties: Errors validating array items`, errors: [
+            {
+              [Symbol.for('hsmusic.decorate.indexInSourceArray')]: 2,
+              message: /Expected a string, got number/,
+            },
+          ]},
+        ]}}});
 });
