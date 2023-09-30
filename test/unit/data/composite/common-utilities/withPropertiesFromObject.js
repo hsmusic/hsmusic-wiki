@@ -216,7 +216,7 @@ t.test(`withPropertiesFromObject: validate static inputs`, t => {
       {message: 'object: Expected an object, got array'},
       {message: 'properties: Errors validating array items', errors: [
         {
-          [Symbol.for('hsmusic.sugar.index')]: 2,
+          [Symbol.for('hsmusic.decorate.indexInSourceArray')]: 2,
           message: /Expected a string, got number/,
         },
       ]},

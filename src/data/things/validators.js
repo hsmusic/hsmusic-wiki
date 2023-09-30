@@ -174,7 +174,8 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${colors.yellow(`#${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      error.message = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
       throw error;
     }
   };
