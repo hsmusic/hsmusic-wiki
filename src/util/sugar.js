@@ -624,6 +624,7 @@ export function decorateErrorWithIndex(fn) {
       return fn(x, index, array);
     } catch (error) {
       error.message = `(${colors.yellow(`#${index + 1}`)}) ${error.message}`;
+      error[Symbol.for('hsmusic.sugar.index')] = 1;
       throw error;
     }
   };

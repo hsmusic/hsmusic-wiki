@@ -179,3 +179,46 @@ t.test(`withPropertiesFromObject: output shapes & values`, t => {
       outputDict);
   }
 });
+
+t.test(`withPropertiesFromObject: validate static inputs`, t => {
+  t.plan(3);
+
+  t.throws(
+    () => withPropertiesFromObject({}),
+    {
+      message: `Errors in input options passed to withPropertiesFromObject`,
+      errors: [
+        {message: `Required these inputs: object, properties`},
+      ],
+    });
+
+  t.throws(
+    () => withPropertiesFromObject({
+      object: input.value('intriguing'),
+      properties: input.value('very'),
+      prefix: input.value({yes: 'yup'}),
+    }),
+    {
+      message: `Errors in input options passed to withPropertiesFromObject`,
+      errors: [
+        {message: `object: Expected an object, got string`},
+        {message: 'properties: Expected an array, got string'},
+        {message: 'prefix: Expected a string, got object'},
+      ],
+    });
+
+  t.throws(
+    () => withPropertiesFromObject({
+      object: input.value([['abc', 1], ['def', 2], [123, 3]]),
+      properties: input.value(['abc', 'def', 123]),
+    }),
+    {message: `Errors in input options passed to withPropertiesFromObject`, errors: [
+      {message: 'object: Expected an object, got array'},
+      {message: 'properties: Errors validating array items', errors: [
+        {
+          [Symbol.for('hsmusic.sugar.index')]: 2,
+          message: /Expected a string, got number/,
+        },
+      ]},
+    ]});
+});
