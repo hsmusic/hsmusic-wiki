@@ -2,7 +2,7 @@ import {input} from '#composite';
 import find from '#find';
 import {isName, validateArrayItems} from '#validators';
 
-import Thing, {
+import {
   directory,
   fileExtension,
   flag,
@@ -11,7 +11,9 @@ import Thing, {
   singleReference,
   urls,
   wikiData,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';

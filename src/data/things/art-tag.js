@@ -1,14 +1,18 @@
-import {exposeUpdateValueOrContinue, input} from '#composite';
+import {input} from '#composite';
 import {sortAlbumsTracksChronologically} from '#wiki-data';
 import {isName} from '#validators';
 
-import Thing, {
+import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+
+import {
   color,
   directory,
   flag,
   name,
   wikiData,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';

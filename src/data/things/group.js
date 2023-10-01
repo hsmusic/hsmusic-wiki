@@ -1,7 +1,7 @@
 import {input} from '#composite';
 import find from '#find';
 
-import Thing, {
+import {
   color,
   directory,
   name,
@@ -9,7 +9,9 @@ import Thing, {
   simpleString,
   urls,
   wikiData,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';

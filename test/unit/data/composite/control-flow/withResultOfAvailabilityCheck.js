@@ -1,11 +1,7 @@
 import t from 'tap';
 
-import {
-  compositeFrom,
-  continuationSymbol,
-  input,
-  withResultOfAvailabilityCheck,
-} from '#composite';
+import {compositeFrom, continuationSymbol, input} from '#composite';
+import {withResultOfAvailabilityCheck} from '#composite/control-flow';
 
 const composite = compositeFrom({
   compose: false,

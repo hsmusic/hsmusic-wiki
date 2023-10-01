@@ -1,10 +1,12 @@
 import {isName} from '#validators';
 
-import Thing, {
+import {
   directory,
   name,
   simpleString,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';

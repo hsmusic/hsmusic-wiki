@@ -14,6 +14,12 @@
     "imports": {
         "#colors": "./src/util/colors.js",
         "#composite": "./src/data/things/composite.js",
+        "#composite/control-flow": "./src/data/composite/control-flow/index.js",
+        "#composite/data": "./src/data/composite/data/index.js",
+        "#composite/wiki-data": "./src/data/composite/wiki-data/index.js",
+        "#composite/wiki-properties": "./src/data/composite/wiki-properties/index.js",
+        "#composite/things/album": "./src/data/composite/things/album/index.js",
+        "#composite/things/track": "./src/data/composite/things/track/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",

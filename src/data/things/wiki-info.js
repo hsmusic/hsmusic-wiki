@@ -2,14 +2,16 @@ import {input} from '#composite';
 import find from '#find';
 import {isLanguageCode, isName, isURL} from '#validators';
 
-import Thing, {
+import {
   color,
   flag,
   name,
   referenceList,
   simpleString,
   wikiData,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class WikiInfo extends Thing {
   static [Thing.getPropertyDescriptors] = ({Group}) => ({

@@ -1,11 +1,7 @@
 import t from 'tap';
 
-import {
-  compositeFrom,
-  continuationSymbol,
-  exposeConstant,
-  input,
-} from '#composite';
+import {compositeFrom, continuationSymbol, input} from '#composite';
+import {exposeConstant} from '#composite/control-flow';
 
 t.test(`exposeConstant: basic behavior`, t => {
   t.plan(2);

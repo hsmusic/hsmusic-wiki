@@ -1,13 +1,14 @@
 import {Tag} from '#html';
 import {isLanguageCode} from '#validators';
 
-import CacheableObject from './cacheable-object.js';
-
-import Thing, {
+import {
   externalFunction,
   flag,
   simpleString,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import CacheableObject from './cacheable-object.js';
+import Thing from './thing.js';
 
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({

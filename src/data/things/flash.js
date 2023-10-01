@@ -9,7 +9,7 @@ import {
   oneOf,
 } from '#validators';
 
-import Thing, {
+import {
   color,
   contributionList,
   fileExtension,
@@ -19,7 +19,9 @@ import Thing, {
   simpleString,
   urls,
   wikiData,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';

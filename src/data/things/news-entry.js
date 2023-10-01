@@ -1,9 +1,11 @@
-import Thing, {
+import {
   directory,
   name,
   simpleDate,
   simpleString,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class NewsEntry extends Thing {
   static [Thing.referenceType] = 'news-entry';

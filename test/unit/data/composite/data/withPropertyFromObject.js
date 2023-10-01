@@ -1,11 +1,8 @@
 import t from 'tap';
 
-import {
-  compositeFrom,
-  exposeDependency,
-  input,
-  withPropertyFromObject,
-} from '#composite';
+import {compositeFrom, input} from '#composite';
+import {exposeDependency} from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
 t.test(`withPropertyFromObject: basic behavior`, t => {
   t.plan(4);

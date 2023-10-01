@@ -22,14 +22,9 @@ export default function map(F) {
   if (match) {
     const f = match[1];
 
-    match = f.match(/^composite\/(.*?)\//);
+    match = f.match(/^composite\/(.*)$/);
     if (match) {
-      switch (match[1]) {
-        case 'common-utilities':
-          return `src/data/things/composite.js`;
-        default:
-          return null;
-      }
+      return `src/data/composite/${match[1]}`;
     }
 
     match = f.match(/^things\/(.*)\.js$/);

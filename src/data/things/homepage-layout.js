@@ -1,9 +1,5 @@
+import {input} from '#composite';
 import find from '#find';
-
-import {
-  exposeDependency,
-  input,
-} from '#composite';
 
 import {
   is,
@@ -16,14 +12,18 @@ import {
   validateReference,
 } from '#validators';
 
-import Thing, {
+import {exposeDependency} from '#composite/control-flow';
+import {withResolvedReference} from '#composite/wiki-data';
+
+import {
   color,
   name,
   referenceList,
   simpleString,
   wikiData,
-  withResolvedReference,
-} from './thing.js';
+} from '#composite/wiki-properties';
+
+import Thing from './thing.js';
 
 export class HomepageLayout extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({

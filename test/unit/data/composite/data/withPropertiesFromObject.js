@@ -1,11 +1,8 @@
 import t from 'tap';
 
-import {
-  compositeFrom,
-  exposeDependency,
-  input,
-  withPropertiesFromObject,
-} from '#composite';
+import {compositeFrom, input} from '#composite';
+import {exposeDependency} from '#composite/control-flow';
+import {withPropertiesFromObject} from '#composite/data';
 
 const composite = compositeFrom({
   compose: false,
