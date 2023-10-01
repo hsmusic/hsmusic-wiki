@@ -41,6 +41,7 @@ export default templateCompositeFrom({
         'tracks',
         'dateOriginallyReleased',
         'isDefaultTrackSection',
+        'name',
         'color',
       ]),
     }),
@@ -53,6 +54,11 @@ export default templateCompositeFrom({
     fillMissingListItems({
       list: '#sections.isDefaultTrackSection',
       fill: input.value(false),
+    }),
+
+    fillMissingListItems({
+      list: '#sections.name',
+      fill: input.value('Unnamed Track Section'),
     }),
 
     fillMissingListItems({
@@ -86,6 +92,7 @@ export default templateCompositeFrom({
     {
       dependencies: [
         '#sections.tracks',
+        '#sections.name',
         '#sections.color',
         '#sections.dateOriginallyReleased',
         '#sections.isDefaultTrackSection',
@@ -94,19 +101,21 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         '#sections.tracks': tracks,
+        '#sections.name': name,
         '#sections.color': color,
         '#sections.dateOriginallyReleased': dateOriginallyReleased,
         '#sections.isDefaultTrackSection': isDefaultTrackSection,
         '#sections.startIndex': startIndex,
       }) => {
         filterMultipleArrays(
-          tracks, color, dateOriginallyReleased, isDefaultTrackSection, startIndex,
+          tracks, name, color, dateOriginallyReleased, isDefaultTrackSection, startIndex,
           tracks => !empty(tracks));
 
         return continuation({
           ['#trackSections']:
             stitchArrays({
               tracks,
+              name,
               color,
               dateOriginallyReleased,
               isDefaultTrackSection,

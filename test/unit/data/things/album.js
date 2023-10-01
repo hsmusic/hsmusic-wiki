@@ -252,7 +252,7 @@ t.test(`Album.tracks`, t => {
 });
 
 t.test(`Album.trackSections`, t => {
-  t.plan(6);
+  t.plan(7);
 
   const album = new Album();
   const track1 = stubTrack('track1');
@@ -280,6 +280,18 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track3, track4], startIndex: 2},
   ], `Album.trackSections #2: exposes startIndex`);
 
+  album.trackSections = [
+    {name: 'First section', tracks: ['track:track1']},
+    {name: 'Second section', tracks: ['track:track2']},
+    {tracks: ['track:track3']},
+  ];
+
+  t.match(album.trackSections, [
+    {name: 'First section', tracks: [track1]},
+    {name: 'Second section', tracks: [track2]},
+    {name: 'Unnamed Track Section', tracks: [track3]},
+  ], `Album.trackSections #3: exposes name, with fallback value`);
+
   album.color = '#123456';
 
   album.trackSections = [
@@ -292,7 +304,7 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track1], color: '#123456'},
     {tracks: [track2], color: '#abcdef'},
     {tracks: [track3], color: '#123456'},
-  ], `Album.trackSections #3: exposes color, inherited from album`);
+  ], `Album.trackSections #4: exposes color, inherited from album`);
 
   album.trackSections = [
     {tracks: ['track:track1'], dateOriginallyReleased: null},
@@ -304,7 +316,7 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track1], dateOriginallyReleased: null},
     {tracks: [track2], dateOriginallyReleased: new Date('2009-04-11')},
     {tracks: [track3], dateOriginallyReleased: null},
-  ], `Album.trackSections #4: exposes dateOriginallyReleased, if present`);
+  ], `Album.trackSections #5: exposes dateOriginallyReleased, if present`);
 
   album.trackSections = [
     {tracks: ['track:track1'], isDefaultTrackSection: true},
@@ -316,7 +328,7 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track1], isDefaultTrackSection: true},
     {tracks: [track2], isDefaultTrackSection: false},
     {tracks: [track3], isDefaultTrackSection: false},
-  ], `Album.trackSections #5: exposes isDefaultTrackSection, defaults to false`);
+  ], `Album.trackSections #6: exposes isDefaultTrackSection, defaults to false`);
 
   album.trackSections = [
     {tracks: ['track:track1', 'track:track2', 'track:snooping'], color: '#112233'},
@@ -330,7 +342,7 @@ t.test(`Album.trackSections`, t => {
     {tracks: [track1, track2], color: '#112233'},
     {tracks: [track3],         color: '#334455'},
     {tracks: [track4],         color: '#778899'},
-  ], `Album.trackSections #6: filters out references without matches & empty sections`);
+  ], `Album.trackSections #7: filters out references without matches & empty sections`);
 });
 
 t.test(`Album.wallpaperFileExtension`, t => {
