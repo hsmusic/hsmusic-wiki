@@ -15,6 +15,8 @@ import withOriginalRelease from './withOriginalRelease.js';
 export default templateCompositeFrom({
   annotation: `withAlwaysReferenceByDirectory`,
 
+  outputs: ['#alwaysReferenceByDirectory'],
+
   steps: () => [
     exposeUpdateValueOrContinue({
       validate: input.value(isBoolean),

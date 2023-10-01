@@ -21,6 +21,7 @@ export default templateCompositeFrom({
     exitWithoutDependency({
       dependency: input('data'),
       value: input.value([]),
+      mode: input.value('empty'),
     }),
 
     {
