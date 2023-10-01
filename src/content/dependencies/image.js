@@ -102,6 +102,7 @@ export default {
     const willReveal =
       slots.reveal &&
       originalSrc &&
+      !isMissingImageFile &&
       !empty(data.contentWarnings);
 
     const willSquare = slots.square;
