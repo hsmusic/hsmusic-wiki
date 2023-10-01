@@ -198,7 +198,7 @@ t.test(`Album.coverArtFileExtension`, t => {
 });
 
 t.test(`Album.tracks`, t => {
-  t.plan(4);
+  t.plan(5);
 
   const album = new Album();
   const track1 = stubTrack('track1');
@@ -237,6 +237,18 @@ t.test(`Album.tracks`, t => {
 
   t.same(album.tracks, [track1, track2, track3],
     `Album.tracks #4: filters out references without matches`);
+
+  album.trackSections = [
+    {tracks: ['track:track1']},
+    {},
+    {tracks: ['track:track2']},
+    {},
+    {},
+    {tracks: ['track:track3']},
+  ];
+
+  t.same(album.tracks, [track1, track2, track3],
+    `Album.tracks #5: skips missing tracks property`);
 });
 
 t.test(`Album.trackSections`, t => {
