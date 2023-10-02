@@ -4,9 +4,11 @@ import {input} from '#composite';
 import find from '#find';
 import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
+import {unique} from '#sugar';
 import {isName} from '#validators';
 
-import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
 
 import {
   color,
@@ -14,11 +16,14 @@ import {
   flag,
   referenceList,
   reverseReferenceList,
+  simpleString,
   name,
   soupyFind,
   soupyReverse,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {withAllDescendantTags} from '#composite/things/art-tag';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -44,6 +49,8 @@ export class ArtTag extends Thing {
       },
     ],
 
+    description: simpleString(),
+
     directDescendantTags: referenceList({
       class: input.value(ArtTag),
       find: soupyFind.input('artTag'),
@@ -56,7 +63,20 @@ export class ArtTag extends Thing {
 
     // Expose only
 
-    taggedInThings: {
+    descriptionShort: [
+      exitWithoutDependency({
+        dependency: 'description',
+        mode: input.value('falsy'),
+      }),
+
+      {
+        dependencies: ['description'],
+        compute: ({description}) =>
+          description.split('<hr class="split">')[0],
+      },
+    ],
+
+    directlyTaggedInThings: {
       flags: {expose: true},
 
       expose: {
@@ -70,6 +90,21 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    indirectlyTaggedInThings: [
+      withAllDescendantTags(),
+
+      {
+        dependencies: ['#allDescendantTags'],
+        compute: ({'#allDescendantTags': allDescendantTags}) =>
+          unique(allDescendantTags.flatMap(tag => tag.directlyTaggedInThings)),
+      },
+    ],
+
+    allDescendantTags: [
+      withAllDescendantTags(),
+      exposeDependency({dependency: '#allDescendantTags'}),
+    ],
 
     directAncestorTags: reverseReferenceList({
       reverse: soupyReverse.input('artTagsWhichDirectlyAncestor'),
@@ -102,6 +137,7 @@ export class ArtTag extends Thing {
       'Tag': {property: 'name'},
       'Short Name': {property: 'nameShort'},
       'Directory': {property: 'directory'},
+      'Description': {property: 'description'},
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
