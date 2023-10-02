@@ -5,11 +5,11 @@ export default {
   contentDependencies: [
     'generateCoverGrid',
     'generatePageLayout',
+    'generateQuickDescription',
     'image',
     'linkAlbum',
     'linkArtTag',
     'linkTrack',
-    'transformContent',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -46,10 +46,8 @@ export default {
     relations.infoPageLink =
       relation('linkArtTag', tag);
 
-    if (tag.descriptionShort) {
-      relations.description =
-        relation('transformContent', tag.descriptionShort);
-    }
+    relations.quickDescription =
+      relation('generateQuickDescription', tag);
 
     if (!empty(tag.directAncestorTags)) {
       relations.ancestorLinks =
@@ -86,7 +84,6 @@ export default {
 
     data.name = tag.name;
     data.color = tag.color;
-    data.hasLongerDescription = tag.descriptionShort !== tag.description;
 
     data.numArtworks = query.allThings.length;
 
@@ -125,19 +122,8 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          html.tag('p', {class:' quick-info'},
-            {[html.joinChildren]: html.tag('br')},
-            {[html.onlyIfContent]: true},
-
-            [
-              relations.description?.slot('mode', 'inline'),
-              data.hasLongerDescription &&
-                language.$('tagPage.moreInfo', {
-                  link:
-                    relations.infoPageLink
-                      .slot('content', language.$('tagPage.moreInfo.link')),
-                }),
-            ]),
+          relations.quickDescription
+            .slot('infoPageLink', relations.infoPageLink),
 
           html.tag('p', {class: 'quick-info'},
             language.$('tagPage.infoLine', {
