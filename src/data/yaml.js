@@ -617,6 +617,7 @@ export const processArtTagDocument = makeProcessDocument(T.ArtTag, {
     name: 'Tag',
     nameShort: 'Short Name',
     directory: 'Directory',
+    description: 'Description',
 
     color: 'Color',
     isContentWarning: 'Is CW',
