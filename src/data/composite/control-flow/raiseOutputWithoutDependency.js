@@ -17,7 +17,7 @@ export default templateCompositeFrom({
 
   outputs: ({
     [input.staticValue('output')]: output,
-  }) => Object.keys(output),
+  }) => Object.keys(output ?? {}),
 
   steps: () => [
     withResultOfAvailabilityCheck({
