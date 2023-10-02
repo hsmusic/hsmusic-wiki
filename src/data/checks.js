@@ -166,6 +166,10 @@ export function filterReferenceErrors(wikiData, {
       commentary: '_commentary',
     }],
 
+    ['artTagData', {
+      directDescendantTags: 'artTag',
+    }],
+
     ['groupCategoryData', {
       groups: 'group',
     }],

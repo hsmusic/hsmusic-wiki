@@ -1,6 +1,7 @@
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {input} from '#composite';
+import find from '#find';
 import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
@@ -11,6 +12,8 @@ import {
   color,
   directory,
   flag,
+  referenceList,
+  reverseReferenceList,
   name,
   wikiData,
 } from '#composite/wiki-properties';
@@ -39,10 +42,20 @@ export class ArtTag extends Thing {
       },
     ],
 
+    directDescendantTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
+
     // Update only
 
     albumData: wikiData({
       class: input.value(Album),
+    }),
+
+    artTagData: wikiData({
+      class: input.value(ArtTag),
     }),
 
     trackData: wikiData({
@@ -63,6 +76,11 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    directAncestorTags: reverseReferenceList({
+      data: 'artTagData',
+      list: input.value('directDescendantTags'),
+    }),
   });
 
   static [Thing.findSpecs] = {
@@ -85,6 +103,8 @@ export class ArtTag extends Thing {
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
+
+      'Direct Descendant Tags': {property: 'directDescendantTags'},
     },
   };
 

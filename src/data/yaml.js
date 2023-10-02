@@ -924,6 +924,7 @@ export function linkWikiDataArrays(wikiData) {
 
     [wikiData.artTagData, [
       'albumData',
+      'artTagData',
       'trackData',
     ]],
 
