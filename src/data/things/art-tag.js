@@ -1,6 +1,7 @@
 import {input} from '#composite';
-import {sortAlbumsTracksChronologically} from '#wiki-data';
+import find from '#find';
 import {isName} from '#validators';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
 
 import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 
@@ -8,6 +9,8 @@ import {
   color,
   directory,
   flag,
+  referenceList,
+  reverseReferenceList,
   name,
   wikiData,
 } from '#composite/wiki-properties';
@@ -38,10 +41,20 @@ export class ArtTag extends Thing {
       },
     ],
 
+    directDescendantTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
+
     // Update only
 
     albumData: wikiData({
       class: input.value(Album),
+    }),
+
+    artTagData: wikiData({
+      class: input.value(ArtTag),
     }),
 
     trackData: wikiData({
@@ -62,5 +75,10 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    directAncestorTags: reverseReferenceList({
+      data: 'artTagData',
+      list: input.value('directDescendantTags'),
+    }),
   });
 }
