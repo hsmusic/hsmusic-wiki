@@ -405,6 +405,8 @@ export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
 }
 
+const validateWikiData_cache = {};
+
 export function validateWikiData({
   referenceType = '',
   allowMixedTypes = false,
@@ -413,51 +415,63 @@ export function validateWikiData({
     throw new TypeError(`Don't specify both referenceType and allowMixedTypes`);
   }
 
+  validateWikiData_cache[referenceType] ??= {};
+  validateWikiData_cache[referenceType][allowMixedTypes] ??= new WeakMap();
+
   const isArrayOfObjects = validateArrayItems(isObject);
 
   return (array) => {
-    isArrayOfObjects(array);
+    const subcache = validateWikiData_cache[referenceType][allowMixedTypes];
+    if (subcache.has(array)) return subcache.get(array);
 
-    if (empty(array)) {
-      return true;
-    }
+    let OK = false;
 
-    const allRefTypes =
-      new Set(array.map(object =>
-        object.constructor[Symbol.for('Thing.referenceType')]));
+    try {
+      isArrayOfObjects(array);
 
-    if (allRefTypes.has(undefined)) {
-      if (allRefTypes.size === 1) {
-        throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
-      } else {
-        throw new TypeError(`Expected array of wiki data objects, got mixed items`);
-      }
-    }
-
-    if (allRefTypes.size > 1) {
-      if (allowMixedTypes) {
-        return true;
+      if (empty(array)) {
+        OK = true; return true;
       }
 
-      const types = () => Array.from(allRefTypes).join(', ');
+      const allRefTypes =
+        new Set(array.map(object =>
+          object.constructor[Symbol.for('Thing.referenceType')]));
 
-      if (referenceType) {
-        if (allRefTypes.has(referenceType)) {
-          allRefTypes.remove(referenceType);
-          throw new TypeError(`Expected array of only ${referenceType}, also got other types: ${types()}`)
+      if (allRefTypes.has(undefined)) {
+        if (allRefTypes.size === 1) {
+          throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
         } else {
-          throw new TypeError(`Expected array of only ${referenceType}, got other types: ${types()}`);
+          throw new TypeError(`Expected array of wiki data objects, got mixed items`);
         }
       }
 
-      throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
-    }
+      if (allRefTypes.size > 1) {
+        if (allowMixedTypes) {
+          OK = true; return true;
+        }
 
-    if (referenceType && !allRefTypes.has(referenceType)) {
-      throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
-    }
+        const types = () => Array.from(allRefTypes).join(', ');
 
-    return true;
+        if (referenceType) {
+          if (allRefTypes.has(referenceType)) {
+            allRefTypes.remove(referenceType);
+            throw new TypeError(`Expected array of only ${referenceType}, also got other types: ${types()}`)
+          } else {
+            throw new TypeError(`Expected array of only ${referenceType}, got other types: ${types()}`);
+          }
+        }
+
+        throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
+      }
+
+      if (referenceType && !allRefTypes.has(referenceType)) {
+        throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
+      }
+
+      OK = true; return true;
+    } finally {
+      subcache.set(array, OK);
+    }
   };
 }
 
