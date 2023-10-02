@@ -625,6 +625,11 @@ misc:
 
   missingLinkContent: "(Missing link content)"
 
+  quickDescription:
+    moreInfo:
+      _: "({LINK})"
+      link: "More info..."
+
   # nav:
   #   Generic navigational elements. These usually only appear in the
   #   wiki's nav bar, at the top of the page.
