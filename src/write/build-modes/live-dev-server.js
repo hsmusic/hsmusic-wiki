@@ -42,8 +42,8 @@ export function getCLIOptions() {
       },
     },
 
-    'quiet-responses': {
-      help: `Disables outputting [200] and [404] responses in the server log`,
+    'loud-responses': {
+      help: `Enables outputting [200] and [404] responses in the server log, which are suppressed by default`,
       type: 'flag',
     },
   };
@@ -78,7 +78,7 @@ export async function go({
 
   const host = cliOptions['host'] ?? defaultHost;
   const port = parseInt(cliOptions['port'] ?? defaultPort);
-  const quietResponses = cliOptions['quiet-responses'] ?? false;
+  const loudResponses = cliOptions['loud-responses'] ?? false;
 
   const contentDependenciesWatcher = await watchContentDependencies();
   const {contentDependencies} = contentDependenciesWatcher;
@@ -160,7 +160,7 @@ export async function go({
         });
         response.writeHead(200, contentTypeJSON);
         response.end(json);
-        if (!quietResponses) console.log(`${requestHead} [200] /data.json`);
+        if (loudResponses) console.log(`${requestHead} [200] /data.json`);
       } catch (error) {
         response.writeHead(500, contentTypeJSON);
         response.end(`Internal error serializing wiki JSON`);
@@ -256,7 +256,7 @@ export async function go({
         await pipeline(
           createReadStream(filePath),
           response);
-        if (!quietResponses) console.log(`${requestHead} [200] ${pathname}`);
+        if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       } catch (error) {
         response.writeHead(500, contentTypePlain);
         response.end(`Failed during file-to-response pipeline`);
@@ -274,7 +274,7 @@ export async function go({
     if (!Object.hasOwn(urlToPageMap, pathnameKey)) {
       response.writeHead(404, contentTypePlain);
       response.end(`No page found for: ${pathnameKey}\n`);
-      if (!quietResponses) console.log(`${requestHead} [404] ${pathname}`);
+      if (loudResponses) console.log(`${requestHead} [404] ${pathname}`);
       return;
     }
 
@@ -358,7 +358,7 @@ export async function go({
 
       const {pageHTML} = html.resolve(topLevelResult);
 
-      if (!quietResponses) console.log(`${requestHead} [200] ${pathname}`);
+      if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       response.writeHead(200, contentTypeHTML);
       response.end(pageHTML);
     } catch (error) {
@@ -388,8 +388,11 @@ export async function go({
   server.on('listening', () => {
     logInfo`${'All done!'} Listening at: ${address}`;
     logInfo`Press ^C here (control+C) to stop the server and exit.`;
-    if (quietResponses) {
-      logInfo`Suppressing [200] and [404] response logging.`;
+    if (loudResponses) {
+      logInfo`Printing [200] and [404] responses.`
+    } else {
+      logInfo`Suppressing [200] and [404] response logging.`
+      logInfo`(Pass --loud-responses to show these.)`;
     }
   });
 
