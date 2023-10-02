@@ -1770,6 +1770,13 @@ tagPage:
   infoLine: >-
     Appears in {COVER_ARTS}.
 
+  descendsFrom: "Descends from {TAGS.}"
+  descendants: "Direct descendants: {TAGS}."
+
+  moreInfo:
+    _: "({LINK})"
+    link: "More info..."
+
 #
 # trackPage:
 #
