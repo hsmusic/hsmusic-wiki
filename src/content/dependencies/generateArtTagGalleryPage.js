@@ -5,6 +5,7 @@ export default {
   contentDependencies: [
     'generateCoverGrid',
     'generatePageLayout',
+    'generateQuickDescription',
     'image',
     'linkAlbum',
     'linkArtTag',
@@ -38,6 +39,9 @@ export default {
 
     relations.artTagMainLink =
       relation('linkArtTag', tag);
+
+    relations.quickDescription =
+      relation('generateQuickDescription', tag);
 
     relations.coverGrid =
       relation('generateCoverGrid');
@@ -99,6 +103,8 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
+          relations.quickDescription,
+
           html.tag('p', {class: 'quick-info'},
             language.$(pageCapsule, 'infoLine', {
               coverArts: language.countCoverArts(data.numArtworks, {
