@@ -188,6 +188,10 @@ export function filterReferenceErrors(wikiData, {
       commentary: '_commentary',
     }],
 
+    ['artTagData', {
+      directDescendantTags: 'artTag',
+    }],
+
     ['flashData', {
       commentary: '_commentary',
     }],

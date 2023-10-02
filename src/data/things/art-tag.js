@@ -1,6 +1,7 @@
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {input} from '#composite';
+import find from '#find';
 import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
@@ -11,7 +12,10 @@ import {
   color,
   directory,
   flag,
+  referenceList,
+  reverseReferenceList,
   name,
+  soupyFind,
   soupyReverse,
   wikiData,
 } from '#composite/wiki-properties';
@@ -40,8 +44,14 @@ export class ArtTag extends Thing {
       },
     ],
 
+    directDescendantTags: referenceList({
+      class: input.value(ArtTag),
+      find: soupyFind.input('artTag'),
+    }),
+
     // Update only
 
+    find: soupyFind(),
     reverse: soupyReverse(),
 
     // Expose only
@@ -60,6 +70,10 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    directAncestorTags: reverseReferenceList({
+      reverse: soupyReverse.input('artTagsWhichDirectlyAncestor'),
+    }),
   });
 
   static [Thing.findSpecs] = {
@@ -74,6 +88,15 @@ export class ArtTag extends Thing {
     },
   };
 
+  static [Thing.reverseSpecs] = {
+    artTagsWhichDirectlyAncestor: {
+      bindTo: 'artTagData',
+
+      referencing: artTag => [artTag],
+      referenced: artTag => artTag.directDescendantTags,
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Tag': {property: 'name'},
@@ -82,6 +105,8 @@ export class ArtTag extends Thing {
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
+
+      'Direct Descendant Tags': {property: 'directDescendantTags'},
     },
   };
 
