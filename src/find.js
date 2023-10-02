@@ -77,7 +77,7 @@ function findHelper({
   // errors for null matches (with details about the error), while 'warn' and
   // 'quiet' both return null, with 'warn' logging details directly to the
   // console.
-  return (fullRef, data, {mode = 'warn'}) => {
+  return (fullRef, data, {mode = 'warn'} = {}) => {
     if (!fullRef) return null;
     if (typeof fullRef !== 'string') {
       throw new TypeError(`Expected a string, got ${typeAppearance(fullRef)}`);
