@@ -560,6 +560,15 @@ misc:
 
   missingLinkContent: "(Missing link content)"
 
+  # moreInfo:
+  #   Displayed in "quick descriptions", where usually just the first
+  #   paragraph of a long description is displayed; this link shows
+  #   the full description.
+
+  moreInfo:
+    _: "({LINK})"
+    link: "More info..."
+
   # nav:
   #   Generic navigational elements. These usually only appear in the
   #   wiki's nav bar, at the top of the page.
@@ -1781,10 +1790,6 @@ tagPage:
 
   descendsFrom: "Descends from {TAGS.}"
   descendants: "Direct descendants: {TAGS}."
-
-  moreInfo:
-    _: "({LINK})"
-    link: "More info..."
 
 #
 # trackPage:
