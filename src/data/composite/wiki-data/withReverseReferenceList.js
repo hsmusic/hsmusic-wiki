@@ -10,6 +10,10 @@
 //
 // Note that this implementation is mirrored in withReverseContributionList,
 // so any changes should be reflected there (until these are combined).
+//
+// Reference code for:
+//  - (atomic) reverseReferenceList
+//
 
 import {input, templateCompositeFrom} from '#composite';
 

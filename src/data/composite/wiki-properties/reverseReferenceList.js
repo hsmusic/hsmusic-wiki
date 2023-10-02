@@ -3,13 +3,17 @@
 // you would use this to compute a corresponding "referenced *by* tracks"
 // property. Naturally, the passed ref list property is of the things in the
 // wiki data provided, not the requesting Thing itself.
+//
+// Reference code for:
+//  - (atomic) reverseReferenceList
+//
 
 import {input, templateCompositeFrom} from '#composite';
 
 import {exposeDependency} from '#composite/control-flow';
 import {inputWikiData, withReverseReferenceList} from '#composite/wiki-data';
 
-export default templateCompositeFrom({
+export const REFERENCE = templateCompositeFrom({
   annotation: `reverseReferenceList`,
 
   compose: false,
@@ -28,3 +32,5 @@ export default templateCompositeFrom({
     exposeDependency({dependency: '#reverseReferenceList'}),
   ],
 });
+
+export {default} from './atomic/reverseReferenceList.js';
