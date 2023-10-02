@@ -16,7 +16,10 @@ function warnOrThrow(mode, message) {
 }
 
 export function processAllAvailableMatches(data, {
-  getMatchableNames = thing => [thing.name],
+  getMatchableNames = thing =>
+    (Object.hasOwn(thing, 'name')
+      ? [thing.name]
+      : []),
 } = {}) {
   const byName = Object.create(null);
   const byDirectory = Object.create(null);
@@ -24,6 +27,11 @@ export function processAllAvailableMatches(data, {
 
   for (const thing of data) {
     for (const name of getMatchableNames(thing)) {
+      if (typeof name !== 'string') {
+        logWarn`Unexpected ${typeAppearance(name)} returned in names for ${inspect(thing)}`;
+        continue;
+      }
+
       const normalizedName = name.toLowerCase();
       if (normalizedName in byName) {
         byName[normalizedName] = null;
