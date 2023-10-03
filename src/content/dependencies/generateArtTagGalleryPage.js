@@ -127,7 +127,7 @@ export default {
 
           html.tag('p', {class: 'quick-info'},
             language.$('tagPage.infoLine', {
-              coverArts: language.countCoverArts(data.numArtworks, {
+              coverArts: language.countArtworks(data.numArtworks, {
                 unit: true,
               }),
             })),
@@ -148,6 +148,7 @@ export default {
             .slots({
               links: relations.links,
               names: data.names,
+              lazy: 12,
 
               classes:
                 data.onlyFeaturedIndirectly.map(onlyFeaturedIndirectly =>
