@@ -999,6 +999,32 @@ artistGalleryPage:
     Contributed to {COVER_ARTS}.
 
 #
+# artTagPage:
+#   The art tag info page displays general information about a tag,
+#   including details about how it's networked with other tags in
+#   particular.
+#
+artTagPage:
+  nav:
+    tag: "Tag: {TAG}"
+
+#
+# artTagGalleryPage:
+#   The tag gallery page displays all the artworks that a tag has
+#   been featured in, in one neat grid, with each artwork displaying
+#   its illustrators, as well as a short info line that indicates
+#   how many artworks the tag's part of.
+#
+artTagGalleryPage:
+  title: "{TAG}"
+
+  infoLine: >-
+    Appears in {COVER_ARTS}.
+
+  descendsFrom: "Descends from {TAGS.}"
+  descendants: "Direct descendants: {TAGS}."
+
+#
 # commentaryIndex:
 #   The commentary index page shows a summary of all the commentary
 #   across the entire wiki, with a list linking to each album's
@@ -1762,25 +1788,6 @@ redirectPage:
 
   infoLine: >-
     This page has been moved to {TARGET}.
-
-#
-# tagPage:
-#   The tag gallery page displays all the artworks that a tag has
-#   been featured in, in one neat grid, with each artwork displaying
-#   its illustrators, as well as a short info line that indicates
-#   how many artworks the tag's part of.
-#
-tagPage:
-  title: "{TAG}"
-
-  nav:
-    tag: "Tag: {TAG}"
-
-  infoLine: >-
-    Appears in {COVER_ARTS}.
-
-  descendsFrom: "Descends from {TAGS.}"
-  descendants: "Direct descendants: {TAGS}."
 
 #
 # trackPage:

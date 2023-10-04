@@ -899,7 +899,7 @@ export function filterItemsForCarousel(items) {
 
   return items
     .filter(item => item.hasCoverArt)
-    .filter(item => item.artTags.every(tag => !tag.isContentWarning))
+    .filter(item => item.artTags.every(artTag => !artTag.isContentWarning))
     .slice(0, maxCarouselLayoutItems + 1);
 }
 

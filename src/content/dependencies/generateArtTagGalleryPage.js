@@ -3,12 +3,14 @@ import {sortAlbumsTracksChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [
+    'generateArtTagNavLinks',
     'generateCoverGrid',
     'generatePageLayout',
     'generateQuickDescription',
     'image',
     'linkAlbum',
     'linkArtTag',
+    'linkArtTagGallery',
     'linkTrack',
   ],
 
@@ -20,9 +22,9 @@ export default {
     };
   },
 
-  query(sprawl, tag) {
-    const directThings = tag.directlyTaggedInThings;
-    const indirectThings = tag.indirectlyTaggedInThings;
+  query(sprawl, artTag) {
+    const directThings = artTag.directlyTaggedInThings;
+    const indirectThings = artTag.indirectlyTaggedInThings;
     const allThings = unique([...directThings, ...indirectThings]);
 
     sortAlbumsTracksChronologically(allThings, {
@@ -33,57 +35,57 @@ export default {
     return {directThings, indirectThings, allThings};
   },
 
-  relations(relation, query, sprawl, tag) {
+  relations(relation, query, sprawl, artTag) {
     const relations = {};
 
     relations.layout =
       relation('generatePageLayout');
 
-    relations.artTagMainLink =
-      relation('linkArtTag', tag);
+    relations.navLinks =
+      relation('generateArtTagNavLinks', artTag);
 
-    // TODO: linkArtTagInfo
     relations.infoPageLink =
-      relation('linkArtTag', tag);
+      relation('linkArtTag', artTag);
 
     relations.quickDescription =
-      relation('generateQuickDescription', tag);
+      relation('generateQuickDescription', artTag);
 
-    if (!empty(tag.directAncestorTags)) {
+    if (!empty(artTag.directAncestorArtTags)) {
       relations.ancestorLinks =
-        tag.directAncestorTags.map(tag =>
-          relation('linkArtTag', tag));
+        artTag.directAncestorArtTags
+          .map(artTag => relation('linkArtTagGallery', artTag));
     }
 
-    if (!empty(tag.directDescendantTags)) {
+    if (!empty(artTag.directDescendantArtTags)) {
       relations.descendantLinks =
-        tag.directDescendantTags.map(tag =>
-          relation('linkArtTag', tag));
+        artTag.directDescendantArtTags
+          .map(artTag => relation('linkArtTagGallery', artTag));
     }
 
     relations.coverGrid =
       relation('generateCoverGrid');
 
     relations.links =
-      query.allThings.map(thing =>
-        (thing.album
-          ? relation('linkTrack', thing)
-          : relation('linkAlbum', thing)));
+      query.allThings
+        .map(thing =>
+          (thing.album
+            ? relation('linkTrack', thing)
+            : relation('linkAlbum', thing)));
 
     relations.images =
-      query.allThings.map(thing =>
-        relation('image', thing.artTags));
+      query.allThings
+        .map(thing => relation('image', thing.artTags));
 
     return relations;
   },
 
-  data(query, sprawl, tag) {
+  data(query, sprawl, artTag) {
     const data = {};
 
     data.enableListings = sprawl.enableListings;
 
-    data.name = tag.name;
-    data.color = tag.color;
+    data.name = artTag.name;
+    data.color = artTag.color;
 
     data.numArtworks = query.allThings.length;
 
@@ -112,7 +114,7 @@ export default {
     return relations.layout
       .slots({
         title:
-          language.$('tagPage.title', {
+          language.$('artTagGalleryPage.title', {
             tag: data.name,
           }),
 
@@ -126,7 +128,7 @@ export default {
             .slot('infoPageLink', relations.infoPageLink),
 
           html.tag('p', {class: 'quick-info'},
-            language.$('tagPage.infoLine', {
+            language.$('artTagGalleryPage.infoLine', {
               coverArts: language.countArtworks(data.numArtworks, {
                 unit: true,
               }),
@@ -134,13 +136,13 @@ export default {
 
           relations.ancestorLinks &&
             html.tag('p', {class: 'quick-info'},
-              language.$('tagPage.descendsFrom', {
+              language.$('artTagGalleryPage.descendsFrom', {
                 tags: language.formatConjunctionList(relations.ancestorLinks),
               })),
 
           relations.descendantLinks &&
             html.tag('p', {clasS: 'quick-info'},
-              language.$('tagPage.desendants', {
+              language.$('artTagGalleryPage.desendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),
 
@@ -172,22 +174,10 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-
-          data.enableListings &&
-            {
-              path: ['localized.listingIndex'],
-              title: language.$('listingIndex.title'),
-            },
-
-          {
-            html:
-              language.$('tagPage.nav.tag', {
-                tag: relations.artTagMainLink,
-              }),
-          },
-        ],
+        navLinks:
+          relations.navLinks
+            .slot('currentExtra', 'gallery')
+            .content,
       });
   },
 };

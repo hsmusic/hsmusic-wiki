@@ -1,23 +1,25 @@
-import {stitchArrays} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
 import {filterByCount, sortAlphabetically, sortByCount} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtTag'],
+  contentDependencies: ['generateListingPage', 'linkArtTagGallery'],
   extraDependencies: ['language', 'wikiData'],
 
-  sprawl({artTagData}) {
-    return {artTagData};
-  },
+  sprawl: ({artTagData}) =>
+    ({artTagData}),
 
   query({artTagData}, spec) {
     const artTags =
       sortAlphabetically(
         artTagData
-          .filter(tag => !tag.isContentWarning));
+          .filter(artTag => !artTag.isContentWarning));
 
     const counts =
-      artTags
-        .map(tag => tag.taggedInThings.length);
+      artTags.map(artTag =>
+        unique([
+          ...artTag.directlyTaggedInThings,
+          ...artTag.indirectlyTaggedInThings,
+        ]).length);
 
     filterByCount(artTags, counts);
     sortByCount(artTags, counts, {greatestFirst: true});
@@ -25,26 +27,20 @@ export default {
     return {spec, artTags, counts};
   },
 
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
+  relations: (relation, query) => ({
+    page:
+      relation('generateListingPage', query.spec),
 
-      artTagLinks:
-        query.artTags
-          .map(tag => relation('linkArtTag', tag)),
-    };
-  },
+    artTagLinks:
+      query.artTags
+        .map(artTag => relation('linkArtTagGallery', artTag)),
+  }),
 
-  data(query) {
-    return {
-      counts:
-        query.artTags
-          .map(tag => tag.taggedInThings.length),
-    };
-  },
+  data: (query) =>
+    ({counts: query.counts}),
 
-  generate(data, relations, {language}) {
-    return relations.page.slots({
+  generate: (data, relations, {language}) =>
+    relations.page.slots({
       type: 'rows',
       rows:
         stitchArrays({
@@ -54,6 +50,5 @@ export default {
             tag: link,
             timesUsed: language.countTimesUsed(count, {unit: true}),
           })),
-    });
-  },
+    }),
 };
