@@ -2,7 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
-    'linkArtTag',
+    'linkArtTagInfo',
     'linkArtTagGallery',
   ],
 
@@ -13,10 +13,10 @@ export default {
 
   relations: (relation, sprawl, tag) => ({
     mainLink:
-      relation('linkArtTag', tag),
+      relation('linkArtTagInfo', tag),
 
     infoLink:
-      relation('linkArtTag', tag),
+      relation('linkArtTagInfo', tag),
 
     galleryLink:
       relation('linkArtTagGallery', tag),
