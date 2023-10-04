@@ -6,6 +6,7 @@ import {
   isObject,
   isStringNonEmpty,
   optional,
+  validateAllPropertyValues,
   validateArrayItems,
   validateInstanceOf,
   validateProperties,
@@ -35,10 +36,24 @@ export const isExternalLinkContext = is(...externalLinkContexts);
 const isRegExp =
   validateInstanceOf(RegExp);
 
+export const isExternalLinkTransformCommand =
+  is(...[
+    'decode-uri',
+    'find-replace',
+  ]);
+
+export const isExternalLinkTransformSpec =
+  anyOf(
+    isExternalLinkTransformCommand,
+    validateProperties({
+      [validateProperties.allowOtherKeys]: true,
+      command: isExternalLinkTransformCommand,
+    }));
+
 export const isExternalLinkExtractSpec =
   validateProperties({
     prefix: optional(isStringNonEmpty),
-
+    transform: optional(validateArrayItems(isExternalLinkTransformSpec)),
     url: optional(isRegExp),
     domain: optional(isRegExp),
     pathname: optional(isRegExp),
@@ -79,7 +94,7 @@ export const isExternalLinkSpec =
       handle: optional(isExternalLinkExtractSpec),
 
       // TODO: This should validate each value with isExternalLinkExtractSpec.
-      custom: optional(isObject),
+      custom: optional(validateAllPropertyValues(isExternalLinkExtractSpec)),
     }));
 
 export const fallbackDescriptor = {
@@ -268,6 +283,44 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {
+      domain: 'mspaintadventures.fandom.com',
+      pathname: /^wiki\/(.+)\/?$/,
+    },
+
+    platform: 'fandom',
+    substring: 'mspaintadventures.page',
+
+    normal: 'custom',
+    icon: 'globe',
+
+    custom: {
+      page: {
+        pathname: /^wiki\/(.+)\/?$/,
+        transform: [
+          {command: 'decode-uri'},
+          {command: 'find-replace', find: /_/g, replace: ' '},
+        ],
+      },
+    },
+  },
+
+  {
+    match: {domain: 'mspaintadventures.fandom.com'},
+
+    platform: 'fandom',
+    substring: 'mspaintadventures',
+
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'fandom.com'},
+    platform: 'fandom',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'homestuck.com'},
     platform: 'homestuck',
     icon: 'globe',
@@ -422,6 +475,7 @@ export function extractPartFromExternalLink(url, extract) {
 
   let regexen = [];
   let tests = [];
+  let transform = [];
   let prefix = '';
 
   if (extract instanceof RegExp) {
@@ -432,6 +486,32 @@ export function extractPartFromExternalLink(url, extract) {
       switch (key) {
         case 'prefix':
           prefix = value;
+          continue;
+
+        case 'transform':
+          for (const entry of value) {
+            const command =
+              (typeof entry === 'string'
+                ? command
+                : entry.command);
+
+            const options =
+              (typeof entry === 'string'
+                ? {}
+                : entry);
+
+            switch (command) {
+              case 'decode-uri':
+                transform.push(value =>
+                  decodeURIComponent(value));
+                break;
+
+              case 'find-replace':
+                transform.push(value =>
+                  value.replace(options.find, options.replace));
+                break;
+            }
+          }
           continue;
 
         case 'url':
@@ -459,17 +539,27 @@ export function extractPartFromExternalLink(url, extract) {
     }
   }
 
+  let value;
   for (const {regex, test} of stitchArrays({
     regex: regexen,
     test: tests,
   })) {
     const match = test.match(regex);
     if (match) {
-      return prefix + (match[1] ?? match[0]);
+      value = prefix + (match[1] ?? match[0]);
+      break;
     }
   }
 
-  return null;
+  if (!value) {
+    return null;
+  }
+
+  for (const fn of transform) {
+    value = fn(value);
+  }
+
+  return value;
 }
 
 export function extractAllCustomPartsFromExternalLink(url, custom) {

@@ -64,6 +64,12 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">buzinkai.newgrounds.com</a>
 <a href="https://music.solatrus.com/" class="nowrap">music.solatrus.com</a>
 <a href="https://types.pl/" class="nowrap">types.pl</a>
+<a href="https://community.fandom.com/" class="nowrap">community.fandom.com</a>
+<a href="https://community.fandom.com/wiki/" class="nowrap">community.fandom.com</a>
+<a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">community.fandom.com</a>
+<a href="https://mspaintadventures.fandom.com/" class="nowrap">mspaintadventures.fandom.com</a>
+<a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">mspaintadventures.fandom.com</a>
+<a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">mspaintadventures.fandom.com</a>
 `
 
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: generic, style: normal 1`] = `
@@ -80,6 +86,12 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">Newgrounds</a>
 <a href="https://music.solatrus.com/" class="nowrap">Bandcamp (music.solatrus.com)</a>
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
+<a href="https://community.fandom.com/" class="nowrap">Fandom</a>
+<a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
+<a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
+<a href="https://mspaintadventures.fandom.com/" class="nowrap">MSPA Wiki</a>
+<a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">MSPA Wiki</a>
+<a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">MSPA Wiki (Draconian Dignitary)</a>
 `
 
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: generic, style: platform 1`] = `
@@ -96,6 +108,12 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">Newgrounds</a>
 <a href="https://music.solatrus.com/" class="nowrap">Bandcamp</a>
 <a href="https://types.pl/" class="nowrap">Mastodon</a>
+<a href="https://community.fandom.com/" class="nowrap">Fandom</a>
+<a href="https://community.fandom.com/wiki/" class="nowrap">Fandom</a>
+<a href="https://community.fandom.com/wiki/Community_Central" class="nowrap">Fandom</a>
+<a href="https://mspaintadventures.fandom.com/" class="nowrap">Fandom</a>
+<a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">Fandom</a>
+<a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">Fandom</a>
 `
 
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > unknown domain (arbitrary world wide web path) 1`] = `

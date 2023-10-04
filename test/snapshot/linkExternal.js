@@ -42,6 +42,13 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // Just one custom domain of each platform is OK here
     'https://music.solatrus.com/',
     'https://types.pl/',
+
+    'https://community.fandom.com/',
+    'https://community.fandom.com/wiki/',
+    'https://community.fandom.com/wiki/Community_Central',
+    'https://mspaintadventures.fandom.com/',
+    'https://mspaintadventures.fandom.com/wiki/',
+    'https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary',
   ]);
 
   quickSnapshotAllStyles('album', [

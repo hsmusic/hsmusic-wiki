@@ -505,6 +505,13 @@ misc:
 
     deviantart: "DeviantArt"
 
+    fandom:
+      _: "Fandom"
+
+      mspaintadventures:
+        _: "MSPA Wiki"
+        page: "MSPA Wiki ({PAGE})"
+
     homestuck:
       _: "Homestuck"
       page: "Homestuck (page {PAGE})"
