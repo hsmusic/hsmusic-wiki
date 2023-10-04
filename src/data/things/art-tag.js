@@ -15,6 +15,7 @@ import {
   reverseReferenceList,
   simpleString,
   name,
+  urls,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -33,6 +34,7 @@ export class ArtTag extends Thing {
     directory: directory(),
     color: color(),
     isContentWarning: flag(false),
+    extraReadingURLs: urls(),
 
     nameShort: [
       exposeUpdateValueOrContinue({
