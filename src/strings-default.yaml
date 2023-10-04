@@ -315,7 +315,6 @@ releaseInfo:
 
   visitOn: "Visit on {LINKS}."
   playOn: "Play on {LINKS}."
-  readMoreOn: "Read more on {LINKS}."
 
   readCommentary:
     _: "Read {LINK}."
@@ -1015,6 +1014,25 @@ artTagPage:
 #
 artTagInfoPage:
   title: "{TAG}"
+
+  viewArtGallery:
+    _: "View this tag's {LINK}!"
+    link: "art gallery"
+
+  readMoreOn: "Read more about {TAG} on {LINKS}."
+
+  featuredIn:
+    notFeatured: >-
+      This tag hasn't been featured in any artworks yet.
+
+    directlyOnly: >-
+      This tag is featured in {ARTWORKS}.
+
+    indirectlyOnly: >-
+      This tag is featured in {ARTWORKS}, but only indirectly - have a look at its descendant tags!
+
+    directlyAndIndirectly: >-
+      This tag is directly featured in {ARTWORKS_DIRECTLY}, and indirectly in {ARTWORKS_INDIRECTLY} more, for a total of {ARTWORKS_TOTAL}.
 
   descendantTags: "Tags that descend from {TAG}:"
   descendsFromTags: "Tags that {TAG} descends from:"
