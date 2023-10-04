@@ -20,7 +20,7 @@ testContentFunctions(t, 'linkThing (snapshot)', async (t, evaluate) => {
   });
 
   quickSnapshot('preferShortName', {
-    args: ['localized.tag', {
+    args: ['localized.artTagGallery', {
       directory: 'five-oceanfalls',
       name: 'Five (Oceanfalls)',
       nameShort: 'Five',

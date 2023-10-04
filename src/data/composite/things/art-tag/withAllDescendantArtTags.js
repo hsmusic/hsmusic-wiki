@@ -1,4 +1,4 @@
-// Gets all the tags which descend from this one - that means its own direct
+// Gets all the art tags which descend from this one - that means its own direct
 // descendants, but also all the direct and indirect desceands of each of those!
 // The results aren't specially sorted, but they won't contain any duplicates
 // (for example if two descendant tags both route deeper to end up including
@@ -12,19 +12,19 @@ import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withResolvedReferenceList} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
-  annotation: `withAllDescendantTags`,
+  annotation: `withAllDescendantArtTags`,
 
-  outputs: ['#allDescendantTags'],
+  outputs: ['#allDescendantArtTags'],
 
   steps: () => [
     raiseOutputWithoutDependency({
-      dependency: 'directDescendantTags',
+      dependency: 'directDescendantArtTags',
       mode: input.value('empty'),
-      output: input.value({'#allDescendantTags': []})
+      output: input.value({'#allDescendantArtTags': []})
     }),
 
     withResolvedReferenceList({
-      list: 'directDescendantTags',
+      list: 'directDescendantArtTags',
       data: 'artTagData',
       find: input.value(find.artTag),
     }),
@@ -32,12 +32,12 @@ export default templateCompositeFrom({
     {
       dependencies: ['#resolvedReferenceList'],
       compute: (continuation, {
-        ['#resolvedReferenceList']: directDescendantTags,
+        ['#resolvedReferenceList']: directDescendantArtTags,
       }) => continuation({
-        ['#allDescendantTags']:
+        ['#allDescendantArtTags']:
           unique([
-            ...directDescendantTags,
-            ...directDescendantTags.flatMap(tag => tag.allDescendantTags),
+            ...directDescendantArtTags,
+            ...directDescendantArtTags.flatMap(artTag => artTag.allDescendantArtTags),
           ]),
       }),
     },

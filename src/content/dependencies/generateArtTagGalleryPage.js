@@ -3,12 +3,13 @@ import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateArtTagNavLinks',
     'generateCoverGrid',
     'generatePageLayout',
     'generateQuickDescription',
     'image',
     'linkAlbum',
-    'linkArtTag',
+    'linkArtTagGallery',
     'linkTrack',
   ],
 
@@ -20,9 +21,9 @@ export default {
     };
   },
 
-  query(sprawl, tag) {
-    const directThings = tag.directlyTaggedInThings;
-    const indirectThings = tag.indirectlyTaggedInThings;
+  query(sprawl, artTag) {
+    const directThings = artTag.directlyTaggedInThings;
+    const indirectThings = artTag.indirectlyTaggedInThings;
     const allThings = unique([...directThings, ...indirectThings]);
 
     sortAlbumsTracksChronologically(allThings, {
@@ -33,54 +34,54 @@ export default {
     return {directThings, indirectThings, allThings};
   },
 
-  relations(relation, query, sprawl, tag) {
+  relations(relation, query, sprawl, artTag) {
     const relations = {};
 
     relations.layout =
       relation('generatePageLayout');
 
-    relations.artTagMainLink =
-      relation('linkArtTag', tag);
+    relations.navLinks =
+      relation('generateArtTagNavLinks', artTag);
 
     relations.quickDescription =
-      relation('generateQuickDescription', tag);
+      relation('generateQuickDescription', artTag);
 
-    if (!empty(tag.directAncestorTags)) {
+    if (!empty(artTag.directAncestorArtTags)) {
       relations.ancestorLinks =
-        tag.directAncestorTags.map(tag =>
-          relation('linkArtTag', tag));
+        artTag.directAncestorArtTags
+          .map(artTag => relation('linkArtTagGallery', artTag));
     }
 
-    if (!empty(tag.directDescendantTags)) {
+    if (!empty(artTag.directDescendantArtTags)) {
       relations.descendantLinks =
-        tag.directDescendantTags.map(tag =>
-          relation('linkArtTag', tag));
+        artTag.directDescendantArtTags
+          .map(artTag => relation('linkArtTagGallery', artTag));
     }
 
     relations.coverGrid =
       relation('generateCoverGrid');
 
     relations.links =
-      query.allThings.map(thing =>
-        (thing.album
-          ? relation('linkTrack', thing)
-          : relation('linkAlbum', thing)));
+      query.allThings
+        .map(thing =>
+          (thing.album
+            ? relation('linkTrack', thing)
+            : relation('linkAlbum', thing)));
 
     relations.images =
-      query.allThings.map(thing =>
-        relation('image', thing.artTags));
+      query.allThings
+        .map(thing => relation('image', thing.artTags));
 
     return relations;
   },
 
-  data(query, sprawl, tag) {
+  data(query, sprawl, artTag) {
     const data = {};
 
     data.enableListings = sprawl.enableListings;
 
-    data.name = tag.name;
-    data.color = tag.color;
-    data.hasLongerDescription = tag.descriptionShort !== tag.description;
+    data.name = artTag.name;
+    data.color = artTag.color;
 
     data.numArtworks = query.allThings.length;
 
@@ -109,7 +110,7 @@ export default {
   },
 
   generate: (data, relations, {html, language}) =>
-    language.encapsulate('tagPage', pageCapsule =>
+    language.encapsulate('artTagGalleryPage', pageCapsule =>
       relations.layout.slots({
         title:
           language.$(pageCapsule, 'title', {
@@ -175,21 +176,9 @@ export default {
         ],
 
         navLinkStyle: 'hierarchical',
-        navLinks: [
-          {auto: 'home'},
-
-          data.enableListings &&
-            {
-              path: ['localized.listingIndex'],
-              title: language.$('listingIndex.title'),
-            },
-
-          {
-            html:
-              language.$(pageCapsule, 'nav.tag', {
-                tag: relations.artTagMainLink,
-              }),
-          },
-        ],
+        navLinks:
+          relations.navLinks
+            .slot('currentExtra', 'gallery')
+            .content,
       })),
 };
