@@ -9,7 +9,7 @@ export default {
     'generateQuickDescription',
     'image',
     'linkAlbum',
-    'linkArtTag',
+    'linkArtTagInfo',
     'linkArtTagGallery',
     'linkTrack',
   ],
@@ -45,7 +45,7 @@ export default {
       relation('generateArtTagNavLinks', artTag);
 
     relations.infoPageLink =
-      relation('linkArtTag', artTag);
+      relation('linkArtTagInfo', artTag);
 
     relations.quickDescription =
       relation('generateQuickDescription', artTag);
