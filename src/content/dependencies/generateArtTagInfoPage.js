@@ -1,11 +1,12 @@
-import {unique} from '#sugar';
+import {empty, unique} from '#sugar';
 
 export default {
   contentDependencies: [
     'generateArtTagNavLinks',
     'generateContentHeading',
     'generatePageLayout',
-    'linkArtTag',
+    'linkArtTagGallery',
+    'linkArtTagInfo',
     'linkExternal',
     'transformContent',
   ],
@@ -37,17 +38,22 @@ export default {
     description:
       relation('transformContent', artTag.description),
 
+    galleryLink:
+      (empty(query.allThings)
+        ? null
+        : relation('linkArtTagGallery', artTag)),
+
     extraReadingLinks:
       artTag.extraReadingURLs
         .map(url => relation('linkExternal', url)),
 
     directAncestorLinks:
       artTag.directAncestorArtTags
-        .map(artTag => relation('linkArtTag', artTag)),
+        .map(artTag => relation('linkArtTagInfo', artTag)),
 
     directDescendantLinks:
       artTag.directDescendantArtTags
-        .map(artTag => relation('linkArtTag', artTag)),
+        .map(artTag => relation('linkArtTagInfo', artTag)),
   }),
 
   data: (query, sprawl, artTag) => ({
@@ -60,7 +66,13 @@ export default {
     color:
       artTag.color,
 
-    numArtworks:
+    numArtworksIndirectly:
+      query.indirectThings.length,
+
+    numArtworksDirectly:
+      query.directThings.length,
+
+    numArtworksTotal:
       query.allThings.length,
 
     names:
@@ -82,7 +94,7 @@ export default {
       relations.layout.slots({
         title:
           language.$(pageCapsule, 'title', {
-            tag: data.name,
+            tag: language.sanitize(data.name),
           }),
 
         headingMode: 'static',
@@ -90,12 +102,42 @@ export default {
 
         mainContent: [
           html.tag('p',
+            language.encapsulate(pageCapsule, 'featuredIn', capsule =>
+              (data.numArtworksTotal === 0
+                ? language.$(capsule, 'notFeatured')
+
+             : data.numArtworksDirectly === 0
+                ? language.$(capsule, 'indirectlyOnly', {
+                    artworks:
+                      language.countArtworks(data.numArtworksIndirectly, {unit: true}),
+                  })
+
+             : data.numArtworksIndirectly === 0
+                ? language.$(capsule, 'directlyOnly', {
+                    artworks:
+                      language.countArtworks(data.numArtworksDirectly, {unit: true}),
+                  })
+
+                : language.$(capsule, 'directlyAndIndirectly', {
+                    artworksDirectly:
+                      language.countArtworks(data.numArtworksDirectly, {unit: true}),
+
+                    artworksIndirectly:
+                      language.countArtworks(data.numArtworksIndirectly, {unit: false}),
+
+                    artworksTotal:
+                      language.countArtworks(data.numArtworksTotal, {unit: false}),
+                  })))),
+
+          html.tag('p',
             {[html.onlyIfContent]: true},
 
-            language.$('releaseInfo.readMoreOn', {
-              [language.onlyIfOptions]: ['links'],
+            language.$(pageCapsule, 'viewArtGallery', {
+              [language.onlyIfOptions]: ['link'],
 
-              links: language.formatDisjunctionList(relations.extraReadingLinks),
+              link:
+                relations.galleryLink
+                  ?.slot('content', language.$(pageCapsule, 'viewArtGallery.link')),
             })),
 
           html.tag('blockquote',
@@ -103,6 +145,16 @@ export default {
 
             relations.description
               .slot('mode', 'multiline')),
+
+          html.tag('p',
+            {[html.onlyIfContent]: true},
+
+            language.$(pageCapsule, 'readMoreOn', {
+              [language.onlyIfOptions]: ['links'],
+
+              tag: language.sanitize(data.name),
+              links: language.formatDisjunctionList(relations.extraReadingLinks),
+            })),
 
           html.tags([
             relations.contentHeading.clone()
