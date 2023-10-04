@@ -20,6 +20,7 @@ import {
   name,
   soupyFind,
   soupyReverse,
+  urls,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -36,6 +37,7 @@ export class ArtTag extends Thing {
     directory: directory(),
     color: color(),
     isContentWarning: flag(false),
+    extraReadingURLs: urls(),
 
     nameShort: [
       exposeUpdateValueOrContinue({
@@ -138,6 +140,7 @@ export class ArtTag extends Thing {
       'Short Name': {property: 'nameShort'},
       'Directory': {property: 'directory'},
       'Description': {property: 'description'},
+      'Extra Reading URLs': {property: 'extraReadingURLs'},
 
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
