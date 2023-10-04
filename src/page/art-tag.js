@@ -1,6 +1,6 @@
 // Art tag page specification.
 
-export const description = `per-art-tag gallery pages`;
+export const description = `per-art-tag info & gallery pages`;
 
 export function condition({wikiData}) {
   return wikiData.wikiInfo.enableArtTagUI;
@@ -12,6 +12,16 @@ export function targets({wikiData}) {
 
 export function pathsForTarget(tag) {
   return [
+    {
+      type: 'page',
+      path: ['artTagInfo', tag.directory],
+
+      contentFunction: {
+        name: 'generateArtTagInfoPage',
+        args: [tag],
+      },
+    },
+
     {
       type: 'page',
       path: ['artTagGallery', tag.directory],
