@@ -22,7 +22,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withAllDescendantTags} from '#composite/things/art-tag';
+import {withAllDescendantArtTags} from '#composite/things/art-tag';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -51,7 +51,7 @@ export class ArtTag extends Thing {
 
     description: simpleString(),
 
-    directDescendantTags: referenceList({
+    directDescendantArtTags: referenceList({
       class: input.value(ArtTag),
       find: input.value(find.artTag),
       data: 'artTagData',
@@ -100,23 +100,25 @@ export class ArtTag extends Thing {
     },
 
     indirectlyTaggedInThings: [
-      withAllDescendantTags(),
+      withAllDescendantArtTags(),
 
       {
-        dependencies: ['#allDescendantTags'],
-        compute: ({'#allDescendantTags': allDescendantTags}) =>
-          unique(allDescendantTags.flatMap(tag => tag.directlyTaggedInThings)),
+        dependencies: ['#allDescendantArtTags'],
+        compute: ({'#allDescendantArtTags': allDescendantArtTags}) =>
+          unique(
+            allDescendantArtTags
+              .flatMap(artTag => artTag.directlyTaggedInThings)),
       },
     ],
 
-    allDescendantTags: [
-      withAllDescendantTags(),
-      exposeDependency({dependency: '#allDescendantTags'}),
+    allDescendantArtTags: [
+      withAllDescendantArtTags(),
+      exposeDependency({dependency: '#allDescendantArtTags'}),
     ],
 
-    directAncestorTags: reverseReferenceList({
+    directAncestorArtTags: reverseReferenceList({
       data: 'artTagData',
-      list: input.value('directDescendantTags'),
+      list: input.value('directDescendantArtTags'),
     }),
   });
 
@@ -125,10 +127,10 @@ export class ArtTag extends Thing {
       referenceTypes: ['tag'],
       bindTo: 'artTagData',
 
-      getMatchableNames: tag =>
-        (tag.isContentWarning
-          ? [`cw: ${tag.name}`]
-          : [tag.name]),
+      getMatchableNames: artTag =>
+        (artTag.isContentWarning
+          ? [`cw: ${artTag.name}`]
+          : [artTag.name]),
     },
   };
 
@@ -143,7 +145,7 @@ export class ArtTag extends Thing {
       'Color': {property: 'color'},
       'Is CW': {property: 'isContentWarning'},
 
-      'Direct Descendant Tags': {property: 'directDescendantTags'},
+      'Direct Descendant Tags': {property: 'directDescendantArtTags'},
     },
   };
 

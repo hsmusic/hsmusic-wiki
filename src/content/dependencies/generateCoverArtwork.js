@@ -1,7 +1,7 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['image', 'linkArtTag'],
+  contentDependencies: ['image', 'linkArtTagGallery'],
   extraDependencies: ['html'],
 
   query: (artTags) => ({
@@ -15,10 +15,10 @@ export default {
     image:
       relation('image', artTags),
 
-    tagLinks:
+    artTagLinks:
       query.linkableArtTags
         .filter(tag => !tag.isContentWarning)
-        .map(tag => relation('linkArtTag', tag)),
+        .map(tag => relation('linkArtTagGallery', tag)),
   }),
 
   data: (query) => {
@@ -93,11 +93,11 @@ export default {
             {[html.onlyIfContent]: true},
 
             stitchArrays({
-              tagLink: relations.tagLinks,
+              artTagLink: relations.artTagLinks,
               preferShortName: data.preferShortName,
-            }).map(({tagLink, preferShortName}) =>
+            }).map(({artTagLink, preferShortName}) =>
                 html.tag('li',
-                  tagLink.slot('preferShortName', preferShortName)))),
+                  artTagLink.slot('preferShortName', preferShortName)))),
         ]);
 
       case 'thumbnail':
