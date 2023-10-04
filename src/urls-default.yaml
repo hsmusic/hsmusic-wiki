@@ -36,6 +36,9 @@ localized:
     albumReferencedArtworks: 'album/<>/referenced-art/'
     albumReferencingArtworks: 'album/<>/referencing-art/'
 
+    artTagInfo: 'tag/<>/info/'
+    artTagGallery: 'tag/<>/'
+
     artist: 'artist/<>/'
     artistGallery: 'artist/<>/gallery/'
 
@@ -59,8 +62,6 @@ localized:
     newsEntry: 'news/<>/'
 
     staticPage: '<>/'
-
-    tag: 'tag/<>/'
 
     track: 'track/<>/'
     trackReferencedArtworks: 'track/<>/referenced-art/'

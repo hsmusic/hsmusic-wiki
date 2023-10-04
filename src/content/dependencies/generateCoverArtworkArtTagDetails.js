@@ -11,7 +11,7 @@ export default {
   }),
 
   relations: (relation, query, _artTags) => ({
-    tagLinks:
+    artTagLinks:
       query.linkableArtTags
         .map(tag => relation('linkArtTag', tag)),
   }),
@@ -42,9 +42,9 @@ export default {
       {class: 'art-tag-details'},
 
       stitchArrays({
-        tagLink: relations.tagLinks,
+        artTagLink: relations.artTagLinks,
         preferShortName: data.preferShortName,
-      }).map(({tagLink, preferShortName}) =>
+      }).map(({artTagLink, preferShortName}) =>
           html.tag('li',
-            tagLink.slot('preferShortName', preferShortName)))),
+            artTagLink.slot('preferShortName', preferShortName)))),
 };

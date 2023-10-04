@@ -1,1 +1,1 @@
-export {default as withAllDescendantTags} from './withAllDescendantTags.js';
+export {default as withAllDescendantArtTags} from './withAllDescendantArtTags.js';
