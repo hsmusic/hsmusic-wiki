@@ -315,6 +315,7 @@ releaseInfo:
 
   visitOn: "Visit on {LINKS}."
   playOn: "Play on {LINKS}."
+  readMoreOn: "Read more on {LINKS}."
 
   readCommentary:
     _: "Read {LINK}."
@@ -1000,13 +1001,23 @@ artistGalleryPage:
 
 #
 # artTagPage:
-#   The art tag info page displays general information about a tag,
-#   including details about how it's networked with other tags in
-#   particular.
+#   Stuff that's common between art tag pages.
 #
 artTagPage:
   nav:
     tag: "Tag: {TAG}"
+
+#
+# artTagInfoPage:
+#   The art tag info page displays general information about a tag,
+#   including details about how it's networked with other tags in
+#   particular.
+#
+artTagInfoPage:
+  title: "{TAG}"
+
+  descendantTags: "Tags that descend from {TAG}:"
+  descendsFromTags: "Tags that {TAG} descends from:"
 
 #
 # artTagGalleryPage:
