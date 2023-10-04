@@ -5,7 +5,8 @@ export default {
     'generateArtTagNavLinks',
     'generateContentHeading',
     'generatePageLayout',
-    'linkArtTag',
+    'linkArtTagGallery',
+    'linkArtTagInfo',
     'linkExternal',
     'transformContent',
   ],
@@ -43,6 +44,11 @@ export default {
         relation('transformContent', artTag.description);
     }
 
+    if (!empty(query.allThings)) {
+      info.galleryLink =
+        relation('linkArtTagGallery', artTag);
+    }
+
     if (!empty(artTag.extraReadingURLs)) {
       info.extraReadingLinks =
         artTag.extraReadingURLs
@@ -57,7 +63,7 @@ export default {
 
       ancestors.directAncestorLinks =
         artTag.directAncestorArtTags
-          .map(artTag => relation('linkArtTag', artTag));
+          .map(artTag => relation('linkArtTagInfo', artTag));
     }
 
     if (!empty(artTag.directDescendantArtTags)) {
@@ -68,7 +74,7 @@ export default {
 
       descendants.directDescendantLinks =
         artTag.directDescendantArtTags
-          .map(artTag => relation('linkArtTag', artTag));
+          .map(artTag => relation('linkArtTagInfo', artTag));
     }
 
     return relations;
@@ -82,7 +88,9 @@ export default {
     data.name = artTag.name;
     data.color = artTag.color;
 
-    data.numArtworks = query.allThings.length;
+    data.numArtworksIndirectly = query.indirectThings.length;
+    data.numArtworksDirectly = query.directThings.length;
+    data.numArtworksTotal = query.allThings.length;
 
     data.names =
       query.allThings.map(thing => thing.name);
@@ -102,22 +110,38 @@ export default {
 
   generate(data, relations, {html, language}) {
     const {sections: sec} = relations;
+    const nameOption = {tag: language.sanitize(data.name)};
 
     return relations.layout
       .slots({
-        title:
-          language.$('artTagInfoPage.title', {
-            tag: data.name,
-          }),
-
-        headingMode: 'static',
+        title: language.$('artTagInfoPage.title', nameOption),
+        headingMode: 'sticky',
         color: data.color,
 
         mainContent: [
-          sec.info.extraReadingLinks &&
+          html.tag('p',
+            (data.numArtworksTotal === 0
+              ? language.$('artTagInfoPage.featuredIn.notFeatured')
+           : data.numArtworksDirectly === 0
+              ? language.$('artTagInfoPage.featuredIn.indirectlyOnly', {
+                  artworks: language.countArtworks(data.numArtworksIndirectly, {unit: true}),
+                })
+           : data.numArtworksIndirectly === 0
+              ? language.$('artTagInfoPage.featuredIn.directlyOnly', {
+                  artworks: language.countArtworks(data.numArtworksDirectly, {unit: true}),
+                })
+              : language.$('artTagInfoPage.featuredIn.directlyAndIndirectly', {
+                  artworksDirectly: language.countArtworks(data.numArtworksDirectly, {unit: true}),
+                  artworksIndirectly: language.countArtworks(data.numArtworksIndirectly, {unit: false}),
+                  artworksTotal: language.countArtworks(data.numArtworksTotal, {unit: false}),
+                }))),
+
+          sec.info.galleryLink &&
             html.tag('p',
-              language.$('releaseInfo.readMoreOn', {
-                links: language.formatDisjunctionList(sec.info.extraReadingLinks),
+              language.$('artTagInfoPage.viewArtGallery', {
+                link:
+                  sec.info.galleryLink
+                    .slot('content', language.$('artTagInfoPage.viewArtGallery.link')),
               })),
 
           html.tag('blockquote',
@@ -125,11 +149,17 @@ export default {
             sec.info.description
               ?.slot('mode', 'multiline')),
 
+          sec.info.extraReadingLinks &&
+            html.tag('p',
+              language.$('artTagInfoPage.readMoreOn', {
+                ...nameOption,
+                links: language.formatDisjunctionList(sec.info.extraReadingLinks),
+              })),
+
           sec.ancestors && [
             sec.ancestors.heading
-              .slot('title', language.$('artTagInfoPage.descendsFromTags', {
-                tag: language.sanitize(data.name),
-              })),
+              .slot('title',
+                language.$('artTagInfoPage.descendsFromTags', nameOption)),
 
             html.tag('ul',
               sec.ancestors.directAncestorLinks
@@ -138,9 +168,8 @@ export default {
 
           sec.descendants && [
             sec.descendants.heading
-              .slot('title', language.$('artTagInfoPage.descendantTags', {
-                tag: language.sanitize(data.name),
-              })),
+              .slot('title',
+                language.$('artTagInfoPage.descendantTags', nameOption)),
 
             html.tag('ul',
               sec.descendants.directDescendantLinks
@@ -150,6 +179,8 @@ export default {
 
         navLinkStyle: 'hierarchical',
         navLinks: relations.navLinks.content,
+
+        leftSidebarMultiple: [],
       });
   },
 };
