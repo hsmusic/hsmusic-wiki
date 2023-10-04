@@ -28,8 +28,8 @@ export default {
     if (artTags) {
       data.contentWarnings =
         artTags
-          .filter(tag => tag.isContentWarning)
-          .map(tag => tag.name);
+          .filter(artTag => artTag.isContentWarning)
+          .map(artTag => artTag.name);
     } else {
       data.contentWarnings = null;
     }

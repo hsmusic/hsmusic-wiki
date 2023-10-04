@@ -32,6 +32,9 @@ const urlSpec = {
       artist: 'artist/<>/',
       artistGallery: 'artist/<>/gallery/',
 
+      artTagInfo: 'tag/<>/info/',
+      artTagGallery: 'tag/<>/',
+
       commentaryIndex: 'commentary/',
 
       flashIndex: 'flash/',
@@ -52,8 +55,6 @@ const urlSpec = {
       newsEntry: 'news/<>/',
 
       staticPage: '<>/',
-
-      tag: 'tag/<>/',
 
       track: 'track/<>/',
     },

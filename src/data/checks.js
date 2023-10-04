@@ -167,7 +167,7 @@ export function filterReferenceErrors(wikiData, {
     }],
 
     ['artTagData', {
-      directDescendantTags: 'artTag',
+      directDescendantArtTags: 'artTag',
     }],
 
     ['groupCategoryData', {
