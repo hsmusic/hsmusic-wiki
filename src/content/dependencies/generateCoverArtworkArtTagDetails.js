@@ -1,7 +1,7 @@
 import {stitchArrays} from '#sugar';
 
 export default {
-  contentDependencies: ['linkArtTag'],
+  contentDependencies: ['linkArtTagGallery'],
   extraDependencies: ['html'],
 
   query: (artTags) => ({
@@ -13,7 +13,7 @@ export default {
   relations: (relation, query, _artTags) => ({
     artTagLinks:
       query.linkableArtTags
-        .map(tag => relation('linkArtTag', tag)),
+        .map(tag => relation('linkArtTagGallery', tag)),
   }),
 
   data: (query, _artTags) => {

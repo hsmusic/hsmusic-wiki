@@ -152,12 +152,12 @@ export const replacerSpec = {
 
   'tag': {
     find: 'artTag',
-    link: 'linkArtTagGallery',
+    link: 'linkArtTagDynamically',
   },
 
   'tag-info': {
     find: 'artTag',
-    link: 'linkArtTag',
+    link: 'linkArtTagInfo',
   },
 
   'track': {

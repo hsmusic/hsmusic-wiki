@@ -1,7 +1,7 @@
 export default {
   contentDependencies: [
     'generateInterpageDotSwitcher',
-    'linkArtTag',
+    'linkArtTagInfo',
     'linkArtTagGallery',
   ],
 
@@ -15,10 +15,10 @@ export default {
       relation('generateInterpageDotSwitcher'),
 
     mainLink:
-      relation('linkArtTag', tag),
+      relation('linkArtTagInfo', tag),
 
     infoLink:
-      relation('linkArtTag', tag),
+      relation('linkArtTagInfo', tag),
 
     galleryLink:
       relation('linkArtTagGallery', tag),
