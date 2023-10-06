@@ -74,6 +74,11 @@ export default {
           ? ['media.trackCover', thing.album.directory, thing.directory, thing.coverArtFileExtension]
           : ['media.albumCover', thing.directory, thing.coverArtFileExtension]));
 
+    data.coverArtists =
+      query.things.map(thing =>
+        thing.coverArtistContribs
+          .map(({who: artist}) => artist.name));
+
     return data;
   },
 
@@ -108,6 +113,14 @@ export default {
                   path: data.paths,
                 }).map(({image, path}) =>
                     image.slot('path', path)),
+
+              info:
+                data.coverArtists.map(names =>
+                  (names === null
+                    ? null
+                    : language.$('misc.albumGrid.details.coverArtists', {
+                        artists: language.formatUnitList(names),
+                      }))),
             }),
         ],
 
