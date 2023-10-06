@@ -1047,8 +1047,18 @@ artTagInfoPage:
     directlyAndIndirectly: >-
       This tag is directly featured in {ARTWORKS_DIRECTLY}, and indirectly in {ARTWORKS_INDIRECTLY} more, for a total of {ARTWORKS_TOTAL}.
 
-  descendantTags: "Tags that descend from {TAG}:"
-  descendsFromTags: "Tags that {TAG} descends from:"
+  descendsFromTags:
+    _: "Tags that {TAG} descends from:"
+    item: "{TAG}"
+
+  descendantTags:
+    _: "Tags that descend from {TAG}:"
+
+    item:
+      _: "{TAG}"
+      withGallery:
+        _: "{TAG} ({GALLERY})"
+        gallery: "Gallery"
 
 #
 # artTagGalleryPage:

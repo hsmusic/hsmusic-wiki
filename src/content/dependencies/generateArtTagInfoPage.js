@@ -1,4 +1,4 @@
-import {empty, unique} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -76,9 +76,19 @@ export default {
       descendants.heading =
         relation('generateContentHeading');
 
-      descendants.directDescendantLinks =
+      descendants.directDescendantInfoLinks =
         artTag.directDescendantArtTags
           .map(artTag => relation('linkArtTagInfo', artTag));
+
+      const allDescendantsHaveMoreDescendants =
+        artTag.directDescendantArtTags
+          .every(artTag => !empty(artTag.directDescendantArtTags));
+
+      if (!allDescendantsHaveMoreDescendants) {
+        descendants.directDescendantGalleryLinks =
+          artTag.directDescendantArtTags
+            .map(artTag => relation('linkArtTagGallery', artTag));
+      }
     }
 
     return relations;
@@ -167,7 +177,11 @@ export default {
 
             html.tag('ul',
               sec.ancestors.directAncestorLinks
-                .map(link => html.tag('li', link))),
+                .map(link =>
+                  html.tag('li',
+                    language.$('artTagInfoPage.descendsFromTags.item', {
+                      tag: link,
+                    })))),
           ],
 
           sec.descendants && [
@@ -175,9 +189,29 @@ export default {
               .slot('title',
                 language.$('artTagInfoPage.descendantTags', nameOption)),
 
-            html.tag('ul',
-              sec.descendants.directDescendantLinks
-                .map(link => html.tag('li', link))),
+            !sec.descendants.directDescendantGalleryLinks &&
+              html.tag('ul',
+                sec.descendants.directDescendantInfoLinks
+                  .map(link =>
+                    html.tag('li',
+                      language.$('artTagInfoPage.descendantTags.item', {
+                        tag: link,
+                      })))),
+
+            sec.descendants.directDescendantGalleryLinks &&
+              html.tag('ul',
+                stitchArrays({
+                  infoLink: sec.descendants.directDescendantInfoLinks,
+                  galleryLink: sec.descendants.directDescendantGalleryLinks,
+                }).map(({infoLink, galleryLink}) =>
+                    html.tag('li',
+                      language.$('artTagInfoPage.descendantTags.item.withGallery', {
+                        tag: infoLink,
+
+                        gallery:
+                          galleryLink.slot('content',
+                            language.$('artTagInfoPage.descendantTags.item.withGallery.gallery')),
+                      })))),
           ],
         ],
 
