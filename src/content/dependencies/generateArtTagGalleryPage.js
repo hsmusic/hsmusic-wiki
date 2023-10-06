@@ -128,11 +128,17 @@ export default {
             .slot('infoPageLink', relations.infoPageLink),
 
           html.tag('p', {class: 'quick-info'},
-            language.$('artTagGalleryPage.infoLine', {
-              coverArts: language.countArtworks(data.numArtworks, {
-                unit: true,
-              }),
-            })),
+            (data.numArtworks === 0
+              ? [
+                  language.$('artTagGalleryPage.infoLine.notFeatured'),
+                  html.tag('br'),
+                  language.$('artTagGalleryPage.infoLine.notFeatured.callToAction'),
+                ]
+              : language.$('artTagGalleryPage.infoLine', {
+                  coverArts: language.countArtworks(data.numArtworks, {
+                    unit: true,
+                  }),
+                }))),
 
           relations.ancestorLinks &&
             html.tag('p', {class: 'quick-info'},
@@ -142,7 +148,7 @@ export default {
 
           relations.descendantLinks &&
             html.tag('p', {clasS: 'quick-info'},
-              language.$('artTagGalleryPage.desendants', {
+              language.$('artTagGalleryPage.descendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),
 
