@@ -1,8 +1,13 @@
+import {stitchArrays} from '#sugar';
 import {collectTreeLeaves} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateArtTagAncestorSidebarBox'],
-  extraDependencies: ['wikiData'],
+  contentDependencies: [
+    'generateArtTagAncestorDescendantMapList',
+    'linkArtTagDynamically',
+  ],
+
+  extraDependencies: ['html', 'language', 'wikiData'],
 
   sprawl: ({artTagData}) =>
     ({artTagData}),
@@ -20,12 +25,43 @@ export default {
   },
 
   relations: (relation, query, sprawl, artTag) => ({
-    ancestorBoxes:
+    artTagLink: relation('linkArtTagDynamically', artTag),
+
+    furthestAncestorArtTagMapLists:
       query.furthestAncestorArtTags
         .map(ancestorArtTag =>
-          relation('generateArtTagAncestorSidebarBox', ancestorArtTag, artTag)),
+          relation('generateArtTagAncestorDescendantMapList',
+            ancestorArtTag,
+            artTag)),
   }),
 
-  generate: (relations) =>
-    ({leftSidebarMultiple: relations.ancestorBoxes}),
+  data: query => ({
+    furthestAncestorArtTagNames:
+      query.furthestAncestorArtTags
+        .map(ancestorArtTag => ancestorArtTag.name),
+  }),
+
+  generate: (data, relations, {html, language}) => ({
+    leftSidebarContent: [
+      html.tag('h1',
+        relations.artTagLink),
+
+      stitchArrays({
+        name: data.furthestAncestorArtTagNames,
+        list: relations.furthestAncestorArtTagMapLists,
+      }).map(({name, list}) =>
+          html.tag('details',
+            {
+              class: 'has-tree-list',
+              open: relations.furthestAncestorArtTagMapLists.length === 1,
+            },
+            [
+              html.tag('summary',
+                html.tag('span', {class: 'group-name'},
+                  language.sanitize(name))),
+
+              list,
+            ])),
+    ],
+  }),
 };

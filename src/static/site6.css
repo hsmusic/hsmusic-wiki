@@ -370,12 +370,37 @@ body::before {
   margin-left: 0;
 }
 
-.sidebar dl > dd > dl {
+.sidebar > dl .side {
+  padding-left: 10px;
+}
+
+.sidebar details.has-tree-list[open] summary {
+  font-weight: 800;
+}
+
+.sidebar dl.tree-list {
+  margin-top: 0.25em;
+  line-height: 1.25em;
   padding-left: 15px;
 }
 
-.sidebar > dl .side {
-  padding-left: 10px;
+.sidebar dl.tree-list dt {
+  display: list-item;
+  list-style-type: disc;
+  padding-left: 0;
+  margin-left: 20px;
+}
+
+.sidebar dl.tree-list dl {
+  padding-left: 15px;
+}
+
+.sidebar dl.tree-list dd {
+  margin-left: 0;
+}
+
+.sidebar dl.tree-list .current {
+  font-weight: 800;
 }
 
 .sidebar li.current {

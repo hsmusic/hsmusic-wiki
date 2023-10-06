@@ -96,7 +96,7 @@ export default {
 
   generate(data, relations, {html, language}) {
     const recursive = (dataNode, relationsNode) =>
-      html.tag('dl', [
+      html.tag('dl', {class: dataNode === data.root && 'tree-list'}, [
         dataNode.displayBriefly &&
           html.tag('dt',
             language.$('artTagPage.sidebar.otherTagsExempt', {
