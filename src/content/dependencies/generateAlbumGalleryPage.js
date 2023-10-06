@@ -6,6 +6,7 @@ export default {
     'generateAlbumGalleryNoTrackArtworksLine',
     'generateAlbumGalleryStatsLine',
     'generateAlbumNavAccent',
+    'generateAlbumSecondaryNav',
     'generateAlbumStyleRules',
     'generateCoverGrid',
     'generatePageLayout',
@@ -59,6 +60,9 @@ export default {
 
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
+
+    relations.secondaryNav =
+      relation('generateAlbumSecondaryNav', album);
 
     relations.statsLine =
       relation('generateAlbumGalleryStatsLine', album);
@@ -179,6 +183,8 @@ export default {
               }),
           },
         ],
+
+        secondaryNav: relations.secondaryNav,
       });
   },
 };
