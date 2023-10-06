@@ -3,6 +3,7 @@ import {empty, unique} from '#sugar';
 export default {
   contentDependencies: [
     'generateArtTagNavLinks',
+    'generateArtTagSidebar',
     'generateContentHeading',
     'generatePageLayout',
     'linkArtTagGallery',
@@ -31,6 +32,9 @@ export default {
 
     navLinks:
       relation('generateArtTagNavLinks', artTag),
+
+    sidebar:
+      relation('generateArtTagSidebar', artTag),
 
     contentHeading:
       relation('generateContentHeading'),
@@ -191,5 +195,8 @@ export default {
 
         navLinkStyle: 'hierarchical',
         navLinks: relations.navLinks.content,
+
+        leftSidebar:
+          relations.sidebar,
       })),
 };
