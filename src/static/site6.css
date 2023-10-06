@@ -399,8 +399,9 @@ body::before {
   margin-left: 0;
 }
 
-.sidebar dl.tree-list .current {
+.sidebar dl.tree-list dt.current a {
   font-weight: 800;
+  border-bottom: 1px solid;
 }
 
 .sidebar li.current {
