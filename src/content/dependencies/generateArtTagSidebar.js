@@ -1,12 +1,14 @@
-import {collectTreeLeaves} from '#sugar';
+import {collectTreeLeaves, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateArtTagAncestorSidebarBox',
     'generatePageSidebar',
+    'generatePageSidebarBox',
+    'generateArtTagAncestorDescendantMapList',
+    'linkArtTagDynamically',
   ],
 
-  extraDependencies: ['wikiData'],
+  extraDependencies: ['html', 'language', 'wikiData'],
 
   sprawl: ({artTagData}) =>
     ({artTagData}),
@@ -27,14 +29,52 @@ export default {
     sidebar:
       relation('generatePageSidebar'),
 
-    ancestorBoxes:
+    sidebarBox:
+      relation('generatePageSidebarBox'),
+
+    artTagLink:
+      relation('linkArtTagDynamically', artTag),
+
+    furthestAncestorArtTagMapLists:
       query.furthestAncestorArtTags
         .map(ancestorArtTag =>
-          relation('generateArtTagAncestorSidebarBox', ancestorArtTag, artTag)),
+          relation('generateArtTagAncestorDescendantMapList',
+            ancestorArtTag,
+            artTag)),
   }),
 
-  generate: (relations) =>
+  data: query => ({
+    furthestAncestorArtTagNames:
+      query.furthestAncestorArtTags
+        .map(ancestorArtTag => ancestorArtTag.name),
+  }),
+
+  generate: (data, relations, {html, language}) =>
     relations.sidebar.slots({
-      boxes: relations.ancestorBoxes,
+      boxes: [
+        relations.sidebarBox.slots({
+          content: [
+            html.tag('h1',
+              relations.artTagLink),
+
+            stitchArrays({
+              name: data.furthestAncestorArtTagNames,
+              list: relations.furthestAncestorArtTagMapLists,
+            }).map(({name, list}) =>
+                html.tag('details',
+                  {
+                    class: 'has-tree-list',
+                    open: relations.furthestAncestorArtTagMapLists.length === 1,
+                  },
+                  [
+                    html.tag('summary',
+                      html.tag('span', {class: 'group-name'},
+                        language.sanitize(name))),
+
+                    list,
+                  ])),
+          ],
+        }),
+      ],
     }),
 };
