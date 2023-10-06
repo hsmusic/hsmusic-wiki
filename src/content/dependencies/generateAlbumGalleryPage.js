@@ -3,6 +3,7 @@ import {compareArrays, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateAlbumGalleryCoverArtistsLine',
+    'generateAlbumGalleryNoTrackArtworksLine',
     'generateAlbumGalleryStatsLine',
     'generateAlbumNavAccent',
     'generateAlbumStyleRules',
@@ -61,6 +62,11 @@ export default {
 
     relations.statsLine =
       relation('generateAlbumGalleryStatsLine', album);
+
+    if (album.tracks.every(track => !track.hasUniqueCoverArt)) {
+      relations.noTrackArtworksLine =
+        relation('generateAlbumGalleryNoTrackArtworksLine');
+    }
 
     if (query.coverArtistsForAllTracks) {
       relations.coverArtistsLine =
@@ -131,6 +137,7 @@ export default {
         mainContent: [
           relations.statsLine,
           relations.coverArtistsLine,
+          relations.noTrackArtworksLine,
 
           relations.coverGrid
             .slots({

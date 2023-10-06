@@ -5,7 +5,6 @@ export function targets({wikiData}) {
 }
 
 export function pathsForTarget(album) {
-  const hasGalleryPage = album.tracks.some(t => t.hasUniqueCoverArt);
   const hasCommentaryPage = !!album.commentary || album.tracks.some(t => t.commentary);
 
   return [
@@ -19,7 +18,7 @@ export function pathsForTarget(album) {
       },
     },
 
-    hasGalleryPage && {
+    {
       type: 'page',
       path: ['albumGallery', album.directory],
 
