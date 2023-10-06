@@ -24,7 +24,8 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withAllDescendantArtTags} from '#composite/things/art-tag';
+import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
+  from '#composite/things/art-tag';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -113,6 +114,11 @@ export class ArtTag extends Thing {
     directAncestorArtTags: reverseReferenceList({
       reverse: soupyReverse.input('artTagsWhichDirectlyAncestor'),
     }),
+
+    ancestorArtTagBaobabTree: [
+      withAncestorArtTagBaobabTree(),
+      exposeDependency({dependency: '#ancestorArtTagBaobabTree'}),
+    ],
   });
 
   static [Thing.findSpecs] = {
