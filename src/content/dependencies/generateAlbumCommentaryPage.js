@@ -33,8 +33,10 @@ export default {
       relation('generateAlbumNavAccent', album, null);
 
     if (album.commentary) {
-      relations.albumCommentaryCover =
-        relation('generateAlbumCoverArtwork', album);
+      if (album.hasCoverArt) {
+        relations.albumCommentaryCover =
+          relation('generateAlbumCoverArtwork', album);
+      }
 
       relations.albumCommentaryContent =
         relation('transformContent', album.commentary);
