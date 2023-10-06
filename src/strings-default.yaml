@@ -1070,8 +1070,12 @@ artTagInfoPage:
 artTagGalleryPage:
   title: "{TAG}"
 
-  infoLine: >-
-    Appears in {COVER_ARTS}.
+  infoLine:
+    _: "Featured in {COVER_ARTS}."
+
+    notFeatured:
+      _: "This tag hasn't been featured in any artworks yet."
+      callToAction: "Maybe your track will be the first!"
 
   descendsFrom: "Descends from {TAGS}."
   descendants: "Direct descendants: {TAGS}."

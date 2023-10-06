@@ -858,6 +858,7 @@ html[data-url-key="localized.home"] #content h1 {
   text-align: center;
   padding-left: 12%;
   padding-right: 12%;
+  line-height: 1.25em;
 }
 
 ul.quick-info {
