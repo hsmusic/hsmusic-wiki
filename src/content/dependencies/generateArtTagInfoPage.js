@@ -1,4 +1,4 @@
-import {empty, unique} from '#sugar';
+import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -19,11 +19,22 @@ export default {
   }),
 
   query(sprawl, artTag) {
-    const directThings = artTag.directlyTaggedInThings;
-    const indirectThings = artTag.indirectlyTaggedInThings;
-    const allThings = unique([...directThings, ...indirectThings]);
+    const query = {};
 
-    return {directThings, indirectThings, allThings};
+    query.directThings =
+      artTag.directlyTaggedInThings;
+
+    query.indirectThings =
+      artTag.indirectlyTaggedInThings;
+
+    query.allThings =
+      unique([...query.directThings, ...query.indirectThings]);
+
+    query.allDescendantsHaveMoreDescendants =
+      artTag.directDescendantArtTags
+        .every(descendant => !empty(descendant.directDescendantArtTags));
+
+    return query;
   },
 
   relations: (relation, query, sprawl, artTag) => ({
@@ -55,9 +66,15 @@ export default {
       artTag.directAncestorArtTags
         .map(artTag => relation('linkArtTagInfo', artTag)),
 
-    directDescendantLinks:
+    directDescendantInfoLinks:
       artTag.directDescendantArtTags
         .map(artTag => relation('linkArtTagInfo', artTag)),
+
+    directDescendantGalleryLinks:
+      artTag.directDescendantArtTags.map(artTag =>
+        (query.allDescendantsHaveMoreDescendants
+          ? null
+          : relation('linkArtTagInfo', artTag))),
   }),
 
   data: (query, sprawl, artTag) => ({
@@ -160,37 +177,61 @@ export default {
               links: language.formatDisjunctionList(relations.extraReadingLinks),
             })),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                title:
-                  language.$(pageCapsule, 'descendsFromTags', {
-                    tag: language.sanitize(data.name),
-                  }),
-              }),
+          language.encapsulate(pageCapsule, 'descendsFromTags', listCapsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  title:
+                    language.$(listCapsule, {
+                      tag: language.sanitize(data.name),
+                    }),
+                }),
 
-            html.tag('ul',
-              {[html.onlyIfContent]: true},
+              html.tag('ul',
+                {[html.onlyIfContent]: true},
 
-              relations.directAncestorLinks
-                .map(link => html.tag('li', link))),
-          ]),
+                relations.directAncestorLinks
+                  .map(link =>
+                    html.tag('li',
+                      language.$(listCapsule, 'item', {
+                        tag: link,
+                      })))),
+            ])),
 
-          html.tags([
-            relations.contentHeading.clone()
-              .slots({
-                title:
-                  language.$(pageCapsule, 'descendantTags', {
-                    tag: language.sanitize(data.name),
-                  }),
-              }),
+          language.encapsulate(pageCapsule, 'descendantTags', listCapsule =>
+            html.tags([
+              relations.contentHeading.clone()
+                .slots({
+                  title:
+                    language.$(listCapsule, {
+                      tag: language.sanitize(data.name),
+                    }),
+                }),
 
-            html.tag('ul',
-              {[html.onlyIfContent]: true},
+              html.tag('ul',
+                {[html.onlyIfContent]: true},
 
-              relations.directDescendantLinks
-                .map(link => html.tag('li', link))),
-          ]),
+                stitchArrays({
+                  infoLink: relations.directDescendantInfoLinks,
+                  galleryLink: relations.directDescendantGalleryLinks,
+                }).map(({infoLink, galleryLink}) =>
+                    html.tag('li',
+                      language.encapsulate(listCapsule, 'item', itemCapsule =>
+                        language.encapsulate(itemCapsule, workingCapsule => {
+                          const workingOptions = {};
+
+                          workingOptions.tag = infoLink;
+
+                          if (!html.isBlank(galleryLink)) {
+                            workingCapsule += '.withGallery';
+                            workingOptions.gallery =
+                              galleryLink.slot('content',
+                                language.$(itemCapsule, 'withGallery.gallery'));
+                          }
+
+                          return language.$(workingCapsule, workingOptions);
+                        }))))),
+            ])),
         ],
 
         navLinkStyle: 'hierarchical',
