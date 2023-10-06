@@ -178,7 +178,10 @@ export class Track extends Thing {
         '#resolvedContribs': '#artistContribs',
       }),
 
-      exposeDependencyOrContinue({dependency: '#artistContribs'}),
+      exposeDependencyOrContinue({
+        dependency: '#artistContribs',
+        mode: input.value('empty'),
+      }),
 
       withPropertyFromAlbum({
         property: input.value('artistContribs'),
@@ -199,7 +202,9 @@ export class Track extends Thing {
     // typically varies by release and isn't defined by the musical qualities
     // of the track.
     coverArtistContribs: [
-      exitWithoutUniqueCoverArt(),
+      exitWithoutUniqueCoverArt({
+        value: input.value([]),
+      }),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
@@ -207,7 +212,10 @@ export class Track extends Thing {
         '#resolvedContribs': '#coverArtistContribs',
       }),
 
-      exposeDependencyOrContinue({dependency: '#coverArtistContribs'}),
+      exposeDependencyOrContinue({
+        dependency: '#coverArtistContribs',
+        mode: input.value('empty'),
+      }),
 
       withPropertyFromAlbum({
         property: input.value('trackCoverArtistContribs'),

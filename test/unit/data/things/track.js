@@ -115,6 +115,51 @@ t.test(`Track.album`, t => {
     `album #6: is null when album's trackSections don't match track`);
 });
 
+t.test(`Track.artistContribs`, t => {
+  t.plan(4);
+
+  const {track, album} = stubTrackAndAlbum();
+  const artist1 = stubArtist(`Artist 1`);
+  const artist2 = stubArtist(`Artist 2`);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist1, artist2],
+    trackData: [track],
+  });
+
+  t.same(track.artistContribs, [],
+    `artistContribs #1: defaults to empty array`);
+
+  album.artistContribs = [
+    {who: `Artist 1`, what: `composition`},
+    {who: `Artist 2`, what: null},
+  ];
+
+  XXX_decacheWikiData();
+
+  t.same(track.artistContribs,
+    [{who: artist1, what: `composition`}, {who: artist2, what: null}],
+    `artistContribs #2: inherits album artistContribs`);
+
+  track.artistContribs = [
+    {who: `Artist 1`, what: `arrangement`},
+  ];
+
+  t.same(track.artistContribs, [{who: artist1, what: `arrangement`}],
+    `artistContribs #3: resolves from own value`);
+
+  track.artistContribs = [
+    {who: `Artist 1`, what: `snooping`},
+    {who: `Artist 413`, what: `as`},
+    {who: `Artist 2`, what: `usual`},
+  ];
+
+  t.same(track.artistContribs,
+    [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
+    `artistContribs #4: filters out names without matches`);
+});
+
 t.test(`Track.color`, t => {
   t.plan(5);
 
@@ -221,6 +266,56 @@ t.test(`Track.commentatorArtists`, t => {
 
   t.same(track.commentatorArtists, [artist3],
     `Track.commentatorArtists #6: ignores duplicate artist`);
+});
+
+t.test(`Track.coverArtistContribs`, t => {
+  t.plan(5);
+
+  const {track, album} = stubTrackAndAlbum();
+  const artist1 = stubArtist(`Artist 1`);
+  const artist2 = stubArtist(`Artist 2`);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist1, artist2],
+    trackData: [track],
+  });
+
+  t.same(track.coverArtistContribs, [],
+    `coverArtistContribs #1: defaults to empty array`);
+
+  album.trackCoverArtistContribs = [
+    {who: `Artist 1`, what: `lines`},
+    {who: `Artist 2`, what: null},
+  ];
+
+  XXX_decacheWikiData();
+
+  t.same(track.coverArtistContribs,
+    [{who: artist1, what: `lines`}, {who: artist2, what: null}],
+    `coverArtistContribs #2: inherits album trackCoverArtistContribs`);
+
+  track.coverArtistContribs = [
+    {who: `Artist 1`, what: `collage`},
+  ];
+
+  t.same(track.coverArtistContribs, [{who: artist1, what: `collage`}],
+    `coverArtistContribs #3: resolves from own value`);
+
+  track.coverArtistContribs = [
+    {who: `Artist 1`, what: `snooping`},
+    {who: `Artist 413`, what: `as`},
+    {who: `Artist 2`, what: `usual`},
+  ];
+
+  t.same(track.coverArtistContribs,
+    [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
+    `coverArtistContribs #4: filters out names without matches`);
+
+  track.disableUniqueCoverArt = true;
+
+  t.same(track.coverArtistContribs, [],
+    `coverArtistContribs #5: is empty if track disables unique cover artwork`);
 });
 
 t.test(`Track.coverArtDate`, t => {
