@@ -32,7 +32,7 @@ export default {
     },
 
     mode: {
-      validate: v => v.is('primary', 'thumbnail'),
+      validate: v => v.is('primary', 'thumbnail', 'commentary'),
       default: 'primary',
     },
   },
@@ -71,6 +71,19 @@ export default {
             reveal: false,
             link: false,
             square: true,
+          });
+
+      case 'commentary':
+        return relations.image
+          .slots({
+            path: slots.path,
+            alt: slots.alt,
+            thumb: 'medium',
+            class: 'commentary-art',
+            reveal: true,
+            link: true,
+            square: true,
+            lazy: true,
           });
 
       default:

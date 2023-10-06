@@ -533,6 +533,13 @@ p .current {
   margin-top: 5px;
 }
 
+.commentary-art {
+  float: right;
+  width: 30%;
+  max-width: 250px;
+  margin: 15px 0 10px 20px;
+}
+
 .js-hide,
 .js-show-once-data,
 .js-hide-once-data {
@@ -1250,6 +1257,10 @@ html[data-url-key="localized.home"] .carousel-container {
   animation-delay: 125ms;
 }
 
+h3.content-heading {
+  clear: both;
+}
+
 /* This animation's name is referenced in JavaScript */
 @keyframes highlight-hash-link {
   0% {
@@ -1436,6 +1447,30 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 .sidebar-multiple.sticky-column {
   align-self: flex-start;
+}
+
+.sidebar-column.sidebar.sticky-column {
+  max-height: calc(100vh - 20px);
+  overflow-y: scroll;
+  align-self: start;
+  padding-bottom: 0;
+  box-sizing: border-box;
+  flex-basis: 275px;
+  padding-top: 0;
+}
+
+.sidebar-column.sidebar.sticky-column > h1 {
+  position: sticky;
+  top: 0;
+  margin: 0 calc(-1 * var(--content-padding));
+  margin-bottom: 10px;
+
+  border-bottom: 1px dotted rgba(220, 220, 220, 0.4);
+  padding: 10px 5px;
+
+  background: var(--bg-black-color);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
 }
 
 /* Image overlay */
