@@ -1451,12 +1451,27 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 .sidebar-column.sidebar.sticky-column {
   max-height: calc(100vh - 20px);
-  overflow-y: scroll;
   align-self: start;
   padding-bottom: 0;
   box-sizing: border-box;
   flex-basis: 275px;
   padding-top: 0;
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: var(--dark-color);
+}
+
+.sidebar-column.sidebar.sticky-column::-webkit-scrollbar {
+  background: var(--dark-color);
+  width: 12px;
+}
+
+.sidebar-column.sidebar.sticky-column::-webkit-scrollbar-thumb {
+  transition: background 0.2s;
+  background: rgba(255, 255, 255, 0.2);
+  border: 3px solid transparent;
+  border-radius: 10px;
+  background-clip: content-box;
 }
 
 .sidebar-column.sidebar.sticky-column > h1 {
