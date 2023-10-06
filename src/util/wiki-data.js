@@ -101,6 +101,38 @@ export function chunkMultipleArrays(...args) {
   return results;
 }
 
+// This (or its helper function) should probably be a generator, but generators
+// are scary... Note that the root node is never considered a leaf, even if it
+// doesn't have any branches. It does NOT pay attention to the *values* of the
+// leaf nodes - it's suited to handle this kind of form:
+//
+//   {
+//     foo: {
+//       bar: {},
+//       baz: {},
+//       qux: {
+//         woz: {},
+//       },
+//     },
+//   }
+//
+// for which it outputs ['bar', 'baz', 'woz'].
+//
+export function collectTreeLeaves(tree) {
+  const recursive = ([key, value]) =>
+    (value instanceof Map
+      ? (value.size === 0
+          ? [key]
+          : Array.from(value.entries()).flatMap(recursive))
+      : (empty(Object.keys(value))
+          ? [key]
+          : Object.entries(value).flatMap(recursive)));
+
+  const root = Symbol();
+  const leaves = recursive([root, tree]);
+  return (leaves[0] === root ? [] : leaves);
+}
+
 // Sorting functions - all utils here are mutating, so make sure to initially
 // slice/filter/somehow generate a new array from input data if retaining the
 // initial sort matters! (Spoilers: If what you're doing involves any kind of

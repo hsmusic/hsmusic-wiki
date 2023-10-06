@@ -19,7 +19,8 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {withAllDescendantArtTags} from '#composite/things/art-tag';
+import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
+  from '#composite/things/art-tag';
 
 import Thing from './thing.js';
 
@@ -119,5 +120,10 @@ export class ArtTag extends Thing {
       data: 'artTagData',
       list: input.value('directDescendantArtTags'),
     }),
+
+    ancestorArtTagBaobabTree: [
+      withAncestorArtTagBaobabTree(),
+      exposeDependency({dependency: '#ancestorArtTagBaobabTree'}),
+    ],
   });
 }

@@ -57,6 +57,16 @@ count:
       many: ""
       other: "{ALBUMS} albums"
 
+  artTags:
+    _: "{TAGS}"
+    withUnit:
+      zero: ""
+      one: "{TAGS} tag"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TAGS} tags"
+
   artworks:
     _: "{ARTWORKS}"
     withUnit:
@@ -1005,6 +1015,9 @@ artistGalleryPage:
 artTagPage:
   nav:
     tag: "Tag: {TAG}"
+
+  sidebar:
+    otherTagsExempt: "(…another {TAGS}…)"
 
 #
 # artTagInfoPage:
