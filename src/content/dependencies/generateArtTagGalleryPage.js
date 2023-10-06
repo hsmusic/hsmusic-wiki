@@ -126,11 +126,18 @@ export default {
           relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},
-            language.$(pageCapsule, 'infoLine', {
-              coverArts: language.countArtworks(data.numArtworks, {
-                unit: true,
-              }),
-            })),
+            language.encapsulate(pageCapsule, 'infoLine', capsule =>
+              (data.numArtworks === 0
+                ? language.encapsulate(capsule, 'notFeatured', capsule => [
+                    language.$(capsule),
+                    html.tag('br'),
+                    language.$(capsule, 'callToAction'),
+                  ])
+                : language.$(capsule, {
+                    coverArts: language.countArtworks(data.numArtworks, {
+                      unit: true,
+                    }),
+                  })))),
 
           relations.ancestorLinks &&
             html.tag('p', {class: 'quick-info'},
