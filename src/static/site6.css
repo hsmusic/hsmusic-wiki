@@ -318,6 +318,11 @@ body::before {
   margin: 0;
 }
 
+.sidebar h2:first-child {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
 .sidebar h3 {
   font-size: 1.1em;
   font-style: oblique;
@@ -363,6 +368,10 @@ body::before {
 .sidebar > dl dd ul {
   padding-left: 30px;
   margin-left: 0;
+}
+
+.sidebar dl > dd > dl {
+  padding-left: 15px;
 }
 
 .sidebar > dl .side {
