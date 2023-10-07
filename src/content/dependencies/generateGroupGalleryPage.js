@@ -21,18 +21,8 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({listingSpec, wikiInfo}) {
-    const sprawl = {};
-    sprawl.enableGroupUI = wikiInfo.enableGroupUI;
-
-    if (wikiInfo.enableListings && wikiInfo.enableGroupUI) {
-      sprawl.groupsByCategoryListing =
-        listingSpec
-          .find(l => l.directory === 'groups/by-category');
-    }
-
-    return sprawl;
-  },
+  sprawl: ({wikiInfo}) =>
+    ({enableGroupUI: wikiInfo.enableGroupUI}),
 
   relations(relation, sprawl, group) {
     const relations = {};
@@ -52,11 +42,6 @@ export default {
 
       relations.sidebar =
         relation('generateGroupSidebar', group);
-    }
-
-    if (sprawl.groupsByCategoryListing) {
-      relations.groupListingLink =
-        relation('linkListing', sprawl.groupsByCategoryListing);
     }
 
     const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
@@ -163,15 +148,6 @@ export default {
                   unit: true,
                 })),
             })),
-
-          relations.groupListingLink &&
-            html.tag('p',
-              {class: 'quick-info'},
-              language.$('groupGalleryPage.anotherGroupLine', {
-                link:
-                  relations.groupListingLink
-                    .slot('content', language.$('groupGalleryPage.anotherGroupLine.link')),
-              })),
 
           relations.coverGrid
             .slots({
