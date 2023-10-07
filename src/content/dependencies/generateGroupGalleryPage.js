@@ -11,6 +11,7 @@ export default {
     'generateCoverCarousel',
     'generateCoverGrid',
     'generateGroupNavLinks',
+    'generateGroupSecondaryNav',
     'generateGroupSidebar',
     'generatePageLayout',
     'image',
@@ -46,6 +47,9 @@ export default {
       relation('generateGroupNavLinks', group);
 
     if (sprawl.enableGroupUI) {
+      relations.secondaryNav =
+        relation('generateGroupSecondaryNav', group);
+
       relations.sidebar =
         relation('generateGroupSidebar', group);
     }
@@ -208,6 +212,9 @@ export default {
           relations.navLinks
             .slot('currentExtra', 'gallery')
             .content,
+
+        secondaryNav:
+          relations.secondaryNav ?? null,
       });
   },
 };

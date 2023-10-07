@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'generateContentHeading',
     'generateGroupNavLinks',
+    'generateGroupSecondaryNav',
     'generateGroupSidebar',
     'generatePageLayout',
     'linkAlbum',
@@ -32,6 +33,9 @@ export default {
       relation('generateGroupNavLinks', group);
 
     if (sprawl.enableGroupUI) {
+      relations.secondaryNav =
+        relation('generateGroupSecondaryNav', group);
+
       relations.sidebar =
         relation('generateGroupSidebar', group);
     }
@@ -161,6 +165,8 @@ export default {
 
         navLinkStyle: 'hierarchical',
         navLinks: relations.navLinks.content,
+
+        secondaryNav: relations.secondaryNav ?? null,
       });
   },
 };
