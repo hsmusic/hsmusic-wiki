@@ -177,7 +177,14 @@ export function watchContentDependencies({
       // Just skip newly created files. They'll be processed again when
       // written.
       if (spec === undefined) {
-        contentDependencies[functionName] = null;
+        // For practical purposes the file is treated as though it doesn't
+        // even exist (undefined), rather than not being ready yet (null).
+        // Apart from if existing contents of the file were erased (but not
+        // the file itself), this value might already be set (to null!) by
+        // the readdir performed at the beginning to evaluate which files
+        // should be read and processed at least once before reporting all
+        // dependencies as ready.
+        delete contentDependencies[functionName];
         return;
       }
 
