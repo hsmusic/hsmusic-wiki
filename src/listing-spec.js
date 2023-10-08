@@ -195,15 +195,15 @@ listingSpec.push({
 
 listingSpec.push({
   directory: 'tags/by-name',
-  stringsKey: 'listTags.byName',
-  contentFunction: 'listTagsByName',
+  stringsKey: 'listArtTags.byName',
+  contentFunction: 'listArtTagsByName',
   featureFlag: 'enableArtTagUI',
 });
 
 listingSpec.push({
   directory: 'tags/by-uses',
-  stringsKey: 'listTags.byUses',
-  contentFunction: 'listTagsByUses',
+  stringsKey: 'listArtTags.byUses',
+  contentFunction: 'listArtTagsByUses',
   featureFlag: 'enableArtTagUI',
 });
 

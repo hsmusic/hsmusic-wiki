@@ -1350,6 +1350,29 @@ listingPage:
         title: "{DATE}"
         item: "{ALBUM}"
 
+  listArtTags:
+
+    # listArtTags.byName:
+    #   List art tags alphabetically without sorting or chunking by
+    #   any other criteria. Also displays the number of times each
+    #   art tag has been featured.
+
+    byName:
+      title: "Tags - by Name"
+      title.short: "...by Name"
+      item: "{TAG} ({TIMES_USED})"
+
+    # listArtTags.byUses:
+    #   List art tags by number of times used, falling back to an
+    #   alphabetical sort if two art tags have been featured the same
+    #   number of times. Art tags which haven't haven't been featured
+    #   at all yet are totally excluded from the list.
+
+    byUses:
+      title: "Tags - by Uses"
+      title.short: "...by Uses"
+      item: "{TAG} ({TIMES_USED})"
+
   listArtists:
 
     # listArtists.byName:
@@ -1676,29 +1699,6 @@ listingPage:
         title: "{ALBUM}"
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
-
-  listTags:
-
-    # listTags.byName:
-    #   List art tags alphabetically without sorting or chunking by
-    #   any other criteria. Also displays the number of times each
-    #   art tag has been featured.
-
-    byName:
-      title: "Tags - by Name"
-      title.short: "...by Name"
-      item: "{TAG} ({TIMES_USED})"
-
-    # listTags.byUses:
-    #   List art tags by number of times used, falling back to an
-    #   alphabetical sort if two art tags have been featured the same
-    #   number of times. Art tags which haven't haven't been featured
-    #   at all yet are totally excluded from the list.
-
-    byUses:
-      title: "Tags - by Uses"
-      title.short: "...by Uses"
-      item: "{TAG} ({TIMES_USED})"
 
   other:
 
