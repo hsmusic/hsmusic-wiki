@@ -9,8 +9,8 @@ export default {
     'generateQuickDescription',
     'image',
     'linkAlbum',
-    'linkArtTagInfo',
     'linkArtTagGallery',
+    'linkExternal',
     'linkTrack',
   ],
 
@@ -44,11 +44,14 @@ export default {
     relations.navLinks =
       relation('generateArtTagNavLinks', artTag);
 
-    relations.infoPageLink =
-      relation('linkArtTagInfo', artTag);
-
     relations.quickDescription =
       relation('generateQuickDescription', artTag);
+
+    if (!empty(artTag.extraReadingURLs)) {
+      relations.extraReadingLinks =
+        artTag.extraReadingURLs
+          .map(url => relation('linkExternal', url));
+    }
 
     if (!empty(artTag.directAncestorArtTags)) {
       relations.ancestorLinks =
@@ -124,8 +127,9 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          relations.quickDescription
-            .slot('infoPageLink', relations.infoPageLink),
+          relations.quickDescription.slots({
+            extraReadingLinks: relations.extraReadingLinks ?? null,
+          }),
 
           html.tag('p', {class: 'quick-info'},
             (data.numArtworks === 0
