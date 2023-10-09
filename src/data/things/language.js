@@ -101,6 +101,7 @@ export class Language extends Thing {
       },
     },
 
+    // TODO: This currently isn't used. Is it still needed?
     strings_htmlEscaped: {
       flags: {expose: true},
       expose: {
@@ -130,8 +131,8 @@ export class Language extends Thing {
     };
   }
 
-  $(key, args = {}) {
-    return this.formatString(key, args);
+  $(...args) {
+    return this.formatString(...args);
   }
 
   assertIntlAvailable(property) {
@@ -145,8 +146,20 @@ export class Language extends Thing {
     return this.intl_pluralCardinal.select(value);
   }
 
-  formatString(key, args = {}) {
-    const strings = this.strings_htmlEscaped;
+  formatString(...args) {
+    const hasOptions =
+      typeof args.at(-1) === 'object' &&
+      args.at(-1) !== null;
+
+    const key =
+      (hasOptions ? args.slice(0, -1) : args)
+        .filter(Boolean)
+        .join('.');
+
+    const options =
+      (hasOptions
+        ? args.at(-1)
+        : null);
 
     if (!this.strings) {
       throw new Error(`Strings unavailable`);
@@ -158,27 +171,36 @@ export class Language extends Thing {
 
     const template = this.strings[key];
 
-    // Convert the keys on the args dict from camelCase to CONSTANT_CASE.
-    // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
-    // like, who cares, dude?) Also, this is an array, 8ecause it's handy
-    // for the iterating we're a8out to do. Also strip HTML from arguments
-    // that are literal strings - real HTML content should always be proper
-    // HTML objects (see html.js).
-    const processedArgs =
-      Object.entries(args).map(([k, v]) => [
-        k.replace(/[A-Z]/g, '_$&').toUpperCase(),
-        this.#sanitizeStringArg(v),
-      ]);
+    let output;
 
-    // Replacement time! Woot. Reduce comes in handy here!
-    const output =
-      processedArgs.reduce(
-        (x, [k, v]) => x.replaceAll(`{${k}}`, v),
-        template);
+    if (hasOptions) {
+      // Convert the keys on the options dict from camelCase to CONSTANT_CASE.
+      // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
+      // like, who cares, dude?) Also, this is an array, 8ecause it's handy
+      // for the iterating we're a8out to do. Also strip HTML from arguments
+      // that are literal strings - real HTML content should always be proper
+      // HTML objects (see html.js).
+      const processedOptions =
+        Object.entries(options).map(([k, v]) => [
+          k.replace(/[A-Z]/g, '_$&').toUpperCase(),
+          this.#sanitizeStringArg(v),
+        ]);
+
+      // Replacement time! Woot. Reduce comes in handy here!
+      output =
+        processedOptions.reduce(
+          (x, [k, v]) => x.replaceAll(`{${k}}`, v),
+          template);
+    } else {
+      // Without any options provided, just use the template as-is. This will
+      // still error if the template expected arguments, and otherwise will be
+      // the right value.
+      output = template;
+    }
 
     // Post-processing: if any expected arguments *weren't* replaced, that
     // is almost definitely an error.
-    if (output.match(/\{[A-Z_]+\}/)) {
+    if (output.match(/\{[A-Z][A-Z0-9_]*\}/)) {
       throw new Error(`Args in ${key} were missing - output: ${output}`);
     }
 
