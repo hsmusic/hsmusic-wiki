@@ -561,10 +561,29 @@ misc:
 
   missingLinkContent: "(Missing link content)"
 
-  # moreInfo:
-  #   Displayed in "quick descriptions", where usually just the first
-  #   paragraph of a long description is displayed; this link shows
-  #   the full description.
+  # quickDescription:
+  #   Toggleable display where a shorter blurb from a description is
+  #   initially visible, and a button can be clicked to display the
+  #   rest. May also display "read more" links (to external sites).
+
+  quickDescription:
+    readMore: "Read more on {LINKS}."
+
+    expandDescription:
+      _: "({EXPAND})"
+      expand: "Expand description..."
+
+    expandDescription.orReadMore:
+      _: "({EXPAND}, or read more on {LINKS})"
+      expand: "Expand description"
+
+    collapseDescription:
+      _: "({COLLAPSE})"
+      collapse: "Collapse description"
+
+    collapseDescription.orReadMore:
+      _: "({COLLAPSE}, or read more on {LINKS})"
+      collapse: "Collapse description"
 
   moreInfo:
     _: "({LINK})"
