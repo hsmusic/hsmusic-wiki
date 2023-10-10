@@ -34,11 +34,12 @@ export function processAllAvailableMatches(data, {
 
       const normalizedName = name.toLowerCase();
       if (normalizedName in byName) {
+        const alreadyMatchesByName = byName[normalizedName];
         byName[normalizedName] = null;
         if (normalizedName in multipleNameMatches) {
           multipleNameMatches[normalizedName].push(thing);
         } else {
-          multipleNameMatches[normalizedName] = [thing];
+          multipleNameMatches[normalizedName] = [alreadyMatchesByName, thing];
         }
       } else {
         byName[normalizedName] = thing;
@@ -97,16 +98,21 @@ function findHelper({
     const typePart = regexMatch[1];
     const refPart = regexMatch[2];
 
+    const normalizedName =
+      (typePart
+        ? null
+        : refPart.toLowerCase());
+
     const match =
       (typePart
         ? subcache.byDirectory[refPart]
-        : subcache.byName[refPart.toLowerCase()]);
+        : subcache.byName[normalizedName]);
 
     if (!match && !typePart) {
-      if (subcache.multipleNameMatches[refPart]) {
+      if (subcache.multipleNameMatches[normalizedName]) {
         return warnOrThrow(mode,
           `Multiple matches for reference "${fullRef}". Please resolve:\n` +
-          subcache.multipleNameMatches[refPart]
+          subcache.multipleNameMatches[normalizedName]
             .map(match => `- ${inspect(match)}\n`)
             .join('') +
           `Returning null for this reference.`);
