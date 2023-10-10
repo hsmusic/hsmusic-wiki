@@ -5,7 +5,7 @@ export default {
     'generateColorStyleVariables',
     'generatePreviousNextLinks',
     'generateSecondaryNav',
-    'linkAlbum',
+    'linkAlbumDynamically',
     'linkGroup',
     'linkTrack',
   ],
@@ -64,14 +64,14 @@ export default {
         query.adjacentGroupInfo
           .map(({previousAlbum}) =>
             (previousAlbum
-              ? relation('linkAlbum', previousAlbum)
+              ? relation('linkAlbumDynamically', previousAlbum)
               : null));
 
       relations.nextAlbumLinks =
         query.adjacentGroupInfo
           .map(({nextAlbum}) =>
             (nextAlbum
-              ? relation('linkAlbum', nextAlbum)
+              ? relation('linkAlbumDynamically', nextAlbum)
               : null));
     }
 

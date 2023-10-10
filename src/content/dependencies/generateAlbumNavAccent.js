@@ -33,10 +33,8 @@ export default {
       }
     }
 
-    if (album.tracks.some(t => t.hasUniqueCoverArt)) {
-      relations.albumGalleryLink =
-        relation('linkAlbumGallery', album);
-    }
+    relations.albumGalleryLink =
+      relation('linkAlbumGallery', album);
 
     if (album.commentary || album.tracks.some(t => t.commentary)) {
       relations.albumCommentaryLink =
@@ -49,6 +47,7 @@ export default {
   data(album, track) {
     return {
       hasMultipleTracks: album.tracks.length > 1,
+      galleryIsStub: album.tracks.every(t => !t.hasUniqueCoverArt),
       isTrackPage: !!track,
     };
   },
@@ -66,10 +65,11 @@ export default {
     const {content: extraLinks = []} =
       slots.showExtraLinks &&
         {content: [
-          relations.albumGalleryLink?.slots({
-            attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-            content: language.$('albumPage.nav.gallery'),
-          }),
+          (!data.galleryIsStub || slots.currentExtra === 'gallery') &&
+            relations.albumGalleryLink?.slots({
+              attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+              content: language.$('albumPage.nav.gallery'),
+            }),
 
           relations.albumCommentaryLink?.slots({
             attributes: {class: slots.currentExtra === 'commentary' && 'current'},

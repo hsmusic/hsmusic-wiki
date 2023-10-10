@@ -11,6 +11,7 @@ export default {
     'generateCoverCarousel',
     'generateCoverGrid',
     'generateGroupNavLinks',
+    'generateGroupSecondaryNav',
     'generateGroupSidebar',
     'generatePageLayout',
     'image',
@@ -20,18 +21,8 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({listingSpec, wikiInfo}) {
-    const sprawl = {};
-    sprawl.enableGroupUI = wikiInfo.enableGroupUI;
-
-    if (wikiInfo.enableListings && wikiInfo.enableGroupUI) {
-      sprawl.groupsByCategoryListing =
-        listingSpec
-          .find(l => l.directory === 'groups/by-category');
-    }
-
-    return sprawl;
-  },
+  sprawl: ({wikiInfo}) =>
+    ({enableGroupUI: wikiInfo.enableGroupUI}),
 
   relations(relation, sprawl, group) {
     const relations = {};
@@ -46,13 +37,11 @@ export default {
       relation('generateGroupNavLinks', group);
 
     if (sprawl.enableGroupUI) {
+      relations.secondaryNav =
+        relation('generateGroupSecondaryNav', group);
+
       relations.sidebar =
         relation('generateGroupSidebar', group);
-    }
-
-    if (sprawl.groupsByCategoryListing) {
-      relations.groupListingLink =
-        relation('linkListing', sprawl.groupsByCategoryListing);
     }
 
     const carouselAlbums = filterItemsForCarousel(group.featuredAlbums);
@@ -160,15 +149,6 @@ export default {
                 })),
             })),
 
-          relations.groupListingLink &&
-            html.tag('p',
-              {class: 'quick-info'},
-              language.$('groupGalleryPage.anotherGroupLine', {
-                link:
-                  relations.groupListingLink
-                    .slot('content', language.$('groupGalleryPage.anotherGroupLine.link')),
-              })),
-
           relations.coverGrid
             .slots({
               links: relations.gridLinks,
@@ -208,6 +188,9 @@ export default {
           relations.navLinks
             .slot('currentExtra', 'gallery')
             .content,
+
+        secondaryNav:
+          relations.secondaryNav ?? null,
       });
   },
 };
