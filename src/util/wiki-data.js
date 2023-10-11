@@ -610,20 +610,9 @@ export function sortFlashesChronologically(data, {
   latestFirst = false,
   getDate,
 } = {}) {
-  // Flash acts don't actually have any identifying properties because they
-  // don't have dedicated pages (yet), so don't have a directory. Make up a
-  // fake key identifying them so flashes can be grouped together.
-  const flashActs = new Set(data.map(flash => flash.act));
-  const flashActIdentifiers = new Map();
-
-  let counter = 0;
-  for (const act of flashActs) {
-    flashActIdentifiers.set(act, ++counter);
-  }
-
   // Group flashes by act...
-  data.sort((a, b) => {
-    return flashActIdentifiers.get(a.act) - flashActIdentifiers.get(b.act);
+  sortByDirectory(data, {
+    getDirectory: flash => flash.act.directory,
   });
 
   // Sort flashes by position in act...

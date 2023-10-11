@@ -1391,6 +1391,7 @@ export function filterDuplicateDirectories(wikiData) {
     'albumData',
     'artTagData',
     'flashData',
+    'flashActData',
     'groupData',
     'newsData',
     'trackData',
