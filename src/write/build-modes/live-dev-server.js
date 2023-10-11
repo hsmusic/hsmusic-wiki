@@ -1,8 +1,6 @@
 import * as http from 'node:http';
-import {createReadStream} from 'node:fs';
-import {stat} from 'node:fs/promises';
+import {readFile, stat} from 'node:fs/promises';
 import * as path from 'node:path';
-import {pipeline} from 'node:stream/promises'
 
 import {logInfo, logWarn, progressCallAll} from '#cli';
 import {watchContentDependencies} from '#content-dependencies';
@@ -224,7 +222,7 @@ export async function go({
         'gif': 'image/gif',
         'ico': 'image/vnd.microsoft.icon',
         'jpg': 'image/jpeg',
-        'jpeg:': 'image/jpeg',
+        'jpeg': 'image/jpeg',
         'js': 'text/javascript',
         'mjs': 'text/javascript',
         'mp3': 'audio/mpeg',
@@ -249,13 +247,12 @@ export async function go({
 
       try {
         const {size} = await stat(filePath);
+        const buffer = await readFile(filePath)
         response.writeHead(200, contentType ? {
           'Content-Type': contentType,
           'Content-Length': size,
         } : {});
-        await pipeline(
-          createReadStream(filePath),
-          response);
+        response.end(buffer);
         if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       } catch (error) {
         response.writeHead(500, contentTypePlain);
