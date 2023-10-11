@@ -4,13 +4,13 @@ export default {
   contentDependencies: [
     'generateContentHeading',
     'generateContributionList',
+    'generateFlashActSidebar',
     'generateFlashCoverArtwork',
     'generateFlashNavAccent',
-    'generateFlashSidebar',
     'generatePageLayout',
     'generateTrackList',
     'linkExternal',
-    'linkFlashIndex',
+    'linkFlashAct',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -41,7 +41,7 @@ export default {
       relation('generatePageLayout');
 
     relations.sidebar =
-      relation('generateFlashSidebar', flash);
+      relation('generateFlashActSidebar', flash.act, flash);
 
     if (query.urls) {
       relations.externalLinks =
@@ -59,8 +59,8 @@ export default {
 
     const nav = sections.nav = {};
 
-    nav.flashIndexLink =
-      relation('linkFlashIndex');
+    nav.flashActLink =
+      relation('linkFlashAct', flash.act);
 
     nav.flashNavAccent =
       relation('generateFlashNavAccent', flash);
@@ -163,14 +163,11 @@ export default {
       navLinkStyle: 'hierarchical',
       navLinks: [
         {auto: 'home'},
-        {html: sec.nav.flashIndexLink},
+        {html: sec.nav.flashActLink.slot('color', false)},
         {auto: 'current'},
       ],
 
-      navBottomRowContent:
-        sec.nav.flashNavAccent.slots({
-          showFlashNavigation: true,
-        }),
+      navBottomRowContent: sec.nav.flashNavAccent,
 
       ...relations.sidebar,
     });

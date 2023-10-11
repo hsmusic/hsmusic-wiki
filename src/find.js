@@ -150,6 +150,10 @@ const find = {
     referenceTypes: ['flash'],
   }),
 
+  flashAct: findHelper({
+    referenceTypes: ['flash-act'],
+  }),
+
   group: findHelper({
     referenceTypes: ['group', 'group-gallery'],
   }),
@@ -190,6 +194,7 @@ export function bindFind(wikiData, opts1) {
       artist: 'artistData',
       artTag: 'artTagData',
       flash: 'flashData',
+      flashAct: 'flashActData',
       group: 'groupData',
       listing: 'listingSpec',
       newsEntry: 'newsData',

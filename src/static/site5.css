@@ -285,6 +285,8 @@ body::before {
 .sidebar > h3,
 .sidebar > p {
   text-align: center;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .sidebar h1 {

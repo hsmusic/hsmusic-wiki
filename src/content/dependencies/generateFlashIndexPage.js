@@ -7,6 +7,7 @@ export default {
     'generatePageLayout',
     'image',
     'linkFlash',
+    'linkFlashAct',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -36,9 +37,9 @@ export default {
       query.flashActs
         .map(() => relation('generateColorStyleVariables')),
 
-    actFirstFlashLinks:
+    actLinks:
       query.flashActs
-        .map(act => relation('linkFlash', act.flashes[0])),
+        .map(act => relation('linkFlashAct', act)),
 
     actCoverGrids:
       query.flashActs
@@ -58,7 +59,7 @@ export default {
   data: (query) => ({
     jumpLinkAnchors:
       query.jumpActs
-        .map(act => act.anchor),
+        .map(act => act.directory),
 
     jumpLinkColors:
       query.jumpActs
@@ -70,15 +71,11 @@ export default {
 
     actAnchors:
       query.flashActs
-        .map(act => act.anchor),
+        .map(act => act.directory),
 
     actColors:
       query.flashActs
         .map(act => act.color),
-
-    actNames:
-      query.flashActs
-        .map(act => act.name),
 
     actCoverGridNames:
       query.flashActs
@@ -118,10 +115,9 @@ export default {
 
         stitchArrays({
           colorVariables: relations.actColorVariables,
-          firstFlashLink: relations.actFirstFlashLinks,
+          actLink: relations.actLinks,
           anchor: data.actAnchors,
           color: data.actColors,
-          name: data.actNames,
 
           coverGrid: relations.actCoverGrids,
           coverGridImages: relations.actCoverGridImages,
@@ -132,8 +128,7 @@ export default {
             colorVariables,
             anchor,
             color,
-            name,
-            firstFlashLink,
+            actLink,
 
             coverGrid,
             coverGridImages,
@@ -146,7 +141,7 @@ export default {
                 id: anchor,
                 style: colorVariables.slot('color', color).content,
               },
-              firstFlashLink.slot('content', name)),
+              actLink),
 
             coverGrid.slots({
               links: coverGridLinks,

@@ -3,7 +3,7 @@ import {empty} from '#sugar';
 export default {
   contentDependencies: [
     'generatePreviousNextLinks',
-    'linkFlash',
+    'linkFlashAct',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -12,43 +12,41 @@ export default {
     return {flashActData};
   },
 
-  query(sprawl, flash) {
-    // Don't sort chronologically here. The previous/next buttons should match
-    // the order in the sidebar, by act rather than date.
-    const flashes =
-      sprawl.flashActData
-        .flatMap(act => act.flashes);
+  query(sprawl, flashAct) {
+    // Like with generateFlashNavAccent, don't sort chronologically here.
+    const flashActs =
+      sprawl.flashActData;
 
-    const index = flashes.indexOf(flash);
+    const index = flashActs.indexOf(flashAct);
 
-    const previousFlash =
+    const previousFlashAct =
       (index > 0
-        ? flashes[index - 1]
+        ? flashActs[index - 1]
         : null);
 
-    const nextFlash =
-      (index < flashes.length - 1
-        ? flashes[index + 1]
+    const nextFlashAct =
+      (index < flashActs.length - 1
+        ? flashActs[index + 1]
         : null);
 
-    return {previousFlash, nextFlash};
+    return {previousFlashAct, nextFlashAct};
   },
 
   relations(relation, query) {
     const relations = {};
 
-    if (query.previousFlash || query.nextFlash) {
+    if (query.previousFlashAct || query.nextFlashAct) {
       relations.previousNextLinks =
         relation('generatePreviousNextLinks');
 
-      relations.previousFlashLink =
-        (query.previousFlash
-          ? relation('linkFlash', query.previousFlash)
+      relations.previousFlashActLink =
+        (query.previousFlashAct
+          ? relation('linkFlashAct', query.previousFlashAct)
           : null);
 
-      relations.nextFlashLink =
-        (query.nextFlash
-          ? relation('linkFlash', query.nextFlash)
+      relations.nextFlashActLink =
+        (query.nextFlashAct
+          ? relation('linkFlashAct', query.nextFlashAct)
           : null);
     }
 
@@ -59,8 +57,8 @@ export default {
     const {content: previousNextLinks = []} =
       relations.previousNextLinks &&
         relations.previousNextLinks.slots({
-          previousLink: relations.previousFlashLink,
-          nextLink: relations.nextFlashLink,
+          previousLink: relations.previousFlashActLink,
+          nextLink: relations.nextFlashActLink,
         });
 
     const allLinks = [

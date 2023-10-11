@@ -12,6 +12,7 @@ import {
 import {
   color,
   contributionList,
+  directory,
   fileExtension,
   name,
   referenceList,
@@ -117,12 +118,15 @@ export class Flash extends Thing {
 }
 
 export class FlashAct extends Thing {
+  static [Thing.referenceType] = 'flash-act';
+
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
     name: name('Unnamed Flash Act'),
+    directory: directory(),
     color: color(),
-    anchor: simpleString(),
+
     jump: simpleString(),
 
     jumpColor: {

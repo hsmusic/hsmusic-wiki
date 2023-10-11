@@ -434,8 +434,10 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
 export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
   propertyFieldMapping: {
     name: 'Act',
+    directory: 'Directory',
+
     color: 'Color',
-    anchor: 'Anchor',
+
     jump: 'Jump',
     jumpColor: 'Jump Color',
   },
