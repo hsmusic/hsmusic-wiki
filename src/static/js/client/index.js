@@ -5,6 +5,7 @@ import '../image-overlay.js';
 
 import * as additionalNamesBoxModule from './additional-names-box.js';
 import * as albumCommentarySidebarModule from './album-commentary-sidebar.js';
+import * as artTagGalleryFilterModule from './art-tag-gallery-filter.js';
 import * as artistExternalLinkTooltipModule from './artist-external-link-tooltip.js';
 import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.js';
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
@@ -22,6 +23,7 @@ import * as wikiSearchModule from './wiki-search.js';
 export const modules = [
   additionalNamesBoxModule,
   albumCommentarySidebarModule,
+  artTagGalleryFilterModule,
   artistExternalLinkTooltipModule,
   cssCompatibilityAssistantModule,
   datetimestampTooltipModule,
