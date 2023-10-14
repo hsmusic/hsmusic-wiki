@@ -1373,6 +1373,42 @@ listingPage:
       title.short: "...by Uses"
       item: "{TAG} ({TIMES_USED})"
 
+    # listArtTags.network:
+    #   List art tags in a custom networked fashion, showing all
+    #   connections between ancestors and descendants. Each top-level
+    #   tag gets one section. Descendants are generally nested directly
+    #   under their ancestors, except if they have two or more direct
+    #   ancestors *and* at least one direct descendant, in which case
+    #   they're moved to a dedicated section further down the page.
+    #   "Orphan" art tags, if any - tags which don't have any ancestors
+    #   nor any descendants - are displayed in a section at the bottom.
+
+    network:
+      title: "Art Tag Network"
+      title.short: "Art Tag Network"
+
+      jumpToRoot:
+        title: "Jump to one of the upper-most tags:"
+        item: "{TAG}"
+
+      root:
+        _: "{TAG}"
+
+      root.jumpToTop:
+        _: "{TAG} ({LINK})"
+        link: "Jump back to top"
+
+      root.withAncestors:
+        _: "{TAG} (descends from {ANCESTORS})"
+
+      descendant:
+        _: "{TAG}"
+        jumpToRoot: "Jump to: {TAG}"
+
+      orphanArtTags:
+        title: "These tags don't have any descendants or ancestors:"
+        item: "{TAG}"
+
   listArtists:
 
     # listArtists.byName:

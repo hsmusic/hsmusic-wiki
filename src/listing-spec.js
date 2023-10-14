@@ -208,6 +208,13 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  directory: 'tags/network',
+  stringsKey: 'listArtTags.network',
+  contentFunction: 'listArtTagNetwork',
+  featureFlag: 'enableArtTagUI',
+});
+
+listingSpec.push({
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',
