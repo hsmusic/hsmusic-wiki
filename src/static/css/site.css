@@ -1804,6 +1804,65 @@ h1 a[href="#additional-names-box"]:hover {
   vertical-align: text-bottom;
 }
 
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd) {
+  margin-left: 20px;
+  margin-bottom: 0;
+  padding-left: 10px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd):not(:last-child) {
+  padding-bottom: 20px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
+  padding-left: 10px;
+  margin-left: 20px;
+  margin-bottom: 0;
+  padding-bottom: 2px;
+  max-width: unset;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).even,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).even {
+  border-left: 1px solid #eaeaea;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).odd,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).odd {
+  border-left: 1px solid #7b7b7b;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
+  position: relative;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).odd::after,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).odd::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #7b7b7b;
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).even::after,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).even::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: #eaeaea;
+  position: absolute;
+  bottom: -3px;
+  left: -3px;
+  border-bottom-right-radius: 6px;
+  border-top-left-radius: 3px;
+}
+
 /* Images */
 
 .image-container {
