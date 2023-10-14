@@ -1084,20 +1084,45 @@ artTagInfoPage:
 #   The tag gallery page displays all the artworks that a tag has
 #   been featured in, in one neat grid, with each artwork displaying
 #   its illustrators, as well as a short info line that indicates
-#   how many artworks the tag's part of.
+#   how many artworks the tag's been featured in, whether directly,
+#   indirectly (via descendant tags), both, or neither. If a tag's
+#   been featured both directly and indirectly, there are buttons
+#   to switch what's being shown.
 #
 artTagGalleryPage:
   title: "{TAG}"
 
-  infoLine:
-    _: "Featured in {COVER_ARTS}."
-
-    notFeatured:
-      _: "This tag hasn't been featured in any artworks yet."
-      callToAction: "Maybe your track will be the first!"
-
   descendsFrom: "Descends from {TAGS}."
   descendants: "Direct descendants: {TAGS}."
+
+  featuredLine:
+    all: >-
+      Featured in {COVER_ARTS}.
+
+    direct: >-
+      Featured directly in {COVER_ARTS}.
+
+    indirect: >-
+      Featured indirectly in {COVER_ARTS}.
+
+    notFeatured:
+      _: >-
+        This tag hasn't been featured in any artworks yet.
+
+      callToAction: >-
+        Maybe your track will be the first!
+
+  showingLine:
+    _: "({SHOWING})"
+
+    all: >-
+      Showing all artworks.
+
+    indirect: >-
+      Showing artworks where this tag is only featured indirectly.
+
+    direct: >-
+      Showing artworks where this tag is featured directly.
 
 #
 # commentaryIndex:

@@ -90,7 +90,9 @@ export default {
     data.name = artTag.name;
     data.color = artTag.color;
 
-    data.numArtworks = query.allThings.length;
+    data.numArtworksIndirectly = query.indirectThings.length;
+    data.numArtworksDirectly = query.directThings.length;
+    data.numArtworksTotal = query.allThings.length;
 
     data.names =
       query.allThings.map(thing => thing.name);
@@ -110,10 +112,30 @@ export default {
       query.allThings.map(thing =>
         !query.directThings.includes(thing));
 
+    data.hasMixedDirectIndirect =
+      data.onlyFeaturedIndirectly.includes(true) &&
+      data.onlyFeaturedIndirectly.includes(false);
+
     return data;
   },
 
   generate(data, relations, {html, language}) {
+    const wrapFeaturedLine = (showing, count) =>
+      html.tag('p', {class: 'quick-info', id: `featured-${showing}-line`},
+        language.$('artTagGalleryPage.featuredLine', showing, {
+          coverArts: language.countArtworks(count, {
+            unit: true,
+          }),
+        }));
+
+    const wrapShowingLine = showing =>
+      html.tag('p', {class: 'quick-info', id: `showing-${showing}-line`},
+        language.$('artTagGalleryPage.showingLine', {
+          showing:
+            html.tag('a', {href: '#'},
+              language.$('artTagGalleryPage.showingLine', showing)),
+        }));
+
     return relations.layout
       .slots({
         title:
@@ -131,18 +153,20 @@ export default {
             extraReadingLinks: relations.extraReadingLinks ?? null,
           }),
 
-          html.tag('p', {class: 'quick-info'},
-            (data.numArtworks === 0
-              ? [
-                  language.$('artTagGalleryPage.infoLine.notFeatured'),
-                  html.tag('br'),
-                  language.$('artTagGalleryPage.infoLine.notFeatured.callToAction'),
-                ]
-              : language.$('artTagGalleryPage.infoLine', {
-                  coverArts: language.countArtworks(data.numArtworks, {
-                    unit: true,
-                  }),
-                }))),
+          data.numArtworksTotal === 0 &&
+            html.tag('p', {class: 'quick-info'}, [
+              language.$('artTagGalleryPage.featuredLine.notFeatured'),
+              html.tag('br'),
+              language.$('artTagGalleryPage.featuredLine.notFeatured.callToAction'),
+            ]),
+
+          data.numArtworksTotal > 0 &&
+            wrapFeaturedLine('all', data.numArtworksTotal),
+
+          data.hasMixedDirectIndirect && [
+            wrapFeaturedLine('direct', data.numArtworksDirectly),
+            wrapFeaturedLine('indirect', data.numArtworksIndirectly),
+          ],
 
           relations.ancestorLinks &&
             html.tag('p', {class: 'quick-info'},
@@ -151,10 +175,16 @@ export default {
               })),
 
           relations.descendantLinks &&
-            html.tag('p', {clasS: 'quick-info'},
+            html.tag('p', {class: 'quick-info'},
               language.$('artTagGalleryPage.descendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),
+
+          data.hasMixedDirectIndirect && [
+            wrapShowingLine('all'),
+            wrapShowingLine('direct'),
+            wrapShowingLine('indirect'),
+          ],
 
           relations.coverGrid
             .slots({
