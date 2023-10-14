@@ -3,6 +3,8 @@ import {empty, stitchArrays, unique} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateArtTagGalleryPageFeaturedLine',
+    'generateArtTagGalleryPageShowingLine',
     'generateArtTagNavLinks',
     'generateCoverGrid',
     'generatePageLayout',
@@ -47,6 +49,12 @@ export default {
     relations.quickDescription =
       relation('generateQuickDescription', artTag);
 
+    relations.featuredLine =
+      relation('generateArtTagGalleryPageFeaturedLine');
+
+    relations.showingLine =
+      relation('generateArtTagGalleryPageShowingLine');
+
     if (!empty(artTag.extraReadingURLs)) {
       relations.extraReadingLinks =
         artTag.extraReadingURLs
@@ -90,7 +98,9 @@ export default {
     data.name = artTag.name;
     data.color = artTag.color;
 
-    data.numArtworks = query.allThings.length;
+    data.numArtworksIndirectly = query.indirectThings.length;
+    data.numArtworksDirectly = query.directThings.length;
+    data.numArtworksTotal = query.allThings.length;
 
     data.names =
       query.allThings.map(thing => thing.name);
@@ -113,6 +123,10 @@ export default {
       query.allThings.map(thing =>
         !query.directThings.includes(thing));
 
+    data.hasMixedDirectIndirect =
+      data.onlyFeaturedIndirectly.includes(true) &&
+      data.onlyFeaturedIndirectly.includes(false);
+
     return data;
   },
 
@@ -134,19 +148,33 @@ export default {
             extraReadingLinks: relations.extraReadingLinks ?? null,
           }),
 
-          html.tag('p', {class: 'quick-info'},
-            language.encapsulate(pageCapsule, 'infoLine', capsule =>
-              (data.numArtworks === 0
-                ? language.encapsulate(capsule, 'notFeatured', capsule => [
-                    language.$(capsule),
-                    html.tag('br'),
-                    language.$(capsule, 'callToAction'),
-                  ])
-                : language.$(capsule, {
-                    coverArts: language.countArtworks(data.numArtworks, {
-                      unit: true,
-                    }),
-                  })))),
+          data.numArtworksTotal === 0 &&
+            html.tag('p', {class: 'quick-info'},
+              language.encapsulate(pageCapsule, 'featuredLine.notFeatured', capsule => [
+                language.$(capsule),
+                html.tag('br'),
+                language.$(capsule, 'callToAction'),
+              ])),
+
+          relations.featuredLine.clone()
+            .slots({
+              showing: 'all',
+              count: data.numArtworksTotal,
+            }),
+
+          data.hasMixedDirectIndirect && [
+            relations.featuredLine.clone()
+              .slots({
+                showing: 'direct',
+                count: data.numArtworksDirectly,
+              }),
+
+            relations.featuredLine.clone()
+              .slots({
+                showing: 'indirect',
+                count: data.numArtworksIndirectly,
+              }),
+          ],
 
           relations.ancestorLinks &&
             html.tag('p', {class: 'quick-info'},
@@ -159,6 +187,17 @@ export default {
               language.$(pageCapsule, 'descendants', {
                 tags: language.formatUnitList(relations.descendantLinks),
               })),
+
+          data.hasMixedDirectIndirect && [
+            relations.showingLine.clone()
+              .slot('showing', 'all'),
+
+            relations.showingLine.clone()
+              .slot('showing', 'direct'),
+
+            relations.showingLine.clone()
+              .slot('showing', 'indirect'),
+          ],
 
           relations.coverGrid
             .slots({
