@@ -27,14 +27,14 @@ export default {
        {directAncestorArtTags: ancestorsB}) =>
         ancestorsA.length - ancestorsB.length);
 
-    const recursive = (artTag, asRoot) => {
+    const recursive = (artTag, depth) => {
       const descendantNodes =
         (empty(artTag.directDescendantArtTags)
           ? null
-       : !asRoot && artTag.directAncestorArtTags.length >= 2
+       : depth > 0 && artTag.directAncestorArtTags.length >= 2
           ? null
           : artTag.directDescendantArtTags
-              .map(artTag => recursive(artTag, false)));
+              .map(artTag => recursive(artTag, depth + 1)));
 
       descendantNodes?.sort(
         ({descendantNodes: descendantNodesA},
@@ -48,7 +48,7 @@ export default {
           : ancestorArtTag);
 
       const ancestorRootArtTags =
-        (asRoot && !empty(artTag.directAncestorArtTags)
+        (depth === 0 && !empty(artTag.directAncestorArtTags)
           ? unique(artTag.directAncestorArtTags.map(recursiveGetRootAncestor))
           : null);
 
@@ -74,7 +74,7 @@ export default {
 
       rootNodes:
         rootArtTags
-          .map(artTag => recursive(artTag, true)),
+          .map(artTag => recursive(artTag, 0)),
 
       uppermostRootTags,
       orphanArtTags,
@@ -148,13 +148,14 @@ export default {
   generate(data, relations, {html, language}) {
     const prefix = `listingPage.listArtTags.network`;
 
-    const recursive = (dataNode, relationsNode, asRoot) => [
+    const recursive = (dataNode, relationsNode, depth) => [
       html.tag('dt',
-        (asRoot
-          ? {id: dataNode.directory}
-          : {}),
+        {
+          id: depth === 0 && dataNode.directory,
+          class: depth % 2 === 0 ? 'even' : 'odd',
+        },
 
-        (asRoot
+        (depth === 0
           ? (relationsNode.ancestorTagLinks
               ? language.$(prefix, 'root.withAncestors', {
                   tag: relationsNode.artTagLink,
@@ -190,19 +191,20 @@ export default {
       dataNode.descendantNodes &&
       relationsNode.descendantNodes &&
         html.tag('dd',
+          {class: depth % 2 === 0 ? 'even' : 'odd'},
           html.tag('dl',
             stitchArrays({
               dataNode: dataNode.descendantNodes,
               relationsNode: relationsNode.descendantNodes,
             }).map(({dataNode, relationsNode}) =>
-                recursive(dataNode, relationsNode, false)))),
+                recursive(dataNode, relationsNode, depth + 1)))),
     ];
 
     return relations.page.slots({
       type: 'custom',
 
       content: [
-        html.tag('dl', [
+        html.tag('dl', {id: 'network-top-dl'}, [
           html.tag('dt', {id: 'top'},
             language.$(prefix, 'jumpToRoot.title')),
 
@@ -225,7 +227,7 @@ export default {
             dataNode: data.rootNodes,
             relationsNode: relations.rootNodes,
           }).map(({dataNode, relationsNode}) =>
-              recursive(dataNode, relationsNode, true)),
+              recursive(dataNode, relationsNode, 0)),
 
           !empty(relations.orphanArtTagLinks) && [
             html.tag('dt',
