@@ -43,9 +43,9 @@ export default {
           - (descendantNodesB ? 1 : 0));
 
       const recursiveGetRootAncestor = ancestorArtTag =>
-        (rootArtTags.includes(ancestorArtTag)
-          ? ancestorArtTag
-          : recursiveGetRootAncestor(ancestorArtTag.directAncestorArtTags[0]));
+        (ancestorArtTag.directAncestorArtTags.length === 1
+          ? recursiveGetRootAncestor(ancestorArtTag.directAncestorArtTags[0])
+          : ancestorArtTag);
 
       const ancestorRootArtTags =
         (asRoot && !empty(artTag.directAncestorArtTags)
