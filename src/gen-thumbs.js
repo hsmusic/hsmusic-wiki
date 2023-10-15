@@ -81,8 +81,8 @@ const thumbnailSpec = {
   'huge': {size: 1600, quality: 90},
   'semihuge': {size: 1200, quality: 92},
   'large': {size: 800, quality: 93},
-  'medium': {size: 400, quality: 95},
-  'small': {size: 250, quality: 85},
+  'medium': {size: 400, quality: 95, square: true},
+  'small': {size: 250, quality: 85, square: true},
 };
 
 import {spawn} from 'node:child_process';
@@ -313,16 +313,23 @@ function generateImageThumbnails({
   const basename = path.basename(filePath, extname);
   const output = (name) => path.join(dirname, basename + name + '.jpg');
 
-  const convert = (name, {size, quality}) =>
+  const convert = (name, {size, quality, square}) =>
     spawnConvert([
       filePath,
-      '-strip',
-      '-resize',
-      `${size}x${size}>`,
-      '-interlace',
-      'Plane',
-      '-quality',
-      `${quality}%`,
+      ...
+        (square
+          // Scale so the smaller length matches the specified size.
+          // Then crop about the center. The result will always be
+          // a square image, scaled as to retain the best resolution
+          // in the specified dimensions.
+          ? ['-thumbnail', `${size}x${size}^`,
+             '-gravity', 'center',
+             '-extent', `${size}x${size}`]
+          // Scale so the longer length matches the specified size.
+          // The result will retain the original aspect ratio.
+          : ['-thumbnail', `${size}x${size}>`]),
+      '-interlace', 'Plane',
+      '-quality', `${quality}%`,
       output(name),
     ]);
 
