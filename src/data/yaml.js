@@ -10,7 +10,12 @@ import yaml from 'js-yaml';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
-import T, {CacheableObject, Thing} from '#things';
+
+import T, {
+  CacheableObject,
+  CacheableObjectPropertyValueError,
+  Thing,
+} from '#things';
 
 import {
   conditionallySuppressError,
@@ -144,6 +149,25 @@ function makeProcessDocument(
   };
 
   const fn = decorateErrorWithName((document) => {
+    const nameField = propertyFieldMapping['name'];
+    const namePart =
+      (nameField
+        ? (document[nameField]
+          ? ` named ${colors.green(`"${document[nameField]}"`)}`
+          : ` (name field, "${nameField}", not specified)`)
+        : ``);
+
+    const constructorPart =
+      (thingConstructor[Thing.friendlyName]
+        ? colors.green(thingConstructor[Thing.friendlyName])
+     : thingConstructor.name
+        ? colors.green(thingConstructor.name)
+        : `document`);
+
+    const aggregate = openAggregate({
+      message: `Errors processing ${constructorPart}` + namePart,
+    });
+
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
 
@@ -187,19 +211,31 @@ function makeProcessDocument(
     const sourceProperties = {};
 
     for (const [field, value] of Object.entries(fieldValues)) {
-      const property = fieldPropertyMapping[field];
-      sourceProperties[property] = value;
+      if (Object.hasOwn(fieldPropertyMapping, field)) {
+        const property = fieldPropertyMapping[field];
+        sourceProperties[property] = value;
+      }
     }
 
     const thing = Reflect.construct(thingConstructor, []);
 
-    withAggregate({message: `Errors applying ${colors.green(thingConstructor.name)} properties`}, ({call}) => {
-      for (const [property, value] of Object.entries(sourceProperties)) {
-        call(() => (thing[property] = value));
-      }
-    });
+    const fieldValueErrors = [];
 
-    return thing;
+    // This for loop would like to certify itself as "not into capitalism".
+    for (const [property, value] of Object.entries(sourceProperties)) {
+      const field = propertyFieldMapping[property];
+      try {
+        thing[property] = value;
+      } catch (caughtError) {
+        fieldValueErrors.push(new FieldValueError(field, property, value, caughtError));
+      }
+    }
+
+    if (!empty(fieldValueErrors)) {
+      aggregate.push(new FieldValueAggregateError(thingConstructor, fieldValueErrors));
+    }
+
+    return {thing, aggregate};
   });
 
   Object.assign(fn, {
@@ -212,7 +248,7 @@ function makeProcessDocument(
 
 export class UnknownFieldsError extends Error {
   constructor(fields) {
-    super(`Unknown fields present: ${fields.join(', ')}`);
+    super(`Unknown fields present: ${fields.map(field => colors.red(field)).join(', ')}`);
     this.fields = fields;
   }
 }
@@ -237,6 +273,25 @@ export class FieldCombinationError extends Error {
 
     super(combinePart + messagePart);
     this.fields = fields;
+  }
+}
+
+export class FieldValueAggregateError extends AggregateError {
+  constructor(thingConstructor, errors) {
+    super(errors, `Errors processing field values for ${colors.green(thingConstructor.name)}`);
+  }
+}
+
+export class FieldValueError extends Error {
+  constructor(field, property, value, caughtError) {
+    const cause =
+      (caughtError instanceof CacheableObjectPropertyValueError
+        ? caughtError.cause
+        : caughtError);
+
+    super(
+      `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
+      {cause});
   }
 }
 
@@ -1023,8 +1078,8 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
-      {message: `Errors during data step: ${dataStep.title}`},
-      async ({call, callAsync, map, mapAsync, nest}) => {
+      {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
+      async ({call, callAsync, map, mapAsync, push, nest}) => {
         const {documentMode} = dataStep;
 
         if (!Object.values(documentModes).includes(documentMode)) {
@@ -1149,32 +1204,52 @@ export async function loadAndProcessDataDocuments({dataPath}) {
             return;
           }
 
-          const yamlResult =
-            documentMode === documentModes.oneDocumentTotal
-              ? call(yaml.load, readResult)
-              : call(yaml.loadAll, readResult);
-
-          if (!yamlResult) {
-            return;
-          }
-
           let processResults;
 
-          if (documentMode === documentModes.oneDocumentTotal) {
-            nest({message: `Errors processing document`}, ({call}) => {
-              processResults = call(dataStep.processDocument, yamlResult);
-            });
-          } else {
-            const {documents, aggregate: aggregate1} = filterBlankDocuments(yamlResult);
-            call(aggregate1.close);
+          switch (documentMode) {
+            case documentModes.oneDocumentTotal: {
+              const yamlResult = call(yaml.load, readResult);
 
-            const {result, aggregate: aggregate2} = mapAggregate(
-              documents,
-              decorateErrorWithIndex(dataStep.processDocument),
-              {message: `Errors processing documents`});
-            call(aggregate2.close);
+              if (!yamlResult) {
+                processResults = null;
+                break;
+              }
 
-            processResults = result;
+              const {thing, aggregate} =
+                dataStep.processDocument(yamlResult);
+
+              processResults = thing;
+
+              call(() => aggregate.close());
+
+              break;
+            }
+
+            case documentModes.allInOne: {
+              const yamlResults = call(yaml.loadAll, readResult);
+
+              if (!yamlResults) {
+                processResults = [];
+                return;
+              }
+
+              const {documents, aggregate: filterAggregate} =
+                filterBlankDocuments(yamlResults);
+
+              call(filterAggregate.close);
+
+              processResults = [];
+
+              map(documents, decorateErrorWithIndex(document => {
+                const {thing, aggregate} =
+                  dataStep.processDocument(document);
+
+                processResults.push(thing);
+                aggregate.close();
+              }), {message: `Errors processing documents`});
+
+              break;
+            }
           }
 
           if (!processResults) return;
@@ -1232,81 +1307,74 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           return {file, documents: filteredDocuments};
         });
 
-        let processResults;
+        const processResults = [];
 
-        if (documentMode === documentModes.headerAndEntries) {
-          nest({message: `Errors processing data files as valid documents`}, ({call, map}) => {
-            processResults = [];
+        switch (documentMode) {
+          case documentModes.headerAndEntries:
+            map(yamlResults, decorateErrorWithFile(({documents}) => {
+              const headerDocument = documents[0];
+              const entryDocuments = documents.slice(1).filter(Boolean);
 
-            yamlResults.forEach(({file, documents}) => {
-              const [headerDocument, ...entryDocuments] = documents;
+              if (!headerDocument)
+                throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
 
-              if (!headerDocument) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
-                }), {file});
-                return;
+              // This'll be decorated with the file, and groups together any
+              // errors from processing the header and entry documents.
+              const fileAggregate =
+                openAggregate({message: `Errors processing documents`});
+
+              const {thing: headerObject, aggregate: headerAggregate} =
+                dataStep.processHeaderDocument(headerDocument);
+
+              try {
+                headerAggregate.close()
+              } catch (caughtError) {
+                caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
+                fileAggregate.push(caughtError);
               }
 
-              const header = call(
-                decorateErrorWithFile(({document}) =>
-                  dataStep.processHeaderDocument(document)),
-                {file, document: headerDocument});
+              const entryObjects = [];
 
-              // Don't continue processing files whose header
-              // document is invalid - the entire file is excempt
-              // from data in this case.
-              if (!header) {
-                return;
+              for (let index = 0; index < entryDocuments.length; index++) {
+                const entryDocument = entryDocuments[index];
+
+                const {thing: entryObject, aggregate: entryAggregate} =
+                  dataStep.processEntryDocument(entryDocument);
+
+                entryObjects.push(entryObject);
+
+                try {
+                  entryAggregate.close();
+                } catch (caughtError) {
+                  caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
+                  fileAggregate.push(caughtError);
+                }
               }
 
-              const entries = map(
-                entryDocuments
-                  .filter(Boolean)
-                  .map((document) => ({file, document})),
-                decorateErrorWithFile(
-                  decorateErrorWithIndex(({document}) =>
-                    dataStep.processEntryDocument(document))),
-                {message: `Errors processing entry documents`});
+              processResults.push({
+                header: headerObject,
+                entries: entryObjects,
+              });
 
-              // Entries may be incomplete (i.e. any errored
-              // documents won't have a processed output
-              // represented here) - this is intentional! By
-              // principle, partial output is preferred over
-              // erroring an entire file.
-              processResults.push({header, entries});
-            });
-          });
-        }
+              fileAggregate.close();
+            }), {message: `Errors processing documents in data files`});
+            break;
 
-        if (documentMode === documentModes.onePerFile) {
-          nest({message: `Errors processing data files as valid documents`}, ({call}) => {
-            processResults = [];
+          case documentModes.onePerFile:
+            map(yamlResults, decorateErrorWithFile(({documents}) => {
+              if (documents.length > 1)
+                throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
 
-            yamlResults.forEach(({file, documents}) => {
-              if (documents.length > 1) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Only expected one document to be present per file`);
-                }), {file});
-                return;
-              } else if (empty(documents) || !documents[0]) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Expected a document, this file is empty`);
-                }), {file});
-              }
+              if (empty(documents) || !documents[0])
+                throw new Error(`Expected a document, this file is empty`);
 
-              const result = call(
-                decorateErrorWithFile(({document}) =>
-                  dataStep.processDocument(document)),
-                {file, document: documents[0]});
+              const {thing, aggregate} =
+                dataStep.processDocument(documents[0]);
 
-              if (!result) {
-                return;
-              }
-
-              processResults.push(result);
-            });
-          });
+              processResults.push(thing);
+              aggregate.close();
+            }), {message: `Errors processing data files as valid documents`});
+            break;
         }
 
         const saveResult = call(dataStep.save, processResults);
