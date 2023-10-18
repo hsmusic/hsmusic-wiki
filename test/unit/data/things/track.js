@@ -208,7 +208,8 @@ t.test(`Track.color`, t => {
   t.equal(track.color, '#123456',
     `color #4: is own value`);
 
-  t.throws(() => { track.color = '#aeiouw'; }, TypeError,
+  t.throws(() => { track.color = '#aeiouw'; },
+    {cause: TypeError},
     `color #5: must be set to valid color`);
 });
 

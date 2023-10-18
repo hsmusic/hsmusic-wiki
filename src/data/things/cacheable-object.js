@@ -179,13 +179,8 @@ export default class CacheableObject {
           } else if (result !== true) {
             throw new TypeError(`Validation failed for value ${newValue}`);
           }
-        } catch (error) {
-          error.message = [
-            `Property ${colors.green(property)}`,
-            `(${inspect(this[property])} -> ${inspect(newValue)}):`,
-            error.message
-          ].join(' ');
-          throw error;
+        } catch (caughtError) {
+          throw new CacheableObjectPropertyValueError(property, this[property], newValue, caughtError);
         }
       }
 
@@ -357,5 +352,15 @@ export default class CacheableObject {
     }
 
     return object.#propertyUpdateValues[key] ?? null;
+  }
+}
+
+export class CacheableObjectPropertyValueError extends Error {
+  constructor(property, oldValue, newValue, error) {
+    super(
+      `Error setting ${colors.green(property)} (${inspect(oldValue)} -> ${inspect(newValue)})`,
+      {cause: error});
+
+    this.property = property;
   }
 }
