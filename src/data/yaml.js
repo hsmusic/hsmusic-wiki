@@ -59,7 +59,7 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 // document and apply the configuration passed to makeProcessDocument in order
 // to construct a Thing subclass.
 function makeProcessDocument(
-  thingClass,
+  thingConstructor,
   {
     // Optional early step for transforming field values before providing them
     // to the Thing's update() method. This is useful when the input format
@@ -110,7 +110,7 @@ function makeProcessDocument(
     invalidFieldCombinations = [],
   }
 ) {
-  if (!thingClass) {
+  if (!thingConstructor) {
     throw new Error(`Missing Thing class`);
   }
 
@@ -152,7 +152,7 @@ function makeProcessDocument(
       .filter((field) => !knownFields.includes(field));
 
     if (!empty(unknownFields)) {
-      throw new makeProcessDocument.UnknownFieldsError(unknownFields);
+      aggregate.push(new UnknownFieldsError(unknownFields));
     }
 
     const presentFields = Object.keys(document);
@@ -162,18 +162,16 @@ function makeProcessDocument(
     for (const {message, fields} of invalidFieldCombinations) {
       const fieldsPresent = presentFields.filter(field => fields.includes(field));
 
-      if (fieldsPresent.length <= 1) {
-        continue;
+      if (fieldsPresent.length >= 2) {
+        fieldCombinationErrors.push(
+          new FieldCombinationError(
+            filterProperties(document, fieldsPresent),
+            message));
       }
-
-      fieldCombinationErrors.push(
-        new makeProcessDocument.FieldCombinationError(
-          filterProperties(document, fieldsPresent),
-          message));
     }
 
     if (!empty(fieldCombinationErrors)) {
-      throw new makeProcessDocument.FieldCombinationsError(fieldCombinationErrors);
+      aggregate.push(new FieldCombinationAggregateError(fieldCombinationErrors));
     }
 
     const fieldValues = {};
@@ -193,9 +191,9 @@ function makeProcessDocument(
       sourceProperties[property] = value;
     }
 
-    const thing = Reflect.construct(thingClass, []);
+    const thing = Reflect.construct(thingConstructor, []);
 
-    withAggregate({message: `Errors applying ${colors.green(thingClass.name)} properties`}, ({call}) => {
+    withAggregate({message: `Errors applying ${colors.green(thingConstructor.name)} properties`}, ({call}) => {
       for (const [property, value] of Object.entries(sourceProperties)) {
         call(() => (thing[property] = value));
       }
@@ -212,20 +210,20 @@ function makeProcessDocument(
   return fn;
 }
 
-makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
+export class UnknownFieldsError extends Error {
   constructor(fields) {
     super(`Unknown fields present: ${fields.join(', ')}`);
     this.fields = fields;
   }
-};
+}
 
-makeProcessDocument.FieldCombinationsError = class FieldCombinationsError extends AggregateError {
+export class FieldCombinationAggregateError extends AggregateError {
   constructor(errors) {
     super(errors, `Errors in combinations of fields present`);
   }
-};
+}
 
-makeProcessDocument.FieldCombinationError = class FieldCombinationError extends Error {
+export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
     const combinePart = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
@@ -933,6 +931,10 @@ export const dataSteps = [
 
   {
     title: `Process homepage layout file`,
+
+    // Kludge: This benefits from the same headerAndEntries style messaging as
+    // albums and tracks (for example), but that document mode is designed to
+    // support multiple files, and only one is actually getting processed here.
     files: [HOMEPAGE_LAYOUT_DATA_FILE],
 
     documentMode: documentModes.headerAndEntries,
