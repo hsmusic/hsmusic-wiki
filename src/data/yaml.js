@@ -171,12 +171,18 @@ function makeProcessDocument(
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
 
+    const skippedFields = new Set();
+
     const unknownFields = documentEntries
       .map(([field]) => field)
       .filter((field) => !knownFields.includes(field));
 
     if (!empty(unknownFields)) {
       aggregate.push(new UnknownFieldsError(unknownFields));
+
+      for (const field of unknownFields) {
+        skippedFields.add(field);
+      }
     }
 
     const presentFields = Object.keys(document);
@@ -187,10 +193,17 @@ function makeProcessDocument(
       const fieldsPresent = presentFields.filter(field => fields.includes(field));
 
       if (fieldsPresent.length >= 2) {
-        fieldCombinationErrors.push(
-          new FieldCombinationError(
-            filterProperties(document, fieldsPresent),
-            message));
+        const filteredDocument =
+          filterProperties(
+            document,
+            fieldsPresent,
+            {preserveOriginalOrder: true});
+
+        fieldCombinationErrors.push(new FieldCombinationError(filteredDocument, message));
+
+        for (const field of Object.keys(filteredDocument)) {
+          skippedFields.add(field);
+        }
       }
     }
 
@@ -201,6 +214,7 @@ function makeProcessDocument(
     const fieldValues = {};
 
     for (const [field, value] of documentEntries) {
+      if (skippedFields.has(field)) continue;
       if (Object.hasOwn(fieldTransformations, field)) {
         fieldValues[field] = fieldTransformations[field](value);
       } else {
@@ -211,10 +225,8 @@ function makeProcessDocument(
     const sourceProperties = {};
 
     for (const [field, value] of Object.entries(fieldValues)) {
-      if (Object.hasOwn(fieldPropertyMapping, field)) {
-        const property = fieldPropertyMapping[field];
-        sourceProperties[property] = value;
-      }
+      const property = fieldPropertyMapping[field];
+      sourceProperties[property] = value;
     }
 
     const thing = Reflect.construct(thingConstructor, []);
@@ -227,12 +239,22 @@ function makeProcessDocument(
       try {
         thing[property] = value;
       } catch (caughtError) {
+        skippedFields.add(field);
         fieldValueErrors.push(new FieldValueError(field, property, value, caughtError));
       }
     }
 
     if (!empty(fieldValueErrors)) {
       aggregate.push(new FieldValueAggregateError(thingConstructor, fieldValueErrors));
+    }
+
+    if (skippedFields.size >= 1) {
+      aggregate.push(
+        new SkippedFieldsSummaryError(
+          filterProperties(
+            document,
+            Array.from(skippedFields),
+            {preserveOriginalOrder: true})));
     }
 
     return {thing, aggregate};
@@ -248,30 +270,37 @@ function makeProcessDocument(
 
 export class UnknownFieldsError extends Error {
   constructor(fields) {
-    super(`Unknown fields present: ${fields.map(field => colors.red(field)).join(', ')}`);
+    super(`Unknown fields ignored: ${fields.map(field => colors.red(field)).join(', ')}`);
     this.fields = fields;
   }
 }
 
 export class FieldCombinationAggregateError extends AggregateError {
   constructor(errors) {
-    super(errors, `Errors in combinations of fields present`);
+    super(errors, `Invalid field combinations - all involved fields ignored`);
   }
 }
 
 export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
-    const combinePart = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
 
-    const messagePart =
+    const mainMessage = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
+
+    const causeMessage =
       (typeof message === 'function'
-        ? `: ${message(fields)}`
+        ? message(fields)
      : typeof message === 'string'
-        ? `: ${message}`
-        : ``);
+        ? message
+        : null);
 
-    super(combinePart + messagePart);
+    super(mainMessage, {
+      cause:
+        (causeMessage
+          ? new Error(causeMessage)
+          : null),
+    });
+
     this.fields = fields;
   }
 }
@@ -292,6 +321,25 @@ export class FieldValueError extends Error {
     super(
       `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
       {cause});
+  }
+}
+
+export class SkippedFieldsSummaryError extends Error {
+  constructor(filteredDocument) {
+    const entries = Object.entries(filteredDocument);
+
+    const lines =
+      entries.map(([field, value]) =>
+        ` - ${field}: ` +
+        inspect(value)
+          .split('\n')
+          .map((line, index) => index === 0 ? line : `   ${line}`)
+          .join('\n'));
+
+    super(
+      colors.bright(colors.yellow(`Altogether, skipped ${entries.length === 1 ? `1 field` : `${entries.length} fields`}:\n`)) +
+      lines.join('\n') + '\n' +
+      colors.bright(colors.yellow(`See above errors for details.`)));
   }
 }
 
