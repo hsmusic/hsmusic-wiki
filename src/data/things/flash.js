@@ -119,6 +119,7 @@ export class Flash extends Thing {
 
 export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
+  static [Thing.friendlyName] = `Flash Act`;
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose

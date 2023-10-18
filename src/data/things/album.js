@@ -181,6 +181,8 @@ export class Album extends Thing {
 }
 
 export class TrackSectionHelper extends Thing {
+  static [Thing.friendlyName] = `Track Section`;
+
   static [Thing.getPropertyDescriptors] = () => ({
     name: name('Unnamed Track Section'),
     color: color(),

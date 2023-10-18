@@ -16,6 +16,7 @@ import Thing from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
+  static [Thing.friendlyName] = `Art Tag`;
 
   static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
     // Update & expose

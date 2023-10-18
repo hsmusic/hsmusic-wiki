@@ -14,6 +14,8 @@ import {
 import Thing from './thing.js';
 
 export class WikiInfo extends Thing {
+  static [Thing.friendlyName] = `Wiki Info`;
+
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 

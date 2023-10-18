@@ -10,6 +10,7 @@ import Thing from './thing.js';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
+  static [Thing.friendlyName] = `Static Page`;
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose

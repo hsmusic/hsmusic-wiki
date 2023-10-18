@@ -9,6 +9,7 @@ import Thing from './thing.js';
 
 export class NewsEntry extends Thing {
   static [Thing.referenceType] = 'news-entry';
+  static [Thing.friendlyName] = `News Entry`;
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose

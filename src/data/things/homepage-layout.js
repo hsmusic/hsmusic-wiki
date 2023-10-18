@@ -26,6 +26,8 @@ import {
 import Thing from './thing.js';
 
 export class HomepageLayout extends Thing {
+  static [Thing.friendlyName] = `Homepage Layout`;
+
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
@@ -47,6 +49,8 @@ export class HomepageLayout extends Thing {
 }
 
 export class HomepageLayoutRow extends Thing {
+  static [Thing.friendlyName] = `Homepage Row`;
+
   static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
@@ -75,6 +79,8 @@ export class HomepageLayoutRow extends Thing {
 }
 
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
+  static [Thing.friendlyName] = `Homepage Albums Row`;
+
   static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
