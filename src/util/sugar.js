@@ -168,7 +168,9 @@ export function setIntersection(set1, set2) {
   return intersection;
 }
 
-export function filterProperties(object, properties) {
+export function filterProperties(object, properties, {
+  preserveOriginalOrder = false,
+} = {}) {
   if (typeof object !== 'object' || object === null) {
     throw new TypeError(`Expected object to be an object, got ${typeAppearance(object)}`);
   }
@@ -179,9 +181,17 @@ export function filterProperties(object, properties) {
 
   const filteredObject = {};
 
-  for (const property of properties) {
-    if (Object.hasOwn(object, property)) {
-      filteredObject[property] = object[property];
+  if (preserveOriginalOrder) {
+    for (const property of Object.keys(object)) {
+      if (properties.includes(property)) {
+        filteredObject[property] = object[property];
+      }
+    }
+  } else {
+    for (const property of properties) {
+      if (Object.hasOwn(object, property)) {
+        filteredObject[property] = object[property];
+      }
     }
   }
 
