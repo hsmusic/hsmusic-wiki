@@ -100,7 +100,7 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: [this, 'albumData'],
+        dependencies: ['this', 'albumData'],
 
         compute: ({this: artist, albumData}) =>
           albumData?.filter(({commentatorArtists}) =>
