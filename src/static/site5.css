@@ -439,6 +439,14 @@ a.current {
   font-weight: 800;
 }
 
+a:not([href]) {
+  cursor: default;
+}
+
+a:not([href]):hover {
+  text-decoration: none;
+}
+
 .nav-main-links > span > span {
   white-space: nowrap;
 }

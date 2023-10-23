@@ -36,6 +36,7 @@ export default {
     },
 
     anchor: {type: 'boolean', default: false},
+    linkless: {type: 'boolean', default: false},
 
     attributes: {validate: v => v.isAttributes},
     hash: {type: 'string'},
@@ -78,6 +79,7 @@ export default {
 
         attributes: slots.attributes,
         hash: slots.hash,
+        linkless: slots.linkless,
       });
   },
 }

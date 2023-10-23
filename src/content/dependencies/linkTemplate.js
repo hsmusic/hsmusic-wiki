@@ -15,6 +15,7 @@ export default {
     href: {type: 'string'},
     path: {validate: v => v.validateArrayItems(v.isString)},
     hash: {type: 'string'},
+    linkless: {type: 'boolean', default: false},
 
     tooltip: {type: 'string'},
     attributes: {validate: v => v.isAttributes},
@@ -33,25 +34,29 @@ export default {
     let style;
     let title;
 
-    if (slots.href) {
-      href = encodeURI(slots.href);
-    } else if (!empty(slots.path)) {
-      href = to(...slots.path);
+    if (slots.linkless) {
+      href = null;
     } else {
-      href = '';
-    }
-
-    if (appendIndexHTML) {
-      if (
-        /^(?!https?:\/\/).+\/$/.test(href) &&
-        href.endsWith('/')
-      ) {
-        href += 'index.html';
+      if (slots.href) {
+        href = encodeURI(slots.href);
+      } else if (!empty(slots.path)) {
+        href = to(...slots.path);
+      } else {
+        href = '';
       }
-    }
 
-    if (slots.hash) {
-      href += (slots.hash.startsWith('#') ? '' : '#') + slots.hash;
+      if (appendIndexHTML) {
+        if (
+          /^(?!https?:\/\/).+\/$/.test(href) &&
+          href.endsWith('/')
+        ) {
+          href += 'index.html';
+        }
+      }
+
+      if (slots.hash) {
+        href += (slots.hash.startsWith('#') ? '' : '#') + slots.hash;
+      }
     }
 
     if (slots.color) {
