@@ -689,10 +689,14 @@ p code {
   margin-bottom: 0;
 }
 
+main.long-content {
+  --long-content-padding-ratio: 0.12;
+}
+
 main.long-content .main-content-container,
 main.long-content > h1 {
-  padding-left: 12%;
-  padding-right: 12%;
+  padding-left: calc(var(--long-content-padding-ratio) * 100%);
+  padding-right: calc(var(--long-content-padding-ratio) * 100%);
 }
 
 dl dt {
@@ -1311,8 +1315,8 @@ main.long-content .content-sticky-heading-container {
 
 main.long-content .content-sticky-heading-container .content-sticky-heading-row,
 main.long-content .content-sticky-heading-container .content-sticky-subheading-row {
-  padding-left: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
-  padding-right: calc(0.12 * (100% - 2 * var(--content-padding)) + var(--content-padding));
+  padding-left: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
+  padding-right: calc(var(--long-content-padding-ratio) * (100% - 2 * var(--content-padding)) + var(--content-padding));
 }
 
 .content-sticky-heading-row {
@@ -1743,5 +1747,9 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   #header > div:not(:first-child) {
     margin-top: 0.5em;
+  }
+
+  main.long-content {
+    --long-content-padding-ratio: 0.04;
   }
 }
