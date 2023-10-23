@@ -794,6 +794,10 @@ li > ul {
   display: none;
 }
 
+html[data-url-key="localized.albumCommentary"] li.no-commentary {
+  opacity: 0.7;
+}
+
 /* Images */
 
 .image-container {

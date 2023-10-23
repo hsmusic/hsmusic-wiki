@@ -207,6 +207,7 @@ export default {
             section.slots({
               anchor: true,
               open: true,
+              mode: 'commentary',
             })),
         ],
       });

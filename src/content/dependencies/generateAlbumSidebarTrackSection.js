@@ -37,12 +37,21 @@ export default {
       trackSection.tracks
         .map(track => track.directory);
 
+    data.tracksAreMissingCommentary =
+      trackSection.tracks
+        .map(track => !track.commentary);
+
     return data;
   },
 
   slots: {
     anchor: {type: 'boolean'},
     open: {type: 'boolean'},
+
+    mode: {
+      validate: v => v.is('info', 'commentary'),
+      default: 'info',
+    },
   },
 
   generate(data, relations, slots, {getColors, html, language}) {
@@ -62,14 +71,23 @@ export default {
       relations.trackLinks.map((trackLink, index) =>
         html.tag('li',
           {
-            class:
+            class: [
               data.includesCurrentTrack &&
               index === data.currentTrackIndex &&
-              'current',
+                'current',
+
+              slots.mode === 'commentary' &&
+              data.tracksAreMissingCommentary[index] &&
+                'no-commentary',
+            ],
           },
           language.$('albumSidebar.trackList.item', {
             track:
-              (slots.anchor
+              (slots.mode === 'commentary' && data.tracksAreMissingCommentary[index]
+                ? trackLink.slots({
+                    linkless: true,
+                  })
+             : slots.anchor
                 ? trackLink.slots({
                     anchor: true,
                     hash: data.trackDirectories[index],
