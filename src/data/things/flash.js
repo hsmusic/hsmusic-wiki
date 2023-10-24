@@ -127,6 +127,7 @@ export class FlashAct extends Thing {
     name: name('Unnamed Flash Act'),
     directory: directory(),
     color: color(),
+    listTerminology: simpleString(),
 
     jump: simpleString(),
 

@@ -560,6 +560,7 @@ export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
     directory: 'Directory',
 
     color: 'Color',
+    listTerminology: 'List Terminology',
 
     jump: 'Jump',
     jumpColor: 'Jump Color',
