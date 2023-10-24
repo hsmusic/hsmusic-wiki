@@ -544,6 +544,7 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
     name: 'Flash',
     directory: 'Directory',
     page: 'Page',
+    color: 'Color',
     urls: 'URLs',
 
     date: 'Date',

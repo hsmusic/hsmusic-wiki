@@ -10,6 +10,10 @@ import {
 } from '#validators';
 
 import {
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
+
+import {
   color,
   contributionList,
   directory,
@@ -58,6 +62,19 @@ export class Flash extends Thing {
       },
     },
 
+    color: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
+
+      {
+        flags: {expose: true},
+        dependencies: ['this', 'flashActData'],
+        compute: ({this: flash, flashActData}) =>
+          flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
+      },
+    ],
+
     date: simpleDate(),
 
     coverArtFileExtension: fileExtension('jpg'),
@@ -88,17 +105,6 @@ export class Flash extends Thing {
 
         compute: ({this: flash, flashActData}) =>
           flashActData.find((act) => act.flashes.includes(flash)) ?? null,
-      },
-    },
-
-    color: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'flashActData'],
-
-        compute: ({this: flash, flashActData}) =>
-          flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
       },
     },
   });
