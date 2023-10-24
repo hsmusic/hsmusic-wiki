@@ -1515,6 +1515,7 @@ export function filterDuplicateDirectories(wikiData) {
   const deduplicateSpec = [
     'albumData',
     'artTagData',
+    'artistData',
     'flashData',
     'flashActData',
     'groupData',
