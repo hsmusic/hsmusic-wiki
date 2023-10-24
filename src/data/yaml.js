@@ -213,13 +213,36 @@ function makeProcessDocument(
 
     const fieldValues = {};
 
-    for (const [field, value] of documentEntries) {
+    for (const [field, documentValue] of documentEntries) {
       if (skippedFields.has(field)) continue;
-      if (Object.hasOwn(fieldTransformations, field)) {
-        fieldValues[field] = fieldTransformations[field](value);
-      } else {
-        fieldValues[field] = value;
+
+      // This variable would like to certify itself as "not into capitalism".
+      let propertyValue =
+        (Object.hasOwn(fieldTransformations, field)
+          ? fieldTransformations[field](documentValue)
+          : documentValue);
+
+      // Completely blank items in a YAML list are read as null.
+      // They're handy to have around when filling out a document and shouldn't
+      // be considered an error (or data at all).
+      if (Array.isArray(propertyValue)) {
+        const wasEmpty = empty(propertyValue);
+
+        propertyValue =
+          propertyValue.filter(item => item !== null);
+
+        const isEmpty = empty(propertyValue);
+
+        // Don't set arrays which are empty as a result of the above filter.
+        // Arrays which were originally empty, i.e. `Field: []`, are still
+        // valid data, but if it's just an array not containing any filled out
+        // items, it should be treated as a placeholder and skipped over.
+        if (isEmpty && !wasEmpty) {
+          propertyValue = null;
+        }
       }
+
+      fieldValues[field] = propertyValue;
     }
 
     const sourceProperties = {};
@@ -233,7 +256,6 @@ function makeProcessDocument(
 
     const fieldValueErrors = [];
 
-    // This for loop would like to certify itself as "not into capitalism".
     for (const [property, value] of Object.entries(sourceProperties)) {
       const field = propertyFieldMapping[property];
       try {
@@ -700,32 +722,16 @@ export function parseContributors(contributors) {
     return contributors;
   }
 
-  if (contributors.length === 1 && contributors[0].startsWith('<i>')) {
-    const arr = [];
-    arr.textContent = contributors[0];
-    return arr;
-  }
-
   contributors = contributors.map((contrib) => {
-    // 8asically, the format is "Who (What)", or just "Who". 8e sure to
-    // keep in mind that "what" doesn't necessarily have a value!
+    if (typeof contrib !== 'string') return contrib;
+
     const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) {
-      return contrib;
-    }
+    if (!match) return contrib;
+
     const who = match[1];
     const what = match[3] || null;
     return {who, what};
   });
-
-  const badContributor = contributors.find((val) => typeof val === 'string');
-  if (badContributor) {
-    throw new Error(`Incorrectly formatted contribution: "${badContributor}".`);
-  }
-
-  if (contributors.length === 1 && contributors[0].who === 'none') {
-    return null;
-  }
 
   return contributors;
 }
