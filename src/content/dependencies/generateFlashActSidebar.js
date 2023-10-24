@@ -18,7 +18,7 @@ export default {
       findFlashAct('flash-act:a6a1'),
       findFlashAct('flash-act:hiveswap'),
       findFlashAct('flash-act:cool-and-new-web-comic'),
-      findFlashAct('flash-act:psycholonials'),
+      findFlashAct('flash-act:sunday-night-strifin'),
     ];
 
     const sideNames = [
@@ -26,7 +26,7 @@ export default {
       `Side 2 (Acts 6-7)`,
       `Additional Canon`,
       `Fan Adventures`,
-      `More Flashes & Games`,
+      `Fan Games & More`,
     ];
 
     const sideColors = [
