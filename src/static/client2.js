@@ -1241,7 +1241,7 @@ function getAlbumCommentarySidebarReferences() {
 
   info.sidebarTrackDirectories =
     info.sidebarTrackLinks
-      .map(el => el.getAttribute('href').slice(1));
+      .map(el => el.getAttribute('href')?.slice(1) ?? null);
 
   info.sidebarTrackSections =
     Array.from(info.sidebar.getElementsByTagName('details'));
