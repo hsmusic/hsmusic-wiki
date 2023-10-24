@@ -75,27 +75,9 @@ export default {
     const currentActIndex =
       currentSideActs.indexOf(act);
 
-    const visualNovelActs = [
-      findFlashAct('flash-act:friendsim'),
-      findFlashAct('flash-act:pesterquest'),
-      findFlashAct('flash-act:psycholonials'),
-    ];
-
-    const gameSeriesActs = [
-      findFlashAct('flash-act:hiveswap'),
-    ];
-
-    const listTerminology =
-      (visualNovelActs.includes(act)
-        ? 'volumesInThisGame'
-     : gameSeriesActs.includes(act)
-        ? 'gamesInThisSeries'
-     : act === findFlashAct('flash-act:other-fan-adventures')
-        ? 'flashesInThisSection'
-     : currentSideIndex <= 1
+    const fallbackListTerminology =
+      (currentSideIndex <= 1
         ? 'flashesInThisAct'
-     : currentSideIndex === 3
-        ? 'flashesInThisStory'
         : 'entriesInThisSection');
 
     return {
@@ -109,7 +91,7 @@ export default {
       currentActFlashes,
       currentFlashIndex,
 
-      listTerminology,
+      fallbackListTerminology,
     };
   },
 
@@ -140,7 +122,8 @@ export default {
     currentActIndex: query.currentActIndex,
     currentFlashIndex: query.currentFlashIndex,
 
-    listTerminology: query.listTerminology,
+    customListTerminology: act.listTerminology,
+    fallbackListTerminology: query.fallbackListTerminology,
   }),
 
   generate(data, relations, {getColors, html, language}) {
@@ -154,7 +137,9 @@ export default {
         [
           html.tag('summary',
             html.tag('span', {class: 'group-name'},
-              language.$('flashSidebar.flashList', data.listTerminology))),
+              (data.customListTerminology
+                ? language.sanitize(data.customListTerminology)
+                : language.$('flashSidebar.flashList', data.fallbackListTerminology)))),
 
           html.tag('ul',
             relations.currentActFlashLinks
