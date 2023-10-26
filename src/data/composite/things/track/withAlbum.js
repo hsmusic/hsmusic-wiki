@@ -2,6 +2,8 @@
 // By default, if there's no album whose list of tracks includes this track,
 // the output dependency will be null; set {notFoundMode: 'exit'} to early
 // exit instead.
+//
+// This step models with Flash.withFlashAct.
 
 import {input, templateCompositeFrom} from '#composite';
 import {is} from '#validators';
