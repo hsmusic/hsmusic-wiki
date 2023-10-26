@@ -16,41 +16,67 @@
 //  - withUnflattenedList
 //
 
-import {empty} from '#sugar';
+import {input, templateCompositeFrom} from '#composite';
 
-// todo: OUHHH THIS ONE'S NOT UPDATED YET LOL
-export default function({
-  list,
-  property,
-  into = null,
-}) {
-  into ??=
-    (list.startsWith('#')
-      ? `${list}.${property}`
-      : `#${list}.${property}`);
-
-  return {
-    annotation: `withPropertyFromList`,
-    flags: {expose: true, compose: true},
-
-    expose: {
-      mapDependencies: {list},
-      mapContinuation: {into},
-      options: {property},
-
-      compute(continuation, {list, '#options': {property}}) {
-        if (list === undefined || empty(list)) {
-          return continuation({into: []});
-        }
-
-        return continuation({
-          into:
-            list.map(item =>
-              (item === null || item === undefined
-                ? null
-                : item[property] ?? null)),
-        });
-      },
-    },
-  };
+function getOutputName({list, property, prefix}) {
+  if (!property) return `#values`;
+  if (prefix) return `${prefix}.${property}`;
+  if (list) return `${list}.${property}`;
+  return `#list.${property}`;
 }
+
+export default templateCompositeFrom({
+  annotation: `withPropertyFromList`,
+
+  inputs: {
+    list: input({type: 'array'}),
+    property: input({type: 'string'}),
+    prefix: input.staticValue({type: 'string', defaultValue: null}),
+  },
+
+  outputs: ({
+    [input.staticDependency('list')]: list,
+    [input.staticValue('property')]: property,
+    [input.staticValue('prefix')]: prefix,
+  }) =>
+    [getOutputName({list, property, prefix})],
+
+  steps: () => [
+    {
+      dependencies: [input('list'), input('property')],
+      compute: (continuation, {
+        [input('list')]: list,
+        [input('property')]: property,
+      }) => continuation({
+        ['#values']:
+          list.map(item => item[property] ?? null),
+      }),
+    },
+
+    {
+      dependencies: [
+        input.staticDependency('list'),
+        input.staticValue('property'),
+        input.staticValue('prefix'),
+      ],
+
+      compute: (continuation, {
+        [input.staticDependency('list')]: list,
+        [input.staticValue('property')]: property,
+        [input.staticValue('prefix')]: prefix,
+      }) => continuation({
+        ['#outputName']:
+          getOutputName({list, property, prefix}),
+      }),
+    },
+
+    {
+      dependencies: ['#values', '#outputName'],
+      compute: (continuation, {
+        ['#values']: values,
+        ['#outputName']: outputName,
+      }) =>
+        continuation.raiseOutput({[outputName]: values}),
+    },
+  ],
+});
