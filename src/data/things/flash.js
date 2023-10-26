@@ -9,9 +9,9 @@ import {
   oneOf,
 } from '#validators';
 
-import {
-  exposeUpdateValueOrContinue,
-} from '#composite/control-flow';
+import {exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
 
 import {
   color,
@@ -25,6 +25,8 @@ import {
   urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {withFlashAct} from '#composite/things/flash';
 
 import Thing from './thing.js';
 
@@ -67,12 +69,14 @@ export class Flash extends Thing {
         validate: input.value(isColor),
       }),
 
-      {
-        flags: {expose: true},
-        dependencies: ['this', 'flashActData'],
-        compute: ({this: flash, flashActData}) =>
-          flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
-      },
+      withFlashAct(),
+
+      withPropertyFromObject({
+        object: '#flashAct',
+        property: input.value('color'),
+      }),
+
+      exposeDependency({dependency: '#flashAct.color'}),
     ],
 
     date: simpleDate(),
