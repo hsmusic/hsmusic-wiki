@@ -38,7 +38,7 @@ const quickThrows = (t, {from, mode}) =>
   t.throws(() => composite.expose.compute({from, mode}));
 
 t.test(`withResultOfAvailabilityCheck: mode = null`, t => {
-  t.plan(10);
+  t.plan(11);
 
   quickCompare(t, true,  {mode: 'null', from: 'truthy string'});
   quickCompare(t, true,  {mode: 'null', from: 123});
@@ -46,6 +46,7 @@ t.test(`withResultOfAvailabilityCheck: mode = null`, t => {
 
   quickCompare(t, true,  {mode: 'null', from: ''});
   quickCompare(t, true,  {mode: 'null', from: 0});
+  quickCompare(t, true,  {mode: 'null', from: -1});
   quickCompare(t, true,  {mode: 'null', from: false});
 
   quickCompare(t, true,  {mode: 'null', from: [1, 2, 3]});
@@ -56,7 +57,7 @@ t.test(`withResultOfAvailabilityCheck: mode = null`, t => {
 });
 
 t.test(`withResultOfAvailabilityCheck: mode = empty`, t => {
-  t.plan(10);
+  t.plan(11);
 
   quickThrows(t, {mode: 'empty', from: 'truthy string'});
   quickThrows(t, {mode: 'empty', from: 123});
@@ -64,6 +65,7 @@ t.test(`withResultOfAvailabilityCheck: mode = empty`, t => {
 
   quickThrows(t, {mode: 'empty', from: ''});
   quickThrows(t, {mode: 'empty', from: 0});
+  quickThrows(t, {mode: 'empty', from: -1});
   quickThrows(t, {mode: 'empty', from: false});
 
   quickCompare(t, true,  {mode: 'empty', from: [1, 2, 3]});
@@ -74,7 +76,7 @@ t.test(`withResultOfAvailabilityCheck: mode = empty`, t => {
 });
 
 t.test(`withResultOfAvailabilityCheck: mode = falsy`, t => {
-  t.plan(10);
+  t.plan(11);
 
   quickCompare(t, true,  {mode: 'falsy', from: 'truthy string'});
   quickCompare(t, true,  {mode: 'falsy', from: 123});
@@ -82,6 +84,7 @@ t.test(`withResultOfAvailabilityCheck: mode = falsy`, t => {
 
   quickCompare(t, false, {mode: 'falsy', from: ''});
   quickCompare(t, false, {mode: 'falsy', from: 0});
+  quickCompare(t, true,  {mode: 'falsy', from: -1});
   quickCompare(t, false, {mode: 'falsy', from: false});
 
   quickCompare(t, true,  {mode: 'falsy', from: [1, 2, 3]});
@@ -89,6 +92,25 @@ t.test(`withResultOfAvailabilityCheck: mode = falsy`, t => {
 
   quickCompare(t, false, {mode: 'falsy', from: null});
   quickCompare(t, false, {mode: 'falsy', from: undefined});
+});
+
+t.test(`withResultOfAvailabilityCheck: mode = index`, t => {
+  t.plan(11);
+
+  quickCompare(t, false, {mode: 'index', from: 'truthy string'});
+  quickCompare(t, true,  {mode: 'index', from: 123});
+  quickCompare(t, false, {mode: 'index', from: true});
+
+  quickCompare(t, false, {mode: 'index', from: ''});
+  quickCompare(t, true,  {mode: 'index', from: 0});
+  quickCompare(t, false, {mode: 'index', from: -1});
+  quickCompare(t, false, {mode: 'index', from: false});
+
+  quickCompare(t, false, {mode: 'index', from: [1, 2, 3]});
+  quickCompare(t, false, {mode: 'index', from: []});
+
+  quickCompare(t, false, {mode: 'index', from: null});
+  quickCompare(t, false, {mode: 'index', from: undefined});
 });
 
 t.test(`withResultOfAvailabilityCheck: default mode`, t => {
@@ -133,7 +155,7 @@ t.test(`withResultOfAvailabilityCheck: validate static inputs`, t => {
       mode: input.value('invalid'),
     }),
     {message: `Errors in input options passed to withResultOfAvailabilityCheck`, errors: [
-      {message: `mode: Expected one of null empty falsy, got invalid`},
+      {message: `mode: Expected one of null empty falsy index, got invalid`},
     ]});
 
   t.throws(() =>
@@ -157,7 +179,7 @@ t.test(`withResultOfAvailabilityCheck: validate dynamic inputs`, t => {
     {message: `Error computing composition`, cause:
       {message: `Error computing composition withResultOfAvailabilityCheck`, cause:
         {message: `Errors in input values provided to withResultOfAvailabilityCheck`, errors: [
-          {message: `mode: Expected one of null empty falsy, got banana`},
+          {message: `mode: Expected one of null empty falsy index, got banana`},
         ]}}});
 
   t.throws(

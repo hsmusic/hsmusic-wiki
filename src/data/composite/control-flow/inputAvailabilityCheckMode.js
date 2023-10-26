@@ -3,7 +3,7 @@ import {is} from '#validators';
 
 export default function inputAvailabilityCheckMode() {
   return input({
-    validate: is('null', 'empty', 'falsy'),
+    validate: is('null', 'empty', 'falsy', 'index'),
     defaultValue: 'null',
   });
 }

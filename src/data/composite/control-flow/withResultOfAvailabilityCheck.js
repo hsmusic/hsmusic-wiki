@@ -10,6 +10,7 @@
 // * 'falsy': Check that the value isn't false when treated as a boolean
 //            (nor an empty array). Keep in mind this will also be false
 //            for values like zero and the empty string!
+// * 'index': Check that the value is a number, and is at least zero.
 //
 // See also:
 //  - exitWithoutDependency
@@ -56,6 +57,10 @@ export default templateCompositeFrom({
 
           case 'falsy':
             availability = !!value && (!Array.isArray(value) || !empty(value));
+            break;
+
+          case 'index':
+            availability = typeof value === 'number' && value >= 0;
             break;
         }
 
