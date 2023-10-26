@@ -4,9 +4,8 @@
 // exit instead.
 
 import {input, templateCompositeFrom} from '#composite';
+import {empty} from '#sugar';
 import {is} from '#validators';
-
-import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
 export default templateCompositeFrom({
   annotation: `withAlbum`,
@@ -21,13 +20,20 @@ export default templateCompositeFrom({
   outputs: ['#album'],
 
   steps: () => [
-    raiseOutputWithoutDependency({
-      dependency: 'albumData',
-      mode: input.value('empty'),
-      output: input.value({
-        ['#album']: null,
-      }),
-    }),
+    {
+      dependencies: [input('notFoundMode'), 'albumData'],
+      compute: (continuation, {
+        [input('notFoundMode')]: notFoundMode,
+        ['albumData']: albumData,
+      }) =>
+        (albumData === null
+          ? continuation.exit(null)
+       : empty(albumData)
+          ? (notFoundMode === 'exit'
+              ? continuation.exit(null)
+              : continuation.raiseOutput({'#album': null}))
+          : continuation()),
+    },
 
     {
       dependencies: [input.myself(), 'albumData'],
@@ -37,21 +43,20 @@ export default templateCompositeFrom({
       }) =>
         continuation({
           ['#album']:
-            albumData.find(album => album.tracks.includes(track)),
+            albumData.find(album => album.tracks.includes(track))
+              ?? null,
         }),
     },
 
-    raiseOutputWithoutDependency({
-      dependency: '#album',
-      output: input.value({
-        ['#album']: null,
-      }),
-    }),
-
     {
-      dependencies: ['#album'],
-      compute: (continuation, {'#album': album}) =>
-        continuation.raiseOutput({'#album': album}),
+      dependencies: [input('notFoundMode'), '#album'],
+      compute: (continuation, {
+        [input('notFoundMode')]: notFoundMode,
+        ['#album']: album,
+      }) =>
+        ((album === null && notFoundMode === 'exit')
+          ? continuation.exit(null)
+          : continuation.raiseOutput({'#album': album})),
     },
   ],
 });
