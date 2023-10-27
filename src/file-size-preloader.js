@@ -29,6 +29,8 @@ export default class FileSizePreloader {
   #loadingPromise = null;
   #resolveLoadingPromise = null;
 
+  hadErrored = false;
+
   loadPaths(...paths) {
     this.#paths.push(...paths.filter((p) => !this.#paths.includes(p)));
     return this.#startLoadingPaths();
@@ -67,6 +69,7 @@ export default class FileSizePreloader {
       // Oops! Discard that path, and don't increment the index before
       // moving on, since the next path will now be in its place.
       this.#paths.splice(this.#loadedPathIndex + 1, 1);
+      this.hasErrored = true;
       logWarn`Failed to process file size for ${path}: ${error.message}`;
       return this.#loadNextPath();
     }

@@ -50,6 +50,7 @@ import {sortByName} from '#wiki-data';
 import {
   colors,
   decorateTime,
+  fileIssue,
   logWarn,
   logInfo,
   logError,
@@ -94,8 +95,63 @@ const BUILD_TIME = new Date();
 
 const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
+const STATUS_NOT_STARTED       = `not started`;
+const STATUS_NOT_APPLICABLE    = `not applicable`;
+const STATUS_STARTED_NOT_DONE  = `started but not yet done`;
+const STATUS_DONE_CLEAN        = `done without warnings`;
+const STATUS_FATAL_ERROR       = `fatal error`;
+const STATUS_HAS_WARNINGS      = `has warnings`;
+
+const defaultStepStatus = {status: STATUS_NOT_STARTED, annotation: null};
+
+// Defined globally for quick access outside the main() function's contents.
+// This will be initialized and mutated over the course of main().
+let stepStatusSummary;
+let showStepStatusSummary = false;
+
 async function main() {
   Error.stackTraceLimit = Infinity;
+
+  stepStatusSummary = {
+    loadThumbnailCache:
+      {...defaultStepStatus, name: `load thumbnail cache file`},
+
+    generateThumbnails:
+      {...defaultStepStatus, name: `generate thumbnails`},
+
+    loadDataFiles:
+      {...defaultStepStatus, name: `load and process data files`},
+
+    linkWikiDataArrays:
+      {...defaultStepStatus, name: `link wiki data arrays`},
+
+    filterDuplicateDirectories:
+      {...defaultStepStatus, name: `filter duplicate directories`},
+
+    filterReferenceErrors:
+      {...defaultStepStatus, name: `filter reference errors`},
+
+    sortWikiDataArrays:
+      {...defaultStepStatus, name: `sort wiki data arrays`},
+
+    precacheData:
+      {...defaultStepStatus, name: `precache data`},
+
+    loadInternalDefaultLanguage:
+      {...defaultStepStatus, name: `load internal default language`},
+
+    loadLanguageFiles:
+      {...defaultStepStatus, name: `load custom language files`},
+
+    initializeDefaultLanguage:
+      {...defaultStepStatus, name: `initialize default language`},
+
+    preloadFileSizes:
+      {...defaultStepStatus, name: `preload file sizes`},
+
+    performBuild:
+      {...defaultStepStatus, name: `perform selected build mode`},
+  };
 
   const defaultQueueSize = 500;
 
@@ -121,7 +177,7 @@ async function main() {
   } else if (selectedBuildModeFlags.length > 1) {
     logError`Building multiple modes (${selectedBuildModeFlags.join(', ')}) at once not supported.`;
     logError`Please specify a maximum of one build mode.`;
-    return;
+    return false;
   } else {
     selectedBuildModeFlag = selectedBuildModeFlags[0];
     usingDefaultBuildMode = false;
@@ -218,6 +274,11 @@ async function main() {
     // 8ecause wow that is a lot of visual noise.
     'show-traces': {
       help: `Show JavaScript source code paths for reported errors in "aggregate" error displays\n\n(Debugging use only, but please enable this if you're reporting bugs for our issue tracker!)`,
+      type: 'flag',
+    },
+
+    'show-step-summary': {
+      help: `Show a summary of all the top-level build steps once hsmusic exits. This is mostly useful for progammer debugging!`,
       type: 'flag',
     },
 
@@ -361,7 +422,7 @@ async function main() {
       })`, buildOptions);
     }
 
-    return;
+    return true;
   }
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
@@ -372,6 +433,8 @@ async function main() {
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const clearThumbsFlag = cliOptions['clear-thumbs'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
+
+  showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
   const replFlag = cliOptions['repl'] ?? false;
   const disableReplHistory = cliOptions['no-repl-history'] ?? false;
@@ -388,19 +451,16 @@ async function main() {
 
   const magickThreads = +(cliOptions['magick-threads'] ?? defaultMagickThreads);
 
-  {
-    let errored = false;
-    const error = (cond, msg) => {
-      if (cond) {
-        console.error(`\x1b[31;1m${msg}\x1b[0m`);
-        errored = true;
-      }
-    };
-    error(!dataPath, `Expected --data-path option or HSMUSIC_DATA to be set`);
-    error(!mediaPath, `Expected --media-path option or HSMUSIC_MEDIA to be set`);
-    if (errored) {
-      return;
-    }
+  if (!dataPath) {
+    logError`${`Expected --data-path option or HSMUSIC_DATA to be set`}`;
+  }
+
+  if (!mediaPath) {
+    logError`${`Expected --media-path option or HSMUSIC_MEDIA to be set`}`;
+  }
+
+  if (!dataPath || !mediaPath) {
+    return false;
   }
 
   if (replFlag) {
@@ -423,7 +483,7 @@ async function main() {
 
   if (skipThumbs && thumbsOnly) {
     logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
-    return;
+    return false;
   }
 
   if (clearThumbsFlag) {
@@ -434,23 +494,38 @@ async function main() {
         logInfo`And don't forget to remove ${'--skip-thumbs'} too, eh?`;
       }
     }
-    return;
+    return true;
   }
 
   let thumbsCache;
 
   if (skipThumbs) {
+    Object.assign(stepStatusSummary.generateThumbnails, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `provided --skip-thumbs`,
+    });
+
+    stepStatusSummary.loadThumbnailCache.status = STATUS_STARTED_NOT_DONE;
+
     const thumbsCachePath = path.join(mediaPath, thumbsCacheFile);
+
     try {
       thumbsCache = JSON.parse(await readFile(thumbsCachePath));
       logInfo`Thumbnail cache file successfully read.`;
+      stepStatusSummary.loadThumbnailCache.status = STATUS_DONE_CLEAN;
     } catch (error) {
       if (error.code === 'ENOENT') {
         logError`The thumbnail cache doesn't exist, and it's necessary to build`
         logError`the website. Please run once without ${'--skip-thumbs'} - after`
         logError`that you'll be good to go and don't need to process thumbnails`
         logError`again!`;
-        return;
+
+        Object.assign(stepStatusSummary.loadThumbnailCache, {
+          status: STATUS_FATAL_ERROR,
+          annotation: `cache does not exist`,
+        });
+
+        return false;
       } else {
         logError`Malformed or unreadable thumbnail cache file: ${error}`;
         logError`Path: ${thumbsCachePath}`;
@@ -460,21 +535,50 @@ async function main() {
         logError`you're welcome to message in the HSMusic Discord and we'll try`;
         logError`to help you out with troubleshooting!`;
         logError`${'https://hsmusic.wiki/discord/'}`;
-        return;
+
+        Object.assign(stepStatusSummary.loadThumbnailCache, {
+          status: STATUS_FATAL_ERROR,
+          annotation: `cache malformed or unreadable`,
+        });
+
+        return false;
       }
     }
 
     logInfo`Skipping thumbnail generation.`;
   } else {
+    Object.assign(stepStatusSummary.loadThumbnailCache, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `using cache from thumbnail generation`,
+    });
+
+    stepStatusSummary.generateThumbnails.status = STATUS_STARTED_NOT_DONE;
+
     logInfo`Begin thumbnail generation... -----+`;
+
     const result = await genThumbs(mediaPath, {
       queueSize,
       magickThreads,
       quiet: !thumbsOnly,
     });
+
     logInfo`Done thumbnail generation! --------+`;
-    if (!result.success) return;
-    if (thumbsOnly) return;
+
+    if (!result.success) {
+      Object.assign(stepStatusSummary.generateThumbnails, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `view log for details`,
+      });
+
+      return false;
+    }
+
+    stepStatusSummary.generateThumbnails.status = STATUS_DONE_CLEAN;
+
+    if (thumbsOnly) {
+      return true;
+    }
+
     thumbsCache = result.cache;
   }
 
@@ -490,8 +594,26 @@ async function main() {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
-  const {aggregate: processDataAggregate, result: wikiDataResult} =
-    await loadAndProcessDataDocuments({dataPath});
+  stepStatusSummary.loadDataFiles.status = STATUS_STARTED_NOT_DONE;
+
+  let processDataAggregate, wikiDataResult;
+
+  try {
+    ({aggregate: processDataAggregate, result: wikiDataResult} =
+        await loadAndProcessDataDocuments({dataPath}));
+  } catch (error) {
+    console.error(error);
+
+    logError`There was a JavaScript error loading data files.`;
+    fileIssue();
+
+    Object.assign(stepStatusSummary.loadDataFiles, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `javascript error - view log for details`,
+    });
+
+    return false;
+  }
 
   Object.assign(wikiData, wikiDataResult);
 
@@ -536,84 +658,105 @@ async function main() {
       logWarn`still build - but all errored data will be skipped.`;
       logWarn`(Resolve errors for more complete output!)`;
       errorless = false;
+
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `view log for details`,
+      });
+    }
+
+    if (!wikiData.wikiInfo) {
+      logError`Can't proceed without wiki info file (${WIKI_INFO_FILE}) successfully loading`;
+
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `wiki info object not available`,
+      });
+
+      return false;
     }
 
     if (errorless) {
-      logInfo`All data processed without any errors - nice!`;
-      logInfo`(This means all source files will be fully accounted for during page generation.)`;
-    }
-  }
-
-  if (!wikiData.wikiInfo) {
-    logError`Can't proceed without wiki info file (${WIKI_INFO_FILE}) successfully loading`;
-    return;
-  }
-
-  let duplicateDirectoriesErrored = false;
-
-  function filterAndShowDuplicateDirectories() {
-    const aggregate = filterDuplicateDirectories(wikiData);
-    let errorless = true;
-    try {
-      aggregate.close();
-    } catch (aggregate) {
-      niceShowAggregate(aggregate);
-      logWarn`The above duplicate directories were detected while reviewing data files.`;
-      logWarn`Each thing listed above will been totally excempt from this build of the site!`;
-      logWarn`Specify unique 'Directory' fields in data entries to resolve these.`;
-      logWarn`${`Note:`} This will probably result in reference errors below.`;
-      logWarn`${`. . .`} You should fix duplicate directories first!`;
-      logWarn`(Resolve errors for more complete output!)`;
-      duplicateDirectoriesErrored = true;
-      errorless = false;
-    }
-    if (errorless) {
-      logInfo`No duplicate directories found - nice!`;
-    }
-  }
-
-  function filterAndShowReferenceErrors() {
-    const aggregate = filterReferenceErrors(wikiData);
-    let errorless = true;
-    try {
-      aggregate.close();
-    } catch (error) {
-      niceShowAggregate(error);
-      logWarn`The above errors were detected while validating references in data files.`;
-      logWarn`If the remaining valid data is complete enough, the wiki will still build -`;
-      logWarn`but all errored references will be skipped.`;
-      if (duplicateDirectoriesErrored) {
-        logWarn`${`Note:`} Duplicate directories were found as well. Review those first,`;
-        logWarn`${`. . .`} as they may have caused some of the errors detected above.`;
-      }
-      logWarn`(Resolve errors for more complete output!)`;
-      errorless = false;
-    }
-    if (errorless) {
-      logInfo`All references validated without any errors - nice!`;
-      logInfo`(This means all references between things, such as leitmotif references`;
-      logInfo` and artist credits, will be fully accounted for during page generation.)`;
+      logInfo`All data files processed without any errors - nice!`;
+      stepStatusSummary.loadDataFiles.status = STATUS_DONE_CLEAN;
     }
   }
 
   // Link data arrays so that all essential references between objects are
   // complete, so properties (like dates!) are inherited where that's
   // appropriate.
+
+  stepStatusSummary.linkWikiDataArrays.status = STATUS_STARTED_NOT_DONE;
+
   linkWikiDataArrays(wikiData);
+
+  stepStatusSummary.linkWikiDataArrays.status = STATUS_DONE_CLEAN;
 
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
-  filterAndShowDuplicateDirectories();
+
+  stepStatusSummary.filterDuplicateDirectories.status = STATUS_STARTED_NOT_DONE;
+
+  const filterDuplicateDirectoriesAggregate =
+    filterDuplicateDirectories(wikiData);
+
+  try {
+    filterDuplicateDirectoriesAggregate.close();
+    logInfo`No duplicate directories found - nice!`;
+    stepStatusSummary.filterDuplicateDirectories.status = STATUS_DONE_CLEAN;
+  } catch (aggregate) {
+    niceShowAggregate(aggregate);
+
+    logWarn`The above duplicate directories were detected while reviewing data files.`;
+    logWarn`Since it's impossible to automatically determine which one's directory is`;
+    logWarn`correct, the build can't continue. Specify unique 'Directory' fields in`;
+    logWarn`some or all of these data entries to resolve the errors.`;
+
+    Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `duplicate directories found`,
+    });
+
+    return false;
+  }
 
   // Filter out any reference errors throughout the data, warning about them
   // too.
-  filterAndShowReferenceErrors();
+
+  stepStatusSummary.filterReferenceErrors.status = STATUS_STARTED_NOT_DONE;
+
+  const filterReferenceErrorsAggregate = filterReferenceErrors(wikiData);
+
+  try {
+    filterReferenceErrorsAggregate.close();
+    logInfo`All references validated without any errors - nice!`;
+    stepStatusSummary.filterReferenceErrors.status = STATUS_DONE_CLEAN;
+  } catch (error) {
+    niceShowAggregate(error);
+
+    logWarn`The above errors were detected while validating references in data files.`;
+    logWarn`The wiki will still build, but these connections between data objects`;
+    logWarn`will be completely skipped. Resolve the errors for more complete output.`;
+
+    Object.assign(stepStatusSummary.filterReferenceErrors, {
+      status: STATUS_HAS_WARNINGS,
+      annotation: `view log for details`,
+    });
+  }
 
   // Sort data arrays so that they're all in order! This may use properties
   // which are only available after the initial linking.
+
+  stepStatusSummary.sortWikiDataArrays.status = STATUS_STARTED_NOT_DONE;
+
   sortWikiDataArrays(wikiData);
 
+  stepStatusSummary.sortWikiDataArrays.status = STATUS_DONE_CLEAN;
+
   if (precacheData) {
+    stepStatusSummary.precacheData.status = STATUS_STARTED_NOT_DONE;
+
+    // TODO: Aggregate errors here, instead of just throwing.
     progressCallAll('Caching all data values', Object.entries(wikiData)
       .filter(([key]) =>
         key !== 'listingSpec' &&
@@ -624,31 +767,95 @@ async function main() {
         [key, value])
       .flatMap(([_key, things]) => things)
       .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
+
+    stepStatusSummary.precacheData.status = STATUS_DONE_CLEAN;
+  } else {
+    Object.assign(stepStatusSummary.precacheData, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--precache-data not provided`,
+    });
   }
 
   if (noBuild) {
+    Object.assign(stepStatusSummary.performBuild, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--no-build provided`,
+    });
+
     displayCompositeCacheAnalysis();
-    if (precacheData) return;
+
+    if (precacheData) {
+      return true;
+    }
   }
 
-  const internalDefaultLanguage = await processLanguageFile(
-    path.join(__dirname, DEFAULT_STRINGS_FILE));
+  let internalDefaultLanguage;
+
+  try {
+    internalDefaultLanguage =
+      await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+
+    stepStatusSummary.loadInternalDefaultLanguage.status = STATUS_DONE_CLEAN;
+  } catch (error) {
+    console.error(error);
+
+    logError`There was an error reading the internal language file.`;
+    fileIssue();
+
+    Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `see log for details`,
+    });
+
+    return false;
+  }
 
   let languages;
+
   if (langPath) {
+    stepStatusSummary.loadLanguageFiles.status = STATUS_STARTED_NOT_DONE;
+
     const languageDataFiles = await traverse(langPath, {
       filterFile: name => path.extname(name) === '.json',
       pathStyle: 'device',
     });
 
-    const results = await progressPromiseAll(`Reading & processing language files.`,
-      languageDataFiles.map((file) => processLanguageFile(file)));
+    let results;
 
-    languages = Object.fromEntries(
-      results.map((language) => [language.code, language]));
+    // TODO: Aggregate errors (with Promise.allSettled).
+    try {
+      results =
+        await progressPromiseAll(`Reading & processing language files.`,
+          languageDataFiles.map((file) => processLanguageFile(file)));
+    } catch (error) {
+      console.error(error);
+
+      logError`Failed to load language files. Please investigate these, or don't provide`;
+      logError`--lang-path (or HSMUSIC_LANG) and build again.`;
+
+      Object.assign(stepStatusSummary.loadLanguageFiles, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `see log for details`,
+      });
+
+      return false;
+    }
+
+    languages =
+      Object.fromEntries(
+        results.map((language) => [language.code, language]));
+
+    stepStatusSummary.loadLanguageFiles.status = STATUS_DONE_CLEAN;
   } else {
     languages = {};
+
+    Object.assign(stepStatusSummary.loadLanguageFiles, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--lang-path and HSMUSIC_LANG not provided`,
+    });
   }
+
+  stepStatusSummary.initializeDefaultLanguage.status = STATUS_STARTED_NOT_DONE;
 
   const customDefaultLanguage =
     languages[wikiData.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
@@ -658,17 +865,34 @@ async function main() {
     logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
     customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
     finalDefaultLanguage = customDefaultLanguage;
+
+    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+      status: STATUS_DONE_CLEAN,
+      annotation: `using wiki-specified custom default language`,
+    });
   } else if (wikiData.wikiInfo.defaultLanguage) {
     logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
     if (langPath) {
       logError`Check if an appropriate file exists in ${langPath}?`;
     } else {
-      logError`Be sure to specify ${'--lang'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+      logError`Be sure to specify ${'--lang-path'} or ${'HSMUSIC_LANG'} with the path to language files.`;
     }
-    return;
+
+    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+      status: STATUS_FATAL_ERROR,
+      annotation: `wiki specifies default language whose file is not available`,
+    });
+
+    return false;
   } else {
     languages[internalDefaultLanguage.code] = internalDefaultLanguage;
     finalDefaultLanguage = internalDefaultLanguage;
+    stepStatusSummary.initializeDefaultLanguage.status = STATUS_DONE_CLEAN;
+
+    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+      status: STATUS_DONE_CLEAN,
+      annotation: `no custom default language specified`,
+    });
   }
 
   for (const language of Object.values(languages)) {
@@ -749,6 +973,8 @@ async function main() {
   const getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
   const getSizeOfImagePath = getSizeOfMediaFileHelper(imageFilePaths);
 
+  stepStatusSummary.preloadFileSizes.status = STATUS_STARTED_NOT_DONE;
+
   logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
 
   fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
@@ -759,10 +985,22 @@ async function main() {
   fileSizePreloader.loadPaths(...imageFilePaths.map((path) => path.device));
   await fileSizePreloader.waitUntilDoneLoading();
 
-  logInfo`Done preloading filesizes!`;
+  if (fileSizePreloader.hasErrored) {
+    logWarn`Some media files couldn't be read for preloading filesizes.`;
+    logWarn`This means the wiki won't display file sizes for these files.`;
+    logWarn`Investigate missing or unreadable files to get that fixed!`;
+
+    Object.assign(stepStatusSummary.preloadFileSizes, {
+      status: STATUS_HAS_WARNINGS,
+      annotation: `see log for details`,
+    });
+  } else {
+    logInfo`Done preloading filesizes without any errors - nice!`;
+    stepStatusSummary.preloadFileSizes.status = STATUS_DONE_CLEAN;
+  }
 
   if (noBuild) {
-    return;
+    return true;
   }
 
   const developersComment =
@@ -795,27 +1033,58 @@ async function main() {
       .map(line => `    ` + line)
       .join('\n') + `\n-->`;
 
-  return selectedBuildMode.go({
-    cliOptions,
-    dataPath,
-    mediaPath,
-    queueSize,
-    srcRootPath: __dirname,
+  stepStatusSummary.performBuild.status = STATUS_STARTED_NOT_DONE;
 
-    defaultLanguage: finalDefaultLanguage,
-    languages,
-    missingImagePaths,
-    thumbsCache,
-    urls,
-    urlSpec,
-    wikiData,
+  let buildModeResult;
 
-    cachebust: '?' + CACHEBUST,
-    developersComment,
-    getSizeOfAdditionalFile,
-    getSizeOfImagePath,
-    niceShowAggregate,
-  });
+  try {
+    buildModeResult = await selectedBuildMode.go({
+      cliOptions,
+      dataPath,
+      mediaPath,
+      queueSize,
+      srcRootPath: __dirname,
+
+      defaultLanguage: finalDefaultLanguage,
+      languages,
+      missingImagePaths,
+      thumbsCache,
+      urls,
+      urlSpec,
+      wikiData,
+
+      cachebust: '?' + CACHEBUST,
+      developersComment,
+      getSizeOfAdditionalFile,
+      getSizeOfImagePath,
+      niceShowAggregate,
+    });
+  } catch (error) {
+    console.error(error);
+
+    logError`There was a JavaScript error performing the build.`;
+    fileIssue();
+
+    Object.assign(stepStatusSummary.performBuild, {
+      status: STATUS_FATAL_ERROR,
+      message: `javascript error - view log for details`,
+    });
+
+    return false;
+  }
+
+  if (buildModeResult !== true) {
+    Object.assign(stepStatusSummary.performBuild, {
+      status: STATUS_HAS_WARNINGS,
+      message: `may not have completed - view log for details`,
+    });
+
+    return false;
+  }
+
+  stepStatusSummary.performBuild.status = STATUS_DONE_CLEAN;
+
+  return true;
 }
 
 // TODO: isMain detection isn't consistent across platforms here
@@ -831,6 +1100,65 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
         showAggregate(error);
       } else {
         console.error(error);
+      }
+    }
+
+    if (showStepStatusSummary) {
+      console.error(colors.bright(`Step summary:`));
+
+      const longestNameLength =
+        Math.max(...
+          Object.values(stepStatusSummary)
+            .map(({name}) => name.length));
+
+      const anyStepsNotClean =
+        Object.values(stepStatusSummary)
+          .some(({status}) =>
+            status === STATUS_HAS_WARNINGS ||
+            status === STATUS_FATAL_ERROR ||
+            status === STATUS_STARTED_NOT_DONE);
+
+      for (const {name, status, annotation} of Object.values(stepStatusSummary)) {
+        let message = `${(name + ': ').padEnd(longestNameLength + 4, '.')} ${status}`;
+        if (annotation) {
+          message += ` (${annotation})`;
+        }
+
+        switch (status) {
+          case STATUS_DONE_CLEAN:
+            console.error(colors.green(message));
+            break;
+
+          case STATUS_NOT_STARTED:
+          case STATUS_NOT_APPLICABLE:
+            console.error(colors.dim(message));
+            break;
+
+          case STATUS_HAS_WARNINGS:
+          case STATUS_STARTED_NOT_DONE:
+            console.error(colors.yellow(message));
+            break;
+
+          case STATUS_FATAL_ERROR:
+            console.error(colors.red(message));
+            break;
+
+          default:
+            console.error(message);
+            break;
+        }
+      }
+
+      if (result === true) {
+        if (anyStepsNotClean) {
+          console.error(colors.bright(`Final output is true, but some steps aren't clean.`));
+          process.exit(1);
+          return;
+        } else {
+          console.error(colors.bright(`Final output is true and all steps are clean.`));
+        }
+      } else {
+        console.error(colors.bright(`Final output is not true (${result}).`));
       }
     }
 
