@@ -55,13 +55,8 @@ export default {
     return relations;
   },
 
-  slots: {
-    showFlashNavigation: {type: 'boolean', default: false},
-  },
-
-  generate(relations, slots, {html, language}) {
+  generate(relations, {html, language}) {
     const {content: previousNextLinks = []} =
-      slots.showFlashNavigation &&
       relations.previousNextLinks &&
         relations.previousNextLinks.slots({
           previousLink: relations.previousFlashLink,

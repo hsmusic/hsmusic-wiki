@@ -1,32 +1,43 @@
+import {input} from '#composite';
 import find from '#find';
+
+import {
+  color,
+  directory,
+  name,
+  referenceList,
+  simpleString,
+  urls,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import Thing from './thing.js';
 
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Group'),
-    directory: Thing.common.directory(),
+    name: name('Unnamed Group'),
+    directory: directory(),
 
-    description: Thing.common.simpleString(),
+    description: simpleString(),
 
-    urls: Thing.common.urls(),
+    urls: urls(),
 
-    featuredAlbumsByRef: Thing.common.referenceList(Album),
+    featuredAlbums: referenceList({
+      class: input.value(Album),
+      find: input.value(find.album),
+      data: 'albumData',
+    }),
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    groupCategoryData: Thing.common.wikiData(GroupCategory),
+    albumData: wikiData(Album),
+    groupCategoryData: wikiData(GroupCategory),
 
     // Expose only
-
-    featuredAlbums: Thing.common.dynamicThingsFromReferenceList('featuredAlbumsByRef', 'albumData', find.album),
 
     descriptionShort: {
       flags: {expose: true},
@@ -41,8 +52,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData'],
-        compute: ({albumData, [Group.instance]: group}) =>
+        dependencies: ['this', 'albumData'],
+        compute: ({this: group, albumData}) =>
           albumData?.filter((album) => album.groups.includes(group)) ?? [],
       },
     },
@@ -51,9 +62,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['groupCategoryData'],
-
-        compute: ({groupCategoryData, [Group.instance]: group}) =>
+        dependencies: ['this', 'groupCategoryData'],
+        compute: ({this: group, groupCategoryData}) =>
           groupCategoryData.find((category) => category.groups.includes(group))
             ?.color,
       },
@@ -63,8 +73,8 @@ export class Group extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['groupCategoryData'],
-        compute: ({groupCategoryData, [Group.instance]: group}) =>
+        dependencies: ['this', 'groupCategoryData'],
+        compute: ({this: group, groupCategoryData}) =>
           groupCategoryData.find((category) => category.groups.includes(group)) ??
           null,
       },
@@ -73,26 +83,22 @@ export class Group extends Thing {
 }
 
 export class GroupCategory extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Group,
-  }) => ({
+  static [Thing.friendlyName] = `Group Category`;
+
+  static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Group Category'),
-    color: Thing.common.color(),
+    name: name('Unnamed Group Category'),
+    color: color(),
 
-    groupsByRef: Thing.common.referenceList(Group),
+    groups: referenceList({
+      class: input.value(Group),
+      find: input.value(find.group),
+      data: 'groupData',
+    }),
 
     // Update only
 
-    groupData: Thing.common.wikiData(Group),
-
-    // Expose only
-
-    groups: Thing.common.dynamicThingsFromReferenceList(
-      'groupsByRef',
-      'groupData',
-      find.group
-    ),
+    groupData: wikiData(Group),
   });
 }

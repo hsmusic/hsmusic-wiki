@@ -1,20 +1,37 @@
+import {input} from '#composite';
 import find from '#find';
+
+import {
+  is,
+  isCountingNumber,
+  isString,
+  isStringNonEmpty,
+  oneOf,
+  validateArrayItems,
+  validateInstanceOf,
+  validateReference,
+} from '#validators';
+
+import {exposeDependency} from '#composite/control-flow';
+import {withResolvedReference} from '#composite/wiki-data';
+
+import {
+  color,
+  name,
+  referenceList,
+  simpleString,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import Thing from './thing.js';
 
 export class HomepageLayout extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    HomepageLayoutRow,
+  static [Thing.friendlyName] = `Homepage Layout`;
 
-    validators: {
-      isStringNonEmpty,
-      validateArrayItems,
-      validateInstanceOf,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
-    sidebarContent: Thing.common.simpleString(),
+    sidebarContent: simpleString(),
 
     navbarLinks: {
       flags: {update: true, expose: true},
@@ -32,13 +49,12 @@ export class HomepageLayout extends Thing {
 }
 
 export class HomepageLayoutRow extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Group,
-  }) => ({
+  static [Thing.friendlyName] = `Homepage Row`;
+
+  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Homepage Row'),
+    name: name('Unnamed Homepage Row'),
 
     type: {
       flags: {update: true, expose: true},
@@ -50,30 +66,22 @@ export class HomepageLayoutRow extends Thing {
       },
     },
 
-    color: Thing.common.color(),
+    color: color(),
 
     // Update only
 
     // These aren't necessarily used by every HomepageLayoutRow subclass, but
     // for convenience of providing this data, every row accepts all wiki data
     // arrays depended upon by any subclass's behavior.
-    albumData: Thing.common.wikiData(Album),
-    groupData: Thing.common.wikiData(Group),
+    albumData: wikiData(Album),
+    groupData: wikiData(Group),
   });
 }
 
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
-  static [Thing.getPropertyDescriptors] = (opts, {
-    Album,
-    Group,
+  static [Thing.friendlyName] = `Homepage Albums Row`;
 
-    validators: {
-      is,
-      isCountingNumber,
-      isString,
-      validateArrayItems,
-    },
-  } = opts) => ({
+  static [Thing.getPropertyDescriptors] = (opts, {Album, Group} = opts) => ({
     ...HomepageLayoutRow[Thing.getPropertyDescriptors](opts),
 
     // Update & expose
@@ -104,8 +112,39 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       },
     },
 
-    sourceGroupByRef: Thing.common.singleReference(Group),
-    sourceAlbumsByRef: Thing.common.referenceList(Album),
+    sourceGroup: [
+      {
+        flags: {expose: true, update: true, compose: true},
+
+        update: {
+          validate:
+            oneOf(
+              is('new-releases', 'new-additions'),
+              validateReference(Group[Thing.referenceType])),
+        },
+
+        expose: {
+          transform: (value, continuation) =>
+            (value === 'new-releases' || value === 'new-additions'
+              ? value
+              : continuation(value)),
+        },
+      },
+
+      withResolvedReference({
+        ref: input.updateValue(),
+        data: 'groupData',
+        find: input.value(find.group),
+      }),
+
+      exposeDependency({dependency: '#resolvedReference'}),
+    ],
+
+    sourceAlbums: referenceList({
+      class: input.value(Album),
+      find: input.value(find.album),
+      data: 'albumData',
+    }),
 
     countAlbumsFromGroup: {
       flags: {update: true, expose: true},
@@ -116,19 +155,5 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
       flags: {update: true, expose: true},
       update: {validate: validateArrayItems(isString)},
     },
-
-    // Expose only
-
-    sourceGroup: Thing.common.dynamicThingFromSingleReference(
-      'sourceGroupByRef',
-      'groupData',
-      find.group
-    ),
-
-    sourceAlbums: Thing.common.dynamicThingsFromReferenceList(
-      'sourceAlbumsByRef',
-      'albumData',
-      find.album
-    ),
   });
 }

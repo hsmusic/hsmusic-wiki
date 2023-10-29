@@ -44,14 +44,17 @@ export default {
       relation('generatePageLayout');
 
     relations.albumStyleRules =
-      relation('generateAlbumStyleRules', track.album);
+      relation('generateAlbumStyleRules', track.album, track);
 
     relations.socialEmbed =
       relation('generateTrackSocialEmbed', track);
 
     relations.artistChronologyContributions =
       getChronologyRelations(track, {
-        contributions: [...track.artistContribs, ...track.contributorContribs],
+        contributions: [
+          ...track.artistContribs ?? [],
+          ...track.contributorContribs ?? [],
+        ],
 
         linkArtist: artist => relation('linkArtist', artist),
         linkThing: track => relation('linkTrack', track),
@@ -65,7 +68,7 @@ export default {
 
     relations.coverArtistChronologyContributions =
       getChronologyRelations(track, {
-        contributions: track.coverArtistContribs,
+        contributions: track.coverArtistContribs ?? [],
 
         linkArtist: artist => relation('linkArtist', artist),
 

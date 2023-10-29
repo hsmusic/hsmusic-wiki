@@ -1,6 +1,6 @@
 export default {
   contentDependencies: ['linkTemplate'],
-  extraDependencies: ['html'],
+  extraDependencies: ['html', 'language'],
 
   relations(relation) {
     return {
@@ -26,7 +26,7 @@ export default {
     preferShortName: {type: 'boolean', default: false},
 
     tooltip: {
-      validate: v => v.oneOf(v.isBoolean, v.isString),
+      validate: v => v.oneOf(v.isBoolean, v.isHTML),
       default: false,
     },
 
@@ -36,12 +36,13 @@ export default {
     },
 
     anchor: {type: 'boolean', default: false},
+    linkless: {type: 'boolean', default: false},
 
     attributes: {validate: v => v.isAttributes},
     hash: {type: 'string'},
   },
 
-  generate(data, relations, slots, {html}) {
+  generate(data, relations, slots, {html, language}) {
     const path = [data.pathKey, data.directory];
 
     const name =
@@ -51,7 +52,7 @@ export default {
 
     const content =
       (html.isBlank(slots.content)
-        ? name
+        ? language.sanitize(name)
         : slots.content);
 
     let color = null;
@@ -78,6 +79,7 @@ export default {
 
         attributes: slots.attributes,
         hash: slots.hash,
+        linkless: slots.linkless,
       });
   },
 }

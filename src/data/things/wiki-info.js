@@ -1,20 +1,25 @@
+import {input} from '#composite';
 import find from '#find';
+import {isLanguageCode, isName, isURL} from '#validators';
+
+import {
+  color,
+  flag,
+  name,
+  referenceList,
+  simpleString,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import Thing from './thing.js';
 
 export class WikiInfo extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    Group,
+  static [Thing.friendlyName] = `Wiki Info`;
 
-    validators: {
-      isLanguageCode,
-      isName,
-      isURL,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Wiki'),
+    name: name('Unnamed Wiki'),
 
     // Displayed in nav bar.
     nameShort: {
@@ -27,12 +32,12 @@ export class WikiInfo extends Thing {
       },
     },
 
-    color: Thing.common.color(),
+    color: color(),
 
     // One-line description used for <meta rel="description"> tag.
-    description: Thing.common.simpleString(),
+    description: simpleString(),
 
-    footerContent: Thing.common.simpleString(),
+    footerContent: simpleString(),
 
     defaultLanguage: {
       flags: {update: true, expose: true},
@@ -44,25 +49,21 @@ export class WikiInfo extends Thing {
       update: {validate: isURL},
     },
 
-    divideTrackListsByGroupsByRef: Thing.common.referenceList(Group),
+    divideTrackListsByGroups: referenceList({
+      class: input.value(Group),
+      find: input.value(find.group),
+      data: 'groupData',
+    }),
 
     // Feature toggles
-    enableFlashesAndGames: Thing.common.flag(false),
-    enableListings: Thing.common.flag(false),
-    enableNews: Thing.common.flag(false),
-    enableArtTagUI: Thing.common.flag(false),
-    enableGroupUI: Thing.common.flag(false),
+    enableFlashesAndGames: flag(false),
+    enableListings: flag(false),
+    enableNews: flag(false),
+    enableArtTagUI: flag(false),
+    enableGroupUI: flag(false),
 
     // Update only
 
-    groupData: Thing.common.wikiData(Group),
-
-    // Expose only
-
-    divideTrackListsByGroups: Thing.common.dynamicThingsFromReferenceList(
-      'divideTrackListsByGroupsByRef',
-      'groupData',
-      find.group
-    ),
+    groupData: wikiData(Group),
   });
 }

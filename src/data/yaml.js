@@ -7,10 +7,15 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
-import {color, ENABLE_COLOR, logInfo, logWarn} from '#cli';
+import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
-import T from '#things';
+
+import T, {
+  CacheableObject,
+  CacheableObjectPropertyValueError,
+  Thing,
+} from '#things';
 
 import {
   conditionallySuppressError,
@@ -59,7 +64,7 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 // document and apply the configuration passed to makeProcessDocument in order
 // to construct a Thing subclass.
 function makeProcessDocument(
-  thingClass,
+  thingConstructor,
   {
     // Optional early step for transforming field values before providing them
     // to the Thing's update() method. This is useful when the input format
@@ -110,7 +115,7 @@ function makeProcessDocument(
     invalidFieldCombinations = [],
   }
 ) {
-  if (!thingClass) {
+  if (!thingConstructor) {
     throw new Error(`Missing Thing class`);
   }
 
@@ -137,22 +142,47 @@ function makeProcessDocument(
         const name = document[nameField];
         error.message = name
           ? `(name: ${inspect(name)}) ${error.message}`
-          : `(${color.dim(`no name found`)}) ${error.message}`;
+          : `(${colors.dim(`no name found`)}) ${error.message}`;
         throw error;
       }
     };
   };
 
   const fn = decorateErrorWithName((document) => {
+    const nameField = propertyFieldMapping['name'];
+    const namePart =
+      (nameField
+        ? (document[nameField]
+          ? ` named ${colors.green(`"${document[nameField]}"`)}`
+          : ` (name field, "${nameField}", not specified)`)
+        : ``);
+
+    const constructorPart =
+      (thingConstructor[Thing.friendlyName]
+        ? colors.green(thingConstructor[Thing.friendlyName])
+     : thingConstructor.name
+        ? colors.green(thingConstructor.name)
+        : `document`);
+
+    const aggregate = openAggregate({
+      message: `Errors processing ${constructorPart}` + namePart,
+    });
+
     const documentEntries = Object.entries(document)
       .filter(([field]) => !ignoredFields.includes(field));
+
+    const skippedFields = new Set();
 
     const unknownFields = documentEntries
       .map(([field]) => field)
       .filter((field) => !knownFields.includes(field));
 
     if (!empty(unknownFields)) {
-      throw new makeProcessDocument.UnknownFieldsError(unknownFields);
+      aggregate.push(new UnknownFieldsError(unknownFields));
+
+      for (const field of unknownFields) {
+        skippedFields.add(field);
+      }
     }
 
     const presentFields = Object.keys(document);
@@ -162,28 +192,57 @@ function makeProcessDocument(
     for (const {message, fields} of invalidFieldCombinations) {
       const fieldsPresent = presentFields.filter(field => fields.includes(field));
 
-      if (fieldsPresent.length <= 1) {
-        continue;
-      }
+      if (fieldsPresent.length >= 2) {
+        const filteredDocument =
+          filterProperties(
+            document,
+            fieldsPresent,
+            {preserveOriginalOrder: true});
 
-      fieldCombinationErrors.push(
-        new makeProcessDocument.FieldCombinationError(
-          filterProperties(document, fieldsPresent),
-          message));
+        fieldCombinationErrors.push(new FieldCombinationError(filteredDocument, message));
+
+        for (const field of Object.keys(filteredDocument)) {
+          skippedFields.add(field);
+        }
+      }
     }
 
     if (!empty(fieldCombinationErrors)) {
-      throw new makeProcessDocument.FieldCombinationsError(fieldCombinationErrors);
+      aggregate.push(new FieldCombinationAggregateError(fieldCombinationErrors));
     }
 
     const fieldValues = {};
 
-    for (const [field, value] of documentEntries) {
-      if (Object.hasOwn(fieldTransformations, field)) {
-        fieldValues[field] = fieldTransformations[field](value);
-      } else {
-        fieldValues[field] = value;
+    for (const [field, documentValue] of documentEntries) {
+      if (skippedFields.has(field)) continue;
+
+      // This variable would like to certify itself as "not into capitalism".
+      let propertyValue =
+        (Object.hasOwn(fieldTransformations, field)
+          ? fieldTransformations[field](documentValue)
+          : documentValue);
+
+      // Completely blank items in a YAML list are read as null.
+      // They're handy to have around when filling out a document and shouldn't
+      // be considered an error (or data at all).
+      if (Array.isArray(propertyValue)) {
+        const wasEmpty = empty(propertyValue);
+
+        propertyValue =
+          propertyValue.filter(item => item !== null);
+
+        const isEmpty = empty(propertyValue);
+
+        // Don't set arrays which are empty as a result of the above filter.
+        // Arrays which were originally empty, i.e. `Field: []`, are still
+        // valid data, but if it's just an array not containing any filled out
+        // items, it should be treated as a placeholder and skipped over.
+        if (isEmpty && !wasEmpty) {
+          propertyValue = null;
+        }
       }
+
+      fieldValues[field] = propertyValue;
     }
 
     const sourceProperties = {};
@@ -193,15 +252,34 @@ function makeProcessDocument(
       sourceProperties[property] = value;
     }
 
-    const thing = Reflect.construct(thingClass, []);
+    const thing = Reflect.construct(thingConstructor, []);
 
-    withAggregate({message: `Errors applying ${color.green(thingClass.name)} properties`}, ({call}) => {
-      for (const [property, value] of Object.entries(sourceProperties)) {
-        call(() => (thing[property] = value));
+    const fieldValueErrors = [];
+
+    for (const [property, value] of Object.entries(sourceProperties)) {
+      const field = propertyFieldMapping[property];
+      try {
+        thing[property] = value;
+      } catch (caughtError) {
+        skippedFields.add(field);
+        fieldValueErrors.push(new FieldValueError(field, property, value, caughtError));
       }
-    });
+    }
 
-    return thing;
+    if (!empty(fieldValueErrors)) {
+      aggregate.push(new FieldValueAggregateError(thingConstructor, fieldValueErrors));
+    }
+
+    if (skippedFields.size >= 1) {
+      aggregate.push(
+        new SkippedFieldsSummaryError(
+          filterProperties(
+            document,
+            Array.from(skippedFields),
+            {preserveOriginalOrder: true})));
+    }
+
+    return {thing, aggregate};
   });
 
   Object.assign(fn, {
@@ -212,33 +290,78 @@ function makeProcessDocument(
   return fn;
 }
 
-makeProcessDocument.UnknownFieldsError = class UnknownFieldsError extends Error {
+export class UnknownFieldsError extends Error {
   constructor(fields) {
-    super(`Unknown fields present: ${fields.join(', ')}`);
+    super(`Unknown fields ignored: ${fields.map(field => colors.red(field)).join(', ')}`);
     this.fields = fields;
   }
-};
+}
 
-makeProcessDocument.FieldCombinationsError = class FieldCombinationsError extends AggregateError {
+export class FieldCombinationAggregateError extends AggregateError {
   constructor(errors) {
-    super(errors, `Errors in combinations of fields present`);
+    super(errors, `Invalid field combinations - all involved fields ignored`);
   }
-};
+}
 
-makeProcessDocument.FieldCombinationError = class FieldCombinationError extends Error {
+export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
-    const combinePart = `Don't combine ${fieldNames.map(field => color.red(field)).join(', ')}`;
 
-    const messagePart =
+    const mainMessage = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
+
+    const causeMessage =
       (typeof message === 'function'
-        ? `: ${message(fields)}`
+        ? message(fields)
      : typeof message === 'string'
-        ? `: ${message}`
-        : ``);
+        ? message
+        : null);
 
-    super(combinePart + messagePart);
+    super(mainMessage, {
+      cause:
+        (causeMessage
+          ? new Error(causeMessage)
+          : null),
+    });
+
     this.fields = fields;
+  }
+}
+
+export class FieldValueAggregateError extends AggregateError {
+  constructor(thingConstructor, errors) {
+    super(errors, `Errors processing field values for ${colors.green(thingConstructor.name)}`);
+  }
+}
+
+export class FieldValueError extends Error {
+  constructor(field, property, value, caughtError) {
+    const cause =
+      (caughtError instanceof CacheableObjectPropertyValueError
+        ? caughtError.cause
+        : caughtError);
+
+    super(
+      `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
+      {cause});
+  }
+}
+
+export class SkippedFieldsSummaryError extends Error {
+  constructor(filteredDocument) {
+    const entries = Object.entries(filteredDocument);
+
+    const lines =
+      entries.map(([field, value]) =>
+        ` - ${field}: ` +
+        inspect(value)
+          .split('\n')
+          .map((line, index) => index === 0 ? line : `   ${line}`)
+          .join('\n'));
+
+    super(
+      colors.bright(colors.yellow(`Altogether, skipped ${entries.length === 1 ? `1 field` : `${entries.length} fields`}:\n`)) +
+      lines.join('\n') + '\n' +
+      colors.bright(colors.yellow(`See above errors for details.`)));
   }
 }
 
@@ -278,11 +401,11 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     coverArtFileExtension: 'Cover Art File Extension',
     trackCoverArtFileExtension: 'Track Art File Extension',
 
-    wallpaperArtistContribsByRef: 'Wallpaper Artists',
+    wallpaperArtistContribs: 'Wallpaper Artists',
     wallpaperStyle: 'Wallpaper Style',
     wallpaperFileExtension: 'Wallpaper File Extension',
 
-    bannerArtistContribsByRef: 'Banner Artists',
+    bannerArtistContribs: 'Banner Artists',
     bannerStyle: 'Banner Style',
     bannerFileExtension: 'Banner File Extension',
     bannerDimensions: 'Banner Dimensions',
@@ -290,11 +413,11 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     commentary: 'Commentary',
     additionalFiles: 'Additional Files',
 
-    artistContribsByRef: 'Artists',
-    coverArtistContribsByRef: 'Cover Artists',
-    trackCoverArtistContribsByRef: 'Default Track Cover Artists',
-    groupsByRef: 'Groups',
-    artTagsByRef: 'Art Tags',
+    artistContribs: 'Artists',
+    coverArtistContribs: 'Cover Artists',
+    trackCoverArtistContribs: 'Default Track Cover Artists',
+    groups: 'Groups',
+    artTags: 'Art Tags',
   },
 });
 
@@ -316,6 +439,10 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
 
     'Date First Released': (value) => new Date(value),
     'Cover Art Date': (value) => new Date(value),
+    'Has Cover Art': (value) =>
+      (value === true ? false :
+       value === false ? true :
+       value),
 
     'Artists': parseContributors,
     'Contributors': parseContributors,
@@ -336,7 +463,9 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     dateFirstReleased: 'Date First Released',
     coverArtDate: 'Cover Art Date',
     coverArtFileExtension: 'Cover Art File Extension',
-    hasCoverArt: 'Has Cover Art',
+    disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
+
+    alwaysReferenceByDirectory: 'Always Reference By Directory',
 
     lyrics: 'Lyrics',
     commentary: 'Commentary',
@@ -344,13 +473,13 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     sheetMusicFiles: 'Sheet Music Files',
     midiProjectFiles: 'MIDI Project Files',
 
-    originalReleaseTrackByRef: 'Originally Released As',
-    referencedTracksByRef: 'Referenced Tracks',
-    sampledTracksByRef: 'Sampled Tracks',
-    artistContribsByRef: 'Artists',
-    contributorContribsByRef: 'Contributors',
-    coverArtistContribsByRef: 'Cover Artists',
-    artTagsByRef: 'Art Tags',
+    originalReleaseTrack: 'Originally Released As',
+    referencedTracks: 'Referenced Tracks',
+    sampledTracks: 'Sampled Tracks',
+    artistContribs: 'Artists',
+    contributorContribs: 'Contributors',
+    coverArtistContribs: 'Cover Artists',
+    artTags: 'Art Tags',
   },
 
   invalidFieldCombinations: [
@@ -415,21 +544,25 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
     name: 'Flash',
     directory: 'Directory',
     page: 'Page',
+    color: 'Color',
     urls: 'URLs',
 
     date: 'Date',
     coverArtFileExtension: 'Cover Art File Extension',
 
-    featuredTracksByRef: 'Featured Tracks',
-    contributorContribsByRef: 'Contributors',
+    featuredTracks: 'Featured Tracks',
+    contributorContribs: 'Contributors',
   },
 });
 
 export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
   propertyFieldMapping: {
     name: 'Act',
+    directory: 'Directory',
+
     color: 'Color',
-    anchor: 'Anchor',
+    listTerminology: 'List Terminology',
+
     jump: 'Jump',
     jumpColor: 'Jump Color',
   },
@@ -466,7 +599,7 @@ export const processGroupDocument = makeProcessDocument(T.Group, {
     description: 'Description',
     urls: 'URLs',
 
-    featuredAlbumsByRef: 'Featured Albums',
+    featuredAlbums: 'Featured Albums',
   },
 });
 
@@ -497,7 +630,7 @@ export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
     footerContent: 'Footer Content',
     defaultLanguage: 'Default Language',
     canonicalBase: 'Canonical Base',
-    divideTrackListsByGroupsByRef: 'Divide Track Lists By Groups',
+    divideTrackListsByGroups: 'Divide Track Lists By Groups',
     enableFlashesAndGames: 'Enable Flashes & Games',
     enableListings: 'Enable Listings',
     enableNews: 'Enable News',
@@ -532,9 +665,9 @@ export const homepageLayoutRowTypeProcessMapping = {
   albums: makeProcessHomepageLayoutRowDocument(T.HomepageLayoutAlbumsRow, {
     propertyFieldMapping: {
       displayStyle: 'Display Style',
-      sourceGroupByRef: 'Group',
+      sourceGroup: 'Group',
       countAlbumsFromGroup: 'Count',
-      sourceAlbumsByRef: 'Albums',
+      sourceAlbums: 'Albums',
       actionLinks: 'Actions',
     },
   }),
@@ -591,32 +724,16 @@ export function parseContributors(contributors) {
     return contributors;
   }
 
-  if (contributors.length === 1 && contributors[0].startsWith('<i>')) {
-    const arr = [];
-    arr.textContent = contributors[0];
-    return arr;
-  }
-
   contributors = contributors.map((contrib) => {
-    // 8asically, the format is "Who (What)", or just "Who". 8e sure to
-    // keep in mind that "what" doesn't necessarily have a value!
+    if (typeof contrib !== 'string') return contrib;
+
     const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) {
-      return contrib;
-    }
+    if (!match) return contrib;
+
     const who = match[1];
     const what = match[3] || null;
     return {who, what};
   });
-
-  const badContributor = contributors.find((val) => typeof val === 'string');
-  if (badContributor) {
-    throw new Error(`Incorrectly formatted contribution: "${badContributor}".`);
-  }
-
-  if (contributors.length === 1 && contributors[0].who === 'none') {
-    return null;
-  }
 
   return contributors;
 }
@@ -767,13 +884,13 @@ export const dataSteps = [
         let currentTrackSection = {
           name: `Default Track Section`,
           isDefaultTrackSection: true,
-          tracksByRef: [],
+          tracks: [],
         };
 
-        const albumRef = T.Thing.getReference(album);
+        const albumRef = Thing.getReference(album);
 
         const closeCurrentTrackSection = () => {
-          if (!empty(currentTrackSection.tracksByRef)) {
+          if (!empty(currentTrackSection.tracks)) {
             trackSections.push(currentTrackSection);
           }
         };
@@ -787,7 +904,7 @@ export const dataSteps = [
               color: entry.color,
               dateOriginallyReleased: entry.dateOriginallyReleased,
               isDefaultTrackSection: false,
-              tracksByRef: [],
+              tracks: [],
             };
 
             continue;
@@ -795,9 +912,9 @@ export const dataSteps = [
 
           trackData.push(entry);
 
-          entry.dataSourceAlbumByRef = albumRef;
+          entry.dataSourceAlbum = albumRef;
 
-          currentTrackSection.tracksByRef.push(T.Thing.getReference(entry));
+          currentTrackSection.tracks.push(Thing.getReference(entry));
         }
 
         closeCurrentTrackSection();
@@ -821,12 +938,12 @@ export const dataSteps = [
       const artistData = results;
 
       const artistAliasData = results.flatMap((artist) => {
-        const origRef = T.Thing.getReference(artist);
+        const origRef = Thing.getReference(artist);
         return artist.aliasNames?.map((name) => {
           const alias = new T.Artist();
           alias.name = name;
           alias.isAlias = true;
-          alias.aliasedArtistRef = origRef;
+          alias.aliasedArtist = origRef;
           alias.artistData = artistData;
           return alias;
         }) ?? [];
@@ -850,7 +967,7 @@ export const dataSteps = [
 
     save(results) {
       let flashAct;
-      let flashesByRef = [];
+      let flashRefs = [];
 
       if (results[0] && !(results[0] instanceof T.FlashAct)) {
         throw new Error(`Expected an act at top of flash data file`);
@@ -859,18 +976,18 @@ export const dataSteps = [
       for (const thing of results) {
         if (thing instanceof T.FlashAct) {
           if (flashAct) {
-            Object.assign(flashAct, {flashesByRef});
+            Object.assign(flashAct, {flashes: flashRefs});
           }
 
           flashAct = thing;
-          flashesByRef = [];
+          flashRefs = [];
         } else {
-          flashesByRef.push(T.Thing.getReference(thing));
+          flashRefs.push(Thing.getReference(thing));
         }
       }
 
       if (flashAct) {
-        Object.assign(flashAct, {flashesByRef});
+        Object.assign(flashAct, {flashes: flashRefs});
       }
 
       const flashData = results.filter((x) => x instanceof T.Flash);
@@ -893,7 +1010,7 @@ export const dataSteps = [
 
     save(results) {
       let groupCategory;
-      let groupsByRef = [];
+      let groupRefs = [];
 
       if (results[0] && !(results[0] instanceof T.GroupCategory)) {
         throw new Error(`Expected a category at top of group data file`);
@@ -902,18 +1019,18 @@ export const dataSteps = [
       for (const thing of results) {
         if (thing instanceof T.GroupCategory) {
           if (groupCategory) {
-            Object.assign(groupCategory, {groupsByRef});
+            Object.assign(groupCategory, {groups: groupRefs});
           }
 
           groupCategory = thing;
-          groupsByRef = [];
+          groupRefs = [];
         } else {
-          groupsByRef.push(T.Thing.getReference(thing));
+          groupRefs.push(Thing.getReference(thing));
         }
       }
 
       if (groupCategory) {
-        Object.assign(groupCategory, {groupsByRef});
+        Object.assign(groupCategory, {groups: groupRefs});
       }
 
       const groupData = results.filter((x) => x instanceof T.Group);
@@ -925,6 +1042,10 @@ export const dataSteps = [
 
   {
     title: `Process homepage layout file`,
+
+    // Kludge: This benefits from the same headerAndEntries style messaging as
+    // albums and tracks (for example), but that document mode is designed to
+    // support multiple files, and only one is actually getting processed here.
     files: [HOMEPAGE_LAYOUT_DATA_FILE],
 
     documentMode: documentModes.headerAndEntries,
@@ -1005,7 +1126,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
       } catch (error) {
         error.message +=
           (error.message.includes('\n') ? '\n' : ' ') +
-          `(file: ${color.bright(color.blue(path.relative(dataPath, x.file)))})`;
+          `(file: ${colors.bright(colors.blue(path.relative(dataPath, x.file)))})`;
         throw error;
       }
     };
@@ -1013,8 +1134,8 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
-      {message: `Errors during data step: ${dataStep.title}`},
-      async ({call, callAsync, map, mapAsync, nest}) => {
+      {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
+      async ({call, callAsync, map, mapAsync, push, nest}) => {
         const {documentMode} = dataStep;
 
         if (!Object.values(documentModes).includes(documentMode)) {
@@ -1028,7 +1149,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
         // just without the callbacks. Thank you.
         const filterBlankDocuments = documents => {
           const aggregate = openAggregate({
-            message: `Found blank documents - check for extra '${color.cyan(`---`)}'`,
+            message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
           });
 
           const filteredDocuments =
@@ -1072,10 +1193,10 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
               if (count === 1) {
                 const range = `#${start + 1}`;
-                parts.push(`${count} document (${color.yellow(range)}), `);
+                parts.push(`${count} document (${colors.yellow(range)}), `);
               } else {
                 const range = `#${start + 1}-${end + 1}`;
-                parts.push(`${count} documents (${color.yellow(range)}), `);
+                parts.push(`${count} documents (${colors.yellow(range)}), `);
               }
 
               if (previous === null) {
@@ -1085,7 +1206,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               } else {
                 const previousDescription = Object.entries(previous).at(0).join(': ');
                 const nextDescription = Object.entries(next).at(0).join(': ');
-                parts.push(`between "${color.cyan(previousDescription)}" and "${color.cyan(nextDescription)}"`);
+                parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
               }
 
               aggregate.push(new Error(parts.join('')));
@@ -1139,32 +1260,52 @@ export async function loadAndProcessDataDocuments({dataPath}) {
             return;
           }
 
-          const yamlResult =
-            documentMode === documentModes.oneDocumentTotal
-              ? call(yaml.load, readResult)
-              : call(yaml.loadAll, readResult);
-
-          if (!yamlResult) {
-            return;
-          }
-
           let processResults;
 
-          if (documentMode === documentModes.oneDocumentTotal) {
-            nest({message: `Errors processing document`}, ({call}) => {
-              processResults = call(dataStep.processDocument, yamlResult);
-            });
-          } else {
-            const {documents, aggregate: aggregate1} = filterBlankDocuments(yamlResult);
-            call(aggregate1.close);
+          switch (documentMode) {
+            case documentModes.oneDocumentTotal: {
+              const yamlResult = call(yaml.load, readResult);
 
-            const {result, aggregate: aggregate2} = mapAggregate(
-              documents,
-              decorateErrorWithIndex(dataStep.processDocument),
-              {message: `Errors processing documents`});
-            call(aggregate2.close);
+              if (!yamlResult) {
+                processResults = null;
+                break;
+              }
 
-            processResults = result;
+              const {thing, aggregate} =
+                dataStep.processDocument(yamlResult);
+
+              processResults = thing;
+
+              call(() => aggregate.close());
+
+              break;
+            }
+
+            case documentModes.allInOne: {
+              const yamlResults = call(yaml.loadAll, readResult);
+
+              if (!yamlResults) {
+                processResults = [];
+                return;
+              }
+
+              const {documents, aggregate: filterAggregate} =
+                filterBlankDocuments(yamlResults);
+
+              call(filterAggregate.close);
+
+              processResults = [];
+
+              map(documents, decorateErrorWithIndex(document => {
+                const {thing, aggregate} =
+                  dataStep.processDocument(document);
+
+                processResults.push(thing);
+                aggregate.close();
+              }), {message: `Errors processing documents`});
+
+              break;
+            }
           }
 
           if (!processResults) return;
@@ -1222,81 +1363,74 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           return {file, documents: filteredDocuments};
         });
 
-        let processResults;
+        const processResults = [];
 
-        if (documentMode === documentModes.headerAndEntries) {
-          nest({message: `Errors processing data files as valid documents`}, ({call, map}) => {
-            processResults = [];
+        switch (documentMode) {
+          case documentModes.headerAndEntries:
+            map(yamlResults, decorateErrorWithFile(({documents}) => {
+              const headerDocument = documents[0];
+              const entryDocuments = documents.slice(1).filter(Boolean);
 
-            yamlResults.forEach(({file, documents}) => {
-              const [headerDocument, ...entryDocuments] = documents;
+              if (!headerDocument)
+                throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
 
-              if (!headerDocument) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
-                }), {file});
-                return;
+              // This'll be decorated with the file, and groups together any
+              // errors from processing the header and entry documents.
+              const fileAggregate =
+                openAggregate({message: `Errors processing documents`});
+
+              const {thing: headerObject, aggregate: headerAggregate} =
+                dataStep.processHeaderDocument(headerDocument);
+
+              try {
+                headerAggregate.close()
+              } catch (caughtError) {
+                caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
+                fileAggregate.push(caughtError);
               }
 
-              const header = call(
-                decorateErrorWithFile(({document}) =>
-                  dataStep.processHeaderDocument(document)),
-                {file, document: headerDocument});
+              const entryObjects = [];
 
-              // Don't continue processing files whose header
-              // document is invalid - the entire file is excempt
-              // from data in this case.
-              if (!header) {
-                return;
+              for (let index = 0; index < entryDocuments.length; index++) {
+                const entryDocument = entryDocuments[index];
+
+                const {thing: entryObject, aggregate: entryAggregate} =
+                  dataStep.processEntryDocument(entryDocument);
+
+                entryObjects.push(entryObject);
+
+                try {
+                  entryAggregate.close();
+                } catch (caughtError) {
+                  caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
+                  fileAggregate.push(caughtError);
+                }
               }
 
-              const entries = map(
-                entryDocuments
-                  .filter(Boolean)
-                  .map((document) => ({file, document})),
-                decorateErrorWithFile(
-                  decorateErrorWithIndex(({document}) =>
-                    dataStep.processEntryDocument(document))),
-                {message: `Errors processing entry documents`});
+              processResults.push({
+                header: headerObject,
+                entries: entryObjects,
+              });
 
-              // Entries may be incomplete (i.e. any errored
-              // documents won't have a processed output
-              // represented here) - this is intentional! By
-              // principle, partial output is preferred over
-              // erroring an entire file.
-              processResults.push({header, entries});
-            });
-          });
-        }
+              fileAggregate.close();
+            }), {message: `Errors processing documents in data files`});
+            break;
 
-        if (documentMode === documentModes.onePerFile) {
-          nest({message: `Errors processing data files as valid documents`}, ({call}) => {
-            processResults = [];
+          case documentModes.onePerFile:
+            map(yamlResults, decorateErrorWithFile(({documents}) => {
+              if (documents.length > 1)
+                throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
 
-            yamlResults.forEach(({file, documents}) => {
-              if (documents.length > 1) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Only expected one document to be present per file`);
-                }), {file});
-                return;
-              } else if (empty(documents) || !documents[0]) {
-                call(decorateErrorWithFile(() => {
-                  throw new Error(`Expected a document, this file is empty`);
-                }), {file});
-              }
+              if (empty(documents) || !documents[0])
+                throw new Error(`Expected a document, this file is empty`);
 
-              const result = call(
-                decorateErrorWithFile(({document}) =>
-                  dataStep.processDocument(document)),
-                {file, document: documents[0]});
+              const {thing, aggregate} =
+                dataStep.processDocument(documents[0]);
 
-              if (!result) {
-                return;
-              }
-
-              processResults.push(result);
-            });
-          });
+              processResults.push(thing);
+              aggregate.close();
+            }), {message: `Errors processing data files as valid documents`});
+            break;
         }
 
         const saveResult = call(dataStep.save, processResults);
@@ -1316,13 +1450,27 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
 // Data linking! Basically, provide (portions of) wikiData to the Things which
 // require it - they'll expose dynamically computed properties as a result (many
-// of which are required for page HTML generation).
-export function linkWikiDataArrays(wikiData) {
+// of which are required for page HTML generation and other expected behavior).
+//
+// The XXX_decacheWikiData option should be used specifically to mark
+// points where you *aren't* replacing any of the arrays under wikiData with
+// new values, and are using linkWikiDataArrays to instead "decache" data
+// properties which depend on any of them. It's currently not possible for
+// a CacheableObject to depend directly on the value of a property exposed
+// on some other CacheableObject, so when those values change, you have to
+// manually decache before the object will realize its cache isn't valid
+// anymore.
+export function linkWikiDataArrays(wikiData, {
+  XXX_decacheWikiData = false,
+} = {}) {
   function assignWikiData(things, ...keys) {
+    if (things === undefined) return;
     for (let i = 0; i < things.length; i++) {
       const thing = things[i];
       for (let j = 0; j < keys.length; j++) {
         const key = keys[j];
+        if (!(key in wikiData)) continue;
+        if (XXX_decacheWikiData) thing[key] = [];
         thing[key] = wikiData[key];
       }
     }
@@ -1340,7 +1488,7 @@ export function linkWikiDataArrays(wikiData) {
   assignWikiData(WD.flashData, 'artistData', 'flashActData', 'trackData');
   assignWikiData(WD.flashActData, 'flashData');
   assignWikiData(WD.artTagData, 'albumData', 'trackData');
-  assignWikiData(WD.homepageLayout.rows, 'albumData', 'groupData');
+  assignWikiData(WD.homepageLayout?.rows, 'albumData', 'groupData');
 }
 
 export function sortWikiDataArrays(wikiData) {
@@ -1368,7 +1516,9 @@ export function filterDuplicateDirectories(wikiData) {
   const deduplicateSpec = [
     'albumData',
     'artTagData',
+    'artistData',
     'flashData',
+    'flashActData',
     'groupData',
     'newsData',
     'trackData',
@@ -1377,7 +1527,7 @@ export function filterDuplicateDirectories(wikiData) {
   const aggregate = openAggregate({message: `Duplicate directories found`});
   for (const thingDataProp of deduplicateSpec) {
     const thingData = wikiData[thingDataProp];
-    aggregate.nest({message: `Duplicate directories found in ${color.green('wikiData.' + thingDataProp)}`}, ({call}) => {
+    aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({call}) => {
       const directoryPlaces = Object.create(null);
       const duplicateDirectories = [];
 
@@ -1403,7 +1553,7 @@ export function filterDuplicateDirectories(wikiData) {
         const places = directoryPlaces[directory];
         call(() => {
           throw new Error(
-            `Duplicate directory ${color.green(directory)}:\n` +
+            `Duplicate directory ${colors.green(directory)}:\n` +
               places.map((thing) => ` - ` + inspect(thing)).join('\n')
           );
         });
@@ -1444,45 +1594,45 @@ export function filterDuplicateDirectories(wikiData) {
 export function filterReferenceErrors(wikiData) {
   const referenceSpec = [
     ['wikiInfo', processWikiInfoDocument, {
-      divideTrackListsByGroupsByRef: 'group',
+      divideTrackListsByGroups: 'group',
     }],
 
     ['albumData', processAlbumDocument, {
-      artistContribsByRef: '_contrib',
-      coverArtistContribsByRef: '_contrib',
-      trackCoverArtistContribsByRef: '_contrib',
-      wallpaperArtistContribsByRef: '_contrib',
-      bannerArtistContribsByRef: '_contrib',
-      groupsByRef: 'group',
-      artTagsByRef: 'artTag',
+      artistContribs: '_contrib',
+      coverArtistContribs: '_contrib',
+      trackCoverArtistContribs: '_contrib',
+      wallpaperArtistContribs: '_contrib',
+      bannerArtistContribs: '_contrib',
+      groups: 'group',
+      artTags: 'artTag',
     }],
 
     ['trackData', processTrackDocument, {
-      artistContribsByRef: '_contrib',
-      contributorContribsByRef: '_contrib',
-      coverArtistContribsByRef: '_contrib',
-      referencedTracksByRef: '_trackNotRerelease',
-      sampledTracksByRef: '_trackNotRerelease',
-      artTagsByRef: 'artTag',
-      originalReleaseTrackByRef: '_trackNotRerelease',
+      artistContribs: '_contrib',
+      contributorContribs: '_contrib',
+      coverArtistContribs: '_contrib',
+      referencedTracks: '_trackNotRerelease',
+      sampledTracks: '_trackNotRerelease',
+      artTags: 'artTag',
+      originalReleaseTrack: '_trackNotRerelease',
     }],
 
     ['groupCategoryData', processGroupCategoryDocument, {
-      groupsByRef: 'group',
+      groups: 'group',
     }],
 
     ['homepageLayout.rows', undefined, {
-      sourceGroupByRef: 'group',
-      sourceAlbumsByRef: 'album',
+      sourceGroup: '_homepageSourceGroup',
+      sourceAlbums: 'album',
     }],
 
     ['flashData', processFlashDocument, {
-      contributorContribsByRef: '_contrib',
-      featuredTracksByRef: 'track',
+      contributorContribs: '_contrib',
+      featuredTracks: 'track',
     }],
 
     ['flashActData', processFlashActDocument, {
-      flashesByRef: 'flash',
+      flashes: 'flash',
     }],
   ];
 
@@ -1498,7 +1648,7 @@ export function filterReferenceErrors(wikiData) {
   for (const [thingDataProp, providedProcessDocumentFn, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
 
-    aggregate.nest({message: `Reference errors in ${color.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
+    aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       const things = Array.isArray(thingData) ? thingData : [thingData];
 
       for (const thing of things) {
@@ -1514,10 +1664,10 @@ export function filterReferenceErrors(wikiData) {
 
         nest({message: `Reference errors in ${inspect(thing)}`}, ({push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
-            const value = thing[property];
+            const value = CacheableObject.getUpdateValue(thing, property);
 
             if (value === undefined) {
-              push(new TypeError(`Property ${color.red(property)} isn't valid for ${color.green(thing.constructor.name)}`));
+              push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
               continue;
             }
 
@@ -1534,23 +1684,34 @@ export function filterReferenceErrors(wikiData) {
                   if (alias) {
                     // No need to check if the original exists here. Aliases are automatically
                     // created from a field on the original, so the original certainly exists.
-                    const original = find.artist(alias.aliasedArtistRef, wikiData.artistData, {mode: 'quiet'});
-                    throw new Error(`Reference ${color.red(contribRef.who)} is to an alias, should be ${color.green(original.name)}`);
+                    const original = alias.aliasedArtist;
+                    throw new Error(`Reference ${colors.red(contribRef.who)} is to an alias, should be ${colors.green(original.name)}`);
                   }
 
                   return boundFind.artist(contribRef.who);
                 };
                 break;
 
+              case '_homepageSourceGroup':
+                findFn = groupRef => {
+                  if (groupRef === 'new-additions' || groupRef === 'new-releases') {
+                    return true;
+                  }
+
+                  return boundFind.group(groupRef);
+                };
+                break;
+
               case '_trackNotRerelease':
                 findFn = trackRef => {
                   const track = find.track(trackRef, wikiData.trackData, {mode: 'error'});
+                  const originalRef = track && CacheableObject.getUpdateValue(track, 'originalReleaseTrack');
 
-                  if (track?.originalReleaseTrackByRef) {
+                  if (originalRef) {
                     // It's possible for the original to not actually exist, in this case.
                     // It should still be reported since the 'Originally Released As' field
                     // was present.
-                    const original = find.track(track.originalReleaseTrackByRef, wikiData.trackData, {mode: 'quiet'});
+                    const original = find.track(originalRef, wikiData.trackData, {mode: 'quiet'});
 
                     // Prefer references by name, but only if it's unambiguous.
                     const originalByName =
@@ -1560,12 +1721,12 @@ export function filterReferenceErrors(wikiData) {
 
                     const shouldBeMessage =
                       (originalByName
-                        ? color.green(original.name)
+                        ? colors.green(original.name)
                      : original
-                        ? color.green('track:' + original.directory)
-                        : color.green(track.originalReleaseTrackByRef));
+                        ? colors.green('track:' + original.directory)
+                        : colors.green(originalRef));
 
-                    throw new Error(`Reference ${color.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
+                    throw new Error(`Reference ${colors.red(trackRef)} is to a rerelease, should be ${shouldBeMessage}`);
                   }
 
                   return track;
@@ -1578,7 +1739,7 @@ export function filterReferenceErrors(wikiData) {
             }
 
             const suppress = fn => conditionallySuppressError(error => {
-              if (property === 'sampledTracksByRef') {
+              if (property === 'sampledTracks') {
                 // Suppress "didn't match anything" errors in particular, just for samples.
                 // In hsmusic-data we have a lot of "stub" sample data which don't have
                 // corresponding tracks yet, so it won't be useful to report such reference
@@ -1596,13 +1757,13 @@ export function filterReferenceErrors(wikiData) {
 
             const fieldPropertyMessage =
               (processDocumentFn?.propertyFieldMapping?.[property]
-                ? ` in field ${color.green(processDocumentFn.propertyFieldMapping[property])}`
-                : ` in property ${color.green(property)}`);
+                ? ` in field ${colors.green(processDocumentFn.propertyFieldMapping[property])}`
+                : ` in property ${colors.green(property)}`);
 
             const findFnMessage =
               (findFnKey.startsWith('_')
                 ? ``
-                : ` (${color.green('find.' + findFnKey)})`);
+                : ` (${colors.green('find.' + findFnKey)})`);
 
             const errorMessage =
               (Array.isArray(value)

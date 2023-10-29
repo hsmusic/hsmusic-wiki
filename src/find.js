@@ -1,6 +1,7 @@
 import {inspect} from 'node:util';
 
-import {color, logWarn} from '#cli';
+import {colors, logWarn} from '#cli';
+import {typeAppearance} from '#sugar';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -14,115 +15,169 @@ function warnOrThrow(mode, message) {
   return null;
 }
 
-function findHelper(keys, findFns = {}) {
+export function processAllAvailableMatches(data, {
+  getMatchableNames = thing =>
+    (Object.hasOwn(thing, 'name')
+      ? [thing.name]
+      : []),
+} = {}) {
+  const byName = Object.create(null);
+  const byDirectory = Object.create(null);
+  const multipleNameMatches = Object.create(null);
+
+  for (const thing of data) {
+    for (const name of getMatchableNames(thing)) {
+      if (typeof name !== 'string') {
+        logWarn`Unexpected ${typeAppearance(name)} returned in names for ${inspect(thing)}`;
+        continue;
+      }
+
+      const normalizedName = name.toLowerCase();
+      if (normalizedName in byName) {
+        const alreadyMatchesByName = byName[normalizedName];
+        byName[normalizedName] = null;
+        if (normalizedName in multipleNameMatches) {
+          multipleNameMatches[normalizedName].push(thing);
+        } else {
+          multipleNameMatches[normalizedName] = [alreadyMatchesByName, thing];
+        }
+      } else {
+        byName[normalizedName] = thing;
+      }
+    }
+
+    byDirectory[thing.directory] = thing;
+  }
+
+  return {byName, byDirectory, multipleNameMatches};
+}
+
+function findHelper({
+  referenceTypes,
+
+  getMatchableNames = undefined,
+}) {
+  const keyRefRegex =
+    new RegExp(String.raw`^(?:(${referenceTypes.join('|')}):(?=\S))?(.*)$`);
+
   // Note: This cache explicitly *doesn't* support mutable data arrays. If the
   // data array is modified, make sure it's actually a new array object, not
   // the original, or the cache here will break and act as though the data
   // hasn't changed!
   const cache = new WeakMap();
 
-  const byDirectory = findFns.byDirectory || matchDirectory;
-  const byName = findFns.byName || matchName;
-
-  const keyRefRegex = new RegExp(String.raw`^(?:(${keys.join('|')}):(?=\S))?(.*)$`);
-
   // The mode argument here may be 'warn', 'error', or 'quiet'. 'error' throws
   // errors for null matches (with details about the error), while 'warn' and
   // 'quiet' both return null, with 'warn' logging details directly to the
   // console.
-  return (fullRef, data, {mode = 'warn'} = {}) => {
+  return (fullRef, data, {mode = 'warn'}) => {
     if (!fullRef) return null;
     if (typeof fullRef !== 'string') {
-      throw new Error(`Got a reference that is ${typeof fullRef}, not string: ${fullRef}`);
+      throw new TypeError(`Expected a string, got ${typeAppearance(fullRef)}`);
     }
 
     if (!data) {
-      throw new Error(`Expected data to be present`);
+      throw new TypeError(`Expected data to be present`);
     }
 
-    if (!Array.isArray(data) && data.wikiData) {
-      throw new Error(`Old {wikiData: {...}} format provided`);
+    let subcache = cache.get(data);
+    if (!subcache) {
+      subcache =
+        processAllAvailableMatches(data, {
+          getMatchableNames,
+        });
+
+      cache.set(data, subcache);
     }
 
-    let cacheForThisData = cache.get(data);
-    const cachedValue = cacheForThisData?.[fullRef];
-    if (cachedValue) {
-      globalThis.NUM_CACHE = (globalThis.NUM_CACHE || 0) + 1;
-      return cachedValue;
-    }
-    if (!cacheForThisData) {
-      cacheForThisData = Object.create(null);
-      cache.set(data, cacheForThisData);
+    const regexMatch = fullRef.match(keyRefRegex);
+    if (!regexMatch) {
+      warnOrThrow(mode, `Malformed link reference: "${fullRef}"`);
     }
 
-    const match = fullRef.match(keyRefRegex);
+    const typePart = regexMatch[1];
+    const refPart = regexMatch[2];
+
+    const normalizedName =
+      (typePart
+        ? null
+        : refPart.toLowerCase());
+
+    const match =
+      (typePart
+        ? subcache.byDirectory[refPart]
+        : subcache.byName[normalizedName]);
+
+    if (!match && !typePart) {
+      if (subcache.multipleNameMatches[normalizedName]) {
+        return warnOrThrow(mode,
+          `Multiple matches for reference "${fullRef}". Please resolve:\n` +
+          subcache.multipleNameMatches[normalizedName]
+            .map(match => `- ${inspect(match)}\n`)
+            .join('') +
+          `Returning null for this reference.`);
+      }
+    }
+
     if (!match) {
-      return warnOrThrow(mode, `Malformed link reference: "${fullRef}"`);
+      warnOrThrow(mode, `Didn't match anything for ${colors.bright(fullRef)}`);
+      return null;
     }
 
-    const key = match[1];
-    const ref = match[2];
-
-    const found = key ? byDirectory(ref, data, mode) : byName(ref, data, mode);
-
-    if (!found) {
-      warnOrThrow(mode, `Didn't match anything for ${color.bright(fullRef)}`);
-    }
-
-    cacheForThisData[fullRef] = found;
-
-    return found;
+    return match;
   };
 }
 
-function matchDirectory(ref, data) {
-  return data.find(({directory}) => directory === ref);
-}
-
-function matchName(ref, data, mode) {
-  const matches = data.filter(
-    ({name}) => name.toLowerCase() === ref.toLowerCase()
-  );
-
-  if (matches.length > 1) {
-    return warnOrThrow(
-      mode,
-      `Multiple matches for reference "${ref}". Please resolve:\n` +
-        matches.map((match) => `- ${inspect(match)}\n`).join('') +
-        `Returning null for this reference.`
-    );
-  }
-
-  if (matches.length === 0) {
-    return null;
-  }
-
-  const thing = matches[0];
-
-  if (ref !== thing.name) {
-    warnOrThrow(
-      mode,
-      `Bad capitalization: ${color.red(ref)} -> ${color.green(thing.name)}`
-    );
-  }
-
-  return thing;
-}
-
-function matchTagName(ref, data, quiet) {
-  return matchName(ref.startsWith('cw: ') ? ref.slice(4) : ref, data, quiet);
-}
-
 const find = {
-  album: findHelper(['album', 'album-commentary', 'album-gallery']),
-  artist: findHelper(['artist', 'artist-gallery']),
-  artTag: findHelper(['tag'], {byName: matchTagName}),
-  flash: findHelper(['flash']),
-  group: findHelper(['group', 'group-gallery']),
-  listing: findHelper(['listing']),
-  newsEntry: findHelper(['news-entry']),
-  staticPage: findHelper(['static']),
-  track: findHelper(['track']),
+  album: findHelper({
+    referenceTypes: ['album', 'album-commentary', 'album-gallery'],
+  }),
+
+  artist: findHelper({
+    referenceTypes: ['artist', 'artist-gallery'],
+  }),
+
+  artTag: findHelper({
+    referenceTypes: ['tag'],
+
+    getMatchableNames: tag =>
+      (tag.isContentWarning
+        ? [`cw: ${tag.name}`]
+        : [tag.name]),
+  }),
+
+  flash: findHelper({
+    referenceTypes: ['flash'],
+  }),
+
+  flashAct: findHelper({
+    referenceTypes: ['flash-act'],
+  }),
+
+  group: findHelper({
+    referenceTypes: ['group', 'group-gallery'],
+  }),
+
+  listing: findHelper({
+    referenceTypes: ['listing'],
+  }),
+
+  newsEntry: findHelper({
+    referenceTypes: ['news-entry'],
+  }),
+
+  staticPage: findHelper({
+    referenceTypes: ['static'],
+  }),
+
+  track: findHelper({
+    referenceTypes: ['track'],
+
+    getMatchableNames: track =>
+      (track.alwaysReferenceByDirectory
+        ? []
+        : [track.name]),
+  }),
 };
 
 export default find;
@@ -139,6 +194,7 @@ export function bindFind(wikiData, opts1) {
       artist: 'artistData',
       artTag: 'artTagData',
       flash: 'flashData',
+      flashAct: 'flashActData',
       group: 'groupData',
       listing: 'listingSpec',
       newsEntry: 'newsData',
@@ -155,7 +211,9 @@ export function bindFind(wikiData, opts1) {
                 ? findFn(ref, thingData, {...opts1, ...opts2})
                 : findFn(ref, thingData, opts1)
           : (ref, opts2) =>
-              opts2 ? findFn(ref, thingData, opts2) : findFn(ref, thingData),
+              opts2
+                ? findFn(ref, thingData, opts2)
+                : findFn(ref, thingData),
       ];
     })
   );

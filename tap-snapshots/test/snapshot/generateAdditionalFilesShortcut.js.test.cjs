@@ -5,10 +5,10 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
-exports[`test/snapshot/generateAdditionalFilesShortcut.js TAP generateAdditionalFilesShortcut (snapshot) > basic behavior 1`] = `
+exports[`test/snapshot/generateAdditionalFilesShortcut.js > TAP > generateAdditionalFilesShortcut (snapshot) > basic behavior 1`] = `
 View <a href="#additional-files">additional files</a>: SBURB Wallpaper, Alternate Covers
 `
 
-exports[`test/snapshot/generateAdditionalFilesShortcut.js TAP generateAdditionalFilesShortcut (snapshot) > no additional files 1`] = `
+exports[`test/snapshot/generateAdditionalFilesShortcut.js > TAP > generateAdditionalFilesShortcut (snapshot) > no additional files 1`] = `
 
 `

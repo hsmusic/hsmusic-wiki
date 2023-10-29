@@ -1,6 +1,6 @@
 // Utility functions for interacting with wiki data.
 
-import {accumulateSum, empty, stitchArrays, unique} from './sugar.js';
+import {accumulateSum, empty, unique} from './sugar.js';
 
 // Generic value operations
 
@@ -610,20 +610,9 @@ export function sortFlashesChronologically(data, {
   latestFirst = false,
   getDate,
 } = {}) {
-  // Flash acts don't actually have any identifying properties because they
-  // don't have dedicated pages (yet), so don't have a directory. Make up a
-  // fake key identifying them so flashes can be grouped together.
-  const flashActs = new Set(data.map(flash => flash.act));
-  const flashActIdentifiers = new Map();
-
-  let counter = 0;
-  for (const act of flashActs) {
-    flashActIdentifiers.set(act, ++counter);
-  }
-
   // Group flashes by act...
-  data.sort((a, b) => {
-    return flashActIdentifiers.get(a.act) - flashActIdentifiers.get(b.act);
+  sortByDirectory(data, {
+    getDirectory: flash => flash.act.directory,
   });
 
   // Sort flashes by position in act...
@@ -873,4 +862,72 @@ export function filterItemsForCarousel(items) {
     .filter(item => item.hasCoverArt)
     .filter(item => item.artTags.every(tag => !tag.isContentWarning))
     .slice(0, maxCarouselLayoutItems + 1);
+}
+
+// Ridiculous caching support nonsense
+
+export class TupleMap {
+  static maxNestedTupleLength = 25;
+
+  #store = [undefined, null, null, null];
+
+  #lifetime(value) {
+    if (Array.isArray(value) && value.length <= TupleMap.maxNestedTupleLength) {
+      return 'tuple';
+    } else if (
+      typeof value === 'object' && value !== null ||
+      typeof value === 'function'
+    ) {
+      return 'weak';
+    } else {
+      return 'strong';
+    }
+  }
+
+  #getSubstoreShallow(value, store) {
+    const lifetime = this.#lifetime(value);
+    const mapIndex = {weak: 1, strong: 2, tuple: 3}[lifetime];
+
+    let map = store[mapIndex];
+    if (map === null) {
+      map = store[mapIndex] =
+        (lifetime === 'weak' ? new WeakMap()
+       : lifetime === 'strong' ? new Map()
+       : lifetime === 'tuple' ? new TupleMap()
+       : null);
+    }
+
+    if (map.has(value)) {
+      return map.get(value);
+    } else {
+      const substore = [undefined, null, null, null];
+      map.set(value, substore);
+      return substore;
+    }
+  }
+
+  #getSubstoreDeep(tuple, store = this.#store) {
+    if (tuple.length === 0) {
+      return store;
+    } else {
+      const [first, ...rest] = tuple;
+      return this.#getSubstoreDeep(rest, this.#getSubstoreShallow(first, store));
+    }
+  }
+
+  get(tuple) {
+    const store = this.#getSubstoreDeep(tuple);
+    return store[0];
+  }
+
+  has(tuple) {
+    const store = this.#getSubstoreDeep(tuple);
+    return store[0] !== undefined;
+  }
+
+  set(tuple, value) {
+    const store = this.#getSubstoreDeep(tuple);
+    store[0] = value;
+    return value;
+  }
 }

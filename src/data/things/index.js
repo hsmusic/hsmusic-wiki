@@ -2,9 +2,9 @@ import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {logError} from '#cli';
+import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
 import {openAggregate, showAggregate} from '#sugar';
-import * as validators from '#validators';
 
 import Thing from './thing.js';
 
@@ -21,7 +21,11 @@ import * as trackClasses from './track.js';
 import * as wikiInfoClasses from './wiki-info.js';
 
 export {default as Thing} from './thing.js';
-export {default as CacheableObject} from './cacheable-object.js';
+
+export {
+  default as CacheableObject,
+  CacheableObjectPropertyValueError,
+} from './cacheable-object.js';
 
 const allClassLists = {
   'album.js': albumClasses,
@@ -82,6 +86,8 @@ function errorDuplicateClassNames() {
 function flattenClassLists() {
   for (const classes of Object.values(allClassLists)) {
     for (const [name, constructor] of Object.entries(classes)) {
+      if (typeof constructor !== 'function') continue;
+      if (!(constructor.prototype instanceof Thing)) continue;
       allClasses[name] = constructor;
     }
   }
@@ -119,7 +125,7 @@ function descriptorAggregateHelper({
 }
 
 function evaluatePropertyDescriptors() {
-  const opts = {...allClasses, validators};
+  const opts = {...allClasses};
 
   return descriptorAggregateHelper({
     message: `Errors evaluating Thing class property descriptors`,
@@ -129,8 +135,21 @@ function evaluatePropertyDescriptors() {
         throw new Error(`Missing [Thing.getPropertyDescriptors] function`);
       }
 
-      constructor.propertyDescriptors =
-        constructor[Thing.getPropertyDescriptors](opts);
+      const results = constructor[Thing.getPropertyDescriptors](opts);
+
+      for (const [key, value] of Object.entries(results)) {
+        if (Array.isArray(value)) {
+          results[key] = compositeFrom({
+            annotation: `${constructor.name}.${key}`,
+            compose: false,
+            steps: value,
+          });
+        } else if (value.toResolvedComposition) {
+          results[key] = compositeFrom(value.toResolvedComposition());
+        }
+      }
+
+      constructor.propertyDescriptors = results;
     },
 
     showFailedClasses(failedClasses) {

@@ -53,6 +53,10 @@ export const replacerSpec = {
       }
     },
   },
+  'flash-act': {
+    find: 'flashAct',
+    link: 'flashAct',
+  },
   group: {
     find: 'group',
     link: 'groupInfo',
@@ -119,6 +123,7 @@ const linkThingRelationMap = {
   artist: 'linkArtist',
   artistGallery: 'linkArtistGallery',
   flash: 'linkFlash',
+  flashAct: 'linkFlashAct',
   groupInfo: 'linkGroup',
   groupGallery: 'linkGroupGallery',
   listing: 'linkListing',

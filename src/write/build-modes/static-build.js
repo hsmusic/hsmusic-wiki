@@ -17,16 +17,15 @@ import {serializeThings} from '#serialize';
 import {empty, queue, withEntries} from '#sugar';
 
 import {
+  fileIssue,
   logError,
   logInfo,
   logWarn,
-  progressCallAll,
   progressPromiseAll,
 } from '#cli';
 
 import {
   getPagePathname,
-  getPagePathnameAcrossLanguages,
   getURLsFrom,
   getURLsFromRoot,
 } from '#urls';
@@ -89,15 +88,17 @@ export async function go({
 
   defaultLanguage,
   languages,
+  missingImagePaths,
   srcRootPath,
+  thumbsCache,
   urls,
-  urlSpec,
   wikiData,
 
   cachebust,
   developersComment,
   getSizeOfAdditionalFile,
-  getSizeOfImageFile,
+  getSizeOfImagePath,
+  niceShowAggregate,
 }) {
   const outputPath = cliOptions['out-path'] || process.env.HSMUSIC_OUT;
   const appendIndexHTML = cliOptions['append-index-html'] ?? false;
@@ -253,6 +254,8 @@ export async function go({
   ));
   */
 
+  let errored = false;
+
   const contentDependencies = await quickLoadContentDependencies();
 
   const perLanguageFn = async (language, i, entries) => {
@@ -264,13 +267,6 @@ export async function go({
     await progressPromiseAll(`Writing ${language.code}`, queue([
       ...pageWrites.map(page => () => {
         const pagePath = page.path;
-
-        const localizedPathnames = getPagePathnameAcrossLanguages({
-          defaultLanguage,
-          languages,
-          pagePath,
-          urls,
-        });
 
         const pathname = getPagePathname({
           baseDirectory,
@@ -294,23 +290,33 @@ export async function go({
           cachebust,
           defaultLanguage,
           getSizeOfAdditionalFile,
-          getSizeOfImageFile,
+          getSizeOfImagePath,
           language,
           languages,
+          missingImagePaths,
           pagePath,
+          thumbsCache,
           to,
           urls,
           wikiData,
         });
 
-        const topLevelResult =
-          quickEvaluate({
-            contentDependencies,
-            extraDependencies: {...bound, appendIndexHTML},
+        let topLevelResult;
+        try {
+          topLevelResult =
+            quickEvaluate({
+              contentDependencies,
+              extraDependencies: {...bound, appendIndexHTML},
 
-            name: page.contentFunction.name,
-            args: page.contentFunction.args ?? [],
-          });
+              name: page.contentFunction.name,
+              args: page.contentFunction.args ?? [],
+            });
+        } catch (error) {
+          logError`\rError generating page: ${pathname}`;
+          niceShowAggregate(error);
+          errored = true;
+          return;
+        }
 
         const {pageHTML, oEmbedJSON} = html.resolve(topLevelResult);
 
@@ -358,6 +364,16 @@ export async function go({
 
   // The single most important step.
   logInfo`Written!`;
+
+  if (errored) {
+    logWarn`The code generating content for some pages ended up erroring.`;
+    logWarn`These pages were skipped, so if you ran a build previously and`;
+    logWarn`they didn't error that time, then the old version is still`;
+    logWarn`available - albeit possibly outdated! Please scroll up and send`;
+    logWarn`the HSMusic developers a copy of the errors:`;
+    fileIssue({topMessage: null});
+  }
+
   return true;
 }
 
@@ -454,14 +470,9 @@ async function writeFavicon({
 }
 
 async function writeSharedFilesAndPages({
-  language,
   outputPath,
-  urls,
-  wikiData,
   wikiDataJSON,
 }) {
-  const {groupData, wikiInfo} = wikiData;
-
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
     wikiDataJSON &&
       writeFile(

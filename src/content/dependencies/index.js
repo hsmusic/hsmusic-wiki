@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import chokidar from 'chokidar';
 import {ESLint} from 'eslint';
 
-import {color, logWarn} from '#cli';
+import {colors, logWarn} from '#cli';
 import contentFunction, {ContentFunctionSpecError} from '#content-function';
 import {annotateFunction} from '#sugar';
 
@@ -30,7 +30,6 @@ export function watchContentDependencies({
   const contentDependencies = {};
 
   let emittedReady = false;
-  let allDependenciesFulfilled = false;
   let closed = false;
 
   let _close = () => {};
@@ -77,12 +76,12 @@ export function watchContentDependencies({
   // prematurely find out there aren't any nulls - before the nulls have
   // been entered at all!).
 
-  readdir(metaDirname).then(files => {
+  readdir(watchPath).then(files => {
     if (closed) {
       return;
     }
 
-    const filePaths = files.map(file => path.join(metaDirname, file));
+    const filePaths = files.map(file => path.join(watchPath, file));
     for (const filePath of filePaths) {
       if (filePath === metaPath) continue;
       const functionName = getFunctionName(filePath);
@@ -91,7 +90,7 @@ export function watchContentDependencies({
       }
     }
 
-    const watcher = chokidar.watch(metaDirname);
+    const watcher = chokidar.watch(watchPath);
 
     watcher.on('all', (event, filePath) => {
       if (!['add', 'change'].includes(event)) return;
@@ -178,7 +177,14 @@ export function watchContentDependencies({
       // Just skip newly created files. They'll be processed again when
       // written.
       if (spec === undefined) {
-        contentDependencies[functionName] = null;
+        // For practical purposes the file is treated as though it doesn't
+        // even exist (undefined), rather than not being ready yet (null).
+        // Apart from if existing contents of the file were erased (but not
+        // the file itself), this value might already be set (to null!) by
+        // the readdir performed at the beginning to evaluate which files
+        // should be read and processed at least once before reporting all
+        // dependencies as ready.
+        delete contentDependencies[functionName];
         return;
       }
 
@@ -192,7 +198,7 @@ export function watchContentDependencies({
 
       if (logging && emittedReady) {
         const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
-        console.log(color.green(`[${timestamp}] Updated ${functionName}`));
+        console.log(colors.green(`[${timestamp}] Updated ${functionName}`));
       }
 
       contentDependencies[functionName] = fn;
@@ -219,9 +225,9 @@ export function watchContentDependencies({
       }
 
       if (typeof error === 'string') {
-        console.error(color.yellow(error));
+        console.error(colors.yellow(error));
       } else if (error instanceof ContentFunctionSpecError) {
-        console.error(color.yellow(error.message));
+        console.error(colors.yellow(error.message));
       } else {
         console.error(error);
       }

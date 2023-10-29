@@ -1,25 +1,42 @@
+import {input} from '#composite';
 import find from '#find';
+
+import {
+  isColor,
+  isDirectory,
+  isNumber,
+  isString,
+  oneOf,
+} from '#validators';
+
+import {exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {withPropertyFromObject} from '#composite/data';
+
+import {
+  color,
+  contributionList,
+  directory,
+  fileExtension,
+  name,
+  referenceList,
+  simpleDate,
+  simpleString,
+  urls,
+  wikiData,
+} from '#composite/wiki-properties';
+
+import {withFlashAct} from '#composite/things/flash';
 
 import Thing from './thing.js';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Artist,
-    Track,
-    FlashAct,
-
-    validators: {
-      isDirectory,
-      isNumber,
-      isString,
-      oneOf,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Flash'),
+    name: name('Unnamed Flash'),
 
     directory: {
       flags: {update: true, expose: true},
@@ -47,51 +64,51 @@ export class Flash extends Thing {
       },
     },
 
-    date: Thing.common.simpleDate(),
+    color: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
 
-    coverArtFileExtension: Thing.common.fileExtension('jpg'),
+      withFlashAct(),
 
-    contributorContribsByRef: Thing.common.contribsByRef(),
+      withPropertyFromObject({
+        object: '#flashAct',
+        property: input.value('color'),
+      }),
 
-    featuredTracksByRef: Thing.common.referenceList(Track),
+      exposeDependency({dependency: '#flashAct.color'}),
+    ],
 
-    urls: Thing.common.urls(),
+    date: simpleDate(),
+
+    coverArtFileExtension: fileExtension('jpg'),
+
+    contributorContribs: contributionList(),
+
+    featuredTracks: referenceList({
+      class: input.value(Track),
+      find: input.value(find.track),
+      data: 'trackData',
+    }),
+
+    urls: urls(),
 
     // Update only
 
-    artistData: Thing.common.wikiData(Artist),
-    trackData: Thing.common.wikiData(Track),
-    flashActData: Thing.common.wikiData(FlashAct),
+    artistData: wikiData(Artist),
+    trackData: wikiData(Track),
+    flashActData: wikiData(FlashAct),
 
     // Expose only
-
-    contributorContribs: Thing.common.dynamicContribs('contributorContribsByRef'),
-
-    featuredTracks: Thing.common.dynamicThingsFromReferenceList(
-      'featuredTracksByRef',
-      'trackData',
-      find.track
-    ),
 
     act: {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['flashActData'],
+        dependencies: ['this', 'flashActData'],
 
-        compute: ({flashActData, [Flash.instance]: flash}) =>
+        compute: ({this: flash, flashActData}) =>
           flashActData.find((act) => act.flashes.includes(flash)) ?? null,
-      },
-    },
-
-    color: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['flashActData'],
-
-        compute: ({flashActData, [Flash.instance]: flash}) =>
-          flashActData.find((act) => act.flashes.includes(flash))?.color ?? null,
       },
     },
   });
@@ -111,17 +128,18 @@ export class Flash extends Thing {
 }
 
 export class FlashAct extends Thing {
-  static [Thing.getPropertyDescriptors] = ({
-    validators: {
-      isColor,
-    },
-  }) => ({
+  static [Thing.referenceType] = 'flash-act';
+  static [Thing.friendlyName] = `Flash Act`;
+
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Flash Act'),
-    color: Thing.common.color(),
-    anchor: Thing.common.simpleString(),
-    jump: Thing.common.simpleString(),
+    name: name('Unnamed Flash Act'),
+    directory: directory(),
+    color: color(),
+    listTerminology: simpleString(),
+
+    jump: simpleString(),
 
     jumpColor: {
       flags: {update: true, expose: true},
@@ -133,18 +151,14 @@ export class FlashAct extends Thing {
       }
     },
 
-    flashesByRef: Thing.common.referenceList(Flash),
+    flashes: referenceList({
+      class: input.value(Flash),
+      find: input.value(find.flash),
+      data: 'flashData',
+    }),
 
     // Update only
 
-    flashData: Thing.common.wikiData(Flash),
-
-    // Expose only
-
-    flashes: Thing.common.dynamicThingsFromReferenceList(
-      'flashesByRef',
-      'flashData',
-      find.flash
-    ),
+    flashData: wikiData(Flash),
   })
 }

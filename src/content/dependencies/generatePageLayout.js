@@ -105,7 +105,7 @@ export default {
     color: {validate: v => v.isColor},
 
     styleRules: {
-      validate: v => v.sparseArrayOf(v.isString),
+      validate: v => v.sparseArrayOf(v.isHTML),
       default: [],
     },
 
@@ -183,7 +183,7 @@ export default {
           } else {
             aggregate.call(v.validateProperties({
               path: v.strictArrayOf(v.isString),
-              title: v.isString,
+              title: v.isHTML,
             }), {
               path: object.path,
               title: object.title,
@@ -394,6 +394,10 @@ export default {
 
     const sidebarLeftHTML = generateSidebarHTML('leftSidebar', 'sidebar-left');
     const sidebarRightHTML = generateSidebarHTML('rightSidebar', 'sidebar-right');
+
+    const hasSidebarLeft = !html.isBlank(sidebarLeftHTML);
+    const hasSidebarRight = !html.isBlank(sidebarRightHTML);
+
     const collapseSidebars = slots.leftSidebarCollapse && slots.rightSidebarCollapse;
 
     const hasID = (() => {
@@ -422,20 +426,20 @@ export default {
             processSkippers([
               {condition: true, id: 'content', string: 'content'},
               {
-                condition: !html.isBlank(sidebarLeftHTML),
+                condition: hasSidebarLeft,
                 id: 'sidebar-left',
                 string:
-                  (html.isBlank(sidebarRightHTML)
-                    ? 'sidebar'
-                    : 'sidebar.left'),
+                  (hasSidebarRight
+                    ? 'sidebar.left'
+                    : 'sidebar'),
               },
               {
-                condition: !html.isBlank(sidebarRightHTML),
+                condition: hasSidebarRight,
                 id: 'sidebar-right',
                 string:
-                  (html.isBlank(sidebarLeftHTML)
-                    ? 'sidebar'
-                    : 'sidebar.right'),
+                  (hasSidebarLeft
+                    ? 'sidebar.right'
+                    : 'sidebar'),
               },
               {condition: navHTML, id: 'header', string: 'header'},
               {condition: footerHTML, id: 'footer', string: 'footer'},
@@ -507,11 +511,6 @@ export default {
           class: [
             'layout-columns',
             !collapseSidebars && 'vertical-when-thin',
-            (sidebarLeftHTML || sidebarRightHTML) && 'has-one-sidebar',
-            (sidebarLeftHTML && sidebarRightHTML) && 'has-two-sidebars',
-            !(sidebarLeftHTML || sidebarRightHTML) && 'has-zero-sidebars',
-            sidebarLeftHTML && 'has-sidebar-left',
-            sidebarRightHTML && 'has-sidebar-right',
           ],
         },
         [
@@ -521,7 +520,7 @@ export default {
         ]),
       slots.bannerPosition === 'bottom' && slots.banner,
       footerHTML,
-    ].filter(Boolean).join('\n');
+    ];
 
     const pageHTML = html.tags([
       `<!DOCTYPE html>`,
@@ -609,7 +608,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', 'site4.css', cachebust),
+              href: to('shared.staticFile', 'site5.css', cachebust),
             }),
 
             html.tag('style', [
@@ -624,12 +623,22 @@ export default {
           ]),
 
           html.tag('body',
-            // {style: body.style || ''},
             [
-              html.tag('div', {id: 'page-container'}, [
-                skippersHTML,
-                layoutHTML,
-              ]),
+              html.tag('div',
+                {
+                  id: 'page-container',
+                  class: [
+                    (hasSidebarLeft || hasSidebarRight) && 'has-one-sidebar',
+                    (hasSidebarLeft && hasSidebarRight) && 'has-two-sidebars',
+                    !(hasSidebarLeft || hasSidebarRight) && 'has-zero-sidebars',
+                    hasSidebarLeft && 'has-sidebar-left',
+                    hasSidebarRight && 'has-sidebar-right',
+                  ],
+                },
+                [
+                  skippersHTML,
+                  layoutHTML,
+                ]),
 
               // infoCardHTML,
               imageOverlayHTML,

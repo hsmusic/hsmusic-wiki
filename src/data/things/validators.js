@@ -1,7 +1,7 @@
 import {inspect as nodeInspect} from 'node:util';
 
-import {color, ENABLE_COLOR} from '#cli';
-import {withAggregate} from '#sugar';
+import {colors, ENABLE_COLOR} from '#cli';
+import {empty, typeAppearance, withAggregate} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -9,13 +9,13 @@ function inspect(value) {
 
 // Basic types (primitives)
 
-function a(noun) {
+export function a(noun) {
   return /[aeiou]/.test(noun[0]) ? `an ${noun}` : `a ${noun}`;
 }
 
-function isType(value, type) {
+export function isType(value, type) {
   if (typeof value !== type)
-    throw new TypeError(`Expected ${a(type)}, got ${typeof value}`);
+    throw new TypeError(`Expected ${a(type)}, got ${typeAppearance(value)}`);
 
   return true;
 }
@@ -132,7 +132,7 @@ export function isObject(value) {
 
 export function isArray(value) {
   if (typeof value !== 'object' || value === null || !Array.isArray(value))
-    throw new TypeError(`Expected an array, got ${value}`);
+    throw new TypeError(`Expected an array, got ${typeAppearance(value)}`);
 
   return true;
 }
@@ -174,7 +174,8 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${color.green(index)}, item: ${inspect(item)}) ${error.message}`;
+      error.message = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
       throw error;
     }
   };
@@ -264,7 +265,7 @@ export function validateProperties(spec) {
           try {
             specValidator(value);
           } catch (error) {
-            error.message = `(key: ${color.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
+            error.message = `(key: ${colors.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
             throw error;
           }
         });
@@ -308,7 +309,7 @@ export const isTrackSection = validateProperties({
   color: optional(isColor),
   dateOriginallyReleased: optional(isDate),
   isDefaultTrackSection: optional(isBoolean),
-  tracksByRef: optional(validateReferenceList('track')),
+  tracks: optional(validateReferenceList('track')),
 });
 
 export const isTrackSectionList = validateArrayItems(isTrackSection);
@@ -402,6 +403,76 @@ export function validateReference(type = 'track') {
 
 export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
+}
+
+const validateWikiData_cache = {};
+
+export function validateWikiData({
+  referenceType = '',
+  allowMixedTypes = false,
+}) {
+  if (referenceType && allowMixedTypes) {
+    throw new TypeError(`Don't specify both referenceType and allowMixedTypes`);
+  }
+
+  validateWikiData_cache[referenceType] ??= {};
+  validateWikiData_cache[referenceType][allowMixedTypes] ??= new WeakMap();
+
+  const isArrayOfObjects = validateArrayItems(isObject);
+
+  return (array) => {
+    const subcache = validateWikiData_cache[referenceType][allowMixedTypes];
+    if (subcache.has(array)) return subcache.get(array);
+
+    let OK = false;
+
+    try {
+      isArrayOfObjects(array);
+
+      if (empty(array)) {
+        OK = true; return true;
+      }
+
+      const allRefTypes =
+        new Set(array.map(object =>
+          object.constructor[Symbol.for('Thing.referenceType')]));
+
+      if (allRefTypes.has(undefined)) {
+        if (allRefTypes.size === 1) {
+          throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
+        } else {
+          throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+        }
+      }
+
+      if (allRefTypes.size > 1) {
+        if (allowMixedTypes) {
+          OK = true; return true;
+        }
+
+        const types = () => Array.from(allRefTypes).join(', ');
+
+        if (referenceType) {
+          if (allRefTypes.has(referenceType)) {
+            allRefTypes.remove(referenceType);
+            throw new TypeError(`Expected array of only ${referenceType}, also got other types: ${types()}`)
+          } else {
+            throw new TypeError(`Expected array of only ${referenceType}, got other types: ${types()}`);
+          }
+        }
+
+        throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
+      }
+
+      if (referenceType && !allRefTypes.has(referenceType)) {
+        throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
+      }
+
+      OK = true; return true;
+    } finally {
+      subcache.set(array, OK);
+    }
+  };
 }
 
 // Compositional utilities

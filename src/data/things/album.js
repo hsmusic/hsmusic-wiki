@@ -1,163 +1,143 @@
-import {empty} from '#sugar';
+import {input} from '#composite';
 import find from '#find';
+import {isDate} from '#validators';
+
+import {exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
+import {exitWithoutContribs} from '#composite/wiki-data';
+
+import {
+  additionalFiles,
+  commentary,
+  color,
+  commentatorArtists,
+  contribsPresent,
+  contributionList,
+  dimensions,
+  directory,
+  fileExtension,
+  flag,
+  name,
+  referenceList,
+  simpleDate,
+  simpleString,
+  urls,
+  wikiData,
+} from '#composite/wiki-properties';
+
+import {
+  withTracks,
+  withTrackSections,
+} from '#composite/things/album';
 
 import Thing from './thing.js';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({
-    ArtTag,
-    Artist,
-    Group,
-    Track,
-
-    validators: {
-      isDate,
-      isDimensions,
-      isTrackSectionList,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Album'),
-    color: Thing.common.color(),
-    directory: Thing.common.directory(),
-    urls: Thing.common.urls(),
+    name: name('Unnamed Album'),
+    color: color(),
+    directory: directory(),
+    urls: urls(),
 
-    date: Thing.common.simpleDate(),
-    trackArtDate: Thing.common.simpleDate(),
-    dateAddedToWiki: Thing.common.simpleDate(),
+    date: simpleDate(),
+    trackArtDate: simpleDate(),
+    dateAddedToWiki: simpleDate(),
 
-    coverArtDate: {
-      flags: {update: true, expose: true},
+    coverArtDate: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
 
-      update: {validate: isDate},
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
 
-      expose: {
-        dependencies: ['date', 'coverArtistContribsByRef'],
-        transform: (coverArtDate, {
-          coverArtistContribsByRef,
-          date,
-        }) =>
-          (!empty(coverArtistContribsByRef)
-            ? coverArtDate ?? date ?? null
-            : null),
-      },
-    },
+      exposeDependency({dependency: 'date'}),
+    ],
 
-    artistContribsByRef: Thing.common.contribsByRef(),
-    coverArtistContribsByRef: Thing.common.contribsByRef(),
-    trackCoverArtistContribsByRef: Thing.common.contribsByRef(),
-    wallpaperArtistContribsByRef: Thing.common.contribsByRef(),
-    bannerArtistContribsByRef: Thing.common.contribsByRef(),
+    coverArtFileExtension: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      fileExtension('jpg'),
+    ],
 
-    groupsByRef: Thing.common.referenceList(Group),
-    artTagsByRef: Thing.common.referenceList(ArtTag),
+    trackCoverArtFileExtension: fileExtension('jpg'),
 
-    trackSections: {
-      flags: {update: true, expose: true},
+    wallpaperFileExtension: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      fileExtension('jpg'),
+    ],
 
-      update: {
-        validate: isTrackSectionList,
-      },
+    bannerFileExtension: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      fileExtension('jpg'),
+    ],
 
-      expose: {
-        dependencies: ['color', 'trackData'],
-        transform(trackSections, {
-          color: albumColor,
-          trackData,
-        }) {
-          let startIndex = 0;
-          return trackSections?.map(section => ({
-            name: section.name ?? null,
-            color: section.color ?? albumColor ?? null,
-            dateOriginallyReleased: section.dateOriginallyReleased ?? null,
-            isDefaultTrackSection: section.isDefaultTrackSection ?? false,
+    wallpaperStyle: [
+      exitWithoutContribs({contribs: 'wallpaperArtistContribs'}),
+      simpleString(),
+    ],
 
-            startIndex: (
-              startIndex += section.tracksByRef.length,
-              startIndex - section.tracksByRef.length
-            ),
+    bannerStyle: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      simpleString(),
+    ],
 
-            tracksByRef: section.tracksByRef ?? [],
-            tracks:
-              (trackData && section.tracksByRef
-                ?.map(ref => find.track(ref, trackData, {mode: 'quiet'}))
-                .filter(Boolean)) ??
-              [],
-          }));
-        },
-      },
-    },
+    bannerDimensions: [
+      exitWithoutContribs({contribs: 'bannerArtistContribs'}),
+      dimensions(),
+    ],
 
-    coverArtFileExtension: Thing.common.fileExtension('jpg'),
-    trackCoverArtFileExtension: Thing.common.fileExtension('jpg'),
+    hasTrackNumbers: flag(true),
+    isListedOnHomepage: flag(true),
+    isListedInGalleries: flag(true),
 
-    wallpaperStyle: Thing.common.simpleString(),
-    wallpaperFileExtension: Thing.common.fileExtension('jpg'),
+    commentary: commentary(),
+    additionalFiles: additionalFiles(),
 
-    bannerStyle: Thing.common.simpleString(),
-    bannerFileExtension: Thing.common.fileExtension('jpg'),
-    bannerDimensions: {
-      flags: {update: true, expose: true},
-      update: {validate: isDimensions},
-    },
+    trackSections: [
+      withTrackSections(),
+      exposeDependency({dependency: '#trackSections'}),
+    ],
 
-    hasTrackNumbers: Thing.common.flag(true),
-    isListedOnHomepage: Thing.common.flag(true),
-    isListedInGalleries: Thing.common.flag(true),
+    artistContribs: contributionList(),
+    coverArtistContribs: contributionList(),
+    trackCoverArtistContribs: contributionList(),
+    wallpaperArtistContribs: contributionList(),
+    bannerArtistContribs: contributionList(),
 
-    commentary: Thing.common.commentary(),
-    additionalFiles: Thing.common.additionalFiles(),
+    groups: referenceList({
+      class: input.value(Group),
+      find: input.value(find.group),
+      data: 'groupData',
+    }),
+
+    artTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
 
     // Update only
 
-    artistData: Thing.common.wikiData(Artist),
-    artTagData: Thing.common.wikiData(ArtTag),
-    groupData: Thing.common.wikiData(Group),
-    trackData: Thing.common.wikiData(Track),
+    artistData: wikiData(Artist),
+    artTagData: wikiData(ArtTag),
+    groupData: wikiData(Group),
+    trackData: wikiData(Track),
 
     // Expose only
 
-    artistContribs: Thing.common.dynamicContribs('artistContribsByRef'),
-    coverArtistContribs: Thing.common.dynamicContribs('coverArtistContribsByRef'),
-    trackCoverArtistContribs: Thing.common.dynamicContribs('trackCoverArtistContribsByRef'),
-    wallpaperArtistContribs: Thing.common.dynamicContribs('wallpaperArtistContribsByRef'),
-    bannerArtistContribs: Thing.common.dynamicContribs('bannerArtistContribsByRef'),
+    commentatorArtists: commentatorArtists(),
 
-    commentatorArtists: Thing.common.commentatorArtists(),
+    hasCoverArt: contribsPresent({contribs: 'coverArtistContribs'}),
+    hasWallpaperArt: contribsPresent({contribs: 'wallpaperArtistContribs'}),
+    hasBannerArt: contribsPresent({contribs: 'bannerArtistContribs'}),
 
-    hasCoverArt: Thing.common.contribsPresent('coverArtistContribsByRef'),
-    hasWallpaperArt: Thing.common.contribsPresent('wallpaperArtistContribsByRef'),
-    hasBannerArt: Thing.common.contribsPresent('bannerArtistContribsByRef'),
-
-    tracks: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['trackSections', 'trackData'],
-        compute: ({trackSections, trackData}) =>
-          trackSections && trackData
-            ? trackSections
-                .flatMap((section) => section.tracksByRef ?? [])
-                .map((ref) => find.track(ref, trackData, {mode: 'quiet'}))
-                .filter(Boolean)
-            : [],
-      },
-    },
-
-    groups: Thing.common.dynamicThingsFromReferenceList(
-      'groupsByRef',
-      'groupData',
-      find.group
-    ),
-
-    artTags: Thing.common.dynamicThingsFromReferenceList(
-      'artTagsByRef',
-      'artTagData',
-      find.artTag
-    ),
+    tracks: [
+      withTracks(),
+      exposeDependency({dependency: '#tracks'}),
+    ],
   });
 
   static [Thing.getSerializeDescriptors] = ({
@@ -201,10 +181,12 @@ export class Album extends Thing {
 }
 
 export class TrackSectionHelper extends Thing {
+  static [Thing.friendlyName] = `Track Section`;
+
   static [Thing.getPropertyDescriptors] = () => ({
-    name: Thing.common.name('Unnamed Track Group'),
-    color: Thing.common.color(),
-    dateOriginallyReleased: Thing.common.simpleDate(),
-    isDefaultTrackGroup: Thing.common.flag(false),
+    name: name('Unnamed Track Section'),
+    color: color(),
+    dateOriginallyReleased: simpleDate(),
+    isDefaultTrackGroup: flag(false),
   })
 }

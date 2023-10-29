@@ -1,16 +1,24 @@
+import {
+  directory,
+  name,
+  simpleDate,
+  simpleString,
+} from '#composite/wiki-properties';
+
 import Thing from './thing.js';
 
 export class NewsEntry extends Thing {
   static [Thing.referenceType] = 'news-entry';
+  static [Thing.friendlyName] = `News Entry`;
 
   static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed News Entry'),
-    directory: Thing.common.directory(),
-    date: Thing.common.simpleDate(),
+    name: name('Unnamed News Entry'),
+    directory: directory(),
+    date: simpleDate(),
 
-    content: Thing.common.simpleString(),
+    content: simpleString(),
 
     // Expose only
 

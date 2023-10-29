@@ -237,27 +237,6 @@ export function getPagePathname({
     : to('localized.' + pagePath[0], ...pagePath.slice(1)));
 }
 
-export function getPagePathnameAcrossLanguages({
-  defaultLanguage,
-  languages,
-  pagePath,
-  urls,
-}) {
-  return withEntries(languages, entries => entries
-    .filter(([key, language]) => key !== 'default' && !language.hidden)
-    .map(([_key, language]) => [
-      language.code,
-      getPagePathname({
-        baseDirectory:
-          (language === defaultLanguage
-            ? ''
-            : language.code),
-        pagePath,
-        urls,
-      }),
-    ]));
-}
-
 // Needed for the rare path arguments which themselves contains one or more
 // slashes, e.g. for listings, with arguments like 'albums/by-name'.
 export function getPageSubdirectoryPrefix({

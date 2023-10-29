@@ -74,7 +74,7 @@
 
 'use strict';
 
-const CACHE_FILE = 'thumbnail-cache.json';
+export const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
 const thumbnailSpec = {
@@ -91,8 +91,13 @@ import {createReadStream} from 'node:fs';
 import {readFile, stat, unlink, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
+import dimensionsOf from 'image-size';
+
+import {delay, empty, queue} from '#sugar';
+import {CacheableObject} from '#things';
+
 import {
-  color,
+  colors,
   fileIssue,
   logError,
   logInfo,
@@ -108,9 +113,118 @@ import {
   traverse,
 } from '#node-utils';
 
-import {delay, empty, queue} from '#sugar';
-
 export const defaultMagickThreads = 8;
+
+export function getThumbnailsAvailableForDimensions([width, height]) {
+  // This function is intended to be portable, so it can be used both for
+  // calculating which thumbnails to generate, and which ones will be ready
+  // to reference in generated code. Sizes are in array [name, size] form
+  // with larger sizes earlier in return. Keep in mind this isn't a direct
+  // 1:1 mapping with the sizes listed in the thumbnail spec, because the
+  // largest thumbnail (first in return) will be adjusted to the provided
+  // dimensions.
+
+  const {all} = getThumbnailsAvailableForDimensions;
+
+  // Find the largest size which is beneath the passed dimensions. We use the
+  // longer edge here (of width and height) so that each resulting thumbnail is
+  // fully constrained within the size*size square defined by its spec.
+  const longerEdge = Math.max(width, height);
+  const index = all.findIndex(([name, size]) => size <= longerEdge);
+
+  // Literal edge cases are handled specially. For dimensions which are bigger
+  // than the biggest thumbnail in the spec, return all possible results.
+  // These don't need any adjustments since the largest is already smaller than
+  // the provided dimensions.
+  if (index === 0) {
+    return [
+      ...all,
+    ];
+  }
+
+  // For dimensions which are smaller than the smallest thumbnail, return only
+  // the smallest, adjusted to the provided dimensions.
+  if (index === -1) {
+    const smallest = all[all.length - 1];
+    return [
+      [smallest[0], longerEdge],
+    ];
+  }
+
+  // For non-edge cases, we return the largest size below the dimensions
+  // as well as everything smaller, but also the next size larger - that way
+  // there's a size which is as big as the original, but still JPEG compressed.
+  // The size larger is adjusted to the provided dimensions to represent the
+  // actual dimensions it'll provide.
+  const larger = all[index - 1];
+  const rest = all.slice(index);
+  return [
+    [larger[0], longerEdge],
+    ...rest,
+  ];
+}
+
+getThumbnailsAvailableForDimensions.all =
+  Object.entries(thumbnailSpec)
+    .map(([name, {size}]) => [name, size])
+    .sort((a, b) => b[1] - a[1]);
+
+function getCacheEntryForMediaPath(mediaPath, cache) {
+  // Gets the cache entry for the provided image path, which should always be
+  // a forward-slashes path (i.e. suitable for display online). Since the cache
+  // file may have forward or back-slashes, this checks both.
+
+  const entryFromMediaPath = cache[mediaPath];
+  if (entryFromMediaPath) return entryFromMediaPath;
+
+  const winPath = mediaPath.split(path.posix.sep).join(path.win32.sep);
+  const entryFromWinPath = cache[winPath];
+  if (entryFromWinPath) return entryFromWinPath;
+
+  return null;
+}
+
+export function checkIfImagePathHasCachedThumbnails(mediaPath, cache) {
+  // Generic utility for checking if the thumbnail cache includes any info for
+  // the provided image path, so that the other functions don't hard-code the
+  // cache format.
+
+  return !!getCacheEntryForMediaPath(mediaPath, cache);
+}
+
+export function getDimensionsOfImagePath(mediaPath, cache) {
+  // This function is really generic. It takes the gen-thumbs image cache and
+  // returns the dimensions in that cache, so that other functions don't need
+  // to hard-code the cache format.
+
+  const cacheEntry = getCacheEntryForMediaPath(mediaPath, cache);
+
+  if (!cacheEntry) {
+    throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
+  }
+
+  const [width, height] = cacheEntry.slice(1);
+  return [width, height];
+}
+
+export function getThumbnailEqualOrSmaller(preferred, mediaPath, cache) {
+  // This function is totally exclusive to page generation. It's a shorthand
+  // for accessing dimensions from the thumbnail cache, calculating all the
+  // thumbnails available, and selecting the one which is equal to or smaller
+  // than the provided size. Since the path provided might not be the actual
+  // one which is being thumbnail-ified, this just returns the name of the
+  // selected thumbnail size.
+
+  if (!getCacheEntryForMediaPath(mediaPath, cache)) {
+    throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
+  }
+
+  const {size: preferredSize} = thumbnailSpec[preferred];
+  const [width, height] = getDimensionsOfImagePath(mediaPath, cache);
+  const available = getThumbnailsAvailableForDimensions([width, height]);
+  const [selected] = available.find(([name, size]) => size <= preferredSize);
+  return selected;
+}
 
 function readFileMD5(filePath) {
   return new Promise((resolve, reject) => {
@@ -122,15 +236,26 @@ function readFileMD5(filePath) {
   });
 }
 
-async function getImageMagickVersion(spawnConvert) {
-  const proc = spawnConvert(['--version'], false);
+async function identifyImageDimensions(filePath) {
+  // See: https://github.com/image-size/image-size/issues/96
+  const buffer = await readFile(filePath);
+  const dimensions = dimensionsOf(buffer);
+  return [dimensions.width, dimensions.height];
+}
+
+async function getImageMagickVersion(binary) {
+  const proc = spawn(binary, ['--version']);
 
   let allData = '';
   proc.stdout.on('data', (data) => {
     allData += data.toString();
   });
 
-  await promisifyProcess(proc, false);
+  try {
+    await promisifyProcess(proc, false);
+  } catch (error) {
+    return null;
+  }
 
   if (!allData.match(/ImageMagick/i)) {
     return null;
@@ -144,29 +269,45 @@ async function getImageMagickVersion(spawnConvert) {
   return match[1];
 }
 
-async function getSpawnConvert() {
-  let fn, description, version;
-  if (await commandExists('convert')) {
-    fn = (args) => spawn('convert', args);
-    description = 'convert';
-  } else if (await commandExists('magick')) {
-    fn = (args, prefix = true) =>
-      spawn('magick', prefix ? ['convert', ...args] : args);
-    description = 'magick convert';
-  } else {
-    return [`no convert or magick binary`, null];
+async function getSpawnMagick(tool) {
+  if (tool !== 'identify' && tool !== 'convert') {
+    throw new Error(`Expected identify or convert`);
   }
 
-  version = await getImageMagickVersion(fn);
+  let fn = null;
+  let description = null;
+  let version = null;
 
-  if (version === null) {
-    return [`binary --version output didn't indicate it's ImageMagick`];
+  if (await commandExists(tool)) {
+    version = await getImageMagickVersion(tool);
+    if (version !== null) {
+      fn = (args) => spawn(tool, args);
+      description = tool;
+    }
+  }
+
+  if (fn === null && await commandExists('magick')) {
+    version = await getImageMagickVersion('magick');
+    if (version !== null) {
+      fn = (args) => spawn('magick', [tool, ...args]);
+      description = `magick ${tool}`;
+    }
+  }
+
+  if (fn === null) {
+    return [`no ${tool} or magick binary`, null];
   }
 
   return [`${description} (${version})`, fn];
 }
 
-function generateImageThumbnails(filePath, {spawnConvert}) {
+// Note: This returns an array of no-argument functions, suitable for passing
+// to queue().
+function generateImageThumbnails({
+  filePath,
+  dimensions,
+  spawnConvert,
+}) {
   const dirname = path.dirname(filePath);
   const extname = path.extname(filePath);
   const basename = path.basename(filePath, extname);
@@ -185,10 +326,11 @@ function generateImageThumbnails(filePath, {spawnConvert}) {
       output(name),
     ]);
 
-  return Promise.all(
-    Object.entries(thumbnailSpec)
-      .map(([ext, details]) =>
-        promisifyProcess(convert('.' + ext, details), false)));
+  return (
+    getThumbnailsAvailableForDimensions(dimensions)
+      .map(([name]) => [name, thumbnailSpec[name]])
+      .map(([name, details]) => () =>
+        promisifyProcess(convert('.' + name, details), false)));
 }
 
 export async function clearThumbs(mediaPath, {
@@ -224,7 +366,7 @@ export async function clearThumbs(mediaPath, {
         console.error(file);
       }
       fileIssue();
-      return;
+      return {success: false};
     }
 
     logInfo`Clearing out ${thumbFiles.length} thumbs.`;
@@ -249,6 +391,7 @@ export async function clearThumbs(mediaPath, {
         console.error(file);
       }
       logError`Check for permission errors?`;
+      return {success: false};
     } else {
       logInfo`Successfully deleted all ${thumbFiles.length} thumbnail files!`;
     }
@@ -277,6 +420,8 @@ export async function clearThumbs(mediaPath, {
       logWarn`Failed to remove cache file. Check its permissions?`;
     }
   }
+
+  return {success: true};
 }
 
 export default async function genThumbs(mediaPath, {
@@ -290,18 +435,21 @@ export default async function genThumbs(mediaPath, {
 
   const quietInfo = quiet ? () => null : logInfo;
 
-  const [convertInfo, spawnConvert] = (await getSpawnConvert()) ?? [];
+  const [convertInfo, spawnConvert] = await getSpawnMagick('convert');
+
   if (!spawnConvert) {
     logError`${`It looks like you don't have ImageMagick installed.`}`;
     logError`ImageMagick is required to generate thumbnails for display on the wiki.`;
-    logError`(Error message: ${convertInfo})`;
+    for (const error of [convertInfo].filter(Boolean)) {
+      logError`(Error message: ${error})`;
+    }
     logInfo`You can find info to help install ImageMagick on Linux, Windows, or macOS`;
     logInfo`from its official website: ${`https://imagemagick.org/script/download.php`}`;
     logInfo`If you have trouble working ImageMagick and would like some help, feel free`;
     logInfo`to drop a message in the HSMusic Discord server! ${'https://hsmusic.wiki/discord/'}`;
-    return false;
+    return {success: false};
   } else {
-    logInfo`Found ImageMagick binary: ${convertInfo}`;
+    logInfo`Found ImageMagick binary:  ${convertInfo}`;
   }
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
@@ -341,19 +489,16 @@ export default async function genThumbs(mediaPath, {
 
   const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
 
-  const imageToMD5Entries = await progressPromiseAll(
-    `Generating MD5s of image files`,
-    queue(
-      imagePaths.map(
-        (imagePath) => () =>
-          readFileMD5(path.join(mediaPath, imagePath)).then(
-            (md5) => [imagePath, md5],
-            (error) => [imagePath, {error}]
-          )
-      ),
-      queueSize
-    )
-  );
+  const imageToMD5Entries =
+    await progressPromiseAll(
+      `Generating MD5s of image files`,
+      queue(
+        imagePaths.map(imagePath => () =>
+          readFileMD5(path.join(mediaPath, imagePath))
+            .then(
+              md5 => [imagePath, md5],
+              error => [imagePath, {error}])),
+        queueSize));
 
   {
     let error = false;
@@ -367,23 +512,53 @@ export default async function genThumbs(mediaPath, {
       logError`Failed to read at least one image file!`;
       logError`This implies a thumbnail probably won't be generatable.`;
       logError`So, exiting early.`;
-      return false;
+      return {success: false};
     } else {
       quietInfo`All image files successfully read.`;
     }
   }
+
+  const imageToDimensionsEntries =
+    await progressPromiseAll(
+      `Identifying dimensions of image files`,
+      queue(
+        imagePaths.map(imagePath => () =>
+          identifyImageDimensions(path.join(mediaPath, imagePath))
+            .then(
+              dimensions => [imagePath, dimensions],
+              error => [imagePath, {error}])),
+        queueSize));
+
+  {
+    let error = false;
+    for (const entry of imageToDimensionsEntries) {
+      if (entry[1].error) {
+        logError`Failed to identify dimensions ${entry[0]}: ${entry[1].error}`;
+        error = true;
+      }
+    }
+    if (error) {
+      logError`Failed to identify dimensions of at least one image file!`;
+      logError`This implies a thumbnail probably won't be generatable.`;
+      logError`So, exiting early.`;
+      return {success: false};
+    } else {
+      quietInfo`All image files successfully had dimensions identified.`;
+    }
+  }
+
+  const imageToDimensions = Object.fromEntries(imageToDimensionsEntries);
 
   // Technically we could pro8a8ly mut8te the cache varia8le in-place?
   // 8ut that seems kinda iffy.
   const updatedCache = Object.assign({}, cache);
 
   const entriesToGenerate = imageToMD5Entries.filter(
-    ([filePath, md5]) => md5 !== cache[filePath]
-  );
+    ([filePath, md5]) => md5 !== cache[filePath]?.[0]);
 
   if (empty(entriesToGenerate)) {
     logInfo`All image thumbnails are already up-to-date - nice!`;
-    return true;
+    return {success: true, cache};
   }
 
   logInfo`Generating thumbnails for ${entriesToGenerate.length} media files.`;
@@ -392,31 +567,45 @@ export default async function genThumbs(mediaPath, {
   }
 
   const failed = [];
-  const succeeded = [];
+
   const writeMessageFn = () =>
     `Writing image thumbnails. [failed: ${failed.length}]`;
 
+  const generateCalls =
+    entriesToGenerate.flatMap(([filePath, md5]) =>
+      generateImageThumbnails({
+        filePath: path.join(mediaPath, filePath),
+        dimensions: imageToDimensions[filePath],
+        spawnConvert,
+      }).map(call => async () => {
+        try {
+          await call();
+        } catch (error) {
+          failed.push([filePath, error]);
+        }
+      }));
+
   await progressPromiseAll(writeMessageFn,
-    queue(
-      entriesToGenerate.map(([filePath, md5]) => () =>
-        generateImageThumbnails(path.join(mediaPath, filePath), {spawnConvert}).then(
-          () => {
-            updatedCache[filePath] = md5;
-            succeeded.push(filePath);
-          },
-          error => {
-            failed.push([filePath, error]);
-          })),
-      magickThreads));
+    queue(generateCalls, magickThreads));
+
+  // Sort by file path.
+  failed.sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+
+  const failedFilePaths = new Set(failed.map(([filePath]) => filePath));
+
+  for (const [filePath, md5] of entriesToGenerate) {
+    if (failedFilePaths.has(filePath)) continue;
+    updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
+  }
 
   if (empty(failed)) {
     logInfo`Generated all (updated) thumbnails successfully!`;
   } else {
     for (const [path, error] of failed) {
-      logError`Thumbnails failed to generate for ${path} - ${error}`;
+      logError`Thumbnail failed to generate for ${path} - ${error}`;
     }
-    logWarn`Result is incomplete - the above ${failed.length} thumbnails should be checked for errors.`;
-    logWarn`${succeeded.length} successfully generated images won't be regenerated next run, though!`;
+    logWarn`Result is incomplete - the above thumbnails should be checked for errors.`;
+    logWarn`Successfully generated images won't be regenerated next run, though!`;
   }
 
   try {
@@ -431,7 +620,7 @@ export default async function genThumbs(mediaPath, {
     logWarn`Sorry about that!`;
   }
 
-  return true;
+  return {success: true, cache: updatedCache};
 }
 
 export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
@@ -441,8 +630,8 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
     wikiData.albumData
       .flatMap(album => [
         album.hasCoverArt && fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
-        !empty(album.bannerArtistContribsByRef) && fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
-        !empty(album.wallpaperArtistContribsByRef) && fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
+        !empty(CacheableObject.getUpdateValue(album, 'bannerArtistContribs')) && fromRoot.to('media.albumBanner', album.directory, album.bannerFileExtension),
+        !empty(CacheableObject.getUpdateValue(album, 'wallpaperArtistContribs')) && fromRoot.to('media.albumWallpaper', album.directory, album.wallpaperFileExtension),
       ])
       .filter(Boolean),
 
@@ -489,22 +678,24 @@ export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
 
   if (empty(missing) && empty(misplaced)) {
     logInfo`All image paths are good - nice! None are missing or misplaced.`;
-    return;
+    return {missing, misplaced};
   }
 
   if (!empty(missing)) {
     logWarn`** Some image files are missing! (${missing.length + ' files'}) **`;
     for (const file of missing) {
-      console.warn(color.yellow(` - `) + file);
+      console.warn(colors.yellow(` - `) + file);
     }
   }
 
   if (!empty(misplaced)) {
     logWarn`** Some image files are misplaced! (${misplaced.length + ' files'}) **`;
     for (const file of misplaced) {
-      console.warn(color.yellow(` - `) + file);
+      console.warn(colors.yellow(` - `) + file);
     }
   }
+
+  return {missing, misplaced};
 }
 
 // Recursively traverses the provided (extant) media path, filtering so only

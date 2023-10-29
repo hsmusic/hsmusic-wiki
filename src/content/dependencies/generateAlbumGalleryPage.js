@@ -3,8 +3,10 @@ import {compareArrays, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateAlbumGalleryCoverArtistsLine',
+    'generateAlbumGalleryNoTrackArtworksLine',
     'generateAlbumGalleryStatsLine',
     'generateAlbumNavAccent',
+    'generateAlbumSecondaryNav',
     'generateAlbumStyleRules',
     'generateCoverGrid',
     'generatePageLayout',
@@ -51,7 +53,7 @@ export default {
       relation('generatePageLayout');
 
     relations.albumStyleRules =
-      relation('generateAlbumStyleRules', album);
+      relation('generateAlbumStyleRules', album, null);
 
     relations.albumLink =
       relation('linkAlbum', album);
@@ -59,8 +61,16 @@ export default {
     relations.albumNavAccent =
       relation('generateAlbumNavAccent', album, null);
 
+    relations.secondaryNav =
+      relation('generateAlbumSecondaryNav', album);
+
     relations.statsLine =
       relation('generateAlbumGalleryStatsLine', album);
+
+    if (album.tracks.every(track => !track.hasUniqueCoverArt)) {
+      relations.noTrackArtworksLine =
+        relation('generateAlbumGalleryNoTrackArtworksLine');
+    }
 
     if (query.coverArtistsForAllTracks) {
       relations.coverArtistsLine =
@@ -70,15 +80,25 @@ export default {
     relations.coverGrid =
       relation('generateCoverGrid');
 
-    relations.links =
-      album.tracks.map(track =>
-        relation('linkTrack', track));
+    relations.links = [
+      relation('linkAlbum', album),
 
-    relations.images =
-      album.tracks.map(track =>
-        (track.hasUniqueCoverArt
-          ? relation('image', track.artTags)
-          : relation('image')));
+      ...
+        album.tracks
+          .map(track => relation('linkTrack', track)),
+    ];
+
+    relations.images = [
+      (album.hasCoverArt
+        ? relation('image', album.artTags)
+        : relation('image')),
+
+      ...
+        album.tracks.map(track =>
+          (track.hasUniqueCoverArt
+            ? relation('image', track.artTags)
+            : relation('image'))),
+    ];
 
     return relations;
   },
@@ -89,27 +109,41 @@ export default {
     data.name = album.name;
     data.color = album.color;
 
-    data.names =
-      album.tracks.map(track => track.name);
+    data.names = [
+      album.name,
+      ...album.tracks.map(track => track.name),
+    ];
 
-    data.coverArtists =
-      album.tracks.map(track => {
-        if (query.coverArtistsForAllTracks) {
+    data.coverArtists = [
+      (album.hasCoverArt
+        ? album.coverArtistContribs.map(({who: artist}) => artist.name)
+        : null),
+
+      ...
+        album.tracks.map(track => {
+          if (query.coverArtistsForAllTracks) {
+            return null;
+          }
+
+          if (track.hasUniqueCoverArt) {
+            return track.coverArtistContribs.map(({who: artist}) => artist.name);
+          }
+
           return null;
-        }
+        }),
+    ];
 
-        if (track.hasUniqueCoverArt) {
-          return track.coverArtistContribs.map(({who: artist}) => artist.name);
-        }
+    data.paths = [
+      (album.hasCoverArt
+        ? ['media.albumCover', album.directory, album.coverArtFileExtension]
+        : null),
 
-        return null;
-      });
-
-    data.paths =
-      album.tracks.map(track =>
-        (track.hasUniqueCoverArt
-          ? ['media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension]
-          : null));
+      ...
+        album.tracks.map(track =>
+          (track.hasUniqueCoverArt
+            ? ['media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension]
+            : null)),
+    ];
 
     return data;
   },
@@ -131,6 +165,7 @@ export default {
         mainContent: [
           relations.statsLine,
           relations.coverArtistsLine,
+          relations.noTrackArtworksLine,
 
           relations.coverGrid
             .slots({
@@ -172,6 +207,8 @@ export default {
               }),
           },
         ],
+
+        secondaryNav: relations.secondaryNav,
       });
   },
 };

@@ -1,16 +1,21 @@
+import {isName} from '#validators';
+
+import {
+  directory,
+  name,
+  simpleString,
+} from '#composite/wiki-properties';
+
 import Thing from './thing.js';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
+  static [Thing.friendlyName] = `Static Page`;
 
-  static [Thing.getPropertyDescriptors] = ({
-    validators: {
-      isName,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = () => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Static Page'),
+    name: name('Unnamed Static Page'),
 
     nameShort: {
       flags: {update: true, expose: true},
@@ -22,8 +27,8 @@ export class StaticPage extends Thing {
       },
     },
 
-    directory: Thing.common.directory(),
-    content: Thing.common.simpleString(),
-    stylesheet: Thing.common.simpleString(),
+    directory: directory(),
+    content: simpleString(),
+    stylesheet: simpleString(),
   });
 }

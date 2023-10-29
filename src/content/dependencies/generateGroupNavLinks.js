@@ -2,10 +2,8 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generatePreviousNextLinks',
     'linkGroup',
     'linkGroupGallery',
-    'linkGroupExtra',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -27,24 +25,6 @@ export default {
 
     relations.mainLink =
       relation('linkGroup', group);
-
-    relations.previousNextLinks =
-      relation('generatePreviousNextLinks');
-
-    const groups = sprawl.groupCategoryData
-      .flatMap(category => category.groups);
-
-    const index = groups.indexOf(group);
-
-    if (index > 0) {
-      relations.previousLink =
-        relation('linkGroupExtra', groups[index - 1]);
-    }
-
-    if (index < groups.length - 1) {
-      relations.nextLink =
-        relation('linkGroupExtra', groups[index + 1]);
-    }
 
     relations.infoLink =
       relation('linkGroup', group);
@@ -80,26 +60,6 @@ export default {
       ];
     }
 
-    const previousNextLinks =
-      (relations.previousLink || relations.nextLink) &&
-        relations.previousNextLinks.slots({
-          previousLink:
-            relations.previousLink
-              ?.slot('extra', slots.currentExtra)
-              ?.content
-            ?? null,
-          nextLink:
-            relations.nextLink
-              ?.slot('extra', slots.currentExtra)
-              ?.content
-            ?? null,
-        });
-
-    const previousNextPart =
-      previousNextLinks &&
-        language.formatUnitList(
-          previousNextLinks.content.filter(Boolean));
-
     const infoLink =
       relations.infoLink.slots({
         attributes: {class: slots.currentExtra === null && 'current'},
@@ -119,7 +79,9 @@ export default {
         : language.formatUnitList([infoLink, ...extraLinks]));
 
     const accent =
-      `(${[extrasPart, previousNextPart].filter(Boolean).join('; ')})`;
+      (extrasPart
+        ? `(${extrasPart})`
+        : null);
 
     return [
       {auto: 'home'},

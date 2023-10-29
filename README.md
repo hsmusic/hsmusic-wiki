@@ -19,7 +19,7 @@ $ git clone https://github.com/hsmusic/hsmusic-wiki code
 Cloning into 'code'...
 $ git clone https://github.com/hsmusic/hsmusic-data data
 Cloning into 'data'...
-$ git clone https://nebula.ed1.club/git/hsmusic-media media
+$ git clone https://github.com/hsmusic/hsmusic-media media
 Cloning into 'media'...
 ```
 
@@ -106,7 +106,7 @@ HSMusic works using a number of repositories in tandem:
   - This repo covers albums, tracks, artists, groups, and a variety of other things which make up the content of a music wiki.
   - The data repo also contains all the metadata which makes one wiki unique from another: layout info, static pages (like "About & Credits"), whether or not certain site features are enabled (like "Flashes & Games" or UI for browsing groups), and so on.
   - All data is written and accessed in the YAML format, and every file follows a specific structure described within this (code) repository. See below and the `src/data` directory for details.
-- [`hsmusic-media`][ed1-media]: The media repository, holding all album, track, and layout media used across the site in one place. Media and organization directly corresponds to entries in the data repository; generally the data and media repositories go together and are swapped out for another together.
+- [`hsmusic-media`][github-media]: The media repository, holding all album, track, and layout media used across the site in one place. Media and organization directly corresponds to entries in the data repository; generally the data and media repositories go together and are swapped out for another together.
 - *Language repo:* The language repository, holding up-to-date strings and other localization info for HSMusic. NB: This repo isn't currently online as its structure and tooling haven't been polished or properly put together yet, but it's not required for building the site.
   - Strings and language info are stored in top-level JSON files within this repository. They're based off the `src/strings-default.json` file within the code repo (and don't need to provide translations for all strings to be used for site building).
 
@@ -139,16 +139,18 @@ The source code for HSMusic is divided across a number of source files, loosely 
 
 - `src/`
   - `data/`
-    - `cacheable-object.js`: Backbone of how data objects (colloquially "things") store, share, and compute their properties
-    - `things.js`: Descriptors for all "thing" classes used across the wiki: albums, tracks, artists, groups, etc
-    - `validators.js`: Convenient error-throwing utilities which help ensure properties set on things follow the right format
-    - `yaml.js`: Mappings from YAML documents (the format used in `hsmusic-data`) to things (actual data objects), and a full set of utilities used to actually load that data from scratch
-  - `page/`
-    - All page templates (HTML content and layout metadata) are kept in source files under this directory
-  - `static/`
-    - Purely client-side files are kept here, e.g. site CSS, icon SVGs, and client-side JS
-  - `util/`
-    - Common utilities which generally may be accessed from both Node.js or the client (web browser)
+    - `things/`: Descriptors for individual types of data objects used across the wiki, notably including:
+      - `cacheable-object.js`: Backbone of how data objects (colloquially "things") store, share, and compute their properties
+      - `thing.js`: Common superclass for most data objects, with a bunch of utilities and common behavior
+      - `validators.js`: Convenient error-throwing utilities which help ensure properties set on data objects follow the right format
+    - `yaml.js`: Mappings from YAML documents (the format used in `hsmusic-data`) to things (actual data objects), and a full suite of utilities used to actually load that data from scratch
+  - `content/`: Functions which generate HTML content; these go from bite-sized, commonly reused utilities (like `linkTemplate`) all the way up to entire page definitions (like `generateArtistInfoPage`)
+  - `page/`: Definitions for page paths, mapping data objects to paths served over an HTTP server (or written to an output folder) and to the functions which actually generate those pages' content
+  - `write/`: Common utilities and output methods for controlling what hsmusic does to turn data and media into something you actually visit; these each define a variety of command-line arguments and are basically the interchangeable  "second half" of upd8.js
+    - `live-dev-server.js`: Gets the site available for viewing as quickly as possible, generating and serving pages as they are requested from a local HTTP server; reacts live to code changes in the `content` directory
+    - `static-build.js`: Builds the entire site at once, writing all the output to one self-contained folder which can be uploaded to a static file server
+  - `static/`: Purely client-side files are kept here, e.g. site CSS, icon SVGs, and client-side JS
+  - `util/`: Common utilities which generally may be accessed from both Node.js or the client (web browser)
   - `upd8.js`: Main entry point which controls and directs site generation from start to finish
   - `gen-thumbs.js`: Standalone utility also called every time HSMusic is run (unless `--skip-thumbs` is provided) which keeps a persistent cache of media MD5s and (re)generates thumbnails for new or updated image files
   - `repl.js`: Standalone utility for loading all wiki data and providing a convenient REPL to run filters and transformations on data objects right from the Node.js command line
@@ -165,16 +167,16 @@ hsmusic is a relatively generic music wiki software, so you're more than encoura
 
 As mentioned, part of the focus of the hsmusic.wiki release, as well as most development since, has been to create a more modular and developer-friendly repository. So, on the curious chance anyone would like to contribute code to the repo, that's more possible now than it used to be!
 
-Still, for larger additions, we encourage you to [drop the main dev an email][feedback] or, better yet, [pop by the Discord][discord] before writing all the implementation code: besides code tips which might make your life a bit easier (questions are welcome), we also love to discuss feature designs and values while they're still being brainstormed! That way, nobody has to tell you there are fundamental ideas or implementation details that should be rebuilt from the ground up - the last thing we want is anyone putting hours into code that has to be replaced by another implementation before it ever ends up part of the wiki!
+Still, for larger additions, we encourage you to [drop the main devs an email][feedback] or, better yet, [pop by the Discord][discord] before writing all the implementation code: besides code tips which might make your life a bit easier (questions are welcome), we also love to discuss feature designs and values while they're still being brainstormed! That way, nobody has to tell you there are fundamental ideas or implementation details that should be rebuilt from the ground up - the last thing we want is anyone putting hours into code that has to be replaced by another implementation before it ever ends up part of the wiki!
 
 As ever, feedback is always welcome, and may be shared via the usual links. Thank you for checking the repository out!
 
-  [ed1-media]: https://nebula.ed1.club/git/hsmusic-media/
   [discord]: https://hsmusic.wiki/discord/
   [fandom]: https://homestuck-and-mspa-music.fandom.com/wiki/Homestuck_and_MSPA_Music_Wiki
   [feedback]: https://hsmusic.wiki/feedback/
   [github]: https://github.com/hsmusic/hsmusic-wiki
   [github-code]: https://github.com/hsmusic/hsmusic-wiki
   [github-data]: https://github.com/hsmusic/hsmusic-data
+  [github-media]: https://github.com/hsmusic/hsmusic-media
   [hsmusic]: https://hsmusic.wiki
   [nsnd]: https://homestuck.net/music/references.html

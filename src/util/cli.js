@@ -17,7 +17,7 @@ export const ENABLE_COLOR =
 const C = (n) =>
   ENABLE_COLOR ? (text) => `\x1b[${n}m${text}\x1b[0m` : (text) => text;
 
-export const color = {
+export const colors = {
   bright: C('1'),
   dim: C('2'),
   normal: C('22'),
@@ -334,7 +334,9 @@ export function progressCallAll(msgOrMsgFn, array) {
 export function fileIssue({
   topMessage = `This shouldn't happen.`,
 } = {}) {
-  console.error(color.red(`${topMessage} Please let the HSMusic developers know:`));
-  console.error(color.red(`- https://hsmusic.wiki/feedback/`));
-  console.error(color.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
+  if (topMessage) {
+    console.error(colors.red(`${topMessage} Please let the HSMusic developers know:`));
+  }
+  console.error(colors.red(`- https://hsmusic.wiki/feedback/`));
+  console.error(colors.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
 }

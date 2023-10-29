@@ -5,9 +5,8 @@
 // function, which converts nodes parsed here into actual HTML, links, etc
 // for embedding in a wiki webpage.
 
-import {logError, logWarn} from '#cli';
 import * as html from '#html';
-import {escapeRegex} from '#sugar';
+import {escapeRegex, typeAppearance} from '#sugar';
 
 // Syntax literals.
 const tagBeginning = '[[';
@@ -408,7 +407,7 @@ export function postprocessHeadings(inputNodes) {
 
 export function parseInput(input) {
   if (typeof input !== 'string') {
-    throw new TypeError(`Expected input to be string, got ${input}`);
+    throw new TypeError(`Expected input to be string, got ${typeAppearance(input)}`);
   }
 
   try {

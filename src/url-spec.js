@@ -37,6 +37,8 @@ const urlSpec = {
       flashIndex: 'flash/',
       flash: 'flash/<>/',
 
+      flashActGallery: 'flash-act/<>/',
+
       groupInfo: 'group/<>/',
       groupGallery: 'group/<>/gallery/',
 

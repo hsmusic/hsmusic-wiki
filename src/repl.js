@@ -11,7 +11,7 @@ import {generateURLs, urlSpec} from '#urls';
 import {quickLoadAllFromYAML} from '#yaml';
 
 import _find, {bindFind} from '#find';
-import thingConstructors from '#things';
+import thingConstructors, {CacheableObject} from '#things';
 import * as serialize from '#serialize';
 import * as sugar from '#sugar';
 import * as wikiDataUtils from '#wiki-data';
@@ -63,6 +63,7 @@ export async function getContextAssignments({
     WD: wikiData,
 
     ...thingConstructors,
+    CacheableObject,
     language,
 
     ...sugar,

@@ -1,460 +1,330 @@
 import {inspect} from 'node:util';
 
-import {color} from '#cli';
+import {colors} from '#cli';
+import {input} from '#composite';
 import find from '#find';
-import {empty} from '#sugar';
 
+import {
+  isColor,
+  isContributionList,
+  isDate,
+  isFileExtension,
+} from '#validators';
+
+import {withPropertyFromObject} from '#composite/data';
+import {withResolvedContribs} from '#composite/wiki-data';
+
+import {
+  exitWithoutDependency,
+  exposeConstant,
+  exposeDependency,
+  exposeDependencyOrContinue,
+  exposeUpdateValueOrContinue,
+} from '#composite/control-flow';
+
+import {
+  additionalFiles,
+  commentary,
+  commentatorArtists,
+  contributionList,
+  directory,
+  duration,
+  flag,
+  name,
+  referenceList,
+  reverseReferenceList,
+  simpleDate,
+  singleReference,
+  simpleString,
+  urls,
+  wikiData,
+} from '#composite/wiki-properties';
+
+import {
+  exitWithoutUniqueCoverArt,
+  inheritFromOriginalRelease,
+  trackReverseReferenceList,
+  withAlbum,
+  withAlwaysReferenceByDirectory,
+  withContainingTrackSection,
+  withHasUniqueCoverArt,
+  withOtherReleases,
+  withPropertyFromAlbum,
+} from '#composite/things/track';
+
+import CacheableObject from './cacheable-object.js';
 import Thing from './thing.js';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    ArtTag,
-    Artist,
-    Flash,
-
-    validators: {
-      isBoolean,
-      isColor,
-      isDate,
-      isDuration,
-      isFileExtension,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Track'),
-    directory: Thing.common.directory(),
+    name: name('Unnamed Track'),
+    directory: directory(),
 
-    duration: {
-      flags: {update: true, expose: true},
-      update: {validate: isDuration},
-    },
+    duration: duration(),
+    urls: urls(),
+    dateFirstReleased: simpleDate(),
 
-    urls: Thing.common.urls(),
-    dateFirstReleased: Thing.common.simpleDate(),
+    color: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isColor),
+      }),
 
-    artistContribsByRef: Thing.common.contribsByRef(),
-    contributorContribsByRef: Thing.common.contribsByRef(),
-    coverArtistContribsByRef: Thing.common.contribsByRef(),
+      withContainingTrackSection(),
 
-    referencedTracksByRef: Thing.common.referenceList(Track),
-    sampledTracksByRef: Thing.common.referenceList(Track),
-    artTagsByRef: Thing.common.referenceList(ArtTag),
+      withPropertyFromObject({
+        object: '#trackSection',
+        property: input.value('color'),
+      }),
 
-    hasCoverArt: {
-      flags: {update: true, expose: true},
+      exposeDependencyOrContinue({dependency: '#trackSection.color'}),
 
-      update: {
-        validate(value) {
-          if (value !== false) {
-            throw new TypeError(`Expected false or null`);
-          }
+      withPropertyFromAlbum({
+        property: input.value('color'),
+      }),
 
-          return true;
-        },
-      },
+      exposeDependency({dependency: '#album.color'}),
+    ],
 
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef'],
-        transform: (hasCoverArt, {
-          albumData,
-          coverArtistContribsByRef,
-          [Track.instance]: track,
-        }) =>
-          Track.hasCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          ),
-      },
-    },
+    alwaysReferenceByDirectory: [
+      withAlwaysReferenceByDirectory(),
+      exposeDependency({dependency: '#alwaysReferenceByDirectory'}),
+    ],
 
-    coverArtFileExtension: {
-      flags: {update: true, expose: true},
+    // Disables presenting the track as though it has its own unique artwork.
+    // This flag should only be used in select circumstances, i.e. to override
+    // an album's trackCoverArtists. This flag supercedes that property, as well
+    // as the track's own coverArtists.
+    disableUniqueCoverArt: flag(),
 
-      update: {validate: isFileExtension},
+    // File extension for track's corresponding media file. This represents the
+    // track's unique cover artwork, if any, and does not inherit the extension
+    // of the album's main artwork. It does inherit trackCoverArtFileExtension,
+    // if present on the album.
+    coverArtFileExtension: [
+      exitWithoutUniqueCoverArt(),
 
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef'],
-        transform: (coverArtFileExtension, {
-          albumData,
-          coverArtistContribsByRef,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          coverArtFileExtension ??
-          (Track.hasCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          )
-            ? Track.findAlbum(track, albumData)?.trackCoverArtFileExtension
-            : Track.findAlbum(track, albumData)?.coverArtFileExtension) ??
-          'jpg',
-      },
-    },
+      exposeUpdateValueOrContinue({
+        validate: input.value(isFileExtension),
+      }),
 
-    originalReleaseTrackByRef: Thing.common.singleReference(Track),
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtFileExtension'),
+      }),
 
-    dataSourceAlbumByRef: Thing.common.singleReference(Album),
+      exposeDependencyOrContinue({dependency: '#album.trackCoverArtFileExtension'}),
 
-    commentary: Thing.common.commentary(),
-    lyrics: Thing.common.simpleString(),
-    additionalFiles: Thing.common.additionalFiles(),
-    sheetMusicFiles: Thing.common.additionalFiles(),
-    midiProjectFiles: Thing.common.additionalFiles(),
+      exposeConstant({
+        value: input.value('jpg'),
+      }),
+    ],
 
-    // Update only
+    // Date of cover art release. Like coverArtFileExtension, this represents
+    // only the track's own unique cover artwork, if any. This exposes only as
+    // the track's own coverArtDate or its album's trackArtDate, so if neither
+    // is specified, this value is null.
+    coverArtDate: [
+      withHasUniqueCoverArt(),
 
-    albumData: Thing.common.wikiData(Album),
-    artistData: Thing.common.wikiData(Artist),
-    artTagData: Thing.common.wikiData(ArtTag),
-    flashData: Thing.common.wikiData(Flash),
-    trackData: Thing.common.wikiData(Track),
+      exitWithoutDependency({
+        dependency: '#hasUniqueCoverArt',
+        mode: input.value('falsy'),
+      }),
 
-    // Expose only
+      exposeUpdateValueOrContinue({
+        validate: input.value(isDate),
+      }),
 
-    commentatorArtists: Thing.common.commentatorArtists(),
+      withPropertyFromAlbum({
+        property: input.value('trackArtDate'),
+      }),
 
-    album: {
-      flags: {expose: true},
+      exposeDependency({dependency: '#album.trackArtDate'}),
+    ],
 
-      expose: {
-        dependencies: ['albumData'],
-        compute: ({[Track.instance]: track, albumData}) =>
-          albumData?.find((album) => album.tracks.includes(track)) ?? null,
-      },
-    },
+    commentary: commentary(),
+    lyrics: simpleString(),
 
-    // Note - this is an internal property used only to help identify a track.
-    // It should not be assumed in general that the album and dataSourceAlbum match
-    // (i.e. a track may dynamically be moved from one album to another, at
-    // which point dataSourceAlbum refers to where it was originally from, and is
-    // not generally relevant information). It's also not guaranteed that
-    // dataSourceAlbum is available (depending on the Track creator to optionally
-    // provide dataSourceAlbumByRef).
-    dataSourceAlbum: Thing.common.dynamicThingFromSingleReference(
-      'dataSourceAlbumByRef',
-      'albumData',
-      find.album
-    ),
+    additionalFiles: additionalFiles(),
+    sheetMusicFiles: additionalFiles(),
+    midiProjectFiles: additionalFiles(),
 
-    date: {
-      flags: {expose: true},
+    originalReleaseTrack: singleReference({
+      class: input.value(Track),
+      find: input.value(find.track),
+      data: 'trackData',
+    }),
 
-      expose: {
-        dependencies: ['albumData', 'dateFirstReleased'],
-        compute: ({albumData, dateFirstReleased, [Track.instance]: track}) =>
-          dateFirstReleased ?? Track.findAlbum(track, albumData)?.date ?? null,
-      },
-    },
+    // Internal use only - for directly identifying an album inside a track's
+    // util.inspect display, if it isn't indirectly available (by way of being
+    // included in an album's track list).
+    dataSourceAlbum: singleReference({
+      class: input.value(Album),
+      find: input.value(find.album),
+      data: 'albumData',
+    }),
 
-    color: {
-      flags: {update: true, expose: true},
+    artistContribs: [
+      inheritFromOriginalRelease({
+        property: input.value('artistContribs'),
+      }),
 
-      update: {validate: isColor},
+      withResolvedContribs({
+        from: input.updateValue({validate: isContributionList}),
+      }).outputs({
+        '#resolvedContribs': '#artistContribs',
+      }),
 
-      expose: {
-        dependencies: ['albumData'],
+      exposeDependencyOrContinue({
+        dependency: '#artistContribs',
+        mode: input.value('empty'),
+      }),
 
-        transform: (color, {albumData, [Track.instance]: track}) =>
-          color ??
-            Track.findAlbum(track, albumData)
-              ?.trackSections.find(({tracks}) => tracks.includes(track))
-                ?.color ?? null,
-      },
-    },
+      withPropertyFromAlbum({
+        property: input.value('artistContribs'),
+      }),
 
-    coverArtDate: {
-      flags: {update: true, expose: true},
+      exposeDependency({dependency: '#album.artistContribs'}),
+    ],
 
-      update: {validate: isDate},
+    contributorContribs: [
+      inheritFromOriginalRelease({
+        property: input.value('contributorContribs'),
+      }),
 
-      expose: {
-        dependencies: [
-          'albumData',
-          'coverArtistContribsByRef',
-          'dateFirstReleased',
-          'hasCoverArt',
-        ],
-        transform: (coverArtDate, {
-          albumData,
-          coverArtistContribsByRef,
-          dateFirstReleased,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          (Track.hasCoverArt(track, albumData, coverArtistContribsByRef, hasCoverArt)
-            ? coverArtDate ??
-              dateFirstReleased ??
-              Track.findAlbum(track, albumData)?.trackArtDate ??
-              Track.findAlbum(track, albumData)?.date ??
-              null
-            : null),
-      },
-    },
-
-    hasUniqueCoverArt: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['albumData', 'coverArtistContribsByRef', 'hasCoverArt'],
-        compute: ({
-          albumData,
-          coverArtistContribsByRef,
-          hasCoverArt,
-          [Track.instance]: track,
-        }) =>
-          Track.hasUniqueCoverArt(
-            track,
-            albumData,
-            coverArtistContribsByRef,
-            hasCoverArt
-          ),
-      },
-    },
-
-    originalReleaseTrack: Thing.common.dynamicThingFromSingleReference(
-      'originalReleaseTrackByRef',
-      'trackData',
-      find.track
-    ),
-
-    otherReleases: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['originalReleaseTrackByRef', 'trackData'],
-
-        compute: ({
-          originalReleaseTrackByRef: t1origRef,
-          trackData,
-          [Track.instance]: t1,
-        }) => {
-          if (!trackData) {
-            return [];
-          }
-
-          const t1orig = find.track(t1origRef, trackData);
-
-          return [
-            t1orig,
-            ...trackData.filter((t2) => {
-              const {originalReleaseTrack: t2orig} = t2;
-              return t2 !== t1 && t2orig && (t2orig === t1orig || t2orig === t1);
-            }),
-          ].filter(Boolean);
-        },
-      },
-    },
-
-    artistContribs:
-      Track.inheritFromOriginalRelease('artistContribs', [],
-        Thing.common.dynamicInheritContribs(
-          null,
-          'artistContribsByRef',
-          'artistContribsByRef',
-          'albumData',
-          Track.findAlbum)),
-
-    contributorContribs:
-      Track.inheritFromOriginalRelease('contributorContribs', [],
-        Thing.common.dynamicContribs('contributorContribsByRef')),
+      contributionList(),
+    ],
 
     // Cover artists aren't inherited from the original release, since it
     // typically varies by release and isn't defined by the musical qualities
     // of the track.
-    coverArtistContribs:
-      Thing.common.dynamicInheritContribs(
-        'hasCoverArt',
-        'coverArtistContribsByRef',
-        'trackCoverArtistContribsByRef',
-        'albumData',
-        Track.findAlbum),
+    coverArtistContribs: [
+      exitWithoutUniqueCoverArt({
+        value: input.value([]),
+      }),
 
-    referencedTracks:
-      Track.inheritFromOriginalRelease('referencedTracks', [],
-        Thing.common.dynamicThingsFromReferenceList(
-          'referencedTracksByRef',
-          'trackData',
-          find.track)),
+      withResolvedContribs({
+        from: input.updateValue({validate: isContributionList}),
+      }).outputs({
+        '#resolvedContribs': '#coverArtistContribs',
+      }),
 
-    sampledTracks:
-      Track.inheritFromOriginalRelease('sampledTracks', [],
-        Thing.common.dynamicThingsFromReferenceList(
-          'sampledTracksByRef',
-          'trackData',
-          find.track)),
+      exposeDependencyOrContinue({
+        dependency: '#coverArtistContribs',
+        mode: input.value('empty'),
+      }),
 
-    // Specifically exclude re-releases from this list - while it's useful to
-    // get from a re-release to the tracks it references, re-releases aren't
-    // generally relevant from the perspective of the tracks being referenced.
-    // Filtering them from data here hides them from the corresponding field
-    // on the site (obviously), and has the bonus of not counting them when
-    // counting the number of times a track has been referenced, for use in
-    // the "Tracks - by Times Referenced" listing page (or other data
-    // processing).
-    referencedByTracks: {
-      flags: {expose: true},
+      withPropertyFromAlbum({
+        property: input.value('trackCoverArtistContribs'),
+      }),
 
-      expose: {
-        dependencies: ['trackData'],
+      exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
+    ],
 
-        compute: ({trackData, [Track.instance]: track}) =>
-          trackData
-            ? trackData
-                .filter((t) => !t.originalReleaseTrack)
-                .filter((t) => t.referencedTracks?.includes(track))
-            : [],
-      },
-    },
+    referencedTracks: [
+      inheritFromOriginalRelease({
+        property: input.value('referencedTracks'),
+      }),
 
-    // For the same reasoning, exclude re-releases from sampled tracks too.
-    sampledByTracks: {
-      flags: {expose: true},
+      referenceList({
+        class: input.value(Track),
+        find: input.value(find.track),
+        data: 'trackData',
+      }),
+    ],
 
-      expose: {
-        dependencies: ['trackData'],
+    sampledTracks: [
+      inheritFromOriginalRelease({
+        property: input.value('sampledTracks'),
+      }),
 
-        compute: ({trackData, [Track.instance]: track}) =>
-          trackData
-            ? trackData
-                .filter((t) => !t.originalReleaseTrack)
-                .filter((t) => t.sampledTracks?.includes(track))
-            : [],
-      },
-    },
+      referenceList({
+        class: input.value(Track),
+        find: input.value(find.track),
+        data: 'trackData',
+      }),
+    ],
 
-    featuredInFlashes: Thing.common.reverseReferenceList(
-      'flashData',
-      'featuredTracks'
-    ),
+    artTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
 
-    artTags: Thing.common.dynamicThingsFromReferenceList(
-      'artTagsByRef',
-      'artTagData',
-      find.artTag
-    ),
+    // Update only
+
+    albumData: wikiData(Album),
+    artistData: wikiData(Artist),
+    artTagData: wikiData(ArtTag),
+    flashData: wikiData(Flash),
+    trackData: wikiData(Track),
+
+    // Expose only
+
+    commentatorArtists: commentatorArtists(),
+
+    album: [
+      withAlbum(),
+      exposeDependency({dependency: '#album'}),
+    ],
+
+    date: [
+      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
+
+      withPropertyFromAlbum({
+        property: input.value('date'),
+      }),
+
+      exposeDependency({dependency: '#album.date'}),
+    ],
+
+    hasUniqueCoverArt: [
+      withHasUniqueCoverArt(),
+      exposeDependency({dependency: '#hasUniqueCoverArt'}),
+    ],
+
+    otherReleases: [
+      withOtherReleases(),
+      exposeDependency({dependency: '#otherReleases'}),
+    ],
+
+    referencedByTracks: trackReverseReferenceList({
+      list: input.value('referencedTracks'),
+    }),
+
+    sampledByTracks: trackReverseReferenceList({
+      list: input.value('sampledTracks'),
+    }),
+
+    featuredInFlashes: reverseReferenceList({
+      data: 'flashData',
+      list: input.value('featuredTracks'),
+    }),
   });
 
-  // This is a quick utility function for now, since the same code is reused in
-  // several places. Ideally it wouldn't be - we'd just reuse the `album`
-  // property - but support for that hasn't been coded yet :P
-  static findAlbum = (track, albumData) =>
-    albumData?.find((album) => album.tracks.includes(track));
+  [inspect.custom](depth) {
+    const parts = [];
 
-  // Another reused utility function. This one's logic is a bit more complicated.
-  static hasCoverArt(
-    track,
-    albumData,
-    coverArtistContribsByRef,
-    hasCoverArt
-  ) {
-    if (!empty(coverArtistContribsByRef)) {
-      return true;
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (CacheableObject.getUpdateValue(this, 'originalReleaseTrack')) {
+      parts.unshift(`${colors.yellow('[rerelease]')} `);
     }
 
-    const album = Track.findAlbum(track, albumData);
-    if (album && !empty(album.trackCoverArtistContribsByRef)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  static hasUniqueCoverArt(
-    track,
-    albumData,
-    coverArtistContribsByRef,
-    hasCoverArt
-  ) {
-    if (!empty(coverArtistContribsByRef)) {
-      return true;
-    }
-
-    if (hasCoverArt === false) {
-      return false;
-    }
-
-    const album = Track.findAlbum(track, albumData);
-    if (album && !empty(album.trackCoverArtistContribsByRef)) {
-      return true;
-    }
-
-    return false;
-  }
-
-  static inheritFromOriginalRelease(
-    originalProperty,
-    originalMissingValue,
-    ownPropertyDescriptor
-  ) {
-    return {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: [
-          ...ownPropertyDescriptor.expose.dependencies,
-          'originalReleaseTrackByRef',
-          'trackData',
-        ],
-
-        compute(dependencies) {
-          const {
-            originalReleaseTrackByRef,
-            trackData,
-          } = dependencies;
-
-          if (originalReleaseTrackByRef) {
-            if (!trackData) return originalMissingValue;
-            const original = find.track(originalReleaseTrackByRef, trackData, {mode: 'quiet'});
-            if (!original) return originalMissingValue;
-            return original[originalProperty];
-          }
-
-          return ownPropertyDescriptor.expose.compute(dependencies);
-        },
-      },
-    };
-  }
-
-  [inspect.custom]() {
-    const base = Thing.prototype[inspect.custom].apply(this);
-
-    const rereleasePart =
-      (this.originalReleaseTrackByRef
-        ? `${color.yellow('[rerelease]')} `
-        : ``);
-
-    const {album, dataSourceAlbum} = this;
-
-    const albumName =
-      (album
-        ? album.name
-        : dataSourceAlbum?.name);
-
-    const albumIndex =
-      albumName &&
-        (album
-          ? album.tracks.indexOf(this)
-          : dataSourceAlbum.tracks.indexOf(this));
-
-    const trackNum =
-      albumName &&
+    let album;
+    if (depth >= 0 && (album = this.album ?? this.dataSourceAlbum)) {
+      const albumName = album.name;
+      const albumIndex = album.tracks.indexOf(this);
+      const trackNum =
         (albumIndex === -1
           ? '#?'
           : `#${albumIndex + 1}`);
+      parts.push(` (${colors.yellow(trackNum)} in ${colors.green(albumName)})`);
+    }
 
-    const albumPart =
-      albumName
-        ? ` (${color.yellow(trackNum)} in ${color.green(albumName)})`
-        : ``;
-
-    return rereleasePart + base + albumPart;
+    return parts.join('');
   }
 }

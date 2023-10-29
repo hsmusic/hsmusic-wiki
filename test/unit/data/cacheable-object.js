@@ -195,13 +195,10 @@ t.test(`CacheableObject validate on update`, t => {
   obj.directory = 'megalovania';
   t.equal(obj.directory, 'megalovania');
 
-  try {
-    obj.directory = 25;
-  } catch (err) {
-    thrownError = err;
-  }
+  t.throws(
+    () => { obj.directory = 25; },
+    {cause: mockError});
 
-  t.equal(thrownError, mockError);
   t.equal(obj.directory, 'megalovania');
 
   const date = new Date(`25 December 2009`);
@@ -209,13 +206,10 @@ t.test(`CacheableObject validate on update`, t => {
   obj.date = date;
   t.equal(obj.date, date);
 
-  try {
-    obj.date = `TWELFTH PERIGEE'S EVE`;
-  } catch (err) {
-    thrownError = err;
-  }
+  t.throws(
+    () => { obj.date = `TWELFTH PERIGEE'S EVE`; },
+    {cause: TypeError});
 
-  t.equal(thrownError?.constructor, TypeError);
   t.equal(obj.date, date);
 });
 
@@ -244,8 +238,8 @@ t.test(`CacheableObject default property throws if invalid`, t => {
 
   let thrownError;
 
-  try {
-    newCacheableObject({
+  t.throws(
+    () => newCacheableObject({
       string: {
         flags: {
           update: true
@@ -261,10 +255,6 @@ t.test(`CacheableObject default property throws if invalid`, t => {
           }
         }
       }
-    });
-  } catch (err) {
-    thrownError = err;
-  }
-
-  t.equal(thrownError, mockError);
+    }),
+    {cause: mockError});
 });

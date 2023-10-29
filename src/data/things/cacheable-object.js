@@ -76,28 +76,24 @@
 
 import {inspect as nodeInspect} from 'node:util';
 
-import {color, ENABLE_COLOR} from '#cli';
+import {colors, ENABLE_COLOR} from '#cli';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
 }
 
 export default class CacheableObject {
-  static instance = Symbol('CacheableObject `this` instance');
-
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
 
-  /*
-    // Note the constructor doesn't take an initial data source. Due to a quirk
-    // of JavaScript, private members can't be accessed before the superclass's
-    // constructor is finished processing - so if we call the overridden
-    // update() function from inside this constructor, it will error when
-    // writing to private members. Pretty bad!
-    //
-    // That means initial data must be provided by following up with update()
-    // after constructing the new instance of the Thing (sub)class.
-    */
+  // Note the constructor doesn't take an initial data source. Due to a quirk
+  // of JavaScript, private members can't be accessed before the superclass's
+  // constructor is finished processing - so if we call the overridden
+  // update() function from inside this constructor, it will error when
+  // writing to private members. Pretty bad!
+  //
+  // That means initial data must be provided by following up with update()
+  // after constructing the new instance of the Thing (sub)class.
 
   constructor() {
     this.#defineProperties();
@@ -143,7 +139,7 @@ export default class CacheableObject {
 
       const definition = {
         configurable: false,
-        enumerable: true,
+        enumerable: flags.expose,
       };
 
       if (flags.update) {
@@ -183,13 +179,8 @@ export default class CacheableObject {
           } else if (result !== true) {
             throw new TypeError(`Validation failed for value ${newValue}`);
           }
-        } catch (error) {
-          error.message = [
-            `Property ${color.green(property)}`,
-            `(${inspect(this[property])} -> ${inspect(newValue)}):`,
-            error.message
-          ].join(' ');
-          throw error;
+        } catch (caughtError) {
+          throw new CacheableObjectPropertyValueError(property, this[property], newValue, caughtError);
         }
       }
 
@@ -250,20 +241,27 @@ export default class CacheableObject {
 
     let getAllDependencies;
 
-    const dependencyKeys = expose.dependencies;
-    if (dependencyKeys?.length > 0) {
-      const reflectionEntry = [this.constructor.instance, this];
-      const dependencyGetters = dependencyKeys
-        .map(key => () => [key, this.#propertyUpdateValues[key]]);
+    if (expose.dependencies?.length > 0) {
+      const dependencyKeys = expose.dependencies.slice();
+      const shouldReflect = dependencyKeys.includes('this');
 
-      getAllDependencies = () =>
-        Object.fromEntries(dependencyGetters
-          .map(f => f())
-          .concat([reflectionEntry]));
+      getAllDependencies = () => {
+        const dependencies = Object.create(null);
+
+        for (const key of dependencyKeys) {
+          dependencies[key] = this.#propertyUpdateValues[key];
+        }
+
+        if (shouldReflect) {
+          dependencies.this = this;
+        }
+
+        return dependencies;
+      };
     } else {
-      const allDependencies = {[this.constructor.instance]: this};
-      Object.freeze(allDependencies);
-      getAllDependencies = () => allDependencies;
+      const dependencies = Object.create(null);
+      Object.freeze(dependencies);
+      getAllDependencies = () => dependencies;
     }
 
     if (flags.update) {
@@ -346,5 +344,23 @@ export default class CacheableObject {
     for (const line of this._invalidAccesses) {
       console.log(` - ${line}`);
     }
+  }
+
+  static getUpdateValue(object, key) {
+    if (!Object.hasOwn(object, key)) {
+      return undefined;
+    }
+
+    return object.#propertyUpdateValues[key] ?? null;
+  }
+}
+
+export class CacheableObjectPropertyValueError extends Error {
+  constructor(property, oldValue, newValue, error) {
+    super(
+      `Error setting ${colors.green(property)} (${inspect(oldValue)} -> ${inspect(newValue)})`,
+      {cause: error});
+
+    this.property = property;
   }
 }

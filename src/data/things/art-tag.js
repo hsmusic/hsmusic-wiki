@@ -1,35 +1,47 @@
+import {input} from '#composite';
 import {sortAlbumsTracksChronologically} from '#wiki-data';
+import {isName} from '#validators';
+
+import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+
+import {
+  color,
+  directory,
+  flag,
+  name,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import Thing from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
+  static [Thing.friendlyName] = `Art Tag`;
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Track,
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Art Tag'),
-    directory: Thing.common.directory(),
-    color: Thing.common.color(),
-    isContentWarning: Thing.common.flag(false),
+    name: name('Unnamed Art Tag'),
+    directory: directory(),
+    color: color(),
+    isContentWarning: flag(false),
 
-    nameShort: {
-      flags: {update: true, expose: true},
+    nameShort: [
+      exposeUpdateValueOrContinue({
+        validate: input.value(isName),
+      }),
 
-      expose: {
+      {
         dependencies: ['name'],
-        transform: (value, {name}) =>
-          value ?? name.replace(/ \(.*?\)$/, ''),
+        compute: ({name}) =>
+          name.replace(/ \([^)]*?\)$/, ''),
       },
-    },
+    ],
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    trackData: Thing.common.wikiData(Track),
+    albumData: wikiData(Album),
+    trackData: wikiData(Track),
 
     // Expose only
 
@@ -37,8 +49,8 @@ export class ArtTag extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData', 'trackData'],
-        compute: ({albumData, trackData, [ArtTag.instance]: artTag}) =>
+        dependencies: ['this', 'albumData', 'trackData'],
+        compute: ({this: artTag, albumData, trackData}) =>
           sortAlbumsTracksChronologically(
             [...albumData, ...trackData]
               .filter(({artTags}) => artTags.includes(artTag)),

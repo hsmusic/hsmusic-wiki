@@ -5,7 +5,7 @@ export default {
     content: {type: 'html'},
 
     otherArtistLinks: {validate: v => v.strictArrayOf(v.isHTML)},
-    contribution: {type: 'string'},
+    contribution: {type: 'html'},
     rerelease: {type: 'boolean'},
   },
 
@@ -30,7 +30,7 @@ export default {
         options.artists = language.formatConjunctionList(slots.otherArtistLinks);
       }
 
-      if (slots.contribution) {
+      if (!html.isBlank(slots.contribution)) {
         parts.push('withContribution');
         options.contribution = slots.contribution;
       }

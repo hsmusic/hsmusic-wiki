@@ -38,7 +38,7 @@ export default {
 
     return html.tag('div', {class: 'footer-localization-links'},
       language.$('misc.uiLanguage', {
-        languages: links.join('\n'),
+        languages: language.formatListWithoutSeparator(links),
       }));
   },
 };

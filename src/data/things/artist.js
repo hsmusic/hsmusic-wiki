@@ -1,29 +1,33 @@
+import {input} from '#composite';
 import find from '#find';
+import {isName, validateArrayItems} from '#validators';
+
+import {
+  directory,
+  fileExtension,
+  flag,
+  name,
+  simpleString,
+  singleReference,
+  urls,
+  wikiData,
+} from '#composite/wiki-properties';
 
 import Thing from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
 
-  static [Thing.getPropertyDescriptors] = ({
-    Album,
-    Flash,
-    Track,
-
-    validators: {
-      isName,
-      validateArrayItems,
-    },
-  }) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Flash, Track}) => ({
     // Update & expose
 
-    name: Thing.common.name('Unnamed Artist'),
-    directory: Thing.common.directory(),
-    urls: Thing.common.urls(),
-    contextNotes: Thing.common.simpleString(),
+    name: name('Unnamed Artist'),
+    directory: directory(),
+    urls: urls(),
+    contextNotes: simpleString(),
 
-    hasAvatar: Thing.common.flag(false),
-    avatarFileExtension: Thing.common.fileExtension('jpg'),
+    hasAvatar: flag(false),
+    avatarFileExtension: fileExtension('jpg'),
 
     aliasNames: {
       flags: {update: true, expose: true},
@@ -31,29 +35,22 @@ export class Artist extends Thing {
       expose: {transform: (names) => names ?? []},
     },
 
-    isAlias: Thing.common.flag(),
-    aliasedArtistRef: Thing.common.singleReference(Artist),
+    isAlias: flag(),
+
+    aliasedArtist: singleReference({
+      class: input.value(Artist),
+      find: input.value(find.artist),
+      data: 'artistData',
+    }),
 
     // Update only
 
-    albumData: Thing.common.wikiData(Album),
-    artistData: Thing.common.wikiData(Artist),
-    flashData: Thing.common.wikiData(Flash),
-    trackData: Thing.common.wikiData(Track),
+    albumData: wikiData(Album),
+    artistData: wikiData(Artist),
+    flashData: wikiData(Flash),
+    trackData: wikiData(Track),
 
     // Expose only
-
-    aliasedArtist: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['artistData', 'aliasedArtistRef'],
-        compute: ({artistData, aliasedArtistRef}) =>
-          aliasedArtistRef && artistData
-            ? find.artist(aliasedArtistRef, artistData, {mode: 'quiet'})
-            : null,
-      },
-    },
 
     tracksAsArtist:
       Artist.filterByContrib('trackData', 'artistContribs'),
@@ -66,14 +63,14 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, trackData}) =>
           trackData?.filter((track) =>
             [
-              ...track.artistContribs,
-              ...track.contributorContribs,
-              ...track.coverArtistContribs,
+              ...track.artistContribs ?? [],
+              ...track.contributorContribs ?? [],
+              ...track.coverArtistContribs ?? [],
             ].some(({who}) => who === artist)) ?? [],
       },
     },
@@ -82,9 +79,9 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['trackData'],
+        dependencies: ['this', 'trackData'],
 
-        compute: ({trackData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, trackData}) =>
           trackData?.filter(({commentatorArtists}) =>
             commentatorArtists.includes(artist)) ?? [],
       },
@@ -120,18 +117,16 @@ export class Artist extends Thing {
       flags: {expose: true},
 
       expose: {
-        dependencies: ['albumData'],
+        dependencies: ['this', 'albumData'],
 
-        compute: ({albumData, [Artist.instance]: artist}) =>
+        compute: ({this: artist, albumData}) =>
           albumData?.filter(({commentatorArtists}) =>
             commentatorArtists.includes(artist)) ?? [],
       },
     },
 
-    flashesAsContributor: Artist.filterByContrib(
-      'flashData',
-      'contributorContribs'
-    ),
+    flashesAsContributor:
+      Artist.filterByContrib('flashData', 'contributorContribs'),
   });
 
   static [Thing.getSerializeDescriptors] = ({
@@ -165,15 +160,15 @@ export class Artist extends Thing {
     flags: {expose: true},
 
     expose: {
-      dependencies: [thingDataProperty],
+      dependencies: ['this', thingDataProperty],
 
       compute: ({
+        this: artist,
         [thingDataProperty]: thingData,
-        [Artist.instance]: artist
       }) =>
         thingData?.filter(thing =>
           thing[contribsProperty]
-            .some(contrib => contrib.who === artist)) ?? [],
+            ?.some(contrib => contrib.who === artist)) ?? [],
     },
   });
 }

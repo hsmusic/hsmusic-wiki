@@ -2,7 +2,7 @@ import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['generateGridActionLinks'],
-  extraDependencies: ['html'],
+  extraDependencies: ['html', 'language'],
 
   relations(relation) {
     return {
@@ -20,7 +20,7 @@ export default {
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 
-  generate(relations, slots, {html}) {
+  generate(relations, slots, {html, language}) {
     return (
       html.tag('div', {class: 'grid-listing'}, [
         stitchArrays({
@@ -42,8 +42,12 @@ export default {
                       ? slots.lazy
                       : false),
                 }),
-                html.tag('span', {[html.onlyIfContent]: true}, name),
-                html.tag('span', {[html.onlyIfContent]: true}, info),
+
+                html.tag('span', {[html.onlyIfContent]: true},
+                  language.sanitize(name)),
+
+                html.tag('span', {[html.onlyIfContent]: true},
+                  language.sanitize(info)),
               ],
             })),
 

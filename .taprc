@@ -1,0 +1,3 @@
+coverage-map: coverage-map.js
+exclude:
+  - test/lib/*

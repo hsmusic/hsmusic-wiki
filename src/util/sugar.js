@@ -6,7 +6,7 @@
 // It will likely only do exactly what I want it to, and only in the cases I
 // decided were relevant enough to 8other handling.
 
-import {color} from './cli.js';
+import {colors} from './cli.js';
 
 // Apparently JavaScript doesn't come with a function to split an array into
 // chunks! Weird. Anyway, this is an awesome place to use a generator, even
@@ -82,7 +82,7 @@ export function stitchArrays(keyToArray) {
   for (const [key, value] of Object.entries(keyToArray)) {
     if (value === null) continue;
     if (Array.isArray(value)) continue;
-    errors.push(new TypeError(`(${key}) Expected array or null, got ${value}`));
+    errors.push(new TypeError(`(${key}) Expected array or null, got ${typeAppearance(value)}`));
   }
 
   if (!empty(errors)) {
@@ -168,12 +168,34 @@ export function setIntersection(set1, set2) {
   return intersection;
 }
 
-export function filterProperties(obj, properties) {
-  const set = new Set(properties);
-  return Object.fromEntries(
-    Object
-      .entries(obj)
-      .filter(([key]) => set.has(key)));
+export function filterProperties(object, properties, {
+  preserveOriginalOrder = false,
+} = {}) {
+  if (typeof object !== 'object' || object === null) {
+    throw new TypeError(`Expected object to be an object, got ${typeAppearance(object)}`);
+  }
+
+  if (!Array.isArray(properties)) {
+    throw new TypeError(`Expected properties to be an array, got ${typeAppearance(properties)}`);
+  }
+
+  const filteredObject = {};
+
+  if (preserveOriginalOrder) {
+    for (const property of Object.keys(object)) {
+      if (properties.includes(property)) {
+        filteredObject[property] = object[property];
+      }
+    }
+  } else {
+    for (const property of properties) {
+      if (Object.hasOwn(object, property)) {
+        filteredObject[property] = object[property];
+      }
+    }
+  }
+
+  return filteredObject;
 }
 
 export function queue(array, max = 50) {
@@ -216,6 +238,16 @@ export function delay(ms) {
 // past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
 export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+// Gets the "look" of some arbitrary value. It's like typeof, but smarter.
+// Don't use this for actually validating types - it's only suitable for
+// inclusion in error messages.
+export function typeAppearance(value) {
+  if (value === null) return 'null';
+  if (value === undefined) return 'undefined';
+  if (Array.isArray(value)) return 'array';
+  return typeof value;
 }
 
 // Binds default values for arguments in a {key: value} type function argument
@@ -532,15 +564,17 @@ export function showAggregate(topError, {
   print = true,
 } = {}) {
   const recursive = (error, {level}) => {
-    let header = showTraces
+    let headerPart = showTraces
       ? `[${error.constructor.name || 'unnamed'}] ${
           error.message || '(no message)'
         }`
       : error instanceof AggregateError
       ? `[${error.message || '(no message)'}]`
       : error.message || '(no message)';
+
     if (showTraces) {
       const stackLines = error.stack?.split('\n');
+
       const stackLine = stackLines?.find(
         (line) =>
           line.trim().startsWith('at') &&
@@ -548,30 +582,41 @@ export function showAggregate(topError, {
           !line.includes('node:') &&
           !line.includes('<anonymous>')
       );
+
       const tracePart = stackLine
         ? '- ' +
           stackLine
             .trim()
             .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
         : '(no stack trace)';
-      header += ` ${color.dim(tracePart)}`;
-    }
-    const bar = level % 2 === 0 ? '\u2502' : color.dim('\u254e');
-    const head = level % 2 === 0 ? '\u257f' : color.dim('\u257f');
 
-    if (error instanceof AggregateError) {
-      return (
-        header +
-        '\n' +
-        error.errors
-          .map((error) => recursive(error, {level: level + 1}))
-          .flatMap((str) => str.split('\n'))
-          .map((line, i) => i === 0 ? ` ${head} ${line}` : ` ${bar} ${line}`)
-          .join('\n')
-      );
-    } else {
-      return header;
+      headerPart += ` ${colors.dim(tracePart)}`;
     }
+
+    const head1 = level % 2 === 0 ? '\u21aa' : colors.dim('\u21aa');
+    const bar1 = ' ';
+
+    const causePart =
+      (error.cause
+        ? recursive(error.cause, {level: level + 1})
+            .split('\n')
+            .map((line, i) => i === 0 ? ` ${head1} ${line}` : ` ${bar1} ${line}`)
+            .join('\n')
+        : '');
+
+    const head2 = level % 2 === 0 ? '\u257f' : colors.dim('\u257f');
+    const bar2 = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
+
+    const aggregatePart =
+      (error instanceof AggregateError
+        ? error.errors
+            .map(error => recursive(error, {level: level + 1}))
+            .flatMap(str => str.split('\n'))
+            .map((line, i) => i === 0 ? ` ${head2} ${line}` : ` ${bar2} ${line}`)
+            .join('\n')
+        : '');
+
+    return [headerPart, causePart, aggregatePart].filter(Boolean).join('\n');
   };
 
   const message = recursive(topError, {level: 0});
@@ -588,7 +633,8 @@ export function decorateErrorWithIndex(fn) {
     try {
       return fn(x, index, array);
     } catch (error) {
-      error.message = `(${color.yellow(`#${index + 1}`)}) ${error.message}`;
+      error.message = `(${colors.yellow(`#${index + 1}`)}) ${error.message}`;
+      error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
       throw error;
     }
   };

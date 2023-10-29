@@ -4,11 +4,18 @@ import {testContentFunctions} from '#test-lib';
 testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
   await evaluate.load();
 
-  const quickSnapshot = (message, opts) =>
+  const quickSnapshot = (message, {extraDependencies, ...opts}) =>
     evaluate.snapshot(message, {
       name: 'image',
       extraDependencies: {
-        getSizeOfImageFile: () => 0,
+        checkIfImagePathHasCachedThumbnails: path => !path.endsWith('.gif'),
+        getSizeOfImagePath: () => 0,
+        getDimensionsOfImagePath: () => [600, 600],
+        getThumbnailEqualOrSmaller: () => 'medium',
+        getThumbnailsAvailableForDimensions: () =>
+          [['large', 800], ['medium', 400], ['small', 250]],
+        missingImagePaths: ['album-art/missing/cover.png'],
+        ...extraDependencies,
       },
       ...opts,
     });
@@ -79,7 +86,7 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
 
   quickSnapshot('link with file size', {
     extraDependencies: {
-      getSizeOfImageFile: () => 10 ** 6,
+      getSizeOfImagePath: () => 10 ** 6,
     },
     slots: {
       path: ['media.albumCover', 'pingas', 'png'],
@@ -96,6 +103,46 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     ],
     slots: {
       path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
+  });
+
+  evaluate.snapshot('thumbnail details', {
+    name: 'image',
+    extraDependencies: {
+      checkIfImagePathHasCachedThumbnails: () => true,
+      getSizeOfImagePath: () => 0,
+      getDimensionsOfImagePath: () => [900, 1200],
+      getThumbnailsAvailableForDimensions: () =>
+        [['voluminous', 1200], ['middling', 900], ['petite', 20]],
+      getThumbnailEqualOrSmaller: () => 'voluminous',
+      missingImagePaths: [],
+    },
+    slots: {
+      thumb: 'gargantuan',
+      path: ['media.albumCover', 'beyond-canon', 'png'],
+    },
+  });
+
+  quickSnapshot('thumb requested but source is gif', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.flashArt', '5426', 'gif'],
+    },
+  });
+
+  quickSnapshot('missing image path', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.albumCover', 'missing', 'png'],
+      link: true,
+    },
+  });
+
+  quickSnapshot('missing image path w/ missingSourceContent', {
+    slots: {
+      thumb: 'medium',
+      path: ['media.albumCover', 'missing', 'png'],
+      missingSourceContent: `Cover's missing, whoops`,
     },
   });
 });

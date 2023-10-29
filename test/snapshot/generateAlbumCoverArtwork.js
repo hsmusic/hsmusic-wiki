@@ -1,12 +1,14 @@
 import t from 'tap';
+
+import contentFunction from '#content-function';
 import {testContentFunctions} from '#test-lib';
 
 testContentFunctions(t, 'generateAlbumCoverArtwork (snapshot)', async (t, evaluate) => {
-  await evaluate.load();
-
-  const extraDependencies = {
-    getSizeOfImageFile: () => 0,
-  };
+  await evaluate.load({
+    mock: {
+      image: evaluate.stubContentFunction('image'),
+    },
+  });
 
   const album = {
     directory: 'bee-forus-seatbelt-safebee',
@@ -23,13 +25,11 @@ testContentFunctions(t, 'generateAlbumCoverArtwork (snapshot)', async (t, evalua
     name: 'generateAlbumCoverArtwork',
     args: [album],
     slots: {mode: 'primary'},
-    extraDependencies,
   });
 
   evaluate.snapshot('display: thumbnail', {
     name: 'generateAlbumCoverArtwork',
     args: [album],
     slots: {mode: 'thumbnail'},
-    extraDependencies,
   });
 });

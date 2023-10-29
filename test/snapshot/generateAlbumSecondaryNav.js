@@ -6,8 +6,8 @@ testContentFunctions(t, 'generateAlbumSecondaryNav (snapshot)', async (t, evalua
 
   let album, group1, group2;
 
-  group1 = {name: 'VCG', directory: 'vcg'};
-  group2 = {name: 'Bepis', directory: 'bepis'};
+  group1 = {name: 'VCG', directory: 'vcg', color: '#abcdef'};
+  group2 = {name: 'Bepis', directory: 'bepis', color: '#123456'};
 
   album = {
     date: new Date('2010-04-13'),
