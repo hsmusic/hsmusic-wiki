@@ -64,6 +64,7 @@ import genThumbs, {
   defaultMagickThreads,
   determineMediaCachePath,
   isThumb,
+  migrateThumbsIntoDedicatedCacheDirectory,
   verifyImagePaths,
 } from '#thumbs';
 
@@ -115,6 +116,9 @@ async function main() {
   stepStatusSummary = {
     loadThumbnailCache:
       {...defaultStepStatus, name: `load thumbnail cache file`},
+
+    migrateThumbnails:
+      {...defaultStepStatus, name: `migrate thumbnails`},
 
     generateThumbnails:
       {...defaultStepStatus, name: `generate thumbnails`},
@@ -257,6 +261,11 @@ async function main() {
     // pass this flag! It exits 8efore 8uilding the rest of the site.
     'thumbs-only': {
       help: `Skip everything besides processing media directory and generating up-to-date thumbnails (useful when using --skip-thumbs for most runs)`,
+      type: 'flag',
+    },
+
+    'migrate-thumbs': {
+      help: `Transfer automatically generated thumbnail files out of an existing media directory and into the easier-to-manage media-cache directory`,
       type: 'flag',
     },
 
@@ -429,6 +438,7 @@ async function main() {
   const mediaPath = cliOptions['media-path'] || process.env.HSMUSIC_MEDIA;
   const langPath = cliOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
 
+  const migrateThumbs = cliOptions['migrate-thumbs'] ?? false;
   const skipThumbs = cliOptions['skip-thumbs'] ?? false;
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
@@ -504,6 +514,35 @@ async function main() {
   }
 
   logInfo`Using media cache at: ${mediaCachePath} (${mediaCachePathAnnotation})`;
+
+  if (migrateThumbs) {
+    stepStatusSummary.migrateThumbnails.status = STATUS_STARTED_NOT_DONE;
+
+    const result = await migrateThumbsIntoDedicatedCacheDirectory({
+      mediaPath,
+      mediaCachePath,
+      queueSize,
+    });
+
+    if (result.succses) {
+      Object.assign(stepStatusSummary.migrateThumbnails, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `view log for details`,
+      });
+      return false;
+    }
+
+    stepStatusSummary.migrateThumbnails.status = STATUS_DONE_CLEAN;
+
+    logInfo`Good to go! Run hsmusic again without ${'--migrate-thumbs'} to start`;
+    logInfo`using the migrated media cache.`;
+    return true;
+  } else {
+    Object.assign(stepStatusSummary.migrateThumbnails, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--migrate-thumbs not provided`,
+    });
+  }
 
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
