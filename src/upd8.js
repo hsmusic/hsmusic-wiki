@@ -61,7 +61,6 @@ import {
 
 import genThumbs, {
   CACHE_FILE as thumbsCacheFile,
-  clearThumbs,
   defaultMagickThreads,
   determineMediaCachePath,
   isThumb,
