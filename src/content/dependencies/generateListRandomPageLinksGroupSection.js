@@ -23,10 +23,7 @@ export default {
         .map(() => relation('generateColorStyleVariables')),
   }),
 
-  data: (query, sprawl, group) => ({
-    groupDirectory:
-      group.directory,
-
+  data: (query) => ({
     albumColors:
       query.albums
         .map(album => album.color),
@@ -48,12 +45,12 @@ export default {
 
           randomAlbum:
             html.tag('a',
-              {href: '#', 'data-random': 'album-in-' + data.groupDirectory},
+              {href: '#', 'data-random': 'album-in-group-dl'},
               language.$('listingPage.other.randomPages.group.randomAlbum')),
 
           randomTrack:
             html.tag('a',
-              {href: '#', 'data-random': 'track-in-' + data.groupDirectory},
+              {href: '#', 'data-random': 'track-in-group-dl'},
               language.$('listingPage.other.randomPages.group.randomTrack')),
         })),
 

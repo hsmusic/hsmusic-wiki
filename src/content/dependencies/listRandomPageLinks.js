@@ -6,19 +6,16 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({groupData}) {
-    return {groupData};
+  sprawl({wikiInfo}) {
+    return {wikiInfo};
   },
 
   query(sprawl, spec) {
-    const group = directory =>
-      sprawl.groupData.find(group => group.directory === directory);
-
     return {
       spec,
-      officialGroup: group('official'),
-      fandomGroup: group('fandom'),
-      beyondGroup: group('beyond'),
+
+      groups:
+        sprawl.wikiInfo.divideTrackListsByGroups,
     };
   },
 
@@ -26,14 +23,9 @@ export default {
     return {
       page: relation('generateListingPage', query.spec),
 
-      officialSection:
-        relation('generateListRandomPageLinksGroupSection', query.officialGroup),
-
-      fandomSection:
-        relation('generateListRandomPageLinksGroupSection', query.fandomGroup),
-
-      beyondSection:
-        relation('generateListRandomPageLinksGroupSection', query.beyondGroup),
+      groupSections:
+        query.groups
+          .map(group => relation('generateListRandomPageLinksGroupSection', group)),
     };
   },
 
@@ -81,9 +73,7 @@ export default {
                   language.$('listingPage.other.randomPages.misc.randomTrackWholeSite'))),
             ])),
 
-          relations.officialSection,
-          relations.fandomSection,
-          relations.beyondSection,
+          relations.groupSections,
         ]),
       ],
     });
