@@ -88,7 +88,7 @@ const thumbnailSpec = {
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
-import {readFile, stat, unlink, writeFile} from 'node:fs/promises';
+import {readFile, stat, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import dimensionsOf from 'image-size';
@@ -333,14 +333,13 @@ function generateImageThumbnails({
         promisifyProcess(convert('.' + name, details), false)));
 }
 
-export async function clearThumbs(mediaPath, {
+export async function processThumbs(mediaPath, {
   queueSize = 0,
 } = {}) {
   if (!mediaPath) {
     throw new Error('Expected mediaPath to be passed');
   }
 
-  logInfo`Looking for thumbnails to clear out...`;
 
   const thumbFiles = await traverse(mediaPath, {
     pathStyle: 'device',
@@ -349,8 +348,7 @@ export async function clearThumbs(mediaPath, {
   });
 
   if (thumbFiles.length) {
-    // Double-check files. Since we're unlinking (deleting) files,
-    // we're better off safe than sorry!
+    // Double-check files.
     const thumbtacks = Object.keys(thumbnailSpec);
     const unsafeFiles = thumbFiles.filter(file => {
       if (path.extname(file) !== '.jpg') return true;
@@ -369,14 +367,13 @@ export async function clearThumbs(mediaPath, {
       return {success: false};
     }
 
-    logInfo`Clearing out ${thumbFiles.length} thumbs.`;
 
     const errored = [];
 
-    await progressPromiseAll(`Removing thumbnail files`, queue(
+    await progressPromiseAll(`Processing thumbnail files`, queue(
       thumbFiles.map(file => async () => {
         try {
-          await unlink(file);
+          /* no-op */
         } catch (error) {
           if (error.code !== 'ENOENT') {
             errored.push(file);
@@ -386,18 +383,18 @@ export async function clearThumbs(mediaPath, {
       queueSize));
 
     if (errored.length) {
-      logError`Couldn't remove these paths (${errored.length}):`;
+      logError`Couldn't process these paths (${errored.length}):`;
       for (const file of errored) {
         console.error(file);
       }
-      logError`Check for permission errors?`;
+      logError`It's possible there were permission errors. After you've`;
+      logError`investigated, running again should work to process these.`;
       return {success: false};
     } else {
-      logInfo`Successfully deleted all ${thumbFiles.length} thumbnail files!`;
+      logInfo`Successfully processed all ${thumbFiles.length} thumbnail files!`;
     }
   } else {
-    logInfo`Didn't find any thumbs in media directory.`;
-    logInfo`${mediaPath}`;
+    logInfo`Didn't find any thumbnails to process.`;
   }
 
   let cacheExists = false;
@@ -406,7 +403,7 @@ export async function clearThumbs(mediaPath, {
     cacheExists = true;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      logInfo`Cache file already missing, nothing to remove there.`;
+      logInfo`No cache file present here. (${CACHE_FILE})`;
     } else {
       logWarn`Failed to access cache file. Check its permissions?`;
     }
@@ -414,10 +411,11 @@ export async function clearThumbs(mediaPath, {
 
   if (cacheExists) {
     try {
-      unlink(path.join(mediaPath, CACHE_FILE));
-      logInfo`Removed thumbnail cache file.`;
+      /* no-op */
+      logInfo`Processed thumbnail cache file.`;
     } catch (error) {
-      logWarn`Failed to remove cache file. Check its permissions?`;
+      logWarn`Failed to process cache file. (${CACHE_FILE})`;
+      logWarn`Check its permissions.`;
     }
   }
 
