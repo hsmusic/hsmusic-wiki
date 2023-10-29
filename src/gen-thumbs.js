@@ -88,7 +88,7 @@ const thumbnailSpec = {
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
-import {readFile, stat, writeFile} from 'node:fs/promises';
+import {mkdir, readFile, rename, stat, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import dimensionsOf from 'image-size';
@@ -333,13 +333,23 @@ function generateImageThumbnails({
         promisifyProcess(convert('.' + name, details), false)));
 }
 
-export async function processThumbs(mediaPath, {
+export async function migrateThumbsIntoDedicatedCacheDirectory({
+  mediaPath,
+  mediaCachePath,
+
   queueSize = 0,
-} = {}) {
+}) {
   if (!mediaPath) {
-    throw new Error('Expected mediaPath to be passed');
+    throw new Error('Expected mediaPath');
   }
 
+  if (!mediaCachePath) {
+    throw new Error(`Expected mediaCachePath`);
+  }
+
+  logInfo`Migrating thumbnail files into dedicated directory.`;
+  logInfo`Moving thumbs from: ${mediaPath}`;
+  logInfo`Moving thumbs into: ${mediaCachePath}`;
 
   const thumbFiles = await traverse(mediaPath, {
     pathStyle: 'device',
@@ -367,13 +377,20 @@ export async function processThumbs(mediaPath, {
       return {success: false};
     }
 
+    logInfo`Moving ${thumbFiles.length} thumbs.`;
+
+    await mkdir(mediaCachePath, {recursive: true});
 
     const errored = [];
 
-    await progressPromiseAll(`Processing thumbnail files`, queue(
+    await progressPromiseAll(`Moving thumbnail files`, queue(
       thumbFiles.map(file => async () => {
         try {
-          /* no-op */
+          const filePathInMedia = file;
+          const filePath = path.relative(mediaPath, filePathInMedia);
+          const filePathInCache = path.join(mediaCachePath, filePath);
+          await mkdir(path.dirname(filePathInCache), {recursive: true});
+          await rename(filePathInMedia, filePathInCache);
         } catch (error) {
           if (error.code !== 'ENOENT') {
             errored.push(file);
@@ -383,18 +400,18 @@ export async function processThumbs(mediaPath, {
       queueSize));
 
     if (errored.length) {
-      logError`Couldn't process these paths (${errored.length}):`;
+      logError`Couldn't move these paths (${errored.length}):`;
       for (const file of errored) {
         console.error(file);
       }
       logError`It's possible there were permission errors. After you've`;
-      logError`investigated, running again should work to process these.`;
+      logError`investigated, running again should work to move these.`;
       return {success: false};
     } else {
-      logInfo`Successfully processed all ${thumbFiles.length} thumbnail files!`;
+      logInfo`Successfully moved all ${thumbFiles.length} thumbnail files!`;
     }
   } else {
-    logInfo`Didn't find any thumbnails to process.`;
+    logInfo`Didn't find any thumbnails to move.`;
   }
 
   let cacheExists = false;
@@ -411,11 +428,13 @@ export async function processThumbs(mediaPath, {
 
   if (cacheExists) {
     try {
-      /* no-op */
-      logInfo`Processed thumbnail cache file.`;
+      await rename(
+        path.join(mediaPath, CACHE_FILE),
+        path.join(mediaCachePath, CACHE_FILE));
+      logInfo`Moved thumbnail cache file.`;
     } catch (error) {
-      logWarn`Failed to process cache file. (${CACHE_FILE})`;
-      logWarn`Check its permissions.`;
+      logWarn`Failed to move cache file. (${CACHE_FILE})`;
+      logWarn`Check its permissions, or try copying/pasting.`;
     }
   }
 
