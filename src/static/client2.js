@@ -954,10 +954,14 @@ function handleImageLinkClicked(evt) {
   const thumbImage = document.getElementById('image-overlay-image-thumb');
 
   const {href: originalSrc} = evt.target.closest('a');
-  const {dataset: {
-    originalSize: originalFileSize,
-    thumbs: availableThumbList,
-  }} = evt.target.closest('a').querySelector('img');
+
+  const {
+    src: embeddedSrc,
+    dataset: {
+      originalSize: originalFileSize,
+      thumbs: availableThumbList,
+    },
+  } = evt.target.closest('a').querySelector('img');
 
   updateFileSizeInformation(originalFileSize);
 
@@ -967,8 +971,8 @@ function handleImageLinkClicked(evt) {
   if (availableThumbList) {
     const {thumb: mainThumb, length: mainLength} = getPreferredThumbSize(availableThumbList);
     const {thumb: smallThumb, length: smallLength} = getSmallestThumbSize(availableThumbList);
-    mainSrc = originalSrc.replace(/\.(jpg|png)$/, `.${mainThumb}.jpg`);
-    thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${smallThumb}.jpg`);
+    mainSrc = embeddedSrc.replace(/\.[a-z]+\.(jpg|png)$/, `.${mainThumb}.jpg`);
+    thumbSrc = embeddedSrc.replace(/\.[a-z]+\.(jpg|png)$/, `.${smallThumb}.jpg`);
     // Show the thumbnail size on each <img> element's data attributes.
     // Y'know, just for debugging convenience.
     mainImage.dataset.displayingThumb = `${mainThumb}:${mainLength}`;
