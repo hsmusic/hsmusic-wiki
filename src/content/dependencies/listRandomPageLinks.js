@@ -1,33 +1,36 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateListingPage',
+    'generateListRandomPageLinksAllAlbumsSection',
     'generateListRandomPageLinksGroupSection',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({wikiInfo}) {
-    return {wikiInfo};
-  },
+  sprawl: ({wikiInfo}) => ({wikiInfo}),
 
-  query(sprawl, spec) {
-    return {
-      spec,
+  query: ({wikiInfo: {divideTrackListsByGroups: groups}}, spec) => ({
+    spec,
+    groups,
+    divideByGroups: !empty(groups),
+  }),
 
-      groups:
-        sprawl.wikiInfo.divideTrackListsByGroups,
-    };
-  },
+  relations: (relation, query) => ({
+    page: relation('generateListingPage', query.spec),
 
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
+    allAlbumsSection:
+      (query.divideByGroups
+        ? null
+        : relation('generateListRandomPageLinksAllAlbumsSection')),
 
-      groupSections:
-        query.groups
-          .map(group => relation('generateListRandomPageLinksGroupSection', group)),
-    };
-  },
+    groupSections:
+      (query.divideByGroups
+        ? query.groups
+            .map(group => relation('generateListRandomPageLinksGroupSection', group))
+        : null),
+  }),
 
   generate(relations, {html, language}) {
     return relations.page.slots({
@@ -73,6 +76,7 @@ export default {
                   language.$('listingPage.other.randomPages.misc.randomTrackWholeSite'))),
             ])),
 
+          relations.allAlbumsSection,
           relations.groupSections,
         ]),
       ],

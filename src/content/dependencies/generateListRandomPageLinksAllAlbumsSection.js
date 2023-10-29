@@ -6,17 +6,13 @@ export default {
 
   sprawl: ({albumData}) => ({albumData}),
 
-  query: (sprawl, group) => ({
+  query: (sprawl) => ({
     albums:
       sortChronologically(sprawl.albumData.slice())
-        .filter(album => album.groups.includes(group))
         .filter(album => album.tracks.length > 1),
   }),
 
-  relations: (relation, query, sprawl, group) => ({
-    groupLink:
-      relation('linkGroup', group),
-
+  relations: (relation, query) => ({
     albumLinks:
       query.albums
         .map(album => relation('generateListRandomPageLinksAlbumLink', album)),
@@ -25,19 +21,7 @@ export default {
   generate: (relations, {html, language}) =>
     html.tags([
       html.tag('dt',
-        language.$('listingPage.other.randomPages.fromGroup', {
-          group: relations.groupLink,
-
-          randomAlbum:
-            html.tag('a',
-              {href: '#', 'data-random': 'album-in-group-dl'},
-              language.$('listingPage.other.randomPages.fromGroup.randomAlbum')),
-
-          randomTrack:
-            html.tag('a',
-              {href: '#', 'data-random': 'track-in-group-dl'},
-              language.$('listingPage.other.randomPages.fromGroup.randomTrack')),
-        })),
+        language.$('listingPage.other.randomPages.fromAlbum')),
 
       html.tag('dd',
         html.tag('ul',
