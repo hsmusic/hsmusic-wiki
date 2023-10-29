@@ -88,8 +88,16 @@ const thumbnailSpec = {
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
-import {mkdir, readFile, rename, stat, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
+
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 
 import dimensionsOf from 'image-size';
 
@@ -331,6 +339,82 @@ function generateImageThumbnails({
       .map(([name]) => [name, thumbnailSpec[name]])
       .map(([name, details]) => () =>
         promisifyProcess(convert('.' + name, details), false)));
+}
+
+export async function determineMediaCachePath({
+  mediaPath,
+  providedMediaCachePath,
+  disallowDoubling = false,
+}) {
+  if (!mediaPath) {
+    return {
+      annotation: 'media path not provided',
+      mediaCachePath: null,
+    };
+  }
+
+  if (providedMediaCachePath) {
+    return {
+      annotation: 'custom path provided',
+      mediaCachePath: providedMediaCachePath,
+    };
+  }
+
+  let mediaIncludesThumbnailCache;
+
+  try {
+    const files = await readdir(mediaPath);
+    mediaIncludesThumbnailCache = files.includes(CACHE_FILE);
+  } catch (error) {
+    mediaIncludesThumbnailCache = false;
+  }
+
+  if (mediaIncludesThumbnailCache === true && !disallowDoubling) {
+    return {
+      annotation: 'media path doubles as cache',
+      mediaCachePath: mediaPath,
+    };
+  }
+
+  const inferredPath =
+    path.join(
+      path.dirname(mediaPath),
+      path.basename(mediaPath) + '-cache');
+
+  let inferredIncludesThumbnailCache;
+
+  try {
+    const files = await readdir(inferredPath);
+    inferredIncludesThumbnailCache = files.includes(CACHE_FILE);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      inferredIncludesThumbnailCache = null;
+    } else {
+      inferredIncludesThumbnailCache = undefined;
+    }
+  }
+
+  if (inferredIncludesThumbnailCache === true) {
+    return {
+      annotation: 'inferred path has cache',
+      mediaCachePath: inferredPath,
+    };
+  } else if (inferredIncludesThumbnailCache === false) {
+    return {
+      annotation: 'inferred path does not have cache',
+      mediaCachePath: null,
+    };
+  } else if (inferredIncludesThumbnailCache === null) {
+    return {
+      annotation: 'inferred path will be created',
+      mediaCachePath: inferredPath,
+    };
+  } else {
+    return {
+      annotation: 'inferred path not readable',
+      mediaCachePath: null,
+    };
+  }
 }
 
 export async function migrateThumbsIntoDedicatedCacheDirectory({
