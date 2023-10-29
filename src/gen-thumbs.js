@@ -312,18 +312,30 @@ async function getSpawnMagick(tool) {
 // Note: This returns an array of no-argument functions, suitable for passing
 // to queue().
 function generateImageThumbnails({
+  mediaPath,
+  mediaCachePath,
   filePath,
   dimensions,
   spawnConvert,
 }) {
-  const dirname = path.dirname(filePath);
-  const extname = path.extname(filePath);
-  const basename = path.basename(filePath, extname);
-  const output = (name) => path.join(dirname, basename + name + '.jpg');
+  const filePathInMedia = path.join(mediaPath, filePath);
 
-  const convert = (name, {size, quality}) =>
-    spawnConvert([
-      filePath,
+  function getOutputPath(thumbtack) {
+    return path.join(
+      mediaCachePath,
+      path.dirname(filePath),
+      [
+        path.basename(filePath, path.extname(filePath)),
+        thumbtack,
+        'jpg'
+      ].join('.'));
+  }
+
+  function startConvertProcess(outputPathInCache, details) {
+    const {size, quality} = details;
+
+    return spawnConvert([
+      filePathInMedia,
       '-strip',
       '-resize',
       `${size}x${size}>`,
@@ -331,14 +343,20 @@ function generateImageThumbnails({
       'Plane',
       '-quality',
       `${quality}%`,
-      output(name),
+      outputPathInCache,
     ]);
+  }
 
   return (
     getThumbnailsAvailableForDimensions(dimensions)
-      .map(([name]) => [name, thumbnailSpec[name]])
-      .map(([name, details]) => () =>
-        promisifyProcess(convert('.' + name, details), false)));
+      .map(([thumbtack]) => [thumbtack, thumbnailSpec[thumbtack]])
+      .map(([thumbtack, details]) => async () => {
+        const outputPathInCache = getOutputPath(thumbtack);
+        await mkdir(path.dirname(outputPathInCache), {recursive: true});
+
+        const convertProcess = startConvertProcess(outputPathInCache, details);
+        await promisifyProcess(convertProcess, false);
+      }));
 }
 
 export async function determineMediaCachePath({
@@ -525,11 +543,14 @@ export async function migrateThumbsIntoDedicatedCacheDirectory({
   return {success: true};
 }
 
-export default async function genThumbs(mediaPath, {
+export default async function genThumbs({
+  mediaPath,
+  mediaCachePath,
+
   queueSize = 0,
   magickThreads = defaultMagickThreads,
   quiet = false,
-} = {}) {
+}) {
   if (!mediaPath) {
     throw new Error('Expected mediaPath to be passed');
   }
@@ -555,13 +576,13 @@ export default async function genThumbs(mediaPath, {
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
 
-  let cache,
-    firstRun = false;
+  let cache = null;
+  let firstRun = false;
+
   try {
-    cache = JSON.parse(await readFile(path.join(mediaPath, CACHE_FILE)));
+    cache = JSON.parse(await readFile(path.join(mediaCachePath, CACHE_FILE)));
     quietInfo`Cache file successfully read.`;
   } catch (error) {
-    cache = {};
     if (error.code === 'ENOENT') {
       firstRun = true;
     } else {
@@ -573,7 +594,20 @@ export default async function genThumbs(mediaPath, {
   }
 
   try {
-    await writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(cache));
+    await mkdir(mediaCachePath, {recursive: true});
+  } catch (error) {
+    logError`Couldn't create the media cache directory: ${error.code}`;
+    logError`That's where the media files are going to go, so you'll`;
+    logError`have to investigate this - it's likely a permissions error.`;
+    return {success: false};
+  }
+
+  try {
+    await writeFile(
+      path.join(mediaCachePath, CACHE_FILE),
+      (firstRun
+        ? JSON.stringify({})
+        : JSON.stringify(cache)));
     quietInfo`Writing to cache file appears to be working.`;
   } catch (error) {
     logWarn`Test of cache file writing failed: ${error}`;
@@ -581,11 +615,16 @@ export default async function genThumbs(mediaPath, {
       logWarn`Cache read succeeded: Any newly written thumbs will be unnecessarily regenerated on the next run.`;
     } else if (firstRun) {
       logWarn`No cache found: All thumbs will be generated now, and will be unnecessarily regenerated next run.`;
+      logWarn`You may also have to provide ${'--media-cache-path'} ${mediaCachePath} next run.`;
     } else {
       logWarn`Cache read failed: All thumbs will be regenerated now, and will be unnecessarily regenerated again next run.`;
     }
     logWarn`You may want to cancel and investigate this!`;
     await delay(WARNING_DELAY_TIME);
+  }
+
+  if (firstRun) {
+    cache = {};
   }
 
   const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
@@ -675,7 +714,9 @@ export default async function genThumbs(mediaPath, {
   const generateCalls =
     entriesToGenerate.flatMap(([filePath, md5]) =>
       generateImageThumbnails({
-        filePath: path.join(mediaPath, filePath),
+        mediaPath,
+        mediaCachePath,
+        filePath,
         dimensions: imageToDimensions[filePath],
         spawnConvert,
       }).map(call => async () => {
@@ -711,7 +752,7 @@ export default async function genThumbs(mediaPath, {
 
   try {
     await writeFile(
-      path.join(mediaPath, CACHE_FILE),
+      path.join(mediaCachePath, CACHE_FILE),
       JSON.stringify(updatedCache)
     );
     quietInfo`Updated cache file successfully written!`;
