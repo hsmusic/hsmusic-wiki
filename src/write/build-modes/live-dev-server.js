@@ -51,6 +51,7 @@ export async function go({
   cliOptions,
   _dataPath,
   mediaPath,
+  mediaCachePath,
 
   defaultLanguage,
   languages,
@@ -171,7 +172,7 @@ export async function go({
     const {
       area: localFileArea,
       path: localFilePath
-    } = pathname.match(/^\/(?<area>static|util|media)\/(?<path>.*)/)?.groups ?? {};
+    } = pathname.match(/^\/(?<area>static|util|media|thumb)\/(?<path>.*)/)?.groups ?? {};
 
     if (localFileArea) {
       // Not security tested, man, this is a dev server!!
@@ -182,6 +183,8 @@ export async function go({
         localDirectory = path.join(srcRootPath, localFileArea);
       } else if (localFileArea === 'media') {
         localDirectory = mediaPath;
+      } else if (localFileArea === 'thumb') {
+        localDirectory = mediaCachePath;
       }
 
       let filePath;
