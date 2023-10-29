@@ -37,7 +37,15 @@ export default {
       type: 'custom',
       content: [
         html.tag('p',
-          language.$('listingPage.other.randomPages.chooseLinkLine')),
+          language.$('listingPage.other.randomPages.chooseLinkLine', {
+            fromPart:
+              (empty(relations.groupSections)
+                ? language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.notDividedByGroups')
+                : language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.dividedByGroups')),
+
+            browserSupportPart:
+              language.$('listingPage.other.randomPages.chooseLinkLine.browserSupportPart'),
+          })),
 
         html.tag('p',
           {class: 'js-hide-once-data'},
