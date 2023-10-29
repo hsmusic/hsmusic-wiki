@@ -63,6 +63,7 @@ import genThumbs, {
   CACHE_FILE as thumbsCacheFile,
   clearThumbs,
   defaultMagickThreads,
+  determineMediaCachePath,
   isThumb,
   verifyImagePaths,
 } from '#thumbs';
@@ -215,6 +216,11 @@ async function main() {
       type: 'value',
     },
 
+    'media-cache-path': {
+      help: `Specify path to media cache directory, including automatically generated thumbnails\n\nThis usually doesn't need to be provided, and will be inferred by adding "-cache" to the end of the media directory`,
+      type: 'value',
+    },
+
     // String files! For the most part, this is used for translating the
     // site to different languages, though you can also customize strings
     // for your own 8uild of the site if you'd like. Files here should all
@@ -252,11 +258,6 @@ async function main() {
     // pass this flag! It exits 8efore 8uilding the rest of the site.
     'thumbs-only': {
       help: `Skip everything besides processing media directory and generating up-to-date thumbnails (useful when using --skip-thumbs for most runs)`,
-      type: 'flag',
-    },
-
-    'clear-thumbs': {
-      help: `Clear the thumbnail cache and remove generated thumbnail files from media directory\n\n(This skips building. Run again without --clear-thumbs to build the site.)`,
       type: 'flag',
     },
 
@@ -431,7 +432,6 @@ async function main() {
 
   const skipThumbs = cliOptions['skip-thumbs'] ?? false;
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
-  const clearThumbsFlag = cliOptions['clear-thumbs'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
@@ -473,6 +473,39 @@ async function main() {
     });
   }
 
+  const {mediaCachePath, annotation: mediaCachePathAnnotation} =
+    await determineMediaCachePath({
+      mediaPath,
+      providedMediaCachePath:
+        cliOptions['media-cache-path'] || process.env.HSMUSIC_MEDIA_CACHE,
+      disallowDoubling:
+        migrateThumbs,
+    });
+
+  if (!mediaCachePath) {
+    logError`Couldn't determine a media cache path. (${mediaCachePathAnnotation})`;
+    switch (mediaCachePathAnnotation) {
+      case 'inferred path does not have cache':
+        logError`If you're certain this is the right path, you can provide it via`;
+        logError`${'--media-cache-path'} or ${'HSMUSIC_MEDIA_CACHE'}, and it should work.`;
+        break;
+
+      case 'inferred path not readable':
+        logError`The folder couldn't be read, which usually indicates`;
+        logError`a permissions error. Try to resolve this, or provide`;
+        logError`a new path with ${'--media-cache-path'} or ${'HSMUSIC_MEDIA_CACHE'}.`;
+        break;
+
+      case 'media path not provided': /* unreachable */
+        logError`It seems a ${'--media-path'} (or ${'HSMUSIC_MEDIA'}) wasn't provided.`;
+        logError`Make sure one of these is actually pointing to a path that exists.`;
+        break;
+    }
+    return false;
+  }
+
+  logInfo`Using media cache at: ${mediaCachePath} (${mediaCachePathAnnotation})`;
+
   const niceShowAggregate = (error, ...opts) => {
     showAggregate(error, {
       showTraces: showAggregateTraces,
@@ -486,17 +519,6 @@ async function main() {
     return false;
   }
 
-  if (clearThumbsFlag) {
-    const result = await clearThumbs(mediaPath, {queueSize});
-    if (result.success) {
-      logInfo`All done! Remove ${'--clear-thumbs'} to run the next build.`;
-      if (skipThumbs) {
-        logInfo`And don't forget to remove ${'--skip-thumbs'} too, eh?`;
-      }
-    }
-    return true;
-  }
-
   let thumbsCache;
 
   if (skipThumbs) {
@@ -507,7 +529,7 @@ async function main() {
 
     stepStatusSummary.loadThumbnailCache.status = STATUS_STARTED_NOT_DONE;
 
-    const thumbsCachePath = path.join(mediaPath, thumbsCacheFile);
+    const thumbsCachePath = path.join(mediaCachePath, thumbsCacheFile);
 
     try {
       thumbsCache = JSON.parse(await readFile(thumbsCachePath));
@@ -556,7 +578,10 @@ async function main() {
 
     logInfo`Begin thumbnail generation... -----+`;
 
-    const result = await genThumbs(mediaPath, {
+    const result = await genThumbs({
+      mediaPath,
+      mediaCachePath,
+
       queueSize,
       magickThreads,
       quiet: !thumbsOnly,
@@ -1042,6 +1067,7 @@ async function main() {
       cliOptions,
       dataPath,
       mediaPath,
+      mediaCachePath,
       queueSize,
       srcRootPath: __dirname,
 
