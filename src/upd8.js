@@ -114,6 +114,9 @@ async function main() {
   Error.stackTraceLimit = Infinity;
 
   stepStatusSummary = {
+    determineMediaCachePath:
+      {...defaultStepStatus, name: `determine media cache path`},
+
     migrateThumbnails:
       {...defaultStepStatus, name: `migrate thumbnails`},
 
@@ -485,6 +488,8 @@ async function main() {
     });
   }
 
+  stepStatusSummary.determineMediaCachePath.status = STATUS_STARTED_NOT_DONE;
+
   const {mediaCachePath, annotation: mediaCachePathAnnotation} =
     await determineMediaCachePath({
       mediaPath,
@@ -496,6 +501,7 @@ async function main() {
 
   if (!mediaCachePath) {
     logError`Couldn't determine a media cache path. (${mediaCachePathAnnotation})`;
+
     switch (mediaCachePathAnnotation) {
       case 'inferred path does not have cache':
         logError`If you're certain this is the right path, you can provide it via`;
@@ -513,10 +519,21 @@ async function main() {
         logError`Make sure one of these is actually pointing to a path that exists.`;
         break;
     }
+
+    Object.assign(stepStatusSummary.determineMediaCachePath, {
+      status: STATUS_FATAL_ERROR,
+      annotation: mediaCachePathAnnotation,
+    });
+
     return false;
   }
 
   logInfo`Using media cache at: ${mediaCachePath} (${mediaCachePathAnnotation})`;
+
+  Object.assign(stepStatusSummary.determineMediaCachePath, {
+    status: STATUS_DONE_CLEAN,
+    annotation: mediaCachePathAnnotation,
+  });
 
   if (migrateThumbs) {
     stepStatusSummary.migrateThumbnails.status = STATUS_STARTED_NOT_DONE;
