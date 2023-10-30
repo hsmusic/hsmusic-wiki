@@ -101,7 +101,7 @@ import {
 
 import dimensionsOf from 'image-size';
 
-import {delay, empty, queue} from '#sugar';
+import {delay, empty, queue, unique} from '#sugar';
 import {CacheableObject} from '#things';
 
 import {
@@ -110,6 +110,7 @@ import {
   logError,
   logInfo,
   logWarn,
+  logicalPathTo,
   parseOptions,
   progressPromiseAll,
 } from '#cli';
@@ -816,28 +817,114 @@ export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImageP
 export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   const expectedPaths = getExpectedImagePaths(mediaPath, {urls, wikiData});
   const extantPaths = await traverseSourceImagePaths(mediaPath, {target: 'verify'});
-  const {missing, misplaced} = checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
 
-  if (empty(missing) && empty(misplaced)) {
+  const {missing: missingPaths, misplaced: misplacedPaths} =
+    checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
+
+  if (empty(missingPaths) && empty(misplacedPaths)) {
     logInfo`All image paths are good - nice! None are missing or misplaced.`;
-    return {missing, misplaced};
+    return {missing: [], misplaced: []};
   }
 
-  if (!empty(missing)) {
-    logWarn`** Some image files are missing! (${missing.length + ' files'}) **`;
-    for (const file of missing) {
-      console.warn(colors.yellow(` - `) + file);
+  const relativeMediaPath = await logicalPathTo(mediaPath);
+
+  const dirnamesOfExpectedPaths =
+    unique(expectedPaths.map(file => path.dirname(file)));
+
+  const dirnamesOfExtantPaths =
+    unique(extantPaths.map(file => path.dirname(file)));
+
+  const dirnamesOfMisplacedPaths =
+    unique(misplacedPaths.map(file => path.dirname(file)));
+
+  const completelyMisplacedDirnames =
+    dirnamesOfMisplacedPaths
+      .filter(dirname => !dirnamesOfExpectedPaths.includes(dirname));
+
+  const completelyMissingDirnames =
+    dirnamesOfExpectedPaths
+      .filter(dirname => !dirnamesOfExtantPaths.includes(dirname));
+
+  const individuallyMisplacedPaths =
+    misplacedPaths
+      .filter(file => !completelyMisplacedDirnames.includes(path.dirname(file)));
+
+  const individuallyMissingPaths =
+    missingPaths
+      .filter(file => !completelyMissingDirnames.includes(path.dirname(file)));
+
+  const wrongExtensionPaths =
+    misplacedPaths
+      .map(file => {
+        const stripExtension = file =>
+          path.join(
+            path.dirname(file),
+            path.basename(file, path.extname(file)));
+
+        const extantExtension = path.extname(file);
+        const basename = stripExtension(file);
+
+        const expectedPath =
+          missingPaths
+            .find(file => stripExtension(file) === basename);
+
+        if (!expectedPath) return null;
+
+        const expectedExtension = path.extname(expectedPath);
+        return {basename, extantExtension, expectedExtension};
+      })
+      .filter(Boolean);
+
+  if (!empty(missingPaths)) {
+    if (missingPaths.length === 1) {
+      logWarn`${1} expected image file is missing from ${relativeMediaPath}:`;
+    } else {
+      logWarn`${missingPaths.length} expected image files are missing:`;
+    }
+
+    for (const dirname of completelyMissingDirnames) {
+      console.log(` - (missing) All files under ${colors.bright(dirname)}`);
+    }
+
+    for (const file of individuallyMissingPaths) {
+      console.log(` - (missing) ${file}`);
     }
   }
 
-  if (!empty(misplaced)) {
-    logWarn`** Some image files are misplaced! (${misplaced.length + ' files'}) **`;
-    for (const file of misplaced) {
-      console.warn(colors.yellow(` - `) + file);
+  if (!empty(misplacedPaths)) {
+    if (misplacedPaths.length === 1) {
+      logWarn`${1} image file, present in ${relativeMediaPath}, wasn't expected:`;
+    } else {
+      logWarn`${misplacedPaths.length} image files, present in ${relativeMediaPath}, weren't expected:`;
+    }
+
+    for (const dirname of completelyMisplacedDirnames) {
+      console.log(` - (misplaced) All files under ${colors.bright(dirname)}`);
+    }
+
+    for (const file of individuallyMisplacedPaths) {
+      console.log(` - (misplaced) ${file}`);
     }
   }
 
-  return {missing, misplaced};
+  if (!empty(wrongExtensionPaths)) {
+    if (wrongExtensionPaths.length === 1) {
+      logWarn`Of these, ${1} has an unexpected file extension:`;
+    } else {
+      logWarn`Of these, ${wrongExtensionPaths.length} have an unexpected file extension:`;
+    }
+
+    for (const {basename, extantExtension, expectedExtension} of wrongExtensionPaths) {
+      console.log(` - (expected ${colors.green(expectedExtension)}) ${basename + colors.red(extantExtension)}`);
+    }
+
+    logWarn`To handle unexpected file extensions:`;
+    logWarn` * Source and ${`replace`} with the correct file, or`;
+    logWarn` * Add ${`"Cover Art File Extension"`} field (or similar)`;
+    logWarn`   to the respective document in YAML data files.`;
+  }
+
+  return {missing: missingPaths, misplaced: misplacedPaths};
 }
 
 // Recursively traverses the provided (extant) media path, filtering so only
