@@ -1199,15 +1199,28 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
           Object.values(stepStatusSummary)
             .map(({name}) => name.length));
 
-      const anyStepsNotClean =
+      const stepsNotClean =
         Object.values(stepStatusSummary)
-          .some(({status}) =>
+          .map(({status}) =>
             status === STATUS_HAS_WARNINGS ||
             status === STATUS_FATAL_ERROR ||
             status === STATUS_STARTED_NOT_DONE);
 
-      for (const {name, status, annotation} of Object.values(stepStatusSummary)) {
-        let message = `${(name + ': ').padEnd(longestNameLength + 4, '.')} ${status}`;
+      const anyStepsNotClean =
+        stepsNotClean.includes(true);
+
+      const stepDetails = Object.values(stepStatusSummary);
+
+      for (let index = 0; index < stepDetails.length; index++) {
+        const {name, status, annotation} = stepDetails[index];
+
+        let message =
+          (stepsNotClean[index]
+            ? `!! `
+            : ` - `);
+
+        message += `${(name + ': ').padEnd(longestNameLength + 4, '.')} ${status}`;
+
         if (annotation) {
           message += ` (${annotation})`;
         }
@@ -1245,6 +1258,8 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
         } else {
           console.error(colors.bright(`Final output is true and all steps are clean.`));
         }
+      } else if (result === false) {
+        console.error(colors.bright(`Final output is false.`));
       } else {
         console.error(colors.bright(`Final output is not true (${result}).`));
       }
