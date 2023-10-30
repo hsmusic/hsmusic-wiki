@@ -114,11 +114,11 @@ async function main() {
   Error.stackTraceLimit = Infinity;
 
   stepStatusSummary = {
-    loadThumbnailCache:
-      {...defaultStepStatus, name: `load thumbnail cache file`},
-
     migrateThumbnails:
       {...defaultStepStatus, name: `migrate thumbnails`},
+
+    loadThumbnailCache:
+      {...defaultStepStatus, name: `load thumbnail cache file`},
 
     generateThumbnails:
       {...defaultStepStatus, name: `generate thumbnails`},
@@ -914,7 +914,7 @@ async function main() {
 
     Object.assign(stepStatusSummary.loadLanguageFiles, {
       status: STATUS_NOT_APPLICABLE,
-      annotation: `--lang-path and HSMUSIC_LANG not provided`,
+      annotation: `neither --lang-path nor HSMUSIC_LANG provided`,
     });
   }
 
