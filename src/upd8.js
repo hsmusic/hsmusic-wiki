@@ -150,6 +150,9 @@ async function main() {
     initializeDefaultLanguage:
       {...defaultStepStatus, name: `initialize default language`},
 
+    verifyImagePaths:
+      {...defaultStepStatus, name: `verify missing/misplaced image paths`},
+
     preloadFileSizes:
       {...defaultStepStatus, name: `preload file sizes`},
 
@@ -970,8 +973,29 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  const {missing: missingImagePaths} =
+  stepStatusSummary.verifyImagePaths.status = STATUS_STARTED_NOT_DONE;
+
+  const {missing: missingImagePaths, misplaced: misplacedImagePaths} =
     await verifyImagePaths(mediaPath, {urls, wikiData});
+
+  if (empty(missingImagePaths) && empty(misplacedImagePaths)) {
+    stepStatusSummary.verifyImagePaths.status = STATUS_DONE_CLEAN;
+  } else if (empty(missingImagePaths)) {
+    Object.assign(stepStatusSummary.verifyImagePaths, {
+      status: STATUS_HAS_WARNINGS,
+      annotation: `misplaced images detected`,
+    });
+  } else if (empty(misplacedImagePaths)) {
+    Object.assign(stepStatusSummary.verifyImagePaths, {
+      status: STATUS_HAS_WARNINGS,
+      annotation: `missing images detected`,
+    });
+  } else {
+    Object.assign(stepStatusSummary.verifyImagePaths, {
+      status :STATUS_HAS_WARNINGS,
+      annotation: `missing and misplaced images detected`,
+    });
+  }
 
   const fileSizePreloader = new FileSizePreloader();
 
