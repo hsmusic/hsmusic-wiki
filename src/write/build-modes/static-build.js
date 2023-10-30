@@ -374,6 +374,8 @@ export async function go({
     logWarn`available - albeit possibly outdated! Please scroll up and send`;
     logWarn`the HSMusic developers a copy of the errors:`;
     fileIssue({topMessage: null});
+
+    return false;
   }
 
   return true;

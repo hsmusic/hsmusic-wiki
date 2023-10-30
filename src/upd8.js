@@ -1164,7 +1164,7 @@ async function main() {
   if (buildModeResult !== true) {
     Object.assign(stepStatusSummary.performBuild, {
       status: STATUS_HAS_WARNINGS,
-      message: `may not have completed - view log for details`,
+      annotation: `may not have completed - view log for details`,
     });
 
     return false;
