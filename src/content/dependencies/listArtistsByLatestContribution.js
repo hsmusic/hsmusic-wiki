@@ -143,10 +143,10 @@ export default {
         ],
         [
           // TODO: Per-artwork dates, see #90.
-          ...artist.tracksAsCoverArtist.map(track => track.coverArtDate),
-          ...artist.albumsAsCoverArtist.map(album => album.coverArtDate),
-          ...artist.albumsAsWallpaperArtist.map(album => album.coverArtDate),
-          ...artist.albumsAsBannerArtist.map(album => album.coverArtDate),
+          ...artist.tracksAsCoverArtist.map(track => track.coverArtDate ?? track.date),
+          ...artist.albumsAsCoverArtist.map(album => album.coverArtDate ?? album.date),
+          ...artist.albumsAsWallpaperArtist.map(album => album.coverArtDate ?? album.date),
+          ...artist.albumsAsBannerArtist.map(album => album.coverArtDate ?? album.date),
         ],
       ]);
 

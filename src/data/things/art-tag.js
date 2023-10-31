@@ -54,7 +54,7 @@ export class ArtTag extends Thing {
           sortAlbumsTracksChronologically(
             [...albumData, ...trackData]
               .filter(({artTags}) => artTags.includes(artTag)),
-            {getDate: o => o.coverArtDate}),
+            {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
   });

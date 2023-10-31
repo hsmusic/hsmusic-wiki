@@ -82,7 +82,7 @@ export default {
             ...artist.albumsAsCoverArtist,
             ...artist.tracksAsCoverArtist,
           ], {
-            getDate: albumOrTrack => albumOrTrack.coverArtDate,
+            getDate: thing => thing.coverArtDate ?? thing.date,
           }),
       }),
 
