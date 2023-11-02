@@ -103,6 +103,7 @@ import dimensionsOf from 'image-size';
 
 import {delay, empty, queue, unique} from '#sugar';
 import {CacheableObject} from '#things';
+import {sortByName} from '#wiki-data';
 
 import {
   colors,
@@ -769,7 +770,7 @@ export default async function genThumbs({
 export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
   const fromRoot = urls.from('media.root');
 
-  return [
+  const paths = [
     wikiData.albumData
       .flatMap(album => [
         album.hasCoverArt && fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
@@ -789,6 +790,10 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
     wikiData.flashData
       .map(flash => fromRoot.to('media.flashArt', flash.directory, flash.coverArtFileExtension)),
   ].flat();
+
+  sortByName(paths, {getName: path => path});
+
+  return paths;
 }
 
 export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImagePaths) {
@@ -954,7 +959,7 @@ export async function traverseSourceImagePaths(mediaPath, {target}) {
     throw new Error(`Expected target to be 'verify' or 'generate', got ${target}`);
   }
 
-  return await traverse(mediaPath, {
+  const paths = await traverse(mediaPath, {
     pathStyle: (target === 'verify' ? 'posix' : 'device'),
     prefixPath: '',
 
@@ -984,6 +989,10 @@ export async function traverseSourceImagePaths(mediaPath, {target}) {
       return true;
     },
   });
+
+  sortByName(paths, {getName: path => path});
+
+  return paths;
 }
 
 export function isThumb(file) {
