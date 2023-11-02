@@ -1662,7 +1662,7 @@ export function filterReferenceErrors(wikiData) {
           }
         }
 
-        nest({message: `Reference errors in ${inspect(thing)}`}, ({push, filter}) => {
+        nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
             const value = CacheableObject.getUpdateValue(thing, property);
 
