@@ -40,8 +40,13 @@ export class ArtTag extends Thing {
 
     // Update only
 
-    albumData: wikiData(Album),
-    trackData: wikiData(Track),
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
 
     // Expose only
 

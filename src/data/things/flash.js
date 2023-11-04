@@ -95,9 +95,17 @@ export class Flash extends Thing {
 
     // Update only
 
-    artistData: wikiData(Artist),
-    trackData: wikiData(Track),
-    flashActData: wikiData(FlashAct),
+    artistData: wikiData({
+      class: input.value(Artist),
+    }),
+
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
+
+    flashActData: wikiData({
+      class: input.value(FlashAct),
+    }),
 
     // Expose only
 
@@ -159,6 +167,8 @@ export class FlashAct extends Thing {
 
     // Update only
 
-    flashData: wikiData(Flash),
+    flashData: wikiData({
+      class: input.value(Flash),
+    }),
   })
 }

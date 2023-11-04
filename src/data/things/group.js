@@ -34,8 +34,13 @@ export class Group extends Thing {
 
     // Update only
 
-    albumData: wikiData(Album),
-    groupCategoryData: wikiData(GroupCategory),
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    groupCategoryData: wikiData({
+      class: input.value(GroupCategory),
+    }),
 
     // Expose only
 
@@ -102,6 +107,8 @@ export class GroupCategory extends Thing {
 
     // Update only
 
-    groupData: wikiData(Group),
+    groupData: wikiData({
+      class: input.value(Group),
+    }),
   });
 }

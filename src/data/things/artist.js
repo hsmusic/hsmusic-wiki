@@ -45,10 +45,21 @@ export class Artist extends Thing {
 
     // Update only
 
-    albumData: wikiData(Album),
-    artistData: wikiData(Artist),
-    flashData: wikiData(Flash),
-    trackData: wikiData(Track),
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    artistData: wikiData({
+      class: input.value(Artist),
+    }),
+
+    flashData: wikiData({
+      class: input.value(Flash),
+    }),
+
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
 
     // Expose only
 
