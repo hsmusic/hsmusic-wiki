@@ -1,17 +1,20 @@
 // General purpose wiki data constructor, for properties like artistData,
 // trackData, etc.
 
-import {validateArrayItems, validateInstanceOf} from '#validators';
+import {validateWikiData} from '#validators';
+
+// TODO: Kludge.
+import Thing from '../../things/thing.js';
 
 // TODO: Not templateCompositeFrom.
 
-// TODO: This should validate with validateWikiData.
-
 export default function(thingClass) {
+  const referenceType = thingClass[Thing.referenceType];
+
   return {
     flags: {update: true},
     update: {
-      validate: validateArrayItems(validateInstanceOf(thingClass)),
+      validate: validateWikiData({referenceType}),
     },
   };
 }
