@@ -83,12 +83,15 @@ export class Group extends Thing {
 }
 
 export class GroupCategory extends Thing {
+  static [Thing.referenceType] = 'group-category';
   static [Thing.friendlyName] = `Group Category`;
 
   static [Thing.getPropertyDescriptors] = ({Group}) => ({
     // Update & expose
 
     name: name('Unnamed Group Category'),
+    directory: directory(),
+
     color: color(),
 
     groups: referenceList({
