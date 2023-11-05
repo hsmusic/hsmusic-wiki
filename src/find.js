@@ -2,6 +2,7 @@ import {inspect} from 'node:util';
 
 import {colors, logWarn} from '#cli';
 import {typeAppearance} from '#sugar';
+import {CacheableObject} from '#things';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -185,6 +186,22 @@ const find = {
         ? []
         : [track.name]),
   }),
+
+  trackOriginalReleasesOnly: findHelper({
+    referenceTypes: ['track'],
+
+    include: track =>
+      !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'),
+
+    // It's still necessary to check alwaysReferenceByDirectory here, since it
+    // may be set manually (with the `Always Reference By Directory` field), and
+    // these shouldn't be matched by name (as per usual). See the definition for
+    // that property for more information.
+    getMatchableNames: track =>
+      (track.alwaysReferenceByDirectory
+        ? []
+        : [track.name]),
+  }),
 };
 
 export default find;
@@ -207,6 +224,7 @@ export function bindFind(wikiData, opts1) {
       newsEntry: 'newsData',
       staticPage: 'staticPageData',
       track: 'trackData',
+      trackOriginalReleasesOnly: 'trackData',
     }).map(([key, value]) => {
       const findFn = find[key];
       const thingData = wikiData[value];
