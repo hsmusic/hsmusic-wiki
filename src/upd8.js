@@ -488,6 +488,53 @@ async function main() {
     });
   }
 
+  // Prepare not-applicable steps before anything else.
+
+  if (skipThumbs) {
+    Object.assign(stepStatusSummary.generateThumbnails, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `provided --skip-thumbs`,
+    });
+  } else {
+    Object.assign(stepStatusSummary.loadThumbnailCache, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `using cache from thumbnail generation`,
+    });
+  }
+
+  if (!migrateThumbs) {
+    Object.assign(stepStatusSummary.migrateThumbnails, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--migrate-thumbs not provided`,
+    });
+  }
+
+  if (!precacheData) {
+    Object.assign(stepStatusSummary.precacheData, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--precache-data not provided`,
+    });
+  }
+
+  if (!langPath) {
+    Object.assign(stepStatusSummary.loadLanguageFiles, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `neither --lang-path nor HSMUSIC_LANG provided`,
+    });
+  }
+
+  if (noBuild) {
+    Object.assign(stepStatusSummary.performBuild, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--no-build provided`,
+    });
+  }
+
+  if (skipThumbs && thumbsOnly) {
+    logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
+    return false;
+  }
+
   stepStatusSummary.determineMediaCachePath.status = STATUS_STARTED_NOT_DONE;
 
   const {mediaCachePath, annotation: mediaCachePathAnnotation} =
@@ -557,11 +604,6 @@ async function main() {
     logInfo`Good to go! Run hsmusic again without ${'--migrate-thumbs'} to start`;
     logInfo`using the migrated media cache.`;
     return true;
-  } else {
-    Object.assign(stepStatusSummary.migrateThumbnails, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `--migrate-thumbs not provided`,
-    });
   }
 
   const niceShowAggregate = (error, ...opts) => {
@@ -572,19 +614,9 @@ async function main() {
     });
   };
 
-  if (skipThumbs && thumbsOnly) {
-    logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
-    return false;
-  }
-
   let thumbsCache;
 
   if (skipThumbs) {
-    Object.assign(stepStatusSummary.generateThumbnails, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `provided --skip-thumbs`,
-    });
-
     stepStatusSummary.loadThumbnailCache.status = STATUS_STARTED_NOT_DONE;
 
     const thumbsCachePath = path.join(mediaCachePath, thumbsCacheFile);
@@ -627,11 +659,6 @@ async function main() {
 
     logInfo`Skipping thumbnail generation.`;
   } else {
-    Object.assign(stepStatusSummary.loadThumbnailCache, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `using cache from thumbnail generation`,
-    });
-
     stepStatusSummary.generateThumbnails.status = STATUS_STARTED_NOT_DONE;
 
     logInfo`Begin thumbnail generation... -----+`;
@@ -852,19 +879,9 @@ async function main() {
       .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
 
     stepStatusSummary.precacheData.status = STATUS_DONE_CLEAN;
-  } else {
-    Object.assign(stepStatusSummary.precacheData, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `--precache-data not provided`,
-    });
   }
 
   if (noBuild) {
-    Object.assign(stepStatusSummary.performBuild, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `--no-build provided`,
-    });
-
     displayCompositeCacheAnalysis();
 
     if (precacheData) {
@@ -931,11 +948,6 @@ async function main() {
     stepStatusSummary.loadLanguageFiles.status = STATUS_DONE_CLEAN;
   } else {
     languages = {};
-
-    Object.assign(stepStatusSummary.loadLanguageFiles, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `neither --lang-path nor HSMUSIC_LANG provided`,
-    });
   }
 
   stepStatusSummary.initializeDefaultLanguage.status = STATUS_STARTED_NOT_DONE;
