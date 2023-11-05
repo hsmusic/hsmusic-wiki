@@ -255,6 +255,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-reference-validation': {
+      help: `Skips checking and reporting reference errors, which speeds up the build but may silently allow erroneous data to pass through`,
+      type: 'flag',
+    },
+
     // Thum8nail gener8tion is *usually* something you want, 8ut it can 8e
     // kinda a pain to run every time, since it does necessit8te reading
     // every media file at run time. Pass this to skip it.
@@ -447,6 +452,7 @@ async function main() {
   const migrateThumbs = cliOptions['migrate-thumbs'] ?? false;
   const skipThumbs = cliOptions['skip-thumbs'] ?? false;
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
+  const skipReferenceValidation = cliOptions['skip-reference-validation'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
@@ -506,6 +512,16 @@ async function main() {
     Object.assign(stepStatusSummary.migrateThumbnails, {
       status: STATUS_NOT_APPLICABLE,
       annotation: `--migrate-thumbs not provided`,
+    });
+  }
+
+  if (skipReferenceValidation) {
+    logWarn`Skipping reference validation. If any reference errors are present`;
+    logWarn`in data, they will be silently passed along to the build.`;
+
+    Object.assign(stepStatusSummary.filterReferenceErrors, {
+      status: STATUS_NOT_APPLICABLE,
+      annotation: `--skip-reference-validation provided`,
     });
   }
 
@@ -833,25 +849,27 @@ async function main() {
   // Filter out any reference errors throughout the data, warning about them
   // too.
 
-  stepStatusSummary.filterReferenceErrors.status = STATUS_STARTED_NOT_DONE;
+  if (!skipReferenceValidation) {
+    stepStatusSummary.filterReferenceErrors.status = STATUS_STARTED_NOT_DONE;
 
-  const filterReferenceErrorsAggregate = filterReferenceErrors(wikiData);
+    const filterReferenceErrorsAggregate = filterReferenceErrors(wikiData);
 
-  try {
-    filterReferenceErrorsAggregate.close();
-    logInfo`All references validated without any errors - nice!`;
-    stepStatusSummary.filterReferenceErrors.status = STATUS_DONE_CLEAN;
-  } catch (error) {
-    niceShowAggregate(error);
+    try {
+      filterReferenceErrorsAggregate.close();
+      logInfo`All references validated without any errors - nice!`;
+      stepStatusSummary.filterReferenceErrors.status = STATUS_DONE_CLEAN;
+    } catch (error) {
+      niceShowAggregate(error);
 
-    logWarn`The above errors were detected while validating references in data files.`;
-    logWarn`The wiki will still build, but these connections between data objects`;
-    logWarn`will be completely skipped. Resolve the errors for more complete output.`;
+      logWarn`The above errors were detected while validating references in data files.`;
+      logWarn`The wiki will still build, but these connections between data objects`;
+      logWarn`will be completely skipped. Resolve the errors for more complete output.`;
 
-    Object.assign(stepStatusSummary.filterReferenceErrors, {
-      status: STATUS_HAS_WARNINGS,
-      annotation: `view log for details`,
-    });
+      Object.assign(stepStatusSummary.filterReferenceErrors, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `view log for details`,
+      });
+    }
   }
 
   // Sort data arrays so that they're all in order! This may use properties
