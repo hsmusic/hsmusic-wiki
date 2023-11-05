@@ -16,6 +16,8 @@ function warnOrThrow(mode, message) {
 }
 
 export function processAllAvailableMatches(data, {
+  include = thing => true,
+
   getMatchableNames = thing =>
     (Object.hasOwn(thing, 'name')
       ? [thing.name]
@@ -26,6 +28,10 @@ export function processAllAvailableMatches(data, {
   const multipleNameMatches = Object.create(null);
 
   for (const thing of data) {
+    if (!include(thing)) continue;
+
+    byDirectory[thing.directory] = thing;
+
     for (const name of getMatchableNames(thing)) {
       if (typeof name !== 'string') {
         logWarn`Unexpected ${typeAppearance(name)} returned in names for ${inspect(thing)}`;
@@ -33,6 +39,7 @@ export function processAllAvailableMatches(data, {
       }
 
       const normalizedName = name.toLowerCase();
+
       if (normalizedName in byName) {
         const alreadyMatchesByName = byName[normalizedName];
         byName[normalizedName] = null;
@@ -45,8 +52,6 @@ export function processAllAvailableMatches(data, {
         byName[normalizedName] = thing;
       }
     }
-
-    byDirectory[thing.directory] = thing;
   }
 
   return {byName, byDirectory, multipleNameMatches};
@@ -55,6 +60,7 @@ export function processAllAvailableMatches(data, {
 function findHelper({
   referenceTypes,
 
+  include = undefined,
   getMatchableNames = undefined,
 }) {
   const keyRefRegex =
@@ -84,6 +90,7 @@ function findHelper({
     if (!subcache) {
       subcache =
         processAllAvailableMatches(data, {
+          include,
           getMatchableNames,
         });
 
