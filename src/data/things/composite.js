@@ -637,6 +637,10 @@ export function compositeFrom(description) {
 
   const compositionNests = description.compose ?? true;
 
+  if (compositionNests && empty(steps)) {
+    aggregate.push(new TypeError(`Expected at least one step`));
+  }
+
   // Steps default to exposing if using a shorthand syntax where flags aren't
   // specified at all.
   const stepsExpose =
