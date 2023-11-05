@@ -433,16 +433,36 @@ export function validateWikiData({
         OK = true; return true;
       }
 
-      const allRefTypes =
-        new Set(array.map(object =>
-          object.constructor[Symbol.for('Thing.referenceType')]));
+      const allRefTypes = new Set();
 
-      if (allRefTypes.has(undefined)) {
-        if (allRefTypes.size === 1) {
-          throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
+      let foundThing = false;
+      let foundOtherObject = false;
+
+      for (const object of array) {
+        const {[Symbol.for('Thing.referenceType')]: referenceType} = object.constructor;
+
+        if (referenceType === undefined) {
+          foundOtherObject = true;
+
+          // Early-exit if a Thing has been found - nothing more can be learned.
+          if (foundThing) {
+            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+          }
         } else {
-          throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+          foundThing = true;
+
+          // Early-exit if a non-Thing object has been found - nothing more can
+          // be learned.
+          if (foundOtherObject) {
+            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+          }
+
+          allRefTypes.add(referenceType);
         }
+      }
+
+      if (foundOtherObject && !foundThing) {
+        throw new TypeError(`Expected array of wiki data objects, got array of other objects`);
       }
 
       if (allRefTypes.size > 1) {
@@ -464,8 +484,10 @@ export function validateWikiData({
         throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
       }
 
-      if (referenceType && !allRefTypes.has(referenceType)) {
-        throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
+      const onlyRefType = Array.from(allRefTypes)[0];
+
+      if (referenceType && onlyRefType !== referenceType) {
+        throw new TypeError(`Expected array of ${referenceType}, got array of ${onlyRefType}`)
       }
 
       OK = true; return true;

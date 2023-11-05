@@ -256,11 +256,25 @@ export class Track extends Thing {
 
     // Update only
 
-    albumData: wikiData(Album),
-    artistData: wikiData(Artist),
-    artTagData: wikiData(ArtTag),
-    flashData: wikiData(Flash),
-    trackData: wikiData(Track),
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    artistData: wikiData({
+      class: input.value(Artist),
+    }),
+
+    artTagData: wikiData({
+      class: input.value(ArtTag),
+    }),
+
+    flashData: wikiData({
+      class: input.value(Flash),
+    }),
+
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
 
     // Expose only
 

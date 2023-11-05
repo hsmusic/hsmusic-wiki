@@ -64,6 +64,8 @@ export class WikiInfo extends Thing {
 
     // Update only
 
-    groupData: wikiData(Group),
+    groupData: wikiData({
+      class: input.value(Group),
+    }),
   });
 }
