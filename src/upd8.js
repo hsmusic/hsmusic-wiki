@@ -1428,6 +1428,9 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
     } catch (error) {
       if (error instanceof AggregateError) {
         showAggregate(error);
+      } else if (error.cause) {
+        console.error(error);
+        showAggregate(error);
       } else {
         console.error(error);
       }
