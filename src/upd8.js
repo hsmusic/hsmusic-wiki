@@ -132,6 +132,9 @@ async function main() {
     linkWikiDataArrays:
       {...defaultStepStatus, name: `link wiki data arrays`},
 
+    precacheCommonData:
+      {...defaultStepStatus, name: `precache common data`},
+
     filterDuplicateDirectories:
       {...defaultStepStatus, name: `filter duplicate directories`},
 
@@ -141,8 +144,8 @@ async function main() {
     sortWikiDataArrays:
       {...defaultStepStatus, name: `sort wiki data arrays`},
 
-    precacheData:
-      {...defaultStepStatus, name: `precache data`},
+    precacheAllData:
+      {...defaultStepStatus, name: `precache nearly all data`},
 
     loadInternalDefaultLanguage:
       {...defaultStepStatus, name: `load internal default language`},
@@ -462,7 +465,7 @@ async function main() {
 
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
-  const precacheData = cliOptions['precache-data'] ?? false;
+  const precacheAllData = cliOptions['precache-data'] ?? false;
   const showInvalidPropertyAccesses = cliOptions['show-invalid-property-accesses'] ?? false;
 
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
@@ -525,8 +528,8 @@ async function main() {
     });
   }
 
-  if (!precacheData) {
-    Object.assign(stepStatusSummary.precacheData, {
+  if (!precacheAllData) {
+    Object.assign(stepStatusSummary.precacheAllData, {
       status: STATUS_NOT_APPLICABLE,
       annotation: `--precache-data not provided`,
     });
@@ -866,6 +869,72 @@ async function main() {
     timeEnd: Date.now(),
   });
 
+  Object.assign(stepStatusSummary.precacheCommonData, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
+
+  const commonDataMap = {
+    albumData: new Set([
+      // Needed for sorting
+      'date', 'tracks',
+      // Needed for computing page paths
+      'commentary',
+    ]),
+
+    artTagData: new Set([
+      // Needed for computing page paths
+      'isContentWarning',
+    ]),
+
+    artistAliasData: new Set([
+      // Needed for computing page paths
+      'aliasedArtist',
+    ]),
+
+    flashData: new Set([
+      // Needed for sorting
+      'act', 'date',
+    ]),
+
+    flashActData: new Set([
+      // Needed for sorting
+      'flashes',
+    ]),
+
+    groupData: new Set([
+      // Needed for computing page paths
+      'albums',
+    ]),
+
+    listingSpec: new Set([
+      // Needed for computing page paths
+      'contentFunction', 'featureFlag',
+    ]),
+
+    trackData: new Set([
+      // Needed for sorting
+      'album', 'date',
+      // Needed for computing page paths
+      'commentary',
+    ]),
+  };
+
+  for (const [wikiDataKey, properties] of Object.entries(commonDataMap)) {
+    const thingData = wikiData[wikiDataKey];
+    const allProperties = new Set(['name', 'directory', ...properties]);
+    for (const thing of thingData) {
+      for (const property of allProperties) {
+        void thing[property];
+      }
+    }
+  }
+
+  Object.assign(stepStatusSummary.precacheCommonData, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
+
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
@@ -952,8 +1021,8 @@ async function main() {
     timeEnd: Date.now(),
   });
 
-  if (precacheData) {
-    Object.assign(stepStatusSummary.precacheData, {
+  if (precacheAllData) {
+    Object.assign(stepStatusSummary.precacheAllData, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
     });
@@ -970,7 +1039,7 @@ async function main() {
       .flatMap(([_key, things]) => things)
       .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
 
-    Object.assign(stepStatusSummary.precacheData, {
+    Object.assign(stepStatusSummary.precacheAllData, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
     });
@@ -979,7 +1048,7 @@ async function main() {
   if (noBuild) {
     displayCompositeCacheAnalysis();
 
-    if (precacheData) {
+    if (precacheAllData) {
       return true;
     }
   }
