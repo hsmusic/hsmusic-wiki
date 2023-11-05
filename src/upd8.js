@@ -551,7 +551,10 @@ async function main() {
     return false;
   }
 
-  stepStatusSummary.determineMediaCachePath.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.determineMediaCachePath, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   const {mediaCachePath, annotation: mediaCachePathAnnotation} =
     await determineMediaCachePath({
@@ -586,6 +589,7 @@ async function main() {
     Object.assign(stepStatusSummary.determineMediaCachePath, {
       status: STATUS_FATAL_ERROR,
       annotation: mediaCachePathAnnotation,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -596,10 +600,14 @@ async function main() {
   Object.assign(stepStatusSummary.determineMediaCachePath, {
     status: STATUS_DONE_CLEAN,
     annotation: mediaCachePathAnnotation,
+    timeEnd: Date.now(),
   });
 
   if (migrateThumbs) {
-    stepStatusSummary.migrateThumbnails.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.migrateThumbnails, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     const result = await migrateThumbsIntoDedicatedCacheDirectory({
       mediaPath,
@@ -611,14 +619,20 @@ async function main() {
       Object.assign(stepStatusSummary.migrateThumbnails, {
         status: STATUS_FATAL_ERROR,
         annotation: `view log for details`,
+        timeEnd: Date.now(),
       });
+
       return false;
     }
 
-    stepStatusSummary.migrateThumbnails.status = STATUS_DONE_CLEAN;
-
     logInfo`Good to go! Run hsmusic again without ${'--migrate-thumbs'} to start`;
     logInfo`using the migrated media cache.`;
+
+    Object.assign(stepStatusSummary.migrateThumbnails, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
+
     return true;
   }
 
@@ -633,14 +647,15 @@ async function main() {
   let thumbsCache;
 
   if (skipThumbs) {
-    stepStatusSummary.loadThumbnailCache.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.loadThumbnailCache, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     const thumbsCachePath = path.join(mediaCachePath, thumbsCacheFile);
 
     try {
       thumbsCache = JSON.parse(await readFile(thumbsCachePath));
-      logInfo`Thumbnail cache file successfully read.`;
-      stepStatusSummary.loadThumbnailCache.status = STATUS_DONE_CLEAN;
     } catch (error) {
       if (error.code === 'ENOENT') {
         logError`The thumbnail cache doesn't exist, and it's necessary to build`
@@ -651,6 +666,7 @@ async function main() {
         Object.assign(stepStatusSummary.loadThumbnailCache, {
           status: STATUS_FATAL_ERROR,
           annotation: `cache does not exist`,
+          timeEnd: Date.now(),
         });
 
         return false;
@@ -667,15 +683,26 @@ async function main() {
         Object.assign(stepStatusSummary.loadThumbnailCache, {
           status: STATUS_FATAL_ERROR,
           annotation: `cache malformed or unreadable`,
+          timeEnd: Date.now(),
         });
 
         return false;
       }
     }
 
+    logInfo`Thumbnail cache file successfully read.`;
+
+    Object.assign(stepStatusSummary.loadThumbnailCache, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
+
     logInfo`Skipping thumbnail generation.`;
   } else {
-    stepStatusSummary.generateThumbnails.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.generateThumbnails, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     logInfo`Begin thumbnail generation... -----+`;
 
@@ -694,12 +721,16 @@ async function main() {
       Object.assign(stepStatusSummary.generateThumbnails, {
         status: STATUS_FATAL_ERROR,
         annotation: `view log for details`,
+        timeEnd: Date.now(),
       });
 
       return false;
     }
 
-    stepStatusSummary.generateThumbnails.status = STATUS_DONE_CLEAN;
+    Object.assign(stepStatusSummary.generateThumbnails, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
 
     if (thumbsOnly) {
       return true;
@@ -720,7 +751,10 @@ async function main() {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
-  stepStatusSummary.loadDataFiles.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.loadDataFiles, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   let processDataAggregate, wikiDataResult;
 
@@ -736,6 +770,7 @@ async function main() {
     Object.assign(stepStatusSummary.loadDataFiles, {
       status: STATUS_FATAL_ERROR,
       annotation: `javascript error - view log for details`,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -780,15 +815,7 @@ async function main() {
     } catch (error) {
       niceShowAggregate(error);
       logWarn`The above errors were detected while processing data files.`;
-      logWarn`If the remaining valid data is complete enough, the wiki will`;
-      logWarn`still build - but all errored data will be skipped.`;
-      logWarn`(Resolve errors for more complete output!)`;
       errorless = false;
-
-      Object.assign(stepStatusSummary.loadDataFiles, {
-        status: STATUS_HAS_WARNINGS,
-        annotation: `view log for details`,
-      });
     }
 
     if (!wikiData.wikiInfo) {
@@ -797,6 +824,7 @@ async function main() {
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_FATAL_ERROR,
         annotation: `wiki info object not available`,
+        timeEnd: Date.now(),
       });
 
       return false;
@@ -804,7 +832,21 @@ async function main() {
 
     if (errorless) {
       logInfo`All data files processed without any errors - nice!`;
-      stepStatusSummary.loadDataFiles.status = STATUS_DONE_CLEAN;
+
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } else {
+      logWarn`If the remaining valid data is complete enough, the wiki will`;
+      logWarn`still build - but all errored data will be skipped.`;
+      logWarn`(Resolve errors for more complete output!)`;
+
+      Object.assign(stepStatusSummary.loadDataFiles, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `view log for details`,
+        timeEnd: Date.now(),
+      });
     }
   }
 
@@ -812,16 +854,25 @@ async function main() {
   // complete, so properties (like dates!) are inherited where that's
   // appropriate.
 
-  stepStatusSummary.linkWikiDataArrays.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.linkWikiDataArrays, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   linkWikiDataArrays(wikiData);
 
-  stepStatusSummary.linkWikiDataArrays.status = STATUS_DONE_CLEAN;
+  Object.assign(stepStatusSummary.linkWikiDataArrays, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
 
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
-  stepStatusSummary.filterDuplicateDirectories.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   const filterDuplicateDirectoriesAggregate =
     filterDuplicateDirectories(wikiData);
@@ -829,7 +880,11 @@ async function main() {
   try {
     filterDuplicateDirectoriesAggregate.close();
     logInfo`No duplicate directories found - nice!`;
-    stepStatusSummary.filterDuplicateDirectories.status = STATUS_DONE_CLEAN;
+
+    Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   } catch (aggregate) {
     niceShowAggregate(aggregate);
 
@@ -841,6 +896,7 @@ async function main() {
     Object.assign(stepStatusSummary.filterDuplicateDirectories, {
       status: STATUS_FATAL_ERROR,
       annotation: `duplicate directories found`,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -850,14 +906,22 @@ async function main() {
   // too.
 
   if (!skipReferenceValidation) {
-    stepStatusSummary.filterReferenceErrors.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.filterReferenceErrors, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     const filterReferenceErrorsAggregate = filterReferenceErrors(wikiData);
 
     try {
       filterReferenceErrorsAggregate.close();
+
       logInfo`All references validated without any errors - nice!`;
-      stepStatusSummary.filterReferenceErrors.status = STATUS_DONE_CLEAN;
+
+      Object.assign(stepStatusSummary.filterReferenceErrors, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
     } catch (error) {
       niceShowAggregate(error);
 
@@ -868,6 +932,7 @@ async function main() {
       Object.assign(stepStatusSummary.filterReferenceErrors, {
         status: STATUS_HAS_WARNINGS,
         annotation: `view log for details`,
+        timeEnd: Date.now(),
       });
     }
   }
@@ -875,14 +940,23 @@ async function main() {
   // Sort data arrays so that they're all in order! This may use properties
   // which are only available after the initial linking.
 
-  stepStatusSummary.sortWikiDataArrays.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.sortWikiDataArrays, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   sortWikiDataArrays(wikiData);
 
-  stepStatusSummary.sortWikiDataArrays.status = STATUS_DONE_CLEAN;
+  Object.assign(stepStatusSummary.sortWikiDataArrays, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
 
   if (precacheData) {
-    stepStatusSummary.precacheData.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.precacheData, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     // TODO: Aggregate errors here, instead of just throwing.
     progressCallAll('Caching all data values', Object.entries(wikiData)
@@ -896,7 +970,10 @@ async function main() {
       .flatMap(([_key, things]) => things)
       .map(thing => () => CacheableObject.cacheAllExposedProperties(thing)));
 
-    stepStatusSummary.precacheData.status = STATUS_DONE_CLEAN;
+    Object.assign(stepStatusSummary.precacheData, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   }
 
   if (noBuild) {
@@ -907,13 +984,21 @@ async function main() {
     }
   }
 
+  Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
+
   let internalDefaultLanguage;
 
   try {
     internalDefaultLanguage =
       await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
 
-    stepStatusSummary.loadInternalDefaultLanguage.status = STATUS_DONE_CLEAN;
+    Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   } catch (error) {
     console.error(error);
 
@@ -923,6 +1008,7 @@ async function main() {
     Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
       status: STATUS_FATAL_ERROR,
       annotation: `see log for details`,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -931,7 +1017,10 @@ async function main() {
   let languages;
 
   if (langPath) {
-    stepStatusSummary.loadLanguageFiles.status = STATUS_STARTED_NOT_DONE;
+    Object.assign(stepStatusSummary.loadLanguageFiles, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
     const languageDataFiles = await traverse(langPath, {
       filterFile: name => path.extname(name) === '.json',
@@ -954,6 +1043,7 @@ async function main() {
       Object.assign(stepStatusSummary.loadLanguageFiles, {
         status: STATUS_FATAL_ERROR,
         annotation: `see log for details`,
+        timeEnd: Date.now(),
       });
 
       return false;
@@ -963,12 +1053,18 @@ async function main() {
       Object.fromEntries(
         results.map((language) => [language.code, language]));
 
-    stepStatusSummary.loadLanguageFiles.status = STATUS_DONE_CLEAN;
+    Object.assign(stepStatusSummary.loadLanguageFiles, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   } else {
     languages = {};
   }
 
-  stepStatusSummary.initializeDefaultLanguage.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   const customDefaultLanguage =
     languages[wikiData.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
@@ -982,6 +1078,7 @@ async function main() {
     Object.assign(stepStatusSummary.initializeDefaultLanguage, {
       status: STATUS_DONE_CLEAN,
       annotation: `using wiki-specified custom default language`,
+      timeEnd: Date.now(),
     });
   } else if (wikiData.wikiInfo.defaultLanguage) {
     logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
@@ -994,6 +1091,7 @@ async function main() {
     Object.assign(stepStatusSummary.initializeDefaultLanguage, {
       status: STATUS_FATAL_ERROR,
       annotation: `wiki specifies default language whose file is not available`,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -1005,6 +1103,7 @@ async function main() {
     Object.assign(stepStatusSummary.initializeDefaultLanguage, {
       status: STATUS_DONE_CLEAN,
       annotation: `no custom default language specified`,
+      timeEnd: Date.now(),
     });
   }
 
@@ -1020,29 +1119,43 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  stepStatusSummary.verifyImagePaths.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.verifyImagePaths, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   const {missing: missingImagePaths, misplaced: misplacedImagePaths} =
     await verifyImagePaths(mediaPath, {urls, wikiData});
 
   if (empty(missingImagePaths) && empty(misplacedImagePaths)) {
-    stepStatusSummary.verifyImagePaths.status = STATUS_DONE_CLEAN;
+    Object.assign(stepStatusSummary.verifyImagePaths, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   } else if (empty(missingImagePaths)) {
     Object.assign(stepStatusSummary.verifyImagePaths, {
       status: STATUS_HAS_WARNINGS,
       annotation: `misplaced images detected`,
+      timeEnd: Date.now(),
     });
   } else if (empty(misplacedImagePaths)) {
     Object.assign(stepStatusSummary.verifyImagePaths, {
       status: STATUS_HAS_WARNINGS,
       annotation: `missing images detected`,
+      timeEnd: Date.now(),
     });
   } else {
     Object.assign(stepStatusSummary.verifyImagePaths, {
-      status :STATUS_HAS_WARNINGS,
+      status: STATUS_HAS_WARNINGS,
       annotation: `missing and misplaced images detected`,
+      timeEnd: Date.now(),
     });
   }
+
+  Object.assign(stepStatusSummary.preloadFileSizes, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   const fileSizePreloader = new FileSizePreloader();
 
@@ -1107,8 +1220,6 @@ async function main() {
   const getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
   const getSizeOfImagePath = getSizeOfMediaFileHelper(imageFilePaths);
 
-  stepStatusSummary.preloadFileSizes.status = STATUS_STARTED_NOT_DONE;
-
   logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
 
   fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
@@ -1127,10 +1238,15 @@ async function main() {
     Object.assign(stepStatusSummary.preloadFileSizes, {
       status: STATUS_HAS_WARNINGS,
       annotation: `see log for details`,
+      timeEnd: Date.now(),
     });
   } else {
     logInfo`Done preloading filesizes without any errors - nice!`;
-    stepStatusSummary.preloadFileSizes.status = STATUS_DONE_CLEAN;
+
+    Object.assign(stepStatusSummary.preloadFileSizes, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
   }
 
   if (noBuild) {
@@ -1167,7 +1283,10 @@ async function main() {
       .map(line => `    ` + line)
       .join('\n') + `\n-->`;
 
-  stepStatusSummary.performBuild.status = STATUS_STARTED_NOT_DONE;
+  Object.assign(stepStatusSummary.performBuild, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
 
   let buildModeResult;
 
@@ -1203,6 +1322,7 @@ async function main() {
     Object.assign(stepStatusSummary.performBuild, {
       status: STATUS_FATAL_ERROR,
       message: `javascript error - view log for details`,
+      timeEnd: Date.now(),
     });
 
     return false;
@@ -1212,12 +1332,16 @@ async function main() {
     Object.assign(stepStatusSummary.performBuild, {
       status: STATUS_HAS_WARNINGS,
       annotation: `may not have completed - view log for details`,
+      timeEnd: Date.now(),
     });
 
     return false;
   }
 
-  stepStatusSummary.performBuild.status = STATUS_DONE_CLEAN;
+  Object.assign(stepStatusSummary.performBuild, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
 
   return true;
 }
@@ -1227,6 +1351,8 @@ async function main() {
 if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmusic') {
   (async () => {
     let result;
+
+    const totalTimeStart = Date.now();
 
     try {
       result = await main();
@@ -1238,7 +1364,28 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
       }
     }
 
+    const totalTimeEnd = Date.now();
+
+    const formatDuration = timeDelta => {
+      const seconds = timeDelta / 1000;
+
+      if (seconds > 90) {
+        const modSeconds = Math.floor(seconds % 60);
+        const minutes = Math.floor(seconds - seconds % 60) / 60;
+        return `${minutes}m${modSeconds}s`;
+      }
+
+      if (seconds < 0.1) {
+        return 'instant';
+      }
+
+      const precision = (seconds > 1 ? 3 : 2);
+      return `${seconds.toPrecision(precision)}s`;
+    };
+
     if (showStepStatusSummary) {
+      const totalDuration = formatDuration(totalTimeEnd - totalTimeStart);
+
       console.error(colors.bright(`Step summary:`));
 
       const longestNameLength =
@@ -1258,15 +1405,40 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
 
       const stepDetails = Object.values(stepStatusSummary);
 
+      const stepDurations =
+        stepDetails.map(({status, timeStart, timeEnd}) => {
+          if (
+            status === STATUS_NOT_APPLICABLE ||
+            status === STATUS_NOT_STARTED ||
+            status === STATUS_STARTED_NOT_DONE
+          ) {
+            return '-';
+          }
+
+          if (typeof timeStart !== 'number' || typeof timeEnd !== 'number') {
+            return 'unknown';
+          }
+
+          return formatDuration(timeEnd - timeStart);
+        });
+
+      const longestDurationLength =
+        Math.max(...stepDurations.map(duration => duration.length));
+
       for (let index = 0; index < stepDetails.length; index++) {
         const {name, status, annotation} = stepDetails[index];
+        const duration = stepDurations[index];
 
         let message =
           (stepsNotClean[index]
             ? `!! `
             : ` - `);
 
-        message += `${(name + ': ').padEnd(longestNameLength + 4, '.')} ${status}`;
+        message += `(${duration})`.padStart(longestDurationLength + 2, ' ');
+        message += ` `;
+        message += `${name}: `.padEnd(longestNameLength + 4, '.');
+        message += ` `;
+        message += status;
 
         if (annotation) {
           message += ` (${annotation})`;
@@ -1296,6 +1468,8 @@ if (true || isMain(import.meta.url) || path.basename(process.argv[1]) === 'hsmus
             break;
         }
       }
+
+      console.error(colors.bright(`Done in ${totalDuration}.`));
 
       if (result === true) {
         if (anyStepsNotClean) {
