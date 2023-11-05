@@ -335,18 +335,18 @@ async function main() {
       type: 'flag',
     },
 
-    // Compute ALL data properties before moving on to building. This ensures
-    // writes are processed at a stable speed (since they don't have to perform
-    // any additional data computation besides what is done for the page
-    // itself), but it'll also take a long while for the initial caching to
-    // complete. This shouldn't have any overall difference on efficiency as
-    // it's the same amount of processing being done regardless; the option is
-    // mostly present for optimization testing (i.e. if you want to focus on
-    // efficiency of data calculation or write generation separately instead of
-    // mixed together).
-    'precache-data': {
-      help: `Compute all runtime-cached values for wiki data objects before proceeding to site build (optimizes rate of content generation/serving, but waits a lot longer before build actually starts, and may compute data which is never required for this build)`,
-      type: 'flag',
+    'precache-mode': {
+      help:
+        `Change the way certain runtime-computed values are preemptively evaluated and cached\n\n` +
+        `common: Preemptively compute certain properties which are needed for basic data loading and site generation\n\n` +
+        `all: Compute every visible data property, optimizing rate of content generation, but causing a long stall before the build actually starts\n\n` +
+        `none: Don't preemptively compute any values - strictly the most efficient, but may result in unpredictably "lopsided" performance for individual steps of loading data and building the site\n\n` +
+        `Defaults to 'common'`,
+      type: 'value',
+      validate(value) {
+        if (['common', 'all', 'none'].includes(value)) return true;
+        return 'common, all, or none';
+      },
     },
   };
 
@@ -465,7 +465,7 @@ async function main() {
 
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
-  const precacheAllData = cliOptions['precache-data'] ?? false;
+  const precacheMode = cliOptions['precache-mode'] ?? 'common';
   const showInvalidPropertyAccesses = cliOptions['show-invalid-property-accesses'] ?? false;
 
   // Makes writing nicer on the CPU and file I/O parts of the OS, with a
@@ -528,11 +528,35 @@ async function main() {
     });
   }
 
-  if (!precacheAllData) {
-    Object.assign(stepStatusSummary.precacheAllData, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `--precache-data not provided`,
-    });
+  switch (precacheMode) {
+    case 'common':
+      Object.assign(stepStatusSummary.precacheAllData, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `--precache-mode is common, not all`,
+      });
+
+      break;
+
+    case 'all':
+      Object.assign(stepStatusSummary.precacheCommonData, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `--precache-mode is all, not common`,
+      });
+
+      break;
+
+    case 'none':
+      Object.assign(stepStatusSummary.precacheCommonData, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `--precache-mode is none`,
+      });
+
+      Object.assign(stepStatusSummary.precacheAllData, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `--precache-mode is none`,
+      });
+
+      break;
   }
 
   if (!langPath) {
@@ -869,71 +893,73 @@ async function main() {
     timeEnd: Date.now(),
   });
 
-  Object.assign(stepStatusSummary.precacheCommonData, {
-    status: STATUS_STARTED_NOT_DONE,
-    timeStart: Date.now(),
-  });
+  if (precacheMode === 'common') {
+    Object.assign(stepStatusSummary.precacheCommonData, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
-  const commonDataMap = {
-    albumData: new Set([
-      // Needed for sorting
-      'date', 'tracks',
-      // Needed for computing page paths
-      'commentary',
-    ]),
+    const commonDataMap = {
+      albumData: new Set([
+        // Needed for sorting
+        'date', 'tracks',
+        // Needed for computing page paths
+        'commentary',
+      ]),
 
-    artTagData: new Set([
-      // Needed for computing page paths
-      'isContentWarning',
-    ]),
+      artTagData: new Set([
+        // Needed for computing page paths
+        'isContentWarning',
+      ]),
 
-    artistAliasData: new Set([
-      // Needed for computing page paths
-      'aliasedArtist',
-    ]),
+      artistAliasData: new Set([
+        // Needed for computing page paths
+        'aliasedArtist',
+      ]),
 
-    flashData: new Set([
-      // Needed for sorting
-      'act', 'date',
-    ]),
+      flashData: new Set([
+        // Needed for sorting
+        'act', 'date',
+      ]),
 
-    flashActData: new Set([
-      // Needed for sorting
-      'flashes',
-    ]),
+      flashActData: new Set([
+        // Needed for sorting
+        'flashes',
+      ]),
 
-    groupData: new Set([
-      // Needed for computing page paths
-      'albums',
-    ]),
+      groupData: new Set([
+        // Needed for computing page paths
+        'albums',
+      ]),
 
-    listingSpec: new Set([
-      // Needed for computing page paths
-      'contentFunction', 'featureFlag',
-    ]),
+      listingSpec: new Set([
+        // Needed for computing page paths
+        'contentFunction', 'featureFlag',
+      ]),
 
-    trackData: new Set([
-      // Needed for sorting
-      'album', 'date',
-      // Needed for computing page paths
-      'commentary',
-    ]),
-  };
+      trackData: new Set([
+        // Needed for sorting
+        'album', 'date',
+        // Needed for computing page paths
+        'commentary',
+      ]),
+    };
 
-  for (const [wikiDataKey, properties] of Object.entries(commonDataMap)) {
-    const thingData = wikiData[wikiDataKey];
-    const allProperties = new Set(['name', 'directory', ...properties]);
-    for (const thing of thingData) {
-      for (const property of allProperties) {
-        void thing[property];
+    for (const [wikiDataKey, properties] of Object.entries(commonDataMap)) {
+      const thingData = wikiData[wikiDataKey];
+      const allProperties = new Set(['name', 'directory', ...properties]);
+      for (const thing of thingData) {
+        for (const property of allProperties) {
+          void thing[property];
+        }
       }
     }
-  }
 
-  Object.assign(stepStatusSummary.precacheCommonData, {
-    status: STATUS_DONE_CLEAN,
-    timeEnd: Date.now(),
-  });
+    Object.assign(stepStatusSummary.precacheCommonData, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
+  }
 
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
@@ -1021,7 +1047,7 @@ async function main() {
     timeEnd: Date.now(),
   });
 
-  if (precacheAllData) {
+  if (precacheMode === 'all') {
     Object.assign(stepStatusSummary.precacheAllData, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -1048,7 +1074,7 @@ async function main() {
   if (noBuild) {
     displayCompositeCacheAnalysis();
 
-    if (precacheAllData) {
+    if (precacheMode === 'all') {
       return true;
     }
   }
