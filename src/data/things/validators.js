@@ -484,8 +484,10 @@ export function validateWikiData({
         throw new TypeError(`Expected array of unmixed reference types, got multiple: ${types()}`);
       }
 
-      if (referenceType && !allRefTypes.has(referenceType)) {
-        throw new TypeError(`Expected array of ${referenceType}, got array of ${allRefTypes[0]}`)
+      const onlyRefType = Array.from(allRefTypes)[0];
+
+      if (referenceType && onlyRefType !== referenceType) {
+        throw new TypeError(`Expected array of ${referenceType}, got array of ${onlyRefType}`)
       }
 
       OK = true; return true;
