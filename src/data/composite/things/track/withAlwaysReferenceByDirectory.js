@@ -53,19 +53,28 @@ export default templateCompositeFrom({
     // logic on a completely unrelated context.
     {
       dependencies: [input.myself(), 'trackData', 'originalReleaseTrack'],
-      compute: (continuation, {
+      compute(continuation, {
         [input.myself()]: thisTrack,
         ['trackData']: trackData,
         ['originalReleaseTrack']: ref,
-      }) => continuation({
-        ['#originalRelease']:
-          (ref.startsWith('track:')
-            ? trackData.find(track => track.directory === ref.slice('track:'.length))
-            : trackData.find(track =>
-                track !== thisTrack &&
-                !CacheableObject.getUpdateValue(track, 'originalReleaseTrack') &&
-                track.name.toLowerCase() === ref.toLowerCase())),
-      })
+      }) {
+        let originalRelease;
+
+        if (ref.startsWith('track:')) {
+          const refDirectory = ref.slice('track:'.length);
+          originalRelease =
+            trackData.find(track => track.directory === refDirectory);
+        } else {
+          const refName = ref.toLowerCase();
+          originalRelease =
+            trackData.find(track =>
+              track.name.toLowerCase() === refName &&
+              track !== thisTrack &&
+              !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'));
+        }
+
+        return continuation({['#originalRelease']: originalRelease});
+      },
     },
 
     exitWithoutDependency({
