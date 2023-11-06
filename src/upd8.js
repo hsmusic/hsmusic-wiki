@@ -1134,6 +1134,7 @@ async function main() {
     timeEnd: Date.now(),
   });
 
+  let customLanguageWatchers;
   let languages;
 
   if (langPath) {
@@ -1147,31 +1148,77 @@ async function main() {
       pathStyle: 'device',
     });
 
-    let results;
+    customLanguageWatchers =
+      languageDataFiles.map(file => {
+        const watcher = watchLanguageFile(file);
 
-    // TODO: Aggregate errors (with Promise.allSettled).
-    try {
-      results =
-        await progressPromiseAll(`Reading & processing language files.`,
-          languageDataFiles.map((file) => processLanguageFile(file)));
-    } catch (error) {
-      console.error(error);
+        // Bypass node.js special-case handling for uncaught error events
+        watcher.on('error', () => {});
 
-      logError`Failed to load language files. Please investigate these, or don't provide`;
-      logError`--lang-path (or HSMUSIC_LANG) and build again.`;
-
-      Object.assign(stepStatusSummary.loadLanguageFiles, {
-        status: STATUS_FATAL_ERROR,
-        annotation: `see log for details`,
-        timeEnd: Date.now(),
+        return watcher;
       });
 
-      return false;
+    const waitingOnWatchers = new Set(customLanguageWatchers);
+
+    const initialResults =
+      await Promise.allSettled(
+        customLanguageWatchers.map(watcher =>
+          new Promise((resolve, reject) => {
+            const onReady = () => {
+              watcher.removeListener('ready', onReady);
+              watcher.removeListener('error', onError);
+              waitingOnWatchers.delete(watcher);
+              resolve();
+            };
+
+            const onError = error => {
+              watcher.removeListener('ready', onReady);
+              watcher.removeListener('error', onError);
+              reject(error);
+            };
+
+            watcher.on('ready', onReady);
+            watcher.on('error', onError);
+          })));
+
+    if (initialResults.some(({status}) => status === 'rejected')) {
+      logWarn`There were errors loading custom languages from the language path`;
+      logWarn`provided: ${langPath}`;
+
+      if (noInput) {
+        logError`Failed to load language files. Please investigate these, or don't provide`;
+        logError`--lang-path (or HSMUSIC_LANG) and build again.`;
+
+        Object.assign(stepStatusSummary.loadLanguageFiles, {
+          status: STATUS_FATAL_ERROR,
+          annotation: `see log for details`,
+          timeEnd: Date.now(),
+        });
+
+        return false;
+      }
+
+      logWarn`The build should start automatically if you investigate these.`;
+      logWarn`Or, exit by pressing ^C here (control+C) and run again without`;
+      logWarn`providing ${'--lang-path'} (or ${'HSMUSIC_LANG'}) to build without custom`;
+      logWarn`languages.`;
+
+      await new Promise(resolve => {
+        for (const watcher of waitingOnWatchers) {
+          watcher.once('ready', () => {
+            waitingOnWatchers.remove(watcher);
+            if (empty(waitingOnWatchers)) {
+              resolve();
+            }
+          });
+        }
+      });
     }
 
     languages =
       Object.fromEntries(
-        results.map((language) => [language.code, language]));
+        customLanguageWatchers
+          .map(watcher => [watcher.language.code, watcher.language]));
 
     Object.assign(stepStatusSummary.loadLanguageFiles, {
       status: STATUS_DONE_CLEAN,
@@ -1192,53 +1239,66 @@ async function main() {
       : null);
 
   let finalDefaultLanguage;
+  let finalDefaultLanguageWatcher;
+  let finalDefaultLanguageAnnotation;
 
-  if (customDefaultLanguage) {
-    logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
-    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
-    finalDefaultLanguage = customDefaultLanguage;
+  if (wikiData.wikiInfo.defaultLanguage) {
+    const customDefaultLanguage = languages[wikiData.wikiInfo.defaultLanguage];
 
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      annotation: `using wiki-specified custom default language`,
-      timeEnd: Date.now(),
-    });
-  } else if (wikiData.wikiInfo.defaultLanguage) {
-    logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
-    if (langPath) {
-      logError`Check if an appropriate file exists in ${langPath}?`;
-    } else {
-      logError`Be sure to specify ${'--lang-path'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+    if (!customDefaultLanguage) {
+      logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
+      if (langPath) {
+        logError`Check if an appropriate file exists in ${langPath}?`;
+      } else {
+        logError`Be sure to specify ${'--lang-path'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+      }
+
+      Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `wiki specifies default language whose file is not available`,
+        timeEnd: Date.now(),
+      });
+
+      return false;
     }
 
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_FATAL_ERROR,
-      annotation: `wiki specifies default language whose file is not available`,
-      timeEnd: Date.now(),
-    });
+    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
 
-    return false;
+    logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
+
+    finalDefaultLanguage = customDefaultLanguage;
+    finalDefaultLanguageWatcher =
+      customLanguageWatchers.find(({language}) => language === customDefaultLanguage);
+    finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
   } else {
     languages[internalDefaultLanguage.code] = internalDefaultLanguage;
+
     finalDefaultLanguage = internalDefaultLanguage;
-    stepStatusSummary.initializeDefaultLanguage.status = STATUS_DONE_CLEAN;
-
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      annotation: `no custom default language specified`,
-      timeEnd: Date.now(),
-    });
+    finalDefaultLanguageWatcher = internalDefaultLanguageWatcher;
+    finalDefaultLanguageAnnotation = `no custom default language specified`;
   }
 
-  for (const language of Object.values(languages)) {
-    if (language === finalDefaultLanguage) {
-      continue;
+  const inheritStringsFromDefaultLanguage = () => {
+    const {strings: inheritedStrings} = finalDefaultLanguage;
+    for (const language of Object.values(languages)) {
+      if (language === finalDefaultLanguage) continue;
+      Object.assign(language, {inheritedStrings});
     }
+  };
 
-    language.inheritedStrings = finalDefaultLanguage.strings;
-  }
+  inheritStringsFromDefaultLanguage();
+
+  finalDefaultLanguageWatcher.on('update', () => {
+    inheritStringsFromDefaultLanguage();
+  });
 
   logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
+
+  Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+    status: STATUS_DONE_CLEAN,
+    annotation: finalDefaultLanguageAnnotation,
+    timeEnd: Date.now(),
+  });
 
   const urls = generateURLs(urlSpec);
 
