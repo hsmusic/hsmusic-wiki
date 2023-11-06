@@ -656,28 +656,6 @@ export function annotateErrorWithIndex(error, index) {
   });
 }
 
-export function decorateErrorWithIndex(fn) {
-  return (x, index, array) => {
-    try {
-      return fn(x, index, array);
-    } catch (error) {
-      annotateErrorWithIndex(error, index);
-      throw error;
-    }
-  };
-}
-
-export function decorateErrorWithCause(fn, cause) {
-  return (...args) => {
-    try {
-      return fn(...args);
-    } catch (error) {
-      error.cause = cause;
-      throw error;
-    }
-  };
-}
-
 export function annotateErrorWithFile(error, file) {
   return Object.assign(error, {
     [Symbol.for('hsmusic.annotateError.file')]:
@@ -688,6 +666,72 @@ export function annotateErrorWithFile(error, file) {
       (error.message.includes('\n') ? '\n' : ' ') +
       `(file: ${colors.bright(colors.blue(file))})`,
   });
+}
+
+export function asyncAdaptiveDecorateError(fn, callback) {
+  if (typeof callback !== 'function') {
+    throw new Error(`Expected callback to be a function, got ${typeAppearance(callback)}`);
+  }
+
+  const syncDecorated = function (...args) {
+    try {
+      return fn(...args);
+    } catch (caughtError) {
+      throw callback(caughtError, ...args);
+    }
+  };
+
+  const asyncDecorated = async function(...args) {
+    try {
+      return await fn(...args);
+    } catch (caughtError) {
+      throw callback(caughtError);
+    }
+  };
+
+  syncDecorated.async = asyncDecorated;
+
+  return syncDecorated;
+}
+
+export function decorateError(fn, callback) {
+  return asyncAdaptiveDecorateError(fn, callback);
+}
+
+export function asyncDecorateError(fn, callback) {
+  return asyncAdaptiveDecorateError(fn, callback).async;
+}
+
+export function decorateErrorWithAnnotation(fn, ...annotationCallbacks) {
+  return asyncAdaptiveDecorateError(fn,
+    (caughtError, ...args) =>
+      annotateError(caughtError,
+        ...annotationCallbacks
+          .map(callback => error => callback(error, ...args))));
+}
+
+export function decorateErrorWithIndex(fn) {
+  return decorateErrorWithAnnotation(fn,
+    (caughtError, _value, index) =>
+      annotateErrorWithIndex(caughtError, index));
+}
+
+export function decorateErrorWithCause(fn, cause) {
+  return asyncAdaptiveDecorateError(fn,
+    (caughtError) =>
+      Object.assign(caughtError, {cause}));
+}
+
+export function asyncDecorateErrorWithAnnotation(fn, ...annotationCallbacks) {
+  return decorateErrorWithAnnotation(fn, ...annotationCallbacks).async;
+}
+
+export function asyncDecorateErrorWithIndex(fn) {
+  return decorateErrorWithIndex(fn).async;
+}
+
+export function asyncDecorateErrorWithCause(fn, cause) {
+  return decorateErrorWithCause(fn, cause).async;
 }
 
 export function conditionallySuppressError(conditionFn, callbackFn) {
