@@ -411,6 +411,18 @@ export function aggregateThrows(errorClass) {
   return {[openAggregate.errorClassSymbol]: errorClass};
 }
 
+// Helper function for allowing both (fn, aggregateOpts) and (aggregateOpts, fn)
+// in aggregate utilities.
+function _reorganizeAggregateArguments(arg1, arg2) {
+  if (typeof arg1 === 'function') {
+    return {fn: arg1, opts: arg2 ?? {}};
+  } else if (typeof arg2 === 'function') {
+    return {fn: arg2, opts: arg1 ?? {}};
+  } else {
+    throw new Error(`Expected a function`);
+  }
+}
+
 // Performs an ordinary array map with the given function, collating into a
 // results array (with errored inputs filtered out) and an error aggregate.
 //
@@ -420,15 +432,15 @@ export function aggregateThrows(errorClass) {
 // Note the aggregate property is the result of openAggregate(), still unclosed;
 // use aggregate.close() to throw the error. (This aggregate may be passed to a
 // parent aggregate: `parent.call(aggregate.close)`!)
-export function mapAggregate(array, fn, aggregateOpts) {
-  return _mapAggregate('sync', null, array, fn, aggregateOpts);
+export function mapAggregate(array, arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  return _mapAggregate('sync', null, array, fn, opts);
 }
 
-export function mapAggregateAsync(array, fn, {
-  promiseAll = Promise.all.bind(Promise),
-  ...aggregateOpts
-} = {}) {
-  return _mapAggregate('async', promiseAll, array, fn, aggregateOpts);
+export function mapAggregateAsync(array, arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const {promiseAll = Promise.all.bind(Promise), ...remainingOpts} = opts;
+  return _mapAggregate('async', promiseAll, array, fn, remainingOpts);
 }
 
 // Helper function for mapAggregate which holds code common between sync and
@@ -462,15 +474,15 @@ export function _mapAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 // inputs to a particular output.
 //
 // As with mapAggregate, the returned aggregate property is not yet closed.
-export function filterAggregate(array, fn, aggregateOpts) {
-  return _filterAggregate('sync', null, array, fn, aggregateOpts);
+export function filterAggregate(array, arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  return _filterAggregate('sync', null, array, fn, opts);
 }
 
-export async function filterAggregateAsync(array, fn, {
-  promiseAll = Promise.all.bind(Promise),
-  ...aggregateOpts
-} = {}) {
-  return _filterAggregate('async', promiseAll, array, fn, aggregateOpts);
+export async function filterAggregateAsync(array, arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  const {promiseAll = Promise.all.bind(Promise), ...remainingOpts} = opts;
+  return _filterAggregate('async', promiseAll, array, fn, remainingOpts);
 }
 
 // Helper function for filterAggregate which holds code common between sync and
@@ -530,20 +542,17 @@ function _filterAggregate(mode, promiseAll, array, fn, aggregateOpts) {
 // Totally sugar function for opening an aggregate, running the provided
 // function with it, then closing the function and returning the result (if
 // there's no throw).
-export function withAggregate(aggregateOpts, fn) {
-  return _withAggregate('sync', aggregateOpts, fn);
+export function withAggregate(arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  return _withAggregate('sync', opts, fn);
 }
 
-export function withAggregateAsync(aggregateOpts, fn) {
-  return _withAggregate('async', aggregateOpts, fn);
+export function withAggregateAsync(arg1, arg2) {
+  const {fn, opts} = _reorganizeAggregateArguments(arg1, arg2);
+  return _withAggregate('async', opts, fn);
 }
 
 export function _withAggregate(mode, aggregateOpts, fn) {
-  if (typeof aggregateOpts === 'function') {
-    fn = aggregateOpts;
-    aggregateOpts = {};
-  }
-
   const aggregate = openAggregate(aggregateOpts);
 
   if (mode === 'sync') {
