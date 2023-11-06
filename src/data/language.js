@@ -4,6 +4,7 @@ import path from 'node:path';
 
 import chokidar from 'chokidar';
 import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
+import yaml from 'js-yaml';
 
 import T from '#things';
 import {colors, logWarn} from '#cli';
@@ -56,11 +57,18 @@ async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
       error => annotateErrorWithFile(error, file));
   }
 
+  let parseLanguage;
   try {
-    spec = JSON.parse(contents);
+    if (path.extname(file) === '.yaml') {
+      parseLanguage = 'YAML';
+      spec = yaml.load(contents);
+    } else {
+      parseLanguage = 'JSON';
+      spec = JSON.parse(contents);
+    }
   } catch (caughtError) {
     throw annotateError(
-      new Error(`Failed to parse language file as valid JSON`, {cause: caughtError}),
+      new Error(`Failed to parse language file as valid ${parseLanguage}`, {cause: caughtError}),
       error => annotateErrorWithFile(error, file));
   }
 
