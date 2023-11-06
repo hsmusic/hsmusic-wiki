@@ -17,7 +17,7 @@ import {
 
 const {Language} = T;
 
-export function processLanguageSpec(spec) {
+export function processLanguageSpec(spec, {existingCode = null}) {
   const {
     'meta.languageCode': code,
     'meta.languageName': name,
@@ -36,12 +36,16 @@ export function processLanguageSpec(spec) {
     if (!name) {
       push(new Error(`Missing language name`));
     }
+
+    if (code && existingCode && code !== existingCode) {
+      push(new Error(`Language code (${code}) doesn't match previous value\n(You'll have to reload hsmusic to load this)`));
+    }
   });
 
   return {code, intlCode, name, hidden, strings};
 }
 
-async function processLanguageSpecFromFile(file) {
+async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
   let contents, spec;
 
   try {
@@ -61,7 +65,7 @@ async function processLanguageSpecFromFile(file) {
   }
 
   try {
-    return processLanguageSpec(spec);
+    return processLanguageSpec(spec, processLanguageSpecOpts);
   } catch (caughtError) {
     throw annotateErrorWithFile(caughtError, file);
   }
@@ -118,15 +122,25 @@ export function watchLanguageFile(file, {
     let properties;
 
     try {
-      properties = await processLanguageSpecFromFile(file);
+      properties = await processLanguageSpecFromFile(file, {
+        existingCode:
+          (successfullyAppliedLanguage
+            ? language.code
+            : null),
+      });
     } catch (error) {
       events.emit('error', error);
 
       if (logging) {
+        const label =
+          (successfullyAppliedLanguage
+            ? `${language.name} (${language.code})`
+            : basename);
+
         if (successfullyAppliedLanguage) {
-          logWarn`Failed to load language ${basename} - using existing version`;
+          logWarn`Failed to load language ${label} - using existing version`;
         } else {
-          logWarn`Failed to load language ${basename} - no prior version loaded`;
+          logWarn`Failed to load language ${label} - no prior version loaded`;
         }
         showAggregate(error, {showTraces: false});
       }
