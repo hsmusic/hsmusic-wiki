@@ -637,13 +637,31 @@ export function showAggregate(topError, {
   }
 }
 
+export function annotateError(error, ...callbacks) {
+  for (const callback of callbacks) {
+    error = callback(error) ?? error;
+  }
+
+  return error;
+}
+
+export function annotateErrorWithIndex(error, index) {
+  return Object.assign(error, {
+    [Symbol.for('hsmusic.annotateError.indexInSourceArray')]:
+      index,
+
+    message:
+      `(${colors.yellow(`#${index + 1}`)}) ` +
+      error.message,
+  });
+}
+
 export function decorateErrorWithIndex(fn) {
   return (x, index, array) => {
     try {
       return fn(x, index, array);
     } catch (error) {
-      error.message = `(${colors.yellow(`#${index + 1}`)}) ${error.message}`;
-      error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
+      annotateErrorWithIndex(error, index);
       throw error;
     }
   };
@@ -658,6 +676,18 @@ export function decorateErrorWithCause(fn, cause) {
       throw error;
     }
   };
+}
+
+export function annotateErrorWithFile(error, file) {
+  return Object.assign(error, {
+    [Symbol.for('hsmusic.annotateError.file')]:
+      file,
+
+    message:
+      error.message +
+      (error.message.includes('\n') ? '\n' : ' ') +
+      `(file: ${colors.bright(colors.blue(file))})`,
+  });
 }
 
 export function conditionallySuppressError(conditionFn, callbackFn) {
