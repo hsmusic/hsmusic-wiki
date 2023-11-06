@@ -39,7 +39,7 @@ import {fileURLToPath} from 'node:url';
 import wrap from 'word-wrap';
 
 import {displayCompositeCacheAnalysis} from '#composite';
-import {processLanguageFile} from '#language';
+import {processLanguageFile, watchLanguageFile} from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
@@ -1086,17 +1086,34 @@ async function main() {
 
   let internalDefaultLanguage;
 
+  const internalDefaultLanguageWatcher =
+    watchLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+
   try {
-    internalDefaultLanguage =
-      await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+    await new Promise((resolve, reject) => {
+      const watcher = internalDefaultLanguageWatcher;
 
-    Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
+      const onReady = () => {
+        watcher.removeListener('ready', onReady);
+        watcher.removeListener('error', onError);
+        resolve();
+      };
+
+      const onError = error => {
+        watcher.removeListener('ready', onReady);
+        watcher.removeListener('error', onError);
+        watcher.close();
+        reject(error);
+      };
+
+      watcher.on('ready', onReady);
+      watcher.on('error', onError);
     });
-  } catch (error) {
-    console.error(error);
 
+    internalDefaultLanguage = internalDefaultLanguageWatcher.language;
+  } catch (_error) {
+    // No need to display the error here - it's already printed by
+    // watchLanguageFile.
     logError`There was an error reading the internal language file.`;
     fileIssue();
 
@@ -1108,6 +1125,14 @@ async function main() {
 
     return false;
   }
+
+  // Bypass node.js special-case handling for uncaught error events
+  internalDefaultLanguageWatcher.on('error', () => {});
+
+  Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
 
   let languages;
 

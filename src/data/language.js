@@ -120,6 +120,8 @@ export function watchLanguageFile(file, {
     try {
       properties = await processLanguageSpecFromFile(file);
     } catch (error) {
+      events.emit('error', error);
+
       if (logging) {
         if (successfullyAppliedLanguage) {
           logWarn`Failed to load language ${basename} - using existing version`;
@@ -128,6 +130,7 @@ export function watchLanguageFile(file, {
         }
         showAggregate(error, {showTraces: false});
       }
+
       return;
     }
 
