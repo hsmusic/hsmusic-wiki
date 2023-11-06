@@ -94,7 +94,7 @@ try {
 
 const BUILD_TIME = new Date();
 
-const DEFAULT_STRINGS_FILE = 'strings-default.json';
+const DEFAULT_STRINGS_FILE = 'strings-default.yaml';
 
 const STATUS_NOT_STARTED       = `not started`;
 const STATUS_NOT_APPLICABLE    = `not applicable`;
