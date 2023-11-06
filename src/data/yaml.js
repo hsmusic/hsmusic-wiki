@@ -21,6 +21,7 @@ import {
   annotateErrorWithFile,
   conditionallySuppressError,
   decorateErrorWithIndex,
+  decorateErrorWithAnnotation,
   empty,
   filterProperties,
   openAggregate,
@@ -1119,32 +1120,20 @@ export async function loadAndProcessDataDocuments({dataPath}) {
   });
   const wikiDataResult = {};
 
-  const _getFileFromArgument = arg =>
-    (typeof arg === 'object'
-      ? arg.file
-      : arg);
-
   function decorateErrorWithFile(fn) {
-    return (...args) => {
-      try {
-        return fn(...args);
-      } catch (caughtError) {
-        const file = _getFileFromArgument(args[0]);
-        throw annotateErrorWithFile(caughtError, path.relative(dataPath, file));
-      }
-    };
+    return decorateErrorWithAnnotation(fn,
+      (caughtError, firstArg) =>
+        annotateErrorWithFile(
+          caughtError,
+          path.relative(
+            dataPath,
+            (typeof firstArg === 'object'
+              ? firstArg.file
+              : firstArg))));
   }
 
-  // Certified gensync moment.
   function asyncDecorateErrorWithFile(fn) {
-    return async (...args) => {
-      try {
-        return await fn(...args);
-      } catch (caughtError) {
-        const file = _getFileFromArgument(args[0]);
-        throw annotateErrorWithFile(caughtError, path.relative(dataPath, file));
-      }
-    };
+    return decorateErrorWithFile(fn).async;
   }
 
   for (const dataStep of dataSteps) {
