@@ -1,10 +1,19 @@
+import EventEmitter from 'node:events';
 import {readFile} from 'node:fs/promises';
+import path from 'node:path';
 
 import chokidar from 'chokidar';
 import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
 
-import {withAggregate} from '#sugar';
 import T from '#things';
+import {colors, logWarn} from '#cli';
+
+import {
+  annotateError,
+  annotateErrorWithFile,
+  showAggregate,
+  withAggregate,
+} from '#sugar';
 
 const {Language} = T;
 
@@ -21,15 +30,41 @@ export function processLanguageSpec(spec) {
 
   withAggregate({message: `Errors validating language spec`}, ({push}) => {
     if (!code) {
-      push(new Error(`Missing language code (file: ${file})`));
+      push(new Error(`Missing language code`));
     }
 
     if (!name) {
-      push(new Error(`Missing language name (${code})`));
+      push(new Error(`Missing language name`));
     }
   });
 
   return {code, intlCode, name, hidden, strings};
+}
+
+async function processLanguageSpecFromFile(file) {
+  let contents, spec;
+
+  try {
+    contents = await readFile(file, 'utf-8');
+  } catch (caughtError) {
+    throw annotateError(
+      new Error(`Failed to read language file`, {cause: caughtError}),
+      error => annotateErrorWithFile(error, file));
+  }
+
+  try {
+    spec = JSON.parse(contents);
+  } catch (caughtError) {
+    throw annotateError(
+      new Error(`Failed to parse language file as valid JSON`, {cause: caughtError}),
+      error => annotateErrorWithFile(error, file));
+  }
+
+  try {
+    return processLanguageSpec(spec);
+  } catch (caughtError) {
+    throw annotateErrorWithFile(caughtError, file);
+  }
 }
 
 export function initializeLanguageObject() {
@@ -42,12 +77,69 @@ export function initializeLanguageObject() {
 }
 
 export async function processLanguageFile(file) {
-  const contents = await readFile(file, 'utf-8');
-  const spec = JSON.parse(contents);
-
   const language = initializeLanguageObject();
-  const properties = processLanguageSpec(spec);
-  Object.assign(language, properties);
+  const properties = await processLanguageSpecFromFile(file);
+  return Object.assign(language, properties);
+}
 
-  return language;
+export function watchLanguageFile(file, {
+  logging = true,
+} = {}) {
+  const basename = path.basename(file);
+
+  const events = new EventEmitter();
+  const language = initializeLanguageObject();
+
+  let emittedReady = false;
+  let successfullyAppliedLanguage = false;
+
+  Object.assign(events, {language, close});
+
+  const watcher = chokidar.watch(file);
+  watcher.on('change', () => handleFileUpdated());
+
+  setImmediate(handleFileUpdated);
+
+  return events;
+
+  async function close() {
+    return watcher.close();
+  }
+
+  function checkReadyConditions() {
+    if (emittedReady) return;
+    if (!successfullyAppliedLanguage) return;
+
+    events.emit('ready');
+    emittedReady = true;
+  }
+
+  async function handleFileUpdated() {
+    let properties;
+
+    try {
+      properties = await processLanguageSpecFromFile(file);
+    } catch (error) {
+      if (logging) {
+        if (successfullyAppliedLanguage) {
+          logWarn`Failed to load language ${basename} - using existing version`;
+        } else {
+          logWarn`Failed to load language ${basename} - no prior version loaded`;
+        }
+        showAggregate(error, {showTraces: false});
+      }
+      return;
+    }
+
+    Object.assign(language, properties);
+    successfullyAppliedLanguage = true;
+
+    if (logging && emittedReady) {
+      const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
+      console.log(colors.green(`[${timestamp}] Updated language ${language.name} (${language.code})`));
+    }
+
+    events.emit('update');
+    checkReadyConditions();
+  }
 }
