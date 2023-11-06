@@ -1162,7 +1162,10 @@ async function main() {
   });
 
   const customDefaultLanguage =
-    languages[wikiData.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
+    (wikiData.wikiInfo.defaultLanguage
+      ? languages[wikiData.wikiInfo.defaultLanguage]
+      : null);
+
   let finalDefaultLanguage;
 
   if (customDefaultLanguage) {
