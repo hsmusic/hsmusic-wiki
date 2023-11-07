@@ -1233,11 +1233,6 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  const customDefaultLanguage =
-    (wikiData.wikiInfo.defaultLanguage
-      ? languages[wikiData.wikiInfo.defaultLanguage]
-      : null);
-
   let finalDefaultLanguage;
   let finalDefaultLanguageWatcher;
   let finalDefaultLanguageAnnotation;
@@ -1262,14 +1257,25 @@ async function main() {
       return false;
     }
 
-    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
-
     logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
+
+    // The custom default language will be the new one providing fallback strings
+    // for other languages, but on its own, it still might not be a complete list
+    // of strings. So it falls back to the internal default language - which won't
+    // otherwise be presented on the site.
+    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
 
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageWatcher =
       customLanguageWatchers.find(({language}) => language === customDefaultLanguage);
     finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
+  } else if (languages[internalDefaultLanguage.code]) {
+    const customDefaultLanguage = languages[internalDefaultLanguage.code];
+    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
+    finalDefaultLanguage = customDefaultLanguage;
+    finalDefaultLanguageWatcher =
+      customLanguageWatchers.find(({language}) => language === customDefaultLanguage);
+    finalDefaultLanguageAnnotation = `using inferred custom default language`;
   } else {
     languages[internalDefaultLanguage.code] = internalDefaultLanguage;
 
