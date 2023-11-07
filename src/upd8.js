@@ -290,6 +290,11 @@ async function main() {
       type: 'flag',
     },
 
+    'no-input': {
+      help: `Don't wait on input from stdin - assume the device is headless`,
+      type: 'flag',
+    },
+
     // Want sweet, sweet trace8ack info in aggreg8te error messages? This
     // will print all the juicy details (or at least the first relevant
     // line) right to your output, 8ut also pro8a8ly give you a headache
@@ -456,6 +461,7 @@ async function main() {
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const skipReferenceValidation = cliOptions['skip-reference-validation'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
+  const noInput = cliOptions['no-input'] ?? false;
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
