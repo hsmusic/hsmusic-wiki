@@ -1,585 +1,930 @@
 meta.languageCode: en
 meta.languageName: English
 
-count.tracks: "{TRACKS}"
-count.tracks.withUnit.zero: ""
-count.tracks.withUnit.one: "{TRACKS} track"
-count.tracks.withUnit.two: ""
-count.tracks.withUnit.few: ""
-count.tracks.withUnit.many: ""
-count.tracks.withUnit.other: "{TRACKS} tracks"
+count:
+  tracks:
+    _: "{TRACKS}"
+    withUnit:
+      zero: ""
+      one: "{TRACKS} track"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TRACKS} tracks"
 
-count.additionalFiles: "{FILES}"
-count.additionalFiles.withUnit.zero: ""
-count.additionalFiles.withUnit.one: "{FILES} file"
-count.additionalFiles.withUnit.two: ""
-count.additionalFiles.withUnit.few: ""
-count.additionalFiles.withUnit.many: ""
-count.additionalFiles.withUnit.other: "{FILES} files"
+  additionalFiles:
+    _: "{FILES}"
+    withUnit:
+      zero: ""
+      one: "{FILES} file"
+      two: ""
+      few: ""
+      many: ""
+      other: "{FILES} files"
 
-count.albums: "{ALBUMS}"
-count.albums.withUnit.zero: ""
-count.albums.withUnit.one: "{ALBUMS} album"
-count.albums.withUnit.two: ""
-count.albums.withUnit.few: ""
-count.albums.withUnit.many: ""
-count.albums.withUnit.other: "{ALBUMS} albums"
+  albums:
+    _: "{ALBUMS}"
+    withUnit:
+      zero: ""
+      one: "{ALBUMS} album"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ALBUMS} albums"
 
-count.artworks: "{ARTWORKS}"
-count.artworks.withUnit.zero: ""
-count.artworks.withUnit.one: "{ARTWORKS} artwork"
-count.artworks.withUnit.two: ""
-count.artworks.withUnit.few: ""
-count.artworks.withUnit.many: ""
-count.artworks.withUnit.other: "{ARTWORKS} artworks"
+  artworks:
+    _: "{ARTWORKS}"
+    withUnit:
+      zero: ""
+      one: "{ARTWORKS} artwork"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ARTWORKS} artworks"
 
-count.commentaryEntries: "{ENTRIES}"
-count.commentaryEntries.withUnit.zero: ""
-count.commentaryEntries.withUnit.one: "{ENTRIES} entry"
-count.commentaryEntries.withUnit.two: ""
-count.commentaryEntries.withUnit.few: ""
-count.commentaryEntries.withUnit.many: ""
-count.commentaryEntries.withUnit.other: "{ENTRIES} entries"
+  commentaryEntries:
+    _: "{ENTRIES}"
+    withUnit:
+      zero: ""
+      one: "{ENTRIES} entry"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ENTRIES} entries"
 
-count.contributions: "{CONTRIBUTIONS}"
-count.contributions.withUnit.zero: ""
-count.contributions.withUnit.one: "{CONTRIBUTIONS} contribution"
-count.contributions.withUnit.two: ""
-count.contributions.withUnit.few: ""
-count.contributions.withUnit.many: ""
-count.contributions.withUnit.other: "{CONTRIBUTIONS} contributions"
+  contributions:
+    _: "{CONTRIBUTIONS}"
+    withUnit:
+      zero: ""
+      one: "{CONTRIBUTIONS} contribution"
+      two: ""
+      few: ""
+      many: ""
+      other: "{CONTRIBUTIONS} contributions"
 
-count.coverArts: "{COVER_ARTS}"
-count.coverArts.withUnit.zero: ""
-count.coverArts.withUnit.one: "{COVER_ARTS} cover art"
-count.coverArts.withUnit.two: ""
-count.coverArts.withUnit.few: ""
-count.coverArts.withUnit.many: ""
-count.coverArts.withUnit.other: "{COVER_ARTS} cover arts"
+  coverArts:
+    _: "{COVER_ARTS}"
+    withUnit:
+      zero: ""
+      one: "{COVER_ARTS} cover art"
+      two: ""
+      few: ""
+      many: ""
+      other: "{COVER_ARTS} cover arts"
 
-count.flashes: "{FLASHES}"
-count.flashes.withUnit.zero: ""
-count.flashes.withUnit.one: "{FLASHES} flashes & games"
-count.flashes.withUnit.two: ""
-count.flashes.withUnit.few: ""
-count.flashes.withUnit.many: ""
-count.flashes.withUnit.other: "{FLASHES} flashes & games"
+  flashes:
+    _: "{FLASHES}"
+    withUnit:
+      zero: ""
+      one: "{FLASHES} flashes & games"
+      two: ""
+      few: ""
+      many: ""
+      other: "{FLASHES} flashes & games"
 
-count.timesReferenced: "{TIMES_REFERENCED}"
-count.timesReferenced.withUnit.zero: ""
-count.timesReferenced.withUnit.one: "{TIMES_REFERENCED} time referenced"
-count.timesReferenced.withUnit.two: ""
-count.timesReferenced.withUnit.few: ""
-count.timesReferenced.withUnit.many: ""
-count.timesReferenced.withUnit.other: "{TIMES_REFERENCED} times referenced"
+  timesReferenced:
+    _: "{TIMES_REFERENCED}"
+    withUnit:
+      zero: ""
+      one: "{TIMES_REFERENCED} time referenced"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TIMES_REFERENCED} times referenced"
 
-count.words: "{WORDS}"
-count.words.thousand: "{WORDS}k"
-count.words.withUnit.zero: ""
-count.words.withUnit.one: "{WORDS} word"
-count.words.withUnit.two: ""
-count.words.withUnit.few: ""
-count.words.withUnit.many: ""
-count.words.withUnit.other: "{WORDS} words"
+  words:
+    _: "{WORDS}"
+    thousand: "{WORDS}k"
+    withUnit:
+      zero: ""
+      one: "{WORDS} word"
+      two: ""
+      few: ""
+      many: ""
+      other: "{WORDS} words"
 
-count.timesUsed: "{TIMES_USED}"
-count.timesUsed.withUnit.zero: ""
-count.timesUsed.withUnit.one: "used {TIMES_USED} time"
-count.timesUsed.withUnit.two: ""
-count.timesUsed.withUnit.few: ""
-count.timesUsed.withUnit.many: ""
-count.timesUsed.withUnit.other: "used {TIMES_USED} times"
+  timesUsed:
+    _: "{TIMES_USED}"
+    withUnit:
+      zero: ""
+      one: "used {TIMES_USED} time"
+      two: ""
+      few: ""
+      many: ""
+      other: "used {TIMES_USED} times"
 
-count.index.zero: ""
-count.index.one: "{INDEX}st"
-count.index.two: "{INDEX}nd"
-count.index.few: "{INDEX}rd"
-count.index.many: ""
-count.index.other: "{INDEX}th"
+  index:
+    zero: ""
+    one: "{INDEX}st"
+    two: "{INDEX}nd"
+    few: "{INDEX}rd"
+    many: ""
+    other: "{INDEX}th"
 
-count.duration.hours: "{HOURS}:{MINUTES}:{SECONDS}"
-count.duration.hours.withUnit: "{HOURS}:{MINUTES}:{SECONDS} hours"
-count.duration.minutes: "{MINUTES}:{SECONDS}"
-count.duration.minutes.withUnit: "{MINUTES}:{SECONDS} minutes"
-count.duration.approximate: "~{DURATION}"
-count.duration.missing: "_:__"
+  duration:
+    missing: "_:__"
+    approximate: "~{DURATION}"
+    hours:
+      _:        "{HOURS}:{MINUTES}:{SECONDS}"
+      withUnit: "{HOURS}:{MINUTES}:{SECONDS} hours"
+    minutes:
+      _:        "{MINUTES}:{SECONDS}"
+      withUnit: "{MINUTES}:{SECONDS} minutes"
 
-count.fileSize.terabytes: "{TERABYTES} TB"
-count.fileSize.gigabytes: "{GIGABYTES} GB"
-count.fileSize.megabytes: "{MEGABYTES} MB"
-count.fileSize.kilobytes: "{KILOBYTES} kB"
-count.fileSize.bytes: "{BYTES} bytes"
+  fileSize:
+    terabytes: "{TERABYTES} TB"
+    gigabytes: "{GIGABYTES} GB"
+    megabytes: "{MEGABYTES} MB"
+    kilobytes: "{KILOBYTES} kB"
+    bytes: "{BYTES} bytes"
 
-releaseInfo.by: "By {ARTISTS}."
-releaseInfo.from: "From {ALBUM}."
-releaseInfo.coverArtBy: "Cover art by {ARTISTS}."
-releaseInfo.wallpaperArtBy: "Wallpaper art by {ARTISTS}."
-releaseInfo.bannerArtBy: "Banner art by {ARTISTS}."
-releaseInfo.released: "Released {DATE}."
-releaseInfo.artReleased: "Art released {DATE}."
-releaseInfo.addedToWiki: "Added to wiki {DATE}."
-releaseInfo.duration: "Duration: {DURATION}."
-releaseInfo.viewCommentary: "View {LINK}!"
-releaseInfo.viewCommentary.link: "commentary page"
-releaseInfo.viewGallery: "View {LINK}!"
-releaseInfo.viewGallery.link: "gallery page"
-releaseInfo.viewGalleryOrCommentary: "View {GALLERY} or {COMMENTARY}!"
-releaseInfo.viewGalleryOrCommentary.gallery: "gallery page"
-releaseInfo.viewGalleryOrCommentary.commentary: "commentary page"
-releaseInfo.viewOriginalFile: "View {LINK}."
-releaseInfo.viewOriginalFile.withSize: "View {LINK} ({SIZE})."
-releaseInfo.viewOriginalFile.link: "original file"
-releaseInfo.viewOriginalFile.sizeWarning: >-
-  (Heads up! If you're on a mobile plan, this is a large download.)
-releaseInfo.listenOn: "Listen on {LINKS}."
-releaseInfo.listenOn.noLinks: >-
-  This wiki doesn't have any listening links for {NAME}.
-releaseInfo.visitOn: "Visit on {LINKS}."
-releaseInfo.playOn: "Play on {LINKS}."
-releaseInfo.readCommentary: "Read {LINK}."
-releaseInfo.readCommentary.link: "artist commentary"
-releaseInfo.alsoReleasedAs: "Also released as:"
-releaseInfo.alsoReleasedAs.item: "{TRACK} (on {ALBUM})"
-releaseInfo.contributors: "Contributors:"
-releaseInfo.tracksReferenced: "Tracks that {TRACK} references:"
-releaseInfo.tracksThatReference: "Tracks that reference {TRACK}:"
-releaseInfo.tracksSampled: "Tracks that {TRACK} samples:"
-releaseInfo.tracksThatSample: "Tracks that sample {TRACK}:"
-releaseInfo.flashesThatFeature: "Flashes & games that feature {TRACK}:"
-releaseInfo.flashesThatFeature.item: "{FLASH}"
-releaseInfo.flashesThatFeature.item.asDifferentRelease: "{FLASH} (as {TRACK})"
-releaseInfo.tracksFeatured: "Tracks that {FLASH} features:"
-releaseInfo.lyrics: "Lyrics:"
-releaseInfo.artistCommentary: "Artist commentary:"
-releaseInfo.artistCommentary.seeOriginalRelease: "See {ORIGINAL}!"
-releaseInfo.artTags: "Tags:"
-releaseInfo.artTags.inline: "Tags: {TAGS}"
-releaseInfo.additionalFiles.shortcut: "View {ANCHOR_LINK}: {TITLES}"
-releaseInfo.additionalFiles.shortcut.anchorLink: "additional files"
-releaseInfo.additionalFiles.heading: "View or download {ADDITIONAL_FILES}:"
-releaseInfo.additionalFiles.entry: "{TITLE}"
-releaseInfo.additionalFiles.entry.withDescription: "{TITLE}: {DESCRIPTION}"
-releaseInfo.additionalFiles.file: "{FILE}"
-releaseInfo.additionalFiles.file.withSize: "{FILE} ({SIZE})"
-releaseInfo.sheetMusicFiles.shortcut: "Download {LINK}."
-releaseInfo.sheetMusicFiles.shortcut.link: "sheet music files"
-releaseInfo.sheetMusicFiles.heading: "Print or download sheet music files:"
-releaseInfo.midiProjectFiles.shortcut: "Download {LINK}."
-releaseInfo.midiProjectFiles.shortcut.link: "MIDI/project files"
-releaseInfo.midiProjectFiles.heading: "Download MIDI/project files:"
-releaseInfo.note: "Context notes:"
+releaseInfo:
+  by: "By {ARTISTS}."
+  from: "From {ALBUM}."
 
-trackList.section.withDuration: "{SECTION} ({DURATION}):"
-trackList.group: "From {GROUP}:"
-trackList.group.fromOther: "From somewhere else:"
-trackList.item.withDuration: "({DURATION}) {TRACK}"
-trackList.item.withDuration.withArtists: "({DURATION}) {TRACK} {BY}"
-trackList.item.withArtists: "{TRACK} {BY}"
-trackList.item.withArtists.by: "by {ARTISTS}"
-trackList.item.rerelease: "{TRACK} (re-release)"
+  coverArtBy: "Cover art by {ARTISTS}."
+  wallpaperArtBy: "Wallpaper art by {ARTISTS}."
+  bannerArtBy: "Banner art by {ARTISTS}."
 
-misc.alt.albumCover: "album cover"
-misc.alt.albumBanner: "album banner"
-misc.alt.trackCover: "track cover"
-misc.alt.artistAvatar: "artist avatar"
-misc.alt.flashArt: "flash art"
+  released: "Released {DATE}."
+  artReleased: "Art released {DATE}."
+  addedToWiki: "Added to wiki {DATE}."
 
-misc.artistLink: "{ARTIST}"
-misc.artistLink.withContribution: "{ARTIST} ({CONTRIB})"
-misc.artistLink.withExternalLinks: "{ARTIST} ({LINKS})"
-misc.artistLink.withContribution.withExternalLinks: "{ARTIST} ({CONTRIB}) ({LINKS})"
+  duration: "Duration: {DURATION}."
 
-misc.chronology.seeArtistPages: "(See artist pages for chronology info!)"
-misc.chronology.heading.coverArt: "{INDEX} cover art by {ARTIST}"
-misc.chronology.heading.flash: "{INDEX} flash/game by {ARTIST}"
-misc.chronology.heading.track: "{INDEX} track by {ARTIST}"
-misc.chronology.withNavigation: "{HEADING} ({NAVIGATION})"
+  viewCommentary:
+    _: "View {LINK}!"
+    link: "commentary page"
 
-misc.external.domain: "External ({DOMAIN})"
-misc.external.local: "Wiki Archive (local upload)"
-misc.external.bandcamp: "Bandcamp"
-misc.external.bandcamp.domain: "Bandcamp ({DOMAIN})"
-misc.external.deviantart: "DeviantArt"
-misc.external.instagram: "Instagram"
-misc.external.mastodon: "Mastodon"
-misc.external.mastodon.domain: "Mastodon ({DOMAIN})"
-misc.external.newgrounds: "Newgrounds"
-misc.external.patreon: "Patreon"
-misc.external.poetryFoundation: "Poetry Foundation"
-misc.external.soundcloud: "SoundCloud"
-misc.external.spotify: "Spotify"
-misc.external.tumblr: "Tumblr"
-misc.external.twitter: "Twitter"
-misc.external.wikipedia: "Wikipedia"
-misc.external.youtube: "YouTube"
-misc.external.youtube.playlist: "YouTube (playlist)"
-misc.external.youtube.fullAlbum: "YouTube (full album)"
-misc.external.flash.bgreco: "{LINK} (HQ Audio)"
-misc.external.flash.homestuck.page: "{LINK} (page {PAGE})"
-misc.external.flash.homestuck.secret: "{LINK} (secret page)"
-misc.external.flash.youtube: "{LINK} (on any device)"
+  viewGallery:
+    _: "View {LINK}!"
+    link: "gallery page"
 
-misc.missingImage: "(This image file is missing)"
-misc.missingLinkContent: "(Missing link content)"
+  viewGalleryOrCommentary:
+    _: "View {GALLERY} or {COMMENTARY}!"
+    gallery: "gallery page"
+    commentary: "commentary page"
 
-misc.nav.previous: "Previous"
-misc.nav.next: "Next"
-misc.nav.info: "Info"
-misc.nav.gallery: "Gallery"
+  viewOriginalFile:
+    _: "View {LINK}."
+    withSize: "View {LINK} ({SIZE})."
+    link: "original file"
+    sizeWarning: >-
+      (Heads up! If you're on a mobile plan, this is a large download.)
 
-misc.pageTitle: "{TITLE}"
-misc.pageTitle.withWikiName: "{TITLE} | {WIKI_NAME}"
+  listenOn:
+    _: "Listen on {LINKS}."
+    noLinks: >-
+      This wiki doesn't have any listening links for {NAME}.
 
-misc.skippers.skipTo: "Skip to:"
-misc.skippers.content: "Content"
-misc.skippers.sidebar: "Sidebar"
-misc.skippers.sidebar.left: "Sidebar (left)"
-misc.skippers.sidebar.right: "Sidebar (right)"
-misc.skippers.header: "Header"
-misc.skippers.footer: "Footer"
-misc.skippers.tracks: "Tracks"
-misc.skippers.art: "Artworks"
-misc.skippers.flashes: "Flashes & Games"
-misc.skippers.contributors: "Contributors"
-misc.skippers.references: "References..."
-misc.skippers.referencedBy: "Referenced by..."
-misc.skippers.samples: "Samples..."
-misc.skippers.sampledBy: "Sampled by..."
-misc.skippers.features: "Features..."
-misc.skippers.featuredIn: "Featured in..."
-misc.skippers.lyrics: "Lyrics"
-misc.skippers.sheetMusicFiles: "Sheet music files"
-misc.skippers.midiProjectFiles: "MIDI/project files"
-misc.skippers.additionalFiles: "Additional files"
-misc.skippers.commentary: "Commentary"
-misc.skippers.artistCommentary: "Commentary"
+  visitOn: "Visit on {LINKS}."
+  playOn: "Play on {LINKS}."
 
-misc.socialEmbed.heading: "{WIKI_NAME} | {HEADING}"
+  readCommentary:
+    _: "Read {LINK}."
+    link: "artist commentary"
 
-misc.jumpTo: "Jump to:"
-misc.jumpTo.withLinks: "Jump to: {LINKS}."
+  alsoReleasedAs:
+    _: "Also released as:"
+    item: "{TRACK} (on {ALBUM})"
 
-misc.contentWarnings: "cw: {WARNINGS}"
-misc.contentWarnings.reveal: "click to show"
+  contributors: "Contributors:"
 
-misc.albumGrid.details: "({TRACKS}, {TIME})"
-misc.albumGrid.details.coverArtists: "(Illust. {ARTISTS})"
-misc.albumGrid.details.otherCoverArtists: "(With {ARTISTS})"
-misc.albumGrid.noCoverArt: "{ALBUM}"
-misc.albumGalleryGrid.noCoverArt: "{NAME}"
+  tracksReferenced: "Tracks that {TRACK} references:"
+  tracksThatReference: "Tracks that reference {TRACK}:"
+  tracksSampled: "Tracks that {TRACK} samples:"
+  tracksThatSample: "Tracks that sample {TRACK}:"
 
-misc.uiLanguage: "UI Language: {LANGUAGES"
+  flashesThatFeature:
+    _: "Flashes & games that feature {TRACK}:"
+    item:
+      _: "{FLASH}"
+      asDifferentRelease: "{FLASH} (as {TRACK})"
 
-homepage.title: "{TITLE}"
-homepage.news.title: News
-homepage.news.entry.viewRest: "(View rest of entry!)"
+  tracksFeatured: "Tracks that {FLASH} features:"
 
-albumSidebar.trackList.fallbackSectionName: "Track list"
-albumSidebar.trackList.group: "{GROUP}"
-albumSidebar.trackList.group.withRange: "{GROUP} ({RANGE})"
-albumSidebar.trackList.item: "{TRACK}"
-albumSidebar.groupBox.title: "{GROUP}"
-albumSidebar.groupBox.next: "Next: {ALBUM}"
-albumSidebar.groupBox.previous: "Previous: {ALBUM}"
+  lyrics: "Lyrics:"
+  note: "Context notes:"
 
-albumPage.title: "{ALBUM}"
-albumPage.nav.album: "{ALBUM}"
-albumPage.nav.randomTrack: "Random Track"
-albumPage.nav.gallery: "Gallery"
-albumPage.nav.commentary: "Commentary"
-albumPage.socialEmbed.heading: "{GROUP}"
-albumPage.socialEmbed.title: "{ALBUM}"
-albumPage.socialEmbed.body.withDuration: "{DURATION}."
-albumPage.socialEmbed.body.withTracks: "{TRACKS}."
-albumPage.socialEmbed.body.withReleaseDate: Released {DATE}.
-albumPage.socialEmbed.body.withDuration.withTracks: "{DURATION}, {TRACKS}."
-albumPage.socialEmbed.body.withDuration.withReleaseDate: "{DURATION}. Released {DATE}."
-albumPage.socialEmbed.body.withTracks.withReleaseDate: "{TRACKS}. Released {DATE}."
-albumPage.socialEmbed.body.withDuration.withTracks.withReleaseDate: "{DURATION}, {TRACKS}.
-  Released {DATE}."
+  artistCommentary:
+    _: "Artist commentary:"
+    seeOriginalRelease: "See {ORIGINAL}!"
 
-albumGalleryPage.title: "{ALBUM} - Gallery"
-albumGalleryPage.statsLine: >-
-  {TRACKS} totaling {DURATION}.
-albumGalleryPage.statsLine.withDate: >-
-  {TRACKS} totaling {DURATION}. Released {DATE}.
-albumGalleryPage.coverArtistsLine: >-
-  All track artwork by {ARTISTS}.
-albumGalleryPage.noTrackArtworksLine: >-
-  This album doesn't have any track artwork.
+  artTags:
+    _: "Tags:"
+    inline: "Tags: {TAGS}"
 
-albumCommentaryPage.title: "{ALBUM} - Commentary"
-albumCommentaryPage.infoLine: "{WORDS} across {ENTRIES}."
-albumCommentaryPage.nav.album: "Album: {ALBUM}"
-albumCommentaryPage.entry.title.albumCommentary: "Album commentary"
-albumCommentaryPage.entry.title.trackCommentary: "{TRACK}"
+  additionalFiles:
+    heading: "View or download {ADDITIONAL_FILES}:"
 
-artistPage.title: "{ARTIST}"
-artistPage.creditList.album: "{ALBUM}"
-artistPage.creditList.album.withDate: "{ALBUM} ({DATE})"
-artistPage.creditList.album.withDuration: "{ALBUM} ({DURATION})"
-artistPage.creditList.album.withDate.withDuration: "{ALBUM} ({DATE}; {DURATION})"
-artistPage.creditList.flashAct: "{ACT}"
-artistPage.creditList.flashAct.withDate: "{ACT} ({DATE})"
-artistPage.creditList.flashAct.withDateRange: "{ACT} ({DATE_RANGE})"
-artistPage.creditList.entry.track: "{TRACK}"
-artistPage.creditList.entry.track.withDuration: "({DURATION}) {TRACK}"
-artistPage.creditList.entry.album.coverArt: "(cover art)"
-artistPage.creditList.entry.album.wallpaperArt: "(wallpaper art)"
-artistPage.creditList.entry.album.bannerArt: "(banner art)"
-artistPage.creditList.entry.album.commentary: "(album commentary)"
-artistPage.creditList.entry.flash: "{FLASH}"
-artistPage.creditList.entry.rerelease: "{ENTRY} (re-release)"
-artistPage.creditList.entry.withContribution: "{ENTRY} ({CONTRIBUTION})"
-artistPage.creditList.entry.withArtists: "{ENTRY} (with {ARTISTS})"
-artistPage.creditList.entry.withArtists.withContribution: "{ENTRY} ({CONTRIBUTION}; with {ARTISTS})"
-artistPage.contributedDurationLine: >-
-  {ARTIST} has contributed {DURATION} of music shared on this wiki.
-artistPage.musicGroupsLine: "Contributed music to groups: {GROUPS}"
-artistPage.artGroupsLine: "Contributed art to groups: {GROUPS}"
-artistPage.groupsLine.item.withCount: "{GROUP} ({COUNT})"
-artistPage.groupsLine.item.withDuration: "{GROUP} ({DURATION})"
-artistPage.groupContributions.title.music: "Contributed music to groups:"
-artistPage.groupContributions.title.artworks: "Contributed artworks to groups:"
-artistPage.groupContributions.title.withSortButton: "{TITLE} ({SORT})"
-artistPage.groupContributions.title.sorting.count: "Sorting by count."
-artistPage.groupContributions.title.sorting.duration: "Sorting by duration."
-artistPage.groupContributions.item.countAccent: "({COUNT})"
-artistPage.groupContributions.item.durationAccent: "({DURATION})"
-artistPage.groupContributions.item.countDurationAccent: "({COUNT} — {DURATION})"
-artistPage.groupContributions.item.durationCountAccent: "({DURATION} — {COUNT})"
-artistPage.trackList.title: "Tracks"
-artistPage.artList.title: "Artworks"
-artistPage.flashList.title: "Flashes & Games"
-artistPage.commentaryList.title: "Commentary"
-artistPage.viewArtGallery: "View {LINK}!"
-artistPage.viewArtGallery.orBrowseList: "View {LINK}! Or browse the list:"
-artistPage.viewArtGallery.link: "art gallery"
-artistPage.nav.artist: "Artist: {ARTIST}"
-artistGalleryPage.title: "{ARTIST} - Gallery"
-artistGalleryPage.infoLine: "Contributed to {COVER_ARTS}."
+    entry:
+      _: "{TITLE}"
+      withDescription: "{TITLE}: {DESCRIPTION}"
 
-commentaryIndex.title: "Commentary"
-commentaryIndex.infoLine: "{WORDS} across {ENTRIES}, in all."
-commentaryIndex.albumList.title: "Choose an album:"
-commentaryIndex.albumList.item: "{ALBUM} ({WORDS} across {ENTRIES})"
+    file:
+      _: "{FILE}"
+      withSize: "{FILE} ({SIZE})"
 
-flashIndex.title: "Flashes & Games"
+    shortcut:
+      _: "View {ANCHOR_LINK}: {TITLES}"
+      anchorLink: "additional files"
 
-flashPage.title: "{FLASH}"
-flashPage.nav.flash: "{FLASH}"
+  sheetMusicFiles:
+    heading: "Print or download sheet music files:"
 
-flashSidebar.flashList.flashesInThisAct: "Flashes in this act"
-flashSidebar.flashList.entriesInThisSection: "Entries in this section"
+    shortcut:
+      _: "Download {LINK}."
+      link: "sheet music files"
 
-groupSidebar.title: "Groups"
-groupSidebar.groupList.category: "{CATEGORY}"
-groupSidebar.groupList.item: "{GROUP}"
+  midiProjectFiles:
+    heading: "Download MIDI/project files:"
 
-groupPage.nav.group: "Group: {GROUP}"
+    shortcut:
+      _: "Download {LINK}."
+      link: "MIDI/project files"
 
-groupInfoPage.title: "{GROUP}"
-groupInfoPage.viewAlbumGallery: "View {LINK}! Or browse the list:"
-groupInfoPage.viewAlbumGallery.link: "album gallery"
-groupInfoPage.albumList.title: "Albums"
-groupInfoPage.albumList.item: "({YEAR}) {ALBUM}"
-groupInfoPage.albumList.item.withoutYear: "{ALBUM}"
-groupInfoPage.albumList.item.withAccent: "{ITEM} {ACCENT}"
-groupInfoPage.albumList.item.otherGroupAccent: "(from {GROUP})"
+trackList:
+  section:
+    withDuration: "{SECTION} ({DURATION}):"
 
-groupGalleryPage.title: "{GROUP} - Gallery"
-groupGalleryPage.infoLine: "{TRACKS} across {ALBUMS}, totaling {TIME}."
+  group:
+    _: "From {GROUP}:"
+    fromOther: "From somewhere else:"
 
-listingIndex.title: "Listings"
-listingIndex.infoLine: >-
-  {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
-listingIndex.exploreList: >-
-  Feel free to explore any of the listings linked below and in the sidebar!
+  item:
+    withDuration: "({DURATION}) {TRACK}"
+    withDuration.withArtists: "({DURATION}) {TRACK} {BY}"
+    withArtists: "{TRACK} {BY}"
+    withArtists.by: "by {ARTISTS}"
+    rerelease: "{TRACK} (re-release)"
 
-listingPage.target.album: "Albums"
-listingPage.target.artist: "Artists"
-listingPage.target.group: "Groups"
-listingPage.target.track: "Tracks"
-listingPage.target.tag: "Tags"
-listingPage.target.other: "Other"
+misc:
+  alt:
+    albumCover: "album cover"
+    albumBanner: "album banner"
+    trackCover: "track cover"
+    artistAvatar: "artist avatar"
+    flashArt: "flash art"
 
-listingPage.listingsFor: "Listings for {TARGET}: {LISTINGS}"
-listingPage.seeAlso: "Also check out: {LISTINGS}"
+  artistLink:
+    _: "{ARTIST}"
+    withContribution: "{ARTIST} ({CONTRIB})"
+    withExternalLinks: "{ARTIST} ({LINKS})"
+    withContribution.withExternalLinks: "{ARTIST} ({CONTRIB}) ({LINKS})"
 
-listingPage.listAlbums.byName.title: "Albums - by Name"
-listingPage.listAlbums.byName.title.short: "...by Name"
-listingPage.listAlbums.byName.item: "{ALBUM} ({TRACKS})"
-listingPage.listAlbums.byTracks.title: "Albums - by Tracks"
-listingPage.listAlbums.byTracks.title.short: "...by Tracks"
-listingPage.listAlbums.byTracks.item: "{ALBUM} ({TRACKS})"
-listingPage.listAlbums.byDuration.title: "Albums - by Duration"
-listingPage.listAlbums.byDuration.title.short: "...by Duration"
-listingPage.listAlbums.byDuration.item: "{ALBUM} ({DURATION})"
-listingPage.listAlbums.byDate.title: "Albums - by Date"
-listingPage.listAlbums.byDate.title.short: "...by Date"
-listingPage.listAlbums.byDate.item: "{ALBUM} ({DATE})"
-listingPage.listAlbums.byDateAdded.title.short: "...by Date Added to Wiki"
-listingPage.listAlbums.byDateAdded.title: "Albums - by Date Added to Wiki"
-listingPage.listAlbums.byDateAdded.chunk.title: "{DATE}"
-listingPage.listAlbums.byDateAdded.chunk.item: "{ALBUM}"
+  chronology:
+    seeArtistPages: "(See artist pages for chronology info!)"
+    withNavigation: "{HEADING} ({NAVIGATION})"
 
-listingPage.listArtists.byName.title: "Artists - by Name"
-listingPage.listArtists.byName.title.short: "...by Name"
-listingPage.listArtists.byName.item: "{ARTIST} ({CONTRIBUTIONS})"
-listingPage.listArtists.byContribs.title: "Artists - by Contributions"
-listingPage.listArtists.byContribs.title.short: "...by Contributions"
-listingPage.listArtists.byContribs.item: "{ARTIST} ({CONTRIBUTIONS})"
-listingPage.listArtists.byCommentary.title: "Artists - by Commentary Entries"
-listingPage.listArtists.byCommentary.title.short: "...by Commentary Entries"
-listingPage.listArtists.byCommentary.item: "{ARTIST} ({ENTRIES})"
-listingPage.listArtists.byDuration.title: "Artists - by Duration"
-listingPage.listArtists.byDuration.title.short: "...by Duration"
-listingPage.listArtists.byDuration.item: "{ARTIST} ({DURATION})"
-listingPage.listArtists.byLatest.title: "Artists - by Latest Contribution"
-listingPage.listArtists.byLatest.title.short: "...by Latest Contribution"
-listingPage.listArtists.byLatest.chunk.title.album: "{ALBUM} ({DATE})"
-listingPage.listArtists.byLatest.chunk.title.flash: "{FLASH} ({DATE})"
-listingPage.listArtists.byLatest.chunk.item: "{ARTIST}"
-listingPage.listArtists.byLatest.dateless.title: "These artists' contributions aren't dated:"
-listingPage.listArtists.byLatest.dateless.item: "{ARTIST}"
+    heading:
+      coverArt: "{INDEX} cover art by {ARTIST}"
+      flash: "{INDEX} flash/game by {ARTIST}"
+      track: "{INDEX} track by {ARTIST}"
 
-listingPage.listGroups.byName.title: "Groups - by Name"
-listingPage.listGroups.byName.title.short: "...by Name"
-listingPage.listGroups.byName.item: "{GROUP} ({GALLERY})"
-listingPage.listGroups.byName.item.gallery: "Gallery"
-listingPage.listGroups.byCategory.title: "Groups - by Category"
-listingPage.listGroups.byCategory.title.short: "...by Category"
-listingPage.listGroups.byCategory.chunk.title: "{CATEGORY}"
-listingPage.listGroups.byCategory.chunk.item: "{GROUP} ({GALLERY})"
-listingPage.listGroups.byCategory.chunk.item.gallery: "Gallery"
-listingPage.listGroups.byAlbums.title: "Groups - by Albums"
-listingPage.listGroups.byAlbums.title.short: "...by Albums"
-listingPage.listGroups.byAlbums.item: "{GROUP} ({ALBUMS})"
-listingPage.listGroups.byTracks.title: "Groups - by Tracks"
-listingPage.listGroups.byTracks.title.short: "...by Tracks"
-listingPage.listGroups.byTracks.item: "{GROUP} ({TRACKS})"
-listingPage.listGroups.byDuration.title: "Groups - by Duration"
-listingPage.listGroups.byDuration.title.short: "...by Duration"
-listingPage.listGroups.byDuration.item: "{GROUP} ({DURATION})"
-listingPage.listGroups.byLatest.title: "Groups - by Latest Album"
-listingPage.listGroups.byLatest.title.short: "...by Latest Album"
-listingPage.listGroups.byLatest.item: "{GROUP} ({DATE})"
+  external:
+    domain: "External ({DOMAIN})"
+    local: "Wiki Archive (local upload)"
+    deviantart: "DeviantArt"
+    instagram: "Instagram"
+    newgrounds: "Newgrounds"
+    patreon: "Patreon"
+    poetryFoundation: "Poetry Foundation"
+    soundcloud: "SoundCloud"
+    spotify: "Spotify"
+    tumblr: "Tumblr"
+    twitter: "Twitter"
+    wikipedia: "Wikipedia"
 
-listingPage.listTracks.byName.title: "Tracks - by Name"
-listingPage.listTracks.byName.title.short: "...by Name"
-listingPage.listTracks.byName.item: "{TRACK}"
-listingPage.listTracks.byAlbum.title: "Tracks - by Album"
-listingPage.listTracks.byAlbum.title.short: "...by Album"
-listingPage.listTracks.byAlbum.chunk.title: "{ALBUM}"
-listingPage.listTracks.byAlbum.chunk.item: "{TRACK}"
-listingPage.listTracks.byDate.title: "Tracks - by Date"
-listingPage.listTracks.byDate.title.short: "...by Date"
-listingPage.listTracks.byDate.chunk.title: "{ALBUM} ({DATE})"
-listingPage.listTracks.byDate.chunk.item: "{TRACK}"
-listingPage.listTracks.byDate.chunk.item.rerelease: "{TRACK} (re-release)"
-listingPage.listTracks.byDuration.title: "Tracks - by Duration"
-listingPage.listTracks.byDuration.title.short: "...by Duration"
-listingPage.listTracks.byDuration.item: "{TRACK} ({DURATION})"
-listingPage.listTracks.byDurationInAlbum.title: "Tracks - by Duration (in Album)"
-listingPage.listTracks.byDurationInAlbum.title.short: "...by Duration (in Album)"
-listingPage.listTracks.byDurationInAlbum.chunk.title: "{ALBUM}"
-listingPage.listTracks.byDurationInAlbum.chunk.item: "{TRACK} ({DURATION})"
-listingPage.listTracks.byTimesReferenced.title: "Tracks - by Times Referenced"
-listingPage.listTracks.byTimesReferenced.title.short: "...by Times Referenced"
-listingPage.listTracks.byTimesReferenced.item: "{TRACK} ({TIMES_REFERENCED})"
-listingPage.listTracks.inFlashes.byAlbum.title: "Tracks - in Flashes & Games (by Album)"
-listingPage.listTracks.inFlashes.byAlbum.title.short: "...in Flashes & Games (by Album)"
-listingPage.listTracks.inFlashes.byAlbum.chunk.title: "{ALBUM}"
-listingPage.listTracks.inFlashes.byAlbum.chunk.item: "{TRACK} (in {FLASHES})"
-listingPage.listTracks.inFlashes.byFlash.title: "Tracks - in Flashes & Games (by Flash)"
-listingPage.listTracks.inFlashes.byFlash.title.short: "...in Flashes & Games (by Flash)"
-listingPage.listTracks.inFlashes.byFlash.chunk.title: "{FLASH}"
-listingPage.listTracks.inFlashes.byFlash.chunk.item: "{TRACK} (from {ALBUM})"
-listingPage.listTracks.withLyrics.title: "Tracks - with Lyrics"
-listingPage.listTracks.withLyrics.title.short: "...with Lyrics"
-listingPage.listTracks.withLyrics.chunk.title: "{ALBUM}"
-listingPage.listTracks.withLyrics.chunk.title.withDate: "{ALBUM} ({DATE})"
-listingPage.listTracks.withLyrics.chunk.item: "{TRACK}"
-listingPage.listTracks.withSheetMusicFiles.title: "Tracks - with Sheet Music Files"
-listingPage.listTracks.withSheetMusicFiles.title.short: "...with Sheet Music Files"
-listingPage.listTracks.withSheetMusicFiles.chunk.title: "{ALBUM}"
-listingPage.listTracks.withSheetMusicFiles.chunk.title.withDate: "{ALBUM} ({DATE})"
-listingPage.listTracks.withSheetMusicFiles.chunk.item: "{TRACK}"
-listingPage.listTracks.withMidiProjectFiles.title: "Tracks - with MIDI & Project Files"
-listingPage.listTracks.withMidiProjectFiles.title.short: "...with MIDI & Project Files"
-listingPage.listTracks.withMidiProjectFiles.chunk.title: "{ALBUM}"
-listingPage.listTracks.withMidiProjectFiles.chunk.title.withDate: "{ALBUM} ({DATE})"
-listingPage.listTracks.withMidiProjectFiles.chunk.item: "{TRACK}"
+    bandcamp:
+      _: "Bandcamp"
+      domain: "Bandcamp ({DOMAIN})"
 
-listingPage.listTags.byName.title: "Tags - by Name"
-listingPage.listTags.byName.title.short: "...by Name"
-listingPage.listTags.byName.item: "{TAG} ({TIMES_USED})"
-listingPage.listTags.byUses.title: "Tags - by Uses"
-listingPage.listTags.byUses.title.short: "...by Uses"
-listingPage.listTags.byUses.item: "{TAG} ({TIMES_USED})"
+    mastodon:
+      _: "Mastodon"
+      domain: "Mastodon ({DOMAIN})"
 
-listingPage.other.allSheetMusic.title: "All Sheet Music"
-listingPage.other.allSheetMusic.title.short: "All Sheet Music"
-listingPage.other.allSheetMusic.albumFiles: "Album sheet music:"
-listingPage.other.allSheetMusic.file: "{TITLE}"
-listingPage.other.allSheetMusic.file.withMultipleFiles: "{TITLE} ({FILES})"
-listingPage.other.allMidiProjectFiles.title: "All MIDI/Project Files"
-listingPage.other.allMidiProjectFiles.title.short: "All MIDI/Project Files"
-listingPage.other.allMidiProjectFiles.albumFiles: "Album MIDI/project files:"
-listingPage.other.allMidiProjectFiles.file: "{TITLE}"
-listingPage.other.allMidiProjectFiles.file.withMultipleFiles: "{TITLE} ({FILES})"
-listingPage.other.allAdditionalFiles.title: "All Additional Files"
-listingPage.other.allAdditionalFiles.title.short: "All Additional Files"
-listingPage.other.allAdditionalFiles.albumFiles: "Album additional files:"
-listingPage.other.allAdditionalFiles.file: "{TITLE}"
-listingPage.other.allAdditionalFiles.file.withMultipleFiles: "{TITLE} ({FILES})"
+    youtube:
+      _: "YouTube"
+      playlist: "YouTube (playlist)"
+      fullAlbum: "YouTube (full album)"
 
-listingPage.other.randomPages.title: "Random Pages"
-listingPage.other.randomPages.title.short: "Random Pages"
-listingPage.other.randomPages.chooseLinkLine: >-
-  Choose a link to go to a random page in that category or album!
-  If your browser doesn't support relatively modern JavaScript
-  or you've disabled it, these links won't work - sorry.
-listingPage.other.randomPages.dataLoadingLine: >-
-  (Data files are downloading in the background! Please wait for data to load.)
-listingPage.other.randomPages.dataLoadedLine: >-
-  (Data files have finished being downloaded. The links should work!)
-listingPage.other.randomPages.misc: "Miscellaneous:"
-listingPage.other.randomPages.misc.randomArtist: "Random Artist"
-listingPage.other.randomPages.misc.atLeastTwoContributions: "at least 2 contributions"
-listingPage.other.randomPages.misc.randomAlbumWholeSite: "Random Album (whole site)"
-listingPage.other.randomPages.misc.randomTrackWholeSite: "Random Track (whole site)"
-listingPage.other.randomPages.group: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
-listingPage.other.randomPages.group.randomAlbum: "Random Album"
-listingPage.other.randomPages.group.randomTrack: "Random Track"
-listingPage.other.randomPages.album: "{ALBUM}"
+    flash:
+      bgreco: "{LINK} (HQ Audio)"
+      youtube: "{LINK} (on any device)"
+      homestuck:
+        page: "{LINK} (page {PAGE})"
+        secret: "{LINK} (secret page)"
 
-listingPage.misc.trackContributors: "Track Contributors"
-listingPage.misc.artContributors: "Art Contributors"
-listingPage.misc.flashContributors: "Flash & Game Contributors"
-listingPage.misc.artAndFlashContributors: "Art & Flash Contributors"
+  missingImage: "(This image file is missing)"
+  missingLinkContent: "(Missing link content)"
 
-newsIndex.title: "News"
-newsIndex.entry.viewRest: "(View rest of entry!)"
+  nav:
+    previous: "Previous"
+    next: "Next"
+    info: "Info"
+    gallery: "Gallery"
 
-newsEntryPage.title: "{ENTRY}"
-newsEntryPage.published: "(Published {DATE}.)"
+  pageTitle:
+    _: "{TITLE}"
+    withWikiName: "{TITLE} | {WIKI_NAME}"
 
-redirectPage.title: "Moved to {TITLE}"
-redirectPage.infoLine: "This page has been moved to {TARGET}."
+  skippers:
+    skipTo: "Skip to:"
 
-tagPage.title: "{TAG}"
-tagPage.infoLine: "Appears in {COVER_ARTS}."
-tagPage.nav.tag: "Tag: {TAG}"
+    content: "Content"
+    header: "Header"
+    footer: "Footer"
 
-trackPage.title: "{TRACK}"
-trackPage.referenceList.fandom: "Fandom:"
-trackPage.referenceList.official: "Official:"
-trackPage.nav.track: "{TRACK}"
-trackPage.nav.track.withNumber: "{NUMBER}. {TRACK}"
-trackPage.nav.random: "Random"
-trackPage.socialEmbed.heading: "{ALBUM}"
-trackPage.socialEmbed.title: "{TRACK}"
-trackPage.socialEmbed.body.withArtists.withCoverArtists: "By {ARTISTS}; art by {COVER_ARTISTS}."
-trackPage.socialEmbed.body.withArtists: "By {ARTISTS}."
-trackPage.socialEmbed.body.withCoverArtists: "Art by {COVER_ARTISTS}."
+    sidebar:
+      _: "Sidebar"
+      left: "Sidebar (left)"
+      right: "Sidebar (right)"
+
+    tracks: "Tracks"
+    art: "Artworks"
+    flashes: "Flashes & Games"
+    contributors: "Contributors"
+
+    references: "References..."
+    referencedBy: "Referenced by..."
+    samples: "Samples..."
+    sampledBy: "Sampled by..."
+    features: "Features..."
+    featuredIn: "Featured in..."
+
+    lyrics: "Lyrics"
+    sheetMusicFiles: "Sheet music files"
+    midiProjectFiles: "MIDI/project files"
+    additionalFiles: "Additional files"
+    commentary: "Commentary"
+    artistCommentary: "Commentary"
+
+  socialEmbed:
+    heading: "{WIKI_NAME} | {HEADING}"
+
+  jumpTo:
+    _: "Jump to:"
+    withLinks: "Jump to: {LINKS}."
+
+  contentWarnings:
+    _: "cw: {WARNINGS}"
+    reveal: "click to show"
+
+  albumGrid:
+    noCoverArt: "{ALBUM}"
+
+    details:
+      _: "({TRACKS}, {TIME})"
+      coverArtists: "(Illust. {ARTISTS})"
+      otherCoverArtists: "(With {ARTISTS})"
+
+  albumGalleryGrid:
+    noCoverArt: "{NAME}"
+
+  uiLanguage: "UI Language: {LANGUAGES"
+
+homepage:
+  title: "{TITLE}"
+
+  news:
+    title: "News"
+
+    entry:
+      viewRest: "(View rest of entry!)"
+
+albumSidebar:
+  trackList:
+    fallbackSectionName: "Track list"
+    item: "{TRACK}"
+
+    group:
+      _: "{GROUP}"
+      withRange: "{GROUP} ({RANGE})"
+
+  groupBox:
+    title: "{GROUP}"
+    next: "Next: {ALBUM}"
+    previous: "Previous: {ALBUM}"
+
+albumPage:
+  title: "{ALBUM}"
+
+  nav:
+    album: "{ALBUM}"
+    randomTrack: "Random Track"
+    gallery: "Gallery"
+    commentary: "Commentary"
+
+  socialEmbed:
+    heading: "{GROUP}"
+    title: "{ALBUM}"
+
+    body:
+      withDuration: "{DURATION}."
+      withTracks: "{TRACKS}."
+      withReleaseDate: Released {DATE}.
+      withDuration.withTracks: "{DURATION}, {TRACKS}."
+      withDuration.withReleaseDate: "{DURATION}. Released {DATE}."
+      withTracks.withReleaseDate: "{TRACKS}. Released {DATE}."
+      withDuration.withTracks.withReleaseDate: "{DURATION}, {TRACKS}. Released {DATE}."
+
+albumGalleryPage:
+  title: "{ALBUM} - Gallery"
+
+  statsLine: >-
+    {TRACKS} totaling {DURATION}.
+
+  statsLine.withDate: >-
+    {TRACKS} totaling {DURATION}. Released {DATE}.
+
+  coverArtistsLine: >-
+    All track artwork by {ARTISTS}.
+
+  noTrackArtworksLine: >-
+    This album doesn't have any track artwork.
+
+albumCommentaryPage:
+  title: "{ALBUM} - Commentary"
+
+  nav:
+    album: "Album: {ALBUM}"
+
+  infoLine: >-
+    {WORDS} across {ENTRIES}.
+
+  entry:
+    title:
+      albumCommentary: "Album commentary"
+      trackCommentary: "{TRACK}"
+
+artistPage:
+  title: "{ARTIST}"
+
+  nav:
+    artist: "Artist: {ARTIST}"
+
+  creditList:
+    album:
+      _: "{ALBUM}"
+      withDate: "{ALBUM} ({DATE})"
+      withDuration: "{ALBUM} ({DURATION})"
+      withDate.withDuration: "{ALBUM} ({DATE}; {DURATION})"
+
+    flashAct:
+      _: "{ACT}"
+      withDate: "{ACT} ({DATE})"
+      withDateRange: "{ACT} ({DATE_RANGE})"
+
+    entry:
+      rerelease: "{ENTRY} (re-release)"
+      withContribution: "{ENTRY} ({CONTRIBUTION})"
+      withArtists: "{ENTRY} (with {ARTISTS})"
+      withArtists.withContribution: "{ENTRY} ({CONTRIBUTION}; with {ARTISTS})"
+
+      track:
+        _: "{TRACK}"
+        withDuration: "({DURATION}) {TRACK}"
+
+      album:
+        coverArt: "(cover art)"
+        wallpaperArt: "(wallpaper art)"
+        bannerArt: "(banner art)"
+        commentary: "(album commentary)"
+
+      flash:
+        _: "{FLASH}"
+
+  contributedDurationLine: >-
+    {ARTIST} has contributed {DURATION} of music shared on this wiki.
+
+  musicGroupsLine: >-
+    Contributed music to groups: {GROUPS}
+
+  artGroupsLine: >-
+    Contributed art to groups: {GROUPS}
+
+  groupsLine:
+    item:
+      withCount: "{GROUP} ({COUNT})"
+      withDuration: "{GROUP} ({DURATION})"
+
+  groupContributions:
+    title:
+      music: "Contributed music to groups:"
+      artworks: "Contributed artworks to groups:"
+      withSortButton: "{TITLE} ({SORT})"
+
+      sorting:
+        count: "Sorting by count."
+        duration: "Sorting by duration."
+
+    item:
+      countAccent: "({COUNT})"
+      durationAccent: "({DURATION})"
+      countDurationAccent: "({COUNT} — {DURATION})"
+      durationCountAccent: "({DURATION} — {COUNT})"
+
+  trackList:
+    title: "Tracks"
+
+  artList:
+    title: "Artworks"
+
+  flashList:
+    title: "Flashes & Games"
+
+  commentaryList:
+    title: "Commentary"
+
+  viewArtGallery:
+    _: "View {LINK}!"
+    orBrowseList: "View {LINK}! Or browse the list:"
+    link: "art gallery"
+
+artistGalleryPage:
+  title: "{ARTIST} - Gallery"
+
+  infoLine: >-
+    Contributed to {COVER_ARTS}.
+
+commentaryIndex:
+  title: "Commentary"
+
+  infoLine: >-
+    {WORDS} across {ENTRIES}, in all.
+
+  albumList:
+    title: "Choose an album:"
+    item: "{ALBUM} ({WORDS} across {ENTRIES})"
+
+flashIndex:
+  title: "Flashes & Games"
+
+flashPage:
+  title: "{FLASH}"
+
+  nav:
+    flash: "{FLASH}"
+
+flashSidebar:
+  flashList:
+    flashesInThisAct: "Flashes in this act"
+    entriesInThisSection: "Entries in this section"
+
+groupSidebar:
+  title: "Groups"
+
+  groupList:
+    category: "{CATEGORY}"
+    item: "{GROUP}"
+
+groupPage:
+  nav:
+    group: "Group: {GROUP}"
+
+groupInfoPage:
+  title: "{GROUP}"
+
+  viewAlbumGallery:
+    _: "View {LINK}! Or browse the list:"
+    link: "album gallery"
+
+  albumList:
+    title: "Albums"
+
+    item:
+      _: "({YEAR}) {ALBUM}"
+      withoutYear: "{ALBUM}"
+      withAccent: "{ITEM} {ACCENT}"
+      otherGroupAccent: "(from {GROUP})"
+
+groupGalleryPage:
+  title: "{GROUP} - Gallery"
+
+  infoLine: >-
+    {TRACKS} across {ALBUMS}, totaling {TIME}.
+
+listingIndex:
+  title: "Listings"
+
+  infoLine: >-
+    {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
+
+  exploreList: >-
+    Feel free to explore any of the listings linked below and in the sidebar!
+
+listingPage:
+  target:
+    album: "Albums"
+    artist: "Artists"
+    group: "Groups"
+    track: "Tracks"
+    tag: "Tags"
+    other: "Other"
+
+  listingsFor: "Listings for {TARGET}: {LISTINGS}"
+  seeAlso: "Also check out: {LISTINGS}"
+
+  listAlbums:
+    byName:
+      title: "Albums - by Name"
+      title.short: "...by Name"
+      item: "{ALBUM} ({TRACKS})"
+
+    byTracks:
+      title: "Albums - by Tracks"
+      title.short: "...by Tracks"
+      item: "{ALBUM} ({TRACKS})"
+
+    byDuration:
+      title: "Albums - by Duration"
+      title.short: "...by Duration"
+      item: "{ALBUM} ({DURATION})"
+
+    byDate:
+      title: "Albums - by Date"
+      title.short: "...by Date"
+      item: "{ALBUM} ({DATE})"
+
+    byDateAdded:
+      title: "Albums - by Date Added to Wiki"
+      title.short: "...by Date Added to Wiki"
+      chunk:
+        title: "{DATE}"
+        item: "{ALBUM}"
+
+  listArtists:
+    byName:
+      title: "Artists - by Name"
+      title.short: "...by Name"
+      item: "{ARTIST} ({CONTRIBUTIONS})"
+
+    byContribs:
+      title: "Artists - by Contributions"
+      title.short: "...by Contributions"
+      item: "{ARTIST} ({CONTRIBUTIONS})"
+
+    byCommentary:
+      title: "Artists - by Commentary Entries"
+      title.short: "...by Commentary Entries"
+      item: "{ARTIST} ({ENTRIES})"
+
+    byDuration:
+      title: "Artists - by Duration"
+      title.short: "...by Duration"
+      item: "{ARTIST} ({DURATION})"
+
+    byLatest:
+      title: "Artists - by Latest Contribution"
+      title.short: "...by Latest Contribution"
+
+      chunk:
+        title.album: "{ALBUM} ({DATE})"
+        title.flash: "{FLASH} ({DATE})"
+        item: "{ARTIST}"
+
+      dateless:
+        title: "These artists' contributions aren't dated:"
+        item: "{ARTIST}"
+
+  listGroups:
+    byName:
+      title: "Groups - by Name"
+      title.short: "...by Name"
+      item: "{GROUP} ({GALLERY})"
+      item.gallery: "Gallery"
+
+    byCategory:
+      title: "Groups - by Category"
+      title.short: "...by Category"
+
+      chunk:
+        title: "{CATEGORY}"
+        item: "{GROUP} ({GALLERY})"
+        item.gallery: "Gallery"
+
+    byAlbums:
+      title: "Groups - by Albums"
+      title.short: "...by Albums"
+      item: "{GROUP} ({ALBUMS})"
+
+    byTracks:
+      title: "Groups - by Tracks"
+      title.short: "...by Tracks"
+      item: "{GROUP} ({TRACKS})"
+
+    byDuration:
+      title: "Groups - by Duration"
+      title.short: "...by Duration"
+      item: "{GROUP} ({DURATION})"
+
+    byLatest:
+      title: "Groups - by Latest Album"
+      title.short: "...by Latest Album"
+      item: "{GROUP} ({DATE})"
+
+  listTracks:
+    byName:
+      title: "Tracks - by Name"
+      title.short: "...by Name"
+      item: "{TRACK}"
+
+    byAlbum:
+      title: "Tracks - by Album"
+      title.short: "...by Album"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK}"
+
+    byDate:
+      title: "Tracks - by Date"
+      title.short: "...by Date"
+
+      chunk:
+        title: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+        item.rerelease: "{TRACK} (re-release)"
+
+    byDuration:
+      title: "Tracks - by Duration"
+      title.short: "...by Duration"
+      item: "{TRACK} ({DURATION})"
+
+    byDurationInAlbum:
+      title: "Tracks - by Duration (in Album)"
+      title.short: "...by Duration (in Album)"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK} ({DURATION})"
+
+    byTimesReferenced:
+      title: "Tracks - by Times Referenced"
+      title.short: "...by Times Referenced"
+      item: "{TRACK} ({TIMES_REFERENCED})"
+
+    inFlashes.byAlbum:
+      title: "Tracks - in Flashes & Games (by Album)"
+      title.short: "...in Flashes & Games (by Album)"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK} (in {FLASHES})"
+
+    inFlashes.byFlash:
+      title: "Tracks - in Flashes & Games (by Flash)"
+      title.short: "...in Flashes & Games (by Flash)"
+
+      chunk:
+        title: "{FLASH}"
+        item: "{TRACK} (from {ALBUM})"
+
+    withLyrics:
+      title: "Tracks - with Lyrics"
+      title.short: "...with Lyrics"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+    withSheetMusicFiles:
+      title: "Tracks - with Sheet Music Files"
+      title.short: "...with Sheet Music Files"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+    withMidiProjectFiles:
+      title: "Tracks - with MIDI & Project Files"
+      title.short: "...with MIDI & Project Files"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+  listTags:
+    byName:
+      title: "Tags - by Name"
+      title.short: "...by Name"
+      item: "{TAG} ({TIMES_USED})"
+
+    byUses:
+      title: "Tags - by Uses"
+      title.short: "...by Uses"
+      item: "{TAG} ({TIMES_USED})"
+
+  other:
+    allSheetMusic:
+      title: "All Sheet Music"
+      title.short: "All Sheet Music"
+      albumFiles: "Album sheet music:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    allMidiProjectFiles:
+      title: "All MIDI/Project Files"
+      title.short: "All MIDI/Project Files"
+      albumFiles: "Album MIDI/project files:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    allAdditionalFiles:
+      title: "All Additional Files"
+      title.short: "All Additional Files"
+      albumFiles: "Album additional files:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    randomPages:
+      title: "Random Pages"
+      title.short: "Random Pages"
+
+      chooseLinkLine: >-
+        Choose a link to go to a random page in that category or album!
+        If your browser doesn't support relatively modern JavaScript
+        or you've disabled it, these links won't work - sorry.
+
+      dataLoadingLine: >-
+        (Data files are downloading in the background! Please wait for data to load.)
+
+      dataLoadedLine: >-
+        (Data files have finished being downloaded. The links should work!)
+
+      misc:
+        _: "Miscellaneous:"
+        randomArtist: "Random Artist"
+        atLeastTwoContributions: "at least 2 contributions"
+        randomAlbumWholeSite: "Random Album (whole site)"
+        randomTrackWholeSite: "Random Track (whole site)"
+
+      group:
+        _: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
+        randomAlbum: "Random Album"
+        randomTrack: "Random Track"
+
+      album: "{ALBUM}"
+
+  misc:
+    trackContributors: "Track Contributors"
+    artContributors: "Art Contributors"
+    flashContributors: "Flash & Game Contributors"
+    artAndFlashContributors: "Art & Flash Contributors"
+
+newsIndex:
+  title: "News"
+
+  entry:
+    viewRest: "(View rest of entry!)"
+
+newsEntryPage:
+  title: "{ENTRY}"
+  published: "(Published {DATE}.)"
+
+redirectPage:
+  title: "Moved to {TITLE}"
+
+  infoLine: >-
+    This page has been moved to {TARGET}.
+
+tagPage:
+  title: "{TAG}"
+
+  nav:
+    tag: "Tag: {TAG}"
+
+  infoLine: >-
+    Appears in {COVER_ARTS}.
+
+trackPage:
+  title: "{TRACK}"
+
+  nav:
+    random: "Random"
+
+    track:
+      _: "{TRACK}"
+      withNumber: "{NUMBER}. {TRACK}"
+
+  referenceList:
+    fandom: "Fandom:"
+    official: "Official:"
+
+  socialEmbed:
+    heading: "{ALBUM}"
+    title: "{TRACK}"
+
+    body:
+      withArtists.withCoverArtists: "By {ARTISTS}; art by {COVER_ARTISTS}."
+      withArtists: "By {ARTISTS}."
+      withCoverArtists: "Art by {COVER_ARTISTS}."
