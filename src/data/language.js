@@ -17,7 +17,7 @@ import {
 
 const {Language} = T;
 
-export function processLanguageSpec(spec, {existingCode = null}) {
+export function processLanguageSpec(spec, {existingCode = null} = {}) {
   const {
     'meta.languageCode': code,
     'meta.languageName': name,
