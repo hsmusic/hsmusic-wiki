@@ -402,15 +402,23 @@ export async function determineMediaCachePath({
       path.basename(mediaPath) + '-cache');
 
   let inferredIncludesThumbnailCache;
+  let inferredIsEmpty;
 
   try {
-    const files = await readdir(inferredPath);
-    inferredIncludesThumbnailCache = files.includes(CACHE_FILE);
+    const files = new Set(await readdir(inferredPath));
+    files.delete('.DS_Store');
+    inferredIsEmpty = empty(files);
+    inferredIncludesThumbnailCache =
+      (inferredIsEmpty
+        ? null
+        : files.has(CACHE_FILE));
   } catch (error) {
     if (error.code === 'ENOENT') {
       inferredIncludesThumbnailCache = null;
+      inferredIsEmpty = null;
     } else {
       inferredIncludesThumbnailCache = undefined;
+      inferredIsEmpty = undefined;
     }
   }
 
@@ -425,10 +433,17 @@ export async function determineMediaCachePath({
       mediaCachePath: null,
     };
   } else if (inferredIncludesThumbnailCache === null) {
-    return {
-      annotation: 'inferred path will be created',
-      mediaCachePath: inferredPath,
-    };
+    if (inferredIsEmpty) {
+      return {
+        annotation: `inferred path is empty, will be filled`,
+        mediaCachePath: inferredPath,
+      };
+    } else {
+      return {
+        annotation: 'inferred path will be created',
+        mediaCachePath: inferredPath,
+      };
+    }
   } else {
     return {
       annotation: 'inferred path not readable',
@@ -628,7 +643,6 @@ export default async function genThumbs({
     } else if (firstRun) {
       logWarn`Since no cache was found, all thumbs ${willWould} be generated now,`;
       logWarn`and ${willWould} be unnecessarily regenerated next run, too.`;
-      logWarn`You may have to provide ${'--media-cache-path'} ${mediaCachePath} next run.`;
     } else {
       logWarn`Since the cache read failed, all thumbs ${willWould} be regenerated now,`;
       logWarn`and ${willWould} be unnecessarily regenerated again next run.`;
