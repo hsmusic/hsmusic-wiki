@@ -744,6 +744,7 @@ async function main() {
 
       queueSize,
       magickThreads,
+      noInput,
       quiet: !thumbsOnly,
     });
 

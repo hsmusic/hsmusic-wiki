@@ -551,6 +551,7 @@ export default async function genThumbs({
 
   queueSize = 0,
   magickThreads = defaultMagickThreads,
+  noInput = false,
   quiet = false,
 }) {
   if (!mediaPath) {
@@ -558,6 +559,7 @@ export default async function genThumbs({
   }
 
   const quietInfo = quiet ? () => null : logInfo;
+  const willWould = (noInput ? `would` : `will`);
 
   const [convertInfo, spawnConvert] = await getSpawnMagick('convert');
 
@@ -590,7 +592,13 @@ export default async function genThumbs({
     } else {
       logWarn`Malformed or unreadable cache file: ${error}`;
       logWarn`You may want to cancel and investigate this!`;
-      logWarn`All-new thumbnails and cache will be generated for this run.`;
+      logWarn`All-new thumbnails and cache ${willWould} be generated for this run.`;
+
+      if (noInput) {
+        logError`Canceling here since --no-input was provided.`;
+        return {success: false};
+      }
+
       await delay(WARNING_DELAY_TIME);
     }
   }
@@ -613,14 +621,24 @@ export default async function genThumbs({
     quietInfo`Writing to cache file appears to be working.`;
   } catch (error) {
     logWarn`Test of cache file writing failed: ${error}`;
+
     if (cache) {
-      logWarn`Cache read succeeded: Any newly written thumbs will be unnecessarily regenerated on the next run.`;
+      logWarn`Since the cache read succeeded, any newly written thumbs ${willWould}`;
+      logWarn`be unnecessarily regenerated on the next run.`;
     } else if (firstRun) {
-      logWarn`No cache found: All thumbs will be generated now, and will be unnecessarily regenerated next run.`;
-      logWarn`You may also have to provide ${'--media-cache-path'} ${mediaCachePath} next run.`;
+      logWarn`Since no cache was found, all thumbs ${willWould} be generated now,`;
+      logWarn`and ${willWould} be unnecessarily regenerated next run, too.`;
+      logWarn`You may have to provide ${'--media-cache-path'} ${mediaCachePath} next run.`;
     } else {
-      logWarn`Cache read failed: All thumbs will be regenerated now, and will be unnecessarily regenerated again next run.`;
+      logWarn`Since the cache read failed, all thumbs ${willWould} be regenerated now,`;
+      logWarn`and ${willWould} be unnecessarily regenerated again next run.`;
     }
+
+    if (noInput) {
+      logError`Canceling here since --no-input was provided.`;
+      return {success: false};
+    }
+
     logWarn`You may want to cancel and investigate this!`;
     await delay(WARNING_DELAY_TIME);
   }
