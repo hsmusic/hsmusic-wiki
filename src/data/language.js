@@ -46,8 +46,24 @@ export function processLanguageSpec(spec, {existingCode = null}) {
   return {code, intlCode, name, hidden, strings};
 }
 
+function flattenLanguageSpec(spec) {
+  const recursive = (keyPath, value) =>
+    (typeof value === 'object'
+      ? Object.assign({}, ...
+          Object.entries(value)
+            .map(([key, value]) =>
+              (key === '_'
+                ? {[keyPath]: value}
+                : recursive(
+                    (keyPath ? `${keyPath}.${key}` : key),
+                    value))))
+      : {[keyPath]: value});
+
+  return recursive('', spec);
+}
+
 async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
-  let contents, spec;
+  let contents;
 
   try {
     contents = await readFile(file, 'utf-8');
@@ -57,14 +73,16 @@ async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
       error => annotateErrorWithFile(error, file));
   }
 
+  let rawSpec;
   let parseLanguage;
+
   try {
     if (path.extname(file) === '.yaml') {
       parseLanguage = 'YAML';
-      spec = yaml.load(contents);
+      rawSpec = yaml.load(contents);
     } else {
       parseLanguage = 'JSON';
-      spec = JSON.parse(contents);
+      rawSpec = JSON.parse(contents);
     }
   } catch (caughtError) {
     throw annotateError(
@@ -72,8 +90,10 @@ async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
       error => annotateErrorWithFile(error, file));
   }
 
+  const flattenedSpec = flattenLanguageSpec(rawSpec);
+
   try {
-    return processLanguageSpec(spec, processLanguageSpecOpts);
+    return processLanguageSpec(flattenedSpec, processLanguageSpecOpts);
   } catch (caughtError) {
     throw annotateErrorWithFile(caughtError, file);
   }
