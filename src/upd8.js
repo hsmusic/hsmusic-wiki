@@ -39,7 +39,7 @@ import {fileURLToPath} from 'node:url';
 import wrap from 'word-wrap';
 
 import {displayCompositeCacheAnalysis} from '#composite';
-import {processLanguageFile, watchLanguageFile} from '#language';
+import {watchLanguageFile} from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
@@ -56,7 +56,6 @@ import {
   logError,
   parseOptions,
   progressCallAll,
-  progressPromiseAll,
 } from '#cli';
 
 import genThumbs, {
