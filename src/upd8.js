@@ -1259,19 +1259,12 @@ async function main() {
 
     logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
 
-    // The custom default language will be the new one providing fallback strings
-    // for other languages, but on its own, it still might not be a complete list
-    // of strings. So it falls back to the internal default language - which won't
-    // otherwise be presented on the site.
-    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
-
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageWatcher =
       customLanguageWatchers.find(({language}) => language === customDefaultLanguage);
     finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
   } else if (languages[internalDefaultLanguage.code]) {
     const customDefaultLanguage = languages[internalDefaultLanguage.code];
-    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageWatcher =
       customLanguageWatchers.find(({language}) => language === customDefaultLanguage);
@@ -1284,6 +1277,12 @@ async function main() {
     finalDefaultLanguageAnnotation = `no custom default language specified`;
   }
 
+  const inheritStringsFromInternalLanguage = () => {
+    if (finalDefaultLanguage === internalDefaultLanguage) return;
+    const {strings: inheritedStrings} = internalDefaultLanguage;
+    Object.assign(finalDefaultLanguage, {inheritedStrings});
+  };
+
   const inheritStringsFromDefaultLanguage = () => {
     const {strings: inheritedStrings} = finalDefaultLanguage;
     for (const language of Object.values(languages)) {
@@ -1292,8 +1291,19 @@ async function main() {
     }
   };
 
-  inheritStringsFromDefaultLanguage();
+  // The custom default language, if set, will be the new one providing fallback
+  // strings for other languages. But on its own, it still might not be a complete
+  // list of strings - so it falls back to the internal default language, which
+  // won't otherwise be presented in the build.
+  if (finalDefaultLanguage !== internalDefaultLanguage) {
+    inheritStringsFromInternalLanguage();
+    internalDefaultLanguageWatcher.on('update', () => {
+      inheritStringsFromInternalLanguage();
+      inheritStringsFromDefaultLanguage();
+    });
+  }
 
+  inheritStringsFromDefaultLanguage();
   finalDefaultLanguageWatcher.on('update', () => {
     inheritStringsFromDefaultLanguage();
   });
