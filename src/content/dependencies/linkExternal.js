@@ -24,6 +24,11 @@ export default {
       validate: v => v.is('generic', 'album', 'flash'),
       default: 'generic',
     },
+
+    tab: {
+      validate: v => v.is('default', 'separate'),
+      default: 'default',
+    },
   },
 
   generate(data, slots, {html, language}) {
@@ -53,6 +58,10 @@ export default {
       {
         href: data.url,
         class: 'nowrap',
+        target:
+          (slots.tab === 'separate'
+            ? '_blank'
+            : null),
       },
 
       // truly unhinged indentation here
