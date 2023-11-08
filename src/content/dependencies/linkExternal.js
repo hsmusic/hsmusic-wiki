@@ -3,10 +3,20 @@ const BANDCAMP_DOMAINS = ['bc.s3m.us', 'music.solatrux.com'];
 const MASTODON_DOMAINS = ['types.pl'];
 
 export default {
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html', 'language', 'wikiData'],
 
-  data(url) {
-    return {url};
+  sprawl: ({wikiInfo}) => ({wikiInfo}),
+
+  data(sprawl, url) {
+    const data = {url};
+
+    const {canonicalBase} = sprawl.wikiInfo;
+    if (canonicalBase) {
+      const {hostname: canonicalDomain} = new URL(canonicalBase);
+      Object.assign(data, {canonicalDomain});
+    }
+
+    return data;
   },
 
   slots: {
@@ -20,6 +30,7 @@ export default {
     let isLocal;
     let domain;
     let pathname;
+
     try {
       const url = new URL(data.url);
       domain = url.hostname;
@@ -27,6 +38,14 @@ export default {
     } catch (error) {
       // No support for relative local URLs yet, sorry! (I.e, local URLs must
       // be absolute relative to the domain name in order to work.)
+      isLocal = true;
+      domain = null;
+      pathname = null;
+    }
+
+    // isLocal also applies for URLs which match the 'Canonical Base' under
+    // wiki-info.yaml, if present.
+    if (data.canonicalDomain && domain === data.canonicalDomain) {
       isLocal = true;
     }
 

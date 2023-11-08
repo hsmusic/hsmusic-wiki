@@ -16,6 +16,8 @@ import * as serialize from '#serialize';
 import * as sugar from '#sugar';
 import * as wikiDataUtils from '#wiki-data';
 
+import {DEFAULT_STRINGS_FILE} from './upd8.js';
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function getContextAssignments({
@@ -46,7 +48,7 @@ export async function getContextAssignments({
     language = await processLanguageFile(
       path.join(
         path.dirname(fileURLToPath(import.meta.url)),
-        'strings-default.json'));
+        DEFAULT_STRINGS_FILE));
   } catch (error) {
     console.error(error);
     logWarn`Failed to create Language object`;
