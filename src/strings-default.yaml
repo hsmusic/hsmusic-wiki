@@ -1586,6 +1586,12 @@ newsEntryPage:
   title: "{ENTRY}"
   published: "(Published {DATE}.)"
 
+  readAnother:
+    previous: "(← {DATE} {ENTRY})"
+    next: "(→ {DATE} {ENTRY})"
+    earlier: "{TIME} earlier"
+    later: "{TIME} later"
+
 #
 # redirectPage:
 #   Static "placeholder" pages when redirecting a visitor from one

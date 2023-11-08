@@ -398,6 +398,7 @@ Object.assign(Language.prototype, {
   countAdditionalFiles: countHelper('additionalFiles', 'files'),
   countAlbums: countHelper('albums'),
   countArtworks: countHelper('artworks'),
+  countDays: countHelper('days'),
   countFlashes: countHelper('flashes'),
   countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
   countContributions: countHelper('contributions'),

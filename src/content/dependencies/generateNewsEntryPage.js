@@ -53,12 +53,18 @@ export default {
         relation('generatePreviousNextLinks');
 
       if (query.previousEntry) {
-        relations.previousEntryLink =
+        relations.previousEntryNavLink =
+          relation('linkNewsEntry', query.previousEntry);
+
+        relations.previousEntryContentLink =
           relation('linkNewsEntry', query.previousEntry);
       }
 
       if (query.nextEntry) {
-        relations.nextEntryLink =
+        relations.nextEntryNavLink =
+          relation('linkNewsEntry', query.nextEntry);
+
+        relations.nextEntryContentLink =
           relation('linkNewsEntry', query.nextEntry);
       }
     }
@@ -70,6 +76,20 @@ export default {
     return {
       name: newsEntry.name,
       date: newsEntry.date,
+
+      daysSincePreviousEntry:
+        query.previousEntry &&
+          Math.round((newsEntry.date - query.previousEntry.date) / 86400000),
+
+      daysUntilNextEntry:
+        query.nextEntry &&
+          Math.round((query.nextEntry.date - newsEntry.date) / 86400000),
+
+      previousEntryDate:
+        query.previousEntry?.date,
+
+      nextEntryDate:
+        query.nextEntry?.date,
     };
   },
 
@@ -90,6 +110,44 @@ export default {
           })),
 
         relations.content,
+
+        html.tag('p', {
+          [html.onlyIfContent]: true,
+          [html.joinChildren]: html.tag('br'),
+          class: 'read-another-links',
+        }, [
+          relations.previousEntryContentLink &&
+            language.$('newsEntryPage.readAnother.previous', {
+              entry: relations.previousEntryContentLink,
+
+              date:
+                html.tag('span',
+                  {
+                    title:
+                      language.$('newsEntryPage.readAnother.earlier', {
+                        time:
+                          language.countDays(data.daysSincePreviousEntry, {unit: true}),
+                      }).toString(),
+                  },
+                  language.formatDate(data.previousEntryDate)),
+            }),
+
+          relations.nextEntryContentLink &&
+            language.$('newsEntryPage.readAnother.next', {
+              entry: relations.nextEntryContentLink,
+
+              date:
+                html.tag('span',
+                  {
+                    title:
+                      language.$('newsEntryPage.readAnother.later', {
+                        time:
+                          language.countDays(data.daysUntilNextEntry, {unit: true}),
+                      }).toString(),
+                  },
+                  language.formatDate(data.nextEntryDate)),
+            }),
+        ]),
       ],
 
       navLinkStyle: 'hierarchical',
@@ -101,8 +159,8 @@ export default {
           accent:
             (relations.previousNextLinks
               ? `(${language.formatUnitList(relations.previousNextLinks.slots({
-                  previousLink: relations.previousEntryLink ?? null,
-                  nextLink: relations.nextEntryLink ?? null,
+                  previousLink: relations.previousEntryNavLink ?? null,
+                  nextLink: relations.nextEntryNavLink ?? null,
                 }).content)})`
               : null),
         },
