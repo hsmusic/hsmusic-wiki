@@ -130,7 +130,7 @@ const linkThingRelationMap = {
   newsEntry: 'linkNewsEntry',
   staticPage: 'linkStaticPage',
   tag: 'linkArtTag',
-  track: 'linkTrack',
+  track: 'linkTrackDynamically',
 };
 
 const linkValueRelationMap = {
