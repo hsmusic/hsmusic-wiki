@@ -31,6 +31,10 @@ export default {
       type: 'string',
     },
 
+    color: {
+      validate: v => v.isColor,
+    },
+
     mode: {
       validate: v => v.is('primary', 'thumbnail', 'commentary'),
       default: 'primary',
@@ -45,6 +49,7 @@ export default {
             .slots({
               path: slots.path,
               alt: slots.alt,
+              color: slots.color,
               thumb: 'medium',
               id: 'cover-art',
               reveal: true,
@@ -67,6 +72,7 @@ export default {
           .slots({
             path: slots.path,
             alt: slots.alt,
+            color: slots.color,
             thumb: 'small',
             reveal: false,
             link: false,
@@ -78,6 +84,7 @@ export default {
           .slots({
             path: slots.path,
             alt: slots.alt,
+            color: slots.color,
             thumb: 'medium',
             class: 'commentary-art',
             reveal: true,
