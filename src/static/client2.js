@@ -879,6 +879,10 @@ function updateStickySubheadingContent(index) {
     }
 
     for (const child of closestHeading.childNodes) {
+      if (child.classList?.contains('content-heading-accent')) {
+        continue;
+      }
+
       if (child.tagName === 'A') {
         for (const grandchild of child.childNodes) {
           stickySubheading.appendChild(grandchild.cloneNode(true));
