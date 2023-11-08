@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -33,6 +33,15 @@ export default {
       relation('generateAlbumNavAccent', album, null);
 
     if (album.commentary) {
+      relations.albumCommentaryHeading =
+        relation('generateContentHeading');
+
+      relations.albumCommentaryLink =
+        relation('linkAlbum', album);
+
+      relations.albumCommentaryListeningLinks =
+        album.urls.map(url => relation('linkExternal', url));
+
       if (album.hasCoverArt) {
         relations.albumCommentaryCover =
           relation('generateAlbumCoverArtwork', album);
@@ -148,9 +157,27 @@ export default {
             })),
 
           relations.albumCommentaryContent && [
-            html.tag('h3',
-              {class: ['content-heading']},
-              language.$('albumCommentaryPage.entry.title.albumCommentary')),
+            relations.albumCommentaryHeading.slots({
+              tag: 'h3',
+              color: data.color,
+
+              title:
+                language.$('albumCommentaryPage.entry.title.albumCommentary', {
+                  album: relations.albumCommentaryLink,
+                }),
+
+              accent:
+                !empty(relations.albumCommentaryListeningLinks) &&
+                  language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
+                    listeningLinks:
+                      language.formatUnitList(
+                        relations.albumCommentaryListeningLinks
+                          .map(link => link.slots({
+                            mode: 'album',
+                            tab: 'separate',
+                          }))),
+                  }),
+            }),
 
             relations.albumCommentaryCover
               ?.slots({mode: 'commentary'}),
@@ -187,12 +214,13 @@ export default {
                   }),
 
                 accent:
-                  language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
-                    listeningLinks:
-                      language.formatUnitList(
-                        listeningLinks.map(link =>
-                          link.slot('tab', 'separate'))),
-                  }),
+                  !empty(listeningLinks) &&
+                    language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
+                      listeningLinks:
+                        language.formatUnitList(
+                          listeningLinks.map(link =>
+                            link.slot('tab', 'separate'))),
+                    }),
               }),
 
               cover?.slots({mode: 'commentary'}),

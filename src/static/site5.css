@@ -1292,7 +1292,8 @@ html[data-url-key="localized.home"] .carousel-container {
 
 .content-heading .content-heading-accent {
   font-weight: normal;
-  font-size: 1rem;
+  font-style: oblique;
+  font-size: 0.9rem;
   margin-left: 0.25em;
 }
 
