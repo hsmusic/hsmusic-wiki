@@ -754,7 +754,9 @@ albumCommentaryPage:
   entry:
     title:
       albumCommentary: "Album commentary"
-      trackCommentary: "{TRACK}"
+      trackCommentary:
+        _: "{TRACK}"
+        accent: "({LISTENING_LINKS})"
 
 #
 # artistInfoPage:

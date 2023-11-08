@@ -11,6 +11,7 @@ export default {
     'generateTrackCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
+    'linkExternal',
     'linkTrack',
   ],
 
@@ -53,6 +54,11 @@ export default {
     relations.trackCommentaryLinks =
       tracksWithCommentary
         .map(track => relation('linkTrack', track));
+
+    relations.trackCommentaryListeningLinks =
+      tracksWithCommentary
+        .map(track =>
+          track.urls.map(url => relation('linkExternal', url)));
 
     relations.trackCommentaryCovers =
       tracksWithCommentary
@@ -156,15 +162,37 @@ export default {
           stitchArrays({
             heading: relations.trackCommentaryHeadings,
             link: relations.trackCommentaryLinks,
+            listeningLinks: relations.trackCommentaryListeningLinks,
             directory: data.trackCommentaryDirectories,
             cover: relations.trackCommentaryCovers,
             entries: relations.trackCommentaryEntries,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, cover, entries, color}) => [
+          }).map(({
+              heading,
+              link,
+              listeningLinks,
+              directory,
+              cover,
+              entries,
+              color,
+            }) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
-                title: link,
+                color,
+
+                title:
+                  language.$('albumCommentaryPage.entry.title.trackCommentary', {
+                    track: link,
+                  }),
+
+                accent:
+                  language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
+                    listeningLinks:
+                      language.formatUnitList(
+                        listeningLinks.map(link =>
+                          link.slot('tab', 'separate'))),
+                  }),
               }),
 
               cover?.slots({mode: 'commentary'}),
