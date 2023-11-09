@@ -1568,43 +1568,39 @@ listingPage:
       dataLoadedLine: >-
         (Data files have finished being downloaded. The links should work!)
 
-      # misc:
-      #   The first chunk in the list includes general links which
-      #   bring you to some random page across the whole site!
+      chunk:
 
-      misc:
-        _: "Miscellaneous:"
-        randomArtist:
-          _: "{MAIN_LINK} ({AT_LEAST_TWO_CONTRIBUTIONS})"
-          mainLink: "Random Artist"
-          atLeastTwoContributions: "at least 2 contributions"
-        randomAlbumWholeSite: "Random Album (whole site)"
-        randomTrackWholeSite: "Random Track (whole site)"
+        title:
+          misc: "Miscellaneous:"
 
-      # fromGroup:
-      #   Provided the wiki has "Divide Track Lists By Groups" set,
-      #   the remaining chunks are one for each of those groups, each
-      #   with a list of links for albums from the group that bring
-      #   you to a random track from the chosen album.
+          # fromAlbum:
+          #   If the wiki hasn't got "Divide Track Lists By Groups"
+          #   set, all albums across the wiki are grouped in one
+          #   long chunk.
 
-      fromGroup:
-        _: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
-        randomAlbum: "Random Album"
-        randomTrack: "Random Track"
+          fromAlbum: "From an album:"
 
-      # fromAlbum:
-      #   If the wiki doesn't have "Divide Track Lists By Groups",
-      #   all albums across the wiki are grouped in one list.
-      #  (There aren't "random album" and "random track" links like
-      #   for groups because those are already included at the top,
-      #   under the "miscellaneous" chunk.)
+          # fromGroup:
+          #   If the wiki does have "Divide Track Lists By Groups"
+          #   set, there's one chunk past Miscellaneous for each of
+          #   those groups, listing all the albums from that group,
+          #   each of which links to a random track from that album.
 
-      fromAlbum: "From an album:"
+          fromGroup:
+            _: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
+            randomAlbum: "Random Album"
+            randomTrack: "Random Track"
 
-      # album:
-      #   Album entries under each group.
+        item:
+          album: "{ALBUM}"
 
-      album: "{ALBUM}"
+          randomArtist:
+            _: "{MAIN_LINK} ({AT_LEAST_TWO_CONTRIBUTIONS})"
+            mainLink: "Random Artist"
+            atLeastTwoContributions: "at least 2 contributions"
+
+          randomAlbumWholeSite: "Random Album (whole site)"
+          randomTrackWholeSite: "Random Track (whole site)"
 
 #
 # newsIndex:

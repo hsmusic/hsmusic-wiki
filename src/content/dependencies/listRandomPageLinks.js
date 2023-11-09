@@ -1,47 +1,102 @@
 import {empty} from '#sugar';
+import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [
     'generateListingPage',
-    'generateListRandomPageLinksAllAlbumsSection',
-    'generateListRandomPageLinksGroupSection',
+    'generateListRandomPageLinksAlbumLink',
+    'linkGroup',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
   sprawl: ({wikiInfo}) => ({wikiInfo}),
 
-  query: ({wikiInfo: {divideTrackListsByGroups: groups}}, spec) => ({
-    spec,
-    groups,
-    divideByGroups: !empty(groups),
-  }),
+  query(sprawl, spec) {
+    const query = {spec};
 
-  relations: (relation, query) => ({
-    page: relation('generateListingPage', query.spec),
+    const groups = sprawl.wikiInfo.divideTrackListsByGroups;
 
-    allAlbumsSection:
-      (query.divideByGroups
-        ? null
-        : relation('generateListRandomPageLinksAllAlbumsSection')),
+    query.divideByGroups = !empty(groups);
 
-    groupSections:
-      (query.divideByGroups
-        ? query.groups
-            .map(group => relation('generateListRandomPageLinksGroupSection', group))
-        : null),
-  }),
+    if (query.divideByGroups) {
+      query.groups = groups;
+
+      query.groupAlbums =
+        groups
+          .map(group =>
+            group.albums.filter(album => album.tracks.length > 1));
+    } else {
+      query.undividedAlbums =
+        sortChronologically(sprawl.albumData.slice())
+          .filter(album => album.tracks.length > 1);
+    }
+
+    return query;
+  },
+
+  relations(relation, query) {
+    const relations = {};
+
+    relations.page =
+      relation('generateListingPage', query.spec);
+
+    if (query.divideByGroups) {
+      relations.groupLinks =
+        query.groups
+          .map(group => relation('linkGroup', group));
+
+      relations.groupAlbumLinks =
+        query.groupAlbums
+          .map(albums => albums
+            .map(album =>
+              relation('generateListRandomPageLinksAlbumLink', album)));
+    } else {
+      relations.undividedAlbumLinks =
+        query.undividedAlbums
+          .map(album =>
+            relation('generateListRandomPageLinksAlbumLink', album));
+    }
+
+    return relations;
+  },
 
   generate(relations, {html, language}) {
+    const miscellaneousChunkRows = [
+      {
+        stringsKey: 'randomArtist',
+
+        mainLink:
+          html.tag('a',
+            {href: '#', 'data-random': 'artist'},
+            language.$('listingPage.other.randomPages.chunk.item.randomArtist.mainLink')),
+
+        atLeastTwoContributions:
+          html.tag('a',
+            {href: '#', 'data-random': 'artist-more-than-one-contrib'},
+            language.$('listingPage.other.randomPages.chunk.item.randomArtist.atLeastTwoContributions')),
+      },
+
+      {stringsKey: 'randomAlbumWholeSite'},
+      {stringsKey: 'randomTrackWholeSite'},
+    ];
+
+    const miscellaneousChunkRowAttributes = [
+      null,
+      {href: '#', 'data-random': 'album'},
+      {href: '#','data-random': 'track'},
+    ];
+
     return relations.page.slots({
-      type: 'custom',
+      type: 'chunks',
+
       content: [
         html.tag('p',
           language.$('listingPage.other.randomPages.chooseLinkLine', {
             fromPart:
-              (empty(relations.groupSections)
-                ? language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.notDividedByGroups')
-                : language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.dividedByGroups')),
+              (relations.groupLinks
+                ? language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.dividedByGroups')
+                : language.$('listingPage.other.randomPages.chooseLinkLine.fromPart.notDividedByGroups')),
 
             browserSupportPart:
               language.$('listingPage.other.randomPages.chooseLinkLine.browserSupportPart'),
@@ -54,40 +109,54 @@ export default {
         html.tag('p',
           {class: 'js-show-once-data'},
           language.$('listingPage.other.randomPages.dataLoadedLine')),
+      ],
 
-        html.tag('dl', [
-          html.tag('dt',
-            language.$('listingPage.other.randomPages.misc')),
+      chunkTitles: [
+        {stringsKey: 'misc'},
 
-          html.tag('dd',
-            html.tag('ul', [
-              html.tag('li',
-                language.$('listingPage.other.randomPages.misc.randomArtist', {
-                  mainLink:
-                    html.tag('a',
-                      {href: '#', 'data-random': 'artist'},
-                      language.$('listingPage.other.randomPages.misc.randomArtist.mainLink')),
+        ...
+          (relations.groupLinks
+            ? relations.groupLinks.map(groupLink => ({
+                stringsKey: 'fromGroup',
 
-                  atLeastTwoContributions:
-                    html.tag('a',
-                      {href: '#', 'data-random': 'artist-more-than-one-contrib'},
-                      language.$('listingPage.other.randomPages.misc.randomArtist.atLeastTwoContributions')),
-                })),
+                group: groupLink,
 
-              html.tag('li',
-                html.tag('a',
-                  {href: '#', 'data-random': 'album'},
-                  language.$('listingPage.other.randomPages.misc.randomAlbumWholeSite'))),
+                randomAlbum:
+                  html.tag('a',
+                    {href: '#', 'data-random': 'album-in-group-dl'},
+                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.randomAlbum')),
 
-              html.tag('li',
-                html.tag('a',
-                  {href: '#', 'data-random': 'track'},
-                  language.$('listingPage.other.randomPages.misc.randomTrackWholeSite'))),
-            ])),
+                randomTrack:
+                  html.tag('a',
+                    {href: '#', 'data-random': 'track-in-group-dl'},
+                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.randomTrack')),
+              }))
+            : [{stringsKey: 'fromAlbum'}]),
+      ],
 
-          relations.allAlbumsSection,
-          relations.groupSections,
-        ]),
+      chunkRows: [
+        miscellaneousChunkRows,
+
+        ...
+          (relations.groupAlbumLinks
+            ? relations.groupAlbumLinks.map(albumLinks =>
+                albumLinks.map(albumLink => ({
+                  stringsKey: 'album',
+                  album: albumLink,
+                })))
+            : relations.albumLinks.map(albumLink => ({
+                stringsKey: 'album',
+                album: albumLink,
+              }))),
+      ],
+
+      chunkRowAttributes: [
+        miscellaneousChunkRowAttributes,
+        ...
+          (relations.groupAlbumLinks
+            ? relations.groupAlbumLinks.map(albumLinks =>
+                albumLinks.map(() => null))
+            : [relations.albumLinks.map(() => null)]),
       ],
     });
   },
