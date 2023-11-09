@@ -803,11 +803,15 @@ html[data-url-key="localized.albumCommentary"] li.no-commentary {
   opacity: 0.7;
 }
 
-html[data-url-key="localized.albumCommentary"] .content-heading .content-heading-accent {
+html[data-url-key="localized.albumCommentary"] .content-heading-main-title {
+  margin-right: 0.25em;
+}
+
+html[data-url-key="localized.albumCommentary"] .content-heading-accent {
   font-weight: normal;
   font-style: oblique;
   font-size: 0.9rem;
-  margin-left: 0.25em;
+  display: inline-block;
 }
 
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
