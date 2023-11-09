@@ -78,6 +78,10 @@ export default {
       validate: v => v.strictArrayOf(v.isObject),
     },
 
+    chunkTitleAccents: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
     chunkRows: {
       validate: v => v.strictArrayOf(v.isObject),
     },
@@ -218,10 +222,11 @@ export default {
 
             stitchArrays({
               title: slots.chunkTitles,
+              titleAccent: slots.chunkTitleAccents,
               id: slots.chunkIDs,
               rows: slots.chunkRows,
               rowAttributes: slots.chunkRowAttributes,
-            }).map(({title, id, rows, rowAttributes}) => [
+            }).map(({title, titleAccent, id, rows, rowAttributes}) => [
                 relations.chunkHeading
                   .clone()
                   .slots({
@@ -233,6 +238,13 @@ export default {
                         context: 'chunk.title',
                         provided: title,
                       }),
+
+                    accent:
+                      titleAccent &&
+                        formatListingString({
+                          context: ['chunk.title', title.stringsKey, 'accent'],
+                          provided: titleAccent,
+                        }),
                   }),
 
                 html.tag('dd',
