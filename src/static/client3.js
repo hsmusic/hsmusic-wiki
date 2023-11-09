@@ -899,11 +899,12 @@ function updateStickySubheadingContent(index) {
       child.remove();
     }
 
-    for (const child of closestHeading.childNodes) {
-      if (child.classList?.contains('content-heading-accent')) {
-        continue;
-      }
+    const textContainer =
+      closestHeading.querySelector('.content-heading-main-title')
+        // Just for compatibility with older builds of the site.
+        ?? closestHeading;
 
+    for (const child of textContainer.childNodes) {
       if (child.tagName === 'A') {
         for (const grandchild of child.childNodes) {
           stickySubheading.appendChild(grandchild.cloneNode(true));
