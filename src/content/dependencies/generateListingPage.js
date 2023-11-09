@@ -104,29 +104,43 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const formatListingString = (contextStringsKey, options = {}) => {
-      const baseStringsKey = `listingPage.${data.stringsKey}`;
+    function formatListingString({
+      context,
+      provided = {},
+    }) {
+      const parts = ['listingPage', data.stringsKey];
 
-      const parts = [baseStringsKey, contextStringsKey];
-
-      const {stringsKey, ...passOptions} = options;
-
-      if (stringsKey) {
-        parts.push(options.stringsKey);
+      if (Array.isArray(context)) {
+        parts.push(...context);
+      } else {
+        parts.push(context);
       }
 
-      return language.formatString(parts.join('.'), passOptions);
-    };
+      if (provided.stringsKey) {
+        parts.push(provided.stringsKey);
+      }
+
+      const options = {...provided};
+      delete options.stringsKey;
+
+      return language.formatString(...parts, options);
+    }
 
     const formatRow = ({row, attributes}) =>
       (attributes?.href
         ? html.tag('li',
             html.tag('a',
               attributes,
-              formatListingString('chunk.item', row)))
+              formatListingString({
+                context: 'chunk.item',
+                provided: row,
+              })))
         : html.tag('li',
             attributes,
-            formatListingString('chunk.item', row)));
+            formatListingString({
+              context: 'chunk.item',
+              provided: row,
+            })));
 
     const formatRowList = ({rows, rowAttributes}) =>
       html.tag(
@@ -137,7 +151,8 @@ export default {
         }).map(formatRow));
 
     return relations.layout.slots({
-      title: formatListingString('title'),
+      title: formatListingString({context: 'title'}),
+
       headingMode: 'sticky',
 
       mainContent: [
@@ -193,8 +208,10 @@ export default {
                             hash: id,
                             content:
                               html.normalize(
-                                formatListingString('chunk.title', title)
-                                  .toString()
+                                formatListingString({
+                                  context: 'chunk.title',
+                                  provided: title,
+                                }).toString()
                                   .replace(/:$/, '')),
                           }))))),
             ],
@@ -209,8 +226,13 @@ export default {
                   .clone()
                   .slots({
                     tag: 'dt',
-                    title: formatListingString('chunk.title', title),
                     id,
+
+                    title:
+                      formatListingString({
+                        context: 'chunk.title',
+                        provided: title,
+                      }),
                   }),
 
                 html.tag('dd',
