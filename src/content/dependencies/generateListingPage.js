@@ -68,6 +68,7 @@ export default {
 
     chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
     chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
+    chunkRowAttributes: {validate: v => v.strictArrayOf(v.optional(v.isObject))},
 
     showSkipToSection: {type: 'boolean', default: false},
     chunkIDs: {validate: v => v.strictArrayOf(v.isString)},
@@ -165,9 +166,17 @@ export default {
 
             stitchArrays({
               title: slots.chunkTitles,
-              rows: slots.chunkRows,
               id: slots.chunkIDs,
-            }).map(({title, rows, id}) => [
+
+              rows: slots.chunkRows,
+              rowAttributes: slots.chunkRowAttributes,
+            }).map(({
+                title,
+                id,
+
+                rows,
+                rowAttributes,
+              }) => [
                 relations.chunkHeading
                   .clone()
                   .slots({
@@ -178,10 +187,13 @@ export default {
 
                 html.tag('dd',
                   html.tag(listTag,
-                    rows.map(row =>
-                      html.tag('li',
-                        {class: row.stringsKey === 'rerelease' && 'rerelease'},
-                        formatListingString('chunk.item', row))))),
+                    stitchArrays({
+                      row: rows,
+                      attributes: rowAttributes ?? rows.map(() => null),
+                    }).map(({row, attributes}) =>
+                        html.tag('li',
+                          attributes,
+                          formatListingString('chunk.item', row))))),
               ]),
           ]),
       ],
