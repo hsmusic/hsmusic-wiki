@@ -803,6 +803,13 @@ html[data-url-key="localized.albumCommentary"] li.no-commentary {
   opacity: 0.7;
 }
 
+html[data-url-key="localized.albumCommentary"] .content-heading .content-heading-accent {
+  font-weight: normal;
+  font-style: oblique;
+  font-size: 0.9rem;
+  margin-left: 0.25em;
+}
+
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-error-line {
@@ -1288,13 +1295,6 @@ html[data-url-key="localized.home"] .carousel-container {
 .content-heading.highlight-hash-link {
   animation: highlight-hash-link 4s;
   animation-delay: 125ms;
-}
-
-.content-heading .content-heading-accent {
-  font-weight: normal;
-  font-style: oblique;
-  font-size: 0.9rem;
-  margin-left: 0.25em;
 }
 
 h3.content-heading {
