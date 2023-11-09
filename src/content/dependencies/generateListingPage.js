@@ -191,9 +191,14 @@ export default {
                       row: rows,
                       attributes: rowAttributes ?? rows.map(() => null),
                     }).map(({row, attributes}) =>
-                        html.tag('li',
-                          attributes,
-                          formatListingString('chunk.item', row))))),
+                        (attributes?.href
+                          ? html.tag('li',
+                              html.tag('a',
+                                attributes,
+                                formatListingString('chunk.item', row)))
+                          : html.tag('li',
+                              attributes,
+                              formatListingString('chunk.item', row)))))),
               ]),
           ]),
       ],
