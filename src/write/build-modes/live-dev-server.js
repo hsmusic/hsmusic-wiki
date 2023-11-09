@@ -44,6 +44,11 @@ export function getCLIOptions() {
       help: `Enables outputting [200] and [404] responses in the server log, which are suppressed by default`,
       type: 'flag',
     },
+
+    'skip-serving': {
+      help: `Causes the build to exit when it would start serving over HTTP instead\n\nMainly useful for testing performance`,
+      type: 'flag',
+    },
   };
 }
 
@@ -51,6 +56,7 @@ export async function go({
   cliOptions,
   _dataPath,
   mediaPath,
+  mediaCachePath,
 
   defaultLanguage,
   languages,
@@ -77,6 +83,7 @@ export async function go({
   const host = cliOptions['host'] ?? defaultHost;
   const port = parseInt(cliOptions['port'] ?? defaultPort);
   const loudResponses = cliOptions['loud-responses'] ?? false;
+  const skipServing = cliOptions['skip-serving'] ?? false;
 
   const contentDependenciesWatcher = await watchContentDependencies();
   const {contentDependencies} = contentDependenciesWatcher;
@@ -171,7 +178,7 @@ export async function go({
     const {
       area: localFileArea,
       path: localFilePath
-    } = pathname.match(/^\/(?<area>static|util|media)\/(?<path>.*)/)?.groups ?? {};
+    } = pathname.match(/^\/(?<area>static|util|media|thumb)\/(?<path>.*)/)?.groups ?? {};
 
     if (localFileArea) {
       // Not security tested, man, this is a dev server!!
@@ -182,6 +189,8 @@ export async function go({
         localDirectory = path.join(srcRootPath, localFileArea);
       } else if (localFileArea === 'media') {
         localDirectory = mediaPath;
+      } else if (localFileArea === 'thumb') {
+        localDirectory = mediaCachePath;
       }
 
       let filePath;
@@ -393,10 +402,14 @@ export async function go({
     }
   });
 
-  server.listen(port, host);
+  if (skipServing) {
+    logInfo`Ready to serve! But --skip-serving was passed, so all done.`;
+  } else {
+    server.listen(port, host);
 
-  // Just keep going... forever!!!
-  await new Promise(() => {});
+    // Just keep going... forever!!!
+    await new Promise(() => {});
+  }
 
   return true;
 }

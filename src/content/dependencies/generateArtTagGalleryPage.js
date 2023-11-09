@@ -23,7 +23,7 @@ export default {
     const things = tag.taggedInThings.slice();
 
     sortAlbumsTracksChronologically(things, {
-      getDate: thing => thing.coverArtDate,
+      getDate: thing => thing.coverArtDate ?? thing.date,
       latestFirst: true,
     });
 

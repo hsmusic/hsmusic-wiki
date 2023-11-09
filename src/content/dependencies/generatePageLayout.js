@@ -449,7 +449,8 @@ export default {
             {[html.onlyIfContent]: true, class: 'skipper-list'},
             processSkippers([
               {id: 'tracks', string: 'tracks'},
-              {id: 'art', string: 'flashes'},
+              {id: 'art', string: 'artworks'},
+              {id: 'flashes', string: 'flashes'},
               {id: 'contributors', string: 'contributors'},
               {id: 'references', string: 'references'},
               {id: 'referenced-by', string: 'referencedBy'},

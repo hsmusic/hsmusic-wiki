@@ -30,7 +30,7 @@ export default {
         entry: {
           type: 'albumCover',
           album: album,
-          date: album.coverArtDate,
+          date: album.coverArtDate ?? album.date,
           contribs: album.coverArtistContribs,
         },
       })),
@@ -40,7 +40,7 @@ export default {
         entry: {
           type: 'albumWallpaper',
           album: album,
-          date: album.coverArtDate,
+          date: album.coverArtDate ?? album.date,
           contribs: album.wallpaperArtistContribs,
         },
       })),
@@ -50,7 +50,7 @@ export default {
         entry: {
           type: 'albumBanner',
           album: album,
-          date: album.coverArtDate,
+          date: album.coverArtDate ?? album.date,
           contribs: album.bannerArtistContribs,
         },
       })),
@@ -60,7 +60,7 @@ export default {
         entry: {
           type: 'trackCover',
           album: track.album,
-          date: track.coverArtDate,
+          date: track.coverArtDate ?? track.date,
           track: track,
           contribs: track.coverArtistContribs,
         },
@@ -69,7 +69,7 @@ export default {
 
     sortEntryThingPairs(entries,
       things => sortAlbumsTracksChronologically(things, {
-        getDate: thing => thing.coverArtDate,
+        getDate: thing => thing.coverArtDate ?? thing.date,
       }));
 
     const chunks =

@@ -79,10 +79,23 @@ const urlSpec = {
       albumCover: 'album-art/<>/cover.<>',
       albumWallpaper: 'album-art/<>/bg.<>',
       albumBanner: 'album-art/<>/banner.<>',
+
       trackCover: 'album-art/<>/<>.<>',
+
       artistAvatar: 'artist-avatar/<>.<>',
+
       flashArt: 'flash-art/<>.<>',
+
       albumAdditionalFile: 'album-additional/<>/<>',
+    },
+  },
+
+  thumb: {
+    prefix: 'thumb/',
+
+    paths: {
+      root: '',
+      path: '<>',
     },
   },
 };

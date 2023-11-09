@@ -40,8 +40,13 @@ export class ArtTag extends Thing {
 
     // Update only
 
-    albumData: wikiData(Album),
-    trackData: wikiData(Track),
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    trackData: wikiData({
+      class: input.value(Track),
+    }),
 
     // Expose only
 
@@ -54,7 +59,7 @@ export class ArtTag extends Thing {
           sortAlbumsTracksChronologically(
             [...albumData, ...trackData]
               .filter(({artTags}) => artTags.includes(artTag)),
-            {getDate: o => o.coverArtDate}),
+            {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
   });

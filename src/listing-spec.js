@@ -66,6 +66,7 @@ listingSpec.push({
   contentFunction: 'listArtistsByDuration',
 });
 
+// TODO: hide if no groups...
 listingSpec.push({
   directory: 'artists/by-group',
   stringsKey: 'listArtists.byGroup',

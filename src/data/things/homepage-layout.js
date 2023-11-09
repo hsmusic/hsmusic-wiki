@@ -70,11 +70,17 @@ export class HomepageLayoutRow extends Thing {
 
     // Update only
 
-    // These aren't necessarily used by every HomepageLayoutRow subclass, but
-    // for convenience of providing this data, every row accepts all wiki data
-    // arrays depended upon by any subclass's behavior.
-    albumData: wikiData(Album),
-    groupData: wikiData(Group),
+    // These wiki data arrays aren't necessarily used by every subclass, but
+    // to the convenience of providing these, the superclass accepts all wiki
+    // data arrays depended upon by any subclass.
+
+    albumData: wikiData({
+      class: input.value(Album),
+    }),
+
+    groupData: wikiData({
+      class: input.value(Group),
+    }),
   });
 }
 

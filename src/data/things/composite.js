@@ -637,6 +637,10 @@ export function compositeFrom(description) {
 
   const compositionNests = description.compose ?? true;
 
+  if (compositionNests && empty(steps)) {
+    aggregate.push(new TypeError(`Expected at least one step`));
+  }
+
   // Steps default to exposing if using a shorthand syntax where flags aren't
   // specified at all.
   const stepsExpose =
@@ -802,8 +806,8 @@ export function compositeFrom(description) {
     });
   }
 
-  if (!compositionNests && !anyStepsCompute && !anyStepsTransform) {
-    aggregate.push(new TypeError(`Expected at least one step to compute or transform`));
+  if (!compositionNests && !compositionUpdates && !anyStepsCompute) {
+    aggregate.push(new TypeError(`Expected at least one step to compute`));
   }
 
   aggregate.close();
@@ -1241,8 +1245,10 @@ export function compositeFrom(description) {
         expose.cache = base.cacheComposition;
       }
     } else if (compositionUpdates) {
-      expose.transform = (value, dependencies) =>
-        _wrapper(value, null, dependencies);
+      if (!empty(steps)) {
+        expose.transform = (value, dependencies) =>
+          _wrapper(value, null, dependencies);
+      }
     } else {
       expose.compute = (dependencies) =>
         _wrapper(noTransformSymbol, null, dependencies);

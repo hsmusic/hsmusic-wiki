@@ -88,13 +88,22 @@ const thumbnailSpec = {
 import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createReadStream} from 'node:fs';
-import {readFile, stat, unlink, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
+
+import {
+  mkdir,
+  readdir,
+  readFile,
+  rename,
+  stat,
+  writeFile,
+} from 'node:fs/promises';
 
 import dimensionsOf from 'image-size';
 
-import {delay, empty, queue} from '#sugar';
+import {delay, empty, queue, unique} from '#sugar';
 import {CacheableObject} from '#things';
+import {sortByName} from '#wiki-data';
 
 import {
   colors,
@@ -102,6 +111,7 @@ import {
   logError,
   logInfo,
   logWarn,
+  logicalPathTo,
   parseOptions,
   progressPromiseAll,
 } from '#cli';
@@ -304,18 +314,30 @@ async function getSpawnMagick(tool) {
 // Note: This returns an array of no-argument functions, suitable for passing
 // to queue().
 function generateImageThumbnails({
+  mediaPath,
+  mediaCachePath,
   filePath,
   dimensions,
   spawnConvert,
 }) {
-  const dirname = path.dirname(filePath);
-  const extname = path.extname(filePath);
-  const basename = path.basename(filePath, extname);
-  const output = (name) => path.join(dirname, basename + name + '.jpg');
+  const filePathInMedia = path.join(mediaPath, filePath);
 
-  const convert = (name, {size, quality}) =>
-    spawnConvert([
-      filePath,
+  function getOutputPath(thumbtack) {
+    return path.join(
+      mediaCachePath,
+      path.dirname(filePath),
+      [
+        path.basename(filePath, path.extname(filePath)),
+        thumbtack,
+        'jpg'
+      ].join('.'));
+  }
+
+  function startConvertProcess(outputPathInCache, details) {
+    const {size, quality} = details;
+
+    return spawnConvert([
+      filePathInMedia,
       '-strip',
       '-resize',
       `${size}x${size}>`,
@@ -323,24 +345,115 @@ function generateImageThumbnails({
       'Plane',
       '-quality',
       `${quality}%`,
-      output(name),
+      outputPathInCache,
     ]);
+  }
 
   return (
     getThumbnailsAvailableForDimensions(dimensions)
-      .map(([name]) => [name, thumbnailSpec[name]])
-      .map(([name, details]) => () =>
-        promisifyProcess(convert('.' + name, details), false)));
+      .map(([thumbtack]) => [thumbtack, thumbnailSpec[thumbtack]])
+      .map(([thumbtack, details]) => async () => {
+        const outputPathInCache = getOutputPath(thumbtack);
+        await mkdir(path.dirname(outputPathInCache), {recursive: true});
+
+        const convertProcess = startConvertProcess(outputPathInCache, details);
+        await promisifyProcess(convertProcess, false);
+      }));
 }
 
-export async function clearThumbs(mediaPath, {
-  queueSize = 0,
-} = {}) {
+export async function determineMediaCachePath({
+  mediaPath,
+  providedMediaCachePath,
+  disallowDoubling = false,
+}) {
   if (!mediaPath) {
-    throw new Error('Expected mediaPath to be passed');
+    return {
+      annotation: 'media path not provided',
+      mediaCachePath: null,
+    };
   }
 
-  logInfo`Looking for thumbnails to clear out...`;
+  if (providedMediaCachePath) {
+    return {
+      annotation: 'custom path provided',
+      mediaCachePath: providedMediaCachePath,
+    };
+  }
+
+  let mediaIncludesThumbnailCache;
+
+  try {
+    const files = await readdir(mediaPath);
+    mediaIncludesThumbnailCache = files.includes(CACHE_FILE);
+  } catch (error) {
+    mediaIncludesThumbnailCache = false;
+  }
+
+  if (mediaIncludesThumbnailCache === true && !disallowDoubling) {
+    return {
+      annotation: 'media path doubles as cache',
+      mediaCachePath: mediaPath,
+    };
+  }
+
+  const inferredPath =
+    path.join(
+      path.dirname(mediaPath),
+      path.basename(mediaPath) + '-cache');
+
+  let inferredIncludesThumbnailCache;
+
+  try {
+    const files = await readdir(inferredPath);
+    inferredIncludesThumbnailCache = files.includes(CACHE_FILE);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      inferredIncludesThumbnailCache = null;
+    } else {
+      inferredIncludesThumbnailCache = undefined;
+    }
+  }
+
+  if (inferredIncludesThumbnailCache === true) {
+    return {
+      annotation: 'inferred path has cache',
+      mediaCachePath: inferredPath,
+    };
+  } else if (inferredIncludesThumbnailCache === false) {
+    return {
+      annotation: 'inferred path does not have cache',
+      mediaCachePath: null,
+    };
+  } else if (inferredIncludesThumbnailCache === null) {
+    return {
+      annotation: 'inferred path will be created',
+      mediaCachePath: inferredPath,
+    };
+  } else {
+    return {
+      annotation: 'inferred path not readable',
+      mediaCachePath: null,
+    };
+  }
+}
+
+export async function migrateThumbsIntoDedicatedCacheDirectory({
+  mediaPath,
+  mediaCachePath,
+
+  queueSize = 0,
+}) {
+  if (!mediaPath) {
+    throw new Error('Expected mediaPath');
+  }
+
+  if (!mediaCachePath) {
+    throw new Error(`Expected mediaCachePath`);
+  }
+
+  logInfo`Migrating thumbnail files into dedicated directory.`;
+  logInfo`Moving thumbs from: ${mediaPath}`;
+  logInfo`Moving thumbs into: ${mediaCachePath}`;
 
   const thumbFiles = await traverse(mediaPath, {
     pathStyle: 'device',
@@ -349,8 +462,7 @@ export async function clearThumbs(mediaPath, {
   });
 
   if (thumbFiles.length) {
-    // Double-check files. Since we're unlinking (deleting) files,
-    // we're better off safe than sorry!
+    // Double-check files.
     const thumbtacks = Object.keys(thumbnailSpec);
     const unsafeFiles = thumbFiles.filter(file => {
       if (path.extname(file) !== '.jpg') return true;
@@ -369,14 +481,20 @@ export async function clearThumbs(mediaPath, {
       return {success: false};
     }
 
-    logInfo`Clearing out ${thumbFiles.length} thumbs.`;
+    logInfo`Moving ${thumbFiles.length} thumbs.`;
+
+    await mkdir(mediaCachePath, {recursive: true});
 
     const errored = [];
 
-    await progressPromiseAll(`Removing thumbnail files`, queue(
+    await progressPromiseAll(`Moving thumbnail files`, queue(
       thumbFiles.map(file => async () => {
         try {
-          await unlink(file);
+          const filePathInMedia = file;
+          const filePath = path.relative(mediaPath, filePathInMedia);
+          const filePathInCache = path.join(mediaCachePath, filePath);
+          await mkdir(path.dirname(filePathInCache), {recursive: true});
+          await rename(filePathInMedia, filePathInCache);
         } catch (error) {
           if (error.code !== 'ENOENT') {
             errored.push(file);
@@ -386,18 +504,18 @@ export async function clearThumbs(mediaPath, {
       queueSize));
 
     if (errored.length) {
-      logError`Couldn't remove these paths (${errored.length}):`;
+      logError`Couldn't move these paths (${errored.length}):`;
       for (const file of errored) {
         console.error(file);
       }
-      logError`Check for permission errors?`;
+      logError`It's possible there were permission errors. After you've`;
+      logError`investigated, running again should work to move these.`;
       return {success: false};
     } else {
-      logInfo`Successfully deleted all ${thumbFiles.length} thumbnail files!`;
+      logInfo`Successfully moved all ${thumbFiles.length} thumbnail files!`;
     }
   } else {
-    logInfo`Didn't find any thumbs in media directory.`;
-    logInfo`${mediaPath}`;
+    logInfo`Didn't find any thumbnails to move.`;
   }
 
   let cacheExists = false;
@@ -406,7 +524,7 @@ export async function clearThumbs(mediaPath, {
     cacheExists = true;
   } catch (error) {
     if (error.code === 'ENOENT') {
-      logInfo`Cache file already missing, nothing to remove there.`;
+      logInfo`No cache file present here. (${CACHE_FILE})`;
     } else {
       logWarn`Failed to access cache file. Check its permissions?`;
     }
@@ -414,21 +532,27 @@ export async function clearThumbs(mediaPath, {
 
   if (cacheExists) {
     try {
-      unlink(path.join(mediaPath, CACHE_FILE));
-      logInfo`Removed thumbnail cache file.`;
+      await rename(
+        path.join(mediaPath, CACHE_FILE),
+        path.join(mediaCachePath, CACHE_FILE));
+      logInfo`Moved thumbnail cache file.`;
     } catch (error) {
-      logWarn`Failed to remove cache file. Check its permissions?`;
+      logWarn`Failed to move cache file. (${CACHE_FILE})`;
+      logWarn`Check its permissions, or try copying/pasting.`;
     }
   }
 
   return {success: true};
 }
 
-export default async function genThumbs(mediaPath, {
+export default async function genThumbs({
+  mediaPath,
+  mediaCachePath,
+
   queueSize = 0,
   magickThreads = defaultMagickThreads,
   quiet = false,
-} = {}) {
+}) {
   if (!mediaPath) {
     throw new Error('Expected mediaPath to be passed');
   }
@@ -454,13 +578,13 @@ export default async function genThumbs(mediaPath, {
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
 
-  let cache,
-    firstRun = false;
+  let cache = null;
+  let firstRun = false;
+
   try {
-    cache = JSON.parse(await readFile(path.join(mediaPath, CACHE_FILE)));
+    cache = JSON.parse(await readFile(path.join(mediaCachePath, CACHE_FILE)));
     quietInfo`Cache file successfully read.`;
   } catch (error) {
-    cache = {};
     if (error.code === 'ENOENT') {
       firstRun = true;
     } else {
@@ -472,7 +596,20 @@ export default async function genThumbs(mediaPath, {
   }
 
   try {
-    await writeFile(path.join(mediaPath, CACHE_FILE), JSON.stringify(cache));
+    await mkdir(mediaCachePath, {recursive: true});
+  } catch (error) {
+    logError`Couldn't create the media cache directory: ${error.code}`;
+    logError`That's where the media files are going to go, so you'll`;
+    logError`have to investigate this - it's likely a permissions error.`;
+    return {success: false};
+  }
+
+  try {
+    await writeFile(
+      path.join(mediaCachePath, CACHE_FILE),
+      (firstRun
+        ? JSON.stringify({})
+        : JSON.stringify(cache)));
     quietInfo`Writing to cache file appears to be working.`;
   } catch (error) {
     logWarn`Test of cache file writing failed: ${error}`;
@@ -480,11 +617,16 @@ export default async function genThumbs(mediaPath, {
       logWarn`Cache read succeeded: Any newly written thumbs will be unnecessarily regenerated on the next run.`;
     } else if (firstRun) {
       logWarn`No cache found: All thumbs will be generated now, and will be unnecessarily regenerated next run.`;
+      logWarn`You may also have to provide ${'--media-cache-path'} ${mediaCachePath} next run.`;
     } else {
       logWarn`Cache read failed: All thumbs will be regenerated now, and will be unnecessarily regenerated again next run.`;
     }
     logWarn`You may want to cancel and investigate this!`;
     await delay(WARNING_DELAY_TIME);
+  }
+
+  if (firstRun) {
+    cache = {};
   }
 
   const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
@@ -574,7 +716,9 @@ export default async function genThumbs(mediaPath, {
   const generateCalls =
     entriesToGenerate.flatMap(([filePath, md5]) =>
       generateImageThumbnails({
-        filePath: path.join(mediaPath, filePath),
+        mediaPath,
+        mediaCachePath,
+        filePath,
         dimensions: imageToDimensions[filePath],
         spawnConvert,
       }).map(call => async () => {
@@ -610,7 +754,7 @@ export default async function genThumbs(mediaPath, {
 
   try {
     await writeFile(
-      path.join(mediaPath, CACHE_FILE),
+      path.join(mediaCachePath, CACHE_FILE),
       JSON.stringify(updatedCache)
     );
     quietInfo`Updated cache file successfully written!`;
@@ -626,7 +770,7 @@ export default async function genThumbs(mediaPath, {
 export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
   const fromRoot = urls.from('media.root');
 
-  return [
+  const paths = [
     wikiData.albumData
       .flatMap(album => [
         album.hasCoverArt && fromRoot.to('media.albumCover', album.directory, album.coverArtFileExtension),
@@ -646,6 +790,10 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
     wikiData.flashData
       .map(flash => fromRoot.to('media.flashArt', flash.directory, flash.coverArtFileExtension)),
   ].flat();
+
+  sortByName(paths, {getName: path => path});
+
+  return paths;
 }
 
 export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImagePaths) {
@@ -674,28 +822,114 @@ export function checkMissingMisplacedMediaFiles(expectedImagePaths, extantImageP
 export async function verifyImagePaths(mediaPath, {urls, wikiData}) {
   const expectedPaths = getExpectedImagePaths(mediaPath, {urls, wikiData});
   const extantPaths = await traverseSourceImagePaths(mediaPath, {target: 'verify'});
-  const {missing, misplaced} = checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
 
-  if (empty(missing) && empty(misplaced)) {
+  const {missing: missingPaths, misplaced: misplacedPaths} =
+    checkMissingMisplacedMediaFiles(expectedPaths, extantPaths);
+
+  if (empty(missingPaths) && empty(misplacedPaths)) {
     logInfo`All image paths are good - nice! None are missing or misplaced.`;
-    return {missing, misplaced};
+    return {missing: [], misplaced: []};
   }
 
-  if (!empty(missing)) {
-    logWarn`** Some image files are missing! (${missing.length + ' files'}) **`;
-    for (const file of missing) {
-      console.warn(colors.yellow(` - `) + file);
+  const relativeMediaPath = await logicalPathTo(mediaPath);
+
+  const dirnamesOfExpectedPaths =
+    unique(expectedPaths.map(file => path.dirname(file)));
+
+  const dirnamesOfExtantPaths =
+    unique(extantPaths.map(file => path.dirname(file)));
+
+  const dirnamesOfMisplacedPaths =
+    unique(misplacedPaths.map(file => path.dirname(file)));
+
+  const completelyMisplacedDirnames =
+    dirnamesOfMisplacedPaths
+      .filter(dirname => !dirnamesOfExpectedPaths.includes(dirname));
+
+  const completelyMissingDirnames =
+    dirnamesOfExpectedPaths
+      .filter(dirname => !dirnamesOfExtantPaths.includes(dirname));
+
+  const individuallyMisplacedPaths =
+    misplacedPaths
+      .filter(file => !completelyMisplacedDirnames.includes(path.dirname(file)));
+
+  const individuallyMissingPaths =
+    missingPaths
+      .filter(file => !completelyMissingDirnames.includes(path.dirname(file)));
+
+  const wrongExtensionPaths =
+    misplacedPaths
+      .map(file => {
+        const stripExtension = file =>
+          path.join(
+            path.dirname(file),
+            path.basename(file, path.extname(file)));
+
+        const extantExtension = path.extname(file);
+        const basename = stripExtension(file);
+
+        const expectedPath =
+          missingPaths
+            .find(file => stripExtension(file) === basename);
+
+        if (!expectedPath) return null;
+
+        const expectedExtension = path.extname(expectedPath);
+        return {basename, extantExtension, expectedExtension};
+      })
+      .filter(Boolean);
+
+  if (!empty(missingPaths)) {
+    if (missingPaths.length === 1) {
+      logWarn`${1} expected image file is missing from ${relativeMediaPath}:`;
+    } else {
+      logWarn`${missingPaths.length} expected image files are missing:`;
+    }
+
+    for (const dirname of completelyMissingDirnames) {
+      console.log(` - (missing) All files under ${colors.bright(dirname)}`);
+    }
+
+    for (const file of individuallyMissingPaths) {
+      console.log(` - (missing) ${file}`);
     }
   }
 
-  if (!empty(misplaced)) {
-    logWarn`** Some image files are misplaced! (${misplaced.length + ' files'}) **`;
-    for (const file of misplaced) {
-      console.warn(colors.yellow(` - `) + file);
+  if (!empty(misplacedPaths)) {
+    if (misplacedPaths.length === 1) {
+      logWarn`${1} image file, present in ${relativeMediaPath}, wasn't expected:`;
+    } else {
+      logWarn`${misplacedPaths.length} image files, present in ${relativeMediaPath}, weren't expected:`;
+    }
+
+    for (const dirname of completelyMisplacedDirnames) {
+      console.log(` - (misplaced) All files under ${colors.bright(dirname)}`);
+    }
+
+    for (const file of individuallyMisplacedPaths) {
+      console.log(` - (misplaced) ${file}`);
     }
   }
 
-  return {missing, misplaced};
+  if (!empty(wrongExtensionPaths)) {
+    if (wrongExtensionPaths.length === 1) {
+      logWarn`Of these, ${1} has an unexpected file extension:`;
+    } else {
+      logWarn`Of these, ${wrongExtensionPaths.length} have an unexpected file extension:`;
+    }
+
+    for (const {basename, extantExtension, expectedExtension} of wrongExtensionPaths) {
+      console.log(` - (expected ${colors.green(expectedExtension)}) ${basename + colors.red(extantExtension)}`);
+    }
+
+    logWarn`To handle unexpected file extensions:`;
+    logWarn` * Source and ${`replace`} with the correct file, or`;
+    logWarn` * Add ${`"Cover Art File Extension"`} field (or similar)`;
+    logWarn`   to the respective document in YAML data files.`;
+  }
+
+  return {missing: missingPaths, misplaced: misplacedPaths};
 }
 
 // Recursively traverses the provided (extant) media path, filtering so only
@@ -725,7 +959,7 @@ export async function traverseSourceImagePaths(mediaPath, {target}) {
     throw new Error(`Expected target to be 'verify' or 'generate', got ${target}`);
   }
 
-  return await traverse(mediaPath, {
+  const paths = await traverse(mediaPath, {
     pathStyle: (target === 'verify' ? 'posix' : 'device'),
     prefixPath: '',
 
@@ -755,6 +989,10 @@ export async function traverseSourceImagePaths(mediaPath, {target}) {
       return true;
     },
   });
+
+  sortByName(paths, {getName: path => path});
+
+  return paths;
 }
 
 export function isThumb(file) {

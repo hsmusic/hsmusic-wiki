@@ -2,6 +2,7 @@ import {inspect} from 'node:util';
 
 import {colors, logWarn} from '#cli';
 import {typeAppearance} from '#sugar';
+import {CacheableObject} from '#things';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -16,6 +17,8 @@ function warnOrThrow(mode, message) {
 }
 
 export function processAllAvailableMatches(data, {
+  include = thing => true,
+
   getMatchableNames = thing =>
     (Object.hasOwn(thing, 'name')
       ? [thing.name]
@@ -26,6 +29,10 @@ export function processAllAvailableMatches(data, {
   const multipleNameMatches = Object.create(null);
 
   for (const thing of data) {
+    if (!include(thing)) continue;
+
+    byDirectory[thing.directory] = thing;
+
     for (const name of getMatchableNames(thing)) {
       if (typeof name !== 'string') {
         logWarn`Unexpected ${typeAppearance(name)} returned in names for ${inspect(thing)}`;
@@ -33,6 +40,7 @@ export function processAllAvailableMatches(data, {
       }
 
       const normalizedName = name.toLowerCase();
+
       if (normalizedName in byName) {
         const alreadyMatchesByName = byName[normalizedName];
         byName[normalizedName] = null;
@@ -45,8 +53,6 @@ export function processAllAvailableMatches(data, {
         byName[normalizedName] = thing;
       }
     }
-
-    byDirectory[thing.directory] = thing;
   }
 
   return {byName, byDirectory, multipleNameMatches};
@@ -55,6 +61,7 @@ export function processAllAvailableMatches(data, {
 function findHelper({
   referenceTypes,
 
+  include = undefined,
   getMatchableNames = undefined,
 }) {
   const keyRefRegex =
@@ -84,6 +91,7 @@ function findHelper({
     if (!subcache) {
       subcache =
         processAllAvailableMatches(data, {
+          include,
           getMatchableNames,
         });
 
@@ -178,6 +186,22 @@ const find = {
         ? []
         : [track.name]),
   }),
+
+  trackOriginalReleasesOnly: findHelper({
+    referenceTypes: ['track'],
+
+    include: track =>
+      !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'),
+
+    // It's still necessary to check alwaysReferenceByDirectory here, since it
+    // may be set manually (with the `Always Reference By Directory` field), and
+    // these shouldn't be matched by name (as per usual). See the definition for
+    // that property for more information.
+    getMatchableNames: track =>
+      (track.alwaysReferenceByDirectory
+        ? []
+        : [track.name]),
+  }),
 };
 
 export default find;
@@ -200,6 +224,7 @@ export function bindFind(wikiData, opts1) {
       newsEntry: 'newsData',
       staticPage: 'staticPageData',
       track: 'trackData',
+      trackOriginalReleasesOnly: 'trackData',
     }).map(([key, value]) => {
       const findFn = find[key];
       const thingData = wikiData[value];

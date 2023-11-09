@@ -18,11 +18,12 @@ import T, {
 } from '#things';
 
 import {
+  annotateErrorWithFile,
   conditionallySuppressError,
   decorateErrorWithIndex,
+  decorateErrorWithAnnotation,
   empty,
   filterProperties,
-  mapAggregate,
   openAggregate,
   showAggregate,
   withAggregate,
@@ -1120,22 +1121,25 @@ export async function loadAndProcessDataDocuments({dataPath}) {
   const wikiDataResult = {};
 
   function decorateErrorWithFile(fn) {
-    return (x, index, array) => {
-      try {
-        return fn(x, index, array);
-      } catch (error) {
-        error.message +=
-          (error.message.includes('\n') ? '\n' : ' ') +
-          `(file: ${colors.bright(colors.blue(path.relative(dataPath, x.file)))})`;
-        throw error;
-      }
-    };
+    return decorateErrorWithAnnotation(fn,
+      (caughtError, firstArg) =>
+        annotateErrorWithFile(
+          caughtError,
+          path.relative(
+            dataPath,
+            (typeof firstArg === 'object'
+              ? firstArg.file
+              : firstArg))));
+  }
+
+  function asyncDecorateErrorWithFile(fn) {
+    return decorateErrorWithFile(fn).async;
   }
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
       {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
-      async ({call, callAsync, map, mapAsync, push, nest}) => {
+      async ({call, callAsync, map, mapAsync, push}) => {
         const {documentMode} = dataStep;
 
         if (!Object.values(documentModes).includes(documentMode)) {
@@ -1323,8 +1327,8 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           throw new Error(`Expected 'files' property for ${documentMode.toString()}`);
         }
 
-        let files = (
-          typeof dataStep.files === 'function'
+        const filesFromDataStep =
+          (typeof dataStep.files === 'function'
             ? await callAsync(() =>
                 dataStep.files(dataPath).then(
                   files => files,
@@ -1335,101 +1339,110 @@ export async function loadAndProcessDataDocuments({dataPath}) {
                       throw error;
                     }
                   }))
-            : dataStep.files
-        );
+            : dataStep.files);
 
-        if (!files) {
-          return;
-        }
+        const filesUnderDataPath =
+          filesFromDataStep
+            .map(file => path.join(dataPath, file));
 
-        files = files.map((file) => path.join(dataPath, file));
+        const yamlResults = [];
 
-        const readResults = await mapAsync(
-          files,
-          (file) => readFile(file, 'utf-8').then((contents) => ({file, contents})),
-          {message: `Errors reading data files`});
+        await mapAsync(filesUnderDataPath, {message: `Errors loading data files`},
+          asyncDecorateErrorWithFile(async file => {
+            let contents;
+            try {
+              contents = await readFile(file, 'utf-8');
+            } catch (caughtError) {
+              throw new Error(`Failed to read data file`, {cause: caughtError});
+            }
 
-        let yamlResults = map(
-          readResults,
-          decorateErrorWithFile(({file, contents}) => ({
-            file,
-            documents: yaml.loadAll(contents),
-          })),
-          {message: `Errors parsing data files as valid YAML`});
+            let documents;
+            try {
+              documents = yaml.loadAll(contents);
+            } catch (caughtError) {
+              throw new Error(`Failed to parse valid YAML`, {cause: caughtError});
+            }
 
-        yamlResults = yamlResults.map(({file, documents}) => {
-          const {documents: filteredDocuments, aggregate} = filterBlankDocuments(documents);
-          call(decorateErrorWithFile(aggregate.close), {file});
-          return {file, documents: filteredDocuments};
-        });
+            const {documents: filteredDocuments, aggregate: filterAggregate} =
+              filterBlankDocuments(documents);
+
+            try {
+              filterAggregate.close();
+            } catch (caughtError) {
+              // Blank documents aren't a critical error, they're just something
+              // that should be noted - the (filtered) documents still get pushed.
+              const pathToFile = path.relative(dataPath, file);
+              annotateErrorWithFile(caughtError, pathToFile);
+              push(caughtError);
+            }
+
+            yamlResults.push({file, documents: filteredDocuments});
+          }));
 
         const processResults = [];
 
         switch (documentMode) {
           case documentModes.headerAndEntries:
-            map(yamlResults, decorateErrorWithFile(({documents}) => {
-              const headerDocument = documents[0];
-              const entryDocuments = documents.slice(1).filter(Boolean);
+            map(yamlResults, {message: `Errors processing documents in data files`},
+              decorateErrorWithFile(({documents}) => {
+                const headerDocument = documents[0];
+                const entryDocuments = documents.slice(1).filter(Boolean);
 
-              if (!headerDocument)
-                throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
+                if (!headerDocument)
+                  throw new Error(`Missing header document (empty file or erroneously starting with "---"?)`);
 
-              // This'll be decorated with the file, and groups together any
-              // errors from processing the header and entry documents.
-              const fileAggregate =
-                openAggregate({message: `Errors processing documents`});
+                withAggregate({message: `Errors processing documents`}, ({push}) => {
+                  const {thing: headerObject, aggregate: headerAggregate} =
+                    dataStep.processHeaderDocument(headerDocument);
 
-              const {thing: headerObject, aggregate: headerAggregate} =
-                dataStep.processHeaderDocument(headerDocument);
+                  try {
+                    headerAggregate.close();
+                  } catch (caughtError) {
+                    caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
+                    push(caughtError);
+                  }
 
-              try {
-                headerAggregate.close()
-              } catch (caughtError) {
-                caughtError.message = `(${colors.yellow(`header`)}) ${caughtError.message}`;
-                fileAggregate.push(caughtError);
-              }
+                  const entryObjects = [];
 
-              const entryObjects = [];
+                  for (let index = 0; index < entryDocuments.length; index++) {
+                    const entryDocument = entryDocuments[index];
 
-              for (let index = 0; index < entryDocuments.length; index++) {
-                const entryDocument = entryDocuments[index];
+                    const {thing: entryObject, aggregate: entryAggregate} =
+                      dataStep.processEntryDocument(entryDocument);
 
-                const {thing: entryObject, aggregate: entryAggregate} =
-                  dataStep.processEntryDocument(entryDocument);
+                    entryObjects.push(entryObject);
 
-                entryObjects.push(entryObject);
+                    try {
+                      entryAggregate.close();
+                    } catch (caughtError) {
+                      caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
+                      push(caughtError);
+                    }
+                  }
 
-                try {
-                  entryAggregate.close();
-                } catch (caughtError) {
-                  caughtError.message = `(${colors.yellow(`entry #${index + 1}`)}) ${caughtError.message}`;
-                  fileAggregate.push(caughtError);
-                }
-              }
-
-              processResults.push({
-                header: headerObject,
-                entries: entryObjects,
-              });
-
-              fileAggregate.close();
-            }), {message: `Errors processing documents in data files`});
+                  processResults.push({
+                    header: headerObject,
+                    entries: entryObjects,
+                  });
+                });
+              }));
             break;
 
           case documentModes.onePerFile:
-            map(yamlResults, decorateErrorWithFile(({documents}) => {
-              if (documents.length > 1)
-                throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
+            map(yamlResults, {message: `Errors processing data files as valid documents`},
+              decorateErrorWithFile(({documents}) => {
+                if (documents.length > 1)
+                  throw new Error(`Only expected one document to be present per file, got ${documents.length} here`);
 
-              if (empty(documents) || !documents[0])
-                throw new Error(`Expected a document, this file is empty`);
+                if (empty(documents) || !documents[0])
+                  throw new Error(`Expected a document, this file is empty`);
 
-              const {thing, aggregate} =
-                dataStep.processDocument(documents[0]);
+                const {thing, aggregate} =
+                  dataStep.processDocument(documents[0]);
 
-              processResults.push(thing);
-              aggregate.close();
-            }), {message: `Errors processing data files as valid documents`});
+                processResults.push(thing);
+                aggregate.close();
+              }));
             break;
         }
 
@@ -1662,7 +1675,7 @@ export function filterReferenceErrors(wikiData) {
           }
         }
 
-        nest({message: `Reference errors in ${inspect(thing)}`}, ({push, filter}) => {
+        nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
             const value = CacheableObject.getUpdateValue(thing, property);
 

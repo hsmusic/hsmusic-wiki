@@ -84,6 +84,7 @@ export async function go({
   cliOptions,
   _dataPath,
   mediaPath,
+  mediaCachePath,
   queueSize,
 
   defaultLanguage,
@@ -133,6 +134,7 @@ export async function go({
   await writeSymlinks({
     srcRootPath,
     mediaPath,
+    mediaCachePath,
     outputPath,
     urls,
   });
@@ -372,6 +374,8 @@ export async function go({
     logWarn`available - albeit possibly outdated! Please scroll up and send`;
     logWarn`the HSMusic developers a copy of the errors:`;
     fileIssue({topMessage: null});
+
+    return false;
   }
 
   return true;
@@ -414,6 +418,7 @@ async function writePage({
 function writeSymlinks({
   srcRootPath,
   mediaPath,
+  mediaCachePath,
   outputPath,
   urls,
 }) {
@@ -421,6 +426,7 @@ function writeSymlinks({
     link(path.join(srcRootPath, 'util'), 'shared.utilityRoot'),
     link(path.join(srcRootPath, 'static'), 'shared.staticRoot'),
     link(mediaPath, 'media.root'),
+    link(mediaCachePath, 'thumb.root'),
   ]);
 
   async function link(directory, urlKey) {

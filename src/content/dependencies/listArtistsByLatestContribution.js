@@ -97,14 +97,14 @@ export default {
         ...getArtists(album, 'bannerArtistContribs'),
       ])) {
         // Might combine later with 'track' of the same album and date.
-        considerDate(artist, album.coverArtDate, album, 'artwork');
+        considerDate(artist, album.coverArtDate ?? album.date, album, 'artwork');
       }
     }
 
     for (const track of tracksLatestFirst) {
       for (const artist of getArtists(track, 'coverArtistContribs')) {
         // No special effect if artist already has 'artwork' for the same album and date.
-        considerDate(artist, track.coverArtDate, track.album, 'artwork');
+        considerDate(artist, track.coverArtDate ?? track.date, track.album, 'artwork');
       }
 
       for (const artist of new Set([
@@ -198,10 +198,6 @@ export default {
           return index2 - index1;
         }
       });
-
-    // Last off, turn the flat sorted list into a proper chunked list, now that
-    // entries going in the same chunk are sorted correctly next to each other.
-    // Then extract the parts that are useful for displaying on the listing!
 
     const chunks =
       chunkMultipleArrays(artistThings, artistDates, artistContributions, artists,

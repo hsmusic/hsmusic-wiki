@@ -2,22 +2,15 @@
 // just to the track's name, which means you don't have to always reference
 // some *other* (much more commonly referenced) track by directory instead
 // of more naturally by name.
-//
-// See the implementation for an important caveat about matching the original
-// track against other tracks, which uses a custom implementation pulling (and
-// duplicating) details from #find instead of using withOriginalRelease and the
-// usual withResolvedReference / find.track() utilities.
-//
 
 import {input, templateCompositeFrom} from '#composite';
+import find from '#find';
 import {isBoolean} from '#validators';
 
 import {exitWithoutDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
-
-// TODO: Kludge. (The usage of this, not so much the import.)
-import CacheableObject from '../../../things/cacheable-object.js';
+import {withResolvedReference} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `withAlwaysReferenceByDirectory`,
@@ -44,29 +37,23 @@ export default templateCompositeFrom({
       value: input.value(false),
     }),
 
-    // "Slow" / uncached, manual search from trackData (with this track
-    // excluded). Otherwise there end up being pretty bad recursion issues
-    // (track1.alwaysReferencedByDirectory depends on searching through data
-    // including track2, which depends on evaluating track2.alwaysReferenced-
-    // ByDirectory, which depends on searcing through data including track1...)
-    // That said, this is 100% a kludge, since it involves duplicating find
-    // logic on a completely unrelated context.
-    {
-      dependencies: [input.myself(), 'trackData', 'originalReleaseTrack'],
-      compute: (continuation, {
-        [input.myself()]: thisTrack,
-        ['trackData']: trackData,
-        ['originalReleaseTrack']: ref,
-      }) => continuation({
-        ['#originalRelease']:
-          (ref.startsWith('track:')
-            ? trackData.find(track => track.directory === ref.slice('track:'.length))
-            : trackData.find(track =>
-                track !== thisTrack &&
-                !CacheableObject.getUpdateValue(track, 'originalReleaseTrack') &&
-                track.name.toLowerCase() === ref.toLowerCase())),
-      })
-    },
+    // It's necessary to use the custom trackOriginalReleasesOnly find function
+    // here, so as to avoid recursion issues - the find.track() function depends
+    // on accessing each track's alwaysReferenceByDirectory, which means it'll
+    // hit *this track* - and thus this step - and end up recursing infinitely.
+    // By definition, find.trackOriginalReleasesOnly excludes tracks which have
+    // an originalReleaseTrack update value set, which means even though it does
+    // still access each of tracks' `alwaysReferenceByDirectory` property, it
+    // won't access that of *this* track - it will never proceed past the
+    // `exitWithoutDependency` step directly above, so there's no opportunity
+    // for recursion.
+    withResolvedReference({
+      ref: 'originalReleaseTrack',
+      data: 'trackData',
+      find: input.value(find.trackOriginalReleasesOnly),
+    }).outputs({
+      '#resolvedReference': '#originalRelease',
+    }),
 
     exitWithoutDependency({
       dependency: '#originalRelease',

@@ -77,6 +77,11 @@ export default {
       originalSrc = '';
     }
 
+    // TODO: This feels janky. It's necessary to deal with static content that
+    // includes strings like <img src="media/misc/foo.png">, but processing the
+    // src string directly when a parts-formed path *is* available seems wrong.
+    // It should be possible to do urls.from(slots.path[0]).to(...slots.path),
+    // for example, but will require reworking the control flow here a little.
     let mediaSrc = null;
     if (originalSrc.startsWith(to('media.root'))) {
       mediaSrc =
@@ -160,7 +165,7 @@ export default {
       // which is the HTML output-appropriate path including `../../` or
       // another alternate base path.
       const selectedSize = getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
-      thumbSrc = originalSrc.replace(/\.(jpg|png)$/, `.${selectedSize}.jpg`);
+      thumbSrc = to('thumb.path', mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`));
 
       const dimensions = getDimensionsOfImagePath(mediaSrc);
       availableThumbs = getThumbnailsAvailableForDimensions(dimensions);

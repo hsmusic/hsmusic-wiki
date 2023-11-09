@@ -340,3 +340,34 @@ export function fileIssue({
   console.error(colors.red(`- https://hsmusic.wiki/feedback/`));
   console.error(colors.red(`- https://github.com/hsmusic/hsmusic-wiki/issues/`));
 }
+
+export async function logicalCWD() {
+  if (process.env.PWD) {
+    return process.env.PWD;
+  }
+
+  const {exec} = await import('node:child_process');
+  const {stat} = await import('node:fs/promises');
+
+  try {
+    await stat('/bin/sh');
+  } catch (error) {
+    // Not logical, so sad.
+    return process.cwd();
+  }
+
+  const proc = exec('/bin/pwd -L');
+
+  let output = '';
+  proc.stdout.on('data', buf => { output += buf; });
+
+  await new Promise(resolve => proc.on('exit', resolve));
+
+  return output.trim();
+}
+
+export async function logicalPathTo(target) {
+  const {relative} = await import('node:path');
+  const cwd = await logicalCWD();
+  return relative(cwd, target);
+}

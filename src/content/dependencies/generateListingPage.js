@@ -156,8 +156,10 @@ export default {
                           .slots({
                             hash: id,
                             content:
-                              formatListingString('chunk.title', title)
-                                .replace(/:$/, ''),
+                              html.normalize(
+                                formatListingString('chunk.title', title)
+                                  .toString()
+                                  .replace(/:$/, '')),
                           }))))),
             ],
 
