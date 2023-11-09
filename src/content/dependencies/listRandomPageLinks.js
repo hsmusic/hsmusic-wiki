@@ -118,20 +118,28 @@ export default {
           (relations.groupLinks
             ? relations.groupLinks.map(groupLink => ({
                 stringsKey: 'fromGroup',
-
                 group: groupLink,
+              }))
+            : [{stringsKey: 'fromAlbum'}]),
+      ],
 
+      chunkTitleAccents: [
+        null,
+
+        ...
+          (relations.groupLinks
+            ? relations.groupLinks.map(() => ({
                 randomAlbum:
                   html.tag('a',
                     {href: '#', 'data-random': 'album-in-group-dl'},
-                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.randomAlbum')),
+                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.accent.randomAlbum')),
 
                 randomTrack:
                   html.tag('a',
                     {href: '#', 'data-random': 'track-in-group-dl'},
-                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.randomTrack')),
+                    language.$('listingPage.other.randomPages.chunk.title.fromGroup.accent.randomTrack')),
               }))
-            : [{stringsKey: 'fromAlbum'}]),
+            : [null]),
       ],
 
       chunkRows: [

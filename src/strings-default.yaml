@@ -1587,9 +1587,12 @@ listingPage:
           #   each of which links to a random track from that album.
 
           fromGroup:
-            _: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
-            randomAlbum: "Random Album"
-            randomTrack: "Random Track"
+            _: "From {GROUP}:"
+
+            accent:
+              _: "({RANDOM_ALBUM}, {RANDOM_TRACK})"
+              randomAlbum: "Random Album"
+              randomTrack: "Random Track"
 
         item:
           album: "{ALBUM}"
