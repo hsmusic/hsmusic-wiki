@@ -61,17 +61,18 @@ export default {
 
           html.tag('dd',
             html.tag('ul', [
-              html.tag('li', [
-                html.tag('a',
-                  {href: '#', 'data-random': 'artist'},
-                  language.$('listingPage.other.randomPages.misc.randomArtist')),
+              html.tag('li',
+                language.$('listingPage.other.randomPages.misc.randomArtist', {
+                  mainLink:
+                    html.tag('a',
+                      {href: '#', 'data-random': 'artist'},
+                      language.$('listingPage.other.randomPages.misc.randomArtist.mainLink')),
 
-                '(' +
-                html.tag('a',
-                  {href: '#', 'data-random': 'artist-more-than-one-contrib'},
-                  language.$('listingPage.other.randomPages.misc.atLeastTwoContributions')) +
-                ')',
-              ]),
+                  atLeastTwoContributions:
+                    html.tag('a',
+                      {href: '#', 'data-random': 'artist-more-than-one-contrib'},
+                      language.$('listingPage.other.randomPages.misc.randomArtist.atLeastTwoContributions')),
+                })),
 
               html.tag('li',
                 html.tag('a',

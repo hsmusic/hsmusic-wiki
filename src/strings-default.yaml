@@ -1574,8 +1574,10 @@ listingPage:
 
       misc:
         _: "Miscellaneous:"
-        randomArtist: "Random Artist"
-        atLeastTwoContributions: "at least 2 contributions"
+        randomArtist:
+          _: "{MAIN_LINK} ({AT_LEAST_TWO_CONTRIBUTIONS})"
+          mainLink: "Random Artist"
+          atLeastTwoContributions: "at least 2 contributions"
         randomAlbumWholeSite: "Random Album (whole site)"
         randomTrackWholeSite: "Random Track (whole site)"
 
