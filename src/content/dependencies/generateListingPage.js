@@ -62,16 +62,38 @@ export default {
   },
 
   slots: {
-    type: {validate: v => v.is('rows', 'chunks', 'custom')},
+    type: {
+      validate: v => v.is('rows', 'chunks', 'custom'),
+    },
 
-    rows: {validate: v => v.strictArrayOf(v.isObject)},
+    rows: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
 
-    chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
-    chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
-    chunkRowAttributes: {validate: v => v.strictArrayOf(v.optional(v.isObject))},
+    rowAttributes: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject))
+    },
 
-    showSkipToSection: {type: 'boolean', default: false},
-    chunkIDs: {validate: v => v.strictArrayOf(v.isString)},
+    chunkTitles: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
+
+    chunkRows: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
+
+    chunkRowAttributes: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
+    showSkipToSection: {
+      type: 'boolean',
+      default: false,
+    },
+
+    chunkIDs: {
+      validate: v => v.strictArrayOf(v.isString),
+    },
 
     listStyle: {
       validate: v => v.is('ordered', 'unordered'),
@@ -82,11 +104,6 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const listTag =
-      (slots.listStyle === 'ordered'
-        ? 'ol'
-        : 'ul');
-
     const formatListingString = (contextStringsKey, options = {}) => {
       const baseStringsKey = `listingPage.${data.stringsKey}`;
 
@@ -100,6 +117,24 @@ export default {
 
       return language.formatString(parts.join('.'), passOptions);
     };
+
+    const formatRow = ({row, attributes}) =>
+      (attributes?.href
+        ? html.tag('li',
+            html.tag('a',
+              attributes,
+              formatListingString('chunk.item', row)))
+        : html.tag('li',
+            attributes,
+            formatListingString('chunk.item', row)));
+
+    const formatRowList = ({rows, rowAttributes}) =>
+      html.tag(
+        (slots.listStyle === 'ordered' ? 'ol' : 'ul'),
+        stitchArrays({
+          row: rows,
+          attributes: rowAttributes ?? rows.map(() => null),
+        }).map(formatRow));
 
     return relations.layout.slots({
       title: formatListingString('title'),
@@ -133,10 +168,10 @@ export default {
         slots.content,
 
         slots.type === 'rows' &&
-          html.tag(listTag,
-            slots.rows.map(row =>
-              html.tag('li',
-                formatListingString('item', row)))),
+          formatRowList({
+            rows: slots.rows,
+            rowAttributes: slots.rowAttributes,
+          }),
 
         slots.type === 'chunks' &&
           html.tag('dl', [
@@ -167,16 +202,9 @@ export default {
             stitchArrays({
               title: slots.chunkTitles,
               id: slots.chunkIDs,
-
               rows: slots.chunkRows,
               rowAttributes: slots.chunkRowAttributes,
-            }).map(({
-                title,
-                id,
-
-                rows,
-                rowAttributes,
-              }) => [
+            }).map(({title, id, rows, rowAttributes}) => [
                 relations.chunkHeading
                   .clone()
                   .slots({
@@ -186,19 +214,7 @@ export default {
                   }),
 
                 html.tag('dd',
-                  html.tag(listTag,
-                    stitchArrays({
-                      row: rows,
-                      attributes: rowAttributes ?? rows.map(() => null),
-                    }).map(({row, attributes}) =>
-                        (attributes?.href
-                          ? html.tag('li',
-                              html.tag('a',
-                                attributes,
-                                formatListingString('chunk.item', row)))
-                          : html.tag('li',
-                              attributes,
-                              formatListingString('chunk.item', row)))))),
+                  formatRowList({rows, rowAttributes})),
               ]),
           ]),
       ],
