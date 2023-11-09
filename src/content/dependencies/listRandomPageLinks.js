@@ -61,7 +61,19 @@ export default {
     return relations;
   },
 
-  generate(relations, {html, language}) {
+  data(query) {
+    const data = {};
+
+    if (query.divideByGroups) {
+      data.groupDirectories =
+        query.groups
+          .map(group => group.directory);
+    }
+
+    return data;
+  },
+
+  generate(data, relations, {html, language}) {
     const miscellaneousChunkRows = [
       {
         stringsKey: 'randomArtist',
@@ -109,6 +121,13 @@ export default {
         html.tag('p',
           {class: 'js-show-once-data'},
           language.$('listingPage.other.randomPages.dataLoadedLine')),
+      ],
+
+      showSkipToSection: true,
+
+      chunkIDs: [
+        null,
+        ...data.groupDirectories,
       ],
 
       chunkTitles: [

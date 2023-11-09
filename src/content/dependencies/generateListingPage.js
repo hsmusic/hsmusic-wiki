@@ -96,7 +96,7 @@ export default {
     },
 
     chunkIDs: {
-      validate: v => v.strictArrayOf(v.isString),
+      validate: v => v.strictArrayOf(v.optional(v.isString)),
     },
 
     listStyle: {
