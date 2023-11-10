@@ -85,8 +85,10 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
-    relations.defaultFooterContent =
-      relation('transformContent', sprawl.footerContent);
+    if (sprawl.footerContent) {
+      relations.defaultFooterContent =
+        relation('transformContent', sprawl.footerContent);
+    }
 
     relations.colorStyleRules =
       relation('generateColorStyleRules');
@@ -231,7 +233,7 @@ export default {
 
     let footerContent = slots.footerContent;
 
-    if (html.isBlank(footerContent)) {
+    if (html.isBlank(footerContent) && relations.defaultFooterContent) {
       footerContent = relations.defaultFooterContent
         .slot('mode', 'multiline');
     }
