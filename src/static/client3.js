@@ -354,17 +354,209 @@ if (
     });
 }
 
+// Tooltip-style hover (infrastructure) -------------------
+
+const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
+  settings: {
+    normalHoverInfoDelay: 400,
+    fastHoveringInfoDelay: 150,
+
+    endFastHoveringDelay: 500,
+
+    hideTooltipDelay: 500,
+  },
+
+  state: {
+    // These maps store a record for each registered element and related state
+    // and registration info, if applicable.
+    registeredTooltips: new Map(),
+    registeredHoverables: new Map(),
+
+    // These are common across all tooltips, rather than stored individually,
+    // based on the principles that 1) only a single tooltip can be displayed
+    // at once, and 2) only a single hoverable can be hovered at a once.
+    hoverTimeout: null,
+    hideTimeout: null,
+    currentlyShownTooltip: null,
+
+    // Fast hovering is a global mode which is activated as soon as any tooltip
+    // is displayed and turns off after a delay of no hoverables being hovered.
+    // Note that fast hovering may be turned off while hovering a tooltip, but
+    // it will never be turned off while idling over a hoverable.
+    fastHovering: false,
+    endFastHoveringTimeout: false,
+  },
+
+  event: {
+    whenTooltipShouldBeShown: [],
+    whenTooltipShouldBeHidden: [],
+  },
+};
+
+// Adds DOM event listeners, so must be called during addPageListeners step.
+function registerTooltipElement(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (!tooltip)
+    throw new Error(`Expected tooltip`);
+
+  if (state.registeredTooltips.has(tooltip))
+    throw new Error(`This tooltip is already registered`);
+
+  // No state or registration info here.
+  state.registeredTooltips.set(tooltip, {});
+
+  tooltip.addEventListener('mouseenter', () => {
+    handleTooltipMouseEntered(tooltip);
+  });
+
+  tooltip.addEventListener('mouseleave', () => {
+    handleTooltipMouseLeft(tooltip);
+  });
+}
+
+// Adds DOM event listeners, so must be called during addPageListeners step.
+function registerTooltipHoverableElement(hoverable, tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (!hoverable || !tooltip)
+    if (hoverable)
+      throw new Error(`Expected hoverable and tooltip, got only hoverable`);
+    else
+      throw new Error(`Expected hoverable and tooltip, got neither`);
+
+  if (!state.registeredTooltips.has(tooltip))
+    throw new Error(`Register tooltip before registering hoverable`);
+
+  if (state.registeredHoverables.has(hoverable))
+    throw new Error(`This hoverable is already registered`);
+
+  state.registeredHoverables.set(hoverable, {tooltip});
+
+  hoverable.addEventListener('mouseenter', () => {
+    handleTooltipHoverableMouseEntered(hoverable);
+  });
+
+  hoverable.addEventListener('mouseleave', () => {
+    handleTooltipHoverableMouseLeft(hoverable);
+  });
+}
+
+function handleTooltipMouseEntered(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (state.currentlyShownTooltip !== tooltip) return;
+
+  // Don't time out the current tooltip while hovering it.
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipMouseLeft(tooltip) {
+  const {state, settings} = hoverableTooltipInfo;
+
+  if (state.currentlyShownTooltip !== tooltip) return;
+
+  // Start timing out the current tooltip when it's left. This could be
+  // canceled by mousing over a hoverable, or back over the tooltip again.
+  if (!state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function handleTooltipHoverableMouseEntered(hoverable) {
+  const {event, settings, state} = hoverableTooltipInfo;
+
+  const hoverTimeoutDelay =
+    (state.fastHovering
+      ? settings.fastHoveringInfoDelay
+      : settings.normalHoverInfoDelay);
+
+  // Start a timer to show the corresponding tooltip, with the delay depending
+  // on whether fast hovering or not. This could be canceled by mousing out of
+  // the hoverable.
+  state.hoverTimeout =
+    setTimeout(() => {
+      state.hoverTimeout = null;
+      state.fastHovering = true;
+      showTooltipFromHoverable(hoverable);
+    }, hoverTimeoutDelay);
+
+  // Don't stop fast hovering while over any hoverable.
+  if (state.endFastHoveringTimeout) {
+    clearTimeout(state.endFastHoveringTimeout);
+    state.endFastHoveringTimeout = null;
+  }
+
+  // Don't time out the current tooltip while over any hoverable.
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipHoverableMouseLeft(hoverable) {
+  const {state, settings} = hoverableTooltipInfo;
+
+  // Don't show a tooltip when not over a hoverable!
+  if (state.hoverTimeout) {
+    clearTimeout(state.hoverTimeout);
+    state.hoverTimeout = null;
+  }
+
+  // Start timing out fast hovering (if active) when not over a hoverable.
+  // This will only be canceled by mousing over another hoverable.
+  if (state.fastHovering && !state.endFastHoveringTimeout) {
+    state.endFastHoveringTimeout =
+      setTimeout(() => {
+        state.endFastHoveringTimeout = null;
+        state.fastHovering = false;
+      }, settings.endFastHoveringDelay);
+  }
+
+  // Start timing out the current tooltip when mousing not over a hoverable.
+  // This could be canceled by mousing over another hoverable, or over the
+  // currently shown tooltip.
+  if (state.currentlyShownTooltip && !state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function hideCurrentlyShownTooltip() {
+  const {event, state} = hoverableTooltipInfo;
+  const {currentlyShownTooltip: tooltip} = state;
+
+  if (!tooltip) return;
+
+  dispatchInternalEvent(event, 'whenTooltipShouldBeHidden', {tooltip});
+
+  state.currentlyShownTooltip = null;
+}
+
+function showTooltipFromHoverable(hoverable) {
+  const {event, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  hideCurrentlyShownTooltip();
+
+  dispatchInternalEvent(event, 'whenTooltipShouldBeShown', {hoverable, tooltip});
+
+  state.currentlyShownTooltip = tooltip;
+}
+
 // Data & info card ---------------------------------------
 
 /*
-const NORMAL_HOVER_INFO_DELAY = 750;
-const FAST_HOVER_INFO_DELAY = 250;
-const END_FAST_HOVER_DELAY = 500;
-const HIDE_HOVER_DELAY = 250;
-
-let fastHover = false;
-let endFastHoverTimeout = null;
-
 function colorLink(a, color) {
   console.warn('Info card link colors temporarily disabled: chroma.js required, no dependency linking for client.js yet');
   return;
