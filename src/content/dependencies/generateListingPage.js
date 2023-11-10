@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {bindOpts, empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -130,29 +130,33 @@ export default {
       return language.formatString(...parts, options);
     }
 
-    const formatRow = ({row, attributes}) =>
+    const formatRow = ({context, row, attributes}) =>
       (attributes?.href
         ? html.tag('li',
             html.tag('a',
               attributes,
               formatListingString({
-                context: 'chunk.item',
+                context,
                 provided: row,
               })))
         : html.tag('li',
             attributes,
             formatListingString({
-              context: 'chunk.item',
+              context,
               provided: row,
             })));
 
-    const formatRowList = ({rows, rowAttributes}) =>
+    const formatRowList = ({context, rows, rowAttributes}) =>
       html.tag(
         (slots.listStyle === 'ordered' ? 'ol' : 'ul'),
         stitchArrays({
           row: rows,
           attributes: rowAttributes ?? rows.map(() => null),
-        }).map(formatRow));
+        }).map(
+          bindOpts(formatRow, {
+            [bindOpts.bindIndex]: 0,
+            context,
+          })));
 
     return relations.layout.slots({
       title: formatListingString({context: 'title'}),
@@ -188,6 +192,7 @@ export default {
 
         slots.type === 'rows' &&
           formatRowList({
+            context: 'item',
             rows: slots.rows,
             rowAttributes: slots.rowAttributes,
           }),
@@ -248,7 +253,11 @@ export default {
                   }),
 
                 html.tag('dd',
-                  formatRowList({rows, rowAttributes})),
+                  formatRowList({
+                    context: 'chunk.item',
+                    rows,
+                    rowAttributes,
+                  })),
               ]),
           ]),
       ],
