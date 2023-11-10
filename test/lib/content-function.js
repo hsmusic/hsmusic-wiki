@@ -50,8 +50,15 @@ export function testContentFunctions(t, message, fn) {
             thumb,
             to,
             urls,
+
+            pagePath: ['home'],
             appendIndexHTML: false,
             getColors: c => getColors(c, {chroma}),
+
+            wikiData: {
+              wikiInfo: {},
+            },
+
             ...extraDependencies,
           },
         });
