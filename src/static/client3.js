@@ -361,6 +361,8 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     normalHoverInfoDelay: 400,
     fastHoveringInfoDelay: 150,
 
+    focusInfoDelay: 750,
+
     endFastHoveringDelay: 500,
 
     hideTooltipDelay: 500,
@@ -374,10 +376,13 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
 
     // These are common across all tooltips, rather than stored individually,
     // based on the principles that 1) only a single tooltip can be displayed
-    // at once, and 2) only a single hoverable can be hovered at a once.
+    // at once, and 2) likewise, only a single hoverable can be hovered,
+    // focused, or otherwise active at once.
     hoverTimeout: null,
+    focusTimeout: null,
     hideTimeout: null,
     currentlyShownTooltip: null,
+    currentlyActiveHoverable: null,
 
     // Fast hovering is a global mode which is activated as soon as any tooltip
     // is displayed and turns off after a delay of no hoverables being hovered.
@@ -413,6 +418,19 @@ function registerTooltipElement(tooltip) {
   tooltip.addEventListener('mouseleave', () => {
     handleTooltipMouseLeft(tooltip);
   });
+
+  tooltip.addEventListener('focusin', () => {
+    handleTooltipReceivedFocus(tooltip);
+  });
+
+  tooltip.addEventListener('focusout', event => {
+    // This event gets activated for tabbing *between* links inside the
+    // tooltip, which is no good and certainly doesn't represent the focus
+    // leaving the tooltip.
+    if (tooltip.contains(event.relatedTarget)) return;
+
+    handleTooltipLostFocus(tooltip);
+  });
 }
 
 // Adds DOM event listeners, so must be called during addPageListeners step.
@@ -440,6 +458,14 @@ function registerTooltipHoverableElement(hoverable, tooltip) {
   hoverable.addEventListener('mouseleave', () => {
     handleTooltipHoverableMouseLeft(hoverable);
   });
+
+  hoverable.addEventListener('focusin', () => {
+    handleTooltipHoverableReceivedFocus(hoverable);
+  });
+
+  hoverable.addEventListener('focusout', () => {
+    handleTooltipHoverableLostFocus(hoverable);
+  });
 }
 
 function handleTooltipMouseEntered(tooltip) {
@@ -455,12 +481,40 @@ function handleTooltipMouseEntered(tooltip) {
 }
 
 function handleTooltipMouseLeft(tooltip) {
-  const {state, settings} = hoverableTooltipInfo;
+  const {settings, state} = hoverableTooltipInfo;
 
   if (state.currentlyShownTooltip !== tooltip) return;
 
   // Start timing out the current tooltip when it's left. This could be
   // canceled by mousing over a hoverable, or back over the tooltip again.
+  if (!state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function handleTooltipReceivedFocus(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  // Cancel the tooltip-hiding timeout if it exists. The tooltip will never
+  // be hidden while it contains the focus anyway, but this ensures the timeout
+  // will be suitably reset when the tooltip loses focus.
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipLostFocus(tooltip) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Start timing out the current tooltip when it loses focus. This will be
+  // canceled if the tooltip receives focus again. Another tooltip might also
+  // display before this timeout runs, but since this is the same timeout name
+  // as all tooltip interactions, it'll get cleared appropriately.
   if (!state.hideTimeout) {
     state.hideTimeout =
       setTimeout(() => {
@@ -502,7 +556,7 @@ function handleTooltipHoverableMouseEntered(hoverable) {
 }
 
 function handleTooltipHoverableMouseLeft(hoverable) {
-  const {state, settings} = hoverableTooltipInfo;
+  const {settings, state} = hoverableTooltipInfo;
 
   // Don't show a tooltip when not over a hoverable!
   if (state.hoverTimeout) {
@@ -532,26 +586,93 @@ function handleTooltipHoverableMouseLeft(hoverable) {
   }
 }
 
+function handleTooltipHoverableReceivedFocus(hoverable) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Start a timer to show the corresponding tooltip.
+  state.focusTimeout =
+    setTimeout(() => {
+      state.focusTimeout = null;
+      showTooltipFromHoverable(hoverable);
+    }, settings.focusInfoDelay);
+}
+
+function handleTooltipHoverableLostFocus(hoverable) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Don't show a tooltip from focusing a hoverable if it isn't focused
+  // anymore! If another hoverable is receiving focus, that will be evaluated
+  // and set its own focus timeout after we clear the previous one here.
+  if (state.focusTimeout) {
+    clearTimeout(state.focusTimeout);
+    state.focusTimeout = null;
+  }
+
+  // Start timing out the current tooltip when the hoverable loses focus.
+  // Yes, even if focus is going *into* that very tooltip! This timeout will
+  // be immediately canceled, in that case.
+  if (!state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function currentlyShownTooltipHasFocus() {
+  const {state} = hoverableTooltipInfo;
+
+  const {
+    currentlyShownTooltip: tooltip,
+    currentlyActiveHoverable: hoverable,
+  } = state;
+
+  // If there's no tooltip, it can't possibly have focus.
+  if (!tooltip) return false;
+
+  // If the tooltip literally contains (or is) the focused element, then that's
+  // the principle condition we're looking for.
+  if (tooltip.contains(document.activeElement)) return true;
+
+  // If the hoverable *which opened the tooltip* is focused, then that also
+  // represents the tooltip being focused (in its currently shown state).
+  if (hoverable.contains(document.activeElement)) return true;
+
+  return false;
+}
+
 function hideCurrentlyShownTooltip() {
   const {event, state} = hoverableTooltipInfo;
   const {currentlyShownTooltip: tooltip} = state;
 
-  if (!tooltip) return;
+  // If there was no tooltip to begin with, we're functionally in the desired
+  // state already, so return true.
+  if (!tooltip) return true;
+
+  // Never hide the tooltip if it's focused.
+  if (currentlyShownTooltipHasFocus()) return false;
+
+  state.currentlyShownTooltip = null;
+  state.currentlyActiveHoverable = null;
 
   dispatchInternalEvent(event, 'whenTooltipShouldBeHidden', {tooltip});
 
-  state.currentlyShownTooltip = null;
+  return true;
 }
 
 function showTooltipFromHoverable(hoverable) {
   const {event, state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
-  hideCurrentlyShownTooltip();
+  if (!hideCurrentlyShownTooltip()) return false;
+
+  state.currentlyShownTooltip = tooltip;
+  state.currentlyActiveHoverable = hoverable;
 
   dispatchInternalEvent(event, 'whenTooltipShouldBeShown', {hoverable, tooltip});
 
-  state.currentlyShownTooltip = tooltip;
+  return true;
 }
 
 // Data & info card ---------------------------------------
