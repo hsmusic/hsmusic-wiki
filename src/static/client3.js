@@ -1502,8 +1502,67 @@ for (const info of groupContributionsTableInfo) {
 
 // Artist link icon tooltips ------------------------------
 
-// TODO: Update to clientSteps style.
+const externalIconTooltipInfo = clientInfo.externalIconTooltipInfo = {
+  hoverableLinks: null,
+  iconContainers: null,
+};
 
+function getExternalIconTooltipReferences() {
+  const info = externalIconTooltipInfo;
+
+  const spans =
+    Array.from(document.querySelectorAll('span.contribution.has-tooltip'));
+
+  info.hoverableLinks =
+    spans
+      .map(span => span.querySelector('a'));
+
+  info.iconContainers =
+    spans
+      .map(span => span.querySelector('span.icons-tooltip'));
+}
+
+function addExternalIconTooltipInternalListeners() {
+  const info = externalIconTooltipInfo;
+
+  hoverableTooltipInfo.event.whenTooltipShouldBeShown.push(({tooltip}) => {
+    if (!info.iconContainers.includes(tooltip)) return;
+    showExternalIconTooltip(tooltip);
+  });
+
+  hoverableTooltipInfo.event.whenTooltipShouldBeHidden.push(({tooltip}) => {
+    if (!info.iconContainers.includes(tooltip)) return;
+    hideExternalIconTooltip(tooltip);
+  });
+}
+
+function showExternalIconTooltip(iconContainer) {
+  iconContainer.classList.add('visible');
+  iconContainer.inert = false;
+}
+
+function hideExternalIconTooltip(iconContainer) {
+  iconContainer.classList.remove('visible');
+  iconContainer.inert = true;
+}
+
+function addExternalIconTooltipPageListeners() {
+  const info = externalIconTooltipInfo;
+
+  for (const {hoverable, tooltip} of stitchArrays({
+    hoverable: info.hoverableLinks,
+    tooltip: info.iconContainers,
+  })) {
+    registerTooltipElement(tooltip);
+    registerTooltipHoverableElement(hoverable, tooltip);
+  }
+}
+
+clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
+clientSteps.addInternalListeners.push(addExternalIconTooltipInternalListeners);
+clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
+
+/*
 const linkIconTooltipInfo =
   Array.from(document.querySelectorAll('span.contribution.has-tooltip'))
     .map(span => ({
@@ -1538,7 +1597,7 @@ for (const info of linkIconTooltipInfo) {
       return;
     }
 
-    if (focusElements.includes(document.activeElement)) {
+    if (<document.activeElement is inside tooltip>) {
       return;
     }
 
@@ -1645,6 +1704,7 @@ for (const info of linkIconTooltipInfo) {
     hide();
   });
 }
+*/
 
 // Sticky commentary sidebar ------------------------------
 
