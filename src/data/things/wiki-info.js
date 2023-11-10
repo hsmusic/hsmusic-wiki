@@ -1,9 +1,8 @@
 import {input} from '#composite';
 import find from '#find';
-import {isLanguageCode, isName, isURL} from '#validators';
+import {isColor, isLanguageCode, isName, isURL} from '#validators';
 
 import {
-  color,
   flag,
   name,
   referenceList,
@@ -32,7 +31,14 @@ export class WikiInfo extends Thing {
       },
     },
 
-    color: color(),
+    color: {
+      flags: {update: true, expose: true},
+      update: {validate: isColor},
+
+      expose: {
+        transform: color => color ?? '#0088ff',
+      },
+    },
 
     // One-line description used for <meta rel="description"> tag.
     description: simpleString(),
