@@ -10,7 +10,7 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl: ({wikiInfo}) => ({wikiInfo}),
+  sprawl: ({albumData, wikiInfo}) => ({albumData, wikiInfo}),
 
   query(sprawl, spec) {
     const query = {spec};
@@ -125,10 +125,10 @@ export default {
 
       showSkipToSection: true,
 
-      chunkIDs: [
-        null,
-        ...data.groupDirectories,
-      ],
+      chunkIDs:
+        (data.groupDirectories
+          ? [null, ...data.groupDirectories]
+          : null),
 
       chunkTitles: [
         {stringsKey: 'misc'},
@@ -171,10 +171,12 @@ export default {
                   stringsKey: 'album',
                   album: albumLink,
                 })))
-            : relations.albumLinks.map(albumLink => ({
-                stringsKey: 'album',
-                album: albumLink,
-              }))),
+            : [
+                relations.undividedAlbumLinks.map(albumLink => ({
+                  stringsKey: 'album',
+                  album: albumLink,
+                })),
+              ]),
       ],
 
       chunkRowAttributes: [
@@ -183,7 +185,7 @@ export default {
           (relations.groupAlbumLinks
             ? relations.groupAlbumLinks.map(albumLinks =>
                 albumLinks.map(() => null))
-            : [relations.albumLinks.map(() => null)]),
+            : [relations.undividedAlbumLinks.map(() => null)]),
       ],
     });
   },
