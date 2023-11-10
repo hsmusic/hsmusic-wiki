@@ -39,7 +39,8 @@ import {fileURLToPath} from 'node:url';
 import wrap from 'word-wrap';
 
 import {displayCompositeCacheAnalysis} from '#composite';
-import {processLanguageFile, watchLanguageFile} from '#language';
+import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
+  from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
@@ -92,8 +93,6 @@ try {
 }
 
 const BUILD_TIME = new Date();
-
-export const DEFAULT_STRINGS_FILE = 'strings-default.yaml';
 
 const STATUS_NOT_STARTED       = `not started`;
 const STATUS_NOT_APPLICABLE    = `not applicable`;
@@ -1103,8 +1102,6 @@ async function main() {
 
   let internalDefaultLanguage;
   let internalDefaultLanguageWatcher;
-
-  const internalDefaultStringsFile = path.join(__dirname, DEFAULT_STRINGS_FILE);
 
   let errorLoadingInternalDefaultLanguage = false;
 

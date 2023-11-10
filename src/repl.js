@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 
 import {logError, logWarn, parseOptions} from '#cli';
 import {isMain} from '#node-utils';
-import {processLanguageFile} from '#language';
+import {internalDefaultStringsFile, processLanguageFile} from '#language';
 import {bindOpts, showAggregate} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {quickLoadAllFromYAML} from '#yaml';
@@ -15,8 +15,6 @@ import thingConstructors, {CacheableObject} from '#things';
 import * as serialize from '#serialize';
 import * as sugar from '#sugar';
 import * as wikiDataUtils from '#wiki-data';
-
-import {DEFAULT_STRINGS_FILE} from './upd8.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -45,10 +43,7 @@ export async function getContextAssignments({
 
   let language;
   try {
-    language = await processLanguageFile(
-      path.join(
-        path.dirname(fileURLToPath(import.meta.url)),
-        DEFAULT_STRINGS_FILE));
+    language = await processLanguageFile(internalDefaultStringsFile);
   } catch (error) {
     console.error(error);
     logWarn`Failed to create Language object`;

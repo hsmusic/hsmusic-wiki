@@ -1,6 +1,7 @@
 import EventEmitter from 'node:events';
 import {readFile} from 'node:fs/promises';
 import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 
 import chokidar from 'chokidar';
 import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
@@ -17,6 +18,14 @@ import {
 } from '#sugar';
 
 const {Language} = T;
+
+export const DEFAULT_STRINGS_FILE = 'strings-default.yaml';
+
+export const internalDefaultStringsFile =
+  path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    '../',
+    DEFAULT_STRINGS_FILE);
 
 export function processLanguageSpec(spec, {existingCode = null} = {}) {
   const {
