@@ -1,5 +1,6 @@
 import find from '#find';
 import {stitchArrays} from '#sugar';
+import {filterMultipleArrays} from '#wiki-data';
 
 export default {
   contentDependencies: ['linkFlash', 'linkFlashAct', 'linkFlashIndex'],
@@ -11,10 +12,12 @@ export default {
 
   query(sprawl, act, flash) {
     const findFlashAct = directory =>
-      find.flashAct(directory, sprawl.flashActData, {mode: 'error'});
+      find.flashAct(directory, sprawl.flashActData, {mode: 'quiet'});
+
+    const homestuckSide1 = findFlashAct('flash-act:a1');
 
     const sideFirstActs = [
-      findFlashAct('flash-act:a1'),
+      sprawl.flashActData[0],
       findFlashAct('flash-act:a6a1'),
       findFlashAct('flash-act:hiveswap'),
       findFlashAct('flash-act:cool-and-new-web-comic'),
@@ -22,7 +25,9 @@ export default {
     ];
 
     const sideNames = [
-      `Side 1 (Acts 1-5)`,
+      (homestuckSide1
+        ? `Side 1 (Acts 1-5)`
+        : `All flashes & games`),
       `Side 2 (Acts 6-7)`,
       `Additional Canon`,
       `Fan Adventures`,
@@ -30,12 +35,17 @@ export default {
     ];
 
     const sideColors = [
-      '#4ac925',
+      (homestuckSide1
+        ? '#4ac925'
+        : null),
       '#3796c6',
       '#f2a400',
       '#c466ff',
       '#32c7fe',
     ];
+
+    filterMultipleArrays(sideFirstActs, sideNames, sideColors,
+      firstAct => firstAct);
 
     const sideFirstActIndexes =
       sideFirstActs
