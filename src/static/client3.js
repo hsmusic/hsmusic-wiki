@@ -81,6 +81,31 @@ function fetchData(type, directory) {
   );
 }
 
+function dispatchInternalEvent(event, eventName, ...args) {
+  const [infoName] =
+    Object.entries(clientInfo)
+      .find(pair => pair[1].event === event);
+
+  if (!infoName) {
+    throw new Error(`Expected event to be stored on clientInfo`);
+  }
+
+  const {[eventName]: listeners} = event;
+
+  if (!listeners) {
+    throw new Error(`Event name "${eventName}" isn't stored on ${infoName}.event`);
+  }
+
+  for (const listener of listeners) {
+    try {
+      listener(...args);
+    } catch (error) {
+      console.warn(`Uncaught error in listener for ${infoName}.${eventName}`);
+      console.debug(error);
+    }
+  }
+}
+
 // JS-based links -----------------------------------------
 
 const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
@@ -671,6 +696,8 @@ function addHashLinkListeners() {
       }
 
       processScrollingAfterHashLinkClicked();
+
+      dispatchInternalEvent(event, 'whenHashLinkClicked', {link: hashLink});
 
       for (const handler of event.whenHashLinkClicked) {
         handler({
