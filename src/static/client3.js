@@ -660,21 +660,22 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
   // case touching the hoverable again should behave just like a normal click.
   if (state.currentlyShownTooltip === tooltip) return;
 
-  const endedTouches = Array.from(domEvent.changedTouches);
+  const touches = Array.from(domEvent.changedTouches);
+  const identifiers = touches.map(touch => touch.identifier);
 
   // Don't process touch events that were "banished" because the page was
   // scrolled while those touches were active, and most likely as a result of
   // them.
-  const unbanishedTouches =
-    endedTouches.filter(touch =>
-      !state.touchIdentifiersBanishedByScrolling.has(touch.identifier));
+  filterMultipleArrays(touches, identifiers,
+    (_touch, identifier) =>
+      !state.touchIdentifiersBanishedByScrolling.has(identifier));
 
-  if (empty(unbanishedTouches)) return;
+  if (empty(touches)) return;
 
   // Don't proceed if none of the (just-ended) touches ended over the
   // hoverable.
   const anyTouchEndedOverHoverable =
-    unbanishedTouches.some(touch =>
+    touches.some(touch =>
       hoverable.contains(
         document.elementFromPoint(touch.clientX, touch.clientY)));
 
@@ -780,29 +781,28 @@ function showTooltipFromHoverable(hoverable) {
 }
 
 function addHoverableTooltipPageListeners() {
+  const {state} = hoverableTooltipInfo;
+
+  const getTouchIdentifiers = domEvent =>
+    Array.from(domEvent.changedTouches)
+      .map(touch => touch.identifier)
+      .filter(identifier => typeof identifier !== 'undefined');
+
   document.body.addEventListener('touchstart', domEvent => {
-    const {state} = hoverableTooltipInfo;
-    for (const {identifier} of domEvent.changedTouches) {
+    for (const identifier of getTouchIdentifiers(domEvent)) {
       state.currentTouchIdentifiers.add(identifier);
     }
   });
 
-  window.addEventListener('scroll', domEvent => {
-    const {state} = hoverableTooltipInfo;
+  window.addEventListener('scroll', () => {
     for (const identifier of state.currentTouchIdentifiers) {
       state.touchIdentifiersBanishedByScrolling.add(identifier);
     }
   });
 
   document.body.addEventListener('touchend', domEvent => {
-    const {state} = hoverableTooltipInfo;
-
-    const identifiers =
-      Array.from(domEvent.changedTouches)
-        .map(touch => touch.identifier);
-
     setTimeout(() => {
-      for (const identifier of identifiers) {
+      for (const identifier of getTouchIdentifiers(domEvent)) {
         state.currentTouchIdentifiers.delete(identifier);
         state.touchIdentifiersBanishedByScrolling.delete(identifier);
       }
@@ -810,24 +810,23 @@ function addHoverableTooltipPageListeners() {
   });
 
   document.body.addEventListener('touchend', domEvent => {
-    const {state} = hoverableTooltipInfo;
-
     const hoverables = Array.from(state.registeredHoverables.keys());
     const tooltips = Array.from(state.registeredTooltips.keys());
 
-    const endedTouches = Array.from(domEvent.changedTouches);
+    const touches = Array.from(domEvent.changedTouches);
+    const identifiers = touches.map(touch => touch.identifier);
 
     // Don't process touch events that were "banished" because the page was
     // scrolled while those touches were active, and most likely as a result of
     // them.
-    const unbanishedTouches =
-      endedTouches.filter(touch =>
-        !state.touchIdentifiersBanishedByScrolling.has(touch.identifier));
+    filterMultipleArrays(touches, identifiers,
+      (_touch, identifier) =>
+        !state.touchIdentifiersBanishedByScrolling.has(identifier));
 
-    if (empty(unbanishedTouches)) return;
+    if (empty(touches)) return;
 
     const anyTouchOverAnyHoverableOrTooltip =
-      unbanishedTouches.some(({clientX, clientY}) => {
+      touches.some(({clientX, clientY}) => {
         const element = document.elementFromPoint(clientX, clientY);
         if (hoverables.some(el => el.contains(element))) return true;
         if (tooltips.some(el => el.contains(element))) return true;
