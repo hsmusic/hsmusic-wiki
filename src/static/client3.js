@@ -813,6 +813,7 @@ function addHoverableTooltipPageListeners() {
     const {state} = hoverableTooltipInfo;
 
     const hoverables = Array.from(state.registeredHoverables.keys());
+    const tooltips = Array.from(state.registeredTooltips.keys());
 
     const endedTouches = Array.from(domEvent.changedTouches);
 
@@ -825,14 +826,15 @@ function addHoverableTooltipPageListeners() {
 
     if (empty(unbanishedTouches)) return;
 
-    // TODO: https://github.com/tc39/proposal-iterator-helpers
-    const anyTouchOverAnyHoverable =
+    const anyTouchOverAnyHoverableOrTooltip =
       unbanishedTouches.some(({clientX, clientY}) => {
         const element = document.elementFromPoint(clientX, clientY);
-        return hoverables.some(hoverable => hoverable.contains(element));
+        if (hoverables.some(el => el.contains(element))) return true;
+        if (tooltips.some(el => el.contains(element))) return true;
+        return false;
       });
 
-    if (!anyTouchOverAnyHoverable) {
+    if (!anyTouchOverAnyHoverableOrTooltip) {
       hideCurrentlyShownTooltip();
     }
   });

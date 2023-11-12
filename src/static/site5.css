@@ -489,7 +489,7 @@ a:not([href]):hover {
 
 .icons-tooltip {
   position: absolute;
-  z-index: 999;
+  z-index: 1;
   left: -12px;
   top: calc(1em - 2px);
   padding: 4px 12px 6px 8px;
