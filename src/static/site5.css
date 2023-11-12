@@ -506,8 +506,12 @@ a:not([href]):hover {
   border: 1px dotted var(--primary-color);
   border-radius: 4px;
 
+  -webkit-backdrop-filter: blur(2px);
+          backdrop-filter: blur(2px);
+
   -webkit-user-select: none;
-  user-select: none;
+          user-select: none;
+
   cursor: default;
 }
 
