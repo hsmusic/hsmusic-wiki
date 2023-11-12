@@ -393,10 +393,12 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     // focused, or otherwise active at once.
     hoverTimeout: null,
     focusTimeout: null,
+    touchTimeout: null,
     hideTimeout: null,
     currentlyShownTooltip: null,
     currentlyActiveHoverable: null,
     tooltipWasJustHidden: false,
+    hoverableWasRecentlyTouched: false,
 
     // Fast hovering is a global mode which is activated as soon as any tooltip
     // is displayed and turns off after a delay of no hoverables being hovered.
@@ -474,11 +476,19 @@ function registerTooltipHoverableElement(hoverable, tooltip) {
   });
 
   hoverable.addEventListener('focusin', event => {
-    handleTooltipHoverableReceivedFocus(hoverable, event.relatedTarget);
+    handleTooltipHoverableReceivedFocus(hoverable, event);
   });
 
   hoverable.addEventListener('focusout', event => {
-    handleTooltipHoverableLostFocus(hoverable, event.relatedTarget);
+    handleTooltipHoverableLostFocus(hoverable, event);
+  });
+
+  hoverable.addEventListener('touchend', event => {
+    handleTooltipHoverableTouchEnded(hoverable, event);
+  });
+
+  hoverable.addEventListener('click', event => {
+    handleTooltipHoverableClicked(hoverable, event);
   });
 }
 
@@ -522,7 +532,7 @@ function handleTooltipReceivedFocus(tooltip) {
   }
 }
 
-function handleTooltipLostFocus(tooltip, newlyFocusedElement) {
+function handleTooltipLostFocus(tooltip) {
   const {settings, state} = hoverableTooltipInfo;
 
   // Hide the current tooltip right away when it loses focus.
@@ -591,7 +601,7 @@ function handleTooltipHoverableMouseLeft(hoverable) {
   }
 }
 
-function handleTooltipHoverableReceivedFocus(hoverable, previouslyFocusedElement) {
+function handleTooltipHoverableReceivedFocus(hoverable) {
   const {settings, state} = hoverableTooltipInfo;
 
   // By default, display the corresponding tooltip after a delay.
@@ -614,7 +624,7 @@ function handleTooltipHoverableReceivedFocus(hoverable, previouslyFocusedElement
   }
 }
 
-function handleTooltipHoverableLostFocus(hoverable, newlyFocusedElement) {
+function handleTooltipHoverableLostFocus(hoverable, domEvent) {
   const {settings, state} = hoverableTooltipInfo;
 
   // Don't show a tooltip from focusing a hoverable if it isn't focused
@@ -628,8 +638,60 @@ function handleTooltipHoverableLostFocus(hoverable, newlyFocusedElement) {
   // Unless focus is entering the tooltip itself, hide the tooltip immediately.
   // This will set the tooltipWasJustHidden flag, which is detected by a newly
   // focused hoverable, if applicable.
-  if (!currentlyShownTooltipHasFocus(newlyFocusedElement)) {
+  if (!currentlyShownTooltipHasFocus(domEvent.relatedTarget)) {
     hideCurrentlyShownTooltip();
+  }
+}
+
+function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
+  const {settings, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // Don't proceed if this hoverable's tooltip is already visible - in that
+  // case touching the hoverable again should behave just like a normal click.
+  if (state.currentlyShownTooltip === tooltip) return;
+
+  const touchEndedOverHoverable =
+    Array.from(domEvent.changedTouches)
+      .some(touch =>
+        hoverable.contains(
+          document.elementFromPoint(touch.clientX, touch.clientY)));
+
+  if (!touchEndedOverHoverable) {
+    return;
+  }
+
+  if (state.touchTimeout) {
+    clearTimeout(state.touchTimeout);
+    state.touchTimeout = null;
+  }
+
+  // Show the tooltip right away.
+  showTooltipFromHoverable(hoverable);
+
+  // Set a state, for a brief but not instantaneous period, indicating that a
+  // hoverable was recently touched. The touchend event may precede the click
+  // event by some time, and we don't want to navigate away from the page as
+  // a result of the click event which this touch precipitated.
+  state.hoverableWasRecentlyTouched = true;
+  state.touchTimeout =
+    setTimeout(() => {
+      state.hoverableWasRecentlyTouched = false;
+    }, 250);
+}
+
+function handleTooltipHoverableClicked(hoverable, domEvent) {
+  const {state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // Don't navigate away from the page if the this hoverable was recently
+  // touched (and had its tooltip activated). That flag won't be set if its
+  // tooltip was already open before the touch.
+  if (
+    state.currentlyActiveHoverable === hoverable &&
+    state.hoverableWasRecentlyTouched
+  ) {
+    event.preventDefault();
   }
 }
 
@@ -695,6 +757,28 @@ function showTooltipFromHoverable(hoverable) {
 
   return true;
 }
+
+function addHoverableTooltipPageListeners() {
+  document.body.addEventListener('touchend', domEvent => {
+    const {state} = hoverableTooltipInfo;
+
+    const touches = [...domEvent.changedTouches, ...domEvent.touches];
+    const hoverables = Array.from(state.registeredHoverables.keys());
+
+    // TODO: https://github.com/tc39/proposal-iterator-helpers
+    const anyTouchOverAnyHoverable =
+      touches.some(({clientX, clientY}) => {
+        const element = document.elementFromPoint(clientX, clientY);
+        return hoverables.some(hoverable => hoverable.contains(element));
+      });
+
+    if (!anyTouchOverAnyHoverable) {
+      hideCurrentlyShownTooltip();
+    }
+  });
+}
+
+clientSteps.addPageListeners.push(addHoverableTooltipPageListeners);
 
 // Data & info card ---------------------------------------
 
@@ -863,53 +947,6 @@ const infoCard = (() => {
     cancelHide,
   };
 })();
-
-function makeInfoCardLinkHandlers(type) {
-  let hoverTimeout = null;
-
-  return {
-    mouseenter(evt) {
-      hoverTimeout = setTimeout(
-        () => {
-          fastHover = true;
-          infoCard.show(type, evt.target);
-        },
-        fastHover ? FAST_HOVER_INFO_DELAY : NORMAL_HOVER_INFO_DELAY);
-
-      clearTimeout(endFastHoverTimeout);
-      endFastHoverTimeout = null;
-
-      infoCard.cancelHide();
-    },
-
-    mouseleave() {
-      clearTimeout(hoverTimeout);
-
-      if (fastHover && !endFastHoverTimeout) {
-        endFastHoverTimeout = setTimeout(() => {
-          endFastHoverTimeout = null;
-          fastHover = false;
-        }, END_FAST_HOVER_DELAY);
-      }
-
-      infoCard.readyHide();
-    },
-  };
-}
-
-const infoCardLinkHandlers = {
-  track: makeInfoCardLinkHandlers('track'),
-};
-
-function addInfoCardLinkHandlers(type) {
-  for (const a of document.querySelectorAll(`a[data-${type}]`)) {
-    for (const [eventName, handler] of Object.entries(
-      infoCardLinkHandlers[type]
-    )) {
-      a.addEventListener(eventName, handler);
-    }
-  }
-}
 
 // Info cards are disa8led for now since they aren't quite ready for release,
 // 8ut you can try 'em out 8y setting this localStorage flag!
@@ -1792,58 +1829,6 @@ for (const info of linkIconTooltipInfo) {
 
   info.mainLink.addEventListener('blur', () => {
     requestAnimationFrame(considerHiding);
-  });
-
-  // Touch (finger)
-
-  let justTouched = false;
-  let touchTimeout;
-
-  info.mainLink.addEventListener('touchend', event => {
-    let wasTarget = false;
-
-    for (const touch of event.changedTouches) {
-      if (touch.target === info.mainLink) {
-        wasTarget = true;
-        break;
-      }
-    }
-
-    if (!wasTarget) {
-      return;
-    }
-
-    justTouched = true;
-
-    clearTimeout(touchTimeout);
-    touchTimeout = setTimeout(() => {
-      justTouched = false;
-    }, 250);
-
-    show();
-  });
-
-  info.mainLink.addEventListener('click', event => {
-    if (hidden && justTouched) {
-      event.preventDefault();
-      event.target.focus();
-      show();
-    }
-  });
-
-  document.body.addEventListener('touchend', event => {
-    const touches = [...event.changedTouches, ...event.touches];
-    for (const {clientX, clientY} of touches) {
-      const touchEl = document.elementFromPoint(clientX, clientY);
-      if (!touchEl) continue;
-
-      for (const hoverEl of hoverElements) {
-        if (touchEl === hoverEl) return;
-        if (hoverEl.contains(touchEl)) return;
-      }
-    }
-
-    hide();
   });
 }
 */
