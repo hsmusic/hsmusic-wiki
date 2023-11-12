@@ -1179,7 +1179,9 @@ async function main() {
     });
 
     const languageDataFiles = await traverse(langPath, {
-      filterFile: name => path.extname(name) === '.json',
+      filterFile: name =>
+        path.extname(name) === '.json' ||
+        path.extname(name) === '.yaml',
       pathStyle: 'device',
     });
 
