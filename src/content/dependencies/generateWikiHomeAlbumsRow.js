@@ -108,14 +108,15 @@ export default {
       stitchArrays({
         image: relations.images,
         path: data.paths,
-        name: data.names,
+        name: data.names ?? data.paths.slice().fill(null),
       }).map(({image, path, name}) =>
           image.slots({
             path,
             missingSourceContent:
-              language.$('misc.albumGrid.noCoverArt', {
-                album: name,
-              }),
+              name &&
+                language.$('misc.albumGrid.noCoverArt', {
+                  album: name,
+                }),
             }));
 
     commonSlots.actionLinks =
