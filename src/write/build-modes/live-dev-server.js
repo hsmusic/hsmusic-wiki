@@ -16,7 +16,7 @@ import {
 } from '#urls';
 
 import {bindUtilities} from '../bind-utilities.js';
-import {generateGlobalWikiDataJSON, generateRedirectHTML} from '../common-templates.js';
+import {generateRandomLinkDataJSON, generateRedirectHTML} from '../common-templates.js';
 
 const defaultHost = '0.0.0.0';
 const defaultPort = 8002;
@@ -157,19 +157,20 @@ export async function go({
 
     // Specialized routes
 
-    if (pathname === '/data.json') {
+    if (pathname === '/random-link-data.json') {
       try {
-        const json = generateGlobalWikiDataJSON({
+        const json = generateRandomLinkDataJSON({
           serializeThings,
           wikiData,
         });
+
         response.writeHead(200, contentTypeJSON);
         response.end(json);
-        if (loudResponses) console.log(`${requestHead} [200] /data.json`);
+        if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       } catch (error) {
         response.writeHead(500, contentTypeJSON);
         response.end(`Internal error serializing wiki JSON`);
-        console.error(`${requestHead} [500] /data.json`);
+        console.error(`${requestHead} [500] ${pathname}`);
         showError(error);
       }
       return;

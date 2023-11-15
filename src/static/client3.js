@@ -7,11 +7,7 @@
 
 import {getColors} from '../util/colors.js';
 import {empty, stitchArrays} from '../util/sugar.js';
-
-import {
-  filterMultipleArrays,
-  getArtistNumContributions,
-} from '../util/wiki-data.js';
+import {filterMultipleArrays} from '../util/wiki-data.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
@@ -71,10 +67,6 @@ function cssProp(el, key) {
   return getComputedStyle(el).getPropertyValue(key).trim();
 }
 
-function getRefDirectory(ref) {
-  return ref.split(':')[1];
-}
-
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
@@ -100,8 +92,10 @@ const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
   randomLink: null,
 
   state: {
-    albumData: null,
-    artistData: null,
+    albumDirectories: null,
+    albumTrackDirectories: null,
+    artistDirectories: null,
+    artistNumContributions: null,
   },
 };
 
@@ -147,21 +141,31 @@ function handleRandomLinkClicked(a, domEvent) {
 
 function determineRandomLinkHref(a) {
   const {state} = scriptedLinkInfo;
-  const {albumData, artistData} = state;
 
-  const tracksFromAlbums = albums =>
-    albums
-      .map(album => album.tracks)
-      .reduce((acc, tracks) => acc.concat(tracks), []);
+  const trackDirectoriesFromAlbumDirectories = albumDirectories =>
+    albumDirectories
+      .map(directory => state.albumDirectories.indexOf(directory))
+      .map(index => state.albumTrackDirectories[index])
+      .reduce((acc, trackDirectories) => acc.concat(trackDirectories, []));
 
   switch (a.dataset.random) {
-    case 'album':
-      if (!albumData) return null;
-      return openAlbum(pick(albumData).directory);
+    case 'album': {
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
 
-    case 'track':
-      if (!albumData) return null;
-      return openTrack(getRefDirectory(pick(tracksFromAlbums(albumData))));
+      return openAlbum(pick(albumDirectories));
+    }
+
+    case 'track': {
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
+
+      const trackDirectories =
+        trackDirectoriesFromAlbumDirectories(
+          albumDirectories);
+
+      return openTrack(pick(trackDirectories));
+    }
 
     case 'album-in-group-dl': {
       const albumLinks =
@@ -170,15 +174,16 @@ function determineRandomLinkHref(a) {
           .nextElementSibling
           .querySelectorAll('li a'))
 
-      const albumDirectories =
+      const listAlbumDirectories =
         albumLinks
           .map(a => cssProp(a, '--album-directory'));
 
-      return openAlbum(pick(albumDirectories));
+      return openAlbum(pick(listAlbumDirectories));
     }
 
     case 'track-in-group-dl': {
-      if (!albumData) return null;
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
 
       const albumLinks =
         Array.from(a
@@ -186,16 +191,15 @@ function determineRandomLinkHref(a) {
           .nextElementSibling
           .querySelectorAll('li a'))
 
-      const albumDirectories =
+      const listAlbumDirectories =
         albumLinks
           .map(a => cssProp(a, '--album-directory'));
 
-      const filteredAlbumData =
-        albumData
-          .filter(album =>
-            albumDirectories.includes(album.directory));
+      const trackDirectories =
+        trackDirectoriesFromAlbumDirectories(
+          listAlbumDirectories);
 
-      return openTrack(getRefDirectory(pick(tracksFromAlbums(filteredAlbumData))));
+      return openTrack(pick(trackDirectories));
     }
 
     case 'track-in-sidebar': {
@@ -211,27 +215,32 @@ function determineRandomLinkHref(a) {
     }
 
     case 'track-in-album': {
-      if (!albumData) return null;
+      const {albumDirectories, albumTrackDirectories} = state;
+      if (!albumDirectories || !albumTrackDirectories) return null;
 
-      const directory = cssProp(a, '--album-directory');
-      const {tracks} = albumData.find(album => album.directory === directory);
+      const albumDirectory = cssProp(a, '--album-directory');
+      const albumIndex = albumDirectories.indexOf(albumDirectory);
+      const trackDirectories = albumTrackDirectories[albumIndex];
 
-      return openTrack(getRefDirectory(pick(tracks)));
+      return openTrack(pick(trackDirectories));
     }
 
     case 'artist': {
-      if (!artistData) return null;
-      return openArtist(pick(artistData).directory);
+      const {artistDirectories} = state;
+      if (!artistDirectories) return null;
+
+      return openArtist(pick(artistDirectories));
     }
 
     case 'artist-more-than-one-contrib': {
-      if (!artistData) return null;
+      const {artistDirectories, artistNumContributions} = state;
+      if (!artistDirectories || !artistNumContributions) return null;
 
-      const artists =
-        artistData
-          .filter(artist => getArtistNumContributions(artist) > 1);
+      const filteredArtistDirectories =
+        artistDirectories
+          .filter((_artist, index) => artistNumContributions[index] > 1);
 
-      return openArtist(pick(artists).directory);
+      return openArtist(pick(filteredArtistDirectories));
     }
   }
 }
@@ -291,29 +300,32 @@ if (
 
   dataLoadingLine.style.display = 'block';
 
-  fetch(rebase('data.json', 'rebaseShared'))
-    .then((data) => data.json())
-    .then((data) => {
+  fetch(rebase('random-link-data.json', 'rebaseShared'))
+    .then(data => data.json())
+    .then(data => {
       const {state} = scriptedLinkInfo;
 
-      state.albumData = data.albumData;
-      state.artistData = data.artistData;
+      Object.assign(state, {
+        albumDirectories: data.albumDirectories,
+        albumTrackDirectories: data.albumTrackDirectories,
+        artistDirectories: data.artistDirectories,
+        artistNumContributions: data.artistNumContributions,
+      });
 
       dataLoadingLine.style.display = 'none';
       dataLoadedLine.style.display = 'block';
+    }, () => {
+      dataLoadingLine.style.display = 'none';
+      dataErrorLine.style.display = 'block';
     })
-    .catch(() => {
-      const info = scriptedLinkInfo;
-
-      for (const a of info.randomLinks) {
+    .then(() => {
+      const {randomLinks} = scriptedLinkInfo;
+      for (const a of randomLinks) {
         const href = determineRandomLinkHref(a);
         if (!href) {
           a.removeAttribute('href');
         }
       }
-
-      dataLoadingLine.style.display = 'none';
-      dataErrorLine.style.display = 'block';
     });
 }
 
