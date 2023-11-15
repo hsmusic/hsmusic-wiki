@@ -6,12 +6,19 @@ function sidebarSlots(side) {
     // if specified.
     [side + 'Content']: {type: 'html'},
 
-    // Multiple is an array of {content: (HTML)} objects. Each of these
-    // will generate one sidebar section.
+    // A single class to apply to the whole sidebar. If specifying multiple
+    // sections, this be added to the containing sidebar-column - specify a
+    // class on each section if that's more suitable.
+    [side + 'Class']: {type: 'string'},
+
+    // Multiple is an array of objects, each specifying content (HTML) and
+    // optionally class (a string). Each of these will generate one sidebar
+    // section.
     [side + 'Multiple']: {
       validate: v =>
         v.sparseArrayOf(
           v.validateProperties({
+            class: v.optional(v.isString),
             content: v.isHTML,
           })),
     },
@@ -27,6 +34,7 @@ function sidebarSlots(side) {
     // the whole section's containing box (or the sidebar column as a whole).
     [side + 'StickyMode']: {
       validate: v => v.is('last', 'column', 'static'),
+      default: 'static',
     },
 
     // Collapsing sidebars disappear when the viewport is sufficiently
@@ -354,6 +362,7 @@ export default {
 
     const generateSidebarHTML = (side, id) => {
       const content = slots[side + 'Content'];
+      const topClass = slots[side + 'Class'];
       const multiple = slots[side + 'Multiple'];
       const stickyMode = slots[side + 'StickyMode'];
       const wide = slots[side + 'Wide'];
@@ -363,20 +372,18 @@ export default {
       let sidebarContent = html.blank();
 
       if (!html.isBlank(content)) {
-        sidebarClasses = ['sidebar'];
+        sidebarClasses = ['sidebar', topClass];
         sidebarContent = content;
       } else if (multiple) {
-        sidebarClasses = ['sidebar-multiple'];
+        sidebarClasses = ['sidebar-multiple', topClass];
         sidebarContent =
           multiple
             .filter(Boolean)
-            .map(({content}) =>
-              html.tag('div',
-                {
-                  [html.onlyIfContent]: true,
-                  class: 'sidebar',
-                },
-                content));
+            .map(box =>
+              html.tag('div', {
+                [html.onlyIfContent]: true,
+                class: ['sidebar', box.class],
+              }, box.content));
       }
 
       if (html.isBlank(sidebarContent)) {
