@@ -13,10 +13,6 @@ import {
   getArtistNumContributions,
 } from '../util/wiki-data.js';
 
-let albumData, artistData;
-
-let ready = false;
-
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
 const clientSteps = {
@@ -79,11 +75,6 @@ function getRefDirectory(ref) {
   return ref.split(':')[1];
 }
 
-function getAlbum(el) {
-  const directory = cssProp(el, '--album-directory');
-  return albumData.find((album) => album.directory === directory);
-}
-
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
@@ -107,6 +98,11 @@ const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
   nextLink: null,
   previousLink: null,
   randomLink: null,
+
+  state: {
+    albumData: null,
+    artistData: null,
+  },
 };
 
 function getScriptedLinkReferences() {
@@ -128,93 +124,115 @@ function getScriptedLinkReferences() {
 
 function addRandomLinkListeners() {
   for (const a of scriptedLinkInfo.randomLinks ?? []) {
-    a.addEventListener('click', evt => {
-      if (!ready) {
-        evt.preventDefault();
-        return;
-      }
-
-      const tracks = albumData =>
-        albumData
-          .map(album => album.tracks)
-          .reduce((acc, tracks) => acc.concat(tracks), []);
-
-      setTimeout(() => {
-        a.href = rebase('js-disabled');
-      });
-
-      switch (a.dataset.random) {
-        case 'album':
-          a.href = openAlbum(pick(albumData).directory);
-          break;
-
-        case 'track':
-          a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
-          break;
-
-        case 'album-in-group-dl': {
-          const albumLinks =
-            Array.from(a
-              .closest('dt')
-              .nextElementSibling
-              .querySelectorAll('li a'))
-
-          const albumDirectories =
-            albumLinks.map(a =>
-              getComputedStyle(a).getPropertyValue('--album-directory'));
-
-          a.href = openAlbum(pick(albumDirectories));
-          break;
-        }
-
-        case 'track-in-group-dl': {
-          const albumLinks =
-            Array.from(a
-              .closest('dt')
-              .nextElementSibling
-              .querySelectorAll('li a'))
-
-          const albumDirectories =
-            albumLinks.map(a =>
-              getComputedStyle(a).getPropertyValue('--album-directory'));
-
-          const filteredAlbumData =
-            albumData.filter(album =>
-              albumDirectories.includes(album.directory));
-
-          a.href = openTrack(getRefDirectory(pick(tracks(filteredAlbumData))));
-          break;
-        }
-
-        case 'track-in-sidebar': {
-          // Note that the container for track links may be <ol> or <ul>, and
-          // they can't be identified by href, since links from one track to
-          // another don't include "track" in the href.
-          const trackLinks =
-            Array.from(document
-              .querySelector('.track-list-sidebar-box')
-              .querySelectorAll('li a'));
-
-          a.href = pick(trackLinks).href;
-          break;
-        }
-
-        case 'track-in-album':
-          a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
-          break;
-
-        case 'artist':
-          a.href = openArtist(pick(artistData).directory);
-          break;
-
-        case 'artist-more-than-one-contrib':
-          a.href =
-            openArtist(
-              pick(artistData.filter((artist) => getArtistNumContributions(artist) > 1))
-                .directory);
-          break;
-      }
+    a.addEventListener('click', domEvent => {
+      handleRandomLinkClicked(a, domEvent);
     });
+  }
+}
+
+function handleRandomLinkClicked(a, domEvent) {
+  const href = determineRandomLinkHref(a);
+
+  if (!href) {
+    domEvent.preventDefault();
+    return;
+  }
+
+  setTimeout(() => {
+    a.href = '#'
+  });
+
+  a.href = href;
+}
+
+function determineRandomLinkHref(a) {
+  const {state} = scriptedLinkInfo;
+  const {albumData, artistData} = state;
+
+  const tracksFromAlbums = albums =>
+    albums
+      .map(album => album.tracks)
+      .reduce((acc, tracks) => acc.concat(tracks), []);
+
+  switch (a.dataset.random) {
+    case 'album':
+      if (!albumData) return null;
+      return openAlbum(pick(albumData).directory);
+
+    case 'track':
+      if (!albumData) return null;
+      return openTrack(getRefDirectory(pick(tracksFromAlbums(albumData))));
+
+    case 'album-in-group-dl': {
+      const albumLinks =
+        Array.from(a
+          .closest('dt')
+          .nextElementSibling
+          .querySelectorAll('li a'))
+
+      const albumDirectories =
+        albumLinks
+          .map(a => cssProp(a, '--album-directory'));
+
+      return openAlbum(pick(albumDirectories));
+    }
+
+    case 'track-in-group-dl': {
+      if (!albumData) return null;
+
+      const albumLinks =
+        Array.from(a
+          .closest('dt')
+          .nextElementSibling
+          .querySelectorAll('li a'))
+
+      const albumDirectories =
+        albumLinks
+          .map(a => cssProp(a, '--album-directory'));
+
+      const filteredAlbumData =
+        albumData
+          .filter(album =>
+            albumDirectories.includes(album.directory));
+
+      return openTrack(getRefDirectory(pick(tracksFromAlbums(filteredAlbumData))));
+    }
+
+    case 'track-in-sidebar': {
+      // Note that the container for track links may be <ol> or <ul>, and
+      // they can't be identified by href, since links from one track to
+      // another don't include "track" in the href.
+      const trackLinks =
+        Array.from(document
+          .querySelector('.track-list-sidebar-box')
+          .querySelectorAll('li a'));
+
+      return pick(trackLinks).href;
+    }
+
+    case 'track-in-album': {
+      if (!albumData) return null;
+
+      const directory = cssProp(a, '--album-directory');
+      const {tracks} = albumData.find(album => album.directory === directory);
+
+      return openTrack(getRefDirectory(pick(tracks)));
+    }
+
+    case 'artist': {
+      if (!artistData) return null;
+      return openArtist(pick(artistData).directory);
+    }
+
+    case 'artist-more-than-one-contrib': {
+      if (!artistData) return null;
+
+      const artists =
+        artistData
+          .filter(artist => getArtistNumContributions(artist) > 1);
+
+      return openArtist(pick(artists).directory);
+    }
   }
 }
 
@@ -263,22 +281,28 @@ clientSteps.addPageListeners.push(addNavigationKeyPressListeners);
 clientSteps.addPageListeners.push(addRevealLinkClickListeners);
 clientSteps.mutatePageContent.push(mutateNavigationLinkContent);
 
-const elements1 = document.getElementsByClassName('js-hide-once-data');
-const elements2 = document.getElementsByClassName('js-show-once-data');
+if (
+  document.documentElement.dataset.urlKey === 'localized.listing' &&
+  document.documentElement.dataset.urlValue0 === 'random'
+) {
+  const dataLoadingLine = document.getElementById('data-loading-line');
+  const dataLoadedLine = document.getElementById('data-loaded-line');
 
-for (const element of elements1) element.style.display = 'block';
+  dataLoadingLine.style.display = 'block';
 
-fetch(rebase('data.json', 'rebaseShared'))
-  .then((data) => data.json())
-  .then((data) => {
-    albumData = data.albumData;
-    artistData = data.artistData;
+  fetch(rebase('data.json', 'rebaseShared'))
+    .then((data) => data.json())
+    .then((data) => {
+      const {state} = scriptedLinkInfo;
 
-    for (const element of elements1) element.style.display = 'none';
-    for (const element of elements2) element.style.display = 'block';
+      state.albumData = data.albumData;
+      state.artistData = data.artistData;
 
-    ready = true;
-  });
+      dataLoadingLine.style.display = 'none';
+      dataLoadedLine.style.display = 'block';
+    });
+
+}
 
 // Data & info card ---------------------------------------
 

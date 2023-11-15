@@ -792,6 +792,11 @@ html[data-url-key="localized.albumCommentary"] li.no-commentary {
   opacity: 0.7;
 }
 
+html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
+html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line {
+  display: none;
+}
+
 /* Images */
 
 .image-container {
