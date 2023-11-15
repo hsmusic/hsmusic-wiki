@@ -1,13 +1,12 @@
-// This one's kinda tricky: it parses artist "references" from the
-// commentary content, and finds the matching artist for each reference.
+// List of artists referenced in commentary entries.
 // This is mostly useful for credits and listings on artist pages.
 
 import {input, templateCompositeFrom} from '#composite';
-import find from '#find';
 import {unique} from '#sugar';
 
 import {exitWithoutDependency} from '#composite/control-flow';
-import {withResolvedReferenceList} from '#composite/wiki-data';
+import {withPropertyFromList} from '#composite/data';
+import {withParsedCommentaryEntries} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `commentatorArtists`,
@@ -21,35 +20,21 @@ export default templateCompositeFrom({
       value: input.value([]),
     }),
 
-    {
-      dependencies: ['commentary'],
-      compute: (continuation, {commentary}) =>
-        continuation({
-          '#artistRefs':
-            Array.from(
-              commentary
-                .replace(/<\/?b>/g, '')
-                .matchAll(/<i>(?<who>.*?):<\/i>/g))
-              .map(({groups: {who}}) => who),
-        }),
-    },
+    withParsedCommentaryEntries({
+      from: 'commentary',
+    }),
 
-    withResolvedReferenceList({
-      list: '#artistRefs',
-      data: 'artistData',
-      find: input.value(find.artist),
+    withPropertyFromList({
+      list: '#parsedCommentaryEntries',
+      property: input.value('artist'),
     }).outputs({
-      '#resolvedReferenceList': '#artists',
+      '#parsedCommentaryEntries.artist': '#artists',
     }),
 
     {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['#artists'],
-        compute: ({'#artists': artists}) =>
-          unique(artists),
-      },
+      dependencies: ['#artists'],
+      compute: ({'#artists': artists}) =>
+        unique(artists.filter(artist => artist !== null)),
     },
   ],
 });
