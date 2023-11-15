@@ -1,0 +1,1691 @@
+meta.languageCode: en
+meta.languageName: English
+
+#
+# count:
+#
+#   This covers pretty much any time that a specific number of things
+#   is represented! It's sectioned... like an alignment chart meme...
+#
+#   First counting specific wiki objects, then more abstract stuff,
+#   and finally numerical representations of kinds of quantities that
+#   aren't really "counting", per se.
+#
+#   These must be filled out according to the Unicode Common Locale
+#   Data Repository (Unicode CLDR). Check out info on their site:
+#   https://cldr.unicode.org
+#
+#   Specifically, you'll want to look into the Plural Rules for your
+#   language. Here's a summary on what those even are:
+#   https://cldr.unicode.org/index/cldr-spec/plural-rules
+#
+#   CLDR's charts are available online! This should bring you to the
+#   most recent table of plural rules:
+#   https://www.unicode.org/cldr/charts/latest/supplemental/language_plural_rules.html
+#
+#   Counting is generally done with the "Type: cardinal" section on
+#   that chart - for example, if the chart lists "one", "many", and
+#   "other" under the cardinal plural rules for your language, then
+#   your job is to fill in the correct pluralizations of the specific
+#   term for each of those.
+#
+#   If you adore technical details or want to better understand the
+#   "Rules" column, you'll want to check out the syntax outline here:
+#   https://unicode.org/reports/tr35/tr35-numbers.html#Language_Plural_Rules
+#
+count:
+
+  # Count things and objects
+
+  additionalFiles:
+    _: "{FILES}"
+    withUnit:
+      zero: ""
+      one: "{FILES} file"
+      two: ""
+      few: ""
+      many: ""
+      other: "{FILES} files"
+
+  albums:
+    _: "{ALBUMS}"
+    withUnit:
+      zero: ""
+      one: "{ALBUMS} album"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ALBUMS} albums"
+
+  artworks:
+    _: "{ARTWORKS}"
+    withUnit:
+      zero: ""
+      one: "{ARTWORKS} artwork"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ARTWORKS} artworks"
+
+  commentaryEntries:
+    _: "{ENTRIES}"
+    withUnit:
+      zero: ""
+      one: "{ENTRIES} entry"
+      two: ""
+      few: ""
+      many: ""
+      other: "{ENTRIES} entries"
+
+  contributions:
+    _: "{CONTRIBUTIONS}"
+    withUnit:
+      zero: ""
+      one: "{CONTRIBUTIONS} contribution"
+      two: ""
+      few: ""
+      many: ""
+      other: "{CONTRIBUTIONS} contributions"
+
+  coverArts:
+    _: "{COVER_ARTS}"
+    withUnit:
+      zero: ""
+      one: "{COVER_ARTS} cover art"
+      two: ""
+      few: ""
+      many: ""
+      other: "{COVER_ARTS} cover arts"
+
+  flashes:
+    _: "{FLASHES}"
+    withUnit:
+      zero: ""
+      one: "{FLASHES} flashes & games"
+      two: ""
+      few: ""
+      many: ""
+      other: "{FLASHES} flashes & games"
+
+  tracks:
+    _: "{TRACKS}"
+    withUnit:
+      zero: ""
+      one: "{TRACKS} track"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TRACKS} tracks"
+
+  # Count more abstract stuff
+
+  days:
+    _: "{DAYS}"
+    withUnit:
+      zero: ""
+      one: "{DAYS} day"
+      two: ""
+      few: ""
+      many: ""
+      other: "{DAYS} days"
+
+  timesReferenced:
+    _: "{TIMES_REFERENCED}"
+    withUnit:
+      zero: ""
+      one: "{TIMES_REFERENCED} time referenced"
+      two: ""
+      few: ""
+      many: ""
+      other: "{TIMES_REFERENCED} times referenced"
+
+  timesUsed:
+    _: "{TIMES_USED}"
+    withUnit:
+      zero: ""
+      one: "used {TIMES_USED} time"
+      two: ""
+      few: ""
+      many: ""
+      other: "used {TIMES_USED} times"
+
+  words:
+    _: "{WORDS}"
+    thousand: "{WORDS}k"
+    withUnit:
+      zero: ""
+      one: "{WORDS} word"
+      two: ""
+      few: ""
+      many: ""
+      other: "{WORDS} words"
+
+  # Numerical things that aren't exactly counting, per se
+
+  duration:
+    missing: "_:__"
+    approximate: "~{DURATION}"
+    hours:
+      _:        "{HOURS}:{MINUTES}:{SECONDS}"
+      withUnit: "{HOURS}:{MINUTES}:{SECONDS} hours"
+    minutes:
+      _:        "{MINUTES}:{SECONDS}"
+      withUnit: "{MINUTES}:{SECONDS} minutes"
+
+  fileSize:
+    terabytes: "{TERABYTES} TB"
+    gigabytes: "{GIGABYTES} GB"
+    megabytes: "{MEGABYTES} MB"
+    kilobytes: "{KILOBYTES} kB"
+    bytes: "{BYTES} bytes"
+
+  # Indexes in a list
+  # These use "Type: ordinal" on CLDR's chart of plural rules.
+
+  index:
+    zero: ""
+    one: "{INDEX}st"
+    two: "{INDEX}nd"
+    few: "{INDEX}rd"
+    many: ""
+    other: "{INDEX}th"
+
+#
+# releaseInfo:
+#
+#   This covers a lot of generic strings - they're used in a variety
+#   of contexts. They're sorted below with descriptions first, then
+#   actions further down.
+#
+releaseInfo:
+
+  # Descriptions
+
+  by: "By {ARTISTS}."
+  from: "From {ALBUM}."
+
+  coverArtBy: "Cover art by {ARTISTS}."
+  wallpaperArtBy: "Wallpaper art by {ARTISTS}."
+  bannerArtBy: "Banner art by {ARTISTS}."
+
+  released: "Released {DATE}."
+  artReleased: "Art released {DATE}."
+  addedToWiki: "Added to wiki {DATE}."
+
+  duration: "Duration: {DURATION}."
+
+  contributors: "Contributors:"
+  lyrics: "Lyrics:"
+  note: "Context notes:"
+
+  alsoReleasedAs:
+    _: "Also released as:"
+    item: "{TRACK} (on {ALBUM})"
+
+  tracksReferenced: "Tracks that {TRACK} references:"
+  tracksThatReference: "Tracks that reference {TRACK}:"
+  tracksSampled: "Tracks that {TRACK} samples:"
+  tracksThatSample: "Tracks that sample {TRACK}:"
+
+  flashesThatFeature:
+    _: "Flashes & games that feature {TRACK}:"
+    item:
+      _: "{FLASH}"
+      asDifferentRelease: "{FLASH} (as {TRACK})"
+
+  tracksFeatured: "Tracks that {FLASH} features:"
+
+  artTags:
+    _: "Tags:"
+    inline: "Tags: {TAGS}"
+
+  # Actions
+
+  viewCommentary:
+    _: "View {LINK}!"
+    link: "commentary page"
+
+  viewGallery:
+    _: "View {LINK}!"
+    link: "gallery page"
+
+  viewGalleryOrCommentary:
+    _: "View {GALLERY} or {COMMENTARY}!"
+    gallery: "gallery page"
+    commentary: "commentary page"
+
+  viewOriginalFile:
+    _: "View {LINK}."
+    withSize: "View {LINK} ({SIZE})."
+    link: "original file"
+    sizeWarning: >-
+      (Heads up! If you're on a mobile plan, this is a large download.)
+
+  listenOn:
+    _: "Listen on {LINKS}."
+    noLinks: >-
+      This wiki doesn't have any listening links for {NAME}.
+
+  visitOn: "Visit on {LINKS}."
+  playOn: "Play on {LINKS}."
+
+  readCommentary:
+    _: "Read {LINK}."
+    link: "artist commentary"
+
+  artistCommentary:
+    _: "Artist commentary:"
+    seeOriginalRelease: "See {ORIGINAL}!"
+
+  additionalFiles:
+    heading: "View or download {ADDITIONAL_FILES}:"
+
+    entry:
+      _: "{TITLE}"
+      withDescription: "{TITLE}: {DESCRIPTION}"
+
+    file:
+      _: "{FILE}"
+      withSize: "{FILE} ({SIZE})"
+
+    shortcut:
+      _: "View {ANCHOR_LINK}: {TITLES}"
+      anchorLink: "additional files"
+
+  sheetMusicFiles:
+    heading: "Print or download sheet music files:"
+
+    shortcut:
+      _: "Download {LINK}."
+      link: "sheet music files"
+
+  midiProjectFiles:
+    heading: "Download MIDI/project files:"
+
+    shortcut:
+      _: "Download {LINK}."
+      link: "MIDI/project files"
+
+#
+# trackList:
+#
+#   A list of tracks! These are used pretty much across the wiki.
+#   Track lists can be split into sections, groups, or not split at
+#   all. "Track sections" are divisions in the list which suit the
+#   album as a whole, like if it has multiple discs or bonus tracks.
+#   "Groups" are actual group objects (see ex. groupInfoPage).
+#
+trackList:
+  section:
+    withDuration: "{SECTION} ({DURATION}):"
+
+  group:
+    _: "From {GROUP}:"
+    fromOther: "From somewhere else:"
+
+  item:
+    withDuration: "({DURATION}) {TRACK}"
+    withDuration.withArtists: "({DURATION}) {TRACK} {BY}"
+    withArtists: "{TRACK} {BY}"
+    withArtists.by: "by {ARTISTS}"
+    rerelease: "{TRACK} (re-release)"
+
+#
+# misc:
+#
+#   These cover a whole host of general things across the wiki, and
+#   aren't specially organized. Sorry! See each entry for details.
+#
+misc:
+
+  # alt:
+  #   Fallback text for the alt text of images and artworks - these
+  #   are read aloud by screen readers.
+
+  alt:
+    albumCover: "album cover"
+    albumBanner: "album banner"
+    trackCover: "track cover"
+    artistAvatar: "artist avatar"
+    flashArt: "flash art"
+
+  # artistLink:
+  #   Artist links have special accents which are made conditionally
+  #   present in a variety of places across the wiki.
+
+  artistLink:
+    _: "{ARTIST}"
+
+    # Contribution to a track, artwork, or other thing.
+    withContribution: "{ARTIST} ({CONTRIB})"
+
+    # External links to visit the artist's own websites or profiles.
+    withExternalLinks: "{ARTIST} ({LINKS})"
+
+    # Combination of above.
+    withContribution.withExternalLinks: "{ARTIST} ({CONTRIB}) ({LINKS})"
+
+  # chronology:
+  #
+  #   "Chronology links" are a section that appear in the nav bar for
+  #   most things with individual contributors across the wiki! These
+  #   allow for quick navigation between older and newer releases of
+  #   a given artist, or seeing at a glance how many contributions an
+  #   artist made before the one you're currently viewing.
+  #
+  #   Chronology information is described for each artist and shows
+  #   the kind of thing which is being contributed to, since all of
+  #   the entries are displayed together in one list.
+  #
+
+  chronology:
+
+    # seeArtistPages:
+    #   If the thing you're viewing has a lot of contributors, their
+    #   chronology info will be exempt from the nav bar, which'll
+    #   show this message instead.
+
+    seeArtistPages: "(See artist pages for chronology info!)"
+
+    # withNavigation:
+    #   Navigation refers to previous/next links.
+
+    withNavigation: "{HEADING} ({NAVIGATION})"
+
+    heading:
+      coverArt: "{INDEX} cover art by {ARTIST}"
+      flash: "{INDEX} flash/game by {ARTIST}"
+      track: "{INDEX} track by {ARTIST}"
+
+  # external:
+  #   Links which will generally bring you somewhere off of the wiki.
+  #   The list of sites is hard-coded into the wiki software, so it
+  #   may be out of date or missing ones that are relevant to another
+  #   wiki - sorry!
+
+  external:
+
+    # domain:
+    #   General domain when one the URL doesn't match one of the
+    #   sites below.
+
+    domain: "External ({DOMAIN})"
+
+    # local:
+    #   Files which are locally available on the wiki (under its media
+    #   directory).
+
+    local: "Wiki Archive (local upload)"
+
+    deviantart: "DeviantArt"
+    instagram: "Instagram"
+    newgrounds: "Newgrounds"
+    patreon: "Patreon"
+    poetryFoundation: "Poetry Foundation"
+    soundcloud: "SoundCloud"
+    spotify: "Spotify"
+    tumblr: "Tumblr"
+    twitter: "Twitter"
+    wikipedia: "Wikipedia"
+
+    bandcamp:
+      _: "Bandcamp"
+      domain: "Bandcamp ({DOMAIN})"
+
+    mastodon:
+      _: "Mastodon"
+      domain: "Mastodon ({DOMAIN})"
+
+    youtube:
+      _: "YouTube"
+      playlist: "YouTube (playlist)"
+      fullAlbum: "YouTube (full album)"
+
+    flash:
+      bgreco: "{LINK} (HQ Audio)"
+      youtube: "{LINK} (on any device)"
+      homestuck:
+        page: "{LINK} (page {PAGE})"
+        secret: "{LINK} (secret page)"
+
+  # missingImage:
+  #   Fallback text displayed in an image when it's sourced to a file
+  #   that isn't available under the wiki's media directory. While it
+  #   shouldn't display on a correct build of the site, it may be
+  #   displayed when working on data locally (for example adding a
+  #   track before you've brought in its cover art).
+
+  missingImage: "(This image file is missing)"
+
+  # misingLinkContent:
+  #   Generic fallback when a link is completely missing its content.
+  #   This is only to make those links visible in the first place -
+  #   it should never appear on the website and is only intended for
+  #   debugging.
+
+  missingLinkContent: "(Missing link content)"
+
+  # nav:
+  #   Generic navigational elements. These usually only appear in the
+  #   wiki's nav bar, at the top of the page.
+
+  nav:
+    previous: "Previous"
+    next: "Next"
+    info: "Info"
+    gallery: "Gallery"
+
+  # pageTitle:
+  #   Title set under the page's <title> HTML element, which is
+  #   displayed in the browser tab bar, bookmarks list, etc.
+
+  pageTitle:
+    _: "{TITLE}"
+    withWikiName: "{TITLE} | {WIKI_NAME}"
+
+  # skippers:
+  #
+  #   These are navigational links that only show up when you're
+  #   navigating the wiki using the Tab key (or some other method of
+  #   "tabbing" between links and interactive elements). They move
+  #   the browser's nav focus to the selected element when pressed.
+  #
+  #   There are a lot of definitions here, and they're mostly shown
+  #   conditionally, based on the elements that are actually apparent
+  #   on the current page.
+  #
+
+  skippers:
+    skipTo: "Skip to:"
+
+    content: "Content"
+    header: "Header"
+    footer: "Footer"
+
+    sidebar:
+      _: "Sidebar"
+      left: "Sidebar (left)"
+      right: "Sidebar (right)"
+
+    # Displayed on artist info page.
+
+    tracks: "Tracks"
+    artworks: "Artworks"
+    flashes: "Flashes & Games"
+
+    # Displayed on track and flash info pages.
+
+    contributors: "Contributors"
+
+    # Displayed on track info page.
+
+    references: "References..."
+    referencedBy: "Referenced by..."
+    samples: "Samples..."
+    sampledBy: "Sampled by..."
+    features: "Features..."
+    featuredIn: "Featured in..."
+
+    lyrics: "Lyrics"
+
+    sheetMusicFiles: "Sheet music files"
+    midiProjectFiles: "MIDI/project files"
+
+    # Displayed on track and album info pages.
+
+    commentary: "Commentary"
+
+    artistCommentary: "Commentary"
+    additionalFiles: "Additional files"
+
+  # socialEmbed:
+  #   Social embeds describe how the page should be represented on
+  #   social platforms, chat messaging apps, and so on.
+
+  socialEmbed:
+    heading: "{WIKI_NAME} | {HEADING}"
+
+  # jumpTo:
+  #   Generic action displayed at the top of some longer pages, for
+  #   quickly scrolling down to a particular section.
+
+  jumpTo:
+    _: "Jump to:"
+    withLinks: "Jump to: {LINKS}."
+
+  # contentWarnings:
+  #   Displayed for some artworks, informing of possibly sensitive
+  #   content and giving the viewer a chance to consider before
+  #   clicking through.
+
+  contentWarnings:
+    _: "cw: {WARNINGS}"
+    reveal: "click to show"
+
+  # albumGrid:
+  #   Generic strings for various sorts of gallery grids, displayed
+  #   on the homepage, album galleries, artist artwork galleries, and
+  #   so on. These get the name of the thing being represented and,
+  #   often, a bit of text providing pertinent extra details about
+  #   that thing.
+
+  albumGrid:
+    noCoverArt: "{ALBUM}"
+
+    details:
+      _: "({TRACKS}, {TIME})"
+      coverArtists: "(Illust. {ARTISTS})"
+      otherCoverArtists: "(With {ARTISTS})"
+
+  albumGalleryGrid:
+    noCoverArt: "{NAME}"
+
+  # uiLanguage:
+  #   Displayed in the footer, for switching between languages.
+
+  uiLanguage: "UI Language: {LANGUAGES}"
+
+#
+# homepage:
+#   This is the main index and home for the whole wiki! There isn't
+#   much for strings here as the layout is very customizable and
+#   includes mostly wiki-provided content.
+#
+homepage:
+  title: "{TITLE}"
+
+  # news:
+  #   If the wiki has news entries enabled, then there's a box in the
+  #   homepage's sidebar (beneath custom sidebar content, if any)
+  #   which displays the bodies the latest few entries up to a split.
+
+  news:
+    title: "News"
+
+    entry:
+      viewRest: "(View rest of entry!)"
+
+#
+# albumSidebar:
+#   This sidebar is displayed on both the album and track info pages!
+#   It displays the groups that the album is from (each getting its
+#   own box on the album page, all conjoined in one box on the track
+#   page) and the list of tracks in the album, which can be sectioned
+#   similarly to normal track lists, but displays the range of tracks
+#   in each section rather than the section's duration.
+#
+albumSidebar:
+  trackList:
+    item: "{TRACK}"
+
+    # fallbackSectionName:
+    #   If an album's track list isn't sectioned, the track list here
+    #   will still have all the tracks grouped under a list that can
+    #   be toggled open and closed. This controls how that list gets
+    #   titled.
+
+    fallbackSectionName: "Track list"
+
+    # group:
+    #   "Group" is a misnomer - these are track sections. Some albums
+    #   don't use track numbers at all, and for these, the default
+    #   string will be used instead of group.withRange.
+
+    group:
+      _: "{GROUP}"
+      withRange: "{GROUP} ({RANGE})"
+
+  # groupBox:
+  #   This is the box for groups. Apart from the next and previous
+  #   links, it also gets "visit on" and the group's descripton
+  #   (up to a split).
+
+  groupBox:
+    title: "{GROUP}"
+    next: "Next: {ALBUM}"
+    previous: "Previous: {ALBUM}"
+
+#
+# albumPage:
+#
+#   Albums group together tracks and provide quick access to each of
+#   their pages, have release data (and sometimes credits) that are
+#   generally inherited by the album's tracks plus commentary and
+#   other goodies of their own, and are generally the main object on
+#   the wiki!
+#
+#   Most of the strings on the album info page are tracked under
+#   releaseInfo, so there isn't a lot here.
+#
+albumPage:
+  title: "{ALBUM}"
+
+  nav:
+    album: "{ALBUM}"
+    randomTrack: "Random Track"
+    gallery: "Gallery"
+    commentary: "Commentary"
+
+  socialEmbed:
+    heading: "{GROUP}"
+    title: "{ALBUM}"
+
+    # body:
+    #   These permutations are a bit awkward. "Tracks" is a counted
+    #   string, ex. "63 tracks".
+
+    body:
+      withDuration: "{DURATION}."
+      withTracks: "{TRACKS}."
+      withReleaseDate: Released {DATE}.
+      withDuration.withTracks: "{DURATION}, {TRACKS}."
+      withDuration.withReleaseDate: "{DURATION}. Released {DATE}."
+      withTracks.withReleaseDate: "{TRACKS}. Released {DATE}."
+      withDuration.withTracks.withReleaseDate: "{DURATION}, {TRACKS}. Released {DATE}."
+
+#
+# albumGalleryPage:
+#   Album galleries provide an alternative way to navigate the album,
+#   and put all its artwork - including for each track - into the
+#   spotlight. Apart from the main gallery grid (which usually lists
+#   each artwork's illustrators), this page also has a quick stats
+#   line about the album, and may display a message about all of the
+#   artworks if one applies.
+#
+albumGalleryPage:
+  title: "{ALBUM} - Gallery"
+
+  # statsLine:
+  #   Most albums have release dates, but not all. These strings
+  #   react accordingly.
+
+  statsLine: >-
+    {TRACKS} totaling {DURATION}.
+
+  statsLine.withDate: >-
+    {TRACKS} totaling {DURATION}. Released {DATE}.
+
+  # coverArtistsLine:
+  #   This is displayed if every track (which has artwork at all)
+  #   has the same illustration credits.
+
+  coverArtistsLine: >-
+    All track artwork by {ARTISTS}.
+
+  # noTrackArtworksLine:
+  #   This is displayed if none of the tracks on the album have any
+  #   artwork at all. Generally, this means the album gallery won't
+  #   be linked from the album's other pages, but it is possible to
+  #   end up on "stub galleries" using nav links on another gallery.
+
+  noTrackArtworksLine: >-
+    This album doesn't have any track artwork.
+
+#
+# albumCommentaryPage:
+#   The album commentary page is a more minimal layout that brings
+#   the commentary for the album, and each of its tracks, to the
+#   front. It's basically inspired by reading in a library, or by
+#   following along with an album's booklet or liner notes while
+#   playing it back on a treasured dinky CD player late at night.
+#
+albumCommentaryPage:
+  title: "{ALBUM} - Commentary"
+
+  nav:
+    album: "Album: {ALBUM}"
+
+  infoLine: >-
+    {WORDS} across {ENTRIES}.
+
+  entry:
+    title:
+      albumCommentary: "Album commentary"
+      trackCommentary: "{TRACK}"
+
+#
+# artistInfoPage:
+#   The artist info page is an artist's main home on the wiki, and
+#   automatically includes a full list of all the things they've
+#   contributed to and been credited on. It's split into a section
+#   for each of the kinds of things the artist is credited for,
+#   including tracks, artworks, flashes/games, and commentary.
+#
+artistPage:
+  title: "{ARTIST}"
+
+  nav:
+    artist: "Artist: {ARTIST}"
+
+  creditList:
+
+    # album:
+    #   Tracks are chunked by albums, as long as the tracks are all
+    #   of the same date (if applicable).
+
+    album:
+      _: "{ALBUM}"
+      withDate: "{ALBUM} ({DATE})"
+      withDuration: "{ALBUM} ({DURATION})"
+      withDate.withDuration: "{ALBUM} ({DATE}; {DURATION})"
+
+    # flashAct:
+    #   Flashes are chunked by flash act, though a single flash act
+    #   might be split into multiple chunks if it spans a long range
+    #   and the artist contributed to a flash from some other act
+    #   between. A date range will be shown if an act has at least
+    #   two differently dated flashes.
+
+    flashAct:
+      _: "{ACT}"
+      withDate: "{ACT} ({DATE})"
+      withDateRange: "{ACT} ({DATE_RANGE})"
+
+    # entry:
+    #   This section covers strings for all kinds of individual
+    #   things which an artist has contributed to, and refers to the
+    #   items in each of the chunks described above.
+
+    entry:
+
+      # withContribution:
+      #   The specific contribution that an artist made to a given
+      #   thing may be described with a word or two, and that's shown
+      #   in the list.
+
+      withContribution: "{ENTRY} ({CONTRIBUTION})"
+
+      # withArtists:
+      #   This lists co-artists or co-contributors, depending on how
+      #   the artist themselves was credited.
+
+      withArtists: "{ENTRY} (with {ARTISTS})"
+
+      withArtists.withContribution: "{ENTRY} ({CONTRIBUTION}; with {ARTISTS})"
+
+      # rerelease:
+      #   Tracks which aren't the original release don't display co-
+      #   artists or contributors, and get dimmed a little compared
+      #   to original release track entries.
+
+      rerelease: "{ENTRY} (re-release)"
+
+      # track:
+      #   The string without duration is used in both the artist's
+      #   track credits list as well as their commentary list.
+
+      track:
+        _: "{TRACK}"
+        withDuration: "({DURATION}) {TRACK}"
+
+      # album:
+      #   The artist info page doesn't display if the artist is
+      #   musically credited outright for the album as a whole,
+      #   opting to show each of the tracks from that album instead.
+      #   But other parts belonging specifically to the album have
+      #   credits too, and those entreis get the strings below.
+
+      album:
+        coverArt: "(cover art)"
+        wallpaperArt: "(wallpaper art)"
+        bannerArt: "(banner art)"
+        commentary: "(album commentary)"
+
+      flash:
+        _: "{FLASH}"
+
+  # contributedDurationLine:
+  #   This is shown at the top of the artist's track list, provided
+  #   any of their tracks have durations at all.
+
+  contributedDurationLine: >-
+    {ARTIST} has contributed {DURATION} of music shared on this wiki.
+
+  # groupContributions:
+  #   This is a special "chunk" shown at the top of an artist's
+  #   track and artwork lists. It lists which groups an artist has
+  #   contributed the most (and least) to, and is interactive -
+  #   it can be sorted by count or, for tracks, by duration.
+
+  groupContributions:
+    title:
+      music: "Contributed music to groups:"
+      artworks: "Contributed artworks to groups:"
+      withSortButton: "{TITLE} ({SORT})"
+
+      sorting:
+        count: "Sorting by count."
+        duration: "Sorting by duration."
+
+    item:
+      countAccent: "({COUNT})"
+      durationAccent: "({DURATION})"
+      countDurationAccent: "({COUNT} — {DURATION})"
+      durationCountAccent: "({DURATION} — {COUNT})"
+
+  trackList:
+    title: "Tracks"
+
+  artList:
+    title: "Artworks"
+
+  flashList:
+    title: "Flashes & Games"
+
+  commentaryList:
+    title: "Commentary"
+
+  # viewArtGallery:
+  #   This is shown twice on the page - once at almost the very top
+  #   of the page, just beneath visiting links, and once above the
+  #   list of credited artworks, where it gets the longer
+  #   orBrowseList form.
+
+  viewArtGallery:
+    _: "View {LINK}!"
+    orBrowseList: "View {LINK}! Or browse the list:"
+    link: "art gallery"
+
+#
+# artistGalleryPage:
+#   The artist gallery page shows a neat grid of all of the album and
+#   track artworks an artist has contributed to! Co-illustrators are
+#   also displayed when applicable.
+#
+artistGalleryPage:
+  title: "{ARTIST} - Gallery"
+
+  infoLine: >-
+    Contributed to {COVER_ARTS}.
+
+#
+# commentaryIndex:
+#   The commentary index page shows a summary of all the commentary
+#   across the entire wiki, with a list linking to each album's
+#   dedicated commentary page.
+#
+commentaryIndex:
+  title: "Commentary"
+
+  infoLine: >-
+    {WORDS} across {ENTRIES}, in all.
+
+  albumList:
+    title: "Choose an album:"
+    item: "{ALBUM} ({WORDS} across {ENTRIES})"
+
+#
+# flashIndex:
+#   The flash index page shows a very long grid including every flash
+#   on the wiki, sectioned with big headings for each act. It's also
+#   got jump links at the top to skip to a specific overarching
+#   section ("side") of flash acts.
+#
+flashIndex:
+  title: "Flashes & Games"
+
+#
+# flashSidebar:
+#   The flash sidebar is used on both the flash info and flash act
+#   gallery pages, and has two boxes - one showing all the flashes in
+#   the current flash act, and one showing all the flash acts on the
+#   wiki, sectioned by "side".
+#
+flashSidebar:
+  flashList:
+
+    # These two strings are the default ones used when a flash act
+    # doesn't specify a custom phrasing.
+    flashesInThisAct: "Flashes in this act"
+    entriesInThisSection: "Entries in this section"
+
+#
+# flashPage:
+#   The flash info page shows release information, links to check the
+#   flash out, and lists of contributors and featured tracks. Most of
+#   those strings are under releaseInfo, so there aren't a lot of
+#   strings here.
+#
+flashPage:
+  title: "{FLASH}"
+
+  nav:
+    flash: "{FLASH}"
+
+#
+# groupSidebar:
+#   The group sidebar is used on both the group info and group
+#   gallery pages, and is formed of just one box, showing all the
+#   groups on the wiki, sectioned by "category".
+#
+groupSidebar:
+  title: "Groups"
+
+  groupList:
+    category: "{CATEGORY}"
+    item: "{GROUP}"
+
+#
+# groupPage:
+#   This section represents strings common to multiple group pages.
+#
+groupPage:
+  nav:
+    group: "Group: {GROUP}"
+
+#
+# groupInfoPage:
+#   The group info page shows visiting links, the group's full
+#   description, and a list of albums from the group.
+#
+groupInfoPage:
+  title: "{GROUP}"
+
+  viewAlbumGallery:
+    _: "View {LINK}! Or browse the list:"
+    link: "album gallery"
+
+  # albumList:
+  #   Many albums are present under multiple groups, and these get an
+  #   accent indicating what other group is highest on the album's
+  #   list of groups.
+
+  albumList:
+    title: "Albums"
+
+    item:
+      _: "({YEAR}) {ALBUM}"
+      withoutYear: "{ALBUM}"
+      withAccent: "{ITEM} {ACCENT}"
+      otherGroupAccent: "(from {GROUP})"
+
+#
+# groupGalleryPage:
+#   The group gallery page shows a grid of all the albums from that
+#   group, each including the number of tracks and duration, as well
+#   as a stats line for the group as a whole, and a neat carousel, if
+#   pre-configured!
+#
+groupGalleryPage:
+  title: "{GROUP} - Gallery"
+
+  infoLine: >-
+    {TRACKS} across {ALBUMS}, totaling {TIME}.
+
+#
+# listingIndex:
+#   The listing index page shows all available listings on the wiki,
+#   and a very exciting stats line for the wiki as a whole.
+#
+listingIndex:
+  title: "Listings"
+
+  infoLine: >-
+    {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
+
+  exploreList: >-
+    Feel free to explore any of the listings linked below and in the sidebar!
+
+#
+# listingPage:
+#
+#   There are a lot of listings! Each is automatically generated and
+#   sorts or organizes the data on the wiki in some way that provides
+#   useful or interesting information. Most listings work primarily
+#   with one kind of data and are sectioned accordingly, for example
+#   "listAlbums.byDuration" or "listTracks.byDate".
+#
+#   There are also some miscellaneous strings here, most of which are
+#   common to a variety of listings, and are often navigational in
+#   nature.
+#
+listingPage:
+
+  # target:
+  #   Just the names for each of the sections - each chunk on the
+  #   listing index (and in the sidebar) gets is titled with one of
+  #   these.
+
+  target:
+    album: "Albums"
+    artist: "Artists"
+    group: "Groups"
+    track: "Tracks"
+    tag: "Tags"
+    other: "Other"
+
+  # misc:
+  #   Common, generic terminology across multiple listings.
+
+  misc:
+    trackContributors: "Track Contributors"
+    artContributors: "Art Contributors"
+    flashContributors: "Flash & Game Contributors"
+    artAndFlashContributors: "Art & Flash Contributors"
+
+  # listingFor:
+  #   Displays quick links to navigate to other listings for the
+  #   current target.
+
+  listingsFor: "Listings for {TARGET}: {LISTINGS}"
+
+  # seeAlso:
+  #   Displays directly related listings, which might be from other
+  #   targets besides the current one.
+
+  seeAlso: "Also check out: {LISTINGS}"
+
+  # skipToSection:
+  #   Some listings which use a chunked-list layout also show links
+  #   to scroll down to each of these sections - this is the title
+  #   for the list of those links.
+
+  skipToSection: "Skip to a section:"
+
+  listAlbums:
+
+    # listAlbums.byName:
+    #   Lists albums alphabetically without sorting or chunking by
+    #   any other criteria. Also displays the number of tracks for
+    #   each album.
+
+    byName:
+      title: "Albums - by Name"
+      title.short: "...by Name"
+      item: "{ALBUM} ({TRACKS})"
+
+    # listAlbums.byTracks:
+    #   Lists albums by number of tracks, most to least, or by name
+    #   alphabetically, if two albums have the same track count.
+    #   Albums without any tracks are totally excluded.
+
+    byTracks:
+      title: "Albums - by Tracks"
+      title.short: "...by Tracks"
+      item: "{ALBUM} ({TRACKS})"
+
+    # listAlbums.byDuration:
+    #   Lists albums by total duration of all tracks, longest to
+    #   shortest, falling back to an alphabetical sort if two albums
+    #   are the same duration. Albums with zero duration are totally
+    #   excluded.
+
+    byDuration:
+      title: "Albums - by Duration"
+      title.short: "...by Duration"
+      item: "{ALBUM} ({DURATION})"
+
+    # listAlbums.byDate:
+    #   Lists albums by release date, oldest to newest, falling back
+    #   to an alphabetical sort if two albums were released on the
+    #   same date. Dateless albums are totally excluded.
+
+    byDate:
+      title: "Albums - by Date"
+      title.short: "...by Date"
+      item: "{ALBUM} ({DATE})"
+
+    # listAlbums.byDateAdded:
+    #   Lists albums by the date they were added to the wiki, oldest
+    #   to newest, and chunks these by date, since albums are usually
+    #   added in bunches at a time. The albums in each chunk are
+    #   sorted alphabetically, and albums which are missing the
+    #   "Date Added" field are totally excluded.
+
+    byDateAdded:
+      title: "Albums - by Date Added to Wiki"
+      title.short: "...by Date Added to Wiki"
+      chunk:
+        title: "{DATE}"
+        item: "{ALBUM}"
+
+  listArtists:
+
+    # listArtists.byName:
+    #   Lists artists alphabetically without sorting or chunking by
+    #   any other criteria. Also displays the number of contributions
+    #   from each artist.
+
+    byName:
+      title: "Artists - by Name"
+      title.short: "...by Name"
+      item: "{ARTIST} ({CONTRIBUTIONS})"
+
+    # listArtists.byContribs:
+    #   Lists artists by number of contributions, most to least,
+    #   with separate lists for contributions to tracks, artworks,
+    #   and flashes. Falls back alphabetically if two artists have
+    #   the same number of contributions. Artists who aren't credited
+    #   for any contributions to each of these categories are
+    #   excluded from the respective list.
+
+    byContribs:
+      title: "Artists - by Contributions"
+      title.short: "...by Contributions"
+      chunk:
+        item: "{ARTIST} ({CONTRIBUTIONS})"
+        title:
+          trackContributors: "Contributed tracks:"
+          artContributors: "Contributed artworks:"
+          flashContributors: "Contributed to flashes & games:"
+
+    # listArtists.byCommentary:
+    #   Lists artists by number of commentary entries, most to least,
+    #   falling back to an alphabetical sort if two artists have the
+    #   same count. Artists who don't have any commentary entries are
+    #   totally excluded.
+
+    byCommentary:
+      title: "Artists - by Commentary Entries"
+      title.short: "...by Commentary Entries"
+      item: "{ARTIST} ({ENTRIES})"
+
+    # listArtists.byDuration:
+    #   Lists artists by total duration of the tracks which they're
+    #   credited on (as either artist or contributor), longest sum to
+    #   shortest, falling back alphabetically if two artists have
+    #   the same duration. Artists who haven't contributed any music,
+    #   or whose tracks all lack durations, are totally excluded.
+
+    byDuration:
+      title: "Artists - by Duration"
+      title.short: "...by Duration"
+      item: "{ARTIST} ({DURATION})"
+
+    # listArtists.byGroup:
+    #   Lists artists who have contributed to each of the main groups
+    #   of a wiki (its "Divide Track Lists By Groups" field), sorted
+    #   alphabetically. Artists who aren't credited for contributions
+    #   under each of the groups are exlcuded from the respective
+    #   list.
+
+    byGroup:
+      title: "Artists - by Group"
+      title.short: "...by Group"
+      item: "{ARTIST} ({CONTRIBUTIONS})"
+      chunk:
+        title: "Contributed to {GROUP}:"
+        item: "{ARTIST} ({CONTRIBUTIONS})"
+
+    # listArtists.byLatest:
+    #   Lists artists by the date of their latest contribution
+    #   overall, and chunks artists together by the album or flash
+    #   which that contribution belongs to. Within albums, each
+    #   artist is accented with the kind of contribution they made -
+    #   tracks, artworks, or both - and sorted so those of the same
+    #   sort of contribution are bunched together, then by name.
+    #   Artists who aren't credited for any dated contributions are
+    #   included at the bottom under a separate chunk.
+
+    byLatest:
+      title: "Artists - by Latest Contribution"
+      title.short: "...by Latest Contribution"
+      chunk:
+        title:
+          album: "{ALBUM} ({DATE})"
+          flash: "{FLASH} ({DATE})"
+          dateless: "These artists' contributions aren't dated:"
+        item:
+          _: "{ARTIST}"
+          tracks: "{ARTIST} (tracks)"
+          tracksAndArt: "{ARTIST} (tracks, art)"
+          art: "{ARTIST} (art)"
+
+  listGroups:
+
+    # listGroups.byName:
+    #   Lists groups alphabetically without sorting or chunking by
+    #   any other criteria. Also displays a link to each group's
+    #   gallery page.
+
+    byName:
+      title: "Groups - by Name"
+      title.short: "...by Name"
+      item: "{GROUP} ({GALLERY})"
+      item.gallery: "Gallery"
+
+    # listGroups.byCategory:
+    #   Lists groups directly reflecting the way they're sorted in
+    #   the wiki's groups.yaml data file, with no automatic sorting,
+    #   chunked (as sectioned in groups.yaml) by category. Also shows
+    #   a link to each group's gallery page.
+
+    byCategory:
+      title: "Groups - by Category"
+      title.short: "...by Category"
+
+      chunk:
+        title: "{CATEGORY}"
+        item: "{GROUP} ({GALLERY})"
+        item.gallery: "Gallery"
+
+    # listGroups.byAlbums:
+    #   Lists groups by number of belonging albums, most to least,
+    #   falling back alphabetically if two groups have the same
+    #   number of albums. Groups without any albums are totally
+    #   excluded.
+
+    byAlbums:
+      title: "Groups - by Albums"
+      title.short: "...by Albums"
+      item: "{GROUP} ({ALBUMS})"
+
+    # listGroups.byTracks:
+    #   Lists groups by number of tracks under each group's albums,
+    #   most to least, falling back to an alphabetical sort if two
+    #   groups have the same track counts. Groups without any tracks
+    #   are totally excluded.
+
+    byTracks:
+      title: "Groups - by Tracks"
+      title.short: "...by Tracks"
+      item: "{GROUP} ({TRACKS})"
+
+    # listGroups.byDuration:
+    #   Lists groups by sum of durations of all the tracks under each
+    #   of the group's albums, longest to shortest, falling back to
+    #   an alphabetical sort if two groups have the same duration.
+    #   Groups whose total duration is zero are totally excluded.
+
+    byDuration:
+      title: "Groups - by Duration"
+      title.short: "...by Duration"
+      item: "{GROUP} ({DURATION})"
+
+    # listGroups.byLatest:
+    #   List groups by release date of each group's most recent
+    #   album, most recent to longest ago, falling back to sorting
+    #   alphabetically if two groups' latest albums were released
+    #   on the same date. Groups which don't have any albums, or
+    #   whose albums are all dateless, are totally excluded.
+
+    byLatest:
+      title: "Groups - by Latest Album"
+      title.short: "...by Latest Album"
+      item: "{GROUP} ({DATE})"
+
+  listTracks:
+
+    # listTracks.byName:
+    #   List tracks alphabetically without sorting or chunking by
+    #   any other criteria.
+
+    byName:
+      title: "Tracks - by Name"
+      title.short: "...by Name"
+      item: "{TRACK}"
+
+    # listTracks.byAlbum:
+    #   List tracks chunked by the album they're from, retaining the
+    #   position each track occupies in its album, and sorting albums
+    #   from oldest to newest (or alphabetically, if two albums were
+    #   released on the same date). Dateless albums are included at
+    #   the bottom of the list. Custom "Date First Released" fields
+    #   on individual tracks are totally ignored.
+
+    byAlbum:
+      title: "Tracks - by Album"
+      title.short: "...by Album"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK}"
+
+    # listTracks.byDate:
+    #   List tracks according to their own release dates, which may
+    #   differ from that of the album via the "Date First Released"
+    #   field, oldest to newest, and chunked by album when multiple
+    #   tracks from one album were released on the same date. Track
+    #   order within a given album is preserved where possible.
+    #   Dateless albums are excluded, except for contained tracks
+    #   which have custom "Date First Released" fields.
+
+    byDate:
+      title: "Tracks - by Date"
+      title.short: "...by Date"
+
+      chunk:
+        title: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+        item.rerelease: "{TRACK} (re-release)"
+
+    # listTracks.byDuration:
+    #   List tracks by duration, longest to shortest, falling back to
+    #   an alphabetical sort if two tracks have the same duration.
+    #   Tracks which don't have any duration are totally excluded.
+
+    byDuration:
+      title: "Tracks - by Duration"
+      title.short: "...by Duration"
+      item: "{TRACK} ({DURATION})"
+
+    # listTracks.byDurationInAlbum:
+    #   List tracks chunked by the album they're from, then sorted
+    #   by duration, longest to shortest; albums are sorted by date,
+    #   oldest to newest, and both sorts fall back alphabetically.
+    #   Dateless albums are included at the bottom of the list.
+
+    byDurationInAlbum:
+      title: "Tracks - by Duration (in Album)"
+      title.short: "...by Duration (in Album)"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK} ({DURATION})"
+
+    # listTracks.byTimesReferenced:
+    #   List tracks by how many other tracks' reference lists each
+    #   appears in, most times referenced to fewest, falling back
+    #   alphabetically if two tracks have been referenced the same
+    #   number of times. Tracks that aren't referenced by any other
+    #   tracks are totally excluded from the list.
+
+    byTimesReferenced:
+      title: "Tracks - by Times Referenced"
+      title.short: "...by Times Referenced"
+      item: "{TRACK} ({TIMES_REFERENCED})"
+
+    # listTracks.inFlashes.byAlbum:
+    #   List tracks, chunked by album (which are sorted by date,
+    #   falling back alphabetically) and in their usual track order,
+    #   and display the list of flashes that eack track is featured
+    #   in. Tracks which aren't featured in any flashes are totally
+    #   excluded from the list.
+
+    inFlashes.byAlbum:
+      title: "Tracks - in Flashes & Games (by Album)"
+      title.short: "...in Flashes & Games (by Album)"
+
+      chunk:
+        title: "{ALBUM}"
+        item: "{TRACK} (in {FLASHES})"
+
+    # listTracks.inFlashes.byFlash:
+    #   List tracks, chunked by flash (which are sorted by date,
+    #   retaining their positions in a common act where applicable,
+    #   or else by the two acts' names) and sorted according to the
+    #   featured list of the flash, and display a link to the album
+    #   each track is contained in. Tracks which aren't featured in
+    #   any flashes are totally excluded from the list.
+
+    inFlashes.byFlash:
+      title: "Tracks - in Flashes & Games (by Flash)"
+      title.short: "...in Flashes & Games (by Flash)"
+
+      chunk:
+        title: "{FLASH}"
+        item: "{TRACK} (from {ALBUM})"
+
+    # listTracks.withLyrics:
+    #   List tracks, chunked by album (which are sorted by date,
+    #   falling back alphabetically) and in their usual track order,
+    #   displaying only tracks which have lyrics. The chunk titles
+    #   also display the date each album was released, and tracks'
+    #   own custom "Date First Released" fields are totally ignored.
+
+    withLyrics:
+      title: "Tracks - with Lyrics"
+      title.short: "...with Lyrics"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+    # listTracks.withSheetMusicFiles:
+    #   List tracks, chunked by album (which are sorted by date,
+    #   falling back alphabetically) and in their usual track order,
+    #   displaying only tracks which have sheet music files. The
+    #   chunk titles also display the date each album was released,
+    #   and tracks' own custom "Date First Released" fields are
+    #   totally ignored.
+
+    withSheetMusicFiles:
+      title: "Tracks - with Sheet Music Files"
+      title.short: "...with Sheet Music Files"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+    # listTracks.withMidiProjectFiles:
+    #   List tracks, chunked by album (which are sorted by date,
+    #   falling back alphabetically) and in their usual track order,
+    #   displaying only tracks which have MIDI & project files. The
+    #   chunk titles also display the date each album was released,
+    #   and tracks' own custom "Date First Released" fields are
+    #   totally ignored.
+
+    withMidiProjectFiles:
+      title: "Tracks - with MIDI & Project Files"
+      title.short: "...with MIDI & Project Files"
+
+      chunk:
+        title: "{ALBUM}"
+        title.withDate: "{ALBUM} ({DATE})"
+        item: "{TRACK}"
+
+  listTags:
+
+    # listTags.byName:
+    #   List art tags alphabetically without sorting or chunking by
+    #   any other criteria. Also displays the number of times each
+    #   art tag has been featured.
+
+    byName:
+      title: "Tags - by Name"
+      title.short: "...by Name"
+      item: "{TAG} ({TIMES_USED})"
+
+    # listTags.byUses:
+    #   List art tags by number of times used, falling back to an
+    #   alphabetical sort if two art tags have been featured the same
+    #   number of times. Art tags which haven't haven't been featured
+    #   at all yet are totally excluded from the list.
+
+    byUses:
+      title: "Tags - by Uses"
+      title.short: "...by Uses"
+      item: "{TAG} ({TIMES_USED})"
+
+  other:
+
+    # other.allSheetMusic:
+    #   List all sheet music files, sectioned by album (which are
+    #   sorted by date, falling back alphabetically) and then by
+    #   track (which retain album ordering). If one "file" entry
+    #   contains multiple files, then it's displayed as an expandable
+    #   list, collapsed by default, accented with the number of
+    #   downloadable files.
+
+    allSheetMusic:
+      title: "All Sheet Music"
+      title.short: "All Sheet Music"
+      albumFiles: "Album sheet music:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    # other.midiProjectFiles:
+    #   Same as other.allSheetMusic, but for MIDI & project files.
+
+    allMidiProjectFiles:
+      title: "All MIDI/Project Files"
+      title.short: "All MIDI/Project Files"
+      albumFiles: "Album MIDI/project files:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    # other.additionalFiles:
+    #   Same as other.allSheetMusic, but for additional files.
+
+    allAdditionalFiles:
+      title: "All Additional Files"
+      title.short: "All Additional Files"
+      albumFiles: "Album additional files:"
+
+      file:
+        _: "{TITLE}"
+        withMultipleFiles: "{TITLE} ({FILES})"
+
+    # other.randomPages:
+    #   Special listing which shows a bunch of buttons that each
+    #   link to a random page on the wiki under a particular scope.
+
+    randomPages:
+      title: "Random Pages"
+      title.short: "Random Pages"
+
+      # chooseLinkLine:
+      #   Introductory line explaining the links on this listing.
+
+      chooseLinkLine:
+        _: "{FROM_PART} {BROWSER_SUPPORT_PART}"
+
+        fromPart:
+          dividedByGroups: >-
+            Choose a link to go to a random page in that group or album!
+          notDividedByGroups: >-
+            Choose a link to go to a random page in that album!
+
+        browserSupportPart: >-
+          If your browser doesn't support relatively modern JavaScript
+          or you've disabled it, these links won't work - sorry.
+
+      # dataLoadingLine, dataLoadedLine:
+      #   Since the links on this page depend on access to a fairly
+      #   large data file that is downloaded separately and in the
+      #   background, these messages indicate the status of that
+      #   download and whether or not the links will work yet.
+
+      dataLoadingLine: >-
+        (Data files are downloading in the background! Please wait for data to load.)
+
+      dataLoadedLine: >-
+        (Data files have finished being downloaded. The links should work!)
+
+      chunk:
+
+        title:
+          misc: "Miscellaneous:"
+
+          # fromAlbum:
+          #   If the wiki hasn't got "Divide Track Lists By Groups"
+          #   set, all albums across the wiki are grouped in one
+          #   long chunk.
+
+          fromAlbum: "From an album:"
+
+          # fromGroup:
+          #   If the wiki does have "Divide Track Lists By Groups"
+          #   set, there's one chunk past Miscellaneous for each of
+          #   those groups, listing all the albums from that group,
+          #   each of which links to a random track from that album.
+
+          fromGroup:
+            _: "From {GROUP}:"
+
+            accent:
+              _: "({RANDOM_ALBUM}, {RANDOM_TRACK})"
+              randomAlbum: "Random Album"
+              randomTrack: "Random Track"
+
+        item:
+          album: "{ALBUM}"
+
+          randomArtist:
+            _: "{MAIN_LINK} ({AT_LEAST_TWO_CONTRIBUTIONS})"
+            mainLink: "Random Artist"
+            atLeastTwoContributions: "at least 2 contributions"
+
+          randomAlbumWholeSite: "Random Album (whole site)"
+          randomTrackWholeSite: "Random Track (whole site)"
+
+#
+# newsIndex:
+#   The news index page shows a list of every news entry on the wiki!
+#   (If it's got news entries enabled.) Each entry gets a stylized
+#   heading with its name of and date, sorted newest to oldest, as
+#   well as its body (up to a split) and a link to view the rest of
+#   the entry on its dedicated news entry page.
+#
+newsIndex:
+  title: "News"
+
+  entry:
+    viewRest: "(View rest of entry!)"
+
+#
+# newsEntryPage:
+#   The news entry page displays all the content of a news entry,
+#   as well as its date published, in one big list, and has nav links
+#   to go to the previous and next news entry.
+#
+newsEntryPage:
+  title: "{ENTRY}"
+  published: "(Published {DATE}.)"
+
+#
+# redirectPage:
+#   Static "placeholder" pages when redirecting a visitor from one
+#   page to another - this generally happens automatically, before
+#   you have a chance to read the page, so content is concise.
+#
+redirectPage:
+  title: "Moved to {TITLE}"
+
+  infoLine: >-
+    This page has been moved to {TARGET}.
+
+#
+# tagPage:
+#   The tag gallery page displays all the artworks that a tag has
+#   been featured in, in one neat grid, with each artwork displaying
+#   its illustrators, as well as a short info line that indicates
+#   how many artworks the tag's part of.
+#
+tagPage:
+  title: "{TAG}"
+
+  nav:
+    tag: "Tag: {TAG}"
+
+  infoLine: >-
+    Appears in {COVER_ARTS}.
+
+#
+# trackPage:
+#
+#   The track info page is pretty much the most discrete and common
+#   chunk of information across the whole site, displaying info about
+#   the track like its release date, artists, cover illustrators,
+#   commentary, and more, as well as relational info, like the tracks
+#   it references and tracks which reference it, and flashes which
+#   it's been featured in. Tracks can also have extra related files,
+#   like sheet music and MIDI/project files.
+#
+#   Most of the details about tracks use strings that are defined
+#   under releaseInfo, so this section is a little sparse.
+#
+trackPage:
+  title: "{TRACK}"
+
+  nav:
+    random: "Random"
+
+    track:
+      _: "{TRACK}"
+      withNumber: "{NUMBER}. {TRACK}"
+
+  socialEmbed:
+    heading: "{ALBUM}"
+    title: "{TRACK}"
+
+    body:
+      withArtists.withCoverArtists: "By {ARTISTS}; art by {COVER_ARTISTS}."
+      withArtists: "By {ARTISTS}."
+      withCoverArtists: "Art by {COVER_ARTISTS}."

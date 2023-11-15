@@ -181,6 +181,10 @@ export function tags(content, attributes = null) {
   return new Tag(null, attributes, content);
 }
 
+export function normalize(content) {
+  return Tag.normalize(content);
+}
+
 export class Tag {
   #tagName = '';
   #content = null;

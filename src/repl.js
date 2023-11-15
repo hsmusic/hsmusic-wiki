@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 
 import {logError, logWarn, parseOptions} from '#cli';
 import {isMain} from '#node-utils';
-import {processLanguageFile} from '#language';
+import {internalDefaultStringsFile, processLanguageFile} from '#language';
 import {bindOpts, showAggregate} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {quickLoadAllFromYAML} from '#yaml';
@@ -44,10 +44,7 @@ export async function getContextAssignments({
 
   let language;
   try {
-    language = await processLanguageFile(
-      path.join(
-        path.dirname(fileURLToPath(import.meta.url)),
-        'strings-default.json'));
+    language = await processLanguageFile(internalDefaultStringsFile);
   } catch (error) {
     console.error(error);
     logWarn`Failed to create Language object`;

@@ -40,7 +40,8 @@ import wrap from 'word-wrap';
 
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
-import {processLanguageFile} from '#language';
+import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
+  from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
@@ -56,7 +57,6 @@ import {
   logError,
   parseOptions,
   progressCallAll,
-  progressPromiseAll,
 } from '#cli';
 
 import genThumbs, {
@@ -93,8 +93,6 @@ try {
 }
 
 const BUILD_TIME = new Date();
-
-const DEFAULT_STRINGS_FILE = 'strings-default.json';
 
 const STATUS_NOT_STARTED       = `not started`;
 const STATUS_NOT_APPLICABLE    = `not applicable`;
@@ -291,6 +289,18 @@ async function main() {
       type: 'flag',
     },
 
+    'no-input': {
+      help: `Don't wait on input from stdin - assume the device is headless`,
+      type: 'flag',
+    },
+
+    'no-language-reloading': {
+      help: `Don't reload language files while the build is running\n\nApplied by default for --static-build`,
+      type: 'flag',
+    },
+
+    'no-language-reload': {alias: 'no-language-reloading'},
+
     // Want sweet, sweet trace8ack info in aggreg8te error messages? This
     // will print all the juicy details (or at least the first relevant
     // line) right to your output, 8ut also pro8a8ly give you a headache
@@ -457,6 +467,8 @@ async function main() {
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
   const skipReferenceValidation = cliOptions['skip-reference-validation'] ?? false;
   const noBuild = cliOptions['no-build'] ?? false;
+  const noInput = cliOptions['no-input'] ?? false;
+  let noLanguageReloading = cliOptions['no-language-reloading'] ?? null; // Will get default later.
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
@@ -567,11 +579,23 @@ async function main() {
   }
 
   if (noBuild) {
+    logInfo`Won't generate any site or page files this run (--no-build passed).`;
+
     Object.assign(stepStatusSummary.performBuild, {
       status: STATUS_NOT_APPLICABLE,
       annotation: `--no-build provided`,
     });
+  } else if (usingDefaultBuildMode) {
+    logInfo`No build mode specified, will use default: ${selectedBuildModeFlag}`;
+  } else {
+    logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
   }
+
+  noLanguageReloading ??=
+    ({
+      'static-build': true,
+      'live-dev-server': false,
+    })[selectedBuildModeFlag];
 
   if (skipThumbs && thumbsOnly) {
     logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
@@ -764,14 +788,6 @@ async function main() {
     }
 
     thumbsCache = result.cache;
-  }
-
-  if (noBuild) {
-    logInfo`Not generating any site or page files this run (--no-build passed).`;
-  } else if (usingDefaultBuildMode) {
-    logInfo`No build mode specified, using default: ${selectedBuildModeFlag}`;
-  } else {
-    logInfo`Using specified build mode: ${selectedBuildModeFlag}`;
   }
 
   if (showInvalidPropertyAccesses) {
@@ -1085,18 +1101,52 @@ async function main() {
   });
 
   let internalDefaultLanguage;
+  let internalDefaultLanguageWatcher;
 
-  try {
-    internalDefaultLanguage =
-      await processLanguageFile(path.join(__dirname, DEFAULT_STRINGS_FILE));
+  let errorLoadingInternalDefaultLanguage = false;
 
-    Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
-    });
-  } catch (error) {
-    console.error(error);
+  if (noLanguageReloading) {
+    internalDefaultLanguageWatcher = null;
 
+    try {
+      internalDefaultLanguage = await processLanguageFile(internalDefaultStringsFile);
+    } catch (error) {
+      niceShowAggregate(error);
+      errorLoadingInternalDefaultLanguage = true;
+    }
+  } else {
+    internalDefaultLanguageWatcher = watchLanguageFile(internalDefaultStringsFile);
+
+    try {
+      await new Promise((resolve, reject) => {
+        const watcher = internalDefaultLanguageWatcher;
+
+        const onReady = () => {
+          watcher.removeListener('ready', onReady);
+          watcher.removeListener('error', onError);
+          resolve();
+        };
+
+        const onError = error => {
+          watcher.removeListener('ready', onReady);
+          watcher.removeListener('error', onError);
+          watcher.close();
+          reject(error);
+        };
+
+        watcher.on('ready', onReady);
+        watcher.on('error', onError);
+      });
+
+      internalDefaultLanguage = internalDefaultLanguageWatcher.language;
+    } catch (_error) {
+      // No need to display the error here - it's already printed by
+      // watchLanguageFile.
+      errorLoadingInternalDefaultLanguage = true;
+    }
+  }
+
+  if (errorLoadingInternalDefaultLanguage) {
     logError`There was an error reading the internal language file.`;
     fileIssue();
 
@@ -1109,6 +1159,17 @@ async function main() {
     return false;
   }
 
+  if (!noLanguageReloading) {
+    // Bypass node.js special-case handling for uncaught error events
+    internalDefaultLanguageWatcher.on('error', () => {});
+  }
+
+  Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
+
+  let customLanguageWatchers;
   let languages;
 
   if (langPath) {
@@ -1118,20 +1179,103 @@ async function main() {
     });
 
     const languageDataFiles = await traverse(langPath, {
-      filterFile: name => path.extname(name) === '.json',
+      filterFile: name =>
+        path.extname(name) === '.json' ||
+        path.extname(name) === '.yaml',
       pathStyle: 'device',
     });
 
-    let results;
+    let errorLoadingCustomLanguages = false;
 
-    // TODO: Aggregate errors (with Promise.allSettled).
-    try {
-      results =
-        await progressPromiseAll(`Reading & processing language files.`,
-          languageDataFiles.map((file) => processLanguageFile(file)));
-    } catch (error) {
-      console.error(error);
+    if (noLanguageReloading) {
+      languages = {};
 
+      const results =
+        await Promise.allSettled(
+          languageDataFiles
+            .map(file => processLanguageFile(file)));
+
+      for (const {status, value: language, reason: error} of results) {
+        if (status === 'rejected') {
+          errorLoadingCustomLanguages = true;
+          niceShowAggregate(error);
+        } else {
+          languages[language.code] = language;
+        }
+      }
+    } else watchCustomLanguages: {
+      customLanguageWatchers =
+        languageDataFiles.map(file => {
+          const watcher = watchLanguageFile(file);
+
+          // Bypass node.js special-case handling for uncaught error events
+          watcher.on('error', () => {});
+
+          return watcher;
+        });
+
+      const waitingOnWatchers = new Set(customLanguageWatchers);
+
+      const initialResults =
+        await Promise.allSettled(
+          customLanguageWatchers
+            .map(watcher => new Promise((resolve, reject) => {
+              const onReady = () => {
+                watcher.removeListener('ready', onReady);
+                watcher.removeListener('error', onError);
+                waitingOnWatchers.delete(watcher);
+                resolve();
+              };
+
+              const onError = error => {
+                watcher.removeListener('ready', onReady);
+                watcher.removeListener('error', onError);
+                reject(error);
+              };
+
+              watcher.on('ready', onReady);
+              watcher.on('error', onError);
+            })));
+
+      if (initialResults.some(({status}) => status === 'rejected')) {
+        logWarn`There were errors loading custom languages from the language path`;
+        logWarn`provided: ${langPath}`;
+
+        if (noInput) {
+          internalDefaultLanguageWatcher.close();
+
+          for (const watcher of Object.values(customLanguageWatchers)) {
+            watcher.close();
+          }
+
+          errorLoadingCustomLanguages = true;
+          break watchCustomLanguages;
+        }
+
+        logWarn`The build should start automatically if you investigate these.`;
+        logWarn`Or, exit by pressing ^C here (control+C) and run again without`;
+        logWarn`providing ${'--lang-path'} (or ${'HSMUSIC_LANG'}) to build without custom`;
+        logWarn`languages.`;
+
+        await new Promise(resolve => {
+          for (const watcher of waitingOnWatchers) {
+            watcher.once('ready', () => {
+              waitingOnWatchers.remove(watcher);
+              if (empty(waitingOnWatchers)) {
+                resolve();
+              }
+            });
+          }
+        });
+      }
+
+      languages =
+        Object.fromEntries(
+          customLanguageWatchers
+            .map(({language}) => [language.code, language]));
+    }
+
+    if (errorLoadingCustomLanguages) {
       logError`Failed to load language files. Please investigate these, or don't provide`;
       logError`--lang-path (or HSMUSIC_LANG) and build again.`;
 
@@ -1144,13 +1288,15 @@ async function main() {
       return false;
     }
 
-    languages =
-      Object.fromEntries(
-        results.map((language) => [language.code, language]));
-
     Object.assign(stepStatusSummary.loadLanguageFiles, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
+        annotation:
+        (noLanguageReloading
+          ? (selectedBuildModeFlag === 'static-build'
+              ? `loaded statically, default for --static-build`
+              : `loaded statically, --no-language-reloading provided`)
+          : `watching for changes`),
     });
   } else {
     languages = {};
@@ -1161,56 +1307,106 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  const customDefaultLanguage =
-    languages[wikiData.wikiInfo.defaultLanguage ?? internalDefaultLanguage.code];
   let finalDefaultLanguage;
+  let finalDefaultLanguageWatcher;
+  let finalDefaultLanguageAnnotation;
 
-  if (customDefaultLanguage) {
-    logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
-    customDefaultLanguage.inheritedStrings = internalDefaultLanguage.strings;
-    finalDefaultLanguage = customDefaultLanguage;
+  if (wikiData.wikiInfo.defaultLanguage) {
+    const customDefaultLanguage = languages[wikiData.wikiInfo.defaultLanguage];
 
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      annotation: `using wiki-specified custom default language`,
-      timeEnd: Date.now(),
-    });
-  } else if (wikiData.wikiInfo.defaultLanguage) {
-    logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
-    if (langPath) {
-      logError`Check if an appropriate file exists in ${langPath}?`;
-    } else {
-      logError`Be sure to specify ${'--lang-path'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+    if (!customDefaultLanguage) {
+      logError`Wiki info file specified default language is ${wikiData.wikiInfo.defaultLanguage}, but no such language file exists!`;
+      if (langPath) {
+        logError`Check if an appropriate file exists in ${langPath}?`;
+      } else {
+        logError`Be sure to specify ${'--lang-path'} or ${'HSMUSIC_LANG'} with the path to language files.`;
+      }
+
+      Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+        status: STATUS_FATAL_ERROR,
+        annotation: `wiki specifies default language whose file is not available`,
+        timeEnd: Date.now(),
+      });
+
+      return false;
     }
 
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_FATAL_ERROR,
-      annotation: `wiki specifies default language whose file is not available`,
-      timeEnd: Date.now(),
-    });
+    logInfo`Applying new default strings from custom ${customDefaultLanguage.code} language file.`;
 
-    return false;
+    finalDefaultLanguage = customDefaultLanguage;
+    finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
+
+    if (!noLanguageReloading) {
+      finalDefaultLanguageWatcher =
+        customLanguageWatchers
+          .find(({language}) => language === customDefaultLanguage);
+    }
+  } else if (languages[internalDefaultLanguage.code]) {
+    const customDefaultLanguage = languages[internalDefaultLanguage.code];
+
+    finalDefaultLanguage = customDefaultLanguage;
+    finalDefaultLanguageAnnotation = `using inferred custom default language`;
+
+    if (!noLanguageReloading) {
+      finalDefaultLanguageWatcher =
+        customLanguageWatchers
+          .find(({language}) => language === customDefaultLanguage);
+    }
   } else {
     languages[internalDefaultLanguage.code] = internalDefaultLanguage;
-    finalDefaultLanguage = internalDefaultLanguage;
-    stepStatusSummary.initializeDefaultLanguage.status = STATUS_DONE_CLEAN;
 
-    Object.assign(stepStatusSummary.initializeDefaultLanguage, {
-      status: STATUS_DONE_CLEAN,
-      annotation: `no custom default language specified`,
-      timeEnd: Date.now(),
-    });
+    finalDefaultLanguage = internalDefaultLanguage;
+    finalDefaultLanguageAnnotation = `no custom default language specified`;
+
+    if (!noLanguageReloading) {
+      finalDefaultLanguageWatcher = internalDefaultLanguageWatcher;
+    }
   }
 
-  for (const language of Object.values(languages)) {
-    if (language === finalDefaultLanguage) {
-      continue;
+  const inheritStringsFromInternalLanguage = () => {
+    // The custom default language, if set, will be the new one providing fallback
+    // strings for other languages. But on its own, it still might not be a complete
+    // list of strings - so it falls back to the internal default language, which
+    // won't otherwise be presented in the build.
+    if (finalDefaultLanguage === internalDefaultLanguage) return;
+    const {strings: inheritedStrings} = internalDefaultLanguage;
+    Object.assign(finalDefaultLanguage, {inheritedStrings});
+  };
+
+  const inheritStringsFromDefaultLanguage = () => {
+    const {strings: inheritedStrings} = finalDefaultLanguage;
+    for (const language of Object.values(languages)) {
+      if (language === finalDefaultLanguage) continue;
+      Object.assign(language, {inheritedStrings});
+    }
+  };
+
+  if (finalDefaultLanguage !== internalDefaultLanguage) {
+    inheritStringsFromInternalLanguage();
+  }
+
+  inheritStringsFromDefaultLanguage();
+
+  if (!noLanguageReloading) {
+    if (finalDefaultLanguage !== internalDefaultLanguage) {
+      internalDefaultLanguageWatcher.on('update', () => {
+        inheritStringsFromInternalLanguage();
+        inheritStringsFromDefaultLanguage();
+      });
     }
 
-    language.inheritedStrings = finalDefaultLanguage.strings;
+    finalDefaultLanguageWatcher.on('update', () => {
+      inheritStringsFromDefaultLanguage();
+    });
   }
 
   logInfo`Loaded language strings: ${Object.keys(languages).join(', ')}`;
+
+  Object.assign(stepStatusSummary.initializeDefaultLanguage, {
+    status: STATUS_DONE_CLEAN,
+    annotation: finalDefaultLanguageAnnotation,
+    timeEnd: Date.now(),
+  });
 
   const urls = generateURLs(urlSpec);
 

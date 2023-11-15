@@ -149,6 +149,47 @@ function addRandomLinkListeners() {
           a.href = openAlbum(pick(albumData).directory);
           break;
 
+        case 'track':
+          a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
+          break;
+
+        case 'album-in-group-dl': {
+          const albumLinks =
+            Array.from(a
+              .closest('dt')
+              .nextElementSibling
+              .querySelectorAll('li a'))
+
+          const albumDirectories =
+            albumLinks.map(a =>
+              getComputedStyle(a).getPropertyValue('--album-directory'));
+
+          a.href = openAlbum(pick(albumDirectories));
+          break;
+        }
+
+        case 'track-in-group-dl': {
+          const albumLinks =
+            Array.from(a
+              .closest('dt')
+              .nextElementSibling
+              .querySelectorAll('li a'))
+
+          const albumDirectories =
+            albumLinks.map(a =>
+              getComputedStyle(a).getPropertyValue('--album-directory'));
+
+          const filteredAlbumData =
+            albumData.filter(album =>
+              albumDirectories.includes(album.directory));
+
+          a.href = openTrack(getRefDirectory(pick(tracks(filteredAlbumData))));
+          break;
+        }
+
+        /* Legacy links, for old versions             *
+         * of generateListRandomPageLinksGroupSection */
+
         case 'album-in-official':
           a.href = openAlbum(pick(officialAlbumData).directory);
           break;
@@ -161,9 +202,7 @@ function addRandomLinkListeners() {
           a.href = openAlbum(pick(beyondAlbumData).directory);
           break;
 
-        case 'track':
-          a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
-          break;
+        /* End legacy links */
 
         case 'track-in-album':
           a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
@@ -840,6 +879,10 @@ function updateStickySubheadingContent(index) {
     }
 
     for (const child of closestHeading.childNodes) {
+      if (child.classList?.contains('content-heading-accent')) {
+        continue;
+      }
+
       if (child.tagName === 'A') {
         for (const grandchild of child.childNodes) {
           stickySubheading.appendChild(grandchild.cloneNode(true));

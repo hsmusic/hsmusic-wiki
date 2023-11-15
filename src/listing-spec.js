@@ -44,12 +44,14 @@ listingSpec.push({
   directory: 'artists/by-name',
   stringsKey: 'listArtists.byName',
   contentFunction: 'listArtistsByName',
+  seeAlso: ['artists/by-contribs', 'artists/by-group'],
 });
 
 listingSpec.push({
   directory: 'artists/by-contribs',
   stringsKey: 'listArtists.byContribs',
   contentFunction: 'listArtistsByContributions',
+  seeAlso: ['artists/by-name', 'artists/by-group'],
 });
 
 listingSpec.push({
@@ -62,6 +64,15 @@ listingSpec.push({
   directory: 'artists/by-duration',
   stringsKey: 'listArtists.byDuration',
   contentFunction: 'listArtistsByDuration',
+});
+
+// TODO: hide if no groups...
+listingSpec.push({
+  directory: 'artists/by-group',
+  stringsKey: 'listArtists.byGroup',
+  contentFunction: 'listArtistsByGroup',
+  featureFlag: 'enableGroupUI',
+  seeAlso: ['artists/by-name', 'artists/by-contribs'],
 });
 
 listingSpec.push({
