@@ -187,6 +187,19 @@ function addRandomLinkListeners() {
           break;
         }
 
+        case 'track-in-sidebar': {
+          // Note that the container for track links may be <ol> or <ul>, and
+          // they can't be identified by href, since links from one track to
+          // another don't include "track" in the href.
+          const trackLinks =
+            Array.from(document
+              .querySelector('.track-list-sidebar-box')
+              .querySelectorAll('li a'));
+
+          a.href = pick(trackLinks).href;
+          break;
+        }
+
         /* Legacy links, for old versions             *
          * of generateListRandomPageLinksGroupSection */
 
@@ -255,9 +268,7 @@ function addNavigationKeyPressListeners() {
       } else if (event.charCode === 'P'.charCodeAt(0)) {
         scriptedLinkInfo.previousNavLink?.click();
       } else if (event.charCode === 'R'.charCodeAt(0)) {
-        if (ready) {
-          scriptedLinkInfo.randomNavLink?.click();
-        }
+        scriptedLinkInfo.randomNavLink?.click();
       }
     }
   });

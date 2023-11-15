@@ -92,7 +92,7 @@ export default {
         html.tag('a',
           {
             href: '#',
-            'data-random': 'track-in-album',
+            'data-random': 'track-in-sidebar',
             id: 'random-button',
           },
           (data.isTrackPage
