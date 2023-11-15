@@ -14,7 +14,6 @@ import {
 } from '../util/wiki-data.js';
 
 let albumData, artistData;
-let officialAlbumData, fandomAlbumData, beyondAlbumData;
 
 let ready = false;
 
@@ -200,37 +199,8 @@ function addRandomLinkListeners() {
           break;
         }
 
-        /* Legacy links, for old versions             *
-         * of generateListRandomPageLinksGroupSection */
-
-        case 'album-in-official':
-          a.href = openAlbum(pick(officialAlbumData).directory);
-          break;
-
-        case 'album-in-fandom':
-          a.href = openAlbum(pick(fandomAlbumData).directory);
-          break;
-
-        case 'album-in-beyond':
-          a.href = openAlbum(pick(beyondAlbumData).directory);
-          break;
-
-        /* End legacy links */
-
         case 'track-in-album':
           a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
-          break;
-
-        case 'track-in-official':
-          a.href = openTrack(getRefDirectory(pick(tracks(officialAlbumData))));
-          break;
-
-        case 'track-in-fandom':
-          a.href = openTrack(getRefDirectory(pick(tracks(fandomAlbumData))));
-          break;
-
-        case 'track-in-beyond':
-          a.href = openTrack(getRefDirectory(pick(tracks(beyondAlbumData))));
           break;
 
         case 'artist':
@@ -303,15 +273,6 @@ fetch(rebase('data.json', 'rebaseShared'))
   .then((data) => {
     albumData = data.albumData;
     artistData = data.artistData;
-
-    const albumsInGroup = directory =>
-      albumData
-        .filter(album =>
-          album.groups.includes(`group:${directory}`));
-
-    officialAlbumData = albumsInGroup('official');
-    fandomAlbumData = albumsInGroup('fandom');
-    beyondAlbumData = albumsInGroup('beyond');
 
     for (const element of elements1) element.style.display = 'none';
     for (const element of elements2) element.style.display = 'block';
