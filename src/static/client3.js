@@ -287,6 +287,7 @@ if (
 ) {
   const dataLoadingLine = document.getElementById('data-loading-line');
   const dataLoadedLine = document.getElementById('data-loaded-line');
+  const dataErrorLine = document.getElementById('data-error-line');
 
   dataLoadingLine.style.display = 'block';
 
@@ -300,8 +301,20 @@ if (
 
       dataLoadingLine.style.display = 'none';
       dataLoadedLine.style.display = 'block';
-    });
+    })
+    .catch(() => {
+      const info = scriptedLinkInfo;
 
+      for (const a of info.randomLinks) {
+        const href = determineRandomLinkHref(a);
+        if (!href) {
+          a.removeAttribute('href');
+        }
+      }
+
+      dataLoadingLine.style.display = 'none';
+      dataErrorLine.style.display = 'block';
+    });
 }
 
 // Data & info card ---------------------------------------

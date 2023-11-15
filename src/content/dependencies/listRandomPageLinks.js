@@ -119,6 +119,9 @@ export default {
 
         html.tag('p', {id: 'data-loaded-line'},
           language.$('listingPage.other.randomPages.dataLoadedLine')),
+
+        html.tag('p', {id: 'data-error-line'},
+          language.$('listingPage.other.randomPages.dataErrorLine')),
       ],
 
       showSkipToSection: true,
