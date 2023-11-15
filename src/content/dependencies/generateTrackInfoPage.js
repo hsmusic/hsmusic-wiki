@@ -11,6 +11,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
+    'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
@@ -268,13 +269,8 @@ export default {
     // Section: Artist commentary
 
     if (track.commentary) {
-      const artistCommentary = sections.artistCommentary = {};
-
-      artistCommentary.heading =
-        relation('generateContentHeading');
-
-      artistCommentary.content =
-        relation('transformContent', track.commentary);
+      sections.artistCommentary =
+        relation('generateCommentarySection', track.commentary);
     }
 
     return relations;
@@ -491,17 +487,7 @@ export default {
             sec.additionalFiles.list,
           ],
 
-          sec.artistCommentary && [
-            sec.artistCommentary.heading
-              .slots({
-                id: 'artist-commentary',
-                title: language.$('releaseInfo.artistCommentary')
-              }),
-
-            html.tag('blockquote',
-              sec.artistCommentary.content
-                .slot('mode', 'multiline')),
-          ],
+          sec.artistCommentary,
         ],
 
         navLinkStyle: 'hierarchical',

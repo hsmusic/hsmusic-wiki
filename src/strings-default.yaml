@@ -273,10 +273,6 @@ releaseInfo:
     _: "Read {LINK}."
     link: "artist commentary"
 
-  artistCommentary:
-    _: "Artist commentary:"
-    seeOriginalRelease: "See {ORIGINAL}!"
-
   additionalFiles:
     heading: "View or download {ADDITIONAL_FILES}:"
 
@@ -348,6 +344,22 @@ misc:
     trackCover: "track cover"
     artistAvatar: "artist avatar"
     flashArt: "flash art"
+
+  # artistCommentary:
+
+  artistCommentary:
+    _: "Artist commentary:"
+
+    entry:
+      title:
+        _: "{ARTISTS}:"
+        withAccent: "{ARTISTS}: {ACCENT}"
+        accent:
+          withAnnotation: "({ANNOTATION})"
+          withDate: ({DATE})"
+          withAnnotation.withDate: "({ANNOTATION}, {DATE})"
+
+      seeOriginalRelease: "See {ORIGINAL}!"
 
   # artistLink:
   #   Artist links have special accents which are made conditionally
