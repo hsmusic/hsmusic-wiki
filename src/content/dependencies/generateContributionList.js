@@ -16,5 +16,6 @@ export default {
               showIcons: true,
               showContribution: true,
               preventWrapping: false,
+              iconMode: 'tooltip',
             })))),
 };
