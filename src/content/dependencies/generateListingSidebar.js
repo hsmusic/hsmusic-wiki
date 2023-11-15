@@ -11,6 +11,7 @@ export default {
 
   generate(relations, {html}) {
     return {
+      leftSidebarClass: 'listing-map-sidebar-box',
       leftSidebarContent: [
         html.tag('h1', relations.listingIndexLink),
         relations.listingIndexList.slot('mode', 'sidebar'),
