@@ -28,6 +28,7 @@ import {
 } from '#sugar';
 
 import {
+  commentaryRegex,
   sortAlbumsTracksChronologically,
   sortAlphabetically,
   sortChronologically,
@@ -1616,6 +1617,7 @@ export function filterReferenceErrors(wikiData) {
       bannerArtistContribs: '_contrib',
       groups: 'group',
       artTags: 'artTag',
+      commentary: '_commentary',
     }],
 
     ['trackData', processTrackDocument, {
@@ -1626,6 +1628,7 @@ export function filterReferenceErrors(wikiData) {
       sampledTracks: '_trackNotRerelease',
       artTags: 'artTag',
       originalReleaseTrack: '_trackNotRerelease',
+      commentary: '_commentary',
     }],
 
     ['groupCategoryData', processGroupCategoryDocument, {
@@ -1675,7 +1678,19 @@ export function filterReferenceErrors(wikiData) {
 
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
-            const value = CacheableObject.getUpdateValue(thing, property);
+            let value = CacheableObject.getUpdateValue(thing, property);
+            let writeProperty = true;
+
+            switch (findFnKey) {
+              case '_commentary':
+                if (value) {
+                  value =
+                    Array.from(value.matchAll(commentaryRegex))
+                      .map(({groups}) => groups.artistReference);
+                }
+                writeProperty = false;
+                break;
+            }
 
             if (value === undefined) {
               push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
@@ -1688,19 +1703,25 @@ export function filterReferenceErrors(wikiData) {
 
             let findFn;
 
-            switch (findFnKey) {
-              case '_contrib':
-                findFn = contribRef => {
-                  const alias = find.artist(contribRef.who, wikiData.artistAliasData, {mode: 'quiet'});
-                  if (alias) {
-                    // No need to check if the original exists here. Aliases are automatically
-                    // created from a field on the original, so the original certainly exists.
-                    const original = alias.aliasedArtist;
-                    throw new Error(`Reference ${colors.red(contribRef.who)} is to an alias, should be ${colors.green(original.name)}`);
-                  }
+            const findArtistOrAlias = artistRef => {
+              const alias = find.artist(artistRef, wikiData.artistAliasData, {mode: 'quiet'});
+              if (alias) {
+                // No need to check if the original exists here. Aliases are automatically
+                // created from a field on the original, so the original certainly exists.
+                const original = alias.aliasedArtist;
+                throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
+              }
 
-                  return boundFind.artist(contribRef.who);
-                };
+              return boundFind.artist(artistRef);
+            };
+
+            switch (findFnKey) {
+              case '_commentary':
+                findFn = findArtistOrAlias;
+                break;
+
+              case '_contrib':
+                findFn = contribRef => findArtistOrAlias(contribRef.who);
                 break;
 
               case '_homepageSourceGroup':
@@ -1781,8 +1802,10 @@ export function filterReferenceErrors(wikiData) {
                 ? `Reference errors` + fieldPropertyMessage + findFnMessage
                 : `Reference error` + fieldPropertyMessage + findFnMessage);
 
+            let newPropertyValue = value;
+
             if (Array.isArray(value)) {
-              thing[property] = filter(
+              newPropertyValue = filter(
                 value,
                 decorateErrorWithIndex(suppress(findFn)),
                 {message: errorMessage});
@@ -1792,10 +1815,14 @@ export function filterReferenceErrors(wikiData) {
                   try {
                     call(findFn, value);
                   } catch (error) {
-                    thing[property] = null;
+                    newPropertyValue = null;
                     throw error;
                   }
                 }));
+            }
+
+            if (writeProperty) {
+              thing[property] = newPropertyValue;
             }
           }
         });
