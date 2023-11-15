@@ -629,9 +629,10 @@ export function sortFlashesChronologically(data, {
 
 // Specific data utilities
 
-// Matches heading details from commentary data in roughly the format:
+// Matches heading details from commentary data in roughly the formats:
 //
 //    <i>artistReference:</i> (annotation, date)
+//    <i>artistReference|artistDisplayText:</i> (annotation, date)
 //
 // where capturing group "annotation" can be any text at all, except that the
 // last entry (past a comma or the only content within parentheses), if parsed
@@ -643,16 +644,15 @@ export function sortFlashesChronologically(data, {
 //   * "12/25/2019" - one or two number digits, a slash, one or two number
 //     digits, a slash, and two to four number digits
 //
-// The artist reference can optionally be boldface (in <b></b>), which will be
-// captured as non-null in "boldfaceArtist". Otherwise it is all the characters
-// between <i> and </i> and is captured in "artistReference" and is either the
-// name of an artist or an "artist:directory"-style reference.
+// Capturing group "artistReference" is all the characters between <i> and </i>
+// (apart from the pipe and "artistDisplayText" text, if present), and is either
+// the name of an artist or an "artist:directory"-style reference.
 //
 // This regular expression *doesn't* match bodies, which will need to be parsed
 // out of the original string based on the indices matched using this.
 //
 export const commentaryRegex =
-  /^<i>(?<boldfaceArtist><b>)?(?<artistReference>.+):(?:<\/b>)?<\/i>(?: \((?<annotation>(?:.*?(?=[,)]))*?)(?:,? ?(?<date>[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}))?\))?/gm;
+  /^<i>(?<artistReference>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=[,)]))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}))?\))?/gm;
 
 export function filterAlbumsByCommentary(albums) {
   return albums

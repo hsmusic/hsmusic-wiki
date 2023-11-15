@@ -87,7 +87,7 @@ export default templateCompositeFrom({
       prefix: input.value('#entries'),
       properties: input.value([
         'artistReference',
-        'boldfaceArtist',
+        'artistDisplayText',
         'annotation',
         'date',
       ]),
@@ -105,15 +105,10 @@ export default templateCompositeFrom({
       '#resolvedReferenceList': '#entries.artist',
     }),
 
-    {
-      dependencies: ['#entries.boldfaceArtist'],
-      compute: (continuation, {
-        ['#entries.boldfaceArtist']: boldfaceArtist,
-      }) => continuation({
-        ['#entries.boldfaceArtist']:
-          boldfaceArtist.map(boldface => boldface ? true : false),
-      }),
-    },
+    fillMissingListItems({
+      list: '#entries.artistDisplayText',
+      fill: input.value(null),
+    }),
 
     fillMissingListItems({
       list: '#entries.annotation',
@@ -133,7 +128,7 @@ export default templateCompositeFrom({
     {
       dependencies: [
         '#entries.artist',
-        '#entries.boldfaceArtist',
+        '#entries.artistDisplayText',
         '#entries.annotation',
         '#entries.date',
         '#entries.body',
@@ -141,7 +136,7 @@ export default templateCompositeFrom({
 
       compute: (continuation, {
         ['#entries.artist']: artist,
-        ['#entries.boldfaceArtist']: boldfaceArtist,
+        ['#entries.artistDisplayText']: artistDisplayText,
         ['#entries.annotation']: annotation,
         ['#entries.date']: date,
         ['#entries.body']: body,
@@ -149,7 +144,7 @@ export default templateCompositeFrom({
         ['#parsedCommentaryEntries']:
           stitchArrays({
             artist,
-            boldfaceArtist,
+            artistDisplayText,
             annotation,
             date,
             body,
