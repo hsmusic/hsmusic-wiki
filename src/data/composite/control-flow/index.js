@@ -1,3 +1,8 @@
+// #composite/control-flow
+//
+// No entries depend on any other entries, except siblings in this directory.
+//
+
 export {default as exitWithoutDependency} from './exitWithoutDependency.js';
 export {default as exitWithoutUpdateValue} from './exitWithoutUpdateValue.js';
 export {default as exposeConstant} from './exposeConstant.js';
