@@ -7,15 +7,13 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
+import CacheableObject, {CacheableObjectPropertyValueError}
+  from '#cacheable-object';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
 
-import T, {
-  CacheableObject,
-  CacheableObjectPropertyValueError,
-  Thing,
-} from '#things';
+import T, {Thing} from '#things';
 
 import {
   annotateErrorWithFile,

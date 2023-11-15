@@ -11,7 +11,8 @@ import {generateURLs, urlSpec} from '#urls';
 import {quickLoadAllFromYAML} from '#yaml';
 
 import _find, {bindFind} from '#find';
-import thingConstructors, {CacheableObject} from '#things';
+import CacheableObject from '#cacheable-object';
+import thingConstructors from '#things';
 import * as serialize from '#serialize';
 import * as sugar from '#sugar';
 import * as wikiDataUtils from '#wiki-data';

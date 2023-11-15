@@ -12,6 +12,7 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
+        "#cacheable-object": "./src/data/things/cacheable-object.js",
         "#colors": "./src/util/colors.js",
         "#composite": "./src/data/things/composite.js",
         "#composite/control-flow": "./src/data/composite/control-flow/index.js",
