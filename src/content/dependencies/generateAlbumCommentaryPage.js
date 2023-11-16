@@ -7,12 +7,12 @@ export default {
     'generateAlbumSidebarTrackSection',
     'generateAlbumStyleRules',
     'generateColorStyleVariables',
+    'generateCommentaryEntry',
     'generateContentHeading',
     'generateTrackCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
     'linkTrack',
-    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -38,8 +38,9 @@ export default {
           relation('generateAlbumCoverArtwork', album);
       }
 
-      relations.albumCommentaryContent =
-        relation('transformContent', album.commentary);
+      relations.albumCommentaryEntries =
+        album.commentary
+          .map(entry => relation('generateCommentaryEntry', entry));
     }
 
     const tracksWithCommentary =
@@ -61,9 +62,11 @@ export default {
             ? relation('generateTrackCoverArtwork', track)
             : null));
 
-    relations.trackCommentaryContent =
+    relations.trackCommentaryEntries =
       tracksWithCommentary
-        .map(track => relation('transformContent', track.commentary));
+        .map(track =>
+          track.commentary
+            .map(entry => relation('generateCommentaryEntry', entry)));
 
     relations.trackCommentaryColorVariables =
       tracksWithCommentary
@@ -163,10 +166,10 @@ export default {
             link: relations.trackCommentaryLinks,
             directory: data.trackCommentaryDirectories,
             cover: relations.trackCommentaryCovers,
-            content: relations.trackCommentaryContent,
+            entries: relations.trackCommentaryEntries,
             colorVariables: relations.trackCommentaryColorVariables,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, cover, content, colorVariables, color}) => [
+          }).map(({heading, link, directory, cover, entries, colorVariables, color}) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
@@ -175,11 +178,7 @@ export default {
 
               cover?.slots({mode: 'commentary'}),
 
-              html.tag('blockquote',
-                (color
-                  ? {style: colorVariables.slot('color', color).content}
-                  : {}),
-                content),
+              entries,
             ]),
         ],
 
