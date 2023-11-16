@@ -704,7 +704,7 @@ p code {
 }
 
 main.long-content {
-  --long-content-padding-ratio: 0.12;
+  --long-content-padding-ratio: 0.10;
 }
 
 main.long-content .main-content-container,
@@ -1683,6 +1683,13 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
  */
 
 @media (min-width: 600px) and (max-width: 899.98px) {
+  /* Medim layout is mainly defined (to the user) by hiding the sidebar, so
+   * don't apply the similar layout change of widening the long-content area
+   * if this page doesn't have a sidebar to hide in the first place.
+   */
+  #page-container:not(.has-zero-sidebars) main.long-content {
+    --long-content-padding-ratio: 0.06;
+  }
 }
 
 /* Layout - Wide or Medium */
@@ -1772,6 +1779,10 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     max-width: unset;
   }
 
+  main.long-content {
+    --long-content-padding-ratio: 0.02;
+  }
+
   /* Show sticky heading above cover art */
 
   .content-sticky-heading-container {
@@ -1786,9 +1797,5 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   #header > div:not(:first-child) {
     margin-top: 0.5em;
-  }
-
-  main.long-content {
-    --long-content-padding-ratio: 0.04;
   }
 }
