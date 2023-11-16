@@ -47,7 +47,7 @@ export default {
           ? relations.artistsContent.slot('mode', 'inline')
        : relations.artistLink
           ? relations.artistLink
-          : language.$('misc.artistCommentary.noArtist')));
+          : language.$('misc.artistCommentary.entry.title.noArtists')));
 
     const accentParts = ['misc.artistCommentary.entry.title.accent'];
     const accentOptions = {};
