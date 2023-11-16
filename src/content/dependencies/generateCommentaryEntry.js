@@ -1,5 +1,10 @@
 export default {
-  contentDependencies: ['linkArtist', 'transformContent'],
+  contentDependencies: [
+    'generateColorStyleVariables',
+    'linkArtist',
+    'transformContent',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   relations: (relation, entry) => ({
@@ -22,13 +27,20 @@ export default {
       (entry.body
         ? relation('transformContent', entry.body)
         : null),
+
+    colorVariables:
+      relation('generateColorStyleVariables'),
   }),
 
   data: (entry) => ({
     date: entry.date,
   }),
 
-  generate(data, relations, {html, language}) {
+  slots: {
+    color: {validate: v => v.isColor},
+  },
+
+  generate(data, relations, slots, {html, language}) {
     const artistsSpan =
       html.tag('span', {class: 'commentary-entry-artists'},
         (relations.artistsContent
@@ -66,11 +78,18 @@ export default {
       titleOptions.accent = accent;
     }
 
+    const style =
+      (slots.color
+        ? relations.colorVariables
+            .slot('color', slots.color)
+            .content
+        : null);
+
     return html.tags([
-      html.tag('p', {class: 'commentary-entry-heading'},
+      html.tag('p', {class: 'commentary-entry-heading', style},
         language.$(...titleParts, titleOptions)),
 
-      html.tag('blockquote', {class: 'commentary-entry-body'},
+      html.tag('blockquote', {class: 'commentary-entry-body', style},
         relations.bodyContent.slot('mode', 'multiline')),
     ]);
   },

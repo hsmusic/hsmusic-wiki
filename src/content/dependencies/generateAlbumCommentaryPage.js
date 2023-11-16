@@ -6,7 +6,6 @@ export default {
     'generateAlbumNavAccent',
     'generateAlbumSidebarTrackSection',
     'generateAlbumStyleRules',
-    'generateColorStyleVariables',
     'generateCommentaryEntry',
     'generateContentHeading',
     'generateTrackCoverArtwork',
@@ -67,13 +66,6 @@ export default {
         .map(track =>
           track.commentary
             .map(entry => relation('generateCommentaryEntry', entry)));
-
-    relations.trackCommentaryColorVariables =
-      tracksWithCommentary
-        .map(track =>
-          (track.color === album.color
-            ? null
-            : relation('generateColorStyleVariables')));
 
     relations.sidebarAlbumLink =
       relation('linkAlbum', album);
@@ -167,9 +159,8 @@ export default {
             directory: data.trackCommentaryDirectories,
             cover: relations.trackCommentaryCovers,
             entries: relations.trackCommentaryEntries,
-            colorVariables: relations.trackCommentaryColorVariables,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, cover, entries, colorVariables, color}) => [
+          }).map(({heading, link, directory, cover, entries, color}) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
@@ -178,7 +169,7 @@ export default {
 
               cover?.slots({mode: 'commentary'}),
 
-              entries,
+              entries.map(entry => entry.slot('color', color)),
             ]),
         ],
 
