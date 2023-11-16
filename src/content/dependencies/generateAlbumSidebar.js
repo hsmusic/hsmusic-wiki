@@ -30,6 +30,7 @@ export default {
 
   generate(data, relations, {html}) {
     const trackListBox = {
+      class: 'track-list-sidebar-box',
       content:
         html.tags([
           html.tag('h1', relations.albumLink),
@@ -40,8 +41,10 @@ export default {
     if (data.isAlbumPage) {
       const groupBoxes =
         relations.groupBoxes
-          .map(content => content.slot('mode', 'album'))
-          .map(content => ({content}));
+          .map(content => ({
+            class: 'individual-group-sidebar-box',
+            content: content.slot('mode', 'album'),
+          }));
 
       return {
         leftSidebarMultiple: [
@@ -52,6 +55,7 @@ export default {
     }
 
     const conjoinedGroupBox = {
+      class: 'conjoined-group-sidebar-box',
       content:
         relations.groupBoxes
           .flatMap((content, i, {length}) => [

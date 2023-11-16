@@ -137,7 +137,7 @@ export default {
   }),
 
   generate(data, relations, {getColors, html, language}) {
-    const currentActBox = html.tags([
+    const currentActBoxContent = html.tags([
       html.tag('h1', relations.currentActLink),
 
       html.tag('details',
@@ -160,7 +160,7 @@ export default {
         ]),
     ]);
 
-    const sideMapBox = html.tags([
+    const sideMapBoxContent = html.tags([
       html.tag('h1', relations.flashIndexLink),
 
       stitchArrays({
@@ -188,17 +188,21 @@ export default {
           ])),
     ]);
 
+    const sideMapBox = {
+      class: 'flash-act-map-sidebar-box',
+      content: sideMapBoxContent,
+    };
+
+    const currentActBox = {
+      class: 'flash-current-act-sidebar-box',
+      content: currentActBoxContent,
+    };
+
     return {
       leftSidebarMultiple:
         (data.isFlashActPage
-          ? [
-              {content: sideMapBox},
-              {content: currentActBox},
-            ]
-          : [
-              {content: currentActBox},
-              {content: sideMapBox},
-            ]),
+          ? [sideMapBox, currentActBox]
+          : [currentActBox, sideMapBox]),
     };
   },
 };

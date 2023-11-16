@@ -1568,7 +1568,7 @@ listingPage:
           If your browser doesn't support relatively modern JavaScript
           or you've disabled it, these links won't work - sorry.
 
-      # dataLoadingLine, dataLoadedLine:
+      # dataLoadingLine, dataLoadedLine, dataErrorLine:
       #   Since the links on this page depend on access to a fairly
       #   large data file that is downloaded separately and in the
       #   background, these messages indicate the status of that
@@ -1579,6 +1579,9 @@ listingPage:
 
       dataLoadedLine: >-
         (Data files have finished being downloaded. The links should work!)
+
+      dataErrorLine: >-
+        (Data files failed to download. Sorry, some of these links won't work right now!)
 
       chunk:
 

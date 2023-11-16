@@ -22,6 +22,7 @@ export default {
 
   generate(relations, slots, {html, language}) {
     return {
+      leftSidebarClass: 'category-map-sidebar-box',
       leftSidebarContent: [
         html.tag('h1',
           language.$('groupSidebar.title')),

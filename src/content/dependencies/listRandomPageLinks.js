@@ -114,13 +114,14 @@ export default {
               language.$('listingPage.other.randomPages.chooseLinkLine.browserSupportPart'),
           })),
 
-        html.tag('p',
-          {class: 'js-hide-once-data'},
+        html.tag('p', {id: 'data-loading-line'},
           language.$('listingPage.other.randomPages.dataLoadingLine')),
 
-        html.tag('p',
-          {class: 'js-show-once-data'},
+        html.tag('p', {id: 'data-loaded-line'},
           language.$('listingPage.other.randomPages.dataLoadedLine')),
+
+        html.tag('p', {id: 'data-error-line'},
+          language.$('listingPage.other.randomPages.dataErrorLine')),
       ],
 
       showSkipToSection: true,

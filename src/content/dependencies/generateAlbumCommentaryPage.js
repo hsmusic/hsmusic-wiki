@@ -201,6 +201,7 @@ export default {
         ],
 
         leftSidebarStickyMode: 'column',
+        leftSidebarClass: 'commentary-track-list-sidebar-box',
         leftSidebarContent: [
           html.tag('h1', relations.sidebarAlbumLink),
           relations.sidebarTrackSections.map(section =>
