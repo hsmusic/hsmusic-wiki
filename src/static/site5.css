@@ -553,6 +553,7 @@ p .current {
   width: 30%;
   max-width: 250px;
   margin: 15px 0 10px 20px;
+  box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.35);
 }
 
 .js-hide,
