@@ -540,6 +540,7 @@ p .current {
 .commentary-entry-heading {
   margin-left: 15px;
   padding-left: 5px;
+  max-width: 625px;
   padding-bottom: 0.2em;
   border-bottom: 1px dotted var(--primary-color);
 }
@@ -1713,7 +1714,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     float: right;
     width: 40%;
     max-width: 400px;
-    margin: -60px 0 10px 10px;
+    margin: -60px 0 10px 20px;
 
     position: relative;
     z-index: 2;

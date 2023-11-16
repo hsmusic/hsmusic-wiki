@@ -450,7 +450,9 @@ export default {
     // In inline mode, no further processing is needed!
 
     if (slots.mode === 'inline') {
-      return html.tags(contentFromNodes.map(node => node.data));
+      return html.tags(
+        contentFromNodes.map(node => node.data),
+        {[html.joinChildren]: ''});
     }
 
     // Multiline mode has a secondary processing stage where it's passed...
