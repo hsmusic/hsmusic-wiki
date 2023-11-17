@@ -21,6 +21,7 @@ import {
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
   empty,
+  filterAggregate,
   filterProperties,
   openAggregate,
   showAggregate,
@@ -1686,8 +1687,10 @@ export function filterReferenceErrors(wikiData) {
                 if (value) {
                   value =
                     Array.from(value.matchAll(commentaryRegex))
-                      .map(({groups}) => groups.artistReference);
+                      .map(({groups}) => groups.artistReferences)
+                      .map(text => text.split(',').map(text => text.trim()));
                 }
+
                 writeProperty = false;
                 break;
             }
@@ -1804,11 +1807,22 @@ export function filterReferenceErrors(wikiData) {
 
             let newPropertyValue = value;
 
-            if (Array.isArray(value)) {
+            if (findFnKey === '_commentary') {
+              // Commentary doesn't write a property value, so no need to set.
+              filter(
+                value, {message: errorMessage},
+                decorateErrorWithIndex(refs =>
+                  (refs.length === 1
+                    ? suppress(findFn)(refs[0])
+                    : filterAggregate(
+                        refs, {message: `Errors in entry's artist references`},
+                        decorateErrorWithIndex(suppress(findFn)))
+                          .aggregate
+                          .close())));
+            } else if (Array.isArray(value)) {
               newPropertyValue = filter(
-                value,
-                decorateErrorWithIndex(suppress(findFn)),
-                {message: errorMessage});
+                value, {message: errorMessage},
+                decorateErrorWithIndex(suppress(findFn)));
             } else {
               nest({message: errorMessage},
                 suppress(({call}) => {

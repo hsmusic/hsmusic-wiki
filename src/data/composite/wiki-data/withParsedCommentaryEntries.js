@@ -4,7 +4,12 @@ import {stitchArrays} from '#sugar';
 import {isCommentary} from '#validators';
 import {commentaryRegex} from '#wiki-data';
 
-import {fillMissingListItems, withPropertiesFromList} from '#composite/data';
+import {
+  fillMissingListItems,
+  withFlattenedList,
+  withPropertiesFromList,
+  withUnflattenedList,
+} from '#composite/data';
 
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
@@ -86,23 +91,43 @@ export default templateCompositeFrom({
       list: '#rawMatches.groups',
       prefix: input.value('#entries'),
       properties: input.value([
-        'artistReference',
+        'artistReferences',
         'artistDisplayText',
         'annotation',
         'date',
       ]),
     }),
 
-    // The artistReference group will always have a value, since it's required
+    // The artistReferences group will always have a value, since it's required
     // for the line to match in the first place.
 
+    {
+      dependencies: ['#entries.artistReferences'],
+      compute: (continuation, {
+        ['#entries.artistReferences']: artistReferenceTexts,
+      }) => continuation({
+        ['#entries.artistReferences']:
+          artistReferenceTexts
+            .map(text => text.split(',').map(ref => ref.trim())),
+      }),
+    },
+
+    withFlattenedList({
+      list: '#entries.artistReferences',
+    }),
+
     withResolvedReferenceList({
-      list: '#entries.artistReference',
+      list: '#flattenedList',
       data: 'artistData',
       find: input.value(find.artist),
       notFoundMode: input.value('null'),
+    }),
+
+    withUnflattenedList({
+      list: '#resolvedReferenceList',
+      filter: input.value(false),
     }).outputs({
-      '#resolvedReferenceList': '#entries.artist',
+      '#unflattenedList': '#entries.artists',
     }),
 
     fillMissingListItems({
@@ -127,7 +152,7 @@ export default templateCompositeFrom({
 
     {
       dependencies: [
-        '#entries.artist',
+        '#entries.artists',
         '#entries.artistDisplayText',
         '#entries.annotation',
         '#entries.date',
@@ -135,7 +160,7 @@ export default templateCompositeFrom({
       ],
 
       compute: (continuation, {
-        ['#entries.artist']: artist,
+        ['#entries.artists']: artists,
         ['#entries.artistDisplayText']: artistDisplayText,
         ['#entries.annotation']: annotation,
         ['#entries.date']: date,
@@ -143,7 +168,7 @@ export default templateCompositeFrom({
       }) => continuation({
         ['#parsedCommentaryEntries']:
           stitchArrays({
-            artist,
+            artists,
             artistDisplayText,
             annotation,
             date,
