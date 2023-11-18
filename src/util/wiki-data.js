@@ -652,7 +652,7 @@ export function sortFlashesChronologically(data, {
 // out of the original string based on the indices matched using this.
 //
 export const commentaryRegex =
-  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=[,)]))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}))?\))?/gm;
+  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}))?\))?$/gm;
 
 export function filterAlbumsByCommentary(albums) {
   return albums
