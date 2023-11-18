@@ -41,7 +41,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   });
 
-  t.match(composite.expose.compute({
+  t.same(composite.expose.compute({
     artistData,
     from:
       `<i>Mobius Trip:</i>\n` +
@@ -57,7 +57,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.match(composite.expose.compute({
+  t.same(composite.expose.compute({
     artistData,
     from:
       `<i>Mobius Trip|Moo-bius Trip:</i> (music, art, 12 January 2015)\n` +
