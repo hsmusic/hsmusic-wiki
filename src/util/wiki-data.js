@@ -641,8 +641,10 @@ export function sortFlashesChronologically(data, {
 //
 //   * "25 December 2019" - one or two number digits, followed by any text,
 //     followed by four number digits
-//   * "12/25/2019" - one or two number digits, a slash, one or two number
-//     digits, a slash, and two to four number digits
+//   * "December 25, 2019" - one all-letters word, a space, one or two number
+//     digits, a comma, and four number digits
+//   * "12/25/2019" etc - three sets of one to four number digits, separated
+//     by slashes (only valid formats are MM/DD/YYYY and YYYY/MM/DD)
 //
 // Capturing group "artistReference" is all the characters between <i> and </i>
 // (apart from the pipe and "artistDisplayText" text, if present), and is either
@@ -652,7 +654,7 @@ export function sortFlashesChronologically(data, {
 // out of the original string based on the indices matched using this.
 //
 export const commentaryRegex =
-  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4}))?\))?$/gm;
+  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}\/[0-9]{1,4}\/[0-9]{1,4}))?\))?$/gm;
 
 export function filterAlbumsByCommentary(albums) {
   return albums
