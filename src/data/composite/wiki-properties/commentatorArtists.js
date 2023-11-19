@@ -6,7 +6,8 @@ import {unique} from '#sugar';
 
 import {exitWithoutDependency, exposeDependency}
   from '#composite/control-flow';
-import {withFlattenedList, withPropertyFromList} from '#composite/data';
+import {withFlattenedList, withPropertyFromList, withUniqueItemsOnly}
+  from '#composite/data';
 import {withParsedCommentaryEntries} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
@@ -36,6 +37,10 @@ export default templateCompositeFrom({
       list: '#artistLists',
     }).outputs({
       '#flattenedList': '#artists',
+    }),
+
+    withUniqueItemsOnly({
+      list: '#artists',
     }),
 
     exposeDependency({
