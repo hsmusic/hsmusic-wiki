@@ -42,6 +42,9 @@
         "#wiki-data": "./src/util/wiki-data.js",
         "#yaml": "./src/data/yaml.js"
     },
+    "engines": {
+        "node": ">= 20.9.0"
+    },
     "dependencies": {
         "chroma-js": "^2.4.2",
         "command-exists": "^1.2.9",
@@ -49,7 +52,7 @@
         "he": "^1.2.0",
         "image-size": "^1.0.2",
         "js-yaml": "^4.1.0",
-        "marked": "^5.0.2",
+        "marked": "^10.0.0",
         "striptags": "^4.0.0-alpha.4",
         "word-wrap": "^1.2.3"
     },

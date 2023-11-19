@@ -1,3 +1,5 @@
+import {empty} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateColorStyleVariables',
@@ -8,9 +10,10 @@ export default {
   extraDependencies: ['html', 'language'],
 
   relations: (relation, entry) => ({
-    artistLink:
-      (entry.artist && !entry.artistDisplayText
-        ? relation('linkArtist', entry.artist)
+    artistLinks:
+      (!empty(entry.artists) && !entry.artistDisplayText
+        ? entry.artists
+            .map(artist => relation('linkArtist', artist))
         : null),
 
     artistsContent:
@@ -45,8 +48,8 @@ export default {
       html.tag('span', {class: 'commentary-entry-artists'},
         (relations.artistsContent
           ? relations.artistsContent.slot('mode', 'inline')
-       : relations.artistLink
-          ? relations.artistLink
+       : relations.artistLinks
+          ? language.formatConjunctionList(relations.artistLinks)
           : language.$('misc.artistCommentary.entry.title.noArtists')));
 
     const accentParts = ['misc.artistCommentary.entry.title.accent'];

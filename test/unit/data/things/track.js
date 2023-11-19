@@ -214,7 +214,7 @@ t.test(`Track.color`, t => {
 });
 
 t.test(`Track.commentatorArtists`, t => {
-  t.plan(6);
+  t.plan(8);
 
   const track = new Track();
   const artist1 = stubArtist(`SnooPING`);
@@ -226,47 +226,67 @@ t.test(`Track.commentatorArtists`, t => {
     artistData: [artist1, artist2, artist3],
   });
 
-  track.commentary =
+  // Keep track of the last commentary string in a separate value, since
+  // the track.commentary property exposes as a completely different format
+  // (i.e. an array of objects, one for each entry), and so isn't compatible
+  // with the += operator on its own.
+  let commentary;
+
+  track.commentary = commentary =
     `<i>SnooPING:</i>\n` +
     `Wow.\n`;
 
   t.same(track.commentatorArtists, [artist1],
     `Track.commentatorArtists #1: works with one commentator`);
 
-  track.commentary +=
+  track.commentary = commentary +=
     `<i>ASUsual:</i>\n` +
     `Yes!\n`;
 
   t.same(track.commentatorArtists, [artist1, artist2],
     `Track.commentatorArtists #2: works with two commentators`);
 
-  track.commentary +=
-    `<i><b>Icy:</b></i>\n` +
+  track.commentary = commentary +=
+    `<i>Icy|<b>Icy What You Did There</b>:</i>\n` +
     `Incredible.\n`;
 
   t.same(track.commentatorArtists, [artist1, artist2, artist3],
-    `Track.commentatorArtists #3: works with boldface name`);
+    `Track.commentatorArtists #3: works with custom artist text`);
 
-  track.commentary =
+  track.commentary = commentary =
     `<i>Icy:</i> (project manager)\n` +
     `Very good track.\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #4: works with parenthical accent`);
+    `Track.commentatorArtists #4: works with annotation`);
 
-  track.commentary +=
-    `<i>SNooPING ASUsual Icy:</i>\n` +
-    `WITH ALL THREE POWERS COMBINED...`;
+  track.commentary = commentary =
+    `<i>Icy:</i> (project manager, 08/15/2023)\n` +
+    `Very very good track.\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #5: ignores artist names not found`);
+    `Track.commentatorArtists #5: works with date`);
 
-  track.commentary +=
+  track.commentary = commentary +=
+    `<i>Ohohohoho:</i>\n` +
+    `OHOHOHOHOHOHO...\n`;
+
+  t.same(track.commentatorArtists, [artist3],
+    `Track.commentatorArtists #6: ignores artist names not found`);
+
+  track.commentary = commentary +=
     `<i>Icy:</i>\n` +
     `I'm back!\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #6: ignores duplicate artist`);
+    `Track.commentatorArtists #7: ignores duplicate artist`);
+
+  track.commentary = commentary +=
+    `<i>SNooPING, ASUsual, Icy:</i>\n` +
+    `WITH ALL THREE POWERS COMBINED...`;
+
+  t.same(track.commentatorArtists, [artist3, artist1, artist2],
+    `Track.commentatorArtists #8: works with more than one artist in one entry`);
 });
 
 t.test(`Track.coverArtistContribs`, t => {

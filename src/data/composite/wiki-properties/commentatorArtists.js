@@ -4,8 +4,10 @@
 import {input, templateCompositeFrom} from '#composite';
 import {unique} from '#sugar';
 
-import {exitWithoutDependency} from '#composite/control-flow';
-import {withPropertyFromList} from '#composite/data';
+import {exitWithoutDependency, exposeDependency}
+  from '#composite/control-flow';
+import {withFlattenedList, withPropertyFromList, withUniqueItemsOnly}
+  from '#composite/data';
 import {withParsedCommentaryEntries} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
@@ -26,15 +28,23 @@ export default templateCompositeFrom({
 
     withPropertyFromList({
       list: '#parsedCommentaryEntries',
-      property: input.value('artist'),
+      property: input.value('artists'),
     }).outputs({
-      '#parsedCommentaryEntries.artist': '#artists',
+      '#parsedCommentaryEntries.artists': '#artistLists',
     }),
 
-    {
-      dependencies: ['#artists'],
-      compute: ({'#artists': artists}) =>
-        unique(artists.filter(artist => artist !== null)),
-    },
+    withFlattenedList({
+      list: '#artistLists',
+    }).outputs({
+      '#flattenedList': '#artists',
+    }),
+
+    withUniqueItemsOnly({
+      list: '#artists',
+    }),
+
+    exposeDependency({
+      dependency: '#artists',
+    }),
   ],
 });

@@ -41,7 +41,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   });
 
-  t.match(composite.expose.compute({
+  t.same(composite.expose.compute({
     artistData,
     from:
       `<i>Mobius Trip:</i>\n` +
@@ -49,7 +49,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `Very cool.\n`,
   }), [
     {
-      artist: artist1,
+      artists: [artist1],
       artistDisplayText: null,
       annotation: null,
       date: null,
@@ -57,7 +57,7 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
     },
   ]);
 
-  t.match(composite.expose.compute({
+  t.same(composite.expose.compute({
     artistData,
     from:
       `<i>Mobius Trip|Moo-bius Trip:</i> (music, art, 12 January 2015)\n` +
@@ -67,32 +67,32 @@ t.test(`withParsedCommentaryEntries: basic behavior`, t => {
       `Second commentary entry. Yes. So cool.\n` +
       `<i>Mystery Artist:</i> (pingas, August 25, 2023)\n` +
       `Oh no.. Oh dear...\n` +
-      `<i>Mobius Trip:</i>\n` +
+      `<i>Mobius Trip, Hadron Kaleido:</i>\n` +
       `And back around we go.`,
   }), [
     {
-      artist: artist1,
+      artists: [artist1],
       artistDisplayText: `Moo-bius Trip`,
       annotation: `music, art`,
       date: new Date('12 January 2015'),
       body: `First commentary entry.\nVery cool.`,
     },
     {
-      artist: artist2,
+      artists: [artist2],
       artistDisplayText: `<b>[[artist:hadron-kaleido|The Ol' Hadron]]</b>`,
       annotation: `moral support`,
       date: new Date('4 April 2022'),
       body: `Second commentary entry. Yes. So cool.`,
     },
     {
-      artist: null,
+      artists: [],
       artistDisplayText: null,
       annotation: `pingas`,
       date: new Date('25 August 2023'),
       body: `Oh no.. Oh dear...`,
     },
     {
-      artist: artist1,
+      artists: [artist1, artist2],
       artistDisplayText: null,
       annotation: null,
       date: null,
