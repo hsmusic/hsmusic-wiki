@@ -125,7 +125,6 @@ export default templateCompositeFrom({
 
     withUnflattenedList({
       list: '#resolvedReferenceList',
-      filter: input.value(false),
     }).outputs({
       '#unflattenedList': '#entries.artists',
     }),
