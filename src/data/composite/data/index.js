@@ -11,3 +11,4 @@ export {default as withPropertiesFromObject} from './withPropertiesFromObject.js
 export {default as withPropertyFromList} from './withPropertyFromList.js';
 export {default as withPropertyFromObject} from './withPropertyFromObject.js';
 export {default as withUnflattenedList} from './withUnflattenedList.js';
+export {default as withUniqueItemsOnly} from './withUniqueItemsOnly.js';
