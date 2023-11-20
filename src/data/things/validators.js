@@ -1,5 +1,9 @@
 import {inspect as nodeInspect} from 'node:util';
 
+// Heresy.
+import printable_characters from 'printable-characters';
+const {strlen} = printable_characters;
+
 import {colors, ENABLE_COLOR} from '#cli';
 import {empty, typeAppearance, withAggregate} from '#sugar';
 
@@ -174,8 +178,19 @@ function validateArrayItemsHelper(itemValidator) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      const annotation = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)})`;
+
+      error.message =
+        (error.message.includes('\n') || strlen(annotation) > 20
+          ? annotation + '\n' +
+            error.message
+              .split('\n')
+              .map(line => `  ${line}`)
+              .join('\n')
+          : `${annotation} ${error}`);
+
       error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
+
       throw error;
     }
   };
