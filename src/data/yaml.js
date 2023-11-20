@@ -717,26 +717,28 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export function parseContributors(contributors) {
+const extractAccentRegex =
+  /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
+
+export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
-  if (!Array.isArray(contributors)) {
-    return contributors;
+  if (!Array.isArray(contributionStrings)) {
+    return contributionStrings;
   }
 
-  contributors = contributors.map((contrib) => {
-    if (typeof contrib !== 'string') return contrib;
+  return contributionStrings.map(contribString => {
+    if (typeof contribString !== 'string') return contribString;
 
-    const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) return contrib;
+    const match = contribString.match(extractAccentRegex);
+    if (!match) return contribString;
 
-    const who = match[1];
-    const what = match[3] || null;
-    return {who, what};
+    return {
+      who: match.groups.main,
+      what: match.groups.accent ?? null,
+    };
   });
-
-  return contributors;
 }
 
 function parseDimensions(string) {
