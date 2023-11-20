@@ -250,6 +250,16 @@ export function typeAppearance(value) {
   return typeof value;
 }
 
+// Limits a string to the desired length, filling in an ellipsis at the end
+// if it cuts any text off.
+export function cut(text, length = 40) {
+  if (text.length >= length) {
+    return text.slice(0, Math.max(1, length - 3)) + '...';
+  } else {
+    return text;
+  }
+}
+
 // Binds default values for arguments in a {key: value} type function argument
 // (typically the second argument, but may be overridden by providing a
 // [bindOpts.bindIndex] argument). Typically useful for preparing a function for
