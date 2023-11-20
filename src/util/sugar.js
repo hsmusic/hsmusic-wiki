@@ -592,34 +592,101 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 export function showAggregate(topError, {
   pathToFileURL = f => f,
   showTraces = true,
+  showTranslucent = showTraces,
   print = true,
 } = {}) {
-  const recursive = (error, {level}) => {
-    let headerPart = showTraces
-      ? `[${error.constructor.name || 'unnamed'}] ${
-          error.message || '(no message)'
-        }`
-      : error instanceof AggregateError
-      ? `[${error.message || '(no message)'}]`
-      : error.message || '(no message)';
+  const translucentSymbol = Symbol.for('hsmusic.aggregate.translucent');
+
+  const determineCause = error => {
+    let cause = error.cause;
+    if (showTranslucent) return cause ?? null;
+
+    while (cause) {
+      if (!cause[translucentSymbol]) return cause;
+      cause = cause.cause;
+    }
+
+    return null;
+  };
+
+  const determineErrors = parentError => {
+    if (!parentError.errors) return null;
+    if (showTranslucent) return parentError.errors;
+
+    const errors = [];
+    for (const error of parentError.errors) {
+      if (!error[translucentSymbol]) {
+        errors.push(error);
+        continue;
+      }
+
+      if (error.cause) {
+        errors.push(determineCause(error));
+      }
+
+      if (error.errors) {
+        errors.push(...determineErrors(error));
+      }
+    }
+
+    return errors;
+  };
+
+  const flattenErrorStructure = (error, level = 0) => {
+    const cause = determineCause(error);
+    const errors = determineErrors(error);
+
+    return {
+      level,
+
+      kind: error.constructor.name,
+      message: error.message,
+      stack: error.stack,
+
+      cause:
+        (cause
+          ? flattenErrorStructure(cause, level + 1)
+          : null),
+
+      errors:
+        (errors
+          ? errors.map(error => flattenErrorStructure(error, level + 1))
+          : null),
+    };
+  };
+
+  const recursive = ({level, kind, message, stack, cause, errors}) => {
+    const messagePart =
+      message || `(no message)`;
+
+    const kindPart =
+      kind || `unnamed kind`;
+
+    let headerPart =
+      (showTraces
+        ? `[${kindPart}] ${messagePart}`
+     : errors
+        ? `[${messagePart}]`
+        : messagePart);
 
     if (showTraces) {
-      const stackLines = error.stack?.split('\n');
+      const stackLines =
+        stack?.split('\n');
 
-      const stackLine = stackLines?.find(
-        (line) =>
+      const stackLine =
+        stackLines?.find(line =>
           line.trim().startsWith('at') &&
           !line.includes('sugar') &&
           !line.includes('node:') &&
-          !line.includes('<anonymous>')
-      );
+          !line.includes('<anonymous>'));
 
-      const tracePart = stackLine
-        ? '- ' +
-          stackLine
-            .trim()
-            .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
-        : '(no stack trace)';
+      const tracePart =
+        (stackLine
+          ? '- ' +
+            stackLine
+              .trim()
+              .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
+          : '(no stack trace)');
 
       headerPart += ` ${colors.dim(tracePart)}`;
     }
@@ -628,8 +695,8 @@ export function showAggregate(topError, {
     const bar1 = ' ';
 
     const causePart =
-      (error.cause
-        ? recursive(error.cause, {level: level + 1})
+      (cause
+        ? recursive(cause)
             .split('\n')
             .map((line, i) => i === 0 ? ` ${head1} ${line}` : ` ${bar1} ${line}`)
             .join('\n')
@@ -638,19 +705,20 @@ export function showAggregate(topError, {
     const head2 = level % 2 === 0 ? '\u257f' : colors.dim('\u257f');
     const bar2 = level % 2 === 0 ? '\u2502' : colors.dim('\u254e');
 
-    const aggregatePart =
-      (error instanceof AggregateError
-        ? error.errors
-            .map(error => recursive(error, {level: level + 1}))
+    const errorsPart =
+      (errors
+        ? errors
+            .map(error => recursive(error))
             .flatMap(str => str.split('\n'))
             .map((line, i) => i === 0 ? ` ${head2} ${line}` : ` ${bar2} ${line}`)
             .join('\n')
         : '');
 
-    return [headerPart, causePart, aggregatePart].filter(Boolean).join('\n');
+    return [headerPart, causePart, errorsPart].filter(Boolean).join('\n');
   };
 
-  const message = recursive(topError, {level: 0});
+  const structure = flattenErrorStructure(topError);
+  const message = recursive(structure);
 
   if (print) {
     console.error(message);
