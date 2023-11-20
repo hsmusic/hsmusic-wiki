@@ -436,6 +436,7 @@ export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHel
 
 export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
+    'Additional Names': parseAdditionalNames,
     'Duration': parseDuration,
 
     'Date First Released': (value) => new Date(value),
@@ -457,6 +458,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
   propertyFieldMapping: {
     name: 'Track',
     directory: 'Directory',
+    additionalNames: 'Additional Names',
     duration: 'Duration',
     color: 'Color',
     urls: 'URLs',
@@ -737,6 +739,24 @@ export function parseContributors(contributionStrings) {
     return {
       who: match.groups.main,
       what: match.groups.accent ?? null,
+    };
+  });
+}
+
+export function parseAdditionalNames(additionalNameStrings) {
+  if (!Array.isArray(additionalNameStrings)) {
+    return additionalNameStrings;
+  }
+
+  return additionalNameStrings.map(additionalNameString => {
+    if (typeof additionalNameString !== 'string') return additionalNameString;
+
+    const match = additionalNameString.match(extractAccentRegex);
+    if (!match) return additionalNameString;
+
+    return {
+      name: match.groups.main,
+      annotation: match.groups.accent ?? null,
     };
   });
 }

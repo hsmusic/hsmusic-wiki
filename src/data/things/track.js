@@ -24,6 +24,7 @@ import {
 
 import {
   additionalFiles,
+  additionalNameList,
   commentary,
   commentatorArtists,
   contributionList,
@@ -63,6 +64,7 @@ export class Track extends Thing {
 
     name: name('Unnamed Track'),
     directory: directory(),
+    additionalNames: additionalNameList(),
 
     duration: duration(),
     urls: urls(),

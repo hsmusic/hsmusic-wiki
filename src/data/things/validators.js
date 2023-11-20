@@ -373,6 +373,13 @@ export function isURL(string) {
   return true;
 }
 
+export const isAdditionalName = validateProperties({
+  name: isName,
+  annotation: optional(isStringNonEmpty),
+});
+
+export const isAdditionalNameList = validateArrayItems(isAdditionalName);
+
 export function validateReference(type = 'track') {
   return (ref) => {
     isStringNonEmpty(ref);
