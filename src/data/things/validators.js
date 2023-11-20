@@ -170,9 +170,9 @@ export function is(...values) {
 }
 
 function validateArrayItemsHelper(itemValidator) {
-  return (item, index) => {
+  return (item, index, array) => {
     try {
-      const value = itemValidator(item);
+      const value = itemValidator(item, index, array);
 
       if (value !== true) {
         throw new Error(`Expected validator to return true`);
@@ -197,13 +197,15 @@ function validateArrayItemsHelper(itemValidator) {
 }
 
 export function validateArrayItems(itemValidator) {
-  const fn = validateArrayItemsHelper(itemValidator);
+  const helper = validateArrayItemsHelper(itemValidator);
 
   return (array) => {
     isArray(array);
 
-    withAggregate({message: 'Errors validating array items'}, ({wrap}) => {
-      array.forEach(wrap(fn));
+    withAggregate({message: 'Errors validating array items'}, ({call}) => {
+      for (let index = 0; index < array.length; index++) {
+        call(helper, array[index], index, array);
+      }
     });
 
     return true;
@@ -215,12 +217,12 @@ export function strictArrayOf(itemValidator) {
 }
 
 export function sparseArrayOf(itemValidator) {
-  return validateArrayItems(item => {
+  return validateArrayItems((item, index, array) => {
     if (item === false || item === null) {
       return true;
     }
 
-    return itemValidator(item);
+    return itemValidator(item, index, array);
   });
 }
 
