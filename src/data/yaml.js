@@ -334,6 +334,8 @@ export class FieldCombinationError extends Error {
 }
 
 export class FieldValueAggregateError extends AggregateError {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
   constructor(thingConstructor, errors) {
     const constructorText =
       colors.green(thingConstructor.name);
@@ -1162,7 +1164,10 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
-      {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
+      {
+        message: `Errors during data step: ${colors.bright(dataStep.title)}`,
+        translucent: true,
+      },
       async ({call, callAsync, map, mapAsync, push}) => {
         const {documentMode} = dataStep;
 
@@ -1407,7 +1412,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
         switch (documentMode) {
           case documentModes.headerAndEntries:
-            map(yamlResults, {message: `Errors processing documents in data files`},
+            map(yamlResults, {message: `Errors processing documents in data files`, translucent: true},
               decorateErrorWithFile(({documents}) => {
                 const headerDocument = documents[0];
                 const entryDocuments = documents.slice(1).filter(Boolean);

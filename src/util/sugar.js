@@ -325,6 +325,12 @@ export function openAggregate({
   // constructed.
   message = '',
 
+  // Optional flag to indicate that this layer of the aggregate error isn't
+  // generally useful outside of developer debugging purposes - it will be
+  // skipped by default when using showAggregate, showing contained errors
+  // inline with other children of this aggregate's parent.
+  translucent = false,
+
   // Value to return when a provided function throws an error. If this is a
   // function, it will be called with the arguments given to the function.
   // (This is primarily useful when wrapping a function and then providing it
@@ -407,7 +413,13 @@ export function openAggregate({
 
   aggregate.close = () => {
     if (errors.length) {
-      throw Reflect.construct(errorClass, [errors, message]);
+      const error = Reflect.construct(errorClass, [errors, message]);
+
+      if (translucent) {
+        error[Symbol.for(`hsmusic.aggregate.translucent`)] = true;
+      }
+
+      throw error;
     }
   };
 
