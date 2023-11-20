@@ -38,8 +38,8 @@ import {
 
 // --> General supporting stuff
 
-function inspect(value) {
-  return nodeInspect(value, {colors: ENABLE_COLOR});
+function inspect(value, opts = {}) {
+  return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
 // --> YAML data repository structure constants
@@ -308,7 +308,12 @@ export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
 
-    const mainMessage = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
+    const fieldNamesText =
+      fieldNames
+        .map(field => colors.red(field))
+        .join(', ');
+
+    const mainMessage = `Don't combine ${fieldNamesText}`;
 
     const causeMessage =
       (typeof message === 'function'
@@ -330,7 +335,12 @@ export class FieldCombinationError extends Error {
 
 export class FieldValueAggregateError extends AggregateError {
   constructor(thingConstructor, errors) {
-    super(errors, `Errors processing field values for ${colors.green(thingConstructor.name)}`);
+    const constructorText =
+      colors.green(thingConstructor.name);
+
+    super(
+      errors,
+      `Errors processing field values for ${constructorText}`);
   }
 }
 
@@ -341,8 +351,17 @@ export class FieldValueError extends Error {
         ? caughtError.cause
         : caughtError);
 
+    const fieldText =
+      colors.green(`"${field}"`);
+
+    const propertyText =
+      colors.green(property);
+
+    const valueText =
+      inspect(value, {maxStringLength: 40});
+
     super(
-      `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
+      `Failed to set ${fieldText} field (${propertyText}) to ${valueText}`,
       {cause});
   }
 }
@@ -354,13 +373,18 @@ export class SkippedFieldsSummaryError extends Error {
     const lines =
       entries.map(([field, value]) =>
         ` - ${field}: ` +
-        inspect(value)
+        inspect(value, {maxStringLength: 70})
           .split('\n')
           .map((line, index) => index === 0 ? line : `   ${line}`)
           .join('\n'));
 
+    const numFieldsText =
+      (entries.length === 1
+        ? `1 field`
+        : `${entries.length} fields`);
+
     super(
-      colors.bright(colors.yellow(`Altogether, skipped ${entries.length === 1 ? `1 field` : `${entries.length} fields`}:\n`)) +
+      colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:\n`)) +
       lines.join('\n') + '\n' +
       colors.bright(colors.yellow(`See above errors for details.`)));
   }
