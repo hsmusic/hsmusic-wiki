@@ -96,7 +96,10 @@ export function isStringNonEmpty(value) {
 }
 
 export function optional(validator) {
-  return value => value === null || value === undefined || validator(value);
+  return value =>
+    value === null ||
+    value === undefined ||
+    validator(value);
 }
 
 // Complex types (non-primitives)
@@ -285,20 +288,14 @@ export function validateProperties(spec) {
 
 export const isContribution = validateProperties({
   who: isArtistRef,
-  what: (value) =>
-    value === undefined ||
-    value === null ||
-    isStringNonEmpty(value),
+  what: optional(isStringNonEmpty),
 });
 
 export const isContributionList = validateArrayItems(isContribution);
 
 export const isAdditionalFile = validateProperties({
   title: isString,
-  description: (value) =>
-    value === undefined ||
-    value === null ||
-    isString(value),
+  description: optional(isStringNonEmpty),
   files: validateArrayItems(isString),
 });
 
