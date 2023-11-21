@@ -1836,6 +1836,13 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     z-index: 2;
   }
 
+  /* Let sticky heading text span past lower-index cover art */
+
+  .content-sticky-heading-container.has-cover .content-sticky-heading-row,
+  .content-sticky-heading-container.has-cover .content-sticky-subheading-row {
+    grid-template-columns: 1fr 90px;
+  }
+
   /* Disable grid features, just line header children up vertically */
 
   #header {
