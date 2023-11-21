@@ -1310,6 +1310,10 @@ h3.content-heading {
 
 /* Sticky heading */
 
+[id] {
+  --custom-scroll-offset: 0px;
+}
+
 #content [id] {
   /* Adjust scroll margin. */
   scroll-margin-top: calc(
@@ -1317,6 +1321,7 @@ h3.content-heading {
     + 33px /* Sticky subheading */
     - 1em  /* One line of text (align bottom) */
     - 12px /* Padding for hanging letters & focus ring */
+    + var(--custom-scroll-offset) /* Customizable offset */
   );
 }
 
