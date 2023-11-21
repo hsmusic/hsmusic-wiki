@@ -685,7 +685,7 @@ export function asyncAdaptiveDecorateError(fn, callback) {
     try {
       return await fn(...args);
     } catch (caughtError) {
-      throw callback(caughtError);
+      throw callback(caughtError, ...args);
     }
   };
 
