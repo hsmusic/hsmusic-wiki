@@ -730,11 +730,14 @@ export function parseContributors(contributionStrings) {
     return contributionStrings;
   }
 
-  return contributionStrings.map(contribString => {
-    if (typeof contribString !== 'string') return contribString;
+  return contributionStrings.map(item => {
+    if (typeof item === 'object' && item['Who'])
+      return {who: item['Who'], what: item['What'] ?? null};
 
-    const match = contribString.match(extractAccentRegex);
-    if (!match) return contribString;
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
 
     return {
       who: match.groups.main,
@@ -748,11 +751,14 @@ export function parseAdditionalNames(additionalNameStrings) {
     return additionalNameStrings;
   }
 
-  return additionalNameStrings.map(additionalNameString => {
-    if (typeof additionalNameString !== 'string') return additionalNameString;
+  return additionalNameStrings.map(item => {
+    if (typeof item === 'object' && item['Name'])
+      return {name: item['Name'], annotation: item['Annotation'] ?? null};
 
-    const match = additionalNameString.match(extractAccentRegex);
-    if (!match) return additionalNameString;
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
 
     return {
       name: match.groups.main,
