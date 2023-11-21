@@ -576,6 +576,7 @@ const hashLinkInfo = clientInfo.hashLinkInfo = {
   },
 
   event: {
+    beforeHashLinkScrolls: [],
     whenHashLinkClicked: [],
   },
 };
@@ -638,6 +639,21 @@ function addHashLinkListeners() {
         return;
       }
 
+      // Don't do anything if the target element isn't actually visible!
+      if (target.offsetParent === null) {
+        return;
+      }
+
+      // Allow event handlers to prevent scrolling.
+      for (const handler of event.beforeHashLinkScrolls) {
+        if (handler({
+          link: hashLink,
+          target,
+        }) === false) {
+          return;
+        }
+      }
+
       // Hide skipper box right away, so the layout is updated on time for the
       // math operations coming up next.
       const skipper = document.getElementById('skippers');
@@ -675,6 +691,7 @@ function addHashLinkListeners() {
       for (const handler of event.whenHashLinkClicked) {
         handler({
           link: hashLink,
+          target,
         });
       }
     });
