@@ -802,6 +802,68 @@ html[data-url-key="localized.listing"][data-url-value0="random"] #content a:not(
   opacity: 0.7;
 }
 
+/* Additional names (heading and box) */
+
+h1 a[href="#additional-names-box"] {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+h1 a[href="#additional-names-box"]:hover {
+  text-decoration-style: solid;
+}
+
+#additional-names-box {
+  --custom-scroll-offset: calc(0.5em - 2px);
+
+  margin: 1em 0 1em -10px;
+  padding: 15px 20px 10px 20px;
+  width: max-content;
+  max-width: min(60vw, 600px);
+
+  border: 1px dotted var(--primary-color);
+  border-radius: 6px;
+
+  background:
+    linear-gradient(var(--bg-color), var(--bg-color)),
+    linear-gradient(#000000bb, #000000bb),
+    var(--primary-color);
+
+  box-shadow: 0 -2px 6px -1px var(--dim-color) inset;
+
+  display: none;
+}
+
+#additional-names-box > :first-child { margin-top: 0; }
+#additional-names-box > :last-child { margin-bottom: 0; }
+
+#additional-names-box p {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 0;
+  font-style: oblique;
+}
+
+#additional-names-box ul {
+  padding-left: 10px;
+  margin-top: 0.5em;
+}
+
+#additional-names-box li .additional-name {
+  margin-right: 0.25em;
+}
+
+#additional-names-box li .additional-name .content-image {
+  margin-bottom: 0.25em;
+  margin-top: 0.5em;
+}
+
+#additional-names-box li .annotation {
+  opacity: 0.8;
+  display: inline-block;
+}
+
 /* Images */
 
 .image-container {
@@ -1757,6 +1819,10 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   #cover-art-container {
     margin: 25px 0 5px 0;
     width: 100%;
+    max-width: unset;
+  }
+
+  #additional-names-box {
     max-width: unset;
   }
 
