@@ -3,6 +3,7 @@ import {Tag} from '#html';
 
 import {
   getExternalLinkStringsFromDescriptors,
+  isExternalLinkContext,
   isExternalLinkSpec,
   isExternalLinkStyle,
 } from '#external-links';
@@ -312,17 +313,22 @@ export class Language extends Thing {
       : duration;
   }
 
-  formatExternalLink(url, {style = 'normal'} = {}) {
+  formatExternalLink(url, {
+    style = 'normal',
+    context = 'generic',
+  } = {}) {
     if (!this.externalLinkSpec) {
       throw new TypeError(`externalLinkSpec unavailable`);
     }
 
-    if (style !== 'all') {
-      isExternalLinkStyle(style);
-    }
+    if (style !== 'all') isExternalLinkStyle(style);
+    isExternalLinkContext(context);
 
     const results =
-      getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, this);
+      getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
+        language: this,
+        context,
+      });
 
     if (style === 'all') {
       return results;

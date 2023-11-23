@@ -413,8 +413,17 @@ misc:
       "{PLACE} ({HANDLE})"
 
     local: "Wiki Archive (local upload)"
+
+    bandcamp: "Bandcamp"
+
+    bgreco:
+      _: "bgreco.net"
+      flash: "bgreco.net (high quality audio)"
+
     deviantart: "DeviantArt"
+    homestuck: "Homestuck"
     instagram: "Instagram"
+    mastodon: "Mastodon"
     newgrounds: "Newgrounds"
     patreon: "Patreon"
     poetryFoundation: "Poetry Foundation"
@@ -423,20 +432,20 @@ misc:
     tumblr: "Tumblr"
     twitter: "Twitter"
     wikipedia: "Wikipedia"
-    bandcamp: "Bandcamp"
-    mastodon: "Mastodon"
 
     youtube:
       _: "YouTube"
+      flash: "YouTube (on any device)"
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
 
-    flash:
-      bgreco: "{LINK} (HQ Audio)"
-      youtube: "{LINK} (on any device)"
-      homestuck:
-        page: "{LINK} (page {PAGE})"
-        secret: "{LINK} (secret page)"
+  # flashLink:
+  #   Flashes can be positioned by page! They're accented with this
+  #   information, if available.
+
+  flashLink:
+    page: "{LINK} (page {PAGE})"
+    secret: "{LINK} (secret page)"
 
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file

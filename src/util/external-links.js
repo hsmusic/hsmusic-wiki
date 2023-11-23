@@ -18,31 +18,48 @@ export const externalLinkStyles = [
 
 export const isExternalLinkStyle = is(...externalLinkStyles);
 
+export const externalLinkContexts = [
+  'album',
+  'artist',
+  'flash',
+  'generic',
+  'group',
+  'track',
+];
+
+export const isExternalLinkContext = is(...externalLinkContexts);
+
 // This might need to be adjusted for YAML importing...
-const isExternalLinkSpecRegex =
+const isRegExp =
   validateInstanceOf(RegExp);
 
 export const isExternalLinkHandleSpec =
   validateProperties({
     prefix: optional(isStringNonEmpty),
 
-    url: optional(isExternalLinkSpecRegex),
-
-    // TODO: Don't allow specifying both of these (they're aliases)
-    domain: optional(isExternalLinkSpecRegex),
-    hostname: optional(isExternalLinkSpecRegex),
-
-    // TODO: Don't allow specifying both of these (they're aliases)
-    path: optional(isExternalLinkSpecRegex),
-    pathname: optional(isExternalLinkSpecRegex),
+    url: optional(isRegExp),
+    domain: optional(isRegExp),
+    pathname: optional(isRegExp),
   });
 
 export const isExternalLinkSpec =
   validateArrayItems(
     validateProperties({
-      // TODO: Don't allow providing both of these, and require providing one
-      matchDomain: optional(isStringNonEmpty),
-      matchDomains: optional(validateArrayItems(isStringNonEmpty)),
+      match: validateProperties({
+        // TODO: Don't allow providing both of these, and require providing one
+        domain: optional(isStringNonEmpty),
+        domains: optional(validateArrayItems(isStringNonEmpty)),
+
+        // TODO: Don't allow providing both of these
+        pathname: optional(isRegExp),
+        pathnames: optional(validateArrayItems(isRegExp)),
+
+        // TODO: Don't allow providing both of these
+        query: optional(isRegExp),
+        queries: optional(validateArrayItems(isRegExp)),
+
+        context: optional(isExternalLinkContext),
+      }),
 
       string: isStringNonEmpty,
 
@@ -64,27 +81,84 @@ export const fallbackDescriptor = {
 
 // TODO: Define all this stuff in data as YAML!
 export const externalLinkSpec = [
+  // Special handling for album links
+
   {
-    matchDomain: 'hsmusic.wiki',
+    match: {
+      context: 'album',
+      domain: 'youtube.com',
+      pathname: /^playlist/,
+    },
 
-    string: 'local',
-
-    icon: 'globe',
+    string: 'youtube.playlist',
+    icon: 'youtube',
   },
 
   {
-    matchDomain: 'bandcamp.com',
+    match: {
+      context: 'album',
+      domain: 'youtube.com',
+      pathname: /^watch/,
+    },
 
-    string: 'bandcamp',
+    string: 'youtube.fullAlbum',
+    icon: 'youtube',
+  },
+
+  {
+    match: {
+      context: 'album',
+      domain: 'youtu.be',
+    },
+
+    string: 'youtube.fullAlbum',
+    icon: 'youtube',
+  },
+
+  // Special handling for artist links
+
+  {
+    match: {
+      context: 'artist',
+      domains: ['youtube.com', 'youtu.be'],
+    },
+
+    string: 'youtube',
+    icon: 'youtube',
 
     compact: 'handle',
-    icon: 'bandcamp',
 
-    handle: {domain: /^[^.]*/},
+    handle: {
+      pathname: /^(@.*?)\/?$/,
+    },
+  },
+
+  // Special handling for flash links
+
+  {
+    match: {
+      context: 'flash',
+      domain: 'bgreco.net',
+    },
+
+    string: 'bgreco.flash',
+    icon: 'external',
   },
 
   {
-    matchDomains: ['bc.s3m.us', 'music.solatrux.com'],
+    match: {
+      context: 'flash',
+      domains: ['youtube.com', 'youtu.be'],
+    },
+
+    string: 'youtube.flash',
+    icon: 'youtube',
+  },
+
+  // Generic domains, sorted alphabetically (by string)
+
+  {
+    match: {domains: ['bc.s3m.us', 'music.solatrux.com']},
 
     icon: 'bandcamp',
     string: 'bandcamp',
@@ -94,7 +168,47 @@ export const externalLinkSpec = [
   },
 
   {
-    matchDomains: ['types.pl'],
+    match: {domain: 'bandcamp.com'},
+
+    string: 'bandcamp',
+
+    compact: 'handle',
+    icon: 'bandcamp',
+
+    handle: {domain: /^[^.]*/},
+  },
+
+  {
+    match: {domain: 'deviantart.com'},
+
+    string: 'deviantart',
+    icon: 'deviantart',
+  },
+
+  {
+    match: {domain: 'instagram.com'},
+
+    string: 'instagram',
+    icon: 'instagram',
+  },
+
+  {
+    match: {domain: 'homestuck.com'},
+
+    string: 'homestuck',
+    icon: 'globe', // The horror!
+  },
+
+  {
+    match: {domain: 'hsmusic.wiki'},
+
+    string: 'local',
+
+    icon: 'globe',
+  },
+
+  {
+    match: {domains: ['types.pl']},
 
     icon: 'mastodon',
     string: 'mastodon',
@@ -103,23 +217,17 @@ export const externalLinkSpec = [
   },
 
   {
-    matchDomains: ['youtube.com', 'youtu.be'],
+    match: {domain: 'newgrounds.com'},
 
-    icon: 'youtube',
-    string: 'youtube',
-
-    compact: 'handle',
-
-    handle: {
-      pathname: /^(@.*?)\/?$/,
-    },
+    string: 'newgrounds',
+    icon: 'newgrounds',
   },
 
   {
-    matchDomain: 'soundcloud.com',
+    match: {domain: 'soundcloud.com'},
 
-    icon: 'soundcloud',
     string: 'soundcloud',
+    icon: 'soundcloud',
 
     compact: 'handle',
 
@@ -127,10 +235,10 @@ export const externalLinkSpec = [
   },
 
   {
-    matchDomain: 'tumblr.com',
+    match: {domain: 'tumblr.com'},
 
-    icon: 'tumblr',
     string: 'tumblr',
+    icon: 'tumblr',
 
     compact: 'handle',
 
@@ -138,62 +246,80 @@ export const externalLinkSpec = [
   },
 
   {
-    matchDomain: 'twitter.com',
+    match: {domain: 'twitter.com'},
 
-    icon: 'twitter',
     string: 'twitter',
+    icon: 'twitter',
 
     compact: 'handle',
 
     handle: {
       prefix: '@',
-      pathname: /^@?.*\/?$/,
+      pathname: /^@?([a-zA-Z0-9_]*)\/?$/,
     },
   },
 
   {
-    matchDomain: 'deviantart.com',
+    match: {domains: ['youtube.com', 'youtu.be']},
 
-    icon: 'deviantart',
-    string: 'deviantart',
-  },
-
-  {
-    matchDomain: 'instagram.com',
-
-    icon: 'instagram',
-    string: 'instagram',
-  },
-
-  {
-    matchDomain: 'newgrounds.com',
-
-    icon: 'newgrounds',
-    string: 'newgrounds',
+    string: 'youtube',
+    icon: 'youtube',
   },
 ];
 
-export function getMatchingDescriptorsForExternalLink(url, descriptors) {
-  const {hostname: domain} = new URL(url);
-  const compare = d => domain.includes(d);
+function urlParts(url) {
+  const {
+    hostname: domain,
+    pathname,
+    search: query,
+  } = new URL(url);
+
+  return {domain, pathname, query};
+}
+
+export function getMatchingDescriptorsForExternalLink(url, descriptors, {
+  context = 'generic',
+} = {}) {
+  const {domain, pathname, query} = urlParts(url);
+
+  const compareDomain = string => domain.includes(string);
+  const comparePathname = regex => regex.test(pathname.slice(1));
+  const compareQuery = regex => regex.test(query.slice(1));
 
   const matchingDescriptors =
-    descriptors.filter(spec => {
-      if (spec.matchDomain && compare(spec.matchDomain)) return true;
-      if (spec.matchDomains && spec.matchDomains.some(compare)) return true;
-      return false;
-    });
+    descriptors
+      .filter(({match}) => {
+        if (match.domain) return compareDomain(match.domain);
+        if (match.domains) return match.domains.some(compareDomain);
+        return false;
+      })
+      .filter(({match}) => {
+        if (match.context) return context === match.context;
+        return true;
+      })
+      .filter(({match}) => {
+        if (match.pathname) return comparePathname(match.pathname);
+        if (match.pathnames) return match.pathnames.some(comparePathname);
+        return true;
+      })
+      .filter(({match}) => {
+        if (match.query) return compareQuery(match.query);
+        if (match.queries) return match.quieries.some(compareQuery);
+        return true;
+      });
 
   return [...matchingDescriptors, fallbackDescriptor];
 }
 
-export function getExternalLinkStringsFromDescriptor(url, descriptor, language) {
+export function getExternalLinkStringsFromDescriptor(url, descriptor, {
+  language,
+}) {
   const prefix = 'misc.external';
 
   const results =
     Object.fromEntries(externalLinkStyles.map(style => [style, null]));
 
-  const {hostname: domain, pathname} = new URL(url);
+  const {domain, pathname, query} = urlParts(url);
 
   const place = language.$(prefix, descriptor.string);
 
@@ -240,7 +366,7 @@ export function getExternalLinkStringsFromDescriptor(url, descriptor, language) 
 
           case 'path':
           case 'pathname':
-            tests.push(pathname.slice(1));
+            tests.push(pathname.slice(1) + query);
             break;
 
           default:
@@ -277,7 +403,10 @@ export function getExternalLinkStringsFromDescriptor(url, descriptor, language) 
   return results;
 }
 
-export function getExternalLinkStringsFromDescriptors(url, descriptors, language) {
+export function getExternalLinkStringsFromDescriptors(url, descriptors, {
+  language,
+  context = 'generic',
+}) {
   const results =
     Object.fromEntries(externalLinkStyles.map(style => [style, null]));
 
@@ -285,11 +414,11 @@ export function getExternalLinkStringsFromDescriptors(url, descriptors, language
     new Set(Object.keys(results));
 
   const matchingDescriptors =
-    getMatchingDescriptorsForExternalLink(url, descriptors);
+    getMatchingDescriptorsForExternalLink(url, descriptors, {context});
 
   for (const descriptor of matchingDescriptors) {
     const descriptorResults =
-      getExternalLinkStringsFromDescriptor(url, descriptor, language);
+      getExternalLinkStringsFromDescriptor(url, descriptor, {language});
 
     const descriptorKeys =
       new Set(
