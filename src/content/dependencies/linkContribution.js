@@ -1,15 +1,8 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'linkArtist',
-    'linkExternalAsIcon',
-  ],
-
-  extraDependencies: [
-    'html',
-    'language',
-  ],
+  contentDependencies: ['linkArtist', 'linkExternalAsIcon'],
+  extraDependencies: ['html', 'language'],
 
   relations(relation, contribution) {
     const relations = {};
@@ -85,7 +78,8 @@ export default {
               [html.joinChildren]: '',
               class: 'icons-tooltip-content',
             },
-            relations.artistIcons)),
+            relations.artistIcons
+              .map(icon => icon.slot('withText', true)))),
       ];
     }
 

@@ -477,7 +477,7 @@ a:not([href]):hover {
   position: relative;
 }
 
-.contribution.has-tooltip a {
+.contribution.has-tooltip > a {
   text-decoration: underline;
   text-decoration-style: dotted;
 }
@@ -489,8 +489,8 @@ a:not([href]):hover {
 
 .icons-tooltip {
   position: absolute;
-  z-index: 1;
-  left: -12px;
+  z-index: 3;
+  left: -36px;
   top: calc(1em - 2px);
   padding: 4px 12px 6px 8px;
 }
@@ -504,13 +504,20 @@ a:not([href]):hover {
   padding: 6px 2px 2px 2px;
   background: var(--bg-black-color);
   border: 1px dotted var(--primary-color);
-  border-radius: 4px;
+  border-radius: 6px;
 
-  -webkit-backdrop-filter: blur(2px);
-          backdrop-filter: blur(2px);
+  -webkit-backdrop-filter:
+    brightness(1.5) saturate(1.4) blur(4px);
+
+          backdrop-filter:
+    brightness(1.5) saturate(1.4) blur(4px);
 
   -webkit-user-select: none;
           user-select: none;
+
+  box-shadow:
+    0 3px 4px 4px #000000aa,
+    0 -2px 4px -2px var(--primary-color) inset;
 
   cursor: default;
 }
@@ -536,6 +543,23 @@ a:not([href]):hover {
   top: -0.25em;
   position: absolute;
   fill: var(--primary-color);
+}
+
+.icon.has-text {
+  display: block;
+  width: unset;
+  height: 1.4em;
+}
+
+.icon.has-text > svg {
+  width: 18px;
+  height: 18px;
+  top: -0.1em;
+}
+
+.icon.has-text > .icon-text {
+  margin-left: 24px;
+  padding-right: 8px;
 }
 
 .rerelease,

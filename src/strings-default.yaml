@@ -404,19 +404,15 @@ misc:
   #   wiki - sorry!
 
   external:
+    external: "External"
 
-    # domain:
-    #   General domain when one the URL doesn't match one of the
-    #   sites below.
+    withDomain:
+      "{PLACE} ({DOMAIN})"
 
-    domain: "External ({DOMAIN})"
-
-    # local:
-    #   Files which are locally available on the wiki (under its media
-    #   directory).
+    withHandle:
+      "{PLACE} ({HANDLE})"
 
     local: "Wiki Archive (local upload)"
-
     deviantart: "DeviantArt"
     instagram: "Instagram"
     newgrounds: "Newgrounds"
@@ -427,14 +423,8 @@ misc:
     tumblr: "Tumblr"
     twitter: "Twitter"
     wikipedia: "Wikipedia"
-
-    bandcamp:
-      _: "Bandcamp"
-      domain: "Bandcamp ({DOMAIN})"
-
-    mastodon:
-      _: "Mastodon"
-      domain: "Mastodon ({DOMAIN})"
+    bandcamp: "Bandcamp"
+    mastodon: "Mastodon"
 
     youtube:
       _: "YouTube"
