@@ -12,6 +12,7 @@ import {
 export const externalLinkStyles = [
   'normal',
   'compact',
+  'platform',
   'icon-id',
 ];
 
@@ -181,15 +182,14 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors) {
 export function getExternalLinkStringsFromDescriptor(url, descriptor, language) {
   const prefix = 'misc.external';
 
-  const results = {
-    'normal': null,
-    'compact': null,
-    'icon-id': null,
-  };
+  const results =
+    Object.fromEntries(externalLinkStyles.map(style => [style, null]));
 
   const {hostname: domain, pathname} = new URL(url);
 
   const place = language.$(prefix, descriptor.string);
+
+  results['platform'] = place;
 
   if (descriptor.icon) {
     results['icon-id'] = descriptor.icon;
@@ -270,11 +270,8 @@ export function getExternalLinkStringsFromDescriptor(url, descriptor, language) 
 }
 
 export function getExternalLinkStringsFromDescriptors(url, descriptors, language) {
-  const results = {
-    'normal': null,
-    'compact': null,
-    'icon-id': null,
-  };
+  const results =
+    Object.fromEntries(externalLinkStyles.map(style => [style, null]));
 
   const remainingKeys =
     new Set(Object.keys(results));
