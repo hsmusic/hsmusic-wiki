@@ -161,7 +161,10 @@ export default {
           sec.visit &&
             html.tag('p',
               language.$('releaseInfo.visitOn', {
-                links: language.formatDisjunctionList(sec.visit.externalLinks),
+                links:
+                  language.formatDisjunctionList(
+                    sec.visit.externalLinks
+                      .map(link => link.slot('context', 'artist'))),
               })),
 
           sec.artworks?.artistGalleryLink &&

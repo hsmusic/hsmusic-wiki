@@ -58,7 +58,8 @@ export default {
           },
           language.formatUnitList(
             relations.artistIcons
-              .slice(0, 4)));
+              .slice(0, 4)
+              .map(icon => icon.slot('context', 'artist'))));
     }
 
     let content = language.formatString(parts.join('.'), options);
@@ -79,7 +80,7 @@ export default {
               class: 'icons-tooltip-content',
             },
             relations.artistIcons
-              .map(icon => icon.slot('withText', true)))),
+              .map(icon => icon.slots({context: 'artist', withText: true})))),
       ];
     }
 

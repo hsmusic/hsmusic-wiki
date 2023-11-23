@@ -94,7 +94,7 @@ export default {
             links:
               language.formatDisjunctionList(
                 relations.externalLinks
-                  .map(link => link.slot('mode', 'album'))),
+                  .map(link => link.slot('context', 'album'))),
           })),
     ]);
   },

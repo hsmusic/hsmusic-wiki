@@ -1,6 +1,8 @@
 // Note: This function is seriously hard-coded for HSMusic, with custom
 // presentation of links to Homestuck flashes hosted various places.
 
+// This also appears to be dead code, apart from a single snapshot test??
+
 export default {
   contentDependencies: ['linkExternal'],
   extraDependencies: ['html', 'language'],
@@ -21,6 +23,8 @@ export default {
   generate(data, relations, {html, language}) {
     const {link} = relations;
     const {url, page} = data;
+
+    link.setSlot('context', 'flash');
 
     return html.tag('span',
       {class: 'nowrap'},

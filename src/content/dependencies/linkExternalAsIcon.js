@@ -1,21 +1,32 @@
+import {isExternalLinkContext} from '#external-links';
+
 export default {
   extraDependencies: ['html', 'language', 'to'],
 
   data: (url) => ({url}),
 
   slots: {
+    context: {
+      // This awkward syntax is because the slot descriptor validator can't
+      // differentiate between a function that returns a validator (the usual
+      // syntax) and a function that is itself a validator.
+      validate: () => isExternalLinkContext,
+      default: 'generic',
+    },
+
     withText: {type: 'boolean'},
   },
 
   generate(data, slots, {html, language, to}) {
-    const {url} = data;
+    const format = style =>
+      language.formatExternalLink(data.url, {style, context: slots.context});
 
-    const normalText = language.formatExternalLink(url, {style: 'normal'});
-    const compactText = language.formatExternalLink(url, {style: 'compact'});
-    const iconId = language.formatExternalLink(url, {style: 'icon-id'});
+    const normalText = format('normal');
+    const compactText = format('compact');
+    const iconId = format('icon-id');
 
     return html.tag('a',
-      {href: url, class: ['icon', slots.withText && 'has-text']},
+      {href: data.url, class: ['icon', slots.withText && 'has-text']},
       [
         html.tag('svg', [
           !slots.withText &&

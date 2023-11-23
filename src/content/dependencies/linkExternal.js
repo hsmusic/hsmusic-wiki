@@ -1,3 +1,5 @@
+import {isExternalLinkContext} from '#external-links';
+
 export default {
   extraDependencies: ['html', 'language', 'wikiData'],
 
@@ -16,8 +18,11 @@ export default {
   },
 
   slots: {
-    mode: {
-      validate: v => v.is('generic', 'album', 'flash'),
+    context: {
+      // This awkward syntax is because the slot descriptor validator can't
+      // differentiate between a function that returns a validator (the usual
+      // syntax) and a function that is itself a validator.
+      validate: () => isExternalLinkContext,
       default: 'generic',
     },
   },
@@ -26,7 +31,10 @@ export default {
     return (
       html.tag('a',
         {href: data.url, class: 'nowrap'},
-        language.formatExternalLink(data.url, {style: 'platform'})));
+        language.formatExternalLink(data.url, {
+          style: 'platform',
+          context: slots.context,
+        })));
   },
 
     /*
