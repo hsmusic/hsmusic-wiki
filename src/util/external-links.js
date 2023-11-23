@@ -65,6 +65,14 @@ export const fallbackDescriptor = {
 // TODO: Define all this stuff in data as YAML!
 export const externalLinkSpec = [
   {
+    matchDomain: 'hsmusic.wiki',
+
+    string: 'local',
+
+    icon: 'globe',
+  },
+
+  {
     matchDomain: 'bandcamp.com',
 
     string: 'bandcamp',

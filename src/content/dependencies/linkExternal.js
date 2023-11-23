@@ -30,28 +30,6 @@ export default {
   },
 
     /*
-    let isLocal;
-    let domain;
-    let pathname;
-
-    try {
-      const url = new URL(data.url);
-      domain = url.hostname;
-      pathname = url.pathname;
-    } catch (error) {
-      // No support for relative local URLs yet, sorry! (I.e, local URLs must
-      // be absolute relative to the domain name in order to work.)
-      isLocal = true;
-      domain = null;
-      pathname = null;
-    }
-
-    // isLocal also applies for URLs which match the 'Canonical Base' under
-    // wiki-info.yaml, if present.
-    if (data.canonicalDomain && domain === data.canonicalDomain) {
-      isLocal = true;
-    }
-
     : domain.includes('youtu')
         ? slots.mode === 'album'
           ? data.url.includes('list=')
