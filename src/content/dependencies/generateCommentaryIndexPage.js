@@ -19,13 +19,13 @@ export default {
       query.albums.map(album =>
         [album, ...album.tracks]
           .filter(({commentary}) => commentary)
-          .map(({commentary}) => commentary));
+          .flatMap(({commentary}) => commentary));
 
     query.wordCounts =
       entries.map(entries =>
         accumulateSum(
           entries,
-          entry => entry.split(' ').length));
+          entry => entry.body.split(' ').length));
 
     query.entryCounts =
       entries.map(entries => entries.length);
