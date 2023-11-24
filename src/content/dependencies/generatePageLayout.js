@@ -108,6 +108,8 @@ export default {
     title: {type: 'html'},
     showWikiNameInTitle: {type: 'boolean', default: true},
 
+    additionalNames: {type: 'html'},
+
     cover: {type: 'html'},
 
     socialEmbed: {type: 'html'},
@@ -222,22 +224,25 @@ export default {
     const colors = getColors(slots.color ?? data.wikiColor);
     const hasSocialEmbed = !html.isBlank(slots.socialEmbed);
 
-    let titleHTML = null;
+    const titleContentsHTML =
+      (html.isBlank(slots.title)
+        ? null
+     : html.isBlank(slots.additionalNames)
+        ? language.sanitize(slots.title)
+        : html.tag('a', {
+            href: '#additional-names-box',
+            title: language.$('misc.additionalNames.tooltip').toString(),
+          }, language.sanitize(slots.title)));
 
-    if (!html.isBlank(slots.title)) {
-      switch (slots.headingMode) {
-        case 'sticky':
-          titleHTML =
-            relations.stickyHeadingContainer.slots({
-              title: slots.title,
-              cover: slots.cover,
-            });
-          break;
-        case 'static':
-          titleHTML = html.tag('h1', slots.title);
-          break;
-      }
-    }
+    const titleHTML =
+      (html.isBlank(slots.title)
+        ? null
+     : slots.headingMode === 'sticky'
+        ? relations.stickyHeadingContainer.slots({
+            title: titleContentsHTML,
+            cover: slots.cover,
+          })
+        : html.tag('h1', titleContentsHTML));
 
     let footerContent = slots.footerContent;
 
@@ -254,6 +259,7 @@ export default {
         titleHTML,
 
         slots.cover,
+        slots.additionalNames,
 
         html.tag('div',
           {

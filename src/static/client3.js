@@ -1033,6 +1033,7 @@ const hashLinkInfo = clientInfo.hashLinkInfo = {
   },
 
   event: {
+    beforeHashLinkScrolls: [],
     whenHashLinkClicked: [],
   },
 };
@@ -1095,6 +1096,21 @@ function addHashLinkListeners() {
         return;
       }
 
+      // Don't do anything if the target element isn't actually visible!
+      if (target.offsetParent === null) {
+        return;
+      }
+
+      // Allow event handlers to prevent scrolling.
+      for (const handler of event.beforeHashLinkScrolls) {
+        if (handler({
+          link: hashLink,
+          target,
+        }) === false) {
+          return;
+        }
+      }
+
       // Hide skipper box right away, so the layout is updated on time for the
       // math operations coming up next.
       const skipper = document.getElementById('skippers');
@@ -1134,6 +1150,7 @@ function addHashLinkListeners() {
       for (const handler of event.whenHashLinkClicked) {
         handler({
           link: hashLink,
+          target,
         });
       }
     });
@@ -1703,6 +1720,96 @@ function loadImage(imageUrl, onprogress) {
     xhr.send();
   });
 }
+
+// "Additional names" box ---------------------------------
+
+const additionalNamesBoxInfo = clientInfo.additionalNamesBox = {
+  box: null,
+  links: null,
+  mainContentContainer: null,
+
+  state: {
+    visible: false,
+  },
+};
+
+function getAdditionalNamesBoxReferences() {
+  const info = additionalNamesBoxInfo;
+
+  info.box =
+    document.getElementById('additional-names-box');
+
+  info.links =
+    document.querySelectorAll('a[href="#additional-names-box"]');
+
+  info.mainContentContainer =
+    document.querySelector('#content .main-content-container');
+}
+
+function addAdditionalNamesBoxInternalListeners() {
+  const info = additionalNamesBoxInfo;
+
+  hashLinkInfo.event.beforeHashLinkScrolls.push(({target}) => {
+    if (target === info.box) {
+      return false;
+    }
+  });
+}
+
+function addAdditionalNamesBoxListeners() {
+  const info = additionalNamesBoxInfo;
+
+  for (const link of info.links) {
+    link.addEventListener('click', domEvent => {
+      handleAdditionalNamesBoxLinkClicked(domEvent);
+    });
+  }
+}
+
+function handleAdditionalNamesBoxLinkClicked(domEvent) {
+  const info = additionalNamesBoxInfo;
+  const {state} = info;
+
+  domEvent.preventDefault();
+
+  if (!info.box || !info.mainContentContainer) return;
+
+  const margin =
+    +(cssProp(info.box, 'scroll-margin-top').replace('px', ''));
+
+  const {top} =
+    (state.visible
+      ? info.box.getBoundingClientRect()
+      : info.mainContentContainer.getBoundingClientRect());
+
+  if (top + 20 < margin || top > 0.4 * window.innerHeight) {
+    if (!state.visible) {
+      toggleAdditionalNamesBox();
+    }
+
+    window.scrollTo({
+      top: window.scrollY + top - margin,
+      behavior: 'smooth',
+    });
+  } else {
+    toggleAdditionalNamesBox();
+  }
+}
+
+function toggleAdditionalNamesBox() {
+  const info = additionalNamesBoxInfo;
+  const {state} = info;
+
+  state.visible = !state.visible;
+  info.box.style.display =
+    (state.visible
+      ? 'block'
+      : 'none');
+}
+
+clientSteps.getPageReferences.push(getAdditionalNamesBoxReferences);
+clientSteps.addInternalListeners.push(addAdditionalNamesBoxInternalListeners);
+clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
 
 // Group contributions table ------------------------------
 

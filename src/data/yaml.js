@@ -436,6 +436,7 @@ export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHel
 
 export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
+    'Additional Names': parseAdditionalNames,
     'Duration': parseDuration,
 
     'Date First Released': (value) => new Date(value),
@@ -457,6 +458,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
   propertyFieldMapping: {
     name: 'Track',
     directory: 'Directory',
+    additionalNames: 'Additional Names',
     duration: 'Duration',
     color: 'Color',
     urls: 'URLs',
@@ -717,26 +719,52 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export function parseContributors(contributors) {
+const extractAccentRegex =
+  /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
+
+export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
-  if (!Array.isArray(contributors)) {
-    return contributors;
+  if (!Array.isArray(contributionStrings)) {
+    return contributionStrings;
   }
 
-  contributors = contributors.map((contrib) => {
-    if (typeof contrib !== 'string') return contrib;
+  return contributionStrings.map(item => {
+    if (typeof item === 'object' && item['Who'])
+      return {who: item['Who'], what: item['What'] ?? null};
 
-    const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) return contrib;
+    if (typeof item !== 'string') return item;
 
-    const who = match[1];
-    const what = match[3] || null;
-    return {who, what};
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      who: match.groups.main,
+      what: match.groups.accent ?? null,
+    };
   });
+}
 
-  return contributors;
+export function parseAdditionalNames(additionalNameStrings) {
+  if (!Array.isArray(additionalNameStrings)) {
+    return additionalNameStrings;
+  }
+
+  return additionalNameStrings.map(item => {
+    if (typeof item === 'object' && item['Name'])
+      return {name: item['Name'], annotation: item['Annotation'] ?? null};
+
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      name: match.groups.main,
+      annotation: match.groups.accent ?? null,
+    };
+  });
 }
 
 function parseDimensions(string) {
