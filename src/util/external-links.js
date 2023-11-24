@@ -380,7 +380,7 @@ export function extractPartFromExternalLink(url, extract) {
   let prefix = '';
 
   if (extract instanceof RegExp) {
-    regexen.push(descriptor.handle);
+    regexen.push(extract);
     tests.push(url);
   } else {
     for (const [key, value] of Object.entries(extract)) {
@@ -403,6 +403,7 @@ export function extractPartFromExternalLink(url, extract) {
 
         case 'query':
           tests.push(query.slice(1));
+          break;
 
         default:
           tests.push('');
