@@ -2,6 +2,7 @@ import {empty, stitchArrays} from '#sugar';
 
 import {
   is,
+  isObject,
   isStringNonEmpty,
   optional,
   validateArrayItems,
@@ -33,13 +34,14 @@ export const isExternalLinkContext = is(...externalLinkContexts);
 const isRegExp =
   validateInstanceOf(RegExp);
 
-export const isExternalLinkHandleSpec =
+export const isExternalLinkExtractSpec =
   validateProperties({
     prefix: optional(isStringNonEmpty),
 
     url: optional(isRegExp),
     domain: optional(isRegExp),
     pathname: optional(isRegExp),
+    query: optional(isRegExp),
   });
 
 export const isExternalLinkSpec =
@@ -63,12 +65,16 @@ export const isExternalLinkSpec =
 
       string: isStringNonEmpty,
 
-      // TODO: Don't allow 'handle' options if handle isn't provided
-      normal: optional(is('domain', 'handle')),
-      compact: optional(is('domain', 'handle')),
+      // TODO: Don't allow 'handle' or 'custom' options if the corresponding
+      // properties aren't provided
+      normal: optional(is('domain', 'handle', 'custom')),
+      compact: optional(is('domain', 'handle', 'custom')),
       icon: optional(isStringNonEmpty),
 
-      handle: optional(isExternalLinkHandleSpec),
+      handle: optional(isExternalLinkExtractSpec),
+
+      // TODO: This should validate each value with isExternalLinkExtractSpec.
+      custom: optional(isObject),
     }));
 
 export const fallbackDescriptor = {
@@ -143,6 +149,38 @@ export const externalLinkSpec = [
 
     string: 'bgreco.flash',
     icon: 'external',
+  },
+
+  // This takes precedence over the secretPage match below.
+  {
+    match: {
+      context: 'flash',
+      domain: 'homestuck.com',
+      pathname: /^story\/[0-9]+\/?$/,
+    },
+
+    platform: 'homestuck',
+    string: 'homestuck.page',
+    icon: 'globe',
+
+    normal: 'custom',
+
+    custom: {
+      page: {
+        pathname: /[0-9]+/,
+      },
+    },
+  },
+
+  {
+    match: {
+      context: 'flash',
+      domain: 'homestuck.com',
+      pathname: /^story\/.+\/?$/,
+    },
+
+    string: 'homestuck.secretPage',
+    icon: 'globe',
   },
 
   {
@@ -277,6 +315,10 @@ function urlParts(url) {
   return {domain, pathname, query};
 }
 
+function createEmptyResults() {
+  return Object.fromEntries(externalLinkStyles.map(style => [style, null]));
+}
+
 export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   context = 'generic',
 } = {}) {
@@ -311,107 +353,257 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   return [...matchingDescriptors, fallbackDescriptor];
 }
 
-export function getExternalLinkStringsFromDescriptor(url, descriptor, {
-  language,
-}) {
-  const prefix = 'misc.external';
-
-  const results =
-    Object.fromEntries(externalLinkStyles.map(style => [style, null]));
-
+export function extractPartFromExternalLink(url, extract) {
   const {domain, pathname, query} = urlParts(url);
 
-  const place = language.$(prefix, descriptor.string);
+  let regexen = [];
+  let tests = [];
+  let prefix = '';
 
-  results['platform'] = place;
+  if (extract instanceof RegExp) {
+    regexen.push(descriptor.handle);
+    tests.push(url);
+  } else {
+    for (const [key, value] of Object.entries(extract)) {
+      switch (key) {
+        case 'prefix':
+          prefix = value;
+          continue;
 
-  if (descriptor.icon) {
-    results['icon-id'] = descriptor.icon;
+        case 'url':
+          tests.push(url);
+          break;
+
+        case 'domain':
+          tests.push(domain);
+          break;
+
+        case 'pathname':
+          tests.push(pathname.slice(1));
+          break;
+
+        case 'query':
+          tests.push(query.slice(1));
+
+        default:
+          tests.push('');
+          break;
+      }
+
+      regexen.push(value);
+    }
   }
 
-  if (descriptor.normal === 'domain') {
-    results['normal'] = language.$(prefix, 'withDomain', {place, domain});
+  for (const {regex, test} of stitchArrays({
+    regex: regexen,
+    test: tests,
+  })) {
+    const match = test.match(regex);
+    if (match) {
+      return prefix + (match[1] ?? match[0]);
+    }
   }
 
-  if (descriptor.compact === 'domain') {
-    results['compact'] = language.sanitize(domain.replace(/^www\./, ''));
+  return null;
+}
+
+export function extractAllCustomPartsFromExternalLink(url, custom) {
+  const customParts = {};
+
+  // All or nothing: if one part doesn't match, all results are scrapped.
+  for (const [key, value] of Object.entries(custom)) {
+    customParts[key] = extractPartFromExternalLink(url, value);
+    if (!customParts[key]) return null;
   }
 
-  let handle = null;
+  return customParts;
+}
 
-  if (descriptor.handle) {
-    let regexen = [];
-    let tests = [];
+const prefix = 'misc.external';
 
-    let handlePrefix = '';
+export function getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language}) {
+  function getPlatform() {
+    if (descriptor.custom) {
+      return null;
+    }
 
-    if (descriptor.handle instanceof RegExp) {
-      regexen.push(descriptor.handle);
-      tests.push(url);
+    return language.$(prefix, descriptor.string);
+  }
+
+  function getDomain() {
+    return urlParts(url).domain;
+  }
+
+  function getCustom() {
+    if (!descriptor.custom) {
+      return null;
+    }
+
+    const customParts =
+      extractAllCustomPartsFromExternalLink(url, descriptor.custom);
+
+    if (!customParts) {
+      return null;
+    }
+
+    return language.$(prefix, descriptor.string, customParts);
+  }
+
+  function getHandle() {
+    if (!descriptor.handle) {
+      return null;
+    }
+
+    return extractPartFromExternalLink(url, descriptor.handle);
+  }
+
+  function getNormal() {
+    if (descriptor.custom) {
+      if (descriptor.normal === 'custom') {
+        return getCustom();
+      } else {
+        return null;
+      }
+    }
+
+    if (descriptor.normal === 'domain') {
+      const platform = getPlatform();
+      const domain = getDomain();
+
+      if (!platform || !domain) {
+        return null;
+      }
+
+      return language.$(prefix, 'withDomain', {platform, domain});
+    }
+
+    if (descriptor.normal === 'handle') {
+      const platform = getPlatform();
+      const handle = getHandle();
+
+      if (!platform || !handle) {
+        return null;
+      }
+
+      return language.$(prefix, 'withHandle', {platform, handle});
+    }
+
+    return language.$(prefix, descriptor.string);
+  }
+
+  function getCompact() {
+    if (descriptor.custom) {
+      if (descriptor.compact === 'custom') {
+        return getCustom();
+      } else {
+        return null;
+      }
+    }
+
+    if (descriptor.compact === 'domain') {
+      const domain = getDomain();
+
+      if (!domain) {
+        return null;
+      }
+
+      return language.sanitize(domain.replace(/^www\./, ''));
+    }
+
+    if (descriptor.compact === 'handle') {
+      const handle = getHandle();
+
+      if (!handle) {
+        return null;
+      }
+
+      return language.sanitize(handle);
+    }
+  }
+
+  function getIconId() {
+    return descriptor.icon ?? null;
+  }
+
+  switch (style) {
+    case 'normal': return getNormal();
+    case 'compact': return getCompact();
+    case 'platform': return getPlatform();
+    case 'icon-id': return getIconId();
+  }
+}
+
+export function couldDescriptorSupportStyle(descriptor, style) {
+  if (style === 'platform') {
+    return !descriptor.custom;
+  }
+
+  if (style === 'icon-id') {
+    return !!descriptor.icon;
+  }
+
+  if (style === 'normal') {
+    if (descriptor.custom) {
+      return descriptor.normal === 'custom';
     } else {
-      for (const [key, value] of Object.entries(descriptor.handle)) {
-        switch (key) {
-          case 'prefix':
-            handlePrefix = value;
-            continue;
-
-          case 'url':
-            tests.push(url);
-            break;
-
-          case 'domain':
-          case 'hostname':
-            tests.push(domain);
-            break;
-
-          case 'path':
-          case 'pathname':
-            tests.push(pathname.slice(1) + query);
-            break;
-
-          default:
-            tests.push('');
-            break;
-        }
-
-        regexen.push(value);
-      }
-    }
-
-    for (const {regex, test} of stitchArrays({
-      regex: regexen,
-      test: tests,
-    })) {
-      const match = test.match(regex);
-      if (match) {
-        handle = handlePrefix + (match[1] ?? match[0]);
-        break;
-      }
+      return true;
     }
   }
 
-  if (descriptor.compact === 'handle') {
-    results.compact = language.sanitize(handle);
+  if (style === 'compact') {
+    if (descriptor.custom) {
+      return descriptor.compact === 'custom';
+    } else {
+      return !!descriptor.compact;
+    }
+  }
+}
+
+export function getExternalLinkStringOfStyleFromDescriptors(url, style, descriptors, {
+  language,
+  context = 'generic',
+}) {
+  const matchingDescriptors =
+    getMatchingDescriptorsForExternalLink(url, descriptors, {context});
+
+  console.log('match-filtered:', matchingDescriptors);
+
+  const styleFilteredDescriptors =
+    matchingDescriptors.filter(descriptor =>
+      couldDescriptorSupportStyle(descriptor, style));
+
+  console.log('style-filtered:', styleFilteredDescriptors);
+
+  for (const descriptor of styleFilteredDescriptors) {
+    const descriptorResult =
+      getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language});
+
+    if (descriptorResult) {
+      return descriptorResult;
+    }
   }
 
-  if (descriptor.normal === 'handle' && handle) {
-    results.normal = language.$(prefix, 'withHandle', {place, handle});
-  }
+  return null;
+}
 
-  results.normal ??= language.$(prefix, descriptor.string);
+export function getExternalLinkStringsFromDescriptor(url, descriptor, {language}) {
+  const getStyle = style =>
+    getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language});
 
-  return results;
+  return {
+    'normal': getStyle('normal'),
+    'compact': getStyle('compact'),
+    'platform': getStyle('platform'),
+    'icon-id': getStyle('icon-id'),
+  };
 }
 
 export function getExternalLinkStringsFromDescriptors(url, descriptors, {
   language,
   context = 'generic',
 }) {
-  const results =
-    Object.fromEntries(externalLinkStyles.map(style => [style, null]));
-
-  const remainingKeys =
-    new Set(Object.keys(results));
+  const results = createEmptyResults();
+  const remainingKeys = new Set(Object.keys(results));
 
   const matchingDescriptors =
     getMatchingDescriptorsForExternalLink(url, descriptors, {context});

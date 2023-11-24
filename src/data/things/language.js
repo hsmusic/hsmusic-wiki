@@ -2,6 +2,7 @@ import {isLanguageCode} from '#validators';
 import {Tag} from '#html';
 
 import {
+  getExternalLinkStringOfStyleFromDescriptors,
   getExternalLinkStringsFromDescriptors,
   isExternalLinkContext,
   isExternalLinkSpec,
@@ -321,20 +322,19 @@ export class Language extends Thing {
       throw new TypeError(`externalLinkSpec unavailable`);
     }
 
-    if (style !== 'all') isExternalLinkStyle(style);
     isExternalLinkContext(context);
 
-    const results =
-      getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
+    if (style === 'all') {
+      return getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
         language: this,
         context,
       });
-
-    if (style === 'all') {
-      return results;
-    } else {
-      return results[style];
     }
+
+    return getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
+      language: this,
+      context,
+    });
   }
 
   formatIndex(value) {

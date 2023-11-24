@@ -407,10 +407,10 @@ misc:
     external: "External"
 
     withDomain:
-      "{PLACE} ({DOMAIN})"
+      "{PLATFORM} ({DOMAIN})"
 
     withHandle:
-      "{PLACE} ({HANDLE})"
+      "{PLATFORM} ({HANDLE})"
 
     local: "Wiki Archive (local upload)"
 
@@ -421,7 +421,12 @@ misc:
       flash: "bgreco.net (high quality audio)"
 
     deviantart: "DeviantArt"
-    homestuck: "Homestuck"
+
+    homestuck:
+      _: "Homestuck"
+      page: "Homestuck (page {PAGE})"
+      secretPage: "Homestuck (secret page)"
+
     instagram: "Instagram"
     mastodon: "Mastodon"
     newgrounds: "Newgrounds"
@@ -438,14 +443,6 @@ misc:
       flash: "YouTube (on any device)"
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
-
-  # flashLink:
-  #   Flashes can be positioned by page! They're accented with this
-  #   information, if available.
-
-  flashLink:
-    page: "{LINK} (page {PAGE})"
-    secret: "{LINK} (secret page)"
 
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file
