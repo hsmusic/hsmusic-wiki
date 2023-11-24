@@ -624,7 +624,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', 'site5.css', cachebust),
+              href: to('shared.staticFile', 'site6.css', cachebust),
             }),
 
             html.tag('style', [
