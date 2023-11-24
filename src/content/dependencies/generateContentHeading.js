@@ -29,7 +29,9 @@ export default {
               .slot('color', slots.color)
               .content,
       }, [
-        slots.title,
+        html.tag('span',
+          {[html.onlyIfContent]: true, class: 'content-heading-main-title'},
+          slots.title),
 
         html.tag('span',
           {[html.onlyIfContent]: true, class: 'content-heading-accent'},

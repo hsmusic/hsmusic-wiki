@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -11,6 +11,7 @@ export default {
     'generateTrackCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
+    'linkExternal',
     'linkTrack',
   ],
 
@@ -32,6 +33,15 @@ export default {
       relation('generateAlbumNavAccent', album, null);
 
     if (album.commentary) {
+      relations.albumCommentaryHeading =
+        relation('generateContentHeading');
+
+      relations.albumCommentaryLink =
+        relation('linkAlbum', album);
+
+      relations.albumCommentaryListeningLinks =
+        album.urls.map(url => relation('linkExternal', url));
+
       if (album.hasCoverArt) {
         relations.albumCommentaryCover =
           relation('generateAlbumCoverArtwork', album);
@@ -53,6 +63,11 @@ export default {
     relations.trackCommentaryLinks =
       tracksWithCommentary
         .map(track => relation('linkTrack', track));
+
+    relations.trackCommentaryListeningLinks =
+      tracksWithCommentary
+        .map(track =>
+          track.urls.map(url => relation('linkExternal', url)));
 
     relations.trackCommentaryCovers =
       tracksWithCommentary
@@ -142,9 +157,27 @@ export default {
             })),
 
           relations.albumCommentaryContent && [
-            html.tag('h3',
-              {class: ['content-heading']},
-              language.$('albumCommentaryPage.entry.title.albumCommentary')),
+            relations.albumCommentaryHeading.slots({
+              tag: 'h3',
+              color: data.color,
+
+              title:
+                language.$('albumCommentaryPage.entry.title.albumCommentary', {
+                  album: relations.albumCommentaryLink,
+                }),
+
+              accent:
+                !empty(relations.albumCommentaryListeningLinks) &&
+                  language.$('albumCommentaryPage.entry.title.albumCommentary.accent', {
+                    listeningLinks:
+                      language.formatUnitList(
+                        relations.albumCommentaryListeningLinks
+                          .map(link => link.slots({
+                            mode: 'album',
+                            tab: 'separate',
+                          }))),
+                  }),
+            }),
 
             relations.albumCommentaryCover
               ?.slots({mode: 'commentary'}),
@@ -156,15 +189,38 @@ export default {
           stitchArrays({
             heading: relations.trackCommentaryHeadings,
             link: relations.trackCommentaryLinks,
+            listeningLinks: relations.trackCommentaryListeningLinks,
             directory: data.trackCommentaryDirectories,
             cover: relations.trackCommentaryCovers,
             entries: relations.trackCommentaryEntries,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, cover, entries, color}) => [
+          }).map(({
+              heading,
+              link,
+              listeningLinks,
+              directory,
+              cover,
+              entries,
+              color,
+            }) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
-                title: link,
+                color,
+
+                title:
+                  language.$('albumCommentaryPage.entry.title.trackCommentary', {
+                    track: link,
+                  }),
+
+                accent:
+                  !empty(listeningLinks) &&
+                    language.$('albumCommentaryPage.entry.title.trackCommentary.accent', {
+                      listeningLinks:
+                        language.formatUnitList(
+                          listeningLinks.map(link =>
+                            link.slot('tab', 'separate'))),
+                    }),
               }),
 
               cover?.slots({mode: 'commentary'}),

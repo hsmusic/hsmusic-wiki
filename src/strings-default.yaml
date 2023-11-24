@@ -764,8 +764,13 @@ albumCommentaryPage:
 
   entry:
     title:
-      albumCommentary: "Album commentary"
-      trackCommentary: "{TRACK}"
+      albumCommentary:
+        _: "{ALBUM}"
+        accent: "Listen on: {LISTENING_LINKS}"
+
+      trackCommentary:
+        _: "{TRACK}"
+        accent: "Listen on: {LISTENING_LINKS}"
 
 #
 # artistInfoPage:

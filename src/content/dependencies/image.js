@@ -14,6 +14,12 @@ export default {
     'to',
   ],
 
+  contentDependencies: ['generateColorStyleVariables'],
+
+  relations: (relation) => ({
+    colorVariables: relation('generateColorStyleVariables'),
+  }),
+
   data(artTags) {
     const data = {};
 
@@ -43,6 +49,10 @@ export default {
       default: false,
     },
 
+    color: {
+      validate: v => v.isColor,
+    },
+
     reveal: {type: 'boolean', default: true},
     lazy: {type: 'boolean', default: false},
     square: {type: 'boolean', default: false},
@@ -56,7 +66,7 @@ export default {
     missingSourceContent: {type: 'html'},
   },
 
-  generate(data, slots, {
+  generate(data, relations, slots, {
     checkIfImagePathHasCachedThumbnails,
     getDimensionsOfImagePath,
     getSizeOfImagePath,
@@ -110,6 +120,12 @@ export default {
       !isMissingImageFile &&
       !empty(data.contentWarnings);
 
+    const colorStyle =
+      slots.color &&
+        relations.colorVariables
+          .slot('color', slots.color)
+          .content;
+
     const willSquare = slots.square;
 
     const idOnImg = willLink ? null : slots.id;
@@ -117,6 +133,9 @@ export default {
 
     const classOnImg = willLink ? null : slots.class;
     const classOnLink = willLink ? slots.class : null;
+
+    const styleOnContainer = willLink ? null : colorStyle;
+    const styleOnLink = willLink ? colorStyle : null;
 
     if (!originalSrc || isMissingImageFile) {
       return prepare(
@@ -191,7 +210,7 @@ export default {
       imgAttributes['data-no-image-preview'] = true;
     }
 
-    // These attributes are only relevant when a thumbnail are available *and*
+    // These attributes are only relevant when a thumbnail is available *and*
     // being used.
     if (hasThumbnails && slots.thumb) {
       if (fileSize) {
@@ -238,9 +257,13 @@ export default {
       let wrapped = content;
 
       wrapped =
-        html.tag('div', {class: ['image-container', !originalSrc && 'placeholder-image']},
+        html.tag('div', {
+          class: ['image-container', !originalSrc && 'placeholder-image'],
+          style: styleOnContainer,
+        }, [
           html.tag('div', {class: 'image-inner-area'},
-            wrapped));
+            wrapped),
+        ]);
 
       if (willReveal) {
         wrapped =
@@ -270,12 +293,15 @@ export default {
         wrapped = html.tag('a',
           {
             id: idOnLink,
+
             class: [
               'box',
               'image-link',
               hide && 'js-hide',
               classOnLink,
             ],
+
+            style: styleOnLink,
 
             href:
               (typeof slots.link === 'string'

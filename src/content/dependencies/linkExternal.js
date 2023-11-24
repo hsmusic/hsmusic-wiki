@@ -18,11 +18,23 @@ export default {
       validate: () => isExternalLinkContext,
       default: 'generic',
     },
+
+    tab: {
+      validate: v => v.is('default', 'separate'),
+      default: 'default',
+    },
   },
 
   generate: (data, slots, {html, language}) =>
     html.tag('a',
-      {href: data.url, class: 'nowrap'},
+      {
+        href: data.url,
+        class: 'nowrap',
+        target:
+          (slots.tab === 'separate'
+            ? '_blank'
+            : null),
+      },
       language.formatExternalLink(data.url, {
         style: slots.style,
         context: slots.context,

@@ -624,6 +624,7 @@ p .current {
   width: 30%;
   max-width: 250px;
   margin: 15px 0 10px 20px;
+  box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.35);
 }
 
 .js-hide,
@@ -774,7 +775,7 @@ p code {
 }
 
 main.long-content {
-  --long-content-padding-ratio: 0.12;
+  --long-content-padding-ratio: 0.10;
 }
 
 main.long-content .main-content-container,
@@ -872,6 +873,17 @@ li > ul {
 
 html[data-url-key="localized.albumCommentary"] li.no-commentary {
   opacity: 0.7;
+}
+
+html[data-url-key="localized.albumCommentary"] .content-heading-main-title {
+  margin-right: 0.25em;
+}
+
+html[data-url-key="localized.albumCommentary"] .content-heading-accent {
+  font-weight: normal;
+  font-style: oblique;
+  font-size: 0.9rem;
+  display: inline-block;
 }
 
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
@@ -1423,12 +1435,6 @@ html[data-url-key="localized.home"] .carousel-container {
   animation-delay: 125ms;
 }
 
-.content-heading .content-heading-accent {
-  font-weight: normal;
-  font-size: 1rem;
-  margin-left: 0.25em;
-}
-
 h3.content-heading {
   clear: both;
 }
@@ -1815,6 +1821,13 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
  */
 
 @media (min-width: 600px) and (max-width: 899.98px) {
+  /* Medim layout is mainly defined (to the user) by hiding the sidebar, so
+   * don't apply the similar layout change of widening the long-content area
+   * if this page doesn't have a sidebar to hide in the first place.
+   */
+  #page-container:not(.has-zero-sidebars) main.long-content {
+    --long-content-padding-ratio: 0.06;
+  }
 }
 
 /* Layout - Wide or Medium */
@@ -1898,6 +1911,10 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     columns: 1;
   }
 
+  main.long-content {
+    --long-content-padding-ratio: 0.02;
+  }
+
   #cover-art-container {
     margin: 25px 0 5px 0;
     width: 100%;
@@ -1929,9 +1946,5 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   #header > div:not(:first-child) {
     margin-top: 0.5em;
-  }
-
-  main.long-content {
-    --long-content-padding-ratio: 0.04;
   }
 }
