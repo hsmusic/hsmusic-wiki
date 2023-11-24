@@ -25,6 +25,7 @@
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",
+        "#external-links": "./src/util/external-links.js",
         "#find": "./src/find.js",
         "#html": "./src/util/html.js",
         "#language": "./src/data/language.js",
@@ -53,6 +54,7 @@
         "image-size": "^1.0.2",
         "js-yaml": "^4.1.0",
         "marked": "^10.0.0",
+        "printable-characters": "^1.0.42",
         "striptags": "^4.0.0-alpha.4",
         "word-wrap": "^1.2.3"
     },

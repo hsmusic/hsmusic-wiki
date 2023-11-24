@@ -334,6 +334,21 @@ trackList:
 #
 misc:
 
+  # additionalNames:
+  #   "Drop"-styled box that catalogues a variety of additional or
+  #   alternate names for the current thing; toggled by clicking on the
+  #   thing's title, which is styled interactively and gets a tooltip
+  #   (hover text), since it isn't usually an interactive element.
+
+  additionalNames:
+    title: "Additional or alternate names:"
+    tooltip: "Click to view additional or alternate names"
+
+    item:
+      _: "{NAME}"
+      withAnnotation: "{NAME} {ANNOTATION}"
+      annotation: "({ANNOTATION})"
+
   # alt:
   #   Fallback text for the alt text of images and artworks - these
   #   are read aloud by screen readers.
@@ -417,21 +432,31 @@ misc:
   #   wiki - sorry!
 
   external:
+    external: "External"
 
-    # domain:
-    #   General domain when one the URL doesn't match one of the
-    #   sites below.
+    withDomain:
+      "{PLATFORM} ({DOMAIN})"
 
-    domain: "External ({DOMAIN})"
-
-    # local:
-    #   Files which are locally available on the wiki (under its media
-    #   directory).
+    withHandle:
+      "{PLATFORM} ({HANDLE})"
 
     local: "Wiki Archive (local upload)"
 
+    bandcamp: "Bandcamp"
+
+    bgreco:
+      _: "bgreco.net"
+      flash: "bgreco.net (high quality audio)"
+
     deviantart: "DeviantArt"
+
+    homestuck:
+      _: "Homestuck"
+      page: "Homestuck (page {PAGE})"
+      secretPage: "Homestuck (secret page)"
+
     instagram: "Instagram"
+    mastodon: "Mastodon"
     newgrounds: "Newgrounds"
     patreon: "Patreon"
     poetryFoundation: "Poetry Foundation"
@@ -441,25 +466,11 @@ misc:
     twitter: "Twitter"
     wikipedia: "Wikipedia"
 
-    bandcamp:
-      _: "Bandcamp"
-      domain: "Bandcamp ({DOMAIN})"
-
-    mastodon:
-      _: "Mastodon"
-      domain: "Mastodon ({DOMAIN})"
-
     youtube:
       _: "YouTube"
+      flash: "YouTube (on any device)"
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
-
-    flash:
-      bgreco: "{LINK} (HQ Audio)"
-      youtube: "{LINK} (on any device)"
-      homestuck:
-        page: "{LINK} (page {PAGE})"
-        secret: "{LINK} (secret page)"
 
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file

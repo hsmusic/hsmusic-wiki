@@ -6,6 +6,7 @@ import getChronologyRelations from '../util/getChronologyRelations.js';
 export default {
   contentDependencies: [
     'generateAdditionalFilesShortcut',
+    'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSidebar',
@@ -106,6 +107,11 @@ export default {
       heading: relation('generateContentHeading'),
       list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
     });
+
+    if (!empty(track.additionalNames)) {
+      relations.additionalNamesBox =
+        relation('generateAdditionalNamesBox', track.additionalNames);
+    }
 
     if (track.hasUniqueCoverArt || album.hasCoverArt) {
       relations.cover =
@@ -295,6 +301,8 @@ export default {
       .slots({
         title: language.$('trackPage.title', {track: data.name}),
         headingMode: 'sticky',
+
+        additionalNames: relations.additionalNamesBox ?? null,
 
         color: data.color,
         styleRules: [relations.albumStyleRules],

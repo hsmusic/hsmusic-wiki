@@ -66,7 +66,10 @@ export default {
       !empty(relations.externalLinks) &&
         html.tag('p',
           language.$('releaseInfo.visitOn', {
-            links: language.formatDisjunctionList(relations.externalLinks),
+            links:
+              language.formatDisjunctionList(
+                relations.externalLinks
+                  .map(link => link.slot('context', 'group'))),
           })),
 
       slots.mode === 'album' &&

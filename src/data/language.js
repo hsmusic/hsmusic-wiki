@@ -7,15 +7,11 @@ import chokidar from 'chokidar';
 import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
 import yaml from 'js-yaml';
 
-import T from '#things';
+import {externalLinkSpec} from '#external-links';
 import {colors, logWarn} from '#cli';
-
-import {
-  annotateError,
-  annotateErrorWithFile,
-  showAggregate,
-  withAggregate,
-} from '#sugar';
+import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
+  from '#sugar';
+import T from '#things';
 
 const {Language} = T;
 
@@ -113,6 +109,8 @@ export function initializeLanguageObject() {
 
   language.escapeHTML = string =>
     he.encode(string, {useNamedReferences: true});
+
+  language.externalLinkSpec = externalLinkSpec;
 
   return language;
 }

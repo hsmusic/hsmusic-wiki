@@ -636,8 +636,8 @@ export function sortFlashesChronologically(data, {
 //
 // where capturing group "annotation" can be any text at all, except that the
 // last entry (past a comma or the only content within parentheses), if parsed
-// as a date, is the capturing group "date". "Parsing as a date" means one of
-// these formats:
+// as a date, is the capturing group "date". "Parsing as a date" means matching
+// one of these formats:
 //
 //   * "25 December 2019" - one or two number digits, followed by any text,
 //     followed by four number digits
@@ -645,6 +645,14 @@ export function sortFlashesChronologically(data, {
 //     digits, a comma, and four number digits
 //   * "12/25/2019" etc - three sets of one to four number digits, separated
 //     by slashes or dashes (only valid orders are MM/DD/YYYY and YYYY/MM/DD)
+//
+// Note that the annotation and date are always wrapped by one opening and one
+// closing parentheses. The whole heading does NOT need to match the entire
+// line it occupies (though it does always start at the first position on that
+// line), and if there is more than one closing parenthesis on the line, the
+// annotation will always cut off only at the last parenthesis, or a comma
+// preceding a date and then the last parenthesis. This is to ensure that
+// parentheses can be part of the actual annotation content.
 //
 // Capturing group "artistReference" is all the characters between <i> and </i>
 // (apart from the pipe and "artistDisplayText" text, if present), and is either
@@ -654,7 +662,7 @@ export function sortFlashesChronologically(data, {
 // out of the original string based on the indices matched using this.
 //
 export const commentaryRegex =
-  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}))?\))?$/gm;
+  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}))?\))?/gm;
 
 export function filterAlbumsByCommentary(albums) {
   return albums

@@ -38,8 +38,8 @@ import {
 
 // --> General supporting stuff
 
-function inspect(value) {
-  return nodeInspect(value, {colors: ENABLE_COLOR});
+function inspect(value, opts = {}) {
+  return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
 // --> YAML data repository structure constants
@@ -308,7 +308,12 @@ export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
 
-    const mainMessage = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
+    const fieldNamesText =
+      fieldNames
+        .map(field => colors.red(field))
+        .join(', ');
+
+    const mainMessage = `Don't combine ${fieldNamesText}`;
 
     const causeMessage =
       (typeof message === 'function'
@@ -329,8 +334,15 @@ export class FieldCombinationError extends Error {
 }
 
 export class FieldValueAggregateError extends AggregateError {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
   constructor(thingConstructor, errors) {
-    super(errors, `Errors processing field values for ${colors.green(thingConstructor.name)}`);
+    const constructorText =
+      colors.green(thingConstructor.name);
+
+    super(
+      errors,
+      `Errors processing field values for ${constructorText}`);
   }
 }
 
@@ -341,8 +353,17 @@ export class FieldValueError extends Error {
         ? caughtError.cause
         : caughtError);
 
+    const fieldText =
+      colors.green(`"${field}"`);
+
+    const propertyText =
+      colors.green(property);
+
+    const valueText =
+      inspect(value, {maxStringLength: 40});
+
     super(
-      `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
+      `Failed to set ${fieldText} field (${propertyText}) to ${valueText}`,
       {cause});
   }
 }
@@ -354,13 +375,18 @@ export class SkippedFieldsSummaryError extends Error {
     const lines =
       entries.map(([field, value]) =>
         ` - ${field}: ` +
-        inspect(value)
+        inspect(value, {maxStringLength: 70})
           .split('\n')
           .map((line, index) => index === 0 ? line : `   ${line}`)
           .join('\n'));
 
+    const numFieldsText =
+      (entries.length === 1
+        ? `1 field`
+        : `${entries.length} fields`);
+
     super(
-      colors.bright(colors.yellow(`Altogether, skipped ${entries.length === 1 ? `1 field` : `${entries.length} fields`}:\n`)) +
+      colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:\n`)) +
       lines.join('\n') + '\n' +
       colors.bright(colors.yellow(`See above errors for details.`)));
   }
@@ -436,6 +462,7 @@ export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHel
 
 export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
+    'Additional Names': parseAdditionalNames,
     'Duration': parseDuration,
 
     'Date First Released': (value) => new Date(value),
@@ -457,6 +484,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
   propertyFieldMapping: {
     name: 'Track',
     directory: 'Directory',
+    additionalNames: 'Additional Names',
     duration: 'Duration',
     color: 'Color',
     urls: 'URLs',
@@ -717,26 +745,52 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export function parseContributors(contributors) {
+const extractAccentRegex =
+  /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
+
+export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
-  if (!Array.isArray(contributors)) {
-    return contributors;
+  if (!Array.isArray(contributionStrings)) {
+    return contributionStrings;
   }
 
-  contributors = contributors.map((contrib) => {
-    if (typeof contrib !== 'string') return contrib;
+  return contributionStrings.map(item => {
+    if (typeof item === 'object' && item['Who'])
+      return {who: item['Who'], what: item['What'] ?? null};
 
-    const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) return contrib;
+    if (typeof item !== 'string') return item;
 
-    const who = match[1];
-    const what = match[3] || null;
-    return {who, what};
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      who: match.groups.main,
+      what: match.groups.accent ?? null,
+    };
   });
+}
 
-  return contributors;
+export function parseAdditionalNames(additionalNameStrings) {
+  if (!Array.isArray(additionalNameStrings)) {
+    return additionalNameStrings;
+  }
+
+  return additionalNameStrings.map(item => {
+    if (typeof item === 'object' && item['Name'])
+      return {name: item['Name'], annotation: item['Annotation'] ?? null};
+
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      name: match.groups.main,
+      annotation: match.groups.accent ?? null,
+    };
+  });
 }
 
 function parseDimensions(string) {
@@ -1138,7 +1192,10 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
-      {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
+      {
+        message: `Errors during data step: ${colors.bright(dataStep.title)}`,
+        translucent: true,
+      },
       async ({call, callAsync, map, mapAsync, push}) => {
         const {documentMode} = dataStep;
 
@@ -1383,7 +1440,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
         switch (documentMode) {
           case documentModes.headerAndEntries:
-            map(yamlResults, {message: `Errors processing documents in data files`},
+            map(yamlResults, {message: `Errors processing documents in data files`, translucent: true},
               decorateErrorWithFile(({documents}) => {
                 const headerDocument = documents[0];
                 const entryDocuments = documents.slice(1).filter(Boolean);

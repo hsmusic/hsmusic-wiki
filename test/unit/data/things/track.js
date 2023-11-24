@@ -189,13 +189,14 @@ t.test(`Track.color`, t => {
   // connection breaks for some future reason (with the album still present),
   // Track.color should still inherit directly from the album.
   wikiData.albumData = [
-    new Proxy({
+    {
+      constructor: {[Thing.referenceType]: 'album'},
       color: '#abcdef',
       tracks: [track],
       trackSections: [
         {color: '#baaaad', tracks: []},
       ],
-    }, {getPrototypeOf: () => Album.prototype}),
+    },
   ];
 
   linkWikiDataArrays();

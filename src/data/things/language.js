@@ -1,5 +1,13 @@
-import {Tag} from '#html';
 import {isLanguageCode} from '#validators';
+import {Tag} from '#html';
+
+import {
+  getExternalLinkStringOfStyleFromDescriptors,
+  getExternalLinkStringsFromDescriptors,
+  isExternalLinkContext,
+  isExternalLinkSpec,
+  isExternalLinkStyle,
+} from '#external-links';
 
 import {
   externalFunction,
@@ -70,6 +78,13 @@ export class Language extends Thing {
     inheritedStrings: {
       flags: {update: true, expose: true},
       update: {validate: (t) => typeof t === 'object'},
+    },
+
+    // List of descriptors for providing to external link utilities when using
+    // language.formatExternalLink - refer to util/external-links.js for info.
+    externalLinkSpec: {
+      flags: {update: true, expose: true},
+      update: {validate: isExternalLinkSpec},
     },
 
     // Update only
@@ -297,6 +312,29 @@ export class Language extends Thing {
     return approximate
       ? this.formatString('count.duration.approximate', {duration})
       : duration;
+  }
+
+  formatExternalLink(url, {
+    style = 'normal',
+    context = 'generic',
+  } = {}) {
+    if (!this.externalLinkSpec) {
+      throw new TypeError(`externalLinkSpec unavailable`);
+    }
+
+    isExternalLinkContext(context);
+
+    if (style === 'all') {
+      return getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
+        language: this,
+        context,
+      });
+    }
+
+    return getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
+      language: this,
+      context,
+    });
   }
 
   formatIndex(value) {

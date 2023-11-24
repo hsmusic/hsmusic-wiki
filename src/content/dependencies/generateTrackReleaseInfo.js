@@ -77,7 +77,10 @@ export default {
       html.tag('p',
         (relations.externalLinks
           ? language.$('releaseInfo.listenOn', {
-              links: language.formatDisjunctionList(relations.externalLinks),
+              links:
+                language.formatDisjunctionList(
+                  relations.externalLinks
+                    .map(link => link.slot('context', 'track'))),
             })
           : language.$('releaseInfo.listenOn.noLinks', {
               name: html.tag('i', data.name),
