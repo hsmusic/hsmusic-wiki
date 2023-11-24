@@ -149,13 +149,18 @@ t.test('isColor', t => {
 });
 
 t.test('isCommentary', t => {
-  t.plan(6);
+  t.plan(9);
+
+  // TODO: Test specific error messages.
   t.ok(isCommentary(`<i>Toby Fox:</i>\ndogsong.mp3`));
-  t.ok(isCommentary(`Technically, this works:</i>`));
-  t.ok(isCommentary(`<i><b>Whodunnit:</b></i>`));
-  t.throws(() => isCommentary(123), TypeError);
-  t.throws(() => isCommentary(``), TypeError);
-  t.throws(() => isCommentary(`<i><u>Toby Fox:</u></i>`));
+  t.ok(isCommentary(`<i>Toby Fox:</i> (music)\ndogsong.mp3`));
+  t.throws(() => isCommentary(`dogsong.mp3\n<i>Toby Fox:</i>\ndogsong.mp3`));
+  t.throws(() => isCommentary(`<i>Toby Fox:</i> dogsong.mp3`));
+  t.throws(() => isCommentary(`<i>Toby Fox:</i> (music) dogsong.mp3`));
+  t.throws(() => isCommentary(`<i>I Have Nothing To Say:</i>`));
+  t.throws(() => isCommentary(123));
+  t.throws(() => isCommentary(``));
+  t.throws(() => isCommentary(`Technically, ah, er:</i>\nCorrect`));
 });
 
 t.test('isContribution', t => {
