@@ -4,6 +4,7 @@ import {
   is,
   isObject,
   isStringNonEmpty,
+  oneOf,
   optional,
   validateArrayItems,
   validateInstanceOf,
@@ -60,7 +61,10 @@ export const isExternalLinkSpec =
         query: optional(isRegExp),
         queries: optional(validateArrayItems(isRegExp)),
 
-        context: optional(isExternalLinkContext),
+        context:
+          optional(oneOf(
+            isExternalLinkContext,
+            validateArrayItems(isExternalLinkContext))),
       }),
 
       platform: isStringNonEmpty,
@@ -129,6 +133,21 @@ export const externalLinkSpec = [
   },
 
   // Special handling for artist links
+
+  {
+    match: {
+      domain: 'patreon.com',
+      context: 'artist',
+    },
+
+    platform: 'patreon',
+
+    normal: 'handle',
+    compact: 'handle',
+    icon: 'globe',
+
+    handle: /([^/]*)\/?$/,
+  },
 
   {
     match: {
@@ -210,7 +229,7 @@ export const externalLinkSpec = [
   // Generic domains, sorted alphabetically (by string)
 
   {
-    match: {domains: ['bc.s3m.us', 'music.solatrux.com']},
+    match: {domains: ['bc.s3m.us', 'music.solatrus.com']},
 
     platform: 'bandcamp',
 
@@ -220,7 +239,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'bandcamp.com'},
+    match: {domain: '.bandcamp.com'},
 
     platform: 'bandcamp',
 
@@ -232,34 +251,26 @@ export const externalLinkSpec = [
 
   {
     match: {domain: 'deviantart.com'},
-
     platform: 'deviantart',
-
     icon: 'deviantart',
   },
 
   {
-    match: {domain: 'instagram.com'},
-
-    platform: 'instagram',
-
-    icon: 'instagram',
-  },
-
-  {
     match: {domain: 'homestuck.com'},
-
     platform: 'homestuck',
-
     icon: 'globe',
   },
 
   {
     match: {domain: 'hsmusic.wiki'},
-
     platform: 'local',
-
     icon: 'globe',
+  },
+
+  {
+    match: {domain: 'instagram.com'},
+    platform: 'instagram',
+    icon: 'instagram',
   },
 
   {
@@ -267,16 +278,27 @@ export const externalLinkSpec = [
 
     platform: 'mastodon',
 
+    normal: 'domain',
     compact: 'domain',
     icon: 'mastodon',
   },
 
   {
     match: {domain: 'newgrounds.com'},
-
     platform: 'newgrounds',
-
     icon: 'newgrounds',
+  },
+
+  {
+    match: {domain: 'patreon.com'},
+    platform: 'patreon',
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'poetryfoundation.org'},
+    platform: 'poetryFoundation',
+    icon: 'globe',
   },
 
   {
@@ -291,7 +313,13 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'tumblr.com'},
+    match: {domain: 'spotify.com'},
+    platform: 'spotify',
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: '.tumblr.com'},
 
     platform: 'tumblr',
 
@@ -316,10 +344,14 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'wikipedia.org'},
+    platform: 'wikipedia',
+    icon: 'misc',
+  },
+
+  {
     match: {domains: ['youtube.com', 'youtu.be']},
-
     platform: 'youtube',
-
     icon: 'youtube',
   },
 ];
@@ -355,6 +387,7 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
         return false;
       })
       .filter(({match}) => {
+        if (Array.isArray(match.context)) return match.context.includes(context);
         if (match.context) return context === match.context;
         return true;
       })
