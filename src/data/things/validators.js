@@ -1,7 +1,12 @@
 import {inspect as nodeInspect} from 'node:util';
 
+// Heresy.
+import printable_characters from 'printable-characters';
+const {strlen} = printable_characters;
+
 import {colors, ENABLE_COLOR} from '#cli';
-import {empty, typeAppearance, withAggregate} from '#sugar';
+import {cut, empty, typeAppearance, withAggregate} from '#sugar';
+import {commentaryRegex} from '#wiki-data';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -169,29 +174,42 @@ export function is(...values) {
 }
 
 function validateArrayItemsHelper(itemValidator) {
-  return (item, index) => {
+  return (item, index, array) => {
     try {
-      const value = itemValidator(item);
+      const value = itemValidator(item, index, array);
 
       if (value !== true) {
         throw new Error(`Expected validator to return true`);
       }
     } catch (error) {
-      error.message = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)}) ${error.message}`;
+      const annotation = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)})`;
+
+      error.message =
+        (error.message.includes('\n') || strlen(annotation) > 20
+          ? annotation + '\n' +
+            error.message
+              .split('\n')
+              .map(line => `  ${line}`)
+              .join('\n')
+          : `${annotation} ${error}`);
+
       error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
+
       throw error;
     }
   };
 }
 
 export function validateArrayItems(itemValidator) {
-  const fn = validateArrayItemsHelper(itemValidator);
+  const helper = validateArrayItemsHelper(itemValidator);
 
   return (array) => {
     isArray(array);
 
-    withAggregate({message: 'Errors validating array items'}, ({wrap}) => {
-      array.forEach(wrap(fn));
+    withAggregate({message: 'Errors validating array items'}, ({call}) => {
+      for (let index = 0; index < array.length; index++) {
+        call(helper, array[index], index, array);
+      }
     });
 
     return true;
@@ -203,12 +221,12 @@ export function strictArrayOf(itemValidator) {
 }
 
 export function sparseArrayOf(itemValidator) {
-  return validateArrayItems(item => {
+  return validateArrayItems((item, index, array) => {
     if (item === false || item === null) {
       return true;
     }
 
-    return itemValidator(item);
+    return itemValidator(item, index, array);
   });
 }
 
@@ -234,17 +252,55 @@ export function isColor(color) {
   throw new TypeError(`Unknown color format`);
 }
 
-export function isCommentary(commentary) {
-  isString(commentary);
+export function isCommentary(commentaryText) {
+  isString(commentaryText);
 
-  const [firstLine] = commentary.match(/.*/);
-  if (!firstLine.replace(/<\/b>/g, '').includes(':</i>')) {
-    throw new TypeError(`Missing commentary citation: "${
-      firstLine.length > 40
-        ? firstLine.slice(0, 40) + '...'
-        : firstLine
-    }"`);
+  const rawMatches =
+    Array.from(commentaryText.matchAll(commentaryRegex));
+
+  if (empty(rawMatches)) {
+    throw new TypeError(`Expected at least one commentary heading`);
   }
+
+  const niceMatches =
+    rawMatches.map(match => ({
+      position: match.index,
+      length: match[0].length,
+    }));
+
+  validateArrayItems(({position, length}, index) => {
+    if (index === 0 && position > 0) {
+      throw new TypeError(`Expected first commentary heading to be at top`);
+    }
+
+    const ownInput = commentaryText.slice(position, position + length);
+    const restOfInput = commentaryText.slice(position + length);
+    const nextLineBreak = restOfInput.indexOf('\n');
+    const upToNextLineBreak = restOfInput.slice(0, nextLineBreak);
+
+    if (/\S/.test(upToNextLineBreak)) {
+      throw new TypeError(
+        `Expected commentary heading to occupy entire line, got extra text:\n` +
+        `${colors.green(`"${cut(ownInput, 40)}"`)} (<- heading)\n` +
+        `(extra on same line ->) ${colors.red(`"${cut(upToNextLineBreak, 30)}"`)}\n` +
+        `(Check for missing "|-" in YAML, or a misshapen annotation)`);
+    }
+
+    const nextHeading =
+      (index === niceMatches.length - 1
+        ? commentaryText.length
+        : niceMatches[index + 1].position);
+
+    const upToNextHeading =
+      commentaryText.slice(position + length, nextHeading);
+
+    if (!/\S/.test(upToNextHeading)) {
+      throw new TypeError(
+        `Expected commentary entry to have body text, only got a heading`);
+    }
+
+    return true;
+  })(niceMatches);
 
   return true;
 }

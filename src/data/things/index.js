@@ -22,11 +22,6 @@ import * as wikiInfoClasses from './wiki-info.js';
 
 export {default as Thing} from './thing.js';
 
-export {
-  default as CacheableObject,
-  CacheableObjectPropertyValueError,
-} from './cacheable-object.js';
-
 const allClassLists = {
   'album.js': albumClasses,
   'art-tag.js': artTagClasses,

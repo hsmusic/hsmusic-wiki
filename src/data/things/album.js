@@ -181,7 +181,8 @@ export class Album extends Thing {
     hasTrackArt: S.id,
     isListedOnHomepage: S.id,
 
-    commentary: S.id,
+    commentary: S.toCommentaryRefs,
+
     additionalFiles: S.id,
 
     tracks: S.toRefs,

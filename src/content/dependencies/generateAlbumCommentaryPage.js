@@ -6,13 +6,12 @@ export default {
     'generateAlbumNavAccent',
     'generateAlbumSidebarTrackSection',
     'generateAlbumStyleRules',
-    'generateColorStyleVariables',
+    'generateCommentaryEntry',
     'generateContentHeading',
     'generateTrackCoverArtwork',
     'generatePageLayout',
     'linkAlbum',
     'linkTrack',
-    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -38,8 +37,9 @@ export default {
           relation('generateAlbumCoverArtwork', album);
       }
 
-      relations.albumCommentaryContent =
-        relation('transformContent', album.commentary);
+      relations.albumCommentaryEntries =
+        album.commentary
+          .map(entry => relation('generateCommentaryEntry', entry));
     }
 
     const tracksWithCommentary =
@@ -61,16 +61,11 @@ export default {
             ? relation('generateTrackCoverArtwork', track)
             : null));
 
-    relations.trackCommentaryContent =
-      tracksWithCommentary
-        .map(track => relation('transformContent', track.commentary));
-
-    relations.trackCommentaryColorVariables =
+    relations.trackCommentaryEntries =
       tracksWithCommentary
         .map(track =>
-          (track.color === album.color
-            ? null
-            : relation('generateColorStyleVariables')));
+          track.commentary
+            .map(entry => relation('generateCommentaryEntry', entry)));
 
     relations.sidebarAlbumLink =
       relation('linkAlbum', album);
@@ -163,10 +158,9 @@ export default {
             link: relations.trackCommentaryLinks,
             directory: data.trackCommentaryDirectories,
             cover: relations.trackCommentaryCovers,
-            content: relations.trackCommentaryContent,
-            colorVariables: relations.trackCommentaryColorVariables,
+            entries: relations.trackCommentaryEntries,
             color: data.trackCommentaryColors,
-          }).map(({heading, link, directory, cover, content, colorVariables, color}) => [
+          }).map(({heading, link, directory, cover, entries, color}) => [
               heading.slots({
                 tag: 'h3',
                 id: directory,
@@ -175,11 +169,7 @@ export default {
 
               cover?.slots({mode: 'commentary'}),
 
-              html.tag('blockquote',
-                (color
-                  ? {style: colorVariables.slot('color', color).content}
-                  : {}),
-                content),
+              entries.map(entry => entry.slot('color', color)),
             ]),
         ],
 

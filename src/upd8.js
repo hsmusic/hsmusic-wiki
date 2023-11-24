@@ -38,13 +38,13 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
+import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
-import {CacheableObject} from '#things';
 import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
 

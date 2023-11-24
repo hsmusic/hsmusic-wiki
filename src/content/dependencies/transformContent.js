@@ -1,7 +1,7 @@
 import {bindFind} from '#find';
 import {parseInput} from '#replacer';
 
-import {marked} from 'marked';
+import {Marked} from 'marked';
 
 export const replacerSpec = {
   album: {
@@ -146,6 +146,29 @@ const linkIndexRelationMap = {
   listingIndex: 'linkListingIndex',
   newsIndex: 'linkNewsIndex',
 };
+
+const commonMarkedOptions = {
+  headerIds: false,
+  mangle: false,
+};
+
+const multilineMarked = new Marked({
+  ...commonMarkedOptions,
+});
+
+const inlineMarked = new Marked({
+  ...commonMarkedOptions,
+
+  renderer: {
+    paragraph(text) {
+      return text;
+    },
+  },
+});
+
+const lyricsMarked = new Marked({
+  ...commonMarkedOptions,
+});
 
 function getPlaceholder(node, content) {
   return {type: 'text', data: content.slice(node.i, node.iEnd)};
@@ -447,19 +470,9 @@ export default {
       return link.data;
     }
 
-    // In inline mode, no further processing is needed!
-
-    if (slots.mode === 'inline') {
-      return html.tags(contentFromNodes.map(node => node.data));
-    }
-
-    // Multiline mode has a secondary processing stage where it's passed...
-    // through marked! Rolling your own Markdown only gets you so far :D
-
-    const markedOptions = {
-      headerIds: false,
-      mangle: false,
-    };
+    // Content always goes through marked (i.e. parsing as Markdown).
+    // This does require some attention to detail, mostly to do with line
+    // breaks (in multiline mode) and extracting/re-inserting non-text nodes.
 
     // The content of non-text nodes can end up getting mangled by marked.
     // To avoid this, we replace them with mundane placeholders, then
@@ -534,6 +547,16 @@ export default {
       return html.tags(tags, {[html.joinChildren]: ''});
     };
 
+    if (slots.mode === 'inline') {
+      const markedInput =
+        extractNonTextNodes();
+
+      const markedOutput =
+        inlineMarked.parse(markedInput);
+
+      return reinsertNonTextNodes(markedOutput);
+    }
+
     // This is separated into its own function just since we're gonna reuse
     // it in a minute if everything goes to heck in lyrics mode.
     const transformMultiline = () => {
@@ -550,7 +573,7 @@ export default {
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
       const markedOutput =
-        marked.parse(markedInput, markedOptions);
+        multilineMarked.parse(markedInput);
 
       return reinsertNonTextNodes(markedOutput);
     }
@@ -600,7 +623,7 @@ export default {
         });
 
       const markedOutput =
-        marked.parse(markedInput, markedOptions);
+        lyricsMarked.parse(markedInput);
 
       return reinsertNonTextNodes(markedOutput);
     }
