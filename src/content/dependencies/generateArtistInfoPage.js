@@ -166,7 +166,7 @@ export default {
                     sec.visit.externalLinks.map(link =>
                       link.slots({
                         context: 'artist',
-                        mode: 'platform',
+                        style: 'platform',
                       }))),
               })),
 
