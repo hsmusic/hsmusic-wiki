@@ -24,6 +24,7 @@
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",
+        "#external-links": "./src/util/external-links.js",
         "#find": "./src/find.js",
         "#html": "./src/util/html.js",
         "#language": "./src/data/language.js",

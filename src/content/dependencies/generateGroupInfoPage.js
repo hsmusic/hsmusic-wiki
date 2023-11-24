@@ -107,7 +107,10 @@ export default {
           sec.info.visitLinks &&
             html.tag('p',
               language.$('releaseInfo.visitOn', {
-                links: language.formatDisjunctionList(sec.info.visitLinks),
+                links:
+                  language.formatDisjunctionList(
+                    sec.info.visitLinks
+                      .map(link => link.slot('context', 'group'))),
               })),
 
           html.tag('blockquote',

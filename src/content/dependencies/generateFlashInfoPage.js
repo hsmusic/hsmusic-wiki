@@ -133,7 +133,7 @@ export default {
               links:
                 language.formatDisjunctionList(
                   relations.externalLinks
-                    .map(link => link.slot('mode', 'flash'))),
+                    .map(link => link.slot('context', 'flash'))),
             })),
 
         sec.featuredTracks && [
