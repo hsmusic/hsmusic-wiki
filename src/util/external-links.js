@@ -133,7 +133,7 @@ export const externalLinkSpec = [
   {
     match: {
       context: 'artist',
-      domains: ['youtube.com', 'youtu.be'],
+      domain: 'youtube.com',
     },
 
     platform: 'youtube',
@@ -158,7 +158,7 @@ export const externalLinkSpec = [
     platform: 'bgreco',
     substring: 'flash',
 
-    icon: 'external',
+    icon: 'globe',
   },
 
   // This takes precedence over the secretPage match below.
