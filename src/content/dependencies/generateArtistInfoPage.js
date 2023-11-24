@@ -163,8 +163,11 @@ export default {
               language.$('releaseInfo.visitOn', {
                 links:
                   language.formatDisjunctionList(
-                    sec.visit.externalLinks
-                      .map(link => link.slot('context', 'artist'))),
+                    sec.visit.externalLinks.map(link =>
+                      link.slots({
+                        context: 'artist',
+                        mode: 'platform',
+                      }))),
               })),
 
           sec.artworks?.artistGalleryLink &&

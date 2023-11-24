@@ -132,11 +132,8 @@ export default {
             language.$('releaseInfo.playOn', {
               links:
                 language.formatDisjunctionList(
-                  relations.externalLinks.map(link =>
-                    link.slots({
-                      context: 'flash',
-                      style: 'normal',
-                    }))),
+                  relations.externalLinks
+                    .map(link => link.slot('context', 'flash'))),
             })),
 
         sec.featuredTracks && [
