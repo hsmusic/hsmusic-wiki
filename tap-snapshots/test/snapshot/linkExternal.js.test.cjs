@@ -99,5 +99,5 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 `
 
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > unknown domain (arbitrary world wide web path) 1`] = `
-<a href="https://snoo.ping.as/usual/i/see/" class="nowrap">External</a>
+<a href="https://snoo.ping.as/usual/i/see/" class="nowrap">External (snoo.ping.as)</a>
 `

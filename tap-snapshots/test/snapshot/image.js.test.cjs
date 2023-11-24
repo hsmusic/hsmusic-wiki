@@ -68,7 +68,7 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > thumb requested but s
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > thumbnail details 1`] = `
-<div class="image-container"><div class="image-inner-area"><img data-original-length="1200" data-thumbs="voluminous:1200 middling:900 petite:20" src="media/album-art/beyond-canon/cover.voluminous.jpg"></div></div>
+<div class="image-container"><div class="image-inner-area"><img data-original-length="1200" data-thumbs="voluminous:1200 middling:900 petite:20" src="thumb/album-art/beyond-canon/cover.voluminous.jpg"></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > width & height 1`] = `
