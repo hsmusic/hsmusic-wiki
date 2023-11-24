@@ -16,7 +16,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
          { name: 'creepy crawlies', isContentWarning: true }
        ]
      ]
-     slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+     slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
     <p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
 </div>
 `
@@ -25,7 +25,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
 <div id="cover-art-container">
     [mocked: image
      args: [ [ { name: 'Bees', directory: 'bees', isContentWarning: false } ] ]
-     slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+     slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], color: '#f28514', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
     <p>Tags: <a href="tag/bees/">Bees</a></p>
 </div>
 `
@@ -40,11 +40,11 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'small', reveal: false, link: false, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'small', reveal: false, link: false, square: true }]
 `
 
 exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverArtwork (snapshot) > display: thumbnail - unique art 1`] = `
 [mocked: image
  args: [ [ { name: 'Bees', directory: 'bees', isContentWarning: false } ] ]
- slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], thumb: 'small', reveal: false, link: false, square: true }]
+ slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], color: '#f28514', thumb: 'small', reveal: false, link: false, square: true }]
 `
