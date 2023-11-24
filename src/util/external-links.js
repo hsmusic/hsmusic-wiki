@@ -63,7 +63,8 @@ export const isExternalLinkSpec =
         context: optional(isExternalLinkContext),
       }),
 
-      string: isStringNonEmpty,
+      platform: isStringNonEmpty,
+      substring: optional(isStringNonEmpty),
 
       // TODO: Don't allow 'handle' or 'custom' options if the corresponding
       // properties aren't provided
@@ -78,7 +79,7 @@ export const isExternalLinkSpec =
     }));
 
 export const fallbackDescriptor = {
-  string: 'external',
+  platform: 'external',
 
   normal: 'domain',
   compact: 'domain',
@@ -96,7 +97,9 @@ export const externalLinkSpec = [
       pathname: /^playlist/,
     },
 
-    string: 'youtube.playlist',
+    platform: 'youtube',
+    substring: 'playlist',
+
     icon: 'youtube',
   },
 
@@ -107,7 +110,9 @@ export const externalLinkSpec = [
       pathname: /^watch/,
     },
 
-    string: 'youtube.fullAlbum',
+    platform: 'youtube',
+    substring: 'fullAlbum',
+
     icon: 'youtube',
   },
 
@@ -117,7 +122,9 @@ export const externalLinkSpec = [
       domain: 'youtu.be',
     },
 
-    string: 'youtube.fullAlbum',
+    platform: 'youtube',
+    substring: 'fullAlbum',
+
     icon: 'youtube',
   },
 
@@ -129,10 +136,11 @@ export const externalLinkSpec = [
       domains: ['youtube.com', 'youtu.be'],
     },
 
-    string: 'youtube',
-    icon: 'youtube',
+    platform: 'youtube',
 
+    normal: 'handle',
     compact: 'handle',
+    icon: 'youtube',
 
     handle: {
       pathname: /^(@.*?)\/?$/,
@@ -147,7 +155,9 @@ export const externalLinkSpec = [
       domain: 'bgreco.net',
     },
 
-    string: 'bgreco.flash',
+    platform: 'bgreco',
+    substring: 'flash',
+
     icon: 'external',
   },
 
@@ -160,10 +170,10 @@ export const externalLinkSpec = [
     },
 
     platform: 'homestuck',
-    string: 'homestuck.page',
-    icon: 'globe',
+    substring: 'page',
 
     normal: 'custom',
+    icon: 'globe',
 
     custom: {
       page: {
@@ -179,7 +189,9 @@ export const externalLinkSpec = [
       pathname: /^story\/.+\/?$/,
     },
 
-    string: 'homestuck.secretPage',
+    platform: 'homestuck',
+    substring: 'secretPage',
+
     icon: 'globe',
   },
 
@@ -189,7 +201,9 @@ export const externalLinkSpec = [
       domains: ['youtube.com', 'youtu.be'],
     },
 
-    string: 'youtube.flash',
+    platform: 'youtube',
+    substring: 'flash',
+
     icon: 'youtube',
   },
 
@@ -198,17 +212,17 @@ export const externalLinkSpec = [
   {
     match: {domains: ['bc.s3m.us', 'music.solatrux.com']},
 
-    icon: 'bandcamp',
-    string: 'bandcamp',
+    platform: 'bandcamp',
 
     normal: 'domain',
     compact: 'domain',
+    icon: 'bandcamp',
   },
 
   {
     match: {domain: 'bandcamp.com'},
 
-    string: 'bandcamp',
+    platform: 'bandcamp',
 
     compact: 'handle',
     icon: 'bandcamp',
@@ -219,28 +233,31 @@ export const externalLinkSpec = [
   {
     match: {domain: 'deviantart.com'},
 
-    string: 'deviantart',
+    platform: 'deviantart',
+
     icon: 'deviantart',
   },
 
   {
     match: {domain: 'instagram.com'},
 
-    string: 'instagram',
+    platform: 'instagram',
+
     icon: 'instagram',
   },
 
   {
     match: {domain: 'homestuck.com'},
 
-    string: 'homestuck',
-    icon: 'globe', // The horror!
+    platform: 'homestuck',
+
+    icon: 'globe',
   },
 
   {
     match: {domain: 'hsmusic.wiki'},
 
-    string: 'local',
+    platform: 'local',
 
     icon: 'globe',
   },
@@ -248,37 +265,38 @@ export const externalLinkSpec = [
   {
     match: {domains: ['types.pl']},
 
-    icon: 'mastodon',
-    string: 'mastodon',
+    platform: 'mastodon',
 
     compact: 'domain',
+    icon: 'mastodon',
   },
 
   {
     match: {domain: 'newgrounds.com'},
 
-    string: 'newgrounds',
+    platform: 'newgrounds',
+
     icon: 'newgrounds',
   },
 
   {
     match: {domain: 'soundcloud.com'},
 
-    string: 'soundcloud',
-    icon: 'soundcloud',
+    platform: 'soundcloud',
 
     compact: 'handle',
+    icon: 'soundcloud',
 
-    handle: /[^/]*\/?$/,
+    handle: /([^/]*)\/?$/,
   },
 
   {
     match: {domain: 'tumblr.com'},
 
-    string: 'tumblr',
-    icon: 'tumblr',
+    platform: 'tumblr',
 
     compact: 'handle',
+    icon: 'tumblr',
 
     handle: {domain: /^[^.]*/},
   },
@@ -286,10 +304,10 @@ export const externalLinkSpec = [
   {
     match: {domain: 'twitter.com'},
 
-    string: 'twitter',
-    icon: 'twitter',
+    platform: 'twitter',
 
     compact: 'handle',
+    icon: 'twitter',
 
     handle: {
       prefix: '@',
@@ -300,7 +318,8 @@ export const externalLinkSpec = [
   {
     match: {domains: ['youtube.com', 'youtu.be']},
 
-    string: 'youtube',
+    platform: 'youtube',
+
     icon: 'youtube',
   },
 ];
@@ -419,15 +438,11 @@ export function extractAllCustomPartsFromExternalLink(url, custom) {
   return customParts;
 }
 
-const prefix = 'misc.external';
-
 export function getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language}) {
-  function getPlatform() {
-    if (descriptor.custom) {
-      return null;
-    }
+  const prefix = 'misc.external';
 
-    return language.$(prefix, descriptor.string);
+  function getPlatform() {
+    return language.$(prefix, descriptor.platform);
   }
 
   function getDomain() {
@@ -446,7 +461,7 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
       return null;
     }
 
-    return language.$(prefix, descriptor.string, customParts);
+    return language.$(prefix, descriptor.platform, descriptor.substring, customParts);
   }
 
   function getHandle() {
@@ -488,7 +503,7 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
       return language.$(prefix, 'withHandle', {platform, handle});
     }
 
-    return language.$(prefix, descriptor.string);
+    return language.$(prefix, descriptor.platform, descriptor.substring);
   }
 
   function getCompact() {
@@ -534,14 +549,6 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
 }
 
 export function couldDescriptorSupportStyle(descriptor, style) {
-  if (style === 'platform') {
-    return !descriptor.custom;
-  }
-
-  if (style === 'icon-id') {
-    return !!descriptor.icon;
-  }
-
   if (style === 'normal') {
     if (descriptor.custom) {
       return descriptor.normal === 'custom';
@@ -557,6 +564,14 @@ export function couldDescriptorSupportStyle(descriptor, style) {
       return !!descriptor.compact;
     }
   }
+
+  if (style === 'platform') {
+    return true;
+  }
+
+  if (style === 'icon-id') {
+    return !!descriptor.icon;
+  }
 }
 
 export function getExternalLinkStringOfStyleFromDescriptors(url, style, descriptors, {
@@ -566,13 +581,9 @@ export function getExternalLinkStringOfStyleFromDescriptors(url, style, descript
   const matchingDescriptors =
     getMatchingDescriptorsForExternalLink(url, descriptors, {context});
 
-  console.log('match-filtered:', matchingDescriptors);
-
   const styleFilteredDescriptors =
     matchingDescriptors.filter(descriptor =>
       couldDescriptorSupportStyle(descriptor, style));
-
-  console.log('style-filtered:', styleFilteredDescriptors);
 
   for (const descriptor of styleFilteredDescriptors) {
     const descriptorResult =
