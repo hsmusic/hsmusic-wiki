@@ -96,14 +96,18 @@ function dispatchInternalEvent(event, eventName, ...args) {
     throw new Error(`Event name "${eventName}" isn't stored on ${infoName}.event`);
   }
 
+  let results = [];
   for (const listener of listeners) {
     try {
-      listener(...args);
+      results.push(listener(...args));
     } catch (error) {
       console.warn(`Uncaught error in listener for ${infoName}.${eventName}`);
       console.debug(error);
+      results.push(undefined);
     }
   }
+
+  return results;
 }
 
 // JS-based links -----------------------------------------
@@ -1102,13 +1106,14 @@ function addHashLinkListeners() {
       }
 
       // Allow event handlers to prevent scrolling.
-      for (const handler of event.beforeHashLinkScrolls) {
-        if (handler({
+      const listenerResults =
+        dispatchInternalEvent(event, 'beforeHashLinkScrolls', {
           link: hashLink,
           target,
-        }) === false) {
-          return;
-        }
+        });
+
+      if (listenerResults.includes(false)) {
+        return;
       }
 
       // Hide skipper box right away, so the layout is updated on time for the
@@ -1145,14 +1150,10 @@ function addHashLinkListeners() {
 
       processScrollingAfterHashLinkClicked();
 
-      dispatchInternalEvent(event, 'whenHashLinkClicked', {link: hashLink});
-
-      for (const handler of event.whenHashLinkClicked) {
-        handler({
-          link: hashLink,
-          target,
-        });
-      }
+      dispatchInternalEvent(event, 'whenHashLinkClicked', {
+        link: hashLink,
+        target,
+      });
     });
   }
 
@@ -1399,12 +1400,10 @@ function updateStickySubheadingContent(index) {
 
   state.displayedHeading = closestHeading;
 
-  for (const handler of event.whenDisplayedHeadingChanges) {
-    handler(index, {
-      oldHeading: oldDisplayedHeading,
-      newHeading: closestHeading,
-    });
-  }
+  dispatchInternalEvent(event, 'whenDisplayedHeadingChanges', index, {
+    oldHeading: oldDisplayedHeading,
+    newHeading: closestHeading,
+  });
 }
 
 function updateStickyHeadings(index) {
