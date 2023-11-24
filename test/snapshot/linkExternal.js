@@ -49,4 +49,13 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://youtube.com/watch?v=abc',
     'https://youtube.com/Playlist?list=kweh',
   ]);
+
+  quickSnapshotAllStyles('flash', [
+    'https://www.bgreco.net/hsflash/002238.html',
+    'https://homestuck.com/story/1234',
+    'https://homestuck.com/story/pony',
+    'https://www.youtube.com/watch?v=wKgOp3Kg2wI',
+    'https://youtu.be/IOcvkkklWmY',
+    'https://some.external.site/foo/bar/',
+  ]);
 });

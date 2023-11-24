@@ -23,6 +23,33 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
 `
 
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: flash, style: compact 1`] = `
+<a href="https://www.bgreco.net/hsflash/002238.html" class="nowrap">bgreco.net</a>
+<a href="https://homestuck.com/story/1234" class="nowrap">homestuck.com</a>
+<a href="https://homestuck.com/story/pony" class="nowrap">homestuck.com</a>
+<a href="https://www.youtube.com/watch?v=wKgOp3Kg2wI" class="nowrap">youtube.com</a>
+<a href="https://youtu.be/IOcvkkklWmY" class="nowrap">youtu.be</a>
+<a href="https://some.external.site/foo/bar/" class="nowrap">some.external.site</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: flash, style: normal 1`] = `
+<a href="https://www.bgreco.net/hsflash/002238.html" class="nowrap">bgreco.net (high quality audio)</a>
+<a href="https://homestuck.com/story/1234" class="nowrap">Homestuck (page 1234)</a>
+<a href="https://homestuck.com/story/pony" class="nowrap">Homestuck (secret page)</a>
+<a href="https://www.youtube.com/watch?v=wKgOp3Kg2wI" class="nowrap">YouTube (on any device)</a>
+<a href="https://youtu.be/IOcvkkklWmY" class="nowrap">YouTube (on any device)</a>
+<a href="https://some.external.site/foo/bar/" class="nowrap">External (some.external.site)</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: flash, style: platform 1`] = `
+<a href="https://www.bgreco.net/hsflash/002238.html" class="nowrap">bgreco.net</a>
+<a href="https://homestuck.com/story/1234" class="nowrap">Homestuck</a>
+<a href="https://homestuck.com/story/pony" class="nowrap">Homestuck</a>
+<a href="https://www.youtube.com/watch?v=wKgOp3Kg2wI" class="nowrap">YouTube</a>
+<a href="https://youtu.be/IOcvkkklWmY" class="nowrap">YouTube</a>
+<a href="https://some.external.site/foo/bar/" class="nowrap">External</a>
+`
+
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: generic, style: compact 1`] = `
 <a href="https://homestuck.bandcamp.com/" class="nowrap">homestuck</a>
 <a href="https://soundcloud.com/plazmataz" class="nowrap">plazmataz</a>
