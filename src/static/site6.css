@@ -504,6 +504,14 @@ a:not([href]):hover {
   display: none;
 }
 
+.icons-tooltip:not(.visible).transition-tooltip-hidden {
+  display: block !important;
+  opacity: 0;
+
+  transition-property: opacity;
+  transition-timing-function: linear;
+}
+
 .icons-tooltip-content {
   display: block;
   padding: 6px 2px 2px 2px;
