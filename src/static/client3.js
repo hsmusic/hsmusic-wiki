@@ -63,8 +63,25 @@ function pick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function cssProp(el, key) {
-  return getComputedStyle(el).getPropertyValue(key).trim();
+function cssProp(el, ...args) {
+  if (typeof args[0] === 'string' && args.length === 1) {
+    return getComputedStyle(el).getPropertyValue(args[0]).trim();
+  }
+
+  if (typeof args[0] === 'string' && args.length === 2) {
+    if (args[1] === null) {
+      el.style.removeProperty(args[0]);
+    } else {
+      el.style.setProperty(args[0], args[1]);
+    }
+    return;
+  }
+
+  if (typeof args[0] === 'object') {
+    for (const [property, value] of Object.entries(args[0])) {
+      cssProp(el, property, value);
+    }
+  }
 }
 
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
@@ -772,9 +789,13 @@ function beginTransitioningTooltipHidden(tooltip) {
     cancelTransitioningTooltipHidden();
   }
 
-  tooltip.classList.add('transition-tooltip-hidden');
-  tooltip.style.transitionDuration =
-    `${settings.transitionHiddenDuration / 1000}s`;
+  cssProp(tooltip, {
+    'display': 'block',
+    'opacity': '0',
+    'transition-property': 'opacity',
+    'transition-timing-function': 'linear',
+    'transition-duration': `${settings.transitionHiddenDuration / 1000}s`,
+  });
 
   state.currentlyTransitioningHiddenTooltip = tooltip;
   state.transitionHiddenTimeout =
@@ -800,8 +821,13 @@ function endTransitioningTooltipHidden() {
 
   if (!tooltip) return;
 
-  tooltip.classList.remove('transition-tooltip-hidden');
-  tooltip.style.removeProperty('transition-duration');
+  cssProp(tooltip, {
+    'display': null,
+    'opacity': null,
+    'transition-property': null,
+    'transition-timing-function': null,
+    'transition-duration': null,
+  });
 
   state.currentlyTransitioningHiddenTooltip = null;
 }
