@@ -331,6 +331,8 @@ export class Language extends Thing {
       });
     }
 
+    isExternalLinkStyle(style);
+
     return getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
       language: this,
       context,
