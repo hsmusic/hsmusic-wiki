@@ -792,9 +792,12 @@ function beginTransitioningTooltipHidden(tooltip) {
   cssProp(tooltip, {
     'display': 'block',
     'opacity': '0',
+
     'transition-property': 'opacity',
-    'transition-timing-function': 'linear',
-    'transition-duration': `${settings.transitionHiddenDuration / 1000}s`,
+    'transition-timing-function':
+      `steps(${Math.ceil(settings.transitionHiddenDuration / 60)}, end)`,
+    'transition-duration':
+      `${settings.transitionHiddenDuration / 1000}s`,
   });
 
   state.currentlyTransitioningHiddenTooltip = tooltip;
