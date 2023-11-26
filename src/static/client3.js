@@ -847,11 +847,11 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
   // apparent in the interaction, and should be hidden with a transition.
   if (intendingToReplace) {
     cancelTransitioningTooltipHidden();
+    cssProp(tooltip, 'display', 'none');
   } else {
     beginTransitioningTooltipHidden(state.currentlyShownTooltip);
   }
 
-  tooltip.classList.remove('visible');
   tooltip.inert = true;
 
   state.currentlyShownTooltip = null;
@@ -879,7 +879,8 @@ function showTooltipFromHoverable(hoverable) {
   }
 
   hoverable.classList.add('has-visible-tooltip');
-  tooltip.classList.add('visible');
+
+  cssProp(tooltip, 'display', 'block');
   tooltip.inert = false;
 
   state.currentlyShownTooltip = tooltip;

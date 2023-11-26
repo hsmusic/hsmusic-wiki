@@ -498,9 +498,6 @@ a:not([href]):hover {
   left: -34px;
   top: calc(1em + 1px);
   padding: 3px 6px 6px 6px;
-}
-
-.icons-tooltip:not(.visible) {
   display: none;
 }
 
