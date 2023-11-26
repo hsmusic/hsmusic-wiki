@@ -754,6 +754,8 @@ function hideCurrentlyShownTooltip() {
   // Never hide the tooltip if it's focused.
   if (currentlyShownTooltipHasFocus()) return false;
 
+  state.currentlyActiveHoverable.classList.remove('has-visible-tooltip');
+
   state.currentlyShownTooltip = null;
   state.currentlyActiveHoverable = null;
 
@@ -773,6 +775,8 @@ function showTooltipFromHoverable(hoverable) {
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
   if (!hideCurrentlyShownTooltip()) return false;
+
+  hoverable.classList.add('has-visible-tooltip');
 
   state.currentlyShownTooltip = tooltip;
   state.currentlyActiveHoverable = hoverable;
