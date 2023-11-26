@@ -401,9 +401,11 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
 
     hideTooltipDelay: 500,
 
-    // If a tooltip that's transitioning to hidden is hovered, it'll cancel
-    // out of this animation immediately.
+    // If a tooltip that's transitioning to hidden is hovered during the grace
+    // period (or the corresponding hoverable is hovered at any point in the
+    // transition), it'll cancel out of this animation immediately.
     transitionHiddenDuration: 300,
+    inertGracePeriod: 100,
   },
 
   state: {
@@ -421,9 +423,11 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     touchTimeout: null,
     hideTimeout: null,
     transitionHiddenTimeout: null,
+    inertGracePeriodTimeout: null,
     currentlyShownTooltip: null,
     currentlyActiveHoverable: null,
     currentlyTransitioningHiddenTooltip: null,
+    previouslyActiveHoverable: null,
     tooltipWasJustHidden: false,
     hoverableWasRecentlyTouched: false,
 
@@ -526,9 +530,15 @@ function registerTooltipHoverableElement(hoverable, tooltip) {
 function handleTooltipMouseEntered(tooltip) {
   const {state} = hoverableTooltipInfo;
 
+  if (state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden(true);
+    return;
+  }
+
   if (state.currentlyShownTooltip !== tooltip) return;
 
   // Don't time out the current tooltip while hovering it.
+
   if (state.hideTimeout) {
     clearTimeout(state.hideTimeout);
     state.hideTimeout = null;
@@ -582,8 +592,7 @@ function handleTooltipHoverableMouseEntered(hoverable) {
   // animation and show it immediately.
 
   if (tooltip === state.currentlyTransitioningHiddenTooltip) {
-    cancelTransitioningTooltipHidden();
-    showTooltipFromHoverable(hoverable);
+    cancelTransitioningTooltipHidden(true);
     return;
   }
 
@@ -802,14 +811,13 @@ function beginTransitioningTooltipHidden(tooltip) {
     }, settings.transitionHiddenDuration);
 }
 
-function cancelTransitioningTooltipHidden() {
+function cancelTransitioningTooltipHidden(andShow = false) {
   const {state} = hoverableTooltipInfo;
 
   endTransitioningTooltipHidden();
 
-  if (state.transitionHiddenTimeout) {
-    clearTimeout(state.transitionHiddenTimeout);
-    state.transitionHiddenTimeout = null;
+  if (andShow) {
+    showTooltipFromHoverable(state.previouslyActiveHoverable);
   }
 }
 
@@ -828,10 +836,20 @@ function endTransitioningTooltipHidden() {
   });
 
   state.currentlyTransitioningHiddenTooltip = null;
+
+  if (state.inertGracePeriodTimeout) {
+    clearTimeout(state.inertGracePeriodTimeout);
+    state.inertGracePeriodTimeout = null;
+  }
+
+  if (state.transitionHiddenTimeout) {
+    clearTimeout(state.transitionHiddenTimeout);
+    state.transitionHiddenTimeout = null;
+  }
 }
 
 function hideCurrentlyShownTooltip(intendingToReplace = false) {
-  const {event, state} = hoverableTooltipInfo;
+  const {event, settings, state} = hoverableTooltipInfo;
   const {currentlyShownTooltip: tooltip} = state;
 
   // If there was no tooltip to begin with, we're functionally in the desired
@@ -846,13 +864,21 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
   // If there's no intent to replace this tooltip, it's the last one currently
   // apparent in the interaction, and should be hidden with a transition.
   if (intendingToReplace) {
-    cancelTransitioningTooltipHidden();
     cssProp(tooltip, 'display', 'none');
   } else {
     beginTransitioningTooltipHidden(state.currentlyShownTooltip);
   }
 
-  tooltip.inert = true;
+  // Wait just a moment before making the tooltip inert. You might react
+  // (to the ghosting, or just to time passing) and realize you wanted
+  // to look at the tooltip after all - this delay gives a little buffer
+  // to second guess letting it disappear.
+  state.inertGracePeriodTimeout =
+    setTimeout(() => {
+      tooltip.inert = true;
+    }, settings.inertGracePeriod);
+
+  state.previouslyActiveHoverable = state.currentlyActiveHoverable;
 
   state.currentlyShownTooltip = null;
   state.currentlyActiveHoverable = null;
@@ -874,9 +900,7 @@ function showTooltipFromHoverable(hoverable) {
 
   // Cancel out another tooltip that's transitioning hidden, if that's going
   // on - it's a distraction that this tooltip is now replacing.
-  if (state.currentlyTransitioningHiddenTooltip) {
-    cancelTransitioningTooltipHidden();
-  }
+  cancelTransitioningTooltipHidden();
 
   hoverable.classList.add('has-visible-tooltip');
 
