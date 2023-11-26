@@ -443,11 +443,6 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     currentTouchIdentifiers: new Set(),
     touchIdentifiersBanishedByScrolling: new Set(),
   },
-
-  event: {
-    whenTooltipShouldBeShown: [],
-    whenTooltipShouldBeHidden: [],
-  },
 };
 
 // Adds DOM event listeners, so must be called during addPageListeners step.
@@ -856,6 +851,9 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
     beginTransitioningTooltipHidden(state.currentlyShownTooltip);
   }
 
+  tooltip.classList.remove('visible');
+  tooltip.inert = true;
+
   state.currentlyShownTooltip = null;
   state.currentlyActiveHoverable = null;
 
@@ -864,8 +862,6 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
   setTimeout(() => {
     state.tooltipWasJustHidden = false;
   });
-
-  dispatchInternalEvent(event, 'whenTooltipShouldBeHidden', {tooltip});
 
   return true;
 }
@@ -883,13 +879,13 @@ function showTooltipFromHoverable(hoverable) {
   }
 
   hoverable.classList.add('has-visible-tooltip');
+  tooltip.classList.add('visible');
+  tooltip.inert = false;
 
   state.currentlyShownTooltip = tooltip;
   state.currentlyActiveHoverable = hoverable;
 
   state.tooltipWasJustHidden = false;
-
-  dispatchInternalEvent(event, 'whenTooltipShouldBeShown', {hoverable, tooltip});
 
   return true;
 }
@@ -1979,30 +1975,6 @@ function getExternalIconTooltipReferences() {
       .map(span => span.querySelector('span.icons-tooltip'));
 }
 
-function addExternalIconTooltipInternalListeners() {
-  const info = externalIconTooltipInfo;
-
-  hoverableTooltipInfo.event.whenTooltipShouldBeShown.push(({tooltip}) => {
-    if (!info.iconContainers.includes(tooltip)) return;
-    showExternalIconTooltip(tooltip);
-  });
-
-  hoverableTooltipInfo.event.whenTooltipShouldBeHidden.push(({tooltip}) => {
-    if (!info.iconContainers.includes(tooltip)) return;
-    hideExternalIconTooltip(tooltip);
-  });
-}
-
-function showExternalIconTooltip(iconContainer) {
-  iconContainer.classList.add('visible');
-  iconContainer.inert = false;
-}
-
-function hideExternalIconTooltip(iconContainer) {
-  iconContainer.classList.remove('visible');
-  iconContainer.inert = true;
-}
-
 function addExternalIconTooltipPageListeners() {
   const info = externalIconTooltipInfo;
 
@@ -2016,7 +1988,6 @@ function addExternalIconTooltipPageListeners() {
 }
 
 clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
-clientSteps.addInternalListeners.push(addExternalIconTooltipInternalListeners);
 clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
 
 /*
