@@ -107,11 +107,15 @@ export default {
         ? [album, ...tracksWithCommentary]
         : tracksWithCommentary);
 
-    data.entryCount = thingsWithCommentary.length;
+    data.entryCount =
+      thingsWithCommentary
+        .flatMap(({commentary}) => commentary)
+        .length;
 
     data.wordCount =
       thingsWithCommentary
-        .map(({commentary}) => commentary)
+        .flatMap(({commentary}) => commentary)
+        .map(({body}) => body)
         .join(' ')
         .split(' ')
         .length;
@@ -156,7 +160,7 @@ export default {
                   language.countCommentaryEntries(data.entryCount, {unit: true})),
             })),
 
-          relations.albumCommentaryContent && [
+          relations.albumCommentaryEntries && [
             relations.albumCommentaryHeading.slots({
               tag: 'h3',
               color: data.color,
@@ -173,7 +177,7 @@ export default {
                       language.formatUnitList(
                         relations.albumCommentaryListeningLinks
                           .map(link => link.slots({
-                            mode: 'album',
+                            context: 'album',
                             tab: 'separate',
                           }))),
                   }),
@@ -182,8 +186,7 @@ export default {
             relations.albumCommentaryCover
               ?.slots({mode: 'commentary'}),
 
-            html.tag('blockquote',
-              relations.albumCommentaryContent),
+            relations.albumCommentaryEntries,
           ],
 
           stitchArrays({
