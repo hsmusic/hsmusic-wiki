@@ -24,7 +24,6 @@ import {
 
 import {
   additionalFiles,
-  additionalNameList,
   commentary,
   commentatorArtists,
   contributionList,
@@ -44,6 +43,7 @@ import {
 import {
   exitWithoutUniqueCoverArt,
   inheritFromOriginalRelease,
+  trackAdditionalNameList,
   trackReverseReferenceList,
   withAlbum,
   withAlwaysReferenceByDirectory,
@@ -64,7 +64,7 @@ export class Track extends Thing {
 
     name: name('Unnamed Track'),
     directory: directory(),
-    additionalNames: additionalNameList(),
+    additionalNames: trackAdditionalNameList(),
 
     duration: duration(),
     urls: urls(),

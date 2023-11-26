@@ -1,9 +1,12 @@
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inheritFromOriginalRelease} from './inheritFromOriginalRelease.js';
+export {default as trackAdditionalNameList} from './trackAdditionalNameList.js';
 export {default as trackReverseReferenceList} from './trackReverseReferenceList.js';
 export {default as withAlbum} from './withAlbum.js';
 export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';
 export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
+export {default as withInferredAdditionalNames} from './withInferredAdditionalNames.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
+export {default as withSharedAdditionalNames} from './withSharedAdditionalNames.js';
