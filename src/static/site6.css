@@ -482,6 +482,11 @@ a:not([href]):hover {
   text-decoration-style: dotted;
 }
 
+.contribution.has-tooltip > a:hover,
+.contribution.has-tooltip > a.has-visible-tooltip {
+  text-decoration-style: wavy !important;
+}
+
 .icons {
   font-style: normal;
   white-space: nowrap;
@@ -490,12 +495,9 @@ a:not([href]):hover {
 .icons-tooltip {
   position: absolute;
   z-index: 3;
-  left: -36px;
-  top: calc(1em - 2px);
-  padding: 4px 12px 6px 8px;
-}
-
-.icons-tooltip:not(.visible) {
+  left: -34px;
+  top: calc(1em + 1px);
+  padding: 3px 6px 6px 6px;
   display: none;
 }
 

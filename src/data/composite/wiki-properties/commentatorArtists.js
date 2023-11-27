@@ -2,7 +2,6 @@
 // This is mostly useful for credits and listings on artist pages.
 
 import {input, templateCompositeFrom} from '#composite';
-import {unique} from '#sugar';
 
 import {exitWithoutDependency, exposeDependency}
   from '#composite/control-flow';

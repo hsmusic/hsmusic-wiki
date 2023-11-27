@@ -63,8 +63,25 @@ function pick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function cssProp(el, key) {
-  return getComputedStyle(el).getPropertyValue(key).trim();
+function cssProp(el, ...args) {
+  if (typeof args[0] === 'string' && args.length === 1) {
+    return getComputedStyle(el).getPropertyValue(args[0]).trim();
+  }
+
+  if (typeof args[0] === 'string' && args.length === 2) {
+    if (args[1] === null) {
+      el.style.removeProperty(args[0]);
+    } else {
+      el.style.setProperty(args[0], args[1]);
+    }
+    return;
+  }
+
+  if (typeof args[0] === 'object') {
+    for (const [property, value] of Object.entries(args[0])) {
+      cssProp(el, property, value);
+    }
+  }
 }
 
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
@@ -383,6 +400,12 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     focusInfoDelay: 750,
 
     hideTooltipDelay: 500,
+
+    // If a tooltip that's transitioning to hidden is hovered during the grace
+    // period (or the corresponding hoverable is hovered at any point in the
+    // transition), it'll cancel out of this animation immediately.
+    transitionHiddenDuration: 300,
+    inertGracePeriod: 100,
   },
 
   state: {
@@ -399,8 +422,12 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     focusTimeout: null,
     touchTimeout: null,
     hideTimeout: null,
+    transitionHiddenTimeout: null,
+    inertGracePeriodTimeout: null,
     currentlyShownTooltip: null,
     currentlyActiveHoverable: null,
+    currentlyTransitioningHiddenTooltip: null,
+    previouslyActiveHoverable: null,
     tooltipWasJustHidden: false,
     hoverableWasRecentlyTouched: false,
 
@@ -419,11 +446,6 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     // from causing the current tooltip to be hidden.
     currentTouchIdentifiers: new Set(),
     touchIdentifiersBanishedByScrolling: new Set(),
-  },
-
-  event: {
-    whenTooltipShouldBeShown: [],
-    whenTooltipShouldBeHidden: [],
   },
 };
 
@@ -508,9 +530,15 @@ function registerTooltipHoverableElement(hoverable, tooltip) {
 function handleTooltipMouseEntered(tooltip) {
   const {state} = hoverableTooltipInfo;
 
+  if (state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden(true);
+    return;
+  }
+
   if (state.currentlyShownTooltip !== tooltip) return;
 
   // Don't time out the current tooltip while hovering it.
+
   if (state.hideTimeout) {
     clearTimeout(state.hideTimeout);
     state.hideTimeout = null;
@@ -548,21 +576,35 @@ function handleTooltipReceivedFocus(tooltip) {
 function handleTooltipLostFocus(tooltip) {
   const {settings, state} = hoverableTooltipInfo;
 
-  // Hide the current tooltip right away when it loses focus.
-  hideCurrentlyShownTooltip();
+  // Hide the current tooltip right away when it loses focus. Specify intent
+  // to replace - while we don't strictly know if another tooltip is going to
+  // immediately replace it, the mode of navigating with tab focus (once one
+  // tooltip has been activated) is a "switch focus immediately" kind of
+  // interaction in its nature.
+  hideCurrentlyShownTooltip(true);
 }
 
 function handleTooltipHoverableMouseEntered(hoverable) {
   const {event, settings, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // If this tooltip was transitioning to hidden, hovering should cancel that
+  // animation and show it immediately.
+
+  if (tooltip === state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden(true);
+    return;
+  }
+
+  // Start a timer to show the corresponding tooltip, with the delay depending
+  // on whether fast hovering or not. This could be canceled by mousing out of
+  // the hoverable.
 
   const hoverTimeoutDelay =
     (state.fastHovering
       ? settings.fastHoveringInfoDelay
       : settings.normalHoverInfoDelay);
 
-  // Start a timer to show the corresponding tooltip, with the delay depending
-  // on whether fast hovering or not. This could be canceled by mousing out of
-  // the hoverable.
   state.hoverTimeout =
     setTimeout(() => {
       state.hoverTimeout = null;
@@ -650,9 +692,10 @@ function handleTooltipHoverableLostFocus(hoverable, domEvent) {
 
   // Unless focus is entering the tooltip itself, hide the tooltip immediately.
   // This will set the tooltipWasJustHidden flag, which is detected by a newly
-  // focused hoverable, if applicable.
+  // focused hoverable, if applicable. Always specify intent to replace when
+  // navigating via tab focus. (Check `handleTooltipLostFocus` for details.)
   if (!currentlyShownTooltipHasFocus(domEvent.relatedTarget)) {
-    hideCurrentlyShownTooltip();
+    hideCurrentlyShownTooltip(true);
   }
 }
 
@@ -743,8 +786,70 @@ function currentlyShownTooltipHasFocus(focusElement = document.activeElement) {
   return false;
 }
 
-function hideCurrentlyShownTooltip() {
-  const {event, state} = hoverableTooltipInfo;
+function beginTransitioningTooltipHidden(tooltip) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  if (state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden();
+  }
+
+  cssProp(tooltip, {
+    'display': 'block',
+    'opacity': '0',
+
+    'transition-property': 'opacity',
+    'transition-timing-function':
+      `steps(${Math.ceil(settings.transitionHiddenDuration / 60)}, end)`,
+    'transition-duration':
+      `${settings.transitionHiddenDuration / 1000}s`,
+  });
+
+  state.currentlyTransitioningHiddenTooltip = tooltip;
+  state.transitionHiddenTimeout =
+    setTimeout(() => {
+      endTransitioningTooltipHidden();
+    }, settings.transitionHiddenDuration);
+}
+
+function cancelTransitioningTooltipHidden(andShow = false) {
+  const {state} = hoverableTooltipInfo;
+
+  endTransitioningTooltipHidden();
+
+  if (andShow) {
+    showTooltipFromHoverable(state.previouslyActiveHoverable);
+  }
+}
+
+function endTransitioningTooltipHidden() {
+  const {state} = hoverableTooltipInfo;
+  const {currentlyTransitioningHiddenTooltip: tooltip} = state;
+
+  if (!tooltip) return;
+
+  cssProp(tooltip, {
+    'display': null,
+    'opacity': null,
+    'transition-property': null,
+    'transition-timing-function': null,
+    'transition-duration': null,
+  });
+
+  state.currentlyTransitioningHiddenTooltip = null;
+
+  if (state.inertGracePeriodTimeout) {
+    clearTimeout(state.inertGracePeriodTimeout);
+    state.inertGracePeriodTimeout = null;
+  }
+
+  if (state.transitionHiddenTimeout) {
+    clearTimeout(state.transitionHiddenTimeout);
+    state.transitionHiddenTimeout = null;
+  }
+}
+
+function hideCurrentlyShownTooltip(intendingToReplace = false) {
+  const {event, settings, state} = hoverableTooltipInfo;
   const {currentlyShownTooltip: tooltip} = state;
 
   // If there was no tooltip to begin with, we're functionally in the desired
@@ -753,6 +858,27 @@ function hideCurrentlyShownTooltip() {
 
   // Never hide the tooltip if it's focused.
   if (currentlyShownTooltipHasFocus()) return false;
+
+  state.currentlyActiveHoverable.classList.remove('has-visible-tooltip');
+
+  // If there's no intent to replace this tooltip, it's the last one currently
+  // apparent in the interaction, and should be hidden with a transition.
+  if (intendingToReplace) {
+    cssProp(tooltip, 'display', 'none');
+  } else {
+    beginTransitioningTooltipHidden(state.currentlyShownTooltip);
+  }
+
+  // Wait just a moment before making the tooltip inert. You might react
+  // (to the ghosting, or just to time passing) and realize you wanted
+  // to look at the tooltip after all - this delay gives a little buffer
+  // to second guess letting it disappear.
+  state.inertGracePeriodTimeout =
+    setTimeout(() => {
+      tooltip.inert = true;
+    }, settings.inertGracePeriod);
+
+  state.previouslyActiveHoverable = state.currentlyActiveHoverable;
 
   state.currentlyShownTooltip = null;
   state.currentlyActiveHoverable = null;
@@ -763,8 +889,6 @@ function hideCurrentlyShownTooltip() {
     state.tooltipWasJustHidden = false;
   });
 
-  dispatchInternalEvent(event, 'whenTooltipShouldBeHidden', {tooltip});
-
   return true;
 }
 
@@ -772,14 +896,21 @@ function showTooltipFromHoverable(hoverable) {
   const {event, state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
-  if (!hideCurrentlyShownTooltip()) return false;
+  if (!hideCurrentlyShownTooltip(true)) return false;
+
+  // Cancel out another tooltip that's transitioning hidden, if that's going
+  // on - it's a distraction that this tooltip is now replacing.
+  cancelTransitioningTooltipHidden();
+
+  hoverable.classList.add('has-visible-tooltip');
+
+  cssProp(tooltip, 'display', 'block');
+  tooltip.inert = false;
 
   state.currentlyShownTooltip = tooltip;
   state.currentlyActiveHoverable = hoverable;
 
   state.tooltipWasJustHidden = false;
-
-  dispatchInternalEvent(event, 'whenTooltipShouldBeShown', {hoverable, tooltip});
 
   return true;
 }
@@ -1869,30 +2000,6 @@ function getExternalIconTooltipReferences() {
       .map(span => span.querySelector('span.icons-tooltip'));
 }
 
-function addExternalIconTooltipInternalListeners() {
-  const info = externalIconTooltipInfo;
-
-  hoverableTooltipInfo.event.whenTooltipShouldBeShown.push(({tooltip}) => {
-    if (!info.iconContainers.includes(tooltip)) return;
-    showExternalIconTooltip(tooltip);
-  });
-
-  hoverableTooltipInfo.event.whenTooltipShouldBeHidden.push(({tooltip}) => {
-    if (!info.iconContainers.includes(tooltip)) return;
-    hideExternalIconTooltip(tooltip);
-  });
-}
-
-function showExternalIconTooltip(iconContainer) {
-  iconContainer.classList.add('visible');
-  iconContainer.inert = false;
-}
-
-function hideExternalIconTooltip(iconContainer) {
-  iconContainer.classList.remove('visible');
-  iconContainer.inert = true;
-}
-
 function addExternalIconTooltipPageListeners() {
   const info = externalIconTooltipInfo;
 
@@ -1906,7 +2013,6 @@ function addExternalIconTooltipPageListeners() {
 }
 
 clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
-clientSteps.addInternalListeners.push(addExternalIconTooltipInternalListeners);
 clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
 
 /*
