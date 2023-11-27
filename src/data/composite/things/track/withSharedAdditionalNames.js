@@ -20,7 +20,7 @@ export default templateCompositeFrom({
     raiseOutputWithoutDependency({
       dependency: '#otherReleases',
       mode: input.value('empty'),
-      output: input.value({'#inferredAdditionalNames': []}),
+      output: input.value({'#sharedAdditionalNames': []}),
     }),
 
     // TODO: Using getUpdateValue is always a bit janky.
