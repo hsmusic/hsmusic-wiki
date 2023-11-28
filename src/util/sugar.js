@@ -589,6 +589,32 @@ export function _withAggregate(mode, aggregateOpts, fn) {
   }
 }
 
+export const unhelpfulStackLines = [
+  /sugar/,
+  /node:/,
+  /<anonymous>/,
+];
+
+export function getUsefulStackLine(stack) {
+  if (!stack) return '';
+
+  function isUseful(stackLine) {
+    const trimmed = stackLine.trim();
+
+    if (!trimmed.startsWith('at'))
+      return false;
+
+    if (unhelpfulStackLines.some(regex => regex.test(trimmed)))
+      return false;
+
+    return true;
+  }
+
+  const stackLines = stack.split('\n');
+  const usefulStackLine = stackLines.find(isUseful);
+  return usefulStackLine ?? '';
+}
+
 export function showAggregate(topError, {
   pathToFileURL = f => f,
   showTraces = true,
@@ -670,15 +696,8 @@ export function showAggregate(topError, {
         : messagePart);
 
     if (showTraces) {
-      const stackLines =
-        stack?.split('\n');
-
       const stackLine =
-        stackLines?.find(line =>
-          line.trim().startsWith('at') &&
-          !line.includes('sugar') &&
-          !line.includes('node:') &&
-          !line.includes('<anonymous>'));
+        getUsefulStackLine(stack);
 
       const tracePart =
         (stackLine
