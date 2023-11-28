@@ -1,7 +1,32 @@
+import CacheableObject from '#cacheable-object';
+import find from '#find';
 import {linkWikiDataArrays} from '#yaml';
 
-export function linkAndBindWikiData(wikiData) {
-  linkWikiDataArrays(wikiData);
+export function linkAndBindWikiData(wikiData, {
+  inferAlbumsOwnTrackData = true,
+} = {}) {
+  function customLinkWikiDataArrays(...args) {
+    linkWikiDataArrays(...args);
+
+    // If albumData is present, automatically set albums' ownTrackData values
+    // by resolving track sections' references against the full array. This is
+    // just a nicety for working with albums throughout tests.
+    if (inferAlbumsOwnTrackData && wikiData.albumData && wikiData.trackData) {
+      for (const album of wikiData.albumData) {
+        const trackSections =
+          CacheableObject.getUpdateValue(album, 'trackSections');
+
+        const trackRefs =
+          trackSections.flatMap(section => section.tracks);
+
+        album.ownTrackData =
+          trackRefs.map(ref =>
+            find.track(ref, wikiData.trackData, {mode: 'error'}));
+      }
+    }
+  }
+
+  customLinkWikiDataArrays(wikiData);
 
   return {
     // Mutate to make the below functions aware of new data objects, or of
@@ -13,12 +38,14 @@ export function linkAndBindWikiData(wikiData) {
     // It'll automatically relink everything on wikiData so all the objects
     // are caught up to date.
     linkWikiDataArrays:
-      linkWikiDataArrays.bind(null, wikiData),
+      customLinkWikiDataArrays
+        .bind(null, wikiData),
 
     // Use this if you HAVEN'T mutated wikiData and just need to decache
     // indirect dependencies on exposed properties of other data objects.
     // See documentation on linkWikiDataArarys (in yaml.js) for more info.
     XXX_decacheWikiData:
-      linkWikiDataArrays.bind(null, wikiData, {XXX_decacheWikiData: true}),
+      customLinkWikiDataArrays
+        .bind(null, wikiData, {XXX_decacheWikiData: true}),
   };
 }

@@ -133,7 +133,10 @@ export class Album extends Thing {
       class: input.value(Group),
     }),
 
-    trackData: wikiData({
+    // Only the tracks which belong to this album.
+    // Necessary for computing the track list, so provide this statically
+    // or keep it updated.
+    ownTrackData: wikiData({
       class: input.value(Track),
     }),
 

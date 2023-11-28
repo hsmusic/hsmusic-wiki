@@ -80,8 +80,8 @@ t.test(`Track.album`, t => {
 
   track1.albumData = [album1, album2];
   track2.albumData = [album1, album2];
-  album1.trackData = [track1, track2];
-  album2.trackData = [track1, track2];
+  album1.ownTrackData = [track1, track2];
+  album2.ownTrackData = [track1, track2];
   album1.trackSections = [{tracks: ['track:track1']}];
   album2.trackSections = [{tracks: ['track:track2']}];
 
@@ -98,13 +98,13 @@ t.test(`Track.album`, t => {
   t.equal(track1.album, null,
     `album #4: is null when track missing albumData`);
 
-  album1.trackData = [];
+  album1.ownTrackData = [];
   track1.albumData = [album1, album2];
 
   t.equal(track1.album, null,
-    `album #5: is null when album missing trackData`);
+    `album #5: is null when album missing ownTrackData`);
 
-  album1.trackData = [track1, track2];
+  album1.ownTrackData = [track1, track2];
   album1.trackSections = [{tracks: ['track:track2']}];
 
   // XXX_decacheWikiData
@@ -165,7 +165,7 @@ t.test(`Track.color`, t => {
 
   const {track, album} = stubTrackAndAlbum();
 
-  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
     albumData: [album],
     trackData: [track],
   });
@@ -188,7 +188,7 @@ t.test(`Track.color`, t => {
   // track's album will always have a corresponding track section. But if that
   // connection breaks for some future reason (with the album still present),
   // Track.color should still inherit directly from the album.
-  wikiData.albumData = [
+  track.albumData = [
     {
       constructor: {[Thing.referenceType]: 'album'},
       color: '#abcdef',
@@ -198,8 +198,6 @@ t.test(`Track.color`, t => {
       ],
     },
   ];
-
-  linkWikiDataArrays();
 
   t.equal(track.color, '#abcdef',
     `color #3: inherits from album without matching track section`);

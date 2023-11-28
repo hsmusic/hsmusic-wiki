@@ -936,6 +936,7 @@ export const dataSteps = [
         // an individual section before applying it, since those are just
         // generic objects; they aren't Things in and of themselves.)
         const trackSections = [];
+        const ownTrackData = [];
 
         let currentTrackSection = {
           name: `Default Track Section`,
@@ -970,13 +971,16 @@ export const dataSteps = [
 
           entry.dataSourceAlbum = albumRef;
 
+          ownTrackData.push(entry);
           currentTrackSection.tracks.push(Thing.getReference(entry));
         }
 
         closeCurrentTrackSection();
 
-        album.trackSections = trackSections;
         albumData.push(album);
+
+        album.trackSections = trackSections;
+        album.ownTrackData = ownTrackData;
       }
 
       return {albumData, trackData};
@@ -1551,7 +1555,7 @@ export function linkWikiDataArrays(wikiData, {
 
   assignWikiData([WD.wikiInfo], 'groupData');
 
-  assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
+  assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData');
   assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
   assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
   assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
