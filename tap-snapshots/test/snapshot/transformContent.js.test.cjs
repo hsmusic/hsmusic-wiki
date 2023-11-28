@@ -10,6 +10,45 @@ exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) >
 <p>Very nice: <time datetime="Fri, 25 Oct 2413 03:00:00 GMT">10/25/2413</time></p>
 `
 
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > hanging indent list 1`] = `
+<p>Hello!</p>
+<ul>
+<li><p>I am a list item and I
+go on and on and on
+and on and on and on.</p>
+</li>
+<li><p>I am another list item.
+Yeah.</p>
+</li>
+</ul>
+<p>In-between!</p>
+<ul>
+<li>Spooky,
+spooky, I say!</li>
+<li>Following list item.
+No empty line around me.</li>
+<li>Very cool.
+So, so cool.</li>
+</ul>
+<p>Goodbye!</p>
+`
+
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > indent on a directly following line 1`] = `
+<div>
+    <span>Wow!</span>
+</div>
+`
+
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > indent on an indierctly following line 1`] = `
+<p>Some text.</p>
+<p>Yes, some more text.</p>
+<pre><code>I am hax0rz!!
+All yor base r blong 2 us.
+</code></pre>
+<p>Aye.</p>
+<p>Aye aye aye.</p>
+`
+
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > inline images 1`] = `
 <p><img src="snooping.png"> as USUAL...</p>
 <p>What do you know? <img src="cowabunga.png" width="24" height="32"></p>
