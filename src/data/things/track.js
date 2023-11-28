@@ -331,12 +331,21 @@ export class Track extends Thing {
     }
 
     let album;
-    if (depth >= 0 && (album = this.album ?? this.dataSourceAlbum)) {
+
+    if (depth >= 0) {
+      try {
+        album = this.album;
+      } catch (_error) {}
+
+      album ??= this.dataSourceAlbum;
+    }
+
+    if (album) {
       const albumName = album.name;
       const albumIndex = album.tracks.indexOf(this);
       const trackNum =
         (albumIndex === -1
-          ? '#?'
+          ? 'indeterminate position'
           : `#${albumIndex + 1}`);
       parts.push(` (${colors.yellow(trackNum)} in ${colors.green(albumName)})`);
     }

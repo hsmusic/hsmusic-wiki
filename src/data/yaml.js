@@ -1625,8 +1625,7 @@ export function filterDuplicateDirectories(wikiData) {
         call(() => {
           throw new Error(
             `Duplicate directory ${colors.green(directory)}:\n` +
-              places.map((thing) => ` - ` + inspect(thing)).join('\n')
-          );
+            places.map(thing => ` - ` + inspect(thing)).join('\n'));
         });
       }
 
