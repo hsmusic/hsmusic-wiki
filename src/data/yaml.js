@@ -646,6 +646,7 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
     directory: 'Directory',
 
     stylesheet: 'Style',
+    script: 'Script',
     content: 'Content',
   },
 });
