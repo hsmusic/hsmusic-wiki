@@ -1981,8 +1981,8 @@ for (const info of groupContributionsTableInfo) {
 // Artist link icon tooltips ------------------------------
 
 const externalIconTooltipInfo = clientInfo.externalIconTooltipInfo = {
-  hoverableLinks: null,
-  iconContainers: null,
+  hoverables: null,
+  tooltips: null,
 };
 
 function getExternalIconTooltipReferences() {
@@ -1991,21 +1991,19 @@ function getExternalIconTooltipReferences() {
   const spans =
     Array.from(document.querySelectorAll('span.contribution.has-tooltip'));
 
-  info.hoverableLinks =
-    spans
-      .map(span => span.querySelector('a'));
+  info.hoverables =
+    spans.map(span => span.querySelector('a'));
 
-  info.iconContainers =
-    spans
-      .map(span => span.querySelector('span.icons-tooltip'));
+  info.tooltips =
+    spans.map(span => span.querySelector('span.icons-tooltip'));
 }
 
 function addExternalIconTooltipPageListeners() {
   const info = externalIconTooltipInfo;
 
   for (const {hoverable, tooltip} of stitchArrays({
-    hoverable: info.hoverableLinks,
-    tooltip: info.iconContainers,
+    hoverable: info.hoverables,
+    tooltip: info.tooltips,
   })) {
     registerTooltipElement(tooltip);
     registerTooltipHoverableElement(hoverable, tooltip);
@@ -2014,6 +2012,41 @@ function addExternalIconTooltipPageListeners() {
 
 clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
 clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
+
+// Datetimestamp tooltips ---------------------------------
+
+const datetimestampTooltipInfo = clientInfo.datetimestampTooltipInfo = {
+  hoverables: null,
+  tooltips: null,
+};
+
+function getDatestampTooltipReferences() {
+  const info = datetimestampTooltipInfo;
+
+  const spans =
+    Array.from(document.querySelectorAll('span.datetimestamp.has-tooltip'));
+
+  info.hoverables =
+    spans.map(span => span.querySelector('time'));
+
+  info.tooltips =
+    spans.map(span => span.querySelector('span.datetimestamp-tooltip'));
+}
+
+function addDatestampTooltipPageListeners() {
+  const info = datetimestampTooltipInfo;
+
+  for (const {hoverable, tooltip} of stitchArrays({
+    hoverable: info.hoverables,
+    tooltip: info.tooltips,
+  })) {
+    registerTooltipElement(tooltip);
+    registerTooltipHoverableElement(hoverable, tooltip);
+  }
+}
+
+clientSteps.getPageReferences.push(getDatestampTooltipReferences);
+clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
 
 // Sticky commentary sidebar ------------------------------
 

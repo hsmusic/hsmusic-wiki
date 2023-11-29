@@ -473,37 +473,51 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
-.contribution {
+.contribution.has-tooltip,
+.datetimestamp.has-tooltip {
   position: relative;
 }
 
-.contribution.has-tooltip > a {
+.contribution.has-tooltip > a,
+.datetimestamp.has-tooltip > time {
   text-decoration: underline;
   text-decoration-style: dotted;
 }
 
+.datetimestamp.has-tooltip > time {
+  cursor: default;
+}
+
 .contribution.has-tooltip > a:hover,
-.contribution.has-tooltip > a.has-visible-tooltip {
+.contribution.has-tooltip > a.has-visible-tooltip,
+.datetimestamp.has-tooltip > time:hover,
+.datetimestamp.has-tooltip > time.has-visible-tooltip {
   text-decoration-style: wavy !important;
 }
 
-.icons {
-  font-style: normal;
-  white-space: nowrap;
-}
-
-.icons-tooltip {
+.icons-tooltip,
+.datetimestamp-tooltip {
   position: absolute;
   z-index: 3;
   left: -34px;
   top: calc(1em + 1px);
-  padding: 3px 6px 6px 6px;
   display: none;
 }
 
-.icons-tooltip-content {
+.icons-tooltip {
+  padding: 3px 6px 6px 6px;
+  left: -34px;
+}
+
+.datetimestamp-tooltip {
+  padding: 3px 4px 2px 2px;
+  left: 14px;
+}
+
+.icons-tooltip-content,
+.datetimestamp-tooltip-content {
   display: block;
-  padding: 6px 2px 2px 2px;
+
   background: var(--bg-black-color);
   border: 1px dotted var(--primary-color);
   border-radius: 6px;
@@ -514,14 +528,29 @@ a:not([href]):hover {
           backdrop-filter:
     brightness(1.5) saturate(1.4) blur(4px);
 
-  -webkit-user-select: none;
-          user-select: none;
-
   box-shadow:
     0 3px 4px 4px #000000aa,
     0 -2px 4px -2px var(--primary-color) inset;
+}
+
+.icons-tooltip-content {
+  padding: 6px 2px 2px 2px;
+
+  -webkit-user-select: none;
+          user-select: none;
 
   cursor: default;
+}
+
+.datetimestamp-tooltip-content {
+  padding: 5px 6px;
+  white-space: nowrap;
+  font-size: 0.9em;
+}
+
+.icons {
+  font-style: normal;
+  white-space: nowrap;
 }
 
 .icons a:hover {
