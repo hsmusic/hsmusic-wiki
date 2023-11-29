@@ -3,6 +3,7 @@ import {empty, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
+    'generateColorStyleVariables',
     'generateContentHeading',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
@@ -63,6 +64,10 @@ export default {
       sec.albums.galleryLink =
         relation('linkGroupGallery', group);
 
+      sec.albums.colorVariables =
+        group.albums
+          .map(() => relation('generateColorStyleVariables'));
+
       sec.albums.albumLinks =
         group.albums
           .map(album => relation('linkAlbum', album));
@@ -90,6 +95,9 @@ export default {
 
     data.name = group.name;
     data.color = group.color;
+
+    data.albumColors =
+      group.albums.map(album => album.color);
 
     return data;
   },
@@ -137,10 +145,21 @@ export default {
                 albumLink: sec.albums.albumLinks,
                 groupLink: sec.albums.groupLinks,
                 datetimestamp: sec.albums.datetimestamps,
-              }).map(({albumLink, groupLink, datetimestamp}) => {
+                colorVariables: sec.albums.colorVariables,
+                albumColor: data.albumColors,
+              }).map(({
+                  albumLink,
+                  groupLink,
+                  datetimestamp,
+                  colorVariables,
+                  albumColor,
+                }) => {
                   const prefix = 'groupInfoPage.albumList.item';
                   const parts = [prefix];
-                  const options = {album: albumLink};
+                  const options = {};
+
+                  options.album =
+                    albumLink.slot('color', false);
 
                   if (datetimestamp) {
                     parts.push('withYear');
@@ -161,9 +180,11 @@ export default {
                         }));
                   }
 
-                  return language.$(...parts, options);
-                })
-                .map(content => html.tag('li', content))),
+                  return (
+                    html.tag('li',
+                      {style: colorVariables.slot('color', albumColor).content},
+                      language.$(...parts, options)));
+                })),
           ],
         ],
 

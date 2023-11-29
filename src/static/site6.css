@@ -603,6 +603,10 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
+.other-group-accent a {
+  color: var(--page-primary-color);
+}
+
 .content-columns {
   columns: 2;
 }
