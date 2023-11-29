@@ -1023,10 +1023,20 @@ groupInfoPage:
     title: "Albums"
 
     item:
-      _: "({YEAR}) {ALBUM}"
-      withoutYear: "{ALBUM}"
-      withAccent: "{ITEM} {ACCENT}"
-      otherGroupAccent: "(from {GROUP})"
+      _: >-
+        {ALBUM}
+
+      withYear: >-
+        {YEAR_ACCENT} {ALBUM}
+
+      withOtherGroup: >-
+        {ALBUM} {OTHER_GROUP_ACCENT}
+
+      withYear.withOtherGroup: >-
+        {YEAR_ACCENT} {ALBUM} {OTHER_GROUP_ACCENT}
+
+      yearAccent: "({YEAR})"
+      otherGroupAccent:  "(from {GROUP})"
 
 #
 # groupGalleryPage:
