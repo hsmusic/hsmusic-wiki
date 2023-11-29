@@ -2,6 +2,7 @@ import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAbsoluteDatetimestamp',
     'generateContentHeading',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
@@ -73,6 +74,12 @@ export default {
             (group
               ? relation('linkGroup', group)
               : null));
+
+      sec.albums.datetimestamps =
+        group.albums.map(album =>
+          (album.date
+            ? relation('generateAbsoluteDatetimestamp', album.date)
+            : null));
     }
 
     return relations;
@@ -83,10 +90,6 @@ export default {
 
     data.name = group.name;
     data.color = group.color;
-
-    data.albumYears =
-      group.albums
-        .map(album => album.date?.getFullYear());
 
     return data;
   },
@@ -133,17 +136,18 @@ export default {
               stitchArrays({
                 albumLink: sec.albums.albumLinks,
                 groupLink: sec.albums.groupLinks,
-                albumYear: data.albumYears,
-              }).map(({albumLink, groupLink, albumYear}) => {
+                datetimestamp: sec.albums.datetimestamps,
+              }).map(({albumLink, groupLink, datetimestamp}) => {
                   const prefix = 'groupInfoPage.albumList.item';
                   const parts = [prefix];
                   const options = {album: albumLink};
 
-                  if (albumYear) {
+                  if (datetimestamp) {
                     parts.push('withYear');
                     options.yearAccent =
                       language.$(prefix, 'yearAccent', {
-                        year: albumYear,
+                        year:
+                          datetimestamp.slots({style: 'year', tooltip: true}),
                       });
                   }
 
