@@ -511,6 +511,10 @@ a:not([href]):hover {
 
 .datetimestamp-tooltip {
   padding: 3px 4px 2px 2px;
+  left: -10px;
+}
+
+li .datetimestamp-tooltip {
   left: 14px;
 }
 
