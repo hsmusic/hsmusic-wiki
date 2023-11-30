@@ -48,7 +48,7 @@ export default {
           language.formatRelativeDate(data.currentDate, data.referenceDate, {
             considerRoundingDays: true,
             approximate: true,
-            absolute: true,
+            absolute: slots.style === 'year',
           }),
 
       datetime:
