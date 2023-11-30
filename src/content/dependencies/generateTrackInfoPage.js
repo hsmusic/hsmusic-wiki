@@ -1,10 +1,11 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 import {sortAlbumsTracksChronologically, sortFlashesChronologically} from '#wiki-data';
 
 import getChronologyRelations from '../util/getChronologyRelations.js';
 
 export default {
   contentDependencies: [
+    'generateAbsoluteDatetimestamp',
     'generateAdditionalFilesShortcut',
     'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
@@ -16,6 +17,7 @@ export default {
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
+    'generateRelativeDatetimestamp',
     'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
@@ -139,6 +141,25 @@ export default {
 
       otherReleases.heading =
         relation('generateContentHeading');
+
+      otherReleases.trackLinks =
+        track.otherReleases
+          .map(track => relation('linkTrack', track));
+
+      otherReleases.albumLinks =
+        track.otherReleases
+          .map(track => relation('linkAlbum', track.album));
+
+      otherReleases.datetimestamps =
+        track.otherReleases.map(track2 =>
+          (track2.date
+            ? (track.date
+                ? relation('generateRelativeDatetimestamp',
+                    track2.date,
+                    track.date)
+                : relation('generateAbsoluteDatetimestamp',
+                    track2.date))
+            : null));
 
       otherReleases.items =
         track.otherReleases.map(track => ({
@@ -356,12 +377,27 @@ export default {
               }),
 
             html.tag('ul',
-              sec.otherReleases.items.map(({trackLink, albumLink}) =>
-                html.tag('li',
-                  language.$('releaseInfo.alsoReleasedAs.item', {
-                    track: trackLink,
-                    album: albumLink,
-                  })))),
+              stitchArrays({
+                trackLink: sec.otherReleases.trackLinks,
+                albumLink: sec.otherReleases.albumLinks,
+                datetimestamp: sec.otherReleases.datetimestamps,
+              }).map(({trackLink, albumLink, datetimestamp}) => {
+                  const parts = ['releaseInfo.alsoReleasedAs.item'];
+                  const options = {track: trackLink, album: albumLink};
+
+                  if (datetimestamp) {
+                    parts.push('withYear');
+                    options.year =
+                      datetimestamp.slots({
+                        style: 'year',
+                        tooltip: true,
+                      });
+                  }
+
+                  return (
+                    html.tag('li',
+                      language.$(...parts, options)));
+                })),
           ],
 
           sec.contributors && [

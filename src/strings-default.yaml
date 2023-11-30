@@ -268,7 +268,10 @@ releaseInfo:
 
   alsoReleasedAs:
     _: "Also released as:"
-    item: "{TRACK} (on {ALBUM})"
+
+    item:
+      _: "{TRACK} ({ALBUM})"
+      withYear: "({YEAR}) {TRACK} ({ALBUM})"
 
   tracksReferenced: "Tracks that {TRACK} references:"
   tracksThatReference: "Tracks that reference {TRACK}:"
