@@ -13,6 +13,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
+    'generateColorStyleVariables',
     'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
@@ -141,6 +142,10 @@ export default {
 
       otherReleases.heading =
         relation('generateContentHeading');
+
+      otherReleases.colorVariables =
+        track.otherReleases
+          .map(() => relation('generateColorStyleVariables'));
 
       otherReleases.trackLinks =
         track.otherReleases
@@ -311,6 +316,9 @@ export default {
       hasTrackNumbers: track.album.hasTrackNumbers,
       trackNumber: track.album.tracks.indexOf(track) + 1,
 
+      otherReleaseColors:
+        track.otherReleases.map(track => track.color),
+
       numAdditionalFiles: track.additionalFiles.length,
     };
   },
@@ -381,9 +389,20 @@ export default {
                 trackLink: sec.otherReleases.trackLinks,
                 albumLink: sec.otherReleases.albumLinks,
                 datetimestamp: sec.otherReleases.datetimestamps,
-              }).map(({trackLink, albumLink, datetimestamp}) => {
+                colorVariables: sec.otherReleases.colorVariables,
+                color: data.otherReleaseColors,
+              }).map(({
+                  trackLink,
+                  albumLink,
+                  datetimestamp,
+                  colorVariables,
+                  color,
+                }) => {
                   const parts = ['releaseInfo.alsoReleasedAs.item'];
-                  const options = {track: trackLink, album: albumLink};
+                  const options = {};
+
+                  options.track = trackLink.slot('color', false);
+                  options.album = albumLink;
 
                   if (datetimestamp) {
                     parts.push('withYear');
@@ -396,6 +415,7 @@ export default {
 
                   return (
                     html.tag('li',
+                      {style: colorVariables.slot('color', color).content},
                       language.$(...parts, options)));
                 })),
           ],
