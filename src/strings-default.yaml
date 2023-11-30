@@ -129,6 +129,16 @@ count:
       many: ""
       other: "{DAYS} days"
 
+  months:
+    _: "{MONTHS}"
+    withUnit:
+      zero: ""
+      one: "{MONTHS} month"
+      two: ""
+      few: ""
+      many: ""
+      other: "{MONTHS} months"
+
   timesReferenced:
     _: "{TIMES_REFERENCED}"
     withUnit:
@@ -149,6 +159,16 @@ count:
       many: ""
       other: "used {TIMES_USED} times"
 
+  weeks:
+    _: "{WEEKS}"
+    withUnit:
+      zero: ""
+      one: "{WEEKS} week"
+      two: ""
+      few: ""
+      many: ""
+      other: "{WEEKS} weeks"
+
   words:
     _: "{WORDS}"
     thousand: "{WORDS}k"
@@ -159,6 +179,16 @@ count:
       few: ""
       many: ""
       other: "{WORDS} words"
+
+  years:
+    _: "{YEARS}"
+    withUnit:
+      zero: ""
+      one: "{YEARS} year"
+      two: ""
+      few: ""
+      many: ""
+      other: "{YEARS} years"
 
   # Numerical things that aren't exactly counting, per se
 
@@ -171,6 +201,24 @@ count:
     minutes:
       _:        "{MINUTES}:{SECONDS}"
       withUnit: "{MINUTES}:{SECONDS} minutes"
+
+  dateDuration:
+    earlier: "{DURATION} earlier"
+    later: "{DURATION} later"
+    same: "on the same date"
+    zero: "no days apart"
+    approximate: "about {DURATION}"
+    approximateEarlier: "about {DURATION} earlier"
+    approximateLater: "about {DURATION} later"
+    relativeAbsolute: "{ABSOLUTE}; {RELATIVE}"
+
+    years: "{YEARS}"
+    months: "{MONTHS}"
+    days: "{DAYS}"
+    yearsMonthsDays: "{YEARS}, {MONTHS}, {DAYS}"
+    yearsMonths: "{YEARS}, {MONTHS}"
+    yearsDays: "{YEARS}, {DAYS}"
+    monthsDays: "{MONTHS}, {DAYS}"
 
   fileSize:
     terabytes: "{TERABYTES} TB"
