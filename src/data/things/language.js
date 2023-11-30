@@ -369,7 +369,7 @@ export class Language extends Thing {
     const relative =
       this.formatString(
         'count.dateDuration',
-        (approximate
+        (approximate && (years || months || days)
           ? (comparison === -1
               ? 'approximateEarlier'
               : 'approximateLater')
