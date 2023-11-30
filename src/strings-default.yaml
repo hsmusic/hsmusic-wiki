@@ -206,7 +206,7 @@ count:
     earlier: "{DURATION} earlier"
     later: "{DURATION} later"
     same: "on the same date"
-    zero: "no days apart"
+    zero: "at most one day"
     approximate: "about {DURATION}"
     approximateEarlier: "about {DURATION} earlier"
     approximateLater: "about {DURATION} later"
