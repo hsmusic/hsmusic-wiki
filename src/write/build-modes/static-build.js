@@ -31,7 +31,7 @@ import {
 } from '#urls';
 
 import {bindUtilities} from '../bind-utilities.js';
-import {generateRedirectHTML, generateGlobalWikiDataJSON} from '../common-templates.js';
+import {generateRedirectHTML, generateRandomLinkDataJSON} from '../common-templates.js';
 
 const pageFlags = Object.keys(pageSpecs);
 
@@ -145,14 +145,8 @@ export async function go({
   });
 
   await writeSharedFilesAndPages({
-    language: defaultLanguage,
     outputPath,
-    urls,
-    wikiData,
-    wikiDataJSON: generateGlobalWikiDataJSON({
-      serializeThings,
-      wikiData,
-    }),
+    randomLinkDataJSON: generateRandomLinkDataJSON({wikiData}),
   });
 
   const buildSteps = writeAll
@@ -477,12 +471,12 @@ async function writeFavicon({
 
 async function writeSharedFilesAndPages({
   outputPath,
-  wikiDataJSON,
+  randomLinkDataJSON,
 }) {
   return progressPromiseAll(`Writing files & pages shared across languages.`, [
-    wikiDataJSON &&
+    randomLinkDataJSON &&
       writeFile(
-        path.join(outputPath, 'data.json'),
-        wikiDataJSON),
+        path.join(outputPath, 'random-link-data.json'),
+        randomLinkDataJSON),
   ].filter(Boolean));
 }

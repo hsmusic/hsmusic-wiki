@@ -37,6 +37,45 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
       `That's right, [[album:cool-album]]!`);
 
   quickSnapshot(
+    'indent on a directly following line',
+      `<div>\n` +
+      `    <span>Wow!</span>\n` +
+      `</div>`);
+
+  quickSnapshot(
+    'indent on an indierctly following line',
+      `Some text.\n` +
+      `Yes, some more text.\n` +
+      `\n` +
+      `    I am hax0rz!!\n` +
+      `    All yor base r blong 2 us.\n` +
+      `\n` +
+      `Aye.\n` +
+      `Aye aye aye.`);
+
+  quickSnapshot(
+    'hanging indent list',
+      `Hello!\n` +
+      `\n` +
+      `* I am a list item and I\n` +
+      `  go on and on and on\n` +
+      `  and on and on and on.\n` +
+      `\n` +
+      `* I am another list item.\n` +
+      `  Yeah.\n` +
+      `\n` +
+      `In-between!\n` +
+      `\n` +
+      `* Spooky,\n` +
+      `  spooky, I say!\n` +
+      `* Following list item.\n` +
+      `  No empty line around me.\n` +
+      `* Very cool.\n` +
+      `  So, so cool.\n` +
+      `\n` +
+      `Goodbye!`);
+
+  quickSnapshot(
     'inline images',
       `<img src="snooping.png"> as USUAL...\n` +
       `What do you know? <img src="cowabunga.png" width="24" height="32">\n` +

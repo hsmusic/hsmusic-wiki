@@ -19,6 +19,10 @@ export function toContribRefs(contribs) {
   return contribs?.map(({who, what}) => ({who: toRef(who), what}));
 }
 
+export function toCommentaryRefs(entries) {
+  return entries?.map(({artist, ...props}) => ({artist: toRef(artist), ...props}));
+}
+
 // Interface
 
 export const serializeDescriptors = Symbol();

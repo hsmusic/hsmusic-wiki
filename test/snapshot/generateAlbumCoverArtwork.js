@@ -13,6 +13,7 @@ testContentFunctions(t, 'generateAlbumCoverArtwork (snapshot)', async (t, evalua
   const album = {
     directory: 'bee-forus-seatbelt-safebee',
     coverArtFileExtension: 'png',
+    color: '#f28514',
     artTags: [
       {name: 'Damara', directory: 'damara', isContentWarning: false},
       {name: 'Cronus', directory: 'cronus', isContentWarning: false},

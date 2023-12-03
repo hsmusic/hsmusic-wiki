@@ -1,5 +1,15 @@
-import {Tag} from '#html';
+import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
+
 import {isLanguageCode} from '#validators';
+import {Tag} from '#html';
+
+import {
+  getExternalLinkStringOfStyleFromDescriptors,
+  getExternalLinkStringsFromDescriptors,
+  isExternalLinkContext,
+  isExternalLinkSpec,
+  isExternalLinkStyle,
+} from '#external-links';
 
 import {
   externalFunction,
@@ -70,6 +80,13 @@ export class Language extends Thing {
     inheritedStrings: {
       flags: {update: true, expose: true},
       update: {validate: (t) => typeof t === 'object'},
+    },
+
+    // List of descriptors for providing to external link utilities when using
+    // language.formatExternalLink - refer to util/external-links.js for info.
+    externalLinkSpec: {
+      flags: {update: true, expose: true},
+      update: {validate: isExternalLinkSpec},
     },
 
     // Update only
@@ -269,6 +286,108 @@ export class Language extends Thing {
     return this.intl_date.formatRange(startDate, endDate);
   }
 
+  formatDateDuration({
+    years: numYears = 0,
+    months: numMonths = 0,
+    days: numDays = 0,
+    approximate = false,
+  }) {
+    let basis;
+
+    const years = this.countYears(numYears, {unit: true});
+    const months = this.countMonths(numMonths, {unit: true});
+    const days = this.countDays(numDays, {unit: true});
+
+    if (numYears && numMonths && numDays)
+      basis = this.formatString('count.dateDuration.yearsMonthsDays', {years, months, days});
+    else if (numYears && numMonths)
+      basis = this.formatString('count.dateDuration.yearsMonths', {years, months});
+    else if (numYears && numDays)
+      basis = this.formatString('count.dateDuration.yearsDays', {years, days});
+    else if (numYears)
+      basis = this.formatString('count.dateDuration.years', {years});
+    else if (numMonths && numDays)
+      basis = this.formatString('count.dateDuration.monthsDays', {months, days});
+    else if (numMonths)
+      basis = this.formatzString('count.dateDuration.months', {months});
+    else if (numDays)
+      basis = this.formatString('count.dateDuration.days', {days});
+    else
+      return this.formatString('count.dateDuration.zero');
+
+    if (approximate) {
+      return this.formatString('count.dateDuration.approximate', {
+        duration: basis,
+      });
+    } else {
+      return basis;
+    }
+  }
+
+  formatRelativeDate(currentDate, referenceDate, {
+    considerRoundingDays = false,
+    approximate = true,
+    absolute = true,
+  } = {}) {
+    const currentInstant = toTemporalInstant.apply(currentDate);
+    const referenceInstant = toTemporalInstant.apply(referenceDate);
+
+    const comparison =
+      Temporal.Instant.compare(currentInstant, referenceInstant);
+
+    if (comparison === 0) {
+      return this.formatString('count.dateDuration.same');
+    }
+
+    const currentTDZ = currentInstant.toZonedDateTimeISO('Etc/UTC');
+    const referenceTDZ = referenceInstant.toZonedDateTimeISO('Etc/UTC');
+
+    const earlierTDZ = (comparison === -1 ? currentTDZ : referenceTDZ);
+    const laterTDZ = (comparison === 1 ? currentTDZ : referenceTDZ);
+
+    const {years, months, days} =
+      laterTDZ.since(earlierTDZ, {
+        largestUnit: 'year',
+        smallestUnit:
+          (considerRoundingDays
+            ? (laterTDZ.since(earlierTDZ, {
+                largestUnit: 'year',
+                smallestUnit: 'day',
+              }).years
+                ? 'month'
+                : 'day')
+            : 'day'),
+        roundingMode: 'halfCeil',
+      });
+
+    const duration =
+      this.formatDateDuration({
+        years, months, days,
+        approximate: false,
+      });
+
+    const relative =
+      this.formatString(
+        'count.dateDuration',
+        (approximate && (years || months || days)
+          ? (comparison === -1
+              ? 'approximateEarlier'
+              : 'approximateLater')
+          : (comparison === -1
+              ? 'earlier'
+              : 'later')),
+        {duration});
+
+    if (absolute) {
+      return this.formatString('count.dateDuration.relativeAbsolute', {
+        relative,
+        absolute: this.formatDate(currentDate),
+      });
+    } else {
+      return relative;
+    }
+  }
+
   formatDuration(secTotal, {approximate = false, unit = false} = {}) {
     if (secTotal === 0) {
       return this.formatString('count.duration.missing');
@@ -297,6 +416,31 @@ export class Language extends Thing {
     return approximate
       ? this.formatString('count.duration.approximate', {duration})
       : duration;
+  }
+
+  formatExternalLink(url, {
+    style = 'normal',
+    context = 'generic',
+  } = {}) {
+    if (!this.externalLinkSpec) {
+      throw new TypeError(`externalLinkSpec unavailable`);
+    }
+
+    isExternalLinkContext(context);
+
+    if (style === 'all') {
+      return getExternalLinkStringsFromDescriptors(url, this.externalLinkSpec, {
+        language: this,
+        context,
+      });
+    }
+
+    isExternalLinkStyle(style);
+
+    return getExternalLinkStringOfStyleFromDescriptors(url, style, this.externalLinkSpec, {
+      language: this,
+      context,
+    });
   }
 
   formatIndex(value) {
@@ -403,7 +547,11 @@ Object.assign(Language.prototype, {
   countCommentaryEntries: countHelper('commentaryEntries', 'entries'),
   countContributions: countHelper('contributions'),
   countCoverArts: countHelper('coverArts'),
+  countDays: countHelper('days'),
+  countMonths: countHelper('months'),
   countTimesReferenced: countHelper('timesReferenced'),
   countTimesUsed: countHelper('timesUsed'),
   countTracks: countHelper('tracks'),
+  countWeeks: countHelper('weeks'),
+  countYears: countHelper('years'),
 });

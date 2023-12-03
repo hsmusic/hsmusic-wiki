@@ -7,15 +7,13 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
+import CacheableObject, {CacheableObjectPropertyValueError}
+  from '#cacheable-object';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
 
-import T, {
-  CacheableObject,
-  CacheableObjectPropertyValueError,
-  Thing,
-} from '#things';
+import T, {Thing} from '#things';
 
 import {
   annotateErrorWithFile,
@@ -23,6 +21,7 @@ import {
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
   empty,
+  filterAggregate,
   filterProperties,
   openAggregate,
   showAggregate,
@@ -30,6 +29,7 @@ import {
 } from '#sugar';
 
 import {
+  commentaryRegex,
   sortAlbumsTracksChronologically,
   sortAlphabetically,
   sortChronologically,
@@ -38,8 +38,8 @@ import {
 
 // --> General supporting stuff
 
-function inspect(value) {
-  return nodeInspect(value, {colors: ENABLE_COLOR});
+function inspect(value, opts = {}) {
+  return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
 
 // --> YAML data repository structure constants
@@ -308,7 +308,12 @@ export class FieldCombinationError extends Error {
   constructor(fields, message) {
     const fieldNames = Object.keys(fields);
 
-    const mainMessage = `Don't combine ${fieldNames.map(field => colors.red(field)).join(', ')}`;
+    const fieldNamesText =
+      fieldNames
+        .map(field => colors.red(field))
+        .join(', ');
+
+    const mainMessage = `Don't combine ${fieldNamesText}`;
 
     const causeMessage =
       (typeof message === 'function'
@@ -329,8 +334,15 @@ export class FieldCombinationError extends Error {
 }
 
 export class FieldValueAggregateError extends AggregateError {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
   constructor(thingConstructor, errors) {
-    super(errors, `Errors processing field values for ${colors.green(thingConstructor.name)}`);
+    const constructorText =
+      colors.green(thingConstructor.name);
+
+    super(
+      errors,
+      `Errors processing field values for ${constructorText}`);
   }
 }
 
@@ -341,8 +353,17 @@ export class FieldValueError extends Error {
         ? caughtError.cause
         : caughtError);
 
+    const fieldText =
+      colors.green(`"${field}"`);
+
+    const propertyText =
+      colors.green(property);
+
+    const valueText =
+      inspect(value, {maxStringLength: 40});
+
     super(
-      `Failed to set ${colors.green(`"${field}"`)} field (${colors.green(property)}) to ${inspect(value)}`,
+      `Failed to set ${fieldText} field (${propertyText}) to ${valueText}`,
       {cause});
   }
 }
@@ -354,13 +375,18 @@ export class SkippedFieldsSummaryError extends Error {
     const lines =
       entries.map(([field, value]) =>
         ` - ${field}: ` +
-        inspect(value)
+        inspect(value, {maxStringLength: 70})
           .split('\n')
           .map((line, index) => index === 0 ? line : `   ${line}`)
           .join('\n'));
 
+    const numFieldsText =
+      (entries.length === 1
+        ? `1 field`
+        : `${entries.length} fields`);
+
     super(
-      colors.bright(colors.yellow(`Altogether, skipped ${entries.length === 1 ? `1 field` : `${entries.length} fields`}:\n`)) +
+      colors.bright(colors.yellow(`Altogether, skipped ${numFieldsText}:\n`)) +
       lines.join('\n') + '\n' +
       colors.bright(colors.yellow(`See above errors for details.`)));
   }
@@ -436,6 +462,7 @@ export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHel
 
 export const processTrackDocument = makeProcessDocument(T.Track, {
   fieldTransformations: {
+    'Additional Names': parseAdditionalNames,
     'Duration': parseDuration,
 
     'Date First Released': (value) => new Date(value),
@@ -457,6 +484,7 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
   propertyFieldMapping: {
     name: 'Track',
     directory: 'Directory',
+    additionalNames: 'Additional Names',
     duration: 'Duration',
     color: 'Color',
     urls: 'URLs',
@@ -618,6 +646,7 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
     directory: 'Directory',
 
     stylesheet: 'Style',
+    script: 'Script',
     content: 'Content',
   },
 });
@@ -717,26 +746,52 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export function parseContributors(contributors) {
+const extractAccentRegex =
+  /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
+
+export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
   // The Thing object's validators will handle the data error better
   // than we're able to here.
-  if (!Array.isArray(contributors)) {
-    return contributors;
+  if (!Array.isArray(contributionStrings)) {
+    return contributionStrings;
   }
 
-  contributors = contributors.map((contrib) => {
-    if (typeof contrib !== 'string') return contrib;
+  return contributionStrings.map(item => {
+    if (typeof item === 'object' && item['Who'])
+      return {who: item['Who'], what: item['What'] ?? null};
 
-    const match = contrib.match(/^(.*?)( \((.*)\))?$/);
-    if (!match) return contrib;
+    if (typeof item !== 'string') return item;
 
-    const who = match[1];
-    const what = match[3] || null;
-    return {who, what};
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      who: match.groups.main,
+      what: match.groups.accent ?? null,
+    };
   });
+}
 
-  return contributors;
+export function parseAdditionalNames(additionalNameStrings) {
+  if (!Array.isArray(additionalNameStrings)) {
+    return additionalNameStrings;
+  }
+
+  return additionalNameStrings.map(item => {
+    if (typeof item === 'object' && item['Name'])
+      return {name: item['Name'], annotation: item['Annotation'] ?? null};
+
+    if (typeof item !== 'string') return item;
+
+    const match = item.match(extractAccentRegex);
+    if (!match) return item;
+
+    return {
+      name: match.groups.main,
+      annotation: match.groups.accent ?? null,
+    };
+  });
 }
 
 function parseDimensions(string) {
@@ -881,6 +936,7 @@ export const dataSteps = [
         // an individual section before applying it, since those are just
         // generic objects; they aren't Things in and of themselves.)
         const trackSections = [];
+        const ownTrackData = [];
 
         let currentTrackSection = {
           name: `Default Track Section`,
@@ -915,13 +971,16 @@ export const dataSteps = [
 
           entry.dataSourceAlbum = albumRef;
 
+          ownTrackData.push(entry);
           currentTrackSection.tracks.push(Thing.getReference(entry));
         }
 
         closeCurrentTrackSection();
 
-        album.trackSections = trackSections;
         albumData.push(album);
+
+        album.trackSections = trackSections;
+        album.ownTrackData = ownTrackData;
       }
 
       return {albumData, trackData};
@@ -1138,7 +1197,10 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
   for (const dataStep of dataSteps) {
     await processDataAggregate.nestAsync(
-      {message: `Errors during data step: ${colors.bright(dataStep.title)}`},
+      {
+        message: `Errors during data step: ${colors.bright(dataStep.title)}`,
+        translucent: true,
+      },
       async ({call, callAsync, map, mapAsync, push}) => {
         const {documentMode} = dataStep;
 
@@ -1383,7 +1445,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
         switch (documentMode) {
           case documentModes.headerAndEntries:
-            map(yamlResults, {message: `Errors processing documents in data files`},
+            map(yamlResults, {message: `Errors processing documents in data files`, translucent: true},
               decorateErrorWithFile(({documents}) => {
                 const headerDocument = documents[0];
                 const entryDocuments = documents.slice(1).filter(Boolean);
@@ -1493,7 +1555,7 @@ export function linkWikiDataArrays(wikiData, {
 
   assignWikiData([WD.wikiInfo], 'groupData');
 
-  assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData', 'trackData');
+  assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData');
   assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
   assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
   assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
@@ -1567,8 +1629,7 @@ export function filterDuplicateDirectories(wikiData) {
         call(() => {
           throw new Error(
             `Duplicate directory ${colors.green(directory)}:\n` +
-              places.map((thing) => ` - ` + inspect(thing)).join('\n')
-          );
+            places.map(thing => ` - ` + inspect(thing)).join('\n'));
         });
       }
 
@@ -1618,6 +1679,7 @@ export function filterReferenceErrors(wikiData) {
       bannerArtistContribs: '_contrib',
       groups: 'group',
       artTags: 'artTag',
+      commentary: '_commentary',
     }],
 
     ['trackData', processTrackDocument, {
@@ -1628,6 +1690,7 @@ export function filterReferenceErrors(wikiData) {
       sampledTracks: '_trackNotRerelease',
       artTags: 'artTag',
       originalReleaseTrack: '_trackNotRerelease',
+      commentary: '_commentary',
     }],
 
     ['groupCategoryData', processGroupCategoryDocument, {
@@ -1677,7 +1740,21 @@ export function filterReferenceErrors(wikiData) {
 
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
-            const value = CacheableObject.getUpdateValue(thing, property);
+            let value = CacheableObject.getUpdateValue(thing, property);
+            let writeProperty = true;
+
+            switch (findFnKey) {
+              case '_commentary':
+                if (value) {
+                  value =
+                    Array.from(value.matchAll(commentaryRegex))
+                      .map(({groups}) => groups.artistReferences)
+                      .map(text => text.split(',').map(text => text.trim()));
+                }
+
+                writeProperty = false;
+                break;
+            }
 
             if (value === undefined) {
               push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
@@ -1690,19 +1767,25 @@ export function filterReferenceErrors(wikiData) {
 
             let findFn;
 
-            switch (findFnKey) {
-              case '_contrib':
-                findFn = contribRef => {
-                  const alias = find.artist(contribRef.who, wikiData.artistAliasData, {mode: 'quiet'});
-                  if (alias) {
-                    // No need to check if the original exists here. Aliases are automatically
-                    // created from a field on the original, so the original certainly exists.
-                    const original = alias.aliasedArtist;
-                    throw new Error(`Reference ${colors.red(contribRef.who)} is to an alias, should be ${colors.green(original.name)}`);
-                  }
+            const findArtistOrAlias = artistRef => {
+              const alias = find.artist(artistRef, wikiData.artistAliasData, {mode: 'quiet'});
+              if (alias) {
+                // No need to check if the original exists here. Aliases are automatically
+                // created from a field on the original, so the original certainly exists.
+                const original = alias.aliasedArtist;
+                throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
+              }
 
-                  return boundFind.artist(contribRef.who);
-                };
+              return boundFind.artist(artistRef);
+            };
+
+            switch (findFnKey) {
+              case '_commentary':
+                findFn = findArtistOrAlias;
+                break;
+
+              case '_contrib':
+                findFn = contribRef => findArtistOrAlias(contribRef.who);
                 break;
 
               case '_homepageSourceGroup':
@@ -1783,21 +1866,38 @@ export function filterReferenceErrors(wikiData) {
                 ? `Reference errors` + fieldPropertyMessage + findFnMessage
                 : `Reference error` + fieldPropertyMessage + findFnMessage);
 
-            if (Array.isArray(value)) {
-              thing[property] = filter(
-                value,
-                decorateErrorWithIndex(suppress(findFn)),
-                {message: errorMessage});
+            let newPropertyValue = value;
+
+            if (findFnKey === '_commentary') {
+              // Commentary doesn't write a property value, so no need to set.
+              filter(
+                value, {message: errorMessage},
+                decorateErrorWithIndex(refs =>
+                  (refs.length === 1
+                    ? suppress(findFn)(refs[0])
+                    : filterAggregate(
+                        refs, {message: `Errors in entry's artist references`},
+                        decorateErrorWithIndex(suppress(findFn)))
+                          .aggregate
+                          .close())));
+            } else if (Array.isArray(value)) {
+              newPropertyValue = filter(
+                value, {message: errorMessage},
+                decorateErrorWithIndex(suppress(findFn)));
             } else {
               nest({message: errorMessage},
                 suppress(({call}) => {
                   try {
                     call(findFn, value);
                   } catch (error) {
-                    thing[property] = null;
+                    newPropertyValue = null;
                     throw error;
                   }
                 }));
+            }
+
+            if (writeProperty) {
+              thing[property] = newPropertyValue;
             }
           }
         });

@@ -129,6 +129,16 @@ count:
       many: ""
       other: "{DAYS} days"
 
+  months:
+    _: "{MONTHS}"
+    withUnit:
+      zero: ""
+      one: "{MONTHS} month"
+      two: ""
+      few: ""
+      many: ""
+      other: "{MONTHS} months"
+
   timesReferenced:
     _: "{TIMES_REFERENCED}"
     withUnit:
@@ -149,6 +159,16 @@ count:
       many: ""
       other: "used {TIMES_USED} times"
 
+  weeks:
+    _: "{WEEKS}"
+    withUnit:
+      zero: ""
+      one: "{WEEKS} week"
+      two: ""
+      few: ""
+      many: ""
+      other: "{WEEKS} weeks"
+
   words:
     _: "{WORDS}"
     thousand: "{WORDS}k"
@@ -159,6 +179,16 @@ count:
       few: ""
       many: ""
       other: "{WORDS} words"
+
+  years:
+    _: "{YEARS}"
+    withUnit:
+      zero: ""
+      one: "{YEARS} year"
+      two: ""
+      few: ""
+      many: ""
+      other: "{YEARS} years"
 
   # Numerical things that aren't exactly counting, per se
 
@@ -171,6 +201,24 @@ count:
     minutes:
       _:        "{MINUTES}:{SECONDS}"
       withUnit: "{MINUTES}:{SECONDS} minutes"
+
+  dateDuration:
+    earlier: "{DURATION} earlier"
+    later: "{DURATION} later"
+    same: "on the same date"
+    zero: "at most one day"
+    approximate: "about {DURATION}"
+    approximateEarlier: "about {DURATION} earlier"
+    approximateLater: "about {DURATION} later"
+    relativeAbsolute: "{ABSOLUTE}; {RELATIVE}"
+
+    years: "{YEARS}"
+    months: "{MONTHS}"
+    days: "{DAYS}"
+    yearsMonthsDays: "{YEARS}, {MONTHS}, {DAYS}"
+    yearsMonths: "{YEARS}, {MONTHS}"
+    yearsDays: "{YEARS}, {DAYS}"
+    monthsDays: "{MONTHS}, {DAYS}"
 
   fileSize:
     terabytes: "{TERABYTES} TB"
@@ -220,7 +268,10 @@ releaseInfo:
 
   alsoReleasedAs:
     _: "Also released as:"
-    item: "{TRACK} (on {ALBUM})"
+
+    item:
+      _: "{TRACK} ({ALBUM})"
+      withYear: "({YEAR}) {TRACK} ({ALBUM})"
 
   tracksReferenced: "Tracks that {TRACK} references:"
   tracksThatReference: "Tracks that reference {TRACK}:"
@@ -272,10 +323,6 @@ releaseInfo:
   readCommentary:
     _: "Read {LINK}."
     link: "artist commentary"
-
-  artistCommentary:
-    _: "Artist commentary:"
-    seeOriginalRelease: "See {ORIGINAL}!"
 
   additionalFiles:
     heading: "View or download {ADDITIONAL_FILES}:"
@@ -338,6 +385,25 @@ trackList:
 #
 misc:
 
+  # additionalNames:
+  #   "Drop"-styled box that catalogues a variety of additional or
+  #   alternate names for the current thing; toggled by clicking on the
+  #   thing's title, which is styled interactively and gets a tooltip
+  #   (hover text), since it isn't usually an interactive element.
+
+  additionalNames:
+    title: "Additional or alternate names:"
+    tooltip: "Click to view additional or alternate names"
+
+    item:
+      _: "{NAME}"
+      withAccent: "{NAME} {ACCENT}"
+
+      accent:
+        withAnnotation: "({ANNOTATION})"
+        withAlbums: "(on {ALBUMS})"
+        withAnnotations.withAlbums: "({ANNOTATION}; on {ALBUMS})"
+
   # alt:
   #   Fallback text for the alt text of images and artworks - these
   #   are read aloud by screen readers.
@@ -348,6 +414,23 @@ misc:
     trackCover: "track cover"
     artistAvatar: "artist avatar"
     flashArt: "flash art"
+
+  # artistCommentary:
+
+  artistCommentary:
+    _: "Artist commentary:"
+
+    entry:
+      title:
+        _: "{ARTISTS}:"
+        noArtists: "Unknown artist"
+        withAccent: "{ARTISTS}: {ACCENT}"
+        accent:
+          withAnnotation: "({ANNOTATION})"
+          withDate: ({DATE})"
+          withAnnotation.withDate: "({ANNOTATION}, {DATE})"
+
+      seeOriginalRelease: "See {ORIGINAL}!"
 
   # artistLink:
   #   Artist links have special accents which are made conditionally
@@ -404,21 +487,31 @@ misc:
   #   wiki - sorry!
 
   external:
+    external: "External"
 
-    # domain:
-    #   General domain when one the URL doesn't match one of the
-    #   sites below.
+    withDomain:
+      "{PLATFORM} ({DOMAIN})"
 
-    domain: "External ({DOMAIN})"
-
-    # local:
-    #   Files which are locally available on the wiki (under its media
-    #   directory).
+    withHandle:
+      "{PLATFORM} ({HANDLE})"
 
     local: "Wiki Archive (local upload)"
 
+    bandcamp: "Bandcamp"
+
+    bgreco:
+      _: "bgreco.net"
+      flash: "bgreco.net (high quality audio)"
+
     deviantart: "DeviantArt"
+
+    homestuck:
+      _: "Homestuck"
+      page: "Homestuck (page {PAGE})"
+      secretPage: "Homestuck (secret page)"
+
     instagram: "Instagram"
+    mastodon: "Mastodon"
     newgrounds: "Newgrounds"
     patreon: "Patreon"
     poetryFoundation: "Poetry Foundation"
@@ -428,25 +521,11 @@ misc:
     twitter: "Twitter"
     wikipedia: "Wikipedia"
 
-    bandcamp:
-      _: "Bandcamp"
-      domain: "Bandcamp ({DOMAIN})"
-
-    mastodon:
-      _: "Mastodon"
-      domain: "Mastodon ({DOMAIN})"
-
     youtube:
       _: "YouTube"
+      flash: "YouTube (on any device)"
       playlist: "YouTube (playlist)"
       fullAlbum: "YouTube (full album)"
-
-    flash:
-      bgreco: "{LINK} (HQ Audio)"
-      youtube: "{LINK} (on any device)"
-      homestuck:
-        page: "{LINK} (page {PAGE})"
-        secret: "{LINK} (secret page)"
 
   # missingImage:
   #   Fallback text displayed in an image when it's sourced to a file
@@ -740,8 +819,13 @@ albumCommentaryPage:
 
   entry:
     title:
-      albumCommentary: "Album commentary"
-      trackCommentary: "{TRACK}"
+      albumCommentary:
+        _: "{ALBUM}"
+        accent: "Listen on: {LISTENING_LINKS}"
+
+      trackCommentary:
+        _: "{TRACK}"
+        accent: "Listen on: {LISTENING_LINKS}"
 
 #
 # artistInfoPage:
@@ -994,10 +1078,20 @@ groupInfoPage:
     title: "Albums"
 
     item:
-      _: "({YEAR}) {ALBUM}"
-      withoutYear: "{ALBUM}"
-      withAccent: "{ITEM} {ACCENT}"
-      otherGroupAccent: "(from {GROUP})"
+      _: >-
+        {ALBUM}
+
+      withYear: >-
+        {YEAR_ACCENT} {ALBUM}
+
+      withOtherGroup: >-
+        {ALBUM} {OTHER_GROUP_ACCENT}
+
+      withYear.withOtherGroup: >-
+        {YEAR_ACCENT} {ALBUM} {OTHER_GROUP_ACCENT}
+
+      yearAccent: "({YEAR})"
+      otherGroupAccent:  "(from {GROUP})"
 
 #
 # groupGalleryPage:
@@ -1074,6 +1168,13 @@ listingPage:
   #   targets besides the current one.
 
   seeAlso: "Also check out: {LISTINGS}"
+
+  # skipToSection:
+  #   Some listings which use a chunked-list layout also show links
+  #   to scroll down to each of these sections - this is the title
+  #   for the list of those links.
+
+  skipToSection: "Skip to a section:"
 
   listAlbums:
 
@@ -1155,7 +1256,12 @@ listingPage:
     byContribs:
       title: "Artists - by Contributions"
       title.short: "...by Contributions"
-      item: "{ARTIST} ({CONTRIBUTIONS})"
+      chunk:
+        item: "{ARTIST} ({CONTRIBUTIONS})"
+        title:
+          trackContributors: "Contributed tracks:"
+          artContributors: "Contributed artworks:"
+          flashContributors: "Contributed to flashes & games:"
 
     # listArtists.byCommentary:
     #   Lists artists by number of commentary entries, most to least,
@@ -1180,31 +1286,44 @@ listingPage:
       title.short: "...by Duration"
       item: "{ARTIST} ({DURATION})"
 
+    # listArtists.byGroup:
+    #   Lists artists who have contributed to each of the main groups
+    #   of a wiki (its "Divide Track Lists By Groups" field), sorted
+    #   alphabetically. Artists who aren't credited for contributions
+    #   under each of the groups are exlcuded from the respective
+    #   list.
+
+    byGroup:
+      title: "Artists - by Group"
+      title.short: "...by Group"
+      item: "{ARTIST} ({CONTRIBUTIONS})"
+      chunk:
+        title: "Contributed to {GROUP}:"
+        item: "{ARTIST} ({CONTRIBUTIONS})"
+
     # listArtists.byLatest:
-    #   Lists artists by the date of their latest musical, artwork,
-    #   or flash contributions (with a separate section for each),
-    #   latest to longest ago, and chunks artists together by the
-    #   album/flash which their contribution was to. If two albums
-    #   (or flashes) released on the same date, they're sorted by
-    #   name, and artists within each album/flash are also sorted
-    #   alphabetically. If an artist has contributions of a given
-    #   kind, but those contributions aren't dated at all, they're
-    #   listed at the bottom; artists who aren't credited for any
-    #   contributions to each category are totally excluded from the
-    #   respective lists.
+    #   Lists artists by the date of their latest contribution
+    #   overall, and chunks artists together by the album or flash
+    #   which that contribution belongs to. Within albums, each
+    #   artist is accented with the kind of contribution they made -
+    #   tracks, artworks, or both - and sorted so those of the same
+    #   sort of contribution are bunched together, then by name.
+    #   Artists who aren't credited for any dated contributions are
+    #   included at the bottom under a separate chunk.
 
     byLatest:
       title: "Artists - by Latest Contribution"
       title.short: "...by Latest Contribution"
-
       chunk:
-        title.album: "{ALBUM} ({DATE})"
-        title.flash: "{FLASH} ({DATE})"
-        item: "{ARTIST}"
-
-      dateless:
-        title: "These artists' contributions aren't dated:"
-        item: "{ARTIST}"
+        title:
+          album: "{ALBUM} ({DATE})"
+          flash: "{FLASH} ({DATE})"
+          dateless: "These artists' contributions aren't dated:"
+        item:
+          _: "{ARTIST}"
+          tracks: "{ARTIST} (tracks)"
+          tracksAndArt: "{ARTIST} (tracks, art)"
+          art: "{ARTIST} (art)"
 
   listGroups:
 
@@ -1518,12 +1637,20 @@ listingPage:
       # chooseLinkLine:
       #   Introductory line explaining the links on this listing.
 
-      chooseLinkLine: >-
-        Choose a link to go to a random page in that category or album!
-        If your browser doesn't support relatively modern JavaScript
-        or you've disabled it, these links won't work - sorry.
+      chooseLinkLine:
+        _: "{FROM_PART} {BROWSER_SUPPORT_PART}"
 
-      # dataLoadingLine, dataLoadedLine:
+        fromPart:
+          dividedByGroups: >-
+            Choose a link to go to a random page in that group or album!
+          notDividedByGroups: >-
+            Choose a link to go to a random page in that album!
+
+        browserSupportPart: >-
+          If your browser doesn't support relatively modern JavaScript
+          or you've disabled it, these links won't work - sorry.
+
+      # dataLoadingLine, dataLoadedLine, dataErrorLine:
       #   Since the links on this page depend on access to a fairly
       #   large data file that is downloaded separately and in the
       #   background, these messages indicate the status of that
@@ -1535,32 +1662,45 @@ listingPage:
       dataLoadedLine: >-
         (Data files have finished being downloaded. The links should work!)
 
-      # misc:
-      #   The first chunk in the list includes general links which
-      #   bring you to some random page across the whole site!
+      dataErrorLine: >-
+        (Data files failed to download. Sorry, some of these links won't work right now!)
 
-      misc:
-        _: "Miscellaneous:"
-        randomArtist: "Random Artist"
-        atLeastTwoContributions: "at least 2 contributions"
-        randomAlbumWholeSite: "Random Album (whole site)"
-        randomTrackWholeSite: "Random Track (whole site)"
+      chunk:
 
-      # group:
-      #   The remaining chunks are one for each of the main groups on
-      #   the site, and each includes a list of all the albums from
-      #   that group - clicking one brings to a random track from the
-      #   album.
+        title:
+          misc: "Miscellaneous:"
 
-      group:
-        _: "From {GROUP}: ({RANDOM_ALBUM}, {RANDOM_TRACK})"
-        randomAlbum: "Random Album"
-        randomTrack: "Random Track"
+          # fromAlbum:
+          #   If the wiki hasn't got "Divide Track Lists By Groups"
+          #   set, all albums across the wiki are grouped in one
+          #   long chunk.
 
-      # album:
-      #   Album entries under each group.
+          fromAlbum: "From an album:"
 
-      album: "{ALBUM}"
+          # fromGroup:
+          #   If the wiki does have "Divide Track Lists By Groups"
+          #   set, there's one chunk past Miscellaneous for each of
+          #   those groups, listing all the albums from that group,
+          #   each of which links to a random track from that album.
+
+          fromGroup:
+            _: "From {GROUP}:"
+
+            accent:
+              _: "({RANDOM_ALBUM}, {RANDOM_TRACK})"
+              randomAlbum: "Random Album"
+              randomTrack: "Random Track"
+
+        item:
+          album: "{ALBUM}"
+
+          randomArtist:
+            _: "{MAIN_LINK} ({AT_LEAST_TWO_CONTRIBUTIONS})"
+            mainLink: "Random Artist"
+            atLeastTwoContributions: "at least 2 contributions"
+
+          randomAlbumWholeSite: "Random Album (whole site)"
+          randomTrackWholeSite: "Random Track (whole site)"
 
 #
 # newsIndex:

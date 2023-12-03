@@ -1,7 +1,7 @@
 import {bindFind} from '#find';
 import {parseInput} from '#replacer';
 
-import {marked} from 'marked';
+import {Marked} from 'marked';
 
 export const replacerSpec = {
   album: {
@@ -130,7 +130,7 @@ const linkThingRelationMap = {
   newsEntry: 'linkNewsEntry',
   staticPage: 'linkStaticPage',
   tag: 'linkArtTag',
-  track: 'linkTrack',
+  track: 'linkTrackDynamically',
 };
 
 const linkValueRelationMap = {
@@ -146,6 +146,29 @@ const linkIndexRelationMap = {
   listingIndex: 'linkListingIndex',
   newsIndex: 'linkNewsIndex',
 };
+
+const commonMarkedOptions = {
+  headerIds: false,
+  mangle: false,
+};
+
+const multilineMarked = new Marked({
+  ...commonMarkedOptions,
+});
+
+const inlineMarked = new Marked({
+  ...commonMarkedOptions,
+
+  renderer: {
+    paragraph(text) {
+      return text;
+    },
+  },
+});
+
+const lyricsMarked = new Marked({
+  ...commonMarkedOptions,
+});
 
 function getPlaceholder(node, content) {
   return {type: 'text', data: content.slice(node.i, node.iEnd)};
@@ -447,19 +470,9 @@ export default {
       return link.data;
     }
 
-    // In inline mode, no further processing is needed!
-
-    if (slots.mode === 'inline') {
-      return html.tags(contentFromNodes.map(node => node.data));
-    }
-
-    // Multiline mode has a secondary processing stage where it's passed...
-    // through marked! Rolling your own Markdown only gets you so far :D
-
-    const markedOptions = {
-      headerIds: false,
-      mangle: false,
-    };
+    // Content always goes through marked (i.e. parsing as Markdown).
+    // This does require some attention to detail, mostly to do with line
+    // breaks (in multiline mode) and extracting/re-inserting non-text nodes.
 
     // The content of non-text nodes can end up getting mangled by marked.
     // To avoid this, we replace them with mundane placeholders, then
@@ -534,23 +547,36 @@ export default {
       return html.tags(tags, {[html.joinChildren]: ''});
     };
 
+    if (slots.mode === 'inline') {
+      const markedInput =
+        extractNonTextNodes();
+
+      const markedOutput =
+        inlineMarked.parse(markedInput);
+
+      return reinsertNonTextNodes(markedOutput);
+    }
+
     // This is separated into its own function just since we're gonna reuse
     // it in a minute if everything goes to heck in lyrics mode.
     const transformMultiline = () => {
       const markedInput =
         extractNonTextNodes()
-          // Compress multiple line breaks into single line breaks.
-          .replace(/\n{2,}/g, '\n')
+          // Compress multiple line breaks into single line breaks,
+          // except when they're preceding or following indented
+          // text (by at least two spaces).
+          .replace(/(?<!  .*)\n{2,}(?!^  )/gm, '\n') /* eslint-disable-line no-regex-spaces */
           // Expand line breaks which don't follow a list, quote,
-          // or <br> / "  ".
-          .replace(/(?<!^ *-.*|^>.*|  $|<br>$)\n+/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
+          // or <br> / "  ", and which don't precede or follow
+          // indented text (by at least two spaces).
+          .replace(/(?<!^ *-.*|^>.*|^  .*\n*|  $|<br>$)\n+(?!  |\n)/gm, '\n\n') /* eslint-disable-line no-regex-spaces */
           // Expand line breaks which are at the end of a list.
           .replace(/(?<=^ *-.*)\n+(?!^ *-)/gm, '\n\n')
           // Expand line breaks which are at the end of a quote.
           .replace(/(?<=^>.*)\n+(?!^>)/gm, '\n\n');
 
       const markedOutput =
-        marked.parse(markedInput, markedOptions);
+        multilineMarked.parse(markedInput);
 
       return reinsertNonTextNodes(markedOutput);
     }
@@ -600,7 +626,7 @@ export default {
         });
 
       const markedOutput =
-        marked.parse(markedInput, markedOptions);
+        lyricsMarked.parse(markedInput);
 
       return reinsertNonTextNodes(markedOutput);
     }

@@ -18,9 +18,12 @@ export default {
       `:root {`,
       ...(
         relations.variables
-          .slot('color', slots.color)
+          .slots({
+            color: slots.color,
+            context: 'page-root',
+            mode: 'property-list',
+          })
           .content
-          .split(';')
           .map(line => line + ';')),
       `}`,
     ].join('\n');

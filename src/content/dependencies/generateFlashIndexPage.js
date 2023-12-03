@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -95,23 +95,25 @@ export default {
 
       mainClasses: ['flash-index'],
       mainContent: [
-        html.tag('p',
-          {class: 'quick-info'},
-          language.$('misc.jumpTo')),
+        !empty(data.jumpLinkLabels) && [
+          html.tag('p',
+            {class: 'quick-info'},
+            language.$('misc.jumpTo')),
 
-        html.tag('ul',
-          {class: 'quick-info'},
-          stitchArrays({
-            colorVariables: relations.jumpLinkColorVariables,
-            anchor: data.jumpLinkAnchors,
-            color: data.jumpLinkColors,
-            label: data.jumpLinkLabels,
-          }).map(({colorVariables, anchor, color, label}) =>
-              html.tag('li',
-                html.tag('a', {
-                  href: '#' + anchor,
-                  style: colorVariables.slot('color', color).content,
-                }, label)))),
+          html.tag('ul',
+            {class: 'quick-info'},
+            stitchArrays({
+              colorVariables: relations.jumpLinkColorVariables,
+              anchor: data.jumpLinkAnchors,
+              color: data.jumpLinkColors,
+              label: data.jumpLinkLabels,
+            }).map(({colorVariables, anchor, color, label}) =>
+                html.tag('li',
+                  html.tag('a', {
+                    href: '#' + anchor,
+                    style: colorVariables.slot('color', color).content,
+                  }, label)))),
+        ],
 
         stitchArrays({
           colorVariables: relations.actColorVariables,

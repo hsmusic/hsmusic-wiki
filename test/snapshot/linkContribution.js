@@ -33,22 +33,36 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
       slots,
     });
 
-  quickSnapshot('showContribution & showIcons', {
+  quickSnapshot('showContribution & showIcons (inline)', {
     showContribution: true,
     showIcons: true,
+    iconMode: 'inline',
+  });
+
+  quickSnapshot('showContribution & showIcons (tooltip)', {
+    showContribution: true,
+    showIcons: true,
+    iconMode: 'tooltip',
   });
 
   quickSnapshot('only showContribution', {
     showContribution: true,
   });
 
-  quickSnapshot('only showIcons', {
+  quickSnapshot('only showIcons (inline)', {
     showIcons: true,
+    iconMode: 'inline',
+  });
+
+  quickSnapshot('only showIcons (tooltip)', {
+    showContribution: true,
+    showIcons: true,
+    iconMode: 'tooltip',
   });
 
   quickSnapshot('no accents', {});
 
-  evaluate.snapshot('loads of links', {
+  evaluate.snapshot('loads of links (inline)', {
     name: 'linkContribution',
     args: [
       {who: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
@@ -63,6 +77,23 @@ testContentFunctions(t, 'linkContribution (snapshot)', async (t, evaluate) => {
       ]}, what: null},
     ],
     slots: {showIcons: true},
+  });
+
+  evaluate.snapshot('loads of links (tooltip)', {
+    name: 'linkContribution',
+    args: [
+      {who: {name: 'Lorem Ipsum Lover', directory: 'lorem-ipsum-lover', urls: [
+        'https://loremipsum.io',
+        'https://loremipsum.io/generator/',
+        'https://loremipsum.io/#meaning',
+        'https://loremipsum.io/#usage-and-examples',
+        'https://loremipsum.io/#controversy',
+        'https://loremipsum.io/#when-to-use-lorem-ipsum',
+        'https://loremipsum.io/#lorem-ipsum-all-the-things',
+        'https://loremipsum.io/#original-source',
+      ]}, what: null},
+    ],
+    slots: {showIcons: true, iconMode: 'tooltip'},
   });
 
   quickSnapshot('no preventWrapping', {

@@ -16,7 +16,7 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0">First section (~1:30):</dt>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section (~1:30):</span></dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
@@ -24,7 +24,7 @@ exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList 
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0">Second section (0:05):</dt>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section (0:05):</span></dt>
     <dd><ul><li style="--primary-color: #ea2e83">(0:05) <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
 </dl>
 `

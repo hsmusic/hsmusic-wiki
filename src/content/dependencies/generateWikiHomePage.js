@@ -75,6 +75,7 @@ export default {
       leftSidebarMultiple: [
         (relations.customSidebarContent
           ? {
+              class: 'custom-content-sidebar-box',
               content:
                 relations.customSidebarContent
                   .slot('mode', 'multiline'),

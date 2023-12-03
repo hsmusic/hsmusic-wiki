@@ -7,16 +7,7 @@
 
 import {getColors} from '../util/colors.js';
 import {empty, stitchArrays} from '../util/sugar.js';
-
-import {
-  filterMultipleArrays,
-  getArtistNumContributions,
-} from '../util/wiki-data.js';
-
-let albumData, artistData;
-let officialAlbumData, fandomAlbumData, beyondAlbumData;
-
-let ready = false;
+import {filterMultipleArrays} from '../util/wiki-data.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
@@ -72,17 +63,25 @@ function pick(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-function cssProp(el, key) {
-  return getComputedStyle(el).getPropertyValue(key).trim();
-}
+function cssProp(el, ...args) {
+  if (typeof args[0] === 'string' && args.length === 1) {
+    return getComputedStyle(el).getPropertyValue(args[0]).trim();
+  }
 
-function getRefDirectory(ref) {
-  return ref.split(':')[1];
-}
+  if (typeof args[0] === 'string' && args.length === 2) {
+    if (args[1] === null) {
+      el.style.removeProperty(args[0]);
+    } else {
+      el.style.setProperty(args[0], args[1]);
+    }
+    return;
+  }
 
-function getAlbum(el) {
-  const directory = cssProp(el, '--album-directory');
-  return albumData.find((album) => album.directory === directory);
+  if (typeof args[0] === 'object') {
+    for (const [property, value] of Object.entries(args[0])) {
+      cssProp(el, property, value);
+    }
+  }
 }
 
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
@@ -99,6 +98,35 @@ function fetchData(type, directory) {
   );
 }
 
+function dispatchInternalEvent(event, eventName, ...args) {
+  const [infoName] =
+    Object.entries(clientInfo)
+      .find(pair => pair[1].event === event);
+
+  if (!infoName) {
+    throw new Error(`Expected event to be stored on clientInfo`);
+  }
+
+  const {[eventName]: listeners} = event;
+
+  if (!listeners) {
+    throw new Error(`Event name "${eventName}" isn't stored on ${infoName}.event`);
+  }
+
+  let results = [];
+  for (const listener of listeners) {
+    try {
+      results.push(listener(...args));
+    } catch (error) {
+      console.warn(`Uncaught error in listener for ${infoName}.${eventName}`);
+      console.debug(error);
+      results.push(undefined);
+    }
+  }
+
+  return results;
+}
+
 // JS-based links -----------------------------------------
 
 const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
@@ -108,6 +136,13 @@ const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
   nextLink: null,
   previousLink: null,
   randomLink: null,
+
+  state: {
+    albumDirectories: null,
+    albumTrackDirectories: null,
+    artistDirectories: null,
+    artistNumContributions: null,
+  },
 };
 
 function getScriptedLinkReferences() {
@@ -129,70 +164,130 @@ function getScriptedLinkReferences() {
 
 function addRandomLinkListeners() {
   for (const a of scriptedLinkInfo.randomLinks ?? []) {
-    a.addEventListener('click', evt => {
-      if (!ready) {
-        evt.preventDefault();
-        return;
-      }
-
-      const tracks = albumData =>
-        albumData
-          .map(album => album.tracks)
-          .reduce((acc, tracks) => acc.concat(tracks), []);
-
-      setTimeout(() => {
-        a.href = rebase('js-disabled');
-      });
-
-      switch (a.dataset.random) {
-        case 'album':
-          a.href = openAlbum(pick(albumData).directory);
-          break;
-
-        case 'album-in-official':
-          a.href = openAlbum(pick(officialAlbumData).directory);
-          break;
-
-        case 'album-in-fandom':
-          a.href = openAlbum(pick(fandomAlbumData).directory);
-          break;
-
-        case 'album-in-beyond':
-          a.href = openAlbum(pick(beyondAlbumData).directory);
-          break;
-
-        case 'track':
-          a.href = openTrack(getRefDirectory(pick(tracks(albumData))));
-          break;
-
-        case 'track-in-album':
-          a.href = openTrack(getRefDirectory(pick(getAlbum(a).tracks)));
-          break;
-
-        case 'track-in-official':
-          a.href = openTrack(getRefDirectory(pick(tracks(officialAlbumData))));
-          break;
-
-        case 'track-in-fandom':
-          a.href = openTrack(getRefDirectory(pick(tracks(fandomAlbumData))));
-          break;
-
-        case 'track-in-beyond':
-          a.href = openTrack(getRefDirectory(pick(tracks(beyondAlbumData))));
-          break;
-
-        case 'artist':
-          a.href = openArtist(pick(artistData).directory);
-          break;
-
-        case 'artist-more-than-one-contrib':
-          a.href =
-            openArtist(
-              pick(artistData.filter((artist) => getArtistNumContributions(artist) > 1))
-                .directory);
-          break;
-      }
+    a.addEventListener('click', domEvent => {
+      handleRandomLinkClicked(a, domEvent);
     });
+  }
+}
+
+function handleRandomLinkClicked(a, domEvent) {
+  const href = determineRandomLinkHref(a);
+
+  if (!href) {
+    domEvent.preventDefault();
+    return;
+  }
+
+  setTimeout(() => {
+    a.href = '#'
+  });
+
+  a.href = href;
+}
+
+function determineRandomLinkHref(a) {
+  const {state} = scriptedLinkInfo;
+
+  const trackDirectoriesFromAlbumDirectories = albumDirectories =>
+    albumDirectories
+      .map(directory => state.albumDirectories.indexOf(directory))
+      .map(index => state.albumTrackDirectories[index])
+      .reduce((acc, trackDirectories) => acc.concat(trackDirectories, []));
+
+  switch (a.dataset.random) {
+    case 'album': {
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
+
+      return openAlbum(pick(albumDirectories));
+    }
+
+    case 'track': {
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
+
+      const trackDirectories =
+        trackDirectoriesFromAlbumDirectories(
+          albumDirectories);
+
+      return openTrack(pick(trackDirectories));
+    }
+
+    case 'album-in-group-dl': {
+      const albumLinks =
+        Array.from(a
+          .closest('dt')
+          .nextElementSibling
+          .querySelectorAll('li a'))
+
+      const listAlbumDirectories =
+        albumLinks
+          .map(a => cssProp(a, '--album-directory'));
+
+      return openAlbum(pick(listAlbumDirectories));
+    }
+
+    case 'track-in-group-dl': {
+      const {albumDirectories} = state;
+      if (!albumDirectories) return null;
+
+      const albumLinks =
+        Array.from(a
+          .closest('dt')
+          .nextElementSibling
+          .querySelectorAll('li a'))
+
+      const listAlbumDirectories =
+        albumLinks
+          .map(a => cssProp(a, '--album-directory'));
+
+      const trackDirectories =
+        trackDirectoriesFromAlbumDirectories(
+          listAlbumDirectories);
+
+      return openTrack(pick(trackDirectories));
+    }
+
+    case 'track-in-sidebar': {
+      // Note that the container for track links may be <ol> or <ul>, and
+      // they can't be identified by href, since links from one track to
+      // another don't include "track" in the href.
+      const trackLinks =
+        Array.from(document
+          .querySelector('.track-list-sidebar-box')
+          .querySelectorAll('li a'));
+
+      return pick(trackLinks).href;
+    }
+
+    case 'track-in-album': {
+      const {albumDirectories, albumTrackDirectories} = state;
+      if (!albumDirectories || !albumTrackDirectories) return null;
+
+      const albumDirectory = cssProp(a, '--album-directory');
+      const albumIndex = albumDirectories.indexOf(albumDirectory);
+      const trackDirectories = albumTrackDirectories[albumIndex];
+
+      return openTrack(pick(trackDirectories));
+    }
+
+    case 'artist': {
+      const {artistDirectories} = state;
+      if (!artistDirectories) return null;
+
+      return openArtist(pick(artistDirectories));
+    }
+
+    case 'artist-more-than-one-contrib': {
+      const {artistDirectories, artistNumContributions} = state;
+      if (!artistDirectories || !artistNumContributions) return null;
+
+      const filteredArtistDirectories =
+        artistDirectories
+          .filter((_artist, index) => artistNumContributions[index] > 1);
+
+      return openArtist(pick(filteredArtistDirectories));
+    }
   }
 }
 
@@ -216,9 +311,7 @@ function addNavigationKeyPressListeners() {
       } else if (event.charCode === 'P'.charCodeAt(0)) {
         scriptedLinkInfo.previousNavLink?.click();
       } else if (event.charCode === 'R'.charCodeAt(0)) {
-        if (ready) {
-          scriptedLinkInfo.randomNavLink?.click();
-        }
+        scriptedLinkInfo.randomNavLink?.click();
       }
     }
   });
@@ -243,43 +336,649 @@ clientSteps.addPageListeners.push(addNavigationKeyPressListeners);
 clientSteps.addPageListeners.push(addRevealLinkClickListeners);
 clientSteps.mutatePageContent.push(mutateNavigationLinkContent);
 
-const elements1 = document.getElementsByClassName('js-hide-once-data');
-const elements2 = document.getElementsByClassName('js-show-once-data');
+if (
+  document.documentElement.dataset.urlKey === 'localized.listing' &&
+  document.documentElement.dataset.urlValue0 === 'random'
+) {
+  const dataLoadingLine = document.getElementById('data-loading-line');
+  const dataLoadedLine = document.getElementById('data-loaded-line');
+  const dataErrorLine = document.getElementById('data-error-line');
 
-for (const element of elements1) element.style.display = 'block';
+  dataLoadingLine.style.display = 'block';
 
-fetch(rebase('data.json', 'rebaseShared'))
-  .then((data) => data.json())
-  .then((data) => {
-    albumData = data.albumData;
-    artistData = data.artistData;
+  fetch(rebase('random-link-data.json', 'rebaseShared'))
+    .then(data => data.json())
+    .then(data => {
+      const {state} = scriptedLinkInfo;
 
-    const albumsInGroup = directory =>
-      albumData
-        .filter(album =>
-          album.groups.includes(`group:${directory}`));
+      Object.assign(state, {
+        albumDirectories: data.albumDirectories,
+        albumTrackDirectories: data.albumTrackDirectories,
+        artistDirectories: data.artistDirectories,
+        artistNumContributions: data.artistNumContributions,
+      });
 
-    officialAlbumData = albumsInGroup('official');
-    fandomAlbumData = albumsInGroup('fandom');
-    beyondAlbumData = albumsInGroup('beyond');
+      dataLoadingLine.style.display = 'none';
+      dataLoadedLine.style.display = 'block';
+    }, () => {
+      dataLoadingLine.style.display = 'none';
+      dataErrorLine.style.display = 'block';
+    })
+    .then(() => {
+      const {randomLinks} = scriptedLinkInfo;
+      for (const a of randomLinks) {
+        const href = determineRandomLinkHref(a);
+        if (!href) {
+          a.removeAttribute('href');
+        }
+      }
+    });
+}
 
-    for (const element of elements1) element.style.display = 'none';
-    for (const element of elements2) element.style.display = 'block';
+// Tooltip-style hover (infrastructure) -------------------
 
-    ready = true;
+const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
+  settings: {
+    // Hovering has two speed settings. The normal setting is used by default,
+    // and once a tooltip is displayed as a result of hover, the entire tooltip
+    // system will enter a "fast hover mode" - hovering will activate tooltips
+    // sooner. "Fast hover mode" is disabled after a sustained duration of not
+    // hovering over any hoverables; it's meant only to accelerate switching
+    // tooltips while still deciding, or getting a quick overview across more
+    // than one tooltip.
+    normalHoverInfoDelay: 400,
+    fastHoveringInfoDelay: 150,
+    endFastHoveringDelay: 500,
+
+    // Focusing has a single speed setting, which is how long it will take to
+    // enter a functional "focus mode" (though it's not actually implemented
+    // in terms of this state). As soon as "focus mode" is entered, the tooltip
+    // for the current hoverable is displayed, and focusing another hoverable
+    // will cause the current tooltip to be swapped for that one immediately.
+    // "Focus mode" ends as soon as anything apart from a tooltip or hoverable
+    // is focused, and it will be necessary to wait on this delay again.
+    focusInfoDelay: 750,
+
+    hideTooltipDelay: 500,
+
+    // If a tooltip that's transitioning to hidden is hovered during the grace
+    // period (or the corresponding hoverable is hovered at any point in the
+    // transition), it'll cancel out of this animation immediately.
+    transitionHiddenDuration: 300,
+    inertGracePeriod: 100,
+  },
+
+  state: {
+    // These maps store a record for each registered element and related state
+    // and registration info, if applicable.
+    registeredTooltips: new Map(),
+    registeredHoverables: new Map(),
+
+    // These are common across all tooltips, rather than stored individually,
+    // based on the principles that 1) only a single tooltip can be displayed
+    // at once, and 2) likewise, only a single hoverable can be hovered,
+    // focused, or otherwise active at once.
+    hoverTimeout: null,
+    focusTimeout: null,
+    touchTimeout: null,
+    hideTimeout: null,
+    transitionHiddenTimeout: null,
+    inertGracePeriodTimeout: null,
+    currentlyShownTooltip: null,
+    currentlyActiveHoverable: null,
+    currentlyTransitioningHiddenTooltip: null,
+    previouslyActiveHoverable: null,
+    tooltipWasJustHidden: false,
+    hoverableWasRecentlyTouched: false,
+
+    // Fast hovering is a global mode which is activated as soon as any tooltip
+    // is displayed and turns off after a delay of no hoverables being hovered.
+    // Note that fast hovering may be turned off while hovering a tooltip, but
+    // it will never be turned off while idling over a hoverable.
+    fastHovering: false,
+    endFastHoveringTimeout: false,
+
+    // These track the identifiers of current touches and a record of current
+    // identifiers that are "banished" by scrolling - that is, touches which
+    // existed while the page scrolled and were probably responsible for that
+    // scrolling. This is a bit loose (we can't actually tell which touches
+    // caused the page to scroll) but it's intended to keep scrolling the page
+    // from causing the current tooltip to be hidden.
+    currentTouchIdentifiers: new Set(),
+    touchIdentifiersBanishedByScrolling: new Set(),
+  },
+};
+
+// Adds DOM event listeners, so must be called during addPageListeners step.
+function registerTooltipElement(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (!tooltip)
+    throw new Error(`Expected tooltip`);
+
+  if (state.registeredTooltips.has(tooltip))
+    throw new Error(`This tooltip is already registered`);
+
+  // No state or registration info here.
+  state.registeredTooltips.set(tooltip, {});
+
+  tooltip.addEventListener('mouseenter', () => {
+    handleTooltipMouseEntered(tooltip);
   });
+
+  tooltip.addEventListener('mouseleave', () => {
+    handleTooltipMouseLeft(tooltip);
+  });
+
+  tooltip.addEventListener('focusin', event => {
+    handleTooltipReceivedFocus(tooltip, event.relatedTarget);
+  });
+
+  tooltip.addEventListener('focusout', event => {
+    // This event gets activated for tabbing *between* links inside the
+    // tooltip, which is no good and certainly doesn't represent the focus
+    // leaving the tooltip.
+    if (currentlyShownTooltipHasFocus(event.relatedTarget)) return;
+
+    handleTooltipLostFocus(tooltip, event.relatedTarget);
+  });
+}
+
+// Adds DOM event listeners, so must be called during addPageListeners step.
+function registerTooltipHoverableElement(hoverable, tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (!hoverable || !tooltip)
+    if (hoverable)
+      throw new Error(`Expected hoverable and tooltip, got only hoverable`);
+    else
+      throw new Error(`Expected hoverable and tooltip, got neither`);
+
+  if (!state.registeredTooltips.has(tooltip))
+    throw new Error(`Register tooltip before registering hoverable`);
+
+  if (state.registeredHoverables.has(hoverable))
+    throw new Error(`This hoverable is already registered`);
+
+  state.registeredHoverables.set(hoverable, {tooltip});
+
+  hoverable.addEventListener('mouseenter', () => {
+    handleTooltipHoverableMouseEntered(hoverable);
+  });
+
+  hoverable.addEventListener('mouseleave', () => {
+    handleTooltipHoverableMouseLeft(hoverable);
+  });
+
+  hoverable.addEventListener('focusin', event => {
+    handleTooltipHoverableReceivedFocus(hoverable, event);
+  });
+
+  hoverable.addEventListener('focusout', event => {
+    handleTooltipHoverableLostFocus(hoverable, event);
+  });
+
+  hoverable.addEventListener('touchend', event => {
+    handleTooltipHoverableTouchEnded(hoverable, event);
+  });
+
+  hoverable.addEventListener('click', event => {
+    handleTooltipHoverableClicked(hoverable, event);
+  });
+}
+
+function handleTooltipMouseEntered(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  if (state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden(true);
+    return;
+  }
+
+  if (state.currentlyShownTooltip !== tooltip) return;
+
+  // Don't time out the current tooltip while hovering it.
+
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipMouseLeft(tooltip) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  if (state.currentlyShownTooltip !== tooltip) return;
+
+  // Start timing out the current tooltip when it's left. This could be
+  // canceled by mousing over a hoverable, or back over the tooltip again.
+  if (!state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function handleTooltipReceivedFocus(tooltip) {
+  const {state} = hoverableTooltipInfo;
+
+  // Cancel the tooltip-hiding timeout if it exists. The tooltip will never
+  // be hidden while it contains the focus anyway, but this ensures the timeout
+  // will be suitably reset when the tooltip loses focus.
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipLostFocus(tooltip) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Hide the current tooltip right away when it loses focus. Specify intent
+  // to replace - while we don't strictly know if another tooltip is going to
+  // immediately replace it, the mode of navigating with tab focus (once one
+  // tooltip has been activated) is a "switch focus immediately" kind of
+  // interaction in its nature.
+  hideCurrentlyShownTooltip(true);
+}
+
+function handleTooltipHoverableMouseEntered(hoverable) {
+  const {event, settings, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // If this tooltip was transitioning to hidden, hovering should cancel that
+  // animation and show it immediately.
+
+  if (tooltip === state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden(true);
+    return;
+  }
+
+  // Start a timer to show the corresponding tooltip, with the delay depending
+  // on whether fast hovering or not. This could be canceled by mousing out of
+  // the hoverable.
+
+  const hoverTimeoutDelay =
+    (state.fastHovering
+      ? settings.fastHoveringInfoDelay
+      : settings.normalHoverInfoDelay);
+
+  state.hoverTimeout =
+    setTimeout(() => {
+      state.hoverTimeout = null;
+      state.fastHovering = true;
+      showTooltipFromHoverable(hoverable);
+    }, hoverTimeoutDelay);
+
+  // Don't stop fast hovering while over any hoverable.
+  if (state.endFastHoveringTimeout) {
+    clearTimeout(state.endFastHoveringTimeout);
+    state.endFastHoveringTimeout = null;
+  }
+
+  // Don't time out the current tooltip while over any hoverable.
+  if (state.hideTimeout) {
+    clearTimeout(state.hideTimeout);
+    state.hideTimeout = null;
+  }
+}
+
+function handleTooltipHoverableMouseLeft(hoverable) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Don't show a tooltip when not over a hoverable!
+  if (state.hoverTimeout) {
+    clearTimeout(state.hoverTimeout);
+    state.hoverTimeout = null;
+  }
+
+  // Start timing out fast hovering (if active) when not over a hoverable.
+  // This will only be canceled by mousing over another hoverable.
+  if (state.fastHovering && !state.endFastHoveringTimeout) {
+    state.endFastHoveringTimeout =
+      setTimeout(() => {
+        state.endFastHoveringTimeout = null;
+        state.fastHovering = false;
+      }, settings.endFastHoveringDelay);
+  }
+
+  // Start timing out the current tooltip when mousing not over a hoverable.
+  // This could be canceled by mousing over another hoverable, or over the
+  // currently shown tooltip.
+  if (state.currentlyShownTooltip && !state.hideTimeout) {
+    state.hideTimeout =
+      setTimeout(() => {
+        state.hideTimeout = null;
+        hideCurrentlyShownTooltip();
+      }, settings.hideTooltipDelay);
+  }
+}
+
+function handleTooltipHoverableReceivedFocus(hoverable) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // By default, display the corresponding tooltip after a delay.
+
+  state.focusTimeout =
+    setTimeout(() => {
+      state.focusTimeout = null;
+      showTooltipFromHoverable(hoverable);
+    }, settings.focusInfoDelay);
+
+  // If a tooltip was just hidden - which is almost certainly a result of the
+  // focus changing - then display this tooltip immediately, canceling the
+  // above timeout.
+
+  if (state.tooltipWasJustHidden) {
+    clearTimeout(state.focusTimeout);
+    state.focusTimeout = null;
+
+    showTooltipFromHoverable(hoverable);
+  }
+}
+
+function handleTooltipHoverableLostFocus(hoverable, domEvent) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  // Don't show a tooltip from focusing a hoverable if it isn't focused
+  // anymore! If another hoverable is receiving focus, that will be evaluated
+  // and set its own focus timeout after we clear the previous one here.
+  if (state.focusTimeout) {
+    clearTimeout(state.focusTimeout);
+    state.focusTimeout = null;
+  }
+
+  // Unless focus is entering the tooltip itself, hide the tooltip immediately.
+  // This will set the tooltipWasJustHidden flag, which is detected by a newly
+  // focused hoverable, if applicable. Always specify intent to replace when
+  // navigating via tab focus. (Check `handleTooltipLostFocus` for details.)
+  if (!currentlyShownTooltipHasFocus(domEvent.relatedTarget)) {
+    hideCurrentlyShownTooltip(true);
+  }
+}
+
+function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
+  const {settings, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // Don't proceed if this hoverable's tooltip is already visible - in that
+  // case touching the hoverable again should behave just like a normal click.
+  if (state.currentlyShownTooltip === tooltip) return;
+
+  const touches = Array.from(domEvent.changedTouches);
+  const identifiers = touches.map(touch => touch.identifier);
+
+  // Don't process touch events that were "banished" because the page was
+  // scrolled while those touches were active, and most likely as a result of
+  // them.
+  filterMultipleArrays(touches, identifiers,
+    (_touch, identifier) =>
+      !state.touchIdentifiersBanishedByScrolling.has(identifier));
+
+  if (empty(touches)) return;
+
+  // Don't proceed if none of the (just-ended) touches ended over the
+  // hoverable.
+  const anyTouchEndedOverHoverable =
+    touches.some(touch =>
+      hoverable.contains(
+        document.elementFromPoint(touch.clientX, touch.clientY)));
+
+  if (!anyTouchEndedOverHoverable) {
+    return;
+  }
+
+  if (state.touchTimeout) {
+    clearTimeout(state.touchTimeout);
+    state.touchTimeout = null;
+  }
+
+  // Show the tooltip right away.
+  showTooltipFromHoverable(hoverable);
+
+  // Set a state, for a brief but not instantaneous period, indicating that a
+  // hoverable was recently touched. The touchend event may precede the click
+  // event by some time, and we don't want to navigate away from the page as
+  // a result of the click event which this touch precipitated.
+  state.hoverableWasRecentlyTouched = true;
+  state.touchTimeout =
+    setTimeout(() => {
+      state.hoverableWasRecentlyTouched = false;
+    }, 250);
+}
+
+function handleTooltipHoverableClicked(hoverable, domEvent) {
+  const {state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // Don't navigate away from the page if the this hoverable was recently
+  // touched (and had its tooltip activated). That flag won't be set if its
+  // tooltip was already open before the touch.
+  if (
+    state.currentlyActiveHoverable === hoverable &&
+    state.hoverableWasRecentlyTouched
+  ) {
+    event.preventDefault();
+  }
+}
+
+function currentlyShownTooltipHasFocus(focusElement = document.activeElement) {
+  const {state} = hoverableTooltipInfo;
+
+  const {
+    currentlyShownTooltip: tooltip,
+    currentlyActiveHoverable: hoverable,
+  } = state;
+
+  // If there's no tooltip, it can't possibly have focus.
+  if (!tooltip) return false;
+
+  // If the tooltip literally contains (or is) the focused element, then that's
+  // the principle condition we're looking for.
+  if (tooltip.contains(focusElement)) return true;
+
+  // If the hoverable *which opened the tooltip* is focused, then that also
+  // represents the tooltip being focused (in its currently shown state).
+  if (hoverable.contains(focusElement)) return true;
+
+  return false;
+}
+
+function beginTransitioningTooltipHidden(tooltip) {
+  const {settings, state} = hoverableTooltipInfo;
+
+  if (state.currentlyTransitioningHiddenTooltip) {
+    cancelTransitioningTooltipHidden();
+  }
+
+  cssProp(tooltip, {
+    'display': 'block',
+    'opacity': '0',
+
+    'transition-property': 'opacity',
+    'transition-timing-function':
+      `steps(${Math.ceil(settings.transitionHiddenDuration / 60)}, end)`,
+    'transition-duration':
+      `${settings.transitionHiddenDuration / 1000}s`,
+  });
+
+  state.currentlyTransitioningHiddenTooltip = tooltip;
+  state.transitionHiddenTimeout =
+    setTimeout(() => {
+      endTransitioningTooltipHidden();
+    }, settings.transitionHiddenDuration);
+}
+
+function cancelTransitioningTooltipHidden(andShow = false) {
+  const {state} = hoverableTooltipInfo;
+
+  endTransitioningTooltipHidden();
+
+  if (andShow) {
+    showTooltipFromHoverable(state.previouslyActiveHoverable);
+  }
+}
+
+function endTransitioningTooltipHidden() {
+  const {state} = hoverableTooltipInfo;
+  const {currentlyTransitioningHiddenTooltip: tooltip} = state;
+
+  if (!tooltip) return;
+
+  cssProp(tooltip, {
+    'display': null,
+    'opacity': null,
+    'transition-property': null,
+    'transition-timing-function': null,
+    'transition-duration': null,
+  });
+
+  state.currentlyTransitioningHiddenTooltip = null;
+
+  if (state.inertGracePeriodTimeout) {
+    clearTimeout(state.inertGracePeriodTimeout);
+    state.inertGracePeriodTimeout = null;
+  }
+
+  if (state.transitionHiddenTimeout) {
+    clearTimeout(state.transitionHiddenTimeout);
+    state.transitionHiddenTimeout = null;
+  }
+}
+
+function hideCurrentlyShownTooltip(intendingToReplace = false) {
+  const {event, settings, state} = hoverableTooltipInfo;
+  const {currentlyShownTooltip: tooltip} = state;
+
+  // If there was no tooltip to begin with, we're functionally in the desired
+  // state already, so return true.
+  if (!tooltip) return true;
+
+  // Never hide the tooltip if it's focused.
+  if (currentlyShownTooltipHasFocus()) return false;
+
+  state.currentlyActiveHoverable.classList.remove('has-visible-tooltip');
+
+  // If there's no intent to replace this tooltip, it's the last one currently
+  // apparent in the interaction, and should be hidden with a transition.
+  if (intendingToReplace) {
+    cssProp(tooltip, 'display', 'none');
+  } else {
+    beginTransitioningTooltipHidden(state.currentlyShownTooltip);
+  }
+
+  // Wait just a moment before making the tooltip inert. You might react
+  // (to the ghosting, or just to time passing) and realize you wanted
+  // to look at the tooltip after all - this delay gives a little buffer
+  // to second guess letting it disappear.
+  state.inertGracePeriodTimeout =
+    setTimeout(() => {
+      tooltip.inert = true;
+    }, settings.inertGracePeriod);
+
+  state.previouslyActiveHoverable = state.currentlyActiveHoverable;
+
+  state.currentlyShownTooltip = null;
+  state.currentlyActiveHoverable = null;
+
+  // Set this for one tick of the event cycle.
+  state.tooltipWasJustHidden = true;
+  setTimeout(() => {
+    state.tooltipWasJustHidden = false;
+  });
+
+  return true;
+}
+
+function showTooltipFromHoverable(hoverable) {
+  const {event, state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  if (!hideCurrentlyShownTooltip(true)) return false;
+
+  // Cancel out another tooltip that's transitioning hidden, if that's going
+  // on - it's a distraction that this tooltip is now replacing.
+  cancelTransitioningTooltipHidden();
+
+  hoverable.classList.add('has-visible-tooltip');
+
+  cssProp(tooltip, 'display', 'block');
+  tooltip.inert = false;
+
+  state.currentlyShownTooltip = tooltip;
+  state.currentlyActiveHoverable = hoverable;
+
+  state.tooltipWasJustHidden = false;
+
+  return true;
+}
+
+function addHoverableTooltipPageListeners() {
+  const {state} = hoverableTooltipInfo;
+
+  const getTouchIdentifiers = domEvent =>
+    Array.from(domEvent.changedTouches)
+      .map(touch => touch.identifier)
+      .filter(identifier => typeof identifier !== 'undefined');
+
+  document.body.addEventListener('touchstart', domEvent => {
+    for (const identifier of getTouchIdentifiers(domEvent)) {
+      state.currentTouchIdentifiers.add(identifier);
+    }
+  });
+
+  window.addEventListener('scroll', () => {
+    for (const identifier of state.currentTouchIdentifiers) {
+      state.touchIdentifiersBanishedByScrolling.add(identifier);
+    }
+  });
+
+  document.body.addEventListener('touchend', domEvent => {
+    setTimeout(() => {
+      for (const identifier of getTouchIdentifiers(domEvent)) {
+        state.currentTouchIdentifiers.delete(identifier);
+        state.touchIdentifiersBanishedByScrolling.delete(identifier);
+      }
+    });
+  });
+
+  document.body.addEventListener('touchend', domEvent => {
+    const hoverables = Array.from(state.registeredHoverables.keys());
+    const tooltips = Array.from(state.registeredTooltips.keys());
+
+    const touches = Array.from(domEvent.changedTouches);
+    const identifiers = touches.map(touch => touch.identifier);
+
+    // Don't process touch events that were "banished" because the page was
+    // scrolled while those touches were active, and most likely as a result of
+    // them.
+    filterMultipleArrays(touches, identifiers,
+      (_touch, identifier) =>
+        !state.touchIdentifiersBanishedByScrolling.has(identifier));
+
+    if (empty(touches)) return;
+
+    const anyTouchOverAnyHoverableOrTooltip =
+      touches.some(({clientX, clientY}) => {
+        const element = document.elementFromPoint(clientX, clientY);
+        if (hoverables.some(el => el.contains(element))) return true;
+        if (tooltips.some(el => el.contains(element))) return true;
+        return false;
+      });
+
+    if (!anyTouchOverAnyHoverableOrTooltip) {
+      hideCurrentlyShownTooltip();
+    }
+  });
+}
+
+clientSteps.addPageListeners.push(addHoverableTooltipPageListeners);
 
 // Data & info card ---------------------------------------
 
 /*
-const NORMAL_HOVER_INFO_DELAY = 750;
-const FAST_HOVER_INFO_DELAY = 250;
-const END_FAST_HOVER_DELAY = 500;
-const HIDE_HOVER_DELAY = 250;
-
-let fastHover = false;
-let endFastHoverTimeout = null;
-
 function colorLink(a, color) {
   console.warn('Info card link colors temporarily disabled: chroma.js required, no dependency linking for client.js yet');
   return;
@@ -445,53 +1144,6 @@ const infoCard = (() => {
   };
 })();
 
-function makeInfoCardLinkHandlers(type) {
-  let hoverTimeout = null;
-
-  return {
-    mouseenter(evt) {
-      hoverTimeout = setTimeout(
-        () => {
-          fastHover = true;
-          infoCard.show(type, evt.target);
-        },
-        fastHover ? FAST_HOVER_INFO_DELAY : NORMAL_HOVER_INFO_DELAY);
-
-      clearTimeout(endFastHoverTimeout);
-      endFastHoverTimeout = null;
-
-      infoCard.cancelHide();
-    },
-
-    mouseleave() {
-      clearTimeout(hoverTimeout);
-
-      if (fastHover && !endFastHoverTimeout) {
-        endFastHoverTimeout = setTimeout(() => {
-          endFastHoverTimeout = null;
-          fastHover = false;
-        }, END_FAST_HOVER_DELAY);
-      }
-
-      infoCard.readyHide();
-    },
-  };
-}
-
-const infoCardLinkHandlers = {
-  track: makeInfoCardLinkHandlers('track'),
-};
-
-function addInfoCardLinkHandlers(type) {
-  for (const a of document.querySelectorAll(`a[data-${type}]`)) {
-    for (const [eventName, handler] of Object.entries(
-      infoCardLinkHandlers[type]
-    )) {
-      a.addEventListener(eventName, handler);
-    }
-  }
-}
-
 // Info cards are disa8led for now since they aren't quite ready for release,
 // 8ut you can try 'em out 8y setting this localStorage flag!
 //
@@ -516,6 +1168,7 @@ const hashLinkInfo = clientInfo.hashLinkInfo = {
   },
 
   event: {
+    beforeHashLinkScrolls: [],
     whenHashLinkClicked: [],
   },
 };
@@ -578,6 +1231,22 @@ function addHashLinkListeners() {
         return;
       }
 
+      // Don't do anything if the target element isn't actually visible!
+      if (target.offsetParent === null) {
+        return;
+      }
+
+      // Allow event handlers to prevent scrolling.
+      const listenerResults =
+        dispatchInternalEvent(event, 'beforeHashLinkScrolls', {
+          link: hashLink,
+          target,
+        });
+
+      if (listenerResults.includes(false)) {
+        return;
+      }
+
       // Hide skipper box right away, so the layout is updated on time for the
       // math operations coming up next.
       const skipper = document.getElementById('skippers');
@@ -612,11 +1281,10 @@ function addHashLinkListeners() {
 
       processScrollingAfterHashLinkClicked();
 
-      for (const handler of event.whenHashLinkClicked) {
-        handler({
-          link: hashLink,
-        });
-      }
+      dispatchInternalEvent(event, 'whenHashLinkClicked', {
+        link: hashLink,
+        target,
+      });
     });
   }
 
@@ -839,7 +1507,12 @@ function updateStickySubheadingContent(index) {
       child.remove();
     }
 
-    for (const child of closestHeading.childNodes) {
+    const textContainer =
+      closestHeading.querySelector('.content-heading-main-title')
+        // Just for compatibility with older builds of the site.
+        ?? closestHeading;
+
+    for (const child of textContainer.childNodes) {
       if (child.tagName === 'A') {
         for (const grandchild of child.childNodes) {
           stickySubheading.appendChild(grandchild.cloneNode(true));
@@ -858,12 +1531,10 @@ function updateStickySubheadingContent(index) {
 
   state.displayedHeading = closestHeading;
 
-  for (const handler of event.whenDisplayedHeadingChanges) {
-    handler(index, {
-      oldHeading: oldDisplayedHeading,
-      newHeading: closestHeading,
-    });
-  }
+  dispatchInternalEvent(event, 'whenDisplayedHeadingChanges', index, {
+    oldHeading: oldDisplayedHeading,
+    newHeading: closestHeading,
+  });
 }
 
 function updateStickyHeadings(index) {
@@ -893,6 +1564,8 @@ clientSteps.addPageListeners.push(addRevealListenersForStickyHeadingCovers);
 clientSteps.addPageListeners.push(addScrollListenerForStickyHeadings);
 
 // Image overlay ------------------------------------------
+
+// TODO: Update to clientSteps style.
 
 function addImageOverlayClickHandlers() {
   const container = document.getElementById('image-overlay-container');
@@ -1179,7 +1852,99 @@ function loadImage(imageUrl, onprogress) {
   });
 }
 
+// "Additional names" box ---------------------------------
+
+const additionalNamesBoxInfo = clientInfo.additionalNamesBox = {
+  box: null,
+  links: null,
+  mainContentContainer: null,
+
+  state: {
+    visible: false,
+  },
+};
+
+function getAdditionalNamesBoxReferences() {
+  const info = additionalNamesBoxInfo;
+
+  info.box =
+    document.getElementById('additional-names-box');
+
+  info.links =
+    document.querySelectorAll('a[href="#additional-names-box"]');
+
+  info.mainContentContainer =
+    document.querySelector('#content .main-content-container');
+}
+
+function addAdditionalNamesBoxInternalListeners() {
+  const info = additionalNamesBoxInfo;
+
+  hashLinkInfo.event.beforeHashLinkScrolls.push(({target}) => {
+    if (target === info.box) {
+      return false;
+    }
+  });
+}
+
+function addAdditionalNamesBoxListeners() {
+  const info = additionalNamesBoxInfo;
+
+  for (const link of info.links) {
+    link.addEventListener('click', domEvent => {
+      handleAdditionalNamesBoxLinkClicked(domEvent);
+    });
+  }
+}
+
+function handleAdditionalNamesBoxLinkClicked(domEvent) {
+  const info = additionalNamesBoxInfo;
+  const {state} = info;
+
+  domEvent.preventDefault();
+
+  if (!info.box || !info.mainContentContainer) return;
+
+  const margin =
+    +(cssProp(info.box, 'scroll-margin-top').replace('px', ''));
+
+  const {top} =
+    (state.visible
+      ? info.box.getBoundingClientRect()
+      : info.mainContentContainer.getBoundingClientRect());
+
+  if (top + 20 < margin || top > 0.4 * window.innerHeight) {
+    if (!state.visible) {
+      toggleAdditionalNamesBox();
+    }
+
+    window.scrollTo({
+      top: window.scrollY + top - margin,
+      behavior: 'smooth',
+    });
+  } else {
+    toggleAdditionalNamesBox();
+  }
+}
+
+function toggleAdditionalNamesBox() {
+  const info = additionalNamesBoxInfo;
+  const {state} = info;
+
+  state.visible = !state.visible;
+  info.box.style.display =
+    (state.visible
+      ? 'block'
+      : 'none');
+}
+
+clientSteps.getPageReferences.push(getAdditionalNamesBoxReferences);
+clientSteps.addInternalListeners.push(addAdditionalNamesBoxInternalListeners);
+clientSteps.addPageListeners.push(addAdditionalNamesBoxListeners);
+
 // Group contributions table ------------------------------
+
+// TODO: Update to clientSteps style.
 
 const groupContributionsTableInfo =
   Array.from(document.querySelectorAll('#content dl'))
@@ -1212,6 +1977,76 @@ for (const info of groupContributionsTableInfo) {
     sortGroupContributionsTableBy(info, 'count');
   });
 }
+
+// Artist link icon tooltips ------------------------------
+
+const externalIconTooltipInfo = clientInfo.externalIconTooltipInfo = {
+  hoverables: null,
+  tooltips: null,
+};
+
+function getExternalIconTooltipReferences() {
+  const info = externalIconTooltipInfo;
+
+  const spans =
+    Array.from(document.querySelectorAll('span.contribution.has-tooltip'));
+
+  info.hoverables =
+    spans.map(span => span.querySelector('a'));
+
+  info.tooltips =
+    spans.map(span => span.querySelector('span.icons-tooltip'));
+}
+
+function addExternalIconTooltipPageListeners() {
+  const info = externalIconTooltipInfo;
+
+  for (const {hoverable, tooltip} of stitchArrays({
+    hoverable: info.hoverables,
+    tooltip: info.tooltips,
+  })) {
+    registerTooltipElement(tooltip);
+    registerTooltipHoverableElement(hoverable, tooltip);
+  }
+}
+
+clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
+clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
+
+// Datetimestamp tooltips ---------------------------------
+
+const datetimestampTooltipInfo = clientInfo.datetimestampTooltipInfo = {
+  hoverables: null,
+  tooltips: null,
+};
+
+function getDatestampTooltipReferences() {
+  const info = datetimestampTooltipInfo;
+
+  const spans =
+    Array.from(document.querySelectorAll('span.datetimestamp.has-tooltip'));
+
+  info.hoverables =
+    spans.map(span => span.querySelector('time'));
+
+  info.tooltips =
+    spans.map(span => span.querySelector('span.datetimestamp-tooltip'));
+}
+
+function addDatestampTooltipPageListeners() {
+  const info = datetimestampTooltipInfo;
+
+  for (const {hoverable, tooltip} of stitchArrays({
+    hoverable: info.hoverables,
+    tooltip: info.tooltips,
+  })) {
+    registerTooltipElement(tooltip);
+    registerTooltipHoverableElement(hoverable, tooltip);
+  }
+}
+
+clientSteps.getPageReferences.push(getDatestampTooltipReferences);
+clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
 
 // Sticky commentary sidebar ------------------------------
 

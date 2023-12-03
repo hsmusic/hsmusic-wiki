@@ -42,6 +42,7 @@ export default {
     }
 
     return {
+      class: 'latest-news-sidebar-box',
       content: [
         html.tag('h1', language.$('homepage.news.title')),
 

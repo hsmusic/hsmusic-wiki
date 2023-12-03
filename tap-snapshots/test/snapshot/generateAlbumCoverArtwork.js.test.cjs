@@ -16,7 +16,7 @@ exports[`test/snapshot/generateAlbumCoverArtwork.js > TAP > generateAlbumCoverAr
          { name: 'creepy crawlies', isContentWarning: true }
        ]
      ]
-     slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+     slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#f28514', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
     <p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
 </div>
 `
@@ -31,5 +31,5 @@ exports[`test/snapshot/generateAlbumCoverArtwork.js > TAP > generateAlbumCoverAr
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'small', reveal: false, link: false, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#f28514', thumb: 'small', reveal: false, link: false, square: true }]
 `

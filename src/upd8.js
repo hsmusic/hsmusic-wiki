@@ -38,12 +38,13 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
+import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
-import {processLanguageFile, watchLanguageFile} from '#language';
+import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
+  from '#language';
 import {isMain, traverse} from '#node-utils';
 import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
-import {CacheableObject} from '#things';
 import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
 
@@ -92,8 +93,6 @@ try {
 }
 
 const BUILD_TIME = new Date();
-
-export const DEFAULT_STRINGS_FILE = 'strings-default.yaml';
 
 const STATUS_NOT_STARTED       = `not started`;
 const STATUS_NOT_APPLICABLE    = `not applicable`;
@@ -1104,8 +1103,6 @@ async function main() {
   let internalDefaultLanguage;
   let internalDefaultLanguageWatcher;
 
-  const internalDefaultStringsFile = path.join(__dirname, DEFAULT_STRINGS_FILE);
-
   let errorLoadingInternalDefaultLanguage = false;
 
   if (noLanguageReloading) {
@@ -1182,7 +1179,9 @@ async function main() {
     });
 
     const languageDataFiles = await traverse(langPath, {
-      filterFile: name => path.extname(name) === '.json',
+      filterFile: name =>
+        path.extname(name) === '.json' ||
+        path.extname(name) === '.yaml',
       pathStyle: 'device',
     });
 

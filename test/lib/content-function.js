@@ -8,7 +8,7 @@ import {getColors} from '#colors';
 import {quickLoadContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
-import {processLanguageFile} from '#language';
+import {internalDefaultStringsFile, processLanguageFile} from '#language';
 import {empty, showAggregate} from '#sugar';
 import {generateURLs, thumb, urlSpec} from '#urls';
 
@@ -22,7 +22,7 @@ export function testContentFunctions(t, message, fn) {
   t.test(message, async t => {
     let loadedContentDependencies;
 
-    const language = await processLanguageFile('./src/strings-default.json');
+    const language = await processLanguageFile(internalDefaultStringsFile);
     const mocks = [];
 
     const evaluate = ({
@@ -50,8 +50,15 @@ export function testContentFunctions(t, message, fn) {
             thumb,
             to,
             urls,
+
+            pagePath: ['home'],
             appendIndexHTML: false,
             getColors: c => getColors(c, {chroma}),
+
+            wikiData: {
+              wikiInfo: {},
+            },
+
             ...extraDependencies,
           },
         });

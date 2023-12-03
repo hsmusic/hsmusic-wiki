@@ -6,12 +6,19 @@ function sidebarSlots(side) {
     // if specified.
     [side + 'Content']: {type: 'html'},
 
-    // Multiple is an array of {content: (HTML)} objects. Each of these
-    // will generate one sidebar section.
+    // A single class to apply to the whole sidebar. If specifying multiple
+    // sections, this be added to the containing sidebar-column - specify a
+    // class on each section if that's more suitable.
+    [side + 'Class']: {type: 'string'},
+
+    // Multiple is an array of objects, each specifying content (HTML) and
+    // optionally class (a string). Each of these will generate one sidebar
+    // section.
     [side + 'Multiple']: {
       validate: v =>
         v.sparseArrayOf(
           v.validateProperties({
+            class: v.optional(v.isString),
             content: v.isHTML,
           })),
     },
@@ -27,6 +34,7 @@ function sidebarSlots(side) {
     // the whole section's containing box (or the sidebar column as a whole).
     [side + 'StickyMode']: {
       validate: v => v.is('last', 'column', 'static'),
+      default: 'static',
     },
 
     // Collapsing sidebars disappear when the viewport is sufficiently
@@ -85,8 +93,10 @@ export default {
     relations.stickyHeadingContainer =
       relation('generateStickyHeadingContainer');
 
-    relations.defaultFooterContent =
-      relation('transformContent', sprawl.footerContent);
+    if (sprawl.footerContent) {
+      relations.defaultFooterContent =
+        relation('transformContent', sprawl.footerContent);
+    }
 
     relations.colorStyleRules =
       relation('generateColorStyleRules');
@@ -97,6 +107,8 @@ export default {
   slots: {
     title: {type: 'html'},
     showWikiNameInTitle: {type: 'boolean', default: true},
+
+    additionalNames: {type: 'html'},
 
     cover: {type: 'html'},
 
@@ -212,26 +224,29 @@ export default {
     const colors = getColors(slots.color ?? data.wikiColor);
     const hasSocialEmbed = !html.isBlank(slots.socialEmbed);
 
-    let titleHTML = null;
+    const titleContentsHTML =
+      (html.isBlank(slots.title)
+        ? null
+     : html.isBlank(slots.additionalNames)
+        ? language.sanitize(slots.title)
+        : html.tag('a', {
+            href: '#additional-names-box',
+            title: language.$('misc.additionalNames.tooltip').toString(),
+          }, language.sanitize(slots.title)));
 
-    if (!html.isBlank(slots.title)) {
-      switch (slots.headingMode) {
-        case 'sticky':
-          titleHTML =
-            relations.stickyHeadingContainer.slots({
-              title: slots.title,
-              cover: slots.cover,
-            });
-          break;
-        case 'static':
-          titleHTML = html.tag('h1', slots.title);
-          break;
-      }
-    }
+    const titleHTML =
+      (html.isBlank(slots.title)
+        ? null
+     : slots.headingMode === 'sticky'
+        ? relations.stickyHeadingContainer.slots({
+            title: titleContentsHTML,
+            cover: slots.cover,
+          })
+        : html.tag('h1', titleContentsHTML));
 
     let footerContent = slots.footerContent;
 
-    if (html.isBlank(footerContent)) {
+    if (html.isBlank(footerContent) && relations.defaultFooterContent) {
       footerContent = relations.defaultFooterContent
         .slot('mode', 'multiline');
     }
@@ -244,6 +259,7 @@ export default {
         titleHTML,
 
         slots.cover,
+        slots.additionalNames,
 
         html.tag('div',
           {
@@ -352,6 +368,7 @@ export default {
 
     const generateSidebarHTML = (side, id) => {
       const content = slots[side + 'Content'];
+      const topClass = slots[side + 'Class'];
       const multiple = slots[side + 'Multiple'];
       const stickyMode = slots[side + 'StickyMode'];
       const wide = slots[side + 'Wide'];
@@ -361,20 +378,18 @@ export default {
       let sidebarContent = html.blank();
 
       if (!html.isBlank(content)) {
-        sidebarClasses = ['sidebar'];
+        sidebarClasses = ['sidebar', topClass];
         sidebarContent = content;
       } else if (multiple) {
-        sidebarClasses = ['sidebar-multiple'];
+        sidebarClasses = ['sidebar-multiple', topClass];
         sidebarContent =
           multiple
             .filter(Boolean)
-            .map(({content}) =>
-              html.tag('div',
-                {
-                  [html.onlyIfContent]: true,
-                  class: 'sidebar',
-                },
-                content));
+            .map(box =>
+              html.tag('div', {
+                [html.onlyIfContent]: true,
+                class: ['sidebar', box.class],
+              }, box.content));
       }
 
       if (html.isBlank(sidebarContent)) {
@@ -609,7 +624,7 @@ export default {
 
             html.tag('link', {
               rel: 'stylesheet',
-              href: to('shared.staticFile', 'site5.css', cachebust),
+              href: to('shared.staticFile', 'site6.css', cachebust),
             }),
 
             html.tag('style', [
@@ -646,7 +661,7 @@ export default {
 
               html.tag('script', {
                 type: 'module',
-                src: to('shared.staticFile', 'client2.js', cachebust),
+                src: to('shared.staticFile', 'client3.js', cachebust),
               }),
             ]),
         ])

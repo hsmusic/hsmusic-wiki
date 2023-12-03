@@ -101,8 +101,8 @@ import {
 
 import dimensionsOf from 'image-size';
 
+import CacheableObject from '#cacheable-object';
 import {delay, empty, queue, unique} from '#sugar';
-import {CacheableObject} from '#things';
 import {sortByName} from '#wiki-data';
 
 import {

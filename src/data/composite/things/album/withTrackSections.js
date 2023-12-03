@@ -22,7 +22,7 @@ export default templateCompositeFrom({
 
   steps: () => [
     exitWithoutDependency({
-      dependency: 'trackData',
+      dependency: 'ownTrackData',
       value: input.value([]),
     }),
 
@@ -75,7 +75,7 @@ export default templateCompositeFrom({
 
     withResolvedReferenceList({
       list: '#trackRefs',
-      data: 'trackData',
+      data: 'ownTrackData',
       notFoundMode: input.value('null'),
       find: input.value(find.track),
     }).outputs({

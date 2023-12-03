@@ -30,5 +30,6 @@ export class StaticPage extends Thing {
     directory: directory(),
     content: simpleString(),
     stylesheet: simpleString(),
+    script: simpleString(),
   });
 }

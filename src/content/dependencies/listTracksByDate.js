@@ -71,8 +71,15 @@ export default {
               rerelease: rereleases,
             }).map(({trackLink, rerelease}) =>
                 (rerelease
-                  ? {track: trackLink, stringsKey: 'rerelease'}
+                  ? {stringsKey: 'rerelease', track: trackLink}
                   : {track: trackLink}))),
+
+      chunkRowAttributes:
+        data.rereleases.map(rereleases =>
+          rereleases.map(rerelease =>
+            (rerelease
+              ? {class: 'rerelease'}
+              : null))),
     });
   },
 };

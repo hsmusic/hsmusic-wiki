@@ -3,13 +3,7 @@
  * no need to re-run upd8.js when tweaking values here. Handy!
  */
 
-:root {
-  --primary-color: #0088ff;
-}
-
-/* Layout - Common
- *
- */
+/* Layout - Common */
 
 body {
   margin: 10px;
@@ -433,6 +427,7 @@ a {
 
 a:hover {
   text-decoration: underline;
+  text-decoration-style: solid !important;
 }
 
 a.current {
@@ -478,9 +473,96 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
+.contribution.has-tooltip,
+.datetimestamp.has-tooltip {
+  position: relative;
+}
+
+.contribution.has-tooltip > a,
+.datetimestamp.has-tooltip > time {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.datetimestamp.has-tooltip > time {
+  cursor: default;
+}
+
+.contribution.has-tooltip > a:hover,
+.contribution.has-tooltip > a.has-visible-tooltip,
+.datetimestamp.has-tooltip > time:hover,
+.datetimestamp.has-tooltip > time.has-visible-tooltip {
+  text-decoration-style: wavy !important;
+}
+
+.icons-tooltip,
+.datetimestamp-tooltip {
+  position: absolute;
+  z-index: 3;
+  left: -34px;
+  top: calc(1em + 1px);
+  display: none;
+}
+
+.icons-tooltip {
+  padding: 3px 6px 6px 6px;
+  left: -34px;
+}
+
+.datetimestamp-tooltip {
+  padding: 3px 4px 2px 2px;
+  left: -10px;
+}
+
+li:not(:first-child:last-child) .datetimestamp-tooltip {
+  left: 14px;
+}
+
+.icons-tooltip-content,
+.datetimestamp-tooltip-content {
+  display: block;
+
+  background: var(--bg-black-color);
+  border: 1px dotted var(--primary-color);
+  border-radius: 6px;
+
+  -webkit-backdrop-filter:
+    brightness(1.5) saturate(1.4) blur(4px);
+
+          backdrop-filter:
+    brightness(1.5) saturate(1.4) blur(4px);
+
+  box-shadow:
+    0 3px 4px 4px #000000aa,
+    0 -2px 4px -2px var(--primary-color) inset;
+}
+
+.icons-tooltip-content {
+  padding: 6px 2px 2px 2px;
+
+  -webkit-user-select: none;
+          user-select: none;
+
+  cursor: default;
+}
+
+.datetimestamp-tooltip-content {
+  padding: 5px 6px;
+  white-space: nowrap;
+  font-size: 0.9em;
+}
+
 .icons {
   font-style: normal;
   white-space: nowrap;
+}
+
+.icons a:hover {
+  filter: brightness(1.4);
+}
+
+.icons a {
+  padding: 0 3px;
 }
 
 .icon {
@@ -498,6 +580,23 @@ a:not([href]):hover {
   fill: var(--primary-color);
 }
 
+.icon.has-text {
+  display: block;
+  width: unset;
+  height: 1.4em;
+}
+
+.icon.has-text > svg {
+  width: 18px;
+  height: 18px;
+  top: -0.1em;
+}
+
+.icon.has-text > .icon-text {
+  margin-left: 24px;
+  padding-right: 8px;
+}
+
 .rerelease,
 .other-group-accent {
   opacity: 0.7;
@@ -506,6 +605,10 @@ a:not([href]):hover {
 
 .other-group-accent {
   white-space: nowrap;
+}
+
+.other-group-accent a {
+  color: var(--page-primary-color);
 }
 
 .content-columns {
@@ -543,11 +646,24 @@ p .current {
   margin-top: 5px;
 }
 
+.commentary-entry-heading {
+  margin-left: 15px;
+  padding-left: 5px;
+  max-width: 625px;
+  padding-bottom: 0.2em;
+  border-bottom: 1px dotted var(--primary-color);
+}
+
+.commentary-entry-accent {
+  font-style: oblique;
+}
+
 .commentary-art {
   float: right;
   width: 30%;
   max-width: 250px;
   margin: 15px 0 10px 20px;
+  box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.35);
 }
 
 .js-hide,
@@ -698,7 +814,7 @@ p code {
 }
 
 main.long-content {
-  --long-content-padding-ratio: 0.12;
+  --long-content-padding-ratio: 0.10;
 }
 
 main.long-content .main-content-container,
@@ -798,10 +914,94 @@ html[data-url-key="localized.albumCommentary"] li.no-commentary {
   opacity: 0.7;
 }
 
+html[data-url-key="localized.albumCommentary"] .content-heading-main-title {
+  margin-right: 0.25em;
+}
+
+html[data-url-key="localized.albumCommentary"] .content-heading-accent {
+  font-weight: normal;
+  font-style: oblique;
+  font-size: 0.9rem;
+  display: inline-block;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
+html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line,
+html[data-url-key="localized.listing"][data-url-value0="random"] #data-error-line {
+  display: none;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="random"] #content a:not([href]) {
+  opacity: 0.7;
+}
+
 html[data-url-key="localized.newsEntry"] .read-another-links {
   font-style: oblique;
 }
 
+/* Additional names (heading and box) */
+
+h1 a[href="#additional-names-box"] {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+h1 a[href="#additional-names-box"]:hover {
+  text-decoration-style: solid;
+}
+
+#additional-names-box {
+  --custom-scroll-offset: calc(0.5em - 2px);
+
+  margin: 1em 0 1em -10px;
+  padding: 15px 20px 10px 20px;
+  width: max-content;
+  max-width: min(60vw, 600px);
+
+  border: 1px dotted var(--primary-color);
+  border-radius: 6px;
+
+  background:
+    linear-gradient(var(--bg-color), var(--bg-color)),
+    linear-gradient(#000000bb, #000000bb),
+    var(--primary-color);
+
+  box-shadow: 0 -2px 6px -1px var(--dim-color) inset;
+
+  display: none;
+}
+
+#additional-names-box > :first-child { margin-top: 0; }
+#additional-names-box > :last-child { margin-bottom: 0; }
+
+#additional-names-box p {
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-bottom: 0;
+  font-style: oblique;
+}
+
+#additional-names-box ul {
+  padding-left: 10px;
+  margin-top: 0.5em;
+}
+
+#additional-names-box li .additional-name {
+  margin-right: 0.25em;
+}
+
+#additional-names-box li .additional-name .content-image {
+  margin-bottom: 0.25em;
+  margin-top: 0.5em;
+}
+
+#additional-names-box li .accent {
+  opacity: 0.8;
+  display: inline-block;
+}
+
+>>>>>>> preview:src/static/site6.css
 /* Images */
 
 .image-container {
@@ -1304,6 +1504,10 @@ h3.content-heading {
 
 /* Sticky heading */
 
+[id] {
+  --custom-scroll-offset: 0px;
+}
+
 #content [id] {
   /* Adjust scroll margin. */
   scroll-margin-top: calc(
@@ -1311,6 +1515,7 @@ h3.content-heading {
     + 33px /* Sticky subheading */
     - 1em  /* One line of text (align bottom) */
     - 12px /* Padding for hanging letters & focus ring */
+    + var(--custom-scroll-offset) /* Customizable offset */
   );
 }
 
@@ -1660,6 +1865,13 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
  */
 
 @media (min-width: 600px) and (max-width: 899.98px) {
+  /* Medim layout is mainly defined (to the user) by hiding the sidebar, so
+   * don't apply the similar layout change of widening the long-content area
+   * if this page doesn't have a sidebar to hide in the first place.
+   */
+  #page-container:not(.has-zero-sidebars) main.long-content {
+    --long-content-padding-ratio: 0.06;
+  }
 }
 
 /* Layout - Wide or Medium */
@@ -1683,7 +1895,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     float: right;
     width: 40%;
     max-width: 400px;
-    margin: -60px 0 10px 10px;
+    margin: -60px 0 10px 20px;
 
     position: relative;
     z-index: 2;
@@ -1743,9 +1955,17 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     columns: 1;
   }
 
+  main.long-content {
+    --long-content-padding-ratio: 0.02;
+  }
+
   #cover-art-container {
     margin: 25px 0 5px 0;
     width: 100%;
+    max-width: unset;
+  }
+
+  #additional-names-box {
     max-width: unset;
   }
 
@@ -1753,6 +1973,13 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   .content-sticky-heading-container {
     z-index: 2;
+  }
+
+  /* Let sticky heading text span past lower-index cover art */
+
+  .content-sticky-heading-container.has-cover .content-sticky-heading-row,
+  .content-sticky-heading-container.has-cover .content-sticky-subheading-row {
+    grid-template-columns: 1fr 90px;
   }
 
   /* Disable grid features, just line header children up vertically */
@@ -1763,9 +1990,5 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   #header > div:not(:first-child) {
     margin-top: 0.5em;
-  }
-
-  main.long-content {
-    --long-content-padding-ratio: 0.04;
   }
 }

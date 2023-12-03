@@ -64,6 +64,14 @@ export default {
       style = `--primary-color: ${primary}; --dim-color: ${dim}`;
     }
 
+    if (slots.attributes?.style) {
+      if (style) {
+        style += '; ' + slots.attributes.style;
+      } else {
+        style = slots.attributes.style;
+      }
+    }
+
     if (slots.tooltip) {
       title = slots.tooltip;
     }

@@ -1,8 +1,8 @@
 import {inspect} from 'node:util';
 
+import CacheableObject from '#cacheable-object';
 import {colors, logWarn} from '#cli';
 import {typeAppearance} from '#sugar';
-import {CacheableObject} from '#things';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {

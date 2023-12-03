@@ -3,13 +3,13 @@
 // successive source array.
 //
 // See also:
-//  - withFlattenedList
+//  - withUnflattenedList
 //
 // More list utilities:
 //  - excludeFromList
 //  - fillMissingListItems
-//  - withPropertyFromList
-//  - withPropertiesFromList
+//  - withFilteredList, withMappedList, withSortedList
+//  - withPropertyFromList, withPropertiesFromList
 //
 
 import {input, templateCompositeFrom} from '#composite';

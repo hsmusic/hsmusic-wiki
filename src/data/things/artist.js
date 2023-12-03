@@ -107,6 +107,23 @@ export class Artist extends Thing {
     albumsAsBannerArtist:
       Artist.filterByContrib('albumData', 'bannerArtistContribs'),
 
+    albumsAsAny: {
+      flags: {expose: true},
+
+      expose: {
+        dependencies: ['albumData'],
+
+        compute: ({albumData, [Artist.instance]: artist}) =>
+          albumData?.filter((album) =>
+            [
+              ...album.artistContribs,
+              ...album.coverArtistContribs,
+              ...album.wallpaperArtistContribs,
+              ...album.bannerArtistContribs,
+            ].some(({who}) => who === artist)) ?? [],
+      },
+    },
+
     albumsAsCommentator: {
       flags: {expose: true},
 

@@ -12,6 +12,7 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
+        "#cacheable-object": "./src/data/things/cacheable-object.js",
         "#colors": "./src/util/colors.js",
         "#composite": "./src/data/things/composite.js",
         "#composite/control-flow": "./src/data/composite/control-flow/index.js",
@@ -24,6 +25,7 @@
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",
+        "#external-links": "./src/util/external-links.js",
         "#find": "./src/find.js",
         "#html": "./src/util/html.js",
         "#language": "./src/data/language.js",
@@ -41,14 +43,19 @@
         "#wiki-data": "./src/util/wiki-data.js",
         "#yaml": "./src/data/yaml.js"
     },
+    "engines": {
+        "node": ">= 20.9.0"
+    },
     "dependencies": {
+        "@js-temporal/polyfill": "^0.4.4",
         "chroma-js": "^2.4.2",
         "command-exists": "^1.2.9",
         "eslint": "^8.37.0",
         "he": "^1.2.0",
         "image-size": "^1.0.2",
         "js-yaml": "^4.1.0",
-        "marked": "^5.0.2",
+        "marked": "^10.0.0",
+        "printable-characters": "^1.0.42",
         "striptags": "^4.0.0-alpha.4",
         "word-wrap": "^1.2.3"
     },

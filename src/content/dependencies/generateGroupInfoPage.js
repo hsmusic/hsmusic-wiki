@@ -1,7 +1,9 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAbsoluteDatetimestamp',
+    'generateColorStyleVariables',
     'generateContentHeading',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
@@ -62,18 +64,27 @@ export default {
       sec.albums.galleryLink =
         relation('linkGroupGallery', group);
 
-      sec.albums.entries =
-        group.albums.map(album => {
-          const links = {};
-          links.albumLink = relation('linkAlbum', album);
+      sec.albums.colorVariables =
+        group.albums
+          .map(() => relation('generateColorStyleVariables'));
 
-          const otherGroup = album.groups.find(g => g !== group);
-          if (otherGroup) {
-            links.groupLink = relation('linkGroup', otherGroup);
-          }
+      sec.albums.albumLinks =
+        group.albums
+          .map(album => relation('linkAlbum', album));
 
-          return links;
-        });
+      sec.albums.groupLinks =
+        group.albums
+          .map(album => album.groups.find(g => g !== group))
+          .map(group =>
+            (group
+              ? relation('linkGroup', group)
+              : null));
+
+      sec.albums.datetimestamps =
+        group.albums.map(album =>
+          (album.date
+            ? relation('generateAbsoluteDatetimestamp', album.date)
+            : null));
     }
 
     return relations;
@@ -85,11 +96,8 @@ export default {
     data.name = group.name;
     data.color = group.color;
 
-    if (!empty(group.albums)) {
-      data.albumYears =
-        group.albums
-          .map(album => album.date?.getFullYear());
-    }
+    data.albumColors =
+      group.albums.map(album => album.color);
 
     return data;
   },
@@ -107,7 +115,10 @@ export default {
           sec.info.visitLinks &&
             html.tag('p',
               language.$('releaseInfo.visitOn', {
-                links: language.formatDisjunctionList(sec.info.visitLinks),
+                links:
+                  language.formatDisjunctionList(
+                    sec.info.visitLinks
+                      .map(link => link.slot('context', 'group'))),
               })),
 
           html.tag('blockquote',
@@ -130,34 +141,50 @@ export default {
               })),
 
             html.tag('ul',
-              sec.albums.entries.map(({albumLink, groupLink}, index) => {
-                // All these strings are really jank, and should probably
-                // be implemented with the same 'const parts = [], opts = {}'
-                // form used elsewhere...
-                const year = data.albumYears[index];
-                const item =
-                  (year
-                    ? language.$('groupInfoPage.albumList.item', {
-                        year,
-                        album: albumLink,
-                      })
-                    : language.$('groupInfoPage.albumList.item.withoutYear', {
-                        album: albumLink,
-                      }));
+              stitchArrays({
+                albumLink: sec.albums.albumLinks,
+                groupLink: sec.albums.groupLinks,
+                datetimestamp: sec.albums.datetimestamps,
+                colorVariables: sec.albums.colorVariables,
+                albumColor: data.albumColors,
+              }).map(({
+                  albumLink,
+                  groupLink,
+                  datetimestamp,
+                  colorVariables,
+                  albumColor,
+                }) => {
+                  const prefix = 'groupInfoPage.albumList.item';
+                  const parts = [prefix];
+                  const options = {};
 
-                return html.tag('li',
-                  (groupLink
-                    ? language.$('groupInfoPage.albumList.item.withAccent', {
-                        item,
-                        accent:
-                          html.tag('span', {class: 'other-group-accent'},
-                            language.$('groupInfoPage.albumList.item.otherGroupAccent', {
-                              group:
-                                groupLink.slot('color', false),
-                            })),
-                      })
-                    : item));
-              })),
+                  options.album =
+                    albumLink.slot('color', false);
+
+                  if (datetimestamp) {
+                    parts.push('withYear');
+                    options.yearAccent =
+                      language.$(prefix, 'yearAccent', {
+                        year:
+                          datetimestamp.slots({style: 'year', tooltip: true}),
+                      });
+                  }
+
+                  if (groupLink) {
+                    parts.push('withOtherGroup');
+                    options.otherGroupAccent =
+                      html.tag('span', {class: 'other-group-accent'},
+                        language.$(prefix, 'otherGroupAccent', {
+                          group:
+                            groupLink.slot('color', false),
+                        }));
+                  }
+
+                  return (
+                    html.tag('li',
+                      {style: colorVariables.slot('color', albumColor).content},
+                      language.$(...parts, options)));
+                })),
           ],
         ],
 

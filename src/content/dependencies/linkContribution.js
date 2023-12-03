@@ -1,15 +1,8 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: [
-    'linkArtist',
-    'linkExternalAsIcon',
-  ],
-
-  extraDependencies: [
-    'html',
-    'language',
-  ],
+  contentDependencies: ['linkArtist', 'linkExternalAsIcon'],
+  extraDependencies: ['html', 'language'],
 
   relations(relation, contribution) {
     const relations = {};
@@ -20,7 +13,6 @@ export default {
     if (!empty(contribution.who.urls)) {
       relations.artistIcons =
         contribution.who.urls
-          .slice(0, 4)
           .map(url => relation('linkExternalAsIcon', url));
     }
 
@@ -37,37 +29,81 @@ export default {
     showContribution: {type: 'boolean', default: false},
     showIcons: {type: 'boolean', default: false},
     preventWrapping: {type: 'boolean', default: true},
+
+    iconMode: {
+      validate: v => v.is('inline', 'tooltip'),
+      default: 'inline'
+    },
   },
 
   generate(data, relations, slots, {html, language}) {
-    const hasContributionPart = !!(slots.showContribution && data.what);
-    const hasExternalPart = !!(slots.showIcons && relations.artistIcons);
-
-    const externalLinks = hasExternalPart &&
-      html.tag('span',
-        {[html.noEdgeWhitespace]: true, class: 'icons'},
-        language.formatUnitList(relations.artistIcons));
+    const hasContribution = !!(slots.showContribution && data.what);
+    const hasExternalIcons = !!(slots.showIcons && relations.artistIcons);
 
     const parts = ['misc.artistLink'];
     const options = {artist: relations.artistLink};
 
-    if (hasContributionPart) {
+    if (hasContribution) {
       parts.push('withContribution');
       options.contrib = data.what;
     }
 
-    if (hasExternalPart) {
+    if (hasExternalIcons && slots.iconMode === 'inline') {
       parts.push('withExternalLinks');
-      options.links = externalLinks;
+      options.links =
+        html.tag('span',
+          {
+            [html.noEdgeWhitespace]: true,
+            class: ['icons', 'icons-inline'],
+          },
+          language.formatUnitList(
+            relations.artistIcons
+              .slice(0, 4)
+              .map(icon => icon.slot('context', 'artist'))));
     }
 
-    const content = language.formatString(parts.join('.'), options);
+    let content = language.formatString(parts.join('.'), options);
 
-    return (
-      (parts.length > 1 && slots.preventWrapping
-        ? html.tag('span',
-            {[html.noEdgeWhitespace]: true, class: 'nowrap'},
-            content)
-        : content));
-    },
+    if (hasExternalIcons && slots.iconMode === 'tooltip') {
+      content = [
+        content,
+        html.tag('span',
+          {
+            [html.noEdgeWhitespace]: true,
+            class: ['icons', 'icons-tooltip'],
+            inert: true,
+          },
+          html.tag('span',
+            {
+              [html.noEdgeWhitespace]: true,
+              [html.joinChildren]: '',
+              class: 'icons-tooltip-content',
+            },
+            relations.artistIcons
+              .map(icon => icon.slots({context: 'artist', withText: true})))),
+      ];
+    }
+
+    if (hasContribution || hasExternalIcons) {
+      content =
+        html.tag('span', {
+          [html.noEdgeWhitespace]: true,
+          [html.joinChildren]: '',
+
+          class: [
+            'contribution',
+
+            hasExternalIcons &&
+            slots.iconMode === 'tooltip' &&
+              'has-tooltip',
+
+            parts.length > 1 &&
+            slots.preventWrapping &&
+              'nowrap',
+          ],
+        }, content);
+    }
+
+    return content;
+  }
 };

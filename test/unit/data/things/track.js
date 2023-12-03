@@ -80,8 +80,8 @@ t.test(`Track.album`, t => {
 
   track1.albumData = [album1, album2];
   track2.albumData = [album1, album2];
-  album1.trackData = [track1, track2];
-  album2.trackData = [track1, track2];
+  album1.ownTrackData = [track1, track2];
+  album2.ownTrackData = [track1, track2];
   album1.trackSections = [{tracks: ['track:track1']}];
   album2.trackSections = [{tracks: ['track:track2']}];
 
@@ -98,13 +98,13 @@ t.test(`Track.album`, t => {
   t.equal(track1.album, null,
     `album #4: is null when track missing albumData`);
 
-  album1.trackData = [];
+  album1.ownTrackData = [];
   track1.albumData = [album1, album2];
 
   t.equal(track1.album, null,
-    `album #5: is null when album missing trackData`);
+    `album #5: is null when album missing ownTrackData`);
 
-  album1.trackData = [track1, track2];
+  album1.ownTrackData = [track1, track2];
   album1.trackSections = [{tracks: ['track:track2']}];
 
   // XXX_decacheWikiData
@@ -165,7 +165,7 @@ t.test(`Track.color`, t => {
 
   const {track, album} = stubTrackAndAlbum();
 
-  const {wikiData, linkWikiDataArrays, XXX_decacheWikiData} = linkAndBindWikiData({
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
     albumData: [album],
     trackData: [track],
   });
@@ -188,17 +188,16 @@ t.test(`Track.color`, t => {
   // track's album will always have a corresponding track section. But if that
   // connection breaks for some future reason (with the album still present),
   // Track.color should still inherit directly from the album.
-  wikiData.albumData = [
-    new Proxy({
+  track.albumData = [
+    {
+      constructor: {[Thing.referenceType]: 'album'},
       color: '#abcdef',
       tracks: [track],
       trackSections: [
         {color: '#baaaad', tracks: []},
       ],
-    }, {getPrototypeOf: () => Album.prototype}),
+    },
   ];
-
-  linkWikiDataArrays();
 
   t.equal(track.color, '#abcdef',
     `color #3: inherits from album without matching track section`);
@@ -214,7 +213,7 @@ t.test(`Track.color`, t => {
 });
 
 t.test(`Track.commentatorArtists`, t => {
-  t.plan(6);
+  t.plan(8);
 
   const track = new Track();
   const artist1 = stubArtist(`SnooPING`);
@@ -226,47 +225,67 @@ t.test(`Track.commentatorArtists`, t => {
     artistData: [artist1, artist2, artist3],
   });
 
-  track.commentary =
+  // Keep track of the last commentary string in a separate value, since
+  // the track.commentary property exposes as a completely different format
+  // (i.e. an array of objects, one for each entry), and so isn't compatible
+  // with the += operator on its own.
+  let commentary;
+
+  track.commentary = commentary =
     `<i>SnooPING:</i>\n` +
     `Wow.\n`;
 
   t.same(track.commentatorArtists, [artist1],
     `Track.commentatorArtists #1: works with one commentator`);
 
-  track.commentary +=
+  track.commentary = commentary +=
     `<i>ASUsual:</i>\n` +
     `Yes!\n`;
 
   t.same(track.commentatorArtists, [artist1, artist2],
     `Track.commentatorArtists #2: works with two commentators`);
 
-  track.commentary +=
-    `<i><b>Icy:</b></i>\n` +
+  track.commentary = commentary +=
+    `<i>Icy|<b>Icy What You Did There</b>:</i>\n` +
     `Incredible.\n`;
 
   t.same(track.commentatorArtists, [artist1, artist2, artist3],
-    `Track.commentatorArtists #3: works with boldface name`);
+    `Track.commentatorArtists #3: works with custom artist text`);
 
-  track.commentary =
+  track.commentary = commentary =
     `<i>Icy:</i> (project manager)\n` +
     `Very good track.\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #4: works with parenthical accent`);
+    `Track.commentatorArtists #4: works with annotation`);
 
-  track.commentary +=
-    `<i>SNooPING ASUsual Icy:</i>\n` +
-    `WITH ALL THREE POWERS COMBINED...`;
+  track.commentary = commentary =
+    `<i>Icy:</i> (project manager, 08/15/2023)\n` +
+    `Very very good track.\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #5: ignores artist names not found`);
+    `Track.commentatorArtists #5: works with date`);
 
-  track.commentary +=
+  track.commentary = commentary +=
+    `<i>Ohohohoho:</i>\n` +
+    `OHOHOHOHOHOHO...\n`;
+
+  t.same(track.commentatorArtists, [artist3],
+    `Track.commentatorArtists #6: ignores artist names not found`);
+
+  track.commentary = commentary +=
     `<i>Icy:</i>\n` +
     `I'm back!\n`;
 
   t.same(track.commentatorArtists, [artist3],
-    `Track.commentatorArtists #6: ignores duplicate artist`);
+    `Track.commentatorArtists #7: ignores duplicate artist`);
+
+  track.commentary = commentary +=
+    `<i>SNooPING, ASUsual, Icy:</i>\n` +
+    `WITH ALL THREE POWERS COMBINED...`;
+
+  t.same(track.commentatorArtists, [artist3, artist1, artist2],
+    `Track.commentatorArtists #8: works with more than one artist in one entry`);
 });
 
 t.test(`Track.coverArtistContribs`, t => {

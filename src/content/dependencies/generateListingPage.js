@@ -1,4 +1,4 @@
-import {empty, stitchArrays} from '#sugar';
+import {bindOpts, empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -7,6 +7,7 @@ export default {
     'generatePageLayout',
     'linkListing',
     'linkListingIndex',
+    'linkTemplate',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -25,6 +26,9 @@ export default {
 
     relations.chunkHeading =
       relation('generateContentHeading');
+
+    relations.showSkipToSectionLinkTemplate =
+      relation('linkTemplate');
 
     if (listing.target.listings.length > 1) {
       relations.sameTargetListingLinks =
@@ -58,12 +62,42 @@ export default {
   },
 
   slots: {
-    type: {validate: v => v.is('rows', 'chunks', 'custom')},
+    type: {
+      validate: v => v.is('rows', 'chunks', 'custom'),
+    },
 
-    rows: {validate: v => v.strictArrayOf(v.isObject)},
+    rows: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
 
-    chunkTitles: {validate: v => v.strictArrayOf(v.isObject)},
-    chunkRows: {validate: v => v.strictArrayOf(v.isObject)},
+    rowAttributes: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject))
+    },
+
+    chunkTitles: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
+
+    chunkTitleAccents: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
+    chunkRows: {
+      validate: v => v.strictArrayOf(v.isObject),
+    },
+
+    chunkRowAttributes: {
+      validate: v => v.strictArrayOf(v.optional(v.isObject)),
+    },
+
+    showSkipToSection: {
+      type: 'boolean',
+      default: false,
+    },
+
+    chunkIDs: {
+      validate: v => v.strictArrayOf(v.optional(v.isString)),
+    },
 
     listStyle: {
       validate: v => v.is('ordered', 'unordered'),
@@ -74,26 +108,59 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const listTag =
-      (slots.listStyle === 'ordered'
-        ? 'ol'
-        : 'ul');
+    function formatListingString({
+      context,
+      provided = {},
+    }) {
+      const parts = ['listingPage', data.stringsKey];
 
-    const formatListingString = (contextStringsKey, options = {}) => {
-      const baseStringsKey = `listingPage.${data.stringsKey}`;
-
-      const parts = [baseStringsKey, contextStringsKey];
-
-      if (options.stringsKey) {
-        parts.push(options.stringsKey);
-        delete options.stringsKey;
+      if (Array.isArray(context)) {
+        parts.push(...context);
+      } else {
+        parts.push(context);
       }
 
-      return language.formatString(parts.join('.'), options);
-    };
+      if (provided.stringsKey) {
+        parts.push(provided.stringsKey);
+      }
+
+      const options = {...provided};
+      delete options.stringsKey;
+
+      return language.formatString(...parts, options);
+    }
+
+    const formatRow = ({context, row, attributes}) =>
+      (attributes?.href
+        ? html.tag('li',
+            html.tag('a',
+              attributes,
+              formatListingString({
+                context,
+                provided: row,
+              })))
+        : html.tag('li',
+            attributes,
+            formatListingString({
+              context,
+              provided: row,
+            })));
+
+    const formatRowList = ({context, rows, rowAttributes}) =>
+      html.tag(
+        (slots.listStyle === 'ordered' ? 'ol' : 'ul'),
+        stitchArrays({
+          row: rows,
+          attributes: rowAttributes ?? rows.map(() => null),
+        }).map(
+          bindOpts(formatRow, {
+            [bindOpts.bindIndex]: 0,
+            context,
+          })));
 
     return relations.layout.slots({
-      title: formatListingString('title'),
+      title: formatListingString({context: 'title'}),
+
       headingMode: 'sticky',
 
       mainContent: [
@@ -121,35 +188,78 @@ export default {
               listings: language.formatUnitList(relations.seeAlsoLinks),
             })),
 
+        slots.content,
+
         slots.type === 'rows' &&
-          html.tag(listTag,
-            slots.rows.map(row =>
-              html.tag('li',
-                formatListingString('item', row)))),
+          formatRowList({
+            context: 'item',
+            rows: slots.rows,
+            rowAttributes: slots.rowAttributes,
+          }),
 
         slots.type === 'chunks' &&
-          html.tag('dl',
+          html.tag('dl', [
+            slots.showSkipToSection && [
+              html.tag('dt',
+                language.$('listingPage.skipToSection')),
+
+              html.tag('dd',
+                html.tag('ul',
+                  stitchArrays({
+                    title: slots.chunkTitles,
+                    id: slots.chunkIDs,
+                  }).filter(({id}) => id)
+                    .map(({title, id}) =>
+                      html.tag('li',
+                        relations.showSkipToSectionLinkTemplate
+                          .clone()
+                          .slots({
+                            hash: id,
+                            content:
+                              html.normalize(
+                                formatListingString({
+                                  context: 'chunk.title',
+                                  provided: title,
+                                }).toString()
+                                  .replace(/:$/, '')),
+                          }))))),
+            ],
+
             stitchArrays({
               title: slots.chunkTitles,
+              titleAccent: slots.chunkTitleAccents,
+              id: slots.chunkIDs,
               rows: slots.chunkRows,
-            }).map(({title, rows}) => [
+              rowAttributes: slots.chunkRowAttributes,
+            }).map(({title, titleAccent, id, rows, rowAttributes}) => [
                 relations.chunkHeading
                   .clone()
                   .slots({
                     tag: 'dt',
-                    title: formatListingString('chunk.title', title),
+                    id,
+
+                    title:
+                      formatListingString({
+                        context: 'chunk.title',
+                        provided: title,
+                      }),
+
+                    accent:
+                      titleAccent &&
+                        formatListingString({
+                          context: ['chunk.title', title.stringsKey, 'accent'],
+                          provided: titleAccent,
+                        }),
                   }),
 
                 html.tag('dd',
-                  html.tag(listTag,
-                    rows.map(row =>
-                      html.tag('li',
-                        {class: row.stringsKey === 'rerelease' && 'rerelease'},
-                        formatListingString('chunk.item', row))))),
-              ])),
-
-        slots.type === 'custom' &&
-          slots.content,
+                  formatRowList({
+                    context: 'chunk.item',
+                    rows,
+                    rowAttributes,
+                  })),
+              ]),
+          ]),
       ],
 
       navLinkStyle: 'hierarchical',

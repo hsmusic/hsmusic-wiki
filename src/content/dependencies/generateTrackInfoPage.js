@@ -1,19 +1,24 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 import {sortAlbumsTracksChronologically, sortFlashesChronologically} from '#wiki-data';
 
 import getChronologyRelations from '../util/getChronologyRelations.js';
 
 export default {
   contentDependencies: [
+    'generateAbsoluteDatetimestamp',
     'generateAdditionalFilesShortcut',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
+    'generateColorStyleVariables',
+    'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
     'generatePageLayout',
+    'generateRelativeDatetimestamp',
+    'generateTrackAdditionalNamesBox',
     'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
@@ -106,6 +111,10 @@ export default {
       list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
     });
 
+    // This'll take care of itself being blank if there's nothing to show here.
+    relations.additionalNamesBox =
+      relation('generateTrackAdditionalNamesBox', track);
+
     if (track.hasUniqueCoverArt || album.hasCoverArt) {
       relations.cover =
         relation('generateTrackCoverArtwork', track);
@@ -132,6 +141,29 @@ export default {
 
       otherReleases.heading =
         relation('generateContentHeading');
+
+      otherReleases.colorVariables =
+        track.otherReleases
+          .map(() => relation('generateColorStyleVariables'));
+
+      otherReleases.trackLinks =
+        track.otherReleases
+          .map(track => relation('linkTrack', track));
+
+      otherReleases.albumLinks =
+        track.otherReleases
+          .map(track => relation('linkAlbum', track.album));
+
+      otherReleases.datetimestamps =
+        track.otherReleases.map(track2 =>
+          (track2.date
+            ? (track.date
+                ? relation('generateRelativeDatetimestamp',
+                    track2.date,
+                    track.date)
+                : relation('generateAbsoluteDatetimestamp',
+                    track2.date))
+            : null));
 
       otherReleases.items =
         track.otherReleases.map(track => ({
@@ -268,13 +300,8 @@ export default {
     // Section: Artist commentary
 
     if (track.commentary) {
-      const artistCommentary = sections.artistCommentary = {};
-
-      artistCommentary.heading =
-        relation('generateContentHeading');
-
-      artistCommentary.content =
-        relation('transformContent', track.commentary);
+      sections.artistCommentary =
+        relation('generateCommentarySection', track.commentary);
     }
 
     return relations;
@@ -288,6 +315,9 @@ export default {
       hasTrackNumbers: track.album.hasTrackNumbers,
       trackNumber: track.album.tracks.indexOf(track) + 1,
 
+      otherReleaseColors:
+        track.otherReleases.map(track => track.color),
+
       numAdditionalFiles: track.additionalFiles.length,
     };
   },
@@ -299,6 +329,8 @@ export default {
       .slots({
         title: language.$('trackPage.title', {track: data.name}),
         headingMode: 'sticky',
+
+        additionalNames: relations.additionalNamesBox,
 
         color: data.color,
         styleRules: [relations.albumStyleRules],
@@ -352,12 +384,39 @@ export default {
               }),
 
             html.tag('ul',
-              sec.otherReleases.items.map(({trackLink, albumLink}) =>
-                html.tag('li',
-                  language.$('releaseInfo.alsoReleasedAs.item', {
-                    track: trackLink,
-                    album: albumLink,
-                  })))),
+              stitchArrays({
+                trackLink: sec.otherReleases.trackLinks,
+                albumLink: sec.otherReleases.albumLinks,
+                datetimestamp: sec.otherReleases.datetimestamps,
+                colorVariables: sec.otherReleases.colorVariables,
+                color: data.otherReleaseColors,
+              }).map(({
+                  trackLink,
+                  albumLink,
+                  datetimestamp,
+                  colorVariables,
+                  color,
+                }) => {
+                  const parts = ['releaseInfo.alsoReleasedAs.item'];
+                  const options = {};
+
+                  options.track = trackLink.slot('color', false);
+                  options.album = albumLink;
+
+                  if (datetimestamp) {
+                    parts.push('withYear');
+                    options.year =
+                      datetimestamp.slots({
+                        style: 'year',
+                        tooltip: true,
+                      });
+                  }
+
+                  return (
+                    html.tag('li',
+                      {style: colorVariables.slot('color', color).content},
+                      language.$(...parts, options)));
+                })),
           ],
 
           sec.contributors && [
@@ -491,17 +550,7 @@ export default {
             sec.additionalFiles.list,
           ],
 
-          sec.artistCommentary && [
-            sec.artistCommentary.heading
-              .slots({
-                id: 'artist-commentary',
-                title: language.$('releaseInfo.artistCommentary')
-              }),
-
-            html.tag('blockquote',
-              sec.artistCommentary.content
-                .slot('mode', 'multiline')),
-          ],
+          sec.artistCommentary,
         ],
 
         navLinkStyle: 'hierarchical',

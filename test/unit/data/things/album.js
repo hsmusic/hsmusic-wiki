@@ -204,11 +204,13 @@ t.test(`Album.tracks`, t => {
   const track1 = stubTrack('track1');
   const track2 = stubTrack('track2');
   const track3 = stubTrack('track3');
+  const tracks = [track1, track2, track3];
 
-  linkAndBindWikiData({
-    albumData: [album],
-    trackData: [track1, track2, track3],
-  });
+  album.ownTrackData = tracks;
+
+  for (const track of tracks) {
+    track.albumData = [album];
+  }
 
   t.same(album.tracks, [],
     `Album.tracks #1: defaults to empty array`);
@@ -259,11 +261,13 @@ t.test(`Album.trackSections`, t => {
   const track2 = stubTrack('track2');
   const track3 = stubTrack('track3');
   const track4 = stubTrack('track4');
+  const tracks = [track1, track2, track3, track4];
 
-  linkAndBindWikiData({
-    albumData: [album],
-    trackData: [track1, track2, track3, track4],
-  });
+  album.ownTrackData = tracks;
+
+  for (const track of tracks) {
+    track.albumData = [album];
+  }
 
   album.trackSections = [
     {tracks: ['track:track1', 'track:track2']},

@@ -2,38 +2,33 @@ import {stitchArrays} from '#sugar';
 import {getArtistNumContributions, sortAlphabetically} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtist'],
+  contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],
   extraDependencies: ['language', 'wikiData'],
 
-  sprawl({artistData}) {
-    return {artistData};
-  },
+  sprawl: ({artistData, wikiInfo}) =>
+    ({artistData, wikiInfo}),
 
-  query({artistData}, spec) {
-    return {
-      spec,
+  query: (sprawl, spec) => ({
+    spec,
 
-      artists: sortAlphabetically(artistData.slice()),
-    };
-  },
+    artists:
+      sortAlphabetically(sprawl.artistData.slice()),
+  }),
 
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
+  relations: (relation, query) => ({
+    page:
+      relation('generateListingPage', query.spec),
 
-      artistLinks:
-        query.artists
-          .map(artist => relation('linkArtist', artist)),
-    };
-  },
+    artistLinks:
+      query.artists
+        .map(artist => relation('linkArtist', artist)),
+  }),
 
-  data(query) {
-    return {
-      counts:
-        query.artists
-          .map(artist => getArtistNumContributions(artist)),
-    };
-  },
+  data: (query) => ({
+    counts:
+      query.artists
+        .map(artist => getArtistNumContributions(artist)),
+  }),
 
   generate(data, relations, {language}) {
     return relations.page.slots({

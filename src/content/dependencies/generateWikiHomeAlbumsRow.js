@@ -11,7 +11,7 @@ export default {
     'transformContent',
   ],
 
-  extraDependencies: ['wikiData'],
+  extraDependencies: ['language', 'wikiData'],
 
   sprawl({albumData}, row) {
     const sprawl = {};
@@ -90,12 +90,14 @@ export default {
     data.paths =
       sprawl.albums
         .map(album =>
-          ['media.albumCover', album.directory, album.coverArtFileExtension]);
+          (album.hasCoverArt
+            ? ['media.albumCover', album.directory, album.coverArtFileExtension]
+            : null));
 
     return data;
   },
 
-  generate(data, relations) {
+  generate(data, relations, {language}) {
     // Grids and carousels share some slots! Very convenient.
     const commonSlots = {};
 
@@ -106,8 +108,16 @@ export default {
       stitchArrays({
         image: relations.images,
         path: data.paths,
-      }).map(({image, path}) =>
-          image.slot('path', path));
+        name: data.names ?? data.paths.slice().fill(null),
+      }).map(({image, path, name}) =>
+          image.slots({
+            path,
+            missingSourceContent:
+              name &&
+                language.$('misc.albumGrid.noCoverArt', {
+                  album: name,
+                }),
+            }));
 
     commonSlots.actionLinks =
       (relations.actionLinks
