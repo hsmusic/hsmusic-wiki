@@ -309,7 +309,7 @@ export class Language extends Thing {
     else if (numMonths && numDays)
       basis = this.formatString('count.dateDuration.monthsDays', {months, days});
     else if (numMonths)
-      basis = this.formatzString('count.dateDuration.months', {months});
+      basis = this.formatString('count.dateDuration.months', {months});
     else if (numDays)
       basis = this.formatString('count.dateDuration.days', {days});
     else

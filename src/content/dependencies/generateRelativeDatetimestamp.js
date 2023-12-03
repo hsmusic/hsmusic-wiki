@@ -28,7 +28,7 @@ export default {
   },
 
   generate(data, relations, slots, {language}) {
-    if (data.comparison === 'equal') {
+    if (data.equal) {
       return relations.fallback.slots({
         style: slots.style,
         tooltip: slots.tooltip,
