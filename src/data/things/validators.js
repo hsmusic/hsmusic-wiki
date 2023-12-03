@@ -429,13 +429,6 @@ export function isURL(string) {
   return true;
 }
 
-export const isAdditionalName = validateProperties({
-  name: isName,
-  annotation: optional(isStringNonEmpty),
-});
-
-export const isAdditionalNameList = validateArrayItems(isAdditionalName);
-
 export function validateReference(type = 'track') {
   return (ref) => {
     isStringNonEmpty(ref);
@@ -556,6 +549,24 @@ export function validateWikiData({
     }
   };
 }
+
+export const isAdditionalName = validateProperties({
+  name: isName,
+  annotation: optional(isStringNonEmpty),
+
+  // TODO: This only allows indicating sourcing from a track.
+  // That's okay for the current limited use of "from", but
+  // could be expanded later.
+  from:
+    // Double TODO: Explicitly allowing both references and
+    // live objects to co-exist is definitely weird, and
+    // altogether questions the way we define validators...
+    optional(oneOf(
+      validateReferenceList('track'),
+      validateWikiData({referenceType: 'track'}))),
+});
+
+export const isAdditionalNameList = validateArrayItems(isAdditionalName);
 
 // Compositional utilities
 
