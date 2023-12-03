@@ -6,10 +6,9 @@
 //  - fillMissingListItems
 //
 // More list utilities:
-//  - withFlattenedList
-//  - withPropertyFromList
-//  - withPropertiesFromList
-//  - withUnflattenedList
+//  - withFilteredList, withMappedList, withSortedList
+//  - withFlattenedList, withUnflattenedList
+//  - withPropertyFromList, withPropertiesFromList
 //
 
 import {input, templateCompositeFrom} from '#composite';

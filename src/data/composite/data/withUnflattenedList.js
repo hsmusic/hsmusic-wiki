@@ -3,6 +3,16 @@
 // of filtering them out), this function allows for recombining them. It will
 // filter out null and undefined items by default (pass {filter: false} to
 // disable this).
+//
+// See also:
+//  - withFlattenedList
+//
+// More list utilities:
+//  - excludeFromList
+//  - fillMissingListItems
+//  - withFilteredList, withMappedList, withSortedList
+//  - withPropertyFromList, withPropertiesFromList
+//
 
 import {input, templateCompositeFrom} from '#composite';
 import {isWholeNumber, validateArrayItems} from '#validators';
