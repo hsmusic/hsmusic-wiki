@@ -2,6 +2,7 @@ import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [
+    'generateNewsEntryReadAnotherLinks',
     'generatePageLayout',
     'generatePreviousNextLinks',
     'linkNewsEntry',
@@ -52,19 +53,19 @@ export default {
       relations.previousNextLinks =
         relation('generatePreviousNextLinks');
 
+      relations.readAnotherLinks =
+        relation('generateNewsEntryReadAnotherLinks',
+          newsEntry,
+          query.previousEntry,
+          query.nextEntry);
+
       if (query.previousEntry) {
         relations.previousEntryNavLink =
-          relation('linkNewsEntry', query.previousEntry);
-
-        relations.previousEntryContentLink =
           relation('linkNewsEntry', query.previousEntry);
       }
 
       if (query.nextEntry) {
         relations.nextEntryNavLink =
-          relation('linkNewsEntry', query.nextEntry);
-
-        relations.nextEntryContentLink =
           relation('linkNewsEntry', query.nextEntry);
       }
     }
@@ -110,44 +111,7 @@ export default {
           })),
 
         relations.content,
-
-        html.tag('p', {
-          [html.onlyIfContent]: true,
-          [html.joinChildren]: html.tag('br'),
-          class: 'read-another-links',
-        }, [
-          relations.previousEntryContentLink &&
-            language.$('newsEntryPage.readAnother.previous', {
-              entry: relations.previousEntryContentLink,
-
-              date:
-                html.tag('span',
-                  {
-                    title:
-                      language.$('newsEntryPage.readAnother.earlier', {
-                        time:
-                          language.countDays(data.daysSincePreviousEntry, {unit: true}),
-                      }).toString(),
-                  },
-                  language.formatDate(data.previousEntryDate)),
-            }),
-
-          relations.nextEntryContentLink &&
-            language.$('newsEntryPage.readAnother.next', {
-              entry: relations.nextEntryContentLink,
-
-              date:
-                html.tag('span',
-                  {
-                    title:
-                      language.$('newsEntryPage.readAnother.later', {
-                        time:
-                          language.countDays(data.daysUntilNextEntry, {unit: true}),
-                      }).toString(),
-                  },
-                  language.formatDate(data.nextEntryDate)),
-            }),
-        ]),
+        relations.readAnotherLinks,
       ],
 
       navLinkStyle: 'hierarchical',

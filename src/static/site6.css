@@ -514,7 +514,8 @@ a:not([href]):hover {
   left: -10px;
 }
 
-li:not(:first-child:last-child) .datetimestamp-tooltip {
+li:not(:first-child:last-child) > .datetimestamp-tooltip,
+.offset-tooltips :not(:first-child:last-child) > .datetimestamp-tooltip {
   left: 14px;
 }
 
@@ -937,6 +938,7 @@ html[data-url-key="localized.listing"][data-url-value0="random"] #content a:not(
 
 html[data-url-key="localized.newsEntry"] .read-another-links {
   font-style: oblique;
+  font-size: 0.9em;
 }
 
 /* Additional names (heading and box) */

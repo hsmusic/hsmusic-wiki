@@ -1727,10 +1727,13 @@ newsEntryPage:
   published: "(Published {DATE}.)"
 
   readAnother:
-    previous: "(← {DATE} {ENTRY})"
-    next: "(→ {DATE} {ENTRY})"
-    earlier: "{TIME} earlier"
-    later: "{TIME} later"
+    previous:
+      _: "(← {ENTRY})"
+      withDate: "(← {DATE} {ENTRY})"
+
+    next:
+      _: "(→ {ENTRY})"
+      withDate: "(→ {DATE} {ENTRY})"
 
 #
 # redirectPage:
