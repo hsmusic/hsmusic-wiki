@@ -7,7 +7,6 @@ export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
     'generateAdditionalFilesShortcut',
-    'generateAdditionalNamesBox',
     'generateAlbumAdditionalFilesList',
     'generateAlbumNavAccent',
     'generateAlbumSidebar',
@@ -19,6 +18,7 @@ export default {
     'generateContributionList',
     'generatePageLayout',
     'generateRelativeDatetimestamp',
+    'generateTrackAdditionalNamesBox',
     'generateTrackCoverArtwork',
     'generateTrackList',
     'generateTrackListDividedByGroups',
@@ -111,10 +111,9 @@ export default {
       list: relation('generateAlbumAdditionalFilesList', album, additionalFiles),
     });
 
-    if (!empty(track.additionalNames)) {
-      relations.additionalNamesBox =
-        relation('generateAdditionalNamesBox', track.additionalNames);
-    }
+    // This'll take care of itself being blank if there's nothing to show here.
+    relations.additionalNamesBox =
+      relation('generateTrackAdditionalNamesBox', track);
 
     if (track.hasUniqueCoverArt || album.hasCoverArt) {
       relations.cover =
@@ -331,7 +330,7 @@ export default {
         title: language.$('trackPage.title', {track: data.name}),
         headingMode: 'sticky',
 
-        additionalNames: relations.additionalNamesBox ?? null,
+        additionalNames: relations.additionalNamesBox,
 
         color: data.color,
         styleRules: [relations.albumStyleRules],

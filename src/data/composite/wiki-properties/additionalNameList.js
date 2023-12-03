@@ -9,5 +9,6 @@ export default function() {
   return {
     flags: {update: true, expose: true},
     update: {validate: isAdditionalNameList},
+    expose: {transform: value => value ?? []},
   };
 }

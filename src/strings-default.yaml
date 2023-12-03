@@ -397,8 +397,12 @@ misc:
 
     item:
       _: "{NAME}"
-      withAnnotation: "{NAME} {ANNOTATION}"
-      annotation: "({ANNOTATION})"
+      withAccent: "{NAME} {ACCENT}"
+
+      accent:
+        withAnnotation: "({ANNOTATION})"
+        withAlbums: "(on {ALBUMS})"
+        withAnnotations.withAlbums: "({ANNOTATION}; on {ALBUMS})"
 
   # alt:
   #   Fallback text for the alt text of images and artworks - these

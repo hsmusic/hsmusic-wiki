@@ -992,7 +992,7 @@ h1 a[href="#additional-names-box"]:hover {
   margin-top: 0.5em;
 }
 
-#additional-names-box li .annotation {
+#additional-names-box li .accent {
   opacity: 0.8;
   display: inline-block;
 }
