@@ -1045,6 +1045,10 @@ img {
   object-fit: cover;
 }
 
+img.pixelate {
+  image-rendering: crisp-edges;
+}
+
 .reveal {
   position: relative;
   width: 100%;

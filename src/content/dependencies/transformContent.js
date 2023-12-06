@@ -369,14 +369,17 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {link, width, height} = node;
+            const {inline, link, width, height, pixelate} = node;
 
-            if (node.inline) {
+            if (inline) {
               return {
                 type: 'image',
                 inline: true,
                 data:
-                  html.tag('img', {src, width, height}),
+                  html.tag('img', {
+                    src, width, height,
+                    class: pixelate && 'pixelate',
+                  }),
               };
             }
 
@@ -393,6 +396,7 @@ export default {
                     width: width ?? null,
                     height: height ?? null,
                     thumb: slots.thumb,
+                    class: pixelate && 'pixelate',
                   })),
             };
           }

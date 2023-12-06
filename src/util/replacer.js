@@ -313,6 +313,11 @@ export function postprocessImages(inputNodes) {
         }
 
         imageNode.inline = (() => {
+          // Images can force themselves to be rendered inline using a custom
+          // attribute - this style just works better for certain embeds,
+          // usually jokes or small images.
+          if (attributes.get('inline')) return true;
+
           // If we've already determined we're in the middle of a line,
           // we're inline. (Of course!)
           if (!atStartOfLine) {
@@ -344,6 +349,7 @@ export function postprocessImages(inputNodes) {
         if (attributes.get('link')) imageNode.link = attributes.get('link');
         if (attributes.get('width')) imageNode.width = parseInt(attributes.get('width'));
         if (attributes.get('height')) imageNode.height = parseInt(attributes.get('height'));
+        if (attributes.get('pixelate')) imageNode.pixelate = true;
 
         outputNodes.push(imageNode);
 
