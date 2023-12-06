@@ -1,3 +1,4 @@
+import {spawn} from 'node:child_process';
 import * as http from 'node:http';
 import {readFile, stat} from 'node:fs/promises';
 import * as path from 'node:path';
@@ -45,6 +46,11 @@ export function getCLIOptions() {
       type: 'flag',
     },
 
+    'serve-sfx': {
+      help: `Plays the specified sound file once the HTTP server is ready (this requires mpv)`,
+      type: 'value',
+    },
+
     'skip-serving': {
       help: `Causes the build to exit when it would start serving over HTTP instead\n\nMainly useful for testing performance`,
       type: 'flag',
@@ -84,6 +90,7 @@ export async function go({
   const port = parseInt(cliOptions['port'] ?? defaultPort);
   const loudResponses = cliOptions['loud-responses'] ?? false;
   const skipServing = cliOptions['skip-serving'] ?? false;
+  const serveSFX = cliOptions['serve-sfx'] ?? null;
 
   const contentDependenciesWatcher = await watchContentDependencies();
   const {contentDependencies} = contentDependenciesWatcher;
@@ -400,6 +407,10 @@ export async function go({
     } else {
       logInfo`Suppressing [200] and [404] response logging.`
       logInfo`(Pass --loud-responses to show these.)`;
+    }
+
+    if (serveSFX) {
+      spawn('mpv', [serveSFX, '--volume=75']);
     }
   });
 
