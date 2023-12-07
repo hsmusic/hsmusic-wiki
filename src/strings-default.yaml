@@ -448,6 +448,31 @@ misc:
     # Combination of above.
     withContribution.withExternalLinks: "{ARTIST} ({CONTRIB}) ({LINKS})"
 
+  chronologicalList:
+    section:
+      generic:
+        withTimeframe: "Entries {TIMEFRAME}:"
+        dateless: "These entries aren't dated:"
+
+      album:
+        withTimeframe: "Albums released {TIMEFRAME}:"
+        dateless: "These albums aren't dated:"
+
+      track:
+        withTimeframe: "Tracks released {TIMEFRAME}:"
+        dateless: "These tracks aren't dated:"
+
+    item:
+      _: "{TITLE}"
+      withDate: "({DATE}) {TITLE}"
+
+  timeframe:
+    year: "during {YEAR}"
+    years: "from {EARLIER} through {LATER}"
+    month: "in {MONTH}"
+    months: "from {EARLIER} through {LATER}"
+    date: "on {DATE}"
+
   # chronology:
   #
   #   "Chronology links" are a section that appear in the nav bar for
