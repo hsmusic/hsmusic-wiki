@@ -96,6 +96,8 @@ export class Language extends Thing {
     // Expose only
 
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
+    intl_dateMonth: this.#intlHelper(Intl.DateTimeFormat, {month: 'long'}),
+    intl_dateMonthShort: this.#intlHelper(Intl.DateTimeFormat, {month: 'short'}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
     intl_listDisjunction: this.#intlHelper(Intl.ListFormat, {type: 'disjunction'}),
@@ -446,6 +448,20 @@ export class Language extends Thing {
   formatIndex(value) {
     this.assertIntlAvailable('intl_pluralOrdinal');
     return this.formatString('count.index.' + this.intl_pluralOrdinal.select(value), {index: value});
+  }
+
+  formatMonth(monthIndex, {style = 'long'} = {}) {
+    const date = new Date(1, monthIndex);
+    switch (style) {
+      case 'long':
+        this.assertIntlAvailable('intl_dateMonth');
+        return this.intl_dateMonth.format(date);
+      case 'short':
+        this.assertIntlAvailable('intl_dateMonthShort');
+        return this.intl_dateMonthShort.format(date);
+      default:
+        throw new Error(`Invalid style ${style}`);
+    }
   }
 
   formatNumber(value) {
