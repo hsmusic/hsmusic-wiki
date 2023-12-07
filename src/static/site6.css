@@ -848,6 +848,8 @@ ul > li.has-details {
   margin-left: -17px;
 }
 
+/* Old group layout... */
+
 .album-group-list dt {
   font-style: oblique;
   padding-left: 0;
@@ -860,6 +862,17 @@ ul > li.has-details {
 .group-chronology-link {
   font-style: oblique;
 }
+
+/* And new group layout */
+
+.chronological-album-list dt {
+  padding-left: 20px;
+}
+
+.chronological-album-list dd {
+  margin-left: 20px;
+}
+
 
 #content hr {
   border: 1px inset #808080;

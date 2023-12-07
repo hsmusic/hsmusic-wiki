@@ -1,8 +1,9 @@
-import {empty, stitchArrays} from '#sugar';
+import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
+    'generateChronologicalAlbumList',
     'generateColorStyleVariables',
     'generateContentHeading',
     'generateGroupNavLinks',
@@ -64,6 +65,7 @@ export default {
       sec.albums.galleryLink =
         relation('linkGroupGallery', group);
 
+      /*
       sec.albums.colorVariables =
         group.albums
           .map(() => relation('generateColorStyleVariables'));
@@ -85,6 +87,10 @@ export default {
           (album.date
             ? relation('generateAbsoluteDatetimestamp', album.date)
             : null));
+      */
+
+      sec.albums.list =
+        relation('generateChronologicalAlbumList', group.albums);
     }
 
     return relations;
@@ -140,6 +146,9 @@ export default {
                     .slot('content', language.$('groupInfoPage.viewAlbumGallery.link')),
               })),
 
+            sec.albums.list,
+
+            /*
             html.tag('ul',
               stitchArrays({
                 albumLink: sec.albums.albumLinks,
@@ -185,6 +194,7 @@ export default {
                       {style: colorVariables.slot('color', albumColor).content},
                       language.$(...parts, options)));
                 })),
+            */
           ],
         ],
 
