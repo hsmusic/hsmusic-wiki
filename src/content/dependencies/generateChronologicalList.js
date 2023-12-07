@@ -47,7 +47,12 @@ export default {
     const itemPrefix = 'misc.chronologicalList.item';
 
     const filteredItemDates = slots.itemDates.slice();
-    const filteredItemDatetimestamps = slots.itemDatetimestamps.slice();
+
+    const filteredItemDatetimestamps =
+      (slots.itemDatetimestamps
+        ? slots.itemDatetimestamps.slice()
+        : Array.from({length: slots.itemDates}, () => null));
+
     const filteredItemTitles = slots.itemTitles.slice();
 
     const {removed: [,, datelessItemTitles]} =
