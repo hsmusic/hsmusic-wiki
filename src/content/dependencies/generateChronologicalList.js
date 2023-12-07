@@ -26,7 +26,7 @@ export default {
     },
 
     itemDates: {
-      validate: v => v.strictArrayOf(v.isDate),
+      validate: v => v.strictArrayOf(v.optional(v.isDate)),
     },
 
     itemDatetimestamps: {
@@ -35,6 +35,10 @@ export default {
 
     itemTitles: {
       validate: v => v.strictArrayOf(v.isHTML),
+    },
+
+    collapseSections: {
+      validate: v => v.is('bar', 'invisible'),
     },
   },
 
@@ -141,6 +145,8 @@ export default {
         (datelessSectionTitle
           ? [...dateSectionItems, datelessSectionItems]
           : [...dateSectionItems]),
+
+      collapseSections: slots.collapseSections,
     });
   },
 };

@@ -32,8 +32,6 @@ export default {
     relations.chronologicalList.slots({
       string: 'album',
 
-      division: 'year',
-
       itemDates: data.dates,
 
       itemDatetimestamps:

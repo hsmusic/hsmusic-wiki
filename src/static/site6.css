@@ -848,6 +848,19 @@ ul > li.has-details {
   margin-left: -17px;
 }
 
+li[role=separator] {
+  list-style-type: none;
+  margin-left: -5px;
+}
+
+li[role=separator] hr {
+  max-width: 225px;
+  margin-left: 0;
+  border: none !important;
+  border-bottom: 1px dotted !important;
+  opacity: 0.8;
+}
+
 /* Old group layout... */
 
 .album-group-list dt {

@@ -146,7 +146,10 @@ export default {
                     .slot('content', language.$('groupInfoPage.viewAlbumGallery.link')),
               })),
 
-            sec.albums.list,
+            sec.albums.list.slots({
+              division: 'year',
+              collapseSections: 'bar',
+            }),
 
             /*
             html.tag('ul',
