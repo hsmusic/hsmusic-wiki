@@ -514,7 +514,7 @@ a:not([href]):hover {
   left: -10px;
 }
 
-li:not(:first-child:last-child) > .datetimestamp-tooltip,
+li:not(:first-child:last-child) > .datetimestamp .datetimestamp-tooltip,
 .offset-tooltips :not(:first-child:last-child) > .datetimestamp-tooltip {
   left: 14px;
 }
