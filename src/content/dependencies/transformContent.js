@@ -396,7 +396,7 @@ export default {
                     width: width ?? null,
                     height: height ?? null,
                     thumb: slots.thumb,
-                    class: pixelate && 'pixelate',
+                    class: pixelate ? 'pixelate' : null,
                   })),
             };
           }
