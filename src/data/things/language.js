@@ -98,6 +98,7 @@ export class Language extends Thing {
     intl_date: this.#intlHelper(Intl.DateTimeFormat, {full: true}),
     intl_dateMonth: this.#intlHelper(Intl.DateTimeFormat, {month: 'long'}),
     intl_dateMonthShort: this.#intlHelper(Intl.DateTimeFormat, {month: 'short'}),
+    intl_dateMonthDayShort: this.#intlHelper(Intl.DateTimeFormat, {month: '2-digit', day: '2-digit'}),
     intl_number: this.#intlHelper(Intl.NumberFormat),
     intl_listConjunction: this.#intlHelper(Intl.ListFormat, {type: 'conjunction'}),
     intl_listDisjunction: this.#intlHelper(Intl.ListFormat, {type: 'disjunction'}),
@@ -278,9 +279,17 @@ export class Language extends Thing {
         : arg));
   }
 
-  formatDate(date) {
-    this.assertIntlAvailable('intl_date');
-    return this.intl_date.format(date);
+  formatDate(date, {style = 'full'} = {}) {
+    switch (style) {
+      case 'full':
+        this.assertIntlAvailable('intl_date');
+        return this.intl_date.format(date);
+      case 'month-day-short':
+        this.assertIntlAvailable('intl_dateMonthDayShort');
+        return this.intl_dateMonthDayShort.format(date);
+      default:
+        throw new Error(`Invalid style ${style}`);
+    }
   }
 
   formatDateRange(startDate, endDate) {
