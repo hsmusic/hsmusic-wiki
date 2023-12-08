@@ -3,10 +3,17 @@ import {inspect} from 'node:util';
 import {decorateErrorWithIndex, openAggregate, withAggregate}
   from '#aggregate';
 import {colors} from '#cli';
-import {empty, filterProperties, stitchArrays, typeAppearance, unique}
-  from '#sugar';
 import {a} from '#validators';
 import {TupleMap} from '#wiki-data';
+
+import {
+  annotateFunction,
+  empty,
+  filterProperties,
+  stitchArrays,
+  typeAppearance,
+  unique,
+} from '#sugar';
 
 const globalCompositeCache = {};
 
@@ -487,7 +494,10 @@ export function templateCompositeFrom(description) {
     return instantiatedTemplate;
   };
 
+  annotateFunction(instantiate, {description: compositionName});
+
   instantiate.inputs = instantiate;
+  instantiate.description = description;
 
   return instantiate;
 }
