@@ -177,13 +177,19 @@ export function templateCompositeFrom(description) {
         const missingCallsToInput = [];
         const wrongCallsToInput = [];
 
+        const validCallsToInput = new Set([
+          'input',
+          'input.staticDependency',
+          'input.staticValue',
+        ]);
+
         for (const [name, value] of Object.entries(description.inputs)) {
           if (!isInputToken(value)) {
             missingCallsToInput.push(name);
             continue;
           }
 
-          if (!['input', 'input.staticDependency', 'input.staticValue'].includes(getInputTokenShape(value))) {
+          if (!validCallsToInput.has(getInputTokenShape(value))) {
             wrongCallsToInput.push(name);
           }
         }
@@ -241,11 +247,27 @@ export function templateCompositeFrom(description) {
         expectedInputNames
           .filter(name => !providedInputNames.includes(name))
           .filter(name => {
+            const inputShape = getInputTokenShape(description.inputs[name]);
             const inputDescription = getInputTokenValue(description.inputs[name]);
             if (!inputDescription) return true;
-            if ('defaultValue' in inputDescription) return false;
-            if ('defaultDependency' in inputDescription) return false;
-            return true;
+
+            switch (inputShape) {
+              case 'input':
+                if ('defaultValue' in inputDescription) return false;
+                if ('defaultDependency' in inputDescription) return false;
+                return true;
+
+              case 'input.staticValue':
+                if ('defaultValue' in inputDescription) return false;
+                return true;
+
+              case 'input.staticDependency':
+                if ('defaultDependency' in inputDescription) return false;
+                return true;
+
+              default:
+                return true;
+            }
           });
 
       const wrongTypeInputNames = [];
@@ -419,23 +441,58 @@ export function templateCompositeFrom(description) {
           finalDescription.update = ownUpdateDescription;
         }
 
+        function parseDefaultMappingFromInputDescription(inputDescription) {
+          const tokenShape = getInputTokenShape(inputDescription);
+          const tokenValue = getInputTokenValue(inputDescription);
+
+          switch (tokenShape) {
+            case 'input': {
+              const {defaultValue, defaultDependency} = tokenValue;
+
+              if (defaultValue)
+                return input.value(defaultValue);
+
+              if (defaultDependency)
+                return input.dependency(defaultDependency);
+
+              return input.value(null);
+            }
+
+            case 'input.staticValue': {
+              const {defaultValue} = tokenValue;
+
+              if (defaultValue)
+                return input.value(defaultValue);
+
+              return input.value(null);
+            }
+
+            case 'input.staticDependency': {
+              const {defaultDependency} = tokenValue;
+
+              if (defaultDependency)
+                return input.value(defaultDependency);
+
+              return input.value(null);
+            }
+
+            default:
+              return input.value(null);
+          }
+        }
+
         if ('inputs' in description) {
           const inputMapping = {};
 
           for (const [name, token] of Object.entries(description.inputs)) {
-            const tokenValue = getInputTokenValue(token);
             if (name in inputOptions) {
               if (typeof inputOptions[name] === 'string') {
                 inputMapping[name] = input.dependency(inputOptions[name]);
               } else {
                 inputMapping[name] = inputOptions[name];
               }
-            } else if (tokenValue.defaultValue) {
-              inputMapping[name] = input.value(tokenValue.defaultValue);
-            } else if (tokenValue.defaultDependency) {
-              inputMapping[name] = input.dependency(tokenValue.defaultDependency);
             } else {
-              inputMapping[name] = input.value(null);
+              inputMapping[name] = parseDefaultMappingFromInputDescription(token);
             }
           }
 
@@ -717,26 +774,39 @@ export function compositeFrom(description) {
     stepExposeDescriptions
       .map(expose => !!expose?.transform);
 
+  function parseDependenciesFromInputToken(inputToken) {
+    if (typeof inputToken === 'string') {
+      if (inputToken.startsWith('#')) {
+        return [];
+      } else {
+        return [inputToken];
+      }
+    }
+
+    const tokenShape = getInputTokenShape(inputToken);
+    const tokenValue = getInputTokenValue(inputToken);
+
+    switch (tokenShape) {
+      case 'input.dependency':
+        if (tokenValue.startsWith('#')) {
+          return [];
+        } else {
+          return [tokenValue];
+        }
+
+      case 'input.myself':
+        return ['this'];
+
+      default:
+        return [];
+    }
+  }
+
   const dependenciesFromSteps =
     unique(
       stepExposeDescriptions
         .flatMap(expose => expose?.dependencies ?? [])
-        .map(dependency => {
-          if (typeof dependency === 'string')
-            return (dependency.startsWith('#') ? null : dependency);
-
-          const tokenShape = getInputTokenShape(dependency);
-          const tokenValue = getInputTokenValue(dependency);
-          switch (tokenShape) {
-            case 'input.dependency':
-              return (tokenValue.startsWith('#') ? null : tokenValue);
-            case 'input.myself':
-              return 'this';
-            default:
-              return null;
-          }
-        })
-        .filter(Boolean));
+        .flatMap(parseDependenciesFromInputToken));
 
   const anyStepsUseUpdateValue =
     stepExposeDescriptions
@@ -898,6 +968,11 @@ export function compositeFrom(description) {
           }
         });
 
+    const inputDictionary =
+      Object.fromEntries(
+        stitchArrays({symbol: inputSymbols, value: inputValues})
+          .map(({symbol, value}) => [symbol, value]));
+
     withAggregate({message: `Errors in input values provided to ${compositionName}`}, ({push}) => {
       for (const {dynamic, name, value, description} of stitchArrays({
         dynamic: inputsMayBeDynamicValue,
@@ -921,6 +996,31 @@ export function compositeFrom(description) {
       debug(() => colors.bright(`begin composition - not transforming`));
     }
 
+    function filterDependencies(filterableDependencies, dependencies) {
+      const selectDependencies =
+        dependencies.map(dependency => {
+          if (!isInputToken(dependency)) return dependency;
+          const tokenShape = getInputTokenShape(dependency);
+          const tokenValue = getInputTokenValue(dependency);
+          switch (tokenShape) {
+            case 'input':
+            case 'input.staticDependency':
+            case 'input.staticValue':
+              return dependency;
+            case 'input.myself':
+              return input.myself();
+            case 'input.dependency':
+              return tokenValue;
+            case 'input.updateValue':
+              return input.updateValue();
+            default:
+              throw new Error(`Unexpected token ${tokenShape} as dependency`);
+          }
+        });
+
+      return filterProperties(filterableDependencies, selectDependencies);
+    }
+
     for (let i = 0; i < steps.length; i++) {
       const step = steps[i];
       const isBase = i === steps.length - 1;
@@ -931,6 +1031,16 @@ export function compositeFrom(description) {
           ? ` (base):`
           : ` of ${steps.length}:`),
         step]);
+
+      const filterableDependencies = Object.assign({}, ...[
+        availableDependencies,
+        inputMetadata,
+        inputDictionary,
+        (expectingTransform
+          ? {[input.updateValue()]: valueSoFar}
+          : {}),
+        {[input.myself()]: initialDependencies?.['this'] ?? null},
+      ]);
 
       const expose =
         (step.flags
@@ -969,45 +1079,8 @@ export function compositeFrom(description) {
 
       let continuationStorage;
 
-      const inputDictionary =
-        Object.fromEntries(
-          stitchArrays({symbol: inputSymbols, value: inputValues})
-            .map(({symbol, value}) => [symbol, value]));
-
-      const filterableDependencies = {
-        ...availableDependencies,
-        ...inputMetadata,
-        ...inputDictionary,
-        ...
-          (expectingTransform
-            ? {[input.updateValue()]: valueSoFar}
-            : {}),
-        [input.myself()]: initialDependencies?.['this'] ?? null,
-      };
-
-      const selectDependencies =
-        (expose.dependencies ?? []).map(dependency => {
-          if (!isInputToken(dependency)) return dependency;
-          const tokenShape = getInputTokenShape(dependency);
-          const tokenValue = getInputTokenValue(dependency);
-          switch (tokenShape) {
-            case 'input':
-            case 'input.staticDependency':
-            case 'input.staticValue':
-              return dependency;
-            case 'input.myself':
-              return input.myself();
-            case 'input.dependency':
-              return tokenValue;
-            case 'input.updateValue':
-              return input.updateValue();
-            default:
-              throw new Error(`Unexpected token ${tokenShape} as dependency`);
-          }
-        })
-
       const filteredDependencies =
-        filterProperties(filterableDependencies, selectDependencies);
+        filterDependencies(filterableDependencies, expose.dependencies ?? []);
 
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
