@@ -5,6 +5,7 @@ import {TupleMap} from '#wiki-data';
 import {a} from '#validators';
 
 import {
+  annotateFunction,
   decorateErrorWithIndex,
   empty,
   filterProperties,
@@ -492,7 +493,10 @@ export function templateCompositeFrom(description) {
     return instantiatedTemplate;
   };
 
+  annotateFunction(instantiate, {description: compositionName});
+
   instantiate.inputs = instantiate;
+  instantiate.description = description;
 
   return instantiate;
 }
