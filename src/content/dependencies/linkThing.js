@@ -9,15 +9,20 @@ export default {
   },
 
   data(pathKey, thing) {
-    return {
-      pathKey,
+    const data = {};
 
-      color: thing.color,
-      directory: thing.directory,
+    if (pathKey) {
+      data.pathKey = pathKey;
+      data.directory = thing.directory;
+    } else {
+      data.pathKey = null;
+    }
 
-      name: thing.name,
-      nameShort: thing.nameShort,
-    };
+    data.color = thing.color;
+    data.name = thing.name;
+    data.nameShort = thing.nameShort ?? thing.shortName;
+
+    return data;
   },
 
   slots: {
@@ -35,6 +40,8 @@ export default {
       default: true,
     },
 
+    path: {validate: v => v.validateArrayItems(v.isString)},
+
     anchor: {type: 'boolean', default: false},
     linkless: {type: 'boolean', default: false},
 
@@ -43,7 +50,12 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const path = [data.pathKey, data.directory];
+    const path =
+      (slots.path
+        ? slots.path
+     : data.pathKey
+        ? [data.pathKey, data.directory]
+        : null);
 
     const name =
       (slots.preferShortName
