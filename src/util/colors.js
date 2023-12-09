@@ -11,7 +11,7 @@ export function getColors(themeColor, {
   const primary = chroma(themeColor);
 
   const dark = primary.luminance(0.02);
-  const dim = primary.desaturate(2).darken(1.5);
+  const dim = primary.saturate(1.2).luminance(0.035);
   const dimGhost = dim.alpha(0.8);
   const light = chroma.average(['#ffffff', primary], 'rgb', [4, 1]);
 
