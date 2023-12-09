@@ -286,10 +286,6 @@ releaseInfo:
 
   tracksFeatured: "Tracks that {FLASH} features:"
 
-  artTags:
-    _: "Tags:"
-    inline: "{TAGS}"
-
   # Actions
 
   viewCommentary:
