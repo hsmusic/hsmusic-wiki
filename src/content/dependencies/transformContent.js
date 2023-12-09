@@ -6,32 +6,32 @@ import {Marked} from 'marked';
 export const replacerSpec = {
   'album': {
     find: 'album',
-    link: 'album',
+    link: 'linkAlbum',
   },
 
   'album-commentary': {
     find: 'album',
-    link: 'albumCommentary',
+    link: 'linkAlbumCommentary',
   },
 
   'album-gallery': {
     find: 'album',
-    link: 'albumGallery',
+    link: 'linkAlbumGallery',
   },
 
   'artist': {
     find: 'artist',
-    link: 'artist',
+    link: 'linkArtist',
   },
 
   'artist-gallery': {
     find: 'artist',
-    link: 'artistGallery',
+    link: 'linkArtistGallery',
   },
 
   'commentary-index': {
     find: null,
-    link: 'commentaryIndex',
+    link: 'linkCommentaryIndex',
   },
 
   'date': {
@@ -45,12 +45,12 @@ export const replacerSpec = {
 
   'flash-index': {
     find: null,
-    link: 'flashIndex',
+    link: 'linkFlashIndex',
   },
 
   'flash': {
     find: 'flash',
-    link: 'flash',
+    link: 'linkFlash',
     transformName(name, node, input) {
       const nextCharacter = input[node.iEnd];
       const lastCharacter = name[name.length - 1];
@@ -64,62 +64,62 @@ export const replacerSpec = {
 
   'flash-act': {
     find: 'flashAct',
-    link: 'flashAct',
+    link: 'linkFlashAct',
   },
 
   'group': {
     find: 'group',
-    link: 'groupInfo',
+    link: 'linkGroup',
   },
 
   'group-gallery': {
     find: 'group',
-    link: 'groupGallery',
+    link: 'linkGroupGallery',
   },
 
   'home': {
     find: null,
-    link: 'home',
+    link: 'linkWikiHome',
   },
 
   'listing-index': {
     find: null,
-    link: 'listingIndex',
+    link: 'linkListingIndex',
   },
 
   'listing': {
     find: 'listing',
-    link: 'listing',
+    link: 'linkListing',
   },
 
   'media': {
     find: null,
-    link: 'media',
+    link: 'linkPathFromMedia',
   },
 
   'news-index': {
     find: null,
-    link: 'newsIndex',
+    link: 'linkNewsIndex',
   },
 
   'news-entry': {
     find: 'newsEntry',
-    link: 'newsEntry',
+    link: 'linkNewsEntry',
   },
 
   'root': {
     find: null,
-    link: 'root',
+    link: 'linkPathFromRoot',
   },
 
   'site': {
     find: null,
-    link: 'site',
+    link: 'linkPathFromSite',
   },
 
   'static': {
     find: 'staticPage',
-    link: 'staticPage',
+    link: 'linkStaticPage',
   },
 
   'string': {
@@ -130,44 +130,13 @@ export const replacerSpec = {
 
   'tag': {
     find: 'artTag',
-    link: 'tag',
+    link: 'linkArtTag',
   },
 
   'track': {
     find: 'track',
-    link: 'track',
+    link: 'linkTrackDynamically',
   },
-};
-
-const linkThingRelationMap = {
-  album: 'linkAlbum',
-  albumCommentary: 'linkAlbumCommentary',
-  albumGallery: 'linkAlbumGallery',
-  artist: 'linkArtist',
-  artistGallery: 'linkArtistGallery',
-  flash: 'linkFlash',
-  flashAct: 'linkFlashAct',
-  groupInfo: 'linkGroup',
-  groupGallery: 'linkGroupGallery',
-  listing: 'linkListing',
-  newsEntry: 'linkNewsEntry',
-  staticPage: 'linkStaticPage',
-  tag: 'linkArtTag',
-  track: 'linkTrackDynamically',
-};
-
-const linkValueRelationMap = {
-  media: 'linkPathFromMedia',
-  root: 'linkPathFromRoot',
-  site: 'linkPathFromSite',
-};
-
-const linkIndexRelationMap = {
-  commentaryIndex: 'linkCommentaryIndex',
-  flashIndex: 'linkFlashIndex',
-  home: 'linkWikiHome',
-  listingIndex: 'linkListingIndex',
-  newsIndex: 'linkNewsIndex',
 };
 
 const commonMarkedOptions = {
@@ -199,9 +168,10 @@ function getPlaceholder(node, content) {
 
 export default {
   contentDependencies: [
-    ...Object.values(linkThingRelationMap),
-    ...Object.values(linkValueRelationMap),
-    ...Object.values(linkIndexRelationMap),
+    ...(
+      Object.values(replacerSpec)
+        .map(description => description.link)
+        .filter(Boolean)),
     'image',
   ],
 
@@ -235,7 +205,7 @@ export default {
           }
 
           if (spec.link) {
-            let data = {key: spec.link};
+            let data = {link: spec.link};
 
             determineData: {
               // No value at all: this is an index link.
@@ -337,14 +307,14 @@ export default {
         nodes
           .filter(({type}) => type === 'link')
           .map(node => {
-            const {key, thing, value} = node.data;
+            const {link, thing, value} = node.data;
 
             if (thing) {
-              return relationOrPlaceholder(node, linkThingRelationMap[key], thing);
+              return relationOrPlaceholder(node, link, thing);
             } else if (value && value !== '-') {
-              return relationOrPlaceholder(node, linkValueRelationMap[key], value);
+              return relationOrPlaceholder(node, link, value);
             } else {
-              return relationOrPlaceholder(node, linkIndexRelationMap[key]);
+              return relationOrPlaceholder(node, link);
             }
           }),
 
