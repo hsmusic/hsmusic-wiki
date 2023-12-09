@@ -4,31 +4,37 @@ import {parseInput} from '#replacer';
 import {Marked} from 'marked';
 
 export const replacerSpec = {
-  album: {
+  'album': {
     find: 'album',
     link: 'album',
   },
+
   'album-commentary': {
     find: 'album',
     link: 'albumCommentary',
   },
+
   'album-gallery': {
     find: 'album',
     link: 'albumGallery',
   },
-  artist: {
+
+  'artist': {
     find: 'artist',
     link: 'artist',
   },
+
   'artist-gallery': {
     find: 'artist',
     link: 'artistGallery',
   },
+
   'commentary-index': {
     find: null,
     link: 'commentaryIndex',
   },
-  date: {
+
+  'date': {
     find: null,
     value: (ref) => new Date(ref),
     html: (date, {html, language}) =>
@@ -36,11 +42,13 @@ export const replacerSpec = {
         {datetime: date.toUTCString()},
         language.formatDate(date)),
   },
+
   'flash-index': {
     find: null,
     link: 'flashIndex',
   },
-  flash: {
+
+  'flash': {
     find: 'flash',
     link: 'flash',
     transformName(name, node, input) {
@@ -53,64 +61,79 @@ export const replacerSpec = {
       }
     },
   },
+
   'flash-act': {
     find: 'flashAct',
     link: 'flashAct',
   },
-  group: {
+
+  'group': {
     find: 'group',
     link: 'groupInfo',
   },
+
   'group-gallery': {
     find: 'group',
     link: 'groupGallery',
   },
-  home: {
+
+  'home': {
     find: null,
     link: 'home',
   },
+
   'listing-index': {
     find: null,
     link: 'listingIndex',
   },
-  listing: {
+
+  'listing': {
     find: 'listing',
     link: 'listing',
   },
-  media: {
+
+  'media': {
     find: null,
     link: 'media',
   },
+
   'news-index': {
     find: null,
     link: 'newsIndex',
   },
+
   'news-entry': {
     find: 'newsEntry',
     link: 'newsEntry',
   },
-  root: {
+
+  'root': {
     find: null,
     link: 'root',
   },
-  site: {
+
+  'site': {
     find: null,
     link: 'site',
   },
-  static: {
+
+  'static': {
     find: 'staticPage',
     link: 'staticPage',
   },
-  string: {
+
+  'string': {
     find: null,
     value: (ref) => ref,
     html: (ref, {language, args}) => language.$(ref, args),
   },
-  tag: {
+
+  'tag': {
     find: 'artTag',
     link: 'tag',
   },
-  track: {
+
+  'track': {
     find: 'track',
     link: 'track',
   },
