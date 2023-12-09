@@ -779,16 +779,16 @@ export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
       ])
       .filter(Boolean),
 
-    wikiData.trackData
-      .filter(track => track.hasUniqueCoverArt)
-      .map(track => fromRoot.to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension)),
-
     wikiData.artistData
       .filter(artist => artist.hasAvatar)
       .map(artist => fromRoot.to('media.artistAvatar', artist.directory, artist.avatarFileExtension)),
 
     wikiData.flashData
       .map(flash => fromRoot.to('media.flashArt', flash.directory, flash.coverArtFileExtension)),
+
+    wikiData.trackData
+      .filter(track => track.hasUniqueCoverArt)
+      .map(track => fromRoot.to('media.trackCover', track.album.directory, track.directory, track.coverArtFileExtension)),
   ].flat();
 
   sortByName(paths, {getName: path => path});
