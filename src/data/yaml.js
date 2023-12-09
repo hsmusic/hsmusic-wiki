@@ -44,14 +44,13 @@ function inspect(value, opts = {}) {
 
 // --> YAML data repository structure constants
 
-export const WIKI_INFO_FILE = 'wiki-info.yaml';
-export const BUILD_DIRECTIVE_DATA_FILE = 'build-directives.yaml';
-export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
+export const ART_TAG_DATA_FILE = 'tags.yaml';
 export const ARTIST_DATA_FILE = 'artists.yaml';
 export const FLASH_DATA_FILE = 'flashes.yaml';
-export const NEWS_DATA_FILE = 'news.yaml';
-export const ART_TAG_DATA_FILE = 'tags.yaml';
 export const GROUP_DATA_FILE = 'groups.yaml';
+export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
+export const NEWS_DATA_FILE = 'news.yaml';
+export const WIKI_INFO_FILE = 'wiki-info.yaml';
 
 export const DATA_ALBUM_DIRECTORY = 'album';
 export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
@@ -1538,7 +1537,63 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 export function linkWikiDataArrays(wikiData, {
   XXX_decacheWikiData = false,
 } = {}) {
-  function assignWikiData(things, ...keys) {
+  const linkWikiDataSpec = new Map([
+    [wikiData.albumData, [
+      'artTagData',
+      'artistData',
+      'groupData',
+    ]],
+
+    [wikiData.artTagData, [
+      'albumData',
+      'trackData',
+    ]],
+
+    [wikiData.artistData, [
+      'albumData',
+      'artistData',
+      'flashData',
+      'trackData',
+    ]],
+
+    [wikiData.flashData, [
+      'artistData',
+      'flashActData',
+      'trackData',
+    ]],
+
+    [wikiData.flashActData, [
+      'flashData',
+    ]],
+
+    [wikiData.groupData, [
+      'albumData',
+      'groupCategoryData',
+    ]],
+
+    [wikiData.groupCategoryData, [
+      'groupData',
+    ]],
+
+    [wikiData.homepageLayout?.rows, [
+      'albumData',
+      'groupData',
+    ]],
+
+    [wikiData.trackData, [
+      'albumData',
+      'artTagData',
+      'artistData',
+      'flashData',
+      'trackData',
+    ]],
+
+    [[wikiData.wikiInfo], [
+      'groupData',
+    ]],
+  ]);
+
+  for (const [things, keys] of linkWikiDataSpec.entries()) {
     if (things === undefined) return;
     for (let i = 0; i < things.length; i++) {
       const thing = things[i];
@@ -1550,20 +1605,6 @@ export function linkWikiDataArrays(wikiData, {
       }
     }
   }
-
-  const WD = wikiData;
-
-  assignWikiData([WD.wikiInfo], 'groupData');
-
-  assignWikiData(WD.albumData, 'artistData', 'artTagData', 'groupData');
-  assignWikiData(WD.trackData, 'albumData', 'artistData', 'artTagData', 'flashData', 'trackData');
-  assignWikiData(WD.artistData, 'albumData', 'artistData', 'flashData', 'trackData');
-  assignWikiData(WD.groupData, 'albumData', 'groupCategoryData');
-  assignWikiData(WD.groupCategoryData, 'groupData');
-  assignWikiData(WD.flashData, 'artistData', 'flashActData', 'trackData');
-  assignWikiData(WD.flashActData, 'flashData');
-  assignWikiData(WD.artTagData, 'albumData', 'trackData');
-  assignWikiData(WD.homepageLayout?.rows, 'albumData', 'groupData');
 }
 
 export function sortWikiDataArrays(wikiData) {
@@ -1667,10 +1708,6 @@ export function filterDuplicateDirectories(wikiData) {
 // data array.
 export function filterReferenceErrors(wikiData) {
   const referenceSpec = [
-    ['wikiInfo', processWikiInfoDocument, {
-      divideTrackListsByGroups: 'group',
-    }],
-
     ['albumData', processAlbumDocument, {
       artistContribs: '_contrib',
       coverArtistContribs: '_contrib',
@@ -1679,17 +1716,6 @@ export function filterReferenceErrors(wikiData) {
       bannerArtistContribs: '_contrib',
       groups: 'group',
       artTags: 'artTag',
-      commentary: '_commentary',
-    }],
-
-    ['trackData', processTrackDocument, {
-      artistContribs: '_contrib',
-      contributorContribs: '_contrib',
-      coverArtistContribs: '_contrib',
-      referencedTracks: '_trackNotRerelease',
-      sampledTracks: '_trackNotRerelease',
-      artTags: 'artTag',
-      originalReleaseTrack: '_trackNotRerelease',
       commentary: '_commentary',
     }],
 
@@ -1709,6 +1735,21 @@ export function filterReferenceErrors(wikiData) {
 
     ['flashActData', processFlashActDocument, {
       flashes: 'flash',
+    }],
+
+    ['trackData', processTrackDocument, {
+      artistContribs: '_contrib',
+      contributorContribs: '_contrib',
+      coverArtistContribs: '_contrib',
+      referencedTracks: '_trackNotRerelease',
+      sampledTracks: '_trackNotRerelease',
+      artTags: 'artTag',
+      originalReleaseTrack: '_trackNotRerelease',
+      commentary: '_commentary',
+    }],
+
+    ['wikiInfo', processWikiInfoDocument, {
+      divideTrackListsByGroups: 'group',
     }],
   ];
 
