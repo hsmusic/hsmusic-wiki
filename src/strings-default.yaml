@@ -288,7 +288,7 @@ releaseInfo:
 
   artTags:
     _: "Tags:"
-    inline: "Tags: {TAGS}"
+    inline: "{TAGS}"
 
   # Actions
 

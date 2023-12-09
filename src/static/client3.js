@@ -145,6 +145,34 @@ function dispatchInternalEvent(event, eventName, ...args) {
   return results;
 }
 
+// CSS compatibility-assistant ----------------------------
+
+const cssCompatibilityAssistantInfo = clientInfo.cssCompatibilityAssistantInfo = {
+  coverArtContainer: null,
+  coverArtImageDetails: null,
+};
+
+function getCSSCompatibilityAssistantInfoReferences() {
+  const info = cssCompatibilityAssistantInfo;
+
+  info.coverArtContainer =
+    document.getElementById('cover-art-container');
+
+  info.coverArtImageDetails =
+    info.coverArtContainer?.querySelector('.image-details');
+}
+
+function mutateCSSCompatibilityContent() {
+  const info = cssCompatibilityAssistantInfo;
+
+  if (info.coverArtImageDetails) {
+    info.coverArtContainer.classList.add('has-image-details');
+  }
+}
+
+clientSteps.getPageReferences.push(getCSSCompatibilityAssistantInfoReferences);
+clientSteps.mutatePageContent.push(mutateCSSCompatibilityContent);
+
 // JS-based links -----------------------------------------
 
 const scriptedLinkInfo = initInfo('scriptedLinkInfo', {

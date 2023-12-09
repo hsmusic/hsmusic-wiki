@@ -57,14 +57,12 @@ export default {
           }),
 
           !empty(relations.tagLinks) &&
-            html.tag('p',
-              language.$('releaseInfo.artTags.inline', {
-                tags:
-                  language.formatUnitList(
-                    relations.tagLinks
-                      .map(tagLink => tagLink.slot('preferShortName', true))),
-              })),
-          ]);
+            html.tag('ul', {class: 'image-details'},
+              relations.tagLinks
+                .map(tagLink =>
+                  html.tag('li',
+                    tagLink.slot('preferShortName', true)))),
+        ]);
 
       case 'thumbnail':
         return relations.image.slots({
