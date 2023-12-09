@@ -2,8 +2,9 @@ import {spawn} from 'node:child_process';
 import * as http from 'node:http';
 import {readFile, stat} from 'node:fs/promises';
 import * as path from 'node:path';
+import {inspect as nodeInspect} from 'node:util';
 
-import {logInfo, logWarn, progressCallAll} from '#cli';
+import {ENABLE_COLOR, logInfo, logWarn, progressCallAll} from '#cli';
 import {watchContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
@@ -23,6 +24,10 @@ const defaultHost = '0.0.0.0';
 const defaultPort = 8002;
 
 export const description = `Hosts a local HTTP server which generates page content as it is requested, instead of all at once; reacts to changes in data files, so new reloads will be up-to-date with on-disk YAML data (<- not implemented yet, check back soon!)\n\nIntended for local development ONLY; this custom HTTP server is NOT rigorously tested and almost certainly has security flaws`;
+
+function inspect(value, opts = {}) {
+  return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
+}
 
 export function getCLIOptions() {
   return {
@@ -82,7 +87,7 @@ export async function go({
     if (error instanceof AggregateError && niceShowAggregate) {
       niceShowAggregate(error);
     } else {
-      console.error(error);
+      console.error(inspect(error, {depth: Infinity}));
     }
   };
 
