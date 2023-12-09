@@ -258,7 +258,11 @@ export default {
       }, [
         titleHTML,
 
-        slots.cover,
+        html.tag('div', {
+          [html.onlyIfContent]: true,
+          id: 'cover-art-container',
+        }, slots.cover),
+
         slots.additionalNames,
 
         html.tag('div',
