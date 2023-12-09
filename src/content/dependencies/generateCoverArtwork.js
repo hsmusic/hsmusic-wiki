@@ -44,7 +44,7 @@ export default {
   generate(relations, slots, {html, language}) {
     switch (slots.mode) {
       case 'primary':
-        return html.tag('div', {id: 'cover-art-container'}, [
+        return html.tags([
           relations.image.slots({
             path: slots.path,
             alt: slots.alt,
