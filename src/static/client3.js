@@ -1491,7 +1491,7 @@ function updateStickyCoverVisibility(index) {
   const contentCover = info.contentCovers[index];
 
   if (contentCover && stickyCoverContainer) {
-    if (contentCover.getBoundingClientRect().bottom < 0) {
+    if (contentCover.getBoundingClientRect().bottom < 4) {
       stickyCoverContainer.classList.add('visible');
     } else {
       stickyCoverContainer.classList.remove('visible');

@@ -1625,6 +1625,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 .content-sticky-heading-cover-container:not(.visible) .content-sticky-heading-cover {
   opacity: 0;
   transform: translateY(15px);
+  transition: transform 0.35s, opacity 0.30s;
 }
 
 .content-sticky-heading-cover .image-container {
