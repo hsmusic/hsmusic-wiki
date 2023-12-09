@@ -45,17 +45,16 @@ export default {
     switch (slots.mode) {
       case 'primary':
         return html.tag('div', {id: 'cover-art-container'}, [
-          relations.image
-            .slots({
-              path: slots.path,
-              alt: slots.alt,
-              color: slots.color,
-              thumb: 'medium',
-              id: 'cover-art',
-              reveal: true,
-              link: true,
-              square: true,
-            }),
+          relations.image.slots({
+            path: slots.path,
+            alt: slots.alt,
+            color: slots.color,
+            thumb: 'medium',
+            id: 'cover-art',
+            reveal: true,
+            link: true,
+            square: true,
+          }),
 
           !empty(relations.tagLinks) &&
             html.tag('p',
@@ -68,30 +67,28 @@ export default {
           ]);
 
       case 'thumbnail':
-        return relations.image
-          .slots({
-            path: slots.path,
-            alt: slots.alt,
-            color: slots.color,
-            thumb: 'small',
-            reveal: false,
-            link: false,
-            square: true,
-          });
+        return relations.image.slots({
+          path: slots.path,
+          alt: slots.alt,
+          color: slots.color,
+          thumb: 'small',
+          reveal: false,
+          link: false,
+          square: true,
+        });
 
       case 'commentary':
-        return relations.image
-          .slots({
-            path: slots.path,
-            alt: slots.alt,
-            color: slots.color,
-            thumb: 'medium',
-            class: 'commentary-art',
-            reveal: true,
-            link: true,
-            square: true,
-            lazy: true,
-          });
+        return relations.image.slots({
+          path: slots.path,
+          alt: slots.alt,
+          color: slots.color,
+          thumb: 'medium',
+          class: 'commentary-art',
+          reveal: true,
+          link: true,
+          square: true,
+          lazy: true,
+        });
 
       default:
         return html.blank();
