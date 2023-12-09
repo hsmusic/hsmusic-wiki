@@ -4,8 +4,9 @@ import * as repl from 'node:repl';
 import {fileURLToPath} from 'node:url';
 
 import {logError, logWarn, parseOptions} from '#cli';
-import {isMain} from '#node-utils';
+import {debugComposite} from '#composite';
 import {internalDefaultStringsFile, processLanguageFile} from '#language';
+import {isMain} from '#node-utils';
 import {bindOpts, showAggregate} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {quickLoadAllFromYAML} from '#yaml';
@@ -63,6 +64,7 @@ export async function getContextAssignments({
     ...thingConstructors,
     CacheableObject,
     language,
+    debugComposite,
 
     ...sugar,
     ...wikiDataUtils,
