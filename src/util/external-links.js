@@ -250,6 +250,18 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'music.deconreconstruction.com'},
+    platform: 'deconreconstruction.music',
+    icon: 'globe',
+  },
+
+  {
+    match: {domain: 'deconreconstruction.com'},
+    platform: 'deconreconstruction',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: 'deviantart.com'},
     platform: 'deviantart',
     icon: 'deviantart',

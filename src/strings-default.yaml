@@ -503,6 +503,10 @@ misc:
       _: "bgreco.net"
       flash: "bgreco.net (high quality audio)"
 
+    deconreconstruction:
+      _: "Deconreconstruction"
+      music: "MUSIC@DCRC"
+
     deviantart: "DeviantArt"
 
     homestuck:
