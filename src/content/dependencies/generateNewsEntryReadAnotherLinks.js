@@ -88,7 +88,10 @@ export default {
       html.tag('p', {
         [html.onlyIfContent]: true,
         [html.joinChildren]: html.tag('br'),
-        class: ['read-another-links', 'offset-tooltips'],
+        class: [
+          'read-another-links',
+          entryLines.length > 1 && 'offset-tooltips',
+        ],
       }, entryLines));
   },
 };
