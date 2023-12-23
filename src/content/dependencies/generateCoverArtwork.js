@@ -2,7 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: ['image', 'linkArtTag'],
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['html'],
 
   relations(relation, artTags) {
     const relations = {};
@@ -41,7 +41,7 @@ export default {
     },
   },
 
-  generate(relations, slots, {html, language}) {
+  generate(relations, slots, {html}) {
     switch (slots.mode) {
       case 'primary':
         return html.tags([
