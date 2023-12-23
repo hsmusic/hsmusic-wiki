@@ -133,9 +133,9 @@ const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
   randomLinks: null,
   revealLinks: null,
 
-  nextLink: null,
-  previousLink: null,
-  randomLink: null,
+  nextNavLink: null,
+  previousNavLink: null,
+  randomNavLink: null,
 
   state: {
     albumDirectories: null,
