@@ -6,7 +6,14 @@ export default {
     'generatePageSidebarConjoinedBox',
   ],
 
-  relations: (relation, album, track) => ({
+  query: (album, track) => ({
+    groups:
+      (track
+        ? track.groups
+        : album.groups),
+  }),
+
+  relations: (relation, query, album, track) => ({
     sidebar:
       relation('generatePageSidebar'),
 
@@ -17,11 +24,11 @@ export default {
       relation('generateAlbumSidebarTrackListBox', album, track),
 
     groupBoxes:
-      album.groups.map(group =>
+      query.groups.map(group =>
         relation('generateAlbumSidebarGroupBox', album, group)),
   }),
 
-  data: (album, track) => ({
+  data: (query, album, track) => ({
     isAlbumPage: !track,
   }),
 
