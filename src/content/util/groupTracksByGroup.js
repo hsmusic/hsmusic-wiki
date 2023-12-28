@@ -5,11 +5,15 @@ export default function groupTracksByGroup(tracks, groups) {
   lists.set('other', []);
 
   for (const track of tracks) {
-    const group = groups.find(group => group.albums.includes(track.album));
-    if (group) {
-      lists.get(group).push(track);
-    } else {
+    const containingGroups =
+      groups.filter(group => group.albums.includes(track.album));
+
+    if (empty(containingGroups)) {
       lists.get('other').push(track);
+    } else {
+      for (const group of containingGroups) {
+        lists.get(group).push(track);
+      }
     }
   }
 
