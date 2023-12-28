@@ -194,6 +194,7 @@ export function filterReferenceErrors(wikiData, {
       coverArtistContribs: '_contrib',
       referencedTracks: '_trackNotRerelease',
       sampledTracks: '_trackNotRerelease',
+      groups: 'group',
       artTags: '_artTag',
       originalReleaseTrack: '_trackNotRerelease',
       commentary: '_commentary',

@@ -968,6 +968,7 @@ export function linkWikiDataArrays(wikiData) {
       'artTagData',
       'artistData',
       'flashData',
+      'groupData',
       'trackData',
     ]],
 

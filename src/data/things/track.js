@@ -5,8 +5,14 @@ import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
-import {isColor, isContributionList, isDate, isFileExtension}
-  from '#validators';
+
+import {
+  isColor,
+  isContributionList,
+  isDate,
+  isFileExtension,
+  validateReferenceList,
+} from '#validators';
 
 import {
   parseAdditionalFiles,
@@ -18,7 +24,8 @@ import {
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {withResolvedContribs} from '#composite/wiki-data';
+import {withResolvedContribs, withResolvedReferenceList}
+  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -66,7 +73,13 @@ import {
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    ArtTag,
+    Artist,
+    Flash,
+    Group,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Track'),
@@ -279,6 +292,30 @@ export class Track extends Thing {
       }),
     ],
 
+    groups: [
+      withResolvedReferenceList({
+        list: input.updateValue({
+          validate: validateReferenceList(Group[Thing.referenceType]),
+        }),
+
+        find: input.value(find.group),
+        data: 'groupData',
+      }),
+
+      exposeDependencyOrContinue({
+        dependency: '#resolvedReferenceList',
+        mode: input.value('empty'),
+      }),
+
+      withPropertyFromAlbum({
+        property: input.value('groups'),
+      }),
+
+      exposeDependency({
+        dependency: '#album.groups',
+      }),
+    ],
+
     artTags: [
       exitWithoutUniqueCoverArt({
         value: input.value([]),
@@ -307,6 +344,10 @@ export class Track extends Thing {
 
     flashData: wikiData({
       class: input.value(Flash),
+    }),
+
+    groupData: wikiData({
+      class: input.value(Group),
     }),
 
     trackData: wikiData({
@@ -451,6 +492,7 @@ export class Track extends Thing {
         transform: parseContributors,
       },
 
+      'Groups': {property: 'groups'},
       'Art Tags': {property: 'artTags'},
 
       'Review Points': {ignore: true},
