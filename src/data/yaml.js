@@ -1594,11 +1594,10 @@ export function linkWikiDataArrays(wikiData, {
   ]);
 
   for (const [things, keys] of linkWikiDataSpec.entries()) {
-    if (things === undefined) return;
-    for (let i = 0; i < things.length; i++) {
-      const thing = things[i];
-      for (let j = 0; j < keys.length; j++) {
-        const key = keys[j];
+    if (things === undefined) continue;
+    for (const thing of things) {
+      if (thing === undefined) continue;
+      for (const key of keys) {
         if (!(key in wikiData)) continue;
         if (XXX_decacheWikiData) thing[key] = [];
         thing[key] = wikiData[key];
