@@ -162,6 +162,7 @@ export function filterReferenceErrors(wikiData, {
       wallpaperArtistContribs: '_contrib',
       bannerArtistContribs: '_contrib',
       groups: 'group',
+      trackGroups: 'group',
       artTags: '_artTag',
       commentary: '_commentary',
     }],

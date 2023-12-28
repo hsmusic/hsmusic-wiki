@@ -308,11 +308,11 @@ export class Track extends Thing {
       }),
 
       withPropertyFromAlbum({
-        property: input.value('groups'),
+        property: input.value('trackGroups'),
       }),
 
       exposeDependency({
-        dependency: '#album.groups',
+        dependency: '#album.trackGroups',
       }),
     ],
 
