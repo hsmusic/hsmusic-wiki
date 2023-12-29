@@ -22,6 +22,16 @@ const clientSteps = {
 function initInfo(key, description) {
   const object = {...description};
 
+  for (const obj of [
+    object,
+    object.state,
+    object.setting,
+    object.event,
+  ]) {
+    if (!obj) continue;
+    Object.preventExtensions(obj);
+  }
+
   clientInfo[key] = object;
 
   return object;
