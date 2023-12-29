@@ -6,19 +6,17 @@
  */
 'use strict'
 exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (snapshot) > display: primary 1`] = `
-<div id="cover-art-container">
-    [mocked: image
-     args: [
-       [
-         { name: 'Damara', directory: 'damara', isContentWarning: false },
-         { name: 'Cronus', directory: 'cronus', isContentWarning: false },
-         { name: 'Bees', directory: 'bees', isContentWarning: false },
-         { name: 'creepy crawlies', isContentWarning: true }
-       ]
-     ]
-     slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
-    <p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
-</div>
+[mocked: image
+ args: [
+   [
+     { name: 'Damara', directory: 'damara', isContentWarning: false },
+     { name: 'Cronus', directory: 'cronus', isContentWarning: false },
+     { name: 'Bees', directory: 'bees', isContentWarning: false },
+     { name: 'creepy crawlies', isContentWarning: true }
+   ]
+ ]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+<p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
 `
 
 exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (snapshot) > display: thumbnail 1`] = `
