@@ -1,8 +1,8 @@
 import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
 
-import {isLanguageCode} from '#validators';
-import {Tag} from '#html';
+import * as html from '#html';
 import {empty, withAggregate} from '#sugar';
+import {isLanguageCode} from '#validators';
 
 import {
   getExternalLinkStringOfStyleFromDescriptors,
@@ -274,8 +274,11 @@ export class Language extends Thing {
   // content is a string *that may contain HTML* and doesn't need to
   // sanitized any further. It'll still .toString() to just the string
   // contents, if needed.
-  #wrapSanitized(output) {
-    return new Tag(null, null, output);
+  #wrapSanitized(content) {
+    return html.tags(content, {
+      [html.joinChildren]: '',
+      [html.noEdgeWhitespace]: true,
+    });
   }
 
   // Similar to the above internal methods, but this one is public.
@@ -296,7 +299,7 @@ export class Language extends Thing {
 
     return (
       (typeof arg === 'string'
-        ? new Tag(null, null, escapeHTML(arg))
+        ? this.#wrapSanitized(escapeHTML(arg))
         : arg));
   }
 
