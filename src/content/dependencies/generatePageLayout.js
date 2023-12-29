@@ -368,24 +368,34 @@ export default {
                       break;
                   }
 
-                  content =
-                    html.tag('a', {href}, title);
+                  content = html.tag('a',
+                    {href},
+                    title);
                 }
 
+                const showAsCurrent =
+                  cur.current ||
+                  cur.auto === 'current' ||
+                  (slots.navLinkStyle === 'hierarchical' &&
+                    i === slots.navLinks.length - 1);
+
                 return (
-                  html.tag('span',
-                    cur.current &&
+                  html.tag('span', {class: 'nav-link'},
+                    showAsCurrent &&
                       {class: 'current'},
 
-                    cur.auto === 'current' &&
-                      {class: 'current'},
-
-                    slots.navLinkStyle === 'hierarchical' &&
-                    i === slots.navLinks.length - 1 &&
-                      {class: 'current'},
+                    i > 0 &&
+                      {class: 'has-divider'},
 
                     [
                       html.tag('span', {class: 'nav-link-content'},
+                        // Use inline-block styling on the content span,
+                        // rather than wrapping the whole nav-link in a proper
+                        // blockwrap, so that if the content spans multiple
+                        // lines, it'll kick the accent down beneath it.
+                        i > 0 &&
+                          {class: 'blockwrap'},
+
                         content),
 
                       html.tag('span', {class: 'nav-link-accent'},

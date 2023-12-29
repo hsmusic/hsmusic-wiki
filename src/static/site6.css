@@ -468,21 +468,21 @@ a:not([href]):hover {
   text-decoration: none;
 }
 
-.nav-main-links > span > span {
-  white-space: nowrap;
-}
-
-.nav-main-links > span.current > span.nav-link-content > a {
+.nav-main-links .nav-link.current > span.nav-link-content > a {
   font-weight: 800;
 }
 
-.nav-links-index > span:not(:first-child):not(.no-divider)::before,
-.nav-links-groups > span:not(:first-child):not(.no-divider)::before {
+.nav-main-links .nav-link-accent {
+  display: inline-block;
+}
+
+.nav-links-index .nav-link.has-divider::before,
+.nav-links-groups .nav-link.has-divider::before {
   content: "\0020\00b7\0020";
   font-weight: 800;
 }
 
-.nav-links-hierarchical > span:not(:first-child):not(.no-divider)::before {
+.nav-links-hierarchical .nav-link.has-divider::before {
   content: "\0020/\0020";
 }
 
