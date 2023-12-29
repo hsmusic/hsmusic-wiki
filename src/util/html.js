@@ -397,14 +397,27 @@ export class Tag {
     const joiner =
       (this.joinChildren === undefined
         ? '\n'
-        : (this.joinChildren === ''
-            ? ''
-            : `\n${this.joinChildren}\n`));
+     : this.joinChildren === ''
+        ? ''
+        : `\n${this.joinChildren}\n`);
 
-    return this.content
-      .map(item => item.toString())
-      .filter(Boolean)
-      .join(joiner);
+    let content = '';
+
+    for (const [index, item] of this.content.entries()) {
+      const itemContent = item.toString();
+
+      if (!itemContent) {
+        continue;
+      }
+
+      if (content) {
+        content += joiner;
+      }
+
+      content += itemContent;
+    }
+
+    return content;
   }
 
   static normalize(content) {
