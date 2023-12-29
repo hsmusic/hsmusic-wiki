@@ -2,6 +2,7 @@ import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
 
 import {isLanguageCode} from '#validators';
 import {Tag} from '#html';
+import {empty, withAggregate} from '#sugar';
 
 import {
   getExternalLinkStringOfStyleFromDescriptors,
@@ -188,13 +189,42 @@ export class Language extends Thing {
 
     const template = this.strings[key];
 
+    const providedOptionNames =
+      (hasOptions
+        ? Object.keys(options)
+            .map(name => name.replace(/[A-Z]/g, '_$&'))
+            .map(name => name.toUpperCase())
+        : []);
+
+    const expectedOptionNames =
+      Array.from(template.matchAll(/{(?<name>[A-Z0-9_]+)}/g))
+        .map(({groups}) => groups.name);
+
+    const missingOptionNames =
+      expectedOptionNames.filter(name => !providedOptionNames.includes(name));
+
+    const misplacedOptionNames =
+      providedOptionNames.filter(name => !expectedOptionNames.includes(name));
+
+    withAggregate({message: `Errors in options for string "${key}"`}, ({push}) => {
+      if (!empty(missingOptionNames)) {
+        const names = missingOptionNames.join(`, `);
+        push(new Error(`Missing options: ${names}`));
+      }
+
+      if (!empty(misplacedOptionNames)) {
+        const names = misplacedOptionNames.join(`, `);
+        push(new Error(`Unexpected options: ${names}`));
+      }
+    });
+
     let output;
 
     if (hasOptions) {
       // Convert the keys on the options dict from camelCase to CONSTANT_CASE.
       // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
       // like, who cares, dude?) Also, this is an array, 8ecause it's handy
-      // for the iterating we're a8out to do. Also strip HTML from arguments
+      // for the iterating we're a8out to do. Also strip HTML from options
       // that are literal strings - real HTML content should always be proper
       // HTML objects (see html.js).
       const processedOptions =
@@ -210,15 +240,9 @@ export class Language extends Thing {
           template);
     } else {
       // Without any options provided, just use the template as-is. This will
-      // still error if the template expected arguments, and otherwise will be
+      // have errored if the template expected options, and otherwise will be
       // the right value.
       output = template;
-    }
-
-    // Post-processing: if any expected arguments *weren't* replaced, that
-    // is almost definitely an error.
-    if (output.match(/\{[A-Z][A-Z0-9_]*\}/)) {
-      throw new Error(`Args in ${key} were missing - output: ${output}`);
     }
 
     // Last caveat: Wrap the output in an HTML tag so that it doesn't get
