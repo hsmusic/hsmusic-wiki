@@ -242,10 +242,7 @@ export class Language extends Thing {
       // Sanitize string arguments in particular. These are taken to come from
       // (raw) data and may include special characters that aren't meant to be
       // rendered as HTML markup.
-      const optionPart = this.#sanitizeStringArg(optionValue, {
-        // TODO: Won't need to specify preserveType.
-        preserveType: true,
-      });
+      const optionPart = this.#sanitizeStringArg(optionValue);
 
       outputParts.push(languageText);
       outputParts.push(optionPart);
@@ -280,23 +277,17 @@ export class Language extends Thing {
   // treated by the browser as a tag. This does *not* have an effect on actual
   // html.Tag objects, which are treated as sanitized by default (so that they
   // can be nested inside strings at all).
-  #sanitizeStringArg(arg, {preserveType = false} = {}) {
+  #sanitizeStringArg(arg) {
     const escapeHTML = CacheableObject.getUpdateValue(this, 'escapeHTML');
-
     if (!escapeHTML) {
       throw new Error(`escapeHTML unavailable`);
     }
 
-    if (typeof arg !== 'string') {
-      // TODO: Preserving type will be the only behavior.
-      if (preserveType) {
-        return arg;
-      } else {
-        return arg.toString();
-      }
+    if (typeof arg === 'string') {
+      return escapeHTML(arg);
+    } else {
+      return arg;
     }
-
-    return escapeHTML(arg);
   }
 
   // Wraps the output of a formatting function in a no-name-nor-attributes
@@ -321,16 +312,11 @@ export class Language extends Thing {
   // contents of a slot directly, it should be manually sanitized with this
   // function first.
   sanitize(arg) {
-    const escapeHTML = CacheableObject.getUpdateValue(this, 'escapeHTML');
-
-    if (!escapeHTML) {
-      throw new Error(`escapeHTML unavailable`);
+    if (typeof arg === 'string') {
+      return this.#wrapSanitized(this.#sanitizeStringArg(arg));
+    } else {
+      return arg;
     }
-
-    return (
-      (typeof arg === 'string'
-        ? this.#wrapSanitized(escapeHTML(arg))
-        : arg));
   }
 
   formatDate(date) {
@@ -552,10 +538,7 @@ export class Language extends Thing {
       const markerValue = array[markerIndex];
 
       const languageText = template.slice(lastIndex, match.index);
-      const markerPart = this.#sanitizeStringArg(markerValue, {
-        // TODO: Won't need to specify preserveType.
-        preserveType: true,
-      });
+      const markerPart = this.#sanitizeStringArg(markerValue);
 
       outputParts.push(languageText);
       outputParts.push(markerPart);
