@@ -19,6 +19,14 @@ const clientSteps = {
   addPageListeners: [],
 };
 
+function initInfo(key, description) {
+  const object = {...description};
+
+  clientInfo[key] = object;
+
+  return object;
+}
+
 // Localiz8tion nonsense ----------------------------------
 
 const language = document.documentElement.getAttribute('lang');
@@ -129,7 +137,7 @@ function dispatchInternalEvent(event, eventName, ...args) {
 
 // JS-based links -----------------------------------------
 
-const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
+const scriptedLinkInfo = initInfo('scriptedLinkInfo', {
   randomLinks: null,
   revealLinks: null,
 
@@ -143,7 +151,7 @@ const scriptedLinkInfo = clientInfo.scriptedLinkInfo = {
     artistDirectories: null,
     artistNumContributions: null,
   },
-};
+});
 
 function getScriptedLinkReferences() {
   scriptedLinkInfo.randomLinks =
@@ -377,7 +385,7 @@ if (
 
 // Tooltip-style hover (infrastructure) -------------------
 
-const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
+const hoverableTooltipInfo = initInfo('hoverableTooltipInfo', {
   settings: {
     // Hovering has two speed settings. The normal setting is used by default,
     // and once a tooltip is displayed as a result of hover, the entire tooltip
@@ -447,7 +455,7 @@ const hoverableTooltipInfo = clientInfo.hoverableTooltipInfo = {
     currentTouchIdentifiers: new Set(),
     touchIdentifiersBanishedByScrolling: new Set(),
   },
-};
+});
 
 // Adds DOM event listeners, so must be called during addPageListeners step.
 function registerTooltipElement(tooltip) {
@@ -1156,7 +1164,7 @@ if (localStorage.tryInfoCards) {
 
 // Custom hash links --------------------------------------
 
-const hashLinkInfo = clientInfo.hashLinkInfo = {
+const hashLinkInfo = initInfo('hashLinkInfo', {
   links: null,
   hrefs: null,
   targets: null,
@@ -1171,7 +1179,7 @@ const hashLinkInfo = clientInfo.hashLinkInfo = {
     beforeHashLinkScrolls: [],
     whenHashLinkClicked: [],
   },
-};
+});
 
 function getHashLinkReferences() {
   const info = hashLinkInfo;
@@ -1303,7 +1311,7 @@ clientSteps.addPageListeners.push(addHashLinkListeners);
 
 // Sticky content heading ---------------------------------
 
-const stickyHeadingInfo = clientInfo.stickyHeadingInfo = {
+const stickyHeadingInfo = initInfo('stickyHeadingInfo', {
   stickyContainers: null,
 
   stickySubheadingRows: null,
@@ -1325,7 +1333,7 @@ const stickyHeadingInfo = clientInfo.stickyHeadingInfo = {
   event: {
     whenDisplayedHeadingChanges: [],
   },
-};
+});
 
 function getStickyHeadingReferences() {
   const info = stickyHeadingInfo;
@@ -1854,7 +1862,7 @@ function loadImage(imageUrl, onprogress) {
 
 // "Additional names" box ---------------------------------
 
-const additionalNamesBoxInfo = clientInfo.additionalNamesBox = {
+const additionalNamesBoxInfo = initInfo('additionalNamesBox', {
   box: null,
   links: null,
   mainContentContainer: null,
@@ -1862,7 +1870,7 @@ const additionalNamesBoxInfo = clientInfo.additionalNamesBox = {
   state: {
     visible: false,
   },
-};
+});
 
 function getAdditionalNamesBoxReferences() {
   const info = additionalNamesBoxInfo;
@@ -1980,10 +1988,10 @@ for (const info of groupContributionsTableInfo) {
 
 // Artist link icon tooltips ------------------------------
 
-const externalIconTooltipInfo = clientInfo.externalIconTooltipInfo = {
+const externalIconTooltipInfo = initInfo('externalIconTooltipInfo', {
   hoverables: null,
   tooltips: null,
-};
+});
 
 function getExternalIconTooltipReferences() {
   const info = externalIconTooltipInfo;
@@ -2015,10 +2023,10 @@ clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
 
 // Datetimestamp tooltips ---------------------------------
 
-const datetimestampTooltipInfo = clientInfo.datetimestampTooltipInfo = {
+const datetimestampTooltipInfo = initInfo('datetimestampTooltipInfo', {
   hoverables: null,
   tooltips: null,
-};
+});
 
 function getDatestampTooltipReferences() {
   const info = datetimestampTooltipInfo;
@@ -2050,7 +2058,7 @@ clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
 
 // Sticky commentary sidebar ------------------------------
 
-const albumCommentarySidebarInfo = clientInfo.albumCommentarySidebarInfo = {
+const albumCommentarySidebarInfo = initInfo('albumCommentarySidebarInfo', {
   sidebar: null,
 
   sidebarTrackLinks: null,
@@ -2064,7 +2072,7 @@ const albumCommentarySidebarInfo = clientInfo.albumCommentarySidebarInfo = {
     currentTrackLink: null,
     justChangedTrackSection: false,
   },
-};
+});
 
 function getAlbumCommentarySidebarReferences() {
   const info = albumCommentarySidebarInfo;
