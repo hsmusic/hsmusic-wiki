@@ -242,7 +242,7 @@ export class Language extends Thing {
       // Sanitize string arguments in particular. These are taken to come from
       // (raw) data and may include special characters that aren't meant to be
       // rendered as HTML markup.
-      const optionPart = this.#sanitizeStringArg(optionValue);
+      const optionPart = this.#sanitizeValueForInsertion(optionValue);
 
       outputParts.push(languageText);
       outputParts.push(optionPart);
@@ -273,26 +273,29 @@ export class Language extends Thing {
     return this.#wrapSanitized(outputParts);
   }
 
-  // Escapes HTML special characters so they're displayed as-are instead of
-  // treated by the browser as a tag. This does *not* have an effect on actual
-  // html.Tag objects, which are treated as sanitized by default (so that they
-  // can be nested inside strings at all).
-  #sanitizeStringArg(arg) {
+  // Processes a value so that it's suitable to be inserted into a template.
+  // For strings, this escapes HTML special characters, displaying them as-are
+  // instead of representing HTML markup. For numbers and booleans, this turns
+  // them into string values, so they never accidentally get caught as falsy
+  // by #html stringification. Everything else - most importantly including
+  // html.Tag objects - gets left as-is, preserving the value exactly as it's
+  // provided.
+  #sanitizeValueForInsertion(value) {
     const escapeHTML = CacheableObject.getUpdateValue(this, 'escapeHTML');
     if (!escapeHTML) {
       throw new Error(`escapeHTML unavailable`);
     }
 
-    switch (typeof arg) {
+    switch (typeof value) {
       case 'string':
-        return escapeHTML(arg);
+        return escapeHTML(value);
 
       case 'number':
       case 'boolean':
-        return arg.toString();
+        return value.toString();
 
       default:
-        return arg;
+        return value;
     }
   }
 
@@ -312,16 +315,16 @@ export class Language extends Thing {
   // It should be used when embedding content that may not have previously
   // been sanitized directly into an HTML tag or template's contents.
   // The templating engine usually handles this on its own, as does passing
-  // a value (sanitized or not) directly as an argument to formatString,
-  // but if you used a custom validation function ({validate: v => v.isHTML}
-  // instead of {type: 'string'} / {type: 'html'}) and are embedding the
-  // contents of a slot directly, it should be manually sanitized with this
-  // function first.
-  sanitize(arg) {
-    if (typeof arg === 'string') {
-      return this.#wrapSanitized(this.#sanitizeStringArg(arg));
+  // a value (sanitized or not) directly for inserting into formatting
+  // functions, but if you used a custom slot validation function (for example,
+  // {validate: v => v.isHTML} instead of {type: 'string'} / {type: 'html'})
+  // and are embedding the contents of the slot as a direct child of another
+  // tag, you should manually sanitize those contents with this function.
+  sanitize(value) {
+    if (typeof value === 'string') {
+      return this.#wrapSanitized(this.#sanitizeValueForInsertion(value));
     } else {
-      return arg;
+      return value;
     }
   }
 
@@ -544,7 +547,7 @@ export class Language extends Thing {
       const markerValue = array[markerIndex];
 
       const languageText = template.slice(lastIndex, match.index);
-      const markerPart = this.#sanitizeStringArg(markerValue);
+      const markerPart = this.#sanitizeValueForInsertion(markerValue);
 
       outputParts.push(languageText);
       outputParts.push(markerPart);
@@ -622,13 +625,13 @@ export class Language extends Thing {
   }
 }
 
-const countHelper = (stringKey, argName = stringKey) =>
+const countHelper = (stringKey, optionName = stringKey) =>
   function(value, {unit = false} = {}) {
     return this.formatString(
       unit
         ? `count.${stringKey}.withUnit.` + this.getUnitForm(value)
         : `count.${stringKey}`,
-      {[argName]: this.formatNumber(value)});
+      {[optionName]: this.formatNumber(value)});
   };
 
 // TODO: These are hard-coded. Is there a better way?
