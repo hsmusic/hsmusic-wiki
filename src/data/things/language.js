@@ -177,7 +177,7 @@ export class Language extends Thing {
     const options =
       (hasOptions
         ? args.at(-1)
-        : null);
+        : {});
 
     if (!this.strings) {
       throw new Error(`Strings unavailable`);
@@ -189,22 +189,72 @@ export class Language extends Thing {
 
     const template = this.strings[key];
 
-    const providedOptionNames =
-      (hasOptions
-        ? Object.keys(options)
-            .map(name => name.replace(/[A-Z]/g, '_$&'))
-            .map(name => name.toUpperCase())
-        : []);
+    // These will be filled up as we iterate over the template, slotting in
+    // each option (if it's present).
+    const missingOptionNames = new Set();
+    const outputParts = [];
 
-    const expectedOptionNames =
-      Array.from(template.matchAll(/{(?<name>[A-Z0-9_]+)}/g))
-        .map(({groups}) => groups.name);
+    // And this will have entries deleted as they're encountered in the
+    // template. Leftover entries are misplaced.
+    const optionsMap =
+      new Map(
+        Object.entries(options).map(([name, value]) => [
+          name
+            .replace(/[A-Z]/g, '_$&')
+            .toUpperCase(),
+          value,
+        ]));
 
-    const missingOptionNames =
-      expectedOptionNames.filter(name => !providedOptionNames.includes(name));
+    const optionRegexp = /{(?<name>[A-Z0-9_]+)}/g;
+
+    let lastIndex = 0;
+    for (const match of template.matchAll(optionRegexp)) {
+      const optionName = match.groups.name;
+      let optionValue;
+
+      if (optionsMap.has(optionName)) {
+        // We'll only need the option's value if we're going to use it as part
+        // of the formed output (see below).
+        if (empty(missingOptionNames)) {
+          optionValue = optionsMap.get(optionName);
+        }
+
+        // But we always have to delete expected options off the provided
+        // option map, since the leftovers are what will be used to tell which
+        // are misplaced.
+        optionsMap.delete(optionName);
+      } else {
+        missingOptionNames.add(optionName);
+      }
+
+      // We don't need to actually fill in more output parts if we've hit any
+      // missing option names, since the end result of this formatString call
+      // will be a thrown error, and formed output isn't going to be needed.
+      // This also guarantees for later code that all options (so far),
+      // including the current one, were provided - meaning optionValue will
+      // have its provided value present.
+      if (!empty(missingOptionNames)) {
+        continue;
+      }
+
+      const languageText = template.slice(lastIndex, match.index);
+
+      // Sanitize string arguments in particular. These are taken to come from
+      // (raw) data and may include special characters that aren't meant to be
+      // rendered as HTML markup.
+      const optionPart = this.#sanitizeStringArg(optionValue, {
+        // TODO: Won't need to specify preserveType.
+        preserveType: true,
+      });
+
+      outputParts.push(languageText);
+      outputParts.push(optionPart);
+
+      lastIndex = match.index + match[0].length;
+    }
 
     const misplacedOptionNames =
-      providedOptionNames.filter(name => !expectedOptionNames.includes(name));
+      Array.from(optionsMap.keys());
 
     withAggregate({message: `Errors in options for string "${key}"`}, ({push}) => {
       if (!empty(missingOptionNames)) {
@@ -218,37 +268,12 @@ export class Language extends Thing {
       }
     });
 
-    let output;
-
-    if (hasOptions) {
-      // Convert the keys on the options dict from camelCase to CONSTANT_CASE.
-      // (This isn't an OUTRAGEOUSLY versatile algorithm for doing that, 8ut
-      // like, who cares, dude?) Also, this is an array, 8ecause it's handy
-      // for the iterating we're a8out to do. Also strip HTML from options
-      // that are literal strings - real HTML content should always be proper
-      // HTML objects (see html.js).
-      const processedOptions =
-        Object.entries(options).map(([k, v]) => [
-          k.replace(/[A-Z]/g, '_$&').toUpperCase(),
-          this.#sanitizeStringArg(v),
-        ]);
-
-      // Replacement time! Woot. Reduce comes in handy here!
-      output =
-        processedOptions.reduce(
-          (x, [k, v]) => x.replaceAll(`{${k}}`, v),
-          template);
-    } else {
-      // Without any options provided, just use the template as-is. This will
-      // have errored if the template expected options, and otherwise will be
-      // the right value.
-      output = template;
+    if (lastIndex < template.length) {
+      const lastLanguageText = template.slice(lastIndex);
+      outputParts.push(lastLanguageText);
     }
 
-    // Last caveat: Wrap the output in an HTML tag so that it doesn't get
-    // treated as unsanitized HTML if *it* gets passed as an argument to
-    // *another* formatString call.
-    return this.#wrapSanitized(output);
+    return this.#wrapSanitized(outputParts);
   }
 
   // Escapes HTML special characters so they're displayed as-are instead of
