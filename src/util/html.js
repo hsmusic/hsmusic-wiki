@@ -477,8 +477,10 @@ export class Tag {
 
       // Blockwraps only apply if they actually contain some content whose
       // words should be kept together, so it's okay to put them beneath the
-      // itemContent check.
-      if (item instanceof Tag && item.blockwrap) {
+      // itemContent check. They also never apply at the very start of content,
+      // because at that point there aren't any preceding words from which the
+      // blockwrap would differentiate its content.
+      if (item instanceof Tag && item.blockwrap && content) {
         content += `<span class="blockwrap">`;
         blockwrapClosers += `</span>`;
       }
