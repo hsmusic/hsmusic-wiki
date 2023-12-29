@@ -733,7 +733,7 @@ export function showAggregate(topError, {
             .join('\n')
         : '');
 
-    return [headerPart, causePart, errorsPart].filter(Boolean).join('\n');
+    return [headerPart, errorsPart, causePart].filter(Boolean).join('\n');
   };
 
   const structure = flattenErrorStructure(topError);
