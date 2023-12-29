@@ -283,10 +283,16 @@ export class Language extends Thing {
       throw new Error(`escapeHTML unavailable`);
     }
 
-    if (typeof arg === 'string') {
-      return escapeHTML(arg);
-    } else {
-      return arg;
+    switch (typeof arg) {
+      case 'string':
+        return escapeHTML(arg);
+
+      case 'number':
+      case 'boolean':
+        return arg.toString();
+
+      default:
+        return arg;
     }
   }
 
