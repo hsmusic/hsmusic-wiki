@@ -187,8 +187,6 @@ export class Language extends Thing {
       throw new Error(`Invalid key ${key} accessed`);
     }
 
-    const template = this.strings[key];
-
     // These will be filled up as we iterate over the template, slotting in
     // each option (if it's present).
     const missingOptionNames = new Set();
@@ -205,50 +203,40 @@ export class Language extends Thing {
           value,
         ]));
 
-    const optionRegexp = /{(?<name>[A-Z0-9_]+)}/g;
+    const output = this.#iterateOverTemplate({
+      template: this.strings[key],
 
-    let lastIndex = 0;
-    for (const match of template.matchAll(optionRegexp)) {
-      const optionName = match.groups.name;
-      let optionValue;
+      match: /{(?<name>[A-Z0-9_]+)}/g,
 
-      if (optionsMap.has(optionName)) {
-        // We'll only need the option's value if we're going to use it as part
-        // of the formed output (see below).
-        if (empty(missingOptionNames)) {
-          optionValue = optionsMap.get(optionName);
+      insert: ({name: optionName}, canceledForming) => {
+        if (optionsMap.has(optionName)) {
+          let optionValue;
+
+          // We'll only need the option's value if we're going to use it as
+          // part of the formed output (see below).
+          if (!canceledForming) {
+            optionValue = optionsMap.get(optionName);
+          }
+
+          // But we always have to delete expected options off the provided
+          // option map, since the leftovers are what will be used to tell
+          // which are misplaced.
+          optionsMap.delete(optionName);
+
+          if (canceledForming) {
+            return undefined;
+          } else {
+            return optionValue;
+          }
+        } else {
+          // We don't need to continue forming the output if we've hit a
+          // missing option name, since the end result of this formatString
+          // call will be a thrown error, and formed output won't be needed.
+          missingOptionNames.add(optionName);
+          return undefined;
         }
-
-        // But we always have to delete expected options off the provided
-        // option map, since the leftovers are what will be used to tell which
-        // are misplaced.
-        optionsMap.delete(optionName);
-      } else {
-        missingOptionNames.add(optionName);
-      }
-
-      // We don't need to actually fill in more output parts if we've hit any
-      // missing option names, since the end result of this formatString call
-      // will be a thrown error, and formed output isn't going to be needed.
-      // This also guarantees for later code that all options (so far),
-      // including the current one, were provided - meaning optionValue will
-      // have its provided value present.
-      if (!empty(missingOptionNames)) {
-        continue;
-      }
-
-      const languageText = template.slice(lastIndex, match.index);
-
-      // Sanitize string arguments in particular. These are taken to come from
-      // (raw) data and may include special characters that aren't meant to be
-      // rendered as HTML markup.
-      const optionPart = this.#sanitizeValueForInsertion(optionValue);
-
-      outputParts.push(languageText);
-      outputParts.push(optionPart);
-
-      lastIndex = match.index + match[0].length;
-    }
+      },
+    });
 
     const misplacedOptionNames =
       Array.from(optionsMap.keys());
@@ -265,9 +253,77 @@ export class Language extends Thing {
       }
     });
 
+    return output;
+  }
+
+  #iterateOverTemplate({
+    template,
+    match: regexp,
+    insert: insertFn,
+  }) {
+    const outputParts = [];
+
+    let canceledForming = false;
+
+    let lastIndex = 0;
+    let partInProgress = '';
+
+    for (const match of template.matchAll(regexp)) {
+      const insertion =
+        insertFn(match.groups, canceledForming);
+
+      if (insertion === undefined) {
+        canceledForming = true;
+      }
+
+      // Don't proceed with forming logic if the insertion function has
+      // indicated that's not needed anymore - but continue iterating over
+      // the rest of the template's matches, so other iteration logic (with
+      // side effects) gets to process everything.
+      if (canceledForming) {
+        continue;
+      }
+
+      partInProgress += template.slice(lastIndex, match.index);
+
+      // Sanitize string arguments in particular. These are taken to come from
+      // (raw) data and may include special characters that aren't meant to be
+      // rendered as HTML markup.
+      const sanitizedInsertion =
+        this.#sanitizeValueForInsertion(insertion);
+
+      if (typeof sanitizedInsertion === 'string') {
+        // Join consecutive strings together.
+        partInProgress += sanitizedInsertion;
+      } else if (
+        sanitizedInsertion instanceof html.Tag &&
+        sanitizedInsertion.contentOnly
+      ) {
+        // Collapse string-only tag contents onto the current string part.
+        partInProgress += sanitizedInsertion.toString();
+      } else {
+        // Push the string part in progress, then the insertion as-is.
+        outputParts.push(partInProgress);
+        outputParts.push(sanitizedInsertion);
+        partInProgress = '';
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (canceledForming) {
+      return undefined;
+    }
+
+    // Tack onto the final partInProgress, which may still have a value by this
+    // point, if the final inserted value was a string. (Otherwise, it'll just
+    // be equal to the remaining template text.)
     if (lastIndex < template.length) {
-      const lastLanguageText = template.slice(lastIndex);
-      outputParts.push(lastLanguageText);
+      partInProgress += template.slice(lastIndex);
+    }
+
+    if (partInProgress) {
+      outputParts.push(partInProgress);
     }
 
     return this.#wrapSanitized(outputParts);
@@ -523,12 +579,11 @@ export class Language extends Thing {
     // array, because the process function (likely an Intl operation) is taken
     // to only operate on strings. We'll insert the contents of the array back
     // at these points afterwards.
+
     const insertionMarkers =
       Array.from(
         {length: array.length},
         (_item, index) => `<::insertion_${index}>`);
-
-    const template = processFn(insertionMarkers);
 
     // Basically the same insertion logic as in formatString. Like there, we
     // can't assume that insertion markers were kept in the same order as they
@@ -537,30 +592,15 @@ export class Language extends Thing {
     // item, like we do in formatString, so that cuts out a lot of the
     // validation logic.
 
-    const outputParts = [];
+    return this.#iterateOverTemplate({
+      template: processFn(insertionMarkers),
 
-    const insertionMarkerRegexp = /<::insertion_(?<index>[0-9]+)>/g;
-    let lastIndex = 0;
+      match: /<::insertion_(?<index>[0-9]+)>/g,
 
-    for (const match of template.matchAll(insertionMarkerRegexp)) {
-      const markerIndex = match.groups.index;
-      const markerValue = array[markerIndex];
-
-      const languageText = template.slice(lastIndex, match.index);
-      const markerPart = this.#sanitizeValueForInsertion(markerValue);
-
-      outputParts.push(languageText);
-      outputParts.push(markerPart);
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    if (lastIndex < template.length) {
-      const lastLanguageText = template.slice(lastIndex);
-      outputParts.push(lastLanguageText);
-    }
-
-    return this.#wrapSanitized(outputParts);
+      insert: ({index: markerIndex}) => {
+        return array[markerIndex];
+      },
+    });
   }
 
   // Conjunction list: A, B, and C
