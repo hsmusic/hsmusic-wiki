@@ -1,5 +1,8 @@
+import {compareArrays} from '#sugar';
+
 export default {
   contentDependencies: [
+    'generateAlbumSidebarDifferingTrackGroupsBox',
     'generateAlbumSidebarGroupBox',
     'generateAlbumSidebarTrackListBox',
     'generatePageSidebar',
@@ -11,6 +14,11 @@ export default {
       (track
         ? track.groups
         : album.groups),
+
+    trackGroupsDifferFromAlbum:
+      (track
+        ? !compareArrays(track.groups, album.groups)
+        : null),
   }),
 
   relations: (relation, query, album, track) => ({
@@ -26,6 +34,11 @@ export default {
     groupBoxes:
       query.groups.map(group =>
         relation('generateAlbumSidebarGroupBox', album, group)),
+
+    differingTrackGroupsBox:
+      (query.trackGroupsDifferFromAlbum
+        ? relation('generateAlbumSidebarDifferingTrackGroupsBox', album)
+        : null),
   }),
 
   data: (query, album, track) => ({
@@ -44,10 +57,15 @@ export default {
         !data.isAlbumPage &&
           relations.conjoinedBox.slots({
             attributes: {class: 'conjoined-group-sidebar-box'},
-            boxes:
-              relations.groupBoxes
-                .map(box => box.slot('mode', 'track'))
-                .map(box => box.content), /* TODO: Kludge. */
+
+            boxes: [
+              ...
+                relations.groupBoxes
+                  .map(box => box.slot('mode', 'track'))
+                  .map(box => box.content), /* TODO: Kludge. */
+
+              relations.differingTrackGroupsBox,
+            ],
           }),
       ],
     }),
