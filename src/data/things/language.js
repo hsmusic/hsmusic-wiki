@@ -255,7 +255,7 @@ export class Language extends Thing {
   // treated by the browser as a tag. This does *not* have an effect on actual
   // html.Tag objects, which are treated as sanitized by default (so that they
   // can be nested inside strings at all).
-  #sanitizeStringArg(arg) {
+  #sanitizeStringArg(arg, {preserveType = false} = {}) {
     const escapeHTML = CacheableObject.getUpdateValue(this, 'escapeHTML');
 
     if (!escapeHTML) {
@@ -263,7 +263,12 @@ export class Language extends Thing {
     }
 
     if (typeof arg !== 'string') {
-      return arg.toString();
+      // TODO: Preserving type will be the only behavior.
+      if (preserveType) {
+        return arg;
+      } else {
+        return arg.toString();
+      }
     }
 
     return escapeHTML(arg);
