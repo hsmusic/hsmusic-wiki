@@ -472,6 +472,16 @@ export class Attributes {
     return this.#attributes;
   }
 
+  get blank() {
+    const attributeValues =
+      Object.values(this.#attributes);
+
+    const keepAnyAttributes =
+      attributeValues.some(value => this.#keepAttributeValue(value));
+
+    return !keepAnyAttributes;
+  }
+
   set(attribute, value) {
     if (value === null || value === undefined) {
       this.remove(attribute);
