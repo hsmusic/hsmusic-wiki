@@ -523,35 +523,83 @@ export class Language extends Thing {
     return this.formatString('count.words.withUnit.' + this.getUnitForm(value), {words});
   }
 
+  #formatListHelper(array, processFn) {
+    // Operate on "insertion markers" instead of the actual contents of the
+    // array, because the process function (likely an Intl operation) is taken
+    // to only operate on strings. We'll insert the contents of the array back
+    // at these points afterwards.
+    const insertionMarkers =
+      Array.from(
+        {length: array.length},
+        (_item, index) => `<::insertion_${index}>`);
+
+    const template = processFn(insertionMarkers);
+
+    // Basically the same insertion logic as in formatString. Like there, we
+    // can't assume that insertion markers were kept in the same order as they
+    // were provided, so we'll refer to the marked index. But we don't need to
+    // worry about some of the indices *not* corresponding to a provided source
+    // item, like we do in formatString, so that cuts out a lot of the
+    // validation logic.
+
+    const outputParts = [];
+
+    const insertionMarkerRegexp = /<::insertion_(?<index>[0-9]+)>/g;
+    let lastIndex = 0;
+
+    for (const match of template.matchAll(insertionMarkerRegexp)) {
+      const markerIndex = match.groups.index;
+      const markerValue = array[markerIndex];
+
+      const languageText = template.slice(lastIndex, match.index);
+      const markerPart = this.#sanitizeStringArg(markerValue, {
+        // TODO: Won't need to specify preserveType.
+        preserveType: true,
+      });
+
+      outputParts.push(languageText);
+      outputParts.push(markerPart);
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < template.length) {
+      const lastLanguageText = template.slice(lastIndex);
+      outputParts.push(lastLanguageText);
+    }
+
+    return this.#wrapSanitized(outputParts);
+  }
+
   // Conjunction list: A, B, and C
   formatConjunctionList(array) {
     this.assertIntlAvailable('intl_listConjunction');
-    return this.#wrapSanitized(
-      this.intl_listConjunction.format(
-        array.map(item => this.#sanitizeStringArg(item))));
+    return this.#formatListHelper(
+      array,
+      array => this.intl_listConjunction.format(array));
   }
 
   // Disjunction lists: A, B, or C
   formatDisjunctionList(array) {
     this.assertIntlAvailable('intl_listDisjunction');
-    return this.#wrapSanitized(
-      this.intl_listDisjunction.format(
-        array.map(item => this.#sanitizeStringArg(item))));
+    return this.#formatListHelper(
+      array,
+      array => this.intl_listDisjunction.format(array));
   }
 
   // Unit lists: A, B, C
   formatUnitList(array) {
     this.assertIntlAvailable('intl_listUnit');
-    return this.#wrapSanitized(
-      this.intl_listUnit.format(
-        array.map(item => this.#sanitizeStringArg(item))));
+    return this.#formatListHelper(
+      array,
+      array => this.intl_listUnit.format(array));
   }
 
   // Lists without separator: A B C
   formatListWithoutSeparator(array) {
-    return this.#wrapSanitized(
-      array.map(item => this.#sanitizeStringArg(item))
-        .join(' '));
+    return this.#formatListHelper(
+      array,
+      array => array.join(' '));
   }
 
   // File sizes: 42.5 kB, 127.2 MB, 4.13 GB, 998.82 TB
