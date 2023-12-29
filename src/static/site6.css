@@ -473,6 +473,10 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
+.blockwrap {
+  display: inline-block;
+}
+
 .contribution.has-tooltip,
 .datetimestamp.has-tooltip {
   position: relative;
