@@ -502,28 +502,71 @@ export class Attributes {
   }
 
   toString() {
-    return Object.entries(this.attributes)
-      .map(([key, val]) => {
-        if (typeof val === 'undefined' || val === null)
-          return [key, val, false];
-        else if (typeof val === 'string')
-          return [key, val, true];
-        else if (typeof val === 'boolean')
-          return [key, val, val];
-        else if (typeof val === 'number')
-          return [key, val.toString(), true];
-        else if (Array.isArray(val))
-          return [key, val.filter(Boolean).join(' '), val.length > 0];
-        else
-          throw new Error(`Attribute value for ${key} should be primitive or array, got ${typeof val}`);
-      })
-      .filter(([_key, _val, keep]) => keep)
-      .map(([key, val]) =>
-        typeof val === 'boolean'
-          ? `${key}`
-          : `${key}="${this.#escapeAttributeValue(val)}"`
-      )
-      .join(' ');
+    const attributeKeyValues =
+      Object.entries(this.attributes)
+        .map(([key, value]) =>
+          (this.#keepAttributeValue(value)
+            ? [key, this.#transformAttributeValue(value), true]
+            : [key, undefined, false]))
+        .filter(([_key, _value, keep]) => keep)
+        .map(([key, value]) => [key, value]);
+
+    const attributeParts =
+      attributeKeyValues
+        .map(([key, value]) =>
+          (typeof value === 'boolean'
+            ? `${key}`
+            : `${key}="${this.#escapeAttributeValue(value)}"`));
+
+    return attributeParts.join(' ');
+  }
+
+  #keepAttributeValue(value) {
+    switch (typeof value) {
+      case 'undefined':
+        return false;
+
+      case 'object':
+        if (Array.isArray(value)) {
+          return value.some(Boolean);
+        } else if (value === null) {
+          return false;
+        } else {
+          // Other objects are an error.
+          break;
+        }
+
+      case 'boolean':
+        return value;
+
+      case 'string':
+      case 'number':
+        return true;
+
+      case 'array':
+        return value.some(Boolean);
+    }
+
+    throw new Error(
+      `Attribute value for ${key} should be primitive or array, ` +
+      `got ${typeAppearance(val)}`);
+  }
+
+  #transformAttributeValue(value) {
+    switch (typeof value) {
+      case 'boolean':
+        return value;
+
+      case 'number':
+        return value.toString();
+
+      // If it's a kept object, it's an array.
+      case 'object':
+        return value.filter(Boolean).join(' ');
+
+      default:
+        return value;
+    }
   }
 
   #escapeAttributeValue(value) {
