@@ -435,20 +435,50 @@ export class Tag {
     return new Tag(null, null, content);
   }
 
-  [inspect.custom]() {
-    if (this.tagName) {
-      if (empty(this.content)) {
-        return `Tag <${this.tagName} />`;
-      } else {
-        return `Tag <${this.tagName}> (${this.content.length} items)`;
-      }
-    } else {
-      if (empty(this.content)) {
-        return `Tag (no name)`;
-      } else {
-        return `Tag (no name, ${this.content.length} items)`;
+  [inspect.custom](depth, opts) {
+    const lines = [];
+
+    const heading =
+      (this.tagName
+        ? (empty(this.content)
+            ? `Tag <${this.tagName} />`
+            : `Tag <${this.tagName}> (${this.content.length} items)`)
+        : (empty(this.content)
+            ? `Tag (no name)`
+            : `Tag (no name, ${this.content.length} items)`));
+
+    lines.push(heading);
+
+    if (!opts.compact && (depth === null || depth >= 0)) {
+      const nextDepth =
+        (depth === null
+          ? null
+          : depth - 1);
+
+      for (const child of this.content) {
+        const childLines = [];
+
+        if (typeof child === 'string') {
+          const childFlat = child.replace(/\n/g, String.raw`\n`);
+          const childTrim =
+            (childFlat.length >= 40
+              ? childFlat.slice(0, 37) + '...'
+              : childFlat);
+
+          childLines.push(
+            `  Text: ${opts.stylize(`"${childTrim}"`, 'string')}`);
+        } else {
+          childLines.push(...
+            inspect(child, {depth: nextDepth})
+              .split('\n')
+              .map(line => `  ${line}`));
+        }
+
+        lines.push(...childLines);
       }
     }
+
+    return lines.join('\n');
   }
 }
 
