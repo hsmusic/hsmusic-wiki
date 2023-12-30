@@ -84,11 +84,14 @@ export async function go({
   niceShowAggregate,
 }) {
   const showError = (error) => {
-    if (error instanceof AggregateError && niceShowAggregate) {
-      niceShowAggregate(error);
-    } else {
-      console.error(inspect(error, {depth: Infinity}));
+    if (niceShowAggregate) {
+      if (error.errors || error.cause) {
+        niceShowAggregate(error);
+        return;
+      }
     }
+
+    console.error(inspect(error, {depth: Infinity}));
   };
 
   const host = cliOptions['host'] ?? defaultHost;
