@@ -284,6 +284,10 @@ export class Tag {
     }
   }
 
+  get contentOnly() {
+    return this.tagName === '' && this.attributes.blank;
+  }
+
   #setAttributeFlag(attribute, value) {
     if (value) {
       this.attributes.set(attribute, true);
