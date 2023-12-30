@@ -12,6 +12,20 @@ function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
 }
 
+export function getValidatorCreator(validator) {
+  return validator[Symbol.for(`hsmusic.validator.creator`)] ?? null;
+}
+
+export function getValidatorCreatorMeta(validator) {
+  return validator[Symbol.for(`hsmusic.validator.creatorMeta`)] ?? null;
+}
+
+export function setValidatorCreatorMeta(validator, creator, meta) {
+  validator[Symbol.for(`hsmusic.validator.creator`)] = creator;
+  validator[Symbol.for(`hsmusic.validator.creatorMeta`)] = meta;
+  return validator;
+}
+
 // Basic types (primitives)
 
 export function a(noun) {
