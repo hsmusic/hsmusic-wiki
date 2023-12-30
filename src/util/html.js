@@ -13,6 +13,7 @@ const {
   isNumber,
   isString,
   isSymbol,
+  looseArrayOf,
   oneOf,
   validateAllPropertyValues,
   validateArrayItems,
@@ -148,60 +149,6 @@ export const validators = {
     return true;
   },
 };
-
-const isAttributeKey =
-  oneOf(isString, isSymbol);
-
-const isAttributeValue =
-  oneOf(isString, isNumber, isBoolean, isArray);
-
-const isAttributesAdditionPair = pair => {
-  isArray(pair);
-
-  if (pair.length !== 2) {
-    throw new TypeError(`Expected attributes pair to have two items`);
-  }
-
-  withAggregate(({push}) => {
-    try {
-      isAttributeKey(pair[0]);
-    } catch (caughtError) {
-      push(new Error(`Error validating key`, {cause: caughtError}));
-    }
-
-    try {
-      isAttributeValue(pair[1]);
-    } catch (caughtError) {
-      push(new Error(`Error validating value`, {cause: caughtError}));
-    }
-  });
-
-  return true;
-};
-
-const isAttributesAdditionSingletValue = value =>
-  oneOf(
-    validators.isTemplate,
-    validateAllPropertyValues(isAttributeValue),
-    validateArrayItems(
-      oneOf(
-        is(null, undefined, false),
-        isAttributesAdditionSingletValue)));
-
-const isAttributesAdditionSinglet = singlet => {
-  isArray(singlet);
-
-  if (singlet.length !== 1) {
-    throw new TypeError(`Expected attributes singlet to have one item`);
-  }
-
-  isAttributesAdditionSingletValue(singlet[0]);
-
-  return true;
-}
-
-const isAttributesAddition =
-  oneOf(isAttributesAdditionSinglet, isAttributesAdditionPair);
 
 export function blank() {
   return [];
@@ -1396,3 +1343,56 @@ export const isHTML =
     },
 
     isArrayOfHTML);
+
+export const isAttributeKey =
+  oneOf(isString, isSymbol);
+
+export const isAttributeValue =
+  oneOf(
+    isString, isNumber, isBoolean, isArray,
+    isTag, isTemplate);
+
+export const isAttributesAdditionPair = pair => {
+  isArray(pair);
+
+  if (pair.length !== 2) {
+    throw new TypeError(`Expected attributes pair to have two items`);
+  }
+
+  withAggregate(({push}) => {
+    try {
+      isAttributeKey(pair[0]);
+    } catch (caughtError) {
+      push(new Error(`Error validating key`, {cause: caughtError}));
+    }
+
+    try {
+      isAttributeValue(pair[1]);
+    } catch (caughtError) {
+      push(new Error(`Error validating value`, {cause: caughtError}));
+    }
+  });
+
+  return true;
+};
+
+export const isAttributesAdditionSingletValue =
+  oneOf(
+    validateInstanceOf(Template),
+    validateAllPropertyValues(isAttributeValue),
+    looseArrayOf(value => isAttributesAdditionSingletValue(value)));
+
+export const isAttributesAdditionSinglet = singlet => {
+  isArray(singlet);
+
+  if (singlet.length !== 1) {
+    throw new TypeError(`Expected attributes singlet to have one item`);
+  }
+
+  isAttributesAdditionSingletValue(singlet[0]);
+
+  return true;
+}
+
+export const isAttributesAddition =
+  oneOf(isAttributesAdditionSinglet, isAttributesAdditionPair);
