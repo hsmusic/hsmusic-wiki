@@ -2,6 +2,7 @@
 
 import {inspect} from 'node:util';
 
+import {colors} from '#cli';
 import {empty, typeAppearance} from '#sugar';
 import * as commonValidators from '#validators';
 
@@ -409,8 +410,9 @@ export class Tag {
       try {
         itemContent = item.toString();
       } catch (caughtError) {
+        const indexPart = colors.yellow(`child #${index + 1}`);
         throw new Error(
-          `Error in child #${index + 1} ` +
+          `Error in ${indexPart} ` +
           `of ${inspect(this, {compact: true})}`,
           {cause: caughtError});
       }
@@ -478,9 +480,44 @@ export class Tag {
     const attributesPart =
       (attributes.blank
         ? ``
-        : ` ${attributes}`);
+        : ` ${attributes.toString({color: true})}`);
 
-    const heading =
+    const tagNamePart =
+      (this.tagName
+        ? colors.bright(colors.blue(this.tagName))
+        : ``);
+
+    const tagPart =
+      (this.tagName
+        ? [
+            `<`,
+            tagNamePart,
+            attributesPart,
+            (empty(this.content) ? ` />` : `>`),
+          ]
+        : []);
+
+    const accentText =
+      (this.tagName
+        ? (empty(this.content)
+            ? ``
+            : `(${this.content.length} items)`)
+        : (empty(this.content)
+            ? `(no name)`
+            : `(no name, ${this.content.length} items)`));
+
+    const accentPart =
+      (accentText
+        ? ` ${colors.dim(accentText)}`
+        : ``);
+
+    const headingParts = [
+      `Tag `,
+      tagPart,
+      accentPart,
+    ].flat(Infinity);
+
+    const heading = headingParts.join('');
       (this.tagName
         ? (empty(this.content)
             ? `Tag <${this.tagName + attributesPart} />`
@@ -600,7 +637,7 @@ export class Attributes {
     return newValue;
   }
 
-  toString() {
+  toString({color = false} = {}) {
     const attributeKeyValues =
       Object.entries(this.attributes)
         .map(([key, value]) =>
@@ -612,10 +649,19 @@ export class Attributes {
 
     const attributeParts =
       attributeKeyValues
-        .map(([key, value]) =>
-          (typeof value === 'boolean'
-            ? `${key}`
-            : `${key}="${this.#escapeAttributeValue(value)}"`));
+        .map(([key, value]) => {
+          const keyPart = key;
+          const escapedValue = this.#escapeAttributeValue(value);
+          const valuePart =
+            (color
+              ? colors.green(`"${escapedValue}"`)
+              : `"${escapedValue}"`);
+
+          return (
+            (typeof value === 'boolean'
+              ? `${keyPart}`
+              : `${keyPart}=${valuePart}`));
+        });
 
     return attributeParts.join(' ');
   }
@@ -670,6 +716,7 @@ export class Attributes {
 
   #escapeAttributeValue(value) {
     return value
+      .toString()
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&apos;');
   }
@@ -735,7 +782,7 @@ export class Attributes {
   }
 
   [inspect.custom]() {
-    return `Attributes <${this.toString() || 'no attributes'}>`;
+    return `Attributes <${this.toString({color: true}) || 'no attributes'}>`;
   }
 }
 
@@ -1071,7 +1118,7 @@ export class Template {
       return this.description.content(slots);
     } catch (caughtError) {
       throw new Error(
-        `Error computing content of ${inspect(this, {compact: true})}`,
+        `Error in content of ${inspect(this, {compact: true})}`,
         {cause: caughtError});
     }
   }
@@ -1108,11 +1155,11 @@ export class Template {
 
   [inspect.custom]() {
     const {annotation} = this.description;
-    if (annotation) {
-      return `Template "${annotation}"`;
-    } else {
-      return `Template (no annotation)`;
-    }
+
+    return (
+      (annotation
+        ? `Template ${colors.bright(colors.blue(`"${annotation}"`))}`
+        : `Template ${colors.dim(`(no annotation)`)}`));
   }
 }
 
@@ -1136,11 +1183,11 @@ export class Stationery {
   }
 
   [inspect.custom]() {
-    const {annotation} = this.#templateDescription;
-    if (annotation) {
-      return `Stationery "${annotation}"`;
-    } else {
-      return `Stationery (no annotation)`;
-    }
+    const {annotation} = this.description;
+
+    return (
+      (annotation
+        ? `Stationery ${colors.bright(colors.blue(`"${annotation}"`))}`
+        : `Stationery ${colors.dim(`(no annotation)`)}`));
   }
 }
