@@ -404,7 +404,17 @@ export class Tag {
     let content = '';
 
     for (const [index, item] of this.content.entries()) {
-      const itemContent = item.toString();
+      let itemContent;
+
+      try {
+        itemContent = item.toString();
+      } catch (caughtError) {
+        throw new Error(
+          `Error stringifying child #${index + 1} ` +
+          `of ${inspect(this, {compact: true})}: ` +
+          inspect(item, {compact: true}),
+          {cause: caughtError});
+      }
 
       if (!itemContent) {
         continue;
