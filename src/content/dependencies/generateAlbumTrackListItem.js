@@ -44,11 +44,10 @@ export default {
   },
 
   generate(data, relations, {getColors, html, language}) {
-    let style;
-
+    let colorStyle;
     if (data.color) {
       const {primary} = getColors(data.color);
-      style = `--primary-color: ${primary}`;
+      colorStyle = {style: `--primary-color: ${primary}`};
     }
 
     const parts = ['trackList.item.withDuration'];
@@ -70,7 +69,8 @@ export default {
           }));
     }
 
-    return html.tag('li', {style},
+    return html.tag('li',
+      colorStyle,
       language.formatString(...parts, options));
   },
 };

@@ -18,8 +18,10 @@ export default {
 
   generate: (relations, slots, {html}) =>
     html.tag(slots.tag, {class: 'content-heading'},
-      {id: slots.id},
       {tabindex: '0'},
+
+      slots.id &&
+        {id: slots.id},
 
       slots.color &&
         relations.colorStyle.slot('color', slots.color),

@@ -30,26 +30,18 @@ export default {
     language,
     to,
   }) {
-    let href;
-    let style;
-    let title;
+    const attributes = html.attributes();
 
-    if (slots.linkless) {
-      href = null;
-    } else {
-      if (slots.href) {
-        href = encodeURI(slots.href);
-      } else if (!empty(slots.path)) {
-        href = to(...slots.path);
-      } else {
-        href = '';
-      }
+    if (!slots.linkless) {
+      let href =
+        (slots.href
+          ? encodeURI(slots.href)
+       : !empty(slots.path)
+          ? to(...slots.path)
+          : '');
 
       if (appendIndexHTML) {
-        if (
-          /^(?!https?:\/\/).+\/$/.test(href) &&
-          href.endsWith('/')
-        ) {
+        if (/^(?!https?:\/\/).+\/$/.test(href) && href.endsWith('/')) {
           href += 'index.html';
         }
       }
@@ -57,23 +49,18 @@ export default {
       if (slots.hash) {
         href += (slots.hash.startsWith('#') ? '' : '#') + slots.hash;
       }
+
+      attributes.add({href});
     }
 
     if (slots.color) {
       const {primary, dim} = getColors(slots.color);
-      style = `--primary-color: ${primary}; --dim-color: ${dim}`;
-    }
-
-    if (slots.attributes?.style) {
-      if (style) {
-        style += '; ' + slots.attributes.style;
-      } else {
-        style = slots.attributes.style;
-      }
+      attributes.set('style',
+        `--primary-color: ${primary}; --dim-color: ${dim}`);
     }
 
     if (slots.tooltip) {
-      title = slots.tooltip;
+      attributes.set('title', slots.tooltip);
     }
 
     const content =
@@ -83,11 +70,10 @@ export default {
             disallowedTags: new Set(['a']),
           }));
 
-    return html.tag('a', {
-      ...slots.attributes ?? {},
-      href,
-      style,
-      title,
-    }, content);
+    return (
+      html.tag('a',
+        attributes,
+        slots.attributes,
+        content));
   },
 }

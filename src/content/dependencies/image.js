@@ -121,21 +121,51 @@ export default {
       !isMissingImageFile &&
       !empty(data.contentWarnings);
 
-    const colorStyle =
-      slots.color &&
-        relations.colorStyle
-          .slot('color', slots.color);
-
     const willSquare = slots.square;
 
-    const idOnImg = willLink ? null : slots.id;
-    const idOnLink = willLink ? slots.id : null;
+    const imgAttributes = html.attributes([
+      slots.alt && {alt: slots.alt},
+      slots.width && {width: slots.width},
+      slots.height && {height: slots.height},
 
-    const classOnImg = willLink ? null : slots.class;
-    const classOnLink = willLink ? slots.class : null;
+      customLink &&
+        {'data-no-image-preview': true},
+    ]);
 
-    const styleOnContainer = willLink ? null : colorStyle;
-    const styleOnLink = willLink ? colorStyle : null;
+    const linkAttributes = html.attributes([
+      (customLink
+        ? {href: slots.link}
+        : {href: originalSrc}),
+    ]);
+
+    const containerAttributes = html.attributes();
+
+    if (slots.id) {
+      if (willLink) {
+        linkAttributes.set('id', slots.id);
+      } else {
+        imgAttributes.set('id', slots.id);
+      }
+    }
+
+    if (slots.class) {
+      if (willLink) {
+        linkAttributes.set('class', slots.class);
+      } else {
+        imgAttributes.set('class', slots.class);
+      }
+    }
+
+    if (slots.color) {
+      const colorStyle =
+        relations.colorStyle.slot('color', slots.color);
+
+      if (willLink) {
+        linkAttributes.add(colorStyle);
+      } else {
+        containerAttributes.add(colorStyle);
+      }
+    }
 
     if (!originalSrc || isMissingImageFile) {
       return prepare(
@@ -171,83 +201,71 @@ export default {
       logWarn`No thumbnail info cached: ${mediaSrc} - displaying original image here (instead of ${slots.thumb})`;
     }
 
-    // Important to note that these might not be set at all, even if
-    // slots.thumb was provided.
-    let thumbSrc = null;
-    let availableThumbs = null;
-    let originalLength = null;
+    let displaySrc = originalSrc;
 
+    // If thumbnails are available *and* being used, calculate thumbSrc,
+    // and provide some attributes relevant to the large image overlay.
     if (hasThumbnails && slots.thumb) {
-      // Note: This provides mediaSrc to getThumbnailEqualOrSmaller, since
-      // it's the identifier which thumbnail utilities use to query from the
-      // thumbnail cache. But we use the result to operate on originalSrc,
-      // which is the HTML output-appropriate path including `../../` or
-      // another alternate base path.
-      const selectedSize = getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
-      thumbSrc = to('thumb.path', mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`));
+      const selectedSize =
+        getThumbnailEqualOrSmaller(slots.thumb, mediaSrc);
+
+      const mediaSrcJpeg =
+        mediaSrc.replace(/\.(png|jpg)$/, `.${selectedSize}.jpg`);
+
+      displaySrc =
+        to('thumb.path', mediaSrcJpeg);
 
       const dimensions = getDimensionsOfImagePath(mediaSrc);
-      availableThumbs = getThumbnailsAvailableForDimensions(dimensions);
+      const availableThumbs = getThumbnailsAvailableForDimensions(dimensions);
 
       const [width, height] = dimensions;
-      originalLength = Math.max(width, height)
-    }
+      const originalLength = Math.max(width, height)
 
-    let fileSize = null;
-    if (willLink && mediaSrc) {
-      fileSize = getSizeOfImagePath(mediaSrc);
-    }
+      const fileSize =
+        (willLink && mediaSrc
+          ? getSizeOfImagePath(mediaSrc)
+          : null);
 
-    const imgAttributes = {
-      id: idOnImg,
-      class: classOnImg,
-      alt: slots.alt,
-      width: slots.width,
-      height: slots.height,
-    };
+      imgAttributes.add([
+        fileSize &&
+          {'data-original-size': fileSize},
 
-    if (customLink) {
-      imgAttributes['data-no-image-preview'] = true;
-    }
+        originalLength &&
+          {'data-original-length': originalLength},
 
-    // These attributes are only relevant when a thumbnail is available *and*
-    // being used.
-    if (hasThumbnails && slots.thumb) {
-      if (fileSize) {
-        imgAttributes['data-original-size'] = fileSize;
-      }
-
-      if (originalLength) {
-        imgAttributes['data-original-length'] = originalLength;
-      }
-
-      if (!empty(availableThumbs)) {
-        imgAttributes['data-thumbs'] =
-          availableThumbs
-            .map(([name, size]) => `${name}:${size}`)
-            .join(' ');
-      }
-    }
-
-    const nonlazyHTML =
-      originalSrc &&
-        prepareVisible(
-          html.tag('img',
-            imgAttributes,
-            {src: thumbSrc ?? originalSrc}));
-
-    if (slots.lazy) {
-      return html.tags([
-        html.tag('noscript', nonlazyHTML),
-        prepareHidden(
-          html.tag('img', {class: 'lazy'},
-            imgAttributes,
-            {'data-original': thumbSrc ?? originalSrc}),
-          true),
+        !empty(availableThumbs) &&
+          {'data-thumbs':
+              availableThumbs
+                .map(([name, size]) => `${name}:${size}`)
+                .join(' ')},
       ]);
     }
 
-    return nonlazyHTML;
+    if (!displaySrc) {
+      return (
+        prepareVisible(
+          html.tag('img', imgAttributes)));
+    }
+
+    const nonlazyHTML =
+      prepareVisible(
+        html.tag('img',
+          imgAttributes,
+          {src: displaySrc}));
+
+    if (slots.lazy) {
+      return html.tags([
+        html.tag('noscript',
+          nonlazyHTML),
+
+        prepareHidden(
+          html.tag('img', {class: 'lazy'},
+            imgAttributes,
+            {'data-original': displaySrc})),
+      ]);
+    } else {
+      return nonlazyHTML;
+    }
 
     function prepareVisible(content) {
       return prepare(content, false);
@@ -262,7 +280,7 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-container'},
-          styleOnContainer,
+          containerAttributes,
 
           !originalSrc &&
             {style: 'placeholder-image'},
@@ -293,16 +311,10 @@ export default {
       if (willLink) {
         wrapped =
           html.tag('a', {class: ['box', 'image-link']},
-            {id: idOnLink},
-            {class: classOnLink},
-            styleOnLink,
+            linkAttributes,
 
             hide &&
               {class: 'js-hide'},
-
-            (typeof slots.link === 'string'
-              ? {href: slots.link}
-              : {href: originalSrc}),
 
             wrapped);
       }
