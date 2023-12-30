@@ -491,6 +491,10 @@ export class Attributes {
     return value;
   }
 
+  has(attribute) {
+    return attribute in this.#attributes;
+  }
+
   get(attribute) {
     return this.#attributes[attribute];
   }
