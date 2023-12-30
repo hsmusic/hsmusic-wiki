@@ -262,6 +262,16 @@ export function sparseArrayOf(itemValidator) {
   });
 }
 
+export function looseArrayOf(itemValidator) {
+  return validateArrayItems((item, index, array) => {
+    if (item === false || item === null || item === undefined) {
+      return true;
+    }
+
+    return itemValidator(item, index, array);
+  });
+}
+
 export function validateInstanceOf(constructor) {
   const fn = (object) => isInstance(object, constructor);
 
