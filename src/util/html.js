@@ -7,6 +7,10 @@ import {empty, typeAppearance} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {
+  is,
+  isArray,
+  isString,
+  oneOf,
   validateArrayItems,
   validateInstanceOf,
 } = commonValidators;
@@ -1213,26 +1217,19 @@ export const isTag =
 export const isTemplate =
   validateInstanceOf(Template);
 
-export function isHTML(value) {
-  if (typeof value === 'string') {
-    return true;
-  }
-
-  if (value === null || value === undefined || value === false) {
-    return true;
-  }
-
-  if (isBlank(value) || value instanceof Tag || value instanceof Template) {
-    return true;
-  }
-
-  if (isArrayOfHTML(value)) {
-    return true;
-  }
-
-  throw new TypeError(
-    `Expected html (tag, template, or blank), got ${typeAppearance(value)}`);
-}
-
 export const isArrayOfHTML =
-  validateArrayItems(isHTML);
+  validateArrayItems(value => isHTML(value));
+
+export const isHTML =
+  oneOf(
+    is(null, undefined, false),
+    isString,
+    isTag,
+    isTemplate,
+
+    value => {
+      isArray(value);
+      return value.length === 0;
+    },
+
+    isArrayOfHTML);
