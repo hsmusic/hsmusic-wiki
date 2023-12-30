@@ -301,9 +301,9 @@ export async function go({
           wikiData,
         });
 
-        let topLevelResult;
+        let pageHTML, oEmbedJSON;
         try {
-          topLevelResult =
+          const topLevelResult =
             quickEvaluate({
               contentDependencies,
               extraDependencies: {...bound, appendIndexHTML},
@@ -311,14 +311,14 @@ export async function go({
               name: page.contentFunction.name,
               args: page.contentFunction.args ?? [],
             });
+
+          ({pageHTML, oEmbedJSON} = html.resolve(topLevelResult));
         } catch (error) {
           logError`\rError generating page: ${pathname}`;
           niceShowAggregate(error);
           errored = true;
           return;
         }
-
-        const {pageHTML, oEmbedJSON} = html.resolve(topLevelResult);
 
         return writePage({
           pageHTML,
