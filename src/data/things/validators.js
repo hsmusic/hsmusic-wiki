@@ -602,13 +602,49 @@ export const isAdditionalNameList = validateArrayItems(isAdditionalName);
 
 // Compositional utilities
 
-export function oneOf(...checks) {
-  return (value) => {
-    const errorMeta = [];
+export function oneOf(...validators) {
+  const validConstructors = new Set();
+  const validTypes = new Set();
 
-    for (let i = 0, check; (check = checks[i]); i++) {
+  const leftoverValidators = [];
+
+  for (const validator of validators) {
+    const creator = getValidatorCreator(validator);
+    const creatorMeta = getValidatorCreatorMeta(validator);
+
+    switch (creator) {
+      case validateInstanceOf:
+        validConstructors.add(creatorMeta.constructor);
+        break;
+
+      case validateType:
+        validTypes.add(creatorMeta.type);
+        break;
+
+      default:
+        leftoverValidators.push(validator);
+        break;
+    }
+  }
+
+  return (value) => {
+    const errorInfo = [];
+
+    if (!empty(validTypes)) {
+      if (validTypes.has(typeof value)) {
+        return true;
+      }
+    }
+
+    for (const constructor of validConstructors) {
+      if (value instanceof constructor) {
+        return true;
+      }
+    }
+
+    for (const [i, validator] of leftoverValidators.entries()) {
       try {
-        const result = check(value);
+        const result = validator(value);
 
         if (result !== true) {
           throw new Error(`Check returned false`);
@@ -616,19 +652,65 @@ export function oneOf(...checks) {
 
         return true;
       } catch (error) {
-        errorMeta.push([check, i, error]);
+        errorInfo.push([validator, i, error]);
       }
     }
 
-    // Don't process error messages until every check has failed.
+    // Don't process error messages until every validator has failed.
+
     const errors = [];
-    for (const [check, i, error] of errorMeta) {
-      error.message = check.name
-        ? `(#${i} "${check.name}") ${error.message}`
-        : `(#${i}) ${error.message}`;
-      error.check = check;
+    const prefaceErrorInfo = [];
+
+    let offset = 0;
+
+    if (!empty(validTypes)) {
+      const types =
+        Array.from(validTypes);
+
+      const gotType = typeAppearance(value);
+      const gotPart = `, got ${gotType}`;
+
+      prefaceErrorInfo.push([
+        null,
+        offset++,
+        new TypeError(
+          `Expected one of ${types.join(', ')}` + gotPart),
+      ]);
+    }
+
+    if (!empty(validConstructors)) {
+      const names =
+        Array.from(validConstructors)
+          .map(constructor => constructor.name);
+
+      const gotName = value?.constructor?.name;
+      const gotPart = (gotName ? `, got ${gotName}` : ``);
+
+      prefaceErrorInfo.push([
+        null,
+        offset++,
+        new TypeError(
+          `Expected one of ${names.join(', ')}` + gotPart),
+      ]);
+    }
+
+    for (const info of errorInfo) {
+      info[1] += offset;
+    }
+
+    for (const [validator, i, error] of prefaceErrorInfo.concat(errorInfo)) {
+      error.message =
+        (validator?.name
+          ? `(#${i + 1} "${validator.name}") ${error.message}`
+          : `(#${i + 1}) ${error.message}`);
+
+      error.check = validator;
+
       errors.push(error);
     }
-    throw new AggregateError(errors, `Expected one of ${checks.length} possible checks, but none were true`);
+
+    throw new AggregateError(errors,
+      `Expected one of ${validators.length} possible checks, ` +
+      `but none were true`);
   };
 }
