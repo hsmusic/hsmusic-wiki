@@ -1068,7 +1068,13 @@ export class Template {
       slots[slotName] = this.getSlotValue(slotName);
     }
 
-    return this.description.content(slots);
+    try {
+      return this.description.content(slots);
+    } catch (caughtError) {
+      throw new Error(
+        `Error computing content of ${inspect(this, {compact: true})}`,
+        {cause: caughtError});
+    }
   }
 
   set description(_value) {
