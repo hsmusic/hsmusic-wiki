@@ -589,30 +589,42 @@ export function _withAggregate(mode, aggregateOpts, fn) {
   }
 }
 
-export const unhelpfulStackLines = [
+export const unhelpfulTraceLines = [
   /sugar/,
   /node:/,
   /<anonymous>/,
 ];
 
-export function getUsefulStackLine(stack) {
-  if (!stack) return '';
+export function getUsefulTraceLine(trace, {helpful, unhelpful}) {
+  if (!trace) return '';
 
-  function isUseful(stackLine) {
-    const trimmed = stackLine.trim();
+  for (const traceLine of trace.split('\n')) {
+    if (!traceLine.trim().startsWith('at')) {
+      continue;
+    }
 
-    if (!trimmed.startsWith('at'))
-      return false;
+    if (!empty(unhelpful)) {
+      if (unhelpful.some(regex => regex.test(traceLine))) {
+        continue;
+      }
+    }
 
-    if (unhelpfulStackLines.some(regex => regex.test(trimmed)))
-      return false;
+    if (!empty(helpful)) {
+      for (const regex of helpful) {
+        const match = traceLine.match(regex);
 
-    return true;
+        if (match) {
+          return match[1] ?? traceLine;
+        }
+      }
+
+      continue;
+    }
+
+    return traceLine;
   }
 
-  const stackLines = stack.split('\n');
-  const usefulStackLine = stackLines.find(isUseful);
-  return usefulStackLine ?? '';
+  return '';
 }
 
 export function showAggregate(topError, {
@@ -667,7 +679,11 @@ export function showAggregate(topError, {
 
       kind: error.constructor.name,
       message: error.message,
-      stack: error.stack,
+
+      trace:
+        (error[Symbol.for(`hsmusic.aggregate.traceFrom`)]
+          ? error[Symbol.for(`hsmusic.aggregate.traceFrom`)].stack
+          : error.stack),
 
       cause:
         (cause
@@ -678,10 +694,33 @@ export function showAggregate(topError, {
         (errors
           ? errors.map(error => flattenErrorStructure(error, level + 1))
           : null),
+
+      options: {
+        alwaysTrace:
+          error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)],
+
+        helpfulTraceLines:
+          error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)],
+
+        unhelpfulTraceLines:
+          error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)],
+      }
     };
   };
 
-  const recursive = ({level, kind, message, stack, cause, errors}) => {
+  const recursive = ({
+    level,
+    kind,
+    message,
+    trace,
+    cause,
+    errors,
+    options: {
+      alwaysTrace,
+      helpfulTraceLines: ownHelpfulTraceLines,
+      unhelpfulTraceLines: ownUnhelpfulTraceLines,
+    },
+  }) => {
     const messagePart =
       message || `(no message)`;
 
@@ -695,14 +734,24 @@ export function showAggregate(topError, {
         ? `[${messagePart}]`
         : messagePart);
 
-    if (showTraces) {
-      const stackLine =
-        getUsefulStackLine(stack);
+    if (showTraces || alwaysTrace) {
+      const traceLine =
+        getUsefulTraceLine(trace, {
+          unhelpful:
+            (ownUnhelpfulTraceLines
+              ? unhelpfulTraceLines.concat(ownUnhelpfulTraceLines)
+              : unhelpfulTraceLines),
+
+          helpful:
+            (ownHelpfulTraceLines
+              ? ownHelpfulTraceLines
+              : null),
+        });
 
       const tracePart =
-        (stackLine
+        (traceLine
           ? '- ' +
-            stackLine
+            traceLine
               .trim()
               .replace(/file:\/\/.*\.js/, (match) => pathToFileURL(match))
           : '(no stack trace)');
