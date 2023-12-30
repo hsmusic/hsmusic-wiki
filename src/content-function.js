@@ -124,12 +124,32 @@ export function expectDependencies({
         throw new Error(`Expected relations`);
       }
 
-      if (hasDataFunction && hasRelationsFunction) {
-        return generate(arg1, arg2, ...extraArgs, fulfilledDependencies);
-      } else if (hasDataFunction || hasRelationsFunction) {
-        return generate(arg1, ...extraArgs, fulfilledDependencies);
-      } else {
-        return generate(...extraArgs, fulfilledDependencies);
+      try {
+        if (hasDataFunction && hasRelationsFunction) {
+          return generate(arg1, arg2, ...extraArgs, fulfilledDependencies);
+        } else if (hasDataFunction || hasRelationsFunction) {
+          return generate(arg1, ...extraArgs, fulfilledDependencies);
+        } else {
+          return generate(...extraArgs, fulfilledDependencies);
+        }
+      } catch (caughtError) {
+        const error = new Error(
+          `Error generating content for ${generate.name}`,
+          {cause: caughtError});
+
+        error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
+        error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = caughtError;
+
+        error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
+          /content-function\.js/,
+          /util\/html\.js/,
+        ];
+
+        error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
+          /content\/dependencies\/(.*\.js:.*(?=\)))/,
+        ];
+
+        throw error;
       }
     };
 
