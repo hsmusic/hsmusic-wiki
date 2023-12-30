@@ -32,20 +32,37 @@ export function a(noun) {
   return /[aeiou]/.test(noun[0]) ? `an ${noun}` : `a ${noun}`;
 }
 
-export function isType(value, type) {
-  if (typeof value !== type)
-    throw new TypeError(`Expected ${a(type)}, got ${typeAppearance(value)}`);
+export function validateType(type) {
+  const fn = value => {
+    if (typeof value !== type)
+      throw new TypeError(`Expected ${a(type)}, got ${typeAppearance(value)}`);
 
-  return true;
+    return true;
+  };
+
+  setValidatorCreatorMeta(fn, validateType, {type});
+
+  return fn;
 }
 
-export function isBoolean(value) {
-  return isType(value, 'boolean');
-}
+export const isBoolean =
+  validateType('boolean');
 
-export function isNumber(value) {
-  return isType(value, 'number');
-}
+export const isFunction =
+  validateType('function');
+
+export const isNumber =
+  validateType('number');
+
+export const isString =
+  validateType('string');
+
+export const isSymbol =
+  validateType('symbol');
+
+// Use isObject instead, which disallows null.
+export const isTypeofObject =
+  validateType('object');
 
 export function isPositive(number) {
   isNumber(number);
@@ -101,10 +118,6 @@ export function isWholeNumber(number) {
   return true;
 }
 
-export function isString(value) {
-  return isType(value, 'string');
-}
-
 export function isStringNonEmpty(value) {
   isString(value);
 
@@ -142,12 +155,13 @@ export function isDate(value) {
 }
 
 export function isObject(value) {
-  isType(value, 'object');
+  isTypeofObject(value);
 
   // Note: Please remember that null is always a valid value for properties
   // held by a CacheableObject. This assertion is exclusively for use in other
   // contexts.
-  if (value === null) throw new TypeError(`Expected an object, got null`);
+  if (value === null)
+    throw new TypeError(`Expected an object, got null`);
 
   return true;
 }
@@ -245,7 +259,11 @@ export function sparseArrayOf(itemValidator) {
 }
 
 export function validateInstanceOf(constructor) {
-  return (object) => isInstance(object, constructor);
+  const fn = (object) => isInstance(object, constructor);
+
+  setValidatorCreatorMeta(fn, validateInstanceOf, {constructor});
+
+  return fn;
 }
 
 // Wiki data (primitives & non-primitives)
