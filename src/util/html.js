@@ -665,37 +665,45 @@ export class Attributes {
   }
 
   #addMultipleAttributes(attributes) {
-    if (attributes === null) return;
-    if (attributes === undefined) return;
-    if (attributes === false) return;
+    const flatInputAttributes =
+      [attributes].flat(Infinity).filter(Boolean);
 
-    if (Array.isArray(attributes)) {
-      return attributes.map(item => this.#addMultipleAttributes(item));
+    const attributeSets =
+      flatInputAttributes.map(attributes => this.#getAttributeSet(attributes));
+
+    const resultList = [];
+
+    for (const set of attributeSets) {
+      const setResults = {};
+
+      for (const key of Reflect.ownKeys(set)) {
+        const value = set[key];
+        setResults[key] = this.#addOneAttribute(key, value);
+      }
+
+      resultList.push(setResults);
     }
 
+    return resultList;
+  }
+
+  #getAttributeSet(attributes) {
     if (attributes instanceof Attributes) {
-      return this.#addMultipleAttributes(attributes.attributes);
+      return attributes.attributes;
     }
 
     if (attributes instanceof Template) {
       const resolved = Template.resolve(attributes);
       isAttributesAdditionSingletValue(resolved);
-      return this.#addMultipleAttributes(resolved);
+      return resolved;
     }
 
     if (typeof attributes === 'object') {
-      const results = {};
-
-      for (const key of Reflect.ownKeys(attributes)) {
-        const value = attributes[key];
-        results[key] = this.#addOneAttribute(key, value);
-      }
-
-      return results;
+      return attributes;
     }
 
     throw new Error(
-      `Expected an array, object, or template, ` +
+      `Expected Attributes, Template, or object, ` +
       `got ${typeAppearance(attribute)}`);
   }
 
