@@ -673,6 +673,10 @@ export class Attributes {
       return attributes.map(item => this.#addMultipleAttributes(item));
     }
 
+    if (attributes instanceof Attributes) {
+      return this.#addMultipleAttributes(attributes.attributes);
+    }
+
     if (attributes instanceof Template) {
       const resolved = Template.resolve(attributes);
       isAttributesAdditionSingletValue(resolved);
@@ -1379,6 +1383,7 @@ export const isAttributesAdditionPair = pair => {
 export const isAttributesAdditionSingletValue =
   oneOf(
     validateInstanceOf(Template),
+    validateInstanceOf(Attributes),
     validateAllPropertyValues(isAttributeValue),
     looseArrayOf(value => isAttributesAdditionSingletValue(value)));
 
