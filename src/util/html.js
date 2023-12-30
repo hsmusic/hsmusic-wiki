@@ -6,6 +6,10 @@ import {colors} from '#cli';
 import {empty, typeAppearance} from '#sugar';
 import * as commonValidators from '#validators';
 
+const {
+  validateInstanceOf,
+} = commonValidators;
+
 // COMPREHENSIVE!
 // https://html.spec.whatwg.org/multipage/syntax.html#void-elements
 export const selfClosingTags = [
@@ -70,14 +74,6 @@ export function isBlank(value) {
   }
 
   return value.length === 0;
-}
-
-export function isTag(value) {
-  return value instanceof Tag;
-}
-
-export function isTemplate(value) {
-  return value instanceof Template;
 }
 
 export function isHTML(value) {
@@ -1238,3 +1234,9 @@ export class Stationery {
         : `Stationery ${colors.dim(`(no annotation)`)}`));
   }
 }
+
+export const isTag =
+  validateInstanceOf(Tag);
+
+export const isTemplate =
+  validateInstanceOf(Template);
