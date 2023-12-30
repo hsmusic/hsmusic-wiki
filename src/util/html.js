@@ -181,6 +181,7 @@ const isAttributesAdditionPair = pair => {
 
 const isAttributesAdditionSingletValue = value =>
   oneOf(
+    validators.isTemplate,
     validateAllPropertyValues(isAttributeValue),
     validateArrayItems(
       oneOf(
@@ -687,6 +688,10 @@ export class Attributes {
   }
 
   set(attribute, value) {
+    if (value instanceof Template) {
+      return this.set(attribute, Template.resolve(value));
+    }
+
     if (value === null || value === undefined) {
       this.remove(attribute);
     } else {
@@ -708,6 +713,8 @@ export class Attributes {
         return;
       } else if (Array.isArray(arg)) {
         return arg.map(item => this.#addHelper(item));
+      } else if (arg instanceof Template) {
+        return this.#addHelper(Template.resolve(arg));
       } else if (typeof arg === 'object') {
         const results = {};
         for (const key of Reflect.ownKeys(arg)) {
@@ -715,7 +722,7 @@ export class Attributes {
         }
         return results;
       } else {
-        throw new Error(`Expected an array or object, got ${typeAppearance(args[0])}`);
+        throw new Error(`Expected an array, object, or template, got ${typeAppearance(args[0])}`);
       }
     } else if (args.length === 2) {
       return this.#addOneAttribute(args[0], args[1]);
@@ -727,6 +734,10 @@ export class Attributes {
   #addOneAttribute(attribute, value) {
     if (value === null || value === undefined) {
       return;
+    }
+
+    if (value instanceof Template) {
+      return this.#addOneAttribute(attribute, Template.resolve(value));
     }
 
     if (!this.has(attribute)) {
