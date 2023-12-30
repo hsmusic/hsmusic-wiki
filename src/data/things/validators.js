@@ -395,23 +395,26 @@ export function validateAllPropertyValues(validator) {
     if (Array.isArray(object))
       throw new TypeError(`Expected an object, got array`);
 
-    withAggregate({message: `Errors validating object properties`}, ({call}) => {
-      for (const key of Reflect.ownKeys(object)) {
-        call(() => {
-          const value = object[key];
-          try {
-            validator(value);
-          } catch (error) {
-            const keyPart = colors.green(key.toString());
-            const valuePart = inspect(value);
-            error.message = `(key: ${keyPart}, value: ${valuePart}) ${error.message}`;
-            throw error;
-          }
-        });
-      }
-    });
+    const errors = [];
 
-    return true;
+    for (const key of Reflect.ownKeys(object)) {
+      const value = object[key];
+      try {
+        validator(value);
+      } catch (error) {
+        const keyPart = colors.green(key.toString());
+        const valuePart = inspect(value);
+        error.message = `(key: ${keyPart}, value: ${valuePart}) ${error.message}`;
+        errors.push(error);
+      }
+    }
+
+    if (empty(errors)) {
+      return true;
+    }
+
+    throw new AggregateError(errors,
+      `Errors validating object properties`);
   };
 }
 
