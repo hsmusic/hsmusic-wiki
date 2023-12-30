@@ -1,3 +1,6 @@
+# vim: set filetype=yaml :
 coverage-map: coverage-map.js
 exclude:
   - test/lib/*
+test-env:
+  - CLICOLOR_FORCE=0
