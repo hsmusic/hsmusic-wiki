@@ -192,13 +192,17 @@ export function is(...values) {
     };
   }
 
-  return (value) => {
+  const fn = (value) => {
     if (!values.has(value)) {
       throw new TypeError(`Expected one of ${Array.from(values).join(' ')}, got ${value}`);
     }
 
     return true;
   };
+
+  setValidatorCreatorMeta(fn, is, {values});
+
+  return fn;
 }
 
 function validateArrayItemsHelper(itemValidator) {
@@ -603,6 +607,7 @@ export const isAdditionalNameList = validateArrayItems(isAdditionalName);
 // Compositional utilities
 
 export function oneOf(...validators) {
+  const validConstants = new Set();
   const validConstructors = new Set();
   const validTypes = new Set();
 
@@ -613,6 +618,12 @@ export function oneOf(...validators) {
     const creatorMeta = getValidatorCreatorMeta(validator);
 
     switch (creator) {
+      case is:
+        for (const value of creatorMeta.values) {
+          validConstants.add(value);
+        }
+        break;
+
       case validateInstanceOf:
         validConstructors.add(creatorMeta.constructor);
         break;
@@ -629,6 +640,10 @@ export function oneOf(...validators) {
 
   return (value) => {
     const errorInfo = [];
+
+    if (validConstants.has(value)) {
+      return true;
+    }
 
     if (!empty(validTypes)) {
       if (validTypes.has(typeof value)) {
@@ -662,6 +677,20 @@ export function oneOf(...validators) {
     const prefaceErrorInfo = [];
 
     let offset = 0;
+
+    if (!empty(validConstants)) {
+      const constants =
+        Array.from(validConstants);
+
+      const gotPart = `, got ${value}`;
+
+      prefaceErrorInfo.push([
+        null,
+        offset++,
+        new TypeError(
+          `Expected one of ${constants.join(' ')}` + gotPart),
+      ]);
+    }
 
     if (!empty(validTypes)) {
       const types =
