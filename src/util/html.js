@@ -494,8 +494,8 @@ export class Tag {
             tagNamePart,
             attributesPart,
             (empty(this.content) ? ` />` : `>`),
-          ]
-        : []);
+          ].join(``)
+        : ``);
 
     const accentText =
       (this.tagName
@@ -508,23 +508,16 @@ export class Tag {
 
     const accentPart =
       (accentText
-        ? ` ${colors.dim(accentText)}`
+        ? `${colors.dim(accentText)}`
         : ``);
 
     const headingParts = [
-      `Tag `,
+      `Tag`,
       tagPart,
       accentPart,
-    ].flat(Infinity);
+    ];
 
-    const heading = headingParts.join('');
-      (this.tagName
-        ? (empty(this.content)
-            ? `Tag <${this.tagName + attributesPart} />`
-            : `Tag <${this.tagName + attributesPart}> (${this.content.length} items)`)
-        : (empty(this.content)
-            ? `Tag (no name)`
-            : `Tag (no name, ${this.content.length} items)`));
+    const heading = headingParts.filter(Boolean).join(` `);
 
     lines.push(heading);
 
