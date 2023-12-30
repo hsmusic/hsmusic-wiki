@@ -9,11 +9,9 @@ export default {
     },
   },
 
-  generate(slots, {html}) {
-    return html.tag('nav', {
-      [html.onlyIfContent]: true,
-      id: 'secondary-nav',
-      class: slots.class,
-    }, slots.content);
-  },
+  generate: (slots, {html}) =>
+    html.tag('nav', {id: 'secondary-nav'},
+      {[html.onlyIfContent]: true},
+      {class: slots.class},
+      slots.content),
 };

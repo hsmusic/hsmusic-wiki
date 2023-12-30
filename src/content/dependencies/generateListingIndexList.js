@@ -81,16 +81,18 @@ export default {
               listingStringsKey: listingStringsKeys,
             }).map(({listingLink, listingStringsKey}, listingIndex) =>
                 html.tag('li',
-                  {class:
-                    targetIndex === data.currentTargetIndex &&
-                    listingIndex === data.currentListingIndex &&
-                      'current'},
-                  listingLink
-                    .slot('content', language.$(`listingPage.${listingStringsKey}.title.short`))))));
+                  targetIndex === data.currentTargetIndex &&
+                  listingIndex === data.currentListingIndex &&
+                    {class: 'current'},
+
+                  listingLink.slots({
+                    content:
+                      language.$('listingPage', listingStringsKey, 'title.short'),
+                  })))));
 
     const targetTitles =
       data.targetStringsKeys
-        .map(stringsKey => language.$(`listingPage.target.${stringsKey}`));
+        .map(stringsKey => language.$('listingPage.target', stringsKey));
 
     switch (slots.mode) {
       case 'sidebar':
@@ -100,13 +102,13 @@ export default {
             listingLinkList: listingLinkLists,
           }).map(({targetTitle, listingLinkList}, targetIndex) =>
               html.tag('details',
-                {
-                  open: targetIndex === data.currentTargetIndex,
-                  class: targetIndex === data.currentTargetIndex && 'current',
-                },
+                targetIndex === data.currentTargetIndex &&
+                  {class: 'current', open: true},
+
                 [
                   html.tag('summary',
-                    html.tag('span', {class: 'group-name'}, targetTitle)),
+                    html.tag('span', {class: 'group-name'},
+                      targetTitle)),
 
                   listingLinkList,
                 ])));
@@ -118,8 +120,11 @@ export default {
               targetTitle: targetTitles,
               listingLinkList: listingLinkLists,
             }).map(({targetTitle, listingLinkList}) => [
-                html.tag('dt', {class: ['content-heading']}, targetTitle),
-                html.tag('dd', listingLinkList),
+                html.tag('dt', {class: 'content-heading'},
+                  targetTitle),
+
+                html.tag('dd',
+                  listingLinkList),
               ])));
     }
   },

@@ -33,15 +33,14 @@ export default {
     const layout = getCarouselLayoutForNumberOfItems(stitched.length);
 
     return html.tags([
-      html.tag('div',
-        {
-          class: 'carousel-container',
-          'data-carousel-rows': layout.rows,
-          'data-carousel-columns': layout.columns,
-        },
+      html.tag('div', {class: 'carousel-container'},
+        {'data-carousel-rows': layout.rows},
+        {'data-carousel-columns': layout.columns},
+
         repeat(3, [
-          html.tag('div',
-            {class: 'carousel-grid', 'aria-hidden': 'true'},
+          html.tag('div', {class: 'carousel-grid'},
+            {'aria-hidden': 'true'},
+
             stitched.map(({image, link}, index) =>
               html.tag('div', {class: 'carousel-item'},
                 link.slots({

@@ -167,7 +167,9 @@ export default {
         relations.sameTargetListingLinks &&
           html.tag('p',
             language.$('listingPage.listingsFor', {
-              target: language.$(`listingPage.target.${data.targetStringsKey}`),
+              target:
+                language.$('listingPage.target', data.targetStringsKey),
+
               listings:
                 language.formatUnitList(
                   stitchArrays({
@@ -175,10 +177,12 @@ export default {
                     stringsKey: data.sameTargetListingStringsKeys,
                   }).map(({link, stringsKey}, index) =>
                       html.tag('span',
-                        {class: index === data.sameTargetListingsCurrentIndex && 'current'},
+                        index === data.sameTargetListingsCurrentIndex &&
+                          {class: 'current'},
+
                         link.slots({
                           attributes: {class: 'nowrap'},
-                          content: language.$(`listingPage.${stringsKey}.title.short`),
+                          content: language.$('listingPage', stringsKey, 'title.short'),
                         })))),
             })),
 

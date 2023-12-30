@@ -155,7 +155,9 @@ export default {
             relations.currentActFlashLinks
               .map((flashLink, index) =>
                 html.tag('li',
-                  {class: index === data.currentFlashIndex && 'current'},
+                  index === data.currentFlashIndex &&
+                    {class: 'current'},
+
                   flashLink))),
         ]),
     ]);
@@ -168,24 +170,31 @@ export default {
         sideColor: data.sideColors,
         actLinks: relations.sideActLinks,
       }).map(({sideName, sideColor, actLinks}, sideIndex) =>
-          html.tag('details', {
-            class: sideIndex === data.currentSideIndex && 'current',
-            open: data.isFlashActPage && sideIndex === data.currentSideIndex,
-            style: sideColor && `--primary-color: ${getColors(sideColor).primary}`
-          }, [
-            html.tag('summary',
-              html.tag('span', {class: 'group-name'},
-                sideName)),
+          html.tag('details',
+            sideIndex === data.currentSideIndex &&
+              {class: 'current'},
 
-            html.tag('ul',
-              actLinks.map((actLink, actIndex) =>
-                html.tag('li',
-                  {class:
+            data.isFlashActPage &&
+            sideIndex === data.currentSideIndex &&
+              {open: true},
+
+            sideColor &&
+              {style: `--primary-color: ${getColors(sideColor).primary}`},
+
+            [
+              html.tag('summary',
+                html.tag('span', {class: 'group-name'},
+                  sideName)),
+
+              html.tag('ul',
+                actLinks.map((actLink, actIndex) =>
+                  html.tag('li',
                     sideIndex === data.currentSideIndex &&
                     actIndex === data.currentActIndex &&
-                      'current'},
-                  actLink))),
-          ])),
+                      {class: 'current'},
+
+                    actLink))),
+            ])),
     ]);
 
     const sideMapBox = {

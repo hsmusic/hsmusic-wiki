@@ -91,8 +91,7 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          html.tag('p',
-            {class: 'quick-info'},
+          html.tag('p', {class: 'quick-info'},
             language.$('tagPage.infoLine', {
               coverArts: language.countCoverArts(data.numArtworks, {
                 unit: true,

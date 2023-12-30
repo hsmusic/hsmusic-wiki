@@ -162,7 +162,9 @@ export default {
           ? language.$('artistPage.groupContributions.title.withSortButton', {
               title: slots.title,
               sort:
-                html.tag('a', {href: '#', class: 'group-contributions-sort-button'},
+                html.tag('a', {class: 'group-contributions-sort-button'},
+                  {href: '#'},
+
                   (slots.sort === 'count'
                     ? language.$('artistPage.groupContributions.title.sorting.count')
                     : language.$('artistPage.groupContributions.title.sorting.duration'))),
@@ -170,12 +172,17 @@ export default {
           : slots.title)),
 
       html.tag('dd', {class: topLevelClasses},
-        html.tag('ul', {class: 'group-contributions-table', role: 'list'},
+        html.tag('ul', {class: 'group-contributions-table'},
+          {role: 'list'},
+
           (slots.sort === 'count'
             ? stitchArrays({
                 group: relations.groupLinksSortedByCount,
                 count: getCounts(data.groupCountsSortedByCount),
-                duration: getDurations(data.groupDurationsSortedByCount, data.groupDurationsApproximateSortedByCount),
+                duration:
+                  getDurations(
+                    data.groupDurationsSortedByCount,
+                    data.groupDurationsApproximateSortedByCount),
               }).map(({group, count, duration}) =>
                 html.tag('li',
                   html.tag('div', {class: 'group-contributions-row'}, [
@@ -187,10 +194,14 @@ export default {
                         ? language.$('artistPage.groupContributions.item.countDurationAccent', {count, duration})
                         : language.$('artistPage.groupContributions.item.countAccent', {count}))),
                   ])))
+
             : stitchArrays({
                 group: relations.groupLinksSortedByDuration,
                 count: getCounts(data.groupCountsSortedByDuration),
-                duration: getDurations(data.groupDurationsSortedByDuration, data.groupDurationsApproximateSortedByCount),
+                duration:
+                  getDurations(
+                    data.groupDurationsSortedByDuration,
+                    data.groupDurationsApproximateSortedByCount),
               }).map(({group, count, duration}) =>
                 html.tag('li',
                   html.tag('div', {class: 'group-contributions-row'}, [

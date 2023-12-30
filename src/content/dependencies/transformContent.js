@@ -369,10 +369,11 @@ export default {
                 type: 'image',
                 inline: true,
                 data:
-                  html.tag('img', {
-                    src, width, height,
-                    class: pixelate && 'pixelate',
-                  }),
+                  html.tag('img',
+                    {src, width, height},
+
+                    pixelate &&
+                      {class: 'pixelate'}),
               };
             }
 

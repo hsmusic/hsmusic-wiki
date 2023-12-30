@@ -252,123 +252,114 @@ export default {
     }
 
     const mainHTML =
-      html.tag('main', {
-        id: 'content',
-        class: slots.mainClasses,
-      }, [
-        titleHTML,
+      html.tag('main', {id: 'content'},
+        {class: slots.mainClasses},
 
-        html.tag('div', {
-          [html.onlyIfContent]: true,
-          id: 'cover-art-container',
-        }, slots.cover),
+        [
+          titleHTML,
 
-        slots.additionalNames,
+          html.tag('div', {id: 'cover-art-container'},
+            {[html.onlyIfContent]: true},
+            slots.cover),
 
-        html.tag('div',
-          {
-            [html.onlyIfContent]: true,
-            class: 'main-content-container',
-          },
-          slots.mainContent),
-      ]);
+          slots.additionalNames,
+
+          html.tag('div', {class: 'main-content-container'},
+            {[html.onlyIfContent]: true},
+            slots.mainContent),
+        ]);
 
     const footerHTML =
-      html.tag('footer',
-        {[html.onlyIfContent]: true, id: 'footer'},
+      html.tag('footer', {id: 'footer'},
+        {[html.onlyIfContent]: true},
+
         [
-          html.tag('div',
-            {
-              [html.onlyIfContent]: true,
-              class: 'footer-content',
-            },
+          html.tag('div', {class: 'footer-content'},
+            {[html.onlyIfContent]: true},
             footerContent),
 
           relations.footerLocalizationLinks,
         ]);
 
-    const navHTML = html.tag('nav',
-      {
-        [html.onlyIfContent]: true,
-        id: 'header',
-        class: [
-          !empty(slots.navLinks) && 'nav-has-main-links',
-          !html.isBlank(slots.navContent) && 'nav-has-content',
-          !html.isBlank(slots.navBottomRowContent) && 'nav-has-bottom-row',
-        ],
-      },
-      [
-        html.tag('div',
-          {
-            [html.onlyIfContent]: true,
-            class: [
-              'nav-main-links',
-              'nav-links-' + slots.navLinkStyle,
-            ],
-          },
-          slots.navLinks
-            ?.filter(Boolean)
-            ?.map((cur, i) => {
-              let content;
+    const navHTML =
+      html.tag('nav', {id: 'header'},
+        {[html.onlyIfContent]: true},
 
-              if (cur.html) {
-                content = cur.html;
-              } else {
-                let title;
-                let href;
+        !empty(slots.navLinks) &&
+          {class: 'nav-has-main-links'},
 
-                switch (cur.auto) {
-                  case 'home':
-                    title = data.wikiName;
-                    href = to('localized.home');
-                    break;
-                  case 'current':
-                    title = slots.title;
-                    href = '';
-                    break;
-                  case null:
-                  case undefined:
-                    title = cur.title;
-                    href = to(...cur.path);
-                    break;
+        !html.isBlank(slots.navContent) &&
+          {class: 'nav-has-content'},
+
+        !html.isBlank(slots.navBottomRowContent) &&
+          {class: 'nav-has-bottom-row'},
+
+        [
+          html.tag('div', {class: 'nav-main-links'},
+            {[html.onlyIfContent]: true},
+            {class: 'nav-links-' + slots.navLinkStyle},
+
+            slots.navLinks
+              ?.filter(Boolean)
+              ?.map((cur, i) => {
+                let content;
+
+                if (cur.html) {
+                  content = cur.html;
+                } else {
+                  let title;
+                  let href;
+
+                  switch (cur.auto) {
+                    case 'home':
+                      title = data.wikiName;
+                      href = to('localized.home');
+                      break;
+                    case 'current':
+                      title = slots.title;
+                      href = '';
+                      break;
+                    case null:
+                    case undefined:
+                      title = cur.title;
+                      href = to(...cur.path);
+                      break;
+                  }
+
+                  content =
+                    html.tag('a', {href}, title);
                 }
 
-                content = html.tag('a',
-                  {href},
-                  title);
-              }
-
-              let className;
-
-              if (
-                cur.current ||
-                cur.auto === 'current' ||
-                (slots.navLinkStyle === 'hierarchical' &&
-                  i === slots.navLinks.length - 1)
-              ) {
-                className = 'current';
-              }
-
-              return html.tag('span',
-                {class: className},
-                [
+                return (
                   html.tag('span',
-                    {class: 'nav-link-content'},
-                    content),
-                  html.tag('span',
-                    {[html.onlyIfContent]: true, class: 'nav-link-accent'},
-                    cur.accent),
-                ]);
-            })),
+                    cur.current &&
+                      {class: 'current'},
 
-        html.tag('div',
-          {[html.onlyIfContent]: true, class: 'nav-bottom-row'},
-          slots.navBottomRowContent),
+                    cur.auto === 'current' &&
+                      {class: 'current'},
 
-        html.tag('div',
-          {[html.onlyIfContent]: true, class: 'nav-content'},
-          slots.navContent),
-      ])
+                    slots.navLinkStyle === 'hierarchical' &&
+                    i === slots.navLinks.length - 1 &&
+                      {class: 'current'},
+
+                    [
+                      html.tag('span', {class: 'nav-link-content'},
+                        content),
+
+                      html.tag('span', {class: 'nav-link-accent'},
+                        {[html.onlyIfContent]: true},
+                        cur.accent),
+                    ]));
+              })),
+
+          html.tag('div', {class: 'nav-bottom-row'},
+            {[html.onlyIfContent]: true},
+            slots.navBottomRowContent),
+
+          html.tag('div', {class: 'nav-content'},
+            {[html.onlyIfContent]: true},
+            slots.navContent),
+        ]);
 
     const generateSidebarHTML = (side, id) => {
       const content = slots[side + 'Content'];
@@ -390,24 +381,28 @@ export default {
           multiple
             .filter(Boolean)
             .map(box =>
-              html.tag('div', {
-                [html.onlyIfContent]: true,
-                class: ['sidebar', box.class],
-              }, box.content));
+              html.tag('div', {class: 'sidebar'},
+                {[html.onlyIfContent]: true},
+                {class: box.class},
+                box.content));
       }
 
       if (html.isBlank(sidebarContent)) {
         return html.blank();
       }
 
-      return html.tag('div',
-        {id, class: [
-          'sidebar-column',
-          wide && 'wide',
-          !collapse && 'no-hide',
-          stickyMode !== 'static' && `sticky-${stickyMode}`,
-          ...sidebarClasses,
-        ]},
+      return html.tag('div', {class: 'sidebar-column'},
+        {id, class: sidebarClasses},
+
+        wide &&
+          {class: 'wide'},
+
+        !collapse &&
+          {class: 'no-hide'},
+
+        stickyMode !== 'static' &&
+          {class: `sticky-${stickyMode}`},
+
         sidebarContent);
     }
 
@@ -435,7 +430,7 @@ export default {
           html.tag('span', {class: 'skipper'},
             html.tag('a',
               {href: `#${id}`},
-              language.$(`misc.skippers.${string}`))));
+              language.$('misc.skippers', string))));
 
     const skippersHTML =
       mainHTML &&
@@ -464,8 +459,8 @@ export default {
               {condition: footerHTML, id: 'footer', string: 'footer'},
             ])),
 
-          html.tag('div',
-            {[html.onlyIfContent]: true, class: 'skipper-list'},
+          html.tag('div', {class: 'skipper-list'},
+            {[html.onlyIfContent]: true},
             processSkippers([
               {id: 'tracks', string: 'tracks'},
               {id: 'art', string: 'artworks'},
@@ -500,20 +495,26 @@ export default {
 
           html.tag('div', {id: 'image-overlay-action-content-with-size'}, [
             language.$('releaseInfo.viewOriginalFile.withSize', {
-              link: html.tag('a', {class: 'image-overlay-view-original'},
-                language.$('releaseInfo.viewOriginalFile.link')),
-              size: html.tag('span',
-                {[html.joinChildren]: ''},
-                [
-                  html.tag('span', {id: 'image-overlay-file-size-kilobytes'},
-                    language.$('count.fileSize.kilobytes', {
-                      kilobytes: html.tag('span', {class: 'image-overlay-file-size-count'}),
-                    })),
-                  html.tag('span', {id: 'image-overlay-file-size-megabytes'},
-                    language.$('count.fileSize.megabytes', {
-                      megabytes: html.tag('span', {class: 'image-overlay-file-size-count'}),
-                    })),
-                ]),
+              link:
+                html.tag('a', {class: 'image-overlay-view-original'},
+                  language.$('releaseInfo.viewOriginalFile.link')),
+
+              size:
+                html.tag('span',
+                  {[html.joinChildren]: ''},
+                  [
+                    html.tag('span', {id: 'image-overlay-file-size-kilobytes'},
+                      language.$('count.fileSize.kilobytes', {
+                        kilobytes:
+                          html.tag('span', {class: 'image-overlay-file-size-count'}),
+                      })),
+
+                    html.tag('span', {id: 'image-overlay-file-size-megabytes'},
+                      language.$('count.fileSize.megabytes', {
+                        megabytes:
+                          html.tag('span', {class: 'image-overlay-file-size-count'}),
+                      })),
+                  ]),
             }),
 
             html.tag('span', {id: 'image-overlay-file-size-warning'},
@@ -524,42 +525,45 @@ export default {
 
     const layoutHTML = [
       navHTML,
-      slots.bannerPosition === 'top' && slots.banner,
+
+      slots.bannerPosition === 'top' &&
+        slots.banner,
+
       slots.secondaryNav,
-      html.tag('div',
-        {
-          class: [
-            'layout-columns',
-            !collapseSidebars && 'vertical-when-thin',
-          ],
-        },
+
+      html.tag('div', {class: 'layout-columns'},
+        !collapseSidebars &&
+          {class: 'vertical-when-thin'},
+
         [
           sidebarLeftHTML,
           mainHTML,
           sidebarRightHTML,
         ]),
-      slots.bannerPosition === 'bottom' && slots.banner,
+
+      slots.bannerPosition === 'bottom' &&
+        slots.banner,
+
       footerHTML,
     ];
 
     const pageHTML = html.tags([
       `<!DOCTYPE html>`,
       html.tag('html',
-        {
-          lang: language.intlCode,
-          'data-language-code': language.code,
+        {lang: language.intlCode},
+        {'data-language-code': language.code},
 
-          'data-url-key': 'localized.' + pagePath[0],
-          ...Object.fromEntries(
-            pagePath
-              .slice(1)
-              .map((v, i) => [['data-url-value' + i], v])),
+        {'data-url-key': 'localized.' + pagePath[0]},
+        Object.fromEntries(
+          pagePath
+            .slice(1)
+            .map((v, i) => [['data-url-value' + i], v])),
 
-          'data-rebase-localized': to('localized.root'),
-          'data-rebase-shared': to('shared.root'),
-          'data-rebase-media': to('media.root'),
-          'data-rebase-data': to('data.root'),
-        },
+        {'data-rebase-localized': to('localized.root')},
+        {'data-rebase-shared': to('shared.root')},
+        {'data-rebase-media': to('media.root')},
+        {'data-rebase-data': to('data.root')},
+
         [
           // developersComment,
 
@@ -644,17 +648,20 @@ export default {
 
           html.tag('body',
             [
-              html.tag('div',
-                {
-                  id: 'page-container',
-                  class: [
-                    (hasSidebarLeft || hasSidebarRight) && 'has-one-sidebar',
-                    (hasSidebarLeft && hasSidebarRight) && 'has-two-sidebars',
-                    !(hasSidebarLeft || hasSidebarRight) && 'has-zero-sidebars',
-                    hasSidebarLeft && 'has-sidebar-left',
-                    hasSidebarRight && 'has-sidebar-right',
-                  ],
-                },
+              html.tag('div', {id: 'page-container'},
+                (hasSidebarLeft || hasSidebarRight
+                  ? {class: 'has-one-sidebar'}
+                  : {class: 'has-zero-sidebars'}),
+
+                hasSidebarLeft && hasSidebarRight &&
+                  {class: 'has-two-sidebars'},
+
+                hasSidebarLeft &&
+                  {class: 'has-sidebar-left'},
+
+                hasSidebarRight &&
+                  {class: 'has-sidebar-right'},
+
                 [
                   skippersHTML,
                   layoutHTML,

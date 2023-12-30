@@ -71,6 +71,6 @@ export default {
     }
 
     return html.tag('li', {style},
-      language.formatString(parts.join('.'), options));
+      language.formatString(...parts, options));
   },
 };

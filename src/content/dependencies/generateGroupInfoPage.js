@@ -182,7 +182,11 @@ export default {
 
                   return (
                     html.tag('li',
-                      {style: colorVariables.slot('color', albumColor).content},
+                      {style:
+                        colorVariables
+                          .slot('color', albumColor)
+                          .content},
+
                       language.$(...parts, options)));
                 })),
           ],

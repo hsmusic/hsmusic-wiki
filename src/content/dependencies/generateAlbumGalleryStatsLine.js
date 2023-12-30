@@ -33,6 +33,6 @@ export default {
 
     return (
       html.tag('p', {class: 'quick-info'},
-        language.formatString(parts.join('.'), options)));
+        language.formatString(...parts, options)));
   },
 };

@@ -132,21 +132,25 @@ export default {
                     image.slot('path', path)),
             }),
 
-          html.tag('p',
-            {class: 'quick-info'},
+          html.tag('p', {class: 'quick-info'},
             language.$('groupGalleryPage.infoLine', {
-              tracks: html.tag('b',
-                language.countTracks(data.numTracks, {
-                  unit: true,
-                })),
-              albums: html.tag('b',
-                language.countAlbums(data.numAlbums, {
-                  unit: true,
-                })),
-              time: html.tag('b',
-                language.formatDuration(data.totalDuration, {
-                  unit: true,
-                })),
+              tracks:
+                html.tag('b',
+                  language.countTracks(data.numTracks, {
+                    unit: true,
+                  })),
+
+              albums:
+                html.tag('b',
+                  language.countAlbums(data.numAlbums, {
+                    unit: true,
+                  })),
+
+              time:
+                html.tag('b',
+                  language.formatDuration(data.totalDuration, {
+                    unit: true,
+                  })),
             })),
 
           relations.coverGrid

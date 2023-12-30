@@ -83,8 +83,7 @@ export default {
 
         mainClasses: ['top-index'],
         mainContent: [
-          html.tag('p',
-            {class: 'quick-info'},
+          html.tag('p', {class: 'quick-info'},
             language.$('artistGalleryPage.infoLine', {
               coverArts: language.countCoverArts(data.numArtworks, {
                 unit: true,

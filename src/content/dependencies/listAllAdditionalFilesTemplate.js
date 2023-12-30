@@ -173,10 +173,13 @@ export default {
 
             html.tag('dl', [
               albumChunk.slots({
-                title: language.$(`listingPage.${slots.stringsKey}.albumFiles`),
+                title:
+                  language.$('listingPage', slots.stringsKey, 'albumFiles'),
+
                 additionalFileTitles: albumAdditionalFileTitles,
                 additionalFileLinks: albumAdditionalFileLinks,
                 additionalFileFiles: albumAdditionalFileFiles,
+
                 stringsKey: slots.stringsKey,
               }),
 

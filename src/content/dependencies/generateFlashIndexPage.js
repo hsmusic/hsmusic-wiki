@@ -96,12 +96,10 @@ export default {
       mainClasses: ['flash-index'],
       mainContent: [
         !empty(data.jumpLinkLabels) && [
-          html.tag('p',
-            {class: 'quick-info'},
+          html.tag('p', {class: 'quick-info'},
             language.$('misc.jumpTo')),
 
-          html.tag('ul',
-            {class: 'quick-info'},
+          html.tag('ul', {class: 'quick-info'},
             stitchArrays({
               colorVariables: relations.jumpLinkColorVariables,
               anchor: data.jumpLinkAnchors,
@@ -109,10 +107,15 @@ export default {
               label: data.jumpLinkLabels,
             }).map(({colorVariables, anchor, color, label}) =>
                 html.tag('li',
-                  html.tag('a', {
-                    href: '#' + anchor,
-                    style: colorVariables.slot('color', color).content,
-                  }, label)))),
+                  html.tag('a',
+                    {href: '#' + anchor},
+
+                    {style:
+                      colorVariables
+                        .slot('color', color)
+                        .content},
+
+                    label)))),
         ],
 
         stitchArrays({
@@ -139,10 +142,13 @@ export default {
             coverGridPaths,
           }, index) => [
             html.tag('h2',
-              {
-                id: anchor,
-                style: colorVariables.slot('color', color).content,
-              },
+              {id: anchor},
+
+              {style:
+                colorVariables
+                  .slot('color', color)
+                  .content},
+
               actLink),
 
             coverGrid.slots({

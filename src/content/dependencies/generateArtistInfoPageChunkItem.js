@@ -39,12 +39,12 @@ export default {
         break accent;
       }
 
-      accentedContent = language.formatString(parts.join('.'), options);
+      accentedContent = language.formatString(...parts, options);
     }
 
     return (
       html.tag('li',
-        {class: slots.rerelease && 'rerelease'},
+        slots.rerelease && {class: 'rerelease'},
         accentedContent));
   },
 };

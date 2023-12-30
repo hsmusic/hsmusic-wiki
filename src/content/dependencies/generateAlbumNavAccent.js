@@ -90,11 +90,9 @@ export default {
       slots.showTrackNavigation &&
       data.hasMultipleTracks &&
         html.tag('a',
-          {
-            href: '#',
-            'data-random': 'track-in-sidebar',
-            id: 'random-button',
-          },
+          {id: 'random-button'},
+          {href: '#', 'data-random': 'track-in-sidebar'},
+
           (data.isTrackPage
             ? language.$('trackPage.nav.random')
             : language.$('albumPage.nav.randomTrack')));

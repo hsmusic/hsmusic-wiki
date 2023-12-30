@@ -49,13 +49,16 @@ export default {
 
   generate(data, relations, slots, {html, language}) {
     return html.tag('details',
-      {
-        open: data.isCurrentCategory,
-        class: data.isCurrentCategory && 'current',
-      },
+      data.isCurrentCategory &&
+        {class: 'current', open: true},
+
       [
         html.tag('summary',
-          {style: relations.colorVariables.slot('color', data.color).content},
+          {style:
+            relations.colorVariables
+              .slot('color', data.color)
+              .content},
+
           html.tag('span',
             language.$('groupSidebar.groupList.category', {
               category:
@@ -69,7 +72,9 @@ export default {
             galleryLink: relations.groupGalleryLinks,
           })).map(({infoLink, galleryLink}, index) =>
                 html.tag('li',
-                  {class: index === data.currentGroupIndex && 'current'},
+                  index === data.currentGroupIndex &&
+                    {class: 'current'},
+
                   language.$('groupSidebar.groupList.item', {
                     group:
                       (slots.currentExtra === 'gallery'

@@ -43,7 +43,7 @@ export default {
                 ? html.tag('li',
                     additionalFileLinks[0].slots({
                       content:
-                        language.$(`listingPage.${slots.stringsKey}.file`, {
+                        language.$('listingPage', slots.stringsKey, 'file', {
                           title: additionalFileTitle,
                         }),
                     }))
@@ -52,11 +52,15 @@ export default {
                     html.tag('details', [
                       html.tag('summary',
                         html.tag('span',
-                          language.$(`listingPage.${slots.stringsKey}.file.withMultipleFiles`, {
+                          language.$('listingPage', slots.stringsKey, 'file.withMultipleFiles', {
                             title:
-                              html.tag('span', {class: 'group-name'}, additionalFileTitle),
+                              html.tag('span', {class: 'group-name'},
+                                additionalFileTitle),
+
                             files:
-                              language.countAdditionalFiles(additionalFileLinks.length, {unit: true}),
+                              language.countAdditionalFiles(
+                                additionalFileLinks.length,
+                                {unit: true}),
                           }))),
 
                       html.tag('ul',
@@ -67,7 +71,7 @@ export default {
                             html.tag('li',
                               additionalFileLink.slots({
                                 content:
-                                  language.$(`listingPage.${slots.stringsKey}.file`, {
+                                  language.$('listingPage', slots.stringsKey, 'file', {
                                     title: additionalFileFile,
                                   }),
                               })))),

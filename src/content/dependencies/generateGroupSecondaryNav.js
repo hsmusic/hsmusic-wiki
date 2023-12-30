@@ -89,7 +89,11 @@ export default {
         (!relations.previousGroupLink && !relations.nextGroupLink
           ? categoryLink
           : html.tag('span',
-              {style: relations.colorVariables.slot('color', data.categoryColor).content},
+              {style:
+                relations.colorVariables
+                  .slot('color', data.categoryColor)
+                  .content},
+
               [
                 categoryLink.slot('color', false),
                 `(${language.formatUnitList(previousNextPart)})`,

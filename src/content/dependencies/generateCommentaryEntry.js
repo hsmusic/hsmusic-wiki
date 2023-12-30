@@ -89,10 +89,12 @@ export default {
         : null);
 
     return html.tags([
-      html.tag('p', {class: 'commentary-entry-heading', style},
+      html.tag('p', {class: 'commentary-entry-heading'},
+        {style},
         language.$(...titleParts, titleOptions)),
 
-      html.tag('blockquote', {class: 'commentary-entry-body', style},
+      html.tag('blockquote', {class: 'commentary-entry-body'},
+        {style},
         relations.bodyContent.slot('mode', 'multiline')),
     ]);
   },

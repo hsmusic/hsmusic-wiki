@@ -129,11 +129,16 @@ export default {
 
             return (
               html.tag('span',
-                {style: colorVariables.slot('color', groupColor).content},
+                {style:
+                  colorVariables
+                    .slot('color', groupColor)
+                    .content},
+
                 [
                   language.$('albumSidebar.groupBox.title', {
                     group: groupLink.slot('color', false),
                   }),
+
                   `(${language.formatUnitList(previousNextPart)})`,
                 ]));
           }),

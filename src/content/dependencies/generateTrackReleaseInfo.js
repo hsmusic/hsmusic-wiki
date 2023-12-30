@@ -46,33 +46,34 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
-    return html.tags([
-      html.tag('p', {
-        [html.onlyIfContent]: true,
-        [html.joinChildren]: html.tag('br'),
-      }, [
-        relations.artistContributionLinks
-          .slots({stringKey: 'releaseInfo.by'}),
+  generate: (data, relations, {html, language}) =>
+    html.tags([
+      html.tag('p',
+        {[html.onlyIfContent]: true},
+        {[html.joinChildren]: html.tag('br')},
 
-        relations.coverArtistContributionsLine
-          ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
+        [
+          relations.artistContributionLinks
+            .slots({stringKey: 'releaseInfo.by'}),
 
-        data.date &&
-          language.$('releaseInfo.released', {
-            date: language.formatDate(data.date),
-          }),
+          relations.coverArtistContributionsLine
+            ?.slots({stringKey: 'releaseInfo.coverArtBy'}),
 
-        data.coverArtDate &&
-          language.$('releaseInfo.artReleased', {
-            date: language.formatDate(data.coverArtDate),
-          }),
+          data.date &&
+            language.$('releaseInfo.released', {
+              date: language.formatDate(data.date),
+            }),
 
-        data.duration &&
-          language.$('releaseInfo.duration', {
-            duration: language.formatDuration(data.duration),
-          }),
-      ]),
+          data.coverArtDate &&
+            language.$('releaseInfo.artReleased', {
+              date: language.formatDate(data.coverArtDate),
+            }),
+
+          data.duration &&
+            language.$('releaseInfo.duration', {
+              duration: language.formatDuration(data.duration),
+            }),
+        ]),
 
       html.tag('p',
         (relations.externalLinks
@@ -85,6 +86,5 @@ export default {
           : language.$('releaseInfo.listenOn.noLinks', {
               name: html.tag('i', data.name),
             }))),
-    ]);
-  },
+    ]),
 };

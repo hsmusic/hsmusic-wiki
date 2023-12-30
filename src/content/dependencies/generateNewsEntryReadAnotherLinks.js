@@ -85,13 +85,13 @@ export default {
     }
 
     return (
-      html.tag('p', {
-        [html.onlyIfContent]: true,
-        [html.joinChildren]: html.tag('br'),
-        class: [
-          'read-another-links',
-          entryLines.length > 1 && 'offset-tooltips',
-        ],
-      }, entryLines));
+      html.tag('p', {class: 'read-another-links'},
+        {[html.onlyIfContent]: true},
+        {[html.joinChildren]: html.tag('br')},
+
+        entryLines.length > 1 &&
+          {class: 'offset-tooltips'},
+
+        entryLines));
   },
 };

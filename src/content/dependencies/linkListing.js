@@ -10,5 +10,6 @@ export default {
 
   generate: (data, relations, {language}) =>
     relations.link
-      .slot('content', language.$(`listingPage.${data.stringsKey}.title`)),
+      .slot('content',
+        language.$('listingPage', data.stringsKey, 'title')),
 };

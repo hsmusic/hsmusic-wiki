@@ -52,10 +52,9 @@ export default {
   generate(data, relations, {html, language}) {
     return html.tags([
       html.tag('p',
-        {
-          [html.onlyIfContent]: true,
-          [html.joinChildren]: html.tag('br'),
-        },
+        {[html.onlyIfContent]: true},
+        {[html.joinChildren]: html.tag('br')},
+
         [
           relations.artistContributionsLine
             .slots({stringKey: 'releaseInfo.by'}),

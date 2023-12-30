@@ -123,7 +123,9 @@ export default {
 
               html.tag('dd',
                 html.tag(listTag,
-                  data.hasTrackNumbers ? {start: info.startIndex + 1} : {},
+                  data.hasTrackNumbers &&
+                    {start: info.startIndex + 1},
+
                   items)),
             ]));
 

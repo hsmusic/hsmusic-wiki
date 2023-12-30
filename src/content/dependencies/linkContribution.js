@@ -51,57 +51,55 @@ export default {
     if (hasExternalIcons && slots.iconMode === 'inline') {
       parts.push('withExternalLinks');
       options.links =
-        html.tag('span',
-          {
-            [html.noEdgeWhitespace]: true,
-            class: ['icons', 'icons-inline'],
-          },
+        html.tag('span', {class: ['icons', 'icons-inline']},
+          {[html.noEdgeWhitespace]: true},
+
           language.formatUnitList(
             relations.artistIcons
               .slice(0, 4)
-              .map(icon => icon.slot('context', 'artist'))));
+              .map(icon =>
+                icon.slot({
+                  context: 'artist',
+                }))));
     }
 
-    let content = language.formatString(parts.join('.'), options);
+    let content = language.formatString(...parts, options);
 
     if (hasExternalIcons && slots.iconMode === 'tooltip') {
       content = [
         content,
-        html.tag('span',
-          {
-            [html.noEdgeWhitespace]: true,
-            class: ['icons', 'icons-tooltip'],
-            inert: true,
-          },
-          html.tag('span',
-            {
-              [html.noEdgeWhitespace]: true,
-              [html.joinChildren]: '',
-              class: 'icons-tooltip-content',
-            },
+        html.tag('span', {class: ['icons', 'icons-tooltip']},
+          {[html.noEdgeWhitespace]: true},
+          {inert: true},
+
+          html.tag('span', {class: 'icons-tooltip-content'},
+            {[html.noEdgeWhitespace]: true},
+            {[html.joinChildren]: ''},
+
             relations.artistIcons
-              .map(icon => icon.slots({context: 'artist', withText: true})))),
+              .map(icon =>
+                icon.slots({
+                  context: 'artist',
+                  withText: true,
+                })))),
       ];
     }
 
     if (hasContribution || hasExternalIcons) {
       content =
-        html.tag('span', {
-          [html.noEdgeWhitespace]: true,
-          [html.joinChildren]: '',
+        html.tag('span', {class: 'contribution'},
+          {[html.noEdgeWhitespace]: true},
+          {[html.joinChildren]: ''},
 
-          class: [
-            'contribution',
+          hasExternalIcons &&
+          slots.iconMode === 'tooltip' &&
+            {class: 'has-tooltip'},
 
-            hasExternalIcons &&
-            slots.iconMode === 'tooltip' &&
-              'has-tooltip',
+          parts.length > 1 &&
+          slots.preventWrapping &&
+            {class: 'nowrap'},
 
-            parts.length > 1 &&
-            slots.preventWrapping &&
-              'nowrap',
-          ],
-        }, content);
+          content);
     }
 
     return content;

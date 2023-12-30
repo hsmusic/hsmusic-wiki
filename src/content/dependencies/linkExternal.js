@@ -27,14 +27,12 @@ export default {
 
   generate: (data, slots, {html, language}) =>
     html.tag('a',
-      {
-        href: data.url,
-        class: 'nowrap',
-        target:
-          (slots.tab === 'separate'
-            ? '_blank'
-            : null),
-      },
+      {class: 'nowrap'},
+      {href: data.url},
+
+      slots.tab === 'separate' &&
+        {target: '_blank'},
+
       language.formatExternalLink(data.url, {
         style: slots.style,
         context: slots.context,

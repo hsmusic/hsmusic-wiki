@@ -346,10 +346,9 @@ export default {
           relations.releaseInfo,
 
           html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: '<br>',
-            },
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
             [
               sec.sheetMusicFiles &&
                 language.$('releaseInfo.sheetMusicFiles.shortcut', {
@@ -414,7 +413,11 @@ export default {
 
                   return (
                     html.tag('li',
-                      {style: colorVariables.slot('color', color).content},
+                      {style:
+                        colorVariables
+                          .slot('color', color)
+                          .content},
+
                       language.$(...parts, options)));
                 })),
           ],

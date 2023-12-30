@@ -16,26 +16,24 @@ export default {
     tag: {type: 'string', default: 'p'},
   },
 
-  generate(relations, slots, {html}) {
-    return html.tag(slots.tag,
-      {
-        class: 'content-heading',
-        id: slots.id,
-        tabindex: '0',
+  generate: (relations, slots, {html}) =>
+    html.tag(slots.tag, {class: 'content-heading'},
+      {id: slots.id},
+      {tabindex: '0'},
 
-        style:
-          slots.color &&
-            relations.colorVariables
-              .slot('color', slots.color)
-              .content,
-      }, [
-        html.tag('span',
-          {[html.onlyIfContent]: true, class: 'content-heading-main-title'},
+      slots.color &&
+        {style:
+          relations.colorVariables
+            .slot('color', slots.color)
+            .content},
+
+      [
+        html.tag('span', {class: 'content-heading-main-title'},
+          {[html.onlyIfContent]: true},
           slots.title),
 
-        html.tag('span',
-          {[html.onlyIfContent]: true, class: 'content-heading-accent'},
+        html.tag('span', {class: 'content-heading-accent'},
+          {[html.onlyIfContent]: true},
           slots.accent),
-      ]);
-  }
+      ]),
 }

@@ -25,8 +25,12 @@ export default {
     const compactText = format('compact');
     const iconId = format('icon-id');
 
-    return html.tag('a',
-      {href: data.url, class: ['icon', slots.withText && 'has-text']},
+    return html.tag('a', {class: 'icon'},
+      {href: data.url},
+
+      slots.withText &&
+        {class: 'has-text'},
+
       [
         html.tag('svg', [
           !slots.withText &&

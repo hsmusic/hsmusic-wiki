@@ -171,10 +171,9 @@ export default {
           relations.releaseInfo,
 
           html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: html.tag('br'),
-            },
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
             [
               sec.extra.additionalFilesShortcut,
 
@@ -206,10 +205,9 @@ export default {
           relations.trackList,
 
           html.tag('p',
-            {
-              [html.onlyIfContent]: true,
-              [html.joinChildren]: '<br>',
-            },
+            {[html.onlyIfContent]: true},
+            {[html.joinChildren]: html.tag('br')},
+
             [
               data.dateAddedToWiki &&
                 language.$('releaseInfo.addedToWiki', {

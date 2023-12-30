@@ -8,21 +8,20 @@ export default {
   },
 
   generate: (slots, {html}) =>
-    html.tag('span', {
-      [html.joinChildren]: '',
-
-      class: [
-        'datetimestamp',
-        slots.tooltipContent && 'has-tooltip',
-      ],
-    }, [
-      html.tag('time',
-        {datetime: slots.datetime},
-        slots.mainContent),
+    html.tag('span', {class: 'datetimestamp'},
+      {[html.joinChildren]: ''},
 
       slots.tooltipContent &&
-        html.tag('span', {class: 'datetimestamp-tooltip'},
-          html.tag('span', {class: 'datetimestamp-tooltip-content'},
-            slots.tooltipContent)),
-    ]),
+        {class: 'has-tooltip'},
+
+      [
+        html.tag('time',
+          {datetime: slots.datetime},
+          slots.mainContent),
+
+        slots.tooltipContent &&
+          html.tag('span', {class: 'datetimestamp-tooltip'},
+            html.tag('span', {class: 'datetimestamp-tooltip-content'},
+              slots.tooltipContent)),
+      ]),
 };

@@ -57,23 +57,25 @@ export default {
             mainLink,
             readMoreLink,
           }, index) =>
-          html.tag('article',
-            {class: ['news-entry', index === 0 && 'first-news-entry']},
-            [
-              html.tag('h2', [
-                html.tag('time', language.formatDate(date)),
-                mainLink,
-              ]),
+            html.tag('article', {class: 'news-entry'},
+              index === 0 &&
+                {class: 'first-news-entry'},
 
-              content.slot('thumb', 'medium'),
+              [
+                html.tag('h2', [
+                  html.tag('time', language.formatDate(date)),
+                  mainLink,
+                ]),
 
-              html.tag('p',
-                {[html.onlyIfContent]: true},
-                readMoreLink
-                  ?.slots({
-                    content: language.$('homepage.news.entry.viewRest'),
-                  })),
-            ])),
+                content.slot('thumb', 'medium'),
+
+                html.tag('p',
+                  {[html.onlyIfContent]: true},
+                  readMoreLink
+                    ?.slots({
+                      content: language.$('homepage.news.entry.viewRest'),
+                    })),
+              ])),
       ],
     };
   },

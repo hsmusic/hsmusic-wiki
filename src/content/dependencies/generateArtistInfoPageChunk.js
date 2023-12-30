@@ -43,7 +43,7 @@ export default {
               });
           }
 
-          accentedLink = language.formatString(parts.join('.'), options);
+          accentedLink = language.formatString(...parts, options);
           break;
         }
 
@@ -65,7 +65,7 @@ export default {
             options.date = language.formatDate(slots.dateRangeStart ?? slots.date);
           }
 
-          accentedLink = language.formatString(parts.join('.'), options);
+          accentedLink = language.formatString(...parts, options);
           break;
         }
       }

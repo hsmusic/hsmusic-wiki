@@ -141,7 +141,7 @@ export default {
       return prepare(
         html.tag('div', {class: 'image-text-area'},
           (html.isBlank(slots.missingSourceContent)
-            ? language.$(`misc.missingImage`)
+            ? language.$('misc.missingImage')
             : slots.missingSourceContent)));
     }
 
@@ -231,39 +231,44 @@ export default {
 
     const nonlazyHTML =
       originalSrc &&
-        prepare(
-          html.tag('img', {
-            ...imgAttributes,
-            src: thumbSrc ?? originalSrc,
-          }));
+        prepareVisible(
+          html.tag('img',
+            imgAttributes,
+            {src: thumbSrc ?? originalSrc}));
 
     if (slots.lazy) {
       return html.tags([
         html.tag('noscript', nonlazyHTML),
-        prepare(
-          html.tag('img',
-            {
-              ...imgAttributes,
-              class: 'lazy',
-              'data-original': thumbSrc ?? originalSrc,
-            }),
+        prepareHidden(
+          html.tag('img', {class: 'lazy'},
+            imgAttributes,
+            {'data-original': thumbSrc ?? originalSrc}),
           true),
       ]);
     }
 
     return nonlazyHTML;
 
-    function prepare(content, hide = false) {
+    function prepareVisible(content) {
+      return prepare(content, false);
+    }
+
+    function prepareHidden(content) {
+      return prepare(content, true);
+    }
+
+    function prepare(content, hide) {
       let wrapped = content;
 
       wrapped =
-        html.tag('div', {
-          class: ['image-container', !originalSrc && 'placeholder-image'],
-          style: styleOnContainer,
-        }, [
+        html.tag('div', {class: 'image-container'},
+          {style: styleOnContainer},
+
+          !originalSrc &&
+            {style: 'placeholder-image'},
+
           html.tag('div', {class: 'image-inner-area'},
-            wrapped),
-        ]);
+            wrapped));
 
       if (willReveal) {
         wrapped =
@@ -277,38 +282,29 @@ export default {
 
       if (willSquare) {
         wrapped =
-          html.tag('div',
-            {
-              class: [
-                'square',
-                hide && !willLink && 'js-hide'
-              ],
-            },
+          html.tag('div', {class: 'square'},
+            hide && !willLink &&
+              {class: 'js-hide'},
 
             html.tag('div', {class: 'square-content'},
               wrapped));
       }
 
       if (willLink) {
-        wrapped = html.tag('a',
-          {
-            id: idOnLink,
+        wrapped =
+          html.tag('a', {class: ['box', 'image-link']},
+            {id: idOnLink},
+            {class: classOnLink},
+            {style: styleOnLink},
 
-            class: [
-              'box',
-              'image-link',
-              hide && 'js-hide',
-              classOnLink,
-            ],
+            hide &&
+              {class: 'js-hide'},
 
-            style: styleOnLink,
+            (typeof slots.link === 'string'
+              ? {href: slots.link}
+              : {href: originalSrc}),
 
-            href:
-              (typeof slots.link === 'string'
-                ? slots.link
-                : originalSrc),
-          },
-          wrapped);
+            wrapped);
       }
 
       return wrapped;
