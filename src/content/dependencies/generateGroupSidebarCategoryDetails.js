@@ -2,7 +2,7 @@ import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'linkGroup',
     'linkGroupGallery',
   ],
@@ -11,8 +11,8 @@ export default {
 
   relations(relation, category) {
     return {
-      colorVariables:
-        relation('generateColorStyleVariables'),
+      colorStyle:
+        relation('generateColorStyleAttribute', category.color),
 
       groupInfoLinks:
         category.groups.map(group =>
@@ -30,7 +30,6 @@ export default {
     const data = {};
 
     data.name = category.name;
-    data.color = category.color;
 
     data.isCurrentCategory = category === group.category;
 
@@ -54,10 +53,7 @@ export default {
 
       [
         html.tag('summary',
-          {style:
-            relations.colorVariables
-              .slot('color', data.color)
-              .content},
+          relations.colorStyle,
 
           html.tag('span',
             language.$('groupSidebar.groupList.category', {

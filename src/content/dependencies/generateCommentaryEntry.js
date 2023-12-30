@@ -2,7 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'linkArtist',
     'transformContent',
   ],
@@ -31,8 +31,8 @@ export default {
         ? relation('transformContent', entry.body)
         : null),
 
-    colorVariables:
-      relation('generateColorStyleVariables'),
+    colorStyle:
+      relation('generateColorStyleAttribute'),
   }),
 
   data: (entry) => ({
@@ -82,19 +82,16 @@ export default {
     }
 
     const style =
-      (slots.color
-        ? relations.colorVariables
-            .slot('color', slots.color)
-            .content
-        : null);
+      slots.color &&
+        relations.colorStyle.slot('color', slots.color);
 
     return html.tags([
       html.tag('p', {class: 'commentary-entry-heading'},
-        {style},
+        style,
         language.$(...titleParts, titleOptions)),
 
       html.tag('blockquote', {class: 'commentary-entry-body'},
-        {style},
+        style,
         relations.bodyContent.slot('mode', 'multiline')),
     ]);
   },

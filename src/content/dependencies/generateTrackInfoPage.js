@@ -12,7 +12,7 @@ export default {
     'generateAlbumSidebar',
     'generateAlbumStyleRules',
     'generateChronologyLinks',
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'generateCommentarySection',
     'generateContentHeading',
     'generateContributionList',
@@ -142,9 +142,9 @@ export default {
       otherReleases.heading =
         relation('generateContentHeading');
 
-      otherReleases.colorVariables =
+      otherReleases.colorStyles =
         track.otherReleases
-          .map(() => relation('generateColorStyleVariables'));
+          .map(track => relation('generateColorStyleAttribute', track.color));
 
       otherReleases.trackLinks =
         track.otherReleases
@@ -315,9 +315,6 @@ export default {
       hasTrackNumbers: track.album.hasTrackNumbers,
       trackNumber: track.album.tracks.indexOf(track) + 1,
 
-      otherReleaseColors:
-        track.otherReleases.map(track => track.color),
-
       numAdditionalFiles: track.additionalFiles.length,
     };
   },
@@ -387,14 +384,12 @@ export default {
                 trackLink: sec.otherReleases.trackLinks,
                 albumLink: sec.otherReleases.albumLinks,
                 datetimestamp: sec.otherReleases.datetimestamps,
-                colorVariables: sec.otherReleases.colorVariables,
-                color: data.otherReleaseColors,
+                colorStyle: sec.otherReleases.colorStyles,
               }).map(({
                   trackLink,
                   albumLink,
                   datetimestamp,
-                  colorVariables,
-                  color,
+                  colorStyle,
                 }) => {
                   const parts = ['releaseInfo.alsoReleasedAs.item'];
                   const options = {};
@@ -413,11 +408,7 @@ export default {
 
                   return (
                     html.tag('li',
-                      {style:
-                        colorVariables
-                          .slot('color', color)
-                          .content},
-
+                      colorStyle,
                       language.$(...parts, options)));
                 })),
           ],

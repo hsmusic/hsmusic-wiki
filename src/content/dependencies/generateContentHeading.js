@@ -1,9 +1,9 @@
 export default {
   extraDependencies: ['html'],
-  contentDependencies: ['generateColorStyleVariables'],
+  contentDependencies: ['generateColorStyleAttribute'],
 
   relations: (relation) => ({
-    colorVariables: relation('generateColorStyleVariables'),
+    colorStyle: relation('generateColorStyleAttribute'),
   }),
 
   slots: {
@@ -22,10 +22,7 @@ export default {
       {tabindex: '0'},
 
       slots.color &&
-        {style:
-          relations.colorVariables
-            .slot('color', slots.color)
-            .content},
+        relations.colorStyle.slot('color', slots.color),
 
       [
         html.tag('span', {class: 'content-heading-main-title'},

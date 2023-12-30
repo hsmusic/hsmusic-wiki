@@ -3,7 +3,7 @@ import {empty, stitchArrays} from '#sugar';
 export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'generateContentHeading',
     'generateGroupNavLinks',
     'generateGroupSecondaryNav',
@@ -64,9 +64,9 @@ export default {
       sec.albums.galleryLink =
         relation('linkGroupGallery', group);
 
-      sec.albums.colorVariables =
+      sec.albums.albumColorStyles =
         group.albums
-          .map(() => relation('generateColorStyleVariables'));
+          .map(album => relation('generateColorStyleAttribute', album.color));
 
       sec.albums.albumLinks =
         group.albums
@@ -95,9 +95,6 @@ export default {
 
     data.name = group.name;
     data.color = group.color;
-
-    data.albumColors =
-      group.albums.map(album => album.color);
 
     return data;
   },
@@ -145,14 +142,12 @@ export default {
                 albumLink: sec.albums.albumLinks,
                 groupLink: sec.albums.groupLinks,
                 datetimestamp: sec.albums.datetimestamps,
-                colorVariables: sec.albums.colorVariables,
-                albumColor: data.albumColors,
+                albumColorStyle: sec.albums.albumColorStyles,
               }).map(({
                   albumLink,
                   groupLink,
                   datetimestamp,
-                  colorVariables,
-                  albumColor,
+                  albumColorStyle,
                 }) => {
                   const prefix = 'groupInfoPage.albumList.item';
                   const parts = [prefix];
@@ -182,11 +177,7 @@ export default {
 
                   return (
                     html.tag('li',
-                      {style:
-                        colorVariables
-                          .slot('color', albumColor)
-                          .content},
-
+                      albumColorStyle,
                       language.$(...parts, options)));
                 })),
           ],

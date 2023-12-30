@@ -2,7 +2,7 @@ import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'generatePreviousNextLinks',
     'generateSecondaryNav',
     'linkAlbumDynamically',
@@ -48,9 +48,9 @@ export default {
       album.groups
         .map(group => relation('linkGroup', group));
 
-    relations.colorVariables =
+    relations.colorStyles =
       album.groups
-        .map(() => relation('generateColorStyleVariables'));
+        .map(group => relation('generateColorStyleAttribute', group.color));
 
     if (query.adjacentGroupInfo) {
       relations.previousNextLinks =
@@ -78,13 +78,6 @@ export default {
     return relations;
   },
 
-  data(query, album) {
-    return {
-      groupColors:
-        album.groups.map(group => group.color),
-    };
-  },
-
   slots: {
     mode: {
       validate: v => v.is('album', 'track'),
@@ -92,24 +85,22 @@ export default {
     },
   },
 
-  generate(data, relations, slots, {html, language}) {
+  generate(relations, slots, {html, language}) {
     return relations.secondaryNav.slots({
       class: 'nav-links-groups',
       content:
         stitchArrays({
-          colorVariables: relations.colorVariables,
+          colorStyle: relations.colorStyles,
           groupLink: relations.groupLinks,
           previousNextLinks: relations.previousNextLinks ?? null,
           previousAlbumLink: relations.previousAlbumLinks ?? null,
           nextAlbumLink: relations.nextAlbumLinks ?? null,
-          groupColor: data.groupColors,
         }).map(({
-            colorVariables,
+            colorStyle,
             groupLink,
             previousNextLinks,
             previousAlbumLink,
             nextAlbumLink,
-            groupColor,
           }) => {
             if (
               slots.mode === 'track' ||
@@ -129,10 +120,7 @@ export default {
 
             return (
               html.tag('span',
-                {style:
-                  colorVariables
-                    .slot('color', groupColor)
-                    .content},
+                colorStyle,
 
                 [
                   language.$('albumSidebar.groupBox.title', {

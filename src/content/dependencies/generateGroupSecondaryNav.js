@@ -1,6 +1,6 @@
 export default {
   contentDependencies: [
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'generatePreviousNextLinks',
     'generateSecondaryNav',
     'linkGroupDynamically',
@@ -34,7 +34,7 @@ export default {
     };
   },
 
-  relations(relation, query, sprawl, _group) {
+  relations(relation, query, sprawl, group) {
     const relations = {};
 
     relations.secondaryNav =
@@ -45,8 +45,8 @@ export default {
         relation('linkListing', sprawl.groupsByCategoryListing);
     }
 
-    relations.colorVariables =
-      relation('generateColorStyleVariables');
+    relations.colorStyle =
+      relation('generateColorStyleAttribute', group.category.color);
 
     if (query.previousGroup || query.nextGroup) {
       relations.previousNextLinks =
@@ -68,7 +68,6 @@ export default {
 
   data: (query, sprawl, group) => ({
     categoryName: group.category.name,
-    categoryColor: group.category.color,
   }),
 
   generate(data, relations, {html, language}) {
@@ -89,10 +88,7 @@ export default {
         (!relations.previousGroupLink && !relations.nextGroupLink
           ? categoryLink
           : html.tag('span',
-              {style:
-                relations.colorVariables
-                  .slot('color', data.categoryColor)
-                  .content},
+              relations.colorStyle,
 
               [
                 categoryLink.slot('color', false),

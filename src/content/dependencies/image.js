@@ -14,10 +14,11 @@ export default {
     'to',
   ],
 
-  contentDependencies: ['generateColorStyleVariables'],
+  contentDependencies: ['generateColorStyleAttribute'],
 
   relations: (relation) => ({
-    colorVariables: relation('generateColorStyleVariables'),
+    colorStyle:
+      relation('generateColorStyleAttribute'),
   }),
 
   data(artTags) {
@@ -122,9 +123,8 @@ export default {
 
     const colorStyle =
       slots.color &&
-        relations.colorVariables
-          .slot('color', slots.color)
-          .content;
+        relations.colorStyle
+          .slot('color', slots.color);
 
     const willSquare = slots.square;
 
@@ -262,7 +262,7 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-container'},
-          {style: styleOnContainer},
+          styleOnContainer,
 
           !originalSrc &&
             {style: 'placeholder-image'},
@@ -295,7 +295,7 @@ export default {
           html.tag('a', {class: ['box', 'image-link']},
             {id: idOnLink},
             {class: classOnLink},
-            {style: styleOnLink},
+            styleOnLink,
 
             hide &&
               {class: 'js-hide'},

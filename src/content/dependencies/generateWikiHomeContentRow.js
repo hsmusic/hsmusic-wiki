@@ -1,20 +1,14 @@
 export default {
-  contentDependencies: ['generateColorStyleVariables'],
+  contentDependencies: ['generateColorStyleAttribute'],
   extraDependencies: ['html'],
 
-  relations(relation) {
-    return {
-      colorVariables:
-        relation('generateColorStyleVariables'),
-    };
-  },
+  relations: (relation, row) => ({
+    colorStyle:
+      relation('generateColorStyleAttribute', row.color),
+  }),
 
-  data(row) {
-    return {
-      name: row.name,
-      color: row.color,
-    };
-  },
+  data: (row) =>
+    ({name: row.name}),
 
   slots: {
     content: {type: 'html'},
@@ -22,10 +16,7 @@ export default {
 
   generate: (data, relations, slots, {html}) =>
     html.tag('section', {class: 'row'},
-      {style:
-        relations.colorVariables
-          .slot('color', data.color)
-          .content},
+      relations.colorStyle,
 
       [
         html.tag('h2', data.name),

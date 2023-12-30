@@ -2,7 +2,7 @@ import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
-    'generateColorStyleVariables',
+    'generateColorStyleAttribute',
     'generateCoverGrid',
     'generatePageLayout',
     'image',
@@ -29,13 +29,13 @@ export default {
     layout:
       relation('generatePageLayout'),
 
-    jumpLinkColorVariables:
+    jumpLinkColorStyles:
       query.jumpActs
-        .map(() => relation('generateColorStyleVariables')),
+        .map(act => relation('generateColorStyleAttribute', act.jumpColor)),
 
-    actColorVariables:
+    actColorStyles:
       query.flashActs
-        .map(() => relation('generateColorStyleVariables')),
+        .map(act => relation('generateColorStyleAttribute', act.color)),
 
     actLinks:
       query.flashActs
@@ -61,10 +61,6 @@ export default {
       query.jumpActs
         .map(act => act.directory),
 
-    jumpLinkColors:
-      query.jumpActs
-        .map(act => act.jumpColor),
-
     jumpLinkLabels:
       query.jumpActs
         .map(act => act.jump),
@@ -72,10 +68,6 @@ export default {
     actAnchors:
       query.flashActs
         .map(act => act.directory),
-
-    actColors:
-      query.flashActs
-        .map(act => act.color),
 
     actCoverGridNames:
       query.flashActs
@@ -101,28 +93,21 @@ export default {
 
           html.tag('ul', {class: 'quick-info'},
             stitchArrays({
-              colorVariables: relations.jumpLinkColorVariables,
+              colorStyle: relations.jumpLinkColorStyles,
               anchor: data.jumpLinkAnchors,
-              color: data.jumpLinkColors,
               label: data.jumpLinkLabels,
-            }).map(({colorVariables, anchor, color, label}) =>
+            }).map(({colorStyle, anchor, label}) =>
                 html.tag('li',
                   html.tag('a',
                     {href: '#' + anchor},
-
-                    {style:
-                      colorVariables
-                        .slot('color', color)
-                        .content},
-
+                    colorStyle,
                     label)))),
         ],
 
         stitchArrays({
-          colorVariables: relations.actColorVariables,
+          colorStyle: relations.actColorStyles,
           actLink: relations.actLinks,
           anchor: data.actAnchors,
-          color: data.actColors,
 
           coverGrid: relations.actCoverGrids,
           coverGridImages: relations.actCoverGridImages,
@@ -130,10 +115,9 @@ export default {
           coverGridNames: data.actCoverGridNames,
           coverGridPaths: data.actCoverGridPaths,
         }).map(({
-            colorVariables,
-            anchor,
-            color,
+            colorStyle,
             actLink,
+            anchor,
 
             coverGrid,
             coverGridImages,
@@ -143,12 +127,7 @@ export default {
           }, index) => [
             html.tag('h2',
               {id: anchor},
-
-              {style:
-                colorVariables
-                  .slot('color', color)
-                  .content},
-
+              colorStyle,
               actLink),
 
             coverGrid.slots({

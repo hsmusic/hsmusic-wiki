@@ -2,15 +2,26 @@ export default {
   contentDependencies: ['generateColorStyleVariables'],
   extraDependencies: ['html'],
 
-  relations: (relation) =>
-    ({variables: relation('generateColorStyleVariables')}),
+  relations: (relation) => ({
+    variables:
+      relation('generateColorStyleVariables'),
+  }),
+
+  data: (color) => ({
+    color:
+      color ?? null,
+  }),
 
   slots: {
-    color: {validate: v => v.isColor},
+    color: {
+      validate: v => v.isColor,
+    },
   },
 
-  generate(relations, slots) {
-    if (!slots.color) {
+  generate(data, relations, slots) {
+    const color = data.color ?? slots.color;
+
+    if (!color) {
       return '';
     }
 
@@ -19,7 +30,7 @@ export default {
       ...(
         relations.variables
           .slots({
-            color: slots.color,
+            color,
             context: 'page-root',
             mode: 'property-list',
           })
