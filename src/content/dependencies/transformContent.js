@@ -370,7 +370,9 @@ export default {
                 inline: true,
                 data:
                   html.tag('img',
-                    {src, width, height},
+                    src && {src},
+                    width && {width},
+                    height && {height},
 
                     pixelate &&
                       {class: 'pixelate'}),
