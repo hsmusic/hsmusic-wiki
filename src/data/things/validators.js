@@ -378,6 +378,31 @@ export function validateProperties(spec) {
   };
 }
 
+export function validateAllPropertyValues(validator) {
+  return (object) => {
+    isObject(object);
+
+    if (Array.isArray(object))
+      throw new TypeError(`Expected an object, got array`);
+
+    withAggregate({message: `Errors validating object properties`}, ({call}) => {
+      for (const key of Reflect.ownKeys(object)) {
+        call(() => {
+          const value = object[key];
+          try {
+            validator(value);
+          } catch (error) {
+            error.message = `(key: ${colors.green(key)}, value: ${inspect(value)}) ${error.message}`;
+            throw error;
+          }
+        });
+      }
+    });
+
+    return true;
+  };
+}
+
 export const isContribution = validateProperties({
   who: isArtistRef,
   what: optional(isStringNonEmpty),
