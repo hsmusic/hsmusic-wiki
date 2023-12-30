@@ -57,11 +57,11 @@ export const blockwrap = Symbol();
 // html.blank()) and false for Tags and Templates (regardless of contents or
 // other properties). Don't depend on this to match any other values.
 export function isBlank(value) {
-  if (isTag(value)) {
+  if (value instanceof Tag) {
     return false;
   }
 
-  if (isTemplate(value)) {
+  if (value instanceof Template) {
     return false;
   }
 
@@ -89,7 +89,7 @@ export function isHTML(value) {
     return true;
   }
 
-  if (isBlank(value) || isTag(value) || isTemplate(value)) {
+  if (isBlank(value) || value instanceof Tag || value instanceof Template) {
     return true;
   }
 
@@ -111,7 +111,7 @@ export function isAttributes(value) {
     return false;
   }
 
-  if (isTag(value) || isTemplate(value)) {
+  if (value instanceof Tag || value instanceof Template) {
     return false;
   }
 
@@ -132,19 +132,11 @@ export const validators = {
   },
 
   isTag(value) {
-    if (!isTag(value)) {
-      throw new TypeError(`Expected HTML tag`);
-    }
-
-    return true;
+    return isTag(value);
   },
 
   isTemplate(value) {
-    if (!isTemplate(value)) {
-      throw new TypeError(`Expected HTML template`);
-    }
-
-    return true;
+    return isTemplate(value);
   },
 
   isHTML(value) {
@@ -1077,7 +1069,7 @@ export class Template {
         case 'string': {
           // Tags and templates are valid in string arguments - they'll be
           // stringified when exposed to the description's .content() function.
-          if (isTag(value) || isTemplate(value))
+          if (value instanceof Tag || value instanceof Template)
             return true;
 
           if (typeof value !== 'string')
@@ -1115,7 +1107,7 @@ export class Template {
     }
 
     if (description.type === 'string') {
-      if (isTag(providedValue) || isTemplate(providedValue)) {
+      if (providedValue instanceof Tag || providedValue instanceof Template) {
         return providedValue.toString();
       }
     }
