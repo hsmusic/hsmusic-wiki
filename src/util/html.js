@@ -708,27 +708,44 @@ export class Attributes {
 
   #addHelper(...args) {
     if (args.length === 1) {
-      const arg = args[0];
-      if (arg === null || arg === undefined || arg === false) {
-        return;
-      } else if (Array.isArray(arg)) {
-        return arg.map(item => this.#addHelper(item));
-      } else if (arg instanceof Template) {
-        return this.#addHelper(Template.resolve(arg));
-      } else if (typeof arg === 'object') {
-        const results = {};
-        for (const key of Reflect.ownKeys(arg)) {
-          results[key] = this.#addHelper(key, arg[key]);
-        }
-        return results;
-      } else {
-        throw new Error(`Expected an array, object, or template, got ${typeAppearance(args[0])}`);
-      }
+      return this.#addMultipleAttributes(args[0]);
     } else if (args.length === 2) {
       return this.#addOneAttribute(args[0], args[1]);
     } else {
-      throw new Error(`Expected array or object, or attribute and value`);
+      throw new Error(
+        `Expected array or object, or attribute and value`);
     }
+  }
+
+  #addMultipleAttributes(attributes) {
+    if (attributes === null) return;
+    if (attributes === undefined) return;
+    if (attributes === false) return;
+
+    if (Array.isArray(attributes)) {
+      return attributes.map(item => this.#addMultipleAttributes(item));
+    }
+
+    if (attributes instanceof Template) {
+      const resolved = Template.resolve(attributes);
+      isAttributesAdditionSingletValue(resolved);
+      return this.#addMultipleAttributes(resolved);
+    }
+
+    if (typeof attributes === 'object') {
+      const results = {};
+
+      for (const key of Reflect.ownKeys(attributes)) {
+        const value = attributes[key];
+        results[key] = this.#addOneAttribute(key, value);
+      }
+
+      return results;
+    }
+
+    throw new Error(
+      `Expected an array, object, or template, ` +
+      `got ${typeAppearance(attribute)}`);
   }
 
   #addOneAttribute(attribute, value) {
@@ -741,8 +758,7 @@ export class Attributes {
     }
 
     if (!this.has(attribute)) {
-      this.set(attribute, value);
-      return value;
+      return this.set(attribute, value);
     }
 
     const descriptor = attributeSpec[attribute];
@@ -772,9 +788,7 @@ export class Attributes {
       }
     }
 
-    this.set(attribute, newValue);
-
-    return newValue;
+    return this.set(attribute, newValue);
   }
 
   get(attribute) {
