@@ -96,20 +96,21 @@ export default {
       data.includesCurrentTrack &&
         {class: 'current'},
 
-      {open:
-        // Allow forcing open via a template slot.
-        // This isn't exactly janky, but the rest of this function
-        // kind of is when you contextualize it in a template...
-        slots.open ||
+      // Allow forcing open via a template slot.
+      // This isn't exactly janky, but the rest of this function
+      // kind of is when you contextualize it in a template...
+      slots.open &&
+        {open: true},
 
-        // Leave sidebar track sections collapsed on album info page,
-        // since there's already a view of the full track listing
-        // in the main content area.
-        data.isTrackPage &&
+      // Leave sidebar track sections collapsed on album info page,
+      // since there's already a view of the full track listing
+      // in the main content area.
+      data.isTrackPage &&
 
-        // Only expand the track section which includes the track
-        // currently being viewed by default.
-        data.includesCurrentTrack},
+      // Only expand the track section which includes the track
+      // currently being viewed by default.
+      data.includesCurrentTrack &&
+        {open: true},
 
       [
         html.tag('summary', {style},
