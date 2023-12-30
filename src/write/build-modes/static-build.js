@@ -139,15 +139,19 @@ export async function go({
     urls,
   });
 
-  await writeFavicon({
-    mediaPath,
-    outputPath,
-  });
+  if (writeAll) {
+    await writeFavicon({
+      mediaPath,
+      outputPath,
+    });
 
-  await writeSharedFilesAndPages({
-    outputPath,
-    randomLinkDataJSON: generateRandomLinkDataJSON({wikiData}),
-  });
+    await writeSharedFilesAndPages({
+      outputPath,
+      randomLinkDataJSON: generateRandomLinkDataJSON({wikiData}),
+    });
+  } else {
+    logInfo`Skipping favicon and shared files (not writing all site pages).`
+  }
 
   const buildSteps = writeAll
     ? Object.entries(pageSpecs)
