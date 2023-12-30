@@ -3,14 +3,18 @@
 import {inspect} from 'node:util';
 
 import {colors} from '#cli';
-import {empty, typeAppearance} from '#sugar';
+import {empty, typeAppearance, unique, withAggregate} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {
   is,
   isArray,
+  isBoolean,
+  isNumber,
   isString,
+  isSymbol,
   oneOf,
+  validateAllPropertyValues,
   validateArrayItems,
   validateInstanceOf,
 } = commonValidators;
@@ -32,6 +36,20 @@ export const selfClosingTags = [
   'track',
   'wbr',
 ];
+
+// Not so comprehensive!!
+export const attributeSpec = {
+  'class': {
+    arraylike: true,
+    join: ' ',
+    unique: true,
+  },
+
+  'style': {
+    arraylike: true,
+    join: '; ',
+  },
+};
 
 // Pass to tag() as an attributes key to make tag() return a 8lank string if the
 // provided content is empty. Useful for when you'll only 8e showing an element
@@ -131,30 +149,78 @@ export const validators = {
   },
 };
 
+const isAttributeKey =
+  oneOf(isString, isSymbol);
+
+const isAttributeValue =
+  oneOf(isString, isNumber, isBoolean, isArray);
+
+const isAttributesAdditionPair = pair => {
+  isArray(pair);
+
+  if (pair.length !== 2) {
+    throw new TypeError(`Expected attributes pair to have two items`);
+  }
+
+  withAggregate(({push}) => {
+    try {
+      isAttributeKey(pair[0]);
+    } catch (caughtError) {
+      push(new Error(`Error validating key`, {cause: caughtError}));
+    }
+
+    try {
+      isAttributeValue(pair[1]);
+    } catch (caughtError) {
+      push(new Error(`Error validating value`, {cause: caughtError}));
+    }
+  });
+
+  return true;
+};
+
+const isAttributesAdditionSingletValue = value =>
+  oneOf(
+    validateAllPropertyValues(isAttributeValue),
+    validateArrayItems(
+      oneOf(
+        is(null, undefined, false),
+        isAttributesAdditionSingletValue)));
+
+const isAttributesAdditionSinglet = singlet => {
+  isArray(singlet);
+
+  if (singlet.length !== 1) {
+    throw new TypeError(`Expected attributes singlet to have one item`);
+  }
+
+  isAttributesAdditionSingletValue(singlet[0]);
+
+  return true;
+}
+
+const isAttributesAddition =
+  oneOf(isAttributesAdditionSinglet, isAttributesAdditionPair);
+
 export function blank() {
   return [];
 }
 
 export function tag(tagName, ...args) {
-  let content;
-  let attributes;
+  const content =
+    (isAttributes(args.at(-1))
+      ? null
+      : args.at(-1));
 
-  if (
-    typeof args[0] === 'object' &&
-    !(Array.isArray(args[0]) ||
-      args[0] instanceof Tag ||
-      args[0] instanceof Template)
-  ) {
-    attributes = args[0];
-    content = args[1];
-  } else {
-    content = args[0];
-  }
+  const attributes =
+    (isAttributes(args.at(-1))
+      ? args
+      : args.slice(0, -1));
 
   return new Tag(tagName, attributes, content);
 }
 
-export function tags(content, attributes = null) {
+export function tags(content, ...attributes) {
   return new Tag(null, attributes, content);
 }
 
@@ -599,17 +665,13 @@ export class Attributes {
   }
 
   set attributes(value) {
+    this.#attributes = Object.create(null);
+
     if (value === undefined || value === null) {
-      this.#attributes = {};
       return;
     }
 
-    if (typeof value !== 'object') {
-      throw new Error(`Expected attributes to be an object`);
-    }
-
-    this.#attributes = Object.create(null);
-    Object.assign(this.#attributes, value);
+    this.add(value);
   }
 
   get attributes() {
@@ -617,11 +679,9 @@ export class Attributes {
   }
 
   get blank() {
-    const attributeValues =
-      Object.values(this.#attributes);
-
     const keepAnyAttributes =
-      attributeValues.some(value => this.#keepAttributeValue(value));
+      Object.entries(this.attributes).some(([attribute, value]) =>
+        this.#keepAttributeValue(attribute, value));
 
     return !keepAnyAttributes;
   }
@@ -632,15 +692,86 @@ export class Attributes {
     } else {
       this.#attributes[attribute] = value;
     }
+
     return value;
   }
 
-  has(attribute) {
-    return attribute in this.#attributes;
+  add(...args) {
+    isAttributesAddition(args);
+    return this.#addHelper(...args);
+  }
+
+  #addHelper(...args) {
+    if (args.length === 1) {
+      const arg = args[0];
+      if (arg === null || arg === undefined || arg === false) {
+        return;
+      } else if (Array.isArray(arg)) {
+        return arg.map(item => this.#addHelper(item));
+      } else if (typeof arg === 'object') {
+        const results = {};
+        for (const key of Reflect.ownKeys(arg)) {
+          results[key] = this.#addHelper(key, arg[key]);
+        }
+        return results;
+      } else {
+        throw new Error(`Expected an array or object, got ${typeAppearance(args[0])}`);
+      }
+    } else if (args.length === 2) {
+      return this.#addOneAttribute(args[0], args[1]);
+    } else {
+      throw new Error(`Expected array or object, or attribute and value`);
+    }
+  }
+
+  #addOneAttribute(attribute, value) {
+    if (value === null || value === undefined) {
+      return;
+    }
+
+    if (!this.has(attribute)) {
+      this.set(attribute, value);
+      return value;
+    }
+
+    const descriptor = attributeSpec[attribute];
+    const existingValue = this.get(attribute);
+
+    let newValue = value;
+
+    if (descriptor?.arraylike) {
+      const valueArray =
+        (Array.isArray(value)
+          ? value
+          : [value]);
+
+      const existingValueArray =
+        (Array.isArray(existingValue)
+          ? existingValue
+          : [existingValue]);
+
+      newValue = existingValueArray.concat(valueArray);
+
+      if (descriptor.unique) {
+        newValue = unique(newValue);
+      }
+
+      if (newValue.length === 1) {
+        newValue = newValue[0];
+      }
+    }
+
+    this.set(attribute, newValue);
+
+    return newValue;
   }
 
   get(attribute) {
     return this.#attributes[attribute];
+  }
+
+  has(attribute) {
+    return attribute in this.#attributes;
   }
 
   remove(attribute) {
@@ -663,8 +794,8 @@ export class Attributes {
     const attributeKeyValues =
       Object.entries(this.attributes)
         .map(([key, value]) =>
-          (this.#keepAttributeValue(value)
-            ? [key, this.#transformAttributeValue(value), true]
+          (this.#keepAttributeValue(key, value)
+            ? [key, this.#transformAttributeValue(key, value), true]
             : [key, undefined, false]))
         .filter(([_key, _value, keep]) => keep)
         .map(([key, value]) => [key, value]);
@@ -688,7 +819,7 @@ export class Attributes {
     return attributeParts.join(' ');
   }
 
-  #keepAttributeValue(value) {
+  #keepAttributeValue(attribute, value) {
     switch (typeof value) {
       case 'undefined':
         return false;
@@ -715,11 +846,13 @@ export class Attributes {
     }
 
     throw new Error(
-      `Attribute value for ${key} should be primitive or array, ` +
-      `got ${typeAppearance(val)}`);
+      `Value for attribute "${attribute}" should be primitive or array, ` +
+      `got ${typeAppearance(value)}: ${inspect(value)}`);
   }
 
-  #transformAttributeValue(value) {
+  #transformAttributeValue(attribute, value) {
+    const descriptor = attributeSpec[attribute];
+
     switch (typeof value) {
       case 'boolean':
         return value;
@@ -728,8 +861,13 @@ export class Attributes {
         return value.toString();
 
       // If it's a kept object, it's an array.
-      case 'object':
-        return value.filter(Boolean).join(' ');
+      case 'object': {
+        const joiner =
+          (descriptor?.arraylike && descriptor?.join)
+            ?? ' ';
+
+        return value.filter(Boolean).join(joiner);
+      }
 
       default:
         return value;
