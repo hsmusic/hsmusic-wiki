@@ -402,7 +402,9 @@ export function validateAllPropertyValues(validator) {
           try {
             validator(value);
           } catch (error) {
-            error.message = `(key: ${colors.green(key)}, value: ${inspect(value)}) ${error.message}`;
+            const keyPart = colors.green(key.toString());
+            const valuePart = inspect(value);
+            error.message = `(key: ${keyPart}, value: ${valuePart}) ${error.message}`;
             throw error;
           }
         });
