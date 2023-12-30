@@ -411,8 +411,7 @@ export class Tag {
       } catch (caughtError) {
         throw new Error(
           `Error in child #${index + 1} ` +
-          `of ${inspect(this, {compact: true})}: ` +
-          inspect(item, {compact: true}),
+          `of ${inspect(this, {compact: true})}`,
           {cause: caughtError});
       }
 
