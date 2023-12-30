@@ -410,7 +410,7 @@ export class Tag {
         itemContent = item.toString();
       } catch (caughtError) {
         throw new Error(
-          `Error stringifying child #${index + 1} ` +
+          `Error in child #${index + 1} ` +
           `of ${inspect(this, {compact: true})}: ` +
           inspect(item, {compact: true}),
           {cause: caughtError});
@@ -448,11 +448,44 @@ export class Tag {
   [inspect.custom](depth, opts) {
     const lines = [];
 
+    const niceAttributes = ['id', 'class'];
+    const attributes = new Attributes();
+
+    for (const attribute of niceAttributes) {
+      if (this.attributes.has(attribute)) {
+        const value = this.attributes.get(attribute);
+
+        let string;
+        let suffix = '';
+
+        if (Array.isArray(value)) {
+          string = value[0].toString();
+          if (value.length > 1) {
+            suffix = ` (+${value.length - 1})`;
+          }
+        } else {
+          string = value.toString();
+        }
+
+        const trim =
+          (string.length > 15
+            ? `${string.slice(0, 12)}...`
+            : string);
+
+        attributes.set(attribute, trim + suffix);
+      }
+    }
+
+    const attributesPart =
+      (attributes.blank
+        ? ``
+        : ` ${attributes}`);
+
     const heading =
       (this.tagName
         ? (empty(this.content)
-            ? `Tag <${this.tagName} />`
-            : `Tag <${this.tagName}> (${this.content.length} items)`)
+            ? `Tag <${this.tagName + attributesPart} />`
+            : `Tag <${this.tagName + attributesPart}> (${this.content.length} items)`)
         : (empty(this.content)
             ? `Tag (no name)`
             : `Tag (no name, ${this.content.length} items)`));
