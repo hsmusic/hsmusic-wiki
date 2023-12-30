@@ -7,6 +7,7 @@ import {empty, typeAppearance} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {
+  validateArrayItems,
   validateInstanceOf,
 } = commonValidators;
 
@@ -76,28 +77,6 @@ export function isBlank(value) {
   return value.length === 0;
 }
 
-export function isHTML(value) {
-  if (typeof value === 'string') {
-    return true;
-  }
-
-  if (value === null || value === undefined || value === false) {
-    return true;
-  }
-
-  if (isBlank(value) || value instanceof Tag || value instanceof Template) {
-    return true;
-  }
-
-  if (Array.isArray(value)) {
-    if (value.every(isHTML)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
 export function isAttributes(value) {
   if (typeof value !== 'object' || Array.isArray(value)) {
     return false;
@@ -136,11 +115,7 @@ export const validators = {
   },
 
   isHTML(value) {
-    if (!isHTML(value)) {
-      throw new TypeError(`Expected HTML content`);
-    }
-
-    return true;
+    return isHTML(value);
   },
 
   isAttributes(value) {
@@ -1056,10 +1031,7 @@ export class Template {
     if ('type' in description) {
       switch (description.type) {
         case 'html': {
-          if (!isHTML(value))
-            throw new TypeError(`Slot expects html (tag, template or blank), got ${typeof value}`);
-
-          return true;
+          return isHTML(value);
         }
 
         case 'string': {
@@ -1240,3 +1212,27 @@ export const isTag =
 
 export const isTemplate =
   validateInstanceOf(Template);
+
+export function isHTML(value) {
+  if (typeof value === 'string') {
+    return true;
+  }
+
+  if (value === null || value === undefined || value === false) {
+    return true;
+  }
+
+  if (isBlank(value) || value instanceof Tag || value instanceof Template) {
+    return true;
+  }
+
+  if (isArrayOfHTML(value)) {
+    return true;
+  }
+
+  throw new TypeError(
+    `Expected html (tag, template, or blank), got ${typeAppearance(value)}`);
+}
+
+export const isArrayOfHTML =
+  validateArrayItems(isHTML);
