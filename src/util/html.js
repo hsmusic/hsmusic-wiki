@@ -194,10 +194,14 @@ export class Tag {
   #content = null;
   #attributes = null;
 
+  #traceError = null;
+
   constructor(tagName, attributes, content) {
     this.tagName = tagName;
     this.attributes = attributes;
     this.content = content;
+
+    this.#traceError = new Error();
   }
 
   clone() {
@@ -430,10 +434,26 @@ export class Tag {
         itemContent = item.toString();
       } catch (caughtError) {
         const indexPart = colors.yellow(`child #${index + 1}`);
-        throw new Error(
-          `Error in ${indexPart} ` +
-          `of ${inspect(this, {compact: true})}`,
-          {cause: caughtError});
+
+        const error =
+          new Error(
+            `Error in ${indexPart} ` +
+            `of ${inspect(this, {compact: true})}`,
+            {cause: caughtError});
+
+        error[Symbol.for(`hsmusic.aggregate.alwaysTrace`)] = true;
+        error[Symbol.for(`hsmusic.aggregate.traceFrom`)] = this.#traceError;
+
+        error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
+          /content-function\.js/,
+          /util\/html\.js/,
+        ];
+
+        error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
+          /content\/dependencies\/(.*\.js:.*(?=\)))/,
+        ];
+
+        throw error;
       }
 
       if (!itemContent) {
