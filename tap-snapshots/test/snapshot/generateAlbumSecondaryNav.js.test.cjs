@@ -7,11 +7,11 @@
 'use strict'
 exports[`test/snapshot/generateAlbumSecondaryNav.js > TAP > generateAlbumSecondaryNav (snapshot) > basic behavior, mode: album 1`] = `
 <nav id="secondary-nav" class="nav-links-groups">
-    <span style="--primary-color: #abcdef; --dark-color: #21272e; --dim-color: #818181; --dim-ghost-color: #818181cc; --bg-color: #161616cc; --bg-black-color: #06090bcc; --shadow-color: #0d0d0dcc">
+    <span style="--primary-color: #abcdef">
         <a href="group/vcg/">VCG</a>
         (<a href="album/first/" title="First">Previous</a>, <a href="album/last/" title="Last">Next</a>)
     </span>
-    <span style="--primary-color: #123456; --dark-color: #0e2842; --dim-color: #000000; --dim-ghost-color: #000000cc; --bg-color: #161616cc; --bg-black-color: #000913cc; --shadow-color: #0d0d0dcc">
+    <span style="--primary-color: #123456">
         <a href="group/bepis/">Bepis</a>
         (<a href="album/second/" title="Second">Next</a>)
     </span>

@@ -120,7 +120,7 @@ export default {
 
             return (
               html.tag('span',
-                colorStyle,
+                colorStyle.slot('context', 'primary-only'),
 
                 [
                   language.$('albumSidebar.groupBox.title', {
