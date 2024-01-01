@@ -1378,7 +1378,8 @@ export const isAttributeKey =
 export const isAttributeValue =
   oneOf(
     isString, isNumber, isBoolean, isArray,
-    isTag, isTemplate);
+    isTag, isTemplate,
+    validateArrayItems(item => isAttributeValue(item)));
 
 export const isAttributesAdditionPair = pair => {
   isArray(pair);
