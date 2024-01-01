@@ -256,7 +256,9 @@ export async function go({
 
   let errored = false;
 
-  const contentDependencies = await quickLoadContentDependencies();
+  const contentDependencies = await quickLoadContentDependencies({
+    showAggregate: niceShowAggregate,
+  });
 
   const perLanguageFn = async (language, i, entries) => {
     const baseDirectory =

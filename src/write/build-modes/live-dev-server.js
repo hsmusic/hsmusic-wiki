@@ -106,7 +106,10 @@ export async function go({
   const skipServing = cliOptions['skip-serving'] ?? false;
   const serveSFX = cliOptions['serve-sfx'] ?? null;
 
-  const contentDependenciesWatcher = await watchContentDependencies();
+  const contentDependenciesWatcher = await watchContentDependencies({
+    showAggregate: niceShowAggregate,
+  });
+
   const {contentDependencies} = contentDependenciesWatcher;
 
   contentDependenciesWatcher.on('error', () => {});

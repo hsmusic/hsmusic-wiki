@@ -8,7 +8,11 @@ import {ESLint} from 'eslint';
 
 import {colors, logWarn} from '#cli';
 import contentFunction, {ContentFunctionSpecError} from '#content-function';
-import {annotateFunction} from '#sugar';
+
+import {
+  annotateFunction,
+  showAggregate as _showAggregate
+} from '#sugar';
 
 function cachebust(filePath) {
   if (filePath in cachebust.cache) {
@@ -25,6 +29,7 @@ cachebust.cache = Object.create(null);
 export function watchContentDependencies({
   mock = null,
   logging = true,
+  showAggregate = _showAggregate,
 } = {}) {
   const events = new EventEmitter();
   const contentDependencies = {};
@@ -229,7 +234,7 @@ export function watchContentDependencies({
       } else if (error instanceof ContentFunctionSpecError) {
         console.error(colors.yellow(error.message));
       } else {
-        console.error(error);
+        showAggregate(error);
       }
     }
 
