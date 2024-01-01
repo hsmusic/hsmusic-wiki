@@ -929,7 +929,31 @@ export class Attributes {
   }
 
   [inspect.custom]() {
-    return `Attributes <${this.toString({color: true}) || 'no attributes'}>`;
+    const visiblePart = this.toString({color: true});
+
+    const numSymbols = Object.getOwnPropertySymbols(this.#attributes).length;
+    const numSymbolsPart =
+      (numSymbols >= 2
+        ? `${numSymbols} symbol`
+     : numSymbols === 1
+        ? `1 symbol`
+        : ``);
+
+    const symbolPart =
+      (visiblePart && numSymbolsPart
+        ? `(+${numSymbolsPart})`
+     : numSymbols
+        ? `(${numSymbolsPart})`
+        : ``);
+
+    const contentPart =
+      (visiblePart && symbolPart
+        ? `<${visiblePart} ${symbolPart}>`
+     : visiblePart || symbolPart
+        ? `<${visiblePart || symbolPart}>`
+        : `<no attributes>`);
+
+    return `Attributes ${contentPart}`;
   }
 }
 
