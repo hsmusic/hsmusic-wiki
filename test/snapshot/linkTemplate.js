@@ -8,12 +8,7 @@ testContentFunctions(t, 'linkTemplate (snapshot)', async (t, evaluate) => {
   evaluate.snapshot('fill many slots', {
     name: 'linkTemplate',
 
-    extraDependencies: {
-      getColors: c => ({primary: c + 'ff', dim: c + '77'}),
-    },
-
     slots: {
-      'color': '#123456',
       'href': 'https://hsmusic.wiki/media/cool file.pdf',
       'hash': 'fooey',
       'attributes': {class: 'dog', id: 'cat1'},
