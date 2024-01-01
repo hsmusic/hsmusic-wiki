@@ -11,6 +11,7 @@ export default {
         'any-content',
         'image-box',
         'page-root',
+        'image-box',
         'primary-only'),
 
       default: 'any-content',
@@ -29,7 +30,8 @@ export default {
       primary,
       dark,
       dim,
-      dimGhost,
+      deep,
+      deepGhost,
       bg,
       bgBlack,
       shadow,
@@ -39,7 +41,8 @@ export default {
       `--primary-color: ${primary}`,
       `--dark-color: ${dark}`,
       `--dim-color: ${dim}`,
-      `--dim-ghost-color: ${dimGhost}`,
+      `--deep-color: ${deep}`,
+      `--deep-ghost-color: ${deepGhost}`,
       `--bg-color: ${bg}`,
       `--bg-black-color: ${bgBlack}`,
       `--shadow-color: ${shadow}`,
@@ -56,6 +59,8 @@ export default {
         selectedProperties = [
           `--primary-color: ${primary}`,
           `--dim-color: ${dim}`,
+          `--deep-color: ${deep}`,
+          `--bg-black-color: ${bgBlack}`,
         ];
         break;
 
