@@ -20,14 +20,14 @@ exports[`test/snapshot/generateAlbumSecondaryNav.js > TAP > generateAlbumSeconda
 
 exports[`test/snapshot/generateAlbumSecondaryNav.js > TAP > generateAlbumSecondaryNav (snapshot) > basic behavior, mode: track 1`] = `
 <nav id="secondary-nav" class="nav-links-groups">
-    <a href="group/vcg/" style="--primary-color: #abcdef; --dim-color: #818181">VCG</a>
-    <a href="group/bepis/" style="--primary-color: #123456; --dim-color: #000000">Bepis</a>
+    <a style="--primary-color: #abcdef" href="group/vcg/">VCG</a>
+    <a style="--primary-color: #123456" href="group/bepis/">Bepis</a>
 </nav>
 `
 
 exports[`test/snapshot/generateAlbumSecondaryNav.js > TAP > generateAlbumSecondaryNav (snapshot) > dateless album in mixed group 1`] = `
 <nav id="secondary-nav" class="nav-links-groups">
-    <a href="group/vcg/" style="--primary-color: #abcdef; --dim-color: #818181">VCG</a>
-    <a href="group/bepis/" style="--primary-color: #123456; --dim-color: #000000">Bepis</a>
+    <a style="--primary-color: #abcdef" href="group/vcg/">VCG</a>
+    <a style="--primary-color: #123456" href="group/bepis/">Bepis</a>
 </nav>
 `

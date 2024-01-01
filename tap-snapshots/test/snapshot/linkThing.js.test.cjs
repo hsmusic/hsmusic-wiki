@@ -6,13 +6,13 @@
  */
 'use strict'
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > basic behavior 1`] = `
-<a href="track/foo/" style="--primary-color: #abcdef; --dim-color: #818181">Cool track!</a>
+<a style="--primary-color: #abcdef" href="track/foo/">Cool track!</a>
 `
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > color 1`] = `
 <a href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
-<a href="track/showtime-piano-refrain/" style="--primary-color: #38f43d; --dim-color: #389f33">Showtime (Piano Refrain)</a>
-<a href="track/showtime-piano-refrain/" style="--primary-color: #aaccff; --dim-color: #828282">Showtime (Piano Refrain)</a>
+<a style="--primary-color: #38f43d" href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
+<a style="--primary-color: #aaccff" href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
 `
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > nested links in content stripped 1`] = `
