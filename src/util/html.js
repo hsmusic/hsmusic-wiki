@@ -487,6 +487,9 @@ export class Tag {
       if (this.attributes.has(attribute)) {
         const value = this.attributes.get(attribute);
 
+        if (!value) continue;
+        if (Array.isArray(value) && empty(value)) continue;
+
         let string;
         let suffix = '';
 
