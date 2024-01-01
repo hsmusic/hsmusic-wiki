@@ -130,6 +130,10 @@ export function blank() {
   return [];
 }
 
+export function blankAttributes() {
+  return new Attributes();
+}
+
 export function tag(tagName, ...args) {
   const lastArg = args.at(-1);
 
@@ -477,7 +481,7 @@ export class Tag {
     const lines = [];
 
     const niceAttributes = ['id', 'class'];
-    const attributes = new Attributes();
+    const attributes = blankAttributes();
 
     for (const attribute of niceAttributes) {
       if (this.attributes.has(attribute)) {
