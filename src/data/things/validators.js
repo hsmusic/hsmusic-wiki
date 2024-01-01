@@ -651,6 +651,10 @@ export function oneOf(...validators) {
   const validConstructors = new Set();
   const validTypes = new Set();
 
+  const constantValidators = [];
+  const constructorValidators = [];
+  const typeValidators = [];
+
   const leftoverValidators = [];
 
   for (const validator of validators) {
@@ -662,14 +666,18 @@ export function oneOf(...validators) {
         for (const value of creatorMeta.values) {
           validConstants.add(value);
         }
+
+        constantValidators.push(validator);
         break;
 
       case validateInstanceOf:
         validConstructors.add(creatorMeta.constructor);
+        constructorValidators.push(validator);
         break;
 
       case validateType:
         validTypes.add(creatorMeta.type);
+        typeValidators.push(validator);
         break;
 
       default:
@@ -725,7 +733,7 @@ export function oneOf(...validators) {
       const gotPart = `, got ${value}`;
 
       prefaceErrorInfo.push([
-        null,
+        constantValidators,
         offset++,
         new TypeError(
           `Expected one of ${constants.join(' ')}` + gotPart),
@@ -740,7 +748,7 @@ export function oneOf(...validators) {
       const gotPart = `, got ${gotType}`;
 
       prefaceErrorInfo.push([
-        null,
+        typeValidators,
         offset++,
         new TypeError(
           `Expected one of ${types.join(', ')}` + gotPart),
@@ -756,7 +764,7 @@ export function oneOf(...validators) {
       const gotPart = (gotName ? `, got ${gotName}` : ``);
 
       prefaceErrorInfo.push([
-        null,
+        constructorValidators,
         offset++,
         new TypeError(
           `Expected one of ${names.join(', ')}` + gotPart),
@@ -773,7 +781,10 @@ export function oneOf(...validators) {
           ? `(#${i + 1} "${validator.name}") ${error.message}`
           : `(#${i + 1}) ${error.message}`);
 
-      error.check = validator;
+      error.check =
+        (Array.isArray(validator) && validator.length === 1
+          ? validator[0]
+          : validator);
 
       errors.push(error);
     }
