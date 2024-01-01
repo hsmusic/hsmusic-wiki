@@ -155,13 +155,21 @@ export function blank() {
 }
 
 export function tag(tagName, ...args) {
+  const lastArg = args.at(-1);
+
+  const lastArgIsAttributes =
+    typeof lastArg === 'object' && lastArg !== null &&
+    !Array.isArray(lastArg) &&
+    !(lastArg instanceof Tag) &&
+    !(lastArg instanceof Template);
+
   const content =
-    (isAttributes(args.at(-1))
+    (lastArgIsAttributes
       ? null
       : args.at(-1));
 
   const attributes =
-    (isAttributes(args.at(-1))
+    (lastArgIsAttributes
       ? args
       : args.slice(0, -1));
 
