@@ -283,7 +283,7 @@ export default {
           containerAttributes,
 
           !originalSrc &&
-            {style: 'placeholder-image'},
+            {class: 'placeholder-image'},
 
           html.tag('div', {class: 'image-inner-area'},
             wrapped));
