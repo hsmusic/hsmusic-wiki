@@ -27,7 +27,7 @@ export default {
     language,
     to,
   }) {
-    const attributes = html.attributes();
+    const {attributes} = slots;
 
     if (!slots.linkless) {
       let href =
@@ -61,10 +61,6 @@ export default {
             disallowedTags: new Set(['a']),
           }));
 
-    return (
-      html.tag('a',
-        attributes,
-        slots.attributes,
-        content));
+    return html.tag('a', attributes, content);
   },
 }
