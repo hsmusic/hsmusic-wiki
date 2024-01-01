@@ -15,14 +15,19 @@ export default {
     },
   },
 
-  generate(slots, {html, to}) {
-    return (
-      html.tag('div', {id: 'banner'},
-        html.tag('img', {
-          src: to(...slots.path),
-          alt: slots.alt,
-          width: slots.dimensions?.[0] ?? 1100,
-          height: slots.dimensions?.[1] ?? 200,
-        })));
-  },
+  generate: (slots, {html, to}) =>
+    html.tag('div', {id: 'banner'},
+      html.tag('img',
+        {src: to(...slots.path)},
+
+        (slots.dimensions
+          ? {width: slots.dimensions[0]}
+          : {width: 1100}),
+
+        (slots.dimensions
+          ? {height: slots.dimensions[1]}
+          : {height: 200}),
+
+        slots.alt &&
+          {alt: slots.alt})),
 };
