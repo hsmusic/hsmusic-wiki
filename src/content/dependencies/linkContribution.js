@@ -53,14 +53,10 @@ export default {
       options.links =
         html.tag('span', {class: ['icons', 'icons-inline']},
           {[html.noEdgeWhitespace]: true},
-
           language.formatUnitList(
             relations.artistIcons
               .slice(0, 4)
-              .map(icon =>
-                icon.slot({
-                  context: 'artist',
-                }))));
+              .map(icon => icon.slot('context', 'artist'))));
     }
 
     let content = language.formatString(...parts, options);
