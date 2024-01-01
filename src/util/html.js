@@ -1063,8 +1063,23 @@ export class Template {
           slotErrors.push(new TypeError(`(${slotName}) Functions shouldn't be provided to slots`));
         } else if (slotDescription.type === 'object') {
           slotErrors.push(new TypeError(`(${slotName}) Provide validate function instead of type: object`));
+        } else if (
+          (slotDescription.type === 'html' || slotDescription.type === 'attributes') &&
+          !('mutable' in slotDescription)
+        ) {
+          slotErrors.push(new TypeError(`(${slotName}) Specify mutable: true/false alongside type: ${slotDescription.type}`));
         } else if (!acceptableSlotTypes.includes(slotDescription.type)) {
           slotErrors.push(new TypeError(`(${slotName}) Expected slot type to be one of ${acceptableSlotTypes.join(', ')}`));
+        }
+      }
+
+      if ('mutable' in slotDescription) {
+        if (slotDescription.type !== 'html' && slotDescription.type !== 'attributes') {
+          slotErrors.push(new TypeError(`(${slotName}) Only specify mutable alongside type: html or attributes`));
+        }
+
+        if (typeof slotDescription.mutable !== 'boolean') {
+          slotErrors.push(new TypeError(`(${slotName}) Expected slot mutable to be boolean`));
         }
       }
     }
@@ -1198,7 +1213,10 @@ export class Template {
         return blank();
       }
 
-      if (providedValue instanceof Tag || providedValue instanceof Template) {
+      if (
+        (providedValue instanceof Tag || providedValue instanceof Template) &&
+        description.mutable
+      ) {
         return providedValue.clone();
       }
 
@@ -1210,7 +1228,10 @@ export class Template {
         return blankAttributes();
       }
 
-      if (providedValue instanceof Attributes) {
+      if (
+        providedValue instanceof Attributes &&
+        description.mutable
+      ) {
         return providedValue.clone();
       }
 
