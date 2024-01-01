@@ -100,27 +100,7 @@ export function isBlank(value) {
   return value.length === 0;
 }
 
-export function isAttributes(value) {
-  if (typeof value !== 'object' || Array.isArray(value)) {
-    return false;
-  }
-
-  if (value === null) {
-    return false;
-  }
-
-  if (value instanceof Tag || value instanceof Template) {
-    return false;
-  }
-
-  // TODO: Validate attribute values (just the general shape)
-
-  return true;
-}
-
 export const validators = {
-  // TODO: Move above implementations here and detail errors
-
   isBlank(value) {
     if (!isBlank(value)) {
       throw new TypeError(`Expected html.blank()`);
@@ -142,11 +122,7 @@ export const validators = {
   },
 
   isAttributes(value) {
-    if (!isAttributes(value)) {
-      throw new TypeError(`Expected HTML attributes`);
-    }
-
-    return true;
+    return isAttributesAdditionSingletValue(value);
   },
 };
 
