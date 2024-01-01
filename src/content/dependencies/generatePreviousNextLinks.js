@@ -6,9 +6,20 @@ export default {
   extraDependencies: ['html', 'language'],
 
   slots: {
-    previousLink: {type: 'html'},
-    nextLink: {type: 'html'},
-    id: {type: 'boolean', default: true},
+    previousLink: {
+      type: 'html',
+      mutable: true,
+    },
+
+    nextLink: {
+      type: 'html',
+      mutable: true,
+    },
+
+    id: {
+      type: 'boolean',
+      default: true,
+    },
   },
 
   generate(slots, {html, language}) {

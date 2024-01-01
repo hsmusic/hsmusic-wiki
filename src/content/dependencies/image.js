@@ -64,7 +64,10 @@ export default {
     width: {type: 'number'},
     height: {type: 'number'},
 
-    missingSourceContent: {type: 'html'},
+    missingSourceContent: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate(data, relations, slots, {

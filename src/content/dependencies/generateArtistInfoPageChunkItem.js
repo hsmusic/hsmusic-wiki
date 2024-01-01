@@ -2,10 +2,20 @@ export default {
   extraDependencies: ['html', 'language'],
 
   slots: {
-    content: {type: 'html'},
+    content: {
+      type: 'html',
+      mutable: false,
+    },
 
-    otherArtistLinks: {validate: v => v.strictArrayOf(v.isHTML)},
-    contribution: {type: 'html'},
+    contribution: {
+      type: 'html',
+      mutable: false,
+    },
+
+    otherArtistLinks: {
+      validate: v => v.strictArrayOf(v.isHTML),
+    },
+
     rerelease: {type: 'boolean'},
   },
 

@@ -117,7 +117,11 @@ export default {
   },
 
   slots: {
-    title: {type: 'html'},
+    title: {
+      type: 'html',
+      mutable: false,
+    },
+
     showBothColumns: {type: 'boolean'},
     showSortButton: {type: 'boolean'},
     visible: {type: 'boolean', default: true},

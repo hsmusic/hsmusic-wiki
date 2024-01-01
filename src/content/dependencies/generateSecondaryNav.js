@@ -2,7 +2,10 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
-    content: {type: 'html'},
+    content: {
+      type: 'html',
+      mutable: false,
+    },
 
     class: {
       validate: v => v.oneOf(v.isString, v.sparseArrayOf(v.isString)),

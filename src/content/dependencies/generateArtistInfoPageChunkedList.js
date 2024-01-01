@@ -2,8 +2,15 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
-    groupInfo: {type: 'html'},
-    chunks: {type: 'html'},
+    groupInfo: {
+      type: 'html',
+      mutable: false,
+    },
+
+    chunks: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate(slots, {html}) {

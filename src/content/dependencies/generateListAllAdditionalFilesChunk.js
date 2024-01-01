@@ -4,7 +4,10 @@ export default {
   extraDependencies: ['html', 'language'],
 
   slots: {
-    title: {type: 'html'},
+    title: {
+      type: 'html',
+      mutable: false,
+    },
 
     additionalFileTitles: {
       validate: v => v.strictArrayOf(v.isHTML),

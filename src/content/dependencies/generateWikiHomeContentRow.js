@@ -11,7 +11,10 @@ export default {
     ({name: row.name}),
 
   slots: {
-    content: {type: 'html'},
+    content: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate: (data, relations, slots, {html}) =>

@@ -6,8 +6,20 @@ export default {
       validate: v => v.is('flash', 'album'),
     },
 
-    albumLink: {type: 'html'},
-    flashActLink: {type: 'html'},
+    albumLink: {
+      type: 'html',
+      mutable: false,
+    },
+
+    flashActLink: {
+      type: 'html',
+      mutable: false,
+    },
+
+    items: {
+      type: 'html',
+      mutable: false,
+    },
 
     date: {validate: v => v.isDate},
     dateRangeStart: {validate: v => v.isDate},
@@ -15,8 +27,6 @@ export default {
 
     duration: {validate: v => v.isDuration},
     durationApproximate: {type: 'boolean'},
-
-    items: {type: 'html'},
   },
 
   generate(slots, {html, language}) {

@@ -4,7 +4,10 @@ function sidebarSlots(side) {
   return {
     // Content is a flat HTML array. It'll generate one sidebar section
     // if specified.
-    [side + 'Content']: {type: 'html'},
+    [side + 'Content']: {
+      type: 'html',
+      mutable: false,
+    },
 
     // A single class to apply to the whole sidebar. If specifying multiple
     // sections, this be added to the containing sidebar-column - specify a
@@ -105,14 +108,32 @@ export default {
   },
 
   slots: {
-    title: {type: 'html'},
-    showWikiNameInTitle: {type: 'boolean', default: true},
+    title: {
+      type: 'html',
+      mutable: false,
+    },
 
-    additionalNames: {type: 'html'},
+    showWikiNameInTitle: {
+      type: 'boolean',
+      default: true,
+    },
 
-    cover: {type: 'html'},
+    additionalNames: {
+      type: 'html',
+      mutable: false,
+    },
 
-    socialEmbed: {type: 'html'},
+    cover: {
+      type: 'html',
+      mutable: false,
+    },
+
+    // Strictly speaking we clone this each time we use it, so it doesn't
+    // need to be marked as mutable here.
+    socialEmbed: {
+      type: 'html',
+      mutable: true,
+    },
 
     color: {validate: v => v.isColor},
 
@@ -128,7 +149,10 @@ export default {
 
     // Main
 
-    mainContent: {type: 'html'},
+    mainContent: {
+      type: 'html',
+      mutable: false,
+    },
 
     headingMode: {
       validate: v => v.is('sticky', 'static'),
@@ -142,7 +166,11 @@ export default {
 
     // Banner
 
-    banner: {type: 'html'},
+    banner: {
+      type: 'html',
+      mutable: false,
+    },
+
     bannerPosition: {
       validate: v => v.is('top', 'bottom'),
       default: 'top',
@@ -150,8 +178,15 @@ export default {
 
     // Nav & Footer
 
-    navContent: {type: 'html'},
-    navBottomRowContent: {type: 'html'},
+    navContent: {
+      type: 'html',
+      mutable: false,
+    },
+
+    navBottomRowContent: {
+      type: 'html',
+      mutable: false,
+    },
 
     navLinkStyle: {
       validate: v => v.is('hierarchical', 'index'),
@@ -208,9 +243,15 @@ export default {
         })
     },
 
-    secondaryNav: {type: 'html'},
+    secondaryNav: {
+      type: 'html',
+      mutable: false,
+    },
 
-    footerContent: {type: 'html'},
+    footerContent: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate(data, relations, slots, {

@@ -20,9 +20,20 @@ export default {
   }),
 
   slots: {
-    content: {type: 'html'},
+    content: {
+      type: 'html',
+      mutable: false,
+    },
 
-    preferShortName: {type: 'boolean', default: false},
+    attributes: {
+      type: 'attributes',
+      mutable: true,
+    },
+
+    preferShortName: {
+      type: 'boolean',
+      default: false,
+    },
 
     tooltip: {
       validate: v => v.oneOf(v.isBoolean, v.isHTML),
@@ -48,8 +59,6 @@ export default {
 
     anchor: {type: 'boolean', default: false},
     linkless: {type: 'boolean', default: false},
-
-    attributes: {type: 'attributes'},
     hash: {type: 'string'},
   },
 

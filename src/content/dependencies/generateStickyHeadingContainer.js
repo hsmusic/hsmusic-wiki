@@ -2,8 +2,15 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
-    title: {type: 'html'},
-    cover: {type: 'html'},
+    title: {
+      type: 'html',
+      mutable: false,
+    },
+
+    cover: {
+      type: 'html',
+      mutable: true,
+    },
   },
 
   generate: (slots, {html}) =>

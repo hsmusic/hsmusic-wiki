@@ -7,8 +7,15 @@ export default {
   }),
 
   slots: {
-    title: {type: 'html'},
-    accent: {type: 'html'},
+    title: {
+      type: 'html',
+      mutable: false,
+    },
+
+    accent: {
+      type: 'html',
+      mutable: false,
+    },
 
     color: {validate: v => v.isColor},
 

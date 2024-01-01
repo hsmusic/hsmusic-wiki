@@ -2,8 +2,16 @@ export default {
   extraDependencies: ['html'],
 
   slots: {
-    mainContent: {type: 'html'},
-    tooltipContent: {type: 'html'},
+    mainContent: {
+      type: 'html',
+      mutable: false,
+    },
+
+    tooltipContent: {
+      type: 'html',
+      mutable: false,
+    },
+
     datetime: {type: 'string'},
   },
 

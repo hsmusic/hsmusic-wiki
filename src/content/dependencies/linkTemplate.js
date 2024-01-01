@@ -15,10 +15,17 @@ export default {
     path: {validate: v => v.validateArrayItems(v.isString)},
     hash: {type: 'string'},
     linkless: {type: 'boolean', default: false},
-
     tooltip: {type: 'string'},
-    attributes: {type: 'attributes'},
-    content: {type: 'html'},
+
+    attributes: {
+      type: 'attributes',
+      mutable: true,
+    },
+
+    content: {
+      type: 'html',
+      mutable: false,
+    },
   },
 
   generate(slots, {
