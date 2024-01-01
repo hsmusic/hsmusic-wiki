@@ -5,7 +5,6 @@ import striptags from 'striptags';
 export default {
   extraDependencies: [
     'appendIndexHTML',
-    'getColors',
     'html',
     'language',
     'to',
@@ -19,13 +18,11 @@ export default {
 
     tooltip: {type: 'string'},
     attributes: {type: 'attributes'},
-    color: {validate: v => v.isColor},
     content: {type: 'html'},
   },
 
   generate(slots, {
     appendIndexHTML,
-    getColors,
     html,
     language,
     to,
@@ -51,12 +48,6 @@ export default {
       }
 
       attributes.add({href});
-    }
-
-    if (slots.color) {
-      const {primary, dim} = getColors(slots.color);
-      attributes.set('style',
-        `--primary-color: ${primary}; --dim-color: ${dim}`);
     }
 
     if (slots.tooltip) {
