@@ -51,6 +51,11 @@ export function getCLIOptions() {
       type: 'flag',
     },
 
+    'show-timings': {
+      help: `Enables outputting timings in the server log for how long pages to take to generate`,
+      type: 'flag',
+    },
+
     'serve-sfx': {
       help: `Plays the specified sound file once the HTTP server is ready (this requires mpv)`,
       type: 'value',
@@ -97,6 +102,7 @@ export async function go({
   const host = cliOptions['host'] ?? defaultHost;
   const port = parseInt(cliOptions['port'] ?? defaultPort);
   const loudResponses = cliOptions['loud-responses'] ?? false;
+  const showTimings = cliOptions['show-timings'] ?? false;
   const skipServing = cliOptions['skip-serving'] ?? false;
   const serveSFX = cliOptions['serve-sfx'] ?? null;
 
@@ -157,7 +163,10 @@ export async function go({
     const contentTypePlain = {'Content-Type': 'text/plain; charset=utf-8'};
 
     const requestTime = new Date().toLocaleDateString('en-US', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
-    const requestHead = `${requestTime} - ${request.socket.remoteAddress}`;
+    const requestHead =
+      (loudResponses
+        ? `${requestTime} - ${request.socket.remoteAddress}`
+        : `${requestTime}`);
 
     let url;
     try {
@@ -353,6 +362,8 @@ export async function go({
         return;
       }
 
+      const timeStart = Date.now();
+
       const bound = bindUtilities({
         absoluteTo,
         cachebust,
@@ -380,7 +391,20 @@ export async function go({
 
       const {pageHTML} = html.resolve(topLevelResult);
 
-      if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
+      const timeEnd = Date.now();
+      const timeDelta = timeEnd - timeStart;
+
+      if (showTimings) {
+        const timeString =
+          (timeDelta > 100
+            ? `${(timeDelta / 1000).toFixed(2)}s`
+            : `${timeDelta}ms`);
+
+        console.log(`${requestHead} [200, ${timeString}] ${pathname}`);
+      } else if (loudResponses) {
+        console.log(`${requestHead} [200] ${pathname}`);
+      }
+
       response.writeHead(200, contentTypeHTML);
       response.end(pageHTML);
     } catch (error) {
@@ -410,8 +434,12 @@ export async function go({
   server.on('listening', () => {
     logInfo`${'All done!'} Listening at: ${address}`;
     logInfo`Press ^C here (control+C) to stop the server and exit.`;
-    if (loudResponses) {
-      logInfo`Printing [200] and [404] responses.`
+    if (showTimings && loudResponses) {
+      logInfo`Printing all HTTP responses, plus page generation timings.`;
+    } else if (showTimings) {
+      logInfo`Printing page generation timings.`;
+    } else if (loudResponses) {
+      logInfo`Printing all HTTP responses.`
     } else {
       logInfo`Suppressing [200] and [404] response logging.`
       logInfo`(Pass --loud-responses to show these.)`;
