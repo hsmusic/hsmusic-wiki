@@ -723,7 +723,7 @@ t.test(`Template - description errors`, t => {
         slot3: {type: 'bigint'},
         slot4: {type: 'boolean'},
         slot5: {type: 'symbol'},
-        slot6: {type: 'html'},
+        slot6: {type: 'html', mutable: false},
       },
       content: () => {},
     }));
@@ -739,7 +739,7 @@ t.test(`Template - slot value errors`, t => {
       basicBigint: {type: 'bigint'},
       basicBoolean: {type: 'boolean'},
       basicSymbol: {type: 'symbol'},
-      basicHTML: {type: 'html'},
+      basicHTML: {type: 'html', mutable: false},
     },
 
     content: slots =>
