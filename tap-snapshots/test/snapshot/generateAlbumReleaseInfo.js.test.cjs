@@ -7,7 +7,7 @@
 'use strict'
 exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseInfo (snapshot) > basic behavior 1`] = `
 <p>
-    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution has-tooltip nowrap"><a href="artist/tensei/">Tensei</a> (hot jams)<span class="icons icons-tooltip" inert><span class="icons-tooltip-content"><a href="https://tenseimusic.bandcamp.com/" class="icon has-text">
+    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution has-tooltip nowrap"><a href="artist/tensei/">Tensei</a> (hot jams)<span class="icons icons-tooltip" inert><span class="icons-tooltip-content"><a class="icon has-text" href="https://tenseimusic.bandcamp.com/">
                     <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
                     <span class="icon-text">tenseimusic</span>
                 </a></span></span></span>.

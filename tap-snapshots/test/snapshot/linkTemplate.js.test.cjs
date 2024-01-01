@@ -6,7 +6,7 @@
  */
 'use strict'
 exports[`test/snapshot/linkTemplate.js > TAP > linkTemplate (snapshot) > fill many slots 1`] = `
-<a class="dog" id="cat1" href="https://hsmusic.wiki/media/cool%20file.pdf#fooey" style="--primary-color: #123456ff; --dim-color: #12345677">My Cool Link</a>
+<a href="https://hsmusic.wiki/media/cool%20file.pdf#fooey" style="--primary-color: #123456ff; --dim-color: #12345677" class="dog" id="cat1">My Cool Link</a>
 `
 
 exports[`test/snapshot/linkTemplate.js > TAP > linkTemplate (snapshot) > fill path slot & provide appendIndexHTML 1`] = `

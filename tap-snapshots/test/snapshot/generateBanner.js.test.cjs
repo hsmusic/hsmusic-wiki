@@ -6,7 +6,7 @@
  */
 'use strict'
 exports[`test/snapshot/generateBanner.js > TAP > generateBanner (snapshot) > basic behavior 1`] = `
-<div id="banner"><img src="media/album-art/cool-album/banner.png" alt="Very cool banner art." width="800" height="200"></div>
+<div id="banner"><img src="media/album-art/cool-album/banner.png" width="800" height="200" alt="Very cool banner art."></div>
 `
 
 exports[`test/snapshot/generateBanner.js > TAP > generateBanner (snapshot) > no dimensions 1`] = `

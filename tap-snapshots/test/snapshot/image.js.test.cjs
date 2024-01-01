@@ -19,7 +19,7 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via 
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > id with link 1`] = `
-<a id="banana" class="box image-link" href="foobar"><div class="image-container"><div class="image-inner-area"><img src="foobar"></div></div></a>
+<a class="box image-link" href="foobar" id="banana"><div class="image-container"><div class="image-inner-area"><img src="foobar"></div></div></a>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > id with square 1`] = `
