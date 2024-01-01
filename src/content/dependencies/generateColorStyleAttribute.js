@@ -20,7 +20,6 @@ export default {
     context: {
       validate: v => v.is(
         'any-content',
-        'page-root',
         'primary-only'),
 
       default: 'any-content',
