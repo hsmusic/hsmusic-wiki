@@ -45,7 +45,7 @@ export default {
     anchor: {type: 'boolean', default: false},
     linkless: {type: 'boolean', default: false},
 
-    attributes: {validate: v => v.isAttributes},
+    attributes: {type: 'attributes'},
     hash: {type: 'string'},
   },
 

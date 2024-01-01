@@ -1056,6 +1056,7 @@ export class Template {
           'boolean',
           'symbol',
           'html',
+          'attributes',
         ];
 
         if (slotDescription.type === 'function') {
@@ -1160,6 +1161,10 @@ export class Template {
           return isHTML(value);
         }
 
+        case 'attributes': {
+          return isAttributesAdditionSingletValue(value);
+        }
+
         case 'string': {
           // Tags and templates are valid in string arguments - they'll be
           // stringified when exposed to the description's .content() function.
@@ -1198,6 +1203,18 @@ export class Template {
       }
 
       return providedValue;
+    }
+
+    if (description.type === 'attributes') {
+      if (!providedValue) {
+        return blankAttributes();
+      }
+
+      if (providedValue instanceof Attributes) {
+        return providedValue.clone();
+      }
+
+      return new Attributes(providedValue);
     }
 
     if (description.type === 'string') {

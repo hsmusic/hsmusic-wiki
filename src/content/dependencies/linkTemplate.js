@@ -18,7 +18,7 @@ export default {
     linkless: {type: 'boolean', default: false},
 
     tooltip: {type: 'string'},
-    attributes: {validate: v => v.isAttributes},
+    attributes: {type: 'attributes'},
     color: {validate: v => v.isColor},
     content: {type: 'html'},
   },
