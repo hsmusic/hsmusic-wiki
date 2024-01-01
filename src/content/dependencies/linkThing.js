@@ -1,29 +1,23 @@
 export default {
   contentDependencies: ['linkTemplate'],
-  extraDependencies: ['html', 'language'],
+  extraDependencies: ['getColors', 'html', 'language'],
 
-  relations(relation) {
-    return {
-      linkTemplate: relation('linkTemplate'),
-    };
-  },
+  relations: (relation) => ({
+    linkTemplate:
+      relation('linkTemplate'),
+  }),
 
-  data(pathKey, thing) {
-    const data = {};
+  data: (pathKey, thing) => ({
+    name: thing.name,
+    nameShort: thing.nameShort ?? thing.shortName,
 
-    if (pathKey) {
-      data.pathKey = pathKey;
-      data.directory = thing.directory;
-    } else {
-      data.pathKey = null;
-    }
+    color: thing.color,
 
-    data.color = thing.color;
-    data.name = thing.name;
-    data.nameShort = thing.nameShort ?? thing.shortName;
-
-    return data;
-  },
+    path:
+      (pathKey
+        ? [pathKey, thing.directory]
+        : null),
+  }),
 
   slots: {
     content: {type: 'html'},
@@ -40,7 +34,16 @@ export default {
       default: true,
     },
 
-    path: {validate: v => v.validateArrayItems(v.isString)},
+    colorContext: {
+      validate: v => v.is(
+        'primary-only'),
+
+      default: 'primary-only',
+    },
+
+    path: {
+      validate: v => v.validateArrayItems(v.isString),
+    },
 
     anchor: {type: 'boolean', default: false},
     linkless: {type: 'boolean', default: false},
@@ -49,13 +52,11 @@ export default {
     hash: {type: 'string'},
   },
 
-  generate(data, relations, slots, {html, language}) {
+  generate(data, relations, slots, {getColors, html, language}) {
+    const {attributes} = slots;
+
     const path =
-      (slots.path
-        ? slots.path
-     : data.pathKey
-        ? [data.pathKey, data.directory]
-        : null);
+      slots.path ?? data.path;
 
     const name =
       (slots.preferShortName
@@ -67,11 +68,37 @@ export default {
         ? language.sanitize(name)
         : slots.content);
 
-    let color = null;
-    if (slots.color === true) {
-      color = data.color ?? null;
-    } else if (typeof slots.color === 'string') {
-      color = slots.color;
+    if (slots.color !== false) addColor: {
+      const color =
+        (typeof slots.color === 'string'
+          ? slots.color
+          : data.color);
+
+      if (!color) {
+        break addColor;
+      }
+
+      let selectColors;
+
+      switch (slots.colorContext) {
+        case 'primary-only':
+          selectColors = {
+            '--primary-color': 'primary',
+          };
+          break;
+
+        default:
+          break addColor;
+      }
+
+      const colors = getColors(color);
+      const selectedColors = [];
+
+      for (const [variable, key] of Object.entries(selectColors)) {
+        selectedColors.push(`${variable}: ${colors[key]}`);
+      }
+
+      attributes.add('style', selectedColors);
     }
 
     let tooltip = null;
@@ -86,10 +113,8 @@ export default {
         path: slots.anchor ? [] : path,
         href: slots.anchor ? '' : null,
         content,
-        color,
         tooltip,
-
-        attributes: slots.attributes,
+        attributes,
         hash: slots.hash,
         linkless: slots.linkless,
       });
