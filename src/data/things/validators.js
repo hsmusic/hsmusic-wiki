@@ -225,7 +225,7 @@ function validateArrayItemsHelper(itemValidator) {
               .join('\n')
           : `${annotation} ${error}`);
 
-      error[Symbol.for('hsmusic.decorate.indexInSourceArray')] = index;
+      error[Symbol.for('hsmusic.annotateError.indexInSourceArray')] = index;
 
       throw error;
     }
