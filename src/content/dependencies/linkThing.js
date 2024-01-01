@@ -1,17 +1,18 @@
 export default {
-  contentDependencies: ['linkTemplate'],
-  extraDependencies: ['getColors', 'html', 'language'],
+  contentDependencies: ['generateColorStyleAttribute', 'linkTemplate'],
+  extraDependencies: ['html', 'language'],
 
-  relations: (relation) => ({
+  relations: (relation, _pathKey, thing) => ({
     linkTemplate:
       relation('linkTemplate'),
+
+    colorStyle:
+      relation('generateColorStyleAttribute', thing.color ?? null),
   }),
 
   data: (pathKey, thing) => ({
     name: thing.name,
     nameShort: thing.nameShort ?? thing.shortName,
-
-    color: thing.color,
 
     path:
       (pathKey
@@ -62,7 +63,7 @@ export default {
     hash: {type: 'string'},
   },
 
-  generate(data, relations, slots, {getColors, html, language}) {
+  generate(data, relations, slots, {html, language}) {
     const {attributes} = slots;
 
     const path =
@@ -78,46 +79,16 @@ export default {
         ? language.sanitize(name)
         : slots.content);
 
-    if (slots.color !== false) addColor: {
-      const color =
-        (typeof slots.color === 'string'
-          ? slots.color
-          : data.color);
+    if (slots.color !== false) {
+      const {colorStyle} = relations;
 
-      if (!color) {
-        break addColor;
+      colorStyle.setSlot('context', slots.colorContext);
+
+      if (typeof slots.color === 'string') {
+        colorStyle.setSlot('color', slots.color);
       }
 
-      let selectColors;
-
-      switch (slots.colorContext) {
-        case 'image-box':
-          selectColors = {
-            '--primary-color': 'primary',
-            '--dim-color': 'dim',
-            '--deep-color': 'deep',
-            '--bg-black-color': 'bgBlack',
-          };
-          break;
-
-        case 'primary-only':
-          selectColors = {
-            '--primary-color': 'primary',
-          };
-          break;
-
-        default:
-          break addColor;
-      }
-
-      const colors = getColors(color);
-      const selectedColors = [];
-
-      for (const [variable, key] of Object.entries(selectColors)) {
-        selectedColors.push(`${variable}: ${colors[key]}`);
-      }
-
-      attributes.add('style', selectedColors);
+      attributes.add(colorStyle);
     }
 
     let tooltip = null;
