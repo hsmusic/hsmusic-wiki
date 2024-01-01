@@ -600,6 +600,10 @@ export class Attributes {
     this.attributes = attributes;
   }
 
+  clone() {
+    return new Attributes(this);
+  }
+
   set attributes(value) {
     this.#attributes = Object.create(null);
 
