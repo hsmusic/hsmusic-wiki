@@ -1,3 +1,5 @@
+import {Template} from '#html';
+
 import {
   annotateFunction,
   decorateErrorWithCause,
@@ -42,6 +44,10 @@ export default function contentFunction({
 
   if (slots && !expectedExtraDependencyKeys.has('html')) {
     throw new ContentFunctionSpecError(`Content functions with slots must specify html in extraDependencies`);
+  }
+
+  if (slots) {
+    Template.validateSlotsDescription(slots);
   }
 
   // Pass all the details to expectDependencies, which will recursively build
