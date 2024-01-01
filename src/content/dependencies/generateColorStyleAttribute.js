@@ -20,6 +20,7 @@ export default {
     context: {
       validate: v => v.is(
         'any-content',
+        'image-box',
         'primary-only'),
 
       default: 'any-content',

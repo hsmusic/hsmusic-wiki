@@ -9,6 +9,7 @@ export default {
     context: {
       validate: v => v.is(
         'any-content',
+        'image-box',
         'page-root',
         'primary-only'),
 
@@ -49,6 +50,13 @@ export default {
     switch (slots.context) {
       case 'any-content':
         selectedProperties = anyContent;
+        break;
+
+      case 'image-box':
+        selectedProperties = [
+          `--primary-color: ${primary}`,
+          `--dim-color: ${dim}`,
+        ];
         break;
 
       case 'page-root':

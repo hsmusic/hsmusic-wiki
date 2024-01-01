@@ -158,7 +158,10 @@ export default {
 
     if (slots.color) {
       const colorStyle =
-        relations.colorStyle.slot('color', slots.color);
+        relations.colorStyle.slots({
+          color: slots.color,
+          context: 'image-box',
+        });
 
       if (willLink) {
         linkAttributes.add(colorStyle);

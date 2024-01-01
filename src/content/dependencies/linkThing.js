@@ -36,6 +36,7 @@ export default {
 
     colorContext: {
       validate: v => v.is(
+        'image-box',
         'primary-only'),
 
       default: 'primary-only',
@@ -81,6 +82,13 @@ export default {
       let selectColors;
 
       switch (slots.colorContext) {
+        case 'image-box':
+          selectColors = {
+            '--primary-color': 'primary',
+            '--dim-color': 'dim',
+          };
+          break;
+
         case 'primary-only':
           selectColors = {
             '--primary-color': 'primary',

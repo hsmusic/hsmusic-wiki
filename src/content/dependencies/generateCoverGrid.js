@@ -31,6 +31,7 @@ export default {
         }).map(({image, link, name, info}, index) =>
             link.slots({
               attributes: {class: ['grid-item', 'box']},
+              colorContext: 'image-box',
               content: [
                 image.slots({
                   thumb: 'medium',
