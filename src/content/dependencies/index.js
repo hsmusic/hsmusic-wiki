@@ -35,6 +35,7 @@ export function watchContentDependencies({
   const contentDependencies = {};
 
   let emittedReady = false;
+  let emittedErrorForFunctions = new Set();
   let closed = false;
 
   let _close = () => {};
@@ -201,7 +202,8 @@ export function watchContentDependencies({
         break main;
       }
 
-      if (logging && emittedReady) {
+      const emittedError = emittedErrorForFunctions.has(functionName);
+      if (logging && (emittedReady || emittedError)) {
         const timestamp = new Date().toLocaleString('en-US', {timeStyle: 'medium'});
         console.log(colors.green(`[${timestamp}] Updated ${functionName}`));
       }
@@ -221,6 +223,7 @@ export function watchContentDependencies({
     }
 
     events.emit('error', functionName, error);
+    emittedErrorForFunctions.add(functionName);
 
     if (logging) {
       if (contentDependencies[functionName]) {
