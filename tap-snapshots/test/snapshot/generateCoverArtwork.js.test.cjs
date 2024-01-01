@@ -16,7 +16,11 @@ exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (sna
    ]
  ]
  slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
-<p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
+<ul class="image-details">
+    <li><a href="tag/damara/">Damara</a></li>
+    <li><a href="tag/cronus/">Cronus</a></li>
+    <li><a href="tag/bees/">Bees</a></li>
+</ul>
 `
 
 exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (snapshot) > display: thumbnail 1`] = `

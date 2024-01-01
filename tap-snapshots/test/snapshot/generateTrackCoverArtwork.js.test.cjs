@@ -16,14 +16,18 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
    ]
  ]
  slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
-<p>Tags: <a href="tag/damara/">Damara</a>, <a href="tag/cronus/">Cronus</a>, <a href="tag/bees/">Bees</a></p>
+<ul class="image-details">
+    <li><a href="tag/damara/">Damara</a></li>
+    <li><a href="tag/cronus/">Cronus</a></li>
+    <li><a href="tag/bees/">Bees</a></li>
+</ul>
 `
 
 exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverArtwork (snapshot) > display: primary - unique art 1`] = `
 [mocked: image
  args: [ [ { name: 'Bees', directory: 'bees', isContentWarning: false } ] ]
  slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], color: '#f28514', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
-<p>Tags: <a href="tag/bees/">Bees</a></p>
+<ul class="image-details"><li><a href="tag/bees/">Bees</a></li></ul>
 `
 
 exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverArtwork (snapshot) > display: thumbnail - no unique art 1`] = `
