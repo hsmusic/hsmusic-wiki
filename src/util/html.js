@@ -644,7 +644,11 @@ export class Attributes {
 
   set(attribute, value) {
     if (value instanceof Template) {
-      return this.set(attribute, Template.resolve(value));
+      value = Template.resolve(value);
+    }
+
+    if (Array.isArray(value)) {
+      value = value.flat(Infinity);
     }
 
     if (value === null || value === undefined) {
@@ -722,6 +726,10 @@ export class Attributes {
 
     if (value instanceof Template) {
       return this.#addOneAttribute(attribute, Template.resolve(value));
+    }
+
+    if (Array.isArray(value)) {
+      value = value.flat(Infinity);
     }
 
     if (!this.has(attribute)) {
