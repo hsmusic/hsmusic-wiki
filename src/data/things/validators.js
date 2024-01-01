@@ -789,8 +789,9 @@ export function oneOf(...validators) {
       errors.push(error);
     }
 
+    const total = offset + leftoverValidators.length;
     throw new AggregateError(errors,
-      `Expected one of ${validators.length} possible checks, ` +
+      `Expected one of ${total} possible checks, ` +
       `but none were true`);
   };
 }
