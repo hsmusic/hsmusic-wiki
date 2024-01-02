@@ -1621,11 +1621,7 @@ function addImageOverlayClickHandlers() {
     return;
   }
 
-  for (const link of document.querySelectorAll('.image-link')) {
-    if (link.querySelector('img').hasAttribute('data-no-image-preview')) {
-      continue;
-    }
-
+  for (const link of document.querySelectorAll('.image-link:not(.no-image-preview)')) {
     link.addEventListener('click', handleImageLinkClicked);
   }
 

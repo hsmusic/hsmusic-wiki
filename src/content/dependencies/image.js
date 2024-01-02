@@ -130,15 +130,15 @@ export default {
       slots.alt && {alt: slots.alt},
       slots.width && {width: slots.width},
       slots.height && {height: slots.height},
-
-      customLink &&
-        {'data-no-image-preview': true},
     ]);
 
     const linkAttributes = html.attributes([
       (customLink
         ? {href: slots.link}
         : {href: originalSrc}),
+
+      customLink &&
+        {class: 'no-image-preview'},
     ]);
 
     const containerAttributes = html.attributes();
