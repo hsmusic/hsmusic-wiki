@@ -1228,11 +1228,12 @@ export class Template {
         return blankAttributes();
       }
 
-      if (
-        providedValue instanceof Attributes &&
-        description.mutable
-      ) {
-        return providedValue.clone();
+      if (providedValue instanceof Attributes) {
+        if (description.mutable) {
+          return providedValue.clone();
+        } else {
+          return providedValue;
+        }
       }
 
       return new Attributes(providedValue);
