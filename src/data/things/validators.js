@@ -401,35 +401,10 @@ export function validateProperties(spec) {
 validateProperties.validateOtherKeys = Symbol();
 validateProperties.allowOtherKeys = Symbol();
 
-export function validateAllPropertyValues(validator) {
-  return (object) => {
-    isObject(object);
-
-    if (Array.isArray(object))
-      throw new TypeError(`Expected an object, got array`);
-
-    const errors = [];
-
-    for (const key of Reflect.ownKeys(object)) {
-      const value = object[key];
-      try {
-        validator(value);
-      } catch (error) {
-        const keyPart = colors.green(key.toString());
-        const valuePart = inspect(value);
-        error.message = `(key: ${keyPart}, value: ${valuePart}) ${error.message}`;
-        errors.push(error);
-      }
-    }
-
-    if (empty(errors)) {
-      return true;
-    }
-
-    throw new AggregateError(errors,
-      `Errors validating object properties`);
-  };
-}
+export const validateAllPropertyValues = (validator) =>
+  validateProperties({
+    [validateProperties.validateOtherKeys]: validator,
+  });
 
 export const isContribution = validateProperties({
   who: isArtistRef,
