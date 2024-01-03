@@ -1,11 +1,18 @@
+import {inspect as nodeInspect} from 'node:util';
+
+import {colors, ENABLE_COLOR} from '#cli';
 import {Template} from '#html';
 
 import {
   annotateFunction,
-  decorateErrorWithCause,
+  decorateError,
   empty,
   setIntersection,
 } from '#sugar';
+
+function inspect(value, opts = {}) {
+  return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
+}
 
 export class ContentFunctionSpecError extends Error {}
 
@@ -359,7 +366,7 @@ export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
   const relationIdentifier = Symbol('Relation');
 
-  function recursive(contentFunctionName, args, superCause = null) {
+  function recursive(contentFunctionName, args, traceStack) {
     const contentFunction = dependencies[contentFunctionName];
     if (!contentFunction) {
       throw new Error(`Couldn't find dependency ${contentFunctionName}`);
@@ -371,15 +378,13 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     // later call to data (outside of getRelationsTree). There might be a nicer way
     // of handling this.
     const argsForRelationsAndData =
-      getArgsForRelationsAndData(
-        contentFunction,
-        wikiData,
-        ...args);
+      decorateErrorWithRelationStack(getArgsForRelationsAndData, traceStack)
+        (contentFunction, wikiData, ...args);
 
     const result = {
       name: contentFunctionName,
       args: argsForRelationsAndData,
-      cause: superCause,
+      trace: traceStack,
     };
 
     if (contentFunction.relations) {
@@ -403,15 +408,10 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
         }
 
         const relationSymbol = Symbol(relationSymbolMessage(name));
+        const traceError = new Error();
 
-        const {stackTraceLimit} = Error;
-        Error.stackTraceLimit = 0;
-        const subCause = new Error(`Error in relation('${name}') within ${contentFunctionName}`);
-        Error.stackTraceLimit = stackTraceLimit;
-        Error.captureStackTrace(subCause, relationFunction);
-        if (superCause) subCause.cause = superCause;
+        relationSlots[relationSymbol] = {name, args, traceError};
 
-        relationSlots[relationSymbol] = {name, args, cause: subCause};
         return {[relationIdentifier]: relationSymbol};
       };
 
@@ -421,9 +421,9 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
       const relationsTree = Object.fromEntries(
         Object.getOwnPropertySymbols(relationSlots)
           .map(symbol => [symbol, relationSlots[symbol]])
-          .map(([symbol, {name, args, cause: subCause}]) => [
+          .map(([symbol, {name, args, traceError}]) => [
             symbol,
-            recursive(name, args, subCause),
+            recursive(name, args, [...traceStack, {name, args, traceError}]),
           ]));
 
       result.relations = {
@@ -436,7 +436,9 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     return result;
   }
 
-  const root = recursive(contentFunctionName, args, null);
+  const root =
+    recursive(contentFunctionName, args,
+      [{name: contentFunctionName, args, traceError: new Error()}]);
 
   return {root, relationIdentifier};
 }
@@ -448,7 +450,7 @@ export function flattenRelationsTree({root, relationIdentifier}) {
     const flatNode = {
       name: node.name,
       args: node.args,
-      cause: node.cause,
+      trace: node.trace,
       relations: node.relations?.layout ?? null,
     };
 
@@ -510,6 +512,39 @@ export function getNeededContentDependencyNames(contentDependencies, name) {
 
   return set;
 }
+
+export const decorateErrorWithRelationStack = (fn, traceStack) =>
+  decorateError(fn, (caughtError, ...args) => {
+    let cause = caughtError;
+
+    for (const {name, args, traceError} of traceStack.slice().reverse()) {
+      const nameText = colors.green(`"${name}"`);
+      const namePart = `Error in relation(${nameText})`;
+
+      const argsPart =
+        (empty(args)
+          ? ``
+          : ` called with args: ${inspect(args)}`);
+
+      const error = new Error(namePart + argsPart, {cause});
+
+      error[Symbol.for('hsmusic.aggregate.alwaysTrace')] = true;
+      error[Symbol.for('hsmusic.aggregate.traceFrom')] = traceError;
+
+      error[Symbol.for(`hsmusic.aggregate.unhelpfulTraceLines`)] = [
+        /content-function\.js/,
+        /util\/html\.js/,
+      ];
+
+      error[Symbol.for(`hsmusic.aggregate.helpfulTraceLines`)] = [
+        /content\/dependencies\/(.*\.js:.*(?=\)))/,
+      ];
+
+      cause = error;
+    }
+
+    return cause;
+  });
 
 export function quickEvaluate({
   contentDependencies: allContentDependencies,
@@ -602,7 +637,10 @@ export function quickEvaluate({
 
   const slotResults = {};
 
-  function runContentFunction({name, args, relations: layout, cause}) {
+  function runContentFunction({name, args, relations: layout, trace: traceStack}) {
+    const callDecorated = (fn, ...args) =>
+      decorateErrorWithRelationStack(fn, traceStack)(...args);
+
     const contentFunction = fulfilledContentDependencies[name];
 
     if (!contentFunction) {
@@ -612,16 +650,14 @@ export function quickEvaluate({
     const generateArgs = [];
 
     if (contentFunction.data) {
-      generateArgs.push(
-        decorateErrorWithCause(contentFunction.data, cause)(...args));
+      generateArgs.push(callDecorated(contentFunction.data, ...args));
     }
 
     if (layout) {
       generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
     }
 
-    return (
-      decorateErrorWithCause(contentFunction, cause)(...generateArgs));
+    return callDecorated(contentFunction, ...generateArgs);
   }
 
   for (const slot of Object.getOwnPropertySymbols(flatRelationSlots)) {
