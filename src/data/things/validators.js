@@ -363,30 +363,43 @@ export function validateProperties(spec) {
     if (Array.isArray(object))
       throw new TypeError(`Expected an object, got array`);
 
-    withAggregate({message: `Errors validating object properties`}, ({call}) => {
+    withAggregate({message: `Errors validating object properties`}, ({push}) => {
       for (const [specKey, specValidator] of specEntries) {
-        call(() => {
-          const value = object[specKey];
-          try {
-            specValidator(value);
-          } catch (error) {
-            error.message = `(key: ${colors.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
-            throw error;
-          }
-        });
+        const value = object[specKey];
+        try {
+          specValidator(value);
+        } catch (error) {
+          error.message = `(key: ${colors.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
+          push(error);
+        }
       }
 
       const unknownKeys = Object.keys(object).filter((key) => !specKeys.includes(key));
-      if (unknownKeys.length > 0) {
-        call(() => {
-          throw new Error(`Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`);
-        });
+      if (!empty(unknownKeys)) {
+        if (spec[validateProperties.validateOtherKeys]) {
+          const specValidator = spec[validateProperties.validateOtherKeys];
+          for (const key of unknownKeys) {
+            const value = object[key];
+            try {
+              specValidator(value);
+            } catch (error) {
+              error.message = `(key: ${colors.green(key)}, value: ${inspect(value)}) ${error.message}`;
+              push(error);
+            }
+          }
+        } else if (!spec[validateProperties.allowOtherKeys]) {
+          push(new Error(
+            `Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`));
+        }
       }
     });
 
     return true;
   };
 }
+
+validateProperties.validateOtherKeys = Symbol();
+validateProperties.allowOtherKeys = Symbol();
 
 export function validateAllPropertyValues(validator) {
   return (object) => {
