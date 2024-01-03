@@ -354,6 +354,11 @@ export function isCommentary(commentaryText) {
 const isArtistRef = validateReference('artist');
 
 export function validateProperties(spec) {
+  const {
+    [validateProperties.validateOtherKeys]: validateOtherKeys = null,
+    [validateProperties.allowOtherKeys]: allowOtherKeys = false,
+  } = spec;
+
   const specEntries = Object.entries(spec);
   const specKeys = Object.keys(spec);
 
@@ -364,7 +369,16 @@ export function validateProperties(spec) {
       throw new TypeError(`Expected an object, got array`);
 
     withAggregate({message: `Errors validating object properties`}, ({push}) => {
-      for (const [specKey, specValidator] of specEntries) {
+      const testEntries = specEntries.slice();
+
+      const unknownKeys = Object.keys(object).filter((key) => !specKeys.includes(key));
+      if (validateOtherKeys) {
+        for (const key of unknownKeys) {
+          testEntries.push([key, validateOtherKeys]);
+        }
+      }
+
+      for (const [specKey, specValidator] of testEntries) {
         const value = object[specKey];
         try {
           specValidator(value);
@@ -374,23 +388,9 @@ export function validateProperties(spec) {
         }
       }
 
-      const unknownKeys = Object.keys(object).filter((key) => !specKeys.includes(key));
-      if (!empty(unknownKeys)) {
-        if (spec[validateProperties.validateOtherKeys]) {
-          const specValidator = spec[validateProperties.validateOtherKeys];
-          for (const key of unknownKeys) {
-            const value = object[key];
-            try {
-              specValidator(value);
-            } catch (error) {
-              error.message = `(key: ${colors.green(key)}, value: ${inspect(value)}) ${error.message}`;
-              push(error);
-            }
-          }
-        } else if (!spec[validateProperties.allowOtherKeys]) {
-          push(new Error(
-            `Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`));
-        }
+      if (!validateOtherKeys && !allowOtherKeys && !empty(unknownKeys)) {
+        push(new Error(
+          `Unknown keys present (${unknownKeys.length}): [${unknownKeys.join(', ')}]`));
       }
     });
 
