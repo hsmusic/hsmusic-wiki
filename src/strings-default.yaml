@@ -1021,7 +1021,7 @@ artTagGalleryPage:
   infoLine: >-
     Appears in {COVER_ARTS}.
 
-  descendsFrom: "Descends from {TAGS.}"
+  descendsFrom: "Descends from {TAGS}."
   descendants: "Direct descendants: {TAGS}."
 
 #
