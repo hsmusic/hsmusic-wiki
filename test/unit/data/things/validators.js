@@ -115,7 +115,7 @@ test(t, 'isObject', t => {
 });
 
 test(t, 'validateArrayItems', t => {
-  t.plan(6);
+  t.plan(9);
 
   t.ok(validateArrayItems(isNumber)([3, 4, 5]));
   t.ok(validateArrayItems(validateArrayItems(isNumber))([[3, 4], [4, 5], [6, 7]]));
@@ -130,7 +130,10 @@ test(t, 'validateArrayItems', t => {
   t.not(caughtError, null);
   t.ok(caughtError instanceof AggregateError);
   t.equal(caughtError.errors.length, 1);
-  t.ok(caughtError.errors[0] instanceof TypeError);
+  t.ok(caughtError.errors[0] instanceof Error);
+  t.equal(caughtError.errors[0][Symbol.for('hsmusic.annotateError.indexInSourceArray')], 2);
+  t.not(caughtError.errors[0].cause, null);
+  t.ok(caughtError.errors[0].cause instanceof TypeError);
 });
 
 // Wiki data
@@ -267,7 +270,7 @@ test(t, 'validateReferenceList', t => {
   const track = validateReferenceList('track');
   const artist = validateReferenceList('artist');
 
-  t.plan(9);
+  t.plan(11);
 
   t.ok(track(['track:fallen-down', 'Once Upon a Time']));
   t.ok(artist(['artist:toby-fox', 'Mark Hadley']));
@@ -284,8 +287,10 @@ test(t, 'validateReferenceList', t => {
   t.not(caughtError, null);
   t.ok(caughtError instanceof AggregateError);
   t.equal(caughtError.errors.length, 2);
-  t.ok(caughtError.errors[0] instanceof TypeError);
-  t.ok(caughtError.errors[1] instanceof TypeError);
+  t.ok(caughtError.errors[0] instanceof Error);
+  t.ok(caughtError.errors[0].cause instanceof TypeError);
+  t.ok(caughtError.errors[1] instanceof Error);
+  t.ok(caughtError.errors[0].cause instanceof TypeError);
 });
 
 test(t, 'anyOf', t => {

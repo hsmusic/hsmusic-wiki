@@ -213,20 +213,12 @@ function validateArrayItemsHelper(itemValidator) {
       if (value !== true) {
         throw new Error(`Expected validator to return true`);
       }
-    } catch (error) {
-      const annotation = `(index: ${colors.yellow(`${index}`)}, item: ${inspect(item)})`;
-
-      error.message =
-        (error.message.includes('\n') || strlen(annotation) > 20
-          ? annotation + '\n' +
-            error.message
-              .split('\n')
-              .map(line => `  ${line}`)
-              .join('\n')
-          : `${annotation} ${error}`);
-
+    } catch (caughtError) {
+      const indexPart = colors.yellow(`zero-index ${index}`)
+      const itemPart = inspect(item);
+      const message = `Error at ${indexPart}: ${itemPart}`;
+      const error = new Error(message, {cause: caughtError});
       error[Symbol.for('hsmusic.annotateError.indexInSourceArray')] = index;
-
       throw error;
     }
   };
