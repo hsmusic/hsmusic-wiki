@@ -720,7 +720,19 @@ export function showAggregate(topError, {
       helpfulTraceLines: ownHelpfulTraceLines,
       unhelpfulTraceLines: ownUnhelpfulTraceLines,
     },
-  }) => {
+  }, index, apparentSiblings) => {
+    const subApparentSiblings =
+      (cause && errors
+        ? [cause, ...errors]
+     : cause
+        ? [cause]
+     : errors
+        ? errors
+        : []);
+
+    const anythingHasErrorsThisLayer =
+      apparentSiblings.some(({errors}) => !empty(errors));
+
     const messagePart =
       message || `(no message)`;
 
@@ -732,6 +744,8 @@ export function showAggregate(topError, {
         ? `[${kindPart}] ${messagePart}`
      : errors
         ? `[${messagePart}]`
+     : anythingHasErrorsThisLayer
+        ? ` ${messagePart}`
         : messagePart);
 
     if (showTraces || alwaysTrace) {
@@ -764,7 +778,7 @@ export function showAggregate(topError, {
 
     const causePart =
       (cause
-        ? recursive(cause)
+        ? recursive(cause, 0, subApparentSiblings)
             .split('\n')
             .map((line, i) => i === 0 ? ` ${head1} ${line}` : ` ${bar1} ${line}`)
             .join('\n')
@@ -776,7 +790,7 @@ export function showAggregate(topError, {
     const errorsPart =
       (errors
         ? errors
-            .map(error => recursive(error))
+            .map((error, index) => recursive(error, index + 1, subApparentSiblings))
             .flatMap(str => str.split('\n'))
             .map((line, i) => i === 0 ? ` ${head2} ${line}` : ` ${bar2} ${line}`)
             .join('\n')
@@ -786,7 +800,7 @@ export function showAggregate(topError, {
   };
 
   const structure = flattenErrorStructure(topError);
-  const message = recursive(structure);
+  const message = recursive(structure, 0, [structure]);
 
   if (print) {
     console.error(message);
