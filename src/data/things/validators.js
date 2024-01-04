@@ -374,9 +374,11 @@ export function validateProperties(spec) {
         const value = object[specKey];
         try {
           specValidator(value);
-        } catch (error) {
-          error.message = `(key: ${colors.green(specKey)}, value: ${inspect(value)}) ${error.message}`;
-          push(error);
+        } catch (caughtError) {
+          const keyPart = colors.green(specKey);
+          const valuePart = inspect(value);
+          const message = `Error for key ${keyPart}: ${valuePart}`;
+          push(new Error(message, {cause: caughtError}));
         }
       }
 
