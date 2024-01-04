@@ -766,8 +766,8 @@ export function anyOf(...validators) {
     for (const [validator, i, error] of prefaceErrorInfo.concat(errorInfo)) {
       error.message =
         (validator?.name
-          ? `(#${i + 1} "${validator.name}") ${error.message}`
-          : `(#${i + 1}) ${error.message}`);
+          ? `${i + 1}. "${validator.name}": ${error.message}`
+          : `${i + 1}. ${error.message}`);
 
       error.check =
         (Array.isArray(validator) && validator.length === 1
