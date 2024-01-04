@@ -122,7 +122,7 @@ export const validators = {
   },
 
   isAttributes(value) {
-    return isAttributesAdditionSingletValue(value);
+    return isAttributesAdditionSinglet(value);
   },
 };
 
@@ -645,18 +645,18 @@ export class Attributes {
   }
 
   add(...args) {
-    isAttributesAddition(args);
-    return this.#addHelper(...args);
-  }
+    switch (args.length) {
+      case 1:
+        isAttributesAdditionSinglet(args[0]);
+        return this.#addMultipleAttributes(args[0]);
 
-  #addHelper(...args) {
-    if (args.length === 1) {
-      return this.#addMultipleAttributes(args[0]);
-    } else if (args.length === 2) {
-      return this.#addOneAttribute(args[0], args[1]);
-    } else {
-      throw new Error(
-        `Expected array or object, or attribute and value`);
+      case 2:
+        isAttributesAdditionPair(args);
+        return this.#addOneAttribute(args[0], args[1]);
+
+      default:
+        throw new Error(
+          `Expected array or object, or attribute and value`);
     }
   }
 
@@ -690,7 +690,7 @@ export class Attributes {
 
     if (attributes instanceof Template) {
       const resolved = Template.resolve(attributes);
-      isAttributesAdditionSingletValue(resolved);
+      isAttributesAdditionSinglet(resolved);
       return resolved;
     }
 
@@ -1177,7 +1177,7 @@ export class Template {
         }
 
         case 'attributes': {
-          return isAttributesAdditionSingletValue(value);
+          return isAttributesAdditionSinglet(value);
         }
 
         case 'string': {
@@ -1411,7 +1411,7 @@ export const isAttributesAdditionPair = pair => {
     throw new TypeError(`Expected attributes pair to have two items`);
   }
 
-  withAggregate(({push}) => {
+  withAggregate({message: `Error validating attributes pair`}, ({push}) => {
     try {
       isAttributeKey(pair[0]);
     } catch (caughtError) {
@@ -1428,24 +1428,9 @@ export const isAttributesAdditionPair = pair => {
   return true;
 };
 
-export const isAttributesAdditionSingletValue =
+export const isAttributesAdditionSinglet =
   oneOf(
     validateInstanceOf(Template),
     validateInstanceOf(Attributes),
     validateAllPropertyValues(isAttributeValue),
-    looseArrayOf(value => isAttributesAdditionSingletValue(value)));
-
-export const isAttributesAdditionSinglet = singlet => {
-  isArray(singlet);
-
-  if (singlet.length !== 1) {
-    throw new TypeError(`Expected attributes singlet to have one item`);
-  }
-
-  isAttributesAdditionSingletValue(singlet[0]);
-
-  return true;
-}
-
-export const isAttributesAddition =
-  oneOf(isAttributesAdditionSinglet, isAttributesAdditionPair);
+    looseArrayOf(value => isAttributesAdditionSinglet(value)));
