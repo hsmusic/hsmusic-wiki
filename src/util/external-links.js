@@ -1,10 +1,10 @@
 import {empty, stitchArrays} from '#sugar';
 
 import {
+  anyOf,
   is,
   isObject,
   isStringNonEmpty,
-  oneOf,
   optional,
   validateArrayItems,
   validateInstanceOf,
@@ -62,7 +62,7 @@ export const isExternalLinkSpec =
         queries: optional(validateArrayItems(isRegExp)),
 
         context:
-          optional(oneOf(
+          optional(anyOf(
             isExternalLinkContext,
             validateArrayItems(isExternalLinkContext))),
       }),

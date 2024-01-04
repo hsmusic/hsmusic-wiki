@@ -8,7 +8,7 @@ export default {
     },
 
     class: {
-      validate: v => v.oneOf(v.isString, v.sparseArrayOf(v.isString)),
+      validate: v => v.anyOf(v.isString, v.sparseArrayOf(v.isString)),
     },
   },
 

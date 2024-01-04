@@ -625,7 +625,7 @@ export const isAdditionalName = validateProperties({
     // Double TODO: Explicitly allowing both references and
     // live objects to co-exist is definitely weird, and
     // altogether questions the way we define validators...
-    optional(oneOf(
+    optional(anyOf(
       validateReferenceList('track'),
       validateWikiData({referenceType: 'track'}))),
 });
@@ -634,7 +634,7 @@ export const isAdditionalNameList = validateArrayItems(isAdditionalName);
 
 // Compositional utilities
 
-export function oneOf(...validators) {
+export function anyOf(...validators) {
   const validConstants = new Set();
   const validConstructors = new Set();
   const validTypes = new Set();
@@ -724,7 +724,7 @@ export function oneOf(...validators) {
         constantValidators,
         offset++,
         new TypeError(
-          `Expected one of ${constants.join(' ')}` + gotPart),
+          `Expected any of ${constants.join(' ')}` + gotPart),
       ]);
     }
 
@@ -739,7 +739,7 @@ export function oneOf(...validators) {
         typeValidators,
         offset++,
         new TypeError(
-          `Expected one of ${types.join(', ')}` + gotPart),
+          `Expected any of ${types.join(', ')}` + gotPart),
       ]);
     }
 
@@ -755,7 +755,7 @@ export function oneOf(...validators) {
         constructorValidators,
         offset++,
         new TypeError(
-          `Expected one of ${names.join(', ')}` + gotPart),
+          `Expected any of ${names.join(', ')}` + gotPart),
       ]);
     }
 
@@ -779,7 +779,7 @@ export function oneOf(...validators) {
 
     const total = offset + leftoverValidators.length;
     throw new AggregateError(errors,
-      `Expected one of ${total} possible checks, ` +
+      `Expected any of ${total} possible checks, ` +
       `but none were true`);
   };
 }

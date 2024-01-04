@@ -7,6 +7,7 @@ import {empty, typeAppearance, unique, withAggregate} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {
+  anyOf,
   is,
   isArray,
   isBoolean,
@@ -14,7 +15,6 @@ const {
   isString,
   isSymbol,
   looseArrayOf,
-  oneOf,
   validateAllPropertyValues,
   validateArrayItems,
   validateInstanceOf,
@@ -1382,7 +1382,7 @@ export const isArrayOfHTML =
   validateArrayItems(value => isHTML(value));
 
 export const isHTML =
-  oneOf(
+  anyOf(
     is(null, undefined, false),
     isString,
     isTag,
@@ -1396,10 +1396,10 @@ export const isHTML =
     isArrayOfHTML);
 
 export const isAttributeKey =
-  oneOf(isString, isSymbol);
+  anyOf(isString, isSymbol);
 
 export const isAttributeValue =
-  oneOf(
+  anyOf(
     isString, isNumber, isBoolean, isArray,
     isTag, isTemplate,
     validateArrayItems(item => isAttributeValue(item)));
@@ -1429,7 +1429,7 @@ export const isAttributesAdditionPair = pair => {
 };
 
 export const isAttributesAdditionSinglet =
-  oneOf(
+  anyOf(
     validateInstanceOf(Template),
     validateInstanceOf(Attributes),
     validateAllPropertyValues(isAttributeValue),

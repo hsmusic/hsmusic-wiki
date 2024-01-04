@@ -30,7 +30,7 @@ import {
   validateReferenceList,
 
   // Compositional utilities
-  oneOf,
+  anyOf,
 } from '#validators';
 
 function test(t, msg, fn) {
@@ -288,10 +288,10 @@ test(t, 'validateReferenceList', t => {
   t.ok(caughtError.errors[1] instanceof TypeError);
 });
 
-test(t, 'oneOf', t => {
+test(t, 'anyOf', t => {
   t.plan(11);
 
-  const isStringOrNumber = oneOf(isString, isNumber);
+  const isStringOrNumber = anyOf(isString, isNumber);
 
   t.ok(isStringOrNumber('hello world'));
   t.ok(isStringOrNumber(42));
@@ -302,7 +302,7 @@ test(t, 'oneOf', t => {
     throw mockError;
   };
 
-  const isStringOrGetRekt = oneOf(isString, neverSucceeds);
+  const isStringOrGetRekt = anyOf(isString, neverSucceeds);
 
   t.ok(isStringOrGetRekt('phew!'));
 

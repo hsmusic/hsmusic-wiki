@@ -2,11 +2,11 @@ import {input} from '#composite';
 import find from '#find';
 
 import {
+  anyOf,
   is,
   isCountingNumber,
   isString,
   isStringNonEmpty,
-  oneOf,
   validateArrayItems,
   validateInstanceOf,
   validateReference,
@@ -124,7 +124,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
 
         update: {
           validate:
-            oneOf(
+            anyOf(
               is('new-releases', 'new-additions'),
               validateReference(Group[Thing.referenceType])),
         },

@@ -46,7 +46,7 @@ export default {
     thumb: {type: 'string'},
 
     link: {
-      validate: v => v.oneOf(v.isBoolean, v.isString),
+      validate: v => v.anyOf(v.isBoolean, v.isString),
       default: false,
     },
 

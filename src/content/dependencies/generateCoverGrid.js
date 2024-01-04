@@ -16,7 +16,7 @@ export default {
     names: {validate: v => v.strictArrayOf(v.isHTML)},
     info: {validate: v => v.strictArrayOf(v.isHTML)},
 
-    lazy: {validate: v => v.oneOf(v.isWholeNumber, v.isBoolean)},
+    lazy: {validate: v => v.anyOf(v.isWholeNumber, v.isBoolean)},
     actionLinks: {validate: v => v.sparseArrayOf(v.isHTML)},
   },
 

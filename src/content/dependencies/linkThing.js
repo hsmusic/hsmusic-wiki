@@ -36,12 +36,12 @@ export default {
     },
 
     tooltip: {
-      validate: v => v.oneOf(v.isBoolean, v.isHTML),
+      validate: v => v.anyOf(v.isBoolean, v.isHTML),
       default: false,
     },
 
     color: {
-      validate: v => v.oneOf(v.isBoolean, v.isColor),
+      validate: v => v.anyOf(v.isBoolean, v.isColor),
       default: true,
     },
 

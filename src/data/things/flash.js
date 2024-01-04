@@ -2,11 +2,11 @@ import {input} from '#composite';
 import find from '#find';
 
 import {
+  anyOf,
   isColor,
   isDirectory,
   isNumber,
   isString,
-  oneOf,
 } from '#validators';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
@@ -57,7 +57,7 @@ export class Flash extends Thing {
 
     page: {
       flags: {update: true, expose: true},
-      update: {validate: oneOf(isString, isNumber)},
+      update: {validate: anyOf(isString, isNumber)},
 
       expose: {
         transform: (value) => (value === null ? null : value.toString()),
