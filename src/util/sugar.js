@@ -633,42 +633,53 @@ export function showAggregate(topError, {
   showTranslucent = showTraces,
   print = true,
 } = {}) {
-  const translucentSymbol = Symbol.for('hsmusic.aggregate.translucent');
+  const getTranslucency = error =>
+    error[Symbol.for('hsmusic.aggregate.translucent')] ?? false;
 
-  const determineCause = error => {
-    let cause = error.cause;
-    if (showTranslucent) return cause ?? null;
-
-    while (cause) {
-      if (!cause[translucentSymbol]) return cause;
-      cause = cause.cause;
+  const determineCauseHelper = cause => {
+    if (!cause) {
+      return null;
     }
 
-    return null;
+    const translucency = getTranslucency(cause);
+
+    if (!translucency) {
+      return cause;
+    }
+
+
+    return determineCauseHelper(cause.cause);
   };
 
-  const determineErrors = parentError => {
-    if (!parentError.errors) return null;
-    if (showTranslucent) return parentError.errors;
+  const determineCause = error =>
+    (showTranslucent
+      ? error.cause ?? null
+      : determineCauseHelper(error.cause));
+
+  const determineErrorsHelper = error => {
+    const translucency = getTranslucency(error);
+
+    if (!translucency) {
+      return [error];
+    }
 
     const errors = [];
-    for (const error of parentError.errors) {
-      if (!error[translucentSymbol]) {
-        errors.push(error);
-        continue;
-      }
 
-      if (error.cause) {
-        errors.push(determineCause(error));
-      }
+    if (error.cause) {
+      errors.push(...determineErrorsHelper(error.cause));
+    }
 
-      if (error.errors) {
-        errors.push(...determineErrors(error));
-      }
+    if (error.errors) {
+      errors.push(...error.errors.flatMap(determineErrorsHelper));
     }
 
     return errors;
   };
+
+  const determineErrors = error =>
+    (showTranslucent
+      ? error.errors ?? null
+      : error.errors?.flatMap(determineErrorsHelper) ?? null);
 
   const flattenErrorStructure = (error, level = 0) => {
     const cause = determineCause(error);
