@@ -408,18 +408,49 @@ export const validateAllPropertyValues = (validator) =>
     [validateProperties.validateOtherKeys]: validator,
   });
 
-const illegalCharactersInContent = [
-  '\u200b',
+const illegalContentSpec = [
+  {
+    illegal: '\u200b',
+    action: 'delete',
+    annotation: `zero-width space`,
+  },
+  {
+    illegal: '\xa0',
+    action: 'replace',
+    with: ' ',
+    annotation: `non-breaking space`,
+    withAnnotation: `normal space`,
+  },
 ];
 
+for (const entry of illegalContentSpec) {
+  entry.test = string =>
+    string.startsWith(entry.illegal);
+
+  if (entry.action === 'replace') {
+    entry.enact = string =>
+      string.replaceAll(entry.illegal, entry.with);
+  }
+}
+
 const illegalContentRegexp =
-  new RegExp(`[${illegalCharactersInContent.join('')}]+`, 'g');
+  new RegExp(
+    illegalContentSpec
+      .map(entry => entry.illegal)
+      .map(illegal => `${illegal}+`)
+      .join('|'),
+    'g');
+
+const illegalCharactersInContent =
+  illegalContentSpec
+    .map(entry => entry.illegal)
+    .join('');
 
 const legalContentNearEndRegexp =
-  new RegExp(`[^${illegalCharactersInContent.join('')}]+$`);
+  new RegExp(`[^${illegalCharactersInContent}]+$`);
 
 const legalContentNearStartRegexp =
-  new RegExp(`^[^${illegalCharactersInContent.join('')}]+`);
+  new RegExp(`^[^${illegalCharactersInContent}]+`);
 
 const trimWhitespaceNearBothSidesRegexp =
   /^ +| +$/gm;
@@ -436,13 +467,14 @@ export function isContentString(content) {
   });
 
   const illegalAggregate = openAggregate({
-    message:
-      `Illegal characters found in content string\n` +
-      `(These probably look like normal characters, so try typing\n` +
-      ` the character that belongs into data manually, where marked)`,
+    message: `Illegal characters found in content string`,
   });
 
   for (const {match, where} of matchMultiline(content, illegalContentRegexp)) {
+    const {annotation, action, ...options} =
+      illegalContentSpec
+        .find(entry => entry.test(match[0]));
+
     const matchStart = match.index;
     const matchEnd = match.index + match[0].length;
 
@@ -459,10 +491,10 @@ export function isContentString(content) {
         ?.[0];
 
     const beforePart =
-      before && colors.green(`"${before}"`);
+      before && `"${before}"`;
 
     const afterPart =
-      after && colors.green(`"${after}"`);
+      after && `"${after}"`;
 
     const surroundings =
       (before && after
@@ -474,10 +506,33 @@ export function isContentString(content) {
         : ``);
 
     const illegalPart =
-      colors.red(`"${match[0]}"`);
+      colors.red(
+        (annotation
+          ? `"${match[0]}" (${annotation})`
+          : `"${match[0]}"`));
+
+    const replacement =
+      (action === 'replace'
+        ? options.enact(match[0])
+        : null);
+
+    const replaceWithPart =
+      (action === 'replace'
+        ? colors.green(
+            (options.withAnnotation
+              ? `"${replacement}" (${options.withAnnotation})`
+              : `"${replacement}"`))
+        : null);
+
+    const actionPart =
+      (action === `delete`
+        ? `Delete ${illegalPart}`
+     : action === 'replace'
+        ? `Replace ${illegalPart} with ${replaceWithPart}`
+        : `Matched ${illegalPart}`);
 
     const parts = [
-      `Matched ${illegalPart}`,
+      actionPart,
       surroundings,
       `(${where})`,
     ].filter(Boolean);
