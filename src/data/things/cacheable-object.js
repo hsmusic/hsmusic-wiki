@@ -180,7 +180,7 @@ export default class CacheableObject {
             throw new TypeError(`Validation failed for value ${newValue}`);
           }
         } catch (caughtError) {
-          throw new CacheableObjectPropertyValueError(property, this[property], newValue, caughtError);
+          throw new CacheableObjectPropertyValueError(property, oldValue, newValue, caughtError);
         }
       }
 
