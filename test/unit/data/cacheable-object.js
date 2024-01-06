@@ -213,6 +213,101 @@ t.test(`CacheableObject validate on update`, t => {
   t.equal(obj.date, date);
 });
 
+t.test(`CacheableObject transform on null value`, t => {
+  let computed = false;
+
+  const obj = newCacheableObject({
+    spookyFactor: {
+      flags: {
+        update: true,
+        expose: true,
+      },
+
+      expose: {
+        transform: value => {
+          computed = true;
+          return (value ? 2 * value : -1);
+        },
+      },
+    },
+  });
+
+  t.plan(4);
+
+  t.equal(obj.spookyFactor, -1);
+  t.ok(computed);
+
+  computed = false;
+  obj.spookyFactor = 1;
+
+  t.equal(obj.spookyFactor, 2);
+  t.ok(computed);
+});
+
+t.test(`CacheableObject don't transform on successful update`, t => {
+  let computed = false;
+
+  const obj = newCacheableObject({
+    original: {
+      flags: {
+        update: true,
+        expose: true,
+      },
+
+      update: {
+        validate: value => value.startsWith('track:'),
+      },
+
+      expose: {
+        transform: value => {
+          computed = true;
+          return (value ? value.split(':')[1] : null);
+        },
+      },
+    },
+  });
+
+  t.plan(4);
+
+  t.doesNotThrow(() => obj.original = 'track:foo');
+  t.notOk(computed);
+
+  t.equal(obj.original, 'foo');
+  t.ok(computed);
+});
+
+t.test(`CacheableObject don't transform on failed update`, t => {
+  let computed = false;
+
+  const obj = newCacheableObject({
+    original: {
+      flags: {
+        update: true,
+        expose: true,
+      },
+
+      update: {
+        validate: value => value.startsWith('track:'),
+      },
+
+      expose: {
+        transform: value => {
+          computed = true;
+          return (value ? value.split(':')[1] : null);
+        },
+      },
+    },
+  });
+
+  t.plan(4);
+
+  t.throws(() => obj.original = 'album:foo');
+  t.notOk(computed);
+
+  t.equal(obj.original, null);
+  t.ok(computed);
+});
+
 t.test(`CacheableObject default update property value`, t => {
   const obj = newCacheableObject({
     fruit: {
