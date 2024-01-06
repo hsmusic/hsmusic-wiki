@@ -15,7 +15,7 @@ import {
 import {
   externalFunction,
   flag,
-  simpleString,
+  name,
 } from '#composite/wiki-properties';
 
 import CacheableObject from './cacheable-object.js';
@@ -35,7 +35,7 @@ export class Language extends Thing {
 
     // Human-readable name. This should be the language's own native name, not
     // localized to any other language.
-    name: simpleString(),
+    name: name(`Unnamed Language`),
 
     // Language code specific to JavaScript's Internationalization (Intl) API.
     // Usually this will be the same as the language's general code, but it
