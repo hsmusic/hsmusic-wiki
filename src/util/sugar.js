@@ -305,7 +305,7 @@ export function* matchMultiline(content, matchRegexp, {
         colors.yellow(
           (isMultiline
             ? `line: ${lineNumber + 1}, col: ${columnNumber + 1}`
-            : `pos: ${match.index}`));
+            : `pos: ${match.index + 1}`));
     }
 
     countLineBreaks(match.index, match[0]);
