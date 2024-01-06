@@ -346,12 +346,7 @@ export class FieldValueAggregateError extends AggregateError {
 }
 
 export class FieldValueError extends Error {
-  constructor(field, property, value, caughtError) {
-    const cause =
-      (caughtError instanceof CacheableObjectPropertyValueError
-        ? caughtError.cause
-        : caughtError);
-
+  constructor(field, property, value, cause) {
     const fieldText =
       colors.green(`"${field}"`);
 

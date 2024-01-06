@@ -356,6 +356,8 @@ export default class CacheableObject {
 }
 
 export class CacheableObjectPropertyValueError extends Error {
+  [Symbol.for('hsmusic.aggregate.translucent')] = true;
+
   constructor(property, oldValue, newValue, error) {
     super(
       `Error setting ${colors.green(property)} (${inspect(oldValue)} -> ${inspect(newValue)})`,
