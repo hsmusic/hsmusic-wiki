@@ -262,7 +262,7 @@ function makeProcessDocument(
         thing[property] = value;
       } catch (caughtError) {
         skippedFields.add(field);
-        fieldValueErrors.push(new FieldValueError(field, property, value, caughtError));
+        fieldValueErrors.push(new FieldValueError(field, value, caughtError));
       }
     }
 
@@ -346,18 +346,15 @@ export class FieldValueAggregateError extends AggregateError {
 }
 
 export class FieldValueError extends Error {
-  constructor(field, property, value, cause) {
+  constructor(field, value, cause) {
     const fieldText =
       colors.green(`"${field}"`);
-
-    const propertyText =
-      colors.green(property);
 
     const valueText =
       inspect(value, {maxStringLength: 40});
 
     super(
-      `Failed to set ${fieldText} field (${propertyText}) to ${valueText}`,
+      `Failed to set ${fieldText} field to ${valueText}`,
       {cause});
   }
 }
