@@ -447,10 +447,10 @@ const illegalCharactersInContent =
     .join('');
 
 const legalContentNearEndRegexp =
-  new RegExp(`[^${illegalCharactersInContent}]+$`);
+  new RegExp(`[^\n${illegalCharactersInContent}]+$`);
 
 const legalContentNearStartRegexp =
-  new RegExp(`^[^${illegalCharactersInContent}]+`);
+  new RegExp(`^[^\n${illegalCharactersInContent}]+`);
 
 const trimWhitespaceNearBothSidesRegexp =
   /^ +| +$/gm;

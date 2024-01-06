@@ -168,7 +168,7 @@ t.test('isCommentary', t => {
 });
 
 t.test('isContentString', t => {
-  t.plan(11);
+  t.plan(12);
 
   t.ok(isContentString(`Hello, world!`));
   t.ok(isContentString(`Hello...\nWorld!`));
@@ -206,6 +206,19 @@ t.test('isContentString', t => {
         new TypeError(`Delete "\u200b\u200b" (zero-width space) (pos: 31)`),
         new TypeError(`Replace "\xa0\xa0\xa0" (non-breaking space) with "   " (normal space) (pos: 33)`),
         new TypeError(`Delete "\u200b\u200b\u200b" (zero-width space) before "and" (pos: 36)`),
+      ]),
+    ]));
+
+  quickThrows(
+    `It's go-\u200bin',\n` +
+    `\u200bIt's goin',\u200b\n` +
+    `\u200b\u200bIt's going!`,
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Delete "\u200b" (zero-width space) between "go-" and "in'" (line: 1, col: 9)`),
+        new TypeError(`Delete "\u200b" (zero-width space) before "It'" (line: 2, col: 1)`),
+        new TypeError(`Delete "\u200b" (zero-width space) after "n'," (line: 2, col: 13)`),
+        new TypeError(`Delete "\u200b\u200b" (zero-width space) before "It'" (line: 3, col: 1)`),
       ]),
     ]));
 
