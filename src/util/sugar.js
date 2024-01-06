@@ -329,6 +329,9 @@ export function openAggregate({
   // generally useful outside of developer debugging purposes - it will be
   // skipped by default when using showAggregate, showing contained errors
   // inline with other children of this aggregate's parent.
+  //
+  // If set to 'single', it'll be hidden only if there's a single error in the
+  // aggregate (so it's not grouping multiple errors together).
   translucent = false,
 
   // Value to return when a provided function throws an error. If this is a
@@ -416,7 +419,7 @@ export function openAggregate({
       const error = Reflect.construct(errorClass, [errors, message]);
 
       if (translucent) {
-        error[Symbol.for(`hsmusic.aggregate.translucent`)] = true;
+        error[Symbol.for('hsmusic.aggregate.translucent')] = translucent;
       }
 
       throw error;
@@ -647,6 +650,13 @@ export function showAggregate(topError, {
       return cause;
     }
 
+    if (translucency === 'single') {
+      if (cause.errors?.length === 1) {
+        return determineCauseHelper(cause.errors[0]);
+      } else {
+        return cause;
+      }
+    }
 
     return determineCauseHelper(cause.cause);
   };
@@ -660,6 +670,10 @@ export function showAggregate(topError, {
     const translucency = getTranslucency(error);
 
     if (!translucency) {
+      return [error];
+    }
+
+    if (translucency === 'single' && error.errors?.length >= 2) {
       return [error];
     }
 
