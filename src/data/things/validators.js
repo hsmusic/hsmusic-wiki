@@ -5,8 +5,16 @@ import printable_characters from 'printable-characters';
 const {strlen} = printable_characters;
 
 import {colors, ENABLE_COLOR} from '#cli';
-import {cut, empty, typeAppearance, withAggregate} from '#sugar';
 import {commentaryRegex} from '#wiki-data';
+
+import {
+  cut,
+  empty,
+  matchMultiline,
+  openAggregate,
+  typeAppearance,
+  withAggregate,
+} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});
@@ -399,6 +407,136 @@ export const validateAllPropertyValues = (validator) =>
   validateProperties({
     [validateProperties.validateOtherKeys]: validator,
   });
+
+const illegalCharactersInContent = [
+  '\u200b',
+];
+
+const illegalContentRegexp =
+  new RegExp(`[${illegalCharactersInContent.join('')}]+`, 'g');
+
+const legalContentNearEndRegexp =
+  new RegExp(`[^${illegalCharactersInContent.join('')}]+$`);
+
+const legalContentNearStartRegexp =
+  new RegExp(`^[^${illegalCharactersInContent.join('')}]+`);
+
+const trimWhitespaceNearBothSidesRegexp =
+  /^ +| +$/gm;
+
+const trimWhitespaceNearEndRegexp =
+  / +$/gm;
+
+export function isContentString(content) {
+  isStringNonEmpty(content);
+
+  const mainAggregate = openAggregate({
+    message: `Errors validating content string`,
+    translucent: 'single',
+  });
+
+  const illegalAggregate = openAggregate({
+    message:
+      `Illegal characters found in content string\n` +
+      `(These probably look like normal characters, so try typing\n` +
+      ` the character that belongs into data manually, where marked)`,
+  });
+
+  for (const {match, where} of matchMultiline(content, illegalContentRegexp)) {
+    const matchStart = match.index;
+    const matchEnd = match.index + match[0].length;
+
+    const before =
+      content
+        .slice(Math.max(0, matchStart - 3), matchStart)
+        .match(legalContentNearEndRegexp)
+        ?.[0];
+
+    const after =
+      content
+        .slice(matchEnd, Math.min(content.length, matchEnd + 3))
+        .match(legalContentNearStartRegexp)
+        ?.[0];
+
+    const beforePart =
+      before && colors.green(`"${before}"`);
+
+    const afterPart =
+      after && colors.green(`"${after}"`);
+
+    const surroundings =
+      (before && after
+        ? `between ${beforePart} and ${afterPart}`
+     : before
+        ? `after ${beforePart}`
+     : after
+        ? `before ${afterPart}`
+        : ``);
+
+    const illegalPart =
+      colors.red(`"${match[0]}"`);
+
+    const parts = [
+      `Matched ${illegalPart}`,
+      surroundings,
+      `(${where})`,
+    ].filter(Boolean);
+
+    illegalAggregate.push(new TypeError(parts.join(` `)));
+  }
+
+  const isMultiline = content.includes('\n');
+
+  const trimWhitespaceAggregate = openAggregate({
+    message:
+      (isMultiline
+        ? `Whitespace found at end of line`
+        : `Whitespace found at start or end`),
+  });
+
+  const trimWhitespaceRegexp =
+    (isMultiline
+      ? trimWhitespaceNearEndRegexp
+      : trimWhitespaceNearBothSidesRegexp);
+
+  for (
+    const {match, lineNumber, columnNumber, containingLine} of
+    matchMultiline(content, trimWhitespaceRegexp, {
+      formatWhere: false,
+      getContainingLine: true,
+    })
+  ) {
+    const linePart =
+      colors.yellow(`line ${lineNumber + 1}`);
+
+    const where =
+      (match[0].length === containingLine.length
+        ? `all of ${linePart}`
+     : columnNumber === 0
+        ? (isMultiline
+            ? `start of ${linePart}`
+            : `at start`)
+        : (isMultiline
+            ? `end of ${linePart}`
+            : `at end`));
+
+    const whitespacePart =
+      colors.red(`"${match[0]}"`);
+
+    const parts = [
+      `Matched ${whitespacePart}`,
+      `(${where})`,
+    ];
+
+    trimWhitespaceAggregate.push(new TypeError(parts.join(` `)));
+  }
+
+  mainAggregate.call(() => illegalAggregate.close());
+  mainAggregate.call(() => trimWhitespaceAggregate.close());
+  mainAggregate.close();
+
+  return true;
+}
 
 export const isContribution = validateProperties({
   who: isArtistRef,
