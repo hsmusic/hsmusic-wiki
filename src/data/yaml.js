@@ -159,9 +159,9 @@ function makeProcessDocument(
 
     const constructorPart =
       (thingConstructor[Thing.friendlyName]
-        ? colors.green(thingConstructor[Thing.friendlyName])
+        ? thingConstructor[Thing.friendlyName]
      : thingConstructor.name
-        ? colors.green(thingConstructor.name)
+        ? thingConstructor.name
         : `document`);
 
     const aggregate = openAggregate({
