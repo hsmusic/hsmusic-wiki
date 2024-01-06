@@ -168,7 +168,7 @@ t.test('isCommentary', t => {
 });
 
 t.test('isContentString', t => {
-  t.plan(10);
+  t.plan(11);
 
   t.ok(isContentString(`Hello, world!`));
   t.ok(isContentString(`Hello...\nWorld!`));
@@ -177,81 +177,75 @@ t.test('isContentString', t => {
     t.throws(() => isContentString(string), description);
 
   quickThrows(
-    `Snooping\u200bas usual, I\u200bSEE.`,
-    {
-      [Symbol.for(`hsmusic.aggregate.translucent`)]: 'single',
-      message: `Errors validating content string`,
-      errors: [{
-        message: /^Illegal characters found in content string/,
-        errors: [
-          {message: `Matched "\u200b" between "ing" and "as " (pos: 9)`},
-        ],
-      }],
-    });
+    `Snooping\xa0as usual, I\xa0\xa0\xa0SEE.`,
+    Object.assign(
+      new AggregateError([
+        new AggregateError([
+          new TypeError(`Replace "\xa0" (non-breaking space) with " " (normal space) between "ing" and "as " (pos: 9)`),
+          new TypeError(`Replace "\xa0\xa0\xa0" (non-breaking space) with "   " (normal space) between ", I" and "SEE" (pos: 21)`),
+        ], `Illegal characters found in content string`),
+      ], `Errors validating content string`),
+      {[Symbol.for(`hsmusic.aggregate.translucent`)]: 'single'}));
 
   quickThrows(
     `Oh\u200bdear,\n` +
     `Oh dear,\n` +
-    `oh-dear-oh-dear-\u200boh dear.`,
-    {
-      errors: [{
-        message: /^Illegal characters found in content string/,
-        errors: [
-          {message: `Matched "\u200b" between "Oh" and "dea" (line: 1, col: 3)`},
-          {message: `Matched "\u200b" between "ar-" and "oh " (line: 3, col: 17)`},
-        ],
-      }],
-    });
+    `oh-dear-oh-dear-oh\u200bdear.`,
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Delete "\u200b" (zero-width space) between "Oh" and "dea" (line: 1, col: 3)`),
+        new TypeError(`Delete "\u200b" (zero-width space) between "-oh" and "dea" (line: 3, col: 19)`),
+      ]),
+    ]));
+
+  quickThrows(
+    `Well the days start comin'\xa0\xa0\xa0\xa0\u200b\u200b\xa0\xa0\xa0\u200b\u200b\u200band they don't stop comin'`,
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Replace "\xa0\xa0\xa0\xa0" (non-breaking space) with "    " (normal space) after "in'" (pos: 27)`),
+        new TypeError(`Delete "\u200b\u200b" (zero-width space) (pos: 31)`),
+        new TypeError(`Replace "\xa0\xa0\xa0" (non-breaking space) with "   " (normal space) (pos: 33)`),
+        new TypeError(`Delete "\u200b\u200b\u200b" (zero-width space) before "and" (pos: 36)`),
+      ]),
+    ]));
 
   quickThrows(
     `  Room at the start.`,
-    {
-      errors: [{
-        message: `Whitespace found at start or end`,
-        errors: [
-          {message: `Matched "  " at start`},
-        ],
-      }],
-    });
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Matched "  " at start`),
+      ], `Whitespace found at start or end`),
+    ]));
 
   quickThrows(
     `Room at the end.      `,
-    {
-      errors: [{
-        message: `Whitespace found at start or end`,
-        errors: [
-          {message: `Matched "      " at end`},
-        ],
-      }],
-    });
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Matched "      " at end`),
+      ], `Whitespace found at start or end`),
+    ]));
 
   quickThrows(
     `      Room on both sides. `,
-    {
-      errors: [{
-        message: `Whitespace found at start or end`,
-        errors: [
-          {message: `Matched "      " at start`},
-          {message: `Matched " " at end`},
-        ],
-      }],
-    });
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Matched "      " at start`),
+        new TypeError(`Matched " " at end`),
+      ], `Whitespace found at start or end`),
+    ]));
 
   quickThrows(
     `We're going multiline! \n` +
     `That we are, aye.    \n` +
     `      \n`,
     `Yessir.`,
-    {
-      errors: [{
-        message: `Whitespace found at end of line`,
-        errors: [
-          {message: `Matched " " at end of line 1`},
-          {message: `Matched "    " at end of line 2`},
-          {messaeg: `Matched "      " as all of line 3`},
-        ],
-      }],
-    });
+    new AggregateError([
+      new AggregateError([
+        new TypeError(`Matched " " at end of line 1`),
+        new TypeError(`Matched "    " at end of line 2`),
+        new TypeError(`Matched "      " as all of line 3`),
+      ], `Whitespace found at end of line`),
+    ]));
 
   t.doesNotThrow(() =>
     isContentString(
