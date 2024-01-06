@@ -18,6 +18,7 @@ import {
   // Wiki data
   isColor,
   isCommentary,
+  isContentString,
   isContribution,
   isContributionList,
   isDimensions,
@@ -164,6 +165,110 @@ t.test('isCommentary', t => {
   t.throws(() => isCommentary(123));
   t.throws(() => isCommentary(``));
   t.throws(() => isCommentary(`Technically, ah, er:</i>\nCorrect`));
+});
+
+t.test('isContentString', t => {
+  t.plan(10);
+
+  t.ok(isContentString(`Hello, world!`));
+  t.ok(isContentString(`Hello...\nWorld!`));
+
+  const quickThrows = (string, description) =>
+    t.throws(() => isContentString(string), description);
+
+  quickThrows(
+    `Snooping\u200bas usual, I\u200bSEE.`,
+    {
+      [Symbol.for(`hsmusic.aggregate.translucent`)]: 'single',
+      message: `Errors validating content string`,
+      errors: [{
+        message: /^Illegal characters found in content string/,
+        errors: [
+          {message: `Matched "\u200b" between "ing" and "as " (pos: 9)`},
+        ],
+      }],
+    });
+
+  quickThrows(
+    `Oh\u200bdear,\n` +
+    `Oh dear,\n` +
+    `oh-dear-oh-dear-\u200boh dear.`,
+    {
+      errors: [{
+        message: /^Illegal characters found in content string/,
+        errors: [
+          {message: `Matched "\u200b" between "Oh" and "dea" (line: 1, col: 3)`},
+          {message: `Matched "\u200b" between "ar-" and "oh " (line: 3, col: 17)`},
+        ],
+      }],
+    });
+
+  quickThrows(
+    `  Room at the start.`,
+    {
+      errors: [{
+        message: `Whitespace found at start or end`,
+        errors: [
+          {message: `Matched "  " at start`},
+        ],
+      }],
+    });
+
+  quickThrows(
+    `Room at the end.      `,
+    {
+      errors: [{
+        message: `Whitespace found at start or end`,
+        errors: [
+          {message: `Matched "      " at end`},
+        ],
+      }],
+    });
+
+  quickThrows(
+    `      Room on both sides. `,
+    {
+      errors: [{
+        message: `Whitespace found at start or end`,
+        errors: [
+          {message: `Matched "      " at start`},
+          {message: `Matched " " at end`},
+        ],
+      }],
+    });
+
+  quickThrows(
+    `We're going multiline! \n` +
+    `That we are, aye.    \n` +
+    `      \n`,
+    `Yessir.`,
+    {
+      errors: [{
+        message: `Whitespace found at end of line`,
+        errors: [
+          {message: `Matched " " at end of line 1`},
+          {message: `Matched "    " at end of line 2`},
+          {messaeg: `Matched "      " as all of line 3`},
+        ],
+      }],
+    });
+
+  t.doesNotThrow(() =>
+    isContentString(
+      `It's cool.\n` +
+      `  It's cool.\n` +
+      `    It's cool.\n` +
+      `      It's so cool.`));
+
+  t.doesNotThrow(() =>
+    isContentString(
+      `\n` +
+      `\n` +
+      `It's okay for\n` +
+      `blank lines\n` +
+      `\n` +
+      `just about anywhere.\n` +
+      ``));
 });
 
 t.test('isContribution', t => {
