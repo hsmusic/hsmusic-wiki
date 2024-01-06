@@ -260,6 +260,81 @@ export function cut(text, length = 40) {
   }
 }
 
+// Iterates over regular expression matches within a single- or multiline
+// string, yielding each match as well as:
+//
+// * its line and column numbers;
+// * if `formatWhere` is true (the default), a pretty-formatted,
+//   human-readable indication of the match's placement in the string;
+// * if `getContainingLine` is true, the entire line (or multiple lines)
+//   of text containing the match.
+//
+export function* matchMultiline(content, matchRegexp, {
+  formatWhere = true,
+  getContainingLine = false,
+} = {}) {
+  const lineRegexp = /\n/g;
+  const isMultiline = content.includes('\n');
+
+  let lineNumber = 0;
+  let startOfLine = 0;
+  let previousIndex = 0;
+
+  const countLineBreaks = range => {
+    const lineBreaks = Array.from(range.matchAll(lineRegexp));
+    if (!empty(lineBreaks)) {
+      lineNumber += lineBreaks.length;
+      startOfLine = lineBreaks.at(-1).index + 1;
+    }
+  };
+
+  for (const match of content.matchAll(matchRegexp)) {
+    countLineBreaks(content.slice(previousIndex, match.index));
+
+    const matchStartOfLine = startOfLine;
+
+    previousIndex = match.index + match[0].length;
+
+    const columnNumber = match.index - startOfLine;
+
+    let where = null;
+    if (formatWhere) {
+      where =
+        colors.yellow(
+          (isMultiline
+            ? `line: ${lineNumber + 1}, col: ${columnNumber + 1}`
+            : `pos: ${match.index}`));
+    }
+
+    countLineBreaks(match[0]);
+
+    let containingLine = null;
+    if (getContainingLine) {
+      const nextLineResult =
+        content
+          .slice(previousIndex)
+          .matchAll(lineRegexp)
+          .next();
+
+      const nextStartOfLine =
+        (nextLineResult.done
+          ? content.length
+          : previousIndex + nextLineResult.value.index);
+
+      containingLine =
+        content.slice(matchStartOfLine, nextStartOfLine);
+    }
+
+    yield {
+      match,
+      lineNumber,
+      columnNumber,
+      where,
+      containingLine,
+    };
+  }
+}
+
 // Binds default values for arguments in a {key: value} type function argument
 // (typically the second argument, but may be overridden by providing a
 // [bindOpts.bindIndex] argument). Typically useful for preparing a function for
