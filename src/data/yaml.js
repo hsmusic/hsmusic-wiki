@@ -262,12 +262,14 @@ function makeProcessDocument(
         thing[property] = value;
       } catch (caughtError) {
         skippedFields.add(field);
-        fieldValueErrors.push(new FieldValueError(field, value, caughtError));
+        fieldValueErrors.push(new FieldValueError(
+          field, value, {cause: caughtError}));
       }
     }
 
     if (!empty(fieldValueErrors)) {
-      aggregate.push(new FieldValueAggregateError(thingConstructor, fieldValueErrors));
+      aggregate.push(new FieldValueAggregateError(
+        fieldValueErrors, thingConstructor));
     }
 
     if (skippedFields.size >= 1) {
@@ -335,7 +337,7 @@ export class FieldCombinationError extends Error {
 export class FieldValueAggregateError extends AggregateError {
   [Symbol.for('hsmusic.aggregate.translucent')] = true;
 
-  constructor(thingConstructor, errors) {
+  constructor(errors, thingConstructor) {
     const constructorText =
       colors.green(thingConstructor.name);
 
@@ -346,7 +348,7 @@ export class FieldValueAggregateError extends AggregateError {
 }
 
 export class FieldValueError extends Error {
-  constructor(field, value, cause) {
+  constructor(field, value, options) {
     const fieldText =
       colors.green(`"${field}"`);
 
@@ -355,7 +357,7 @@ export class FieldValueError extends Error {
 
     super(
       `Failed to set ${fieldText} field to ${valueText}`,
-      {cause});
+      options);
   }
 }
 
