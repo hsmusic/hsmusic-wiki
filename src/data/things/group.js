@@ -3,10 +3,10 @@ import find from '#find';
 
 import {
   color,
+  contentString,
   directory,
   name,
   referenceList,
-  simpleString,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -22,7 +22,7 @@ export class Group extends Thing {
     name: name('Unnamed Group'),
     directory: directory(),
 
-    description: simpleString(),
+    description: contentString(),
 
     urls: urls(),
 

@@ -1,6 +1,7 @@
 import {isName} from '#validators';
 
 import {
+  contentString,
   directory,
   name,
   simpleString,
@@ -28,7 +29,7 @@ export class StaticPage extends Thing {
     },
 
     directory: directory(),
-    content: simpleString(),
+    content: contentString(),
     stylesheet: simpleString(),
     script: simpleString(),
   });

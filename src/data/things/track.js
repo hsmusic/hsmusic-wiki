@@ -27,6 +27,7 @@ import {
   additionalNameList,
   commentary,
   commentatorArtists,
+  contentString,
   contributionList,
   directory,
   duration,
@@ -36,7 +37,6 @@ import {
   reverseReferenceList,
   simpleDate,
   singleReference,
-  simpleString,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -153,7 +153,7 @@ export class Track extends Thing {
     ],
 
     commentary: commentary(),
-    lyrics: simpleString(),
+    lyrics: contentString(),
 
     additionalFiles: additionalFiles(),
     sheetMusicFiles: additionalFiles(),

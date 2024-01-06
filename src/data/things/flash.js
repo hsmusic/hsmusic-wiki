@@ -15,13 +15,13 @@ import {withPropertyFromObject} from '#composite/data';
 
 import {
   color,
+  contentString,
   contributionList,
   directory,
   fileExtension,
   name,
   referenceList,
   simpleDate,
-  simpleString,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -145,9 +145,9 @@ export class FlashAct extends Thing {
     name: name('Unnamed Flash Act'),
     directory: directory(),
     color: color(),
-    listTerminology: simpleString(),
+    listTerminology: contentString(),
 
-    jump: simpleString(),
+    jump: contentString(),
 
     jumpColor: {
       flags: {update: true, expose: true},

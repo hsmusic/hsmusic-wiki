@@ -3,11 +3,11 @@ import find from '#find';
 import {isName, validateArrayItems} from '#validators';
 
 import {
+  contentString,
   directory,
   fileExtension,
   flag,
   name,
-  simpleString,
   singleReference,
   urls,
   wikiData,
@@ -24,7 +24,8 @@ export class Artist extends Thing {
     name: name('Unnamed Artist'),
     directory: directory(),
     urls: urls(),
-    contextNotes: simpleString(),
+
+    contextNotes: contentString(),
 
     hasAvatar: flag(false),
     avatarFileExtension: fileExtension('jpg'),

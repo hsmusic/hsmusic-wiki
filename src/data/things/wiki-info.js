@@ -3,10 +3,10 @@ import find from '#find';
 import {isColor, isLanguageCode, isName, isURL} from '#validators';
 
 import {
+  contentString,
   flag,
   name,
   referenceList,
-  simpleString,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -41,9 +41,9 @@ export class WikiInfo extends Thing {
     },
 
     // One-line description used for <meta rel="description"> tag.
-    description: simpleString(),
+    description: contentString(),
 
-    footerContent: simpleString(),
+    footerContent: contentString(),
 
     defaultLanguage: {
       flags: {update: true, expose: true},

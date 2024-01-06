@@ -17,9 +17,9 @@ import {withResolvedReference} from '#composite/wiki-data';
 
 import {
   color,
+  contentString,
   name,
   referenceList,
-  simpleString,
   wikiData,
 } from '#composite/wiki-properties';
 
@@ -31,7 +31,7 @@ export class HomepageLayout extends Thing {
   static [Thing.getPropertyDescriptors] = ({HomepageLayoutRow}) => ({
     // Update & expose
 
-    sidebarContent: simpleString(),
+    sidebarContent: contentString(),
 
     navbarLinks: {
       flags: {update: true, expose: true},

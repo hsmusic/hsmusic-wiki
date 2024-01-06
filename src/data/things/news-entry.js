@@ -1,8 +1,8 @@
 import {
+  contentString,
   directory,
   name,
   simpleDate,
-  simpleString,
 } from '#composite/wiki-properties';
 
 import Thing from './thing.js';
@@ -18,7 +18,7 @@ export class NewsEntry extends Thing {
     directory: directory(),
     date: simpleDate(),
 
-    content: simpleString(),
+    content: contentString(),
 
     // Expose only
 
