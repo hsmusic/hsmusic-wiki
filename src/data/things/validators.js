@@ -511,13 +511,13 @@ export function isContentString(content) {
 
     const where =
       (match[0].length === containingLine.length
-        ? `all of ${linePart}`
+        ? `as all of ${linePart}`
      : columnNumber === 0
         ? (isMultiline
-            ? `start of ${linePart}`
+            ? `at start of ${linePart}`
             : `at start`)
         : (isMultiline
-            ? `end of ${linePart}`
+            ? `at end of ${linePart}`
             : `at end`));
 
     const whitespacePart =
@@ -525,7 +525,7 @@ export function isContentString(content) {
 
     const parts = [
       `Matched ${whitespacePart}`,
-      `(${where})`,
+      where,
     ];
 
     trimWhitespaceAggregate.push(new TypeError(parts.join(` `)));
