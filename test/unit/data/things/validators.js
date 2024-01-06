@@ -227,7 +227,7 @@ t.test('isName', t => {
   t.plan(4);
   t.ok(isName('Dogz 2.0'));
   t.ok(isName('album:this-track-is-only-named-thusly-to-give-niklink-a-headache'));
-  t.ok(isName(''));
+  t.throws(() => isName(''));
   t.throws(() => isName(612));
 });
 

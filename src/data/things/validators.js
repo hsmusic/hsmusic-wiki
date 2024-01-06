@@ -299,7 +299,7 @@ export function isColor(color) {
 }
 
 export function isCommentary(commentaryText) {
-  isString(commentaryText);
+  isContentString(commentaryText);
 
   const rawMatches =
     Array.from(commentaryText.matchAll(commentaryRegex));
@@ -546,15 +546,15 @@ export const isContribution = validateProperties({
 export const isContributionList = validateArrayItems(isContribution);
 
 export const isAdditionalFile = validateProperties({
-  title: isString,
-  description: optional(isStringNonEmpty),
+  title: isName,
+  description: optional(isContentString),
   files: validateArrayItems(isString),
 });
 
 export const isAdditionalFileList = validateArrayItems(isAdditionalFile);
 
 export const isTrackSection = validateProperties({
-  name: optional(isString),
+  name: optional(isName),
   color: optional(isColor),
   dateOriginallyReleased: optional(isDate),
   isDefaultTrackSection: optional(isBoolean),
@@ -614,7 +614,7 @@ export function isLanguageCode(string) {
 }
 
 export function isName(name) {
-  return isString(name);
+  return isContentString(name);
 }
 
 export function isURL(string) {
@@ -748,7 +748,7 @@ export function validateWikiData({
 
 export const isAdditionalName = validateProperties({
   name: isName,
-  annotation: optional(isStringNonEmpty),
+  annotation: optional(isContentString),
 
   // TODO: This only allows indicating sourcing from a track.
   // That's okay for the current limited use of "from", but
