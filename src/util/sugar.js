@@ -280,16 +280,18 @@ export function* matchMultiline(content, matchRegexp, {
   let startOfLine = 0;
   let previousIndex = 0;
 
-  const countLineBreaks = range => {
+  const countLineBreaks = (offset, range) => {
     const lineBreaks = Array.from(range.matchAll(lineRegexp));
     if (!empty(lineBreaks)) {
       lineNumber += lineBreaks.length;
-      startOfLine = lineBreaks.at(-1).index + 1;
+      startOfLine = offset + lineBreaks.at(-1).index + 1;
     }
   };
 
   for (const match of content.matchAll(matchRegexp)) {
-    countLineBreaks(content.slice(previousIndex, match.index));
+    countLineBreaks(
+      previousIndex,
+      content.slice(previousIndex, match.index));
 
     const matchStartOfLine = startOfLine;
 
@@ -306,7 +308,7 @@ export function* matchMultiline(content, matchRegexp, {
             : `pos: ${match.index}`));
     }
 
-    countLineBreaks(match[0]);
+    countLineBreaks(match.index, match[0]);
 
     let containingLine = null;
     if (getContainingLine) {
