@@ -26,6 +26,10 @@ const defaultPort = 8002;
 export const description = `Hosts a local HTTP server which generates page content as it is requested, instead of all at once; reacts to changes in data files, so new reloads will be up-to-date with on-disk YAML data (<- not implemented yet, check back soon!)\n\nIntended for local development ONLY; this custom HTTP server is NOT rigorously tested and almost certainly has security flaws`;
 
 export const config = {
+  fileSizes: {
+    default: true,
+  },
+
   languageReloading: {
     default: true,
   },

@@ -285,6 +285,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-file-sizes': {
+      help: `Skips preloading file sizes for images and additional files, which will be left blank in the build`,
+      type: 'flag',
+    },
+
     'skip-media-validation': {
       help: `Skips checking and reporting missing and misplaced media files, which isn't necessary if you aren't adding or removing data or updating directories`,
       type: 'flag',
@@ -643,6 +648,15 @@ async function main() {
       buildConfig: null,
       cli: {
         flag: 'migrate-thumbs',
+      },
+    });
+
+    fallbackStep('preloadFileSizes', {
+      default: 'perform',
+      buildConfig: 'fileSizes',
+      cli: {
+        flag: 'skip-file-sizes',
+        negate: true,
       },
     });
 
@@ -1614,101 +1628,109 @@ async function main() {
     }
   }
 
-  Object.assign(stepStatusSummary.preloadFileSizes, {
-    status: STATUS_STARTED_NOT_DONE,
-    timeStart: Date.now(),
-  });
+  let getSizeOfAdditionalFile;
+  let getSizeOfImagePath;
 
-  const fileSizePreloader = new FileSizePreloader();
-
-  // File sizes of additional files need to be precalculated before we can
-  // actually reference 'em in site building, so get those loading right
-  // away. We actually need to keep track of two things here - the on-device
-  // file paths we're actually reading, and the corresponding on-site media
-  // paths that will be exposed in site build code. We'll build a mapping
-  // function between them so that when site code requests a site path,
-  // it'll get the size of the file at the corresponding device path.
-  const additionalFilePaths = [
-    ...wikiData.albumData.flatMap((album) =>
-      [
-        ...(album.additionalFiles ?? []),
-        ...album.tracks.flatMap((track) => [
-          ...(track.additionalFiles ?? []),
-          ...(track.sheetMusicFiles ?? []),
-          ...(track.midiProjectFiles ?? []),
-        ]),
-      ]
-        .flatMap((fileGroup) => fileGroup.files)
-        .map((file) => ({
-          device: path.join(
-            mediaPath,
-            urls
-              .from('media.root')
-              .toDevice('media.albumAdditionalFile', album.directory, file)
-          ),
-          media: urls
-            .from('media.root')
-            .to('media.albumAdditionalFile', album.directory, file),
-        }))
-    ),
-  ];
-
-  // Same dealio for images. Since just about any image can be embedded and
-  // we can't super easily know which ones are referenced at runtime, just
-  // cheat and get file sizes for all images under media. (This includes
-  // additional files which are images.)
-  const imageFilePaths =
-    await traverse(mediaPath, {
-      pathStyle: 'device',
-      filterDir: dir => dir !== '.git',
-      filterFile: file =>
-        ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&
-        !isThumb(file),
-    }).then(files => files
-        .map(file => ({
-          device: file,
-          media:
-            urls
-              .from('media.root')
-              .to('media.path', path.relative(mediaPath, file).split(path.sep).join('/')),
-        })));
-
-  const getSizeOfMediaFileHelper = paths => (mediaPath) => {
-    const pair = paths.find(({media}) => media === mediaPath);
-    if (!pair) return null;
-    return fileSizePreloader.getSizeOfPath(pair.device);
-  };
-
-  const getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
-  const getSizeOfImagePath = getSizeOfMediaFileHelper(imageFilePaths);
-
-  logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
-
-  fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
-  await fileSizePreloader.waitUntilDoneLoading();
-
-  logInfo`Preloading filesizes for ${imageFilePaths.length} full-resolution images...`;
-
-  fileSizePreloader.loadPaths(...imageFilePaths.map((path) => path.device));
-  await fileSizePreloader.waitUntilDoneLoading();
-
-  if (fileSizePreloader.hasErrored) {
-    logWarn`Some media files couldn't be read for preloading filesizes.`;
-    logWarn`This means the wiki won't display file sizes for these files.`;
-    logWarn`Investigate missing or unreadable files to get that fixed!`;
-
+  if (stepStatusSummary.preloadFileSizes.status === STATUS_NOT_APPLICABLE) {
+    getSizeOfAdditionalFile = () => null;
+    getSizeOfImagePath = () => null;
+  } else if (stepStatusSummary.preloadFileSizes.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.preloadFileSizes, {
-      status: STATUS_HAS_WARNINGS,
-      annotation: `see log for details`,
-      timeEnd: Date.now(),
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
     });
-  } else {
-    logInfo`Done preloading filesizes without any errors - nice!`;
 
-    Object.assign(stepStatusSummary.preloadFileSizes, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
-    });
+    const fileSizePreloader = new FileSizePreloader();
+
+    // File sizes of additional files need to be precalculated before we can
+    // actually reference 'em in site building, so get those loading right
+    // away. We actually need to keep track of two things here - the on-device
+    // file paths we're actually reading, and the corresponding on-site media
+    // paths that will be exposed in site build code. We'll build a mapping
+    // function between them so that when site code requests a site path,
+    // it'll get the size of the file at the corresponding device path.
+    const additionalFilePaths = [
+      ...wikiData.albumData.flatMap((album) =>
+        [
+          ...(album.additionalFiles ?? []),
+          ...album.tracks.flatMap((track) => [
+            ...(track.additionalFiles ?? []),
+            ...(track.sheetMusicFiles ?? []),
+            ...(track.midiProjectFiles ?? []),
+          ]),
+        ]
+          .flatMap((fileGroup) => fileGroup.files)
+          .map((file) => ({
+            device: path.join(
+              mediaPath,
+              urls
+                .from('media.root')
+                .toDevice('media.albumAdditionalFile', album.directory, file)
+            ),
+            media: urls
+              .from('media.root')
+              .to('media.albumAdditionalFile', album.directory, file),
+          }))
+      ),
+    ];
+
+    // Same dealio for images. Since just about any image can be embedded and
+    // we can't super easily know which ones are referenced at runtime, just
+    // cheat and get file sizes for all images under media. (This includes
+    // additional files which are images.)
+    const imageFilePaths =
+      await traverse(mediaPath, {
+        pathStyle: 'device',
+        filterDir: dir => dir !== '.git',
+        filterFile: file =>
+          ['.png', '.gif', '.jpg'].includes(path.extname(file)) &&
+          !isThumb(file),
+      }).then(files => files
+          .map(file => ({
+            device: file,
+            media:
+              urls
+                .from('media.root')
+                .to('media.path', path.relative(mediaPath, file).split(path.sep).join('/')),
+          })));
+
+    const getSizeOfMediaFileHelper = paths => (mediaPath) => {
+      const pair = paths.find(({media}) => media === mediaPath);
+      if (!pair) return null;
+      return fileSizePreloader.getSizeOfPath(pair.device);
+    };
+
+    getSizeOfAdditionalFile = getSizeOfMediaFileHelper(additionalFilePaths);
+    getSizeOfImagePath = getSizeOfMediaFileHelper(imageFilePaths);
+
+    logInfo`Preloading filesizes for ${additionalFilePaths.length} additional files...`;
+
+    fileSizePreloader.loadPaths(...additionalFilePaths.map((path) => path.device));
+    await fileSizePreloader.waitUntilDoneLoading();
+
+    logInfo`Preloading filesizes for ${imageFilePaths.length} full-resolution images...`;
+
+    fileSizePreloader.loadPaths(...imageFilePaths.map((path) => path.device));
+    await fileSizePreloader.waitUntilDoneLoading();
+
+    if (fileSizePreloader.hasErrored) {
+      logWarn`Some media files couldn't be read for preloading filesizes.`;
+      logWarn`This means the wiki won't display file sizes for these files.`;
+      logWarn`Investigate missing or unreadable files to get that fixed!`;
+
+      Object.assign(stepStatusSummary.preloadFileSizes, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `see log for details`,
+        timeEnd: Date.now(),
+      });
+    } else {
+      logInfo`Done preloading filesizes without any errors - nice!`;
+
+      Object.assign(stepStatusSummary.preloadFileSizes, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    }
   }
 
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
