@@ -662,7 +662,7 @@ async function main() {
 
     fallbackStep('verifyImagePaths', {
       default: 'perform',
-      buildConfig: 'skipMediaValidation',
+      buildConfig: 'mediaValidation',
       cli: {
         flag: 'skip-media-validation',
         negate: true,
