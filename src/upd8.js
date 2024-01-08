@@ -145,11 +145,15 @@ async function main() {
     precacheAllData:
       {...defaultStepStatus, name: `precache nearly all data`},
 
+    // TODO: This should be split into load/watch steps.
     loadInternalDefaultLanguage:
       {...defaultStepStatus, name: `load internal default language`},
 
     loadLanguageFiles:
-      {...defaultStepStatus, name: `load custom language files`},
+      {...defaultStepStatus, name: `statically load custom language files`},
+
+    watchLanguageFiles:
+      {...defaultStepStatus, name: `watch custom language files`},
 
     initializeDefaultLanguage:
       {...defaultStepStatus, name: `initialize default language`},
@@ -462,13 +466,8 @@ async function main() {
   const mediaPath = cliOptions['media-path'] || process.env.HSMUSIC_MEDIA;
   const langPath = cliOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
 
-  const migrateThumbs = cliOptions['migrate-thumbs'] ?? false;
-  const skipThumbs = cliOptions['skip-thumbs'] ?? false;
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
-  const skipReferenceValidation = cliOptions['skip-reference-validation'] ?? false;
-  const noBuild = cliOptions['no-build'] ?? false;
   const noInput = cliOptions['no-input'] ?? false;
-  let noLanguageReloading = cliOptions['no-language-reloading'] ?? null; // Will get default later.
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
@@ -509,34 +508,164 @@ async function main() {
     });
   }
 
-  // Prepare not-applicable steps before anything else.
+  if (cliOptions['no-build']) {
+    logInfo`Won't generate any site or page files this run (--no-build passed).`;
 
-  if (skipThumbs) {
-    Object.assign(stepStatusSummary.generateThumbnails, {
+    Object.assign(stepStatusSummary.performBuild, {
       status: STATUS_NOT_APPLICABLE,
-      annotation: `provided --skip-thumbs`,
+      annotation: `--no-build provided`,
     });
   } else {
+    if (usingDefaultBuildMode) {
+      logInfo`No build mode specified, will use default: ${selectedBuildModeFlag}`;
+    } else {
+      logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
+    }
+  }
+
+  // Finish setting up defaults by combining information from all options.
+
+  const _fallbackStep = (stepKey, {
+    default: defaultValue,
+
+    cli: {
+      flag: cliFlag = null,
+      negate: cliFlagNegates = false,
+      warn: cliFlagWarning = null,
+    } = {},
+
+    buildConfig: buildConfigKey,
+  }) => {
+    const {[buildConfigKey]: buildConfig} = selectedBuildMode.config;
+    const {[stepKey]: step} = stepStatusSummary;
+
+    if (cliFlag && cliOptions[cliFlag]) {
+      const cliPart = `--` + cliFlag;
+      const modePart = `--` + selectedBuildModeFlag;
+      if (buildConfig?.applicable === false) {
+        if (cliFlagNegates) {
+          logWarn`${cliPart} provided, but ${modePart} already skips this step`;
+          logWarn`Redundant option ${cliPart}`;
+        } else {
+          logWarn`${cliPart} provided, but this step isn't applicable for ${modePart}`;
+          logWarn`Ignoring option ${cliPart}`;
+        }
+      } else if (buildConfig?.required === true) {
+        if (cliFlagNegates) {
+          logWarn`${cliPart} provided, but ${modePart} requires this step`;
+          logWarn`Ignoring option ${cliPart}`;
+        } else {
+          logWarn`${cliPart} provided, but ${modePart} already requires this step`;
+          logWarn`Redundant option ${cliPart}`;
+        }
+      } else {
+        if (cliFlagNegates) {
+          step.status = STATUS_NOT_APPLICABLE;
+          step.annotation = `--${cliFlag} provided`;
+        }
+        if (cliFlagWarning) {
+          for (const line of cliFlagWarning.split('\n')) {
+            logWarn(line);
+          }
+        }
+      }
+    }
+
+    if (buildConfig?.applicable === false) {
+      step.status = STATUS_NOT_APPLICABLE;
+      step.annotation = `N/A for --${selectedBuildModeFlag}`;
+      return;
+    }
+
+    if (buildConfig?.default === 'skip') {
+      step.status = STATUS_NOT_APPLICABLE;
+      step.annotation = `default for --${selectedBuildModeFlag}`;
+      return;
+    }
+
+    switch (defaultValue) {
+      case 'skip':
+        step.status = STATUS_NOT_APPLICABLE;
+        if (cliFlag && !cliFlagNegates) {
+          step.annotation = `--${cliFlag} not provided`;
+        }
+        break;
+
+      case 'perform':
+        break;
+
+      default:
+        throw new Error(`Invalid default step status ${defaultValue}`);
+    }
+  };
+
+  {
+    let errored = false;
+
+    const fallbackStep = (stepKey, options) => {
+      try {
+        _fallbackStep(stepKey, options);
+      } catch (error) {
+        logError`Error determining fallback for step ${stepKey}`;
+        showAggregate(error);
+        errored = true;
+      }
+    };
+
+    fallbackStep('filterReferenceErrors', {
+      default: 'perform',
+      buildConfig: null,
+      cli: {
+        flag: 'skip-reference-validation',
+        negate: true,
+        warn:
+          `Skipping reference validation. If any reference errors are present\n` +
+          `in data, they will be silently passed along to the build.`,
+      }
+    });
+
+    fallbackStep('generateThumbnails', {
+      default: 'perform',
+      buildConfig: 'thumbs',
+      cli: {
+        flag: 'skip-thumbs',
+        negate: true,
+      },
+    });
+
+    fallbackStep('migrateThumbnails', {
+      default: 'skip',
+      buildConfig: null,
+      cli: {
+        flag: 'migrate-thumbs',
+      },
+    });
+
+    fallbackStep('watchLanguageFiles', {
+      default: 'perform',
+      buildConfig: 'languageReloading',
+      cli: {
+        flag: 'no-language-reloading',
+        negate: true,
+      },
+    });
+
+    if (errored) {
+      return false;
+    }
+  }
+
+  if (stepStatusSummary.generateThumbnails.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.loadThumbnailCache, {
       status: STATUS_NOT_APPLICABLE,
       annotation: `using cache from thumbnail generation`,
     });
   }
 
-  if (!migrateThumbs) {
-    Object.assign(stepStatusSummary.migrateThumbnails, {
+  if (stepStatusSummary.watchLanguageFiles.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.loadLanguageFiles, {
       status: STATUS_NOT_APPLICABLE,
-      annotation: `--migrate-thumbs not provided`,
-    });
-  }
-
-  if (skipReferenceValidation) {
-    logWarn`Skipping reference validation. If any reference errors are present`;
-    logWarn`in data, they will be silently passed along to the build.`;
-
-    Object.assign(stepStatusSummary.filterReferenceErrors, {
-      status: STATUS_NOT_APPLICABLE,
-      annotation: `--skip-reference-validation provided`,
+      annotation: `watching for changes instead`,
     });
   }
 
@@ -576,28 +705,14 @@ async function main() {
       status: STATUS_NOT_APPLICABLE,
       annotation: `neither --lang-path nor HSMUSIC_LANG provided`,
     });
-  }
 
-  if (noBuild) {
-    logInfo`Won't generate any site or page files this run (--no-build passed).`;
-
-    Object.assign(stepStatusSummary.performBuild, {
+    Object.assign(stepStatusSummary.watchLanguageFiles, {
       status: STATUS_NOT_APPLICABLE,
-      annotation: `--no-build provided`,
+      annotation: `neither --lang-path nor HSMUSIC_LANG provided`,
     });
-  } else if (usingDefaultBuildMode) {
-    logInfo`No build mode specified, will use default: ${selectedBuildModeFlag}`;
-  } else {
-    logInfo`Will use specified build mode: ${selectedBuildModeFlag}`;
   }
 
-  noLanguageReloading ??=
-    ({
-      'static-build': true,
-      'live-dev-server': false,
-    })[selectedBuildModeFlag];
-
-  if (skipThumbs && thumbsOnly) {
+  if (stepStatusSummary.generateThumbnails.status === STATUS_NOT_APPLICABLE && thumbsOnly) {
     logInfo`Well, you've put yourself rather between a roc and a hard place, hmmmm?`;
     return false;
   }
@@ -613,7 +728,7 @@ async function main() {
       providedMediaCachePath:
         cliOptions['media-cache-path'] || process.env.HSMUSIC_MEDIA_CACHE,
       disallowDoubling:
-        migrateThumbs,
+        stepStatusSummary.migrateThumbnails.status === STATUS_NOT_STARTED,
     });
 
   if (!mediaCachePath) {
@@ -654,7 +769,7 @@ async function main() {
     timeEnd: Date.now(),
   });
 
-  if (migrateThumbs) {
+  if (stepStatusSummary.migrateThumbnails.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.migrateThumbnails, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -695,9 +810,16 @@ async function main() {
     });
   };
 
+  if (
+    stepStatusSummary.loadThumbnailCache.status === STATUS_NOT_STARTED &&
+    stepStatusSummary.generateThumbnails.status === STATUS_NOT_STARTED
+  ) {
+    throw new Error(`Unable to continue with both loadThumbnailCache and generateThumbnails`);
+  }
+
   let thumbsCache;
 
-  if (skipThumbs) {
+  if (stepStatusSummary.loadThumbnailCache.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.loadThumbnailCache, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -749,7 +871,7 @@ async function main() {
     });
 
     logInfo`Skipping thumbnail generation.`;
-  } else {
+  } else if (stepStatusSummary.generateThumbnails.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.generateThumbnails, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -788,6 +910,8 @@ async function main() {
     }
 
     thumbsCache = result.cache;
+  } else {
+    thumbsCache = {};
   }
 
   if (showInvalidPropertyAccesses) {
@@ -1016,7 +1140,7 @@ async function main() {
   // Filter out any reference errors throughout the data, warning about them
   // too.
 
-  if (!skipReferenceValidation) {
+  if (stepStatusSummary.filterReferenceErrors.status === STATUS_NOT_STARTED) {
     Object.assign(stepStatusSummary.filterReferenceErrors, {
       status: STATUS_STARTED_NOT_DONE,
       timeStart: Date.now(),
@@ -1087,13 +1211,16 @@ async function main() {
     });
   }
 
-  if (noBuild) {
+  if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     displayCompositeCacheAnalysis();
 
     if (precacheMode === 'all') {
       return true;
     }
   }
+
+  const languageReloading =
+    stepStatusSummary.watchLanguageFiles.status === STATUS_NOT_STARTED;
 
   Object.assign(stepStatusSummary.loadInternalDefaultLanguage, {
     status: STATUS_STARTED_NOT_DONE,
@@ -1105,16 +1232,7 @@ async function main() {
 
   let errorLoadingInternalDefaultLanguage = false;
 
-  if (noLanguageReloading) {
-    internalDefaultLanguageWatcher = null;
-
-    try {
-      internalDefaultLanguage = await processLanguageFile(internalDefaultStringsFile);
-    } catch (error) {
-      niceShowAggregate(error);
-      errorLoadingInternalDefaultLanguage = true;
-    }
-  } else {
+  if (languageReloading) {
     internalDefaultLanguageWatcher = watchLanguageFile(internalDefaultStringsFile);
 
     try {
@@ -1144,6 +1262,15 @@ async function main() {
       // watchLanguageFile.
       errorLoadingInternalDefaultLanguage = true;
     }
+  } else {
+    internalDefaultLanguageWatcher = null;
+
+    try {
+      internalDefaultLanguage = await processLanguageFile(internalDefaultStringsFile);
+    } catch (error) {
+      niceShowAggregate(error);
+      errorLoadingInternalDefaultLanguage = true;
+    }
   }
 
   if (errorLoadingInternalDefaultLanguage) {
@@ -1159,7 +1286,7 @@ async function main() {
     return false;
   }
 
-  if (!noLanguageReloading) {
+  if (languageReloading) {
     // Bypass node.js special-case handling for uncaught error events
     internalDefaultLanguageWatcher.on('error', () => {});
   }
@@ -1173,10 +1300,17 @@ async function main() {
   let languages;
 
   if (langPath) {
-    Object.assign(stepStatusSummary.loadLanguageFiles, {
-      status: STATUS_STARTED_NOT_DONE,
-      timeStart: Date.now(),
-    });
+    if (languageReloading) {
+      Object.assign(stepStatusSummary.watchLanguageFiles, {
+        status: STATUS_STARTED_NOT_DONE,
+        timeStart: Date.now(),
+      });
+    } else {
+      Object.assign(stepStatusSummary.loadLanguageFiles, {
+        status: STATUS_STARTED_NOT_DONE,
+        timeStart: Date.now(),
+      });
+    }
 
     const languageDataFiles = await traverse(langPath, {
       filterFile: name =>
@@ -1187,23 +1321,12 @@ async function main() {
 
     let errorLoadingCustomLanguages = false;
 
-    if (noLanguageReloading) {
-      languages = {};
+    if (languageReloading) watchCustomLanguages: {
+      Object.assign(stepStatusSummary.watchLanguageFiles, {
+        status: STATUS_STARTED_NOT_DONE,
+        timeStart: Date.now(),
+      });
 
-      const results =
-        await Promise.allSettled(
-          languageDataFiles
-            .map(file => processLanguageFile(file)));
-
-      for (const {status, value: language, reason: error} of results) {
-        if (status === 'rejected') {
-          errorLoadingCustomLanguages = true;
-          niceShowAggregate(error);
-        } else {
-          languages[language.code] = language;
-        }
-      }
-    } else watchCustomLanguages: {
       customLanguageWatchers =
         languageDataFiles.map(file => {
           const watcher = watchLanguageFile(file);
@@ -1248,6 +1371,12 @@ async function main() {
             watcher.close();
           }
 
+          Object.assign(stepStatusSummary.watchLanguageFiles, {
+            status: STATUS_FATAL_ERROR,
+            annotation: `see log for details`,
+            timeEnd: Date.now(),
+          });
+
           errorLoadingCustomLanguages = true;
           break watchCustomLanguages;
         }
@@ -1273,31 +1402,47 @@ async function main() {
         Object.fromEntries(
           customLanguageWatchers
             .map(({language}) => [language.code, language]));
+
+      Object.assign(stepStatusSummary.watchLanguageFiles, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } else {
+      languages = {};
+
+      const results =
+        await Promise.allSettled(
+          languageDataFiles
+            .map(file => processLanguageFile(file)));
+
+      for (const {status, value: language, reason: error} of results) {
+        if (status === 'rejected') {
+          errorLoadingCustomLanguages = true;
+          niceShowAggregate(error);
+        } else {
+          languages[language.code] = language;
+        }
+      }
+
+      if (errorLoadingCustomLanguages) {
+        Object.assign(stepStatusSummary.loadLanguageFiles, {
+          status: STATUS_FATAL_ERROR,
+          annotation: `see log for details`,
+          timeEnd: Date.now(),
+        });
+      } else {
+        Object.assign(stepStatusSummary.loadLanguageFiles, {
+          status: STATUS_DONE_CLEAN,
+          timeEnd: Date.now(),
+        });
+      }
     }
 
     if (errorLoadingCustomLanguages) {
       logError`Failed to load language files. Please investigate these, or don't provide`;
       logError`--lang-path (or HSMUSIC_LANG) and build again.`;
-
-      Object.assign(stepStatusSummary.loadLanguageFiles, {
-        status: STATUS_FATAL_ERROR,
-        annotation: `see log for details`,
-        timeEnd: Date.now(),
-      });
-
       return false;
     }
-
-    Object.assign(stepStatusSummary.loadLanguageFiles, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
-        annotation:
-        (noLanguageReloading
-          ? (selectedBuildModeFlag === 'static-build'
-              ? `loaded statically, default for --static-build`
-              : `loaded statically, --no-language-reloading provided`)
-          : `watching for changes`),
-    });
   } else {
     languages = {};
   }
@@ -1336,7 +1481,7 @@ async function main() {
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageAnnotation = `using wiki-specified custom default language`;
 
-    if (!noLanguageReloading) {
+    if (languageReloading) {
       finalDefaultLanguageWatcher =
         customLanguageWatchers
           .find(({language}) => language === customDefaultLanguage);
@@ -1347,7 +1492,7 @@ async function main() {
     finalDefaultLanguage = customDefaultLanguage;
     finalDefaultLanguageAnnotation = `using inferred custom default language`;
 
-    if (!noLanguageReloading) {
+    if (languageReloading) {
       finalDefaultLanguageWatcher =
         customLanguageWatchers
           .find(({language}) => language === customDefaultLanguage);
@@ -1358,7 +1503,7 @@ async function main() {
     finalDefaultLanguage = internalDefaultLanguage;
     finalDefaultLanguageAnnotation = `no custom default language specified`;
 
-    if (!noLanguageReloading) {
+    if (languageReloading) {
       finalDefaultLanguageWatcher = internalDefaultLanguageWatcher;
     }
   }
@@ -1387,7 +1532,7 @@ async function main() {
 
   inheritStringsFromDefaultLanguage();
 
-  if (!noLanguageReloading) {
+  if (languageReloading) {
     if (finalDefaultLanguage !== internalDefaultLanguage) {
       internalDefaultLanguageWatcher.on('update', () => {
         inheritStringsFromInternalLanguage();
@@ -1540,7 +1685,7 @@ async function main() {
     });
   }
 
-  if (noBuild) {
+  if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     return true;
   }
 

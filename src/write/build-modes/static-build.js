@@ -37,6 +37,16 @@ const pageFlags = Object.keys(pageSpecs);
 
 export const description = `Generates all page content in one build (according to the contents of data files at build time) and writes them to disk, preparing the output folder for upload and serving by any static web host\n\nIntended for any production or public-facing release of a wiki; serviceable for local development, but can be a bit unwieldy and time/CPU-expensive`;
 
+export const config = {
+  languageReloading: {
+    applicable: false,
+  },
+
+  thumbs: {
+    default: true,
+  },
+};
+
 export function getCLIOptions() {
   return {
     // This is the output directory. It's the one you'll upload online with
