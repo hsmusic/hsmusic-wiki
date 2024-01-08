@@ -285,6 +285,11 @@ async function main() {
       type: 'flag',
     },
 
+    'skip-media-validation': {
+      help: `Skips checking and reporting missing and misplaced media files, which isn't necessary if you aren't adding or removing data or updating directories`,
+      type: 'flag',
+    },
+
     // Just working on data entries and not interested in actually
     // generating site HTML yet? This flag will cut execution off right
     // 8efore any site 8uilding actually happens.
@@ -638,6 +643,18 @@ async function main() {
       buildConfig: null,
       cli: {
         flag: 'migrate-thumbs',
+      },
+    });
+
+    fallbackStep('verifyImagePaths', {
+      default: 'perform',
+      buildConfig: 'skipMediaValidation',
+      cli: {
+        flag: 'skip-media-validation',
+        negate: true,
+        warning:
+          `Skipping media validation. If any media files are missing or misplaced,\n` +
+          `those errors will be silently passed along to the build.`,
       },
     });
 
@@ -1555,37 +1572,46 @@ async function main() {
 
   const urls = generateURLs(urlSpec);
 
-  Object.assign(stepStatusSummary.verifyImagePaths, {
-    status: STATUS_STARTED_NOT_DONE,
-    timeStart: Date.now(),
-  });
+  let missingImagePaths;
 
-  const {missing: missingImagePaths, misplaced: misplacedImagePaths} =
-    await verifyImagePaths(mediaPath, {urls, wikiData});
+  if (stepStatusSummary.verifyImagePaths.status === STATUS_NOT_APPLICABLE) {
+    missingImagePaths = [];
+  } else if (stepStatusSummary.verifyImagePaths.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.verifyImagePaths, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
 
-  if (empty(missingImagePaths) && empty(misplacedImagePaths)) {
-    Object.assign(stepStatusSummary.verifyImagePaths, {
-      status: STATUS_DONE_CLEAN,
-      timeEnd: Date.now(),
-    });
-  } else if (empty(missingImagePaths)) {
-    Object.assign(stepStatusSummary.verifyImagePaths, {
-      status: STATUS_HAS_WARNINGS,
-      annotation: `misplaced images detected`,
-      timeEnd: Date.now(),
-    });
-  } else if (empty(misplacedImagePaths)) {
-    Object.assign(stepStatusSummary.verifyImagePaths, {
-      status: STATUS_HAS_WARNINGS,
-      annotation: `missing images detected`,
-      timeEnd: Date.now(),
-    });
-  } else {
-    Object.assign(stepStatusSummary.verifyImagePaths, {
-      status: STATUS_HAS_WARNINGS,
-      annotation: `missing and misplaced images detected`,
-      timeEnd: Date.now(),
-    });
+    const results =
+      await verifyImagePaths(mediaPath, {urls, wikiData});
+
+    missingImagePaths = results.missing;
+    const misplacedImagePaths = results.misplaced;
+
+    if (empty(missingImagePaths) && empty(misplacedImagePaths)) {
+      Object.assign(stepStatusSummary.verifyImagePaths, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } else if (empty(missingImagePaths)) {
+      Object.assign(stepStatusSummary.verifyImagePaths, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `misplaced images detected`,
+        timeEnd: Date.now(),
+      });
+    } else if (empty(misplacedImagePaths)) {
+      Object.assign(stepStatusSummary.verifyImagePaths, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `missing images detected`,
+        timeEnd: Date.now(),
+      });
+    } else {
+      Object.assign(stepStatusSummary.verifyImagePaths, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `missing and misplaced images detected`,
+        timeEnd: Date.now(),
+      });
+    }
   }
 
   Object.assign(stepStatusSummary.preloadFileSizes, {

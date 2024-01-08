@@ -30,6 +30,10 @@ export const config = {
     default: true,
   },
 
+  mediaValidation: {
+    default: true,
+  },
+
   thumbs: {
     default: true,
   },
