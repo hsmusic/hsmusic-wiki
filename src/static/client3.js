@@ -1032,6 +1032,33 @@ function addHoverableTooltipPageListeners() {
       hideCurrentlyShownTooltip();
     }
   });
+
+  document.body.addEventListener('click', domEvent => {
+    const {clientX, clientY} = domEvent;
+
+    const pointIsOverHoverableOrTooltip =
+      pointIsOverAnyOf(getHoverablesAndTooltips());
+
+    if (!pointIsOverHoverableOrTooltip(clientX, clientY)) {
+      // Hide with "intent to replace" - we aren't actually going to replace
+      // the tooltip with a new one, but this intent indicates that it should
+      // be hidden right away, instead of showing. What we're really replacing,
+      // or rather removing, is the state of interacting with tooltips at all.
+      hideCurrentlyShownTooltip(true);
+
+      // Part of that state is fast hovering, which should be canceled out.
+      state.fastHovering = false;
+      if (state.endFastHoveringTimeout) {
+        clearTimeout(state.endFastHoveringTimeout);
+        state.endFastHoveringTimeout = null;
+      }
+
+      // Also cancel out of transitioning a tooltip hidden - this isn't caught
+      // by `hideCurrentlyShownTooltip` because a transitioning-hidden tooltip
+      // doesn't count as "shown" anymore.
+      cancelTransitioningTooltipHidden();
+    }
+  });
 }
 
 clientSteps.addPageListeners.push(addHoverableTooltipPageListeners);
