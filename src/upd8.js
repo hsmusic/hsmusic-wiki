@@ -43,7 +43,6 @@ import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
-import bootRepl from '#repl';
 import {empty, showAggregate, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
@@ -248,16 +247,6 @@ async function main() {
     'lang-path': {
       help: `Specify path to language directory, including JSON files that mapping internal string keys to localized language content, and various language metadata\n\nOptional for wiki building, unless the wiki's default language is not English; may be provided via the HSMUSIC_LANG environment variable instead`,
       type: 'value',
-    },
-
-    'repl': {
-      help: `Boot into the HSMusic REPL for command-line interactive access to data objects`,
-      type: 'flag',
-    },
-
-    'no-repl-history': {
-      help: `Disable locally logging commands entered into the REPL in your home directory`,
-      type: 'flag',
     },
 
     'skip-reference-validation': {
@@ -481,9 +470,6 @@ async function main() {
 
   showStepStatusSummary = cliOptions['show-step-summary'] ?? false;
 
-  const replFlag = cliOptions['repl'] ?? false;
-  const disableReplHistory = cliOptions['no-repl-history'] ?? false;
-
   const showAggregateTraces = cliOptions['show-traces'] ?? false;
 
   const precacheMode = cliOptions['precache-mode'] ?? 'common';
@@ -506,16 +492,6 @@ async function main() {
 
   if (!dataPath || !mediaPath) {
     return false;
-  }
-
-  if (replFlag) {
-    return bootRepl({
-      dataPath,
-      mediaPath,
-
-      disableHistory: disableReplHistory,
-      showTraces: showAggregateTraces,
-    });
   }
 
   if (cliOptions['no-build']) {

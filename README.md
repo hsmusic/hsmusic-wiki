@@ -149,11 +149,11 @@ The source code for HSMusic is divided across a number of source files, loosely 
   - `write/`: Common utilities and output methods for controlling what hsmusic does to turn data and media into something you actually visit; these each define a variety of command-line arguments and are basically the interchangeable  "second half" of upd8.js
     - `live-dev-server.js`: Gets the site available for viewing as quickly as possible, generating and serving pages as they are requested from a local HTTP server; reacts live to code changes in the `content` directory
     - `static-build.js`: Builds the entire site at once, writing all the output to one self-contained folder which can be uploaded to a static file server
+    - `repl.js`: Provides a convenient REPL to run filters and transformations on data objects right from the Node.js command line
   - `static/`: Purely client-side files are kept here, e.g. site CSS, icon SVGs, and client-side JS
   - `util/`: Common utilities which generally may be accessed from both Node.js or the client (web browser)
   - `upd8.js`: Main entry point which controls and directs site generation from start to finish
   - `gen-thumbs.js`: Standalone utility also called every time HSMusic is run (unless `--skip-thumbs` is provided) which keeps a persistent cache of media MD5s and (re)generates thumbnails for new or updated image files
-  - `repl.js`: Standalone utility for loading all wiki data and providing a convenient REPL to run filters and transformations on data objects right from the Node.js command line
   - `listing-spec.js`: Descriptors for computations and HTML templates used for the Listings part of the site
   - `url-spec.js`: Index of output paths where generated HTML ends up; also controls where `<a>`, `<img>`, etc tags link
   - `file-size-preloader.js`: Simple utility for calculating size of files in media directory

@@ -31,7 +31,7 @@
         "#language": "./src/data/language.js",
         "#page-specs": "./src/page/index.js",
         "#node-utils": "./src/util/node-utils.js",
-        "#repl": "./src/repl.js",
+        "#repl": "./src/write/build-modes/repl.js",
         "#replacer": "./src/util/replacer.js",
         "#serialize": "./src/data/serialize.js",
         "#sugar": "./src/util/sugar.js",
