@@ -2271,7 +2271,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
     max-width: unset;
   }
 
-  .nav-main-links .nav-link-accent {
+  .nav-has-content .nav-main-links .nav-link-accent {
     display: block;
   }
 
