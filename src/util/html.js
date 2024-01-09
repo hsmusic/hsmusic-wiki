@@ -82,29 +82,33 @@ export const noEdgeWhitespace = Symbol();
 // character).
 export const blockwrap = Symbol();
 
-// Note: This is only guaranteed to return true for blanks (as returned by
-// html.blank()) and false for Tags and Templates (regardless of contents or
-// other properties). Don't depend on this to match any other values.
-export function isBlank(value) {
-  if (value instanceof Tag) {
-    return false;
+// Checks if the content provided would be represented as nothing if included
+// on a page. This can be used on its own, and is the underlying "interface"
+// layer for specific classes' `blank` getters, so its definition and usage
+// tend to be recursive.
+//
+// Note that this shouldn't be used to infer anything about non-content values
+// (e.g. attributes) - it's only suited for actual page content.
+export function isBlank(content) {
+  if (content instanceof Tag || content instanceof Template) {
+    return content.blank;
   }
 
-  if (value instanceof Template) {
-    return false;
+  if (Array.isArray(content)) {
+    return content.every(isBlank);
   }
 
-  if (!Array.isArray(value)) {
-    return false;
+  if (typeof content === 'string') {
+    return content.length === 0;
   }
 
-  return value.length === 0;
+  return false;
 }
 
 export const validators = {
   isBlank(value) {
     if (!isBlank(value)) {
-      throw new TypeError(`Expected html.blank()`);
+      throw new TypeError(`Expected blank content`);
     }
 
     return true;
@@ -292,6 +296,18 @@ export class Tag {
     }
   }
 
+  get blank() {
+    if (this.onlyIfContent && isBlank(this.content)) {
+      return true;
+    }
+
+    if (this.contentOnly && isBlank(this.content)) {
+      return true;
+    }
+
+    return false;
+  }
+
   get contentOnly() {
     if (this.tagName !== '') return false;
     if (!this.attributes.blank) return false;
@@ -366,12 +382,12 @@ export class Tag {
   }
 
   toString() {
-    const attributesString = this.attributes.toString();
-    const contentString = this.content.toString();
-
-    if (this.onlyIfContent && !contentString) {
+    if (this.onlyIfContent && isBlank(this.content)) {
       return '';
     }
+
+    const attributesString = this.attributes.toString();
+    const contentString = this.content.toString();
 
     if (!this.tagName) {
       return contentString;
@@ -1357,6 +1373,10 @@ export class Template {
 
   get description() {
     return this.#description;
+  }
+
+  get blank() {
+    return isBlank(this.content);
   }
 
   toString() {
