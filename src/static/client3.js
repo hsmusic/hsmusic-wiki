@@ -102,6 +102,14 @@ function cssProp(el, ...args) {
   }
 }
 
+// Curry-style, so multiple points can more conveniently be tested at once.
+function pointIsOverAnyOf(elements) {
+  return (clientX, clientY) => {
+    const element = document.elementFromPoint(clientX, clientY);
+    return elements.some(el => el.contains(element));
+  };
+}
+
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
@@ -767,10 +775,12 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
 
   // Don't proceed if none of the (just-ended) touches ended over the
   // hoverable.
+
+  const pointIsOverThisHoverable = pointIsOverAnyOf([hoverable]);
+
   const anyTouchEndedOverHoverable =
-    touches.some(touch =>
-      hoverable.contains(
-        document.elementFromPoint(touch.clientX, touch.clientY)));
+    touches.some(({clientX, clientY}) =>
+      pointIsOverThisHoverable(clientX, clientY));
 
   if (!anyTouchEndedOverHoverable) {
     return;
@@ -990,6 +1000,11 @@ function addHoverableTooltipPageListeners() {
     });
   });
 
+  const getHoverablesAndTooltips = () => [
+    ...Array.from(state.registeredHoverables.keys()),
+    ...Array.from(state.registeredTooltips.keys()),
+  ];
+
   document.body.addEventListener('touchend', domEvent => {
     const hoverables = Array.from(state.registeredHoverables.keys());
     const tooltips = Array.from(state.registeredTooltips.keys());
@@ -1006,13 +1021,12 @@ function addHoverableTooltipPageListeners() {
 
     if (empty(touches)) return;
 
+    const pointIsOverHoverableOrTooltip =
+      pointIsOverAnyOf(getHoverablesAndTooltips());
+
     const anyTouchOverAnyHoverableOrTooltip =
-      touches.some(({clientX, clientY}) => {
-        const element = document.elementFromPoint(clientX, clientY);
-        if (hoverables.some(el => el.contains(element))) return true;
-        if (tooltips.some(el => el.contains(element))) return true;
-        return false;
-      });
+      touches.some(({clientX, clientY}) =>
+        pointIsOverHoverableOrTooltip(clientX, clientY));
 
     if (!anyTouchOverAnyHoverableOrTooltip) {
       hideCurrentlyShownTooltip();
