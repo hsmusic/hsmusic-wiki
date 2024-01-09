@@ -408,19 +408,21 @@ export const validateAllPropertyValues = (validator) =>
     [validateProperties.validateOtherKeys]: validator,
   });
 
+const illeaglInvisibleSpace = {
+  action: 'delete',
+};
+
+const illegalVisibleSpace = {
+  action: 'replace',
+  with: ' ',
+  withAnnotation: `normal space`,
+};
+
 const illegalContentSpec = [
-  {
-    illegal: '\u200b',
-    action: 'delete',
-    annotation: `zero-width space`,
-  },
-  {
-    illegal: '\xa0',
-    action: 'replace',
-    with: ' ',
-    annotation: `non-breaking space`,
-    withAnnotation: `normal space`,
-  },
+  {illegal: '\u200b', annotation: `zero-width space`, ...illeaglInvisibleSpace},
+  {illegal: '\u2005', annotation: `four-per-em space`, ...illegalVisibleSpace},
+  {illegal: '\u205f', annotation: `medium mathematical space`, ...illegalVisibleSpace},
+  {illegal: '\xa0', annotation: `non-breaking space`, ...illegalVisibleSpace},
 ];
 
 for (const entry of illegalContentSpec) {
