@@ -82,6 +82,117 @@ export const noEdgeWhitespace = Symbol();
 // character).
 export const blockwrap = Symbol();
 
+function* isBlankArrayHelper(content) {
+  // First look for string items. These are the easiest to
+  // test blankness.
+
+  const nonStringContent = [];
+
+  for (const item of content) {
+    if (typeof item === 'string') {
+      if (item.length > 0) {
+        return false;
+      }
+    } else {
+      nonStringContent.push(item);
+    }
+  }
+
+  // Analyze the content more closely. Put arrays (and
+  // content of tags marked onlyIfContent) into one array,
+  // and templates into another. And if there's anything
+  // else, that's a non-blank condition we'll detect now.
+
+  const arrayContent = [];
+  const templateContent = [];
+
+  for (const item of nonStringContent) {
+    if (item instanceof Tag) {
+      if (item.onlyIfContent || item.contentOnly) {
+        arrayContent.push(item.content);
+      } else {
+        return false;
+      }
+    } else if (Array.isArray(item)) {
+      arrayContent.push(item);
+    } else if (item instanceof Template) {
+      templateContent.push(item);
+    } else {
+      return false;
+    }
+  }
+
+  // Iterate over arrays and tag content recursively.
+  // But only perform a basic test, first.
+
+  const recursiveGenerators = [];
+
+  for (const item of arrayContent) {
+    const generator = isBlankArrayHelper(item);
+    const firstResult = generator.next();
+    if (firstResult.done) {
+      if (firstResult.value === false) {
+        return false;
+      }
+    } else {
+      recursiveGenerators.push(generator);
+    }
+  }
+
+  // If none of the arrays/tag content ended up including
+  // templates, *and* this call's content doesn't have any
+  // directly descendant templates, then we've iterated
+  // over everything and didn't find anything non-blank.
+
+  if (empty(recursiveGenerators) && empty(templateContent)) {
+    return true;
+  }
+
+  // We'll continue the recursive generators to test for
+  // template content only if nothing else passes first,
+  // and only after a yield, so that the calling function
+  // can refer back to this generator only if needed.
+
+  yield;
+
+  // First check directly descendant templates. We don't
+  // actually have any way to rank one template as "easier"
+  // to test for blankness tha nanother, so the order is
+  // basically arbitrary, but this probably avoids some
+  // overhead of resuming generators (which would perform
+  // equivalent template-resolving work anyway).
+
+  for (const template of templateContent) {
+    // Note that we're using the atomic isBlank function
+    // to test templates, instead of recursing into
+    // another generator. At this point we've established
+    // that there's no hope but to test the templates,
+    // and we're already performing the worst operation
+    // available - if we decided to defer recursively
+    // evaluating one template's own descendant templates,
+    // what would we do *instead?* Well, just evaluate
+    // some other template... which is already the worst-
+    // priority action. So there's nothing lost by just
+    // checking each remaining template atomically.
+    if (!isBlank(template.content)) {
+      return false;
+    }
+  }
+
+  // Test recursive generators last.
+
+  for (const generator of recursiveGenerators) {
+    if (generator.next().value === false) {
+      return false;
+    }
+  }
+
+  // If absolutely nothing has been found, we're golden!
+  // This content is definitely blank.
+
+  return true;
+}
+
 // Checks if the content provided would be represented as nothing if included
 // on a page. This can be used on its own, and is the underlying "interface"
 // layer for specific classes' `blank` getters, so its definition and usage
@@ -95,7 +206,14 @@ export function isBlank(content) {
   }
 
   if (Array.isArray(content)) {
-    return content.every(isBlank);
+    const generator = isBlankArrayHelper(content);
+
+    let result;
+    do {
+      result = generator.next();
+    } while (!result.done);
+
+    return result.value;
   }
 
   if (typeof content === 'string') {
