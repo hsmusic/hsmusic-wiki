@@ -82,7 +82,13 @@ export const noEdgeWhitespace = Symbol();
 // character).
 export const blockwrap = Symbol();
 
-function* isBlankArrayHelper(content) {
+// Recursive helper function for isBlank, which basically flattens an array
+// and returns as soon as it finds any content - a non-blank case - and doesn't
+// traverse templates of its own accord. If it doesn't find directly non-blank
+// content nor any templates, it returns true; if it saw templates, but no
+// other content, then those templates are returned in a flat array, to be
+// traversed externally.
+function isBlankArrayHelper(content) {
   // First look for string items. These are the easiest to
   // test blankness.
 
@@ -123,71 +129,31 @@ function* isBlankArrayHelper(content) {
   }
 
   // Iterate over arrays and tag content recursively.
-  // But only perform a basic test, first.
-
-  const recursiveGenerators = [];
+  // The result will always be true/false (blank or not),
+  // or an array of templates. Defer accessing templates
+  // until later - we'll check on them from the outside
+  // end only if nothing else matches.
 
   for (const item of arrayContent) {
-    const generator = isBlankArrayHelper(item);
-    const firstResult = generator.next();
-    if (firstResult.done) {
-      if (firstResult.value === false) {
-        return false;
-      }
-    } else {
-      recursiveGenerators.push(generator);
-    }
-  }
-
-  // If none of the arrays/tag content ended up including
-  // templates, *and* this call's content doesn't have any
-  // directly descendant templates, then we've iterated
-  // over everything and didn't find anything non-blank.
-
-  if (empty(recursiveGenerators) && empty(templateContent)) {
-    return true;
-  }
-
-  // We'll continue the recursive generators to test for
-  // template content only if nothing else passes first,
-  // and only after a yield, so that the calling function
-  // can refer back to this generator only if needed.
-
-  yield;
-
-  // First check directly descendant templates. We don't
-  // actually have any way to rank one template as "easier"
-  // to test for blankness tha nanother, so the order is
-  // basically arbitrary, but this probably avoids some
-  // overhead of resuming generators (which would perform
-  // equivalent template-resolving work anyway).
-
-  for (const template of templateContent) {
-    // Note that we're using the atomic isBlank function
-    // to test templates, instead of recursing into
-    // another generator. At this point we've established
-    // that there's no hope but to test the templates,
-    // and we're already performing the worst operation
-    // available - if we decided to defer recursively
-    // evaluating one template's own descendant templates,
-    // what would we do *instead?* Well, just evaluate
-    // some other template... which is already the worst-
-    // priority action. So there's nothing lost by just
-    // checking each remaining template atomically.
-    if (!isBlank(template.content)) {
+    const result = isBlankArrayHelper(item);
+    if (result === false) {
       return false;
+    } else if (Array.isArray(result)) {
+      templateContent.push(...result);
     }
   }
 
-  // Test recursive generators last.
+  // Return templates, if there are any. We don't actually
+  // handle the base case of evaluating these templates
+  // inside this recursive function - the topmost caller
+  // will handle that.
 
-  for (const generator of recursiveGenerators) {
-    if (generator.next().value === false) {
-      return false;
-    }
+  if (!empty(templateContent)) {
+    return templateContent;
   }
 
-  // If absolutely nothing has been found, we're golden!
+  // If there weren't any templates found (as direct or
+  // indirect descendants), then we're good to go!
   // This content is definitely blank.
 
   return true;
@@ -201,23 +167,37 @@ function* isBlankArrayHelper(content) {
 // Note that this shouldn't be used to infer anything about non-content values
 // (e.g. attributes) - it's only suited for actual page content.
 export function isBlank(content) {
+  if (typeof content === 'string') {
+    return content.length === 0;
+  }
+
   if (content instanceof Tag || content instanceof Template) {
     return content.blank;
   }
 
   if (Array.isArray(content)) {
-    const generator = isBlankArrayHelper(content);
+    const result = isBlankArrayHelper(content);
 
-    let result;
-    do {
-      result = generator.next();
-    } while (!result.done);
+    // If the result is true or false, the helper came to
+    // a conclusive decision on its own.
+    if (typeof result === 'boolean') {
+      return result;
+    }
 
-    return result.value;
-  }
+    // Otherwise, it couldn't immediately find any content,
+    // but did come across templates that prospectively
+    // could include content. These need to be checked too.
+    // Check each of the templates one at a time.
+    for (const template of result) {
+      if (!template.blank) {
+        return false;
+      }
+    }
 
-  if (typeof content === 'string') {
-    return content.length === 0;
+    // If none of the templates included content either,
+    // then there really isn't any content to find in this
+    // tree at all. It's blank!
+    return true;
   }
 
   return false;
