@@ -1539,6 +1539,17 @@ async function main() {
     }
   }
 
+  const closeLanguageWatchers = () => {
+    if (languageReloading) {
+      for (const watcher of [
+        internalDefaultLanguageWatcher,
+        ...customLanguageWatchers,
+      ]) {
+        watcher.close();
+      }
+    }
+  };
+
   const inheritStringsFromInternalLanguage = () => {
     // The custom default language, if set, will be the new one providing fallback
     // strings for other languages. But on its own, it still might not be a complete
@@ -1792,6 +1803,7 @@ async function main() {
       wikiData,
 
       cachebust: '?' + CACHEBUST,
+      closeLanguageWatchers,
       developersComment,
       getSizeOfAdditionalFile,
       getSizeOfImagePath,
