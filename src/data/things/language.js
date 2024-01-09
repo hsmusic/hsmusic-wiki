@@ -243,12 +243,12 @@ export class Language extends Thing {
 
     withAggregate({message: `Errors in options for string "${key}"`}, ({push}) => {
       if (!empty(missingOptionNames)) {
-        const names = missingOptionNames.join(`, `);
+        const names = Array.from(missingOptionNames).join(`, `);
         push(new Error(`Missing options: ${names}`));
       }
 
       if (!empty(misplacedOptionNames)) {
-        const names = misplacedOptionNames.join(`, `);
+        const names = Array.from(misplacedOptionNames).join(`, `);
         push(new Error(`Unexpected options: ${names}`));
       }
     });
