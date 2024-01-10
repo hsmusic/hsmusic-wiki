@@ -95,6 +95,8 @@ export default {
           selectColors = {
             '--primary-color': 'primary',
             '--dim-color': 'dim',
+            '--deep-color': 'deep',
+            '--bg-black-color': 'bgBlack',
           };
           break;
 
