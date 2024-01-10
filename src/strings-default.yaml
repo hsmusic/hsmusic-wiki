@@ -645,7 +645,8 @@ misc:
   #   clicking through.
 
   contentWarnings:
-    _: "cw: {WARNINGS}"
+    warnings: "{WARNINGS}"
+    heading: "ⓘ"
     reveal: "click to show"
 
   # albumGrid:

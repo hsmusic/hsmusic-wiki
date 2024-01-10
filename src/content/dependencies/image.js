@@ -184,10 +184,18 @@ export default {
     let reveal = null;
     if (willReveal) {
       reveal = [
-        language.$('misc.contentWarnings', {
-          warnings: language.formatUnitList(data.contentWarnings),
-        }),
+        html.tag('span', {class: 'reveal-heading'},
+          language.$('misc.contentWarnings.heading')),
+
         html.tag('br'),
+
+        html.tag('span', {class: 'reveal-warnings'},
+          language.$('misc.contentWarnings.warnings', {
+            warnings: language.formatUnitList(data.contentWarnings),
+          })),
+
+        html.tag('br'),
+
         html.tag('span', {class: 'reveal-interaction'},
           language.$('misc.contentWarnings.reveal')),
       ];

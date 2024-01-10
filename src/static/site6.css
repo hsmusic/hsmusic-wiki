@@ -1141,13 +1141,32 @@ img.pixelate {
   bottom: 10px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
+}
+
+.grid-item .reveal-text {
+  font-size: 0.9em;
+}
+
+.reveal:not(.revealed) .image-inner-area {
+  background: var(--deep-color);
 }
 
 .reveal-text {
   color: white;
   text-align: center;
   font-weight: bold;
+  padding-bottom: 0.5em;
+}
+
+.reveal-heading {
+  font-size: 1.2em;
+  opacity: 0.8;
+  font-weight: 800;
+  width: 1em;
+  height: 1em;
+  margin-bottom: 0.4em;
+  display: inline-block;
 }
 
 .reveal-interaction {
