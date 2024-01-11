@@ -71,6 +71,10 @@ export function chunkMultipleArrays(...args) {
   const arrays = args.slice(0, -1);
   const fn = args.at(-1);
 
+  if (arrays[0].length === 0) {
+    return [];
+  }
+
   const newChunk = index => arrays.map(array => [array[index]]);
   const results = [newChunk(0)];
 
