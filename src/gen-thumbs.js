@@ -131,6 +131,12 @@ const thumbnailSpec = {
     size: 250,
     quality: 85,
   },
+
+  'mini': {
+    tackbust: 2,
+    size: 8,
+    quality: 95,
+  },
 };
 
 import {spawn} from 'node:child_process';

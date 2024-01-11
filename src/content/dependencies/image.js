@@ -221,6 +221,10 @@ export default {
 
     let displaySrc = originalSrc;
 
+    // This is only distinguished from displaySrc by being a thumbnail,
+    // so it won't be set if thumbnails aren't available.
+    let revealSrc = null;
+
     // If thumbnails are available *and* being used, calculate thumbSrc,
     // and provide some attributes relevant to the large image overlay.
     if (hasThumbnails && slots.thumb) {
@@ -232,6 +236,17 @@ export default {
 
       displaySrc =
         to('thumb.path', mediaSrcJpeg);
+
+      if (willReveal) {
+        const miniSize =
+          getThumbnailEqualOrSmaller('mini', mediaSrc);
+
+        const mediaSrcJpeg =
+          mediaSrc.replace(/\.(png|jpg)$/, `.${miniSize}.jpg`);
+
+        revealSrc =
+          to('thumb.path', mediaSrcJpeg);
+      }
 
       const dimensions = getDimensionsOfImagePath(mediaSrc);
       const availableThumbs = getThumbnailsAvailableForDimensions(dimensions);
@@ -261,40 +276,66 @@ export default {
 
     if (!displaySrc) {
       return (
-        prepareVisible(
-          html.tag('img', imgAttributes)));
+        prepare(
+          html.tag('img', imgAttributes),
+          'visible'));
     }
 
-    const nonlazyHTML =
-      prepareVisible(
+    const images = {
+      displayStatic:
         html.tag('img',
           imgAttributes,
-          {src: displaySrc}));
+          {src: displaySrc}),
+
+      displayLazy:
+        slots.lazy &&
+          html.tag('img',
+            imgAttributes,
+            {class: 'lazy', 'data-original': displaySrc}),
+
+      revealStatic:
+        revealSrc &&
+          html.tag('img', {class: 'reveal-thumbnail'},
+            imgAttributes,
+            {src: revealSrc}),
+
+      revealLazy:
+        slots.lazy &&
+        revealSrc &&
+          html.tag('img', {class: 'reveal-thumbnail'},
+            imgAttributes,
+            {class: 'lazy', 'data-original': revealSrc}),
+    };
+
+    const staticImageContent =
+      html.tags([images.displayStatic, images.revealStatic]);
 
     if (slots.lazy) {
+      const lazyImageContent =
+        html.tags([images.displayLazy, images.revealLazy]);
+
       return html.tags([
         html.tag('noscript',
-          nonlazyHTML),
+          prepare(staticImageContent, 'visible')),
 
-        prepareHidden(
-          html.tag('img', {class: 'lazy'},
-            imgAttributes,
-            {'data-original': displaySrc})),
+        prepare(lazyImageContent, 'hidden'),
       ]);
     } else {
-      return nonlazyHTML;
+      return prepare(staticImageContent, 'visible');
     }
 
-    function prepareVisible(content) {
-      return prepare(content, false);
-    }
+    function prepare(imageContent, visibility) {
+      let wrapped = imageContent;
 
-    function prepareHidden(content) {
-      return prepare(content, true);
-    }
-
-    function prepare(content, hide) {
-      let wrapped = content;
+      if (willReveal) {
+        wrapped =
+          html.tags([
+            wrapped,
+            html.tag('span', {class: 'reveal-text-container'},
+              html.tag('span', {class: 'reveal-text'},
+                reveal)),
+          ]);
+      }
 
       wrapped =
         html.tag('div', {class: 'image-container'},
@@ -308,18 +349,18 @@ export default {
 
       if (willReveal) {
         wrapped =
-          html.tag('div', {class: 'reveal'}, [
-            wrapped,
-            html.tag('span', {class: 'reveal-text-container'},
-              html.tag('span', {class: 'reveal-text'},
-                reveal)),
-          ]);
+          html.tag('div', {class: 'reveal'},
+            images.revealStatic &&
+              {class: 'has-reveal-thumbnail'},
+
+            wrapped);
       }
 
       if (willSquare) {
         wrapped =
           html.tag('div', {class: 'square'},
-            hide && !willLink &&
+            visibility === 'hidden' &&
+            !willLink &&
               {class: 'js-hide'},
 
             html.tag('div', {class: 'square-content'},
@@ -331,7 +372,7 @@ export default {
           html.tag('a', {class: ['box', 'image-link']},
             linkAttributes,
 
-            hide &&
+            visibility === 'hidden' &&
               {class: 'js-hide'},
 
             wrapped);

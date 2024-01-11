@@ -186,6 +186,7 @@ clientSteps.mutatePageContent.push(mutateCSSCompatibilityContent);
 const scriptedLinkInfo = initInfo('scriptedLinkInfo', {
   randomLinks: null,
   revealLinks: null,
+  revealContainers: null,
 
   nextNavLink: null,
   previousNavLink: null,
@@ -204,7 +205,11 @@ function getScriptedLinkReferences() {
     document.querySelectorAll('[data-random]');
 
   scriptedLinkInfo.revealLinks =
-    document.getElementsByClassName('reveal');
+    document.querySelectorAll('.reveal .image-inner-area');
+
+  scriptedLinkInfo.revealContainers =
+    Array.from(scriptedLinkInfo.revealLinks)
+      .map(link => link.closest('.reveal'));
 
   scriptedLinkInfo.nextNavLink =
     document.getElementById('next-button');
@@ -372,16 +377,27 @@ function addNavigationKeyPressListeners() {
 }
 
 function addRevealLinkClickListeners() {
-  for (const reveal of scriptedLinkInfo.revealLinks ?? []) {
-    reveal.addEventListener('click', (event) => {
-      if (!reveal.classList.contains('revealed')) {
-        reveal.classList.add('revealed');
-        event.preventDefault();
-        event.stopPropagation();
-        reveal.dispatchEvent(new CustomEvent('hsmusic-reveal'));
-      }
+  const info = scriptedLinkInfo;
+
+  for (const {revealLink, revealContainer} of stitchArrays({
+    revealLink: Array.from(info.revealLinks ?? []),
+    revealContainer: Array.from(info.revealContainers ?? []),
+  })) {
+    revealLink.addEventListener('click', (event) => {
+      handleRevealLinkClicked(event, revealLink, revealContainer);
     });
   }
+}
+
+function handleRevealLinkClicked(domEvent, _revealLink, revealContainer) {
+  if (revealContainer.classList.contains('revealed')) {
+    return;
+  }
+
+  revealContainer.classList.add('revealed');
+  domEvent.preventDefault();
+  domEvent.stopPropagation();
+  revealContainer.dispatchEvent(new CustomEvent('hsmusic-reveal'));
 }
 
 clientSteps.getPageReferences.push(getScriptedLinkReferences);
@@ -1698,7 +1714,13 @@ function handleImageLinkClicked(evt) {
   if (evt.metaKey || evt.shiftKey || evt.altKey) {
     return;
   }
+
   evt.preventDefault();
+
+  // Don't show the overlay if the image still needs to be revealed.
+  if (evt.target.closest('a').querySelector('.reveal:not(.revealed)')) {
+    return;
+  }
 
   const container = document.getElementById('image-overlay-container');
   container.classList.add('visible');

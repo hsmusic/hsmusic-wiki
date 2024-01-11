@@ -1128,11 +1128,6 @@ img.pixelate {
   height: 100%;
 }
 
-.reveal .image {
-  filter: blur(20px);
-  opacity: 0.4;
-}
-
 .reveal-text-container {
   position: absolute;
   top: 15px;
@@ -1146,10 +1141,6 @@ img.pixelate {
 
 .grid-item .reveal-text {
   font-size: 0.9em;
-}
-
-.reveal:not(.revealed) .image-inner-area {
-  background: var(--deep-color);
 }
 
 .reveal-text {
@@ -1172,6 +1163,25 @@ img.pixelate {
 
 .reveal-interaction {
   opacity: 0.8;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.reveal .image {
+  opacity: 0.7;
+  filter: blur(20px) brightness(0.7);
+}
+
+.reveal .image.reveal-thumbnail {
+  image-rendering: pixelated;
+}
+
+.reveal.has-reveal-thumbnail:not(.revealed) .image:not(.reveal-thumbnail) {
+  display: none !important;
+}
+
+.reveal.revealed.has-reveal-thumbnail .image.reveal-thumbnail {
+  display: none !important;
 }
 
 .reveal.revealed .image {
@@ -1181,6 +1191,27 @@ img.pixelate {
 
 .reveal.revealed .reveal-text {
   display: none;
+}
+
+.reveal:not(.revealed) .image-inner-area {
+  background: var(--deep-color);
+
+  box-sizing: border-box;
+  border: 1px dotted var(--primary-color);
+  border-radius: 6px;
+}
+
+.reveal .image-inner-area:hover .reveal-interaction {
+  text-decoration-style: solid;
+}
+
+.reveal:not(.revealed) .image-inner-area:hover {
+  border-style: solid;
+}
+
+.reveal:not(.revealed) .image-inner-area:hover .image {
+  filter: blur(20px) brightness(0.6);
+  opacity: 0.6;
 }
 
 .image-link:not(.no-image-preview) .image-container {
