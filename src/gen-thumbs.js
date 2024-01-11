@@ -869,7 +869,7 @@ export default async function genThumbs({
 
   quietInfo`Running up to ${magickThreads + ' magick threads'} simultaneously.`;
 
-  let cache = null;
+  let cache = {};
   let firstRun = false;
 
   try {
