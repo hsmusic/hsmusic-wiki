@@ -251,12 +251,6 @@ export function thumbnailCacheEntryToDetails(entry) {
       mtime: details.mtime} = entry);
   }
 
-  for (const thumbtack of Object.keys(thumbnailSpec)) {
-    if (!Object.hasOwn(details.tackbust, thumbtack)) {
-      details.tackbust[thumbtack] = 0;
-    }
-  }
-
   return details;
 }
 
@@ -495,12 +489,12 @@ async function getSpawnMagick(tool) {
   return [`${description} (${version})`, fn];
 }
 
-// TODO: This function may read MD5 and mtime (stats), and both of those values
-// are needed for writing a cache entry. Reusing them from the cache if they
-// *weren't* checked is fine, but if they were checked, we don't have any way
-// to extract the results of the check - and reuse them for writing the cache.
-// This function probably needs a bit of a restructure to avoid duplicating
-// that work.
+// TODO: This function may read MD5, mtime (stats), and image dimensions, and
+// all of those values are needed for writing a cache entry. Reusing them from
+// the cache if they *weren't* checked is fine, but if they were checked, we
+// don't have any way to extract the results of the check - and reuse them for
+// writing the cache. This function probably needs a bit of a restructure to
+// avoid duplicating that work.
 async function determineThumbtacksNeededForFile({
   filePath,
   mediaPath,
@@ -510,13 +504,17 @@ async function determineThumbtacksNeededForFile({
   reuseFutureBust = false,
   reusePastBust = false,
 }) {
-  const all = Object.keys(thumbnailSpec);
+  const allRightSize = async () => {
+    const dimensions = await identifyImageDimensions(filePath);
+    const sizes = getThumbnailsAvailableForDimensions(dimensions);
+    return sizes.map(([thumbtack]) => thumbtack);
+  };
 
   const cacheEntry = getCacheEntryForMediaPath(mediaPath, cache);
   const cacheDetails = thumbnailCacheEntryToDetails(cacheEntry);
 
   if (!cacheDetails) {
-    return all;
+    return await allRightSize();
   }
 
   if (!reuseMismatchedMD5) checkMD5: {
@@ -530,18 +528,26 @@ async function determineThumbtacksNeededForFile({
 
     const md5 = await readFileMD5(filePath);
     if (md5 !== cacheDetails.md5) {
-      return all;
+      return await allRightSize();
     }
   }
 
   const mismatchedBusts =
     Object.entries(thumbnailSpec)
       .filter(([thumbtack, specEntry]) =>
-        (!reusePastBust && cacheDetails.tackbust[thumbtack] < specEntry.tackbust) ||
-        (!reuseFutureBust && cacheDetails.tackbust[thumbtack] > specEntry.tackbust))
+        (!reusePastBust && (cacheDetails.tackbust[thumbtack] ?? 0) < specEntry.tackbust) ||
+        (!reuseFutureBust && (cacheDetails.tackbust[thumbtack] ?? 0) > specEntry.tackbust))
       .map(([thumbtack]) => thumbtack);
 
-  return mismatchedBusts;
+  if (empty(mismatchedBusts)) {
+    return [];
+  }
+
+  const rightSize = new Set(await allRightSize());
+  const mismatchedWithinRightSize =
+    mismatchedBusts.filter(size => rightSize.has(size));
+
+  return mismatchedWithinRightSize;
 }
 
 async function generateImageThumbnail(imagePath, thumbtack, {
