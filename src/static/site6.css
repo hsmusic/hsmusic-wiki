@@ -1159,14 +1159,15 @@ img.pixelate {
   padding-bottom: 0.5em;
 }
 
-.reveal-heading {
-  font-size: 1.2em;
-  opacity: 0.8;
-  font-weight: 800;
+.reveal-symbol {
+  display: inline-block;
   width: 1em;
   height: 1em;
-  margin-bottom: 0.4em;
-  display: inline-block;
+  margin-bottom: 0.1em;
+
+  font-size: 1.6em;
+  opacity: 0.8;
+  background-image: url("warning.svg");
 }
 
 .reveal-interaction {

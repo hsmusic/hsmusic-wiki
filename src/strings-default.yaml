@@ -646,7 +646,6 @@ misc:
 
   contentWarnings:
     warnings: "{WARNINGS}"
-    heading: "ⓘ"
     reveal: "click to show"
 
   # albumGrid:

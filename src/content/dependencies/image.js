@@ -3,6 +3,7 @@ import {empty} from '#sugar';
 
 export default {
   extraDependencies: [
+    'cachebust',
     'checkIfImagePathHasCachedThumbnails',
     'getDimensionsOfImagePath',
     'getSizeOfImagePath',
@@ -71,6 +72,7 @@ export default {
   },
 
   generate(data, relations, slots, {
+    cachebust,
     checkIfImagePathHasCachedThumbnails,
     getDimensionsOfImagePath,
     getSizeOfImagePath,
@@ -186,8 +188,8 @@ export default {
     let reveal = null;
     if (willReveal) {
       reveal = [
-        html.tag('span', {class: 'reveal-heading'},
-          language.$('misc.contentWarnings.heading')),
+        html.tag('img', {class: 'reveal-symbol'},
+          {src: to('shared.staticFile', 'warning.svg', cachebust)}),
 
         html.tag('br'),
 
