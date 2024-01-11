@@ -127,6 +127,8 @@ export default {
     const willSquare = slots.square;
 
     const imgAttributes = html.attributes([
+      {class: 'image'},
+
       slots.alt && {alt: slots.alt},
       slots.width && {width: slots.width},
       slots.height && {height: slots.height},
