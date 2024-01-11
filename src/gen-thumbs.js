@@ -788,18 +788,28 @@ export async function refreshThumbnailCache(cache, {mediaPath, queueSize}) {
           try {
             const filePathInMedia = path.join(mediaPath, imagePath);
 
-            if (!md5) {
+            if (md5 === null) {
               md5 = await readFileMD5(filePathInMedia);
               updatedAnything = true;
             }
 
-            if (!mtime) {
+            if (mtime === null) {
               const statResults = await stat(filePathInMedia);
               mtime = +statResults.mtime;
               updatedAnything = true;
             }
           } catch (error) {
-            if (error.code !== 'ENOENT') {
+            if (error.code === 'ENOENT') {
+              if (md5 === null) {
+                md5 = "-";
+                updatedAnything = true;
+              }
+
+              if (mtime === null) {
+                mtime = 0;
+                updatedAnything = true;
+              }
+            } else {
               throw error;
             }
           }
