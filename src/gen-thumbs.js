@@ -77,12 +77,60 @@
 export const CACHE_FILE = 'thumbnail-cache.json';
 const WARNING_DELAY_TIME = 10000;
 
+// Thumbnail spec details:
+//
+// * `currentSpecbust` is the current version of the thumbnail specification
+//   format, which will be written to new or updated cache entries;
+//   it represents just the overall format for reading and writing macro
+//   details, not individual thumbnail spec versions.
+//
+// For each spec entry:
+//
+// * `tackbust` is the current version of this thumbtack's specification.
+//   If a cache entry's tackbust for this thumbtack is less than this value,
+//   this particular thumbtack will be regenerated, but any others (whose
+//   `tackbust` listed below is equal or below the cache-recorded bust) will be
+//   reused. (Zero is a special value that means this tack's spec is still the
+//   same as it would've been generated prior to thumbtack versioning.)
+//
+// * `size` is the maximum length of the image. It will be scaled down,
+//   keeping aspect ratio, to fit in this dimension.
+//
+// * `quality` represents how much to trade a lower file size for better JPEG
+//   image quality. Maximum is 100, but very high values tend to yield
+//   diminishing returns.
+//
+const currentSpecbust = 2;
 const thumbnailSpec = {
-  'huge': {size: 1600, quality: 90},
-  'semihuge': {size: 1200, quality: 92},
-  'large': {size: 800, quality: 93},
-  'medium': {size: 400, quality: 95},
-  'small': {size: 250, quality: 85},
+  'huge': {
+    tackbust: 0,
+    size: 1600,
+    quality: 90,
+  },
+
+  'semihuge': {
+    tackbust: 0,
+    size: 1200,
+    quality: 92,
+  },
+
+  'large': {
+    tackbust: 0,
+    size: 800,
+    quality: 93,
+  },
+
+  'medium': {
+    tackbust: 0,
+    size: 400,
+    quality: 95,
+  },
+
+  'small': {
+    tackbust: 0,
+    size: 250,
+    quality: 85,
+  },
 };
 
 import {spawn} from 'node:child_process';
@@ -102,8 +150,8 @@ import {
 import dimensionsOf from 'image-size';
 
 import CacheableObject from '#cacheable-object';
-import {delay, empty, queue, unique} from '#sugar';
-import {sortByName} from '#wiki-data';
+import {delay, empty, queue, stitchArrays, unique} from '#sugar';
+import {chunkMultipleArrays, filterMultipleArrays, sortByName} from '#wiki-data';
 
 import {
   colors,
@@ -124,6 +172,120 @@ import {
 } from '#node-utils';
 
 export const defaultMagickThreads = 8;
+
+function getSpecbustForCacheEntry(entry) {
+  const nope = () => {
+    logWarn`Couldn't determine a spec version for:`;
+    console.error(entry);
+    return null;
+  };
+
+  if (!entry) {
+    return null;
+  }
+
+  if (Array.isArray(entry)) {
+    if (entry.length === 3) {
+      return 0;
+    } else if (entry.length > 3) {
+      return entry[0];
+    } else {
+      return nope();
+    }
+  } else if (typeof entry === 'object') {
+    if (entry.specbust) {
+      return entry.specbust;
+    } else {
+      return nope();
+    }
+  } else {
+    return nope();
+  }
+}
+
+export function thumbnailCacheEntryToDetails(entry) {
+  // Empty entries get no details.
+  if (!entry) {
+    return null;
+  }
+
+  // First attempt to identify a specification version (aka "bust") for this
+  // entry. It'll be used to actually parse the contents.
+
+  const bust = getSpecbustForCacheEntry(entry);
+  if (bust === null) {
+    return null;
+  }
+
+  // Now extract details, reading based on the spec version.
+
+  const details = {
+    bust,
+    md5: null,
+    width: null,
+    height: null,
+    mtime: null,
+    tackbust: {},
+  };
+
+  if (bust === 0) {
+    ([details.md5,
+      details.width,
+      details.height] =
+      entry);
+  }
+
+  if (bust === 1) {
+    ([details.md5,
+      details.width,
+      details.height,
+      details.mtime] =
+      entry.slice(1))
+  }
+
+  if (bust >= 2 && bust <= Infinity) {
+    ({tackbust: details.tackbust,
+      md5: details.md5,
+      width: details.width,
+      height: details.height,
+      mtime: details.mtime} = entry);
+  }
+
+  for (const thumbtack of Object.keys(thumbnailSpec)) {
+    if (!Object.hasOwn(details.tackbust, thumbtack)) {
+      details.tackbust[thumbtack] = 0;
+    }
+  }
+
+  return details;
+}
+
+function detailsToThumbnailCacheEntry({
+  specbust,
+  tackbust,
+  md5,
+  width,
+  height,
+  mtime,
+}) {
+  // It's not necessarily impossible to write an earlier version of the cache
+  // entry format, but doing so would be a lie - an entry's bust should always
+  // identify the version of the spec it was generated with, so that other code
+  // can make assumptions about not only the format of the entry, but also the
+  // content of the generated thumbnail.
+  if (specbust !== currentSpecbust) {
+    throw new Error(`Writing a different specbust than current is unsupported`);
+  }
+
+  return {
+    specbust,
+    tackbust,
+    md5,
+    width,
+    height,
+    mtime,
+  };
+}
 
 export function getThumbnailsAvailableForDimensions([width, height]) {
   // This function is intended to be portable, so it can be used both for
@@ -174,6 +336,28 @@ export function getThumbnailsAvailableForDimensions([width, height]) {
   ];
 }
 
+function stringifyCache(cache) {
+  if (Object.keys(cache).length === 0) {
+    return `{}`;
+  }
+
+  const entries = Object.entries(cache);
+  sortByName(entries, {getName: entry => entry[0]});
+
+  return [
+    `{`,
+    entries
+      .map(([key, value]) => [JSON.stringify(key), JSON.stringify(value)])
+      .map(([key, value]) => `${key}: ${value}`)
+      .map((line, index, array) =>
+        (index < array.length - 1
+          ? `${line},`
+          : line))
+      .map(line => `  ${line}`),
+    `}`,
+  ].flat().join('\n');
+}
+
 getThumbnailsAvailableForDimensions.all =
   Object.entries(thumbnailSpec)
     .map(([name, {size}]) => [name, size])
@@ -213,7 +397,7 @@ export function getDimensionsOfImagePath(mediaPath, cache) {
     throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
   }
 
-  const [width, height] = cacheEntry.slice(1);
+  const {width, height} = thumbnailCacheEntryToDetails(cacheEntry);
   return [width, height];
 }
 
@@ -311,54 +495,91 @@ async function getSpawnMagick(tool) {
   return [`${description} (${version})`, fn];
 }
 
-// Note: This returns an array of no-argument functions, suitable for passing
-// to queue().
-function generateImageThumbnails({
+// TODO: This function may read MD5 and mtime (stats), and both of those values
+// are needed for writing a cache entry. Reusing them from the cache if they
+// *weren't* checked is fine, but if they were checked, we don't have any way
+// to extract the results of the check - and reuse them for writing the cache.
+// This function probably needs a bit of a restructure to avoid duplicating
+// that work.
+async function determineThumbtacksNeededForFile({
+  filePath,
+  mediaPath,
+  cache,
+
+  reuseMismatchedMD5 = false,
+  reuseFutureBust = false,
+  reusePastBust = false,
+}) {
+  const all = Object.keys(thumbnailSpec);
+
+  const cacheEntry = getCacheEntryForMediaPath(mediaPath, cache);
+  const cacheDetails = thumbnailCacheEntryToDetails(cacheEntry);
+
+  if (!cacheDetails) {
+    return all;
+  }
+
+  if (!reuseMismatchedMD5) checkMD5: {
+    // Reading MD5 is expensive because it means reading all the file contents.
+    // Skip out if the file's date modified matches what's recorded on the
+    // cache.
+    const results = await stat(filePath);
+    if (+results.mtime === cacheDetails.mtime) {
+      break checkMD5;
+    }
+
+    const md5 = await readFileMD5(filePath);
+    if (md5 !== cacheDetails.md5) {
+      return all;
+    }
+  }
+
+  const mismatchedBusts =
+    Object.entries(thumbnailSpec)
+      .filter(([thumbtack, specEntry]) =>
+        (!reusePastBust && cacheDetails.tackbust[thumbtack] < specEntry.tackbust) ||
+        (!reuseFutureBust && cacheDetails.tackbust[thumbtack] > specEntry.tackbust))
+      .map(([thumbtack]) => thumbtack);
+
+  return mismatchedBusts;
+}
+
+async function generateImageThumbnail(imagePath, thumbtack, {
   mediaPath,
   mediaCachePath,
-  filePath,
-  dimensions,
   spawnConvert,
 }) {
-  const filePathInMedia = path.join(mediaPath, filePath);
+  const filePathInMedia =
+    path.join(mediaPath, imagePath);
 
-  function getOutputPath(thumbtack) {
-    return path.join(
-      mediaCachePath,
-      path.dirname(filePath),
-      [
-        path.basename(filePath, path.extname(filePath)),
-        thumbtack,
-        'jpg'
-      ].join('.'));
-  }
+  const dirnameInCache =
+    path.join(mediaCachePath, path.dirname(imagePath));
 
-  function startConvertProcess(outputPathInCache, details) {
-    const {size, quality} = details;
+  const filename =
+    path.basename(imagePath, path.extname(imagePath)) +
+    `.${thumbtack}.jpg`;
 
-    return spawnConvert([
-      filePathInMedia,
-      '-strip',
-      '-resize',
-      `${size}x${size}>`,
-      '-interlace',
-      'Plane',
-      '-quality',
-      `${quality}%`,
-      outputPathInCache,
-    ]);
-  }
+  const filePathInCache =
+    path.join(dirnameInCache, filename);
 
-  return (
-    getThumbnailsAvailableForDimensions(dimensions)
-      .map(([thumbtack]) => [thumbtack, thumbnailSpec[thumbtack]])
-      .map(([thumbtack, details]) => async () => {
-        const outputPathInCache = getOutputPath(thumbtack);
-        await mkdir(path.dirname(outputPathInCache), {recursive: true});
+  await mkdir(dirnameInCache, {recursive: true});
 
-        const convertProcess = startConvertProcess(outputPathInCache, details);
-        await promisifyProcess(convertProcess, false);
-      }));
+  const specEntry = thumbnailSpec[thumbtack];
+  const {size, quality} = specEntry;
+
+  const convertProcess = spawnConvert([
+    filePathInMedia,
+    '-strip',
+    '-resize',
+    `${size}x${size}>`,
+    '-interlace',
+    'Plane',
+    '-quality',
+    `${quality}%`,
+    filePathInCache,
+  ]);
+
+  await promisifyProcess(convertProcess, false);
 }
 
 export async function determineMediaCachePath({
@@ -545,6 +766,60 @@ export async function migrateThumbsIntoDedicatedCacheDirectory({
   return {success: true};
 }
 
+// Fill in missing details (usually on older entries) that don't actually
+// require generating any thumbnails to determine. This makes sure all
+// entries are using the latest specbust, too.
+export async function refreshThumbnailCache(cache, {mediaPath, queueSize}) {
+  if (Object.keys(cache).length === 0) {
+    return;
+  }
+
+  await progressPromiseAll(`Refreshing existing entries on thumbnail cache`,
+    queue(
+      Object.entries(cache)
+        .map(([imagePath, cacheEntry]) => async () => {
+          const details = thumbnailCacheEntryToDetails(cacheEntry);
+
+          const {tackbust, width, height} = details;
+
+          let {md5, mtime} = details;
+          let updatedAnything = false;
+
+          try {
+            const filePathInMedia = path.join(mediaPath, imagePath);
+
+            if (!md5) {
+              md5 = await readFileMD5(filePathInMedia);
+              updatedAnything = true;
+            }
+
+            if (!mtime) {
+              const statResults = await stat(filePathInMedia);
+              mtime = +statResults.mtime;
+              updatedAnything = true;
+            }
+          } catch (error) {
+            if (error.code !== 'ENOENT') {
+              throw error;
+            }
+          }
+
+          if (!updatedAnything) {
+            return;
+          }
+
+          cache[imagePath] = detailsToThumbnailCacheEntry({
+            specbust: currentSpecbust,
+            tackbust,
+            width,
+            height,
+            md5,
+            mtime,
+          });
+        }),
+      queueSize));
+}
+
 export default async function genThumbs({
   mediaPath,
   mediaCachePath,
@@ -595,6 +870,8 @@ export default async function genThumbs({
     }
   }
 
+  await refreshThumbnailCache(cache, {mediaPath, queueSize});
+
   try {
     await mkdir(mediaCachePath, {recursive: true});
   } catch (error) {
@@ -607,9 +884,7 @@ export default async function genThumbs({
   try {
     await writeFile(
       path.join(mediaCachePath, CACHE_FILE),
-      (firstRun
-        ? JSON.stringify({})
-        : JSON.stringify(cache)));
+      stringifyCache(cache));
     quietInfo`Writing to cache file appears to be working.`;
   } catch (error) {
     logWarn`Test of cache file writing failed: ${error}`;
@@ -631,28 +906,29 @@ export default async function genThumbs({
 
   const imagePaths = await traverseSourceImagePaths(mediaPath, {target: 'generate'});
 
-  const imageToMD5Entries =
-    await progressPromiseAll(
-      `Generating MD5s of image files`,
+  const imageThumbtacksNeeded =
+    await progressPromiseAll(`Determining thumbtacks needed`,
       queue(
         imagePaths.map(imagePath => () =>
-          readFileMD5(path.join(mediaPath, imagePath))
-            .then(
-              md5 => [imagePath, md5],
-              error => [imagePath, {error}])),
+          determineThumbtacksNeededForFile({
+            filePath: path.join(mediaPath, imagePath),
+            mediaPath: imagePath,
+            cache,
+          }).catch(error => ({error}))),
         queueSize));
 
   {
-    let error = false;
-    for (const entry of imageToMD5Entries) {
-      if (entry[1].error) {
-        logError`Failed to read ${entry[0]}: ${entry[1].error}`;
-        error = true;
-      }
+    const erroredPaths = imagePaths.slice();
+    const errors = imageThumbtacksNeeded.map(({error}) => error);
+    filterMultipleArrays(erroredPaths, errors, (_imagePath, error) => error);
+
+    for (const {imagePath, error} of stitchArrays({imagePath: erroredPaths, error: errors})) {
+      logError`Failed to identify thumbs needed for ${imagePath}: ${error}`;
     }
-    if (error) {
-      logError`Failed to read at least one image file!`;
-      logError`This implies a thumbnail probably won't be generatable.`;
+
+    if (!empty(errors)) {
+      logError`Failed to determine needed thumbnails for least one image file!`;
+      logError`This indicates a thumbnail probably wouldn't be generated.`;
       logError`So, exiting early.`;
       return {success: false};
     } else {
@@ -660,28 +936,38 @@ export default async function genThumbs({
     }
   }
 
-  const imageToDimensionsEntries =
-    await progressPromiseAll(
-      `Identifying dimensions of image files`,
+  // We aren't going to need the original value of `imagePaths` again, so it's
+  // fine to filter it here.
+  filterMultipleArrays(
+    imagePaths,
+    imageThumbtacksNeeded,
+    (_imagePath, needed) => !empty(needed));
+
+  if (empty(imagePaths)) {
+    logInfo`All image thumbnails are already up-to-date - nice!`;
+    return {success: true, cache};
+  }
+
+  const imageDimensions =
+    await progressPromiseAll(`Identifying dimensions of image files`,
       queue(
         imagePaths.map(imagePath => () =>
           identifyImageDimensions(path.join(mediaPath, imagePath))
-            .then(
-              dimensions => [imagePath, dimensions],
-              error => [imagePath, {error}])),
+            .catch(error => ({error}))),
         queueSize));
 
   {
-    let error = false;
-    for (const entry of imageToDimensionsEntries) {
-      if (entry[1].error) {
-        logError`Failed to identify dimensions ${entry[0]}: ${entry[1].error}`;
-        error = true;
-      }
+    const erroredPaths = imagePaths.slice();
+    const errors = imageDimensions.map(result => result.error);
+    filterMultipleArrays(erroredPaths, errors, (_imagePath, error) => error);
+
+    for (const {imagePath, error} of stitchArrays({imagePath: erroredPaths, error: errors})) {
+      logError`Failed to identify dimensions for ${imagePath}: ${error}`;
     }
-    if (error) {
-      logError`Failed to identify dimensions of at least one image file!`;
-      logError`This implies a thumbnail probably won't be generatable.`;
+
+    if (!empty(errors)) {
+      logError`Failed to identify dimensions for at least one image file!`;
+      logError`This indicates a thumbnail probably wouldn't be generated.`;
       logError`So, exiting early.`;
       return {success: false};
     } else {
@@ -689,74 +975,138 @@ export default async function genThumbs({
     }
   }
 
-  const imageToDimensions = Object.fromEntries(imageToDimensionsEntries);
+  let numFailed = 0;
+  const writeMessageFn = () =>
+    `Writing image thumbnails. [failed: ${numFailed}]`;
 
-  // Technically we could pro8a8ly mut8te the cache varia8le in-place?
-  // 8ut that seems kinda iffy.
-  const updatedCache = Object.assign({}, cache);
+  const generateCallImageIndices =
+    imageThumbtacksNeeded
+      .flatMap(({length}, index) =>
+        Array.from({length}, () => index));
 
-  const entriesToGenerate = imageToMD5Entries.filter(
-    ([filePath, md5]) => md5 !== cache[filePath]?.[0]);
+  const generateCallImagePaths =
+    generateCallImageIndices
+      .map(index => imagePaths[index]);
 
-  if (empty(entriesToGenerate)) {
-    logInfo`All image thumbnails are already up-to-date - nice!`;
-    return {success: true, cache};
-  }
+  const generateCallThumbtacks =
+    imageThumbtacksNeeded.flat();
 
-  logInfo`Generating thumbnails for ${entriesToGenerate.length} media files.`;
-  if (entriesToGenerate.length > 250) {
+  const generateCallFns =
+    stitchArrays({
+      imagePath: generateCallImagePaths,
+      thumbtack: generateCallThumbtacks,
+    }).map(({imagePath, thumbtack}) => () =>
+        generateImageThumbnail(imagePath, thumbtack, {
+          mediaPath,
+          mediaCachePath,
+          spawnConvert,
+        }).catch(error => {
+            numFailed++;
+            return ({error});
+          }));
+
+  logInfo`Generating ${generateCallFns.length} thumbnails for ${imagePaths.length} media files.`;
+  if (generateCallFns.length > 500) {
     logInfo`Go get a latte - this could take a while!`;
   }
 
-  const failed = [];
+  const generateCallResults =
+    await progressPromiseAll(writeMessageFn,
+      queue(generateCallFns, magickThreads));
 
-  const writeMessageFn = () =>
-    `Writing image thumbnails. [failed: ${failed.length}]`;
+  let successfulIndices;
 
-  const generateCalls =
-    entriesToGenerate.flatMap(([filePath, md5]) =>
-      generateImageThumbnails({
-        mediaPath,
-        mediaCachePath,
-        filePath,
-        dimensions: imageToDimensions[filePath],
-        spawnConvert,
-      }).map(call => async () => {
-        try {
-          await call();
-        } catch (error) {
-          failed.push([filePath, error]);
-        }
-      }));
+  {
+    const erroredIndices = generateCallImageIndices.slice();
+    const erroredPaths = generateCallImagePaths.slice();
+    const erroredThumbtacks = generateCallThumbtacks.slice();
+    const errors = generateCallResults.map(result => result?.error);
 
-  await progressPromiseAll(writeMessageFn,
-    queue(generateCalls, magickThreads));
+    const {removed} =
+      filterMultipleArrays(
+        erroredIndices,
+        erroredPaths,
+        erroredThumbtacks,
+        errors,
+        (_index, _imagePath, _thumbtack, error) => error);
 
-  // Sort by file path.
-  failed.sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0);
+    successfulIndices = new Set(removed[0]);
 
-  const failedFilePaths = new Set(failed.map(([filePath]) => filePath));
+    const chunks =
+      chunkMultipleArrays(erroredPaths, erroredThumbtacks, errors,
+        (imagePath, lastImagePath) => imagePath !== lastImagePath);
 
-  for (const [filePath, md5] of entriesToGenerate) {
-    if (failedFilePaths.has(filePath)) continue;
-    updatedCache[filePath] = [md5, ...imageToDimensions[filePath]];
+    // TODO: This should obviously be an aggregate error.
+    // ...Just like every other error report here, and those dang aggregates
+    // should be constructable from within the queue, rather than after.
+    for (const [[imagePath], thumbtacks, errors] of chunks) {
+      logError`Failed to generate thumbnails for ${imagePath}:`;
+      for (const {thumbtack, error} of stitchArrays({thumbtack: thumbtacks, error: errors})) {
+        logError`- ${thumbtack}: ${error}`;
+      }
+    }
+
+    if (empty(errors)) {
+      logInfo`All needed thumbnails generated successfully - nice!`;
+    } else {
+      logWarn`Result is incomplete - the above thumbnails should be checked for errors.`;
+      logWarn`Successfully generated images won't be regenerated next run, though!`;
+    }
   }
 
-  if (empty(failed)) {
-    logInfo`Generated all (updated) thumbnails successfully!`;
-  } else {
-    for (const [path, error] of failed) {
-      logError`Thumbnail failed to generate for ${path} - ${error}`;
+  filterMultipleArrays(
+    imagePaths,
+    imageThumbtacksNeeded,
+    imageDimensions,
+    (_imagePath, _thumbtacksNeeded, _dimensions, index) =>
+      successfulIndices.has(index));
+
+  for (const {
+    imagePath,
+    thumbtacksNeeded,
+    dimensions,
+  } of stitchArrays({
+    imagePath: imagePaths,
+    thumbtacksNeeded: imageThumbtacksNeeded,
+    dimensions: imageDimensions,
+  })) {
+    const cacheEntry = cache[imagePath];
+    const cacheDetails = thumbnailCacheEntryToDetails(cacheEntry);
+
+    const updatedTackbust =
+      (cacheDetails
+        ? {...cacheDetails.tackbust}
+        : {});
+
+    for (const thumbtack of thumbtacksNeeded) {
+      updatedTackbust[thumbtack] = thumbnailSpec[thumbtack].tackbust;
     }
-    logWarn`Result is incomplete - the above thumbnails should be checked for errors.`;
-    logWarn`Successfully generated images won't be regenerated next run, though!`;
+
+    // We could reuse md5 and mtime values from the preivous cache entry, if
+    // extant, but we can't identify the *reason* for why those thumbtacks
+    // were generated, so it's possible these values were at fault. No getting
+    // around computing them again here, at the moment.
+
+    const filePathInMedia = path.join(mediaPath, imagePath);
+    const md5 = await readFileMD5(filePathInMedia);
+
+    const statResults = await stat(filePathInMedia);
+    const mtime = +statResults.mtime;
+
+    cache[imagePath] = detailsToThumbnailCacheEntry({
+      specbust: currentSpecbust,
+      tackbust: updatedTackbust,
+      width: dimensions[0],
+      height: dimensions[1],
+      md5,
+      mtime,
+    });
   }
 
   try {
     await writeFile(
       path.join(mediaCachePath, CACHE_FILE),
-      JSON.stringify(updatedCache)
-    );
+      stringifyCache(cache));
     quietInfo`Updated cache file successfully written!`;
   } catch (error) {
     logWarn`Failed to write updated cache file: ${error}`;
@@ -764,7 +1114,7 @@ export default async function genThumbs({
     logWarn`Sorry about that!`;
   }
 
-  return {success: true, cache: updatedCache};
+  return {success: true, cache};
 }
 
 export function getExpectedImagePaths(mediaPath, {urls, wikiData}) {
