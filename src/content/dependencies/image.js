@@ -338,14 +338,25 @@ export default {
       }
 
       wrapped =
+        html.tag('div', {class: 'image-inner-area'},
+          wrapped);
+
+      if (willLink) {
+        wrapped =
+          html.tag('a', {class: 'image-link'},
+            linkAttributes,
+
+            wrapped);
+      }
+
+      wrapped =
         html.tag('div', {class: 'image-container'},
           containerAttributes,
 
           !originalSrc &&
             {class: 'placeholder-image'},
 
-          html.tag('div', {class: 'image-inner-area'},
-            wrapped));
+          wrapped);
 
       if (willReveal) {
         wrapped =
@@ -365,17 +376,6 @@ export default {
 
             html.tag('div', {class: 'square-content'},
               wrapped));
-      }
-
-      if (willLink) {
-        wrapped =
-          html.tag('a', {class: ['box', 'image-link']},
-            linkAttributes,
-
-            visibility === 'hidden' &&
-              {class: 'js-hide'},
-
-            wrapped);
       }
 
       return wrapped;

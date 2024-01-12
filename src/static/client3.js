@@ -205,7 +205,9 @@ function getScriptedLinkReferences() {
     document.querySelectorAll('[data-random]');
 
   scriptedLinkInfo.revealLinks =
-    document.querySelectorAll('.reveal .image-inner-area');
+    document.querySelectorAll(
+      '.reveal .image-container > .image-link, ' +
+      '.reveal .image-container > .image-inner-area');
 
   scriptedLinkInfo.revealContainers =
     Array.from(scriptedLinkInfo.revealLinks)
@@ -394,9 +396,8 @@ function handleRevealLinkClicked(domEvent, _revealLink, revealContainer) {
     return;
   }
 
-  revealContainer.classList.add('revealed');
   domEvent.preventDefault();
-  domEvent.stopPropagation();
+  revealContainer.classList.add('revealed');
   revealContainer.dispatchEvent(new CustomEvent('hsmusic-reveal'));
 }
 
@@ -1718,7 +1719,7 @@ function handleImageLinkClicked(evt) {
   evt.preventDefault();
 
   // Don't show the overlay if the image still needs to be revealed.
-  if (evt.target.closest('a').querySelector('.reveal:not(.revealed)')) {
+  if (evt.target.closest('.reveal:not(.revealed)')) {
     return;
   }
 
