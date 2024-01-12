@@ -82,7 +82,7 @@ import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const CACHEBUST = 22;
+const CACHEBUST = 23;
 
 let COMMIT;
 try {

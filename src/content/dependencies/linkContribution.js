@@ -64,11 +64,11 @@ export default {
     if (hasExternalIcons && slots.iconMode === 'tooltip') {
       content = [
         content,
-        html.tag('span', {class: ['icons', 'icons-tooltip']},
+        html.tag('span', {class: ['icons', 'tooltip', 'icons-tooltip']},
           {[html.noEdgeWhitespace]: true},
           {inert: true},
 
-          html.tag('span', {class: 'icons-tooltip-content'},
+          html.tag('span', {class: 'tooltip-content'},
             {[html.noEdgeWhitespace]: true},
             {[html.joinChildren]: ''},
 

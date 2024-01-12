@@ -525,32 +525,20 @@ a:not([href]):hover {
   text-decoration-style: wavy !important;
 }
 
-.icons-tooltip,
-.datetimestamp-tooltip {
+.tooltip {
   position: absolute;
   z-index: 3;
-  left: -34px;
+  left: -10px;
   top: calc(1em + 1px);
   display: none;
 }
 
-.icons-tooltip {
-  padding: 3px 6px 6px 6px;
-  left: -34px;
-}
-
-.datetimestamp-tooltip {
-  padding: 3px 4px 2px 2px;
-  left: -10px;
-}
-
-li:not(:first-child:last-child) .datetimestamp-tooltip,
-.offset-tooltips > :not(:first-child:last-child) .datetimestamp-tooltip {
+li:not(:first-child:last-child) .tooltip,
+.offset-tooltips > :not(:first-child:last-child) .tooltip {
   left: 14px;
 }
 
-.icons-tooltip-content,
-.datetimestamp-tooltip-content {
+.tooltip-content {
   display: block;
 
   background: var(--bg-black-color);
@@ -568,7 +556,17 @@ li:not(:first-child:last-child) .datetimestamp-tooltip,
     0 -2px 4px -2px var(--primary-color) inset;
 }
 
-.icons-tooltip-content {
+.icons-tooltip {
+  padding: 3px 6px 6px 6px;
+  left: -34px;
+}
+
+.datetimestamp-tooltip {
+  padding: 3px 4px 2px 2px;
+  left: -10px;
+}
+
+.icons-tooltip .tooltip-content {
   padding: 6px 2px 2px 2px;
 
   -webkit-user-select: none;
@@ -577,7 +575,7 @@ li:not(:first-child:last-child) .datetimestamp-tooltip,
   cursor: default;
 }
 
-.datetimestamp-tooltip-content {
+.datetimestamp-tooltip .tooltip-content {
   padding: 5px 6px;
   white-space: nowrap;
   font-size: 0.9em;

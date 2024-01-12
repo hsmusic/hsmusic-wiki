@@ -28,8 +28,8 @@ export default {
           slots.mainContent),
 
         slots.tooltipContent &&
-          html.tag('span', {class: 'datetimestamp-tooltip'},
-            html.tag('span', {class: 'datetimestamp-tooltip-content'},
+          html.tag('span', {class: ['tooltip', 'datetimestamp-tooltip']},
+            html.tag('span', {class: 'tooltip-content'},
               slots.tooltipContent)),
       ]),
 };
