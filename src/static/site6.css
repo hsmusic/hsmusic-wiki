@@ -1096,7 +1096,7 @@ h1 a[href="#additional-names-box"]:hover {
 
 .image-link {
   border-bottom: 1px solid #ffffff03;
-  border-radius: 2.5px;
+  border-radius: 2.5px 2.5px 3px 3px;
   box-shadow:
     0 1px 8px -3px var(--bg-black-color);
 }
