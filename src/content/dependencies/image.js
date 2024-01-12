@@ -140,9 +140,6 @@ export default {
       (customLink
         ? {href: slots.link}
         : {href: originalSrc}),
-
-      customLink &&
-        {class: 'no-image-preview'},
     ]);
 
     const containerAttributes = html.attributes();
@@ -352,6 +349,12 @@ export default {
       wrapped =
         html.tag('div', {class: 'image-container'},
           containerAttributes,
+
+          willLink &&
+            {class: 'has-link'},
+
+          customLink &&
+            {class: 'no-image-preview'},
 
           !originalSrc &&
             {class: 'placeholder-image'},

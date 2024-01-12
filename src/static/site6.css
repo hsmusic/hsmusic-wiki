@@ -1228,7 +1228,7 @@ img.pixelate {
   text-decoration-style: solid;
 }
 
-.image-link:not(.no-image-preview) .image-container {
+.image-container.has-link:not(.no-image-preview) {
   background: var(--deep-color);
   box-shadow: none;
   border-radius: 0 0 4px 4px;
