@@ -1842,7 +1842,7 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 .content-sticky-heading-row h1 {
   margin: 0;
-  padding-right: 10px;
+  padding-right: 20px;
 }
 
 .content-sticky-heading-cover-container {
@@ -2279,6 +2279,10 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
 
   .content-sticky-heading-container {
     z-index: 2;
+  }
+
+  .content-sticky-heading-row h1 {
+    padding-right: 10px;
   }
 
   /* Let sticky heading text span past lower-index cover art */
