@@ -737,7 +737,8 @@ ul.image-details li {
   height: auto;
 }
 
-.square .image-container {
+.square .image-container,
+.square .image-link {
   width: 100%;
   height: 100%;
 }
@@ -1104,6 +1105,15 @@ h1 a[href="#additional-names-box"]:hover {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.image-link .image-inner-area {
+  /* Jankily fix a rendering issue with border-radius on Safari.
+   * The `-webkit-` prefix is only to keep this from applying on
+   * other browsers (well, Firefox), where it doesn't *break*
+   * anything, but also isn't necessary.
+   */
+  -webkit-transform: translateZ(0);
 }
 
 img {
