@@ -255,11 +255,17 @@ export class Track extends Thing {
       }),
     ],
 
-    artTags: referenceList({
-      class: input.value(ArtTag),
-      find: input.value(find.artTag),
-      data: 'artTagData',
-    }),
+    artTags: [
+      exitWithoutUniqueCoverArt({
+        value: input.value([]),
+      }),
+
+      referenceList({
+        class: input.value(ArtTag),
+        find: input.value(find.artTag),
+        data: 'artTagData',
+      }),
+    ],
 
     // Update only
 
