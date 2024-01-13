@@ -25,8 +25,8 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via 
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > lazy with square 1`] = `
-<noscript><div class="image-container square"><div class="square-content"><div class="image-outer-area"><div class="image-inner-area"><img class="image" src="foobar"></div></div></div></div></noscript>
-<div class="image-container square js-hide"><div class="square-content"><div class="image-outer-area"><div class="image-inner-area"><img class="image lazy" data-original="foobar"></div></div></div></div>
+<noscript><div class="image-container square"><div class="image-outer-area square-content"><div class="image-inner-area"><img class="image" src="foobar"></div></div></div></noscript>
+<div class="image-container square js-hide"><div class="image-outer-area square-content"><div class="image-inner-area"><img class="image lazy" data-original="foobar"></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > link with file size 1`] = `
@@ -54,7 +54,7 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > source via src 1`] = 
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > square 1`] = `
-<div class="image-container square"><div class="square-content"><div class="image-outer-area"><div class="image-inner-area"><img class="image" src="foobar"></div></div></div></div>
+<div class="image-container square"><div class="image-outer-area square-content"><div class="image-inner-area"><img class="image" src="foobar"></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > thumb requested but source is gif 1`] = `

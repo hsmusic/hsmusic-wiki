@@ -317,13 +317,10 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-outer-area'},
-          wrapped);
+          willSquare &&
+            {class: 'square-content'},
 
-      if (willSquare) {
-        wrapped =
-          html.tag('div', {class: 'square-content'},
-            wrapped);
-      }
+          wrapped);
 
       wrapped =
         html.tag('div', {class: 'image-container'},
