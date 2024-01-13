@@ -20,7 +20,7 @@ exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > nested links 
 `
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > preferShortName 1`] = `
-<a href="tag/five-oceanfalls/">Five</a>
+<span class="text-with-tooltip"><a href="tag/five-oceanfalls/">Five</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Five (Oceanfalls)</span></span></span>
 `
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > tags in name escaped 1`] = `
@@ -34,5 +34,11 @@ exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > tooltip & con
 <a href="album/beyond-canon/">Beyond Canon</a>
 <a title="Beyond Canon" href="album/beyond-canon/">Beyond Canon</a>
 <a title="Beyond Canon" href="album/beyond-canon/">Next</a>
+<a href="album/beyond-canon/">Beyond Canon</a>
+<span class="text-with-tooltip"><a href="album/beyond-canon/">BC</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Beyond Canon</span></span></span>
+<span class="text-with-tooltip"><a href="album/beyond-canon/">Next</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Beyond Canon</span></span></span>
+<a href="album/beyond-canon/">Next</a>
+<span class="text-with-tooltip"><a href="album/beyond-canon/">Beyond Canon</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Beyond Canon</span></span></span>
+<span class="text-with-tooltip"><a href="album/beyond-canon/">Next</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Beyond Canon</span></span></span>
 <a href="album/beyond-canon/">Banana</a>
 `

@@ -32,11 +32,18 @@ testContentFunctions(t, 'linkThing (snapshot)', async (t, evaluate) => {
     args: ['localized.album', {
       directory: 'beyond-canon',
       name: 'Beyond Canon',
+      nameShort: 'BC',
     }],
     multiple: [
       {slots: {tooltipStyle: 'none'}},
       {slots: {tooltipStyle: 'browser'}},
       {slots: {tooltipStyle: 'browser', content: 'Next'}},
+      {slots: {tooltipStyle: 'auto'}},
+      {slots: {tooltipStyle: 'auto', preferShortName: true}},
+      {slots: {tooltipStyle: 'auto', preferShortName: true, content: 'Next'}},
+      {slots: {tooltipStyle: 'auto', content: 'Next'}},
+      {slots: {tooltipStyle: 'wiki'}},
+      {slots: {tooltipStyle: 'wiki', content: 'Next'}},
       {slots: {content: 'Banana'}},
     ],
   });

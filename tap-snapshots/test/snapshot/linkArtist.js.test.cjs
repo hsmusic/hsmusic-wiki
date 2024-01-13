@@ -10,5 +10,5 @@ exports[`test/snapshot/linkArtist.js > TAP > linkArtist (snapshot) > basic behav
 `
 
 exports[`test/snapshot/linkArtist.js > TAP > linkArtist (snapshot) > prefer short name 1`] = `
-<a href="artist/55gore/">55gore</a>
+<span class="text-with-tooltip"><a href="artist/55gore/">55gore</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">ICCTTCMDMIROTMCWMWFTPFTDDOTARHPOESWGBTWEATFCWSEBTSSFOFG</span></span></span>
 `

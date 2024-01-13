@@ -562,6 +562,11 @@ li:not(:first-child:last-child) .tooltip,
   left: -10px;
 }
 
+.thing-name-tooltip {
+  padding: 3px 4px 2px 2px;
+  left: -6px !important;
+}
+
 .icons-tooltip .tooltip-content {
   padding: 6px 2px 2px 2px;
 
@@ -575,6 +580,12 @@ li:not(:first-child:last-child) .tooltip,
   padding: 5px 6px;
   white-space: nowrap;
   font-size: 0.9em;
+}
+
+.thing-name-tooltip .tooltip-content {
+  padding: 3px 4.5px;
+  white-space: nowrap;
+  max-width: 120px;
 }
 
 .icons {

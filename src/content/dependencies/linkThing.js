@@ -1,5 +1,11 @@
 export default {
-  contentDependencies: ['generateColorStyleAttribute', 'linkTemplate'],
+  contentDependencies: [
+    'generateColorStyleAttribute',
+    'generateTextWithTooltip',
+    'generateTooltip',
+    'linkTemplate',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   relations: (relation, _pathKey, thing) => ({
@@ -8,6 +14,12 @@ export default {
 
     colorStyle:
       relation('generateColorStyleAttribute', thing.color ?? null),
+
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+
+    tooltip:
+      relation('generateTooltip'),
   }),
 
   data: (pathKey, thing) => ({
@@ -37,8 +49,8 @@ export default {
     },
 
     tooltipStyle: {
-      validate: v => v.is('none', 'browser'),
-      default: 'none',
+      validate: v => v.is('none', 'auto', 'browser', 'wiki'),
+      default: 'auto',
     },
 
     color: {
@@ -79,6 +91,18 @@ export default {
         ? data.nameShort
         : data.name);
 
+    const showWikiTooltip =
+      (slots.tooltipStyle === 'auto'
+        ? showShortName
+        : slots.tooltipStyle === 'wiki');
+
+    const wikiTooltip =
+      showWikiTooltip &&
+        relations.tooltip.slots({
+          attributes: {class: 'thing-name-tooltip'},
+          content: data.name,
+        });
+
     if (slots.tooltipStyle === 'browser') {
       attributes.add('title', data.name);
     }
@@ -100,14 +124,19 @@ export default {
       attributes.add(colorStyle);
     }
 
-    return relations.linkTemplate
-      .slots({
-        path: slots.anchor ? [] : path,
-        href: slots.anchor ? '' : null,
-        content,
-        attributes,
-        hash: slots.hash,
-        linkless: slots.linkless,
-      });
+    return relations.textWithTooltip.slots({
+      text:
+        relations.linkTemplate.slots({
+          path: slots.anchor ? [] : path,
+          href: slots.anchor ? '' : null,
+          content,
+          attributes,
+          hash: slots.hash,
+          linkless: slots.linkless,
+        }),
+
+      tooltip:
+        wikiTooltip ?? null,
+    });
   },
 }
