@@ -739,9 +739,13 @@ ul.image-details li {
   display: none;
 }
 
-.content-image {
+.content-image-container {
   margin-top: 1em;
   margin-bottom: 1em;
+}
+
+.content-image {
+  display: inline-block !important;
 }
 
 .image-link {

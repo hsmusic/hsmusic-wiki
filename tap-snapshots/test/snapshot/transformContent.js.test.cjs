@@ -92,16 +92,16 @@ How it goes</p>
 `
 
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > non-inline image #1 1`] = `
-<div class="content-image">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large' }]</div>
+<div class="content-image-container">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large', attributes: [ { class: 'content-image' }, undefined ] }]</div>
 `
 
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > non-inline image #2 1`] = `
 <p>Rad.</p>
-<div class="content-image">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large' }]</div>
+<div class="content-image-container">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large', attributes: [ { class: 'content-image' }, undefined ] }]</div>
 `
 
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > non-inline image #3 1`] = `
-<div class="content-image">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large' }]</div>
+<div class="content-image-container">[mocked: image - slots: { src: 'spark.png', link: true, thumb: 'large', attributes: [ { class: 'content-image' }, undefined ] }]</div>
 <p>Baller.</p>
 `
 

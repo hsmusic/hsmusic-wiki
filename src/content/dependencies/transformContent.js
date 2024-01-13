@@ -385,7 +385,7 @@ export default {
               type: 'image',
               inline: false,
               data:
-                html.tag('div', {class: 'content-image'},
+                html.tag('div', {class: 'content-image-container'},
                   image.slots({
                     src,
 
@@ -394,10 +394,12 @@ export default {
                     height: height ?? null,
                     thumb: slots.thumb,
 
-                    attributes:
-                      (pixelate
-                        ? {class: 'pixelate'}
-                        : null),
+                    attributes: [
+                      {class: 'content-image'},
+
+                      pixelate &&
+                        {class: 'pixelate'},
+                    ],
                   })),
             };
           }
