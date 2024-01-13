@@ -763,7 +763,6 @@ ul.image-details li {
   height: auto;
 }
 
-.square .image-container,
 .square .image-link {
   width: 100%;
   height: 100%;
@@ -1083,7 +1082,7 @@ h1 a[href="#additional-names-box"]:hover {
 /* Images */
 
 .image-container {
-  display: inline-block;
+  display: block;
   box-sizing: border-box;
   position: relative;
   height: 100%;
