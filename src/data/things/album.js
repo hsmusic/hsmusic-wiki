@@ -113,11 +113,18 @@ export class Album extends Thing {
       data: 'groupData',
     }),
 
-    artTags: referenceList({
-      class: input.value(ArtTag),
-      find: input.value(find.artTag),
-      data: 'artTagData',
-    }),
+    artTags: [
+      exitWithoutContribs({
+        contribs: 'coverArtistContribs',
+        value: input.value([]),
+      }),
+
+      referenceList({
+        class: input.value(ArtTag),
+        find: input.value(find.artTag),
+        data: 'artTagData',
+      }),
+    ],
 
     // Update only
 
