@@ -6,6 +6,7 @@ import thingConstructors from '#things';
 
 const {
   Album,
+  ArtTag,
   Artist,
   Flash,
   FlashAct,
@@ -50,6 +51,13 @@ function stubArtistAndContribs(artistName = `Test Artist`) {
   const badContribs = [{who: `Figment of Your Imagination`, what: null}];
 
   return {artist, contribs, badContribs};
+}
+
+function stubArtTag(tagName = `Test Art Tag`) {
+  const tag = new ArtTag();
+  tag.name = tagName;
+
+  return tag;
 }
 
 function stubFlashAndAct(directory = 'zam') {
@@ -113,6 +121,56 @@ t.test(`Track.album`, t => {
 
   t.equal(track1.album, null,
     `album #6: is null when album's trackSections don't match track`);
+});
+
+t.test(`Track.artTags`, t => {
+  t.plan(6);
+
+  const {track, album} = stubTrackAndAlbum();
+  const {artist, contribs} = stubArtistAndContribs();
+  const tag1 = stubArtTag(`Tag 1`);
+  const tag2 = stubArtTag(`Tag 2`);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+    artTagData: [tag1, tag2],
+    trackData: [track],
+  });
+
+  t.same(track.artTags, [],
+    `artTags #1: defaults to empty array`);
+
+  track.artTags = [`Tag 1`, `Tag 2`];
+
+  t.same(track.artTags, [],
+    `artTags #2: is empty if track doesn't have cover artists`);
+
+  track.coverArtistContribs = contribs;
+
+  t.same(track.artTags, [tag1, tag2],
+    `artTags #3: resolves if track has cover artists`);
+
+  track.coverArtistContribs = null;
+  album.trackCoverArtistContribs = contribs;
+
+  XXX_decacheWikiData();
+
+  t.same(track.artTags, [tag1, tag2],
+    `artTags #4: resolves if track inherits cover artists`);
+
+  track.disableUniqueCoverArt = true;
+
+  t.same(track.artTags, [],
+    `artTags #5: is empty if track disables unique cover artwork`);
+
+  album.coverArtistContribs = contribs;
+  album.artTags = [`Tag 2`];
+
+  XXX_decacheWikiData();
+
+  t.notSame(track.artTags, [tag2],
+    `artTags #6: doesn't inherit from album's art tags`);
 });
 
 t.test(`Track.artistContribs`, t => {

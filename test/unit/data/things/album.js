@@ -5,9 +5,17 @@ import thingConstructors from '#things';
 
 const {
   Album,
+  ArtTag,
   Artist,
   Track,
 } = thingConstructors;
+
+function stubArtTag(tagName = `Test Art Tag`) {
+  const tag = new ArtTag();
+  tag.name = tagName;
+
+  return tag;
+}
 
 function stubArtistAndContribs() {
   const artist = new Artist();
@@ -25,6 +33,34 @@ function stubTrack(directory = 'foo') {
 
   return track;
 }
+
+t.test(`Album.artTags`, t => {
+  t.plan(3);
+
+  const {artist, contribs} = stubArtistAndContribs();
+  const album = new Album();
+  const tag1 = stubArtTag(`Tag 1`);
+  const tag2 = stubArtTag(`Tag 2`);
+
+  const {XXX_decacheWikiData} = linkAndBindWikiData({
+    albumData: [album],
+    artistData: [artist],
+    artTagData: [tag1, tag2],
+  });
+
+  t.same(album.artTags, [],
+    `artTags #1: defaults to empty array`);
+
+  album.artTags = [`Tag 1`, `Tag 2`];
+
+  t.same(album.artTags, [],
+    `artTags #2: is empty if album doesn't have cover artists`);
+
+  album.coverArtistContribs = contribs;
+
+  t.same(album.artTags, [tag1, tag2],
+    `artTags #3: resolves if album has cover artists`);
+});
 
 t.test(`Album.bannerDimensions`, t => {
   t.plan(4);
