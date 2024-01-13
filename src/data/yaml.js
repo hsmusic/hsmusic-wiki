@@ -1902,23 +1902,31 @@ export function filterReferenceErrors(wikiData) {
 
             let newPropertyValue = value;
 
-            if (findFnKey === '_commentary') {
-              // Commentary doesn't write a property value, so no need to set.
-              filter(
-                value, {message: errorMessage},
-                decorateErrorWithIndex(refs =>
-                  (refs.length === 1
-                    ? suppress(findFn)(refs[0])
-                    : filterAggregate(
-                        refs, {message: `Errors in entry's artist references`},
-                        decorateErrorWithIndex(suppress(findFn)))
-                          .aggregate
-                          .close())));
-            } else if (Array.isArray(value)) {
-              newPropertyValue = filter(
-                value, {message: errorMessage},
-                decorateErrorWithIndex(suppress(findFn)));
-            } else {
+            determineNewPropertyValue: {
+              if (findFnKey === '_commentary') {
+                filter(
+                  value, {message: errorMessage},
+                  decorateErrorWithIndex(refs =>
+                    (refs.length === 1
+                      ? suppress(findFn)(refs[0])
+                      : filterAggregate(
+                          refs, {message: `Errors in entry's artist references`},
+                          decorateErrorWithIndex(suppress(findFn)))
+                            .aggregate
+                            .close())));
+
+                // Commentary doesn't write a property value, so no need to set
+                // anything on `newPropertyValue`.
+                break determineNewPropertyValue;
+              }
+
+              if (Array.isArray(value)) {
+                newPropertyValue = filter(
+                  value, {message: errorMessage},
+                  decorateErrorWithIndex(suppress(findFn)));
+                break determineNewPropertyValue;
+              }
+
               nest({message: errorMessage},
                 suppress(({call}) => {
                   try {
