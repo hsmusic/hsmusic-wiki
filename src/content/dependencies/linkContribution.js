@@ -66,7 +66,6 @@ export default {
         content,
         html.tag('span', {class: ['icons', 'tooltip', 'icons-tooltip']},
           {[html.noEdgeWhitespace]: true},
-          {inert: true},
 
           html.tag('span', {class: 'tooltip-content'},
             {[html.noEdgeWhitespace]: true},
