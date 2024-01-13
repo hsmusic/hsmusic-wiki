@@ -1708,7 +1708,7 @@ export function filterReferenceErrors(wikiData) {
       wallpaperArtistContribs: '_contrib',
       bannerArtistContribs: '_contrib',
       groups: 'group',
-      artTags: 'artTag',
+      artTags: '_artTag',
       commentary: '_commentary',
     }],
 
@@ -1736,7 +1736,7 @@ export function filterReferenceErrors(wikiData) {
       coverArtistContribs: '_contrib',
       referencedTracks: '_trackNotRerelease',
       sampledTracks: '_trackNotRerelease',
-      artTags: 'artTag',
+      artTags: '_artTag',
       originalReleaseTrack: '_trackNotRerelease',
       commentary: '_commentary',
     }],
@@ -1814,6 +1814,10 @@ export function filterReferenceErrors(wikiData) {
             };
 
             switch (findFnKey) {
+              case '_artTag':
+                findFn = boundFind.artTag;
+                break;
+
               case '_commentary':
                 findFn = findArtistOrAlias;
                 break;
@@ -1903,6 +1907,37 @@ export function filterReferenceErrors(wikiData) {
             let newPropertyValue = value;
 
             determineNewPropertyValue: {
+              // TODO: The special-casing for artTag is obviously a bit janky.
+              // It would be nice if this could be moved to processDocument ala
+              // fieldCombinationErrors, but art tags are only an error if the
+              // thing doesn't have an artwork - which can't be determined from
+              // the track document on its own, thanks to inheriting contribs
+              // from the album.
+              if (findFnKey === '_artTag') {
+                let hasCoverArtwork =
+                  !empty(CacheableObject.getUpdateValue(thing, 'coverArtistContribs'));
+
+                if (processDocumentFn === processTrackDocument) {
+                  if (thing.album) {
+                    hasCoverArtwork ||=
+                      !empty(CacheableObject.getUpdateValue(thing.album, 'trackCoverArtistContribs'));
+                  }
+
+                  if (thing.disableUniqueCoverArt) {
+                    hasCoverArtwork = false;
+                  }
+                }
+
+                if (!hasCoverArtwork) {
+                  nest({message: errorMessage}, ({push}) => {
+                    push(new TypeError(`No cover artwork, so this shouldn't have art tags specified`));
+                  });
+
+                  newPropertyValue = [];
+                  break determineNewPropertyValue;
+                }
+              }
+
               if (findFnKey === '_commentary') {
                 filter(
                   value, {message: errorMessage},
