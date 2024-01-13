@@ -2086,28 +2086,28 @@ for (const info of groupContributionsTableInfo) {
   });
 }
 
-// Artist link icon tooltips ------------------------------
+// Generic links with tooltips ----------------------------
 
-const externalIconTooltipInfo = initInfo('externalIconTooltipInfo', {
+const textWithTooltipInfo = initInfo('textWithTooltipInfo', {
   hoverables: null,
   tooltips: null,
 });
 
-function getExternalIconTooltipReferences() {
-  const info = externalIconTooltipInfo;
+function getTextWithTooltipReferences() {
+  const info = textWithTooltipInfo;
 
   const spans =
-    Array.from(document.querySelectorAll('span.contribution.has-tooltip'));
+    Array.from(document.querySelectorAll('.text-with-tooltip'));
 
   info.hoverables =
-    spans.map(span => span.querySelector('a'));
+    spans.map(span => span.children[0]);
 
   info.tooltips =
-    spans.map(span => span.querySelector('span.icons-tooltip'));
+    spans.map(span => span.children[1]);
 }
 
-function addExternalIconTooltipPageListeners() {
-  const info = externalIconTooltipInfo;
+function addTextWithTooltipPageListeners() {
+  const info = textWithTooltipInfo;
 
   for (const {hoverable, tooltip} of stitchArrays({
     hoverable: info.hoverables,
@@ -2118,8 +2118,8 @@ function addExternalIconTooltipPageListeners() {
   }
 }
 
-clientSteps.getPageReferences.push(getExternalIconTooltipReferences);
-clientSteps.addPageListeners.push(addExternalIconTooltipPageListeners);
+clientSteps.getPageReferences.push(getTextWithTooltipReferences);
+clientSteps.addPageListeners.push(addTextWithTooltipPageListeners);
 
 // Datetimestamp tooltips ---------------------------------
 

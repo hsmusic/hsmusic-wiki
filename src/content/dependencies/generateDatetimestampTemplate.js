@@ -1,5 +1,11 @@
 export default {
+  contentDependencies: ['generateTextWithTooltip'],
   extraDependencies: ['html'],
+
+  relations: (relation) => ({
+    textWithTooltip:
+      relation('generateTextWithTooltip'),
+  }),
 
   slots: {
     mainContent: {
@@ -15,20 +21,18 @@ export default {
     datetime: {type: 'string'},
   },
 
-  generate: (slots, {html}) =>
-    html.tag('span', {class: 'datetimestamp'},
-      {[html.joinChildren]: ''},
+  generate: (relations, slots, {html}) =>
+    relations.textWithTooltip.slots({
+      attributes: {class: 'datetimestamp'},
 
-      !html.isBlank(slots.tooltip) &&
-        {class: 'has-tooltip'},
-
-      [
+      text:
         html.tag('time',
           {datetime: slots.datetime},
           slots.mainContent),
 
+      tooltip:
         slots.tooltip?.slots({
           attributes: [{class: 'datetimestamp-tooltip'}],
         }),
-      ]),
+    }),
 };

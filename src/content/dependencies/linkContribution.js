@@ -2,6 +2,7 @@ import {empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateTextWithTooltip',
     'generateTooltip',
     'linkArtist',
     'linkExternalAsIcon',
@@ -14,6 +15,9 @@ export default {
 
     relations.artistLink =
       relation('linkArtist', contribution.who);
+
+    relations.textWithTooltip =
+      relation('generateTextWithTooltip');
 
     relations.tooltip =
       relation('generateTooltip');
@@ -49,7 +53,30 @@ export default {
     const hasExternalIcons = !!(slots.showIcons && relations.artistIcons);
 
     const parts = ['misc.artistLink'];
-    const options = {artist: relations.artistLink};
+    const options = {};
+
+    options.artist =
+      (hasExternalIcons && slots.iconMode === 'tooltip'
+        ? relations.textWithTooltip.slots({
+            text: relations.artistLink,
+            tooltip:
+              relations.tooltip.slots({
+                attributes:
+                  {class: ['icons', 'icons-tooltip']},
+
+                contentAttributes:
+                  {[html.joinChildren]: ''},
+
+                content:
+                  relations.artistIcons
+                    .map(icon =>
+                      icon.slots({
+                        context: 'artist',
+                        withText: true,
+                      })),
+              }),
+          })
+        : relations.artistLink);
 
     if (hasContribution) {
       parts.push('withContribution');
@@ -67,46 +94,21 @@ export default {
               .map(icon => icon.slot('context', 'artist'))));
     }
 
-    let content = language.formatString(...parts, options);
+    const contributionPart =
+      language.formatString(...parts, options);
 
-    if (hasExternalIcons && slots.iconMode === 'tooltip') {
-      content = [
-        content,
-        relations.tooltip.slots({
-          attributes:
-            {class: ['icons', 'icons-tooltip']},
-
-          contentAttributes:
-            {[html.joinChildren]: ''},
-
-          content:
-            relations.artistIcons
-              .map(icon =>
-                icon.slots({
-                  context: 'artist',
-                  withText: true,
-                })),
-        }),
-      ];
+    if (!hasContribution && !hasExternalIcons) {
+      return contributionPart;
     }
 
-    if (hasContribution || hasExternalIcons) {
-      content =
-        html.tag('span', {class: 'contribution'},
-          {[html.noEdgeWhitespace]: true},
-          {[html.joinChildren]: ''},
+    return (
+      html.tag('span', {class: 'contribution'},
+        {[html.noEdgeWhitespace]: true},
 
-          hasExternalIcons &&
-          slots.iconMode === 'tooltip' &&
-            {class: 'has-tooltip'},
+        parts.length > 1 &&
+        slots.preventWrapping &&
+          {class: 'nowrap'},
 
-          parts.length > 1 &&
-          slots.preventWrapping &&
-            {class: 'nowrap'},
-
-          content);
-    }
-
-    return content;
-  }
+        contributionPart));
+  },
 };

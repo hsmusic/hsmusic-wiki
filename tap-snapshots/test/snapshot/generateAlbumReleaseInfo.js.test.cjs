@@ -7,10 +7,10 @@
 'use strict'
 exports[`test/snapshot/generateAlbumReleaseInfo.js > TAP > generateAlbumReleaseInfo (snapshot) > basic behavior 1`] = `
 <p>
-    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution has-tooltip nowrap"><a href="artist/tensei/">Tensei</a> (hot jams)<span class="icons tooltip icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tenseimusic.bandcamp.com/">
-                    <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
-                    <span class="icon-text">tenseimusic</span>
-                </a></span></span></span>.
+    By <span class="contribution nowrap"><a href="artist/toby-fox/">Toby Fox</a> (music probably)</span> and <span class="contribution nowrap"><span class="text-with-tooltip"><a href="artist/tensei/">Tensei</a><span class="tooltip icons icons-tooltip"><span class="tooltip-content"><a class="icon has-text" href="https://tenseimusic.bandcamp.com/">
+                        <svg><use href="static/icons.svg#icon-bandcamp"></use></svg>
+                        <span class="icon-text">tenseimusic</span>
+                    </a></span></span></span> (hot jams)</span>.
     <br>
     Cover art by <a href="artist/hb/">Hanni Brosh</a>.
     <br>

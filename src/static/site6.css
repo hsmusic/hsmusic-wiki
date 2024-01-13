@@ -503,26 +503,22 @@ a:not([href]):hover {
   display: inline-block;
 }
 
-.contribution.has-tooltip,
-.datetimestamp.has-tooltip {
+.text-with-tooltip {
   position: relative;
 }
 
-.contribution.has-tooltip > a,
-.datetimestamp.has-tooltip > time {
+.text-with-tooltip > :first-child {
   text-decoration: underline;
   text-decoration-style: dotted;
 }
 
-.datetimestamp.has-tooltip > time {
-  cursor: default;
+.text-with-tooltip > :first-child:hover,
+.text-with-tooltip > :first-child.has-visible-tooltip {
+  text-decoration-style: wavy !important;
 }
 
-.contribution.has-tooltip > a:hover,
-.contribution.has-tooltip > a.has-visible-tooltip,
-.datetimestamp.has-tooltip > time:hover,
-.datetimestamp.has-tooltip > time.has-visible-tooltip {
-  text-decoration-style: wavy !important;
+.text-with-tooltip.datetimestamp > :first-child {
+  cursor: default;
 }
 
 .tooltip {
