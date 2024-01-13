@@ -1171,12 +1171,6 @@ img.pixelate, .pixelate img {
   image-rendering: crisp-edges;
 }
 
-.reveal {
-  position: relative;
-  width: 100%;
-  height: 100%;
-}
-
 .reveal-text-container {
   position: absolute;
   top: 15px;

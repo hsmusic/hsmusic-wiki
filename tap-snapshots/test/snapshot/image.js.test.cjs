@@ -6,21 +6,19 @@
  */
 'use strict'
 exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via tags 1`] = `
-<div class="image-container">
-    <div class="reveal">
-        <div class="image-outer-area">
-            <div class="image-inner-area">
-                <img class="image" src="media/album-art/beyond-canon/cover.png">
-                <span class="reveal-text-container">
-                    <span class="reveal-text">
-                        <img class="reveal-symbol" src="static/warning.svg?413">
-                        <br>
-                        <span class="reveal-warnings">too cool for school</span>
-                        <br>
-                        <span class="reveal-interaction">click to show</span>
-                    </span>
+<div class="image-container reveal">
+    <div class="image-outer-area">
+        <div class="image-inner-area">
+            <img class="image" src="media/album-art/beyond-canon/cover.png">
+            <span class="reveal-text-container">
+                <span class="reveal-text">
+                    <img class="reveal-symbol" src="static/warning.svg?413">
+                    <br>
+                    <span class="reveal-warnings">too cool for school</span>
+                    <br>
+                    <span class="reveal-interaction">click to show</span>
                 </span>
-            </div>
+            </span>
         </div>
     </div>
 </div>
@@ -36,11 +34,11 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > link with file size 1
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > missing image path 1`] = `
-<div class="image-container"><div class="image-outer-area"><div class="image-inner-area"><div class="image-text-area">(This image file is missing)</div></div></div></div>
+<div class="image-container placeholder-image"><div class="image-outer-area"><div class="image-inner-area"><div class="image-text-area">(This image file is missing)</div></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > missing image path w/ missingSourceContent 1`] = `
-<div class="image-container"><div class="image-outer-area"><div class="image-inner-area"><div class="image-text-area">Cover's missing, whoops</div></div></div></div>
+<div class="image-container placeholder-image"><div class="image-outer-area"><div class="image-inner-area"><div class="image-text-area">Cover's missing, whoops</div></div></div></div>
 `
 
 exports[`test/snapshot/image.js > TAP > image (snapshot) > source missing 1`] = `

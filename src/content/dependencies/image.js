@@ -136,12 +136,17 @@ export default {
       slots.height && {height: slots.height},
     ]);
 
-    if (!originalSrc || isMissingImageFile) {
-      return prepare(
-        html.tag('div', {class: 'image-text-area'},
-          (html.isBlank(slots.missingSourceContent)
-            ? language.$('misc.missingImage')
-            : slots.missingSourceContent)));
+    const isPlaceholder =
+      !originalSrc || isMissingImageFile;
+
+    if (isPlaceholder) {
+      return (
+        prepare(
+          html.tag('div', {class: 'image-text-area'},
+            (html.isBlank(slots.missingSourceContent)
+              ? language.$('misc.missingImage')
+              : slots.missingSourceContent)),
+          'visible'));
     }
 
     let reveal = null;
@@ -314,15 +319,6 @@ export default {
         html.tag('div', {class: 'image-outer-area'},
           wrapped);
 
-      if (willReveal) {
-        wrapped =
-          html.tag('div', {class: 'reveal'},
-            images.revealStatic &&
-              {class: 'has-reveal-thumbnail'},
-
-            wrapped);
-      }
-
       if (willSquare) {
         wrapped =
           html.tag('div', {class: 'square-content'},
@@ -331,17 +327,24 @@ export default {
 
       wrapped =
         html.tag('div', {class: 'image-container'},
-          willLink &&
-            {class: 'has-link'},
-
           willSquare &&
             {class: 'square'},
 
           typeof slots.link === 'string' &&
             {class: 'no-image-preview'},
 
-          !originalSrc &&
-            {class: 'placeholder-image'},
+          (isPlaceholder
+            ? {class: 'placeholder-image'}
+            : [
+                willLink &&
+                  {class: 'has-link'},
+
+                willReveal &&
+                  {class: 'reveal'},
+
+                revealSrc &&
+                  {class: 'has-reveal-thumbnail'},
+              ]),
 
           visibility === 'hidden' &&
             {class: 'js-hide'},
