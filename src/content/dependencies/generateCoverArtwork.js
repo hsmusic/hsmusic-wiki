@@ -1,25 +1,45 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['image', 'linkArtTag'],
   extraDependencies: ['html'],
 
-  relations(relation, artTags) {
-    const relations = {};
+  query: (artTags) => ({
+    linkableArtTags:
+      (artTags
+        ? artTags.filter(tag => !tag.isContentWarning)
+        : []),
+  }),
 
-    relations.image =
-      relation('image', artTags);
+  relations: (relation, query, artTags) => ({
+    image:
+      relation('image', artTags),
 
-    if (artTags) {
-      relations.tagLinks =
-        artTags
-          .filter(tag => !tag.isContentWarning)
-          .map(tag => relation('linkArtTag', tag));
-    } else {
-      relations.tagLinks = null;
+    tagLinks:
+      query.linkableArtTags
+        .filter(tag => !tag.isContentWarning)
+        .map(tag => relation('linkArtTag', tag)),
+  }),
+
+  data: (query) => {
+    const data = {};
+
+    const seenShortNames = new Set();
+    const duplicateShortNames = new Set();
+
+    for (const {nameShort: shortName} of query.linkableArtTags) {
+      if (seenShortNames.has(shortName)) {
+        duplicateShortNames.add(shortName);
+      } else {
+        seenShortNames.add(shortName);
+      }
     }
 
-    return relations;
+    data.preferShortName =
+      query.linkableArtTags
+        .map(artTag => !duplicateShortNames.has(artTag.nameShort));
+
+    return data;
   },
 
   slots: {
@@ -41,7 +61,7 @@ export default {
     },
   },
 
-  generate(relations, slots, {html}) {
+  generate(data, relations, slots, {html}) {
     switch (slots.mode) {
       case 'primary':
         return html.tags([
@@ -57,10 +77,12 @@ export default {
 
           !empty(relations.tagLinks) &&
             html.tag('ul', {class: 'image-details'},
-              relations.tagLinks
-                .map(tagLink =>
+              stitchArrays({
+                tagLink: relations.tagLinks,
+                preferShortName: data.preferShortName,
+              }).map(({tagLink, preferShortName}) =>
                   html.tag('li',
-                    tagLink.slot('preferShortName', true)))),
+                    tagLink.slot('preferShortName', preferShortName)))),
         ]);
 
       case 'thumbnail':
