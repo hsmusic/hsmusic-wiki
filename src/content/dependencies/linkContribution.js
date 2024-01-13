@@ -1,7 +1,12 @@
 import {empty} from '#sugar';
 
 export default {
-  contentDependencies: ['linkArtist', 'linkExternalAsIcon'],
+  contentDependencies: [
+    'generateTooltip',
+    'linkArtist',
+    'linkExternalAsIcon',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   relations(relation, contribution) {
@@ -9,6 +14,9 @@ export default {
 
     relations.artistLink =
       relation('linkArtist', contribution.who);
+
+    relations.tooltip =
+      relation('generateTooltip');
 
     if (!empty(contribution.who.urls)) {
       relations.artistIcons =
@@ -64,19 +72,21 @@ export default {
     if (hasExternalIcons && slots.iconMode === 'tooltip') {
       content = [
         content,
-        html.tag('span', {class: ['icons', 'tooltip', 'icons-tooltip']},
-          {[html.noEdgeWhitespace]: true},
+        relations.tooltip.slots({
+          attributes:
+            {class: ['icons', 'icons-tooltip']},
 
-          html.tag('span', {class: 'tooltip-content'},
-            {[html.noEdgeWhitespace]: true},
+          contentAttributes:
             {[html.joinChildren]: ''},
 
+          content:
             relations.artistIcons
               .map(icon =>
                 icon.slots({
                   context: 'artist',
                   withText: true,
-                })))),
+                })),
+        }),
       ];
     }
 
