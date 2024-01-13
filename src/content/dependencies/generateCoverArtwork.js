@@ -80,11 +80,13 @@ export default {
           alt: slots.alt,
           color: slots.color,
           thumb: 'medium',
-          class: 'commentary-art',
           reveal: true,
           link: true,
           square: true,
           lazy: true,
+
+          attributes:
+            {class: 'commentary-art'},
         });
 
       default:

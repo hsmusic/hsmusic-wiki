@@ -388,11 +388,16 @@ export default {
                 html.tag('div', {class: 'content-image'},
                   image.slots({
                     src,
+
                     link: link ?? true,
                     width: width ?? null,
                     height: height ?? null,
                     thumb: slots.thumb,
-                    class: pixelate ? 'pixelate' : null,
+
+                    attributes:
+                      (pixelate
+                        ? {class: 'pixelate'}
+                        : null),
                   })),
             };
           }

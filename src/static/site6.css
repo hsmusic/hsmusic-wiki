@@ -3,6 +3,32 @@
  * no need to re-run upd8.js when tweaking values here. Handy!
  */
 
+/* Squares */
+
+/* This styling is kind of awkwardly placed at the very top. Sorry!
+ * We need to rework what order sets of styles get applied in to be
+ * much more explicit (so that overriding isn't a headache), and
+ * hopefully that can be done through @imports, but it'll take some
+ * reworking and cleaning up.
+ */
+
+.square {
+  position: relative;
+  width: 100%;
+}
+
+.square::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
+
+.square-content {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 /* Layout - Common */
 
 body {
@@ -1061,7 +1087,6 @@ h1 a[href="#additional-names-box"]:hover {
   box-sizing: border-box;
   position: relative;
   height: 100%;
-  padding: 5px;
   overflow: hidden;
 
   background-color: var(--dim-color);
@@ -1092,6 +1117,13 @@ h1 a[href="#additional-names-box"]:hover {
   color: var(--primary-color);
   font-style: oblique;
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.75);
+}
+
+.image-outer-area {
+  width: 100%;
+  height: 100%;
+  padding: 5px;
+  box-sizing: border-box;
 }
 
 .image-link {
@@ -1135,7 +1167,7 @@ img {
     6px -6px 2px -4px white inset;
 }
 
-img.pixelate {
+img.pixelate, .pixelate img {
   image-rendering: crisp-edges;
 }
 
@@ -1210,8 +1242,7 @@ img.pixelate {
   display: none;
 }
 
-.reveal:not(.revealed) .image-container > .image-link,
-.reveal:not(.revealed) .image-container > .image-inner-area {
+.reveal:not(.revealed) .image-outer-area > * {
   box-sizing: border-box;
   border: 1px dotted var(--primary-color);
   border-radius: 6px;
@@ -1222,19 +1253,16 @@ img.pixelate {
   background: var(--deep-color);
 }
 
-.reveal:not(.revealed) .image-container > .image-link:hover,
-.reveal:not(.revealed) .image-container > .image-inner-area:hover {
+.reveal:not(.revealed) .image-outer-area > *:hover {
   border-style: solid;
 }
 
-.reveal:not(.revealed) .image-container > .image-link:hover .image,
-.reveal:not(.revealed) .image-container > .image-inner-area:hover .image {
+.reveal:not(.revealed) .image-outer-area > *:hover .image {
   filter: blur(20px) brightness(0.6);
   opacity: 0.6;
 }
 
-.reveal:not(.revealed) .image-container > .image-link:hover .reveal-interaction,
-.reveal:not(.revealed) .image-container > .image-inner-area:hover .reveal-interaction {
+.reveal:not(.revealed) .image-outer-area > *:hover .reveal-interaction {
   text-decoration-style: solid;
 }
 
@@ -1270,6 +1298,10 @@ img.pixelate {
   border-radius: 2px;
   padding: 5px;
   margin: 10px;
+}
+
+.grid-item .image-container {
+  width: 100%;
 }
 
 .grid-item .image-inner-area {
@@ -1474,6 +1506,9 @@ html[data-url-key="localized.home"] .carousel-container {
 
 .carousel-item .image-container {
   border: none;
+}
+
+.carousel-item .image-outer-area {
   padding: 0;
 }
 
@@ -1488,25 +1523,6 @@ html[data-url-key="localized.home"] .carousel-container {
 .carousel-item:hover {
   filter: brightness(1);
   background: var(--dim-color);
-}
-
-/* Squares */
-
-.square {
-  position: relative;
-  width: 100%;
-}
-
-.square::after {
-  content: "";
-  display: block;
-  padding-bottom: 100%;
-}
-
-.square-content {
-  position: absolute;
-  width: 100%;
-  height: 100%;
 }
 
 /* Info card */
@@ -1766,13 +1782,17 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 
 .content-sticky-heading-cover .image-container {
   border-width: 1px;
-  padding: 3px;
   border-radius: 1.25px;
   box-shadow: none;
 }
 
+.content-sticky-heading-container .image-outer-area {
+  padding: 3px;
+}
+
 .content-sticky-heading-container .image-inner-area {
   border-radius: 1.75px;
+  overflow: hidden;
 }
 
 .content-sticky-heading-cover .image {

@@ -59,10 +59,14 @@ export default {
     lazy: {type: 'boolean', default: false},
     square: {type: 'boolean', default: false},
 
-    class: {type: 'string'},
     alt: {type: 'string'},
     width: {type: 'number'},
     height: {type: 'number'},
+
+    attributes: {
+      type: 'attributes',
+      mutable: false,
+    },
 
     missingSourceContent: {
       type: 'html',
@@ -116,9 +120,6 @@ export default {
       !isMissingImageFile &&
       (typeof slots.link === 'string' || slots.link);
 
-    const customLink =
-      typeof slots.link === 'string';
-
     const willReveal =
       slots.reveal &&
       originalSrc &&
@@ -134,36 +135,6 @@ export default {
       slots.width && {width: slots.width},
       slots.height && {height: slots.height},
     ]);
-
-    const linkAttributes = html.attributes([
-      (customLink
-        ? {href: slots.link}
-        : {href: originalSrc}),
-    ]);
-
-    const containerAttributes = html.attributes();
-
-    if (slots.class) {
-      if (willLink) {
-        linkAttributes.set('class', slots.class);
-      } else {
-        imgAttributes.set('class', slots.class);
-      }
-    }
-
-    if (slots.color) {
-      const colorStyle =
-        relations.colorStyle.slots({
-          color: slots.color,
-          context: 'image-box',
-        });
-
-      if (willLink) {
-        linkAttributes.add(colorStyle);
-      } else {
-        containerAttributes.add(colorStyle);
-      }
-    }
 
     if (!originalSrc || isMissingImageFile) {
       return prepare(
@@ -332,24 +303,15 @@ export default {
       if (willLink) {
         wrapped =
           html.tag('a', {class: 'image-link'},
-            linkAttributes,
+            (typeof slots.link === 'string'
+              ? {href: slots.link}
+              : {href: originalSrc}),
 
             wrapped);
       }
 
       wrapped =
-        html.tag('div', {class: 'image-container'},
-          containerAttributes,
-
-          willLink &&
-            {class: 'has-link'},
-
-          customLink &&
-            {class: 'no-image-preview'},
-
-          !originalSrc &&
-            {class: 'placeholder-image'},
-
+        html.tag('div', {class: 'image-outer-area'},
           wrapped);
 
       if (willReveal) {
@@ -363,14 +325,36 @@ export default {
 
       if (willSquare) {
         wrapped =
-          html.tag('div', {class: 'square'},
-            visibility === 'hidden' &&
-            !willLink &&
-              {class: 'js-hide'},
-
-            html.tag('div', {class: 'square-content'},
-              wrapped));
+          html.tag('div', {class: 'square-content'},
+            wrapped);
       }
+
+      wrapped =
+        html.tag('div', {class: 'image-container'},
+          willLink &&
+            {class: 'has-link'},
+
+          willSquare &&
+            {class: 'square'},
+
+          typeof slots.link === 'string' &&
+            {class: 'no-image-preview'},
+
+          !originalSrc &&
+            {class: 'placeholder-image'},
+
+          visibility === 'hidden' &&
+            {class: 'js-hide'},
+
+          slots.color &&
+            relations.colorStyle.slots({
+              color: slots.color,
+              context: 'image-box',
+            }),
+
+          slots.attributes,
+
+          wrapped);
 
       return wrapped;
     }

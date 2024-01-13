@@ -205,9 +205,7 @@ function getScriptedLinkReferences() {
     document.querySelectorAll('[data-random]');
 
   scriptedLinkInfo.revealLinks =
-    document.querySelectorAll(
-      '.reveal .image-container > .image-link, ' +
-      '.reveal .image-container > .image-inner-area');
+    document.querySelectorAll('.reveal .image-outer-area > *');
 
   scriptedLinkInfo.revealContainers =
     Array.from(scriptedLinkInfo.revealLinks)
