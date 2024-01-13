@@ -7,9 +7,9 @@ export default {
       mutable: false,
     },
 
-    tooltipContent: {
+    tooltip: {
       type: 'html',
-      mutable: false,
+      mutable: true,
     },
 
     datetime: {type: 'string'},
@@ -19,7 +19,7 @@ export default {
     html.tag('span', {class: 'datetimestamp'},
       {[html.joinChildren]: ''},
 
-      slots.tooltipContent &&
+      !html.isBlank(slots.tooltip) &&
         {class: 'has-tooltip'},
 
       [
@@ -27,9 +27,8 @@ export default {
           {datetime: slots.datetime},
           slots.mainContent),
 
-        slots.tooltipContent &&
-          html.tag('span', {class: ['tooltip', 'datetimestamp-tooltip']},
-            html.tag('span', {class: 'tooltip-content'},
-              slots.tooltipContent)),
+        slots.tooltip?.slots({
+          attributes: [{class: 'datetimestamp-tooltip'}],
+        }),
       ]),
 };

@@ -1,12 +1,21 @@
 export default {
-  contentDependencies: ['generateDatetimestampTemplate'],
+  contentDependencies: [
+    'generateDatetimestampTemplate',
+    'generateTooltip',
+  ],
+
   extraDependencies: ['html', 'language'],
 
   data: (date) =>
     ({date}),
 
-  relations: (relation) =>
-    ({template: relation('generateDatetimestampTemplate')}),
+  relations: (relation) => ({
+    template:
+      relation('generateDatetimestampTemplate'),
+
+    tooltip:
+      relation('generateTooltip'),
+  }),
 
   slots: {
     style: {
@@ -30,10 +39,13 @@ export default {
           ? data.date.getFullYear().toString()
           : null),
 
-      tooltipContent:
+      tooltip:
         slots.tooltip &&
         slots.style === 'year' &&
-          language.formatDate(data.date),
+          relations.tooltip.slots({
+            content:
+              language.formatDate(data.date),
+          }),
 
       datetime:
         data.date.toISOString(),

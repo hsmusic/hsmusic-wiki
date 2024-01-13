@@ -2,6 +2,7 @@ export default {
   contentDependencies: [
     'generateAbsoluteDatetimestamp',
     'generateDatetimestampTemplate',
+    'generateTooltip',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -11,9 +12,16 @@ export default {
       ? {equal: true, date: currentDate}
       : {equal: false, currentDate, referenceDate}),
 
-  relations: (relation, currentDate) =>
-    ({template: relation('generateDatetimestampTemplate'),
-      fallback: relation('generateAbsoluteDatetimestamp', currentDate)}),
+  relations: (relation, currentDate) => ({
+    template:
+      relation('generateDatetimestampTemplate'),
+
+    fallback:
+      relation('generateAbsoluteDatetimestamp', currentDate),
+
+    tooltip:
+      relation('generateTooltip'),
+  }),
 
   slots: {
     style: {
@@ -43,12 +51,15 @@ export default {
           ? data.currentDate.getFullYear().toString()
           : null),
 
-      tooltipContent:
+      tooltip:
         slots.tooltip &&
-          language.formatRelativeDate(data.currentDate, data.referenceDate, {
-            considerRoundingDays: true,
-            approximate: true,
-            absolute: slots.style === 'year',
+          relations.tooltip.slots({
+            content:
+              language.formatRelativeDate(data.currentDate, data.referenceDate, {
+                considerRoundingDays: true,
+                approximate: true,
+                absolute: slots.style === 'year',
+              }),
           }),
 
       datetime:
