@@ -661,7 +661,10 @@ p .current {
     0 0 12px 12px #00000080;
 
   border-radius: 0 0 4px 4px;
-  overflow: hidden;
+  background: var(--bg-black-color);
+
+  -webkit-backdrop-filter: blur(3px);
+          backdrop-filter: blur(3px);
 }
 
 #cover-art-container:has(.image-details),
@@ -691,11 +694,7 @@ p .current {
   padding: 6px 9px 4px 9px;
   margin-top: 0;
   margin-bottom: 0;
-  background: var(--bg-black-color);
   border-top: 1px dashed var(--dim-color);
-
-  -webkit-backdrop-filter: blur(3px);
-          backdrop-filter: blur(3px);
 }
 
 ul.image-details li {
