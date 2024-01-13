@@ -15,7 +15,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], color: '#abcdef', thumb: 'medium', reveal: true, link: true, square: true }]
 <ul class="image-details">
     <li><a href="tag/damara/">Damara</a></li>
     <li><a href="tag/cronus/">Cronus</a></li>
@@ -26,7 +26,7 @@ exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverAr
 exports[`test/snapshot/generateTrackCoverArtwork.js > TAP > generateTrackCoverArtwork (snapshot) > display: primary - unique art 1`] = `
 [mocked: image
  args: [ [ { name: 'Bees', directory: 'bees', isContentWarning: false } ] ]
- slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], color: '#f28514', thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+ slots: { path: [ 'media.trackCover', 'bee-forus-seatbelt-safebee', 'beesmp3', 'jpg' ], color: '#f28514', thumb: 'medium', reveal: true, link: true, square: true }]
 <ul class="image-details"><li><a href="tag/bees/">Bees</a></li></ul>
 `
 

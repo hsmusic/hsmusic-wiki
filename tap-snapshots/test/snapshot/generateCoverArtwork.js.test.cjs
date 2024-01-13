@@ -15,7 +15,7 @@ exports[`test/snapshot/generateCoverArtwork.js > TAP > generateCoverArtwork (sna
      { name: 'creepy crawlies', isContentWarning: true }
    ]
  ]
- slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', id: 'cover-art', reveal: true, link: true, square: true }]
+ slots: { path: [ 'media.albumCover', 'bee-forus-seatbelt-safebee', 'png' ], thumb: 'medium', reveal: true, link: true, square: true }]
 <ul class="image-details">
     <li><a href="tag/damara/">Damara</a></li>
     <li><a href="tag/cronus/">Cronus</a></li>

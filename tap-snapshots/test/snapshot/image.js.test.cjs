@@ -24,18 +24,6 @@ exports[`test/snapshot/image.js > TAP > image (snapshot) > content warnings via 
 </div>
 `
 
-exports[`test/snapshot/image.js > TAP > image (snapshot) > id with link 1`] = `
-<div class="image-container has-link"><a class="image-link" href="foobar" id="banana"><div class="image-inner-area"><img class="image" src="foobar"></div></a></div>
-`
-
-exports[`test/snapshot/image.js > TAP > image (snapshot) > id with square 1`] = `
-<div class="square"><div class="square-content"><div class="image-container"><div class="image-inner-area"><img class="image" id="banana" src="foobar"></div></div></div></div>
-`
-
-exports[`test/snapshot/image.js > TAP > image (snapshot) > id without link 1`] = `
-<div class="image-container"><div class="image-inner-area"><img class="image" id="banana" src="foobar"></div></div>
-`
-
 exports[`test/snapshot/image.js > TAP > image (snapshot) > lazy with square 1`] = `
 <noscript><div class="square"><div class="square-content"><div class="image-container"><div class="image-inner-area"><img class="image" src="foobar"></div></div></div></div></noscript>
 <div class="square js-hide"><div class="square-content"><div class="image-container"><div class="image-inner-area"><img class="image lazy" data-original="foobar"></div></div></div></div>

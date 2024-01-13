@@ -659,7 +659,7 @@ p .current {
   border-top-color: var(--deep-color);
 }
 
-#cover-art .image {
+#cover-art-container .image {
   display: block;
   width: 100%;
   height: 100%;

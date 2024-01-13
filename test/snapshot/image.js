@@ -38,29 +38,6 @@ testContentFunctions(t, 'image (snapshot)', async (t, evaluate) => {
     },
   });
 
-  quickSnapshot('id without link', {
-    slots: {
-      src: 'foobar',
-      id: 'banana',
-    },
-  });
-
-  quickSnapshot('id with link', {
-    slots: {
-      src: 'foobar',
-      link: true,
-      id: 'banana',
-    },
-  });
-
-  quickSnapshot('id with square', {
-    slots: {
-      src: 'foobar',
-      square: true,
-      id: 'banana',
-    },
-  });
-
   quickSnapshot('width & height', {
     slots: {
       src: 'foobar',

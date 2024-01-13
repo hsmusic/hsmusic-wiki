@@ -59,7 +59,6 @@ export default {
     lazy: {type: 'boolean', default: false},
     square: {type: 'boolean', default: false},
 
-    id: {type: 'string'},
     class: {type: 'string'},
     alt: {type: 'string'},
     width: {type: 'number'},
@@ -143,14 +142,6 @@ export default {
     ]);
 
     const containerAttributes = html.attributes();
-
-    if (slots.id) {
-      if (willLink) {
-        linkAttributes.set('id', slots.id);
-      } else {
-        imgAttributes.set('id', slots.id);
-      }
-    }
 
     if (slots.class) {
       if (willLink) {

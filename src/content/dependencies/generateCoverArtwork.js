@@ -50,7 +50,6 @@ export default {
             alt: slots.alt,
             color: slots.color,
             thumb: 'medium',
-            id: 'cover-art',
             reveal: true,
             link: true,
             square: true,
