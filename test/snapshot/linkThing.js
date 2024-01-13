@@ -58,6 +58,7 @@ testContentFunctions(t, 'linkThing (snapshot)', async (t, evaluate) => {
       {slots: {color: false}},
       {slots: {color: true}},
       {slots: {color: '#aaccff'}},
+      {slots: {color: '#aaccff', tooltipStyle: 'wiki'}},
     ],
   });
 

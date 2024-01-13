@@ -13,6 +13,7 @@ exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > color 1`] = `
 <a href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
 <a style="--primary-color: #38f43d" href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
 <a style="--primary-color: #aaccff" href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a>
+<span style="--primary-color: #aaccff" class="text-with-tooltip"><a href="track/showtime-piano-refrain/">Showtime (Piano Refrain)</a><span class="tooltip thing-name-tooltip"><span class="tooltip-content">Showtime (Piano Refrain)</span></span></span>
 `
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > nested links in content stripped 1`] = `

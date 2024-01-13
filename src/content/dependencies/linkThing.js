@@ -76,10 +76,11 @@ export default {
   },
 
   generate(data, relations, slots, {html, language}) {
-    const {attributes} = slots;
-
     const path =
       slots.path ?? data.path;
+
+    const linkAttributes = slots.attributes;
+    const wrapperAttributes = html.attributes();
 
     const showShortName =
       (slots.preferShortName
@@ -104,7 +105,7 @@ export default {
         });
 
     if (slots.tooltipStyle === 'browser') {
-      attributes.add('title', data.name);
+      linkAttributes.add('title', data.name);
     }
 
     const content =
@@ -121,18 +122,24 @@ export default {
         colorStyle.setSlot('color', slots.color);
       }
 
-      attributes.add(colorStyle);
+      if (showWikiTooltip) {
+        wrapperAttributes.add(colorStyle);
+      } else {
+        linkAttributes.add(colorStyle);
+      }
     }
 
     return relations.textWithTooltip.slots({
+      attributes: wrapperAttributes,
+
       text:
         relations.linkTemplate.slots({
           path: slots.anchor ? [] : path,
           href: slots.anchor ? '' : null,
-          content,
-          attributes,
+          attributes: linkAttributes,
           hash: slots.hash,
           linkless: slots.linkless,
+          content,
         }),
 
       tooltip:
