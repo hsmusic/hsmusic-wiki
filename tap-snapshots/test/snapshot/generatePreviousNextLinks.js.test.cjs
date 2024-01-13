@@ -6,13 +6,13 @@
  */
 'use strict'
 exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNextLinks (snapshot) > basic behavior 1`] = `
-previous: { tooltip: true, color: false, attributes: { id: 'previous-button' }, content: Tag (no name, 1 items) }
-next: { tooltip: true, color: false, attributes: { id: 'next-button' }, content: Tag (no name, 1 items) }
+previous: { tooltipStyle: 'browser', color: false, attributes: { id: 'previous-button' }, content: Tag (no name, 1 items) }
+next: { tooltipStyle: 'browser', color: false, attributes: { id: 'next-button' }, content: Tag (no name, 1 items) }
 `
 
 exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNextLinks (snapshot) > disable id 1`] = `
-previous: { tooltip: true, color: false, attributes: { id: false }, content: Tag (no name, 1 items) }
-next: { tooltip: true, color: false, attributes: { id: false }, content: Tag (no name, 1 items) }
+previous: { tooltipStyle: 'browser', color: false, attributes: { id: false }, content: Tag (no name, 1 items) }
+next: { tooltipStyle: 'browser', color: false, attributes: { id: false }, content: Tag (no name, 1 items) }
 `
 
 exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNextLinks (snapshot) > neither link present 1`] = `
@@ -20,9 +20,9 @@ exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNext
 `
 
 exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNextLinks (snapshot) > next missing 1`] = `
-previous: { tooltip: true, color: false, attributes: { id: 'previous-button' }, content: Tag (no name, 1 items) }
+previous: { tooltipStyle: 'browser', color: false, attributes: { id: 'previous-button' }, content: Tag (no name, 1 items) }
 `
 
 exports[`test/snapshot/generatePreviousNextLinks.js > TAP > generatePreviousNextLinks (snapshot) > previous missing 1`] = `
-next: { tooltip: true, color: false, attributes: { id: 'next-button' }, content: Tag (no name, 1 items) }
+next: { tooltipStyle: 'browser', color: false, attributes: { id: 'next-button' }, content: Tag (no name, 1 items) }
 `

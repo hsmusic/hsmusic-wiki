@@ -34,10 +34,9 @@ testContentFunctions(t, 'linkThing (snapshot)', async (t, evaluate) => {
       name: 'Beyond Canon',
     }],
     multiple: [
-      {slots: {tooltip: false}},
-      {slots: {tooltip: true}},
-      {slots: {tooltip: true, content: 'Next'}},
-      {slots: {tooltip: 'Apple', content: 'Banana'}},
+      {slots: {tooltipStyle: 'none'}},
+      {slots: {tooltipStyle: 'browser'}},
+      {slots: {tooltipStyle: 'browser', content: 'Next'}},
       {slots: {content: 'Banana'}},
     ],
   });

@@ -36,9 +36,9 @@ export default {
       default: false,
     },
 
-    tooltip: {
-      validate: v => v.anyOf(v.isBoolean, v.isHTML),
-      default: false,
+    tooltipStyle: {
+      validate: v => v.is('none', 'browser'),
+      default: 'none',
     },
 
     color: {
@@ -69,10 +69,19 @@ export default {
     const path =
       slots.path ?? data.path;
 
-    const name =
+    const showShortName =
       (slots.preferShortName
-        ? data.nameShort ?? data.name ?? null
-        : data.name ?? null);
+        ? data.nameShort && data.nameShort !== data.name
+        : false);
+
+    const name =
+      (showShortName
+        ? data.nameShort
+        : data.name);
+
+    if (slots.tooltipStyle === 'browser') {
+      attributes.add('title', data.name);
+    }
 
     const content =
       (html.isBlank(slots.content)
@@ -91,19 +100,11 @@ export default {
       attributes.add(colorStyle);
     }
 
-    let tooltip = null;
-    if (slots.tooltip === true) {
-      tooltip = name;
-    } else if (typeof slots.tooltip === 'string') {
-      tooltip = slots.tooltip;
-    }
-
     return relations.linkTemplate
       .slots({
         path: slots.anchor ? [] : path,
         href: slots.anchor ? '' : null,
         content,
-        tooltip,
         attributes,
         hash: slots.hash,
         linkless: slots.linkless,

@@ -28,7 +28,7 @@ export default {
     if (!html.isBlank(slots.previousLink)) {
       previousNext.push(
         slots.previousLink.slots({
-          tooltip: true,
+          tooltipStyle: 'browser',
           color: false,
           attributes: {id: slots.id && 'previous-button'},
           content: language.$('misc.nav.previous'),
@@ -38,7 +38,7 @@ export default {
     if (!html.isBlank(slots.nextLink)) {
       previousNext.push(
         slots.nextLink.slots({
-          tooltip: true,
+          tooltipStyle: 'browser',
           color: false,
           attributes: {id: slots.id && 'next-button'},
           content: language.$('misc.nav.next'),

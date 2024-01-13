@@ -32,8 +32,7 @@ exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > tags in name 
 
 exports[`test/snapshot/linkThing.js > TAP > linkThing (snapshot) > tooltip & content 1`] = `
 <a href="album/beyond-canon/">Beyond Canon</a>
-<a href="album/beyond-canon/" title="Beyond Canon">Beyond Canon</a>
-<a href="album/beyond-canon/" title="Beyond Canon">Next</a>
-<a href="album/beyond-canon/" title="Apple">Banana</a>
+<a title="Beyond Canon" href="album/beyond-canon/">Beyond Canon</a>
+<a title="Beyond Canon" href="album/beyond-canon/">Next</a>
 <a href="album/beyond-canon/">Banana</a>
 `

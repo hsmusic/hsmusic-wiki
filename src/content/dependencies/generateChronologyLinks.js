@@ -61,13 +61,13 @@ export default {
               html.tag('span', {class: 'buttons'},
                 language.formatUnitList([
                   previousLink?.slots({
-                    tooltip: true,
+                    tooltipStyle: 'browser',
                     color: false,
                     content: language.$('misc.nav.previous'),
                   }),
 
                   nextLink?.slots({
-                    tooltip: true,
+                    tooltipStyle: 'browser',
                     color: false,
                     content: language.$('misc.nav.next'),
                   }),

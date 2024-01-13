@@ -9,11 +9,11 @@ exports[`test/snapshot/generateAlbumSecondaryNav.js > TAP > generateAlbumSeconda
 <nav id="secondary-nav" class="nav-links-groups">
     <span style="--primary-color: #abcdef">
         <a href="group/vcg/">VCG</a>
-        (<a href="album/first/" title="First">Previous</a>, <a href="album/last/" title="Last">Next</a>)
+        (<a title="First" href="album/first/">Previous</a>, <a title="Last" href="album/last/">Next</a>)
     </span>
     <span style="--primary-color: #123456">
         <a href="group/bepis/">Bepis</a>
-        (<a href="album/second/" title="Second">Next</a>)
+        (<a title="Second" href="album/second/">Next</a>)
     </span>
 </nav>
 `
