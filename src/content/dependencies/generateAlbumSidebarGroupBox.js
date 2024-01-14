@@ -1,4 +1,5 @@
-import {empty} from '#sugar';
+import {atOffset, empty} from '#sugar';
+import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -10,7 +11,33 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  relations(relation, album, group) {
+  query(album, group) {
+    const query = {};
+
+    if (album.date) {
+      const albums =
+        group.albums.filter(album => album.date);
+
+      // Sort by latest first. This matches the sorting order used on group
+      // gallery pages, ensuring that previous/next matches moving up/down
+      // the gallery. Note that this makes the index offsets "backwards"
+      // compared to how latest-last chronological lists are accessed.
+      sortChronologically(albums, {latestFirst: true});
+
+      const index =
+        albums.indexOf(album);
+
+      query.previousAlbum =
+        atOffset(albums, index, +1);
+
+      query.nextAlbum =
+        atOffset(albums, index, -1);
+    }
+
+    return query;
+  },
+
+  relations(relation, query, album, group) {
     const relations = {};
 
     relations.groupLink =
@@ -25,21 +52,14 @@ export default {
         relation('transformContent', group.descriptionShort);
     }
 
-    if (album.date) {
-      const albums = group.albums.filter(album => album.date);
-      const index = albums.indexOf(album);
-      const previousAlbum = (index > 0) && albums[index - 1];
-      const nextAlbum = (index < albums.length - 1) && albums[index + 1];
+    if (query.previousAlbum) {
+      relations.previousAlbumLink =
+        relation('linkAlbum', query.previousAlbum);
+    }
 
-      if (previousAlbum) {
-        relations.previousAlbumLink =
-          relation('linkAlbum', previousAlbum);
-      }
-
-      if (nextAlbum) {
-        relations.nextAlbumLink =
-          relation('linkAlbum', nextAlbum);
-      }
+    if (query.nextAlbum) {
+      relations.nextAlbumLink =
+        relation('linkAlbum', query.nextAlbum);
     }
 
     return relations;
