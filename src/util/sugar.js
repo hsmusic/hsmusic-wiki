@@ -60,6 +60,34 @@ export function repeat(times, array) {
   return out;
 }
 
+// Gets the item at an index relative to another index.
+export function atOffset(array, index, offset, {
+  wrap = false,
+  valuePastEdge = null,
+} = {}) {
+  if (index === -1) {
+    return valuePastEdge;
+  }
+
+  if (offset === 0) {
+    return array[index];
+  }
+
+  if (wrap) {
+    return array[(index + offset) % array.length];
+  }
+
+  if (offset > 0 && index + offset > array.length - 1) {
+    return valuePastEdge;
+  }
+
+  if (offset < 0 && index + offset < 0) {
+    return valuePastEdge;
+  }
+
+  return array[index + offset];
+}
+
 // Sums the values in an array, optionally taking a function which maps each
 // item to a number (handy for accessing a certain property on an array of like
 // objects). This also coalesces null values to zero, so if the mapping function
