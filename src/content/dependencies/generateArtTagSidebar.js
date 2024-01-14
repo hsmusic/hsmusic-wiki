@@ -56,8 +56,15 @@ export default {
         .map(ancestorArtTag => ancestorArtTag.name),
   }),
 
-  generate: (data, relations, {html, language}) =>
-    relations.sidebar.slots({
+  generate(data, relations, {html, language}) {
+    if (
+      empty(relations.directDescendantArtTagLinks) &&
+      empty(relations.furthestAncestorArtTagMapLists)
+    ) {
+      return relations.sidebar;
+    }
+
+    return relations.sidebar.slots({
       boxes: [
         relations.sidebarBox.slots({
           content: [
@@ -96,5 +103,6 @@ export default {
           ],
         }),
       ],
-    }),
+    });
+  },
 };
