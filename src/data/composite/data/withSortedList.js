@@ -102,7 +102,7 @@ export default templateCompositeFrom({
               if (empty(accumulator)) {
                 accumulator.push(0);
               } else {
-                const last = accumulator[accumulator.length - 1];
+                const last = accumulator.at(-1);
                 if (collapseEqual) {
                   accumulator.push(last);
                 } else {

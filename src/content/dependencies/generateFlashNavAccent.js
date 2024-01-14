@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {atOffset, empty} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -19,17 +19,14 @@ export default {
       sprawl.flashActData
         .flatMap(act => act.flashes);
 
-    const index = flashes.indexOf(flash);
+    const index =
+      flashes.indexOf(flash);
 
     const previousFlash =
-      (index > 0
-        ? flashes[index - 1]
-        : null);
+      atOffset(flashes, index, -1);
 
     const nextFlash =
-      (index < flashes.length - 1
-        ? flashes[index + 1]
-        : null);
+      atOffset(flashes, index, +1);
 
     return {previousFlash, nextFlash};
   },

@@ -1,3 +1,4 @@
+import {atOffset} from '#sugar';
 import {sortChronologically} from '#wiki-data';
 
 export default {
@@ -22,14 +23,10 @@ export default {
     const index = entries.indexOf(newsEntry);
 
     const previousEntry =
-      (index > 0
-        ? entries[index - 1]
-        : null);
+      atOffset(entries, index, -1);
 
     const nextEntry =
-      (index < entries.length - 1
-        ? entries[index + 1]
-        : null);
+      atOffset(entries, index, +1);
 
     return {previousEntry, nextEntry};
   },

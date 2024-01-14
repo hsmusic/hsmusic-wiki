@@ -287,7 +287,7 @@ export function postprocessImages(inputNodes) {
 
   let atStartOfLine = true;
 
-  const lastNode = inputNodes[inputNodes.length - 1];
+  const lastNode = inputNodes.at(-1);
 
   for (const node of inputNodes) {
     if (node.type === 'tag') {

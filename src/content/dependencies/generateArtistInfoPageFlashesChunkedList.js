@@ -71,7 +71,7 @@ export default {
         query.chunks.map(({chunk}) => chunk[0].flash.date ?? null),
 
       lastDates:
-        query.chunks.map(({chunk}) => chunk[chunk.length - 1].flash.date ?? null),
+        query.chunks.map(({chunk}) => chunk.at(-1).flash.date ?? null),
 
       itemContributions:
         query.chunks.map(({chunk}) =>

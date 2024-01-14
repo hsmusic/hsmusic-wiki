@@ -1,3 +1,5 @@
+import {atOffset} from '#sugar';
+
 export default {
   contentDependencies: [
     'generateColorStyleAttribute',
@@ -23,14 +25,10 @@ export default {
 
     return {
       previousGroup:
-        (index > 0
-          ? groups[index - 1]
-          : null),
+        atOffset(groups, index, -1),
 
       nextGroup:
-        (index < groups.length - 1
-          ? groups[index + 1]
-          : null),
+        atOffset(groups, index, +1),
     };
   },
 

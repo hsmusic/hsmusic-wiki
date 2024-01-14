@@ -17,6 +17,7 @@ import T, {Thing} from '#things';
 
 import {
   annotateErrorWithFile,
+  atOffset,
   conditionallySuppressError,
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
@@ -1237,14 +1238,8 @@ export async function loadAndProcessDataDocuments({dataPath}) {
                   start,
                   end,
                   count: end - start + 1,
-                  previous:
-                    (start > 0
-                      ? documents[start - 1]
-                      : null),
-                  next:
-                    (end < documents.length - 1
-                      ? documents[end + 1]
-                      : null),
+                  previous: atOffset(documents, start, -1),
+                  next: atOffset(documents, end, +1),
                 }));
 
             for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
