@@ -432,6 +432,19 @@ export default {
               link.setSlot('preferShortName', slots.preferShortLinkNames);
             }
 
+            // TODO: The same, the same.
+            let hasTooltipStyleSlot;
+            try {
+              link.getSlotDescription('tooltipStyle');
+              hasTooltipStyleSlot = true;
+            } catch (error) {
+              hasTooltipStyleSlot = false;
+            }
+
+            if (hasTooltipStyleSlot) {
+              link.setSlot('tooltipStyle', 'none');
+            }
+
             return {type: 'link', data: link};
           }
 
