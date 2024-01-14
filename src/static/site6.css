@@ -565,6 +565,11 @@ li:not(:first-child:last-child) .tooltip,
 .thing-name-tooltip {
   padding: 3px 4px 2px 2px;
   left: -6px !important;
+
+  /* Terrifying?
+   * https://stackoverflow.com/a/64424759/4633828
+   */
+  margin-right: -120px;
 }
 
 .icons-tooltip .tooltip-content {
@@ -584,8 +589,6 @@ li:not(:first-child:last-child) .tooltip,
 
 .thing-name-tooltip .tooltip-content {
   padding: 3px 4.5px;
-  white-space: nowrap;
-  max-width: 120px;
 }
 
 .icons {
