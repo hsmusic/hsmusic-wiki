@@ -49,40 +49,49 @@ export default {
         .map(ancestorArtTag => ancestorArtTag.name),
   }),
 
-  generate: (data, relations, {html, language}) => ({
-    leftSidebarContent: [
-      html.tag('h1',
-        relations.artTagLink),
+  generate(data, relations, {html, language}) {
+    if (
+      empty(relations.directDescendantArtTagLinks) &&
+      empty(relations.furthestAncestorArtTagMapLists)
+    ) {
+      return {};
+    }
 
-      !empty(relations.directDescendantArtTagLinks) &&
-        html.tag('details', {class: 'current', open: true}, [
-          html.tag('summary',
-            html.tag('span', {class: 'group-name'},
-              language.sanitize(data.name))),
+    return {
+      leftSidebarContent: [
+        html.tag('h1',
+          relations.artTagLink),
 
-          html.tag('ul',
-            relations.directDescendantArtTagLinks
-              .map(link => html.tag('li', link))),
-        ]),
+        !empty(relations.directDescendantArtTagLinks) &&
+          html.tag('details', {class: 'current', open: true}, [
+            html.tag('summary',
+              html.tag('span', {class: 'group-name'},
+                language.sanitize(data.name))),
 
-      stitchArrays({
-        name: data.furthestAncestorArtTagNames,
-        list: relations.furthestAncestorArtTagMapLists,
-      }).map(({name, list}) =>
-          html.tag('details',
-            {
-              class: 'has-tree-list',
-              open:
-                empty(relations.directDescendantArtTagLinks) &&
-                relations.furthestAncestorArtTagMapLists.length === 1,
-            },
-            [
-              html.tag('summary',
-                html.tag('span', {class: 'group-name'},
-                  language.sanitize(name))),
+            html.tag('ul',
+              relations.directDescendantArtTagLinks
+                .map(link => html.tag('li', link))),
+          ]),
 
-              list,
-            ])),
-    ],
-  }),
+        stitchArrays({
+          name: data.furthestAncestorArtTagNames,
+          list: relations.furthestAncestorArtTagMapLists,
+        }).map(({name, list}) =>
+            html.tag('details',
+              {
+                class: 'has-tree-list',
+                open:
+                  empty(relations.directDescendantArtTagLinks) &&
+                  relations.furthestAncestorArtTagMapLists.length === 1,
+              },
+              [
+                html.tag('summary',
+                  html.tag('span', {class: 'group-name'},
+                    language.sanitize(name))),
+
+                list,
+              ])),
+      ],
+    };
+  },
 };
