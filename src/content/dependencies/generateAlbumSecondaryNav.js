@@ -1,4 +1,5 @@
-import {stitchArrays} from '#sugar';
+import {atOffset, stitchArrays} from '#sugar';
+import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -15,24 +16,37 @@ export default {
   query(album) {
     const query = {};
 
+    query.groups =
+      album.groups;
+
     if (album.date) {
-      query.adjacentGroupInfo =
-        album.groups.map(group => {
-          const albums = group.albums.filter(album => album.date);
-          const index = albums.indexOf(album);
+      // Sort by latest first. This matches the sorting order used on group
+      // gallery pages, ensuring that previous/next matches moving up/down
+      // the gallery. Note that this makes the index offsets "backwards"
+      // compared to how latest-last chronological lists are accessed.
+      const groupAlbums =
+        query.groups.map(group =>
+          sortChronologically(
+            group.albums.filter(album => album.date),
+            {latestFirst: true}));
 
-          return {
-            previousAlbum:
-              (index > 0
-                ? albums[index - 1]
-                : null),
+      const groupCurrentIndex =
+        groupAlbums.map(albums =>
+          albums.indexOf(album));
 
-            nextAlbum:
-              (index < albums.length - 1
-                ? albums[index + 1]
-                : null),
-          };
-        });
+      query.groupPreviousAlbum =
+        stitchArrays({
+          albums: groupAlbums,
+          index: groupCurrentIndex,
+        }).map(({albums, index}) =>
+            atOffset(albums, index, +1));
+
+      query.groupNextAlbum =
+        stitchArrays({
+          albums: groupAlbums,
+          index: groupCurrentIndex,
+        }).map(({albums, index}) =>
+            atOffset(albums, index, -1));
     }
 
     return query;
@@ -52,27 +66,27 @@ export default {
       album.groups
         .map(group => relation('generateColorStyleAttribute', group.color));
 
-    if (query.adjacentGroupInfo) {
+    if (album.date) {
       relations.previousNextLinks =
-        query.adjacentGroupInfo
-          .map(({previousAlbum, nextAlbum}) =>
+        stitchArrays({
+          previousAlbum: query.groupPreviousAlbum,
+          nextAlbum: query.groupNextAlbum
+        }).map(({previousAlbum, nextAlbum}) =>
             (previousAlbum || nextAlbum
               ? relation('generatePreviousNextLinks')
               : null));
 
       relations.previousAlbumLinks =
-        query.adjacentGroupInfo
-          .map(({previousAlbum}) =>
-            (previousAlbum
-              ? relation('linkAlbumDynamically', previousAlbum)
-              : null));
+        query.groupPreviousAlbum.map(previousAlbum =>
+          (previousAlbum
+            ? relation('linkAlbumDynamically', previousAlbum)
+            : null));
 
       relations.nextAlbumLinks =
-        query.adjacentGroupInfo
-          .map(({nextAlbum}) =>
-            (nextAlbum
-              ? relation('linkAlbumDynamically', nextAlbum)
-              : null));
+        query.groupNextAlbum.map(nextAlbum =>
+          (nextAlbum
+            ? relation('linkAlbumDynamically', nextAlbum)
+            : null));
     }
 
     return relations;
