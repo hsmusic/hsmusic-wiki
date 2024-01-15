@@ -94,7 +94,8 @@ export default {
 
     const showWikiTooltip =
       (slots.tooltipStyle === 'auto'
-        ? showShortName
+        ? !html.isBlank(slots.content) ||
+          showShortName
         : slots.tooltipStyle === 'wiki');
 
     const wikiTooltip =

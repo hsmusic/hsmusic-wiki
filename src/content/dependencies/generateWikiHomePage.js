@@ -96,6 +96,7 @@ export default {
                 content.slots({
                   mode: 'single-link',
                   preferShortLinkNames: true,
+                  linkTooltipStyle: 'none',
                 }),
             }))
           ?? []),

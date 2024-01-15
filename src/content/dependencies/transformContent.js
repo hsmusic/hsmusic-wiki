@@ -337,6 +337,11 @@ export default {
       default: false,
     },
 
+    linkTooltipStyle: {
+      validate: v => v.is('none', 'auto', 'browser', 'wiki'),
+      default: 'auto',
+    },
+
     thumb: {
       validate: v => v.is('small', 'medium', 'large'),
       default: 'large',
@@ -442,7 +447,7 @@ export default {
             }
 
             if (hasTooltipStyleSlot) {
-              link.setSlot('tooltipStyle', 'none');
+              link.setSlot('tooltipStyle', slots.linkTooltipStyle);
             }
 
             return {type: 'link', data: link};
