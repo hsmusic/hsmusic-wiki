@@ -1783,6 +1783,15 @@ export function filterReferenceErrors(wikiData) {
 
                 writeProperty = false;
                 break;
+
+              case '_contrib':
+                // Don't write out contributions - these'll be filtered out
+                // for content and data purposes automatically, and they're
+                // handy to keep around when update values get checked for
+                // art tags below. (Possibly no reference-related properties
+                // need writing, humm...)
+                writeProperty = false;
+                break;
             }
 
             if (value === undefined) {
