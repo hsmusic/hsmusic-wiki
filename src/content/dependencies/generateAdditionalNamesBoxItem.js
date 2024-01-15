@@ -53,7 +53,8 @@ export default {
             trackLink: relations.trackLinks,
             albumName: data.albumNames,
           }).map(({trackLink, albumName}) =>
-              trackLink.slot('content', albumName)));
+              trackLink.slot('content',
+                language.sanitize(albumName))));
     }
 
     if (accentParts.length > 2) {
