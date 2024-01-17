@@ -1051,7 +1051,7 @@ async function main() {
         // Needed for sorting
         'date', 'tracks',
         // Needed for computing page paths
-        'commentary',
+        'commentary', 'coverArtistContribs',
       ]),
 
       artTagData: new Set([
@@ -1088,7 +1088,7 @@ async function main() {
         // Needed for sorting
         'album', 'date',
         // Needed for computing page paths
-        'commentary',
+        'commentary', 'coverArtistContribs',
       ]),
     };
 
