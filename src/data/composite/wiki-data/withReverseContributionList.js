@@ -4,12 +4,22 @@
 // up subsequent similar accesses. Reverse contribution lists are the most
 // costly in live-dev-server, but we intend to expand the impelemntation here
 // to reverse reference lists in general later on.
+//
+// This has absolutely not been rigorously tested with altering properties of
+// data objects in a wiki data array which is reused. If a new wiki data array
+// is used, a fresh cache will always be created.
 
 import {input, templateCompositeFrom} from '#composite';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 
 import inputWikiData from './inputWikiData.js';
+
+// Mapping of reference list property to WeakMap.
+// Each WeakMap maps a wiki data array to another weak map,
+// which in turn maps each referenced thing to an array of
+// things referencing it.
+const caches = new Map();
 
 export default templateCompositeFrom({
   annotation: `withReverseContributionList`,
@@ -35,11 +45,35 @@ export default templateCompositeFrom({
         [input.myself()]: myself,
         [input('data')]: data,
         [input('list')]: list,
-      }) =>
-        continuation({
+      }) => {
+        if (!caches.has(list)) {
+          caches.set(list, new WeakMap());
+        }
+
+        const cache = caches.get(list);
+
+        if (!cache.has(data)) {
+          const cacheRecord = new WeakMap();
+
+          for (const referencingThing of data) {
+            const referenceList = referencingThing[list];
+            for (const {who: referencedThing} of referenceList) {
+              if (cacheRecord.has(referencedThing)) {
+                cacheRecord.get(referencedThing).push(referencingThing);
+              } else {
+                cacheRecord.set(referencedThing, [referencingThing]);
+              }
+            }
+          }
+
+          cache.set(data, cacheRecord);
+        }
+
+        return continuation({
           ['#reverseContributionList']:
-            data.filter(thing => thing[list].some(({who}) => who === myself)),
-        }),
+            cache.get(data).get(myself) ?? [],
+        });
+      },
     },
   ],
 });
