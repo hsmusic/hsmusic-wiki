@@ -1,9 +1,9 @@
-// Analogous implementation for withReverseReferenceList, but contributions.
+// Analogous implementation for withReverseReferenceList, for contributions.
+// This is all duplicate code and both should be ported to the same underlying
+// data form later on.
 //
 // This implementation uses a global cache (via WeakMap) to attempt to speed
-// up subsequent similar accesses. Reverse contribution lists are the most
-// costly in live-dev-server, but we intend to expand the impelemntation here
-// to reverse reference lists in general later on.
+// up subsequent similar accesses.
 //
 // This has absolutely not been rigorously tested with altering properties of
 // data objects in a wiki data array which is reused. If a new wiki data array
@@ -57,6 +57,10 @@ export default templateCompositeFrom({
 
           for (const referencingThing of data) {
             const referenceList = referencingThing[list];
+
+            // Destructuring {who} is the only unique part of the
+            // withReverseContributionList implementation, compared to
+            // withReverseReferneceList.
             for (const {who: referencedThing} of referenceList) {
               if (cacheRecord.has(referencedThing)) {
                 cacheRecord.get(referencedThing).push(referencingThing);
