@@ -196,6 +196,18 @@ export default {
         relation('generateTrackList', track.referencedTracks);
     }
 
+    // Section: Sampled tracks
+
+    if (!empty(track.sampledTracks)) {
+      const samples = sections.samples = {};
+
+      samples.heading =
+        relation('generateContentHeading');
+
+      samples.list =
+        relation('generateTrackList', track.sampledTracks);
+    }
+
     // Section: Tracks that reference
 
     if (!empty(track.referencedByTracks)) {
@@ -208,18 +220,6 @@ export default {
         relation('generateTrackListDividedByGroups',
           track.referencedByTracks,
           sprawl.divideTrackListsByGroups);
-    }
-
-    // Section: Sampled tracks
-
-    if (!empty(track.sampledTracks)) {
-      const samples = sections.samples = {};
-
-      samples.heading =
-        relation('generateContentHeading');
-
-      samples.list =
-        relation('generateTrackList', track.sampledTracks);
     }
 
     // Section: Tracks that sample
@@ -436,19 +436,6 @@ export default {
             sec.references.list,
           ],
 
-          sec.referencedBy && [
-            sec.referencedBy.heading
-              .slots({
-                id: 'referenced-by',
-                title:
-                  language.$('releaseInfo.tracksThatReference', {
-                    track: html.tag('i', data.name),
-                  }),
-              }),
-
-            sec.referencedBy.list,
-          ],
-
           sec.samples && [
             sec.samples.heading
               .slots({
@@ -460,6 +447,19 @@ export default {
               }),
 
             sec.samples.list,
+          ],
+
+          sec.referencedBy && [
+            sec.referencedBy.heading
+              .slots({
+                id: 'referenced-by',
+                title:
+                  language.$('releaseInfo.tracksThatReference', {
+                    track: html.tag('i', data.name),
+                  }),
+              }),
+
+            sec.referencedBy.list,
           ],
 
           sec.sampledBy && [
