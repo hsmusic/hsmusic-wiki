@@ -8,10 +8,15 @@ import {
   fileExtension,
   flag,
   name,
+  reverseContributionList,
   singleReference,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {
+  withReverseContributionList,
+} from '#composite/wiki-data';
 
 import Thing from './thing.js';
 
@@ -64,28 +69,62 @@ export class Artist extends Thing {
 
     // Expose only
 
-    tracksAsArtist:
-      Artist.filterByContrib('trackData', 'artistContribs'),
-    tracksAsContributor:
-      Artist.filterByContrib('trackData', 'contributorContribs'),
-    tracksAsCoverArtist:
-      Artist.filterByContrib('trackData', 'coverArtistContribs'),
+    tracksAsArtist: reverseContributionList({
+      data: 'trackData',
+      list: input.value('artistContribs'),
+    }),
 
-    tracksAsAny: {
-      flags: {expose: true},
+    tracksAsContributor: reverseContributionList({
+      data: 'trackData',
+      list: input.value('contributorContribs'),
+    }),
 
-      expose: {
-        dependencies: ['this', 'trackData'],
+    tracksAsCoverArtist: reverseContributionList({
+      data: 'trackData',
+      list: input.value('coverArtistContribs'),
+    }),
 
-        compute: ({this: artist, trackData}) =>
-          trackData?.filter((track) =>
-            [
-              ...track.artistContribs ?? [],
-              ...track.contributorContribs ?? [],
-              ...track.coverArtistContribs ?? [],
-            ].some(({who}) => who === artist)) ?? [],
+    tracksAsAny: [
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('artistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#tracksAsArtist',
+      }),
+
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('contributorContribs'),
+      }).outputs({
+        '#reverseContributionList': '#tracksAsContributor',
+      }),
+
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('coverArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#tracksAsCoverArtist',
+      }),
+
+      {
+        dependencies: [
+          '#tracksAsArtist',
+          '#tracksAsContributor',
+          '#tracksAsCoverArtist',
+        ],
+
+        compute: ({
+          ['#tracksAsArtist']: tracksAsArtist,
+          ['#tracksAsContributor']: tracksAsContributor,
+          ['#tracksAsCoverArtist']: tracksAsCoverArtist,
+        }) =>
+          unique([
+            ...tracksAsArtist,
+            ...tracksAsContributor,
+            ...tracksAsCoverArtist,
+          ]),
       },
-    },
+    ],
 
     tracksAsCommentator: {
       flags: {expose: true},
@@ -99,31 +138,77 @@ export class Artist extends Thing {
       },
     },
 
-    albumsAsAlbumArtist:
-      Artist.filterByContrib('albumData', 'artistContribs'),
-    albumsAsCoverArtist:
-      Artist.filterByContrib('albumData', 'coverArtistContribs'),
-    albumsAsWallpaperArtist:
-      Artist.filterByContrib('albumData', 'wallpaperArtistContribs'),
-    albumsAsBannerArtist:
-      Artist.filterByContrib('albumData', 'bannerArtistContribs'),
+    albumsAsAlbumArtist: reverseContributionList({
+      data: 'albumData',
+      list: input.value('artistContribs'),
+    }),
 
-    albumsAsAny: {
-      flags: {expose: true},
+    albumsAsCoverArtist: reverseContributionList({
+      data: 'albumData',
+      list: input.value('coverArtistContribs'),
+    }),
 
-      expose: {
-        dependencies: ['albumData'],
+    albumsAsWallpaperArtist: reverseContributionList({
+      data: 'albumData',
+      list: input.value('wallpaperArtistContribs'),
+    }),
 
-        compute: ({albumData, [Artist.instance]: artist}) =>
-          albumData?.filter((album) =>
-            [
-              ...album.artistContribs,
-              ...album.coverArtistContribs,
-              ...album.wallpaperArtistContribs,
-              ...album.bannerArtistContribs,
-            ].some(({who}) => who === artist)) ?? [],
+    albumsAsBannerArtist: reverseContributionList({
+      data: 'albumData',
+      list: input.value('bannerArtistContribs'),
+    }),
+
+    albumsAsAny: [
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('artistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumsAsArtist',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('coverArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumsAsCoverArtist',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('wallpaperArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumsAsWallpaperArtist',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('bannerArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumsAsBannerArtist',
+      }),
+
+      {
+        dependencies: [
+          '#albumsAsArtist',
+          '#albumsAsCoverArtist',
+          '#albumsAsWallpaperArtist',
+          '#albumsAsBannerArtist',
+        ],
+
+        compute: ({
+          ['#albumsAsArtist']: albumsAsArtist,
+          ['#albumsAsCoverArtist']: albumsAsCoverArtist,
+          ['#albumsAsWallpaperArtist']: albumsAsWallpaperArtist,
+          ['#albumsAsBannerArtist']: albumsAsBannerArtist,
+        }) =>
+          unique([
+            ...albumsAsArtist,
+            ...albumsAsCoverArtist,
+            ...albumsAsWallpaperArtist,
+            ...albumsAsBannerArtist,
+          ]),
       },
-    },
+    ],
 
     albumsAsCommentator: {
       flags: {expose: true},
@@ -137,8 +222,10 @@ export class Artist extends Thing {
       },
     },
 
-    flashesAsContributor:
-      Artist.filterByContrib('flashData', 'contributorContribs'),
+    flashesAsContributor: reverseContributionList({
+      data: 'flashData',
+      list: input.value('contributorContribs'),
+    }),
   });
 
   static [Thing.getSerializeDescriptors] = ({
@@ -166,21 +253,5 @@ export class Artist extends Thing {
     albumsAsCommentator: S.toRefs,
 
     flashesAsContributor: S.toRefs,
-  });
-
-  static filterByContrib = (thingDataProperty, contribsProperty) => ({
-    flags: {expose: true},
-
-    expose: {
-      dependencies: ['this', thingDataProperty],
-
-      compute: ({
-        this: artist,
-        [thingDataProperty]: thingData,
-      }) =>
-        thingData?.filter(thing =>
-          thing[contribsProperty]
-            ?.some(contrib => contrib.who === artist)) ?? [],
-    },
   });
 }
