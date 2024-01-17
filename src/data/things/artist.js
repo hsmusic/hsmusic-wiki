@@ -9,6 +9,7 @@ import {
   flag,
   name,
   reverseContributionList,
+  reverseReferenceList,
   singleReference,
   urls,
   wikiData,
@@ -126,17 +127,10 @@ export class Artist extends Thing {
       },
     ],
 
-    tracksAsCommentator: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'trackData'],
-
-        compute: ({this: artist, trackData}) =>
-          trackData?.filter(({commentatorArtists}) =>
-            commentatorArtists.includes(artist)) ?? [],
-      },
-    },
+    tracksAsCommentator: reverseReferenceList({
+      data: 'trackData',
+      list: input.value('commentatorArtists'),
+    }),
 
     albumsAsAlbumArtist: reverseContributionList({
       data: 'albumData',
@@ -210,17 +204,10 @@ export class Artist extends Thing {
       },
     ],
 
-    albumsAsCommentator: {
-      flags: {expose: true},
-
-      expose: {
-        dependencies: ['this', 'albumData'],
-
-        compute: ({this: artist, albumData}) =>
-          albumData?.filter(({commentatorArtists}) =>
-            commentatorArtists.includes(artist)) ?? [],
-      },
-    },
+    albumsAsCommentator: reverseReferenceList({
+      data: 'albumData',
+      list: input.value('commentatorArtists'),
+    }),
 
     flashesAsContributor: reverseContributionList({
       data: 'flashData',
