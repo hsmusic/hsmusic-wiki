@@ -868,9 +868,10 @@ li .by a {
 }
 
 p code {
-  font-size: 1em;
-  font-family: "courier new";
+  font-size: 0.95em;
+  font-family: "courier new", monospace;
   font-weight: 800;
+  line-height: 1.1;
 }
 
 #content blockquote {
