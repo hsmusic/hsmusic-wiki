@@ -466,6 +466,89 @@ export function parseDimensions(string) {
   return nums;
 }
 
+export function parseReferenceDiscussions(referenceDiscussions) {
+  if (!Array.isArray(referenceDiscussions)) {
+    return referenceDiscussions;
+  }
+
+  return referenceDiscussions.map(source => {
+    switch (typeof source) {
+      case 'object': {
+        const entry = {};
+
+        if (source['URL']) {
+          entry.url = source['URL'];
+        }
+
+        if (source['Date']) {
+          entry.date = new Date(source['Date']);
+        }
+
+        if (source['Participants']) {
+          entry.participants = source['Participants'];
+        }
+
+        return entry;
+      }
+
+      case 'string': {
+        const entry = {};
+
+        const match = source.match(extractPrefixAccentRegex);
+        if (!match) return source;
+
+        entry.url = match.groups.main;
+
+        if (match.groups.accent) {
+          entry.date = new Date(match.groups.accent);
+        }
+
+        return entry;
+      }
+
+      default:
+        return source;
+    }
+  });
+}
+
+export function parseReviewPoints(reviewPoints) {
+  if (!Array.isArray(reviewPoints)) {
+    return reviewPoints;
+  }
+
+  return reviewPoints.map(source => {
+    if (typeof source !== 'object') {
+      return source;
+    }
+
+    const entry = {};
+
+    if (source['Field']) {
+      entry.field = source['Field'];
+    }
+
+    if (source['Notes']) {
+      entry.notes = source['Notes'];
+    }
+
+    if (source['Date Recorded']) {
+      entry.dateRecorded = new Date(source['Date Recorded']);
+    }
+
+    if (source['Reference Discussions']) {
+      entry.referenceDiscussions =
+        parseReferenceDiscussions(source['Reference Discussions']);
+    }
+
+    if (source['Referral Artists']) {
+      entry.referralArtists = source['Referral Artists'];
+    }
+
+    return entry;
+  });
+}
+
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.
 export const documentModes = {

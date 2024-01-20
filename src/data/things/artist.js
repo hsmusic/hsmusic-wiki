@@ -11,6 +11,7 @@ import {stitchArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
+import {parseReviewPoints} from '#yaml';
 
 import {withReverseContributionList} from '#composite/wiki-data';
 
@@ -22,6 +23,7 @@ import {
   name,
   reverseContributionList,
   reverseReferenceList,
+  reviewPointList,
   singleReference,
   urls,
   wikiData,
@@ -31,7 +33,7 @@ export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
   static [Thing.wikiDataArray] = 'artistData';
 
-  static [Thing.getPropertyDescriptors] = ({Album, Flash, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Artist, Flash, Track}) => ({
     // Update & expose
 
     name: name('Unnamed Artist'),
@@ -55,6 +57,10 @@ export class Artist extends Thing {
       class: input.value(Artist),
       find: input.value(find.artist),
       data: 'artistData',
+    }),
+
+    reviewPoints: reviewPointList({
+      class: input.value(Artist),
     }),
 
     // Update only
@@ -323,7 +329,10 @@ export class Artist extends Thing {
 
       'Dead URLs': {ignore: true},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 
