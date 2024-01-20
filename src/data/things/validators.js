@@ -595,6 +595,16 @@ export function isContentString(content) {
   return true;
 }
 
+export function isThingClass(thingClass) {
+  isFunction(thingClass);
+
+  if (!Object.hasOwn(thingClass, Symbol.for('Thing.referenceType'))) {
+    throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
+  }
+
+  return true;
+}
+
 export const isContribution = validateProperties({
   who: isArtistRef,
   what: optional(isStringNonEmpty),

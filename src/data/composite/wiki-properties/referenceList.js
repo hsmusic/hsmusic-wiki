@@ -7,14 +7,10 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {validateReferenceList} from '#validators';
+import {isThingClass, validateReferenceList} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
-import {inputThingClass, inputWikiData, withResolvedReferenceList}
-  from '#composite/wiki-data';
-
-// TODO: Kludge.
-import Thing from '../../things/thing.js';
+import {inputWikiData, withResolvedReferenceList} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
   annotation: `referenceList`,
@@ -22,18 +18,20 @@ export default templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: inputThingClass(),
+    class: input.staticValue({validate: isThingClass}),
 
     data: inputWikiData({allowMixedTypes: false}),
+
     find: input({type: 'function'}),
   },
 
   update: ({
     [input.staticValue('class')]: thingClass,
-  }) => {
-    const {[Thing.referenceType]: referenceType} = thingClass;
-    return {validate: validateReferenceList(referenceType)};
-  },
+  }) => ({
+    validate:
+      validateReferenceList(
+        thingClass[Symbol.for('Thing.referenceType')]),
+  }),
 
   steps: () => [
     withResolvedReferenceList({

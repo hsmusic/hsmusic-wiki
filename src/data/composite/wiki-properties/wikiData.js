@@ -2,12 +2,7 @@
 // trackData, etc.
 
 import {input, templateCompositeFrom} from '#composite';
-import {validateWikiData} from '#validators';
-
-import {inputThingClass} from '#composite/wiki-data';
-
-// TODO: Kludge.
-import Thing from '../../things/thing.js';
+import {isThingClass, validateWikiData} from '#validators';
 
 export default templateCompositeFrom({
   annotation: `wikiData`,
@@ -15,15 +10,18 @@ export default templateCompositeFrom({
   compose: false,
 
   inputs: {
-    class: inputThingClass(),
+    class: input.staticValue({validate: isThingClass}),
   },
 
   update: ({
     [input.staticValue('class')]: thingClass,
-  }) => {
-    const referenceType = thingClass[Thing.referenceType];
-    return {validate: validateWikiData({referenceType})};
-  },
+  }) => ({
+    validate:
+      validateWikiData({
+        referenceType:
+          thingClass[Symbol.for('Thing.referenceType')],
+      }),
+  }),
 
   steps: () => [],
 });
