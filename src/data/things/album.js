@@ -9,8 +9,14 @@ import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
 import {isDate} from '#validators';
-import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
-  from '#yaml';
+
+import {
+  parseAdditionalFiles,
+  parseContributors,
+  parseDate,
+  parseDimensions,
+  parseReviewPoints,
+} from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -29,6 +35,7 @@ import {
   flag,
   name,
   referenceList,
+  reviewPointList,
   simpleDate,
   simpleString,
   urls,
@@ -40,7 +47,13 @@ import {withTracks, withTrackSections} from '#composite/things/album';
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    ArtTag,
+    Artist,
+    Group,
+    Track,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Album'),
@@ -138,6 +151,10 @@ export class Album extends Thing {
         data: 'artTagData',
       }),
     ],
+
+    reviewPoints: reviewPointList({
+      classes: input.value([Album, Track]),
+    }),
 
     // Update only
 
@@ -319,7 +336,10 @@ export class Album extends Thing {
       'Groups': {property: 'groups'},
       'Art Tags': {property: 'artTags'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 
