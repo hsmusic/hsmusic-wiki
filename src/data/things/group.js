@@ -85,6 +85,19 @@ export class Group extends Thing {
       },
     },
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Group',
+      directory: 'Directory',
+      description: 'Description',
+      urls: 'URLs',
+
+      featuredAlbums: 'Featured Albums',
+    },
+
+    ignoredFields: ['Review Points'],
+  };
 }
 
 export class GroupCategory extends Thing {
@@ -111,4 +124,11 @@ export class GroupCategory extends Thing {
       class: input.value(Group),
     }),
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Category',
+      color: 'Color',
+    },
+  };
 }

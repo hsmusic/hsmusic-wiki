@@ -28,6 +28,8 @@ import {
 
 import {withFlashAct} from '#composite/things/flash';
 
+import {parseContributors} from '#yaml';
+
 import Thing from './thing.js';
 
 export class Flash extends Thing {
@@ -133,6 +135,30 @@ export class Flash extends Thing {
     urls: S.id,
     color: S.id,
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    fieldTransformations: {
+      'Date': (value) => new Date(value),
+
+      'Contributors': parseContributors,
+    },
+
+    propertyFieldMapping: {
+      name: 'Flash',
+      directory: 'Directory',
+      page: 'Page',
+      color: 'Color',
+      urls: 'URLs',
+
+      date: 'Date',
+      coverArtFileExtension: 'Cover Art File Extension',
+
+      featuredTracks: 'Featured Tracks',
+      contributorContribs: 'Contributors',
+    },
+
+    ignoredFields: ['Review Points'],
+  };
 }
 
 export class FlashAct extends Thing {
@@ -170,5 +196,20 @@ export class FlashAct extends Thing {
     flashData: wikiData({
       class: input.value(Flash),
     }),
-  })
+  });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Act',
+      directory: 'Directory',
+
+      color: 'Color',
+      listTerminology: 'List Terminology',
+
+      jump: 'Jump',
+      jumpColor: 'Jump Color',
+    },
+
+    ignoredFields: ['Review Points'],
+  };
 }

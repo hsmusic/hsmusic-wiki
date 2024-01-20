@@ -25,10 +25,13 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
+import {withTracks, withTrackSections} from '#composite/things/album';
+
 import {
-  withTracks,
-  withTrackSections,
-} from '#composite/things/album';
+  parseAdditionalFiles,
+  parseContributors,
+  parseDimensions,
+} from '#yaml';
 
 import Thing from './thing.js';
 
@@ -200,6 +203,64 @@ export class Album extends Thing {
     artTags: S.toRefs,
     commentatorArtists: S.toRefs,
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    fieldTransformations: {
+      'Artists': parseContributors,
+      'Cover Artists': parseContributors,
+      'Default Track Cover Artists': parseContributors,
+      'Wallpaper Artists': parseContributors,
+      'Banner Artists': parseContributors,
+
+      'Date': (value) => new Date(value),
+      'Date Added': (value) => new Date(value),
+      'Cover Art Date': (value) => new Date(value),
+      'Default Track Cover Art Date': (value) => new Date(value),
+
+      'Banner Dimensions': parseDimensions,
+
+      'Additional Files': parseAdditionalFiles,
+    },
+
+    propertyFieldMapping: {
+      name: 'Album',
+      directory: 'Directory',
+      date: 'Date',
+      color: 'Color',
+      urls: 'URLs',
+
+      hasTrackNumbers: 'Has Track Numbers',
+      isListedOnHomepage: 'Listed on Homepage',
+      isListedInGalleries: 'Listed in Galleries',
+
+      coverArtDate: 'Cover Art Date',
+      trackArtDate: 'Default Track Cover Art Date',
+      dateAddedToWiki: 'Date Added',
+
+      coverArtFileExtension: 'Cover Art File Extension',
+      trackCoverArtFileExtension: 'Track Art File Extension',
+
+      wallpaperArtistContribs: 'Wallpaper Artists',
+      wallpaperStyle: 'Wallpaper Style',
+      wallpaperFileExtension: 'Wallpaper File Extension',
+
+      bannerArtistContribs: 'Banner Artists',
+      bannerStyle: 'Banner Style',
+      bannerFileExtension: 'Banner File Extension',
+      bannerDimensions: 'Banner Dimensions',
+
+      commentary: 'Commentary',
+      additionalFiles: 'Additional Files',
+
+      artistContribs: 'Artists',
+      coverArtistContribs: 'Cover Artists',
+      trackCoverArtistContribs: 'Default Track Cover Artists',
+      groups: 'Groups',
+      artTags: 'Art Tags',
+    },
+
+    ignoredFields: ['Review Points'],
+  };
 }
 
 export class TrackSectionHelper extends Thing {
@@ -211,4 +272,16 @@ export class TrackSectionHelper extends Thing {
     dateOriginallyReleased: simpleDate(),
     isDefaultTrackGroup: flag(false),
   })
+
+  static [Thing.yamlDocumentSpec] = {
+    fieldTransformations: {
+      'Date Originally Released': (value) => new Date(value),
+    },
+
+    propertyFieldMapping: {
+      name: 'Section',
+      color: 'Color',
+      dateOriginallyReleased: 'Date Originally Released',
+    },
+  };
 }

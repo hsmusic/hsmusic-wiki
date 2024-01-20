@@ -74,4 +74,22 @@ export class WikiInfo extends Thing {
       class: input.value(Group),
     }),
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Name',
+      nameShort: 'Short Name',
+      color: 'Color',
+      description: 'Description',
+      footerContent: 'Footer Content',
+      defaultLanguage: 'Default Language',
+      canonicalBase: 'Canonical Base',
+      divideTrackListsByGroups: 'Divide Track Lists By Groups',
+      enableFlashesAndGames: 'Enable Flashes & Games',
+      enableListings: 'Enable Listings',
+      enableNews: 'Enable News',
+      enableArtTagUI: 'Enable Art Tag UI',
+      enableGroupUI: 'Enable Group UI',
+    },
+  };
 }

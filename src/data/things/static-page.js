@@ -33,4 +33,18 @@ export class StaticPage extends Thing {
     stylesheet: simpleString(),
     script: simpleString(),
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Name',
+      nameShort: 'Short Name',
+      directory: 'Directory',
+
+      stylesheet: 'Style',
+      script: 'Script',
+      content: 'Content',
+    },
+
+    ignoredFields: ['Review Points'],
+  };
 }

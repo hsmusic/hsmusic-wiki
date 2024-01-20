@@ -45,7 +45,16 @@ export class HomepageLayout extends Thing {
         validate: validateArrayItems(validateInstanceOf(HomepageLayoutRow)),
       },
     },
-  })
+  });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      sidebarContent: 'Sidebar Content',
+      navbarLinks: 'Navbar Links',
+    },
+
+    ignoredFields: ['Homepage'],
+  };
 }
 
 export class HomepageLayoutRow extends Thing {
@@ -82,6 +91,14 @@ export class HomepageLayoutRow extends Thing {
       class: input.value(Group),
     }),
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Row',
+      color: 'Color',
+      type: 'Type',
+    },
+  };
 }
 
 export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
@@ -160,6 +177,16 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
     actionLinks: {
       flags: {update: true, expose: true},
       update: {validate: validateArrayItems(isString)},
+    },
+  });
+
+  static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
+    propertyFieldMapping: {
+      displayStyle: 'Display Style',
+      sourceGroup: 'Group',
+      countAlbumsFromGroup: 'Count',
+      sourceAlbums: 'Albums',
+      actionLinks: 'Actions',
     },
   });
 }

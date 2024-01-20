@@ -26,6 +26,7 @@ import {
   filterProperties,
   openAggregate,
   showAggregate,
+  typeAppearance,
   withAggregate,
 } from '#sugar';
 
@@ -149,7 +150,7 @@ function makeProcessDocument(
     };
   };
 
-  const fn = decorateErrorWithName((document) => {
+  return decorateErrorWithName((document) => {
     const nameField = propertyFieldMapping['name'];
     const namePart =
       (nameField
@@ -284,13 +285,6 @@ function makeProcessDocument(
 
     return {thing, aggregate};
   });
-
-  Object.assign(fn, {
-    propertyFieldMapping,
-    fieldPropertyMapping,
-  });
-
-  return fn;
 }
 
 export class UnknownFieldsError extends Error {
@@ -386,344 +380,6 @@ export class SkippedFieldsSummaryError extends Error {
   }
 }
 
-export const processAlbumDocument = makeProcessDocument(T.Album, {
-  fieldTransformations: {
-    'Artists': parseContributors,
-    'Cover Artists': parseContributors,
-    'Default Track Cover Artists': parseContributors,
-    'Wallpaper Artists': parseContributors,
-    'Banner Artists': parseContributors,
-
-    'Date': (value) => new Date(value),
-    'Date Added': (value) => new Date(value),
-    'Cover Art Date': (value) => new Date(value),
-    'Default Track Cover Art Date': (value) => new Date(value),
-
-    'Banner Dimensions': parseDimensions,
-
-    'Additional Files': parseAdditionalFiles,
-  },
-
-  propertyFieldMapping: {
-    name: 'Album',
-    directory: 'Directory',
-    date: 'Date',
-    color: 'Color',
-    urls: 'URLs',
-
-    hasTrackNumbers: 'Has Track Numbers',
-    isListedOnHomepage: 'Listed on Homepage',
-    isListedInGalleries: 'Listed in Galleries',
-
-    coverArtDate: 'Cover Art Date',
-    trackArtDate: 'Default Track Cover Art Date',
-    dateAddedToWiki: 'Date Added',
-
-    coverArtFileExtension: 'Cover Art File Extension',
-    trackCoverArtFileExtension: 'Track Art File Extension',
-
-    wallpaperArtistContribs: 'Wallpaper Artists',
-    wallpaperStyle: 'Wallpaper Style',
-    wallpaperFileExtension: 'Wallpaper File Extension',
-
-    bannerArtistContribs: 'Banner Artists',
-    bannerStyle: 'Banner Style',
-    bannerFileExtension: 'Banner File Extension',
-    bannerDimensions: 'Banner Dimensions',
-
-    commentary: 'Commentary',
-    additionalFiles: 'Additional Files',
-
-    artistContribs: 'Artists',
-    coverArtistContribs: 'Cover Artists',
-    trackCoverArtistContribs: 'Default Track Cover Artists',
-    groups: 'Groups',
-    artTags: 'Art Tags',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHelper, {
-  fieldTransformations: {
-    'Date Originally Released': (value) => new Date(value),
-  },
-
-  propertyFieldMapping: {
-    name: 'Section',
-    color: 'Color',
-    dateOriginallyReleased: 'Date Originally Released',
-  },
-});
-
-export const processTrackDocument = makeProcessDocument(T.Track, {
-  fieldTransformations: {
-    'Additional Names': parseAdditionalNames,
-    'Duration': parseDuration,
-
-    'Date First Released': (value) => new Date(value),
-    'Cover Art Date': (value) => new Date(value),
-    'Has Cover Art': (value) =>
-      (value === true ? false :
-       value === false ? true :
-       value),
-
-    'Artists': parseContributors,
-    'Contributors': parseContributors,
-    'Cover Artists': parseContributors,
-
-    'Additional Files': parseAdditionalFiles,
-    'Sheet Music Files': parseAdditionalFiles,
-    'MIDI Project Files': parseAdditionalFiles,
-  },
-
-  propertyFieldMapping: {
-    name: 'Track',
-    directory: 'Directory',
-    additionalNames: 'Additional Names',
-    duration: 'Duration',
-    color: 'Color',
-    urls: 'URLs',
-
-    dateFirstReleased: 'Date First Released',
-    coverArtDate: 'Cover Art Date',
-    coverArtFileExtension: 'Cover Art File Extension',
-    disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
-
-    alwaysReferenceByDirectory: 'Always Reference By Directory',
-
-    lyrics: 'Lyrics',
-    commentary: 'Commentary',
-    additionalFiles: 'Additional Files',
-    sheetMusicFiles: 'Sheet Music Files',
-    midiProjectFiles: 'MIDI Project Files',
-
-    originalReleaseTrack: 'Originally Released As',
-    referencedTracks: 'Referenced Tracks',
-    sampledTracks: 'Sampled Tracks',
-    artistContribs: 'Artists',
-    contributorContribs: 'Contributors',
-    coverArtistContribs: 'Cover Artists',
-    artTags: 'Art Tags',
-  },
-
-  ignoredFields: ['Review Points'],
-
-  invalidFieldCombinations: [
-    {message: `Re-releases inherit references from the original`, fields: [
-      'Originally Released As',
-      'Referenced Tracks',
-    ]},
-
-    {message: `Re-releases inherit samples from the original`, fields: [
-      'Originally Released As',
-      'Sampled Tracks',
-    ]},
-
-    {message: `Re-releases inherit artists from the original`, fields: [
-      'Originally Released As',
-      'Artists',
-    ]},
-
-    {message: `Re-releases inherit contributors from the original`, fields: [
-      'Originally Released As',
-      'Contributors',
-    ]},
-
-    {
-      message: ({'Has Cover Art': hasCoverArt}) =>
-        (hasCoverArt
-          ? `"Has Cover Art: true" is inferred from cover artist credits`
-          : `Tracks without cover art must not have cover artist credits`),
-
-      fields: [
-        'Has Cover Art',
-        'Cover Artists',
-      ],
-    },
-  ],
-});
-
-export const processArtistDocument = makeProcessDocument(T.Artist, {
-  propertyFieldMapping: {
-    name: 'Artist',
-    directory: 'Directory',
-    urls: 'URLs',
-    contextNotes: 'Context Notes',
-
-    hasAvatar: 'Has Avatar',
-    avatarFileExtension: 'Avatar File Extension',
-
-    aliasNames: 'Aliases',
-  },
-
-  ignoredFields: ['Dead URLs', 'Review Points'],
-});
-
-export const processFlashDocument = makeProcessDocument(T.Flash, {
-  fieldTransformations: {
-    'Date': (value) => new Date(value),
-
-    'Contributors': parseContributors,
-  },
-
-  propertyFieldMapping: {
-    name: 'Flash',
-    directory: 'Directory',
-    page: 'Page',
-    color: 'Color',
-    urls: 'URLs',
-
-    date: 'Date',
-    coverArtFileExtension: 'Cover Art File Extension',
-
-    featuredTracks: 'Featured Tracks',
-    contributorContribs: 'Contributors',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
-  propertyFieldMapping: {
-    name: 'Act',
-    directory: 'Directory',
-
-    color: 'Color',
-    listTerminology: 'List Terminology',
-
-    jump: 'Jump',
-    jumpColor: 'Jump Color',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processNewsEntryDocument = makeProcessDocument(T.NewsEntry, {
-  fieldTransformations: {
-    'Date': (value) => new Date(value),
-  },
-
-  propertyFieldMapping: {
-    name: 'Name',
-    directory: 'Directory',
-    date: 'Date',
-    content: 'Content',
-  },
-});
-
-export const processArtTagDocument = makeProcessDocument(T.ArtTag, {
-  propertyFieldMapping: {
-    name: 'Tag',
-    nameShort: 'Short Name',
-    directory: 'Directory',
-
-    color: 'Color',
-    isContentWarning: 'Is CW',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processGroupDocument = makeProcessDocument(T.Group, {
-  propertyFieldMapping: {
-    name: 'Group',
-    directory: 'Directory',
-    description: 'Description',
-    urls: 'URLs',
-
-    featuredAlbums: 'Featured Albums',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processGroupCategoryDocument = makeProcessDocument(T.GroupCategory, {
-  propertyFieldMapping: {
-    name: 'Category',
-    color: 'Color',
-  },
-});
-
-export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
-  propertyFieldMapping: {
-    name: 'Name',
-    nameShort: 'Short Name',
-    directory: 'Directory',
-
-    stylesheet: 'Style',
-    script: 'Script',
-    content: 'Content',
-  },
-
-  ignoredFields: ['Review Points'],
-});
-
-export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
-  propertyFieldMapping: {
-    name: 'Name',
-    nameShort: 'Short Name',
-    color: 'Color',
-    description: 'Description',
-    footerContent: 'Footer Content',
-    defaultLanguage: 'Default Language',
-    canonicalBase: 'Canonical Base',
-    divideTrackListsByGroups: 'Divide Track Lists By Groups',
-    enableFlashesAndGames: 'Enable Flashes & Games',
-    enableListings: 'Enable Listings',
-    enableNews: 'Enable News',
-    enableArtTagUI: 'Enable Art Tag UI',
-    enableGroupUI: 'Enable Group UI',
-  },
-});
-
-export const processHomepageLayoutDocument = makeProcessDocument(T.HomepageLayout, {
-  propertyFieldMapping: {
-    sidebarContent: 'Sidebar Content',
-    navbarLinks: 'Navbar Links',
-  },
-
-  ignoredFields: ['Homepage'],
-});
-
-export function makeProcessHomepageLayoutRowDocument(rowClass, spec) {
-  return makeProcessDocument(rowClass, {
-    ...spec,
-
-    propertyFieldMapping: {
-      name: 'Row',
-      color: 'Color',
-      type: 'Type',
-      ...spec.propertyFieldMapping,
-    },
-  });
-}
-
-export const homepageLayoutRowTypeProcessMapping = {
-  albums: makeProcessHomepageLayoutRowDocument(T.HomepageLayoutAlbumsRow, {
-    propertyFieldMapping: {
-      displayStyle: 'Display Style',
-      sourceGroup: 'Group',
-      countAlbumsFromGroup: 'Count',
-      sourceAlbums: 'Albums',
-      actionLinks: 'Actions',
-    },
-  }),
-};
-
-export function processHomepageLayoutRowDocument(document) {
-  const type = document['Type'];
-
-  const match = Object.entries(homepageLayoutRowTypeProcessMapping)
-    .find(([key]) => key === type);
-
-  if (!match) {
-    throw new TypeError(`No processDocument function for row type ${type}!`);
-  }
-
-  return match[1](document);
-}
-
 // --> Utilities shared across document parsing functions
 
 export function parseDuration(string) {
@@ -754,8 +410,11 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-const extractAccentRegex =
+export const extractAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
+
+export const extractPrefixAccentRegex =
+  /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
 
 export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
@@ -802,7 +461,7 @@ export function parseAdditionalNames(additionalNameStrings) {
   });
 }
 
-function parseDimensions(string) {
+export function parseDimensions(string) {
   // It's technically possible to pass an array like [30, 40] through here.
   // That's not really an issue because if it isn't of the appropriate shape,
   // the Thing object's validators will handle the error.
@@ -899,13 +558,13 @@ export const documentModes = {
 //   them to each other, setting additional properties, etc). Input argument
 //   format depends on documentMode.
 //
-export const dataSteps = [
+export const getDataSteps = () => [
   {
     title: `Process wiki info file`,
     file: WIKI_INFO_FILE,
 
     documentMode: documentModes.oneDocumentTotal,
-    processDocument: processWikiInfoDocument,
+    documentThing: T.WikiInfo,
 
     save(wikiInfo) {
       if (!wikiInfo) {
@@ -926,12 +585,11 @@ export const dataSteps = [
       }),
 
     documentMode: documentModes.headerAndEntries,
-    processHeaderDocument: processAlbumDocument,
-    processEntryDocument(document) {
-      return 'Section' in document
-        ? processTrackSectionDocument(document)
-        : processTrackDocument(document);
-    },
+    headerDocumentThing: T.Album,
+    entryDocumentThing: document =>
+      ('Section' in document
+        ? T.TrackSectionHelper
+        : T.Track),
 
     save(results) {
       const albumData = [];
@@ -1000,7 +658,7 @@ export const dataSteps = [
     file: ARTIST_DATA_FILE,
 
     documentMode: documentModes.allInOne,
-    processDocument: processArtistDocument,
+    documentThing: T.Artist,
 
     save(results) {
       const artistData = results;
@@ -1027,11 +685,10 @@ export const dataSteps = [
     file: FLASH_DATA_FILE,
 
     documentMode: documentModes.allInOne,
-    processDocument(document) {
-      return 'Act' in document
-        ? processFlashActDocument(document)
-        : processFlashDocument(document);
-    },
+    documentThing: document =>
+      ('Act' in document
+        ? T.FlashAct
+        : T.Flash),
 
     save(results) {
       let flashAct;
@@ -1070,11 +727,10 @@ export const dataSteps = [
     file: GROUP_DATA_FILE,
 
     documentMode: documentModes.allInOne,
-    processDocument(document) {
-      return 'Category' in document
-        ? processGroupCategoryDocument(document)
-        : processGroupDocument(document);
-    },
+    documentThing: document =>
+      ('Category' in document
+        ? T.GroupCategory
+        : T.Group),
 
     save(results) {
       let groupCategory;
@@ -1117,8 +773,15 @@ export const dataSteps = [
     files: [HOMEPAGE_LAYOUT_DATA_FILE],
 
     documentMode: documentModes.headerAndEntries,
-    processHeaderDocument: processHomepageLayoutDocument,
-    processEntryDocument: processHomepageLayoutRowDocument,
+    headerDocumentThing: T.HomepageLayout,
+    entryDocumentThing: document => {
+      switch (document['Type']) {
+        case 'albums':
+          return T.HomepageLayoutAlbumsRow;
+        default:
+          throw new TypeError(`No processDocument function for row type ${type}!`);
+      }
+    },
 
     save(results) {
       if (!results[0]) {
@@ -1137,7 +800,7 @@ export const dataSteps = [
     file: NEWS_DATA_FILE,
 
     documentMode: documentModes.allInOne,
-    processDocument: processNewsEntryDocument,
+    documentThing: T.NewsEntry,
 
     save(newsData) {
       sortChronologically(newsData);
@@ -1152,7 +815,7 @@ export const dataSteps = [
     file: ART_TAG_DATA_FILE,
 
     documentMode: documentModes.allInOne,
-    processDocument: processArtTagDocument,
+    documentThing: T.ArtTag,
 
     save(artTagData) {
       sortAlphabetically(artTagData);
@@ -1171,7 +834,7 @@ export const dataSteps = [
       }),
 
     documentMode: documentModes.onePerFile,
-    processDocument: processStaticPageDocument,
+    documentThing: T.StaticPage,
 
     save(staticPageData) {
       sortAlphabetically(staticPageData);
@@ -1203,7 +866,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
     return decorateErrorWithFile(fn).async;
   }
 
-  for (const dataStep of dataSteps) {
+  for (const dataStep of getDataSteps()) {
     await processDataAggregate.nestAsync(
       {
         message: `Errors during data step: ${colors.bright(dataStep.title)}`,
@@ -1284,6 +947,32 @@ export async function loadAndProcessDataDocuments({dataPath}) {
           return {documents: filteredDocuments, aggregate};
         };
 
+        const processDocument = (document, thingClassOrFn) => {
+          const thingClass =
+            (thingClassOrFn.prototype instanceof Thing
+              ? thingClassOrFn
+              : thingClassOrFn(document));
+
+          if (typeof thingClass !== 'function') {
+            throw new Error(`Expected a thing class, got ${typeAppearance(thingClass)}`);
+          }
+
+          if (!(thingClass.prototype instanceof Thing)) {
+            throw new Error(`Expected a thing class, got ${thingClass.name}`);
+          }
+
+          const spec = thingClass[Thing.yamlDocumentSpec];
+
+          if (!spec) {
+            throw new Error(`Class "${thingClass.name}" doesn't specify Thing.yamlDocumentSpec`);
+          }
+
+          // TODO: Making a function to only call it just like that is
+          // obviously pretty jank! It should be created once per data step.
+          const fn = makeProcessDocument(thingClass, spec);
+          return fn(document);
+        };
+
         if (
           documentMode === documentModes.allInOne ||
           documentMode === documentModes.oneDocumentTotal
@@ -1340,7 +1029,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
               }
 
               const {thing, aggregate} =
-                dataStep.processDocument(yamlResult);
+                processDocument(yamlResult, dataStep.documentThing);
 
               processResults = thing;
 
@@ -1366,7 +1055,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
               map(documents, decorateErrorWithIndex(document => {
                 const {thing, aggregate} =
-                  dataStep.processDocument(document);
+                  processDocument(document, dataStep.documentThing);
 
                 processResults.push(thing);
                 aggregate.close();
@@ -1457,7 +1146,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
 
                 withAggregate({message: `Errors processing documents`}, ({push}) => {
                   const {thing: headerObject, aggregate: headerAggregate} =
-                    dataStep.processHeaderDocument(headerDocument);
+                    processDocument(headerDocument, dataStep.headerDocumentThing);
 
                   try {
                     headerAggregate.close();
@@ -1472,7 +1161,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
                     const entryDocument = entryDocuments[index];
 
                     const {thing: entryObject, aggregate: entryAggregate} =
-                      dataStep.processEntryDocument(entryDocument);
+                      processDocument(entryDocument, dataStep.entryDocumentThing);
 
                     entryObjects.push(entryObject);
 
@@ -1502,7 +1191,7 @@ export async function loadAndProcessDataDocuments({dataPath}) {
                   throw new Error(`Expected a document, this file is empty`);
 
                 const {thing, aggregate} =
-                  dataStep.processDocument(documents[0]);
+                  processDocument(documents[0], dataStep.documentThing);
 
                 processResults.push(thing);
                 aggregate.close();
@@ -1698,7 +1387,7 @@ export function filterDuplicateDirectories(wikiData) {
 // data array.
 export function filterReferenceErrors(wikiData) {
   const referenceSpec = [
-    ['albumData', processAlbumDocument, {
+    ['albumData', {
       artistContribs: '_contrib',
       coverArtistContribs: '_contrib',
       trackCoverArtistContribs: '_contrib',
@@ -1709,25 +1398,25 @@ export function filterReferenceErrors(wikiData) {
       commentary: '_commentary',
     }],
 
-    ['groupCategoryData', processGroupCategoryDocument, {
+    ['groupCategoryData', {
       groups: 'group',
     }],
 
-    ['homepageLayout.rows', undefined, {
+    ['homepageLayout.rows', {
       sourceGroup: '_homepageSourceGroup',
       sourceAlbums: 'album',
     }],
 
-    ['flashData', processFlashDocument, {
+    ['flashData', {
       contributorContribs: '_contrib',
       featuredTracks: 'track',
     }],
 
-    ['flashActData', processFlashActDocument, {
+    ['flashActData', {
       flashes: 'flash',
     }],
 
-    ['trackData', processTrackDocument, {
+    ['trackData', {
       artistContribs: '_contrib',
       contributorContribs: '_contrib',
       coverArtistContribs: '_contrib',
@@ -1738,7 +1427,7 @@ export function filterReferenceErrors(wikiData) {
       commentary: '_commentary',
     }],
 
-    ['wikiInfo', processWikiInfoDocument, {
+    ['wikiInfo', {
       divideTrackListsByGroups: 'group',
     }],
   ];
@@ -1752,23 +1441,13 @@ export function filterReferenceErrors(wikiData) {
 
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   const boundFind = bindFind(wikiData, {mode: 'error'});
-  for (const [thingDataProp, providedProcessDocumentFn, propSpec] of referenceSpec) {
+  for (const [thingDataProp, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
 
     aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
       const things = Array.isArray(thingData) ? thingData : [thingData];
 
       for (const thing of things) {
-        let processDocumentFn = providedProcessDocumentFn;
-
-        if (processDocumentFn === undefined) {
-          switch (thingDataProp) {
-            case 'homepageLayout.rows':
-              processDocumentFn = homepageLayoutRowTypeProcessMapping[thing.type]
-              break;
-          }
-        }
-
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
             let value = CacheableObject.getUpdateValue(thing, property);
@@ -1895,9 +1574,13 @@ export function filterReferenceErrors(wikiData) {
               return false;
             }, fn);
 
+            const field =
+              thing.constructor[Thing.yamlDocumentSpec]
+                .propertyFieldMapping[property];
+
             const fieldPropertyMessage =
-              (processDocumentFn?.propertyFieldMapping?.[property]
-                ? ` in field ${colors.green(processDocumentFn.propertyFieldMapping[property])}`
+              (field
+                ? ` in field ${colors.green(field)}`
                 : ` in property ${colors.green(property)}`);
 
             const findFnMessage =
@@ -1923,7 +1606,7 @@ export function filterReferenceErrors(wikiData) {
                 let hasCoverArtwork =
                   !empty(CacheableObject.getUpdateValue(thing, 'coverArtistContribs'));
 
-                if (processDocumentFn === processTrackDocument) {
+                if (thing.constructor === T.Track) {
                   if (thing.album) {
                     hasCoverArtwork ||=
                       !empty(CacheableObject.getUpdateValue(thing.album, 'trackCoverArtistContribs'));

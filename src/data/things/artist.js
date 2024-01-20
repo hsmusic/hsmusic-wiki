@@ -16,9 +16,7 @@ import {
   wikiData,
 } from '#composite/wiki-properties';
 
-import {
-  withReverseContributionList,
-} from '#composite/wiki-data';
+import {withReverseContributionList} from '#composite/wiki-data';
 
 import Thing from './thing.js';
 
@@ -242,4 +240,20 @@ export class Artist extends Thing {
 
     flashesAsContributor: S.toRefs,
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Artist',
+      directory: 'Directory',
+      urls: 'URLs',
+      contextNotes: 'Context Notes',
+
+      hasAvatar: 'Has Avatar',
+      avatarFileExtension: 'Avatar File Extension',
+
+      aliasNames: 'Aliases',
+    },
+
+    ignoredFields: ['Dead URLs', 'Review Points'],
+  };
 }

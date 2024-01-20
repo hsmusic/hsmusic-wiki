@@ -14,6 +14,8 @@ export default class Thing extends CacheableObject {
   static getPropertyDescriptors = Symbol('Thing.getPropertyDescriptors');
   static getSerializeDescriptors = Symbol('Thing.getSerializeDescriptors');
 
+  static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
+
   // Default custom inspect function, which may be overridden by Thing
   // subclasses. This will be used when displaying aggregate errors and other
   // command-line logging - it's the place to provide information useful in
@@ -37,5 +39,45 @@ export default class Thing extends CacheableObject {
     }
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
+  }
+
+  static extendDocumentSpec(thingClass, subspec) {
+    const superspec = thingClass[Thing.yamlDocumentSpec];
+
+    const {
+      fieldTransformations,
+      propertyFieldMapping,
+      ignoredFields,
+      invalidFieldCombinations,
+      ...restOfSubspec
+    } = subspec;
+
+    const newFields =
+      Object.values(subspec.propertyFieldMapping ?? {});
+
+    return {
+      ...superspec,
+      ...restOfSubspec,
+
+      fieldTransformations: {
+        ...superspec.fieldTransformations,
+        ...fieldTransformations,
+      },
+
+      propertyFieldMapping: {
+        ...superspec.propertyFieldMapping,
+        ...propertyFieldMapping,
+      },
+
+      ignoredFields:
+        (superspec.ignoredFields ?? [])
+          .filter(field => newFields.includes(field))
+          .concat(ignoredFields ?? []),
+
+      invalidFieldCombinations: [
+        ...superspec.invalidFieldCombinations ?? [],
+        ...invalidFieldCombinations ?? [],
+      ],
+    };
   }
 }

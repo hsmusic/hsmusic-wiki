@@ -32,4 +32,17 @@ export class NewsEntry extends Thing {
       },
     },
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    fieldTransformations: {
+      'Date': (value) => new Date(value),
+    },
+
+    propertyFieldMapping: {
+      name: 'Name',
+      directory: 'Directory',
+      date: 'Date',
+      content: 'Content',
+    },
+  };
 }

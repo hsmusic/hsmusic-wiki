@@ -63,4 +63,15 @@ export class ArtTag extends Thing {
       },
     },
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    propertyFieldMapping: {
+      name: 'Tag',
+      nameShort: 'Short Name',
+      directory: 'Directory',
+
+      color: 'Color',
+      isContentWarning: 'Is CW',
+    },
+  };
 }

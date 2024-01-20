@@ -55,6 +55,13 @@ import {
   withPropertyFromAlbum,
 } from '#composite/things/track';
 
+import {
+  parseAdditionalFiles,
+  parseAdditionalNames,
+  parseContributors,
+  parseDuration,
+} from '#yaml';
+
 import CacheableObject from './cacheable-object.js';
 import Thing from './thing.js';
 
@@ -331,6 +338,94 @@ export class Track extends Thing {
       list: input.value('featuredTracks'),
     }),
   });
+
+  static [Thing.yamlDocumentSpec] = {
+    fieldTransformations: {
+      'Additional Names': parseAdditionalNames,
+      'Duration': parseDuration,
+
+      'Date First Released': (value) => new Date(value),
+      'Cover Art Date': (value) => new Date(value),
+      'Has Cover Art': (value) =>
+        (value === true ? false :
+         value === false ? true :
+         value),
+
+      'Artists': parseContributors,
+      'Contributors': parseContributors,
+      'Cover Artists': parseContributors,
+
+      'Additional Files': parseAdditionalFiles,
+      'Sheet Music Files': parseAdditionalFiles,
+      'MIDI Project Files': parseAdditionalFiles,
+    },
+
+    propertyFieldMapping: {
+      name: 'Track',
+      directory: 'Directory',
+      additionalNames: 'Additional Names',
+      duration: 'Duration',
+      color: 'Color',
+      urls: 'URLs',
+
+      dateFirstReleased: 'Date First Released',
+      coverArtDate: 'Cover Art Date',
+      coverArtFileExtension: 'Cover Art File Extension',
+      disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
+
+      alwaysReferenceByDirectory: 'Always Reference By Directory',
+
+      lyrics: 'Lyrics',
+      commentary: 'Commentary',
+      additionalFiles: 'Additional Files',
+      sheetMusicFiles: 'Sheet Music Files',
+      midiProjectFiles: 'MIDI Project Files',
+
+      originalReleaseTrack: 'Originally Released As',
+      referencedTracks: 'Referenced Tracks',
+      sampledTracks: 'Sampled Tracks',
+      artistContribs: 'Artists',
+      contributorContribs: 'Contributors',
+      coverArtistContribs: 'Cover Artists',
+      artTags: 'Art Tags',
+    },
+
+    ignoredFields: ['Review Points'],
+
+    invalidFieldCombinations: [
+      {message: `Re-releases inherit references from the original`, fields: [
+        'Originally Released As',
+        'Referenced Tracks',
+      ]},
+
+      {message: `Re-releases inherit samples from the original`, fields: [
+        'Originally Released As',
+        'Sampled Tracks',
+      ]},
+
+      {message: `Re-releases inherit artists from the original`, fields: [
+        'Originally Released As',
+        'Artists',
+      ]},
+
+      {message: `Re-releases inherit contributors from the original`, fields: [
+        'Originally Released As',
+        'Contributors',
+      ]},
+
+      {
+        message: ({'Has Cover Art': hasCoverArt}) =>
+          (hasCoverArt
+            ? `"Has Cover Art: true" is inferred from cover artist credits`
+            : `Tracks without cover art must not have cover artist credits`),
+
+        fields: [
+          'Has Cover Art',
+          'Cover Artists',
+        ],
+      },
+    ],
+  };
 
   [inspect.custom](depth) {
     const parts = [];
