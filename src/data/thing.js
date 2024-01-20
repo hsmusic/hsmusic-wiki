@@ -3,9 +3,8 @@
 
 import {inspect} from 'node:util';
 
+import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
-
-import CacheableObject from './cacheable-object.js';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol.for('Thing.referenceType');
@@ -45,28 +44,21 @@ export default class Thing extends CacheableObject {
     const superspec = thingClass[Thing.yamlDocumentSpec];
 
     const {
-      fieldTransformations,
-      propertyFieldMapping,
+      fields,
       ignoredFields,
       invalidFieldCombinations,
       ...restOfSubspec
     } = subspec;
 
-    const newFields =
-      Object.values(subspec.propertyFieldMapping ?? {});
+    const newFields = Object.keys(fields ?? {});
 
     return {
       ...superspec,
       ...restOfSubspec,
 
-      fieldTransformations: {
-        ...superspec.fieldTransformations,
-        ...fieldTransformations,
-      },
-
-      propertyFieldMapping: {
-        ...superspec.propertyFieldMapping,
-        ...propertyFieldMapping,
+      fields: {
+        ...superspec.fields ?? {},
+        ...fields,
       },
 
       ignoredFields:

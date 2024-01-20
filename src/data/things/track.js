@@ -1,15 +1,20 @@
 import {inspect} from 'node:util';
 
+import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
+import Thing from '#thing';
+import {isColor, isContributionList, isDate, isFileExtension}
+  from '#validators';
 
 import {
-  isColor,
-  isContributionList,
-  isDate,
-  isFileExtension,
-} from '#validators';
+  parseAdditionalFiles,
+  parseAdditionalNames,
+  parseContributors,
+  parseDate,
+  parseDuration,
+} from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
 import {withResolvedContribs} from '#composite/wiki-data';
@@ -54,16 +59,6 @@ import {
   withOtherReleases,
   withPropertyFromAlbum,
 } from '#composite/things/track';
-
-import {
-  parseAdditionalFiles,
-  parseAdditionalNames,
-  parseContributors,
-  parseDuration,
-} from '#yaml';
-
-import CacheableObject from './cacheable-object.js';
-import Thing from './thing.js';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
@@ -340,54 +335,83 @@ export class Track extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    fieldTransformations: {
-      'Additional Names': parseAdditionalNames,
-      'Duration': parseDuration,
+    fields: {
+      'Track': {property: 'name'},
+      'Directory': {property: 'directory'},
 
-      'Date First Released': (value) => new Date(value),
-      'Cover Art Date': (value) => new Date(value),
-      'Has Cover Art': (value) =>
-        (value === true ? false :
-         value === false ? true :
-         value),
+      'Additional Names': {
+        property: 'additionalNames',
+        transform: parseAdditionalNames,
+      },
 
-      'Artists': parseContributors,
-      'Contributors': parseContributors,
-      'Cover Artists': parseContributors,
+      'Duration': {
+        property: 'duration',
+        transform: parseDuration,
+      },
 
-      'Additional Files': parseAdditionalFiles,
-      'Sheet Music Files': parseAdditionalFiles,
-      'MIDI Project Files': parseAdditionalFiles,
-    },
+      'Color': {property: 'color'},
+      'URLs': {property: 'urls'},
 
-    propertyFieldMapping: {
-      name: 'Track',
-      directory: 'Directory',
-      additionalNames: 'Additional Names',
-      duration: 'Duration',
-      color: 'Color',
-      urls: 'URLs',
+      'Date First Released': {
+        property: 'dateFirstReleased',
+        transform: parseDate,
+      },
 
-      dateFirstReleased: 'Date First Released',
-      coverArtDate: 'Cover Art Date',
-      coverArtFileExtension: 'Cover Art File Extension',
-      disableUniqueCoverArt: 'Has Cover Art', // This gets transformed to flip true/false.
+      'Cover Art Date': {
+        property: 'coverArtDate',
+        transform: parseDate,
+      },
 
-      alwaysReferenceByDirectory: 'Always Reference By Directory',
+      'Cover Art File Extension': {property: 'coverArtFileExtension'},
 
-      lyrics: 'Lyrics',
-      commentary: 'Commentary',
-      additionalFiles: 'Additional Files',
-      sheetMusicFiles: 'Sheet Music Files',
-      midiProjectFiles: 'MIDI Project Files',
+      'Has Cover Art': {
+        property: 'disableUniqueCoverArt',
+        transform: value =>
+          (typeof value === 'boolean'
+            ? !value
+            : value),
+      },
 
-      originalReleaseTrack: 'Originally Released As',
-      referencedTracks: 'Referenced Tracks',
-      sampledTracks: 'Sampled Tracks',
-      artistContribs: 'Artists',
-      contributorContribs: 'Contributors',
-      coverArtistContribs: 'Cover Artists',
-      artTags: 'Art Tags',
+      'Always Reference By Directory': {property: 'alwaysReferenceByDirectory'},
+
+      'Lyrics': {property: 'lyrics'},
+      'Commentary': {property: 'commentary'},
+
+      'Additional Files': {
+        property: 'additionalFiles',
+        transform: parseAdditionalFiles,
+      },
+
+      'Sheet Music Files': {
+        property: 'sheetMusicFiles',
+        transform: parseAdditionalFiles,
+      },
+
+      'MIDI Project Files': {
+        property: 'midiProjectFiles',
+        transform: parseAdditionalFiles,
+      },
+
+      'Originally Released As': {property: 'originalReleaseTrack'},
+      'Referenced Tracks': {property: 'referencedTracks'},
+      'Sampled Tracks': {property: 'sampledTracks'},
+
+      'Artists': {
+        property: 'artistContribs',
+        transform: parseContributors,
+      },
+
+      'Contributors': {
+        property: 'contributorContribs',
+        transform: parseContributors,
+      },
+
+      'Cover Artists': {
+        property: 'coverArtistContribs',
+        transform: parseContributors,
+      },
+
+      'Art Tags': {property: 'artTags'},
     },
 
     ignoredFields: ['Review Points'],

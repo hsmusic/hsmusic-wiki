@@ -1,5 +1,6 @@
 import {input} from '#composite';
 import find from '#find';
+import Thing from '#thing';
 
 import {
   color,
@@ -10,8 +11,6 @@ import {
   urls,
   wikiData,
 } from '#composite/wiki-properties';
-
-import Thing from './thing.js';
 
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
@@ -87,13 +86,13 @@ export class Group extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Group',
-      directory: 'Directory',
-      description: 'Description',
-      urls: 'URLs',
+    fields: {
+      'Group': {property: 'name'},
+      'Directory': {property: 'directory'},
+      'Description': {property: 'description'},
+      'URLs': {property: 'urls'},
 
-      featuredAlbums: 'Featured Albums',
+      'Featured Albums': {property: 'featuredAlbums'},
     },
 
     ignoredFields: ['Review Points'],
@@ -126,9 +125,9 @@ export class GroupCategory extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Category',
-      color: 'Color',
+    fields: {
+      'Category': {property: 'name'},
+      'Color': {property: 'color'},
     },
   };
 }

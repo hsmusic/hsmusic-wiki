@@ -1,6 +1,7 @@
 import {input} from '#composite';
-import {sortAlbumsTracksChronologically} from '#wiki-data';
+import Thing from '#thing';
 import {isName} from '#validators';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
 
 import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 
@@ -11,8 +12,6 @@ import {
   name,
   wikiData,
 } from '#composite/wiki-properties';
-
-import Thing from './thing.js';
 
 export class ArtTag extends Thing {
   static [Thing.referenceType] = 'tag';
@@ -65,13 +64,13 @@ export class ArtTag extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Tag',
-      nameShort: 'Short Name',
-      directory: 'Directory',
+    fields: {
+      'Tag': {property: 'name'},
+      'Short Name': {property: 'nameShort'},
+      'Directory': {property: 'directory'},
 
-      color: 'Color',
-      isContentWarning: 'Is CW',
+      'Color': {property: 'color'},
+      'Is CW': {property: 'isContentWarning'},
     },
   };
 }

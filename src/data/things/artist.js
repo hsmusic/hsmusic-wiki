@@ -1,7 +1,10 @@
 import {input} from '#composite';
 import find from '#find';
 import {unique} from '#sugar';
+import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
+
+import {withReverseContributionList} from '#composite/wiki-data';
 
 import {
   contentString,
@@ -15,10 +18,6 @@ import {
   urls,
   wikiData,
 } from '#composite/wiki-properties';
-
-import {withReverseContributionList} from '#composite/wiki-data';
-
-import Thing from './thing.js';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
@@ -242,16 +241,16 @@ export class Artist extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Artist',
-      directory: 'Directory',
-      urls: 'URLs',
-      contextNotes: 'Context Notes',
+    fields: {
+      'Artist': {property: 'name'},
+      'Directory': {property: 'directory'},
+      'URLs': {property: 'urls'},
+      'Context Notes': {property: 'contextNotes'},
 
-      hasAvatar: 'Has Avatar',
-      avatarFileExtension: 'Avatar File Extension',
+      'Has Avatar': {property: 'hasAvatar'},
+      'Avatar File Extension': {property: 'avatarFileExtension'},
 
-      aliasNames: 'Aliases',
+      'Aliases': {property: 'aliasNames'},
     },
 
     ignoredFields: ['Dead URLs', 'Review Points'],

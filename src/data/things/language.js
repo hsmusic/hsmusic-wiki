@@ -1,8 +1,10 @@
 import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
 
+import CacheableObject from '#cacheable-object';
 import * as html from '#html';
 import {empty, withAggregate} from '#sugar';
 import {isLanguageCode} from '#validators';
+import Thing from '#thing';
 
 import {
   getExternalLinkStringOfStyleFromDescriptors,
@@ -12,14 +14,7 @@ import {
   isExternalLinkStyle,
 } from '#external-links';
 
-import {
-  externalFunction,
-  flag,
-  name,
-} from '#composite/wiki-properties';
-
-import CacheableObject from './cacheable-object.js';
-import Thing from './thing.js';
+import {externalFunction, flag, name} from '#composite/wiki-properties';
 
 export class Language extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({

@@ -1,11 +1,8 @@
-import {
-  contentString,
-  directory,
-  name,
-  simpleDate,
-} from '#composite/wiki-properties';
+import Thing from '#thing';
+import {parseDate} from '#yaml';
 
-import Thing from './thing.js';
+import {contentString, directory, name, simpleDate}
+  from '#composite/wiki-properties';
 
 export class NewsEntry extends Thing {
   static [Thing.referenceType] = 'news-entry';
@@ -34,15 +31,16 @@ export class NewsEntry extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    fieldTransformations: {
-      'Date': (value) => new Date(value),
-    },
+    fields: {
+      'Name': {property: 'name'},
+      'Directory': {property: 'directory'},
 
-    propertyFieldMapping: {
-      name: 'Name',
-      directory: 'Directory',
-      date: 'Date',
-      content: 'Content',
+      'Date': {
+        property: 'date',
+        transform: parseDate,
+      },
+
+      'Content': {property: 'content'},
     },
   };
 }

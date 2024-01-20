@@ -12,8 +12,8 @@ import CacheableObject, {CacheableObjectPropertyValueError}
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import {traverse} from '#node-utils';
-
-import T, {Thing} from '#things';
+import Thing from '#thing';
+import T from '#things';
 
 import {
   annotateErrorWithFile,
@@ -28,6 +28,7 @@ import {
   showAggregate,
   typeAppearance,
   withAggregate,
+  withEntries,
 } from '#sugar';
 
 import {
@@ -65,76 +66,68 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 // makeProcessDocument is a factory function: the returned function will take a
 // document and apply the configuration passed to makeProcessDocument in order
 // to construct a Thing subclass.
-function makeProcessDocument(
-  thingConstructor,
-  {
-    // Optional early step for transforming field values before providing them
-    // to the Thing's update() method. This is useful when the input format
-    // (i.e. values in the document) differ from the format the actual Thing
-    // expects.
-    //
-    // Each key and value are a field name (not an update() property) and a
-    // function which takes the value for that field and returns the value which
-    // will be passed on to update().
-    //
-    fieldTransformations = {},
+//
+function makeProcessDocument(thingConstructor, {
+  // The bulk of configuration happens here in the spec's `fields` property.
+  // Each key is a field that's expected on the source document; fields that
+  // don't match one of these keys will cause an error. Values are object
+  // entries describing what to do with the field.
+  //
+  // A field entry's `property` tells what property the value for this field
+  // will be put into, on the respective Thing (subclass) instance.
+  //
+  // A field entry's `transform` optionally allows converting the raw value in
+  // YAML into some other format before providing setting it on the Thing
+  // instance.
+  //
+  fields: fieldSpecs = {},
 
-    // Mapping of Thing.update() source properties to field names.
-    //
-    // Note this is property -> field, not field -> property. This is a
-    // shorthand convenience because properties are generally typical
-    // camel-cased JS properties, while fields may contain whitespace and be
-    // more easily represented as quoted strings.
-    //
-    propertyFieldMapping,
+  // Completely ignored fields. These won't throw an unknown field error if
+  // they're present in a document, but they won't be used for Thing property
+  // generation, either. Useful for stuff that's present in data files but not
+  // yet implemented as part of a Thing's data model!
+  //
+  ignoredFields = [],
 
-    // Completely ignored fields. These won't throw an unknown field error if
-    // they're present in a document, but they won't be used for Thing property
-    // generation, either. Useful for stuff that's present in data files but not
-    // yet implemented as part of a Thing's data model!
-    //
-    ignoredFields = [],
-
-    // List of fields which are invalid when coexisting in a document.
-    // Data objects are generally allowing with regards to what properties go
-    // together, allowing for properties to be set separately from each other
-    // instead of complaining about invalid or unused-data cases. But it's
-    // useful to see these kinds of errors when actually validating YAML files!
-    //
-    // Each item of this array should itself be an object with a descriptive
-    // message and a list of fields. Of those fields, none should ever coexist
-    // with any other. For example:
-    //
-    //   [
-    //     {message: '...', fields: ['A', 'B', 'C']},
-    //     {message: '...', fields: ['C', 'D']},
-    //   ]
-    //
-    // ...means A can't coexist with B or C, B can't coexist with A or C, and
-    // C can't coexist iwth A, B, or D - but it's okay for D to coexist with
-    // A or B.
-    //
-    invalidFieldCombinations = [],
-  }
-) {
+  // List of fields which are invalid when coexisting in a document.
+  // Data objects are generally allowing with regards to what properties go
+  // together, allowing for properties to be set separately from each other
+  // instead of complaining about invalid or unused-data cases. But it's
+  // useful to see these kinds of errors when actually validating YAML files!
+  //
+  // Each item of this array should itself be an object with a descriptive
+  // message and a list of fields. Of those fields, none should ever coexist
+  // with any other. For example:
+  //
+  //   [
+  //     {message: '...', fields: ['A', 'B', 'C']},
+  //     {message: '...', fields: ['C', 'D']},
+  //   ]
+  //
+  // ...means A can't coexist with B or C, B can't coexist with A or C, and
+  // C can't coexist iwth A, B, or D - but it's okay for D to coexist with
+  // A or B.
+  //
+  invalidFieldCombinations = [],
+}) {
   if (!thingConstructor) {
     throw new Error(`Missing Thing class`);
   }
 
-  if (!propertyFieldMapping) {
-    throw new Error(`Expected propertyFieldMapping to be provided`);
+  if (!fieldSpecs) {
+    throw new Error(`Expected fields to be provided`);
   }
 
-  const knownFields = Object.values(propertyFieldMapping);
+  const knownFields = Object.keys(fieldSpecs);
 
-  // Invert the property-field mapping, since it'll come in handy for
-  // assigning update() source values later.
-  const fieldPropertyMapping = Object.fromEntries(
-    Object.entries(propertyFieldMapping)
-      .map(([property, field]) => [field, property]));
+  const propertyToField =
+    withEntries(fieldSpecs, entries => entries
+      .map(([field, {property}]) => [property, field]));
 
+  // TODO: Is this function even necessary??
+  // Aren't we doing basically the same work in the function it's decorating???
   const decorateErrorWithName = (fn) => {
-    const nameField = propertyFieldMapping['name'];
+    const nameField = propertyToField.name;
     if (!nameField) return fn;
 
     return (document) => {
@@ -151,7 +144,7 @@ function makeProcessDocument(
   };
 
   return decorateErrorWithName((document) => {
-    const nameField = propertyFieldMapping['name'];
+    const nameField = propertyToField.name;
     const namePart =
       (nameField
         ? (document[nameField]
@@ -192,7 +185,8 @@ function makeProcessDocument(
     const fieldCombinationErrors = [];
 
     for (const {message, fields} of invalidFieldCombinations) {
-      const fieldsPresent = presentFields.filter(field => fields.includes(field));
+      const fieldsPresent =
+        presentFields.filter(field => fields.includes(field));
 
       if (fieldsPresent.length >= 2) {
         const filteredDocument =
@@ -201,7 +195,8 @@ function makeProcessDocument(
             fieldsPresent,
             {preserveOriginalOrder: true});
 
-        fieldCombinationErrors.push(new FieldCombinationError(filteredDocument, message));
+        fieldCombinationErrors.push(
+          new FieldCombinationError(filteredDocument, message));
 
         for (const field of Object.keys(filteredDocument)) {
           skippedFields.add(field);
@@ -220,8 +215,8 @@ function makeProcessDocument(
 
       // This variable would like to certify itself as "not into capitalism".
       let propertyValue =
-        (Object.hasOwn(fieldTransformations, field)
-          ? fieldTransformations[field](documentValue)
+        (fieldSpecs[field].transform
+          ? fieldSpecs[field].transform(documentValue)
           : documentValue);
 
       // Completely blank items in a YAML list are read as null.
@@ -247,19 +242,13 @@ function makeProcessDocument(
       fieldValues[field] = propertyValue;
     }
 
-    const sourceProperties = {};
-
-    for (const [field, value] of Object.entries(fieldValues)) {
-      const property = fieldPropertyMapping[field];
-      sourceProperties[property] = value;
-    }
-
     const thing = Reflect.construct(thingConstructor, []);
 
     const fieldValueErrors = [];
 
-    for (const [property, value] of Object.entries(sourceProperties)) {
-      const field = propertyFieldMapping[property];
+    for (const [field, value] of Object.entries(fieldValues)) {
+      const {property} = fieldSpecs[field];
+
       try {
         thing[property] = value;
       } catch (caughtError) {
@@ -381,6 +370,10 @@ export class SkippedFieldsSummaryError extends Error {
 }
 
 // --> Utilities shared across document parsing functions
+
+export function parseDate(date) {
+  return new Date(date);
+}
 
 export function parseDuration(string) {
   if (typeof string !== 'string') {
@@ -779,7 +772,7 @@ export const getDataSteps = () => [
         case 'albums':
           return T.HomepageLayoutAlbumsRow;
         default:
-          throw new TypeError(`No processDocument function for row type ${type}!`);
+          throw new TypeError(`No processDocument function for row type ${document['Type']}!`);
       }
     },
 
@@ -1574,9 +1567,12 @@ export function filterReferenceErrors(wikiData) {
               return false;
             }, fn);
 
+            const {fields} = thing.constructor[Thing.yamlDocumentSpec];
+
             const field =
-              thing.constructor[Thing.yamlDocumentSpec]
-                .propertyFieldMapping[property];
+              Object.entries(fields ?? {})
+                .find(([field, fieldSpec]) => fieldSpec.property === property)
+                ?.[0];
 
             const fieldPropertyMessage =
               (field

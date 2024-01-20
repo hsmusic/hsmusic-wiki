@@ -1,6 +1,9 @@
 import {input} from '#composite';
 import find from '#find';
+import Thing from '#thing';
 import {isDate} from '#validators';
+import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
+  from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -26,14 +29,6 @@ import {
 } from '#composite/wiki-properties';
 
 import {withTracks, withTrackSections} from '#composite/things/album';
-
-import {
-  parseAdditionalFiles,
-  parseContributors,
-  parseDimensions,
-} from '#yaml';
-
-import Thing from './thing.js';
 
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
@@ -205,58 +200,85 @@ export class Album extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    fieldTransformations: {
-      'Artists': parseContributors,
-      'Cover Artists': parseContributors,
-      'Default Track Cover Artists': parseContributors,
-      'Wallpaper Artists': parseContributors,
-      'Banner Artists': parseContributors,
+    fields: {
+      'Album': {property: 'name'},
+      'Directory': {property: 'directory'},
 
-      'Date': (value) => new Date(value),
-      'Date Added': (value) => new Date(value),
-      'Cover Art Date': (value) => new Date(value),
-      'Default Track Cover Art Date': (value) => new Date(value),
+      'Date': {
+        property: 'date',
+        transform: parseDate,
+      },
 
-      'Banner Dimensions': parseDimensions,
+      'Color': {property: 'color'},
+      'URLs': {property: 'urls'},
 
-      'Additional Files': parseAdditionalFiles,
-    },
+      'Has Track Numbers': {property: 'hasTrackNumbers'},
+      'Listed on Homepage': {property: 'isListedOnHomepage'},
+      'Listed in Galleries': {property: 'isListedInGalleries'},
 
-    propertyFieldMapping: {
-      name: 'Album',
-      directory: 'Directory',
-      date: 'Date',
-      color: 'Color',
-      urls: 'URLs',
+      'Cover Art Date': {
+        property: 'coverArtDate',
+        transform: parseDate,
+      },
 
-      hasTrackNumbers: 'Has Track Numbers',
-      isListedOnHomepage: 'Listed on Homepage',
-      isListedInGalleries: 'Listed in Galleries',
+      'Default Track Cover Art Date': {
+        property: 'trackArtDate',
+        transform: parseDate,
+      },
 
-      coverArtDate: 'Cover Art Date',
-      trackArtDate: 'Default Track Cover Art Date',
-      dateAddedToWiki: 'Date Added',
+      'Date Added': {
+        property: 'dateAddedToWiki',
+        transform: parseDate,
+      },
 
-      coverArtFileExtension: 'Cover Art File Extension',
-      trackCoverArtFileExtension: 'Track Art File Extension',
+      'Cover Art File Extension': {property: 'coverArtFileExtension'},
+      'Track Art File Extension': {property: 'trackCoverArtFileExtension'},
 
-      wallpaperArtistContribs: 'Wallpaper Artists',
-      wallpaperStyle: 'Wallpaper Style',
-      wallpaperFileExtension: 'Wallpaper File Extension',
+      'Wallpaper Artists': {
+        property: 'wallpaperArtistContribs',
+        transform: parseContributors,
+      },
 
-      bannerArtistContribs: 'Banner Artists',
-      bannerStyle: 'Banner Style',
-      bannerFileExtension: 'Banner File Extension',
-      bannerDimensions: 'Banner Dimensions',
+      'Wallpaper Style': {property: 'wallpaperStyle'},
+      'Wallpaper File Extension': {property: 'wallpaperFileExtension'},
 
-      commentary: 'Commentary',
-      additionalFiles: 'Additional Files',
+      'Banner Artists': {
+        property: 'bannerArtistContribs',
+        transform: parseContributors,
+      },
 
-      artistContribs: 'Artists',
-      coverArtistContribs: 'Cover Artists',
-      trackCoverArtistContribs: 'Default Track Cover Artists',
-      groups: 'Groups',
-      artTags: 'Art Tags',
+      'Banner Style': {property: 'bannerStyle'},
+      'Banner File Extension': {property: 'bannerFileExtension'},
+
+      'Banner Dimensions': {
+        property: 'bannerDimensions',
+        transform: parseDimensions,
+      },
+
+      'Commentary': {property: 'commentary'},
+
+      'Additional Files': {
+        property: 'additionalFiles',
+        transform: parseAdditionalFiles,
+      },
+
+      'Artists': {
+        property: 'artistContribs',
+        transform: parseContributors,
+      },
+
+      'Cover Artists': {
+        property: 'coverArtistContribs',
+        transform: parseContributors,
+      },
+
+      'Default Track Cover Artists': {
+        property: 'trackCoverArtistContribs',
+        transform: parseContributors,
+      },
+
+      'Groups': {property: 'groups'},
+      'Art Tags': {property: 'artTags'},
     },
 
     ignoredFields: ['Review Points'],
@@ -274,14 +296,14 @@ export class TrackSectionHelper extends Thing {
   })
 
   static [Thing.yamlDocumentSpec] = {
-    fieldTransformations: {
-      'Date Originally Released': (value) => new Date(value),
-    },
+    fields: {
+      'Section': {property: 'name'},
+      'Color': {property: 'color'},
 
-    propertyFieldMapping: {
-      name: 'Section',
-      color: 'Color',
-      dateOriginallyReleased: 'Date Originally Released',
+      'Date Originally Released': {
+        property: 'dateOriginallyReleased',
+        transform: parseDate,
+      },
     },
   };
 }

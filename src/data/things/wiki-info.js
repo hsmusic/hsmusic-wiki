@@ -1,16 +1,10 @@
 import {input} from '#composite';
 import find from '#find';
+import Thing from '#thing';
 import {isColor, isLanguageCode, isName, isURL} from '#validators';
 
-import {
-  contentString,
-  flag,
-  name,
-  referenceList,
-  wikiData,
-} from '#composite/wiki-properties';
-
-import Thing from './thing.js';
+import {contentString, flag, name, referenceList, wikiData}
+  from '#composite/wiki-properties';
 
 export class WikiInfo extends Thing {
   static [Thing.friendlyName] = `Wiki Info`;
@@ -76,20 +70,20 @@ export class WikiInfo extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Name',
-      nameShort: 'Short Name',
-      color: 'Color',
-      description: 'Description',
-      footerContent: 'Footer Content',
-      defaultLanguage: 'Default Language',
-      canonicalBase: 'Canonical Base',
-      divideTrackListsByGroups: 'Divide Track Lists By Groups',
-      enableFlashesAndGames: 'Enable Flashes & Games',
-      enableListings: 'Enable Listings',
-      enableNews: 'Enable News',
-      enableArtTagUI: 'Enable Art Tag UI',
-      enableGroupUI: 'Enable Group UI',
+    fields: {
+      'Name': {property: 'name'},
+      'Short Name': {property: 'nameShort'},
+      'Color': {property: 'color'},
+      'Description': {property: 'description'},
+      'Footer Content': {property: 'footerContent'},
+      'Default Language': {property: 'defaultLanguage'},
+      'Canonical Base': {property: 'canonicalBase'},
+      'Divide Track Lists By Groups': {property: 'divideTrackListsByGroups'},
+      'Enable Flashes & Games': {property: 'enableFlashesAndGames'},
+      'Enable Listings': {property: 'enableListings'},
+      'Enable News': {property: 'enableNews'},
+      'Enable Art Tag UI': {property: 'enableArtTagUI'},
+      'Enable Group UI': {property: 'enableGroupUI'},
     },
   };
 }

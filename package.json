@@ -12,9 +12,9 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
-        "#cacheable-object": "./src/data/things/cacheable-object.js",
+        "#cacheable-object": "./src/data/cacheable-object.js",
         "#colors": "./src/util/colors.js",
-        "#composite": "./src/data/things/composite.js",
+        "#composite": "./src/data/composite.js",
         "#composite/control-flow": "./src/data/composite/control-flow/index.js",
         "#composite/data": "./src/data/composite/data/index.js",
         "#composite/wiki-data": "./src/data/composite/wiki-data/index.js",
@@ -36,10 +36,11 @@
         "#serialize": "./src/data/serialize.js",
         "#sugar": "./src/util/sugar.js",
         "#test-lib": "./test/lib/index.js",
+        "#thing": "./src/data/thing.js",
         "#things": "./src/data/things/index.js",
         "#thumbs": "./src/gen-thumbs.js",
         "#urls": "./src/util/urls.js",
-        "#validators": "./src/data/things/validators.js",
+        "#validators": "./src/data/validators.js",
         "#wiki-data": "./src/util/wiki-data.js",
         "#yaml": "./src/data/yaml.js"
     },

@@ -1,5 +1,6 @@
 import {input} from '#composite';
 import find from '#find';
+import Thing from '#thing';
 
 import {
   anyOf,
@@ -14,16 +15,8 @@ import {
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
-
-import {
-  color,
-  contentString,
-  name,
-  referenceList,
-  wikiData,
-} from '#composite/wiki-properties';
-
-import Thing from './thing.js';
+import {color, contentString, name, referenceList, wikiData}
+  from '#composite/wiki-properties';
 
 export class HomepageLayout extends Thing {
   static [Thing.friendlyName] = `Homepage Layout`;
@@ -48,9 +41,9 @@ export class HomepageLayout extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      sidebarContent: 'Sidebar Content',
-      navbarLinks: 'Navbar Links',
+    fields: {
+      'Sidebar Content': {property: 'sidebarContent'},
+      'Navbar Links': {property: 'navbarLinks'},
     },
 
     ignoredFields: ['Homepage'],
@@ -93,10 +86,10 @@ export class HomepageLayoutRow extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Row',
-      color: 'Color',
-      type: 'Type',
+    fields: {
+      'Row': {property: 'name'},
+      'Color': {property: 'color'},
+      'Type': {property: 'type'},
     },
   };
 }
@@ -181,12 +174,12 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
   });
 
   static [Thing.yamlDocumentSpec] = Thing.extendDocumentSpec(HomepageLayoutRow, {
-    propertyFieldMapping: {
-      displayStyle: 'Display Style',
-      sourceGroup: 'Group',
-      countAlbumsFromGroup: 'Count',
-      sourceAlbums: 'Albums',
-      actionLinks: 'Actions',
+    fields: {
+      'Display Style': {property: 'displayStyle'},
+      'Group': {property: 'sourceGroup'},
+      'Count': {property: 'countAlbumsFromGroup'},
+      'Albums': {property: 'sourceAlbums'},
+      'Actions': {property: 'actionLinks'},
     },
   });
 }

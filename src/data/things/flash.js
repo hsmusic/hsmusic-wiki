@@ -1,13 +1,8 @@
 import {input} from '#composite';
 import find from '#find';
-
-import {
-  anyOf,
-  isColor,
-  isDirectory,
-  isNumber,
-  isString,
-} from '#validators';
+import Thing from '#thing';
+import {anyOf, isColor, isDirectory, isNumber, isString} from '#validators';
+import {parseDate, parseContributors} from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -27,10 +22,6 @@ import {
 } from '#composite/wiki-properties';
 
 import {withFlashAct} from '#composite/things/flash';
-
-import {parseContributors} from '#yaml';
-
-import Thing from './thing.js';
 
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
@@ -137,24 +128,25 @@ export class Flash extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    fieldTransformations: {
-      'Date': (value) => new Date(value),
+    fields: {
+      'Flash': {property: 'name'},
+      'Directory': {property: 'directory'},
+      'Page': {property: 'page'},
+      'Color': {property: 'color'},
+      'URLs': {property: 'urls'},
 
-      'Contributors': parseContributors,
-    },
+      'Date': {
+        property: 'date',
+        transform: parseDate,
+      },
 
-    propertyFieldMapping: {
-      name: 'Flash',
-      directory: 'Directory',
-      page: 'Page',
-      color: 'Color',
-      urls: 'URLs',
+      'Cover Art File Extension': {property: 'coverArtFileExtension'},
 
-      date: 'Date',
-      coverArtFileExtension: 'Cover Art File Extension',
-
-      featuredTracks: 'Featured Tracks',
-      contributorContribs: 'Contributors',
+      'Featured Tracks': {property: 'featuredTracks'},
+      'Contributors': {
+        property: 'contributorContribs',
+        transform: parseContributors,
+      },
     },
 
     ignoredFields: ['Review Points'],
@@ -199,15 +191,15 @@ export class FlashAct extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Act',
-      directory: 'Directory',
+    fields: {
+      'Act': {property: 'name'},
+      'Directory': {property: 'directory'},
 
-      color: 'Color',
-      listTerminology: 'List Terminology',
+      'Color': {property: 'color'},
+      'List Terminology': {property: 'listTerminology'},
 
-      jump: 'Jump',
-      jumpColor: 'Jump Color',
+      'Jump': {property: 'jump'},
+      'Jump Color': {property: 'jumpColor'},
     },
 
     ignoredFields: ['Review Points'],

@@ -6,7 +6,7 @@ import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
 import {openAggregate, showAggregate} from '#sugar';
 
-import Thing from './thing.js';
+import Thing from '#thing';
 
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
@@ -19,8 +19,6 @@ import * as newsEntryClasses from './news-entry.js';
 import * as staticPageClasses from './static-page.js';
 import * as trackClasses from './track.js';
 import * as wikiInfoClasses from './wiki-info.js';
-
-export {default as Thing} from './thing.js';
 
 const allClassLists = {
   'album.js': albumClasses,

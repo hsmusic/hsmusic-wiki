@@ -1,13 +1,8 @@
+import Thing from '#thing';
 import {isName} from '#validators';
 
-import {
-  contentString,
-  directory,
-  name,
-  simpleString,
-} from '#composite/wiki-properties';
-
-import Thing from './thing.js';
+import {contentString, directory, name, simpleString}
+  from '#composite/wiki-properties';
 
 export class StaticPage extends Thing {
   static [Thing.referenceType] = 'static';
@@ -35,14 +30,14 @@ export class StaticPage extends Thing {
   });
 
   static [Thing.yamlDocumentSpec] = {
-    propertyFieldMapping: {
-      name: 'Name',
-      nameShort: 'Short Name',
-      directory: 'Directory',
+    fields: {
+      'Name': {property: 'name'},
+      'Short Name': {property: 'nameShort'},
+      'Directory': {property: 'directory'},
 
-      stylesheet: 'Style',
-      script: 'Script',
-      content: 'Content',
+      'Style': {property: 'stylesheet'},
+      'Script': {property: 'script'},
+      'Content': {property: 'content'},
     },
 
     ignoredFields: ['Review Points'],
