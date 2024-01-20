@@ -9,10 +9,10 @@ import CacheableObject from './cacheable-object.js';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol.for('Thing.referenceType');
-  static friendlyName = Symbol.for(`Thing.friendlyName`);
+  static friendlyName = Symbol.for('Thing.friendlyName');
 
-  static getPropertyDescriptors = Symbol('Thing.getPropertyDescriptors');
-  static getSerializeDescriptors = Symbol('Thing.getSerializeDescriptors');
+  static getPropertyDescriptors = Symbol.for('Thing.getPropertyDescriptors');
+  static getSerializeDescriptors = Symbol.for('Thing.getSerializeDescriptors');
 
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
 
