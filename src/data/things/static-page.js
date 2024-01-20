@@ -6,6 +6,7 @@ import {traverse} from '#node-utils';
 import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
+import {parseReviewPoints} from '#yaml';
 
 import {contentString, directory, name, simpleString}
   from '#composite/wiki-properties';
@@ -52,7 +53,10 @@ export class StaticPage extends Thing {
       'Script': {property: 'script'},
       'Content': {property: 'content'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 

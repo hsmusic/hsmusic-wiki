@@ -5,7 +5,7 @@ import find from '#find';
 import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isDirectory, isNumber, isString} from '#validators';
-import {parseDate, parseContributors} from '#yaml';
+import {parseDate, parseContributors, parseReviewPoints} from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
@@ -19,6 +19,7 @@ import {
   fileExtension,
   name,
   referenceList,
+  reviewPointList,
   simpleDate,
   urls,
   wikiData,
@@ -29,7 +30,12 @@ import {withFlashAct} from '#composite/things/flash';
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
-  static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Artist,
+    Track,
+    Flash,
+    FlashAct,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Flash'),
@@ -88,6 +94,10 @@ export class Flash extends Thing {
     }),
 
     urls: urls(),
+
+    reviewPoints: reviewPointList({
+      class: input.value(Flash),
+    }),
 
     // Update only
 
@@ -158,7 +168,10 @@ export class Flash extends Thing {
         transform: parseContributors,
       },
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 }
@@ -167,7 +180,7 @@ export class FlashAct extends Thing {
   static [Thing.referenceType] = 'flash-act';
   static [Thing.friendlyName] = `Flash Act`;
 
-  static [Thing.getPropertyDescriptors] = () => ({
+  static [Thing.getPropertyDescriptors] = ({FlashAct, Flash}) => ({
     // Update & expose
 
     name: name('Unnamed Flash Act'),
@@ -191,6 +204,10 @@ export class FlashAct extends Thing {
       class: input.value(Flash),
       find: input.value(find.flash),
       data: 'flashData',
+    }),
+
+    reviewPoints: reviewPointList({
+      classes: input.value([FlashAct, Flash]),
     }),
 
     // Update only
@@ -218,7 +235,10 @@ export class FlashAct extends Thing {
       'Jump': {property: 'jump'},
       'Jump Color': {property: 'jumpColor'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 

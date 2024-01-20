@@ -3,6 +3,7 @@ export const GROUP_DATA_FILE = 'groups.yaml';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
+import {parseReviewPoints} from '#yaml';
 
 import {
   color,
@@ -10,6 +11,7 @@ import {
   directory,
   name,
   referenceList,
+  reviewPointList,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -17,7 +19,7 @@ import {
 export class Group extends Thing {
   static [Thing.referenceType] = 'group';
 
-  static [Thing.getPropertyDescriptors] = ({Album}) => ({
+  static [Thing.getPropertyDescriptors] = ({Album, Group}) => ({
     // Update & expose
 
     name: name('Unnamed Group'),
@@ -31,6 +33,10 @@ export class Group extends Thing {
       class: input.value(Album),
       find: input.value(find.album),
       data: 'albumData',
+    }),
+
+    reviewPoints: reviewPointList({
+      class: input.value(Group),
     }),
 
     // Update only
@@ -106,7 +112,10 @@ export class Group extends Thing {
 
       'Featured Albums': {property: 'featuredAlbums'},
 
-      'Review Points': {ignore: true},
+      'Review Points': {
+        property: 'reviewPoints',
+        transform: parseReviewPoints,
+      },
     },
   };
 
