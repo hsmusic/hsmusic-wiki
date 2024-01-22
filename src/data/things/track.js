@@ -412,9 +412,9 @@ export class Track extends Thing {
       },
 
       'Art Tags': {property: 'artTags'},
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
 
     invalidFieldCombinations: [
       {message: `Re-releases inherit references from the original`, fields: [

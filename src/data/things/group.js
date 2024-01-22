@@ -93,9 +93,9 @@ export class Group extends Thing {
       'URLs': {property: 'urls'},
 
       'Featured Albums': {property: 'featuredAlbums'},
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
   };
 }
 

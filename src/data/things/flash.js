@@ -147,9 +147,9 @@ export class Flash extends Thing {
         property: 'contributorContribs',
         transform: parseContributors,
       },
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
   };
 }
 
@@ -200,8 +200,8 @@ export class FlashAct extends Thing {
 
       'Jump': {property: 'jump'},
       'Jump Color': {property: 'jumpColor'},
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
   };
 }

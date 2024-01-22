@@ -251,8 +251,10 @@ export class Artist extends Thing {
       'Avatar File Extension': {property: 'avatarFileExtension'},
 
       'Aliases': {property: 'aliasNames'},
-    },
 
-    ignoredFields: ['Dead URLs', 'Review Points'],
+      'Dead URLs': {ignore: true},
+
+      'Review Points': {ignore: true},
+    },
   };
 }

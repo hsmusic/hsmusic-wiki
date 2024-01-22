@@ -42,11 +42,11 @@ export class HomepageLayout extends Thing {
 
   static [Thing.yamlDocumentSpec] = {
     fields: {
+      'Homepage': {ignore: true},
+
       'Sidebar Content': {property: 'sidebarContent'},
       'Navbar Links': {property: 'navbarLinks'},
     },
-
-    ignoredFields: ['Homepage'],
   };
 }
 

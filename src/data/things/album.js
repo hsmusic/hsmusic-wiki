@@ -279,9 +279,9 @@ export class Album extends Thing {
 
       'Groups': {property: 'groups'},
       'Art Tags': {property: 'artTags'},
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
   };
 }
 

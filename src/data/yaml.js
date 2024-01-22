@@ -80,14 +80,12 @@ function makeProcessDocument(thingConstructor, {
   // YAML into some other format before providing setting it on the Thing
   // instance.
   //
-  fields: fieldSpecs = {},
-
-  // Completely ignored fields. These won't throw an unknown field error if
-  // they're present in a document, but they won't be used for Thing property
-  // generation, either. Useful for stuff that's present in data files but not
-  // yet implemented as part of a Thing's data model!
+  // If a field entry has `ignore: true`, it will be completely skipped by the
+  // YAML parser - it won't be validated, read, or loaded into data objects.
+  // This is mainly useful for fields that are purely annotational or are
+  // currently placeholders.
   //
-  ignoredFields = [],
+  fields: fieldSpecs = {},
 
   // List of fields which are invalid when coexisting in a document.
   // Data objects are generally allowing with regards to what properties go
@@ -119,6 +117,11 @@ function makeProcessDocument(thingConstructor, {
   }
 
   const knownFields = Object.keys(fieldSpecs);
+
+  const ignoredFields =
+    Object.entries(fieldSpecs)
+      .filter(([, {ignore}]) => ignore)
+      .map(([field]) => field);
 
   const propertyToField =
     withEntries(fieldSpecs, entries => entries

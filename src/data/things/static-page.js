@@ -38,8 +38,8 @@ export class StaticPage extends Thing {
       'Style': {property: 'stylesheet'},
       'Script': {property: 'script'},
       'Content': {property: 'content'},
-    },
 
-    ignoredFields: ['Review Points'],
+      'Review Points': {ignore: true},
+    },
   };
 }
