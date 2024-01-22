@@ -832,6 +832,9 @@ export const isReferenceDiscussion = validateProperties({
   url: isURL,
   date: isDate,
 
+  annotation:
+    optional(isContentString),
+
   participants:
     optional(validateArrayItems(isArtistRef)),
 });
