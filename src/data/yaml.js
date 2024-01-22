@@ -383,11 +383,20 @@ export function parseAdditionalFiles(array) {
   }));
 }
 
-export const extractAccentRegex =
+// E.g: "main (accent)" or "main"
+export const suffixAccentRegex =
   /^(?<main>.*?)(?: \((?<accent>.*)\))?$/;
 
-export const extractPrefixAccentRegex =
+// E.g: "(accent) main" or "main"
+export const prefixAccentRegex =
   /^(?:\((?<accent>.*)\) )?(?<main>.*?)$/;
+
+// E.g: "Jan 12, 2025, #issuefication-zone"
+//   -> date:       "Jan 12, 2025"
+//      annotation: "#issuefication-zone"
+// Mostly extracted from commentaryRegex in #wiki-data.
+export const dateAnnotationRegex =
+  /^(?:(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4})(?=[,)]|$))?(?:,? ?(?<annotation>.*))/;
 
 export function parseContributors(contributionStrings) {
   // If this isn't something we can parse, just return it as-is.
@@ -412,7 +421,7 @@ export function parseContributors(contributionStrings) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    const match = item.match(suffixAccentRegex);
     if (!match) return item;
 
     return {
@@ -433,7 +442,7 @@ export function parseAdditionalNames(additionalNameStrings) {
 
     if (typeof item !== 'string') return item;
 
-    const match = item.match(extractAccentRegex);
+    const match = item.match(suffixAccentRegex);
     if (!match) return item;
 
     return {
@@ -488,19 +497,36 @@ export function parseReferenceDiscussions(referenceDiscussions) {
           entry.participants = source['Participants'];
         }
 
+        if (source['Annotation']) {
+          entry.annotation = source['Annotation'];
+        }
+
         return entry;
       }
 
       case 'string': {
         const entry = {};
 
-        const match = source.match(extractPrefixAccentRegex);
-        if (!match) return source;
+        const match1 = source.match(prefixAccentRegex);
 
-        entry.url = match.groups.main;
+        if (!match1) {
+          return source;
+        }
 
-        if (match.groups.accent) {
-          entry.date = new Date(match.groups.accent);
+        entry.url = match1.groups.main;
+
+        if (!match1.groups.accent) {
+          return entry;
+        }
+
+        const match2 = match1.groups.accent.match(dateAnnotationRegex);
+
+        if (match2.groups.date) {
+          entry.date = new Date(match2.groups.date);
+        }
+
+        if (match2.groups.annotation) {
+          entry.annotation = match2.groups.annotation;
         }
 
         return entry;
