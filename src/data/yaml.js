@@ -440,6 +440,8 @@ export const processAlbumDocument = makeProcessDocument(T.Album, {
     groups: 'Groups',
     artTags: 'Art Tags',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processTrackSectionDocument = makeProcessDocument(T.TrackSectionHelper, {
@@ -505,6 +507,8 @@ export const processTrackDocument = makeProcessDocument(T.Track, {
     artTags: 'Art Tags',
   },
 
+  ignoredFields: ['Review Points'],
+
   invalidFieldCombinations: [
     {message: `Re-releases inherit references from the original`, fields: [
       'Originally Released As',
@@ -553,7 +557,7 @@ export const processArtistDocument = makeProcessDocument(T.Artist, {
     aliasNames: 'Aliases',
   },
 
-  ignoredFields: ['Dead URLs'],
+  ignoredFields: ['Dead URLs', 'Review Points'],
 });
 
 export const processFlashDocument = makeProcessDocument(T.Flash, {
@@ -576,6 +580,8 @@ export const processFlashDocument = makeProcessDocument(T.Flash, {
     featuredTracks: 'Featured Tracks',
     contributorContribs: 'Contributors',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
@@ -589,6 +595,8 @@ export const processFlashActDocument = makeProcessDocument(T.FlashAct, {
     jump: 'Jump',
     jumpColor: 'Jump Color',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processNewsEntryDocument = makeProcessDocument(T.NewsEntry, {
@@ -613,6 +621,8 @@ export const processArtTagDocument = makeProcessDocument(T.ArtTag, {
     color: 'Color',
     isContentWarning: 'Is CW',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processGroupDocument = makeProcessDocument(T.Group, {
@@ -624,6 +634,8 @@ export const processGroupDocument = makeProcessDocument(T.Group, {
 
     featuredAlbums: 'Featured Albums',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processGroupCategoryDocument = makeProcessDocument(T.GroupCategory, {
@@ -643,6 +655,8 @@ export const processStaticPageDocument = makeProcessDocument(T.StaticPage, {
     script: 'Script',
     content: 'Content',
   },
+
+  ignoredFields: ['Review Points'],
 });
 
 export const processWikiInfoDocument = makeProcessDocument(T.WikiInfo, {
