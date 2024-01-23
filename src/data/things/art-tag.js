@@ -1,16 +1,26 @@
 import {input} from '#composite';
-import {sortAlbumsTracksChronologically} from '#wiki-data';
+import find from '#find';
+import {unique} from '#sugar';
 import {isName} from '#validators';
+import {sortAlbumsTracksChronologically} from '#wiki-data';
 
-import {exposeUpdateValueOrContinue} from '#composite/control-flow';
+import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
+  from '#composite/control-flow';
 
 import {
   color,
   directory,
   flag,
+  referenceList,
+  reverseReferenceList,
+  simpleString,
   name,
+  urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {withAllDescendantArtTags, withAncestorArtTagBaobabTree}
+  from '#composite/things/art-tag';
 
 import Thing from './thing.js';
 
@@ -25,6 +35,7 @@ export class ArtTag extends Thing {
     directory: directory(),
     color: color(),
     isContentWarning: flag(false),
+    extraReadingURLs: urls(),
 
     nameShort: [
       exposeUpdateValueOrContinue({
@@ -38,10 +49,22 @@ export class ArtTag extends Thing {
       },
     ],
 
+    description: simpleString(),
+
+    directDescendantArtTags: referenceList({
+      class: input.value(ArtTag),
+      find: input.value(find.artTag),
+      data: 'artTagData',
+    }),
+
     // Update only
 
     albumData: wikiData({
       class: input.value(Album),
+    }),
+
+    artTagData: wikiData({
+      class: input.value(ArtTag),
     }),
 
     trackData: wikiData({
@@ -50,7 +73,20 @@ export class ArtTag extends Thing {
 
     // Expose only
 
-    taggedInThings: {
+    descriptionShort: [
+      exitWithoutDependency({
+        dependency: 'description',
+        mode: input.value('falsy'),
+      }),
+
+      {
+        dependencies: ['description'],
+        compute: ({description}) =>
+          description.split('<hr class="split">')[0],
+      },
+    ],
+
+    directlyTaggedInThings: {
       flags: {expose: true},
 
       expose: {
@@ -62,5 +98,32 @@ export class ArtTag extends Thing {
             {getDate: thing => thing.coverArtDate ?? thing.date}),
       },
     },
+
+    indirectlyTaggedInThings: [
+      withAllDescendantArtTags(),
+
+      {
+        dependencies: ['#allDescendantArtTags'],
+        compute: ({'#allDescendantArtTags': allDescendantArtTags}) =>
+          unique(
+            allDescendantArtTags
+              .flatMap(artTag => artTag.directlyTaggedInThings)),
+      },
+    ],
+
+    allDescendantArtTags: [
+      withAllDescendantArtTags(),
+      exposeDependency({dependency: '#allDescendantArtTags'}),
+    ],
+
+    directAncestorArtTags: reverseReferenceList({
+      data: 'artTagData',
+      list: input.value('directDescendantArtTags'),
+    }),
+
+    ancestorArtTagBaobabTree: [
+      withAncestorArtTagBaobabTree(),
+      exposeDependency({dependency: '#ancestorArtTagBaobabTree'}),
+    ],
   });
 }

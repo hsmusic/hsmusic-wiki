@@ -1,8 +1,8 @@
-import {stitchArrays} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
 import {sortAlphabetically} from '#wiki-data';
 
 export default {
-  contentDependencies: ['generateListingPage', 'linkArtTag'],
+  contentDependencies: ['generateListingPage', 'linkArtTagGallery'],
   extraDependencies: ['language', 'wikiData'],
 
   sprawl({artTagData}) {
@@ -16,7 +16,7 @@ export default {
       artTags:
         sortAlphabetically(
           artTagData
-            .filter(tag => !tag.isContentWarning)),
+            .filter(artTag => !artTag.isContentWarning)),
     };
   },
 
@@ -26,15 +26,18 @@ export default {
 
       artTagLinks:
         query.artTags
-          .map(tag => relation('linkArtTag', tag)),
+          .map(artTag => relation('linkArtTagGallery', artTag)),
     };
   },
 
   data(query) {
     return {
       counts:
-        query.artTags
-          .map(tag => tag.taggedInThings.length),
+        query.artTags.map(artTag =>
+          unique([
+            ...artTag.indirectlyTaggedInThings,
+            ...artTag.directlyTaggedInThings,
+          ]).length),
     };
   },
 

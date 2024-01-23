@@ -148,10 +148,10 @@ const find = {
   artTag: findHelper({
     referenceTypes: ['tag'],
 
-    getMatchableNames: tag =>
-      (tag.isContentWarning
-        ? [`cw: ${tag.name}`]
-        : [tag.name]),
+    getMatchableNames: artTag =>
+      (artTag.isContentWarning
+        ? [`cw: ${artTag.name}`]
+        : [artTag.name]),
   }),
 
   flash: findHelper({

@@ -20,6 +20,7 @@
         "#composite/wiki-data": "./src/data/composite/wiki-data/index.js",
         "#composite/wiki-properties": "./src/data/composite/wiki-properties/index.js",
         "#composite/things/album": "./src/data/composite/things/album/index.js",
+        "#composite/things/art-tag": "./src/data/composite/things/art-tag/index.js",
         "#composite/things/flash": "./src/data/composite/things/flash/index.js",
         "#composite/things/track": "./src/data/composite/things/track/index.js",
         "#content-dependencies": "./src/content/dependencies/index.js",

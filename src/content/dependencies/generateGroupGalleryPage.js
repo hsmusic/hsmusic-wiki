@@ -14,8 +14,10 @@ export default {
     'generateGroupSecondaryNav',
     'generateGroupSidebar',
     'generatePageLayout',
+    'generateQuickDescription',
     'image',
     'linkAlbum',
+    'linkGroup',
     'linkListing',
   ],
 
@@ -58,6 +60,9 @@ export default {
         carouselAlbums
           .map(album => relation('image', album.artTags));
     }
+
+    relations.quickDescription =
+      relation('generateQuickDescription', group);
 
     relations.coverGrid =
       relation('generateCoverGrid');
@@ -131,6 +136,8 @@ export default {
                 }).map(({image, path}) =>
                     image.slot('path', path)),
             }),
+
+          relations.quickDescription,
 
           html.tag('p', {class: 'quick-info'},
             language.$('groupGalleryPage.infoLine', {

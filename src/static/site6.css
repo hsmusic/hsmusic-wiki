@@ -318,6 +318,11 @@ body::before {
   margin: 0;
 }
 
+.sidebar h2:first-child {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
 .sidebar h3 {
   font-size: 1.1em;
   font-style: oblique;
@@ -367,6 +372,36 @@ body::before {
 
 .sidebar > dl .side {
   padding-left: 10px;
+}
+
+.sidebar details.has-tree-list[open] summary {
+  font-weight: 800;
+}
+
+.sidebar dl.tree-list {
+  margin-top: 0.25em;
+  line-height: 1.25em;
+  padding-left: 15px;
+}
+
+.sidebar dl.tree-list dt {
+  display: list-item;
+  list-style-type: disc;
+  padding-left: 0;
+  margin-left: 20px;
+}
+
+.sidebar dl.tree-list dl {
+  padding-left: 15px;
+}
+
+.sidebar dl.tree-list dd {
+  margin-left: 0;
+}
+
+.sidebar dl.tree-list dt.current a {
+  font-weight: 800;
+  border-bottom: 1px solid;
 }
 
 .sidebar li.current {
@@ -797,11 +832,6 @@ h1 {
   font-size: 2em;
 }
 
-html[data-url-key="localized.home"] #content h1 {
-  text-align: center;
-  font-size: 2.5em;
-}
-
 #content.flash-index h2 {
   text-align: center;
   font-size: 2.5em;
@@ -821,11 +851,13 @@ html[data-url-key="localized.home"] #content h1 {
 
 .quick-info {
   text-align: center;
+  padding-left: 12%;
+  padding-right: 12%;
+  line-height: 1.25em;
 }
 
 ul.quick-info {
   list-style: none;
-  padding-left: 0;
 }
 
 ul.quick-info li {
@@ -837,8 +869,60 @@ ul.quick-info li:not(:last-child)::after {
   font-weight: 800;
 }
 
-.carousel-container + .quick-info {
+.carousel-container + .quick-info,
+.carousel-container + .quick-description {
   margin-top: 25px;
+}
+
+.quick-description:not(.has-external-links-only) {
+  margin-left: 8%;
+  margin-right: 8%;
+  padding-left: 4%;
+  padding-right: 4%;
+  padding-top: 0.25em;
+  padding-bottom: 0.75em;
+  border-left: 1px solid var(--dim-color);
+  border-right: 1px solid var(--dim-color);
+  line-height: 1.25em;
+}
+
+.quick-description.has-external-links-only {
+  padding-left: 12%;
+  padding-right: 12%;
+}
+
+.quick-description.has-content-only {
+  padding-bottom: 0.5em;
+}
+
+.quick-description p {
+  text-align: center;
+}
+
+.quick-description .description-content.long hr ~ p {
+  text-align: left;
+}
+
+.quick-description > .description-content :first-child {
+  margin-top: 0;
+}
+
+.quick-description > .quick-description-actions,
+.quick-description.has-content-only .description-content :last-child {
+  margin-bottom: 0;
+}
+
+.quick-description:not(.collapsed) .description-content.short,
+.quick-description:not(.collapsed) .quick-description-actions.when-collapsed,
+.quick-description:not(.expanded) .description-content.long,
+.quick-description:not(.expanded) .quick-description-actions.when-expanded {
+  display: none;
+}
+
+.quick-description .quick-description-actions .expand-link,
+.quick-description .quick-description-actions .collapse-link {
+  text-decoration: underline;
+  text-decoration-style: dotted;
 }
 
 #intro-menu {
@@ -1089,6 +1173,97 @@ h1 a[href="#additional-names-box"]:hover {
 #additional-names-box li .accent {
   opacity: 0.8;
   display: inline-block;
+}
+
+/* Specific pages - homepage */
+
+html[data-url-key="localized.home"] #content h1 {
+  text-align: center;
+  font-size: 2.5em;
+}
+
+html[data-language-code="preview-en"][data-url-key="localized.home"] #content h1::after {
+  font-family: cursive;
+  display: block;
+  content: "(Preview Build)";
+  font-size: 0.8em;
+}
+
+/* Specific pages - art tag gallery */
+
+html[data-url-key="localized.artTagGallery"] #featured-direct-line,
+html[data-url-key="localized.artTagGallery"] #featured-indirect-line,
+html[data-url-key="localized.artTagGallery"] #showing-direct-line,
+html[data-url-key="localized.artTagGallery"] #showing-indirect-line {
+  display: none;
+}
+
+html[data-url-key="localized.artTagGallery"] #showing-all-line a,
+html[data-url-key="localized.artTagGallery"] #showing-direct-line a,
+html[data-url-key="localized.artTagGallery"] #showing-indirect-line a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* Specific pages - "Art Tag Network" listing */
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd) {
+  margin-left: 20px;
+  margin-bottom: 0;
+  padding-left: 10px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd):not(:last-child) {
+  padding-bottom: 20px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
+  padding-left: 10px;
+  margin-left: 20px;
+  margin-bottom: 0;
+  padding-bottom: 2px;
+  max-width: unset;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).even,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).even {
+  border-left: 1px solid #eaeaea;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not(#network-top-dl > dd).odd,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:not(#network-top-dl > dt).odd {
+  border-left: 1px solid #7b7b7b;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
+  position: relative;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).odd::after,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).odd::after {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #7b7b7b;
+  position: absolute;
+  bottom: -4px;
+  left: -4px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:last-child:not(#network-top-dl > dd).even::after,
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt:last-child:not(#network-top-dl > dt).even::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: #eaeaea;
+  position: absolute;
+  bottom: -3px;
+  left: -3px;
+  border-bottom-right-radius: 6px;
+  border-top-left-radius: 3px;
 }
 
 /* Images */
@@ -2048,16 +2223,6 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 #image-overlay-file-size-warning {
   opacity: 0.8;
   font-size: 0.9em;
-}
-
-/* important easter egg mode */
-
-html[data-language-code="preview-en"][data-url-key="localized.home"] #content
-  h1::after {
-  font-family: cursive;
-  display: block;
-  content: "(Preview Build)";
-  font-size: 0.8em;
 }
 
 /* Layout - Wide (most computers) */
