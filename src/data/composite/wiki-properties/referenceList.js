@@ -1,6 +1,9 @@
 // Stores and exposes a list of references to other data objects; all items
 // must be references to the same type, which is specified on the class input.
 //
+// Reference code for:
+//  - (atomic) referenceList
+//
 // See also:
 //  - singleReference
 //  - withResolvedReferenceList
@@ -16,7 +19,7 @@ import {inputThingClass, inputWikiData, withResolvedReferenceList}
 // TODO: Kludge.
 import Thing from '../../things/thing.js';
 
-export default templateCompositeFrom({
+export const REFERENCE = templateCompositeFrom({
   annotation: `referenceList`,
 
   compose: false,
@@ -45,3 +48,5 @@ export default templateCompositeFrom({
     exposeDependency({dependency: '#resolvedReferenceList'}),
   ],
 });
+
+export {default} from './atomic/referenceList.js';

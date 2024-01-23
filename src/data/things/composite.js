@@ -42,7 +42,7 @@ input.updateValue = _valueIntoToken('input.updateValue');
 input.staticDependency = _valueIntoToken('input.staticDependency');
 input.staticValue = _valueIntoToken('input.staticValue');
 
-function isInputToken(token) {
+export function isInputToken(token) {
   if (token === null) {
     return false;
   } else if (typeof token === 'object') {
@@ -54,7 +54,7 @@ function isInputToken(token) {
   }
 }
 
-function getInputTokenShape(token) {
+export function getInputTokenShape(token) {
   if (!isInputToken(token)) {
     throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }
@@ -66,7 +66,7 @@ function getInputTokenShape(token) {
   }
 }
 
-function getInputTokenValue(token) {
+export function getInputTokenValue(token) {
   if (!isInputToken(token)) {
     throw new TypeError(`Expected an input token, got ${typeAppearance(token)}`);
   }

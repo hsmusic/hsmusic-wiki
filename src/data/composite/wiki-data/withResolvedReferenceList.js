@@ -3,6 +3,10 @@
 // data dependency is null (even if the reference list is empty). By default
 // it will filter out references which don't match, but this can be changed
 // to early exit ({notFoundMode: 'exit'}) or leave null in place ('null').
+//
+// Reference code for:
+//  - (atomic) referenceList
+//
 
 import {input, templateCompositeFrom} from '#composite';
 import {is, isString, validateArrayItems} from '#validators';
