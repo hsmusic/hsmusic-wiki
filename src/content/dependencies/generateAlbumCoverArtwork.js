@@ -12,11 +12,15 @@ export default {
 
     color:
       album.color,
+
+    dimensions:
+      album.coverArtDimensions,
   }),
 
   generate: (data, relations) =>
     relations.coverArtwork.slots({
       path: data.path,
       color: data.color,
+      dimensions: data.dimensions,
     }),
 };
