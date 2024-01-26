@@ -92,6 +92,11 @@ export class Album extends Thing {
       simpleString(),
     ],
 
+    coverArtDimensions: [
+      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      dimensions(),
+    ],
+
     bannerDimensions: [
       exitWithoutContribs({contribs: 'bannerArtistContribs'}),
       dimensions(),
@@ -260,6 +265,11 @@ export class Album extends Thing {
 
       'Cover Art File Extension': {property: 'coverArtFileExtension'},
       'Track Art File Extension': {property: 'trackCoverArtFileExtension'},
+
+      'Cover Art Dimensions': {
+        property: 'coverArtDimensions',
+        transform: parseDimensions,
+      },
 
       'Wallpaper Artists': {
         property: 'wallpaperArtistContribs',
