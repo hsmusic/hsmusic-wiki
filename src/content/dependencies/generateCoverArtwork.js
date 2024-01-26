@@ -59,9 +59,23 @@ export default {
       validate: v => v.is('primary', 'thumbnail', 'commentary'),
       default: 'primary',
     },
+
+    dimensions: {
+      validate: v => v.isDimensions,
+    },
   },
 
   generate(data, relations, slots, {html}) {
+    const square =
+      (slots.dimensions
+        ? slots.dimensions[0] === slots.dimensions[1]
+        : true);
+
+    const sizeSlots =
+      (square
+        ? {square: true}
+        : {width: slots.dimensions[0], height: slots.dimensions[1]});
+
     switch (slots.mode) {
       case 'primary':
         return html.tags([
@@ -72,7 +86,7 @@ export default {
             thumb: 'medium',
             reveal: true,
             link: true,
-            square: true,
+            ...sizeSlots,
           }),
 
           !empty(relations.tagLinks) &&
@@ -93,7 +107,7 @@ export default {
           thumb: 'small',
           reveal: false,
           link: false,
-          square: true,
+          ...sizeSlots,
         });
 
       case 'commentary':
@@ -104,8 +118,8 @@ export default {
           thumb: 'medium',
           reveal: true,
           link: true,
-          square: true,
           lazy: true,
+          ...sizeSlots,
 
           attributes:
             {class: 'commentary-art'},
