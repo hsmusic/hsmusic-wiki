@@ -1098,7 +1098,7 @@ groupInfoPage:
         {YEAR_ACCENT} {ALBUM} {OTHER_GROUP_ACCENT}
 
       yearAccent: "({YEAR})"
-      otherGroupAccent:  "(from {GROUP})"
+      otherGroupAccent:  "(from {GROUPS})"
 
 #
 # groupGalleryPage:

@@ -24,7 +24,32 @@ export default {
     };
   },
 
-  relations(relation, sprawl, group) {
+  query(sprawl, group) {
+    const albums =
+      group.albums;
+
+    const albumGroups =
+      albums
+        .map(album => album.groups);
+
+    const albumOtherCategory =
+      albumGroups
+        .map(groups => groups
+          .map(group => group.category)
+          .find(category => category !== group.category));
+
+    const albumOtherGroups =
+      stitchArrays({
+        groups: albumGroups,
+        category: albumOtherCategory,
+      }).map(({groups, category}) =>
+          groups
+            .filter(group => group.category === category));
+
+    return {albums, albumOtherGroups};
+  },
+
+  relations(relation, query, sprawl, group) {
     const relations = {};
     const sec = relations.sections = {};
 
@@ -55,7 +80,7 @@ export default {
         relation('transformContent', group.description);
     }
 
-    if (!empty(group.albums)) {
+    if (!empty(query.albums)) {
       sec.albums = {};
 
       sec.albums.heading =
@@ -65,20 +90,17 @@ export default {
         relation('linkGroupGallery', group);
 
       sec.albums.albumColorStyles =
-        group.albums
+        query.albums
           .map(album => relation('generateColorStyleAttribute', album.color));
 
       sec.albums.albumLinks =
-        group.albums
+        query.albums
           .map(album => relation('linkAlbum', album));
 
-      sec.albums.groupLinks =
-        group.albums
-          .map(album => album.groups.find(g => g !== group))
-          .map(group =>
-            (group
-              ? relation('linkGroup', group)
-              : null));
+      sec.albums.otherGroupLinks =
+        query.albumOtherGroups
+          .map(groups => groups
+            .map(group => relation('linkGroup', group)));
 
       sec.albums.datetimestamps =
         group.albums.map(album =>
@@ -90,7 +112,7 @@ export default {
     return relations;
   },
 
-  data(sprawl, group) {
+  data(query, sprawl, group) {
     const data = {};
 
     data.name = group.name;
@@ -140,12 +162,12 @@ export default {
             html.tag('ul',
               stitchArrays({
                 albumLink: sec.albums.albumLinks,
-                groupLink: sec.albums.groupLinks,
+                otherGroupLinks: sec.albums.otherGroupLinks,
                 datetimestamp: sec.albums.datetimestamps,
                 albumColorStyle: sec.albums.albumColorStyles,
               }).map(({
                   albumLink,
-                  groupLink,
+                  otherGroupLinks,
                   datetimestamp,
                   albumColorStyle,
                 }) => {
@@ -165,13 +187,15 @@ export default {
                       });
                   }
 
-                  if (groupLink) {
+                  if (!empty(otherGroupLinks)) {
                     parts.push('withOtherGroup');
                     options.otherGroupAccent =
                       html.tag('span', {class: 'other-group-accent'},
                         language.$(prefix, 'otherGroupAccent', {
-                          group:
-                            groupLink.slot('color', false),
+                          groups:
+                            language.formatConjunctionList(
+                              otherGroupLinks.map(groupLink =>
+                                groupLink.slot('color', false))),
                         }));
                   }
 
