@@ -1,3 +1,5 @@
+export const WIKI_INFO_FILE = 'wiki-info.yaml';
+
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
@@ -86,4 +88,23 @@ export class WikiInfo extends Thing {
       'Enable Group UI': {property: 'enableGroupUI'},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {oneDocumentTotal},
+    thingConstructors: {WikiInfo},
+  }) => ({
+    title: `Process wiki info file`,
+    file: WIKI_INFO_FILE,
+
+    documentMode: oneDocumentTotal,
+    documentThing: WikiInfo,
+
+    save(wikiInfo) {
+      if (!wikiInfo) {
+        return;
+      }
+
+      return {wikiInfo};
+    },
+  });
 }

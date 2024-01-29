@@ -73,7 +73,6 @@ import {
   linkWikiDataArrays,
   loadAndProcessDataDocuments,
   sortWikiDataArrays,
-  WIKI_INFO_FILE,
 } from '#yaml';
 
 import FileSizePreloader from './file-size-preloader.js';
@@ -993,7 +992,7 @@ async function main() {
     }
 
     if (!wikiData.wikiInfo) {
-      logError`Can't proceed without wiki info file (${WIKI_INFO_FILE}) successfully loading`;
+      logError`Can't proceed without wiki info file successfully loading`;
 
       Object.assign(stepStatusSummary.loadDataFiles, {
         status: STATUS_FATAL_ERROR,

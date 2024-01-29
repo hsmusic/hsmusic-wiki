@@ -1,7 +1,9 @@
+export const ART_TAG_DATA_FILE = 'tags.yaml';
+
 import {input} from '#composite';
 import Thing from '#thing';
 import {isName} from '#validators';
-import {sortAlbumsTracksChronologically} from '#wiki-data';
+import {sortAlphabetically, sortAlbumsTracksChronologically} from '#wiki-data';
 
 import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 
@@ -73,4 +75,21 @@ export class ArtTag extends Thing {
       'Is CW': {property: 'isContentWarning'},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {allInOne},
+    thingConstructors: {ArtTag},
+  }) => ({
+    title: `Process art tags file`,
+    file: ART_TAG_DATA_FILE,
+
+    documentMode: allInOne,
+    documentThing: ArtTag,
+
+    save(artTagData) {
+      sortAlphabetically(artTagData);
+
+      return {artTagData};
+    },
+  });
 }

@@ -1,4 +1,7 @@
+export const NEWS_DATA_FILE = 'news.yaml';
+
 import Thing from '#thing';
+import {sortChronologically} from '#wiki-data';
 import {parseDate} from '#yaml';
 
 import {contentString, directory, name, simpleDate}
@@ -43,4 +46,22 @@ export class NewsEntry extends Thing {
       'Content': {property: 'content'},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {allInOne},
+    thingConstructors: {NewsEntry},
+  }) => ({
+    title: `Process news data file`,
+    file: NEWS_DATA_FILE,
+
+    documentMode: allInOne,
+    documentThing: NewsEntry,
+
+    save(newsData) {
+      sortChronologically(newsData);
+      newsData.reverse();
+
+      return {newsData};
+    },
+  });
 }

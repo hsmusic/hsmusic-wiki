@@ -7,13 +7,11 @@ import {inspect as nodeInspect} from 'node:util';
 
 import yaml from 'js-yaml';
 
-import CacheableObject, {CacheableObjectPropertyValueError}
-  from '#cacheable-object';
+import CacheableObject from '#cacheable-object';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
-import {traverse} from '#node-utils';
 import Thing from '#thing';
-import T from '#things';
+import thingConstructors from '#things';
 
 import {
   annotateErrorWithFile,
@@ -34,31 +32,14 @@ import {
 import {
   commentaryRegex,
   sortAlbumsTracksChronologically,
-  sortAlphabetically,
+  sortByName,
   sortChronologically,
   sortFlashesChronologically,
 } from '#wiki-data';
 
-// --> General supporting stuff
-
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
 }
-
-// --> YAML data repository structure constants
-
-export const ART_TAG_DATA_FILE = 'tags.yaml';
-export const ARTIST_DATA_FILE = 'artists.yaml';
-export const FLASH_DATA_FILE = 'flashes.yaml';
-export const GROUP_DATA_FILE = 'groups.yaml';
-export const HOMEPAGE_LAYOUT_DATA_FILE = 'homepage.yaml';
-export const NEWS_DATA_FILE = 'news.yaml';
-export const WIKI_INFO_FILE = 'wiki-info.yaml';
-
-export const DATA_ALBUM_DIRECTORY = 'album';
-export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
-
-// --> Document processing functions
 
 // General function for inputting a single document (usually loaded from YAML)
 // and outputting an instance of a provided Thing subclass.
@@ -372,8 +353,6 @@ export class SkippedFieldsSummaryError extends Error {
   }
 }
 
-// --> Utilities shared across document parsing functions
-
 export function parseDate(date) {
   return new Date(date);
 }
@@ -480,8 +459,6 @@ export function parseDimensions(string) {
   return nums;
 }
 
-// --> Data repository loading functions and descriptors
-
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.
 export const documentModes = {
@@ -554,291 +531,23 @@ export const documentModes = {
 //   them to each other, setting additional properties, etc). Input argument
 //   format depends on documentMode.
 //
-export const getDataSteps = () => [
-  {
-    title: `Process wiki info file`,
-    file: WIKI_INFO_FILE,
+export const getDataSteps = () => {
+  const steps = [];
 
-    documentMode: documentModes.oneDocumentTotal,
-    documentThing: T.WikiInfo,
+  for (const thing of Object.values(thingConstructors)) {
+    const getSpecFn = thing[Thing.getYamlLoadingSpec];
+    if (!getSpecFn) continue;
 
-    save(wikiInfo) {
-      if (!wikiInfo) {
-        return;
-      }
+    steps.push(getSpecFn({
+      documentModes,
+      thingConstructors,
+    }));
+  }
 
-      return {wikiInfo};
-    },
-  },
+  sortByName(steps, {getName: step => step.title});
 
-  {
-    title: `Process album files`,
-
-    files: dataPath =>
-      traverse(path.join(dataPath, DATA_ALBUM_DIRECTORY), {
-        filterFile: name => path.extname(name) === '.yaml',
-        prefixPath: DATA_ALBUM_DIRECTORY,
-      }),
-
-    documentMode: documentModes.headerAndEntries,
-    headerDocumentThing: T.Album,
-    entryDocumentThing: document =>
-      ('Section' in document
-        ? T.TrackSectionHelper
-        : T.Track),
-
-    save(results) {
-      const albumData = [];
-      const trackData = [];
-
-      for (const {header: album, entries} of results) {
-        // We can't mutate an array once it's set as a property value,
-        // so prepare the track sections that will show up in a track list
-        // all the way before actually applying them. (It's okay to mutate
-        // an individual section before applying it, since those are just
-        // generic objects; they aren't Things in and of themselves.)
-        const trackSections = [];
-        const ownTrackData = [];
-
-        let currentTrackSection = {
-          name: `Default Track Section`,
-          isDefaultTrackSection: true,
-          tracks: [],
-        };
-
-        const albumRef = Thing.getReference(album);
-
-        const closeCurrentTrackSection = () => {
-          if (!empty(currentTrackSection.tracks)) {
-            trackSections.push(currentTrackSection);
-          }
-        };
-
-        for (const entry of entries) {
-          if (entry instanceof T.TrackSectionHelper) {
-            closeCurrentTrackSection();
-
-            currentTrackSection = {
-              name: entry.name,
-              color: entry.color,
-              dateOriginallyReleased: entry.dateOriginallyReleased,
-              isDefaultTrackSection: false,
-              tracks: [],
-            };
-
-            continue;
-          }
-
-          trackData.push(entry);
-
-          entry.dataSourceAlbum = albumRef;
-
-          ownTrackData.push(entry);
-          currentTrackSection.tracks.push(Thing.getReference(entry));
-        }
-
-        closeCurrentTrackSection();
-
-        albumData.push(album);
-
-        album.trackSections = trackSections;
-        album.ownTrackData = ownTrackData;
-      }
-
-      return {albumData, trackData};
-    },
-  },
-
-  {
-    title: `Process artists file`,
-    file: ARTIST_DATA_FILE,
-
-    documentMode: documentModes.allInOne,
-    documentThing: T.Artist,
-
-    save(results) {
-      const artistData = results;
-
-      const artistAliasData = results.flatMap((artist) => {
-        const origRef = Thing.getReference(artist);
-        return artist.aliasNames?.map((name) => {
-          const alias = new T.Artist();
-          alias.name = name;
-          alias.isAlias = true;
-          alias.aliasedArtist = origRef;
-          alias.artistData = artistData;
-          return alias;
-        }) ?? [];
-      });
-
-      return {artistData, artistAliasData};
-    },
-  },
-
-  // TODO: WD.wikiInfo.enableFlashesAndGames &&
-  {
-    title: `Process flashes file`,
-    file: FLASH_DATA_FILE,
-
-    documentMode: documentModes.allInOne,
-    documentThing: document =>
-      ('Act' in document
-        ? T.FlashAct
-        : T.Flash),
-
-    save(results) {
-      let flashAct;
-      let flashRefs = [];
-
-      if (results[0] && !(results[0] instanceof T.FlashAct)) {
-        throw new Error(`Expected an act at top of flash data file`);
-      }
-
-      for (const thing of results) {
-        if (thing instanceof T.FlashAct) {
-          if (flashAct) {
-            Object.assign(flashAct, {flashes: flashRefs});
-          }
-
-          flashAct = thing;
-          flashRefs = [];
-        } else {
-          flashRefs.push(Thing.getReference(thing));
-        }
-      }
-
-      if (flashAct) {
-        Object.assign(flashAct, {flashes: flashRefs});
-      }
-
-      const flashData = results.filter((x) => x instanceof T.Flash);
-      const flashActData = results.filter((x) => x instanceof T.FlashAct);
-
-      return {flashData, flashActData};
-    },
-  },
-
-  {
-    title: `Process groups file`,
-    file: GROUP_DATA_FILE,
-
-    documentMode: documentModes.allInOne,
-    documentThing: document =>
-      ('Category' in document
-        ? T.GroupCategory
-        : T.Group),
-
-    save(results) {
-      let groupCategory;
-      let groupRefs = [];
-
-      if (results[0] && !(results[0] instanceof T.GroupCategory)) {
-        throw new Error(`Expected a category at top of group data file`);
-      }
-
-      for (const thing of results) {
-        if (thing instanceof T.GroupCategory) {
-          if (groupCategory) {
-            Object.assign(groupCategory, {groups: groupRefs});
-          }
-
-          groupCategory = thing;
-          groupRefs = [];
-        } else {
-          groupRefs.push(Thing.getReference(thing));
-        }
-      }
-
-      if (groupCategory) {
-        Object.assign(groupCategory, {groups: groupRefs});
-      }
-
-      const groupData = results.filter((x) => x instanceof T.Group);
-      const groupCategoryData = results.filter((x) => x instanceof T.GroupCategory);
-
-      return {groupData, groupCategoryData};
-    },
-  },
-
-  {
-    title: `Process homepage layout file`,
-
-    // Kludge: This benefits from the same headerAndEntries style messaging as
-    // albums and tracks (for example), but that document mode is designed to
-    // support multiple files, and only one is actually getting processed here.
-    files: [HOMEPAGE_LAYOUT_DATA_FILE],
-
-    documentMode: documentModes.headerAndEntries,
-    headerDocumentThing: T.HomepageLayout,
-    entryDocumentThing: document => {
-      switch (document['Type']) {
-        case 'albums':
-          return T.HomepageLayoutAlbumsRow;
-        default:
-          throw new TypeError(`No processDocument function for row type ${document['Type']}!`);
-      }
-    },
-
-    save(results) {
-      if (!results[0]) {
-        return;
-      }
-
-      const {header: homepageLayout, entries: rows} = results[0];
-      Object.assign(homepageLayout, {rows});
-      return {homepageLayout};
-    },
-  },
-
-  // TODO: WD.wikiInfo.enableNews &&
-  {
-    title: `Process news data file`,
-    file: NEWS_DATA_FILE,
-
-    documentMode: documentModes.allInOne,
-    documentThing: T.NewsEntry,
-
-    save(newsData) {
-      sortChronologically(newsData);
-      newsData.reverse();
-
-      return {newsData};
-    },
-  },
-
-  {
-    title: `Process art tags file`,
-    file: ART_TAG_DATA_FILE,
-
-    documentMode: documentModes.allInOne,
-    documentThing: T.ArtTag,
-
-    save(artTagData) {
-      sortAlphabetically(artTagData);
-
-      return {artTagData};
-    },
-  },
-
-  {
-    title: `Process static page files`,
-
-    files: dataPath =>
-      traverse(path.join(dataPath, DATA_STATIC_PAGE_DIRECTORY), {
-        filterFile: name => path.extname(name) === '.yaml',
-        prefixPath: DATA_STATIC_PAGE_DIRECTORY,
-      }),
-
-    documentMode: documentModes.onePerFile,
-    documentThing: T.StaticPage,
-
-    save(staticPageData) {
-      sortAlphabetically(staticPageData);
-
-      return {staticPageData};
-    },
-  },
-];
+  return steps;
+};
 
 export async function loadAndProcessDataDocuments({dataPath}) {
   const processDataAggregate = openAggregate({
@@ -1605,7 +1314,7 @@ export function filterReferenceErrors(wikiData) {
                 let hasCoverArtwork =
                   !empty(CacheableObject.getUpdateValue(thing, 'coverArtistContribs'));
 
-                if (thing.constructor === T.Track) {
+                if (thing.constructor === thingConstructors.Track) {
                   if (thing.album) {
                     hasCoverArtwork ||=
                       !empty(CacheableObject.getUpdateValue(thing.album, 'trackCoverArtistContribs'));

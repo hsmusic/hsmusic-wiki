@@ -1,3 +1,5 @@
+export const ARTIST_DATA_FILE = 'artists.yaml';
+
 import {input} from '#composite';
 import find from '#find';
 import {unique} from '#sugar';
@@ -257,4 +259,33 @@ export class Artist extends Thing {
       'Review Points': {ignore: true},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {allInOne},
+    thingConstructors: {Artist},
+  }) => ({
+    title: `Process artists file`,
+    file: ARTIST_DATA_FILE,
+
+    documentMode: allInOne,
+    documentThing: Artist,
+
+    save(results) {
+      const artistData = results;
+
+      const artistAliasData = results.flatMap((artist) => {
+        const origRef = Thing.getReference(artist);
+        return artist.aliasNames?.map((name) => {
+          const alias = new Artist();
+          alias.name = name;
+          alias.isAlias = true;
+          alias.aliasedArtist = origRef;
+          alias.artistData = artistData;
+          return alias;
+        }) ?? [];
+      });
+
+      return {artistData, artistAliasData};
+    },
+  });
 }

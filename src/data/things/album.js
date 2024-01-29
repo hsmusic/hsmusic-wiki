@@ -1,5 +1,11 @@
+export const DATA_ALBUM_DIRECTORY = 'album';
+
+import * as path from 'node:path';
+
 import {input} from '#composite';
 import find from '#find';
+import {traverse} from '#node-utils';
+import {empty} from '#sugar';
 import Thing from '#thing';
 import {isDate} from '#validators';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
@@ -283,6 +289,87 @@ export class Album extends Thing {
       'Review Points': {ignore: true},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {headerAndEntries},
+    thingConstructors: {Album, Track, TrackSectionHelper},
+  }) => ({
+    title: `Process album files`,
+
+    files: dataPath =>
+      traverse(path.join(dataPath, DATA_ALBUM_DIRECTORY), {
+        filterFile: name => path.extname(name) === '.yaml',
+        prefixPath: DATA_ALBUM_DIRECTORY,
+      }),
+
+    documentMode: headerAndEntries,
+    headerDocumentThing: Album,
+    entryDocumentThing: document =>
+      ('Section' in document
+        ? TrackSectionHelper
+        : Track),
+
+    save(results) {
+      const albumData = [];
+      const trackData = [];
+
+      for (const {header: album, entries} of results) {
+        // We can't mutate an array once it's set as a property value,
+        // so prepare the track sections that will show up in a track list
+        // all the way before actually applying them. (It's okay to mutate
+        // an individual section before applying it, since those are just
+        // generic objects; they aren't Things in and of themselves.)
+        const trackSections = [];
+        const ownTrackData = [];
+
+        let currentTrackSection = {
+          name: `Default Track Section`,
+          isDefaultTrackSection: true,
+          tracks: [],
+        };
+
+        const albumRef = Thing.getReference(album);
+
+        const closeCurrentTrackSection = () => {
+          if (!empty(currentTrackSection.tracks)) {
+            trackSections.push(currentTrackSection);
+          }
+        };
+
+        for (const entry of entries) {
+          if (entry instanceof TrackSectionHelper) {
+            closeCurrentTrackSection();
+
+            currentTrackSection = {
+              name: entry.name,
+              color: entry.color,
+              dateOriginallyReleased: entry.dateOriginallyReleased,
+              isDefaultTrackSection: false,
+              tracks: [],
+            };
+
+            continue;
+          }
+
+          trackData.push(entry);
+
+          entry.dataSourceAlbum = albumRef;
+
+          ownTrackData.push(entry);
+          currentTrackSection.tracks.push(Thing.getReference(entry));
+        }
+
+        closeCurrentTrackSection();
+
+        albumData.push(album);
+
+        album.trackSections = trackSections;
+        album.ownTrackData = ownTrackData;
+      }
+
+      return {albumData, trackData};
+    },
+  });
 }
 
 export class TrackSectionHelper extends Thing {

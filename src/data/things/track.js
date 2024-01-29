@@ -451,6 +451,9 @@ export class Track extends Thing {
     ],
   };
 
+  // Track YAML loading is handled in album.js.
+  static [Thing.getYamlLoadingSpec] = null;
+
   [inspect.custom](depth) {
     const parts = [];
 

@@ -1,3 +1,5 @@
+export const GROUP_DATA_FILE = 'groups.yaml';
+
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
@@ -97,6 +99,51 @@ export class Group extends Thing {
       'Review Points': {ignore: true},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {allInOne},
+    thingConstructors: {Group, GroupCategory},
+  }) => ({
+    title: `Process groups file`,
+    file: GROUP_DATA_FILE,
+
+    documentMode: allInOne,
+    documentThing: document =>
+      ('Category' in document
+        ? GroupCategory
+        : Group),
+
+    save(results) {
+      let groupCategory;
+      let groupRefs = [];
+
+      if (results[0] && !(results[0] instanceof GroupCategory)) {
+        throw new Error(`Expected a category at top of group data file`);
+      }
+
+      for (const thing of results) {
+        if (thing instanceof GroupCategory) {
+          if (groupCategory) {
+            Object.assign(groupCategory, {groups: groupRefs});
+          }
+
+          groupCategory = thing;
+          groupRefs = [];
+        } else {
+          groupRefs.push(Thing.getReference(thing));
+        }
+      }
+
+      if (groupCategory) {
+        Object.assign(groupCategory, {groups: groupRefs});
+      }
+
+      const groupData = results.filter(x => x instanceof Group);
+      const groupCategoryData = results.filter(x => x instanceof GroupCategory);
+
+      return {groupData, groupCategoryData};
+    },
+  });
 }
 
 export class GroupCategory extends Thing {

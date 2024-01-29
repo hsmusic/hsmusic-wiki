@@ -1,3 +1,5 @@
+export const FLASH_DATA_FILE = 'flashes.yaml';
+
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
@@ -204,4 +206,49 @@ export class FlashAct extends Thing {
       'Review Points': {ignore: true},
     },
   };
+
+  static [Thing.getYamlLoadingSpec] = ({
+    documentModes: {allInOne},
+    thingConstructors: {Flash, FlashAct},
+  }) => ({
+    title: `Process flashes file`,
+    file: FLASH_DATA_FILE,
+
+    documentMode: allInOne,
+    documentThing: document =>
+      ('Act' in document
+        ? FlashAct
+        : Flash),
+
+    save(results) {
+      let flashAct;
+      let flashRefs = [];
+
+      if (results[0] && !(results[0] instanceof FlashAct)) {
+        throw new Error(`Expected an act at top of flash data file`);
+      }
+
+      for (const thing of results) {
+        if (thing instanceof FlashAct) {
+          if (flashAct) {
+            Object.assign(flashAct, {flashes: flashRefs});
+          }
+
+          flashAct = thing;
+          flashRefs = [];
+        } else {
+          flashRefs.push(Thing.getReference(thing));
+        }
+      }
+
+      if (flashAct) {
+        Object.assign(flashAct, {flashes: flashRefs});
+      }
+
+      const flashData = results.filter(x => x instanceof Flash);
+      const flashActData = results.filter(x => x instanceof FlashAct);
+
+      return {flashData, flashActData};
+    },
+  });
 }

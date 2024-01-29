@@ -14,6 +14,7 @@ export default class Thing extends CacheableObject {
   static getSerializeDescriptors = Symbol.for('Thing.getSerializeDescriptors');
 
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
+  static getYamlLoadingSpec = Symbol.for('Thing.getYamlLoadingSpec');
 
   // Default custom inspect function, which may be overridden by Thing
   // subclasses. This will be used when displaying aggregate errors and other
