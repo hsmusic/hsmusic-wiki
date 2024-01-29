@@ -143,6 +143,10 @@ export class Group extends Thing {
 
       return {groupData, groupCategoryData};
     },
+
+    // Groups aren't sorted at all, always preserving the order in the data
+    // file as-is.
+    sort: null,
   });
 }
 

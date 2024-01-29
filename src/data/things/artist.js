@@ -5,6 +5,7 @@ import find from '#find';
 import {unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
+import {sortAlphabetically} from '#wiki-data';
 
 import {withReverseContributionList} from '#composite/wiki-data';
 
@@ -286,6 +287,11 @@ export class Artist extends Thing {
       });
 
       return {artistData, artistAliasData};
+    },
+
+    sort({artistData, artistAliasData}) {
+      sortAlphabetically(artistData);
+      sortAlphabetically(artistAliasData);
     },
   });
 }
