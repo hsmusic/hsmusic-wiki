@@ -686,6 +686,17 @@ p .current {
   border-radius: 0 0 6px 6px;
 }
 
+#cover-art-container:not(:has(.image-details)),
+#cover-art-container:not(.has-image-details) {
+  /* Hacky: `overflow: hidden` hides tag tooltips, so it can't be applied
+   * if we've got tags/details visible. But it's okay, because we only
+   * need to apply it if it *doesn't* - that's when the rounded border
+   * of #cover-art-container needs to cut off its child image-container
+   * (which has a background that otherwise causes sharp corners).
+   */
+  overflow: hidden;
+}
+
 #cover-art-container .image-container {
   /* Border is handled on the cover-art-container. */
   border: none;
