@@ -57,11 +57,10 @@ export class NewsEntry extends Thing {
     documentMode: allInOne,
     documentThing: NewsEntry,
 
-    save(newsData) {
-      sortChronologically(newsData);
-      newsData.reverse();
+    save: (results) => ({newsData: results}),
 
-      return {newsData};
+    sort({newsData}) {
+      sortChronologically(newsData, {latestFirst: true});
     },
   });
 }

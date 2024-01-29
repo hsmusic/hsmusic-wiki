@@ -4,6 +4,7 @@ import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
 import {anyOf, isColor, isDirectory, isNumber, isString} from '#validators';
+import {sortFlashesChronologically} from '#wiki-data';
 import {parseDate, parseContributors} from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}
@@ -249,6 +250,10 @@ export class FlashAct extends Thing {
       const flashActData = results.filter(x => x instanceof FlashAct);
 
       return {flashData, flashActData};
+    },
+
+    sort({flashData}) {
+      sortFlashesChronologically(flashData);
     },
   });
 }

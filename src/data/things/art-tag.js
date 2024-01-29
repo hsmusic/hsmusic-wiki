@@ -86,10 +86,10 @@ export class ArtTag extends Thing {
     documentMode: allInOne,
     documentThing: ArtTag,
 
-    save(artTagData) {
-      sortAlphabetically(artTagData);
+    save: (results) => ({artTagData: results}),
 
-      return {artTagData};
+    sort({artTagData}) {
+      sortAlphabetically(artTagData);
     },
   });
 }

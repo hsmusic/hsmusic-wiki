@@ -8,6 +8,8 @@ import {traverse} from '#node-utils';
 import {empty} from '#sugar';
 import Thing from '#thing';
 import {isDate} from '#validators';
+import {sortAlbumsTracksChronologically, sortChronologically}
+  from '#wiki-data';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
   from '#yaml';
 
@@ -368,6 +370,11 @@ export class Album extends Thing {
       }
 
       return {albumData, trackData};
+    },
+
+    sort({albumData, trackData}) {
+      sortChronologically(albumData);
+      sortAlbumsTracksChronologically(trackData);
     },
   });
 }

@@ -12,6 +12,7 @@ import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind} from '#find';
 import Thing from '#thing';
 import thingConstructors from '#things';
+import {commentaryRegex, sortByName} from '#wiki-data';
 
 import {
   annotateErrorWithFile,
@@ -28,14 +29,6 @@ import {
   withAggregate,
   withEntries,
 } from '#sugar';
-
-import {
-  commentaryRegex,
-  sortAlbumsTracksChronologically,
-  sortByName,
-  sortChronologically,
-  sortFlashesChronologically,
-} from '#wiki-data';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -534,8 +527,8 @@ export const documentModes = {
 export const getDataSteps = () => {
   const steps = [];
 
-  for (const thing of Object.values(thingConstructors)) {
-    const getSpecFn = thing[Thing.getYamlLoadingSpec];
+  for (const thingConstructor of Object.values(thingConstructors)) {
+    const getSpecFn = thingConstructor[Thing.getYamlLoadingSpec];
     if (!getSpecFn) continue;
 
     steps.push(getSpecFn({
@@ -992,11 +985,17 @@ export function linkWikiDataArrays(wikiData) {
 }
 
 export function sortWikiDataArrays(wikiData) {
-  Object.assign(wikiData, {
-    albumData: sortChronologically(wikiData.albumData.slice()),
-    trackData: sortAlbumsTracksChronologically(wikiData.trackData.slice()),
-    flashData: sortFlashesChronologically(wikiData.flashData.slice()),
-  });
+  for (const [key, value] of Object.entries(wikiData)) {
+    if (!Array.isArray(value)) continue;
+    wikiData[key] = value.slice();
+  }
+
+  const steps = getDataSteps();
+
+  for (const step of steps) {
+    if (!step.sort) continue;
+    step.sort(wikiData);
+  }
 
   // Re-link data arrays, so that every object has the new, sorted versions.
   // Note that the sorting step deliberately creates new arrays (mutating

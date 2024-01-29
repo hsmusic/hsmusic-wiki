@@ -64,10 +64,10 @@ export class StaticPage extends Thing {
     documentMode: onePerFile,
     documentThing: StaticPage,
 
-    save(staticPageData) {
-      sortAlphabetically(staticPageData);
+    save: (results) => ({staticPageData: results}),
 
-      return {staticPageData};
+    sort({staticPageData}) {
+      sortAlphabetically(staticPageData);
     },
   });
 }
