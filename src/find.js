@@ -23,6 +23,11 @@ export function processAllAvailableMatches(data, {
     (Object.hasOwn(thing, 'name')
       ? [thing.name]
       : []),
+
+  getMatchableDirectories = thing =>
+    (Object.hasOwn(thing, 'directory')
+      ? [thing.directory]
+      : [null]),
 } = {}) {
   const byName = Object.create(null);
   const byDirectory = Object.create(null);
@@ -31,7 +36,14 @@ export function processAllAvailableMatches(data, {
   for (const thing of data) {
     if (!include(thing)) continue;
 
-    byDirectory[thing.directory] = thing;
+    for (const directory of getMatchableDirectories(thing)) {
+      if (typeof directory !== 'string') {
+        logWarn`Unexpected ${typeAppearance(directory)} returned in directories for ${inspect(thing)}`;
+        continue;
+      }
+
+      byDirectory[directory] = thing;
+    }
 
     for (const name of getMatchableNames(thing)) {
       if (typeof name !== 'string') {
