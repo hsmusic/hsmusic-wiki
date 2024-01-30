@@ -155,6 +155,12 @@ const find = {
 
   artist: findHelper({
     referenceTypes: ['artist', 'artist-gallery'],
+
+    include: artist => !artist.isAlias,
+  }),
+
+  artistIncludingAliases: findHelper({
+    referenceTypes: ['artist', 'artist-gallery'],
   }),
 
   artTag: findHelper({
