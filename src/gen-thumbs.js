@@ -397,7 +397,18 @@ export function getDimensionsOfImagePath(mediaPath, cache) {
     throw new Error(`Expected mediaPath to be included in cache, got ${mediaPath}`);
   }
 
-  const {width, height} = thumbnailCacheEntryToDetails(cacheEntry);
+  const details = thumbnailCacheEntryToDetails(cacheEntry);
+
+  if (!details) {
+    throw new Error(`Couldn't determine any details for this image (${mediaPath})`);
+  }
+
+  const {width, height} = details;
+
+  if (typeof width !== 'number' && typeof height !== 'number') {
+    throw new Error(`Details for this image don't appear to contain dimensions (${mediaPath})`);
+  }
+
   return [width, height];
 }
 
@@ -791,6 +802,13 @@ export async function refreshThumbnailCache(cache, {mediaPath, queueSize}) {
       Object.entries(cache)
         .map(([imagePath, cacheEntry]) => async () => {
           const details = thumbnailCacheEntryToDetails(cacheEntry);
+
+          // Couldn't parse this entry, it won't be used later on.
+          // But leave it around just in case some other version of hsmusic
+          // can get use out of it.
+          if (!details) {
+            return;
+          }
 
           const {tackbust, width, height} = details;
 
