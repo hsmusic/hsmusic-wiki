@@ -1,5 +1,9 @@
 export const ARTIST_DATA_FILE = 'artists.yaml';
 
+import {inspect} from 'node:util';
+
+import CacheableObject from '#cacheable-object';
+import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
 import {unique} from '#sugar';
@@ -294,4 +298,25 @@ export class Artist extends Thing {
       sortAlphabetically(artistAliasData);
     },
   });
+
+  [inspect.custom]() {
+    const parts = [];
+
+    parts.push(Thing.prototype[inspect.custom].apply(this));
+
+    if (CacheableObject.getUpdateValue(this, 'isAlias')) {
+      parts.unshift(`${colors.yellow('[alias]')} `);
+
+      let aliasedArtist;
+      try {
+        aliasedArtist = this.aliasedArtist.name;
+      } catch (_error) {
+        aliasedArtist = CacheableObject.getUpdateValue(this, 'aliasedArtist');
+      }
+
+      parts.push(` ${colors.yellow(`[of ${aliasedArtist}]`)}`);
+    }
+
+    return parts.join('');
+  }
 }
