@@ -1118,8 +1118,22 @@ export function filterReferenceErrors(wikiData) {
     return recursive(obj, keys);
   }
 
-  const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   const boundFind = bindFind(wikiData, {mode: 'error'});
+
+  const artistAliasData = wikiData.artistData.filter(artist => artist.isAlias);
+  const findArtistOrAlias = artistRef => {
+    const alias = find.artistIncludingAliases(artistRef, artistAliasData, {mode: 'quiet'});
+    if (alias) {
+      // No need to check if the original exists here. Aliases are automatically
+      // created from a field on the original, so the original certainly exists.
+      const original = alias.aliasedArtist;
+      throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
+    }
+
+    return boundFind.artist(artistRef);
+  };
+
+  const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   for (const [thingDataProp, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
 
@@ -1164,18 +1178,6 @@ export function filterReferenceErrors(wikiData) {
             }
 
             let findFn;
-
-            const findArtistOrAlias = artistRef => {
-              const alias = find.artist(artistRef, wikiData.artistAliasData, {mode: 'quiet'});
-              if (alias) {
-                // No need to check if the original exists here. Aliases are automatically
-                // created from a field on the original, so the original certainly exists.
-                const original = alias.aliasedArtist;
-                throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
-              }
-
-              return boundFind.artist(artistRef);
-            };
 
             switch (findFnKey) {
               case '_artTag':

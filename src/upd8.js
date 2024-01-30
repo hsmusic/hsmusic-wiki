@@ -952,13 +952,20 @@ async function main() {
   Object.assign(wikiData, wikiDataResult);
 
   {
-    const logThings = (thingDataProp, label) =>
-      logInfo` - ${wikiData[thingDataProp]?.length ?? colors.red('(Missing!)')} ${colors.normal(colors.dim(label))}`;
+    const logThings = (prop, label) => {
+      const array =
+        (Array.isArray(prop)
+          ? prop
+          : wikiData[prop]);
+
+      logInfo` - ${array?.length ?? colors.red('(Missing!)')} ${colors.normal(colors.dim(label))}`;
+    }
+
     try {
       logInfo`Loaded data and processed objects:`;
       logThings('albumData', 'albums');
       logThings('trackData', 'tracks');
-      logThings('artistData', 'artists');
+      logThings(wikiData.artistData.filter(artist => !artist.isAlias), 'artists');
       if (wikiData.flashData) {
         logThings('flashData', 'flashes');
         logThings('flashActData', 'flash acts');
@@ -1050,17 +1057,12 @@ async function main() {
         // Needed for sorting
         'date', 'tracks',
         // Needed for computing page paths
-        'commentary', 'coverArtistContribs',
+        'aliasedArtist', 'commentary', 'coverArtistContribs',
       ]),
 
       artTagData: new Set([
         // Needed for computing page paths
         'isContentWarning',
-      ]),
-
-      artistAliasData: new Set([
-        // Needed for computing page paths
-        'aliasedArtist',
       ]),
 
       flashData: new Set([

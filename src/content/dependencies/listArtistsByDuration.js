@@ -10,12 +10,16 @@ export default {
   },
 
   query({artistData}, spec) {
-    const artists = sortAlphabetically(artistData.slice());
-    const durations = artists.map(artist =>
-      getTotalDuration([
-        ...(artist.tracksAsArtist ?? []),
-        ...(artist.tracksAsContributor ?? []),
-      ], {originalReleasesOnly: true}));
+    const artists =
+      sortAlphabetically(
+        artistData.filter(artist => !artist.isAlias));
+
+    const durations =
+      artists.map(artist =>
+        getTotalDuration([
+          ...(artist.tracksAsArtist ?? []),
+          ...(artist.tracksAsContributor ?? []),
+        ], {originalReleasesOnly: true}));
 
     filterByCount(artists, durations);
     sortByCount(artists, durations, {greatestFirst: true});

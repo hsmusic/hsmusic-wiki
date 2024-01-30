@@ -10,7 +10,10 @@ export default {
   },
 
   query({artistData}, spec) {
-    const artists = sortAlphabetically(artistData.slice());
+    const artists =
+      sortAlphabetically(
+        artistData.filter(artist => !artist.isAlias));
+
     const counts =
       artists.map(artist =>
         artist.tracksAsCommentator.length +

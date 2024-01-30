@@ -46,10 +46,12 @@ export function generateRandomLinkDataJSON({wikiData}) {
 
     artistDirectories:
       artistData
+        .filter(artist => !artist.isAlias)
         .map(artist => artist.directory),
 
     artistNumContributions:
       artistData
+        .filter(artist => !artist.isAlias)
         .map(artist => getArtistNumContributions(artist)),
   });
 }

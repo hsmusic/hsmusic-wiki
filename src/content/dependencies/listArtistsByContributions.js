@@ -25,8 +25,12 @@ export default {
     };
 
     const queryContributionInfo = (artistsKey, countsKey, fn) => {
-      const artists = sortAlphabetically(sprawl.artistData.slice());
-      const counts = artists.map(artist => fn(artist));
+      const artists =
+        sortAlphabetically(
+          sprawl.artistData.filter(artist => !artist.isAlias));
+
+      const counts =
+        artists.map(artist => fn(artist));
 
       filterByCount(artists, counts);
       sortByCount(artists, counts, {greatestFirst: true});

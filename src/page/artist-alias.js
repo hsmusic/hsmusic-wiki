@@ -1,7 +1,7 @@
 export const description = `redirects for aliased artist names`;
 
 export function targets({wikiData}) {
-  return wikiData.artistAliasData;
+  return wikiData.artistData.filter(artist => artist.isAlias);
 }
 
 export function pathsForTarget(aliasArtist) {

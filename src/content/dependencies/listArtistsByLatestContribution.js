@@ -145,7 +145,8 @@ export default {
     //
 
     const artistsAlphabetically =
-      sortAlphabetically(sprawl.artistData.slice());
+      sortAlphabetically(
+        sprawl.artistData.filter(artist => !artist.isAlias));
 
     const artists =
       Array.from(artistLatestContribMap.keys());

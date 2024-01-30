@@ -15,8 +15,12 @@ export default {
   },
 
   query(sprawl, spec) {
-    const artists = sortAlphabetically(sprawl.artistData.slice());
-    const groups = sprawl.wikiInfo.divideTrackListsByGroups;
+    const artists =
+      sortAlphabetically(
+        sprawl.artistData.filter(artist => !artist.isAlias));
+
+    const groups =
+      sprawl.wikiInfo.divideTrackListsByGroups;
 
     if (empty(groups)) {
       return {spec, artists};

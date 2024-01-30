@@ -12,7 +12,8 @@ export default {
     spec,
 
     artists:
-      sortAlphabetically(sprawl.artistData.slice()),
+      sortAlphabetically(
+        sprawl.artistData.filter(artist => !artist.isAlias)),
   }),
 
   relations: (relation, query) => ({

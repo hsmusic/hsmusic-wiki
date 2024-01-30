@@ -6,7 +6,7 @@ export const description = `per-artist info & artwork gallery pages`;
 
 // NB: See artist-alias.js for artist alias redirect pages.
 export function targets({wikiData}) {
-  return wikiData.artistData;
+  return wikiData.artistData.filter(artist => !artist.isAlias);
 }
 
 export function pathsForTarget(artist) {
