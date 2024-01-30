@@ -1921,6 +1921,8 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
 .sidebar-column.sidebar.sticky-column > h1 {
   position: sticky;
   top: 0;
+  z-index: 2;
+
   margin: 0 calc(-1 * var(--content-padding));
   margin-bottom: 10px;
 
