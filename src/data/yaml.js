@@ -1028,13 +1028,13 @@ export function filterDuplicateDirectories(wikiData) {
     const thingData = wikiData[thingDataProp];
     aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({call}) => {
       const directoryPlaces = Object.create(null);
-      const duplicateDirectories = [];
+      const duplicateDirectories = new Set();
 
       for (const thing of thingData) {
         const {directory} = thing;
         if (directory in directoryPlaces) {
           directoryPlaces[directory].push(thing);
-          duplicateDirectories.push(directory);
+          duplicateDirectories.add(directory);
         } else {
           directoryPlaces[directory] = [thing];
         }
@@ -1042,13 +1042,15 @@ export function filterDuplicateDirectories(wikiData) {
 
       if (empty(duplicateDirectories)) return;
 
-      duplicateDirectories.sort((a, b) => {
-        const aL = a.toLowerCase();
-        const bL = b.toLowerCase();
-        return aL < bL ? -1 : aL > bL ? 1 : 0;
-      });
+      const sortedDuplicateDirectories =
+        Array.from(duplicateDirectories)
+          .sort((a, b) => {
+            const aL = a.toLowerCase();
+            const bL = b.toLowerCase();
+            return aL < bL ? -1 : aL > bL ? 1 : 0;
+          });
 
-      for (const directory of duplicateDirectories) {
+      for (const directory of sortedDuplicateDirectories) {
         const places = directoryPlaces[directory];
         call(() => {
           throw new Error(
