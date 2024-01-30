@@ -2160,6 +2160,7 @@ clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
 
 const albumCommentarySidebarInfo = initInfo('albumCommentarySidebarInfo', {
   sidebar: null,
+  sidebarHeading: null,
 
   sidebarTrackLinks: null,
   sidebarTrackDirectories: null,
