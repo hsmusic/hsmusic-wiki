@@ -1930,8 +1930,12 @@ main.long-content .content-sticky-heading-container .content-sticky-subheading-r
   padding: 10px 5px;
 
   background: var(--bg-black-color);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+
+  box-shadow:
+    0 2px 3px -1px #0006,
+    0 4px 8px -2px #0009;
 }
 
 /* Image overlay */
