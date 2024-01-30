@@ -9,7 +9,7 @@ import yaml from 'js-yaml';
 
 import CacheableObject from '#cacheable-object';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
-import find, {bindFind} from '#find';
+import find, {bindFind, getAllFindSpecs} from '#find';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegex, sortByName} from '#wiki-data';
@@ -17,6 +17,7 @@ import {commentaryRegex, sortByName} from '#wiki-data';
 import {
   annotateErrorWithFile,
   atOffset,
+  compareArrays,
   conditionallySuppressError,
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
@@ -1009,26 +1010,26 @@ export function sortWikiDataArrays(wikiData) {
 // of Thing. Directories are the unique identifier for most data objects across
 // the wiki, so we have to make sure they aren't duplicated!
 export function reportDuplicateDirectories(wikiData) {
-  const deduplicateSpec = [
-    'albumData',
-    'artTagData',
-    'artistData',
-    'flashData',
-    'flashActData',
-    'groupData',
-    'newsData',
-    'trackData',
-  ];
+  const duplicateSets = [];
 
-  const aggregate = openAggregate({message: `Duplicate directories found`});
-  for (const thingDataProp of deduplicateSpec) {
-    const thingData = wikiData[thingDataProp];
-    aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({push}) => {
-      const directoryPlaces = Object.create(null);
-      const duplicateDirectories = new Set();
+  for (const findSpec of Object.values(getAllFindSpecs())) {
+    if (!findSpec.bindTo) continue;
 
-      for (const thing of thingData) {
-        const {directory} = thing;
+    const directoryPlaces = Object.create(null);
+    const duplicateDirectories = new Set();
+    const thingData = wikiData[findSpec.bindTo];
+
+    for (const thing of thingData) {
+      if (findSpec.include && !findSpec.include(thing)) {
+        continue;
+      }
+
+      const directories =
+        (findSpec.getMatchableDirectories
+          ? findSpec.getMatchableDirectories(thing)
+          : [thing.directory]);
+
+      for (const directory of directories) {
         if (directory in directoryPlaces) {
           directoryPlaces[directory].push(thing);
           duplicateDirectories.add(directory);
@@ -1036,25 +1037,63 @@ export function reportDuplicateDirectories(wikiData) {
           directoryPlaces[directory] = [thing];
         }
       }
+    }
 
-      if (empty(duplicateDirectories)) return;
+    if (empty(duplicateDirectories)) continue;
 
-      const sortedDuplicateDirectories =
-        Array.from(duplicateDirectories)
-          .sort((a, b) => {
-            const aL = a.toLowerCase();
-            const bL = b.toLowerCase();
-            return aL < bL ? -1 : aL > bL ? 1 : 0;
-          });
+    const sortedDuplicateDirectories =
+      Array.from(duplicateDirectories)
+        .sort((a, b) => {
+          const aL = a.toLowerCase();
+          const bL = b.toLowerCase();
+          return aL < bL ? -1 : aL > bL ? 1 : 0;
+        });
 
-      for (const directory of sortedDuplicateDirectories) {
-        const places = directoryPlaces[directory];
-        push(new Error(
-          `Duplicate directory ${colors.green(directory)}:\n` +
-          places.map(thing => ` - ` + inspect(thing)).join('\n')));
-      }
-    });
+    for (const directory of sortedDuplicateDirectories) {
+      const places = directoryPlaces[directory];
+      duplicateSets.push({directory, places});
+    }
   }
+
+  if (empty(duplicateSets)) return;
+
+  // Multiple find functions may effectively have duplicates across the same
+  // things. These only need to be reported once, because resolving one of them
+  // will resolve the rest, so cut out duplicate sets before reporting.
+
+  const seenDuplicateSets = new Map();
+  const deduplicateDuplicateSets = [];
+
+  for (const set of duplicateSets) {
+    if (seenDuplicateSets.has(set.directory)) {
+      const placeLists = seenDuplicateSets.get(set.directory);
+
+      for (const places of placeLists) {
+        // We're iterating globally over all duplicate directories, which may
+        // span multiple kinds of things, but that isn't going to cause an
+        // issue because we're comparing the contents by identity, anyway.
+        // Two artists named Foodog aren't going to match two tracks named
+        // Foodog.
+        if (compareArrays(places, set.places, {checkOrder: false})) {
+          continue;
+        }
+      }
+
+      placeLists.push(set.places);
+    } else {
+      seenDuplicateSets.set(set.directory, [set.places]);
+    }
+
+    deduplicateDuplicateSets.push(set);
+  }
+
+  withAggregate({message: `Duplicate directories found`}, ({push}) => {
+    for (const {directory, places} of deduplicateDuplicateSets) {
+      push(new Error(
+        `Duplicate directory ${colors.green(`"${directory}"`)}:\n` +
+        places.map(thing => ` - ` + inspect(thing)).join('\n')));
+    }
+  });
 
   aggregate.close();
 }
