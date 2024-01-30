@@ -464,6 +464,8 @@ function writeSymlinks({
     } catch (error) {
       if (error.code === 'EPERM') {
         await symlink(path.resolve(directory), file, 'junction');
+      } else {
+        throw error;
       }
     }
   }
