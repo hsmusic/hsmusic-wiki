@@ -1023,7 +1023,7 @@ export function reportDuplicateDirectories(wikiData) {
   const aggregate = openAggregate({message: `Duplicate directories found`});
   for (const thingDataProp of deduplicateSpec) {
     const thingData = wikiData[thingDataProp];
-    aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({call}) => {
+    aggregate.nest({message: `Duplicate directories found in ${colors.green('wikiData.' + thingDataProp)}`}, ({push}) => {
       const directoryPlaces = Object.create(null);
       const duplicateDirectories = new Set();
 
@@ -1049,11 +1049,9 @@ export function reportDuplicateDirectories(wikiData) {
 
       for (const directory of sortedDuplicateDirectories) {
         const places = directoryPlaces[directory];
-        call(() => {
-          throw new Error(
-            `Duplicate directory ${colors.green(directory)}:\n` +
-            places.map(thing => ` - ` + inspect(thing)).join('\n'));
-        });
+        push(new Error(
+          `Duplicate directory ${colors.green(directory)}:\n` +
+          places.map(thing => ` - ` + inspect(thing)).join('\n')));
       }
     });
   }
