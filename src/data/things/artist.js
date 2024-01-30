@@ -6,7 +6,7 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
-import {unique} from '#sugar';
+import {stitchArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {sortAlphabetically} from '#wiki-data';
@@ -276,26 +276,34 @@ export class Artist extends Thing {
     documentThing: Artist,
 
     save(results) {
-      const artistData = results;
+      const artists = results;
 
-      const artistAliasData = results.flatMap((artist) => {
-        const origRef = Thing.getReference(artist);
-        return artist.aliasNames?.map((name) => {
-          const alias = new Artist();
-          alias.name = name;
-          alias.isAlias = true;
-          alias.aliasedArtist = origRef;
-          alias.artistData = artistData;
-          return alias;
-        }) ?? [];
-      });
+      const artistRefs =
+        artists.map(artist => Thing.getReference(artist));
 
-      return {artistData, artistAliasData};
+      const artistAliasNames =
+        artists.map(artist => artist.aliasNames);
+
+      const artistAliases =
+        stitchArrays({
+          originalArtistRef: artistRefs,
+          aliasNames: artistAliasNames,
+        }).flatMap(({originalArtistRef, aliasNames}) =>
+            aliasNames.map(name => {
+              const alias = new Artist();
+              alias.name = name;
+              alias.isAlias = true;
+              alias.aliasedArtist = originalArtistRef;
+              return alias;
+            }));
+
+      const artistData = [...artists, ...artistAliases];
+
+      return {artistData};
     },
 
-    sort({artistData, artistAliasData}) {
+    sort({artistData}) {
       sortAlphabetically(artistData);
-      sortAlphabetically(artistAliasData);
     },
   });
 
