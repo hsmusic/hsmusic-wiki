@@ -2,8 +2,8 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors, logWarn} from '#cli';
+import thingConstructors from '#things';
 import {typeAppearance} from '#sugar';
-import {getKebabCase} from '#wiki-data';
 
 function warnOrThrow(mode, message) {
   if (mode === 'error') {
@@ -149,125 +149,75 @@ function findHelper({
   };
 }
 
-const find = {
-  album: findHelper({
-    referenceTypes: ['album', 'album-commentary', 'album-gallery'],
-  }),
-
-  artist: findHelper({
-    referenceTypes: ['artist', 'artist-gallery'],
-
-    include: artist => !artist.isAlias,
-  }),
-
-  artistIncludingAliases: findHelper({
-    referenceTypes: ['artist', 'artist-gallery'],
-
-    getMatchableDirectories(artist) {
-      // Regular artists are always matchable by their directory.
-      if (!artist.isAlias) {
-        return [artist.directory];
-      }
-
-      const originalArtist = artist.aliasedArtist;
-
-      // Aliases never match by the same directory as the original.
-      if (artist.directory === originalArtist.directory) {
-        return [];
-      }
-
-      // Aliases never match by the same directory as some *previous* alias
-      // in the original's alias list. This is honestly a bit awkward, but it
-      // avoids artist aliases conflicting with each other when checking for
-      // duplicate directories.
-      for (const aliasName of originalArtist.aliasNames) {
-        // These are trouble. We should be accessing aliases' directories
-        // directly, but artists currently don't expose a reverse reference
-        // list for aliases. (This is pending a cleanup of "reverse reference"
-        // behavior in general.) It doesn't actually cause problems *here*
-        // because alias directories are computed from their names 100% of the
-        // time, but that *is* an assumption this code makes.
-        if (aliasName === artist.name) continue;
-        if (artist.directory === getKebabCase(aliasName)) {
-          return [];
-        }
-      }
-
-      // And, aliases never return just a blank string. This part is pretty
-      // spooky because it doesn't handle two differently named aliases, on
-      // different artists, who have names that are similar *apart* from a
-      // character that's shortened. But that's also so fundamentally scary
-      // that we can't support it properly with existing code, anyway - we
-      // would need to be able to specifically set a directory *on an alias,*
-      // which currently can't be done in YAML data files.
-      if (artist.directory === '') {
-        return [];
-      }
-
-      return [artist.directory];
-    },
-  }),
-
-  artTag: findHelper({
-    referenceTypes: ['tag'],
-
-    getMatchableNames: tag =>
-      (tag.isContentWarning
-        ? [`cw: ${tag.name}`]
-        : [tag.name]),
-  }),
-
-  flash: findHelper({
-    referenceTypes: ['flash'],
-  }),
-
-  flashAct: findHelper({
-    referenceTypes: ['flash-act'],
-  }),
-
-  group: findHelper({
-    referenceTypes: ['group', 'group-gallery'],
-  }),
-
-  listing: findHelper({
+const hardcodedFindSpecs = {
+  // Listings aren't Thing objects, so this find spec isn't provided by any
+  // Thing constructor.
+  listing: {
     referenceTypes: ['listing'],
-  }),
-
-  newsEntry: findHelper({
-    referenceTypes: ['news-entry'],
-  }),
-
-  staticPage: findHelper({
-    referenceTypes: ['static'],
-  }),
-
-  track: findHelper({
-    referenceTypes: ['track'],
-
-    getMatchableNames: track =>
-      (track.alwaysReferenceByDirectory
-        ? []
-        : [track.name]),
-  }),
-
-  trackOriginalReleasesOnly: findHelper({
-    referenceTypes: ['track'],
-
-    include: track =>
-      !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'),
-
-    // It's still necessary to check alwaysReferenceByDirectory here, since it
-    // may be set manually (with the `Always Reference By Directory` field), and
-    // these shouldn't be matched by name (as per usual). See the definition for
-    // that property for more information.
-    getMatchableNames: track =>
-      (track.alwaysReferenceByDirectory
-        ? []
-        : [track.name]),
-  }),
+    bindTo: 'listingSpec',
+  },
 };
 
-export default find;
+export function getAllFindSpecs(key) {
+  try {
+    thingConstructors;
+  } catch (error) {
+    throw new Error(`Thing constructors aren't ready yet, can't get all find specs`);
+  }
+
+  const findSpecs = {...hardcodedFindSpecs};
+
+  for (const thingConstructor of Object.values(thingConstructors)) {
+    const thingFindSpecs = thingConstructor[Symbol.for('Thing.findSpecs')];
+    if (!thingFindSpecs) continue;
+
+    Object.assign(findSpecs, thingFindSpecs);
+  }
+
+  return findSpecs;
+}
+
+export function findFindSpec(key) {
+  if (Object.hasOwn(hardcodedFindSpecs, key)) {
+    return hardcodedFindSpecs[key];
+  }
+
+  try {
+    thingConstructors;
+  } catch (error) {
+    throw new Error(`Thing constructors aren't ready yet, can't check if "find.${key}" available`);
+  }
+
+  for (const thingConstructor of Object.values(thingConstructors)) {
+    const thingFindSpecs = thingConstructor[Symbol.for('Thing.findSpecs')];
+    if (!thingFindSpecs) continue;
+
+    if (Object.hasOwn(thingFindSpecs, key)) {
+      return thingFindSpecs[key];
+    }
+  }
+
+  throw new Error(`"find.${key}" isn't available`);
+}
+
+export default new Proxy({}, {
+  get: (store, key) => {
+    if (!Object.hasOwn(store, key)) {
+      let behavior = (...args) => {
+        // This will error if the find spec isn't available...
+        const findSpec = findFindSpec(key);
+
+        // ...or, if it is available, replace this function with the
+        // ready-for-use find function made out of that find spec.
+        return (behavior = findHelper(findSpec))(...args);
+      };
+
+      store[key] = (...args) => behavior(...args);
+    }
+
+    return store[key];
+  },
+});
 
 // Handy utility function for binding the find.thing() functions to a complete
 // wikiData object, optionally taking default options to provide to the find
@@ -275,34 +225,27 @@ export default find;
 // called, so if their values change, you'll have to continue with a fresh call
 // to bindFind.
 export function bindFind(wikiData, opts1) {
-  return Object.fromEntries(
-    Object.entries({
-      album: 'albumData',
-      artist: 'artistData',
-      artTag: 'artTagData',
-      flash: 'flashData',
-      flashAct: 'flashActData',
-      group: 'groupData',
-      listing: 'listingSpec',
-      newsEntry: 'newsData',
-      staticPage: 'staticPageData',
-      track: 'trackData',
-      trackOriginalReleasesOnly: 'trackData',
-    }).map(([key, value]) => {
-      const findFn = find[key];
-      const thingData = wikiData[value];
-      return [
-        key,
-        opts1
-          ? (ref, opts2) =>
-              opts2
-                ? findFn(ref, thingData, {...opts1, ...opts2})
-                : findFn(ref, thingData, opts1)
-          : (ref, opts2) =>
-              opts2
-                ? findFn(ref, thingData, opts2)
-                : findFn(ref, thingData),
-      ];
-    })
-  );
+  const findSpecs = getAllFindSpecs();
+
+  const boundFindFns = {};
+
+  for (const [key, spec] of Object.entries(findSpecs)) {
+    if (!spec.bindTo) continue;
+
+    const findFn = findHelper(spec);
+    const thingData = wikiData[spec.bindTo];
+
+    boundFindFns[key] =
+      (opts1
+        ? (ref, opts2) =>
+            (opts2
+              ? findFn(ref, thingData, {...opts1, ...opts2})
+              : findFn(ref, thingData, opts1))
+        : (ref, opts2) =>
+            (opts2
+              ? findFn(ref, thingData, opts2)
+              : findFn(ref, thingData)));
+  }
+
+  return boundFindFns;
 }

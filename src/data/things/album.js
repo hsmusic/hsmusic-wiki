@@ -207,6 +207,13 @@ export class Album extends Thing {
     commentatorArtists: S.toRefs,
   });
 
+  static [Thing.findSpecs] = {
+    album: {
+      referenceTypes: ['album', 'album-commentary', 'album-gallery'],
+      bindTo: 'albumData',
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Album': {property: 'name'},

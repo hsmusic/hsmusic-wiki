@@ -65,6 +65,18 @@ export class ArtTag extends Thing {
     },
   });
 
+  static [Thing.findSpecs] = {
+    artTag: {
+      referenceTypes: ['tag'],
+      bindTo: 'artTagData',
+
+      getMatchableNames: tag =>
+        (tag.isContentWarning
+          ? [`cw: ${tag.name}`]
+          : [tag.name]),
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Tag': {property: 'name'},

@@ -35,6 +35,13 @@ export class StaticPage extends Thing {
     script: simpleString(),
   });
 
+  static [Thing.findSpecs] = {
+    staticPage: {
+      referenceTypes: ['static'],
+      bindTo: 'staticPageData',
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Name': {property: 'name'},

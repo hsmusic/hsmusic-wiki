@@ -9,7 +9,7 @@ import find from '#find';
 import {stitchArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
-import {sortAlphabetically} from '#wiki-data';
+import {getKebabCase, sortAlphabetically} from '#wiki-data';
 
 import {withReverseContributionList} from '#composite/wiki-data';
 
@@ -28,6 +28,7 @@ import {
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
+  static [Thing.wikiDataArray] = 'artistData';
 
   static [Thing.getPropertyDescriptors] = ({Album, Flash, Track}) => ({
     // Update & expose
@@ -246,6 +247,64 @@ export class Artist extends Thing {
 
     flashesAsContributor: S.toRefs,
   });
+
+  static [Thing.findSpecs] = {
+    artist: {
+      referenceTypes: ['artist', 'artist-gallery'],
+      bindTo: 'artistData',
+
+      include: artist => !artist.isAlias,
+    },
+
+    artistIncludingAliases: {
+      referenceTypes: ['artist', 'artist-gallery'],
+      bindTo: 'artistData',
+
+      getMatchableDirectories(artist) {
+        // Regular artists are always matchable by their directory.
+        if (!artist.isAlias) {
+          return [artist.directory];
+        }
+
+        const originalArtist = artist.aliasedArtist;
+
+        // Aliases never match by the same directory as the original.
+        if (artist.directory === originalArtist.directory) {
+          return [];
+        }
+
+        // Aliases never match by the same directory as some *previous* alias
+        // in the original's alias list. This is honestly a bit awkward, but it
+        // avoids artist aliases conflicting with each other when checking for
+        // duplicate directories.
+        for (const aliasName of originalArtist.aliasNames) {
+          // These are trouble. We should be accessing aliases' directories
+          // directly, but artists currently don't expose a reverse reference
+          // list for aliases. (This is pending a cleanup of "reverse reference"
+          // behavior in general.) It doesn't actually cause problems *here*
+          // because alias directories are computed from their names 100% of the
+          // time, but that *is* an assumption this code makes.
+          if (aliasName === artist.name) continue;
+          if (artist.directory === getKebabCase(aliasName)) {
+            return [];
+          }
+        }
+
+        // And, aliases never return just a blank string. This part is pretty
+        // spooky because it doesn't handle two differently named aliases, on
+        // different artists, who have names that are similar *apart* from a
+        // character that's shortened. But that's also so fundamentally scary
+        // that we can't support it properly with existing code, anyway - we
+        // would need to be able to specifically set a directory *on an alias,*
+        // which currently can't be done in YAML data files.
+        if (artist.directory === '') {
+          return [];
+        }
+
+        return [artist.directory];
+      },
+    },
+  };
 
   static [Thing.yamlDocumentSpec] = {
     fields: {

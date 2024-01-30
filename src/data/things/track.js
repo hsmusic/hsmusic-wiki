@@ -451,6 +451,35 @@ export class Track extends Thing {
     ],
   };
 
+  static [Thing.findSpecs] = {
+    track: {
+      referenceTypes: ['track'],
+      bindTo: 'trackData',
+
+      getMatchableNames: track =>
+        (track.alwaysReferenceByDirectory
+          ? []
+          : [track.name]),
+    },
+
+    trackOriginalReleasesOnly: {
+      referenceTypes: ['track'],
+      bindTo: 'trackData',
+
+      include: track =>
+        !CacheableObject.getUpdateValue(track, 'originalReleaseTrack'),
+
+      // It's still necessary to check alwaysReferenceByDirectory here, since
+      // it may be set manually (with `Always Reference By Directory: true`),
+      // and these shouldn't be matched by name (as per usual).
+      // See the definition for that property for more information.
+      getMatchableNames: track =>
+        (track.alwaysReferenceByDirectory
+          ? []
+          : [track.name]),
+    },
+  };
+
   // Track YAML loading is handled in album.js.
   static [Thing.getYamlLoadingSpec] = null;
 

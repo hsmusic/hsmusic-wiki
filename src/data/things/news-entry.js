@@ -33,6 +33,13 @@ export class NewsEntry extends Thing {
     },
   });
 
+  static [Thing.findSpecs] = {
+    newsEntry: {
+      referenceTypes: ['news-entry'],
+      bindTo: 'newsData',
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Name': {property: 'name'},

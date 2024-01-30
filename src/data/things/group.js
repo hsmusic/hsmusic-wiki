@@ -87,6 +87,13 @@ export class Group extends Thing {
     },
   });
 
+  static [Thing.findSpecs] = {
+    group: {
+      referenceTypes: ['group', 'group-gallery'],
+      bindTo: 'groupData',
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Group': {property: 'name'},

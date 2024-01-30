@@ -130,6 +130,13 @@ export class Flash extends Thing {
     color: S.id,
   });
 
+  static [Thing.findSpecs] = {
+    flash: {
+      referenceTypes: ['flash'],
+      bindTo: 'flashData',
+    },
+  };
+
   static [Thing.yamlDocumentSpec] = {
     fields: {
       'Flash': {property: 'name'},
@@ -192,6 +199,13 @@ export class FlashAct extends Thing {
       class: input.value(Flash),
     }),
   });
+
+  static [Thing.findSpecs] = {
+    flashAct: {
+      referenceTypes: ['flash-act'],
+      bindTo: 'flashActData',
+    },
+  };
 
   static [Thing.yamlDocumentSpec] = {
     fields: {

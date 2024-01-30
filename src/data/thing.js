@@ -13,6 +13,7 @@ export default class Thing extends CacheableObject {
   static getPropertyDescriptors = Symbol.for('Thing.getPropertyDescriptors');
   static getSerializeDescriptors = Symbol.for('Thing.getSerializeDescriptors');
 
+  static findSpecs = Symbol.for('Thing.findSpecs');
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
   static getYamlLoadingSpec = Symbol.for('Thing.getYamlLoadingSpec');
 
