@@ -1007,11 +1007,8 @@ export function sortWikiDataArrays(wikiData) {
 
 // Warn about directories which are reused across more than one of the same type
 // of Thing. Directories are the unique identifier for most data objects across
-// the wiki, so we have to make sure they aren't duplicated!  This also
-// altogether filters out instances of things with duplicate directories (so if
-// two tracks share the directory "megalovania", they'll both be skipped for the
-// build, for example).
-export function filterDuplicateDirectories(wikiData) {
+// the wiki, so we have to make sure they aren't duplicated!
+export function reportDuplicateDirectories(wikiData) {
   const deduplicateSpec = [
     'albumData',
     'artTagData',
@@ -1058,32 +1055,10 @@ export function filterDuplicateDirectories(wikiData) {
             places.map(thing => ` - ` + inspect(thing)).join('\n'));
         });
       }
-
-      const allDuplicatedThings = Object.values(directoryPlaces)
-        .filter((arr) => arr.length > 1)
-        .flat();
-
-      const filteredThings = thingData
-        .filter((thing) => !allDuplicatedThings.includes(thing));
-
-      wikiData[thingDataProp] = filteredThings;
     });
   }
 
-  // TODO: This code closes the aggregate but it generally gets closed again
-  // by the caller. This works but it might be weird to assume closing an
-  // aggregate twice is okay, maybe there's a better solution? Expose a new
-  // function on aggregates for checking if it *would* error?
-  // (i.e: errors.length > 0)
-  try {
-    aggregate.close();
-  } catch (error) {
-    // Duplicate entries were found and filtered out, resulting in altered
-    // wikiData arrays. These must be re-linked so objects receive the new
-    // data.
-    linkWikiDataArrays(wikiData);
-  }
-  return aggregate;
+  aggregate.close();
 }
 
 // Warn about references across data which don't match anything.  This involves
@@ -1413,7 +1388,7 @@ export async function quickLoadAllFromYAML(dataPath, {
   linkWikiDataArrays(wikiData);
 
   try {
-    filterDuplicateDirectories(wikiData).close();
+    reportDuplicateDirectories(wikiData).close();
     logInfo`No duplicate directories found. (complete data)`;
   } catch (error) {
     showAggregate(error);

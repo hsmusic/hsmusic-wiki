@@ -68,10 +68,10 @@ import genThumbs, {
 } from '#thumbs';
 
 import {
-  filterDuplicateDirectories,
   filterReferenceErrors,
   linkWikiDataArrays,
   loadAndProcessDataDocuments,
+  reportDuplicateDirectories,
   sortWikiDataArrays,
 } from '#yaml';
 
@@ -131,7 +131,7 @@ async function main() {
     precacheCommonData:
       {...defaultStepStatus, name: `precache common data`},
 
-    filterDuplicateDirectories:
+    reportDuplicateDirectories:
       {...defaultStepStatus, name: `filter duplicate directories`},
 
     filterReferenceErrors:
@@ -1110,19 +1110,16 @@ async function main() {
   // Filter out any things with duplicate directories throughout the data,
   // warning about them too.
 
-  Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+  Object.assign(stepStatusSummary.reportDuplicateDirectories, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
   });
 
-  const filterDuplicateDirectoriesAggregate =
-    filterDuplicateDirectories(wikiData);
-
   try {
-    filterDuplicateDirectoriesAggregate.close();
+    reportDuplicateDirectories(wikiData);
     logInfo`No duplicate directories found - nice!`;
 
-    Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+    Object.assign(stepStatusSummary.reportDuplicateDirectories, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
     });
@@ -1134,7 +1131,7 @@ async function main() {
     logWarn`correct, the build can't continue. Specify unique 'Directory' fields in`;
     logWarn`some or all of these data entries to resolve the errors.`;
 
-    Object.assign(stepStatusSummary.filterDuplicateDirectories, {
+    Object.assign(stepStatusSummary.reportDuplicateDirectories, {
       status: STATUS_FATAL_ERROR,
       annotation: `duplicate directories found`,
       timeEnd: Date.now(),
