@@ -61,10 +61,10 @@ export default {
           ? language.$('albumSidebar.trackList.fallbackSectionName')
           : data.name));
 
-    let style;
+    let colorStyle;
     if (data.color) {
       const {primary} = getColors(data.color);
-      style = `--primary-color: ${primary}`;
+      colorStyle = {style: `--primary-color: ${primary}`};
     }
 
     const trackListItems =
@@ -113,7 +113,9 @@ export default {
         {open: true},
 
       [
-        html.tag('summary', {style},
+        html.tag('summary',
+          colorStyle,
+
           html.tag('span',
             (data.hasTrackNumbers
               ? language.$('albumSidebar.trackList.group.withRange', {
