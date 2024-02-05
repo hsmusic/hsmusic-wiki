@@ -107,21 +107,27 @@ export default {
   },
 
   generate(data, relations, {language}) {
-    const listChunkIDs = ['tracks', 'artworks', 'flashes'];
-    const listTitleStringsKeys = ['trackContributors', 'artContributors', 'flashContributors'];
-    const listCountFunctions = ['countTracks', 'countArtworks', 'countFlashes'];
+    const listChunkIDs = ['tracks', 'artworks'];
+    const listTitleStringsKeys = ['trackContributors', 'artContributors'];
+    const listCountFunctions = ['countTracks', 'countArtworks'];
 
     const listArtistLinks = [
       relations.artistLinksByTrackContributions,
       relations.artistLinksByArtworkContributions,
-      relations.artistLinksByFlashContributions,
     ];
 
     const listArtistCounts = [
       data.countsByTrackContributions,
       data.countsByArtworkContributions,
-      data.countsByFlashContributions,
     ];
+
+    if (data.enableFlashesAndGames) {
+      listChunkIDs.push('flashes');
+      listTitleStringsKeys.push('flashContributors');
+      listCountFunctions.push('countFlashes');
+      listArtistLinks.push(relations.artistLinksByFlashContributions);
+      listArtistCounts.push(data.countsByFlashContributions);
+    }
 
     filterMultipleArrays(
       listChunkIDs,
