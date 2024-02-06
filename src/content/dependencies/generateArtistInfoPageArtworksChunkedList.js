@@ -179,7 +179,7 @@ export default {
                   }) =>
                     item.slots({
                       otherArtistLinks,
-                      contribution,
+                      annotation: contribution,
 
                       content:
                         (type === 'trackCover'

@@ -206,7 +206,7 @@ export default {
                       otherArtistLinks,
                       rerelease,
 
-                      contribution:
+                      annotation:
                         (contribution
                           ? language.formatUnitList(contribution)
                           : html.blank()),

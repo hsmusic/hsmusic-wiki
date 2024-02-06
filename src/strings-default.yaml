@@ -879,12 +879,12 @@ artistPage:
 
     entry:
 
-      # withContribution:
+      # withAnnotation:
       #   The specific contribution that an artist made to a given
       #   thing may be described with a word or two, and that's shown
       #   in the list.
 
-      withContribution: "{ENTRY} ({CONTRIBUTION})"
+      withAnnotation: "{ENTRY} ({ANNOTATION})"
 
       # withArtists:
       #   This lists co-artists or co-contributors, depending on how
@@ -892,7 +892,7 @@ artistPage:
 
       withArtists: "{ENTRY} (with {ARTISTS})"
 
-      withArtists.withContribution: "{ENTRY} ({CONTRIBUTION}; with {ARTISTS})"
+      withArtists.withAnnotation: "{ENTRY} ({ANNOTATION}; with {ARTISTS})"
 
       # rerelease:
       #   Tracks which aren't the original release don't display co-

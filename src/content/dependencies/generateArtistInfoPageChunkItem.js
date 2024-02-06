@@ -7,7 +7,7 @@ export default {
       mutable: false,
     },
 
-    contribution: {
+    annotation: {
       type: 'html',
       mutable: false,
     },
@@ -40,9 +40,9 @@ export default {
         options.artists = language.formatConjunctionList(slots.otherArtistLinks);
       }
 
-      if (!html.isBlank(slots.contribution)) {
-        parts.push('withContribution');
-        options.contribution = slots.contribution;
+      if (!html.isBlank(slots.annotation)) {
+        parts.push('withAnnotation');
+        options.annotation = slots.annotation;
       }
 
       if (parts.length === 1) {

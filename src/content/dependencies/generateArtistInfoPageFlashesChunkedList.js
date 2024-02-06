@@ -130,7 +130,7 @@ export default {
                   contribution,
                 }) =>
                   item.slots({
-                    contribution,
+                    annotation: contribution,
 
                     content:
                       language.$('artistPage.creditList.entry.flash', {
