@@ -9,6 +9,8 @@ import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {validateWikiData} from '#validators';
 
+import {exitWithoutDependency, withResultOfAvailabilityCheck}
+  from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
 
 export default templateCompositeFrom({
@@ -26,33 +28,48 @@ export default templateCompositeFrom({
   outputs: ['#originalRelease'],
 
   steps: () => [
-    withResolvedReference({
-      ref: 'originalReleaseTrack',
-      data: input('data'),
-      find: input.value(find.track),
-      notFoundMode: input.value('exit'),
-    }).outputs({
-      ['#resolvedReference']: '#originalRelease',
+    withResultOfAvailabilityCheck({
+      from: 'originalReleaseTrack',
     }),
 
     {
       dependencies: [
         input.myself(),
         input('selfIfOriginal'),
-        '#originalRelease',
+        '#availability',
       ],
 
       compute: (continuation, {
         [input.myself()]: track,
         [input('selfIfOriginal')]: selfIfOriginal,
-        ['#originalRelease']: originalRelease,
+        '#availability': availability,
+      }) =>
+        (availability
+          ? continuation()
+          : continuation.raiseOutput({
+              ['#originalRelease']:
+                (selfIfOriginal ? track : null),
+            })),
+    },
+
+    withResolvedReference({
+      ref: 'originalReleaseTrack',
+      data: input('data'),
+      find: input.value(find.track),
+    }),
+
+    exitWithoutDependency({
+      dependency: '#resolvedReference',
+    }),
+
+    {
+      dependencies: ['#resolvedReference'],
+
+      compute: (continuation, {
+        ['#resolvedReference']: resolvedReference,
       }) =>
         continuation({
-          ['#originalRelease']:
-            (originalRelease ??
-              (selfIfOriginal
-                ? track
-                : null)),
+          ['#originalRelease']: resolvedReference,
         }),
     },
   ],
