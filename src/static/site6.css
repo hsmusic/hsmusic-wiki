@@ -507,35 +507,28 @@ a:not([href]):hover {
   position: relative;
 }
 
-.text-with-tooltip > :first-child {
+.text-with-tooltip .text-with-tooltip-interaction-cue {
   text-decoration: underline;
   text-decoration-style: dotted;
 }
 
-.text-with-tooltip > :first-child:hover,
-.text-with-tooltip > :first-child.has-visible-tooltip {
+.text-with-tooltip > .hoverable:hover .text-with-tooltip-interaction-cue,
+.text-with-tooltip > .hoverable.has-visible-tooltip .text-with-tooltip-interaction-cue {
   text-decoration-style: wavy !important;
 }
 
-.text-with-tooltip.datetimestamp > :first-child,
-.text-with-tooltip.missing-duration > :first-child {
+.text-with-tooltip.datetimestamp .text-with-tooltip-interaction-cue,
+.text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue {
   cursor: default;
 }
 
-.text-with-tooltip.missing-duration > :first-child {
+.text-with-tooltip.missing-duration > .hoverable {
   opacity: 0.5;
 }
 
-.text-with-tooltip.missing-duration > :first-child:hover,
-.text-with-tooltip.missing-duration > :first-child.has-visible-tooltip {
-  text-decoration: none !important;
+.text-with-tooltip.missing-duration > .hoverable:hover,
+.text-with-tooltip.missing-duration > .hoverable.has-visible-tooltip {
   opacity: 1;
-}
-
-.text-with-tooltip.missing-duration > :first-child:hover .duration-text,
-.text-with-tooltip.missing-duration > :first-child.has-visible-tooltip .duration-text {
-  text-decoration: underline;
-  text-decoration-style: wavy;
 }
 
 .tooltip {

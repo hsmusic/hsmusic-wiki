@@ -7,6 +7,11 @@ export default {
       mutable: false,
     },
 
+    customInteractionCue: {
+      type: 'boolean',
+      default: false,
+    },
+
     text: {
       type: 'html',
       mutable: false,
@@ -37,10 +42,20 @@ export default {
       });
     }
 
+    const textPart =
+      (hasTooltip && slots.customInteractionCue
+        ? html.tag('span', {class: 'hoverable'},
+            slots.text)
+     : hasTooltip
+        ? html.tag('span', {class: 'hoverable'},
+            html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
+              slots.text))
+        : slots.text);
+
     const content =
       (hasTooltip
-        ? [slots.text, slots.tooltip]
-        : slots.text);
+        ? [textPart, slots.tooltip]
+        : textPart);
 
     return html.tag('span', attributes, content);
   },

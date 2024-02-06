@@ -13,14 +13,14 @@ export default {
   generate: (relations, {html, language}) =>
     relations.textWithTooltip.slots({
       attributes: {class: 'missing-duration'},
+      customInteractionCue: true,
 
       text:
-        html.tag('span',
-          language.$('trackList.item.withDuration.duration', {
-            duration:
-              html.tag('span', {class: 'duration-text'},
-                language.$('trackList.item.withDuration.duration.missing')),
-          })),
+        language.$('trackList.item.withDuration.duration', {
+          duration:
+            html.tag('span', {class: 'text-with-tooltip-interaction-cue'},
+              language.$('trackList.item.withDuration.duration.missing')),
+        }),
 
       tooltip:
         relations.tooltip.slots({

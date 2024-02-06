@@ -58,7 +58,13 @@ export default {
     options.artist =
       (hasExternalIcons && slots.iconMode === 'tooltip'
         ? relations.textWithTooltip.slots({
-            text: relations.artistLink,
+            customInteractionCue: true,
+
+            text:
+              relations.artistLink.slots({
+                attributes: {class: 'text-with-tooltip-interaction-cue'},
+              }),
+
             tooltip:
               relations.tooltip.slots({
                 attributes:
