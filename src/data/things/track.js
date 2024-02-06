@@ -396,6 +396,9 @@ export class Track extends Thing {
       'Referenced Tracks': {property: 'referencedTracks'},
       'Sampled Tracks': {property: 'sampledTracks'},
 
+      'Franchises': {ignore: true},
+      'Inherit Franchises': {ignore: true},
+
       'Artists': {
         property: 'artistContribs',
         transform: parseContributors,

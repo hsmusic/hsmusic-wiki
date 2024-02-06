@@ -277,6 +277,8 @@ export class Album extends Thing {
         transform: parseAdditionalFiles,
       },
 
+      'Franchises': {ignore: true},
+
       'Artists': {
         property: 'artistContribs',
         transform: parseContributors,
