@@ -19,58 +19,73 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const processEntries = (things, details) =>
-      things.map(thing => ({
-        thing,
-        entry: details(thing),
-      }));
+    const processTrackEntry = ({track, contribs}) => ({
+      thing: track,
+      entry: {
+        track: track,
+        album: track.album,
+        date: track.date,
+        contribs: contribs,
+      },
+    });
+
+    const processTrackEntries = ({tracks, contribs}) =>
+      stitchArrays({
+        track: tracks,
+        contribs: contribs,
+      }).map(processTrackEntry);
+
+    const {tracksAsArtist, tracksAsContributor} = artist;
 
     const tracksAsArtistAndContributor =
-      artist.tracksAsArtist
-        .filter(track => artist.tracksAsContributor.includes(track));
+      tracksAsArtist
+        .filter(track => tracksAsContributor.includes(track));
 
     const tracksAsArtistOnly =
-      artist.tracksAsArtist
-        .filter(track => !artist.tracksAsContributor.includes(track));
+      tracksAsArtist
+        .filter(track => !tracksAsContributor.includes(track));
 
     const tracksAsContributorOnly =
-      artist.tracksAsContributor
-        .filter(track => !artist.tracksAsArtist.includes(track));
+      tracksAsContributor
+        .filter(track => !tracksAsArtist.includes(track));
 
-    const entriesAsArtistAndContributor =
-      processEntries(
-        tracksAsArtistAndContributor,
-        track => ({
-          track,
-          album: track.album,
-          date: track.date,
-          contribs: [...track.artistContribs, ...track.contributorContribs],
-        }));
+    const tracksAsArtistAndContributorContribs =
+      tracksAsArtistAndContributor
+        .map(track => [
+          ...track.artistContribs,
+          ...track.contributorContribs,
+        ]);
 
-    const entriesAsArtistOnly =
-      processEntries(
-        tracksAsArtistOnly,
-        track => ({
-          track,
-          album: track.album,
-          date: track.date,
-          contribs: track.artistContribs,
-        }));
+    const tracksAsArtistOnlyContribs =
+      tracksAsArtistOnly
+        .map(track => track.artistContribs);
 
-    const entriesAsContributorOnly =
-      processEntries(
-        tracksAsContributorOnly,
-        track => ({
-          track,
-          date: track.date,
-          album: track.album,
-          contribs: track.contributorContribs,
-        }));
+    const tracksAsContributorOnlyContribs =
+      tracksAsContributorOnly
+        .map(track => track.contributorContribs);
+
+    const tracksAsArtistAndContributorEntries =
+      processTrackEntries({
+        tracks: tracksAsArtistAndContributor,
+        contribs: tracksAsArtistAndContributorContribs,
+      });
+
+    const tracksAsArtistOnlyEntries =
+      processTrackEntries({
+        tracks: tracksAsArtistOnly,
+        contribs: tracksAsArtistOnlyContribs,
+      });
+
+    const tracksAsContributorOnlyEntries =
+      processTrackEntries({
+        tracks: tracksAsContributorOnly,
+        contribs: tracksAsContributorOnlyContribs,
+      });
 
     const entries = [
-      ...entriesAsArtistAndContributor,
-      ...entriesAsArtistOnly,
-      ...entriesAsContributorOnly,
+      ...tracksAsArtistAndContributorEntries,
+      ...tracksAsArtistOnlyEntries,
+      ...tracksAsContributorOnlyEntries,
     ];
 
     sortEntryThingPairs(entries, sortAlbumsTracksChronologically);

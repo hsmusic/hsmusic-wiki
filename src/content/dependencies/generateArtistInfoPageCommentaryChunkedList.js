@@ -19,34 +19,76 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const processEntries = (things, details) =>
-      things.flatMap(thing =>
-        thing.commentary
-          .filter(entry => entry.artists.includes(artist))
-          .map(entry => ({
-            thing,
-            entry: {
-              annotation: entry.annotation,
-              ...details(thing, entry),
-            },
-          })));
+    const processEntry = ({thing, entry, type, track, album}) => ({
+      thing: thing,
+      entry: {
+        type: type,
+        track: track,
+        album: album,
+        annotation: entry.annotation,
+      },
+    });
 
-    const albumEntries =
-      processEntries(
-        artist.albumsAsCommentator,
-        album => ({
-          type: 'album',
-          album,
-        }));
+    const processAlbumEntry = ({type, album, entry}) =>
+      processEntry({
+        thing: album,
+        entry: entry,
+        type: type,
+        album: album,
+        track: null,
+      });
+
+    const processTrackEntry = ({type, track, entry}) =>
+      processEntry({
+        thing: track,
+        entry: entry,
+        type: type,
+        album: track.album,
+        track: track,
+      });
+
+    const processEntries = ({things, processEntry}) =>
+      things
+        .flatMap(thing =>
+          thing.commentary
+            .filter(entry => entry.artists.includes(artist))
+            .map(entry => processEntry({thing, entry})));
+
+    const processAlbumEntries = ({type, albums}) =>
+      processEntries({
+        things: albums,
+        processEntry: ({thing, entry}) =>
+          processAlbumEntry({
+            type: type,
+            album: thing,
+            entry: entry,
+          }),
+      });
+
+    const processTrackEntries = ({type, tracks}) =>
+      processEntries({
+        things: tracks,
+        processEntry: ({thing, entry}) =>
+          processTrackEntry({
+            type: type,
+            track: thing,
+            entry: entry,
+          }),
+      });
+
+    const {albumsAsCommentator, tracksAsCommentator} = artist;
 
     const trackEntries =
-      processEntries(
-        artist.tracksAsCommentator,
-        track => ({
-          type: 'track',
-          album: track.album,
-          track,
-        }));
+      processTrackEntries({
+        type: 'track',
+        tracks: tracksAsCommentator,
+      });
+
+    const albumEntries =
+      processAlbumEntries({
+        type: 'album',
+        albums: albumsAsCommentator,
+      });
 
     const entries = [
       ...albumEntries,

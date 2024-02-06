@@ -16,23 +16,35 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const processEntries = (things, details) =>
-      things.map(thing => ({
-        thing,
-        entry: details(thing),
-      }));
+    const processFlashEntry = ({flash, contribs}) => ({
+      thing: flash,
+      entry: {
+        flash: flash,
+        act: flash.act,
+        contribs: contribs,
+      },
+    });
 
-    const contributorEntries =
-      processEntries(
-        artist.flashesAsContributor,
-        flash => ({
-          flash,
-          act: flash.act,
-          contribs: flash.contributorContribs,
-        }));
+    const processFlashEntries = ({flashes, contribs}) =>
+      stitchArrays({
+        flash: flashes,
+        contribs: contribs,
+      }).map(processFlashEntry);
+
+    const {flashesAsContributor} = artist;
+
+    const flashesAsContributorContribs =
+      flashesAsContributor
+        .map(flash => flash.contributorContribs);
+
+    const flashesAsContributorEntries =
+      processFlashEntries({
+        flashes: flashesAsContributor,
+        contribs: flashesAsContributorContribs,
+      });
 
     const entries = [
-      ...contributorEntries,
+      ...flashesAsContributorEntries,
     ];
 
     sortEntryThingPairs(entries, sortFlashesChronologically);

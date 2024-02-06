@@ -24,58 +24,105 @@ export default {
     // shape (#70) and get their own sorting function. Read for more info:
     // https://github.com/hsmusic/hsmusic-wiki/issues/90#issuecomment-1607422961
 
-    const processEntries = (things, details) =>
-      things.map(thing => ({
-        thing,
-        entry: details(thing),
-      }));
+    const processEntry = ({thing, type, track, album, contribs}) => ({
+      thing: thing,
+      entry: {
+        type: type,
+        track: track,
+        album: album,
+        contribs: contribs,
+        date: thing.coverArtDate ?? thing.date,
+      },
+    });
 
-    const albumCoverEntries =
-      processEntries(
-        artist.albumsAsCoverArtist,
-        album => ({
-          type: 'albumCover',
-          album: album,
-          date: album.coverArtDate ?? album.date,
-          contribs: album.coverArtistContribs,
-        }));
+    const processAlbumEntry = ({type, album, contribs}) =>
+      processEntry({
+        thing: album,
+        type: type,
+        track: null,
+        album: album,
+        contribs: contribs,
+      });
 
-    const albumWallpaperEntries =
-      processEntries(
-        artist.albumsAsWallpaperArtist,
-        album => ({
-          type: 'albumWallpaper',
-          album: album,
-          date: album.coverArtDate ?? album.date,
-          contribs: album.wallpaperArtistContribs,
-        }));
+    const processTrackEntry = ({type, track, contribs}) =>
+      processEntry({
+        thing: track,
+        type: type,
+        track: track,
+        album: track.album,
+        contribs: contribs,
+      });
 
-    const albumBannerEntries =
-      processEntries(
-        artist.albumsAsBannerArtist,
-        album => ({
-          type: 'albumBanner',
-          album: album,
-          date: album.coverArtDate ?? album.date,
-          contribs: album.bannerArtistContribs,
-        }));
+    const processAlbumEntries = ({type, albums, contribs}) =>
+      stitchArrays({
+        album: albums,
+        contribs: contribs,
+      }).map(entry =>
+          processAlbumEntry({type, ...entry}));
 
-    const trackCoverEntries =
-      processEntries(
-        artist.tracksAsCoverArtist,
-        track => ({
-          type: 'trackCover',
-          album: track.album,
-          date: track.coverArtDate ?? track.date,
-          track: track,
-          contribs: track.coverArtistContribs,
-        }));
+    const processTrackEntries = ({type, tracks, contribs}) =>
+      stitchArrays({
+        track: tracks,
+        contribs: contribs,
+      }).map(entry =>
+          processTrackEntry({type, ...entry}));
+
+    const {
+      albumsAsCoverArtist,
+      albumsAsWallpaperArtist,
+      albumsAsBannerArtist,
+      tracksAsCoverArtist,
+    } = artist;
+
+    const albumsAsCoverArtistContribs =
+      albumsAsCoverArtist
+        .map(album => album.coverArtistContribs);
+
+    const albumsAsWallpaperArtistContribs =
+      albumsAsWallpaperArtist
+        .map(album => album.wallpaperArtistContribs);
+
+    const albumsAsBannerArtistContribs =
+      albumsAsBannerArtist
+        .map(album => album.bannerArtistContribs);
+
+    const tracksAsCoverArtistContribs =
+      tracksAsCoverArtist
+        .map(track => track.coverArtistContribs);
+
+    const albumsAsCoverArtistEntries =
+      processAlbumEntries({
+        type: 'albumCover',
+        albums: albumsAsCoverArtist,
+        contribs: albumsAsCoverArtistContribs,
+      });
+
+    const albumsAsWallpaperArtistEntries =
+      processAlbumEntries({
+        type: 'albumWallpaper',
+        albums: albumsAsWallpaperArtist,
+        contribs: albumsAsWallpaperArtistContribs,
+      });
+
+    const albumsAsBannerArtistEntries =
+      processAlbumEntries({
+        type: 'albumBanner',
+        albums: albumsAsBannerArtist,
+        contribs: albumsAsBannerArtistContribs,
+      });
+
+    const tracksAsCoverArtistEntries =
+      processTrackEntries({
+        type: 'trackCover',
+        tracks: tracksAsCoverArtist,
+        contribs: tracksAsCoverArtistContribs,
+      });
 
     const entries = [
-      ...albumCoverEntries,
-      ...albumWallpaperEntries,
-      ...albumBannerEntries,
-      ...trackCoverEntries,
+      ...albumsAsCoverArtistEntries,
+      ...albumsAsWallpaperArtistEntries,
+      ...albumsAsBannerArtistEntries,
+      ...tracksAsCoverArtistEntries,
     ];
 
     sortEntryThingPairs(entries,
