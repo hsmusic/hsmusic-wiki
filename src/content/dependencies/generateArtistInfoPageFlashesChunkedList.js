@@ -16,15 +16,23 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const entries = [
-      ...artist.flashesAsContributor.map(flash => ({
-        thing: flash,
-        entry: {
+    const processEntries = (things, details) =>
+      things.map(thing => ({
+        thing,
+        entry: details(thing),
+      }));
+
+    const contributorEntries =
+      processEntries(
+        artist.flashesAsContributor,
+        flash => ({
           flash,
           act: flash.act,
           contribs: flash.contributorContribs,
-        },
-      })),
+        }));
+
+    const entries = [
+      ...contributorEntries,
     ];
 
     sortEntryThingPairs(entries, sortFlashesChronologically);

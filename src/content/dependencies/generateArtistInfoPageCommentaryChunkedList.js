@@ -18,23 +18,32 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const entries = [
-      ...artist.albumsAsCommentator.map(album => ({
-        thing: album,
-        entry: {
+    const processEntries = (things, details) =>
+      things.map(thing => ({
+        thing,
+        entry: details(thing),
+      }));
+
+    const albumEntries =
+      processEntries(
+        artist.albumsAsCommentator,
+        album => ({
           type: 'album',
           album,
-        },
-      })),
+        }));
 
-      ...artist.tracksAsCommentator.map(track => ({
-        thing: track,
-        entry: {
+    const trackEntries =
+      processEntries(
+        artist.tracksAsCommentator,
+        track => ({
           type: 'track',
           album: track.album,
           track,
-        },
-      })),
+        }));
+
+    const entries = [
+      ...albumEntries,
+      ...trackEntries,
     ];
 
     sortEntryThingPairs(entries, sortAlbumsTracksChronologically);

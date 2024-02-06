@@ -24,47 +24,58 @@ export default {
     // shape (#70) and get their own sorting function. Read for more info:
     // https://github.com/hsmusic/hsmusic-wiki/issues/90#issuecomment-1607422961
 
-    const entries = [
-      ...artist.albumsAsCoverArtist.map(album => ({
-        thing: album,
-        entry: {
+    const processEntries = (things, details) =>
+      things.map(thing => ({
+        thing,
+        entry: details(thing),
+      }));
+
+    const albumCoverEntries =
+      processEntries(
+        artist.albumsAsCoverArtist,
+        album => ({
           type: 'albumCover',
           album: album,
           date: album.coverArtDate ?? album.date,
           contribs: album.coverArtistContribs,
-        },
-      })),
+        }));
 
-      ...artist.albumsAsWallpaperArtist.map(album => ({
-        thing: album,
-        entry: {
+    const albumWallpaperEntries =
+      processEntries(
+        artist.albumsAsWallpaperArtist,
+        album => ({
           type: 'albumWallpaper',
           album: album,
           date: album.coverArtDate ?? album.date,
           contribs: album.wallpaperArtistContribs,
-        },
-      })),
+        }));
 
-      ...artist.albumsAsBannerArtist.map(album => ({
-        thing: album,
-        entry: {
+    const albumBannerEntries =
+      processEntries(
+        artist.albumsAsBannerArtist,
+        album => ({
           type: 'albumBanner',
           album: album,
           date: album.coverArtDate ?? album.date,
           contribs: album.bannerArtistContribs,
-        },
-      })),
+        }));
 
-      ...artist.tracksAsCoverArtist.map(track => ({
-        thing: track,
-        entry: {
+    const trackCoverEntries =
+      processEntries(
+        artist.tracksAsCoverArtist,
+        track => ({
           type: 'trackCover',
           album: track.album,
           date: track.coverArtDate ?? track.date,
           track: track,
           contribs: track.coverArtistContribs,
-        },
-      })),
+        }));
+
+    const entries = [
+      ...albumCoverEntries,
+      ...albumWallpaperEntries,
+      ...albumBannerEntries,
+      ...trackCoverEntries,
     ];
 
     sortEntryThingPairs(entries,

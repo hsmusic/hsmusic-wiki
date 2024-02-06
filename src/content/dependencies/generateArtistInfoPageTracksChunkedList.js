@@ -19,6 +19,12 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
+    const processEntries = (things, details) =>
+      things.map(thing => ({
+        thing,
+        entry: details(thing),
+      }));
+
     const tracksAsArtistAndContributor =
       artist.tracksAsArtist
         .filter(track => artist.tracksAsContributor.includes(track));
@@ -31,36 +37,40 @@ export default {
       artist.tracksAsContributor
         .filter(track => !artist.tracksAsArtist.includes(track));
 
-    const entries = [
-      ...tracksAsArtistAndContributor.map(track => ({
-        thing: track,
-        entry: {
+    const entriesAsArtistAndContributor =
+      processEntries(
+        tracksAsArtistAndContributor,
+        track => ({
           track,
           album: track.album,
           date: track.date,
           contribs: [...track.artistContribs, ...track.contributorContribs],
-        },
-      })),
+        }));
 
-      ...tracksAsArtistOnly.map(track => ({
-        thing: track,
-        entry: {
+    const entriesAsArtistOnly =
+      processEntries(
+        tracksAsArtistOnly,
+        track => ({
           track,
           album: track.album,
           date: track.date,
           contribs: track.artistContribs,
-        },
-      })),
+        }));
 
-      ...tracksAsContributorOnly.map(track => ({
-        thing: track,
-        entry: {
+    const entriesAsContributorOnly =
+      processEntries(
+        tracksAsContributorOnly,
+        track => ({
           track,
           date: track.date,
           album: track.album,
           contribs: track.contributorContribs,
-        },
-      })),
+        }));
+
+    const entries = [
+      ...entriesAsArtistAndContributor,
+      ...entriesAsArtistOnly,
+      ...entriesAsContributorOnly,
     ];
 
     sortEntryThingPairs(entries, sortAlbumsTracksChronologically);
