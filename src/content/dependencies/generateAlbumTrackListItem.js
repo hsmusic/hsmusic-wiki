@@ -2,13 +2,23 @@ import {compareArrays, empty} from '#sugar';
 
 export default {
   contentDependencies: [
+    'generateAlbumTrackListMissingDuration',
     'linkContribution',
     'linkTrack',
   ],
 
   extraDependencies: ['getColors', 'html', 'language'],
 
-  relations(relation, track) {
+  query(track) {
+    const query = {};
+
+    query.duration = track.duration ?? 0;
+    query.durationMissing = !track.duration;
+
+    return query;
+  },
+
+  relations(relation, query, track) {
     const relations = {};
 
     if (!empty(track.artistContribs)) {
@@ -20,13 +30,19 @@ export default {
     relations.trackLink =
       relation('linkTrack', track);
 
+    if (query.durationMissing) {
+      relations.missingDuration =
+        relation('generateAlbumTrackListMissingDuration');
+    }
+
     return relations;
   },
 
-  data(track, album) {
+  data(query, track, album) {
     const data = {};
 
-    data.duration = track.duration ?? 0;
+    data.duration = query.duration;
+    data.durationMissing = query.durationMissing;
 
     if (track.color !== album.color) {
       data.color = track.color;
@@ -50,11 +66,18 @@ export default {
       colorStyle = {style: `--primary-color: ${primary}`};
     }
 
-    const parts = ['trackList.item.withDuration'];
+    const parts = ['trackList.item'];
     const options = {};
 
+    parts.push('withDuration');
+
     options.duration =
-      language.formatDuration(data.duration);
+      (data.durationMissing
+        ? relations.missingDuration
+        : language.$('trackList.item.withDuration.duration', {
+            duration:
+              language.formatDuration(data.duration),
+          }));
 
     options.track =
       relations.trackLink

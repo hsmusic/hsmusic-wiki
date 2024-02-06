@@ -367,10 +367,17 @@ trackList:
     fromOther: "From somewhere else:"
 
   item:
-    withDuration: "({DURATION}) {TRACK}"
-    withDuration.withArtists: "({DURATION}) {TRACK} {BY}"
+    withDuration: "{DURATION} {TRACK}"
     withArtists: "{TRACK} {BY}"
+    withDuration.withArtists: "{DURATION} {TRACK} {BY}"
+
+    withDuration.duration:
+      _: "({DURATION})"
+      missing: "0:00"
+      missing.info: "no duration provided"
+
     withArtists.by: "by {ARTISTS}"
+
     rerelease: "{TRACK} (re-release)"
 
 #

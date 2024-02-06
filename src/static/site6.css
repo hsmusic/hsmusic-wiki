@@ -517,8 +517,25 @@ a:not([href]):hover {
   text-decoration-style: wavy !important;
 }
 
-.text-with-tooltip.datetimestamp > :first-child {
+.text-with-tooltip.datetimestamp > :first-child,
+.text-with-tooltip.missing-duration > :first-child {
   cursor: default;
+}
+
+.text-with-tooltip.missing-duration > :first-child {
+  opacity: 0.5;
+}
+
+.text-with-tooltip.missing-duration > :first-child:hover,
+.text-with-tooltip.missing-duration > :first-child.has-visible-tooltip {
+  text-decoration: none !important;
+  opacity: 1;
+}
+
+.text-with-tooltip.missing-duration > :first-child:hover .duration-text,
+.text-with-tooltip.missing-duration > :first-child.has-visible-tooltip .duration-text {
+  text-decoration: underline;
+  text-decoration-style: wavy;
 }
 
 .tooltip {
@@ -557,7 +574,8 @@ li:not(:first-child:last-child) .tooltip,
   left: -34px;
 }
 
-.datetimestamp-tooltip {
+.datetimestamp-tooltip,
+.missing-duration-tooltip {
   padding: 3px 4px 2px 2px;
   left: -10px;
 }
@@ -581,7 +599,8 @@ li:not(:first-child:last-child) .tooltip,
   cursor: default;
 }
 
-.datetimestamp-tooltip .tooltip-content {
+.datetimestamp-tooltip .tooltip-content,
+.missing-duration-tooltip .tooltip-content {
   padding: 5px 6px;
   white-space: nowrap;
   font-size: 0.9em;
