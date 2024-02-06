@@ -19,10 +19,13 @@ export default {
 
   query(artist) {
     const processEntries = (things, details) =>
-      things.map(thing => ({
-        thing,
-        entry: details(thing),
-      }));
+      things.flatMap(thing =>
+        thing.commentary
+          .filter(entry => entry.artists.includes(artist))
+          .map(entry => ({
+            thing,
+            entry: details(thing, entry),
+          })));
 
     const albumEntries =
       processEntries(
