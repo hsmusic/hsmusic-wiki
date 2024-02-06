@@ -179,6 +179,7 @@ export class Track extends Thing {
     artistContribs: [
       inheritFromOriginalRelease({
         property: input.value('artistContribs'),
+        notFoundValue: input.value([]),
       }),
 
       withResolvedContribs({
@@ -202,6 +203,7 @@ export class Track extends Thing {
     contributorContribs: [
       inheritFromOriginalRelease({
         property: input.value('contributorContribs'),
+        notFoundValue: input.value([]),
       }),
 
       contributionList(),
@@ -236,6 +238,7 @@ export class Track extends Thing {
     referencedTracks: [
       inheritFromOriginalRelease({
         property: input.value('referencedTracks'),
+        notFoundValue: input.value([]),
       }),
 
       referenceList({
@@ -248,6 +251,7 @@ export class Track extends Thing {
     sampledTracks: [
       inheritFromOriginalRelease({
         property: input.value('sampledTracks'),
+        notFoundValue: input.value([]),
       }),
 
       referenceList({
