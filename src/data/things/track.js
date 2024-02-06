@@ -155,7 +155,14 @@ export class Track extends Thing {
     ],
 
     commentary: commentary(),
-    lyrics: contentString(),
+
+    lyrics: [
+      inheritFromOriginalRelease({
+        property: input.value('lyrics'),
+      }),
+
+      contentString(),
+    ],
 
     additionalFiles: additionalFiles(),
     sheetMusicFiles: additionalFiles(),
@@ -442,6 +449,11 @@ export class Track extends Thing {
       {message: `Re-releases inherit contributors from the original`, fields: [
         'Originally Released As',
         'Contributors',
+      ]},
+
+      {message: `Re-releases inherit lyrics from the original`, fields: [
+        'Originally Released As',
+        'Lyrics',
       ]},
 
       {
