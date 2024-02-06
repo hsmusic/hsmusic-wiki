@@ -17,6 +17,7 @@ export default templateCompositeFrom({
 
     withOriginalRelease({
       selfIfOriginal: input.value(true),
+      notFoundValue: input.value([]),
     }),
 
     {
