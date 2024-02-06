@@ -53,7 +53,7 @@ export default {
           album.trackSections.map(() =>
             relation('generateContentHeading'));
 
-        relations.itemsByTrackSection =
+        relations.trackSectionItems =
           album.trackSections.map(section =>
             section.tracks.map(track =>
               relation('generateAlbumTrackListItem', track, album)));
@@ -61,9 +61,10 @@ export default {
         break;
 
       case 'tracks':
-        relations.itemsByTrack =
+        relations.items =
           album.tracks.map(track =>
             relation('generateAlbumTrackListItem', track, album));
+
         break;
     }
 
@@ -78,20 +79,29 @@ export default {
 
     switch (query.displayMode) {
       case 'trackSections':
-        data.trackSectionInfo =
-          album.trackSections.map(section => {
-            const info = {};
+        data.trackSectionNames =
+          album.trackSections
+            .map(section => section.name);
 
-            info.name = section.name;
-            info.duration = accumulateSum(section.tracks, track => track.duration);
-            info.durationApproximate = section.tracks.length > 1;
+        data.trackSectionDurations =
+          album.trackSections
+            .map(section =>
+              accumulateSum(section.tracks, track => track.duration));
 
-            if (album.hasTrackNumbers) {
-              info.startIndex = section.startIndex;
-            }
+        data.trackSectionDurationsApproximate =
+          album.trackSections
+            .map(section => section.tracks.length > 1);
 
-            return info;
-          });
+        if (album.hasTrackNumbers) {
+          data.trackSectionStartIndices =
+            album.trackSections
+              .map(section => section.startIndex);
+        } else {
+          data.trackSectionStartIndices =
+            album.trackSections
+              .map(() => null);
+        }
+
         break;
     }
 
@@ -106,17 +116,29 @@ export default {
         return html.tag('dl', {class: 'album-group-list'},
           stitchArrays({
             heading: relations.trackSectionHeadings,
-            items: relations.itemsByTrackSection,
-            info: data.trackSectionInfo,
-          }).map(({heading, items, info}) => [
+            items: relations.trackSectionItems,
+
+            name: data.trackSectionNames,
+            duration: data.trackSectionDurations,
+            durationApproximate: data.trackSectionDurationsApproximate,
+            startIndex: data.trackSectionStartIndices,
+          }).map(({
+              heading,
+              items,
+
+              name,
+              duration,
+              durationApproximate,
+              startIndex,
+            }) => [
               heading.slots({
                 tag: 'dt',
                 title:
                   language.$('trackList.section.withDuration', {
-                    section: info.name,
+                    section: name,
                     duration:
-                      language.formatDuration(info.duration, {
-                        approximate: info.durationApproximate,
+                      language.formatDuration(duration, {
+                        approximate: durationApproximate,
                       }),
                   }),
               }),
@@ -124,13 +146,13 @@ export default {
               html.tag('dd',
                 html.tag(listTag,
                   data.hasTrackNumbers &&
-                    {start: info.startIndex + 1},
+                    {start: startIndex + 1},
 
                   items)),
             ]));
 
       case 'tracks':
-        return html.tag(listTag, relations.itemsByTrack);
+        return html.tag(listTag, relations.items);
 
       default:
         return html.blank();
