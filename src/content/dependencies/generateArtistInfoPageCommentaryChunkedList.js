@@ -18,11 +18,6 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    // TODO: Add and integrate wallpaper and banner date fields (#90)
-    // This will probably only happen once all artworks follow a standard
-    // shape (#70) and get their own sorting function. Read for more info:
-    // https://github.com/hsmusic/hsmusic-wiki/issues/90#issuecomment-1607422961
-
     const entries = [
       ...artist.albumsAsCommentator.map(album => ({
         thing: album,
