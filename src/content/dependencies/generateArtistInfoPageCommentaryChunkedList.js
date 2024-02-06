@@ -13,6 +13,7 @@ export default {
     'generateArtistInfoPageOtherArtistLinks',
     'linkAlbum',
     'linkTrack',
+    'transformContent',
   ],
 
   extraDependencies: ['html', 'language'],
@@ -24,7 +25,10 @@ export default {
           .filter(entry => entry.artists.includes(artist))
           .map(entry => ({
             thing,
-            entry: details(thing, entry),
+            entry: {
+              annotation: entry.annotation,
+              ...details(thing, entry),
+            },
           })));
 
     const albumEntries =
@@ -73,7 +77,17 @@ export default {
 
       itemTrackLinks:
         query.chunks.map(({chunk}) =>
-          chunk.map(({track}) => track ? relation('linkTrack', track) : null)),
+          chunk.map(({track}) =>
+            (track
+              ? relation('linkTrack', track)
+              : null))),
+
+      itemAnnotations:
+        query.chunks.map(({chunk}) =>
+          chunk.map(({annotation}) =>
+            (annotation
+              ? relation('transformContent', annotation)
+              : null))),
     };
   },
 
@@ -93,8 +107,17 @@ export default {
 
         items: relations.items,
         itemTrackLinks: relations.itemTrackLinks,
+        itemAnnotations: relations.itemAnnotations,
         itemTypes: data.itemTypes,
-      }).map(({chunk, albumLink, items, itemTrackLinks, itemTypes}) =>
+      }).map(({
+          chunk,
+          albumLink,
+
+          items,
+          itemTrackLinks,
+          itemAnnotations,
+          itemTypes,
+        }) =>
           chunk.slots({
             mode: 'album',
             albumLink,
@@ -102,9 +125,15 @@ export default {
               stitchArrays({
                 item: items,
                 trackLink: itemTrackLinks,
+                annotation: itemAnnotations,
                 type: itemTypes,
-              }).map(({item, trackLink, type}) =>
+              }).map(({item, trackLink, annotation, type}) =>
                 item.slots({
+                  annotation:
+                    (annotation
+                      ? annotation.slot('mode', 'inline')
+                      : null),
+
                   content:
                     (type === 'album'
                       ? html.tag('i',
