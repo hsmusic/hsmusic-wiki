@@ -1,9 +1,8 @@
 // Just includes the original release of this track as a dependency.
 // If this track isn't a rerelease, then it'll provide null, unless the
 // {selfIfOriginal} option is set, in which case it'll provide this track
-// itself. Note that this will early exit if the original release is
-// specified by reference and that reference doesn't resolve to anything.
-// Outputs to '#originalRelease' by default.
+// itself. This will early exit (with notFoundValue) if the original release
+// is specified by reference and that reference doesn't resolve to anything.
 
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
@@ -23,6 +22,8 @@ export default templateCompositeFrom({
       validate: validateWikiData({referenceType: 'track'}),
       defaultDependency: 'trackData',
     }),
+
+    notFoundValue: input({defaultValue: null}),
   },
 
   outputs: ['#originalRelease'],
@@ -60,6 +61,7 @@ export default templateCompositeFrom({
 
     exitWithoutDependency({
       dependency: '#resolvedReference',
+      value: input('notFoundValue'),
     }),
 
     {

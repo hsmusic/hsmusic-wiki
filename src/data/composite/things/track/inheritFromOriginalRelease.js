@@ -3,6 +3,10 @@
 // dependencies provided. If allowOverride is true, then the continuation
 // will also be called if the original release exposed the requested
 // property as null.
+//
+// Like withOriginalRelease, this will early exit (with notFoundValue) if the
+// original release is specified by reference and that reference doesn't
+// resolve to anything.
 
 import {input, templateCompositeFrom} from '#composite';
 
@@ -14,10 +18,13 @@ export default templateCompositeFrom({
   inputs: {
     property: input({type: 'string'}),
     allowOverride: input({type: 'boolean', defaultValue: false}),
+    notFoundValue: input({defaultValue: null}),
   },
 
   steps: () => [
-    withOriginalRelease(),
+    withOriginalRelease({
+      notFoundValue: input('notFoundValue'),
+    }),
 
     {
       dependencies: [
