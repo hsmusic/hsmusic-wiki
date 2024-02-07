@@ -108,6 +108,10 @@ export default {
       linkAttributes.add('title', data.name);
     }
 
+    if (showWikiTooltip) {
+      linkAttributes.add('class', 'text-with-tooltip-interaction-cue');
+    }
+
     const content =
       (html.isBlank(slots.content)
         ? language.sanitize(name)
@@ -131,6 +135,7 @@ export default {
 
     return relations.textWithTooltip.slots({
       attributes: wrapperAttributes,
+      customInteractionCue: true,
 
       text:
         relations.linkTemplate.slots({
