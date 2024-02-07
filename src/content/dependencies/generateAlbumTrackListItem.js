@@ -9,11 +9,21 @@ export default {
 
   extraDependencies: ['getColors', 'html', 'language'],
 
-  query(track) {
+  query(track, album) {
     const query = {};
 
     query.duration = track.duration ?? 0;
-    query.durationMissing = !track.duration;
+
+    query.trackHasDuration = !!track.duration;
+
+    query.sectionHasDuration =
+      !album.trackSections
+        .some(section =>
+          section.tracks.every(track => !track.duration) &&
+          section.tracks.includes(track));
+
+    query.albumHasDuration =
+      album.tracks.some(track => track.duration);
 
     return query;
   },
@@ -30,7 +40,7 @@ export default {
     relations.trackLink =
       relation('linkTrack', track);
 
-    if (query.durationMissing) {
+    if (!query.trackHasDuration) {
       relations.missingDuration =
         relation('generateAlbumTrackListMissingDuration');
     }
@@ -42,7 +52,9 @@ export default {
     const data = {};
 
     data.duration = query.duration;
-    data.durationMissing = query.durationMissing;
+    data.trackHasDuration = query.trackHasDuration;
+    data.sectionHasDuration = query.sectionHasDuration;
+    data.albumHasDuration = query.albumHasDuration;
 
     if (track.color !== album.color) {
       data.color = track.color;
@@ -59,7 +71,16 @@ export default {
     return data;
   },
 
-  generate(data, relations, {getColors, html, language}) {
+  slots: {
+    collapseDurationScope: {
+      validate: v =>
+        v.is('never', 'track', 'section', 'album'),
+
+      default: 'album',
+    },
+  },
+
+  generate(data, relations, slots, {getColors, html, language}) {
     let colorStyle;
     if (data.color) {
       const {primary} = getColors(data.color);
@@ -69,19 +90,30 @@ export default {
     const parts = ['trackList.item'];
     const options = {};
 
-    parts.push('withDuration');
-
-    options.duration =
-      (data.durationMissing
-        ? relations.missingDuration
-        : language.$('trackList.item.withDuration.duration', {
-            duration:
-              language.formatDuration(data.duration),
-          }));
-
     options.track =
       relations.trackLink
         .slot('color', false);
+
+    const collapseDuration =
+      (slots.collapseDurationScope === 'track'
+        ? !data.trackHasDuration
+     : slots.collapseDurationScope === 'section'
+        ? !data.sectionHasDuration
+     : slots.collapseDurationScope === 'album'
+        ? !data.albumHasDuration
+        : false);
+
+    if (!collapseDuration) {
+      parts.push('withDuration');
+
+      options.duration =
+        (data.trackHasDuration
+          ? language.$('trackList.item.withDuration.duration', {
+              duration:
+                language.formatDuration(data.duration),
+            })
+          : relations.missingDuration);
+    }
 
     if (data.showArtists) {
       parts.push('withArtists');

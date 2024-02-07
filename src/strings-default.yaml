@@ -368,6 +368,7 @@ trackList:
     fromOther: "From somewhere else:"
 
   item:
+    _: "{TRACK}"
     withDuration: "{DURATION} {TRACK}"
     withArtists: "{TRACK} {BY}"
     withDuration.withArtists: "{DURATION} {TRACK} {BY}"

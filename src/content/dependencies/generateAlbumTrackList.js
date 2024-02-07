@@ -108,8 +108,24 @@ export default {
     return data;
   },
 
-  generate(data, relations, {html, language}) {
+  slots: {
+    collapseDurationScope: {
+      validate: v =>
+        v.is('never', 'track', 'section', 'album'),
+
+      default: 'album',
+    },
+  },
+
+  generate(data, relations, slots, {html, language}) {
     const listTag = (data.hasTrackNumbers ? 'ol' : 'ul');
+
+    const slotItems = items =>
+      items.map(item =>
+        item.slots({
+          collapseDurationScope:
+            slots.collapseDurationScope,
+        }));
 
     switch (data.displayMode) {
       case 'trackSections':
@@ -152,11 +168,11 @@ export default {
                   data.hasTrackNumbers &&
                     {start: startIndex + 1},
 
-                  items)),
+                  slotItems(items))),
             ]));
 
       case 'tracks':
-        return html.tag(listTag, relations.items);
+        return html.tag(listTag, slotItems(relations.items));
 
       default:
         return html.blank();
