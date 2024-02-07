@@ -375,8 +375,8 @@ trackList:
 
     withDuration.duration:
       _: "({DURATION})"
-      missing: "0:00"
-      missing.info: "no duration provided"
+      missing: "_:__"
+      missing.info: "no duration provided; treated as zero seconds long"
 
     withArtists.by: "by {ARTISTS}"
 

@@ -531,6 +531,10 @@ a:not([href]):hover {
   opacity: 1;
 }
 
+.text-with-tooltip.missing-duration .text-with-tooltip-interaction-cue {
+  text-decoration: none !important;
+}
+
 .tooltip {
   position: absolute;
   z-index: 3;
