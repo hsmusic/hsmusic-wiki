@@ -134,13 +134,17 @@ export default {
               heading.slots({
                 tag: 'dt',
                 title:
-                  language.$('trackList.section.withDuration', {
-                    section: name,
-                    duration:
-                      language.formatDuration(duration, {
-                        approximate: durationApproximate,
-                      }),
-                  }),
+                  (duration === 0
+                    ? language.$('trackList.section', {
+                        section: name,
+                      })
+                    : language.$('trackList.section.withDuration', {
+                        section: name,
+                        duration:
+                          language.formatDuration(duration, {
+                            approximate: durationApproximate,
+                          }),
+                      })),
               }),
 
               html.tag('dd',

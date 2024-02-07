@@ -360,6 +360,7 @@ releaseInfo:
 #
 trackList:
   section:
+    _: "{SECTION}:"
     withDuration: "{SECTION}: ({DURATION})"
 
   group:
