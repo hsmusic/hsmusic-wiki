@@ -8,23 +8,123 @@
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, default track section 1`] = `
 <ul>
     <li>(0:20) <a href="track/t1/">Track 1</a></li>
-    <li>(0:30) <a href="track/t2/">Track 2</a></li>
+    <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
     <li>(0:40) <a href="track/t3/">Track 3</a></li>
-    <li style="--primary-color: #ea2e83">(0:05) <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+    <li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
 </ul>
 `
 
 exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > basic behavior, with track sections 1`] = `
 <dl class="album-group-list">
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:30)</span></dt>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
     <dd>
         <ul>
             <li>(0:20) <a href="track/t1/">Track 1</a></li>
-            <li>(0:30) <a href="track/t2/">Track 2</a></li>
+            <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
             <li>(0:40) <a href="track/t3/">Track 3</a></li>
         </ul>
     </dd>
-    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section: (0:05)</span></dt>
-    <dd><ul><li style="--primary-color: #ea2e83">(0:05) <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
 </dl>
+`
+
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: album 1`] = `
+<dl class="album-group-list">
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dd>
+        <ul>
+            <li>(0:20) <a href="track/t1/">Track 1</a></li>
+            <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+            <li>(0:40) <a href="track/t3/">Track 3</a></li>
+        </ul>
+    </dd>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
+</dl>
+<ul>
+    <li>(0:20) <a href="track/t1/">Track 1</a></li>
+    <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+    <li>(0:40) <a href="track/t3/">Track 3</a></li>
+    <li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+<ul>
+    <li><a href="track/t2/">Track 2</a></li>
+    <li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+`
+
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: never 1`] = `
+<dl class="album-group-list">
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dd>
+        <ul>
+            <li>(0:20) <a href="track/t1/">Track 1</a></li>
+            <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+            <li>(0:40) <a href="track/t3/">Track 3</a></li>
+        </ul>
+    </dd>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dd><ul><li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
+</dl>
+<ul>
+    <li>(0:20) <a href="track/t1/">Track 1</a></li>
+    <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+    <li>(0:40) <a href="track/t3/">Track 3</a></li>
+    <li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+<ul>
+    <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+    <li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+`
+
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: section 1`] = `
+<dl class="album-group-list">
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dd>
+        <ul>
+            <li>(0:20) <a href="track/t1/">Track 1</a></li>
+            <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+            <li>(0:40) <a href="track/t3/">Track 3</a></li>
+        </ul>
+    </dd>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dd><ul><li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
+</dl>
+<ul>
+    <li>(0:20) <a href="track/t1/">Track 1</a></li>
+    <li>[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t2/">Track 2</a></li>
+    <li>(0:40) <a href="track/t3/">Track 3</a></li>
+    <li style="--primary-color: #ea2e83">[mocked: generateAlbumTrackListMissingDuration - slots: {}] <a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+<ul>
+    <li><a href="track/t2/">Track 2</a></li>
+    <li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+`
+
+exports[`test/snapshot/generateAlbumTrackList.js > TAP > generateAlbumTrackList (snapshot) > collapseDurationScope: track 1`] = `
+<dl class="album-group-list">
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">First section: (~1:00)</span></dt>
+    <dd>
+        <ul>
+            <li>(0:20) <a href="track/t1/">Track 1</a></li>
+            <li><a href="track/t2/">Track 2</a></li>
+            <li>(0:40) <a href="track/t3/">Track 3</a></li>
+        </ul>
+    </dd>
+    <dt class="content-heading" tabindex="0"><span class="content-heading-main-title">Second section:</span></dt>
+    <dd><ul><li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li></ul></dd>
+</dl>
+<ul>
+    <li>(0:20) <a href="track/t1/">Track 1</a></li>
+    <li><a href="track/t2/">Track 2</a></li>
+    <li>(0:40) <a href="track/t3/">Track 3</a></li>
+    <li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
+<ul>
+    <li><a href="track/t2/">Track 2</a></li>
+    <li style="--primary-color: #ea2e83"><a href="track/t4/">Track 4</a> <span class="by">by <a href="artist/apricot/">Apricot</a> and <a href="artist/peach/">Peach</a></span></li>
+</ul>
 `
