@@ -46,6 +46,8 @@ export default {
     data.duration = accumulateSum(album.tracks, track => track.duration);
     data.durationApproximate = album.tracks.length > 1;
 
+    data.numTracks = album.tracks.length;
+
     return data;
   },
 
@@ -95,7 +97,14 @@ export default {
                 relations.externalLinks
                   .map(link =>
                     link.slots({
-                      context: 'album',
+                      context: [
+                        'album',
+                        (data.numTracks === 0
+                          ? 'albumNoTracks'
+                       : data.numTracks === 1
+                          ? 'albumOneTrack'
+                          : 'albumMultipleTracks'),
+                      ],
                       style: 'normal',
                     }))),
           })),

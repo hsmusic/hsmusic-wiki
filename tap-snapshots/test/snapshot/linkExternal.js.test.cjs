@@ -12,12 +12,66 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 `
 
 exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: album, style: normal 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: album, style: platform 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumMultipleTracks, style: compact 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">youtu.be</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">youtube.com</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">youtube.com</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumMultipleTracks, style: normal 1`] = `
 <a href="https://youtu.be/abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube (full album)</a>
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
 `
 
-exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: album, style: platform 1`] = `
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumMultipleTracks, style: platform 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumNoTracks, style: compact 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">youtu.be</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">youtube.com</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">youtube.com</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumNoTracks, style: normal 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumNoTracks, style: platform 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumOneTrack, style: compact 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">youtu.be</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">youtube.com</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">youtube.com</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumOneTrack, style: normal 1`] = `
+<a href="https://youtu.be/abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
+<a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>
+`
+
+exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context: albumOneTrack, style: platform 1`] = `
 <a href="https://youtu.be/abc" class="nowrap">YouTube</a>
 <a href="https://youtube.com/watch?v=abc" class="nowrap">YouTube</a>
 <a href="https://youtube.com/Playlist?list=kweh" class="nowrap">YouTube</a>

@@ -57,6 +57,24 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://youtube.com/Playlist?list=kweh',
   ]);
 
+  quickSnapshotAllStyles('albumNoTracks', [
+    'https://youtu.be/abc',
+    'https://youtube.com/watch?v=abc',
+    'https://youtube.com/Playlist?list=kweh',
+  ]);
+
+  quickSnapshotAllStyles('albumOneTrack', [
+    'https://youtu.be/abc',
+    'https://youtube.com/watch?v=abc',
+    'https://youtube.com/Playlist?list=kweh',
+  ]);
+
+  quickSnapshotAllStyles('albumMultipleTracks', [
+    'https://youtu.be/abc',
+    'https://youtube.com/watch?v=abc',
+    'https://youtube.com/Playlist?list=kweh',
+  ]);
+
   quickSnapshotAllStyles('flash', [
     'https://www.bgreco.net/hsflash/002238.html',
     'https://homestuck.com/story/1234',

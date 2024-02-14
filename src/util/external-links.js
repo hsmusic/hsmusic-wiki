@@ -24,6 +24,9 @@ export const isExternalLinkStyle = is(...externalLinkStyles);
 
 export const externalLinkContexts = [
   'album',
+  'albumOneTrack',
+  'albumMultipleTracks',
+  'albumNoTracks',
   'artist',
   'flash',
   'generic',
@@ -125,7 +128,7 @@ export const externalLinkSpec = [
 
   {
     match: {
-      context: 'album',
+      context: 'albumMultipleTracks',
       domain: 'youtube.com',
       pathname: /^watch/,
     },
@@ -138,7 +141,7 @@ export const externalLinkSpec = [
 
   {
     match: {
-      context: 'album',
+      context: 'albumMultipleTracks',
       domain: 'youtu.be',
     },
 
