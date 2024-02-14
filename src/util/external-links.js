@@ -5,6 +5,7 @@ import {
   is,
   isObject,
   isStringNonEmpty,
+  looseArrayOf,
   optional,
   validateAllPropertyValues,
   validateArrayItems,
@@ -30,7 +31,10 @@ export const externalLinkContexts = [
   'track',
 ];
 
-export const isExternalLinkContext = is(...externalLinkContexts);
+export const isExternalLinkContext =
+  anyOf(
+    is(...externalLinkContexts),
+    looseArrayOf(is(...externalLinkContexts)));
 
 // This might need to be adjusted for YAML importing...
 const isRegExp =
@@ -76,10 +80,7 @@ export const isExternalLinkSpec =
         query: optional(isRegExp),
         queries: optional(validateArrayItems(isRegExp)),
 
-        context:
-          optional(anyOf(
-            isExternalLinkContext,
-            validateArrayItems(isExternalLinkContext))),
+        context: optional(isExternalLinkContext),
       }),
 
       platform: isStringNonEmpty,
@@ -444,6 +445,11 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   const comparePathname = regex => regex.test(pathname.slice(1));
   const compareQuery = regex => regex.test(query.slice(1));
 
+  const contextArray =
+    (Array.isArray(context)
+      ? context
+      : [context]).filter(Boolean);
+
   const matchingDescriptors =
     descriptors
       .filter(({match}) => {
@@ -452,8 +458,10 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
         return false;
       })
       .filter(({match}) => {
-        if (Array.isArray(match.context)) return match.context.includes(context);
-        if (match.context) return context === match.context;
+        if (Array.isArray(match.context))
+          return match.context.some(c => contextArray.includes(c));
+        if (match.context)
+          return contextArray.includes(match.context);
         return true;
       })
       .filter(({match}) => {
