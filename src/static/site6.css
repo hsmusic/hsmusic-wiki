@@ -1547,6 +1547,7 @@ html[data-url-key="localized.home"] .carousel-container {
 
 .carousel-item .image-container {
   border: none;
+  border-radius: 5px;
 }
 
 .carousel-item .image-outer-area {
@@ -1562,7 +1563,6 @@ html[data-url-key="localized.home"] .carousel-container {
   height: 100%;
   margin-top: auto;
   margin-bottom: auto;
-  border-radius: 6px;
 }
 
 .carousel-item:hover {
