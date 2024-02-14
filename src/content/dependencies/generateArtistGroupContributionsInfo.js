@@ -36,7 +36,7 @@ export default {
     for (const track of filteredTracks) {
       for (const group of track.album.groups) {
         groupToCountMap.set(group, groupToCountMap.get(group) + 1);
-        if (track.duration) {
+        if (track.duration && track.originalReleaseTrack === null) {
           groupToDurationMap.set(group, groupToDurationMap.get(group) + track.duration);
           groupToDurationCountMap.set(group, groupToDurationCountMap.get(group) + 1);
         }
