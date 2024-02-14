@@ -54,13 +54,16 @@ export default {
             ? relation('linkTrack', trackOrAlbum)
             : relation('linkAlbum', trackOrAlbum)),
 
-        getThings: artist =>
-          sortAlbumsTracksChronologically([
+        getThings(artist) {
+          const getDate = thing => thing.coverArtDate ?? thing.date;
+
+          const things = [
             ...artist.albumsAsCoverArtist,
             ...artist.tracksAsCoverArtist,
-          ], {
-            getDate: thing => thing.coverArtDate ?? thing.date,
-          }),
+          ].filter(getDate);
+
+          return sortAlbumsTracksChronologically(things, {getDate});
+        },
       });
 
     relations.albumNavAccent =

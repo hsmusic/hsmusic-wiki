@@ -29,13 +29,22 @@ export default function getChronologyRelations(thing, {
 
   return contributions.map(({who}) => {
     const things = Array.from(new Set(getThings(who)));
-    if (things.length === 1) {
+
+    // Don't show a line if this contribution isn't part of the artist's
+    // chronology at all (usually because this thing isn't dated).
+    const index = things.indexOf(thing);
+    if (index === -1) {
       return;
     }
 
-    const index = things.indexOf(thing);
+    // Don't show a line if this contribution is the *only* item in the
+    // artist's chronology (since there's nothing to navigate there).
     const previous = things[index - 1];
     const next = things[index + 1];
+    if (!previous && !next) {
+      return;
+    }
+
     return {
       index: index + 1,
       artistLink: linkArtist(who),
