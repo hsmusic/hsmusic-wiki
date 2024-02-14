@@ -14,8 +14,16 @@ export default {
   extraDependencies: ['html', 'language'],
 
   query(artist) {
-    const things = [...artist.albumsAsCoverArtist, ...artist.tracksAsCoverArtist];
-    sortAlbumsTracksChronologically(things, {latestFirst: true});
+    const things = [
+      ...artist.albumsAsCoverArtist,
+      ...artist.tracksAsCoverArtist,
+    ];
+
+    sortAlbumsTracksChronologically(things, {
+      latestFirst: true,
+      getDate: thing => thing.coverArtDate ?? thing.date,
+    });
+
     return {things};
   },
 
