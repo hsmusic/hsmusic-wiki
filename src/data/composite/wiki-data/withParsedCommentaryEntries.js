@@ -2,7 +2,7 @@ import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {stitchArrays} from '#sugar';
 import {isCommentary} from '#validators';
-import {commentaryRegex} from '#wiki-data';
+import {commentaryRegexCaseSensitive} from '#wiki-data';
 
 import {
   fillMissingListItems,
@@ -30,7 +30,7 @@ export default templateCompositeFrom({
         [input('from')]: commentaryText,
       }) => continuation({
         ['#rawMatches']:
-          Array.from(commentaryText.matchAll(commentaryRegex)),
+          Array.from(commentaryText.matchAll(commentaryRegexCaseSensitive)),
       }),
     },
 

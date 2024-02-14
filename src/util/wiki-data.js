@@ -665,8 +665,12 @@ export function sortFlashesChronologically(data, {
 // This regular expression *doesn't* match bodies, which will need to be parsed
 // out of the original string based on the indices matched using this.
 //
-export const commentaryRegex =
-  /^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}))?\))?/gm;
+const commentaryRegexRaw =
+  String.raw`^<i>(?<artistReferences>.+?)(?:\|(?<artistDisplayText>.+))?:<\/i>(?: \((?<annotation>(?:.*?(?=,|\)[^)]*$))*?)(?:,? ?(?<date>[a-zA-Z]+ [0-9]{1,2}, [0-9]{4,4}|[0-9]{1,2} [^,]*[0-9]{4,4}|[0-9]{1,4}[-/][0-9]{1,4}[-/][0-9]{1,4}))?\))?`;
+export const commentaryRegexCaseInsensitive =
+  new RegExp(commentaryRegexRaw, 'gmi');
+export const commentaryRegexCaseSensitive =
+  new RegExp(commentaryRegexRaw, 'gm');
 
 export function filterAlbumsByCommentary(albums) {
   return albums

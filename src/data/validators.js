@@ -5,7 +5,8 @@ import printable_characters from 'printable-characters';
 const {strlen} = printable_characters;
 
 import {colors, ENABLE_COLOR} from '#cli';
-import {commentaryRegex} from '#wiki-data';
+import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitive}
+  from '#wiki-data';
 
 import {
   cut,
@@ -302,7 +303,7 @@ export function isCommentary(commentaryText) {
   isContentString(commentaryText);
 
   const rawMatches =
-    Array.from(commentaryText.matchAll(commentaryRegex));
+    Array.from(commentaryText.matchAll(commentaryRegexCaseInsensitive));
 
   if (empty(rawMatches)) {
     throw new TypeError(`Expected at least one commentary heading`);
@@ -330,6 +331,14 @@ export function isCommentary(commentaryText) {
         `${colors.green(`"${cut(ownInput, 40)}"`)} (<- heading)\n` +
         `(extra on same line ->) ${colors.red(`"${cut(upToNextLineBreak, 30)}"`)}\n` +
         `(Check for missing "|-" in YAML, or a misshapen annotation)`);
+    }
+
+    commentaryRegexCaseSensitive.lastIndex = 0;
+    if (!commentaryRegexCaseSensitive.test(ownInput)) {
+      throw new TypeError(
+        `Miscapitalization in commentary heading:\n` +
+        `${colors.red(`"${cut(ownInput, 60)}"`)}\n` +
+        `(Check for ${colors.red(`"<I>"`)} instead of ${colors.green(`"<i>"`)})`);
     }
 
     const nextHeading =

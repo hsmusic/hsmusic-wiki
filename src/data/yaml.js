@@ -12,7 +12,7 @@ import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import find, {bindFind, getAllFindSpecs} from '#find';
 import Thing from '#thing';
 import thingConstructors from '#things';
-import {commentaryRegex, sortByName} from '#wiki-data';
+import {commentaryRegexCaseSensitive, sortByName} from '#wiki-data';
 
 import {
   annotateErrorWithFile,
@@ -1189,7 +1189,7 @@ export function filterReferenceErrors(wikiData) {
               case '_commentary':
                 if (value) {
                   value =
-                    Array.from(value.matchAll(commentaryRegex))
+                    Array.from(value.matchAll(commentaryRegexCaseSensitive))
                       .map(({groups}) => groups.artistReferences)
                       .map(text => text.split(',').map(text => text.trim()));
                 }
