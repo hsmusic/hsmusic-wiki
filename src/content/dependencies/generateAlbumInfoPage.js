@@ -58,7 +58,9 @@ export default {
           sortAlbumsTracksChronologically([
             ...artist.albumsAsCoverArtist,
             ...artist.tracksAsCoverArtist,
-          ]),
+          ], {
+            getDate: thing => thing.coverArtDate ?? thing.date,
+          }),
       });
 
     relations.albumNavAccent =
