@@ -431,27 +431,27 @@ export class Track extends Thing {
     },
 
     invalidFieldCombinations: [
-      {message: `Re-releases inherit references from the original`, fields: [
+      {message: `Rereleases inherit references from the original`, fields: [
         'Originally Released As',
         'Referenced Tracks',
       ]},
 
-      {message: `Re-releases inherit samples from the original`, fields: [
+      {message: `Rereleases inherit samples from the original`, fields: [
         'Originally Released As',
         'Sampled Tracks',
       ]},
 
-      {message: `Re-releases inherit artists from the original`, fields: [
+      {message: `Rereleases inherit artists from the original`, fields: [
         'Originally Released As',
         'Artists',
       ]},
 
-      {message: `Re-releases inherit contributors from the original`, fields: [
+      {message: `Rereleases inherit contributors from the original`, fields: [
         'Originally Released As',
         'Contributors',
       ]},
 
-      {message: `Re-releases inherit lyrics from the original`, fields: [
+      {message: `Rereleases inherit lyrics from the original`, fields: [
         'Originally Released As',
         'Lyrics',
       ]},

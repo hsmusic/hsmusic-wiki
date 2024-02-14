@@ -720,7 +720,7 @@ t.test(`Track.referencedByTracks`, t => {
   XXX_decacheWikiData();
 
   t.same(track1.referencedByTracks, [track2],
-    `referencedByTracks #4: doesn't include re-releases`);
+    `referencedByTracks #4: doesn't include rereleases`);
 });
 
 t.test(`Track.sampledByTracks`, t => {
@@ -756,5 +756,5 @@ t.test(`Track.sampledByTracks`, t => {
   XXX_decacheWikiData();
 
   t.same(track1.sampledByTracks, [track2],
-    `sampledByTracks #4: doesn't include re-releases`);
+    `sampledByTracks #4: doesn't include rereleases`);
 });

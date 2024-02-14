@@ -1,8 +1,8 @@
 // Like a normal reverse reference list ("objects which reference this object
-// under a specified property"), only excluding re-releases from the possible
-// outputs. While it's useful to travel from a re-release to the tracks it
-// references, re-releases aren't generally relevant from the perspective of
-// the tracks *being* referenced. Apart from hiding re-releases from lists on
+// under a specified property"), only excluding rereleases from the possible
+// outputs. While it's useful to travel from a rerelease to the tracks it
+// references, rereleases aren't generally relevant from the perspective of
+// the tracks *being* referenced. Apart from hiding rereleases from lists on
 // the site, it also excludes keeps them from relational data processing, such
 // as on the "Tracks - by Times Referenced" listing page.
 
