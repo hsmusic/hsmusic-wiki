@@ -380,7 +380,7 @@ trackList:
 
     withArtists.by: "by {ARTISTS}"
 
-    rerelease: "{TRACK} (re-release)"
+    rerelease: "{TRACK} (rerelease)"
 
 #
 # misc:
@@ -908,7 +908,7 @@ artistPage:
       #   artists or contributors, and get dimmed a little compared
       #   to original release track entries.
 
-      rerelease: "{ENTRY} (re-release)"
+      rerelease: "{ENTRY} (rerelease)"
 
       # track:
       #   The string without duration is used in both the artist's
@@ -1457,7 +1457,7 @@ listingPage:
       chunk:
         title: "{ALBUM} ({DATE})"
         item: "{TRACK}"
-        item.rerelease: "{TRACK} (re-release)"
+        item.rerelease: "{TRACK} (rerelease)"
 
     # listTracks.byDuration:
     #   List tracks by duration, longest to shortest, falling back to
