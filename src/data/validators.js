@@ -5,7 +5,7 @@ import printable_characters from 'printable-characters';
 const {strlen} = printable_characters;
 
 import {colors, ENABLE_COLOR} from '#cli';
-import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitive}
+import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitiveOneShot}
   from '#wiki-data';
 
 import {
@@ -333,8 +333,7 @@ export function isCommentary(commentaryText) {
         `(Check for missing "|-" in YAML, or a misshapen annotation)`);
     }
 
-    commentaryRegexCaseSensitive.lastIndex = 0;
-    if (!commentaryRegexCaseSensitive.test(ownInput)) {
+    if (!commentaryRegexCaseSensitiveOneShot.test(ownInput)) {
       throw new TypeError(
         `Miscapitalization in commentary heading:\n` +
         `${colors.red(`"${cut(ownInput, 60)}"`)}\n` +

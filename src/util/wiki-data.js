@@ -671,6 +671,8 @@ export const commentaryRegexCaseInsensitive =
   new RegExp(commentaryRegexRaw, 'gmi');
 export const commentaryRegexCaseSensitive =
   new RegExp(commentaryRegexRaw, 'gm');
+export const commentaryRegexCaseSensitiveOneShot =
+  new RegExp(commentaryRegexRaw);
 
 export function filterAlbumsByCommentary(albums) {
   return albums
