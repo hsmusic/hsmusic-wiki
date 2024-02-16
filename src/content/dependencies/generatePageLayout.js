@@ -1,4 +1,5 @@
-import {empty, openAggregate} from '#sugar';
+import {openAggregate} from '#aggregate';
+import {empty} from '#sugar';
 
 function sidebarSlots(side) {
   return {

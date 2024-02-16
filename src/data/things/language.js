@@ -1,8 +1,9 @@
 import { Temporal, toTemporalInstant } from '@js-temporal/polyfill';
 
+import {withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import * as html from '#html';
-import {empty, withAggregate} from '#sugar';
+import {empty} from '#sugar';
 import {isLanguageCode} from '#validators';
 import Thing from '#thing';
 

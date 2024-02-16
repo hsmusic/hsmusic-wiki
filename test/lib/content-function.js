@@ -4,12 +4,13 @@ import {inspect} from 'node:util';
 
 import chroma from 'chroma-js';
 
+import {showAggregate} from '#aggregate';
 import {getColors} from '#colors';
 import {quickLoadContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import {internalDefaultStringsFile, processLanguageFile} from '#language';
-import {empty, showAggregate} from '#sugar';
+import {empty} from '#sugar';
 import {generateURLs, thumb, urlSpec} from '#urls';
 
 import mock from './generic-mock.js';

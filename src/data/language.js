@@ -7,10 +7,10 @@ import chokidar from 'chokidar';
 import he from 'he'; // It stands for "HTML Entities", apparently. Cursed.
 import yaml from 'js-yaml';
 
+import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
+  from '#aggregate';
 import {externalLinkSpec} from '#external-links';
 import {colors, logWarn} from '#cli';
-import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
-  from '#sugar';
 import T from '#things';
 
 const {Language} = T;

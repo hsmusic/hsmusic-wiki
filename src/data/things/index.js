@@ -1,10 +1,10 @@
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
+import {openAggregate, showAggregate} from '#aggregate';
 import {logError} from '#cli';
 import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
-import {openAggregate, showAggregate} from '#sugar';
 
 import Thing from '#thing';
 

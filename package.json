@@ -12,6 +12,7 @@
         "dev": "eslint src && node src/upd8.js"
     },
     "imports": {
+        "#aggregate": "./src/util/aggregate.js",
         "#cacheable-object": "./src/data/cacheable-object.js",
         "#colors": "./src/util/colors.js",
         "#composite": "./src/data/composite.js",

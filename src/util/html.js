@@ -2,8 +2,9 @@
 
 import {inspect} from 'node:util';
 
+import {withAggregate} from '#aggregate';
 import {colors} from '#cli';
-import {empty, typeAppearance, unique, withAggregate} from '#sugar';
+import {empty, typeAppearance, unique} from '#sugar';
 import * as commonValidators from '#validators';
 
 const {

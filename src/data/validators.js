@@ -1,17 +1,10 @@
 import {inspect as nodeInspect} from 'node:util';
 
+import {openAggregate, withAggregate} from '#aggregate';
 import {colors, ENABLE_COLOR} from '#cli';
+import {cut, empty, matchMultiline, typeAppearance} from '#sugar';
 import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitiveOneShot}
   from '#wiki-data';
-
-import {
-  cut,
-  empty,
-  matchMultiline,
-  openAggregate,
-  typeAppearance,
-  withAggregate,
-} from '#sugar';
 
 function inspect(value) {
   return nodeInspect(value, {colors: ENABLE_COLOR});

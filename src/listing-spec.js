@@ -1,4 +1,5 @@
-import {empty, showAggregate} from '#sugar';
+import {showAggregate} from '#aggregate';
+import {empty} from '#sugar';
 
 const listingSpec = [];
 

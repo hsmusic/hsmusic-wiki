@@ -4,19 +4,18 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
+import {compareArrays, empty} from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegexCaseSensitive} from '#wiki-data';
 
 import {
-  compareArrays,
   conditionallySuppressError,
   decorateErrorWithIndex,
-  empty,
   filterAggregate,
   openAggregate,
   withAggregate,
-} from '#sugar';
+} from '#aggregate';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});

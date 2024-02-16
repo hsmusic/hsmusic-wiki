@@ -1,19 +1,12 @@
 import {inspect} from 'node:util';
 
+import {decorateErrorWithIndex, openAggregate, withAggregate}
+  from '#aggregate';
 import {colors} from '#cli';
-import {TupleMap} from '#wiki-data';
+import {empty, filterProperties, stitchArrays, typeAppearance, unique}
+  from '#sugar';
 import {a} from '#validators';
-
-import {
-  decorateErrorWithIndex,
-  empty,
-  filterProperties,
-  openAggregate,
-  stitchArrays,
-  typeAppearance,
-  unique,
-  withAggregate,
-} from '#sugar';
+import {TupleMap} from '#wiki-data';
 
 const globalCompositeCache = {};
 

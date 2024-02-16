@@ -38,6 +38,7 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
+import {showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {filterReferenceErrors, reportDuplicateDirectories}
@@ -46,7 +47,7 @@ import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
-import {empty, showAggregate, withEntries} from '#sugar';
+import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}

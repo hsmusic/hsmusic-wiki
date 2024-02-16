@@ -10,23 +10,20 @@ import yaml from 'js-yaml';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
 import {reportDuplicateDirectories, filterReferenceErrors}
   from '#data-checks';
+import {atOffset, empty, filterProperties, typeAppearance, withEntries}
+  from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {sortByName} from '#wiki-data';
 
 import {
   annotateErrorWithFile,
-  atOffset,
   decorateErrorWithIndex,
   decorateErrorWithAnnotation,
-  empty,
-  filterProperties,
   openAggregate,
   showAggregate,
-  typeAppearance,
   withAggregate,
-  withEntries,
-} from '#sugar';
+} from '#aggregate';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});

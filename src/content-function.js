@@ -1,14 +1,9 @@
 import {inspect as nodeInspect} from 'node:util';
 
+import {decorateError} from '#aggregate';
 import {colors, ENABLE_COLOR} from '#cli';
 import {Template} from '#html';
-
-import {
-  annotateFunction,
-  decorateError,
-  empty,
-  setIntersection,
-} from '#sugar';
+import {annotateFunction, empty, setIntersection} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});

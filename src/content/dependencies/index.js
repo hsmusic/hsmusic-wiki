@@ -6,13 +6,10 @@ import {fileURLToPath} from 'node:url';
 import chokidar from 'chokidar';
 import {ESLint} from 'eslint';
 
+import {showAggregate as _showAggregate} from '#aggregate';
 import {colors, logWarn} from '#cli';
 import contentFunction, {ContentFunctionSpecError} from '#content-function';
-
-import {
-  annotateFunction,
-  showAggregate as _showAggregate
-} from '#sugar';
+import {annotateFunction} from '#sugar';
 
 function cachebust(filePath) {
   if (filePath in cachebust.cache) {
