@@ -1,9 +1,5 @@
 import {inspect as nodeInspect} from 'node:util';
 
-// Heresy.
-import printable_characters from 'printable-characters';
-const {strlen} = printable_characters;
-
 import {colors, ENABLE_COLOR} from '#cli';
 import {commentaryRegexCaseInsensitive, commentaryRegexCaseSensitiveOneShot}
   from '#wiki-data';
