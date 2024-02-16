@@ -282,7 +282,19 @@ export function typeAppearance(value) {
 // if it cuts any text off.
 export function cut(text, length = 40) {
   if (text.length >= length) {
-    return text.slice(0, Math.max(1, length - 3)) + '...';
+    const index = Math.max(1, length - 3);
+    return text.slice(0, index) + '...';
+  } else {
+    return text;
+  }
+}
+
+// Limits a string to the desired length, filling in an ellipsis at the start
+// if it cuts any text off.
+export function cutStart(text, length = 40) {
+  if (text.length >= length) {
+    const index = Math.min(text.length - 1, text.length - length + 3);
+    return '...' + text.slice(index);
   } else {
     return text;
   }
