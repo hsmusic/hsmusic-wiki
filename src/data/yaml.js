@@ -9,7 +9,7 @@ import yaml from 'js-yaml';
 
 import CacheableObject from '#cacheable-object';
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
-import find, {bindFind, getAllFindSpecs} from '#find';
+import {bindFind, getAllFindSpecs} from '#find';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegexCaseSensitive, sortByName} from '#wiki-data';
@@ -1240,19 +1240,19 @@ export function filterReferenceErrors(wikiData) {
 
               case '_trackNotRerelease':
                 findFn = trackRef => {
-                  const track = find.track(trackRef, wikiData.trackData, {mode: 'error'});
+                  const track = boundFind.track(trackRef);
                   const originalRef = track && CacheableObject.getUpdateValue(track, 'originalReleaseTrack');
 
                   if (originalRef) {
                     // It's possible for the original to not actually exist, in this case.
                     // It should still be reported since the 'Originally Released As' field
                     // was present.
-                    const original = find.track(originalRef, wikiData.trackData, {mode: 'quiet'});
+                    const original = boundFind.track(originalRef, {mode: 'quiet'});
 
                     // Prefer references by name, but only if it's unambiguous.
                     const originalByName =
                       (original
-                        ? find.track(original.name, wikiData.trackData, {mode: 'quiet'})
+                        ? boundFind.track(original.name, {mode: 'quiet'})
                         : null);
 
                     const shouldBeMessage =
