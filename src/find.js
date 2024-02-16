@@ -1,6 +1,5 @@
 import {inspect} from 'node:util';
 
-import CacheableObject from '#cacheable-object';
 import {colors, logWarn} from '#cli';
 import thingConstructors from '#things';
 import {typeAppearance} from '#sugar';
@@ -18,7 +17,7 @@ function warnOrThrow(mode, message) {
 }
 
 export function processAllAvailableMatches(data, {
-  include = thing => true,
+  include = _thing => true,
 
   getMatchableNames = thing =>
     (Object.hasOwn(thing, 'name')
@@ -158,7 +157,7 @@ const hardcodedFindSpecs = {
   },
 };
 
-export function getAllFindSpecs(key) {
+export function getAllFindSpecs() {
   try {
     thingConstructors;
   } catch (error) {
