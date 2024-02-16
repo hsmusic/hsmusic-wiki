@@ -25,6 +25,7 @@
         "#content-dependencies": "./src/content/dependencies/index.js",
         "#content-function": "./src/content-function.js",
         "#cli": "./src/util/cli.js",
+        "#data-checks": "./src/data/checks.js",
         "#external-links": "./src/util/external-links.js",
         "#find": "./src/find.js",
         "#html": "./src/util/html.js",

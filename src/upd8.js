@@ -40,12 +40,17 @@ import wrap from 'word-wrap';
 
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
+import {filterReferenceErrors, reportDuplicateDirectories}
+  from '#data-checks';
+import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
 import {empty, showAggregate, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {sortByName} from '#wiki-data';
+import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
+  from '#yaml';
 
 import {
   colors,
@@ -66,14 +71,6 @@ import genThumbs, {
   migrateThumbsIntoDedicatedCacheDirectory,
   verifyImagePaths,
 } from '#thumbs';
-
-import {
-  filterReferenceErrors,
-  linkWikiDataArrays,
-  loadAndProcessDataDocuments,
-  reportDuplicateDirectories,
-  sortWikiDataArrays,
-} from '#yaml';
 
 import FileSizePreloader from './file-size-preloader.js';
 import {listingSpec, listingTargetSpec} from './listing-spec.js';
@@ -1118,7 +1115,7 @@ async function main() {
   });
 
   try {
-    reportDuplicateDirectories(wikiData);
+    reportDuplicateDirectories(wikiData, {getAllFindSpecs});
     logInfo`No duplicate directories found - nice!`;
 
     Object.assign(stepStatusSummary.reportDuplicateDirectories, {
@@ -1151,7 +1148,8 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    const filterReferenceErrorsAggregate = filterReferenceErrors(wikiData);
+    const filterReferenceErrorsAggregate =
+      filterReferenceErrors(wikiData, {bindFind});
 
     try {
       filterReferenceErrorsAggregate.close();
