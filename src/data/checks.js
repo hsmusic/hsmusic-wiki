@@ -113,6 +113,20 @@ export function reportDuplicateDirectories(wikiData, {
   });
 }
 
+function bindFindArtistOrAlias(boundFind) {
+  return artistRef => {
+    const alias = boundFind.artistAlias(artistRef, {mode: 'quiet'});
+    if (alias) {
+      // No need to check if the original exists here. Aliases are automatically
+      // created from a field on the original, so the original certainly exists.
+      const original = alias.aliasedArtist;
+      throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
+    }
+
+    return boundFind.artist(artistRef);
+  };
+}
+
 // Warn about references across data which don't match anything.  This involves
 // using the find() functions on all references, setting it to 'error' mode, and
 // collecting everything in a structured logged (which gets logged if there are
@@ -168,18 +182,7 @@ export function filterReferenceErrors(wikiData, {
   ];
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
-
-  const findArtistOrAlias = artistRef => {
-    const alias = boundFind.artistAlias(artistRef, {mode: 'quiet'});
-    if (alias) {
-      // No need to check if the original exists here. Aliases are automatically
-      // created from a field on the original, so the original certainly exists.
-      const original = alias.aliasedArtist;
-      throw new Error(`Reference ${colors.red(artistRef)} is to an alias, should be ${colors.green(original.name)}`);
-    }
-
-    return boundFind.artist(artistRef);
-  };
+  const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
 
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   for (const [thingDataProp, propSpec] of referenceSpec) {
