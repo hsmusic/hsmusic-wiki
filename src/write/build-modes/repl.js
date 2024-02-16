@@ -31,14 +31,13 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as repl from 'node:repl';
 
-import {logWarn} from '#cli';
-import {debugComposite} from '#composite';
-
 import _find, {bindFind} from '#find';
 import CacheableObject from '#cacheable-object';
-import thingConstructors from '#things';
+import {logWarn} from '#cli';
+import {debugComposite} from '#composite';
 import * as serialize from '#serialize';
 import * as sugar from '#sugar';
+import thingConstructors from '#things';
 import * as wikiDataUtils from '#wiki-data';
 
 export async function getContextAssignments({
