@@ -42,8 +42,11 @@ import wrap from 'word-wrap';
 // order. This obviously needs fixing up.
 
 /* precede #find */
-import {filterReferenceErrors, reportDuplicateDirectories}
-  from '#data-checks';
+import {
+  filterReferenceErrors,
+  reportDuplicateDirectories,
+  reportContentTextErrors,
+} from '#data-checks';
 
 import {bindFind, getAllFindSpecs} from '#find';
 
@@ -138,10 +141,13 @@ async function main() {
       {...defaultStepStatus, name: `precache common data`},
 
     reportDuplicateDirectories:
-      {...defaultStepStatus, name: `filter duplicate directories`},
+      {...defaultStepStatus, name: `report duplicate directories`},
 
     filterReferenceErrors:
       {...defaultStepStatus, name: `filter reference errors`},
+
+    reportContentTextErrors:
+      {...defaultStepStatus, name: `report content text errors`},
 
     sortWikiDataArrays:
       {...defaultStepStatus, name: `sort wiki data arrays`},
@@ -1177,6 +1183,35 @@ async function main() {
       logWarn`will be completely skipped. Resolve the errors for more complete output.`;
 
       Object.assign(stepStatusSummary.filterReferenceErrors, {
+        status: STATUS_HAS_WARNINGS,
+        annotation: `view log for details`,
+        timeEnd: Date.now(),
+      });
+    }
+  }
+
+  if (stepStatusSummary.reportContentTextErrors.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.reportContentTextErrors, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    try {
+      reportContentTextErrors(wikiData, {bindFind});
+      logInfo`All content text validated without any errors - nice!`;
+
+      Object.assign(stepStatusSummary.reportContentTextErrors, {
+        status: STATUS_DONE_CLEAN,
+        timeEnd: Date.now(),
+      });
+    } catch (error) {
+      niceShowAggregate(error);
+
+      logWarn`The above errors were detected while processing content text in data files.`;
+      logWarn`The wiki will still build, but placeholders will be displayed in these spots.`;
+      logWarn`Resolve the errors for more complete output.`;
+
+      Object.assign(stepStatusSummary.reportContentTextErrors, {
         status: STATUS_HAS_WARNINGS,
         annotation: `view log for details`,
         timeEnd: Date.now(),

@@ -4,12 +4,15 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
-import {compareArrays, empty, getNestedProp} from '#sugar';
+import {replacerSpec, parseInput} from '#replacer';
+import {compareArrays, cut, cutStart, empty, getNestedProp, iterateMultiline}
+  from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegexCaseSensitive} from '#wiki-data';
 
 import {
+  annotateErrorWithIndex,
   conditionallySuppressError,
   decorateErrorWithIndex,
   filterAggregate,
@@ -203,10 +206,8 @@ export function filterReferenceErrors(wikiData, {
   const aggregate = openAggregate({message: `Errors validating between-thing references in data`});
   for (const [thingDataProp, propSpec] of referenceSpec) {
     const thingData = getNestedProp(wikiData, thingDataProp);
-
+    const things = Array.isArray(thingData) ? thingData : [thingData];
     aggregate.nest({message: `Reference errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
-      const things = Array.isArray(thingData) ? thingData : [thingData];
-
       for (const thing of things) {
         nest({message: `Reference errors in ${inspect(thing)}`}, ({nest, push, filter}) => {
           for (const [property, findFnKey] of Object.entries(propSpec)) {
@@ -416,4 +417,253 @@ export function filterReferenceErrors(wikiData, {
   }
 
   return aggregate;
+}
+
+export class ContentNodeError extends Error {
+  constructor({
+    length,
+    columnNumber,
+    containingLine,
+    where,
+    message,
+  }) {
+    const headingLine =
+      `(${where}) ${message}`;
+
+    const textUpToNode =
+      containingLine.slice(0, columnNumber);
+
+    const nodeText =
+      containingLine.slice(columnNumber, columnNumber + length);
+
+    const textPastNode =
+      containingLine.slice(columnNumber + length);
+
+    const containingLines =
+      containingLine.split('\n');
+
+    const formattedSourceLines =
+      containingLines.map((_, index, {length}) => {
+        let line = ' ⋮ ';
+
+        if (index === 0) {
+          line += colors.dim(cutStart(textUpToNode, 20));
+        }
+
+        line += nodeText;
+
+        if (index === length - 1) {
+          line += colors.dim(cut(textPastNode, 20));
+        }
+
+        return line;
+      });
+
+    super([
+      headingLine,
+      ...formattedSourceLines,
+    ].filter(Boolean).join('\n'));
+  }
+}
+
+export function reportContentTextErrors(wikiData, {
+  bindFind,
+}) {
+  const commentaryShape = {
+    body: 'commentary body',
+    artistDisplayText: 'commentary artist display text',
+    annotation: 'commentary annotation',
+  };
+
+  const contentTextSpec = [
+    ['albumData', {
+      commentary: commentaryShape,
+    }],
+
+    ['artistData', {
+      contextNotes: '_content',
+    }],
+
+    ['flashActData', {
+      jump: '_content',
+      listTerminology: '_content',
+    }],
+
+    ['groupData', {
+      description: '_content',
+    }],
+
+    ['homepageLayout', {
+      sidebarContent: '_content',
+    }],
+
+    ['newsData', {
+      content: '_content',
+    }],
+
+    ['staticPageData', {
+      content: '_content',
+    }],
+
+    ['trackData', {
+      commentary: commentaryShape,
+      lyrics: '_content',
+    }],
+
+    ['wikiInfo', {
+      description: '_content',
+      footerContent: '_content',
+    }],
+  ];
+
+  const boundFind = bindFind(wikiData, {mode: 'error'});
+  const findArtistOrAlias = bindFindArtistOrAlias(boundFind);
+
+  function* processContent(input) {
+    const nodes = parseInput(input);
+
+    for (const node of nodes) {
+      const index = node.i;
+      const length = node.iEnd - node.i;
+
+      if (node.type === 'tag') {
+        const replacerKeyImplied = !node.data.replacerKey;
+        const replacerKey = replacerKeyImplied ? 'track' : node.data.replacerKey.data;
+        const spec = replacerSpec[replacerKey];
+
+        if (!spec) {
+          yield {
+            index, length,
+            message:
+              `Unknown tag key ${colors.red(`"${replacerKey}"`)}`,
+          };
+        }
+
+        const replacerValue = node.data.replacerValue[0].data;
+
+        if (spec.find) {
+          let findFn;
+
+          switch (spec.find) {
+            case 'artist':
+              findFn = findArtistOrAlias;
+              break;
+
+            default:
+              findFn = boundFind[spec.find];
+              break;
+          }
+
+          const findRef =
+            (replacerKeyImplied
+              ? replacerValue
+              : replacerKey + `:` + replacerValue);
+
+          try {
+            findFn(findRef);
+          } catch (error) {
+            yield {
+              index, length,
+              message: error.message,
+            };
+          }
+        }
+      }
+    }
+  }
+
+  function callProcessContent({
+    nest,
+    push,
+    value,
+    message,
+    annotateError = error => error,
+  }) {
+    const processContentIterator =
+      nest({message}, ({call}) =>
+        call(processContent, value));
+
+    if (!processContentIterator) return;
+
+    const multilineIterator =
+      iterateMultiline(value, processContentIterator, {
+        formatWhere: true,
+        getContainingLine: true,
+      });
+
+    const errors = [];
+
+    for (const result of multilineIterator) {
+      errors.push(new ContentNodeError(result));
+    }
+
+    if (empty(errors)) return;
+
+    push(
+      annotateError(
+        new AggregateError(errors, message)));
+  }
+
+  withAggregate({message: `Errors validating content text`}, ({nest}) => {
+    for (const [thingDataProp, propSpec] of contentTextSpec) {
+      const thingData = getNestedProp(wikiData, thingDataProp);
+      const things = Array.isArray(thingData) ? thingData : [thingData];
+      nest({message: `Content text errors in ${colors.green('wikiData.' + thingDataProp)}`}, ({nest}) => {
+        for (const thing of things) {
+          nest({message: `Content text errors in ${inspect(thing)}`}, ({nest, push}) => {
+
+            for (const [property, shape] of Object.entries(propSpec)) {
+              const value = thing[property];
+
+              if (value === undefined) {
+                push(new TypeError(`Property ${colors.red(property)} isn't valid for ${colors.green(thing.constructor.name)}`));
+                continue;
+              }
+
+              if (value === null) {
+                continue;
+              }
+
+              const fieldPropertyMessage =
+                getFieldPropertyMessage(
+                  thing.constructor[Thing.yamlDocumentSpec],
+                  property);
+
+              const topMessage =
+                `Content text errors` + fieldPropertyMessage;
+
+              if (shape === '_content') {
+                callProcessContent({
+                  nest,
+                  push,
+                  value,
+                  message: topMessage,
+                });
+              } else {
+                nest({message: topMessage}, ({push}) => {
+                  for (const [index, entry] of value.entries()) {
+                    for (const [key, annotation] of Object.entries(shape)) {
+                      const value = entry[key];
+
+                      // TODO: Should this check undefined/null similar to above?
+                      if (!value) continue;
+
+                      callProcessContent({
+                        nest,
+                        push,
+                        value,
+                        message: `Error in ${colors.green(annotation)}`,
+                        annotateError: error =>
+                          annotateErrorWithIndex(error, index),
+                      });
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+  });
 }
