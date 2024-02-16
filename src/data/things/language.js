@@ -185,7 +185,6 @@ export class Language extends Thing {
     // These will be filled up as we iterate over the template, slotting in
     // each option (if it's present).
     const missingOptionNames = new Set();
-    const outputParts = [];
 
     // And this will have entries deleted as they're encountered in the
     // template. Leftover entries are misplaced.

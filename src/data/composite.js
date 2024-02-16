@@ -750,9 +750,6 @@ export function compositeFrom(description) {
   const anyStepsCompute =
     stepsCompute.includes(true);
 
-  const anyStepsTransform =
-    stepsTransform.includes(true);
-
   const compositionExposes =
     anyStepsExpose;
 

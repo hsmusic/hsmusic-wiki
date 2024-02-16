@@ -514,7 +514,7 @@ export function getNeededContentDependencyNames(contentDependencies, name) {
 }
 
 export const decorateErrorWithRelationStack = (fn, traceStack) =>
-  decorateError(fn, (caughtError, ...args) => {
+  decorateError(fn, caughtError => {
     let cause = caughtError;
 
     for (const {name, args, traceError} of traceStack.slice().reverse()) {
