@@ -516,7 +516,11 @@ export class Track extends Thing {
     if (depth >= 0) {
       try {
         album = this.album;
-      } catch (_error) {}
+      } catch (_error) {
+        // Computing album might crash for any reason, which we don't want to
+        // distract from another error we might be trying to work out at the
+        // moment (for which debugging might involve inspecting this track!).
+      }
 
       album ??= this.dataSourceAlbum;
     }
