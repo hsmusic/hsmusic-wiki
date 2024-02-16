@@ -1157,9 +1157,8 @@ export function filterReferenceErrors(wikiData) {
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
 
-  const artistAliasData = wikiData.artistData.filter(artist => artist.isAlias);
   const findArtistOrAlias = artistRef => {
-    const alias = find.artistIncludingAliases(artistRef, artistAliasData, {mode: 'quiet'});
+    const alias = boundFind.artistAlias(artistRef, {mode: 'quiet'});
     if (alias) {
       // No need to check if the original exists here. Aliases are automatically
       // created from a field on the original, so the original certainly exists.

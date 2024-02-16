@@ -256,16 +256,13 @@ export class Artist extends Thing {
       include: artist => !artist.isAlias,
     },
 
-    artistIncludingAliases: {
+    artistAlias: {
       referenceTypes: ['artist', 'artist-gallery'],
       bindTo: 'artistData',
 
-      getMatchableDirectories(artist) {
-        // Regular artists are always matchable by their directory.
-        if (!artist.isAlias) {
-          return [artist.directory];
-        }
+      include: artist => artist.isAlias,
 
+      getMatchableDirectories(artist) {
         const originalArtist = artist.aliasedArtist;
 
         // Aliases never match by the same directory as the original.
