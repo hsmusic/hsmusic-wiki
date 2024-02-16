@@ -1,6 +1,5 @@
 import t from 'tap';
 
-import {showAggregate} from '#sugar';
 import {linkAndBindWikiData} from '#test-lib';
 import thingConstructors from '#things';
 

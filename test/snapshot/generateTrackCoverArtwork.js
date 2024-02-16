@@ -1,6 +1,5 @@
 import t from 'tap';
 import {testContentFunctions} from '#test-lib';
-import {showAggregate} from '#sugar';
 
 testContentFunctions(t, 'generateTrackCoverArtwork (snapshot)', async (t, evaluate) => {
   await evaluate.load({
@@ -36,15 +35,11 @@ testContentFunctions(t, 'generateTrackCoverArtwork (snapshot)', async (t, evalua
     album,
   };
 
-  try {
-    evaluate.snapshot('display: primary - unique art', {
-      name: 'generateTrackCoverArtwork',
-      args: [track1],
-      slots: {mode: 'primary'},
-    });
-  } catch (error) {
-    showAggregate(error);
-  }
+  evaluate.snapshot('display: primary - unique art', {
+    name: 'generateTrackCoverArtwork',
+    args: [track1],
+    slots: {mode: 'primary'},
+  });
 
   evaluate.snapshot('display: thumbnail - unique art', {
     name: 'generateTrackCoverArtwork',
