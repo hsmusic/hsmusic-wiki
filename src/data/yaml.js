@@ -8,13 +8,17 @@ import {inspect as nodeInspect} from 'node:util';
 import yaml from 'js-yaml';
 
 import {colors, ENABLE_COLOR, logInfo, logWarn} from '#cli';
-import {reportDuplicateDirectories, filterReferenceErrors}
-  from '#data-checks';
 import {sortByName} from '#sort';
 import {atOffset, empty, filterProperties, typeAppearance, withEntries}
   from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
+
+import {
+  filterReferenceErrors,
+  reportContentTextErrors,
+  reportDuplicateDirectories,
+} from '#data-checks';
 
 import {
   annotateErrorWithFile,
@@ -1033,7 +1037,7 @@ export async function quickLoadAllFromYAML(dataPath, {
   linkWikiDataArrays(wikiData);
 
   try {
-    reportDuplicateDirectories(wikiData, {getAllFindSpecs}).close();
+    reportDuplicateDirectories(wikiData, {getAllFindSpecs});
     logInfo`No duplicate directories found. (complete data)`;
   } catch (error) {
     showAggregate(error);
@@ -1046,6 +1050,14 @@ export async function quickLoadAllFromYAML(dataPath, {
   } catch (error) {
     showAggregate(error);
     logWarn`Reference errors found. (partial data)`;
+  }
+
+  try {
+    reportContentTextErrors(wikiData, {bindFind});
+    logInfo`No content text errors found.`;
+  } catch (error) {
+    showAggregate(error);
+    logWarn`Content text errors found.`;
   }
 
   sortWikiDataArrays(wikiData);
