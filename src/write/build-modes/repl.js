@@ -30,15 +30,9 @@ export function getCLIOptions() {
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as repl from 'node:repl';
-import {fileURLToPath} from 'node:url';
 
-import {logError, logWarn, parseOptions} from '#cli';
+import {logWarn} from '#cli';
 import {debugComposite} from '#composite';
-import {internalDefaultStringsFile, processLanguageFile} from '#language';
-import {isMain} from '#node-utils';
-import {bindOpts, showAggregate} from '#sugar';
-import {generateURLs, urlSpec} from '#urls';
-import {quickLoadAllFromYAML} from '#yaml';
 
 import _find, {bindFind} from '#find';
 import CacheableObject from '#cacheable-object';
@@ -46,8 +40,6 @@ import thingConstructors from '#things';
 import * as serialize from '#serialize';
 import * as sugar from '#sugar';
 import * as wikiDataUtils from '#wiki-data';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function getContextAssignments({
   dataPath,
