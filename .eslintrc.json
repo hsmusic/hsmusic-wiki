@@ -10,6 +10,7 @@
   },
   "rules": {
     "indent": ["off"],
+    "no-unexpected-multiline": ["off"],
     "no-unused-labels": ["off"],
     "no-unused-vars": ["error", {
       "argsIgnorePattern": "^_",
