@@ -1,6 +1,5 @@
 import find from '#find';
-import {stitchArrays} from '#sugar';
-import {filterMultipleArrays} from '#wiki-data';
+import {filterMultipleArrays, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['linkFlash', 'linkFlashAct', 'linkFlashIndex'],

@@ -1,5 +1,6 @@
+import {sortAlbumsTracksChronologically, sortFlashesChronologically}
+  from '#sort';
 import {empty, stitchArrays} from '#sugar';
-import {sortAlbumsTracksChronologically, sortFlashesChronologically} from '#wiki-data';
 
 import getChronologyRelations from '../util/getChronologyRelations.js';
 

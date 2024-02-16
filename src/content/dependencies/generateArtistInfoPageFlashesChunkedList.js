@@ -1,10 +1,5 @@
-import {stitchArrays} from '#sugar';
-
-import {
-  chunkByProperties,
-  sortEntryThingPairs,
-  sortFlashesChronologically,
-} from '#wiki-data';
+import {sortEntryThingPairs, sortFlashesChronologically} from '#sort';
+import {chunkByProperties, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [

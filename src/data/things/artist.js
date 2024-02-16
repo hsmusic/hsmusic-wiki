@@ -6,10 +6,11 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
+import {sortAlphabetically} from '#sort';
 import {stitchArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
-import {getKebabCase, sortAlphabetically} from '#wiki-data';
+import {getKebabCase} from '#wiki-data';
 
 import {withReverseContributionList} from '#composite/wiki-data';
 

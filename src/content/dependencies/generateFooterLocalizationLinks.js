@@ -1,5 +1,5 @@
+import {sortByName} from '#sort';
 import {stitchArrays} from '#sugar';
-import {sortByName} from '#wiki-data';
 
 export default {
   extraDependencies: [

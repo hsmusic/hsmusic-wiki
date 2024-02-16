@@ -47,9 +47,9 @@ import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
+import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
-import {sortByName} from '#wiki-data';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
 

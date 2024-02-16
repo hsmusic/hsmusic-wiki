@@ -1,10 +1,6 @@
-import {empty, stitchArrays, unique} from '#sugar';
-
-import {
-  filterMultipleArrays,
-  getArtistNumContributions,
-  sortAlphabetically,
-} from '#wiki-data';
+import {sortAlphabetically} from '#sort';
+import {empty, filterMultipleArrays, stitchArrays, unique} from '#sugar';
+import {getArtistNumContributions} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],

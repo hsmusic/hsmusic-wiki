@@ -3,9 +3,9 @@ export const DATA_STATIC_PAGE_DIRECTORY = 'static-page';
 import * as path from 'node:path';
 
 import {traverse} from '#node-utils';
+import {sortAlphabetically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
-import {sortAlphabetically} from '#wiki-data';
 
 import {contentString, directory, name, simpleString}
   from '#composite/wiki-properties';

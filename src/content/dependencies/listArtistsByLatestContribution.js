@@ -1,13 +1,12 @@
-import {empty, stitchArrays} from '#sugar';
+import {chunkMultipleArrays, empty, sortMultipleArrays, stitchArrays}
+  from '#sugar';
 import T from '#things';
 
 import {
-  chunkMultipleArrays,
   sortAlphabetically,
   sortAlbumsTracksChronologically,
   sortFlashesChronologically,
-  sortMultipleArrays,
-} from '#wiki-data';
+} from '#sort';
 
 const {Album, Flash} = T;
 

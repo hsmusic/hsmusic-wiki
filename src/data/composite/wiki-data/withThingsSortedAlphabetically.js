@@ -5,8 +5,8 @@
 // a list so same-name entries are beside each other.
 
 import {input, templateCompositeFrom} from '#composite';
+import {compareCaseLessSensitive, normalizeName} from '#sort';
 import {validateWikiData} from '#validators';
-import {compareCaseLessSensitive, normalizeName} from '#wiki-data';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withMappedList, withSortedList, withPropertiesFromList}

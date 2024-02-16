@@ -1,10 +1,6 @@
+import {sortChronologically} from '#sort';
 import {empty, stitchArrays} from '#sugar';
-
-import {
-  filterItemsForCarousel,
-  getTotalDuration,
-  sortChronologically,
-} from '#wiki-data';
+import {filterItemsForCarousel, getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [

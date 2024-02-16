@@ -1,4 +1,5 @@
-import {chunkByProperties, sortAlphabetically} from '#wiki-data';
+import {sortAlphabetically} from '#sort';
+import {chunkByProperties} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],

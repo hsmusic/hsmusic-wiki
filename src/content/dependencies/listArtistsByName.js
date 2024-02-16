@@ -1,5 +1,6 @@
+import {sortAlphabetically} from '#sort';
 import {stitchArrays} from '#sugar';
-import {getArtistNumContributions, sortAlphabetically} from '#wiki-data';
+import {getArtistNumContributions} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkArtist', 'linkGroup'],

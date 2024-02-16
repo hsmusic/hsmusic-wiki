@@ -1,5 +1,5 @@
+import {sortChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
-import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [

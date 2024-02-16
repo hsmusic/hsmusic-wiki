@@ -5,9 +5,8 @@
 
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
-import {stitchArrays} from '#sugar';
+import {filterMultipleArrays, stitchArrays} from '#sugar';
 import {is, isContributionList} from '#validators';
-import {filterMultipleArrays} from '#wiki-data';
 
 import {
   raiseOutputWithoutDependency,

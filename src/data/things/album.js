@@ -5,11 +5,10 @@ import * as path from 'node:path';
 import {input} from '#composite';
 import find from '#find';
 import {traverse} from '#node-utils';
+import {sortAlbumsTracksChronologically, sortChronologically} from '#sort';
 import {empty} from '#sugar';
 import Thing from '#thing';
 import {isDate} from '#validators';
-import {sortAlbumsTracksChronologically, sortChronologically}
-  from '#wiki-data';
 import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
   from '#yaml';
 

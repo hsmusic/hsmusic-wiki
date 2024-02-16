@@ -406,6 +406,219 @@ export function bindOpts(fn, bind) {
 
 bindOpts.bindIndex = Symbol();
 
+// Sorts multiple arrays by an arbitrary function (which is the last argument).
+// Paired values from each array are provided to the callback sequentially:
+//
+//   (a_fromFirstArray, b_fromFirstArray,
+//    a_fromSecondArray, b_fromSecondArray,
+//    a_fromThirdArray, b_fromThirdArray) =>
+//     relative positioning (negative, positive, or zero)
+//
+// Like native single-array sort, this is a mutating function.
+export function sortMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  const length = arrays[0].length;
+  const symbols = new Array(length).fill(null).map(() => Symbol());
+  const indexes = Object.fromEntries(symbols.map((symbol, index) => [symbol, index]));
+
+  symbols.sort((a, b) => {
+    const indexA = indexes[a];
+    const indexB = indexes[b];
+
+    const args = [];
+    for (let i = 0; i < arrays.length; i++) {
+      args.push(arrays[i][indexA]);
+      args.push(arrays[i][indexB]);
+    }
+
+    return fn(...args);
+  });
+
+  for (const array of arrays) {
+    // Note: We're mutating this array pulling values from itself, but only all
+    // at once after all those values have been pulled.
+    array.splice(0, array.length, ...symbols.map(symbol => array[indexes[symbol]]));
+  }
+
+  return arrays;
+}
+
+// Filters multiple arrays by an arbitrary function (which is the last argument).
+// Values from each array are provided to the callback sequentially:
+//
+//   (value_fromFirstArray,
+//    value_fromSecondArray,
+//    value_fromThirdArray,
+//    index,
+//    [firstArray, secondArray, thirdArray]) =>
+//      true or false
+//
+// Please be aware that this is a mutating function, unlike native single-array
+// filter. The mutated arrays are returned. Also attached under `.removed` are
+// corresponding arrays of items filtered out.
+export function filterMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  const removed = new Array(arrays.length).fill(null).map(() => []);
+
+  for (let i = arrays[0].length - 1; i >= 0; i--) {
+    const args = arrays.map(array => array[i]);
+    args.push(i, arrays);
+
+    if (!fn(...args)) {
+      for (let j = 0; j < arrays.length; j++) {
+        const item = arrays[j][i];
+        arrays[j].splice(i, 1);
+        removed[j].unshift(item);
+      }
+    }
+  }
+
+  Object.assign(arrays, {removed});
+  return arrays;
+}
+
+// Corresponding filter function for sortByCount. By default, items whose
+// corresponding count is zero will be removed.
+export function filterByCount(data, counts, {
+  min = 1,
+  max = Infinity,
+} = {}) {
+  filterMultipleArrays(data, counts, (data, count) =>
+    count >= min && count <= max);
+}
+
+// Reduces multiple arrays with an arbitrary function (which is the last
+// argument). Note that this reduces into multiple accumulators, one for
+// each input array, not just a single value. That's reflected in both the
+// callback parameters:
+//
+//   (accumulator1,
+//    accumulator2,
+//    value_fromFirstArray,
+//    value_fromSecondArray,
+//    index,
+//    [firstArray, secondArray]) =>
+//      [newAccumulator1, newAccumulator2]
+//
+// As well as the final return value of reduceMultipleArrays:
+//
+//   [finalAccumulator1, finalAccumulator2]
+//
+// This is not a mutating function.
+export function reduceMultipleArrays(...args) {
+  const [arrays, fn, initialAccumulators] =
+    (typeof args.at(-1) === 'function'
+      ? [args.slice(0, -1), args.at(-1), null]
+      : [args.slice(0, -2), args.at(-2), args.at(-1)]);
+
+  if (empty(arrays[0])) {
+    throw new TypeError(`Reduce of empty arrays with no initial value`);
+  }
+
+  let [accumulators, i] =
+    (initialAccumulators
+      ? [initialAccumulators, 0]
+      : [arrays.map(array => array[0]), 1]);
+
+  for (; i < arrays[0].length; i++) {
+    const args = [...accumulators, ...arrays.map(array => array[i])];
+    args.push(i, arrays);
+    accumulators = fn(...args);
+  }
+
+  return accumulators;
+}
+
+export function chunkByConditions(array, conditions) {
+  if (empty(array)) {
+    return [];
+  }
+
+  if (empty(conditions)) {
+    return [array];
+  }
+
+  const out = [];
+  let cur = [array[0]];
+  for (let i = 1; i < array.length; i++) {
+    const item = array[i];
+    const prev = array[i - 1];
+    let chunk = false;
+    for (const condition of conditions) {
+      if (condition(item, prev)) {
+        chunk = true;
+        break;
+      }
+    }
+    if (chunk) {
+      out.push(cur);
+      cur = [item];
+    } else {
+      cur.push(item);
+    }
+  }
+  out.push(cur);
+  return out;
+}
+
+export function chunkByProperties(array, properties) {
+  return chunkByConditions(
+    array,
+    properties.map((p) => (a, b) => {
+      if (a[p] instanceof Date && b[p] instanceof Date) return +a[p] !== +b[p];
+
+      if (a[p] !== b[p]) return true;
+
+      // Not sure if this line is still necessary with the specific check for
+      // d8tes a8ove, 8ut, uh, keeping it anyway, just in case....?
+      if (a[p] != b[p]) return true;
+
+      return false;
+    })
+  ).map((chunk) => ({
+    ...Object.fromEntries(properties.map((p) => [p, chunk[0][p]])),
+    chunk,
+  }));
+}
+
+export function chunkMultipleArrays(...args) {
+  const arrays = args.slice(0, -1);
+  const fn = args.at(-1);
+
+  if (arrays[0].length === 0) {
+    return [];
+  }
+
+  const newChunk = index => arrays.map(array => [array[index]]);
+  const results = [newChunk(0)];
+
+  for (let i = 1; i < arrays[0].length; i++) {
+    const current = results.at(-1);
+
+    const args = [];
+    for (let j = 0; j < arrays.length; j++) {
+      const item = arrays[j][i];
+      const previous = current[j].at(-1);
+      args.push(item, previous);
+    }
+
+    if (fn(...args)) {
+      results.push(newChunk(i));
+      continue;
+    }
+
+    for (let j = 0; j < arrays.length; j++) {
+      current[j].push(arrays[j][i]);
+    }
+  }
+
+  return results;
+}
+
 // Delicious function annotations, such as:
 //
 //   (*bound) soWeAreBackInTheMine

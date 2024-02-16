@@ -2,9 +2,9 @@ export const FLASH_DATA_FILE = 'flashes.yaml';
 
 import {input} from '#composite';
 import find from '#find';
+import {sortFlashesChronologically} from '#sort';
 import Thing from '#thing';
 import {anyOf, isColor, isDirectory, isNumber, isString} from '#validators';
-import {sortFlashesChronologically} from '#wiki-data';
 import {parseDate, parseContributors} from '#yaml';
 
 import {exposeDependency, exposeUpdateValueOrContinue}

@@ -1,9 +1,9 @@
 export const ART_TAG_DATA_FILE = 'tags.yaml';
 
 import {input} from '#composite';
+import {sortAlphabetically, sortAlbumsTracksChronologically} from '#sort';
 import Thing from '#thing';
 import {isName} from '#validators';
-import {sortAlphabetically, sortAlbumsTracksChronologically} from '#wiki-data';
 
 import {exposeUpdateValueOrContinue} from '#composite/control-flow';
 

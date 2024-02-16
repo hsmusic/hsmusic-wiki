@@ -1,8 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
-import {empty, stitchArrays} from '#sugar';
+import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
 import {isTrackSectionList} from '#validators';
-import {filterMultipleArrays} from '#wiki-data';
 
 import {exitWithoutDependency, exitWithoutUpdateValue}
   from '#composite/control-flow';

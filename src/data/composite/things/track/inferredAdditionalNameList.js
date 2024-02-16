@@ -4,7 +4,7 @@
 // shares the same name differing from this one's.
 
 import {input, templateCompositeFrom} from '#composite';
-import {chunkByProperties} from '#wiki-data';
+import {chunkByProperties} from '#sugar';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 import {withFilteredList, withPropertyFromList} from '#composite/data';

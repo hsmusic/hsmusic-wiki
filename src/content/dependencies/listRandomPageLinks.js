@@ -1,5 +1,5 @@
+import {sortChronologically} from '#sort';
 import {empty} from '#sugar';
-import {sortChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: [

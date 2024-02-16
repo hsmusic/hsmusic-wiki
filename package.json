@@ -37,6 +37,7 @@
         "#replacer": "./src/util/replacer.js",
         "#serialize": "./src/data/serialize.js",
         "#sugar": "./src/util/sugar.js",
+        "#sort": "./src/util/sort.js",
         "#test-lib": "./test/lib/index.js",
         "#thing": "./src/data/thing.js",
         "#things": "./src/data/things/index.js",

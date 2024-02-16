@@ -1,7 +1,7 @@
 export const NEWS_DATA_FILE = 'news.yaml';
 
+import {sortChronologically} from '#sort';
 import Thing from '#thing';
-import {sortChronologically} from '#wiki-data';
 import {parseDate} from '#yaml';
 
 import {contentString, directory, name, simpleDate}

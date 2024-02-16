@@ -1,5 +1,5 @@
+import {sortFlashesChronologically} from '#sort';
 import {empty, stitchArrays} from '#sugar';
-import {sortFlashesChronologically} from '#wiki-data';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum', 'linkFlash', 'linkTrack'],

@@ -156,8 +156,8 @@ import {
 import dimensionsOf from 'image-size';
 
 import CacheableObject from '#cacheable-object';
-import {delay, empty, queue, stitchArrays, unique} from '#sugar';
-import {chunkMultipleArrays, filterMultipleArrays, sortByName} from '#wiki-data';
+import {commandExists, isMain, promisifyProcess, traverse} from '#node-utils';
+import {sortByName} from '#sort';
 
 import {
   colors,
@@ -171,11 +171,14 @@ import {
 } from '#cli';
 
 import {
-  commandExists,
-  isMain,
-  promisifyProcess,
-  traverse,
-} from '#node-utils';
+  delay,
+  empty,
+  chunkMultipleArrays,
+  filterMultipleArrays,
+  queue,
+  stitchArrays,
+  unique,
+} from '#sugar';
 
 export const defaultMagickThreads = 8;
 
