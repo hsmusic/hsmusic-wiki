@@ -263,9 +263,20 @@ export function delay(ms) {
 // Stolen from here: https://stackoverflow.com/a/3561711
 //
 // There's a proposal for a native JS function like this, 8ut it's not even
-// past stage 1 yet: https://github.com/tc39/proposal-regex-escaping
+// past stage ~~1~~ 2 yet: https://github.com/tc39/proposal-regex-escaping
 export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
+// Follows a key path like 'foo.bar.baz' to get an item nested deeply inside
+// an object.
+export function getNestedProp(obj, key) {
+  const recursive = (o, k) =>
+    (k.length === 1
+      ? o[k[0]]
+      : recursive(o[k[0]], k.slice(1)));
+
+  return recursive(obj, key.split(/(?<=(?<!\\)(?:\\\\)*)\./));
 }
 
 // Gets the "look" of some arbitrary value. It's like typeof, but smarter.

@@ -4,7 +4,7 @@ import {inspect as nodeInspect} from 'node:util';
 import {colors, ENABLE_COLOR} from '#cli';
 
 import CacheableObject from '#cacheable-object';
-import {compareArrays, empty} from '#sugar';
+import {compareArrays, empty, getNestedProp} from '#sugar';
 import Thing from '#thing';
 import thingConstructors from '#things';
 import {commentaryRegexCaseSensitive} from '#wiki-data';
@@ -166,13 +166,6 @@ export function filterReferenceErrors(wikiData, {
       divideTrackListsByGroups: 'group',
     }],
   ];
-
-  function getNestedProp(obj, key) {
-    const recursive = (o, k) =>
-      k.length === 1 ? o[k[0]] : recursive(o[k[0]], k.slice(1));
-    const keys = key.split(/(?<=(?<!\\)(?:\\\\)*)\./);
-    return recursive(obj, keys);
-  }
 
   const boundFind = bindFind(wikiData, {mode: 'error'});
 
