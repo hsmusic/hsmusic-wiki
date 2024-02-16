@@ -5,7 +5,6 @@
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
 
-import {getColors} from '../util/colors.js';
 import {empty, stitchArrays} from '../util/sugar.js';
 import {filterMultipleArrays} from '../util/wiki-data.js';
 
@@ -39,6 +38,7 @@ function initInfo(key, description) {
 
 // Localiz8tion nonsense ----------------------------------
 
+/*
 const language = document.documentElement.getAttribute('lang');
 
 let list;
@@ -65,6 +65,7 @@ if (typeof Intl === 'object' && typeof Intl.ListFormat === 'function') {
     unit: arbitraryMock,
   };
 }
+*/
 
 // Miscellaneous helpers ----------------------------------
 
@@ -112,17 +113,24 @@ function pointIsOverAnyOf(elements) {
 
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
+
+/*
 const getLinkHref = (type, directory) => rebase(`${type}/${directory}`);
+*/
+
 const openAlbum = (d) => rebase(`album/${d}`);
 const openTrack = (d) => rebase(`track/${d}`);
 const openArtist = (d) => rebase(`artist/${d}`);
 
 // TODO: This should also use urlSpec.
+
+/*
 function fetchData(type, directory) {
   return fetch(rebase(`${type}/${directory}/data.json`, 'rebaseData')).then(
     (res) => res.json()
   );
 }
+*/
 
 function dispatchInternalEvent(event, eventName, ...args) {
   const [infoName] =
@@ -2248,9 +2256,6 @@ function scrollAlbumCommentarySidebar() {
 
   const linkScrollTop =
     linkTopEdge - stickyPadding - 5;
-
-  const linkDistanceFromSection =
-    linkScrollTop - sectionTopEdge;
 
   const linkVisibleFromTopOfSection =
     linkBottomEdge - sectionTopEdge > sidebarViewportHeight;
