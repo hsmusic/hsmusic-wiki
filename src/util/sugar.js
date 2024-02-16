@@ -288,8 +288,8 @@ export function cut(text, length = 40) {
   }
 }
 
-// Iterates over regular expression matches within a single- or multiline
-// string, yielding each match as well as:
+// Annotates {index, length} results from another iterator with contextual
+// details, including:
 //
 // * its line and column numbers;
 // * if `formatWhere` is true (the default), a pretty-formatted,
@@ -297,7 +297,7 @@ export function cut(text, length = 40) {
 // * if `getContainingLine` is true, the entire line (or multiple lines)
 //   of text containing the match.
 //
-export function* matchMultiline(content, matchRegexp, {
+export function* iterateMultiline(content, iterator, {
   formatWhere = true,
   getContainingLine = false,
 } = {}) {
@@ -308,24 +308,25 @@ export function* matchMultiline(content, matchRegexp, {
   let startOfLine = 0;
   let previousIndex = 0;
 
-  const countLineBreaks = (offset, range) => {
+  const countLineBreaks = (index, length) => {
+    const range = content.slice(index, index + length);
     const lineBreaks = Array.from(range.matchAll(lineRegexp));
     if (!empty(lineBreaks)) {
       lineNumber += lineBreaks.length;
-      startOfLine = offset + lineBreaks.at(-1).index + 1;
+      startOfLine = index + lineBreaks.at(-1).index + 1;
     }
   };
 
-  for (const match of content.matchAll(matchRegexp)) {
-    countLineBreaks(
-      previousIndex,
-      content.slice(previousIndex, match.index));
+  for (const result of iterator) {
+    const {index, length} = result;
+
+    countLineBreaks(previousIndex, index - previousIndex);
 
     const matchStartOfLine = startOfLine;
 
-    previousIndex = match.index + match[0].length;
+    previousIndex = index + length;
 
-    const columnNumber = match.index - startOfLine;
+    const columnNumber = index - startOfLine;
 
     let where = null;
     if (formatWhere) {
@@ -333,10 +334,10 @@ export function* matchMultiline(content, matchRegexp, {
         colors.yellow(
           (isMultiline
             ? `line: ${lineNumber + 1}, col: ${columnNumber + 1}`
-            : `pos: ${match.index + 1}`));
+            : `pos: ${index + 1}`));
     }
 
-    countLineBreaks(match.index, match[0]);
+    countLineBreaks(index, length);
 
     let containingLine = null;
     if (getContainingLine) {
@@ -356,13 +357,37 @@ export function* matchMultiline(content, matchRegexp, {
     }
 
     yield {
-      match,
+      ...result,
       lineNumber,
       columnNumber,
       where,
       containingLine,
     };
   }
+}
+
+// Iterates over regular expression matches within a single- or multiline
+// string, yielding each match as well as contextual details; this accepts
+// the same options (and provides the same context) as iterateMultiline.
+export function* matchMultiline(content, matchRegexp, options) {
+  const matchAllIterator =
+    content.matchAll(matchRegexp);
+
+  const cleanMatchAllIterator =
+    (function*() {
+      for (const match of matchAllIterator) {
+        yield {
+          index: match.index,
+          length: match[0].length,
+          match,
+        };
+      }
+    })();
+
+  const multilineIterator =
+    iterateMultiline(content, cleanMatchAllIterator, options);
+
+  yield* multilineIterator;
 }
 
 // Binds default values for arguments in a {key: value} type function argument
