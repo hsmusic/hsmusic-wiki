@@ -75,6 +75,7 @@ function findHelper({
 
   include = undefined,
   getMatchableNames = undefined,
+  getMatchableDirectories = undefined,
 }) {
   const keyRefRegex =
     new RegExp(String.raw`^(?:(${referenceTypes.join('|')}):(?=\S))?(.*)$`);
@@ -105,6 +106,7 @@ function findHelper({
         processAllAvailableMatches(data, {
           include,
           getMatchableNames,
+          getMatchableDirectories,
         });
 
       cache.set(data, subcache);
