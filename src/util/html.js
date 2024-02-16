@@ -170,7 +170,7 @@ export function metatag(identifier, ...args) {
       args[0] instanceof Tag ||
       args[0] instanceof Template)
   ) {
-    opts = args[0];
+    opts = args[0];  /* eslint-disable-line no-unused-vars */
     content = args[1];
   } else {
     content = args[0];
@@ -723,7 +723,7 @@ export class Attributes {
 
     throw new Error(
       `Expected Attributes, Template, or object, ` +
-      `got ${typeAppearance(attribute)}`);
+      `got ${typeAppearance(attributes)}`);
   }
 
   #addOneAttribute(attribute, value) {
