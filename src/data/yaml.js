@@ -1094,8 +1094,6 @@ export function reportDuplicateDirectories(wikiData) {
         places.map(thing => ` - ` + inspect(thing)).join('\n')));
     }
   });
-
-  aggregate.close();
 }
 
 // Warn about references across data which don't match anything.  This involves
