@@ -127,6 +127,22 @@ function bindFindArtistOrAlias(boundFind) {
   };
 }
 
+function getFieldPropertyMessage(yamlDocumentSpec, property) {
+  const {fields} = yamlDocumentSpec;
+
+  const field =
+    Object.entries(fields ?? {})
+      .find(([field, fieldSpec]) => fieldSpec.property === property)
+      ?.[0];
+
+  const fieldPropertyMessage =
+    (field
+      ? ` in field ${colors.green(field)}`
+      : ` in property ${colors.green(property)}`);
+
+  return fieldPropertyMessage;
+}
+
 // Warn about references across data which don't match anything.  This involves
 // using the find() functions on all references, setting it to 'error' mode, and
 // collecting everything in a structured logged (which gets logged if there are
@@ -306,17 +322,10 @@ export function filterReferenceErrors(wikiData, {
               return false;
             }, fn);
 
-            const {fields} = thing.constructor[Thing.yamlDocumentSpec];
-
-            const field =
-              Object.entries(fields ?? {})
-                .find(([field, fieldSpec]) => fieldSpec.property === property)
-                ?.[0];
-
             const fieldPropertyMessage =
-              (field
-                ? ` in field ${colors.green(field)}`
-                : ` in property ${colors.green(property)}`);
+              getFieldPropertyMessage(
+                thing.constructor[Thing.yamlDocumentSpec],
+                property);
 
             const findFnMessage =
               (findFnKey.startsWith('_')
