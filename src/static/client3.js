@@ -638,7 +638,7 @@ function handleTooltipMouseLeft(tooltip) {
   }
 }
 
-function handleTooltipReceivedFocus(tooltip) {
+function handleTooltipReceivedFocus(_tooltip) {
   const {state} = hoverableTooltipInfo;
 
   // Cancel the tooltip-hiding timeout if it exists. The tooltip will never
@@ -650,9 +650,7 @@ function handleTooltipReceivedFocus(tooltip) {
   }
 }
 
-function handleTooltipLostFocus(tooltip) {
-  const {settings, state} = hoverableTooltipInfo;
-
+function handleTooltipLostFocus(_tooltip) {
   // Hide the current tooltip right away when it loses focus. Specify intent
   // to replace - while we don't strictly know if another tooltip is going to
   // immediately replace it, the mode of navigating with tab focus (once one
@@ -662,7 +660,7 @@ function handleTooltipLostFocus(tooltip) {
 }
 
 function handleTooltipHoverableMouseEntered(hoverable) {
-  const {event, settings, state} = hoverableTooltipInfo;
+  const {settings, state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
   // If this tooltip was transitioning to hidden, hovering should cancel that
@@ -702,7 +700,7 @@ function handleTooltipHoverableMouseEntered(hoverable) {
   }
 }
 
-function handleTooltipHoverableMouseLeft(hoverable) {
+function handleTooltipHoverableMouseLeft(_hoverable) {
   const {settings, state} = hoverableTooltipInfo;
 
   // Don't show a tooltip when not over a hoverable!
@@ -757,7 +755,7 @@ function handleTooltipHoverableReceivedFocus(hoverable) {
 }
 
 function handleTooltipHoverableLostFocus(hoverable, domEvent) {
-  const {settings, state} = hoverableTooltipInfo;
+  const {state} = hoverableTooltipInfo;
 
   // Don't show a tooltip from focusing a hoverable if it isn't focused
   // anymore! If another hoverable is receiving focus, that will be evaluated
@@ -777,7 +775,7 @@ function handleTooltipHoverableLostFocus(hoverable, domEvent) {
 }
 
 function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
-  const {settings, state} = hoverableTooltipInfo;
+  const {state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
   // Don't proceed if this hoverable's tooltip is already visible - in that
@@ -828,9 +826,8 @@ function handleTooltipHoverableTouchEnded(hoverable, domEvent) {
     }, 250);
 }
 
-function handleTooltipHoverableClicked(hoverable, domEvent) {
+function handleTooltipHoverableClicked(hoverable) {
   const {state} = hoverableTooltipInfo;
-  const {tooltip} = state.registeredHoverables.get(hoverable);
 
   // Don't navigate away from the page if the this hoverable was recently
   // touched (and had its tooltip activated). That flag won't be set if its
@@ -928,7 +925,7 @@ function endTransitioningTooltipHidden() {
 }
 
 function hideCurrentlyShownTooltip(intendingToReplace = false) {
-  const {event, settings, state} = hoverableTooltipInfo;
+  const {settings, state} = hoverableTooltipInfo;
   const {currentlyShownTooltip: tooltip} = state;
 
   // If there was no tooltip to begin with, we're functionally in the desired
@@ -972,7 +969,7 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
 }
 
 function showTooltipFromHoverable(hoverable) {
-  const {event, state} = hoverableTooltipInfo;
+  const {state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
   if (!hideCurrentlyShownTooltip(true)) return false;
@@ -1029,9 +1026,6 @@ function addHoverableTooltipPageListeners() {
   ];
 
   document.body.addEventListener('touchend', domEvent => {
-    const hoverables = Array.from(state.registeredHoverables.keys());
-    const tooltips = Array.from(state.registeredTooltips.keys());
-
     const touches = Array.from(domEvent.changedTouches);
     const identifiers = touches.map(touch => touch.identifier);
 
