@@ -13,7 +13,6 @@ import {quickLoadContentDependencies} from '#content-dependencies';
 import {quickEvaluate} from '#content-function';
 import * as html from '#html';
 import * as pageSpecs from '#page-specs';
-import {serializeThings} from '#serialize';
 import {empty, queue, withEntries} from '#sugar';
 
 import {
@@ -114,7 +113,7 @@ export async function go({
   wikiData,
 
   cachebust,
-  developersComment,
+  developersComment: _developersComment,
   getSizeOfAdditionalFile,
   getSizeOfImagePath,
   niceShowAggregate,

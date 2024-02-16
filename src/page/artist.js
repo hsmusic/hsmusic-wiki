@@ -1,7 +1,5 @@
 import {empty} from '#sugar';
 
-import CacheableObject from '#cacheable-object';
-
 export const description = `per-artist info & artwork gallery pages`;
 
 // NB: See artist-alias.js for artist alias redirect pages.

@@ -101,7 +101,7 @@ export async function go({
   wikiData,
 
   cachebust,
-  developersComment,
+  developersComment: _developersComment,
   getSizeOfAdditionalFile,
   getSizeOfImagePath,
   niceShowAggregate,

@@ -3,7 +3,6 @@ import {empty, stitchArrays} from '#sugar';
 import {
   anyOf,
   is,
-  isObject,
   isStringNonEmpty,
   looseArrayOf,
   optional,
