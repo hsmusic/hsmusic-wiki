@@ -5,8 +5,7 @@
 // that cannot 8e done at static-site compile time, 8y its fundamentally
 // ephemeral nature.
 
-import {empty, stitchArrays} from '../util/sugar.js';
-import {filterMultipleArrays} from '../util/wiki-data.js';
+import {empty, filterMultipleArrays, stitchArrays} from '../util/sugar.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
