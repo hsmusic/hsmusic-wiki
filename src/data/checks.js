@@ -537,6 +537,9 @@ export function reportContentTextErrors(wikiData, {
             message:
               `Unknown tag key ${colors.red(`"${replacerKey}"`)}`,
           };
+
+          // No spec, no further errors to report.
+          continue;
         }
 
         const replacerValue = node.data.replacerValue[0].data;
@@ -566,6 +569,9 @@ export function reportContentTextErrors(wikiData, {
               index, length,
               message: error.message,
             };
+
+            // It's only possible to have one error per node at the moment.
+            continue;
           }
         }
       }
