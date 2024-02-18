@@ -229,7 +229,7 @@ export default {
             const {
               link,
               style,
-              warning,
+              warnings,
               width,
               height,
               pixelate,
@@ -264,12 +264,8 @@ export default {
                     link: link ?? true,
                     width: width ?? null,
                     height: height ?? null,
+                    warnings: warnings ?? null,
                     thumb: slots.thumb,
-
-                    warnings:
-                      (warning
-                        ? warning.split(', ')
-                        : null),
 
                     attributes: [
                       {class: 'content-image'},
