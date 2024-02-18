@@ -55,6 +55,10 @@ export default {
       validate: v => v.isColor,
     },
 
+    warnings: {
+      validate: v => v.looseArrayOf(v.isString),
+    },
+
     reveal: {type: 'boolean', default: true},
     lazy: {type: 'boolean', default: false},
     square: {type: 'boolean', default: false},
@@ -120,11 +124,15 @@ export default {
       !isMissingImageFile &&
       (typeof slots.link === 'string' || slots.link);
 
+    const contentWarnings =
+      slots.warnings ??
+      data.contentWarnings;
+
     const willReveal =
       slots.reveal &&
       originalSrc &&
       !isMissingImageFile &&
-      !empty(data.contentWarnings);
+      !empty(contentWarnings);
 
     const willSquare = slots.square;
 
@@ -159,7 +167,7 @@ export default {
 
         html.tag('span', {class: 'reveal-warnings'},
           language.$('misc.contentWarnings.warnings', {
-            warnings: language.formatUnitList(data.contentWarnings),
+            warnings: language.formatUnitList(contentWarnings),
           })),
 
         html.tag('br'),
