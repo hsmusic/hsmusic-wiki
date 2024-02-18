@@ -226,7 +226,7 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {inline, link, width, height, pixelate} = node;
+            const {inline, link, width, height, style, pixelate} = node;
 
             if (inline) {
               return {
@@ -237,6 +237,7 @@ export default {
                     src && {src},
                     width && {width},
                     height && {height},
+                    style && {style},
 
                     pixelate &&
                       {class: 'pixelate'}),
