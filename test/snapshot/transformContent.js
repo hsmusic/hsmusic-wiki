@@ -109,6 +109,23 @@ testContentFunctions(t, 'transformContent (snapshot)', async (t, evaluate) => {
       `Neat listing: [[string:listingPage.listAlbums.byDate.title]]`);
 
   quickSnapshot(
+    'basic markdown',
+      `Hello *world!* This is **SO COOL.**`);
+
+  quickSnapshot(
+    'escape entire tag',
+      `\\[[album:cool-album|spooky]] [[album:cool-album|scary]]`);
+
+  quickSnapshot(
+    'escape end of tag',
+      `My favorite album is [[album:cool-album|[Tactical Omission\\]]].\n` +
+      `Your favorite album is [[album:cool-album|[Tactical Wha-Huh-Now]]].`);
+
+  quickSnapshot(
+    'escape markdown',
+      `What will it be, *ye fool?* \\*arr*`);
+
+  quickSnapshot(
     'lyrics - basic line breaks',
       `Hey, ho\n` +
       `And away we go\n` +

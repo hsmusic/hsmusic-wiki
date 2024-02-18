@@ -5,9 +5,26 @@
  * Make sure to inspect the output below.  Do not ignore changes!
  */
 'use strict'
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > basic markdown 1`] = `
+<p>Hello <em>world!</em> This is <strong>SO COOL.</strong></p>
+`
+
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > dates 1`] = `
 <p><time datetime="Thu, 13 Apr 2023 00:00:00 GMT">4/12/2023</time> Yep!</p>
 <p>Very nice: <time datetime="Fri, 25 Oct 2413 03:00:00 GMT">10/25/2413</time></p>
+`
+
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > escape end of tag 1`] = `
+<p>My favorite album is <a style="--primary-color: #123456" href="to-localized.album/cool-album">[Tactical Omission]</a>.</p>
+<p>Your favorite album is <a style="--primary-color: #123456" href="to-localized.album/cool-album">[Tactical Wha-Huh-Now</a>].</p>
+`
+
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > escape entire tag 1`] = `
+<p>[[album:cool-album|spooky]] <a style="--primary-color: #123456" href="to-localized.album/cool-album">scary</a></p>
+`
+
+exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > escape markdown 1`] = `
+<p>What will it be, <em>ye fool?</em> *arr*</p>
 `
 
 exports[`test/snapshot/transformContent.js > TAP > transformContent (snapshot) > hanging indent list 1`] = `
