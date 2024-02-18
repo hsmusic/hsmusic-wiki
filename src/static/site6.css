@@ -1238,6 +1238,7 @@ img.pixelate, .pixelate img {
   text-align: center;
   font-weight: bold;
   padding-bottom: 0.5em;
+  font-size: 0.8rem;
 }
 
 .reveal-symbol {
