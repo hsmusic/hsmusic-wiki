@@ -1285,17 +1285,30 @@ img.pixelate, .pixelate img {
 }
 
 .reveal:not(.revealed) .image-outer-area > * {
-  box-sizing: border-box;
-  border: 1px dotted var(--primary-color);
-  border-radius: 6px;
+  --reveal-border-radius: 6px;
+  position: relative;
   overflow: hidden;
+  border-radius: var(--reveal-border-radius);
+}
+
+.reveal:not(.revealed) .image-outer-area > *::after {
+  content: "";
+  position: absolute;
+  box-sizing: border-box;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  border: 1px dotted var(--primary-color);
+  border-radius: var(--reveal-border-radius);
+  pointer-events: none;
 }
 
 .reveal:not(.revealed) .image-inner-area {
   background: var(--deep-color);
 }
 
-.reveal:not(.revealed) .image-outer-area > *:hover {
+.reveal:not(.revealed) .image-outer-area > *:hover::after {
   border-style: solid;
 }
 
