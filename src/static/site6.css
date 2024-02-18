@@ -1287,7 +1287,7 @@ img.pixelate, .pixelate img {
   opacity: 1;
 }
 
-.reveal.revealed .reveal-text {
+.reveal.revealed .reveal-text-container {
   display: none;
 }
 
