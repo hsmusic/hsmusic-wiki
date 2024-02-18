@@ -36,6 +36,7 @@ import CacheableObject from '#cacheable-object';
 import {logWarn} from '#cli';
 import {debugComposite} from '#composite';
 import * as serialize from '#serialize';
+import * as sort from '#sort';
 import * as sugar from '#sugar';
 import thingConstructors from '#things';
 import * as wikiDataUtils from '#wiki-data';
@@ -86,6 +87,7 @@ export async function getContextAssignments({
     CacheableObject,
     debugComposite,
 
+    ...sort,
     ...sugar,
     ...wikiDataUtils,
 
