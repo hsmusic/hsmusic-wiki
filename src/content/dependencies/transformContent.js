@@ -226,9 +226,16 @@ export default {
                 ? to('media.path', node.src.slice('media/'.length))
                 : node.src);
 
-            const {inline, link, width, height, style, pixelate} = node;
+            const {
+              link,
+              style,
+              warning,
+              width,
+              height,
+              pixelate,
+            } = node;
 
-            if (inline) {
+            if (node.inline) {
               return {
                 type: 'image',
                 inline: true,
@@ -258,6 +265,11 @@ export default {
                     width: width ?? null,
                     height: height ?? null,
                     thumb: slots.thumb,
+
+                    warnings:
+                      (warning
+                        ? warning.split(', ')
+                        : null),
 
                     attributes: [
                       {class: 'content-image'},

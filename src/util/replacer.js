@@ -495,6 +495,7 @@ export function postprocessImages(inputNodes) {
 
         if (attributes.get('link')) imageNode.link = attributes.get('link');
         if (attributes.get('style')) imageNode.style = attributes.get('style');
+        if (attributes.get('warning')) imageNode.warning = attributes.get('warning');
         if (attributes.get('width')) imageNode.width = parseInt(attributes.get('width'));
         if (attributes.get('height')) imageNode.height = parseInt(attributes.get('height'));
         if (attributes.get('pixelate')) imageNode.pixelate = true;
