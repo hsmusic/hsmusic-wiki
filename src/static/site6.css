@@ -1264,11 +1264,18 @@ img.pixelate, .pixelate img {
 }
 
 .reveal .image.reveal-thumbnail {
+  position: absolute;
+  top: 0;
   image-rendering: pixelated;
 }
 
 .reveal.has-reveal-thumbnail:not(.revealed) .image:not(.reveal-thumbnail) {
-  display: none !important;
+  /* Keep the main image as part of the box model.
+   * It's what actually defines the dimensions of the
+   * image-container, so those dimensions never shift
+   * once the image is actually revealed.
+   */
+  visibility: hidden;
 }
 
 .reveal.revealed.has-reveal-thumbnail .image.reveal-thumbnail {
