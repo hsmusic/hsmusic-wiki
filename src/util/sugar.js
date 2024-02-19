@@ -268,6 +268,10 @@ export function escapeRegex(string) {
   return string.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
+export function splitKeys(key) {
+  return key.split(/(?<=(?<!\\)(?:\\\\)*)\./);
+}
+
 // Follows a key path like 'foo.bar.baz' to get an item nested deeply inside
 // an object.
 export function getNestedProp(obj, key) {
@@ -276,7 +280,7 @@ export function getNestedProp(obj, key) {
       ? o[k[0]]
       : recursive(o[k[0]], k.slice(1)));
 
-  return recursive(obj, key.split(/(?<=(?<!\\)(?:\\\\)*)\./));
+  return recursive(obj, splitKeys(key));
 }
 
 // Gets the "look" of some arbitrary value. It's like typeof, but smarter.
