@@ -11,6 +11,7 @@ import {annotateError, annotateErrorWithFile, showAggregate, withAggregate}
   from '#aggregate';
 import {externalLinkSpec} from '#external-links';
 import {colors, logWarn} from '#cli';
+import {splitKeys, withEntries} from '#sugar';
 import T from '#things';
 
 const {Language} = T;
@@ -51,7 +52,7 @@ export function processLanguageSpec(spec, {existingCode = null} = {}) {
   return {code, intlCode, name, hidden, strings};
 }
 
-function flattenLanguageSpec(spec) {
+export function flattenLanguageSpec(spec) {
   const recursive = (keyPath, value) =>
     (typeof value === 'object'
       ? Object.assign({}, ...
@@ -65,6 +66,139 @@ function flattenLanguageSpec(spec) {
       : {[keyPath]: value});
 
   return recursive('', spec);
+}
+
+export function unflattenLanguageSpec(flat, reference) {
+  const setNestedProp = (obj, key, value) => {
+    const recursive = (o, k) => {
+      if (k.length === 1) {
+        o[k[0]] = value;
+        return;
+      }
+
+      if (typeof o[k[0]] === 'undefined') {
+        o[k[0]] = {};
+      } else if (typeof o[k[0]] === 'string') {
+        o[k[0]] = {_: o[k[0]]};
+      }
+
+      recursive(o[k[0]], k.slice(1));
+    };
+
+    return recursive(obj, splitKeys(key));
+  };
+
+  const walkEntries = (ownNode, refNode) => {
+    const recursive = (refKeys, ownNode, refNode) => {
+      const [firstKey, ...restKeys] = refKeys;
+
+      if (typeof ownNode[firstKey] === 'undefined') {
+        return undefined;
+      }
+
+      const result =
+        (refKeys.length === 1
+          ? walkEntry(ownNode[firstKey], refNode)
+          : recursive(restKeys, ownNode[firstKey], refNode));
+
+      if (typeof result === 'undefined') {
+        return undefined;
+      }
+
+      if (typeof result === 'string') {
+        delete ownNode[firstKey];
+        return {[firstKey]: result};
+      }
+
+      if (refKeys.length > 1) {
+        return withEntries(result, entries =>
+          entries.map(([key, value]) => [`${firstKey}.${key}`, value]));
+      } else {
+        return {[firstKey]: result};
+      }
+    };
+
+    let mapped;
+
+    for (const [key, value] of Object.entries(refNode)) {
+      const result = recursive(splitKeys(key), ownNode, refNode[key]);
+      if (!result) continue;
+      if (!mapped) mapped = {};
+      Object.assign(mapped, result);
+    }
+
+    return mapped;
+  };
+
+  const walkEntry = (ownNode, refNode) => {
+    if (
+      typeof ownNode === 'object' &&
+      typeof refNode === 'object'
+    ) {
+      return walkEntries(ownNode, refNode);
+    }
+
+    if (
+      typeof ownNode === 'string' &&
+      typeof refNode === 'object' &&
+      typeof refNode._ === 'string'
+    ) {
+      return {_: ownNode};
+    }
+
+    if (
+      typeof ownNode === 'object' &&
+      typeof refNode === 'string' &&
+      typeof ownNode._ === 'string'
+    ) {
+      return ownNode._;
+    }
+
+    if (
+      typeof ownNode === 'string' &&
+      typeof refNode === 'string'
+    ) {
+      return ownNode;
+    }
+
+    return undefined;
+  };
+
+  const clean = node => {
+    if (typeof node === 'string') {
+      return node;
+    }
+
+    const entries = Object.entries(node);
+    if (entries.length === 0) {
+      return undefined;
+    }
+
+    let results;
+    for (const [key, value] of entries) {
+      const cleanValue = clean(value);
+      if (typeof cleanValue === 'undefined') continue;
+      if (!results) results = {};
+      results[key] = cleanValue;
+    }
+
+    return results;
+  };
+
+  const storage = {};
+  for (const [key, value] of Object.entries(flat)) {
+    setNestedProp(storage, key, value);
+  }
+
+  const rootResult = walkEntries(storage, reference);
+  const spec = rootResult ?? {};
+
+  const unmapped = clean(storage);
+  if (unmapped) {
+    spec['meta.unmapped'] = unmapped;
+  }
+
+  return spec;
 }
 
 async function processLanguageSpecFromFile(file, processLanguageSpecOpts) {
