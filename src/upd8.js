@@ -32,7 +32,7 @@
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
 import {execSync} from 'node:child_process';
-import {readFile} from 'node:fs/promises';
+import {readdir, readFile} from 'node:fs/promises';
 import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
@@ -1359,12 +1359,10 @@ async function main() {
       });
     }
 
-    const languageDataFiles = await traverse(langPath, {
-      filterFile: name =>
-        path.extname(name) === '.json' ||
-        path.extname(name) === '.yaml',
-      pathStyle: 'device',
-    });
+    const languageDataFiles =
+      (await readdir(langPath))
+        .filter(name => ['.json', '.yaml'].includes(path.extname(name)))
+        .map(name => path.join(langPath, name));
 
     let errorLoadingCustomLanguages = false;
 

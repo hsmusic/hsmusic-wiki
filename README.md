@@ -107,8 +107,8 @@ HSMusic works using a number of repositories in tandem:
   - The data repo also contains all the metadata which makes one wiki unique from another: layout info, static pages (like "About & Credits"), whether or not certain site features are enabled (like "Flashes & Games" or UI for browsing groups), and so on.
   - All data is written and accessed in the YAML format, and every file follows a specific structure described within this (code) repository. See below and the `src/data` directory for details.
 - [`hsmusic-media`][github-media]: The media repository, holding all album, track, and layout media used across the site in one place. Media and organization directly corresponds to entries in the data repository; generally the data and media repositories go together and are swapped out for another together.
-- *Language repo:* The language repository, holding up-to-date strings and other localization info for HSMusic. NB: This repo isn't currently online as its structure and tooling haven't been polished or properly put together yet, but it's not required for building the site.
-  - Strings and language info are stored in top-level JSON files within this repository. They're based off the `src/strings-default.json` file within the code repo (and don't need to provide translations for all strings to be used for site building).
+- [`hsmusic-lang`][github-lang]: The language repository, holding up-to-date strings and other localization info for HSMusic.
+  - Strings and language info are stored in top-level YAML files within this repository. They're based off the `src/strings-default.yaml` file within the code repo (and don't need to provide translations for all strings to be used for site building).
 
 The code repository as well as the data and media repositories are require for site building, with the language repo optionally provided to add localization support to the wiki build.
 
@@ -177,6 +177,7 @@ As ever, feedback is always welcome, and may be shared via the usual links. Than
   [github]: https://github.com/hsmusic/hsmusic-wiki
   [github-code]: https://github.com/hsmusic/hsmusic-wiki
   [github-data]: https://github.com/hsmusic/hsmusic-data
+  [github-lang]: https://github.com/hsmusic/hsmusic-lang
   [github-media]: https://github.com/hsmusic/hsmusic-media
   [hsmusic]: https://hsmusic.wiki
   [nsnd]: https://homestuck.net/music/references.html
