@@ -28,6 +28,8 @@ const urlSpec = {
       album: 'album/<>/',
       albumCommentary: 'commentary/album/<>/',
       albumGallery: 'album/<>/gallery/',
+      albumListingIndex: 'album/<>/list/',
+      albumListing: 'album/<>/list/<>/',
 
       artist: 'artist/<>/',
       artistGallery: 'artist/<>/gallery/',
@@ -43,10 +45,6 @@ const urlSpec = {
       groupInfo: 'group/<>/',
       groupGallery: 'group/<>/gallery/',
 
-      listingIndex: 'list/',
-
-      listing: 'list/<>/',
-
       newsIndex: 'news/',
 
       newsEntry: 'news/<>/',
@@ -56,6 +54,9 @@ const urlSpec = {
       tag: 'tag/<>/',
 
       track: 'track/<>/',
+
+      wikiListingIndex: 'list/',
+      wikiListing: 'list/<>/',
     },
   },
 

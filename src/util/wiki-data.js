@@ -232,6 +232,28 @@ export function getNewReleases(numReleases, {albumData}) {
     .slice(0, numReleases);
 }
 
+export function getIndexListingForScope(scope, {listingSpec}) {
+  return listingSpec.find(listing =>
+    listing.scope === scope &&
+    listing.directory === 'index');
+}
+
+export function getListingStringsKey(listing) {
+  const parts = ['listingPage'];
+
+  if (listing.scope === 'wiki') {
+    if (listing.directory === 'index') {
+      parts.push('wiki');
+    }
+  } else {
+    parts.push(listing.scope);
+  }
+
+  parts.push(listing.stringsKey);
+
+  return parts.join('.');
+}
+
 // Carousel layout and utilities
 
 // Layout constants:

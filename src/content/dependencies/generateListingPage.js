@@ -1,4 +1,5 @@
 import {bindOpts, empty, stitchArrays} from '#sugar';
+import {getListingStringsKey, getIndexListingForScope} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -6,13 +7,17 @@ export default {
     'generateListingSidebar',
     'generatePageLayout',
     'linkListing',
-    'linkListingIndex',
     'linkTemplate',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  relations(relation, listing) {
+  sprawl: ({listingSpec}, listing) => ({
+    indexListing:
+      getIndexListingForScope(listing.scope, {listingSpec}),
+  }),
+
+  relations(relation, sprawl, listing) {
     const relations = {};
 
     relations.layout =
@@ -21,8 +26,10 @@ export default {
     relations.sidebar =
       relation('generateListingSidebar', listing);
 
-    relations.listingsIndexLink =
-      relation('linkListingIndex');
+    if (sprawl.indexListing) {
+      relations.indexListingLink =
+        relation('linkListing', sprawl.indexListing);
+    }
 
     relations.chunkHeading =
       relation('generateContentHeading');
@@ -45,21 +52,19 @@ export default {
     return relations;
   },
 
-  data(listing) {
-    return {
-      stringsKey: listing.stringsKey,
+  data: (sprawl, listing) => ({
+    stringsKey: getListingStringsKey(listing),
 
-      targetStringsKey: listing.target.stringsKey,
+    targetStringsKey: listing.target.stringsKey,
 
-      sameTargetListingStringsKeys:
-        listing.target.listings
-          .map(listing => listing.stringsKey),
+    sameTargetListingStringsKeys:
+      listing.target.listings
+        .map(listing => getListingStringsKey(listing)),
 
-      sameTargetListingsCurrentIndex:
-        listing.target.listings
-          .indexOf(listing),
-    };
-  },
+    sameTargetListingsCurrentIndex:
+      listing.target.listings
+        .indexOf(listing),
+  }),
 
   slots: {
     type: {
@@ -115,7 +120,7 @@ export default {
       context,
       provided = {},
     }) {
-      const parts = ['listingPage', data.stringsKey];
+      const parts = [data.stringsKey];
 
       if (Array.isArray(context)) {
         parts.push(...context);
@@ -185,7 +190,7 @@ export default {
 
                         link.slots({
                           attributes: {class: 'nowrap'},
-                          content: language.$('listingPage', stringsKey, 'title.short'),
+                          content: language.$(stringsKey, 'title.short'),
                         })))),
             })),
 
@@ -272,7 +277,7 @@ export default {
       navLinkStyle: 'hierarchical',
       navLinks: [
         {auto: 'home'},
-        {html: relations.listingsIndexLink},
+        {html: relations.indexListingLink},
         {auto: 'current'},
       ],
 

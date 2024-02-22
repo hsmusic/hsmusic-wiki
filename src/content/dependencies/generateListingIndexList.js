@@ -51,7 +51,7 @@ export default {
         .map(listings =>
           listings.map(({stringsKey}) => stringsKey));
 
-    if (currentListing) {
+    if (currentListing && currentListing.directory !== 'index') {
       data.currentTargetIndex =
         query.targets
           .indexOf(currentListing.target);

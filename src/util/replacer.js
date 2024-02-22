@@ -88,8 +88,8 @@ export const replacerSpec = {
   },
 
   'listing-index': {
-    find: null,
-    link: 'linkListingIndex',
+    find: 'listingIndex',
+    link: 'linkListing',
   },
 
   'listing': {
