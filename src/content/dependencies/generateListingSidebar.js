@@ -1,14 +1,21 @@
+import {getIndexListingForScope} from '#wiki-data';
+
 export default {
   contentDependencies: [
     'generateListingIndexList',
     'generatePageSidebar',
     'generatePageSidebarBox',
-    'linkListingIndex',
+    'linkListing',
   ],
 
-  extraDependencies: ['html'],
+  extraDependencies: ['html', 'wikiData'],
 
-  relations: (relation, currentListing) => ({
+  sprawl: ({listingSpec}, currentListing) => ({
+    indexListing:
+      getIndexListingForScope(currentListing.scope, {listingSpec}),
+  }),
+
+  relations: (relation, sprawl, currentListing) => ({
     sidebar:
       relation('generatePageSidebar'),
 
@@ -16,7 +23,7 @@ export default {
       relation('generatePageSidebarBox'),
 
     listingIndexLink:
-      relation('linkListingIndex'),
+      relation('linkListing', sprawl.indexListing),
 
     listingIndexList:
       relation('generateListingIndexList', currentListing),

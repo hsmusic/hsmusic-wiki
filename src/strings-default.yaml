@@ -1217,20 +1217,6 @@ groupGalleryPage:
     {TRACKS} across {ALBUMS}, totaling {TIME}.
 
 #
-# listingIndex:
-#   The listing index page shows all available listings on the wiki,
-#   and a very exciting stats line for the wiki as a whole.
-#
-listingIndex:
-  title: "Listings"
-
-  infoLine: >-
-    {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
-
-  exploreList: >-
-    Feel free to explore any of the listings linked below and in the sidebar!
-
-#
 # listingPage:
 #
 #   There are a lot of listings! Each is automatically generated and
@@ -1285,6 +1271,24 @@ listingPage:
   #   for the list of those links.
 
   skipToSection: "Skip to a section:"
+
+  wiki:
+
+    #
+    # wiki.index:
+    #   The wiki-global listing index shows listings which apply
+    #   to all the wiki data at once, and a very exciting stats line
+    #   for the wiki as a whole.
+    #
+
+    index:
+      title: "Listings"
+
+      infoLine: >-
+        {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
+
+      exploreList: >-
+        Feel free to explore any of the listings linked below and in the sidebar!
 
   listAlbums:
 

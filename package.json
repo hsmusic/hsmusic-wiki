@@ -38,6 +38,7 @@
         "#language": "./src/data/language.js",
         "#page-specs": "./src/page/index.js",
         "#node-utils": "./src/util/node-utils.js",
+        "#page-util": "./src/page/page-util.js",
         "#repl": "./src/write/build-modes/repl.js",
         "#replacer": "./src/util/replacer.js",
         "#search": "./src/search.js",

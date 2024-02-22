@@ -4,6 +4,14 @@ import {empty} from '#sugar';
 const listingSpec = [];
 
 listingSpec.push({
+  scope: 'wiki',
+  directory: 'index',
+  stringsKey: 'index',
+  contentFunction: 'generateListingsIndexPage',
+});
+
+listingSpec.push({
+  scope: 'wiki',
   directory: 'albums/by-name',
   stringsKey: 'listAlbums.byName',
   contentFunction: 'listAlbumsByName',
@@ -14,18 +22,21 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'albums/by-tracks',
   stringsKey: 'listAlbums.byTracks',
   contentFunction: 'listAlbumsByTracks',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'albums/by-duration',
   stringsKey: 'listAlbums.byDuration',
   contentFunction: 'listAlbumsByDuration',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'albums/by-date',
   stringsKey: 'listAlbums.byDate',
   contentFunction: 'listAlbumsByDate',
@@ -36,12 +47,14 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'albums/by-date-added',
   stringsKey: 'listAlbums.byDateAdded',
   contentFunction: 'listAlbumsByDateAdded',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-name',
   stringsKey: 'listArtists.byName',
   contentFunction: 'listArtistsByName',
@@ -49,6 +62,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-contribs',
   stringsKey: 'listArtists.byContribs',
   contentFunction: 'listArtistsByContributions',
@@ -56,12 +70,14 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-commentary',
   stringsKey: 'listArtists.byCommentary',
   contentFunction: 'listArtistsByCommentaryEntries',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-duration',
   stringsKey: 'listArtists.byDuration',
   contentFunction: 'listArtistsByDuration',
@@ -69,6 +85,7 @@ listingSpec.push({
 
 // TODO: hide if divideTrackListsByGroups empty...
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-group',
   stringsKey: 'listArtists.byGroup',
   contentFunction: 'listArtistsByGroup',
@@ -77,12 +94,14 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'artists/by-latest',
   stringsKey: 'listArtists.byLatest',
   contentFunction: 'listArtistsByLatestContribution',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-name',
   stringsKey: 'listGroups.byName',
   contentFunction: 'listGroupsByName',
@@ -90,6 +109,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-category',
   stringsKey: 'listGroups.byCategory',
   contentFunction: 'listGroupsByCategory',
@@ -97,6 +117,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-albums',
   stringsKey: 'listGroups.byAlbums',
   contentFunction: 'listGroupsByAlbums',
@@ -104,6 +125,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-tracks',
   stringsKey: 'listGroups.byTracks',
   contentFunction: 'listGroupsByTracks',
@@ -111,6 +133,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-duration',
   stringsKey: 'listGroups.byDuration',
   contentFunction: 'listGroupsByDuration',
@@ -118,6 +141,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'groups/by-latest-album',
   stringsKey: 'listGroups.byLatest',
   contentFunction: 'listGroupsByLatestAlbum',
@@ -125,42 +149,49 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-name',
   stringsKey: 'listTracks.byName',
   contentFunction: 'listTracksByName',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-album',
   stringsKey: 'listTracks.byAlbum',
   contentFunction: 'listTracksByAlbum',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-date',
   stringsKey: 'listTracks.byDate',
   contentFunction: 'listTracksByDate',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-duration',
   stringsKey: 'listTracks.byDuration',
   contentFunction: 'listTracksByDuration',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-duration-in-album',
   stringsKey: 'listTracks.byDurationInAlbum',
   contentFunction: 'listTracksByDurationInAlbum',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/by-times-referenced',
   stringsKey: 'listTracks.byTimesReferenced',
   contentFunction: 'listTracksByTimesReferenced',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/in-flashes/by-album',
   stringsKey: 'listTracks.inFlashes.byAlbum',
   contentFunction: 'listTracksInFlashesByAlbum',
@@ -168,6 +199,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/in-flashes/by-flash',
   stringsKey: 'listTracks.inFlashes.byFlash',
   contentFunction: 'listTracksInFlashesByFlash',
@@ -175,12 +207,14 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/with-lyrics',
   stringsKey: 'listTracks.withLyrics',
   contentFunction: 'listTracksWithLyrics',
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/with-sheet-music-files',
   stringsKey: 'listTracks.withSheetMusicFiles',
   contentFunction: 'listTracksWithSheetMusicFiles',
@@ -188,6 +222,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tracks/with-midi-project-files',
   stringsKey: 'listTracks.withMidiProjectFiles',
   contentFunction: 'listTracksWithMidiProjectFiles',
@@ -195,6 +230,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tags/by-name',
   stringsKey: 'listTags.byName',
   contentFunction: 'listTagsByName',
@@ -202,6 +238,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'tags/by-uses',
   stringsKey: 'listTags.byUses',
   contentFunction: 'listTagsByUses',
@@ -209,6 +246,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'all-sheet-music-files',
   stringsKey: 'other.allSheetMusic',
   contentFunction: 'listAllSheetMusicFiles',
@@ -217,6 +255,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'all-midi-project-files',
   stringsKey: 'other.allMidiProjectFiles',
   contentFunction: 'listAllMidiProjectFiles',
@@ -225,6 +264,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'all-additional-files',
   stringsKey: 'other.allAdditionalFiles',
   contentFunction: 'listAllAdditionalFiles',
@@ -232,6 +272,7 @@ listingSpec.push({
 });
 
 listingSpec.push({
+  scope: 'wiki',
   directory: 'random',
   stringsKey: 'other.randomPages',
   contentFunction: 'listRandomPageLinks',

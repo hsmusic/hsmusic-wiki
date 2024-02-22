@@ -1,4 +1,4 @@
-import {getTotalDuration} from '#wiki-data';
+import {getListingStringsKey, getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -9,48 +9,42 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({albumData, trackData, wikiInfo}) {
-    return {
-      wikiName: wikiInfo.name,
-      numTracks: trackData.length,
-      numAlbums: albumData.length,
-      totalDuration: getTotalDuration(trackData),
-    };
-  },
+  sprawl: ({albumData, trackData, wikiInfo}) => ({
+    wikiName: wikiInfo.name,
+    numTracks: trackData.length,
+    numAlbums: albumData.length,
+    totalDuration: getTotalDuration(trackData),
+  }),
 
-  relations(relation) {
-    const relations = {};
+  relations: (relation, sprawl, listing) => ({
+    layout:
+      relation('generatePageLayout'),
 
-    relations.layout =
-      relation('generatePageLayout');
+    sidebar:
+      relation('generateListingSidebar', listing),
 
-    relations.sidebar =
-      relation('generateListingSidebar', null);
+    list:
+      relation('generateListingIndexList', listing),
+  }),
 
-    relations.list =
-      relation('generateListingIndexList', null);
+  data: (sprawl, listing) => ({
+    stringsKey: getListingStringsKey(listing),
 
-    return relations;
-  },
-
-  data(sprawl) {
-    return {
-      wikiName: sprawl.wikiName,
-      numTracks: sprawl.numTracks,
-      numAlbums: sprawl.numAlbums,
-      totalDuration: sprawl.totalDuration,
-    };
-  },
+    wikiName: sprawl.wikiName,
+    numTracks: sprawl.numTracks,
+    numAlbums: sprawl.numAlbums,
+    totalDuration: sprawl.totalDuration,
+  }),
 
   generate(data, relations, {html, language}) {
     return relations.layout.slots({
-      title: language.$('listingIndex.title'),
+      title: language.$(data.stringsKey, 'title'),
 
       headingMode: 'static',
 
       mainContent: [
         html.tag('p',
-          language.$('listingIndex.infoLine', {
+          language.$(data.stringsKey, 'infoLine', {
             wiki: data.wikiName,
 
             tracks:
@@ -72,7 +66,7 @@ export default {
         html.tag('hr'),
 
         html.tag('p',
-          language.$('listingIndex.exploreList')),
+          language.$(data.stringsKey, 'exploreList')),
 
         relations.list.slot('mode', 'content'),
       ],
