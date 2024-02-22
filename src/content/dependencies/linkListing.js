@@ -1,5 +1,3 @@
-import {getListingStringsKey} from '#wiki-data';
-
 export default {
   contentDependencies: ['linkStationaryIndex', 'linkThing'],
   extraDependencies: ['language'],
@@ -19,7 +17,7 @@ export default {
   },
 
   data: (listing) => ({
-    stringsKey: getListingStringsKey(listing),
+    stringsKey: listing.stringsKey,
   }),
 
   generate: (data, relations, {language}) =>

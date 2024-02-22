@@ -18,7 +18,7 @@ export function getListingPaths({
   });
 
   const listings =
-    wikiData.listingSpec
+    wikiData.listingData
       .filter(listing => listing.scope === scope);
 
   const indexListing =

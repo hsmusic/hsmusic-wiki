@@ -768,6 +768,33 @@ export function isLanguageCode(string) {
   return true;
 }
 
+export function isListingDirectory(directory) {
+  isStringNonEmpty(directory);
+
+  if (directory.match(/[^a-z-/]i/))
+    throw new TypeError(`Expected only letters, dash, and slash, got "${directory}"`);
+
+  return true;
+}
+
+export function isListingScope(scope) {
+  isStringNonEmpty(scope);
+
+  if (scope.match(/[^a-z]/i))
+    throw new TypeError(`Expected only letters, got "${scope}"`);
+
+  return true;
+}
+
+export function isListingTarget(target) {
+  isStringNonEmpty(target);
+
+  if (target.match(/[^a-z]/i))
+    throw new TypeError(`Expected only letters, got "${target}"`);
+
+  return true;
+}
+
 export function isName(name) {
   return isContentString(name);
 }

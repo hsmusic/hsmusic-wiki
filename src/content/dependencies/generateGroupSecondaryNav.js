@@ -11,11 +11,12 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl: ({listingSpec, wikiInfo}) => ({
+  sprawl: ({listingData, wikiInfo}) => ({
     groupsByCategoryListing:
       (wikiInfo.enableListings
-        ? listingSpec
-            .find(l => l.directory === 'groups/by-category')
+        ? listingData.find(listing =>
+            listing.scope === 'wiki' &&
+            listing.directory === 'groups/by-category')
         : null),
   }),
 
