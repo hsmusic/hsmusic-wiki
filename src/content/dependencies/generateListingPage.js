@@ -1,5 +1,4 @@
 import {bindOpts, empty, stitchArrays} from '#sugar';
-import {getListingStringsKey, getIndexListingForScope} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -12,12 +11,7 @@ export default {
 
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl: ({listingSpec}, listing) => ({
-    indexListing:
-      getIndexListingForScope(listing.scope, {listingSpec}),
-  }),
-
-  relations(relation, sprawl, listing) {
+  relations(relation, listing) {
     const relations = {};
 
     relations.layout =
@@ -26,10 +20,8 @@ export default {
     relations.sidebar =
       relation('generateListingSidebar', listing);
 
-    if (sprawl.indexListing) {
-      relations.indexListingLink =
-        relation('linkListing', sprawl.indexListing);
-    }
+    relations.indexListingLink =
+      relation('linkListing', listing.indexListing);
 
     relations.chunkHeading =
       relation('generateContentHeading');
@@ -37,34 +29,39 @@ export default {
     relations.showSkipToSectionLinkTemplate =
       relation('linkTemplate');
 
-    if (listing.target.listings.length > 1) {
+    if (listing.sameTargetListings.length > 1) {
       relations.sameTargetListingLinks =
-        listing.target.listings
+        listing.sameTargetListings
           .map(listing => relation('linkListing', listing));
     }
 
-    if (!empty(listing.seeAlso)) {
+    if (!empty(listing.seeAlsoListings)) {
       relations.seeAlsoLinks =
-        listing.seeAlso
+        listing.seeAlsoListings
           .map(listing => relation('linkListing', listing));
     }
 
     return relations;
   },
 
-  data: (sprawl, listing) => ({
-    stringsKey: getListingStringsKey(listing),
+  data(listing) {
+    const data = {};
 
-    targetStringsKey: listing.target.stringsKey,
+    data.stringsKey = listing.stringsKey,
+    data.target = listing.target;
 
-    sameTargetListingStringsKeys:
-      listing.target.listings
-        .map(listing => getListingStringsKey(listing)),
+    if (listing.sameTargetListings.length > 1) {
+      data.sameTargetListingStringsKeys =
+        listing.sameTargetListings
+          .map(listing => listing.stringsKey);
 
-    sameTargetListingsCurrentIndex:
-      listing.target.listings
-        .indexOf(listing),
-  }),
+      data.sameTargetListingsCurrentIndex =
+        listing.target.listings
+          .indexOf(listing);
+    }
+
+    return data;
+  },
 
   slots: {
     type: {

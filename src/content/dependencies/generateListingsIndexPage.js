@@ -1,4 +1,4 @@
-import {getListingStringsKey, getTotalDuration} from '#wiki-data';
+import {getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -28,7 +28,7 @@ export default {
   }),
 
   data: (sprawl, listing) => ({
-    stringsKey: getListingStringsKey(listing),
+    stringsKey: listing.stringsKey,
 
     wikiName: sprawl.wikiName,
     numTracks: sprawl.numTracks,

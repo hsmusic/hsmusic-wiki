@@ -1,17 +1,10 @@
-import {getIndexListingForScope} from '#wiki-data';
-
 export default {
   contentDependencies: ['generateListingIndexList', 'linkListing'],
   extraDependencies: ['html', 'wikiData'],
 
-  sprawl: ({listingSpec}, currentListing) => ({
-    indexListing:
-      getIndexListingForScope(currentListing.scope, {listingSpec}),
-  }),
-
-  relations: (relation, sprawl, currentListing) => ({
+  relations: (relation, currentListing) => ({
     listingIndexLink:
-      relation('linkListing', sprawl.indexListing),
+      relation('linkListing', currentListing.indexListing),
 
     listingIndexList:
       relation('generateListingIndexList', currentListing),

@@ -52,14 +52,16 @@ import {bindFind, getAllFindSpecs} from '#find';
 
 // End of import time shenanigans (hopefully)
 
-import {showAggregate} from '#aggregate';
+import {mapAggregate, showAggregate, withAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
+import listingSpec from '#listing-spec';
 import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
+import thingConstructors from '#things';
 import {generateURLs, urlSpec} from '#urls';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
@@ -85,7 +87,6 @@ import genThumbs, {
 } from '#thumbs';
 
 import FileSizePreloader from './file-size-preloader.js';
-import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -130,6 +131,9 @@ async function main() {
 
     generateThumbnails:
       {...defaultStepStatus, name: `generate thumbnails`},
+
+    prepareListings:
+      {...defaultStepStatus, name: `prepare live listing objects`},
 
     loadDataFiles:
       {...defaultStepStatus, name: `load and process data files`},
@@ -210,11 +214,8 @@ async function main() {
 
   const selectedBuildMode = buildModes[selectedBuildModeFlag];
 
-  // This is about to get a whole lot more stuff put in it.
-  const wikiData = {
-    listingSpec,
-    listingTargetSpec,
-  };
+  // This is about to get a whole lot of stuff put in it.
+  const wikiData = {};
 
   const buildOptions = selectedBuildMode.getCLIOptions();
 
@@ -936,6 +937,50 @@ async function main() {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
+  Object.assign(stepStatusSummary.prepareListings, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
+
+  {
+    const {aggregate, result} =
+      mapAggregate(listingSpec,
+        {message: `Errors preparing live listing objects`},
+        spec =>
+          withAggregate({message: `Errors preparing listing ${spec.directory} (${spec.scope})`}, ({call}) => {
+            const listing = new thingConstructors.Listing();
+
+            for (const [property, value] of Object.entries(spec)) {
+              call(() => listing[property] = value);
+            }
+
+            return listing;
+          }));
+
+    wikiData.listingData = result;
+
+    try {
+      aggregate.close();
+    } catch (error) {
+      niceShowAggregate(error);
+
+      logError`There was a JavaScript error preparing live listing objects.`;
+      fileIssue();
+
+      Object.assign(stepStatusSummary.prepareListings, {
+        status: STATUS_FATAL_ERROR,
+        timeEnd: Date.now(),
+      });
+
+      return false;
+    }
+  }
+
+  Object.assign(stepStatusSummary.prepareListings, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
+
   Object.assign(stepStatusSummary.loadDataFiles, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
@@ -1092,7 +1137,7 @@ async function main() {
         'albums',
       ]),
 
-      listingSpec: new Set([
+      listingData: new Set([
         // Needed for computing page paths
         'contentFunction', 'featureFlag',
       ]),
@@ -1242,9 +1287,6 @@ async function main() {
 
     // TODO: Aggregate errors here, instead of just throwing.
     progressCallAll('Caching all data values', Object.entries(wikiData)
-      .filter(([key]) =>
-        key !== 'listingSpec' &&
-        key !== 'listingTargetSpec')
       .map(([key, value]) =>
         key === 'wikiInfo' ? [key, [value]] :
         key === 'homepageLayout' ? [key, [value]] :

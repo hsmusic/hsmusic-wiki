@@ -1,25 +1,11 @@
+/*
 import {showAggregate} from '#aggregate';
 import {empty} from '#sugar';
+import thingConstructors from '#things';
+
+const {Listing} = thingConstructors;
 
 const listingSpec = [];
-
-listingSpec.push({
-  scope: 'wiki',
-  directory: 'index',
-  stringsKey: 'index',
-  contentFunction: 'generateListingsIndexPage',
-});
-
-listingSpec.push({
-  scope: 'wiki',
-  directory: 'albums/by-name',
-  stringsKey: 'listAlbums.byName',
-  contentFunction: 'listAlbumsByName',
-
-  seeAlso: [
-    'tracks/by-album',
-  ],
-});
 
 listingSpec.push({
   scope: 'wiki',
@@ -153,13 +139,6 @@ listingSpec.push({
   directory: 'tracks/by-name',
   stringsKey: 'listTracks.byName',
   contentFunction: 'listTracksByName',
-});
-
-listingSpec.push({
-  scope: 'wiki',
-  directory: 'tracks/by-album',
-  stringsKey: 'listTracks.byAlbum',
-  contentFunction: 'listTracksByAlbum',
 });
 
 listingSpec.push({
@@ -351,3 +330,4 @@ for (const target of listingTargetSpec) {
 }
 
 export {listingSpec, listingTargetSpec};
+*/
