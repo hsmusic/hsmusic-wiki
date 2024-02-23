@@ -55,6 +55,17 @@ export function getKebabCase(name) {
     .toLowerCase();
 }
 
+export function getCamelCase(name) {
+  // Built on getKebabCase for normalizing purposes.
+  return getKebabCase(name)
+    .split('-')
+    .map((word, index) =>
+      (index >= 1
+        ? word[0].toUpperCase() + word.slice(1)
+        : word))
+    .join('');
+}
+
 // Specific data utilities
 
 // Matches heading details from commentary data in roughly the formats:
