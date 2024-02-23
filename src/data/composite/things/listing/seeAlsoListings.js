@@ -1,8 +1,7 @@
 import {input, templateCompositeFrom} from '#composite';
 import {isListingDirectory, looseArrayOf} from '#validators';
 
-import {exitWithoutDependency, exitWithoutUpdateValue}
-  from '#composite/control-flow';
+import {exitWithoutUpdateValue} from '#composite/control-flow';
 
 import withSameScopeListings from './withSameScopeListings.js';
 
