@@ -3,7 +3,6 @@
 // of allowed characters.
 
 import {isListingDirectory} from '#validators';
-import {getKebabCase} from '#wiki-data';
 
 export default function() {
   return {

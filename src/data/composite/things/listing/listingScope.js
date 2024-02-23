@@ -5,4 +5,4 @@ export default function() {
     flags: {update: true, expose: true},
     update: {validate: isListingScope},
   };
-};
+}

@@ -3,7 +3,7 @@ import Thing from '#thing';
 import {isStringNonEmpty} from '#validators';
 
 import {exitWithoutDependency} from '#composite/control-flow';
-import {name, wikiData} from '#composite/wiki-properties';
+import {wikiData} from '#composite/wiki-properties';
 
 import {
   listingDirectory,
@@ -129,4 +129,4 @@ export class Listing extends Thing {
       },
     ],
   });
-};
+}
