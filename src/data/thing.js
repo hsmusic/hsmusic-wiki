@@ -5,6 +5,7 @@ import {inspect} from 'node:util';
 
 import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
+import {compositeFrom} from '#composite';
 
 export default class Thing extends CacheableObject {
   static referenceType = Symbol.for('Thing.referenceType');
@@ -75,6 +76,34 @@ export default class Thing extends CacheableObject {
     }
 
     return `${thing.constructor[Thing.referenceType]}:${thing.directory}`;
+  }
+
+  static computePropertyDescriptors(constructor, {
+    thingConstructors,
+  }) {
+    if (!constructor[Thing.getPropertyDescriptors]) {
+      throw new Error(`Missing [Thing.getPropertyDescriptors] function`);
+    }
+
+    const results =
+      constructor[Thing.getPropertyDescriptors](thingConstructors);
+
+    for (const [key, value] of Object.entries(results)) {
+      if (Array.isArray(value)) {
+        results[key] = compositeFrom({
+          annotation: `${constructor.name}.${key}`,
+          compose: false,
+          steps: value,
+        });
+      } else if (value.toResolvedComposition) {
+        results[key] = compositeFrom(value.toResolvedComposition());
+      }
+    }
+
+    return {
+      ...constructor[CacheableObject.propertyDescriptors] ?? {},
+      ...results,
+    };
   }
 
   static extendDocumentSpec(thingClass, subspec) {
