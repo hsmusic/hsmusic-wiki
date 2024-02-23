@@ -3,7 +3,6 @@ import {fileURLToPath} from 'node:url';
 
 import {openAggregate, showAggregate} from '#aggregate';
 import {logError} from '#cli';
-import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
 
 import Thing from '#thing';
@@ -120,31 +119,14 @@ function descriptorAggregateHelper({
 }
 
 function evaluatePropertyDescriptors() {
-  const opts = {...allClasses};
-
   return descriptorAggregateHelper({
     message: `Errors evaluating Thing class property descriptors`,
 
     op(constructor) {
-      if (!constructor[Thing.getPropertyDescriptors]) {
-        throw new Error(`Missing [Thing.getPropertyDescriptors] function`);
-      }
-
-      const results = constructor[Thing.getPropertyDescriptors](opts);
-
-      for (const [key, value] of Object.entries(results)) {
-        if (Array.isArray(value)) {
-          results[key] = compositeFrom({
-            annotation: `${constructor.name}.${key}`,
-            compose: false,
-            steps: value,
-          });
-        } else if (value.toResolvedComposition) {
-          results[key] = compositeFrom(value.toResolvedComposition());
-        }
-      }
-
-      constructor.propertyDescriptors = results;
+      constructor.propertyDescriptors =
+        Thing.computePropertyDescriptors(constructor, {
+          thingConstructors: allClasses,
+        });
     },
 
     showFailedClasses(failedClasses) {
