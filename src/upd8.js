@@ -46,7 +46,7 @@ import {displayCompositeCacheAnalysis} from '#composite';
 import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
-import {prepareLiveListingObjects} from '#listings';
+import {linkListingDataArrays, prepareLiveListingObjects} from '#listings';
 import {isMain, traverse} from '#node-utils';
 import {writeSearchData} from '#search';
 import {sortByName} from '#sort';
@@ -1516,6 +1516,7 @@ async function main() {
   });
 
   linkWikiDataArrays(wikiData);
+  linkListingDataArrays(wikiData);
 
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,

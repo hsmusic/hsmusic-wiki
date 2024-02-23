@@ -107,3 +107,34 @@ export function prepareLiveListingObjects() {
   aggregate.close();
   return result;
 }
+
+export function linkListingDataArrays(wikiData) {
+  // This is a very silly function that only exists because we don't currently
+  // detect (and react to) the presence of wikiData properties in general.
+  // See issue #390.
+
+  if (!wikiData.listingData) return;
+
+  const linkableProperties = [
+    'albumData',
+    'artTagData',
+    'artistData',
+    'flashData',
+    'groupData',
+    'listingData',
+    'trackData',
+    'wikiData',
+  ];
+
+  for (const listing of wikiData.listingData) {
+    for (const property of linkableProperties) {
+      if (!Object.hasOwn(listing, property)) continue;
+
+      if (property === 'wikiData') {
+        listing[property] = wikiData;
+      } else {
+        listing[property] = wikiData[property];
+      }
+    }
+  }
+}
