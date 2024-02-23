@@ -59,7 +59,7 @@ export default {
           .map(listing => listing.stringsKey);
 
       data.sameTargetListingsCurrentIndex =
-        listing.target.listings
+        listing.sameTargetListings
           .indexOf(listing);
     }
 
