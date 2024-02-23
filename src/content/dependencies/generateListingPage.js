@@ -1,4 +1,5 @@
 import {bindOpts, empty, stitchArrays} from '#sugar';
+import {getCamelCase} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -173,7 +174,7 @@ export default {
           html.tag('p',
             language.$('listingPage.listingsFor', {
               target:
-                language.$('listingPage.target', data.targetStringsKey),
+                language.$('listingPage.target', getCamelCase(data.target)),
 
               listings:
                 language.formatUnitList(

@@ -1,5 +1,6 @@
-import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
 import {listingTargetOrder} from '#listing-spec';
+import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
+import {getCamelCase} from '#wiki-data';
 
 export default {
   contentDependencies: ['linkListing'],
@@ -87,7 +88,8 @@ export default {
 
     const targetTitles =
       data.targets
-        .map(target => language.$('listingPage.target', target));
+        .map(target =>
+          language.$('listingPage.target', getCamelCase(target)));
 
     switch (slots.mode) {
       case 'sidebar':
