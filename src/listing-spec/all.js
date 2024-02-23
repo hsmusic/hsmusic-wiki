@@ -7,6 +7,6 @@ export const listingTargetOrder = [
   'artist',
   'group',
   'track',
-  'tag',
+  'art-tag',
   'other',
 ];

@@ -23,6 +23,11 @@ export class Listing extends Thing {
     directory: listingDirectory(),
     target: listingTarget(),
 
+    featureFlag: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
+
     stringsKey: {
       flags: {update: true, expose: true},
 
