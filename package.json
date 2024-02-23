@@ -38,6 +38,7 @@
         "#import-heck": "./src/import-heck.js",
         "#language": "./src/data/language.js",
         "#listing-spec": "./src/listing-spec/all.js",
+        "#listings": "./src/listings.js",
         "#page-specs": "./src/page/index.js",
         "#node-utils": "./src/util/node-utils.js",
         "#page-util": "./src/page/page-util.js",
