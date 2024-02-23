@@ -57,7 +57,7 @@ import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
-import {prepareLiveListingObjects} from '#listings';
+import {linkListingDataArrays, prepareLiveListingObjects} from '#listings';
 import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
@@ -1078,6 +1078,7 @@ async function main() {
   });
 
   linkWikiDataArrays(wikiData);
+  linkListingDataArrays(wikiData);
 
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
