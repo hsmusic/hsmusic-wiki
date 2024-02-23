@@ -1,4 +1,5 @@
 import {input} from '#composite';
+import {sortChronologically} from '#sort';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 
@@ -23,7 +24,8 @@ export default {
     {
       dependencies: ['albumData'],
       compute: ({albumData}) =>
-        albumData.filter(album => album.date),
+        sortChronologically(
+          albumData.filter(album => album.date)),
     },
   ],
 };

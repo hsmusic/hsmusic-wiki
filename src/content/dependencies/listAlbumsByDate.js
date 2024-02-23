@@ -1,43 +1,26 @@
-import {sortChronologically} from '#sort';
 import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
+  extraDependencies: ['language'],
 
-  sprawl({albumData}) {
-    return {albumData};
-  },
+  relations: (relation, listing) => ({
+    page:
+      relation('generateListingPage', listing),
 
-  query({albumData}, spec) {
-    return {
-      spec,
+    albumLinks:
+      listing.data
+        .map(album => relation('linkAlbum', album)),
+  }),
 
-      albums:
-        sortChronologically(albumData.filter(album => album.date)),
-    };
-  },
+  data: (listing) => ({
+    dates:
+      listing.data
+        .map(album => album.date),
+  }),
 
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
-
-      albumLinks:
-        query.albums
-          .map(album => relation('linkAlbum', album)),
-    };
-  },
-
-  data(query) {
-    return {
-      dates:
-        query.albums
-          .map(album => album.date),
-    };
-  },
-
-  generate(data, relations, {language}) {
-    return relations.page.slots({
+  generate: (data, relations, {language}) =>
+    relations.page.slots({
       type: 'rows',
       rows:
         stitchArrays({
@@ -47,6 +30,5 @@ export default {
             album: link,
             date: language.formatDate(date),
           })),
-    });
-  },
+    }),
 };
