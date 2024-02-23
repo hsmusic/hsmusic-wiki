@@ -780,8 +780,8 @@ export function isListingDirectory(directory) {
 export function isListingScope(scope) {
   isStringNonEmpty(scope);
 
-  if (scope.match(/[^a-z]/i))
-    throw new TypeError(`Expected only letters, got "${scope}"`);
+  if (scope.match(/[^a-z-]/i))
+    throw new TypeError(`Expected only letters and dash, got "${scope}"`);
 
   return true;
 }
@@ -789,8 +789,8 @@ export function isListingScope(scope) {
 export function isListingTarget(target) {
   isStringNonEmpty(target);
 
-  if (target.match(/[^a-z]/i))
-    throw new TypeError(`Expected only letters, got "${target}"`);
+  if (target.match(/[^a-z-]/i))
+    throw new TypeError(`Expected only letters and dash, got "${target}"`);
 
   return true;
 }
