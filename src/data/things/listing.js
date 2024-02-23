@@ -129,4 +129,23 @@ export class Listing extends Thing {
       },
     ],
   });
+
+  static [Thing.findSpecs] = {
+    listing: {
+      referenceTypes: ['listing'],
+      bindTo: 'listingData',
+
+      getMatchableNames: _listing => [],
+
+      getMatchableDirectories: listing => {
+        const directories = [`${listing.scope}/${listing.directory}`];
+
+        if (listing.scope === 'wiki') {
+          directories.push(listing.directory);
+        }
+
+        return directories;
+      },
+    },
+  };
 }
