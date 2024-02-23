@@ -52,16 +52,15 @@ import {bindFind, getAllFindSpecs} from '#find';
 
 // End of import time shenanigans (hopefully)
 
-import {mapAggregate, showAggregate, withAggregate} from '#aggregate';
+import {showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
-import listingSpec from '#listing-spec';
+import {prepareLiveListingObjects} from '#listings';
 import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
-import thingConstructors from '#things';
 import {generateURLs, urlSpec} from '#urls';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
@@ -942,38 +941,20 @@ async function main() {
     timeStart: Date.now(),
   });
 
-  {
-    const {aggregate, result} =
-      mapAggregate(listingSpec,
-        {message: `Errors preparing live listing objects`},
-        spec =>
-          withAggregate({message: `Errors preparing listing ${spec.directory} (${spec.scope})`}, ({call}) => {
-            const listing = new thingConstructors.Listing();
+  try {
+    wikiData.listingData = prepareLiveListingObjects();
+  } catch (error) {
+    niceShowAggregate(error);
 
-            for (const [property, value] of Object.entries(spec)) {
-              call(() => listing[property] = value);
-            }
+    logError`There was a JavaScript error preparing live listing objects.`;
+    fileIssue();
 
-            return listing;
-          }));
+    Object.assign(stepStatusSummary.prepareListings, {
+      status: STATUS_FATAL_ERROR,
+      timeEnd: Date.now(),
+    });
 
-    wikiData.listingData = result;
-
-    try {
-      aggregate.close();
-    } catch (error) {
-      niceShowAggregate(error);
-
-      logError`There was a JavaScript error preparing live listing objects.`;
-      fileIssue();
-
-      Object.assign(stepStatusSummary.prepareListings, {
-        status: STATUS_FATAL_ERROR,
-        timeEnd: Date.now(),
-      });
-
-      return false;
-    }
+    return false;
   }
 
   Object.assign(stepStatusSummary.prepareListings, {
