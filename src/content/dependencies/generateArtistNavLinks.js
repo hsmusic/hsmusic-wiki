@@ -82,12 +82,6 @@ export default {
     return [
       {auto: 'home'},
 
-      data.enableListings &&
-        {
-          path: ['localized.listingIndex'],
-          title: language.$('listingIndex.title'),
-        },
-
       {
         accent,
         html:
