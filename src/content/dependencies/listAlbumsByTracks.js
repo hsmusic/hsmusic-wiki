@@ -1,42 +1,25 @@
-import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays} from '#sugar';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],
-  extraDependencies: ['language', 'wikiData'],
+  extraDependencies: ['language'],
 
-  sprawl({albumData}) {
-    return {albumData};
-  },
+  relations: (relation, listing) => ({
+    page:
+      relation('generateListingPage', listing),
 
-  query({albumData}, spec) {
-    const albums = sortAlphabetically(albumData.slice());
-    const counts = albums.map(album => album.tracks.length);
+    albumLinks:
+      listing.data.albums
+        .map(album => relation('linkAlbum', album)),
+  }),
 
-    filterByCount(albums, counts);
-    sortByCount(albums, counts, {greatestFirst: true});
+  data: (listing) => ({
+    counts:
+      listing.data.counts,
+  }),
 
-    return {spec, albums, counts};
-  },
-
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
-
-      albumLinks:
-        query.albums
-          .map(album => relation('linkAlbum', album)),
-    };
-  },
-
-  data(query) {
-    return {
-      counts: query.counts,
-    };
-  },
-
-  generate(data, relations, {language}) {
-    return relations.page.slots({
+  generate: (data, relations, {language}) =>
+    relations.page.slots({
       type: 'rows',
       rows:
         stitchArrays({
@@ -46,6 +29,5 @@ export default {
             album: link,
             tracks: language.countTracks(count, {unit: true}),
           })),
-    });
-  },
+    }),
 };

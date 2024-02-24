@@ -1,3 +1,9 @@
+import {input} from '#composite';
+
+import {exitWithoutDependency, exposeDependency}
+  from '#composite/control-flow';
+import {withThingsSortedAlphabetically} from '#composite/wiki-data';
+
 export default {
   scope: 'wiki',
   directory: 'albums/by-name',
@@ -8,5 +14,20 @@ export default {
 
   seeAlsoListings: [
     'tracks/by-album',
+  ],
+
+  data: () => [
+    exitWithoutDependency({
+      dependency: 'albumData',
+      value: input.value([]),
+    }),
+
+    withThingsSortedAlphabetically({
+      things: 'albumData',
+    }),
+
+    exposeDependency({
+      dependency: '#sortedThings',
+    }),
   ],
 };
