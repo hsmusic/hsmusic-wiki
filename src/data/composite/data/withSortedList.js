@@ -64,6 +64,14 @@ export default templateCompositeFrom({
           new Map(Array.from(symbols,
             (symbol, index) => [symbol, index]));
 
+        const assertEqual = (symbol1, symbol2) => {
+          if (equalSymbols.has(symbol1)) {
+            equalSymbols.get(symbol1).add(symbol2);
+          } else {
+            equalSymbols.set(symbol1, new Set([symbol2]));
+          }
+        };
+
         symbols.sort((symbol1, symbol2) => {
           const comparison =
             sortFn(
@@ -71,17 +79,8 @@ export default templateCompositeFrom({
               list[indexMap.get(symbol2)]);
 
           if (comparison === 0) {
-            if (equalSymbols.has(symbol1)) {
-              equalSymbols.get(symbol1).add(symbol2);
-            } else {
-              equalSymbols.set(symbol1, new Set([symbol2]));
-            }
-
-            if (equalSymbols.has(symbol2)) {
-              equalSymbols.get(symbol2).add(symbol1);
-            } else {
-              equalSymbols.set(symbol2, new Set([symbol1]));
-            }
+            assertEqual(symbol1, symbol2);
+            assertEqual(symbol2, symbol1);
           }
 
           return comparison;
@@ -95,22 +94,28 @@ export default templateCompositeFrom({
 
         const stableToUnstable =
           symbols
-            .map((symbol, index) =>
-              index > 0 &&
-              equalSymbols.get(symbols[index - 1])?.has(symbol))
-            .reduce((accumulator, collapseEqual) => {
-              if (empty(accumulator)) {
-                accumulator.push(0);
-              } else {
-                const last = accumulator.at(-1);
-                if (collapseEqual) {
-                  accumulator.push(last);
-                } else {
-                  accumulator.push(last + 1);
-                }
+            .map((current, index) => {
+              if (index === 0) {
+                return false;
               }
+
+              const previous = symbols[index - 1];
+              return equalSymbols.get(previous)?.has(current);
+            })
+            .reduce((accumulator, collapseEqual, index) => {
+              if (index === 0) {
+                return accumulator;
+              }
+
+              const last = accumulator.at(-1);
+              if (collapseEqual) {
+                accumulator.push(last);
+              } else {
+                accumulator.push(last + 1);
+              }
+
               return accumulator;
-            }, []);
+            }, [0]);
 
         const unstableSortIndices =
           sortIndices.map(stable => stableToUnstable[stable]);
