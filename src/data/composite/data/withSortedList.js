@@ -54,19 +54,21 @@ export default templateCompositeFrom({
         [input('list')]: list,
         [input('sort')]: sortFn,
       }) {
-        const symbols =
-          Array.from({length: list.length}, () => Symbol());
+        const originalIndices =
+          Array.from({length: list.length}, (_, index) => index);
 
-        const equalSymbols =
-          new Map();
+        const symbols = [];
+        const symbolToIndex = new Map();
+        const indexToSymbol = new Map();
 
-        const symbolToIndex =
-          new Map(Array.from(symbols,
-            (symbol, index) => [symbol, index]));
+        for (const index of originalIndices) {
+          const symbol = Symbol();
+          symbols.push(symbol);
+          symbolToIndex.set(symbol, index);
+          indexToSymbol.set(index, symbol);
+        }
 
-        const indexToSymbol =
-          new Map(Array.from(symbols,
-            (symbol, index) => [index, symbol]));
+        const equalSymbols = new Map();
 
         const assertEqual = (symbol1, symbol2) => {
           if (equalSymbols.has(symbol1)) {
@@ -75,6 +77,9 @@ export default templateCompositeFrom({
             equalSymbols.set(symbol1, new Set([symbol2]));
           }
         };
+
+        const isEqual = (symbol1, symbol2) =>
+          !!equalSymbols.get(symbol1)?.has(symbol2);
 
         symbols.sort((symbol1, symbol2) => {
           const comparison =
@@ -96,33 +101,29 @@ export default templateCompositeFrom({
         const sortedList =
           sortIndices.map(index => list[index]);
 
+        const push = (array, value) => {
+          array.push(value);
+          return array;
+        };
+
         const stableToUnstable =
           symbols
-            .map((current, index) => {
-              if (index === 0) {
-                return false;
-              }
-
-              const previous = symbols[index - 1];
-              return equalSymbols.get(previous)?.has(current);
-            })
-            .reduce((accumulator, collapseEqual, index) => {
-              if (index === 0) {
-                return accumulator;
-              }
-
-              const last = accumulator.at(-1);
-              if (collapseEqual) {
-                accumulator.push(last);
-              } else {
-                accumulator.push(last + 1);
-              }
-
-              return accumulator;
-            }, [0]);
+            .map(
+              (current, index) =>
+                (index === 0
+                  ? false
+                  : isEqual(current, symbols[index - 1])))
+            .reduce(
+              (accumulator, equalsPrevious, index) =>
+                (index === 0
+                  ? accumulator
+                  : (equalsPrevious
+                      ? push(accumulator, accumulator.at(-1))
+                      : push(accumulator, accumulator.at(-1) + 1))),
+              [0]);
 
         const unstableSortIndices =
-          Array.from({length: list.length}, (_, index) => index)
+          originalIndices
             .map(index => indexToSymbol.get(index))
             .map(symbol => symbols.indexOf(symbol))
             .map(stable => stableToUnstable[stable]);
