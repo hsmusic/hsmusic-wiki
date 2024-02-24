@@ -122,10 +122,10 @@ export default templateCompositeFrom({
             }, [0]);
 
         const unstableSortIndices =
-          Array.from(
-            {length: list.length},
-            (_, index) =>
-              stableToUnstable[symbols.indexOf(indexToSymbol.get(index))]);
+          Array.from({length: list.length}, (_, index) => index)
+            .map(index => indexToSymbol.get(index))
+            .map(symbol => symbols.indexOf(symbol))
+            .map(stable => stableToUnstable[stable]);
 
         return continuation({
           ['#sortedList']: sortedList,
