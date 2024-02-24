@@ -95,11 +95,16 @@ export default templateCompositeFrom({
           return comparison;
         });
 
-        const sortIndices =
-          symbols.map(symbol => symbolToIndex.get(symbol));
+        const symbolToStable = new Map();
+        const stableSortIndices = [];
+        const sortedList = [];
 
-        const sortedList =
-          sortIndices.map(index => list[index]);
+        for (const [stableIndex, symbol] of symbols.entries()) {
+          const sourceIndex = symbolToIndex.get(symbol);
+          stableSortIndices.push(sourceIndex);
+          symbolToStable.set(symbol, stableIndex);
+          sortedList.push(list[sourceIndex]);
+        }
 
         const push = (array, value) => {
           array.push(value);
@@ -119,12 +124,12 @@ export default templateCompositeFrom({
         const unstableSortIndices =
           originalIndices
             .map(index => indexToSymbol.get(index))
-            .map(symbol => symbols.indexOf(symbol))
+            .map(symbol => symbolToStable.get(symbol))
             .map(stable => stableToUnstable[stable]);
 
         return continuation({
           ['#sortedList']: sortedList,
-          ['#sortIndices']: sortIndices,
+          ['#sortIndices']: stableSortIndices,
           ['#unstableSortIndices']: unstableSortIndices,
         });
       },
