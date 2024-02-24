@@ -98,7 +98,6 @@ export default templateCompositeFrom({
 
         for (const [stableIndex, symbol] of symbols.entries()) {
           const sourceIndex = symbolToIndex.get(symbol);
-          stableSortIndices.push(sourceIndex);
           sortedList.push(list[sourceIndex]);
 
           if (stableIndex > 0) {
@@ -108,6 +107,7 @@ export default templateCompositeFrom({
             }
           }
 
+          stableSortIndices[sourceIndex] = stableIndex;
           unstableSortIndices[sourceIndex] = unstableIndex;
         }
 
