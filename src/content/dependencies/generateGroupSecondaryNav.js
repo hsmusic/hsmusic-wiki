@@ -84,12 +84,12 @@ export default {
       class: 'nav-links-groups',
       content:
         (!relations.previousGroupLink && !relations.nextGroupLink
-          ? categoryLink
+          ? categoryLink ?? html.blank()
           : html.tag('span',
               relations.colorStyle,
 
               [
-                categoryLink.slot('color', false),
+                categoryLink?.slot('color', false),
                 `(${language.formatUnitList(previousNextPart)})`,
               ])),
     });
