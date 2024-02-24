@@ -35,7 +35,6 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {empty} from '#sugar';
 
 export default templateCompositeFrom({
   annotation: `withSortedList`,
