@@ -107,20 +107,14 @@ export default templateCompositeFrom({
         };
 
         const stableToUnstable =
-          symbols
-            .map(
-              (current, index) =>
-                (index === 0
-                  ? false
-                  : isEqual(current, symbols[index - 1])))
-            .reduce(
-              (accumulator, equalsPrevious, index) =>
-                (index === 0
-                  ? accumulator
-                  : (equalsPrevious
-                      ? push(accumulator, accumulator.at(-1))
-                      : push(accumulator, accumulator.at(-1) + 1))),
-              [0]);
+          symbols.reduce(
+            (accumulator, current, index) =>
+              (index === 0
+                ? push(accumulator, 0)
+                : (isEqual(current, symbols[index - 1])
+                    ? push(accumulator, accumulator.at(-1))
+                    : push(accumulator, accumulator.at(-1) + 1))),
+            []);
 
         const unstableSortIndices =
           originalIndices
