@@ -60,9 +60,13 @@ export default templateCompositeFrom({
         const equalSymbols =
           new Map();
 
-        const indexMap =
+        const symbolToIndex =
           new Map(Array.from(symbols,
             (symbol, index) => [symbol, index]));
+
+        const indexToSymbol =
+          new Map(Array.from(symbols,
+            (symbol, index) => [index, symbol]));
 
         const assertEqual = (symbol1, symbol2) => {
           if (equalSymbols.has(symbol1)) {
@@ -75,8 +79,8 @@ export default templateCompositeFrom({
         symbols.sort((symbol1, symbol2) => {
           const comparison =
             sortFn(
-              list[indexMap.get(symbol1)],
-              list[indexMap.get(symbol2)]);
+              list[symbolToIndex.get(symbol1)],
+              list[symbolToIndex.get(symbol2)]);
 
           if (comparison === 0) {
             assertEqual(symbol1, symbol2);
@@ -87,7 +91,7 @@ export default templateCompositeFrom({
         });
 
         const sortIndices =
-          symbols.map(symbol => indexMap.get(symbol));
+          symbols.map(symbol => symbolToIndex.get(symbol));
 
         const sortedList =
           sortIndices.map(index => list[index]);
@@ -118,7 +122,10 @@ export default templateCompositeFrom({
             }, [0]);
 
         const unstableSortIndices =
-          sortIndices.map(stable => stableToUnstable[stable]);
+          Array.from(
+            {length: list.length},
+            (_, index) =>
+              stableToUnstable[symbols.indexOf(indexToSymbol.get(index))]);
 
         return continuation({
           ['#sortedList']: sortedList,
