@@ -54,13 +54,10 @@ export default templateCompositeFrom({
         [input('list')]: list,
         [input('sort')]: sortFn,
       }) {
-        const originalIndices =
-          Array.from({length: list.length}, (_, index) => index);
-
         const symbols = [];
         const symbolToIndex = new Map();
 
-        for (const index of originalIndices) {
+        for (const index of list.keys()) {
           const symbol = Symbol();
           symbols.push(symbol);
           symbolToIndex.set(symbol, index);
@@ -104,8 +101,11 @@ export default templateCompositeFrom({
           stableSortIndices.push(sourceIndex);
           sortedList.push(list[sourceIndex]);
 
-          if (stableIndex > 0 && !isEqual(symbol, symbols[stableIndex - 1])) {
-            unstableIndex++;
+          if (stableIndex > 0) {
+            const previous = symbols[stableIndex - 1];
+            if (!isEqual(symbol, previous)) {
+              unstableIndex++;
+            }
           }
 
           unstableSortIndices[sourceIndex] = unstableIndex;
