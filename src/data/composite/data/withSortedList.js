@@ -92,7 +92,7 @@ export default templateCompositeFrom({
         const sortedList =
           sortIndices.map(index => list[index]);
 
-        const stableToUnstable =
+        const unstableSortIndices =
           symbols
             .map((current, index) => {
               if (index === 0) {
@@ -116,9 +116,6 @@ export default templateCompositeFrom({
 
               return accumulator;
             }, [0]);
-
-        const unstableSortIndices =
-          sortIndices.map(stable => stableToUnstable[stable]);
 
         return continuation({
           ['#sortedList']: sortedList,
