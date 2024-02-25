@@ -1266,6 +1266,7 @@ img.pixelate, .pixelate img {
 .reveal .image.reveal-thumbnail {
   position: absolute;
   top: 0;
+  left: 0;
   image-rendering: pixelated;
 }
 
@@ -1309,6 +1310,15 @@ img.pixelate, .pixelate img {
   border: 1px dotted var(--primary-color);
   border-radius: var(--reveal-border-radius);
   pointer-events: none;
+
+  /* By an awkward DOM intersection, this element might be
+   * .image-inner-area::after, which is already styled with
+   * a slight visual effect. Guarantee that the properties
+   * set to that end are overwritten, and fully co-opt it
+   * to serve as the interaction cue instead.
+   */
+  box-shadow: none;
+  opacity: 1;
 }
 
 .reveal:not(.revealed) .image-inner-area {
@@ -1317,6 +1327,7 @@ img.pixelate, .pixelate img {
 
 .reveal:not(.revealed) .image-outer-area > *:hover::after {
   border-style: solid;
+  box-shadow: 0 0 0 1.5px #00000099 inset;
 }
 
 .reveal:not(.revealed) .image-outer-area > *:hover .image {
