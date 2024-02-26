@@ -3,6 +3,12 @@
 import {accumulateSum, empty} from './sugar.js';
 import {sortByDate} from './sort.js';
 
+// This is a duplicate binding of filterMultipleArrays that's included purely
+// to leave wiki-data.js compatible with the release build of HSMusic.
+// Sorry! This is really ridiculous!! If the next update after 10/25/2023 has
+// released, this binding is no longer needed!
+export {filterMultipleArrays} from './sugar.js';
+
 // Generic value operations
 
 export function getKebabCase(name) {
