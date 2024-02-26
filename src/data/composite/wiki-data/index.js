@@ -13,3 +13,4 @@ export {default as withResolvedReferenceList} from './withResolvedReferenceList.
 export {default as withReverseContributionList} from './withReverseContributionList.js';
 export {default as withReverseReferenceList} from './withReverseReferenceList.js';
 export {default as withThingsSortedAlphabetically} from './withThingsSortedAlphabetically.js';
+export {default as withThingsSortedChronologically} from './withThingsSortedChronologically.js';
