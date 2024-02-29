@@ -201,7 +201,7 @@ function parseNodes(input, i, stopAt, textOnly) {
       string = string.trimEnd();
     }
 
-    string = squashBackslashes(string);
+    string = cleanRawText(string);
 
     if (string.length) {
       nodes.push({i: iString, iEnd: i, type: 'text', data: string});
@@ -427,6 +427,19 @@ export function squashBackslashes(text) {
   // into later formatting (i.e. markdown). Note that we do
   // NOT compress double backslashes into single backslashes.
   return text.replace(/([^\\](?:\\{2})*)\\(?![\\*_-])/g, '$1');
+}
+
+export function restoreRawHTMLTags(text) {
+  // Replace stuff like <html:a> with <a>; these signal that
+  // the tag shouldn't be processed by the replacer system,
+  // and should just be embedded into the content as raw HTML.
+  return text.replace(/<html:(.*?)(?=[ >])/g, '<$1');
+}
+
+export function cleanRawText(text) {
+  text = squashBackslashes(text);
+  text = restoreRawHTMLTags(text);
+  return text;
 }
 
 export function postprocessImages(inputNodes) {
