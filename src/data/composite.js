@@ -998,8 +998,8 @@ export function compositeFrom(description) {
       debug(() => [
         `step #${i+1} - ${callingTransformForThisStep ? 'transform' : 'compute'}`,
         `with dependencies:`, filteredDependencies,
-        `selecting:`, selectDependencies,
-        `from available:`, filterableDependencies,
+        // `selecting:`, selectDependencies,
+        // `from available:`, filterableDependencies,
         ...callingTransformForThisStep ? [`from value:`, valueSoFar] : []]);
 
       let result;

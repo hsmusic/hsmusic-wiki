@@ -1,5 +1,5 @@
 import {input} from '#composite';
-import {sortAlphabetically, sortByCount} from '#sort';
+import {sortByCount} from '#sort';
 import {filterByCount} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
