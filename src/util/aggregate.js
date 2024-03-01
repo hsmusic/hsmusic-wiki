@@ -294,6 +294,7 @@ export function _withAggregate(mode, aggregateOpts, fn) {
 
 export const unhelpfulTraceLines = [
   /sugar/,
+  /aggregate/,
   /node:/,
   /<anonymous>/,
 ];
