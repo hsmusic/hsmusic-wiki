@@ -33,7 +33,7 @@ export default {
   generate: (data, slots, {html, language}) =>
     html.tag('a',
       {href: data.url},
-      {class: 'nowrap'},
+      {class: 'external-link'},
 
       slots.tab === 'separate' &&
         {target: '_blank'},

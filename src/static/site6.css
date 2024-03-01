@@ -468,6 +468,10 @@ a:not([href]):hover {
   text-decoration: none;
 }
 
+.external-link {
+  white-space: nowrap;
+}
+
 .nav-main-links > span > span {
   white-space: nowrap;
 }
@@ -757,6 +761,10 @@ ul.image-details li {
 
 .commentary-entry-accent {
   font-style: oblique;
+}
+
+.commentary-entry-body .external-link {
+  white-space: normal;
 }
 
 .commentary-art {
