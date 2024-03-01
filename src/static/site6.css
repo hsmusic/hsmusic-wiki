@@ -472,6 +472,14 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
+.external-link.indicate-external::after {
+  content: ' ➚';
+}
+
+.external-link.indicate-external:hover::after {
+  color: white;
+}
+
 .nav-main-links .nav-link.current > span.nav-link-content > a {
   font-weight: 800;
 }

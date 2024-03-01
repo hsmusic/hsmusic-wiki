@@ -24,6 +24,11 @@ export default {
       default: 'generic',
     },
 
+    indicateExternal: {
+      type: 'boolean',
+      default: false,
+    },
+
     tab: {
       validate: v => v.is('default', 'separate'),
       default: 'default',
@@ -31,28 +36,54 @@ export default {
   },
 
   generate(data, slots, {html, language}) {
-    const linkAttributes = html.attributes();
-    let linkContent = slots.content;
-
-    if (html.isBlank(linkContent)) {
-      linkContent =
-        language.formatExternalLink(data.url, {
-          style: slots.style,
-          context: slots.context,
-        });
-    }
+    let formattedLink =
+      language.formatExternalLink(data.url, {
+        style: slots.style,
+        context: slots.context,
+      });
 
     // Fall back to platform if nothing matched the desired style.
-    if (html.isBlank(linkContent) && slots.style !== 'platform') {
-      linkContent =
+    if (html.isBlank(formattedLink) && slots.style !== 'platform') {
+      formattedLink =
         language.formatExternalLink(data.url, {
           style: 'platform',
           context: slots.context,
         });
     }
 
+    const linkAttributes = html.attributes();
+    const linkContent =
+      (html.isBlank(slots.content)
+        ? formattedLink
+        : slots.content);
+
     linkAttributes.set('class', 'external-link');
     linkAttributes.set('href', data.url);
+
+    if (slots.indicateExternal) {
+      linkAttributes.add('class', 'indicate-external');
+
+      let titleText;
+      if (slots.tab === 'separate') {
+        if (html.isBlank(slots.content)) {
+          titleText =
+            language.$('misc.external.opensInNewTab.annotation');
+        } else {
+          titleText =
+            language.$('misc.external.opensInNewTab', {
+              link: formattedLink,
+              annotation:
+                language.$('misc.external.opensInNewTab.annotation'),
+            });
+        }
+      } else if (!html.isBlank(slots.content)) {
+        titleText = formattedLink;
+      }
+
+      if (titleText) {
+        linkAttributes.set('title', titleText.toString());
+      }
+    }
 
     if (slots.tab === 'separate') {
       linkAttributes.set('target', '_blank');
