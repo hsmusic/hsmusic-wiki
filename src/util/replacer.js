@@ -5,6 +5,8 @@
 // function, which converts nodes parsed here into actual HTML, links, etc
 // for embedding in a wiki webpage.
 
+import * as marked from 'marked';
+
 import * as html from '#html';
 import {escapeRegex, typeAppearance} from '#sugar';
 
@@ -580,6 +582,60 @@ export function postprocessHeadings(inputNodes) {
   return outputNodes;
 }
 
+export function postprocessExternalLinks(inputNodes) {
+  const outputNodes = [];
+
+  for (const node of inputNodes) {
+    if (node.type !== 'text') {
+      outputNodes.push(node);
+      continue;
+    }
+
+    const plausibleLinkRegexp = /\[.*\)/g;
+
+    let textContent = '';
+
+    let plausibleMatch = null, parseFrom = 0;
+    while (plausibleMatch = plausibleLinkRegexp.exec(node.data)) {
+      textContent += node.data.slice(parseFrom, plausibleMatch.index);
+
+      const definiteMatch =
+        marked.Lexer.rules.inline.link.exec(
+          node.data.slice(plausibleMatch.index));
+
+      if (definiteMatch) {
+        const {1: label, 2: href} = definiteMatch;
+
+        // Split the containing text node into two - the second of these will
+        // be added after iterating over matches, or by the next match.
+        if (textContent.length) {
+          outputNodes.push({type: 'text', data: textContent});
+          textContent = '';
+        }
+
+        outputNodes.push({type: 'external-link', data: {label, href}});
+
+        parseFrom =
+          plausibleMatch.index +
+          definiteMatch.index +
+          definiteMatch[0].length;
+      } else {
+        parseFrom = plausibleMatch.index;
+      }
+    }
+
+    if (parseFrom !== node.data.length) {
+      textContent += node.data.slice(parseFrom);
+    }
+
+    if (textContent.length) {
+      outputNodes.push({type: 'text', data: textContent});
+    }
+  }
+
+  return outputNodes;
+}
+
 export function parseInput(input) {
   if (typeof input !== 'string') {
     throw new TypeError(`Expected input to be string, got ${typeAppearance(input)}`);
@@ -589,6 +645,7 @@ export function parseInput(input) {
     let output = parseNodes(input, 0);
     output = postprocessImages(output);
     output = postprocessHeadings(output);
+    output = postprocessExternalLinks(output);
     return output;
   } catch (errorNode) {
     if (errorNode.type !== 'error') {
