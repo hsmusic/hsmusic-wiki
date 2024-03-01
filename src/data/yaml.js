@@ -451,6 +451,74 @@ export function parseDimensions(string) {
   return nums;
 }
 
+// Hear me out, it's been like 1200 years since I wrote the rest of
+// this beautifully error-containing code and I don't know how to
+// integrate this nicely. So I'm just returning the result and the
+// error that should be thrown. Yes, we're back in callback hell,
+// just without the callbacks. Thank you.
+export function filterBlankDocuments(documents) {
+  const aggregate = openAggregate({
+    message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
+  });
+
+  const filteredDocuments =
+    documents
+      .filter(doc => doc !== null);
+
+  if (filteredDocuments.length !== documents.length) {
+    const blankIndexRangeInfo =
+      documents
+        .map((doc, index) => [doc, index])
+        .filter(([doc]) => doc === null)
+        .map(([doc, index]) => index)
+        .reduce((accumulator, index) => {
+          if (accumulator.length === 0) {
+            return [[index, index]];
+          }
+          const current = accumulator.at(-1);
+          const rest = accumulator.slice(0, -1);
+          if (current[1] === index - 1) {
+            return rest.concat([[current[0], index]]);
+          } else {
+            return accumulator.concat([[index, index]]);
+          }
+        }, [])
+        .map(([start, end]) => ({
+          start,
+          end,
+          count: end - start + 1,
+          previous: atOffset(documents, start, -1),
+          next: atOffset(documents, end, +1),
+        }));
+
+    for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
+      const parts = [];
+
+      if (count === 1) {
+        const range = `#${start + 1}`;
+        parts.push(`${count} document (${colors.yellow(range)}), `);
+      } else {
+        const range = `#${start + 1}-${end + 1}`;
+        parts.push(`${count} documents (${colors.yellow(range)}), `);
+      }
+
+      if (previous === null) {
+        parts.push(`at start of file`);
+      } else if (next === null) {
+        parts.push(`at end of file`);
+      } else {
+        const previousDescription = Object.entries(previous).at(0).join(': ');
+        const nextDescription = Object.entries(next).at(0).join(': ');
+        parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
+      }
+
+      aggregate.push(new Error(parts.join('')));
+    }
+  }
+
+  return {documents: filteredDocuments, aggregate};
+}
+
 // documentModes: Symbols indicating sets of behavior for loading and processing
 // data files.
 export const documentModes = {
@@ -575,74 +643,6 @@ export async function loadAndProcessDataDocuments({dataPath}) {
         if (!Object.values(documentModes).includes(documentMode)) {
           throw new Error(`Invalid documentMode: ${documentMode.toString()}`);
         }
-
-        // Hear me out, it's been like 1200 years since I wrote the rest of
-        // this beautifully error-containing code and I don't know how to
-        // integrate this nicely. So I'm just returning the result and the
-        // error that should be thrown. Yes, we're back in callback hell,
-        // just without the callbacks. Thank you.
-        const filterBlankDocuments = documents => {
-          const aggregate = openAggregate({
-            message: `Found blank documents - check for extra '${colors.cyan(`---`)}'`,
-          });
-
-          const filteredDocuments =
-            documents
-              .filter(doc => doc !== null);
-
-          if (filteredDocuments.length !== documents.length) {
-            const blankIndexRangeInfo =
-              documents
-                .map((doc, index) => [doc, index])
-                .filter(([doc]) => doc === null)
-                .map(([doc, index]) => index)
-                .reduce((accumulator, index) => {
-                  if (accumulator.length === 0) {
-                    return [[index, index]];
-                  }
-                  const current = accumulator.at(-1);
-                  const rest = accumulator.slice(0, -1);
-                  if (current[1] === index - 1) {
-                    return rest.concat([[current[0], index]]);
-                  } else {
-                    return accumulator.concat([[index, index]]);
-                  }
-                }, [])
-                .map(([start, end]) => ({
-                  start,
-                  end,
-                  count: end - start + 1,
-                  previous: atOffset(documents, start, -1),
-                  next: atOffset(documents, end, +1),
-                }));
-
-            for (const {start, end, count, previous, next} of blankIndexRangeInfo) {
-              const parts = [];
-
-              if (count === 1) {
-                const range = `#${start + 1}`;
-                parts.push(`${count} document (${colors.yellow(range)}), `);
-              } else {
-                const range = `#${start + 1}-${end + 1}`;
-                parts.push(`${count} documents (${colors.yellow(range)}), `);
-              }
-
-              if (previous === null) {
-                parts.push(`at start of file`);
-              } else if (next === null) {
-                parts.push(`at end of file`);
-              } else {
-                const previousDescription = Object.entries(previous).at(0).join(': ');
-                const nextDescription = Object.entries(next).at(0).join(': ');
-                parts.push(`between "${colors.cyan(previousDescription)}" and "${colors.cyan(nextDescription)}"`);
-              }
-
-              aggregate.push(new Error(parts.join('')));
-            }
-          }
-
-          return {documents: filteredDocuments, aggregate};
-        };
 
         const processDocument = (document, thingClassOrFn) => {
           const thingClass =
