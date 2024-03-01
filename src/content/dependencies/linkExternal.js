@@ -36,6 +36,22 @@ export default {
   },
 
   generate(data, slots, {html, language}) {
+    try {
+      new URL(data.url);
+    } catch (error) {
+      return (
+        html.tag('a', {class: 'external-link'},
+          (html.isBlank(slots.content)
+            ? html.tag('i',
+                language.$('misc.external.invalidURL.annotation'))
+            : language.$('misc.external.invalidURL', {
+                link: slots.content,
+                annotation:
+                  html.tag('i',
+                    language.$('misc.external.invalidURL.annotation')),
+              }))));
+    }
+
     const formattedLink =
       language.formatExternalLink(data.url, {
         style: slots.style,
@@ -44,9 +60,8 @@ export default {
       });
 
     return (
-      html.tag('a',
+      html.tag('a', {class: 'external-link'},
         {href: data.url},
-        {class: 'external-link'},
 
         slots.indicateExternal && [
           {class: 'indicate-external'},
