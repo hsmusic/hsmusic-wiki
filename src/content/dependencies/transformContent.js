@@ -114,7 +114,7 @@ export default {
 
             data.hash = enteredHash ?? null;
 
-            return {i: node.i, iEnd: node.iEnd, type: 'link', data};
+            return {i: node.i, iEnd: node.iEnd, type: 'internal-link', data};
           }
 
           // This will be another {type: 'tag'} node which gets processed in
@@ -238,7 +238,7 @@ export default {
 
             if (node.inline) {
               return {
-                type: 'image',
+                type: 'processed-image',
                 inline: true,
                 data:
                   html.tag('img',
@@ -255,7 +255,7 @@ export default {
             const image = relations.images[imageIndex++];
 
             return {
-              type: 'image',
+              type: 'processed-image',
               inline: false,
               data:
                 html.tag('div', {class: 'content-image-container'},
@@ -322,7 +322,7 @@ export default {
               link.setSlot('tooltipStyle', 'none');
             }
 
-            return {type: 'link', data: link};
+            return {type: 'processed-link', data: link};
           }
 
           case 'tag': {
@@ -358,7 +358,9 @@ export default {
     // access to its slots.
 
     if (slots.mode === 'single-link') {
-      const link = contentFromNodes.find(node => node.type === 'link');
+      const link =
+        contentFromNodes.find(node =>
+          node.type === 'processed-link');
 
       if (!link) {
         return html.blank();
@@ -390,7 +392,7 @@ export default {
             'data-type': node.type,
           });
 
-          if (node.type === 'image') {
+          if (node.type === 'processed-image') {
             attributes.set('data-inline', node.inline);
           }
 
@@ -426,7 +428,7 @@ export default {
         // the surrounding <p> tag that marked generates. The HTML parser
         // treats a <div> that starts inside a <p> as a Crocker-class
         // misgiving, and will treat you very badly if you feed it that.
-        if (attributes.get('data-type') === 'image') {
+        if (attributes.get('data-type') === 'processed-image') {
           if (!attributes.get('data-inline')) {
             tags[tags.length - 1] = tags[tags.length - 1].replace(/<p>$/, '');
             deleteParagraph = true;
