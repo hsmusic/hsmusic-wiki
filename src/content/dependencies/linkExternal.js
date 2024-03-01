@@ -36,31 +36,64 @@ export default {
   },
 
   generate(data, slots, {html, language}) {
-    let formattedLink =
-      language.formatExternalLink(data.url, {
-        style: slots.style,
-        context: slots.context,
-      });
-
-    // Fall back to platform if nothing matched the desired style.
-    if (html.isBlank(formattedLink) && slots.style !== 'platform') {
-      formattedLink =
-        language.formatExternalLink(data.url, {
-          style: 'platform',
-          context: slots.context,
-        });
+    let urlIsValid;
+    try {
+      new URL(data.url);
+      urlIsValid = true;
+    } catch (error) {
+      urlIsValid = false;
     }
 
-    const linkAttributes = html.attributes();
-    const linkContent =
-      (html.isBlank(slots.content)
-        ? formattedLink
-        : slots.content);
+    let formattedLink;
+    if (urlIsValid) {
+      formattedLink =
+        language.formatExternalLink(data.url, {
+          style: slots.style,
+          context: slots.context,
+        });
 
-    linkAttributes.set('class', 'external-link');
-    linkAttributes.set('href', data.url);
+      // Fall back to platform if nothing matched the desired style.
+      if (html.isBlank(formattedLink) && slots.style !== 'platform') {
+        formattedLink =
+          language.formatExternalLink(data.url, {
+            style: 'platform',
+            context: slots.context,
+          });
+      }
+    } else {
+      formattedLink = null;
+    }
 
-    if (slots.indicateExternal) {
+    const linkAttributes = html.attributes({
+      class: 'external-link',
+    });
+
+    let linkContent;
+    if (urlIsValid) {
+      linkAttributes.set('href', data.url);
+
+      if (html.isBlank(slots.content)) {
+        linkContent = formattedLink;
+      } else {
+        linkContent = slots.content;
+      }
+    } else {
+      if (html.isBlank(slots.content)) {
+        linkContent =
+          html.tag('i',
+            language.$('misc.external.invalidURL.annotation'));
+      } else {
+        linkContent =
+          language.$('misc.external.invalidURL', {
+            link: slots.content,
+            annotation:
+              html.tag('i',
+                language.$('misc.external.invalidURL.annotation')),
+          });
+      }
+    }
+
+    if (urlIsValid && slots.indicateExternal) {
       linkAttributes.add('class', 'indicate-external');
 
       let titleText;
@@ -85,7 +118,7 @@ export default {
       }
     }
 
-    if (slots.tab === 'separate') {
+    if (urlIsValid && slots.tab === 'separate') {
       linkAttributes.set('target', '_blank');
     }
 

@@ -506,8 +506,11 @@ misc:
 
     opensInNewTab:
       _: "{LINK} ({ANNOTATION})"
-      annotation:
-        "opens in new tab"
+      annotation: "opens in new tab"
+
+    invalidURL:
+      _: "{LINK} ({ANNOTATION})"
+      annotation: "invalid URL"
 
     appleMusic: "Apple Music"
     artstation: "ArtStation"
