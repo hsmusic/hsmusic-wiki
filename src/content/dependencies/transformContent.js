@@ -216,6 +216,11 @@ export default {
       default: false,
     },
 
+    indicateExternalLinks: {
+      type: 'boolean',
+      default: true,
+    },
+
     thumb: {
       validate: v => v.is('small', 'medium', 'large'),
       default: 'large',
@@ -342,12 +347,15 @@ export default {
             const {label} = node.data;
             const externalLink = relations.externalLinks[externalLinkIndex++];
 
-            externalLink.setSlots({
-              indicateExternal: true,
-              tab: 'separate',
-              style: 'platform',
-              content: label,
-            });
+            externalLink.setSlot('content', label);
+
+            if (slots.indicateExternalLinks) {
+              externalLink.setSlots({
+                indicateExternal: true,
+                tab: 'separate',
+                style: 'platform',
+              });
+            }
 
             return {type: 'processed-external-link', data: externalLink};
           }

@@ -289,8 +289,11 @@ export default {
     let footerContent = slots.footerContent;
 
     if (html.isBlank(footerContent) && relations.defaultFooterContent) {
-      footerContent = relations.defaultFooterContent
-        .slot('mode', 'multiline');
+      footerContent =
+        relations.defaultFooterContent.slots({
+          mode: 'multiline',
+          indicateExternalLinks: false,
+        });
     }
 
     const mainHTML =
