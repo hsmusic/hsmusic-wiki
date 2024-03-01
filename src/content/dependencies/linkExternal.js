@@ -51,8 +51,8 @@ export default {
         });
     }
 
+    linkAttributes.set('class', 'external-link');
     linkAttributes.set('href', data.url);
-    linkAttributes.set('class', 'nowrap');
 
     if (slots.tab === 'separate') {
       linkAttributes.set('target', '_blank');
