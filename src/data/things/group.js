@@ -50,7 +50,10 @@ export class Group extends Thing {
 
       expose: {
         dependencies: ['description'],
-        compute: ({description}) => description.split('<hr class="split">')[0],
+        compute: ({description}) =>
+          (description
+            ? description.split('<hr class="split">')[0]
+            : null),
       },
     },
 
