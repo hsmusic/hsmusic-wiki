@@ -342,7 +342,12 @@ export default {
             const {label} = node.data;
             const externalLink = relations.externalLinks[externalLinkIndex++];
 
-            externalLink.setSlot('content', label);
+            externalLink.setSlots({
+              indicateExternal: true,
+              tab: 'separate',
+              style: 'platform',
+              content: label,
+            });
 
             return {type: 'processed-external-link', data: externalLink};
           }

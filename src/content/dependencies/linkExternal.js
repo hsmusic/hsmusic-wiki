@@ -24,24 +24,52 @@ export default {
       default: 'generic',
     },
 
+    indicateExternal: {
+      type: 'boolean',
+      default: false,
+    },
+
     tab: {
       validate: v => v.is('default', 'separate'),
       default: 'default',
     },
   },
 
-  generate: (data, slots, {html, language}) =>
-    html.tag('a',
-      {href: data.url},
-      {class: 'external-link'},
+  generate(data, slots, {html, language}) {
+    const formattedLink =
+      language.formatExternalLink(data.url, {
+        style: slots.style,
+        context: slots.context,
+        indicateExternal: slots.indicateExternal,
+      });
 
-      slots.tab === 'separate' &&
-        {target: '_blank'},
+    return (
+      html.tag('a',
+        {href: data.url},
+        {class: 'external-link'},
 
-      (html.isBlank(slots.content)
-        ? language.formatExternalLink(data.url, {
-            style: slots.style,
-            context: slots.context,
-          }),
-        : slots.content)),
+        slots.indicateExternal && [
+          {class: 'indicate-external'},
+
+          {title:
+            (slots.tab === 'separate' && html.isBlank(slots.content)
+              ? language.$('misc.external.opensInNewTab.annotation')
+           : slots.tab === 'separate'
+              ? language.$('misc.external.opensInNewTab', {
+                  link: formattedLink,
+                  annotation:
+                    language.$('misc.external.opensInNewTab.annotation'),
+                })
+           : html.isBlank(slots.content)
+              ? null
+              : formattedLink)?.toString()},
+        ],
+
+        slots.tab === 'separate' &&
+          {target: '_blank'},
+
+        (html.isBlank(slots.content)
+          ? formattedLink
+          : slots.content)));
+  },
 };

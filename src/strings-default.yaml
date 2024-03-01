@@ -500,6 +500,11 @@ misc:
     withHandle:
       "{PLATFORM} ({HANDLE})"
 
+    opensInNewTab:
+      _: "{LINK} ({ANNOTATION})"
+      annotation:
+        "opens in new tab"
+
     local: "Wiki Archive (local upload)"
 
     bandcamp: "Bandcamp"
