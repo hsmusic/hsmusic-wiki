@@ -420,6 +420,14 @@ const illegalContentSpec = [
   {illegal: '\u2005', annotation: `four-per-em space`, ...illegalVisibleSpace},
   {illegal: '\u205f', annotation: `medium mathematical space`, ...illegalVisibleSpace},
   {illegal: '\xa0', annotation: `non-breaking space`, ...illegalVisibleSpace},
+
+  {
+    action: 'replace',
+    illegal: '<a href',
+    annotation: `HTML-style link`,
+    with: '[...](...)',
+    withAnnotation: `markdown`,
+  },
 ];
 
 for (const entry of illegalContentSpec) {
