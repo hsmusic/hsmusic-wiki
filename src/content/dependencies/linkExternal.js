@@ -6,6 +6,11 @@ export default {
   data: (url) => ({url}),
 
   slots: {
+    content: {
+      type: 'html',
+      mutable: false,
+    },
+
     style: {
       // This awkward syntax is because the slot descriptor validator can't
       // differentiate between a function that returns a validator (the usual
@@ -33,8 +38,10 @@ export default {
       slots.tab === 'separate' &&
         {target: '_blank'},
 
-      language.formatExternalLink(data.url, {
-        style: slots.style,
-        context: slots.context,
-      })),
+      (html.isBlank(slots.content)
+        ? language.formatExternalLink(data.url, {
+            style: slots.style,
+            context: slots.context,
+          }),
+        : slots.content)),
 };
