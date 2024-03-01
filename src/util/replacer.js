@@ -591,7 +591,7 @@ export function postprocessExternalLinks(inputNodes) {
       continue;
     }
 
-    const plausibleLinkRegexp = /\[.*\)/g;
+    const plausibleLinkRegexp = /\[.*?\)/g;
 
     let textContent = '';
 
