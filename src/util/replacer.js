@@ -462,7 +462,14 @@ export function postprocessImages(inputNodes) {
       let match = null, parseFrom = 0;
       while (match = imageRegexp.exec(node.data)) {
         const previousText = node.data.slice(parseFrom, match.index);
-        outputNodes.push({type: 'text', data: previousText});
+
+        outputNodes.push({
+          type: 'text',
+          data: previousText,
+          i: node.i + parseFrom,
+          iEnd: node.i + parseFrom + match.index,
+        });
+
         parseFrom = match.index + match[0].length;
 
         const imageNode = {type: 'image'};
@@ -534,6 +541,8 @@ export function postprocessImages(inputNodes) {
         outputNodes.push({
           type: 'text',
           data: node.data.slice(parseFrom),
+          i: node.i + parseFrom,
+          iEnd: node.iEnd,
         });
       }
 
@@ -576,7 +585,12 @@ export function postprocessHeadings(inputNodes) {
       textContent += node.data.slice(parseFrom);
     }
 
-    outputNodes.push({type: 'text', data: textContent});
+    outputNodes.push({
+      type: 'text',
+      data: textContent,
+      i: node.i,
+      iEnd: node.iEnd,
+    });
   }
 
   return outputNodes;
@@ -613,12 +627,17 @@ export function postprocessExternalLinks(inputNodes) {
           textContent = '';
         }
 
-        outputNodes.push({type: 'external-link', data: {label, href}});
+        const offset = plausibleMatch.index + definiteMatch.index;
+        const length = definiteMatch[0].length;
 
-        parseFrom =
-          plausibleMatch.index +
-          definiteMatch.index +
-          definiteMatch[0].length;
+        outputNodes.push({
+          i: node.i + offset,
+          iEnd: node.i + offset + length,
+          type: 'external-link',
+          data: {label, href},
+        });
+
+        parseFrom = offset + length;
       } else {
         parseFrom = plausibleMatch.index;
       }
