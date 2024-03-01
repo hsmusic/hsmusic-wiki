@@ -171,6 +171,11 @@ export function transposeArrays(arrays) {
   return results;
 }
 
+// Maps an array of keys and an array of values together, into one big object.
+export function transposeEntries(keys, values) {
+  return Object.fromEntries(transposeArrays([keys, values]));
+}
+
 export const mapInPlace = (array, fn) =>
   array.splice(0, array.length, ...array.map(fn));
 
