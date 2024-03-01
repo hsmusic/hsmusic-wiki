@@ -140,10 +140,15 @@ export default {
         sprawl.nodes
           .map(node => {
             switch (node.type) {
-              // Replace link nodes with a stub. It'll be replaced (by position)
-              // with an item from relations.
-              case 'link':
-                return {type: 'link'};
+              // Replace internal link nodes with a stub. It'll be replaced
+              // (by position) with an item from relations.
+              //
+              // TODO: This should be where label and hash get passed through,
+              // rather than in relations... (in which case there's no need to
+              // handle it specially here, and we can really just return
+              // data.nodes = sprawl.nodes)
+              case 'internal-link':
+                return {type: 'internal-link'};
 
               // Other nodes will get processed in generate.
               default:
@@ -167,9 +172,9 @@ export default {
           : getPlaceholder(node, content));
 
     return {
-      links:
+      internalLinks:
         nodes
-          .filter(({type}) => type === 'link')
+          .filter(({type}) => type === 'internal-link')
           .map(node => {
             const {link, thing, value} = node.data;
 
@@ -208,12 +213,9 @@ export default {
   },
 
   generate(data, relations, slots, {html, language, to}) {
-    let linkIndex = 0;
     let imageIndex = 0;
+    let internalLinkIndex = 0;
 
-    // This array contains only straight text and link nodes, which are directly
-    // representable in html (so no further processing is needed on the level of
-    // individual nodes).
     const contentFromNodes =
       data.nodes.map(node => {
         switch (node.type) {
@@ -281,13 +283,13 @@ export default {
             };
           }
 
-          case 'link': {
-            const linkNode = relations.links[linkIndex++];
-            if (linkNode.type === 'text') {
-              return {type: 'text', data: linkNode.data};
+          case 'internal-link': {
+            const nodeFromRelations = relations.internalLinks[internalLinkIndex++];
+            if (nodeFromRelations.type === 'text') {
+              return {type: 'text', data: nodeFromRelations.data};
             }
 
-            const {link, label, hash} = linkNode;
+            const {link, label, hash} = nodeFromRelations;
 
             // These are removed from the typical combined slots({})-style
             // because we don't want to override slots that were already set
@@ -322,7 +324,7 @@ export default {
               link.setSlot('tooltipStyle', 'none');
             }
 
-            return {type: 'processed-link', data: link};
+            return {type: 'processed-internal-link', data: link};
           }
 
           case 'tag': {
@@ -360,7 +362,7 @@ export default {
     if (slots.mode === 'single-link') {
       const link =
         contentFromNodes.find(node =>
-          node.type === 'processed-link');
+          node.type === 'processed-internal-link');
 
       if (!link) {
         return html.blank();
