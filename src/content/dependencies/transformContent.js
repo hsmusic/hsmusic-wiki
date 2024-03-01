@@ -37,6 +37,7 @@ export default {
         .map(description => description.link)
         .filter(Boolean)),
     'image',
+    'linkExternal',
   ],
 
   extraDependencies: ['html', 'language', 'to', 'wikiData'],
@@ -187,6 +188,15 @@ export default {
             }
           }),
 
+      externalLinks:
+        nodes
+          .filter(({type}) => type === 'external-link')
+          .map(node => {
+            const {href} = node.data;
+
+            return relation('linkExternal', href);
+          }),
+
       images:
         nodes
           .filter(({type}) => type === 'image')
@@ -215,6 +225,7 @@ export default {
   generate(data, relations, slots, {html, language, to}) {
     let imageIndex = 0;
     let internalLinkIndex = 0;
+    let externalLinkIndex = 0;
 
     const contentFromNodes =
       data.nodes.map(node => {
@@ -327,6 +338,15 @@ export default {
             return {type: 'processed-internal-link', data: link};
           }
 
+          case 'external-link': {
+            const {label} = node.data;
+            const externalLink = relations.externalLinks[externalLinkIndex++];
+
+            externalLink.setSlot('content', label);
+
+            return {type: 'processed-external-link', data: externalLink};
+          }
+
           case 'tag': {
             const {replacerKey, replacerValue} = node.data;
 
@@ -362,7 +382,8 @@ export default {
     if (slots.mode === 'single-link') {
       const link =
         contentFromNodes.find(node =>
-          node.type === 'processed-internal-link');
+          node.type === 'processed-internal-link' ||
+          node.type === 'processed-external-link');
 
       if (!link) {
         return html.blank();
