@@ -574,6 +574,16 @@ export function reportContentTextErrors(wikiData, {
             continue;
           }
         }
+      } else if (node.type === 'external-link') {
+        try {
+          new URL(node.data.href);
+        } catch (error) {
+          yield {
+            index, length,
+            message:
+              `Invalid URL ${colors.red(`"${node.data.href}"`)}`,
+          };
+        }
       }
     }
   }
