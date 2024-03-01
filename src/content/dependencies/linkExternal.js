@@ -6,6 +6,11 @@ export default {
   data: (url) => ({url}),
 
   slots: {
+    content: {
+      type: 'html',
+      mutable: false,
+    },
+
     style: {
       // This awkward syntax is because the slot descriptor validator can't
       // differentiate between a function that returns a validator (the usual
@@ -27,12 +32,15 @@ export default {
 
   generate(data, slots, {html, language}) {
     const linkAttributes = html.attributes();
+    let linkContent = slots.content;
 
-    let linkContent =
-      language.formatExternalLink(data.url, {
-        style: slots.style,
-        context: slots.context,
-      });
+    if (html.isBlank(linkContent)) {
+      linkContent =
+        language.formatExternalLink(data.url, {
+          style: slots.style,
+          context: slots.context,
+        });
+    }
 
     // Fall back to platform if nothing matched the desired style.
     if (html.isBlank(linkContent) && slots.style !== 'platform') {
