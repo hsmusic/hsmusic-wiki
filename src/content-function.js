@@ -3,7 +3,14 @@ import {inspect as nodeInspect} from 'node:util';
 import {decorateError} from '#aggregate';
 import {colors, ENABLE_COLOR} from '#cli';
 import {Template} from '#html';
-import {annotateFunction, empty, setIntersection} from '#sugar';
+
+import {
+  annotateFunction,
+  empty,
+  setIntersection,
+  slotIdentifier,
+  slotValuesIntoLayout,
+} from '#sugar';
 
 function inspect(value, opts = {}) {
   return nodeInspect(value, {colors: ENABLE_COLOR, ...opts});
@@ -359,8 +366,6 @@ export function getArgsForRelationsAndData(contentFunction, wikiData, ...args) {
 }
 
 export function getRelationsTree(dependencies, contentFunctionName, wikiData, ...args) {
-  const relationIdentifier = Symbol('Relation');
-
   function recursive(contentFunctionName, args, traceStack) {
     const contentFunction = dependencies[contentFunctionName];
     if (!contentFunction) {
@@ -407,7 +412,7 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
 
         relationSlots[relationSymbol] = {name, args, traceError};
 
-        return {[relationIdentifier]: relationSymbol};
+        return {[slotIdentifier]: relationSymbol};
       };
 
       const relationsLayout =
@@ -435,10 +440,10 @@ export function getRelationsTree(dependencies, contentFunctionName, wikiData, ..
     recursive(contentFunctionName, args,
       [{name: contentFunctionName, args, traceError: new Error()}]);
 
-  return {root, relationIdentifier};
+  return {root};
 }
 
-export function flattenRelationsTree({root, relationIdentifier}) {
+export function flattenRelationsTree({root}) {
   const flatRelationSlots = {};
 
   function recursive(node) {
@@ -461,35 +466,8 @@ export function flattenRelationsTree({root, relationIdentifier}) {
 
   return {
     root: recursive(root, []),
-    relationIdentifier,
     flatRelationSlots,
   };
-}
-
-export function fillRelationsLayoutFromSlotResults(relationIdentifier, results, layout) {
-  function recursive(object) {
-    if (typeof object !== 'object' || object === null) {
-      return object;
-    }
-
-    if (Array.isArray(object)) {
-      return object.map(recursive);
-    }
-
-    if (relationIdentifier in object) {
-      return results[object[relationIdentifier]];
-    }
-
-    if (object.constructor !== Object) {
-      throw new Error(`Expected primitive, array, relation, or normal {key: value} style Object, got constructor ${object.constructor?.name}`);
-    }
-
-    return Object.fromEntries(
-      Object.entries(object)
-        .map(([key, value]) => [key, recursive(value)]));
-  }
-
-  return recursive(layout);
 }
 
 export function getNeededContentDependencyNames(contentDependencies, name) {
@@ -567,7 +545,7 @@ export function quickEvaluate({
 
   const treeInfo = getRelationsTree(allContentDependencies, name, allExtraDependencies.wikiData ?? {}, ...args);
   const flatTreeInfo = flattenRelationsTree(treeInfo);
-  const {root, relationIdentifier, flatRelationSlots} = flatTreeInfo;
+  const {root, flatRelationSlots} = flatTreeInfo;
 
   const neededContentDependencyNames =
     getNeededContentDependencyNames(allContentDependencies, name);
@@ -649,7 +627,10 @@ export function quickEvaluate({
     }
 
     if (layout) {
-      generateArgs.push(fillRelationsLayoutFromSlotResults(relationIdentifier, slotResults, layout));
+      generateArgs.push(slotValuesIntoLayout({
+        values: slotResults,
+        layout,
+      }));
     }
 
     return callDecorated(contentFunction, ...generateArgs);

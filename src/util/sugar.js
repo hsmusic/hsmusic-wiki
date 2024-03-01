@@ -741,3 +741,34 @@ export function annotateFunction(fn, {
 
   Object.defineProperty(fn, 'name', {value: finalName});
 }
+
+export const slotIdentifier = Symbol.for('hsmusic.slotIdentifier');
+export function slotValuesIntoLayout({
+  slotIdentifier = Symbol.for('hsmusic.slotIdentifier'),
+  values,
+  layout,
+}) {
+  function recursive(object) {
+    if (typeof object !== 'object' || object === null) {
+      return object;
+    }
+
+    if (Array.isArray(object)) {
+      return object.map(recursive);
+    }
+
+    if (slotIdentifier in object) {
+      return values[object[slotIdentifier]];
+    }
+
+    if (object.constructor !== Object) {
+      throw new Error(`Expected primitive, array, relation, or normal {key: value} style Object, got constructor ${object.constructor?.name}`);
+    }
+
+    return Object.fromEntries(
+      Object.entries(object)
+        .map(([key, value]) => [key, recursive(value)]));
+  }
+
+  return recursive(layout);
+}
