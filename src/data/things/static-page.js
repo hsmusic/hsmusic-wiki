@@ -57,7 +57,6 @@ export class StaticPage extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {onePerFile},
     thingConstructors: {StaticPage},
   }) => ({
     title: `Process static page files`,
@@ -68,7 +67,6 @@ export class StaticPage extends Thing {
         prefixPath: DATA_STATIC_PAGE_DIRECTORY,
       }),
 
-    documentMode: onePerFile,
     documentThing: StaticPage,
 
     save: (results) => ({staticPageData: results}),

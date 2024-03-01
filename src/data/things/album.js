@@ -301,7 +301,7 @@ export class Album extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {headerAndEntries},
+    structureFeatures: {header, entries},
     thingConstructors: {Album, Track, TrackSectionHelper},
   }) => ({
     title: `Process album files`,
@@ -312,9 +312,9 @@ export class Album extends Thing {
         prefixPath: DATA_ALBUM_DIRECTORY,
       }),
 
-    documentMode: headerAndEntries,
-    headerDocumentThing: Album,
-    entryDocumentThing: document =>
+    structureFeatures: [header, entries],
+    headerThing: Album,
+    entryThing: document =>
       ('Section' in document
         ? TrackSectionHelper
         : Track),

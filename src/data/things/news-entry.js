@@ -55,14 +55,15 @@ export class NewsEntry extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    structureFeatures: {entries},
     thingConstructors: {NewsEntry},
   }) => ({
     title: `Process news data file`,
+
     file: NEWS_DATA_FILE,
 
-    documentMode: allInOne,
-    documentThing: NewsEntry,
+    structureFeatures: [entries],
+    entryThing: NewsEntry,
 
     save: (results) => ({newsData: results}),
 

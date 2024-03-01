@@ -323,14 +323,15 @@ export class Artist extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    structureFeatures: {entries},
     thingConstructors: {Artist},
   }) => ({
     title: `Process artists file`,
+
     file: ARTIST_DATA_FILE,
 
-    documentMode: allInOne,
-    documentThing: Artist,
+    structureFeatures: [entries],
+    entryThing: Artist,
 
     save(results) {
       const artists = results;

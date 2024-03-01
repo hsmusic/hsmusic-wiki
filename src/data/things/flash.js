@@ -223,14 +223,15 @@ export class FlashAct extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    structureFeatures: {entries},
     thingConstructors: {Flash, FlashAct},
   }) => ({
     title: `Process flashes file`,
+
     file: FLASH_DATA_FILE,
 
-    documentMode: allInOne,
-    documentThing: document =>
+    structureFeatures: [entries],
+    entryThing: document =>
       ('Act' in document
         ? FlashAct
         : Flash),

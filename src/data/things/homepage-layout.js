@@ -186,7 +186,7 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
   });
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {headerAndEntries}, // Kludge, see below
+    structureFeatures: {header, entries},
     thingConstructors: {
       HomepageLayout,
       HomepageLayoutAlbumsRow,
@@ -199,9 +199,9 @@ export class HomepageLayoutAlbumsRow extends HomepageLayoutRow {
     // support multiple files, and only one is actually getting processed here.
     files: [HOMEPAGE_LAYOUT_DATA_FILE],
 
-    documentMode: headerAndEntries,
-    headerDocumentThing: HomepageLayout,
-    entryDocumentThing: document => {
+    structureFeatures: [header, entries],
+    headerThing: HomepageLayout,
+    entryThing: document => {
       switch (document['Type']) {
         case 'albums':
           return HomepageLayoutAlbumsRow;

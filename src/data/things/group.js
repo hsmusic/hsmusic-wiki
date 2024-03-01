@@ -111,14 +111,15 @@ export class Group extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    structureFeatures: {entries},
     thingConstructors: {Group, GroupCategory},
   }) => ({
     title: `Process groups file`,
+
     file: GROUP_DATA_FILE,
 
-    documentMode: allInOne,
-    documentThing: document =>
+    structureFeatures: [entries],
+    entryThing: document =>
       ('Category' in document
         ? GroupCategory
         : Group),

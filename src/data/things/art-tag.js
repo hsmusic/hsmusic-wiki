@@ -89,14 +89,15 @@ export class ArtTag extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {allInOne},
+    structureFeatures: {entries},
     thingConstructors: {ArtTag},
   }) => ({
     title: `Process art tags file`,
+
     file: ART_TAG_DATA_FILE,
 
-    documentMode: allInOne,
-    documentThing: ArtTag,
+    structureFeatures: [entries],
+    entryThing: ArtTag,
 
     save: (results) => ({artTagData: results}),
 

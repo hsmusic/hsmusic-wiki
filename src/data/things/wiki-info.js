@@ -90,13 +90,12 @@ export class WikiInfo extends Thing {
   };
 
   static [Thing.getYamlLoadingSpec] = ({
-    documentModes: {oneDocumentTotal},
     thingConstructors: {WikiInfo},
   }) => ({
     title: `Process wiki info file`,
+
     file: WIKI_INFO_FILE,
 
-    documentMode: oneDocumentTotal,
     documentThing: WikiInfo,
 
     save(wikiInfo) {
