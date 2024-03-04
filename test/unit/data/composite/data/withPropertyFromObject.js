@@ -1,6 +1,7 @@
 import t from 'tap';
 import {quickCheckCompositeOutputs} from '#test-lib';
 
+import CacheableObject from '#cacheable-object';
 import {compositeFrom, input} from '#composite';
 import {exposeDependency} from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
@@ -40,6 +41,89 @@ t.test(`withPropertyFromObject: basic behavior`, t => {
   t.equal(composite.expose.compute({
     object: null,
     property: 'oml where did me object go',
+  }), null);
+});
+
+t.test(`withPropertyFromObject: "internal" input`, t => {
+  t.plan(7);
+
+  const composite = compositeFrom({
+    compose: false,
+
+    steps: [
+      withPropertyFromObject({
+        object: 'object',
+        property: 'property',
+        internal: 'internal',
+      }),
+
+      exposeDependency({dependency: '#value'}),
+    ],
+  });
+
+  const thing = new (class extends CacheableObject {
+    static [CacheableObject.propertyDescriptors] = {
+      foo: {
+        flags: {update: true, expose: false},
+      },
+
+      bar: {
+        flags: {update: true, expose: true},
+      },
+
+      baz: {
+        flags: {update: true, expose: true},
+        expose: {
+          transform: baz => baz * 2,
+        },
+      },
+    };
+  });
+
+  thing.foo = 100;
+  thing.bar = 200;
+  thing.baz = 300;
+
+  t.match(composite, {
+    expose: {
+      dependencies: ['object', 'property', 'internal'],
+    },
+  });
+
+  t.equal(composite.expose.compute({
+    object: thing,
+    property: 'foo',
+    internal: true,
+  }), 100);
+
+  t.equal(composite.expose.compute({
+    object: thing,
+    property: 'bar',
+    internal: true,
+  }), 200);
+
+  t.equal(composite.expose.compute({
+    object: thing,
+    property: 'baz',
+    internal: true,
+  }), 300);
+
+  t.equal(composite.expose.compute({
+    object: thing,
+    property: 'baz',
+    internal: false,
+  }), 600);
+
+  t.equal(composite.expose.compute({
+    object: thing,
+    property: 'bimbam',
+    internal: false,
+  }), null);
+
+  t.equal(composite.expose.compute({
+    object: null,
+    property: 'bambim',
+    internal: false,
   }), null);
 });
 
