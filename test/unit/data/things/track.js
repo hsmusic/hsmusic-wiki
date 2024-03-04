@@ -248,6 +248,7 @@ t.test(`Track.color`, t => {
   track.albumData = [
     {
       constructor: {[Thing.referenceType]: 'album'},
+      [Thing.isThing]: true,
       color: '#abcdef',
       tracks: [track],
       trackSections: [
