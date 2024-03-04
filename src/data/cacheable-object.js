@@ -83,6 +83,8 @@ function inspect(value) {
 }
 
 export default class CacheableObject {
+  static propertyDescriptors = Symbol.for('CacheableObject.propertyDescriptors');
+
   #propertyUpdateValues = Object.create(null);
   #propertyUpdateCacheInvalidators = Object.create(null);
 
@@ -113,12 +115,21 @@ export default class CacheableObject {
     }
   }
 
+  #withEachPropertyDescriptor(callback) {
+    const {[CacheableObject.propertyDescriptors]: propertyDescriptors} =
+      this.constructor;
+
+    for (const property of Reflect.ownKeys(propertyDescriptors)) {
+      callback(property, propertyDescriptors[property]);
+    }
+  }
+
   #initializeUpdatingPropertyValues() {
-    for (const [property, descriptor] of Object.entries(this.constructor.propertyDescriptors)) {
+    this.#withEachPropertyDescriptor((property, descriptor) => {
       const {flags, update} = descriptor;
 
       if (!flags.update) {
-        continue;
+        return;
       }
 
       if (update?.default) {
@@ -126,15 +137,15 @@ export default class CacheableObject {
       } else {
         this[property] = null;
       }
-    }
+    });
   }
 
   #defineProperties() {
-    if (!this.constructor.propertyDescriptors) {
-      throw new Error(`Expected constructor ${this.constructor.name} to define propertyDescriptors`);
+    if (!this.constructor[CacheableObject.propertyDescriptors]) {
+      throw new Error(`Expected constructor ${this.constructor.name} to provide CacheableObject.propertyDescriptors`);
     }
 
-    for (const [property, descriptor] of Object.entries(this.constructor.propertyDescriptors)) {
+    this.#withEachPropertyDescriptor((property, descriptor) => {
       const {flags} = descriptor;
 
       const definition = {
@@ -151,7 +162,7 @@ export default class CacheableObject {
       }
 
       Object.defineProperty(this, property, definition);
-    }
+    });
 
     Object.seal(this);
   }
@@ -191,7 +202,7 @@ export default class CacheableObject {
   }
 
   #getPropertyDescriptor(property) {
-    return this.constructor.propertyDescriptors[property];
+    return this.constructor[CacheableObject.propertyDescriptors][property];
   }
 
   #invalidateCachesDependentUpon(property) {
@@ -311,16 +322,16 @@ export default class CacheableObject {
       return;
     }
 
-    const {propertyDescriptors} = obj.constructor;
+    const {[CacheableObject.propertyDescriptors]: propertyDescriptors} =
+      obj.constructor;
 
     if (!propertyDescriptors) {
       console.warn('Missing property descriptors:', obj);
       return;
     }
 
-    for (const [property, descriptor] of Object.entries(propertyDescriptors)) {
-      const {flags} = descriptor;
-
+    for (const property of Reflect.ownKeys(propertyDescriptors)) {
+      const {flags} = propertyDescriptors[property];
       if (!flags.expose) {
         continue;
       }
