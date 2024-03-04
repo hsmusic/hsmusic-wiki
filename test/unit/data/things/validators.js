@@ -1,5 +1,5 @@
 import t from 'tap';
-import {showAggregate} from '#sugar';
+import {showAggregate} from '#aggregate';
 
 import {
   // Basic types
