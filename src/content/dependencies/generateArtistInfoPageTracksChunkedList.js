@@ -47,17 +47,23 @@ export default {
     const tracksAsArtistAndContributorContribs =
       tracksAsArtistAndContributor
         .map(track => [
-          ...track.artistContribs,
-          ...track.contributorContribs,
+          ...
+            track.artistContribs
+              .map(contrib => ({...contrib, kind: 'artist'})),
+          ...
+            track.contributorContribs
+              .map(contrib => ({...contrib, kind: 'contributor'})),
         ]);
 
     const tracksAsArtistOnlyContribs =
       tracksAsArtistOnly
-        .map(track => track.artistContribs);
+        .map(track => track.artistContribs
+          .map(contrib => ({...contrib, kind: 'artist'})));
 
     const tracksAsContributorOnlyContribs =
       tracksAsContributorOnly
-        .map(track => track.contributorContribs);
+        .map(track => track.contributorContribs
+          .map(contrib => ({...contrib, kind: 'contributor'})));
 
     const tracksAsArtistAndContributorEntries =
       processTrackEntries({
@@ -144,10 +150,60 @@ export default {
         query.chunks.map(({chunk}) =>
           chunk
             .map(({contribs}) =>
-              contribs
-                .filter(({who}) => who === artist)
-                .filter(({what}) => what)
-                .map(({what}) => what))
+              contribs.filter(({who}) => who === artist))
+            .map(ownContribs => ({
+              creditedAsArtist:
+                ownContribs
+                  .some(({kind}) => kind === 'artist'),
+
+              creditedAsContributor:
+                ownContribs
+                  .some(({kind}) => kind === 'contributor'),
+
+              annotatedContribs:
+                ownContribs
+                  .filter(({what}) => what),
+            }))
+            .map(({annotatedContribs, ...rest}) => ({
+              ...rest,
+
+              annotatedArtistContribs:
+                annotatedContribs
+                  .filter(({kind}) => kind === 'artist'),
+
+              annotatedContributorContribs:
+                annotatedContribs
+                  .filter(({kind}) => kind === 'contributor'),
+            }))
+            .map(({
+              creditedAsArtist,
+              creditedAsContributor,
+              annotatedArtistContribs,
+              annotatedContributorContribs,
+            }) => {
+              // Don't display annotations associated with crediting in the
+              // Contributors field if the artist is also credited as an Artist
+              // *and* the Artist-field contribution is non-annotated. This is
+              // so that we don't misrepresent the artist - the contributor
+              // annotation tends to be for "secondary" and performance roles.
+              // For example, this avoids crediting Marcy Nabors on Renewed
+              // Return seemingly only for "bass clarinet" when they're also
+              // the one who composed and arranged Renewed Return!
+              if (
+                creditedAsArtist &&
+                creditedAsContributor &&
+                empty(annotatedArtistContribs)
+              ) {
+                return [];
+              }
+
+              return [
+                ...annotatedArtistContribs,
+                ...annotatedContributorContribs,
+              ];
+            })
+            .map(contribs =>
+              contribs.map(({what}) => what))
             .map(contributions =>
               (empty(contributions)
                 ? null
