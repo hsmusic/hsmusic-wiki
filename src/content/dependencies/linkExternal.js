@@ -24,6 +24,11 @@ export default {
       default: 'generic',
     },
 
+    fromContent: {
+      type: 'boolean',
+      default: false,
+    },
+
     indicateExternal: {
       type: 'boolean',
       default: false,
@@ -62,6 +67,9 @@ export default {
     return (
       html.tag('a', {class: 'external-link'},
         {href: data.url},
+
+        slots.fromContent &&
+          {class: 'from-content'},
 
         slots.indicateExternal && [
           {class: 'indicate-external'},
