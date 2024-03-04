@@ -606,8 +606,15 @@ export function isContentString(content) {
 export function isThingClass(thingClass) {
   isFunction(thingClass);
 
-  if (!Object.hasOwn(thingClass, Symbol.for('Thing.referenceType'))) {
-    throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
+  // This is *expressly* no faster than an instanceof check, because it's
+  // deliberately still walking the prototype chain for the provided object.
+  // (This is necessary because the symbol we're checking is defined only on
+  // the Thing constructor, and not directly on each subclass.) However, it's
+  // preferred over an instanceof check anyway, because instanceof would
+  // require that the #validators module has access to #thing, which it
+  // currently doesn't!
+  if (!(Symbol.for('Thing.isThingConstructor') in thingClass)) {
+    throw new TypeError(`Expected a Thing constructor, missing Thing.isThingConstructor`);
   }
 
   return true;
@@ -615,10 +622,13 @@ export function isThingClass(thingClass) {
 
 export function isThing(thing) {
   isObject(thing);
-  isFunction(thing.constructor);
 
-  if (!Object.hasOwn(thing.constructor, Symbol.for('Thing.referenceType'))) {
-    throw new TypeError(`Expected a Thing, constructor missing Thing.referenceType`);
+  // This *is* faster than an instanceof check, because it doesn't walk the
+  // prototype chain. It works because this property is set as part of every
+  // Thing subclass's inherited "public class fields" - it's set directly on
+  // every constructed Thing.
+  if (!Object.hasOwn(thing, Symbol.for('Thing.isThing'))) {
+    throw new TypeError(`Expected a Thing, missing Thing.isThing`);
   }
 
   return true;
@@ -798,25 +808,22 @@ export function validateWikiData({
       let foundOtherObject = false;
 
       for (const object of array) {
-        const {[Symbol.for('Thing.referenceType')]: referenceType} = object.constructor;
-
-        if (referenceType === undefined) {
-          foundOtherObject = true;
-
-          // Early-exit if a Thing has been found - nothing more can be learned.
-          if (foundThing) {
-            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
-          }
-        } else {
-          foundThing = true;
-
+        if (Object.hasOwn(object, Symbol.for('Thing.isThing'))) {
           // Early-exit if a non-Thing object has been found - nothing more can
           // be learned.
           if (foundOtherObject) {
             throw new TypeError(`Expected array of wiki data objects, got mixed items`);
           }
 
-          allRefTypes.add(referenceType);
+          foundThing = true;
+          allRefTypes.add(object.constructor[Symbol.for('Thing.referenceType')]);
+        } else {
+          // Early-exit if a Thing has been found - nothing more can be learned.
+          if (foundThing) {
+            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+          }
+
+          foundOtherObject = true;
         }
       }
 
