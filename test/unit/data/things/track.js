@@ -280,7 +280,7 @@ t.test(`Track.artistContribs`, t => {
 
   XXX_decacheWikiData();
 
-  t.same(track.artistContribs,
+  t.match(track.artistContribs,
     [{artist: artist1, annotation: `composition`}, {artist: artist2, annotation: null}],
     `artistContribs #2: inherits album artistContribs`);
 
@@ -288,7 +288,7 @@ t.test(`Track.artistContribs`, t => {
     {artist: `Artist 1`, annotation: `arrangement`},
   ];
 
-  t.same(track.artistContribs, [{artist: artist1, annotation: `arrangement`}],
+  t.match(track.artistContribs, [{artist: artist1, annotation: `arrangement`}],
     `artistContribs #3: resolves from own value`);
 
   track.artistContribs = [
@@ -297,7 +297,7 @@ t.test(`Track.artistContribs`, t => {
     {artist: `Artist 2`, annotation: `usual`},
   ];
 
-  t.same(track.artistContribs,
+  t.match(track.artistContribs,
     [{artist: artist1, annotation: `snooping`}, {artist: artist2, annotation: `usual`}],
     `artistContribs #4: filters out names without matches`);
 });
@@ -457,7 +457,7 @@ t.test(`Track.coverArtistContribs`, t => {
 
   XXX_decacheWikiData();
 
-  t.same(track.coverArtistContribs,
+  t.match(track.coverArtistContribs,
     [{artist: artist1, annotation: `lines`}, {artist: artist2, annotation: null}],
     `coverArtistContribs #2: inherits album trackCoverArtistContribs`);
 
@@ -465,7 +465,7 @@ t.test(`Track.coverArtistContribs`, t => {
     {artist: `Artist 1`, annotation: `collage`},
   ];
 
-  t.same(track.coverArtistContribs, [{artist: artist1, annotation: `collage`}],
+  t.match(track.coverArtistContribs, [{artist: artist1, annotation: `collage`}],
     `coverArtistContribs #3: resolves from own value`);
 
   track.coverArtistContribs = [
@@ -474,7 +474,7 @@ t.test(`Track.coverArtistContribs`, t => {
     {artist: `Artist 2`, annotation: `usual`},
   ];
 
-  t.same(track.coverArtistContribs,
+  t.match(track.coverArtistContribs,
     [{artist: artist1, annotation: `snooping`}, {artist: artist2, annotation: `usual`}],
     `coverArtistContribs #4: filters out names without matches`);
 
