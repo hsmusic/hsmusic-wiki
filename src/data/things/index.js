@@ -144,7 +144,10 @@ function evaluatePropertyDescriptors() {
         }
       }
 
-      constructor[CacheableObject.propertyDescriptors] = results;
+      constructor[CacheableObject.propertyDescriptors] = {
+        ...constructor[CacheableObject.propertyDescriptors] ?? {},
+        ...results,
+      };
     },
 
     showFailedClasses(failedClasses) {
