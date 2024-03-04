@@ -31,6 +31,8 @@
 // Oh yeah, like. Just run this through some relatively recent version of
 // node.js and you'll 8e fine. ...Within the project root. O8viously.
 
+import '#import-heck';
+
 import {execSync} from 'node:child_process';
 import {readdir, readFile} from 'node:fs/promises';
 import * as path from 'node:path';
@@ -38,23 +40,10 @@ import {fileURLToPath} from 'node:url';
 
 import wrap from 'word-wrap';
 
-// Due to import time shenanigans, these imports have to come in the specified
-// order. This obviously needs fixing up.
-
-/* precede #find */
-import {
-  filterReferenceErrors,
-  reportDuplicateDirectories,
-  reportContentTextErrors,
-} from '#data-checks';
-
-import {bindFind, getAllFindSpecs} from '#find';
-
-// End of import time shenanigans (hopefully)
-
 import {showAggregate} from '#aggregate';
 import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
+import {bindFind, getAllFindSpecs} from '#find';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
@@ -74,6 +63,12 @@ import {
   parseOptions,
   progressCallAll,
 } from '#cli';
+
+import {
+  filterReferenceErrors,
+  reportDuplicateDirectories,
+  reportContentTextErrors,
+} from '#data-checks';
 
 import genThumbs, {
   CACHE_FILE as thumbsCacheFile,
