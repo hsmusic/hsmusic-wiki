@@ -31,6 +31,7 @@
         "#external-links": "./src/util/external-links.js",
         "#find": "./src/find.js",
         "#html": "./src/util/html.js",
+        "#import-heck": "./src/import-heck.js",
         "#language": "./src/data/language.js",
         "#page-specs": "./src/page/index.js",
         "#node-utils": "./src/util/node-utils.js",

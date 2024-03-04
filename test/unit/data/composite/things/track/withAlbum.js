@@ -1,5 +1,7 @@
 import t from 'tap';
 
+import '#import-heck';
+
 import {compositeFrom, input} from '#composite';
 import {exposeConstant, exposeDependency} from '#composite/control-flow';
 import {withAlbum} from '#composite/things/track';
