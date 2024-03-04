@@ -613,6 +613,17 @@ export function isThingClass(thingClass) {
   return true;
 }
 
+export function isThing(thing) {
+  isObject(thing);
+  isFunction(thing.constructor);
+
+  if (!Object.hasOwn(thing.constructor, Symbol.for('Thing.referenceType'))) {
+    throw new TypeError(`Expected a Thing, constructor missing Thing.referenceType`);
+  }
+
+  return true;
+}
+
 export const isContribution = validateProperties({
   artist: isArtistRef,
   annotation: optional(isStringNonEmpty),
