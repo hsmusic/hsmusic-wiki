@@ -2,10 +2,10 @@ import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {openAggregate, showAggregate} from '#aggregate';
+import CacheableObject from '#cacheable-object';
 import {logError} from '#cli';
 import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
-
 import Thing from '#thing';
 
 import * as albumClasses from './album.js';
@@ -142,7 +142,7 @@ function evaluatePropertyDescriptors() {
         }
       }
 
-      constructor.propertyDescriptors = results;
+      constructor[CacheableObject.propertyDescriptors] = results;
     },
 
     showFailedClasses(failedClasses) {
