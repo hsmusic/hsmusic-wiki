@@ -6,15 +6,11 @@
 import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {filterMultipleArrays, stitchArrays} from '#sugar';
+import thingConstructors from '#things';
 import {is, isContributionList} from '#validators';
 
-import {
-  raiseOutputWithoutDependency,
-} from '#composite/control-flow';
-
-import {
-  withPropertiesFromList,
-} from '#composite/data';
+import {raiseOutputWithoutDependency} from '#composite/control-flow';
+import {withPropertiesFromList} from '#composite/data';
 
 import withResolvedReferenceList from './withResolvedReferenceList.js';
 
@@ -50,15 +46,6 @@ export default templateCompositeFrom({
       prefix: input.value('#contribs'),
     }),
 
-    withResolvedReferenceList({
-      list: '#contribs.who',
-      data: 'artistData',
-      find: input.value(find.artist),
-      notFoundMode: input('notFoundMode'),
-    }).outputs({
-      ['#resolvedReferenceList']: '#contribs.who',
-    }),
-
     {
       dependencies: ['#contribs.who', '#contribs.what'],
 
@@ -67,10 +54,48 @@ export default templateCompositeFrom({
         ['#contribs.what']: what,
       }) {
         filterMultipleArrays(who, what, (who, _what) => who);
+
         return continuation({
-          ['#resolvedContribs']: stitchArrays({who, what}),
+          ['#details']:
+            stitchArrays({
+              artist: who,
+              annotation: what,
+            }),
         });
       },
+    },
+
+    {
+      dependencies: ['#details', input.myself()],
+
+      compute: (continuation, {
+        ['#details']: details,
+        [input.myself()]: myself,
+      }) => continuation({
+        ['#contributions']:
+          details.map(details => {
+            const contrib = new thingConstructors.Contribution();
+
+            Object.assign(contrib, {
+              ...details,
+              thing: myself,
+            });
+
+            return contrib;
+          }),
+      }),
+    },
+
+    {
+      dependencies: ['#contributions'],
+
+      compute: (continuation, {
+        ['#contributions']: contributions,
+      }) => continuation({
+        ['#resolvedContribs']:
+          contributions
+            .filter(contrib => contrib.artist),
+      }),
     },
   ],
 });

@@ -195,7 +195,7 @@ t.test(`Track.artistContribs`, t => {
 
   XXX_decacheWikiData();
 
-  t.same(track.artistContribs,
+  t.match(track.artistContribs,
     [{who: artist1, what: `composition`}, {who: artist2, what: null}],
     `artistContribs #2: inherits album artistContribs`);
 
@@ -203,7 +203,7 @@ t.test(`Track.artistContribs`, t => {
     {who: `Artist 1`, what: `arrangement`},
   ];
 
-  t.same(track.artistContribs, [{who: artist1, what: `arrangement`}],
+  t.match(track.artistContribs, [{who: artist1, what: `arrangement`}],
     `artistContribs #3: resolves from own value`);
 
   track.artistContribs = [
@@ -212,7 +212,7 @@ t.test(`Track.artistContribs`, t => {
     {who: `Artist 2`, what: `usual`},
   ];
 
-  t.same(track.artistContribs,
+  t.match(track.artistContribs,
     [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
     `artistContribs #4: filters out names without matches`);
 });
@@ -368,7 +368,7 @@ t.test(`Track.coverArtistContribs`, t => {
 
   XXX_decacheWikiData();
 
-  t.same(track.coverArtistContribs,
+  t.match(track.coverArtistContribs,
     [{who: artist1, what: `lines`}, {who: artist2, what: null}],
     `coverArtistContribs #2: inherits album trackCoverArtistContribs`);
 
@@ -376,7 +376,7 @@ t.test(`Track.coverArtistContribs`, t => {
     {who: `Artist 1`, what: `collage`},
   ];
 
-  t.same(track.coverArtistContribs, [{who: artist1, what: `collage`}],
+  t.match(track.coverArtistContribs, [{who: artist1, what: `collage`}],
     `coverArtistContribs #3: resolves from own value`);
 
   track.coverArtistContribs = [
@@ -385,7 +385,7 @@ t.test(`Track.coverArtistContribs`, t => {
     {who: `Artist 2`, what: `usual`},
   ];
 
-  t.same(track.coverArtistContribs,
+  t.match(track.coverArtistContribs,
     [{who: artist1, what: `snooping`}, {who: artist2, what: `usual`}],
     `coverArtistContribs #4: filters out names without matches`);
 
