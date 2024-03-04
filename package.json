@@ -21,6 +21,7 @@
         "#composite/wiki-data": "./src/data/composite/wiki-data/index.js",
         "#composite/wiki-properties": "./src/data/composite/wiki-properties/index.js",
         "#composite/things/album": "./src/data/composite/things/album/index.js",
+        "#composite/things/contribution": "./src/data/composite/things/contribution/index.js",
         "#composite/things/flash": "./src/data/composite/things/flash/index.js",
         "#composite/things/flash-act": "./src/data/composite/things/flash-act/index.js",
         "#composite/things/track": "./src/data/composite/things/track/index.js",
