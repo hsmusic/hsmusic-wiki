@@ -24,6 +24,11 @@ export default {
       default: 'generic',
     },
 
+    fromContent: {
+      type: 'boolean',
+      default: false,
+    },
+
     indicateExternal: {
       type: 'boolean',
       default: false,
@@ -91,6 +96,10 @@ export default {
                 language.$('misc.external.invalidURL.annotation')),
           });
       }
+    }
+
+    if (slots.fromContent) {
+      linkAttributes.add('class', 'from-content');
     }
 
     if (urlIsValid && slots.indicateExternal) {
