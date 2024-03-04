@@ -745,12 +745,31 @@ export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
 }
 
+export function validateThing({
+  referenceType: expectedReferenceType = '',
+} = {}) {
+  return (thing) => {
+    isThing(thing);
+
+    if (expectedReferenceType) {
+      const {[Symbol.for('Thing.referenceType')]: referenceType} =
+        thing.constructor;
+
+      if (referenceType !== expectedReferenceType) {
+        throw new TypeError(`Expected only ${expectedReferenceType}, got other type: ${referenceType}`);
+      }
+    }
+
+    return true;
+  };
+}
+
 const validateWikiData_cache = {};
 
 export function validateWikiData({
   referenceType = '',
   allowMixedTypes = false,
-}) {
+} = {}) {
   if (referenceType && allowMixedTypes) {
     throw new TypeError(`Don't specify both referenceType and allowMixedTypes`);
   }
