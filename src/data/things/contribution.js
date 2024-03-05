@@ -9,8 +9,10 @@ import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
+import {flag} from '#composite/wiki-properties';
 
 import {
+  inheritFromContributionPresets,
   withContributionArtist,
   withContributionContext,
   withMatchingContributionPresets,
@@ -46,6 +48,22 @@ export class Contribution extends Thing {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
     },
+
+    countInContributionTotals: [
+      inheritFromContributionPresets({
+        property: input.thisProperty(),
+      }),
+
+      flag(true),
+    ],
+
+    countInDurationTotals: [
+      inheritFromContributionPresets({
+        property: input.thisProperty(),
+      }),
+
+      flag(true),
+    ],
 
     // Expose only
 

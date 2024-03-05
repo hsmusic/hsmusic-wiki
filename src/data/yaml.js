@@ -416,6 +416,9 @@ export function parseContributors(entries) {
       return {
         artist: item['Artist'],
         annotation: item['Annotation'] ?? null,
+
+        countInContributionTotals: item['Count In Contribution Totals'] ?? null,
+        countInDurationTotals: item['Count In Duration Totals'] ?? null,
       };
 
     if (typeof item !== 'string') return item;
