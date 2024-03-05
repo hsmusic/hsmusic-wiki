@@ -392,8 +392,15 @@ export function parseContributors(contributionStrings) {
   }
 
   return contributionStrings.map(item => {
-    if (typeof item === 'object' && item['Who'])
-      return {who: item['Who'], what: item['What'] ?? null};
+    if (typeof item === 'object' && item['Who']) {
+      return {
+        who: item['Who'],
+        what: item['What'] ?? null,
+
+        countInContributionTotals: item['Count In Contribution Totals'] ?? null,
+        countInDurationTotals: item['Count In Duration Totals'] ?? null,
+      };
+    }
 
     if (typeof item !== 'string') return item;
 
