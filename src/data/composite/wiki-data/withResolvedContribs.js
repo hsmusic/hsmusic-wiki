@@ -7,7 +7,7 @@ import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {filterMultipleArrays, stitchArrays} from '#sugar';
 import thingConstructors from '#things';
-import {is, isContributionList} from '#validators';
+import {is, isContributionList, isStringNonEmpty} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withPropertiesFromList} from '#composite/data';
@@ -27,6 +27,11 @@ export default templateCompositeFrom({
       validate: is('exit', 'filter', 'null'),
       defaultValue: 'null',
     }),
+
+    thingProperty: input({
+      validate: isStringNonEmpty,
+      defaultValue: null,
+    }),
   },
 
   outputs: ['#resolvedContribs'],
@@ -39,6 +44,25 @@ export default templateCompositeFrom({
         ['#resolvedContribs']: [],
       }),
     }),
+
+    {
+      dependencies: [
+        input('thingProperty'),
+        input.staticDependency('from'),
+      ],
+
+      compute: (continuation, {
+        [input('thingProperty')]: thingProperty,
+        [input.staticDependency('from')]: fromDependency,
+      }) => continuation({
+        ['#thingProperty']:
+          (thingProperty
+            ? thingProperty
+         : !fromDependency?.startsWith('#')
+            ? fromDependency
+            : null),
+      }),
+    },
 
     withPropertiesFromList({
       list: input('from'),
@@ -66,10 +90,15 @@ export default templateCompositeFrom({
     },
 
     {
-      dependencies: ['#details', input.myself()],
+      dependencies: [
+        '#details',
+        '#thingProperty',
+        input.myself(),
+      ],
 
       compute: (continuation, {
         ['#details']: details,
+        ['#thingProperty']: thingProperty,
         [input.myself()]: myself,
       }) => continuation({
         ['#contributions']:
@@ -79,6 +108,7 @@ export default templateCompositeFrom({
             Object.assign(contrib, {
               ...details,
               thing: myself,
+              thingProperty: thingProperty,
             });
 
             return contrib;
