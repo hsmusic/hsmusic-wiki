@@ -3,7 +3,16 @@ export const WIKI_INFO_FILE = 'wiki-info.yaml';
 import {input} from '#composite';
 import find from '#find';
 import Thing from '#thing';
-import {isBoolean, isColor, isLanguageCode, isName, isURL} from '#validators';
+import {parseContributionPresets} from '#yaml';
+
+import {
+  isBoolean,
+  isColor,
+  isContributionPresetList,
+  isLanguageCode,
+  isName,
+  isURL,
+} from '#validators';
 
 import {exitWithoutDependency} from '#composite/control-flow';
 import {contentString, flag, name, referenceList, wikiData}
@@ -58,6 +67,11 @@ export class WikiInfo extends Thing {
       data: 'groupData',
     }),
 
+    contributionPresets: {
+      flags: {update: true, expose: true},
+      update: {validate: isContributionPresetList},
+    },
+
     // Feature toggles
     enableFlashesAndGames: flag(false),
     enableListings: flag(false),
@@ -105,6 +119,11 @@ export class WikiInfo extends Thing {
       'Enable News': {property: 'enableNews'},
       'Enable Art Tag UI': {property: 'enableArtTagUI'},
       'Enable Group UI': {property: 'enableGroupUI'},
+
+      'Contribution Presets': {
+        property: 'contributionPresets',
+        transform: parseContributionPresets,
+      },
     },
   };
 
