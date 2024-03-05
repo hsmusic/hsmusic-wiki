@@ -640,6 +640,58 @@ export const isContribution = validateProperties({
 
 export const isContributionList = validateArrayItems(isContribution);
 
+export const contributionPresetPropertySpec = {
+  album: [
+    'artistContribs',
+  ],
+
+  flash: [
+    'contributorContribs',
+  ],
+
+  track: [
+    'artistContribs',
+    'contributorContribs',
+  ],
+};
+
+// TODO: This validator basically constructs itself as it goes.
+// This is definitely some shenanigans!
+export function isContributionPresetContext(list) {
+  isArray(list);
+
+  if (empty(list)) {
+    throw new TypeError(`Expected at least one item`);
+  }
+
+  const isTarget =
+    is(...Object.keys(contributionPresetPropertySpec));
+
+  const [target, ...properties] = list;
+
+  isTarget(target);
+
+  const isProperty =
+    is(...contributionPresetPropertySpec[target]);
+
+  const isPropertyList =
+    validateArrayItems(isProperty);
+
+  isPropertyList(properties);
+
+  return true;
+}
+
+export const isContributionPreset = validateProperties({
+  annotation: isStringNonEmpty,
+  context: isContributionPresetContext,
+
+  countInDurationTotals: optional(isBoolean),
+  countInContributionTotals: optional(isBoolean),
+});
+
+export const isContributionPresetList = validateArrayItems(isContributionPreset);
+
 export const isAdditionalFile = validateProperties({
   title: isName,
   description: optional(isContentString),
