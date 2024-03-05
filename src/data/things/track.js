@@ -43,8 +43,9 @@ import {
   referenceList,
   reverseReferenceList,
   simpleDate,
-  singleReference,
   simpleString,
+  singleReference,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -66,7 +67,13 @@ import {
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    ArtTag,
+    Artist,
+    Flash,
+    WikiInfo,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Track'),
@@ -306,6 +313,10 @@ export class Track extends Thing {
 
     trackData: wikiData({
       class: input.value(Track),
+    }),
+
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
     }),
 
     // Expose only
