@@ -30,6 +30,7 @@ import {
   name,
   referenceList,
   simpleDate,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -40,7 +41,12 @@ import {withFlashSide} from '#composite/things/flash-act';
 export class Flash extends Thing {
   static [Thing.referenceType] = 'flash';
 
-  static [Thing.getPropertyDescriptors] = ({Artist, Track, FlashAct}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Artist,
+    Track,
+    FlashAct,
+    WikiInfo,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Flash'),
@@ -116,6 +122,10 @@ export class Flash extends Thing {
 
     flashActData: wikiData({
       class: input.value(FlashAct),
+    }),
+
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
     }),
 
     // Expose only

@@ -37,6 +37,7 @@ import {
   simpleDate,
   simpleString,
   singleReference,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -53,6 +54,7 @@ export class Album extends Thing {
     Group,
     Track,
     TrackSection,
+    WikiInfo,
   }) => ({
     // Update & expose
 
@@ -171,6 +173,10 @@ export class Album extends Thing {
 
     ownTrackSectionData: wikiData({
       class: input.value(TrackSection),
+    }),
+
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
     }),
 
     // Expose only

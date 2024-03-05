@@ -1149,6 +1149,7 @@ export function linkWikiDataArrays(wikiData) {
       'artTagData',
       'artistData',
       'groupData',
+      'wikiInfo',
     ]],
 
     [wikiData.artTagData, [
@@ -1167,6 +1168,7 @@ export function linkWikiDataArrays(wikiData) {
       'artistData',
       'flashActData',
       'trackData',
+      'wikiInfo',
     ]],
 
     [wikiData.flashActData, [
@@ -1198,6 +1200,7 @@ export function linkWikiDataArrays(wikiData) {
       'artistData',
       'flashData',
       'trackData',
+      'wikiInfo',
     ]],
 
     [[wikiData.wikiInfo], [
