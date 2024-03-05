@@ -28,8 +28,17 @@ export default templateCompositeFrom({
   update: {validate: isContributionList},
 
   steps: () => [
-    withResolvedContribs({from: input.updateValue()}),
-    exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
-    exposeConstant({value: input.value([])}),
+    withResolvedContribs({
+      from: input.updateValue(),
+      thingProperty: input.thisProperty(),
+    }),
+
+    exposeDependencyOrContinue({
+      dependency: '#resolvedContribs',
+    }),
+
+    exposeConstant({
+      value: input.value([]),
+    }),
   ],
 });

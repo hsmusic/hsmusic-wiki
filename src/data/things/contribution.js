@@ -21,6 +21,11 @@ export class Contribution extends Thing {
       update: {validate: isThing},
     },
 
+    thingProperty: {
+      flags: {update: true, expose: true},
+      update: {validate: isStringNonEmpty},
+    },
+
     artist: [
       withContributionArtist({
         ref: input.updateValue({

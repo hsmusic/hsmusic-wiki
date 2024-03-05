@@ -198,6 +198,7 @@ export class Track extends Thing {
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.thisProperty(),
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -232,6 +233,7 @@ export class Track extends Thing {
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.thisProperty(),
       }).outputs({
         '#resolvedContribs': '#coverArtistContribs',
       }),
