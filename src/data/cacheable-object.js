@@ -255,7 +255,8 @@ export default class CacheableObject {
 
     if (expose.dependencies?.length > 0) {
       const dependencyKeys = expose.dependencies.slice();
-      const shouldReflect = dependencyKeys.includes('this');
+      const shouldReflectObject = dependencyKeys.includes('this');
+      const shouldReflectProperty = dependencyKeys.includes('thisProperty');
 
       getAllDependencies = () => {
         const dependencies = Object.create(null);
@@ -264,8 +265,12 @@ export default class CacheableObject {
           dependencies[key] = this.#propertyUpdateValues[key];
         }
 
-        if (shouldReflect) {
+        if (shouldReflectObject) {
           dependencies.this = this;
+        }
+
+        if (shouldReflectProperty) {
+          dependencies.thisProperty = property;
         }
 
         return dependencies;
