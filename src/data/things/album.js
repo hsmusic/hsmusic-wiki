@@ -31,6 +31,7 @@ import {
   referenceList,
   simpleDate,
   simpleString,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -40,7 +41,13 @@ import {withTracks, withTrackSections} from '#composite/things/album';
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    ArtTag,
+    Artist,
+    Group,
+    Track,
+    WikiInfo,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Album'),
@@ -150,6 +157,10 @@ export class Album extends Thing {
     // or keep it updated.
     ownTrackData: wikiData({
       class: input.value(Track),
+    }),
+
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
     }),
 
     // Expose only

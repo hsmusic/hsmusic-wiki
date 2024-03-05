@@ -13,6 +13,7 @@ import {withResolvedReference} from '#composite/wiki-data';
 import {
   withContributionArtist,
   withContributionContext,
+  withMatchingContributionPresets,
 } from '#composite/things/contribution';
 
 export class Contribution extends Thing {
@@ -85,6 +86,14 @@ export class Contribution extends Thing {
           property,
         }),
       },
+    ],
+
+    matchingPresets: [
+      withMatchingContributionPresets(),
+
+      exposeDependency({
+        dependency: '#matchingContributionPresets',
+      }),
     ],
   });
 
