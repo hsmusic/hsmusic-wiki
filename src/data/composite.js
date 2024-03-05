@@ -29,6 +29,7 @@ input.value = _valueIntoToken('input.value');
 input.dependency = _valueIntoToken('input.dependency');
 
 input.myself = () => Symbol.for(`hsmusic.composite.input.myself`);
+input.thisProperty = () => Symbol.for('hsmusic.composite.input.thisProperty');
 
 input.updateValue = _valueIntoToken('input.updateValue');
 
@@ -284,6 +285,7 @@ export function templateCompositeFrom(description) {
               'input.value',
               'input.dependency',
               'input.myself',
+              'input.thisProperty',
               'input.updateValue',
             ].includes(tokenShape)) {
               expectedValueProvidingTokenInputNames.push(name);
@@ -567,6 +569,8 @@ export function compositeFrom(description) {
             return token;
           case 'input.myself':
             return 'this';
+          case 'input.thisProperty':
+            return 'thisProperty';
           default:
             return null;
         }
@@ -721,6 +725,8 @@ export function compositeFrom(description) {
               return (tokenValue.startsWith('#') ? null : tokenValue);
             case 'input.myself':
               return 'this';
+            case 'input.thisProperty':
+              return 'thisProperty';
             default:
               return null;
           }
@@ -877,6 +883,8 @@ export function compositeFrom(description) {
               return valueSoFar;
             case 'input.myself':
               return initialDependencies['this'];
+            case 'input.thisProperty':
+              return initialDependencies['thisProperty'];
             case 'input':
               return initialDependencies[token];
             default:
@@ -969,6 +977,7 @@ export function compositeFrom(description) {
             ? {[input.updateValue()]: valueSoFar}
             : {}),
         [input.myself()]: initialDependencies?.['this'] ?? null,
+        [input.thisProperty()]: initialDependencies?.['thisProperty'] ?? null,
       };
 
       const selectDependencies =
@@ -983,6 +992,8 @@ export function compositeFrom(description) {
               return dependency;
             case 'input.myself':
               return input.myself();
+            case 'input.thisProperty':
+              return input.thisProperty();
             case 'input.dependency':
               return tokenValue;
             case 'input.updateValue':
