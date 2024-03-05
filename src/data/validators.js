@@ -636,6 +636,9 @@ export function isThing(thing) {
 export const isContribution = validateProperties({
   artist: isArtistRef,
   annotation: optional(isStringNonEmpty),
+
+  countInDurationTotals: optional(isBoolean),
+  countInContributionTotals: optional(isBoolean),
 });
 
 export const isContributionList = validateArrayItems(isContribution);
