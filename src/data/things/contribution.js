@@ -10,7 +10,10 @@ import {isStringNonEmpty, isThing, validateReference} from '#validators';
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
 
-import {withContributionArtist} from '#composite/things/contribution';
+import {
+  withContributionArtist,
+  withContributionContext,
+} from '#composite/things/contribution';
 
 export class Contribution extends Thing {
   static [Thing.getPropertyDescriptors] = () => ({
@@ -64,6 +67,25 @@ export class Contribution extends Thing {
         compute: ({annotation}) => annotation ?? null,
       },
     },
+
+    context: [
+      withContributionContext(),
+
+      {
+        dependencies: [
+          '#contributionTarget',
+          '#contributionProperty',
+        ],
+
+        compute: ({
+          ['#contributionTarget']: target,
+          ['#contributionProperty']: property,
+        }) => ({
+          target,
+          property,
+        }),
+      },
+    ],
   });
 
   [inspect.custom](depth, options, inspect) {
