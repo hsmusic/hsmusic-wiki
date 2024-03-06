@@ -54,6 +54,7 @@ import {
 import {
   exitWithoutUniqueCoverArt,
   inferredAdditionalNameList,
+  inheritContributionListFromOriginalRelease,
   inheritFromOriginalRelease,
   sharedAdditionalNameList,
   trackReverseReferenceList,
@@ -200,9 +201,7 @@ export class Track extends Thing {
     }),
 
     artistContribs: [
-      inheritFromOriginalRelease({
-        notFoundValue: input.value([]),
-      }),
+      inheritContributionListFromOriginalRelease(),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
@@ -228,10 +227,7 @@ export class Track extends Thing {
     ],
 
     contributorContribs: [
-      inheritFromOriginalRelease({
-        notFoundValue: input.value([]),
-      }),
-
+      inheritContributionListFromOriginalRelease(),
       contributionList(),
     ],
 
