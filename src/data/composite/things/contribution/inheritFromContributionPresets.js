@@ -34,7 +34,7 @@ export default templateCompositeFrom({
       compute: (continuation, {
         ['#values']: values,
       }) => continuation({
-        ['#presetIndex']:
+        ['#index']:
           values.findIndex(value =>
             value !== undefined &&
             value !== null),
@@ -42,35 +42,20 @@ export default templateCompositeFrom({
     },
 
     raiseOutputWithoutDependency({
-      dependency: '#presetIndex',
+      dependency: '#index',
       mode: input.value('index'),
     }),
 
     {
-      dependencies: ['#presets', '#presetIndex'],
+      dependencies: ['#values', '#index'],
 
       compute: (continuation, {
-        ['#presets']: presets,
-        ['#presetIndex']: presetIndex,
+        ['#values']: values,
+        ['#index']: index,
       }) => continuation({
-        ['#preset']:
-          presets[presetIndex],
+        ['#value']:
+          values[index],
       }),
-    },
-
-    withPropertyFromObject({
-      object: '#preset',
-      property: input('property'),
-    }),
-
-    // Can't use exposeDependency here since it doesn't compose, and so looks
-    // unfit to serve as the composition's base - even though we'll have raised
-    // out of this composition in the relevant cases already!
-    {
-      dependencies: ['#value'],
-      compute: (continuation, {
-        ['#value']: value,
-      }) => continuation.exit(value),
     },
   ],
 });
