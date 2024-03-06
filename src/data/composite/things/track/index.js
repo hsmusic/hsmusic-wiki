@@ -1,5 +1,6 @@
 export {default as exitWithoutUniqueCoverArt} from './exitWithoutUniqueCoverArt.js';
 export {default as inferredAdditionalNameList} from './inferredAdditionalNameList.js';
+export {default as inheritContributionListFromOriginalRelease} from './inheritContributionListFromOriginalRelease.js';
 export {default as inheritFromOriginalRelease} from './inheritFromOriginalRelease.js';
 export {default as sharedAdditionalNameList} from './sharedAdditionalNameList.js';
 export {default as trackReverseReferenceList} from './trackReverseReferenceList.js';
