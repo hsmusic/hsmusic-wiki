@@ -1,5 +1,4 @@
 import {empty, unique} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -127,7 +126,7 @@ export default {
     }
 
     data.totalTrackCount = query.allTracks.length;
-    data.totalDuration = getTotalDuration(query.allTracks, {originalReleasesOnly: true});
+    data.totalDuration = artist.totalDuration;
 
     return data;
   },
