@@ -27,6 +27,7 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  exposeWhetherDependencyAvailable,
 } from '#composite/control-flow';
 
 import {
@@ -62,6 +63,7 @@ import {
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
   withHasUniqueCoverArt,
+  withOriginalRelease,
   withOtherReleases,
   withPropertyFromAlbum,
 } from '#composite/things/track';
@@ -346,6 +348,23 @@ export class Track extends Thing {
     hasUniqueCoverArt: [
       withHasUniqueCoverArt(),
       exposeDependency({dependency: '#hasUniqueCoverArt'}),
+    ],
+
+    isOriginalRelease: [
+      withOriginalRelease(),
+
+      exposeWhetherDependencyAvailable({
+        dependency: '#originalRelease',
+        negate: input.value(true),
+      }),
+    ],
+
+    isRerelease: [
+      withOriginalRelease(),
+
+      exposeWhetherDependencyAvailable({
+        dependency: '#originalRelease',
+      }),
     ],
 
     otherReleases: [
