@@ -8,6 +8,7 @@ export {default as withAlbum} from './withAlbum.js';
 export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';
 export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
+export {default as withOriginalRelease} from './withOriginalRelease.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
 export {default as withPropertyFromOriginalRelease} from './withPropertyFromOriginalRelease.js';
