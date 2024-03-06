@@ -12,6 +12,7 @@ import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
 
+import {exposeDependency} from '#composite/control-flow';
 import {withReverseContributionList} from '#composite/wiki-data';
 
 import {
@@ -26,6 +27,8 @@ import {
   urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {artistTotalDuration} from '#composite/things/artist';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
@@ -225,6 +228,8 @@ export class Artist extends Thing {
       data: 'flashData',
       list: input.value('commentatorArtists'),
     }),
+
+    totalDuration: artistTotalDuration(),
   });
 
   static [Thing.getSerializeDescriptors] = ({
