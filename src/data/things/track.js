@@ -17,7 +17,8 @@ import {
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {withResolvedContribs} from '#composite/wiki-data';
+import {withRecontextualizedContributionList, withResolvedContribs}
+  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -208,6 +209,10 @@ export class Track extends Thing {
         property: input.value('artistContribs'),
       }),
 
+      withRecontextualizedContributionList({
+        list: '#album.artistContribs',
+      }),
+
       exposeDependency({dependency: '#album.artistContribs'}),
     ],
 
@@ -241,6 +246,10 @@ export class Track extends Thing {
 
       withPropertyFromAlbum({
         property: input.value('trackCoverArtistContribs'),
+      }),
+
+      withRecontextualizedContributionList({
+        list: '#album.trackCoverArtistContribs',
       }),
 
       exposeDependency({dependency: '#album.trackCoverArtistContribs'}),

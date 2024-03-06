@@ -7,6 +7,7 @@
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
 export {default as inputWikiData} from './inputWikiData.js';
 export {default as withParsedCommentaryEntries} from './withParsedCommentaryEntries.js';
+export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';
 export {default as withResolvedContribs} from './withResolvedContribs.js';
 export {default as withResolvedReference} from './withResolvedReference.js';
 export {default as withResolvedReferenceList} from './withResolvedReferenceList.js';
