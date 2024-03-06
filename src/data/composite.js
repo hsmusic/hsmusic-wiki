@@ -780,16 +780,9 @@ export function compositeFrom(description) {
       (step.annotation ? ` (${step.annotation})` : ``);
 
     aggregate.nest({message}, ({push}) => {
-      if (isBase && stepComposes !== compositionNests) {
+      if (!isBase && !stepComposes) {
         return push(new TypeError(
-          (compositionNests
-            ? `Base must compose, this composition is nestable`
-            : `Base must not compose, this composition isn't nestable`)));
-      } else if (!isBase && !stepComposes) {
-        return push(new TypeError(
-          (compositionNests
-            ? `All steps must compose`
-            : `All steps (except base) must compose`)));
+          `All steps leading up to base must compose`));
       }
 
       if (
@@ -915,8 +908,16 @@ export function compositeFrom(description) {
       debug(() => colors.bright(`begin composition - not transforming`));
     }
 
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
+    for (
+      const [i, {
+        step,
+        stepComposes,
+      }] of
+        stitchArrays({
+          step: steps,
+          stepComposes: stepsCompose,
+        }).entries()
+    ) {
       const isBase = i === steps.length - 1;
 
       debug(() => [
@@ -1029,10 +1030,7 @@ export function compositeFrom(description) {
 
         let args;
 
-        if (isBase && !compositionNests) {
-          args =
-            argsLayout.filter(arg => arg !== continuationSymbol);
-        } else {
+        if (stepComposes) {
           let continuation;
 
           ({continuation, continuationStorage} =
@@ -1043,6 +1041,9 @@ export function compositeFrom(description) {
               (arg === continuationSymbol
                 ? continuation
                 : arg));
+        } else {
+          args =
+            argsLayout.filter(arg => arg !== continuationSymbol);
         }
 
         return expose[name](...args);
@@ -1102,11 +1103,6 @@ export function compositeFrom(description) {
 
       if (result !== continuationSymbol) {
         debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
-
-        if (compositionNests) {
-          throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
-        }
-
         debug(() => colors.bright(`end composition - exit (inferred)`));
 
         return result;
