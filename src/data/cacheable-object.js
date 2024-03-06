@@ -374,6 +374,18 @@ export default class CacheableObject {
 
     return object.#propertyUpdateValues[key] ?? null;
   }
+
+  static clone(object) {
+    const newObject = Reflect.construct(object.constructor, []);
+
+    this.copyUpdateValuesOnto(object, newObject);
+
+    return newObject;
+  }
+
+  static copyUpdateValuesOnto(source, target) {
+    Object.assign(target, source.#propertyUpdateValues);
+  }
 }
 
 export class CacheableObjectPropertyValueError extends Error {
