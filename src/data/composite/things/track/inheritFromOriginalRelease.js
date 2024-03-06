@@ -1,8 +1,6 @@
-// Early exits with a value inherited from the original release, if
-// this track is a rerelease, and otherwise continues with no further
-// dependencies provided. If allowOverride is true, then the continuation
-// will also be called if the original release exposed the requested
-// property as null.
+// Early exits with the value for the same property as specified on the
+// original release, if this track is a rerelease, and otherwise continues
+// without providing any further dependencies.
 //
 // Like withOriginalRelease, this will early exit (with notFoundValue) if the
 // original release is specified by reference and that reference doesn't
@@ -10,41 +8,34 @@
 
 import {input, templateCompositeFrom} from '#composite';
 
-import withOriginalRelease from './withOriginalRelease.js';
+import {exposeDependency, raiseOutputWithoutDependency}
+  from '#composite/control-flow';
+
+import withPropertyFromOriginalRelease
+  from './withPropertyFromOriginalRelease.js';
 
 export default templateCompositeFrom({
   annotation: `inheritFromOriginalRelease`,
 
   inputs: {
-    property: input({type: 'string'}),
-    allowOverride: input({type: 'boolean', defaultValue: false}),
-    notFoundValue: input({defaultValue: null}),
+    notFoundValue: input({
+      defaultValue: null,
+    }),
   },
 
   steps: () => [
-    withOriginalRelease({
+    withPropertyFromOriginalRelease({
+      property: input.thisProperty(),
       notFoundValue: input('notFoundValue'),
     }),
 
-    {
-      dependencies: [
-        '#originalRelease',
-        input('property'),
-        input('allowOverride'),
-      ],
+    raiseOutputWithoutDependency({
+      dependency: '#isRerelease',
+      mode: input.value('falsy'),
+    }),
 
-      compute: (continuation, {
-        ['#originalRelease']: originalRelease,
-        [input('property')]: originalProperty,
-        [input('allowOverride')]: allowOverride,
-      }) => {
-        if (!originalRelease) return continuation();
-
-        const value = originalRelease[originalProperty];
-        if (allowOverride && value === null) return continuation();
-
-        return continuation.exit(value);
-      },
-    },
+    exposeDependency({
+      dependency: '#originalValue',
+    }),
   ],
 });
