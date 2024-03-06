@@ -1,6 +1,9 @@
 // Analogous implementation for withReverseReferenceList, for contributions.
-// This is all duplicate code and both should be ported to the same underlying
-// data form later on.
+// This is mostly duplicate code and both should be ported to the same
+// underlying data form later on. Unique to contributions, the 'mode' option
+// controls whether the things themselves, for which the artist is credited,
+// are exposed (the default), or the actual contribution objects representing
+// the relationship itself, instead.
 //
 // This implementation uses a global cache (via WeakMap) to attempt to speed
 // up subsequent similar accesses.
@@ -10,6 +13,7 @@
 // is used, a fresh cache will always be created.
 
 import {input, templateCompositeFrom} from '#composite';
+import {is} from '#validators';
 
 import {exitWithoutDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
@@ -28,6 +32,11 @@ export default templateCompositeFrom({
   inputs: {
     data: inputWikiData({allowMixedTypes: false}),
     list: input({type: 'string'}),
+
+    mode: input({
+      validate: is('things', 'contributions'),
+      defaultValue: 'things',
+    }),
   },
 
   outputs: ['#reverseContributionList'],
@@ -64,16 +73,15 @@ export default templateCompositeFrom({
           const cacheRecord = new WeakMap();
 
           for (const referencingThing of data) {
-            const referenceList = referencingThing[list];
+            const contributionList = referencingThing[list];
 
-            // Destructuring {artist} is the only unique part of the
-            // withReverseContributionList implementation, compared to
-            // withReverseReferneceList.
-            for (const {artist: referencedThing} of referenceList) {
-              if (cacheRecord.has(referencedThing)) {
-                cacheRecord.get(referencedThing).push(referencingThing);
+            for (const contribution of contributionList) {
+              const {artist} = contribution;
+
+              if (cacheRecord.has(artist)) {
+                cacheRecord.get(artist).push(contribution);
               } else {
-                cacheRecord.set(referencedThing, [referencingThing]);
+                cacheRecord.set(artist, [contribution]);
               }
             }
           }
@@ -82,10 +90,25 @@ export default templateCompositeFrom({
         }
 
         return continuation({
-          ['#reverseContributionList']:
+          ['#contributions']:
             cache.get(data).get(myself) ?? [],
         });
       },
+    },
+
+    {
+      dependencies: ['#contributions', input('mode')],
+      compute: (continuation, {
+        ['#contributions']: contributions,
+        [input('mode')]: mode,
+      }) => continuation({
+        ['#reverseContributionList']:
+          (mode === 'contributions'
+            ? contributions
+         : mode === 'things'
+            ? contributions.map(contrib => contrib.thing)
+            : []),
+      }),
     },
   ],
 });
