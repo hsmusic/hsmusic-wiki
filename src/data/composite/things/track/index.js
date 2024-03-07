@@ -13,3 +13,4 @@ export {default as withOriginalRelease} from './withOriginalRelease.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
 export {default as withPropertyFromAlbum} from './withPropertyFromAlbum.js';
 export {default as withPropertyFromOriginalRelease} from './withPropertyFromOriginalRelease.js';
+export {default as withTrackArtDate} from './withTrackArtDate.js';
