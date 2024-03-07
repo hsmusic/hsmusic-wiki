@@ -9,8 +9,13 @@ export default {
 
   extraDependencies: ['html', 'language'],
 
-  query (_artist, track, contribs) {
+  query (_artist, contribs) {
     const query = {};
+
+    // TODO: Very mysterious what to do if the set of contributions is,
+    // in total, associated with more than one thing. No design yet.
+    query.track =
+      contribs[0].thing;
 
     const creditedAsArtist =
       contribs
@@ -59,12 +64,12 @@ export default {
     return query;
   },
 
-  relations: (relation, _query, artist, track, contribs) => ({
+  relations: (relation, query, artist, contribs) => ({
     template:
       relation('generateArtistInfoPageChunkItem'),
 
     trackLink:
-      relation('linkTrack', track),
+      relation('linkTrack', query.track),
 
     otherArtistLinks:
       relation('generateArtistInfoPageOtherArtistLinks',
@@ -72,12 +77,12 @@ export default {
         artist),
   }),
 
-  data: (query, _artist, track, _contribs) => ({
+  data: (query) => ({
     duration:
-      track.duration,
+      query.track.duration,
 
     rerelease:
-      track.isRerelease,
+      query.track.isRerelease,
 
     contribAnnotations:
       (query.displayedContributions

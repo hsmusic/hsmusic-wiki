@@ -1,5 +1,6 @@
-import {sortAlbumsTracksChronologically, sortEntryThingPairs} from '#sort';
-import {chunkByProperties, stitchArrays} from '#sugar';
+import {sortAlbumsTracksChronologically, sortContributionsChronologically}
+  from '#sort';
+import {chunkByConditions, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -8,89 +9,38 @@ export default {
   ],
 
   query(artist) {
-    const processTrackEntry = ({track, contribs}) => ({
-      thing: track,
-      entry: {
-        track: track,
-        album: track.album,
-        date: track.date,
-        contribs: contribs,
-      },
-    });
+    const query = {};
 
-    const processTrackEntries = ({tracks, contribs}) =>
-      stitchArrays({
-        track: tracks,
-        contribs: contribs,
-      }).map(processTrackEntry);
-
-    const {tracksAsArtist, tracksAsContributor} = artist;
-
-    const tracksAsArtistAndContributor =
-      tracksAsArtist
-        .filter(track => tracksAsContributor.includes(track));
-
-    const tracksAsArtistOnly =
-      tracksAsArtist
-        .filter(track => !tracksAsContributor.includes(track));
-
-    const tracksAsContributorOnly =
-      tracksAsContributor
-        .filter(track => !tracksAsArtist.includes(track));
-
-    const tracksAsArtistAndContributorContribs =
-      tracksAsArtistAndContributor
-        .map(track => [
-          ...
-            track.artistContribs
-              .map(contrib => ({...contrib, kind: 'artist'})),
-          ...
-            track.contributorContribs
-              .map(contrib => ({...contrib, kind: 'contributor'})),
-        ]);
-
-    const tracksAsArtistOnlyContribs =
-      tracksAsArtistOnly
-        .map(track => track.artistContribs
-          .map(contrib => ({...contrib, kind: 'artist'})));
-
-    const tracksAsContributorOnlyContribs =
-      tracksAsContributorOnly
-        .map(track => track.contributorContribs
-          .map(contrib => ({...contrib, kind: 'contributor'})));
-
-    const tracksAsArtistAndContributorEntries =
-      processTrackEntries({
-        tracks: tracksAsArtistAndContributor,
-        contribs: tracksAsArtistAndContributorContribs,
-      });
-
-    const tracksAsArtistOnlyEntries =
-      processTrackEntries({
-        tracks: tracksAsArtistOnly,
-        contribs: tracksAsArtistOnlyContribs,
-      });
-
-    const tracksAsContributorOnlyEntries =
-      processTrackEntries({
-        tracks: tracksAsContributorOnly,
-        contribs: tracksAsContributorOnlyContribs,
-      });
-
-    const entries = [
-      ...tracksAsArtistAndContributorEntries,
-      ...tracksAsArtistOnlyEntries,
-      ...tracksAsContributorOnlyEntries,
+    const allContributions = [
+      ...artist.artistContributions,
+      ...artist.contributorContributions,
     ];
 
-    sortEntryThingPairs(entries, sortAlbumsTracksChronologically);
+    sortContributionsChronologically(
+      allContributions,
+      sortAlbumsTracksChronologically);
 
-    const chunks =
-      chunkByProperties(
-        entries.map(({entry}) => entry),
-        ['album', 'date']);
+    query.contribs =
+      // First chunk by (contribution) date and album.
+      chunkByConditions(allContributions, [
+        ({date: date1}, {date: date2}) =>
+          +date1 !== +date2,
+        ({thing: track1}, {thing: track2}) =>
+          track1.album !== track2.album,
+      ]).map(contribs =>
+          // Then, *within* the boundaries of the existing chunks,
+          // chunk contributions to the same thing together.
+          chunkByConditions(contribs, [
+            ({thing: thing1}, {thing: thing2}) =>
+              thing1 !== thing2,
+          ]));
 
-    return {chunks};
+    query.albums =
+      query.contribs
+        .map(contribs =>
+          contribs[0][0].thing.album);
+
+    return query;
   },
 
   relations: (relation, query, artist) => ({
@@ -98,12 +48,14 @@ export default {
       relation('generateArtistInfoPageChunkedList'),
 
     chunks:
-      query.chunks.map(({chunk, album}) =>
-        relation('generateArtistInfoPageTracksChunk',
-          artist,
-          album,
-          chunk.map(entry => entry.track),
-          chunk.map(entry => entry.contribs))),
+      stitchArrays({
+        album: query.albums,
+        contribs: query.contribs,
+      }).map(({album, contribs}) =>
+          relation('generateArtistInfoPageTracksChunk',
+            artist,
+            album,
+            contribs)),
   }),
 
   generate: (relations) =>
