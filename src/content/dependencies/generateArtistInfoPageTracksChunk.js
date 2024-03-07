@@ -1,4 +1,4 @@
-import {stitchArrays} from '#sugar';
+import {empty, unique} from '#sugar';
 import {getTotalDuration} from '#wiki-data';
 
 export default {
@@ -8,45 +8,80 @@ export default {
     'linkAlbum',
   ],
 
-  relations: (relation, artist, album, tracks, contribs) => ({
+  relations: (relation, artist, album, trackContribLists) => ({
     template:
       relation('generateArtistInfoPageChunk'),
 
     albumLink:
       relation('linkAlbum', album),
 
+    // Intentional mapping here: each item may be associated with
+    // more than one contribution.
     items:
-      stitchArrays({
-        track: tracks,
-        contribs: contribs,
-      }).map(({track, contribs}) =>
-          relation('generateArtistInfoPageTracksChunkItem',
-            artist,
-            track,
-            contribs)),
+      trackContribLists.map(trackContribs =>
+        relation('generateArtistInfoPageTracksChunkItem',
+          artist,
+          trackContribs)),
   }),
 
-  data: (_artist, album, tracks, _contribs) => ({
-    // STUB: This is flat-out incorrect date behavior.
-    date:
-      album.date,
+  data(_artist, album, trackContribLists) {
+    const data = {};
 
-    duration:
-      getTotalDuration(tracks, {originalReleasesOnly: true}),
+    const allDates =
+      trackContribLists
+        .flat()
+        .filter(contrib => contrib.date)
+        .map(contrib => contrib.date);
 
-    durationApproximate:
-      tracks
-        .filter(track => track.duration && track.isOriginalRelease)
-        .length > 1,
-  }),
+    if (!empty(allDates)) {
+      const earliestDate =
+        allDates
+          .reduce((a, b) => a <= b ? a : b);
+
+      const latestDate =
+        allDates
+          .reduce((a, b) => a <= b ? b : a);
+
+      if (+earliestDate === +latestDate) {
+        data.date = earliestDate;
+      } else {
+        data.earliestDate = earliestDate;
+        data.latestDate = latestDate;
+      }
+    }
+
+    // TODO: Duration stuff should *maybe* be in proper data logic? Maaaybe?
+    const durationTerms =
+      unique(
+        trackContribLists
+          .flat()
+          .filter(contrib => contrib.countInDurationTotals)
+          .map(contrib => contrib.thing)
+          .filter(track => track.isOriginalRelease)
+          .filter(track => track.duration > 0));
+
+    data.duration =
+      getTotalDuration(durationTerms);
+
+    data.durationApproximate =
+      durationTerms.length > 1;
+
+    return data;
+  },
 
   generate: (data, relations) =>
     relations.template.slots({
       mode: 'album',
+
       albumLink: relations.albumLink,
-      date: data.date,
+
+      date: data.date ?? null,
+      dateRangeStart: data.earliestDate ?? null,
+      dateRangeEnd: data.latestDate ?? null,
+
       duration: data.duration,
       durationApproximate: data.durationApproximate,
+
       items: relations.items,
     }),
 };
