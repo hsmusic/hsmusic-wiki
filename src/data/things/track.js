@@ -62,6 +62,7 @@ import {
   withAlbum,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
+  withDate,
   withHasUniqueCoverArt,
   withOriginalRelease,
   withOtherReleases,
@@ -336,13 +337,8 @@ export class Track extends Thing {
     ],
 
     date: [
-      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
-
-      withPropertyFromAlbum({
-        property: input.value('date'),
-      }),
-
-      exposeDependency({dependency: '#album.date'}),
+      withDate(),
+      exposeDependency({dependency: '#date'}),
     ],
 
     hasUniqueCoverArt: [
