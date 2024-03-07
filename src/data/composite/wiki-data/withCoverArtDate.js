@@ -3,6 +3,7 @@
 // any coverArtistContribs.
 
 import {input, templateCompositeFrom} from '#composite';
+import {isDate} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 
@@ -12,6 +13,12 @@ export default templateCompositeFrom({
   annotation: `withCoverArtDate`,
 
   inputs: {
+    from: input({
+      validate: isDate,
+      defaultDependency: 'coverArtDate',
+      acceptsNull: true,
+    }),
+
     fallback: input({
       type: 'boolean',
       defaultValue: false,
@@ -33,14 +40,21 @@ export default templateCompositeFrom({
     }),
 
     {
-      dependencies: ['coverArtDate', input('fallback')],
+      dependencies: [input('from')],
       compute: (continuation, {
-        ['coverArtDate']: coverArtDate,
+        [input('from')]: from,
+      }) =>
+        (from
+          ? continuation.raiseOutput({'#coverArtDate': from})
+          : continuation()),
+    },
+
+    {
+      dependencies: [input('fallback')],
+      compute: (continuation, {
         [input('fallback')]: fallback,
       }) =>
-        (coverArtDate
-          ? continuation.raiseOutput({'#coverArtDate': coverArtDate})
-       : fallback
+        (fallback
           ? continuation()
           : continuation.raiseOutput({'#coverArtDate': null})),
     },
