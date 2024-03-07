@@ -404,3 +404,30 @@ export function sortFlashesChronologically(data, {
 
   return data;
 }
+
+export function sortContributionsChronologically(data, sortThings, {
+  latestFirst = false,
+} = {}) {
+  // Contributions only have one date property (which is provided when
+  // the contribution is created). They're sorted by this most primarily,
+  // but otherwise use the same sort as is provided.
+
+  const entries =
+    data.map(contrib => ({
+      entry: contrib,
+      thing: contrib.thing,
+    }));
+
+  sortEntryThingPairs(
+    entries,
+    things =>
+      sortThings(things, {latestFirst}));
+
+  const contribs =
+    entries
+      .map(({entry: contrib}) => contrib);
+
+  sortByDate(contribs, {latestFirst});
+
+  return contribs;
+}
