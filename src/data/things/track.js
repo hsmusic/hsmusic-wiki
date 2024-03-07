@@ -67,6 +67,7 @@ import {
   withOriginalRelease,
   withOtherReleases,
   withPropertyFromAlbum,
+  withTrackArtDate,
 } from '#composite/things/track';
 
 export class Track extends Thing {
@@ -149,27 +150,14 @@ export class Track extends Thing {
       }),
     ],
 
-    // Date of cover art release. Like coverArtFileExtension, this represents
-    // only the track's own unique cover artwork, if any. This exposes only as
-    // the track's own coverArtDate or its album's trackArtDate, so if neither
-    // is specified, this value is null.
     coverArtDate: [
-      withHasUniqueCoverArt(),
-
-      exitWithoutDependency({
-        dependency: '#hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      withTrackArtDate({
+        from: input.updateValue({
+          validate: isDate,
+        }),
       }),
 
-      exposeUpdateValueOrContinue({
-        validate: input.value(isDate),
-      }),
-
-      withPropertyFromAlbum({
-        property: input.value('trackArtDate'),
-      }),
-
-      exposeDependency({dependency: '#album.trackArtDate'}),
+      exposeDependency({dependency: '#trackArtDate'}),
     ],
 
     coverArtDimensions: [
