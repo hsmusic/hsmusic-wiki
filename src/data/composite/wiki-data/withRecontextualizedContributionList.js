@@ -1,6 +1,10 @@
 // Clones all the contributions in a list, with thing and thingProperty both
-// updated to match the current thing. Overwrite the provided dependency.
+// updated to match the current thing. Overwrites the provided dependency.
 // Doesn't do anything if the provided dependency is null.
+//
+// See also:
+//  - withRedatedContributionList
+//
 
 import {input, templateCompositeFrom} from '#composite';
 

@@ -13,6 +13,7 @@ export {default as withDirectory} from './withDirectory.js';
 export {default as withDirectoryFromName} from './withDirectoryFromName.js';
 export {default as withParsedCommentaryEntries} from './withParsedCommentaryEntries.js';
 export {default as withRecontextualizedContributionList} from './withRecontextualizedContributionList.js';
+export {default as withRedatedContributionList} from './withRedatedContributionList.js';
 export {default as withResolvedContribs} from './withResolvedContribs.js';
 export {default as withResolvedReference} from './withResolvedReference.js';
 export {default as withResolvedReferenceList} from './withResolvedReferenceList.js';
