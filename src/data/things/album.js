@@ -18,8 +18,13 @@ import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
 import {exitWithoutDependency, exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
 import {withPropertyFromObject} from '#composite/data';
-import {exitWithoutContribs, withDirectory, withResolvedReference}
-  from '#composite/wiki-data';
+
+import {
+  exitWithoutContribs,
+  withDirectory,
+  withResolvedReference,
+  withCoverArtDate,
+} from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -73,13 +78,12 @@ export class Album extends Thing {
     dateAddedToWiki: simpleDate(),
 
     coverArtDate: [
-      exitWithoutContribs({contribs: 'coverArtistContribs'}),
-
-      exposeUpdateValueOrContinue({
-        validate: input.value(isDate),
+      // TODO: Why does this fall back, but Track.coverArtDate doesn't?
+      withCoverArtDate({
+        fallback: input.value(true),
       }),
 
-      exposeDependency({dependency: 'date'}),
+      exposeDependency({dependency: '#coverArtDate'}),
     ],
 
     coverArtFileExtension: [
