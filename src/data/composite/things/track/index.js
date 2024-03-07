@@ -7,6 +7,7 @@ export {default as trackReverseReferenceList} from './trackReverseReferenceList.
 export {default as withAlbum} from './withAlbum.js';
 export {default as withAlwaysReferenceByDirectory} from './withAlwaysReferenceByDirectory.js';
 export {default as withContainingTrackSection} from './withContainingTrackSection.js';
+export {default as withDate} from './withDate.js';
 export {default as withHasUniqueCoverArt} from './withHasUniqueCoverArt.js';
 export {default as withOriginalRelease} from './withOriginalRelease.js';
 export {default as withOtherReleases} from './withOtherReleases.js';
