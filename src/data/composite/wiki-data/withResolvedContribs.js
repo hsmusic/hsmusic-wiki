@@ -7,7 +7,7 @@ import {input, templateCompositeFrom} from '#composite';
 import find from '#find';
 import {filterMultipleArrays, stitchArrays} from '#sugar';
 import thingConstructors from '#things';
-import {is, isContributionList, isStringNonEmpty} from '#validators';
+import {is, isContributionList, isDate, isStringNonEmpty} from '#validators';
 
 import {raiseOutputWithoutDependency} from '#composite/control-flow';
 import {withPropertiesFromList} from '#composite/data';
@@ -20,6 +20,11 @@ export default templateCompositeFrom({
   inputs: {
     from: input({
       validate: isContributionList,
+      acceptsNull: true,
+    }),
+
+    date: input({
+      validate: isDate,
       acceptsNull: true,
     }),
 
@@ -71,11 +76,16 @@ export default templateCompositeFrom({
     }),
 
     {
-      dependencies: ['#contribs.who', '#contribs.what'],
+      dependencies: [
+        '#contribs.who',
+        '#contribs.what',
+        input('date'),
+      ],
 
       compute(continuation, {
         ['#contribs.who']: who,
         ['#contribs.what']: what,
+        [input('date')]: date,
       }) {
         filterMultipleArrays(who, what, (who, _what) => who);
 
@@ -84,7 +94,10 @@ export default templateCompositeFrom({
             stitchArrays({
               artist: who,
               annotation: what,
-            }),
+            }).map(details => ({
+                ...details,
+                date: date ?? null,
+              })),
         });
       },
     },

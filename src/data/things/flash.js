@@ -85,7 +85,9 @@ export class Flash extends Thing {
 
     coverArtFileExtension: fileExtension('jpg'),
 
-    contributorContribs: contributionList(),
+    contributorContribs: contributionList({
+      date: 'date',
+    }),
 
     featuredTracks: referenceList({
       class: input.value(Track),
