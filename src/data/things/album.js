@@ -80,6 +80,10 @@ export class Album extends Thing {
     coverArtDate: [
       // TODO: Why does this fall back, but Track.coverArtDate doesn't?
       withCoverArtDate({
+        from: input.updateValue({
+          validate: isDate,
+        }),
+
         fallback: input.value(true),
       }),
 
