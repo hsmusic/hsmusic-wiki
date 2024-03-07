@@ -9,7 +9,7 @@ import {isStringNonEmpty, isThing, validateReference} from '#validators';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withResolvedReference} from '#composite/wiki-data';
-import {flag} from '#composite/wiki-properties';
+import {flag, simpleDate} from '#composite/wiki-properties';
 
 import {
   inheritFromContributionPresets,
@@ -31,6 +31,8 @@ export class Contribution extends Thing {
       flags: {update: true, expose: true},
       update: {validate: isStringNonEmpty},
     },
+
+    date: simpleDate(),
 
     artist: [
       withContributionArtist({
@@ -103,6 +105,10 @@ export class Contribution extends Thing {
 
     if (this.annotation) {
       accentParts.push(colors.green(`"${this.annotation}"`));
+    }
+
+    if (this.date) {
+      accentParts.push(colors.yellow(this.date.toLocaleDateString()));
     }
 
     let artistRef;
