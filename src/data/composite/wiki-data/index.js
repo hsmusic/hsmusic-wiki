@@ -6,6 +6,7 @@
 
 export {default as exitWithoutContribs} from './exitWithoutContribs.js';
 export {default as inputWikiData} from './inputWikiData.js';
+export {default as withClonedThings} from './withClonedThings.js';
 export {default as withContributionListSums} from './withContributionListSums.js';
 export {default as withDirectory} from './withDirectory.js';
 export {default as withDirectoryFromName} from './withDirectoryFromName.js';
