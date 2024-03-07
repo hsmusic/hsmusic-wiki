@@ -29,7 +29,10 @@ export default templateCompositeFrom({
           : continuation()),
     },
 
-    withResolvedContribs({from: 'coverArtistContribs'}),
+    withResolvedContribs({
+      from: 'coverArtistContribs',
+      date: input.value(null),
+    }),
 
     {
       dependencies: ['#resolvedContribs'],

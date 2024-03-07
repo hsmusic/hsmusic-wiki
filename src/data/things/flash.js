@@ -98,7 +98,9 @@ export class Flash extends Thing {
 
     coverArtDimensions: dimensions(),
 
-    contributorContribs: contributionList(),
+    contributorContribs: contributionList({
+      date: 'date',
+    }),
 
     featuredTracks: referenceList({
       class: input.value(Track),
