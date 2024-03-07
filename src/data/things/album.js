@@ -136,11 +136,45 @@ export class Album extends Thing {
       find: input.value(find.unqualifiedTrackSection),
     }),
 
-    artistContribs: contributionList(),
-    coverArtistContribs: contributionList(),
-    trackCoverArtistContribs: contributionList(),
-    wallpaperArtistContribs: contributionList(),
-    bannerArtistContribs: contributionList(),
+    artistContribs: contributionList({
+      date: 'date',
+    }),
+
+    coverArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
+
+    trackCoverArtistContribs: contributionList({
+      // May be null, indicating cover art was added for tracks on the date
+      // each track specifies, or else the track's own release date.
+      date: 'trackArtDate',
+    }),
+
+    wallpaperArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
+
+    bannerArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
 
     groups: referenceList({
       class: input.value(Group),

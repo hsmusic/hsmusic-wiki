@@ -24,6 +24,7 @@ export default templateCompositeFrom({
   steps: () => [
     withResolvedContribs({
       from: input('contribs'),
+      date: input.value(null),
     }),
 
     // TODO: Fairly certain exitWithoutDependency would be sufficient here.

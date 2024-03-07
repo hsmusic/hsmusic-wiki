@@ -194,9 +194,12 @@ export class Track extends Thing {
     artistContribs: [
       inheritContributionListFromOriginalRelease(),
 
+      withDate(),
+
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
+        date: '#date',
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -219,7 +222,10 @@ export class Track extends Thing {
 
     contributorContribs: [
       inheritContributionListFromOriginalRelease(),
-      contributionList(),
+
+      contributionList({
+        date: 'date',
+      }),
     ],
 
     // Cover artists aren't inherited from the original release, since it
@@ -230,9 +236,14 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
+      withTrackArtDate({
+        fallback: input.value(true),
+      }),
+
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
         thingProperty: input.thisProperty(),
+        date: '#trackArtDate',
       }).outputs({
         '#resolvedContribs': '#coverArtistContribs',
       }),
