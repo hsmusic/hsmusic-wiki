@@ -17,8 +17,6 @@ import {
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {withRecontextualizedContributionList, withResolvedContribs}
-  from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -28,6 +26,12 @@ import {
   exposeUpdateValueOrContinue,
   exposeWhetherDependencyAvailable,
 } from '#composite/control-flow';
+
+import {
+  withRecontextualizedContributionList,
+  withRedatedContributionList,
+  withResolvedContribs,
+} from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -206,6 +210,11 @@ export class Track extends Thing {
         list: '#album.artistContribs',
       }),
 
+      withRedatedContributionList({
+        list: '#album.artistContribs',
+        date: '#date',
+      }),
+
       exposeDependency({dependency: '#album.artistContribs'}),
     ],
 
@@ -248,6 +257,11 @@ export class Track extends Thing {
 
       withRecontextualizedContributionList({
         list: '#album.trackCoverArtistContribs',
+      }),
+
+      withRedatedContributionList({
+        list: '#album.trackCoverArtistContribs',
+        date: '#trackArtDate',
       }),
 
       exposeDependency({dependency: '#album.trackCoverArtistContribs'}),

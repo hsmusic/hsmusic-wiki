@@ -5,8 +5,10 @@ import {input, templateCompositeFrom} from '#composite';
 
 import {exposeDependency, raiseOutputWithoutDependency}
   from '#composite/control-flow';
-import {withRecontextualizedContributionList} from '#composite/wiki-data';
+import {withRecontextualizedContributionList, withRedatedContributionList}
+  from '#composite/wiki-data';
 
+import withDate from './withDate.js';
 import withPropertyFromOriginalRelease
   from './withPropertyFromOriginalRelease.js';
 
@@ -26,6 +28,13 @@ export default templateCompositeFrom({
 
     withRecontextualizedContributionList({
       list: '#originalValue',
+    }),
+
+    withDate(),
+
+    withRedatedContributionList({
+      list: '#originalValue',
+      date: '#date',
     }),
 
     exposeDependency({
