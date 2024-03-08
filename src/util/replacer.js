@@ -613,9 +613,16 @@ export function postprocessExternalLinks(inputNodes) {
     while (plausibleMatch = plausibleLinkRegexp.exec(node.data)) {
       textContent += node.data.slice(parseFrom, plausibleMatch.index);
 
+      // Pedantic rules use more particular parentheses detection in link
+      // destinations - they allow one level of balanced parentheses, and
+      // otherwise, parentheses must be escaped. This allows for entire links
+      // to be wrapped in parentheses, e.g below:
+      //
+      //   This is so cool. ([You know??](https://example.com))
+      //
       const definiteMatch =
-        marked.Lexer.rules.inline.link.exec(
-          node.data.slice(plausibleMatch.index));
+        marked.Lexer.rules.inline.pedantic.link
+          .exec(node.data.slice(plausibleMatch.index));
 
       if (definiteMatch) {
         const {1: label, 2: href} = definiteMatch;
