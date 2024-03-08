@@ -232,6 +232,7 @@ export default {
               warnings,
               width,
               height,
+              align,
               pixelate,
             } = node;
 
@@ -258,6 +259,9 @@ export default {
               inline: false,
               data:
                 html.tag('div', {class: 'content-image-container'},
+                  align === 'center' &&
+                    {class: 'align-center'},
+
                   image.slots({
                     src,
 

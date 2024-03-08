@@ -778,6 +778,12 @@ ul.image-details li {
   margin-bottom: 1em;
 }
 
+.content-image-container.align-center {
+  text-align: center;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
 .content-image {
   display: inline-block !important;
 }

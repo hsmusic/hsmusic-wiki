@@ -510,6 +510,7 @@ export function postprocessImages(inputNodes) {
         if (attributes.get('style')) imageNode.style = attributes.get('style');
         if (attributes.get('width')) imageNode.width = parseInt(attributes.get('width'));
         if (attributes.get('height')) imageNode.height = parseInt(attributes.get('height'));
+        if (attributes.get('align')) imageNode.align = attributes.get('align');
         if (attributes.get('pixelate')) imageNode.pixelate = true;
 
         if (attributes.get('warning')) {
