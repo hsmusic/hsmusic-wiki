@@ -110,6 +110,23 @@ function pointIsOverAnyOf(elements) {
   };
 }
 
+function getVisuallyContainingElement(child) {
+  let parent = child.parentElement;
+
+  while (parent) {
+    if (
+      cssProp(parent, 'overflow') === 'hidden' ||
+      cssProp(parent, 'contain') === 'paint'
+    ) {
+      return parent;
+    }
+
+    parent = parent.parentElement;
+  }
+
+  return null;
+}
+
 // TODO: These should pro8a8ly access some shared urlSpec path. We'd need to
 // separ8te the tooling around that into common-shared code too.
 
@@ -979,6 +996,8 @@ function showTooltipFromHoverable(hoverable) {
 
   hoverable.classList.add('has-visible-tooltip');
 
+  positionTooltipFromHoverableWithBrains(hoverable);
+
   cssProp(tooltip, 'display', 'block');
   tooltip.inert = false;
 
@@ -988,6 +1007,183 @@ function showTooltipFromHoverable(hoverable) {
   state.tooltipWasJustHidden = false;
 
   return true;
+}
+
+function peekTooltipClientRect(tooltip) {
+  const oldDisplayStyle = cssProp(tooltip, 'display');
+  cssProp(tooltip, 'display', 'block');
+
+  // Tooltips have a bit of padding that makes the interactive
+  // area wider, so that you're less likely to accidentally let
+  // the tooltip disappear (by hovering outside it). But this
+  // isn't visual at all, so for placement we only care about
+  // the content element.
+  const content =
+    tooltip.querySelector('.tooltip-content');
+
+  try {
+    return content.getBoundingClientRect();
+  } finally {
+    cssProp(tooltip, 'display', oldDisplayStyle);
+  }
+}
+
+function positionTooltipFromHoverableWithBrains(hoverable) {
+  const {state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  // Reset before doing anything else. We're going to adapt to
+  // its natural placement, adjusted by CSS, which otherwise
+  // could be obscured by a placement we've previously provided.
+  resetDynamicTooltipPositioning(tooltip);
+
+  const opportunities =
+    getTooltipFromHoverablePlacementOpportunityAreas(hoverable);
+
+  const tooltipRect =
+    peekTooltipClientRect(tooltip);
+
+  // If the tooltip is already in the baseline containing area,
+  // prefer to keep it positioned naturally, adjusted by CSS
+  // instead of JavaScript.
+
+  const {baseline: baselineRect} = opportunities;
+
+  if (
+    tooltipRect.top >= baselineRect.top &&
+    tooltipRect.bottom <= baselineRect.bottom &&
+    tooltipRect.left >= baselineRect.left &&
+    tooltipRect.right <= baselineRect.right
+  ) {
+    return;
+  }
+
+  // STUB: Will select an opportunity to apply here.
+
+  positionTooltip(tooltip, baselineRect.x, baselineRect.y);
+}
+
+function positionTooltip(tooltip, x, y) {
+  // Imagine what it'd be like if the tooltip were positioned
+  // with zero left/top offset, and calculate its actual offsets
+  // based on that.
+
+  cssProp(tooltip, {
+    left: `0`,
+    top: `0`,
+  });
+
+  const tooltipRect =
+    peekTooltipClientRect(tooltip);
+
+  cssProp(tooltip, {
+    left: `${x - tooltipRect.x}px`,
+    top: `${y - tooltipRect.y}px`,
+  });
+}
+
+function resetDynamicTooltipPositioning(tooltip) {
+  cssProp(tooltip, {
+    left: null,
+    top: null,
+  });
+}
+
+function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
+  const {state} = hoverableTooltipInfo;
+  const {tooltip} = state.registeredHoverables.get(hoverable);
+
+  const baselineRect =
+    getTooltipBaselineOpportunityArea(tooltip);
+
+  const hoverableRect =
+    hoverable.getBoundingClientRect();
+
+  // STUB: Will compute more opportunities here.
+
+  return {
+    baseline: baselineRect,
+  };
+}
+
+function getTooltipBaselineOpportunityArea(tooltip) {
+  const {stickyContainers} = stickyHeadingInfo;
+  const {documentElement} = document;
+
+  const windowRect =
+    new DOMRect(
+      0, 0,
+      documentElement.clientWidth,
+      documentElement.clientHeight);
+
+  const baselineRect =
+    DOMRect.fromRect(windowRect);
+
+  const containingParent =
+    getVisuallyContainingElement(tooltip);
+
+  if (containingParent) {
+    const containingRect =
+      containingParent.getBoundingClientRect();
+
+    // Only respect a portion of the container's padding, giving
+    // the tooltip the impression of a "raised" element.
+    const padding = side =>
+      0.5 *
+      parseFloat(cssProp(containingParent, 'padding-' + side));
+
+    const insetContainingRect =
+      new DOMRect(
+        containingRect.x + padding('left'),
+        containingRect.y + padding('top'),
+        containingRect.width - padding('left') - padding('right'),
+        containingRect.height - padding('top') - padding('bottom'));
+
+    const subtractFromTop =
+      Math.max(0, insetContainingRect.top);
+
+    const subtractFromBottom =
+      Math.max(0, windowRect.height - insetContainingRect.bottom);
+
+    const subtractFromLeft =
+      Math.max(0, insetContainingRect.left);
+
+    const subtractFromRight =
+      Math.max(0, windowRect.width - insetContainingRect.right);
+
+    baselineRect.y += subtractFromTop;
+    baselineRect.height -= subtractFromTop;
+    baselineRect.height -= subtractFromBottom;
+
+    baselineRect.x += subtractFromLeft;
+    baselineRect.width -= subtractFromLeft;
+    baselineRect.width -= subtractFromRight;
+  }
+
+  // This currently assumes a maximum of one sticky container
+  // per visually containing element.
+
+  const stickyContainer =
+    stickyContainers
+      .find(el => el.parentElement === containingParent);
+
+  if (stickyContainer) {
+    const stickyRect =
+      stickyContainer.getBoundingClientRect()
+
+    // Add some padding so the tooltip doesn't line up exactly
+    // with the edge of the sticky container.
+    const stickyBottom =
+      stickyRect.bottom + 10;
+
+    const overlap =
+      Math.max(0, stickyBottom - baselineRect.top);
+
+    baselineRect.y += overlap;
+    baselineRect.height -= overlap;
+  }
+
+  return baselineRect;
 }
 
 function addHoverableTooltipPageListeners() {
