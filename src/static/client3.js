@@ -478,15 +478,21 @@ class WikiRect extends DOMRect {
   }
 
   intersectionWith(rect) {
-    const {origin: x, extent: width} =
+    const horizontalIntersection =
       WikiRect.intersectionFromOriginsExtents(
         {origin: this.x, extent: this.width},
         {origin: rect.x, extent: rect.width});
 
-    const {origin: y, extent: height} =
+    const verticalIntersection =
       WikiRect.intersectionFromOriginsExtents(
         {origin: this.y, extent: this.height},
         {origin: rect.y, extent: rect.height});
+
+    if (!horizontalIntersection) return null;
+    if (!verticalIntersection) return null;
+
+    const {origin: x, extent: width} = horizontalIntersection;
+    const {origin: y, extent: height} = verticalIntersection;
 
     return Reflect.construct(this.constructor, [x, y, width, height]);
   }
@@ -506,23 +512,23 @@ class WikiRect extends DOMRect {
     }
 
     return {
-      origin: origin + start,
-      extent: extent - start - end,
+      origin: normalized.origin + start,
+      extent: normalized.extent - start - end,
     };
   }
 
   toInset(arg1, arg2) {
     if (typeof arg1 === 'number' && typeof arg2 === 'number') {
       return this.toInset({
-        left: arg1,
-        right: arg1,
+        left: arg2,
+        right: arg2,
         top: arg1,
         bottom: arg1,
       });
     } else if (typeof arg1 === 'number') {
       return this.toInset({
-        left: arg2,
-        right: arg2,
+        left: arg1,
+        right: arg1,
         top: arg1,
         bottom: arg1,
       });
@@ -549,6 +555,54 @@ class WikiRect extends DOMRect {
     return Reflect.construct(this.constructor, [x, y, width, height]);
   }
 
+  static extendOriginExtent({origin, extent, start = 0, end = 0}) {
+    const normalized =
+      this.normalizeOriginExtent({origin, extent});
+
+    return {
+      origin: normalized.origin - start,
+      extent: normalized.extent + start + end,
+    };
+  }
+
+  toExtended(arg1, arg2) {
+    if (typeof arg1 === 'number' && typeof arg2 === 'number') {
+      return this.toExtended({
+        left: arg2,
+        right: arg2,
+        top: arg1,
+        bottom: arg1,
+      });
+    } else if (typeof arg1 === 'number') {
+      return this.toExtended({
+        left: arg1,
+        right: arg1,
+        top: arg1,
+        bottom: arg1,
+      });
+    }
+
+    const {top, left, bottom, right} = arg1;
+
+    const {origin: x, extent: width} =
+      WikiRect.extendOriginExtent({
+        origin: this.x,
+        extent: this.width,
+        start: left,
+        end: right,
+      });
+
+    const {origin: y, extent: height} =
+      WikiRect.extendOriginExtent({
+        origin: this.y,
+        extent: this.height,
+        start: top,
+        end: bottom,
+      });
+
+    return Reflect.construct(this.constructor, [x, y, width, height]);
+  }
+
   // Comparisons
 
   equals(rect) {
@@ -564,11 +618,11 @@ class WikiRect extends DOMRect {
   }
 
   contains(rect) {
-    return this.intersectionWith(rect).equals(rect);
+    return !!this.intersectionWith(rect)?.equals(rect);
   }
 
   containedWithin(rect) {
-    return this.intersectionWith(rect).equals(this);
+    return !!this.intersectionWith(rect)?.equals(this);
   }
 
   // Interfacing utilities
