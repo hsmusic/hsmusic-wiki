@@ -625,6 +625,26 @@ class WikiRect extends DOMRect {
     return !!this.intersectionWith(rect)?.equals(this);
   }
 
+  fits(rect) {
+    const rectNormalized = WikiRect.fromRect(rect).toNormalized();
+    const thisNormalized = this.toNormalized();
+
+    return (
+      (!isFinite(this.width) || rectNormalized.width <= thisNormalized.width) &&
+      (!isFinite(this.height) || rectNormalized.height <= thisNormalized.height)
+    );
+  }
+
+  fitsWithin(rect) {
+    const rectNormalized = WikiRect.fromRect(rect).toNormalized();
+    const thisNormalized = this.toNormalized();
+
+    return (
+      (!isFinite(rect.width) || thisNormalized.width <= rectNormalized.width) &&
+      (!isFinite(rect.height) || thisNormalized.height <= rectNormalized.height)
+    );
+  }
+
   // Interfacing utilities
 
   static fromRect(rect) {
@@ -1486,7 +1506,7 @@ function peekTooltipClientRect(tooltip) {
     tooltip.querySelector('.tooltip-content');
 
   try {
-    return content.getBoundingClientRect();
+    return WikiRect.fromElement(content);
   } finally {
     cssProp(tooltip, 'display', oldDisplayStyle);
   }
@@ -1511,15 +1531,30 @@ function positionTooltipFromHoverableWithBrains(hoverable) {
   // prefer to keep it positioned naturally, adjusted by CSS
   // instead of JavaScript.
 
-  const {baseline: baselineRect} = opportunities;
+  const {numBaselineRects, idealBaseline: baselineRect} = opportunities;
 
   if (baselineRect.contains(tooltipRect)) {
     return;
   }
 
-  // STUB: Will select an opportunity to apply here.
+  let selectedRect = null;
+  for (let i = 0; i < numBaselineRects; i++) {
+    selectedRect = opportunities.right.down[i];
+    if (selectedRect) break;
 
-  positionTooltip(tooltip, baselineRect.x, baselineRect.y);
+    selectedRect = opportunities.left.down[i];
+    if (selectedRect) break;
+
+    selectedRect = opportunities.right.up[i];
+    if (selectedRect) break;
+
+    selectedRect = opportunities.left.up[i];
+    if (selectedRect) break;
+  }
+
+  selectedRect ??= baselineRect;
+
+  positionTooltip(tooltip, selectedRect.x, selectedRect.y);
 }
 
 function positionTooltip(tooltip, x, y) {
@@ -1552,27 +1587,119 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
   const {state} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
-  const baselineRect =
-    getTooltipBaselineOpportunityArea(tooltip);
+  const baselineRects =
+    getTooltipBaselineOpportunityAreas(tooltip);
 
   const hoverableRect =
-    hoverable.getBoundingClientRect();
+    WikiRect.fromElement(hoverable).toExtended(5, 10);
 
-  // STUB: Will compute more opportunities here.
+  const tooltipRect =
+    peekTooltipClientRect(tooltip);
+
+  // Get placements relative to the hoverable. Make these available by key,
+  // allowing the caller to choose by preferred orientation. Each value is
+  // an array which corresponds to the baseline areas - placement closer to
+  // front of the array indicates stronger preference. Since not all relative
+  // placements cooperate with all baseline areas, any of these arrays may
+  // include (or be entirely made of) null.
+
+  const keepIfFits = (rect) =>
+    (rect?.fits(tooltipRect)
+      ? rect
+      : null);
+
+  const prepareRegionRects = (relationalRect) =>
+    baselineRects
+      .map(rect => rect.intersectionWith(relationalRect))
+      .map(keepIfFits);
+
+  const regionRects = {
+    left: prepareRegionRects(WikiRect.leftOf(hoverableRect)),
+    right: prepareRegionRects(WikiRect.rightOf(hoverableRect)),
+    top: prepareRegionRects(WikiRect.above(hoverableRect)),
+    bottom: prepareRegionRects(WikiRect.beneath(hoverableRect)),
+  };
+
+  const neededVerticalOverlap = 30;
+  const neededHorizontalOverlap = 30;
+
+  const prepareVerticalOrientationRects = (regionRects) => {
+    const orientations = {};
+
+    const upTopDown =
+      WikiRect.beneath(
+        hoverableRect.top + neededVerticalOverlap - tooltipRect.height);
+
+    const downBottomUp =
+      WikiRect.above(
+        hoverableRect.bottom - neededVerticalOverlap + tooltipRect.height);
+
+    orientations.up =
+      regionRects
+        .map(rect => rect?.intersectionWith(upTopDown))
+        .map(keepIfFits);
+
+    orientations.down =
+      regionRects
+        .map(rect => rect?.intersectionWith(downBottomUp))
+        .map(rect =>
+          (rect
+            ? rect.intersectionWith(WikiRect.fromRect({
+                x: rect.x,
+                y: rect.bottom - tooltipRect.height,
+                width: rect.width,
+                height: tooltipRect.height,
+              }))
+            : null))
+        .map(keepIfFits);
+
+    const centerRect =
+      WikiRect.fromRect({
+        x: -Infinity, width: Infinity,
+        y: hoverableRect.top
+         + hoverableRect.height / 2
+         - tooltipRect.height / 2,
+        height: tooltipRect.height,
+      });
+
+    orientations.center =
+      regionRects
+        .map(rect => rect?.intersectionWith(centerRect))
+        .map(keepIfFits);
+
+    return orientations;
+  };
+
+  const orientationRects = {
+    left: prepareVerticalOrientationRects(regionRects.left),
+    right: prepareVerticalOrientationRects(regionRects.right),
+  };
 
   return {
-    baseline: baselineRect,
+    numBaselineRects: baselineRects.length,
+    idealBaseline: baselineRects[0],
+    ...orientationRects,
   };
 }
 
-function getTooltipBaselineOpportunityArea(tooltip) {
+function getTooltipBaselineOpportunityAreas(tooltip) {
+  // Returns multiple basic areas in order of preference, with front of the
+  // array representing greater preference.
+
   const {stickyContainers} = stickyHeadingInfo;
+  const results = [];
 
   const windowRect =
-    WikiRect.fromWindow();
+    WikiRect.fromWindow().toInset(10);
 
-  const baselineRect =
+  const workingRect =
     WikiRect.fromRect(windowRect);
+
+  const tooltipRect =
+    peekTooltipClientRect(tooltip);
+
+  // As a baseline, always treat the window rect as fitting the tooltip.
+  results.unshift(WikiRect.fromRect(workingRect));
 
   const containingParent =
     getVisuallyContainingElement(tooltip);
@@ -1595,7 +1722,13 @@ function getTooltipBaselineOpportunityArea(tooltip) {
         bottom: padding('bottom'),
       });
 
-    baselineRect.chopExtendingOutside(insetContainingRect);
+    workingRect.chopExtendingOutside(insetContainingRect);
+
+    if (!workingRect.fits(tooltipRect)) {
+      return results;
+    }
+
+    results.unshift(WikiRect.fromRect(workingRect));
   }
 
   // This currently assumes a maximum of one sticky container
@@ -1614,10 +1747,16 @@ function getTooltipBaselineOpportunityArea(tooltip) {
     const beneathStickyContainer =
       WikiRect.beneath(stickyRect, 10);
 
-    baselineRect.chopExtendingOutside(beneathStickyContainer);
+    workingRect.chopExtendingOutside(beneathStickyContainer);
+
+    if (!workingRect.fits(tooltipRect)) {
+      return results;
+    }
+
+    results.unshift(WikiRect.fromRect(workingRect));
   }
 
-  return baselineRect;
+  return results;
 }
 
 function addHoverableTooltipPageListeners() {
