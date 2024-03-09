@@ -549,6 +549,28 @@ class WikiRect extends DOMRect {
     return Reflect.construct(this.constructor, [x, y, width, height]);
   }
 
+  // Comparisons
+
+  equals(rect) {
+    const rectNormalized = WikiRect.fromRect(rect).toNormalized();
+    const thisNormalized = this.toNormalized();
+
+    return (
+      rectNormalized.x === thisNormalized.x &&
+      rectNormalized.y === thisNormalized.y &&
+      rectNormalized.width === thisNormalized.width &&
+      rectNormalized.height === thisNormalized.height
+    );
+  }
+
+  contains(rect) {
+    return this.intersectionWith(rect).equals(rect);
+  }
+
+  containedWithin(rect) {
+    return this.intersectionWith(rect).equals(this);
+  }
+
   // Interfacing utilities
 
   static fromRect(rect) {
@@ -1437,12 +1459,7 @@ function positionTooltipFromHoverableWithBrains(hoverable) {
 
   const {baseline: baselineRect} = opportunities;
 
-  if (
-    tooltipRect.top >= baselineRect.top &&
-    tooltipRect.bottom <= baselineRect.bottom &&
-    tooltipRect.left >= baselineRect.left &&
-    tooltipRect.right <= baselineRect.right
-  ) {
+  if (baselineRect.contains(tooltipRect)) {
     return;
   }
 
