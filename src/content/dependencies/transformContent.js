@@ -255,18 +255,31 @@ export default {
             } = node;
 
             if (node.inline) {
+              let content =
+                html.tag('img',
+                  src && {src},
+                  width && {width},
+                  height && {height},
+                  style && {style},
+
+                  pixelate &&
+                    {class: 'pixelate'});
+
+              if (link) {
+                // TODO: Would be nice to use an external link component here,
+                // just for the title text (ex. "YouTube (opens in new tab)")
+                content =
+                  html.tag('a',
+                    {href: link},
+                    {target: '_blank'},
+
+                    content);
+              }
+
               return {
                 type: 'processed-image',
                 inline: true,
-                data:
-                  html.tag('img',
-                    src && {src},
-                    width && {width},
-                    height && {height},
-                    style && {style},
-
-                    pixelate &&
-                      {class: 'pixelate'}),
+                data: content,
               };
             }
 
