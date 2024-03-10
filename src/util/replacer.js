@@ -470,6 +470,8 @@ export function postprocessImages(inputNodes) {
 
         if (previousText.endsWith('\n')) {
           atStartOfLine = true;
+        } else if (previousText.length) {
+          atStartOfLine = false;
         }
 
         imageNode.inline = (() => {
