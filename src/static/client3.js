@@ -1608,21 +1608,48 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
       ? rect
       : null);
 
-  const prepareRegionRects = (relationalRect) =>
+  const prepareRegionRects = (relationalRect, direct) =>
     baselineRects
       .map(rect => rect.intersectionWith(relationalRect))
+      .map(direct)
       .map(keepIfFits);
 
   const regionRects = {
-    left: prepareRegionRects(WikiRect.leftOf(hoverableRect)),
-    right: prepareRegionRects(WikiRect.rightOf(hoverableRect)),
-    top: prepareRegionRects(WikiRect.above(hoverableRect)),
-    bottom: prepareRegionRects(WikiRect.beneath(hoverableRect)),
+    left:
+      prepareRegionRects(
+        WikiRect.leftOf(hoverableRect),
+        rect => WikiRect.fromRect({
+          x: rect.right,
+          y: rect.y,
+          width: -rect.width,
+          height: rect.height,
+        })),
+
+    right:
+      prepareRegionRects(
+        WikiRect.rightOf(hoverableRect),
+        rect => rect),
+
+    top:
+      prepareRegionRects(
+        WikiRect.above(hoverableRect),
+        rect => WikiRect.fromRect({
+          x: rect.x,
+          y: rect.bottom,
+          width: rect.width,
+          height: -rect.height,
+        })),
+
+    bottom:
+      prepareRegionRects(
+        WikiRect.beneath(hoverableRect),
+        rect => rect),
   };
 
   const neededVerticalOverlap = 30;
   const neededHorizontalOverlap = 30;
 
+  // Please don't ask us to make this but horizontal?
   const prepareVerticalOrientationRects = (regionRects) => {
     const orientations = {};
 
@@ -1634,9 +1661,26 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
       WikiRect.above(
         hoverableRect.bottom - neededVerticalOverlap + tooltipRect.height);
 
+    const orientHorizontally = (rect, i) => {
+      if (!rect) return null;
+
+      const regionRect = regionRects[i];
+      if (regionRect.width > 0) {
+        return regionRect;
+      } else {
+        return WikiRect.fromRect({
+          x: regionRect.right - tooltipRect.width,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        });
+      }
+    };
+
     orientations.up =
       regionRects
         .map(rect => rect?.intersectionWith(upTopDown))
+        .map(orientHorizontally)
         .map(keepIfFits);
 
     orientations.down =
@@ -1651,6 +1695,7 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
                 height: tooltipRect.height,
               }))
             : null))
+        .map(orientHorizontally)
         .map(keepIfFits);
 
     const centerRect =
@@ -1665,6 +1710,7 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
     orientations.center =
       regionRects
         .map(rect => rect?.intersectionWith(centerRect))
+        .map(orientHorizontally)
         .map(keepIfFits);
 
     return orientations;
