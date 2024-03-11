@@ -7,6 +7,7 @@ import * as albumCommentarySidebarModule from './album-commentary-sidebar.js';
 import * as artTagGalleryFilterModule from './art-tag-gallery-filter.js';
 import * as artTagNetworkModule from './art-tag-network.js';
 import * as artistExternalLinkTooltipModule from './artist-external-link-tooltip.js';
+import * as artistRollingWindowModule from './artist-rolling-window.js';
 import * as cssCompatibilityAssistantModule from './css-compatibility-assistant.js';
 import * as datetimestampTooltipModule from './datetimestamp-tooltip.js';
 import * as draggedLinkModule from './dragged-link.js';
@@ -30,6 +31,7 @@ export const modules = [
   artTagGalleryFilterModule,
   artTagNetworkModule,
   artistExternalLinkTooltipModule,
+  artistRollingWindowModule,
   cssCompatibilityAssistantModule,
   datetimestampTooltipModule,
   draggedLinkModule,

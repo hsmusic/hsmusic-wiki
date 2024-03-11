@@ -5,6 +5,7 @@ export default {
     'generateInterpageDotSwitcher',
     'linkArtist',
     'linkArtistGallery',
+    'linkArtistRollingWindow',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -34,6 +35,9 @@ export default {
       (query.hasGallery
         ? relation('linkArtistGallery', artist)
         : null),
+
+    artistRollingWindowLink:
+      relation('linkArtistRollingWindow', artist),
   }),
 
   data: (_query, sprawl) => ({
@@ -45,7 +49,7 @@ export default {
     showExtraLinks: {type: 'boolean', default: false},
 
     currentExtra: {
-      validate: v => v.is('gallery'),
+      validate: v => v.is('gallery', 'rolling-window'),
     },
   },
 
@@ -79,6 +83,7 @@ export default {
             }),
 
             slots.showExtraLinks &&
+            slots.currentExtra !== 'rolling-window' &&
               relations.artistGalleryLink?.slots({
                 attributes: [
                   slots.currentExtra === 'gallery' &&
@@ -86,6 +91,12 @@ export default {
                 ],
 
                 content: language.$('misc.nav.gallery'),
+              }),
+
+            slots.currentExtra === 'rolling-window' &&
+              relations.artistRollingWindowLink.slots({
+                attributes: {class: 'current'},
+                content: language.$('misc.nav.rollingWindow'),
               }),
           ],
         }),

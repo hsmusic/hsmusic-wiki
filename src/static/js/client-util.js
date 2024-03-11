@@ -127,3 +127,10 @@ export function dispatchInternalEvent(event, eventName, ...args) {
 
   return results;
 }
+
+const languageCode = document.documentElement.getAttribute('lang');
+
+export function formatDate(inputDate) {
+  const date = new Date(inputDate);
+  return date.toLocaleDateString(languageCode);
+}
