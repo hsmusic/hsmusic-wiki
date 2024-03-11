@@ -11,6 +11,8 @@ export default {
   },
 
   slots: {
+    attributes: {type: 'attributes', mutable: false},
+
     images: {validate: v => v.strictArrayOf(v.isHTML)},
     links: {validate: v => v.strictArrayOf(v.isHTML)},
     names: {validate: v => v.strictArrayOf(v.isHTML)},
@@ -36,6 +38,7 @@ export default {
 
   generate: (relations, slots, {html, language}) =>
     html.tag('div', {class: 'grid-listing'},
+      slots.attributes,
       {[html.onlyIfContent]: true},
 
       [
@@ -59,6 +62,8 @@ export default {
           }, index) =>
             link.slots({
               attributes: [
+                link.getSlotValue('attributes'),
+
                 {class: ['grid-item', 'box']},
 
                 (classes
