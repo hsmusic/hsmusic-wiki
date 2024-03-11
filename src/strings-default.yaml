@@ -632,8 +632,10 @@ misc:
   nav:
     previous: "Previous"
     next: "Next"
+
     info: "Info"
     gallery: "Gallery"
+    rollingWindow: "Rolling Window"
 
   # pageTitle:
   #   Title set under the page's <title> HTML element, which is
@@ -1092,6 +1094,41 @@ artistGalleryPage:
 
   infoLine: >-
     Contributed to {COVER_ARTS}.
+
+artistRollingWindowPage:
+  title: "{ARTIST} - Rolling Window"
+
+  windowConfigurationLine: >-
+    With a rolling window of {TIME_BEFORE} before a given date, and {TIME_AFTER} after, peeking ahead {PEEK}...
+
+  contributionConfigurationLine: >-
+    Selecting {KIND} contributions from group {GROUP}...
+
+  timeframeSelectionLine:
+    _: >-
+      There are {CONTRIBUTIONS} contributions, making {TIMEFRAMES} timeframes between {FIRST_DATE} and {LAST_DATE}.
+    none: >-
+      There aren't any matching contributions, or those which do aren't dated, so there are no timeframes.
+
+  emptyTimeframeLine: >-
+    This timeframe is empty, since no contributions are in range.
+
+  timeframeSelectionControl:
+    _: "{PREVIOUS} {TIMEFRAMES} {NEXT}"
+    previous: "(← Previous)"
+    next: "(Next →)"
+
+  contributionKind:
+    artwork: "Artwork"
+    music: "Music"
+    flash: "Flash"
+
+  contributionGroup:
+    all: "All groups"
+    group: "{GROUP}"
+
+  timeframe:
+    months: "{INPUT} months"
 
 #
 # commentaryIndex:

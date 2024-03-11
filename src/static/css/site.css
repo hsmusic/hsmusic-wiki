@@ -1481,6 +1481,55 @@ html[data-url-key="localized.albumCommentary"] .content-heading-accent {
   display: inline-block;
 }
 
+html[data-url-key="localized.artistRollingWindow"] #content p {
+  text-align: center;
+}
+
+html[data-url-key="localized.artistRollingWindow"] #content input[type=number] {
+  width: 3em;
+  margin: 0 0.25em;
+  background: black;
+  color: white;
+  border: 1px dotted var(--primary-color);
+  padding: 4px;
+  border-radius: 3px;
+}
+
+html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+html[data-url-key="localized.artistRollingWindow"] #timeframe-selection-control a:not([href]) {
+  text-decoration: none;
+  opacity: 0.7;
+}
+
+html[data-url-key="localized.artistRollingWindow"] #timeframe-source-area {
+  border: 1px dashed #ffffff42;
+  border-top-style: solid;
+  border-bottom-style: solid;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: calc(100vh - 260px);
+}
+
+html[data-url-key="localized.artistRollingWindow"] #timeframe-source-area .grid-listing {
+  width: 100%;
+}
+
+html[data-url-key="localized.artistRollingWindow"] .grid-item.peeking {
+  opacity: 0.8;
+  background: #ffffff24;
+}
+
+/* This is a pretty snazzy selector. */
+html[data-url-key="localized.artistRollingWindow"] .grid-item > span:not(:first-of-type) > *:not([style*="display: none"]) ~ *::before {
+  content: '\0020\00b7\0020';
+}
+
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loading-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-loaded-line,
 html[data-url-key="localized.listing"][data-url-value0="random"] #data-error-line {
@@ -1790,6 +1839,7 @@ img.pixelate, .pixelate img {
   justify-content: center;
   align-items: flex-start;
   padding: 5px 15px;
+  box-sizing: border-box;
 }
 
 .grid-item {

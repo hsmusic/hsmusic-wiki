@@ -4,6 +4,7 @@ export default {
   contentDependencies: [
     'linkArtist',
     'linkArtistGallery',
+    'linkArtistRollingWindow',
   ],
 
   extraDependencies: ['html', 'language', 'wikiData'],
@@ -31,6 +32,9 @@ export default {
         relation('linkArtistGallery', artist);
     }
 
+    relations.artistRollingWindowLink =
+      relation('linkArtistRollingWindow', artist);
+
     return relations;
   },
 
@@ -44,7 +48,7 @@ export default {
     showExtraLinks: {type: 'boolean', default: false},
 
     currentExtra: {
-      validate: v => v.is('gallery'),
+      validate: v => v.is('gallery', 'rolling-window'),
     },
   },
 
@@ -55,13 +59,23 @@ export default {
         content: language.$('misc.nav.info'),
       });
 
+    const secretPage =
+      slots.currentExtra === 'rolling-window';
+
     const {content: extraLinks = []} =
       slots.showExtraLinks &&
         {content: [
-          relations.artistGalleryLink?.slots({
-            attributes: {class: slots.currentExtra === 'gallery' && 'current'},
-            content: language.$('misc.nav.gallery'),
-          }),
+          !secretPage &&
+            relations.artistGalleryLink?.slots({
+              attributes: {class: slots.currentExtra === 'gallery' && 'current'},
+              content: language.$('misc.nav.gallery'),
+            }),
+
+          slots.currentExtra === 'rolling-window' &&
+            relations.artistRollingWindowLink.slots({
+              attributes: {class: 'current'},
+              content: language.$('misc.nav.rollingWindow'),
+            }),
         ]};
 
     const mostAccentLinks = [
