@@ -185,7 +185,16 @@ export default {
       relation('generateCoverGrid'),
 
     sourceGridImages:
-      query.things.map(() => relation('image')),
+      query.things.map(thing =>
+         (thing.constructor[Thing.referenceType] === 'album' && thing.hasCoverArt
+           ? relation('image', thing.artTags)
+        : thing.constructor[Thing.referenceType] === 'track'
+           ? (thing.hasUniqueCoverArt
+               ? relation('image', thing.artTags)
+            : thing.album.hasCoverArt
+               ? relation('image', thing.album.artTags)
+               : relation('image'))
+           : relation('image'))),
 
     sourceGridLinks:
       query.things.map(thing =>
