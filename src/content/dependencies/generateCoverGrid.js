@@ -11,6 +11,8 @@ export default {
   },
 
   slots: {
+    attributes: {type: 'attributes', mutable: false},
+
     images: {validate: v => v.strictArrayOf(v.isHTML)},
     links: {validate: v => v.strictArrayOf(v.isHTML)},
     names: {validate: v => v.strictArrayOf(v.isHTML)},
@@ -22,7 +24,7 @@ export default {
 
   generate(relations, slots, {html, language}) {
     return (
-      html.tag('div', {class: 'grid-listing'}, [
+      html.tag('div', {class: 'grid-listing'}, slots.attributes, [
         stitchArrays({
           image: slots.images,
           link: slots.links,
@@ -30,7 +32,12 @@ export default {
           info: slots.info,
         }).map(({image, link, name, info}, index) =>
             link.slots({
-              attributes: {class: ['grid-item', 'box']},
+              attributes:
+                html.attributes([
+                  link.getSlotValue('attributes'),
+                  {class: ['grid-item', 'box']},
+                ]),
+
               colorContext: 'image-box',
               content: [
                 image.slots({
