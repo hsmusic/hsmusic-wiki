@@ -6,11 +6,16 @@ import CacheableObject from '#cacheable-object';
 import {colors} from '#cli';
 import {input} from '#composite';
 import find from '#find';
-import {sortAlphabetically} from '#sort';
 import {stitchArrays, unique} from '#sugar';
 import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
+
+import {
+  sortAlbumsTracksChronologically,
+  sortAlphabetically,
+  sortContributionsChronologically,
+} from '#sort';
 
 import {exposeDependency} from '#composite/control-flow';
 import {withReverseContributionList} from '#composite/wiki-data';
@@ -134,6 +139,108 @@ export class Artist extends Thing {
       data: 'flashData',
       list: input.value('commentatorArtists'),
     }),
+
+    musicContributions: [
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('artistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#trackArtistContribs',
+      }),
+
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('contributorContribs'),
+      }).outputs({
+        '#reverseContributionList': '#trackContributorContribs',
+      }),
+
+      {
+        dependencies: [
+          '#trackArtistContribs',
+          '#trackContributorContribs',
+        ],
+
+        compute: (continuation, {
+          ['#trackArtistContribs']: trackArtistContribs,
+          ['#trackContributorContribs']: trackContributorContribs,
+        }) => continuation({
+          ['#contributions']: [
+            ...trackArtistContribs,
+            ...trackContributorContribs,
+          ],
+        }),
+      },
+
+      {
+        dependencies: ['#contributions'],
+        compute: ({'#contributions': contributions}) =>
+          sortContributionsChronologically(
+            contributions,
+            sortAlbumsTracksChronologically),
+      },
+    ],
+
+    artworkContributions: [
+      withReverseContributionList({
+        data: 'trackData',
+        list: input.value('coverArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#trackCoverArtistContribs',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('coverArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumCoverArtistContribs',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('wallpaperArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumWallpaperArtistContribs',
+      }),
+
+      withReverseContributionList({
+        data: 'albumData',
+        list: input.value('bannerArtistContribs'),
+      }).outputs({
+        '#reverseContributionList': '#albumBannerArtistContribs',
+      }),
+
+      {
+        dependencies: [
+          '#trackCoverArtistContribs',
+          '#albumCoverArtistContribs',
+          '#albumWallpaperArtistContribs',
+          '#albumBannerArtistContribs',
+        ],
+
+        compute: (continuation, {
+          ['#trackCoverArtistContribs']: trackCoverArtistContribs,
+          ['#albumCoverArtistContribs']: albumCoverArtistContribs,
+          ['#albumWallpaperArtistContribs']: albumWallpaperArtistContribs,
+          ['#albumBannerArtistContribs']: albumBannerArtistContribs,
+        }) => continuation({
+          ['#contributions']: [
+            ...trackCoverArtistContribs,
+            ...albumCoverArtistContribs,
+            ...albumWallpaperArtistContribs,
+            ...albumBannerArtistContribs,
+          ],
+        }),
+      },
+
+      {
+        dependencies: ['#contributions'],
+        compute: ({'#contributions': contributions}) =>
+          sortContributionsChronologically(
+            contributions,
+            sortAlbumsTracksChronologically),
+      },
+    ],
 
     totalDuration: artistTotalDuration(),
   });
