@@ -32,6 +32,16 @@ export function pathsForTarget(artist) {
         args: [artist],
       },
     },
+
+    {
+      type: 'page',
+      path: ['artistRollingWindow', artist.directory],
+
+      contentFunction: {
+        name: 'generateArtistRollingWindowPage',
+        args: [artist],
+      },
+    },
   ];
 }
 

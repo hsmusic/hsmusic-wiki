@@ -31,6 +31,7 @@ const urlSpec = {
 
       artist: 'artist/<>/',
       artistGallery: 'artist/<>/gallery/',
+      artistRollingWindow: 'artist/<>/rolling-window/',
 
       commentaryIndex: 'commentary/',
 
