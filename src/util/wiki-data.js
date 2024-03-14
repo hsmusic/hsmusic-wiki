@@ -13,12 +13,45 @@ export {filterMultipleArrays} from './sugar.js';
 
 export function getKebabCase(name) {
   return name
+
+    // Spaces to dashes
     .split(' ')
     .join('-')
-    .replace(/&/g, 'and')
-    .replace(/[^a-zA-Z0-9-]/g, '')
+
+    // Punctuation as words
+    .replace(/&/g, '-and-')
+    .replace(/\+/g, '-plus-')
+    .replace(/%/g, '-percent-')
+
+    // Punctuation which only divides words, not single characters
+    .replace(/(\b[^\s-.]{2,})\./g, '$1-')
+    .replace(/\.([^\s-.]{2,})\b/g, '-$1')
+
+    // Punctuation which doesn't divide a number following a non-number
+    .replace(/(?<=[0-9])\^/g, '-')
+    .replace(/\^(?![0-9])/g, '-')
+
+    // General punctuation which always separates surrounding words
+    .replace(/[/@#$%*()_=,[\]{}|\\;:<>?`~]/g, '-')
+
+    // Accented characters
+    .replace(/[áâäàå]/gi, 'a')
+    .replace(/[çč]/gi, 'c')
+    .replace(/[éêëè]/gi, 'e')
+    .replace(/[íîïì]/gi, 'i')
+    .replace(/[óôöò]/gi, 'o')
+    .replace(/[úûüù]/gi, 'u')
+
+    // Strip other characters
+    .replace(/[^a-z0-9-]/gi, '')
+
+    // Combine consecutive dashes
     .replace(/-{2,}/g, '-')
+
+    // Trim dashes on boundaries
     .replace(/^-+|-+$/g, '')
+
+    // Always lowercase
     .toLowerCase();
 }
 
