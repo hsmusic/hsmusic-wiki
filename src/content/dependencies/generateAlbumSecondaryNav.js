@@ -100,50 +100,69 @@ export default {
   },
 
   generate(relations, slots, {html, language}) {
-    return relations.secondaryNav.slots({
-      class: 'nav-links-groups',
-      content:
-        stitchArrays({
-          colorStyle: relations.colorStyles,
-          groupLink: relations.groupLinks,
-          previousNextLinks: relations.previousNextLinks ?? null,
-          previousAlbumLink: relations.previousAlbumLinks ?? null,
-          nextAlbumLink: relations.nextAlbumLinks ?? null,
-        }).map(({
-            colorStyle,
-            groupLink,
-            previousNextLinks,
-            previousAlbumLink,
-            nextAlbumLink,
-          }) => {
-            if (
-              slots.mode === 'track' ||
-              !previousAlbumLink && !nextAlbumLink
-            ) {
-              return language.$('albumSidebar.groupBox.title', {
-                group: groupLink,
-              });
-            }
+    const navLinksShouldShowPreviousNext =
+      (slots.mode === 'track'
+        ? Array.from(relations.previousNextLinks, () => false)
+        : stitchArrays({
+            previousAlbumLink: relations.previousAlbumLinks ?? null,
+            nextAlbumLink: relations.nextAlbumLinks ?? null,
+          }).map(({previousAlbumLink, nextAlbumLink}) =>
+              previousAlbumLink ||
+              nextAlbumLink));
 
-            const {content: previousNextPart} =
-              previousNextLinks.slots({
+    const navLinkPreviousNextLinks =
+      stitchArrays({
+        showPreviousNext: navLinksShouldShowPreviousNext,
+        previousNextLinks: relations.previousNextLinks ?? null,
+        previousAlbumLink: relations.previousAlbumLinks ?? null,
+        nextAlbumLink: relations.nextAlbumLinks ?? null,
+      }).map(({
+          showPreviousNext,
+          previousNextLinks,
+          previousAlbumLink,
+          nextAlbumLink,
+        }) =>
+          (showPreviousNext
+            ? previousNextLinks.slots({
                 previousLink: previousAlbumLink,
                 nextLink: nextAlbumLink,
                 id: false,
-              });
+              })
+            : null));
 
-            return (
-              html.tag('span',
-                colorStyle.slot('context', 'primary-only'),
+    for (const groupLink of relations.groupLinks) {
+      groupLink.setSlot('color', false);
+    }
 
-                [
-                  language.$('albumSidebar.groupBox.title', {
-                    group: groupLink.slot('color', false),
-                  }),
-
-                  `(${language.formatUnitList(previousNextPart)})`,
-                ]));
+    const navLinkContents =
+      stitchArrays({
+        groupLink: relations.groupLinks,
+        previousNextLinks: navLinkPreviousNextLinks,
+      }).map(({groupLink, previousNextLinks}) => [
+          language.$('albumSidebar.groupBox.title', {
+            group: groupLink,
           }),
+
+          previousNextLinks &&
+            `(${language.formatUnitList(previousNextLinks.content)})`,
+        ]);
+
+    const navLinks =
+      stitchArrays({
+        content: navLinkContents,
+        colorStyle: relations.colorStyles,
+      }).map(({content, colorStyle}, index) =>
+          html.tag('span', {class: 'nav-link'},
+            index > 0 &&
+              {class: 'has-divider'},
+
+            colorStyle.slot('context', 'primary-only'),
+
+            content));
+
+    return relations.secondaryNav.slots({
+      class: 'nav-links-groups',
+      content: navLinks,
     });
   },
 };

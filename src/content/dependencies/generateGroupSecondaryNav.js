@@ -83,15 +83,18 @@ export default {
     return relations.secondaryNav.slots({
       class: 'nav-links-groups',
       content:
-        (!relations.previousGroupLink && !relations.nextGroupLink
-          ? categoryLink ?? html.blank()
-          : html.tag('span',
-              relations.colorStyle,
+        (relations.previousGroupLink || relations.nextGroupLink
+          ? html.tag('span', {class: 'nav-link'},
+              relations.colorStyle.slot('context', 'primary-only'),
 
               [
                 categoryLink?.slot('color', false),
                 `(${language.formatUnitList(previousNextPart)})`,
-              ])),
+              ])
+       : categoryLink
+          ? html.tag('span', {class: 'nav-link'},
+              categoryLink)
+          : html.blank()),
     });
   },
 };
