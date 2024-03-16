@@ -764,7 +764,13 @@ ul.image-details li {
   width: 30%;
   max-width: 250px;
   margin: 15px 0 10px 20px;
-  box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.35);
+
+  /* This !important is unfortunate, but it's necessary
+   * even if the rule itself is placed lower, because this
+   * is a relatively low-priority selector compared to
+   * others that alter image shadows.
+   */
+  box-shadow: 0 0 4px 5px rgba(0, 0, 0, 0.25) !important;
 }
 
 .js-hide,
