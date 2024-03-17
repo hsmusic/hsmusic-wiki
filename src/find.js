@@ -114,7 +114,8 @@ function findHelper({
 
     const regexMatch = fullRef.match(keyRefRegex);
     if (!regexMatch) {
-      warnOrThrow(mode, `Malformed link reference: "${fullRef}"`);
+      return warnOrThrow(mode,
+        `Malformed link reference: "${fullRef}"`);
     }
 
     const typePart = regexMatch[1];
@@ -142,8 +143,8 @@ function findHelper({
     }
 
     if (!match) {
-      warnOrThrow(mode, `Didn't match anything for ${colors.bright(fullRef)}`);
-      return null;
+      return warnOrThrow(mode,
+        `Didn't match anything for ${colors.bright(fullRef)}`);
     }
 
     return match;
