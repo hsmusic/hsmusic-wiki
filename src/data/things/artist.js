@@ -12,6 +12,7 @@ import Thing from '#thing';
 import {isName, validateArrayItems} from '#validators';
 import {getKebabCase} from '#wiki-data';
 
+import {exposeDependency} from '#composite/control-flow';
 import {withReverseContributionList} from '#composite/wiki-data';
 
 import {
@@ -26,6 +27,8 @@ import {
   urls,
   wikiData,
 } from '#composite/wiki-properties';
+
+import {artistTotalDuration} from '#composite/things/artist';
 
 export class Artist extends Thing {
   static [Thing.referenceType] = 'artist';
@@ -139,6 +142,18 @@ export class Artist extends Thing {
       list: input.value('commentatorArtists'),
     }),
 
+    artistContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('artistContribs'),
+      mode: input.value('contributions'),
+    }),
+
+    contributorContributions: reverseContributionList({
+      data: 'trackData',
+      list: input.value('artistContribs'),
+      mode: input.value('contributions'),
+    }),
+
     albumsAsAlbumArtist: reverseContributionList({
       data: 'albumData',
       list: input.value('artistContribs'),
@@ -220,6 +235,8 @@ export class Artist extends Thing {
       data: 'flashData',
       list: input.value('contributorContribs'),
     }),
+
+    totalDuration: artistTotalDuration(),
   });
 
   static [Thing.getSerializeDescriptors] = ({

@@ -17,6 +17,7 @@
 //  - exitWithoutUpdateValue
 //  - exposeDependencyOrContinue
 //  - exposeUpdateValueOrContinue
+//  - exposeWhetherDependencyAvailable
 //  - raiseOutputWithoutDependency
 //  - raiseOutputWithoutUpdateValue
 //

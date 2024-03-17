@@ -24,5 +24,6 @@ export {default as reverseReferenceList} from './reverseReferenceList.js';
 export {default as simpleDate} from './simpleDate.js';
 export {default as simpleString} from './simpleString.js';
 export {default as singleReference} from './singleReference.js';
+export {default as thing} from './thing.js';
 export {default as urls} from './urls.js';
 export {default as wikiData} from './wikiData.js';

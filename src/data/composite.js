@@ -29,6 +29,7 @@ input.value = _valueIntoToken('input.value');
 input.dependency = _valueIntoToken('input.dependency');
 
 input.myself = () => Symbol.for(`hsmusic.composite.input.myself`);
+input.thisProperty = () => Symbol.for('hsmusic.composite.input.thisProperty');
 
 input.updateValue = _valueIntoToken('input.updateValue');
 
@@ -284,6 +285,7 @@ export function templateCompositeFrom(description) {
               'input.value',
               'input.dependency',
               'input.myself',
+              'input.thisProperty',
               'input.updateValue',
             ].includes(tokenShape)) {
               expectedValueProvidingTokenInputNames.push(name);
@@ -567,6 +569,8 @@ export function compositeFrom(description) {
             return token;
           case 'input.myself':
             return 'this';
+          case 'input.thisProperty':
+            return 'thisProperty';
           default:
             return null;
         }
@@ -721,6 +725,8 @@ export function compositeFrom(description) {
               return (tokenValue.startsWith('#') ? null : tokenValue);
             case 'input.myself':
               return 'this';
+            case 'input.thisProperty':
+              return 'thisProperty';
             default:
               return null;
           }
@@ -774,16 +780,9 @@ export function compositeFrom(description) {
       (step.annotation ? ` (${step.annotation})` : ``);
 
     aggregate.nest({message}, ({push}) => {
-      if (isBase && stepComposes !== compositionNests) {
+      if (!isBase && !stepComposes) {
         return push(new TypeError(
-          (compositionNests
-            ? `Base must compose, this composition is nestable`
-            : `Base must not compose, this composition isn't nestable`)));
-      } else if (!isBase && !stepComposes) {
-        return push(new TypeError(
-          (compositionNests
-            ? `All steps must compose`
-            : `All steps (except base) must compose`)));
+          `All steps leading up to base must compose`));
       }
 
       if (
@@ -877,6 +876,8 @@ export function compositeFrom(description) {
               return valueSoFar;
             case 'input.myself':
               return initialDependencies['this'];
+            case 'input.thisProperty':
+              return initialDependencies['thisProperty'];
             case 'input':
               return initialDependencies[token];
             default:
@@ -907,8 +908,16 @@ export function compositeFrom(description) {
       debug(() => colors.bright(`begin composition - not transforming`));
     }
 
-    for (let i = 0; i < steps.length; i++) {
-      const step = steps[i];
+    for (
+      const [i, {
+        step,
+        stepComposes,
+      }] of
+        stitchArrays({
+          step: steps,
+          stepComposes: stepsCompose,
+        }).entries()
+    ) {
       const isBase = i === steps.length - 1;
 
       debug(() => [
@@ -969,6 +978,7 @@ export function compositeFrom(description) {
             ? {[input.updateValue()]: valueSoFar}
             : {}),
         [input.myself()]: initialDependencies?.['this'] ?? null,
+        [input.thisProperty()]: initialDependencies?.['thisProperty'] ?? null,
       };
 
       const selectDependencies =
@@ -983,6 +993,8 @@ export function compositeFrom(description) {
               return dependency;
             case 'input.myself':
               return input.myself();
+            case 'input.thisProperty':
+              return input.thisProperty();
             case 'input.dependency':
               return tokenValue;
             case 'input.updateValue':
@@ -1018,10 +1030,7 @@ export function compositeFrom(description) {
 
         let args;
 
-        if (isBase && !compositionNests) {
-          args =
-            argsLayout.filter(arg => arg !== continuationSymbol);
-        } else {
+        if (stepComposes) {
           let continuation;
 
           ({continuation, continuationStorage} =
@@ -1032,6 +1041,9 @@ export function compositeFrom(description) {
               (arg === continuationSymbol
                 ? continuation
                 : arg));
+        } else {
+          args =
+            argsLayout.filter(arg => arg !== continuationSymbol);
         }
 
         return expose[name](...args);
@@ -1091,11 +1103,6 @@ export function compositeFrom(description) {
 
       if (result !== continuationSymbol) {
         debug(() => [`step #${i+1} - result: exit (inferred) ->`, result]);
-
-        if (compositionNests) {
-          throw new TypeError(`Inferred early-exit is disallowed in nested compositions`);
-        }
-
         debug(() => colors.bright(`end composition - exit (inferred)`));
 
         return result;

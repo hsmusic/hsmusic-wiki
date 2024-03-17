@@ -2,15 +2,16 @@ import * as path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 import {openAggregate, showAggregate} from '#aggregate';
+import CacheableObject from '#cacheable-object';
 import {logError} from '#cli';
 import {compositeFrom} from '#composite';
 import * as serialize from '#serialize';
-
 import Thing from '#thing';
 
 import * as albumClasses from './album.js';
 import * as artTagClasses from './art-tag.js';
 import * as artistClasses from './artist.js';
+import * as contributionClasses from './contribution.js';
 import * as flashClasses from './flash.js';
 import * as groupClasses from './group.js';
 import * as homepageLayoutClasses from './homepage-layout.js';
@@ -24,6 +25,7 @@ const allClassLists = {
   'album.js': albumClasses,
   'art-tag.js': artTagClasses,
   'artist.js': artistClasses,
+  'contribution.js': contributionClasses,
   'flash.js': flashClasses,
   'group.js': groupClasses,
   'homepage-layout.js': homepageLayoutClasses,
@@ -142,7 +144,10 @@ function evaluatePropertyDescriptors() {
         }
       }
 
-      constructor.propertyDescriptors = results;
+      constructor[CacheableObject.propertyDescriptors] = {
+        ...constructor[CacheableObject.propertyDescriptors] ?? {},
+        ...results,
+      };
     },
 
     showFailedClasses(failedClasses) {

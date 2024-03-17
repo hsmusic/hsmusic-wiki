@@ -14,7 +14,7 @@ import {parseAdditionalFiles, parseContributors, parseDate, parseDimensions}
 
 import {exposeDependency, exposeUpdateValueOrContinue}
   from '#composite/control-flow';
-import {exitWithoutContribs} from '#composite/wiki-data';
+import {exitWithoutContribs, withCoverArtDate} from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -31,6 +31,7 @@ import {
   referenceList,
   simpleDate,
   simpleString,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -40,7 +41,13 @@ import {withTracks, withTrackSections} from '#composite/things/album';
 export class Album extends Thing {
   static [Thing.referenceType] = 'album';
 
-  static [Thing.getPropertyDescriptors] = ({ArtTag, Artist, Group, Track}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    ArtTag,
+    Artist,
+    Group,
+    Track,
+    WikiInfo,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Album'),
@@ -53,13 +60,16 @@ export class Album extends Thing {
     dateAddedToWiki: simpleDate(),
 
     coverArtDate: [
-      exitWithoutContribs({contribs: 'coverArtistContribs'}),
+      // TODO: Why does this fall back, but Track.coverArtDate doesn't?
+      withCoverArtDate({
+        from: input.updateValue({
+          validate: isDate,
+        }),
 
-      exposeUpdateValueOrContinue({
-        validate: input.value(isDate),
+        fallback: input.value(true),
       }),
 
-      exposeDependency({dependency: 'date'}),
+      exposeDependency({dependency: '#coverArtDate'}),
     ],
 
     coverArtFileExtension: [
@@ -106,11 +116,45 @@ export class Album extends Thing {
       exposeDependency({dependency: '#trackSections'}),
     ],
 
-    artistContribs: contributionList(),
-    coverArtistContribs: contributionList(),
-    trackCoverArtistContribs: contributionList(),
-    wallpaperArtistContribs: contributionList(),
-    bannerArtistContribs: contributionList(),
+    artistContribs: contributionList({
+      date: 'date',
+    }),
+
+    coverArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
+
+    trackCoverArtistContribs: contributionList({
+      // May be null, indicating cover art was added for tracks on the date
+      // each track specifies, or else the track's own release date.
+      date: 'trackArtDate',
+    }),
+
+    wallpaperArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
+
+    bannerArtistContribs: [
+      withCoverArtDate({
+        fallback: input.value(true),
+      }),
+
+      contributionList({
+        date: '#coverArtDate',
+      }),
+    ],
 
     groups: referenceList({
       class: input.value(Group),
@@ -150,6 +194,10 @@ export class Album extends Thing {
     // or keep it updated.
     ownTrackData: wikiData({
       class: input.value(Track),
+    }),
+
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
     }),
 
     // Expose only

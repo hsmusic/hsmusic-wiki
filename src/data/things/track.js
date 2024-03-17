@@ -17,7 +17,6 @@ import {
 } from '#yaml';
 
 import {withPropertyFromObject} from '#composite/data';
-import {withResolvedContribs} from '#composite/wiki-data';
 
 import {
   exitWithoutDependency,
@@ -25,7 +24,14 @@ import {
   exposeDependency,
   exposeDependencyOrContinue,
   exposeUpdateValueOrContinue,
+  exposeWhetherDependencyAvailable,
 } from '#composite/control-flow';
+
+import {
+  withRecontextualizedContributionList,
+  withRedatedContributionList,
+  withResolvedContribs,
+} from '#composite/wiki-data';
 
 import {
   additionalFiles,
@@ -42,6 +48,7 @@ import {
   reverseReferenceList,
   simpleDate,
   singleReference,
+  thing,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -49,21 +56,31 @@ import {
 import {
   exitWithoutUniqueCoverArt,
   inferredAdditionalNameList,
+  inheritContributionListFromOriginalRelease,
   inheritFromOriginalRelease,
   sharedAdditionalNameList,
   trackReverseReferenceList,
   withAlbum,
   withAlwaysReferenceByDirectory,
   withContainingTrackSection,
+  withDate,
   withHasUniqueCoverArt,
+  withOriginalRelease,
   withOtherReleases,
   withPropertyFromAlbum,
+  withTrackArtDate,
 } from '#composite/things/track';
 
 export class Track extends Thing {
   static [Thing.referenceType] = 'track';
 
-  static [Thing.getPropertyDescriptors] = ({Album, ArtTag, Artist, Flash}) => ({
+  static [Thing.getPropertyDescriptors] = ({
+    Album,
+    ArtTag,
+    Artist,
+    Flash,
+    WikiInfo,
+  }) => ({
     // Update & expose
 
     name: name('Unnamed Track'),
@@ -131,36 +148,20 @@ export class Track extends Thing {
       }),
     ],
 
-    // Date of cover art release. Like coverArtFileExtension, this represents
-    // only the track's own unique cover artwork, if any. This exposes only as
-    // the track's own coverArtDate or its album's trackArtDate, so if neither
-    // is specified, this value is null.
     coverArtDate: [
-      withHasUniqueCoverArt(),
-
-      exitWithoutDependency({
-        dependency: '#hasUniqueCoverArt',
-        mode: input.value('falsy'),
+      withTrackArtDate({
+        from: input.updateValue({
+          validate: isDate,
+        }),
       }),
 
-      exposeUpdateValueOrContinue({
-        validate: input.value(isDate),
-      }),
-
-      withPropertyFromAlbum({
-        property: input.value('trackArtDate'),
-      }),
-
-      exposeDependency({dependency: '#album.trackArtDate'}),
+      exposeDependency({dependency: '#trackArtDate'}),
     ],
 
     commentary: commentary(),
 
     lyrics: [
-      inheritFromOriginalRelease({
-        property: input.value('lyrics'),
-      }),
-
+      inheritFromOriginalRelease(),
       contentString(),
     ],
 
@@ -184,13 +185,14 @@ export class Track extends Thing {
     }),
 
     artistContribs: [
-      inheritFromOriginalRelease({
-        property: input.value('artistContribs'),
-        notFoundValue: input.value([]),
-      }),
+      inheritContributionListFromOriginalRelease(),
+
+      withDate(),
 
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.thisProperty(),
+        date: '#date',
       }).outputs({
         '#resolvedContribs': '#artistContribs',
       }),
@@ -204,16 +206,24 @@ export class Track extends Thing {
         property: input.value('artistContribs'),
       }),
 
+      withRecontextualizedContributionList({
+        list: '#album.artistContribs',
+      }),
+
+      withRedatedContributionList({
+        list: '#album.artistContribs',
+        date: '#date',
+      }),
+
       exposeDependency({dependency: '#album.artistContribs'}),
     ],
 
     contributorContribs: [
-      inheritFromOriginalRelease({
-        property: input.value('contributorContribs'),
-        notFoundValue: input.value([]),
-      }),
+      inheritContributionListFromOriginalRelease(),
 
-      contributionList(),
+      contributionList({
+        date: 'date',
+      }),
     ],
 
     // Cover artists aren't inherited from the original release, since it
@@ -224,8 +234,14 @@ export class Track extends Thing {
         value: input.value([]),
       }),
 
+      withTrackArtDate({
+        fallback: input.value(true),
+      }),
+
       withResolvedContribs({
         from: input.updateValue({validate: isContributionList}),
+        thingProperty: input.thisProperty(),
+        date: '#trackArtDate',
       }).outputs({
         '#resolvedContribs': '#coverArtistContribs',
       }),
@@ -239,12 +255,20 @@ export class Track extends Thing {
         property: input.value('trackCoverArtistContribs'),
       }),
 
+      withRecontextualizedContributionList({
+        list: '#album.trackCoverArtistContribs',
+      }),
+
+      withRedatedContributionList({
+        list: '#album.trackCoverArtistContribs',
+        date: '#trackArtDate',
+      }),
+
       exposeDependency({dependency: '#album.trackCoverArtistContribs'}),
     ],
 
     referencedTracks: [
       inheritFromOriginalRelease({
-        property: input.value('referencedTracks'),
         notFoundValue: input.value([]),
       }),
 
@@ -257,7 +281,6 @@ export class Track extends Thing {
 
     sampledTracks: [
       inheritFromOriginalRelease({
-        property: input.value('sampledTracks'),
         notFoundValue: input.value([]),
       }),
 
@@ -302,6 +325,10 @@ export class Track extends Thing {
       class: input.value(Track),
     }),
 
+    wikiInfo: thing({
+      class: input.value(WikiInfo),
+    }),
+
     // Expose only
 
     commentatorArtists: commentatorArtists(),
@@ -312,18 +339,30 @@ export class Track extends Thing {
     ],
 
     date: [
-      exposeDependencyOrContinue({dependency: 'dateFirstReleased'}),
-
-      withPropertyFromAlbum({
-        property: input.value('date'),
-      }),
-
-      exposeDependency({dependency: '#album.date'}),
+      withDate(),
+      exposeDependency({dependency: '#date'}),
     ],
 
     hasUniqueCoverArt: [
       withHasUniqueCoverArt(),
       exposeDependency({dependency: '#hasUniqueCoverArt'}),
+    ],
+
+    isOriginalRelease: [
+      withOriginalRelease(),
+
+      exposeWhetherDependencyAvailable({
+        dependency: '#originalRelease',
+        negate: input.value(true),
+      }),
+    ],
+
+    isRerelease: [
+      withOriginalRelease(),
+
+      exposeWhetherDependencyAvailable({
+        dependency: '#originalRelease',
+      }),
     ],
 
     otherReleases: [

@@ -15,7 +15,7 @@
 //
 
 import {input, templateCompositeFrom} from '#composite';
-import {isContributionList} from '#validators';
+import {isContributionList, isDate} from '#validators';
 
 import {exposeConstant, exposeDependencyOrContinue} from '#composite/control-flow';
 import {withResolvedContribs} from '#composite/wiki-data';
@@ -25,11 +25,28 @@ export default templateCompositeFrom({
 
   compose: false,
 
+  inputs: {
+    date: input({
+      validate: isDate,
+      acceptsNull: true,
+    }),
+  },
+
   update: {validate: isContributionList},
 
   steps: () => [
-    withResolvedContribs({from: input.updateValue()}),
-    exposeDependencyOrContinue({dependency: '#resolvedContribs'}),
-    exposeConstant({value: input.value([])}),
+    withResolvedContribs({
+      from: input.updateValue(),
+      thingProperty: input.thisProperty(),
+      date: input('date'),
+    }),
+
+    exposeDependencyOrContinue({
+      dependency: '#resolvedContribs',
+    }),
+
+    exposeConstant({
+      value: input.value([]),
+    }),
   ],
 });

@@ -17,6 +17,22 @@ export default class Thing extends CacheableObject {
   static yamlDocumentSpec = Symbol.for('Thing.yamlDocumentSpec');
   static getYamlLoadingSpec = Symbol.for('Thing.getYamlLoadingSpec');
 
+  static isThingConstructor = Symbol.for('Thing.isThingConstructor');
+  static isThing = Symbol.for('Thing.isThing');
+
+  // To detect:
+  // Symbol.for('Thing.isThingConstructor') in constructor
+  static [Symbol.for('Thing.isThingConstructor')] = NaN;
+
+  static [CacheableObject.propertyDescriptors] = {
+    // To detect:
+    // Object.hasOwn(object, Symbol.for('Thing.isThing'))
+    [Symbol.for('Thing.isThing')]: {
+      flags: {expose: true},
+      expose: {compute: () => NaN},
+    },
+  };
+
   // Default custom inspect function, which may be overridden by Thing
   // subclasses. This will be used when displaying aggregate errors and other
   // command-line logging - it's the place to provide information useful in

@@ -392,8 +392,15 @@ export function parseContributors(contributionStrings) {
   }
 
   return contributionStrings.map(item => {
-    if (typeof item === 'object' && item['Who'])
-      return {who: item['Who'], what: item['What'] ?? null};
+    if (typeof item === 'object' && item['Who']) {
+      return {
+        who: item['Who'],
+        what: item['What'] ?? null,
+
+        countInContributionTotals: item['Count In Contribution Totals'] ?? null,
+        countInDurationTotals: item['Count In Duration Totals'] ?? null,
+      };
+    }
 
     if (typeof item !== 'string') return item;
 
@@ -449,6 +456,73 @@ export function parseDimensions(string) {
   }
 
   return nums;
+}
+
+export const contributionPresetYAMLSpec = [
+  {from: 'Album', to: 'album', fields: [
+    {from: 'Artists', to: 'artistContribs'},
+  ]},
+
+  {from: 'Flash', to: 'flash', fields: [
+    {from: 'Contributors', to: 'contributorContribs'},
+  ]},
+
+  {from: 'Track', to: 'track', fields: [
+    {from: 'Artists', to: 'artistContribs'},
+    {from: 'Contributors', to: 'contributorContribs'},
+  ]},
+];
+
+export function parseContributionPresetContext(context) {
+  if (!Array.isArray(context)) {
+    return context;
+  }
+
+  const [target, ...fields] = context;
+
+  const targetEntry =
+    contributionPresetYAMLSpec
+      .find(({from}) => from === target);
+
+  if (!targetEntry) {
+    return context;
+  }
+
+  const properties =
+    fields.map(field => {
+      const fieldEntry =
+        targetEntry.fields
+          .find(({from}) => from === field);
+
+      if (!fieldEntry) return field;
+
+      return fieldEntry.to;
+    });
+
+  return [targetEntry.to, ...properties];
+}
+
+export function parseContributionPresets(list) {
+  if (!Array.isArray(list)) return list;
+
+  return list.map(item => {
+    if (typeof item !== 'object') return item;
+
+    return {
+      annotation:
+        item['Annotation'] ?? null,
+
+      context:
+        parseContributionPresetContext(
+          item['Context'] ?? null),
+
+      countInContributionTotals:
+        item['Count In Contribution Totals'] ?? null,
+
+      countInDurationTotals:
+        item['Count In Duration Totals'] ?? null,
+    };
+  });
 }
 
 // documentModes: Symbols indicating sets of behavior for loading and processing
@@ -920,6 +994,7 @@ export function linkWikiDataArrays(wikiData) {
       'artTagData',
       'artistData',
       'groupData',
+      'wikiInfo',
     ]],
 
     [wikiData.artTagData, [
@@ -938,6 +1013,7 @@ export function linkWikiDataArrays(wikiData) {
       'artistData',
       'flashActData',
       'trackData',
+      'wikiInfo',
     ]],
 
     [wikiData.flashActData, [
@@ -964,6 +1040,7 @@ export function linkWikiDataArrays(wikiData) {
       'artistData',
       'flashData',
       'trackData',
+      'wikiInfo',
     ]],
 
     [[wikiData.wikiInfo], [

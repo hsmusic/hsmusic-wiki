@@ -595,8 +595,29 @@ export function isContentString(content) {
 export function isThingClass(thingClass) {
   isFunction(thingClass);
 
-  if (!Object.hasOwn(thingClass, Symbol.for('Thing.referenceType'))) {
-    throw new TypeError(`Expected a Thing constructor, missing Thing.referenceType`);
+  // This is *expressly* no faster than an instanceof check, because it's
+  // deliberately still walking the prototype chain for the provided object.
+  // (This is necessary because the symbol we're checking is defined only on
+  // the Thing constructor, and not directly on each subclass.) However, it's
+  // preferred over an instanceof check anyway, because instanceof would
+  // require that the #validators module has access to #thing, which it
+  // currently doesn't!
+  if (!(Symbol.for('Thing.isThingConstructor') in thingClass)) {
+    throw new TypeError(`Expected a Thing constructor, missing Thing.isThingConstructor`);
+  }
+
+  return true;
+}
+
+export function isThing(thing) {
+  isObject(thing);
+
+  // This *is* faster than an instanceof check, because it doesn't walk the
+  // prototype chain. It works because this property is set as part of every
+  // Thing subclass's inherited "public class fields" - it's set directly on
+  // every constructed Thing.
+  if (!Object.hasOwn(thing, Symbol.for('Thing.isThing'))) {
+    throw new TypeError(`Expected a Thing, missing Thing.isThing`);
   }
 
   return true;
@@ -605,9 +626,64 @@ export function isThingClass(thingClass) {
 export const isContribution = validateProperties({
   who: isArtistRef,
   what: optional(isStringNonEmpty),
+
+  countInDurationTotals: optional(isBoolean),
+  countInContributionTotals: optional(isBoolean),
 });
 
 export const isContributionList = validateArrayItems(isContribution);
+
+export const contributionPresetPropertySpec = {
+  album: [
+    'artistContribs',
+  ],
+
+  flash: [
+    'contributorContribs',
+  ],
+
+  track: [
+    'artistContribs',
+    'contributorContribs',
+  ],
+};
+
+// TODO: This validator basically constructs itself as it goes.
+// This is definitely some shenanigans!
+export function isContributionPresetContext(list) {
+  isArray(list);
+
+  if (empty(list)) {
+    throw new TypeError(`Expected at least one item`);
+  }
+
+  const isTarget =
+    is(...Object.keys(contributionPresetPropertySpec));
+
+  const [target, ...properties] = list;
+
+  isTarget(target);
+
+  const isProperty =
+    is(...contributionPresetPropertySpec[target]);
+
+  const isPropertyList =
+    validateArrayItems(isProperty);
+
+  isPropertyList(properties);
+
+  return true;
+}
+
+export const isContributionPreset = validateProperties({
+  annotation: isStringNonEmpty,
+  context: isContributionPresetContext,
+
+  countInDurationTotals: optional(isBoolean),
+  countInContributionTotals: optional(isBoolean),
+});
+
+export const isContributionPresetList = validateArrayItems(isContributionPreset);
 
 export const isAdditionalFile = validateProperties({
   title: isName,
@@ -718,12 +794,31 @@ export function validateReferenceList(type = '') {
   return validateArrayItems(validateReference(type));
 }
 
+export function validateThing({
+  referenceType: expectedReferenceType = '',
+} = {}) {
+  return (thing) => {
+    isThing(thing);
+
+    if (expectedReferenceType) {
+      const {[Symbol.for('Thing.referenceType')]: referenceType} =
+        thing.constructor;
+
+      if (referenceType !== expectedReferenceType) {
+        throw new TypeError(`Expected only ${expectedReferenceType}, got other type: ${referenceType}`);
+      }
+    }
+
+    return true;
+  };
+}
+
 const validateWikiData_cache = {};
 
 export function validateWikiData({
   referenceType = '',
   allowMixedTypes = false,
-}) {
+} = {}) {
   if (referenceType && allowMixedTypes) {
     throw new TypeError(`Don't specify both referenceType and allowMixedTypes`);
   }
@@ -752,25 +847,22 @@ export function validateWikiData({
       let foundOtherObject = false;
 
       for (const object of array) {
-        const {[Symbol.for('Thing.referenceType')]: referenceType} = object.constructor;
-
-        if (referenceType === undefined) {
-          foundOtherObject = true;
-
-          // Early-exit if a Thing has been found - nothing more can be learned.
-          if (foundThing) {
-            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
-          }
-        } else {
-          foundThing = true;
-
+        if (Object.hasOwn(object, Symbol.for('Thing.isThing'))) {
           // Early-exit if a non-Thing object has been found - nothing more can
           // be learned.
           if (foundOtherObject) {
             throw new TypeError(`Expected array of wiki data objects, got mixed items`);
           }
 
-          allRefTypes.add(referenceType);
+          foundThing = true;
+          allRefTypes.add(object.constructor[Symbol.for('Thing.referenceType')]);
+        } else {
+          // Early-exit if a Thing has been found - nothing more can be learned.
+          if (foundThing) {
+            throw new TypeError(`Expected array of wiki data objects, got mixed items`);
+          }
+
+          foundOtherObject = true;
         }
       }
 
