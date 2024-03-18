@@ -42,6 +42,7 @@ import {
   reverseReferenceList,
   simpleDate,
   singleReference,
+  simpleString,
   urls,
   wikiData,
 } from '#composite/wiki-properties';
@@ -72,6 +73,9 @@ export class Track extends Thing {
     additionalNames: additionalNameList(),
     sharedAdditionalNames: sharedAdditionalNameList(),
     inferredAdditionalNames: inferredAdditionalNameList(),
+
+    bandcampTrackIdentifier: simpleString(),
+    bandcampArtworkIdentifier: simpleString(),
 
     duration: duration(),
     urls: urls(),
@@ -353,6 +357,16 @@ export class Track extends Thing {
       'Additional Names': {
         property: 'additionalNames',
         transform: parseAdditionalNames,
+      },
+
+      'Bandcamp Track ID': {
+        property: 'bandcampTrackIdentifier',
+        transform: String,
+      },
+
+      'Bandcamp Artwork ID': {
+        property: 'bandcampArtworkIdentifier',
+        transform: String,
       },
 
       'Duration': {

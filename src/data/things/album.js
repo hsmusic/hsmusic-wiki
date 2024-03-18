@@ -48,6 +48,9 @@ export class Album extends Thing {
     directory: directory(),
     urls: urls(),
 
+    bandcampAlbumIdentifier: simpleString(),
+    bandcampArtworkIdentifier: simpleString(),
+
     date: simpleDate(),
     trackArtDate: simpleDate(),
     dateAddedToWiki: simpleDate(),
@@ -217,6 +220,16 @@ export class Album extends Thing {
     fields: {
       'Album': {property: 'name'},
       'Directory': {property: 'directory'},
+
+      'Bandcamp Album ID': {
+        property: 'bandcampAlbumIdentifier',
+        transform: String,
+      },
+
+      'Bandcamp Artwork ID': {
+        property: 'bandcampArtworkIdentifier',
+        transform: String,
+      },
 
       'Date': {
         property: 'date',
