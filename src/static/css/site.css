@@ -1858,6 +1858,10 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] .network-
   margin-right: 2px;
 }
 
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-top-dl > dt:has(.network-tag.with-stat:not([style*="display: none"])) {
+  padding-left: 20px;
+}
+
 html[data-url-key="localized.listing"][data-url-value0="tags/network"] dt + dt:has(+ dd) {
   padding-top: 20px;
 }
