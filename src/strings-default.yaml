@@ -1727,12 +1727,10 @@ listingPage:
       root.withAncestors:
         _: "{TAG} (descends from {ANCESTORS})"
 
-      descendant:
-        _: "{TAG}"
-        jumpToRoot: "Jump to: {TAG}"
-
       tag:
         _: "{TAG}"
+
+        jumpToRoot: "Jump to: {TAG}"
 
         withStat:
           _: "{STAT} {TAG}"
