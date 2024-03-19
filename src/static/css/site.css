@@ -1851,9 +1851,10 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-
   text-decoration-style: dotted;
 }
 
-/* CSS rule order pls */
-html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line a:hover {
-  text-decoration-style: solid;
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] .network-tag-stat {
+  display: inline-block;
+  text-align: right;
+  min-width: 5ch;
 }
 
 html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {

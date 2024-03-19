@@ -195,21 +195,19 @@ export default {
               : relationsNode.artTagLink),
 
           stat:
-            language.$(prefix, 'tag.withStat.stat', {
-              stat: [
-                html.tag('span', {class: 'network-tag-stat'},
-                  {class: 'network-tag-direct-uses-stat'},
-                  dataNode.directUses.toString()),
+            html.tag('span', {class: 'network-tag-stat'},
+              language.$(prefix, 'tag.withStat.stat', {
+                stat: [
+                  html.tag('span', {class: 'network-tag-direct-uses-stat'},
+                    dataNode.directUses.toString()),
 
-                html.tag('span', {class: 'network-tag-stat'},
-                  {class: 'network-tag-total-uses-stat'},
-                  dataNode.totalUses.toString()),
+                  html.tag('span', {class: 'network-tag-total-uses-stat'},
+                    dataNode.totalUses.toString()),
 
-                html.tag('span', {class: 'network-tag-stat'},
-                  {class: 'network-tag-descendants-stat'},
-                  dataNode.descendants.toString()),
-              ],
-            })
+                  html.tag('span', {class: 'network-tag-descendants-stat'},
+                    dataNode.descendants.toString()),
+                ],
+              })),
         }))
     ];
 
