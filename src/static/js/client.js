@@ -4943,7 +4943,7 @@ if (document.documentElement.dataset.urlKey === 'localized.albumCommentary') {
 
 // Art tag gallery filter ---------------------------------
 
-const artTagGalleryFilterInfo = clientInfo.artTagGalleryFilterInfo = {
+const artTagGalleryFilterInfo = initInfo('artTagGalleryFilterInfo', {
   featuredAllLine: null,
   showingAllLine: null,
   showingAllLink: null,
@@ -4955,7 +4955,7 @@ const artTagGalleryFilterInfo = clientInfo.artTagGalleryFilterInfo = {
   featuredIndirectLine: null,
   showingIndirectLine: null,
   showingIndirectLink: null,
-};
+});
 
 function getArtTagGalleryFilterReferences() {
   const info = artTagGalleryFilterInfo;
@@ -5092,6 +5092,144 @@ function addArtTagGalleryFilterListeners() {
 if (document.documentElement.dataset.urlKey === 'localized.artTagGallery') {
   clientSteps.getPageReferences.push(getArtTagGalleryFilterReferences);
   clientSteps.addPageListeners.push(addArtTagGalleryFilterListeners);
+}
+
+// Art Tag Network dynamics -------------------------------
+
+const artTagNetworkInfo = initInfo('artTagNetworkInfo', {
+  noneStatLink: null,
+  totalUsesStatLink: null,
+  directUsesStatLink: null,
+  descendantsStatLink: null,
+
+  tagsWithoutStats: null,
+  tagsWithStats: null,
+
+  totalUsesStats: null,
+  directUsesStats: null,
+  descendantsStats: null,
+});
+
+function getArtTagNetworkReferences() {
+  const info = artTagNetworkInfo;
+
+  info.noneStatLink =
+    document.getElementById('network-stat-none');
+
+  info.totalUsesStatLink =
+    document.getElementById('network-stat-total-uses');
+
+  info.directUsesStatLink =
+    document.getElementById('network-stat-direct-uses');
+
+  info.descendantsStatLink =
+    document.getElementById('network-stat-descendants');
+
+  info.tagsWithoutStats =
+    document.querySelectorAll('.network-tag:not(.with-stat)');
+
+  info.tagsWithStats =
+    document.querySelectorAll('.network-tag.with-stat');
+
+  info.totalUsesStats =
+    Array.from(document.getElementsByClassName('network-tag-total-uses-stat'));
+
+  info.directUsesStats =
+    Array.from(document.getElementsByClassName('network-tag-direct-uses-stat'));
+
+  info.descendantsStats =
+    Array.from(document.getElementsByClassName('network-tag-descendants-stat'));
+}
+
+function addArtTagNetworkListeners() {
+  const info = artTagNetworkInfo;
+
+  const linkOrder = [
+    info.noneStatLink,
+    info.totalUsesStatLink,
+    info.directUsesStatLink,
+    info.descendantsStatLink,
+  ];
+
+  const statsOrder = [
+    null,
+    info.totalUsesStats,
+    info.directUsesStats,
+    info.descendantsStats,
+  ];
+
+  const stitched =
+    stitchArrays({
+      link: linkOrder,
+      stats: statsOrder,
+    });
+
+  for (const [index, {link}] of stitched.entries()) {
+    const next = atOffset(stitched, index, +1, {wrap: true});
+
+    link.addEventListener('click', domEvent => {
+      domEvent.preventDefault();
+
+      cssProp(link, 'display', 'none');
+      cssProp(next.link, 'display', null);
+
+      if (next.stats === null) {
+        hideArtTagNetworkStats();
+      } else {
+        showArtTagNetworkStats(next.stats);
+      }
+    });
+  }
+}
+
+function showArtTagNetworkStats(stats) {
+  const info = artTagNetworkInfo;
+
+  for (const tagElement of info.tagsWithoutStats) {
+    cssProp(tagElement, 'display', 'none');
+  }
+
+  for (const tagElement of info.tagsWithStats) {
+    cssProp(tagElement, 'display', null);
+  }
+
+  const allStats = [
+    ...info.totalUsesStats,
+    ...info.directUsesStats,
+    ...info.descendantsStats,
+  ];
+
+  const otherStats =
+    allStats
+      .filter(stat => !stats.includes(stat));
+
+  for (const statElement of otherStats) {
+    cssProp(statElement, 'display', 'none');
+  }
+
+  for (const statElement of stats) {
+    cssProp(statElement, 'display', null);
+  }
+}
+
+function hideArtTagNetworkStats() {
+  const info = artTagNetworkInfo;
+
+  for (const tagElement of info.tagsWithoutStats) {
+    cssProp(tagElement, 'display', null);
+  }
+
+  for (const tagElement of info.tagsWithStats) {
+    cssProp(tagElement, 'display', 'none');
+  }
+}
+
+if (
+  document.documentElement.dataset.urlKey === 'localized.listing' &&
+  document.documentElement.dataset.urlValue0 === 'tags/network'
+) {
+  clientSteps.getPageReferences.push(getArtTagNetworkReferences);
+  clientSteps.addPageListeners.push(addArtTagNetworkListeners);
 }
 
 // Run setup steps ----------------------------------------
