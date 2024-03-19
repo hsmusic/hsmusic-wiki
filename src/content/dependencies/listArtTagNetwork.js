@@ -39,6 +39,13 @@ export default {
 
       descendants:
         artTag.allDescendantArtTags.length,
+
+      leaves:
+        (empty(artTag.directDescendantArtTags)
+          ? null
+          : artTag.allDescendantArtTags
+              .filter(artTag => empty(artTag.directDescendantArtTags))
+              .length),
     });
 
     const recursive = (artTag, depth) => {
@@ -147,6 +154,9 @@ export default {
       descendants:
         queryNode.stats.descendants,
 
+      leaves:
+        queryNode.stats.leaves,
+
       representsRoot:
         rootArtTags.includes(queryNode.artTag),
 
@@ -214,6 +224,11 @@ export default {
 
                   html.tag('span', {class: 'network-tag-descendants-stat'},
                     dataNode.descendants.toString()),
+
+                  html.tag('span', {class: 'network-tag-leaves-stat'},
+                    (dataNode.leaves === null
+                      ? language.$(prefix, 'tag.withStat.notApplicable')
+                      : dataNode.leaves.toString())),
                 ],
               })),
         }))
@@ -290,6 +305,11 @@ export default {
                 {href: '#'},
                 {style: 'display: none'},
                 language.$(prefix, 'statLine.descendants')),
+
+              html.tag('a', {id: 'network-stat-leaves'},
+                {href: '#'},
+                {style: 'display: none'},
+                language.$(prefix, 'statLine.leaves')),
             ],
           })),
 

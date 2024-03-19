@@ -11,6 +11,7 @@ export const info = {
   totalUsesStatLink: null,
   directUsesStatLink: null,
   descendantsStatLink: null,
+  leavesStatLink: null,
 
   tagsWithoutStats: null,
   tagsWithStats: null,
@@ -18,6 +19,7 @@ export const info = {
   totalUsesStats: null,
   directUsesStats: null,
   descendantsStats: null,
+  leavesStats: null,
 };
 
 export function getPageReferences() {
@@ -40,6 +42,9 @@ export function getPageReferences() {
   info.descendantsStatLink =
     document.getElementById('network-stat-descendants');
 
+  info.leavesStatLink =
+    document.getElementById('network-stat-leaves');
+
   info.tagsWithoutStats =
     document.querySelectorAll('.network-tag:not(.with-stat)');
 
@@ -54,6 +59,9 @@ export function getPageReferences() {
 
   info.descendantsStats =
     Array.from(document.getElementsByClassName('network-tag-descendants-stat'));
+
+  info.leavesStats =
+    Array.from(document.getElementsByClassName('network-tag-leaves-stat'));
 }
 
 export function addPageListeners() {
@@ -64,6 +72,7 @@ export function addPageListeners() {
     info.totalUsesStatLink,
     info.directUsesStatLink,
     info.descendantsStatLink,
+    info.leavesStatLink,
   ];
 
   const statsOrder = [
@@ -71,6 +80,7 @@ export function addPageListeners() {
     info.totalUsesStats,
     info.directUsesStats,
     info.descendantsStats,
+    info.leavesStats,
   ];
 
   const stitched =
@@ -110,6 +120,7 @@ function showArtTagNetworkStats(stats) {
     ...info.totalUsesStats,
     ...info.directUsesStats,
     ...info.descendantsStats,
+    ...info.leavesStats,
   ];
 
   const otherStats =

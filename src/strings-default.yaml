@@ -1595,9 +1595,10 @@ listingPage:
       statLine:
         _: "Displaying tag info: {STAT}"
         none: "name only"
-        directUses: "uses (direct only)"
         totalUses: "uses (total)"
-        descendants: "descendants"
+        directUses: "uses (direct only)"
+        descendants: "descendants (total)"
+        leaves: "descendants (leaves only)"
 
       root:
         _: "{TAG}"
@@ -1617,6 +1618,7 @@ listingPage:
         withStat:
           _: "{STAT} {TAG}"
           stat: "({STAT})"
+          notApplicable: "-"
 
       orphanArtTags:
         title: "These tags don't have any descendants or ancestors:"
