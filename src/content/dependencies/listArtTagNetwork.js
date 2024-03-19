@@ -174,11 +174,24 @@ export default {
   generate(data, relations, {html, language}) {
     const prefix = `listingPage.listArtTags.network`;
 
-    const wrapTag = (dataNode, relationsNode) => [
+    const wrapTagWithJumpTo = (dataNode, relationsNode, depth) =>
+      (depth === 0
+        ? relationsNode.artTagLink
+     : dataNode.representsRoot
+        ? language.$(prefix, 'tag.jumpToRoot', {
+            tag:
+              relationsNode.artTagLink.slots({
+                anchor: true,
+                hash: dataNode.directory,
+              }),
+          })
+        : relationsNode.artTagLink);
+
+    const wrapTagWithStats = (dataNode, relationsNode, depth) => [
       html.tag('span', {class: 'network-tag'},
         language.$(prefix, 'tag', {
           tag:
-            relationsNode.artTagLink,
+            wrapTagWithJumpTo(dataNode, relationsNode, depth),
         })),
 
       html.tag('span', {class: 'network-tag'},
@@ -187,12 +200,7 @@ export default {
 
         language.$(prefix, 'tag.withStat', {
           tag:
-            (dataNode.representsRoot
-              ? relationsNode.artTagLink.slots({
-                  anchor: true,
-                  hash: dataNode.directory,
-                })
-              : relationsNode.artTagLink),
+            wrapTagWithJumpTo(dataNode, relationsNode, depth),
 
           stat:
             html.tag('span', {class: 'network-tag-stat'},
@@ -222,7 +230,7 @@ export default {
           ? (relationsNode.ancestorTagLinks
               ? language.$(prefix, 'root.withAncestors', {
                   tag:
-                    wrapTag(dataNode, relationsNode),
+                    wrapTagWithStats(dataNode, relationsNode, depth),
 
                   ancestors:
                     language.formatUnitList(
@@ -237,21 +245,13 @@ export default {
                 })
               : language.$(prefix, 'root.jumpToTop', {
                   tag:
-                    wrapTag(dataNode, relationsNode),
+                    wrapTagWithStats(dataNode, relationsNode, depth),
 
                   link:
                     html.tag('a', {href: '#top'},
                       language.$(prefix, 'root.jumpToTop.link')),
                 }))
-          : (dataNode.representsRoot
-              ? language.$(prefix, 'descendant.jumpToRoot', {
-                  tag:
-                    wrapTag(dataNode, relationsNode),
-                })
-              : language.$(prefix, 'descendant', {
-                  tag:
-                    wrapTag(dataNode, relationsNode),
-                })))),
+          : wrapTagWithStats(dataNode, relationsNode, depth))),
 
       dataNode.descendantNodes &&
       relationsNode.descendantNodes &&
