@@ -27,6 +27,20 @@ export default {
        {directAncestorArtTags: ancestorsB}) =>
         ancestorsA.length - ancestorsB.length);
 
+    const getStats = (artTag) => ({
+      directUses:
+        artTag.directlyTaggedInThings.length,
+
+      totalUses:
+        unique([
+          ...artTag.indirectlyTaggedInThings,
+          ...artTag.directlyTaggedInThings,
+        ]).length,
+
+      descendants:
+        artTag.allDescendantArtTags.length,
+    });
+
     const recursive = (artTag, depth) => {
       const descendantNodes =
         (empty(artTag.directDescendantArtTags)
@@ -52,8 +66,11 @@ export default {
           ? unique(artTag.directAncestorArtTags.map(recursiveGetRootAncestor))
           : null);
 
+      const stats = getStats(artTag);
+
       return {
         artTag,
+        stats,
         descendantNodes,
         ancestorRootArtTags,
       };
@@ -121,6 +138,15 @@ export default {
       directory:
         queryNode.artTag.directory,
 
+      directUses:
+        queryNode.stats.directUses,
+
+      totalUses:
+        queryNode.stats.totalUses,
+
+      descendants:
+        queryNode.stats.descendants,
+
       representsRoot:
         rootArtTags.includes(queryNode.artTag),
 
@@ -148,6 +174,45 @@ export default {
   generate(data, relations, {html, language}) {
     const prefix = `listingPage.listArtTags.network`;
 
+    const wrapTag = (dataNode, relationsNode) => [
+      html.tag('span', {class: 'network-tag'},
+        language.$(prefix, 'tag', {
+          tag:
+            relationsNode.artTagLink,
+        })),
+
+      html.tag('span', {class: 'network-tag'},
+        {class: 'with-stat'},
+        {style: 'display: none'},
+
+        language.$(prefix, 'tag.withStat', {
+          tag:
+            (dataNode.representsRoot
+              ? relationsNode.artTagLink.slots({
+                  anchor: true,
+                  hash: dataNode.directory,
+                })
+              : relationsNode.artTagLink),
+
+          stat:
+            language.$(prefix, 'tag.withStat.stat', {
+              stat: [
+                html.tag('span', {class: 'network-tag-stat'},
+                  {class: 'network-tag-direct-uses-stat'},
+                  dataNode.directUses.toString()),
+
+                html.tag('span', {class: 'network-tag-stat'},
+                  {class: 'network-tag-total-uses-stat'},
+                  dataNode.totalUses.toString()),
+
+                html.tag('span', {class: 'network-tag-stat'},
+                  {class: 'network-tag-descendants-stat'},
+                  dataNode.descendants.toString()),
+              ],
+            })
+        }))
+    ];
+
     const recursive = (dataNode, relationsNode, depth) => [
       html.tag('dt',
         {
@@ -158,7 +223,9 @@ export default {
         (depth === 0
           ? (relationsNode.ancestorTagLinks
               ? language.$(prefix, 'root.withAncestors', {
-                  tag: relationsNode.artTagLink,
+                  tag:
+                    wrapTag(dataNode, relationsNode),
+
                   ancestors:
                     language.formatUnitList(
                       stitchArrays({
@@ -171,7 +238,9 @@ export default {
                           }))),
                 })
               : language.$(prefix, 'root.jumpToTop', {
-                  tag: relationsNode.artTagLink,
+                  tag:
+                    wrapTag(dataNode, relationsNode),
+
                   link:
                     html.tag('a', {href: '#top'},
                       language.$(prefix, 'root.jumpToTop.link')),
@@ -179,13 +248,11 @@ export default {
           : (dataNode.representsRoot
               ? language.$(prefix, 'descendant.jumpToRoot', {
                   tag:
-                    relationsNode.artTagLink.slots({
-                      anchor: true,
-                      hash: dataNode.directory,
-                    }),
+                    wrapTag(dataNode, relationsNode),
                 })
               : language.$(prefix, 'descendant', {
-                  tag: relationsNode.artTagLink,
+                  tag:
+                    wrapTag(dataNode, relationsNode),
                 })))),
 
       dataNode.descendantNodes &&
@@ -204,6 +271,30 @@ export default {
       type: 'custom',
 
       content: [
+        html.tag('p', {id: 'network-stat-line'},
+          language.$(prefix, 'statLine', {
+            stat: [
+              html.tag('a', {id: 'network-stat-none'},
+                {href: '#'},
+                language.$(prefix, 'statLine.none')),
+
+              html.tag('a', {id: 'network-stat-total-uses'},
+                {href: '#'},
+                {style: 'display: none'},
+                language.$(prefix, 'statLine.totalUses')),
+
+              html.tag('a', {id: 'network-stat-direct-uses'},
+                {href: '#'},
+                {style: 'display: none'},
+                language.$(prefix, 'statLine.directUses')),
+
+              html.tag('a', {id: 'network-stat-descendants'},
+                {href: '#'},
+                {style: 'display: none'},
+                language.$(prefix, 'statLine.descendants')),
+            ],
+          })),
+
         html.tag('dl', {id: 'network-top-dl'}, [
           html.tag('dt', {id: 'top'},
             language.$(prefix, 'jumpToRoot.title')),

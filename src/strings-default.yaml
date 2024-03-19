@@ -1592,6 +1592,13 @@ listingPage:
         title: "Jump to one of the upper-most tags:"
         item: "{TAG}"
 
+      statLine:
+        _: "Displaying tag info: {STAT}"
+        none: "name only"
+        directUses: "uses (direct only)"
+        totalUses: "uses (total)"
+        descendants: "descendants"
+
       root:
         _: "{TAG}"
 
@@ -1605,6 +1612,13 @@ listingPage:
       descendant:
         _: "{TAG}"
         jumpToRoot: "Jump to: {TAG}"
+
+      tag:
+        _: "{TAG}"
+
+        withStat:
+          _: "{STAT} {TAG}"
+          stat: "({STAT})"
 
       orphanArtTags:
         title: "These tags don't have any descendants or ancestors:"

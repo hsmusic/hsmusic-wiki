@@ -1841,6 +1841,21 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dd:not
   padding-bottom: 20px;
 }
 
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line {
+  padding-left: 10px;
+  margin-left: 20px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line a {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+/* CSS rule order pls */
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] #network-stat-line a:hover {
+  text-decoration-style: solid;
+}
+
 html[data-url-key="localized.listing"][data-url-value0="tags/network"] dl dt {
   padding-left: 10px;
   margin-left: 20px;
