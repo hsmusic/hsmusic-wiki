@@ -31,11 +31,20 @@ export default {
       directUses:
         artTag.directlyTaggedInThings.length,
 
-      totalUses:
+      // Not currently displayed
+      directAndIndirectUses:
         unique([
           ...artTag.indirectlyTaggedInThings,
           ...artTag.directlyTaggedInThings,
         ]).length,
+
+      totalUses:
+        [
+          ...artTag.directlyTaggedInThings,
+          ...
+            artTag.allDescendantArtTags
+              .flatMap(artTag => artTag.directlyTaggedInThings),
+        ].length,
 
       descendants:
         artTag.allDescendantArtTags.length,
