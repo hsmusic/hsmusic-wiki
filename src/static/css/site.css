@@ -1855,6 +1855,11 @@ html[data-url-key="localized.listing"][data-url-value0="tags/network"] .network-
   display: inline-block;
   text-align: right;
   min-width: 5ch;
+  margin-right: 2px;
+}
+
+html[data-url-key="localized.listing"][data-url-value0="tags/network"] dt + dt:has(+ dd) {
+  padding-top: 20px;
 }
 
 html[data-url-key="localized.listing"][data-url-value0="tags/network"] dt:has(+ dd) .network-tag-stat {
