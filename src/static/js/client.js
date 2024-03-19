@@ -5101,6 +5101,7 @@ const artTagNetworkInfo = initInfo('artTagNetworkInfo', {
   totalUsesStatLink: null,
   directUsesStatLink: null,
   descendantsStatLink: null,
+  leavesStatLink: null,
 
   tagsWithoutStats: null,
   tagsWithStats: null,
@@ -5108,6 +5109,7 @@ const artTagNetworkInfo = initInfo('artTagNetworkInfo', {
   totalUsesStats: null,
   directUsesStats: null,
   descendantsStats: null,
+  leavesStats: null,
 });
 
 function getArtTagNetworkReferences() {
@@ -5125,6 +5127,9 @@ function getArtTagNetworkReferences() {
   info.descendantsStatLink =
     document.getElementById('network-stat-descendants');
 
+  info.leavesStatLink =
+    document.getElementById('network-stat-leaves');
+
   info.tagsWithoutStats =
     document.querySelectorAll('.network-tag:not(.with-stat)');
 
@@ -5139,6 +5144,9 @@ function getArtTagNetworkReferences() {
 
   info.descendantsStats =
     Array.from(document.getElementsByClassName('network-tag-descendants-stat'));
+
+  info.leavesStats =
+    Array.from(document.getElementsByClassName('network-tag-leaves-stat'));
 }
 
 function addArtTagNetworkListeners() {
@@ -5149,6 +5157,7 @@ function addArtTagNetworkListeners() {
     info.totalUsesStatLink,
     info.directUsesStatLink,
     info.descendantsStatLink,
+    info.leavesStatLink,
   ];
 
   const statsOrder = [
@@ -5156,6 +5165,7 @@ function addArtTagNetworkListeners() {
     info.totalUsesStats,
     info.directUsesStats,
     info.descendantsStats,
+    info.leavesStats,
   ];
 
   const stitched =
@@ -5197,6 +5207,7 @@ function showArtTagNetworkStats(stats) {
     ...info.totalUsesStats,
     ...info.directUsesStats,
     ...info.descendantsStats,
+    ...info.leavesStats,
   ];
 
   const otherStats =
