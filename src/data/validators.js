@@ -897,9 +897,9 @@ export function validateReviewPoint({
   return validateProperties({
     field: is(...fields),
 
-    notes: isContentString,
-
     dateRecorded: isDate,
+
+    notes: optional(isContentString),
 
     referenceDiscussions:
       optional(validateArrayItems(isReferenceDiscussion)),
