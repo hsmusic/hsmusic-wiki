@@ -2268,6 +2268,7 @@ html[data-language-code="preview-en"][data-url-key="localized.home"] #content
   }
 
   #additional-names-box {
+    width: unset;
     max-width: unset;
   }
 
