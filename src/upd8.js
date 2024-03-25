@@ -240,7 +240,12 @@ async function main() {
     },
 
     'media-cache-path': {
-      help: `Specify path to media cache directory, including automatically generated thumbnails\n\nThis usually doesn't need to be provided, and will be inferred by adding "-cache" to the end of the media directory`,
+      help: `Specify path to media cache directory, including automatically generated thumbnails\n\nThis usually doesn't need to be provided, and will be inferred either by loading "media-cache" from --cache-path, or by adding "-cache" to the end of the media directory\n\nAlso may be provided via the HSMUSIC_MEDIA_CACHE environment variable`,
+      type: 'value',
+    },
+
+    'cache-path': {
+      help: `Specify path to general cache directory, usually containing generated thumbnails and assorted files reused between builds\n\nRequired for some features and may always be required if you're starting a new workspace\n\nAlso may be provided via the HSMUSIC_CACHE environment varaible`,
       type: 'value',
     },
 
@@ -281,6 +286,11 @@ async function main() {
 
     'migrate-thumbs': {
       help: `Transfer automatically generated thumbnail files out of an existing media directory and into the easier-to-manage media-cache directory`,
+      type: 'flag',
+    },
+
+    'new-thumbs': {
+      help: `Repair a media cache that's completely missing its index file by starting clean and not reusing any existing thumbnails`,
       type: 'flag',
     },
 
@@ -473,6 +483,7 @@ async function main() {
 
   const dataPath = cliOptions['data-path'] || process.env.HSMUSIC_DATA;
   const mediaPath = cliOptions['media-path'] || process.env.HSMUSIC_MEDIA;
+  const wikiCachePath = cliOptions['cache-path'] || process.env.HSMUSIC_CACHE;
   const langPath = cliOptions['lang-path'] || process.env.HSMUSIC_LANG; // Can 8e left unset!
 
   const thumbsOnly = cliOptions['thumbs-only'] ?? false;
@@ -498,6 +509,10 @@ async function main() {
 
   if (!mediaPath) {
     logError`${`Expected --media-path option or HSMUSIC_MEDIA to be set`}`;
+  }
+
+  if (!wikiCachePath) {
+    logWarn`No --cache-path option nor HSMUSIC_CACHE set; provide for more features`;
   }
 
   if (!dataPath || !mediaPath) {
@@ -761,31 +776,118 @@ async function main() {
     timeStart: Date.now(),
   });
 
+  const regenerateMissingThumbnailCache =
+    cliOptions['new-thumbs'] ?? false;
+
   const {mediaCachePath, annotation: mediaCachePathAnnotation} =
     await determineMediaCachePath({
       mediaPath,
+      wikiCachePath,
+
       providedMediaCachePath:
         cliOptions['media-cache-path'] || process.env.HSMUSIC_MEDIA_CACHE,
+
+      regenerateMissingThumbnailCache,
+
       disallowDoubling:
         stepStatusSummary.migrateThumbnails.status === STATUS_NOT_STARTED,
     });
+
+  if (regenerateMissingThumbnailCache) {
+    if (
+      mediaCachePathAnnotation !== `contained path will regenerate missing cache` &&
+      mediaCachePathAnnotation !== `adjacent path will regenerate missing cache`
+    ) {
+      if (mediaCachePath) {
+        logError`Determined a media cache path. (${mediaCachePathAnnotation})`;
+        console.error('');
+        logWarn`By using ${'--new-thumbs'}, you requested to generate completely`;
+        logWarn`new thumbnails, but there's already a ${'thumbnail-cache.json'}`;
+        logWarn`file where it's expected, within this media cache:`;
+        logWarn`${path.resolve(mediaCachePath)}`;
+        console.error('');
+        logWarn`If you really do want to completely regenerate all thumbnails`;
+        logWarn`and not reuse any existing ones, move aside ${'thumbnail-cache.json'}`;
+        logWarn`and run with ${'--new-thumbs'} again.`;
+
+        Object.assign(stepStatusSummary.determineMediaCachePath, {
+          status: STATUS_FATAL_ERROR,
+          annotation: `--new-thumbs provided but regeneration not needed`,
+          timeEnd: Date.now(),
+        });
+
+        return false;
+      } else {
+        logError`Couldn't determine a media cache path. (${mediaCachePathAnnotation})`;
+        console.error('');
+        logWarn`You requested to generate completely new thumbnails, but`;
+        logWarn`the media cache wasn't readable or just couldn't be found.`;
+        logWarn`Run again without ${'--new-thumbs'} - you should investigate`;
+        logWarn`what's going on before continuing.`;
+
+        Object.assign(stepStatusSummary.determineMediaCachePath, {
+          status: STATUS_FATAL_ERROR,
+          annotation: mediaCachePathAnnotation,
+          timeEnd: Date.now(),
+        });
+
+        return false;
+      }
+    }
+  }
 
   if (!mediaCachePath) {
     logError`Couldn't determine a media cache path. (${mediaCachePathAnnotation})`;
 
     switch (mediaCachePathAnnotation) {
-      case 'inferred path does not have cache':
-        logError`If you're certain this is the right path, you can provide it via`;
-        logError`${'--media-cache-path'} or ${'HSMUSIC_MEDIA_CACHE'}, and it should work.`;
+      case `contained path does not have cache`:
+        console.error('');
+        logError`You've provided a ${'--cache-path'} or ${'HSMUSIC_CACHE_PATH'},`;
+        logError`${path.resolve(wikiCachePath)}`;
+        console.error('');
+        logError`It contains a ${'media-cache'} folder, but this folder is`;
+        logError`missing its ${'thumbnail-cache.json'} file. This means there's`;
+        logError`no information available to reuse. If you use this cache,`;
+        logError`hsmusic will generate any existing thumbnails over again.`;
+        console.error('');
+        logError`* Try to see if you can recover or locate a copy of your`;
+        logError`  ${'thumbnail-cache.json'} file and put it back in place;`;
+        logError`* Or, generate all-new thumbnails with ${'--new-thumbs'}.`;
         break;
 
-      case 'inferred path not readable':
+      case 'adjacent path does not have cache':
+        console.error('');
+        logError`You have an existing ${'media-cache'} folder next to your media path,`;
+        logError`${path.resolve(mediaPath)}`;
+        console.error('');
+        logError`The ${'media-cache'} folder is missing its ${'thumbnail-cache.json'}`;
+        logError`file. This means there's no information available to reuse,`;
+        logError`and if you use this cache, hsmusic will generate any existing`;
+        logError`thumbnails over again.`;
+        console.error('');
+        logError`* Try to see if you can recover or locate a copy of your`;
+        logError`  ${'thumbnail-cache.json'} file and put it back in place;`;
+        logError`* Or, generate all-new thumbnails with ${'--new-thumbs'}.`;
+        break;
+
+      case `contained path not readable`:
+      case `adjacent path not readable`:
+        console.error('');
         logError`The folder couldn't be read, which usually indicates`;
         logError`a permissions error. Try to resolve this, or provide`;
         logError`a new path with ${'--media-cache-path'} or ${'HSMUSIC_MEDIA_CACHE'}.`;
         break;
 
-      case 'media path not provided': /* unreachable */
+      case `missing wiki cache to create media cache inside`:
+        console.error('');
+        logError`It looks like you're starting totally fresh, so please`;
+        logError`create a ${'cache'} folder and provide it with ${'--cache-path'}`;
+        logError`or ${'HSMUSIC_CACHE'}. The media cache will automatically be`;
+        logError`generated inside of this folder!`;
+        break;
+
+      case `media path not provided`: /* unreachable */
+        console.error('');
         logError`It seems a ${'--media-path'} (or ${'HSMUSIC_MEDIA'}) wasn't provided.`;
         logError`Make sure one of these is actually pointing to a path that exists.`;
         break;
@@ -1794,6 +1896,7 @@ async function main() {
       const webRouteSources = await identifyAllWebRoutes({
         mediaCachePath,
         mediaPath,
+        wikiCachePath,
       });
 
       const {aggregate, result} =

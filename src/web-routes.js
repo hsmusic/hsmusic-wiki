@@ -36,6 +36,7 @@ export const allStaticWebRoutes = [
 export async function identifyDynamicWebRoutes({
   mediaPath,
   mediaCachePath,
+  wikiCachePath,
 }) {
   const routeFunctions = [
     () => Promise.resolve([
