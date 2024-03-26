@@ -1,6 +1,6 @@
 'use strict';
 
-import {writeFile} from 'node:fs/promises';
+import {mkdir, writeFile} from 'node:fs/promises';
 import * as path from 'node:path';
 
 import FlexSearch from 'flexsearch';
@@ -86,9 +86,13 @@ export async function writeSearchIndex({
         });
       }));
 
-  const outputFile =
-    path.join(wikiCachePath, 'search-index.json');
+  const outputDirectory =
+    path.join(wikiCachePath, 'search');
 
+  const outputFile =
+    path.join(outputDirectory, 'index.json');
+
+  await mkdir(outputDirectory, {recursive: true});
   await writeFile(outputFile, JSON.stringify(searchData));
 
   logInfo`Search index successfully written.`;

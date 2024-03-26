@@ -2014,6 +2014,7 @@ async function main() {
       dataPath,
       mediaPath,
       mediaCachePath,
+      wikiCachePath,
       queueSize,
       srcRootPath: __dirname,
 
