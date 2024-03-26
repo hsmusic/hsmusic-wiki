@@ -477,6 +477,13 @@ export class Tag {
   }
 
   get joinChildren() {
+    // A chunkwrap - which serves as the top layer of a smush() when
+    // stringifying that chunkwrap - is only meant to be an invisible
+    // layer, so its own children are never specially joined.
+    if (this.chunkwrap) {
+      return '';
+    }
+
     return this.#getAttributeString(joinChildren);
   }
 
@@ -746,6 +753,13 @@ export class Tag {
     const joiner = this.#getContentJoiner();
 
     const result = [];
+    const attributes = {};
+
+    // Don't use built-in item joining, since we'll be handling it here -
+    // we need to account for descendants having custom joiners too, and
+    // simply using *this* tag's joiner would overwrite those descendants'
+    // differing joiners.
+    attributes[joinChildren] = '';
 
     let workingText = '';
 
@@ -770,10 +784,15 @@ export class Tag {
       }
 
       if (workingText) {
-        result.push(workingText);
+        result.push(workingText + joiner);
+      } else if (!empty(result)) {
+        result.push(joiner);
       }
 
       if (typeof smushedItems.at(-1) === 'string') {
+        // The last smushed item already had its joiner processed from its own
+        // parent - this isn't an appropriate place for us to insert our own
+        // joiner.
         workingText = smushedItems.pop();
       } else {
         workingText = '';
@@ -785,10 +804,6 @@ export class Tag {
     if (workingText) {
       result.push(workingText);
     }
-
-    const attributes = {
-      [joinChildren]: this.joinChildren,
-    };
 
     return new Tag(null, attributes, result);
   }
