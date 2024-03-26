@@ -65,6 +65,8 @@ import {identifyAllWebRoutes} from '#web-routes';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
 
+import {writeSearchIndex} from '#search'
+
 import {
   colors,
   decorateTime,
@@ -131,6 +133,9 @@ async function main() {
 
     generateThumbnails:
       {...defaultStepStatus, name: `generate thumbnails`},
+
+    buildSearchIndex:
+      {...defaultStepStatus, name: `generate search index`},
 
     loadDataFiles:
       {...defaultStepStatus, name: `load and process data files`},
@@ -306,6 +311,11 @@ async function main() {
 
     'skip-media-validation': {
       help: `Skips checking and reporting missing and misplaced media files, which isn't necessary if you aren't adding or removing data or updating directories`,
+      type: 'flag',
+    },
+
+    'skip-search': {
+      help: `Skip creation of the text search file`,
       type: 'flag',
     },
 
@@ -686,6 +696,15 @@ async function main() {
     fallbackStep('identifyWebRoutes', {
       default: 'skip',
       buildConfig: 'webRoutes',
+    });
+
+    fallbackStep('buildSearchIndex', {
+      default: 'perform',
+      buildConfig: 'search',
+      cli: {
+        flag: 'skip-search',
+        negate: true,
+      },
     });
 
     fallbackStep('verifyImagePaths', {
@@ -1244,6 +1263,23 @@ async function main() {
     }
 
     Object.assign(stepStatusSummary.precacheCommonData, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
+  }
+
+  if (stepStatusSummary.buildSearchIndex.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.buildSearchIndex, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    const search_index_path = path.join(mediaPath, "search_index.json")
+    logInfo(`Search index: ${search_index_path}`)
+
+    await writeSearchIndex(search_index_path, wikiData)
+
+    Object.assign(stepStatusSummary.buildSearchIndex, {
       status: STATUS_DONE_CLEAN,
       timeEnd: Date.now(),
     });
