@@ -706,8 +706,16 @@ export class Tag {
       }
     }
 
-    if (seenChunkwrapSplitter) {
-      content += '</span>';
+    if (chunkwrapSplitter) {
+      if (seenChunkwrapSplitter) {
+        content += '</span>';
+      } else {
+        // Since chunkwraps take responsibility for wrapping *away* from the
+        // parent element, we generally always want there to be at least one
+        // chunk that gets wrapped as a single unit. So if no chunkwrap has
+        // been seen at all, just wrap everything in one now.
+        content = `<span class="chunkwrap">${content}</span>`;
+      }
     }
 
     content += blockwrapClosers;
