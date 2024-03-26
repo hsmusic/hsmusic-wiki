@@ -58,14 +58,13 @@ import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
+import {writeSearchIndex} from '#search'
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
 import {identifyAllWebRoutes} from '#web-routes';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
-
-import {writeSearchIndex} from '#search'
 
 import {
   colors,
@@ -1274,10 +1273,10 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    const search_index_path = path.join(mediaPath, "search_index.json")
-    logInfo(`Search index: ${search_index_path}`)
+    const searchIndexPath = path.join(mediaPath, "search_index.json");
+    logInfo`Search index: ${searchIndexPath}`;
 
-    await writeSearchIndex(search_index_path, wikiData)
+    await writeSearchIndex(searchIndexPath, wikiData);
 
     Object.assign(stepStatusSummary.buildSearchIndex, {
       status: STATUS_DONE_CLEAN,
