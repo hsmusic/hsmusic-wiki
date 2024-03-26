@@ -527,17 +527,24 @@ export class Tag {
         : '\n'));
   }
 
+  #getContentJoiner() {
+    if (this.joinChildren === undefined) {
+      return '\n';
+    }
+
+    if (this.joinChildren === '') {
+      return '';
+    }
+
+    return `\n${this.joinChildren}\n`;
+  }
+
   #stringifyContent() {
     if (this.selfClosing) {
       return '';
     }
 
-    const joiner =
-      (this.joinChildren === undefined
-        ? '\n'
-     : this.joinChildren === ''
-        ? ''
-        : `\n${this.joinChildren}\n`);
+    const joiner = this.#getContentJoiner();
 
     let content = '';
     let blockwrapClosers = '';
