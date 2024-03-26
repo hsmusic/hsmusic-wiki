@@ -619,6 +619,61 @@ export class Tag {
     return new Tag(null, null, content);
   }
 
+  smush() {
+    if (!this.contentOnly) {
+      return tags([this]);
+    }
+
+    const joiner = this.#getContentJoiner();
+
+    const result = [];
+
+    let workingText = '';
+
+    for (const item of this.content) {
+      const smushed = smush(item);
+      const smushedItems = smushed.content.slice();
+
+      if (empty(smushedItems)) {
+        continue;
+      }
+
+      if (typeof smushedItems[0] === 'string') {
+        if (workingText) {
+          workingText += joiner;
+        }
+
+        workingText += smushedItems.shift();
+      }
+
+      if (empty(smushedItems)) {
+        continue;
+      }
+
+      if (workingText) {
+        result.push(workingText);
+      }
+
+      if (typeof smushedItems.at(-1) === 'string') {
+        workingText = smushedItems.pop();
+      } else {
+        workingText = '';
+      }
+
+      result.push(...smushedItems);
+    }
+
+    if (workingText) {
+      result.push(workingText);
+    }
+
+    const attributes = {
+      [joinChildren]: this.joinChildren,
+    };
+
+    return new Tag(null, attributes, result);
+  }
+
   [inspect.custom](depth, opts) {
     const lines = [];
 
@@ -1109,6 +1164,31 @@ export function resolve(tagOrTemplate, {normalize = null} = {}) {
   } else {
     return Template.resolve(tagOrTemplate);
   }
+}
+
+export function smush(smushee) {
+  if (
+    typeof smushee === 'string' ||
+    typeof smushee === 'number'
+  ) {
+    return tags([smushee.toString()]);
+  }
+
+  if (smushee instanceof Template) {
+    // Smushing is only really useful if the contents are resolved, because
+    // otherwise we can't actually inspect the boundaries. However, as usual
+    // for smushing, we don't care at all about the contents of tags (which
+    // aren't contentOnly) *within* the content we're smushing, so this won't
+    // for example smush a template nested within a *tag* within the contents
+    // of this template.
+    return smush(Template.resolve(smushee));
+  }
+
+  if (smushee instanceof Tag) {
+    return smushee.smush();
+  }
+
+  return smush(Tag.normalize(smushee));
 }
 
 export function template(description) {
