@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 async function initSearch() {
-  const FlexSearch = window.FlexSearch;
+  const {FlexSearch} = window;
 
   // Copied directly from server search.js
   window.indexes = {
@@ -9,34 +9,37 @@ async function initSearch() {
       id: "reference",
       index: ["name", "groups"],
     }),
+
     tracks: new FlexSearch.Document({
       id: "reference",
       index: ["track", "album", "artists", "directory", "additionalNames"],
     }),
+
     artists: new FlexSearch.Document({
       id: "reference",
       index: ["names"],
-    })
-  }
+    }),
+  };
 
-  let searchData = await fetch('/media/search_index.json').then(resp => resp.json())
+  const searchData =
+    await fetch('/media/search_index.json')
+      .then(resp => resp.json());
 
-  Object.entries(searchData).forEach(key_index_pair => {
-    const [index_key, index_data] = key_index_pair
-    Object.entries(index_data).forEach(key_value_pair => {
-      const [key, value] = key_value_pair
+  for (const [indexName, indexData] of Object.entries(searchData)) {
+    for (const [key, value] of Object.entries(indexData)) {
       window.indexes[index_key].import(key, value);
-    })
-  })
+    }
+  }
 }
 
-function searchAll(query, options) {
-  options = options || {}
-  return Object.entries(window.indexes).reduce((a, pair) => {
-    const [k, v] = pair
-    a[k] = v.search(query, options)
-    return a
-  }, {})
+function searchAll(query, options = {}) {
+  const results = {};
+
+  for (const [indexName, index] of Object.entries(window.indexes)) {
+    results[indexName] = index.search(query, options);
+  }
+
+  return results;
 }
 
 document.addEventListener('DOMContentLoaded', initSearch);

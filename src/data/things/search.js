@@ -2,21 +2,14 @@
 
 'use strict';
 
-import {
-  writeFile,
-} from 'node:fs/promises';
-
-import {
-  logWarn,
-  logInfo,
-  logError,
-} from '#cli';
-
-import Thing from '#thing';
+import {writeFile} from 'node:fs/promises';
 
 import FlexSearch from 'flexsearch';
 
-export async function writeSearchIndex(search_index_path, wikiData) {
+import {logError, logInfo, logWarn} from '#cli';
+import Thing from '#thing';
+
+export async function writeSearchIndex(searchIndexPath, wikiData) {
 
   // Basic flow is:
   // 1. Define schema for type
@@ -29,62 +22,64 @@ export async function writeSearchIndex(search_index_path, wikiData) {
       id: "reference",
       index: ["name", "groups"],
     }),
+
     tracks: new FlexSearch.Document({
       id: "reference",
       index: ["track", "album", "artists", "directory", "additionalNames"],
     }),
+
     artists: new FlexSearch.Document({
       id: "reference",
       index: ["names"],
-    })
-  }
+    }),
+  };
 
-  wikiData.albumData.forEach((album) => {
+  for (const album of wikiData.albumData) {
     indexes.albums.add({
       reference: Thing.getReference(album),
       name: album.name,
       groups: album.groups.map(group => group.name),
-    })
+    });
 
-    album.tracks.forEach((track) => {
+    for (const track of album.tracks) {
       indexes.tracks.add({
         reference: Thing.getReference(track),
         album: album.name,
         track: track.name,
+
         artists: [
           track.artistContribs.map(contrib => contrib.artist.name),
           ...track.artistContribs.map(contrib => contrib.artist.aliasNames)
         ],
-        additionalNames: track.additionalNames.map(entry => entry.name)
-      })
-    })
-  });
 
-  wikiData.artistData
-  .filter(artist => !artist.isAlias)
-  .forEach((artist) => {
+        additionalNames:
+          track.additionalNames.map(entry => entry.name),
+      });
+    }
+  }
+
+  for (const artist of wikiData.artistData) {
+    if (artist.isAlias) {
+      continue;
+    }
+
     indexes.artists.add({
       reference: Thing.getReference(artist),
-      names: [
-        artist.name,
-        ...artist.aliasNames
-      ]
-    })
-  })
+      names: [artist.name, ...artist.aliasNames],
+    });
+  }
 
   // Export indexes to json
-  let searchData = {}
+  const searchData = {}
 
   await Promise.all(
     Object.entries(indexes)
-    .map(pair => {
-      const [index_name, index] = pair
-      searchData[index_name] = {}
-      return index.export((key, data) => {
-        searchData[index_name][key] = data
-      });
-    })
-  )
+      .map(([indexName, index]) => {
+        searchData[indexName] = {};
+        return index.export((key, data) => {
+          searchData[indexName][key] = data
+        });
+      }));
 
-  writeFile(search_index_path, JSON.stringify(searchData))
+  await writeFile(searchIndexPath, JSON.stringify(searchData));
 }
