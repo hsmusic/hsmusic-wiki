@@ -3422,7 +3422,7 @@ async function initSearch() {
   const {FlexSearch} = window;
 
   // Copied directly from server search.js
-  window.indexes = {
+  const indexes = {
     albums: new FlexSearch.Document({
       id: "reference",
       index: ["name", "groups"],
@@ -3430,7 +3430,7 @@ async function initSearch() {
 
     tracks: new FlexSearch.Document({
       id: "reference",
-      index: ["track", "album", "artists", "directory", "additionalNames"],
+      index: ["name", "album", "artists", "directory", "additionalNames"],
     }),
 
     artists: new FlexSearch.Document({
@@ -3439,13 +3439,15 @@ async function initSearch() {
     }),
   };
 
+  window.indexes = indexes;
+
   const searchData =
     await fetch('/search-data/index.json')
       .then(resp => resp.json());
 
   for (const [indexName, indexData] of Object.entries(searchData)) {
     for (const [key, value] of Object.entries(indexData)) {
-      window.indexes[index_key].import(key, value);
+      window.indexes[indexName].import(key, value);
     }
   }
 }

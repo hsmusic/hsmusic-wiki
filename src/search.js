@@ -30,7 +30,7 @@ export async function writeSearchIndex({
 
     tracks: new FlexSearch.Document({
       id: "reference",
-      index: ["track", "album", "artists", "directory", "additionalNames"],
+      index: ["name", "album", "artists", "directory", "additionalNames"],
     }),
 
     artists: new FlexSearch.Document({
@@ -50,7 +50,7 @@ export async function writeSearchIndex({
       indexes.tracks.add({
         reference: Thing.getReference(track),
         album: album.name,
-        track: track.name,
+        name: track.name,
 
         artists: [
           track.artistContribs.map(contrib => contrib.artist.name),
@@ -75,14 +75,15 @@ export async function writeSearchIndex({
   }
 
   // Export indexes to json
-  const searchData = {}
+  const searchData = {};
 
+  // Map each index to an export promise, and await all.
   await Promise.all(
     Object.entries(indexes)
       .map(([indexName, index]) => {
         searchData[indexName] = {};
         return index.export((key, data) => {
-          searchData[indexName][key] = data
+          searchData[indexName][key] = data;
         });
       }));
 
