@@ -1,4 +1,5 @@
 import {bindOpts, empty, stitchArrays} from '#sugar';
+import {getCamelCase} from '#wiki-data';
 
 export default {
   contentDependencies: [
@@ -6,7 +7,6 @@ export default {
     'generateListingSidebar',
     'generatePageLayout',
     'linkListing',
-    'linkListingIndex',
     'linkTemplate',
   ],
 
@@ -21,8 +21,8 @@ export default {
     relations.sidebar =
       relation('generateListingSidebar', listing);
 
-    relations.listingsIndexLink =
-      relation('linkListingIndex');
+    relations.indexListingLink =
+      relation('linkListing', listing.indexListing);
 
     relations.chunkHeading =
       relation('generateContentHeading');
@@ -30,15 +30,15 @@ export default {
     relations.showSkipToSectionLinkTemplate =
       relation('linkTemplate');
 
-    if (listing.target.listings.length > 1) {
+    if (listing.sameTargetListings.length > 1) {
       relations.sameTargetListingLinks =
-        listing.target.listings
+        listing.sameTargetListings
           .map(listing => relation('linkListing', listing));
     }
 
-    if (!empty(listing.seeAlso)) {
+    if (!empty(listing.seeAlsoListings)) {
       relations.seeAlsoLinks =
-        listing.seeAlso
+        listing.seeAlsoListings
           .map(listing => relation('linkListing', listing));
     }
 
@@ -46,19 +46,22 @@ export default {
   },
 
   data(listing) {
-    return {
-      stringsKey: listing.stringsKey,
+    const data = {};
 
-      targetStringsKey: listing.target.stringsKey,
+    data.stringsKey = listing.stringsKey,
+    data.target = listing.target;
 
-      sameTargetListingStringsKeys:
-        listing.target.listings
-          .map(listing => listing.stringsKey),
+    if (listing.sameTargetListings.length > 1) {
+      data.sameTargetListingStringsKeys =
+        listing.sameTargetListings
+          .map(listing => listing.stringsKey);
 
-      sameTargetListingsCurrentIndex:
-        listing.target.listings
-          .indexOf(listing),
-    };
+      data.sameTargetListingsCurrentIndex =
+        listing.sameTargetListings
+          .indexOf(listing);
+    }
+
+    return data;
   },
 
   slots: {
@@ -115,7 +118,7 @@ export default {
       context,
       provided = {},
     }) {
-      const parts = ['listingPage', data.stringsKey];
+      const parts = [data.stringsKey];
 
       if (Array.isArray(context)) {
         parts.push(...context);
@@ -171,7 +174,7 @@ export default {
           html.tag('p',
             language.$('listingPage.listingsFor', {
               target:
-                language.$('listingPage.target', data.targetStringsKey),
+                language.$('listingPage.target', getCamelCase(data.target)),
 
               listings:
                 language.formatUnitList(
@@ -185,7 +188,7 @@ export default {
 
                         link.slots({
                           attributes: {class: 'nowrap'},
-                          content: language.$('listingPage', stringsKey, 'title.short'),
+                          content: language.$(stringsKey, 'title.short'),
                         })))),
             })),
 
@@ -272,7 +275,7 @@ export default {
       navLinkStyle: 'hierarchical',
       navLinks: [
         {auto: 'home'},
-        {html: relations.listingsIndexLink},
+        {html: relations.indexListingLink},
         {auto: 'current'},
       ],
 

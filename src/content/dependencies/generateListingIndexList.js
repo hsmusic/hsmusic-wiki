@@ -1,33 +1,31 @@
-import {empty, stitchArrays} from '#sugar';
+import {listingTargetOrder} from '#listing-spec';
+import {empty, filterMultipleArrays, stitchArrays} from '#sugar';
+import {getCamelCase} from '#wiki-data';
 
 export default {
   contentDependencies: ['linkListing'],
   extraDependencies: ['html', 'language', 'wikiData'],
 
-  sprawl({listingTargetSpec, wikiInfo}) {
-    return {listingTargetSpec, wikiInfo};
+  sprawl({listingData, wikiInfo}) {
+    return {listingData, wikiInfo};
   },
 
-  query(sprawl) {
-    const query = {};
+  query(sprawl, currentListing) {
+    const targets = listingTargetOrder.slice();
 
     const targetListings =
-      sprawl.listingTargetSpec
-        .map(({listings}) =>
-          listings
-            .filter(listing =>
-              !listing.featureFlag ||
-              sprawl.wikiInfo[listing.featureFlag]));
+      targets.map(target =>
+        sprawl.listingData.filter(listing =>
+          listing.scope === currentListing.scope &&
+          listing.target === target &&
+          (listing.featureFlag
+            ? sprawl.wikiInfo[listing.featureFlag]
+            : true)));
 
-    query.targets =
-      sprawl.listingTargetSpec
-        .filter((target, index) => !empty(targetListings[index]));
+    filterMultipleArrays(targets, targetListings,
+      (_target, listings) => !empty(listings));
 
-    query.targetListings =
-      targetListings
-        .filter(listings => !empty(listings))
-
-    return query;
+    return {targets, targetListings};
   },
 
   relations(relation, query) {
@@ -42,16 +40,14 @@ export default {
   data(query, sprawl, currentListing) {
     const data = {};
 
-    data.targetStringsKeys =
-      query.targets
-        .map(({stringsKey}) => stringsKey);
+    data.targets = query.targets;
 
     data.listingStringsKeys =
       query.targetListings
         .map(listings =>
           listings.map(({stringsKey}) => stringsKey));
 
-    if (currentListing) {
+    if (currentListing && currentListing.directory !== 'index') {
       data.currentTargetIndex =
         query.targets
           .indexOf(currentListing.target);
@@ -87,12 +83,13 @@ export default {
 
                   listingLink.slots({
                     content:
-                      language.$('listingPage', listingStringsKey, 'title.short'),
+                      language.$(listingStringsKey, 'title.short'),
                   })))));
 
     const targetTitles =
-      data.targetStringsKeys
-        .map(stringsKey => language.$('listingPage.target', stringsKey));
+      data.targets
+        .map(target =>
+          language.$('listingPage.target', getCamelCase(target)));
 
     switch (slots.mode) {
       case 'sidebar':

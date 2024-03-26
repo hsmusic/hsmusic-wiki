@@ -89,7 +89,7 @@ export const replacerSpec = {
 
   'listing-index': {
     find: null,
-    link: 'linkListingIndex',
+    link: 'linkWikiListingIndex',
   },
 
   'listing': {

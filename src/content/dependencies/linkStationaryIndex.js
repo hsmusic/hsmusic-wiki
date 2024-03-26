@@ -15,10 +15,15 @@ export default {
   },
 
   generate(data, relations, {language}) {
-    return relations.linkTemplate
-      .slots({
-        path: [data.pathKey],
-        content: language.formatString(data.stringKey),
-      });
+    const template = relations.linkTemplate;
+
+    template.setSlot('path', [data.pathKey]);
+
+    if (data.stringKey) {
+      template.setSlot('content',
+        language.formatString(data.stringKey));
+    }
+
+    return template;
   }
 }

@@ -1123,20 +1123,6 @@ groupGalleryPage:
     {TRACKS} across {ALBUMS}, totaling {TIME}.
 
 #
-# listingIndex:
-#   The listing index page shows all available listings on the wiki,
-#   and a very exciting stats line for the wiki as a whole.
-#
-listingIndex:
-  title: "Listings"
-
-  infoLine: >-
-    {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
-
-  exploreList: >-
-    Feel free to explore any of the listings linked below and in the sidebar!
-
-#
 # listingPage:
 #
 #   There are a lot of listings! Each is automatically generated and
@@ -1161,7 +1147,7 @@ listingPage:
     artist: "Artists"
     group: "Groups"
     track: "Tracks"
-    tag: "Tags"
+    artTag: "Tags"
     other: "Other"
 
   # misc:
@@ -1191,6 +1177,24 @@ listingPage:
   #   for the list of those links.
 
   skipToSection: "Skip to a section:"
+
+  wiki:
+
+    #
+    # wiki.index:
+    #   The wiki-global listing index shows listings which apply
+    #   to all the wiki data at once, and a very exciting stats line
+    #   for the wiki as a whole.
+    #
+
+    index:
+      title: "Listings"
+
+      infoLine: >-
+        {WIKI}: {TRACKS} across {ALBUMS}, totaling {DURATION}.
+
+      exploreList: >-
+        Feel free to explore any of the listings linked below and in the sidebar!
 
   listAlbums:
 
@@ -1576,9 +1580,9 @@ listingPage:
         title.withDate: "{ALBUM} ({DATE})"
         item: "{TRACK}"
 
-  listTags:
+  listArtTags:
 
-    # listTags.byName:
+    # listArtTags.byName:
     #   List art tags alphabetically without sorting or chunking by
     #   any other criteria. Also displays the number of times each
     #   art tag has been featured.
@@ -1588,7 +1592,7 @@ listingPage:
       title.short: "...by Name"
       item: "{TAG} ({TIMES_USED})"
 
-    # listTags.byUses:
+    # listArtTags.byUses:
     #   List art tags by number of times used, falling back to an
     #   alphabetical sort if two art tags have been featured the same
     #   number of times. Art tags which haven't haven't been featured

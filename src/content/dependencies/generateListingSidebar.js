@@ -1,21 +1,20 @@
 export default {
-  contentDependencies: ['generateListingIndexList', 'linkListingIndex'],
-  extraDependencies: ['html'],
+  contentDependencies: ['generateListingIndexList', 'linkListing'],
+  extraDependencies: ['html', 'wikiData'],
 
-  relations(relation, currentListing) {
-    return {
-      listingIndexLink: relation('linkListingIndex'),
-      listingIndexList: relation('generateListingIndexList', currentListing),
-    };
-  },
+  relations: (relation, currentListing) => ({
+    listingIndexLink:
+      relation('linkListing', currentListing.indexListing),
 
-  generate(relations, {html}) {
-    return {
-      leftSidebarClass: 'listing-map-sidebar-box',
-      leftSidebarContent: [
-        html.tag('h1', relations.listingIndexLink),
-        relations.listingIndexList.slot('mode', 'sidebar'),
-      ],
-    };
-  },
+    listingIndexList:
+      relation('generateListingIndexList', currentListing),
+  }),
+
+  generate: (relations, {html}) => ({
+    leftSidebarClass: 'listing-map-sidebar-box',
+    leftSidebarContent: [
+      html.tag('h1', relations.listingIndexLink),
+      relations.listingIndexList.slot('mode', 'sidebar'),
+    ],
+  }),
 };

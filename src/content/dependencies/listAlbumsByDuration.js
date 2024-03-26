@@ -1,43 +1,25 @@
-import {sortAlphabetically, sortByCount} from '#sort';
-import {filterByCount, stitchArrays} from '#sugar';
-import {getTotalDuration} from '#wiki-data';
+import {stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: ['generateListingPage', 'linkAlbum'],
   extraDependencies: ['language', 'wikiData'],
 
-  sprawl({albumData}) {
-    return {albumData};
-  },
+  relations: (relation, listing) => ({
+    page:
+      relation('generateListingPage', listing),
 
-  query({albumData}, spec) {
-    const albums = sortAlphabetically(albumData.slice());
-    const durations = albums.map(album => getTotalDuration(album.tracks));
+    albumLinks:
+      listing.data.albums
+        .map(album => relation('linkAlbum', album)),
+  }),
 
-    filterByCount(albums, durations);
-    sortByCount(albums, durations, {greatestFirst: true});
+  data: (listing) => ({
+    durations:
+      listing.data.durations,
+  }),
 
-    return {spec, albums, durations};
-  },
-
-  relations(relation, query) {
-    return {
-      page: relation('generateListingPage', query.spec),
-
-      albumLinks:
-        query.albums
-          .map(album => relation('linkAlbum', album)),
-    };
-  },
-
-  data(query) {
-    return {
-      durations: query.durations,
-    };
-  },
-
-  generate(data, relations, {language}) {
-    return relations.page.slots({
+  generate: (data, relations, {language}) =>
+    relations.page.slots({
       type: 'rows',
       rows:
         stitchArrays({
@@ -47,6 +29,5 @@ export default {
             album: link,
             duration: language.formatDuration(duration),
           })),
-    });
-  },
+    }),
 };

@@ -1,15 +1,27 @@
 export default {
-  contentDependencies: ['linkThing'],
+  contentDependencies: ['linkStationaryIndex', 'linkThing'],
   extraDependencies: ['language'],
 
-  relations: (relation, listing) =>
-    ({link: relation('linkThing', 'localized.listing', listing)}),
+  relations(relation, listing) {
+    const urlKey =
+      (listing.directory === 'index'
+        ? `localized.${listing.scope}ListingIndex`
+        : `localized.${listing.scope}Listing`);
 
-  data: (listing) =>
-    ({stringsKey: listing.stringsKey}),
+    const link =
+      (listing.directory === 'index'
+        ? relation('linkStationaryIndex', urlKey, null)
+        : relation('linkThing', urlKey, listing));
+
+    return {link};
+  },
+
+  data: (listing) => ({
+    stringsKey: listing.stringsKey,
+  }),
 
   generate: (data, relations, {language}) =>
     relations.link
       .slot('content',
-        language.$('listingPage', data.stringsKey, 'title')),
+        language.$(data.stringsKey, 'title')),
 };

@@ -57,6 +57,7 @@ import CacheableObject from '#cacheable-object';
 import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
+import {linkListingDataArrays, prepareLiveListingObjects} from '#listings';
 import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
@@ -85,7 +86,6 @@ import genThumbs, {
 } from '#thumbs';
 
 import FileSizePreloader from './file-size-preloader.js';
-import {listingSpec, listingTargetSpec} from './listing-spec.js';
 import * as buildModes from './write/build-modes/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -130,6 +130,9 @@ async function main() {
 
     generateThumbnails:
       {...defaultStepStatus, name: `generate thumbnails`},
+
+    prepareListings:
+      {...defaultStepStatus, name: `prepare live listing objects`},
 
     loadDataFiles:
       {...defaultStepStatus, name: `load and process data files`},
@@ -210,11 +213,8 @@ async function main() {
 
   const selectedBuildMode = buildModes[selectedBuildModeFlag];
 
-  // This is about to get a whole lot more stuff put in it.
-  const wikiData = {
-    listingSpec,
-    listingTargetSpec,
-  };
+  // This is about to get a whole lot of stuff put in it.
+  const wikiData = {};
 
   const buildOptions = selectedBuildMode.getCLIOptions();
 
@@ -936,6 +936,32 @@ async function main() {
     CacheableObject.DEBUG_SLOW_TRACK_INVALID_PROPERTIES = true;
   }
 
+  Object.assign(stepStatusSummary.prepareListings, {
+    status: STATUS_STARTED_NOT_DONE,
+    timeStart: Date.now(),
+  });
+
+  try {
+    wikiData.listingData = prepareLiveListingObjects();
+  } catch (error) {
+    niceShowAggregate(error);
+
+    logError`There was a JavaScript error preparing live listing objects.`;
+    fileIssue();
+
+    Object.assign(stepStatusSummary.prepareListings, {
+      status: STATUS_FATAL_ERROR,
+      timeEnd: Date.now(),
+    });
+
+    return false;
+  }
+
+  Object.assign(stepStatusSummary.prepareListings, {
+    status: STATUS_DONE_CLEAN,
+    timeEnd: Date.now(),
+  });
+
   Object.assign(stepStatusSummary.loadDataFiles, {
     status: STATUS_STARTED_NOT_DONE,
     timeStart: Date.now(),
@@ -1052,6 +1078,7 @@ async function main() {
   });
 
   linkWikiDataArrays(wikiData);
+  linkListingDataArrays(wikiData);
 
   Object.assign(stepStatusSummary.linkWikiDataArrays, {
     status: STATUS_DONE_CLEAN,
@@ -1092,7 +1119,7 @@ async function main() {
         'albums',
       ]),
 
-      listingSpec: new Set([
+      listingData: new Set([
         // Needed for computing page paths
         'contentFunction', 'featureFlag',
       ]),
@@ -1242,9 +1269,6 @@ async function main() {
 
     // TODO: Aggregate errors here, instead of just throwing.
     progressCallAll('Caching all data values', Object.entries(wikiData)
-      .filter(([key]) =>
-        key !== 'listingSpec' &&
-        key !== 'listingTargetSpec')
       .map(([key, value]) =>
         key === 'wikiInfo' ? [key, [value]] :
         key === 'homepageLayout' ? [key, [value]] :

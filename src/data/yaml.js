@@ -958,6 +958,10 @@ export function linkWikiDataArrays(wikiData) {
       'groupData',
     ]],
 
+    [wikiData.listingData, [
+      'listingData',
+    ]],
+
     [wikiData.trackData, [
       'albumData',
       'artTagData',

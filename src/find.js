@@ -152,12 +152,14 @@ function findHelper({
 }
 
 const hardcodedFindSpecs = {
+  /*
   // Listings aren't Thing objects, so this find spec isn't provided by any
   // Thing constructor.
   listing: {
     referenceTypes: ['listing'],
     bindTo: 'listingSpec',
   },
+  */
 };
 
 export function getAllFindSpecs() {
