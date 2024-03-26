@@ -27,19 +27,19 @@ export const description = `Hosts a local HTTP server which generates page conte
 
 export const config = {
   fileSizes: {
-    default: true,
+    default: 'perform',
   },
 
   languageReloading: {
-    default: true,
+    default: 'perform',
   },
 
   mediaValidation: {
-    default: true,
+    default: 'perform',
   },
 
   thumbs: {
-    default: true,
+    default: 'perform',
   },
 };
 

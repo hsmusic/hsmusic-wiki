@@ -6,7 +6,7 @@ export const config = {
   },
 
   languageReloading: {
-    default: true,
+    default: 'perform',
   },
 
   mediaValidation: {

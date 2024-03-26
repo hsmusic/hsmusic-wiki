@@ -551,16 +551,27 @@ async function main() {
           logWarn`Redundant option ${cliPart}`;
         }
       } else {
-        if (cliFlagNegates) {
-          step.status = STATUS_NOT_APPLICABLE;
-          step.annotation = `--${cliFlag} provided`;
-        }
+        step.status =
+          (cliFlagNegates
+            ? STATUS_NOT_APPLICABLE
+            : STATUS_NOT_STARTED);
+
+        step.annotation = `--${cliFlag} provided`;
+
         if (cliFlagWarning) {
           for (const line of cliFlagWarning.split('\n')) {
             logWarn(line);
           }
         }
+
+        return;
       }
+    }
+
+    if (buildConfig?.required === true) {
+      step.status = STATUS_NOT_STARTED;
+      step.annotation = `required for --${selectedBuildModeFlag}`;
+      return;
     }
 
     if (buildConfig?.applicable === false) {
@@ -571,6 +582,12 @@ async function main() {
 
     if (buildConfig?.default === 'skip') {
       step.status = STATUS_NOT_APPLICABLE;
+      step.annotation = `default for --${selectedBuildModeFlag}`;
+      return;
+    }
+
+    if (buildConfig?.default === 'perform') {
+      step.status = STATUS_NOT_STARTED;
       step.annotation = `default for --${selectedBuildModeFlag}`;
       return;
     }

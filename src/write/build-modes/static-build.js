@@ -38,7 +38,7 @@ export const description = `Generates all page content in one build (according t
 
 export const config = {
   fileSizes: {
-    default: true,
+    default: 'perform',
   },
 
   languageReloading: {
@@ -46,11 +46,11 @@ export const config = {
   },
 
   mediaValidation: {
-    default: true,
+    default: 'perform',
   },
 
   thumbs: {
-    default: true,
+    default: 'perform',
   },
 };
 
