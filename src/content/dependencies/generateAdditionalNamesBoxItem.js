@@ -61,7 +61,9 @@ export default {
       itemParts.push('withAccent');
       itemOptions.accent =
         html.tag('span', {class: 'accent'},
-          language.$(...accentParts, accentOptions));
+          html.metatag('chunkwrap', {split: ','},
+            html.resolve(
+              language.$(...accentParts, accentOptions))));
     }
 
     return language.$(...itemParts, itemOptions);
