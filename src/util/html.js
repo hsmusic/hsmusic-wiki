@@ -82,6 +82,13 @@ export const noEdgeWhitespace = Symbol();
 // character).
 export const blockwrap = Symbol();
 
+// Don't pass this directly, use html.metatag('chunkwrap') instead.
+// Causes *contained* content to be split by the metatag's "split" attribute,
+// and each chunk to be considered its own unit for word wrapping. All these
+// units are *not* wrapped in any containing element, so only the chunks are
+// considered wrappable units, not the entire element!
+export const chunkwrap = Symbol();
+
 // Recursive helper function for isBlank, which basically flattens an array
 // and returns as soon as it finds any content - a non-blank case - and doesn't
 // traverse templates of its own accord. If it doesn't find directly non-blank
@@ -273,7 +280,7 @@ export function metatag(identifier, ...args) {
       args[0] instanceof Tag ||
       args[0] instanceof Template)
   ) {
-    opts = args[0];  /* eslint-disable-line no-unused-vars */
+    opts = args[0];
     content = args[1];
   } else {
     content = args[0];
@@ -282,6 +289,9 @@ export function metatag(identifier, ...args) {
   switch (identifier) {
     case 'blockwrap':
       return new Tag(null, {[blockwrap]: true}, content);
+
+    case 'chunkwrap':
+      return new Tag(null, {[chunkwrap]: true, ...opts}, content);
 
     default:
       throw new Error(`Unknown metatag "${identifier}"`);
@@ -477,6 +487,21 @@ export class Tag {
 
   get blockwrap() {
     return this.#getAttributeFlag(blockwrap);
+  }
+
+  set chunkwrap(value) {
+    this.#setAttributeFlag(chunkwrap, value);
+
+    try {
+      this.content = content;
+    } catch (error) {
+      this.#setAttributeFlag(chunkwrap, false);
+      throw error;
+    }
+  }
+
+  get chunkwrap() {
+    return this.#getAttributeFlag(chunkwrap);
   }
 
   toString() {
