@@ -381,6 +381,12 @@ export class Tag {
       contentArray = [value];
     }
 
+    if (this.chunkwrap) {
+      if (contentArray.some(content => content?.blockwrap)) {
+        throw new Error(`No support for blockwrap as a direct descendant of chunkwrap`);
+      }
+    }
+
     this.#content = contentArray
       .flat(Infinity)
       .filter(Boolean);
@@ -418,6 +424,7 @@ export class Tag {
 
   get contentOnly() {
     if (this.tagName !== '') return false;
+    if (this.chunkwrap) return true;
     if (!this.attributes.blank) return false;
     if (this.blockwrap) return false;
     return true;
@@ -574,7 +581,28 @@ export class Tag {
     let content = '';
     let blockwrapClosers = '';
 
-    for (const [index, item] of this.content.entries()) {
+    const chunkwrapSplitter =
+      (this.chunkwrap
+        ? this.#getAttributeString('split')
+        : null);
+
+    let seenChunkwrapSplitter =
+      (this.chunkwrap
+        ? false
+        : null);
+
+    let contentItems;
+
+    determineContentItems: {
+      if (this.chunkwrap) {
+        contentItems = smush(this).content;
+        break determineContentItems;
+      }
+
+      contentItems = this.content;
+    }
+
+    for (const [index, item] of contentItems.entries()) {
       let itemContent;
 
       try {
@@ -607,8 +635,43 @@ export class Tag {
         continue;
       }
 
+      const chunkwrapChunks =
+        (typeof item === 'string' && chunkwrapSplitter
+          ? itemContent.split(chunkwrapSplitter)
+          : null);
+
+      const itemIncludesChunkwrapSplit =
+        (chunkwrapChunks
+          ? chunkwrapChunks.length > 1
+          : null);
+
       if (content) {
+        if (itemIncludesChunkwrapSplit) {
+          if (!seenChunkwrapSplitter) {
+            // The first time we see a chunkwrap splitter, backtrack and wrap
+            // the content *so far* in a chunk.
+            content = `<span class="chunkwrap">` + content;
+          }
+
+          // Close the existing chunk. We'll add the new chunks after the
+          // (normal) joiner.
+          content += `</span>`;
+        }
+
         content += joiner;
+      } else {
+        // We've encountered a chunkwrap split before any other content.
+        // This means there's no content to wrap, no existing chunkwrap
+        // to close, and no reason to add a joiner, but we *do* need to
+        // enter a chunkwrap wrapper *now*, so the first chunk of this
+        // item will be properly wrapped.
+        if (itemIncludesChunkwrapSplit) {
+          content = `<span class="chunkwrap">`;
+        }
+      }
+
+      if (itemIncludesChunkwrapSplit) {
+        seenChunkwrapSplitter = true;
       }
 
       // Blockwraps only apply if they actually contain some content whose
@@ -621,7 +684,30 @@ export class Tag {
         blockwrapClosers += `</span>`;
       }
 
-      content += itemContent;
+      appendItemContent: {
+        if (itemIncludesChunkwrapSplit) {
+          for (const [index, chunk] of chunkwrapChunks.entries()) {
+            if (index === 0) {
+              content += chunk;
+            } else {
+              const whitespace = chunk.match(/^\s+/);
+              content += chunkwrapSplitter;
+              content += '</span>';
+              content += whitespace;
+              content += '<span class="chunkwrap">';
+              content += chunk.slice(whitespace.length);
+            }
+          }
+
+          break appendItemContent;
+        }
+
+        content += itemContent;
+      }
+    }
+
+    if (seenChunkwrapSplitter) {
+      content += '</span>';
     }
 
     content += blockwrapClosers;

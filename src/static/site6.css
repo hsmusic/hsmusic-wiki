@@ -499,7 +499,7 @@ a:not([href]):hover {
   white-space: nowrap;
 }
 
-.blockwrap {
+.blockwrap, .chunkwrap {
   display: inline-block;
 }
 
