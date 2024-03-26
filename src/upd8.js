@@ -769,14 +769,23 @@ async function main() {
       buildConfig: 'webRoutes',
     });
 
-    fallbackStep('buildSearchIndex', {
-      default: 'perform',
-      buildConfig: 'search',
-      cli: {
-        flag: 'skip-search',
-        negate: true,
-      },
-    });
+    if (wikiCachePath) {
+      fallbackStep('buildSearchIndex', {
+        default: 'perform',
+        buildConfig: 'search',
+        cli: {
+          flag: 'skip-search',
+          negate: true,
+        },
+      });
+    } else {
+      logInfo`No wiki cache provided, so not writing search index.`;
+
+      Object.assign(stepStatusSummary.buildSearchIndex, {
+        status: STATUS_NOT_APPLICABLE,
+        annotation: `no wiki cache to write into`,
+      });
+    }
 
     fallbackStep('verifyImagePaths', {
       default: 'perform',
@@ -1480,10 +1489,10 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    const searchIndexPath = path.join(mediaPath, "search_index.json");
-    logInfo`Search index: ${searchIndexPath}`;
-
-    await writeSearchIndex(searchIndexPath, wikiData);
+    await writeSearchIndex({
+      wikiCachePath,
+      wikiData,
+    });
 
     Object.assign(stepStatusSummary.buildSearchIndex, {
       status: STATUS_DONE_CLEAN,

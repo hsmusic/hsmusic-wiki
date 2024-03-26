@@ -1,15 +1,20 @@
-#!/usr/bin/env node
-
 'use strict';
 
 import {writeFile} from 'node:fs/promises';
+import * as path from 'node:path';
 
 import FlexSearch from 'flexsearch';
 
 import {logError, logInfo, logWarn} from '#cli';
 import Thing from '#thing';
 
-export async function writeSearchIndex(searchIndexPath, wikiData) {
+export async function writeSearchIndex({
+  wikiCachePath,
+  wikiData,
+}) {
+  if (!wikiCachePath) {
+    throw new Error(`Expected wikiCachePath to write into`);
+  }
 
   // Basic flow is:
   // 1. Define schema for type
@@ -81,5 +86,10 @@ export async function writeSearchIndex(searchIndexPath, wikiData) {
         });
       }));
 
-  await writeFile(searchIndexPath, JSON.stringify(searchData));
+  const outputFile =
+    path.join(wikiCachePath, 'search-index.json');
+
+  await writeFile(outputFile, JSON.stringify(searchData));
+
+  logInfo`Search index successfully written.`;
 }
