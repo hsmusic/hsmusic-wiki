@@ -22,7 +22,7 @@ async function initSearch() {
   };
 
   const searchData =
-    await fetch('/media/search_index.json')
+    await fetch('/search-data/index.json')
       .then(resp => resp.json());
 
   for (const [indexName, indexData] of Object.entries(searchData)) {
