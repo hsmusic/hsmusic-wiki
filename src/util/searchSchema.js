@@ -9,7 +9,7 @@ export function makeSearchIndexes(FlexSearch) {
 
     tracks: new FlexSearch.Document({
       id: "reference",
-      index: ["name", "album", "artists", "directory", "additionalNames"],
+      index: ["name", "album", "artists", "additionalNames"],
     }),
 
     artists: new FlexSearch.Document({
