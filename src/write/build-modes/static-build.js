@@ -52,6 +52,10 @@ export const config = {
   thumbs: {
     default: 'perform',
   },
+
+  webRoutes: {
+    required: true,
+  },
 };
 
 export function getCLIOptions() {
@@ -99,9 +103,7 @@ export function getCLIOptions() {
 
 export async function go({
   cliOptions,
-  _dataPath,
   mediaPath,
-  mediaCachePath,
   queueSize,
 
   defaultLanguage,
@@ -110,6 +112,7 @@ export async function go({
   srcRootPath,
   thumbsCache,
   urls,
+  webRoutes,
   wikiData,
 
   cachebust,
@@ -148,12 +151,9 @@ export async function go({
 
   await mkdir(outputPath, {recursive: true});
 
-  await writeSymlinks({
-    srcRootPath,
-    mediaPath,
-    mediaCachePath,
+  await writeWebRouteSymlinks({
     outputPath,
-    urls,
+    webRoutes,
   });
 
   if (writeAll) {
@@ -432,42 +432,51 @@ async function writePage({
   ].filter(Boolean));
 }
 
-function writeSymlinks({
-  srcRootPath,
-  mediaPath,
-  mediaCachePath,
+function writeWebRouteSymlinks({
   outputPath,
-  urls,
+  webRoutes,
 }) {
-  return progressPromiseAll('Writing site symlinks.', [
-    link(path.join(srcRootPath, 'util'), 'shared.utilityRoot'),
-    link(path.join(srcRootPath, 'static'), 'shared.staticRoot'),
-    link(mediaPath, 'media.root'),
-    link(mediaCachePath, 'thumb.root'),
-  ]);
+  const promises =
+    webRoutes.map(async route => {
+      // TODO: Make web routes specify `to` via url spec
+      /*
+      const pathname = urls.from('shared.root').toDevice(urlKey);
+      const file = path.join(outputPath, pathname);
+      */
 
-  async function link(directory, urlKey) {
-    const pathname = urls.from('shared.root').toDevice(urlKey);
-    const file = path.join(outputPath, pathname);
+      const parts =
+        route.to
+          .replace(/^\//, '')
+          .split('/');
 
-    try {
-      await unlink(file);
-    } catch (error) {
-      if (error.code !== 'ENOENT') {
-        throw error;
+      const parentDirectoryParts = parts.slice(0, -1);
+      const symlinkNamePart = parts.at(-1);
+
+      const parentDirectory = path.join(outputPath, ...parentDirectoryParts);
+      const symlinkPath = path.join(parentDirectory, symlinkNamePart);
+
+      try {
+        await unlink(symlinkPath);
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
       }
-    }
 
-    try {
-      await symlink(path.resolve(directory), file);
-    } catch (error) {
-      if (error.code === 'EPERM') {
-        await symlink(path.resolve(directory), file, 'junction');
-      } else {
-        throw error;
+      await mkdir(parentDirectory, {recursive: true});
+
+      try {
+        await symlink(route.from, symlinkPath);
+      } catch (error) {
+        if (error.code === 'EPERM') {
+          await symlink(route.from, symlinkPath, 'junction');
+        } else {
+          throw error;
+        }
       }
-    }
-  }
+    });
+
+  return progressPromiseAll(`Writing web route symlinks.`, promises);
 }
 
 async function writeFavicon({
