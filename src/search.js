@@ -86,6 +86,31 @@ async function populateSearchIndexes(indexes, wikiData) {
     })
   );
 
+  // Groups
+  readCollectionIntoIndex(
+    wikiData.groupData,
+    indexes.groups,
+    group => ({
+      names: group.name,
+      description: group.description,
+      // category: group.category
+    })
+  );
+
+  // Flashes
+  readCollectionIntoIndex(
+    wikiData.flashData,
+    indexes.flashes,
+    flash => ({
+      name: flash.name,
+      tracks: flash.featuredTracks.map(track => track.name),
+      contributors: [
+        flash.contributorContribs.map(contrib => contrib.artist.name),
+        ...flash.contributorContribs.map(contrib => contrib.artist.aliasNames)
+      ].flat()
+    })
+  );
+}
 
 async function exportIndexesToJson(indexes) {
   const searchData = {};
