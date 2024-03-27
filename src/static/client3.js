@@ -6,6 +6,9 @@
 // ephemeral nature.
 
 import {empty, filterMultipleArrays, stitchArrays} from '../util/sugar.js';
+import {makeSearchIndexes} from '../util/searchSchema.js';
+
+import FlexSearch from '/dep/flexsearch/flexsearch.bundle.module.min.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
@@ -2971,6 +2974,43 @@ function addDatestampTooltipPageListeners() {
 
 clientSteps.getPageReferences.push(getDatestampTooltipReferences);
 clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
+
+// Internal search functionality --------------------------
+
+async function initSearch() {
+
+  // Copied directly from server search.js
+  const indexes = makeSearchIndexes(FlexSearch);
+
+  const searchData =
+    await fetch('/search-data/index.json')
+      .then(resp => resp.json());
+
+  // If this fails, it's because an outdated index was cached.
+  // TODO: If this fails, try again once with a cache busting url.
+  for (const [indexName, indexData] of Object.entries(searchData)) {
+    for (const [key, value] of Object.entries(indexData)) {
+      indexes[indexName].import(key, value);
+    }
+  }
+
+  // Expose variable to window
+  window.searchIndexes = indexes;
+}
+
+function searchAll(query, options = {}) {
+  const results = {};
+
+  for (const [indexName, index] of Object.entries(window.searchIndexes)) {
+    results[indexName] = index.search(query, options);
+  }
+
+  return results;
+}
+
+document.addEventListener('DOMContentLoaded', initSearch);
+
+window.searchAll = searchAll;
 
 // Sticky commentary sidebar ------------------------------
 

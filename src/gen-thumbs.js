@@ -610,8 +610,11 @@ async function generateImageThumbnail(imagePath, thumbtack, {
 
 export async function determineMediaCachePath({
   mediaPath,
+  wikiCachePath,
   providedMediaCachePath,
+
   disallowDoubling = false,
+  regenerateMissingThumbnailCache = false,
 }) {
   if (!mediaPath) {
     return {
@@ -643,45 +646,147 @@ export async function determineMediaCachePath({
     };
   }
 
-  const inferredPath =
+  // Two inferred paths are possible - "adjacent" and "contained".
+  // "Contained" is the preferred format and we'll create it if
+  // wikiCachePath is provided, but if it *isn't* we won't know
+  // where to create it. Since "adjacent" isn't preferred we don't
+  // ever generate it, and we'd prefer not to *newly* generate
+  // thumbs in-place with mediaPath, so give up - we've already
+  // determined mediaPath doesn't include in-place thumbs.
+
+  const adjacentInferredPath =
     path.join(
       path.dirname(mediaPath),
       path.basename(mediaPath) + '-cache');
 
-  let inferredIncludesThumbnailCache;
+  const containedInferredPath =
+    (wikiCachePath
+      ? path.join(wikiCachePath, 'media-cache')
+      : null);
+
+  let adjacentIncludesThumbnailCache;
+  let containedIncludesThumbnailCache;
 
   try {
-    const files = await readdir(inferredPath);
-    inferredIncludesThumbnailCache = files.includes(CACHE_FILE);
+    const files = await readdir(adjacentInferredPath);
+    adjacentIncludesThumbnailCache = files.includes(CACHE_FILE);
   } catch (error) {
     if (error.code === 'ENOENT') {
-      inferredIncludesThumbnailCache = null;
+      adjacentIncludesThumbnailCache = null;
     } else {
-      inferredIncludesThumbnailCache = undefined;
+      adjacentIncludesThumbnailCache = undefined;
     }
   }
 
-  if (inferredIncludesThumbnailCache === true) {
+  if (wikiCachePath) {
+    try {
+      const files = await readdir(containedInferredPath);
+      containedIncludesThumbnailCache = files.includes(CACHE_FILE);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        containedIncludesThumbnailCache = null;
+      } else {
+        containedIncludesThumbnailCache = undefined;
+      }
+    }
+  }
+
+  // Go ahead with the contained path if it exists and contains a cache -
+  // no other conditions matter.
+  if (containedIncludesThumbnailCache === true) {
     return {
-      annotation: 'inferred path has cache',
-      mediaCachePath: inferredPath,
+      annotation: `contained path has cache`,
+      mediaCachePath: containedInferredPath,
     };
-  } else if (inferredIncludesThumbnailCache === false) {
+  }
+
+  // Reuse an existing adjacent cache before figuring out what to do
+  // if there's no extant cache at all.
+  if (adjacentIncludesThumbnailCache === true) {
     return {
-      annotation: 'inferred path does not have cache',
-      mediaCachePath: null,
+      annotation: `adjacent path has cache`,
+      mediaCachePath: adjacentInferredPath,
     };
-  } else if (inferredIncludesThumbnailCache === null) {
+  }
+
+  // Throw a very high-priority tantrum if the contained cache exists but
+  // isn't readable. It's the preferred cache and we can't tell if it's
+  // available for use or not!
+  if (wikiCachePath && containedIncludesThumbnailCache === undefined) {
     return {
-      annotation: 'inferred path will be created',
-      mediaCachePath: inferredPath,
-    };
-  } else {
-    return {
-      annotation: 'inferred path not readable',
+      annotation: `contained path not readable`,
       mediaCachePath: null,
     };
   }
+
+  // Throw a secondary tantrum if the adjacent cache exists but
+  // isn't readable. This is just as big of a problem, but if for
+  // some reason both the contained and adjacent caches exist,
+  // the contained one is the one we'd rather have addressed.
+  if (adjacentIncludesThumbnailCache === undefined) {
+    return {
+      annotation: `adjacent path not readable`,
+      mediaCachePath: null,
+    };
+  }
+
+  // Throw a high-priority tantrum if the contained cache exists but is
+  // missing its cache file, again because it's the more preferred cache.
+  // Unless we're indicated to regenerate such a missing cache file!
+  if (containedIncludesThumbnailCache === false) {
+    if (regenerateMissingThumbnailCache) {
+      return {
+        annotation: `contained path will regenerate missing cache`,
+        mediaCachePath: containedInferredPath,
+      };
+    } else {
+      return {
+        annotation: `contained path does not have cache`,
+        mediaCachePath: null,
+      };
+    }
+  }
+
+  // Throw a secondary tantrum if the adjacent cache exists but is
+  // missing its cache file, because it's the less preferred cache.
+  // Unless we're indicated to regenerate a missing cache file!
+  if (adjacentIncludesThumbnailCache === false) {
+    if (regenerateMissingThumbnailCache) {
+      return {
+        annotation: `adjacent path will regenerate missing cache`,
+        mediaCachePath: adjacentInferredPath,
+      };
+    } else {
+      return {
+        annotation: `adjacent path does not have cache`,
+        mediaCachePath: null,
+      };
+    }
+  }
+
+  // If wikiCachePath was provided and the contained cache just doesn't
+  // exist yet, we'll create it during this run.
+  if (wikiCachePath && containedIncludesThumbnailCache === null) {
+    return {
+      annotation: `contained path will be created`,
+      mediaCachePath: containedInferredPath,
+    };
+  }
+
+  // If the adjacent cache doesn't exist, too dang bad!
+  // We aren't interested in newly creating it, so
+  // don't count it as an option.
+
+  // Similarly, we've already established mediaPath isn't
+  // currently doubling as the thumbnail cache, and we won't
+  // newly start generating thumbnails here either.
+
+  // All options aside struck out, there's no way to continue.
+
+  return {
+    annotation: `missing wiki cache to create media cache inside`,
+    mediaCachePath: null,
+  };
 }
 
 export async function migrateThumbsIntoDedicatedCacheDirectory({
