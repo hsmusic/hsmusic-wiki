@@ -50,6 +50,7 @@ import {isMain, traverse} from '#node-utils';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
+import {identifyAllWebRoutes} from '#web-routes';
 import {linkWikiDataArrays, loadAndProcessDataDocuments, sortWikiDataArrays}
   from '#yaml';
 
@@ -168,6 +169,9 @@ async function main() {
 
     preloadFileSizes:
       {...defaultStepStatus, name: `preload file sizes`},
+
+    identifyWebRoutes:
+      {...defaultStepStatus, name: `identify web routes`},
 
     performBuild:
       {...defaultStepStatus, name: `perform selected build mode`},
@@ -657,6 +661,11 @@ async function main() {
         flag: 'skip-file-sizes',
         negate: true,
       },
+    });
+
+    fallbackStep('identifyWebRoutes', {
+      default: 'skip',
+      buildConfig: 'webRoutes',
     });
 
     fallbackStep('verifyImagePaths', {
@@ -1771,6 +1780,42 @@ async function main() {
     }
   }
 
+  let webRoutes = null;
+
+  if (stepStatusSummary.identifyWebRoutes.status === STATUS_NOT_STARTED) {
+    Object.assign(stepStatusSummary.identifyWebRoutes, {
+      status: STATUS_STARTED_NOT_DONE,
+      timeStart: Date.now(),
+    });
+
+    try {
+      webRoutes = await identifyAllWebRoutes({
+        mediaCachePath,
+        mediaPath,
+      });
+    } catch (error) {
+      console.error(error);
+
+      logError`There was an issue identifying web routes!`;
+      fileIssue();
+
+      Object.assign(stepStatusSummary.identifyWebRoutes, {
+        status: STATUS_FATAL_ERROR,
+        message: `JavaScript error - view log for details`,
+        timeEnd: Date.now(),
+      });
+
+      return false;
+    }
+
+    logInfo`Successfully determined web routes.`;
+
+    Object.assign(stepStatusSummary.identifyWebRoutes, {
+      status: STATUS_DONE_CLEAN,
+      timeEnd: Date.now(),
+    });
+  }
+
   if (stepStatusSummary.performBuild.status === STATUS_NOT_APPLICABLE) {
     return true;
   }
@@ -1827,6 +1872,7 @@ async function main() {
       thumbsCache,
       urls,
       urlSpec,
+      webRoutes,
       wikiData,
 
       cachebust: '?' + CACHEBUST,

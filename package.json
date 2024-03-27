@@ -46,6 +46,7 @@
         "#thumbs": "./src/gen-thumbs.js",
         "#urls": "./src/util/urls.js",
         "#validators": "./src/data/validators.js",
+        "#web-routes": "./src/web-routes.js",
         "#wiki-data": "./src/util/wiki-data.js",
         "#yaml": "./src/data/yaml.js"
     },
