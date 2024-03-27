@@ -41,6 +41,10 @@ export const config = {
   thumbs: {
     default: 'perform',
   },
+
+  webRoutes: {
+    required: true,
+  },
 };
 
 function inspect(value, opts = {}) {
@@ -88,9 +92,6 @@ export function getCLIOptions() {
 
 export async function go({
   cliOptions,
-  _dataPath,
-  mediaPath,
-  mediaCachePath,
 
   defaultLanguage,
   languages,
@@ -98,6 +99,7 @@ export async function go({
   srcRootPath,
   thumbsCache,
   urls,
+  webRoutes,
   wikiData,
 
   cachebust,
@@ -221,30 +223,27 @@ export async function go({
       return;
     }
 
-    const {
-      area: localFileArea,
-      path: localFilePath
-    } = pathname.match(/^\/(?<area>static|util|media|thumb)\/(?<path>.*)/)?.groups ?? {};
+    const matchedWebRoute =
+      webRoutes
+        .find(({to}) => pathname.startsWith(to));
 
-    if (localFileArea) {
+    if (matchedWebRoute) {
+      const localFilePath = pathname.slice(matchedWebRoute.to.length);
+
       // Not security tested, man, this is a dev server!!
-      const safePath = path.posix.resolve('/', localFilePath).replace(/^\//, '');
+      const safePath =
+        path.posix
+          .resolve('/', localFilePath)
+          .replace(/^\//, '');
 
-      let localDirectory;
-      if (localFileArea === 'static' || localFileArea === 'util') {
-        localDirectory = path.join(srcRootPath, localFileArea);
-      } else if (localFileArea === 'media') {
-        localDirectory = mediaPath;
-      } else if (localFileArea === 'thumb') {
-        localDirectory = mediaCachePath;
-      }
+      const localDirectory = matchedWebRoute.from;
 
       let filePath;
       try {
         filePath = path.resolve(localDirectory, decodeURI(safePath.split('/').join(path.sep)));
       } catch (error) {
         response.writeHead(404, contentTypePlain);
-        response.end(`No ${localFileArea} file found for: ${safePath}`);
+        response.end(`File not found for: ${safePath}`);
         console.log(`${requestHead} [404] ${pathname}`);
         console.log(`Failed to decode request pathname`);
       }
@@ -254,12 +253,12 @@ export async function go({
       } catch (error) {
         if (error.code === 'ENOENT') {
           response.writeHead(404, contentTypePlain);
-          response.end(`No ${localFileArea} file found for: ${safePath}`);
+          response.end(`File not found for: ${safePath}`);
           console.log(`${requestHead} [404] ${pathname}`);
           console.log(`ENOENT for stat: ${filePath}`);
         } else {
           response.writeHead(500, contentTypePlain);
-          response.end(`Internal error accessing ${localFileArea} file for: ${safePath}`);
+          response.end(`Internal error accessing file for: ${safePath}`);
           console.error(`${requestHead} [500] ${pathname}`);
           showError(error);
         }
@@ -310,8 +309,13 @@ export async function go({
         response.end(buffer);
         if (loudResponses) console.log(`${requestHead} [200] ${pathname}`);
       } catch (error) {
-        response.writeHead(500, contentTypePlain);
-        response.end(`Failed during file-to-response pipeline`);
+        if (error.code === 'EISDIR') {
+          response.writeHead(404, contentTypePlain);
+          response.end(`File not found for: ${safePath}`);
+        } else {
+          response.writeHead(500, contentTypePlain);
+          response.end(`Failed during file-to-response pipeline`);
+        }
         console.error(`${requestHead} [500] ${pathname}`);
         showError(error);
       }
