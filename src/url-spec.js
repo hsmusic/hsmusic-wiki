@@ -82,6 +82,11 @@ const urlSpec = {
     paths: genericPaths,
   },
 
+  staticLib: {
+    prefix: `static-${STATIC_VERSION}/lib/`,
+    paths: genericPaths,
+  },
+
   staticMisc: {
     prefix: `static-${STATIC_VERSION}/misc/`,
     paths: {
