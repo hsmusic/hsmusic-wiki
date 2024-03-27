@@ -3426,23 +3426,26 @@ async function initSearch() {
   // Copied directly from server search.js
   const indexes = makeSearchIndexes(FlexSearch);
 
-  window.indexes = indexes;
-
   const searchData =
     await fetch('/search-data/index.json')
       .then(resp => resp.json());
 
+  // If this fails, it's because an outdated index was cached.
+  // TODO: If this fails, try again once with a cache busting url.
   for (const [indexName, indexData] of Object.entries(searchData)) {
     for (const [key, value] of Object.entries(indexData)) {
-      window.indexes[indexName].import(key, value);
+      indexes[indexName].import(key, value);
     }
   }
+
+  // Expose variable to window
+  window.searchIndexes = indexes;
 }
 
 function searchAll(query, options = {}) {
   const results = {};
 
-  for (const [indexName, index] of Object.entries(window.indexes)) {
+  for (const [indexName, index] of Object.entries(window.searchIndexes)) {
     results[indexName] = index.search(query, options);
   }
 
