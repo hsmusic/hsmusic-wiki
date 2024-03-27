@@ -58,7 +58,7 @@ import {displayCompositeCacheAnalysis} from '#composite';
 import {processLanguageFile, watchLanguageFile, internalDefaultStringsFile}
   from '#language';
 import {isMain, traverse} from '#node-utils';
-import {writeSearchIndex} from '#search'
+import {writeSearchJson} from '#search';
 import {sortByName} from '#sort';
 import {empty, withEntries} from '#sugar';
 import {generateURLs, urlSpec} from '#urls';
@@ -1282,7 +1282,7 @@ async function main() {
       timeStart: Date.now(),
     });
 
-    await writeSearchIndex({
+    await writeSearchJson({
       wikiCachePath,
       wikiData,
     });
