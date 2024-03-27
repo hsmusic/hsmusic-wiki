@@ -8,6 +8,8 @@ import FlexSearch from 'flexsearch';
 import {logError, logInfo, logWarn} from '#cli';
 import Thing from '#thing';
 
+import {makeSearchIndexes} from './util/searchSchema.js';
+
 export async function writeSearchIndex({
   wikiCachePath,
   wikiData,
@@ -21,23 +23,7 @@ export async function writeSearchIndex({
   // 2. Add documents to index
   // 3. Save index to exportable json
 
-  // Copy this block directly into clientSearch.js
-  const indexes = {
-    albums: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "groups"],
-    }),
-
-    tracks: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "album", "artists", "directory", "additionalNames"],
-    }),
-
-    artists: new FlexSearch.Document({
-      id: "reference",
-      index: ["names"],
-    }),
-  };
+  const indexes = makeSearchIndexes(FlexSearch);
 
   for (const album of wikiData.albumData) {
     indexes.albums.add({

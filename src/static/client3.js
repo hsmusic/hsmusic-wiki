@@ -6,6 +6,9 @@
 // ephemeral nature.
 
 import {empty, filterMultipleArrays, stitchArrays} from '../util/sugar.js';
+import {makeSearchIndexes} from '../util/searchSchema.js';
+
+import FlexSearch from '/dep/flexsearch/flexsearch.bundle.module.min.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
 
@@ -2975,25 +2978,9 @@ clientSteps.addPageListeners.push(addDatestampTooltipPageListeners);
 // Internal search functionality --------------------------
 
 async function initSearch() {
-  const {FlexSearch} = window;
 
   // Copied directly from server search.js
-  const indexes = {
-    albums: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "groups"],
-    }),
-
-    tracks: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "album", "artists", "directory", "additionalNames"],
-    }),
-
-    artists: new FlexSearch.Document({
-      id: "reference",
-      index: ["names"],
-    }),
-  };
+  const indexes = makeSearchIndexes(FlexSearch);
 
   window.indexes = indexes;
 
