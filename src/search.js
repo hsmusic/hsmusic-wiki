@@ -10,7 +10,62 @@ import Thing from '#thing';
 
 import {makeSearchIndexes} from './util/searchSchema.js';
 
-export async function writeSearchIndex({
+async function populateSearchIndexes(indexes, wikiData) {
+  // Albums, tracks
+  for (const album of wikiData.albumData) {
+    indexes.albums.add({
+      reference: Thing.getReference(album),
+      name: album.name,
+      groups: album.groups.map(group => group.name),
+    });
+
+    for (const track of album.tracks) {
+      indexes.tracks.add({
+        reference: Thing.getReference(track),
+        name: track.name,
+        album: album.name,
+
+        artists: [
+          track.artistContribs.map(contrib => contrib.artist.name),
+          ...track.artistContribs.map(contrib => contrib.artist.aliasNames)
+        ],
+
+        additionalNames:
+          track.additionalNames.map(entry => entry.name),
+      });
+    }
+  }
+
+  // Artists
+  for (const artist of wikiData.artistData) {
+    if (artist.isAlias) {
+      continue;
+    }
+
+    indexes.artists.add({
+      reference: Thing.getReference(artist),
+      names: [artist.name, ...artist.aliasNames],
+    });
+  }
+
+
+async function exportIndexesToJson(indexes) {
+  const searchData = {};
+
+  // Map each index to an export promise, and await all.
+  await Promise.all(
+    Object.entries(indexes)
+      .map(([indexName, index]) => {
+        searchData[indexName] = {};
+        return index.export((key, data) => {
+          searchData[indexName][key] = data;
+        });
+      }));
+
+  return searchData;
+}
+
+export async function writeSearchJson({
   wikiCachePath,
   wikiData,
 }) {
@@ -25,53 +80,9 @@ export async function writeSearchIndex({
 
   const indexes = makeSearchIndexes(FlexSearch);
 
-  for (const album of wikiData.albumData) {
-    indexes.albums.add({
-      reference: Thing.getReference(album),
-      name: album.name,
-      groups: album.groups.map(group => group.name),
-    });
+  await populateSearchIndexes(indexes, wikiData);
 
-    for (const track of album.tracks) {
-      indexes.tracks.add({
-        reference: Thing.getReference(track),
-        album: album.name,
-        name: track.name,
-
-        artists: [
-          track.artistContribs.map(contrib => contrib.artist.name),
-          ...track.artistContribs.map(contrib => contrib.artist.aliasNames)
-        ],
-
-        additionalNames:
-          track.additionalNames.map(entry => entry.name),
-      });
-    }
-  }
-
-  for (const artist of wikiData.artistData) {
-    if (artist.isAlias) {
-      continue;
-    }
-
-    indexes.artists.add({
-      reference: Thing.getReference(artist),
-      names: [artist.name, ...artist.aliasNames],
-    });
-  }
-
-  // Export indexes to json
-  const searchData = {};
-
-  // Map each index to an export promise, and await all.
-  await Promise.all(
-    Object.entries(indexes)
-      .map(([indexName, index]) => {
-        searchData[indexName] = {};
-        return index.export((key, data) => {
-          searchData[indexName][key] = data;
-        });
-      }));
+  const searchData = await exportIndexesToJson(indexes);
 
   const outputDirectory =
     path.join(wikiCachePath, 'search');
