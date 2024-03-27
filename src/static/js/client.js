@@ -7,6 +7,9 @@
 
 import {accumulateSum, atOffset, empty, filterMultipleArrays, stitchArrays}
   from '../shared-util/sugar.js';
+
+import FlexSearch from '../lib/flexsearch/flexsearch.bundle.module.min.js';
+
 import {fetchWithProgress} from './xhr-util.js';
 
 const clientInfo = window.hsmusicClientInfo = Object.create(null);
@@ -3419,25 +3422,9 @@ clientSteps.addPageListeners.push(addArtistExternalLinkTooltipPageListeners);
 // Internal search functionality --------------------------
 
 async function initSearch() {
-  const {FlexSearch} = window;
 
   // Copied directly from server search.js
-  const indexes = {
-    albums: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "groups"],
-    }),
-
-    tracks: new FlexSearch.Document({
-      id: "reference",
-      index: ["name", "album", "artists", "directory", "additionalNames"],
-    }),
-
-    artists: new FlexSearch.Document({
-      id: "reference",
-      index: ["names"],
-    }),
-  };
+  const indexes = makeSearchIndexes(FlexSearch);
 
   window.indexes = indexes;
 
