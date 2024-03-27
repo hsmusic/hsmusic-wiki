@@ -26,7 +26,17 @@ export const stationaryCodeRoutes = [
   },
 ];
 
-export const dependencyRoutes = [];
+export const dependencyRoutes = [
+  {
+    from:
+      path.join(
+        getNodeDependencyRootPath('flexsearch'),
+        'dist'),
+
+    to:
+      '/dep/flexsearch',
+  },
+];
 
 export const allStaticWebRoutes = [
   ...stationaryCodeRoutes,
