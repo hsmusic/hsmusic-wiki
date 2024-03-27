@@ -38,7 +38,7 @@
         "#node-utils": "./src/util/node-utils.js",
         "#repl": "./src/write/build-modes/repl.js",
         "#replacer": "./src/util/replacer.js",
-        "#search": "./src/data/things/search.js",
+        "#search": "./src/search.js",
         "#serialize": "./src/data/serialize.js",
         "#sort": "./src/util/sort.js",
         "#sugar": "./src/util/sugar.js",
