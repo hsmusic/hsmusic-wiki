@@ -16,6 +16,16 @@ export function makeSearchIndexes(FlexSearch) {
       id: "reference",
       index: ["names"],
     }),
+
+    groups: new FlexSearch.Document({
+      id: "reference",
+      index: ["name", "description", "category"],
+    }),
+
+    flashes: new FlexSearch.Document({
+      id: "reference",
+      index: ["name", "tracks", "contributors"],
+    }),
   };
 
   return indexes;
