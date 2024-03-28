@@ -24,17 +24,11 @@ async function populateSearchIndexes(indexes, wikiData) {
     // Add a doc for mapper(thing) to index for each thing in collection.
     for (const thing of collection) {
       const reference = Thing.getReference(thing);
+
+      // Get mapped fields from thing
+      let mappedResult;
       try {
-        const doc = {
-          reference,
-          ...mapper(thing)
-        };
-        // Print description of output doc, if debugging enabled.
-        if (DEBUG_DOC_GEN && !haveLoggedDocOfThing[thing.constructor.name]) {
-          logInfo(JSON.stringify(doc, null, 2));
-          haveLoggedDocOfThing[thing.constructor.name] = true;
-        }
-        index.add(doc);
+        mappedResult = mapper(thing);
       } catch (e) {
         // Enrich error context
         logError`Failed to write searchable doc for thing ${reference}`;
@@ -45,6 +39,18 @@ async function populateSearchIndexes(indexes, wikiData) {
         logError("Availible properties: " + JSON.stringify(thingSchemaSummary, null, 2));
         throw e;
       }
+
+      // Build doc and add to index
+      const doc = {
+        reference,
+        ...mappedResult
+      }
+      // Print description of an output doc, if debugging enabled.
+      if (DEBUG_DOC_GEN && !haveLoggedDocOfThing[thing.constructor.name]) {
+        logInfo(JSON.stringify(doc, null, 2));
+        haveLoggedDocOfThing[thing.constructor.name] = true;
+      }
+      index.add(doc);
     }
   }
 
