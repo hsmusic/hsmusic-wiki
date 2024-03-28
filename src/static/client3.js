@@ -1666,7 +1666,7 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
 
       const regionRect = regionRects[i];
       if (regionRect.width > 0) {
-        return regionRect;
+        return rect;
       } else {
         return WikiRect.fromRect({
           x: regionRect.right - tooltipRect.width,
