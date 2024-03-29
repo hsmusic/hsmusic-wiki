@@ -20,7 +20,7 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     });
 
   const quickSnapshotAllStyles = (context, urls) => {
-    for (const style of ['platform', 'normal', 'compact']) {
+    for (const style of ['platform', 'handle']) {
       const message = `context: ${context}, style: ${style}`;
       quickSnapshot(message, urls, {context, style});
     }
