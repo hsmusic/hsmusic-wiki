@@ -197,14 +197,13 @@ export const externalLinkSpec = [
     match: {
       context: 'flash',
       domain: 'homestuck.com',
-      pathname: /^story\/[0-9]+\/?$/,
     },
 
     platform: 'homestuck',
 
     detail: {
       substring: 'page',
-      page: {pathname: /[0-9]+/},
+      page: {pathname: /^story\/([0-9]+)\/?$/,},
     },
 
     icon: 'globe',
@@ -281,10 +280,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {
-      domain: 'bsky.app',
-      pathname: /^profile\/[^/]+\/?/,
-    },
+    match: {domain: 'bsky.app'},
 
     platform: 'bluesky',
     handle: {pathname: /^profile\/([^/]+?)(?:\.bsky\.social)?\/?$/},
@@ -329,10 +325,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {
-      domain: 'itch.io',
-      pathname: /^profile\/.+\/?$/,
-    },
+    match: {domain: 'itch.io'},
 
     platform: 'itch',
     handle: {pathname: /^profile\/(.+)\/?$/},
@@ -341,10 +334,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {
-      domain: 'ko-fi.com',
-      pathname: /^.+\/?/,
-    },
+    match: {domain: 'ko-fi.com'},
 
     platform: 'kofi',
     handle: {pathname: /^(.+)\/?/},
@@ -353,10 +343,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {
-      domain: 'mspaintadventures.fandom.com',
-      pathname: /^wiki\/.+\/?$/,
-    },
+    match: {domain: 'mspaintadventures.fandom.com'},
 
     platform: 'fandom.mspaintadventures',
 
@@ -556,6 +543,9 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
   const comparePathname = regex => regex.test(pathname.slice(1));
   const compareQuery = regex => regex.test(query.slice(1));
 
+  const compareExtractSpec = extract =>
+    extractPartFromExternalLink(url, extract, {mode: 'test'});
+
   const contextArray =
     (Array.isArray(context)
       ? context
@@ -589,12 +579,29 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
           ? compareQuery(match.query)
        : match.queries
           ? match.quieries.some(compareQuery)
+          : true))
+
+      .filter(({handle}) =>
+        (handle
+          ? compareExtractSpec(handle)
+          : true))
+
+      .filter(({detail}) =>
+        (typeof detail === 'object'
+          ? Object.entries(detail)
+              .filter(([key]) => key !== 'substring')
+              .map(([_key, value]) => value)
+              .every(compareExtractSpec)
           : true));
 
   return [...matchingDescriptors, fallbackDescriptor];
 }
 
-export function extractPartFromExternalLink(url, extract) {
+export function extractPartFromExternalLink(url, extract, {
+  // Set to 'test' to just see if this would extract anything.
+  // This disables running custom transformations.
+  mode = 'extract',
+} = {}) {
   const {domain, pathname, query} = urlParts(url);
 
   let regexen = [];
@@ -670,13 +677,21 @@ export function extractPartFromExternalLink(url, extract) {
   })) {
     const match = test.match(regex);
     if (match) {
-      value = prefix + (match[1] ?? match[0]);
+      value = match[1] ?? match[0];
       break;
     }
   }
 
+  if (mode === 'test') {
+    return !!value;
+  }
+
   if (!value) {
     return null;
+  }
+
+  if (prefix) {
+    value = prefix + value;
   }
 
   for (const fn of transform) {
