@@ -89,10 +89,7 @@ export default {
             links:
               language.formatDisjunctionList(
                 relations.externalLinks
-                  .map(link => link.slots({
-                    context: 'group',
-                    style: 'platform',
-                  }))),
+                  .map(link => link.slot('context', 'group'))),
           })),
 
       slots.mode === 'album' &&

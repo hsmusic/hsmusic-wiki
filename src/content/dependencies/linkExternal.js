@@ -11,7 +11,7 @@ export default {
       // differentiate between a function that returns a validator (the usual
       // syntax) and a function that is itself a validator.
       validate: () => isExternalLinkStyle,
-      default: 'normal',
+      default: 'platform',
     },
 
     context: {

@@ -1,8 +1,9 @@
-import {empty, stitchArrays} from '#sugar';
+import {empty, stitchArrays, withEntries} from '#sugar';
 
 import {
   anyOf,
   is,
+  isObject,
   isStringNonEmpty,
   looseArrayOf,
   optional,
@@ -13,9 +14,8 @@ import {
 } from '#validators';
 
 export const externalLinkStyles = [
-  'normal',
-  'compact',
   'platform',
+  'handle',
   'icon-id',
 ];
 
@@ -86,25 +86,24 @@ export const isExternalLinkSpec =
       }),
 
       platform: isStringNonEmpty,
-      substring: optional(isStringNonEmpty),
-
-      // TODO: Don't allow 'handle' or 'custom' options if the corresponding
-      // properties aren't provided
-      normal: optional(is('domain', 'handle', 'custom')),
-      compact: optional(is('domain', 'handle', 'custom')),
-      icon: optional(isStringNonEmpty),
 
       handle: optional(isExternalLinkExtractSpec),
 
-      // TODO: This should validate each value with isExternalLinkExtractSpec.
-      custom: optional(validateAllPropertyValues(isExternalLinkExtractSpec)),
+      detail:
+        optional(anyOf(
+          isStringNonEmpty,
+          validateProperties({
+            [validateProperties.validateOtherKeys]:
+              isExternalLinkExtractSpec,
+
+            substring: isStringNonEmpty,
+          }))),
+
+      icon: optional(isStringNonEmpty),
     }));
 
 export const fallbackDescriptor = {
   platform: 'external',
-
-  normal: 'domain',
-  compact: 'domain',
   icon: 'globe',
 };
 
@@ -120,7 +119,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'youtube',
-    substring: 'playlist',
+    detail: 'playlist',
 
     icon: 'youtube',
   },
@@ -133,7 +132,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'youtube',
-    substring: 'fullAlbum',
+    detail: 'fullAlbum',
 
     icon: 'youtube',
   },
@@ -145,7 +144,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'youtube',
-    substring: 'fullAlbum',
+    detail: 'fullAlbum',
 
     icon: 'youtube',
   },
@@ -159,12 +158,9 @@ export const externalLinkSpec = [
     },
 
     platform: 'patreon',
+    handle: {pathname: /([^/]+)\/?$/},
 
-    normal: 'handle',
-    compact: 'handle',
     icon: 'globe',
-
-    handle: /([^/]*)\/?$/,
   },
 
   {
@@ -174,14 +170,9 @@ export const externalLinkSpec = [
     },
 
     platform: 'youtube',
+    handle: {pathname: /^@([^/]+)\/?$/},
 
-    normal: 'handle',
-    compact: 'handle',
     icon: 'youtube',
-
-    handle: {
-      pathname: /^(@.*?)\/?$/,
-    },
   },
 
   // Special handling for flash links
@@ -193,7 +184,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'bgreco',
-    substring: 'flash',
+    detail: 'flash',
 
     icon: 'globe',
   },
@@ -207,16 +198,13 @@ export const externalLinkSpec = [
     },
 
     platform: 'homestuck',
-    substring: 'page',
 
-    normal: 'custom',
-    icon: 'globe',
-
-    custom: {
-      page: {
-        pathname: /[0-9]+/,
-      },
+    detail: {
+      substring: 'page',
+      page: {pathname: /[0-9]+/},
     },
+
+    icon: 'globe',
   },
 
   {
@@ -227,7 +215,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'homestuck',
-    substring: 'secretPage',
+    detail: 'secretPage',
 
     icon: 'globe',
   },
@@ -239,7 +227,7 @@ export const externalLinkSpec = [
     },
 
     platform: 'youtube',
-    substring: 'flash',
+    detail: 'flash',
 
     icon: 'youtube',
   },
@@ -256,31 +244,26 @@ export const externalLinkSpec = [
     match: {domains: ['artstation.com']},
 
     platform: 'artstation',
+    handle: {pathname: /^[^/]+/},
 
-    compact: 'handle',
     icon: 'globe',
-
-    handle: {pathname: /^[^/]*/},
   },
 
   {
     match: {domains: ['.artstation.com']},
 
     platform: 'artstation',
+    handle: {domain: /^[^.]+/},
 
-    compact: 'handle',
     icon: 'globe',
-
-    handle: {domain: /^[^.]*/},
   },
 
   {
     match: {domains: ['bc.s3m.us', 'music.solatrus.com']},
 
     platform: 'bandcamp',
+    handle: {domain: /.+/},
 
-    normal: 'domain',
-    compact: 'domain',
     icon: 'bandcamp',
   },
 
@@ -288,11 +271,9 @@ export const externalLinkSpec = [
     match: {domain: '.bandcamp.com'},
 
     platform: 'bandcamp',
-
-    compact: 'handle',
-    icon: 'bandcamp',
-
     handle: {domain: /^[^.]*/},
+
+    icon: 'bandcamp',
   },
 
   {
@@ -302,22 +283,18 @@ export const externalLinkSpec = [
     },
 
     platform: 'bluesky',
-
-    compact: 'handle',
-    icon: 'bluesky',
-
     handle: {pathname: /^profile\/([^/]+?)(?:\.bsky\.social)?\/?$/},
+
+    icon: 'bluesky',
   },
 
   {
     match: {domain: '.carrd.co'},
 
     platform: 'carrd',
-
-    compact: 'handle',
-    icon: 'carrd',
-
     handle: {domain: /^[^.]*/},
+
+    icon: 'carrd',
   },
 
   {
@@ -342,11 +319,9 @@ export const externalLinkSpec = [
     match: {domain: '.itch.io'},
 
     platform: 'itch',
-
-    compact: 'handle',
-    icon: 'itch',
-
     handle: {domain: /^[^.]*/},
+
+    icon: 'itch',
   },
 
   {
@@ -356,11 +331,9 @@ export const externalLinkSpec = [
     },
 
     platform: 'itch',
+    handle: {pathname: /^profile\/(.+)\/?$/},
 
-    compact: 'handle',
     icon: 'itch',
-
-    handle: {pathname: /^profile\/(.+)\/?$/}
   },
 
   {
@@ -370,11 +343,9 @@ export const externalLinkSpec = [
     },
 
     platform: 'kofi',
-
-    compact: 'handle',
-    icon: 'kofi',
-
     handle: {pathname: /^(.+)\/?/},
+
+    icon: 'kofi',
   },
 
   {
@@ -383,13 +354,10 @@ export const externalLinkSpec = [
       pathname: /^wiki\/.+\/?$/,
     },
 
-    platform: 'fandom',
-    substring: 'mspaintadventures.page',
+    platform: 'fandom.mspaintadventures',
 
-    normal: 'custom',
-    icon: 'globe',
-
-    custom: {
+    detail: {
+      substring: 'page',
       page: {
         pathname: /^wiki\/(.+)\/?$/,
         transform: [
@@ -398,13 +366,14 @@ export const externalLinkSpec = [
         ],
       },
     },
+
+    icon: 'globe',
   },
 
   {
     match: {domain: 'mspaintadventures.fandom.com'},
 
-    platform: 'fandom',
-    substring: 'mspaintadventures',
+    platform: 'fandom.mspaintadventures',
 
     icon: 'globe',
   },
@@ -437,20 +406,17 @@ export const externalLinkSpec = [
     match: {domains: ['tiktok.com']},
 
     platform: 'tiktok',
-
-    compact: 'handle',
-    icon: 'tiktok',
-
     handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+
+    icon: 'tiktok',
   },
 
   {
     match: {domains: ['types.pl']},
 
     platform: 'mastodon',
+    handle: {domain: /.+/},
 
-    normal: 'domain',
-    compact: 'domain',
     icon: 'mastodon',
   },
 
@@ -458,9 +424,8 @@ export const externalLinkSpec = [
     match: {domain: '.neocities.org'},
 
     platform: 'neocities',
+    handle: {domain: /.+/},
 
-    normal: 'domain',
-    compact: 'domain',
     icon: 'globe',
   },
 
@@ -486,11 +451,9 @@ export const externalLinkSpec = [
     match: {domain: 'soundcloud.com'},
 
     platform: 'soundcloud',
-
-    compact: 'handle',
-    icon: 'soundcloud',
-
     handle: /([^/]*)\/?$/,
+
+    icon: 'soundcloud',
   },
 
   {
@@ -503,33 +466,27 @@ export const externalLinkSpec = [
     match: {domain: '.tumblr.com'},
 
     platform: 'tumblr',
-
-    compact: 'handle',
-    icon: 'tumblr',
-
     handle: {domain: /^[^.]*/},
+
+    icon: 'tumblr',
   },
 
   {
     match: {domain: 'twitch.tv'},
 
     platform: 'twitch',
-
-    compact: 'handle',
-    icon: 'twitch',
-
     handle: {pathname: /^(.+)\/?/},
+
+    icon: 'twitch',
   },
 
   {
     match: {domain: 'twitter.com'},
 
     platform: 'twitter',
-
-    compact: 'handle',
-    icon: 'twitter',
-
     handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+
+    icon: 'twitter',
   },
 
   {
@@ -725,147 +682,71 @@ export function extractAllCustomPartsFromExternalLink(url, custom) {
 export function getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language}) {
   const prefix = 'misc.external';
 
-  function getPlatform() {
-    return language.$(prefix, descriptor.platform);
-  }
+  function getDetail() {
+    if (!descriptor.detail) {
+      return null;
+    }
 
-  function getPlatformOrDomain() {
-    // The fallback descriptor has a "platform" which is just
-    // the word "External". This isn't really useful when you're
-    // looking for platform info! Compact mode shows the domain.
-    if (descriptor === fallbackDescriptor) {
-      return getCompactDomain();
+    if (typeof descriptor.detail === 'string') {
+      return language.$(prefix, descriptor.platform, descriptor.detail);
     } else {
-      return getPlatform();
+      const {substring, ...rest} = descriptor.detail;
+
+      const opts =
+        withEntries(rest, entries => entries
+          .map(([key, value]) => [
+            key,
+            extractPartFromExternalLink(url, value),
+          ]));
+
+      return language.$(prefix, descriptor.platform, substring, opts);
     }
-  }
-
-  function getDomain() {
-    return urlParts(url).domain;
-  }
-
-  function getCompactDomain() {
-    const domain = getDomain();
-
-    if (!domain) {
-      return null;
-    }
-
-    return language.sanitize(domain.replace(/^www\./, ''));
-  }
-
-  function getCustom() {
-    if (!descriptor.custom) {
-      return null;
-    }
-
-    const customParts =
-      extractAllCustomPartsFromExternalLink(url, descriptor.custom);
-
-    if (!customParts) {
-      return null;
-    }
-
-    return language.$(prefix, descriptor.platform, descriptor.substring, customParts);
-  }
-
-  function getHandle() {
-    if (!descriptor.handle) {
-      return null;
-    }
-
-    return extractPartFromExternalLink(url, descriptor.handle);
-  }
-
-  function getNormal() {
-    if (descriptor.custom) {
-      if (descriptor.normal === 'custom') {
-        return getCustom();
-      } else {
-        return null;
-      }
-    }
-
-    if (descriptor.normal === 'domain') {
-      const platform = getPlatform();
-      const domain = getDomain();
-
-      if (!platform || !domain) {
-        return null;
-      }
-
-      return language.$(prefix, 'withDomain', {platform, domain});
-    }
-
-    if (descriptor.normal === 'handle') {
-      const platform = getPlatform();
-      const handle = getHandle();
-
-      if (!platform || !handle) {
-        return null;
-      }
-
-      return language.$(prefix, 'withHandle', {platform, handle});
-    }
-
-    return language.$(prefix, descriptor.platform, descriptor.substring);
-  }
-
-  function getCompact() {
-    if (descriptor.custom) {
-      if (descriptor.compact === 'custom') {
-        return getCustom();
-      } else {
-        return null;
-      }
-    }
-
-    if (descriptor.compact === 'domain') {
-      return getCompactDomain();
-    }
-
-    if (descriptor.compact === 'handle') {
-      const handle = getHandle();
-
-      if (!handle) {
-        return null;
-      }
-
-      return language.sanitize(handle);
-    }
-  }
-
-  function getIconId() {
-    return descriptor.icon ?? null;
   }
 
   switch (style) {
-    case 'normal': return getNormal();
-    case 'compact': return getCompact();
-    case 'platform': return getPlatformOrDomain();
-    case 'icon-id': return getIconId();
+    case 'platform': {
+      if (descriptor === fallbackDescriptor) {
+        // The fallback descriptor has a "platform" which is just
+        // the word "External". This isn't really useful when you're
+        // looking for platform info!
+        const domain = urlParts(url).domain;
+        if (domain) {
+          return language.sanitize(domain.replace(/^www\./, ''));
+        } else {
+          return language.$(prefix, descriptor.platform);
+        }
+      } else if (descriptor.detail) {
+        return getDetail();
+      } else {
+        return language.$(prefix, descriptor.platform);
+      }
+    }
+
+    case 'handle': {
+      if (descriptor.handle) {
+        return extractPartFromExternalLink(url, descriptor.handle);
+      } else {
+        return null;
+      }
+    }
+
+    case 'icon-id': {
+      if (descriptor.icon) {
+        return descriptor.icon;
+      } else {
+        return null;
+      }
+    }
   }
 }
 
 export function couldDescriptorSupportStyle(descriptor, style) {
-  if (style === 'normal') {
-    if (descriptor.custom) {
-      return descriptor.normal === 'custom';
-    } else {
-      return true;
-    }
-  }
-
-  if (style === 'compact') {
-    if (descriptor.custom) {
-      return descriptor.compact === 'custom';
-    } else {
-      return !!descriptor.compact;
-    }
-  }
-
   if (style === 'platform') {
     return true;
+  }
+
+  if (style === 'handle') {
+    return !!descriptor.handle;
   }
 
   if (style === 'icon-id') {

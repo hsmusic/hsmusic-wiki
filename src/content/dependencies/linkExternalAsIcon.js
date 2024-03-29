@@ -21,8 +21,8 @@ export default {
     const format = style =>
       language.formatExternalLink(data.url, {style, context: slots.context});
 
-    const normalText = format('normal');
-    const compactText = format('compact');
+    const platformText = format('platform');
+    const handleText = format('handle');
     const iconId = format('icon-id');
 
     return html.tag('a', {class: 'icon'},
@@ -34,7 +34,7 @@ export default {
       [
         html.tag('svg', [
           !slots.withText &&
-            html.tag('title', normalText),
+            html.tag('title', platformText),
 
           html.tag('use', {
             href: to('shared.staticIcon', iconId),
@@ -43,7 +43,7 @@ export default {
 
         slots.withText &&
           html.tag('span', {class: 'icon-text'},
-            compactText ?? normalText),
+            handleText ?? platformText),
       ]);
   },
 };

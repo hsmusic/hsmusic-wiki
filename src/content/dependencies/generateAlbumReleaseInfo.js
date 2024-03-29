@@ -96,17 +96,14 @@ export default {
               language.formatDisjunctionList(
                 relations.externalLinks
                   .map(link =>
-                    link.slots({
-                      context: [
-                        'album',
-                        (data.numTracks === 0
-                          ? 'albumNoTracks'
-                       : data.numTracks === 1
-                          ? 'albumOneTrack'
-                          : 'albumMultipleTracks'),
-                      ],
-                      style: 'normal',
-                    }))),
+                    link.slot('context', [
+                      'album',
+                      (data.numTracks === 0
+                        ? 'albumNoTracks'
+                     : data.numTracks === 1
+                        ? 'albumOneTrack'
+                        : 'albumMultipleTracks'),
+                    ]))),
           })),
     ]);
   },

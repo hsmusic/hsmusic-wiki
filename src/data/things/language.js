@@ -522,7 +522,7 @@ export class Language extends Thing {
   }
 
   formatExternalLink(url, {
-    style = 'normal',
+    style = 'platform',
     context = 'generic',
   } = {}) {
     if (!this.externalLinkSpec) {
