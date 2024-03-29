@@ -247,6 +247,34 @@ export const externalLinkSpec = [
   // Generic domains, sorted alphabetically (by string)
 
   {
+    match: {domains: ['music.apple.com']},
+    platform: 'appleMusic',
+    icon: 'globe',
+  },
+
+  {
+    match: {domains: ['artstation.com']},
+
+    platform: 'artstation',
+
+    compact: 'handle',
+    icon: 'globe',
+
+    handle: {pathname: /^[^/]*/},
+  },
+
+  {
+    match: {domains: ['.artstation.com']},
+
+    platform: 'artstation',
+
+    compact: 'handle',
+    icon: 'globe',
+
+    handle: {domain: /^[^.]*/},
+  },
+
+  {
     match: {domains: ['bc.s3m.us', 'music.solatrus.com']},
 
     platform: 'bandcamp',
@@ -263,6 +291,31 @@ export const externalLinkSpec = [
 
     compact: 'handle',
     icon: 'bandcamp',
+
+    handle: {domain: /^[^.]*/},
+  },
+
+  {
+    match: {
+      domain: 'bsky.app',
+      pathname: /^profile\/[^/]+\/?/,
+    },
+
+    platform: 'bluesky',
+
+    compact: 'handle',
+    icon: 'bluesky',
+
+    handle: {pathname: /^profile\/([^/]+?)(?:\.bsky\.social)?\/?$/},
+  },
+
+  {
+    match: {domain: '.carrd.co'},
+
+    platform: 'carrd',
+
+    compact: 'handle',
+    icon: 'carrd',
 
     handle: {domain: /^[^.]*/},
   },
@@ -286,9 +339,48 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: '.itch.io'},
+
+    platform: 'itch',
+
+    compact: 'handle',
+    icon: 'itch',
+
+    handle: {domain: /^[^.]*/},
+  },
+
+  {
+    match: {
+      domain: 'itch.io',
+      pathname: /^profile\/.+\/?$/,
+    },
+
+    platform: 'itch',
+
+    compact: 'handle',
+    icon: 'itch',
+
+    handle: {pathname: /^profile\/(.+)\/?$/}
+  },
+
+  {
+    match: {
+      domain: 'ko-fi.com',
+      pathname: /^.+\/?/,
+    },
+
+    platform: 'kofi',
+
+    compact: 'handle',
+    icon: 'kofi',
+
+    handle: {pathname: /^(.+)\/?/},
+  },
+
+  {
     match: {
       domain: 'mspaintadventures.fandom.com',
-      pathname: /^wiki\/(.+)\/?$/,
+      pathname: /^wiki\/.+\/?$/,
     },
 
     platform: 'fandom',
@@ -342,6 +434,17 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domains: ['tiktok.com']},
+
+    platform: 'tiktok',
+
+    compact: 'handle',
+    icon: 'tiktok',
+
+    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+  },
+
+  {
     match: {domains: ['types.pl']},
 
     platform: 'mastodon',
@@ -349,6 +452,16 @@ export const externalLinkSpec = [
     normal: 'domain',
     compact: 'domain',
     icon: 'mastodon',
+  },
+
+  {
+    match: {domain: '.neocities.org'},
+
+    platform: 'neocities',
+
+    normal: 'domain',
+    compact: 'domain',
+    icon: 'globe',
   },
 
   {
@@ -398,6 +511,17 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'twitch.tv'},
+
+    platform: 'twitch',
+
+    compact: 'handle',
+    icon: 'twitch',
+
+    handle: {pathname: /^(.+)\/?/},
+  },
+
+  {
     match: {domain: 'twitter.com'},
 
     platform: 'twitter',
@@ -405,10 +529,7 @@ export const externalLinkSpec = [
     compact: 'handle',
     icon: 'twitter',
 
-    handle: {
-      prefix: '@',
-      pathname: /^@?([a-zA-Z0-9_]*)\/?$/,
-    },
+    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
   },
 
   {

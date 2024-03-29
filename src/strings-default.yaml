@@ -506,11 +506,16 @@ misc:
 
     local: "Wiki Archive (local upload)"
 
+    appleMusic: "Apple Music"
+    artstation: "ArtStation"
     bandcamp: "Bandcamp"
 
     bgreco:
       _: "bgreco.net"
       flash: "bgreco.net (high quality audio)"
+
+    bluesky: "Bluesky"
+    carrd: "Carrd"
 
     deconreconstruction:
       _: "Deconreconstruction"
@@ -531,13 +536,18 @@ misc:
       secretPage: "Homestuck (secret page)"
 
     instagram: "Instagram"
+    itch: "itch.io"
+    kofi: "Ko-fi"
     mastodon: "Mastodon"
+    neocities: "Neocities"
     newgrounds: "Newgrounds"
     patreon: "Patreon"
     poetryFoundation: "Poetry Foundation"
     soundcloud: "SoundCloud"
     spotify: "Spotify"
+    tiktok: "TikTok"
     tumblr: "Tumblr"
+    twitch: "Twitch"
     twitter: "Twitter"
     wikipedia: "Wikipedia"
 
