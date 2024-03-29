@@ -453,6 +453,10 @@ misc:
     # Combination of above.
     withContribution.withExternalLinks: "{ARTIST} ({CONTRIB}) ({LINKS})"
 
+    # Displayed in an artist's tooltip, if one of their URLs
+    # isn't a specially detected web platform.
+    noExternalLinkPlatformName: "Other"
+
   # chronology:
   #
   #   "Chronology links" are a section that appear in the nav bar for

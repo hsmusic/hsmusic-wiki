@@ -78,18 +78,33 @@ export default {
                   stitchArrays({
                     icon: relations.artistIcons,
                     url: data.urls,
-                  }).map(({icon, url}) => [
-                      icon.slots({
+                  }).map(({icon, url}) => {
+                      icon.setSlots({
                         context: 'artist',
                         withText: true,
-                      }),
+                      });
 
-                      html.tag('span', {class: 'icon-platform'},
+                      let platformText =
                         language.formatExternalLink(url, {
                           context: 'artist',
                           style: 'platform',
-                        })),
-                    ]),
+                        });
+
+                      // This is a pretty ridiculous hack, but we currently
+                      // don't have a way of telling formatExternalLink to *not*
+                      // use the fallback string, which just formats the URL as
+                      // its host/domain... so is technically detectable.
+                      if (platformText.toString() === (new URL(url)).host) {
+                        platformText =
+                          language.$('misc.artistLink.noExternalLinkPlatformName');
+                      }
+
+                      const platformSpan =
+                        html.tag('span', {class: 'icon-platform'},
+                          platformText);
+
+                      return [icon, platformSpan];
+                    }),
               }),
           })
         : relations.artistLink);
