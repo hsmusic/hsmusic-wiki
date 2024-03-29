@@ -897,15 +897,13 @@ export function getExternalLinkStringOfStyleFromDescriptors(url, style, descript
 }
 
 export function getExternalLinkStringsFromDescriptor(url, descriptor, {language}) {
-  const getStyle = style =>
-    getExternalLinkStringOfStyleFromDescriptor(url, style, descriptor, {language});
-
-  return {
-    'normal': getStyle('normal'),
-    'compact': getStyle('compact'),
-    'platform': getStyle('platform'),
-    'icon-id': getStyle('icon-id'),
-  };
+  return (
+    Object.fromEntries(
+      externalLinkStyles.map(style =>
+        getExternalLinkStringOfStyleFromDescriptor(
+          url,
+          style,
+          descriptor, {language}))));
 }
 
 export function getExternalLinkStringsFromDescriptors(url, descriptors, {
