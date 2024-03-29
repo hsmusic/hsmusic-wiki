@@ -612,6 +612,16 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
     return urlParts(url).domain;
   }
 
+  function getCompactDomain() {
+    const domain = getDomain();
+
+    if (!domain) {
+      return null;
+    }
+
+    return language.sanitize(domain.replace(/^www\./, ''));
+  }
+
   function getCustom() {
     if (!descriptor.custom) {
       return null;
@@ -679,13 +689,7 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
     }
 
     if (descriptor.compact === 'domain') {
-      const domain = getDomain();
-
-      if (!domain) {
-        return null;
-      }
-
-      return language.sanitize(domain.replace(/^www\./, ''));
+      return getCompactDomain();
     }
 
     if (descriptor.compact === 'handle') {
