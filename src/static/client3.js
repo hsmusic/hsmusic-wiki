@@ -1075,6 +1075,11 @@ const hoverableTooltipInfo = initInfo('hoverableTooltipInfo', {
     currentTouchIdentifiers: new Set(),
     touchIdentifiersBanishedByScrolling: new Set(),
   },
+
+  event: {
+    whenTooltipShows: [],
+    whenTooltipHides: [],
+  },
 });
 
 // Adds DOM event listeners, so must be called during addPageListeners step.
@@ -1476,7 +1481,7 @@ function endTransitioningTooltipHidden() {
 }
 
 function hideCurrentlyShownTooltip(intendingToReplace = false) {
-  const {settings, state} = hoverableTooltipInfo;
+  const {settings, state, event} = hoverableTooltipInfo;
   const {currentlyShownTooltip: tooltip} = state;
 
   // If there was no tooltip to begin with, we're functionally in the desired
@@ -1516,11 +1521,15 @@ function hideCurrentlyShownTooltip(intendingToReplace = false) {
     state.tooltipWasJustHidden = false;
   });
 
+  dispatchInternalEvent(event, 'whenTooltipHides', {
+    tooltip,
+  });
+
   return true;
 }
 
 function showTooltipFromHoverable(hoverable) {
-  const {state} = hoverableTooltipInfo;
+  const {state, event} = hoverableTooltipInfo;
   const {tooltip} = state.registeredHoverables.get(hoverable);
 
   if (!hideCurrentlyShownTooltip(true)) return false;
@@ -1540,6 +1549,10 @@ function showTooltipFromHoverable(hoverable) {
   state.currentlyActiveHoverable = hoverable;
 
   state.tooltipWasJustHidden = false;
+
+  dispatchInternalEvent(event, 'whenTooltipShows', {
+    tooltip,
+  });
 
   return true;
 }
