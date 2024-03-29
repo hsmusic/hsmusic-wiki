@@ -3,6 +3,7 @@ import {empty, stitchArrays, withEntries} from '#sugar';
 import {
   anyOf,
   is,
+  isBoolean,
   isObject,
   isStringNonEmpty,
   looseArrayOf,
@@ -98,6 +99,8 @@ export const isExternalLinkSpec =
 
             substring: isStringNonEmpty,
           }))),
+
+      unusualDomain: optional(isBoolean),
 
       icon: optional(isStringNonEmpty),
     }));
@@ -263,6 +266,7 @@ export const externalLinkSpec = [
 
     platform: 'bandcamp',
     handle: {domain: /.+/},
+    unusualDomain: true,
 
     icon: 'bandcamp',
   },
@@ -416,6 +420,7 @@ export const externalLinkSpec = [
 
     platform: 'mastodon',
     handle: {domain: /.+/},
+    unusualDomain: true,
 
     icon: 'mastodon',
   },
@@ -705,20 +710,24 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
 
   switch (style) {
     case 'platform': {
+      const platform = language.$(prefix, descriptor.platform);
+      const domain = urlParts(url).domain;
+
       if (descriptor === fallbackDescriptor) {
         // The fallback descriptor has a "platform" which is just
         // the word "External". This isn't really useful when you're
         // looking for platform info!
-        const domain = urlParts(url).domain;
         if (domain) {
           return language.sanitize(domain.replace(/^www\./, ''));
         } else {
-          return language.$(prefix, descriptor.platform);
+          return platform;
         }
       } else if (descriptor.detail) {
         return getDetail();
+      } else if (descriptor.unusualDomain && domain) {
+        return language.$(prefix, 'withDomain', {platform, domain});
       } else {
-        return language.$(prefix, descriptor.platform);
+        return platform;
       }
     }
 
