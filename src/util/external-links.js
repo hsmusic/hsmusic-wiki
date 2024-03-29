@@ -608,6 +608,17 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
     return language.$(prefix, descriptor.platform);
   }
 
+  function getPlatformOrDomain() {
+    // The fallback descriptor has a "platform" which is just
+    // the word "External". This isn't really useful when you're
+    // looking for platform info! Compact mode shows the domain.
+    if (descriptor === fallbackDescriptor) {
+      return getCompactDomain();
+    } else {
+      return getPlatform();
+    }
+  }
+
   function getDomain() {
     return urlParts(url).domain;
   }
@@ -710,7 +721,7 @@ export function getExternalLinkStringOfStyleFromDescriptor(url, style, descripto
   switch (style) {
     case 'normal': return getNormal();
     case 'compact': return getCompact();
-    case 'platform': return getPlatform();
+    case 'platform': return getPlatformOrDomain();
     case 'icon-id': return getIconId();
   }
 }
