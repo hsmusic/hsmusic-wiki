@@ -1642,7 +1642,7 @@ function getTooltipFromHoverablePlacementOpportunityAreas(hoverable) {
     getTooltipBaselineOpportunityAreas(tooltip);
 
   const hoverableRect =
-    WikiRect.fromElement(hoverable).toExtended(5, 10);
+    WikiRect.fromElementUnderMouse(hoverable).toExtended(5, 10);
 
   const tooltipRect =
     peekTooltipClientRect(tooltip);
