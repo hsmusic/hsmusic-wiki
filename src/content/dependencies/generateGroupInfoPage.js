@@ -137,7 +137,10 @@ export default {
                 links:
                   language.formatDisjunctionList(
                     sec.info.visitLinks
-                      .map(link => link.slot('context', 'group'))),
+                      .map(link => link.slots({
+                        context: 'group',
+                        style: 'platform',
+                      }))),
               })),
 
           html.tag('blockquote',
