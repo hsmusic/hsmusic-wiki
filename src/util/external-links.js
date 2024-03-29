@@ -529,7 +529,7 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
       // "www" is never an acceptable subdomain for this purpose.
       // Sorry to people whose usernames are www!!
       if (domain.startsWith('www.')) {
-        break matchSubdomain;
+        return false;
       }
 
       return domain.endsWith(string);
