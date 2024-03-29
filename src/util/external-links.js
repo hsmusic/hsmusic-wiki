@@ -563,28 +563,33 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
 
   const matchingDescriptors =
     descriptors
-      .filter(({match}) => {
-        if (match.domain) return compareDomain(match.domain);
-        if (match.domains) return match.domains.some(compareDomain);
-        return false;
-      })
-      .filter(({match}) => {
-        if (Array.isArray(match.context))
-          return match.context.some(c => contextArray.includes(c));
-        if (match.context)
-          return contextArray.includes(match.context);
-        return true;
-      })
-      .filter(({match}) => {
-        if (match.pathname) return comparePathname(match.pathname);
-        if (match.pathnames) return match.pathnames.some(comparePathname);
-        return true;
-      })
-      .filter(({match}) => {
-        if (match.query) return compareQuery(match.query);
-        if (match.queries) return match.quieries.some(compareQuery);
-        return true;
-      });
+      .filter(({match}) =>
+        (match.domain
+          ? compareDomain(match.domain)
+       : match.domains
+          ? match.domains.some(compareDomain)
+          : false))
+
+      .filter(({match}) =>
+        (Array.isArray(match.context)
+          ? match.context.some(c => contextArray.includes(c))
+       : match.context
+          ? contextArray.includes(match.context)
+          : true))
+
+      .filter(({match}) =>
+        (match.pathname
+          ? comparePathname(match.pathname)
+       : match.pathnames
+          ? match.pathnames.some(comparePathname)
+          : true))
+
+      .filter(({match}) =>
+        (match.query
+          ? compareQuery(match.query)
+       : match.queries
+          ? match.quieries.some(compareQuery)
+          : true));
 
   return [...matchingDescriptors, fallbackDescriptor];
 }
