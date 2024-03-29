@@ -443,7 +443,24 @@ export function getMatchingDescriptorsForExternalLink(url, descriptors, {
 } = {}) {
   const {domain, pathname, query} = urlParts(url);
 
-  const compareDomain = string => domain.includes(string);
+  const compareDomain = string => {
+    // A dot at the start of the descriptor's domain indicates
+    // we're looking to match a subdomain.
+    if (string.startsWith('.')) matchSubdomain: {
+      // "www" is never an acceptable subdomain for this purpose.
+      // Sorry to people whose usernames are www!!
+      if (domain.startsWith('www.')) {
+        break matchSubdomain;
+      }
+
+      return domain.endsWith(string);
+    }
+
+    // No dot means we're looking for an exact/full domain match.
+    // But let "www" pass here too, implicitly.
+    return domain === string || domain === 'www.' + string;
+  };
+
   const comparePathname = regex => regex.test(pathname.slice(1));
   const compareQuery = regex => regex.test(query.slice(1));
 
