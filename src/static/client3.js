@@ -193,6 +193,34 @@ class WikiRect extends DOMRect {
     return this.fromRect(element.getBoundingClientRect());
   }
 
+  static fromMouse() {
+    const {clientX, clientY} = liveMousePositionInfo.state;
+
+    return WikiRect.fromRect({
+      x: clientX,
+      y: clientY,
+      width: 0,
+      height: 0,
+    });
+  }
+
+  static fromElementUnderMouse(element) {
+    const mouseRect = WikiRect.fromMouse();
+
+    const rects =
+      Array.from(element.getClientRects())
+        .map(rect => WikiRect.fromRect(rect));
+
+    const rectUnderMouse =
+      rects.find(rect => rect.contains(mouseRect));
+
+    if (rectUnderMouse) {
+      return rectUnderMouse;
+    } else {
+      return rects[0];
+    }
+  }
+
   static leftOf(origin, offset = 0) {
     // Returns a rectangle representing everywhere to the left of the provided
     // point or rectangle (with no top or bottom bounds), towards negative x.
