@@ -383,7 +383,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'fandom.com'},
+    match: {domains: ['fandom.com', '.fandom.com']},
     platform: 'fandom',
     icon: 'globe',
   },
@@ -435,6 +435,15 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: '.newgrounds.com'},
+
+    platform: 'newgrounds',
+    handle: {domain: /^[^.]+/},
+
+    icon: 'newgrounds',
+  },
+
+  {
     match: {domain: 'newgrounds.com'},
     platform: 'newgrounds',
     icon: 'newgrounds',
@@ -462,7 +471,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'spotify.com'},
+    match: {domains: ['spotify.com', 'open.spotify.com']},
     platform: 'spotify',
     icon: 'globe',
   },
@@ -495,7 +504,7 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'wikipedia.org'},
+    match: {domains: ['wikipedia.org', '.wikipedia.org']},
     platform: 'wikipedia',
     icon: 'misc',
   },
