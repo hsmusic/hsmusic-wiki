@@ -689,6 +689,29 @@ function mutateCSSCompatibilityContent() {
 clientSteps.getPageReferences.push(getCSSCompatibilityAssistantInfoReferences);
 clientSteps.mutatePageContent.push(mutateCSSCompatibilityContent);
 
+// Ever-updating mouse position helper --------------------
+
+const liveMousePositionInfo = initInfo('liveMousePositionInfo', {
+  state: {
+    clientX: null,
+    clientY: null,
+  },
+});
+
+function addLiveMousePositionPageListeners() {
+  const info = liveMousePositionInfo;
+  const {state} = info;
+
+  document.body.addEventListener('mousemove', domEvent => {
+    Object.assign(state, {
+      clientX: domEvent.clientX,
+      clientY: domEvent.clientY,
+    });
+  });
+}
+
+clientSteps.addPageListeners.push(addLiveMousePositionPageListeners);
+
 // JS-based links -----------------------------------------
 
 const scriptedLinkInfo = initInfo('scriptedLinkInfo', {
