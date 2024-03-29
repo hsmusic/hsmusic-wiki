@@ -1,4 +1,4 @@
-import {empty} from '#sugar';
+import {empty, stitchArrays} from '#sugar';
 
 export default {
   contentDependencies: [
@@ -34,6 +34,7 @@ export default {
   data(contribution) {
     return {
       what: contribution.what,
+      urls: contribution.who.urls,
     };
   },
 
@@ -74,12 +75,21 @@ export default {
                   {[html.joinChildren]: ''},
 
                 content:
-                  relations.artistIcons
-                    .map(icon =>
+                  stitchArrays({
+                    icon: relations.artistIcons,
+                    url: data.urls,
+                  }).map(({icon, url}) => [
                       icon.slots({
                         context: 'artist',
                         withText: true,
-                      })),
+                      }),
+
+                      html.tag('span', {class: 'icon-platform'},
+                        language.formatExternalLink(url, {
+                          context: 'artist',
+                          style: 'platform',
+                        })),
+                    ]),
               }),
           })
         : relations.artistLink);

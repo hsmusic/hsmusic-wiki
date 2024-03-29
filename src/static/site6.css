@@ -594,6 +594,48 @@ li:not(:first-child:last-child) .tooltip,
           user-select: none;
 
   cursor: default;
+
+  display: grid;
+
+  grid-template-columns:
+    [icon-start] auto [icon-end domain-start] auto [domain-end];
+}
+
+.icons-tooltip .icon {
+  grid-column-start: icon-start;
+  grid-column-end: icon-end;
+}
+
+.icons-tooltip .icon-platform {
+  display: none;
+
+  grid-column-start: domain-start;
+  grid-column-end: domain-end;
+
+  --icon-platform-opacity: 0.8;
+  padding-right: 4px;
+  opacity: 0.8;
+}
+
+.icons-tooltip.show-info .icon-platform {
+  display: inline;
+  animation: icon-platform 0.2s forwards linear;
+}
+
+@keyframes icon-platform {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: var(--icon-platform-opacity);
+  }
+}
+
+.icons-tooltip .icon:hover + .icon-platform {
+  --icon-platform-opacity: 1;
+  text-decoration: underline;
+  text-decoration-color: #ffffffaa;
 }
 
 .datetimestamp-tooltip .tooltip-content,
