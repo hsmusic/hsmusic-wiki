@@ -25,16 +25,32 @@ export default {
     },
   },
 
-  generate: (data, slots, {html, language}) =>
-    html.tag('a',
-      {href: data.url},
-      {class: 'nowrap'},
-
-      slots.tab === 'separate' &&
-        {target: '_blank'},
-
+  generate(data, slots, {html, language}) {
+    let formattedText =
       language.formatExternalLink(data.url, {
         style: slots.style,
         context: slots.context,
-      })),
+      });
+
+    // Fall back to platform if nothing matched the desired style.
+    if (!formattedText && slots.style !== 'platform') {
+      formattedText =
+        language.formatExternalLink(data.url, {
+          style: 'platform',
+          context: slots.context,
+        });
+    }
+
+    const link =
+      html.tag('a', formattedText);
+
+    link.attributes.set('href', data.url);
+    link.attributes.set('class', 'nowrap');
+
+    if (slots.tab === 'separate') {
+      link.attributes.set('target', '_blank');
+    }
+
+    return link;
+  },
 };
