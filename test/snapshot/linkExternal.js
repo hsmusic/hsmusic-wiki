@@ -121,6 +121,11 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     // platform: mastodon
     'https://types.pl/',
 
+    // platform: mspfa
+    'https://canwc.mspfa.com/',
+    'https://mspfa.com/?s=12003&p=1045',
+    'https://mspfa.com/user/?u=103334508819793669241',
+
     // platform: neocities
     'https://wodaro.neocities.org',
     'https://neomints.neocities.org/',

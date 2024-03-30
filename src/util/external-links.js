@@ -462,6 +462,12 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domains: ['mspfa.com', '.mspfa.com']},
+    platform: 'mspfa',
+    icon: 'globe',
+  },
+
+  {
     match: {domain: '.neocities.org'},
 
     platform: 'neocities',

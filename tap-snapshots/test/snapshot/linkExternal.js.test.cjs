@@ -109,6 +109,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://ko-fi.com/gnaach" class="nowrap">gnaach</a>
 <a href="https://linktr.ee/bbpanzu" class="nowrap">bbpanzu</a>
 <a href="https://types.pl/" class="nowrap">types.pl</a>
+<a href="https://canwc.mspfa.com/" class="nowrap">MSPFA</a>
+<a href="https://mspfa.com/?s=12003&p=1045" class="nowrap">MSPFA</a>
+<a href="https://mspfa.com/user/?u=103334508819793669241" class="nowrap">MSPFA</a>
 <a href="https://wodaro.neocities.org" class="nowrap">wodaro.neocities.org</a>
 <a href="https://neomints.neocities.org/" class="nowrap">neomints.neocities.org</a>
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">buzinkai</a>
@@ -180,6 +183,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://ko-fi.com/gnaach" class="nowrap">Ko-fi</a>
 <a href="https://linktr.ee/bbpanzu" class="nowrap">Linktree</a>
 <a href="https://types.pl/" class="nowrap">Mastodon (types.pl)</a>
+<a href="https://canwc.mspfa.com/" class="nowrap">MSPFA</a>
+<a href="https://mspfa.com/?s=12003&p=1045" class="nowrap">MSPFA</a>
+<a href="https://mspfa.com/user/?u=103334508819793669241" class="nowrap">MSPFA</a>
 <a href="https://wodaro.neocities.org" class="nowrap">Neocities</a>
 <a href="https://neomints.neocities.org/" class="nowrap">Neocities</a>
 <a href="https://buzinkai.newgrounds.com/" class="nowrap">Newgrounds</a>
