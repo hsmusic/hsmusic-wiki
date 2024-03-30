@@ -213,7 +213,7 @@ export const externalLinkSpec = [
   {
     match: {domain: 'music.apple.com'},
     platform: 'appleMusic',
-    icon: 'globe',
+    icon: 'appleMusic',
   },
 
   {
@@ -530,7 +530,7 @@ export const externalLinkSpec = [
   {
     match: {domains: ['spotify.com', 'open.spotify.com']},
     platform: 'spotify',
-    icon: 'globe',
+    icon: 'spotify',
   },
 
   {
