@@ -26,29 +26,60 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     }
   };
 
+  // Try to comprehensively test every regular expression
+  // (in `match` and extractions like `handle` or `details`).
+
+  // For normal custom-domain matches (e.g. Mastodon),
+  // it's OK to just test one custom domain in the list.
+
+  // Generally match the sorting order in externalLinkSpec,
+  // so corresponding and missing test cases are easy to locate.
+
   quickSnapshotAllStyles('generic', [
-    'https://homestuck.bandcamp.com/',
-    'https://soundcloud.com/plazmataz',
-    'https://aeritus.tumblr.com/',
-    'https://twitter.com/awkwarddoesart',
-    'https://www.deviantart.com/chesswanderlust-sama',
-    'https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)',
-    'https://www.poetryfoundation.org/poets/christina-rossetti',
-    'https://www.instagram.com/levc_egm/',
-    'https://www.patreon.com/CecilyRenns',
-    'https://open.spotify.com/artist/63SNNpNOicDzG3LY82G4q3',
-    'https://buzinkai.newgrounds.com/',
-
-    // Just one custom domain of each platform is OK here
+    // platform: bandcamp
     'https://music.solatrus.com/',
-    'https://types.pl/',
+    'https://homestuck.bandcamp.com/',
 
-    'https://community.fandom.com/',
-    'https://community.fandom.com/wiki/',
-    'https://community.fandom.com/wiki/Community_Central',
+    // platform: deviantart
+    'https://www.deviantart.com/chesswanderlust-sama',
+
+    // platform: fandom
     'https://mspaintadventures.fandom.com/',
     'https://mspaintadventures.fandom.com/wiki/',
     'https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary',
+    'https://community.fandom.com/',
+    'https://community.fandom.com/wiki/',
+    'https://community.fandom.com/wiki/Community_Central',
+
+    // platform: instagram
+    'https://www.instagram.com/levc_egm/',
+
+    // platform: mastodon
+    'https://types.pl/',
+
+    // platform: newgrounds
+    'https://buzinkai.newgrounds.com/',
+
+    // platform: patreon
+    'https://www.patreon.com/CecilyRenns',
+
+    // platform: poetryFoundation
+    'https://www.poetryfoundation.org/poets/christina-rossetti',
+
+    // platform: soundcloud
+    'https://soundcloud.com/plazmataz',
+
+    // platform: spotify
+    'https://open.spotify.com/artist/63SNNpNOicDzG3LY82G4q3',
+
+    // platform: tumblr
+    'https://aeritus.tumblr.com/',
+
+    // platform: twitter
+    'https://twitter.com/awkwarddoesart',
+
+    // platform: wikipedia
+    'https://en.wikipedia.org/wiki/Haydn_Quartet_(vocal_ensemble)',
   ]);
 
   quickSnapshotAllStyles('album', [
