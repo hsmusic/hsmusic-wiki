@@ -456,6 +456,21 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'tumblr.com'},
+
+    platform: 'tumblr',
+    handle: {pathname: /^[^/]+\/?$/},
+
+    icon: 'tumblr',
+  },
+
+  {
+    match: {domain: 'tumblr.com'},
+    platform: 'tumblr',
+    icon: 'tumblr',
+  },
+
+  {
     match: {domain: 'twitch.tv'},
 
     platform: 'twitch',
@@ -470,6 +485,12 @@ export const externalLinkSpec = [
     platform: 'twitter',
     handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
 
+    icon: 'twitter',
+  },
+
+  {
+    match: {domain: 'twitter.com'},
+    platform: 'twitter',
     icon: 'twitter',
   },
 
