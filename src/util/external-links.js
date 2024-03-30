@@ -308,6 +308,30 @@ export const externalLinkSpec = [
   },
 
   {
+    match: {domain: 'facebook.com'},
+
+    platform: 'facebook',
+    handle: {pathname: /^([^/]+)\/?$/},
+
+    icon: 'facebook',
+  },
+
+  {
+    match: {domain: 'facebook.com'},
+
+    platform: 'facebook',
+    handle: {pathname: /^(?:pages|people)\/([^/]+)\/[0-9]+\/?$/},
+
+    icon: 'facebook',
+  },
+
+  {
+    match: {domain: 'facebook.com'},
+    platform: 'facebook',
+    icon: 'facebook',
+  },
+
+  {
     match: {domain: 'mspaintadventures.fandom.com'},
 
     platform: 'fandom.mspaintadventures',

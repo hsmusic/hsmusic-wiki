@@ -86,6 +86,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://culdhira.deviantart.com" class="nowrap">culdhira</a>
 <a href="https://www.deviantart.com/chesswanderlust-sama" class="nowrap">chesswanderlust-sama</a>
 <a href="https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606" class="nowrap">DeviantArt</a>
+<a href="https://www.facebook.com/DoomedCloud/" class="nowrap">DoomedCloud</a>
+<a href="https://www.facebook.com/pages/WoodenToaster/280642235307371" class="nowrap">WoodenToaster</a>
+<a href="https://www.facebook.com/Svixy/posts/400018786702633" class="nowrap">Facebook</a>
 <a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">MSPA Wiki (Draconian Dignitary)</a>
 <a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">MSPA Wiki</a>
 <a href="https://mspaintadventures.fandom.com/" class="nowrap">MSPA Wiki</a>
@@ -150,6 +153,9 @@ exports[`test/snapshot/linkExternal.js > TAP > linkExternal (snapshot) > context
 <a href="https://culdhira.deviantart.com" class="nowrap">DeviantArt</a>
 <a href="https://www.deviantart.com/chesswanderlust-sama" class="nowrap">DeviantArt</a>
 <a href="https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606" class="nowrap">DeviantArt</a>
+<a href="https://www.facebook.com/DoomedCloud/" class="nowrap">Facebook</a>
+<a href="https://www.facebook.com/pages/WoodenToaster/280642235307371" class="nowrap">Facebook</a>
+<a href="https://www.facebook.com/Svixy/posts/400018786702633" class="nowrap">Facebook</a>
 <a href="https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary" class="nowrap">MSPA Wiki (Draconian Dignitary)</a>
 <a href="https://mspaintadventures.fandom.com/wiki/" class="nowrap">MSPA Wiki</a>
 <a href="https://mspaintadventures.fandom.com/" class="nowrap">MSPA Wiki</a>

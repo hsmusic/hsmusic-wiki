@@ -72,6 +72,11 @@ testContentFunctions(t, 'linkExternal (snapshot)', async (t, evaluate) => {
     'https://www.deviantart.com/chesswanderlust-sama',
     'https://www.deviantart.com/shilloshilloh/art/Homestuck-Jake-English-268874606',
 
+    // platform: facebook
+    'https://www.facebook.com/DoomedCloud/',
+    'https://www.facebook.com/pages/WoodenToaster/280642235307371',
+    'https://www.facebook.com/Svixy/posts/400018786702633',
+
     // platform: fandom.mspaintadventures
     'https://mspaintadventures.fandom.com/wiki/Draconian_Dignitary',
     'https://mspaintadventures.fandom.com/wiki/',
