@@ -290,33 +290,6 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: '.itch.io'},
-
-    platform: 'itch',
-    handle: {domain: /^[^.]*/},
-
-    icon: 'itch',
-  },
-
-  {
-    match: {domain: 'itch.io'},
-
-    platform: 'itch',
-    handle: {pathname: /^profile\/(.+)\/?$/},
-
-    icon: 'itch',
-  },
-
-  {
-    match: {domain: 'ko-fi.com'},
-
-    platform: 'kofi',
-    handle: {pathname: /^(.+)\/?/},
-
-    icon: 'kofi',
-  },
-
-  {
     match: {domain: 'mspaintadventures.fandom.com'},
 
     platform: 'fandom.mspaintadventures',
@@ -356,24 +329,42 @@ export const externalLinkSpec = [
   },
 
   {
-    match: {domain: 'hsmusic.wiki'},
-    platform: 'local',
-    icon: 'globe',
-  },
-
-  {
     match: {domain: 'instagram.com'},
     platform: 'instagram',
     icon: 'instagram',
   },
 
   {
-    match: {domain: 'tiktok.com'},
+    match: {domain: '.itch.io'},
 
-    platform: 'tiktok',
-    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+    platform: 'itch',
+    handle: {domain: /^[^.]*/},
 
-    icon: 'tiktok',
+    icon: 'itch',
+  },
+
+  {
+    match: {domain: 'itch.io'},
+
+    platform: 'itch',
+    handle: {pathname: /^profile\/(.+)\/?$/},
+
+    icon: 'itch',
+  },
+
+  {
+    match: {domain: 'ko-fi.com'},
+
+    platform: 'kofi',
+    handle: {pathname: /^(.+)\/?/},
+
+    icon: 'kofi',
+  },
+
+  {
+    match: {domain: 'hsmusic.wiki'},
+    platform: 'local',
+    icon: 'globe',
   },
 
   {
@@ -444,6 +435,15 @@ export const externalLinkSpec = [
     match: {domains: ['spotify.com', 'open.spotify.com']},
     platform: 'spotify',
     icon: 'globe',
+  },
+
+  {
+    match: {domain: 'tiktok.com'},
+
+    platform: 'tiktok',
+    handle: {pathname: /^@?([a-zA-Z0-9_]*)\/?$/},
+
+    icon: 'tiktok',
   },
 
   {
